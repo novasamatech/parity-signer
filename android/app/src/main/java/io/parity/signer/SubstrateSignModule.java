@@ -264,6 +264,9 @@ public class SubstrateSignModule extends ReactContextBaseJavaModule {
 		in.close();
 	}
 
+
+	//react native section begin
+
 	@ReactMethod
 	public void qrCode(String data, Promise promise) {
 		try {
@@ -299,12 +302,24 @@ public class SubstrateSignModule extends ReactContextBaseJavaModule {
 	}
 
 	@ReactMethod
-	public void signTransaction(String action, String pin, String password, Promise promise) {
+	public void signTransaction(String action, String seedName, String password, Promise promise) {
 		try {
-			String signed = substrateSignTransaction(action, pin, password, dbname);
+			String encryptedSeedRecord = sharedPreferences.getString(seedName, null);
+			String seedPhrase = decryptSeed(encryptedSeedRecord);
+			String signed = substrateSignTransaction(action, seedPhrase, password, dbname);
 			promise.resolve(signed);
 		} catch (Exception e) {
 			rejectWithException(promise, "transaction signing", e);
+		}
+	}
+
+	@ReactMethod
+	public void handleTransaction(String action, Promise promise) {
+		try {
+			String signed = substrateSignTransaction(action, "", "", dbname);
+			promise.resolve(signed);
+		} catch (Exception e) {
+			rejectWithException(promise, "transaction handling", e);
 		}
 	}
 
@@ -483,11 +498,15 @@ public class SubstrateSignModule extends ReactContextBaseJavaModule {
 		}
 	}
 
+	//react native section end
+
+	//rust native section begin
+
 	private static native String ethkeyQrCode(String data);
 	private static native String qrparserTryDecodeQrSequence(int size, int chunkSize, String data);
 	private static native String metadataGenerateMetadataHandle(String metadata);
 	private static native String substrateParseTransaction(String transaction, String dbname);
-	private static native String substrateSignTransaction(String action, String pin, String password, String dbname);
+	private static native String substrateSignTransaction(String action, String seedPhrase, String password, String dbname);
 	private static native String substrateDevelopmentTest(String input);
 	private static native String dbGetAllNetworksForNetworkSelector(String dbname);
 	private static native String dbGetNetwork(String genesisHash, String dbname);
@@ -498,4 +517,6 @@ public class SubstrateSignModule extends ReactContextBaseJavaModule {
 	private static native void substrateTryCreateIdentity(String idName, String seedName, String seedPhrase, String crypto, String path, String network, boolean hasPassword, String dbname);
 	private static native String substrateSuggestName(String path);
 	private static native void substrateDeleteIdentity(String pubKey, String network, String dbname);
+
+	//rust native section end
 }

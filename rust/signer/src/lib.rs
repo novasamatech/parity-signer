@@ -94,11 +94,11 @@ export! {
     @Java_io_parity_signer_SubstrateSignModule_substrateSignTransaction
 	fn sign_transaction(
 		action: &str,
-        pin: &str,
+        seed_phrase: &str,
         password: &str,
         dbname: &str
 	) -> std::result::Result<String, Box<dyn std::error::Error>> {
-        transaction_signing::handle_action(action, pin, password, dbname)
+        transaction_signing::handle_action(action, seed_phrase, password, dbname)
     }
 
     @Java_io_parity_signer_SubstrateSignModule_substrateDevelopmentTest

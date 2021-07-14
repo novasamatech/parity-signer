@@ -14,10 +14,10 @@
 // You should have received a copy of the GNU General Public License
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
-import React, { useState } from 'react';
-import { Text, View } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { Text, View, ActivityIndicator } from 'react-native';
 
-import { SafeAreaScrollViewContainer } from 'components/SafeAreaContainer';
+import { SafeAreaScrollViewContainer, SafeAreaViewContainer } from 'components/SafeAreaContainer';
 import { KeyboardAwareContainer } from 'modules/unlock/components/Container';
 import PinInput from 'modules/unlock/components/PinInput';
 import ScreenHeading from 'components/ScreenHeading';
@@ -36,36 +36,57 @@ function SignedTx({
 	navigation
 }: NavigationProps<'SignedTx'>): React.ReactElement {
 	const [signedData, setSignedData] = useState<string>(''); //route.params.action.payload;
-	const [pin, setPin] = useState<string>('');
 	const [password, setPassword] = useState<string>('');
-	const [focusPassword, setFocusPassword] = useState<boolean>(false);
 	const [buttonDisabled, setButtonDisabled] = useState(false);
 	const [errorMessage, setErrorMessage] = useState<string>('');
+	const payload = route.params.payload;
+	const author = route.params.author;
+	const toSign = route.params ? JSON.stringify(route.params.payload) : '';
 
-	async function submit(): Promise<void> {
-		setButtonDisabled(true);
-		setFocusPassword(false);
-		if (pin.length >= 6) {
+	useEffect(() => {
+		console.log(author);
+		const generateSignedData = async (): void => {
+			console.log(author);
+			console.log(typeof author.seed);
+			console.log(toSign);
+			console.log(typeof toSign);
 			try {
-				console.log(pin);
-				console.log(typeof pin);
-				console.log(password);
-				console.log(typeof password);
-				const toSign = route.params ? JSON.stringify(route.params.payload) : '';
-				console.log(toSign);
-				console.log(typeof toSign);
 				const signerOutput = await sign(
 					toSign,
-					pin.toString(),
-					password.toString()
+					author.seed,
+					""
 				);
 				setSignedData(signerOutput);
 			} catch (e) {
 				console.log(e);
 				setErrorMessage(e.toString());
-				//TODO record error times;
 			}
-		} //TODO else { setAlert('pin too short (at least 6 numbers'); }
+		}
+		if (author.has_password === 'false') {
+			generateSignedData();
+		}
+	}, []);
+
+	async function submit(): Promise<void> {
+		setButtonDisabled(true);
+		try {
+			console.log(password);
+			console.log(typeof password);
+			console.log(author);
+			console.log(typeof author.seed);
+			console.log(toSign);
+			console.log(typeof toSign);
+			const signerOutput = await sign(
+				toSign,
+				author.seed,
+				password.toString()
+			);
+			setSignedData(signerOutput);
+		} catch (e) {
+			console.log(e);
+			setErrorMessage(e.toString());
+			//TODO record error times;
+		}
 	}
 
 	//IMPORTANT: nothing but QR code and address name should be shown here; showing address path is dangerous
@@ -86,9 +107,12 @@ function SignedTx({
 				<View style={styles.qr} testID={testIDs.SignedTx.qrView}>
 					<QrView data={signedData} />
 				</View>
+				<Text style={[fontStyles.h_subheading, { paddingHorizontal: 16 }]}>
+					{"Signed by: " + author.name + "; for seed: " + author.seed}
+				</Text>
 			</SafeAreaScrollViewContainer>
 		);
-	} else {
+	} else if (author.has_password === 'true') {
 		return (
 			<KeyboardAwareContainer
 				contentContainerStyle={{
@@ -96,27 +120,16 @@ function SignedTx({
 				}}
 			>
 				<ScreenHeading
-					title={t.title.pinUnlock}
+					title="Please enter password"
 					error={!!errorMessage}
 					subtitle={errorMessage}
 				/>
 				<PinInput
-					label={t.pinLabel}
-					autoFocus
-					testID={testIDs.IdentityPin.unlockPinInput}
-					onChangeText={(newInput: string): void => {
-						setButtonDisabled(false);
-						setPin(newInput);
-					}}
-					onSubmitEditing={(): void => setFocusPassword(true)}
-					value={pin}
-				/>
-				<PinInput
 					label={t.passwordLabel}
+					autoFocus
 					testID={testIDs.IdentityPin.passwordInput}
 					returnKeyType="done"
 					keyboardType="default"
-					focus={focusPassword}
 					onChangeText={(newInput: string): void => {
 						setButtonDisabled(false);
 						setPassword(newInput);
@@ -131,6 +144,22 @@ function SignedTx({
 					testID={testIDs.IdentityPin.unlockPinButton}
 				/>
 			</KeyboardAwareContainer>
+		);
+	} else {
+		return (
+			<SafeAreaViewContainer>
+				<ScreenHeading
+					title="Signed message not ready"
+					error={!!errorMessage}
+					subtitle={errorMessage}
+				/>
+				<ActivityIndicator
+					animating={true}
+					color="red"
+					size="large"
+					style={{margin:15}}
+				/>
+			</SafeAreaViewContainer>
 		);
 	}
 }

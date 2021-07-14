@@ -25,8 +25,10 @@ import testIDs from 'e2e/testIDs';
 import { NavigationProps } from 'types/props';
 import styles from 'modules/sign/styles';
 import Button from 'components/Button';
-import { makeTransactionCardsContents } from 'utils/native';
+import { makeTransactionCardsContents, accept } from 'utils/native';
 import PayloadCard from 'modules/sign/components/PayloadCard';
+import { AlertStateContext } from 'stores/alertContext';
+import { resetNavigationWithNetworkChooser } from 'utils/navigationHelpers';
 
 function DetailsTx({
 	route,
@@ -36,6 +38,8 @@ function DetailsTx({
 	const [payloadCards, setPayloadCards] = useState<PayloadCardData[]>([
 		{ indent: 0, index: 0, payload: {}, type: 'loading' }
 	]);
+	const { setAlert } = useContext(AlertStateContext);
+	const [author, setAuthor] = useState();
 	const [action, setAction] = useState<Action>({
 		payload: '',
 		type: ''
@@ -44,7 +48,7 @@ function DetailsTx({
 	useEffect(() => {
 		const generateCards = async function (encoded: string): Promise<void> {
 			const cardsSet = await makeTransactionCardsContents(encoded);
-
+			if (cardsSet.author) setAuthor(cardsSet.author[0].payload);
 			//TODO: here should be finer features on what to do
 			//with different payload types.
 			//
@@ -67,12 +71,12 @@ function DetailsTx({
 			setPayloadCards(
 				sortedCardSet
 					? sortedCardSet
-					: {
+					: [{
 							indent: 0,
 							index: 0,
 							payload: 'System error: transaction parser failed entirely',
 							type: 'error'
-					  }
+					  }]
 			);
 			if (cardsSet.action) setAction(cardsSet.action);
 		};
@@ -98,12 +102,14 @@ function DetailsTx({
 		);
 	};
 
-	const performAction = (): void => {
+	const performAction = async (): void => {
 		console.log(action);
 		if (action.type === 'sign_transaction') {
-			navigation.navigate('SignedTx', { payload: action.payload });
-		} else if (action.type === 'load_metadata') {
-			navigation.navigate('SignedTx', { payload: action.payload });
+			resetNavigationWithNetworkChooser(navigation, 'SignedTx', { payload: action.payload, author: author });
+		} else if (action.type) {
+			const acceptResult = await accept(JSON.stringify(action.payload));
+			setAlert('Accept result', acceptResult);
+			navigation.goBack();
 		} else {
 			navigation.goBack();
 		}
@@ -112,7 +118,7 @@ function DetailsTx({
 
 	return (
 		<SafeAreaViewContainer testID={testIDs.DetailsTx.detailsScreen}>
-			<Text style={styles.topTitle}>Extrinsic to sign</Text>
+			<Text style={styles.topTitle}>Payload</Text>
 			<FlatList
 				data={payloadCards}
 				renderItem={renderCard}
@@ -123,7 +129,7 @@ function DetailsTx({
 				title={
 					action.type === 'sign_transaction'
 						? 'SIGN'
-						: action.type === 'load_metadata'
+						: action.type
 						? 'ACCEPT'
 						: 'BACK'
 				}

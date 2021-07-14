@@ -117,6 +117,7 @@ export async function tryCreateIdentity(
 	networkId: string
 ): Promise<void> {
 	console.log('creating identity...');
+	if (idName == "") throw new Error("Seed name should not be blank");
 	await SubstrateSign.tryCreateIdentity(
 		idName,
 		seedName,
@@ -186,15 +187,28 @@ export async function makeTransactionCardsContents(
 //Typically sign a transaction
 export async function sign(
 	action: string,
-	pin: string,
+	seedName: string,
 	password: string
 ): Promise<string> {
 	const signedPayload = await SubstrateSign.signTransaction(
 		action,
-		pin,
+		seedName,
 		password
 	);
 	return signedPayload;
+}
+
+//Perform action not requiring use of secret
+//Typically updates
+export async function accept(action: string): Promise<string> {
+	try {
+		const acceptResult = await SubstrateSign.handleTransaction(action);
+		console.log(acceptResult);
+		return acceptResult;
+	} catch (e) {
+		console.log(e);
+		return e.toString();
+	}
 }
 
 /**
