@@ -30,14 +30,6 @@ export default function MetadataManagement({
 	route
 }: NavigationProps<'MetadataManagement'>): React.ReactElement {
 	const networkPathId = route.params.pathId;
-	const {
-		networks,
-		getSubstrateNetwork,
-		setMetadataVersion,
-		isMetadataActive
-	} = useContext(NetworksContext);
-	const networkKey = getSubstrateNetworkKeyByPathId(networkPathId, networks);
-	const networkParams = getSubstrateNetwork(networkKey);
 	const [knownMetadata, setKnownMetadata] = useState<Array<MetadataHandle>>([]);
 	const [showAll, setShowAll] = useState<boolean>(false);
 	const [deletionMode, setDeletionMode] = useState<boolean>(false);

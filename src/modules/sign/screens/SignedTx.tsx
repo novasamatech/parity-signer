@@ -33,7 +33,7 @@ import { sign } from 'utils/native';
 
 function SignedTx({
 	route,
-	_navigation
+	navigation
 }: NavigationProps<'SignedTx'>): React.ReactElement {
 	const [signedData, setSignedData] = useState<string>(''); //route.params.action.payload;
 	const [pin, setPin] = useState<string>('');

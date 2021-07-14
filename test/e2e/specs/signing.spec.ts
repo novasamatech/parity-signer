@@ -100,8 +100,7 @@ describe('Signing ane exporting test', () => {
 			await tapBack();
 			await tapBack();
 			const PolkadotNetworkButtonIndex =
-				Main.networkButton +
-				SUBSTRATE_NETWORK_LIST[SubstrateNetworkKeys.POLKADOT].pathId;
+				Main.networkButton;
 			await testTap(testIDs.Main.addNewNetworkButton);
 			await testScrollAndTap(
 				PolkadotNetworkButtonIndex,

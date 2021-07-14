@@ -28,8 +28,6 @@ import testIDs from 'e2e/testIDs';
 import colors from 'styles/colors';
 import fontStyles from 'styles/fontStyles';
 import {
-	unlockAndReturnSeed,
-	navigateToLegacyAccountList,
 	resetNavigationTo,
 	resetNavigationWithNetworkChooser
 } from 'utils/navigationHelpers';
@@ -62,28 +60,6 @@ function IdentitiesSwitch({}: Record<string, never>): React.ReactElement {
 		setVisible(false);
 		// @ts-ignore: https://github.com/react-navigation/react-navigation/pull/8389/files breaks things
 		navigation.navigate(screenName, params);
-	};
-
-	const onIdentitySelectedAndNavigate = async <
-		RouteName extends keyof RootStackParamList
-	>(
-		identity: Identity,
-		screenName: RouteName,
-		params?: RootStackParamList[RouteName]
-	): Promise<void> => {
-		await accountsStore.selectIdentity(identity);
-		setVisible(false);
-		if (screenName === 'Main') {
-			resetNavigationTo(navigation, screenName, params);
-		} else if (screenName === 'IdentityBackup') {
-			const seedPhrase = await unlockAndReturnSeed(navigation);
-			resetNavigationWithNetworkChooser(navigation, screenName, {
-				isNew: false,
-				seedPhrase
-			});
-		} else {
-			resetNavigationWithNetworkChooser(navigation, screenName, params);
-		}
 	};
 
 	const renderSettings = (): React.ReactElement => {
@@ -135,18 +111,6 @@ function IdentitiesSwitch({}: Record<string, never>): React.ReactElement {
 				animationType="none"
 			>
 				<View style={styles.card}>
-					<ButtonIcon
-						title="Add Identity"
-						testID={testIDs.IdentitiesSwitch.addIdentityButton}
-						onPress={(): void => closeModalAndNavigate('IdentityNew')}
-						iconName="plus"
-						iconType="antdesign"
-						iconSize={24}
-						textStyle={fontStyles.t_big}
-						style={styles.indentedButton}
-					/>
-
-					<Separator />
 					{renderSettings()}
 				</View>
 			</TransparentBackground>

@@ -24,9 +24,6 @@ export const mockIdentityName = 'mockIdentity';
 export const mockSeedPhrase =
 	'ability cave solid soccer gloom thought response hard around minor want welcome';
 export const pinCode = '000000';
-const substrateNetworkButtonIndex =
-	Main.networkButton +
-	SUBSTRATE_NETWORK_LIST[SubstrateNetworkKeys.KUSAMA].pathId;
 
 export const testTap = async (buttonId: string): Promise<Detox.Actions<any>> =>
 	await element(by.id(buttonId)).tap();
@@ -94,7 +91,7 @@ export const testSetUpDefaultPath = async (): Promise<void> => {
 		.toBeVisible()
 		.withTimeout(10000);
 	await testScrollAndTap(
-		substrateNetworkButtonIndex,
+		"",
 		testIDs.Main.chooserScreen
 	);
 	await testVisible(PathDetail.screen);

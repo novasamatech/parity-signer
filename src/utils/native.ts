@@ -202,13 +202,14 @@ export async function sign(
  */
 
 //Get info to fill screen with list of networks
-export async function getAllNetworks(): Promise<Network> {
+export async function getAllNetworks(): Promise<[Network] | []> {
 	try {
 		const allNetworksJSON = await SubstrateSign.getAllNetworksForNetworkSelector();
 		const allNetworks = JSON.parse(allNetworksJSON);
 		return allNetworks;
 	} catch (e) {
 		console.log(e);
+		return [];
 	}
 }
 
@@ -244,7 +245,7 @@ export async function getIdentitiesForSeed(
 }
 
 //Get list of seedphrase identifiers
-export async function getAllSeedNames(): Promise<[string]> {
+export async function getAllSeedNames(): Promise<[string] | []> {
 	try {
 		const allSeedsJSON = await SubstrateSign.getAllSeedNames();
 		console.log('something returned for seeds');

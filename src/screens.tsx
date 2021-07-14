@@ -39,7 +39,6 @@ import IdentityManagement from 'screens/IdentityManagement';
 import LoadingScreen from 'screens/LoadingScreen';
 import RootSeedNew from 'screens/RootSeedNew';
 import MetadataManagement from 'modules/network/screens/MetadataManagement';
-import FullMetadata from 'modules/network/screens/FullMetadata';
 import MetadataSaving from 'screens/MetadataSaving';
 import PathDerivation from 'screens/PathDerivation';
 import PathsList from 'screens/PathsList';
@@ -126,7 +125,6 @@ export const AppNavigator = (): React.ReactElement => (
 			name="MetadataManagement"
 			component={MetadataManagement}
 		/>
-		<ScreenStack.Screen name="FullMetadata" component={FullMetadata} />
 		<ScreenStack.Screen name="MetadataSaving" component={MetadataSaving} />
 		<ScreenStack.Screen name="PathDerivation" component={PathDerivation} />
 		<ScreenStack.Screen name="PathsList" component={PathsList} />
@@ -134,22 +132,6 @@ export const AppNavigator = (): React.ReactElement => (
 		<ScreenStack.Screen name="Security" component={Security} />
 		<ScreenStack.Screen name="DetailsTx" component={DetailsTx} />
 		<ScreenStack.Screen name="SignedTx" component={SignedTx} />
-		<ScreenStack.Screen
-			name="TermsAndConditions"
-			component={TermsAndConditions}
-		/>
-		<ScreenStack.Screen name="PrivacyPolicy" component={PrivacyPolicy} />
-	</ScreenStack.Navigator>
-);
-
-export const TocAndPrivacyPolicyNavigator = (): React.ReactElement => (
-	<ScreenStack.Navigator
-		initialRouteName="TermsAndConditions"
-		screenOptions={{
-			...globalStackNavigationOptions,
-			headerRight: (): React.ReactNode => null
-		}}
-	>
 		<ScreenStack.Screen
 			name="TermsAndConditions"
 			component={TermsAndConditions}

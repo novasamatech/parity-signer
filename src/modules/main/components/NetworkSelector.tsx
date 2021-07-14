@@ -27,12 +27,21 @@ import { NavigationAccountIdentityProps } from 'types/props';
 import QrScannerTab from 'components/QrScannerTab';
 import { getAllNetworks } from 'utils/native';
 
+type Network = {
+	color: string;
+	key: string;
+	logo: string;
+	order: number;
+	secondaryColor: string;
+	title: string;
+};
+
 export default function NetworkSelector({
 	navigation,
 	route
 }: NavigationAccountIdentityProps<'Main'>): React.ReactElement {
 	const isNew = route.params?.isNew ?? false;
-	const [networkList, setNetworkList] = useState<Array>([]);
+	const [networkList, setNetworkList] = useState<Array<Network>>([]);
 
 	const { setAlert } = useContext(AlertStateContext);
 
@@ -49,23 +58,6 @@ export default function NetworkSelector({
 		fetchNetworkList();
 	}, []);
 
-	// catch android back button and prevent exiting the app
-	// TODO: this just doesn't work and nobody noticed, let's fix later
-	// Maybe this is not the desired behavior?
-	/*
-	useFocusEffect(
-		React.useCallback((): any => {
-			const handleBackButton = (): boolean => {
-				return false;
-			};
-			const backHandler = BackHandler.addEventListener(
-				'hardwareBackPress',
-				handleBackButton
-			);
-			return (): void => backHandler.remove();
-		}, [])
-	);*/
-
 	const renderScreenHeading = (): React.ReactElement => {
 		return <IdentityHeading title={'Select network'} />;
 	};
@@ -74,12 +66,12 @@ export default function NetworkSelector({
 		navigation.navigate('PathsList', { networkKey });
 	};
 
-	const renderNetwork = (item): ReactElement => {
+	const renderNetwork = ({item, index, separators}: {item: Network, index: number, separators: any}): ReactElement => {
+		console.log(item);
 		return (
 			<NetworkCard
-				testID={testIDs.Main.networkButton + item.title}
-				network={item.item}
-				onPress={(): Promise<void> => onNetworkChosen(item.item.key)}
+				network={item}
+				onPress={(): Promise<void> => onNetworkChosen(item.key)}
 			/>
 		);
 	};

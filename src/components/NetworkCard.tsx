@@ -40,7 +40,7 @@ export function NetworkCard({
 	onPress,
 	testID
 }: {
-	network?: string;
+	network: any;
 	onPress?: ButtonListener;
 	testID?: string;
 }): ReactElement {

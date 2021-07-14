@@ -47,7 +47,7 @@ export type Action = {
 //Object to store all parsed transaction information
 export type PayloadCardsSet = {
 	[key: string]: unknown;
-	action: Action;
+	action?: Action;
 	author?: PayloadCardData[];
 	error?: PayloadCardData[];
 	extrinsics?: PayloadCardData[];
