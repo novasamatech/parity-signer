@@ -15,8 +15,9 @@
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
 import React, { ReactElement, useContext, useState, useEffect } from 'react';
-import { BackHandler, FlatList } from 'react-native';
+import { BackHandler, FlatList, View } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
+import { Icon } from 'react-native-elements';
 
 import { NetworkCard } from 'components/NetworkCard';
 import { SafeAreaViewContainer } from 'components/SafeAreaContainer';
@@ -26,6 +27,8 @@ import { AlertStateContext } from 'stores/alertContext';
 import { NavigationAccountIdentityProps } from 'types/props';
 import QrScannerTab from 'components/QrScannerTab';
 import { getAllNetworks } from 'utils/native';
+import TouchableItem from 'components/TouchableItem';
+import colors from 'styles/colors';
 
 type Network = {
 	color: string;
@@ -69,10 +72,22 @@ export default function NetworkSelector({
 	const renderNetwork = ({item, index, separators}: {item: Network, index: number, separators: any}): ReactElement => {
 		console.log(item);
 		return (
-			<NetworkCard
-				network={item}
-				onPress={(): Promise<void> => onNetworkChosen(item.key)}
-			/>
+			<View style={{ flexDirection: 'row'}}>
+				<View style={{flex: 8}}>
+				<NetworkCard
+					network={item}
+					onPress={(): Promise<void> => onNetworkChosen(item.key)}
+				/>
+				</View>
+				<View style={{flex:2, alignItems: 'center', justifyContent: 'center'}}>
+					<TouchableItem 
+						onPress={(): Promise<void> => navigation.navigate('NetworkDetails', {networkKey: item.key})}
+						style={{alignItems: 'center', justifyContent: 'center'}}
+					>
+						<Icon name={"settings"} type={"feather"} color={colors.text.main} />
+					</TouchableItem>
+				</View>
+			</View>
 		);
 	};
 

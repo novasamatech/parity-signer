@@ -250,6 +250,15 @@ export! {
 	) -> std::result::Result<(), Box<dyn std::error::Error>> {
         db_handling::identities::delete_address(pub_key, network, dbname)
     }
+
+    @Java_io_parity_signer_SubstrateSignModule_substrateGetNetworkSpecs
+	fn get_network_specs(
+        network: &str,
+        dbname: &str
+	) -> std::result::Result<String, Box<dyn std::error::Error>> {
+        db_handling::network_details::get_network_details_by_hex(network, dbname)
+    }
+
 }
 
 ffi_support::define_string_destructor!(signer_destroy_string);

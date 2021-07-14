@@ -14,7 +14,8 @@
 // You should have received a copy of the GNU General Public License
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
-import React from 'react';
+import React, {useEffect, useState} from 'react';
+import {FlatList, View} from 'react-native';
 
 import NetworkInfoCard from 'components/NetworkInfoCard';
 import { NetworkCard } from 'components/NetworkCard';
@@ -23,85 +24,73 @@ import { SafeAreaScrollViewContainer } from 'components/SafeAreaContainer';
 import { NavigationProps } from 'types/props';
 import Button from 'components/Button';
 import testIDs from 'e2e/testIDs';
+import { getNetworkSpecs, removeNetwork, removeMetadata } from 'utils/native';
 
 export default function NetworkDetails({
 	navigation,
 	route
 }: NavigationProps<'NetworkDetails'>): React.ReactElement {
-	const networkPathId = route.params.pathId as string;
+	const networkKey = route.params.networkKey;
+	const [network, setNetwork] = useState();
 
-	const metadataValid = (): React.ReactElement => (
-		<>
+	useEffect(()=>{
+		const prepareNetworkDetails = async (): Promise<void> => {
+			try {
+				const networkSpecs = await getNetworkSpecs(networkKey);
+				setNetwork(networkSpecs);
+			} catch (e) {
+				console.log(e);
+			}
+		}
+		prepareNetworkDetails();
+	}, [networkKey]);
+
+	const renderMetadata = ({item, index, separators}: {item: any, index: number, separators: any}): React.ReactElement => {
+		return (
 			<MetadataCard
-				specName={metadataHandle ? metadataHandle.specName : ''}
-				specVersion={metadataHandle ? String(metadataHandle.specVersion) : ''}
-				metadataHash={metadataHandle ? metadataHandle.hash : ''}
+				specName={network.name}
+				specVersion={item.spec_version}
+				metadataHash={item.meta_hash}
 				onPress={(): void =>
 					navigation.navigate('FullMetadata', {
 						pathId: networkPathId
 					})
 				}
 			/>
-			<Button
-				onPress={(): void =>
-					navigation.navigate('MetadataManagement', {
-						pathId: networkPathId
-					})
-				}
-				testID={testIDs.NetworkDetails.manageValidMetadata}
-				title="Manage metadata"
-			/>
-		</>
-	);
+		);
+	};
 
-	const metadataInvalid = (): React.ReactElement => (
-		<>
-			<MetadataCard
-				specName="invalid"
-				specVersion="invalid"
-				metadataHash={metadataHandle ? metadataHandle.hash : 'invalid'}
-				onPress={(): void =>
-					navigation.navigate('FullMetadata', {
-						pathId: networkPathId
-					})
-				}
-			/>
-			<Button
-				onPress={(): void =>
-					navigation.navigate('MetadataManagement', {
-						pathId: networkPathId
-					})
-				}
-				title="Please add metadata!"
-			/>
-		</>
-	);
-
-	return (
+	if (network) {
+		return (
 		<SafeAreaScrollViewContainer
 			testID={testIDs.NetworkDetails.networkDetailsScreen}
 		>
 			<NetworkCard
-				networkKey={networkParams.genesisHash}
-				title={networkParams.title}
+				network={network}
 			/>
-			<NetworkInfoCard text={networkParams.title} label="Title" />
-			<NetworkInfoCard text={networkParams.pathId} label="Path ID" />
+			<NetworkInfoCard text={network.title} label="Title" />
+			<NetworkInfoCard text={network.path_id} label="Path ID" />
 			<NetworkInfoCard
-				text={networkParams.genesisHash}
+				text={network.genesis_hash}
 				label="Genesis Hash"
 				small
 			/>
-			<NetworkInfoCard text={networkParams.unit} label="Unit" />
+			<NetworkInfoCard text={network.unit} label="Unit" />
 			<NetworkInfoCard
-				text={networkParams.decimals.toString()}
+				text={network.decimals}
 				label="Decimals"
 			/>
 			<NetworkInfoCard
-				text={networkParams.prefix.toString()}
-				label="Address prefix"
+				text={network.base58prefix}
+				label="Base58 prefix"
 			/>
-			{metadataHandle ? metadataValid() : metadataInvalid()}
+			<FlatList 
+				data={network.meta}
+				renderItem={renderMetadata}
+			/>
 		</SafeAreaScrollViewContainer>
 	);
+	} else {
+		return ( <View/> );
+	}
 }

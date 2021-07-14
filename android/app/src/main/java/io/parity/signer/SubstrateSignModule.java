@@ -498,6 +498,16 @@ public class SubstrateSignModule extends ReactContextBaseJavaModule {
 		}
 	}
 
+	@ReactMethod
+	public void getNetworkSpecs(String networkId, Promise promise) {
+		try {
+			String networkSpecs = substrateGetNetworkSpecs(networkId, dbname);
+			promise.resolve(networkSpecs);
+		} catch (Exception e) {
+			rejectWithException(promise, "Network settings fetch failure", e);
+		}
+	}
+
 	//react native section end
 
 	//rust native section begin
@@ -517,6 +527,7 @@ public class SubstrateSignModule extends ReactContextBaseJavaModule {
 	private static native void substrateTryCreateIdentity(String idName, String seedName, String seedPhrase, String crypto, String path, String network, boolean hasPassword, String dbname);
 	private static native String substrateSuggestName(String path);
 	private static native void substrateDeleteIdentity(String pubKey, String network, String dbname);
+	private static native String substrateGetNetworkSpecs(String network, String dbname);
 
 	//rust native section end
 }

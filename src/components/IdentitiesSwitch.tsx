@@ -75,11 +75,6 @@ function IdentitiesSwitch({}: Record<string, never>): React.ReactElement {
 					style={styles.indentedButton}
 				/>
 				<ButtonWithArrow
-					title="Network Settings"
-					onPress={(): void => closeModalAndNavigate('NetworkSettings')}
-					testID={testIDs.IdentitiesSwitch.networkSettings}
-				/>
-				<ButtonWithArrow
 					title="Terms and Conditions"
 					onPress={(): void => closeModalAndNavigate('TermsAndConditions')}
 				/>

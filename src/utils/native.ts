@@ -271,3 +271,20 @@ export async function getAllSeedNames(): Promise<[string] | []> {
 		return [];
 	}
 }
+
+//Network management screen
+export async function getNetworkSpecs(networkKey: string): Promise<object> {
+	const specsJSON = await SubstrateSign.getNetworkSpecs(networkKey);
+	console.log(specsJSON);
+	const specs = JSON.parse(specsJSON);
+	return specs;
+}
+
+//Network deletion
+export async function removeNetwork(networkKey: string): Promise<void> {
+	return;
+}
+
+export async function removeMetadata(specVersion: string, specName: string): Promise<void> {
+	return;
+}
