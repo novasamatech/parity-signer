@@ -8,9 +8,7 @@ edition = "2018"
 
 [dependencies]
 regex = "1.4.5"
-ethsign = { version = "0.7.3", default-features = false, features = ["pure-rust"] }
 sp-core = "3.0.0"
-serde_json = "1.0"
 hex = "0.4.3"
 lazy_static = "1.4.0"
 definitions = {path = "../definitions"}

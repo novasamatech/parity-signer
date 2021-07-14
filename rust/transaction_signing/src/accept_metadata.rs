@@ -29,16 +29,16 @@ pub fn accept_metadata (dbname: &str, checksum: u32, upd_general: bool) -> Resul
         database.flush()?;
     }
     
-    if let Some(gen_hash) = action.upd_network {
+    if let Some(network_key) = action.upd_network {
         let chainspecs: Tree = database.open_tree(SPECSTREE)?;
-        let specs_to_change = match chainspecs.remove(&gen_hash)? {
+        let specs_to_change = match chainspecs.remove(&network_key)? {
             Some(x) => {<ChainSpecs>::decode(&mut &x[..])?},
             None => {return Err(Box::from("Network specs gone missing."))}
         };
         database.flush()?;
         let mut specs_to_load = specs_to_change;
         specs_to_load.verifier = action.verifier;
-        chainspecs.insert(gen_hash, specs_to_load.encode())?;
+        chainspecs.insert(network_key, specs_to_load.encode())?;
         database.flush()?;
     }
     
@@ -72,14 +72,14 @@ pub fn add_meta_verifier (dbname: &str, checksum: u32, upd_general: bool) -> Res
     }
     
     let chainspecs: Tree = database.open_tree(SPECSTREE)?;
-    let specs_to_change = match chainspecs.remove(&upd_specs.gen_hash)? {
+    let specs_to_change = match chainspecs.remove(&upd_specs.network_key)? {
         Some(x) => {<ChainSpecs>::decode(&mut &x[..])?},
         None => {return Err(Box::from("Network specs gone missing."))}
     };
     database.flush()?;
     let mut specs_to_load = specs_to_change;
     specs_to_load.verifier = upd_specs.verifier;
-    chainspecs.insert(upd_specs.gen_hash, specs_to_load.encode())?;
+    chainspecs.insert(upd_specs.network_key, specs_to_load.encode())?;
     database.flush()?;
     
     if upd_general {Ok(String::from("Network verifier successfully updated. General verifier successfully updated."))}

@@ -109,17 +109,6 @@ export! {
         return output;
     }
 
-    @Java_io_parity_signer_SubstrateSignModule_substrateDbInit
-	fn db_init(
-        metadata: &str,
-		dbname: &str
-	) -> std::result::Result<(), Box<dyn std::error::Error>> {
-        let datafiles = db_handling::DataFiles {
-            metadata_contents : metadata,
-        };
-        db_handling::populate_cold(dbname, datafiles)
-    }
-    
     @Java_io_parity_signer_SubstrateSignModule_dbGetNetwork
 	fn get_network(
 		genesis_hash: &str,

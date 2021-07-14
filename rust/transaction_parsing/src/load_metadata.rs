@@ -1,6 +1,6 @@
 use hex;
 use sled::{Db, Tree, open};
-use definitions::{network_specs::Verifier, transactions::{LoadMetaDb, UpdSpecs}, metadata::{NameVersioned, VersionDecoded}, constants::{ADDGENERALVERIFIER, ADDMETAVERIFIER, LOADMETA, METATREE, SPECSTREE, TRANSACTION}};
+use definitions::{network_specs::{Verifier, generate_network_key}, transactions::{LoadMetaDb, UpdSpecs}, metadata::{NameVersioned, VersionDecoded}, constants::{ADDGENERALVERIFIER, ADDMETAVERIFIER, LOADMETA, METATREE, SPECSTREE, TRANSACTION}};
 use meta_reading::decode_metadata::get_meta_const_light;
 use parity_scale_codec::{Decode, Encode};
 use blake2_rfc::blake2b::blake2b;
@@ -36,10 +36,10 @@ pub fn process_received_metadata (meta: Vec<u8>, name: &str, index: u32, upd_net
                                             if a[..] == meta[..] {
                                             // same versioned name found, and metadata equal
                                                 match upd_network {
-                                                    Some(gen_hash) => {
+                                                    Some(network_key) => {
                                                         // preparing action entry
                                                             let upd = UpdSpecs {
-                                                                gen_hash,
+                                                                network_key,
                                                                 verifier,
                                                             };
                                                         // selecting correct action card type
@@ -200,7 +200,9 @@ pub fn load_metadata (data_hex: &str, dbname: &str) -> Result<String, Error> {
     let meta = checked_info.message[..checked_info.message.len()-32].to_vec();
     let gen_hash = checked_info.message[checked_info.message.len()-32..].to_vec();
     
-    let chain_specs_found = get_chainspecs(&gen_hash, &chainspecs)?;
+    let network_key = generate_network_key(&gen_hash);
+    
+    let chain_specs_found = get_chainspecs(&network_key, &chainspecs)?;
     
     let verifier = checked_info.verifier;
     
@@ -234,7 +236,7 @@ pub fn load_metadata (data_hex: &str, dbname: &str) -> Result<String, Error> {
                     let warning_card = Card::Warning(Warning::VerifierAppeared).card(1,0);
                     let possible_warning = Card::Warning(Warning::MetaAlreadyThereUpdMetaVerifier).card(2, 0);
                     let index = 2;
-                    let upd_network = Some(gen_hash);
+                    let upd_network = Some(network_key);
                     let upd_general = false;
                     let (meta_card, action_card) = process_received_metadata(meta, &chain_specs_found.name, index, upd_network, upd_general, verifier, metadata, transaction, database)?;
                     if meta_card == possible_warning {Ok(format!("{{\"verifier\":[{}],\"warning\":[{},{}],{}}}", verifier_card, warning_card, meta_card, action_card))}

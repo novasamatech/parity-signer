@@ -1,5 +1,5 @@
 use sled::{Db, open, Tree};
-use definitions::{network_specs::ChainSpecs, constants::{ADDNETWORK, GENERALVERIFIER, METATREE, SETTREE, SPECSTREE, TRANSACTION}, transactions::AddNetworkDb};
+use definitions::{network_specs::{ChainSpecs, generate_network_key}, constants::{ADDNETWORK, GENERALVERIFIER, METATREE, SETTREE, SPECSTREE, TRANSACTION}, transactions::AddNetworkDb};
 use parity_scale_codec::{Decode, Encode};
 
 /// function to add approved network to the database;
@@ -31,7 +31,7 @@ pub fn add_network (dbname: &str, checksum: u32, upd_general: bool) -> Result<St
     
     let chainspecs: Tree = database.open_tree(SPECSTREE)?;
     let order = chainspecs.len() as u8;
-    let genesis_hash = action.chainspecs.genesis_hash;
+    let network_key = generate_network_key(&action.chainspecs.genesis_hash.to_vec());
     let new_chainspecs = ChainSpecs {
         base58prefix: action.chainspecs.base58prefix,
         color: action.chainspecs.color,
@@ -46,7 +46,7 @@ pub fn add_network (dbname: &str, checksum: u32, upd_general: bool) -> Result<St
         unit: action.chainspecs.unit,
         verifier: action.verifier,
     };
-    chainspecs.insert(genesis_hash.to_vec(), new_chainspecs.encode())?;
+    chainspecs.insert(network_key, new_chainspecs.encode())?;
     database.flush()?;
     
     if upd_general {Ok(String::from("Network successfully added. General verifier successfully updated."))}

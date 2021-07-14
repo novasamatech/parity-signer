@@ -1,16 +1,16 @@
 use parity_scale_codec_derive::{Decode, Encode};
 
-use super::network_specs::{ChainSpecsToSend, Verifier};
+use super::network_specs::{ChainSpecsToSend, Verifier, NetworkKey};
+use super::users::{Encryption, AddressKey};
 
 /// Struct to store sign_transaction action information
 #[derive(Decode, Encode)]
 pub struct SignDb {
-    pub crypto: String,
+    pub crypto: Encryption,
     pub path: String,
-    pub name_for_seed: String,
     pub transaction: Vec<u8>,
     pub has_pwd: bool,
-    pub author_base58: String,
+    pub address_key: AddressKey,
 }
 
 /// Struct to store load_metadata action information
@@ -18,7 +18,7 @@ pub struct SignDb {
 pub struct LoadMetaDb {
     pub versioned_name: Vec<u8>, // encoded versioned name
     pub meta: Vec<u8>, // encoded metadata
-    pub upd_network: Option<Vec<u8>>, // network genesis hash if the network verifier should be updated
+    pub upd_network: Option<NetworkKey>, // network key if the network verifier should be updated
     pub verifier: Verifier, // transaction verifier, whether this goes anywhere after approval is determined by the action card type
 }
 
@@ -28,7 +28,7 @@ pub struct LoadMetaDb {
 /// the exact type of action is determined by the action card type
 #[derive(Decode, Encode)]
 pub struct UpdSpecs {
-    pub gen_hash: Vec<u8>, // 
+    pub network_key: NetworkKey, // 
     pub verifier: Verifier,
 }
 

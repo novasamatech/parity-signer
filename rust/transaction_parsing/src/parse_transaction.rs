@@ -3,7 +3,7 @@ use parity_scale_codec::{Decode, Encode};
 use parity_scale_codec_derive;
 use printing_balance::{PrettyOutput, convert_balance_pretty};
 use sled::{Db, Tree, open};
-use definitions::{network_specs::ChainSpecs, transactions::SignDb, users::AddressDetails, constants::{SPECSTREE, METATREE, ADDRTREE, SETTREE, SIGNTRANS, TRANSACTION}};
+use definitions::{network_specs::{ChainSpecs, generate_network_key}, transactions::SignDb, users::{AddressDetails, Encryption, generate_address_key}, constants::{SPECSTREE, METATREE, ADDRTREE, SETTREE, SIGNTRANS, TRANSACTION}};
 use sp_runtime::generic::Era;
 use std::convert::TryInto;
 
@@ -127,12 +127,14 @@ pub fn parse_transaction (data_hex: &str, dbname: &str) -> Result<String, Error>
     if transaction_decoded.genesis_hash != short.genesis_hash {return Err(Error::BadInputData(BadInputData::GenesisHashMismatch))}
 
 // this should be here by the standard; should stay commented for now, since the test transactions apparently do not comply to standard.
-    if &data_hex[4..6] == "00" {if let Era::Immortal = short.era {return Err(Error::BadInputData(BadInputData::UnexpectedImmortality))}}
-    if &data_hex[4..6] == "02" {if let Era::Mortal(_, _) = short.era {return Err(Error::BadInputData(BadInputData::UnexpectedMortality))}}
+    //if &data_hex[4..6] == "00" {if let Era::Immortal = short.era {return Err(Error::BadInputData(BadInputData::UnexpectedImmortality))}}
+    //if &data_hex[4..6] == "02" {if let Era::Mortal(_, _) = short.era {return Err(Error::BadInputData(BadInputData::UnexpectedMortality))}}
 
     if let Era::Immortal = short.era {if short.genesis_hash != short.block_hash {return Err(Error::BadInputData(BadInputData::ImmortalHashMismatch))}}
     
-    let chainspecs_db_reply = match chainspecs.get(transaction_decoded.genesis_hash) {
+    let network_key = generate_network_key(&transaction_decoded.genesis_hash.to_vec());
+    
+    let chainspecs_db_reply = match chainspecs.get(&network_key) {
         Ok(x) => x,
         Err(e) => return Err(Error::DatabaseError(DatabaseError::Internal(e))),
     };
@@ -152,24 +154,35 @@ pub fn parse_transaction (data_hex: &str, dbname: &str) -> Result<String, Error>
             };
 
         // transform public key into base58 address and get crypto for action card exporting
-            let (author, crypto) = match author_pub_key {
-                AuthorPublicKey::Ed25519(t) => (vec_to_base(&(t.to_vec()), chain_prefix), "ed25519"),
-                AuthorPublicKey::Sr25519(t) => (vec_to_base(&(t.to_vec()), chain_prefix), "sr25519"),
-                AuthorPublicKey::Ecdsa(t) => (vec_to_base(&(t.to_vec()), chain_prefix), "ecdsa"),
+            let (author, address_key, crypto) = match author_pub_key {
+                AuthorPublicKey::Ed25519(t) => (vec_to_base(&(t.to_vec()), chain_prefix), generate_address_key(&t.to_vec()), Encryption::Ed25519),
+                AuthorPublicKey::Sr25519(t) => (vec_to_base(&(t.to_vec()), chain_prefix), generate_address_key(&t.to_vec()), Encryption::Sr25519),
+                AuthorPublicKey::Ecdsa(t) => (vec_to_base(&(t.to_vec()), chain_prefix), generate_address_key(&t.to_vec()), Encryption::Ecdsa),
             };
         // search for this base58 address in existing accounts, get address details
-            let addresses_db_reply = match addresses.get(author.encode()) {
+            let addresses_db_reply = match addresses.get(&address_key) {
                 Ok(x) => x,
                 Err(e) => return Err(Error::DatabaseError(DatabaseError::Internal(e))),
             };
             match addresses_db_reply {
                 Some(y) => {
-                    let id_values = match <AddressDetails>::decode(&mut &y[..]) {
+                    let address_details = match <AddressDetails>::decode(&mut &y[..]) {
                         Ok(x) => x,
                         Err(_) => return Err(Error::DatabaseError(DatabaseError::DamagedAddressDetails)),
                     };
-                    let author_card = (Card::Author{base58_author: &author, path: &id_values.path, has_pwd: id_values.has_pwd, name: &id_values.name}).card(index, indent);
+                
+                    let author_card = (Card::Author{base58_author: &author, seed_name: &address_details.seed_name, path: &address_details.path, has_pwd: address_details.has_pwd, name: &address_details.name}).card(index, indent);
                     index = index + 1;
+                    
+                // current network is among allowed networks for this address key;
+                    let warn_network_not_allowed = {
+                        if address_details.network_id.contains(&network_key) {None}
+                        else {
+                            let warn_no_network_id = Card::Warning(Warning::NoNetworkID).card(index, indent);
+                            index = index + 1;
+                            Some(warn_no_network_id)
+                        }
+                    };
 
                 // fetch chain metadata in RuntimeMetadataV12 format
                     match find_meta(&chain_name, short.metadata_version, &metadata) {
@@ -196,35 +209,48 @@ pub fn parse_transaction (data_hex: &str, dbname: &str) -> Result<String, Error>
 
                                 // make extrinsics card set
                                     let extrinsics_cards = print_full_extrinsics (index, indent, &tip_output, &short, chain_name);
-                                // making action entry into database
-                                    let action_into_db = SignDb {
-                                        crypto: crypto.to_string(),
-                                        path: id_values.path,
-                                        name_for_seed: id_values.name_for_seed,
-                                        transaction: for_signing,
-                                        has_pwd: id_values.has_pwd,
-                                        author_base58: author,
-                                    };
-                                    match transaction.insert(SIGNTRANS, action_into_db.encode()) {
-                                        Ok(_) => (),
-                                        Err(e) => return Err(Error::DatabaseError(DatabaseError::Internal(e))),
-                                    };
-                                    match database.flush() {
-                                        Ok(_) => (),
-                                        Err(e) => return Err(Error::DatabaseError(DatabaseError::Internal(e))),
-                                    };
-                                    let checksum = match database.checksum() {
-                                        Ok(x) => x,
-                                        Err(e) => return Err(Error::DatabaseError(DatabaseError::Internal(e))),
-                                    };
-                                // action card
-                                    let action_card = Action::SignTransaction(checksum).card();
-                                // full cards set
-                                    let cards = match warning_card {
-                                        Some(warn) => format!("{{\"author\":[{}],\"warning\":[{}],\"method\":[{}],\"extrinsics\":[{}],{}}}", author_card, warn, method_cards, extrinsics_cards, action_card),
-                                        None => format!("{{\"author\":[{}],\"method\":[{}],\"extrinsics\":[{}],{}}}", author_card, method_cards, extrinsics_cards, action_card),
-                                    };
-                                    Ok(cards)
+                                    
+                                    match warn_network_not_allowed {
+                                        None => {
+                                        // network is among the allowed ones for this address key; can sign;
+                                        // making action entry into database
+                                            let action_into_db = SignDb {
+                                                crypto,
+                                                path: address_details.path,
+                                                transaction: for_signing,
+                                                has_pwd: address_details.has_pwd,
+                                                address_key,
+                                            };
+                                            match transaction.insert(SIGNTRANS, action_into_db.encode()) {
+                                                Ok(_) => (),
+                                                Err(e) => return Err(Error::DatabaseError(DatabaseError::Internal(e))),
+                                            };
+                                            match database.flush() {
+                                                Ok(_) => (),
+                                                Err(e) => return Err(Error::DatabaseError(DatabaseError::Internal(e))),
+                                            };
+                                            let checksum = match database.checksum() {
+                                                Ok(x) => x,
+                                                Err(e) => return Err(Error::DatabaseError(DatabaseError::Internal(e))),
+                                            };
+                                        // action card
+                                            let action_card = Action::SignTransaction(checksum).card();
+                                        // full cards set
+                                            let cards = match warning_card {
+                                                Some(warn) => format!("{{\"author\":[{}],\"warning\":[{}],\"method\":[{}],\"extrinsics\":[{}],{}}}", author_card, warn, method_cards, extrinsics_cards, action_card),
+                                                None => format!("{{\"author\":[{}],\"method\":[{}],\"extrinsics\":[{}],{}}}", author_card, method_cards, extrinsics_cards, action_card),
+                                            };
+                                            Ok(cards)
+                                        },
+                                        Some(warn_no_network_id) => {
+                                        // network is NOT among the allowed ones for this address key; should not happen; can decode, not allowed to sign
+                                            let cards = match warning_card {
+                                                Some(warn) => format!("{{\"author\":[{}],\"warning\":[{},{}],\"method\":[{}],\"extrinsics\":[{}]}}", author_card, warn_no_network_id, warn, method_cards, extrinsics_cards),
+                                                None => format!("{{\"author\":[{}],\"warning\":[{}],\"method\":[{}],\"extrinsics\":[{}]}}", author_card, warn_no_network_id, method_cards, extrinsics_cards),
+                                            };
+                                            Ok(cards)
+                                        }
+                                    }
                                 },
                                 Err(e) => {
                                 // was unable to decode transaction properly, produced one of known decoding errors

@@ -13,7 +13,6 @@ pub const COLD_DB_NAME: &str = "../database/database_cold";
 pub const SPECSTREE: &[u8] = b"chainspecs";
 pub const METATREE: &[u8] = b"metadata";
 pub const ADDRTREE: &[u8] = b"addresses";
-pub const IDTREE: &[u8] = b"seeds";
 pub const SETTREE: &[u8] = b"settings";
 pub const TRANSACTION: &[u8] = b"transaction";
 

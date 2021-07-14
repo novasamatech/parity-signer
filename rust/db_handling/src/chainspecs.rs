@@ -1,14 +1,14 @@
 use sled::{Db, Tree, open};
 use parity_scale_codec::{Encode, Decode};
-use definitions::{constants::{SPECSTREE, SPECSTREEPREP}, defaults::{get_default_chainspecs, get_default_chainspecs_to_send}, network_specs::ChainSpecs};
+use definitions::{constants::{SPECSTREE, SPECSTREEPREP}, defaults::{get_default_chainspecs, get_default_chainspecs_to_send}, network_specs::{ChainSpecs, generate_network_key}};
 
 /// Fetch 1 network from database by genesis hash
 pub fn get_network (database_name: &str, genesis_hash: &str) -> Result<ChainSpecs, Box<dyn std::error::Error>> {
     let database: Db = open(database_name)?;
     let chainspecs: Tree = database.open_tree(SPECSTREE)?;
-    let chain_id = hex::decode(genesis_hash)?;
+    let network_key = generate_network_key(&hex::decode(genesis_hash)?);
 
-    match chainspecs.get(chain_id) {
+    match chainspecs.get(network_key) {
         Ok(Some(a)) => Ok(<ChainSpecs>::decode(&mut &a[..])?),
         Ok(None) => return Err(Box::from("Network not found")),
         Err(e) => return Err(Box::from(e)),
@@ -43,8 +43,8 @@ pub fn load_chainspecs (database_name: &str) -> Result<(), Box<dyn std::error::E
     let specs_vec = get_default_chainspecs();
     
     for x in specs_vec.iter() {
-        let genesis_hash = x.genesis_hash;
-        chainspecs.insert(genesis_hash, x.encode())?;
+        let network_key = generate_network_key(&x.genesis_hash.to_vec());
+        chainspecs.insert(network_key, x.encode())?;
     }
     
     database.flush()?;
@@ -63,8 +63,8 @@ pub fn load_chainspecs_to_send (database_name: &str) -> Result<(), Box<dyn std::
     let specs_vec = get_default_chainspecs_to_send();
     
     for x in specs_vec.iter() {
-        let genesis_hash = x.genesis_hash;
-        chainspecs.insert(genesis_hash, x.encode())?;
+        let network_key = generate_network_key(&x.genesis_hash.to_vec());
+        chainspecs.insert(network_key, x.encode())?;
     }
     
     database.flush()?;
@@ -74,7 +74,6 @@ pub fn load_chainspecs_to_send (database_name: &str) -> Result<(), Box<dyn std::
 #[cfg(test)]
 mod tests {
     use super::*;
-    static TESTDB: &str = "tests/testdb";
 
     #[test]
     fn get_constants() {

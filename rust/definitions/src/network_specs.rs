@@ -56,7 +56,7 @@ impl Verifier {
             Verifier::Ed25519(x) => format!("{{\"hex\":\"{}\",\"encryption\":\"ed25519\"}}", x),
             Verifier::Sr25519(x) => format!("{{\"hex\":\"{}\",\"encryption\":\"sr25519\"}}", x),
             Verifier::Ecdsa(x) => format!("{{\"hex\":\"{}\",\"encryption\":\"ecdsa\"}}", x),
-            Verifier::None => String::from("none"),
+            Verifier::None => String::from("\"none\""),
         }
     }
     pub fn show_error(&self) -> String {
@@ -67,5 +67,14 @@ impl Verifier {
             Verifier::None => String::from("none"),
         }
     }
+}
+
+/// Network identifier, used to search for network specs in the database
+/// At this moment, vector made from genesis hash
+pub type NetworkKey = Vec<u8>;
+
+/// Generate network key from minimal amount of information
+pub fn generate_network_key (gen_hash: &Vec<u8>) -> NetworkKey {
+    gen_hash.to_vec()
 }
 

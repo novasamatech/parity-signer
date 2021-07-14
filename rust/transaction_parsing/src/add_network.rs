@@ -1,6 +1,6 @@
 use hex;
 use sled::{Db, Tree, open};
-use definitions::{constants::{ADDNETWORK, METATREE, SETTREE, SPECSTREE, TRANSACTION}, metadata::{NameVersioned, VersionDecoded}, network_specs::{ChainSpecsToSend, Verifier}, transactions::{AddNetworkDb}};
+use definitions::{constants::{ADDNETWORK, METATREE, SETTREE, SPECSTREE, TRANSACTION}, metadata::{NameVersioned, VersionDecoded}, network_specs::{ChainSpecsToSend, Verifier, generate_network_key}, transactions::{AddNetworkDb}};
 use meta_reading::decode_metadata::{get_meta_const_light};
 use parity_scale_codec::{Decode, Encode};
 use blake2_rfc::blake2b::blake2b;
@@ -49,7 +49,9 @@ pub fn add_network (data_hex: &str, dbname: &str) -> Result<String, Error> {
     
     let verifier = checked_info.verifier;
     
-    match get_chainspecs (&(new_chain_specs.genesis_hash.to_vec()), &chainspecs) {
+    let new_network_key = generate_network_key(&new_chain_specs.genesis_hash.to_vec());
+    
+    match get_chainspecs (&new_network_key, &chainspecs) {
         Ok(x) => {
         
         // network is already in the system,
@@ -105,7 +107,7 @@ pub fn add_network (data_hex: &str, dbname: &str) -> Result<String, Error> {
                                 let warning_card_2 = Card::Warning(Warning::VerifierAppeared).card(2,0);
                                 let possible_warning = Card::Warning(Warning::MetaAlreadyThereUpdMetaVerifier).card(3, 0);
                                 let index = 3;
-                                let upd_network = Some(new_chain_specs.genesis_hash.to_vec());
+                                let upd_network = Some(new_network_key);
                                 let upd_general = false;
                                 let (meta_card, action_card) = process_received_metadata(new_meta_vec, &new_chain_specs.name, index, upd_network, upd_general, verifier, metadata, transaction, database)?;
                                 if meta_card == possible_warning {Ok(format!("{{\"verifier\":[{}],\"warning\":[{},{},{}],{}}}", verifier_card, warning_card_1, warning_card_2, meta_card, action_card))}
@@ -136,7 +138,7 @@ pub fn add_network (data_hex: &str, dbname: &str) -> Result<String, Error> {
                                     let warning_card_3 = Card::Warning(Warning::VerifierAppeared).card(3,0);
                                     let possible_warning = Card::Warning(Warning::MetaAlreadyThereUpdBothVerifiers).card(4, 0);
                                     let index = 4;
-                                    let upd_network = Some(new_chain_specs.genesis_hash.to_vec());
+                                    let upd_network = Some(new_network_key);
                                     let upd_general = true;
                                     let (meta_card, action_card) = process_received_metadata(new_meta_vec, &new_chain_specs.name, index, upd_network, upd_general, verifier, metadata, transaction, database)?;
                                     if meta_card == possible_warning {Ok(format!("{{\"verifier\":[{}],\"warning\":[{},{},{},{}],{}}}", verifier_card, warning_card_1, warning_card_2, warning_card_3, meta_card, action_card))}

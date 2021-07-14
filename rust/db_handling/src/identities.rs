@@ -6,10 +6,8 @@
 use sled::{Db, Tree, open};
 use sp_core::{Pair, ed25519, sr25519, ecdsa};
 use parity_scale_codec::{Decode, Encode};
-use parity_scale_codec_derive;
 use regex::Regex;
-use definitions::{constants::{ADDRTREE, SPECSTREE}, network_specs::ChainSpecs};
-use super::db_utils::{generate_seed_key, generate_address_key, generate_network_key, AddressKey, SeedKey, NetworkKey};
+use definitions::{constants::{ADDRTREE, SPECSTREE}, network_specs::{ChainSpecs, NetworkKey, generate_network_key}, users::{Encryption, AddressDetails, SeedObject, AddressKey, generate_address_key}};
 use bip39::{Language, Mnemonic, MnemonicType};
 use zeroize::Zeroize;
 use lazy_static::lazy_static;
@@ -20,138 +18,116 @@ use std::fs;
 #[cfg(test)]
 use super::chainspecs::load_chainspecs;
 
-///Type of encryption; only allow supported types here - compile-time check for that is happening
-///here.
-//TODO: check if it is redundant
-//Could not be replaced by sp_core::...::CRYPTO_ID as that doesn't do anything at compile time
-#[derive(Clone, Copy, PartialEq, Debug, parity_scale_codec_derive::Decode, parity_scale_codec_derive::Encode)]
-pub enum Encryption {
-    Sr25519,
-    Ed25519,
-    Ecdsa,
-}
-
-///Struct associated with public address that has secret key available
-#[derive(parity_scale_codec_derive::Decode, parity_scale_codec_derive::Encode, Debug)]
-pub struct AddressDetails {
-    pub name_for_seed: SeedKey,
-    pub path: String,
-    pub has_pwd: bool,
-    pub name: String,
-    pub network_id: Vec<NetworkKey>,
-    pub encryption: Encryption,
-}
-
-///Struct to move seed around
-//TODO: zeroize somehow
-#[derive(PartialEq, Debug)]
-pub struct SeedObject<'a> {
-    pub seed_name: &'a str,
-    pub seed_phrase: &'a str,
-    pub encryption: Encryption,
-}
 
 lazy_static! {
-    //stolen from sp_core
-    //removed seed phrase part
-    //last '+' used to be '*', but empty password is an error
-    static ref REG_PATH: Regex = Regex::new(r"^(?P<path>(//?[^/]+)*)(///(?P<password>.+))?$")
-		.expect("constructed from known-good static value; qed");
+// stolen from sp_core
+// removed seed phrase part
+// last '+' used to be '*', but empty password is an error
+    static ref REG_PATH: Regex = Regex::new(r"^(?P<path>(//?[^/]+)*)(///(?P<password>.+))?$").expect("known value");
 }
 
-///get all identities for given seed (internal use only!)
+/// get all identities from database for given seed_name (internal use only!)
 fn get_seed_identities (database: &Db, seed_name: &str) -> Result<Vec<(AddressKey, AddressDetails)>, Box<dyn std::error::Error>> {
     let identities: Tree = database.open_tree(ADDRTREE)?;
-    let name_for_seed = generate_seed_key(seed_name);
-    let mut identities_out: Vec<(AddressKey, AddressDetails)> = Vec::new();
-    for (key, value) in identities
-        .iter()
-        .collect::<Result<Vec<_>,_>>()?
-        .into_iter() {
-        let address = key.to_vec();
-        let details = <AddressDetails>::decode(&mut &value[..])?;
-        if details.name_for_seed == name_for_seed {
-            identities_out.push((address, details));
-        }
-    }
-    Ok(identities_out)
+    filter_addresses_by_seed_name (&identities, seed_name)
 }
 
-///get all identities within given seed and network
+/// filter identities by given seed_name
+fn filter_addresses_by_seed_name (identities: &Tree, seed_name: &str) -> Result<Vec<(AddressKey, AddressDetails)>, Box<dyn std::error::Error>> {
+    let mut out: Vec<(AddressKey, AddressDetails)> = Vec::new();
+    for x in identities.iter() {
+        if let Ok((key, value)) = x {
+            let address_key = key.to_vec();
+            let address_details = <AddressDetails>::decode(&mut &value[..])?;
+            if address_details.seed_name == seed_name {
+                out.push((address_key, address_details));
+            }
+        }
+    }
+    Ok(out)
+}
+
+/// filter identities by given seed_name and name
+fn filter_addresses_by_seed_name_and_name (identities: &Tree, seed_name: &str, name: &str) -> Result<Vec<(AddressKey, AddressDetails)>, Box<dyn std::error::Error>> {
+    let mut out: Vec<(AddressKey, AddressDetails)> = Vec::new();
+    for x in identities.iter() {
+        if let Ok((key, value)) = x {
+            let address_key = key.to_vec();
+            let address_details = <AddressDetails>::decode(&mut &value[..])?;
+            if (address_details.seed_name == seed_name)&&(address_details.name == name) {
+                out.push((address_key, address_details));
+            }
+        }
+    }
+    Ok(out)
+}
+
+/// get all identities for given seed_name and network_id as hex string
 pub fn get_relevant_identities (seed_name: &str, network_id_string: &str, database_name: &str) -> Result<Vec<(AddressKey, AddressDetails)>, Box<dyn std::error::Error>> {
-    let network_id = generate_network_key(hex::decode(network_id_string)?); //TODO: add whatever is needed for parachains?
+    let network_id = generate_network_key(&hex::decode(network_id_string)?); //TODO: add whatever is needed for parachains?
     let database: Db = open(database_name)?;
     let identities_out = get_seed_identities(&database, seed_name)?;
     Ok(identities_out.into_iter().filter(|(_, details)| details.network_id.contains(&network_id)).collect())
 }
 
+/// generate random phrase with given number of words
 fn generate_random_phrase (words_number: u32) -> Result<String, Box<dyn std::error::Error>> {
     let mnemonic_type = MnemonicType::for_word_count(words_number as usize)?;
-	let mnemonic = Mnemonic::new(mnemonic_type, Language::English);
-	Ok(mnemonic.into_phrase())
+    let mnemonic = Mnemonic::new(mnemonic_type, Language::English);
+    Ok(mnemonic.into_phrase())
 }
 
-///Create address from seed and path
-fn create_address (
-    database: &Db, 
-    path: &str, 
-    network_id: NetworkKey,
-    name: &str,
-    seed_object: &SeedObject,
-    has_password: bool,
-) -> Result<(), Box<dyn std::error::Error>> {
-    //TOTO: check zeroize
+/// Create address from seed and path and insert it into the database
+fn create_address (database: &Db, path: &str, network_key: NetworkKey, name: &str, seed_object: &SeedObject, has_pwd: bool) -> Result<(), Box<dyn std::error::Error>> {
+
+    // TODO: check zeroize
+
     let mut full_address = seed_object.seed_phrase.to_owned() + path;
     let chainspecs: Tree = database.open_tree(SPECSTREE)?;
-    if !chainspecs.contains_key(&network_id)? { return Err(Box::from("Error: Create address: network not found")); }
+    if !chainspecs.contains_key(&network_key)? { return Err(Box::from("Error: Create address: network not found")); }
+    
     let address_key = match seed_object.encryption {
-        Encryption::Sr25519 => {
-            match sr25519::Pair::from_string(&full_address, None) {
-                Ok(a) => generate_address_key(a.public().to_vec()),
-                Err(_) => return Err(Box::from("Error generating sr25519 address")),
-            }
-        },
         Encryption::Ed25519 => {
             match ed25519::Pair::from_string(&full_address, None) {
-                Ok(a) => generate_address_key(a.public().to_vec()),
+                Ok(a) => generate_address_key(&a.public().to_vec()),
                 Err(_) => return Err(Box::from("Error generating ed25519 address")),
+            }
+        },
+        Encryption::Sr25519 => {
+            match sr25519::Pair::from_string(&full_address, None) {
+                Ok(a) => generate_address_key(&a.public().to_vec()),
+                Err(_) => return Err(Box::from("Error generating sr25519 address")),
             }
         },
         Encryption::Ecdsa => {
             match ecdsa::Pair::from_string(&full_address, None) {
-                Ok(a) => generate_address_key(a.public().0.to_vec()),
+                Ok(a) => generate_address_key(&a.public().0.to_vec()),
                 Err(_) => return Err(Box::from("Error generating ecdsa address")),
             }
         },
     };
     full_address.zeroize();
+    
     let identities: Tree = database.open_tree(ADDRTREE)?;
-    let name_for_seed = generate_seed_key(&seed_object.seed_name);
-    //This address might be already created; maybe we just need to allow its use in another
-    //network?
+    let seed_name = seed_object.seed_name.to_string();
+// This address might be already created; maybe we just need to allow its use in another network?
     match identities.get(&address_key)? {
-        Some(address_record) => {
-            //TODO: check that all collisions are handled
-            let mut address = <AddressDetails>::decode(&mut &address_record[..])?;
-            //Check if something else resolved into this keypair
-            if address.name != name || address.path != path { return Err(Box::from(format!("Address collision with identity {} of seed {}", address.name, <String>::decode(&mut &address.name_for_seed[..])?))) }
-            //Append network to list of allowed networks
-            if !address.network_id.contains(&network_id) {
-                address.network_id.push(network_id);
-                identities.insert(address_key, address.encode())?;
-            };
+        Some(address_details_encoded) => {
+        // TODO: check that all collisions are handled
+            let mut address_details = <AddressDetails>::decode(&mut &address_details_encoded[..])?;
+        // Check if something else resolved into this keypair
+            if address_details.name != name || address_details.path != path { return Err(Box::from(format!("Address key collision with existing identity {} of seed {}", address_details.name, address_details.seed_name))) }
+        // Append network to list of allowed networks
+            if !address_details.network_id.contains(&network_key) {
+                address_details.network_id.push(network_key);
+                identities.insert(address_key, address_details.encode())?;
+            }
         }
         None => {
-            //Check for collisions in name
-            for (_, value) in identities
-                .iter()
-                .collect::<Result<Vec<_>,_>>()?
-                .into_iter() {
-                    let details = <AddressDetails>::decode(&mut &value[..])?;
-                    if details.name == name && details.name_for_seed == name_for_seed {
-                        return Err(Box::from("Identity with this name already exists"));
-                    }
-            }
+        // Check for collisions in name
+            let collided = filter_addresses_by_seed_name_and_name(&identities, &seed_name, name)?;
+            if collided.len() !=0 {return Err(Box::from("Identity with this name already exists"))}
+            
             let cropped_path = match REG_PATH.captures(path) {
                 Some(caps) => match caps.name("path") {
                     Some(a) => a.as_str(),
@@ -160,55 +136,41 @@ fn create_address (
                 None => "",
             };
             let address = AddressDetails {
-                name_for_seed: name_for_seed,
+                seed_name,
                 path: cropped_path.to_string(),
-                has_pwd: has_password,
+                has_pwd,
                 name: name.to_string(),
-                network_id: vec!(network_id),
+                network_id: vec![network_key],
                 encryption: seed_object.encryption,
             };
             identities.insert(address_key, address.encode())?;
         }
     }
-
-
     Ok(())
 }
 
 
-///Create addresses for all default paths in all default networks
+/// Create addresses for all default paths in all default networks, and insert them in the database
 fn populate_addresses (database: &Db, seed_object: &SeedObject) -> Result<(), Box<dyn std::error::Error>> {
-    //TODO: check zeroize
-    //TODO: compatibility with atomic operations
-    let networks: Tree = database.open_tree(SPECSTREE)?;
-    for result in networks.iter() {
-        match result {
-            Ok ((key, value)) => {
-                let network = <ChainSpecs>::decode(&mut &value[..])?;
-                create_address (
-                    database, 
-                    "", 
-                    key.to_vec(),
-                    "root address", 
-                    seed_object,
-                    false)?;
-                let _ = create_address (
-                    database, 
-                    &network.path_id, 
-                    key.to_vec(),
-                    &format!("{} root address", network.name),
-                    seed_object,
-                    false);
+// TODO: check zeroize
+// TODO: compatibility with atomic operations
+    let chainspecs: Tree = database.open_tree(SPECSTREE)?;
+    for x in chainspecs.iter() {
+        if let Ok((network_key, network_specs_encoded)) = x {
+            let network_specs = <ChainSpecs>::decode(&mut &network_specs_encoded[..])?;
+            create_address (database, "", network_key.to_vec(), "root address", seed_object, false)?;
+            match create_address (database, &network_specs.path_id, network_key.to_vec(), &format!("{} root address", network_specs.name), seed_object, false) {
+                Ok(()) => (),
+                Err(_) => (),
             }
-            Err (e) => return Err(Box::from(e)),
         }
     }
     Ok(())
 }
 
-///Generate new seed and populate all known networks with default accounts
+/// Generate new seed and populate all known networks with default accounts
 pub fn try_create_seed (seed_name: &str, encryption_name: &str, seed_phrase_proposal: &str, seed_length: u32, database_name: &str) -> Result<String, Box<dyn std::error::Error>> {
-    //TODO: atomize writes
+// TODO: atomize writes
     let database: Db = open(database_name)?;
     let seed_phrase = match seed_phrase_proposal {
         "" => generate_random_phrase(seed_length)?,
@@ -218,18 +180,18 @@ pub fn try_create_seed (seed_name: &str, encryption_name: &str, seed_phrase_prop
         }
     };
 
-    //TODO: zeroize seed
+// TODO: zeroize seed
 
     let encryption = match encryption_name {
-        "sr25519" => Encryption::Sr25519,
         "ed25519" => Encryption::Ed25519,
+        "sr25519" => Encryption::Sr25519,
         "ecdsa" => Encryption::Ecdsa,
         _ => return Err(Box::from("System error: unknown encryption algorithm")),
     };
     
     let seed_object = SeedObject {
-        seed_name: seed_name,
-        seed_phrase: &seed_phrase,
+        seed_name: seed_name.to_string(),
+        seed_phrase: seed_phrase.to_string(),
         encryption: encryption,
     };
 
@@ -238,7 +200,8 @@ pub fn try_create_seed (seed_name: &str, encryption_name: &str, seed_phrase_prop
     Ok(seed_phrase)
 }
 
-///Sanitize numbers in path (only for name suggestions!)
+/// Sanitize numbers in path (only for name suggestions!)
+/// Removes zeroes
 fn sanitize_number(could_be_number: &str) -> String {
     match could_be_number.parse::<u32>() {
         Ok(number) => number.to_string(),
@@ -246,8 +209,8 @@ fn sanitize_number(could_be_number: &str) -> String {
     }
 }
 
-///Suggest name from path
-//TODO: surprizingly - zeroize!
+/// Suggest name from path
+// TODO: surprizingly - zeroize!
 pub fn suggest_path_name(path_all: &str) -> String {
     let mut output = String::from("");
     if let Some(caps) = REG_PATH.captures(path_all) {
@@ -277,30 +240,25 @@ pub fn suggest_path_name(path_all: &str) -> String {
     output
 }
 
-///Delete identity
+/// Delete identity
 pub fn delete_address(pub_key: &str, network_id_string: &str, database_name: &str) -> Result<(), Box<dyn std::error::Error>> {
     let database: Db = open(database_name)?;
     let identities: Tree = database.open_tree(ADDRTREE)?;
-    let address_key = hex::decode(pub_key)?;
-    let network_id = generate_network_key(hex::decode(network_id_string)?); //TODO: add whatever is needed for parachains?
+    let address_key = generate_address_key(&hex::decode(pub_key)?);
+    let network_key = generate_network_key(&hex::decode(network_id_string)?); //TODO: add whatever is needed for parachains?
     match identities.get(&address_key)? {
-        Some(address_record) => {
-            let mut address = <AddressDetails>::decode(&mut &address_record[..])?;
-            address.network_id = address.network_id.into_iter().filter(|id| *id != network_id).collect();
-            if address.network_id.is_empty() {
-                identities.remove(&address_key)?;
-            } else {
-                identities.insert(address_key, address.encode())?;
-            }
+        Some(address_details_encoded) => {
+            let mut address_details = <AddressDetails>::decode(&mut &address_details_encoded[..])?;
+            address_details.network_id = address_details.network_id.into_iter().filter(|id| *id != network_key).collect();
+            if address_details.network_id.is_empty() {identities.remove(&address_key)?} 
+            else {identities.insert(address_key, address_details.encode())?}
         }
         None => return Err(Box::from("Error: this address does not exist in database")),
     };
-    
-
     Ok(())
 }
 
-///Suggest address and name for weird N+1 feature request
+/// Suggest address and name for weird N+1 feature request
 pub fn suggest_n_plus_one(path: &str, seed_name: &str, network_id_string: &str, database_name: &str) -> Result<String, Box<dyn std::error::Error>> {
     let identities = get_relevant_identities(seed_name, network_id_string, database_name)?;
     let mut last_index = 0;
@@ -316,34 +274,50 @@ pub fn suggest_n_plus_one(path: &str, seed_name: &str, network_id_string: &str, 
     Ok(path.to_string() + "//" + &last_index.to_string())
 }
 
-///Check derivation format and determine whether there is a password
+/// Check derivation format and determine whether there is a password
 pub fn check_derivation_format(path: &str) -> Result<bool, Box<dyn std::error::Error>> {
-	Ok(match REG_PATH.captures(path) {
-        Some(caps) => caps.name("password").is_some(),
+    match REG_PATH.captures(path) {
+        Some(caps) => Ok(caps.name("password").is_some()),
         None => return Err(Box::from("Invalid derivation format")),
-    })
+    }
 }
 
-///Generate new identity (api for create_address())
-pub fn try_create_address (id_name: &str, seed_name: &str, seed_phrase: &str, encryption_name: &str, path: &str, network: &str, has_password: bool, database_name: &str) -> Result<(), Box<dyn std::error::Error>> {
+/// Generate new identity (api for create_address())
+pub fn try_create_address (id_name: &str, seed_name: &str, seed_phrase: &str, encryption_name: &str, path: &str, network: &str, has_pwd: bool, database_name: &str) -> Result<(), Box<dyn std::error::Error>> {
     let database: Db = open(database_name)?;
 
     let encryption = match encryption_name {
-        "sr25519" => Encryption::Sr25519,
         "ed25519" => Encryption::Ed25519,
+        "sr25519" => Encryption::Sr25519,
         "ecdsa" => Encryption::Ecdsa,
         _ => return Err(Box::from("System error: unknown encryption algorithm")),
     };
     
     let seed_object = SeedObject {
-        seed_name: seed_name,
-        seed_phrase: seed_phrase,
-        encryption: encryption,
+        seed_name: seed_name.to_string(),
+        seed_phrase: seed_phrase.to_string(),
+        encryption,
     };
 
-    let network_id: NetworkKey = hex::decode(network)?;
+    let network_key = generate_network_key(&hex::decode(network)?);
 
-    create_address(&database, path, network_id, id_name, &seed_object, has_password)
+    create_address(&database, path, network_key, id_name, &seed_object, has_pwd)
+}
+
+/// Function to populate test cold database with Alice information
+pub fn load_test_identities (database_name: &str) -> Result<(), Box<dyn std::error::Error>> {
+    let database: Db = open(database_name)?;
+    let alice_seed_object = SeedObject {
+        seed_name: String::from("Alice"),
+        seed_phrase: String::from("bottom drive obey lake curtain smoke basket hold race lonely fit walk"),
+        encryption: Encryption::Sr25519,
+    };
+    populate_addresses (&database, &alice_seed_object)?;
+    let westend_network_key = generate_network_key(&hex::decode("e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e").expect("known value"));
+    create_address (&database, "//Alice", westend_network_key, "Alice_test_westend", &alice_seed_object, false)?;
+    
+    database.flush()?;
+    Ok(())
 }
 
 #[cfg(test)]
@@ -392,10 +366,10 @@ mod tests {
         let chainspecs = get_default_chainspecs();
         let default_addresses = get_relevant_identities("Alice", &hex::encode(chainspecs[0].genesis_hash), dbname).unwrap();
         assert!(default_addresses.len()>0);
-        assert_eq!(r#"[([70, 235, 221, 239, 140, 217, 187, 22, 125, 195, 8, 120, 215, 17, 59, 126, 22, 142, 111, 6, 70, 190, 255, 215, 125, 105, 211, 155, 173, 118, 180, 122], AddressDetails { name_for_seed: [20, 65, 108, 105, 99, 101], path: "", has_pwd: false, name: "root address", network_id: [[145, 177, 113, 187, 21, 142, 45, 56, 72, 250, 35, 169, 241, 194, 81, 130, 251, 142, 32, 49, 59, 44, 30, 180, 146, 25, 218, 122, 112, 206, 144, 195], [176, 168, 212, 147, 40, 92, 45, 247, 50, 144, 223, 183, 230, 31, 135, 15, 23, 180, 24, 1, 25, 122, 20, 156, 169, 54, 84, 73, 158, 163, 218, 254], [225, 67, 242, 56, 3, 172, 80, 232, 246, 248, 230, 38, 149, 209, 206, 158, 78, 29, 104, 170, 54, 193, 205, 44, 253, 21, 52, 2, 19, 243, 66, 62], [231, 195, 213, 237, 222, 125, 185, 100, 49, 124, 217, 181, 26, 58, 5, 157, 124, 217, 159, 129, 189, 188, 225, 73, 144, 4, 115, 84, 51, 76, 151, 121]], encryption: Sr25519 }), ([100, 163, 18, 53, 212, 191, 155, 55, 207, 237, 58, 250, 138, 166, 7, 84, 103, 95, 156, 73, 21, 67, 4, 84, 211, 101, 192, 81, 18, 120, 77, 5], AddressDetails { name_for_seed: [20, 65, 108, 105, 99, 101], path: "//kusama", has_pwd: false, name: "kusama root address", network_id: [[176, 168, 212, 147, 40, 92, 45, 247, 50, 144, 223, 183, 230, 31, 135, 15, 23, 180, 24, 1, 25, 122, 20, 156, 169, 54, 84, 73, 158, 163, 218, 254]], encryption: Sr25519 })]"#, format!("{:?}", default_addresses)); //because JSON export is what we care about
+        assert_eq!(r#"[([70, 235, 221, 239, 140, 217, 187, 22, 125, 195, 8, 120, 215, 17, 59, 126, 22, 142, 111, 6, 70, 190, 255, 215, 125, 105, 211, 155, 173, 118, 180, 122], AddressDetails { seed_name: "Alice", path: "", has_pwd: false, name: "root address", network_id: [[145, 177, 113, 187, 21, 142, 45, 56, 72, 250, 35, 169, 241, 194, 81, 130, 251, 142, 32, 49, 59, 44, 30, 180, 146, 25, 218, 122, 112, 206, 144, 195], [176, 168, 212, 147, 40, 92, 45, 247, 50, 144, 223, 183, 230, 31, 135, 15, 23, 180, 24, 1, 25, 122, 20, 156, 169, 54, 84, 73, 158, 163, 218, 254], [225, 67, 242, 56, 3, 172, 80, 232, 246, 248, 230, 38, 149, 209, 206, 158, 78, 29, 104, 170, 54, 193, 205, 44, 253, 21, 52, 2, 19, 243, 66, 62], [231, 195, 213, 237, 222, 125, 185, 100, 49, 124, 217, 181, 26, 58, 5, 157, 124, 217, 159, 129, 189, 188, 225, 73, 144, 4, 115, 84, 51, 76, 151, 121]], encryption: Sr25519 }), ([100, 163, 18, 53, 212, 191, 155, 55, 207, 237, 58, 250, 138, 166, 7, 84, 103, 95, 156, 73, 21, 67, 4, 84, 211, 101, 192, 81, 18, 120, 77, 5], AddressDetails { seed_name: "Alice", path: "//kusama", has_pwd: false, name: "kusama root address", network_id: [[176, 168, 212, 147, 40, 92, 45, 247, 50, 144, 223, 183, 230, 31, 135, 15, 23, 180, 24, 1, 25, 122, 20, 156, 169, 54, 84, 73, 158, 163, 218, 254]], encryption: Sr25519 })]"#, format!("{:?}", default_addresses)); //because JSON export is what we care about
         let database: Db = open(dbname).unwrap();
         let identities: Tree = database.open_tree(ADDRTREE).unwrap();
-        let test_key = generate_address_key(hex::decode("46ebddef8cd9bb167dc30878d7113b7e168e6f0646beffd77d69d39bad76b47a").unwrap());
+        let test_key = generate_address_key(&hex::decode("46ebddef8cd9bb167dc30878d7113b7e168e6f0646beffd77d69d39bad76b47a").unwrap());
         println!("{:?}", test_key);
         assert!(identities.contains_key(test_key).unwrap());
     }
@@ -452,15 +426,15 @@ mod tests {
 
         try_create_seed(seed_name, ENCRYPTION_NAME, SEED, 0, dbname).unwrap();
         let seed_object = SeedObject {
-            seed_name: seed_name,
-            seed_phrase: SEED,
+            seed_name: seed_name.to_string(),
+            seed_phrase: SEED.to_string(),
             encryption: Encryption::Sr25519,
         };
         let database: Db = open(dbname).unwrap();
         create_address(&database, "//Alice", network_id_0.to_vec(), "Alice", &seed_object, false).expect("Create Alice in network 0");
         create_address(&database, "//Alice", network_id_1, "Alice", &seed_object, false).expect("Create Alice in network 1");
         create_address(&database, "//Alice/1", network_id_0, "Alice/1", &seed_object, false).expect("Create Alice/1 in network 0");
-        let identities = get_seed_identities (&database, seed_name).unwrap();
+        let identities = get_seed_identities (&database, &seed_object.seed_name).unwrap();
         println!("{:?}", identities);
         let mut flag0 = false;
         let mut flag1 = false;
@@ -529,13 +503,13 @@ mod tests {
         delete_address(&hex::encode(&key0), network_id_string_0, dbname).expect("delete and address");
         delete_address(&hex::encode(&key1), network_id_string_0, dbname).expect("delete another address");
         let identities = get_relevant_identities("Alice", network_id_string_0, dbname).expect("Alice still should have some addresses after deletion of two");
-        for (pub_key, address) in identities {
+        for (pub_key, _) in identities {
             assert_ne!(pub_key, key0);
             assert_ne!(pub_key, key1);
         }
         let identities = get_relevant_identities("Alice", network_id_string_1, dbname).expect("Alice still should have some addresses after deletion of two");
         let mut flag_to_check_key0_remains = false;
-        for (pub_key, address) in identities {
+        for (pub_key, _) in identities {
             if pub_key == key0 {
                 flag_to_check_key0_remains = true;
             }

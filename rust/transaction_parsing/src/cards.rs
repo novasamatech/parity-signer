@@ -24,7 +24,7 @@ pub enum Card <'a> {
     BlockHash (&'a str),
     TxSpec {network: &'a str, version: u32, tx_version: u32},
     TxSpecPlain {gen_hash: &'a str, version: u32, tx_version: u32},
-    Author {base58_author: &'a str, path: &'a str, has_pwd: bool, name: &'a str},
+    Author {base58_author: &'a str, seed_name: &'a str, path: &'a str, has_pwd: bool, name: &'a str},
     AuthorPlain (&'a str),
     AuthorPublicKey (AuthorPublicKey),
     Verifier(String),
@@ -38,6 +38,7 @@ pub enum Card <'a> {
 pub enum Warning {
     AuthorNotFound,
     NewerVersion {used_version: u32, latest_version: u32},
+    NoNetworkID,
     VerifierAppeared,
     NotVerified,
     UpdatingTypes,
@@ -56,6 +57,7 @@ impl Warning {
         match &self {
             Warning::AuthorNotFound => String::from("Transaction author public key not found."),
             Warning::NewerVersion {used_version, latest_version} => format!("Transaction uses outdated runtime version {}. Latest known available version is {}.", used_version, latest_version),
+            Warning::NoNetworkID => String::from("Public key is on record, but not associated with the network used."),
             Warning::VerifierAppeared => String::from("Previously unverified network metadata now received signed by a verifier. If accepted, only metadata from same verifier could be received for this network."),
             Warning::NotVerified => String::from("Received network metadata is not verified."),
             Warning::UpdatingTypes => String::from("Updating types (really rare operation)."),
@@ -96,7 +98,7 @@ impl <'a> Card <'a> {
             Card::BlockHash (hex_block_hash) => fancy(index, indent, "block_hash", &format!("\"{}\"", hex_block_hash)),
             Card::TxSpec {network, version, tx_version} => fancy(index, indent, "tx_spec", &format!("{{\"network\":\"{}\",\"version\":\"{}\",\"tx_version\":\"{}\"}}", network, version, tx_version)),
             Card::TxSpecPlain {gen_hash, version, tx_version} => fancy(index, indent, "tx_spec_plain", &format!("{{\"network_genesis_hash\":\"{}\",\"version\":\"{}\",\"tx_version\":\"{}\"}}", gen_hash, version, tx_version)),
-            Card::Author {base58_author, path, has_pwd, name} => fancy(index, indent, "author", &format!("{{\"base58\":\"{}\",\"derivation_path\":\"{}\",\"has_password\":\"{}\",\"name\":\"{}\"}}", base58_author, path, has_pwd, name)),
+            Card::Author {base58_author, seed_name, path, has_pwd, name} => fancy(index, indent, "author", &format!("{{\"base58\":\"{}\",\"seed\":\"{}\",\"derivation_path\":\"{}\",\"has_password\":\"{}\",\"name\":\"{}\"}}", base58_author, seed_name, path, has_pwd, name)),
             Card::AuthorPlain (base58_author) => fancy(index, indent, "author_plain", &format!("{{\"base58\":\"{}\"}}", base58_author)),
             Card::AuthorPublicKey (author_pub_key) => match author_pub_key {
                 AuthorPublicKey::Ed25519(x) => fancy(index, indent, "author_public_key", &format!("{{\"hex\":\"{}\",\"crypto\":\"ed25519\"}}", &hex::encode(x))),
@@ -105,8 +107,8 @@ impl <'a> Card <'a> {
             },
             Card::Verifier(x) => fancy(index, indent, "verifier", x),
             Card::Meta{specname, spec_version, meta_hash} => fancy(index, indent, "meta", &format!("{{\"specname\":\"{}\",\"spec_version\":\"{}\",\"meta_hash\":\"{}\"}}", specname, spec_version, meta_hash)),
-            Card::TypesInfo(x) => fancy(index, indent, "types_hash", x),
-            Card::NewNetwork{specname, spec_version, meta_hash, chain_specs, verifier_line} => fancy(index, indent, "new_network", &format!("{{\"specname\":\"{}\",\"spec_version\":\"{}\",\"meta_hash\":\"{}\",\"base58prefix\":\"{}\",\"color\":\"{}\",\"decimals\":\"{}\",\"genesis_hash\":\"{}\",\"logo\":\"{}\",\"name\":\"{}\",\"path_id\":\"{}\",\"secondary_color\":\"{}\",\"title\":\"{}\",\"unit\":\"{}\",\"verifier\":\"{}\"}}", specname, spec_version, meta_hash, chain_specs.base58prefix, chain_specs.color, chain_specs.decimals, hex::encode(chain_specs.genesis_hash), chain_specs.logo, chain_specs.name, chain_specs.path_id, chain_specs.secondary_color, chain_specs.title, chain_specs.unit, verifier_line)),
+            Card::TypesInfo(x) => fancy(index, indent, "types_hash", &format!("\"{}\"", x)),
+            Card::NewNetwork{specname, spec_version, meta_hash, chain_specs, verifier_line} => fancy(index, indent, "new_network", &format!("{{\"specname\":\"{}\",\"spec_version\":\"{}\",\"meta_hash\":\"{}\",\"base58prefix\":\"{}\",\"color\":\"{}\",\"decimals\":\"{}\",\"genesis_hash\":\"{}\",\"logo\":\"{}\",\"name\":\"{}\",\"path_id\":\"{}\",\"secondary_color\":\"{}\",\"title\":\"{}\",\"unit\":\"{}\",\"verifier\":{}}}", specname, spec_version, meta_hash, chain_specs.base58prefix, chain_specs.color, chain_specs.decimals, hex::encode(chain_specs.genesis_hash), chain_specs.logo, chain_specs.name, chain_specs.path_id, chain_specs.secondary_color, chain_specs.title, chain_specs.unit, verifier_line)),
             Card::Warning (warn) => fancy(index, indent, "warning", &format!("\"{}\"", warn.show())),
             Card::Error (err) => fancy(index, indent, "error", &format!("\"{}\"", err.show())),
         }

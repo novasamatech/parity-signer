@@ -1,5 +1,6 @@
 use sled::{Db, open};
 use definitions::{constants::{COLD_DB_NAME, HOT_DB_NAME}, network_specs::Verifier};
+use std::fs;
 
 pub mod address_book;
 use address_book::load_address_book;
@@ -11,17 +12,10 @@ pub mod chainspecs;
 use chainspecs::{load_chainspecs, load_chainspecs_to_send};
 
 pub mod identities;
+use identities::load_test_identities;
 
 pub mod settings;
 use settings::{load_types, set_general_verifier};
-
-mod db_utils;
-
-/// struct to store three important databases: chain_spec, metadata, and types_info
-pub struct DataFiles<'a> {
-    pub metadata_contents: &'a str,
-}
-
 
 /// Function to manually purge the database.
 /// Used to have issues without purge even if the database was physically removed from the device and created again.
@@ -41,18 +35,24 @@ fn purge (dbname: &str) -> Result<(), Box<dyn std::error::Error>> {
 
 
 /// Function to re-populate "cold" database with default values.
-/// Used for tests in signing crate
+/// Flag testing = true indicates if Alice & Co test identities should be added to ADDRTREE
 
-pub fn populate_cold (dbname: &str, datafiles: DataFiles) -> Result<(), Box<dyn std::error::Error>> {
+pub fn populate_cold (dbname: &str, metadata_filename: &str, testing: bool) -> Result<(), Box<dyn std::error::Error>> {
     
     purge(dbname)?;
 
     let general_verifier = Verifier::None;
+    
+    let metadata = match fs::read_to_string(metadata_filename) {
+        Ok(x) => x,
+        Err(_) => return Err(Box::from("Metadata database missing")),
+    };
 
-    load_metadata(dbname, datafiles.metadata_contents)?;
+    load_metadata(dbname, &metadata)?;
     load_chainspecs(dbname)?;
     load_types(dbname)?;
     set_general_verifier(dbname, general_verifier)?;
+    if testing {load_test_identities(dbname)?}
     
     Ok(())
     
@@ -60,11 +60,15 @@ pub fn populate_cold (dbname: &str, datafiles: DataFiles) -> Result<(), Box<dyn 
 
 
 /// Function to re-populate default "cold" database with default values.
+/// Currently this cold database is used for transaction_parsing crate
+/// and needs Alice & Co identities
 
-pub fn default_cold (datafiles: DataFiles) -> Result<(), Box<dyn std::error::Error>> {
+pub fn default_cold () -> Result<(), Box<dyn std::error::Error>> {
     
     let dbname = COLD_DB_NAME;
-    populate_cold(dbname, datafiles)
+    let metadata_filename = "metadata_database.ts";
+    
+    populate_cold(dbname, metadata_filename, true)
 }
 
 

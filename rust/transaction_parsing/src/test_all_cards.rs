@@ -37,7 +37,7 @@ pub fn make_all_cards() -> String {
     all_cards.push(Card::BlockHash("a8dfb73a4b44e6bf84affe258954c12db1fe8e8cf00b965df2af2f49c1ec11cd"));
     all_cards.push(Card::TxSpec{network: "westend", version: 50, tx_version: 5});
     all_cards.push(Card::TxSpecPlain{gen_hash: "a8dfb73a4b44e6bf84affe258954c12db1fe8e8cf00b965df2af2f49c1ec11cd", version: 50, tx_version: 5});
-    all_cards.push(Card::Author{base58_author: "5FHneW46xGXgs5mUiveU4sbTyGBzmstUspZC92UhjJM694ty", path: "//Alice", has_pwd: false, name: ""});
+    all_cards.push(Card::Author{base58_author: "5FHneW46xGXgs5mUiveU4sbTyGBzmstUspZC92UhjJM694ty", seed_name: "Alice", path: "//Alice", has_pwd: false, name: ""});
     all_cards.push(Card::AuthorPlain("5FHneW46xGXgs5mUiveU4sbTyGBzmstUspZC92UhjJM694ty"));
     all_cards.push(Card::AuthorPublicKey(AuthorPublicKey::Sr25519([142, 175, 4, 21, 22, 135, 115, 99, 38, 201, 254, 161, 126, 37, 252, 82, 135, 97, 54, 147, 201, 18, 144, 156, 178, 38, 170, 71, 148, 242, 106, 72])));
     all_cards.push(Card::Verifier(Verifier::Sr25519(String::from("d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d")).show_card()));
@@ -60,6 +60,7 @@ pub fn make_all_cards() -> String {
     
     all_cards.push(Card::Warning(Warning::AuthorNotFound));
     all_cards.push(Card::Warning(Warning::NewerVersion{used_version: 50, latest_version: 9010}));
+    all_cards.push(Card::Warning(Warning::NoNetworkID));
     all_cards.push(Card::Warning(Warning::VerifierAppeared));
     all_cards.push(Card::Warning(Warning::NotVerified));
     all_cards.push(Card::Warning(Warning::UpdatingTypes));
@@ -146,14 +147,14 @@ pub fn make_all_cards() -> String {
     all_cards.push(Card::Error(Error::CryptoError(CryptoError::GeneralVerifierChanged {old_show: Verifier::Ed25519(String::from("d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d")).show_error(), new_show: Verifier::Sr25519(String::from("5a4a03f84a19cf8ebda40e62358c592870691a9cf456138bb4829969d10fe969")).show_error()})));
     all_cards.push(Card::Error(Error::CryptoError(CryptoError::GeneralVerifierDisappeared)));
     all_cards.push(Card::Error(Error::CryptoError(CryptoError::NetworkExistsVerifierDisappeared)));
-    
-    let mut output_cards = String::from("[");
+ 
+    let mut output_cards = String::from("{\"method\":[");
     
     for (i,x) in all_cards.iter().enumerate() {
         if i > 0 {output_cards.push_str(",")}
         output_cards.push_str(&x.card(i as u32,0));
     }
     
-    output_cards.push_str("]");
+    output_cards.push_str("]}");
     output_cards
 }

@@ -1,6 +1,6 @@
 use frame_metadata::{RuntimeMetadataV12};
 use meta_reading::decode_metadata::{get_meta_const_light};
-use definitions::{constants::{GENERALVERIFIER, TRANSACTION, TYPES}, network_specs::{ChainSpecs, Verifier}, metadata::{NameVersioned, VersionDecoded}, types::TypeEntry};
+use definitions::{constants::{GENERALVERIFIER, TRANSACTION, TYPES}, network_specs::{ChainSpecs, Verifier, NetworkKey}, metadata::{NameVersioned, VersionDecoded}, types::TypeEntry};
 use parity_scale_codec::{Decode, Encode};
 use sled::{Db, open, Tree};
 
@@ -71,13 +71,13 @@ pub fn find_meta(chain_name: &str, version: u32, metadata: &Tree) -> Result<(Run
 }
 
 
-/// Function to search for genesis_hash in chainspecs database tree
-pub fn get_chainspecs (gen_hash: &Vec<u8>, chainspecs: &Tree) -> Result<ChainSpecs, Error> {
-    match chainspecs.get(gen_hash) {
+/// Function to search for network_key (genesis_hash at the moment) in chainspecs database tree
+pub fn get_chainspecs (network_key: &NetworkKey, chainspecs: &Tree) -> Result<ChainSpecs, Error> {
+    match chainspecs.get(network_key) {
         Ok(chainspecs_db_reply) => {
             match chainspecs_db_reply {
                 Some(x) => {
-                // some entry found for this genesis hash
+                // some entry found for this network_key
                     match <ChainSpecs>::decode(&mut &x[..]) {
                         Ok(y) => Ok(y),
                         Err(_) => return Err(Error::DatabaseError(DatabaseError::DamagedChainSpecs)),
