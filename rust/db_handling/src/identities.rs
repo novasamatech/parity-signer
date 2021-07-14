@@ -349,18 +349,17 @@ mod tests {
     #[test]
     fn test_generate_random_account() {
         let dbname = "tests/test_generate_random_account";
-        let _ = fs::remove_dir_all(&dbname);
         load_chainspecs(dbname).expect("create default database");
         try_create_seed("Randy", ENCRYPTION_NAME, "", 24, dbname).unwrap();
         let chainspecs = get_default_chainspecs();
         let random_addresses = get_relevant_identities("Randy", &hex::encode(chainspecs[0].genesis_hash), dbname).unwrap();
         assert!(random_addresses.len()>0);
+        fs::remove_dir_all(dbname).unwrap();
     }
 
     #[test]
     fn test_generate_default_addresses_for_alice() {
         let dbname = "tests/test_generate_default_addresses_for_Alice";
-        let _ = fs::remove_dir_all(&dbname);
         load_chainspecs(dbname).expect("create default database");
         try_create_seed("Alice", ENCRYPTION_NAME, SEED, 0, dbname).unwrap();
         let chainspecs = get_default_chainspecs();
@@ -372,6 +371,7 @@ mod tests {
         let test_key = generate_address_key(&hex::decode("46ebddef8cd9bb167dc30878d7113b7e168e6f0646beffd77d69d39bad76b47a").unwrap());
         println!("{:?}", test_key);
         assert!(identities.contains_key(test_key).unwrap());
+        fs::remove_dir_all(dbname).unwrap();
     }
 
     #[test]
@@ -396,7 +396,6 @@ mod tests {
         let path_should_fail_0 = "//path-should-fail-0";
         let path_should_succeed = "//path-should-succeed";
         let path_should_fail_1 = "//path-should-fail-1";
-        let _ = fs::remove_dir_all(&dbname);
         let chainspecs = get_default_chainspecs();
         load_chainspecs(dbname).expect("create default database");
         try_create_seed("Alice", ENCRYPTION_NAME, SEED, 0, dbname).unwrap();
@@ -410,12 +409,12 @@ mod tests {
             flag = flag || address.path == path_should_succeed;
         }
         assert!(flag);
+        fs::remove_dir_all(dbname).unwrap();
     }
 
     #[test]
     fn test_derive() { 
         let dbname = "tests/test_derive";
-        let _ = fs::remove_dir_all(&dbname);
         load_chainspecs(dbname).expect("create default database");
         let chainspecs = get_default_chainspecs();
         let seed_name = "Alice";
@@ -444,18 +443,19 @@ mod tests {
         }
         assert!(flag0, "Something is wrong with //Alice");
         assert!(flag1, "Something is wrong with //Alice/1");
+        fs::remove_dir_all(dbname).unwrap();
     }
 
     #[test]
     fn test_suggest_n_plus_one() { 
         let dbname = "tests/test_suggest_n_plus_one";
-        let _ = fs::remove_dir_all(&dbname);
         load_chainspecs(dbname).expect("create default database");
         try_create_seed("Alice", ENCRYPTION_NAME, SEED, 0, dbname).unwrap();
         let chainspecs = get_default_chainspecs();
         let network_id_string_0 = &hex::encode(chainspecs[0].genesis_hash);
         try_create_address("clone", "Alice", SEED, ENCRYPTION_NAME, "//Alice//10", network_id_string_0, false, dbname).expect("create a valid address //Alice//10");
         assert_eq!("//Alice//11", suggest_n_plus_one("//Alice", "Alice", network_id_string_0, dbname).expect("at least some suggestion about new name should be produced unless db read resulted in a failure"));
+        fs::remove_dir_all(dbname).unwrap();
     }
 
     #[test]
@@ -490,7 +490,6 @@ mod tests {
     #[test]
     fn test_identity_deletion() {
         let dbname = "tests/test_identity_deletion";
-        let _ = fs::remove_dir_all(&dbname);
         load_chainspecs(dbname).expect("create default database");
         try_create_seed("Alice", ENCRYPTION_NAME, SEED, 0, dbname).unwrap();
         let chainspecs = get_default_chainspecs();
@@ -516,6 +515,7 @@ mod tests {
             assert_ne!(pub_key, key1);
         }
         assert!(flag_to_check_key0_remains, "An address that should have only lost network was removed entirely");
+        fs::remove_dir_all(dbname).unwrap();
     }
 }
 

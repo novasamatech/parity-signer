@@ -27,26 +27,21 @@ import {
 import * as React from 'react';
 import { View } from 'react-native';
 
-import NetworkDetails from 'modules/network/screens/NetworkDetails';
-import NetworkSettings from 'modules/network/screens/NetworkSettings';
+import NetworkDetails from 'screens/NetworkDetails';
 import HeaderLeftHome from 'components/HeaderLeftHome';
 import SecurityHeader from 'components/SecurityHeader';
 import testIDs from 'e2e/testIDs';
 import About from 'screens/About';
 import Main from 'modules/main/screens/Main';
 import SeedBackup from 'screens/SeedBackup';
-import IdentityManagement from 'screens/IdentityManagement';
-import LoadingScreen from 'screens/LoadingScreen';
 import RootSeedNew from 'screens/RootSeedNew';
-import MetadataManagement from 'modules/network/screens/MetadataManagement';
-import MetadataSaving from 'screens/MetadataSaving';
 import PathDerivation from 'screens/PathDerivation';
 import PathsList from 'screens/PathsList';
 import PrivacyPolicy from 'screens/PrivacyPolicy';
 import FastQrScanner from 'screens/FastQrScanner';
 import Security from 'screens/Security';
-import DetailsTx from 'modules/sign/screens/DetailsTx';
-import SignedTx from 'modules/sign/screens/SignedTx';
+import DetailsTx from 'screens/DetailsTx';
+import SignedTx from 'screens/SignedTx';
 import TermsAndConditions from 'screens/TermsAndConditions';
 import colors from 'styles/colors';
 import { headerHeight, horizontalPadding } from 'styles/containerStyles';
@@ -113,19 +108,8 @@ export const AppNavigator = (): React.ReactElement => (
 		<ScreenStack.Screen name="Main" component={Main} />
 		<ScreenStack.Screen name="About" component={About} />
 		<ScreenStack.Screen name="SeedBackup" component={SeedBackup} />
-		<ScreenStack.Screen
-			name="IdentityManagement"
-			component={IdentityManagement}
-		/>
-		<ScreenStack.Screen name="LoadingScreen" component={LoadingScreen} />
 		<ScreenStack.Screen name="RootSeedNew" component={RootSeedNew} />
 		<ScreenStack.Screen name="NetworkDetails" component={NetworkDetails} />
-		<ScreenStack.Screen name="NetworkSettings" component={NetworkSettings} />
-		<ScreenStack.Screen
-			name="MetadataManagement"
-			component={MetadataManagement}
-		/>
-		<ScreenStack.Screen name="MetadataSaving" component={MetadataSaving} />
 		<ScreenStack.Screen name="PathDerivation" component={PathDerivation} />
 		<ScreenStack.Screen name="PathsList" component={PathsList} />
 		<ScreenStack.Screen name="FastQrScanner" component={FastQrScanner} />
@@ -137,17 +121,5 @@ export const AppNavigator = (): React.ReactElement => (
 			component={TermsAndConditions}
 		/>
 		<ScreenStack.Screen name="PrivacyPolicy" component={PrivacyPolicy} />
-	</ScreenStack.Navigator>
-);
-
-export const BareLoadingScreen = (): React.ReactElement => (
-	<ScreenStack.Navigator
-		initialRouteName="LoadingScreen"
-		screenOptions={{
-			...globalStackNavigationOptions,
-			headerRight: (): React.ReactNode => null
-		}}
-	>
-		<ScreenStack.Screen name="LoadingScreen" component={LoadingScreen} />
 	</ScreenStack.Navigator>
 );

@@ -16,7 +16,7 @@ import {
 	TipCard,
 	TxSpecCard,
 	VariableNameCard
-} from 'modules/sign/components/CardTemplates';
+} from 'components/CardTemplates';
 
 type PayloadCardProps = {
 	type: PayloadCardType;

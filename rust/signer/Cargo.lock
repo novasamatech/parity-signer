@@ -781,6 +781,7 @@ dependencies = [
  "definitions",
  "hex",
  "lazy_static",
+ "meta_reading",
  "parity-scale-codec",
  "parity-scale-codec-derive",
  "regex",

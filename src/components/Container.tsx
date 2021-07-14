@@ -15,10 +15,9 @@
 
 import React from 'react';
 
-import styles from '../styles';
-
 import KeyboardScrollView from 'components/KeyboardScrollView';
 import testIDs from 'e2e/testIDs';
+import colors from 'styles/colors';
 //import { KeyboardAwareContainerProps } from 'types/props';
 
 export function KeyboardAwareContainer(props: any): React.ReactElement {
@@ -26,7 +25,11 @@ export function KeyboardAwareContainer(props: any): React.ReactElement {
 		<KeyboardScrollView
 			{...props}
 			bounces={false}
-			style={styles.body}
+			style={{
+				backgroundColor: colors.background.app,
+				flex: 1,
+				overflow: 'hidden'
+			}}
 			testID={testIDs.IdentityPin.scrollScreen}
 		/>
 	);

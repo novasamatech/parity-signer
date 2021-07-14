@@ -32,3 +32,24 @@ pub fn load_metadata (database_name: &str, metadata_contents: &str) -> Result<()
     Ok(())
     
 }
+
+
+/// Function to transfer metadata content hot database into cold database
+pub fn transfer_metadata (database_name_from: &str, database_name_to: &str) -> Result<(), Box<dyn std::error::Error>> {
+    
+    let database_from: Db = open(database_name_from)?;
+    let metadata_from: Tree = database_from.open_tree(METATREE)?;
+    
+    let database_to: Db = open(database_name_to)?;
+    let metadata_to: Tree = database_to.open_tree(METATREE)?;
+    
+    for x in metadata_from.iter() {
+        if let Ok((key, value)) = x {
+            metadata_to.insert(key, value)?;
+        }
+    }
+    
+    database_to.flush()?;
+    Ok(())
+    
+}

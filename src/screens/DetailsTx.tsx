@@ -17,16 +17,16 @@
 // This screen shows payload details and asks for signing confirmation
 
 import React, { useContext, useEffect, useState } from 'react';
-import { Text, View, FlatList } from 'react-native';
+import { Text, View, FlatList, StyleSheet } from 'react-native';
+import fontStyles from 'styles/fontStyles';
 
 import { PayloadCardData, Action } from 'types/payloads';
 import { SafeAreaViewContainer } from 'components/SafeAreaContainer';
 import testIDs from 'e2e/testIDs';
 import { NavigationProps } from 'types/props';
-import styles from 'modules/sign/styles';
 import Button from 'components/Button';
 import { makeTransactionCardsContents, accept } from 'utils/native';
-import PayloadCard from 'modules/sign/components/PayloadCard';
+import PayloadCard from 'components/PayloadCard';
 import { AlertStateContext } from 'stores/alertContext';
 import { resetNavigationWithNetworkChooser } from 'utils/navigationHelpers';
 
@@ -140,3 +140,25 @@ function DetailsTx({
 }
 
 export default DetailsTx;
+
+const styles = StyleSheet.create({
+	body: {
+		paddingTop: 24
+	},
+	bodyContent: {
+		marginVertical: 16,
+		paddingHorizontal: 20
+	},
+	qr: {
+		marginBottom: 8
+	},
+	title: {
+		...fontStyles.h2,
+		paddingBottom: 20
+	},
+	topTitle: {
+		...fontStyles.h1,
+		textAlign: 'center'
+	}
+});
+

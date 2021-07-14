@@ -16,9 +16,9 @@
 
 import React from 'react';
 
-import NetworkInfoCard from 'modules/network/components/NetworkInfoCard';
+import NetworkInfoCard from 'components/NetworkInfoCard';
 import { NetworkCard } from 'components/NetworkCard';
-import { MetadataCard } from 'modules/network/components/MetadataCard';
+import { MetadataCard } from 'components/MetadataCard';
 import { SafeAreaScrollViewContainer } from 'components/SafeAreaContainer';
 import { NavigationProps } from 'types/props';
 import Button from 'components/Button';

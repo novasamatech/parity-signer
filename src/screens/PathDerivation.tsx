@@ -24,7 +24,7 @@ import { alertPathDerivationError } from 'utils/alertUtils';
 import Separator from 'components/Separator';
 import ScreenHeading from 'components/ScreenHeading';
 import Button from 'components/Button';
-import { KeyboardAwareContainer } from 'modules/unlock/components/Container';
+import { KeyboardAwareContainer } from 'components/Container';
 import { tryCreateIdentity, suggestSeedName } from 'utils/native';
 import { resetNavigationWithNetworkChooser } from 'utils/navigationHelpers';
 

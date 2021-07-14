@@ -17,7 +17,7 @@
 import React, { useContext, useState } from 'react';
 import { StyleSheet, View } from 'react-native';
 
-import { KeyboardAwareContainer } from 'modules/unlock/components/Container';
+import { KeyboardAwareContainer } from 'components/Container';
 import testIDs from 'e2e/testIDs';
 import { AlertStateContext } from 'stores/alertContext';
 import Button from 'components/Button';

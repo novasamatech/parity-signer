@@ -15,19 +15,17 @@
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
 import React, { useEffect, useState } from 'react';
-import { Text, View, ActivityIndicator } from 'react-native';
+import { Text, View, ActivityIndicator, StyleSheet } from 'react-native';
 
 import { SafeAreaScrollViewContainer, SafeAreaViewContainer } from 'components/SafeAreaContainer';
-import { KeyboardAwareContainer } from 'modules/unlock/components/Container';
-import PinInput from 'modules/unlock/components/PinInput';
+import { KeyboardAwareContainer } from 'components/Container';
+import PinInput from 'components/PinInput';
 import ScreenHeading from 'components/ScreenHeading';
 import Button from 'components/Button';
-import t from 'modules/unlock/strings';
 import testIDs from 'e2e/testIDs';
 import { NavigationProps } from 'types/props';
 import QrView from 'components/QrView';
 import fontStyles from 'styles/fontStyles';
-import styles from 'modules/sign/styles';
 import Separator from 'components/Separator';
 import { sign } from 'utils/native';
 
@@ -165,3 +163,25 @@ function SignedTx({
 }
 
 export default SignedTx;
+
+const styles = StyleSheet.create({
+	body: {
+		paddingTop: 24
+	},
+	bodyContent: {
+		marginVertical: 16,
+		paddingHorizontal: 20
+	},
+	qr: {
+		marginBottom: 8
+	},
+	title: {
+		...fontStyles.h2,
+		paddingBottom: 20
+	},
+	topTitle: {
+		...fontStyles.h1,
+		textAlign: 'center'
+	}
+});
+
