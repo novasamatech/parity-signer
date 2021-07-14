@@ -16,7 +16,7 @@
 
 import React from 'react';
 
-import NetworkSelector from 'modules/main/components/NetworkSelector';
+import NetworkSelector from 'components/NetworkSelector';
 import { NavigationAccountIdentityProps, NavigationProps } from 'types/props';
 
 export default function Main(

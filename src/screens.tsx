@@ -32,7 +32,7 @@ import HeaderLeftHome from 'components/HeaderLeftHome';
 import SecurityHeader from 'components/SecurityHeader';
 import testIDs from 'e2e/testIDs';
 import About from 'screens/About';
-import Main from 'modules/main/screens/Main';
+import Main from 'screens/Main';
 import SeedBackup from 'screens/SeedBackup';
 import RootSeedNew from 'screens/RootSeedNew';
 import PathDerivation from 'screens/PathDerivation';
