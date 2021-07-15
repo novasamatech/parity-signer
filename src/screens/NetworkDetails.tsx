@@ -62,16 +62,20 @@ export default function NetworkDetails({
 		}
 	};
 
-	const onDeleteNetwork = async (): Promise<void> => {};
+	const onDeleteNetwork = async (): Promise<void> => {
+		try {
+			console.log('deleting network');
+			await removeNetwork(network.genesis_hash);
+			navigateToLandingPage(navigation);
+		} catch (e) {
+			console.log(e);
+			setAlert('Error!', e.toString());
+		}
+	};
 
 	const onExportMetadata = async (): Promise<void> => {};
 
 	const onExportNetwork = async (): Promise<void> => {};
-
-	const onPressDeleteMetadata = async (): Promise<void> => {
-	};
-
-	const onPressDeleteNetwork = async (): Promise<void> => {};
 
 	const onPressExportMetadata = async (): Promise<void> => {};
 
@@ -135,7 +139,7 @@ export default function NetworkDetails({
 							`You are about to remove network ${network.name} and all associated metadata and identities, are you sure?`, 
 							[
 								{
-									onDeleteNetwork, 
+									onPress: onDeleteNetwork, 
 									text: 'Confirm'
 								},
 								{
