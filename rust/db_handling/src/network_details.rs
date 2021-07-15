@@ -10,7 +10,7 @@ struct MetaPrint {
     metadata_hash: String,
 }
 
-pub fn get_network_details_by_key (network_key: NetworkKey, database_name: &str) -> Result<String, Box<dyn std::error::Error>> {
+pub fn get_network_details_by_key (network_key: &NetworkKey, database_name: &str) -> Result<String, Box<dyn std::error::Error>> {
     
     let database: Db = open(database_name)?;
     let metadata: Tree = database.open_tree(METATREE)?;
@@ -22,7 +22,7 @@ pub fn get_network_details_by_key (network_key: NetworkKey, database_name: &str)
                 Ok(a) => a,
                 Err(_) => return Err(Box::from("Network specs in the database are damaged, and could not be decoded.")),
             };
-            if generate_network_key(&network_specs.genesis_hash.to_vec()) != network_key {
+            if &generate_network_key(&network_specs.genesis_hash.to_vec()) != network_key {
                 return Err(Box::from("Network specs in the database are corrupted, genesis hash mismatch."))
             }
             let mut relevant_metadata: Vec<MetaPrint> = Vec::new();
@@ -68,6 +68,31 @@ pub fn get_network_details_by_hex (could_be_hex_gen_hash: &str, database_name: &
         else {could_be_hex_gen_hash}
     };
     let network_key = generate_network_key(&hex::decode(hex_gen_hash)?);
-    get_network_details_by_key (network_key, database_name)
+    get_network_details_by_key (&network_key, database_name)
     
 }
+
+
+#[cfg(test)]
+mod tests {
+    use super::super::{populate_cold};
+    use super::*;
+    use std::fs;
+    
+    const METADATA_FILE: &str = "metadata_database.ts";
+
+    #[test]
+    fn print_westend() {
+        let dbname = "tests/print_westend";
+        populate_cold(dbname, METADATA_FILE, true).unwrap();
+        
+        let line = "e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e";
+        let print = get_network_details_by_hex(line, dbname).unwrap();
+        let print_expected = r##"{"base58prefix":"42","color":"#660D35","decimals":"12","genesis_hash":"e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e","logo":"westend","name":"westend","order":"2","path_id":"//westend","secondary_color":"#262626","title":"Westend","unit":"WND","verifier":"none","meta":[{"spec_version":"9000","meta_hash":"e80237ad8b2e92b72fcf6beb8f0e4ba4a21043a7115c844d91d6c4f981e469ce"},{"spec_version":"9010","meta_hash":"70c99738c27fb32c87883f1c9c94ee454bf0b3d88e4a431a2bbfe1222b46ebdf"}]}"##;
+        assert!(print == print_expected, "\nExpected:\n{}\nReceived:\n{}", print_expected, print);
+        
+        fs::remove_dir_all(dbname).unwrap();
+    }
+
+}
+

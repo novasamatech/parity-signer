@@ -18,6 +18,7 @@ pub mod settings;
 use settings::{load_types, set_general_verifier};
 
 pub mod network_details;
+pub mod remove_network;
 
 /// Function to manually purge the database.
 /// Used to have issues without purge even if the database was physically removed from the device and created again.

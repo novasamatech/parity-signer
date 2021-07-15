@@ -63,11 +63,11 @@ fn filter_addresses_by_seed_name_and_name (identities: &Tree, seed_name: &str, n
 }
 
 /// get all identities for given seed_name and network_id as hex string
-pub fn get_relevant_identities (seed_name: &str, network_id_string: &str, database_name: &str) -> Result<Vec<(AddressKey, AddressDetails)>, Box<dyn std::error::Error>> {
-    let network_id = generate_network_key(&hex::decode(network_id_string)?); //TODO: add whatever is needed for parachains?
+pub fn get_relevant_identities (seed_name: &str, network_key_string: &str, database_name: &str) -> Result<Vec<(AddressKey, AddressDetails)>, Box<dyn std::error::Error>> {
+    let network_key = generate_network_key(&hex::decode(network_key_string)?); //TODO: add whatever is needed for parachains?
     let database: Db = open(database_name)?;
     let identities_out = get_seed_identities(&database, seed_name)?;
-    Ok(identities_out.into_iter().filter(|(_, details)| details.network_id.contains(&network_id)).collect())
+    Ok(identities_out.into_iter().filter(|(_, details)| details.network_id.contains(&network_key)).collect())
 }
 
 /// generate random phrase with given number of words
@@ -240,12 +240,13 @@ pub fn suggest_path_name(path_all: &str) -> String {
     output
 }
 
-/// Delete identity
-pub fn delete_address(pub_key: &str, network_id_string: &str, database_name: &str) -> Result<(), Box<dyn std::error::Error>> {
+/// Function removes identity as seen by user
+/// Function removes network_key from network_id vector for database record with address_key corresponding to given public key
+pub fn delete_address(pub_key: &str, network_key_string: &str, database_name: &str) -> Result<(), Box<dyn std::error::Error>> {
     let database: Db = open(database_name)?;
     let identities: Tree = database.open_tree(ADDRTREE)?;
     let address_key = generate_address_key(&hex::decode(pub_key)?);
-    let network_key = generate_network_key(&hex::decode(network_id_string)?); //TODO: add whatever is needed for parachains?
+    let network_key = generate_network_key(&hex::decode(network_key_string)?); //TODO: add whatever is needed for parachains?
     match identities.get(&address_key)? {
         Some(address_details_encoded) => {
             let mut address_details = <AddressDetails>::decode(&mut &address_details_encoded[..])?;
@@ -320,6 +321,26 @@ pub fn load_test_identities (database_name: &str) -> Result<(), Box<dyn std::err
     Ok(())
 }
 
+
+/// Function to remove all identities associated with given seen_name
+pub fn remove_identities_for_seed (seed_name: &str, database_name: &str) -> Result<(), Box<dyn std::error::Error>> {
+    
+    let database: Db = open(database_name)?;
+    let identities: Tree = database.open_tree(ADDRTREE)?;
+    for x in identities.iter() {
+        if let Ok((key, value)) = x {
+            let address_details = <AddressDetails>::decode(&mut &value[..])?;
+            if address_details.seed_name == seed_name {
+                identities.remove(&key)?;
+            }
+        }
+    }
+    database.flush()?;
+    Ok(())
+    
+}
+
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -349,6 +370,7 @@ mod tests {
     #[test]
     fn test_generate_random_account() {
         let dbname = "tests/test_generate_random_account";
+        let _ = fs::remove_dir_all(dbname).unwrap();
         load_chainspecs(dbname).expect("create default database");
         try_create_seed("Randy", ENCRYPTION_NAME, "", 24, dbname).unwrap();
         let chainspecs = get_default_chainspecs();
@@ -360,6 +382,7 @@ mod tests {
     #[test]
     fn test_generate_default_addresses_for_alice() {
         let dbname = "tests/test_generate_default_addresses_for_Alice";
+        let _ = fs::remove_dir_all(dbname).unwrap();
         load_chainspecs(dbname).expect("create default database");
         try_create_seed("Alice", ENCRYPTION_NAME, SEED, 0, dbname).unwrap();
         let chainspecs = get_default_chainspecs();
@@ -396,6 +419,7 @@ mod tests {
         let path_should_fail_0 = "//path-should-fail-0";
         let path_should_succeed = "//path-should-succeed";
         let path_should_fail_1 = "//path-should-fail-1";
+        let _ = fs::remove_dir_all(dbname).unwrap();
         let chainspecs = get_default_chainspecs();
         load_chainspecs(dbname).expect("create default database");
         try_create_seed("Alice", ENCRYPTION_NAME, SEED, 0, dbname).unwrap();
@@ -415,6 +439,7 @@ mod tests {
     #[test]
     fn test_derive() { 
         let dbname = "tests/test_derive";
+        let _ = fs::remove_dir_all(dbname).unwrap();
         load_chainspecs(dbname).expect("create default database");
         let chainspecs = get_default_chainspecs();
         let seed_name = "Alice";
@@ -449,6 +474,7 @@ mod tests {
     #[test]
     fn test_suggest_n_plus_one() { 
         let dbname = "tests/test_suggest_n_plus_one";
+        let _ = fs::remove_dir_all(dbname).unwrap();
         load_chainspecs(dbname).expect("create default database");
         try_create_seed("Alice", ENCRYPTION_NAME, SEED, 0, dbname).unwrap();
         let chainspecs = get_default_chainspecs();
@@ -490,6 +516,7 @@ mod tests {
     #[test]
     fn test_identity_deletion() {
         let dbname = "tests/test_identity_deletion";
+        let _ = fs::remove_dir_all(dbname).unwrap();
         load_chainspecs(dbname).expect("create default database");
         try_create_seed("Alice", ENCRYPTION_NAME, SEED, 0, dbname).unwrap();
         let chainspecs = get_default_chainspecs();

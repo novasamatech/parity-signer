@@ -262,8 +262,6 @@ export async function getIdentitiesForSeed(
 export async function getAllSeedNames(): Promise<[string] | []> {
 	try {
 		const allSeedsJSON = await SubstrateSign.getAllSeedNames();
-		console.log('something returned for seeds');
-		console.log(allSeedsJSON);
 		const allSeeds = JSON.parse(allSeedsJSON);
 		return allSeeds;
 	} catch (e) {
@@ -275,16 +273,21 @@ export async function getAllSeedNames(): Promise<[string] | []> {
 //Network management screen
 export async function getNetworkSpecs(networkKey: string): Promise<object> {
 	const specsJSON = await SubstrateSign.getNetworkSpecs(networkKey);
-	console.log(specsJSON);
 	const specs = JSON.parse(specsJSON);
 	return specs;
 }
 
 //Network deletion
 export async function removeNetwork(networkKey: string): Promise<void> {
-	return;
+	await SubstrateSign.removeNetwork(networkKey);
 }
 
-export async function removeMetadata(specVersion: string, specName: string): Promise<void> {
-	return;
+//Metadata deletion
+export async function removeMetadata(specName: string, specVersion: number): Promise<void> {
+	await SubstrateSign.removeMetadata(specName, specVersion);
+}
+
+//Remove seed and ALL associated addresses
+export async function removeSeed(seedName: string): Promise<void> {
+	await SubstrateSign.removeSeed(seedName);
 }

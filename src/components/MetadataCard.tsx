@@ -23,12 +23,16 @@ import colors from 'styles/colors';
 import fontStyles from 'styles/fontStyles';
 import Separator from 'components/Separator';
 import { ButtonListener } from 'types/props';
+import Button from 'components/Button';
 
 type MetadataCardProps = {
 	specName: string;
 	specVersion: string;
 	metadataHash: string;
+	selected: boolean;
 	onPress?: ButtonListener;
+	onPressDelete?: ButtonListener;
+	onPressExport?: ButtonListener;
 };
 
 const CardSeparator = (): ReactElement => (
@@ -46,42 +50,79 @@ export function MetadataCard({
 	specName,
 	specVersion,
 	metadataHash,
-	onPress
+	selected,
+	onPress,
+	onPressDelete,
+	onPressExport
 }: MetadataCardProps): React.ReactElement {
-	//	const { getNetwork } = useContext();
-
-	return (
-		<TouchableItem
-			accessibilityComponentType="button"
-			disabled={false}
-			onPress={onPress}
-		>
-			<CardSeparator />
-			<View style={styles.body}>
-				<View style={styles.label}>
-					<Text style={fontStyles.t_important}>Metadata version</Text>
+	if (selected) {
+		return (
+			<View style={{backgroundColor: colors.background.cardActive, borderWidth: 10}}>
+				<TouchableItem
+					accessibilityComponentType="button"
+					disabled={false}
+					onPress={onPress}
+				>
+					<CardSeparator />
+					<View style={styles.bodyActive}>
+						<View style={styles.label}>
+							<Text style={fontStyles.t_important}>Metadata version</Text>
+						</View>
+						<View style={styles.content}>
+							<Text style={fontStyles.t_codeS}>
+								{`spec_name: ${specName}\nspec_version: ${specVersion}\nhash: ${metadataHash}`}
+							</Text>
+						</View>
+					</View>
+				</TouchableItem>
+				<View style={{flexDirection:'row', justifyContent: 'space-evenly'}}>
+					<Button
+						title="Delete"
+						onPress={onPressDelete}
+					/>
+					<Button
+						title="Sign"
+						onPress={onPressExport}
+					/>
 				</View>
-				<View style={styles.content}>
-					<Text style={fontStyles.t_code}>
-						{`spec_name: ${specName}\nspec_version: ${specVersion}\nhash: ${metadataHash}`}
-					</Text>
-				</View>
-				<View />
 			</View>
-		</TouchableItem>
-	);
+		);
+	} else {
+		return (
+			<TouchableItem
+				accessibilityComponentType="button"
+				disabled={false}
+				onPress={onPress}
+			>
+				<CardSeparator />
+				<View style={styles.body}>
+					<View style={styles.label}>
+						<Text style={fontStyles.t_important}>Metadata version</Text>
+					</View>
+					<View style={styles.content}>
+						<Text style={fontStyles.t_codeS}>
+							{specVersion}
+						</Text>
+					</View>
+				</View>
+			</TouchableItem>
+		);
+	}
 }
 
 const styles = StyleSheet.create({
 	body: {
-		backgroundColor: colors.background.app,
+		backgroundColor: colors.background.card,
 		flexDirection: 'row'
+	},
+	bodyActive: {
+		backgroundColor: colors.background.cardActive,
 	},
 	content: {
 		alignItems: 'flex-start',
 		flex: 3,
 		justifyContent: 'center',
-		padding: 20
+		padding: 10
 	},
 	desc: {
 		flex: 1,
@@ -93,7 +134,7 @@ const styles = StyleSheet.create({
 		alignItems: 'flex-start',
 		flex: 1,
 		justifyContent: 'center',
-		padding: 20
+		padding: 10
 	},
 	text: {
 		color: colors.signal.main

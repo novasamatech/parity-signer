@@ -1,9 +1,9 @@
 use sled::{Db, Tree, open};
-use parity_scale_codec::Encode;
+use parity_scale_codec::{Decode, Encode};
 use regex::Regex;
 use lazy_static::lazy_static;
 use hex;
-use definitions::{constants::{METATREE}, metadata::NameVersioned};
+use definitions::{constants::{METATREE, SPECSTREE}, metadata::NameVersioned, network_specs::{ChainSpecs, generate_network_key}};
 
 
 
@@ -35,6 +35,8 @@ pub fn load_metadata (database_name: &str, metadata_contents: &str) -> Result<()
 
 
 /// Function to transfer metadata content hot database into cold database
+/// Checks that only networks with network specs already in "to" database are processed,
+/// so that no metadata without associated network specs enters the database
 pub fn transfer_metadata (database_name_from: &str, database_name_to: &str) -> Result<(), Box<dyn std::error::Error>> {
     
     let database_from: Db = open(database_name_from)?;
@@ -42,10 +44,17 @@ pub fn transfer_metadata (database_name_from: &str, database_name_to: &str) -> R
     
     let database_to: Db = open(database_name_to)?;
     let metadata_to: Tree = database_to.open_tree(METATREE)?;
+    let chainspecs_to: Tree = database_to.open_tree(SPECSTREE)?;
     
-    for x in metadata_from.iter() {
-        if let Ok((key, value)) = x {
-            metadata_to.insert(key, value)?;
+    for x in chainspecs_to.iter() {
+        if let Ok((network_key, network_specs_encoded)) = x {
+            let network_specs = <ChainSpecs>::decode(&mut &network_specs_encoded[..])?;
+            if network_key != generate_network_key(&network_specs.genesis_hash.to_vec()) {return Err(Box::from("Database corrupted. Genesis hash mismatch found."))}
+            for y in metadata_from.scan_prefix(network_specs.name.encode()) {
+                if let Ok((key, value)) = y {
+                    metadata_to.insert(key, value)?;
+                }
+            }
         }
     }
     

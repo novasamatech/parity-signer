@@ -141,24 +141,6 @@ export! {
         result::return_json_array(output)
     }
 
-    @Java_io_parity_signer_SubstrateSignModule_dbAddNetwork
-	fn add_network(
-		_network_json: &str,
-        _dbname: &str
-	) -> std::result::Result<(), Box<dyn std::error::Error>> {
-        
-        Ok(())
-    }
-
-    @Java_io_parity_signer_SubstrateSignModule_dbRemoveNetwork
-	fn remove_network(
-		_genesis_hash: &str,
-        _dbname: &str
-	) -> std::result::Result<(), Box<dyn std::error::Error>> {
-        
-        Ok(())
-    }
-
     @Java_io_parity_signer_SubstrateSignModule_dbGetRelevantIdentities
 	fn get_relevant_identities(
 		seed_name: &str,
@@ -177,20 +159,6 @@ export! {
                 identity.name))
         }
         result::return_json_array(output)
-    }
-
-    @Java_io_parity_signer_SubstrateSignModule_dbAckUserAgreement
-	fn ack_user_agreement(
-		dbname: &str
-	) -> std::result::Result<(), Box<dyn std::error::Error>> {
-        db_handling::settings::ack_user_agreement(dbname)
-    }
-
-    @Java_io_parity_signer_SubstrateSignModule_dbCheckUserAgreement
-	fn check_user_agreement(
-		dbname: &str
-	) -> std::result::Result<bool, Box<dyn std::error::Error>> {
-        db_handling::settings::check_user_agreement(dbname)
     }
     
     @Java_io_parity_signer_SubstrateSignModule_substrateTryCreateSeed
@@ -258,7 +226,32 @@ export! {
 	) -> std::result::Result<String, Box<dyn std::error::Error>> {
         db_handling::network_details::get_network_details_by_hex(network, dbname)
     }
+    
+    @Java_io_parity_signer_SubstrateSignModule_substrateRemoveNetwork
+	fn remove_network(
+        network: &str,
+        dbname: &str
+	) -> std::result::Result<(), Box<dyn std::error::Error>> {
+        db_handling::remove_network::remove_network_by_hex(network, dbname)
+    }
 
+    @Java_io_parity_signer_SubstrateSignModule_substrateRemoveMetadata
+	fn remove_metadata(
+        network_name: &str,
+        network_version: u32,
+        dbname: &str
+	) -> std::result::Result<(), Box<dyn std::error::Error>> {
+        db_handling::remove_network::remove_metadata(network_name, network_version, dbname)
+    }
+
+    @Java_io_parity_signer_SubstrateSignModule_substrateRemoveSeed
+	fn remove_seed(
+        seed_name: &str,
+        dbname: &str
+	) -> std::result::Result<(), Box<dyn std::error::Error>> {
+        return
+        db_handling::identities::remove_identities_for_seed(seed_name, dbname)
+    }
 }
 
 ffi_support::define_string_destructor!(signer_destroy_string);

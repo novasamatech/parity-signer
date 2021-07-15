@@ -49,12 +49,12 @@ const styles = StyleSheet.create({
 		alignItems: 'flex-start',
 		flex: 3,
 		justifyContent: 'center',
-		padding: 20
+		padding: 5
 	},
 	label: {
 		alignItems: 'flex-start',
 		flex: 1,
 		justifyContent: 'center',
-		padding: 20
+		padding: 5
 	}
 });

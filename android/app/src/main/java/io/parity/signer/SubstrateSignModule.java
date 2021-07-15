@@ -417,7 +417,7 @@ public class SubstrateSignModule extends ReactContextBaseJavaModule {
 
 			sharedPreferences.edit().putString(seedName, encryptedSeedRecord).apply();
 			
-			promise.resolve(seedPhrase + " =|= " + encryptedSeedRecord);
+			promise.resolve(0);
 		} catch (Exception e) {
 			rejectWithException(promise, "New seed creation failed", e);
 		}
@@ -442,7 +442,7 @@ public class SubstrateSignModule extends ReactContextBaseJavaModule {
 
 			sharedPreferences.edit().putString(seedName, encryptedSeedRecord).apply();
 			
-			promise.resolve(seedPhraseCheck + " =|= " + encryptedSeedRecord);
+			promise.resolve(0);
 		} catch (Exception e) {
 			rejectWithException(promise, "Seed recovery failed", e);
 		}
@@ -508,6 +508,40 @@ public class SubstrateSignModule extends ReactContextBaseJavaModule {
 		}
 	}
 
+	@ReactMethod
+	public void removeNetwork(String network, Promise promise) {
+		try {
+			substrateRemoveNetwork(network, dbname);
+			promise.resolve(0);
+		} catch (Exception e) {
+			rejectWithException(promise, "Network removal error", e);
+		}
+	}
+
+	@ReactMethod
+	public void removeMetadata(String specName, int specVersion, Promise promise) {
+		try {
+			substrateRemoveMetadata(specName, specVersion, dbname);
+			promise.resolve(0);
+		} catch (Exception e) {
+			rejectWithException(promise, "Metadata removal error", e);
+		}
+	}
+
+	@ReactMethod
+	public void removeSeed(String seedName, Promise promise) {
+		try {
+			substrateRemoveSeed(seedName, dbname);
+			sharedPreferences.edit()
+				.remove(seedName)
+				.apply();
+			promise.resolve(0);
+		} catch (Exception e) {
+			rejectWithException(promise, "Seed removal error", e);
+		}
+	}
+
+
 	//react native section end
 
 	//rust native section begin
@@ -528,6 +562,9 @@ public class SubstrateSignModule extends ReactContextBaseJavaModule {
 	private static native String substrateSuggestName(String path);
 	private static native void substrateDeleteIdentity(String pubKey, String network, String dbname);
 	private static native String substrateGetNetworkSpecs(String network, String dbname);
+	private static native void substrateRemoveNetwork(String network, String dbname);
+	private static native void substrateRemoveMetadata(String networkName, int networkVersion, String dbname);
+	private static native void substrateRemoveSeed(String seedName, String dbname);
 
 	//rust native section end
 }
