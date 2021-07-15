@@ -1,3 +1,9 @@
+# .gitlab-ci.yml
+#
+# parity-signer
+#
+# pipelines can be triggered manually in the web
+
 stages:
   - build
 
