@@ -2,20 +2,30 @@ stages:
   - build
 
 variables:
-  GIT_STRATEGY: fetch
-  GIT_DEPTH: 100
+  GIT_STRATEGY:                    fetch
+  GIT_DEPTH:                       100
 
 default:
-  cache: {}
+  cache:                           {}
+
+workflow:
+  rules:
+    - if: $CI_COMMIT_TAG
+    - if: $CI_COMMIT_BRANCH
 
 android-build-release:
-  stage: build
-  image: paritytech/parity-signer
-  tags:
-    - linux-docker
-  only:
-    - master
-    - /^[0-9]+$/
+  stage:                           build
+  image:                           paritytech/parity-signer:latest
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "web"
+    - if: $CI_PIPELINE_SOURCE == "schedule"
+    - if: $CI_COMMIT_REF_NAME == "master"
+    - if: $CI_COMMIT_REF_NAME =~ /^v[0-9]+\.[0-9]+.*$/              # i.e. v1.0, v2.1rc1
+    - if: $CI_COMMIT_REF_NAME =~ /^[0-9]+$/                         # PRs
+      variables:
+        KEYSTORE_ALIAS:            gitlab
+        KEYSTORE_PASS:             1
+        KEYSTORE_DATA:             1
   artifacts:
     paths:
       - signer-app-release-signed.apk
@@ -23,3 +33,5 @@ android-build-release:
     cat "$KEYSTORE_DATA" | base64 -d > /tmp/gitlab-ci.keystore
     wc /tmp/gitlab-ci.keystore
     ./scripts/build-release.sh /tmp/gitlab-ci.keystore "$KEYSTORE_ALIAS" "$KEYSTORE_PASS"
+  tags:
+    - linux-docker
