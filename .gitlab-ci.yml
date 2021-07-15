@@ -28,15 +28,11 @@ android-build-release:
     - if: $CI_COMMIT_REF_NAME == "master"
     - if: $CI_COMMIT_REF_NAME =~ /^v[0-9]+\.[0-9]+.*$/              # i.e. v1.0, v2.1rc1
     - if: $CI_COMMIT_REF_NAME =~ /^[0-9]+$/                         # PRs
-      variables:
-        KEYSTORE_ALIAS:            gitlab
-        KEYSTORE_PASS:             1
-        KEYSTORE_DATA:             1
   artifacts:
     paths:
       - signer-app-release-signed.apk
   script:
-    - cat "$KEYSTORE_DATA" | base64 -d > /tmp/gitlab-ci.keystore
+    - echo "$KEYSTORE_DATA" | base64 -d > /tmp/gitlab-ci.keystore
     - wc /tmp/gitlab-ci.keystore
     - ./scripts/build-release.sh /tmp/gitlab-ci.keystore "$KEYSTORE_ALIAS" "$KEYSTORE_PASS"
   tags:
