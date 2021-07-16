@@ -386,6 +386,7 @@ dependencies = [
  "parity-scale-codec",
  "parity-scale-codec-derive",
  "regex",
+ "sp-core",
 ]
 
 [[package]]

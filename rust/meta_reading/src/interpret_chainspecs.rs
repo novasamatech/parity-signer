@@ -6,7 +6,7 @@ use definitions::network_specs::ChainProperties;
 /// Function to interpret network properties fetched via rpc call
 
 pub fn interpret_properties (x: &Map<String, JsonValue>) -> Result<ChainProperties, Box<dyn std::error::Error>> {
-    let base58prefix: u8 = match x.get("ss58Format") {
+    let base58prefix: u16 = match x.get("ss58Format") {
         Some(a) => {
             match a {
                 JsonValue::Number(b) => {

@@ -12,6 +12,7 @@ parity-scale-codec-derive = "2.1.0"
 hex = "0.4.3"
 regex = "1.4.5"
 lazy_static = "1.4.0"
+sp-core = "3.0.0"
 
 
 [lib]

@@ -193,5 +193,3 @@ pub fn make_message (make: Make) -> Result<(), Box<dyn std::error::Error>> {
     
 }
 
-
-// fn process_verifier_kind (message: Vec<u8>, v: VerifierKind) -> Result<Vec<u8>>

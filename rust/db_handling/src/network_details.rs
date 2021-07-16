@@ -46,7 +46,6 @@ pub fn get_network_details_by_key (network_key: &NetworkKey, database_name: &str
                     relevant_metadata.push(new);
                 }
             }
-            if relevant_metadata.len() == 0 {return Err(Box::from(format!("No entries for network {} found in the metadata database.", network_specs.name)))}
             let chainspecs_print = format!("\"base58prefix\":\"{}\",\"color\":\"{}\",\"decimals\":\"{}\",\"genesis_hash\":\"{}\",\"logo\":\"{}\",\"name\":\"{}\",\"order\":\"{}\",\"path_id\":\"{}\",\"secondary_color\":\"{}\",\"title\":\"{}\",\"unit\":\"{}\",\"verifier\":{}", network_specs.base58prefix, network_specs.color, network_specs.decimals, hex::encode(network_specs.genesis_hash), network_specs.logo, network_specs.name, network_specs.order, network_specs.path_id, network_specs.secondary_color, network_specs.title, network_specs.unit, network_specs.verifier.show_card());
             let mut metadata_print = String::from("[");
             for (i,x) in relevant_metadata.iter().enumerate() {

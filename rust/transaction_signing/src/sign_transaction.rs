@@ -31,7 +31,7 @@ pub fn create_signature (seed_phrase: &str, pwd_entry: &str, dbname: &str, check
 // TODO zeroize
     let full_address = seed_phrase.to_owned() + &action.path;
     
-    match action.crypto {
+    match action.encryption {
         Encryption::Ed25519 => {
             let ed25519_pair = match ed25519::Pair::from_string(&full_address, pwd) {
                 Ok(x) => x,

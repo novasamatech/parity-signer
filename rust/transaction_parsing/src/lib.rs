@@ -2,7 +2,6 @@ mod add_network;
     use add_network::add_network;
 pub mod cards;
     use cards::Card;
-mod constants;
 mod check_signature;
 mod decoding;
 mod error;
@@ -19,7 +18,7 @@ pub mod test_all_cards;
 mod tests;
 mod utils;
     use utils::purge;
-pub mod utils_base58;
+
 
 /// Payload in hex format as it arrives into handling contains following elements:
 /// - prelude, length 6 symbols ("53" stands for substrate, ** - crypto type, ** - transaction type),

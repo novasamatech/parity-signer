@@ -2,7 +2,7 @@
 //TODO: rename fields to make them more clear
 #[derive(parity_scale_codec_derive::Decode, parity_scale_codec_derive::Encode, PartialEq, Debug)]
 pub struct ChainSpecs {
-    pub base58prefix: u8,
+    pub base58prefix: u16,
     pub color: String,
     pub decimals: u8,
     pub genesis_hash: [u8; 32],
@@ -20,7 +20,7 @@ pub struct ChainSpecs {
 
 #[derive(parity_scale_codec_derive::Decode, parity_scale_codec_derive::Encode, PartialEq, Debug)]
 pub struct ChainSpecsToSend {
-    pub base58prefix: u8,
+    pub base58prefix: u16,
     pub color: String,
     pub decimals: u8,
     pub genesis_hash: [u8; 32],
@@ -35,7 +35,7 @@ pub struct ChainSpecsToSend {
 
 #[derive(Debug, parity_scale_codec_derive::Encode, parity_scale_codec_derive::Decode)]
 pub struct ChainProperties {
-    pub base58prefix: u8,
+    pub base58prefix: u16,
     pub decimals: u8,
     pub unit: String,
 }

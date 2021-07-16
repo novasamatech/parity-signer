@@ -147,7 +147,7 @@ pub fn make_all_cards() -> String {
     all_cards.push(Card::Error(Error::CryptoError(CryptoError::GeneralVerifierChanged {old_show: Verifier::Ed25519(String::from("d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d")).show_error(), new_show: Verifier::Sr25519(String::from("5a4a03f84a19cf8ebda40e62358c592870691a9cf456138bb4829969d10fe969")).show_error()})));
     all_cards.push(Card::Error(Error::CryptoError(CryptoError::GeneralVerifierDisappeared)));
     all_cards.push(Card::Error(Error::CryptoError(CryptoError::NetworkExistsVerifierDisappeared)));
- 
+    
     let mut output_cards = String::from("{\"method\":[");
     
     for (i,x) in all_cards.iter().enumerate() {

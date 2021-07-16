@@ -6,7 +6,7 @@ use super::users::{Encryption, AddressKey};
 /// Struct to store sign_transaction action information
 #[derive(Decode, Encode)]
 pub struct SignDb {
-    pub crypto: Encryption,
+    pub encryption: Encryption,
     pub path: String,
     pub transaction: Vec<u8>,
     pub has_pwd: bool,

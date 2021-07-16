@@ -42,9 +42,7 @@ fn purge (dbname: &str) -> Result<(), Box<dyn std::error::Error>> {
 
 pub fn populate_cold (dbname: &str, metadata_filename: &str, testing: bool) -> Result<(), Box<dyn std::error::Error>> {
     
-    purge(dbname)?;
-
-    let general_verifier = Verifier::None;
+    populate_cold_no_meta (dbname, testing)?;
     
     let metadata = match fs::read_to_string(metadata_filename) {
         Ok(x) => x,
@@ -52,10 +50,35 @@ pub fn populate_cold (dbname: &str, metadata_filename: &str, testing: bool) -> R
     };
 
     load_metadata(dbname, &metadata)?;
+    Ok(())
+    
+}
+
+/// Function to re-populate "cold" database with default values, without any metadata added.
+/// For tests.
+/// Flag testing = true indicates if Alice & Co test identities should be added to ADDRTREE
+
+pub fn populate_cold_no_meta (dbname: &str, testing: bool) -> Result<(), Box<dyn std::error::Error>> {
+    
+    populate_cold_no_networks(dbname)?;
     load_chainspecs(dbname)?;
+    if testing {load_test_identities(dbname)?}
+    Ok(())
+    
+}
+
+/// Function to re-populate "cold" database with default values, without any network information added.
+/// For tests.
+/// Flag testing = true indicates if Alice & Co test identities should be added to ADDRTREE
+
+pub fn populate_cold_no_networks (dbname: &str) -> Result<(), Box<dyn std::error::Error>> {
+    
+    purge(dbname)?;
+
+    let general_verifier = Verifier::None;
+    
     load_types(dbname)?;
     set_general_verifier(dbname, general_verifier)?;
-    if testing {load_test_identities(dbname)?}
     
     Ok(())
     

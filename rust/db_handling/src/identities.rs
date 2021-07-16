@@ -7,16 +7,12 @@ use sled::{Db, Tree, open};
 use sp_core::{Pair, ed25519, sr25519, ecdsa};
 use parity_scale_codec::{Decode, Encode};
 use regex::Regex;
-use definitions::{constants::{ADDRTREE, SPECSTREE}, network_specs::{ChainSpecs, NetworkKey, generate_network_key}, users::{Encryption, AddressDetails, SeedObject, AddressKey, generate_address_key}};
+use definitions::{constants::{ADDRTREE, SPECSTREE}, network_specs::{ChainSpecs, NetworkKey, generate_network_key}, users::{Encryption, AddressDetails, SeedObject, AddressKey, generate_address_key, print_as_base58}};
 use bip39::{Language, Mnemonic, MnemonicType};
 use zeroize::Zeroize;
 use lazy_static::lazy_static;
 
-#[cfg(test)]
-use std::fs;
-
-#[cfg(test)]
-use super::chainspecs::load_chainspecs;
+use super::chainspecs::get_network;
 
 
 lazy_static! {
@@ -62,12 +58,53 @@ fn filter_addresses_by_seed_name_and_name (identities: &Tree, seed_name: &str, n
     Ok(out)
 }
 
-/// get all identities for given seed_name and network_id as hex string
-pub fn get_relevant_identities (seed_name: &str, network_key_string: &str, database_name: &str) -> Result<Vec<(AddressKey, AddressDetails)>, Box<dyn std::error::Error>> {
-    let network_key = generate_network_key(&hex::decode(network_key_string)?); //TODO: add whatever is needed for parachains?
+/// get all identities for given seed_name and network_key as hex string
+pub fn get_relevant_identities (seed_name: &str, genesis_hash: &str, database_name: &str) -> Result<Vec<(AddressKey, AddressDetails)>, Box<dyn std::error::Error>> {
+    let network_key = generate_network_key(&hex::decode(genesis_hash)?); //TODO: add whatever is needed for parachains?
     let database: Db = open(database_name)?;
     let identities_out = get_seed_identities(&database, seed_name)?;
     Ok(identities_out.into_iter().filter(|(_, details)| details.network_id.contains(&network_key)).collect())
+}
+
+/// Function to print all relevant identities for given seed_name and network_key as hex string
+pub fn print_relevant_identities (seed_name: &str, genesis_hash: &str, database_name: &str) -> Result<String, Box<dyn std::error::Error>> {
+    let relevant_identities = get_relevant_identities (seed_name, genesis_hash, database_name)?;
+    let network_specs = get_network(database_name, genesis_hash)?;
+    let mut out = String::from("[");
+    for (i, (address_key, address_details)) in relevant_identities.iter().enumerate() {
+        if i>0 {out.push_str(",")}
+        let base58print = match print_as_base58 (&address_key, address_details.encryption, Some(network_specs.base58prefix)) {
+            Ok(a) => a,
+            Err(e) => return Err(Box::from(format!("Database error. {}", e))),
+        };
+        let new = format!("{{\"public_key\":\"{}\",\"ss58\":\"{}\",\"path\":\"{}\",\"has_password\":\"{}\",\"name\":\"{}\"}}", hex::encode(address_key), base58print, address_details.path, address_details.has_pwd, address_details.name);
+        out.push_str(&new);
+    }
+    out.push_str("]");
+    Ok(out)
+}
+
+/// Function to print all identities for all seed names;
+/// ss58 line associated with each of public keys is printed with default base58prefix
+pub fn print_all_identities (database_name: &str) -> Result<String, Box<dyn std::error::Error>> {
+    
+    let database: Db = open(database_name)?;
+    let identities: Tree = database.open_tree(ADDRTREE)?;
+    let mut out = String::from("[");
+    for (i, x) in identities.iter().enumerate() {
+        if let Ok((address_key, address_details_encoded)) = x {
+            if i>0 {out.push_str(",")}
+            let address_details = <AddressDetails>::decode(&mut &address_details_encoded[..])?;
+            let base58print = match print_as_base58 (&address_key.to_vec(), address_details.encryption, None) {
+                Ok(a) => a,
+                Err(e) => return Err(Box::from(format!("Database error. {}", e))),
+            };
+            let new = format!("{{\"public_key\":\"{}\",\"ss58\":\"{}\",\"path\":\"{}\",\"has_password\":\"{}\",\"name\":\"{}\",\"seed_name\":\"{}\"}}", hex::encode(address_key), base58print, address_details.path, address_details.has_pwd, address_details.name, address_details.seed_name);
+            out.push_str(&new);
+        }
+    }
+    out.push_str("]");
+    Ok(out)
 }
 
 /// generate random phrase with given number of words
@@ -345,7 +382,9 @@ pub fn remove_identities_for_seed (seed_name: &str, database_name: &str) -> Resu
 mod tests {
     use super::*;
     use definitions::defaults::get_default_chainspecs;
-    //static PASSWORD: &str = "very long and unguessable phrase";
+    use std::fs;
+    use super::super::chainspecs::load_chainspecs;
+
     static SEED: &str = "bottom drive obey lake curtain smoke basket hold race lonely fit walk";
     static ENCRYPTION_NAME: &str = "sr25519";
 
@@ -370,7 +409,6 @@ mod tests {
     #[test]
     fn test_generate_random_account() {
         let dbname = "tests/test_generate_random_account";
-        let _ = fs::remove_dir_all(dbname).unwrap();
         load_chainspecs(dbname).expect("create default database");
         try_create_seed("Randy", ENCRYPTION_NAME, "", 24, dbname).unwrap();
         let chainspecs = get_default_chainspecs();
@@ -382,7 +420,6 @@ mod tests {
     #[test]
     fn test_generate_default_addresses_for_alice() {
         let dbname = "tests/test_generate_default_addresses_for_Alice";
-        let _ = fs::remove_dir_all(dbname).unwrap();
         load_chainspecs(dbname).expect("create default database");
         try_create_seed("Alice", ENCRYPTION_NAME, SEED, 0, dbname).unwrap();
         let chainspecs = get_default_chainspecs();
@@ -419,7 +456,6 @@ mod tests {
         let path_should_fail_0 = "//path-should-fail-0";
         let path_should_succeed = "//path-should-succeed";
         let path_should_fail_1 = "//path-should-fail-1";
-        let _ = fs::remove_dir_all(dbname).unwrap();
         let chainspecs = get_default_chainspecs();
         load_chainspecs(dbname).expect("create default database");
         try_create_seed("Alice", ENCRYPTION_NAME, SEED, 0, dbname).unwrap();
@@ -439,7 +475,6 @@ mod tests {
     #[test]
     fn test_derive() { 
         let dbname = "tests/test_derive";
-        let _ = fs::remove_dir_all(dbname).unwrap();
         load_chainspecs(dbname).expect("create default database");
         let chainspecs = get_default_chainspecs();
         let seed_name = "Alice";
@@ -474,7 +509,6 @@ mod tests {
     #[test]
     fn test_suggest_n_plus_one() { 
         let dbname = "tests/test_suggest_n_plus_one";
-        let _ = fs::remove_dir_all(dbname).unwrap();
         load_chainspecs(dbname).expect("create default database");
         try_create_seed("Alice", ENCRYPTION_NAME, SEED, 0, dbname).unwrap();
         let chainspecs = get_default_chainspecs();
@@ -516,7 +550,6 @@ mod tests {
     #[test]
     fn test_identity_deletion() {
         let dbname = "tests/test_identity_deletion";
-        let _ = fs::remove_dir_all(dbname).unwrap();
         load_chainspecs(dbname).expect("create default database");
         try_create_seed("Alice", ENCRYPTION_NAME, SEED, 0, dbname).unwrap();
         let chainspecs = get_default_chainspecs();

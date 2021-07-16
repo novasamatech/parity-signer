@@ -2,7 +2,7 @@ use definitions::{constants::{COLD_DB_NAME, HOT_DB_NAME}};
 use db_handling::{default_cold, metadata::transfer_metadata, network_details::get_network_details_by_hex};
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
-    
+   
     default_cold()?;
     transfer_metadata(HOT_DB_NAME, COLD_DB_NAME)?;
     

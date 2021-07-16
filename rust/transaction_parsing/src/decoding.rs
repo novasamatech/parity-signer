@@ -9,9 +9,9 @@ use frame_metadata::{RuntimeMetadataV12};
 use bitvec::prelude::{BitVec, Lsb0};
 use printing_balance::convert_balance_pretty;
 use definitions::{network_specs::ChainSpecs, types::{TypeEntry, Description, EnumVariant, EnumVariantType, StructField}};
+use sp_core::crypto::{Ss58Codec, Ss58AddressFormat, AccountId32};
 
 use super::method::what_next;
-use super::utils_base58::vec_to_base;
 use super::cards::Card;
 use super::error::{Error, UnableToDecode, SystemError};
 
@@ -617,7 +617,9 @@ pub fn special_case_account_id (data: Vec<u8>, mut index: u32, indent: u32, chai
                 if data.len()>32 {(&data[32..]).to_vec()}
                 else {Vec::new()}
             };
-            let fancy_out = format!(",{}", (Card::Id(&vec_to_base(&(x.to_vec()), chain_specs.base58prefix))).card(index, indent));
+            let account_id = AccountId32::new(x);
+            let base58print = account_id.to_ss58check_with_version(Ss58AddressFormat::Custom(chain_specs.base58prefix));
+            let fancy_out = format!(",{}", (Card::Id(&base58print)).card(index, indent));
             index = index + 1;
             Ok(DecodedOut {
                 remaining_vector,

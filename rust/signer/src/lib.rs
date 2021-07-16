@@ -147,20 +147,16 @@ export! {
         genesis_hash: &str,
         dbname: &str
 	) -> std::result::Result<String, Box<dyn std::error::Error>> {
-        let relevant_identities = db_handling::identities::get_relevant_identities(seed_name, genesis_hash, dbname)?;
-        let prefix = db_handling::chainspecs::get_network(dbname, genesis_hash)?.base58prefix;
-        let mut output = "[".to_owned();
-        for (pubkey, identity) in relevant_identities.iter() {
-            output.push_str(&format!("{{\"publicKey\":\"{}\",\"ss58\":\"{}\",\"path\":\"{}\",\"hasPassword\":\"{}\",\"name\":\"{}\"}},",
-                hex::encode(pubkey),
-                transaction_parsing::utils_base58::vec_to_base(pubkey, prefix),
-                identity.path,
-                identity.has_pwd,
-                identity.name))
-        }
-        result::return_json_array(output)
+        db_handling::identities::print_relevant_identities(seed_name, genesis_hash, dbname)
     }
     
+    @Java_io_parity_signer_SubstrateSignModule_dbGetAllIdentities
+	fn get_all_identities(
+        dbname: &str
+	) -> std::result::Result<String, Box<dyn std::error::Error>> {
+        db_handling::identities::print_all_identities(dbname)
+    }
+
     @Java_io_parity_signer_SubstrateSignModule_substrateTryCreateSeed
 	fn try_create_seed(
         seed_name: &str,

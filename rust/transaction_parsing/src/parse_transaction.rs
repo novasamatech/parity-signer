@@ -3,11 +3,10 @@ use parity_scale_codec::{Decode, Encode};
 use parity_scale_codec_derive;
 use printing_balance::{PrettyOutput, convert_balance_pretty};
 use sled::{Db, Tree, open};
-use definitions::{network_specs::{ChainSpecs, generate_network_key}, transactions::SignDb, users::{AddressDetails, Encryption, generate_address_key}, constants::{SPECSTREE, METATREE, ADDRTREE, SETTREE, SIGNTRANS, TRANSACTION}};
+use definitions::{network_specs::{ChainSpecs, generate_network_key}, transactions::SignDb, users::{AddressDetails, Encryption, generate_address_key, print_as_base58}, constants::{SPECSTREE, METATREE, ADDRTREE, SETTREE, SIGNTRANS, TRANSACTION}};
 use sp_runtime::generic::Era;
 use std::convert::TryInto;
 
-use super::utils_base58::vec_to_base;
 use super::utils::{find_meta, get_types};
 use super::decoding::process_as_call;
 use super::cards::{Action, Card, Warning};
@@ -127,8 +126,8 @@ pub fn parse_transaction (data_hex: &str, dbname: &str) -> Result<String, Error>
     if transaction_decoded.genesis_hash != short.genesis_hash {return Err(Error::BadInputData(BadInputData::GenesisHashMismatch))}
 
 // this should be here by the standard; should stay commented for now, since the test transactions apparently do not comply to standard.
-    //if &data_hex[4..6] == "00" {if let Era::Immortal = short.era {return Err(Error::BadInputData(BadInputData::UnexpectedImmortality))}}
-    //if &data_hex[4..6] == "02" {if let Era::Mortal(_, _) = short.era {return Err(Error::BadInputData(BadInputData::UnexpectedMortality))}}
+//    if &data_hex[4..6] == "00" {if let Era::Immortal = short.era {return Err(Error::BadInputData(BadInputData::UnexpectedImmortality))}}
+//    if &data_hex[4..6] == "02" {if let Era::Mortal(_, _) = short.era {return Err(Error::BadInputData(BadInputData::UnexpectedMortality))}}
 
     if let Era::Immortal = short.era {if short.genesis_hash != short.block_hash {return Err(Error::BadInputData(BadInputData::ImmortalHashMismatch))}}
     
@@ -153,12 +152,14 @@ pub fn parse_transaction (data_hex: &str, dbname: &str) -> Result<String, Error>
                 Err(_) => return Err(Error::SystemError(SystemError::BalanceFail)),
             };
 
-        // transform public key into base58 address and get crypto for action card exporting
-            let (author, address_key, crypto) = match author_pub_key {
-                AuthorPublicKey::Ed25519(t) => (vec_to_base(&(t.to_vec()), chain_prefix), generate_address_key(&t.to_vec()), Encryption::Ed25519),
-                AuthorPublicKey::Sr25519(t) => (vec_to_base(&(t.to_vec()), chain_prefix), generate_address_key(&t.to_vec()), Encryption::Sr25519),
-                AuthorPublicKey::Ecdsa(t) => (vec_to_base(&(t.to_vec()), chain_prefix), generate_address_key(&t.to_vec()), Encryption::Ecdsa),
+        // transform public key into base58 address and get encryption for action card exporting
+            let (address_vector, encryption) = match author_pub_key {
+                AuthorPublicKey::Ed25519(t) => (t.to_vec(), Encryption::Ed25519),
+                AuthorPublicKey::Sr25519(t) => (t.to_vec(), Encryption::Sr25519),
+                AuthorPublicKey::Ecdsa(t) => (t.to_vec(), Encryption::Ecdsa),
             };
+            let address_key = generate_address_key(&address_vector);
+            let author = print_as_base58(&address_vector, encryption, Some(chain_prefix)).expect("just matched encryption type and address key length, should always fit");
         // search for this base58 address in existing accounts, get address details
             let addresses_db_reply = match addresses.get(&address_key) {
                 Ok(x) => x,
@@ -215,7 +216,7 @@ pub fn parse_transaction (data_hex: &str, dbname: &str) -> Result<String, Error>
                                         // network is among the allowed ones for this address key; can sign;
                                         // making action entry into database
                                             let action_into_db = SignDb {
-                                                crypto,
+                                                encryption,
                                                 path: address_details.path,
                                                 transaction: for_signing,
                                                 has_pwd: address_details.has_pwd,
