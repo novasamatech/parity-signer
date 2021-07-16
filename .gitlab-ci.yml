@@ -32,7 +32,7 @@ android-build-release:
     paths:
       - signer-app-release-signed.apk
   script:
-    - echo "$KEYSTORE_DATA" | base64 -d > /tmp/gitlab-ci.keystore
+    - cat "$KEYSTORE_DATA" | base64 -d > /tmp/gitlab-ci.keystore
     - wc /tmp/gitlab-ci.keystore
     - ./scripts/build-release.sh /tmp/gitlab-ci.keystore "$KEYSTORE_ALIAS" "$KEYSTORE_PASS"
   tags:
