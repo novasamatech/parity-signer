@@ -22,7 +22,6 @@ use transaction_parsing;
 use transaction_signing;
 
 mod export;
-mod metadata;
 mod qr;
 mod result;
 
