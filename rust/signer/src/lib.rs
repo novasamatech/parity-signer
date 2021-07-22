@@ -33,7 +33,7 @@ fn base64png(png: &[u8]) -> String {
 	out
 }
 
-fn qrcode_bytes(data: &[u8]) -> std::result::Result<String, Box<dyn std::error::Error>> {
+fn qrcode_bytes(data: &[u8]) -> anyhow::Result<String, anyhow::Error> {
 	let qr = QrCode::encode_binary(data, QrCodeEcc::Medium)?;
 	let palette = &[Color::Rgba(255, 255, 255, 0), BLACK];
 	let mut pixels = Vec::with_capacity((qr.size() * qr.size()) as usize);
@@ -51,7 +51,7 @@ fn qrcode_bytes(data: &[u8]) -> std::result::Result<String, Box<dyn std::error::
 	};
 	match image.render(&mut result) {
     	Ok(_) => Ok(base64png(&result)),
-        Err(_) => return Err(Box::from("Pixelation failed")),
+        Err(_) => return Err(anyhow::anyhow!("Pixelation failed")),
     }
 }
 
@@ -59,7 +59,7 @@ export! {
 	@Java_io_parity_signer_SubstrateSignModule_ethkeyQrCode
 	fn qrcode(
 		data: &str
-	) -> std::result::Result<String, Box<dyn std::error::Error>> {
+	) -> anyhow::Result<String, anyhow::Error> {
 		qrcode_bytes(data.as_bytes())
 	}
 
@@ -68,7 +68,7 @@ export! {
         size: u32,
         chunk_size: u32,
 		data: &str
-	) -> std::result::Result<String, Box<dyn std::error::Error>> {
+	) -> anyhow::Result<String, anyhow::Error> {
         let data_vec: Vec<&str> = qr::deserialize(data);
         let answer = qr::parse_goblet(size as u64, chunk_size as u16, data_vec);
         Ok(answer)
@@ -89,14 +89,14 @@ export! {
         seed_phrase: &str,
         password: &str,
         dbname: &str
-	) -> std::result::Result<String, Box<dyn std::error::Error>> {
+	) -> anyhow::Result<String, anyhow::Error> {
         transaction_signing::handle_action(action, seed_phrase, password, dbname)
     }
 
     @Java_io_parity_signer_SubstrateSignModule_substrateDevelopmentTest
 	fn development_test(
 		_input: &str
-	) -> std::result::Result<String, Box<dyn std::error::Error>> {
+	) -> anyhow::Result<String, anyhow::Error> {
         let output = Ok(std::env::consts::OS.to_string());
         return output;
     }
@@ -105,7 +105,7 @@ export! {
 	fn get_network(
 		genesis_hash: &str,
         dbname: &str
-	) -> std::result::Result<String, Box<dyn std::error::Error>> {
+	) -> anyhow::Result<String, anyhow::Error> {
         let spec = db_handling::chainspecs::get_network(dbname, genesis_hash)?;
         Ok(String::from(format!("{{\"color\":\"{}\",\"logo\":\"{}\",\"secondaryColor\":\"{}\",\"title\":\"{}\"}}",
             spec.color, 
@@ -117,7 +117,7 @@ export! {
     @Java_io_parity_signer_SubstrateSignModule_dbGetAllNetworksForNetworkSelector
 	fn get_all_networks_for_network_selector(
         dbname: &str
-    ) -> std::result::Result<String, Box<dyn std::error::Error>> {
+    ) -> anyhow::Result<String, anyhow::Error> {
         let specs = db_handling::chainspecs::get_all_networks(dbname)?;
         //TODO: gentler formatting, or serde-json?
         let mut output = "[".to_owned();
@@ -138,14 +138,14 @@ export! {
 		seed_name: &str,
         genesis_hash: &str,
         dbname: &str
-	) -> std::result::Result<String, Box<dyn std::error::Error>> {
+	) -> anyhow::Result<String, anyhow::Error> {
         db_handling::identities::print_relevant_identities(seed_name, genesis_hash, dbname)
     }
     
     @Java_io_parity_signer_SubstrateSignModule_dbGetAllIdentities
 	fn get_all_identities(
         dbname: &str
-	) -> std::result::Result<String, Box<dyn std::error::Error>> {
+	) -> anyhow::Result<String, anyhow::Error> {
         db_handling::identities::print_all_identities(dbname)
     }
 
@@ -156,7 +156,7 @@ export! {
         seed_phrase: &str,
         seed_length: u32,
 		dbname: &str
-	) -> std::result::Result<String, Box<dyn std::error::Error>> {
+	) -> anyhow::Result<String, anyhow::Error> {
         db_handling::identities::try_create_seed(seed_name, crypto, seed_phrase, seed_length, dbname)
     }
 
@@ -166,14 +166,14 @@ export! {
         seed_name: &str,
         network_id_string: &str,
         dbname: &str
-	) -> std::result::Result<String, Box<dyn std::error::Error>> {
+	) -> anyhow::Result<String, anyhow::Error> {
         db_handling::identities::suggest_n_plus_one(path, seed_name, network_id_string, dbname)
     }
 
     @Java_io_parity_signer_SubstrateSignModule_substrateCheckPath
 	fn check_path(
         path: &str
-	) -> std::result::Result<bool, Box<dyn std::error::Error>> {
+	) -> anyhow::Result<bool, anyhow::Error> {
         db_handling::identities::check_derivation_format(path)
     }
 
@@ -187,7 +187,7 @@ export! {
         network: &str,
         has_password: bool,
 		dbname: &str
-	) -> std::result::Result<(), Box<dyn std::error::Error>> {
+	) -> anyhow::Result<(), anyhow::Error> {
         db_handling::identities::try_create_address(id_name, seed_name, seed_phrase, crypto, path, network, has_password, dbname)
     }
 
@@ -203,7 +203,7 @@ export! {
         pub_key: &str,
         network: &str,
         dbname: &str
-	) -> std::result::Result<(), Box<dyn std::error::Error>> {
+	) -> anyhow::Result<(), anyhow::Error> {
         db_handling::identities::delete_address(pub_key, network, dbname)
     }
 
@@ -211,7 +211,7 @@ export! {
 	fn get_network_specs(
         network: &str,
         dbname: &str
-	) -> std::result::Result<String, Box<dyn std::error::Error>> {
+	) -> anyhow::Result<String, anyhow::Error> {
         db_handling::network_details::get_network_details_by_hex(network, dbname)
     }
     
@@ -219,7 +219,7 @@ export! {
 	fn remove_network(
         network: &str,
         dbname: &str
-	) -> std::result::Result<(), Box<dyn std::error::Error>> {
+	) -> anyhow::Result<(), anyhow::Error> {
         db_handling::remove_network::remove_network_by_hex(network, dbname)
     }
 
@@ -228,7 +228,7 @@ export! {
         network_name: &str,
         network_version: u32,
         dbname: &str
-	) -> std::result::Result<(), Box<dyn std::error::Error>> {
+	) -> anyhow::Result<(), anyhow::Error> {
         db_handling::remove_network::remove_metadata(network_name, network_version, dbname)
     }
 
@@ -236,7 +236,7 @@ export! {
 	fn remove_seed(
         seed_name: &str,
         dbname: &str
-	) -> std::result::Result<(), Box<dyn std::error::Error>> {
+	) -> anyhow::Result<(), anyhow::Error> {
         return
         db_handling::identities::remove_identities_for_seed(seed_name, dbname)
     }
