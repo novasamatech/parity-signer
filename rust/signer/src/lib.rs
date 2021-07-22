@@ -75,13 +75,6 @@ export! {
         Ok(answer)
 	}
 
-    @Java_io_parity_signer_SubstrateSignModule_metadataGenerateMetadataHandle
-	fn generate_metadata_handle(
-		metadata: &str
-	) -> String {
-        metadata::meta_to_json(metadata)
-	}
-
     @Java_io_parity_signer_SubstrateSignModule_substrateParseTransaction
 	fn parse_transaction(
 		transaction: &str,
@@ -91,8 +84,8 @@ export! {
         else {return transaction_parsing::produce_output(transaction, dbname)}
     }
 
-    @Java_io_parity_signer_SubstrateSignModule_substrateSignTransaction
-	fn sign_transaction(
+    @Java_io_parity_signer_SubstrateSignModule_substrateHandleAction
+	fn handle_action(
 		action: &str,
         seed_phrase: &str,
         password: &str,
