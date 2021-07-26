@@ -1,3 +1,4 @@
+use anyhow;
 use transaction_parsing::cards::Action;
 
 mod accept_metadata;
@@ -6,15 +7,17 @@ mod accept_network;
     use accept_network::add_network;
 mod accept_types;
     use accept_types::{accept_types, add_general_verifier};
+mod error;
 mod interpretation;
     use interpretation::interpret_action;
+pub mod sign_message;
 mod sign_transaction;
     use sign_transaction::create_signature;
 mod tests;
 
 /// Function process action card from RN.
 
-pub fn handle_action (action_line: &str, seed_phrase: &str, pwd_entry: &str, dbname: &str) -> Result<String, Box<dyn std::error::Error>> {
+pub fn handle_action (action_line: &str, seed_phrase: &str, pwd_entry: &str, dbname: &str) -> anyhow::Result<String> {
 
     let action = interpret_action (action_line)?;
     

@@ -22,5 +22,6 @@ base58 = "0.1.0"
 zeroize = {version = "1.3.0", features = ["zeroize_derive"]}
 definitions = {path = "../definitions"}
 meta_reading = {path = "../meta_reading"}
+anyhow = "1.0.42"
 
 

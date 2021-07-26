@@ -1,7 +1,7 @@
 use parity_scale_codec_derive::{Decode, Encode};
 
 /// Struct used to store the network metadata name and version in the database
-#[derive(Decode, Encode)]
+#[derive(Decode, Encode, PartialEq)]
 pub struct NameVersioned {
     pub name: String,
     pub version: u32,

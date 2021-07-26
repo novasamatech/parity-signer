@@ -1,7 +1,9 @@
+use anyhow;
 use regex::Regex;
 use lazy_static::lazy_static;
 
 use transaction_parsing::cards::Action;
+use super::error::{Error, Interpretation};
 
 // Making lazy statics for regex interpreting input action string
 
@@ -14,12 +16,15 @@ lazy_static! {
 /// for integrity check of action line returned from RN.
 /// In case of success produces Action enum.
 
-pub fn interpret_action (action_line: &str) -> Result<Action, Box<dyn std::error::Error>> {
+pub fn interpret_action (action_line: &str) -> anyhow::Result<Action> {
     match REG_READ.captures(&action_line) {
         Some(caps) => {
             let checksum: u32 = match caps.name("checksum") {
-                Some(c) => c.as_str().parse()?,
-                None => {return Err(Box::from("Checksum missing."))}
+                Some(c) => match c.as_str().parse() {
+                    Ok(a) => a,
+                    Err(_) => return Err(Error::Interpretation(Interpretation::ChecksumNotU32).show()),
+                },
+                None => return Err(Error::Interpretation(Interpretation::ChecksumMissing).show()),
             };
             match caps.name("action_type") {
                 Some(c) => {
@@ -33,13 +38,13 @@ pub fn interpret_action (action_line: &str) -> Result<Action, Box<dyn std::error
                         "load_metadata_and_add_general_verifier" => Ok(Action::LoadMetadataAndAddGeneralVerifier(checksum)),
                         "add_network" => Ok(Action::AddNetwork(checksum)),
                         "add_network_and_add_general_verifier" => Ok(Action::AddNetworkAndAddGeneralVerifier(checksum)),
-                        _ => return Err(Box::from("Action type not supported.")),
+                        _ => return Err(Error::Interpretation(Interpretation::UnsupportedAction).show()),
                     }
                 },
-                None => return Err(Box::from("Action type missing.")),
+                None => return Err(Error::Interpretation(Interpretation::ActionMissing).show()),
             }
         },
-        None => {return Err(Box::from("Wrong action line format."))},
+        None => return Err(Error::Interpretation(Interpretation::BadActionLine).show()),
     }
 }
 

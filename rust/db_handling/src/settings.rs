@@ -1,53 +1,77 @@
 use sled::{Db, Tree, open};
 use parity_scale_codec::Encode;
 use definitions::{constants::{SETTREE, TYPES, GENERALVERIFIER}, defaults::{get_default_types}, network_specs::Verifier};
+use anyhow;
+
+use super::error::Error;
 
 
-pub fn load_types (database_name: &str) -> Result<(), Box<dyn std::error::Error>> {
+/// Load default types
+
+pub fn load_types (database_name: &str) -> anyhow::Result<()> {
     
-    let database: Db = open(database_name)?;
+    let database: Db = match open(database_name) {
+        Ok(x) => x,
+        Err(e) => return Err(Error::InternalDatabaseError(e).show()),
+    };
     
-    let settings: Tree = database.open_tree(SETTREE)?;
-    settings.remove(TYPES)?;
+    let settings: Tree = match database.open_tree(SETTREE) {
+        Ok(x) => x,
+        Err(e) => return Err(Error::InternalDatabaseError(e).show()),
+    };
     
-    let types_prep = get_default_types()?;
+    match settings.remove(TYPES) {
+        Ok(_) => (),
+        Err(e) => return Err(Error::InternalDatabaseError(e).show()),
+    };
+    
+    let types_prep = match get_default_types() {
+        Ok(x) => x,
+        Err(e) => return Err(Error::BadTypesFile(e).show()),
+    };
     
     let types = types_prep.encode();
-    settings.insert(TYPES, types)?;
+    match settings.insert(TYPES, types) {
+        Ok(_) => (),
+        Err(e) => return Err(Error::InternalDatabaseError(e).show()),
+    };
     
-    database.flush()?;
+    match database.flush() {
+        Ok(_) => (),
+        Err(e) => return Err(Error::InternalDatabaseError(e).show()),
+    };
     
     Ok(())
 }
 
-///Set verifier signature for types definitions and for accepting new networks
+/// Set verifier signature for types definitions and for accepting new networks
 
-pub fn set_general_verifier (database_name: &str, general_verifier: Verifier) -> Result<(), Box<dyn std::error::Error>> {
+pub fn set_general_verifier (database_name: &str, general_verifier: Verifier) -> anyhow::Result<()> {
     
-    let database: Db = open(database_name)?;
-    let settings: Tree = database.open_tree(SETTREE)?;
-    settings.remove(GENERALVERIFIER)?;
-    settings.insert(GENERALVERIFIER, general_verifier.encode())?;
-    database.flush()?;
+    let database: Db = match open(database_name) {
+        Ok(x) => x,
+        Err(e) => return Err(Error::InternalDatabaseError(e).show()),
+    };
+    
+    let settings: Tree = match database.open_tree(SETTREE) {
+        Ok(x) => x,
+        Err(e) => return Err(Error::InternalDatabaseError(e).show()),
+    };
+    
+    match settings.remove(GENERALVERIFIER) {
+        Ok(_) => (),
+        Err(e) => return Err(Error::InternalDatabaseError(e).show()),
+    };
+    
+    match settings.insert(GENERALVERIFIER, general_verifier.encode()) {
+        Ok(_) => (),
+        Err(e) => return Err(Error::InternalDatabaseError(e).show()),
+    };
+    
+    match database.flush() {
+        Ok(_) => (),
+        Err(e) => return Err(Error::InternalDatabaseError(e).show()),
+    };
     Ok(())
 }
 
-///Function to save terms and conditions ack
-
-pub fn ack_user_agreement(database_name: &str) -> Result<(), Box<dyn std::error::Error>> {
-    let database: Db = open(database_name)?;   
-    let settings: Tree = database.open_tree(b"settings")?;
-
-    settings.insert(b"terms and conditions", vec![1])?;
-
-    Ok(())
-}
-
-///Function to check terms and conditions ack
-
-pub fn check_user_agreement(database_name: &str) -> Result<bool, Box<dyn std::error::Error>> {
-    let database: Db = open(database_name)?;
-    let settings: Tree = database.open_tree(b"settings")?;
-
-    Ok(settings.contains_key(b"terms and conditions")?)
-}

@@ -4,7 +4,7 @@
 #[cfg(test)]
 mod tests {
     use transaction_parsing::produce_output;
-    use super::super::handle_action;
+    use crate::{handle_action, error::{Error, ActionFailure}};
     use db_handling::{populate_cold, populate_cold_no_networks, populate_cold_no_meta};
     use definitions::{constants::{METATREE, SPECSTREE}};
     use std::fs;
@@ -14,16 +14,16 @@ mod tests {
     const SEED_PHRASE: &str = "bottom drive obey lake curtain smoke basket hold race lonely fit walk";
     const PWD: &str = "jaskier";
     
-    fn meta_count(dbname: &str) -> Result<usize, Box<dyn std::error::Error>> {
-         let database: Db = open(dbname)?;
-         let metadata: Tree = database.open_tree(METATREE)?;
-         Ok(metadata.len())
+    fn meta_count_test (dbname: &str) -> usize {
+         let database: Db = open(dbname).unwrap();
+         let metadata: Tree = database.open_tree(METATREE).unwrap();
+         metadata.len()
     }
     
-    fn specs_count(dbname: &str) -> Result<usize, Box<dyn std::error::Error>> {
-         let database: Db = open(dbname)?;
-         let chainspecs: Tree = database.open_tree(SPECSTREE)?;
-         Ok(chainspecs.len())
+    fn specs_count_test (dbname: &str) -> usize {
+         let database: Db = open(dbname).unwrap();
+         let chainspecs: Tree = database.open_tree(SPECSTREE).unwrap();
+         chainspecs.len()
     }
     
 // can sign a parsed transaction
@@ -37,7 +37,17 @@ mod tests {
         assert!(reply == reply_known, "Error in action.\nReceived: {}", reply);
         let mock_action_line = r#"{"type":"sign_transaction","checksum":"4278348933"}"#;
         let result = handle_action(&mock_action_line, SEED_PHRASE, PWD, dbname);
-        if let Err(e) = result {panic!("Was unable to sign. {}", e)}
+        match result {
+            Ok(signature) => assert!((signature.len() == 130) && (signature.starts_with("01")), "Wrong signature format,\nReceived:\n{}", signature),
+            Err(e) => panic!("Was unable to sign. {}", e),
+        }
+        let result = handle_action(&mock_action_line, SEED_PHRASE, PWD, dbname);
+        if let Err(e) = result {
+            let err = e.to_string();
+            let expected_err = String::from("Database checksum mismatch.");
+            if err != expected_err {panic!("Expected wrong checksum. Got error: {}.", err)}
+        }
+        else {panic!("Checksum should have changed.")}
         fs::remove_dir_all(dbname).unwrap();
     }
 
@@ -47,8 +57,8 @@ mod tests {
         
         let dbname = "for_tests/add_network_add_two_verifiers_later";
         populate_cold_no_networks(dbname).unwrap();
-        let meta1 = meta_count(dbname).unwrap();
-        let specs1 = specs_count(dbname).unwrap();
+        let meta1 = meta_count_test(dbname);
+        let specs1 = specs_count_test(dbname);
         
         let line = fs::read_to_string("for_tests/add_network_westendV9080_unverified.txt").unwrap();
         let reply = produce_output(&line, dbname);
@@ -58,8 +68,8 @@ mod tests {
         let result = handle_action(&mock_action_line, SEED_PHRASE, PWD, dbname);
         if let Err(e) = result {panic!("Was unable to add network. {}", e)}
         
-        let meta2 = meta_count(dbname).unwrap();
-        let specs2 = specs_count(dbname).unwrap();
+        let meta2 = meta_count_test(dbname);
+        let specs2 = specs_count_test(dbname);
         
         let line = fs::read_to_string("for_tests/add_network_westendV9080_Alice.txt").unwrap();
         let reply = produce_output(&line, dbname);
@@ -69,8 +79,8 @@ mod tests {
         let result = handle_action(&mock_action_line, SEED_PHRASE, PWD, dbname);
         if let Err(e) = result {panic!("Was unable to update two verifiers. {}", e)}
         
-        let meta3 = meta_count(dbname).unwrap();
-        let specs3 = specs_count(dbname).unwrap();
+        let meta3 = meta_count_test(dbname);
+        let specs3 = specs_count_test(dbname);
         
         assert!(meta2 == meta1+1, "Did not add metadata to database on first step.");
         assert!(meta3 == meta2, "Number of meta entries somehow changed on second step.");
@@ -87,8 +97,8 @@ mod tests {
         let dbname = "for_tests/add_network_and_add_general_verifier";
         populate_cold_no_networks(dbname).unwrap();
         
-        let meta1 = meta_count(dbname).unwrap();
-        let specs1 = specs_count(dbname).unwrap();
+        let meta1 = meta_count_test(dbname);
+        let specs1 = specs_count_test(dbname);
         
         let line = fs::read_to_string("for_tests/add_network_westendV9080_Alice.txt").unwrap();
         let reply = produce_output(&line, dbname);
@@ -98,8 +108,8 @@ mod tests {
         let result = handle_action(&mock_action_line, SEED_PHRASE, PWD, dbname);
         if let Err(e) = result {panic!("Was unable to add network and update general verifier. {}", e)}
         
-        let meta2 = meta_count(dbname).unwrap();
-        let specs2 = specs_count(dbname).unwrap();
+        let meta2 = meta_count_test(dbname);
+        let specs2 = specs_count_test(dbname);
         
         assert!(meta2 == meta1+1, "Did not add metadata to database.");
         assert!(specs2 == specs1+1, "Did not add specs to database.");
@@ -120,14 +130,14 @@ mod tests {
         // wrong action: sign_transaction
         let mock_action_line = r#"{"type":"sign_transaction","checksum":"2366800113"}"#;
         
-        let result = handle_action(&mock_action_line, SEED_PHRASE, PWD, dbname);
-        if let Err(e) = result {
-            let err = e.to_string();
-            let expected_err = String::from("No approved transaction found.");
-            if err != expected_err {panic!("Should have correct checksum and wrong action. Parser reply: {}\nMock action line: {}", reply, mock_action_line)}
+        match handle_action(&mock_action_line, SEED_PHRASE, PWD, dbname) {
+            Ok(_) => panic!("Should have failed. Parser reply: {}\nMock action line: {}", reply, mock_action_line),
+            Err(e) => {
+                if e.to_string() != Error::NoAction(ActionFailure::SignTransaction).show().to_string() {
+                    panic!("Should have failed\nwith correct checksum and wrong action. Parser reply: {}\nMock action line: {}", reply, mock_action_line)
+                }
+            },
         }
-        else {panic!("Should have correct checksum and wrong action. Parser reply: {}\nMock action line: {}", reply, mock_action_line)}
-        
         fs::remove_dir_all(dbname).unwrap();
     }
 
@@ -144,14 +154,14 @@ mod tests {
         // wrong action: load_metadata
         let mock_action_line = r#"{"type":"load_metadata","checksum":"4278348933"}"#;
         
-        let result = handle_action(&mock_action_line, SEED_PHRASE, PWD, dbname);
-        if let Err(e) = result {
-            let err = e.to_string();
-            let expected_err = String::from("No approved metadata found.");
-            if err != expected_err {panic!("Should have correct checksum and wrong action. Parser reply: {}\nMock action line: {}", reply, mock_action_line)}
+        match handle_action(&mock_action_line, SEED_PHRASE, PWD, dbname) {
+            Ok(_) => panic!("Should have failed. Parser reply: {}\nMock action line: {}", reply, mock_action_line),
+            Err(e) => {
+                if e.to_string() != Error::NoAction(ActionFailure::LoadMeta).show().to_string() {
+                    panic!("Should have failed\nwith correct checksum and wrong action. Parser reply: {}\nMock action line: {}", reply, mock_action_line)
+                }
+            },
         }
-        else {panic!("Should have correct checksum and wrong action. Parser reply: {}\nMock action line: {}", reply, mock_action_line)}
-        
         fs::remove_dir_all(dbname).unwrap();
     }
     
@@ -168,14 +178,14 @@ mod tests {
         // wrong action: add_metadata_verifier
         let mock_action_line = r#"{"type":"add_metadata_verifier","checksum":"4278348933"}"#;
         
-        let result = handle_action(&mock_action_line, SEED_PHRASE, PWD, dbname);
-        if let Err(e) = result {
-            let err = e.to_string();
-            let expected_err = String::from("No approved verifier found.");
-            if err != expected_err {panic!("Should have correct checksum and wrong action. Parser reply: {}\nMock action line: {}", reply, mock_action_line)}
+        match handle_action(&mock_action_line, SEED_PHRASE, PWD, dbname) {
+            Ok(_) => panic!("Should have failed. Parser reply: {}\nMock action line: {}", reply, mock_action_line),
+            Err(e) => {
+                if e.to_string() != Error::NoAction(ActionFailure::AddVerifier).show().to_string() {
+                    panic!("Should have failed\nwith correct checksum and wrong action. Parser reply: {}\nMock action line: {}", reply, mock_action_line)
+                }
+            },
         }
-        else {panic!("Should have correct checksum and wrong action. Parser reply: {}\nMock action line: {}", reply, mock_action_line)}
-        
         fs::remove_dir_all(dbname).unwrap();
     }
     
@@ -192,14 +202,14 @@ mod tests {
         // wrong action: load_types
         let mock_action_line = r#"{"type":"load_types","checksum":"4278348933"}"#;
         
-        let result = handle_action(&mock_action_line, SEED_PHRASE, PWD, dbname);
-        if let Err(e) = result {
-            let err = e.to_string();
-            let expected_err = String::from("No approved types information found.");
-            if err != expected_err {panic!("Should have correct checksum and wrong action. Parser reply: {}\nMock action line: {}", reply, mock_action_line)}
+        match handle_action(&mock_action_line, SEED_PHRASE, PWD, dbname) {
+            Ok(_) => panic!("Should have failed. Parser reply: {}\nMock action line: {}", reply, mock_action_line),
+            Err(e) => {
+                if e.to_string() != Error::NoAction(ActionFailure::LoadTypes).show().to_string() {
+                    panic!("Should have failed\nwith correct checksum and wrong action. Parser reply: {}\nMock action line: {}", reply, mock_action_line)
+                }
+            },
         }
-        else {panic!("Should have correct checksum and wrong action. Parser reply: {}\nMock action line: {}", reply, mock_action_line)}
-        
         fs::remove_dir_all(dbname).unwrap();
     }
     
@@ -216,13 +226,14 @@ mod tests {
         // wrong action: add_general_verifier
         let mock_action_line = r#"{"type":"add_general_verifier","checksum":"4278348933"}"#;
         
-        let result = handle_action(&mock_action_line, SEED_PHRASE, PWD, dbname);
-        if let Err(e) = result {
-            let err = e.to_string();
-            let expected_err = String::from("No approved general verifier found.");
-            if err != expected_err {panic!("Should have correct checksum and wrong action. Parser reply: {}\nMock action line: {}", reply, mock_action_line)}
+        match handle_action(&mock_action_line, SEED_PHRASE, PWD, dbname) {
+            Ok(_) => panic!("Should have failed. Parser reply: {}\nMock action line: {}", reply, mock_action_line),
+            Err(e) => {
+                if e.to_string() != Error::NoAction(ActionFailure::AddGeneralVerifier).show().to_string() {
+                    panic!("Should have failed\nwith correct checksum and wrong action. Parser reply: {}\nMock action line: {}", reply, mock_action_line)
+                }
+            },
         }
-        else {panic!("Should have correct checksum and wrong action. Parser reply: {}\nMock action line: {}", reply, mock_action_line)}
         fs::remove_dir_all(dbname).unwrap();
     }
     
@@ -239,13 +250,14 @@ mod tests {
         // wrong action: add_two_verifiers
         let mock_action_line = r#"{"type":"add_two_verifiers","checksum":"4278348933"}"#;
         
-        let result = handle_action(&mock_action_line, SEED_PHRASE, PWD, dbname);
-        if let Err(e) = result {
-            let err = e.to_string();
-            let expected_err = String::from("No approved verifier found.");
-            if err != expected_err {panic!("Should have correct checksum and wrong action. Parser reply: {}\nMock action line: {}", reply, mock_action_line)}
+        match handle_action(&mock_action_line, SEED_PHRASE, PWD, dbname) {
+            Ok(_) => panic!("Should have failed. Parser reply: {}\nMock action line: {}", reply, mock_action_line),
+            Err(e) => {
+                if e.to_string() != Error::NoAction(ActionFailure::AddVerifier).show().to_string() {
+                    panic!("Should have failed\nwith correct checksum and wrong action. Parser reply: {}\nMock action line: {}", reply, mock_action_line)
+                }
+            },
         }
-        else {panic!("Should have correct checksum and wrong action. Parser reply: {}\nMock action line: {}", reply, mock_action_line)}
         fs::remove_dir_all(dbname).unwrap();
     }
     
@@ -262,14 +274,14 @@ mod tests {
         // wrong action: load_metadata_and_add_general_verifier
         let mock_action_line = r#"{"type":"load_metadata_and_add_general_verifier","checksum":"4278348933"}"#;
         
-        let result = handle_action(&mock_action_line, SEED_PHRASE, PWD, dbname);
-        if let Err(e) = result {
-            let err = e.to_string();
-            let expected_err = String::from("No approved metadata found.");
-            if err != expected_err {panic!("Should have correct checksum and wrong action. Parser reply: {}\nMock action line: {}", reply, mock_action_line)}
+        match handle_action(&mock_action_line, SEED_PHRASE, PWD, dbname) {
+            Ok(_) => panic!("Should have failed. Parser reply: {}\nMock action line: {}", reply, mock_action_line),
+            Err(e) => {
+                if e.to_string() != Error::NoAction(ActionFailure::LoadMeta).show().to_string() {
+                    panic!("Should have failed\nwith correct checksum and wrong action. Parser reply: {}\nMock action line: {}", reply, mock_action_line)
+                }
+            },
         }
-        else {panic!("Should have correct checksum and wrong action. Parser reply: {}\nMock action line: {}", reply, mock_action_line)}
-        
         fs::remove_dir_all(dbname).unwrap();
     }
     
@@ -286,14 +298,14 @@ mod tests {
         // wrong action: add_network
         let mock_action_line = r#"{"type":"add_network","checksum":"4278348933"}"#;
         
-        let result = handle_action(&mock_action_line, SEED_PHRASE, PWD, dbname);
-        if let Err(e) = result {
-            let err = e.to_string();
-            let expected_err = String::from("No approved network information found.");
-            if err != expected_err {panic!("Should have correct checksum and wrong action. Parser reply: {}\nMock action line: {}", reply, mock_action_line)}
+        match handle_action(&mock_action_line, SEED_PHRASE, PWD, dbname) {
+            Ok(_) => panic!("Should have failed. Parser reply: {}\nMock action line: {}", reply, mock_action_line),
+            Err(e) => {
+                if e.to_string() != Error::NoAction(ActionFailure::AddNetwork).show().to_string() {
+                    panic!("Should have failed\nwith correct checksum and wrong action. Parser reply: {}\nMock action line: {}", reply, mock_action_line)
+                }
+            },
         }
-        else {panic!("Should have correct checksum and wrong action. Parser reply: {}\nMock action line: {}", reply, mock_action_line)}
-        
         fs::remove_dir_all(dbname).unwrap();
     }
     
@@ -310,14 +322,14 @@ mod tests {
         // wrong action: add_network_and_add_general_verifier
         let mock_action_line = r#"{"type":"add_network_and_add_general_verifier","checksum":"4278348933"}"#;
         
-        let result = handle_action(&mock_action_line, SEED_PHRASE, PWD, dbname);
-        if let Err(e) = result {
-            let err = e.to_string();
-            let expected_err = String::from("No approved network information found.");
-            if err != expected_err {panic!("Should have correct checksum and wrong action. Parser reply: {}\nMock action line: {}", reply, mock_action_line)}
+        match handle_action(&mock_action_line, SEED_PHRASE, PWD, dbname) {
+            Ok(_) => panic!("Should have failed. Parser reply: {}\nMock action line: {}", reply, mock_action_line),
+            Err(e) => {
+                if e.to_string() != Error::NoAction(ActionFailure::AddNetwork).show().to_string() {
+                    panic!("Should have failed\nwith correct checksum and wrong action. Parser reply: {}\nMock action line: {}", reply, mock_action_line)
+                }
+            },
         }
-        else {panic!("Should have correct checksum and wrong action. Parser reply: {}\nMock action line: {}", reply, mock_action_line)}
-        
         fs::remove_dir_all(dbname).unwrap();
         
     }
@@ -329,8 +341,8 @@ mod tests {
         let dbname = "for_tests/load_network_unsigned_add_verifier_later";
         populate_cold_no_meta(dbname, true).unwrap();
         
-        let meta1 = meta_count(dbname).unwrap();
-        let specs1 = specs_count(dbname).unwrap();
+        let meta1 = meta_count_test(dbname);
+        let specs1 = specs_count_test(dbname);
         
         let line = fs::read_to_string("for_tests/network_metadata_westendV9070_None.txt").unwrap();
         let reply = produce_output(&line, dbname);
@@ -341,8 +353,8 @@ mod tests {
         let result = handle_action(&mock_action_line, SEED_PHRASE, PWD, dbname);
         if let Err(e) = result {panic!("Was unable to load metadata for westend 9070 network. {}", e)}
         
-        let meta2 = meta_count(dbname).unwrap();
-        let specs2 = specs_count(dbname).unwrap();
+        let meta2 = meta_count_test(dbname);
+        let specs2 = specs_count_test(dbname);
         
         assert!(meta2 == meta1+1, "Did not add metadata to database.");
         assert!(specs2 == specs1, "Number of specs entries somehow changed.");
@@ -356,8 +368,8 @@ mod tests {
         let result = handle_action(&mock_action_line, SEED_PHRASE, PWD, dbname);
         if let Err(e) = result {panic!("Was unable to add verifier for westend. {}", e)}
         
-        let meta3 = meta_count(dbname).unwrap();
-        let specs3 = specs_count(dbname).unwrap();
+        let meta3 = meta_count_test(dbname);
+        let specs3 = specs_count_test(dbname);
         
         assert!(meta3 == meta2, "Number of meta entries somehow changed.");
         assert!(specs3 == specs2, "Number of specs entries somehow changed.");

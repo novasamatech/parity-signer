@@ -4,41 +4,54 @@ use sled::{Db, open, Tree};
 use parity_scale_codec::{Decode, Encode};
 use blake2_rfc::blake2b::blake2b;
 use hex;
+use anyhow;
+
+use super::error::{Error, NotFound, NotDecodeable, NotHex};
 
 struct MetaPrint {
     spec_version: u32,
     metadata_hash: String,
 }
 
-pub fn get_network_details_by_key (network_key: &NetworkKey, database_name: &str) -> Result<String, Box<dyn std::error::Error>> {
+pub fn get_network_details_by_key (network_key: &NetworkKey, database_name: &str) -> anyhow::Result<String> {
     
-    let database: Db = open(database_name)?;
-    let metadata: Tree = database.open_tree(METATREE)?;
-    let chainspecs: Tree = database.open_tree(SPECSTREE)?;
+    let database: Db = match open(database_name) {
+        Ok(x) => x,
+        Err(e) => return Err(Error::InternalDatabaseError(e).show()),
+    };
+    let metadata: Tree = match database.open_tree(METATREE) {
+        Ok(x) => x,
+        Err(e) => return Err(Error::InternalDatabaseError(e).show()),
+    };
+    let chainspecs: Tree = match database.open_tree(SPECSTREE) {
+        Ok(x) => x,
+        Err(e) => return Err(Error::InternalDatabaseError(e).show()),
+    };
     
-    match chainspecs.get(&network_key)? {
-        Some(network_specs_encoded) => {
+    match chainspecs.get(&network_key) {
+        Ok(Some(network_specs_encoded)) => {
             let network_specs = match <ChainSpecs>::decode(&mut &network_specs_encoded[..]) {
                 Ok(a) => a,
-                Err(_) => return Err(Box::from("Network specs in the database are damaged, and could not be decoded.")),
+                Err(_) => return Err(Error::NotDecodeable(NotDecodeable::ChainSpecs).show()),
             };
-            if &generate_network_key(&network_specs.genesis_hash.to_vec()) != network_key {
-                return Err(Box::from("Network specs in the database are corrupted, genesis hash mismatch."))
-            }
+            if network_key != &generate_network_key(&network_specs.genesis_hash.to_vec()) {return Err(Error::GenesisHashMismatch.show())}
             let mut relevant_metadata: Vec<MetaPrint> = Vec::new();
             for x in metadata.scan_prefix(network_specs.name.encode()) {
                 if let Ok((versioned_name_encoded, meta)) = x {
                     let versioned_name = match <NameVersioned>::decode(&mut &versioned_name_encoded[..]) {
                         Ok(a) => a,
-                        Err(_) => return Err(Box::from("Network metadata record is damaged, and versioned name could not be decoded.")),
+                        Err(_) => return Err(Error::NotDecodeable(NotDecodeable::NameVersioned).show()),
                     };
-                    let version_vector = get_meta_const(&meta.to_vec())?;
+                    let version_vector = match get_meta_const(&meta.to_vec()) {
+                        Ok(a) => a,
+                        Err(_) => return Err(Error::NotDecodeable(NotDecodeable::Metadata).show()),
+                    };
                     let version = match VersionDecoded::decode(&mut &version_vector[..]) {
                         Ok(a) => a,
-                        Err(_) => return Err(Box::from("Database records damaged. Network metadata version constant could not be decoded.")),
+                        Err(_) => return Err(Error::NotDecodeable(NotDecodeable::Version).show()),
                     };
-                    if version.specname != versioned_name.name {return Err(Box::from("Database records damaged. Name decoded from version constant does not match the name from database key."))}
-                    if version.spec_version != versioned_name.version {return Err(Box::from("Database records damaged. Metadata version decoded from version constant does not match the version from database key."))}
+                    if version.specname != versioned_name.name {return Err(Error::MetadataNameMismatch.show())}
+                    if version.spec_version != versioned_name.version {return Err(Error::MetadataVersionMismatch.show())}
                     let new = MetaPrint {
                         spec_version: versioned_name.version,
                         metadata_hash: hex::encode(blake2b(32, &[], &meta).as_bytes()),
@@ -55,18 +68,23 @@ pub fn get_network_details_by_key (network_key: &NetworkKey, database_name: &str
             metadata_print.push_str("]");
             Ok(format!("{{{},\"meta\":{}}}", chainspecs_print, metadata_print))
         },
-        None => return Err(Box::from("Network key not found in chainspecs tree of the database")),
+        Ok(None) => return Err(Error::NotFound(NotFound::NetworkKey).show()),
+        Err(e) => return Err(Error::InternalDatabaseError(e).show()),
     }
 }
 
 
-pub fn get_network_details_by_hex (could_be_hex_gen_hash: &str, database_name: &str) -> Result<String, Box<dyn std::error::Error>> {
+pub fn get_network_details_by_hex (could_be_hex_gen_hash: &str, database_name: &str) -> anyhow::Result<String> {
     
     let hex_gen_hash = {
         if could_be_hex_gen_hash.starts_with("0x") {&could_be_hex_gen_hash[2..]}
         else {could_be_hex_gen_hash}
     };
-    let network_key = generate_network_key(&hex::decode(hex_gen_hash)?);
+    let unhex_gen_hash = match hex::decode(hex_gen_hash) {
+        Ok(x) => x,
+        Err(_) => return Err(Error::NotHex(NotHex::GenesisHash).show()),
+    };
+    let network_key = generate_network_key(&unhex_gen_hash);
     get_network_details_by_key (&network_key, database_name)
     
 }

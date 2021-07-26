@@ -1,25 +1,42 @@
-use hex;
-use sp_core::{Pair, ed25519, sr25519, ecdsa};
+use anyhow;
 use sled::{Db, open, Tree};
 use definitions::{transactions::SignDb, constants::{TRANSACTION, SIGNTRANS}, users::Encryption};
 use parity_scale_codec::Decode;
-use std::convert::TryInto;
 
+use super::sign_message::sign_as_address_key;
+use super::error::{Error, ActionFailure};
 
 /// Function to create signatures using RN output action line, and user entered pin and password.
 /// Also needs database name to fetch saved transaction and key.
 
-pub fn create_signature (seed_phrase: &str, pwd_entry: &str, dbname: &str, checksum: u32) -> Result<String, Box<dyn std::error::Error>> {
+pub fn create_signature (seed_phrase: &str, pwd_entry: &str, dbname: &str, checksum: u32) -> anyhow::Result<String> {
     
-    let database: Db = open(dbname)?;
-    let real_checksum = database.checksum()?;
+    let database: Db = match open(dbname) {
+        Ok(x) => x,
+        Err(e) => return Err(Error::InternalDatabaseError(e).show()),
+    };
     
-    if checksum != real_checksum {return Err(Box::from("Database checksum mismatch."))}
+    let real_checksum = match database.checksum() {
+        Ok(x) => x,
+        Err(e) => return Err(Error::InternalDatabaseError(e).show()),
+    };
     
-    let transaction: Tree = database.open_tree(TRANSACTION)?;
-    let action = match transaction.get(SIGNTRANS)? {
-        Some(x) => {<SignDb>::decode(&mut &x[..])?},
-        None => {return Err(Box::from("No approved transaction found."))}
+    if checksum != real_checksum {return Err(Error::ChecksumMismatch.show())}
+    
+    let transaction: Tree = match database.open_tree(TRANSACTION) {
+        Ok(x) => x,
+        Err(e) => return Err(Error::InternalDatabaseError(e).show()),
+    };
+    
+    let action = match transaction.get(SIGNTRANS) {
+        Ok(a) => match a {
+            Some(x) => match <SignDb>::decode(&mut &x[..]) {
+                Ok(b) => b,
+                Err(_) => return Err(Error::BadActionDecode(ActionFailure::SignTransaction).show()),
+            },
+            None => return Err(Error::NoAction(ActionFailure::SignTransaction).show()),
+        },
+        Err(e) => return Err(Error::InternalDatabaseError(e).show()),
     };
     
     let pwd = {
@@ -30,55 +47,27 @@ pub fn create_signature (seed_phrase: &str, pwd_entry: &str, dbname: &str, check
 // get full address with derivation path, used for signature preparation
 // TODO zeroize
     let full_address = seed_phrase.to_owned() + &action.path;
+    let hex_signature = hex::encode(sign_as_address_key(&action.transaction, action.address_key, &action.encryption, &full_address, pwd)?);
+    
+    match transaction.remove(SIGNTRANS) {
+        Ok(_) => (),
+        Err(e) => return Err(Error::InternalDatabaseError(e).show()),
+    };
+    
+    match database.flush() {
+        Ok(_) => (),
+        Err(e) => return Err(Error::InternalDatabaseError(e).show()),
+    };
     
     match action.encryption {
         Encryption::Ed25519 => {
-            let ed25519_pair = match ed25519::Pair::from_string(&full_address, pwd) {
-                Ok(x) => x,
-                Err(_) => return Err(Box::from("Error generating keys for ed25519 crypto."))
-            };
-            let into_key: [u8; 32] = match action.address_key.try_into() {
-                Ok(a) => a,
-                Err(_) => return Err(Box::from("Public key not compatible with ed25519 crypto.")),
-            };
-            let key = ed25519::Public::from_raw(into_key);
-            if key != ed25519_pair.public() {return Err(Box::from("Wrong password."))}
-            let signature = ed25519_pair.sign(&action.transaction[..]);
-            transaction.remove(SIGNTRANS)?;
-            database.flush()?;
-            Ok(format!("00{}", hex::encode(signature)))
+            Ok(format!("00{}", hex_signature))
         },
         Encryption::Sr25519 => {
-            let sr25519_pair = match sr25519::Pair::from_string(&full_address, pwd) {
-                Ok(x) => x,
-                Err(_) => return Err(Box::from("Error generating keys for sr25519 crypto."))
-            };
-            let into_key: [u8; 32] = match action.address_key.try_into() {
-                Ok(a) => a,
-                Err(_) => return Err(Box::from("Public key not compatible with sr25519 crypto.")),
-            };
-            let key = sr25519::Public::from_raw(into_key);
-            if key != sr25519_pair.public() {return Err(Box::from("Wrong password."))}
-            let signature = sr25519_pair.sign(&action.transaction[..]);
-            transaction.remove(SIGNTRANS)?;
-            database.flush()?;
-            Ok(format!("01{}", hex::encode(signature)))
+            Ok(format!("01{}", hex_signature))
         },
         Encryption::Ecdsa => {
-            let ecdsa_pair = match ecdsa::Pair::from_string(&full_address, pwd) {
-                Ok(x) => x,
-                Err(_) => return Err(Box::from("Error generating keys for ecdsa crypto."))
-            };
-            let into_key: [u8; 33] = match action.address_key.try_into() {
-                Ok(a) => a,
-                Err(_) => return Err(Box::from("Public key not compatible with ecdsa crypto.")),
-            };
-            let key = ecdsa::Public::from_raw(into_key);
-            if key != ecdsa_pair.public() {return Err(Box::from("Wrong password."))}
-            let signature = ecdsa_pair.sign(&action.transaction[..]);
-            transaction.remove(SIGNTRANS)?;
-            database.flush()?;
-            Ok(format!("02{}", hex::encode(signature)))
+            Ok(format!("02{}", hex_signature))
         },
     }
 }

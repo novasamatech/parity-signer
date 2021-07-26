@@ -1,73 +1,139 @@
 use sled::{Db, Tree, open};
 use parity_scale_codec::{Encode, Decode};
 use definitions::{constants::{SPECSTREE, SPECSTREEPREP}, defaults::{get_default_chainspecs, get_default_chainspecs_to_send}, network_specs::{ChainSpecs, generate_network_key}};
+use anyhow;
 
-/// Fetch 1 network from database by genesis hash
-pub fn get_network (database_name: &str, genesis_hash: &str) -> Result<ChainSpecs, Box<dyn std::error::Error>> {
-    let database: Db = open(database_name)?;
-    let chainspecs: Tree = database.open_tree(SPECSTREE)?;
-    let network_key = generate_network_key(&hex::decode(genesis_hash)?);
+use super::error::{Error, NotHex, NotDecodeable, NotFound};
 
-    match chainspecs.get(network_key) {
-        Ok(Some(a)) => Ok(<ChainSpecs>::decode(&mut &a[..])?),
-        Ok(None) => return Err(Box::from("Network not found")),
-        Err(e) => return Err(Box::from(e)),
+/// Fetch ChainSpecs for 1 network from database by genesis hash
+pub fn get_network (database_name: &str, genesis_hash: &str) -> anyhow::Result<ChainSpecs> {
+    let database: Db = match open(database_name) {
+        Ok(x) => x,
+        Err(e) => return Err(Error::InternalDatabaseError(e).show()),
+    };
+    let chainspecs: Tree = match database.open_tree(SPECSTREE) {
+        Ok(x) => x,
+        Err(e) => return Err(Error::InternalDatabaseError(e).show()),
+    };
+    
+    let unhex_genesis_hash = match hex::decode(genesis_hash) {
+        Ok(x) => x,
+        Err(_) => return Err(Error::NotHex(NotHex::GenesisHash).show()),
+    };
+    
+    let network_key = generate_network_key(&unhex_genesis_hash);
+
+    match chainspecs.get(&network_key) {
+        Ok(a) => match a {
+            Some(chain_specs_encoded) => match <ChainSpecs>::decode(&mut &chain_specs_encoded[..]) {
+                Ok(b) => {
+                    if generate_network_key(&b.genesis_hash.to_vec()) != network_key {return Err(Error::GenesisHashMismatch.show())}
+                    Ok(b)
+                },
+                Err(_) => return Err(Error::NotDecodeable(NotDecodeable::ChainSpecs).show()),
+            },
+            None => return Err(Error::NotFound(NotFound::NetworkKey).show()),
+        },
+        Err(e) => return Err(Error::InternalDatabaseError(e).show()),
     }
 }
 
-/// Fetch all saved networks
-pub fn get_all_networks (database_name: &str) -> Result<Vec<ChainSpecs>, Box<dyn std::error::Error>> {
-    let database: Db = open(database_name)?;
-    let chainspecs: Tree = database.open_tree(SPECSTREE)?;
+/// Fetch ChainSpecs for all saved networks
+pub fn get_all_networks (database_name: &str) -> anyhow::Result<Vec<ChainSpecs>> {
+    
+    let database: Db = match open(database_name) {
+        Ok(x) => x,
+        Err(e) => return Err(Error::InternalDatabaseError(e).show()),
+    };
+    let chainspecs: Tree = match database.open_tree(SPECSTREE) {
+        Ok(x) => x,
+        Err(e) => return Err(Error::InternalDatabaseError(e).show()),
+    };
+    
+    let mut out: Vec<ChainSpecs> = Vec::new();
 
-    match chainspecs
-        .iter()
-        .collect::<Result<Vec<_>,_>>()?
-        .into_iter()
-        .map(|(_id, record)| <ChainSpecs>::decode(&mut &record[..]))
-        .collect::<Result<Vec<_>,_>>()
-        {
-            Ok(a) => Ok(a),
-            Err(e) => return Err(Box::from(e)),
+    for x in chainspecs.iter() {
+        if let Ok((network_key, network_specs_encoded)) = x {
+            match <ChainSpecs>::decode(&mut &network_specs_encoded[..]) {
+                Ok(network_specs) => {
+                    if generate_network_key(&network_specs.genesis_hash.to_vec()) != network_key.to_vec() {return Err(Error::GenesisHashMismatch.show())}
+                    out.push(network_specs)
+                },
+                Err(_) => return Err(Error::NotDecodeable(NotDecodeable::ChainSpecs).show()),
+            }
         }
+    }
+    Ok(out)
 }
 
 
 /// Function to populate cold database with default network specs ChainSpecs
-pub fn load_chainspecs (database_name: &str) -> Result<(), Box<dyn std::error::Error>> {
+pub fn load_chainspecs (database_name: &str) -> anyhow::Result<()> {
     
-    let database: Db = open(database_name)?;
-    let chainspecs: Tree = database.open_tree(SPECSTREE)?;
-    chainspecs.clear()?;
+    let database: Db = match open(database_name) {
+        Ok(x) => x,
+        Err(e) => return Err(Error::InternalDatabaseError(e).show()),
+    };
+    let chainspecs: Tree = match database.open_tree(SPECSTREE) {
+        Ok(x) => x,
+        Err(e) => return Err(Error::InternalDatabaseError(e).show()),
+    };
+    match chainspecs.clear() {
+        Ok(()) => (),
+        Err(e) => return Err(Error::InternalDatabaseError(e).show()),
+    };
     
     let specs_vec = get_default_chainspecs();
     
     for x in specs_vec.iter() {
         let network_key = generate_network_key(&x.genesis_hash.to_vec());
-        chainspecs.insert(network_key, x.encode())?;
+        match chainspecs.insert(network_key, x.encode()) {
+            Ok(_) => (),
+            Err(e) => return Err(Error::InternalDatabaseError(e).show()),
+        };
     }
     
-    database.flush()?;
+    match database.flush() {
+        Ok(_) => (),
+        Err(e) => return Err(Error::InternalDatabaseError(e).show()),
+    };
+    
     Ok(())
     
 }
 
 
 /// Function to populate hot database with default network specs ChainSpecsToSend
-pub fn load_chainspecs_to_send (database_name: &str) -> Result<(), Box<dyn std::error::Error>> {
+pub fn load_chainspecs_to_send (database_name: &str) -> anyhow::Result<()> {
     
-    let database: Db = open(database_name)?;
-    let chainspecs: Tree = database.open_tree(SPECSTREEPREP)?;
-    chainspecs.clear()?;
+    let database: Db = match open(database_name) {
+        Ok(x) => x,
+        Err(e) => return Err(Error::InternalDatabaseError(e).show()),
+    };
+    let chainspecs: Tree = match database.open_tree(SPECSTREEPREP) {
+        Ok(x) => x,
+        Err(e) => return Err(Error::InternalDatabaseError(e).show()),
+    };
+    match chainspecs.clear() {
+        Ok(()) => (),
+        Err(e) => return Err(Error::InternalDatabaseError(e).show()),
+    };
     
     let specs_vec = get_default_chainspecs_to_send();
     
     for x in specs_vec.iter() {
         let network_key = generate_network_key(&x.genesis_hash.to_vec());
-        chainspecs.insert(network_key, x.encode())?;
+        match chainspecs.insert(network_key, x.encode()) {
+            Ok(_) => (),
+            Err(e) => return Err(Error::InternalDatabaseError(e).show()),
+        };
     }
     
-    database.flush()?;
+    match database.flush() {
+        Ok(_) => (),
+        Err(e) => return Err(Error::InternalDatabaseError(e).show()),
+    };
+    
     Ok(())
 }
 

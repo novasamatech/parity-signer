@@ -16,6 +16,14 @@ pub enum Encryption {
     Ecdsa,
 }
 
+/// Struct to store `sufficient crypto` information
+#[derive(Decode, Encode, PartialEq, Debug)]
+pub enum SufficientCrypto {
+    Ed25519 {public_key: [u8; 32], signature: [u8; 64]},
+    Sr25519 {public_key: [u8; 32], signature: [u8; 64]},
+    Ecdsa {public_key: [u8; 33], signature: [u8; 65]},
+}
+
 /// Struct associated with public address that has secret key available
 #[derive(Decode, Encode, Debug)]
 pub struct AddressDetails {

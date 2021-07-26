@@ -75,10 +75,13 @@ Program is run by
 `$ cargo run COMMAND [KEY(s)]`
 
 Possible commands are:  
+
 - `show` followed by a key:  
     - `-database` to show network `specname` and `spec_version` for all networks in the metadata tree the database  
     - `-address_book` to show network `specname` and url address for all networks in the address_book tree of the database  
+    
 - `types` without any keys to generate `load_types` message  
+
 - `load` to `load_metadata` and `add` to `add_network` with following possible keys:  
     - setting keys (maximum one can be used):  
         - `-d`: do NOT update the database, make rpc calls, and produce ALL requested output files  
@@ -89,8 +92,9 @@ Possible commands are:
     - reference keys (exactly only one has to be used):  
         - `-a`: process all networks (either in database or in the address book, depending on setting key)  
         - `-n` followed by one or more network names (such as in `-n polkadot westend`) to process networks by the name (either from database or from the address book, depending on setting key)  
-        - `-u` followed by one or more url addresses to process network by url address (is incompatible with `-f` key)
+        - `-u` followed by one or more url addresses to process network by url address (is incompatible with `-f` key); '-u' is expected to be used for entirely new networks that have no corresponding entry in address book, or if the address in address book somehow became faulty; in case of successful run with -u key if the address in address book existed and was different, **program replaces old address in the database with new one**.
     - optional `-s` key to stop the program if any failure occurs. By default the program informs user of unsuccessful attempt and proceeds.  
+    
 - `make` to `make_message` with following possible keys:  
     - optional content key: `-qr` will generate only apng qr code, `-text` will generate only text file with hex encoded message; by default, both qr code and text message are generated; content keys are expected immediately after `make` command, if at all; keys to follow could go in any order, but with content immediately following the key.  
     - key `-crypto` followed by encryption variant used in message verification:  
@@ -111,9 +115,23 @@ Possible commands are:
         - `-hex` followed by actual hex line of signature  
         - `-file` followed by file name ****, to read verifier signature as Vec<u8> from file named `****` from folder `../files/for_signing/`  
     - optional key `-name` followed by `****` - name override to save file named `****` for apng export and file named `****.txt` into folder `../files/signed/`  
+    
+- `sign` to `make_message` using sufficient crypto information received from elsewhere, for example, from signer device, with following keys:  
+    - optional content key: `-qr` will generate only apng qr code, `-text` will generate only text file with hex encoded message; by default, both qr code and text message are generated; content keys are expected immediately after `make` command, if at all; keys to follow could go in any order, but with content immediately following the key.  
+    - key `-sufficient` followed by:  
+        - `-hex` followed by actual hex line of hex represented SCALE encoded sufficient crypto  
+        - `-file` followed by file name ****, to read SCALE encoded sufficient crypto as Vec<u8> from file named `****` from folder `../files/for_signing/`  
+    - key `-msgtype` followed by message type:  
+        - `load_types`  
+        - `load_metadata`  
+        - `add_network`  
+    - key `-payload` followed by `****` - file name to read message content as Vec<u8> from file named `****` from folder `../files/for_signing/`  
+    - key `-signature` followed by:  
+        
+    - optional key `-name` followed by `****` - name override to save file named `****` for apng export and file named `****.txt` into folder `../files/signed/`  
 
 
-## Examples:  
+## Example commands  
 
 `$ cargo run types` to generate payload of `load_types` message from the database  
 
@@ -127,6 +145,26 @@ Possible commands are:
 
 `$ cargo run make -text -crypto sr25519 -msgtype load_types -verifier -hex 0xd43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d -payload sign_me_load_types -signature -hex 0x5a4a03f84a19cf8ebda40e62358c592870691a9cf456138bb4829969d10fe969b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe` to create text file of load_types "verified" by verifier with given hex public key with given signature.  
 
+`$ cargo run sign -text -sufficient -hex 01d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d5a4a03f84a19cf8ebda40e62358c592870691a9cf456138bb4829969d10fe969b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe -msgtype load_types -payload sign_me_load_types` to assemble text file with load_type message using sufficient crypto received from signer.  
+
 `$ cargo run load -a -k` to run rpc calls for all networks in `address_book` of the database to fetch current metadata, update the metadata entries in the database if needed, and generate the `load_metadata` message(s) for updated networks; if an error occurs for one of the networks, program informs of that and proceeds to try others.  
 
 `$ cargo run load -n polkadot -d` run rpc call for `polkadot` using the address from `address_book` of the database to fetch current metadata, and generate the `load_metadata` message without updating the database  
+
+
+## Example full run  
+
+Let's say we want to generate QR code with signed load_metadata message for freshly fetched westend metadata using subkey tool for signing.  
+
+1. `$ cargo run load -n westend` This will fetch fresh westend metadata, update the database with it, and - most relevant to us currently - generate file with message body at `../files/for_signing/sign_me_load_metadata_westendV9080`. This file contains stuff that needs to be signed.  
+
+2. Run file `../files/for_signing/sign_me_load_metadata_westendV9080` through subkey to generate the signature. Say, we are using ed25519 encryption.  
+
+3. `$ cargo run make -qr -crypto ed25519 -msgtype load_metadata -verifier -hex <public_key_in_hex> -payload sign_me_load_metadata_westendV9080 -signature -hex <signature_in_hex>` This will assemble the message (prelude, verifier, message body, and signature), and generate apng qr. Before assembling, however, it will check that all things match, i.e. message type corresponds to contents of the message body, signature is good etc, to avoid attention errors.  
+
+Done!  
+
+
+## If the database somehow got corrupted or does not exist:
+
+The database operated by `generate_message` crate is referred as *hot* both here and in crate `db_handling`. To restore the database to defaults, run through steps 1-2 of **Instruction for a fresh start** in `db_handling` readme.

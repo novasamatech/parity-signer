@@ -16,3 +16,4 @@ db_handling = {path = "../db_handling"}
 transaction_parsing = {path = "../transaction_parsing"}
 sled = "0.34.6"
 parity-scale-codec = "2.1.1"
+anyhow = "1.0.42"

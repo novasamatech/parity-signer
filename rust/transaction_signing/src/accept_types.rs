@@ -1,52 +1,126 @@
+use anyhow;
 use sled::{Db, open, Tree};
-use definitions::{constants::{ADDGENERALVERIFIER, LOADTYPES, SETTREE, TRANSACTION, TYPES, GENERALVERIFIER}, transactions::LoadTypesDb};
+use definitions::{constants::{ADDGENERALVERIFIER, LOADTYPES, SETTREE, TRANSACTION, TYPES, GENERALVERIFIER}, network_specs::Verifier, transactions::LoadTypesDb};
 use parity_scale_codec::{Decode, Encode};
 
-pub fn accept_types (dbname: &str, checksum: u32) -> Result<String, Box<dyn std::error::Error>> {
+use super::error::{Error, ActionFailure};
+
+pub fn accept_types (dbname: &str, checksum: u32) -> anyhow::Result<String> {
     
-    let database: Db = open(dbname)?;
-    let real_checksum = database.checksum()?;
-    
-    if checksum != real_checksum {return Err(Box::from("Database checksum mismatch."))}
-    
-    let settings: Tree = database.open_tree(SETTREE)?;
-    let transaction: Tree = database.open_tree(TRANSACTION)?;
-    let action = match transaction.remove(LOADTYPES)? {
-        Some(x) => {<LoadTypesDb>::decode(&mut &x[..])?},
-        None => {return Err(Box::from("No approved types information found."))}
+    let database: Db = match open(dbname) {
+        Ok(x) => x,
+        Err(e) => return Err(Error::InternalDatabaseError(e).show()),
     };
-    database.flush()?;
     
-    settings.insert(TYPES, action.types_info_encoded)?;
-    database.flush()?;
+    let real_checksum = match database.checksum() {
+        Ok(x) => x,
+        Err(e) => return Err(Error::InternalDatabaseError(e).show()),
+    };
+    
+    if checksum != real_checksum {return Err(Error::ChecksumMismatch.show())}
+    
+    let settings: Tree = match database.open_tree(SETTREE) {
+        Ok(x) => x,
+        Err(e) => return Err(Error::InternalDatabaseError(e).show()),
+    };
+    
+    let transaction: Tree = match database.open_tree(TRANSACTION) {
+        Ok(x) => x,
+        Err(e) => return Err(Error::InternalDatabaseError(e).show()),
+    };
+    
+    let action = match transaction.remove(LOADTYPES) {
+        Ok(a) => match a {
+            Some(encoded_load_types) => match <LoadTypesDb>::decode(&mut &encoded_load_types[..]) {
+                Ok(b) => b,
+                Err(_) => return Err(Error::BadActionDecode(ActionFailure::LoadTypes).show()),
+            },
+            None => return Err(Error::NoAction(ActionFailure::LoadTypes).show()),
+        },
+        Err(e) => return Err(Error::InternalDatabaseError(e).show()),
+    };
+    
+    match database.flush() {
+        Ok(_) => (),
+        Err(e) => return Err(Error::InternalDatabaseError(e).show()),
+    };
+    
+    match settings.insert(TYPES, action.types_info_encoded) {
+        Ok(_) => (),
+        Err(e) => return Err(Error::InternalDatabaseError(e).show()),
+    };
+    
+    match database.flush() {
+        Ok(_) => (),
+        Err(e) => return Err(Error::InternalDatabaseError(e).show()),
+    };
     
     if let Some(new_verifier) = action.upd_verifier {
-        settings.insert(GENERALVERIFIER, new_verifier.encode())?;
-        database.flush()?;
+        
+        match settings.insert(GENERALVERIFIER, new_verifier.encode()) {
+            Ok(_) => (),
+            Err(e) => return Err(Error::InternalDatabaseError(e).show()),
+        };
+        
+        match database.flush() {
+            Ok(_) => (),
+            Err(e) => return Err(Error::InternalDatabaseError(e).show()),
+        };
     }
     
     Ok(String::from("Types information successfully loaded."))
 }
 
 
-pub fn add_general_verifier (dbname: &str, checksum: u32) -> Result<String, Box<dyn std::error::Error>> {
+pub fn add_general_verifier (dbname: &str, checksum: u32) -> anyhow::Result<String> {
     
-    let database: Db = open(dbname)?;
-    let real_checksum = database.checksum()?;
-    
-    if checksum != real_checksum {return Err(Box::from("Database checksum mismatch."))}
-    
-    let settings: Tree = database.open_tree(SETTREE)?;
-    let transaction: Tree = database.open_tree(TRANSACTION)?;
-    
-    let new_verifier_encoded = match transaction.remove(ADDGENERALVERIFIER)? {
-        Some(x) => x,
-        None => {return Err(Box::from("No approved general verifier found."))}
+    let database: Db = match open(dbname) {
+        Ok(x) => x,
+        Err(e) => return Err(Error::InternalDatabaseError(e).show()),
     };
-    database.flush()?;
     
-    settings.insert(GENERALVERIFIER, new_verifier_encoded)?;
-    database.flush()?;
+    let real_checksum = match database.checksum() {
+        Ok(x) => x,
+        Err(e) => return Err(Error::InternalDatabaseError(e).show()),
+    };
+    
+    if checksum != real_checksum {return Err(Error::ChecksumMismatch.show())}
+    
+    let settings: Tree = match database.open_tree(SETTREE) {
+        Ok(x) => x,
+        Err(e) => return Err(Error::InternalDatabaseError(e).show()),
+    };
+    
+    let transaction: Tree = match database.open_tree(TRANSACTION) {
+        Ok(x) => x,
+        Err(e) => return Err(Error::InternalDatabaseError(e).show()),
+    };
+    
+    let new_verifier_encoded = match transaction.remove(ADDGENERALVERIFIER) {
+        Ok(a) => match a {
+            Some(x) => match <Verifier>::decode(&mut &x[..]) {
+                Ok(_) => x,
+                Err(_) => return Err(Error::BadActionDecode(ActionFailure::AddGeneralVerifier).show()),
+            },
+            None => return Err(Error::NoAction(ActionFailure::AddGeneralVerifier).show()),
+        },
+        Err(e) => return Err(Error::InternalDatabaseError(e).show()),
+    };
+    
+    match database.flush() {
+        Ok(_) => (),
+        Err(e) => return Err(Error::InternalDatabaseError(e).show()),
+    };
+    
+    match settings.insert(GENERALVERIFIER, new_verifier_encoded) {
+        Ok(_) => (),
+        Err(e) => return Err(Error::InternalDatabaseError(e).show()),
+    };
+    
+    match database.flush() {
+        Ok(_) => (),
+        Err(e) => return Err(Error::InternalDatabaseError(e).show()),
+    };
     
     Ok(String::from("Types verifier successfully updated."))
 }

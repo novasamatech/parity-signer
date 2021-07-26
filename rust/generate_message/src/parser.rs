@@ -1,5 +1,6 @@
 use std::env;
-use definitions::constants::FOLDER;
+use definitions::{constants::FOLDER, users::SufficientCrypto};
+use parity_scale_codec::Decode;
 
 /// Expected typical run commands:
 /// `$ cargo run show -database`
@@ -94,7 +95,7 @@ enum VerKey {
     Alice,
 }
 
-enum Sign {
+enum Entry {
     Hex(String),
     File(String),
 }
@@ -352,7 +353,7 @@ impl Command {
                                                                 Some(h) => {
                                                                     signature_found = match signature_found {
                                                                         Some(_) => {return Err("`-signature` key could be used maximum once.")},
-                                                                        None => Some(Sign::Hex(h.to_string())),
+                                                                        None => Some(Entry::Hex(h.to_string())),
                                                                     };
                                                                 },
                                                                 None => {return Err("Expected hex line for signature after -signature -hex sequence.")},
@@ -363,10 +364,10 @@ impl Command {
                                                                 Some(f) => {
                                                                     signature_found = match signature_found {
                                                                         Some(_) => {return Err("`-signature` key could be used maximum once.")},
-                                                                        None => Some(Sign::File(f.to_string())),
+                                                                        None => Some(Entry::File(f.to_string())),
                                                                     };
                                                                 },
-                                                                None => {return Err("Expected file namefor signature after -signature -file sequence.")},
+                                                                None => {return Err("Expected file name for signature after -signature -file sequence.")},
                                                             }
                                                         },
                                                         _ => {return Err("Invalid `-signature` key argument.")},
@@ -437,6 +438,191 @@ impl Command {
                         };
                         Ok(Command::Make(make))
                     },
+                    "sign" => {
+                        let mut goal = Goal::Both; // default option for `sign`
+                        let mut args = args.peekable();
+                        match args.peek() {
+                            Some(x) => {
+                                match x.as_str() {
+                                    "-qr" => {
+                                        goal = Goal::Qr;
+                                        args.next();
+                                    },
+                                    "-text" => {
+                                        goal = Goal::Text;
+                                        args.next();
+                                    },
+                                    _ => (),
+                                }
+                            },
+                            None => {return Err("Not enough arguments.")}
+                        }
+                        let mut sufficient_crypto_found = None;
+                        let mut msg_type_found = None;
+                        let mut payload_found = None;
+                        let mut name = None; // default option for `sign`
+                        loop {
+                            match args.next() {
+                                Some(x) => {
+                                    match x.as_str() {
+                                        "-sufficient" => {
+                                            match args.next() {
+                                                Some(x) => {
+                                                    match x.as_str() {
+                                                        "-hex" => {
+                                                            match args.next() {
+                                                                Some(h) => {
+                                                                    sufficient_crypto_found = match sufficient_crypto_found {
+                                                                        Some(_) => {return Err("`-sufficient` key could be used maximum once.")},
+                                                                        None => Some(Entry::Hex(h.to_string())),
+                                                                    };
+                                                                },
+                                                                None => {return Err("Expected hex line with sufficient crypto after -sufficient -hex sequence.")},
+                                                            }
+                                                        },
+                                                        "-file" => {
+                                                            match args.next() {
+                                                                Some(f) => {
+                                                                    sufficient_crypto_found = match sufficient_crypto_found {
+                                                                        Some(_) => {return Err("`-sufficient` key could be used maximum once.")},
+                                                                        None => Some(Entry::File(f.to_string())),
+                                                                    };
+                                                                },
+                                                                None => {return Err("Expected file name for sufficient crypto after -sufficient -file sequence.")},
+                                                            }
+                                                        },
+                                                        _ => {return Err("Invalid `-sufficient` key argument.")},
+                                                    }
+                                                },
+                                                None => {return Err("`-sufficient` key must be followed by an argument.")},
+                                            }
+                                        },
+                                        "-msgtype" => {
+                                            match args.next() {
+                                                Some(x) => {
+                                                    match x.as_str() {
+                                                        "load_types" => {
+                                                            msg_type_found = match msg_type_found {
+                                                                Some(_) => {return Err("`-msgtype` key could be used only once.")},
+                                                                None => Some(MsgType::LoadTypes),
+                                                            };
+                                                        },
+                                                        "load_metadata" => {
+                                                            msg_type_found = match msg_type_found {
+                                                                Some(_) => {return Err("`-msgtype` key could be used only once.")},
+                                                                None => Some(MsgType::LoadMetadata),
+                                                            };
+                                                        },
+                                                        "add_network" => {
+                                                            msg_type_found = match msg_type_found {
+                                                                Some(_) => {return Err("`-msgtype` key could be used only once.")},
+                                                                None => Some(MsgType::AddNetwork),
+                                                            };
+                                                        },
+                                                        _ => {return Err("Invalid `-msgtype` key argument.")}
+                                                    }
+                                                },
+                                                None => {return Err("`-msgtype` key must be followed by an argument.")},
+                                            }
+                                        },
+                                        "-payload" => {
+                                            match args.next() {
+                                                Some(x) => {
+                                                // interpret as filename with payload
+                                                    payload_found = match payload_found {
+                                                        Some(_) => {return Err("`-payload` key could be used only once.")},
+                                                        None => Some(x.to_string()),
+                                                    };
+                                                },
+                                                None => {return Err("`-payload` key must be followed by an argument.")},
+                                            }
+                                        },
+                                        "-name" => {
+                                            match args.next() {
+                                                Some(x) => {
+                                                // interpret as custom filename for export
+                                                    name = match name {
+                                                        Some(_) => {return Err("`-name` key could be used maximum once.")},
+                                                        None => Some(x.to_string()),
+                                                    };
+                                                },
+                                                None => {return Err("`-name` key must be followed by an argument.")},
+                                            }
+                                        },
+                                        _ => {return Err("Unexpected key and argument sequence.")},
+                                    }
+                                },
+                                None => break,
+                            }
+                        }
+                    // finalize command parsed with "sign"
+                        let crypto = match sufficient_crypto_found {
+                            Some(x) => {
+                                let sufficient_crypto_vector = match x {
+                                    Entry::Hex(h) => {
+                                        let hex_vector = {
+                                            if h.starts_with("0x") {h[2..].to_string()}
+                                            else {h}
+                                        };
+                                        match hex::decode(&hex_vector) {
+                                            Ok(a) => a,
+                                            Err(_) => {return Err("Error decoding hex string of sufficient crypto entry.")} 
+                                        }
+                                    },
+                                    Entry::File(f) => {
+                                        let filename = format!("{}/{}", FOLDER, f);
+                                        match std::fs::read(&filename) {
+                                            Ok(a) => a,
+                                            Err(_) => {return Err("Error reading provided file with sufficient crypto.")},
+                                        }
+                                    },
+                                };
+                                let sufficient_crypto = match <SufficientCrypto>::decode(&mut &sufficient_crypto_vector[..]) {
+                                    Ok(a) => a,
+                                    Err(_) => {return Err("Error in provided sufficient crypto.")},
+                                };
+                                match sufficient_crypto {
+                                    SufficientCrypto::Ed25519 {public_key, signature} => {
+                                        Crypto::Ed25519(VerifierKind::Normal {verifier_public_key: public_key.to_vec(), signature: signature.to_vec()})
+                                    },
+                                    SufficientCrypto::Sr25519 {public_key, signature} => {
+                                        Crypto::Sr25519(VerifierKind::Normal {verifier_public_key: public_key.to_vec(), signature: signature.to_vec()})
+                                    },
+                                    SufficientCrypto::Ecdsa {public_key, signature} => {
+                                        Crypto::Ecdsa(VerifierKind::Normal {verifier_public_key: public_key.to_vec(), signature: signature.to_vec()})
+                                    },
+                                }
+                            },
+                            None => {return Err("`-sufficient` key must have been used.")},
+                        };
+                        let payload = match payload_found {
+                            Some(x) => {
+                                let filename = format!("{}/{}", FOLDER, x);
+                                match std::fs::read(&filename) {
+                                    Ok(a) => a,
+                                    Err(_) => {return Err("Error reading payload file.")} 
+                                }
+                            },
+                            None => {return Err("`-payload` key must have been used.")},
+                        };
+                        let msg = match msg_type_found {
+                            Some(x) => {
+                                match x {
+                                    MsgType::LoadTypes => Msg::LoadTypes(payload),
+                                    MsgType::LoadMetadata => Msg::LoadMetadata(payload),
+                                    MsgType::AddNetwork => Msg::AddNetwork(payload),
+                                }
+                            },
+                            None => {return Err("`-msgtype` key must have been used.")},
+                        };
+                        let make = Make {
+                            goal,
+                            crypto,
+                            msg,
+                            name,
+                        };
+                        Ok(Command::Make(make))
+                    },
                     _ => return Err("Command type is not supported."),
                 }
             },
@@ -446,7 +632,7 @@ impl Command {
 }
 
 
-fn process_verifier_and_signature (verifier_found: Option<VerKey>, signature_found: Option<Sign>) -> Result<VerifierKind, &'static str> {
+fn process_verifier_and_signature (verifier_found: Option<VerKey>, signature_found: Option<Entry>) -> Result<VerifierKind, &'static str> {
     
     match verifier_found {
         Some(VerKey::Hex(x)) => {
@@ -459,7 +645,7 @@ fn process_verifier_and_signature (verifier_found: Option<VerKey>, signature_fou
                 Err(_) => {return Err("Error decoding hex public key line.")} 
             };
             let signature = match signature_found {
-                Some(Sign::Hex(t)) => {
+                Some(Entry::Hex(t)) => {
                     let hex_signature = {
                         if t.starts_with("0x") {t[2..].to_string()}
                         else {t}
@@ -469,7 +655,7 @@ fn process_verifier_and_signature (verifier_found: Option<VerKey>, signature_fou
                         Err(_) => {return Err("Error decoding hex signature line.")} 
                     }
                 },
-                Some(Sign::File(t)) => {
+                Some(Entry::File(t)) => {
                     let signature_filename = format!("{}/{}", FOLDER, t);
                     match std::fs::read(&signature_filename) {
                         Ok(a) => a,
@@ -487,7 +673,7 @@ fn process_verifier_and_signature (verifier_found: Option<VerKey>, signature_fou
                 Err(_) => {return Err("Error reading verifier public key file.")},
             };
             let signature = match signature_found {
-                Some(Sign::Hex(t)) => {
+                Some(Entry::Hex(t)) => {
                     let hex_signature = {
                         if t.starts_with("0x") {t[2..].to_string()}
                         else {t}
@@ -497,7 +683,7 @@ fn process_verifier_and_signature (verifier_found: Option<VerKey>, signature_fou
                         Err(_) => {return Err("Error decoding hex signature line.")} 
                     }
                 },
-                Some(Sign::File(t)) => {
+                Some(Entry::File(t)) => {
                     let signature_filename = format!("{}/{}", FOLDER, t);
                     match std::fs::read(&signature_filename) {
                         Ok(a) => a,
