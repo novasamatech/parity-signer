@@ -1,12 +1,11 @@
-use definitions::{constants::{METATREE, SPECSTREE}, metadata::{NameVersioned, VersionDecoded}, network_specs::{ChainSpecs, NetworkKey, generate_network_key}};
-use meta_reading::decode_metadata::get_meta_const;
-use sled::{Db, open, Tree};
+use definitions::{constants::{METATREE, SPECSTREE}, metadata::NameVersioned, network_specs::{NetworkKey, generate_network_key}};
 use parity_scale_codec::{Decode, Encode};
 use blake2_rfc::blake2b::blake2b;
 use hex;
 use anyhow;
 
-use super::error::{Error, NotFound, NotDecodeable, NotHex};
+use crate::error::{Error, NotFound, NotDecodeable, NotHex};
+use crate::helpers::{open_db, open_tree, unhex, decode_chain_specs, check_metadata};
 
 struct MetaPrint {
     spec_version: u32,
@@ -15,26 +14,13 @@ struct MetaPrint {
 
 pub fn get_network_details_by_key (network_key: &NetworkKey, database_name: &str) -> anyhow::Result<String> {
     
-    let database: Db = match open(database_name) {
-        Ok(x) => x,
-        Err(e) => return Err(Error::InternalDatabaseError(e).show()),
-    };
-    let metadata: Tree = match database.open_tree(METATREE) {
-        Ok(x) => x,
-        Err(e) => return Err(Error::InternalDatabaseError(e).show()),
-    };
-    let chainspecs: Tree = match database.open_tree(SPECSTREE) {
-        Ok(x) => x,
-        Err(e) => return Err(Error::InternalDatabaseError(e).show()),
-    };
-    
+    let database = open_db(database_name)?;
+    let metadata = open_tree(&database, METATREE)?;
+    let chainspecs = open_tree(&database, SPECSTREE)?;
+        
     match chainspecs.get(&network_key) {
         Ok(Some(network_specs_encoded)) => {
-            let network_specs = match <ChainSpecs>::decode(&mut &network_specs_encoded[..]) {
-                Ok(a) => a,
-                Err(_) => return Err(Error::NotDecodeable(NotDecodeable::ChainSpecs).show()),
-            };
-            if network_key != &generate_network_key(&network_specs.genesis_hash.to_vec()) {return Err(Error::GenesisHashMismatch.show())}
+            let network_specs = decode_chain_specs(network_specs_encoded, &network_key.to_vec())?;
             let mut relevant_metadata: Vec<MetaPrint> = Vec::new();
             for x in metadata.scan_prefix(network_specs.name.encode()) {
                 if let Ok((versioned_name_encoded, meta)) = x {
@@ -42,16 +28,7 @@ pub fn get_network_details_by_key (network_key: &NetworkKey, database_name: &str
                         Ok(a) => a,
                         Err(_) => return Err(Error::NotDecodeable(NotDecodeable::NameVersioned).show()),
                     };
-                    let version_vector = match get_meta_const(&meta.to_vec()) {
-                        Ok(a) => a,
-                        Err(_) => return Err(Error::NotDecodeable(NotDecodeable::Metadata).show()),
-                    };
-                    let version = match VersionDecoded::decode(&mut &version_vector[..]) {
-                        Ok(a) => a,
-                        Err(_) => return Err(Error::NotDecodeable(NotDecodeable::Version).show()),
-                    };
-                    if version.specname != versioned_name.name {return Err(Error::MetadataNameMismatch.show())}
-                    if version.spec_version != versioned_name.version {return Err(Error::MetadataVersionMismatch.show())}
+                    let meta = check_metadata(meta.to_vec(), &versioned_name)?;
                     let new = MetaPrint {
                         spec_version: versioned_name.version,
                         metadata_hash: hex::encode(blake2b(32, &[], &meta).as_bytes()),
@@ -74,17 +51,9 @@ pub fn get_network_details_by_key (network_key: &NetworkKey, database_name: &str
 }
 
 
-pub fn get_network_details_by_hex (could_be_hex_gen_hash: &str, database_name: &str) -> anyhow::Result<String> {
+pub fn get_network_details_by_hex (genesis_hash: &str, database_name: &str) -> anyhow::Result<String> {
     
-    let hex_gen_hash = {
-        if could_be_hex_gen_hash.starts_with("0x") {&could_be_hex_gen_hash[2..]}
-        else {could_be_hex_gen_hash}
-    };
-    let unhex_gen_hash = match hex::decode(hex_gen_hash) {
-        Ok(x) => x,
-        Err(_) => return Err(Error::NotHex(NotHex::GenesisHash).show()),
-    };
-    let network_key = generate_network_key(&unhex_gen_hash);
+    let network_key = generate_network_key(&unhex(genesis_hash, NotHex::GenesisHash)?);
     get_network_details_by_key (&network_key, database_name)
     
 }

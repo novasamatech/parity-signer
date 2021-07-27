@@ -1,12 +1,11 @@
-use sled::{Db, Tree, open};
-use parity_scale_codec::{Decode, Encode};
+use parity_scale_codec::Encode;
 use regex::Regex;
 use lazy_static::lazy_static;
-use hex;
-use definitions::{constants::{METATREE, SPECSTREE}, metadata::NameVersioned, network_specs::{ChainSpecs, generate_network_key}};
+use definitions::{constants::{METATREE, SPECSTREE}, metadata::NameVersioned};
 use anyhow;
 
-use super::error::{Error, NotDecodeable, NotHex};
+use crate::error::{Error, NotHex};
+use crate::helpers::{open_db, open_tree, flush_db, clear_tree, insert_into_tree, unhex, decode_chain_specs};
 
 
 
@@ -16,18 +15,9 @@ lazy_static! {
 
 pub fn load_metadata (database_name: &str, metadata_contents: &str) -> anyhow::Result<()> {
     
-    let database: Db = match open(database_name) {
-        Ok(x) => x,
-        Err(e) => return Err(Error::InternalDatabaseError(e).show()),
-    };
-    let metadata: Tree = match database.open_tree(METATREE) {
-        Ok(x) => x,
-        Err(e) => return Err(Error::InternalDatabaseError(e).show()),
-    };
-    match metadata.clear() {
-        Ok(()) => (),
-        Err(e) => return Err(Error::InternalDatabaseError(e).show()),
-    };
+    let database = open_db(database_name)?;
+    let metadata = open_tree(&database, METATREE)?;
+    clear_tree(&metadata)?;
     
     for caps in REG_META.captures_iter(&metadata_contents) {
         let version: u32 = match caps["version"].parse() {
@@ -39,23 +29,13 @@ pub fn load_metadata (database_name: &str, metadata_contents: &str) -> anyhow::R
             version,
         };
         let meta_hex = caps["meta"].to_string();
-        let meta_to_store = match hex::decode(&meta_hex) {
-            Ok(x) => x,
-            Err(_) => return Err(Error::NotHex(NotHex::DefaultMeta).show()),
-        };
-        match metadata.insert(new.encode(), meta_to_store) {
-            Ok(_) => (),
-            Err(e) => return Err(Error::InternalDatabaseError(e).show()),
-        };
+        
+        let meta_to_store = unhex(&meta_hex, NotHex::DefaultMeta)?;
+        insert_into_tree(new.encode(), meta_to_store, &metadata)?;
     }
     
-    match database.flush() {
-        Ok(_) => (),
-        Err(e) => return Err(Error::InternalDatabaseError(e).show()),
-    };
-    
+    flush_db(&database)?;
     Ok(())
-    
 }
 
 
@@ -64,50 +44,23 @@ pub fn load_metadata (database_name: &str, metadata_contents: &str) -> anyhow::R
 /// so that no metadata without associated network specs enters the database
 pub fn transfer_metadata (database_name_from: &str, database_name_to: &str) -> anyhow::Result<()> {
     
-    let database_from: Db = match open(database_name_from) {
-        Ok(x) => x,
-        Err(e) => return Err(Error::InternalDatabaseError(e).show()),
-    };
-    let metadata_from: Tree = match database_from.open_tree(METATREE) {
-        Ok(x) => x,
-        Err(e) => return Err(Error::InternalDatabaseError(e).show()),
-    };
-    
-    let database_to: Db = match open(database_name_to) {
-        Ok(x) => x,
-        Err(e) => return Err(Error::InternalDatabaseError(e).show()),
-    };
-    let metadata_to: Tree = match database_to.open_tree(METATREE) {
-        Ok(x) => x,
-        Err(e) => return Err(Error::InternalDatabaseError(e).show()),
-    };
-    let chainspecs_to: Tree = match database_to.open_tree(SPECSTREE) {
-        Ok(x) => x,
-        Err(e) => return Err(Error::InternalDatabaseError(e).show()),
-    };
+    let database_from = open_db(database_name_from)?;
+    let metadata_from = open_tree(&database_from, METATREE)?;
+    let database_to = open_db(database_name_to)?;
+    let metadata_to = open_tree(&database_to, METATREE)?;
+    let chainspecs_to = open_tree(&database_to, SPECSTREE)?;
     
     for x in chainspecs_to.iter() {
         if let Ok((network_key, network_specs_encoded)) = x {
-            let network_specs = match <ChainSpecs>::decode(&mut &network_specs_encoded[..]) {
-                Ok(a) => a,
-                Err(_) => return Err(Error::NotDecodeable(NotDecodeable::ChainSpecs).show()),
-            };
-            if network_key != generate_network_key(&network_specs.genesis_hash.to_vec()) {return Err(Error::GenesisHashMismatch.show())}
+            let network_specs = decode_chain_specs(network_specs_encoded, &network_key.to_vec())?;
             for y in metadata_from.scan_prefix(network_specs.name.encode()) {
                 if let Ok((key, value)) = y {
-                    match metadata_to.insert(key, value) {
-                        Ok(_) => (),
-                        Err(e) => return Err(Error::InternalDatabaseError(e).show()),
-                    };
+                    insert_into_tree(key.to_vec(), value.to_vec(), &metadata_to)?;
                 }
             }
         }
     }
-    
-    match database_to.flush() {
-        Ok(_) => (),
-        Err(e) => return Err(Error::InternalDatabaseError(e).show()),
-    };
+    flush_db(&database_to)?;
     Ok(())
     
 }

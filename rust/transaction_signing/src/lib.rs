@@ -8,6 +8,7 @@ mod accept_network;
 mod accept_types;
     use accept_types::{accept_types, add_general_verifier};
 mod error;
+mod helpers;
 mod interpretation;
     use interpretation::interpret_action;
 pub mod sign_message;

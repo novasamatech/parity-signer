@@ -1,46 +1,25 @@
-use sled::{Db, Tree, open};
 use parity_scale_codec::Encode;
-use definitions::{constants::{SETTREE, TYPES, GENERALVERIFIER}, defaults::{get_default_types}, network_specs::Verifier};
+use definitions::{constants::{SETTREE, TYPES, GENERALVERIFIER}, defaults::get_default_types, network_specs::Verifier};
 use anyhow;
 
-use super::error::Error;
+use crate::error::Error;
+use crate::helpers::{open_db, open_tree, flush_db, insert_into_tree, remove_from_tree};
 
 
 /// Load default types
 
 pub fn load_types (database_name: &str) -> anyhow::Result<()> {
     
-    let database: Db = match open(database_name) {
-        Ok(x) => x,
-        Err(e) => return Err(Error::InternalDatabaseError(e).show()),
-    };
-    
-    let settings: Tree = match database.open_tree(SETTREE) {
-        Ok(x) => x,
-        Err(e) => return Err(Error::InternalDatabaseError(e).show()),
-    };
-    
-    match settings.remove(TYPES) {
-        Ok(_) => (),
-        Err(e) => return Err(Error::InternalDatabaseError(e).show()),
-    };
+    let database = open_db(database_name)?;
+    let settings = open_tree(&database, SETTREE)?;
+    remove_from_tree(TYPES.to_vec(), &settings)?;
     
     let types_prep = match get_default_types() {
         Ok(x) => x,
         Err(e) => return Err(Error::BadTypesFile(e).show()),
     };
-    
-    let types = types_prep.encode();
-    match settings.insert(TYPES, types) {
-        Ok(_) => (),
-        Err(e) => return Err(Error::InternalDatabaseError(e).show()),
-    };
-    
-    match database.flush() {
-        Ok(_) => (),
-        Err(e) => return Err(Error::InternalDatabaseError(e).show()),
-    };
-    
+    insert_into_tree(TYPES.to_vec(), types_prep.encode(), &settings)?;
+    flush_db(&database)?;
     Ok(())
 }
 
@@ -48,30 +27,11 @@ pub fn load_types (database_name: &str) -> anyhow::Result<()> {
 
 pub fn set_general_verifier (database_name: &str, general_verifier: Verifier) -> anyhow::Result<()> {
     
-    let database: Db = match open(database_name) {
-        Ok(x) => x,
-        Err(e) => return Err(Error::InternalDatabaseError(e).show()),
-    };
-    
-    let settings: Tree = match database.open_tree(SETTREE) {
-        Ok(x) => x,
-        Err(e) => return Err(Error::InternalDatabaseError(e).show()),
-    };
-    
-    match settings.remove(GENERALVERIFIER) {
-        Ok(_) => (),
-        Err(e) => return Err(Error::InternalDatabaseError(e).show()),
-    };
-    
-    match settings.insert(GENERALVERIFIER, general_verifier.encode()) {
-        Ok(_) => (),
-        Err(e) => return Err(Error::InternalDatabaseError(e).show()),
-    };
-    
-    match database.flush() {
-        Ok(_) => (),
-        Err(e) => return Err(Error::InternalDatabaseError(e).show()),
-    };
+    let database = open_db(database_name)?;
+    let settings = open_tree(&database, SETTREE)?;
+    remove_from_tree(GENERALVERIFIER.to_vec(), &settings)?;
+    insert_into_tree(GENERALVERIFIER.to_vec(), general_verifier.encode(), &settings)?;
+    flush_db(&database)?;
     Ok(())
 }
 

@@ -3,18 +3,19 @@
 //! best available tool and here they are only processed in plaintext.
 //! Zeroization is mostly delegated to os
 
-use sled::{Db, Tree, open};
+use sled::{Db, Tree};
 use sp_core::{Pair, ed25519, sr25519, ecdsa};
-use parity_scale_codec::{Decode, Encode};
+use parity_scale_codec::Encode;
 use regex::Regex;
-use definitions::{constants::{ADDRTREE, SPECSTREE}, network_specs::{ChainSpecs, NetworkKey, generate_network_key}, users::{Encryption, AddressDetails, SeedObject, AddressKey, generate_address_key, print_as_base58}};
+use definitions::{constants::{ADDRTREE, SPECSTREE}, network_specs::{NetworkKey, generate_network_key}, users::{Encryption, AddressDetails, SeedObject, AddressKey, generate_address_key, print_as_base58}};
 use bip39::{Language, Mnemonic, MnemonicType};
 use zeroize::Zeroize;
 use lazy_static::lazy_static;
 use anyhow;
 
-use super::error::{Error, NotFound, NotDecodeable, NotHex, CreateAddress};
-use super::chainspecs::get_network;
+use crate::error::{Error, NotFound, NotHex, CreateAddress};
+use crate::chainspecs::get_network;
+use crate::helpers::{open_db, open_tree, drop_tree, flush_db, insert_into_tree, remove_from_tree, unhex, decode_chain_specs, decode_address_details};
 
 
 lazy_static! {
@@ -26,10 +27,7 @@ lazy_static! {
 
 /// get all identities from database for given seed_name (internal use only!)
 fn get_seed_identities (database: &Db, seed_name: &str) -> anyhow::Result<Vec<(AddressKey, AddressDetails)>> {
-    let identities: Tree = match database.open_tree(ADDRTREE) {
-        Ok(x) => x,
-        Err(e) => return Err(Error::InternalDatabaseError(e).show()),
-    };
+    let identities = open_tree(&database, ADDRTREE)?;
     filter_addresses_by_seed_name (&identities, seed_name)
 }
 
@@ -39,10 +37,7 @@ fn filter_addresses_by_seed_name (identities: &Tree, seed_name: &str) -> anyhow:
     for x in identities.iter() {
         if let Ok((key, value)) = x {
             let address_key = key.to_vec();
-            let address_details = match <AddressDetails>::decode(&mut &value[..]) {
-                Ok(a) => a,
-                Err(_) => return Err(Error::NotDecodeable(NotDecodeable::AddressDetails).show()),
-            };
+            let address_details = decode_address_details(value)?;
             if address_details.seed_name == seed_name {
                 out.push((address_key, address_details));
             }
@@ -57,10 +52,7 @@ fn filter_addresses_by_seed_name_and_name (identities: &Tree, seed_name: &str, n
     for x in identities.iter() {
         if let Ok((key, value)) = x {
             let address_key = key.to_vec();
-            let address_details = match <AddressDetails>::decode(&mut &value[..]) {
-                Ok(a) => a,
-                Err(_) => return Err(Error::NotDecodeable(NotDecodeable::AddressDetails).show()),
-            };
+            let address_details = decode_address_details(value)?;
             if (address_details.seed_name == seed_name)&&(address_details.name == name) {
                 out.push((address_key, address_details));
             }
@@ -72,15 +64,8 @@ fn filter_addresses_by_seed_name_and_name (identities: &Tree, seed_name: &str, n
 /// get all identities for given seed_name and network_key as hex string
 pub fn get_relevant_identities (seed_name: &str, genesis_hash: &str, database_name: &str) -> anyhow::Result<Vec<(AddressKey, AddressDetails)>> {
     
-    let unhex_genesis_hash = match hex::decode(genesis_hash) {
-        Ok(x) => x,
-        Err(_) => return Err(Error::NotHex(NotHex::GenesisHash).show()),
-    };
-    let network_key = generate_network_key(&unhex_genesis_hash); //TODO: add whatever is needed for parachains?
-    let database: Db = match open(database_name) {
-        Ok(x) => x,
-        Err(e) => return Err(Error::InternalDatabaseError(e).show()),
-    };
+    let network_key = generate_network_key(&unhex(genesis_hash, NotHex::GenesisHash)?); //TODO: add whatever is needed for parachains?
+    let database = open_db(database_name)?;
     let identities_out = get_seed_identities(&database, seed_name)?;
     Ok(identities_out.into_iter().filter(|(_, details)| details.network_id.contains(&network_key)).collect())
 }
@@ -107,22 +92,13 @@ pub fn print_relevant_identities (seed_name: &str, genesis_hash: &str, database_
 /// ss58 line associated with each of public keys is printed with default base58prefix
 pub fn print_all_identities (database_name: &str) -> anyhow::Result<String> {
     
-    let database: Db = match open(database_name) {
-        Ok(x) => x,
-        Err(e) => return Err(Error::InternalDatabaseError(e).show()),
-    };
-    let identities: Tree = match database.open_tree(ADDRTREE) {
-        Ok(x) => x,
-        Err(e) => return Err(Error::InternalDatabaseError(e).show()),
-    };
+    let database = open_db(database_name)?;
+    let identities = open_tree(&database, ADDRTREE)?;
     let mut out = String::from("[");
     for (i, x) in identities.iter().enumerate() {
         if let Ok((address_key, address_details_encoded)) = x {
             if i>0 {out.push_str(",")}
-            let address_details = match <AddressDetails>::decode(&mut &address_details_encoded[..]) {
-                Ok(a) => a,
-                Err(_) => return Err(Error::NotDecodeable(NotDecodeable::AddressDetails).show()),
-            };
+            let address_details = decode_address_details(address_details_encoded)?;
             let base58print = match print_as_base58 (&address_key.to_vec(), address_details.encryption, None) {
                 Ok(a) => a,
                 Err(e) => return Err(Error::Base58(e.to_string()).show()),
@@ -148,10 +124,8 @@ fn create_address (database: &Db, path: &str, network_key: NetworkKey, name: &st
     // TODO: check zeroize
 
     let mut full_address = seed_object.seed_phrase.to_owned() + path;
-    let chainspecs: Tree = match database.open_tree(SPECSTREE) {
-        Ok(x) => x,
-        Err(e) => return Err(Error::InternalDatabaseError(e).show()),
-    };
+    let chainspecs = open_tree(&database, SPECSTREE)?;
+    
     if !chainspecs.contains_key(&network_key)? {return Err(Error::CreateAddress(CreateAddress::NetworkNotFound).show())}
     
     let address_key = match seed_object.encryption {
@@ -176,28 +150,19 @@ fn create_address (database: &Db, path: &str, network_key: NetworkKey, name: &st
     };
     full_address.zeroize();
     
-    let identities: Tree = match database.open_tree(ADDRTREE) {
-        Ok(x) => x,
-        Err(e) => return Err(Error::InternalDatabaseError(e).show()),
-    };
+    let identities = open_tree(&database, ADDRTREE)?;
     let seed_name = seed_object.seed_name.to_string();
 // This address might be already created; maybe we just need to allow its use in another network?
     match identities.get(&address_key) {
         Ok(Some(address_details_encoded)) => {
         // TODO: check that all collisions are handled
-            let mut address_details = match <AddressDetails>::decode(&mut &address_details_encoded[..]) {
-                Ok(a) => a,
-                Err(_) => return Err(Error::NotDecodeable(NotDecodeable::AddressDetails).show()),
-            };
+            let mut address_details = decode_address_details(address_details_encoded)?;
         // Check if something else resolved into this keypair
-            if address_details.name != name || address_details.path != path {return Err(Error::AddressKeyCollision {name: address_details.name, seed_name: address_details.seed_name}.show())}
+            if address_details.name != name || address_details.path != path {return Err(Error::AddressKeyCollision{name: address_details.name, seed_name: address_details.seed_name}.show())}
         // Append network to list of allowed networks
             if !address_details.network_id.contains(&network_key) {
                 address_details.network_id.push(network_key);
-                match identities.insert(address_key, address_details.encode()) {
-                    Ok(_) => (),
-                    Err(e) => return Err(Error::InternalDatabaseError(e).show()),
-                };
+                insert_into_tree(address_key, address_details.encode(), &identities)?;
             }
         }
         Ok(None) => {
@@ -212,7 +177,7 @@ fn create_address (database: &Db, path: &str, network_key: NetworkKey, name: &st
                 },
                 None => "",
             };
-            let address = AddressDetails {
+            let address_details = AddressDetails {
                 seed_name,
                 path: cropped_path.to_string(),
                 has_pwd,
@@ -220,10 +185,7 @@ fn create_address (database: &Db, path: &str, network_key: NetworkKey, name: &st
                 network_id: vec![network_key],
                 encryption: seed_object.encryption,
             };
-            match identities.insert(address_key, address.encode()) {
-                Ok(_) => (),
-                Err(e) => return Err(Error::InternalDatabaseError(e).show()),
-            };
+            insert_into_tree(address_key, address_details.encode(), &identities)?;
         },
         Err(e) => return Err(Error::InternalDatabaseError(e).show()),
     }
@@ -235,24 +197,12 @@ fn create_address (database: &Db, path: &str, network_key: NetworkKey, name: &st
 fn populate_addresses (database: &Db, seed_object: &SeedObject) -> anyhow::Result<()> {
 // TODO: check zeroize
 // TODO: compatibility with atomic operations
-    let chainspecs: Tree = match database.open_tree(SPECSTREE) {
-        Ok(x) => x,
-        Err(e) => return Err(Error::InternalDatabaseError(e).show()),
-    };
+    let chainspecs = open_tree(&database, SPECSTREE)?;
     for x in chainspecs.iter() {
         if let Ok((network_key, network_specs_encoded)) = x {
-            let network_specs = match <ChainSpecs>::decode(&mut &network_specs_encoded[..]) {
-                Ok(b) => {
-                    if generate_network_key(&b.genesis_hash.to_vec()) != network_key.to_vec() {return Err(Error::GenesisHashMismatch.show())}
-                    b
-                },
-                Err(_) => return Err(Error::NotDecodeable(NotDecodeable::ChainSpecs).show()),
-            };
+            let network_specs = decode_chain_specs(network_specs_encoded, &network_key.to_vec())?;
             create_address (database, "", network_key.to_vec(), "root address", seed_object, false)?;
-            match create_address (database, &network_specs.path_id, network_key.to_vec(), &format!("{} root address", network_specs.name), seed_object, false) {
-                Ok(()) => (),
-                Err(_) => (),
-            }
+            if let Err(_) = create_address (database, &network_specs.path_id, network_key.to_vec(), &format!("{} root address", network_specs.name), seed_object, false) {()}
         }
     }
     Ok(())
@@ -261,10 +211,7 @@ fn populate_addresses (database: &Db, seed_object: &SeedObject) -> anyhow::Resul
 /// Generate new seed and populate all known networks with default accounts
 pub fn try_create_seed (seed_name: &str, encryption_name: &str, seed_phrase_proposal: &str, seed_length: u32, database_name: &str) -> anyhow::Result<String> {
 // TODO: atomize writes
-    let database: Db = match open(database_name) {
-        Ok(x) => x,
-        Err(e) => return Err(Error::InternalDatabaseError(e).show()),
-    };
+    let database = open_db(database_name)?;
     let seed_phrase = match seed_phrase_proposal {
         "" => generate_random_phrase(seed_length)?,
         string => {
@@ -289,10 +236,7 @@ pub fn try_create_seed (seed_name: &str, encryption_name: &str, seed_phrase_prop
     };
 
     populate_addresses(&database, &seed_object)?;
-    match database.flush() {
-        Ok(_) => (),
-        Err(e) => return Err(Error::InternalDatabaseError(e).show()),
-    };
+    flush_db(&database)?;
     Ok(seed_phrase)
 }
 
@@ -339,43 +283,17 @@ pub fn suggest_path_name(path_all: &str) -> String {
 /// Function removes identity as seen by user
 /// Function removes network_key from network_id vector for database record with address_key corresponding to given public key
 pub fn delete_address(pub_key: &str, network_key_string: &str, database_name: &str) -> anyhow::Result<()> {
-    let database: Db = match open(database_name) {
-        Ok(x) => x,
-        Err(e) => return Err(Error::InternalDatabaseError(e).show()),
-    };
-    let identities: Tree = match database.open_tree(ADDRTREE) {
-        Ok(x) => x,
-        Err(e) => return Err(Error::InternalDatabaseError(e).show()),
-    };
-    let unhex_pub_key = match hex::decode(pub_key) {
-        Ok(x) => x,
-        Err(_) => return Err(Error::NotHex(NotHex::PublicKey).show()),
-    };
-    let address_key = generate_address_key(&unhex_pub_key);
-    let unhex_network_key = match hex::decode(network_key_string) {
-        Ok(x) => x,
-        Err(_) => return Err(Error::NotHex(NotHex::NetworkKey).show()),
-    };
-    let network_key = generate_network_key(&unhex_network_key); //TODO: add whatever is needed for parachains?
+    let database = open_db(database_name)?;
+    let identities = open_tree(&database, ADDRTREE)?;
+    let address_key = generate_address_key(&unhex(pub_key, NotHex::PublicKey)?);
+    let network_key = generate_network_key(&unhex(network_key_string, NotHex::GenesisHash)?);
+
     match identities.get(&address_key) {
         Ok(Some(address_details_encoded)) => {
-            let mut address_details = match <AddressDetails>::decode(&mut &address_details_encoded[..]) {
-                Ok(a) => a,
-                Err(_) => return Err(Error::NotDecodeable(NotDecodeable::AddressDetails).show()),
-            };
+            let mut address_details = decode_address_details(address_details_encoded)?;
             address_details.network_id = address_details.network_id.into_iter().filter(|id| *id != network_key).collect();
-            if address_details.network_id.is_empty() {
-                match identities.remove(&address_key) {
-                    Ok(_) => (),
-                    Err(e) => return Err(Error::InternalDatabaseError(e).show()),
-                }
-            } 
-            else {
-                match identities.insert(address_key, address_details.encode()) {
-                    Ok(_) => (),
-                    Err(e) => return Err(Error::InternalDatabaseError(e).show()),
-                }
-            }
+            if address_details.network_id.is_empty() {remove_from_tree(address_key, &identities)?}
+            else {insert_into_tree(address_key, address_details.encode(), &identities)?}
         }
         Ok(None) => return Err(Error::NotFound(NotFound::Address).show()),
         Err(e) => return Err(Error::InternalDatabaseError(e).show()),
@@ -409,10 +327,7 @@ pub fn check_derivation_format(path: &str) -> anyhow::Result<bool> {
 
 /// Generate new identity (api for create_address())
 pub fn try_create_address (id_name: &str, seed_name: &str, seed_phrase: &str, encryption_name: &str, path: &str, network: &str, has_pwd: bool, database_name: &str) -> anyhow::Result<()> {
-    let database: Db = match open(database_name) {
-        Ok(x) => x,
-        Err(e) => return Err(Error::InternalDatabaseError(e).show()),
-    };
+    let database = open_db(database_name)?;
 
     let encryption = match encryption_name {
         "ed25519" => Encryption::Ed25519,
@@ -427,21 +342,15 @@ pub fn try_create_address (id_name: &str, seed_name: &str, seed_phrase: &str, en
         encryption,
     };
 
-    let unhex_network_key = match hex::decode(network) {
-        Ok(x) => x,
-        Err(_) => return Err(Error::NotHex(NotHex::NetworkKey).show()),
-    };
-    let network_key = generate_network_key(&unhex_network_key);
+    let network_key = generate_network_key(&unhex(network, NotHex::GenesisHash)?);
 
     create_address(&database, path, network_key, id_name, &seed_object, has_pwd)
 }
 
 /// Function to populate test cold database with Alice information
 pub fn load_test_identities (database_name: &str) -> anyhow::Result<()> {
-    let database: Db = match open(database_name) {
-        Ok(x) => x,
-        Err(e) => return Err(Error::InternalDatabaseError(e).show()),
-    };
+    let database = open_db(database_name)?;
+    drop_tree(&database, ADDRTREE)?;
     let alice_seed_object = SeedObject {
         seed_name: String::from("Alice"),
         seed_phrase: String::from("bottom drive obey lake curtain smoke basket hold race lonely fit walk"),
@@ -451,10 +360,7 @@ pub fn load_test_identities (database_name: &str) -> anyhow::Result<()> {
     let westend_network_key = generate_network_key(&hex::decode("e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e").expect("known value"));
     create_address (&database, "//Alice", westend_network_key, "Alice_test_westend", &alice_seed_object, false)?;
     
-    match database.flush() {
-        Ok(_) => (),
-        Err(e) => return Err(Error::InternalDatabaseError(e).show()),
-    };
+    flush_db(&database)?;
     Ok(())
 }
 
@@ -462,32 +368,15 @@ pub fn load_test_identities (database_name: &str) -> anyhow::Result<()> {
 /// Function to remove all identities associated with given seen_name
 pub fn remove_identities_for_seed (seed_name: &str, database_name: &str) -> anyhow::Result<()> {
     
-    let database: Db = match open(database_name) {
-        Ok(x) => x,
-        Err(e) => return Err(Error::InternalDatabaseError(e).show()),
-    };
-    let identities: Tree = match database.open_tree(ADDRTREE) {
-        Ok(x) => x,
-        Err(e) => return Err(Error::InternalDatabaseError(e).show()),
-    };
+    let database = open_db(database_name)?;
+    let identities = open_tree(&database, ADDRTREE)?;
     for x in identities.iter() {
         if let Ok((key, value)) = x {
-            let address_details = match <AddressDetails>::decode(&mut &value[..]) {
-                Ok(a) => a,
-                Err(_) => return Err(Error::NotDecodeable(NotDecodeable::AddressDetails).show()),
-            };
-            if address_details.seed_name == seed_name {
-                match identities.remove(&key) {
-                    Ok(_) => (),
-                    Err(e) => return Err(Error::InternalDatabaseError(e).show()),
-                };
-            }
+            let address_details = decode_address_details(value)?;
+            if address_details.seed_name == seed_name {remove_from_tree(key.to_vec(), &identities)?}
         }
     }
-    match database.flush() {
-        Ok(_) => (),
-        Err(e) => return Err(Error::InternalDatabaseError(e).show()),
-    };
+    flush_db(&database)?;
     Ok(())
     
 }
@@ -498,7 +387,8 @@ mod tests {
     use super::*;
     use definitions::defaults::get_default_chainspecs;
     use std::fs;
-    use super::super::chainspecs::load_chainspecs;
+    use sled::{Db, Tree, open};
+    use crate::chainspecs::load_chainspecs;
 
     static SEED: &str = "bottom drive obey lake curtain smoke basket hold race lonely fit walk";
     static ENCRYPTION_NAME: &str = "sr25519";

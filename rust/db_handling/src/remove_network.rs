@@ -1,67 +1,31 @@
-use definitions::{constants::{ADDRTREE, METATREE, SPECSTREE}, metadata::NameVersioned, network_specs::{ChainSpecs, NetworkKey, generate_network_key}, users::AddressDetails};
-use sled::{Db, open, Tree};
+use definitions::{constants::{ADDRTREE, METATREE, SPECSTREE}, metadata::NameVersioned, network_specs::{NetworkKey, generate_network_key}, users::AddressDetails};
 use parity_scale_codec::{Decode, Encode};
-use hex;
 use anyhow;
 
-use super::error::{Error, NotDecodeable, NotFound, NotHex};
+use crate::error::{Error, NotDecodeable, NotFound, NotHex};
+use crate::helpers::{open_db, open_tree, flush_db, insert_into_tree, remove_from_tree, unhex, decode_chain_specs};
 
 
 pub fn remove_network_by_key (network_key: &NetworkKey, database_name: &str) -> anyhow::Result<()> {
     
-    let database: Db = match open(database_name) {
-        Ok(x) => x,
-        Err(e) => return Err(Error::InternalDatabaseError(e).show()),
-    };
-    let metadata: Tree = match database.open_tree(METATREE) {
-        Ok(x) => x,
-        Err(e) => return Err(Error::InternalDatabaseError(e).show()),
-    };
-    let chainspecs: Tree = match database.open_tree(SPECSTREE) {
-        Ok(x) => x,
-        Err(e) => return Err(Error::InternalDatabaseError(e).show()),
-    };
-    let identities: Tree = match database.open_tree(ADDRTREE) {
-        Ok(x) => x,
-        Err(e) => return Err(Error::InternalDatabaseError(e).show()),
-    };
-
+    let database = open_db(database_name)?;
+    let metadata = open_tree(&database, METATREE)?;
+    let chainspecs = open_tree(&database, SPECSTREE)?;
+    let identities = open_tree(&database, ADDRTREE)?;
+    
 // clean up the chainspecs tree
     let network_specs = match chainspecs.remove(&network_key) {
-        Ok(a) => match a {
-            Some(network_specs_encoded) => {
-                match <ChainSpecs>::decode(&mut &network_specs_encoded[..]) {
-                    Ok(b) => {
-                        if network_key != &generate_network_key(&b.genesis_hash.to_vec()) {return Err(Error::GenesisHashMismatch.show())}
-                        b
-                    },
-                    Err(_) => return Err(Error::NotDecodeable(NotDecodeable::ChainSpecs).show()),
-                }
-            },
-            None => return Err(Error::NotFound(NotFound::NetworkKey).show()),
-        },
+        Ok(Some(network_specs_encoded)) => decode_chain_specs(network_specs_encoded, &network_key.to_vec())?,
+        Ok(None) => return Err(Error::NotFound(NotFound::NetworkKey).show()),
         Err(e) => return Err(Error::InternalDatabaseError(e).show()),
     };
-    
-    match database.flush() {
-        Ok(_) => (),
-        Err(e) => return Err(Error::InternalDatabaseError(e).show()),
-    };
+    flush_db(&database)?;
     
 // clean up the existing metadata for this network (with various versions) in metadata tree
     for x in metadata.scan_prefix(network_specs.name.encode()) {
-        if let Ok((versioned_name_encoded, _)) = x {
-            match metadata.remove(versioned_name_encoded) {
-                Ok(_) => (),
-                Err(e) => return Err(Error::InternalDatabaseError(e).show()),
-            };
-        }
+        if let Ok((versioned_name_encoded, _)) = x {remove_from_tree(versioned_name_encoded.to_vec(), &metadata)?}
     }
-    
-    match database.flush() {
-        Ok(_) => (),
-        Err(e) => return Err(Error::InternalDatabaseError(e).show()),
-    };
+    flush_db(&database)?;
 
 // clean up the network_key from identities having it recorded in network_id
     for x in identities.iter() {
@@ -69,47 +33,23 @@ pub fn remove_network_by_key (network_key: &NetworkKey, database_name: &str) -> 
             let mut address_details = match <AddressDetails>::decode(&mut &address_details_encoded[..]) {
                 Ok(a) => a,
                 Err(_) => {
-                    match identities.remove(address_key) {
-                        Ok(_) => (),
-                        Err(e) => return Err(Error::InternalDatabaseError(e).show()),
-                    };
+                    remove_from_tree(address_key.to_vec(), &identities)?;
                     return Err(Error::NotDecodeable(NotDecodeable::AddressDetailsDel).show())
                 },
             };
             address_details.network_id = address_details.network_id.into_iter().filter(|id| id != network_key).collect();
-            if address_details.network_id.is_empty() {
-                match identities.remove(address_key) {
-                    Ok(_) => (),
-                    Err(e) => return Err(Error::InternalDatabaseError(e).show()),
-                };
-            } 
-            else {
-                match identities.insert(address_key, address_details.encode()) {
-                    Ok(_) => (),
-                    Err(e) => return Err(Error::InternalDatabaseError(e).show()),
-                };
-            }
+            if address_details.network_id.is_empty() {remove_from_tree(address_key.to_vec(), &identities)?}
+            else {insert_into_tree(address_key.to_vec(), address_details.encode(), &identities)?}
         }
     }
-    match database.flush() {
-        Ok(_) => (),
-        Err(e) => return Err(Error::InternalDatabaseError(e).show()),
-    };
+    flush_db(&database)?;
     Ok(())
 }
 
 
-pub fn remove_network_by_hex (could_be_hex_gen_hash: &str, database_name: &str) -> anyhow::Result<()> {
+pub fn remove_network_by_hex (genesis_hash: &str, database_name: &str) -> anyhow::Result<()> {
     
-    let hex_gen_hash = {
-        if could_be_hex_gen_hash.starts_with("0x") {&could_be_hex_gen_hash[2..]}
-        else {could_be_hex_gen_hash}
-    };
-    let unhex_gen_hash = match hex::decode(hex_gen_hash) {
-        Ok(x) => x,
-        Err(_) => return Err(Error::NotHex(NotHex::GenesisHash).show()),
-    };
-    let network_key = generate_network_key(&unhex_gen_hash);
+    let network_key = generate_network_key(&unhex(genesis_hash, NotHex::GenesisHash)?);
     remove_network_by_key (&network_key, database_name)
     
 }
@@ -120,14 +60,8 @@ pub fn remove_metadata (network_name: &str, network_version: u32, database_name:
         name: network_name.to_string(),
         version: network_version,
     };
-    let database: Db = match open(database_name) {
-        Ok(x) => x,
-        Err(e) => return Err(Error::InternalDatabaseError(e).show()),
-    };
-    let metadata: Tree = match database.open_tree(METATREE) {
-        Ok(x) => x,
-        Err(e) => return Err(Error::InternalDatabaseError(e).show()),
-    };
+    let database = open_db(database_name)?;
+    let metadata = open_tree(&database, METATREE)?;
     match metadata.remove(versioned_name.encode()) {
         Ok(Some(_)) => Ok(()),
         Ok(None) => return Err(Error::NotFound(NotFound::NameVersioned(versioned_name)).show()),
@@ -137,9 +71,10 @@ pub fn remove_metadata (network_name: &str, network_version: u32, database_name:
 
 #[cfg(test)]
 mod tests {
-    use super::super::{populate_cold, metadata::transfer_metadata};
+    use crate::{populate_cold, metadata::transfer_metadata};
     use super::*;
     use std::fs;
+    use sled::{Db, Tree, open};
     use definitions::constants::HOT_DB_NAME;
     
     const METADATA_FILE: &str = "metadata_database.ts";

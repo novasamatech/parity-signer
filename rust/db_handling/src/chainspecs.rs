@@ -1,66 +1,30 @@
-use sled::{Db, Tree, open};
-use parity_scale_codec::{Encode, Decode};
+use parity_scale_codec::Encode;
 use definitions::{constants::{SPECSTREE, SPECSTREEPREP}, defaults::{get_default_chainspecs, get_default_chainspecs_to_send}, network_specs::{ChainSpecs, generate_network_key}};
 use anyhow;
 
-use super::error::{Error, NotHex, NotDecodeable, NotFound};
+use crate::error::NotHex;
+use crate::helpers::{open_db, open_tree, flush_db, clear_tree, insert_into_tree, unhex, get_and_decode_chain_specs, decode_chain_specs};
 
-/// Fetch ChainSpecs for 1 network from database by genesis hash
+/// Fetch ChainSpecs for 1 network from cold database by genesis hash
 pub fn get_network (database_name: &str, genesis_hash: &str) -> anyhow::Result<ChainSpecs> {
-    let database: Db = match open(database_name) {
-        Ok(x) => x,
-        Err(e) => return Err(Error::InternalDatabaseError(e).show()),
-    };
-    let chainspecs: Tree = match database.open_tree(SPECSTREE) {
-        Ok(x) => x,
-        Err(e) => return Err(Error::InternalDatabaseError(e).show()),
-    };
-    
-    let unhex_genesis_hash = match hex::decode(genesis_hash) {
-        Ok(x) => x,
-        Err(_) => return Err(Error::NotHex(NotHex::GenesisHash).show()),
-    };
-    
-    let network_key = generate_network_key(&unhex_genesis_hash);
-
-    match chainspecs.get(&network_key) {
-        Ok(a) => match a {
-            Some(chain_specs_encoded) => match <ChainSpecs>::decode(&mut &chain_specs_encoded[..]) {
-                Ok(b) => {
-                    if generate_network_key(&b.genesis_hash.to_vec()) != network_key {return Err(Error::GenesisHashMismatch.show())}
-                    Ok(b)
-                },
-                Err(_) => return Err(Error::NotDecodeable(NotDecodeable::ChainSpecs).show()),
-            },
-            None => return Err(Error::NotFound(NotFound::NetworkKey).show()),
-        },
-        Err(e) => return Err(Error::InternalDatabaseError(e).show()),
-    }
+    let database = open_db(database_name)?;
+    let chainspecs = open_tree(&database, SPECSTREE)?;
+    let network_key = generate_network_key(&unhex(genesis_hash, NotHex::GenesisHash)?);
+    get_and_decode_chain_specs(&chainspecs, &network_key)
 }
 
 /// Fetch ChainSpecs for all saved networks
 pub fn get_all_networks (database_name: &str) -> anyhow::Result<Vec<ChainSpecs>> {
     
-    let database: Db = match open(database_name) {
-        Ok(x) => x,
-        Err(e) => return Err(Error::InternalDatabaseError(e).show()),
-    };
-    let chainspecs: Tree = match database.open_tree(SPECSTREE) {
-        Ok(x) => x,
-        Err(e) => return Err(Error::InternalDatabaseError(e).show()),
-    };
+    let database = open_db(database_name)?;
+    let chainspecs = open_tree(&database, SPECSTREE)?;
     
     let mut out: Vec<ChainSpecs> = Vec::new();
 
     for x in chainspecs.iter() {
         if let Ok((network_key, network_specs_encoded)) = x {
-            match <ChainSpecs>::decode(&mut &network_specs_encoded[..]) {
-                Ok(network_specs) => {
-                    if generate_network_key(&network_specs.genesis_hash.to_vec()) != network_key.to_vec() {return Err(Error::GenesisHashMismatch.show())}
-                    out.push(network_specs)
-                },
-                Err(_) => return Err(Error::NotDecodeable(NotDecodeable::ChainSpecs).show()),
-            }
+            let new = decode_chain_specs(network_specs_encoded, &network_key.to_vec())?;
+            out.push(new);
         }
     }
     Ok(out)
@@ -70,70 +34,37 @@ pub fn get_all_networks (database_name: &str) -> anyhow::Result<Vec<ChainSpecs>>
 /// Function to populate cold database with default network specs ChainSpecs
 pub fn load_chainspecs (database_name: &str) -> anyhow::Result<()> {
     
-    let database: Db = match open(database_name) {
-        Ok(x) => x,
-        Err(e) => return Err(Error::InternalDatabaseError(e).show()),
-    };
-    let chainspecs: Tree = match database.open_tree(SPECSTREE) {
-        Ok(x) => x,
-        Err(e) => return Err(Error::InternalDatabaseError(e).show()),
-    };
-    match chainspecs.clear() {
-        Ok(()) => (),
-        Err(e) => return Err(Error::InternalDatabaseError(e).show()),
-    };
+    let database = open_db(database_name)?;
+    let chainspecs = open_tree(&database, SPECSTREE)?;
+    clear_tree(&chainspecs)?;
     
     let specs_vec = get_default_chainspecs();
     
     for x in specs_vec.iter() {
         let network_key = generate_network_key(&x.genesis_hash.to_vec());
-        match chainspecs.insert(network_key, x.encode()) {
-            Ok(_) => (),
-            Err(e) => return Err(Error::InternalDatabaseError(e).show()),
-        };
+        insert_into_tree(network_key, x.encode(), &chainspecs)?;
     }
     
-    match database.flush() {
-        Ok(_) => (),
-        Err(e) => return Err(Error::InternalDatabaseError(e).show()),
-    };
-    
+    flush_db(&database)?;
     Ok(())
-    
 }
 
 
 /// Function to populate hot database with default network specs ChainSpecsToSend
 pub fn load_chainspecs_to_send (database_name: &str) -> anyhow::Result<()> {
     
-    let database: Db = match open(database_name) {
-        Ok(x) => x,
-        Err(e) => return Err(Error::InternalDatabaseError(e).show()),
-    };
-    let chainspecs: Tree = match database.open_tree(SPECSTREEPREP) {
-        Ok(x) => x,
-        Err(e) => return Err(Error::InternalDatabaseError(e).show()),
-    };
-    match chainspecs.clear() {
-        Ok(()) => (),
-        Err(e) => return Err(Error::InternalDatabaseError(e).show()),
-    };
+    let database = open_db(database_name)?;
+    let chainspecs = open_tree(&database, SPECSTREEPREP)?;
+    clear_tree(&chainspecs)?;
     
     let specs_vec = get_default_chainspecs_to_send();
     
     for x in specs_vec.iter() {
         let network_key = generate_network_key(&x.genesis_hash.to_vec());
-        match chainspecs.insert(network_key, x.encode()) {
-            Ok(_) => (),
-            Err(e) => return Err(Error::InternalDatabaseError(e).show()),
-        };
+        insert_into_tree(network_key, x.encode(), &chainspecs)?;
     }
     
-    match database.flush() {
-        Ok(_) => (),
-        Err(e) => return Err(Error::InternalDatabaseError(e).show()),
-    };
-    
+    flush_db(&database)?;
     Ok(())
 }
 

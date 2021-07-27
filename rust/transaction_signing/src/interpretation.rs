@@ -3,7 +3,7 @@ use regex::Regex;
 use lazy_static::lazy_static;
 
 use transaction_parsing::cards::Action;
-use super::error::{Error, Interpretation};
+use crate::error::{Error, Interpretation};
 
 // Making lazy statics for regex interpreting input action string
 

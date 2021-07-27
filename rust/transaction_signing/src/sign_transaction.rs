@@ -1,41 +1,27 @@
 use anyhow;
-use sled::{Db, open, Tree};
 use definitions::{transactions::SignDb, constants::{TRANSACTION, SIGNTRANS}, users::Encryption};
 use parity_scale_codec::Decode;
+use db_handling::helpers::{open_db, open_tree, flush_db, remove_from_tree};
 
-use super::sign_message::sign_as_address_key;
-use super::error::{Error, ActionFailure};
+use crate::sign_message::sign_as_address_key;
+use crate::error::{Error, ActionFailure};
+use crate::helpers::verify_checksum;
 
 /// Function to create signatures using RN output action line, and user entered pin and password.
 /// Also needs database name to fetch saved transaction and key.
 
-pub fn create_signature (seed_phrase: &str, pwd_entry: &str, dbname: &str, checksum: u32) -> anyhow::Result<String> {
+pub fn create_signature (seed_phrase: &str, pwd_entry: &str, database_name: &str, checksum: u32) -> anyhow::Result<String> {
     
-    let database: Db = match open(dbname) {
-        Ok(x) => x,
-        Err(e) => return Err(Error::InternalDatabaseError(e).show()),
-    };
-    
-    let real_checksum = match database.checksum() {
-        Ok(x) => x,
-        Err(e) => return Err(Error::InternalDatabaseError(e).show()),
-    };
-    
-    if checksum != real_checksum {return Err(Error::ChecksumMismatch.show())}
-    
-    let transaction: Tree = match database.open_tree(TRANSACTION) {
-        Ok(x) => x,
-        Err(e) => return Err(Error::InternalDatabaseError(e).show()),
-    };
+    let database = open_db(database_name)?;
+    verify_checksum(&database, checksum)?;
+    let transaction = open_tree(&database, TRANSACTION)?;
     
     let action = match transaction.get(SIGNTRANS) {
-        Ok(a) => match a {
-            Some(x) => match <SignDb>::decode(&mut &x[..]) {
-                Ok(b) => b,
-                Err(_) => return Err(Error::BadActionDecode(ActionFailure::SignTransaction).show()),
-            },
-            None => return Err(Error::NoAction(ActionFailure::SignTransaction).show()),
+        Ok(Some(x)) => match <SignDb>::decode(&mut &x[..]) {
+            Ok(a) => a,
+            Err(_) => return Err(Error::BadActionDecode(ActionFailure::SignTransaction).show()),
         },
+        Ok(None) => return Err(Error::NoAction(ActionFailure::SignTransaction).show()),
         Err(e) => return Err(Error::InternalDatabaseError(e).show()),
     };
     
@@ -49,15 +35,8 @@ pub fn create_signature (seed_phrase: &str, pwd_entry: &str, dbname: &str, check
     let full_address = seed_phrase.to_owned() + &action.path;
     let hex_signature = hex::encode(sign_as_address_key(&action.transaction, action.address_key, &action.encryption, &full_address, pwd)?);
     
-    match transaction.remove(SIGNTRANS) {
-        Ok(_) => (),
-        Err(e) => return Err(Error::InternalDatabaseError(e).show()),
-    };
-    
-    match database.flush() {
-        Ok(_) => (),
-        Err(e) => return Err(Error::InternalDatabaseError(e).show()),
-    };
+    remove_from_tree(SIGNTRANS.to_vec(), &transaction)?;
+    flush_db(&database)?;
     
     match action.encryption {
         Encryption::Ed25519 => {

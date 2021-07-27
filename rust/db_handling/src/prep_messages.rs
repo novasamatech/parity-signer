@@ -1,25 +1,17 @@
-use definitions::{constants::{METATREE, SETTREE, SPECSTREE, TYPES}, metadata::{MetaValues, NameVersioned, VersionDecoded}, network_specs::{ChainSpecs, ChainSpecsToSend, generate_network_key}, types::TypeEntry};
-use meta_reading::decode_metadata::get_meta_const;
+use definitions::{constants::{METATREE, SETTREE, SPECSTREE, TYPES}, metadata::{MetaValues, NameVersioned}, network_specs::{ChainSpecsToSend}, types::TypeEntry};
 use parity_scale_codec::{Decode, Encode};
-use sled::{Db, open, Tree};
 use anyhow;
 
-use super::error::{Error, NotFound, NotDecodeable};
+use crate::error::{Error, NotFound, NotDecodeable};
+use crate::helpers::{open_db, open_tree, decode_chain_specs, check_metadata};
 
 
 /// Function to get types info from the database
-/// TODO clean types.rs in generate_message
 
 pub fn prep_types (database_name: &str) -> anyhow::Result<Vec<u8>> {
     
-    let database: Db = match open(database_name) {
-        Ok(x) => x,
-        Err(e) => return Err(Error::InternalDatabaseError(e).show()),
-    };
-    let settings: Tree = match database.open_tree(SETTREE) {
-        Ok(x) => x,
-        Err(e) => return Err(Error::InternalDatabaseError(e).show()),
-    };
+    let database = open_db(database_name)?;
+    let settings = open_tree(&database, SETTREE)?;
     
     let types_info = match settings.get(TYPES) {
         Ok(Some(a)) => a.to_vec(),
@@ -33,8 +25,6 @@ pub fn prep_types (database_name: &str) -> anyhow::Result<Vec<u8>> {
     }
 }
 
-/// TODO those functions below are repeating through the code.
-/// Brace yourselves, the refactoring is coming.
 
 /// Function to get encoded ChainSpecsToSend from the cold (!!!) database searching by network name
 /// !!! for cold db only !!!
@@ -42,24 +32,14 @@ pub fn prep_types (database_name: &str) -> anyhow::Result<Vec<u8>> {
 
 pub fn get_network_specs (network_name: &str, database_name: &str) -> anyhow::Result<Vec<u8>> {
     
-    let database: Db = match open(database_name) {
-        Ok(x) => x,
-        Err(e) => return Err(Error::InternalDatabaseError(e).show()),
-    };
-    let chainspecs: Tree = match database.open_tree(SPECSTREE) {
-        Ok(x) => x,
-        Err(e) => return Err(Error::InternalDatabaseError(e).show()),
-    };
+    let database = open_db(database_name)?;
+    let chainspecs = open_tree(&database, SPECSTREE)?;
     
     let mut found_network_specs = None;
     
     for x in chainspecs.iter() {
         if let Ok((network_key, network_specs_encoded)) = x {
-            let network_specs = match <ChainSpecs>::decode(&mut &network_specs_encoded[..]) {
-                Ok(a) => a,
-                Err(_) => return Err(Error::NotDecodeable(NotDecodeable::ChainSpecs).show()),
-            };
-            if network_key != generate_network_key(&network_specs.genesis_hash.to_vec()) {return Err(Error::GenesisHashMismatch.show())}
+            let network_specs = decode_chain_specs(network_specs_encoded, &network_key.to_vec())?;
             if network_specs.name == network_name {
                 found_network_specs = Some(network_specs);
                 break;
@@ -92,24 +72,14 @@ pub fn get_network_specs (network_name: &str, database_name: &str) -> anyhow::Re
 
 pub fn get_genesis_hash (network_name: &str, database_name: &str) -> anyhow::Result<Vec<u8>> {
     
-    let database: Db = match open(database_name) {
-        Ok(x) => x,
-        Err(e) => return Err(Error::InternalDatabaseError(e).show()),
-    };
-    let chainspecs: Tree = match database.open_tree(SPECSTREE) {
-        Ok(x) => x,
-        Err(e) => return Err(Error::InternalDatabaseError(e).show()),
-    };
+    let database = open_db(database_name)?;
+    let chainspecs = open_tree(&database, SPECSTREE)?;
     
     let mut found_genesis_hash = None;
     
     for x in chainspecs.iter() {
         if let Ok((network_key, network_specs_encoded)) = x {
-            let network_specs = match <ChainSpecs>::decode(&mut &network_specs_encoded[..]) {
-                Ok(a) => a,
-                Err(_) => return Err(Error::NotDecodeable(NotDecodeable::ChainSpecs).show()),
-            };
-            if network_key != generate_network_key(&network_specs.genesis_hash.to_vec()) {return Err(Error::GenesisHashMismatch.show())}
+            let network_specs = decode_chain_specs(network_specs_encoded, &network_key.to_vec())?;
             if network_specs.name == network_name {
                 found_genesis_hash = Some(network_specs.genesis_hash.to_vec());
                 break;
@@ -128,14 +98,8 @@ pub fn get_genesis_hash (network_name: &str, database_name: &str) -> anyhow::Res
 
 pub fn get_metadata (network_name: &str, network_version: u32, database_name: &str) -> anyhow::Result<Vec<u8>> {
     
-    let database: Db = match open(database_name) {
-        Ok(x) => x,
-        Err(e) => return Err(Error::InternalDatabaseError(e).show()),
-    };
-    let metadata: Tree = match database.open_tree(METATREE) {
-        Ok(x) => x,
-        Err(e) => return Err(Error::InternalDatabaseError(e).show()),
-    };
+    let database = open_db(database_name)?;
+    let metadata = open_tree(&database, METATREE)?;
     
     let versioned_name = NameVersioned {
         name: network_name.to_string(),
@@ -144,17 +108,7 @@ pub fn get_metadata (network_name: &str, network_version: u32, database_name: &s
     
     match metadata.get(versioned_name.encode()) {
         Ok(Some(meta)) => {
-            let version_vector = match get_meta_const(&meta.to_vec()) {
-                Ok(a) => a,
-                Err(_) => return Err(Error::NotDecodeable(NotDecodeable::Metadata).show()),
-            };
-            let version = match <VersionDecoded>::decode(&mut &version_vector[..]) {
-                Ok(a) => a,
-                Err(_) => return Err(Error::NotDecodeable(NotDecodeable::Version).show()),
-            };
-            if version.specname != network_name {return Err(Error::MetadataNameMismatch.show())}
-            if version.spec_version != network_version {return Err(Error::MetadataVersionMismatch.show())}
-            Ok(meta.to_vec())
+            check_metadata(meta.to_vec(), &versioned_name)
         },
         Ok(None) => return Err(Error::NotFound(NotFound::NameVersioned(versioned_name)).show()),
         Err(e) => return Err(Error::InternalDatabaseError(e).show()),
@@ -167,14 +121,8 @@ pub fn get_metadata (network_name: &str, network_version: u32, database_name: &s
 
 pub fn get_latest_metadata (network_name: &str, database_name: &str) -> anyhow::Result<Vec<u8>> {
     
-    let database: Db = match open(database_name) {
-        Ok(x) => x,
-        Err(e) => return Err(Error::InternalDatabaseError(e).show()),
-    };
-    let metadata: Tree = match database.open_tree(METATREE) {
-        Ok(x) => x,
-        Err(e) => return Err(Error::InternalDatabaseError(e).show()),
-    };
+    let database = open_db(database_name)?;
+    let metadata = open_tree(&database, METATREE)?;
     
     let mut latest_version_meta_values: Option<MetaValues> = None;
     
@@ -184,16 +132,7 @@ pub fn get_latest_metadata (network_name: &str, database_name: &str) -> anyhow::
                 Ok(a) => a,
                 Err(_) => return Err(Error::NotDecodeable(NotDecodeable::NameVersioned).show()),
             };
-            let version_vector = match get_meta_const(&meta.to_vec()) {
-                Ok(a) => a,
-                Err(_) => return Err(Error::NotDecodeable(NotDecodeable::Metadata).show()),
-            };
-            let version = match <VersionDecoded>::decode(&mut &version_vector[..]) {
-                Ok(a) => a,
-                Err(_) => return Err(Error::NotDecodeable(NotDecodeable::Version).show()),
-            };
-            if version.specname != network_name {return Err(Error::MetadataNameMismatch.show())}
-            if version.spec_version != versioned_name.version {return Err(Error::MetadataVersionMismatch.show())}
+            let meta = check_metadata(meta.to_vec(), &versioned_name)?;
             
             latest_version_meta_values = match latest_version_meta_values {
                 Some(a) => {
@@ -201,7 +140,7 @@ pub fn get_latest_metadata (network_name: &str, database_name: &str) -> anyhow::
                         Some (MetaValues {
                             name: network_name.to_string(),
                             version: versioned_name.version,
-                            meta: meta.to_vec(),
+                            meta,
                         })
                     }
                     else {Some(a)}
@@ -210,7 +149,7 @@ pub fn get_latest_metadata (network_name: &str, database_name: &str) -> anyhow::
                     Some (MetaValues {
                         name: network_name.to_string(),
                         version: versioned_name.version,
-                        meta: meta.to_vec(),
+                        meta,
                     })
                 }
             };

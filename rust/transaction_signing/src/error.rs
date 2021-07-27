@@ -7,12 +7,9 @@ pub enum Error {
     ChecksumMismatch,
     NoAction(ActionFailure),
     BadActionDecode(ActionFailure),
-    NotFound(DBFailure),
-    BadDatabaseDecode(DBFailure),
+    AddressDetailsNotFound,
     Interpretation(Interpretation),
     CryptoError(CryptoError),
-    NotHex,
-    MessagePrepError(String),
 }
 
 #[derive(PartialEq)]
@@ -23,12 +20,6 @@ pub enum ActionFailure {
     LoadTypes,
     AddGeneralVerifier,
     SignTransaction,
-}
-
-#[derive(PartialEq)]
-pub enum DBFailure {
-    ChainSpecs,
-    AddressDetails,
 }
 
 #[derive(PartialEq)]
@@ -72,14 +63,7 @@ impl Error {
                 ActionFailure::AddGeneralVerifier => anyhow!("Found add_general_verifier message could not be decoded."),
                 ActionFailure::SignTransaction => anyhow!("Found sign_transaction message could not be decoded."),
             },
-            Error::NotFound(e) => match e {
-                DBFailure::ChainSpecs => anyhow!("Network specs are not found."),
-                DBFailure::AddressDetails => anyhow!("Address details are not found."),
-            },
-            Error::BadDatabaseDecode(e) => match e {
-                DBFailure::ChainSpecs => anyhow!("Network specs from database could not be decoded."),
-                DBFailure::AddressDetails => anyhow!("Address details could not be decoded."),
-            },
+            Error::AddressDetailsNotFound => anyhow!("Identity not found."),
             Error::Interpretation(e) => match e {
                 Interpretation::ChecksumMissing => anyhow!("Checksum is missing in action line."),
                 Interpretation::ChecksumNotU32 => anyhow!("Checksum in action line does not fit in u32."),
@@ -96,8 +80,6 @@ impl Error {
                 CryptoError::KeyFormatEcdsa => anyhow!("Public key not compatible with ecdsa crypto."),
                 CryptoError::WrongPassword => anyhow!("Wrong password."),
             },
-            Error::NotHex => anyhow!("Supposedly hex line could not be decoded as hex."),
-            Error::MessagePrepError(e) => anyhow!("Error preparing message. {}", e),
         }
     }
 }

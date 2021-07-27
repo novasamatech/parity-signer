@@ -1,13 +1,12 @@
 use anyhow;
 use hex;
 use sp_core::{Pair, ed25519, sr25519, ecdsa};
-use sled::{Db, open, Tree};
-use definitions::{constants::ADDRTREE, users::{AddressDetails, AddressKey, Encryption, generate_address_key, SufficientCrypto}};
-use db_handling::prep_messages::{prep_types, prep_load_metadata, prep_add_network_versioned, prep_add_network_latest};
-use parity_scale_codec::{Decode, Encode};
+use definitions::{constants::ADDRTREE, users::{AddressKey, Encryption, generate_address_key, SufficientCrypto}};
+use parity_scale_codec::Encode;
 use std::convert::TryInto;
+use db_handling::{prep_messages::{prep_types, prep_load_metadata, prep_add_network_versioned, prep_add_network_latest}, error::NotHex, helpers::{open_db, open_tree, unhex, decode_address_details}};
 
-use super::error::{Error, CryptoError, DBFailure};
+use crate::error::{Error, CryptoError};
 
 pub fn sign_as_address_key (to_sign: &Vec<u8>, address_key: AddressKey, encryption: &Encryption, full_address: &str, pwd: Option<&str>) -> anyhow::Result<Vec<u8>> {
     
@@ -60,46 +59,24 @@ pub fn sign_as_address_key (to_sign: &Vec<u8>, address_key: AddressKey, encrypti
 /// Function to generate signature for some message for given public key
 pub fn sign_message (public_key: &str, to_sign: &Vec<u8>, database_name: &str, seed_phrase: &str, pwd_entry: &str) -> anyhow::Result<Vec<u8>> {
     
-    let hex_public_key = {
-        if public_key.starts_with("0x") {&public_key[2..]}
-        else {public_key}
-    };
+    let address_key = generate_address_key(&unhex(public_key, NotHex::PublicKey)?);
     
-    let unhex_public_key = match hex::decode(hex_public_key) {
-        Ok(x) => x,
-        Err(_) => return Err(Error::NotHex.show()),
-    };
-    
-    let address_key = generate_address_key(&unhex_public_key);
-    
-    let database: Db = match open(database_name) {
-        Ok(x) => x,
-        Err(e) => return Err(Error::InternalDatabaseError(e).show()),
-    };
-    
-    let identities: Tree = match database.open_tree(ADDRTREE) {
-        Ok(x) => x,
-        Err(e) => return Err(Error::InternalDatabaseError(e).show()),
-    };
+    let database = open_db(database_name)?;
+    let identities = open_tree(&database, ADDRTREE)?;
     
     match identities.get(&address_key) {
-        Ok(a) => match a {
-            Some(address_details_encoded) => {
-                let address_details = match <AddressDetails>::decode(&mut &address_details_encoded[..]) {
-                    Ok(b) => b,
-                    Err(_) => return Err(Error::BadDatabaseDecode(DBFailure::AddressDetails).show())
-                };
-                let pwd = {
-                    if address_details.has_pwd {Some(pwd_entry)}
-                    else {None}
-                };
-            // get full address with derivation path, used for signature preparation
-            // TODO zeroize
-                let full_address = seed_phrase.to_owned() + &address_details.path;
-                sign_as_address_key(to_sign, address_key, &address_details.encryption, &full_address, pwd)
-            },
-            None => return Err(Error::NotFound(DBFailure::AddressDetails).show())
+        Ok(Some(address_details_encoded)) => {
+            let address_details = decode_address_details(address_details_encoded)?;
+            let pwd = {
+                if address_details.has_pwd {Some(pwd_entry)}
+                else {None}
+            };
+        // get full address with derivation path, used for signature preparation
+        // TODO zeroize
+            let full_address = seed_phrase.to_owned() + &address_details.path;
+            sign_as_address_key(to_sign, address_key, &address_details.encryption, &full_address, pwd)
         },
+        Ok(None) => return Err(Error::AddressDetailsNotFound.show()),
         Err(e) => return Err(Error::InternalDatabaseError(e).show()),
     }
 }
@@ -108,54 +85,32 @@ pub fn sign_message (public_key: &str, to_sign: &Vec<u8>, database_name: &str, s
 /// Function to generate `sufficient crypto line` for given public key
 pub fn sufficient_crypto (public_key: &str, to_sign: &Vec<u8>, database_name: &str, seed_phrase: &str, pwd_entry: &str) -> anyhow::Result<String> {
     
-    let hex_public_key = {
-        if public_key.starts_with("0x") {&public_key[2..]}
-        else {public_key}
-    };
-    
-    let unhex_public_key = match hex::decode(hex_public_key) {
-        Ok(x) => x,
-        Err(_) => return Err(Error::NotHex.show()),
-    };
-    
+    let unhex_public_key = unhex(public_key, NotHex::PublicKey)?;
     let address_key = generate_address_key(&unhex_public_key);
     
-    let database: Db = match open(database_name) {
-        Ok(x) => x,
-        Err(e) => return Err(Error::InternalDatabaseError(e).show()),
-    };
-    
-    let identities: Tree = match database.open_tree(ADDRTREE) {
-        Ok(x) => x,
-        Err(e) => return Err(Error::InternalDatabaseError(e).show()),
-    };
+    let database = open_db(database_name)?;
+    let identities = open_tree(&database, ADDRTREE)?;
     
     match identities.get(&address_key) {
-        Ok(a) => match a {
-            Some(address_details_encoded) => {
-                let address_details = match <AddressDetails>::decode(&mut &address_details_encoded[..]) {
-                    Ok(b) => b,
-                    Err(_) => return Err(Error::BadDatabaseDecode(DBFailure::AddressDetails).show())
-                };
-                let pwd = {
-                    if address_details.has_pwd {Some(pwd_entry)}
-                    else {None}
-                };
-            // get full address with derivation path, used for signature preparation
-            // TODO zeroize
-                let full_address = seed_phrase.to_owned() + &address_details.path;
-                let signature = sign_as_address_key(to_sign, address_key, &address_details.encryption, &full_address, pwd)?;
-            
-                let sufficient_crypto = match address_details.encryption {
-                    Encryption::Ed25519 => SufficientCrypto::Ed25519 {public_key: unhex_public_key.try_into().expect("just checked the length"), signature: signature.try_into().expect("just generated, the length is correct")},
-                    Encryption::Sr25519 => SufficientCrypto::Sr25519 {public_key: unhex_public_key.try_into().expect("just checked the length"), signature: signature.try_into().expect("just generated, the length is correct")},
-                    Encryption::Ecdsa => SufficientCrypto::Ecdsa {public_key: unhex_public_key.try_into().expect("just checked the length"), signature: signature.try_into().expect("just generated, the length is correct")},
-                };
-                Ok(hex::encode(sufficient_crypto.encode()))
-            
-            },
-            None => return Err(Error::NotFound(DBFailure::AddressDetails).show())
+        Ok(Some(address_details_encoded)) => {
+            let address_details = decode_address_details(address_details_encoded)?;
+            let pwd = {
+                if address_details.has_pwd {Some(pwd_entry)}
+                else {None}
+            };
+        // get full address with derivation path, used for signature preparation
+        // TODO zeroize
+            let full_address = seed_phrase.to_owned() + &address_details.path;
+            let signature = sign_as_address_key(to_sign, address_key, &address_details.encryption, &full_address, pwd)?;
+        
+            let sufficient_crypto = match address_details.encryption {
+                Encryption::Ed25519 => SufficientCrypto::Ed25519 {public_key: unhex_public_key.try_into().expect("just checked the length"), signature: signature.try_into().expect("just generated, the length is correct")},
+                Encryption::Sr25519 => SufficientCrypto::Sr25519 {public_key: unhex_public_key.try_into().expect("just checked the length"), signature: signature.try_into().expect("just generated, the length is correct")},
+                Encryption::Ecdsa => SufficientCrypto::Ecdsa {public_key: unhex_public_key.try_into().expect("just checked the length"), signature: signature.try_into().expect("just generated, the length is correct")},
+            };
+            Ok(hex::encode(sufficient_crypto.encode()))    
         },
+        Ok(None) => return Err(Error::AddressDetailsNotFound.show()),
         Err(e) => return Err(Error::InternalDatabaseError(e).show()),
     }
     
@@ -169,10 +124,7 @@ pub fn sufficient_crypto (public_key: &str, to_sign: &Vec<u8>, database_name: &s
 
 pub fn sufficient_crypto_load_types (public_key: &str, database_name: &str, seed_phrase: &str, pwd_entry: &str) -> anyhow::Result<String> {
     
-    let to_sign = match prep_types(database_name) {
-        Ok(x) => x,
-        Err(e) => return Err(Error::MessagePrepError(e.to_string()).show()),
-    };
+    let to_sign = prep_types(database_name)?;
     sufficient_crypto (public_key, &to_sign, database_name, seed_phrase, pwd_entry)
     
 }
@@ -186,10 +138,7 @@ pub fn sufficient_crypto_load_types (public_key: &str, database_name: &str, seed
 
 pub fn sufficient_crypto_load_metadata (network_name: &str, network_version: u32, public_key: &str, database_name: &str, seed_phrase: &str, pwd_entry: &str) -> anyhow::Result<String> {
     
-    let to_sign = match prep_load_metadata(network_name, network_version, database_name) {
-        Ok(x) => x,
-        Err(e) => return Err(Error::MessagePrepError(e.to_string()).show()),
-    };
+    let to_sign = prep_load_metadata(network_name, network_version, database_name)?;
     sufficient_crypto (public_key, &to_sign, database_name, seed_phrase, pwd_entry)
     
 }
@@ -203,10 +152,7 @@ pub fn sufficient_crypto_load_metadata (network_name: &str, network_version: u32
 
 pub fn sufficient_crypto_add_network_latest (network_name: &str, public_key: &str, database_name: &str, seed_phrase: &str, pwd_entry: &str) -> anyhow::Result<String> {
     
-    let to_sign = match prep_add_network_latest(network_name, database_name) {
-        Ok(x) => x,
-        Err(e) => return Err(Error::MessagePrepError(e.to_string()).show()),
-    };
+    let to_sign = prep_add_network_latest(network_name, database_name)?;
     sufficient_crypto (public_key, &to_sign, database_name, seed_phrase, pwd_entry)
     
 }
@@ -220,10 +166,7 @@ pub fn sufficient_crypto_add_network_latest (network_name: &str, public_key: &st
 
 pub fn sufficient_crypto_add_network_versioned (network_name: &str, network_version: u32, public_key: &str, database_name: &str, seed_phrase: &str, pwd_entry: &str) -> anyhow::Result<String> {
     
-    let to_sign = match prep_add_network_versioned(network_name, network_version, database_name) {
-        Ok(x) => x,
-        Err(e) => return Err(Error::MessagePrepError(e.to_string()).show()),
-    };
+    let to_sign = prep_add_network_versioned(network_name, network_version, database_name)?;
     sufficient_crypto (public_key, &to_sign, database_name, seed_phrase, pwd_entry)
     
 }
