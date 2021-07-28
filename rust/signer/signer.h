@@ -76,7 +76,7 @@ const char * get_relevant_identities(struct ExternError*, const char* seed_name,
 const char * get_all_identities(struct ExternError*, const char* dbname);
 
 // Function to create new seed
-void try_create_seed(struct ExternError*, const char* seed_name, const char* crypto, const char* seed_phrase, int seed_length, const char* dbname);
+const char * try_create_seed(struct ExternError*, const char* seed_name, const char* crypto, const char* seed_phrase, int seed_length, const char* dbname);
 
 // Suggest next numbered path
 const char * suggest_n_plus_one(struct ExternError*, const char* path, const char* seed_name, const char* network_id_string, const char* dbname);
