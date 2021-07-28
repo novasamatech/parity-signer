@@ -46,7 +46,9 @@ export const EthereumNetworkKeys: Record<string, string> = Object.freeze({
 	RINKEBY: '4',
 	GOERLI: '5',
 	KOVAN: '42',
-	CLASSIC: '61'
+	CLASSIC: '61',
+	MOONBASE_ALPHA:'1287',
+	MOONRIVER:'1285'
 });
 
 /* eslint-enable sort-keys */
@@ -88,7 +90,8 @@ export const dummySubstrateNetworkParams: SubstrateNetworkParams = {
 	genesisHash: UnknownNetworkKeys.UNKNOWN,
 	logo: require('res/img/logos/Substrate_Dev.png'),
 	protocol: NetworkProtocols.SUBSTRATE,
-	unit: 'UNIT'
+	unit: 'UNIT',
+	chainType: "substrate"
 };
 
 const unknownNetworkBase: Record<string, UnknownNetworkParams> = {
@@ -235,6 +238,16 @@ const ethereumNetworkBase: Record<string, EthereumNetworkDefaultConstants> = {
 		ethereumChainId: EthereumNetworkKeys.KOVAN,
 		order: 103,
 		title: 'Kovan Testnet'
+	},
+	[EthereumNetworkKeys.MOONBASE_ALPHA]: {
+		ethereumChainId: EthereumNetworkKeys.MOONBASE_ALPHA,
+		order: 106,
+		title: 'Moonbase Alpha'
+	},
+	[EthereumNetworkKeys.MOONRIVER]: {
+		ethereumChainId: EthereumNetworkKeys.MOONRIVER,
+		order: 107,
+		title: 'Moonriver'
 	}
 };
 

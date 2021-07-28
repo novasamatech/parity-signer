@@ -3,6 +3,7 @@ import { Point, Size } from 'react-native-camera/types';
 
 import { FoundAccount } from 'types/identityTypes';
 import { Transaction } from 'utils/transaction';
+import { ChainType } from './networkTypes';
 
 export type Frames = {
 	completedFramesCount: number;
@@ -35,6 +36,7 @@ export type ParsedData =
 	| EthereumParsedData
 	| NetworkParsedData;
 
+
 export type NetworkParsedData = {
 	action: 'addNetwork';
 	data: {
@@ -44,6 +46,7 @@ export type NetworkParsedData = {
 		prefix: number;
 		title: string;
 		unit: string;
+		chainType:ChainType
 	};
 };
 

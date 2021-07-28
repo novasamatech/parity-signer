@@ -36,6 +36,8 @@ export type SubstrateNetworkBasics = {
 	unit: string;
 };
 
+export type ChainType = 'substrate' | 'ethereum'; // TODO-MOONBEAM: this type , used in apps and parity-signer, should be moved to @polkadot/types
+
 export type SubstrateNetworkParams = {
 	color: string;
 	decimals: number;
@@ -49,6 +51,7 @@ export type SubstrateNetworkParams = {
 	secondaryColor: string;
 	title: string;
 	unit: string;
+	chainType: ChainType;
 };
 
 export type EthereumNetworkDefaultConstants = {
