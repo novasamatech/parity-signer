@@ -12,6 +12,7 @@ ffi-support = "0.4"
 hex = "0.4.3"
 libc = "0.2"
 pixelate = "0.1"
+plot_icon = { git = "https://github.com/paritytech/polkadot-identicon-rust" }
 qrcodegen = "1.4"
 raptorq = "1.6.3"
 rustc-hex = "2.1.0"

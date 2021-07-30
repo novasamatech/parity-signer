@@ -16,6 +16,7 @@
 
 use pixelate::{Color, Image, BLACK};
 use qrcodegen::{QrCode, QrCodeEcc};
+use plot_icon::svg_from_hex;
 
 use db_handling;
 use transaction_parsing;
@@ -98,6 +99,7 @@ export! {
 		_input: &str
 	) -> anyhow::Result<String, anyhow::Error> {
         let output = Ok(std::env::consts::OS.to_string());
+        let _ = svg_from_hex("d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d", 64);
         return output;
     }
 
