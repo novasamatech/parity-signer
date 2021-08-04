@@ -26,3 +26,38 @@ extension Network {
         ]
     }
 }
+
+//MARK: network management
+
+extension SignerDataModel {
+    func refreshNetworks() {
+        let err_ptr: UnsafeMutablePointer<ExternError> = UnsafeMutablePointer(&err)
+        let dbName = NSHomeDirectory() + "/Documents/Database"
+        let res = get_all_networks_for_network_selector(err_ptr, dbName)
+        print("refresh call")
+        if err_ptr.pointee.code == 0 {
+            if let networksJSON = String(cString: res!).data(using: .utf8) {
+            print(networksJSON)
+                guard let networks = try? JSONDecoder().decode([Network].self, from: networksJSON) else {
+                    print("JSON decoder failed on networks")
+                    print(networksJSON)
+                    signer_destroy_string(res!)
+                    return
+                }
+                self.networks = networks
+            } else {
+                    print("networksJSON corrupted")
+                    print(String(cString: res!))
+            }
+            signer_destroy_string(res!)
+        } else {
+            print(String(cString: err_ptr.pointee.message))
+            signer_destroy_string(err_ptr.pointee.message)
+        }
+    }
+    
+    func selectNetwork(network: Network) {
+        self.selectedNetwork = network
+        self.fetchKeys()
+    }
+}

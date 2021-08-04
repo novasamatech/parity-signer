@@ -9,6 +9,7 @@ import SwiftUI
 
 @main
 struct NativeSignerApp: App {
+    @StateObject var data = SignerDataModel()
     var body: some Scene {
         WindowGroup {
             NavigationView {
@@ -17,7 +18,9 @@ struct NativeSignerApp: App {
                         NavbarShield()
                     }
                 }.background(/*@START_MENU_TOKEN@*//*@PLACEHOLDER=View@*/Color("backgroundColor")/*@END_MENU_TOKEN@*/)
-            }.background(/*@START_MENU_TOKEN@*//*@PLACEHOLDER=View@*/Color("backgroundColor")/*@END_MENU_TOKEN@*/)
+            }
+            .environmentObject(data)
+            .background(/*@START_MENU_TOKEN@*//*@PLACEHOLDER=View@*/Color("backgroundColor")/*@END_MENU_TOKEN@*/)
             
         }
     }

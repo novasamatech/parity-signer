@@ -36,4 +36,8 @@ final class CameraViewModel: ObservableObject {
         service.checkForPermissions()
         service.configure()
     }
+    
+    func shutdown() {
+        service.stop()
+    }
 }

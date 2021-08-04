@@ -9,12 +9,13 @@
 /* Begin PBXBuildFile section */
 		2D7A7BA526AE9E680053C1E0 /* Footer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D7A7BA426AE9E680053C1E0 /* Footer.swift */; };
 		2D7A7BAA26AED2500053C1E0 /* Database in Resources */ = {isa = PBXBuildFile; fileRef = 2D7A7BA926AED2500053C1E0 /* Database */; };
-		2D7A7BAC26AEDF860053C1E0 /* Networks.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D7A7BAB26AEDF860053C1E0 /* Networks.swift */; };
 		2D7A7BB026B00A3E0053C1E0 /* NavbarShield.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D7A7BAF26B00A3E0053C1E0 /* NavbarShield.swift */; };
-		2D7A7BB226B01F880053C1E0 /* Seed.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D7A7BB126B01F880053C1E0 /* Seed.swift */; };
 		2D7A7BB426B02B700053C1E0 /* SeedSelector.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D7A7BB326B02B700053C1E0 /* SeedSelector.swift */; };
 		2D7A7BB626B136970053C1E0 /* NewSeedScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D7A7BB526B136970053C1E0 /* NewSeedScreen.swift */; };
 		2D7A7BB826B28D350053C1E0 /* SettingsScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D7A7BB726B28D350053C1E0 /* SettingsScreen.swift */; };
+		2D7A7BC026B97DB30053C1E0 /* Identities.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D7A7BBF26B97DB30053C1E0 /* Identities.swift */; };
+		2D7A7BC226B9D3370053C1E0 /* IdentityCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D7A7BC126B9D3360053C1E0 /* IdentityCard.swift */; };
+		2D7A7BC426BA8B350053C1E0 /* NewIdentityScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D7A7BC326BA8B350053C1E0 /* NewIdentityScreen.swift */; };
 		2DE72BC226A588C7002BB752 /* NativeSignerApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2DE72BC126A588C7002BB752 /* NativeSignerApp.swift */; };
 		2DE72BC426A588C7002BB752 /* MainButtonScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2DE72BC326A588C7002BB752 /* MainButtonScreen.swift */; };
 		2DE72BC626A588C9002BB752 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 2DE72BC526A588C9002BB752 /* Assets.xcassets */; };
@@ -24,7 +25,7 @@
 		2DE72BF126A59834002BB752 /* Network.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2DE72BF026A59834002BB752 /* Network.swift */; };
 		2DE72BF326A59BAB002BB752 /* NetworkList.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2DE72BF226A59BAB002BB752 /* NetworkList.swift */; };
 		2DE72BF526A59C59002BB752 /* NetworkCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2DE72BF426A59C59002BB752 /* NetworkCard.swift */; };
-		2DE72BF726A5AC68002BB752 /* KeyList.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2DE72BF626A5AC68002BB752 /* KeyList.swift */; };
+		2DE72BF726A5AC68002BB752 /* KeyManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2DE72BF626A5AC68002BB752 /* KeyManager.swift */; };
 		2DE72BF926A5C360002BB752 /* CameraView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2DE72BF826A5C360002BB752 /* CameraView.swift */; };
 		2DE72C0026A6ADC5002BB752 /* CameraService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2DE72BFF26A6ADC5002BB752 /* CameraService.swift */; };
 		2DE72C0226A6C27E002BB752 /* Camera.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2DE72C0126A6C27E002BB752 /* Camera.swift */; };
@@ -32,7 +33,6 @@
 		2DE72C0926A98FE9002BB752 /* libsigner.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 2DE72C0826A98FE9002BB752 /* libsigner.a */; };
 		2DE72C0F26A99885002BB752 /* RustNative.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2DE72C0E26A99885002BB752 /* RustNative.swift */; };
 		2DE72C1126AAC3D6002BB752 /* LandingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2DE72C1026AAC3D6002BB752 /* LandingView.swift */; };
-		2DE72C1C26AAD8B0002BB752 /* DBInit.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2DE72C1B26AAD8B0002BB752 /* DBInit.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -55,12 +55,13 @@
 /* Begin PBXFileReference section */
 		2D7A7BA426AE9E680053C1E0 /* Footer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Footer.swift; sourceTree = "<group>"; };
 		2D7A7BA926AED2500053C1E0 /* Database */ = {isa = PBXFileReference; lastKnownFileType = folder; path = Database; sourceTree = "<group>"; };
-		2D7A7BAB26AEDF860053C1E0 /* Networks.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Networks.swift; sourceTree = "<group>"; };
 		2D7A7BAF26B00A3E0053C1E0 /* NavbarShield.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NavbarShield.swift; sourceTree = "<group>"; };
-		2D7A7BB126B01F880053C1E0 /* Seed.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = Seed.swift; path = NativeSigner/Seed.swift; sourceTree = SOURCE_ROOT; };
 		2D7A7BB326B02B700053C1E0 /* SeedSelector.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SeedSelector.swift; sourceTree = "<group>"; };
 		2D7A7BB526B136970053C1E0 /* NewSeedScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewSeedScreen.swift; sourceTree = "<group>"; };
 		2D7A7BB726B28D350053C1E0 /* SettingsScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsScreen.swift; sourceTree = "<group>"; };
+		2D7A7BBF26B97DB30053C1E0 /* Identities.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = Identities.swift; path = NativeSigner/Identities.swift; sourceTree = SOURCE_ROOT; };
+		2D7A7BC126B9D3360053C1E0 /* IdentityCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IdentityCard.swift; sourceTree = "<group>"; };
+		2D7A7BC326BA8B350053C1E0 /* NewIdentityScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewIdentityScreen.swift; sourceTree = "<group>"; };
 		2DE72BBE26A588C7002BB752 /* NativeSigner.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = NativeSigner.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		2DE72BC126A588C7002BB752 /* NativeSignerApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NativeSignerApp.swift; sourceTree = "<group>"; };
 		2DE72BC326A588C7002BB752 /* MainButtonScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainButtonScreen.swift; sourceTree = "<group>"; };
@@ -76,7 +77,7 @@
 		2DE72BF026A59834002BB752 /* Network.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Network.swift; sourceTree = "<group>"; };
 		2DE72BF226A59BAB002BB752 /* NetworkList.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkList.swift; sourceTree = "<group>"; };
 		2DE72BF426A59C59002BB752 /* NetworkCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkCard.swift; sourceTree = "<group>"; };
-		2DE72BF626A5AC68002BB752 /* KeyList.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyList.swift; sourceTree = "<group>"; };
+		2DE72BF626A5AC68002BB752 /* KeyManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyManager.swift; sourceTree = "<group>"; };
 		2DE72BF826A5C360002BB752 /* CameraView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraView.swift; sourceTree = "<group>"; };
 		2DE72BFF26A6ADC5002BB752 /* CameraService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraService.swift; sourceTree = "<group>"; };
 		2DE72C0126A6C27E002BB752 /* Camera.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = Camera.swift; path = NativeSigner/Camera.swift; sourceTree = SOURCE_ROOT; };
@@ -87,7 +88,6 @@
 		2DE72C0D26A99334002BB752 /* NativeSigner-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "NativeSigner-Bridging-Header.h"; sourceTree = "<group>"; };
 		2DE72C0E26A99885002BB752 /* RustNative.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RustNative.swift; sourceTree = "<group>"; };
 		2DE72C1026AAC3D6002BB752 /* LandingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LandingView.swift; sourceTree = "<group>"; };
-		2DE72C1B26AAD8B0002BB752 /* DBInit.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DBInit.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -116,6 +116,48 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		2D7A7BC526BA96D00053C1E0 /* Cards */ = {
+			isa = PBXGroup;
+			children = (
+				2DE72BF426A59C59002BB752 /* NetworkCard.swift */,
+				2D7A7BC126B9D3360053C1E0 /* IdentityCard.swift */,
+			);
+			path = Cards;
+			sourceTree = "<group>";
+		};
+		2D7A7BC626BA974E0053C1E0 /* Screens */ = {
+			isa = PBXGroup;
+			children = (
+				2DE72BC326A588C7002BB752 /* MainButtonScreen.swift */,
+				2D7A7BB726B28D350053C1E0 /* SettingsScreen.swift */,
+				2DE72BF626A5AC68002BB752 /* KeyManager.swift */,
+				2DE72BF826A5C360002BB752 /* CameraView.swift */,
+			);
+			path = Screens;
+			sourceTree = "<group>";
+		};
+		2D7A7BC726BA97A50053C1E0 /* Modals */ = {
+			isa = PBXGroup;
+			children = (
+				2D7A7BB526B136970053C1E0 /* NewSeedScreen.swift */,
+				2D7A7BC326BA8B350053C1E0 /* NewIdentityScreen.swift */,
+				2DE72C1026AAC3D6002BB752 /* LandingView.swift */,
+			);
+			path = Modals;
+			sourceTree = "<group>";
+		};
+		2D7A7BC826BA97AE0053C1E0 /* Components */ = {
+			isa = PBXGroup;
+			children = (
+				2DE72BF226A59BAB002BB752 /* NetworkList.swift */,
+				2D7A7BAF26B00A3E0053C1E0 /* NavbarShield.swift */,
+				2D7A7BB326B02B700053C1E0 /* SeedSelector.swift */,
+				2DE72C0326A6CDC5002BB752 /* CameraPreview.swift */,
+				2D7A7BA426AE9E680053C1E0 /* Footer.swift */,
+			);
+			path = Components;
+			sourceTree = "<group>";
+		};
 		2DE72BB526A588C7002BB752 = {
 			isa = PBXGroup;
 			children = (
@@ -140,22 +182,14 @@
 		2DE72BC026A588C7002BB752 /* NativeSigner */ = {
 			isa = PBXGroup;
 			children = (
+				2D7A7BC826BA97AE0053C1E0 /* Components */,
+				2D7A7BC726BA97A50053C1E0 /* Modals */,
+				2D7A7BC626BA974E0053C1E0 /* Screens */,
+				2D7A7BC526BA96D00053C1E0 /* Cards */,
 				2DE72C0826A98FE9002BB752 /* libsigner.a */,
 				2DE72C0A26A99029002BB752 /* signer.h */,
 				2DE72BEF26A5981C002BB752 /* Models */,
-				2DE72BF226A59BAB002BB752 /* NetworkList.swift */,
-				2DE72BF626A5AC68002BB752 /* KeyList.swift */,
-				2D7A7BAF26B00A3E0053C1E0 /* NavbarShield.swift */,
-				2D7A7BB326B02B700053C1E0 /* SeedSelector.swift */,
-				2D7A7BB526B136970053C1E0 /* NewSeedScreen.swift */,
-				2DE72BF426A59C59002BB752 /* NetworkCard.swift */,
 				2DE72BC126A588C7002BB752 /* NativeSignerApp.swift */,
-				2DE72BF826A5C360002BB752 /* CameraView.swift */,
-				2DE72C0326A6CDC5002BB752 /* CameraPreview.swift */,
-				2DE72BFF26A6ADC5002BB752 /* CameraService.swift */,
-				2DE72BC326A588C7002BB752 /* MainButtonScreen.swift */,
-				2D7A7BA426AE9E680053C1E0 /* Footer.swift */,
-				2DE72C1026AAC3D6002BB752 /* LandingView.swift */,
 				2DE72C1226AACB25002BB752 /* Database */,
 				2DE72BC526A588C9002BB752 /* Assets.xcassets */,
 				2DE72BCA26A588C9002BB752 /* Info.plist */,
@@ -194,13 +228,11 @@
 		2DE72BEF26A5981C002BB752 /* Models */ = {
 			isa = PBXGroup;
 			children = (
-				2D7A7BB126B01F880053C1E0 /* Seed.swift */,
-				2D7A7BB726B28D350053C1E0 /* SettingsScreen.swift */,
+				2DE72BFF26A6ADC5002BB752 /* CameraService.swift */,
+				2D7A7BBF26B97DB30053C1E0 /* Identities.swift */,
 				2DE72C0126A6C27E002BB752 /* Camera.swift */,
 				2DE72BF026A59834002BB752 /* Network.swift */,
 				2DE72C0E26A99885002BB752 /* RustNative.swift */,
-				2DE72C1B26AAD8B0002BB752 /* DBInit.swift */,
-				2D7A7BAB26AEDF860053C1E0 /* Networks.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -351,25 +383,25 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				2D7A7BB226B01F880053C1E0 /* Seed.swift in Sources */,
 				2DE72C1126AAC3D6002BB752 /* LandingView.swift in Sources */,
-				2DE72C1C26AAD8B0002BB752 /* DBInit.swift in Sources */,
 				2DE72C0026A6ADC5002BB752 /* CameraService.swift in Sources */,
 				2DE72BF526A59C59002BB752 /* NetworkCard.swift in Sources */,
+				2D7A7BC226B9D3370053C1E0 /* IdentityCard.swift in Sources */,
 				2DE72BF926A5C360002BB752 /* CameraView.swift in Sources */,
 				2DE72BC426A588C7002BB752 /* MainButtonScreen.swift in Sources */,
-				2D7A7BAC26AEDF860053C1E0 /* Networks.swift in Sources */,
 				2D7A7BB826B28D350053C1E0 /* SettingsScreen.swift in Sources */,
 				2D7A7BB626B136970053C1E0 /* NewSeedScreen.swift in Sources */,
 				2DE72BC226A588C7002BB752 /* NativeSignerApp.swift in Sources */,
 				2DE72C0426A6CDC5002BB752 /* CameraPreview.swift in Sources */,
-				2DE72BF726A5AC68002BB752 /* KeyList.swift in Sources */,
+				2DE72BF726A5AC68002BB752 /* KeyManager.swift in Sources */,
 				2D7A7BA526AE9E680053C1E0 /* Footer.swift in Sources */,
+				2D7A7BC026B97DB30053C1E0 /* Identities.swift in Sources */,
 				2DE72BF326A59BAB002BB752 /* NetworkList.swift in Sources */,
 				2D7A7BB426B02B700053C1E0 /* SeedSelector.swift in Sources */,
 				2D7A7BB026B00A3E0053C1E0 /* NavbarShield.swift in Sources */,
 				2DE72C0F26A99885002BB752 /* RustNative.swift in Sources */,
 				2DE72BF126A59834002BB752 /* Network.swift in Sources */,
+				2D7A7BC426BA8B350053C1E0 /* NewIdentityScreen.swift in Sources */,
 				2DE72C0226A6C27E002BB752 /* Camera.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
