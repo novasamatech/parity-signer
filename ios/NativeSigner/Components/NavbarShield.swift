@@ -6,10 +6,20 @@
 //
 
 import SwiftUI
+import Network
 
 struct NavbarShield: View {
+    @EnvironmentObject var canary: Canary
     var body: some View {
-        Image(systemName: "shield").imageScale(.large).foregroundColor(/*@START_MENU_TOKEN@*/.green/*@END_MENU_TOKEN@*/)
+        if canary.dead {
+            Image(systemName: "shield.fill")
+                .imageScale(.large)
+                .foregroundColor(.red)
+        } else {
+            Image(systemName: "shield.fill")
+                .imageScale(.large)
+                .foregroundColor(.green)
+        }
     }
 }
 

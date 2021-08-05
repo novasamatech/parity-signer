@@ -59,7 +59,13 @@ struct SettingsScreen: View {
                 Spacer()
                 Footer(caller: "Settings")
             }
-        }.background(/*@START_MENU_TOKEN@*//*@PLACEHOLDER=View@*/Color("backgroundColor")/*@END_MENU_TOKEN@*/)
+        }
+        .navigationTitle("Manage identities").navigationBarTitleDisplayMode(.inline).toolbar {
+            ToolbarItem(placement: .navigationBarTrailing) {
+                NavbarShield()
+            }
+        }
+        .background(/*@START_MENU_TOKEN@*//*@PLACEHOLDER=View@*/Color("backgroundColor")/*@END_MENU_TOKEN@*/)
     }
 }
 

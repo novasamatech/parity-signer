@@ -40,7 +40,9 @@ struct IdentityCard: View {
                         Text("Delete")
                     }
                     Spacer()
-                    Button(action: {}) {
+                    Button(action: {
+                        data.exportIdentity = true
+                    }) {
                         Text("Export")
                     }
                     Spacer()

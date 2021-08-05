@@ -13,10 +13,13 @@ final class CameraViewModel: ObservableObject {
     private let service = CameraService()
     
     @Published var payload: String?
+    @Published var captured: Int?
+    @Published var total: Int?
+    @Published var progress = 0.0
     
     @Published var showAlertError = false
     
-    @Published var isFlashOn = false
+    var isFlashOn = false
     
     var session: AVCaptureSession
     
@@ -30,6 +33,18 @@ final class CameraViewModel: ObservableObject {
             self?.payload = value
         }
         .store(in: &self.subscriptions)
+        
+        service.$captured.sink { [weak self] (captured) in
+            guard let value = captured else {return}
+            self?.captured = value
+        }
+        .store(in: &self.subscriptions)
+        
+        service.$total.sink { [weak self] (total) in
+            guard let value = total else {return}
+            self?.total = value
+        }
+        .store(in: &self.subscriptions)
     }
     
     func configure() {
@@ -38,6 +53,7 @@ final class CameraViewModel: ObservableObject {
     }
     
     func shutdown() {
+        print(self.payload ?? "Nothing")
         service.stop()
     }
 }

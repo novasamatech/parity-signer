@@ -12,6 +12,8 @@ import UIKit
 public class CameraService: UIViewController, AVCaptureVideoDataOutputSampleBufferDelegate {
     @Published public var isCameraUnavailable = true
     @Published public var payload: String?
+    @Published public var total: Int?
+    @Published public var captured: Int?
     
     public let session = AVCaptureSession()
     var isSessionRunning = false
@@ -19,6 +21,7 @@ public class CameraService: UIViewController, AVCaptureVideoDataOutputSampleBuff
     var setupResult: SessionSetupResult = .success
     
     private let sessionQueue = DispatchQueue(label: "session queue")
+    private let stitcherQueue = DispatchQueue(label: "stitcher queue")
     
     @objc dynamic var videoDeviceInput: AVCaptureDeviceInput!
     
@@ -70,6 +73,7 @@ public class CameraService: UIViewController, AVCaptureVideoDataOutputSampleBuff
     }
     
     public func start() {
+        self.bucket = []
         sessionQueue.async {
             if !self.isSessionRunning && self.isConfigured {
                 switch self.setupResult {
@@ -162,8 +166,6 @@ public class CameraService: UIViewController, AVCaptureVideoDataOutputSampleBuff
         
         session.commitConfiguration()
         
-        
-        
         self.isConfigured = true
         self.start()
     }
@@ -193,11 +195,17 @@ public class CameraService: UIViewController, AVCaptureVideoDataOutputSampleBuff
                     let payloadArray = descriptor.errorCorrectedPayload.map{$0}
                     let payloadStr = descriptor.errorCorrectedPayload.map{String(format: "%02x", $0)}.joined()
                     if !bucket.contains(payloadArray) {
+                        if total == nil {
+                            DispatchQueue.main.async {
+                                self.total = 30
+                            }
+                        }
                         bucket.append(payloadArray)
-                        bucketCount+=1
-                        print(bucketCount)
                         print(bucket.count)
-                        print(payloadStr)
+                        DispatchQueue.main.async {
+                            self.captured = self.bucket.count
+                            self.payload = payloadStr
+                        }
                     }
                 }
             }

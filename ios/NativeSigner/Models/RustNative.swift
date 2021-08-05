@@ -37,6 +37,7 @@ class DevTestObject: ObservableObject {
     }
 }
 
+//NOTE: this object should always be synchronous
 class SignerDataModel: ObservableObject {
     @Published var seedNames: [String] = []
     @Published var networks: [Network] = []
@@ -46,6 +47,7 @@ class SignerDataModel: ObservableObject {
     @Published var selectedIdentity: Identity?
     @Published var newSeed: Bool = true
     @Published var newIdentity: Bool = false
+    @Published var exportIdentity: Bool = false
     @Published var suggestedPath: String = "//"
     @Published var suggestedName: String = ""
     @Published var onboardingDone: Bool = false
@@ -53,12 +55,39 @@ class SignerDataModel: ObservableObject {
     
     var err = ExternError()
     var error: Unmanaged<CFError>?
+    var dbName: String
+    var err_ptr: UnsafeMutablePointer<ExternError>
     
     init() {
+        self.dbName = NSHomeDirectory() + "/Documents/Database"
         self.onboardingDone = FileManager.default.fileExists(atPath: NSHomeDirectory() + "/Documents/Database")
+        self.err_ptr = UnsafeMutablePointer(&err)
         if self.onboardingDone {
+            self.refreshSeeds()
             self.totalRefresh()
         }
+    }
+    
+    func totalRefresh() {
+        self.lastError = ""
+        self.newSeed = self.seedNames.count == 0
+        self.newIdentity = false
+        self.exportIdentity = false
+        self.refreshNetworks()
+        if self.networks.count > 0 {
+            self.selectedNetwork = self.networks[0]
+            self.fetchKeys()
+        } else {
+            print("No networks found; not handled yet")
+            return
+        }
+    }
+    
+    func handleRustError() {
+        self.lastError = String(cString: self.err_ptr.pointee.message)
+        print("Rust returned error")
+        print(self.lastError)
+        signer_destroy_string(self.err_ptr.pointee.message)
     }
 }
 
@@ -102,11 +131,9 @@ extension SignerDataModel {
     }
     
     func addSeed(seedName: String, seedPhrase: String) -> String {
-        let err_ptr: UnsafeMutablePointer<ExternError> = UnsafeMutablePointer(&err)
-        let dbName = NSHomeDirectory() + "/Documents/Database"
         guard let accessFlags = SecAccessControlCreateWithFlags(kCFAllocatorDefault, kSecAttrAccessibleWhenPasscodeSetThisDeviceOnly, .devicePasscode, &error) else {
             print("Access flags could not be allocated")
-            print(error)
+            print(error ?? "no error code")
             return ""
         }
         print(accessFlags)
@@ -114,12 +141,9 @@ extension SignerDataModel {
             print("Key collision")
             return ""
         }
-        let res = try_create_seed(err_ptr, seedName, "sr25519", seedPhrase, 24, dbName)
-        if err_ptr.pointee.code != 0 {
-            print("Seed creation error!")
-            print(String(cString: err_ptr.pointee.message)
-            )
-            signer_destroy_string(err_ptr.pointee.message)
+        let res = try_create_seed(self.err_ptr, seedName, "sr25519", seedPhrase, 24, dbName)
+        if self.err_ptr.pointee.code != 0 {
+            self.handleRustError()
             return ""
         }
         let finalSeedPhraseString = String(cString: res!)
@@ -196,21 +220,6 @@ extension SignerDataModel {
             }
         } catch {
             print("DB init failed")
-        }
-    }
-    
-    func totalRefresh() {
-        self.lastError = ""
-        self.refreshSeeds()
-        self.newSeed = self.seedNames.count == 0
-        self.newIdentity = false
-        self.refreshNetworks()
-        if self.networks.count > 0 {
-            self.selectedNetwork = self.networks[0]
-            self.fetchKeys()
-        } else {
-            print("No networks found; not handled yet")
-            return
         }
     }
 }
