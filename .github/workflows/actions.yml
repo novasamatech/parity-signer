@@ -27,5 +27,5 @@ jobs:
         shell:          bash
         run:            cd scripts && ./build.sh ios && cd ..
       - name:           Detox biuld
-        run:            xcodebuild -workspace ios/NativeSigner.xcodeproj/project.xcworkspace -scheme NativeSigner -configuration GithubActions -sdk iphonesimulator -derivedDataPath ios/build/NativeSigner -UseModernBuildSystem=YES | xcpretty -t && exit ${PIPESTATUS[0]}
+        run:            xcodebuild -workspace ios/NativeSigner.xcodeproj/project.xcworkspace -scheme NativeSigner -configuration Debug -sdk iphonesimulator -derivedDataPath ios/build/NativeSigner -UseModernBuildSystem=YES | xcpretty -t && exit ${PIPESTATUS[0]}
 
