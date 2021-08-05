@@ -19,6 +19,14 @@ impl<'a> Return<'a> for i64 {
 	}
 }
 
+impl<'a> Return<'a> for u32 {
+	type Ext = jlong;
+	type Env = &'a JNIEnv<'a>;
+	fn convert(_: Self::Env, val: Self) -> Self::Ext {
+		val as Self::Ext
+	}
+}
+
 impl<'a> Return<'a> for bool {
 	type Ext = jboolean;
 	type Env = &'a JNIEnv<'a>;

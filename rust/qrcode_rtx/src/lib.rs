@@ -3,7 +3,7 @@ use raptorq;
 use qrcodegen::{QrCode, QrCodeEcc};
 use apng_encoder;
 
-mod constants;
+pub mod constants;
     use constants::{CHUNK_SIZE, BORDER, SCALING, FPS_NOM, FPS_DEN, MAIN_COLOR, BACK_COLOR};
 
 /// function to take data as Vec<u8>, apply raptorq to get Vec<EncodingPacket>

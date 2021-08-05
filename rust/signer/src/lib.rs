@@ -21,6 +21,7 @@ use plot_icon::svg_from_hex;
 use db_handling;
 use transaction_parsing;
 use transaction_signing;
+use qr_reader_phone;
 
 mod export;
 mod qr;
@@ -64,15 +65,18 @@ export! {
 		qrcode_bytes(data.as_bytes())
 	}
 
+	@Java_io_parity_signer_SubstrateSignModule_qrparserGetPacketsTotal
+	fn get_packets_total(
+		data: &str
+	) -> anyhow::Result<u32, anyhow::Error> {
+        qr_reader_phone::get_length(data)
+	}
+
 	@Java_io_parity_signer_SubstrateSignModule_qrparserTryDecodeQrSequence
 	fn try_decode_qr_sequence(
-        size: u32,
-        chunk_size: u32,
 		data: &str
 	) -> anyhow::Result<String, anyhow::Error> {
-        let data_vec: Vec<&str> = qr::deserialize(data);
-        let answer = qr::parse_goblet(size as u64, chunk_size as u16, data_vec);
-        Ok(answer)
+        qr_reader_phone::decode_sequence(data)
 	}
 
     @Java_io_parity_signer_SubstrateSignModule_substrateParseTransaction
@@ -99,7 +103,7 @@ export! {
 		_input: &str
 	) -> anyhow::Result<String, anyhow::Error> {
         let output = Ok(std::env::consts::OS.to_string());
-        let _ = svg_from_hex("d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d", 64);
+        let doc = svg_from_hex("d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d", 64);
         return output;
     }
 

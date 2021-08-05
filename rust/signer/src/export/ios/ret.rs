@@ -18,6 +18,14 @@ impl Return<'static> for i64 {
 	}
 }
 
+impl Return<'static> for u32 {
+	type Ext = u32;
+	type Env = &'static mut ExternError;
+	fn convert(_: Self::Env, val: Self) -> Self::Ext {
+		val
+	}
+}
+
 impl Return<'static> for bool {
 	type Ext = u8;
 	type Env = &'static mut ExternError;
