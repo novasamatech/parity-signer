@@ -2329,7 +2329,6 @@ dependencies = [
  "plot_icon",
  "qr_reader_phone",
  "qrcodegen",
- "raptorq",
  "rustc-hex",
  "transaction_parsing",
  "transaction_signing",

@@ -16,7 +16,6 @@ pixelate = "0.1"
 plot_icon = { git = "https://github.com/paritytech/polkadot-identicon-rust" }
 qr_reader_phone = {path = "..//qr_reader_phone"}
 qrcodegen = "1.4"
-raptorq = "1.6.3"
 rustc-hex = "2.1.0"
 transaction_parsing = {path = "../transaction_parsing"}
 transaction_signing = {path = "../transaction_signing"}
