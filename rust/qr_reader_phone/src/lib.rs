@@ -62,11 +62,9 @@ pub fn decode_sequence (jsonline: &str) -> anyhow::Result<String> {
     let mut final_result: Option<String> = None;
     for x in set.iter() {
         let payload = get_payload(x)?;
-        match out {
-            Ready::NotYet(decoding) => {
-                out = process_decoded_payload (payload, decoding)?;
-            },
-            Ready::Yes(v) => {
+        if let Ready::NotYet(decoding) = out {
+            out = process_decoded_payload (payload, decoding)?;
+            if let Ready::Yes(v) = out {
                 final_result = Some(hex::encode(&v));
                 break;
             },
