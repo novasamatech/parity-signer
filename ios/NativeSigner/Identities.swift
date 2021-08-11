@@ -28,9 +28,11 @@ extension Identity {
 
 extension SignerDataModel {
     func fetchKeys() {
+        var err = ExternError()
+        let err_ptr: UnsafeMutablePointer<ExternError> = UnsafeMutablePointer(&err)
         print("fetch keys")
-        let res = get_relevant_identities(self.err_ptr, self.selectedSeed, self.selectedNetwork!.key, self.dbName)
-        if self.err_ptr.pointee.code == 0 {
+        let res = get_relevant_identities(err_ptr, self.selectedSeed, self.selectedNetwork!.key, self.dbName)
+        if err_ptr.pointee.code == 0 {
             if let keysJSON = String(cString: res!).data(using: .utf8) {
                 guard let keys = try? JSONDecoder().decode([Identity].self, from: keysJSON) else {
                     print("JSON decoder failed on keys")
@@ -45,61 +47,90 @@ extension SignerDataModel {
             }
             signer_destroy_string(res!)
         } else {
-            self.handleRustError()
+            self.lastError = String(cString: err_ptr.pointee.message)
+            print("Rust returned error")
+            print(self.lastError)
+            signer_destroy_string(err_ptr.pointee.message)
         }
     }
     
     func deleteActiveIdentity() {
-        delete_identity(self.err_ptr, self.selectedIdentity?.public_key, self.selectedNetwork!.key, self.dbName)
-        if self.err_ptr.pointee.code == 0 {
+        var err = ExternError()
+        let err_ptr: UnsafeMutablePointer<ExternError> = UnsafeMutablePointer(&err)
+        delete_identity(err_ptr, self.selectedIdentity?.public_key, self.selectedNetwork!.key, self.dbName)
+        if err_ptr.pointee.code == 0 {
             self.selectedIdentity = nil
             self.fetchKeys()
         } else {
-            self.handleRustError()
+            self.lastError = String(cString: err_ptr.pointee.message)
+            print("Rust returned error")
+            print(self.lastError)
+            signer_destroy_string(err_ptr.pointee.message)
         }
     }
     
     func proposeDerive() {
+        self.lastError = ""
         if self.selectedIdentity == nil {
             self.suggestedPath = "//"
         } else {
             self.suggestedPath = self.selectedIdentity!.path
         }
-        //self.suggestName = String(cString: suggest_name(nil, path))
+        self.suggestedName = String(cString: suggest_name(nil, self.suggestedPath))
     }
     
     func proposeIncrement() {
+        var err = ExternError()
+        let err_ptr: UnsafeMutablePointer<ExternError> = UnsafeMutablePointer(&err)
+        self.lastError = ""
         if self.selectedIdentity == nil {  //this should be impossible but plug it anyway
             self.suggestedPath = "//"
         } else {
-            let res = suggest_n_plus_one(self.err_ptr, self.selectedIdentity!.path, self.selectedSeed, self.selectedNetwork!.key, self.dbName)
-            if self.err_ptr.pointee.code == 0 {
+            let res = suggest_n_plus_one(err_ptr, self.selectedIdentity!.path, self.selectedSeed, self.selectedNetwork!.key, self.dbName)
+            if err_ptr.pointee.code == 0 {
                 self.suggestedPath = String(cString: res!)
             } else {
-                self.handleRustError()
+                self.lastError = String(cString: err_ptr.pointee.message)
+                print("Rust returned error")
+                print(self.lastError)
+                signer_destroy_string(err_ptr.pointee.message)
             }
         }
+        self.suggestedName = String(cString: suggest_name(nil, self.suggestedPath))
     }
     
+    //This does not report error if created identity is identical with already existing one.
+    //This is intended behavior unless there are objections
     func createIdentity(password: String) {
+        var err = ExternError()
+        let err_ptr: UnsafeMutablePointer<ExternError> = UnsafeMutablePointer(&err)
         var fullPath = ""
         if password == "" {
             fullPath = self.suggestedPath
         } else {
             fullPath = self.suggestedPath + "///" + password
         }
-        let res = check_path(self.err_ptr, fullPath)
-        if self.err_ptr.pointee.code != 0 {
-            self.lastError = String(cString: self.err_ptr.pointee.message)
+        let res = check_path(err_ptr, fullPath)
+        if err_ptr.pointee.code != 0 {
+            self.lastError = String(cString: err_ptr.pointee.message)
             print(self.lastError)
-            signer_destroy_string(self.err_ptr.pointee.message)
+            signer_destroy_string(err_ptr.pointee.message)
             return
         }
-        try_create_identity(self.err_ptr, self.suggestedName, self.selectedSeed, self.getSeed(seedName: self.selectedSeed), "sr25519", fullPath, self.selectedNetwork!.key, res, self.dbName)
-        if self.err_ptr.pointee.code == 0 {
+        if password == "" && res != 0 {
+            self.lastError = "The sequence /// is not allowed in path; use password field to include password (omitting ///)"
+            print("password was entered in path field")
+            return
+        }
+        try_create_identity(err_ptr, self.suggestedName, self.selectedSeed, self.getSeed(seedName: self.selectedSeed), "sr25519", fullPath, self.selectedNetwork!.key, res, self.dbName)
+        if err_ptr.pointee.code == 0 {
+            print("Identity added!")
             self.fetchKeys()
         } else {
-            self.handleRustError()
+            self.lastError = String(cString: err_ptr.pointee.message)
+            print("Rust returned error")
+            print(self.lastError)
+            signer_destroy_string(err_ptr.pointee.message)
         }
     }
 }

@@ -14,19 +14,18 @@ struct TransactionScreen: View {
             switch (transaction.state) {
             case .scanning :
                 VStack {
-                    CameraView()
+                    CameraView(transaction: transaction)
                 }
             case .preview :
                 VStack {
-                    Text("Preview")
+                    TransactionPreview(transaction: transaction)
                 }
             case .show :
-                VStack {
-                    Text("Show QR")
-                }
+                TransactionReady(transaction: transaction)
             default:
                 VStack {
                     Text("Please wait")
+                        .foregroundColor(Color("textMainColor"))
                 }
             }
         }

@@ -13,6 +13,9 @@ struct SettingsScreen: View {
     var body: some View {
         ZStack {
         VStack {
+            Button(action: {}) {
+                Text("Show log")
+            }.padding()
             NavigationLink(destination: Text("")) {
                 Text("Manage seeds")
             }.padding()

@@ -30,8 +30,11 @@ void signer_destroy_string(const char* cstring);
 // qr code generator for utf-8 strings
 const char* qrcode(struct ExternError*, const char* data);
 
+// qr frame count estimator
+int get_packets_total(struct ExternError*, const char* data);
+
 // qr fountain decoder
-const char * try_decode_qr_sequence(struct ExternError*, int size, int chunk_size, const char* data);
+const char * try_decode_qr_sequence(struct ExternError*, const char* data);
 
 // Parse transaction
 // takes 2 strings:
@@ -57,7 +60,7 @@ const char * parse_transaction(struct ExternError*, const char* transaction, con
 // password - optional derivation password (///password)
 // dbname (from OS)
 // Returns QR payload string or plaintext statement of action result
-const char * sign_transaction(struct ExternError*, const char* action, const char* pin, const char* password, const char* dbname);
+const char * handle_action(struct ExternError*, const char* action, const char* seed_phrase, const char* password, const char* dbname);
 
 // Self descriptive: development test for channel
 // TODO: remove for safety

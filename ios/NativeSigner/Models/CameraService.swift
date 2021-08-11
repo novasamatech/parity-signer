@@ -42,7 +42,7 @@ public class CameraService: UIViewController, AVCaptureVideoDataOutputSampleBuff
     
     private var bucketCount = 0
     
-    private var bucket: [[UInt8]] = []
+    private var bucket: [String] = []
     
     public func configure() {
         sessionQueue.async {
@@ -171,6 +171,7 @@ public class CameraService: UIViewController, AVCaptureVideoDataOutputSampleBuff
     }
     
     // Callback for receiving buffer - payload assembly should eventually be fed from here
+    //TODO: once everything else works, make this mess readable
     public func captureOutput(_ output: AVCaptureOutput, didOutput sampleBuffer: CMSampleBuffer, from connection: AVCaptureConnection) {
         guard let pixelBuffer = CMSampleBufferGetImageBuffer(sampleBuffer) else {
             print("Failed to obtain pixelbuffer for this frame")
@@ -184,7 +185,7 @@ public class CameraService: UIViewController, AVCaptureVideoDataOutputSampleBuff
         } catch {
             print("Failed to handle \(error)")
         }
-        
+
         if let result = detectionRequests[0].results as? [VNBarcodeObservation] {
             if result.count != 0 {
                 if result.count>1 {
@@ -192,19 +193,68 @@ public class CameraService: UIViewController, AVCaptureVideoDataOutputSampleBuff
                     print(result.count)
                 }
                 if let descriptor = result[0].barcodeDescriptor as? CIQRCodeDescriptor {
-                    let payloadArray = descriptor.errorCorrectedPayload.map{$0}
                     let payloadStr = descriptor.errorCorrectedPayload.map{String(format: "%02x", $0)}.joined()
-                    if !bucket.contains(payloadArray) {
-                        if total == nil {
-                            DispatchQueue.main.async {
-                                self.total = 30
+                    stitcherQueue.async {
+                        if !self.bucket.contains(payloadStr) {
+                            if self.total == nil {
+                                var err = ExternError()
+                                let err_ptr = UnsafeMutablePointer(&err)
+                                let res = get_packets_total(err_ptr, payloadStr)
+                                if err_ptr.pointee.code == 0 {
+                                    let proposeTotal = Int(res)
+                                    if proposeTotal == 1 {
+                                        let process = "[\"" + payloadStr + "\"]"
+                                        let res2 = try_decode_qr_sequence(err_ptr, process)
+                                        if err_ptr.pointee.code == 0 {
+                                            DispatchQueue.main.async {
+                                                self.payload = String(cString: res2!)
+                                                self.stop()
+                                            }
+                                        } else {
+                                            print(String(cString: err_ptr.pointee.message))
+                                            signer_destroy_string(err_ptr.pointee.message)
+                                        }
+                                    } else {
+                                        DispatchQueue.main.async {
+                                            self.bucket.append(payloadStr)
+                                            self.total = proposeTotal
+                                        }
+                                    }
+                                } else {
+                                    //TODO: reset camera on failure
+                                    signer_destroy_string(err_ptr.pointee.message)
+                                }
+                            } else {
+                                self.bucket.append(payloadStr)
+                                print(self.bucket.count)
+                                if self.bucket.count >= self.total ?? 0 {
+                                    var err = ExternError()
+                                    let err_ptr = UnsafeMutablePointer(&err)
+                                    do {
+                                        let process = "[\"" +  self.bucket.joined(separator: "\",\"") + "\"]"
+                                        let res = try_decode_qr_sequence(err_ptr, process)
+                                        if err_ptr.pointee.code == 0 {
+                                            DispatchQueue.main.async {
+                                                self.payload = String(cString: res!)
+                                                signer_destroy_string(res!)
+                                                self.stop()
+                                            }
+                                        } else {
+                                            //TODO: give up when things go badly
+                                            print(String(cString: err_ptr.pointee.message))
+                                            signer_destroy_string(err_ptr.pointee.message)
+                                        }
+                                    } catch {
+                                        DispatchQueue.main.async {
+                                            self.stop()
+                                        }
+                                    }
+                                    
+                                }
+                                DispatchQueue.main.async {
+                                    self.captured = self.bucket.count
+                                }
                             }
-                        }
-                        bucket.append(payloadArray)
-                        print(bucket.count)
-                        DispatchQueue.main.async {
-                            self.captured = self.bucket.count
-                            self.payload = payloadStr
                         }
                     }
                 }

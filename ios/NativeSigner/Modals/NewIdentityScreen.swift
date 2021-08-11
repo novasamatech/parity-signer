@@ -18,22 +18,39 @@ struct NewIdentityScreen: View {
         ZStack {
             RoundedRectangle(cornerRadius: 50).foregroundColor(/*@START_MENU_TOKEN@*/Color("backgroundCard")/*@END_MENU_TOKEN@*/)
             VStack {
-                    Text("Path").font(.title).foregroundColor(Color("textMainColor"))
-                TextField("//hard/soft", text: $data.suggestedPath).font(/*@START_MENU_TOKEN@*/.title/*@END_MENU_TOKEN@*/)
-                        .foregroundColor(/*@START_MENU_TOKEN@*/Color("textEntryColor")/*@END_MENU_TOKEN@*/)
-                    .background(/*@START_MENU_TOKEN@*//*@PLACEHOLDER=View@*/Color("textFieldColor")/*@END_MENU_TOKEN@*/).border(/*@START_MENU_TOKEN@*/Color("borderSignalColor")/*@END_MENU_TOKEN@*/, width: /*@START_MENU_TOKEN@*/1/*@END_MENU_TOKEN@*/)
-                Text("Name").font(.title).foregroundColor(Color("textMainColor"))
+                if !data.lastError.isEmpty {
+                    Text(data.lastError).foregroundColor(Color("AccentColor"))
+                }
+                HStack {
+                Text("Path").font(.body).foregroundColor(Color("textMainColor"))
+                TextField("//hard/soft", text: $data.suggestedPath)
+                    .onChange(of: data.suggestedPath) {path in
+                        data.suggestedName = String(cString:  suggest_name(nil, path)) //this function does not fail
+                    }
+                    .autocapitalization(/*@START_MENU_TOKEN@*/.none/*@END_MENU_TOKEN@*/)
+                    .font(/*@START_MENU_TOKEN@*/.title/*@END_MENU_TOKEN@*/)
+                    .foregroundColor(/*@START_MENU_TOKEN@*/Color("textEntryColor")/*@END_MENU_TOKEN@*/)
+                    .background(/*@START_MENU_TOKEN@*//*@PLACEHOLDER=View@*/Color("textFieldColor")/*@END_MENU_TOKEN@*/)
+                    .border(/*@START_MENU_TOKEN@*/Color("borderSignalColor")/*@END_MENU_TOKEN@*/, width: /*@START_MENU_TOKEN@*/1/*@END_MENU_TOKEN@*/)
+                }
+                HStack {
+                Text("Name").font(.body).foregroundColor(Color("textMainColor"))
                 TextField("Seed name", text: $data.suggestedName).font(/*@START_MENU_TOKEN@*/.title/*@END_MENU_TOKEN@*/)
                     .foregroundColor(/*@START_MENU_TOKEN@*/Color("textEntryColor")/*@END_MENU_TOKEN@*/)
                 .background(/*@START_MENU_TOKEN@*//*@PLACEHOLDER=View@*/Color("textFieldColor")/*@END_MENU_TOKEN@*/).border(/*@START_MENU_TOKEN@*/Color("borderSignalColor")/*@END_MENU_TOKEN@*/, width: /*@START_MENU_TOKEN@*/1/*@END_MENU_TOKEN@*/)
-                Text("Password (optional)").font(.title).foregroundColor(Color("textMainColor"))
+                }
+                HStack {
+                Text("Password (optional)").font(.body).foregroundColor(Color("textMainColor"))
                 TextField("//hard/soft", text: $password).font(.title)
                     .foregroundColor(/*@START_MENU_TOKEN@*/Color("textEntryColor")/*@END_MENU_TOKEN@*/)
                 .background(/*@START_MENU_TOKEN@*//*@PLACEHOLDER=View@*/Color("textFieldColor")/*@END_MENU_TOKEN@*/).border(/*@START_MENU_TOKEN@*/Color("borderSignalColor")/*@END_MENU_TOKEN@*/, width: /*@START_MENU_TOKEN@*/1/*@END_MENU_TOKEN@*/)
-                Text("Password (repeat)").font(.title).foregroundColor(Color("textMainColor"))
+                }
+                HStack {
+                Text("Password (repeat)").font(.body).foregroundColor(Color("textMainColor"))
                 TextField("//hard/soft", text: $passwordCheck).font(/*@START_MENU_TOKEN@*/.title/*@END_MENU_TOKEN@*/)
                     .foregroundColor(/*@START_MENU_TOKEN@*/Color("textEntryColor")/*@END_MENU_TOKEN@*/)
                 .background(/*@START_MENU_TOKEN@*//*@PLACEHOLDER=View@*/Color("textFieldColor")/*@END_MENU_TOKEN@*/).border(/*@START_MENU_TOKEN@*/Color("borderSignalColor")/*@END_MENU_TOKEN@*/, width: /*@START_MENU_TOKEN@*/1/*@END_MENU_TOKEN@*/)
+                }
                 HStack {
                     Button(action: {
                         data.newIdentity = false

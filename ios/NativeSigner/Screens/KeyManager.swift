@@ -15,13 +15,14 @@ struct KeyManager: View {
                 NetworkList()
                 SeedSelector()
                 ScrollView {
-                LazyVStack {
-                    ForEach(data.identities, id: \.public_key) {
-                        identity in
-                        IdentityCard(identity: identity)
-                        .padding(.vertical, 2)
+                    LazyVStack {
+                        ForEach(data.identities, id: \.public_key) {
+                            identity in
+                            IdentityCard(identity: identity)
+                                .padding(.vertical, 2)
+                        }
                     }
-                }}
+                }
                 Spacer()
             }.padding(.bottom, 100)
             if data.newIdentity {
@@ -35,11 +36,15 @@ struct KeyManager: View {
                 Footer(caller: "KeyManager")
             }
     }
-        .navigationTitle("Manage identities").navigationBarTitleDisplayMode(.inline).toolbar {
+        .navigationTitle("Manage identities")
+        .navigationBarTitleDisplayMode(.inline)
+        .toolbar {
             ToolbarItem(placement: .navigationBarTrailing) {
                 NavbarShield()
             }
-        }.background(/*@START_MENU_TOKEN@*//*@PLACEHOLDER=View@*/Color("backgroundColor")/*@END_MENU_TOKEN@*/).onAppear {
+        }
+        .background(/*@START_MENU_TOKEN@*//*@PLACEHOLDER=View@*/Color("backgroundColor")/*@END_MENU_TOKEN@*/)
+        .onAppear {
             data.totalRefresh()
         }
     }

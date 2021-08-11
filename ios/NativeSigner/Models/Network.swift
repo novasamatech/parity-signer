@@ -31,9 +31,11 @@ extension Network {
 
 extension SignerDataModel {
     func refreshNetworks() {
-        let res = get_all_networks_for_network_selector(self.err_ptr, self.dbName)
+        var err = ExternError()
+        let err_ptr: UnsafeMutablePointer<ExternError> = UnsafeMutablePointer(&err)
+        let res = get_all_networks_for_network_selector(err_ptr, self.dbName)
         print("refresh call")
-        if self.err_ptr.pointee.code == 0 {
+        if err_ptr.pointee.code == 0 {
             if let networksJSON = String(cString: res!).data(using: .utf8) {
             print(networksJSON)
                 guard let networks = try? JSONDecoder().decode([Network].self, from: networksJSON) else {
@@ -49,7 +51,10 @@ extension SignerDataModel {
             }
             signer_destroy_string(res!)
         } else {
-            self.handleRustError()
+            self.lastError = String(cString: err_ptr.pointee.message)
+            print("Rust returned error")
+            print(self.lastError)
+            signer_destroy_string(err_ptr.pointee.message)
         }
     }
     

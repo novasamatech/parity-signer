@@ -9,6 +9,7 @@
 
 import Foundation
 import Security
+import UIKit
 
 enum KeychainError: Error {
     case noPassword
@@ -19,16 +20,20 @@ enum KeychainError: Error {
 class DevTestObject: ObservableObject {
     var value: String = ""
     var err = ExternError()
+    @Published var pictureData: Data?
+    @Published var image: UIImage?
     
     init() {
         self.refresh(input: "")
     }
     
     func refresh(input: String) {
-        let err_ptr: UnsafeMutablePointer<ExternError> = UnsafeMutablePointer(&err)
+        let err_ptr: UnsafeMutablePointer<ExternError> = UnsafeMutablePointer(&self.err)
         let res = development_test(err_ptr, input)
         if err_ptr.pointee.code == 0 {
             value = String(cString: res!)
+            self.pictureData = Data(fromHexEncodedString: value)
+            self.image = UIImage(data: self.pictureData!)
             signer_destroy_string(res!)
         } else {
             value = String(cString: err_ptr.pointee.message)
@@ -53,15 +58,12 @@ class SignerDataModel: ObservableObject {
     @Published var onboardingDone: Bool = false
     @Published var lastError: String = ""
     
-    var err = ExternError()
     var error: Unmanaged<CFError>?
     var dbName: String
-    var err_ptr: UnsafeMutablePointer<ExternError>
     
     init() {
         self.dbName = NSHomeDirectory() + "/Documents/Database"
         self.onboardingDone = FileManager.default.fileExists(atPath: NSHomeDirectory() + "/Documents/Database")
-        self.err_ptr = UnsafeMutablePointer(&err)
         if self.onboardingDone {
             self.refreshSeeds()
             self.totalRefresh()
@@ -81,13 +83,6 @@ class SignerDataModel: ObservableObject {
             print("No networks found; not handled yet")
             return
         }
-    }
-    
-    func handleRustError() {
-        self.lastError = String(cString: self.err_ptr.pointee.message)
-        print("Rust returned error")
-        print(self.lastError)
-        signer_destroy_string(self.err_ptr.pointee.message)
     }
 }
 
@@ -131,6 +126,8 @@ extension SignerDataModel {
     }
     
     func addSeed(seedName: String, seedPhrase: String) -> String {
+        var err = ExternError()
+        let err_ptr: UnsafeMutablePointer<ExternError> = UnsafeMutablePointer(&err)
         guard let accessFlags = SecAccessControlCreateWithFlags(kCFAllocatorDefault, kSecAttrAccessibleWhenPasscodeSetThisDeviceOnly, .devicePasscode, &error) else {
             print("Access flags could not be allocated")
             print(error ?? "no error code")
@@ -141,9 +138,12 @@ extension SignerDataModel {
             print("Key collision")
             return ""
         }
-        let res = try_create_seed(self.err_ptr, seedName, "sr25519", seedPhrase, 24, dbName)
-        if self.err_ptr.pointee.code != 0 {
-            self.handleRustError()
+        let res = try_create_seed(err_ptr, seedName, "sr25519", seedPhrase, 24, dbName)
+        if err_ptr.pointee.code != 0 {
+            self.lastError = String(cString: err_ptr.pointee.message)
+            print("Rust returned error")
+            print(self.lastError)
+            signer_destroy_string(err_ptr.pointee.message)
             return ""
         }
         let finalSeedPhraseString = String(cString: res!)
@@ -221,5 +221,13 @@ extension SignerDataModel {
         } catch {
             print("DB init failed")
         }
+    }
+}
+
+//MARK: Actual rust bridge should be here
+
+extension SignerDataModel {
+    func stub(){
+        return
     }
 }

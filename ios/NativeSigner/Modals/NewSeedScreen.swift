@@ -12,6 +12,7 @@ struct NewSeedScreen: View {
     @State private var seedName: String = ""
     @State private var seedPhrase: String = ""
     @State private var recover: Bool = false
+    @State private var createButton: Bool = false
     init() {
         UITextView.appearance().backgroundColor = .clear
     }
@@ -43,11 +44,23 @@ struct NewSeedScreen: View {
                     Spacer()
                     Button(action: {
                         seedPhrase = data.addSeed(seedName: seedName, seedPhrase: seedPhrase)
-                        data.newSeed = false
+                        if !seedPhrase.isEmpty {createButton = true}
                     }) {
                         Text("Create")
                             .font(.largeTitle)
                     }
+                    .alert(isPresented: $createButton, content: {
+                        Alert(
+                            title: Text("Backup your seed phrase"),
+                            message: Text(seedPhrase),
+                            dismissButton: .default(
+                                Text("Done"),
+                                action: {
+                                    data.newSeed = false
+                                }
+                            )
+                        )
+                    })
                 }
             }.padding()
             Spacer()

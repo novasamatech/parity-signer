@@ -15,7 +15,6 @@ final class CameraViewModel: ObservableObject {
     @Published var payload: String?
     @Published var captured: Int?
     @Published var total: Int?
-    @Published var progress = 0.0
     
     @Published var showAlertError = false
     

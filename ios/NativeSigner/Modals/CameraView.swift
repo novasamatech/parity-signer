@@ -10,6 +10,7 @@ import AVFoundation
 
 struct CameraView: View {
     @StateObject var model = CameraViewModel()
+    @ObservedObject var transaction: Transaction
     @Environment(\.presentationMode) var presentationMode: Binding<PresentationMode>
     var body: some View {
         ZStack {
@@ -19,10 +20,18 @@ struct CameraView: View {
                 }
                 .onDisappear {
                     model.shutdown()
-                }
+                }.onReceive(model.$payload, perform: { payload in
+                    if payload != nil {
+                        transaction.payloadStr = payload ?? ""
+                        DispatchQueue.main.async {
+                            transaction.parse()
+                        }
+                        transaction.state = .parsing
+                    }
+                })
             VStack {
                 Spacer()
-                ProgressView(value: Float(model.captured ?? 0)/Float(model.total ?? 1)).padding().background(/*@START_MENU_TOKEN@*//*@PLACEHOLDER=View@*/Color("backgroundColor")/*@END_MENU_TOKEN@*/)
+                ProgressView(value: min(Float(model.captured ?? 0)/(Float(model.total ?? -1) + 2), 1)).padding().background(/*@START_MENU_TOKEN@*//*@PLACEHOLDER=View@*/Color("backgroundColor")/*@END_MENU_TOKEN@*/)
                 Button(action: {
                         presentationMode.wrappedValue.dismiss()}) {
                     Text("Cancel")
@@ -35,6 +44,6 @@ struct CameraView: View {
 
 struct CameraView_Previews: PreviewProvider {
     static var previews: some View {
-        CameraView()
+        CameraView(transaction: Transaction())
     }
 }

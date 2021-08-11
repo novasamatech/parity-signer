@@ -16,9 +16,10 @@ struct MainButtonScreen: View {
             ZStack {
                 VStack {
                     Spacer()
-                    NavigationLink(destination: CameraView()) {
+                    NavigationLink(destination: TransactionScreen()) {
                         VStack() {
                             Image(systemName: "qrcode.viewfinder").imageScale(.large)
+                            Image(uiImage: testValue.image!)
                             Text("Scanner")
                         }
                     }

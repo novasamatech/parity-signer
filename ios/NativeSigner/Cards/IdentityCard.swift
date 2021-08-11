@@ -10,6 +10,7 @@ import SwiftUI
 struct IdentityCard: View {
     @EnvironmentObject var data: SignerDataModel
     var identity: Identity
+    @State var delete = false
     var body: some View {
         VStack {
             Button(action:{
@@ -24,21 +25,43 @@ struct IdentityCard: View {
                     VStack (alignment: .leading) {
                         Text(identity.name)
                             .foregroundColor(Color("AccentColor"))
-                        Text("root" + identity.path)
-                            .foregroundColor(Color("textMainColor"))
+                        HStack {
+                            Text("seed")
+                                .foregroundColor(Color("AccentColor"))
+                            Text(identity.path)
+                                .foregroundColor(Color("textMainColor"))
+                            if identity.has_password == "true" {
+                                Image(systemName: "lock")
+                                    .foregroundColor(Color("AccentColor"))
+                            }
+                        }
                         Text(identity.ss58)
                             .font(.caption2)
                             .foregroundColor(Color("textMainColor"))
                     }
+                    Spacer()
                 }
             }
             if data.selectedIdentity == identity {
                 HStack{
                     Button(action: {
-                        data.deleteActiveIdentity()
+                        //
+                        delete = true
                     }) {
                         Text("Delete")
                     }
+                    .alert(isPresented: $delete, content: {
+                        Alert(
+                            title: Text("Delete identity?"),
+                            message: Text("You are about to delete identity " + data.selectedIdentity!.name),
+                            primaryButton: .cancel(),
+                            secondaryButton: .destructive(
+                                Text("Delete"),
+                                action: { data.deleteActiveIdentity()
+                                }
+                            )
+                        )
+                    })
                     Spacer()
                     Button(action: {
                         data.exportIdentity = true
