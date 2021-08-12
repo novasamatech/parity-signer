@@ -242,8 +242,65 @@ export! {
         seed_name: &str,
         dbname: &str
 	) -> anyhow::Result<(), anyhow::Error> {
-        return
         db_handling::identities::remove_identities_for_seed(seed_name, dbname)
+    }
+
+    @Java_io_parity_signer_SubstrateSignModule_historyPrintHistory
+	fn print_history(
+        dbname: &str
+	) -> anyhow::Result<String, anyhow::Error> {
+        db_handling::manage_history::print_history(dbname)
+    }
+
+    @Java_io_parity_signer_SubstrateSignModule_historyClearHistory
+	fn clear_history(
+        dbname: &str
+	) -> anyhow::Result<(), anyhow::Error> {
+        db_handling::manage_history::clear_history(dbname)
+    }
+
+    @Java_io_parity_signer_SubstrateSignModule_historyInitHistory
+	fn init_history(
+        dbname: &str
+	) -> anyhow::Result<(), anyhow::Error> {
+        db_handling::manage_history::init_history(dbname)
+    }
+
+    @Java_io_parity_signer_SubstrateSignModule_historyDeviceWasOnline
+	fn device_was_online(
+        dbname: &str
+	) -> anyhow::Result<(), anyhow::Error> {
+        db_handling::manage_history::device_was_online(dbname)
+    }
+
+    @Java_io_parity_signer_SubstrateSignModule_historySeedsWereAccessed
+	fn seeds_were_accessed(
+        dbname: &str
+	) -> anyhow::Result<(), anyhow::Error> {
+        db_handling::manage_history::seeds_were_accessed(dbname)
+    }
+
+    @Java_io_parity_signer_SubstrateSignModule_historySeedsWereShown
+	fn seeds_were_shown(
+        dbname: &str
+	) -> anyhow::Result<(), anyhow::Error> {
+        db_handling::manage_history::seeds_were_shown(dbname)
+    }
+
+    @Java_io_parity_signer_SubstrateSignModule_historyHistoryEntryUser
+	fn history_entry_user(
+        entry: &str,
+        dbname: &str
+	) -> anyhow::Result<(), anyhow::Error> {
+        db_handling::manage_history::history_entry_user(dbname, entry.to_string())
+    }
+
+    @Java_io_parity_signer_SubstrateSignModule_historyHistoryEntrySystem
+	fn history_entry_system(
+        entry: &str,
+        dbname: &str
+	) -> anyhow::Result<(), anyhow::Error> {
+        db_handling::manage_history::history_entry_system(dbname, entry.to_string())
     }
 }
 
