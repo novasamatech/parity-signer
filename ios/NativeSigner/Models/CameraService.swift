@@ -230,26 +230,19 @@ public class CameraService: UIViewController, AVCaptureVideoDataOutputSampleBuff
                                 if self.bucket.count >= self.total ?? 0 {
                                     var err = ExternError()
                                     let err_ptr = UnsafeMutablePointer(&err)
-                                    do {
-                                        let process = "[\"" +  self.bucket.joined(separator: "\",\"") + "\"]"
-                                        let res = try_decode_qr_sequence(err_ptr, process)
-                                        if err_ptr.pointee.code == 0 {
-                                            DispatchQueue.main.async {
-                                                self.payload = String(cString: res!)
-                                                signer_destroy_string(res!)
-                                                self.stop()
-                                            }
-                                        } else {
-                                            //TODO: give up when things go badly
-                                            print(String(cString: err_ptr.pointee.message))
-                                            signer_destroy_string(err_ptr.pointee.message)
-                                        }
-                                    } catch {
+                                    let process = "[\"" +  self.bucket.joined(separator: "\",\"") + "\"]"
+                                    let res = try_decode_qr_sequence(err_ptr, process)
+                                    if err_ptr.pointee.code == 0 {
                                         DispatchQueue.main.async {
+                                            self.payload = String(cString: res!)
+                                            signer_destroy_string(res!)
                                             self.stop()
                                         }
+                                    } else {
+                                        //TODO: give up when things go badly?
+                                        print(String(cString: err_ptr.pointee.message))
+                                        signer_destroy_string(err_ptr.pointee.message)
                                     }
-                                    
                                 }
                                 DispatchQueue.main.async {
                                     self.captured = self.bucket.count

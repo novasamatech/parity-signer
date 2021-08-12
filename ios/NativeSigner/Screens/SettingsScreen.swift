@@ -10,54 +10,90 @@ import SwiftUI
 struct SettingsScreen: View {
     @EnvironmentObject var data: SignerDataModel
     @Environment(\.presentationMode) var presentationMode: Binding<PresentationMode>
+    @State var wipe = false
+    @State var showHistory = false
+    @State var showNetworkManager = false
+    @State var showSeedManager = false
     var body: some View {
         ZStack {
-        VStack {
-            Button(action: {}) {
-                Text("Show log")
-            }.padding()
-            NavigationLink(destination: Text("")) {
-                Text("Manage seeds")
-            }.padding()
-            NavigationLink(destination: Text("temp")) {
-                Text("Network settings")
-            }.padding()
-            Button(action: {
+            
+            //Main buttons block
+            VStack {
+                Button(action: {
+                    showHistory = true
+                }) {
+                    Text("Show log")
+                }.padding()
+                Button(action: {
+                    showSeedManager = true
+                }) {
+                    Text("Manage seeds")
+                }.padding()
+                Button (action: {
+                    showNetworkManager = true
+                }) {
+                    Text("Network settings")
+                }.padding()
+                Button(action: {
                 //TODO: add some alerts to make sure the operation was successful
-                do {
-                    var destination = try FileManager.default.url(for: .documentDirectory, in: .userDomainMask, appropriateFor: nil, create: false)
-                    print(destination)
-                    print(destination.appendPathComponent("Database"))
-                    print(destination)
-                    try FileManager.default.removeItem(at: destination)
-                } catch {
-                    print("FileManager failed to delete db")
-                    return
+                    wipe = true
+                }) {
+                    HStack{
+                        Image(systemName: "exclamationmark.triangle.fill").imageScale(.large)
+                        Text("Wipe all data")
+                        Image(systemName: "exclamationmark.triangle.fill").imageScale(.large)
+                    }
                 }
-                let query = [
-                    kSecClass as String: kSecClassGenericPassword
-                ] as CFDictionary
-                SecItemDelete(query)
-                data.onboardingDone = false
-                presentationMode.wrappedValue.dismiss()
-            }) {
-                HStack{
-                    Image(systemName: "exclamationmark.triangle.fill").imageScale(.large)
-                    Text("Wipe all data")
-                    Image(systemName: "exclamationmark.triangle.fill").imageScale(.large)
+                .alert(isPresented: $wipe, content: {
+                    Alert(
+                        title: Text("Wipe ALL data?"),
+                        message: Text("Factory reset the Signer app. This operation can not be reverted!"),
+                        primaryButton: .cancel(),
+                        secondaryButton: .destructive(
+                            Text("Wipe"),
+                            action: {
+                                data.wipe()
+                                presentationMode.wrappedValue.dismiss()
+                            }
+                        )
+                    )
+                })
+                .padding()
+                Button(action: {
+                    data.document = .about
+                }) {
+                    Text("About")
                 }
-            }.padding()
-            NavigationLink(destination: Text("About")) {
-                Text("About")
-            }.padding()
-            NavigationLink(destination: Text("ToC")) {
-                Text("Terms and conditions")
-            }.padding()
-            NavigationLink(destination: Text("Privacy statement")) {
-                Text("Privacy statement")
-            }.padding()
-            Spacer()
-        }
+                .padding()
+                Button(action: {
+                    data.document = .toc
+                }) {
+                    Text("Terms and conditions")
+                }
+                .padding()
+                Button(action: {data.document = .pp}) {
+                    Text("Privacy statement")
+                }
+                .padding()
+                Spacer()
+            }.padding(.bottom, 100)
+            
+            //Modal with seed manager
+            if (showSeedManager) {
+                SeedManager(showSeedManager: $showSeedManager)
+            }
+            
+            //Modal with network settings
+            if (showNetworkManager) {
+                NetworkManager(showNetworkManager: $showNetworkManager)
+            }
+            
+            //Modal with information screens
+            if (data.document != .none) {
+                DocumentModal().padding(.bottom, 100)
+            }
+            
+            //Footer
             VStack {
                 Spacer()
                 Footer(caller: "Settings")

@@ -57,6 +57,8 @@ class SignerDataModel: ObservableObject {
     @Published var suggestedName: String = ""
     @Published var onboardingDone: Bool = false
     @Published var lastError: String = ""
+    @Published var document: ShownDocument = .none
+    @Published var networkSettings: NetworkSettings?
     
     var error: Unmanaged<CFError>?
     var dbName: String
@@ -72,6 +74,7 @@ class SignerDataModel: ObservableObject {
     
     func totalRefresh() {
         self.lastError = ""
+        self.document = .none
         self.newSeed = self.seedNames.count == 0
         self.newIdentity = false
         self.exportIdentity = false
@@ -81,8 +84,8 @@ class SignerDataModel: ObservableObject {
             self.fetchKeys()
         } else {
             print("No networks found; not handled yet")
-            return
         }
+        self.networkSettings = nil
     }
 }
 
@@ -221,6 +224,20 @@ extension SignerDataModel {
         } catch {
             print("DB init failed")
         }
+    }
+    
+    func wipe() {
+        do {
+            try FileManager.default.removeItem(atPath: self.dbName)
+        } catch {
+            print("FileManager failed to delete db")
+            return
+        }
+        let query = [
+            kSecClass as String: kSecClassGenericPassword
+        ] as CFDictionary
+        SecItemDelete(query)
+        self.onboardingDone = false
     }
 }
 

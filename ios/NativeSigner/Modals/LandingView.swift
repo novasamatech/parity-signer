@@ -9,17 +9,32 @@ import SwiftUI
 
 struct LandingView: View {
     @EnvironmentObject var data: SignerDataModel
+    @State var tacAccept = false
     var body: some View {
         ZStack {
-            RoundedRectangle(cornerRadius: 50).foregroundColor(/*@START_MENU_TOKEN@*/Color("backgroundCard")/*@END_MENU_TOKEN@*/)
-            VStack {
-                Text("There should be TC and PP I don't copy and paste code I don't copy and paste code I don't copy and paste code I don't copy and paste code I don't copy and paste code I don't copy and paste code I don't copy and paste code I don't copy and paste code I don't copy and paste code I don't copy and paste code I don't copy and paste code I don't copy and paste code I don't copy and paste code I don't copy and paste code ")
-                    .foregroundColor(Color("textMainColor"))
+                    RoundedRectangle(cornerRadius: 50).foregroundColor(/*@START_MENU_TOKEN@*/Color("backgroundCard")/*@END_MENU_TOKEN@*/)
+                    VStack {
+                        if (tacAccept) {
+                            ScrollView {
+                                Text(data.getPP())
+                                    .foregroundColor(Color("textMainColor"))
+                            }
+                        } else {
+                            ScrollView {
+                                Text(data.getTaC())
+                                    .foregroundColor(Color("textMainColor"))
+                    }.padding()
+                }
                 Button(action: {
-                    data.onboard()
+                    if tacAccept {
+                        data.onboard()
+                    } else {
+                        tacAccept = true
+                    }
                 }) {
                     Text("Accept")
-                }
+                        .font(.largeTitle)
+                }.padding()
             }
         }
     }

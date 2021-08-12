@@ -49,6 +49,7 @@ struct Footer: View {
                 if caller == "Settings" {
                     Button(action: {
                         data.totalRefresh()
+                        data.networkSettings = nil
                     }) {
                         WrenchSymbol()
                     }

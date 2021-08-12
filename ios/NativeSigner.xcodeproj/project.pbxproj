@@ -27,6 +27,14 @@
 		2D7A7BDC26C2613F0053C1E0 /* TransactionCardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D7A7BDB26C2613F0053C1E0 /* TransactionCardView.swift */; };
 		2D7A7BDE26C296AA0053C1E0 /* TransactionReady.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D7A7BDD26C296AA0053C1E0 /* TransactionReady.swift */; };
 		2D7A7BE026C3AC350053C1E0 /* TransactionTypes.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D7A7BDF26C3AC350053C1E0 /* TransactionTypes.swift */; };
+		2D7A7BE326C3FC250053C1E0 /* terms-and-conditions.txt in Resources */ = {isa = PBXBuildFile; fileRef = 2D7A7BE226C3FC250053C1E0 /* terms-and-conditions.txt */; };
+		2D7A7BE526C3FE260053C1E0 /* Documents.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D7A7BE426C3FE260053C1E0 /* Documents.swift */; };
+		2D7A7BE726C410FF0053C1E0 /* privacy-policy.txt in Resources */ = {isa = PBXBuildFile; fileRef = 2D7A7BE626C410FF0053C1E0 /* privacy-policy.txt */; };
+		2D7A7BEB26C4149E0053C1E0 /* DocumentModal.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D7A7BEA26C4149E0053C1E0 /* DocumentModal.swift */; };
+		2D7A7BED26C50AB80053C1E0 /* NetworkManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D7A7BEC26C50AB80053C1E0 /* NetworkManager.swift */; };
+		2D7A7BEF26C50ACB0053C1E0 /* SeedManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D7A7BEE26C50ACB0053C1E0 /* SeedManager.swift */; };
+		2D7A7BF126C50F950053C1E0 /* NetworkSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D7A7BF026C50F950053C1E0 /* NetworkSettings.swift */; };
+		2D7A7BF326C519990053C1E0 /* MetadataCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D7A7BF226C519990053C1E0 /* MetadataCard.swift */; };
 		2DE72BC226A588C7002BB752 /* NativeSignerApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2DE72BC126A588C7002BB752 /* NativeSignerApp.swift */; };
 		2DE72BC426A588C7002BB752 /* MainButtonScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2DE72BC326A588C7002BB752 /* MainButtonScreen.swift */; };
 		2DE72BC626A588C9002BB752 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 2DE72BC526A588C9002BB752 /* Assets.xcassets */; };
@@ -84,6 +92,14 @@
 		2D7A7BDB26C2613F0053C1E0 /* TransactionCardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = TransactionCardView.swift; path = NativeSigner/Cards/TransactionCardView.swift; sourceTree = SOURCE_ROOT; };
 		2D7A7BDD26C296AA0053C1E0 /* TransactionReady.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransactionReady.swift; sourceTree = "<group>"; };
 		2D7A7BDF26C3AC350053C1E0 /* TransactionTypes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransactionTypes.swift; sourceTree = "<group>"; };
+		2D7A7BE226C3FC250053C1E0 /* terms-and-conditions.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = "terms-and-conditions.txt"; sourceTree = "<group>"; };
+		2D7A7BE426C3FE260053C1E0 /* Documents.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Documents.swift; sourceTree = "<group>"; };
+		2D7A7BE626C410FF0053C1E0 /* privacy-policy.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = "privacy-policy.txt"; sourceTree = "<group>"; };
+		2D7A7BEA26C4149E0053C1E0 /* DocumentModal.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = DocumentModal.swift; path = NativeSigner/Screens/DocumentModal.swift; sourceTree = SOURCE_ROOT; };
+		2D7A7BEC26C50AB80053C1E0 /* NetworkManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkManager.swift; sourceTree = "<group>"; };
+		2D7A7BEE26C50ACB0053C1E0 /* SeedManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SeedManager.swift; sourceTree = "<group>"; };
+		2D7A7BF026C50F950053C1E0 /* NetworkSettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = NetworkSettings.swift; path = NativeSigner/Modals/NetworkSettings.swift; sourceTree = SOURCE_ROOT; };
+		2D7A7BF226C519990053C1E0 /* MetadataCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MetadataCard.swift; sourceTree = "<group>"; };
 		2DE72BBE26A588C7002BB752 /* NativeSigner.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = NativeSigner.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		2DE72BC126A588C7002BB752 /* NativeSignerApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NativeSignerApp.swift; sourceTree = "<group>"; };
 		2DE72BC326A588C7002BB752 /* MainButtonScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainButtonScreen.swift; sourceTree = "<group>"; };
@@ -162,6 +178,9 @@
 		2D7A7BC726BA97A50053C1E0 /* Modals */ = {
 			isa = PBXGroup;
 			children = (
+				2D7A7BEA26C4149E0053C1E0 /* DocumentModal.swift */,
+				2D7A7BEC26C50AB80053C1E0 /* NetworkManager.swift */,
+				2D7A7BEE26C50ACB0053C1E0 /* SeedManager.swift */,
 				2D7A7BCB26BAD02A0053C1E0 /* ExportIdentity.swift */,
 				2D7A7BB526B136970053C1E0 /* NewSeedScreen.swift */,
 				2D7A7BD726C163110053C1E0 /* TransactionPreview.swift */,
@@ -182,8 +201,18 @@
 				2D7A7BB326B02B700053C1E0 /* SeedSelector.swift */,
 				2DE72C0326A6CDC5002BB752 /* CameraPreview.swift */,
 				2D7A7BA426AE9E680053C1E0 /* Footer.swift */,
+				2D7A7BF226C519990053C1E0 /* MetadataCard.swift */,
 			);
 			path = Components;
+			sourceTree = "<group>";
+		};
+		2D7A7BE126C3FB680053C1E0 /* Docs */ = {
+			isa = PBXGroup;
+			children = (
+				2D7A7BE626C410FF0053C1E0 /* privacy-policy.txt */,
+				2D7A7BE226C3FC250053C1E0 /* terms-and-conditions.txt */,
+			);
+			path = Docs;
 			sourceTree = "<group>";
 		};
 		2DE72BB526A588C7002BB752 = {
@@ -211,6 +240,7 @@
 		2DE72BC026A588C7002BB752 /* NativeSigner */ = {
 			isa = PBXGroup;
 			children = (
+				2D7A7BE126C3FB680053C1E0 /* Docs */,
 				2D7A7BC826BA97AE0053C1E0 /* Components */,
 				2D7A7BC726BA97A50053C1E0 /* Modals */,
 				2D7A7BC626BA974E0053C1E0 /* Screens */,
@@ -257,12 +287,14 @@
 		2DE72BEF26A5981C002BB752 /* Models */ = {
 			isa = PBXGroup;
 			children = (
+				2D7A7BF026C50F950053C1E0 /* NetworkSettings.swift */,
 				2DE72C0126A6C27E002BB752 /* Camera.swift */,
 				2DE72BFF26A6ADC5002BB752 /* CameraService.swift */,
 				2D7A7BD326BBEAF00053C1E0 /* Canary.swift */,
 				2D7A7BBF26B97DB30053C1E0 /* Identities.swift */,
 				2DE72BF026A59834002BB752 /* Network.swift */,
 				2DE72C0E26A99885002BB752 /* RustNative.swift */,
+				2D7A7BE426C3FE260053C1E0 /* Documents.swift */,
 				2D7A7BCF26BBC72D0053C1E0 /* Transaction.swift */,
 				2D7A7BDF26C3AC350053C1E0 /* TransactionTypes.swift */,
 				2D7A7BD526C1126C0053C1E0 /* Utils.swift */,
@@ -390,9 +422,11 @@
 			buildActionMask = 2147483647;
 			files = (
 				2D7A7BCE26BBC5690053C1E0 /* LaunchScreen.xib in Resources */,
+				2D7A7BE726C410FF0053C1E0 /* privacy-policy.txt in Resources */,
 				2DE72BC926A588C9002BB752 /* Preview Assets.xcassets in Resources */,
 				2D7A7BAA26AED2500053C1E0 /* Database in Resources */,
 				2DE72BC626A588C9002BB752 /* Assets.xcassets in Resources */,
+				2D7A7BE326C3FC250053C1E0 /* terms-and-conditions.txt in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -418,19 +452,23 @@
 			buildActionMask = 2147483647;
 			files = (
 				2D7A7BDE26C296AA0053C1E0 /* TransactionReady.swift in Sources */,
+				2D7A7BE526C3FE260053C1E0 /* Documents.swift in Sources */,
 				2DE72C1126AAC3D6002BB752 /* LandingView.swift in Sources */,
 				2DE72C0026A6ADC5002BB752 /* CameraService.swift in Sources */,
 				2DE72BF526A59C59002BB752 /* NetworkCard.swift in Sources */,
 				2D7A7BC226B9D3370053C1E0 /* IdentityCard.swift in Sources */,
+				2D7A7BF126C50F950053C1E0 /* NetworkSettings.swift in Sources */,
 				2DE72BF926A5C360002BB752 /* CameraView.swift in Sources */,
 				2D7A7BD626C1126C0053C1E0 /* Utils.swift in Sources */,
 				2DE72BC426A588C7002BB752 /* MainButtonScreen.swift in Sources */,
 				2D7A7BB826B28D350053C1E0 /* SettingsScreen.swift in Sources */,
 				2D7A7BB626B136970053C1E0 /* NewSeedScreen.swift in Sources */,
 				2DE72BC226A588C7002BB752 /* NativeSignerApp.swift in Sources */,
+				2D7A7BEF26C50ACB0053C1E0 /* SeedManager.swift in Sources */,
 				2DE72C0426A6CDC5002BB752 /* CameraPreview.swift in Sources */,
 				2D7A7BD426BBEAF00053C1E0 /* Canary.swift in Sources */,
 				2D7A7BD826C163110053C1E0 /* TransactionPreview.swift in Sources */,
+				2D7A7BED26C50AB80053C1E0 /* NetworkManager.swift in Sources */,
 				2DE72BF726A5AC68002BB752 /* KeyManager.swift in Sources */,
 				2D7A7BA526AE9E680053C1E0 /* Footer.swift in Sources */,
 				2D7A7BDC26C2613F0053C1E0 /* TransactionCardView.swift in Sources */,
@@ -441,7 +479,9 @@
 				2D7A7BD226BBCE6F0053C1E0 /* TransactionScreen.swift in Sources */,
 				2D7A7BB426B02B700053C1E0 /* SeedSelector.swift in Sources */,
 				2D7A7BB026B00A3E0053C1E0 /* NavbarShield.swift in Sources */,
+				2D7A7BF326C519990053C1E0 /* MetadataCard.swift in Sources */,
 				2D7A7BE026C3AC350053C1E0 /* TransactionTypes.swift in Sources */,
+				2D7A7BEB26C4149E0053C1E0 /* DocumentModal.swift in Sources */,
 				2DE72C0F26A99885002BB752 /* RustNative.swift in Sources */,
 				2DE72BF126A59834002BB752 /* Network.swift in Sources */,
 				2D7A7BC426BA8B350053C1E0 /* NewIdentityScreen.swift in Sources */,

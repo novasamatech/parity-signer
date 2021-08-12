@@ -35,18 +35,27 @@ struct NewIdentityScreen: View {
                 }
                 HStack {
                 Text("Name").font(.body).foregroundColor(Color("textMainColor"))
-                TextField("Seed name", text: $data.suggestedName).font(/*@START_MENU_TOKEN@*/.title/*@END_MENU_TOKEN@*/)
+                TextField("Seed name", text: $data.suggestedName)
+                    .onChange(of: data.suggestedName, perform: {_ in data.lastError = ""
+                    })
+                    .font(/*@START_MENU_TOKEN@*/.title/*@END_MENU_TOKEN@*/)
                     .foregroundColor(/*@START_MENU_TOKEN@*/Color("textEntryColor")/*@END_MENU_TOKEN@*/)
                 .background(/*@START_MENU_TOKEN@*//*@PLACEHOLDER=View@*/Color("textFieldColor")/*@END_MENU_TOKEN@*/).border(/*@START_MENU_TOKEN@*/Color("borderSignalColor")/*@END_MENU_TOKEN@*/, width: /*@START_MENU_TOKEN@*/1/*@END_MENU_TOKEN@*/)
                 }
                 HStack {
                 Text("Password (optional)").font(.body).foregroundColor(Color("textMainColor"))
-                TextField("//hard/soft", text: $password).font(.title)
+                TextField("//hard/soft", text: $password)
+                    .onChange(of: data.suggestedName, perform: {_ in data.lastError = ""
+                    })
+                    .font(.title)
                     .foregroundColor(/*@START_MENU_TOKEN@*/Color("textEntryColor")/*@END_MENU_TOKEN@*/)
                 .background(/*@START_MENU_TOKEN@*//*@PLACEHOLDER=View@*/Color("textFieldColor")/*@END_MENU_TOKEN@*/).border(/*@START_MENU_TOKEN@*/Color("borderSignalColor")/*@END_MENU_TOKEN@*/, width: /*@START_MENU_TOKEN@*/1/*@END_MENU_TOKEN@*/)
                 }
                 HStack {
-                Text("Password (repeat)").font(.body).foregroundColor(Color("textMainColor"))
+                Text("Password (repeat)")
+                    .onChange(of: data.suggestedName, perform: {_ in data.lastError = ""
+                    })
+                    .font(.body).foregroundColor(Color("textMainColor"))
                 TextField("//hard/soft", text: $passwordCheck).font(/*@START_MENU_TOKEN@*/.title/*@END_MENU_TOKEN@*/)
                     .foregroundColor(/*@START_MENU_TOKEN@*/Color("textEntryColor")/*@END_MENU_TOKEN@*/)
                 .background(/*@START_MENU_TOKEN@*//*@PLACEHOLDER=View@*/Color("textFieldColor")/*@END_MENU_TOKEN@*/).border(/*@START_MENU_TOKEN@*/Color("borderSignalColor")/*@END_MENU_TOKEN@*/, width: /*@START_MENU_TOKEN@*/1/*@END_MENU_TOKEN@*/)
@@ -70,6 +79,9 @@ struct NewIdentityScreen: View {
                 }
                 Spacer()
             }.padding()
+        }
+        .onAppear {
+            data.lastError = ""
         }
         .background(/*@START_MENU_TOKEN@*//*@PLACEHOLDER=View@*/Color("backgroundColor")/*@END_MENU_TOKEN@*/).padding(.bottom, 100)
     }
