@@ -30,7 +30,7 @@ pub fn prep_types (database_name: &str) -> anyhow::Result<Vec<u8>> {
 /// !!! for cold db only !!!
 /// Cuts off the verifier and order, used for preparation of messages
 
-pub fn get_network_specs (network_name: &str, database_name: &str) -> anyhow::Result<Vec<u8>> {
+pub fn get_network_specs (network_name: &str, database_name: &str) -> anyhow::Result<ChainSpecsToSend> {
     
     let database = open_db(database_name)?;
     let chainspecs = open_tree(&database, SPECSTREE)?;
@@ -60,7 +60,7 @@ pub fn get_network_specs (network_name: &str, database_name: &str) -> anyhow::Re
                 title: network_specs.title,
                 unit: network_specs.unit,
             };
-            Ok(network_specs_to_send.encode())
+            Ok(network_specs_to_send)
         },
         None => return Err(Error::NotFound(NotFound::NetworkSpecs(network_name.to_string())).show()),
     }
@@ -119,7 +119,7 @@ pub fn get_metadata (network_name: &str, network_version: u32, database_name: &s
 
 /// Function to get LATEST metadata from the database searching by network name
 
-pub fn get_latest_metadata (network_name: &str, database_name: &str) -> anyhow::Result<Vec<u8>> {
+pub fn get_latest_metadata (network_name: &str, database_name: &str) -> anyhow::Result<(Vec<u8>, u32)> {
     
     let database = open_db(database_name)?;
     let metadata = open_tree(&database, METATREE)?;
@@ -157,7 +157,7 @@ pub fn get_latest_metadata (network_name: &str, database_name: &str) -> anyhow::
     }
     
     match latest_version_meta_values {
-        Some(a) => Ok(a.meta),
+        Some(a) => Ok((a.meta, a.version)),
         None => return Err(Error::NotFound(NotFound::MetaFromName(network_name.to_string())).show()),
     }
 }
@@ -172,19 +172,38 @@ pub fn prep_load_metadata (network_name: &str, network_version: u32, database_na
 }
 
 
+pub struct PrepAddNetwork {
+    pub name: String,
+    pub version: u32,
+    pub meta: Vec<u8>,
+    pub network_specs: ChainSpecsToSend,
+}
+
 /// Function to get contents for load_metadata message from the database
 
-pub fn prep_add_network_versioned (network_name: &str, network_version: u32, database_name: &str) -> anyhow::Result<Vec<u8>> {
+pub fn prep_add_network_versioned (network_name: &str, network_version: u32, database_name: &str) -> anyhow::Result<PrepAddNetwork> {
     let metadata_vector = get_metadata (network_name, network_version, database_name)?;
-    let encoded_network_specs_vector = get_network_specs (network_name, database_name)?;
-    Ok([metadata_vector, encoded_network_specs_vector].concat())
+    let network_specs = get_network_specs (network_name, database_name)?;
+    let prep_add_network = PrepAddNetwork {
+        name: network_name.to_string(),
+        version: network_version,
+        meta: metadata_vector,
+        network_specs,
+    };
+    Ok(prep_add_network)
 }
 
 
 /// Function to get contents for load_metadata message from the database
 
-pub fn prep_add_network_latest (network_name: &str, database_name: &str) -> anyhow::Result<Vec<u8>> {
-    let metadata_vector = get_latest_metadata (network_name, database_name)?;
-    let encoded_network_specs_vector = get_network_specs (network_name, database_name)?;
-    Ok([metadata_vector, encoded_network_specs_vector].concat())
+pub fn prep_add_network_latest (network_name: &str, database_name: &str) -> anyhow::Result<PrepAddNetwork> {
+    let (metadata_vector, version) = get_latest_metadata (network_name, database_name)?;
+    let network_specs = get_network_specs (network_name, database_name)?;
+    let prep_add_network = PrepAddNetwork {
+        name: network_name.to_string(),
+        version,
+        meta: metadata_vector,
+        network_specs,
+    };
+    Ok(prep_add_network)
 }

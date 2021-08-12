@@ -3,7 +3,7 @@ use parity_scale_codec::{Decode, Encode};
 use parity_scale_codec_derive;
 use printing_balance::{PrettyOutput, convert_balance_pretty};
 use sled::{Db, Tree, open};
-use definitions::{network_specs::{ChainSpecs, generate_network_key}, transactions::SignDb, users::{AddressDetails, Encryption, generate_address_key, print_as_base58}, constants::{SPECSTREE, METATREE, ADDRTREE, SETTREE, SIGNTRANS, TRANSACTION}};
+use definitions::{network_specs::{ChainSpecs, generate_network_key}, transactions::{Transaction, Sign}, users::{AddressDetails, Encryption, generate_address_key, print_as_base58}, constants::{SPECSTREE, METATREE, ADDRTREE, SETTREE, SIGNTRANS, TRANSACTION}, history::Event};
 use sp_runtime::generic::Era;
 use std::convert::TryInto;
 
@@ -189,9 +189,11 @@ pub fn parse_transaction (data_hex: &str, dbname: &str) -> Result<String, Error>
                     match find_meta(&chain_name, short.metadata_version, &metadata) {
                         Ok((meta, ver)) => {
                             let mut warning_card = None;
+                            let mut history: Vec<Event> = Vec::new();
                             if let Some(x) = ver {
                                 warning_card = Some(Card::Warning(Warning::NewerVersion{used_version: short.metadata_version, latest_version: x}).card(index, indent));
                                 index = index + 1;
+                                history.push(Event::Warning(Warning::NewerVersion{used_version: short.metadata_version, latest_version: x}.show()));
                             }
                     
                         // generate type database to be used in decoding
@@ -215,13 +217,14 @@ pub fn parse_transaction (data_hex: &str, dbname: &str) -> Result<String, Error>
                                         None => {
                                         // network is among the allowed ones for this address key; can sign;
                                         // making action entry into database
-                                            let action_into_db = SignDb {
+                                            let action_into_db = Transaction::Sign(Sign{
                                                 encryption,
                                                 path: address_details.path,
                                                 transaction: for_signing,
                                                 has_pwd: address_details.has_pwd,
                                                 address_key,
-                                            };
+                                                history,
+                                            });
                                             match transaction.insert(SIGNTRANS, action_into_db.encode()) {
                                                 Ok(_) => (),
                                                 Err(e) => return Err(Error::DatabaseError(DatabaseError::Internal(e))),

@@ -2,7 +2,7 @@ use parity_scale_codec_derive::{Decode, Encode};
 use sp_core::{ed25519, sr25519, ecdsa, crypto::{Ss58Codec, Ss58AddressFormat}};
 use std::convert::TryInto;
 
-use super::network_specs::NetworkKey;
+use crate::network_specs::NetworkKey;
 
 
 /// Type of encryption; only allow supported types here - compile-time check for that is happening
@@ -42,6 +42,21 @@ pub struct SeedObject {
     pub seed_name: String,
     pub seed_phrase: String,
     pub encryption: Encryption,
+}
+
+
+/// Struct to store history entry for identity action
+pub struct IdentityHistory <'a> {
+    pub seed_name: &'a str,
+    pub public_key: &'a str,
+    pub path: &'a str,
+    pub network_key: &'a str,
+}
+
+impl <'a> IdentityHistory <'a> {
+    pub fn show(&self) -> String {
+        format!("\"seed_name\":\"{}\",\"public_key\":\"{}\",\"path\":\"{}\",\"network_key\":\"{}\"", &self.seed_name, &self.public_key, &self.path, &self.network_key)
+    }
 }
 
 

@@ -7,7 +7,7 @@ use sled::{Db, Tree};
 use sp_core::{Pair, ed25519, sr25519, ecdsa};
 use parity_scale_codec::Encode;
 use regex::Regex;
-use definitions::{constants::{ADDRTREE, SPECSTREE}, network_specs::{NetworkKey, generate_network_key}, users::{Encryption, AddressDetails, SeedObject, AddressKey, generate_address_key, print_as_base58}};
+use definitions::{constants::{ADDRTREE, HISTORY, SPECSTREE}, history::Event, network_specs::{NetworkKey, generate_network_key}, users::{Encryption, AddressDetails, SeedObject, AddressKey, generate_address_key, print_as_base58, IdentityHistory}};
 use bip39::{Language, Mnemonic, MnemonicType};
 use zeroize::Zeroize;
 use lazy_static::lazy_static;
@@ -16,6 +16,7 @@ use anyhow;
 use crate::error::{Error, NotFound, NotHex, CreateAddress};
 use crate::chainspecs::get_network;
 use crate::helpers::{open_db, open_tree, drop_tree, flush_db, insert_into_tree, remove_from_tree, unhex, decode_chain_specs, decode_address_details};
+use crate::manage_history::{enter_events_into_tree};
 
 
 lazy_static! {
@@ -125,6 +126,7 @@ fn create_address (database: &Db, path: &str, network_key: NetworkKey, name: &st
 
     let mut full_address = seed_object.seed_phrase.to_owned() + path;
     let chainspecs = open_tree(&database, SPECSTREE)?;
+    let history = open_tree(&database, HISTORY)?;
     
     if !chainspecs.contains_key(&network_key)? {return Err(Error::CreateAddress(CreateAddress::NetworkNotFound).show())}
     
@@ -150,6 +152,14 @@ fn create_address (database: &Db, path: &str, network_key: NetworkKey, name: &st
     };
     full_address.zeroize();
     
+    let identity_history_print = IdentityHistory {
+        seed_name: &seed_object.seed_name,
+        public_key: &hex::encode(&address_key),
+        path: &path,
+        network_key: &hex::encode(&network_key),
+    }.show();
+    let events = vec![Event::IdentityAdded(identity_history_print)];
+    
     let identities = open_tree(&database, ADDRTREE)?;
     let seed_name = seed_object.seed_name.to_string();
 // This address might be already created; maybe we just need to allow its use in another network?
@@ -163,6 +173,7 @@ fn create_address (database: &Db, path: &str, network_key: NetworkKey, name: &st
             if !address_details.network_id.contains(&network_key) {
                 address_details.network_id.push(network_key);
                 insert_into_tree(address_key, address_details.encode(), &identities)?;
+                enter_events_into_tree(&history, events)?;
             }
         }
         Ok(None) => {
@@ -186,6 +197,7 @@ fn create_address (database: &Db, path: &str, network_key: NetworkKey, name: &st
                 encryption: seed_object.encryption,
             };
             insert_into_tree(address_key, address_details.encode(), &identities)?;
+            enter_events_into_tree(&history, events)?;
         },
         Err(e) => return Err(Error::InternalDatabaseError(e).show()),
     }
@@ -285,15 +297,24 @@ pub fn suggest_path_name(path_all: &str) -> String {
 pub fn delete_address(pub_key: &str, network_key_string: &str, database_name: &str) -> anyhow::Result<()> {
     let database = open_db(database_name)?;
     let identities = open_tree(&database, ADDRTREE)?;
+    let history = open_tree(&database, HISTORY)?;
     let address_key = generate_address_key(&unhex(pub_key, NotHex::PublicKey)?);
     let network_key = generate_network_key(&unhex(network_key_string, NotHex::GenesisHash)?);
 
     match identities.get(&address_key) {
         Ok(Some(address_details_encoded)) => {
             let mut address_details = decode_address_details(address_details_encoded)?;
+            let identity_history_print = IdentityHistory {
+                seed_name: &address_details.seed_name,
+                public_key: &pub_key,
+                path: &address_details.path,
+                network_key: &network_key_string,
+            }.show();
+            let events = vec![Event::IdentityRemoved(identity_history_print)];
             address_details.network_id = address_details.network_id.into_iter().filter(|id| *id != network_key).collect();
             if address_details.network_id.is_empty() {remove_from_tree(address_key, &identities)?}
             else {insert_into_tree(address_key, address_details.encode(), &identities)?}
+            enter_events_into_tree(&history, events)?;
         }
         Ok(None) => return Err(Error::NotFound(NotFound::Address).show()),
         Err(e) => return Err(Error::InternalDatabaseError(e).show()),
@@ -351,6 +372,8 @@ pub fn try_create_address (id_name: &str, seed_name: &str, seed_phrase: &str, en
 pub fn load_test_identities (database_name: &str) -> anyhow::Result<()> {
     let database = open_db(database_name)?;
     drop_tree(&database, ADDRTREE)?;
+    let history = open_tree(&database, HISTORY)?;
+    enter_events_into_tree(&history, vec![Event::IdentitiesWiped])?;
     let alice_seed_object = SeedObject {
         seed_name: String::from("Alice"),
         seed_phrase: String::from("bottom drive obey lake curtain smoke basket hold race lonely fit walk"),
@@ -370,10 +393,24 @@ pub fn remove_identities_for_seed (seed_name: &str, database_name: &str) -> anyh
     
     let database = open_db(database_name)?;
     let identities = open_tree(&database, ADDRTREE)?;
+    let history = open_tree(&database, HISTORY)?;
     for x in identities.iter() {
         if let Ok((key, value)) = x {
             let address_details = decode_address_details(value)?;
-            if address_details.seed_name == seed_name {remove_from_tree(key.to_vec(), &identities)?}
+            if address_details.seed_name == seed_name {
+                remove_from_tree(key.to_vec(), &identities)?;
+                let mut events: Vec<Event> = Vec::new();
+                for y in address_details.network_id.iter() {
+                    let identity_history_print = IdentityHistory {
+                        seed_name: seed_name,
+                        public_key: &hex::encode(&key),
+                        path: &address_details.path,
+                        network_key: &hex::encode(y),
+                    }.show();
+                    events.push(Event::IdentityRemoved(identity_history_print));
+                }
+                enter_events_into_tree(&history, events)?;
+            }
         }
     }
     flush_db(&database)?;

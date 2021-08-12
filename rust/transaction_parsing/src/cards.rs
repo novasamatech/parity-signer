@@ -1,6 +1,5 @@
 use bitvec::prelude::{BitVec, Lsb0};
 use hex;
-use definitions::network_specs::ChainSpecsToSend; 
 
 use super::error::Error;
 use super::parse_transaction::AuthorPublicKey;
@@ -28,9 +27,9 @@ pub enum Card <'a> {
     AuthorPlain (&'a str),
     AuthorPublicKey (AuthorPublicKey),
     Verifier(String),
-    Meta {specname: &'a str, spec_version: u32, meta_hash: &'a str},
+    Meta(String), // get String after applying show() to MetaValuesDisplay
     TypesInfo(&'a str),
-    NewNetwork {specname: &'a str, spec_version: u32, meta_hash: &'a str, chain_specs: &'a ChainSpecsToSend, verifier_line: String},
+    NewNetwork(String), // get String after applying show() to NetworkDisplay
     Warning (Warning),
     Error (Error),
 }
@@ -98,7 +97,7 @@ impl <'a> Card <'a> {
             Card::BlockHash (hex_block_hash) => fancy(index, indent, "block_hash", &format!("\"{}\"", hex_block_hash)),
             Card::TxSpec {network, version, tx_version} => fancy(index, indent, "tx_spec", &format!("{{\"network\":\"{}\",\"version\":\"{}\",\"tx_version\":\"{}\"}}", network, version, tx_version)),
             Card::TxSpecPlain {gen_hash, version, tx_version} => fancy(index, indent, "tx_spec_plain", &format!("{{\"network_genesis_hash\":\"{}\",\"version\":\"{}\",\"tx_version\":\"{}\"}}", gen_hash, version, tx_version)),
-            Card::Author {base58_author, seed_name, path, has_pwd, name} => fancy(index, indent, "author", &format!("{{\"base58\":\"{}\",\"seed\":\"{}\",\"derivation_path\":\"{}\",\"has_password\":\"{}\",\"name\":\"{}\"}}", base58_author, seed_name, path, has_pwd, name)),
+            Card::Author {base58_author, seed_name, path, has_pwd, name} => fancy(index, indent, "author", &format!("{{\"base58\":\"{}\",\"seed\":\"{}\",\"derivation_path\":\"{}\",\"has_password\":{},\"name\":\"{}\"}}", base58_author, seed_name, path, has_pwd, name)),
             Card::AuthorPlain (base58_author) => fancy(index, indent, "author_plain", &format!("{{\"base58\":\"{}\"}}", base58_author)),
             Card::AuthorPublicKey (author_pub_key) => match author_pub_key {
                 AuthorPublicKey::Ed25519(x) => fancy(index, indent, "author_public_key", &format!("{{\"hex\":\"{}\",\"crypto\":\"ed25519\"}}", &hex::encode(x))),
@@ -106,9 +105,9 @@ impl <'a> Card <'a> {
                 AuthorPublicKey::Ecdsa(x) => fancy(index, indent, "author_public_key", &format!("{{\"hex\":\"{}\",\"crypto\":\"ecdsa\"}}", &hex::encode(x))),
             },
             Card::Verifier(x) => fancy(index, indent, "verifier", x),
-            Card::Meta{specname, spec_version, meta_hash} => fancy(index, indent, "meta", &format!("{{\"specname\":\"{}\",\"spec_version\":\"{}\",\"meta_hash\":\"{}\"}}", specname, spec_version, meta_hash)),
+            Card::Meta(x) => fancy(index, indent, "meta", &format!("{{{}}}", x)),
             Card::TypesInfo(x) => fancy(index, indent, "types_hash", &format!("\"{}\"", x)),
-            Card::NewNetwork{specname, spec_version, meta_hash, chain_specs, verifier_line} => fancy(index, indent, "new_network", &format!("{{\"specname\":\"{}\",\"spec_version\":\"{}\",\"meta_hash\":\"{}\",\"base58prefix\":\"{}\",\"color\":\"{}\",\"decimals\":\"{}\",\"genesis_hash\":\"{}\",\"logo\":\"{}\",\"name\":\"{}\",\"path_id\":\"{}\",\"secondary_color\":\"{}\",\"title\":\"{}\",\"unit\":\"{}\",\"verifier\":{}}}", specname, spec_version, meta_hash, chain_specs.base58prefix, chain_specs.color, chain_specs.decimals, hex::encode(chain_specs.genesis_hash), chain_specs.logo, chain_specs.name, chain_specs.path_id, chain_specs.secondary_color, chain_specs.title, chain_specs.unit, verifier_line)),
+            Card::NewNetwork(x) => fancy(index, indent, "new_network", &format!("{{{}}}", x)),
             Card::Warning (warn) => fancy(index, indent, "warning", &format!("\"{}\"", warn.show())),
             Card::Error (err) => fancy(index, indent, "error", &format!("\"{}\"", err.show())),
         }

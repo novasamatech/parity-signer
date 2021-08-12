@@ -9,10 +9,21 @@ mod tests {
     use definitions::{constants::{METATREE, SPECSTREE}};
     use std::fs;
     use sled::{Db, open, Tree};
+    use regex::Regex;
+    use lazy_static::lazy_static;
     
     const METADATA_FILE: &str = "for_tests/metadata_database.ts";
     const SEED_PHRASE: &str = "bottom drive obey lake curtain smoke basket hold race lonely fit walk";
     const PWD: &str = "jaskier";
+    
+    lazy_static! {
+        static ref ACTION: Regex = Regex::new(r#"(?i)"action":\{.*?,"payload":(?P<action_line>\{[^}]*\})\}"#).expect("constructed from checked static value");
+    }
+    
+    fn get_action_line(reply: &str) -> String {
+        let caps = ACTION.captures(&reply).unwrap();
+        caps.name("action_line").unwrap().as_str().to_string()
+    }
     
     fn meta_count_test (dbname: &str) -> usize {
          let database: Db = open(dbname).unwrap();
@@ -33,9 +44,9 @@ mod tests {
         populate_cold(dbname, METADATA_FILE, true).unwrap();
         let line = "530100d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27da40403008eaf04151687736326c9fea17e25fc5287613693c912909cb226aa4794f26a480700e8764817b501b8003223000005000000e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e538a7d7a0ac17eb6dd004578cb8e238c384a10f57c999a3fa1200409cd9b3f33e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e";
         let reply = produce_output(line, dbname);
-        let reply_known = r#"{"author":[{"index":0,"indent":0,"type":"author","payload":{"base58":"5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY","seed":"Alice","derivation_path":"//Alice","has_password":"false","name":"Alice_test_westend"}}],"method":[{"index":1,"indent":0,"type":"call","payload":{"method":"transfer_keep_alive","pallet":"Balances"}},{"index":2,"indent":1,"type":"varname","payload":"dest"},{"index":3,"indent":2,"type":"enum_variant_name","payload":"Id"},{"index":4,"indent":3,"type":"Id","payload":"5FHneW46xGXgs5mUiveU4sbTyGBzmstUspZC92UhjJM694ty"},{"index":5,"indent":1,"type":"varname","payload":"value"},{"index":6,"indent":2,"type":"balance","payload":{"amount":"100.000000000","units":"mWND"}}],"extrinsics":[{"index":7,"indent":0,"type":"era_mortal_nonce","payload":{"era":"Mortal","phase":"27","period":"64","nonce":"46"}},{"index":8,"indent":0,"type":"tip","payload":{"amount":"0","units":"pWND"}},{"index":9,"indent":0,"type":"block_hash","payload":"538a7d7a0ac17eb6dd004578cb8e238c384a10f57c999a3fa1200409cd9b3f33"},{"index":10,"indent":0,"type":"tx_spec","payload":{"network":"westend","version":"9010","tx_version":"5"}}],"action":{"type":"sign_transaction","payload":{"type":"sign_transaction","checksum":"4278348933"}}}"#;
-        assert!(reply == reply_known, "Error in action.\nReceived: {}", reply);
-        let mock_action_line = r#"{"type":"sign_transaction","checksum":"4278348933"}"#;
+        let reply_known_part = r#"{"author":[{"index":0,"indent":0,"type":"author","payload":{"base58":"5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY","seed":"Alice","derivation_path":"//Alice","has_password":false,"name":"Alice_test_westend"}}],"method":[{"index":1,"indent":0,"type":"call","payload":{"method":"transfer_keep_alive","pallet":"Balances"}},{"index":2,"indent":1,"type":"varname","payload":"dest"},{"index":3,"indent":2,"type":"enum_variant_name","payload":"Id"},{"index":4,"indent":3,"type":"Id","payload":"5FHneW46xGXgs5mUiveU4sbTyGBzmstUspZC92UhjJM694ty"},{"index":5,"indent":1,"type":"varname","payload":"value"},{"index":6,"indent":2,"type":"balance","payload":{"amount":"100.000000000","units":"mWND"}}],"extrinsics":[{"index":7,"indent":0,"type":"era_mortal_nonce","payload":{"era":"Mortal","phase":"27","period":"64","nonce":"46"}},{"index":8,"indent":0,"type":"tip","payload":{"amount":"0","units":"pWND"}},{"index":9,"indent":0,"type":"block_hash","payload":"538a7d7a0ac17eb6dd004578cb8e238c384a10f57c999a3fa1200409cd9b3f33"},{"index":10,"indent":0,"type":"tx_spec","payload":{"network":"westend","version":"9010","tx_version":"5"}}],"action":{"type":"sign_transaction","payload":{"type":"sign_transaction","checksum":""#;
+        assert!(reply.contains(reply_known_part), "Error in action.\nReceived: {}", reply);
+        let mock_action_line = get_action_line(&reply);
         let result = handle_action(&mock_action_line, SEED_PHRASE, PWD, dbname);
         match result {
             Ok(signature) => assert!((signature.len() == 130) && (signature.starts_with("01")), "Wrong signature format,\nReceived:\n{}", signature),
@@ -62,9 +73,9 @@ mod tests {
         
         let line = fs::read_to_string("for_tests/add_network_westendV9080_unverified.txt").unwrap();
         let reply = produce_output(&line, dbname);
-        let reply_known = r##"{"warning":[{"index":0,"indent":0,"type":"warning","payload":"Received new network information is not verified."}],"new_network":[{"index":1,"indent":0,"type":"new_network","payload":{"specname":"westend","spec_version":"9080","meta_hash":"44e8d52c5af362b3279309ca7476424391902470f363fae097cd8bb620d0e6a7","base58prefix":"42","color":"#660D35","decimals":"12","genesis_hash":"e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e","logo":"westend","name":"westend","path_id":"//westend","secondary_color":"#262626","title":"Westend","unit":"WND","verifier":"none"}}],"action":{"type":"add_network","payload":{"type":"add_network","checksum":"2366800113"}}}"##;
-        assert!(reply == reply_known, "Error in action.\nReceived: {}", reply);
-        let mock_action_line = r#"{"type":"add_network","checksum":"2366800113"}"#;
+        let reply_known_part = r##"{"warning":[{"index":0,"indent":0,"type":"warning","payload":"Received new network information is not verified."}],"new_network":[{"index":1,"indent":0,"type":"new_network","payload":{"specname":"westend","spec_version":"9080","meta_hash":"44e8d52c5af362b3279309ca7476424391902470f363fae097cd8bb620d0e6a7","base58prefix":"42","color":"#660D35","decimals":"12","genesis_hash":"e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e","logo":"westend","name":"westend","path_id":"//westend","secondary_color":"#262626","title":"Westend","unit":"WND","verifier":"none"}}],"action":{"type":"add_network","payload":{"type":"add_network","checksum":""##;
+        assert!(reply.contains(reply_known_part), "Error in action.\nReceived: {}", reply);
+        let mock_action_line = get_action_line(&reply);
         let result = handle_action(&mock_action_line, SEED_PHRASE, PWD, dbname);
         if let Err(e) = result {panic!("Was unable to add network. {}", e)}
         
@@ -73,9 +84,9 @@ mod tests {
         
         let line = fs::read_to_string("for_tests/add_network_westendV9080_Alice.txt").unwrap();
         let reply = produce_output(&line, dbname);
-        let reply_known = r##"{"verifier":[{"index":0,"indent":0,"type":"verifier","payload":{"hex":"d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d","encryption":"sr25519"}}],"warning":[{"index":1,"indent":0,"type":"warning","payload":"Add network message is received for network that already has some entries in the database."},{"index":2,"indent":0,"type":"warning","payload":"Previously unverified information now received signed by a verifier. If accepted, updating types and adding networks could be verified only by this verifier."},{"index":3,"indent":0,"type":"warning","payload":"Previously unverified network metadata now received signed by a verifier. If accepted, only metadata from same verifier could be received for this network."},{"index":4,"indent":0,"type":"warning","payload":"Received metadata is already in database, both general verifier and network verifier could be added."}],"action":{"type":"add_two_verifiers","payload":{"type":"add_two_verifiers","checksum":"2634806696"}}}"##;
-        assert!(reply == reply_known, "Error in action.\nReceived: {}", reply);
-        let mock_action_line = r#"{"type":"add_two_verifiers","checksum":"2634806696"}"#;
+        let reply_known_part = r##"{"verifier":[{"index":0,"indent":0,"type":"verifier","payload":{"hex":"d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d","encryption":"sr25519"}}],"warning":[{"index":1,"indent":0,"type":"warning","payload":"Add network message is received for network that already has some entries in the database."},{"index":2,"indent":0,"type":"warning","payload":"Previously unverified information now received signed by a verifier. If accepted, updating types and adding networks could be verified only by this verifier."},{"index":3,"indent":0,"type":"warning","payload":"Previously unverified network metadata now received signed by a verifier. If accepted, only metadata from same verifier could be received for this network."},{"index":4,"indent":0,"type":"warning","payload":"Received metadata is already in database, both general verifier and network verifier could be added."}],"action":{"type":"add_two_verifiers","payload":{"type":"add_two_verifiers","checksum":""##;
+        assert!(reply.contains(reply_known_part), "Error in action.\nReceived: {}", reply);
+        let mock_action_line = get_action_line(&reply);
         let result = handle_action(&mock_action_line, SEED_PHRASE, PWD, dbname);
         if let Err(e) = result {panic!("Was unable to update two verifiers. {}", e)}
         
@@ -102,9 +113,9 @@ mod tests {
         
         let line = fs::read_to_string("for_tests/add_network_westendV9080_Alice.txt").unwrap();
         let reply = produce_output(&line, dbname);
-        let reply_known = r##"{"verifier":[{"index":0,"indent":0,"type":"verifier","payload":{"hex":"d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d","encryption":"sr25519"}}],"warning":[{"index":1,"indent":0,"type":"warning","payload":"Previously unverified information now received signed by a verifier. If accepted, updating types and adding networks could be verified only by this verifier."}],"new_network":[{"index":2,"indent":0,"type":"new_network","payload":{"specname":"westend","spec_version":"9080","meta_hash":"44e8d52c5af362b3279309ca7476424391902470f363fae097cd8bb620d0e6a7","base58prefix":"42","color":"#660D35","decimals":"12","genesis_hash":"e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e","logo":"westend","name":"westend","path_id":"//westend","secondary_color":"#262626","title":"Westend","unit":"WND","verifier":{"hex":"d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d","encryption":"sr25519"}}}],"action":{"type":"add_network_and_add_general_verifier","payload":{"type":"add_network_and_add_general_verifier","checksum":"946593945"}}}"##;
-        assert!(reply == reply_known, "Error in action.\nReceived: {}", reply);
-        let mock_action_line = r#"{"type":"add_network_and_add_general_verifier","checksum":"946593945"}"#;
+        let reply_known_part = r##"{"verifier":[{"index":0,"indent":0,"type":"verifier","payload":{"hex":"d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d","encryption":"sr25519"}}],"warning":[{"index":1,"indent":0,"type":"warning","payload":"Previously unverified information now received signed by a verifier. If accepted, updating types and adding networks could be verified only by this verifier."}],"new_network":[{"index":2,"indent":0,"type":"new_network","payload":{"specname":"westend","spec_version":"9080","meta_hash":"44e8d52c5af362b3279309ca7476424391902470f363fae097cd8bb620d0e6a7","base58prefix":"42","color":"#660D35","decimals":"12","genesis_hash":"e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e","logo":"westend","name":"westend","path_id":"//westend","secondary_color":"#262626","title":"Westend","unit":"WND","verifier":{"hex":"d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d","encryption":"sr25519"}}}],"action":{"type":"add_network_and_add_general_verifier","payload":{"type":"add_network_and_add_general_verifier","checksum":""##;
+        assert!(reply.contains(reply_known_part), "Error in action.\nReceived: {}", reply);
+        let mock_action_line = get_action_line(&reply);
         let result = handle_action(&mock_action_line, SEED_PHRASE, PWD, dbname);
         if let Err(e) = result {panic!("Was unable to add network and update general verifier. {}", e)}
         
@@ -128,7 +139,7 @@ mod tests {
         let reply = produce_output(&line, dbname);
         
         // wrong action: sign_transaction
-        let mock_action_line = r#"{"type":"sign_transaction","checksum":"2366800113"}"#;
+        let mock_action_line = get_action_line(&reply).replace("add_network", "sign_transaction");
         
         match handle_action(&mock_action_line, SEED_PHRASE, PWD, dbname) {
             Ok(_) => panic!("Should have failed. Parser reply: {}\nMock action line: {}", reply, mock_action_line),
@@ -152,7 +163,7 @@ mod tests {
         let reply = produce_output(&line, dbname);
         
         // wrong action: load_metadata
-        let mock_action_line = r#"{"type":"load_metadata","checksum":"4278348933"}"#;
+        let mock_action_line = get_action_line(&reply).replace("sign_transaction", "load_metadata");
         
         match handle_action(&mock_action_line, SEED_PHRASE, PWD, dbname) {
             Ok(_) => panic!("Should have failed. Parser reply: {}\nMock action line: {}", reply, mock_action_line),
@@ -176,7 +187,7 @@ mod tests {
         let reply = produce_output(&line, dbname);
         
         // wrong action: add_metadata_verifier
-        let mock_action_line = r#"{"type":"add_metadata_verifier","checksum":"4278348933"}"#;
+        let mock_action_line = get_action_line(&reply).replace("sign_transaction", "add_metadata_verifier");
         
         match handle_action(&mock_action_line, SEED_PHRASE, PWD, dbname) {
             Ok(_) => panic!("Should have failed. Parser reply: {}\nMock action line: {}", reply, mock_action_line),
@@ -200,7 +211,7 @@ mod tests {
         let reply = produce_output(&line, dbname);
         
         // wrong action: load_types
-        let mock_action_line = r#"{"type":"load_types","checksum":"4278348933"}"#;
+        let mock_action_line = get_action_line(&reply).replace("sign_transaction", "load_types");
         
         match handle_action(&mock_action_line, SEED_PHRASE, PWD, dbname) {
             Ok(_) => panic!("Should have failed. Parser reply: {}\nMock action line: {}", reply, mock_action_line),
@@ -224,7 +235,7 @@ mod tests {
         let reply = produce_output(&line, dbname);
         
         // wrong action: add_general_verifier
-        let mock_action_line = r#"{"type":"add_general_verifier","checksum":"4278348933"}"#;
+        let mock_action_line = get_action_line(&reply).replace("sign_transaction", "add_general_verifier");
         
         match handle_action(&mock_action_line, SEED_PHRASE, PWD, dbname) {
             Ok(_) => panic!("Should have failed. Parser reply: {}\nMock action line: {}", reply, mock_action_line),
@@ -248,7 +259,7 @@ mod tests {
         let reply = produce_output(&line, dbname);
         
         // wrong action: add_two_verifiers
-        let mock_action_line = r#"{"type":"add_two_verifiers","checksum":"4278348933"}"#;
+        let mock_action_line = get_action_line(&reply).replace("sign_transaction", "add_two_verifiers");
         
         match handle_action(&mock_action_line, SEED_PHRASE, PWD, dbname) {
             Ok(_) => panic!("Should have failed. Parser reply: {}\nMock action line: {}", reply, mock_action_line),
@@ -272,7 +283,7 @@ mod tests {
         let reply = produce_output(&line, dbname);
         
         // wrong action: load_metadata_and_add_general_verifier
-        let mock_action_line = r#"{"type":"load_metadata_and_add_general_verifier","checksum":"4278348933"}"#;
+        let mock_action_line = get_action_line(&reply).replace("sign_transaction", "load_metadata_and_add_general_verifier");
         
         match handle_action(&mock_action_line, SEED_PHRASE, PWD, dbname) {
             Ok(_) => panic!("Should have failed. Parser reply: {}\nMock action line: {}", reply, mock_action_line),
@@ -296,7 +307,7 @@ mod tests {
         let reply = produce_output(&line, dbname);
         
         // wrong action: add_network
-        let mock_action_line = r#"{"type":"add_network","checksum":"4278348933"}"#;
+        let mock_action_line = get_action_line(&reply).replace("sign_transaction", "add_network");
         
         match handle_action(&mock_action_line, SEED_PHRASE, PWD, dbname) {
             Ok(_) => panic!("Should have failed. Parser reply: {}\nMock action line: {}", reply, mock_action_line),
@@ -320,7 +331,7 @@ mod tests {
         let reply = produce_output(&line, dbname);
         
         // wrong action: add_network_and_add_general_verifier
-        let mock_action_line = r#"{"type":"add_network_and_add_general_verifier","checksum":"4278348933"}"#;
+        let mock_action_line = get_action_line(&reply).replace("sign_transaction", "add_network_and_add_general_verifier");
         
         match handle_action(&mock_action_line, SEED_PHRASE, PWD, dbname) {
             Ok(_) => panic!("Should have failed. Parser reply: {}\nMock action line: {}", reply, mock_action_line),
@@ -347,9 +358,9 @@ mod tests {
         let line = fs::read_to_string("for_tests/network_metadata_westendV9070_None.txt").unwrap();
         let reply = produce_output(&line, dbname);
         
-        let reply_known = r##"{"warning":[{"index":0,"indent":0,"type":"warning","payload":"Received network metadata is not verified."}],"meta":[{"index":1,"indent":0,"type":"meta","payload":{"specname":"westend","spec_version":"9070","meta_hash":"e281fbc53168a6b87d1ea212923811f4c083e7be7d18df4b8527b9532e5f5fec"}}],"action":{"type":"load_metadata","payload":{"type":"load_metadata","checksum":"3671328414"}}}"##;
-        assert!(reply == reply_known, "Error in action.\nReceived: {}", reply);
-        let mock_action_line = r#"{"type":"load_metadata","checksum":"3671328414"}"#;
+        let reply_known_part = r##"{"warning":[{"index":0,"indent":0,"type":"warning","payload":"Received network metadata is not verified."}],"meta":[{"index":1,"indent":0,"type":"meta","payload":{"specname":"westend","spec_version":"9070","meta_hash":"e281fbc53168a6b87d1ea212923811f4c083e7be7d18df4b8527b9532e5f5fec"}}],"action":{"type":"load_metadata","payload":{"type":"load_metadata","checksum":""##;
+        assert!(reply.contains(reply_known_part), "Error in action.\nReceived: {}", reply);
+        let mock_action_line = get_action_line(&reply);
         let result = handle_action(&mock_action_line, SEED_PHRASE, PWD, dbname);
         if let Err(e) = result {panic!("Was unable to load metadata for westend 9070 network. {}", e)}
         
@@ -362,9 +373,9 @@ mod tests {
         let line = fs::read_to_string("for_tests/network_metadata_westendV9070_Alice.txt").unwrap();
         let reply = produce_output(&line, dbname);
         
-        let reply_known = r##"{"verifier":[{"index":0,"indent":0,"type":"verifier","payload":{"hex":"d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d","encryption":"sr25519"}}],"warning":[{"index":1,"indent":0,"type":"warning","payload":"Previously unverified network metadata now received signed by a verifier. If accepted, only metadata from same verifier could be received for this network."},{"index":2,"indent":0,"type":"warning","payload":"Received metadata is already in database, only network verifier could be added."}],"action":{"type":"add_metadata_verifier","payload":{"type":"add_metadata_verifier","checksum":"3699141112"}}}"##;
-        assert!(reply == reply_known, "Error in action.\nReceived: {}", reply);
-        let mock_action_line = r#"{"type":"add_metadata_verifier","checksum":"3699141112"}"#;
+        let reply_known_part = r##"{"verifier":[{"index":0,"indent":0,"type":"verifier","payload":{"hex":"d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d","encryption":"sr25519"}}],"warning":[{"index":1,"indent":0,"type":"warning","payload":"Previously unverified network metadata now received signed by a verifier. If accepted, only metadata from same verifier could be received for this network."},{"index":2,"indent":0,"type":"warning","payload":"Received metadata is already in database, only network verifier could be added."}],"action":{"type":"add_metadata_verifier","payload":{"type":"add_metadata_verifier","checksum":""##;
+        assert!(reply.contains(reply_known_part), "Error in action.\nReceived: {}", reply);
+        let mock_action_line = get_action_line(&reply);
         let result = handle_action(&mock_action_line, SEED_PHRASE, PWD, dbname);
         if let Err(e) = result {panic!("Was unable to add verifier for westend. {}", e)}
         
@@ -387,18 +398,18 @@ mod tests {
         let line = fs::read_to_string("for_tests/updating_types_info_None.txt").unwrap();
         let reply = produce_output(&line, dbname);
         
-        let reply_known = r#"{"warning":[{"index":0,"indent":0,"type":"warning","payload":"Received types information is not verified."},{"index":1,"indent":0,"type":"warning","payload":"Updating types (really rare operation)."}],"types_info":[{"index":2,"indent":0,"type":"types_hash","payload":"d2c5b096be10229ce9ea9d219325c4399875b52ceb4264add89b0d7c5e9ad574"}],"action":{"type":"load_types","payload":{"type":"load_types","checksum":"2398652588"}}}"#;
-        assert!(reply == reply_known, "Error in action.\nReceived: {}", reply);
-        let mock_action_line = r#"{"type":"load_types","checksum":"2398652588"}"#;
+        let reply_known_part = r#"{"warning":[{"index":0,"indent":0,"type":"warning","payload":"Received types information is not verified."},{"index":1,"indent":0,"type":"warning","payload":"Updating types (really rare operation)."}],"types_info":[{"index":2,"indent":0,"type":"types_hash","payload":"d2c5b096be10229ce9ea9d219325c4399875b52ceb4264add89b0d7c5e9ad574"}],"action":{"type":"load_types","payload":{"type":"load_types","checksum":""#;
+        assert!(reply.contains(reply_known_part), "Error in action.\nReceived: {}", reply);
+        let mock_action_line = get_action_line(&reply);
         let result = handle_action(&mock_action_line, SEED_PHRASE, PWD, dbname);
         if let Err(e) = result {panic!("Was unable to load types. {}", e)}
         
         let line = fs::read_to_string("for_tests/updating_types_info_Alice.txt").unwrap();
         let reply = produce_output(&line, dbname);
         
-        let reply_known = r#"{"verifier":[{"index":0,"indent":0,"type":"verifier","payload":{"hex":"d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d","encryption":"sr25519"}}],"warning":[{"index":1,"indent":0,"type":"warning","payload":"Previously unverified information now received signed by a verifier. If accepted, updating types and adding networks could be verified only by this verifier."},{"index":2,"indent":0,"type":"warning","payload":"Received types information is already in database, only verifier could be added."}],"action":{"type":"add_general_verifier","payload":{"type":"add_general_verifier","checksum":"4104309118"}}}"#;
-        assert!(reply == reply_known, "Error in action.\nReceived: {}", reply);
-        let mock_action_line = r#"{"type":"add_general_verifier","checksum":"4104309118"}"#;
+        let reply_known_part = r#"{"verifier":[{"index":0,"indent":0,"type":"verifier","payload":{"hex":"d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d","encryption":"sr25519"}}],"warning":[{"index":1,"indent":0,"type":"warning","payload":"Previously unverified information now received signed by a verifier. If accepted, updating types and adding networks could be verified only by this verifier."},{"index":2,"indent":0,"type":"warning","payload":"Received types information is already in database, only verifier could be added."}],"action":{"type":"add_general_verifier","payload":{"type":"add_general_verifier","checksum":""#;
+        assert!(reply.contains(reply_known_part), "Error in action.\nReceived: {}", reply);
+        let mock_action_line = get_action_line(&reply);
         let result = handle_action(&mock_action_line, SEED_PHRASE, PWD, dbname);
         if let Err(e) = result {panic!("Was unable to add general verifier. {}", e)}
         
@@ -415,9 +426,9 @@ mod tests {
         let line = fs::read_to_string("for_tests/updating_types_info_Alice.txt").unwrap();
         let reply = produce_output(&line, dbname);
         
-        let reply_known = r#"{"verifier":[{"index":0,"indent":0,"type":"verifier","payload":{"hex":"d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d","encryption":"sr25519"}}],"warning":[{"index":1,"indent":0,"type":"warning","payload":"Previously unverified information now received signed by a verifier. If accepted, updating types and adding networks could be verified only by this verifier."},{"index":2,"indent":0,"type":"warning","payload":"Updating types (really rare operation)."}],"types_info":[{"index":3,"indent":0,"type":"types_hash","payload":"d2c5b096be10229ce9ea9d219325c4399875b52ceb4264add89b0d7c5e9ad574"}],"action":{"type":"load_types","payload":{"type":"load_types","checksum":"3640306069"}}}"#;
-        assert!(reply == reply_known, "Error in action.\nReceived: {}", reply);
-        let mock_action_line = r#"{"type":"load_types","checksum":"3640306069"}"#;
+        let reply_known_part = r#"{"verifier":[{"index":0,"indent":0,"type":"verifier","payload":{"hex":"d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d","encryption":"sr25519"}}],"warning":[{"index":1,"indent":0,"type":"warning","payload":"Previously unverified information now received signed by a verifier. If accepted, updating types and adding networks could be verified only by this verifier."},{"index":2,"indent":0,"type":"warning","payload":"Updating types (really rare operation)."}],"types_info":[{"index":3,"indent":0,"type":"types_hash","payload":"d2c5b096be10229ce9ea9d219325c4399875b52ceb4264add89b0d7c5e9ad574"}],"action":{"type":"load_types","payload":{"type":"load_types","checksum":""#;
+        assert!(reply.contains(reply_known_part), "Error in action.\nReceived: {}", reply);
+        let mock_action_line = get_action_line(&reply);
         let result = handle_action(&mock_action_line, SEED_PHRASE, PWD, dbname);
         if let Err(e) = result {panic!("Was unable to load types with adding general verifier. {}", e)}
 
@@ -425,9 +436,9 @@ mod tests {
         let line = fs::read_to_string("for_tests/network_metadata_westendV9070_None.txt").unwrap();
         let reply = produce_output(&line, dbname);
         
-        let reply_known = r#"{"warning":[{"index":0,"indent":0,"type":"warning","payload":"Received network metadata is not verified."}],"meta":[{"index":1,"indent":0,"type":"meta","payload":{"specname":"westend","spec_version":"9070","meta_hash":"e281fbc53168a6b87d1ea212923811f4c083e7be7d18df4b8527b9532e5f5fec"}}],"action":{"type":"load_metadata","payload":{"type":"load_metadata","checksum":"2871387243"}}}"#;
-        assert!(reply == reply_known, "Error in action.\nReceived: {}", reply);
-        let mock_action_line = r#"{"type":"load_metadata","checksum":"2871387243"}"#;
+        let reply_known_part = r#"{"warning":[{"index":0,"indent":0,"type":"warning","payload":"Received network metadata is not verified."}],"meta":[{"index":1,"indent":0,"type":"meta","payload":{"specname":"westend","spec_version":"9070","meta_hash":"e281fbc53168a6b87d1ea212923811f4c083e7be7d18df4b8527b9532e5f5fec"}}],"action":{"type":"load_metadata","payload":{"type":"load_metadata","checksum":""#;
+        assert!(reply.contains(reply_known_part), "Error in action.\nReceived: {}", reply);
+        let mock_action_line = get_action_line(&reply);
         let result = handle_action(&mock_action_line, SEED_PHRASE, PWD, dbname);
         if let Err(e) = result {panic!("Was unable to load metadata without signature after general verifier appeared. {}", e)}
         

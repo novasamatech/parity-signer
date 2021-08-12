@@ -49,6 +49,8 @@ pub enum NotDecodeable {
     Metadata,
     Version,
     NameVersioned,
+    EntryOrder,
+    Entry,
 }
 
 #[derive(PartialEq)]
@@ -92,6 +94,8 @@ impl Error {
                     NotDecodeable::Metadata => anyhow!("Version vector of metadata from the database could not be retrieved."),
                     NotDecodeable::Version => anyhow!("Version vector of metadata from the database could not be decoded."),
                     NotDecodeable::NameVersioned => anyhow!("Versioned name (the key for metadata) could not be decoded."),
+                    NotDecodeable::EntryOrder => anyhow!("History entry order (storage key) from the database could not be decoded."),
+                    NotDecodeable::Entry => anyhow!("History entry from the database could not be decoded."),
                 }
             },
             Error::GenesisHashMismatch => anyhow!("Genesis hash mismatch."),

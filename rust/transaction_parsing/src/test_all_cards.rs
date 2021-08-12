@@ -1,6 +1,6 @@
 use bitvec::prelude::{BitVec, Lsb0};
 use sled::IVec;
-use definitions::network_specs::{Verifier, ChainSpecsToSend};
+use definitions::{metadata::{MetaValuesDisplay, NetworkDisplay}, network_specs::{Verifier, ChainSpecsToSend}};
 use hex;
 use std::convert::TryInto;
 
@@ -41,7 +41,14 @@ pub fn make_all_cards() -> String {
     all_cards.push(Card::AuthorPlain("5FHneW46xGXgs5mUiveU4sbTyGBzmstUspZC92UhjJM694ty"));
     all_cards.push(Card::AuthorPublicKey(AuthorPublicKey::Sr25519([142, 175, 4, 21, 22, 135, 115, 99, 38, 201, 254, 161, 126, 37, 252, 82, 135, 97, 54, 147, 201, 18, 144, 156, 178, 38, 170, 71, 148, 242, 106, 72])));
     all_cards.push(Card::Verifier(Verifier::Sr25519(String::from("d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d")).show_card()));
-    all_cards.push(Card::Meta{specname: "westend", spec_version: 9033, meta_hash: "69300be6f9f5d14ee98294ad15c7af8d34aa6c16f94517216dc4178faadacabb"});
+    
+    let new_meta = MetaValuesDisplay {
+        name: "westend",
+        version: 9033,
+        meta_hash: "69300be6f9f5d14ee98294ad15c7af8d34aa6c16f94517216dc4178faadacabb",
+    }.show();
+    
+    all_cards.push(Card::Meta(new_meta));
     all_cards.push(Card::TypesInfo("345f53c073281fc382d20758aee06ceae3014fd53df734d3e94d54642a56dd51"));
     
     let chain_specs = ChainSpecsToSend {
@@ -56,7 +63,18 @@ pub fn make_all_cards() -> String {
         title: String::from("Westend"),
         unit: String::from("WND"),
     };
-    all_cards.push(Card::NewNetwork{specname: "westend", spec_version: 9033, meta_hash: "69300be6f9f5d14ee98294ad15c7af8d34aa6c16f94517216dc4178faadacabb", chain_specs: &chain_specs, verifier_line: Verifier::Sr25519(String::from("d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d")).show_card()});
+    
+    let new_network = (NetworkDisplay{
+        meta_values: MetaValuesDisplay {
+            name: "westend",
+            version: 9033,
+            meta_hash: "69300be6f9f5d14ee98294ad15c7af8d34aa6c16f94517216dc4178faadacabb",
+        },
+        network_specs: &chain_specs,
+        verifier_line: Verifier::Sr25519(String::from("d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d")).show_card(),
+    }).show();
+    
+    all_cards.push(Card::NewNetwork(new_network));
     
     all_cards.push(Card::Warning(Warning::AuthorNotFound));
     all_cards.push(Card::Warning(Warning::NewerVersion{used_version: 50, latest_version: 9010}));

@@ -1,6 +1,6 @@
 use hex;
 use sled::{Db, Tree, open};
-use definitions::{network_specs::{Verifier, generate_network_key}, transactions::{LoadMetaDb, UpdSpecs}, metadata::{NameVersioned, VersionDecoded}, constants::{ADDGENERALVERIFIER, ADDMETAVERIFIER, LOADMETA, METATREE, SPECSTREE, TRANSACTION}};
+use definitions::{network_specs::{Verifier, generate_network_key}, transactions::{Transaction, LoadMeta, UpdMetaVerifier, UpdGeneralVerifier}, metadata::{MetaValuesDisplay, NameVersioned, VersionDecoded}, constants::{ADDGENERALVERIFIER, ADDMETAVERIFIER, LOADMETA, METATREE, SPECSTREE, TRANSACTION}, history::Event};
 use meta_reading::decode_metadata::get_meta_const_light;
 use parity_scale_codec::{Decode, Encode};
 use blake2_rfc::blake2b::blake2b;
@@ -13,7 +13,7 @@ use super::utils::get_chainspecs;
 
 
 /// Function to check incoming metadata, and prepare info card and database entry
-pub fn process_received_metadata (meta: Vec<u8>, name: &str, index: u32, upd_network: Option<Vec<u8>>, upd_general: bool, verifier: Verifier, metadata: Tree, transaction: Tree, database: Db) -> Result<(String, String), Error> {
+pub fn process_received_metadata (meta: Vec<u8>, name: &str, history: Vec<Event>, index: u32, upd_network: Option<Vec<u8>>, upd_general: bool, verifier: Verifier, metadata: Tree, transaction: Tree, database: Db) -> Result<(String, String), Error> {
     if !meta.starts_with(&vec![109, 101, 116, 97]) {return Err(Error::BadInputData(BadInputData::NotMeta))}
     if meta[4] < 12 {return Err(Error::BadInputData(BadInputData::MetaVersionBelow12))}
     match RuntimeMetadataV12::decode(&mut &meta[5..]) {
@@ -38,16 +38,18 @@ pub fn process_received_metadata (meta: Vec<u8>, name: &str, index: u32, upd_net
                                                 match upd_network {
                                                     Some(network_key) => {
                                                         // preparing action entry
-                                                            let upd = UpdSpecs {
-                                                                network_key,
-                                                                verifier,
-                                                            };
+                                                        let mut upd_meta_verifier = UpdMetaVerifier {
+                                                            network_key,
+                                                            verifier,
+                                                            history,
+                                                        };
                                                         // selecting correct action card type
                                                         if upd_general {
                                                         // need to update both verifiers
                                                             let meta_card = Card::Warning(Warning::MetaAlreadyThereUpdBothVerifiers).card(index, 0);
+                                                            upd_meta_verifier.history.push(Event::Warning(Warning::MetaAlreadyThereUpdBothVerifiers.show()));
                                                         // making action entry into database
-                                                            match transaction.insert(ADDMETAVERIFIER, upd.encode()) {
+                                                            match transaction.insert(ADDMETAVERIFIER, Transaction::UpdMetaVerifier(upd_meta_verifier).encode()) {
                                                                 Ok(_) => (),
                                                                 Err(e) => return Err(Error::DatabaseError(DatabaseError::Internal(e))),
                                                             };
@@ -66,8 +68,9 @@ pub fn process_received_metadata (meta: Vec<u8>, name: &str, index: u32, upd_net
                                                         else {
                                                         // need to update only metadata verifier
                                                             let meta_card = Card::Warning(Warning::MetaAlreadyThereUpdMetaVerifier).card(index, 0);
+                                                            upd_meta_verifier.history.push(Event::Warning(Warning::MetaAlreadyThereUpdMetaVerifier.show()));
                                                         // making action entry into database
-                                                            match transaction.insert(ADDMETAVERIFIER, upd.encode()) {
+                                                            match transaction.insert(ADDMETAVERIFIER, Transaction::UpdMetaVerifier(upd_meta_verifier).encode()) {
                                                                 Ok(_) => (),
                                                                 Err(e) => return Err(Error::DatabaseError(DatabaseError::Internal(e))),
                                                             };
@@ -85,9 +88,15 @@ pub fn process_received_metadata (meta: Vec<u8>, name: &str, index: u32, upd_net
                                                         }
                                                     },
                                                     None => {
+                                                        // preparing action entry
+                                                        let mut upd_general_verifier = UpdGeneralVerifier {
+                                                            verifier,
+                                                            history,
+                                                        };
                                                         let meta_card = Card::Warning(Warning::MetaAlreadyThereUpdGeneralVerifier).card(index, 0);
+                                                        upd_general_verifier.history.push(Event::Warning(Warning::MetaAlreadyThereUpdGeneralVerifier.show()));
                                                         if upd_general {
-                                                            match transaction.insert(ADDGENERALVERIFIER, verifier.encode()) {
+                                                            match transaction.insert(ADDGENERALVERIFIER, Transaction::UpdGeneralVerifier(upd_general_verifier).encode()) {
                                                                 Ok(_) => (),
                                                                 Err(e) => return Err(Error::DatabaseError(DatabaseError::Internal(e))),
                                                             };
@@ -111,18 +120,24 @@ pub fn process_received_metadata (meta: Vec<u8>, name: &str, index: u32, upd_net
                                         },
                                         None => {
                                         // same versioned name NOT found
-                                            let meta_card = Card::Meta{specname: name, spec_version: y.spec_version, meta_hash: &hex::encode(blake2b(32, &[], &meta).as_bytes())}.card(index, 0);
+                                            let new_meta = MetaValuesDisplay {
+                                                name,
+                                                version: y.spec_version,
+                                                meta_hash: &hex::encode(blake2b(32, &[], &meta).as_bytes()),
+                                            }.show();
+                                            let meta_card = Card::Meta(new_meta).card(index, 0);
                                         // making action entry into database
-                                            let action_into_db = LoadMetaDb {
-                                                versioned_name: received_versioned_name.encode(),
+                                            let load_meta = Transaction::LoadMeta(LoadMeta{
+                                                versioned_name: received_versioned_name,
                                                 meta,
                                                 upd_network,
                                                 verifier,
-                                            };
+                                                history,
+                                            });
                                             let action_card = {
                                                 if upd_general {
                                                 // updating general verifier
-                                                    match transaction.insert(LOADMETA, action_into_db.encode()) {
+                                                    match transaction.insert(LOADMETA, load_meta.encode()) {
                                                         Ok(_) => (),
                                                         Err(e) => return Err(Error::DatabaseError(DatabaseError::Internal(e))),
                                                     };
@@ -139,7 +154,7 @@ pub fn process_received_metadata (meta: Vec<u8>, name: &str, index: u32, upd_net
                                                 }
                                                 else {
                                                 // NOT updating general verifier
-                                                    match transaction.insert(LOADMETA, action_into_db.encode()) {
+                                                    match transaction.insert(LOADMETA, load_meta.encode()) {
                                                         Ok(_) => (),
                                                         Err(e) => return Err(Error::DatabaseError(DatabaseError::Internal(e))),
                                                     };
@@ -214,7 +229,8 @@ pub fn load_metadata (data_hex: &str, dbname: &str) -> Result<String, Error> {
                 let index = 1;
                 let upd_network = None;
                 let upd_general = false;
-                let (meta_card, action_card) = process_received_metadata(meta, &chain_specs_found.name, index, upd_network, upd_general, verifier, metadata, transaction, database)?;
+                let history: Vec<Event> = vec![Event::Warning(Warning::NotVerified.show())];
+                let (meta_card, action_card) = process_received_metadata(meta, &chain_specs_found.name, history, index, upd_network, upd_general, verifier, metadata, transaction, database)?;
                 Ok(format!("{{\"warning\":[{}],\"meta\":[{}],{}}}", Card::Warning(Warning::NotVerified).card(0,0), meta_card, action_card))
             }
             else {return Err(Error::CryptoError(CryptoError::VerifierDisappeared))}
@@ -227,7 +243,8 @@ pub fn load_metadata (data_hex: &str, dbname: &str) -> Result<String, Error> {
                 let index = 1;
                 let upd_network = None;
                 let upd_general = false;
-                let (meta_card, action_card) = process_received_metadata(meta, &chain_specs_found.name, index, upd_network, upd_general, verifier, metadata, transaction, database)?;
+                let history: Vec<Event> = Vec::new();
+                let (meta_card, action_card) = process_received_metadata(meta, &chain_specs_found.name, history, index, upd_network, upd_general, verifier, metadata, transaction, database)?;
                 Ok(format!("{{\"verifier\":[{}],\"meta\":[{}],{}}}", verifier_card, meta_card, action_card))
             }
             else {
@@ -238,7 +255,8 @@ pub fn load_metadata (data_hex: &str, dbname: &str) -> Result<String, Error> {
                     let index = 2;
                     let upd_network = Some(network_key);
                     let upd_general = false;
-                    let (meta_card, action_card) = process_received_metadata(meta, &chain_specs_found.name, index, upd_network, upd_general, verifier, metadata, transaction, database)?;
+                    let history: Vec<Event> = vec![Event::Warning(Warning::VerifierAppeared.show())];
+                    let (meta_card, action_card) = process_received_metadata(meta, &chain_specs_found.name, history, index, upd_network, upd_general, verifier, metadata, transaction, database)?;
                     if meta_card == possible_warning {Ok(format!("{{\"verifier\":[{}],\"warning\":[{},{}],{}}}", verifier_card, warning_card, meta_card, action_card))}
                     else {Ok(format!("{{\"verifier\":[{}],\"warning\":[{}],\"meta\":[{}],{}}}", verifier_card, warning_card, meta_card, action_card))}
                 }

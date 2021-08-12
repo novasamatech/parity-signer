@@ -20,6 +20,8 @@ use identities::load_test_identities;
 pub mod helpers;
 use helpers::{open_db, drop_tree, flush_db};
 
+pub mod manage_history;
+
 pub mod prep_messages;
 
 pub mod settings;
@@ -77,7 +79,6 @@ pub fn populate_cold_no_meta (database_name: &str, testing: bool) -> anyhow::Res
 
 /// Function to re-populate "cold" database with default values, without any network information added.
 /// For tests.
-/// Flag testing = true indicates if Alice & Co test identities should be added to ADDRTREE
 
 pub fn populate_cold_no_networks (database_name: &str) -> anyhow::Result<()> {
     

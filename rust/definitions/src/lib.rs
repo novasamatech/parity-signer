@@ -2,6 +2,8 @@ pub mod constants;
 
 pub mod defaults;
 
+pub mod history;
+
 pub mod metadata;
 
 pub mod network_specs;

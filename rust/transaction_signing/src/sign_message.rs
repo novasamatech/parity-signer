@@ -1,10 +1,11 @@
 use anyhow;
 use hex;
 use sp_core::{Pair, ed25519, sr25519, ecdsa};
-use definitions::{constants::ADDRTREE, users::{AddressKey, Encryption, generate_address_key, SufficientCrypto}};
+use definitions::{constants::ADDRTREE, history::Event, metadata::{MetaValuesDisplay, VerifiedMetaValuesDisplay, NetworkDisplay}, network_specs::Verifier, types::TypesUpdate, users::{AddressKey, Encryption, generate_address_key, SufficientCrypto}};
 use parity_scale_codec::Encode;
 use std::convert::TryInto;
-use db_handling::{prep_messages::{prep_types, prep_load_metadata, prep_add_network_versioned, prep_add_network_latest}, error::NotHex, helpers::{open_db, open_tree, unhex, decode_address_details}};
+use db_handling::{prep_messages::{prep_types, prep_load_metadata, prep_add_network_versioned, prep_add_network_latest}, error::NotHex, helpers::{open_db, open_tree, unhex, decode_address_details}, manage_history::enter_events};
+use blake2_rfc::blake2b::blake2b;
 
 use crate::error::{Error, CryptoError};
 
@@ -83,7 +84,7 @@ pub fn sign_message (public_key: &str, to_sign: &Vec<u8>, database_name: &str, s
 
 
 /// Function to generate `sufficient crypto line` for given public key
-pub fn sufficient_crypto (public_key: &str, to_sign: &Vec<u8>, database_name: &str, seed_phrase: &str, pwd_entry: &str) -> anyhow::Result<String> {
+fn sufficient_crypto (public_key: &str, to_sign: &Vec<u8>, database_name: &str, seed_phrase: &str, pwd_entry: &str) -> anyhow::Result<SufficientCrypto> {
     
     let unhex_public_key = unhex(public_key, NotHex::PublicKey)?;
     let address_key = generate_address_key(&unhex_public_key);
@@ -108,12 +109,22 @@ pub fn sufficient_crypto (public_key: &str, to_sign: &Vec<u8>, database_name: &s
                 Encryption::Sr25519 => SufficientCrypto::Sr25519 {public_key: unhex_public_key.try_into().expect("just checked the length"), signature: signature.try_into().expect("just generated, the length is correct")},
                 Encryption::Ecdsa => SufficientCrypto::Ecdsa {public_key: unhex_public_key.try_into().expect("just checked the length"), signature: signature.try_into().expect("just generated, the length is correct")},
             };
-            Ok(hex::encode(sufficient_crypto.encode()))    
+            Ok(sufficient_crypto)
         },
         Ok(None) => return Err(Error::AddressDetailsNotFound.show()),
         Err(e) => return Err(Error::InternalDatabaseError(e).show()),
     }
     
+}
+
+/// Helper function to generate verifier_line from known SufficientCrypto
+fn get_verifier_line(s: &SufficientCrypto) -> String {
+    let verifier = match s {
+        &SufficientCrypto::Ed25519 {public_key, signature: _} => Verifier::Ed25519(hex::encode(public_key)),
+        &SufficientCrypto::Sr25519 {public_key, signature:_} => Verifier::Sr25519(hex::encode(public_key)),
+        &SufficientCrypto::Ecdsa {public_key, signature: _} => Verifier::Ecdsa(hex::encode(public_key)),
+    };
+    verifier.show_card()
 }
 
 /// Function to generate `sufficient crypto line` for load_types message;
@@ -124,9 +135,23 @@ pub fn sufficient_crypto (public_key: &str, to_sign: &Vec<u8>, database_name: &s
 
 pub fn sufficient_crypto_load_types (public_key: &str, database_name: &str, seed_phrase: &str, pwd_entry: &str) -> anyhow::Result<String> {
     
-    let to_sign = prep_types(database_name)?;
-    sufficient_crypto (public_key, &to_sign, database_name, seed_phrase, pwd_entry)
-    
+    let to_sign = prep_types(database_name)?; // encoded types info
+    match sufficient_crypto (public_key, &to_sign, database_name, seed_phrase, pwd_entry) {
+        Ok(s) => {
+            let types_update_show = TypesUpdate {
+                types_hash: hex::encode(blake2b(32, &[], &to_sign).as_bytes()),
+                verifier_line: get_verifier_line(&s),
+            }.show();
+            enter_events(database_name, vec![Event::SignedTypes(types_update_show)])?;
+            Ok(hex::encode(s.encode()))
+        },
+        Err(e) => {
+            if e.to_string() == Error::CryptoError(CryptoError::WrongPassword).show().to_string() {
+                enter_events(database_name, vec![Event::Error(e.to_string())])?;
+            }
+            return Err(e)
+        },
+    }
 }
 
 
@@ -138,9 +163,25 @@ pub fn sufficient_crypto_load_types (public_key: &str, database_name: &str, seed
 
 pub fn sufficient_crypto_load_metadata (network_name: &str, network_version: u32, public_key: &str, database_name: &str, seed_phrase: &str, pwd_entry: &str) -> anyhow::Result<String> {
     
-    let to_sign = prep_load_metadata(network_name, network_version, database_name)?;
-    sufficient_crypto (public_key, &to_sign, database_name, seed_phrase, pwd_entry)
-    
+    let to_sign = prep_load_metadata(network_name, network_version, database_name)?; // metadata and genesis hash concatenated
+    match sufficient_crypto (public_key, &to_sign, database_name, seed_phrase, pwd_entry) {
+        Ok(s) => {
+            let verified_meta_values_display = VerifiedMetaValuesDisplay {
+                name: &network_name,
+                version: network_version,
+                meta_hash: &hex::encode(blake2b(32, &[], &to_sign[..to_sign.len()-32]).as_bytes()),
+                verifier_line: get_verifier_line(&s),
+            }.show();
+            enter_events(database_name, vec![Event::SignedLoadMetadata(verified_meta_values_display)])?;
+            Ok(hex::encode(s.encode()))
+        },
+        Err(e) => {
+            if e.to_string() == Error::CryptoError(CryptoError::WrongPassword).show().to_string() {
+                enter_events(database_name, vec![Event::Error(e.to_string())])?;
+            }
+            return Err(e)
+        },
+    }
 }
 
 
@@ -152,9 +193,29 @@ pub fn sufficient_crypto_load_metadata (network_name: &str, network_version: u32
 
 pub fn sufficient_crypto_add_network_latest (network_name: &str, public_key: &str, database_name: &str, seed_phrase: &str, pwd_entry: &str) -> anyhow::Result<String> {
     
-    let to_sign = prep_add_network_latest(network_name, database_name)?;
-    sufficient_crypto (public_key, &to_sign, database_name, seed_phrase, pwd_entry)
-    
+    let prep_add_network = prep_add_network_latest(network_name, database_name)?;
+    let to_sign = [prep_add_network.meta.encode(), prep_add_network.network_specs.encode()].concat();
+    match sufficient_crypto (public_key, &to_sign, database_name, seed_phrase, pwd_entry) {
+        Ok(s) => {
+            let network_display = NetworkDisplay {
+                meta_values: MetaValuesDisplay {
+                    name: &network_name,
+                    version: prep_add_network.version,
+                    meta_hash: &hex::encode(blake2b(32, &[], &prep_add_network.meta).as_bytes()),
+                },
+                network_specs: &prep_add_network.network_specs,
+                verifier_line: get_verifier_line(&s),
+            }.show();
+            enter_events(database_name, vec![Event::SignedAddNetwork(network_display)])?;
+            Ok(hex::encode(s.encode()))
+        },
+        Err(e) => {
+            if e.to_string() == Error::CryptoError(CryptoError::WrongPassword).show().to_string() {
+                enter_events(database_name, vec![Event::Error(e.to_string())])?;
+            }
+            return Err(e)
+        },
+    }
 }
 
 
@@ -166,7 +227,29 @@ pub fn sufficient_crypto_add_network_latest (network_name: &str, public_key: &st
 
 pub fn sufficient_crypto_add_network_versioned (network_name: &str, network_version: u32, public_key: &str, database_name: &str, seed_phrase: &str, pwd_entry: &str) -> anyhow::Result<String> {
     
-    let to_sign = prep_add_network_versioned(network_name, network_version, database_name)?;
-    sufficient_crypto (public_key, &to_sign, database_name, seed_phrase, pwd_entry)
+    let prep_add_network = prep_add_network_versioned(network_name, network_version, database_name)?;
+    let to_sign = [prep_add_network.meta.encode(), prep_add_network.network_specs.encode()].concat();
+    
+    match sufficient_crypto (public_key, &to_sign, database_name, seed_phrase, pwd_entry) {
+        Ok(s) => {
+            let network_display = NetworkDisplay {
+                meta_values: MetaValuesDisplay {
+                    name: &network_name,
+                    version: network_version,
+                    meta_hash: &hex::encode(blake2b(32, &[], &prep_add_network.meta).as_bytes()),
+                },
+                network_specs: &prep_add_network.network_specs,
+                verifier_line: get_verifier_line(&s),
+            }.show();
+            enter_events(database_name, vec![Event::SignedAddNetwork(network_display)])?;
+            Ok(hex::encode(s.encode()))
+        },
+        Err(e) => {
+            if e.to_string() == Error::CryptoError(CryptoError::WrongPassword).show().to_string() {
+                enter_events(database_name, vec![Event::Error(e.to_string())])?;
+            }
+            return Err(e)
+        },
+    }
     
 }

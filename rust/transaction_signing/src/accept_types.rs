@@ -1,7 +1,8 @@
 use anyhow;
-use definitions::{constants::{ADDGENERALVERIFIER, LOADTYPES, SETTREE, TRANSACTION, TYPES, GENERALVERIFIER}, network_specs::Verifier, transactions::LoadTypesDb};
+use definitions::{constants::{ADDGENERALVERIFIER, HISTORY, LOADTYPES, SETTREE, TRANSACTION, TYPES, GENERALVERIFIER}, history::Event, transactions::Transaction, types::TypesUpdate};
 use parity_scale_codec::{Decode, Encode};
-use db_handling::helpers::{open_db, open_tree, flush_db, insert_into_tree};
+use db_handling::{helpers::{open_db, open_tree, flush_db, insert_into_tree}, manage_history::enter_events_into_tree};
+use blake2_rfc::blake2b::blake2b;
 
 use crate::error::{Error, ActionFailure};
 use crate::helpers::verify_checksum;
@@ -13,10 +14,12 @@ pub fn accept_types (database_name: &str, checksum: u32) -> anyhow::Result<Strin
     verify_checksum(&database, checksum)?;
     let settings = open_tree(&database, SETTREE)?;
     let transaction = open_tree(&database, TRANSACTION)?;
+    let history = open_tree(&database, HISTORY)?;
     
     let action = match transaction.remove(LOADTYPES) {
-        Ok(Some(encoded_load_types)) => match <LoadTypesDb>::decode(&mut &encoded_load_types[..]) {
-            Ok(x) => x,
+        Ok(Some(encoded_action)) => match <Transaction>::decode(&mut &encoded_action[..]) {
+            Ok(Transaction::LoadTypes(x)) => x,
+            Ok(_) => return Err(Error::NoAction(ActionFailure::LoadTypes).show()),
             Err(_) => return Err(Error::BadActionDecode(ActionFailure::LoadTypes).show()),
         },
         Ok(None) => return Err(Error::NoAction(ActionFailure::LoadTypes).show()),
@@ -24,13 +27,24 @@ pub fn accept_types (database_name: &str, checksum: u32) -> anyhow::Result<Strin
     };
     flush_db(&database)?;
     
-    insert_into_tree(TYPES.to_vec(), action.types_info_encoded, &settings)?;
+    let mut events = action.history;
+    let types_update_print = TypesUpdate {
+        types_hash: hex::encode(blake2b(32, &[], &action.types_info.encode()).as_bytes()),
+        verifier_line: action.verifier.show_card(),
+    }.show();
+    events.push(Event::TypesInfoUpdated(types_update_print));
+    
+    insert_into_tree(TYPES.to_vec(), action.types_info.encode(), &settings)?;
     flush_db(&database)?;
     
-    if let Some(new_verifier) = action.upd_verifier {
-        insert_into_tree(GENERALVERIFIER.to_vec(), new_verifier.encode(), &settings)?;
+    if action.upd_verifier {
+        events.push(Event::GeneralVerifierAdded(action.verifier.show_card()));
+        insert_into_tree(GENERALVERIFIER.to_vec(), action.verifier.encode(), &settings)?;
         flush_db(&database)?;
     }
+    
+    enter_events_into_tree(&history, events)?;
+    flush_db(&database)?;
     
     Ok(String::from("Types information successfully loaded."))
 }
@@ -42,10 +56,12 @@ pub fn add_general_verifier (database_name: &str, checksum: u32) -> anyhow::Resu
     verify_checksum(&database, checksum)?;
     let settings = open_tree(&database, SETTREE)?;
     let transaction = open_tree(&database, TRANSACTION)?;
+    let history = open_tree(&database, HISTORY)?;
     
-    let new_verifier_encoded = match transaction.remove(ADDGENERALVERIFIER) {
-        Ok(Some(x)) => match <Verifier>::decode(&mut &x[..]) {
-            Ok(_) => x,
+    let action = match transaction.remove(ADDGENERALVERIFIER) {
+        Ok(Some(encoded_action)) => match <Transaction>::decode(&mut &encoded_action[..]) {
+            Ok(Transaction::UpdGeneralVerifier(x)) => x,
+            Ok(_) => return Err(Error::NoAction(ActionFailure::AddGeneralVerifier).show()),
             Err(_) => return Err(Error::BadActionDecode(ActionFailure::AddGeneralVerifier).show()),
         },
         Ok(None) => return Err(Error::NoAction(ActionFailure::AddGeneralVerifier).show()),
@@ -53,8 +69,14 @@ pub fn add_general_verifier (database_name: &str, checksum: u32) -> anyhow::Resu
     };
     flush_db(&database)?;
     
-    insert_into_tree(GENERALVERIFIER.to_vec(), new_verifier_encoded.to_vec(), &settings)?;
+    let mut events = action.history;
+    events.push(Event::GeneralVerifierAdded(action.verifier.show_card()));
+    
+    insert_into_tree(GENERALVERIFIER.to_vec(), action.verifier.encode(), &settings)?;
     flush_db(&database)?;
     
-    Ok(String::from("Types verifier successfully updated."))
+    enter_events_into_tree(&history, events)?;
+    flush_db(&database)?;
+    
+    Ok(String::from("General verifier successfully updated."))
 }

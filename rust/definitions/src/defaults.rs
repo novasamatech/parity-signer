@@ -5,9 +5,9 @@ use regex::Regex;
 use lazy_static::lazy_static;
 
 
-use super::network_specs::{ChainSpecs, ChainSpecsToSend, Verifier};
-use super::types::{TypeEntry, Description, EnumVariant, EnumVariantType, StructField};
-use super::metadata::{AddressBookEntry};
+use crate::network_specs::{ChainSpecs, ChainSpecsToSend, Verifier};
+use crate::types::{TypeEntry, Description, EnumVariant, EnumVariantType, StructField};
+use crate::metadata::{AddressBookEntry};
 
 pub fn get_default_chainspecs() -> Vec<ChainSpecs> {
     vec![

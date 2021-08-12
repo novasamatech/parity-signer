@@ -17,3 +17,4 @@ transaction_parsing = {path = "../transaction_parsing"}
 sled = "0.34.6"
 parity-scale-codec = "2.1.1"
 anyhow = "1.0.42"
+blake2-rfc = "0.2.18"

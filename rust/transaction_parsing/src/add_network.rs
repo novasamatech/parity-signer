@@ -1,6 +1,6 @@
 use hex;
 use sled::{Db, Tree, open};
-use definitions::{constants::{ADDNETWORK, METATREE, SETTREE, SPECSTREE, TRANSACTION}, metadata::{NameVersioned, VersionDecoded}, network_specs::{ChainSpecsToSend, Verifier, generate_network_key}, transactions::{AddNetworkDb}};
+use definitions::{constants::{ADDNETWORK, METATREE, SETTREE, SPECSTREE, TRANSACTION}, history::Event, metadata::{MetaValuesDisplay, NameVersioned, NetworkDisplay, VersionDecoded}, network_specs::{ChainSpecsToSend, Verifier, generate_network_key}, transactions::{Transaction, AddNetwork}};
 use meta_reading::decode_metadata::{get_meta_const_light};
 use parity_scale_codec::{Decode, Encode};
 use blake2_rfc::blake2b::blake2b;
@@ -75,10 +75,11 @@ pub fn add_network (data_hex: &str, dbname: &str) -> Result<String, Error> {
                         // "only verifier" warning is not possible
                             let warning_card_1 = Card::Warning(Warning::NotVerified).card(0,0);
                             let warning_card_2 = Card::Warning(Warning::NetworkAlreadyHasEntries).card(1,0);
+                            let history = vec![Event::Warning(Warning::NotVerified.show()), Event::Warning(Warning::NetworkAlreadyHasEntries.show())];
                             let index = 2;
                             let upd_network = None;
                             let upd_general = false;
-                            let (meta_card, action_card) = process_received_metadata(new_meta_vec, &new_chain_specs.name, index, upd_network, upd_general, verifier, metadata, transaction, database)?;
+                            let (meta_card, action_card) = process_received_metadata(new_meta_vec, &new_chain_specs.name, history, index, upd_network, upd_general, verifier, metadata, transaction, database)?;
                             Ok(format!("{{\"warning\":[{},{}],\"meta\":[{}],{}}}", warning_card_1, warning_card_2, meta_card, action_card))
                         }
                         else {return Err(Error::CryptoError(CryptoError::NetworkExistsVerifierDisappeared))}
@@ -94,10 +95,11 @@ pub fn add_network (data_hex: &str, dbname: &str) -> Result<String, Error> {
                         // action appears only if the metadata is actually uploaded
                         // "only verifier" warning is not possible
                             let warning_card_1 = Card::Warning(Warning::NetworkAlreadyHasEntries).card(1,0);
+                            let history = vec![Event::Warning(Warning::NetworkAlreadyHasEntries.show())];
                             let index = 2;
                             let upd_network = None;
                             let upd_general = false;
-                            let (meta_card, action_card) = process_received_metadata(new_meta_vec, &new_chain_specs.name, index, upd_network, upd_general, verifier, metadata, transaction, database)?;
+                            let (meta_card, action_card) = process_received_metadata(new_meta_vec, &new_chain_specs.name, history, index, upd_network, upd_general, verifier, metadata, transaction, database)?;
                             Ok(format!("{{\"verifier\":[{}],\"warning\":[{}],\"meta\":[{}],{}}}", verifier_card, warning_card_1, meta_card, action_card))
                         }
                         else {
@@ -106,10 +108,11 @@ pub fn add_network (data_hex: &str, dbname: &str) -> Result<String, Error> {
                                 let warning_card_1 = Card::Warning(Warning::NetworkAlreadyHasEntries).card(1,0);
                                 let warning_card_2 = Card::Warning(Warning::VerifierAppeared).card(2,0);
                                 let possible_warning = Card::Warning(Warning::MetaAlreadyThereUpdMetaVerifier).card(3, 0);
+                                let history = vec![Event::Warning(Warning::NetworkAlreadyHasEntries.show()), Event::Warning(Warning::VerifierAppeared.show())];
                                 let index = 3;
                                 let upd_network = Some(new_network_key);
                                 let upd_general = false;
-                                let (meta_card, action_card) = process_received_metadata(new_meta_vec, &new_chain_specs.name, index, upd_network, upd_general, verifier, metadata, transaction, database)?;
+                                let (meta_card, action_card) = process_received_metadata(new_meta_vec, &new_chain_specs.name, history, index, upd_network, upd_general, verifier, metadata, transaction, database)?;
                                 if meta_card == possible_warning {Ok(format!("{{\"verifier\":[{}],\"warning\":[{},{},{}],{}}}", verifier_card, warning_card_1, warning_card_2, meta_card, action_card))}
                                 else {Ok(format!("{{\"verifier\":[{}],\"warning\":[{},{}],\"meta\":[{}],{}}}", verifier_card, warning_card_1, warning_card_2, meta_card, action_card))}
                             }
@@ -123,10 +126,11 @@ pub fn add_network (data_hex: &str, dbname: &str) -> Result<String, Error> {
                                 let warning_card_1 = Card::Warning(Warning::NetworkAlreadyHasEntries).card(1,0);
                                 let warning_card_2 = Card::Warning(Warning::GeneralVerifierAppeared).card(2,0);
                                 let possible_warning = Card::Warning(Warning::MetaAlreadyThereUpdGeneralVerifier).card(3, 0);
+                                let history = vec![Event::Warning(Warning::NetworkAlreadyHasEntries.show()), Event::Warning(Warning::GeneralVerifierAppeared.show())];
                                 let index = 3;
                                 let upd_network = None;
                                 let upd_general = true;
-                                let (meta_card, action_card) = process_received_metadata(new_meta_vec, &new_chain_specs.name, index, upd_network, upd_general, verifier, metadata, transaction, database)?;
+                                let (meta_card, action_card) = process_received_metadata(new_meta_vec, &new_chain_specs.name, history, index, upd_network, upd_general, verifier, metadata, transaction, database)?;
                                 if meta_card == possible_warning {Ok(format!("{{\"verifier\":[{}],\"warning\":[{},{},{}],{}}}", verifier_card, warning_card_1, warning_card_2, meta_card, action_card))}
                                 else {Ok(format!("{{\"verifier\":[{}],\"warning\":[{},{}],\"meta\":[{}],{}}}", verifier_card, warning_card_1, warning_card_2, meta_card, action_card))}
                             }
@@ -136,11 +140,12 @@ pub fn add_network (data_hex: &str, dbname: &str) -> Result<String, Error> {
                                     let warning_card_1 = Card::Warning(Warning::NetworkAlreadyHasEntries).card(1,0);
                                     let warning_card_2 = Card::Warning(Warning::GeneralVerifierAppeared).card(2,0);
                                     let warning_card_3 = Card::Warning(Warning::VerifierAppeared).card(3,0);
+                                    let history = vec![Event::Warning(Warning::NetworkAlreadyHasEntries.show()), Event::Warning(Warning::GeneralVerifierAppeared.show()), Event::Warning(Warning::VerifierAppeared.show())];
                                     let possible_warning = Card::Warning(Warning::MetaAlreadyThereUpdBothVerifiers).card(4, 0);
                                     let index = 4;
                                     let upd_network = Some(new_network_key);
                                     let upd_general = true;
-                                    let (meta_card, action_card) = process_received_metadata(new_meta_vec, &new_chain_specs.name, index, upd_network, upd_general, verifier, metadata, transaction, database)?;
+                                    let (meta_card, action_card) = process_received_metadata(new_meta_vec, &new_chain_specs.name, history, index, upd_network, upd_general, verifier, metadata, transaction, database)?;
                                     if meta_card == possible_warning {Ok(format!("{{\"verifier\":[{}],\"warning\":[{},{},{},{}],{}}}", verifier_card, warning_card_1, warning_card_2, warning_card_3, meta_card, action_card))}
                                     else {Ok(format!("{{\"verifier\":[{}],\"warning\":[{},{},{}],\"meta\":[{}],{}}}", verifier_card, warning_card_1, warning_card_2, warning_card_3, meta_card, action_card))}
                                     }
@@ -166,9 +171,10 @@ pub fn add_network (data_hex: &str, dbname: &str) -> Result<String, Error> {
                 Verifier::None => {
                     if current_verifier == Verifier::None {
                         let warning_card = Card::Warning(Warning::AddNetworkNotVerified).card(0,0);
+                        let history = vec![Event::Warning(Warning::AddNetworkNotVerified.show())];
                         let index = 1;
                         let upd = false;
-                        let (new_network_card, action_card) = process_received_network_info (new_meta_vec, new_chain_specs, index, verifier, upd, transaction, database)?;
+                        let (new_network_card, action_card) = process_received_network_info (new_meta_vec, new_chain_specs, history, index, verifier, upd, transaction, database)?;
                         Ok(format!("{{\"warning\":[{}],\"new_network\":[{}],{}}}", warning_card, new_network_card, action_card))
                     }
                     else {return Err(Error::CryptoError(CryptoError::GeneralVerifierDisappeared))}
@@ -176,17 +182,19 @@ pub fn add_network (data_hex: &str, dbname: &str) -> Result<String, Error> {
                 _ => {
                     let verifier_card = Card::Verifier(verifier.show_card()).card(0,0);
                     if current_verifier == verifier {
+                        let history: Vec<Event> = Vec::new();
                         let index = 1;
                         let upd = false;
-                        let (new_network_card, action_card) = process_received_network_info (new_meta_vec, new_chain_specs, index, verifier, upd, transaction, database)?;
+                        let (new_network_card, action_card) = process_received_network_info (new_meta_vec, new_chain_specs, history, index, verifier, upd, transaction, database)?;
                         Ok(format!("{{\"verifier\":[{}],\"new_network\":[{}],{}}}", verifier_card, new_network_card, action_card))
                     }
                     else {
                         if current_verifier == Verifier::None {
                             let warning_card = Card::Warning(Warning::GeneralVerifierAppeared).card(1,0);
+                            let history = vec![Event::Warning(Warning::GeneralVerifierAppeared.show())];
                             let index = 2;
                             let upd = true;
-                            let (new_network_card, action_card) = process_received_network_info (new_meta_vec, new_chain_specs, index, verifier, upd, transaction, database)?;
+                            let (new_network_card, action_card) = process_received_network_info (new_meta_vec, new_chain_specs, history, index, verifier, upd, transaction, database)?;
                             Ok(format!("{{\"verifier\":[{}],\"warning\":[{}],\"new_network\":[{}],{}}}", verifier_card, warning_card, new_network_card, action_card))
                         }
                         else {return Err(Error::CryptoError(CryptoError::GeneralVerifierChanged{old_show: current_verifier.show_error(), new_show: verifier.show_error()}))}
@@ -203,7 +211,7 @@ pub fn add_network (data_hex: &str, dbname: &str) -> Result<String, Error> {
 }
 
 
-fn process_received_network_info (meta: Vec<u8>, new_chain_specs: ChainSpecsToSend, index: u32, verifier: Verifier, upd: bool, transaction: Tree, database: Db) -> Result<(String, String), Error> {
+fn process_received_network_info (meta: Vec<u8>, new_chain_specs: ChainSpecsToSend, history: Vec<Event>, index: u32, verifier: Verifier, upd: bool, transaction: Tree, database: Db) -> Result<(String, String), Error> {
     if !meta.starts_with(&vec![109, 101, 116, 97]) {return Err(Error::BadInputData(BadInputData::NotMeta))}
     if meta[4] < 12 {return Err(Error::BadInputData(BadInputData::MetaVersionBelow12))}
     match RuntimeMetadataV12::decode(&mut &meta[5..]) {
@@ -214,18 +222,29 @@ fn process_received_network_info (meta: Vec<u8>, new_chain_specs: ChainSpecsToSe
                         Ok(y) => {
                             if y.specname != new_chain_specs.name {return Err(Error::BadInputData(BadInputData::MetaMismatch))}
                             
-                            let new_network_card = Card::NewNetwork{specname: &y.specname, spec_version: y.spec_version, meta_hash: &hex::encode(blake2b(32, &[], &meta).as_bytes()), chain_specs: &new_chain_specs, verifier_line: verifier.show_card()}.card(index, 0);
+                            let new_network = (NetworkDisplay{
+                                meta_values: MetaValuesDisplay {
+                                    name: &y.specname,
+                                    version: y.spec_version,
+                                    meta_hash: &hex::encode(blake2b(32, &[], &meta).as_bytes()),
+                                },
+                                network_specs: &new_chain_specs,
+                                verifier_line: verifier.show_card(),
+                            }).show();
+                            
+                            let new_network_card = Card::NewNetwork(new_network).card(index, 0);
                             
                             let received_versioned_name = NameVersioned {
                                 name: y.specname.to_string(),
                                 version: y.spec_version,
                             };
-                            let add_network = AddNetworkDb {
-                                versioned_name: received_versioned_name.encode(),
+                            let add_network = Transaction::AddNetwork(AddNetwork{
+                                versioned_name: received_versioned_name,
                                 meta,
                                 chainspecs: new_chain_specs,
                                 verifier,
-                            };
+                                history,
+                            });
                             match transaction.insert(ADDNETWORK, add_network.encode()) {
                                 Ok(_) => (),
                                 Err(e) => return Err(Error::DatabaseError(DatabaseError::Internal(e))),

@@ -1,6 +1,7 @@
+use parity_scale_codec_derive::{Decode, Encode};
 
 //TODO: rename fields to make them more clear
-#[derive(parity_scale_codec_derive::Decode, parity_scale_codec_derive::Encode, PartialEq, Debug)]
+#[derive(Decode, Encode, PartialEq, Debug)]
 pub struct ChainSpecs {
     pub base58prefix: u16,
     pub color: String,
@@ -18,7 +19,7 @@ pub struct ChainSpecs {
 }
 
 
-#[derive(parity_scale_codec_derive::Decode, parity_scale_codec_derive::Encode, PartialEq, Debug)]
+#[derive(Decode, Encode, PartialEq, Debug)]
 pub struct ChainSpecsToSend {
     pub base58prefix: u16,
     pub color: String,
@@ -32,8 +33,19 @@ pub struct ChainSpecsToSend {
     pub unit: String,
 }
 
+impl ChainSpecs {
+    pub fn show(&self) -> String {
+        format!("\"base58prefix\":\"{}\",\"color\":\"{}\",\"decimals\":\"{}\",\"genesis_hash\":\"{}\",\"logo\":\"{}\",\"name\":\"{}\",\"order\":\"{}\",\"path_id\":\"{}\",\"secondary_color\":\"{}\",\"title\":\"{}\",\"unit\":\"{}\",\"verifier\":{}", &self.base58prefix, &self.color, &self.decimals, hex::encode(&self.genesis_hash), &self.logo, &self.name, &self.order, &self.path_id, &self.secondary_color, &self.title, &self.unit, &self.verifier.show_card())
+    }
+}
 
-#[derive(Debug, parity_scale_codec_derive::Encode, parity_scale_codec_derive::Decode)]
+impl ChainSpecsToSend {
+    pub fn show(&self) -> String {
+        format!("\"base58prefix\":\"{}\",\"color\":\"{}\",\"decimals\":\"{}\",\"genesis_hash\":\"{}\",\"logo\":\"{}\",\"name\":\"{}\",\"path_id\":\"{}\",\"secondary_color\":\"{}\",\"title\":\"{}\",\"unit\":\"{}\"", &self.base58prefix, &self.color, &self.decimals, hex::encode(&self.genesis_hash), &self.logo, &self.name, &self.path_id, &self.secondary_color, &self.title, &self.unit)
+    }
+}
+
+#[derive(Debug, Decode, Encode)]
 pub struct ChainProperties {
     pub base58prefix: u16,
     pub decimals: u8,
@@ -42,7 +54,7 @@ pub struct ChainProperties {
 
 /// Verifier for both network metadata and for types information,
 /// String is hexadecimal representation of verifier public key
-#[derive(parity_scale_codec_derive::Decode, parity_scale_codec_derive::Encode, PartialEq, Debug)]
+#[derive(Decode, Encode, PartialEq, Debug)]
 pub enum Verifier {
     Ed25519(String),
     Sr25519(String),
@@ -66,6 +78,18 @@ impl Verifier {
             Verifier::Ecdsa(x) => format!("public key: {}, encryption: ecdsa", x),
             Verifier::None => String::from("none"),
         }
+    }
+}
+
+/// Struct to store verifier info for particular network, used in history logging
+pub struct NetworkVerifier <'a> {
+    pub network_key: &'a str,
+    pub verifier_line: String,
+}
+
+impl <'a> NetworkVerifier <'a> {
+    pub fn show(&self) -> String {
+        format!("\"specname\":\"{}\",\"verifier\":{}", &self.network_key, &self.verifier_line)
     }
 }
 

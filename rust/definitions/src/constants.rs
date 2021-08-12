@@ -15,6 +15,7 @@ pub const METATREE: &[u8] = b"metadata";
 pub const ADDRTREE: &[u8] = b"addresses";
 pub const SETTREE: &[u8] = b"settings";
 pub const TRANSACTION: &[u8] = b"transaction";
+pub const HISTORY: &[u8] = b"history";
 
 /// Key names used for settings tree:  
 pub const TYPES: &[u8] = b"types";
