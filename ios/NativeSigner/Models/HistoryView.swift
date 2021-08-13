@@ -46,7 +46,11 @@ struct HistoryView: View {
                         .foregroundColor(Color("AccentColor"))
                 }
             }
-        }.padding(.bottom, 120)
+        }
+        .onAppear {
+            data.getHistory()
+        }
+        .padding(.bottom, 120)
     }
 }
 

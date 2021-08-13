@@ -12,14 +12,15 @@ struct HistoryExpanded: View {
     var body: some View {
         VStack {
             Text(history.timestamp)
-            Text(String(history.events.count))
-            VStack {
+                .multilineTextAlignment(.leading)
+            VStack(alignment: .trailing) {
                 ForEach(history.events, id: \.self) {event in
-                    Text(String(reflecting: event))
+                    HistoryCard(event: event)
                 }
             }
         }
         .foregroundColor(/*@START_MENU_TOKEN@*/Color("textMainColor")/*@END_MENU_TOKEN@*/)
+        .padding()
     }
 }
 

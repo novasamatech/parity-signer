@@ -192,7 +192,7 @@ extension SignerDataModel {
         self.fetchKeys()
     }
     
-    func getSeed(seedName: String) -> String {
+    func getSeed(seedName: String, backup: Bool = false) -> String {
         var err = ExternError()
         let err_ptr: UnsafeMutablePointer<ExternError> = UnsafeMutablePointer(&err)
         var item: CFTypeRef?
@@ -204,7 +204,11 @@ extension SignerDataModel {
         ]
         let status = SecItemCopyMatching(query as CFDictionary, &item)
         if status == errSecSuccess {
-            seeds_were_accessed(err_ptr, self.dbName)
+            if backup {
+                seeds_were_shown(err_ptr, self.dbName)
+            } else {
+                seeds_were_accessed(err_ptr, self.dbName)
+            }
             if err_ptr.pointee.code == 0 {
                 return String(data: (item as! CFData) as Data, encoding: .utf8) ?? ""
             } else {
@@ -228,6 +232,7 @@ extension SignerDataModel {
 
 extension SignerDataModel {
     func onboard() {
+        self.wipe()
         var err = ExternError()
         let err_ptr: UnsafeMutablePointer<ExternError> = UnsafeMutablePointer(&err)
         do {
@@ -253,7 +258,9 @@ extension SignerDataModel {
     
     func wipe() {
         do {
-            try FileManager.default.removeItem(atPath: self.dbName)
+            var destination = try FileManager.default.url(for: .documentDirectory, in: .userDomainMask, appropriateFor: nil, create: false)
+            destination.appendPathComponent("Database")
+            try FileManager.default.removeItem(at: destination)
         } catch {
             print("FileManager failed to delete db")
             return

@@ -23,8 +23,9 @@ struct NavbarShield: View {
     }
 }
 
+/*
 struct NavbarShield_Previews: PreviewProvider {
     static var previews: some View {
         NavbarShield().previewLayout(.sizeThatFits)
     }
-}
+}*/

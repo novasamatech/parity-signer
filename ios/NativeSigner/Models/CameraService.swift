@@ -188,6 +188,8 @@ public class CameraService: UIViewController, AVCaptureVideoDataOutputSampleBuff
 
         if let result = detectionRequests[0].results as? [VNBarcodeObservation] {
             if result.count != 0 {
+                //uncomment to see how fast qr reader goes brrr
+                //print(String(reflecting: result))
                 if result.count>1 {
                     print("lagging!")
                     print(result.count)

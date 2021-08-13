@@ -10,6 +10,8 @@ import SwiftUI
 struct SeedManager: View {
     @EnvironmentObject var data: SignerDataModel
     @Binding var showSeedManager: Bool
+    @State var showBackup = false
+    @State var seedPhrase = ""
     var body: some View {
         ZStack {
             RoundedRectangle(cornerRadius: 50).foregroundColor(/*@START_MENU_TOKEN@*/Color("backgroundCard")/*@END_MENU_TOKEN@*/)
@@ -36,11 +38,27 @@ struct SeedManager: View {
                                             .foregroundColor(Color("AccentColor"))
                                     }
                                     Spacer()
-                                    Button(action:{}) {
+                                    Button(action:{
+                                        seedPhrase = data.getSeed(seedName: data.selectedSeed, backup: true)
+                                        showBackup = !seedPhrase.isEmpty
+                                    }) {
                                         Text("Backup")
                                             .font(.largeTitle)
                                             .foregroundColor(Color("AccentColor"))
                                     }
+                                    .alert(isPresented: $showBackup, content: {
+                                        Alert(
+                                            title: Text("Backup your seed phrase"),
+                                            message: Text(seedPhrase),
+                                            dismissButton: .default(
+                                                Text("Done"),
+                                                action: {
+                                                    seedPhrase = ""
+                                                    showBackup = false
+                                                }
+                                            )
+                                        )
+                                    })
                                 }
                             } else {
                                 Button(action: {
@@ -63,7 +81,11 @@ struct SeedManager: View {
                         .foregroundColor(Color("AccentColor"))
                 }
             }
-        }.padding(.bottom, 100)
+        }
+        .onDisappear {
+            seedPhrase = ""
+        }
+        .padding(.bottom, 100)
     }
 }
 

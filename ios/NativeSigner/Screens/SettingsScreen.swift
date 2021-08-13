@@ -104,7 +104,7 @@ struct SettingsScreen: View {
                 Footer(caller: "Settings")
             }
         }
-        .navigationTitle("Manage identities").navigationBarTitleDisplayMode(.inline).toolbar {
+        .navigationTitle("Settings").navigationBarTitleDisplayMode(.inline).toolbar {
             ToolbarItem(placement: .navigationBarTrailing) {
                 NavbarShield()
             }

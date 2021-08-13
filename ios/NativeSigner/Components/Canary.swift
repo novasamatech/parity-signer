@@ -21,6 +21,8 @@ class Canary: ObservableObject {
                 }
             } else {
                 DispatchQueue.main.async {
+                    let dbName = NSHomeDirectory() + "/Documents/Database"
+                    device_was_online(nil, dbName)
                     self.dead = true
                 }
             }

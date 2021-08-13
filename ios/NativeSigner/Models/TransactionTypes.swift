@@ -8,7 +8,6 @@
 import Foundation
 
 //all cards must match Rust code!
-//TODO: remove unknown fallback
 enum Card {
     case author(Author)
     case authorPlain(AuthorPlain)
@@ -35,9 +34,8 @@ enum Card {
     case txSpecPlain(TxSpecPlain)
     case typesInfo(String)
     case varName(String)
-    case verifier(String)
+    case verifier(Verifier)
     case warning(String)
-    case unknown(String) // this should never be actually present; consider removing in production
 }
 
 struct Author: Decodable {
@@ -80,13 +78,13 @@ struct EraMortalNonce: Decodable {
     var nonce: String
 }
 
-struct MetaSpecs: Decodable {
+struct MetaSpecs: Decodable, Hashable {
     var specname: String
     var spec_version: String
     var meta_hash: String
 }
 
-struct NewNetwork: Decodable {
+struct NewNetwork: Decodable, Hashable {
     var specname: String
     var spec_version: String
     var meta_hash: String
@@ -100,7 +98,7 @@ struct NewNetwork: Decodable {
     var secondary_colod: String
     var title: String
     var unit: String
-    var verifier: String
+    var verifier: Verifier
 }
 
 struct Tip: Decodable {
@@ -118,6 +116,11 @@ struct TxSpecPlain: Decodable {
     var network_genesis_hash: String
     var version: String
     var tx_version: String
+}
+
+struct Verifier: Decodable, Hashable {
+    var hex: String
+    var encryption: String
 }
 
 struct TransactionCard: Decodable {
@@ -162,11 +165,25 @@ struct TransactionCard: Decodable {
         case "era_immortal_nonce":
             card = .eraImmortalNonce(try values.decode(EraImmortalNonce.self, forKey: .payload))
             return
+        case "meta":
+            card = .meta(try values.decode(MetaSpecs.self, forKey: .payload))
+            return
+        case "new_network":
+            card = .newNetwork(try values.decode(NewNetwork.self, forKey: .payload))
+            return
+        case "none":
+            card = .none
         case "tip":
             card = .tip(try values.decode(Currency.self, forKey: .payload))
             return
         case "tx_spec":
             card = .txSpec(try values.decode(TxSpec.self, forKey: .payload))
+            return
+        case "tx_spec_plain":
+            card = .txSpecPlain(try values.decode(TxSpecPlain.self, forKey: .payload))
+            return
+        case "verifier":
+            card = .verifier(try values.decode(Verifier.self, forKey: .payload))
             return
         default:
             content = try values.decode(String.self, forKey: .payload)
@@ -174,14 +191,26 @@ struct TransactionCard: Decodable {
         
         //simple 1-string payloads
         switch type {
+        case "bitvec":
+            card = .bitVec(content)
         case "block_hash":
             card = .blockHash(content)
+        case "default":
+            card = .defaultCard(content)
         case "enum_variant_name":
             card = .enumVariantName(content)
         case "error":
             card = .error(content)
+        case "field_name":
+            card = .fieldName(content)
+        case "field_number":
+            card = .fieldNumber(content)
         case "Id":
             card = .id(content)
+        case "identity_field":
+            card = .identityField(content)
+        case "tip_plain":
+            card = .tipPlain(content)
         case "types_hash":
             card = .typesInfo(content)
         case "varname":
@@ -189,7 +218,7 @@ struct TransactionCard: Decodable {
         case "warning":
             card = .warning(content)
         default:
-            card = .unknown(content)
+            card = .error("Transaction parsing error!")
         }
     }
 }

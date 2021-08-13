@@ -39,6 +39,7 @@
 		2D7A7BF726C650F50053C1E0 /* HistoryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D7A7BF626C650F50053C1E0 /* HistoryView.swift */; };
 		2D7A7BF926C6620B0053C1E0 /* HistoryExpanded.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D7A7BF826C6620B0053C1E0 /* HistoryExpanded.swift */; };
 		2D7A7BFB26C6621D0053C1E0 /* HistoryCollapsed.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D7A7BFA26C6621D0053C1E0 /* HistoryCollapsed.swift */; };
+		2D7A7BFD26C675D30053C1E0 /* HistoryCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D7A7BFC26C675D30053C1E0 /* HistoryCard.swift */; };
 		2DE72BC226A588C7002BB752 /* NativeSignerApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2DE72BC126A588C7002BB752 /* NativeSignerApp.swift */; };
 		2DE72BC426A588C7002BB752 /* MainButtonScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2DE72BC326A588C7002BB752 /* MainButtonScreen.swift */; };
 		2DE72BC626A588C9002BB752 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 2DE72BC526A588C9002BB752 /* Assets.xcassets */; };
@@ -108,6 +109,7 @@
 		2D7A7BF626C650F50053C1E0 /* HistoryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = HistoryView.swift; path = NativeSigner/Models/HistoryView.swift; sourceTree = SOURCE_ROOT; };
 		2D7A7BF826C6620B0053C1E0 /* HistoryExpanded.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HistoryExpanded.swift; sourceTree = "<group>"; };
 		2D7A7BFA26C6621D0053C1E0 /* HistoryCollapsed.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HistoryCollapsed.swift; sourceTree = "<group>"; };
+		2D7A7BFC26C675D30053C1E0 /* HistoryCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = HistoryCard.swift; path = NativeSigner/Components/HistoryCard.swift; sourceTree = SOURCE_ROOT; };
 		2DE72BBE26A588C7002BB752 /* NativeSigner.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = NativeSigner.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		2DE72BC126A588C7002BB752 /* NativeSignerApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NativeSignerApp.swift; sourceTree = "<group>"; };
 		2DE72BC326A588C7002BB752 /* MainButtonScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainButtonScreen.swift; sourceTree = "<group>"; };
@@ -165,6 +167,7 @@
 		2D7A7BC526BA96D00053C1E0 /* Cards */ = {
 			isa = PBXGroup;
 			children = (
+				2D7A7BFC26C675D30053C1E0 /* HistoryCard.swift */,
 				2DE72BF426A59C59002BB752 /* NetworkCard.swift */,
 				2D7A7BC126B9D3360053C1E0 /* IdentityCard.swift */,
 				2D7A7BDB26C2613F0053C1E0 /* TransactionCardView.swift */,
@@ -498,6 +501,7 @@
 				2D7A7BEB26C4149E0053C1E0 /* DocumentModal.swift in Sources */,
 				2D7A7BF726C650F50053C1E0 /* HistoryView.swift in Sources */,
 				2DE72C0F26A99885002BB752 /* RustNative.swift in Sources */,
+				2D7A7BFD26C675D30053C1E0 /* HistoryCard.swift in Sources */,
 				2DE72BF126A59834002BB752 /* Network.swift in Sources */,
 				2D7A7BC426BA8B350053C1E0 /* NewIdentityScreen.swift in Sources */,
 				2D7A7BF526C58E9E0053C1E0 /* History.swift in Sources */,
