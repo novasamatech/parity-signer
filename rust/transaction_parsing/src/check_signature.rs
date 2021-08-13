@@ -3,7 +3,8 @@ use sp_core::{Pair, ed25519, sr25519, ecdsa};
 use std::convert::TryInto;
 use definitions::network_specs::Verifier;
 
-use super::error::{Error, BadInputData, CryptoError};
+use crate::error::{Error, BadInputData, CryptoError};
+use crate::helpers::unhex;
 
 pub struct InfoPassedCrypto {
     pub verifier: Verifier,
@@ -12,10 +13,7 @@ pub struct InfoPassedCrypto {
 
 pub fn pass_crypto(data_hex: &str) -> Result<InfoPassedCrypto, Error> {
     
-    let data = match hex::decode(&data_hex) {
-        Ok(a) => a,
-        Err(_) => return Err(Error::BadInputData(BadInputData::NotHex)),
-    };
+    let data = unhex(&data_hex)?;
     
     match &data_hex[2..4] {
         "00" => {

@@ -1,8 +1,8 @@
 use bitvec::prelude::{BitVec, Lsb0};
 use hex;
 
-use super::error::Error;
-use super::parse_transaction::AuthorPublicKey;
+use crate::error::Error;
+use crate::parse_transaction::AuthorPublicKey;
 
 pub enum Card <'a> {
     Call {pallet: &'a str, method: &'a str},

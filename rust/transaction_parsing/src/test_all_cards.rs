@@ -4,9 +4,9 @@ use definitions::{metadata::{MetaValuesDisplay, NetworkDisplay}, network_specs::
 use hex;
 use std::convert::TryInto;
 
-use super::parse_transaction::AuthorPublicKey;
-use super::cards::{Card, Warning};
-use super::error::{Error, BadInputData, UnableToDecode, DatabaseError, SystemError, CryptoError};
+use crate::parse_transaction::AuthorPublicKey;
+use crate::cards::{Card, Warning};
+use crate::error::{Error, BadInputData, UnableToDecode, DatabaseError, SystemError, CryptoError};
 
 
 /// Function to pring all types of cards.

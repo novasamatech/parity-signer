@@ -2,15 +2,15 @@ use hex;
 use parity_scale_codec::{Decode, Encode};
 use parity_scale_codec_derive;
 use printing_balance::{PrettyOutput, convert_balance_pretty};
-use sled::{Db, Tree, open};
 use definitions::{network_specs::{ChainSpecs, generate_network_key}, transactions::{Transaction, Sign}, users::{AddressDetails, Encryption, generate_address_key, print_as_base58}, constants::{SPECSTREE, METATREE, ADDRTREE, SETTREE, SIGNTRANS, TRANSACTION}, history::Event};
 use sp_runtime::generic::Era;
 use std::convert::TryInto;
 
-use super::utils::{find_meta, get_types};
-use super::decoding::process_as_call;
-use super::cards::{Action, Card, Warning};
-use super::error::{Error, BadInputData, UnableToDecode, DatabaseError, SystemError};
+use crate::utils::{find_meta, get_types};
+use crate::cards::{Action, Card, Warning};
+use crate::decoding::process_as_call;
+use crate::error::{Error, BadInputData, UnableToDecode, DatabaseError, SystemError};
+use crate::helpers::{open_db, open_tree, flush_db, insert_into_tree, get_checksum, unhex, get_from_tree};
 
 /// Transaction payload in hex format as it arrives into parsing program contains following elements:
 /// - prelude, length 6 symbols ("53" stands for substrate, ** - crypto type, 00 or 02 - transaction type),
@@ -71,38 +71,17 @@ fn print_full_extrinsics (index: u32, indent: u32, tip_output: &PrettyOutput, sh
 pub fn parse_transaction (data_hex: &str, dbname: &str) -> Result<String, Error> {
 
 // loading the database and removing the previous (if any) signing saves
-    let database: Db = match open(dbname) {
-        Ok(x) => x,
-        Err(e) => return Err(Error::DatabaseError(DatabaseError::Internal(e))),
-    };
-    let chainspecs: Tree = match database.open_tree(SPECSTREE) {
-        Ok(x) => x,
-        Err(e) => return Err(Error::DatabaseError(DatabaseError::Internal(e))),
-    };
-    let metadata: Tree = match database.open_tree(METATREE) {
-        Ok(x) => x,
-        Err(e) => return Err(Error::DatabaseError(DatabaseError::Internal(e))),
-    };
-    let addresses: Tree = match database.open_tree(ADDRTREE) {
-        Ok(x) => x,
-        Err(e) => return Err(Error::DatabaseError(DatabaseError::Internal(e))),
-    };
-    let settings: Tree = match database.open_tree(SETTREE) {
-        Ok(x) => x,
-        Err(e) => return Err(Error::DatabaseError(DatabaseError::Internal(e))),
-    };
-    let transaction: Tree = match database.open_tree(TRANSACTION) {
-        Ok(x) => x,
-        Err(e) => return Err(Error::DatabaseError(DatabaseError::Internal(e))),
-    };
+    let database = open_db(dbname)?;
+    let chainspecs = open_tree(&database, SPECSTREE)?;
+    let metadata = open_tree(&database, METATREE)?;
+    let addresses = open_tree(&database, ADDRTREE)?;
+    let settings = open_tree(&database, SETTREE)?;
+    let transaction = open_tree(&database, TRANSACTION)?;
     
 // input hex data of correct size should have at least 6 + 64 + 64 symbols (prelude + author public key minimal size + genesis hash)
     if data_hex.len() < 134 {return Err(Error::BadInputData(BadInputData::TooShort))}
 
-    let data = match hex::decode(&data_hex) {
-        Ok(a) => a,
-        Err(_) => return Err(Error::BadInputData(BadInputData::NotHex)),
-    };
+    let data = unhex(&data_hex)?;
     
     let (author_pub_key, data) = match &data_hex[2..4] {
         "00" => (AuthorPublicKey::Ed25519(data[3..35].try_into().expect("fixed size should fit in array")), &data[35..]),
@@ -133,10 +112,7 @@ pub fn parse_transaction (data_hex: &str, dbname: &str) -> Result<String, Error>
     
     let network_key = generate_network_key(&transaction_decoded.genesis_hash.to_vec());
     
-    let chainspecs_db_reply = match chainspecs.get(&network_key) {
-        Ok(x) => x,
-        Err(e) => return Err(Error::DatabaseError(DatabaseError::Internal(e))),
-    };
+    let chainspecs_db_reply = get_from_tree(&network_key, &chainspecs)?;
     match chainspecs_db_reply {
         Some(x) => {
             let chain_specs_found = match <ChainSpecs>::decode(&mut &x[..]) {
@@ -161,10 +137,7 @@ pub fn parse_transaction (data_hex: &str, dbname: &str) -> Result<String, Error>
             let address_key = generate_address_key(&address_vector);
             let author = print_as_base58(&address_vector, encryption, Some(chain_prefix)).expect("just matched encryption type and address key length, should always fit");
         // search for this base58 address in existing accounts, get address details
-            let addresses_db_reply = match addresses.get(&address_key) {
-                Ok(x) => x,
-                Err(e) => return Err(Error::DatabaseError(DatabaseError::Internal(e))),
-            };
+            let addresses_db_reply = get_from_tree(&address_key, &addresses)?;
             match addresses_db_reply {
                 Some(y) => {
                     let address_details = match <AddressDetails>::decode(&mut &y[..]) {
@@ -225,18 +198,11 @@ pub fn parse_transaction (data_hex: &str, dbname: &str) -> Result<String, Error>
                                                 address_key,
                                                 history,
                                             });
-                                            match transaction.insert(SIGNTRANS, action_into_db.encode()) {
-                                                Ok(_) => (),
-                                                Err(e) => return Err(Error::DatabaseError(DatabaseError::Internal(e))),
-                                            };
-                                            match database.flush() {
-                                                Ok(_) => (),
-                                                Err(e) => return Err(Error::DatabaseError(DatabaseError::Internal(e))),
-                                            };
-                                            let checksum = match database.checksum() {
-                                                Ok(x) => x,
-                                                Err(e) => return Err(Error::DatabaseError(DatabaseError::Internal(e))),
-                                            };
+                                            
+                                            insert_into_tree(SIGNTRANS.to_vec(), action_into_db.encode(), &transaction)?;
+                                            flush_db(&database)?;
+                                            let checksum = get_checksum(&database)?;
+                                            
                                         // action card
                                             let action_card = Action::SignTransaction(checksum).card();
                                         // full cards set

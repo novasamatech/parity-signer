@@ -2,9 +2,10 @@ use frame_metadata::{RuntimeMetadataV12};
 use meta_reading::decode_metadata::{get_meta_const_light};
 use definitions::{constants::{GENERALVERIFIER, TRANSACTION, TYPES}, network_specs::{ChainSpecs, Verifier, NetworkKey}, metadata::{NameVersioned, VersionDecoded}, types::TypeEntry};
 use parity_scale_codec::{Decode, Encode};
-use sled::{Db, open, Tree};
+use sled::Tree;
 
-use super::error::{Error, DatabaseError, SystemError};
+use crate::error::{Error, DatabaseError, SystemError};
+use crate::helpers::{open_db, drop_tree, get_from_tree};
 
 /// Function searches for full metadata for certain chain name and version in metadata database tree.
 /// Checks that found full metadata indeed corresponds to the queried name and version;
@@ -73,45 +74,35 @@ pub fn find_meta(chain_name: &str, version: u32, metadata: &Tree) -> Result<(Run
 
 /// Function to search for network_key (genesis_hash at the moment) in chainspecs database tree
 pub fn get_chainspecs (network_key: &NetworkKey, chainspecs: &Tree) -> Result<ChainSpecs, Error> {
-    match chainspecs.get(network_key) {
-        Ok(chainspecs_db_reply) => {
-            match chainspecs_db_reply {
-                Some(x) => {
-                // some entry found for this network_key
-                    match <ChainSpecs>::decode(&mut &x[..]) {
-                        Ok(y) => Ok(y),
-                        Err(_) => return Err(Error::DatabaseError(DatabaseError::DamagedChainSpecs)),
-                    }
-                },
-                None => {
-                // no entry exists
-                    return Err(Error::DatabaseError(DatabaseError::NoNetwork))
-                },
+    match get_from_tree(network_key, chainspecs)? {
+        Some(x) => {
+        // some entry found for this network_key
+            match <ChainSpecs>::decode(&mut &x[..]) {
+                Ok(y) => Ok(y),
+                Err(_) => return Err(Error::DatabaseError(DatabaseError::DamagedChainSpecs)),
             }
         },
-        Err(e) => return Err(Error::DatabaseError(DatabaseError::Internal(e))),
+        None => {
+        // no entry exists
+            return Err(Error::DatabaseError(DatabaseError::NoNetwork))
+        },
     }
 }
 
 
 /// function to search database for the TypeEntry vector
 pub fn get_types (settings: &Tree) -> Result<Vec<TypeEntry>, Error> {
-    match settings.get(TYPES) {
-        Ok(types_db_reply) => {
-            match types_db_reply {
-                Some(a) => {
-                    match <Vec<TypeEntry>>::decode(&mut &a[..]) {
-                        Ok(x) => {
-                            if x.len()==0 {return Err(Error::DatabaseError(DatabaseError::NoTypes))}
-                            Ok(x)
-                        },
-                        Err(_) => return Err(Error::DatabaseError(DatabaseError::DamagedTypesDatabase)),
-                    }
+    match get_from_tree(&TYPES.to_vec(), settings)? {
+        Some(a) => {
+            match <Vec<TypeEntry>>::decode(&mut &a[..]) {
+                Ok(x) => {
+                    if x.len()==0 {return Err(Error::DatabaseError(DatabaseError::NoTypes))}
+                    Ok(x)
                 },
-                None => return Err(Error::DatabaseError(DatabaseError::NoTypes)),
+                Err(_) => return Err(Error::DatabaseError(DatabaseError::DamagedTypesDatabase)),
             }
         },
-        Err(e) => return Err(Error::DatabaseError(DatabaseError::Internal(e))),
+        None => return Err(Error::DatabaseError(DatabaseError::NoTypes)),
     }
 }
 
@@ -120,19 +111,14 @@ pub fn get_types (settings: &Tree) -> Result<Vec<TypeEntry>, Error> {
 
 pub fn get_general_verifier (settings: &Tree) -> Result<Verifier, Error> {
     
-    match settings.get(GENERALVERIFIER) {
-        Ok(reply) => {
-            match reply {
-                Some(a) => {
-                    match <Verifier>::decode(&mut &a[..]) {
-                        Ok(x) => Ok(x),
-                        Err(_) => return Err(Error::DatabaseError(DatabaseError::DamagedGeneralVerifier)),
-                    }
-                },
-                None => return Err(Error::DatabaseError(DatabaseError::NoGeneralVerifier)),
+    match get_from_tree(&GENERALVERIFIER.to_vec(), settings)? {
+        Some(a) => {
+            match <Verifier>::decode(&mut &a[..]) {
+                Ok(x) => Ok(x),
+                Err(_) => return Err(Error::DatabaseError(DatabaseError::DamagedGeneralVerifier)),
             }
         },
-        Err(e) => return Err(Error::DatabaseError(DatabaseError::Internal(e))),
+        None => return Err(Error::DatabaseError(DatabaseError::NoGeneralVerifier)),
     }
 }
 
@@ -140,16 +126,7 @@ pub fn get_general_verifier (settings: &Tree) -> Result<Verifier, Error> {
 /// function to clear all previous (if any) saves in the database
 pub fn purge (dbname: &str) -> Result<(), Error> {
     
-    let database: Db = match open(dbname) {
-        Ok(x) => x,
-        Err(e) => return Err(Error::DatabaseError(DatabaseError::Internal(e))),
-    };
-    
-    match database.drop_tree(TRANSACTION) {
-        Ok(x) => x,
-        Err(e) => return Err(Error::DatabaseError(DatabaseError::Internal(e))),
-    };
-    
-    Ok(())
+    let database = open_db(dbname)?;
+    drop_tree(&database, TRANSACTION)
     
 }

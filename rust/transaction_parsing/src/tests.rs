@@ -3,7 +3,7 @@
 
 #[cfg(test)]
 mod tests {
-    use super::super::produce_output;
+    use crate::produce_output;
     use db_handling::{populate_cold, populate_cold_no_meta, populate_cold_no_networks};
     use std::fs;
     

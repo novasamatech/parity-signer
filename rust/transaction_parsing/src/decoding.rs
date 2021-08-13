@@ -11,9 +11,9 @@ use printing_balance::convert_balance_pretty;
 use definitions::{network_specs::ChainSpecs, types::{TypeEntry, Description, EnumVariant, EnumVariantType, StructField}};
 use sp_core::crypto::{Ss58Codec, Ss58AddressFormat, AccountId32};
 
-use super::method::what_next;
-use super::cards::Card;
-use super::error::{Error, UnableToDecode, SystemError};
+use crate::method::what_next;
+use crate::cards::Card;
+use crate::error::{Error, UnableToDecode, SystemError};
 
 
 /// Struct to store the decoded data, used for data storage between decoding iterations.

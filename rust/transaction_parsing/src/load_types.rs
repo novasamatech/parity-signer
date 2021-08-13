@@ -1,32 +1,22 @@
 use hex;
-use sled::{Db, Tree, open};
+use sled::{Db, Tree};
 use definitions::{network_specs::Verifier, transactions::{LoadTypes, Transaction, UpdGeneralVerifier}, types::TypeEntry, constants::{ADDGENERALVERIFIER, LOADTYPES, SETTREE, TRANSACTION}, history::Event};
 use parity_scale_codec::{Decode, Encode};
 use blake2_rfc::blake2b::blake2b;
 
-use super::cards::{Action, Card, Warning};
-use super::error::{Error, BadInputData, DatabaseError, CryptoError};
-use super::utils::{get_types, get_general_verifier};
-use super::check_signature::pass_crypto;
+use crate::cards::{Action, Card, Warning};
+use crate::check_signature::pass_crypto;
+use crate::error::{Error, BadInputData, CryptoError};
+use crate::helpers::{open_db, open_tree, flush_db, insert_into_tree, get_checksum};
+use crate::utils::{get_types, get_general_verifier};
 
 
 pub fn load_types (data_hex: &str, dbname: &str) -> Result<String, Error> {
 
 // loading the database and removing the previous (if any) load_types saves
-    let database: Db = match open(dbname) {
-        Ok(x) => x,
-        Err(e) => return Err(Error::DatabaseError(DatabaseError::Internal(e))),
-    };
-    
-    let settings: Tree = match database.open_tree(SETTREE) {
-        Ok(x) => x,
-        Err(e) => return Err(Error::DatabaseError(DatabaseError::Internal(e))),
-    };
-    
-    let transaction: Tree = match database.open_tree(TRANSACTION) {
-        Ok(x) => x,
-        Err(e) => return Err(Error::DatabaseError(DatabaseError::Internal(e))),
-    };
+    let database = open_db(dbname)?;
+    let settings = open_tree(&database, SETTREE)?;
+    let transaction = open_tree(&database, TRANSACTION)?;
     
     let current_types = get_types(&settings)?;
     
@@ -48,7 +38,7 @@ pub fn load_types (data_hex: &str, dbname: &str) -> Result<String, Error> {
                 let history = vec![Event::Warning(Warning::TypesNotVerified.show())];
                 let index = 2;
                 let upd_verifier = false;
-                let (types_card, action_card) = process_received_types(&current_types, new_types, history, checked_info.verifier, upd_verifier, index, transaction, database)?;
+                let (types_card, action_card) = process_received_types(&current_types, new_types, history, checked_info.verifier, upd_verifier, index, &transaction, &database)?;
                 Ok(format!("{{\"warning\":[{},{}],\"types_info\":[{}],{}}}", warning_card_1, warning_card_2, types_card, action_card))
             }
             else {return Err(Error::CryptoError(CryptoError::GeneralVerifierDisappeared))}
@@ -61,7 +51,7 @@ pub fn load_types (data_hex: &str, dbname: &str) -> Result<String, Error> {
                 let history: Vec<Event> = Vec::new();
                 let index = 2;
                 let upd_verifier = false;
-                let (types_card, action_card) = process_received_types(&current_types, new_types, history, checked_info.verifier, upd_verifier, index, transaction, database)?;
+                let (types_card, action_card) = process_received_types(&current_types, new_types, history, checked_info.verifier, upd_verifier, index, &transaction, &database)?;
                 Ok(format!("{{\"verifier\":[{}],\"warning\":[{}],\"types_info\":[{}],{}}}", verifier_card, warning_card, types_card, action_card))
             }
             else {
@@ -74,7 +64,7 @@ pub fn load_types (data_hex: &str, dbname: &str) -> Result<String, Error> {
                     let warning_no_types_upd = Card::Warning(Warning::TypesAlreadyThere).card(2,0);
                     let index = 3;
                     let upd_verifier = true;
-                    let (types_card, action_card) = process_received_types(&current_types, new_types, history, checked_info.verifier, upd_verifier, index, transaction, database)?;
+                    let (types_card, action_card) = process_received_types(&current_types, new_types, history, checked_info.verifier, upd_verifier, index, &transaction, &database)?;
                     if types_card == warning_no_types_upd {Ok(format!("{{\"verifier\":[{}],\"warning\":[{},{}],{}}}", verifier_card, warning_card_1, warning_no_types_upd, action_card))}
                     else {Ok(format!("{{\"verifier\":[{}],\"warning\":[{},{}],\"types_info\":[{}],{}}}", verifier_card, warning_card_1, warning_types_upd, types_card, action_card))}
                 }
@@ -85,7 +75,7 @@ pub fn load_types (data_hex: &str, dbname: &str) -> Result<String, Error> {
 }
 
 
-fn process_received_types (current_types: &Vec<TypeEntry>, new_types: Vec<TypeEntry>, mut history: Vec<Event>, verifier: Verifier, upd_verifier: bool, index: u32, transaction: Tree, database: Db) -> Result<(String, String), Error> {
+fn process_received_types (current_types: &Vec<TypeEntry>, new_types: Vec<TypeEntry>, mut history: Vec<Event>, verifier: Verifier, upd_verifier: bool, index: u32, transaction: &Tree, database: &Db) -> Result<(String, String), Error> {
     if &new_types == current_types {
         if upd_verifier {
         // adding only types verifier
@@ -96,20 +86,10 @@ fn process_received_types (current_types: &Vec<TypeEntry>, new_types: Vec<TypeEn
                 verifier,
                 history,
             });
-                
         // making action entry into database
-            match transaction.insert(ADDGENERALVERIFIER, upd_general_verifier.encode()) {
-                Ok(_) => (),
-                Err(e) => return Err(Error::DatabaseError(DatabaseError::Internal(e))),
-            };
-            match database.flush() {
-                Ok(_) => (),
-                Err(e) => return Err(Error::DatabaseError(DatabaseError::Internal(e))),
-            };
-            let checksum = match database.checksum() {
-                Ok(x) => x,
-                Err(e) => return Err(Error::DatabaseError(DatabaseError::Internal(e))),
-            };
+            insert_into_tree(ADDGENERALVERIFIER.to_vec(), upd_general_verifier.encode(), transaction)?;
+            flush_db(database)?;
+            let checksum = get_checksum(database)?;
         // action card
             let action_card = Action::AddGeneralVerifier(checksum).card();
             Ok((types_card, action_card))
@@ -124,18 +104,10 @@ fn process_received_types (current_types: &Vec<TypeEntry>, new_types: Vec<TypeEn
     // making action entry into database
         let load_types = Transaction::LoadTypes(LoadTypes{types_info: new_types, verifier, upd_verifier, history});
         
-        match transaction.insert(LOADTYPES, load_types.encode()) {
-            Ok(_) => (),
-            Err(e) => return Err(Error::DatabaseError(DatabaseError::Internal(e))),
-        };
-        match database.flush() {
-            Ok(_) => (),
-            Err(e) => return Err(Error::DatabaseError(DatabaseError::Internal(e))),
-        };
-        let checksum = match database.checksum() {
-            Ok(x) => x,
-            Err(e) => return Err(Error::DatabaseError(DatabaseError::Internal(e))),
-        };
+        insert_into_tree(LOADTYPES.to_vec(), load_types.encode(), transaction)?;
+        flush_db(database)?;
+        let checksum = get_checksum(database)?;
+        
     // action card
         let action_card = Action::LoadTypes(checksum).card();
         Ok((types_card, action_card))

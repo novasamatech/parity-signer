@@ -1,5 +1,5 @@
 use frame_metadata::{RuntimeMetadataV12, DecodeDifferent};
-use super::error::{Error, UnableToDecode};
+use crate::error::{Error, UnableToDecode};
 
 /// Struct to store the method information
 pub struct Method {

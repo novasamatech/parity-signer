@@ -6,6 +6,7 @@ mod check_signature;
 mod decoding;
 mod error;
     use error::{Error, BadInputData};
+mod helpers;
 mod load_metadata;
     use load_metadata::load_metadata;
 mod load_types;
