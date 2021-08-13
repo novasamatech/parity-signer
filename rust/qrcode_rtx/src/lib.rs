@@ -2,9 +2,7 @@ use std::fs;
 use raptorq;
 use qrcodegen::{QrCode, QrCodeEcc};
 use apng_encoder;
-
-pub mod constants;
-    use constants::{CHUNK_SIZE, BORDER, SCALING, FPS_NOM, FPS_DEN, MAIN_COLOR, BACK_COLOR};
+use definitions::constants::{CHUNK_SIZE, BORDER, SCALING, FPS_NOM, FPS_DEN, MAIN_COLOR, BACK_COLOR};
 
 /// function to take data as Vec<u8>, apply raptorq to get Vec<EncodingPacket>
 /// and serialize it to get Vec<u8> output
