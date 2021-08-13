@@ -55,13 +55,13 @@ struct SeedManager: View {
                     }
                 }
             }
-            }
-            Spacer()
-            Button(action: {showSeedManager = false})
-                {
-                Text("Back")
-                    .font(.largeTitle)
-                    .foregroundColor(Color("AccentColor"))
+                Spacer()
+                Button(action: {showSeedManager = false})
+                    {
+                    Text("Back")
+                        .font(.largeTitle)
+                        .foregroundColor(Color("AccentColor"))
+                }
             }
         }.padding(.bottom, 100)
     }

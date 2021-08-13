@@ -28,7 +28,7 @@ pub fn print_history_tree(database: &Db) -> anyhow::Result<String> {
                 Err(_) => return Err(Error::NotDecodeable(NotDecodeable::Entry).show()),
             };
             if out.len()>1 {out.push_str(",")}
-            out.push_str(&format!("{{\"order\":\"{}\",{}}}", order, history_entry.show()));
+            out.push_str(&format!("{{\"order\":{},{}}}", order, history_entry.show()));
         }
     }
     out.push_str("]");

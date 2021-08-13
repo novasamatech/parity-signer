@@ -107,3 +107,29 @@ void remove_metadata(struct ExternError*, const char* network_name, int network_
 
 // Cleans identities after seed removal - deletes identities bound to given seed
 void remove_seed(struct ExternError*, const char* seed_name, const char* dbname);
+
+// History access operations
+// Fetch history for display
+const char * print_history(struct ExternError*, const char* dbname);
+
+// Clear history (marks history with clearing event time)
+void clear_history(struct ExternError*, const char* dbname);
+
+// Init history - should be called after db copy from resources, marks signer factory reset event
+void init_history(struct ExternError*, const char* dbname);
+
+// Record going online event
+void device_was_online(struct ExternError*, const char* dbname);
+
+// Call on every successful seeds decoding
+void seeds_were_accessed(struct ExternError*, const char* dbname);
+
+// Call on seeds backup
+void seeds_were_shown(struct ExternError*, const char* dbname);
+
+// Add custom record to history
+void history_entry_user(struct ExternError*, const char* enrty, const char* dbname);
+
+// Generic function to record system events
+void history_entry_system(struct ExternError*, const char* entry, const char* dbname);
+

@@ -59,6 +59,7 @@ class SignerDataModel: ObservableObject {
     @Published var lastError: String = ""
     @Published var document: ShownDocument = .none
     @Published var networkSettings: NetworkSettings?
+    @Published var history: [History] = []
     
     var error: Unmanaged<CFError>?
     var dbName: String
@@ -86,6 +87,7 @@ class SignerDataModel: ObservableObject {
             print("No networks found; not handled yet")
         }
         self.networkSettings = nil
+        self.getHistory()
     }
 }
 
@@ -191,6 +193,8 @@ extension SignerDataModel {
     }
     
     func getSeed(seedName: String) -> String {
+        var err = ExternError()
+        let err_ptr: UnsafeMutablePointer<ExternError> = UnsafeMutablePointer(&err)
         var item: CFTypeRef?
         let query: [String: Any] = [
             kSecClass as String: kSecClassGenericPassword,
@@ -200,7 +204,19 @@ extension SignerDataModel {
         ]
         let status = SecItemCopyMatching(query as CFDictionary, &item)
         if status == errSecSuccess {
-            return String(data: (item as! CFData) as Data, encoding: .utf8) ?? ""
+            seeds_were_accessed(err_ptr, self.dbName)
+            if err_ptr.pointee.code == 0 {
+                return String(data: (item as! CFData) as Data, encoding: .utf8) ?? ""
+            } else {
+                print("Seed access logging error! This system is broken and should not be used anymore.")
+                self.lastError = String(cString: err_ptr.pointee.message)
+                print(self.lastError)
+                signer_destroy_string(err_ptr.pointee.message)
+                //Attempt to log this anyway one last time;
+                //if this fails too - complain to joulu pukki
+                history_entry_system(nil, "Seed access logging failed!", self.dbName)
+                return ""
+            }
         } else {
             self.lastError = SecCopyErrorMessageString(status, nil)! as String
             return ""
@@ -212,14 +228,23 @@ extension SignerDataModel {
 
 extension SignerDataModel {
     func onboard() {
+        var err = ExternError()
+        let err_ptr: UnsafeMutablePointer<ExternError> = UnsafeMutablePointer(&err)
         do {
             if let source = Bundle.main.url(forResource: "Database", withExtension: "") {
                 print(source)
                 var destination = try FileManager.default.url(for: .documentDirectory, in: .userDomainMask, appropriateFor: nil, create: false)
                 destination.appendPathComponent("Database")
                 try FileManager.default.copyItem(at: source, to: destination)
-                self.onboardingDone = true
-                self.totalRefresh()
+                init_history(err_ptr, self.dbName)
+                if (err_ptr.pointee.code == 0) {
+                    self.onboardingDone = true
+                    self.totalRefresh()
+                } else {
+                    print("History init failed! This will not do.")
+                    print(String(cString: err_ptr.pointee.message))
+                    signer_destroy_string(err_ptr.pointee.message)
+                }
             }
         } catch {
             print("DB init failed")

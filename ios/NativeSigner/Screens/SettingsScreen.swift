@@ -78,6 +78,11 @@ struct SettingsScreen: View {
                 Spacer()
             }.padding(.bottom, 100)
             
+            //Modal with history
+            if (showHistory) {
+                HistoryView(showHistory: $showHistory)
+            }
+            
             //Modal with seed manager
             if (showSeedManager) {
                 SeedManager(showSeedManager: $showSeedManager)
