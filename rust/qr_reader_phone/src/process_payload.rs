@@ -1,7 +1,7 @@
 use std::convert::TryInto;
 use anyhow::anyhow;
 use raptorq;
-use qrcode_rtx::constants::CHUNK_SIZE;
+use definitions::constants::CHUNK_SIZE;
 
 
 #[derive(PartialEq)]

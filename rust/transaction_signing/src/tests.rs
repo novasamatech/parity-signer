@@ -3,8 +3,8 @@
 
 #[cfg(test)]
 mod tests {
-    use transaction_parsing::produce_output;
-    use crate::{handle_action, error::{Error, ActionFailure}};
+    use transaction_parsing::{produce_output, cards::Action};
+    use crate::{handle_action, error::{Error, ActionFailure}, interpretation::interpret_action, sign_transaction::create_signature};
     use db_handling::{populate_cold, populate_cold_no_networks, populate_cold_no_meta};
     use definitions::{constants::{METATREE, SPECSTREE}};
     use std::fs;
@@ -23,6 +23,12 @@ mod tests {
     fn get_action_line(reply: &str) -> String {
         let caps = ACTION.captures(&reply).unwrap();
         caps.name("action_line").unwrap().as_str().to_string()
+    }
+    
+    fn sign_action_test (action_line: &str, seed_phrase: &str, pwd_entry: &str, dbname: &str) -> anyhow::Result<String> {
+        let action = interpret_action (action_line)?;
+        if let Action::SignTransaction(checksum) = action {create_signature(seed_phrase, pwd_entry, dbname, checksum)}
+        else {return Err(Error::NoAction(ActionFailure::SignTransaction).show())}
     }
     
     fn meta_count_test (dbname: &str) -> usize {
@@ -47,12 +53,12 @@ mod tests {
         let reply_known_part = r#"{"author":[{"index":0,"indent":0,"type":"author","payload":{"base58":"5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY","seed":"Alice","derivation_path":"//Alice","has_password":false,"name":"Alice_test_westend"}}],"method":[{"index":1,"indent":0,"type":"call","payload":{"method":"transfer_keep_alive","pallet":"Balances"}},{"index":2,"indent":1,"type":"varname","payload":"dest"},{"index":3,"indent":2,"type":"enum_variant_name","payload":"Id"},{"index":4,"indent":3,"type":"Id","payload":"5FHneW46xGXgs5mUiveU4sbTyGBzmstUspZC92UhjJM694ty"},{"index":5,"indent":1,"type":"varname","payload":"value"},{"index":6,"indent":2,"type":"balance","payload":{"amount":"100.000000000","units":"mWND"}}],"extrinsics":[{"index":7,"indent":0,"type":"era_mortal_nonce","payload":{"era":"Mortal","phase":"27","period":"64","nonce":"46"}},{"index":8,"indent":0,"type":"tip","payload":{"amount":"0","units":"pWND"}},{"index":9,"indent":0,"type":"block_hash","payload":"538a7d7a0ac17eb6dd004578cb8e238c384a10f57c999a3fa1200409cd9b3f33"},{"index":10,"indent":0,"type":"tx_spec","payload":{"network":"westend","version":"9010","tx_version":"5"}}],"action":{"type":"sign_transaction","payload":{"type":"sign_transaction","checksum":""#;
         assert!(reply.contains(reply_known_part), "Error in action.\nReceived: {}", reply);
         let mock_action_line = get_action_line(&reply);
-        let result = handle_action(&mock_action_line, SEED_PHRASE, PWD, dbname);
+        let result = sign_action_test(&mock_action_line, SEED_PHRASE, PWD, dbname);
         match result {
             Ok(signature) => assert!((signature.len() == 130) && (signature.starts_with("01")), "Wrong signature format,\nReceived:\n{}", signature),
             Err(e) => panic!("Was unable to sign. {}", e),
         }
-        let result = handle_action(&mock_action_line, SEED_PHRASE, PWD, dbname);
+        let result = sign_action_test(&mock_action_line, SEED_PHRASE, PWD, dbname);
         if let Err(e) = result {
             let err = e.to_string();
             let expected_err = String::from("Database checksum mismatch.");
@@ -73,7 +79,7 @@ mod tests {
         
         let line = fs::read_to_string("for_tests/add_network_westendV9080_unverified.txt").unwrap();
         let reply = produce_output(&line, dbname);
-        let reply_known_part = r##"{"warning":[{"index":0,"indent":0,"type":"warning","payload":"Received new network information is not verified."}],"new_network":[{"index":1,"indent":0,"type":"new_network","payload":{"specname":"westend","spec_version":"9080","meta_hash":"44e8d52c5af362b3279309ca7476424391902470f363fae097cd8bb620d0e6a7","base58prefix":"42","color":"#660D35","decimals":"12","genesis_hash":"e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e","logo":"westend","name":"westend","path_id":"//westend","secondary_color":"#262626","title":"Westend","unit":"WND","verifier":"none"}}],"action":{"type":"add_network","payload":{"type":"add_network","checksum":""##;
+        let reply_known_part = r##"{"warning":[{"index":0,"indent":0,"type":"warning","payload":"Received new network information is not verified."}],"new_network":[{"index":1,"indent":0,"type":"new_network","payload":{"specname":"westend","spec_version":"9080","meta_hash":"44e8d52c5af362b3279309ca7476424391902470f363fae097cd8bb620d0e6a7","base58prefix":"42","color":"#660D35","decimals":"12","genesis_hash":"e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e","logo":"westend","name":"westend","path_id":"//westend","secondary_color":"#262626","title":"Westend","unit":"WND","verifier":{"hex":"","encryption":"none"}}}],"action":{"type":"add_network","payload":{"type":"add_network","checksum":""##;
         assert!(reply.contains(reply_known_part), "Error in action.\nReceived: {}", reply);
         let mock_action_line = get_action_line(&reply);
         let result = handle_action(&mock_action_line, SEED_PHRASE, PWD, dbname);

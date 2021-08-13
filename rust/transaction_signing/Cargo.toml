@@ -13,6 +13,7 @@ hex = "0.4.3"
 lazy_static = "1.4.0"
 definitions = {path = "../definitions"}
 db_handling = {path = "../db_handling"}
+qrcode_static = {path = "../qrcode_static"}
 transaction_parsing = {path = "../transaction_parsing"}
 sled = "0.34.6"
 parity-scale-codec = "2.1.1"

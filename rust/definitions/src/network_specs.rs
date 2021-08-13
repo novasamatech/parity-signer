@@ -68,7 +68,7 @@ impl Verifier {
             Verifier::Ed25519(x) => format!("{{\"hex\":\"{}\",\"encryption\":\"ed25519\"}}", x),
             Verifier::Sr25519(x) => format!("{{\"hex\":\"{}\",\"encryption\":\"sr25519\"}}", x),
             Verifier::Ecdsa(x) => format!("{{\"hex\":\"{}\",\"encryption\":\"ecdsa\"}}", x),
-            Verifier::None => String::from("\"none\""),
+            Verifier::None => String::from("{\"hex\":\"\",\"encryption\":\"none\"}"),
         }
     }
     pub fn show_error(&self) -> String {

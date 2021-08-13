@@ -2,6 +2,7 @@ use anyhow;
 use definitions::{constants::{HISTORY, SIGNTRANS, TRANSACTION}, history::Event, network_specs::Verifier, transactions::{Transaction, SignDisplay}, users::Encryption};
 use parity_scale_codec::Decode;
 use db_handling::{helpers::{open_db, open_tree, flush_db, remove_from_tree}, manage_history::enter_events_into_tree};
+use qrcode_static::png_qr_from_hex;
 
 use crate::sign_message::sign_as_address_key;
 use crate::error::{Error, ActionFailure, CryptoError};
@@ -91,4 +92,9 @@ pub fn create_signature (seed_phrase: &str, pwd_entry: &str, database_name: &str
             return Err(e)
         },
     }
+}
+
+pub fn create_signature_png (seed_phrase: &str, pwd_entry: &str, database_name: &str, checksum: u32) -> anyhow::Result<String> {
+    let hex_result = create_signature(seed_phrase, pwd_entry, database_name, checksum)?;
+    Ok(hex::encode(png_qr_from_hex(&hex_result)?))
 }
