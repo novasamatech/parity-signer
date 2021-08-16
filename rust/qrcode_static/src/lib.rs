@@ -68,6 +68,13 @@ pub fn png_qr_from_hex(hex_input: &str) -> anyhow::Result<Vec<u8>> {
     png_qr(&input)
 }
 
+/// Function to generate static qr code from hex string as was done _previously_.
+/// For transitional legacy usage.
+pub fn leg_png_qr_from_hex(hex_input: &str) -> anyhow::Result<Vec<u8>> {
+    
+    let input = hex_input.as_bytes().to_vec();
+    png_qr(&input)
+}
 
 #[cfg(test)]
 mod tests {
@@ -78,5 +85,12 @@ mod tests {
         let hex_data = "530100d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27da40403008eaf04151687736326c9fea17e25fc5287613693c912909cb226aa4794f26a480700e8764817b501b8003223000005000000e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e538a7d7a0ac17eb6dd004578cb8e238c384a10f57c999a3fa1200409cd9b3f33e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e";
         let qr = png_qr_from_hex(hex_data).unwrap();
         std::fs::write("test.png", &qr).unwrap();
+    }
+    
+    #[test]
+    fn make_test_leg_qr_code() {
+        let hex_data = "530100d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27da40403008eaf04151687736326c9fea17e25fc5287613693c912909cb226aa4794f26a480700e8764817b501b8003223000005000000e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e538a7d7a0ac17eb6dd004578cb8e238c384a10f57c999a3fa1200409cd9b3f33e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e";
+        let qr = leg_png_qr_from_hex(hex_data).unwrap();
+        std::fs::write("test_leg.png", &qr).unwrap();
     }
 }

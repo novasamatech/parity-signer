@@ -6,6 +6,7 @@ use parity_scale_codec::Encode;
 use std::convert::TryInto;
 use db_handling::{prep_messages::{prep_types, prep_load_metadata, prep_add_network_versioned, prep_add_network_latest}, error::NotHex, helpers::{open_db, open_tree, unhex, decode_address_details}, manage_history::enter_events};
 use blake2_rfc::blake2b::blake2b;
+use qrcode_static::png_qr;
 
 use crate::error::{Error, CryptoError};
 
@@ -127,8 +128,8 @@ fn get_verifier_line(s: &SufficientCrypto) -> String {
     verifier.show_card()
 }
 
-/// Function to generate `sufficient crypto line` for load_types message;
-/// `sufficient crypto line` is in hex format and consists of
+/// Function to generate hex line of qr data corresponding to `sufficient_crypto` for load_types message;
+/// `sufficient_crypto` consists of:
 /// ** two first symbols denoting encryption algorithm used 00 for ed25519, 01 for sr25519, 02 for ecdsa
 /// <public_key_in_hex> - length depends on encryption algorithm
 /// <signature_in_hex> - length depends on encryption algorithm
@@ -143,7 +144,8 @@ pub fn sufficient_crypto_load_types (public_key: &str, database_name: &str, seed
                 verifier_line: get_verifier_line(&s),
             }.show();
             enter_events(database_name, vec![Event::SignedTypes(types_update_show)])?;
-            Ok(hex::encode(s.encode()))
+            let qr_data = png_qr(&s.encode())?;
+            Ok(hex::encode(qr_data))
         },
         Err(e) => {
             if e.to_string() == Error::CryptoError(CryptoError::WrongPassword).show().to_string() {
@@ -155,8 +157,8 @@ pub fn sufficient_crypto_load_types (public_key: &str, database_name: &str, seed
 }
 
 
-/// Function to generate `sufficient crypto line` for load_metadata message;
-/// `sufficient crypto line` is in hex format and consists of
+/// Function to generate hex line of qr data corresponding to `sufficient_crypto` for load_metadata message;
+/// `sufficient_crypto` consists of:
 /// ** two first symbols denoting encryption algorithm used 00 for ed25519, 01 for sr25519, 02 for ecdsa
 /// <public_key_in_hex> - length depends on encryption algorithm
 /// <signature_in_hex> - length depends on encryption algorithm
@@ -173,7 +175,8 @@ pub fn sufficient_crypto_load_metadata (network_name: &str, network_version: u32
                 verifier_line: get_verifier_line(&s),
             }.show();
             enter_events(database_name, vec![Event::SignedLoadMetadata(verified_meta_values_display)])?;
-            Ok(hex::encode(s.encode()))
+            let qr_data = png_qr(&s.encode())?;
+            Ok(hex::encode(qr_data))
         },
         Err(e) => {
             if e.to_string() == Error::CryptoError(CryptoError::WrongPassword).show().to_string() {
@@ -185,8 +188,9 @@ pub fn sufficient_crypto_load_metadata (network_name: &str, network_version: u32
 }
 
 
-/// Function to generate `sufficient crypto line` for add_network message using latest available version for this network;
-/// `sufficient crypto line` is in hex format and consists of
+/// Function to generate hex line of qr data corresponding to `sufficient_crypto` for add_network message
+/// using latest available version for this network;
+/// `sufficient_crypto` consists of:
 /// ** two first symbols denoting encryption algorithm used 00 for ed25519, 01 for sr25519, 02 for ecdsa
 /// <public_key_in_hex> - length depends on encryption algorithm
 /// <signature_in_hex> - length depends on encryption algorithm
@@ -207,7 +211,8 @@ pub fn sufficient_crypto_add_network_latest (network_name: &str, public_key: &st
                 verifier_line: get_verifier_line(&s),
             }.show();
             enter_events(database_name, vec![Event::SignedAddNetwork(network_display)])?;
-            Ok(hex::encode(s.encode()))
+            let qr_data = png_qr(&s.encode())?;
+            Ok(hex::encode(qr_data))
         },
         Err(e) => {
             if e.to_string() == Error::CryptoError(CryptoError::WrongPassword).show().to_string() {
@@ -219,8 +224,8 @@ pub fn sufficient_crypto_add_network_latest (network_name: &str, public_key: &st
 }
 
 
-/// Function to generate `sufficient crypto line` for add_network message using given version;
-/// `sufficient crypto line` is in hex format and consists of
+/// Function to generate hex line of qr data corresponding to `sufficient_crypto` for add_network message using given version;
+/// `sufficient_crypto` consists of:
 /// ** two first symbols denoting encryption algorithm used 00 for ed25519, 01 for sr25519, 02 for ecdsa
 /// <public_key_in_hex> - length depends on encryption algorithm
 /// <signature_in_hex> - length depends on encryption algorithm
@@ -242,7 +247,8 @@ pub fn sufficient_crypto_add_network_versioned (network_name: &str, network_vers
                 verifier_line: get_verifier_line(&s),
             }.show();
             enter_events(database_name, vec![Event::SignedAddNetwork(network_display)])?;
-            Ok(hex::encode(s.encode()))
+            let qr_data = png_qr(&s.encode())?;
+            Ok(hex::encode(qr_data))
         },
         Err(e) => {
             if e.to_string() == Error::CryptoError(CryptoError::WrongPassword).show().to_string() {
