@@ -12,10 +12,8 @@ ffi-support = "0.4"
 hex = "0.4.3"
 jni = { version = "0.16.0", optional = true }
 libc = "0.2"
-pixelate = "0.1"
 plot_icon = { git = "https://github.com/paritytech/polkadot-identicon-rust" }
 qr_reader_phone = {path = "..//qr_reader_phone"}
-qrcodegen = "1.4"
 rustc-hex = "2.1.0"
 transaction_parsing = {path = "../transaction_parsing"}
 transaction_signing = {path = "../transaction_signing"}

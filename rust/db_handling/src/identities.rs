@@ -12,6 +12,7 @@ use bip39::{Language, Mnemonic, MnemonicType};
 use zeroize::Zeroize;
 use lazy_static::lazy_static;
 use anyhow;
+use qrcode_static::png_qr_from_string;
 
 use crate::error::{Error, NotFound, NotHex, CreateAddress};
 use crate::chainspecs::get_network;
@@ -315,7 +316,7 @@ pub fn delete_address(pub_key: &str, network_key_string: &str, database_name: &s
             if address_details.network_id.is_empty() {remove_from_tree(address_key, &identities)?}
             else {insert_into_tree(address_key, address_details.encode(), &identities)?}
             enter_events_into_tree(&history, events)?;
-        }
+        },
         Ok(None) => return Err(Error::NotFound(NotFound::Address).show()),
         Err(e) => return Err(Error::InternalDatabaseError(e).show()),
     };
@@ -416,6 +417,45 @@ pub fn remove_identities_for_seed (seed_name: &str, database_name: &str) -> anyh
     flush_db(&database)?;
     Ok(())
     
+}
+
+
+/// Function to export identity as qr code readable by polkadot.js
+/// Standard known format:
+/// `substrate:{address_key as as_base58}:0x{network_key}:{seed_name}`
+/// String is transformed into bytes, then into png qr code, then qr code
+/// content is hexed so that it could be transferred into app
+/// Note: if the resulting string is too long, seed_name is cut to length
+pub fn export_identity (address_key_hex: &str, network_key_hex: &str, database_name: &str) -> anyhow::Result<String> {
+    
+    let database = open_db(database_name)?;
+    let identities = open_tree(&database, ADDRTREE)?;
+    let chainspecs = open_tree(&database, SPECSTREE)?;
+    
+    let address_key = generate_address_key(&unhex(address_key_hex, NotHex::PublicKey)?);
+    let network_key = generate_network_key(&unhex(network_key_hex, NotHex::GenesisHash)?);
+    let address_details = match identities.get(&address_key) {
+        Ok(Some(address_details_encoded)) => {
+            decode_address_details(address_details_encoded)?
+        },
+        Ok(None) => return Err(Error::NotFound(NotFound::Address).show()),
+        Err(e) => return Err(Error::InternalDatabaseError(e).show()),
+    };
+    if address_details.network_id.contains(&network_key) {
+        let network_specs = match chainspecs.get(&network_key) {
+            Ok(Some(network_specs_encoded)) => decode_chain_specs(network_specs_encoded, &network_key.to_vec())?,
+            Ok(None) => return Err(Error::NotFound(NotFound::NetworkKey).show()),
+            Err(e) => return Err(Error::InternalDatabaseError(e).show()),
+        };
+        let address_base58 = match print_as_base58 (&address_key, address_details.encryption, Some(network_specs.base58prefix)) {
+            Ok(a) => a,
+            Err(e) => return Err(Error::Base58(e.to_string()).show()),
+        };
+        let mut output = format!("substrate:{}:0x{}:{}", address_base58, hex::encode(&network_key), address_details.seed_name);
+        if output.len() > 2953 {output = output[..2953].to_string();} // to fit into qr code, cut seed_name if needed
+        Ok(hex::encode(png_qr_from_string(&output)?))
+    }
+    else {return Err(Error::NotFound(NotFound::NetworkKey).show())}
 }
 
 

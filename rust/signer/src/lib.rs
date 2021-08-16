@@ -14,9 +14,6 @@
 // You should have received a copy of the GNU General Public License
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
-use pixelate::{Color, Image, BLACK};
-use qrcodegen::{QrCode, QrCodeEcc};
-
 use plot_icon;
 use db_handling;
 use transaction_parsing;
@@ -26,42 +23,14 @@ use qr_reader_phone;
 mod export;
 mod result;
 
-fn base64png(png: &[u8]) -> String {
-	static HEADER: &str = "data:image/png;base64,";
-	let mut out = String::with_capacity(png.len() + png.len() / 2 + HEADER.len());
-	out.push_str(HEADER);
-	base64::encode_config_buf(png, base64::STANDARD, &mut out);
-	out
-}
-
-fn qrcode_bytes(data: &[u8]) -> anyhow::Result<String, anyhow::Error> {
-	let qr = QrCode::encode_binary(data, QrCodeEcc::Medium)?;
-	let palette = &[Color::Rgba(255, 255, 255, 0), BLACK];
-	let mut pixels = Vec::with_capacity((qr.size() * qr.size()) as usize);
-	for y in 0..qr.size() {
-		for x in 0..qr.size() {
-			pixels.push(qr.get_module(x, y) as u8);
-		}
-	}
-	let mut result = Vec::new();
-	let image = Image {
-		palette,
-		pixels: &pixels,
-		width: qr.size() as usize,
-		scale: 16,
-	};
-	match image.render(&mut result) {
-    	Ok(_) => Ok(base64png(&result)),
-        Err(_) => return Err(anyhow::anyhow!("Pixelation failed")),
-    }
-}
-
 export! {
-	@Java_io_parity_signer_SubstrateSignModule_ethkeyQrCode
-	fn qrcode(
-		data: &str
+	@Java_io_parity_signer_SubstrateSignModule_substrateExportPubkey
+	fn export_export_pubkey(
+		address: &str,
+        network: &str,
+        dbname: &str
 	) -> anyhow::Result<String, anyhow::Error> {
-		qrcode_bytes(data.as_bytes())
+		db_handling::identities::export_identity(address, network, dbname)
 	}
 
 	@Java_io_parity_signer_SubstrateSignModule_qrparserGetPacketsTotal
