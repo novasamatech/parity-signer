@@ -94,7 +94,7 @@ pub fn populate_cold_no_networks (database_name: &str) -> anyhow::Result<()> {
 }
 
 /// Function to re-populate default "cold" database with default values.
-/// This dayabase should be copied into Signer's resources
+/// This database should be copied into Signer's resources.
 
 pub fn default_cold_release () -> anyhow::Result<()> {
     

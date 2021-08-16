@@ -33,6 +33,20 @@ fn get_seed_identities (database: &Db, seed_name: &str) -> anyhow::Result<Vec<(A
     filter_addresses_by_seed_name (&identities, seed_name)
 }
 
+/// get all identities from database
+fn get_all_identities (database: &Db) -> anyhow::Result<Vec<(AddressKey, AddressDetails)>> {
+    let identities = open_tree(&database, ADDRTREE)?;
+    let mut out: Vec<(AddressKey, AddressDetails)> = Vec::new();
+    for x in identities.iter() {
+        if let Ok((key, value)) = x {
+            let address_key = key.to_vec();
+            let address_details = decode_address_details(value)?;
+            out.push((address_key, address_details));
+        }
+    }
+    Ok(out)
+}
+
 /// filter identities by given seed_name
 fn filter_addresses_by_seed_name (identities: &Tree, seed_name: &str) -> anyhow::Result<Vec<(AddressKey, AddressDetails)>> {
     let mut out: Vec<(AddressKey, AddressDetails)> = Vec::new();
@@ -68,7 +82,10 @@ pub fn get_relevant_identities (seed_name: &str, genesis_hash: &str, database_na
     
     let network_key = generate_network_key(&unhex(genesis_hash, NotHex::GenesisHash)?); //TODO: add whatever is needed for parachains?
     let database = open_db(database_name)?;
-    let identities_out = get_seed_identities(&database, seed_name)?;
+    let identities_out = {
+        if seed_name == "" {get_all_identities(&database)?}
+        else {get_seed_identities(&database, seed_name)?}
+    };
     Ok(identities_out.into_iter().filter(|(_, details)| details.network_id.contains(&network_key)).collect())
 }
 
@@ -83,7 +100,7 @@ pub fn print_relevant_identities (seed_name: &str, genesis_hash: &str, database_
             Ok(a) => a,
             Err(e) => return Err(Error::Base58(e.to_string()).show()),
         };
-        let new = format!("{{\"public_key\":\"{}\",\"ss58\":\"{}\",\"path\":\"{}\",\"has_password\":\"{}\",\"name\":\"{}\"}}", hex::encode(address_key), base58print, address_details.path, address_details.has_pwd, address_details.name);
+        let new = format!("{{\"public_key\":\"{}\",\"ss58\":\"{}\",\"path\":\"{}\",\"has_password\":\"{}\",\"name\":\"{}\",\"seed_name\":\"{}\"}}", hex::encode(address_key), base58print, address_details.path, address_details.has_pwd, address_details.name, address_details.seed_name);
         out.push_str(&new);
     }
     out.push_str("]");
