@@ -1417,6 +1417,7 @@ name = "qrcode_rtx"
 version = "0.1.0"
 dependencies = [
  "apng-encoder",
+ "definitions",
  "hex",
  "qrcodegen",
  "raptorq",

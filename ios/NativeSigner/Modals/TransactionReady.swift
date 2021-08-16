@@ -21,20 +21,26 @@ struct TransactionReady: View {
                         .font(.subheadline)
                         .foregroundColor(Color("AccentColor"))
                 }
-                if transaction.result != nil {
+                if transaction.qr != nil {
                     VStack {
-                        Text("There will be some better result show eventually")
+                        Text("Scan to publish")
+                            .font(.largeTitle)
                             .foregroundColor(Color("textMainColor"))
-                        Text(transaction.result!)
-                            .font(.body)
+                        Image(uiImage: transaction.qr!)
+                            .resizable()
+                            .aspectRatio(contentMode: .fit)
+                        Text("Signed by:")
+                            .foregroundColor(Color("AccentColor"))
+                        Text(transaction.author?.name ?? "unknown")
                             .foregroundColor(Color("textMainColor"))
                         Spacer()
                         Button(action: {
+                            transaction.qr = nil
                             presentationMode.wrappedValue.dismiss()
                         }) {
                             Text("Done")
                                 .font(.largeTitle)
-                                .foregroundColor(Color("textMainColor"))
+                                
                         }
                     }
                 } else {

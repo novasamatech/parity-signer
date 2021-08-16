@@ -9,7 +9,7 @@ import SwiftUI
 
 
 struct MainButtonScreen: View {
-    var testValue = DevTestObject()
+    //var testValue = DevTestObject()
     @EnvironmentObject var data: SignerDataModel
     var body: some View {
         if data.onboardingDone {
@@ -19,7 +19,6 @@ struct MainButtonScreen: View {
                     NavigationLink(destination: TransactionScreen()) {
                         VStack() {
                             Image(systemName: "qrcode.viewfinder").imageScale(.large)
-                            Image(uiImage: testValue.image!)
                             Text("Scanner")
                         }
                     }

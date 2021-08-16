@@ -25,9 +25,18 @@ struct KeyManager: View {
                 }
                 Spacer()
             }.padding(.bottom, 100)
+            
+            //Modal to export public key
+            if data.exportIdentity {
+                ExportIdentity()
+            }
+            
+            //Modal to create new key
             if data.newIdentity {
                 NewIdentityScreen()
             }
+            
+            //Modal to create new seed
             if data.newSeed {
                 NewSeedScreen()
             }

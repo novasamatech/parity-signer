@@ -91,8 +91,12 @@ class Transaction: ObservableObject {
         let res = handle_action(err_ptr, stringAction, seedPhrase, password, self.dbName)
         if err_ptr.pointee.code == 0 {
             self.result = String(cString: res!)
-            print(self.result)
             signer_destroy_string(res!)
+            if let imageData = Data(fromHexEncodedString: self.result ?? "") {
+                self.qr = UIImage(data: imageData)
+            } else {
+                self.transactionError = "QR code generation error"
+            }
         } else {
             self.transactionError = String(cString: err_ptr.pointee.message)
             print(self.transactionError)

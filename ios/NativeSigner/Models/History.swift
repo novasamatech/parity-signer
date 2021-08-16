@@ -50,12 +50,50 @@ enum Event: Decodable, Hashable, Equatable {
             self = .deviceWasOnline
         case "error":
             self = .error(try values.decode(String.self, forKey: .payload))
+        case "general_verifier_added":
+            self = .generalVerifierAdded(try values.decode(Verifier.self, forKey: .payload))
+        case "general_verifier_removed":
+            self = .generalVerifierRemoved(try values.decode(Verifier.self, forKey: .payload))
+        case "history_cleared":
+            self = .historyCleared
+        case "identities_wiped":
+            self = .identitiesWiped
         case "identity_added":
             self = .identityAdded(try values.decode(IdentityEvent.self, forKey: .payload))
+        case "identity_removed":
+            self = .identityRemoved(try values.decode(IdentityEvent.self, forKey: .payload))
+        case "metadata_added":
+            self = .metadataAdded(try values.decode(MetaSpecs.self, forKey: .payload))
+        case "metadata_removed":
+            self = .metadataRemoved(try values.decode(MetaSpecs.self, forKey: .payload))
+        case "metadata_verifier_added":
+            self = .metadataVerifierAdded(try values.decode(NetworkVerifierEvent.self, forKey: .payload))
+        case "metadata_verifier_removed":
+            self = .metadataVerifierRemoved(try values.decode(NetworkVerifierEvent.self, forKey: .payload))
+        case "network_added":
+            self = .networkAdded(try values.decode(NewNetwork.self, forKey: .payload))
+        case "network_removed":
+            self = .networkRemoved(try values.decode(NetworkRemovedEvent.self, forKey: .payload))
         case "seeds_accessed":
             self = .seedsWereAccessed
         case "seeds_shown":
             self = .seedsWereShown
+        case "add_network_message_signed":
+            self = .signedAddNetwork(try values.decode(NewNetwork.self, forKey: .payload))
+        case "load_metadata_message_signed":
+            self = .signedLoadMetadata(try values.decode(VerifiedMetadataEvent.self, forKey: .payload))
+        case "load_types_message_signed":
+            self = .signedTypes(try values.decode(TypesEvent.self, forKey: .payload))
+        case "system_entered_event":
+            self = .systemEntry(try values.decode(String.self, forKey: .payload))
+        case "transaction_signed":
+            self = .transactionSigned(try values.decode(SigningEvent.self, forKey: .payload))
+        case "types_info_updated":
+            self = .typesInfoUpdated(try values.decode(TypesEvent.self, forKey: .payload))
+        case "user_entered_event":
+            self = .userEntry(try values.decode(String.self, forKey: .payload))
+        case "warning":
+            self = .warning(try values.decode(String.self, forKey: .payload))
         default:
             self = .error(try values.decode(String.self, forKey: .payload))
         }

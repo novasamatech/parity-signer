@@ -27,8 +27,7 @@ struct ExternError {
 
 void signer_destroy_string(const char* cstring);
 
-// qr code generator for utf-8 strings
-const char* qrcode(struct ExternError*, const char* data);
+const char * export_pubkey(struct ExternError*, const char* address, const char* network, const char* dbname);
 
 // qr frame count estimator
 int get_packets_total(struct ExternError*, const char* data);

@@ -21,7 +21,8 @@ struct IdentityCard: View {
                 }
             }) {
                 HStack {
-                    Image(systemName: "circle.fill").foregroundColor(Color("AccentColor")).imageScale(.large)
+                    //TODO: always fetch and mode into model; requires rust code modifications; this is a stub
+                    Image(uiImage: UIImage(data: Data(fromHexEncodedString: String(cString: development_test(nil, identity.ss58)))!)!)
                     VStack (alignment: .leading) {
                         Text(identity.name)
                             .foregroundColor(Color("AccentColor"))
@@ -89,8 +90,10 @@ struct IdentityCard: View {
     }
 }
 
+/*
 struct IdentityCard_Previews: PreviewProvider {
     static var previews: some View {
         IdentityCard(identity: Identity.identityData[0]).previewLayout(.sizeThatFits)
     }
 }
+*/

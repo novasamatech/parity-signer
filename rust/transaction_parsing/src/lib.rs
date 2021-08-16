@@ -54,6 +54,6 @@ fn handle_scanner_input (payload: &str, dbname: &str) -> Result<String, Error> {
 pub fn produce_output (payload: &str, dbname: &str) -> String {
     match handle_scanner_input (payload, dbname) {
         Ok(out) => out,
-        Err(e) => format!("\"error\":[{}]", Card::Error(e).card(0,0)),
+        Err(e) => format!("{{\"error\":[{}]}}", Card::Error(e).card(0,0)),
     }
 }

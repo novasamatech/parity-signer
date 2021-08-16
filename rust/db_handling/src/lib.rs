@@ -93,6 +93,16 @@ pub fn populate_cold_no_networks (database_name: &str) -> anyhow::Result<()> {
     
 }
 
+/// Function to re-populate default "cold" database with default values.
+/// This dayabase should be copied into Signer's resources
+
+pub fn default_cold_release () -> anyhow::Result<()> {
+    
+    let database_name = COLD_DB_NAME;
+    let metadata_filename = "metadata_database.ts";
+    
+    populate_cold(database_name, metadata_filename, false)
+}
 
 /// Function to re-populate default "cold" database with default values.
 /// Currently this cold database is used for transaction_parsing crate

@@ -25,7 +25,7 @@ mod result;
 
 export! {
 	@Java_io_parity_signer_SubstrateSignModule_substrateExportPubkey
-	fn export_export_pubkey(
+	fn export_pubkey(
 		address: &str,
         network: &str,
         dbname: &str
@@ -68,10 +68,10 @@ export! {
 
     @Java_io_parity_signer_SubstrateSignModule_substrateDevelopmentTest
 	fn development_test(
-		_input: &str
+		input: &str
 	) -> anyhow::Result<String, anyhow::Error> {
         //let output = Ok(std::env::consts::OS.to_string());
-        let picture = plot_icon::png_data_from_hex("d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d", 64)?;
+        let picture = plot_icon::png_data_from_base58(input, 32)?;
         Ok(hex::encode(picture))
     }
 

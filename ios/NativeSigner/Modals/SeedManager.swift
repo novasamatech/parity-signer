@@ -85,7 +85,7 @@ struct SeedManager: View {
         .onDisappear {
             seedPhrase = ""
         }
-        .padding(.bottom, 100)
+        .padding(.bottom, 120)
     }
 }
 

@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import SwiftUI
 
 struct Identity: Codable, Equatable {
     var public_key: String
@@ -132,5 +133,30 @@ extension SignerDataModel {
             print(self.lastError)
             signer_destroy_string(err_ptr.pointee.message)
         }
+    }
+    
+    func exportIdentityQR() -> UIImage? {
+        var err = ExternError()
+        let err_ptr: UnsafeMutablePointer<ExternError> = UnsafeMutablePointer(&err)
+        if (self.selectedNetwork == nil) || (self.selectedIdentity == nil) {
+            self.lastError = "identity not defined!"
+            return nil
+        }
+        let res = export_pubkey(err_ptr, self.selectedIdentity!.public_key, self.selectedNetwork!.key, self.dbName)
+        if err_ptr.pointee.code == 0 {
+            let result = String(cString: res!)
+            signer_destroy_string(res!)
+            if let imageData = Data(fromHexEncodedString: result ) {
+                return UIImage(data: imageData)
+            } else {
+                self.lastError = "QR code generation error"
+            }
+        } else {
+            self.lastError = String(cString: err_ptr.pointee.message)
+            print(self.lastError)
+            signer_destroy_string(err_ptr.pointee.message)
+        }
+        
+        return nil
     }
 }
