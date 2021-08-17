@@ -27,7 +27,7 @@ struct IdentityCard: View {
                         Text(identity.name)
                             .foregroundColor(Color("AccentColor"))
                         HStack {
-                            Text("seed")
+                            Text(identity.seed_name)
                                 .foregroundColor(Color("AccentColor"))
                             Text(identity.path)
                                 .foregroundColor(Color("textMainColor"))
@@ -71,6 +71,7 @@ struct IdentityCard: View {
                     }
                     Spacer()
                     Button(action: {
+                        data.selectSeed(seedName: data.selectedIdentity!.seed_name)
                         data.proposeIncrement()
                         data.newIdentity = true
                     }) {
@@ -78,6 +79,7 @@ struct IdentityCard: View {
                     }
                     Spacer()
                     Button(action: {
+                        data.selectSeed(seedName: data.selectedIdentity!.seed_name)
                         data.proposeDerive()
                         data.newIdentity = true
                     }) {

@@ -136,11 +136,13 @@ extension SignerDataModel {
         guard let accessFlags = SecAccessControlCreateWithFlags(kCFAllocatorDefault, kSecAttrAccessibleWhenPasscodeSetThisDeviceOnly, .devicePasscode, &error) else {
             print("Access flags could not be allocated")
             print(error ?? "no error code")
+            self.lastError = "iOS key manager error, report a bug"
             return ""
         }
         print(accessFlags)
         if checkSeedCollision(seedName: seedName) {
             print("Key collision")
+            self.lastError = "Seed with this name already exists"
             return ""
         }
         let res = try_create_seed(err_ptr, seedName, "sr25519", seedPhrase, 24, dbName)
@@ -154,6 +156,7 @@ extension SignerDataModel {
         let finalSeedPhraseString = String(cString: res!)
         guard let finalSeedPhrase = finalSeedPhraseString.data(using: .utf8) else {
             print("could not encode seed phrase")
+            self.lastError = "Seed phrase contains non-0unicode symbols"
             return ""
         }
         signer_destroy_string(res)
@@ -174,6 +177,7 @@ extension SignerDataModel {
             return ""
         }
         self.refreshSeeds()
+        self.selectSeed(seedName: seedName)
         return finalSeedPhraseString
     }
     
@@ -232,7 +236,6 @@ extension SignerDataModel {
 
 extension SignerDataModel {
     func onboard() {
-        self.wipe()
         var err = ExternError()
         let err_ptr: UnsafeMutablePointer<ExternError> = UnsafeMutablePointer(&err)
         do {
@@ -240,11 +243,20 @@ extension SignerDataModel {
                 print(source)
                 var destination = try FileManager.default.url(for: .documentDirectory, in: .userDomainMask, appropriateFor: nil, create: false)
                 destination.appendPathComponent("Database")
+                if FileManager.default.fileExists(atPath: NSHomeDirectory() + "/Documents/Database") {
+                    do {
+                        try FileManager.default.removeItem(at: destination)
+                    } catch {
+                        print("db exists but could not be removed; please report bug")
+                        return
+                    }
+                }
                 try FileManager.default.copyItem(at: source, to: destination)
                 init_history(err_ptr, self.dbName)
                 if (err_ptr.pointee.code == 0) {
                     self.onboardingDone = true
                     self.totalRefresh()
+                    self.refreshSeeds()
                 } else {
                     print("History init failed! This will not do.")
                     print(String(cString: err_ptr.pointee.message))
@@ -260,6 +272,8 @@ extension SignerDataModel {
         do {
             var destination = try FileManager.default.url(for: .documentDirectory, in: .userDomainMask, appropriateFor: nil, create: false)
             destination.appendPathComponent("Database")
+            print(destination)
+            print(self.dbName)
             try FileManager.default.removeItem(at: destination)
         } catch {
             print("FileManager failed to delete db")

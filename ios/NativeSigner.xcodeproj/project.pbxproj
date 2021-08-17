@@ -40,6 +40,23 @@
 		2D7A7BF926C6620B0053C1E0 /* HistoryExpanded.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D7A7BF826C6620B0053C1E0 /* HistoryExpanded.swift */; };
 		2D7A7BFB26C6621D0053C1E0 /* HistoryCollapsed.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D7A7BFA26C6621D0053C1E0 /* HistoryCollapsed.swift */; };
 		2D7A7BFD26C675D30053C1E0 /* HistoryCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D7A7BFC26C675D30053C1E0 /* HistoryCard.swift */; };
+		2D7A7C0026CA97B00053C1E0 /* TCAuthor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D7A7BFF26CA97B00053C1E0 /* TCAuthor.swift */; };
+		2D7A7C0226CA98700053C1E0 /* TCAuthorPlain.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D7A7C0126CA98700053C1E0 /* TCAuthorPlain.swift */; };
+		2D7A7C0826CA9BB00053C1E0 /* TCBlockHash.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D7A7C0726CA9BB00053C1E0 /* TCBlockHash.swift */; };
+		2D7A7C0E26CB929B0053C1E0 /* TCTXSpec.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D7A7C0D26CB929B0053C1E0 /* TCTXSpec.swift */; };
+		2D7A7C1226CB94520053C1E0 /* TCTypesInfo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D7A7C1126CB94520053C1E0 /* TCTypesInfo.swift */; };
+		2D7A7C1426CB96180053C1E0 /* TCTip.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D7A7C1326CB96180053C1E0 /* TCTip.swift */; };
+		2D7A7C1626CB96840053C1E0 /* TCWarning.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D7A7C1526CB96840053C1E0 /* TCWarning.swift */; };
+		2D7A7C1826CB96C70053C1E0 /* TCError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D7A7C1726CB96C70053C1E0 /* TCError.swift */; };
+		2D7A7C1A26CB97B30053C1E0 /* TCID.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D7A7C1926CB97B30053C1E0 /* TCID.swift */; };
+		2D7A7C1C26CB97F50053C1E0 /* TCEnumVariantName.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D7A7C1B26CB97F50053C1E0 /* TCEnumVariantName.swift */; };
+		2D7A7C1E26CB98310053C1E0 /* TCVarName.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D7A7C1D26CB98310053C1E0 /* TCVarName.swift */; };
+		2D7A7C2026CB99250053C1E0 /* TransactionCardSelector.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D7A7C1F26CB99250053C1E0 /* TransactionCardSelector.swift */; };
+		2D7A7C2626CBC3C70053C1E0 /* TCBalance.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D7A7C2126CBC3C70053C1E0 /* TCBalance.swift */; };
+		2D7A7C2726CBC3C70053C1E0 /* TCEraMortalNonce.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D7A7C2226CBC3C70053C1E0 /* TCEraMortalNonce.swift */; };
+		2D7A7C2826CBC3C70053C1E0 /* TCAuthorPublicKey.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D7A7C2326CBC3C70053C1E0 /* TCAuthorPublicKey.swift */; };
+		2D7A7C2926CBC3C70053C1E0 /* TCCall.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D7A7C2426CBC3C70053C1E0 /* TCCall.swift */; };
+		2D7A7C2A26CBC3C70053C1E0 /* TCEraImmortalNonce.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D7A7C2526CBC3C70053C1E0 /* TCEraImmortalNonce.swift */; };
 		2DE72BC226A588C7002BB752 /* NativeSignerApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2DE72BC126A588C7002BB752 /* NativeSignerApp.swift */; };
 		2DE72BC426A588C7002BB752 /* MainButtonScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2DE72BC326A588C7002BB752 /* MainButtonScreen.swift */; };
 		2DE72BC626A588C9002BB752 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 2DE72BC526A588C9002BB752 /* Assets.xcassets */; };
@@ -110,6 +127,23 @@
 		2D7A7BF826C6620B0053C1E0 /* HistoryExpanded.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HistoryExpanded.swift; sourceTree = "<group>"; };
 		2D7A7BFA26C6621D0053C1E0 /* HistoryCollapsed.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HistoryCollapsed.swift; sourceTree = "<group>"; };
 		2D7A7BFC26C675D30053C1E0 /* HistoryCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = HistoryCard.swift; path = NativeSigner/Components/HistoryCard.swift; sourceTree = SOURCE_ROOT; };
+		2D7A7BFF26CA97B00053C1E0 /* TCAuthor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TCAuthor.swift; sourceTree = "<group>"; };
+		2D7A7C0126CA98700053C1E0 /* TCAuthorPlain.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TCAuthorPlain.swift; sourceTree = "<group>"; };
+		2D7A7C0726CA9BB00053C1E0 /* TCBlockHash.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TCBlockHash.swift; sourceTree = "<group>"; };
+		2D7A7C0D26CB929B0053C1E0 /* TCTXSpec.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TCTXSpec.swift; sourceTree = "<group>"; };
+		2D7A7C1126CB94520053C1E0 /* TCTypesInfo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TCTypesInfo.swift; sourceTree = "<group>"; };
+		2D7A7C1326CB96180053C1E0 /* TCTip.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TCTip.swift; sourceTree = "<group>"; };
+		2D7A7C1526CB96840053C1E0 /* TCWarning.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TCWarning.swift; sourceTree = "<group>"; };
+		2D7A7C1726CB96C70053C1E0 /* TCError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TCError.swift; sourceTree = "<group>"; };
+		2D7A7C1926CB97B30053C1E0 /* TCID.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TCID.swift; sourceTree = "<group>"; };
+		2D7A7C1B26CB97F50053C1E0 /* TCEnumVariantName.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TCEnumVariantName.swift; sourceTree = "<group>"; };
+		2D7A7C1D26CB98310053C1E0 /* TCVarName.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TCVarName.swift; sourceTree = "<group>"; };
+		2D7A7C1F26CB99250053C1E0 /* TransactionCardSelector.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransactionCardSelector.swift; sourceTree = "<group>"; };
+		2D7A7C2126CBC3C70053C1E0 /* TCBalance.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TCBalance.swift; sourceTree = "<group>"; };
+		2D7A7C2226CBC3C70053C1E0 /* TCEraMortalNonce.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TCEraMortalNonce.swift; sourceTree = "<group>"; };
+		2D7A7C2326CBC3C70053C1E0 /* TCAuthorPublicKey.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TCAuthorPublicKey.swift; sourceTree = "<group>"; };
+		2D7A7C2426CBC3C70053C1E0 /* TCCall.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TCCall.swift; sourceTree = "<group>"; };
+		2D7A7C2526CBC3C70053C1E0 /* TCEraImmortalNonce.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TCEraImmortalNonce.swift; sourceTree = "<group>"; };
 		2DE72BBE26A588C7002BB752 /* NativeSigner.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = NativeSigner.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		2DE72BC126A588C7002BB752 /* NativeSignerApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NativeSignerApp.swift; sourceTree = "<group>"; };
 		2DE72BC326A588C7002BB752 /* MainButtonScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainButtonScreen.swift; sourceTree = "<group>"; };
@@ -167,10 +201,12 @@
 		2D7A7BC526BA96D00053C1E0 /* Cards */ = {
 			isa = PBXGroup;
 			children = (
+				2D7A7BFE26CA97920053C1E0 /* TransactionCards */,
 				2D7A7BFC26C675D30053C1E0 /* HistoryCard.swift */,
 				2DE72BF426A59C59002BB752 /* NetworkCard.swift */,
 				2D7A7BC126B9D3360053C1E0 /* IdentityCard.swift */,
 				2D7A7BDB26C2613F0053C1E0 /* TransactionCardView.swift */,
+				2D7A7C1F26CB99250053C1E0 /* TransactionCardSelector.swift */,
 			);
 			path = Cards;
 			sourceTree = "<group>";
@@ -227,6 +263,29 @@
 				2D7A7BE226C3FC250053C1E0 /* terms-and-conditions.txt */,
 			);
 			path = Docs;
+			sourceTree = "<group>";
+		};
+		2D7A7BFE26CA97920053C1E0 /* TransactionCards */ = {
+			isa = PBXGroup;
+			children = (
+				2D7A7C2326CBC3C70053C1E0 /* TCAuthorPublicKey.swift */,
+				2D7A7C2126CBC3C70053C1E0 /* TCBalance.swift */,
+				2D7A7C2426CBC3C70053C1E0 /* TCCall.swift */,
+				2D7A7C2526CBC3C70053C1E0 /* TCEraImmortalNonce.swift */,
+				2D7A7C2226CBC3C70053C1E0 /* TCEraMortalNonce.swift */,
+				2D7A7C1126CB94520053C1E0 /* TCTypesInfo.swift */,
+				2D7A7C1526CB96840053C1E0 /* TCWarning.swift */,
+				2D7A7C1726CB96C70053C1E0 /* TCError.swift */,
+				2D7A7C1926CB97B30053C1E0 /* TCID.swift */,
+				2D7A7C1B26CB97F50053C1E0 /* TCEnumVariantName.swift */,
+				2D7A7C1D26CB98310053C1E0 /* TCVarName.swift */,
+				2D7A7C0D26CB929B0053C1E0 /* TCTXSpec.swift */,
+				2D7A7C1326CB96180053C1E0 /* TCTip.swift */,
+				2D7A7BFF26CA97B00053C1E0 /* TCAuthor.swift */,
+				2D7A7C0126CA98700053C1E0 /* TCAuthorPlain.swift */,
+				2D7A7C0726CA9BB00053C1E0 /* TCBlockHash.swift */,
+			);
+			path = TransactionCards;
 			sourceTree = "<group>";
 		};
 		2DE72BB526A588C7002BB752 = {
@@ -468,39 +527,56 @@
 			files = (
 				2D7A7BDE26C296AA0053C1E0 /* TransactionReady.swift in Sources */,
 				2D7A7BE526C3FE260053C1E0 /* Documents.swift in Sources */,
+				2D7A7C0E26CB929B0053C1E0 /* TCTXSpec.swift in Sources */,
 				2DE72C1126AAC3D6002BB752 /* LandingView.swift in Sources */,
+				2D7A7C2726CBC3C70053C1E0 /* TCEraMortalNonce.swift in Sources */,
 				2DE72C0026A6ADC5002BB752 /* CameraService.swift in Sources */,
 				2DE72BF526A59C59002BB752 /* NetworkCard.swift in Sources */,
+				2D7A7C0826CA9BB00053C1E0 /* TCBlockHash.swift in Sources */,
 				2D7A7BC226B9D3370053C1E0 /* IdentityCard.swift in Sources */,
+				2D7A7C1226CB94520053C1E0 /* TCTypesInfo.swift in Sources */,
 				2D7A7BF126C50F950053C1E0 /* NetworkSettings.swift in Sources */,
+				2D7A7C2826CBC3C70053C1E0 /* TCAuthorPublicKey.swift in Sources */,
+				2D7A7C1C26CB97F50053C1E0 /* TCEnumVariantName.swift in Sources */,
 				2DE72BF926A5C360002BB752 /* CameraView.swift in Sources */,
 				2D7A7BD626C1126C0053C1E0 /* Utils.swift in Sources */,
 				2DE72BC426A588C7002BB752 /* MainButtonScreen.swift in Sources */,
 				2D7A7BB826B28D350053C1E0 /* SettingsScreen.swift in Sources */,
+				2D7A7C1A26CB97B30053C1E0 /* TCID.swift in Sources */,
 				2D7A7BB626B136970053C1E0 /* NewSeedScreen.swift in Sources */,
 				2DE72BC226A588C7002BB752 /* NativeSignerApp.swift in Sources */,
+				2D7A7C1426CB96180053C1E0 /* TCTip.swift in Sources */,
+				2D7A7C2626CBC3C70053C1E0 /* TCBalance.swift in Sources */,
 				2D7A7BF926C6620B0053C1E0 /* HistoryExpanded.swift in Sources */,
 				2D7A7BEF26C50ACB0053C1E0 /* SeedManager.swift in Sources */,
+				2D7A7C2A26CBC3C70053C1E0 /* TCEraImmortalNonce.swift in Sources */,
 				2DE72C0426A6CDC5002BB752 /* CameraPreview.swift in Sources */,
 				2D7A7BD426BBEAF00053C1E0 /* Canary.swift in Sources */,
 				2D7A7BD826C163110053C1E0 /* TransactionPreview.swift in Sources */,
+				2D7A7C1626CB96840053C1E0 /* TCWarning.swift in Sources */,
 				2D7A7BED26C50AB80053C1E0 /* NetworkManager.swift in Sources */,
 				2DE72BF726A5AC68002BB752 /* KeyManager.swift in Sources */,
 				2D7A7BA526AE9E680053C1E0 /* Footer.swift in Sources */,
 				2D7A7BDC26C2613F0053C1E0 /* TransactionCardView.swift in Sources */,
 				2D7A7BC026B97DB30053C1E0 /* Identities.swift in Sources */,
+				2D7A7C2926CBC3C70053C1E0 /* TCCall.swift in Sources */,
 				2D7A7BCA26BACFFB0053C1E0 /* QRView.swift in Sources */,
+				2D7A7C2026CB99250053C1E0 /* TransactionCardSelector.swift in Sources */,
 				2D7A7BD026BBC72D0053C1E0 /* Transaction.swift in Sources */,
+				2D7A7C1826CB96C70053C1E0 /* TCError.swift in Sources */,
 				2DE72BF326A59BAB002BB752 /* NetworkList.swift in Sources */,
 				2D7A7BFB26C6621D0053C1E0 /* HistoryCollapsed.swift in Sources */,
 				2D7A7BD226BBCE6F0053C1E0 /* TransactionScreen.swift in Sources */,
 				2D7A7BB426B02B700053C1E0 /* SeedSelector.swift in Sources */,
 				2D7A7BB026B00A3E0053C1E0 /* NavbarShield.swift in Sources */,
 				2D7A7BF326C519990053C1E0 /* MetadataCard.swift in Sources */,
+				2D7A7C0226CA98700053C1E0 /* TCAuthorPlain.swift in Sources */,
 				2D7A7BE026C3AC350053C1E0 /* TransactionTypes.swift in Sources */,
+				2D7A7C1E26CB98310053C1E0 /* TCVarName.swift in Sources */,
 				2D7A7BEB26C4149E0053C1E0 /* DocumentModal.swift in Sources */,
 				2D7A7BF726C650F50053C1E0 /* HistoryView.swift in Sources */,
 				2DE72C0F26A99885002BB752 /* RustNative.swift in Sources */,
+				2D7A7C0026CA97B00053C1E0 /* TCAuthor.swift in Sources */,
 				2D7A7BFD26C675D30053C1E0 /* HistoryCard.swift in Sources */,
 				2DE72BF126A59834002BB752 /* Network.swift in Sources */,
 				2D7A7BC426BA8B350053C1E0 /* NewIdentityScreen.swift in Sources */,

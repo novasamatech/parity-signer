@@ -19,7 +19,9 @@ struct NewIdentityScreen: View {
             RoundedRectangle(cornerRadius: 50).foregroundColor(/*@START_MENU_TOKEN@*/Color("backgroundCard")/*@END_MENU_TOKEN@*/)
             VStack {
                 if !data.lastError.isEmpty {
-                    Text(data.lastError).foregroundColor(Color("AccentColor"))
+                    Text(data.lastError)
+                        .foregroundColor(.red)
+                        .lineLimit(nil)
                 }
                 HStack {
                 Text("Path").font(.body).foregroundColor(Color("textMainColor"))
@@ -28,6 +30,7 @@ struct NewIdentityScreen: View {
                         data.suggestedName = String(cString:  suggest_name(nil, path)) //this function does not fail
                     }
                     .autocapitalization(/*@START_MENU_TOKEN@*/.none/*@END_MENU_TOKEN@*/)
+                    .disableAutocorrection(true)
                     .font(/*@START_MENU_TOKEN@*/.title/*@END_MENU_TOKEN@*/)
                     .foregroundColor(/*@START_MENU_TOKEN@*/Color("textEntryColor")/*@END_MENU_TOKEN@*/)
                     .background(/*@START_MENU_TOKEN@*//*@PLACEHOLDER=View@*/Color("textFieldColor")/*@END_MENU_TOKEN@*/)
@@ -43,22 +46,32 @@ struct NewIdentityScreen: View {
                 .background(/*@START_MENU_TOKEN@*//*@PLACEHOLDER=View@*/Color("textFieldColor")/*@END_MENU_TOKEN@*/).border(/*@START_MENU_TOKEN@*/Color("borderSignalColor")/*@END_MENU_TOKEN@*/, width: /*@START_MENU_TOKEN@*/1/*@END_MENU_TOKEN@*/)
                 }
                 HStack {
-                Text("Password (optional)").font(.body).foregroundColor(Color("textMainColor"))
-                TextField("//hard/soft", text: $password)
+                Text("Password (optional)")
+                    .font(.body)
+                    .foregroundColor(Color("textMainColor"))
+                TextField("password", text: $password)
                     .onChange(of: data.suggestedName, perform: {_ in data.lastError = ""
                     })
                     .font(.title)
+                    .autocapitalization(.none)
+                    .disableAutocorrection(true)
                     .foregroundColor(/*@START_MENU_TOKEN@*/Color("textEntryColor")/*@END_MENU_TOKEN@*/)
-                .background(/*@START_MENU_TOKEN@*//*@PLACEHOLDER=View@*/Color("textFieldColor")/*@END_MENU_TOKEN@*/).border(/*@START_MENU_TOKEN@*/Color("borderSignalColor")/*@END_MENU_TOKEN@*/, width: /*@START_MENU_TOKEN@*/1/*@END_MENU_TOKEN@*/)
+                    .background(/*@START_MENU_TOKEN@*//*@PLACEHOLDER=View@*/Color("textFieldColor")/*@END_MENU_TOKEN@*/)
+                    .border(/*@START_MENU_TOKEN@*/Color("borderSignalColor")/*@END_MENU_TOKEN@*/, width: /*@START_MENU_TOKEN@*/1/*@END_MENU_TOKEN@*/)
                 }
                 HStack {
                 Text("Password (repeat)")
                     .onChange(of: data.suggestedName, perform: {_ in data.lastError = ""
                     })
-                    .font(.body).foregroundColor(Color("textMainColor"))
-                TextField("//hard/soft", text: $passwordCheck).font(/*@START_MENU_TOKEN@*/.title/*@END_MENU_TOKEN@*/)
+                    .font(.body)
+                    .foregroundColor(Color("textMainColor"))
+                TextField("password(again)", text: $passwordCheck)
+                    .font(/*@START_MENU_TOKEN@*/.title/*@END_MENU_TOKEN@*/)
+                    .autocapitalization(.none)
+                    .disableAutocorrection(true)
                     .foregroundColor(/*@START_MENU_TOKEN@*/Color("textEntryColor")/*@END_MENU_TOKEN@*/)
-                .background(/*@START_MENU_TOKEN@*//*@PLACEHOLDER=View@*/Color("textFieldColor")/*@END_MENU_TOKEN@*/).border(/*@START_MENU_TOKEN@*/Color("borderSignalColor")/*@END_MENU_TOKEN@*/, width: /*@START_MENU_TOKEN@*/1/*@END_MENU_TOKEN@*/)
+                    .background(/*@START_MENU_TOKEN@*//*@PLACEHOLDER=View@*/Color("textFieldColor")/*@END_MENU_TOKEN@*/)
+                    .border(/*@START_MENU_TOKEN@*/Color("borderSignalColor")/*@END_MENU_TOKEN@*/, width: /*@START_MENU_TOKEN@*/1/*@END_MENU_TOKEN@*/)
                 }
                 HStack {
                     Button(action: {
@@ -75,7 +88,8 @@ struct NewIdentityScreen: View {
                     }) {
                         Text("Create")
                             .font(.largeTitle)
-                    }.disabled(password != passwordCheck)
+                    }
+                    .disabled(password != passwordCheck)
                 }
                 Spacer()
             }.padding()

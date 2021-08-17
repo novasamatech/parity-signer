@@ -14,13 +14,14 @@ struct Identity: Codable, Equatable {
     var path: String
     var has_password: String
     var name: String
+    var seed_name: String
 }
 
 extension Identity {
     static var identityData: [Identity] {
         [
-            Identity(public_key: "1691a3ce28763a83e094bd5b06835bc5bba4d38d770710f8f327d4f2c71afb21", ss58: "1WbKRCtpZ6XbTdf9w8i7KVwctANhQhQg27qfE54RbamvfrD", path: "", has_password: "false", name: "root address"),
-            Identity(public_key: "1791a3ce28763a83e094bd5b06835bc5bba4d38d770710f8f327d4f2c71afb21", ss58: "11bKRCtpZ6XbTdf9w8i7KVwctANhQhQg27qfE54RbamvfrD", path: "", has_password: "true", name: "Some other address")
+            Identity(public_key: "1691a3ce28763a83e094bd5b06835bc5bba4d38d770710f8f327d4f2c71afb21", ss58: "1WbKRCtpZ6XbTdf9w8i7KVwctANhQhQg27qfE54RbamvfrD", path: "", has_password: "false", name: "root address", seed_name: "Pupa"),
+            Identity(public_key: "1791a3ce28763a83e094bd5b06835bc5bba4d38d770710f8f327d4f2c71afb21", ss58: "11bKRCtpZ6XbTdf9w8i7KVwctANhQhQg27qfE54RbamvfrD", path: "", has_password: "true", name: "Some other address", seed_name: "Lupa")
         ]
     }
 }
@@ -37,8 +38,6 @@ extension SignerDataModel {
             if let keysJSON = String(cString: res!).data(using: .utf8) {
                 guard let keys = try? JSONDecoder().decode([Identity].self, from: keysJSON) else {
                     print("JSON decoder failed on keys")
-                    print(String(cString: res!))
-                    print(keysJSON)
                     signer_destroy_string(res!)
                     return
                 }
@@ -47,6 +46,7 @@ extension SignerDataModel {
                 print("keysJSON corrupted")
             }
             signer_destroy_string(res!)
+            print("success1")
         } else {
             self.lastError = String(cString: err_ptr.pointee.message)
             print("Rust returned error")

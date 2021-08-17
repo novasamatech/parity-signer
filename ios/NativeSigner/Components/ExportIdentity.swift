@@ -39,7 +39,9 @@ struct ExportIdentity: View {
         }
         .onAppear {
             data.lastError = ""
-            image = data.exportIdentityQR()
+            if data.selectedIdentity != nil {
+                image = data.exportIdentityQR()
+            }
         }
         .padding(.bottom, 120)
     }

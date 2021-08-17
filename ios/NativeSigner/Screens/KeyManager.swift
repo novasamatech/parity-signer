@@ -11,9 +11,11 @@ struct KeyManager: View {
     @EnvironmentObject var data: SignerDataModel
     var body: some View {
         ZStack {
+            
             VStack {
                 NetworkList()
                 SeedSelector()
+
                 ScrollView {
                     LazyVStack {
                         ForEach(data.identities, id: \.public_key) {
@@ -23,6 +25,7 @@ struct KeyManager: View {
                         }
                     }
                 }
+ 
                 Spacer()
             }.padding(.bottom, 100)
             

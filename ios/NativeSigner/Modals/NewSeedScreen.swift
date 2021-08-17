@@ -21,28 +21,50 @@ struct NewSeedScreen: View {
             RoundedRectangle(cornerRadius: 50).foregroundColor(/*@START_MENU_TOKEN@*/Color("backgroundCard")/*@END_MENU_TOKEN@*/)
         VStack {
             VStack {
-                Text("Seed name").font(.title).foregroundColor(Color("textMainColor"))
-                TextField("Seed name", text: $seedName).font(/*@START_MENU_TOKEN@*/.title/*@END_MENU_TOKEN@*/)
+                Text("Seed name")
+                    .font(.title)
+                    .foregroundColor(Color("textMainColor"))
+                TextField("Seed name", text: $seedName)
+                    .onChange(of: seedName, perform: { _ in
+                        data.lastError = ""
+                    })
+                    .font(/*@START_MENU_TOKEN@*/.title/*@END_MENU_TOKEN@*/)
                     .foregroundColor(/*@START_MENU_TOKEN@*/Color("textEntryColor")/*@END_MENU_TOKEN@*/)
-                .background(/*@START_MENU_TOKEN@*//*@PLACEHOLDER=View@*/Color("textFieldColor")/*@END_MENU_TOKEN@*/).border(/*@START_MENU_TOKEN@*/Color("borderSignalColor")/*@END_MENU_TOKEN@*/, width: /*@START_MENU_TOKEN@*/1/*@END_MENU_TOKEN@*/)
+                    .background(/*@START_MENU_TOKEN@*//*@PLACEHOLDER=View@*/Color("textFieldColor")/*@END_MENU_TOKEN@*/)
+                    .border(/*@START_MENU_TOKEN@*/Color("borderSignalColor")/*@END_MENU_TOKEN@*/, width: /*@START_MENU_TOKEN@*/1/*@END_MENU_TOKEN@*/)
                 Toggle(isOn: $recover) {
-                    Text("Recover").font(.headline).foregroundColor(Color("textMainColor"))
+                    Text("Enter custom seedphrase")
+                        .font(.headline)
+                        .foregroundColor(Color("textMainColor"))
                 }
                 if (recover) {
-                    Text("Seed phrase").font(.title).foregroundColor(Color("textMainColor"))
+                    
+                    /*
+                    Text("Seed phrase")
+                        .font(.title)
+                        .foregroundColor(Color("textMainColor"))
+                    */
+
                     TextEditor(text: $seedPhrase)
-                .frame(height: 150.0)
-                .background(/*@START_MENU_TOKEN@*//*@PLACEHOLDER=View@*/Color("textFieldColor")/*@END_MENU_TOKEN@*/)
-                .foregroundColor(/*@START_MENU_TOKEN@*/Color("textEntryColor")/*@END_MENU_TOKEN@*/).background(/*@START_MENU_TOKEN@*//*@PLACEHOLDER=View@*/Color("textFieldColor")/*@END_MENU_TOKEN@*/).border(/*@START_MENU_TOKEN@*/Color("borderSignalColor")/*@END_MENU_TOKEN@*/, width: /*@START_MENU_TOKEN@*/1/*@END_MENU_TOKEN@*/)
+                        .frame(height: 150.0)
+                        .autocapitalization(.none)
+                        .font(/*@START_MENU_TOKEN@*/.title/*@END_MENU_TOKEN@*/)
+                        .background(/*@START_MENU_TOKEN@*//*@PLACEHOLDER=View@*/Color("textFieldColor")/*@END_MENU_TOKEN@*/)
+                        .foregroundColor(/*@START_MENU_TOKEN@*/Color("textEntryColor")/*@END_MENU_TOKEN@*/)
+                        .background(/*@START_MENU_TOKEN@*//*@PLACEHOLDER=View@*/Color("textFieldColor")/*@END_MENU_TOKEN@*/)
+                        .border(/*@START_MENU_TOKEN@*/Color("borderSignalColor")/*@END_MENU_TOKEN@*/, width: /*@START_MENU_TOKEN@*/1/*@END_MENU_TOKEN@*/)
                 }
+                Text(data.lastError).foregroundColor(.red)
                 HStack{
                     Button(action: {
+                        data.lastError = ""
                         data.newSeed = false
                     }) {
                         Text("Cancel").font(.largeTitle)
                     }
                     Spacer()
                     Button(action: {
+                        if !recover {seedPhrase = ""}
                         seedPhrase = data.addSeed(seedName: seedName, seedPhrase: seedPhrase)
                         if !seedPhrase.isEmpty {createButton = true}
                     }) {
