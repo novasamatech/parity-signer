@@ -3,60 +3,30 @@
 
 ### Requirements
 
-- `node.js` ( `>=10`)
-- `yarn` (tested on `1.6.0`)
+- Rust
 
 #### iOS
-- `cocoapods` (`$ sudo gem install cocoapods`)
 - `Xcode` (only for iOS, tested on `Version 11.3.1 (9F2000)`)
 
 #### Android
-- `Android Studio` (only for Android, tested on `Version 3.3`)
-- `$JAVA_HOME` envarionment variable set to java home directory (eg. `/Library/Java/JavaVirtualMachines/jdk1.8.0_60.jdk/Contents/Home`)
-- `$ANDROID_HOME` environment variable set to Android SDK directory (eg. `/home/your_username/Android/Sdk`)*.
+- `Android Studio` (only for Android, tested on `Version 2020.3 (build number 203.7717.56.2031.7621141)`)
 
 \* It's recommended to install **Android Studio** and use that to install the necessary build tools and SDKs for the Android version you want to test on. It's also the best way to test in the emulator.
 
 ### Setup
 
-#### iOS
-- Install Dependencies
-
-    ```
-    yarn install:ios
-    ```
 #### Android
-- Install Dependencies
-
-    ```
-    yarn install
-    ```
-
-#### Any system
 - Generate an Android Debug Key if it is first time.
 
     ```
     ./scripts/gen_key.sh
     ```
+- Export `$NDK_HOME` environment variable (usually somewhere under android-sdk directory; please follow AndroidStudio documentation)
 
 ### Develop
 
-- Start React Native server
-
+1. Build Rust libraries
     ```
-    yarn start
+    ./scripts/build.sh
     ```
-
-Then:
-
-- iOS
-
-    ```
-    yarn ios
-    ```
-
-- Android
-
-    ```
-    yarn android
-    ```
+2. Build platform-specific code
