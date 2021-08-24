@@ -70,7 +70,7 @@ fun SignerApp(signerDataModel: SignerDataModel) {
 					)
 				}
 				composable(SignerScreen.Keys.name) {
-					KeyManager()
+					KeyManager(signerDataModel = signerDataModel)
 				}
 				composable(SignerScreen.Settings.name) {
 					SettingsScreen()

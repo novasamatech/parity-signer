@@ -24,7 +24,7 @@ mod export;
 mod result;
 
 export! {
-	@Java_io_parity_signer_SubstrateSignModule_substrateExportPubkey
+	@Java_io_parity_signer_models_SignerDataModel_substrateExportPubkey
 	fn export_pubkey(
 		address: &str,
         network: &str,
@@ -33,21 +33,21 @@ export! {
 		db_handling::identities::export_identity(address, network, dbname)
 	}
 
-	@Java_io_parity_signer_SubstrateSignModule_qrparserGetPacketsTotal
+	@Java_io_parity_signer_models_SignerDataModel_qrparserGetPacketsTotal
 	fn get_packets_total(
 		data: &str
 	) -> anyhow::Result<u32, anyhow::Error> {
         qr_reader_phone::get_length(data)
 	}
 
-	@Java_io_parity_signer_SubstrateSignModule_qrparserTryDecodeQrSequence
+	@Java_io_parity_signer_models_SignerDataModel_qrparserTryDecodeQrSequence
 	fn try_decode_qr_sequence(
 		data: &str
 	) -> anyhow::Result<String, anyhow::Error> {
         qr_reader_phone::decode_sequence(data)
 	}
 
-    @Java_io_parity_signer_SubstrateSignModule_substrateParseTransaction
+    @Java_io_parity_signer_models_SignerDataModel_substrateParseTransaction
 	fn parse_transaction(
 		transaction: &str,
         dbname: &str
@@ -56,7 +56,7 @@ export! {
         else {return transaction_parsing::produce_output(transaction, dbname)}
     }
 
-    @Java_io_parity_signer_SubstrateSignModule_substrateHandleAction
+    @Java_io_parity_signer_models_SignerDataModel_substrateHandleAction
 	fn handle_action(
 		action: &str,
         seed_phrase: &str,
@@ -66,7 +66,7 @@ export! {
         transaction_signing::handle_action(action, seed_phrase, password, dbname)
     }
 
-    @Java_io_parity_signer_SubstrateSignModule_substrateDevelopmentTest
+    @Java_io_parity_signer_models_SignerDataModel_substrateDevelopmentTest
 	fn development_test(
 		input: &str
 	) -> anyhow::Result<String, anyhow::Error> {
@@ -75,7 +75,7 @@ export! {
         Ok(hex::encode(picture))
     }
 
-    @Java_io_parity_signer_SubstrateSignModule_dbGetNetwork
+    @Java_io_parity_signer_models_SignerDataModel_dbGetNetwork
 	fn get_network(
 		genesis_hash: &str,
         dbname: &str
@@ -88,7 +88,7 @@ export! {
             spec.title)))
     }
 
-    @Java_io_parity_signer_SubstrateSignModule_dbGetAllNetworksForNetworkSelector
+    @Java_io_parity_signer_models_SignerDataModel_dbGetAllNetworksForNetworkSelector
 	fn get_all_networks_for_network_selector(
         dbname: &str
     ) -> anyhow::Result<String, anyhow::Error> {
@@ -107,7 +107,7 @@ export! {
         result::return_json_array(output)
     }
 
-    @Java_io_parity_signer_SubstrateSignModule_dbGetRelevantIdentities
+    @Java_io_parity_signer_models_SignerDataModel_dbGetRelevantIdentities
 	fn get_relevant_identities(
 		seed_name: &str,
         genesis_hash: &str,
@@ -116,14 +116,14 @@ export! {
         db_handling::identities::print_relevant_identities(seed_name, genesis_hash, dbname)
     }
     
-    @Java_io_parity_signer_SubstrateSignModule_dbGetAllIdentities
+    @Java_io_parity_signer_models_SignerDataModel_dbGetAllIdentities
 	fn get_all_identities(
         dbname: &str
 	) -> anyhow::Result<String, anyhow::Error> {
         db_handling::identities::print_all_identities(dbname)
     }
 
-    @Java_io_parity_signer_SubstrateSignModule_substrateTryCreateSeed
+    @Java_io_parity_signer_models_SignerDataModel_substrateTryCreateSeed
 	fn try_create_seed(
         seed_name: &str,
         crypto: &str,
@@ -134,7 +134,7 @@ export! {
         db_handling::identities::try_create_seed(seed_name, crypto, seed_phrase, seed_length, dbname)
     }
 
-    @Java_io_parity_signer_SubstrateSignModule_substrateSuggestNPlusOne
+    @Java_io_parity_signer_models_SignerDataModel_substrateSuggestNPlusOne
 	fn suggest_n_plus_one(
         path: &str,
         seed_name: &str,
@@ -144,14 +144,14 @@ export! {
         db_handling::identities::suggest_n_plus_one(path, seed_name, network_id_string, dbname)
     }
 
-    @Java_io_parity_signer_SubstrateSignModule_substrateCheckPath
+    @Java_io_parity_signer_models_SignerDataModel_substrateCheckPath
 	fn check_path(
         path: &str
 	) -> anyhow::Result<bool, anyhow::Error> {
         db_handling::identities::check_derivation_format(path)
     }
 
-    @Java_io_parity_signer_SubstrateSignModule_substrateTryCreateIdentity
+    @Java_io_parity_signer_models_SignerDataModel_substrateTryCreateIdentity
 	fn try_create_identity(
         id_name: &str,
         seed_name: &str,
@@ -165,14 +165,14 @@ export! {
         db_handling::identities::try_create_address(id_name, seed_name, seed_phrase, crypto, path, network, has_password, dbname)
     }
 
-    @Java_io_parity_signer_SubstrateSignModule_substrateSuggestName
+    @Java_io_parity_signer_models_SignerDataModel_substrateSuggestName
 	fn suggest_name(
         path: &str
 	) -> String {
         db_handling::identities::suggest_path_name(path)
     }
 
-    @Java_io_parity_signer_SubstrateSignModule_substrateDeleteIdentity
+    @Java_io_parity_signer_models_SignerDataModel_substrateDeleteIdentity
 	fn delete_identity(
         pub_key: &str,
         network: &str,
@@ -181,7 +181,7 @@ export! {
         db_handling::identities::delete_address(pub_key, network, dbname)
     }
 
-    @Java_io_parity_signer_SubstrateSignModule_substrateGetNetworkSpecs
+    @Java_io_parity_signer_models_SignerDataModel_substrateGetNetworkSpecs
 	fn get_network_specs(
         network: &str,
         dbname: &str
@@ -189,7 +189,7 @@ export! {
         db_handling::network_details::get_network_details_by_hex(network, dbname)
     }
     
-    @Java_io_parity_signer_SubstrateSignModule_substrateRemoveNetwork
+    @Java_io_parity_signer_models_SignerDataModel_substrateRemoveNetwork
 	fn remove_network(
         network: &str,
         dbname: &str
@@ -197,7 +197,7 @@ export! {
         db_handling::remove_network::remove_network_by_hex(network, dbname)
     }
 
-    @Java_io_parity_signer_SubstrateSignModule_substrateRemoveMetadata
+    @Java_io_parity_signer_models_SignerDataModel_substrateRemoveMetadata
 	fn remove_metadata(
         network_name: &str,
         network_version: u32,
@@ -206,7 +206,7 @@ export! {
         db_handling::remove_network::remove_metadata(network_name, network_version, dbname)
     }
 
-    @Java_io_parity_signer_SubstrateSignModule_substrateRemoveSeed
+    @Java_io_parity_signer_models_SignerDataModel_substrateRemoveSeed
 	fn remove_seed(
         seed_name: &str,
         dbname: &str
@@ -214,49 +214,49 @@ export! {
         db_handling::identities::remove_identities_for_seed(seed_name, dbname)
     }
 
-    @Java_io_parity_signer_SubstrateSignModule_historyPrintHistory
+    @Java_io_parity_signer_models_SignerDataModel_historyPrintHistory
 	fn print_history(
         dbname: &str
 	) -> anyhow::Result<String, anyhow::Error> {
         db_handling::manage_history::print_history(dbname)
     }
 
-    @Java_io_parity_signer_SubstrateSignModule_historyClearHistory
+    @Java_io_parity_signer_models_SignerDataModel_historyClearHistory
 	fn clear_history(
         dbname: &str
 	) -> anyhow::Result<(), anyhow::Error> {
         db_handling::manage_history::clear_history(dbname)
     }
 
-    @Java_io_parity_signer_SubstrateSignModule_historyInitHistory
+    @Java_io_parity_signer_models_SignerDataModel_historyInitHistory
 	fn init_history(
         dbname: &str
 	) -> anyhow::Result<(), anyhow::Error> {
         db_handling::manage_history::init_history(dbname)
     }
 
-    @Java_io_parity_signer_SubstrateSignModule_historyDeviceWasOnline
+    @Java_io_parity_signer_models_SignerDataModel_historyDeviceWasOnline
 	fn device_was_online(
         dbname: &str
 	) -> anyhow::Result<(), anyhow::Error> {
         db_handling::manage_history::device_was_online(dbname)
     }
 
-    @Java_io_parity_signer_SubstrateSignModule_historySeedsWereAccessed
+    @Java_io_parity_signer_models_SignerDataModel_historySeedsWereAccessed
 	fn seeds_were_accessed(
         dbname: &str
 	) -> anyhow::Result<(), anyhow::Error> {
         db_handling::manage_history::seeds_were_accessed(dbname)
     }
 
-    @Java_io_parity_signer_SubstrateSignModule_historySeedsWereShown
+    @Java_io_parity_signer_models_SignerDataModel_historySeedsWereShown
 	fn seeds_were_shown(
         dbname: &str
 	) -> anyhow::Result<(), anyhow::Error> {
         db_handling::manage_history::seeds_were_shown(dbname)
     }
 
-    @Java_io_parity_signer_SubstrateSignModule_historyHistoryEntryUser
+    @Java_io_parity_signer_models_SignerDataModel_historyHistoryEntryUser
 	fn history_entry_user(
         entry: &str,
         dbname: &str
@@ -264,7 +264,7 @@ export! {
         db_handling::manage_history::history_entry_user(dbname, entry.to_string())
     }
 
-    @Java_io_parity_signer_SubstrateSignModule_historyHistoryEntrySystem
+    @Java_io_parity_signer_models_SignerDataModel_historyHistoryEntrySystem
 	fn history_entry_system(
         entry: &str,
         dbname: &str

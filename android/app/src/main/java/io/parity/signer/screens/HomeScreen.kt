@@ -16,6 +16,10 @@ import androidx.compose.ui.res.painterResource
 import io.parity.signer.MainActivity
 import io.parity.signer.models.SignerDataModel
 
+/**
+ * This is a simple screen with a single button that
+ * triggers transaction sequence starting with camera
+ */
 @Composable
 fun HomeScreen(signerDataModel: SignerDataModel, navToTransaction: () -> Unit) {
 	Box(
@@ -23,6 +27,7 @@ fun HomeScreen(signerDataModel: SignerDataModel, navToTransaction: () -> Unit) {
 			.clickable(onClick = navToTransaction)
 			.fillMaxSize()
 	) {
+		//TODO: add proper camera image
 		Image(
 			painter = painterResource(id = io.parity.signer.R.drawable.icon),
 			contentDescription = "Icon"
