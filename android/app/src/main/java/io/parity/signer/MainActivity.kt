@@ -51,6 +51,7 @@ fun SignerApp(signerDataModel: SignerDataModel) {
 		val allScreens = SignerScreen.values().toList()
 		val navController = rememberNavController()
 
+		//Structure to contain all app
 		Scaffold(
 			topBar = {
 				TopBar(SignerScreen.Home, navBack = { navController.navigateUp() })

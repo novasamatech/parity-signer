@@ -10,6 +10,11 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import io.parity.signer.models.SignerDataModel
 
+/**
+ * Key manager screen; here all key/identity/seed creation and deletion
+ * operations should happen. This is final point in navigation:
+ * all subsequent interactions should be in modals or drop-down menus
+ */
 @Composable
 fun KeyManager(signerDataModel: SignerDataModel) {
 	Column {

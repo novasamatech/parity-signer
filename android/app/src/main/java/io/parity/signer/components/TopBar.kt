@@ -8,6 +8,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import io.parity.signer.SignerScreen
 
+/**
+ * Top bar - navigation bar
+ * Should get navigation callbacks, current navigation state, network safety
+ * indicator and history alert
+ */
 @Composable
 fun TopBar(currentScreen: SignerScreen, navBack: () -> Unit ) {
 	Surface(color = MaterialTheme.colors.background) {
