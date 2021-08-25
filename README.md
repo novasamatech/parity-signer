@@ -20,9 +20,25 @@ Have a look at the tutorial on our wiki to learn how to use [Parity Signer toget
 
 Any data transfer from or to the app happens using QR code. By doing so, the most sensitive piece of information, the private keys, will never leave the phone. The Parity Signer mobile app can be used to store any Substrate account, this includes Polkadot (DOT) and Kusama (KSM) networks.
 
+## Key features
+
+- This is not a complete cryptowallet in itself. The Signer does not sync with blockchain, so it does not know your account balance, whether transactions were successful or even if the account exists! This is a **cold wallet** app only stores keys, reads and signs messages. It should always be used with **hot wallet** like [polkadot.js](https://polkadot.js.org/apps)
+- The Signer alone does not make your accounts secure. **You must maintain security yourself**. Airgap should be only part of your security protocol, improper use of Signer could still lead to loss of funds and/or secrets.
+- When properly used, Signer provides best achievable security with Substrate networks to-date.
+
+## System requirements
+
+Currently Signer is available only for iOS. Android version is coming soon.
+
 ## Getting Started
 
 **These tutorials and docs are heavily outdated at the moment, please use them as references or help improving**
+
+If you are upgrading from older version of Signer, please see [changelog](./docs/wiki/Changelog.md) and [upgrading Signer](./docs/wiki/Upgrading.md)
+
+Please note that the Signer app is an advanced tool designed for maximum security and complex features. In many use cases, more user-friendly tools would be sufficient.
+
+[Getting started guide](./docs/tutorials/Start.md)
 
 ### Tutorials
 
@@ -39,7 +55,7 @@ Any data transfer from or to the app happens using QR code. By doing so, the mos
 - [Testing](./docs/wiki/Test.md)
 - [Troubleshooting](./docs/wiki/Troubleshooting.md)
 - [QA Check List](./docs/wiki/QA.md)
-- [HDKD Feature](./docs/wiki/HDKD.md)
+- [Key derivations](https://substrate.dev/docs/en/knowledgebase/integrate/subkey)
 - [Changelog](./docs/wiki/Changelog.md)
 
 ### Legacy versions

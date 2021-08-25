@@ -1,5 +1,7 @@
 # Building and Publishing
 
+**Everything here is outdated, please do not use as is!**
+
 In this page we will list the steps to publish the app on iOS App Store / Android Play Store.
 
 ## iOS App Store
