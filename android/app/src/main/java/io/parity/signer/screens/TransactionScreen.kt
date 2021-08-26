@@ -2,6 +2,7 @@ package io.parity.signer.screens
 
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import io.parity.signer.models.SignerDataModel
 
 /**
  * This screen envelops scanning-signing workflow;
@@ -15,6 +16,6 @@ import androidx.compose.runtime.Composable
  *  3. Signature
  */
 @Composable
-fun TransactionScreen() {
+fun TransactionScreen(signerDataModel: SignerDataModel) {
 	Text(text = "Scanner goes brrr")
 }

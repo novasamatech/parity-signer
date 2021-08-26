@@ -32,6 +32,7 @@ fun HomeScreen(signerDataModel: SignerDataModel, navToTransaction: () -> Unit) {
 			painter = painterResource(id = io.parity.signer.R.drawable.icon),
 			contentDescription = "Icon"
 		)
+		Text(signerDataModel.onBoardingDone.value.toString())
 	}
 }
 
