@@ -53,9 +53,9 @@ fun SignerApp(signerDataModel: SignerDataModel) {
 	ParitySignerTheme {
 		//val allScreens = SignerScreen.values().toList()
 		val navController = rememberNavController()
-		var onBoardingDone = signerDataModel.isOnBoardingDone()
+		var onBoardingDone = signerDataModel.onBoardingDone.observeAsState()
 
-		if (signerDataModel.onBoardingDone.value as Boolean) {
+		if (onBoardingDone.value as Boolean) {
 			//Structure to contain all app
 			Scaffold(
 				topBar = {
@@ -126,14 +126,13 @@ fun SignerApp(signerDataModel: SignerDataModel) {
 						),
 						onClick = {
 							signerDataModel.onBoard()
-							onBoardingDone = signerDataModel.isOnBoardingDone()
 						}
 					) {
 						Text("Accept")
 					}
 				},
 				title = { Text("Terms and conditions") },
-				text = { Text(signerDataModel.onBoardingDone.toString()) }
+				text = { Text(onBoardingDone.value.toString()) }
 			)
 		}
 

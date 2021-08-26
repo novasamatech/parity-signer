@@ -85,10 +85,6 @@ class SignerDataModel: ViewModel() {
 		_onBoardingDone.value = File(dbName).exists()
 	}
 
-	fun isOnBoardingDone(): Boolean {
-		return File(dbName).exists()
-	}
-
 	//TODO: development function; should be removed on release
 	fun callNative(input: String): String {
 		var test: String
