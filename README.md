@@ -57,6 +57,7 @@ Please note that the Signer app is an advanced tool designed for maximum securit
 - [QA Check List](./docs/wiki/QA.md)
 - [Key derivations](https://substrate.dev/docs/en/knowledgebase/integrate/subkey)
 - [Changelog](./docs/wiki/Changelog.md)
+- [QR encoding definition](https://github.com/maciejhirsz/uos)
 
 ### Legacy versions
 
