@@ -1,22 +1,10 @@
-use definitions::{constants::{HOT_DB_NAME, SETTREE, TYLO, TYPES}, types::TypeEntry};
-use parity_scale_codec::Decode;
-use sled::{Db, open, Tree};
+use constants::{HOT_DB_NAME, TYLO};
 use std::fs;
+use db_handling::prep_messages::prep_types;
 
 pub fn gen_types() -> Result<(), Box<dyn std::error::Error>> {
     
-    let database: Db = open(HOT_DB_NAME)?;
-    let settings: Tree = database.open_tree(SETTREE)?;
-    
-    let types_info = match settings.get(TYPES)? {
-        Some(a) => a,
-        None => return Err(Box::from("Types info not found in the hot database.")),
-    };
-    
-    match <Vec<TypeEntry>>::decode(&mut &types_info[..]) {
-        Ok(_) => (),
-        Err(_) => return Err(Box::from("Types vector from hot database is not decodeable.")),
-    }
+    let types_info = prep_types(HOT_DB_NAME)?;
     
     match fs::write(&TYLO, &types_info) {
         Ok(()) => Ok(()),

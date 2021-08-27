@@ -1,5 +1,6 @@
 use anyhow;
-use definitions::{constants::{HISTORY, SIGNTRANS, TRANSACTION}, history::Event, network_specs::Verifier, transactions::{Transaction, SignDisplay}, users::Encryption};
+use constants::{HISTORY, SIGNTRANS, TRANSACTION};
+use definitions::{history::Event, network_specs::Verifier, transactions::{Transaction, SignDisplay}, users::Encryption};
 use parity_scale_codec::Decode;
 use db_handling::{helpers::{open_db, open_tree, flush_db, remove_from_tree}, manage_history::enter_events_into_tree};
 use qrcode_static::png_qr_from_string;

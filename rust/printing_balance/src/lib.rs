@@ -20,24 +20,26 @@ fn assist (a: String, decimals: u8, order: u8) -> (String, Option<String>, i8) {
     (String::from("0"), Some(out), MINUS_MIN as i8)
 }
 
-pub fn convert_balance_pretty (balance: u128, decimals: u8, units: &str) -> Result<PrettyOutput, &'static str> {
+/// Input `balance` has to be a printed number. Likely u128 or u64.
+/// Validity of input is checked elsewhere.
+
+pub fn convert_balance_pretty (balance: &str, decimals: u8, units: &str) -> Result<PrettyOutput, &'static str> {
     
-    let a = balance.to_string();
-    let order = (a.len() as u8) -1;
+    let order = (balance.len() as u8) -1;
     
     let transformed_number = match order {
         0 => {
-            if balance == 0 {
+            if balance == "0" {
                 let (before_point, after_point, mag) = {
                     if decimals <= MINUS_MIN*3 {
                         match decimals%3 {
-                            0 => (a, None, (decimals/3) as i8),
-                            1 => (a, Some(String::from("0")), (decimals/3) as i8),
-                            2 => (a, Some(String::from("00")), (decimals/3) as i8),
-                            _ => return Err("Should not be here"),
+                            0 => (balance.to_string(), None, (decimals/3) as i8),
+                            1 => (balance.to_string(), Some(String::from("0")), (decimals/3) as i8),
+                            2 => (balance.to_string(), Some(String::from("00")), (decimals/3) as i8),
+                            _ => unreachable!(),
                         }
                     }
-                    else {assist(a, decimals, order)}
+                    else {assist(balance.to_string(), decimals, order)}
                 };
                 CutNumber {
                     before_point,
@@ -49,13 +51,13 @@ pub fn convert_balance_pretty (balance: u128, decimals: u8, units: &str) -> Resu
                 let (before_point, after_point, mag) = {
                     if decimals <= MINUS_MIN*3 {
                         match decimals%3 {
-                            0 => (a, None, (decimals/3) as i8),
-                            1 => (format!("{}00",a), None, (decimals/3) as i8 + 1),
-                            2 => (format!("{}0",a), None, (decimals/3) as i8 + 1),
-                            _ => return Err("Should not be here"),
+                            0 => (balance.to_string(), None, (decimals/3) as i8),
+                            1 => (format!("{}00",balance), None, (decimals/3) as i8 + 1),
+                            2 => (format!("{}0",balance), None, (decimals/3) as i8 + 1),
+                            _ => unreachable!(),
                         }
                     }
-                    else {assist(a, decimals, order)}
+                    else {assist(balance.to_string(), decimals, order)}
                 };
                 CutNumber {
                     before_point,
@@ -69,16 +71,16 @@ pub fn convert_balance_pretty (balance: u128, decimals: u8, units: &str) -> Resu
                 if order <= decimals {
                     if (decimals-order) <= MINUS_MIN*3 {
                         match (decimals+2)%3 {
-                            0 => (a[..1].to_string(), Some(a[1..].to_string()), (decimals/3) as i8),
-                            1 => (format!("{}0",a), None, (decimals/3) as i8 + 1),
-                            2 => (a, None, (decimals/3) as i8),
-                            _ => return Err("Should not be here"),
+                            0 => (balance[..1].to_string(), Some(balance[1..].to_string()), (decimals/3) as i8),
+                            1 => (format!("{}0", balance), None, (decimals/3) as i8 + 1),
+                            2 => (balance.to_string(), None, (decimals/3) as i8),
+                            _ => unreachable!(),
                         }
                     }
-                    else {assist(a, decimals, order)}
+                    else {assist(balance.to_string(), decimals, order)}
                 }
                 else {
-                    (a, None, 0)
+                    (balance.to_string(), None, 0)
                 }
             };
             CutNumber {
@@ -92,17 +94,17 @@ pub fn convert_balance_pretty (balance: u128, decimals: u8, units: &str) -> Resu
                 if order <= decimals {
                     if (decimals-order) <= MINUS_MIN*3 {
                         match (decimals+1)%3 {
-                            0 => (a[..1].to_string(), Some(a[1..].to_string()), (decimals/3) as i8),
-                            1 => (a, None, (decimals/3) as i8),
-                            2 => (a[..2].to_string(), Some(a[2..].to_string()), (decimals/3) as i8),
-                            _ => return Err("Should not be here"),
+                            0 => (balance[..1].to_string(), Some(balance[1..].to_string()), (decimals/3) as i8),
+                            1 => (balance.to_string(), None, (decimals/3) as i8),
+                            2 => (balance[..2].to_string(), Some(balance[2..].to_string()), (decimals/3) as i8),
+                            _ => unreachable!(),
                         }
                     }
-                    else {assist(a, decimals, order)}
+                    else {assist(balance.to_string(), decimals, order)}
                 }
                 else {
-                    if decimals == 0 {(a, None, 0)}
-                    else {(a[..2].to_string(), Some(a[2..].to_string()), 0)}
+                    if decimals == 0 {(balance.to_string(), None, 0)}
+                    else {(balance[..2].to_string(), Some(balance[2..].to_string()), 0)}
                 }
             };
             CutNumber {
@@ -123,8 +125,8 @@ pub fn convert_balance_pretty (balance: u128, decimals: u8, units: &str) -> Resu
                     }
                     else {(decimals-MINUS_MIN*3) as usize}
                 };
-                let before_point = a[..a.len()-length].to_string();
-                let after_point = Some(a[a.len()-length..].to_string());
+                let before_point = balance[..balance.len()-length].to_string();
+                let after_point = Some(balance[balance.len()-length..].to_string());
                 let mag = {
                     if (decimals-order) <= MINUS_MIN*3 {
                         match (decimals-order)%3 {
@@ -146,8 +148,8 @@ pub fn convert_balance_pretty (balance: u128, decimals: u8, units: &str) -> Resu
                     if (order-decimals) <= (PLUS_MAX*3) {(order-num) as usize}
                     else {(PLUS_MAX*3-decimals) as usize}
                 };
-                let before_point = a[..a.len()-length].to_string();
-                let after_point = Some(a[a.len()-length..].to_string());
+                let before_point = balance[..balance.len()-length].to_string();
+                let after_point = Some(balance[balance.len()-length..].to_string());
                 let mag = {
                     if (order-decimals) <= (PLUS_MAX*3) {-(((order-decimals) as i8)/3)}
                     else {-(PLUS_MAX as i8)}
@@ -187,7 +189,7 @@ pub fn convert_balance_pretty (balance: u128, decimals: u8, units: &str) -> Resu
 }
 
 pub fn print_pretty_test (balance: u128, decimals: u8, units: &str) -> String {
-    let out = convert_balance_pretty (balance, decimals, units).unwrap();
+    let out = convert_balance_pretty (&balance.to_string(), decimals, units).unwrap();
     format!("{} {}", out.number, out.units)
 }
 

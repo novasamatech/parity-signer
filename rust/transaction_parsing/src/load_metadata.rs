@@ -1,10 +1,11 @@
 use hex;
 use sled::{Db, Tree};
-use definitions::{network_specs::{Verifier, generate_network_key}, transactions::{Transaction, LoadMeta, UpdMetaVerifier, UpdGeneralVerifier}, metadata::{MetaValuesDisplay, NameVersioned, VersionDecoded}, constants::{ADDGENERALVERIFIER, ADDMETAVERIFIER, LOADMETA, METATREE, SPECSTREE, TRANSACTION}, history::Event};
+use constants::{ADDGENERALVERIFIER, ADDMETAVERIFIER, LOADMETA, METATREE, SPECSTREE, TRANSACTION};
+use definitions::{network_specs::{Verifier, generate_network_key}, transactions::{Transaction, LoadMeta, UpdMetaVerifier, UpdGeneralVerifier}, metadata::{MetaValuesDisplay, NameVersioned, VersionDecoded}, history::Event};
 use meta_reading::decode_metadata::get_meta_const_light;
 use parity_scale_codec::{Decode, Encode};
 use blake2_rfc::blake2b::blake2b;
-use frame_metadata::RuntimeMetadataV12;
+use frame_metadata::RuntimeMetadata;
 
 use crate::cards::{Action, Card, Warning};
 use crate::check_signature::pass_crypto;
@@ -17,7 +18,7 @@ use crate::utils::get_chainspecs;
 pub fn process_received_metadata (meta: Vec<u8>, name: &str, history: Vec<Event>, index: u32, upd_network: Option<Vec<u8>>, upd_general: bool, verifier: Verifier, metadata: &Tree, transaction: &Tree, database: &Db) -> Result<(String, String), Error> {
     if !meta.starts_with(&vec![109, 101, 116, 97]) {return Err(Error::BadInputData(BadInputData::NotMeta))}
     if meta[4] < 12 {return Err(Error::BadInputData(BadInputData::MetaVersionBelow12))}
-    match RuntimeMetadataV12::decode(&mut &meta[5..]) {
+    match RuntimeMetadata::decode(&mut &meta[4..]) {
         Ok(received_metadata) => {
             match get_meta_const_light(&received_metadata) {
                 Ok(x) => {

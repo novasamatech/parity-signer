@@ -1,7 +1,7 @@
 use qrcodegen::{QrCode, QrCodeEcc};
 use png;
 use anyhow::anyhow;
-use definitions::constants::{BORDER, SCALING, MAIN_COLOR, BACK_COLOR};
+use constants::{BORDER, SCALING, MAIN_COLOR, BACK_COLOR};
 use hex;
 
 struct QrContent {

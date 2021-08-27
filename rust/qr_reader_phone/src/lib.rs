@@ -95,13 +95,7 @@ mod tests {
         let result = decode_sequence(jsonline);
         assert!(result.is_ok(), "Expected ok, {:?}", result);
     }
-   
-    #[test]
-    fn legacy_multiframe_one_frame() {
-        let jsonline = r#"["400be00000100005301025a4a03f84a19cf8ebda40e62358c592870691a9cf456138bb4829969d10fe969a40403005a4a03f84a19cf8ebda40e62358c592870691a9cf456138bb4829969d10fe9690700e40b5402c5005c00ec07000004000000b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafebcd1b489599db4424ed928804ddad3a4689fb8c835151ef34bc250bb845cdc1eb0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe0ec11ec11ec11ec11ec11ec11ec11ec11ec11ec11ec11ec"]"#;
-        let result = decode_sequence(jsonline);
-        assert!(result.is_ok(), "Expected ok, {:?}", result);
-    }
+    
 }
 
 

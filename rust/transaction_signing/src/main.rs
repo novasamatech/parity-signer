@@ -1,6 +1,6 @@
 use anyhow;
 use transaction_signing::*;
-use definitions::constants::COLD_DB_NAME;
+use constants::COLD_DB_NAME;
 
 
 fn main() -> anyhow::Result<()> {

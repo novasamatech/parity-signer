@@ -20,7 +20,9 @@ pub enum Event {
     IdentitiesWiped,
     DeviceWasOnline,
     SeedsWereAccessed,
+    SeedNameWasAccessed(String), // for individual seed_name
     SeedsWereShown,
+    SeedNameWasShown(String), // for individual seed_name
     Warning(String),
     Error(String),
     UserEntry(String),
@@ -56,7 +58,9 @@ impl Event {
             Event::IdentitiesWiped => String::from("{\"event\":\"identities_wiped\"}"),
             Event::DeviceWasOnline => String::from("{\"event\":\"device_online\"}"),
             Event::SeedsWereAccessed => String::from("{\"event\":\"seeds_accessed\"}"),
+            Event::SeedNameWasAccessed(seed_name) => format!("{{\"event\":\"seed_name_accessed\",\"payload\":{{{}}}}}", seed_name),
             Event::SeedsWereShown => String::from("{\"event\":\"seeds_shown\"}"),
+            Event::SeedNameWasShown(seed_name) => format!("{{\"event\":\"seed_name_shown\",\"payload\":{{{}}}}}", seed_name),
             Event::Warning(x) => format!("{{\"event\":\"warning\",\"payload\":\"{}\"}}", x),
             Event::Error(x) => format!("{{\"event\":\"error\",\"payload\":\"{}\"}}", x),
             Event::UserEntry(x) => format!("{{\"event\":\"user_entered_event\",\"payload\":\"{}\"}}", x),

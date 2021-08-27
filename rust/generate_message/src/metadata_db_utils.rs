@@ -3,8 +3,8 @@ use parity_scale_codec::{Encode, Decode};
 use definitions::{metadata::{AddressBookEntry, MetaValues, NameVersioned, VersionDecoded}, network_specs::ChainSpecsToSend};
 use meta_reading::decode_metadata::get_meta_const;
 
-use super::metadata_shortcut::{MetaShortCut, MetaSpecsShortCut, meta_shortcut, meta_specs_shortcut};
-use super::output_prep::{load_meta_print, add_network_print, print_it};
+use crate::metadata_shortcut::{MetaShortCut, MetaSpecsShortCut, meta_shortcut, meta_specs_shortcut};
+use crate::output_prep::{load_meta_print, add_network_print, print_it};
 
 /// Function to read network metadata entries existing in the metadata tree of the database
 /// into MetaValues vector, and clear the metadata tree after reading.

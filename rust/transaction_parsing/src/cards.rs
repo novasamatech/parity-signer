@@ -1,4 +1,3 @@
-use bitvec::prelude::{BitVec, Lsb0};
 use hex;
 
 use crate::error::Error;
@@ -6,16 +5,18 @@ use crate::parse_transaction::AuthorPublicKey;
 
 pub enum Card <'a> {
     Call {pallet: &'a str, method: &'a str},
+    Pallet (&'a str),
     Varname (&'a str),
     Default (&'a str),
     Id (&'a str),
     None,
     IdentityField (&'a str),
-    BitVec (BitVec<Lsb0, u8>),
+    BitVec (String), // String from printing BitVec
     Balance {number: &'a str, units: &'a str},
     FieldName (&'a str),
     FieldNumber (usize),
     EnumVariantName (&'a str),
+    Range {start: String, end: String, inclusive: bool},
     EraImmortalNonce (u64),
     EraMortalNonce {phase: u64, period: u64, nonce: u64},
     Tip {number: &'a str, units: &'a str},
@@ -80,6 +81,7 @@ impl <'a> Card <'a> {
     pub fn card (&self, index: u32, indent: u32) -> String {
         match &self {
             Card::Call {pallet, method} => fancy(index, indent, "call", &format!("{{\"method\":\"{}\",\"pallet\":\"{}\"}}", method, pallet)),
+            Card::Pallet (pallet_name) => fancy(index, indent, "pallet", &format!("\"{}\"", pallet_name)),
             Card::Varname (varname) => fancy(index, indent, "varname", &format!("\"{}\"", varname)),
             Card::Default (decoded_string) => fancy(index, indent, "default", &format!("\"{}\"", decoded_string)),
             Card::Id (base58_id) => fancy(index, indent, "Id", &format!("\"{}\"", base58_id)),
@@ -90,6 +92,7 @@ impl <'a> Card <'a> {
             Card::FieldName (x) => fancy(index, indent, "field_name", &format!("\"{}\"", x)),
             Card::FieldNumber (i) => fancy(index, indent, "field_number", &format!("\"{}\"", i)),
             Card::EnumVariantName (name) => fancy(index, indent, "enum_variant_name", &format!("\"{}\"", name)),
+            Card::Range {start, end, inclusive} => fancy(index, indent, "range", &format!("{{\"start\":\"{}\",\"end\":\"{}\",\"inclusive\":\"{}\"}}", start, end, inclusive)),
             Card::EraImmortalNonce (nonce) => fancy(index, indent, "era_immortal_nonce", &format!("{{\"era\":\"Immortal\",\"nonce\":\"{}\"}}", nonce)),
             Card::EraMortalNonce {phase, period, nonce} => fancy(index, indent, "era_mortal_nonce", &format!("{{\"era\":\"Mortal\",\"phase\":\"{}\",\"period\":\"{}\",\"nonce\":\"{}\"}}", phase, period, nonce)),
             Card::Tip {number, units} => fancy(index, indent, "tip", &format!("{{\"amount\":\"{}\",\"units\":\"{}\"}}", number, units)),

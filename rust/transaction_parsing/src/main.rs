@@ -1,5 +1,5 @@
 use transaction_parsing::produce_output;
-use definitions::constants::COLD_DB_NAME;
+use constants::COLD_DB_NAME;
 
 
 fn main() {

@@ -8,14 +8,20 @@ edition = "2018"
 
 [dependencies]
 regex = "1.4.5"
-sp-core = "3.0.0"
+sp-core = "4.0.0-dev"
 hex = "0.4.3"
 lazy_static = "1.4.0"
+constants = {path = "../constants"}
 definitions = {path = "../definitions"}
 db_handling = {path = "../db_handling"}
 qrcode_static = {path = "../qrcode_static"}
 transaction_parsing = {path = "../transaction_parsing"}
 sled = "0.34.6"
-parity-scale-codec = "2.1.1"
+parity-scale-codec = "2.2.0"
 anyhow = "1.0.42"
 blake2-rfc = "0.2.18"
+
+[patch.crates-io]
+sp-arithmetic = { git = 'https://github.com/paritytech/substrate/' }
+sp-runtime = { git = 'https://github.com/paritytech/substrate/' }
+sp-core = { git = 'https://github.com/paritytech/substrate/' }

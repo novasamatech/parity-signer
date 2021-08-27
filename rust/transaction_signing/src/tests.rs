@@ -6,7 +6,7 @@ mod tests {
     use transaction_parsing::{produce_output, cards::Action};
     use crate::{handle_action, error::{Error, ActionFailure}, interpretation::interpret_action, sign_transaction::create_signature};
     use db_handling::{populate_cold, populate_cold_no_networks, populate_cold_no_meta};
-    use definitions::{constants::{METATREE, SPECSTREE}};
+    use constants::{METATREE, SPECSTREE};
     use std::fs;
     use sled::{Db, open, Tree};
     use regex::Regex;
@@ -452,7 +452,7 @@ mod tests {
         let line = fs::read_to_string("for_tests/add_network_westendV9080_unverified.txt").unwrap();
         let reply = produce_output(&line, dbname);
         
-        let reply_known = r#""error":[{"index":0,"indent":0,"type":"error","payload":"General verifier information exists in the database. Received information could be accepted only from the same general verifier."}]"#;
+        let reply_known = r#"{"error":[{"index":0,"indent":0,"type":"error","payload":"General verifier information exists in the database. Received information could be accepted only from the same general verifier."}]}"#;
         assert!(reply == reply_known, "Error in parsing outcome.\nReceived: {}", reply);
         
         fs::remove_dir_all(dbname).unwrap();

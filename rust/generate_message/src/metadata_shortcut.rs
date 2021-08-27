@@ -2,7 +2,8 @@ use sled::Tree;
 use meta_reading::{decode_metadata::decode_version, fetch_metadata::{fetch_info, fetch_info_with_chainspecs}, interpret_chainspecs::interpret_properties};
 use hex;
 use parity_scale_codec::{Decode};
-use definitions::{constants::{COLOR, SECONDARY_COLOR}, metadata::{MetaValues}, network_specs::ChainSpecsToSend};
+use constants::{COLOR, SECONDARY_COLOR};
+use definitions::{metadata::{MetaValues}, network_specs::ChainSpecsToSend};
 use std::convert::TryInto;
 
 

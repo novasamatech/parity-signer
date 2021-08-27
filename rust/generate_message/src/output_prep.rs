@@ -1,7 +1,8 @@
-use definitions::{constants::{ADD, ADDDEF, LOAD}, metadata::MetaValues};
+use constants::{ADD, ADDDEF, LOAD};
+use definitions::metadata::MetaValues;
 use parity_scale_codec::Encode;
 
-use super::metadata_shortcut::{MetaShortCut, MetaSpecsShortCut};
+use crate::metadata_shortcut::{MetaShortCut, MetaSpecsShortCut};
 
 
 /// Function to print in standardly named file a plaintext output ready for signing

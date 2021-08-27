@@ -1,10 +1,11 @@
 use hex;
 use sled::{Db, Tree};
-use definitions::{constants::{ADDNETWORK, METATREE, SETTREE, SPECSTREE, TRANSACTION}, history::Event, metadata::{MetaValuesDisplay, NameVersioned, NetworkDisplay, VersionDecoded}, network_specs::{ChainSpecsToSend, Verifier, generate_network_key}, transactions::{Transaction, AddNetwork}};
+use constants::{ADDNETWORK, METATREE, SETTREE, SPECSTREE, TRANSACTION};
+use definitions::{history::Event, metadata::{MetaValuesDisplay, NameVersioned, NetworkDisplay, VersionDecoded}, network_specs::{ChainSpecsToSend, Verifier, generate_network_key}, transactions::{Transaction, AddNetwork}};
 use meta_reading::decode_metadata::{get_meta_const_light};
 use parity_scale_codec::{Decode, Encode};
 use blake2_rfc::blake2b::blake2b;
-use frame_metadata::RuntimeMetadataV12;
+use frame_metadata::RuntimeMetadata;
 
 use crate::cards::{Action, Card, Warning};
 use crate::error::{Error, BadInputData, DatabaseError, CryptoError};
@@ -199,7 +200,7 @@ pub fn add_network (data_hex: &str, dbname: &str) -> Result<String, Error> {
 fn process_received_network_info (meta: Vec<u8>, new_chain_specs: ChainSpecsToSend, history: Vec<Event>, index: u32, verifier: Verifier, upd: bool, transaction: &Tree, database: &Db) -> Result<(String, String), Error> {
     if !meta.starts_with(&vec![109, 101, 116, 97]) {return Err(Error::BadInputData(BadInputData::NotMeta))}
     if meta[4] < 12 {return Err(Error::BadInputData(BadInputData::MetaVersionBelow12))}
-    match RuntimeMetadataV12::decode(&mut &meta[5..]) {
+    match RuntimeMetadata::decode(&mut &meta[4..]) {
         Ok(received_metadata) => {
             match get_meta_const_light(&received_metadata) {
                 Ok(x) => {

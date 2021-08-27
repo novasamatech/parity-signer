@@ -1,5 +1,6 @@
 use anyhow;
-use definitions::{constants::{ADDGENERALVERIFIER, HISTORY, LOADTYPES, SETTREE, TRANSACTION, TYPES, GENERALVERIFIER}, history::Event, transactions::Transaction, types::TypesUpdate};
+use constants::{ADDGENERALVERIFIER, HISTORY, LOADTYPES, SETTREE, TRANSACTION, TYPES, GENERALVERIFIER};
+use definitions::{history::Event, transactions::Transaction, types::TypesUpdate};
 use parity_scale_codec::{Decode, Encode};
 use db_handling::{helpers::{open_db, open_tree, flush_db, insert_into_tree}, manage_history::enter_events_into_tree};
 use blake2_rfc::blake2b::blake2b;

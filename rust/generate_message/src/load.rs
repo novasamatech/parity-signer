@@ -1,8 +1,8 @@
-use definitions::{constants::{ADDRESS_BOOK, HOT_DB_NAME, METATREE, SPECSTREEPREP}};
+use constants::{ADDRESS_BOOK, HOT_DB_NAME, METATREE, SPECSTREEPREP};
 use sled::{Db, open, Tree};
 
-use super::parser::{Instruction, Content, Set};
-use super::metadata_db_utils::{load_f_from_metadata_entry, load_f_from_name, do_d_from_address_book_entry, do_d_from_name, sign_me_prep_load_meta_from_address, upd_from_address_book_entry, upd_from_name, insert_from_address, error_occured};
+use crate::parser::{Instruction, Content, Set};
+use crate::metadata_db_utils::{load_f_from_metadata_entry, load_f_from_name, do_d_from_address_book_entry, do_d_from_name, sign_me_prep_load_meta_from_address, upd_from_address_book_entry, upd_from_name, insert_from_address, error_occured};
 
 
 /// Function to generate `load_meta` message ready for signing.

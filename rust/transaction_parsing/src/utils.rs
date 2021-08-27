@@ -1,6 +1,7 @@
-use frame_metadata::{RuntimeMetadataV12};
+use frame_metadata::RuntimeMetadata;
 use meta_reading::decode_metadata::{get_meta_const_light};
-use definitions::{constants::{GENERALVERIFIER, TRANSACTION, TYPES}, network_specs::{ChainSpecs, Verifier, NetworkKey}, metadata::{NameVersioned, VersionDecoded}, types::TypeEntry};
+use constants::{GENERALVERIFIER, TRANSACTION, TYPES};
+use definitions::{network_specs::{ChainSpecs, Verifier, NetworkKey}, metadata::{NameVersioned, VersionDecoded}, types::TypeEntry};
 use parity_scale_codec::{Decode, Encode};
 use sled::Tree;
 
@@ -9,11 +10,11 @@ use crate::helpers::{open_db, drop_tree, get_from_tree};
 
 /// Function searches for full metadata for certain chain name and version in metadata database tree.
 /// Checks that found full metadata indeed corresponds to the queried name and version;
-/// in case of successful find produces a tuple of corresponding RuntimeMetadataV12 and Option<u32>;
+/// in case of successful find produces a tuple of corresponding RuntimeMetadata and Option<u32>;
 /// Option is None if the version of chain is the latest known one,
 /// and Some(latest_version) if there are later versions available.
 
-pub fn find_meta(chain_name: &str, version: u32, metadata: &Tree) -> Result<(RuntimeMetadataV12, Option<u32>), Error> {
+pub fn find_meta(chain_name: &str, version: u32, metadata: &Tree) -> Result<(RuntimeMetadata, Option<u32>), Error> {
     
     let mut meta = None;
     let mut other = false;
@@ -41,7 +42,7 @@ pub fn find_meta(chain_name: &str, version: u32, metadata: &Tree) -> Result<(Run
             if m[4] < 12 {
                 return Err(Error::SystemError(SystemError::MetaVersionBelow12));
             }
-            let data_back = RuntimeMetadataV12::decode(&mut &m[5..]);
+            let data_back = RuntimeMetadata::decode(&mut &m[4..]);
             match data_back {
                 Ok(metadata) => {
                 // check if the name and version are same in metadata, i.e. the database is not damaged

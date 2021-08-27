@@ -1,6 +1,7 @@
 use sled::{Db, open, Tree};
 use parity_scale_codec::Decode;
-use definitions::{constants::{ADDRESS_BOOK, HOT_DB_NAME, METATREE}, metadata::{AddressBookEntry, NameVersioned}};
+use constants::{ADDRESS_BOOK, HOT_DB_NAME, METATREE};
+use definitions::metadata::{AddressBookEntry, NameVersioned};
 
 
 pub fn show_database() -> Result<(), Box<dyn std::error::Error>> {

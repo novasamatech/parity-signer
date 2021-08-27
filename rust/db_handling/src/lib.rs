@@ -1,4 +1,5 @@
-use definitions::{constants::{COLD_DB_NAME, HOT_DB_NAME}, network_specs::Verifier};
+use constants::{COLD_DB_NAME, HOT_DB_NAME};
+use definitions::network_specs::Verifier;
 use std::fs;
 use anyhow;
 
