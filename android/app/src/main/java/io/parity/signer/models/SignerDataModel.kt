@@ -8,6 +8,8 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import io.parity.signer.MainActivity
+import org.json.JSONArray
+import org.json.JSONObject
 import java.io.File
 import java.io.FileOutputStream
 import java.io.IOException
@@ -17,21 +19,37 @@ import java.io.IOException
  * except for some logging features and transaction handling
  */
 class SignerDataModel: ViewModel() {
+	//Internal model values
 	private val _onBoardingDone = MutableLiveData(false)
 	private val _developmentTest = MutableLiveData("")
 
+	//TODO: hard types for these
+	private val _networks = MutableLiveData(JSONArray())
+	private val _selectedNetwork = MutableLiveData(JSONObject())
+
 	private var dbName: String = ""
 
+	//Observables
 	val onBoardingDone: LiveData<Boolean> = _onBoardingDone
 	val developmentTest: LiveData<String> = _developmentTest
+	val networks: LiveData<JSONArray> = _networks
+	val selectedNetwork: LiveData<JSONObject> = _selectedNetwork
 
 	lateinit var context: Context
 
+	//MARK: init boilerplate begin
+
+	/**
+	 * Init on object creation, context not passed yet! Pass it and call next init
+	 */
 	init {
 		//actually load RustNative code
 		System.loadLibrary("signer")
 	}
 
+	/**
+	 * Don't forget to call real init after defining context!
+	 */
 	fun lateInit() {
 		//Define local database name
 		dbName = context.applicationContext.filesDir.toString() + "/Database"
@@ -54,7 +72,7 @@ class SignerDataModel: ViewModel() {
 		file.createNewFile()
 		var input = context.assets.open("Database" + path)
 		var output = FileOutputStream(file)
-		val buffer: ByteArray = ByteArray(1024)
+		val buffer = ByteArray(1024)
 		var read = input.read(buffer)
 		while (read != -1) {
 			output.write(buffer, 0, read)
@@ -77,12 +95,24 @@ class SignerDataModel: ViewModel() {
 		}
 	}
 
+	//MARK: Init boilerplate end
+
+	//MARK: General utils begin
+
 	/**
 	 * This returns the app into starting state; should be called
 	 * on all "back"-like events and new screen spawns just in case
 	 */
 	fun totalRefresh() {
-		_onBoardingDone.value = File(dbName).exists()
+		val checkRefresh = File(dbName).exists()
+		_onBoardingDone.value = checkRefresh
+		if (checkRefresh) {
+			refreshNetworks()
+			//TODO: support state with all networks deleted (low priority)
+			if (true) {
+				_selectedNetwork.value = networks.value!!.get(0) as JSONObject
+			}
+		}
 	}
 
 	//TODO: development function; should be removed on release
@@ -96,7 +126,34 @@ class SignerDataModel: ViewModel() {
 		return test
 	}
 
-	//rust native section begin
+	//MARK: General utils end
+
+	//MARK: Network management begin
+
+	/**
+	 * Get network list updated; call after any networks-altering operation
+	 * and on init and on refresh just in case
+	 */
+	fun refreshNetworks() {
+		val networkJSON = dbGetAllNetworksForNetworkSelector(dbName)
+		try {
+			_networks.value = JSONArray(networkJSON)
+			Log.d("reftesh", "happened")
+			Log.d("testval", networks.value.toString())
+		} catch (e: java.lang.Exception) {
+			Log.d("errormark", "happened")
+			Log.d("catcher", e.toString())
+		}
+	}
+
+
+	fun selectNetwork(network: JSONObject) {
+		_selectedNetwork.value = network
+	}
+
+	//MARK: Network management end
+
+	//MARK: rust native section begin
 
 	external fun substrateExportPubkey(address: String, network: String, dbname: String): String
 	external fun qrparserGetPacketsTotal(data: String): Int
@@ -119,6 +176,6 @@ class SignerDataModel: ViewModel() {
 	external fun substrateRemoveMetadata(networkName: String, networkVersion: Int, dbname: String)
 	external fun substrateRemoveSeed(seedName: String, dbname: String)
 
-	//rust native section end
+	//MARK: rust native section end
 
 }
