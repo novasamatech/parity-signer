@@ -635,8 +635,10 @@ fn decode_type_def_bit_sequence (bit_ty: &TypeDefBitSequence<PortableForm>, data
                     match a {
                         TypeDefPrimitive::U8 => process_bitvec::<u8> (bitorder, into_bv_decode)?,
                         TypeDefPrimitive::U16 => process_bitvec::<u16> (bitorder, into_bv_decode)?,
-                        TypeDefPrimitive::U32 => process_bitvec::<u32> (bitorder, into_bv_decode)?,
-                        TypeDefPrimitive::U64 => process_bitvec::<u64> (bitorder, into_bv_decode)?,
+                        TypeDefPrimitive::U32|TypeDefPrimitive::U64 => process_bitvec::<u32> (bitorder, into_bv_decode)?,
+                        // should rather be the line below, but due to possible architecture issues limit for BitStore is u32;
+                        // architecture dependent implementations could be TODO, but not at this point;
+                        // TypeDefPrimitive::U64 => process_bitvec::<u64> (bitorder, into_bv_decode)?,
                         _ => return Err(Error::UnableToDecode(UnableToDecode::NotBitStoreType)),
                     }
                 },
