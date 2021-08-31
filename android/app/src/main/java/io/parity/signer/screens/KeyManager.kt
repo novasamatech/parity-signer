@@ -6,6 +6,8 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.ui.platform.LocalContext
+import androidx.fragment.app.FragmentActivity
 import io.parity.signer.components.NetworkSelector
 import io.parity.signer.models.SignerDataModel
 
@@ -16,7 +18,7 @@ import io.parity.signer.models.SignerDataModel
  */
 @Composable
 fun KeyManager(signerDataModel: SignerDataModel) {
-	var networks = signerDataModel.networks.observeAsState()
+	val context = LocalContext.current as FragmentActivity
 
 	Column {
 		NetworkSelector(signerDataModel = signerDataModel)
@@ -29,6 +31,16 @@ fun KeyManager(signerDataModel: SignerDataModel) {
 			onClick = { Toast.makeText(signerDataModel.context, signerDataModel.callNative("000000"), LENGTH_LONG).show() }
 		) {
 			Text(text = "Settings")
+		}
+		Button(
+			colors = ButtonDefaults.buttonColors(
+				backgroundColor = MaterialTheme.colors.background,
+				contentColor = MaterialTheme.colors.onBackground
+			),
+			//Copypaste for toast
+			onClick = { signerDataModel.authentication.authenticate(context) }
+		) {
+			Text(text = "Eat me!")
 		}
 	}
 

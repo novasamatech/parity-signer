@@ -3,16 +3,24 @@ package io.parity.signer.models
 import android.app.Activity
 import android.app.PendingIntent.getActivity
 import android.content.Context
+import android.content.SharedPreferences
+import android.security.keystore.KeyGenParameterSpec
+import android.security.keystore.KeyProperties
 import android.util.Log
+import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.security.crypto.EncryptedSharedPreferences
+import androidx.security.crypto.MasterKeys
 import io.parity.signer.MainActivity
+import io.parity.signer.components.Authentication
 import org.json.JSONArray
 import org.json.JSONObject
 import java.io.File
 import java.io.FileOutputStream
 import java.io.IOException
+import javax.crypto.KeyGenerator
 
 /**
  * This is single object to handle all interactions with backend,
@@ -27,7 +35,11 @@ class SignerDataModel: ViewModel() {
 	private val _networks = MutableLiveData(JSONArray())
 	private val _selectedNetwork = MutableLiveData(JSONObject())
 
+	//Data storage locations
 	private var dbName: String = ""
+	private val keyStore = "SignerKeyStore"
+	private var masterKey = "SignerMasterKey"
+	private lateinit var sharedPreferences: SharedPreferences
 
 	//Observables
 	val onBoardingDone: LiveData<Boolean> = _onBoardingDone
@@ -36,6 +48,8 @@ class SignerDataModel: ViewModel() {
 	val selectedNetwork: LiveData<JSONObject> = _selectedNetwork
 
 	lateinit var context: Context
+	lateinit var activity: FragmentActivity
+	var authentication: Authentication = Authentication()
 
 	//MARK: init boilerplate begin
 
@@ -53,6 +67,7 @@ class SignerDataModel: ViewModel() {
 	fun lateInit() {
 		//Define local database name
 		dbName = context.applicationContext.filesDir.toString() + "/Database"
+		authentication.context = context
 		totalRefresh()
 	}
 
@@ -61,6 +76,35 @@ class SignerDataModel: ViewModel() {
 	 */
 	fun onBoard() {
 		copyAsset("")
+
+		//Init crypto for seeds:
+		//1. Generate key
+		val keyGen = KeyGenerator
+			.getInstance(KeyProperties.KEY_ALGORITHM_AES, keyStore)
+		keyGen.init(
+				KeyGenParameterSpec
+					.Builder(
+						masterKey,
+						KeyProperties.PURPOSE_ENCRYPT and KeyProperties.PURPOSE_DECRYPT
+					)
+					.setBlockModes(KeyProperties.BLOCK_MODE_CBC)
+					.setEncryptionPaddings(KeyProperties.ENCRYPTION_PADDING_PKCS7)
+					.setUserAuthenticationParameters(0, KeyProperties.AUTH_DEVICE_CREDENTIAL)
+					.setUserAuthenticationRequired(true)
+					.build()
+			)
+		keyGen.generateKey()
+
+		/*
+		//2. Generate storage
+		sharedPreferences = EncryptedSharedPreferences.create(
+			keyStore,
+			masterKey,
+			context,
+			EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV,
+			EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM
+		)
+*/
 		totalRefresh()
 	}
 
