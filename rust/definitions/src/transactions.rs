@@ -31,11 +31,12 @@ pub struct Sign {
 pub struct SignDisplay <'a> {
     pub transaction: &'a str, // hex encoded transaction
     pub author_line: String, // signature author in Verifier.show_card() format
+    pub user_comment: &'a str, // user entered comment for transaction
 }
 
 impl <'a> SignDisplay <'a> {
     pub fn show(&self) -> String {
-        format!("\"transaction\":\"{}\",\"signed_by\":{}", &self.transaction, &self.author_line)
+        format!("\"transaction\":\"{}\",\"signed_by\":{},\"user_comment\":\"{}\"", &self.transaction, &self.author_line, &self.user_comment)
     }
 }
 

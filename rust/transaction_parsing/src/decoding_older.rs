@@ -140,7 +140,7 @@ pub fn process_as_call (mut data: Vec<u8>, meta: &OlderMeta, type_database: &Vec
     let call_in_processing = what_next_old (data, meta)?;
     data = call_in_processing.data;
     
-    let mut fancy_out = format!(",{}", (Card::Call{method: &call_in_processing.method.method_name, pallet: &call_in_processing.method.pallet_name}).card(index, indent));
+    let mut fancy_out = format!(",{}", (Card::Call{method: &call_in_processing.method.method_name, pallet: &call_in_processing.method.pallet_name, docs: &call_in_processing.method.docs}).card(index, indent));
     index = index + 1;
     indent = indent + 1;
     
@@ -525,8 +525,8 @@ fn deal_with_struct (v1: &Vec<StructField>, mut data: Vec<u8>, type_database: &V
     let mut fancy_out = String::new();
     for (i, y) in v1.iter().enumerate() {
         let fancy_output_prep = match &y.field_name {
-            Some(z) => format!(",{}", (Card::FieldName(&z)).card(index, indent)),
-            None => format!(",{}", (Card::FieldNumber(i)).card(index, indent)),
+            Some(z) => format!(",{}", (Card::FieldName{name: &z, docs: ""}).card(index, indent)),
+            None => format!(",{}", (Card::FieldNumber{number: i, docs: ""}).card(index, indent)),
         };
         fancy_out.push_str(&fancy_output_prep);
         index = index + 1;
@@ -573,7 +573,7 @@ fn deal_with_enum (v1: &Vec<EnumVariant>, mut data: Vec<u8>, type_database: &Vec
                 if data.len()>1 {(&data[1..]).to_vec()}
                 else {Vec::new()}
             };
-            let fancy_out = format!(",{}", (Card::EnumVariantName(&found_variant.variant_name)).card(index, indent));
+            let fancy_out = format!(",{}", (Card::EnumVariantName{name: &found_variant.variant_name, docs: ""}).card(index, indent));
             index = index + 1;
             Ok(DecodedOut {
                 remaining_vector,
@@ -585,7 +585,7 @@ fn deal_with_enum (v1: &Vec<EnumVariant>, mut data: Vec<u8>, type_database: &Vec
         EnumVariantType::Type(inner_ty) => {
             if data.len()==1 {return Err(Error::UnableToDecode(UnableToDecode::DataTooShort))}
             data=data[1..].to_vec();
-            let mut fancy_output_prep = format!(",{}", (Card::EnumVariantName(&found_variant.variant_name)).card(index, indent));
+            let mut fancy_output_prep = format!(",{}", (Card::EnumVariantName{name: &found_variant.variant_name, docs: ""}).card(index, indent));
             index = index + 1;
             let after_run = decode_simple(&inner_ty, data, type_database, index, indent+1, chain_specs)?;
             index = after_run.index;
@@ -604,8 +604,8 @@ fn deal_with_enum (v1: &Vec<EnumVariant>, mut data: Vec<u8>, type_database: &Vec
             let mut fancy_out = String::new();
             for (i, y) in v2.iter().enumerate() {
                 let fancy_output_prep = match &y.field_name {
-                    Some(z) => format!(",{}", (Card::FieldName(&z)).card(index, indent)),
-                    None => format!(",{}", (Card::FieldNumber(i)).card(index, indent)),
+                    Some(z) => format!(",{}", (Card::FieldName{name: &z, docs: ""}).card(index, indent)),
+                    None => format!(",{}", (Card::FieldNumber{number: i, docs: ""}).card(index, indent)),
                 };
                 fancy_out.push_str(&fancy_output_prep);
                 index = index + 1;
@@ -678,7 +678,7 @@ fn decode_simple (found_ty: &str, mut data: Vec<u8>, type_database: &Vec<TypeEnt
                                         let capture_name = format!("arg{}", i);
                                         match caps.name(&capture_name) {
                                             Some(x) => {
-                                                let fancy_output_prep = format!(",{}", (Card::FieldNumber(i)).card(index, indent));
+                                                let fancy_output_prep = format!(",{}", (Card::FieldNumber{number: i, docs: ""}).card(index, indent));
                                                 fancy_out.push_str(&fancy_output_prep);
                                                 index = index + 1;
                                                 let inner_ty = x.as_str();

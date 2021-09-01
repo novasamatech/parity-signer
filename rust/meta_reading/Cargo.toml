@@ -9,7 +9,7 @@ edition = "2018"
 [dependencies]
 hex = "0.4.3"
 serde = { version = "1.0", features = ["derive"] }
-frame-metadata = { version = "14.0.0-rc.2", default-features = false, features = ["v12", "v13", "v14", "std"]}
+frame-metadata = { version = "14.0.0", default-features = false, features = ["v12", "v13", "v14", "std"]}
 parity-scale-codec = "2.2.0"
 jsonrpsee-types = "0.2.0-alpha.6"
 jsonrpsee-ws-client = "0.2.0-alpha.6"

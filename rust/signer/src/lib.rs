@@ -61,9 +61,10 @@ export! {
 		action: &str,
         seed_phrase: &str,
         password: &str,
+        user_comment: &str,
         dbname: &str
 	) -> anyhow::Result<String, anyhow::Error> {
-        transaction_signing::handle_action(action, seed_phrase, password, dbname)
+        transaction_signing::handle_action(action, seed_phrase, password, user_comment, dbname)
     }
 
     @Java_io_parity_signer_SubstrateSignModule_substrateDevelopmentTest

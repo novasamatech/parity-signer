@@ -18,12 +18,12 @@ mod tests;
 
 /// Function process action card from RN.
 
-pub fn handle_action (action_line: &str, seed_phrase: &str, pwd_entry: &str, dbname: &str) -> anyhow::Result<String> {
+pub fn handle_action (action_line: &str, seed_phrase: &str, pwd_entry: &str, user_comment: &str, dbname: &str) -> anyhow::Result<String> {
 
     let action = interpret_action (action_line)?;
     
     match action {
-        Action::SignTransaction(checksum) => create_signature_png(seed_phrase, pwd_entry, dbname, checksum),
+        Action::SignTransaction(checksum) => create_signature_png(seed_phrase, pwd_entry, user_comment, dbname, checksum),
         Action::LoadMetadata(checksum) => accept_metadata(dbname, checksum, false),
         Action::AddMetadataVerifier(checksum) => add_meta_verifier(dbname, checksum, false),
         Action::LoadTypes(checksum) => accept_types(dbname, checksum),

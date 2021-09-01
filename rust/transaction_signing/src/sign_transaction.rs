@@ -12,7 +12,7 @@ use crate::helpers::verify_checksum;
 /// Function to create signatures using RN output action line, and user entered pin and password.
 /// Also needs database name to fetch saved transaction and key.
 
-pub fn create_signature (seed_phrase: &str, pwd_entry: &str, database_name: &str, checksum: u32) -> anyhow::Result<String> {
+pub fn create_signature (seed_phrase: &str, pwd_entry: &str, user_comment: &str, database_name: &str, checksum: u32) -> anyhow::Result<String> {
     
     let database = open_db(database_name)?;
     verify_checksum(&database, checksum)?;
@@ -53,6 +53,7 @@ pub fn create_signature (seed_phrase: &str, pwd_entry: &str, database_name: &str
                     let sign_display = SignDisplay {
                         transaction: &hex_signature,
                         author_line: Verifier::Ed25519(hex_key).show_card(),
+                        user_comment,
                     }.show();
                     events.push(Event::TransactionSigned(sign_display));
                     enter_events_into_tree(&history, events)?;
@@ -64,6 +65,7 @@ pub fn create_signature (seed_phrase: &str, pwd_entry: &str, database_name: &str
                     let sign_display = SignDisplay {
                         transaction: &hex_signature,
                         author_line: Verifier::Sr25519(hex_key).show_card(),
+                        user_comment,
                     }.show();
                     events.push(Event::TransactionSigned(sign_display));
                     enter_events_into_tree(&history, events)?;
@@ -75,6 +77,7 @@ pub fn create_signature (seed_phrase: &str, pwd_entry: &str, database_name: &str
                     let sign_display = SignDisplay {
                         transaction: &hex_signature,
                         author_line: Verifier::Ecdsa(hex_key).show_card(),
+                        user_comment,
                     }.show();
                     events.push(Event::TransactionSigned(sign_display));
                     enter_events_into_tree(&history, events)?;
@@ -95,7 +98,7 @@ pub fn create_signature (seed_phrase: &str, pwd_entry: &str, database_name: &str
     }
 }
 
-pub fn create_signature_png (seed_phrase: &str, pwd_entry: &str, database_name: &str, checksum: u32) -> anyhow::Result<String> {
-    let hex_result = create_signature(seed_phrase, pwd_entry, database_name, checksum)?;
+pub fn create_signature_png (seed_phrase: &str, pwd_entry: &str, user_comment: &str, database_name: &str, checksum: u32) -> anyhow::Result<String> {
+    let hex_result = create_signature(seed_phrase, pwd_entry, user_comment, database_name, checksum)?;
     Ok(hex::encode(png_qr_from_string(&hex_result)?))
 }

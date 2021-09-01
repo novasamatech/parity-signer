@@ -16,10 +16,11 @@ pub fn make_all_cards() -> String {
 
     let mut all_cards: Vec<Card> = Vec::new();
     
-    all_cards.push(Card::Call{pallet: "test_Pallet", method: "test_Method"});
+    all_cards.push(Card::Call{pallet: "test_Pallet", method: "test_Method", docs: "test docs description"});
     all_cards.push(Card::Pallet("test_pallet_v14"));
     all_cards.push(Card::Varname("test_Varname"));
     all_cards.push(Card::Default("12345"));
+    all_cards.push(Card::PathDocs {path: r#"["frame_system","pallet","Call"]"#, docs: "test docs"});
     all_cards.push(Card::Id("5FHneW46xGXgs5mUiveU4sbTyGBzmstUspZC92UhjJM694ty"));
     all_cards.push(Card::None);
     all_cards.push(Card::IdentityField("Twitter"));
@@ -28,9 +29,9 @@ pub fn make_all_cards() -> String {
     all_cards.push(Card::BitVec(bv.to_string()));
     
     all_cards.push(Card::Balance{number: "300.000000", units: "KULU"});
-    all_cards.push(Card::FieldName("test_FieldName"));
-    all_cards.push(Card::FieldNumber(1));
-    all_cards.push(Card::EnumVariantName("test_EnumVariantName"));
+    all_cards.push(Card::FieldName{name: "test_FieldName", docs: ""});
+    all_cards.push(Card::FieldNumber{number: 1, docs: ""});
+    all_cards.push(Card::EnumVariantName{name: "test_EnumVariantName", docs: ""});
     all_cards.push(Card::Range{start: "3".to_string(), end: "14".to_string(), inclusive: false});
     all_cards.push(Card::EraImmortalNonce(4980));
     all_cards.push(Card::EraMortalNonce{phase: 55, period: 64, nonce: 89});
