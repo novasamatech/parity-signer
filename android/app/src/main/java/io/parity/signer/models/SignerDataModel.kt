@@ -4,15 +4,17 @@ import android.app.Activity
 import android.app.PendingIntent.getActivity
 import android.content.Context
 import android.content.SharedPreferences
+import android.content.pm.PackageManager
 import android.security.keystore.KeyGenParameterSpec
 import android.security.keystore.KeyProperties
 import android.util.Log
+import androidx.compose.ui.platform.LocalContext
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.security.crypto.EncryptedSharedPreferences
-import androidx.security.crypto.MasterKeys
+import androidx.security.crypto.MasterKey
 import io.parity.signer.MainActivity
 import io.parity.signer.components.Authentication
 import org.json.JSONArray
@@ -20,6 +22,7 @@ import org.json.JSONObject
 import java.io.File
 import java.io.FileOutputStream
 import java.io.IOException
+import java.security.KeyStore
 import javax.crypto.KeyGenerator
 
 /**
@@ -35,10 +38,14 @@ class SignerDataModel: ViewModel() {
 	private val _networks = MutableLiveData(JSONArray())
 	private val _selectedNetwork = MutableLiveData(JSONObject())
 
+	private val _seedNames = MutableLiveData(arrayOf<String>())
+
+	private val _lastError = MutableLiveData("")
+
 	//Data storage locations
 	private var dbName: String = ""
-	private val keyStore = "SignerKeyStore"
-	private var masterKey = "SignerMasterKey"
+	private val keyStore = "AndroidKeyStore"
+	private val keyStoreName = "SignerSeedStorage"
 	private lateinit var sharedPreferences: SharedPreferences
 
 	//Observables
@@ -47,8 +54,14 @@ class SignerDataModel: ViewModel() {
 	val networks: LiveData<JSONArray> = _networks
 	val selectedNetwork: LiveData<JSONObject> = _selectedNetwork
 
+	val seedNames: LiveData<Array<String>> = _seedNames
+
+	val lastError: LiveData<String> = _lastError
+
 	lateinit var context: Context
 	lateinit var activity: FragmentActivity
+	lateinit var masterKey: MasterKey
+	private var hasStrongbox: Boolean = false
 	var authentication: Authentication = Authentication()
 
 	//MARK: init boilerplate begin
@@ -68,7 +81,29 @@ class SignerDataModel: ViewModel() {
 		//Define local database name
 		dbName = context.applicationContext.filesDir.toString() + "/Database"
 		authentication.context = context
-		totalRefresh()
+		hasStrongbox = context.packageManager.hasSystemFeature(PackageManager.FEATURE_STRONGBOX_KEYSTORE)
+
+		Log.d("strongbox available", hasStrongbox.toString())
+
+		//Init crypto for seeds:
+		//https://developer.android.com/training/articles/keystore
+		masterKey = MasterKey.Builder(context)
+			.setKeyScheme(MasterKey.KeyScheme.AES256_GCM)
+			.setRequestStrongBoxBacked(hasStrongbox) // this must be default, but...
+			.setUserAuthenticationRequired(true)
+			.build()
+
+		//Imitate ios behavior
+		authentication.authenticate(activity) {
+			sharedPreferences = EncryptedSharedPreferences(
+				context,
+				keyStore,
+				masterKey,
+				EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV,
+				EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM
+			)
+			totalRefresh()
+		}
 	}
 
 	/**
@@ -76,36 +111,25 @@ class SignerDataModel: ViewModel() {
 	 */
 	fun onBoard() {
 		copyAsset("")
+		totalRefresh()
+	}
 
-		//Init crypto for seeds:
-		//1. Generate key
-		val keyGen = KeyGenerator
-			.getInstance(KeyProperties.KEY_ALGORITHM_AES, keyStore)
-		keyGen.init(
-				KeyGenParameterSpec
-					.Builder(
-						masterKey,
-						KeyProperties.PURPOSE_ENCRYPT and KeyProperties.PURPOSE_DECRYPT
-					)
-					.setBlockModes(KeyProperties.BLOCK_MODE_CBC)
-					.setEncryptionPaddings(KeyProperties.ENCRYPTION_PADDING_PKCS7)
-					.setUserAuthenticationParameters(0, KeyProperties.AUTH_DEVICE_CREDENTIAL)
-					.setUserAuthenticationRequired(true)
-					.build()
-			)
-		keyGen.generateKey()
+	/**
+	 * TODO: wipe all data!
+	 */
+	fun wipe() {
+		File(dbName).delete()
+	}
 
-		/*
-		//2. Generate storage
-		sharedPreferences = EncryptedSharedPreferences.create(
+	fun initEncryptedSharedPreferences() {
+		//2. Generate storage - incompatible with internals of biometry lib, a pity
+		sharedPreferences = EncryptedSharedPreferences(
+			context,
 			keyStore,
 			masterKey,
-			context,
 			EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV,
 			EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM
 		)
-*/
-		totalRefresh()
 	}
 
 	/**
@@ -114,7 +138,7 @@ class SignerDataModel: ViewModel() {
 	private fun copyFileAsset(path: String) {
 		var file = File(dbName, path)
 		file.createNewFile()
-		var input = context.assets.open("Database" + path)
+		var input = context.assets.open("Database$path")
 		var output = FileOutputStream(file)
 		val buffer = ByteArray(1024)
 		var read = input.read(buffer)
@@ -130,12 +154,12 @@ class SignerDataModel: ViewModel() {
 	 * Util to copy Assets to data dir; only used in onBoard().
 	 */
 	private fun copyAsset(path: String) {
-		val contents = context.assets.list("Database" + path)
+		val contents = context.assets.list("Database$path")
 		if (contents == null || contents.size == 0) {
 			copyFileAsset(path)
 		} else {
 			File(dbName, path).mkdirs()
-			for (entry in contents) copyAsset(path + "/" + entry)
+			for (entry in contents) copyAsset("$path/$entry")
 		}
 	}
 
@@ -151,11 +175,13 @@ class SignerDataModel: ViewModel() {
 		val checkRefresh = File(dbName).exists()
 		_onBoardingDone.value = checkRefresh
 		if (checkRefresh) {
+
 			refreshNetworks()
 			//TODO: support state with all networks deleted (low priority)
 			if (true) {
 				_selectedNetwork.value = networks.value!!.get(0) as JSONObject
 			}
+			refreshSeedNames()
 		}
 	}
 
@@ -172,6 +198,52 @@ class SignerDataModel: ViewModel() {
 
 	//MARK: General utils end
 
+	//MARK: Seed management begin
+
+	/**
+	 * Refresh seed names list
+	 */
+	fun refreshSeedNames() {
+		_seedNames.value = sharedPreferences.all.keys.toTypedArray()
+	}
+
+	/**
+	 * Add seed, encrypt it, and create default accounts
+	 */
+	fun addSeed(seedName: String, seedPhrase: String): String {
+
+		//Check if seed name already exists
+		if (seedNames.value?.contains(seedName) as Boolean) {
+			_lastError.value = "Seed with this name already exists!"
+			return ""
+		}
+
+		try {
+			//Run standard login prompt!
+			authentication.authenticate(context as FragmentActivity) { /*TODO*/  }
+
+			//Create relevant keys - should make sure this works before saving key
+			val finalSeedPhrase = substrateTryCreateSeed(seedName, "sr25519", seedPhrase, 24, dbName)
+
+			//Encrypt and save seed
+
+			Log.d("Create seed", "success")
+			refreshSeedNames()
+			selectSeed(seedName)
+			return finalSeedPhrase
+		} catch (e: java.lang.Exception) {
+			_lastError.value = e.toString()
+			Log.e("Seed creation error", e.toString())
+			return ""
+		}
+	}
+
+	fun selectSeed(seedName: String) {
+
+	}
+
+	//MARK: Seed management end
+
 	//MARK: Network management begin
 
 	/**
@@ -182,11 +254,8 @@ class SignerDataModel: ViewModel() {
 		val networkJSON = dbGetAllNetworksForNetworkSelector(dbName)
 		try {
 			_networks.value = JSONArray(networkJSON)
-			Log.d("reftesh", "happened")
-			Log.d("testval", networks.value.toString())
 		} catch (e: java.lang.Exception) {
-			Log.d("errormark", "happened")
-			Log.d("catcher", e.toString())
+			Log.e("Refresh network error", e.toString())
 		}
 	}
 
@@ -196,6 +265,12 @@ class SignerDataModel: ViewModel() {
 	}
 
 	//MARK: Network management end
+
+	//MARK: Key management begin
+
+
+
+	//MARK: Key management end
 
 	//MARK: rust native section begin
 
@@ -209,7 +284,7 @@ class SignerDataModel: ViewModel() {
 	external fun dbGetAllNetworksForNetworkSelector(dbname: String): String
 	external fun dbGetRelevantIdentities(seedName: String, genesisHash: String, dbname: String): String
 	external fun dbGetAllIdentities(dbname: String): String
-	external fun substrateTryCreateSeed(seedName: String, crypto: String, seedPhrase: String, seedLength: Int, dbname: Int): String
+	external fun substrateTryCreateSeed(seedName: String, crypto: String, seedPhrase: String, seedLength: Int, dbname: String): String
 	external fun substrateSuggestNPlusOne(path: String, seedName: String, networkIdString: String, dbname: String): String
 	external fun substrateCheckPath(path: String): Boolean
 	external fun substrateTryCreateIdentity(idName: String, seedName: String, seedPhrase: String, crypto: String, path: String, network: String, hasPassword: Boolean, dbname: String)
@@ -223,3 +298,19 @@ class SignerDataModel: ViewModel() {
 	//MARK: rust native section end
 
 }
+
+/*
+		.setKeyGenParameterSpec(
+			KeyGenParameterSpec
+				.Builder(
+					MasterKey.DEFAULT_MASTER_KEY_ALIAS,
+					KeyProperties.PURPOSE_ENCRYPT or KeyProperties.PURPOSE_DECRYPT
+				)
+				.setBlockModes(KeyProperties.BLOCK_MODE_GCM)
+				.setEncryptionPaddings(KeyProperties.ENCRYPTION_PADDING_NONE)
+				.setKeySize(MasterKey.DEFAULT_AES_GCM_MASTER_KEY_SIZE)
+				//.setUserAuthenticationParameters(1, KeyProperties.AUTH_DEVICE_CREDENTIAL)
+				//.setUserAuthenticationRequired(true)
+				.setIsStrongBoxBacked(hasStrongbox)
+				.build()
+		)*/

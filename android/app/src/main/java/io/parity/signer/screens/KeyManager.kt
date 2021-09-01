@@ -37,8 +37,7 @@ fun KeyManager(signerDataModel: SignerDataModel) {
 				backgroundColor = MaterialTheme.colors.background,
 				contentColor = MaterialTheme.colors.onBackground
 			),
-			//Copypaste for toast
-			onClick = { signerDataModel.authentication.authenticate(context) }
+			onClick = { signerDataModel.authentication.authenticate(context) {} }
 		) {
 			Text(text = "Eat me!")
 		}

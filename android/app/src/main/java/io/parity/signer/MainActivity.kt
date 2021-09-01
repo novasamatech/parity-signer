@@ -41,6 +41,7 @@ class MainActivity : AppCompatActivity() {
 	override fun onCreate(savedInstanceState: Bundle?) {
 		super.onCreate(savedInstanceState)
 		signerDataModel.context = applicationContext
+		signerDataModel.activity = this
 		signerDataModel.lateInit()
 		setContent {
 			SignerApp(signerDataModel)

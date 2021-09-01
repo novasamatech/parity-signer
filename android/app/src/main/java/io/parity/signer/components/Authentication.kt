@@ -47,7 +47,7 @@ class Authentication {
 	}
 
 
-	fun authenticate(activity: FragmentActivity) {
+	fun authenticate(activity: FragmentActivity, onSuccess: () -> Unit) {
 		val executor = ContextCompat.getMainExecutor(context)
 
 		biometricPrompt = BiometricPrompt(
@@ -67,6 +67,7 @@ class Authentication {
 					Toast.makeText(context,
 						"Authentication succeeded!", Toast.LENGTH_SHORT)
 						.show()
+					onSuccess()
 				}
 
 				override fun onAuthenticationFailed() {
