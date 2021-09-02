@@ -29,18 +29,31 @@ import javax.crypto.KeyGenerator
  * This is single object to handle all interactions with backend,
  * except for some logging features and transaction handling
  */
-class SignerDataModel: ViewModel() {
+class SignerDataModel : ViewModel() {
 	//Internal model values
 	private val _onBoardingDone = MutableLiveData(false)
 	private val _developmentTest = MutableLiveData("")
+	lateinit var context: Context
+	lateinit var activity: FragmentActivity
+	lateinit var masterKey: MasterKey
+	private var hasStrongbox: Boolean = false
+
+	//Authenticator to call!
+	var authentication: Authentication = Authentication()
 
 	//TODO: hard types for these
 	private val _networks = MutableLiveData(JSONArray())
 	private val _selectedNetwork = MutableLiveData(JSONObject())
 
 	private val _seedNames = MutableLiveData(arrayOf<String>())
+	private val _selectedSeed = MutableLiveData("")
+	private val _backupSeedPhrase = MutableLiveData("")
 
 	private val _lastError = MutableLiveData("")
+
+	//States of important modals
+	private val _seedBackup = MutableLiveData(false)
+	private val _newSeedScreen = MutableLiveData(false)
 
 	//Data storage locations
 	private var dbName: String = ""
@@ -48,21 +61,21 @@ class SignerDataModel: ViewModel() {
 	private val keyStoreName = "SignerSeedStorage"
 	private lateinit var sharedPreferences: SharedPreferences
 
-	//Observables
-	val onBoardingDone: LiveData<Boolean> = _onBoardingDone
+	//Observables for values
 	val developmentTest: LiveData<String> = _developmentTest
 	val networks: LiveData<JSONArray> = _networks
 	val selectedNetwork: LiveData<JSONObject> = _selectedNetwork
 
 	val seedNames: LiveData<Array<String>> = _seedNames
+	val selectedSeed: LiveData<String> = _selectedSeed
+	val backupSeedPhrase: LiveData<String> = _backupSeedPhrase
 
 	val lastError: LiveData<String> = _lastError
 
-	lateinit var context: Context
-	lateinit var activity: FragmentActivity
-	lateinit var masterKey: MasterKey
-	private var hasStrongbox: Boolean = false
-	var authentication: Authentication = Authentication()
+	//Observables for screens state
+
+	val onBoardingDone: LiveData<Boolean> = _onBoardingDone
+	val newSeedScreen: LiveData<Boolean> = _newSeedScreen
 
 	//MARK: init boilerplate begin
 
@@ -81,7 +94,8 @@ class SignerDataModel: ViewModel() {
 		//Define local database name
 		dbName = context.applicationContext.filesDir.toString() + "/Database"
 		authentication.context = context
-		hasStrongbox = context.packageManager.hasSystemFeature(PackageManager.FEATURE_STRONGBOX_KEYSTORE)
+		hasStrongbox =
+			context.packageManager.hasSystemFeature(PackageManager.FEATURE_STRONGBOX_KEYSTORE)
 
 		Log.d("strongbox available", hasStrongbox.toString())
 
@@ -119,17 +133,6 @@ class SignerDataModel: ViewModel() {
 	 */
 	fun wipe() {
 		File(dbName).delete()
-	}
-
-	fun initEncryptedSharedPreferences() {
-		//2. Generate storage - incompatible with internals of biometry lib, a pity
-		sharedPreferences = EncryptedSharedPreferences(
-			context,
-			keyStore,
-			masterKey,
-			EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV,
-			EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM
-		)
 	}
 
 	/**
@@ -172,6 +175,8 @@ class SignerDataModel: ViewModel() {
 	 * on all "back"-like events and new screen spawns just in case
 	 */
 	fun totalRefresh() {
+		_backupSeedPhrase.value = ""
+		clearError()
 		val checkRefresh = File(dbName).exists()
 		_onBoardingDone.value = checkRefresh
 		if (checkRefresh) {
@@ -182,6 +187,7 @@ class SignerDataModel: ViewModel() {
 				_selectedNetwork.value = networks.value!!.get(0) as JSONObject
 			}
 			refreshSeedNames()
+			_newSeedScreen.value = seedNames.value?.isEmpty() as Boolean
 		}
 	}
 
@@ -196,6 +202,14 @@ class SignerDataModel: ViewModel() {
 		return test
 	}
 
+	/**
+	 * Just clears last error;
+	 * Run every time user does something
+	 */
+	fun clearError() {
+		_lastError.value = ""
+	}
+
 	//MARK: General utils end
 
 	//MARK: Seed management begin
@@ -204,42 +218,75 @@ class SignerDataModel: ViewModel() {
 	 * Refresh seed names list
 	 */
 	fun refreshSeedNames() {
+		clearError()
 		_seedNames.value = sharedPreferences.all.keys.toTypedArray()
+	}
+
+	/**
+	 * Activate new seed screen on KeyManager screen
+	 */
+	fun newSeedScreenEngage() {
+		_newSeedScreen.value = true
+	}
+
+	/**
+	 * Deactivate new seed screen
+	 */
+	fun newSeedScreenDisengage() {
+		_newSeedScreen.value = false
 	}
 
 	/**
 	 * Add seed, encrypt it, and create default accounts
 	 */
-	fun addSeed(seedName: String, seedPhrase: String): String {
+	fun addSeed(seedName: String, seedPhrase: String) {
+		var finalSeedPhrase = ""
 
 		//Check if seed name already exists
 		if (seedNames.value?.contains(seedName) as Boolean) {
 			_lastError.value = "Seed with this name already exists!"
-			return ""
 		}
 
-		try {
-			//Run standard login prompt!
-			authentication.authenticate(context as FragmentActivity) { /*TODO*/  }
+		//Run standard login prompt!
+		authentication.authenticate(activity) {
+			try {
+				//Create relevant keys - should make sure this works before saving key
+				var finalSeedPhrase =
+					substrateTryCreateSeed(seedName, "sr25519", seedPhrase, 24, dbName)
 
-			//Create relevant keys - should make sure this works before saving key
-			val finalSeedPhrase = substrateTryCreateSeed(seedName, "sr25519", seedPhrase, 24, dbName)
+				//Encrypt and save seed
+				with(sharedPreferences.edit()) {
+					putString(seedName, finalSeedPhrase)
+					apply()
+				}
 
-			//Encrypt and save seed
-
-			Log.d("Create seed", "success")
-			refreshSeedNames()
-			selectSeed(seedName)
-			return finalSeedPhrase
-		} catch (e: java.lang.Exception) {
-			_lastError.value = e.toString()
-			Log.e("Seed creation error", e.toString())
-			return ""
+				//Refresh model
+				refreshSeedNames()
+				selectSeed(seedName)
+				_backupSeedPhrase.value = finalSeedPhrase
+				_newSeedScreen.value = false
+			} catch (e: java.lang.Exception) {
+				_lastError.value = e.toString()
+				Log.e("Seed creation error", e.toString())
+			}
 		}
 	}
 
+	/**
+	 * Seed selector; does not check if seedname is valid
+	 * TODO: check that all related operations are done
+	 */
 	fun selectSeed(seedName: String) {
+		_selectedSeed.value = seedName
+		totalRefresh() //should we?
+	}
 
+	/**
+	 * This happens when backup seed acknowledge button is pressed in seed creation screen.
+	 * TODO: This might misfire
+	 */
+	fun acknowledgeBackup() {
+		_backupSeedPhrase.value = ""
 	}
 
 	//MARK: Seed management end
@@ -269,30 +316,82 @@ class SignerDataModel: ViewModel() {
 	//MARK: Key management begin
 
 
-
 	//MARK: Key management end
 
 	//MARK: rust native section begin
 
-	external fun substrateExportPubkey(address: String, network: String, dbname: String): String
+	external fun substrateExportPubkey(
+		address: String,
+		network: String,
+		dbname: String
+	): String
+
 	external fun qrparserGetPacketsTotal(data: String): Int
 	external fun qrparserTryDecodeQrSequence(data: String): String
-	external fun substrateParseTransaction(transaction: String, dbname: String): String
-	external fun substrateHandleAction(action: String, seedPhrase: String, password: String, dbname: String): String
+	external fun substrateParseTransaction(
+		transaction: String,
+		dbname: String
+	): String
+
+	external fun substrateHandleAction(
+		action: String,
+		seedPhrase: String,
+		password: String,
+		dbname: String
+	): String
+
 	external fun substrateDevelopmentTest(input: String): String
 	external fun dbGetNetwork(genesisHash: String, dbname: String): String
 	external fun dbGetAllNetworksForNetworkSelector(dbname: String): String
-	external fun dbGetRelevantIdentities(seedName: String, genesisHash: String, dbname: String): String
+	external fun dbGetRelevantIdentities(
+		seedName: String,
+		genesisHash: String,
+		dbname: String
+	): String
+
 	external fun dbGetAllIdentities(dbname: String): String
-	external fun substrateTryCreateSeed(seedName: String, crypto: String, seedPhrase: String, seedLength: Int, dbname: String): String
-	external fun substrateSuggestNPlusOne(path: String, seedName: String, networkIdString: String, dbname: String): String
+	external fun substrateTryCreateSeed(
+		seedName: String,
+		crypto: String,
+		seedPhrase: String,
+		seedLength: Int,
+		dbname: String
+	): String
+
+	external fun substrateSuggestNPlusOne(
+		path: String,
+		seedName: String,
+		networkIdString: String,
+		dbname: String
+	): String
+
 	external fun substrateCheckPath(path: String): Boolean
-	external fun substrateTryCreateIdentity(idName: String, seedName: String, seedPhrase: String, crypto: String, path: String, network: String, hasPassword: Boolean, dbname: String)
+	external fun substrateTryCreateIdentity(
+		idName: String,
+		seedName: String,
+		seedPhrase: String,
+		crypto: String,
+		path: String,
+		network: String,
+		hasPassword: Boolean,
+		dbname: String
+	)
+
 	external fun substrateSuggestName(path: String): String
-	external fun substrateDeleteIdentity(pubKey: String, network: String, dbname: String)
+	external fun substrateDeleteIdentity(
+		pubKey: String,
+		network: String,
+		dbname: String
+	)
+
 	external fun substrateGetNetworkSpecs(network: String, dbname: String): String
 	external fun substrateRemoveNetwork(network: String, dbname: String)
-	external fun substrateRemoveMetadata(networkName: String, networkVersion: Int, dbname: String)
+	external fun substrateRemoveMetadata(
+		networkName: String,
+		networkVersion: Int,
+		dbname: String
+	)
+
 	external fun substrateRemoveSeed(seedName: String, dbname: String)
 
 	//MARK: rust native section end

@@ -66,7 +66,10 @@ fun SignerApp(signerDataModel: SignerDataModel) {
 					TopAppBar(
 						title = { Text("Parity Signer") },
 						navigationIcon = {
-							IconButton(onClick = { navController.navigateUp() }) {
+							IconButton(onClick = {
+								signerDataModel.totalRefresh()
+								navController.navigateUp()
+							}) {
 								Icon(Icons.Default.ArrowBack, contentDescription = "go back")
 							}
 						}
@@ -74,17 +77,24 @@ fun SignerApp(signerDataModel: SignerDataModel) {
 				},
 				bottomBar = {
 					BottomAppBar {
-						IconButton(onClick = { navController.navigate(SignerScreen.Keys.name) }) {
+						IconButton(onClick = {
+							signerDataModel.totalRefresh()
+							navController.navigate(SignerScreen.Keys.name)
+						}) {
 							Icon(Icons.Default.Lock, contentDescription = "Key manager")
 						}
 						Spacer(Modifier.weight(1f, true))
-						IconButton(onClick = { navController.navigate(SignerScreen.Settings.name) }) {
+						IconButton(onClick = {
+							signerDataModel.totalRefresh()
+							navController.navigate(SignerScreen.Settings.name)
+						}) {
 							Icon(Icons.Default.Settings, contentDescription = "Settings")
 						}
 					}
 				},
 				floatingActionButton = {
 					FloatingActionButton(onClick = {
+						signerDataModel.totalRefresh()
 						navController.navigateUp()
 					}) {
 						Icon(
