@@ -1,29 +1,20 @@
 package io.parity.signer.models
 
-import android.app.Activity
-import android.app.PendingIntent.getActivity
 import android.content.Context
 import android.content.SharedPreferences
 import android.content.pm.PackageManager
-import android.security.keystore.KeyGenParameterSpec
-import android.security.keystore.KeyProperties
 import android.util.Log
-import androidx.compose.ui.platform.LocalContext
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.security.crypto.EncryptedSharedPreferences
 import androidx.security.crypto.MasterKey
-import io.parity.signer.MainActivity
 import io.parity.signer.components.Authentication
 import org.json.JSONArray
 import org.json.JSONObject
 import java.io.File
 import java.io.FileOutputStream
-import java.io.IOException
-import java.security.KeyStore
-import javax.crypto.KeyGenerator
 
 /**
  * This is single object to handle all interactions with backend,
@@ -41,14 +32,23 @@ class SignerDataModel : ViewModel() {
 	//Authenticator to call!
 	var authentication: Authentication = Authentication()
 
+	//Internal storage for model data:
 	//TODO: hard types for these
+
+	//Keys
+	private val _identities = MutableLiveData(JSONArray())
+	private val _selectedIdentity = MutableLiveData(JSONObject())
+
+	//Networks
 	private val _networks = MutableLiveData(JSONArray())
 	private val _selectedNetwork = MutableLiveData(JSONObject())
 
+	//Seeds
 	private val _seedNames = MutableLiveData(arrayOf<String>())
 	private val _selectedSeed = MutableLiveData("")
 	private val _backupSeedPhrase = MutableLiveData("")
 
+	//Error
 	private val _lastError = MutableLiveData("")
 
 	//States of important modals
@@ -61,8 +61,12 @@ class SignerDataModel : ViewModel() {
 	private val keyStoreName = "SignerSeedStorage"
 	private lateinit var sharedPreferences: SharedPreferences
 
-	//Observables for values
+	//Observables for model data
 	val developmentTest: LiveData<String> = _developmentTest
+
+	val identities: LiveData<JSONArray> = _identities
+	val selectedIdentities: LiveData<JSONObject> = _selectedIdentity
+
 	val networks: LiveData<JSONArray> = _networks
 	val selectedNetwork: LiveData<JSONObject> = _selectedNetwork
 
@@ -188,6 +192,7 @@ class SignerDataModel : ViewModel() {
 			}
 			refreshSeedNames()
 			_newSeedScreen.value = seedNames.value?.isEmpty() as Boolean
+			fetchKeys()
 		}
 	}
 
@@ -298,9 +303,10 @@ class SignerDataModel : ViewModel() {
 	 * and on init and on refresh just in case
 	 */
 	fun refreshNetworks() {
-		val networkJSON = dbGetAllNetworksForNetworkSelector(dbName)
 		try {
+			val networkJSON = dbGetAllNetworksForNetworkSelector(dbName)
 			_networks.value = JSONArray(networkJSON)
+			fetchKeys()
 		} catch (e: java.lang.Exception) {
 			Log.e("Refresh network error", e.toString())
 		}
@@ -309,12 +315,29 @@ class SignerDataModel : ViewModel() {
 
 	fun selectNetwork(network: JSONObject) {
 		_selectedNetwork.value = network
+		fetchKeys()
 	}
 
 	//MARK: Network management end
 
 	//MARK: Key management begin
 
+	/**
+	 * Refresh keys relevant for other parameters
+	 */
+	fun fetchKeys() {
+		try {
+			Log.d("selectedNetwork", selectedNetwork.value.toString())
+			Log.d("Selected seed", selectedSeed.value.toString())
+			_identities.value = JSONArray(dbGetRelevantIdentities(selectedSeed.value?:"", selectedNetwork.value?.get("key").toString(), dbName))
+		} catch (e: java.lang.Exception) {
+			Log.e("fetch keys error", e.toString())
+		}
+	}
+
+	fun selectKey(key: JSONObject) {
+		_selectedIdentity.value = key
+	}
 
 	//MARK: Key management end
 

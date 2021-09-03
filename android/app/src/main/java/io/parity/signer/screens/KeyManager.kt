@@ -1,17 +1,13 @@
 package io.parity.signer.screens
 
-import android.widget.Toast
-import android.widget.Toast.LENGTH_LONG
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.fragment.app.FragmentActivity
+import io.parity.signer.components.KeySelector
 import io.parity.signer.components.NetworkSelector
 import io.parity.signer.components.SeedSelector
 import io.parity.signer.modals.NewSeedModal
@@ -29,16 +25,17 @@ fun KeyManager(signerDataModel: SignerDataModel) {
 	val seedNames = signerDataModel.seedNames.observeAsState()
 	val newSeedScreen = signerDataModel.newSeedScreen.observeAsState()
 	val backupSeedPhrase = signerDataModel.backupSeedPhrase.observeAsState()
+	val keys = signerDataModel.identities.observeAsState()
 
 	if (newSeedScreen.value as Boolean) {
 		NewSeedModal(signerDataModel)
 	} else if (backupSeedPhrase.value?.isEmpty() as Boolean) {
 		Column {
 			NetworkSelector(signerDataModel = signerDataModel)
-			Row (
+			Row(
 				horizontalArrangement = Arrangement.SpaceBetween,
-				modifier = Modifier.fillMaxSize()
-				) {
+				modifier = Modifier.fillMaxWidth()
+			) {
 				SeedSelector(signerDataModel = signerDataModel)
 				Button(
 					colors = ButtonDefaults.buttonColors(
@@ -53,7 +50,16 @@ fun KeyManager(signerDataModel: SignerDataModel) {
 					Text(text = "New seed")
 				}
 			}
-			Button(
+			KeySelector(signerDataModel = signerDataModel)
+		}
+	} else {
+		SeedBackup(signerDataModel = signerDataModel)
+	}
+
+}
+
+/*
+Button(
 				colors = ButtonDefaults.buttonColors(
 					backgroundColor = MaterialTheme.colors.background,
 					contentColor = MaterialTheme.colors.onBackground
@@ -78,9 +84,5 @@ fun KeyManager(signerDataModel: SignerDataModel) {
 			) {
 				Text(text = "Eat me!")
 			}
-		}
-	} else {
-		SeedBackup(signerDataModel = signerDataModel)
-	}
 
-}
+*/

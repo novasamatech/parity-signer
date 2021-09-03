@@ -24,9 +24,6 @@ fun NewSeedModal(signerDataModel: SignerDataModel) {
 	var seedName by remember { mutableStateOf("") }
 	var seedPhrase by remember { mutableStateOf("") }
 	var recover by remember { mutableStateOf(false) }
-	var finalSeedPhrase by remember {
-		mutableStateOf("")
-	}
 	val lastError = signerDataModel.lastError.observeAsState()
 	val focusManager = LocalFocusManager.current
 
