@@ -9,6 +9,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.livedata.observeAsState
 import io.parity.signer.models.SignerDataModel
 
+/**
+ * Modal to show seed phrase. Dangerous place.
+ * TODO: make sure seed phrase is cleared at all times!!!
+ */
 @Composable
 fun SeedBackup(signerDataModel: SignerDataModel) {
 	val selectedSeed = signerDataModel.selectedSeed.observeAsState()

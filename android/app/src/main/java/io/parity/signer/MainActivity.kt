@@ -27,6 +27,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import io.parity.signer.components.BottomBar
+import io.parity.signer.modals.WaitingScreen
 import io.parity.signer.models.SignerDataModel
 import io.parity.signer.screens.HomeScreen
 import io.parity.signer.screens.KeyManager
@@ -59,97 +60,102 @@ fun SignerApp(signerDataModel: SignerDataModel) {
 		val navController = rememberNavController()
 		var onBoardingDone = signerDataModel.onBoardingDone.observeAsState()
 
-		if (onBoardingDone.value as Boolean) {
-			//Structure to contain all app
-			Scaffold(
-				topBar = {
-					TopAppBar(
-						title = { Text("Parity Signer") },
-						navigationIcon = {
+		when (onBoardingDone.value) {
+			OnBoardingState.Yes -> {
+				//Structure to contain all app
+				Scaffold(
+					topBar = {
+						TopAppBar(
+							title = { Text("Parity Signer") },
+							navigationIcon = {
+								IconButton(onClick = {
+									signerDataModel.totalRefresh()
+									navController.navigateUp()
+								}) {
+									Icon(Icons.Default.ArrowBack, contentDescription = "go back")
+								}
+							}
+						)
+					},
+					bottomBar = {
+						BottomAppBar {
 							IconButton(onClick = {
 								signerDataModel.totalRefresh()
-								navController.navigateUp()
+								navController.navigate(SignerScreen.Keys.name)
 							}) {
-								Icon(Icons.Default.ArrowBack, contentDescription = "go back")
+								Icon(Icons.Default.Lock, contentDescription = "Key manager")
+							}
+							Spacer(Modifier.weight(1f, true))
+							IconButton(onClick = {
+								signerDataModel.totalRefresh()
+								navController.navigate(SignerScreen.Settings.name)
+							}) {
+								Icon(Icons.Default.Settings, contentDescription = "Settings")
 							}
 						}
-					)
-				},
-				bottomBar = {
-					BottomAppBar {
-						IconButton(onClick = {
+					},
+					floatingActionButton = {
+						FloatingActionButton(onClick = {
 							signerDataModel.totalRefresh()
-							navController.navigate(SignerScreen.Keys.name)
+							navController.navigateUp()
 						}) {
-							Icon(Icons.Default.Lock, contentDescription = "Key manager")
+							Icon(
+								painter = painterResource(id = R.drawable.icon),
+								modifier = Modifier.size(60.dp),
+								contentDescription = "Home"
+							)
 						}
-						Spacer(Modifier.weight(1f, true))
-						IconButton(onClick = {
-							signerDataModel.totalRefresh()
-							navController.navigate(SignerScreen.Settings.name)
-						}) {
-							Icon(Icons.Default.Settings, contentDescription = "Settings")
+					},
+					floatingActionButtonPosition = FabPosition.Center,
+					isFloatingActionButtonDocked = true
+				) { innerPadding ->
+					NavHost(
+						navController = navController,
+						SignerScreen.Home.name,
+						modifier = Modifier.padding(innerPadding)
+					) {
+						composable(SignerScreen.Home.name) {
+							HomeScreen(
+								signerDataModel = signerDataModel,
+								navToTransaction = { navController.navigate(SignerScreen.Transaction.name) }
+							)
 						}
-					}
-				},
-				floatingActionButton = {
-					FloatingActionButton(onClick = {
-						signerDataModel.totalRefresh()
-						navController.navigateUp()
-					}) {
-						Icon(
-							painter = painterResource(id = R.drawable.icon),
-							modifier = Modifier.size(60.dp),
-							contentDescription = "Home"
-						)
-					}
-				},
-				floatingActionButtonPosition = FabPosition.Center,
-				isFloatingActionButtonDocked = true
-			) { innerPadding ->
-				NavHost(
-					navController = navController,
-					SignerScreen.Home.name,
-					modifier = Modifier.padding(innerPadding)
-				) {
-					composable(SignerScreen.Home.name) {
-						HomeScreen(
-							signerDataModel = signerDataModel,
-							navToTransaction = { navController.navigate(SignerScreen.Transaction.name) }
-						)
-					}
-					composable(SignerScreen.Keys.name) {
-						KeyManager(signerDataModel = signerDataModel)
-					}
-					composable(SignerScreen.Settings.name) {
-						SettingsScreen(signerDataModel = signerDataModel)
-					}
-					composable(SignerScreen.Transaction.name) {
-						TransactionScreen(signerDataModel = signerDataModel)
+						composable(SignerScreen.Keys.name) {
+							KeyManager(signerDataModel = signerDataModel)
+						}
+						composable(SignerScreen.Settings.name) {
+							SettingsScreen(signerDataModel = signerDataModel)
+						}
+						composable(SignerScreen.Transaction.name) {
+							TransactionScreen(signerDataModel = signerDataModel)
+						}
 					}
 				}
 			}
-		} else {
-			AlertDialog(
-				onDismissRequest = { /*TODO: nothing*/ },
-				buttons = {
-					Button(
-						colors = ButtonDefaults.buttonColors(
-							backgroundColor = MaterialTheme.colors.background,
-							contentColor = MaterialTheme.colors.onBackground,
-						),
-						onClick = {
-							signerDataModel.onBoard()
+			OnBoardingState.No -> {
+				AlertDialog(
+					onDismissRequest = { /*TODO: make sure it is nothing*/ },
+					buttons = {
+						Button(
+							colors = ButtonDefaults.buttonColors(
+								backgroundColor = MaterialTheme.colors.background,
+								contentColor = MaterialTheme.colors.onBackground,
+							),
+							onClick = {
+								signerDataModel.onBoard()
+							}
+						) {
+							Text("Accept")
 						}
-					) {
-						Text("Accept")
-					}
-				},
-				title = { Text("Terms and conditions") },
-				text = { Text(onBoardingDone.value.toString()) }
-			)
+					},
+					title = { Text("Terms and conditions") },
+					text = { Text(onBoardingDone.value.toString()) }
+				)
+			}
+			OnBoardingState.InProgress -> {
+				WaitingScreen()
+			}
 		}
-
 
 		/*
 		Surface(color = MaterialTheme.colors.background) {

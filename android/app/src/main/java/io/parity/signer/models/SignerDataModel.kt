@@ -3,13 +3,22 @@ package io.parity.signer.models
 import android.content.Context
 import android.content.SharedPreferences
 import android.content.pm.PackageManager
+import android.graphics.BitmapFactory
 import android.util.Log
+import androidx.compose.ui.graphics.ImageBitmap
+import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.input.key.Key
+import androidx.core.graphics.createBitmap
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.security.crypto.EncryptedSharedPreferences
 import androidx.security.crypto.MasterKey
+import io.parity.signer.KeyManagerModal
+import io.parity.signer.OnBoardingState
+import io.parity.signer.SettingsModal
+import io.parity.signer.TransactionState
 import io.parity.signer.components.Authentication
 import org.json.JSONArray
 import org.json.JSONObject
@@ -22,7 +31,7 @@ import java.io.FileOutputStream
  */
 class SignerDataModel : ViewModel() {
 	//Internal model values
-	private val _onBoardingDone = MutableLiveData(false)
+	private val _onBoardingDone = MutableLiveData(OnBoardingState.InProgress)
 	private val _developmentTest = MutableLiveData("")
 	lateinit var context: Context
 	lateinit var activity: FragmentActivity
@@ -52,8 +61,9 @@ class SignerDataModel : ViewModel() {
 	private val _lastError = MutableLiveData("")
 
 	//States of important modals
-	private val _seedBackup = MutableLiveData(false)
-	private val _newSeedScreen = MutableLiveData(false)
+	private val _keyManagerModal = MutableLiveData(KeyManagerModal.None)
+	private val _settingsModal = MutableLiveData(SettingsModal.None)
+	private val _transactionState = MutableLiveData(TransactionState.None)
 
 	//Data storage locations
 	private var dbName: String = ""
@@ -65,7 +75,7 @@ class SignerDataModel : ViewModel() {
 	val developmentTest: LiveData<String> = _developmentTest
 
 	val identities: LiveData<JSONArray> = _identities
-	val selectedIdentities: LiveData<JSONObject> = _selectedIdentity
+	val selectedIdentity: LiveData<JSONObject> = _selectedIdentity
 
 	val networks: LiveData<JSONArray> = _networks
 	val selectedNetwork: LiveData<JSONObject> = _selectedNetwork
@@ -78,8 +88,10 @@ class SignerDataModel : ViewModel() {
 
 	//Observables for screens state
 
-	val onBoardingDone: LiveData<Boolean> = _onBoardingDone
-	val newSeedScreen: LiveData<Boolean> = _newSeedScreen
+	val onBoardingDone: LiveData<OnBoardingState> = _onBoardingDone
+	val keyManagerModal: LiveData<KeyManagerModal> = _keyManagerModal
+	val settingsModal: LiveData<SettingsModal> = _settingsModal
+	val transactionState: LiveData<TransactionState> = _transactionState
 
 	//MARK: init boilerplate begin
 
@@ -162,7 +174,7 @@ class SignerDataModel : ViewModel() {
 	 */
 	private fun copyAsset(path: String) {
 		val contents = context.assets.list("Database$path")
-		if (contents == null || contents.size == 0) {
+		if (contents == null || contents.isEmpty()) {
 			copyFileAsset(path)
 		} else {
 			File(dbName, path).mkdirs()
@@ -182,16 +194,20 @@ class SignerDataModel : ViewModel() {
 		_backupSeedPhrase.value = ""
 		clearError()
 		val checkRefresh = File(dbName).exists()
-		_onBoardingDone.value = checkRefresh
+		if (checkRefresh) _onBoardingDone.value =
+			OnBoardingState.Yes else _onBoardingDone.value = OnBoardingState.No
 		if (checkRefresh) {
-
 			refreshNetworks()
 			//TODO: support state with all networks deleted (low priority)
 			if (true) {
 				_selectedNetwork.value = networks.value!!.get(0) as JSONObject
 			}
 			refreshSeedNames()
-			_newSeedScreen.value = seedNames.value?.isEmpty() as Boolean
+			_transactionState.value = TransactionState.None
+			_settingsModal.value = SettingsModal.None
+			if (seedNames.value?.isEmpty() as Boolean) _keyManagerModal.value =
+				KeyManagerModal.NewSeed else _keyManagerModal.value =
+				KeyManagerModal.None
 			fetchKeys()
 		}
 	}
@@ -215,6 +231,26 @@ class SignerDataModel : ViewModel() {
 		_lastError.value = ""
 	}
 
+	/**
+	 * Generate identicon from some form of address:
+	 * this is only a wrapper and converter to png.
+	 * This should not fail!
+	 */
+	fun getIdenticon(key: String, size: Int): ImageBitmap {
+		Log.d("key", key)
+		try {
+			val picture = substrateDevelopmentTest(key).decodeHex()
+			var bitmap = BitmapFactory.decodeByteArray(picture, 0, picture.size)
+			//Log.d("picture", picture.joinToString())
+			Log.d("length", picture.size.toString())
+			return bitmap.asImageBitmap()
+		} catch (e: java.lang.Exception) {
+			Log.d("Identicon did not render", e.toString())
+			return ImageBitmap(size, size)
+		}
+		//TODO
+	}
+
 	//MARK: General utils end
 
 	//MARK: Seed management begin
@@ -228,24 +264,9 @@ class SignerDataModel : ViewModel() {
 	}
 
 	/**
-	 * Activate new seed screen on KeyManager screen
-	 */
-	fun newSeedScreenEngage() {
-		_newSeedScreen.value = true
-	}
-
-	/**
-	 * Deactivate new seed screen
-	 */
-	fun newSeedScreenDisengage() {
-		_newSeedScreen.value = false
-	}
-
-	/**
 	 * Add seed, encrypt it, and create default accounts
 	 */
 	fun addSeed(seedName: String, seedPhrase: String) {
-		var finalSeedPhrase = ""
 
 		//Check if seed name already exists
 		if (seedNames.value?.contains(seedName) as Boolean) {
@@ -269,7 +290,7 @@ class SignerDataModel : ViewModel() {
 				refreshSeedNames()
 				selectSeed(seedName)
 				_backupSeedPhrase.value = finalSeedPhrase
-				_newSeedScreen.value = false
+				_keyManagerModal.value = KeyManagerModal.SeedBackup
 			} catch (e: java.lang.Exception) {
 				_lastError.value = e.toString()
 				Log.e("Seed creation error", e.toString())
@@ -284,14 +305,6 @@ class SignerDataModel : ViewModel() {
 	fun selectSeed(seedName: String) {
 		_selectedSeed.value = seedName
 		totalRefresh() //should we?
-	}
-
-	/**
-	 * This happens when backup seed acknowledge button is pressed in seed creation screen.
-	 * TODO: This might misfire
-	 */
-	fun acknowledgeBackup() {
-		_backupSeedPhrase.value = ""
 	}
 
 	//MARK: Seed management end
@@ -329,17 +342,97 @@ class SignerDataModel : ViewModel() {
 		try {
 			Log.d("selectedNetwork", selectedNetwork.value.toString())
 			Log.d("Selected seed", selectedSeed.value.toString())
-			_identities.value = JSONArray(dbGetRelevantIdentities(selectedSeed.value?:"", selectedNetwork.value?.get("key").toString(), dbName))
+			_identities.value = JSONArray(
+				dbGetRelevantIdentities(
+					selectedSeed.value ?: "",
+					selectedNetwork.value?.get("key").toString(),
+					dbName
+				)
+			)
 		} catch (e: java.lang.Exception) {
 			Log.e("fetch keys error", e.toString())
 		}
 	}
 
+	/**
+	 * Just set key for filtering
+	 */
 	fun selectKey(key: JSONObject) {
 		_selectedIdentity.value = key
 	}
 
+	fun addKey() {
+		try {
+
+		} catch (e: java.lang.Exception) {
+
+		}
+	}
+
+	/**
+	 * delete selected key for selected network
+	 */
+	fun deleteKey() {
+		try {
+			substrateDeleteIdentity(
+				selectedIdentity.value?.get("public_key").toString(),
+				selectedNetwork.value?.get("key").toString(),
+				dbName
+			)
+			clearKeyManagerScreen()
+		} catch (e: java.lang.Exception) {
+			Log.e("key deletion error", e.toString())
+		}
+	}
+
 	//MARK: Key management end
+
+	//MARK: Modals control begin
+
+	//KeyManager
+
+	/**
+	 * This happens when backup seed acknowledge button is pressed in seed creation screen.
+	 * TODO: This might misfire
+	 */
+	fun acknowledgeBackup() {
+		_backupSeedPhrase.value = ""
+		clearKeyManagerScreen()
+	}
+
+	/**
+	 * Activate new seed screen on KeyManager screen
+	 */
+	fun newSeedScreenEngage() {
+		_keyManagerModal.value = KeyManagerModal.NewSeed
+	}
+
+	/**
+	 * Derive new key
+	 */
+	fun newKeyScreenEngage() {
+		_keyManagerModal.value = KeyManagerModal.NewKey
+	}
+
+	/**
+	 * Show public key QR screen
+	 */
+	fun exportPublicKeyEngage() {
+		_keyManagerModal.value = KeyManagerModal.ShowKey
+	}
+
+	/**
+	 * Remove key manager modals
+	 */
+	fun clearKeyManagerScreen() {
+		_keyManagerModal.value = KeyManagerModal.None
+	}
+
+	fun deleteKeyConfirmation() {
+		_keyManagerModal.value = KeyManagerModal.KeyDeleteConfirm
+	}
+
+	//MARK: Modals control end
 
 	//MARK: rust native section begin
 

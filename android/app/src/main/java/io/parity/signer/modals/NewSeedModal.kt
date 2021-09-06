@@ -45,7 +45,7 @@ fun NewSeedModal(signerDataModel: SignerDataModel) {
 				keyboardOptions = KeyboardOptions(
 					autoCorrect = false,
 					capitalization = KeyboardCapitalization.Words,
-					keyboardType = KeyboardType.Ascii,
+					keyboardType = KeyboardType.Text,
 					imeAction = ImeAction.Done
 				),
 				keyboardActions = KeyboardActions(

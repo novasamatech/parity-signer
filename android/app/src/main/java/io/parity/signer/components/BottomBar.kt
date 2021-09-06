@@ -16,6 +16,7 @@ import io.parity.signer.models.SignerDataModel
  * Bar to be shown on the bottom of screen;
  * should get navigation callbacks and maybe some information
  * to prevent navigation loops?
+ * TODO: remove this as functionality is elsewhere
  */
 @Composable
 fun BottomBar(

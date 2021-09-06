@@ -1,6 +1,5 @@
 package io.parity.signer.components
 
-import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -19,7 +18,7 @@ import org.json.JSONObject
 @Composable
 fun KeySelector(signerDataModel: SignerDataModel) {
 	val identities = signerDataModel.identities.observeAsState()
-	val selectedIdentity = signerDataModel.selectedIdentities.observeAsState()
+	val selectedIdentity = signerDataModel.selectedIdentity.observeAsState()
 
 	LazyColumn {
 		//keys should be defined already, can't panic
@@ -53,9 +52,33 @@ fun KeySelector(signerDataModel: SignerDataModel) {
 								backgroundColor = MaterialTheme.colors.secondary,
 								contentColor = MaterialTheme.colors.onSecondary,
 							),
-							onClick = { /*TODO*/ }
-						) { Text("test") }
+							onClick = { signerDataModel.deleteKeyConfirmation() }
+						) { Text("delete") }
+						Button(
+							colors = ButtonDefaults.buttonColors(
+								backgroundColor = MaterialTheme.colors.secondary,
+								contentColor = MaterialTheme.colors.onSecondary,
+							),
+							onClick = {
+								signerDataModel.exportPublicKeyEngage()
+							}
+						) { Text("export") }
+						Button(
+							colors = ButtonDefaults.buttonColors(
+								backgroundColor = MaterialTheme.colors.secondary,
+								contentColor = MaterialTheme.colors.onSecondary,
+							),
+							onClick = { signerDataModel.newKeyScreenEngage() /*TODO*/ }
+						) { Text("N+1") }
+						Button(
+							colors = ButtonDefaults.buttonColors(
+								backgroundColor = MaterialTheme.colors.secondary,
+								contentColor = MaterialTheme.colors.onSecondary,
+							),
+							onClick = { signerDataModel.newKeyScreenEngage() }
+						) { Text("new") }
 					}
+					//TODO: Relevant history
 				}
 			}
 		}
