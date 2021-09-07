@@ -18,9 +18,22 @@ import androidx.compose.ui.text.input.KeyboardType
 import io.parity.signer.models.SignerDataModel
 
 @Composable
-fun NewKeyModal(signerDataModel: SignerDataModel) {
-	var derivationPath by remember { mutableStateOf("") }
-	var keyName by remember { mutableStateOf("") }
+fun NewKeyModal(signerDataModel: SignerDataModel, increment: Boolean) {
+	var derivationPath by remember {
+		mutableStateOf(
+			if (increment)
+				signerDataModel.proposeIncrement()
+			else
+				signerDataModel.proposeDerivePath()
+		)
+	}
+	var keyName by remember {
+		mutableStateOf(
+			signerDataModel.proposeName(
+				derivationPath
+			)
+		)
+	}
 	var password by remember { mutableStateOf("") }
 	var passwordRepeat by remember { mutableStateOf("") }
 	val lastError = signerDataModel.lastError.observeAsState()
@@ -37,6 +50,7 @@ fun NewKeyModal(signerDataModel: SignerDataModel) {
 			value = derivationPath,
 			onValueChange = {
 				derivationPath = it
+				keyName = signerDataModel.proposeName(derivationPath)
 				signerDataModel.clearError()
 			},
 			label = { Text("Derivation path") },
@@ -116,8 +130,8 @@ fun NewKeyModal(signerDataModel: SignerDataModel) {
 				onClick = {
 					password = ""
 					passwordRepeat = ""
-					derivationPath = "todo" //TODO
-					keyName = "todo" //TODO
+					derivationPath = signerDataModel.proposeIncrement()
+					keyName = signerDataModel.proposeName(derivationPath)
 				},
 				enabled = true
 			) {
@@ -129,7 +143,7 @@ fun NewKeyModal(signerDataModel: SignerDataModel) {
 					contentColor = MaterialTheme.colors.onBackground
 				),
 				onClick = {
-					//signerDataModel.addSeed(seedName, seedPhrase) TODO
+					signerDataModel.addKey(derivationPath, keyName, password)
 				},
 				enabled = (password == passwordRepeat || password.isEmpty()) && !derivationPath.isEmpty() && lastError.value?.isEmpty() as Boolean
 			) {

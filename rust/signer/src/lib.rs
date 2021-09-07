@@ -14,6 +14,9 @@
 // You should have received a copy of the GNU General Public License
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
+//used for identicon size; because JNI has no signed int
+use std::convert::TryInto;
+
 use plot_icon;
 use db_handling;
 use transaction_parsing;
@@ -72,6 +75,26 @@ export! {
 	) -> anyhow::Result<String, anyhow::Error> {
         //let output = Ok(std::env::consts::OS.to_string());
         let picture = plot_icon::png_data_from_base58(input, 32)?;
+        Ok(hex::encode(picture))
+    }
+
+    @Java_io_parity_signer_models_SignerDataModel_substrateBase58Identicon
+	fn base58_identicon(
+		base58: &str,
+        size: u32
+	) -> anyhow::Result<String, anyhow::Error> {
+        //let output = Ok(std::env::consts::OS.to_string());
+        let picture = plot_icon::png_data_from_base58(base58, size.try_into()?)?;
+        Ok(hex::encode(picture))
+    }
+
+    @Java_io_parity_signer_models_SignerDataModel_substrateIdenticon
+	fn identicon(
+		key: &str,
+        size: u32
+	) -> anyhow::Result<String, anyhow::Error> {
+        //let output = Ok(std::env::consts::OS.to_string());
+        let picture = plot_icon::png_data_from_hex(key, size.try_into()?)?;
         Ok(hex::encode(picture))
     }
 

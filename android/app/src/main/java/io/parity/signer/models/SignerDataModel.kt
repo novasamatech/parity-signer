@@ -237,16 +237,11 @@ class SignerDataModel : ViewModel() {
 	 * This should not fail!
 	 */
 	fun getIdenticon(key: String, size: Int): ImageBitmap {
-		Log.d("key", key)
-		try {
-			val picture = substrateDevelopmentTest(key).decodeHex()
-			var bitmap = BitmapFactory.decodeByteArray(picture, 0, picture.size)
-			//Log.d("picture", picture.joinToString())
-			Log.d("length", picture.size.toString())
-			return bitmap.asImageBitmap()
+		return try {
+			substrateBase58Identicon(key, size).intoImageBitmap()
 		} catch (e: java.lang.Exception) {
 			Log.d("Identicon did not render", e.toString())
-			return ImageBitmap(size, size)
+			ImageBitmap(size, size)
 		}
 		//TODO
 	}
@@ -257,6 +252,9 @@ class SignerDataModel : ViewModel() {
 
 	/**
 	 * Refresh seed names list
+	 * should be called within authentication envelope
+	 * authentication.authenticate(activity) {refreshSeedNames()}
+	 * which is somewhat asynchronous
 	 */
 	fun refreshSeedNames() {
 		clearError()
@@ -305,6 +303,10 @@ class SignerDataModel : ViewModel() {
 	fun selectSeed(seedName: String) {
 		_selectedSeed.value = seedName
 		totalRefresh() //should we?
+	}
+
+	fun getSeed(): String {
+		return sharedPreferences.getString(selectedSeed.value, "") ?: ""
 	}
 
 	//MARK: Seed management end
@@ -361,11 +363,47 @@ class SignerDataModel : ViewModel() {
 		_selectedIdentity.value = key
 	}
 
-	fun addKey() {
+	/**
+	 * Add key to database; uses phone crypto to fetch seeds!
+	 */
+	fun addKey(path: String, name: String, password: String) {
+		if (selectedSeed.value?.isEmpty() as Boolean) selectSeed(
+			selectedIdentity.value?.get(
+				"seed_name"
+			).toString()
+		)
+		var fullPath = path
+		val hasPassword = !password.isEmpty()
+		if (hasPassword) fullPath += "///" + password
 		try {
-
+			if (substrateCheckPath(path) != hasPassword) {
+				_lastError.value =
+					"The sequence /// is not allowed in path; use password field to include password (omitting ///)"
+				Log.e("Add key preparation error", "password in path field")
+				return
+			}
 		} catch (e: java.lang.Exception) {
-
+			_lastError.value = e.toString()
+			Log.e("Add key path check error", e.toString())
+		}
+		authentication.authenticate(activity) {
+			try {
+				substrateTryCreateIdentity(
+					name,
+					selectedSeed.value!!,
+					getSeed(),
+					"sr25519",
+					path,
+					selectedNetwork.value?.get("key").toString(),
+					hasPassword,
+					dbName
+				)
+				fetchKeys()
+				clearKeyManagerScreen()
+			} catch (e: java.lang.Exception) {
+				Log.e("Add key error", e.toString())
+				_lastError.value = e.toString()
+			}
 		}
 	}
 
@@ -379,9 +417,50 @@ class SignerDataModel : ViewModel() {
 				selectedNetwork.value?.get("key").toString(),
 				dbName
 			)
+			fetchKeys()
 			clearKeyManagerScreen()
 		} catch (e: java.lang.Exception) {
 			Log.e("key deletion error", e.toString())
+		}
+	}
+
+	fun proposeDerivePath(): String {
+		return if (selectedIdentity.value?.isNull("path") as Boolean)
+			"//"
+		else
+			selectedIdentity.value?.get("path").toString()
+	}
+
+	fun proposeIncrement(): String {
+		if (selectedIdentity.value?.isNull("path") as Boolean)
+			return ""
+		else {
+			return try {
+				substrateSuggestNPlusOne(
+					selectedIdentity.value?.get("path").toString(),
+					selectedSeed.value.toString(),
+					selectedNetwork.value?.get("key").toString(),
+					dbName
+				)
+			} catch (e: java.lang.Exception) {
+				_lastError.value = e.toString()
+				Log.e("Increment error", e.toString())
+				""
+			}
+		}
+	}
+
+	fun proposeName(path: String): String {
+		return substrateSuggestName(path)
+	}
+
+	fun exportPublicKey(): ImageBitmap {
+		return try {
+			substrateExportPubkey(selectedIdentity.value?.get("public_key").toString(), selectedNetwork.value?.get("key").toString(), dbName).intoImageBitmap()
+		} catch (e: java.lang.Exception) {
+			Log.d("QR export error", e.toString())
+			_lastError.value = e.toString()
+			ImageBitmap(1,1)
 		}
 	}
 
@@ -457,6 +536,8 @@ class SignerDataModel : ViewModel() {
 	): String
 
 	external fun substrateDevelopmentTest(input: String): String
+	external fun substrateBase58Identicon(base58: String, size: Int): String
+	external fun substrateIdenticon(key: String, size: Int): String
 	external fun dbGetNetwork(genesisHash: String, dbname: String): String
 	external fun dbGetAllNetworksForNetworkSelector(dbname: String): String
 	external fun dbGetRelevantIdentities(

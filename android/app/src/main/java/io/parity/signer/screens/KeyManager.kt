@@ -55,7 +55,7 @@ fun KeyManager(signerDataModel: SignerDataModel) {
 			NewSeedModal(signerDataModel)
 		}
 		KeyManagerModal.NewKey -> {
-			NewKeyModal(signerDataModel)
+			NewKeyModal(signerDataModel, false)
 		}
 		KeyManagerModal.ShowKey -> {
 			ExportPublicKey(signerDataModel)

@@ -14,6 +14,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.ImageBitmap
 import io.parity.signer.models.SignerDataModel
+import io.parity.signer.ui.theme.Typography
 import org.json.JSONObject
 
 /**
@@ -23,15 +24,15 @@ import org.json.JSONObject
 @Composable
 fun KeyCard(identity: JSONObject, signerDataModel: SignerDataModel) {
 	Row {
-		Image(signerDataModel.getIdenticon(identity.get("ss58").toString(), 16), "identicon")
+		Image(signerDataModel.getIdenticon(identity.get("ss58").toString(), 80), "identicon")
 		Column {
 			Text(identity.get("name").toString())
 			Row {
-				Text(identity.get("seed_name").toString())
-				Text(identity.get("path").toString())
+				Text(identity.get("seed_name").toString(), style = Typography.body1)
+				Text(identity.get("path").toString(), style = Typography.body1)
 			}
-			Text(identity.get("ss58").toString())
-			Text(identity.get("public_key").toString())
+			Text(identity.get("ss58").toString(), style = Typography.body2)
+			//Text(identity.get("public_key").toString(), style = Typography.body2)
 		}
 	}
 }
