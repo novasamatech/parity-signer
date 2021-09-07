@@ -6,6 +6,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
@@ -21,11 +22,13 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.Observer
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.google.common.util.concurrent.ListenableFuture
 import io.parity.signer.components.BottomBar
 import io.parity.signer.modals.WaitingScreen
 import io.parity.signer.models.SignerDataModel
@@ -34,8 +37,15 @@ import io.parity.signer.screens.KeyManager
 import io.parity.signer.screens.SettingsScreen
 import io.parity.signer.screens.TransactionScreen
 import io.parity.signer.ui.theme.ParitySignerTheme
+import java.util.concurrent.CompletableFuture
+import android.Manifest
+import android.content.pm.PackageManager
+import android.widget.Toast
+import androidx.core.app.ActivityCompat
 
 class MainActivity : AppCompatActivity() {
+	private val REQUIRED_PERMISSIONS = arrayOf(Manifest.permission.CAMERA)
+	private val REQUEST_CODE_PERMISSIONS = 10
 
 	private val signerDataModel by viewModels<SignerDataModel>()
 
@@ -43,11 +53,29 @@ class MainActivity : AppCompatActivity() {
 		super.onCreate(savedInstanceState)
 		signerDataModel.context = applicationContext
 		signerDataModel.activity = this
+
+		//TODO: testing to make sure this goes smoothly
+		if (!allPermissionsGranted()) {
+			ActivityCompat.requestPermissions(
+				this,
+				REQUIRED_PERMISSIONS,
+				REQUEST_CODE_PERMISSIONS
+			)
+		}
+
 		signerDataModel.lateInit()
 		setContent {
 			SignerApp(signerDataModel)
 		}
 	}
+
+	private fun allPermissionsGranted() = REQUIRED_PERMISSIONS.all {
+		ContextCompat.checkSelfPermission(
+			baseContext, it
+		) == PackageManager.PERMISSION_GRANTED
+	}
+
+
 }
 
 /**

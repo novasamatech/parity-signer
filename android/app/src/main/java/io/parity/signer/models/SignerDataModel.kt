@@ -5,9 +5,11 @@ import android.content.SharedPreferences
 import android.content.pm.PackageManager
 import android.graphics.BitmapFactory
 import android.util.Log
+import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.input.key.Key
+import androidx.core.content.ContextCompat
 import androidx.core.graphics.createBitmap
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.LiveData
@@ -15,6 +17,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.security.crypto.EncryptedSharedPreferences
 import androidx.security.crypto.MasterKey
+import com.google.common.util.concurrent.ListenableFuture
 import io.parity.signer.KeyManagerModal
 import io.parity.signer.OnBoardingState
 import io.parity.signer.SettingsModal
@@ -55,6 +58,7 @@ class SignerDataModel : ViewModel() {
 	//Seeds
 	private val _seedNames = MutableLiveData(arrayOf<String>())
 	private val _selectedSeed = MutableLiveData("")
+	//TODO: keeping super secret seeds in questionably managed observable must be studied critically
 	private val _backupSeedPhrase = MutableLiveData("")
 
 	//Error
