@@ -1,10 +1,12 @@
 package io.parity.signer.models
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.content.SharedPreferences
 import android.content.pm.PackageManager
 import android.graphics.BitmapFactory
 import android.util.Log
+import androidx.camera.core.ImageProxy
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asImageBitmap
@@ -18,6 +20,8 @@ import androidx.lifecycle.ViewModel
 import androidx.security.crypto.EncryptedSharedPreferences
 import androidx.security.crypto.MasterKey
 import com.google.common.util.concurrent.ListenableFuture
+import com.google.mlkit.vision.barcode.BarcodeScanner
+import com.google.mlkit.vision.common.InputImage
 import io.parity.signer.KeyManagerModal
 import io.parity.signer.OnBoardingState
 import io.parity.signer.SettingsModal
@@ -27,6 +31,8 @@ import org.json.JSONArray
 import org.json.JSONObject
 import java.io.File
 import java.io.FileOutputStream
+
+//TODO: chop this monster in chunks
 
 /**
  * This is single object to handle all interactions with backend,
@@ -251,6 +257,32 @@ class SignerDataModel : ViewModel() {
 	}
 
 	//MARK: General utils end
+
+	//MARK: Camera tools begin
+
+	/**
+	 * Barcode detecting function.
+	 * This uses experimental features
+	 */
+	@SuppressLint("UnsafeOptInUsageError")
+	fun processFrame(barcodeScanner: BarcodeScanner, imageProxy: ImageProxy) {
+		val inputImage = InputImage.fromMediaImage(imageProxy.image, imageProxy.imageInfo.rotationDegrees)
+
+		barcodeScanner.process(inputImage)
+			.addOnSuccessListener { barcodes ->
+				barcodes.forEach {
+					Log.d("QR", it?.rawBytes.toString() ?: "null")
+				}
+			}
+			.addOnFailureListener {
+				Log.e("Scan failed", it.message.toString())
+			}
+			.addOnCompleteListener {
+				imageProxy.close()
+			}
+	}
+
+	//MARK: Camera tools end
 
 	//MARK: Seed management begin
 

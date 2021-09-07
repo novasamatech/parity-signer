@@ -23,6 +23,8 @@ import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.ContextCompat
+import com.google.mlkit.vision.barcode.BarcodeScanner
+import com.google.mlkit.vision.barcode.BarcodeScanning
 import io.parity.signer.MainActivity
 import io.parity.signer.models.SignerDataModel
 
@@ -47,6 +49,7 @@ fun HomeScreen(signerDataModel: SignerDataModel, navToTransaction: () -> Unit) {
 			factory = { context ->
 				val executor = ContextCompat.getMainExecutor(context)
 				val previewView = PreviewView(context)
+				val barcodeScanner = BarcodeScanning.getClient()
 				cameraProviderFuture.addListener({
 					val cameraProvider = cameraProviderFuture.get()
 
@@ -62,13 +65,16 @@ fun HomeScreen(signerDataModel: SignerDataModel, navToTransaction: () -> Unit) {
 						.setBackpressureStrategy(ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST)
 						.build()
 						.apply {
-							setAnalyzer(executor, ImageAnalysis.Analyzer {  })
+							setAnalyzer(executor, ImageAnalysis.Analyzer { imageProxy ->
+								signerDataModel.processFrame(barcodeScanner, imageProxy)
+							})
 						}
 
 					cameraProvider.unbindAll()
 					cameraProvider.bindToLifecycle(
 						lifecycleOwner,
 						cameraSelector,
+						imageAnalysis,
 						preview
 					)
 				}, executor)
