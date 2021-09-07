@@ -50,6 +50,12 @@ class SignerDataModel : ViewModel() {
 	//Authenticator to call!
 	var authentication: Authentication = Authentication()
 
+	//Camera stuff
+	private var bucket = arrayOf<String>()
+	private var payload: String = ""
+	private val _total = MutableLiveData<Int?>(null)
+	private val _captured = MutableLiveData<Int?>(null)
+
 	//Internal storage for model data:
 	//TODO: hard types for these
 
@@ -64,6 +70,7 @@ class SignerDataModel : ViewModel() {
 	//Seeds
 	private val _seedNames = MutableLiveData(arrayOf<String>())
 	private val _selectedSeed = MutableLiveData("")
+
 	//TODO: keeping super secret seeds in questionably managed observable must be studied critically
 	private val _backupSeedPhrase = MutableLiveData("")
 
@@ -83,6 +90,9 @@ class SignerDataModel : ViewModel() {
 
 	//Observables for model data
 	val developmentTest: LiveData<String> = _developmentTest
+
+	val total: LiveData<Int?> = _total
+	val captured: LiveData<Int?> = _captured
 
 	val identities: LiveData<JSONArray> = _identities
 	val selectedIdentity: LiveData<JSONObject> = _selectedIdentity
@@ -220,6 +230,9 @@ class SignerDataModel : ViewModel() {
 				KeyManagerModal.None
 			fetchKeys()
 		}
+		bucket = arrayOf<String>()
+		_captured.value = null
+		_total.value = null
 	}
 
 	//TODO: development function; should be removed on release
@@ -266,12 +279,52 @@ class SignerDataModel : ViewModel() {
 	 */
 	@SuppressLint("UnsafeOptInUsageError")
 	fun processFrame(barcodeScanner: BarcodeScanner, imageProxy: ImageProxy) {
-		val inputImage = InputImage.fromMediaImage(imageProxy.image, imageProxy.imageInfo.rotationDegrees)
+		val inputImage = InputImage.fromMediaImage(
+			imageProxy.image,
+			imageProxy.imageInfo.rotationDegrees
+		)
 
 		barcodeScanner.process(inputImage)
 			.addOnSuccessListener { barcodes ->
 				barcodes.forEach {
-					Log.d("QR", it?.rawBytes.toString() ?: "null")
+					val payloadString = it?.rawBytes?.encodeHex()
+					Log.d("QR", payloadString ?: "empty")
+					if (!(bucket.contains(payloadString) || payloadString.isNullOrEmpty())) {
+						if (total.value == null) {
+							try {
+								val proposeTotal = qrparserGetPacketsTotal(payloadString, true)
+								Log.d("estimate total", proposeTotal.toString())
+								if (proposeTotal == 1) {
+									try {
+										payload = qrparserTryDecodeQrSequence("[\"" + payloadString + "\"]", true)
+										Log.d("payload", payload)
+									} catch (e: java.lang.Exception) {
+										Log.e("Single frame decode failed", e.toString())
+									}
+								} else {
+									bucket+=payloadString
+									_total.value = proposeTotal
+								}
+							} catch (e: java.lang.Exception) {
+								Log.e("QR sequence length estimation", e.toString())
+							}
+						} else {
+							bucket+=payloadString
+							if (bucket.size >= total.value?: 0) {
+								try {
+									payload = qrparserTryDecodeQrSequence(
+										"[\"" + bucket.joinToString(separator = "\",\"") + "\"]",
+										true
+									)
+									Log.d("multiframe payload", payload)
+								} catch (e: java.lang.Exception) {
+									Log.e("failed to parse sequence", e.toString())
+								}
+							}
+							_captured.value = bucket.size
+							Log.d("captured", captured.value.toString())
+						}
+					}
 				}
 			}
 			.addOnFailureListener {
@@ -492,11 +545,15 @@ class SignerDataModel : ViewModel() {
 
 	fun exportPublicKey(): ImageBitmap {
 		return try {
-			substrateExportPubkey(selectedIdentity.value?.get("public_key").toString(), selectedNetwork.value?.get("key").toString(), dbName).intoImageBitmap()
+			substrateExportPubkey(
+				selectedIdentity.value?.get("public_key").toString(),
+				selectedNetwork.value?.get("key").toString(),
+				dbName
+			).intoImageBitmap()
 		} catch (e: java.lang.Exception) {
 			Log.d("QR export error", e.toString())
 			_lastError.value = e.toString()
-			ImageBitmap(1,1)
+			ImageBitmap(1, 1)
 		}
 	}
 
@@ -557,8 +614,8 @@ class SignerDataModel : ViewModel() {
 		dbname: String
 	): String
 
-	external fun qrparserGetPacketsTotal(data: String): Int
-	external fun qrparserTryDecodeQrSequence(data: String): String
+	external fun qrparserGetPacketsTotal(data: String, cleaned: Boolean): Int
+	external fun qrparserTryDecodeQrSequence(data: String, cleaned: Boolean): String
 	external fun substrateParseTransaction(
 		transaction: String,
 		dbname: String

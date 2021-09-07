@@ -15,6 +15,7 @@ import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -26,6 +27,8 @@ import androidx.core.content.ContextCompat
 import com.google.mlkit.vision.barcode.BarcodeScanner
 import com.google.mlkit.vision.barcode.BarcodeScanning
 import io.parity.signer.MainActivity
+import io.parity.signer.TransactionState
+import io.parity.signer.modals.CameraModal
 import io.parity.signer.models.SignerDataModel
 
 /**
@@ -34,55 +37,12 @@ import io.parity.signer.models.SignerDataModel
  */
 @Composable
 fun HomeScreen(signerDataModel: SignerDataModel, navToTransaction: () -> Unit) {
-	val lifecycleOwner = LocalLifecycleOwner.current
-	val context = LocalContext.current
-	val cameraProviderFuture =
-		remember { ProcessCameraProvider.getInstance(context) }
+	val transactionState = signerDataModel.transactionState.observeAsState()
 
-	Box(
-		modifier = Modifier
-			.clickable(onClick = navToTransaction)
-			.fillMaxSize()
-	) {
-		//TODO: add proper camera image
-		AndroidView(
-			factory = { context ->
-				val executor = ContextCompat.getMainExecutor(context)
-				val previewView = PreviewView(context)
-				val barcodeScanner = BarcodeScanning.getClient()
-				cameraProviderFuture.addListener({
-					val cameraProvider = cameraProviderFuture.get()
-
-					val preview = Preview.Builder().build().also {
-						it.setSurfaceProvider(previewView.surfaceProvider)
-					}
-
-					val cameraSelector = CameraSelector.Builder()
-						.requireLensFacing(CameraSelector.LENS_FACING_BACK)
-						.build()
-
-					val imageAnalysis = ImageAnalysis.Builder()
-						.setBackpressureStrategy(ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST)
-						.build()
-						.apply {
-							setAnalyzer(executor, ImageAnalysis.Analyzer { imageProxy ->
-								signerDataModel.processFrame(barcodeScanner, imageProxy)
-							})
-						}
-
-					cameraProvider.unbindAll()
-					cameraProvider.bindToLifecycle(
-						lifecycleOwner,
-						cameraSelector,
-						imageAnalysis,
-						preview
-					)
-				}, executor)
-				previewView
-			},
-			modifier = Modifier.fillMaxSize()
-		)
-
+	when(transactionState.value) {
+		TransactionState.None -> {
+			CameraModal(signerDataModel)}
 	}
+
 }
 

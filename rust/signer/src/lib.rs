@@ -38,16 +38,18 @@ export! {
 
 	@Java_io_parity_signer_models_SignerDataModel_qrparserGetPacketsTotal
 	fn get_packets_total(
-		data: &str
+		data: &str,
+        cleaned: bool
 	) -> anyhow::Result<u32, anyhow::Error> {
-        qr_reader_phone::get_length(data)
+        qr_reader_phone::get_length(data, cleaned)
 	}
 
 	@Java_io_parity_signer_models_SignerDataModel_qrparserTryDecodeQrSequence
 	fn try_decode_qr_sequence(
-		data: &str
+		data: &str,
+        cleaned: bool
 	) -> anyhow::Result<String, anyhow::Error> {
-        qr_reader_phone::decode_sequence(data)
+        qr_reader_phone::decode_sequence(data, cleaned)
 	}
 
     @Java_io_parity_signer_models_SignerDataModel_substrateParseTransaction
