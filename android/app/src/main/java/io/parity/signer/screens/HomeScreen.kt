@@ -36,7 +36,7 @@ import io.parity.signer.models.SignerDataModel
  * triggers transaction sequence starting with camera
  */
 @Composable
-fun HomeScreen(signerDataModel: SignerDataModel, navToTransaction: () -> Unit) {
+fun HomeScreen(signerDataModel: SignerDataModel) {
 	val transactionState = signerDataModel.transactionState.observeAsState()
 
 	when(transactionState.value) {

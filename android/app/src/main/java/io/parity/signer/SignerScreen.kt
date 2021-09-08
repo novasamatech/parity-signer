@@ -7,7 +7,7 @@ import io.parity.signer.screens.HomeScreen
  * All screens metadata for navigation
  */
 enum class SignerScreen() {
-	Home, Transaction, Keys, Settings;
+	Home, Keys, Settings;
 }
 
 enum class TransactionState {
@@ -19,7 +19,7 @@ enum class KeyManagerModal {
 }
 
 enum class SettingsModal {
-	None;
+	None, History;
 }
 
 enum class OnBoardingState {

@@ -35,7 +35,6 @@ import io.parity.signer.models.SignerDataModel
 import io.parity.signer.screens.HomeScreen
 import io.parity.signer.screens.KeyManager
 import io.parity.signer.screens.SettingsScreen
-import io.parity.signer.screens.TransactionScreen
 import io.parity.signer.ui.theme.ParitySignerTheme
 import java.util.concurrent.CompletableFuture
 import android.Manifest
@@ -144,18 +143,13 @@ fun SignerApp(signerDataModel: SignerDataModel) {
 					) {
 						composable(SignerScreen.Home.name) {
 							HomeScreen(
-								signerDataModel = signerDataModel,
-								navToTransaction = { navController.navigate(SignerScreen.Transaction.name) }
-							)
+								signerDataModel = signerDataModel)
 						}
 						composable(SignerScreen.Keys.name) {
 							KeyManager(signerDataModel = signerDataModel)
 						}
 						composable(SignerScreen.Settings.name) {
 							SettingsScreen(signerDataModel = signerDataModel)
-						}
-						composable(SignerScreen.Transaction.name) {
-							TransactionScreen(signerDataModel = signerDataModel)
 						}
 					}
 				}

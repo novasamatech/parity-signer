@@ -74,6 +74,9 @@ class SignerDataModel : ViewModel() {
 	//TODO: keeping super secret seeds in questionably managed observable must be studied critically
 	private val _backupSeedPhrase = MutableLiveData("")
 
+	//History
+	private val _history = MutableLiveData(JSONArray())
+
 	//Error
 	private val _lastError = MutableLiveData("")
 
@@ -106,6 +109,8 @@ class SignerDataModel : ViewModel() {
 	val seedNames: LiveData<Array<String>> = _seedNames
 	val selectedSeed: LiveData<String> = _selectedSeed
 	val backupSeedPhrase: LiveData<String> = _backupSeedPhrase
+
+	val history: LiveData<JSONArray> = _history
 
 	val lastError: LiveData<String> = _lastError
 
@@ -232,6 +237,7 @@ class SignerDataModel : ViewModel() {
 				KeyManagerModal.NewSeed else _keyManagerModal.value =
 				KeyManagerModal.None
 			fetchKeys()
+			refreshHistory()
 		}
 		clearTransaction()
 	}
@@ -245,6 +251,14 @@ class SignerDataModel : ViewModel() {
 			test = e.toString()
 		}
 		return test
+	}
+
+	fun refreshHistory() {
+		try {
+			_history.value = JSONArray(historyPrintHistory(dbName))
+		} catch(e:java.lang.Exception) {
+			Log.e("History refresh error!", e.toString())
+		}
 	}
 
 	/**
@@ -710,8 +724,21 @@ class SignerDataModel : ViewModel() {
 		_keyManagerModal.value = KeyManagerModal.None
 	}
 
+	/**
+	 * Key deletion confirmation
+	 */
 	fun deleteKeyConfirmation() {
 		_keyManagerModal.value = KeyManagerModal.KeyDeleteConfirm
+	}
+
+	//Settings
+
+	fun engageHistoryScreen() {
+		_settingsModal.value = SettingsModal.History
+	}
+
+	fun clearHistoryScreen() {
+		_settingsModal.value = SettingsModal.None
 	}
 
 	//MARK: Modals control end
@@ -797,6 +824,14 @@ class SignerDataModel : ViewModel() {
 	)
 
 	external fun substrateRemoveSeed(seedName: String, dbname: String)
+	external fun historyPrintHistory(dbname: String): String
+	external fun historyClearHistory(dbname: String)
+	external fun historyInitHistory(dbname: String)
+	external fun historyDeviceWasOnline(dbname: String)
+	external fun historySeedsWereAccessed(dbname: String)
+	external fun historySeedsWereShown(dbName: String)
+	external fun historyEntryUser(entry: String, dbname: String)
+	external fun historyEntrySystem(entry: String, dbname: String)
 
 	//MARK: rust native section end
 

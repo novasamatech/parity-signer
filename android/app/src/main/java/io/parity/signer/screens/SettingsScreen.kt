@@ -1,7 +1,14 @@
 package io.parity.signer.screens
 
+import androidx.compose.foundation.layout.Column
+import androidx.compose.material.Button
+import androidx.compose.material.ButtonDefaults
+import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.livedata.observeAsState
+import io.parity.signer.SettingsModal
+import io.parity.signer.modals.HistoryModal
 import io.parity.signer.models.SignerDataModel
 
 /**
@@ -11,5 +18,23 @@ import io.parity.signer.models.SignerDataModel
  */
 @Composable
 fun SettingsScreen(signerDataModel: SignerDataModel) {
-	Text(text = "Settings")
+	val settingsModal = signerDataModel.settingsModal.observeAsState()
+
+	when (settingsModal.value) {
+		SettingsModal.None -> {
+			Column {
+				Text(text = "Settings")
+				Button(
+					colors = ButtonDefaults.buttonColors(
+						backgroundColor = MaterialTheme.colors.secondary,
+						contentColor = MaterialTheme.colors.onSecondary,
+					),
+					onClick = { signerDataModel.engageHistoryScreen() }
+				) { Text("History") }
+			}
+		}
+		SettingsModal.History -> {
+			HistoryModal(signerDataModel)
+		}
+	}
 }
