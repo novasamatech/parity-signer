@@ -3,6 +3,7 @@ package io.parity.signer.models
 import android.graphics.BitmapFactory
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asImageBitmap
+import org.json.JSONArray
 
 /**
  * Decodes from hex string into number array
@@ -11,8 +12,25 @@ fun String.decodeHex(): ByteArray {
 	return chunked(2).map { it.toInt(16).toByte() }.toByteArray()
 }
 
+/**
+ * Encodes number array into string
+ */
 fun ByteArray.encodeHex(): String {
 	return this.joinToString(separator = "") { byte -> "%02x".format(byte) }
+}
+
+/**
+ * Concatenator for JSON arrays
+ * TODO: should abomination not be needed in final version
+ */
+fun concatJSONArray(vararg arrays: JSONArray): JSONArray {
+	var result = JSONArray()
+	for (array in arrays) {
+		for (i in 0 until array.length()) {
+			result.put(array.getJSONObject(i))
+		}
+	}
+	return result
 }
 
 /**

@@ -4,22 +4,15 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.content.SharedPreferences
 import android.content.pm.PackageManager
-import android.graphics.BitmapFactory
 import android.util.Log
 import androidx.camera.core.ImageProxy
-import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.compose.ui.graphics.ImageBitmap
-import androidx.compose.ui.graphics.asImageBitmap
-import androidx.compose.ui.input.key.Key
-import androidx.core.content.ContextCompat
-import androidx.core.graphics.createBitmap
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.security.crypto.EncryptedSharedPreferences
 import androidx.security.crypto.MasterKey
-import com.google.common.util.concurrent.ListenableFuture
 import com.google.mlkit.vision.barcode.BarcodeScanner
 import com.google.mlkit.vision.common.InputImage
 import io.parity.signer.KeyManagerModal
@@ -55,6 +48,13 @@ class SignerDataModel : ViewModel() {
 	private var payload: String = ""
 	private val _total = MutableLiveData<Int?>(null)
 	private val _captured = MutableLiveData<Int?>(null)
+
+	//Transaction
+	private val _transaction = MutableLiveData(JSONArray())
+	private var action = JSONObject()
+	private val _actionable = MutableLiveData(false)
+	private var signingAuthor = JSONObject()
+	private var signature = ""
 
 	//Internal storage for model data:
 	//TODO: hard types for these
@@ -93,6 +93,9 @@ class SignerDataModel : ViewModel() {
 
 	val total: LiveData<Int?> = _total
 	val captured: LiveData<Int?> = _captured
+
+	val transaction: LiveData<JSONArray> = _transaction
+	val actionable: LiveData<Boolean> = _actionable
 
 	val identities: LiveData<JSONArray> = _identities
 	val selectedIdentity: LiveData<JSONObject> = _selectedIdentity
@@ -230,9 +233,7 @@ class SignerDataModel : ViewModel() {
 				KeyManagerModal.None
 			fetchKeys()
 		}
-		bucket = arrayOf<String>()
-		_captured.value = null
-		_total.value = null
+		clearTransaction()
 	}
 
 	//TODO: development function; should be removed on release
@@ -271,6 +272,97 @@ class SignerDataModel : ViewModel() {
 
 	//MARK: General utils end
 
+	//MARK: Transaction utils begin
+
+	fun parseTransaction() {
+		_transactionState.value = TransactionState.Parsing
+		try {
+			val transactionString = substrateParseTransaction(payload, dbName)
+			Log.d("transaction string", transactionString)
+			val transactionObject = JSONObject(transactionString)
+			//TODO: something here
+			val author = (transactionObject.optJSONArray("author") ?: JSONArray())
+			val warnings = transactionObject.optJSONArray("warning") ?: JSONArray()
+			val typesInfo =
+				transactionObject.optJSONArray("types_info") ?: JSONArray()
+			val error = (transactionObject.optJSONArray("error") ?: JSONArray())
+			val extrinsics =
+				(transactionObject.optJSONArray("extrinsics") ?: JSONArray())
+			val method = (transactionObject.optJSONArray("method") ?: JSONArray())
+			action = transactionObject.optJSONObject("action") ?: JSONObject()
+			_actionable.value = !action.isNull("type")
+			if (action.optString("type") == "sign_transaction") {
+				signingAuthor = author.getJSONObject(0)
+			}
+			Log.d("action", action.toString())
+			_transaction.value =
+				concatJSONArray(author, warnings, typesInfo, error, extrinsics, method)
+			//TODO: sort by index
+			_transactionState.value = TransactionState.Preview
+		} catch (e: java.lang.Exception) {
+			Log.e("Transaction parsing failed", e.toString())
+			_transactionState.value = TransactionState.None
+		}
+	}
+
+	fun acceptTransaction() {
+		if (action.getString("type") == "sign_transaction") {
+			if (signingAuthor.getJSONObject("payload").getBoolean("has_password")) {
+				_transactionState.value = TransactionState.Password
+			} else {
+				signTransaction("")
+			}
+		} else {
+			performTransaction("", "")
+			clearTransaction()
+		}
+	}
+
+	fun signTransaction(password: String) {
+		authentication.authenticate(activity) {
+			signature = performTransaction(
+				sharedPreferences.getString(
+					signingAuthor.getJSONObject("payload").getString("seed"), ""
+				) ?: "", password
+			)
+			_transactionState.value = TransactionState.Signed
+		}
+	}
+
+	fun getSignedQR(): ImageBitmap {
+		return signature.intoImageBitmap()
+	}
+
+	private fun performTransaction(seedPhrase: String, password: String): String {
+		return try {
+			substrateHandleAction(
+				action.getJSONObject("payload").toString(),
+				seedPhrase,
+				password,
+				dbName
+			)
+		} catch (e: java.lang.Exception) {
+			Log.e("transaction failed", e.toString())
+			_lastError.value = e.toString()
+			""
+		}
+	}
+
+	/**
+	 * Clear all transaction progress side effects
+	 */
+	fun clearTransaction() {
+		signature = ""
+		action = JSONObject()
+		signingAuthor = JSONObject()
+		_transaction.value = JSONArray()
+		_actionable.value = false
+		_transactionState.value = TransactionState.None
+		resetScan()
+	}
+
+	//MARK: Transaction utils end
+
 	//MARK: Camera tools begin
 
 	/**
@@ -296,27 +388,36 @@ class SignerDataModel : ViewModel() {
 								Log.d("estimate total", proposeTotal.toString())
 								if (proposeTotal == 1) {
 									try {
-										payload = qrparserTryDecodeQrSequence("[\"" + payloadString + "\"]", true)
+										payload = qrparserTryDecodeQrSequence(
+											"[\"" + payloadString + "\"]",
+											true
+										)
+										resetScan()
+										parseTransaction()
 										Log.d("payload", payload)
 									} catch (e: java.lang.Exception) {
 										Log.e("Single frame decode failed", e.toString())
 									}
 								} else {
-									bucket+=payloadString
+									bucket += payloadString
 									_total.value = proposeTotal
 								}
 							} catch (e: java.lang.Exception) {
 								Log.e("QR sequence length estimation", e.toString())
 							}
 						} else {
-							bucket+=payloadString
-							if (bucket.size >= total.value?: 0) {
+							bucket += payloadString
+							if (bucket.size >= total.value ?: 0) {
 								try {
 									payload = qrparserTryDecodeQrSequence(
 										"[\"" + bucket.joinToString(separator = "\",\"") + "\"]",
 										true
 									)
 									Log.d("multiframe payload", payload)
+									if (!payload.isEmpty()) {
+										resetScan()
+										parseTransaction()
+									}
 								} catch (e: java.lang.Exception) {
 									Log.e("failed to parse sequence", e.toString())
 								}
@@ -333,6 +434,15 @@ class SignerDataModel : ViewModel() {
 			.addOnCompleteListener {
 				imageProxy.close()
 			}
+	}
+
+	/**
+	 * Clears camera progress
+	 */
+	fun resetScan() {
+		bucket = arrayOf<String>()
+		_captured.value = null
+		_total.value = null
 	}
 
 	//MARK: Camera tools end
@@ -615,7 +725,11 @@ class SignerDataModel : ViewModel() {
 	): String
 
 	external fun qrparserGetPacketsTotal(data: String, cleaned: Boolean): Int
-	external fun qrparserTryDecodeQrSequence(data: String, cleaned: Boolean): String
+	external fun qrparserTryDecodeQrSequence(
+		data: String,
+		cleaned: Boolean
+	): String
+
 	external fun substrateParseTransaction(
 		transaction: String,
 		dbname: String

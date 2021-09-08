@@ -1,5 +1,6 @@
 package io.parity.signer.modals
 
+import android.widget.ProgressBar
 import androidx.camera.core.CameraSelector
 import androidx.camera.core.ImageAnalysis
 import androidx.camera.core.Preview
@@ -29,6 +30,7 @@ fun CameraModal(signerDataModel: SignerDataModel) {
 		modifier = Modifier
 			.fillMaxSize()
 	) {
+
 		//TODO: use all the cores needed to make this smooth
 		AndroidView(
 			factory = { context ->

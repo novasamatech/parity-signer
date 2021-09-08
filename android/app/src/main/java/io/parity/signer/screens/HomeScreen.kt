@@ -28,7 +28,7 @@ import com.google.mlkit.vision.barcode.BarcodeScanner
 import com.google.mlkit.vision.barcode.BarcodeScanning
 import io.parity.signer.MainActivity
 import io.parity.signer.TransactionState
-import io.parity.signer.modals.CameraModal
+import io.parity.signer.modals.*
 import io.parity.signer.models.SignerDataModel
 
 /**
@@ -41,7 +41,23 @@ fun HomeScreen(signerDataModel: SignerDataModel, navToTransaction: () -> Unit) {
 
 	when(transactionState.value) {
 		TransactionState.None -> {
-			CameraModal(signerDataModel)}
+			CameraModal(signerDataModel)
+		}
+		TransactionState.Parsing -> {
+			WaitingScreen()
+		}
+		TransactionState.Preview -> {
+			TransactionPreview(signerDataModel)
+		}
+		TransactionState.Password -> {
+			TransactionPassword(signerDataModel)
+		}
+		TransactionState.Signed -> {
+			TransactionSigned(signerDataModel)
+		}
+		null -> {
+			WaitingScreen()
+		}
 	}
 
 }
