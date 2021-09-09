@@ -47,6 +47,7 @@ class SignerDataModel : ViewModel() {
 	private var payload: String = ""
 	private val _total = MutableLiveData<Int?>(null)
 	private val _captured = MutableLiveData<Int?>(null)
+	private val _progress = MutableLiveData<Float>(0.0f)
 
 	//Transaction
 	private val _transaction = MutableLiveData(JSONArray())
@@ -95,6 +96,7 @@ class SignerDataModel : ViewModel() {
 
 	val total: LiveData<Int?> = _total
 	val captured: LiveData<Int?> = _captured
+	val progress: LiveData<Float> = _progress
 
 	val transaction: LiveData<JSONArray> = _transaction
 	val actionable: LiveData<Boolean> = _actionable
@@ -435,6 +437,7 @@ class SignerDataModel : ViewModel() {
 								}
 							}
 							_captured.value = bucket.size
+							_progress.value = ((captured.value?:0).toFloat() / ((total.value?:1).toFloat()))
 							Log.d("captured", captured.value.toString())
 						}
 					}
@@ -455,6 +458,7 @@ class SignerDataModel : ViewModel() {
 		bucket = arrayOf<String>()
 		_captured.value = null
 		_total.value = null
+		_progress.value = 0.0f
 	}
 
 	//MARK: Camera tools end
