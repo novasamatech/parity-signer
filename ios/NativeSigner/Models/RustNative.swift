@@ -211,7 +211,10 @@ extension SignerDataModel {
             if backup {
                 seeds_were_shown(err_ptr, self.dbName)
             } else {
-                seeds_were_accessed(err_ptr, self.dbName)
+                //seeds_were_accessed(err_ptr, self.dbName)
+                //This breaks things badly
+                //TODO: cleanup
+                return String(data: (item as! CFData) as Data, encoding: .utf8) ?? ""
             }
             if err_ptr.pointee.code == 0 {
                 return String(data: (item as! CFData) as Data, encoding: .utf8) ?? ""
