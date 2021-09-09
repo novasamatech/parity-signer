@@ -28,8 +28,7 @@ import java.io.FileOutputStream
 //TODO: chop this monster in chunks
 
 /**
- * This is single object to handle all interactions with backend,
- * except for some logging features and transaction handling
+ * This is single object to handle all interactions with backend
  */
 class SignerDataModel : ViewModel() {
 	//Internal model values
@@ -255,7 +254,7 @@ class SignerDataModel : ViewModel() {
 
 	fun refreshHistory() {
 		try {
-			_history.value = JSONArray(historyPrintHistory(dbName))
+			_history.value = sortHistory(JSONArray(historyPrintHistory(dbName)))
 		} catch(e:java.lang.Exception) {
 			Log.e("History refresh error!", e.toString())
 		}
@@ -297,12 +296,12 @@ class SignerDataModel : ViewModel() {
 			//TODO: something here
 			val author = (transactionObject.optJSONArray("author") ?: JSONArray())
 			val warnings = transactionObject.optJSONArray("warning") ?: JSONArray()
+			val error = (transactionObject.optJSONArray("error") ?: JSONArray())
 			val typesInfo =
 				transactionObject.optJSONArray("types_info") ?: JSONArray()
-			val error = (transactionObject.optJSONArray("error") ?: JSONArray())
+			val method = (transactionObject.optJSONArray("method") ?: JSONArray())
 			val extrinsics =
 				(transactionObject.optJSONArray("extrinsics") ?: JSONArray())
-			val method = (transactionObject.optJSONArray("method") ?: JSONArray())
 			action = transactionObject.optJSONObject("action") ?: JSONObject()
 			_actionable.value = !action.isNull("type")
 			if (action.optString("type") == "sign_transaction") {
@@ -310,8 +309,7 @@ class SignerDataModel : ViewModel() {
 			}
 			Log.d("action", action.toString())
 			_transaction.value =
-				concatJSONArray(author, warnings, typesInfo, error, extrinsics, method)
-			//TODO: sort by index
+				sortCards(concatJSONArray(author, warnings, error, typesInfo, method, extrinsics))
 			_transactionState.value = TransactionState.Preview
 		} catch (e: java.lang.Exception) {
 			Log.e("Transaction parsing failed", e.toString())

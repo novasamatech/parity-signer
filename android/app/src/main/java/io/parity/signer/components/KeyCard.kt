@@ -1,18 +1,10 @@
 package io.parity.signer.components
 
-import android.util.Log
-import android.widget.ImageView
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material.*
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.ImageBitmap
 import io.parity.signer.models.SignerDataModel
 import io.parity.signer.ui.theme.Typography
 import org.json.JSONObject

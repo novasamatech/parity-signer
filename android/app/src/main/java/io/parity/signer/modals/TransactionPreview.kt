@@ -23,7 +23,7 @@ fun TransactionPreview(signerDataModel: SignerDataModel) {
 	Column {
 		LazyColumn (modifier = Modifier.weight(1f)) {
 			items(transaction.value!!.length()) { item ->
-				TransactionCard(card = transaction.value!!.getJSONObject(item))
+				TransactionCard(card = transaction.value!!.getJSONObject(item), signerDataModel)
 			}
 		}
 		Row(

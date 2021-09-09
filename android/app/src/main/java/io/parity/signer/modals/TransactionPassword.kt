@@ -21,7 +21,7 @@ fun TransactionPassword(signerDataModel: SignerDataModel) {
 
 	Column {
 		//TODO: replace with proper author card
-		TransactionCard(transaction.value!!.getJSONObject(0))
+		TransactionCard(transaction.value!!.getJSONObject(0), signerDataModel)
 		Text(lastError.value.toString())
 		Text("Enter password")
 		TextField(

@@ -4,6 +4,7 @@ import android.graphics.BitmapFactory
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asImageBitmap
 import org.json.JSONArray
+import org.json.JSONObject
 
 /**
  * Decodes from hex string into number array
@@ -31,6 +32,28 @@ fun concatJSONArray(vararg arrays: JSONArray): JSONArray {
 		}
 	}
 	return result
+}
+
+/**
+ * Sorter for transaction cards
+ */
+fun sortCards(array: JSONArray): JSONArray {
+	var sortable = emptyList<JSONObject>()
+	for(i in 0 until array.length()) {
+		sortable += array.getJSONObject(i)
+	}
+	return JSONArray(sortable.sortedBy { item -> item.getInt("index") } )
+}
+
+/**
+ * Sorter for history
+ */
+fun sortHistory(array: JSONArray): JSONArray {
+	var sortable = emptyList<JSONObject>()
+	for(i in 0 until array.length()) {
+		sortable += array.getJSONObject(i)
+	}
+	return JSONArray(sortable.sortedBy{ item -> item.getInt("index") }.reversed() )
 }
 
 /**
