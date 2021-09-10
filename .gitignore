@@ -84,6 +84,7 @@ fastlane/screenshots
 android/.project
 android/app/.project
 android/app/bin
+android/app/src/main/jniLibs
 
 # rust
 rust/*/target
