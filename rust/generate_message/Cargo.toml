@@ -7,7 +7,7 @@ edition = "2018"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-sp-core = "4.0.0-dev"
+sp-core = "3.0.0"
 hex = "0.4.3"
 qrcode_rtx = {path = "../qrcode_rtx"}
 meta_reading = {path = "../meta_reading"}
@@ -17,5 +17,3 @@ definitions = {path = "../definitions"}
 db_handling = {path = "../db_handling"}
 constants = {path = "../constants"}
 
-[patch.crates-io]
-sp-core = { git = 'https://github.com/paritytech/substrate/' }

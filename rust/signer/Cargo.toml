@@ -26,7 +26,3 @@ crate-type = ["staticlib", "cdylib"]
 [features]
 default = ["jni"]
 
-[patch.crates-io]
-sp-core = { git = 'https://github.com/paritytech/substrate/' }
-sp-arithmetic = { git = 'https://github.com/paritytech/substrate/' }
-sp-runtime = { git = 'https://github.com/paritytech/substrate/' }

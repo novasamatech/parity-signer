@@ -20,16 +20,11 @@ sled = "0.34.6"
 bitvec = "0.20.4"
 num-bigint = "0.4.0"
 lazy_static = "1.4.0"
-sp-arithmetic = "4.0.0-dev"
-sp-runtime = "4.0.0-dev"
-sp-core = "4.0.0-dev"
+sp-arithmetic = "3.0.0"
+sp-runtime = "3.0.0"
+sp-core = "3.0.0"
 constants = {path = "../constants"}
 db_handling = {path = "../db_handling"}
 definitions = {path = "../definitions"}
 meta_reading = {path = "../meta_reading"}
 
-
-[patch.crates-io]
-sp-arithmetic = { git = 'https://github.com/paritytech/substrate/' }
-sp-runtime = { git = 'https://github.com/paritytech/substrate/' }
-sp-core = { git = 'https://github.com/paritytech/substrate/' }

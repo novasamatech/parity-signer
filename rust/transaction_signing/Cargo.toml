@@ -8,7 +8,7 @@ edition = "2018"
 
 [dependencies]
 regex = "1.4.5"
-sp-core = "4.0.0-dev"
+sp-core = "3.0.0"
 hex = "0.4.3"
 lazy_static = "1.4.0"
 constants = {path = "../constants"}
@@ -21,7 +21,3 @@ parity-scale-codec = "2.2.0"
 anyhow = "1.0.42"
 blake2-rfc = "0.2.18"
 
-[patch.crates-io]
-sp-arithmetic = { git = 'https://github.com/paritytech/substrate/' }
-sp-runtime = { git = 'https://github.com/paritytech/substrate/' }
-sp-core = { git = 'https://github.com/paritytech/substrate/' }

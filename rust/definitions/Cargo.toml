@@ -12,10 +12,7 @@ parity-scale-codec-derive = "2.2.0"
 hex = "0.4.3"
 regex = "1.4.5"
 lazy_static = "1.4.0"
-sp-core = "4.0.0-dev"
-
-[patch.crates-io]
-sp-core = { git = 'https://github.com/paritytech/substrate/' }
+sp-core = "3.0.0"
 
 [lib]
 name = "definitions"
