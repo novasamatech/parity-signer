@@ -13,17 +13,10 @@ struct NativeSignerApp: App {
     @StateObject var canary = Canary()
     var body: some Scene {
         WindowGroup {
-            NavigationView {
-                MainButtonScreen().navigationBarTitleDisplayMode(.inline).toolbar {
-                    ToolbarItem(placement: .navigationBarTrailing) {
-                        NavbarShield()
-                    }
-                }.background(/*@START_MENU_TOKEN@*//*@PLACEHOLDER=View@*/Color("backgroundColor")/*@END_MENU_TOKEN@*/)
-            }
-            .environmentObject(data)
-            .environmentObject(canary)
-            .background(/*@START_MENU_TOKEN@*//*@PLACEHOLDER=View@*/Color("backgroundColor")/*@END_MENU_TOKEN@*/)
-            
+            MainScreenContainer()
+                .environmentObject(data)
+                .environmentObject(canary)
+                .background(/*@START_MENU_TOKEN@*//*@PLACEHOLDER=View@*/Color("backgroundColor")/*@END_MENU_TOKEN@*/)
         }
     }
 }

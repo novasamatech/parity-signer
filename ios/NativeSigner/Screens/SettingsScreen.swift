@@ -15,8 +15,7 @@ struct SettingsScreen: View {
     @State var showNetworkManager = false
     @State var showSeedManager = false
     var body: some View {
-        ZStack {
-            
+        ScrollView {
             //Main buttons block
             VStack {
                 Button(action: {
@@ -76,7 +75,7 @@ struct SettingsScreen: View {
                 }
                 .padding()
                 Spacer()
-            }.padding(.bottom, 100)
+            }
             
             //Modal with history
             if (showHistory) {
@@ -96,17 +95,6 @@ struct SettingsScreen: View {
             //Modal with information screens
             if (data.document != .none) {
                 DocumentModal().padding(.bottom, 100)
-            }
-            
-            //Footer
-            VStack {
-                Spacer()
-                Footer(caller: "Settings")
-            }
-        }
-        .navigationTitle("Settings").navigationBarTitleDisplayMode(.inline).toolbar {
-            ToolbarItem(placement: .navigationBarTrailing) {
-                NavbarShield()
             }
         }
         .background(/*@START_MENU_TOKEN@*//*@PLACEHOLDER=View@*/Color("backgroundColor")/*@END_MENU_TOKEN@*/)

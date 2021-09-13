@@ -5,6 +5,10 @@
 //  Created by Alexander Slesarev on 20.7.2021.
 //
 
+/**
+ * This contains standard Apple boilerplate to generate basic camera preview
+ */
+
 import Foundation
 import Combine
 import AVFoundation

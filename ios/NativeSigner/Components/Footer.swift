@@ -24,39 +24,29 @@ struct WrenchSymbol: View {
 }
 
 struct Footer: View {
-    @Environment(\.presentationMode) var presentationMode: Binding<PresentationMode>
     @EnvironmentObject var data: SignerDataModel
-    var caller: String
     var body: some View {
         VStack {
-            Button(action: {presentationMode.wrappedValue.dismiss()}) {
+            Button(action: {
+                data.totalRefresh()
+                data.signerScreen = .home
+            }) {
                 Image("HomeButton").offset(y: -30).padding(.bottom, -30)
             }
             HStack {
-                if caller == "KeyManager" {
-                    Button(action: {
-                        data.totalRefresh()
-                    }) {
-                        KeySymbol()
-                    }
-                } else {
-                    NavigationLink(
-                    destination: KeyManager()) {
-                        KeySymbol()
-                    }
+                Button(action: {
+                    data.totalRefresh()
+                    data.signerScreen = .keys
+                }) {
+                    KeySymbol()
                 }
                 Spacer()
-                if caller == "Settings" {
-                    Button(action: {
-                        data.totalRefresh()
-                        data.networkSettings = nil
-                    }) {
-                        WrenchSymbol()
-                    }
-                } else {
-                    NavigationLink(destination: SettingsScreen()) {
-                        WrenchSymbol()
-                    }
+                Button(action: {
+                    data.totalRefresh()
+                    data.networkSettings = nil
+                    data.signerScreen = .settings
+                }) {
+                    WrenchSymbol()
                 }
             }
         }.padding().background(/*@START_MENU_TOKEN@*//*@PLACEHOLDER=View@*/Color("backgroundColor")/*@END_MENU_TOKEN@*/)
@@ -65,6 +55,6 @@ struct Footer: View {
 
 struct Footer_Previews: PreviewProvider {
     static var previews: some View {
-        Footer(caller: "home").previewLayout(.sizeThatFits)
+        Footer().previewLayout(.sizeThatFits)
     }
 }

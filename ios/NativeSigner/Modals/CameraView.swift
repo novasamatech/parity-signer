@@ -10,8 +10,7 @@ import AVFoundation
 
 struct CameraView: View {
     @StateObject var model = CameraViewModel()
-    @ObservedObject var transaction: Transaction
-    @Environment(\.presentationMode) var presentationMode: Binding<PresentationMode>
+    @EnvironmentObject var data: SignerDataModel
     var body: some View {
         ZStack {
             CameraPreview(session: model.session)
@@ -19,31 +18,30 @@ struct CameraView: View {
                     model.configure()
                 }
                 .onDisappear {
+                    print("shutdown camera")
                     model.shutdown()
                 }.onReceive(model.$payload, perform: { payload in
                     if payload != nil {
-                        transaction.payloadStr = payload ?? ""
+                        data.payloadStr = payload ?? ""
                         DispatchQueue.main.async {
-                            transaction.parse()
+                            data.parse()
+                            print(String(describing: data.transactionState))
                         }
-                        transaction.state = .parsing
+                        data.transactionState = .parsing
+                        print(String(describing: data.transactionState))
                     }
                 })
             VStack {
                 Spacer()
                 ProgressView(value: min(Float(model.captured ?? 0)/(Float(model.total ?? -1) + 2), 1)).padding().background(/*@START_MENU_TOKEN@*//*@PLACEHOLDER=View@*/Color("backgroundColor")/*@END_MENU_TOKEN@*/)
-                Button(action: {
-                        presentationMode.wrappedValue.dismiss()}) {
-                    Text("Cancel")
-                        .font(.largeTitle)
-                }
             }
         }.background(/*@START_MENU_TOKEN@*//*@PLACEHOLDER=View@*/Color.black/*@END_MENU_TOKEN@*/)
     }
 }
 
+/*
 struct CameraView_Previews: PreviewProvider {
     static var previews: some View {
-        CameraView(transaction: Transaction())
+        CameraView()
     }
-}
+}*/

@@ -8,10 +8,10 @@
 import SwiftUI
 
 struct TCEnumVariantName: View {
-    var text: String
+    var value: EnumVariantName
     var body: some View {
         HStack {
-            Text(text)
+            Text(value.name)
                 .foregroundColor(Color("textMainColor"))
             Spacer()
         }

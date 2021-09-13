@@ -9,34 +9,32 @@ import SwiftUI
 
 struct TransactionReady: View {
     @EnvironmentObject var data: SignerDataModel
-    @ObservedObject var transaction: Transaction
-    @Environment(\.presentationMode) var presentationMode: Binding<PresentationMode>
     @State var seedPhrase: String = ""
     @State var password: String = ""
     var body: some View {
         ZStack {
             VStack {
-                if !transaction.transactionError.isEmpty {
-                    Text(transaction.transactionError)
+                if !data.transactionError.isEmpty {
+                    Text(data.transactionError)
                         .font(.subheadline)
                         .foregroundColor(Color("AccentColor"))
                 }
-                if transaction.qr != nil {
+                if data.qr != nil {
                     VStack {
                         Text("Scan to publish")
                             .font(.largeTitle)
                             .foregroundColor(Color("textMainColor"))
-                        Image(uiImage: transaction.qr!)
+                        Image(uiImage: data.qr!)
                             .resizable()
                             .aspectRatio(contentMode: .fit)
                         Text("Signed by:")
                             .foregroundColor(Color("AccentColor"))
-                        Text(transaction.author?.name ?? "unknown")
+                        Text(data.author?.name ?? "unknown")
                             .foregroundColor(Color("textMainColor"))
                         Spacer()
                         Button(action: {
-                            transaction.qr = nil
-                            presentationMode.wrappedValue.dismiss()
+                            data.qr = nil
+                            data.totalRefresh()
                         }) {
                             Text("Done")
                                 .font(.largeTitle)
@@ -44,6 +42,7 @@ struct TransactionReady: View {
                         }
                     }
                 } else {
+                    //TODO: move to another screen
                     Text("Enter password")
                         .font(.body)
                         .foregroundColor(Color("textMainColor"))
@@ -53,14 +52,14 @@ struct TransactionReady: View {
                     Spacer()
                     HStack {
                         Button(action: {
-                            presentationMode.wrappedValue.dismiss()
+                            data.totalRefresh()
                         }) {
                             Text("Cancel")
                                 .font(.largeTitle)
                                 .foregroundColor(Color("textMainColor"))
                         }
                         Button(action: {
-                                transaction.signTransaction(seedPhrase: seedPhrase, password: password)
+                            data.signTransaction(seedPhrase: seedPhrase, password: password)
                         }) {
                             Text("Submit")
                                 .font(.largeTitle)
@@ -72,10 +71,10 @@ struct TransactionReady: View {
             }
         }
         .onAppear {
-            seedPhrase = data.getSeed(seedName: transaction.author!.seed) //this should not even be called if author is not present, so crash here
+            seedPhrase = data.getSeed(seedName: data.author!.seed) //this should not even be called if author is not present, so crash here
             //TODO: maybe graceful crash
-            if transaction.author?.has_password == false {
-                transaction.signTransaction(seedPhrase: seedPhrase, password: password)
+            if data.author?.has_password == false {
+                data.signTransaction(seedPhrase: seedPhrase, password: password)
             }
         }
         .onDisappear {

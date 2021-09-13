@@ -7,6 +7,9 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		2D72B4F626EF3BC50081E879 /* Navigator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D72B4F526EF3BC50081E879 /* Navigator.swift */; };
+		2D72B4F826EF427C0081E879 /* Header.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D72B4F726EF427C0081E879 /* Header.swift */; };
+		2D72B4FA26EF7D1C0081E879 /* Seeds.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D72B4F926EF7D1C0081E879 /* Seeds.swift */; };
 		2D7A7BA526AE9E680053C1E0 /* Footer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D7A7BA426AE9E680053C1E0 /* Footer.swift */; };
 		2D7A7BAA26AED2500053C1E0 /* Database in Resources */ = {isa = PBXBuildFile; fileRef = 2D7A7BA926AED2500053C1E0 /* Database */; };
 		2D7A7BB026B00A3E0053C1E0 /* NavbarShield.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D7A7BAF26B00A3E0053C1E0 /* NavbarShield.swift */; };
@@ -58,7 +61,7 @@
 		2D7A7C2926CBC3C70053C1E0 /* TCCall.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D7A7C2426CBC3C70053C1E0 /* TCCall.swift */; };
 		2D7A7C2A26CBC3C70053C1E0 /* TCEraImmortalNonce.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D7A7C2526CBC3C70053C1E0 /* TCEraImmortalNonce.swift */; };
 		2DE72BC226A588C7002BB752 /* NativeSignerApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2DE72BC126A588C7002BB752 /* NativeSignerApp.swift */; };
-		2DE72BC426A588C7002BB752 /* MainButtonScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2DE72BC326A588C7002BB752 /* MainButtonScreen.swift */; };
+		2DE72BC426A588C7002BB752 /* MainScreenContainer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2DE72BC326A588C7002BB752 /* MainScreenContainer.swift */; };
 		2DE72BC626A588C9002BB752 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 2DE72BC526A588C9002BB752 /* Assets.xcassets */; };
 		2DE72BC926A588C9002BB752 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 2DE72BC826A588C9002BB752 /* Preview Assets.xcassets */; };
 		2DE72BD426A588C9002BB752 /* NativeSignerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2DE72BD326A588C9002BB752 /* NativeSignerTests.swift */; };
@@ -94,6 +97,9 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		2D72B4F526EF3BC50081E879 /* Navigator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Navigator.swift; sourceTree = "<group>"; };
+		2D72B4F726EF427C0081E879 /* Header.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Header.swift; sourceTree = "<group>"; };
+		2D72B4F926EF7D1C0081E879 /* Seeds.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Seeds.swift; sourceTree = "<group>"; };
 		2D7A7BA426AE9E680053C1E0 /* Footer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Footer.swift; sourceTree = "<group>"; };
 		2D7A7BA926AED2500053C1E0 /* Database */ = {isa = PBXFileReference; lastKnownFileType = folder; path = Database; sourceTree = "<group>"; };
 		2D7A7BAF26B00A3E0053C1E0 /* NavbarShield.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NavbarShield.swift; sourceTree = "<group>"; };
@@ -146,7 +152,7 @@
 		2D7A7C2526CBC3C70053C1E0 /* TCEraImmortalNonce.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TCEraImmortalNonce.swift; sourceTree = "<group>"; };
 		2DE72BBE26A588C7002BB752 /* NativeSigner.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = NativeSigner.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		2DE72BC126A588C7002BB752 /* NativeSignerApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NativeSignerApp.swift; sourceTree = "<group>"; };
-		2DE72BC326A588C7002BB752 /* MainButtonScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainButtonScreen.swift; sourceTree = "<group>"; };
+		2DE72BC326A588C7002BB752 /* MainScreenContainer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainScreenContainer.swift; sourceTree = "<group>"; };
 		2DE72BC526A588C9002BB752 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		2DE72BC826A588C9002BB752 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
 		2DE72BCA26A588C9002BB752 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -215,7 +221,7 @@
 			isa = PBXGroup;
 			children = (
 				2D7A7BD126BBCE6F0053C1E0 /* TransactionScreen.swift */,
-				2DE72BC326A588C7002BB752 /* MainButtonScreen.swift */,
+				2DE72BC326A588C7002BB752 /* MainScreenContainer.swift */,
 				2D7A7BB726B28D350053C1E0 /* SettingsScreen.swift */,
 				2DE72BF626A5AC68002BB752 /* KeyManager.swift */,
 			);
@@ -252,6 +258,7 @@
 				2D7A7BFA26C6621D0053C1E0 /* HistoryCollapsed.swift */,
 				2D7A7BA426AE9E680053C1E0 /* Footer.swift */,
 				2D7A7BF226C519990053C1E0 /* MetadataCard.swift */,
+				2D72B4F726EF427C0081E879 /* Header.swift */,
 			);
 			path = Components;
 			sourceTree = "<group>";
@@ -372,6 +379,8 @@
 				2D7A7BCF26BBC72D0053C1E0 /* Transaction.swift */,
 				2D7A7BDF26C3AC350053C1E0 /* TransactionTypes.swift */,
 				2D7A7BD526C1126C0053C1E0 /* Utils.swift */,
+				2D72B4F526EF3BC50081E879 /* Navigator.swift */,
+				2D72B4F926EF7D1C0081E879 /* Seeds.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -533,6 +542,7 @@
 				2DE72C0026A6ADC5002BB752 /* CameraService.swift in Sources */,
 				2DE72BF526A59C59002BB752 /* NetworkCard.swift in Sources */,
 				2D7A7C0826CA9BB00053C1E0 /* TCBlockHash.swift in Sources */,
+				2D72B4FA26EF7D1C0081E879 /* Seeds.swift in Sources */,
 				2D7A7BC226B9D3370053C1E0 /* IdentityCard.swift in Sources */,
 				2D7A7C1226CB94520053C1E0 /* TCTypesInfo.swift in Sources */,
 				2D7A7BF126C50F950053C1E0 /* NetworkSettings.swift in Sources */,
@@ -540,7 +550,7 @@
 				2D7A7C1C26CB97F50053C1E0 /* TCEnumVariantName.swift in Sources */,
 				2DE72BF926A5C360002BB752 /* CameraView.swift in Sources */,
 				2D7A7BD626C1126C0053C1E0 /* Utils.swift in Sources */,
-				2DE72BC426A588C7002BB752 /* MainButtonScreen.swift in Sources */,
+				2DE72BC426A588C7002BB752 /* MainScreenContainer.swift in Sources */,
 				2D7A7BB826B28D350053C1E0 /* SettingsScreen.swift in Sources */,
 				2D7A7C1A26CB97B30053C1E0 /* TCID.swift in Sources */,
 				2D7A7BB626B136970053C1E0 /* NewSeedScreen.swift in Sources */,
@@ -565,6 +575,7 @@
 				2D7A7BD026BBC72D0053C1E0 /* Transaction.swift in Sources */,
 				2D7A7C1826CB96C70053C1E0 /* TCError.swift in Sources */,
 				2DE72BF326A59BAB002BB752 /* NetworkList.swift in Sources */,
+				2D72B4F826EF427C0081E879 /* Header.swift in Sources */,
 				2D7A7BFB26C6621D0053C1E0 /* HistoryCollapsed.swift in Sources */,
 				2D7A7BD226BBCE6F0053C1E0 /* TransactionScreen.swift in Sources */,
 				2D7A7BB426B02B700053C1E0 /* SeedSelector.swift in Sources */,
@@ -579,6 +590,7 @@
 				2D7A7C0026CA97B00053C1E0 /* TCAuthor.swift in Sources */,
 				2D7A7BFD26C675D30053C1E0 /* HistoryCard.swift in Sources */,
 				2DE72BF126A59834002BB752 /* Network.swift in Sources */,
+				2D72B4F626EF3BC50081E879 /* Navigator.swift in Sources */,
 				2D7A7BC426BA8B350053C1E0 /* NewIdentityScreen.swift in Sources */,
 				2D7A7BF526C58E9E0053C1E0 /* History.swift in Sources */,
 				2DE72C0226A6C27E002BB752 /* Camera.swift in Sources */,

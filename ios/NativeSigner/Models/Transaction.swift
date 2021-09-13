@@ -6,32 +6,30 @@
 //
 
 import Foundation
-import SwiftUI
+import SwiftUI //To generate UIImage from raw png
 
-enum TransactionState {
-    case scanning
-    case parsing
-    case preview
-    case show
-}
-
-class Transaction: ObservableObject {
-    @Published var state: TransactionState = .scanning
-    @Published var cards: [TransactionCard] = []
-    @Published var payloadStr: String = ""
-    @Published var dbName: String
-    @Published var transactionError: String = ""
-    @Published var action: Action?
-    @Published var qr: UIImage?
-    @Published var result: String? //TODO: remove this?
-    @Published var author: Author?
-    
-    //var transactionPreview: TransactionCardSet?
-    
-    init() {
-        self.dbName = NSHomeDirectory() + "/Documents/Database"
+/**
+ * Transaction operations
+ */
+extension SignerDataModel {
+    /**
+     * Clears all transaction data; should be called on all resets, cancels, etc.
+     */
+    func resetTransaction() {
+        self.transactionState = .none
+        self.cards = []
+        self.payloadStr = ""
+        self.transactionError = ""
+        self.action = nil
+        self.qr = nil
+        self.result = nil //TODO: remove this?
+        self.author = nil
+        self.comment = ""
     }
     
+    /**
+     * Parse decoded payload from QR parser (saved in the model)
+     */
     func parse() {
         var err = ExternError()
         let err_ptr = UnsafeMutablePointer(&err)
@@ -43,7 +41,7 @@ class Transaction: ObservableObject {
                     print("JSON decoder failed on transaction cards")
                     print(String(cString: res!))
                     signer_destroy_string(res!)
-                    self.state = .scanning
+                    self.transactionState = .none
                     return
                 }
                 signer_destroy_string(res!)
@@ -66,21 +64,25 @@ class Transaction: ObservableObject {
                     }
                 }
                 print(self.author ?? "no author")
-                self.state = .preview
+                self.transactionState = .preview
             } else {
                 signer_destroy_string(res!)
                 print("cards JSON corrupted!")
-                self.state = .scanning
+                self.transactionState = .none
             }
-            
         } else {
             self.transactionError = String(cString: err_ptr.pointee.message)
             print(self.transactionError)
             signer_destroy_string(err_ptr.pointee.message)
-            self.state = .scanning
+            self.transactionState = .none
         }
     }
     
+    /**
+     * Handle action of whatever was parsed from payload and shown to user
+     * If it is not a transaction, keep seedPhrase and password blank
+     * otherwise fill seedPhrase from keyring and query user for password if it is set
+     */
     func signTransaction(seedPhrase: String, password: String) {
         var err = ExternError()
         let err_ptr = UnsafeMutablePointer(&err)
@@ -88,7 +90,7 @@ class Transaction: ObservableObject {
             return
         }
         let stringAction = String(data: dataAction, encoding: .utf8)
-        let res = handle_action(err_ptr, stringAction, seedPhrase, password, self.dbName)
+        let res = handle_action(err_ptr, stringAction, seedPhrase, password, self.comment, self.dbName)
         if err_ptr.pointee.code == 0 {
             self.result = String(cString: res!)
             signer_destroy_string(res!)

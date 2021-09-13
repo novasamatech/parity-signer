@@ -28,8 +28,8 @@ struct TransactionCardSelector: View {
             TCCall(value: value)
         case .defaultCard(let text):
             Text(text).foregroundColor(Color("textMainColor"))
-        case .enumVariantName(let text):
-            TCEnumVariantName(text: text)
+        case .enumVariantName(let value):
+            TCEnumVariantName(value: value)
         case .eraImmortalNonce(let eraImmortalNonce):
             TCEraImmortalNonce(eraImmortalNonce: eraImmortalNonce)
         case .eraMortalNonce(let eraMortalNonce):

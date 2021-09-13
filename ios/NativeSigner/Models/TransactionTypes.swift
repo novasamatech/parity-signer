@@ -17,7 +17,7 @@ enum Card {
     case blockHash(String)
     case call(Call)
     case defaultCard(String)
-    case enumVariantName(String)
+    case enumVariantName(EnumVariantName)
     case eraImmortalNonce(EraImmortalNonce)
     case eraMortalNonce(EraMortalNonce)
     case error(String)
@@ -58,11 +58,17 @@ struct AuthorPublicKey: Decodable {
 struct Call: Decodable {
     var pallet: String
     var method: String
+    var docs: String
 }
 
 struct Currency: Decodable {
     var amount: String
     var units: String
+}
+
+struct EnumVariantName: Decodable {
+    var name: String
+    var docs: String
 }
 
 //TODO: manual decoders for these two
@@ -145,6 +151,7 @@ struct TransactionCard: Decodable {
         //first handle special cases of complex payloads
         switch type {
         case "author":
+            print("0000000000000000000000")
             card = .author(try values.decode(Author.self, forKey: .payload))
             return
         case "author_plain":
@@ -158,6 +165,9 @@ struct TransactionCard: Decodable {
             return
         case "call":
             card = .call(try values.decode(Call.self, forKey: .payload))
+            return
+        case "enum_variant_name":
+            card = .enumVariantName(try values.decode(EnumVariantName.self, forKey: .payload))
             return
         case "era_mortal_nonce":
             card = .eraMortalNonce(try values.decode(EraMortalNonce.self, forKey: .payload))
@@ -197,8 +207,6 @@ struct TransactionCard: Decodable {
             card = .blockHash(content)
         case "default":
             card = .defaultCard(content)
-        case "enum_variant_name":
-            card = .enumVariantName(content)
         case "error":
             card = .error(content)
         case "field_name":

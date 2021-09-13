@@ -7,11 +7,17 @@
 
 import Foundation
 
+/**
+ * Metadata descriptor
+ */
 struct MetaSpecsNS: Codable {
     var spec_version: String
     var meta_hash: String
 }
 
+/**
+ * Detailed network settings
+ */
 struct NetworkSettings: Codable {
     var base58prefix: String
     var color: String
@@ -28,6 +34,9 @@ struct NetworkSettings: Codable {
     var meta: [MetaSpecsNS]
 }
 
+/**
+ * Operations on network in Settings screen
+ */
 extension SignerDataModel {
     func getNetworkSettings() {
         let dbName = NSHomeDirectory() + "/Documents/Database"

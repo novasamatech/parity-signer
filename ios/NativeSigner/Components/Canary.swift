@@ -8,6 +8,10 @@
 import Foundation
 import Network
 
+/**
+ * This is background network indicator. It will paint the shield icon red and write to history
+ * NOTE: This might sometimes crash transaction; it is intended although not defined behavior for now
+ */
 class Canary: ObservableObject {
     @Published var dead: Bool = false
     let monitor = NWPathMonitor()

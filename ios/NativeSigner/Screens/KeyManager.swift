@@ -15,7 +15,7 @@ struct KeyManager: View {
             VStack {
                 NetworkList()
                 SeedSelector()
-
+                
                 ScrollView {
                     LazyVStack {
                         ForEach(data.identities, id: \.public_key) {
@@ -25,9 +25,9 @@ struct KeyManager: View {
                         }
                     }
                 }
- 
+                
                 Spacer()
-            }.padding(.bottom, 100)
+            }
             
             //Modal to export public key
             if data.exportIdentity {
@@ -42,17 +42,6 @@ struct KeyManager: View {
             //Modal to create new seed
             if data.newSeed {
                 NewSeedScreen()
-            }
-            VStack {
-                Spacer()
-                Footer(caller: "KeyManager")
-            }
-    }
-        .navigationTitle("Manage identities")
-        .navigationBarTitleDisplayMode(.inline)
-        .toolbar {
-            ToolbarItem(placement: .navigationBarTrailing) {
-                NavbarShield()
             }
         }
         .background(/*@START_MENU_TOKEN@*//*@PLACEHOLDER=View@*/Color("backgroundColor")/*@END_MENU_TOKEN@*/)

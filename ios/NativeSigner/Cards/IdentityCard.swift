@@ -22,7 +22,7 @@ struct IdentityCard: View {
             }) {
                 HStack {
                     //TODO: always fetch and mode into model; requires rust code modifications; this is a stub
-                    Image(uiImage: UIImage(data: Data(fromHexEncodedString: String(cString: development_test(nil, identity.ss58)))!)!)
+                    Image(uiImage: UIImage(data: Data(fromHexEncodedString: String(cString: base58_identicon(nil, identity.ss58, 32)))!)!)
                     VStack (alignment: .leading) {
                         Text(identity.name)
                             .foregroundColor(Color("AccentColor"))
