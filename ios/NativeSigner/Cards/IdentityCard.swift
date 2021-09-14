@@ -65,7 +65,7 @@ struct IdentityCard: View {
                     })
                     Spacer()
                     Button(action: {
-                        data.exportIdentity = true
+                        data.keyManagerModal = .showKey
                     }) {
                         Text("Export")
                     }
@@ -73,7 +73,7 @@ struct IdentityCard: View {
                     Button(action: {
                         data.selectSeed(seedName: data.selectedIdentity!.seed_name)
                         data.proposeIncrement()
-                        data.newIdentity = true
+                        data.keyManagerModal = .newKey
                     }) {
                         Text("N+1")
                     }
@@ -81,7 +81,7 @@ struct IdentityCard: View {
                     Button(action: {
                         data.selectSeed(seedName: data.selectedIdentity!.seed_name)
                         data.proposeDerive()
-                        data.newIdentity = true
+                        data.keyManagerModal = .newKey
                     }) {
                         Text("Derive")
                     }

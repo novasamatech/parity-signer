@@ -22,7 +22,10 @@ struct NetworkList: View {
             }
             .background(/*@START_MENU_TOKEN@*//*@PLACEHOLDER=View@*/Color("backgroundCard")/*@END_MENU_TOKEN@*/)
         } label: {
-            NetworkCard(network: data.selectedNetwork)
+            VStack (alignment: .leading) {
+                Text("Selected network").font(.footnote)
+                NetworkCard(network: data.selectedNetwork)
+            }
         }.padding()
     }
 }

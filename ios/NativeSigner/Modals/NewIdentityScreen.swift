@@ -18,16 +18,26 @@ struct NewIdentityScreen: View {
         ZStack {
             RoundedRectangle(cornerRadius: 50).foregroundColor(/*@START_MENU_TOKEN@*/Color("backgroundCard")/*@END_MENU_TOKEN@*/)
             VStack {
+                Text("New key").font(.title).foregroundColor(Color("AccentColor"))
+                HStack {
+                    NetworkCard(network: data.selectedNetwork)
+                    Spacer()
+                    VStack {
+                        Text("seed").font(.footnote)
+                        Text(data.selectedSeed)
+                            .font(.headline)
+                    }
+                }.padding()
                 if !data.lastError.isEmpty {
                     Text(data.lastError)
                         .foregroundColor(.red)
                         .lineLimit(nil)
                 }
                 HStack {
-                Text("Path").font(.body).foregroundColor(Color("textMainColor"))
-                TextField("//hard/soft", text: $data.suggestedPath)
+                TextField("Path: //hard/soft", text: $data.suggestedPath)
                     .onChange(of: data.suggestedPath) {path in
                         data.suggestedName = String(cString:  suggest_name(nil, path)) //this function does not fail
+                        data.lastError = ""
                     }
                     .autocapitalization(/*@START_MENU_TOKEN@*/.none/*@END_MENU_TOKEN@*/)
                     .disableAutocorrection(true)
@@ -37,7 +47,6 @@ struct NewIdentityScreen: View {
                     .border(/*@START_MENU_TOKEN@*/Color("borderSignalColor")/*@END_MENU_TOKEN@*/, width: /*@START_MENU_TOKEN@*/1/*@END_MENU_TOKEN@*/)
                 }
                 HStack {
-                Text("Name").font(.body).foregroundColor(Color("textMainColor"))
                 TextField("Seed name", text: $data.suggestedName)
                     .onChange(of: data.suggestedName, perform: {_ in data.lastError = ""
                     })
@@ -46,10 +55,7 @@ struct NewIdentityScreen: View {
                 .background(/*@START_MENU_TOKEN@*//*@PLACEHOLDER=View@*/Color("textFieldColor")/*@END_MENU_TOKEN@*/).border(/*@START_MENU_TOKEN@*/Color("borderSignalColor")/*@END_MENU_TOKEN@*/, width: /*@START_MENU_TOKEN@*/1/*@END_MENU_TOKEN@*/)
                 }
                 HStack {
-                Text("Password (optional)")
-                    .font(.body)
-                    .foregroundColor(Color("textMainColor"))
-                TextField("password", text: $password)
+                TextField("optional password", text: $password)
                     .onChange(of: data.suggestedName, perform: {_ in data.lastError = ""
                     })
                     .font(.title)
@@ -59,23 +65,21 @@ struct NewIdentityScreen: View {
                     .background(/*@START_MENU_TOKEN@*//*@PLACEHOLDER=View@*/Color("textFieldColor")/*@END_MENU_TOKEN@*/)
                     .border(/*@START_MENU_TOKEN@*/Color("borderSignalColor")/*@END_MENU_TOKEN@*/, width: /*@START_MENU_TOKEN@*/1/*@END_MENU_TOKEN@*/)
                 }
+                if password != "" {
                 HStack {
-                Text("Password (repeat)")
+                TextField("password(again)", text: $passwordCheck)
                     .onChange(of: data.suggestedName, perform: {_ in data.lastError = ""
                     })
-                    .font(.body)
-                    .foregroundColor(Color("textMainColor"))
-                TextField("password(again)", text: $passwordCheck)
                     .font(/*@START_MENU_TOKEN@*/.title/*@END_MENU_TOKEN@*/)
                     .autocapitalization(.none)
                     .disableAutocorrection(true)
                     .foregroundColor(/*@START_MENU_TOKEN@*/Color("textEntryColor")/*@END_MENU_TOKEN@*/)
                     .background(/*@START_MENU_TOKEN@*//*@PLACEHOLDER=View@*/Color("textFieldColor")/*@END_MENU_TOKEN@*/)
                     .border(/*@START_MENU_TOKEN@*/Color("borderSignalColor")/*@END_MENU_TOKEN@*/, width: /*@START_MENU_TOKEN@*/1/*@END_MENU_TOKEN@*/)
-                }
+                }}
                 HStack {
                     Button(action: {
-                        data.newIdentity = false
+                        data.keyManagerModal = .none
                     }) {
                         Text("Cancel").font(.largeTitle)
                     }
@@ -83,7 +87,7 @@ struct NewIdentityScreen: View {
                     Button(action: {
                         data.createIdentity(password: password)
                         if data.lastError == "" {
-                            data.newIdentity = false
+                            data.keyManagerModal = .none
                         }
                     }) {
                         Text("Create")
@@ -91,18 +95,19 @@ struct NewIdentityScreen: View {
                     }
                     .disabled(password != passwordCheck)
                 }
-                Spacer()
-            }.padding()
+            }.padding(.horizontal)
         }
         .onAppear {
             data.lastError = ""
         }
-        .background(/*@START_MENU_TOKEN@*//*@PLACEHOLDER=View@*/Color("backgroundColor")/*@END_MENU_TOKEN@*/).padding(.bottom, 100)
+        .background(/*@START_MENU_TOKEN@*//*@PLACEHOLDER=View@*/Color("backgroundColor")/*@END_MENU_TOKEN@*/)
     }
 }
 
+/*
 struct NewIdentityScreen_Previews: PreviewProvider {
     static var previews: some View {
         NewIdentityScreen().previewLayout(.sizeThatFits)
     }
 }
+*/

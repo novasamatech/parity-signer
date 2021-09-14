@@ -7,6 +7,9 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		2D0D5E7A26F09A5600B0EF9D /* TransactionCommentInput.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D0D5E7926F09A5600B0EF9D /* TransactionCommentInput.swift */; };
+		2D0D5E7C26F0A4A300B0EF9D /* SeedBackup.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D0D5E7B26F0A4A300B0EF9D /* SeedBackup.swift */; };
+		2D0D5E7E26F0B1D900B0EF9D /* DeleteKeyConfirm.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D0D5E7D26F0B1D900B0EF9D /* DeleteKeyConfirm.swift */; };
 		2D72B4F626EF3BC50081E879 /* Navigator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D72B4F526EF3BC50081E879 /* Navigator.swift */; };
 		2D72B4F826EF427C0081E879 /* Header.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D72B4F726EF427C0081E879 /* Header.swift */; };
 		2D72B4FA26EF7D1C0081E879 /* Seeds.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D72B4F926EF7D1C0081E879 /* Seeds.swift */; };
@@ -97,6 +100,9 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		2D0D5E7926F09A5600B0EF9D /* TransactionCommentInput.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransactionCommentInput.swift; sourceTree = "<group>"; };
+		2D0D5E7B26F0A4A300B0EF9D /* SeedBackup.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SeedBackup.swift; sourceTree = "<group>"; };
+		2D0D5E7D26F0B1D900B0EF9D /* DeleteKeyConfirm.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeleteKeyConfirm.swift; sourceTree = "<group>"; };
 		2D72B4F526EF3BC50081E879 /* Navigator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Navigator.swift; sourceTree = "<group>"; };
 		2D72B4F726EF427C0081E879 /* Header.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Header.swift; sourceTree = "<group>"; };
 		2D72B4F926EF7D1C0081E879 /* Seeds.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Seeds.swift; sourceTree = "<group>"; };
@@ -242,6 +248,8 @@
 				2D7A7BC326BA8B350053C1E0 /* NewIdentityScreen.swift */,
 				2DE72C1026AAC3D6002BB752 /* LandingView.swift */,
 				2DE72BF826A5C360002BB752 /* CameraView.swift */,
+				2D0D5E7B26F0A4A300B0EF9D /* SeedBackup.swift */,
+				2D0D5E7D26F0B1D900B0EF9D /* DeleteKeyConfirm.swift */,
 			);
 			path = Modals;
 			sourceTree = "<group>";
@@ -259,6 +267,7 @@
 				2D7A7BA426AE9E680053C1E0 /* Footer.swift */,
 				2D7A7BF226C519990053C1E0 /* MetadataCard.swift */,
 				2D72B4F726EF427C0081E879 /* Header.swift */,
+				2D0D5E7926F09A5600B0EF9D /* TransactionCommentInput.swift */,
 			);
 			path = Components;
 			sourceTree = "<group>";
@@ -559,6 +568,7 @@
 				2D7A7C2626CBC3C70053C1E0 /* TCBalance.swift in Sources */,
 				2D7A7BF926C6620B0053C1E0 /* HistoryExpanded.swift in Sources */,
 				2D7A7BEF26C50ACB0053C1E0 /* SeedManager.swift in Sources */,
+				2D0D5E7A26F09A5600B0EF9D /* TransactionCommentInput.swift in Sources */,
 				2D7A7C2A26CBC3C70053C1E0 /* TCEraImmortalNonce.swift in Sources */,
 				2DE72C0426A6CDC5002BB752 /* CameraPreview.swift in Sources */,
 				2D7A7BD426BBEAF00053C1E0 /* Canary.swift in Sources */,
@@ -569,6 +579,7 @@
 				2D7A7BA526AE9E680053C1E0 /* Footer.swift in Sources */,
 				2D7A7BDC26C2613F0053C1E0 /* TransactionCardView.swift in Sources */,
 				2D7A7BC026B97DB30053C1E0 /* Identities.swift in Sources */,
+				2D0D5E7C26F0A4A300B0EF9D /* SeedBackup.swift in Sources */,
 				2D7A7C2926CBC3C70053C1E0 /* TCCall.swift in Sources */,
 				2D7A7BCA26BACFFB0053C1E0 /* QRView.swift in Sources */,
 				2D7A7C2026CB99250053C1E0 /* TransactionCardSelector.swift in Sources */,
@@ -591,6 +602,7 @@
 				2D7A7BFD26C675D30053C1E0 /* HistoryCard.swift in Sources */,
 				2DE72BF126A59834002BB752 /* Network.swift in Sources */,
 				2D72B4F626EF3BC50081E879 /* Navigator.swift in Sources */,
+				2D0D5E7E26F0B1D900B0EF9D /* DeleteKeyConfirm.swift in Sources */,
 				2D7A7BC426BA8B350053C1E0 /* NewIdentityScreen.swift in Sources */,
 				2D7A7BF526C58E9E0053C1E0 /* History.swift in Sources */,
 				2DE72C0226A6C27E002BB752 /* Camera.swift in Sources */,

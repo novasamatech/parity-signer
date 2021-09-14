@@ -14,12 +14,11 @@ struct NetworkCard: View {
             Image(systemName: "square")
                 .foregroundColor(Color("textMainColor"))
             Text(network?.title ?? "None")
-                .font(.largeTitle)
+                .font(.headline)
                 .fontWeight(.bold)
                 .foregroundColor(Color("textMainColor"))
             Spacer()
         }
-        .background(/*@START_MENU_TOKEN@*//*@PLACEHOLDER=View@*/Color("backgroundColor")/*@END_MENU_TOKEN@*/)
     }
 }
 

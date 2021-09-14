@@ -14,25 +14,26 @@ struct ExportIdentity: View {
         ZStack {
             RoundedRectangle(cornerRadius: 50).foregroundColor(/*@START_MENU_TOKEN@*/Color("backgroundCard")/*@END_MENU_TOKEN@*/)
             VStack {
-                Text("Public address")
-                    .font(.largeTitle)
-                    .foregroundColor(Color("AccentColor"))
-                Text("Scan to export")
+                Text("Scan to export public key")
                     .foregroundColor(Color("textMainColor"))
+                    .font(.title)
+                    .padding()
                 if image != nil {
                     Image(uiImage: image!)
                         .resizable()
                         .aspectRatio(contentMode: .fit)
                 }
-                Text(data.selectedIdentity?.name ?? "none")
-                Text("for network")
-                NetworkCard(network: data.selectedNetwork).padding()
-                Spacer()
-                Button(action: {data.exportIdentity = false})
-                    {
+                HStack {
+                    NetworkCard(network: data.selectedNetwork)
+                    Spacer()
+                    Text(data.selectedIdentity?.name ?? "none")
+                }.padding()
+                Button(action: {data.keyManagerModal = .none})
+                {
                     Text("Done")
                         .font(.largeTitle)
                         .foregroundColor(Color("AccentColor"))
+                        .padding()
                 }
             }
             .foregroundColor(/*@START_MENU_TOKEN@*/Color("textMainColor")/*@END_MENU_TOKEN@*/)
@@ -43,7 +44,6 @@ struct ExportIdentity: View {
                 image = data.exportIdentityQR()
             }
         }
-        .padding(.bottom, 120)
     }
 }
 

@@ -13,9 +13,10 @@ struct KeyManager: View {
         ZStack {
             
             VStack {
-                NetworkList()
-                SeedSelector()
-                
+                HStack {
+                    NetworkList()
+                    SeedSelector()
+                }
                 ScrollView {
                     LazyVStack {
                         ForEach(data.identities, id: \.public_key) {
@@ -28,20 +29,21 @@ struct KeyManager: View {
                 
                 Spacer()
             }
-            
-            //Modal to export public key
-            if data.exportIdentity {
+            switch data.keyManagerModal {
+            case .showKey:
                 ExportIdentity()
-            }
-            
-            //Modal to create new key
-            if data.newIdentity {
+            case .newKey:
                 NewIdentityScreen()
-            }
-            
-            //Modal to create new seed
-            if data.newSeed {
+            case .newSeed:
                 NewSeedScreen()
+            case .seedBackup:
+                SeedBackup()
+            case .keyDeleteConfirm:
+                //not used yet - primitive alert dialog works well enough
+                EmptyView()
+            case .none:
+                EmptyView()
+                
             }
         }
         .background(/*@START_MENU_TOKEN@*//*@PLACEHOLDER=View@*/Color("backgroundColor")/*@END_MENU_TOKEN@*/)
@@ -51,10 +53,12 @@ struct KeyManager: View {
     }
 }
 
-struct KeyManager_Previews: PreviewProvider {
-    static var previews: some View {
-        NavigationView {
-            KeyManager()
-        }
-    }
-}
+/*
+ struct KeyManager_Previews: PreviewProvider {
+ static var previews: some View {
+ NavigationView {
+ KeyManager()
+ }
+ }
+ }
+ */

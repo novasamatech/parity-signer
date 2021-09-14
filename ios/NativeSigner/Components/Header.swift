@@ -27,11 +27,11 @@ struct Header: View {
                 case .parsing:
                     Text("Parsing")
                 case .preview:
-                    Text("Preview")
+                    Text("Payload")
                 case .password:
                     Text("Password")
                 case .signed:
-                    Text("Scan")
+                    Text("Scan to publish")
                 }
             case .keys:
                 Text("Key manager")

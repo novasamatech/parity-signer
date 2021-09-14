@@ -11,6 +11,8 @@ struct TCID: View {
     var text: String
     var body: some View {
         HStack {
+            //TODO: handle error
+            Image(uiImage: UIImage(data: Data(fromHexEncodedString: String(cString: development_test(nil, text)))!)!)
             Text(text)
                 .foregroundColor(Color("textMainColor"))
             Spacer()

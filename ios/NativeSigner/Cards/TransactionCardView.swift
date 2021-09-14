@@ -11,7 +11,8 @@ struct TransactionCardView: View {
     var card: TransactionCard
     var body: some View {
         VStack(alignment: .leading) {
-            TransactionCardSelector(card: card)
+            TransactionCardSelector(card: card).padding(4)
+                .background(/*@START_MENU_TOKEN@*//*@PLACEHOLDER=View@*/Color("backgroundCard")/*@END_MENU_TOKEN@*/)
         }
         .border(Color("borderSignalColor"))
         .padding(.leading, CGFloat(card.indent)*10.0)

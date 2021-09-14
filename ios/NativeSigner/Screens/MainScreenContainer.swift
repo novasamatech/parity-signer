@@ -29,7 +29,8 @@ struct MainScreenContainer: View {
                     }
                 }
                 Spacer()
-                if data.transactionState == .none {
+                //Certain places are better off without footer
+                if (data.transactionState == .none && (data.keyManagerModal != .showKey || data.signerScreen != .keys )){
                     Footer()
                 }
             }

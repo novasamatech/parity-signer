@@ -13,18 +13,13 @@ struct TransactionPreview: View {
     var body: some View {
         ZStack {
             VStack {
-                switch data.action?.type {
-                case "sign":
-                    Text("Extrinsic to sign")
-                default:
-                    Text("Decoded payload")
-                }
                 ScrollView {
                     LazyVStack {
                         ForEach(data.cards, id: \.index) { card in
                             TransactionCardView(card: card)
                         }
                     }
+                    TransactionCommentInput()
                 }
                 Spacer()
                 HStack {

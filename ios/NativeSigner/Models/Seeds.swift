@@ -61,20 +61,19 @@ extension SignerDataModel {
         self.seedNames = seedNames.sorted()
     }
     
-    func addSeed(seedName: String, seedPhrase: String) -> String {
+    func addSeed(seedName: String, seedPhrase: String) {
         var err = ExternError()
         let err_ptr: UnsafeMutablePointer<ExternError> = UnsafeMutablePointer(&err)
         guard let accessFlags = SecAccessControlCreateWithFlags(kCFAllocatorDefault, kSecAttrAccessibleWhenPasscodeSetThisDeviceOnly, .devicePasscode, &error) else {
             print("Access flags could not be allocated")
             print(error ?? "no error code")
             self.lastError = "iOS key manager error, report a bug"
-            return ""
+            return
         }
         print(accessFlags)
         if checkSeedCollision(seedName: seedName) {
             print("Key collision")
             self.lastError = "Seed with this name already exists"
-            return ""
         }
         let res = try_create_seed(err_ptr, seedName, "sr25519", seedPhrase, 24, dbName)
         if err_ptr.pointee.code != 0 {
@@ -82,13 +81,12 @@ extension SignerDataModel {
             print("Rust returned error")
             print(self.lastError)
             signer_destroy_string(err_ptr.pointee.message)
-            return ""
         }
         let finalSeedPhraseString = String(cString: res!)
         guard let finalSeedPhrase = finalSeedPhraseString.data(using: .utf8) else {
             print("could not encode seed phrase")
             self.lastError = "Seed phrase contains non-0unicode symbols"
-            return ""
+            return
         }
         signer_destroy_string(res)
         print(finalSeedPhrase)
@@ -105,11 +103,12 @@ extension SignerDataModel {
             print("key add failure")
             print(status)
             self.lastError = SecCopyErrorMessageString(status, nil)! as String
-            return ""
+            return
         }
         self.refreshSeeds()
         self.selectSeed(seedName: seedName)
-        return finalSeedPhraseString
+        self.seedBackup = finalSeedPhraseString
+        self.keyManagerModal = .seedBackup
     }
     
     /**
@@ -131,6 +130,13 @@ extension SignerDataModel {
     func selectSeed(seedName: String) {
         self.selectedSeed = seedName
         self.fetchKeys()
+    }
+    
+    /**
+     * This is simple explicit "get" for showing plaintext seedBackup value after it was fetched
+     */
+    func getRememberedSeedPhrate() -> String {
+        return self.seedBackup
     }
     
     /**

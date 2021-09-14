@@ -37,6 +37,7 @@ enum TransactionState {
 enum KeyManagerModal {
     case none
     case newSeed
+    case newKey
     case showKey
     case seedBackup
     case keyDeleteConfirm

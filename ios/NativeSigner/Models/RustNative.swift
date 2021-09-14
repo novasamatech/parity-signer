@@ -21,9 +21,6 @@ class SignerDataModel: ObservableObject {
     @Published var selectedSeed: String = ""
     @Published var selectedNetwork: Network?
     @Published var selectedIdentity: Identity?
-    @Published var newSeed: Bool = true
-    @Published var newIdentity: Bool = false
-    @Published var exportIdentity: Bool = false
     @Published var suggestedPath: String = "//"
     @Published var suggestedName: String = ""
     @Published var onboardingDone: Bool = false
@@ -52,6 +49,9 @@ class SignerDataModel: ObservableObject {
     var error: Unmanaged<CFError>?
     var dbName: String
     
+    //This is the secret - thus it's made non-reactive
+    var seedBackup: String = ""
+    
     init() {
         self.dbName = NSHomeDirectory() + "/Documents/Database"
         self.onboardingDone = FileManager.default.fileExists(atPath: NSHomeDirectory() + "/Documents/Database")
@@ -66,11 +66,9 @@ class SignerDataModel: ObservableObject {
      * should be called as often as reasonably possible - on flow interrupts, changes, events, etc.
      */
     func totalRefresh() {
+        self.seedBackup = ""
         self.lastError = ""
         self.document = .none
-        self.newSeed = self.seedNames.count == 0
-        self.newIdentity = false
-        self.exportIdentity = false
         self.refreshNetworks()
         if self.networks.count > 0 {
             self.selectedNetwork = self.networks[0]
