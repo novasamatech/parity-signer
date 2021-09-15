@@ -6,7 +6,7 @@
 
 # Parity Signer - Turn your smartphone into a hardware wallet
 
-![Parity Signer](./docs/src/tutorials/images/logo-parity-signer.jpg)
+![Parity Signer](./tutorials/images/logo-parity-signer.jpg)
 
 Parity Signer is a mobile application that allows any smartphone to act as an air-gapped crypto wallet. This is also known as "cold storage".
 
@@ -14,9 +14,9 @@ You can create accounts in Substrate-based networks, sign messages/transactions,
 
 You must turn off or even physically remove the smartphone's Wifi, Mobile Network, and Bluetooth to ensure that the mobile phone containing these accounts will not be exposed to any online threat. Switching to airplane mode suffices in many cases.
 
-**Disabling the mobile phone's networking abilities is a requirement for the app to be used as intended, check our [wiki](./docs/src/wiki/Security-And-Privacy.md) for more details.**
+**Disabling the mobile phone's networking abilities is a requirement for the app to be used as intended, check our [wiki](./wiki/Security-And-Privacy.md) for more details.**
 
-Have a look at the tutorial on our wiki to learn how to use [Parity Signer together with Polkadot-js app](./docs/src/tutorials/Kusama-tutorial.md).
+Have a look at the tutorial on our wiki to learn how to use [Parity Signer together with Polkadot-js app](./tutorials/Kusama-tutorial.md).
 
 Any data transfer from or to the app happens using QR code. By doing so, the most sensitive piece of information, the private keys, will never leave the phone. The Parity Signer mobile app can be used to store any Substrate account, this includes Polkadot (DOT) and Kusama (KSM) networks.
 
@@ -34,29 +34,29 @@ Currently Signer is available only for iOS. Android version is coming soon.
 
 **These tutorials and docs are heavily outdated at the moment, please use them as references or help improving**
 
-If you are upgrading from older version of Signer, please see [changelog](./docs/src/wiki/Changelog.md) and [upgrading Signer](./docs/src/wiki/Upgrading.md)
+If you are upgrading from older version of Signer, please see [changelog](./wiki/Changelog.md) and [upgrading Signer](./wiki/Upgrading.md)
 
 Please note that the Signer app is an advanced tool designed for maximum security and complex features. In many use cases, more user-friendly tools would be sufficient.
 
-[Getting started guide](./docs/src/tutorials/Start.md)
+[Getting started guide](./tutorials/Start.md)
 
 ### Tutorials
 
-- [Signing with Pokadot.js Apps](./docs/src/tutorials/Kusama-tutorial.md)
-- [Recover Account from Polkadot.js Apps](./docs/src/tutorials/Recover-Account-Polkadotjs.md)
-- [Manage Accounts on Parity Signer](./docs/src/tutorials/Hierarchical-Deterministic-Key-Derivation.md)
-- [Update New Network](./docs/src/tutorials/New-Network.md)
+- [Signing with Pokadot.js Apps](./tutorials/Kusama-tutorial.md)
+- [Recover Account from Polkadot.js Apps](./tutorials/Recover-Account-Polkadotjs.md)
+- [Manage Accounts on Parity Signer](./tutorials/Hierarchical-Deterministic-Key-Derivation.md)
+- [Update New Network](./tutorials/New-Network.md)
 
 ### Wiki
 
-- [Security and Privacy](./docs/src/wiki/Security-And-Privacy.md)
-- [Development](./docs/src/wiki/Development.md)
-- [Building and Publishing](./docs/src/wiki/Building-And-Publishing.md)
-- [Testing](./docs/src/wiki/Test.md)
-- [Troubleshooting](./docs/src/wiki/Troubleshooting.md)
-- [QA Check List](./docs/src/wiki/QA.md)
+- [Security and Privacy](./wiki/Security-And-Privacy.md)
+- [Development](./wiki/Development.md)
+- [Building and Publishing](./wiki/Building-And-Publishing.md)
+- [Testing](./wiki/Test.md)
+- [Troubleshooting](./wiki/Troubleshooting.md)
+- [QA Check List](./wiki/QA.md)
 - [Key derivations](https://substrate.dev/docs/en/knowledgebase/integrate/subkey)
-- [Changelog](./docs/src/wiki/Changelog.md)
+- [Changelog](./wiki/Changelog.md)
 - [QR encoding definition](https://github.com/maciejhirsz/uos)
 
 ### Legacy versions

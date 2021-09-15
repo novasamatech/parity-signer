@@ -24,7 +24,7 @@ Before starting the Signer, you should make sure that network is disabled. Many 
 
 ## First start
 
-When you first launch Signer, it prompts you to read and accept terms and conditions and privacy policy. Once that is done, the database is pre-populated with built-in networks and Signer is ready for use. It could [import network data](./docs/src/tutorials/New-Network.md) or [read transactions](./docs/src/tutorials/Kusama-tutorial.md), but to sign anything you need to create keys.
+When you first launch Signer, it prompts you to read and accept terms and conditions and privacy policy. Once that is done, the database is pre-populated with built-in networks and Signer is ready for use. It could [import network data](./New-Network.md) or [read transactions](./Kusama-tutorial.md), but to sign anything you need to create keys.
 
 ### Create keys
 
@@ -36,13 +36,10 @@ You will see the created secret seed. Please back it up on paper and store it in
 
 Once you dismiss seed phrase backup screen, the seed and some associated keys will be created. For every network known to the Signer, a network root derivation key will be generated, hard-derived from seed phrase with network name. A root key will be generated and made available in all networks. **Do not use the root key unless you know what you do!**.
 
-To learn more on key generation, read [subkey specifications](https://substrate.dev/docs/en/knowledgebase/integrate/subkey) that Signer follows tightly and [Signer key management](./docs/src/tutorials/Hierarchical-Deterministic-Key-Derivation.md).
+To learn more on key generation, read [subkey specifications](https://substrate.dev/docs/en/knowledgebase/integrate/subkey) that Signer follows tightly and [Signer key management](./Hierarchical-Deterministic-Key-Derivation.md).
 
 ### Export public key
 
 Once you have a keypair you would like to use, you should first export it to hot wallet. Tap the key and select `Export` button. You will see the export QR code you can use with hot wallet.
 
-Details on [signing with Pokadot.js Apps](./docs/src/tutorials/Kusama-tutorial.md)
-
-
-
+Details on [signing with Pokadot.js Apps](./Kusama-tutorial.md)

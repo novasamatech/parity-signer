@@ -14,7 +14,7 @@ Switch to the network you want to play with on Polkadot.js app. Click `Settings`
 
 ![Network Metadata QR Code](images/Network-Metadata-QR.png)
 
-Here we can see the chain specifications like `Network Name`, `Address Prefix`, and `Genesis Hash` etc. They are all the metaData of the network which is required by Parity Signer. The only item we could change is network color, it is used on Parity Signer to distinguish other networks. 
+Here we can see the chain specifications like `Network Name`, `Address Prefix`, and `Genesis Hash` etc. They are all the metaData of the network which is required by Parity Signer. The only item we could change is network color, it is used on Parity Signer to distinguish other networks.
 
 On the right side is the QR Code we need.
 
@@ -30,4 +30,4 @@ Please note that as network develops, its metadata will change over time. New me
 
 This is an advanced operation that should only be performed by experienced users on trusted machine. Remember, that any inaccuracy in network specifications or metadata may lead to serious security threat, loss of funds and/or general account access!
 
-[Update generator instructions](../rust/generate_message/readme.md)
+[Update generator instructions](../../rust/generate_message/readme.md)
