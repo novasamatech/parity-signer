@@ -18,7 +18,7 @@ jobs:
       - name:             Setup mdBook
         uses:             peaceiris/actions-mdbook@v1
         with:
-          mdbook-version: '0.4.12'
+          mdbook-version: '0.4.10'
 
       - run:              mdbook build
 
@@ -34,7 +34,7 @@ jobs:
     runs-on:              ubuntu-latest
     steps:
       - name:             Checkout sources
-        uses:             actions/checkout@v2
+        uses:             actions/checkout@v2.3.4
         with:
           fetch-depth:    50
 
