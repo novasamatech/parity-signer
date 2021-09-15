@@ -28,4 +28,6 @@ jobs:
         run:            cd scripts && ./build.sh ios && cd ..
       - name:           Detox biuld
         run:            xcodebuild -workspace ios/NativeSigner.xcodeproj/project.xcworkspace -scheme NativeSigner -configuration Debug -sdk iphonesimulator -derivedDataPath ios/build/NativeSigner -UseModernBuildSystem=YES | xcpretty -t && exit ${PIPESTATUS[0]}
+      - name:           Check links with linkcheck
+        uses:           filiph/linkcheck@v2.0.15+1
 
