@@ -21,8 +21,8 @@ jobs:
           mdbook-version: 'latest'
 
       - run:              |
-          mdbook serve docs &
           mdbook build docs
+          mdbook serve docs &
 
       - name:             Check links with linkcheck
         uses:             filiph/linkcheck@v2.0.15+1
