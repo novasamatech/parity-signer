@@ -1,0 +1,23 @@
+name:                   Check links with linkcheck
+
+on:
+  pull_request:
+  push:
+    branches:
+      - master
+      - stable
+jobs:
+  check:
+    name:               Check doc links
+    runs-on:            ubuntu-latest
+    steps:
+      - name:           Checkout sources
+        uses:           actions/checkout@v2
+        with:
+          fetch-depth:  50
+      - name:           Checkout submodules
+        shell:          bash
+        run:            git submodule update --init --recursive
+      - name:           Check links with linkcheck
+        uses:           filiph/linkcheck@v2.0.15+1
+
