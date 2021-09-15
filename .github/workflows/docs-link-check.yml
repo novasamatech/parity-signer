@@ -21,17 +21,14 @@ jobs:
           mdbook-version: 'latest'
 
       - run:              |
-          mkdir -p book
-          mkdir -p src
-          touch src/SUMMARY.md
-          mdbook build -d ./book
+          mdbook build docs
 
       - name:             Deploy documentation
         uses:             peaceiris/actions-gh-pages@v3
         with:
           github_token:   ${{ secrets.GITHUB_TOKEN }}
           publish_branch: gh-pages
-          publish_dir:    ./book
+          publish_dir:    docs/book/html/
 
   check-links:
     name:                 Check doc links
