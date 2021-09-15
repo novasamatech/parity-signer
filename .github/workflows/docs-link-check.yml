@@ -42,4 +42,4 @@ jobs:
       - name:             Check links with linkcheck
         uses:             filiph/linkcheck@v2.0.15+1
         with:
-          arguments:      https://paritytech.github.io/parity-signer/ -e
+          arguments:      https://paritytech.github.io/parity-signer/, -e
