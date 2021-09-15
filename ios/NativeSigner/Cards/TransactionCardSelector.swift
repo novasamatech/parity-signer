@@ -36,10 +36,10 @@ struct TransactionCardSelector: View {
             TCEraMortalNonce(eraMortalNonce: eraMortalNonce)
         case .error(let text):
             TCError(text: text)
-        case .fieldName(let text):
-            Text(text).foregroundColor(Color("textMainColor"))
-        case .fieldNumber(let text):
-            Text(text).foregroundColor(Color("textMainColor"))
+        case .fieldName(let value):
+            TCFieldName(value: value)
+        case .fieldNumber(let value):
+            TCFieldNumber(value: value)
         case .id(let text):
             TCID(text: text)
         case .identityField(let text):
@@ -52,6 +52,13 @@ struct TransactionCardSelector: View {
                 .foregroundColor(Color("textMainColor"))
         case .none:
             EmptyView()
+        case .pallet(let text):
+            Text(text)
+                .foregroundColor(Color("textMainColor"))
+        case .pathDocs(let value):
+            TCPathDocs(value: value)
+        case .range(let value):
+            TCTXRange(value: value)
         case .tip(let value):
             TCTip(value: value)
         case .tipPlain(let text):

@@ -9,7 +9,6 @@ import SwiftUI
 
 struct HistoryView: View {
     @EnvironmentObject var data: SignerDataModel
-    @Binding var showHistory: Bool
     @State var selectedRecord: Int?
     var body: some View {
         ZStack {
@@ -40,7 +39,7 @@ struct HistoryView: View {
                     }
                 }
                 Spacer()
-                Button(action: {showHistory = false}) {
+                Button(action: {data.settingsModal = .none}) {
                     Text("Back")
                         .font(.largeTitle)
                         .foregroundColor(Color("AccentColor"))
@@ -50,7 +49,6 @@ struct HistoryView: View {
         .onAppear {
             data.getHistory()
         }
-        .padding(.bottom, 120)
     }
 }
 

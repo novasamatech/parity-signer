@@ -9,7 +9,6 @@ import SwiftUI
 
 struct SeedManager: View {
     @EnvironmentObject var data: SignerDataModel
-    @Binding var showSeedManager: Bool
     @State var showBackup = false
     @State var seedPhrase = ""
     var body: some View {
@@ -59,7 +58,7 @@ struct SeedManager: View {
                                             )
                                         )
                                     })
-                                }
+                                }.padding()
                             } else {
                                 Button(action: {
                                         data.selectSeed(seedName: seed)
@@ -74,7 +73,7 @@ struct SeedManager: View {
                 }
             }
                 Spacer()
-                Button(action: {showSeedManager = false})
+                Button(action: {data.settingsModal = .none})
                     {
                     Text("Back")
                         .font(.largeTitle)
@@ -85,7 +84,6 @@ struct SeedManager: View {
         .onDisappear {
             seedPhrase = ""
         }
-        .padding(.bottom, 120)
     }
 }
 

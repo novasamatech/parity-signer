@@ -1,14 +1,14 @@
 //
-//  TCEnumVariantName.swift
+//  TCFieldName.swift
 //  NativeSigner
 //
-//  Created by Alexander Slesarev on 17.8.2021.
+//  Created by Alexander Slesarev on 14.9.2021.
 //
 
 import SwiftUI
 
-struct TCEnumVariantName: View {
-    var value: EnumVariantName
+struct TCFieldName: View {
+    var value: FieldName
     @State private var showDoc = false
     var body: some View {
         Button (action: {
@@ -34,9 +34,8 @@ struct TCEnumVariantName: View {
 }
 
 /*
- struct TCEnumVariantName_Previews: PreviewProvider {
- static var previews: some View {
- TCEnumVariantName()
- }
- }
- */
+struct TCFieldName_Previews: PreviewProvider {
+    static var previews: some View {
+        TCFieldName()
+    }
+}*/

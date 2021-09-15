@@ -23,6 +23,8 @@ enum Event: Decodable, Hashable, Equatable {
     case metadataVerifierRemoved(NetworkVerifierEvent)
     case networkAdded(NewNetwork)
     case networkRemoved(NetworkRemovedEvent)
+    case seedNameWasAccessed(String)
+    case seedNameWasShown(String)
     case seedsWereAccessed
     case seedsWereShown
     case signedAddNetwork(NewNetwork)
@@ -74,6 +76,10 @@ enum Event: Decodable, Hashable, Equatable {
             self = .networkAdded(try values.decode(NewNetwork.self, forKey: .payload))
         case "network_removed":
             self = .networkRemoved(try values.decode(NetworkRemovedEvent.self, forKey: .payload))
+        case "seed_name_accessed":
+            self = .seedNameWasAccessed(try values.decode(String.self, forKey: .payload))
+        case "seed_name_shown":
+            self = .seedNameWasShown(try values.decode(String.self, forKey: .payload))
         case "seeds_accessed":
             self = .seedsWereAccessed
         case "seeds_shown":

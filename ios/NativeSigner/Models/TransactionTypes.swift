@@ -21,13 +21,16 @@ enum Card {
     case eraImmortalNonce(EraImmortalNonce)
     case eraMortalNonce(EraMortalNonce)
     case error(String)
-    case fieldName(String)
-    case fieldNumber(String)
+    case fieldName(FieldName)
+    case fieldNumber(FieldNumber)
     case id(String)
     case identityField(String)
     case meta(MetaSpecs)
     case newNetwork(NewNetwork)
     case none
+    case pallet(String)
+    case pathDocs(PathDocs)
+    case range(TxRange)
     case tip(Currency)
     case tipPlain(String)
     case txSpec(TxSpec)
@@ -84,6 +87,16 @@ struct EraMortalNonce: Decodable {
     var nonce: String
 }
 
+struct FieldName: Decodable {
+    var name: String
+    var docs: String
+}
+
+struct FieldNumber: Decodable {
+    var number: String
+    var docs: String
+}
+
 struct MetaSpecs: Decodable, Hashable {
     var specname: String
     var spec_version: String
@@ -105,6 +118,17 @@ struct NewNetwork: Decodable, Hashable {
     var title: String
     var unit: String
     var verifier: Verifier
+}
+
+struct PathDocs: Decodable {
+    var path: String
+    var docs: String
+}
+
+struct TxRange: Decodable {
+    var start: String
+    var end: String
+    var inclusive: String
 }
 
 struct Tip: Decodable {
@@ -151,7 +175,6 @@ struct TransactionCard: Decodable {
         //first handle special cases of complex payloads
         switch type {
         case "author":
-            print("0000000000000000000000")
             card = .author(try values.decode(Author.self, forKey: .payload))
             return
         case "author_plain":
@@ -175,6 +198,12 @@ struct TransactionCard: Decodable {
         case "era_immortal_nonce":
             card = .eraImmortalNonce(try values.decode(EraImmortalNonce.self, forKey: .payload))
             return
+        case "field_name":
+            card = .fieldName(try values.decode(FieldName.self, forKey: .payload))
+            return
+        case "field_number":
+            card = .fieldNumber(try values.decode(FieldNumber.self, forKey: .payload))
+            return
         case "meta":
             card = .meta(try values.decode(MetaSpecs.self, forKey: .payload))
             return
@@ -183,6 +212,12 @@ struct TransactionCard: Decodable {
             return
         case "none":
             card = .none
+        case "path_and_docs":
+            card = .pathDocs(try values.decode(PathDocs.self, forKey: .payload))
+            return
+        case "range":
+            card = .range(try values.decode(TxRange.self, forKey: .payload))
+            return
         case "tip":
             card = .tip(try values.decode(Currency.self, forKey: .payload))
             return
@@ -209,14 +244,12 @@ struct TransactionCard: Decodable {
             card = .defaultCard(content)
         case "error":
             card = .error(content)
-        case "field_name":
-            card = .fieldName(content)
-        case "field_number":
-            card = .fieldNumber(content)
         case "Id":
             card = .id(content)
         case "identity_field":
             card = .identityField(content)
+        case "pallet":
+            card = .pallet(content)
         case "tip_plain":
             card = .tipPlain(content)
         case "types_hash":

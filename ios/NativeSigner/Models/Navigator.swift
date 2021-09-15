@@ -48,4 +48,8 @@ enum KeyManagerModal {
  */
 enum SettingsModal {
     case none
+    case showHistory
+    case showSeedManager
+    case showNetworkManager
+    case showDocument(ShownDocument)
 }

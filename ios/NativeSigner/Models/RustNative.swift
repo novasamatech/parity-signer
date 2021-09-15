@@ -33,7 +33,6 @@ class SignerDataModel: ObservableObject {
     @Published var keyManagerModal: KeyManagerModal = .none
     @Published var settingsModal: SettingsModal = .none
     @Published var transactionState: TransactionState = .none
-    @Published var document: ShownDocument = .none
     
     //Transaction content
     @Published var cards: [TransactionCard] = []
@@ -68,7 +67,6 @@ class SignerDataModel: ObservableObject {
     func totalRefresh() {
         self.seedBackup = ""
         self.lastError = ""
-        self.document = .none
         self.refreshNetworks()
         if self.networks.count > 0 {
             self.selectedNetwork = self.networks[0]

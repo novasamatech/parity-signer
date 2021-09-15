@@ -9,7 +9,6 @@ import SwiftUI
 
 struct NetworkManager: View {
     @EnvironmentObject var data: SignerDataModel
-    @Binding var showNetworkManager: Bool
     var body: some View {
         ZStack {
             RoundedRectangle(cornerRadius: 50).foregroundColor(/*@START_MENU_TOKEN@*/Color("backgroundCard")/*@END_MENU_TOKEN@*/)
@@ -54,7 +53,7 @@ struct NetworkManager: View {
                 }
                 Spacer()
                 Button(action: {
-                    showNetworkManager = false
+                    data.settingsModal = .none
                 }) {
                     Text("Done")
                 }
@@ -69,7 +68,6 @@ struct NetworkManager: View {
         .onDisappear {
             data.networkSettings = nil
         }
-        .padding(.bottom, 100)
     }
 }
 

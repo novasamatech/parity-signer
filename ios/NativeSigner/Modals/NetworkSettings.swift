@@ -5,12 +5,17 @@
 //  Created by Alexander Slesarev on 12.8.2021.
 //
 
+// This is part of the model to interact with network settings;
+// It is supposed to be much less polished than networks object and it's ok
+// It is used only for things happening on networks screen:
+// deletions and exports
+
 import Foundation
 
 /**
  * Metadata descriptor
  */
-struct MetaSpecsNS: Codable {
+struct MetaSpecsNS: Decodable {
     var spec_version: String
     var meta_hash: String
 }
@@ -18,7 +23,7 @@ struct MetaSpecsNS: Codable {
 /**
  * Detailed network settings
  */
-struct NetworkSettings: Codable {
+struct NetworkSettings: Decodable {
     var base58prefix: String
     var color: String
     var decimals: String
@@ -30,7 +35,7 @@ struct NetworkSettings: Codable {
     var secondary_color: String
     var title: String
     var unit: String
-    var verifier: String
+    var verifier: Verifier
     var meta: [MetaSpecsNS]
 }
 
@@ -47,7 +52,7 @@ extension SignerDataModel {
             if let specsJSON = String(cString: res!).data(using: .utf8) {
                 guard let networkSettings = try? JSONDecoder().decode(NetworkSettings.self, from: specsJSON) else {
                     print("JSON decoder failed on network specs")
-                    print(specsJSON)
+                    print(String(data: specsJSON, encoding: .utf8) ?? "no data!")
                     self.networkSettings = nil
                     signer_destroy_string(res!)
                     return
