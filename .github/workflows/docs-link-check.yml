@@ -8,42 +8,37 @@ on:
 
 jobs:
   deploy-docs:
-    name:               Deploy docs
-    runs-on:            ubuntu-latest
+    name:                 Deploy docs
+    runs-on:              ubuntu-latest
 
     steps:
-      - name:           Checkout repository
-        uses:           actions/checkout@v2.3.4
+      - name:             Checkout repository
+        uses:             actions/checkout@v2.3.4
 
-      - name:           Checkout submodules
-        shell:          bash
-        run:            |
-          git submodule update --init --recursive
-
-      - name: Setup mdBook
-        uses: peaceiris/actions-mdbook@v1
+      - name:             Setup mdBook
+        uses:             peaceiris/actions-mdbook@v1
         with:
           mdbook-version: '0.4.12'
 
-      - run: mdbook build
+      - run:              mdbook build
 
-      - name:           Deploy documentation
-        uses:           peaceiris/actions-gh-pages@v3
+      - name:             Deploy documentation
+        uses:             peaceiris/actions-gh-pages@v3
         with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
+          github_token:   ${{ secrets.GITHUB_TOKEN }}
           publish_branch: gh-pages
-          publish_dir: ./book
+          publish_dir:    ./book
 
   check-links:
-    name:               Check doc links
-    runs-on:            ubuntu-latest
+    name:                 Check doc links
+    runs-on:              ubuntu-latest
     steps:
-      - name:           Checkout sources
-        uses:           actions/checkout@v2
+      - name:             Checkout sources
+        uses:             actions/checkout@v2
         with:
-          fetch-depth:  50
+          fetch-depth:    50
 
-      - name:           Check links with linkcheck
-        uses:           filiph/linkcheck@v2.0.15+1
+      - name:             Check links with linkcheck
+        uses:             filiph/linkcheck@v2.0.15+1
         with:
-          arguments:    https://paritytech.github.io/parity-signer/ -e
+          arguments:      https://paritytech.github.io/parity-signer/ -e
