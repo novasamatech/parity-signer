@@ -21,9 +21,10 @@ jobs:
           mdbook-version: 'latest'
 
       - run:              |
-          mkdir src
+          mkdir -p book
+          mkdir -p src
           touch src/SUMMARY.md
-          mdbook build
+          mdbook build -d ./book
 
       - name:             Deploy documentation
         uses:             peaceiris/actions-gh-pages@v3
