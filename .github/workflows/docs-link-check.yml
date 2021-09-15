@@ -21,26 +21,12 @@ jobs:
         run:            |
           git submodule update --init --recursive
 
-      - name:           Rust versions
-        run:            rustup show
-
-      - name:           Rust cache
-        uses:           Swatinem/rust-cache@v1
-
-      - name:           Build rustdocs
-        run:            |
-          SKIP_WASM_BUILD=1 cargo doc --all --no-deps
-
-      - name:           Make index.html
-        run:            |
-          echo "<meta http-equiv=refresh content=0;url=cumulus_client_collator/index.html>" > ./target/doc/index.html
-
       - name:           Deploy documentation
         uses:           peaceiris/actions-gh-pages@v3
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_branch: gh-pages
-          publish_dir: ./target/doc
+          publish_dir: ./docs
 
   check:
     name:               Check doc links
