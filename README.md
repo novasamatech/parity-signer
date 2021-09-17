@@ -1,8 +1,8 @@
 ![Parity Signer](https://wiki.parity.io/logo-parity-signer.jpg)
 
-[<img src="./res/github-badge.png" width="250"/>](https://github.com/paritytech/parity-signer/releases/)
-[<img src="./res/google-play-badge.png" width="250"/>](https://play.google.com/store/apps/details?id=io.parity.signer)
-[<img src="./res/app-store-badge.png" width="250"/>](https://itunes.apple.com/us/app/parity-signer/id1218174838)
+[<img src="./docs/src/res/github-badge.png" width="250"/>](https://github.com/paritytech/parity-signer/releases/)
+[<img src="./docs/src/res/google-play-badge.png" width="250"/>](https://play.google.com/store/apps/details?id=io.parity.signer)
+[<img src="./docs/src/res/app-store-badge.png" width="250"/>](https://itunes.apple.com/us/app/parity-signer/id1218174838)
 
 # Parity Signer - Turn your smartphone into a hardware wallet
 
