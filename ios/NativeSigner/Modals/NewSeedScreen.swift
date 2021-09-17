@@ -12,9 +12,12 @@ struct NewSeedScreen: View {
     @State private var seedName: String = ""
     @State private var seedPhrase: String = ""
     @State private var recover: Bool = false
+    @State private var focusName: Bool = true
+    
     init() {
         UITextView.appearance().backgroundColor = .clear
     }
+    
     var body: some View {
         ZStack{
             RoundedRectangle(cornerRadius: 50).foregroundColor(/*@START_MENU_TOKEN@*/Color("backgroundCard")/*@END_MENU_TOKEN@*/)
@@ -23,11 +26,11 @@ struct NewSeedScreen: View {
                     Text("Seed name")
                         .font(.title)
                         .foregroundColor(Color("textMainColor"))
-                    TextField("Seed name", text: $seedName)
+                    SignerTextInput(text: $seedName, focus: $focusName, placeholder: "Seed name", autocapitalization: .words, returnKeyType: .next, keyboardType: .default, onReturn: {})
+                        .frame(height: 40)
                         .onChange(of: seedName, perform: { _ in
                             data.lastError = ""
                         })
-                        .font(/*@START_MENU_TOKEN@*/.title/*@END_MENU_TOKEN@*/)
                         .foregroundColor(/*@START_MENU_TOKEN@*/Color("textEntryColor")/*@END_MENU_TOKEN@*/)
                         .background(/*@START_MENU_TOKEN@*//*@PLACEHOLDER=View@*/Color("textFieldColor")/*@END_MENU_TOKEN@*/)
                         .border(/*@START_MENU_TOKEN@*/Color("borderSignalColor")/*@END_MENU_TOKEN@*/, width: /*@START_MENU_TOKEN@*/1/*@END_MENU_TOKEN@*/)
@@ -43,10 +46,11 @@ struct NewSeedScreen: View {
                          .font(.title)
                          .foregroundColor(Color("textMainColor"))
                          */
-                        
+                        //TODO: make completely custom tool for this
                         TextEditor(text: $seedPhrase)
                             .frame(height: 150.0)
                             .autocapitalization(.none)
+                            .disableAutocorrection(true)
                             .font(/*@START_MENU_TOKEN@*/.title/*@END_MENU_TOKEN@*/)
                             .background(/*@START_MENU_TOKEN@*//*@PLACEHOLDER=View@*/Color("textFieldColor")/*@END_MENU_TOKEN@*/)
                             .foregroundColor(/*@START_MENU_TOKEN@*/Color("textEntryColor")/*@END_MENU_TOKEN@*/)
@@ -77,8 +81,10 @@ struct NewSeedScreen: View {
     }
 }
 
+/*
 struct NewSeedScreen_Previews: PreviewProvider {
     static var previews: some View {
         NewSeedScreen().previewLayout(.sizeThatFits)
     }
 }
+*/

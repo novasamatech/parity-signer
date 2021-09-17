@@ -14,6 +14,7 @@
 		2D0D5E8226F0CFEB00B0EF9D /* TCFieldNumber.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D0D5E8126F0CFEB00B0EF9D /* TCFieldNumber.swift */; };
 		2D0D5E8426F0D01800B0EF9D /* TCTXRange.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D0D5E8326F0D01800B0EF9D /* TCTXRange.swift */; };
 		2D0D5E8626F0D0CC00B0EF9D /* TCPathDocs.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D0D5E8526F0D0CC00B0EF9D /* TCPathDocs.swift */; };
+		2D682A6B26F34F3D00A315F6 /* SignerTextInput.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D682A6A26F34F3D00A315F6 /* SignerTextInput.swift */; };
 		2D72B4F626EF3BC50081E879 /* Navigator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D72B4F526EF3BC50081E879 /* Navigator.swift */; };
 		2D72B4F826EF427C0081E879 /* Header.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D72B4F726EF427C0081E879 /* Header.swift */; };
 		2D72B4FA26EF7D1C0081E879 /* Seeds.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D72B4F926EF7D1C0081E879 /* Seeds.swift */; };
@@ -111,6 +112,7 @@
 		2D0D5E8126F0CFEB00B0EF9D /* TCFieldNumber.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TCFieldNumber.swift; sourceTree = "<group>"; };
 		2D0D5E8326F0D01800B0EF9D /* TCTXRange.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TCTXRange.swift; sourceTree = "<group>"; };
 		2D0D5E8526F0D0CC00B0EF9D /* TCPathDocs.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TCPathDocs.swift; sourceTree = "<group>"; };
+		2D682A6A26F34F3D00A315F6 /* SignerTextInput.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignerTextInput.swift; sourceTree = "<group>"; };
 		2D72B4F526EF3BC50081E879 /* Navigator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Navigator.swift; sourceTree = "<group>"; };
 		2D72B4F726EF427C0081E879 /* Header.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Header.swift; sourceTree = "<group>"; };
 		2D72B4F926EF7D1C0081E879 /* Seeds.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Seeds.swift; sourceTree = "<group>"; };
@@ -118,7 +120,7 @@
 		2D7A7BA926AED2500053C1E0 /* Database */ = {isa = PBXFileReference; lastKnownFileType = folder; path = Database; sourceTree = "<group>"; };
 		2D7A7BAF26B00A3E0053C1E0 /* NavbarShield.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NavbarShield.swift; sourceTree = "<group>"; };
 		2D7A7BB326B02B700053C1E0 /* SeedSelector.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SeedSelector.swift; sourceTree = "<group>"; };
-		2D7A7BB526B136970053C1E0 /* NewSeedScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewSeedScreen.swift; sourceTree = "<group>"; };
+		2D7A7BB526B136970053C1E0 /* NewSeedScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; lineEnding = 1; path = NewSeedScreen.swift; sourceTree = "<group>"; };
 		2D7A7BB726B28D350053C1E0 /* SettingsScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsScreen.swift; sourceTree = "<group>"; };
 		2D7A7BBF26B97DB30053C1E0 /* Identities.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = Identities.swift; path = NativeSigner/Identities.swift; sourceTree = SOURCE_ROOT; };
 		2D7A7BC126B9D3360053C1E0 /* IdentityCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IdentityCard.swift; sourceTree = "<group>"; };
@@ -276,6 +278,7 @@
 				2D7A7BF226C519990053C1E0 /* MetadataCard.swift */,
 				2D72B4F726EF427C0081E879 /* Header.swift */,
 				2D0D5E7926F09A5600B0EF9D /* TransactionCommentInput.swift */,
+				2D682A6A26F34F3D00A315F6 /* SignerTextInput.swift */,
 			);
 			path = Components;
 			sourceTree = "<group>";
@@ -601,6 +604,7 @@
 				2D7A7BD026BBC72D0053C1E0 /* Transaction.swift in Sources */,
 				2D7A7C1826CB96C70053C1E0 /* TCError.swift in Sources */,
 				2DE72BF326A59BAB002BB752 /* NetworkList.swift in Sources */,
+				2D682A6B26F34F3D00A315F6 /* SignerTextInput.swift in Sources */,
 				2D72B4F826EF427C0081E879 /* Header.swift in Sources */,
 				2D7A7BFB26C6621D0053C1E0 /* HistoryCollapsed.swift in Sources */,
 				2D7A7BD226BBCE6F0053C1E0 /* TransactionScreen.swift in Sources */,

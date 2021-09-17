@@ -81,6 +81,7 @@ extension SignerDataModel {
             print("Rust returned error")
             print(self.lastError)
             signer_destroy_string(err_ptr.pointee.message)
+            return
         }
         let finalSeedPhraseString = String(cString: res!)
         guard let finalSeedPhrase = finalSeedPhraseString.data(using: .utf8) else {

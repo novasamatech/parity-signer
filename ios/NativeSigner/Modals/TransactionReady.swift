@@ -11,6 +11,7 @@ struct TransactionReady: View {
     @EnvironmentObject var data: SignerDataModel
     @State var seedPhrase: String = ""
     @State var password: String = ""
+    @State var passwordFocus: Bool = true
     var body: some View {
         ZStack {
             VStack {
@@ -46,9 +47,9 @@ struct TransactionReady: View {
                     Text("Enter password")
                         .font(.body)
                         .foregroundColor(Color("textMainColor"))
-                    TextField("password", text: $password).font(.title)
-                        .foregroundColor(/*@START_MENU_TOKEN@*/Color("textEntryColor")/*@END_MENU_TOKEN@*/)
-                    .background(/*@START_MENU_TOKEN@*//*@PLACEHOLDER=View@*/Color("textFieldColor")/*@END_MENU_TOKEN@*/).border(/*@START_MENU_TOKEN@*/Color("borderSignalColor")/*@END_MENU_TOKEN@*/, width: /*@START_MENU_TOKEN@*/1/*@END_MENU_TOKEN@*/)
+                    SignerTextInput(text: $password, focus: $passwordFocus, placeholder: "password (optional)", autocapitalization: .none, returnKeyType: .next, keyboardType: .default, onReturn: {
+                        data.signTransaction(seedPhrase: seedPhrase, password: password)
+                    }).border(/*@START_MENU_TOKEN@*/Color("borderSignalColor")/*@END_MENU_TOKEN@*/, width: /*@START_MENU_TOKEN@*/1/*@END_MENU_TOKEN@*/)
                     Spacer()
                     HStack {
                         Button(action: {
