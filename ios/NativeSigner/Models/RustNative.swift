@@ -21,6 +21,7 @@ class SignerDataModel: ObservableObject {
     @Published var selectedSeed: String = ""
     @Published var selectedNetwork: Network?
     @Published var selectedIdentity: Identity?
+    @Published var searchKey: String = ""
     @Published var suggestedPath: String = "//"
     @Published var suggestedName: String = ""
     @Published var onboardingDone: Bool = false
@@ -88,6 +89,7 @@ class SignerDataModel: ObservableObject {
         if self.signerScreen == .home {
             self.resetCamera = true
         }
+        self.searchKey = ""
     }
 }
 
