@@ -59,4 +59,13 @@ final class CameraViewModel: ObservableObject {
         print(self.payload ?? "Nothing")
         service.stop()
     }
+    
+    /**
+     * Clears recorded frames and starts anew
+     */
+    func reset() {
+        service.emptyBucket()
+        captured = nil
+        total = nil
+    }
 }

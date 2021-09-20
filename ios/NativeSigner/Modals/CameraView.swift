@@ -20,7 +20,8 @@ struct CameraView: View {
                 .onDisappear {
                     print("shutdown camera")
                     model.shutdown()
-                }.onReceive(model.$payload, perform: { payload in
+                }
+                .onReceive(model.$payload, perform: { payload in
                     if payload != nil {
                         data.payloadStr = payload ?? ""
                         DispatchQueue.main.async {
@@ -29,6 +30,13 @@ struct CameraView: View {
                         }
                         data.transactionState = .parsing
                         print(String(describing: data.transactionState))
+                    }
+                })
+                .onReceive(data.$resetCamera, perform: { resetCamera in
+                    print(resetCamera.description)
+                    if resetCamera {
+                        model.reset()
+                        data.resetCamera = false
                     }
                 })
             VStack {

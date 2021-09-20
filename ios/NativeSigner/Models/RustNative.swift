@@ -43,6 +43,7 @@ class SignerDataModel: ObservableObject {
     @Published var result: String? //TODO: remove this?
     @Published var author: Author?
     @Published var comment: String = ""
+    @Published var resetCamera: Bool = false
     
     //internal boilerplate
     var error: Unmanaged<CFError>?
@@ -84,6 +85,9 @@ class SignerDataModel: ObservableObject {
             self.keyManagerModal = .none
         }
         self.settingsModal = .none
+        if self.signerScreen == .home {
+            self.resetCamera = true
+        }
     }
 }
 

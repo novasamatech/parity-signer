@@ -26,7 +26,7 @@ class Canary: ObservableObject {
             } else {
                 DispatchQueue.main.async {
                     let dbName = NSHomeDirectory() + "/Documents/Database"
-                    device_was_online(nil, dbName)
+                    //TODO: uncomment (ipod dev is impossible with airplane mode) device_was_online(nil, dbName)
                     self.dead = true
                 }
             }

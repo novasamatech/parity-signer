@@ -264,6 +264,17 @@ public class CameraService: UIViewController, AVCaptureVideoDataOutputSampleBuff
             }
         }
     }
+    
+    /**
+     * Empty bucket
+     */
+    func emptyBucket() {
+        payload = nil
+        total = nil
+        captured = nil
+        bucketCount = 0
+        bucket = []
+    }
 }
 
 /**
