@@ -10,6 +10,7 @@ import SwiftUI
 struct SeedManager: View {
     @EnvironmentObject var data: SignerDataModel
     @State var showBackup = false
+    @State var deleteConfirm = false
     @State var seedPhrase = ""
     var body: some View {
         ZStack {
@@ -31,11 +32,25 @@ struct SeedManager: View {
                                         .foregroundColor(Color("AccentColor"))
                                 }
                                 HStack {
-                                    Button(action:{}) {
+                                    Button(action:{
+                                        deleteConfirm = true
+                                    }) {
                                         Text("Delete")
                                             .font(.largeTitle)
                                             .foregroundColor(Color("AccentColor"))
                                     }
+                                    .alert(isPresented: $deleteConfirm, content: {
+                                        Alert(
+                                            title: Text("Delete seed?"),
+                                            message: Text("You are about to delete seed " + seed),
+                                            primaryButton: .cancel(),
+                                            secondaryButton: .destructive(
+                                                Text("Delete"),
+                                                action: { data.removeSeed(seedName: seed)
+                                                }
+                                            )
+                                        )
+                                    })
                                     Spacer()
                                     Button(action:{
                                         seedPhrase = data.getSeed(seedName: data.selectedSeed, backup: true)

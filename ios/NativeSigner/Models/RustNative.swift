@@ -151,5 +151,7 @@ extension SignerDataModel {
         ] as CFDictionary
         SecItemDelete(query)
         self.onboardingDone = false
+        self.signerScreen = .keys
+        self.keyManagerModal = .newSeed
     }
 }

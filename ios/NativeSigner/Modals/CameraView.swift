@@ -33,7 +33,6 @@ struct CameraView: View {
                     }
                 })
                 .onReceive(data.$resetCamera, perform: { resetCamera in
-                    print(resetCamera.description)
                     if resetCamera {
                         model.reset()
                         data.resetCamera = false

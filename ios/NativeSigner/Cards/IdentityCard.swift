@@ -53,8 +53,8 @@ struct IdentityCard: View {
                     }
                     .alert(isPresented: $delete, content: {
                         Alert(
-                            title: Text("Delete identity?"),
-                            message: Text("You are about to delete identity " + data.selectedIdentity!.name),
+                            title: Text("Delete key?"),
+                            message: Text("You are about to delete key " + data.selectedIdentity!.name),
                             primaryButton: .cancel(),
                             secondaryButton: .destructive(
                                 Text("Delete"),

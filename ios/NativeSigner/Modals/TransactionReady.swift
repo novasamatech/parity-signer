@@ -47,7 +47,7 @@ struct TransactionReady: View {
                     Text("Enter password")
                         .font(.body)
                         .foregroundColor(Color("textMainColor"))
-                    SignerTextInput(text: $password, focus: $passwordFocus, placeholder: "password (optional)", autocapitalization: .none, returnKeyType: .next, keyboardType: .default, onReturn: {
+                    SignerTextInput(text: $password, focus: $passwordFocus, placeholder: "password (optional)", autocapitalization: .none, returnKeyType: .done, keyboardType: .default, onReturn: {
                         data.signTransaction(seedPhrase: seedPhrase, password: password)
                     }).border(/*@START_MENU_TOKEN@*/Color("borderSignalColor")/*@END_MENU_TOKEN@*/, width: /*@START_MENU_TOKEN@*/1/*@END_MENU_TOKEN@*/)
                     Spacer()

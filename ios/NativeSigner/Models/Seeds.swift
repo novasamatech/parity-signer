@@ -178,4 +178,36 @@ extension SignerDataModel {
             return ""
         }
     }
+    
+    /**
+     * Removes seed and all derived keys
+     */
+    func removeSeed(seedName: String) {
+        var err = ExternError()
+        let err_ptr: UnsafeMutablePointer<ExternError> = UnsafeMutablePointer(&err)
+        
+        let query = [
+            kSecClass as String: kSecClassGenericPassword,
+            kSecAttrAccount as String: seedName
+        ] as CFDictionary
+        let status = SecItemDelete(query)
+        print(status.description)
+        if status == errSecSuccess {
+            remove_seed(err_ptr, seedName, dbName)
+            if err_ptr.pointee.code == 0 {
+                self.seedNames = self.seedNames.filter {
+                    $0 != seedName
+                }
+                self.selectedSeed = ""
+                self.fetchKeys()
+            } else {
+                self.lastError = String(cString: err_ptr.pointee.message)
+                print(self.lastError)
+            }
+        } else {
+            print(seedName)
+            self.lastError = SecCopyErrorMessageString(status, nil)! as String
+            print("remove seed from secure storage error: " + self.lastError)
+        }
+    }
 }

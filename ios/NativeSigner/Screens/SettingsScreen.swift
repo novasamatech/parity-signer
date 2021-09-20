@@ -9,7 +9,6 @@ import SwiftUI
 
 struct SettingsScreen: View {
     @EnvironmentObject var data: SignerDataModel
-    @Environment(\.presentationMode) var presentationMode: Binding<PresentationMode>
     @State var wipe = false
     var body: some View {
         ZStack {
@@ -50,7 +49,6 @@ struct SettingsScreen: View {
                                 Text("Wipe"),
                                 action: {
                                     data.wipe()
-                                    presentationMode.wrappedValue.dismiss()
                                 }
                             )
                         )
