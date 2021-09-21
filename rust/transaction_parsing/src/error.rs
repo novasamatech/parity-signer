@@ -32,8 +32,9 @@ pub enum BadInputData {
     UnableToDecodeTypes,
     TypesAlreadyThere,
     UnableToDecodeAddNetworkMessage,
+    UnableToDecodeLoadMetadataMessage,
     ImportantSpecsChanged,
-    
+    EncryptionMismatch,
 }
 
 #[derive(PartialEq)]
@@ -80,6 +81,8 @@ pub enum DatabaseError {
     NoMetaAtAll,
     DamagedGeneralVerifier,
     NoGeneralVerifier,
+    DamagedNetworkVerifier,
+    NoNetworkVerifier ([u8; 32]),
 }
 
 #[derive(PartialEq)]
@@ -131,7 +134,9 @@ impl Error {
                     BadInputData::UnableToDecodeTypes => String::from("Unable to decode received types information."),
                     BadInputData::TypesAlreadyThere => String::from("Types information already in database."),
                     BadInputData::UnableToDecodeAddNetworkMessage => String::from("Unable to decode received add network message."),
+                    BadInputData::UnableToDecodeLoadMetadataMessage => String::from("Unable to decode received load metadata message."),
                     BadInputData::ImportantSpecsChanged => String::from("Network already has entries. Important chainspecs in received add network message are different."),
+                    BadInputData::EncryptionMismatch => String::from("Encryption used in message is not supported by the network."),
                 }
             },
             Error::UnableToDecode(x) => {
@@ -178,6 +183,8 @@ impl Error {
                     DatabaseError::NoMetaAtAll => String::from("No metadata on file for this network."),
                     DatabaseError::DamagedGeneralVerifier => String::from("General verifier information from database could not be decoded."),
                     DatabaseError::NoGeneralVerifier => String::from("No general verifier information in the database."),
+                    DatabaseError::DamagedNetworkVerifier => String::from("Network verifier is damaged and could not be decoded."),
+                    DatabaseError::NoNetworkVerifier(x) => format!("No network verifier information in the database for genesis hash {}.", hex::encode(x)),
                 }
             },
             Error::SystemError(x) => {

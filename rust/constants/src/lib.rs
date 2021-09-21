@@ -11,6 +11,7 @@ pub const COLD_DB_NAME: &str = "../database/database_cold";
 
 /// Tree names:  
 pub const SPECSTREE: &[u8] = b"chainspecs";
+pub const VERIFIERS: &[u8] = b"verifiers";
 pub const METATREE: &[u8] = b"metadata";
 pub const ADDRTREE: &[u8] = b"addresses";
 pub const SETTREE: &[u8] = b"settings";
@@ -57,9 +58,9 @@ pub const SECONDARY_COLOR: &str = "#262626";
 
 /// File name parts used for exports in generate_message crate
 pub const ADD: &str = "../files/for_signing/sign_me_add_network";
-pub const ADDDEF: &str = "../files/for_signing/sign_me_add_network_with_defaults";
 pub const LOAD: &str = "../files/for_signing/sign_me_load_metadata";
 pub const TYLO: &str = "../files/for_signing/sign_me_load_types";
+pub const SPECS: &str = "../files/for_signing/sign_me_add_specs";
 
 /// Folder name used for imports in generate_message crate
 pub const FOLDER: &str = "../files/for_signing";
@@ -73,5 +74,5 @@ pub const MAIN_COLOR: u8 = 0x00;
 pub const BACK_COLOR: u8 = 0xFF;
 pub const SCALING: i32 = 4;
 pub const FPS_NOM: u16 = 1;
-pub const FPS_DEN: u16 = 32;
+pub const FPS_DEN: u16 = 4;
 pub const BORDER: i32 = 4;

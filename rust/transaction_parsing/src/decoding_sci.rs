@@ -321,10 +321,12 @@ pub fn decoding_sci_complete (type_id: u32, compact_flag: bool, balance_flag: bo
                     reject_flags(compact_flag, balance_flag)?;
                     decode_type_def_bit_sequence (x, data, &meta_v14, index, indent)?
                 },
-                /*TypeDef::Range(x) => {
+/*
+                TypeDef::Range(x) => {
                     reject_flags(compact_flag, balance_flag)?;
                     decode_type_def_range (x, data, &meta_v14, index, indent)?
-                },*/
+                },
+*/
             }
         }
     };

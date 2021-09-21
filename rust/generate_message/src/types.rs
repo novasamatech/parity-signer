@@ -1,17 +1,13 @@
 use constants::{HOT_DB_NAME, TYLO};
-use std::fs;
 use db_handling::prep_messages::prep_types;
 
-pub fn gen_types() -> Result<(), Box<dyn std::error::Error>> {
+use crate::error::Error;
+
+pub fn gen_types() -> anyhow::Result<()> {
     
-    let types_info = prep_types(HOT_DB_NAME)?;
-    
-    match fs::write(&TYLO, &types_info) {
-        Ok(()) => Ok(()),
-        Err(e) => {
-            let err_text = format!("Problem writing types export file. {}", e);
-            let err: Box<dyn std::error::Error> = From::from(err_text);
-            return Err(err)
-        },
+    let content = prep_types(HOT_DB_NAME)?;
+    match content.write(TYLO) {
+        Ok(_) => Ok(()),
+        Err(e) => return Err(Error::InputOutputError(e).show()),
     }
 }

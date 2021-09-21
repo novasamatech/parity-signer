@@ -1,5 +1,5 @@
 use constants::{METATREE, SETTREE, SPECSTREE, TYPES};
-use definitions::{metadata::{MetaValues, NameVersioned}, network_specs::{ChainSpecsToSend}, types::TypeEntry};
+use definitions::{metadata::{MetaValues, NameVersioned}, network_specs::{ChainSpecsToSend}, qr_transfers::ContentLoadTypes};
 use parity_scale_codec::{Decode, Encode};
 use anyhow;
 
@@ -9,19 +9,21 @@ use crate::helpers::{open_db, open_tree, decode_chain_specs, check_metadata};
 
 /// Function to get types info from the database
 
-pub fn prep_types (database_name: &str) -> anyhow::Result<Vec<u8>> {
+pub fn prep_types (database_name: &str) -> anyhow::Result<ContentLoadTypes> {
     
     let database = open_db(database_name)?;
     let settings = open_tree(&database, SETTREE)?;
     
-    let types_info = match settings.get(TYPES) {
+    let types_info_encoded = match settings.get(TYPES) {
         Ok(Some(a)) => a.to_vec(),
         Ok(None) => return Err(Error::NotFound(NotFound::Types).show()),
         Err(e) => return Err(Error::InternalDatabaseError(e).show()),
     };
     
-    match <Vec<TypeEntry>>::decode(&mut &types_info[..]) {
-        Ok(_) => Ok(types_info),
+    let out = ContentLoadTypes::from_vec(&types_info_encoded);
+    
+    match out.types() {
+        Ok(_) => Ok(out),
         Err(_) => return Err(Error::NotDecodeable(NotDecodeable::Types).show()),
     }
 }
@@ -53,6 +55,7 @@ pub fn get_network_specs (network_name: &str, database_name: &str) -> anyhow::Re
                 base58prefix: network_specs.base58prefix,
                 color: network_specs.color,
                 decimals: network_specs.decimals,
+                encryption: network_specs.encryption,
                 genesis_hash: network_specs.genesis_hash,
                 logo: network_specs.logo,
                 name: network_specs.name,

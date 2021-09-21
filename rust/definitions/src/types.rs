@@ -1,14 +1,14 @@
 use parity_scale_codec_derive::{Decode, Encode};
 
 /// Struct to store type name and description
-#[derive(Decode, Encode, PartialEq)]
+#[derive(Decode, Encode, PartialEq, Clone)]
 pub struct TypeEntry {
     pub name: String,
     pub description: Description,
 }
 
 /// Type description
-#[derive(Decode, Encode, PartialEq)]
+#[derive(Decode, Encode, PartialEq, Clone)]
 pub enum Description {
     Type(String),
     Enum(Vec<EnumVariant>),
@@ -16,14 +16,14 @@ pub enum Description {
 }
 
 /// Enum variants
-#[derive(Decode, Encode, PartialEq)]
+#[derive(Decode, Encode, PartialEq, Clone)]
 pub struct EnumVariant {
     pub variant_name: String,
     pub variant_type: EnumVariantType,
 }
 
 /// Types of enum variants
-#[derive(Decode, Encode, PartialEq)]
+#[derive(Decode, Encode, PartialEq, Clone)]
 pub enum EnumVariantType {
     None,
     Type(String),
@@ -31,7 +31,7 @@ pub enum EnumVariantType {
 }
 
 /// Struct fields (field name is optional)
-#[derive(Decode, Encode, PartialEq)]
+#[derive(Decode, Encode, PartialEq, Clone)]
 pub struct StructField {
     pub field_name: Option<String>,
     pub field_type: String,

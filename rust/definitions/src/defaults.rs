@@ -5,9 +5,11 @@ use regex::Regex;
 use lazy_static::lazy_static;
 
 
-use crate::network_specs::{ChainSpecs, ChainSpecsToSend, Verifier};
+use crate::crypto::Encryption;
+use crate::network_specs::{ChainSpecs, ChainSpecsToSend, Verifier, VerifierInfo, generate_verifier_key};
 use crate::types::{TypeEntry, Description, EnumVariant, EnumVariantType, StructField};
 use crate::metadata::{AddressBookEntry};
+use crate::qr_transfers::ContentLoadTypes;
 
 pub fn get_default_chainspecs() -> Vec<ChainSpecs> {
     vec![
@@ -15,6 +17,7 @@ pub fn get_default_chainspecs() -> Vec<ChainSpecs> {
             base58prefix: 2,
             color: String::from("#000"),
             decimals: 12,
+            encryption: Encryption::Sr25519,
             genesis_hash: hex::decode("b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe").expect("known value").try_into().expect("known value"),
             logo: String::from("kusama"),
             name: String::from("kusama"),
@@ -23,12 +26,12 @@ pub fn get_default_chainspecs() -> Vec<ChainSpecs> {
             secondary_color: String::from("#262626"),
             title: String::from("Kusama"),
             unit: String::from("KSM"),
-            verifier: Verifier::None,
     	},
 	ChainSpecs {
             base58prefix: 0,
             color: String::from("#E6027A"),
             decimals: 10,
+            encryption: Encryption::Sr25519,
             genesis_hash: hex::decode("91b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3").expect("known value").try_into().expect("known value"),
             logo: String::from("polkadot"),
             name: String::from("polkadot"),
@@ -37,13 +40,13 @@ pub fn get_default_chainspecs() -> Vec<ChainSpecs> {
             secondary_color: String::from("#262626"),
             title: String::from("Polkadot"),
             unit: String::from("DOT"),
-            verifier: Verifier::None,
     	},
 	ChainSpecs {
             base58prefix: 42,
             color: String::from("#6f36dc"),
             decimals: 12,
-            genesis_hash: hex::decode("e7c3d5edde7db964317cd9b51a3a059d7cd99f81bdbce14990047354334c9779").expect("known value").try_into().expect("known value"),
+            encryption: Encryption::Sr25519,
+            genesis_hash: hex::decode("853faffbfc6713c1f899bf16547fcfbf733ae8361b8ca0129699d01d4f2181fd").expect("known value").try_into().expect("known value"),
             logo: String::from("rococo"),
             name: String::from("rococo"),
             order: 3,
@@ -51,12 +54,12 @@ pub fn get_default_chainspecs() -> Vec<ChainSpecs> {
             secondary_color: String::from("#262626"),
             title: String::from("Rococo"),
             unit: String::from("ROC"),
-            verifier: Verifier::None,
     	},
         ChainSpecs {
             base58prefix: 42,
             color: String::from("#660D35"),
             decimals: 12,
+            encryption: Encryption::Sr25519,
             genesis_hash: hex::decode("e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e").expect("known value").try_into().expect("known value"),
             logo: String::from("westend"),
             name: String::from("westend"),
@@ -65,9 +68,21 @@ pub fn get_default_chainspecs() -> Vec<ChainSpecs> {
             secondary_color: String::from("#262626"),
             title: String::from("Westend"),
             unit: String::from("WND"),
-            verifier: Verifier::None,
         },
     ]
+}
+
+pub fn get_default_verifiers() -> Vec<VerifierInfo> {
+    let specs = get_default_chainspecs();
+    let mut verifier_info_set: Vec<VerifierInfo> = Vec::new();
+    for x in specs.iter() {
+        let new = VerifierInfo {
+            key: generate_verifier_key(&x.genesis_hash.to_vec()),
+            verifier: Verifier::None,
+        };
+        verifier_info_set.push(new);
+    }
+    verifier_info_set
 }
 
 
@@ -80,6 +95,7 @@ pub fn get_default_chainspecs_to_send() -> Vec<ChainSpecsToSend> {
             base58prefix: x.base58prefix,
             color: x.color.to_string(),
             decimals: x.decimals,
+            encryption: x.encryption,
             genesis_hash: x.genesis_hash,
             logo: x.logo.to_string(),
             name: x.name.to_string(),
@@ -106,7 +122,7 @@ lazy_static! {
     static ref REG_TYPES: Regex = Regex::new(r#"(?m)(pub )?type (?P<name>.*) = (?P<description>.*);$"#).expect("checked construction");
 }
 
-pub fn get_default_types() -> Result<Vec<TypeEntry>, String> {
+pub fn get_default_types() -> Result<ContentLoadTypes, String> {
     
     let filename = "../definitions/data/full_types_information";
     let type_info = match fs::read_to_string(filename) {
@@ -200,7 +216,7 @@ pub fn get_default_types() -> Result<Vec<TypeEntry>, String> {
         types_prep.push(new_entry);
     }
     
-    Ok(types_prep)
+    Ok(ContentLoadTypes::generate(&types_prep))
 }
 
 
@@ -210,21 +226,31 @@ pub fn get_default_address_book() -> Vec<AddressBookEntry> {
             name: String::from("kusama"),
             genesis_hash: hex::decode("b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe").expect("known value").try_into().expect("known value"),
             address: String::from("wss://kusama-rpc.polkadot.io"),
+            encryption: Encryption::Sr25519,
+            def: true,
         },
         AddressBookEntry {
             name: String::from("polkadot"),
             genesis_hash: hex::decode("91b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3").expect("known value").try_into().expect("known value"),
             address: String::from("wss://rpc.polkadot.io"),
+            encryption: Encryption::Sr25519,
+            def: true,
         },
         AddressBookEntry {
             name: String::from("rococo"),
-            genesis_hash: hex::decode("e7c3d5edde7db964317cd9b51a3a059d7cd99f81bdbce14990047354334c9779").expect("known value").try_into().expect("known value"),
+            genesis_hash: hex::decode("853faffbfc6713c1f899bf16547fcfbf733ae8361b8ca0129699d01d4f2181fd").expect("known value").try_into().expect("known value"),
+            // previous value: "f9ab3847dec02d434b38c057756d0cb19e5ec5c307419634938c397b1346eb41" changed 2021-09-16
+            // previous value: "e7c3d5edde7db964317cd9b51a3a059d7cd99f81bdbce14990047354334c9779" changed 2021-09-06
             address: String::from("wss://rococo-rpc.polkadot.io"),
+            encryption: Encryption::Sr25519,
+            def: true,
         },
         AddressBookEntry {
             name: String::from("westend"),
             genesis_hash: hex::decode("e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e").expect("known value").try_into().expect("known value"),
             address: String::from("wss://westend-rpc.polkadot.io"),
+            encryption: Encryption::Sr25519,
+            def: true,
         },
     ]
 }
