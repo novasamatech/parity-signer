@@ -18,7 +18,7 @@ mod load_types;
 mod method;
 mod parse_transaction;
     use parse_transaction::parse_transaction;
-mod test_all_cards;
+pub mod test_all_cards;
     use test_all_cards::make_all_cards;
 mod tests;
 mod utils;
