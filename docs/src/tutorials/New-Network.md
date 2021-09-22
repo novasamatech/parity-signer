@@ -30,4 +30,4 @@ Please note that as network develops, its metadata will change over time. New me
 
 This is an advanced operation that should only be performed by experienced users on trusted machine. Remember, that any inaccuracy in network specifications or metadata may lead to serious security threat, loss of funds and/or general account access!
 
-[Update generator instructions](../../../rust/generate_message/readme.md)
+Please follow readme in `rust/generate_message` crate
