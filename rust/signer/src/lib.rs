@@ -24,7 +24,6 @@ use transaction_signing;
 use qr_reader_phone;
 
 mod export;
-mod result;
 
 export! {
 	@Java_io_parity_signer_models_SignerDataModel_substrateExportPubkey
@@ -106,12 +105,7 @@ export! {
 		genesis_hash: &str,
         dbname: &str
 	) -> anyhow::Result<String, anyhow::Error> {
-        let spec = db_handling::chainspecs::get_network(dbname, genesis_hash)?;
-        Ok(String::from(format!("{{\"color\":\"{}\",\"logo\":\"{}\",\"secondaryColor\":\"{}\",\"title\":\"{}\"}}",
-            spec.color, 
-            spec.logo,
-            spec.secondary_color,
-            spec.title)))
+        db_handling::chainspecs::print_network(dbname, genesis_hash)
     }
 
     @Java_io_parity_signer_models_SignerDataModel_dbGetAllNetworksForNetworkSelector
