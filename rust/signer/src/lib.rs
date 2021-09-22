@@ -118,19 +118,7 @@ export! {
 	fn get_all_networks_for_network_selector(
         dbname: &str
     ) -> anyhow::Result<String, anyhow::Error> {
-        let specs = db_handling::chainspecs::get_all_networks(dbname)?;
-        //TODO: gentler formatting, or serde-json?
-        let mut output = "[".to_owned();
-        for spec in specs {
-            output.push_str(&format!("{{\"key\":\"{}\",\"color\":\"{}\",\"logo\":\"{}\",\"order\":\"{}\",\"secondaryColor\":\"{}\",\"title\":\"{}\"}},",
-                hex::encode(spec.genesis_hash),
-                spec.color, 
-                spec.logo, 
-                spec.order,
-                spec.secondary_color,
-                spec.title))
-        }
-        result::return_json_array(output)
+        db_handling::chainspecs::print_all_networks(dbname)
     }
 
     @Java_io_parity_signer_models_SignerDataModel_dbGetRelevantIdentities
