@@ -1,0 +1,28 @@
+[package]
+name = "transaction_parsing"
+version = "0.1.0"
+authors = ["vera"]
+edition = "2018"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+base58 = "0.1.0"
+hex = "0.4.3"
+parity-scale-codec = "2.1.1"
+parity-scale-codec-derive = "2.1.0"
+serde = { version = "1.0", features = ["derive"] }
+regex = "1.4.5"
+blake2-rfc = "0.2.18"
+frame-metadata = "13.0.0"
+serde_json = "1.0.64"
+meta_reading = {path = "../meta_reading"}
+printing_balance = {path = "../printing_balance"}
+definitions = {path = "../definitions"}
+db_handling = {path = "../db_handling"}
+sled = "0.34.6"
+bitvec = "0.20.4"
+sp-arithmetic = "3.0.0"
+lazy_static = "1.4.0"
+sp-runtime = "3.0.0"
+sp-core = "3.0.0"

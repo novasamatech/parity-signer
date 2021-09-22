@@ -1,57 +1,39 @@
+# .gitlab-ci.yml
+#
+# parity-signer
+#
+# pipelines can be triggered manually in the web
+
 stages:
-  - test
   - build
+
 variables:
-  GIT_DEPTH: "3"
-  SIMPLECOV: "true"
-  RUST_BACKTRACE: "1"
-  RUSTFLAGS: ""
-  CARGOFLAGS: ""
-cache:
-  untracked: true
+  GIT_STRATEGY:                    fetch
+  GIT_DEPTH:                       100
 
+default:
+  cache:                           {}
 
+workflow:
+  rules:
+    - if: $CI_COMMIT_TAG
+    - if: $CI_COMMIT_BRANCH
 
-android-test:
-  stage: test
-  image: parity/android-sdk
-  only:
-    - master
-    - /^[0-9]+$/
-    # testing Android build on this branch
-    - tbaut-without-version
-  script:
-    - curl -sL https://deb.nodesource.com/setup_8.x | bash -
-    - apt-get install -y nodejs
-    - npm install -g yarn
-    - npm install
-    - npm run test
-  tags:
-    - linux-docker
-
-android-build:
-  stage: build
-  image: parity/android-sdk
-  only:
-    - beta
-    - tags
-    - stable
-    - triggers
-    - master
-  script:
-    - curl -sL https://deb.nodesource.com/setup_8.x | bash -
-    - apt-get install -y nodejs
-    - echo "ndk.dir=/usr/local/android-ndk-r16b" > android/local.properties
-    - echo "sdk.dir=/opt/android-sdk" >> android/local.properties
-    - npm install -g yarn
-    - bash ./setup_linux.sh
-    - bash ./gen_key.sh
-    - cd android && ./gradlew assembleRelease
-    - pwd
-    - ls
-  tags:
-    - linux-docker
+android-build-release:
+  stage:                           build
+  image:                           paritytech/parity-signer:latest
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "web"
+    - if: $CI_PIPELINE_SOURCE == "schedule"
+    - if: $CI_COMMIT_REF_NAME == "master"
+    - if: $CI_COMMIT_REF_NAME =~ /^v[0-9]+\.[0-9]+.*$/              # i.e. v1.0, v2.1rc1
+    - if: $CI_COMMIT_REF_NAME =~ /^[0-9]+$/                         # PRs
   artifacts:
     paths:
-    - ./android/app/build/outputs/apk/release/app-release.apk 
-
+      - signer-app-release-signed.apk
+  script:
+    - cat "$KEYSTORE_DATA" | base64 -d > /tmp/gitlab-ci.keystore
+    - wc /tmp/gitlab-ci.keystore
+    - ./scripts/build-release.sh /tmp/gitlab-ci.keystore "$KEYSTORE_ALIAS" "$KEYSTORE_PASS"
+  tags:
+    - linux-docker

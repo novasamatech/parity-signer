@@ -1,0 +1,1196 @@
+// from pallet_im_online::Heartbeat
+pub struct Heartbeat<T::BlockNumber> {
+    pub block_number: BlockNumber,
+    pub network_state: OpaqueNetworkState,
+    pub session_index: SessionIndex,
+    pub authority_index: AuthIndex,
+    pub validators_len: u32,
+}
+
+// from node_primitives::BlockNumber
+type BlockNumber = u32;
+type T::BlockNumber = u32;
+
+// from sp_core::offchain::OpaqueNetworkState
+pub struct OpaqueNetworkState {
+    pub peer_id: OpaquePeerId,
+    pub external_addresses: Vec<OpaqueMultiaddr>,
+}
+
+// from sp_core::OpaquePeerId
+pub struct OpaquePeerId(pub Vec<u8>);
+
+// from sp_core::offchain::OpaqueMultiaddr
+pub struct OpaqueMultiaddr(pub Vec<u8>);
+
+// from sp_staking::SessionIndex
+type SessionIndex = u32;
+
+// from pallet_im_online::AuthIndex
+type AuthIndex = u32;
+
+// from pallet_identity::IdentityInfo
+pub struct IdentityInfo {
+    pub additional: Vec<(Data, Data)>,
+    pub display: Data,
+    pub legal: Data,
+    pub web: Data,
+    pub riot: Data,
+    pub email: Data,
+    pub pgp_fingerprint: Option<[u8; 20]>,
+    pub image: Data,
+    pub twitter: Data,
+}
+
+// from pallet_identity::Data
+pub enum Data {
+    None,
+    Raw(Vec<u8>),
+    BlakeTwo256([u8; 32]),
+    Sha256([u8; 32]),
+    Keccak256([u8; 32]),
+    ShaThree256([u8; 32]),
+}
+
+// from js documentation, api/packages/types-known/src/spec/centrifuge-chain.ts
+type chainbridge::ChainId = u8;
+
+// from js documentation, api/packages/types/src/interfaces/parachains/types.ts
+type ValidationCode = Vec<u8>;
+
+// from js documentation, api/packages/types-known/src/spec/centrifuge-chain.ts
+type DepositNonce = u64;
+
+// from js documentation, api/packages/types/src/interfaces/parachains/types.ts
+pub struct HrmpChannelId {
+    pub sender: u32,
+    pub receiver: u32,
+}
+
+// from node_primitives::Balance
+// TODO check BalanceOf
+type T::Balance = u128;
+type Balance = u128;
+type BalanceOf<T> = u128;
+type BalanceOf<T, I> = u128;
+
+// from js documentation, api/packages/types/src/generic/AccountId.ts
+type T::AccountId = [u8; 32];
+type AccountId = [u8; 32];
+
+// from js documentation, api/packages/types/src/interfaces/claims/types.ts, MODIFIED
+// TODO check
+pub enum StatementKind {
+    Regular,
+    Saft,
+}
+
+// from pallet_identity::IdentityFields
+// TODO implement bitflags
+pub struct IdentityFields(BitFlags<IdentityField>);
+
+// from pallet_identity::IdentityField
+pub enum IdentityField {
+    Display,
+    Legal,
+    Web,
+    Riot,
+    Email,
+    PgpFingerprint,
+    Image,
+    Twitter,
+}
+
+// from sp_runtime::MultiSigner
+pub enum MultiSigner {
+    Ed25519(ed25519::Public),
+    Sr25519(sr25519::Public),
+    Ecdsa(ecdsa::Public),
+}
+
+// from sp_core::ed25519::Public
+pub struct ed25519::Public(pub [u8; 32]);
+
+// from sp_runtime::testing::sr25519::Public
+pub struct sr25519::Public(pub [u8; 32]);
+
+// from sp_core::ecdsa::Public
+pub struct ecdsa::Public([u8; 33]);
+
+// from sp_core::ChangesTrieConfiguration
+pub struct ChangesTrieConfiguration {
+    pub digest_interval: u32,
+    pub digest_levels: u32,
+}
+
+// from pallet_democracy::PropIndex
+type PropIndex = u32;
+
+// from pallet_democracy::ReferendumIndex
+type ReferendumIndex = u32;
+
+// from sc_consensus_babe::NextConfigDescriptor
+pub enum NextConfigDescriptor {
+    V1,
+}
+
+// from sc_consensus_babe::NextConfigDescriptor
+pub struct V1 {
+    pub c: (u64, u64),
+    pub allowed_slots: AllowedSlots,
+}
+
+// from sp_consensus_babe::AllowedSlots
+pub enum AllowedSlots {
+    PrimarySlots,
+    PrimaryAndSecondaryPlainSlots,
+    PrimaryAndSecondaryVRFSlots,
+}
+
+// from frame_support::weights::Weight
+type Weight = u64;
+
+// from pallet_contracts::Gas
+type Gas = Weight;
+
+// from pallet_identity::Judgement
+pub enum Judgement<BalanceOf<T>> {
+    Unknown,
+    FeePaid(Balance),
+    Reasonable,
+    KnownGood,
+    OutOfDate,
+    LowQuality,
+    Erroneous,
+}
+
+// TODO something with CompactAssignment here!!!
+// from js documentation, api/packages/types/src/interfaces/staking/types.ts
+
+type CompactAssignments = CompactAssignmentsWith24;
+
+// from js documentation, api/packages/types/src/interfaces/staking/types.ts
+pub struct CompactAssignmentsWith24 {
+    votes1: Vec<(NominatorIndexCompact, ValidatorIndexCompact)>,
+    votes2: Vec<(NominatorIndexCompact, CompactScoreCompact, ValidatorIndexCompact)>,
+    votes3: Vec<(NominatorIndexCompact, Vec<CompactScoreCompact>, ValidatorIndexCompact)>,
+    votes4: Vec<(NominatorIndexCompact, Vec<CompactScoreCompact>, ValidatorIndexCompact)>,
+    votes5: Vec<(NominatorIndexCompact, Vec<CompactScoreCompact>, ValidatorIndexCompact)>,
+    votes6: Vec<(NominatorIndexCompact, Vec<CompactScoreCompact>, ValidatorIndexCompact)>,
+    votes7: Vec<(NominatorIndexCompact, Vec<CompactScoreCompact>, ValidatorIndexCompact)>,
+    votes8: Vec<(NominatorIndexCompact, Vec<CompactScoreCompact>, ValidatorIndexCompact)>,
+    votes9: Vec<(NominatorIndexCompact, Vec<CompactScoreCompact>, ValidatorIndexCompact)>,
+    votes10: Vec<(NominatorIndexCompact, Vec<CompactScoreCompact>, ValidatorIndexCompact)>,
+    votes11: Vec<(NominatorIndexCompact, Vec<CompactScoreCompact>, ValidatorIndexCompact)>,
+    votes12: Vec<(NominatorIndexCompact, Vec<CompactScoreCompact>, ValidatorIndexCompact)>,
+    votes13: Vec<(NominatorIndexCompact, Vec<CompactScoreCompact>, ValidatorIndexCompact)>,
+    votes14: Vec<(NominatorIndexCompact, Vec<CompactScoreCompact>, ValidatorIndexCompact)>,
+    votes15: Vec<(NominatorIndexCompact, Vec<CompactScoreCompact>, ValidatorIndexCompact)>,
+    votes16: Vec<(NominatorIndexCompact, Vec<CompactScoreCompact>, ValidatorIndexCompact)>,
+    votes17: Vec<(NominatorIndexCompact, Vec<CompactScoreCompact>, ValidatorIndexCompact)>,
+    votes18: Vec<(NominatorIndexCompact, Vec<CompactScoreCompact>, ValidatorIndexCompact)>,
+    votes19: Vec<(NominatorIndexCompact, Vec<CompactScoreCompact>, ValidatorIndexCompact)>,
+    votes20: Vec<(NominatorIndexCompact, Vec<CompactScoreCompact>, ValidatorIndexCompact)>,
+    votes21: Vec<(NominatorIndexCompact, Vec<CompactScoreCompact>, ValidatorIndexCompact)>,
+    votes22: Vec<(NominatorIndexCompact, Vec<CompactScoreCompact>, ValidatorIndexCompact)>,
+    votes23: Vec<(NominatorIndexCompact, Vec<CompactScoreCompact>, ValidatorIndexCompact)>,
+    votes24: Vec<(NominatorIndexCompact, Vec<CompactScoreCompact>, ValidatorIndexCompact)>,
+}
+
+// from js documentation, api/packages/types/src/interfaces/staking/types.ts
+type NominatorIndexCompact = Compact<NominatorIndex>;
+
+// from js documentation, api/packages/types/src/interfaces/staking/types.ts
+type CompactScoreCompact = (ValidatorIndexCompact, OffchainAccuracyCompact);
+
+// from js documentation, api/packages/types/src/interfaces/staking/types.ts
+type ValidatorIndexCompact = Compact<ValidatorIndex>;
+
+// from js documentation, api/packages/types/src/interfaces/staking/types.ts
+type OffchainAccuracyCompact = Compact<OffchainAccuracy>;
+
+// from js documentation, api/packages/types/src/interfaces/staking/types.ts
+type OffchainAccuracy = PerU16;
+
+// from sp_npos_elections::ElectionScore
+type ElectionScore = [ExtendedBalance; 3];
+
+// from sp_npos_elections::ExtendedBalance
+type ExtendedBalance = u128;
+
+// from js documentation, api/packages/types/src/interfaces/xcm/types.ts, MODIFIED
+// TODO check
+pub enum xcm::opaque::VersionedXcm {
+    V0(Xcm)
+}
+
+// from node_primitives::AccountIndex
+type T::AccountIndex = u32;
+type AccountIndex = u32;
+
+// from sp_runtime::MultiSignature
+pub enum MultiSignature {
+    Ed25519(ed25519::Signature),
+    Sr25519(sr25519::Signature),
+    Ecdsa(ecdsa::Signature),
+}
+
+// from sp_core::ed25519::Signature
+pub struct ed25519::Signature(pub [u8; 64]);
+
+// from sp_runtime::testing::sr25519::Signature
+pub struct sr25519::Signature(pub [u8; 64]);
+
+// from sp_core::ecdsa::Signature
+pub struct ecdsa::Signature([u8; 65]);
+
+// no other ecdsa signature there
+type EcdsaSignature = ecdsa::Signature;
+
+// from pallet_staking::RewardDestination
+pub enum RewardDestination<T::AccountId> {
+    Staked,
+    Stash,
+    Controller,
+    Account(AccountId),
+}
+
+// from js documentation, api/packages/types/src/interfaces/xcm/types.ts, MODIFIED
+// TODO check
+pub enum MultiAsset {
+    None,
+    All,
+    AllFungible,
+    AllNonFungible,
+    AllAbstractFungible(Vec<u8>),
+    AllAbstractNonFungible(Vec<u8>),
+    AllConcreteFungible(MultiLocation),
+    AllConcreteNonFungible(MultiLocation),
+    AbstractFungible(MultiAssetAbstractFungible),
+    AbstractNonFungible(MultiAssetAbstractNonFungible),
+    ConcreteFungible(MultiAssetConcreteFungible),
+    ConcreteNonFungible(MultiAssetConcreteNonFungible),
+}
+
+// from js documentation, api/packages/types/src/interfaces/xcm/types.ts, MODIFIED
+// TODO check
+pub enum MultiLocation {
+    Null,
+    X1(Junction),
+    X2((Junction, Junction)),
+    X3((Junction, Junction, Junction)),
+    X4((Junction, Junction, Junction, Junction)),
+    X5((Junction, Junction, Junction, Junction, Junction)),
+    X6((Junction, Junction, Junction, Junction, Junction, Junction)),
+    X7((Junction, Junction, Junction, Junction, Junction, Junction, Junction)),
+    X8((Junction, Junction, Junction, Junction, Junction, Junction, Junction, Junction)),
+}
+
+// from js documentation, api/packages/types/src/interfaces/xcm/types.ts, MODIFIED
+// TODO check
+pub enum Junction {
+    Parent,
+    Parachain(Compact<u32>),
+    AccountId32(AccountId32Junction),
+    AccountIndex64(AccountIndex64Junction),
+    AccountKey20(AccountKey20Junction),
+    PalletInstance(u8),
+    GeneralIndex(Compact<u128>),
+    GeneralKey(Vec<u8>),
+    OnlyChild,
+    Plurality(PluralityJunction),
+}
+
+// from js documentation, api/packages/types/src/interfaces/xcm/types.ts
+pub struct AccountId32Junction {
+    pub network: NetworkId,
+    pub id: AccountId,
+}
+
+// from js documentation, api/packages/types/src/interfaces/xcm/types.ts, MODIFIED
+// TODO check
+pub enum NetworkId {
+    Any,
+    Named(Vec<u8>),
+    Polkadot,
+    Kusama,
+}
+
+// from js documentation, api/packages/types/src/interfaces/xcm/types.ts
+pub struct AccountIndex64Junction {
+    pub network: NetworkId,
+    pub index: Compact<u64>,
+}
+
+// from js documentation, api/packages/types/src/interfaces/xcm/types.ts
+pub struct AccountKey20Junction {
+    pub network: NetworkId,
+    pub index: [u8; 20],
+}
+
+// from js documentation, api/packages/types/src/interfaces/xcm/types.ts
+pub struct PluralityJunction {
+    id: BodyId,
+    part: BodyPart,
+}
+
+// from js documentation, api/packages/types/src/interfaces/xcm/types.ts, MODIFIED
+// TODO check
+pub enum BodyId {
+    Unit,
+    Named(Vec<u8>),
+    Index(Compact<u32>),
+    Executive,
+    Technical,
+    Legislative,
+    Judicial,
+}
+
+// from js documentation, api/packages/types/src/interfaces/xcm/types.ts, MODIFIED
+// TODO check
+pub enum BodyPart {
+    Voice,
+    Members(Compact<u32>),
+    Fraction(BodyPartFraction),
+    AtLeastProportion(BodyPartAtLeastProportion),
+    MoreThanProportion(BodyPartMoreThanProportion),
+}
+
+// from js documentation, api/packages/types/src/interfaces/xcm/types.ts
+pub struct BodyPartFraction {
+    pub nom: Compact<u32>,
+    pub denom: Compact<u32>,
+}
+
+// from js documentation, api/packages/types/src/interfaces/xcm/types.ts
+pub struct BodyPartAtLeastProportion {
+    pub nom: Compact<u32>,
+    pub denom: Compact<u32>,
+}
+
+// from js documentation, api/packages/types/src/interfaces/xcm/types.ts
+pub struct BodyPartMoreThanProportion {
+    pub nom: Compact<u32>,
+    pub denom: Compact<u32>,
+}
+
+// from js documentation, api/packages/types/src/interfaces/xcm/types.ts
+pub struct MultiAssetAbstractFungible {
+    pub id: Vec<u8>,
+    pub instance: Compact<u128>,
+}
+
+// from js documentation, api/packages/types/src/interfaces/xcm/types.ts
+pub struct MultiAssetAbstractNonFungible {
+    pub class: Vec<u8>,
+    pub instance: AssetInstance,
+}
+
+// from js documentation, api/packages/types/src/interfaces/xcm/types.ts, MODIFIED
+// TODO check
+pub enum AssetInstance {
+    Undefined,
+    Index8(u8),
+    Index16(Compact<u16>),
+    Index32(Compact<u32>),
+    Index64(Compact<u64>),
+    Index128(Compact<u128>),
+    Array4([u8; 4]),
+    Array8([u8; 8]),
+    Array16([u8; 16]),
+    Array32([u8; 32]),
+    Blob(Vec<u8>),
+}
+
+// from js documentation, api/packages/types/src/interfaces/xcm/types.ts
+pub struct MultiAssetConcreteFungible {
+    pub id: MultiLocation,
+    pub amount: Compact<u128>,
+}
+
+// from js documentation, api/packages/types/src/interfaces/xcm/types.ts
+pub struct MultiAssetConcreteNonFungible {
+    pub class: MultiLocation,
+    pub instance: AssetInstance,
+}
+
+// from pallet_collective::MemberCount
+type MemberCount = u32;
+
+// from js documentation, api/packages/types/src/interfaces/grandpa/types.ts
+type KeyOwnerProof = MembershipProof;
+type T::KeyOwnerProof = MembershipProof;
+
+// from sp_session::MembershipProof
+pub struct MembershipProof {
+    pub session: SessionIndex,
+    pub trie_nodes: Vec<Vec<u8>>,
+    pub validator_count: ValidatorCount,
+}
+
+// from sp_session::ValidatorCount
+type ValidatorCount = u32;
+
+// from node_runtime::ProxyType
+pub enum ProxyType {
+    Any,
+    NonTransfer,
+    Governance,
+    Staking,
+}
+
+pub enum T::ProxyType {
+    Any,
+    NonTransfer,
+    Governance,
+    Staking,
+}
+
+// from js documentation, api/packages/types/src/interfaces/staking/types.ts
+// TODO sort this: ElectionScore in js docs "extends Vec<128>", whereas known ElectionScore is [u128; 3]
+pub struct RawSolution {
+    pub compact: CompactAssignments,
+    pub score: ElectionScore,
+    pub round: u32,
+}
+
+// from js documentation, api/packages/types-known/src/spec/centrifuge-chain.ts
+type ChainId = u8;
+
+// from ethereum_types::Address
+type EthereumAddress = H160;
+
+// from ethereum_types::H160
+pub struct H160(pub [u8; 20]);
+
+// from js documentation, api/packages/types-known/src/spec/centrifuge-chain.ts
+type ResourceId = [u8, 32];
+
+// from node_primitives::Moment
+type Moment = u64;
+type T::Moment = u64;
+
+// from pallet_multisig::Timepoint
+pub struct Timepoint<T::BlockNumber> {
+    height: BlockNumber,
+    index: u32,
+}
+
+// from js documentation, api/packages/types/src/interfaces/xcm/types.ts, MODIFIED
+// TODO check
+pub enum Xcm {
+    WithdrawAsset(XcmWithdrawAsset),
+    ReserveAssetDeposit(XcmReserveAssetDeposit),
+    TeleportAsset(XcmTeleportAsset),
+    QueryResponse(XcmQueryResponse),
+    TransferAsset(XcmTransferAsset),
+    TransferReserveAsset(XcmTransferReserveAsset),
+    Transact(XcmTransact),
+    HrmpNewChannelOpenRequest(XcmHrmpNewChannelOpenRequest),
+    HrmpChannelAccepted(XcmHrmpChannelAccepted),
+    HrmpChannelClosing(XcmHrmpChannelClosing),
+    RelayedFrom(XcmRelayedFrom),
+}
+
+// likely so
+// TODO check
+type Xcm<()> = Xcm;
+type Box<Xcm<T::Call>> = Xcm;
+
+// from js documentation, api/packages/types/src/interfaces/xcm/types.ts
+type XcmWithdrawAsset = XcmAssetEffects;
+
+// from js documentation, api/packages/types/src/interfaces/xcm/types.ts
+pub struct XcmAssetEffects {
+    pub assets: Vec<MultiAsset>,
+    pub effects: Vec<XcmOrder>,
+}
+
+// from js documentation, api/packages/types/src/interfaces/xcm/types.ts, MODIFIED
+// TODO check
+pub enum XcmOrder {
+    Null,
+    DepositAsset(XcmOrderDepositAsset),
+    DepositReserveAsset(XcmOrderDepositReserveAsset),
+    ExchangeAsset(XcmOrderExchangeAsset),
+    InitiateReserveWithdraw(XcmOrderInitiateReserveWithdraw),
+    InitiateTeleport(XcmOrderInitiateTeleport),
+    QueryHolding(XcmOrderQueryHolding),
+    BuyExecution(XcmOrderBuyExecution),
+}
+
+// from js documentation, api/packages/types/src/interfaces/xcm/types.ts
+pub struct XcmOrderDepositAsset {
+    pub assets: Vec<MultiAsset>,
+    pub dest: MultiLocation,
+}
+
+// from js documentation, api/packages/types/src/interfaces/xcm/types.ts
+pub struct XcmOrderDepositReserveAsset {
+    pub assets: Vec<MultiAsset>,
+    pub dest: MultiLocation,
+    pub effects: Vec<XcmOrder>,
+}
+
+// from js documentation, api/packages/types/src/interfaces/xcm/types.ts
+pub struct XcmOrderExchangeAsset {
+    pub give: Vec<MultiAsset>,
+    pub receive: Vec<MultiAsset>,
+}
+
+// from js documentation, api/packages/types/src/interfaces/xcm/types.ts
+pub struct XcmOrderInitiateReserveWithdraw {
+    pub assets: Vec<MultiAsset>,
+    pub reserve: MultiLocation,
+    pub effects: Vec<XcmOrder>,
+}
+
+// from js documentation, api/packages/types/src/interfaces/xcm/types.ts
+pub struct XcmOrderInitiateTeleport {
+    pub assets: Vec<MultiAsset>,
+    pub dest: MultiLocation,
+    pub effects: Vec<XcmOrder>,
+}
+
+// from js documentation, api/packages/types/src/interfaces/xcm/types.ts
+pub struct XcmOrderQueryHolding {
+    pub queryId: Compact<u64>,
+    pub dest: MultiLocation,
+    pub assets: Vec<MultiAsset>,
+}
+
+// from js documentation, api/packages/types/src/interfaces/xcm/types.ts
+pub struct XcmOrderBuyExecution {
+    pub fees: MultiAsset,
+    pub weight: u64,
+    pub debt: u64,
+    pub haltOnError: bool,
+    pub xcm: Vec<Xcm>,
+}
+
+// from js documentation, api/packages/types/src/interfaces/xcm/types.ts
+type XcmReserveAssetDeposit = XcmAssetEffects;
+
+// from js documentation, api/packages/types/src/interfaces/xcm/types.ts
+type XcmTeleportAsset = XcmAssetEffects;
+
+// from js documentation, api/packages/types/src/interfaces/xcm/types.ts
+pub struct XcmQueryResponse {
+    pub queryId: Compact<u64>,
+    pub response: XcmResponse,
+}
+
+// from js documentation, api/packages/types/src/interfaces/xcm/types.ts, MODIFIED
+// TODO check
+pub enum XcmResponse {
+    Assets(Vec<MultiAsset>),
+}
+
+// from js documentation, api/packages/types/src/interfaces/xcm/types.ts
+pub struct XcmTransferAsset {
+    pub assets: Vec<MultiAsset>,
+    pub dest: MultiLocation,
+}
+
+// from js documentation, api/packages/types/src/interfaces/xcm/types.ts
+pub struct XcmTransferReserveAsset {
+    pub assets: Vec<MultiAsset>,
+    pub dest: MultiLocation,
+    pub effects: Vec<XcmOrder>,
+}
+
+// from js documentation, api/packages/types/src/interfaces/xcm/types.ts
+pub struct XcmTransact {
+    pub originType: XcmOriginKind,
+    pub requireWeightAtMost: u64,
+    pub call: DoubleEncodedCall,
+}
+
+// from js documentation, api/packages/types/src/interfaces/xcm/types.ts, MODIFIED
+// TODO check
+pub enum XcmOriginKind {
+    Native,
+    SovereignAccount,
+    Superuser,
+    Xcm,
+}
+
+// from js documentation, api/packages/types/src/interfaces/xcm/types.ts
+pub struct DoubleEncodedCall {
+    pub encoded: Vec<u8>,
+}
+
+// from js documentation, api/packages/types/src/interfaces/xcm/types.ts
+pub struct XcmHrmpNewChannelOpenRequest {
+    pub sender: Compact<u32>,
+    pub maxMessageSize: Compact<u32>,
+    pub maxCapacity: Compact<u32>,
+}
+
+// from js documentation, api/packages/types/src/interfaces/xcm/types.ts
+pub struct XcmHrmpChannelAccepted {
+    pub recipient: Compact<u32>,
+}
+
+// from js documentation, api/packages/types/src/interfaces/xcm/types.ts
+pub struct XcmHrmpChannelClosing {
+    pub initiator: Compact<u32>,
+    pub sender: Compact<u32>,
+    pub recipient: Compact<u32>,
+}
+
+// from js documentation, api/packages/types/src/interfaces/xcm/types.ts
+pub struct XcmRelayedFrom {
+    pub who: MultiLocation,
+    pub message: Xcm,
+}
+
+// from pallet_staking::EraIndex
+type EraIndex = u32;
+
+// from sp_finality_grandpa::EquivocationProof
+pub struct EquivocationProof<T::Hash, T::BlockNumber> {
+    set_id: SetId,
+    equivocation: Equivocation<T::Hash, T::BlockNumber>,
+}
+
+// sp_finality_grandpa::SetId
+type SetId = u64;
+
+// from sp_finality_grandpa::Equivocation, modified
+pub enum Equivocation<T::Hash, T::BlockNumber> {
+    Prevote(EquivocationPrevote),
+    Precommit(EquivocationPrecommit),
+}
+
+// ed25519 part found in src for sp_finality_grandpa::Equivocation
+type AuthorityId = ed25519::Public;
+
+// ed25519 part found in src for sp_finality_grandpa::Equivocation
+type AuthoritySignature = ed25519::Signature;
+
+// from finality_grandpa::Prevote
+pub struct Prevote<T::Hash, T::BlockNumber> {
+    pub target_hash: Hash,
+    pub target_number: Blocknumber,
+}
+
+// from finality_grandpa::Precommit
+pub struct Precommit<T::Hash, T::BlockNumber> {
+    pub target_hash: Hash,
+    pub target_number: BlockNumber,
+}
+
+// from finality_grandpa::Equivocation, modified
+pub struct EquivocationPrevote {
+    pub round_number: u64,
+    pub identity: AuthorityId,
+    pub first: (Prevote<T::Hash, T::BlockNumber>, AuthoritySignature),
+    pub second: (Prevote<T::Hash, T::BlockNumber>, AuthoritySignature),
+}
+
+// from finality_grandpa::Equivocation, modified
+pub struct EquivocationPrecommit {
+    pub round_number: u64,
+    pub identity: AuthorityId,
+    pub first: (Precommit<T::Hash, T::BlockNumber>, AuthoritySignature),
+    pub second: (Precommit<T::Hash, T::BlockNumber>, AuthoritySignature),
+}
+
+// from pallet_staking::ValidatorPrefs
+pub struct ValidatorPrefs {
+    pub commission: Perbill,
+    pub blocked: bool,
+}
+
+// in pallet_contracts::CodeHash described as <T as Config>::Hash;
+type CodeHash<T> = Hash;
+
+// from substrate_test_runtime::Hash
+type Hash = H256;
+type T::Hash = H256;
+
+// from substrate_test_runtime::H256
+pub struct H256 (pub [u8; 32]);
+
+// from js documentation, api/packages/types/src/interfaces/parachains/types.ts
+pub struct ParaGenesisArgs {
+    pub genesisHead: Vec<u8>,
+    pub validationCode: Vec<u8>,
+    pub parachain: bool,
+}
+
+// from pallet_elections_phragmen::Renouncing
+pub enum Renouncing {
+    Member,
+    RunnerUp,
+    Candidate(u32),
+}
+
+// from pallet_staking::ElectionSize
+pub struct ElectionSize {
+    pub validators: ValidatorIndex,
+    pub nominators: NominatorIndex,
+}
+
+// from pallet_staking::ValidatorIndex
+type ValidatorIndex = u16;
+
+// from pallet_staking::NominatorIndex
+type NominatorIndex = u32;
+
+// from js documentation, api/packages/types/src/interfaces/parachains/types.ts
+type HeadData = Vec<u8>;
+
+// from frame_system::KeyValue
+type KeyValue = (Vec<u8>, Vec<u8>);
+
+// from js documentation, api/packages/types/src/interfaces/runtime/types.ts
+type ValidatorId = AccountId;
+type T::ValidatorId = AccountId;
+
+// from frame_system::Key
+type Key = Vec<u8>;
+
+// from js documentation, api/packages/types/src/interfaces/session/types.ts
+type T::Keys = (AccountId, AccountId, AccountId, AccountId);
+
+// from pallet_vesting::VestingInfo
+pub struct VestingInfo<BalanceOf<T>, T::BlockNumber> {
+    pub locked: Balance,
+    pub per_block: Balance,
+    pub starting_block: BlockNumber,
+}
+
+// from js documentation, api/packages/types/src/interfaces/parachains/types.ts
+type AuctionIndex = u32;
+
+// from js documentation, type eventually extends to GenericMultiAddress, api/packages/types/src/generic/MultiAddress.ts
+pub enum <T::Lookup as StaticLookup>::Source {
+    Id(AccountId),
+    Index(Compact<AccountIndex>),
+    Raw(Vec<u8>),
+    Address32(H256),
+    Address20(H160),
+}
+
+// from pallet_identity::RegistrarIndex
+type RegistrarIndex = u32;
+
+// from js documentation, api/packages/types/src/interfaces/parachains/types.ts, modified (vectors instead of custom types extending to vectors)
+pub struct ParachainsInherentData<T::Header> {
+    pub bitfields: Vec<SignedAvailabilityBitfield>,
+    pub backedCandidates: Vec<BackedCandidate>,
+    pub disputes: Vec<DisputeStatementSet>,
+    pub parentHeader: Header,
+}
+
+// from js documentation, api/packages/types/src/interfaces/parachains/types.ts
+pub struct SignedAvailabilityBitfield {
+    pub payload: BitVec,
+    pub validatorIndex: ParaValidatorIndex,
+    pub signature: ValidatorSignature,
+}
+
+// from js documentation, api/packages/types/src/interfaces/parachains/types.ts
+type ParaValidatorIndex = u32;
+
+// from js documentation, api/packages/types/src/interfaces/parachains/types.ts
+type ValidatorSignature = Signature;
+
+// from js documentation, api/packages/types/src/interfaces/extrinsics/types.ts
+type Signature = [u8; 64];
+
+// from js documentation, api/packages/types/src/interfaces/parachains/types.ts
+pub struct BackedCandidate {
+    pub candidate: CommittedCandidateReceipt,
+    pub validityVotes: Vec<ValidityAttestation>,
+    pub validatorIndices: BitVec,
+}
+
+// from js documentation, api/packages/types/src/interfaces/parachains/types.ts
+pub struct CommittedCandidateReceipt {
+    pub descriptor: CandidateDescriptor,
+    pub commitments: CandidateCommitments,
+}
+
+// from js documentation, api/packages/types/src/interfaces/parachains/types.ts
+pub struct CandidateDescriptor {
+    pub paraId: ParaId,
+    pub relayParent: RelayChainHash,
+    pub collatorId: CollatorId,
+    pub persistedValidationDataHash: Hash,
+    pub povHash: Hash,
+    pub erasureRoot: Hash,
+    pub signature: CollatorSignature,
+    pub paraHead: Hash,
+    pub validationCodeHash: Hash
+}
+
+// from js documentation, api/packages/types/src/interfaces/parachains/types.ts
+type ParaId = u32;
+
+// from js documentation, api/packages/types/src/interfaces/parachains/types.ts
+type RelayChainHash = RelayHash;
+
+// from js documentation, api/packages/types/src/interfaces/parachains/types.ts
+type RelayHash = Hash;
+
+// from js documentation, api/packages/types/src/interfaces/parachains/types.ts
+type CollatorId = H256;
+
+// from js documentation, api/packages/types/src/interfaces/parachains/types.ts
+type CollatorSignature = Signature;
+
+// from js documentation, api/packages/types/src/interfaces/parachains/types.ts
+pub struct CandidateCommitments {
+    pub upwardMessages: Vec<UpwardMessage>,
+    pub horizontalMessages: Vec<OutboundHrmpMessage>,
+    pub newValidationCode: Option<ValidationCode>,
+    pub headData: HeadData,
+    pub processedDownwardMessages: u32,
+    pub hrmpWatermark: BlockNumber,
+}
+
+// from js documentation, api/packages/types/src/interfaces/parachains/types.ts
+type UpwardMessage = Vec<u8>;
+
+// from js documentation, api/packages/types/src/interfaces/parachains/types.ts
+pub struct OutboundHrmpMessage {
+    pub recipient: u32,
+    pub data: Vec<u8>,
+}
+
+// from js documentation, api/packages/types/src/interfaces/parachains/types.ts, MODIFIED
+// TODO check
+pub enum ValidityAttestation {
+    Never,
+    Implicit(ValidatorSignature),
+    Explicit(ValidatorSignature),
+}
+
+// from js documentation, api/packages/types/src/interfaces/parachains/types.ts
+pub struct DisputeStatementSet {
+    pub candidateHash: CandidateHash,
+    pub session: SessionIndex,
+    pub statements: Vec<(DisputeStatement, ValidatorIndex, ValidatorSignature)>;
+}
+
+// from js documentation, api/packages/types/src/interfaces/parachains/types.ts
+type CandidateHash = Hash;
+
+// from js documentation, api/packages/types/src/interfaces/parachains/types.ts, MODIFIED
+// TODO check
+pub enum DisputeStatement {
+    Valid(ValidDisputeStatementKind),
+    Invalid(InvalidDisputeStatementKind),
+}
+
+// from js documentation, api/packages/types/src/interfaces/parachains/types.ts, MODIFIED
+// TODO check
+pub enum ValidDisputeStatementKind {
+    Explicit,
+    BackingSeconded,
+    BackingValid,
+    ApprovalChecking,
+}
+
+// from js documentation, api/packages/types/src/interfaces/parachains/types.ts, MODIFIED
+// TODO check
+pub enum InvalidDisputeStatementKind {
+    Explicit,
+}
+
+// from sp_runtime::generic::Header, modified to match name
+pub struct Header {
+    pub parent_hash: Hash,
+    pub number: Number,
+    pub state_root: Hash,
+    pub extrinsics_root: Hash,
+    pub digest: Digest<Hash>,
+}
+
+type T::Header = Header;
+
+// according to js documentation api/packages/types/src/interfaces/runtime/types.ts, is Compact<BlockNumber>
+// in sp_runtime::generic::Header is described as "the block number" with traits <Number: Copy + Into<U256> + TryFrom<U256>
+// TODO check
+type Number = Compact<BlockNumber>
+
+// from sp_runtime::generic::Digest
+pub struct Digest<Hash> {
+    pub logs: Vec<DigestItem<Hash>>,
+}
+
+// from sp_runtime::generic::DigestItem
+pub enum DigestItem<Hash> {
+    ChangesTrieRoot(Hash),
+    PreRuntime(ConsensusEngineId, Vec<u8>),
+    Consensus(ConsensusEngineId, Vec<u8>),
+    Seal(ConsensusEngineId, Vec<u8>),
+    ChangesTrieSignal(ChangesTrieSignal),
+    Other(Vec<u8>),
+}
+
+// from sp_runtime::ConsensusEngineId
+type ConsensusEngineId = [u8; 4];
+
+// from sp_runtime::generic::ChangesTrieSignal
+pub enum ChangesTrieSignal {
+    NewConfiguration(Option<ChangesTrieConfiguration>),
+}
+
+// is encountered in pallet imOnline entries only, pallet supports ed25519 and sr25519, both have similar length signatures
+type <T::AuthorityId as RuntimeAppPublic>::Signature = Signature;
+
+// from js documentation, api/packages/types/src/interfaces/staking/types.ts 
+struct SolutionOrSnapshotSize {
+    pub voters: Compact<u32>,
+    pub targets: Compact<u32>,
+}
+
+// from pallet_bounties::BountyIndex
+type BountyIndex = u32;
+
+// from js documentation, api/packages/types/src/interfaces/runtime/types.ts
+type CallHashOf<T> = CallHash;
+
+// from js documentation, api/packages/types/src/interfaces/runtime/types.ts
+type CallHash = Hash;
+
+// from sp_consensus_slots::EquivocationProof
+pub struct EquivocationProof<T::Header> {
+    pub offender: Id,
+    pub slot: Slot,
+    pub first_header: Header,
+    pub second_header: Header,
+}
+
+// from sp_consensus_slots::EquivocationProof
+// TODO check
+type Id = AuthorityId;
+
+// sp_consensus_slots::Slot
+pub struct Slot(u64);
+
+// from pallet_society::Judgement
+pub enum Judgement {
+    Rebid,
+    Reject,
+    Approve,
+}
+
+// from frame_support::traits::schedule::Priority
+type schedule::Priority = u8;
+
+// from frame_support::traits::schedule::Period
+type schedule::Period<T::BlockNumber> = (BlockNumber, u32);
+
+// from pallet_democracy::Conviction
+pub enum Conviction {
+    None,
+    Locked1x,
+    Locked2x,
+    Locked3x,
+    Locked4x,
+    Locked5x,
+    Locked6x,
+}
+
+// from pallet_multisig::OpaqueCall
+type OpaqueCall = Vec<u8>;
+
+// from primitive_types::U256
+pub struct U256(pub [u64; 4]);
+
+// from js documentation, api/packages/types/src/interfaces/parachains/types.ts
+type LeasePeriodOf<T> = BlockNumber;
+
+// from pallet_contracts::Schedule
+pub struct Schedule<T> {
+    pub version: u32,
+    pub enable_println: bool,
+    pub limits: Limits,
+    pub instruction_weights: InstructionWeights<T>,
+    pub host_fn_weights: HostFnWeights<T>,
+}
+
+// from pallet_contracts::Limits
+pub struct Limits {
+    pub event_topics: u32,
+    pub stack_height: u32,
+    pub globals: u32,
+    pub parameters: u32,
+    pub memory_pages: u32,
+    pub table_size: u32,
+    pub br_table_size: u32,
+    pub subject_len: u32,
+    pub code_size: u32,
+}
+
+// from pallet_contracts::InstructionWeights, empty last line "pub _phantom: PhantomData<T>," removed
+pub struct InstructionWeights<T> {
+    pub i64const: u32,
+    pub i64load: u32,
+    pub i64store: u32,
+    pub select: u32,
+    pub if: u32,
+    pub br: u32,
+    pub br_if: u32,
+    pub br_table: u32,
+    pub br_table_per_entry: u32,
+    pub call: u32,
+    pub call_indirect: u32,
+    pub call_indirect_per_param: u32,
+    pub local_get: u32,
+    pub local_set: u32,
+    pub local_tee: u32,
+    pub global_get: u32,
+    pub global_set: u32,
+    pub memory_current: u32,
+    pub memory_grow: u32,
+    pub i64clz: u32,
+    pub i64ctz: u32,
+    pub i64popcnt: u32,
+    pub i64eqz: u32,
+    pub i64extendsi32: u32,
+    pub i64extendui32: u32,
+    pub i32wrapi64: u32,
+    pub i64eq: u32,
+    pub i64ne: u32,
+    pub i64lts: u32,
+    pub i64ltu: u32,
+    pub i64gts: u32,
+    pub i64gtu: u32,
+    pub i64les: u32,
+    pub i64leu: u32,
+    pub i64ges: u32,
+    pub i64geu: u32,
+    pub i64add: u32,
+    pub i64sub: u32,
+    pub i64mul: u32,
+    pub i64divs: u32,
+    pub i64divu: u32,
+    pub i64rems: u32,
+    pub i64remu: u32,
+    pub i64and: u32,
+    pub i64or: u32,
+    pub i64xor: u32,
+    pub i64shl: u32,
+    pub i64shrs: u32,
+    pub i64shru: u32,
+    pub i64rotl: u32,
+    pub i64rotr: u32,
+}
+
+// from pallet_contracts::HostFnWeights, empty last line "pub _phantom: PhantomData<T>," removed
+pub struct HostFnWeights<T> {
+    pub caller: Weight,
+    pub address: Weight,
+    pub gas_left: Weight,
+    pub balance: Weight,
+    pub value_transferred: Weight,
+    pub minimum_balance: Weight,
+    pub tombstone_deposit: Weight,
+    pub rent_allowance: Weight,
+    pub block_number: Weight,
+    pub now: Weight,
+    pub weight_to_fee: Weight,
+    pub gas: Weight,
+    pub input: Weight,
+    pub input_per_byte: Weight,
+    pub return: Weight,
+    pub return_per_byte: Weight,
+    pub terminate: Weight,
+    pub restore_to: Weight,
+    pub restore_to_per_delta: Weight,
+    pub random: Weight,
+    pub deposit_event: Weight,
+    pub deposit_event_per_topic: Weight,
+    pub deposit_event_per_byte: Weight,
+    pub set_rent_allowance: Weight,
+    pub set_storage: Weight,
+    pub set_storage_per_byte: Weight,
+    pub clear_storage: Weight,
+    pub get_storage: Weight,
+    pub get_storage_per_byte: Weight,
+    pub transfer: Weight,
+    pub call: Weight,
+    pub call_transfer_surcharge: Weight,
+    pub call_per_input_byte: Weight,
+    pub call_per_output_byte: Weight,
+    pub instantiate: Weight,
+    pub instantiate_per_input_byte: Weight,
+    pub instantiate_per_output_byte: Weight,
+    pub instantiate_per_salt_byte: Weight,
+    pub hash_sha2_256: Weight,
+    pub hash_sha2_256_per_byte: Weight,
+    pub hash_keccak_256: Weight,
+    pub hash_keccak_256_per_byte: Weight,
+    pub hash_blake2_256: Weight,
+    pub hash_blake2_256_per_byte: Weight,
+    pub hash_blake2_128: Weight,
+    pub hash_blake2_128_per_byte: Weight,
+}
+
+// from js documentation, api/packages/types/src/interfaces/eth/types.ts
+pub struct EthTransaction {
+    pub nonce: U256,
+    pub gasPrice: U256,
+    pub gasLimit: U256,
+    pub action: EthTransactionAction,
+    pub value: U256,
+    pub input: Vec<u8>,
+    pub signature: EthTransactionSignature,
+}
+
+type ethereum::Transaction = EthTransaction;
+
+// from js documentation, api/packages/types/src/interfaces/eth/types.ts, MODIFIED
+// TODO check
+pub enum EthTransactionAction {
+    Call(H160),
+    Create,
+}
+
+// from js documentation, api/packages/types/src/interfaces/eth/types.ts
+pub struct EthTransactionSignature {
+    pub v: u64,
+    pub r: H256,
+    pub s: H256,
+}
+
+// from pallet_elections_phragmen::DefunctVoter
+// TODO in description type is specified as AccountId, check and correct
+pub struct DefunctVoter<<T::Lookup as StaticLookup>::Source> {
+    pub who: AccountId,
+    pub vote_count: u32,
+    pub candidate_count: u32,
+}
+
+// from js documentation, api/packages/types/src/interfaces/runtime/types.ts
+type AssetId = u32;
+type T::AssetId = u32;
+
+// from pallet_democracy::AccountVote, modify to match type
+pub enum AccountVote<BalanceOf<T>> {
+    Standard {
+        vote: Vote,
+        balance: Balance,
+    },
+    Split {
+        aye: Balance,
+        nay: Balance,
+    },
+}
+
+// from pallet_democracy::Vote
+pub struct Vote {
+    pub aye: bool,
+    pub conviction: Conviction,
+}
+
+// from pallet_collective::ProposalIndex
+type ProposalIndex = u32;
+
+

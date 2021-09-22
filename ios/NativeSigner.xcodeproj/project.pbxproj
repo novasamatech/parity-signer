@@ -3,911 +3,639 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 46;
+	objectVersion = 50;
 	objects = {
 
 /* Begin PBXBuildFile section */
-		00E356F31AD99517003FC87E /* NativeSignerTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 00E356F21AD99517003FC87E /* NativeSignerTests.m */; };
-		0A5DA78AED2F468C8025AF7C /* Roboto-Black.ttf in Resources */ = {isa = PBXBuildFile; fileRef = EA252ACE6F044BD88BDCD173 /* Roboto-Black.ttf */; };
-		0CFC8839F5B54F888E6C01DE /* Roboto-ThinItalic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = FAE70C1AAEEA45159C8CB0EA /* Roboto-ThinItalic.ttf */; };
-		13B07FBC1A68108700A75B9A /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB01A68108700A75B9A /* AppDelegate.m */; };
-		13B07FBD1A68108700A75B9A /* LaunchScreen.xib in Resources */ = {isa = PBXBuildFile; fileRef = 13B07FB11A68108700A75B9A /* LaunchScreen.xib */; };
-		13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 13B07FB51A68108700A75B9A /* Images.xcassets */; };
-		13B07FC11A68108700A75B9A /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB71A68108700A75B9A /* main.m */; };
-		16614F66487241CE933918B8 /* Roboto-Thin.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 020454D0D3C74A398EC7F440 /* Roboto-Thin.ttf */; };
-		399D1B0E22DDDE1B00A815EB /* JavaScriptCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 399D1B0D22DDDE1B00A815EB /* JavaScriptCore.framework */; };
-		39B6F6432315B550009C3C05 /* main.jsbundle in Resources */ = {isa = PBXBuildFile; fileRef = 39B6F6102315B550009C3C05 /* main.jsbundle */; };
-		3C31DDCB4CD0465084344D5F /* Manifold-CF-Bold.otf in Resources */ = {isa = PBXBuildFile; fileRef = 624E6C0FF4A64A97A7D51BEF /* Manifold-CF-Bold.otf */; };
-		3D7A98D07DE443E381067D3A /* Roboto-BlackItalic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 183C9D1307934735A4129705 /* Roboto-BlackItalic.ttf */; };
-		423E02567C044AF6832B2388 /* Roboto-Light.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 53880E8FF84C419EB11ACA5C /* Roboto-Light.ttf */; };
-		5DC40D98E51D492C8FF692B5 /* Manifold-CF-Light.otf in Resources */ = {isa = PBXBuildFile; fileRef = 31AAF2CB51C04377BFC79634 /* Manifold-CF-Light.otf */; };
-		66F342DBB3B573D07F9C7B81 /* libPods-NativeSigner-NativeSignerTests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 8D65048B1ED96512885EC461 /* libPods-NativeSigner-NativeSignerTests.a */; };
-		6701864923270B1100A14061 /* assets in Resources */ = {isa = PBXBuildFile; fileRef = 6701864823270B1100A14061 /* assets */; };
-		6779B94524741C7F00DFEFA9 /* RobotoMono-Medium.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 6779B93E24741C7F00DFEFA9 /* RobotoMono-Medium.ttf */; };
-		6784634924ACE7D0000990D6 /* Bridging.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6784634824ACE7D0000990D6 /* Bridging.swift */; };
-		67E3BED3237C17A6007882FA /* RobotoMono-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 67E3BEA2237C17A6007882FA /* RobotoMono-Regular.ttf */; };
-		77AE2A2069B847F9B7EB4854 /* Manifold-CF.otf in Resources */ = {isa = PBXBuildFile; fileRef = 2EC5DDFE054D4A68B1B7D900 /* Manifold-CF.otf */; };
-		7A7137D6EEDE40C184F30C15 /* Roboto-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 5CD421FF72D947B0AA9EBABB /* Roboto-Regular.ttf */; };
-		8E6DBF7AF484658DAEEFA1FA /* libPods-NativeSigner.a in Frameworks */ = {isa = PBXBuildFile; fileRef = A67D7844B2B3A1BE43F3774E /* libPods-NativeSigner.a */; };
-		95279244A36A49849FCE2DAE /* Roboto-Bold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = D592A5F1000548E09C637958 /* Roboto-Bold.ttf */; };
-		A6DE194CA1E344F6B2BBDD09 /* Roboto-MediumItalic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 5F744F56289845F0A1085BBB /* Roboto-MediumItalic.ttf */; };
-		AD0B6F7EACB74BA7A42D2A2E /* Manifold-CF-Demi-Bold.otf in Resources */ = {isa = PBXBuildFile; fileRef = 5D4F46832A564A6C98432D76 /* Manifold-CF-Demi-Bold.otf */; };
-		B43B3542B9ED441AB8AFBA0B /* Roboto-Italic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 42D126E4D4D84C4784E2377B /* Roboto-Italic.ttf */; };
-		E501D58522AE41A9AF18340A /* Roboto-BoldItalic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 0A3530DA239B43579EF02112 /* Roboto-BoldItalic.ttf */; };
-		EDCE1EC0CA1249279F03F2E2 /* Roboto-Medium.ttf in Resources */ = {isa = PBXBuildFile; fileRef = E3DA81F74A0847378E71E280 /* Roboto-Medium.ttf */; };
-		EE896FB251B94030AC713B6F /* Roboto-LightItalic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 8C99AB759A004CEB88AC4455 /* Roboto-LightItalic.ttf */; };
-		F1569210427145DEBBB5B898 /* Manifold-CF-Extra-Bold.otf in Resources */ = {isa = PBXBuildFile; fileRef = F198D2DE15BC4461B2308E3C /* Manifold-CF-Extra-Bold.otf */; };
+		2D7A7BA526AE9E680053C1E0 /* Footer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D7A7BA426AE9E680053C1E0 /* Footer.swift */; };
+		2D7A7BAA26AED2500053C1E0 /* Database in Resources */ = {isa = PBXBuildFile; fileRef = 2D7A7BA926AED2500053C1E0 /* Database */; };
+		2D7A7BB026B00A3E0053C1E0 /* NavbarShield.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D7A7BAF26B00A3E0053C1E0 /* NavbarShield.swift */; };
+		2D7A7BB426B02B700053C1E0 /* SeedSelector.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D7A7BB326B02B700053C1E0 /* SeedSelector.swift */; };
+		2D7A7BB626B136970053C1E0 /* NewSeedScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D7A7BB526B136970053C1E0 /* NewSeedScreen.swift */; };
+		2D7A7BB826B28D350053C1E0 /* SettingsScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D7A7BB726B28D350053C1E0 /* SettingsScreen.swift */; };
+		2D7A7BC026B97DB30053C1E0 /* Identities.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D7A7BBF26B97DB30053C1E0 /* Identities.swift */; };
+		2D7A7BC226B9D3370053C1E0 /* IdentityCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D7A7BC126B9D3360053C1E0 /* IdentityCard.swift */; };
+		2D7A7BC426BA8B350053C1E0 /* NewIdentityScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D7A7BC326BA8B350053C1E0 /* NewIdentityScreen.swift */; };
+		2D7A7BCA26BACFFB0053C1E0 /* QRView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D7A7BC926BACFFB0053C1E0 /* QRView.swift */; };
+		2D7A7BCC26BAD02A0053C1E0 /* ExportIdentity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D7A7BCB26BAD02A0053C1E0 /* ExportIdentity.swift */; };
+		2D7A7BCE26BBC5690053C1E0 /* LaunchScreen.xib in Resources */ = {isa = PBXBuildFile; fileRef = 2D7A7BCD26BBC5690053C1E0 /* LaunchScreen.xib */; };
+		2D7A7BD026BBC72D0053C1E0 /* Transaction.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D7A7BCF26BBC72D0053C1E0 /* Transaction.swift */; };
+		2D7A7BD226BBCE6F0053C1E0 /* TransactionScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D7A7BD126BBCE6F0053C1E0 /* TransactionScreen.swift */; };
+		2D7A7BD426BBEAF00053C1E0 /* Canary.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D7A7BD326BBEAF00053C1E0 /* Canary.swift */; };
+		2D7A7BD626C1126C0053C1E0 /* Utils.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D7A7BD526C1126C0053C1E0 /* Utils.swift */; };
+		2D7A7BD826C163110053C1E0 /* TransactionPreview.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D7A7BD726C163110053C1E0 /* TransactionPreview.swift */; };
+		2D7A7BDC26C2613F0053C1E0 /* TransactionCardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D7A7BDB26C2613F0053C1E0 /* TransactionCardView.swift */; };
+		2D7A7BDE26C296AA0053C1E0 /* TransactionReady.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D7A7BDD26C296AA0053C1E0 /* TransactionReady.swift */; };
+		2D7A7BE026C3AC350053C1E0 /* TransactionTypes.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D7A7BDF26C3AC350053C1E0 /* TransactionTypes.swift */; };
+		2D7A7BE326C3FC250053C1E0 /* terms-and-conditions.txt in Resources */ = {isa = PBXBuildFile; fileRef = 2D7A7BE226C3FC250053C1E0 /* terms-and-conditions.txt */; };
+		2D7A7BE526C3FE260053C1E0 /* Documents.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D7A7BE426C3FE260053C1E0 /* Documents.swift */; };
+		2D7A7BE726C410FF0053C1E0 /* privacy-policy.txt in Resources */ = {isa = PBXBuildFile; fileRef = 2D7A7BE626C410FF0053C1E0 /* privacy-policy.txt */; };
+		2D7A7BEB26C4149E0053C1E0 /* DocumentModal.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D7A7BEA26C4149E0053C1E0 /* DocumentModal.swift */; };
+		2D7A7BED26C50AB80053C1E0 /* NetworkManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D7A7BEC26C50AB80053C1E0 /* NetworkManager.swift */; };
+		2D7A7BEF26C50ACB0053C1E0 /* SeedManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D7A7BEE26C50ACB0053C1E0 /* SeedManager.swift */; };
+		2D7A7BF126C50F950053C1E0 /* NetworkSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D7A7BF026C50F950053C1E0 /* NetworkSettings.swift */; };
+		2D7A7BF326C519990053C1E0 /* MetadataCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D7A7BF226C519990053C1E0 /* MetadataCard.swift */; };
+		2D7A7BF526C58E9E0053C1E0 /* History.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D7A7BF426C58E9E0053C1E0 /* History.swift */; };
+		2D7A7BF726C650F50053C1E0 /* HistoryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D7A7BF626C650F50053C1E0 /* HistoryView.swift */; };
+		2D7A7BF926C6620B0053C1E0 /* HistoryExpanded.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D7A7BF826C6620B0053C1E0 /* HistoryExpanded.swift */; };
+		2D7A7BFB26C6621D0053C1E0 /* HistoryCollapsed.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D7A7BFA26C6621D0053C1E0 /* HistoryCollapsed.swift */; };
+		2D7A7BFD26C675D30053C1E0 /* HistoryCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D7A7BFC26C675D30053C1E0 /* HistoryCard.swift */; };
+		2D7A7C0026CA97B00053C1E0 /* TCAuthor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D7A7BFF26CA97B00053C1E0 /* TCAuthor.swift */; };
+		2D7A7C0226CA98700053C1E0 /* TCAuthorPlain.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D7A7C0126CA98700053C1E0 /* TCAuthorPlain.swift */; };
+		2D7A7C0826CA9BB00053C1E0 /* TCBlockHash.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D7A7C0726CA9BB00053C1E0 /* TCBlockHash.swift */; };
+		2D7A7C0E26CB929B0053C1E0 /* TCTXSpec.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D7A7C0D26CB929B0053C1E0 /* TCTXSpec.swift */; };
+		2D7A7C1226CB94520053C1E0 /* TCTypesInfo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D7A7C1126CB94520053C1E0 /* TCTypesInfo.swift */; };
+		2D7A7C1426CB96180053C1E0 /* TCTip.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D7A7C1326CB96180053C1E0 /* TCTip.swift */; };
+		2D7A7C1626CB96840053C1E0 /* TCWarning.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D7A7C1526CB96840053C1E0 /* TCWarning.swift */; };
+		2D7A7C1826CB96C70053C1E0 /* TCError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D7A7C1726CB96C70053C1E0 /* TCError.swift */; };
+		2D7A7C1A26CB97B30053C1E0 /* TCID.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D7A7C1926CB97B30053C1E0 /* TCID.swift */; };
+		2D7A7C1C26CB97F50053C1E0 /* TCEnumVariantName.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D7A7C1B26CB97F50053C1E0 /* TCEnumVariantName.swift */; };
+		2D7A7C1E26CB98310053C1E0 /* TCVarName.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D7A7C1D26CB98310053C1E0 /* TCVarName.swift */; };
+		2D7A7C2026CB99250053C1E0 /* TransactionCardSelector.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D7A7C1F26CB99250053C1E0 /* TransactionCardSelector.swift */; };
+		2D7A7C2626CBC3C70053C1E0 /* TCBalance.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D7A7C2126CBC3C70053C1E0 /* TCBalance.swift */; };
+		2D7A7C2726CBC3C70053C1E0 /* TCEraMortalNonce.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D7A7C2226CBC3C70053C1E0 /* TCEraMortalNonce.swift */; };
+		2D7A7C2826CBC3C70053C1E0 /* TCAuthorPublicKey.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D7A7C2326CBC3C70053C1E0 /* TCAuthorPublicKey.swift */; };
+		2D7A7C2926CBC3C70053C1E0 /* TCCall.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D7A7C2426CBC3C70053C1E0 /* TCCall.swift */; };
+		2D7A7C2A26CBC3C70053C1E0 /* TCEraImmortalNonce.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D7A7C2526CBC3C70053C1E0 /* TCEraImmortalNonce.swift */; };
+		2DE72BC226A588C7002BB752 /* NativeSignerApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2DE72BC126A588C7002BB752 /* NativeSignerApp.swift */; };
+		2DE72BC426A588C7002BB752 /* MainButtonScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2DE72BC326A588C7002BB752 /* MainButtonScreen.swift */; };
+		2DE72BC626A588C9002BB752 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 2DE72BC526A588C9002BB752 /* Assets.xcassets */; };
+		2DE72BC926A588C9002BB752 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 2DE72BC826A588C9002BB752 /* Preview Assets.xcassets */; };
+		2DE72BD426A588C9002BB752 /* NativeSignerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2DE72BD326A588C9002BB752 /* NativeSignerTests.swift */; };
+		2DE72BDF26A588C9002BB752 /* NativeSignerUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2DE72BDE26A588C9002BB752 /* NativeSignerUITests.swift */; };
+		2DE72BF126A59834002BB752 /* Network.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2DE72BF026A59834002BB752 /* Network.swift */; };
+		2DE72BF326A59BAB002BB752 /* NetworkList.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2DE72BF226A59BAB002BB752 /* NetworkList.swift */; };
+		2DE72BF526A59C59002BB752 /* NetworkCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2DE72BF426A59C59002BB752 /* NetworkCard.swift */; };
+		2DE72BF726A5AC68002BB752 /* KeyManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2DE72BF626A5AC68002BB752 /* KeyManager.swift */; };
+		2DE72BF926A5C360002BB752 /* CameraView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2DE72BF826A5C360002BB752 /* CameraView.swift */; };
+		2DE72C0026A6ADC5002BB752 /* CameraService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2DE72BFF26A6ADC5002BB752 /* CameraService.swift */; };
+		2DE72C0226A6C27E002BB752 /* Camera.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2DE72C0126A6C27E002BB752 /* Camera.swift */; };
+		2DE72C0426A6CDC5002BB752 /* CameraPreview.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2DE72C0326A6CDC5002BB752 /* CameraPreview.swift */; };
+		2DE72C0926A98FE9002BB752 /* libsigner.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 2DE72C0826A98FE9002BB752 /* libsigner.a */; };
+		2DE72C0F26A99885002BB752 /* RustNative.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2DE72C0E26A99885002BB752 /* RustNative.swift */; };
+		2DE72C1126AAC3D6002BB752 /* LandingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2DE72C1026AAC3D6002BB752 /* LandingView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
-		00E356F41AD99517003FC87E /* PBXContainerItemProxy */ = {
+		2DE72BD026A588C9002BB752 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
-			containerPortal = 83CBB9F71A601CBA00E9B192 /* Project object */;
+			containerPortal = 2DE72BB626A588C7002BB752 /* Project object */;
 			proxyType = 1;
-			remoteGlobalIDString = 13B07F861A680F5B00A75B9A;
+			remoteGlobalIDString = 2DE72BBD26A588C7002BB752;
 			remoteInfo = NativeSigner;
 		};
-		3955110822F4547F00078B17 /* PBXContainerItemProxy */ = {
+		2DE72BDB26A588C9002BB752 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
-			containerPortal = 99AC61BF1E3C4FE8B07077D3 /* RNRandomBytes.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = 163CDE4E2087CAD3001065FB;
-			remoteInfo = "RNRandomBytes-tvOS";
-		};
-		39D36A0722F4588C00EDA4F1 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = BB0882DC34AE448DAA1E2320 /* RNCNetInfo.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = B5027B1B2237B30F00F1AABA;
-			remoteInfo = "RNCNetInfo-tvOS";
-		};
-		671B80D02416CB3B00632516 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = BB0882DC34AE448DAA1E2320 /* RNCNetInfo.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = 134814201AA4EA6300B7C361;
-			remoteInfo = RNCNetInfo;
-		};
-		671B80D42416CB3B00632516 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 99AC61BF1E3C4FE8B07077D3 /* RNRandomBytes.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = 73EEC9391BFE4B1D00D468EB;
-			remoteInfo = RNRandomBytes;
-		};
-		671B80D82416CB3B00632516 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = C0205550495341279B513024 /* RNSVG.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = 0CF68AC11AF0540F00FF9E5C;
-			remoteInfo = RNSVG;
-		};
-		88043C822301BD2B00340AB7 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = C0205550495341279B513024 /* RNSVG.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = 94DDAC5C1F3D024300EED511;
-			remoteInfo = "RNSVG-tvOS";
+			containerPortal = 2DE72BB626A588C7002BB752 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 2DE72BBD26A588C7002BB752;
+			remoteInfo = NativeSigner;
 		};
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
-		00E356EE1AD99517003FC87E /* NativeSignerTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = NativeSignerTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
-		00E356F11AD99517003FC87E /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		00E356F21AD99517003FC87E /* NativeSignerTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = NativeSignerTests.m; sourceTree = "<group>"; };
-		020454D0D3C74A398EC7F440 /* Roboto-Thin.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Roboto-Thin.ttf"; path = "../res/fonts/Roboto-Thin.ttf"; sourceTree = "<group>"; };
-		0A3530DA239B43579EF02112 /* Roboto-BoldItalic.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Roboto-BoldItalic.ttf"; path = "../res/fonts/Roboto-BoldItalic.ttf"; sourceTree = "<group>"; };
-		0CBFA37873E5DC7BE99408C5 /* Pods-NativeSigner-NativeSignerTests.githubactions.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-NativeSigner-NativeSignerTests.githubactions.xcconfig"; path = "Target Support Files/Pods-NativeSigner-NativeSignerTests/Pods-NativeSigner-NativeSignerTests.githubactions.xcconfig"; sourceTree = "<group>"; };
-		13B07F961A680F5B00A75B9A /* NativeSigner.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = NativeSigner.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		13B07FAF1A68108700A75B9A /* AppDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = AppDelegate.h; path = NativeSigner/AppDelegate.h; sourceTree = "<group>"; };
-		13B07FB01A68108700A75B9A /* AppDelegate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = AppDelegate.m; path = NativeSigner/AppDelegate.m; sourceTree = "<group>"; };
-		13B07FB21A68108700A75B9A /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/LaunchScreen.xib; sourceTree = "<group>"; };
-		13B07FB51A68108700A75B9A /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; name = Images.xcassets; path = NativeSigner/Images.xcassets; sourceTree = "<group>"; };
-		13B07FB61A68108700A75B9A /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = Info.plist; path = NativeSigner/Info.plist; sourceTree = "<group>"; };
-		13B07FB71A68108700A75B9A /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = main.m; path = NativeSigner/main.m; sourceTree = "<group>"; };
-		15BC2D6C3FC64019985638C1 /* FontAwesome.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = FontAwesome.ttf; path = "../node_modules/react-native-vector-icons/Fonts/FontAwesome.ttf"; sourceTree = "<group>"; };
-		183C9D1307934735A4129705 /* Roboto-BlackItalic.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Roboto-BlackItalic.ttf"; path = "../res/fonts/Roboto-BlackItalic.ttf"; sourceTree = "<group>"; };
-		1F426F39208B7CC000CA43DB /* libsigner.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libsigner.a; path = ../rust/signer/libsigner.a; sourceTree = "<group>"; };
-		1F426F90208D31D200CA43DB /* signer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = signer.h; path = ../rust/signer/signer.h; sourceTree = "<group>"; };
-		1F426F9B208D358500CA43DB /* NativeSigner-Bridging-Header.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "NativeSigner-Bridging-Header.h"; path = "NativeSigner/NativeSigner-Bridging-Header.h"; sourceTree = "<group>"; };
-		1F7FFA3B208B691700FF717A /* libresolv.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libresolv.tbd; path = usr/lib/libresolv.tbd; sourceTree = SDKROOT; };
-		2D0EA96B71FC4AFF8C35B80E /* Feather.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = Feather.ttf; path = "../node_modules/react-native-vector-icons/Fonts/Feather.ttf"; sourceTree = "<group>"; };
-		2E43A8182F586AE97EC694AD /* Pods-NativeSigner.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-NativeSigner.debug.xcconfig"; path = "Target Support Files/Pods-NativeSigner/Pods-NativeSigner.debug.xcconfig"; sourceTree = "<group>"; };
-		2EC5DDFE054D4A68B1B7D900 /* Manifold-CF.otf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Manifold-CF.otf"; path = "../res/fonts/Manifold-CF.otf"; sourceTree = "<group>"; };
-		31AAF2CB51C04377BFC79634 /* Manifold-CF-Light.otf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Manifold-CF-Light.otf"; path = "../res/fonts/Manifold-CF-Light.otf"; sourceTree = "<group>"; };
-		399D1B0D22DDDE1B00A815EB /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = System/Library/Frameworks/JavaScriptCore.framework; sourceTree = SDKROOT; };
-		39B6F6102315B550009C3C05 /* main.jsbundle */ = {isa = PBXFileReference; lastKnownFileType = text; path = main.jsbundle; sourceTree = "<group>"; };
-		3DB51A3702D94B6BA025DDE6 /* FontAwesome5_Brands.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = FontAwesome5_Brands.ttf; path = "../node_modules/react-native-vector-icons/Fonts/FontAwesome5_Brands.ttf"; sourceTree = "<group>"; };
-		42D126E4D4D84C4784E2377B /* Roboto-Italic.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Roboto-Italic.ttf"; path = "../res/fonts/Roboto-Italic.ttf"; sourceTree = "<group>"; };
-		431C560691184DF8B5347066 /* FontAwesome5_Solid.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = FontAwesome5_Solid.ttf; path = "../node_modules/react-native-vector-icons/Fonts/FontAwesome5_Solid.ttf"; sourceTree = "<group>"; };
-		4BF2B8970DC245F4BA0574F9 /* MaterialIcons.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = MaterialIcons.ttf; path = "../node_modules/react-native-vector-icons/Fonts/MaterialIcons.ttf"; sourceTree = "<group>"; };
-		4CBAF819A6739A2AEC6AB7B1 /* Pods-NativeSigner.githubactions.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-NativeSigner.githubactions.xcconfig"; path = "Target Support Files/Pods-NativeSigner/Pods-NativeSigner.githubactions.xcconfig"; sourceTree = "<group>"; };
-		5099F906199C4A1DB534B2F2 /* libRNRandomBytes.a */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = archive.ar; path = libRNRandomBytes.a; sourceTree = "<group>"; };
-		53880E8FF84C419EB11ACA5C /* Roboto-Light.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Roboto-Light.ttf"; path = "../res/fonts/Roboto-Light.ttf"; sourceTree = "<group>"; };
-		5CD421FF72D947B0AA9EBABB /* Roboto-Regular.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Roboto-Regular.ttf"; path = "../res/fonts/Roboto-Regular.ttf"; sourceTree = "<group>"; };
-		5D4F46832A564A6C98432D76 /* Manifold-CF-Demi-Bold.otf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Manifold-CF-Demi-Bold.otf"; path = "../res/fonts/Manifold-CF-Demi-Bold.otf"; sourceTree = "<group>"; };
-		5F744F56289845F0A1085BBB /* Roboto-MediumItalic.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Roboto-MediumItalic.ttf"; path = "../res/fonts/Roboto-MediumItalic.ttf"; sourceTree = "<group>"; };
-		624E6C0FF4A64A97A7D51BEF /* Manifold-CF-Bold.otf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Manifold-CF-Bold.otf"; path = "../res/fonts/Manifold-CF-Bold.otf"; sourceTree = "<group>"; };
-		6701864823270B1100A14061 /* assets */ = {isa = PBXFileReference; lastKnownFileType = folder; path = assets; sourceTree = "<group>"; };
-		671B818C2416E17100632516 /* libDoubleConversion.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; path = libDoubleConversion.a; sourceTree = BUILT_PRODUCTS_DIR; };
-		6779B93E24741C7F00DFEFA9 /* RobotoMono-Medium.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "RobotoMono-Medium.ttf"; sourceTree = "<group>"; };
-		6784634824ACE7D0000990D6 /* Bridging.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Bridging.swift; sourceTree = "<group>"; };
-		67E3BEA2237C17A6007882FA /* RobotoMono-Regular.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "RobotoMono-Regular.ttf"; sourceTree = "<group>"; };
-		6A7AB3BD3C1A4E0EB3C4B3B6 /* Entypo.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = Entypo.ttf; path = "../node_modules/react-native-vector-icons/Fonts/Entypo.ttf"; sourceTree = "<group>"; };
-		6C53A63D96B24FDD95AF1C97 /* Fontisto.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = Fontisto.ttf; path = "../node_modules/react-native-vector-icons/Fonts/Fontisto.ttf"; sourceTree = "<group>"; };
-		7733AB637FF54DE5B174F42C /* Zocial.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = Zocial.ttf; path = "../node_modules/react-native-vector-icons/Fonts/Zocial.ttf"; sourceTree = "<group>"; };
-		84D1117E71B04C839F00F619 /* Ionicons.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = Ionicons.ttf; path = "../node_modules/react-native-vector-icons/Fonts/Ionicons.ttf"; sourceTree = "<group>"; };
-		894E2A1A52DC44C28E9F9A71 /* AntDesign.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = AntDesign.ttf; path = "../node_modules/react-native-vector-icons/Fonts/AntDesign.ttf"; sourceTree = "<group>"; };
-		8C99AB759A004CEB88AC4455 /* Roboto-LightItalic.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Roboto-LightItalic.ttf"; path = "../res/fonts/Roboto-LightItalic.ttf"; sourceTree = "<group>"; };
-		8CED6BE60471B6CB2A6E0F08 /* Pods-NativeSigner-NativeSignerTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-NativeSigner-NativeSignerTests.release.xcconfig"; path = "Target Support Files/Pods-NativeSigner-NativeSignerTests/Pods-NativeSigner-NativeSignerTests.release.xcconfig"; sourceTree = "<group>"; };
-		8D65048B1ED96512885EC461 /* libPods-NativeSigner-NativeSignerTests.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-NativeSigner-NativeSignerTests.a"; sourceTree = BUILT_PRODUCTS_DIR; };
-		91D53BBCAE6D418EA362A703 /* Foundation.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = Foundation.ttf; path = "../node_modules/react-native-vector-icons/Fonts/Foundation.ttf"; sourceTree = "<group>"; };
-		99AC61BF1E3C4FE8B07077D3 /* RNRandomBytes.xcodeproj */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = "wrapper.pb-project"; name = RNRandomBytes.xcodeproj; path = "../node_modules/react-native-randombytes/RNRandomBytes.xcodeproj"; sourceTree = "<group>"; };
-		A67D7844B2B3A1BE43F3774E /* libPods-NativeSigner.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-NativeSigner.a"; sourceTree = BUILT_PRODUCTS_DIR; };
-		BB0882DC34AE448DAA1E2320 /* RNCNetInfo.xcodeproj */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = "wrapper.pb-project"; name = RNCNetInfo.xcodeproj; path = "../node_modules/@react-native-community/netinfo/ios/RNCNetInfo.xcodeproj"; sourceTree = "<group>"; };
-		C0205550495341279B513024 /* RNSVG.xcodeproj */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = "wrapper.pb-project"; name = RNSVG.xcodeproj; path = "../node_modules/react-native-svg/ios/RNSVG.xcodeproj"; sourceTree = "<group>"; };
-		CB5C4A7F0E8B4E4E98E06EFD /* MaterialCommunityIcons.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = MaterialCommunityIcons.ttf; path = "../node_modules/react-native-vector-icons/Fonts/MaterialCommunityIcons.ttf"; sourceTree = "<group>"; };
-		D44E3C511D404074AF5AFDB9 /* libRNSVG.a */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = archive.ar; path = libRNSVG.a; sourceTree = "<group>"; };
-		D592A5F1000548E09C637958 /* Roboto-Bold.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Roboto-Bold.ttf"; path = "../res/fonts/Roboto-Bold.ttf"; sourceTree = "<group>"; };
-		DDFA123E816A46BBB8DF60B6 /* libRCTCamera.a */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = archive.ar; path = libRCTCamera.a; sourceTree = "<group>"; };
-		E2C73A1D48444F90B25AB1C9 /* EvilIcons.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = EvilIcons.ttf; path = "../node_modules/react-native-vector-icons/Fonts/EvilIcons.ttf"; sourceTree = "<group>"; };
-		E349784A51B7EC61DA0E0127 /* Pods-NativeSigner-NativeSignerTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-NativeSigner-NativeSignerTests.debug.xcconfig"; path = "Target Support Files/Pods-NativeSigner-NativeSignerTests/Pods-NativeSigner-NativeSignerTests.debug.xcconfig"; sourceTree = "<group>"; };
-		E3DA81F74A0847378E71E280 /* Roboto-Medium.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Roboto-Medium.ttf"; path = "../res/fonts/Roboto-Medium.ttf"; sourceTree = "<group>"; };
-		E759893EEAF44DD487B2401E /* FontAwesome5_Regular.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = FontAwesome5_Regular.ttf; path = "../node_modules/react-native-vector-icons/Fonts/FontAwesome5_Regular.ttf"; sourceTree = "<group>"; };
-		E8E0FEBC36F54D78A81C1639 /* SimpleLineIcons.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = SimpleLineIcons.ttf; path = "../node_modules/react-native-vector-icons/Fonts/SimpleLineIcons.ttf"; sourceTree = "<group>"; };
-		EA252ACE6F044BD88BDCD173 /* Roboto-Black.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Roboto-Black.ttf"; path = "../res/fonts/Roboto-Black.ttf"; sourceTree = "<group>"; };
-		F198D2DE15BC4461B2308E3C /* Manifold-CF-Extra-Bold.otf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Manifold-CF-Extra-Bold.otf"; path = "../res/fonts/Manifold-CF-Extra-Bold.otf"; sourceTree = "<group>"; };
-		F2FB2DDD90964B3BB1FC813C /* Octicons.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = Octicons.ttf; path = "../node_modules/react-native-vector-icons/Fonts/Octicons.ttf"; sourceTree = "<group>"; };
-		F5A969A2336EFB6AAFB76B57 /* Pods-NativeSigner.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-NativeSigner.release.xcconfig"; path = "Target Support Files/Pods-NativeSigner/Pods-NativeSigner.release.xcconfig"; sourceTree = "<group>"; };
-		FAE70C1AAEEA45159C8CB0EA /* Roboto-ThinItalic.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Roboto-ThinItalic.ttf"; path = "../res/fonts/Roboto-ThinItalic.ttf"; sourceTree = "<group>"; };
+		2D7A7BA426AE9E680053C1E0 /* Footer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Footer.swift; sourceTree = "<group>"; };
+		2D7A7BA926AED2500053C1E0 /* Database */ = {isa = PBXFileReference; lastKnownFileType = folder; path = Database; sourceTree = "<group>"; };
+		2D7A7BAF26B00A3E0053C1E0 /* NavbarShield.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NavbarShield.swift; sourceTree = "<group>"; };
+		2D7A7BB326B02B700053C1E0 /* SeedSelector.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SeedSelector.swift; sourceTree = "<group>"; };
+		2D7A7BB526B136970053C1E0 /* NewSeedScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewSeedScreen.swift; sourceTree = "<group>"; };
+		2D7A7BB726B28D350053C1E0 /* SettingsScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsScreen.swift; sourceTree = "<group>"; };
+		2D7A7BBF26B97DB30053C1E0 /* Identities.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = Identities.swift; path = NativeSigner/Identities.swift; sourceTree = SOURCE_ROOT; };
+		2D7A7BC126B9D3360053C1E0 /* IdentityCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IdentityCard.swift; sourceTree = "<group>"; };
+		2D7A7BC326BA8B350053C1E0 /* NewIdentityScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewIdentityScreen.swift; sourceTree = "<group>"; };
+		2D7A7BC926BACFFB0053C1E0 /* QRView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = QRView.swift; path = NativeSigner/Models/QRView.swift; sourceTree = SOURCE_ROOT; };
+		2D7A7BCB26BAD02A0053C1E0 /* ExportIdentity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = ExportIdentity.swift; path = NativeSigner/Components/ExportIdentity.swift; sourceTree = SOURCE_ROOT; };
+		2D7A7BCD26BBC5690053C1E0 /* LaunchScreen.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; name = LaunchScreen.xib; path = NativeSigner/LaunchScreen.xib; sourceTree = "<group>"; };
+		2D7A7BCF26BBC72D0053C1E0 /* Transaction.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Transaction.swift; sourceTree = "<group>"; };
+		2D7A7BD126BBCE6F0053C1E0 /* TransactionScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = TransactionScreen.swift; path = NativeSigner/Modals/TransactionScreen.swift; sourceTree = SOURCE_ROOT; };
+		2D7A7BD326BBEAF00053C1E0 /* Canary.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = Canary.swift; path = NativeSigner/Components/Canary.swift; sourceTree = SOURCE_ROOT; };
+		2D7A7BD526C1126C0053C1E0 /* Utils.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Utils.swift; sourceTree = "<group>"; };
+		2D7A7BD726C163110053C1E0 /* TransactionPreview.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransactionPreview.swift; sourceTree = "<group>"; };
+		2D7A7BDB26C2613F0053C1E0 /* TransactionCardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = TransactionCardView.swift; path = NativeSigner/Cards/TransactionCardView.swift; sourceTree = SOURCE_ROOT; };
+		2D7A7BDD26C296AA0053C1E0 /* TransactionReady.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransactionReady.swift; sourceTree = "<group>"; };
+		2D7A7BDF26C3AC350053C1E0 /* TransactionTypes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransactionTypes.swift; sourceTree = "<group>"; };
+		2D7A7BE226C3FC250053C1E0 /* terms-and-conditions.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = "terms-and-conditions.txt"; sourceTree = "<group>"; };
+		2D7A7BE426C3FE260053C1E0 /* Documents.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Documents.swift; sourceTree = "<group>"; };
+		2D7A7BE626C410FF0053C1E0 /* privacy-policy.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = "privacy-policy.txt"; sourceTree = "<group>"; };
+		2D7A7BEA26C4149E0053C1E0 /* DocumentModal.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = DocumentModal.swift; path = NativeSigner/Screens/DocumentModal.swift; sourceTree = SOURCE_ROOT; };
+		2D7A7BEC26C50AB80053C1E0 /* NetworkManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkManager.swift; sourceTree = "<group>"; };
+		2D7A7BEE26C50ACB0053C1E0 /* SeedManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SeedManager.swift; sourceTree = "<group>"; };
+		2D7A7BF026C50F950053C1E0 /* NetworkSettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = NetworkSettings.swift; path = NativeSigner/Modals/NetworkSettings.swift; sourceTree = SOURCE_ROOT; };
+		2D7A7BF226C519990053C1E0 /* MetadataCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MetadataCard.swift; sourceTree = "<group>"; };
+		2D7A7BF426C58E9E0053C1E0 /* History.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = History.swift; sourceTree = "<group>"; };
+		2D7A7BF626C650F50053C1E0 /* HistoryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = HistoryView.swift; path = NativeSigner/Models/HistoryView.swift; sourceTree = SOURCE_ROOT; };
+		2D7A7BF826C6620B0053C1E0 /* HistoryExpanded.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HistoryExpanded.swift; sourceTree = "<group>"; };
+		2D7A7BFA26C6621D0053C1E0 /* HistoryCollapsed.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HistoryCollapsed.swift; sourceTree = "<group>"; };
+		2D7A7BFC26C675D30053C1E0 /* HistoryCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = HistoryCard.swift; path = NativeSigner/Components/HistoryCard.swift; sourceTree = SOURCE_ROOT; };
+		2D7A7BFF26CA97B00053C1E0 /* TCAuthor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TCAuthor.swift; sourceTree = "<group>"; };
+		2D7A7C0126CA98700053C1E0 /* TCAuthorPlain.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TCAuthorPlain.swift; sourceTree = "<group>"; };
+		2D7A7C0726CA9BB00053C1E0 /* TCBlockHash.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TCBlockHash.swift; sourceTree = "<group>"; };
+		2D7A7C0D26CB929B0053C1E0 /* TCTXSpec.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TCTXSpec.swift; sourceTree = "<group>"; };
+		2D7A7C1126CB94520053C1E0 /* TCTypesInfo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TCTypesInfo.swift; sourceTree = "<group>"; };
+		2D7A7C1326CB96180053C1E0 /* TCTip.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TCTip.swift; sourceTree = "<group>"; };
+		2D7A7C1526CB96840053C1E0 /* TCWarning.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TCWarning.swift; sourceTree = "<group>"; };
+		2D7A7C1726CB96C70053C1E0 /* TCError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TCError.swift; sourceTree = "<group>"; };
+		2D7A7C1926CB97B30053C1E0 /* TCID.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TCID.swift; sourceTree = "<group>"; };
+		2D7A7C1B26CB97F50053C1E0 /* TCEnumVariantName.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TCEnumVariantName.swift; sourceTree = "<group>"; };
+		2D7A7C1D26CB98310053C1E0 /* TCVarName.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TCVarName.swift; sourceTree = "<group>"; };
+		2D7A7C1F26CB99250053C1E0 /* TransactionCardSelector.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransactionCardSelector.swift; sourceTree = "<group>"; };
+		2D7A7C2126CBC3C70053C1E0 /* TCBalance.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TCBalance.swift; sourceTree = "<group>"; };
+		2D7A7C2226CBC3C70053C1E0 /* TCEraMortalNonce.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TCEraMortalNonce.swift; sourceTree = "<group>"; };
+		2D7A7C2326CBC3C70053C1E0 /* TCAuthorPublicKey.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TCAuthorPublicKey.swift; sourceTree = "<group>"; };
+		2D7A7C2426CBC3C70053C1E0 /* TCCall.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TCCall.swift; sourceTree = "<group>"; };
+		2D7A7C2526CBC3C70053C1E0 /* TCEraImmortalNonce.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TCEraImmortalNonce.swift; sourceTree = "<group>"; };
+		2DE72BBE26A588C7002BB752 /* NativeSigner.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = NativeSigner.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		2DE72BC126A588C7002BB752 /* NativeSignerApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NativeSignerApp.swift; sourceTree = "<group>"; };
+		2DE72BC326A588C7002BB752 /* MainButtonScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainButtonScreen.swift; sourceTree = "<group>"; };
+		2DE72BC526A588C9002BB752 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		2DE72BC826A588C9002BB752 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
+		2DE72BCA26A588C9002BB752 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		2DE72BCF26A588C9002BB752 /* NativeSignerTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = NativeSignerTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		2DE72BD326A588C9002BB752 /* NativeSignerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NativeSignerTests.swift; sourceTree = "<group>"; };
+		2DE72BD526A588C9002BB752 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		2DE72BDA26A588C9002BB752 /* NativeSignerUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = NativeSignerUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		2DE72BDE26A588C9002BB752 /* NativeSignerUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NativeSignerUITests.swift; sourceTree = "<group>"; };
+		2DE72BE026A588C9002BB752 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		2DE72BF026A59834002BB752 /* Network.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Network.swift; sourceTree = "<group>"; };
+		2DE72BF226A59BAB002BB752 /* NetworkList.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkList.swift; sourceTree = "<group>"; };
+		2DE72BF426A59C59002BB752 /* NetworkCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkCard.swift; sourceTree = "<group>"; };
+		2DE72BF626A5AC68002BB752 /* KeyManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyManager.swift; sourceTree = "<group>"; };
+		2DE72BF826A5C360002BB752 /* CameraView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraView.swift; sourceTree = "<group>"; };
+		2DE72BFF26A6ADC5002BB752 /* CameraService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraService.swift; sourceTree = "<group>"; };
+		2DE72C0126A6C27E002BB752 /* Camera.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = Camera.swift; path = NativeSigner/Camera.swift; sourceTree = SOURCE_ROOT; };
+		2DE72C0326A6CDC5002BB752 /* CameraPreview.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraPreview.swift; sourceTree = "<group>"; };
+		2DE72C0826A98FE9002BB752 /* libsigner.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libsigner.a; sourceTree = "<group>"; };
+		2DE72C0A26A99029002BB752 /* signer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = signer.h; sourceTree = "<group>"; };
+		2DE72C0C26A992D9002BB752 /* libresolv.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libresolv.tbd; path = usr/lib/libresolv.tbd; sourceTree = SDKROOT; };
+		2DE72C0D26A99334002BB752 /* NativeSigner-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "NativeSigner-Bridging-Header.h"; sourceTree = "<group>"; };
+		2DE72C0E26A99885002BB752 /* RustNative.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RustNative.swift; sourceTree = "<group>"; };
+		2DE72C1026AAC3D6002BB752 /* LandingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LandingView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
-		00E356EB1AD99517003FC87E /* Frameworks */ = {
+		2DE72BBB26A588C7002BB752 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				66F342DBB3B573D07F9C7B81 /* libPods-NativeSigner-NativeSignerTests.a in Frameworks */,
+				2DE72C0926A98FE9002BB752 /* libsigner.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		13B07F8C1A680F5B00A75B9A /* Frameworks */ = {
+		2DE72BCC26A588C9002BB752 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				399D1B0E22DDDE1B00A815EB /* JavaScriptCore.framework in Frameworks */,
-				8E6DBF7AF484658DAEEFA1FA /* libPods-NativeSigner.a in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		2DE72BD726A588C9002BB752 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		00E356EF1AD99517003FC87E /* NativeSignerTests */ = {
+		2D7A7BC526BA96D00053C1E0 /* Cards */ = {
 			isa = PBXGroup;
 			children = (
-				00E356F21AD99517003FC87E /* NativeSignerTests.m */,
-				00E356F01AD99517003FC87E /* Supporting Files */,
+				2D7A7BFE26CA97920053C1E0 /* TransactionCards */,
+				2D7A7BFC26C675D30053C1E0 /* HistoryCard.swift */,
+				2DE72BF426A59C59002BB752 /* NetworkCard.swift */,
+				2D7A7BC126B9D3360053C1E0 /* IdentityCard.swift */,
+				2D7A7BDB26C2613F0053C1E0 /* TransactionCardView.swift */,
+				2D7A7C1F26CB99250053C1E0 /* TransactionCardSelector.swift */,
+			);
+			path = Cards;
+			sourceTree = "<group>";
+		};
+		2D7A7BC626BA974E0053C1E0 /* Screens */ = {
+			isa = PBXGroup;
+			children = (
+				2D7A7BD126BBCE6F0053C1E0 /* TransactionScreen.swift */,
+				2DE72BC326A588C7002BB752 /* MainButtonScreen.swift */,
+				2D7A7BB726B28D350053C1E0 /* SettingsScreen.swift */,
+				2DE72BF626A5AC68002BB752 /* KeyManager.swift */,
+			);
+			path = Screens;
+			sourceTree = "<group>";
+		};
+		2D7A7BC726BA97A50053C1E0 /* Modals */ = {
+			isa = PBXGroup;
+			children = (
+				2D7A7BF626C650F50053C1E0 /* HistoryView.swift */,
+				2D7A7BEA26C4149E0053C1E0 /* DocumentModal.swift */,
+				2D7A7BEC26C50AB80053C1E0 /* NetworkManager.swift */,
+				2D7A7BEE26C50ACB0053C1E0 /* SeedManager.swift */,
+				2D7A7BCB26BAD02A0053C1E0 /* ExportIdentity.swift */,
+				2D7A7BB526B136970053C1E0 /* NewSeedScreen.swift */,
+				2D7A7BD726C163110053C1E0 /* TransactionPreview.swift */,
+				2D7A7BDD26C296AA0053C1E0 /* TransactionReady.swift */,
+				2D7A7BC326BA8B350053C1E0 /* NewIdentityScreen.swift */,
+				2DE72C1026AAC3D6002BB752 /* LandingView.swift */,
+				2DE72BF826A5C360002BB752 /* CameraView.swift */,
+			);
+			path = Modals;
+			sourceTree = "<group>";
+		};
+		2D7A7BC826BA97AE0053C1E0 /* Components */ = {
+			isa = PBXGroup;
+			children = (
+				2D7A7BC926BACFFB0053C1E0 /* QRView.swift */,
+				2DE72BF226A59BAB002BB752 /* NetworkList.swift */,
+				2D7A7BAF26B00A3E0053C1E0 /* NavbarShield.swift */,
+				2D7A7BB326B02B700053C1E0 /* SeedSelector.swift */,
+				2DE72C0326A6CDC5002BB752 /* CameraPreview.swift */,
+				2D7A7BF826C6620B0053C1E0 /* HistoryExpanded.swift */,
+				2D7A7BFA26C6621D0053C1E0 /* HistoryCollapsed.swift */,
+				2D7A7BA426AE9E680053C1E0 /* Footer.swift */,
+				2D7A7BF226C519990053C1E0 /* MetadataCard.swift */,
+			);
+			path = Components;
+			sourceTree = "<group>";
+		};
+		2D7A7BE126C3FB680053C1E0 /* Docs */ = {
+			isa = PBXGroup;
+			children = (
+				2D7A7BE626C410FF0053C1E0 /* privacy-policy.txt */,
+				2D7A7BE226C3FC250053C1E0 /* terms-and-conditions.txt */,
+			);
+			path = Docs;
+			sourceTree = "<group>";
+		};
+		2D7A7BFE26CA97920053C1E0 /* TransactionCards */ = {
+			isa = PBXGroup;
+			children = (
+				2D7A7C2326CBC3C70053C1E0 /* TCAuthorPublicKey.swift */,
+				2D7A7C2126CBC3C70053C1E0 /* TCBalance.swift */,
+				2D7A7C2426CBC3C70053C1E0 /* TCCall.swift */,
+				2D7A7C2526CBC3C70053C1E0 /* TCEraImmortalNonce.swift */,
+				2D7A7C2226CBC3C70053C1E0 /* TCEraMortalNonce.swift */,
+				2D7A7C1126CB94520053C1E0 /* TCTypesInfo.swift */,
+				2D7A7C1526CB96840053C1E0 /* TCWarning.swift */,
+				2D7A7C1726CB96C70053C1E0 /* TCError.swift */,
+				2D7A7C1926CB97B30053C1E0 /* TCID.swift */,
+				2D7A7C1B26CB97F50053C1E0 /* TCEnumVariantName.swift */,
+				2D7A7C1D26CB98310053C1E0 /* TCVarName.swift */,
+				2D7A7C0D26CB929B0053C1E0 /* TCTXSpec.swift */,
+				2D7A7C1326CB96180053C1E0 /* TCTip.swift */,
+				2D7A7BFF26CA97B00053C1E0 /* TCAuthor.swift */,
+				2D7A7C0126CA98700053C1E0 /* TCAuthorPlain.swift */,
+				2D7A7C0726CA9BB00053C1E0 /* TCBlockHash.swift */,
+			);
+			path = TransactionCards;
+			sourceTree = "<group>";
+		};
+		2DE72BB526A588C7002BB752 = {
+			isa = PBXGroup;
+			children = (
+				2D7A7BCD26BBC5690053C1E0 /* LaunchScreen.xib */,
+				2DE72BC026A588C7002BB752 /* NativeSigner */,
+				2DE72BD226A588C9002BB752 /* NativeSignerTests */,
+				2DE72BDD26A588C9002BB752 /* NativeSignerUITests */,
+				2DE72BBF26A588C7002BB752 /* Products */,
+				2DE72C0B26A992D9002BB752 /* Frameworks */,
+			);
+			sourceTree = "<group>";
+		};
+		2DE72BBF26A588C7002BB752 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				2DE72BBE26A588C7002BB752 /* NativeSigner.app */,
+				2DE72BCF26A588C9002BB752 /* NativeSignerTests.xctest */,
+				2DE72BDA26A588C9002BB752 /* NativeSignerUITests.xctest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		2DE72BC026A588C7002BB752 /* NativeSigner */ = {
+			isa = PBXGroup;
+			children = (
+				2D7A7BE126C3FB680053C1E0 /* Docs */,
+				2D7A7BC826BA97AE0053C1E0 /* Components */,
+				2D7A7BC726BA97A50053C1E0 /* Modals */,
+				2D7A7BC626BA974E0053C1E0 /* Screens */,
+				2D7A7BC526BA96D00053C1E0 /* Cards */,
+				2DE72C0826A98FE9002BB752 /* libsigner.a */,
+				2DE72C0A26A99029002BB752 /* signer.h */,
+				2DE72BEF26A5981C002BB752 /* Models */,
+				2DE72BC126A588C7002BB752 /* NativeSignerApp.swift */,
+				2DE72C1226AACB25002BB752 /* Database */,
+				2DE72BC526A588C9002BB752 /* Assets.xcassets */,
+				2DE72BCA26A588C9002BB752 /* Info.plist */,
+				2DE72BC726A588C9002BB752 /* Preview Content */,
+				2DE72C0D26A99334002BB752 /* NativeSigner-Bridging-Header.h */,
+			);
+			path = NativeSigner;
+			sourceTree = "<group>";
+		};
+		2DE72BC726A588C9002BB752 /* Preview Content */ = {
+			isa = PBXGroup;
+			children = (
+				2DE72BC826A588C9002BB752 /* Preview Assets.xcassets */,
+			);
+			path = "Preview Content";
+			sourceTree = "<group>";
+		};
+		2DE72BD226A588C9002BB752 /* NativeSignerTests */ = {
+			isa = PBXGroup;
+			children = (
+				2DE72BD326A588C9002BB752 /* NativeSignerTests.swift */,
+				2DE72BD526A588C9002BB752 /* Info.plist */,
 			);
 			path = NativeSignerTests;
 			sourceTree = "<group>";
 		};
-		00E356F01AD99517003FC87E /* Supporting Files */ = {
+		2DE72BDD26A588C9002BB752 /* NativeSignerUITests */ = {
 			isa = PBXGroup;
 			children = (
-				00E356F11AD99517003FC87E /* Info.plist */,
+				2DE72BDE26A588C9002BB752 /* NativeSignerUITests.swift */,
+				2DE72BE026A588C9002BB752 /* Info.plist */,
 			);
-			name = "Supporting Files";
+			path = NativeSignerUITests;
 			sourceTree = "<group>";
 		};
-		13B07FAE1A68108700A75B9A /* NativeSigner */ = {
+		2DE72BEF26A5981C002BB752 /* Models */ = {
 			isa = PBXGroup;
 			children = (
-				1F426F9B208D358500CA43DB /* NativeSigner-Bridging-Header.h */,
-				1F426F90208D31D200CA43DB /* signer.h */,
-				13B07FAF1A68108700A75B9A /* AppDelegate.h */,
-				13B07FB01A68108700A75B9A /* AppDelegate.m */,
-				13B07FB51A68108700A75B9A /* Images.xcassets */,
-				13B07FB61A68108700A75B9A /* Info.plist */,
-				13B07FB11A68108700A75B9A /* LaunchScreen.xib */,
-				13B07FB71A68108700A75B9A /* main.m */,
-				6784634824ACE7D0000990D6 /* Bridging.swift */,
+				2D7A7BF026C50F950053C1E0 /* NetworkSettings.swift */,
+				2DE72C0126A6C27E002BB752 /* Camera.swift */,
+				2DE72BFF26A6ADC5002BB752 /* CameraService.swift */,
+				2D7A7BD326BBEAF00053C1E0 /* Canary.swift */,
+				2D7A7BBF26B97DB30053C1E0 /* Identities.swift */,
+				2DE72BF026A59834002BB752 /* Network.swift */,
+				2DE72C0E26A99885002BB752 /* RustNative.swift */,
+				2D7A7BF426C58E9E0053C1E0 /* History.swift */,
+				2D7A7BE426C3FE260053C1E0 /* Documents.swift */,
+				2D7A7BCF26BBC72D0053C1E0 /* Transaction.swift */,
+				2D7A7BDF26C3AC350053C1E0 /* TransactionTypes.swift */,
+				2D7A7BD526C1126C0053C1E0 /* Utils.swift */,
 			);
-			name = NativeSigner;
+			path = Models;
 			sourceTree = "<group>";
 		};
-		1F3559852089081300E8521D /* Recovered References */ = {
+		2DE72C0B26A992D9002BB752 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
-				DDFA123E816A46BBB8DF60B6 /* libRCTCamera.a */,
-				5099F906199C4A1DB534B2F2 /* libRNRandomBytes.a */,
-				D44E3C511D404074AF5AFDB9 /* libRNSVG.a */,
-			);
-			name = "Recovered References";
-			sourceTree = "<group>";
-		};
-		1F7FFA15208B691700FF717A /* Frameworks */ = {
-			isa = PBXGroup;
-			children = (
-				671B818C2416E17100632516 /* libDoubleConversion.a */,
-				399D1B0D22DDDE1B00A815EB /* JavaScriptCore.framework */,
-				1F426F39208B7CC000CA43DB /* libsigner.a */,
-				1F7FFA3B208B691700FF717A /* libresolv.tbd */,
-				A67D7844B2B3A1BE43F3774E /* libPods-NativeSigner.a */,
-				8D65048B1ED96512885EC461 /* libPods-NativeSigner-NativeSignerTests.a */,
+				2DE72C0C26A992D9002BB752 /* libresolv.tbd */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
 		};
-		3955110222F4547F00078B17 /* Products */ = {
+		2DE72C1226AACB25002BB752 /* Database */ = {
 			isa = PBXGroup;
 			children = (
-				671B80D52416CB3B00632516 /* libRNRandomBytes.a */,
-				3955110922F4547F00078B17 /* libRNRandomBytes-tvOS.a */,
+				2D7A7BA926AED2500053C1E0 /* Database */,
 			);
-			name = Products;
-			sourceTree = "<group>";
-		};
-		39D36A0122F4588B00EDA4F1 /* Products */ = {
-			isa = PBXGroup;
-			children = (
-				671B80D12416CB3B00632516 /* libRNCNetInfo.a */,
-				39D36A0822F4588C00EDA4F1 /* libRNCNetInfo-tvOS.a */,
-			);
-			name = Products;
-			sourceTree = "<group>";
-		};
-		6D14AF58F6CE45DDBA2DE41C /* Resources */ = {
-			isa = PBXGroup;
-			children = (
-				EA252ACE6F044BD88BDCD173 /* Roboto-Black.ttf */,
-				6779B93E24741C7F00DFEFA9 /* RobotoMono-Medium.ttf */,
-				183C9D1307934735A4129705 /* Roboto-BlackItalic.ttf */,
-				D592A5F1000548E09C637958 /* Roboto-Bold.ttf */,
-				0A3530DA239B43579EF02112 /* Roboto-BoldItalic.ttf */,
-				42D126E4D4D84C4784E2377B /* Roboto-Italic.ttf */,
-				53880E8FF84C419EB11ACA5C /* Roboto-Light.ttf */,
-				8C99AB759A004CEB88AC4455 /* Roboto-LightItalic.ttf */,
-				E3DA81F74A0847378E71E280 /* Roboto-Medium.ttf */,
-				67E3BEA2237C17A6007882FA /* RobotoMono-Regular.ttf */,
-				5F744F56289845F0A1085BBB /* Roboto-MediumItalic.ttf */,
-				5CD421FF72D947B0AA9EBABB /* Roboto-Regular.ttf */,
-				020454D0D3C74A398EC7F440 /* Roboto-Thin.ttf */,
-				FAE70C1AAEEA45159C8CB0EA /* Roboto-ThinItalic.ttf */,
-				624E6C0FF4A64A97A7D51BEF /* Manifold-CF-Bold.otf */,
-				5D4F46832A564A6C98432D76 /* Manifold-CF-Demi-Bold.otf */,
-				F198D2DE15BC4461B2308E3C /* Manifold-CF-Extra-Bold.otf */,
-				31AAF2CB51C04377BFC79634 /* Manifold-CF-Light.otf */,
-				2EC5DDFE054D4A68B1B7D900 /* Manifold-CF.otf */,
-				894E2A1A52DC44C28E9F9A71 /* AntDesign.ttf */,
-				6A7AB3BD3C1A4E0EB3C4B3B6 /* Entypo.ttf */,
-				E2C73A1D48444F90B25AB1C9 /* EvilIcons.ttf */,
-				2D0EA96B71FC4AFF8C35B80E /* Feather.ttf */,
-				15BC2D6C3FC64019985638C1 /* FontAwesome.ttf */,
-				3DB51A3702D94B6BA025DDE6 /* FontAwesome5_Brands.ttf */,
-				E759893EEAF44DD487B2401E /* FontAwesome5_Regular.ttf */,
-				431C560691184DF8B5347066 /* FontAwesome5_Solid.ttf */,
-				6C53A63D96B24FDD95AF1C97 /* Fontisto.ttf */,
-				91D53BBCAE6D418EA362A703 /* Foundation.ttf */,
-				84D1117E71B04C839F00F619 /* Ionicons.ttf */,
-				CB5C4A7F0E8B4E4E98E06EFD /* MaterialCommunityIcons.ttf */,
-				4BF2B8970DC245F4BA0574F9 /* MaterialIcons.ttf */,
-				F2FB2DDD90964B3BB1FC813C /* Octicons.ttf */,
-				E8E0FEBC36F54D78A81C1639 /* SimpleLineIcons.ttf */,
-				7733AB637FF54DE5B174F42C /* Zocial.ttf */,
-			);
-			name = Resources;
-			sourceTree = "<group>";
-		};
-		832341AE1AAA6A7D00B99B32 /* Libraries */ = {
-			isa = PBXGroup;
-			children = (
-			);
-			name = Libraries;
-			sourceTree = "<group>";
-		};
-		83CBB9F61A601CBA00E9B192 = {
-			isa = PBXGroup;
-			children = (
-				6701864823270B1100A14061 /* assets */,
-				39B6F6102315B550009C3C05 /* main.jsbundle */,
-				13B07FAE1A68108700A75B9A /* NativeSigner */,
-				832341AE1AAA6A7D00B99B32 /* Libraries */,
-				00E356EF1AD99517003FC87E /* NativeSignerTests */,
-				83CBBA001A601CBA00E9B192 /* Products */,
-				1F3559852089081300E8521D /* Recovered References */,
-				1F7FFA15208B691700FF717A /* Frameworks */,
-				6D14AF58F6CE45DDBA2DE41C /* Resources */,
-				99E67DDEA1C0A1F7EACC69CB /* Pods */,
-			);
-			indentWidth = 2;
-			sourceTree = "<group>";
-			tabWidth = 2;
-		};
-		83CBBA001A601CBA00E9B192 /* Products */ = {
-			isa = PBXGroup;
-			children = (
-				13B07F961A680F5B00A75B9A /* NativeSigner.app */,
-				00E356EE1AD99517003FC87E /* NativeSignerTests.xctest */,
-			);
-			name = Products;
-			sourceTree = "<group>";
-		};
-		88043C742301BD2B00340AB7 /* Products */ = {
-			isa = PBXGroup;
-			children = (
-				671B80D92416CB3B00632516 /* libRNSVG.a */,
-				88043C832301BD2B00340AB7 /* libRNSVG-tvOS.a */,
-			);
-			name = Products;
-			sourceTree = "<group>";
-		};
-		99E67DDEA1C0A1F7EACC69CB /* Pods */ = {
-			isa = PBXGroup;
-			children = (
-				2E43A8182F586AE97EC694AD /* Pods-NativeSigner.debug.xcconfig */,
-				F5A969A2336EFB6AAFB76B57 /* Pods-NativeSigner.release.xcconfig */,
-				4CBAF819A6739A2AEC6AB7B1 /* Pods-NativeSigner.githubactions.xcconfig */,
-				E349784A51B7EC61DA0E0127 /* Pods-NativeSigner-NativeSignerTests.debug.xcconfig */,
-				8CED6BE60471B6CB2A6E0F08 /* Pods-NativeSigner-NativeSignerTests.release.xcconfig */,
-				0CBFA37873E5DC7BE99408C5 /* Pods-NativeSigner-NativeSignerTests.githubactions.xcconfig */,
-			);
-			path = Pods;
+			path = Database;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		00E356ED1AD99517003FC87E /* NativeSignerTests */ = {
+		2DE72BBD26A588C7002BB752 /* NativeSigner */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 00E357021AD99517003FC87E /* Build configuration list for PBXNativeTarget "NativeSignerTests" */;
+			buildConfigurationList = 2DE72BE326A588C9002BB752 /* Build configuration list for PBXNativeTarget "NativeSigner" */;
 			buildPhases = (
-				A6D1330E26B08845E0531D42 /* [CP] Check Pods Manifest.lock */,
-				00E356EA1AD99517003FC87E /* Sources */,
-				00E356EB1AD99517003FC87E /* Frameworks */,
-				00E356EC1AD99517003FC87E /* Resources */,
-				F49EF56164522E60CA8DC9C3 /* [CP] Copy Pods Resources */,
-			);
-			buildRules = (
-			);
-			dependencies = (
-				00E356F51AD99517003FC87E /* PBXTargetDependency */,
-			);
-			name = NativeSignerTests;
-			productName = NativeSignerTests;
-			productReference = 00E356EE1AD99517003FC87E /* NativeSignerTests.xctest */;
-			productType = "com.apple.product-type.bundle.unit-test";
-		};
-		13B07F861A680F5B00A75B9A /* NativeSigner */ = {
-			isa = PBXNativeTarget;
-			buildConfigurationList = 13B07F931A680F5B00A75B9A /* Build configuration list for PBXNativeTarget "NativeSigner" */;
-			buildPhases = (
-				1C3008AF23C42B9FB273318C /* [CP] Check Pods Manifest.lock */,
-				13B07F871A680F5B00A75B9A /* Sources */,
-				13B07F8C1A680F5B00A75B9A /* Frameworks */,
-				13B07F8E1A680F5B00A75B9A /* Resources */,
-				00DD1BFF1BD5951E006B06BC /* Bundle React Native code and images */,
-				709FA926369B7BAC46708BFD /* [CP] Copy Pods Resources */,
+				2DE72BBA26A588C7002BB752 /* Sources */,
+				2DE72BBB26A588C7002BB752 /* Frameworks */,
+				2DE72BBC26A588C7002BB752 /* Resources */,
 			);
 			buildRules = (
 			);
 			dependencies = (
 			);
 			name = NativeSigner;
-			productName = "Hello World";
-			productReference = 13B07F961A680F5B00A75B9A /* NativeSigner.app */;
+			productName = NativeSigner;
+			productReference = 2DE72BBE26A588C7002BB752 /* NativeSigner.app */;
 			productType = "com.apple.product-type.application";
+		};
+		2DE72BCE26A588C9002BB752 /* NativeSignerTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 2DE72BE626A588C9002BB752 /* Build configuration list for PBXNativeTarget "NativeSignerTests" */;
+			buildPhases = (
+				2DE72BCB26A588C9002BB752 /* Sources */,
+				2DE72BCC26A588C9002BB752 /* Frameworks */,
+				2DE72BCD26A588C9002BB752 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				2DE72BD126A588C9002BB752 /* PBXTargetDependency */,
+			);
+			name = NativeSignerTests;
+			productName = NativeSignerTests;
+			productReference = 2DE72BCF26A588C9002BB752 /* NativeSignerTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+		2DE72BD926A588C9002BB752 /* NativeSignerUITests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 2DE72BE926A588C9002BB752 /* Build configuration list for PBXNativeTarget "NativeSignerUITests" */;
+			buildPhases = (
+				2DE72BD626A588C9002BB752 /* Sources */,
+				2DE72BD726A588C9002BB752 /* Frameworks */,
+				2DE72BD826A588C9002BB752 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				2DE72BDC26A588C9002BB752 /* PBXTargetDependency */,
+			);
+			name = NativeSignerUITests;
+			productName = NativeSignerUITests;
+			productReference = 2DE72BDA26A588C9002BB752 /* NativeSignerUITests.xctest */;
+			productType = "com.apple.product-type.bundle.ui-testing";
 		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
-		83CBB9F71A601CBA00E9B192 /* Project object */ = {
+		2DE72BB626A588C7002BB752 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastUpgradeCheck = 1020;
-				ORGANIZATIONNAME = "Parity Technologies";
+				LastSwiftUpdateCheck = 1250;
+				LastUpgradeCheck = 1250;
 				TargetAttributes = {
-					00E356ED1AD99517003FC87E = {
-						CreatedOnToolsVersion = 6.2;
-						DevelopmentTeam = P2PX3JU8FT;
-						LastSwiftMigration = 1140;
-						ProvisioningStyle = Automatic;
-						TestTargetID = 13B07F861A680F5B00A75B9A;
+					2DE72BBD26A588C7002BB752 = {
+						CreatedOnToolsVersion = 12.5.1;
 					};
-					13B07F861A680F5B00A75B9A = {
-						LastSwiftMigration = 930;
-						ProvisioningStyle = Automatic;
+					2DE72BCE26A588C9002BB752 = {
+						CreatedOnToolsVersion = 12.5.1;
+						TestTargetID = 2DE72BBD26A588C7002BB752;
+					};
+					2DE72BD926A588C9002BB752 = {
+						CreatedOnToolsVersion = 12.5.1;
+						TestTargetID = 2DE72BBD26A588C7002BB752;
 					};
 				};
 			};
-			buildConfigurationList = 83CBB9FA1A601CBA00E9B192 /* Build configuration list for PBXProject "NativeSigner" */;
-			compatibilityVersion = "Xcode 3.2";
-			developmentRegion = English;
+			buildConfigurationList = 2DE72BB926A588C7002BB752 /* Build configuration list for PBXProject "NativeSigner" */;
+			compatibilityVersion = "Xcode 9.3";
+			developmentRegion = en;
 			hasScannedForEncodings = 0;
 			knownRegions = (
-				English,
 				en,
 				Base,
 			);
-			mainGroup = 83CBB9F61A601CBA00E9B192;
-			productRefGroup = 83CBBA001A601CBA00E9B192 /* Products */;
+			mainGroup = 2DE72BB526A588C7002BB752;
+			productRefGroup = 2DE72BBF26A588C7002BB752 /* Products */;
 			projectDirPath = "";
-			projectReferences = (
-				{
-					ProductGroup = 39D36A0122F4588B00EDA4F1 /* Products */;
-					ProjectRef = BB0882DC34AE448DAA1E2320 /* RNCNetInfo.xcodeproj */;
-				},
-				{
-					ProductGroup = 3955110222F4547F00078B17 /* Products */;
-					ProjectRef = 99AC61BF1E3C4FE8B07077D3 /* RNRandomBytes.xcodeproj */;
-				},
-				{
-					ProductGroup = 88043C742301BD2B00340AB7 /* Products */;
-					ProjectRef = C0205550495341279B513024 /* RNSVG.xcodeproj */;
-				},
-			);
 			projectRoot = "";
 			targets = (
-				13B07F861A680F5B00A75B9A /* NativeSigner */,
-				00E356ED1AD99517003FC87E /* NativeSignerTests */,
+				2DE72BBD26A588C7002BB752 /* NativeSigner */,
+				2DE72BCE26A588C9002BB752 /* NativeSignerTests */,
+				2DE72BD926A588C9002BB752 /* NativeSignerUITests */,
 			);
 		};
 /* End PBXProject section */
 
-/* Begin PBXReferenceProxy section */
-		3955110922F4547F00078B17 /* libRNRandomBytes-tvOS.a */ = {
-			isa = PBXReferenceProxy;
-			fileType = archive.ar;
-			path = "libRNRandomBytes-tvOS.a";
-			remoteRef = 3955110822F4547F00078B17 /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-		39D36A0822F4588C00EDA4F1 /* libRNCNetInfo-tvOS.a */ = {
-			isa = PBXReferenceProxy;
-			fileType = archive.ar;
-			path = "libRNCNetInfo-tvOS.a";
-			remoteRef = 39D36A0722F4588C00EDA4F1 /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-		671B80D12416CB3B00632516 /* libRNCNetInfo.a */ = {
-			isa = PBXReferenceProxy;
-			fileType = archive.ar;
-			path = libRNCNetInfo.a;
-			remoteRef = 671B80D02416CB3B00632516 /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-		671B80D52416CB3B00632516 /* libRNRandomBytes.a */ = {
-			isa = PBXReferenceProxy;
-			fileType = archive.ar;
-			path = libRNRandomBytes.a;
-			remoteRef = 671B80D42416CB3B00632516 /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-		671B80D92416CB3B00632516 /* libRNSVG.a */ = {
-			isa = PBXReferenceProxy;
-			fileType = archive.ar;
-			path = libRNSVG.a;
-			remoteRef = 671B80D82416CB3B00632516 /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-		88043C832301BD2B00340AB7 /* libRNSVG-tvOS.a */ = {
-			isa = PBXReferenceProxy;
-			fileType = archive.ar;
-			path = "libRNSVG-tvOS.a";
-			remoteRef = 88043C822301BD2B00340AB7 /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-/* End PBXReferenceProxy section */
-
 /* Begin PBXResourcesBuildPhase section */
-		00E356EC1AD99517003FC87E /* Resources */ = {
+		2DE72BBC26A588C7002BB752 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				2D7A7BCE26BBC5690053C1E0 /* LaunchScreen.xib in Resources */,
+				2D7A7BE726C410FF0053C1E0 /* privacy-policy.txt in Resources */,
+				2DE72BC926A588C9002BB752 /* Preview Assets.xcassets in Resources */,
+				2D7A7BAA26AED2500053C1E0 /* Database in Resources */,
+				2DE72BC626A588C9002BB752 /* Assets.xcassets in Resources */,
+				2D7A7BE326C3FC250053C1E0 /* terms-and-conditions.txt in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		2DE72BCD26A588C9002BB752 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		13B07F8E1A680F5B00A75B9A /* Resources */ = {
+		2DE72BD826A588C9002BB752 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				39B6F6432315B550009C3C05 /* main.jsbundle in Resources */,
-				13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */,
-				13B07FBD1A68108700A75B9A /* LaunchScreen.xib in Resources */,
-				0A5DA78AED2F468C8025AF7C /* Roboto-Black.ttf in Resources */,
-				3D7A98D07DE443E381067D3A /* Roboto-BlackItalic.ttf in Resources */,
-				95279244A36A49849FCE2DAE /* Roboto-Bold.ttf in Resources */,
-				E501D58522AE41A9AF18340A /* Roboto-BoldItalic.ttf in Resources */,
-				B43B3542B9ED441AB8AFBA0B /* Roboto-Italic.ttf in Resources */,
-				423E02567C044AF6832B2388 /* Roboto-Light.ttf in Resources */,
-				EE896FB251B94030AC713B6F /* Roboto-LightItalic.ttf in Resources */,
-				EDCE1EC0CA1249279F03F2E2 /* Roboto-Medium.ttf in Resources */,
-				A6DE194CA1E344F6B2BBDD09 /* Roboto-MediumItalic.ttf in Resources */,
-				7A7137D6EEDE40C184F30C15 /* Roboto-Regular.ttf in Resources */,
-				6779B94524741C7F00DFEFA9 /* RobotoMono-Medium.ttf in Resources */,
-				16614F66487241CE933918B8 /* Roboto-Thin.ttf in Resources */,
-				0CFC8839F5B54F888E6C01DE /* Roboto-ThinItalic.ttf in Resources */,
-				67E3BED3237C17A6007882FA /* RobotoMono-Regular.ttf in Resources */,
-				3C31DDCB4CD0465084344D5F /* Manifold-CF-Bold.otf in Resources */,
-				AD0B6F7EACB74BA7A42D2A2E /* Manifold-CF-Demi-Bold.otf in Resources */,
-				F1569210427145DEBBB5B898 /* Manifold-CF-Extra-Bold.otf in Resources */,
-				5DC40D98E51D492C8FF692B5 /* Manifold-CF-Light.otf in Resources */,
-				77AE2A2069B847F9B7EB4854 /* Manifold-CF.otf in Resources */,
-				6701864923270B1100A14061 /* assets in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
 
-/* Begin PBXShellScriptBuildPhase section */
-		00DD1BFF1BD5951E006B06BC /* Bundle React Native code and images */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputPaths = (
-			);
-			name = "Bundle React Native code and images";
-			outputPaths = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "export NODE_BINARY=node\nexport NODE_OPTIONS=\"--max_old_space_size=8192\"\n../node_modules/react-native/scripts/react-native-xcode.sh\n";
-		};
-		1C3008AF23C42B9FB273318C /* [CP] Check Pods Manifest.lock */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputFileListPaths = (
-			);
-			inputPaths = (
-				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
-				"${PODS_ROOT}/Manifest.lock",
-			);
-			name = "[CP] Check Pods Manifest.lock";
-			outputFileListPaths = (
-			);
-			outputPaths = (
-				"$(DERIVED_FILE_DIR)/Pods-NativeSigner-checkManifestLockResult.txt",
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
-			showEnvVarsInLog = 0;
-		};
-		709FA926369B7BAC46708BFD /* [CP] Copy Pods Resources */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-NativeSigner/Pods-NativeSigner-resources.sh",
-				"${PODS_ROOT}/../../node_modules/react-native-vector-icons/Fonts/AntDesign.ttf",
-				"${PODS_ROOT}/../../node_modules/react-native-vector-icons/Fonts/Entypo.ttf",
-				"${PODS_ROOT}/../../node_modules/react-native-vector-icons/Fonts/EvilIcons.ttf",
-				"${PODS_ROOT}/../../node_modules/react-native-vector-icons/Fonts/Feather.ttf",
-				"${PODS_ROOT}/../../node_modules/react-native-vector-icons/Fonts/FontAwesome.ttf",
-				"${PODS_ROOT}/../../node_modules/react-native-vector-icons/Fonts/FontAwesome5_Brands.ttf",
-				"${PODS_ROOT}/../../node_modules/react-native-vector-icons/Fonts/FontAwesome5_Regular.ttf",
-				"${PODS_ROOT}/../../node_modules/react-native-vector-icons/Fonts/FontAwesome5_Solid.ttf",
-				"${PODS_ROOT}/../../node_modules/react-native-vector-icons/Fonts/Fontisto.ttf",
-				"${PODS_ROOT}/../../node_modules/react-native-vector-icons/Fonts/Foundation.ttf",
-				"${PODS_ROOT}/../../node_modules/react-native-vector-icons/Fonts/Ionicons.ttf",
-				"${PODS_ROOT}/../../node_modules/react-native-vector-icons/Fonts/MaterialCommunityIcons.ttf",
-				"${PODS_ROOT}/../../node_modules/react-native-vector-icons/Fonts/MaterialIcons.ttf",
-				"${PODS_ROOT}/../../node_modules/react-native-vector-icons/Fonts/Octicons.ttf",
-				"${PODS_ROOT}/../../node_modules/react-native-vector-icons/Fonts/SimpleLineIcons.ttf",
-				"${PODS_ROOT}/../../node_modules/react-native-vector-icons/Fonts/Zocial.ttf",
-				"${PODS_CONFIGURATION_BUILD_DIR}/React-Core/AccessibilityResources.bundle",
-			);
-			name = "[CP] Copy Pods Resources";
-			outputPaths = (
-				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/AntDesign.ttf",
-				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/Entypo.ttf",
-				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/EvilIcons.ttf",
-				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/Feather.ttf",
-				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/FontAwesome.ttf",
-				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/FontAwesome5_Brands.ttf",
-				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/FontAwesome5_Regular.ttf",
-				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/FontAwesome5_Solid.ttf",
-				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/Fontisto.ttf",
-				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/Foundation.ttf",
-				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/Ionicons.ttf",
-				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/MaterialCommunityIcons.ttf",
-				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/MaterialIcons.ttf",
-				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/Octicons.ttf",
-				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/SimpleLineIcons.ttf",
-				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/Zocial.ttf",
-				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/AccessibilityResources.bundle",
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-NativeSigner/Pods-NativeSigner-resources.sh\"\n";
-			showEnvVarsInLog = 0;
-		};
-		A6D1330E26B08845E0531D42 /* [CP] Check Pods Manifest.lock */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputFileListPaths = (
-			);
-			inputPaths = (
-				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
-				"${PODS_ROOT}/Manifest.lock",
-			);
-			name = "[CP] Check Pods Manifest.lock";
-			outputFileListPaths = (
-			);
-			outputPaths = (
-				"$(DERIVED_FILE_DIR)/Pods-NativeSigner-NativeSignerTests-checkManifestLockResult.txt",
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
-			showEnvVarsInLog = 0;
-		};
-		F49EF56164522E60CA8DC9C3 /* [CP] Copy Pods Resources */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-NativeSigner-NativeSignerTests/Pods-NativeSigner-NativeSignerTests-resources.sh",
-				"${PODS_ROOT}/../../node_modules/react-native-vector-icons/Fonts/AntDesign.ttf",
-				"${PODS_ROOT}/../../node_modules/react-native-vector-icons/Fonts/Entypo.ttf",
-				"${PODS_ROOT}/../../node_modules/react-native-vector-icons/Fonts/EvilIcons.ttf",
-				"${PODS_ROOT}/../../node_modules/react-native-vector-icons/Fonts/Feather.ttf",
-				"${PODS_ROOT}/../../node_modules/react-native-vector-icons/Fonts/FontAwesome.ttf",
-				"${PODS_ROOT}/../../node_modules/react-native-vector-icons/Fonts/FontAwesome5_Brands.ttf",
-				"${PODS_ROOT}/../../node_modules/react-native-vector-icons/Fonts/FontAwesome5_Regular.ttf",
-				"${PODS_ROOT}/../../node_modules/react-native-vector-icons/Fonts/FontAwesome5_Solid.ttf",
-				"${PODS_ROOT}/../../node_modules/react-native-vector-icons/Fonts/Fontisto.ttf",
-				"${PODS_ROOT}/../../node_modules/react-native-vector-icons/Fonts/Foundation.ttf",
-				"${PODS_ROOT}/../../node_modules/react-native-vector-icons/Fonts/Ionicons.ttf",
-				"${PODS_ROOT}/../../node_modules/react-native-vector-icons/Fonts/MaterialCommunityIcons.ttf",
-				"${PODS_ROOT}/../../node_modules/react-native-vector-icons/Fonts/MaterialIcons.ttf",
-				"${PODS_ROOT}/../../node_modules/react-native-vector-icons/Fonts/Octicons.ttf",
-				"${PODS_ROOT}/../../node_modules/react-native-vector-icons/Fonts/SimpleLineIcons.ttf",
-				"${PODS_ROOT}/../../node_modules/react-native-vector-icons/Fonts/Zocial.ttf",
-				"${PODS_CONFIGURATION_BUILD_DIR}/React-Core/AccessibilityResources.bundle",
-			);
-			name = "[CP] Copy Pods Resources";
-			outputPaths = (
-				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/AntDesign.ttf",
-				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/Entypo.ttf",
-				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/EvilIcons.ttf",
-				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/Feather.ttf",
-				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/FontAwesome.ttf",
-				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/FontAwesome5_Brands.ttf",
-				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/FontAwesome5_Regular.ttf",
-				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/FontAwesome5_Solid.ttf",
-				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/Fontisto.ttf",
-				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/Foundation.ttf",
-				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/Ionicons.ttf",
-				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/MaterialCommunityIcons.ttf",
-				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/MaterialIcons.ttf",
-				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/Octicons.ttf",
-				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/SimpleLineIcons.ttf",
-				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/Zocial.ttf",
-				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/AccessibilityResources.bundle",
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-NativeSigner-NativeSignerTests/Pods-NativeSigner-NativeSignerTests-resources.sh\"\n";
-			showEnvVarsInLog = 0;
-		};
-/* End PBXShellScriptBuildPhase section */
-
 /* Begin PBXSourcesBuildPhase section */
-		00E356EA1AD99517003FC87E /* Sources */ = {
+		2DE72BBA26A588C7002BB752 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				00E356F31AD99517003FC87E /* NativeSignerTests.m in Sources */,
+				2D7A7BDE26C296AA0053C1E0 /* TransactionReady.swift in Sources */,
+				2D7A7BE526C3FE260053C1E0 /* Documents.swift in Sources */,
+				2D7A7C0E26CB929B0053C1E0 /* TCTXSpec.swift in Sources */,
+				2DE72C1126AAC3D6002BB752 /* LandingView.swift in Sources */,
+				2D7A7C2726CBC3C70053C1E0 /* TCEraMortalNonce.swift in Sources */,
+				2DE72C0026A6ADC5002BB752 /* CameraService.swift in Sources */,
+				2DE72BF526A59C59002BB752 /* NetworkCard.swift in Sources */,
+				2D7A7C0826CA9BB00053C1E0 /* TCBlockHash.swift in Sources */,
+				2D7A7BC226B9D3370053C1E0 /* IdentityCard.swift in Sources */,
+				2D7A7C1226CB94520053C1E0 /* TCTypesInfo.swift in Sources */,
+				2D7A7BF126C50F950053C1E0 /* NetworkSettings.swift in Sources */,
+				2D7A7C2826CBC3C70053C1E0 /* TCAuthorPublicKey.swift in Sources */,
+				2D7A7C1C26CB97F50053C1E0 /* TCEnumVariantName.swift in Sources */,
+				2DE72BF926A5C360002BB752 /* CameraView.swift in Sources */,
+				2D7A7BD626C1126C0053C1E0 /* Utils.swift in Sources */,
+				2DE72BC426A588C7002BB752 /* MainButtonScreen.swift in Sources */,
+				2D7A7BB826B28D350053C1E0 /* SettingsScreen.swift in Sources */,
+				2D7A7C1A26CB97B30053C1E0 /* TCID.swift in Sources */,
+				2D7A7BB626B136970053C1E0 /* NewSeedScreen.swift in Sources */,
+				2DE72BC226A588C7002BB752 /* NativeSignerApp.swift in Sources */,
+				2D7A7C1426CB96180053C1E0 /* TCTip.swift in Sources */,
+				2D7A7C2626CBC3C70053C1E0 /* TCBalance.swift in Sources */,
+				2D7A7BF926C6620B0053C1E0 /* HistoryExpanded.swift in Sources */,
+				2D7A7BEF26C50ACB0053C1E0 /* SeedManager.swift in Sources */,
+				2D7A7C2A26CBC3C70053C1E0 /* TCEraImmortalNonce.swift in Sources */,
+				2DE72C0426A6CDC5002BB752 /* CameraPreview.swift in Sources */,
+				2D7A7BD426BBEAF00053C1E0 /* Canary.swift in Sources */,
+				2D7A7BD826C163110053C1E0 /* TransactionPreview.swift in Sources */,
+				2D7A7C1626CB96840053C1E0 /* TCWarning.swift in Sources */,
+				2D7A7BED26C50AB80053C1E0 /* NetworkManager.swift in Sources */,
+				2DE72BF726A5AC68002BB752 /* KeyManager.swift in Sources */,
+				2D7A7BA526AE9E680053C1E0 /* Footer.swift in Sources */,
+				2D7A7BDC26C2613F0053C1E0 /* TransactionCardView.swift in Sources */,
+				2D7A7BC026B97DB30053C1E0 /* Identities.swift in Sources */,
+				2D7A7C2926CBC3C70053C1E0 /* TCCall.swift in Sources */,
+				2D7A7BCA26BACFFB0053C1E0 /* QRView.swift in Sources */,
+				2D7A7C2026CB99250053C1E0 /* TransactionCardSelector.swift in Sources */,
+				2D7A7BD026BBC72D0053C1E0 /* Transaction.swift in Sources */,
+				2D7A7C1826CB96C70053C1E0 /* TCError.swift in Sources */,
+				2DE72BF326A59BAB002BB752 /* NetworkList.swift in Sources */,
+				2D7A7BFB26C6621D0053C1E0 /* HistoryCollapsed.swift in Sources */,
+				2D7A7BD226BBCE6F0053C1E0 /* TransactionScreen.swift in Sources */,
+				2D7A7BB426B02B700053C1E0 /* SeedSelector.swift in Sources */,
+				2D7A7BB026B00A3E0053C1E0 /* NavbarShield.swift in Sources */,
+				2D7A7BF326C519990053C1E0 /* MetadataCard.swift in Sources */,
+				2D7A7C0226CA98700053C1E0 /* TCAuthorPlain.swift in Sources */,
+				2D7A7BE026C3AC350053C1E0 /* TransactionTypes.swift in Sources */,
+				2D7A7C1E26CB98310053C1E0 /* TCVarName.swift in Sources */,
+				2D7A7BEB26C4149E0053C1E0 /* DocumentModal.swift in Sources */,
+				2D7A7BF726C650F50053C1E0 /* HistoryView.swift in Sources */,
+				2DE72C0F26A99885002BB752 /* RustNative.swift in Sources */,
+				2D7A7C0026CA97B00053C1E0 /* TCAuthor.swift in Sources */,
+				2D7A7BFD26C675D30053C1E0 /* HistoryCard.swift in Sources */,
+				2DE72BF126A59834002BB752 /* Network.swift in Sources */,
+				2D7A7BC426BA8B350053C1E0 /* NewIdentityScreen.swift in Sources */,
+				2D7A7BF526C58E9E0053C1E0 /* History.swift in Sources */,
+				2DE72C0226A6C27E002BB752 /* Camera.swift in Sources */,
+				2D7A7BCC26BAD02A0053C1E0 /* ExportIdentity.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		13B07F871A680F5B00A75B9A /* Sources */ = {
+		2DE72BCB26A588C9002BB752 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				13B07FBC1A68108700A75B9A /* AppDelegate.m in Sources */,
-				6784634924ACE7D0000990D6 /* Bridging.swift in Sources */,
-				13B07FC11A68108700A75B9A /* main.m in Sources */,
+				2DE72BD426A588C9002BB752 /* NativeSignerTests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		2DE72BD626A588C9002BB752 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				2DE72BDF26A588C9002BB752 /* NativeSignerUITests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
-		00E356F51AD99517003FC87E /* PBXTargetDependency */ = {
+		2DE72BD126A588C9002BB752 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = 13B07F861A680F5B00A75B9A /* NativeSigner */;
-			targetProxy = 00E356F41AD99517003FC87E /* PBXContainerItemProxy */;
+			target = 2DE72BBD26A588C7002BB752 /* NativeSigner */;
+			targetProxy = 2DE72BD026A588C9002BB752 /* PBXContainerItemProxy */;
+		};
+		2DE72BDC26A588C9002BB752 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 2DE72BBD26A588C7002BB752 /* NativeSigner */;
+			targetProxy = 2DE72BDB26A588C9002BB752 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
-/* Begin PBXVariantGroup section */
-		13B07FB11A68108700A75B9A /* LaunchScreen.xib */ = {
-			isa = PBXVariantGroup;
-			children = (
-				13B07FB21A68108700A75B9A /* Base */,
-			);
-			name = LaunchScreen.xib;
-			path = NativeSigner;
-			sourceTree = "<group>";
-		};
-/* End PBXVariantGroup section */
-
 /* Begin XCBuildConfiguration section */
-		00E356F61AD99517003FC87E /* Debug */ = {
-			isa = XCBuildConfiguration;
-			baseConfigurationReference = E349784A51B7EC61DA0E0127 /* Pods-NativeSigner-NativeSignerTests.debug.xcconfig */;
-			buildSettings = {
-				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = "$(inherited)";
-				BUNDLE_LOADER = "$(TEST_HOST)";
-				CLANG_ENABLE_MODULES = YES;
-				CODE_SIGN_IDENTITY = "iPhone Developer";
-				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = P2PX3JU8FT;
-				GCC_PREPROCESSOR_DEFINITIONS = (
-					"DEBUG=1",
-					"$(inherited)",
-				);
-				INFOPLIST_FILE = NativeSignerTests/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
-				LIBRARY_SEARCH_PATHS = "$(inherited)";
-				"LIBRARY_SEARCH_PATHS[arch=*]" = "$(inherited)";
-				OTHER_CFLAGS = (
-					"$(inherited)",
-					"-DFB_SONARKIT_ENABLED=1",
-				);
-				PRODUCT_BUNDLE_IDENTIFIER = "org.reactjs.native.example.$(PRODUCT_NAME:rfc1034identifier)";
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE_SPECIFIER = "";
-				SWIFT_OBJC_BRIDGING_HEADER = "NativeSignerTests-Bridging-Header.h";
-				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
-				SWIFT_VERSION = 5.0;
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/NativeSigner.app/NativeSigner";
-			};
-			name = Debug;
-		};
-		00E356F71AD99517003FC87E /* Release */ = {
-			isa = XCBuildConfiguration;
-			baseConfigurationReference = 8CED6BE60471B6CB2A6E0F08 /* Pods-NativeSigner-NativeSignerTests.release.xcconfig */;
-			buildSettings = {
-				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = "$(inherited)";
-				BUNDLE_LOADER = "$(TEST_HOST)";
-				CLANG_ENABLE_MODULES = YES;
-				CODE_SIGN_IDENTITY = "iPhone Developer";
-				CODE_SIGN_STYLE = Automatic;
-				COPY_PHASE_STRIP = NO;
-				DEVELOPMENT_TEAM = P2PX3JU8FT;
-				INFOPLIST_FILE = NativeSignerTests/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
-				LIBRARY_SEARCH_PATHS = "$(inherited)";
-				OTHER_CFLAGS = (
-					"$(inherited)",
-					"-DFB_SONARKIT_ENABLED=1",
-				);
-				"OTHER_LDFLAGS[arch=*]" = " -lc++";
-				PRODUCT_BUNDLE_IDENTIFIER = "org.reactjs.native.example.$(PRODUCT_NAME:rfc1034identifier)";
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE_SPECIFIER = "";
-				SWIFT_OBJC_BRIDGING_HEADER = "NativeSignerTests-Bridging-Header.h";
-				SWIFT_VERSION = 5.0;
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/NativeSigner.app/NativeSigner";
-			};
-			name = Release;
-		};
-		13B07F941A680F5B00A75B9A /* Debug */ = {
-			isa = XCBuildConfiguration;
-			baseConfigurationReference = 2E43A8182F586AE97EC694AD /* Pods-NativeSigner.debug.xcconfig */;
-			buildSettings = {
-				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = "$(inherited)";
-				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				CLANG_ENABLE_MODULES = YES;
-				CODE_SIGN_IDENTITY = "Apple Development";
-				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
-				DEAD_CODE_STRIPPING = NO;
-				DEVELOPMENT_TEAM = "P2PX3JU8FT";
-				ENABLE_BITCODE = NO;
-				"EXCLUDED_ARCHS[sdk=iphonesimulator*]" = arm64;
-				HEADER_SEARCH_PATHS = (
-					"$(SRCROOT)/../node_modules/react-native-camera/ios",
-					"${PODS_ROOT}/",
-					"$(inherited)",
-				);
-				INFOPLIST_FILE = NativeSigner/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
-				LD_RUNPATH_SEARCH_PATHS = "@executable_path/Frameworks";
-				LIBRARY_SEARCH_PATHS = (
-					"${PODS_ROOT}",
-					"$(inherited)",
-				);
-				OTHER_CFLAGS = (
-					"$(inherited)",
-					"-DFB_SONARKIT_ENABLED=1",
-				);
-				OTHER_LDFLAGS = (
-					"$(inherited)",
-					"-ObjC",
-					"-lc++",
-				);
-				PRODUCT_BUNDLE_IDENTIFIER = io.parity.NativeSigner;
-				PRODUCT_NAME = NativeSigner;
-				PROVISIONING_PROFILE_SPECIFIER = "";
-				SWIFT_OBJC_BRIDGING_HEADER = "NativeSigner/NativeSigner-Bridging-Header.h";
-				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
-				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = 1;
-				VALID_ARCHS = "arm64 arm64e armv7 armv7s x86_64";
-				VERSIONING_SYSTEM = "apple-generic";
-			};
-			name = Debug;
-		};
-		13B07F951A680F5B00A75B9A /* Release */ = {
-			isa = XCBuildConfiguration;
-			baseConfigurationReference = F5A969A2336EFB6AAFB76B57 /* Pods-NativeSigner.release.xcconfig */;
-			buildSettings = {
-				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = "$(inherited)";
-				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				CLANG_ENABLE_MODULES = YES;
-				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = P2PX3JU8FT;
-				ENABLE_BITCODE = NO;
-				HEADER_SEARCH_PATHS = (
-					"$(SRCROOT)/../node_modules/react-native-camera/ios",
-					"${PODS_ROOT}/",
-					"$(inherited)",
-				);
-				INFOPLIST_FILE = NativeSigner/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
-				LD_RUNPATH_SEARCH_PATHS = "@executable_path/Frameworks";
-				LIBRARY_SEARCH_PATHS = (
-					"${PODS_ROOT}",
-					"$(inherited)",
-				);
-				ONLY_ACTIVE_ARCH = YES;
-				OTHER_CFLAGS = (
-					"$(inherited)",
-					"-DFB_SONARKIT_ENABLED=1",
-				);
-				OTHER_LDFLAGS = (
-					"$(inherited)",
-					"-ObjC",
-					"-lc++",
-				);
-				PRODUCT_BUNDLE_IDENTIFIER = io.parity.NativeSigner;
-				PRODUCT_NAME = NativeSigner;
-				SWIFT_OBJC_BRIDGING_HEADER = "NativeSigner/NativeSigner-Bridging-Header.h";
-				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = 1;
-				VALID_ARCHS = "arm64 arm64e armv7 armv7s x86_64";
-				VERSIONING_SYSTEM = "apple-generic";
-			};
-			name = Release;
-		};
-		678810072450B99B00838601 /* GithubActions */ = {
+		2DE72BE126A588C9002BB752 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
-				CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED = YES;
-				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
 				CLANG_CXX_LIBRARY = "libc++";
 				CLANG_ENABLE_MODULES = YES;
 				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
 				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
 				CLANG_WARN_BOOL_CONVERSION = YES;
 				CLANG_WARN_COMMA = YES;
 				CLANG_WARN_CONSTANT_CONVERSION = YES;
 				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
 				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
 				CLANG_WARN_EMPTY_BODY = YES;
 				CLANG_WARN_ENUM_CONVERSION = YES;
 				CLANG_WARN_INFINITE_RECURSION = YES;
@@ -916,137 +644,18 @@
 				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
 				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
 				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
 				CLANG_WARN_STRICT_PROTOTYPES = YES;
 				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
-				COPY_PHASE_STRIP = YES;
-				ENABLE_NS_ASSERTIONS = NO;
-				ENABLE_STRICT_OBJC_MSGSEND = YES;
-				GCC_C_LANGUAGE_STANDARD = gnu99;
-				GCC_NO_COMMON_BLOCKS = YES;
-				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
-				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
-				GCC_WARN_UNDECLARED_SELECTOR = YES;
-				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
-				GCC_WARN_UNUSED_FUNCTION = YES;
-				GCC_WARN_UNUSED_VARIABLE = YES;
-				HEADER_SEARCH_PATHS = "$(inherited)";
-				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
-				LIBRARY_SEARCH_PATHS = "$(inherited)";
-				MTL_ENABLE_DEBUG_INFO = NO;
-				SDKROOT = iphoneos;
-				SWIFT_COMPILATION_MODE = wholemodule;
-				SWIFT_VERSION = 5.0;
-				VALIDATE_PRODUCT = YES;
-				VALID_ARCHS = x86_64;
-			};
-			name = GithubActions;
-		};
-		678810082450B99B00838601 /* GithubActions */ = {
-			isa = XCBuildConfiguration;
-			baseConfigurationReference = 4CBAF819A6739A2AEC6AB7B1 /* Pods-NativeSigner.githubactions.xcconfig */;
-			buildSettings = {
-				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = "$(inherited)";
-				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				CLANG_ENABLE_MODULES = YES;
-				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = P2PX3JU8FT;
-				ENABLE_BITCODE = NO;
-				HEADER_SEARCH_PATHS = (
-					"$(SRCROOT)/../node_modules/react-native-camera/ios",
-					"${PODS_ROOT}/",
-					"$(inherited)",
-				);
-				INFOPLIST_FILE = NativeSigner/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
-				LD_RUNPATH_SEARCH_PATHS = "@executable_path/Frameworks";
-				LIBRARY_SEARCH_PATHS = (
-					"${PODS_ROOT}",
-					"$(inherited)",
-				);
-				ONLY_ACTIVE_ARCH = YES;
-				OTHER_CFLAGS = (
-					"$(inherited)",
-					"-DFB_SONARKIT_ENABLED=1",
-				);
-				OTHER_LDFLAGS = (
-					"$(inherited)",
-					"-ObjC",
-					"-lc++",
-				);
-				PRODUCT_BUNDLE_IDENTIFIER = io.parity.NativeSigner;
-				PRODUCT_NAME = NativeSigner;
-				SWIFT_OBJC_BRIDGING_HEADER = "NativeSigner/NativeSigner-Bridging-Header.h";
-				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = 1;
-				VALID_ARCHS = x86_64;
-				VERSIONING_SYSTEM = "apple-generic";
-			};
-			name = GithubActions;
-		};
-		678810092450B99B00838601 /* GithubActions */ = {
-			isa = XCBuildConfiguration;
-			baseConfigurationReference = 0CBFA37873E5DC7BE99408C5 /* Pods-NativeSigner-NativeSignerTests.githubactions.xcconfig */;
-			buildSettings = {
-				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = "$(inherited)";
-				BUNDLE_LOADER = "$(TEST_HOST)";
-				CODE_SIGN_IDENTITY = "iPhone Developer";
-				CODE_SIGN_STYLE = Automatic;
 				COPY_PHASE_STRIP = NO;
-				DEVELOPMENT_TEAM = P2PX3JU8FT;
-				INFOPLIST_FILE = NativeSignerTests/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
-				LIBRARY_SEARCH_PATHS = "$(inherited)";
-				OTHER_CFLAGS = (
-					"$(inherited)",
-					"-DFB_SONARKIT_ENABLED=1",
-				);
-				"OTHER_LDFLAGS[arch=*]" = " -lc++";
-				PRODUCT_BUNDLE_IDENTIFIER = "org.reactjs.native.example.$(PRODUCT_NAME:rfc1034identifier)";
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE_SPECIFIER = "";
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/NativeSigner.app/NativeSigner";
-			};
-			name = GithubActions;
-		};
-		83CBBA201A601CBA00E9B192 /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = "$(inherited)";
-				ALWAYS_SEARCH_USER_PATHS = NO;
-				CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED = YES;
-				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
-				CLANG_CXX_LIBRARY = "libc++";
-				CLANG_ENABLE_MODULES = YES;
-				CLANG_ENABLE_OBJC_ARC = YES;
-				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
-				CLANG_WARN_BOOL_CONVERSION = YES;
-				CLANG_WARN_COMMA = YES;
-				CLANG_WARN_CONSTANT_CONVERSION = YES;
-				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
-				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
-				CLANG_WARN_EMPTY_BODY = YES;
-				CLANG_WARN_ENUM_CONVERSION = YES;
-				CLANG_WARN_INFINITE_RECURSION = YES;
-				CLANG_WARN_INT_CONVERSION = YES;
-				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
-				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
-				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
-				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
-				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
-				CLANG_WARN_STRICT_PROTOTYPES = YES;
-				CLANG_WARN_SUSPICIOUS_MOVE = YES;
-				CLANG_WARN_UNREACHABLE_CODE = YES;
-				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
-				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
-				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_NO_COMMON_BLOCKS = YES;
 				GCC_OPTIMIZATION_LEVEL = 0;
@@ -1054,41 +663,40 @@
 					"DEBUG=1",
 					"$(inherited)",
 				);
-				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
 				GCC_WARN_UNDECLARED_SELECTOR = YES;
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				HEADER_SEARCH_PATHS = "$(inherited)";
-				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
-				LD_RUNPATH_SEARCH_PATHS = "/usr/lib/swift $(inherited)";
-				LIBRARY_SEARCH_PATHS = "$(inherited)";
-				MTL_ENABLE_DEBUG_INFO = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 14.5;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = iphoneos;
-				SWIFT_OBJC_BRIDGING_HEADER = "";
-				SWIFT_VERSION = 5.0;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 			};
 			name = Debug;
 		};
-		83CBBA211A601CBA00E9B192 /* Release */ = {
+		2DE72BE226A588C9002BB752 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = "$(inherited)";
 				ALWAYS_SEARCH_USER_PATHS = NO;
-				CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED = YES;
-				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
 				CLANG_CXX_LIBRARY = "libc++";
 				CLANG_ENABLE_MODULES = YES;
 				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
 				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
 				CLANG_WARN_BOOL_CONVERSION = YES;
 				CLANG_WARN_COMMA = YES;
 				CLANG_WARN_CONSTANT_CONVERSION = YES;
 				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
 				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
 				CLANG_WARN_EMPTY_BODY = YES;
 				CLANG_WARN_ENUM_CONVERSION = YES;
 				CLANG_WARN_INFINITE_RECURSION = YES;
@@ -1097,16 +705,18 @@
 				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
 				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
 				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
 				CLANG_WARN_STRICT_PROTOTYPES = YES;
 				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
-				COPY_PHASE_STRIP = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
-				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
 				GCC_NO_COMMON_BLOCKS = YES;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
@@ -1114,53 +724,199 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				HEADER_SEARCH_PATHS = "$(inherited)";
-				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
-				LD_RUNPATH_SEARCH_PATHS = "/usr/lib/swift $(inherited)";
-				LIBRARY_SEARCH_PATHS = "$(inherited)";
+				IPHONEOS_DEPLOYMENT_TARGET = 14.5;
 				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
 				SDKROOT = iphoneos;
 				SWIFT_COMPILATION_MODE = wholemodule;
-				SWIFT_OBJC_BRIDGING_HEADER = "";
-				SWIFT_VERSION = 5.0;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
 				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		2DE72BE426A588C9002BB752 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_ASSET_PATHS = "\"NativeSigner/Preview Content\"";
+				DEVELOPMENT_TEAM = 4GK8JWU7P9;
+				ENABLE_BITCODE = NO;
+				ENABLE_PREVIEWS = YES;
+				"EXCLUDED_ARCHS[sdk=iphonesimulator*]" = arm64;
+				INFOPLIST_FILE = NativeSigner/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/NativeSigner",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = parity.NativeSigner;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_OBJC_BRIDGING_HEADER = "$(PROJECT_DIR)/NativeSigner/NativeSigner-Bridging-Header.h";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VALID_ARCHS = "arm64 arm64e x86_64";
+			};
+			name = Debug;
+		};
+		2DE72BE526A588C9002BB752 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_ASSET_PATHS = "\"NativeSigner/Preview Content\"";
+				DEVELOPMENT_TEAM = 4GK8JWU7P9;
+				ENABLE_BITCODE = NO;
+				ENABLE_PREVIEWS = YES;
+				INFOPLIST_FILE = NativeSigner/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/NativeSigner",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = parity.NativeSigner;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_OBJC_BRIDGING_HEADER = "$(PROJECT_DIR)/NativeSigner/NativeSigner-Bridging-Header.h";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VALID_ARCHS = "arm64 arm64e x86_64";
+			};
+			name = Release;
+		};
+		2DE72BE726A588C9002BB752 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = 4GK8JWU7P9;
+				INFOPLIST_FILE = NativeSignerTests/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = parity.NativeSignerTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/NativeSigner.app/NativeSigner";
+			};
+			name = Debug;
+		};
+		2DE72BE826A588C9002BB752 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = 4GK8JWU7P9;
+				INFOPLIST_FILE = NativeSignerTests/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = parity.NativeSignerTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/NativeSigner.app/NativeSigner";
+			};
+			name = Release;
+		};
+		2DE72BEA26A588C9002BB752 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = 4GK8JWU7P9;
+				INFOPLIST_FILE = NativeSignerUITests/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = parity.NativeSignerUITests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_TARGET_NAME = NativeSigner;
+			};
+			name = Debug;
+		};
+		2DE72BEB26A588C9002BB752 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = 4GK8JWU7P9;
+				INFOPLIST_FILE = NativeSignerUITests/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = parity.NativeSignerUITests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_TARGET_NAME = NativeSigner;
 			};
 			name = Release;
 		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		00E357021AD99517003FC87E /* Build configuration list for PBXNativeTarget "NativeSignerTests" */ = {
+		2DE72BB926A588C7002BB752 /* Build configuration list for PBXProject "NativeSigner" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				00E356F61AD99517003FC87E /* Debug */,
-				00E356F71AD99517003FC87E /* Release */,
-				678810092450B99B00838601 /* GithubActions */,
+				2DE72BE126A588C9002BB752 /* Debug */,
+				2DE72BE226A588C9002BB752 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		13B07F931A680F5B00A75B9A /* Build configuration list for PBXNativeTarget "NativeSigner" */ = {
+		2DE72BE326A588C9002BB752 /* Build configuration list for PBXNativeTarget "NativeSigner" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				13B07F941A680F5B00A75B9A /* Debug */,
-				13B07F951A680F5B00A75B9A /* Release */,
-				678810082450B99B00838601 /* GithubActions */,
+				2DE72BE426A588C9002BB752 /* Debug */,
+				2DE72BE526A588C9002BB752 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		83CBB9FA1A601CBA00E9B192 /* Build configuration list for PBXProject "NativeSigner" */ = {
+		2DE72BE626A588C9002BB752 /* Build configuration list for PBXNativeTarget "NativeSignerTests" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				83CBBA201A601CBA00E9B192 /* Debug */,
-				83CBBA211A601CBA00E9B192 /* Release */,
-				678810072450B99B00838601 /* GithubActions */,
+				2DE72BE726A588C9002BB752 /* Debug */,
+				2DE72BE826A588C9002BB752 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		2DE72BE926A588C9002BB752 /* Build configuration list for PBXNativeTarget "NativeSignerUITests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				2DE72BEA26A588C9002BB752 /* Debug */,
+				2DE72BEB26A588C9002BB752 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};
-	rootObject = 83CBB9F71A601CBA00E9B192 /* Project object */;
+	rootObject = 2DE72BB626A588C7002BB752 /* Project object */;
 }

@@ -18,48 +18,14 @@ jobs:
       - name:           Checkout submodules
         shell:          bash
         run:            git submodule update --init --recursive
-      - name:           Install NodeJS
-        uses:           actions/setup-node@v1
-        with:
-          node-version: '13.x'
-      - name:           Cache Npm
-        uses:           actions/cache@v1
-        with:
-          path:         ~/.npm
-          key:          ${{ runner.os }}-node-${{ hashFiles('**/package.json') }}
-          restore-keys: |
-            ${{ runner.os }}-node-
-      - name:           Get yarn cache directory path
-        id:             yarn-cache-dir-path
-        run:            echo "::set-output name=dir::$(yarn cache dir)"
-      - name:           Cache Yarn
-        uses:           actions/cache@v1
-        id:             yarn-cache # use this to check for `cache-hit` (`steps.yarn-cache.outputs.cache-hit != 'true'`)
-        with:
-          path:         ${{ steps.yarn-cache-dir-path.outputs.dir }}
-          key:          ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-yarn-
-      - name:           Cache Pods
-        uses:           actions/cache@v1
-        with:
-          path:         ios/Pods
-          key:          ${{ runner.os }}-pods-${{ hashFiles('**/Podfile.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-pods-
       - name:           Install dependencies
         run:            |
           brew tap wix/brew
           brew install applesimutils
-          npm install -g yarn
-          npm install -g react-native-cli
-          npm install -g detox-cli
-          gem install xcpretty
-          yarn
-      - name:           Build CocoaPods
-        run:            cd ios && pod install && cd ..
+           gem install xcpretty
+      - name:           Rust build
+        shell:          bash
+        run:            cd scripts && ./build.sh ios && cd ..
       - name:           Detox biuld
-        run:            yarn build-e2e:ci
-      - name:           Detox test
-        run:            yarn test-e2e:ci
+        run:            xcodebuild -workspace ios/NativeSigner.xcodeproj/project.xcworkspace -scheme NativeSigner -configuration Debug -sdk iphonesimulator -derivedDataPath ios/build/NativeSigner -UseModernBuildSystem=YES | xcpretty -t && exit ${PIPESTATUS[0]}
 

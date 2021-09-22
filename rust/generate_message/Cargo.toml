@@ -1,0 +1,16 @@
+[package]
+name = "generate_message"
+version = "0.1.0"
+authors = ["vera"]
+edition = "2018"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+sp-core = "3.0.0"
+hex = "0.4.3"
+qrcode_rtx = {path = "../qrcode_rtx"}
+meta_reading = {path = "../meta_reading"}
+parity-scale-codec = "2.1.1"
+sled = "0.34.6"
+definitions = {path = "../definitions"}
