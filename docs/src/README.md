@@ -1,4 +1,4 @@
-![Parity Signer](https://wiki.parity.io/logo-parity-signer.jpg)
+![Parity Signer](./tutorials/images/logo-parity-signer.jpg)
 
 [<img src="./res/github-badge.png" width="250"/>](https://github.com/paritytech/parity-signer/releases/)
 [<img src="./res/google-play-badge.png" width="250"/>](https://play.google.com/store/apps/details?id=io.parity.signer)
