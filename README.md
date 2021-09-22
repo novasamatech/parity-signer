@@ -8,27 +8,47 @@
 
 ![Parity Signer](./docs/tutorials/images/logo-parity-signer.jpg)
 
+**Please read instructions in [Getting started](#getting-started) before building or using the Signer**
+
 Parity Signer is a mobile application that allows any smartphone to act as an air-gapped crypto wallet. This is also known as "cold storage".
 
-You can create Substrate and Ethereum accounts, sign messages/transactions, and transfer funds to and from these accounts without any sort of connectivity enabled on the device.
+You can create accounts in Substrate-based networks, sign messages/transactions, and transfer funds to and from these accounts without any sort of connectivity enabled on the device.
 
-You must turn off or even physically remove the smartphone's Wifi, Mobile Network, and Bluetooth to ensure that the mobile phone containing these accounts will not be exposed to any online threat.
+You must turn off or even physically remove the smartphone's Wifi, Mobile Network, and Bluetooth to ensure that the mobile phone containing these accounts will not be exposed to any online threat. Switching to airplane mode suffices in many cases.
 
 **Disabling the mobile phone's networking abilities is a requirement for the app to be used as intended, check our [wiki](./docs/wiki/Security-And-Privacy.md) for more details.**
 
-Have a look at the tutorial on our wiki to learn how to use [Parity Signer together with Polkadot-js app](./docs/tutorials/Kusama-tutorial.md),  or [MyCrypto app](./docs/tutorials/MyCrypto-tutorial.md) and [Parity Fether](./docs/tutorials/Fether-tutorial.md) for Ethereum.
+Have a look at the tutorial on our wiki to learn how to use [Parity Signer together with Polkadot-js app](./docs/tutorials/Kusama-tutorial.md).
 
-Any data transfer from or to the app happens using QR code. By doing so, the most sensitive piece of information, the private keys, will never leave the phone. The Parity Signer mobile app can be used to store any Polkadot or Ethereum account, this includes KSM, ETH, ETC as well as Ether from various testnets (Kovan, Ropsten...).
+Any data transfer from or to the app happens using QR code. By doing so, the most sensitive piece of information, the private keys, will never leave the phone. The Parity Signer mobile app can be used to store any Substrate account, this includes Polkadot (DOT) and Kusama (KSM) networks.
 
-## Getting Start
+## Key features
+
+- This is not a complete cryptowallet in itself. The Signer does not sync with blockchain, so it does not know your account balance, whether transactions were successful or even if the account exists! This is a **cold wallet** app only stores keys, reads and signs messages. It should always be used with **hot wallet** like [polkadot.js](https://polkadot.js.org/apps)
+- The Signer alone does not make your accounts secure. **You must maintain security yourself**. Airgap should be only part of your security protocol, improper use of Signer could still lead to loss of funds and/or secrets.
+- When properly used, Signer provides best achievable security with Substrate networks to-date.
+
+## System requirements
+
+Currently Signer is available only for iOS. Android version is coming soon.
+
+## Getting Started
+
+**These tutorials and docs are heavily outdated at the moment, please use them as references or help improving**
+
+The `master` branch contains development code; for stable releases and release candidates please use [Release](https://github.com/paritytech/parity-signer/tree/release) branch or fetch tagged commits.
+
+If you are upgrading from older version of Signer, please see [changelog](./docs/wiki/Changelog.md) and [upgrading Signer](./docs/wiki/Upgrading.md)
+
+Please note that the Signer app is an advanced tool designed for maximum security and complex features. In many use cases, more user-friendly tools would be sufficient.
+
+[Getting started guide](./docs/tutorials/Start.md)
 
 ### Tutorials
 
 - [Signing with Pokadot.js Apps](./docs/tutorials/Kusama-tutorial.md)
 - [Recover Account from Polkadot.js Apps](./docs/tutorials/Recover-Account-Polkadotjs.md)
 - [Manage Accounts on Parity Signer](./docs/tutorials/Hierarchical-Deterministic-Key-Derivation.md)
-- [Signing with MyCrypto](./docs/tutorials/MyCrypto-tutorial.md)
-- [Signing with Fether](./docs/tutorials/Fether-tutorial.md)
 - [Update New Network](./docs/tutorials/New-Network.md)
 
 ### Wiki
@@ -39,8 +59,18 @@ Any data transfer from or to the app happens using QR code. By doing so, the mos
 - [Testing](./docs/wiki/Test.md)
 - [Troubleshooting](./docs/wiki/Troubleshooting.md)
 - [QA Check List](./docs/wiki/QA.md)
-- [HDKD Feature](./docs/wiki/HDKD.md)
+- [Key derivations](https://substrate.dev/docs/en/knowledgebase/integrate/subkey)
 - [Changelog](./docs/wiki/Changelog.md)
+- [QR encoding definition](https://github.com/maciejhirsz/uos)
+
+### Legacy versions
+
+Older versions of this app could be useful for development, however, they are not safe for use in production. They are available at following branches:
+
+- [Last public release with React Native](https://github.com/paritytech/parity-signer/tree/legacy-4.5.3)
+- [Non-ascii characters fix and some transaction parsing](https://github.com/paritytech/parity-signer/tree/legacy-4.6.2)
+- [Metadata types import and message parsing in RN](https://github.com/paritytech/parity-signer/tree/legacy-metadataRN)
+- [Rust backend with RN frontend](https://github.com/paritytech/parity-signer/tree/legacy-rust)
 
 ## License
 

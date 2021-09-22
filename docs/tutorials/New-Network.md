@@ -2,9 +2,13 @@
 
 Parity Signer support adding a new Substrate based network or update the existing network via QR code.
 
+## Importing network from polkadot.js
+
 This tutorial will walk through how to add a new Rococo Network with Polkadot.js App.
 
-## 1. Get the network metadata as QR Code
+**This is a work in progress, things could change**
+
+### 1. Get the network metadata as QR Code
 
 Switch to the network you want to play with on Polkadot.js app. Click `Settings` -> `MetaData`
 
@@ -14,10 +18,16 @@ Here we can see the chain specifications like `Network Name`, `Address Prefix`, 
 
 On the right side is the QR Code we need.
 
-## 2. Scan metadata QR code with Parity Signer
+### 2. Scan metadata QR code with Parity Signer
 
-Now on the Parity Signer app, click the QR scanner Button anywhere on the app, and scan this QR code, you will have the new Network added to Parity Signer. You can now create accounts under it and sign extrinsic with this network. 
+Now on the Parity Signer app, click the QR scanner Button, and scan this QR code stream. Please check the hash and note the signig key - now all updates for this network and this particular Signer devise should be signed with the same key.
 
-![Network Metadata Added on Parity Signer](images/Network-Metadata-Added.png)
+If the preview information is legit, click "Accept" (otherwise cancel transaction). Now you will have the new Network added to Parity Signer. You can now create accounts under it and sign extrinsic with this network.
 
-Notice since the metadata is generally very big data, and currently, it is hard to sync with Parity Signer, so when signing the transactions on added networks, we cannot interpreter the extrinsic details at the moment. Please check on this [issue](https://github.com/paritytech/parity-signer/issues/457) for the update.
+Please note that as network develops, its metadata will change over time. New metadata should be downloaded in similar manner when new version is available before any transactions could be signed.
+
+## Generate network updating QR stream
+
+This is an advanced operation that should only be performed by experienced users on trusted machine. Remember, that any inaccuracy in network specifications or metadata may lead to serious security threat, loss of funds and/or general account access!
+
+[Update generator instructions](../rust/generate_message/readme.md)
