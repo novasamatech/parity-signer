@@ -30,10 +30,10 @@ void signer_destroy_string(const char* cstring);
 const char * export_pubkey(struct ExternError*, const char* address, const char* network, const char* dbname);
 
 // qr frame count estimator
-int get_packets_total(struct ExternError*, const char* data);
+int get_packets_total(struct ExternError*, const char* data, int8_t cleaned);
 
 // qr fountain decoder
-const char * try_decode_qr_sequence(struct ExternError*, const char* data);
+const char * try_decode_qr_sequence(struct ExternError*, const char* data, int8_t cleaned);
 
 // Parse transaction
 // takes 2 strings:
