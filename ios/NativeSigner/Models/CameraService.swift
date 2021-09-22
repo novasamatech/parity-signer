@@ -201,12 +201,12 @@ public class CameraService: UIViewController, AVCaptureVideoDataOutputSampleBuff
                             if self.total == nil {
                                 var err = ExternError()
                                 let err_ptr = UnsafeMutablePointer(&err)
-                                let res = get_packets_total(err_ptr, payloadStr)
+                                let res = get_packets_total(err_ptr, payloadStr, 0)
                                 if err_ptr.pointee.code == 0 {
                                     let proposeTotal = Int(res)
                                     if proposeTotal == 1 {
                                         let process = "[\"" + payloadStr + "\"]"
-                                        let res2 = try_decode_qr_sequence(err_ptr, process)
+                                        let res2 = try_decode_qr_sequence(err_ptr, process, 0)
                                         if err_ptr.pointee.code == 0 {
                                             DispatchQueue.main.async {
                                                 self.payload = String(cString: res2!)
@@ -233,7 +233,7 @@ public class CameraService: UIViewController, AVCaptureVideoDataOutputSampleBuff
                                     var err = ExternError()
                                     let err_ptr = UnsafeMutablePointer(&err)
                                     let process = "[\"" +  self.bucket.joined(separator: "\",\"") + "\"]"
-                                    let res = try_decode_qr_sequence(err_ptr, process)
+                                    let res = try_decode_qr_sequence(err_ptr, process, 0)
                                     if err_ptr.pointee.code == 0 {
                                         DispatchQueue.main.async {
                                             self.payload = String(cString: res!)

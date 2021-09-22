@@ -195,7 +195,7 @@ extension SignerDataModel {
         self.selectedSeed = seedName
         self.fetchKeys()
     }
-    
+
     func getSeed(seedName: String, backup: Bool = false) -> String {
         var err = ExternError()
         let err_ptr: UnsafeMutablePointer<ExternError> = UnsafeMutablePointer(&err)
