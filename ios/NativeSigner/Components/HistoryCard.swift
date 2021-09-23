@@ -74,7 +74,7 @@ struct HistoryCard: View {
                 }
                 HStack {
                     Text("Network key: ")
-                    Text(value.network_key)
+                    Text(value.network_genesis_hash)
                 }
                 //TODO: fill below
             case .identityRemoved(let value):
@@ -93,7 +93,7 @@ struct HistoryCard: View {
                 }
                 HStack {
                     Text("Network key: ")
-                    Text(value.network_key)
+                    Text(value.network_genesis_hash)
                 }
             case .metadataAdded(_):
                 Text("New metadata loaded")

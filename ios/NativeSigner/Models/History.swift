@@ -108,9 +108,10 @@ enum Event: Decodable, Hashable, Equatable {
 
 struct IdentityEvent: Decodable, Hashable {
     var seed_name: String
+    var encryption: String
     var public_key: String
     var path: String
-    var network_key: String
+    var network_genesis_hash: String
 }
 
 struct NetworkRemovedEvent: Decodable, Hashable {
