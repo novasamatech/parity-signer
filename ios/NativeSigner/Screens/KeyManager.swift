@@ -44,6 +44,17 @@ struct KeyManager: View {
                                 
                             }
                         }
+                        if data.selectedSeed != "" {
+                            Button(action:{
+                                data.proposeDerive()
+                                data.keyManagerModal = .newKey
+                            }) {
+                                Text("Add key")
+                                    .font(.largeTitle)
+                                    .foregroundColor(Color("AccentColor"))
+                                    .multilineTextAlignment(.center)
+                            }
+                        }
                     }
                 }
                 
