@@ -68,6 +68,7 @@
 		2D7A7C2826CBC3C70053C1E0 /* TCAuthorPublicKey.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D7A7C2326CBC3C70053C1E0 /* TCAuthorPublicKey.swift */; };
 		2D7A7C2926CBC3C70053C1E0 /* TCCall.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D7A7C2426CBC3C70053C1E0 /* TCCall.swift */; };
 		2D7A7C2A26CBC3C70053C1E0 /* TCEraImmortalNonce.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D7A7C2526CBC3C70053C1E0 /* TCEraImmortalNonce.swift */; };
+		2DB037B426FCB06A00A318B2 /* TCPallet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2DB037B326FCB06A00A318B2 /* TCPallet.swift */; };
 		2DE72BC226A588C7002BB752 /* NativeSignerApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2DE72BC126A588C7002BB752 /* NativeSignerApp.swift */; };
 		2DE72BC426A588C7002BB752 /* MainScreenContainer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2DE72BC326A588C7002BB752 /* MainScreenContainer.swift */; };
 		2DE72BC626A588C9002BB752 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 2DE72BC526A588C9002BB752 /* Assets.xcassets */; };
@@ -166,6 +167,7 @@
 		2D7A7C2326CBC3C70053C1E0 /* TCAuthorPublicKey.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TCAuthorPublicKey.swift; sourceTree = "<group>"; };
 		2D7A7C2426CBC3C70053C1E0 /* TCCall.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TCCall.swift; sourceTree = "<group>"; };
 		2D7A7C2526CBC3C70053C1E0 /* TCEraImmortalNonce.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TCEraImmortalNonce.swift; sourceTree = "<group>"; };
+		2DB037B326FCB06A00A318B2 /* TCPallet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TCPallet.swift; sourceTree = "<group>"; };
 		2DE72BBE26A588C7002BB752 /* NativeSigner.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = NativeSigner.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		2DE72BC126A588C7002BB752 /* NativeSignerApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NativeSignerApp.swift; sourceTree = "<group>"; };
 		2DE72BC326A588C7002BB752 /* MainScreenContainer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainScreenContainer.swift; sourceTree = "<group>"; };
@@ -315,6 +317,7 @@
 				2D0D5E7F26F0CFB100B0EF9D /* TCFieldName.swift */,
 				2D0D5E8126F0CFEB00B0EF9D /* TCFieldNumber.swift */,
 				2D0D5E8526F0D0CC00B0EF9D /* TCPathDocs.swift */,
+				2DB037B326FCB06A00A318B2 /* TCPallet.swift */,
 			);
 			path = TransactionCards;
 			sourceTree = "<group>";
@@ -566,6 +569,7 @@
 				2DE72C0026A6ADC5002BB752 /* CameraService.swift in Sources */,
 				2DE72BF526A59C59002BB752 /* NetworkCard.swift in Sources */,
 				2D7A7C0826CA9BB00053C1E0 /* TCBlockHash.swift in Sources */,
+				2DB037B426FCB06A00A318B2 /* TCPallet.swift in Sources */,
 				2D72B4FA26EF7D1C0081E879 /* Seeds.swift in Sources */,
 				2D0D5E8026F0CFB100B0EF9D /* TCFieldName.swift in Sources */,
 				2D7A7BC226B9D3370053C1E0 /* IdentityCard.swift in Sources */,
