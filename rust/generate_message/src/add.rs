@@ -153,5 +153,5 @@ fn network_kpt_u (address: &str, address_book: &Tree, chainspecs: &Tree, metadat
         Write::OnlyNew => if upd_sorted.upd_done {add_network_print(&shortcut)?},
         Write::None => (),
     }
-    write_metadata(sorted_meta_values, &metadata)
+    write_metadata(upd_sorted.sorted, &metadata)
 }
