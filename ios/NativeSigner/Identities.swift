@@ -191,7 +191,7 @@ extension SignerDataModel {
     func selectNextAddress() {
         if self.selectedAddress != nil {
             if let current = self.addresses.firstIndex(of: self.selectedAddress!) {
-                if current < (self.addresses.capacity - 1) {
+                if self.addresses.indices.contains(current + 1) {
                     self.selectedAddress = self.addresses[current+1]
                 }
             }
@@ -204,7 +204,7 @@ extension SignerDataModel {
     func selectPreviousAddress() {
         if self.selectedAddress != nil {
             if let current = self.addresses.firstIndex(of: self.selectedAddress!) {
-                if current > 0 {
+                if self.addresses.indices.contains(current - 1) {
                     self.selectedAddress = self.addresses[current-1]
                 }
             }
