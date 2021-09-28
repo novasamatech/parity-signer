@@ -1,7 +1,8 @@
 use anyhow;
 use hex;
 use sp_core::{Pair, ed25519, sr25519, ecdsa};
-use definitions::{constants::ADDRTREE, history::Event, metadata::{MetaValuesDisplay, VerifiedMetaValuesDisplay, NetworkDisplay}, network_specs::Verifier, types::TypesUpdate, users::{AddressKey, Encryption, generate_address_key, SufficientCrypto}};
+use constants::ADDRTREE;
+use definitions::{history::Event, metadata::{MetaValuesDisplay, VerifiedMetaValuesDisplay, NetworkDisplay}, network_specs::Verifier, types::TypesUpdate, users::{AddressKey, Encryption, generate_address_key, SufficientCrypto}};
 use parity_scale_codec::Encode;
 use std::convert::TryInto;
 use db_handling::{prep_messages::{prep_types, prep_load_metadata, prep_add_network_versioned, prep_add_network_latest}, error::NotHex, helpers::{open_db, open_tree, unhex, decode_address_details}, manage_history::enter_events};

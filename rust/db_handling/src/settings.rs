@@ -1,5 +1,6 @@
 use parity_scale_codec::Encode;
-use definitions::{constants::{SETTREE, TYPES, GENERALVERIFIER}, defaults::get_default_types, network_specs::Verifier};
+use constants::{SETTREE, TYPES, GENERALVERIFIER};
+use definitions::{defaults::get_default_types, network_specs::Verifier};
 use anyhow;
 
 use crate::error::Error;

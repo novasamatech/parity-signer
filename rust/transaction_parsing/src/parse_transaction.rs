@@ -1,16 +1,20 @@
 use hex;
+use frame_metadata::RuntimeMetadata;
 use parity_scale_codec::{Decode, Encode};
 use parity_scale_codec_derive;
 use printing_balance::{PrettyOutput, convert_balance_pretty};
-use definitions::{network_specs::{ChainSpecs, generate_network_key}, transactions::{Transaction, Sign}, users::{AddressDetails, Encryption, generate_address_key, print_as_base58}, constants::{SPECSTREE, METATREE, ADDRTREE, SETTREE, SIGNTRANS, TRANSACTION}, history::Event};
+use constants::{SPECSTREE, METATREE, ADDRTREE, SETTREE, SIGNTRANS, TRANSACTION};
+use definitions::{network_specs::{ChainSpecs, generate_network_key}, transactions::{Transaction, Sign}, users::{AddressDetails, Encryption, generate_address_key, print_as_base58}, history::Event};
 use sp_runtime::generic::Era;
 use std::convert::TryInto;
 
 use crate::utils::{find_meta, get_types};
 use crate::cards::{Action, Card, Warning};
-use crate::decoding::process_as_call;
+use crate::decoding_older::process_as_call;
+use crate::decoding_sci::decoding_sci_entry_point;
 use crate::error::{Error, BadInputData, UnableToDecode, DatabaseError, SystemError};
 use crate::helpers::{open_db, open_tree, flush_db, insert_into_tree, get_checksum, unhex, get_from_tree};
+use crate::method::OlderMeta;
 
 /// Transaction payload in hex format as it arrives into parsing program contains following elements:
 /// - prelude, length 6 symbols ("53" stands for substrate, ** - crypto type, 00 or 02 - transaction type),
@@ -123,7 +127,7 @@ pub fn parse_transaction (data_hex: &str, dbname: &str) -> Result<String, Error>
             let chain_prefix = chain_specs_found.base58prefix;
             
         // update tip output since we know chain specs already
-            let tip_output = match convert_balance_pretty (short.tip, chain_specs_found.decimals, &chain_specs_found.unit) {
+            let tip_output = match convert_balance_pretty (&short.tip.to_string(), chain_specs_found.decimals, &chain_specs_found.unit) {
                 Ok(x) => x,
                 Err(_) => return Err(Error::SystemError(SystemError::BalanceFail)),
             };
@@ -177,65 +181,137 @@ pub fn parse_transaction (data_hex: &str, dbname: &str) -> Result<String, Error>
                             let for_signing = [transaction_decoded.method.to_vec(), transaction_decoded.extrinsics.encode().to_vec()].concat();
                     
                         // transaction parsing
-                            match process_as_call (transaction_decoded.method, &meta, &type_database, index, indent, &chain_specs_found) {
-                                Ok(transaction_parsed) => {
-                                    let method_cards = &transaction_parsed.fancy_out[1..];
-                                    let index = transaction_parsed.index;
-                                    if transaction_parsed.remaining_vector.len() != 0 {return Err(Error::BadInputData(BadInputData::SomeDataNotUsed))}
+                            match meta {
+                                RuntimeMetadata::V12(_)|RuntimeMetadata::V13(_) => {
+                                    let older_meta = match meta {
+                                        RuntimeMetadata::V12(meta_v12) => {OlderMeta::V12(meta_v12)},
+                                        RuntimeMetadata::V13(meta_v13) => {OlderMeta::V13(meta_v13)},
+                                        _ => unreachable!(),
+                                    };
+                                    match process_as_call (transaction_decoded.method, &older_meta, &type_database, index, indent, &chain_specs_found) {
+                                        Ok(transaction_parsed) => {
+                                            let method_cards = &transaction_parsed.fancy_out[1..];
+                                            let index = transaction_parsed.index;
+                                            if transaction_parsed.remaining_vector.len() != 0 {return Err(Error::BadInputData(BadInputData::SomeDataNotUsed))}
 
-                                // make extrinsics card set
-                                    let extrinsics_cards = print_full_extrinsics (index, indent, &tip_output, &short, chain_name);
+                                        // make extrinsics card set
+                                            let extrinsics_cards = print_full_extrinsics (index, indent, &tip_output, &short, chain_name);
                                     
-                                    match warn_network_not_allowed {
-                                        None => {
-                                        // network is among the allowed ones for this address key; can sign;
-                                        // making action entry into database
-                                            let action_into_db = Transaction::Sign(Sign{
-                                                encryption,
-                                                path: address_details.path,
-                                                transaction: for_signing,
-                                                has_pwd: address_details.has_pwd,
-                                                address_key,
-                                                history,
-                                            });
-                                            
-                                            insert_into_tree(SIGNTRANS.to_vec(), action_into_db.encode(), &transaction)?;
-                                            flush_db(&database)?;
-                                            let checksum = get_checksum(&database)?;
-                                            
-                                        // action card
-                                            let action_card = Action::SignTransaction(checksum).card();
+                                            match warn_network_not_allowed {
+                                                None => {
+                                                // network is among the allowed ones for this address key; can sign;
+                                                // making action entry into database
+                                                    let action_into_db = Transaction::Sign(Sign{
+                                                        encryption,
+                                                        path: address_details.path,
+                                                        transaction: for_signing,
+                                                        has_pwd: address_details.has_pwd,
+                                                        address_key,
+                                                        history,
+                                                    });
+                                                    
+                                                    insert_into_tree(SIGNTRANS.to_vec(), action_into_db.encode(), &transaction)?;
+                                                    flush_db(&database)?;
+                                                    let checksum = get_checksum(&database)?;
+                                                    
+                                                // action card
+                                                    let action_card = Action::SignTransaction(checksum).card();
+                                                // full cards set
+                                                    let cards = match warning_card {
+                                                        Some(warn) => format!("{{\"author\":[{}],\"warning\":[{}],\"method\":[{}],\"extrinsics\":[{}],{}}}", author_card, warn, method_cards, extrinsics_cards, action_card),
+                                                        None => format!("{{\"author\":[{}],\"method\":[{}],\"extrinsics\":[{}],{}}}", author_card, method_cards, extrinsics_cards, action_card),
+                                                    };
+                                                    Ok(cards)
+                                                },
+                                                Some(warn_no_network_id) => {
+                                                // network is NOT among the allowed ones for this address key; should not happen; can decode, not allowed to sign
+                                                    let cards = match warning_card {
+                                                        Some(warn) => format!("{{\"author\":[{}],\"warning\":[{},{}],\"method\":[{}],\"extrinsics\":[{}]}}", author_card, warn_no_network_id, warn, method_cards, extrinsics_cards),
+                                                        None => format!("{{\"author\":[{}],\"warning\":[{}],\"method\":[{}],\"extrinsics\":[{}]}}", author_card, warn_no_network_id, method_cards, extrinsics_cards),
+                                                    };
+                                                    Ok(cards)
+                                                },
+                                            }
+                                        },
+                                        Err(e) => {
+                                        // was unable to decode transaction properly, produced one of known decoding errors
+                                        // no action possible
+                                            let error_card = (Card::Error(e)).card(index, indent);
+                                            index = index + 1;
+                                        // make extrinsics card set
+                                            let extrinsics_cards = print_full_extrinsics (index, indent, &tip_output, &short, chain_name);
                                         // full cards set
                                             let cards = match warning_card {
-                                                Some(warn) => format!("{{\"author\":[{}],\"warning\":[{}],\"method\":[{}],\"extrinsics\":[{}],{}}}", author_card, warn, method_cards, extrinsics_cards, action_card),
-                                                None => format!("{{\"author\":[{}],\"method\":[{}],\"extrinsics\":[{}],{}}}", author_card, method_cards, extrinsics_cards, action_card),
+                                                Some(warn) => format!("{{\"author\":[{}],\"warning\":[{}],\"error\":[{}],\"extrinsics\":[{}]}}", author_card, warn, error_card, extrinsics_cards),
+                                                None => format!("{{\"author\":[{}],\"error\":[{}],\"extrinsics\":[{}]}}", author_card, error_card, extrinsics_cards),
                                             };
                                             Ok(cards)
                                         },
-                                        Some(warn_no_network_id) => {
-                                        // network is NOT among the allowed ones for this address key; should not happen; can decode, not allowed to sign
-                                            let cards = match warning_card {
-                                                Some(warn) => format!("{{\"author\":[{}],\"warning\":[{},{}],\"method\":[{}],\"extrinsics\":[{}]}}", author_card, warn_no_network_id, warn, method_cards, extrinsics_cards),
-                                                None => format!("{{\"author\":[{}],\"warning\":[{}],\"method\":[{}],\"extrinsics\":[{}]}}", author_card, warn_no_network_id, method_cards, extrinsics_cards),
-                                            };
-                                            Ok(cards)
-                                        }
                                     }
                                 },
-                                Err(e) => {
-                                // was unable to decode transaction properly, produced one of known decoding errors
-                                // no action possible
-                                    let error_card = (Card::Error(e)).card(index, indent);
-                                    index = index + 1;
-                                // make extrinsics card set
-                                    let extrinsics_cards = print_full_extrinsics (index, indent, &tip_output, &short, chain_name);
-                                // full cards set
-                                    let cards = match warning_card {
-                                        Some(warn) => format!("{{\"author\":[{}],\"warning\":[{}],\"error\":[{}],\"extrinsics\":[{}]}}", author_card, warn, error_card, extrinsics_cards),
-                                        None => format!("{{\"author\":[{}],\"error\":[{}],\"extrinsics\":[{}]}}", author_card, error_card, extrinsics_cards),
-                                    };
-                                    Ok(cards)
+                                RuntimeMetadata::V14(meta_v14) => {
+                                    match decoding_sci_entry_point (transaction_decoded.method, &meta_v14, index, indent, &chain_specs_found) {
+                                        Ok(transaction_parsed) => {
+                                            let method_cards = &transaction_parsed.fancy_out;
+                                            let index = transaction_parsed.index;
+                                            if transaction_parsed.remaining_vector.len() != 0 {return Err(Error::BadInputData(BadInputData::SomeDataNotUsed))}
+
+                                        // make extrinsics card set
+                                            let extrinsics_cards = print_full_extrinsics (index, indent, &tip_output, &short, chain_name);
+                                    
+                                            match warn_network_not_allowed {
+                                                None => {
+                                                // network is among the allowed ones for this address key; can sign;
+                                                // making action entry into database
+                                                    let action_into_db = Transaction::Sign(Sign{
+                                                        encryption,
+                                                        path: address_details.path,
+                                                        transaction: for_signing,
+                                                        has_pwd: address_details.has_pwd,
+                                                        address_key,
+                                                        history,
+                                                    });
+                                                    
+                                                    insert_into_tree(SIGNTRANS.to_vec(), action_into_db.encode(), &transaction)?;
+                                                    flush_db(&database)?;
+                                                    let checksum = get_checksum(&database)?;
+                                                    
+                                                // action card
+                                                    let action_card = Action::SignTransaction(checksum).card();
+                                                // full cards set
+                                                    let cards = match warning_card {
+                                                        Some(warn) => format!("{{\"author\":[{}],\"warning\":[{}],\"method\":[{}],\"extrinsics\":[{}],{}}}", author_card, warn, method_cards, extrinsics_cards, action_card),
+                                                        None => format!("{{\"author\":[{}],\"method\":[{}],\"extrinsics\":[{}],{}}}", author_card, method_cards, extrinsics_cards, action_card),
+                                                    };
+                                                    Ok(cards)
+                                                },
+                                                Some(warn_no_network_id) => {
+                                                // network is NOT among the allowed ones for this address key; should not happen; can decode, not allowed to sign
+                                                    let cards = match warning_card {
+                                                        Some(warn) => format!("{{\"author\":[{}],\"warning\":[{},{}],\"method\":[{}],\"extrinsics\":[{}]}}", author_card, warn_no_network_id, warn, method_cards, extrinsics_cards),
+                                                        None => format!("{{\"author\":[{}],\"warning\":[{}],\"method\":[{}],\"extrinsics\":[{}]}}", author_card, warn_no_network_id, method_cards, extrinsics_cards),
+                                                    };
+                                                    Ok(cards)
+                                                },
+                                            }
+                                        },
+                                        Err(e) => {
+                                        // was unable to decode transaction properly, produced one of known decoding errors
+                                        // no action possible
+                                            let error_card = (Card::Error(e)).card(index, indent);
+                                            index = index + 1;
+                                        // make extrinsics card set
+                                            let extrinsics_cards = print_full_extrinsics (index, indent, &tip_output, &short, chain_name);
+                                        // full cards set
+                                            let cards = match warning_card {
+                                                Some(warn) => format!("{{\"author\":[{}],\"warning\":[{}],\"error\":[{}],\"extrinsics\":[{}]}}", author_card, warn, error_card, extrinsics_cards),
+                                                None => format!("{{\"author\":[{}],\"error\":[{}],\"extrinsics\":[{}]}}", author_card, error_card, extrinsics_cards),
+                                            };
+                                            Ok(cards)
+                                        },
+                                    }
                                 },
+                                _ => return Err(Error::SystemError(SystemError::MetaVersionBelow12)),
                             }
                         },
                         Err(e) => {
@@ -276,28 +352,63 @@ pub fn parse_transaction (data_hex: &str, dbname: &str) -> Result<String, Error>
                             let type_database = get_types(&settings)?;
 
                         // transaction parsing
-                            match process_as_call (transaction_decoded.method, &meta, &type_database, index, indent, &chain_specs_found) {
-                                Ok(transaction_parsed) => {
-                                    let method_cards = &transaction_parsed.fancy_out[1..];
-                                    let index = transaction_parsed.index;
-                                    if transaction_parsed.remaining_vector.len() != 0 {return Err(Error::BadInputData(BadInputData::SomeDataNotUsed))}
+                            match meta {
+                                RuntimeMetadata::V12(_)|RuntimeMetadata::V13(_) => {
+                                    let older_meta = match meta {
+                                        RuntimeMetadata::V12(meta_v12) => {OlderMeta::V12(meta_v12)},
+                                        RuntimeMetadata::V13(meta_v13) => {OlderMeta::V13(meta_v13)},
+                                        _ => unreachable!(),
+                                    };
+                                    match process_as_call (transaction_decoded.method, &older_meta, &type_database, index, indent, &chain_specs_found) {
+                                        Ok(transaction_parsed) => {
+                                            let method_cards = &transaction_parsed.fancy_out[1..];
+                                            let index = transaction_parsed.index;
+                                            if transaction_parsed.remaining_vector.len() != 0 {return Err(Error::BadInputData(BadInputData::SomeDataNotUsed))}
 
-                                // make extrinsics card set
-                                    let extrinsics_cards = print_full_extrinsics (index, indent, &tip_output, &short, chain_name);
-                                // full cards set
-                                    let cards = format!("{{\"author\":[{}],\"warning\":[{}],\"method\":[{}],\"extrinsics\":[{}]}}", author_card, warning_card, method_cards, extrinsics_cards);
-                                    Ok(cards)
+                                        // make extrinsics card set
+                                            let extrinsics_cards = print_full_extrinsics (index, indent, &tip_output, &short, chain_name);
+                                        // full cards set
+                                            let cards = format!("{{\"author\":[{}],\"warning\":[{}],\"method\":[{}],\"extrinsics\":[{}]}}", author_card, warning_card, method_cards, extrinsics_cards);
+                                            Ok(cards)
+                                        },
+                                        Err(e) => {
+                                        // was unable to decode transaction properly, produced one of known decoding errors
+                                        // no action possible
+                                            let error_card = (Card::Error(e)).card(index, indent);
+                                            index = index + 1;
+                                        // make extrinsics card set
+                                            let extrinsics_cards = print_full_extrinsics (index, indent, &tip_output, &short, chain_name);
+                                            let cards = format!("{{\"author\":[{}],\"warning\":[{}],\"error\":[{}],\"extrinsics\":[{}]}}", author_card, warning_card, error_card, extrinsics_cards);
+                                            Ok(cards)
+                                        },
+                                    }
                                 },
-                                Err(e) => {
-                                // was unable to decode transaction properly, produced one of known decoding errors
-                                // no action possible
-                                    let error_card = (Card::Error(e)).card(index, indent);
-                                    index = index + 1;
-                                // make extrinsics card set
-                                    let extrinsics_cards = print_full_extrinsics (index, indent, &tip_output, &short, chain_name);
-                                    let cards = format!("{{\"author\":[{}],\"warning\":[{}],\"error\":[{}],\"extrinsics\":[{}]}}", author_card, warning_card, error_card, extrinsics_cards);
-                                    Ok(cards)
+                                RuntimeMetadata::V14(meta_v14) => {
+                                    match decoding_sci_entry_point (transaction_decoded.method, &meta_v14, index, indent, &chain_specs_found) {
+                                        Ok(transaction_parsed) => {
+                                            let method_cards = &transaction_parsed.fancy_out;
+                                            let index = transaction_parsed.index;
+                                            if transaction_parsed.remaining_vector.len() != 0 {return Err(Error::BadInputData(BadInputData::SomeDataNotUsed))}
+
+                                        // make extrinsics card set
+                                            let extrinsics_cards = print_full_extrinsics (index, indent, &tip_output, &short, chain_name);
+                                        // full cards set
+                                            let cards = format!("{{\"author\":[{}],\"warning\":[{}],\"method\":[{}],\"extrinsics\":[{}]}}", author_card, warning_card, method_cards, extrinsics_cards);
+                                            Ok(cards)
+                                        },
+                                        Err(e) => {
+                                        // was unable to decode transaction properly, produced one of known decoding errors
+                                        // no action possible
+                                            let error_card = (Card::Error(e)).card(index, indent);
+                                            index = index + 1;
+                                        // make extrinsics card set
+                                            let extrinsics_cards = print_full_extrinsics (index, indent, &tip_output, &short, chain_name);
+                                            let cards = format!("{{\"author\":[{}],\"warning\":[{}],\"error\":[{}],\"extrinsics\":[{}]}}", author_card, warning_card, error_card, extrinsics_cards);
+                                            Ok(cards)
+                                        },
+                                    }
                                 },
+                                _ => return Err(Error::SystemError(SystemError::MetaVersionBelow12)),
                             }
                         },
                         Err(e) => {

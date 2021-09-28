@@ -1,7 +1,8 @@
 use parity_scale_codec::Encode;
 use regex::Regex;
 use lazy_static::lazy_static;
-use definitions::{constants::{METATREE, SPECSTREE}, metadata::NameVersioned};
+use constants::{METATREE, SPECSTREE};
+use definitions::metadata::NameVersioned;
 use anyhow;
 
 use crate::error::{Error, NotHex};

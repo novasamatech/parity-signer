@@ -27,6 +27,7 @@ struct ExternError {
 
 void signer_destroy_string(const char* cstring);
 
+// Show QR with key name, public key and network ID
 const char * export_pubkey(struct ExternError*, const char* address, const char* network, const char* dbname);
 
 // qr frame count estimator
@@ -59,11 +60,17 @@ const char * parse_transaction(struct ExternError*, const char* transaction, con
 // password - optional derivation password (///password)
 // dbname (from OS)
 // Returns QR payload string or plaintext statement of action result
-const char * handle_action(struct ExternError*, const char* action, const char* seed_phrase, const char* password, const char* dbname);
+const char * handle_action(struct ExternError*, const char* action, const char* seed_phrase, const char* password, const char* user_comment, const char* dbname);
 
 // Self descriptive: development test for channel
 // TODO: remove for safety
 const char * development_test(struct ExternError*, const char* input);
+
+// Generate identicon from base58 address
+const char * base58_identicon(struct ExternError*, const char* base58, int size);
+
+// Generate identicon from public key
+const char * identicon(struct ExternError*, const char* key, int size);
 
 // Fetch one network for general display purposes
 const char * get_network(struct ExternError*, const char* genesis_hash, const char* dbname);

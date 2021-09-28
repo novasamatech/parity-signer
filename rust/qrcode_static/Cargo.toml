@@ -10,8 +10,9 @@ edition = "2018"
 hex = "0.4.3"
 png = "0.16.8"
 anyhow = "1.0.42"
-definitions = {path = "../definitions"}
+constants = {path = "../constants"}
 qrcodegen = "1.6.0"
+
 
 [lib]
 name = "qrcode_static"

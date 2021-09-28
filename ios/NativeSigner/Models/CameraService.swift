@@ -5,6 +5,11 @@
 //  Created by Alexander Slesarev on 20.7.2021.
 //
 
+/**
+ * Logic behind the camera - boilerplate, parsing QRs into payloads, collection of payloads and their transfer to Rust decoder
+ * Some concurrency
+ */
+
 import AVKit
 import Vision
 import UIKit
@@ -170,7 +175,9 @@ public class CameraService: UIViewController, AVCaptureVideoDataOutputSampleBuff
         self.start()
     }
     
-    // Callback for receiving buffer - payload assembly should eventually be fed from here
+    /**
+     * Callback for receiving buffer - payload assembly is fed from here
+     */
     //TODO: once everything else works, make this mess readable
     public func captureOutput(_ output: AVCaptureOutput, didOutput sampleBuffer: CMSampleBuffer, from connection: AVCaptureConnection) {
         guard let pixelBuffer = CMSampleBufferGetImageBuffer(sampleBuffer) else {
@@ -195,17 +202,18 @@ public class CameraService: UIViewController, AVCaptureVideoDataOutputSampleBuff
                     print(result.count)
                 }
                 if let descriptor = result[0].barcodeDescriptor as? CIQRCodeDescriptor {
+                    //Actual QR handling starts here
                     let payloadStr = descriptor.errorCorrectedPayload.map{String(format: "%02x", $0)}.joined()
                     stitcherQueue.async {
                         if !self.bucket.contains(payloadStr) {
-                            if self.total == nil {
+                            if self.total == nil { //init new collection of frames
                                 var err = ExternError()
                                 let err_ptr = UnsafeMutablePointer(&err)
                                 let res = get_packets_total(err_ptr, payloadStr, 0)
                                 if err_ptr.pointee.code == 0 {
                                     let proposeTotal = Int(res)
-                                    if proposeTotal == 1 {
-                                        let process = "[\"" + payloadStr + "\"]"
+                                    if proposeTotal == 1 { //Special handling for 1-frame payloads
+                                        let process = "[\"" + payloadStr + "\"]" //Decoder expects JSON array
                                         let res2 = try_decode_qr_sequence(err_ptr, process, 0)
                                         if err_ptr.pointee.code == 0 {
                                             DispatchQueue.main.async {
@@ -226,13 +234,13 @@ public class CameraService: UIViewController, AVCaptureVideoDataOutputSampleBuff
                                     //TODO: reset camera on failure
                                     signer_destroy_string(err_ptr.pointee.message)
                                 }
-                            } else {
+                            } else { //collect frames and attempt to decode if it seems that enough are collected
                                 self.bucket.append(payloadStr)
                                 print(self.bucket.count)
                                 if self.bucket.count >= self.total ?? 0 {
                                     var err = ExternError()
                                     let err_ptr = UnsafeMutablePointer(&err)
-                                    let process = "[\"" +  self.bucket.joined(separator: "\",\"") + "\"]"
+                                    let process = "[\"" +  self.bucket.joined(separator: "\",\"") + "\"]" //Decoder expects JSON array
                                     let res = try_decode_qr_sequence(err_ptr, process, 0)
                                     if err_ptr.pointee.code == 0 {
                                         DispatchQueue.main.async {
@@ -256,8 +264,22 @@ public class CameraService: UIViewController, AVCaptureVideoDataOutputSampleBuff
             }
         }
     }
+    
+    /**
+     * Empty bucket
+     */
+    func emptyBucket() {
+        payload = nil
+        total = nil
+        captured = nil
+        bucketCount = 0
+        bucket = []
+    }
 }
 
+/**
+ * Standard boilerplate for camera init
+ */
 extension CameraService {
     enum SessionSetupResult {
         case success

@@ -2,7 +2,7 @@ use std::fs;
 use raptorq;
 use qrcodegen::{QrCode, QrCodeEcc};
 use apng_encoder;
-use definitions::constants::{CHUNK_SIZE, BORDER, SCALING, FPS_NOM, FPS_DEN, MAIN_COLOR, BACK_COLOR};
+use constants::{CHUNK_SIZE, BORDER, SCALING, FPS_NOM, FPS_DEN, MAIN_COLOR, BACK_COLOR};
 
 /// function to take data as Vec<u8>, apply raptorq to get Vec<EncodingPacket>
 /// and serialize it to get Vec<u8> output
@@ -34,7 +34,7 @@ pub fn make_data_packs (input: &Vec<u8>) -> Result<Vec<Vec<u8>>, &'static str> {
             return Err("Encoded chunks have different length");
         }
     }
-    if len_check > 2953 {
+    if len_check > 2953 { // 2953 is bytes limit for qr codes having 8-bit binary data
             return Err("Encoded chunks too large to be turned into QR codes");
     }
     Ok(out)
@@ -82,8 +82,8 @@ pub fn make_apng (data: Vec<QrCode>, output_name: &str) -> Result<(), Box<dyn st
 
     for qr in data.iter() {
         let mut buffer: Vec<u8> = Vec::new();
-        for x in 0..size {
-            for y in 0..size {
+        for y in 0..size {
+            for x in 0..size {
                 if qr.get_module(x as i32/SCALING - BORDER, y as i32/SCALING - BORDER) {
                     buffer.push(MAIN_COLOR);
                 }

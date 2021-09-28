@@ -1,12 +1,12 @@
-![Parity Signer](https://wiki.parity.io/images/logo-parity-signer.jpg)
+![Parity Signer](https://wiki.parity.io/logo-parity-signer.jpg)
 
-[<img src="./res/github-badge.png" width="250"/>](https://github.com/paritytech/parity-signer/releases/)
-[<img src="./res/google-play-badge.png" width="250"/>](https://play.google.com/store/apps/details?id=io.parity.signer)
-[<img src="./res/app-store-badge.png" width="250"/>](https://itunes.apple.com/us/app/parity-signer/id1218174838)
+[<img src="./docs/src/res/github-badge.png" width="250"/>](https://github.com/paritytech/parity-signer/releases/)
+[<img src="./docs/src/res/google-play-badge.png" width="250"/>](https://play.google.com/store/apps/details?id=io.parity.signer)
+[<img src="./docs/src/res/app-store-badge.png" width="250"/>](https://itunes.apple.com/us/app/parity-signer/id1218174838)
 
 # Parity Signer - Turn your smartphone into a hardware wallet
 
-![Parity Signer](./docs/tutorials/images/logo-parity-signer.jpg)
+![Parity Signer](./tutorials/images/logo-parity-signer.jpg)
 
 **Please read instructions in [Getting started](#getting-started) before building or using the Signer**
 
@@ -16,9 +16,9 @@ You can create accounts in Substrate-based networks, sign messages/transactions,
 
 You must turn off or even physically remove the smartphone's Wifi, Mobile Network, and Bluetooth to ensure that the mobile phone containing these accounts will not be exposed to any online threat. Switching to airplane mode suffices in many cases.
 
-**Disabling the mobile phone's networking abilities is a requirement for the app to be used as intended, check our [wiki](./docs/wiki/Security-And-Privacy.md) for more details.**
+**Disabling the mobile phone's networking abilities is a requirement for the app to be used as intended, check our [wiki](./wiki/Security-And-Privacy.md) for more details.**
 
-Have a look at the tutorial on our wiki to learn how to use [Parity Signer together with Polkadot-js app](./docs/tutorials/Kusama-tutorial.md).
+Have a look at the tutorial on our wiki to learn how to use [Parity Signer together with Polkadot-js app](./tutorials/Kusama-tutorial.md).
 
 Any data transfer from or to the app happens using QR code. By doing so, the most sensitive piece of information, the private keys, will never leave the phone. The Parity Signer mobile app can be used to store any Substrate account, this includes Polkadot (DOT) and Kusama (KSM) networks.
 
@@ -36,31 +36,29 @@ Currently Signer is available only for iOS. Android version is coming soon.
 
 **These tutorials and docs are heavily outdated at the moment, please use them as references or help improving**
 
-The `master` branch contains development code; for stable releases and release candidates please use [Release](https://github.com/paritytech/parity-signer/tree/release) branch or fetch tagged commits.
-
-If you are upgrading from older version of Signer, please see [changelog](./docs/wiki/Changelog.md) and [upgrading Signer](./docs/wiki/Upgrading.md)
+If you are upgrading from older version of Signer, please see [changelog](./wiki/Changelog.md) and [upgrading Signer](./wiki/Upgrading.md)
 
 Please note that the Signer app is an advanced tool designed for maximum security and complex features. In many use cases, more user-friendly tools would be sufficient.
 
-[Getting started guide](./docs/tutorials/Start.md)
+[Getting started guide](./tutorials/Start.md)
 
 ### Tutorials
 
-- [Signing with Pokadot.js Apps](./docs/tutorials/Kusama-tutorial.md)
-- [Recover Account from Polkadot.js Apps](./docs/tutorials/Recover-Account-Polkadotjs.md)
-- [Manage Accounts on Parity Signer](./docs/tutorials/Hierarchical-Deterministic-Key-Derivation.md)
-- [Update New Network](./docs/tutorials/New-Network.md)
+- [Signing with Pokadot.js Apps](./tutorials/Kusama-tutorial.md)
+- [Recover Account from Polkadot.js Apps](./tutorials/Recover-Account-Polkadotjs.md)
+- [Manage Accounts on Parity Signer](./tutorials/Hierarchical-Deterministic-Key-Derivation.md)
+- [Update New Network](./tutorials/New-Network.md)
 
 ### Wiki
 
-- [Security and Privacy](./docs/wiki/Security-And-Privacy.md)
-- [Development](./docs/wiki/Development.md)
-- [Building and Publishing](./docs/wiki/Building-And-Publishing.md)
-- [Testing](./docs/wiki/Test.md)
-- [Troubleshooting](./docs/wiki/Troubleshooting.md)
-- [QA Check List](./docs/wiki/QA.md)
+- [Security and Privacy](./wiki/Security-And-Privacy.md)
+- [Development](./wiki/Development.md)
+- [Building and Publishing](./wiki/Building-And-Publishing.md)
+- [Testing](./wiki/Test.md)
+- [Troubleshooting](./wiki/Troubleshooting.md)
+- [QA Check List](./wiki/QA.md)
 - [Key derivations](https://substrate.dev/docs/en/knowledgebase/integrate/subkey)
-- [Changelog](./docs/wiki/Changelog.md)
+- [Changelog](./wiki/Changelog.md)
 - [QR encoding definition](https://github.com/maciejhirsz/uos)
 
 ### Legacy versions

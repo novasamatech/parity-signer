@@ -5,6 +5,10 @@
 //  Created by Alexander Slesarev on 20.7.2021.
 //
 
+/**
+ * This contains standard Apple boilerplate to generate basic camera preview
+ */
+
 import Foundation
 import Combine
 import AVFoundation
@@ -54,5 +58,14 @@ final class CameraViewModel: ObservableObject {
     func shutdown() {
         print(self.payload ?? "Nothing")
         service.stop()
+    }
+    
+    /**
+     * Clears recorded frames and starts anew
+     */
+    func reset() {
+        service.emptyBucket()
+        captured = nil
+        total = nil
     }
 }

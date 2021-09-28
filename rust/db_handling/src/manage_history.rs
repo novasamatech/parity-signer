@@ -1,4 +1,5 @@
-use definitions::{constants::HISTORY, history::{Event, Entry}};
+use constants::HISTORY;
+use definitions::history::{Event, Entry};
 use parity_scale_codec::{Decode, Encode};
 use anyhow;
 use chrono::Utc;
@@ -94,7 +95,17 @@ pub fn seeds_were_accessed(database_name: &str) -> anyhow::Result<()> {
     enter_events(database_name, events)
 }
 
+pub fn seed_name_was_accessed(database_name: &str, seed_name: String) -> anyhow::Result<()> {
+    let events = vec![Event::SeedNameWasAccessed(seed_name)];
+    enter_events(database_name, events)
+}
+
 pub fn seeds_were_shown(database_name: &str) -> anyhow::Result<()> {
     let events = vec![Event::SeedsWereShown];
+    enter_events(database_name, events)
+}
+
+pub fn seed_name_was_shown(database_name: &str, seed_name: String) -> anyhow::Result<()> {
+    let events = vec![Event::SeedNameWasShown(seed_name)];
     enter_events(database_name, events)
 }

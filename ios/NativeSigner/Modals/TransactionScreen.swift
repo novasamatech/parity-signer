@@ -8,30 +8,25 @@
 import SwiftUI
 
 struct TransactionScreen: View {
-    @StateObject var transaction = Transaction()
+    @EnvironmentObject var data: SignerDataModel
     var body: some View {
         ZStack {
-            switch (transaction.state) {
-            case .scanning :
+            switch (data.transactionState) {
+            case .none :
                 VStack {
-                    CameraView(transaction: transaction)
+                    CameraView()
                 }
             case .preview :
                 VStack {
-                    TransactionPreview(transaction: transaction)
+                    TransactionPreview()
                 }
-            case .show :
-                TransactionReady(transaction: transaction)
+            case .signed :
+                TransactionReady()
             default:
                 VStack {
                     Text("Please wait")
                         .foregroundColor(Color("textMainColor"))
                 }
-            }
-        }
-        .navigationTitle("Transaction").navigationBarTitleDisplayMode(.inline).toolbar {
-            ToolbarItem(placement: .navigationBarTrailing) {
-                NavbarShield()
             }
         }.background(/*@START_MENU_TOKEN@*//*@PLACEHOLDER=View@*/Color("backgroundColor")/*@END_MENU_TOKEN@*/)
     }

@@ -22,7 +22,7 @@ struct IdentityCard: View {
             }) {
                 HStack {
                     //TODO: always fetch and mode into model; requires rust code modifications; this is a stub
-                    Image(uiImage: UIImage(data: Data(fromHexEncodedString: String(cString: development_test(nil, identity.ss58)))!)!)
+                    Image(uiImage: UIImage(data: Data(fromHexEncodedString: String(cString: base58_identicon(nil, identity.ss58, 32)))!)!)
                     VStack (alignment: .leading) {
                         Text(identity.name)
                             .foregroundColor(Color("AccentColor"))
@@ -53,8 +53,8 @@ struct IdentityCard: View {
                     }
                     .alert(isPresented: $delete, content: {
                         Alert(
-                            title: Text("Delete identity?"),
-                            message: Text("You are about to delete identity " + data.selectedIdentity!.name),
+                            title: Text("Delete key?"),
+                            message: Text("You are about to delete key " + data.selectedIdentity!.name),
                             primaryButton: .cancel(),
                             secondaryButton: .destructive(
                                 Text("Delete"),
@@ -65,7 +65,7 @@ struct IdentityCard: View {
                     })
                     Spacer()
                     Button(action: {
-                        data.exportIdentity = true
+                        data.keyManagerModal = .showKey
                     }) {
                         Text("Export")
                     }
@@ -73,7 +73,7 @@ struct IdentityCard: View {
                     Button(action: {
                         data.selectSeed(seedName: data.selectedIdentity!.seed_name)
                         data.proposeIncrement()
-                        data.newIdentity = true
+                        data.keyManagerModal = .newKey
                     }) {
                         Text("N+1")
                     }
@@ -81,7 +81,7 @@ struct IdentityCard: View {
                     Button(action: {
                         data.selectSeed(seedName: data.selectedIdentity!.seed_name)
                         data.proposeDerive()
-                        data.newIdentity = true
+                        data.keyManagerModal = .newKey
                     }) {
                         Text("Derive")
                     }

@@ -1,8 +1,8 @@
-use definitions::{constants::{ADDRESS_BOOK, HOT_DB_NAME, METATREE, SPECSTREEPREP}};
+use constants::{ADDRESS_BOOK, HOT_DB_NAME, METATREE, SPECSTREEPREP};
 use sled::{Db, open, Tree};
 
-use super::parser::{Instruction, Content, Set};
-use super::metadata_db_utils::{add_f_from_metadata_entry, add_f_from_name, do_d_from_address_book_entry, do_d_from_name, sign_me_prep_add_network_from_address, upd_from_address_book_entry, upd_from_name, insert_from_address, error_occured};
+use crate::parser::{Instruction, Content, Set};
+use crate::metadata_db_utils::{add_f_from_metadata_entry, add_f_from_name, do_d_from_address_book_entry, do_d_from_name, sign_me_prep_add_network_from_address, upd_from_address_book_entry, upd_from_name, insert_from_address, error_occured};
 
 
 /// Function to generate `add_network` message ready for signing.

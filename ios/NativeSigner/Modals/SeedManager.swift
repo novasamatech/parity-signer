@@ -9,8 +9,8 @@ import SwiftUI
 
 struct SeedManager: View {
     @EnvironmentObject var data: SignerDataModel
-    @Binding var showSeedManager: Bool
     @State var showBackup = false
+    @State var deleteConfirm = false
     @State var seedPhrase = ""
     var body: some View {
         ZStack {
@@ -32,11 +32,25 @@ struct SeedManager: View {
                                         .foregroundColor(Color("AccentColor"))
                                 }
                                 HStack {
-                                    Button(action:{}) {
+                                    Button(action:{
+                                        deleteConfirm = true
+                                    }) {
                                         Text("Delete")
                                             .font(.largeTitle)
                                             .foregroundColor(Color("AccentColor"))
                                     }
+                                    .alert(isPresented: $deleteConfirm, content: {
+                                        Alert(
+                                            title: Text("Delete seed?"),
+                                            message: Text("You are about to delete seed " + seed),
+                                            primaryButton: .cancel(),
+                                            secondaryButton: .destructive(
+                                                Text("Delete"),
+                                                action: { data.removeSeed(seedName: seed)
+                                                }
+                                            )
+                                        )
+                                    })
                                     Spacer()
                                     Button(action:{
                                         seedPhrase = data.getSeed(seedName: data.selectedSeed, backup: true)
@@ -59,7 +73,7 @@ struct SeedManager: View {
                                             )
                                         )
                                     })
-                                }
+                                }.padding()
                             } else {
                                 Button(action: {
                                         data.selectSeed(seedName: seed)
@@ -74,7 +88,7 @@ struct SeedManager: View {
                 }
             }
                 Spacer()
-                Button(action: {showSeedManager = false})
+                Button(action: {data.settingsModal = .none})
                     {
                     Text("Back")
                         .font(.largeTitle)
@@ -85,7 +99,6 @@ struct SeedManager: View {
         .onDisappear {
             seedPhrase = ""
         }
-        .padding(.bottom, 120)
     }
 }
 

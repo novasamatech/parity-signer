@@ -1,4 +1,5 @@
-use definitions::{constants::{METATREE, SPECSTREE}, metadata::NameVersioned, network_specs::{NetworkKey, generate_network_key}};
+use constants::{METATREE, SPECSTREE};
+use definitions::{metadata::NameVersioned, network_specs::{NetworkKey, generate_network_key}};
 use parity_scale_codec::{Decode, Encode};
 use blake2_rfc::blake2b::blake2b;
 use hex;

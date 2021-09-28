@@ -8,7 +8,6 @@
 import Foundation
 
 enum ShownDocument {
-    case none
     case toc
     case pp
     case about

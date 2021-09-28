@@ -9,11 +9,12 @@ import SwiftUI
 
 struct DocumentModal: View {
     @EnvironmentObject var data: SignerDataModel
+    var document: ShownDocument
     var body: some View {
         ZStack {
             RoundedRectangle(cornerRadius: 50).foregroundColor(/*@START_MENU_TOKEN@*/Color("backgroundCard")/*@END_MENU_TOKEN@*/)
             VStack {
-                switch data.document {
+                switch document {
                 case .pp:
                     ScrollView {
                         Text(data.getPP())
@@ -26,8 +27,6 @@ struct DocumentModal: View {
                     }.padding()
                 case .about:
                     Text("About")
-                case .none:
-                    EmptyView()
                 }
                 Spacer()
             }.padding()
@@ -35,8 +34,10 @@ struct DocumentModal: View {
     }
 }
 
+/*
 struct DocumentModal_Previews: PreviewProvider {
     static var previews: some View {
         DocumentModal()
     }
 }
+*/

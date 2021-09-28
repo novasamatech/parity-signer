@@ -1,5 +1,6 @@
 use anyhow;
-use definitions::{constants::{ADDNETWORK, ADDRTREE, GENERALVERIFIER, HISTORY, METATREE, SETTREE, SPECSTREE, TRANSACTION}, history::Event, metadata::{MetaValuesDisplay, NetworkDisplay}, network_specs::{ChainSpecs, generate_network_key}, transactions::Transaction, users::IdentityHistory};
+use constants::{ADDNETWORK, ADDRTREE, GENERALVERIFIER, HISTORY, METATREE, SETTREE, SPECSTREE, TRANSACTION};
+use definitions::{history::Event, metadata::{MetaValuesDisplay, NetworkDisplay}, network_specs::{ChainSpecs, generate_network_key}, transactions::Transaction, users::IdentityHistory};
 use parity_scale_codec::{Decode, Encode};
 use db_handling::{helpers::{open_db, open_tree, flush_db, insert_into_tree, decode_address_details}, manage_history::enter_events_into_tree};
 use blake2_rfc::blake2b::blake2b;

@@ -1,4 +1,5 @@
-use definitions::{constants::{METATREE, SETTREE, SPECSTREE, TYPES}, metadata::{MetaValues, NameVersioned}, network_specs::{ChainSpecsToSend}, types::TypeEntry};
+use constants::{METATREE, SETTREE, SPECSTREE, TYPES};
+use definitions::{metadata::{MetaValues, NameVersioned}, network_specs::{ChainSpecsToSend}, types::TypeEntry};
 use parity_scale_codec::{Decode, Encode};
 use anyhow;
 

@@ -54,6 +54,10 @@ struct HistoryCollapsed: View {
                             Text("New network loaded")
                         case .networkRemoved(_):
                             Text("Removed network")
+                        case .seedNameWasAccessed(let text):
+                            Text("Seed was accessed: " + text)
+                        case .seedNameWasShown(let text):
+                            Text("Seed was shown: " + text)
                         case .seedsWereAccessed:
                             Text("Seeds were accessed")
                         case .seedsWereShown:

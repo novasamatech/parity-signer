@@ -13,46 +13,57 @@ struct KeyManager: View {
         ZStack {
             
             VStack {
-                NetworkList()
-                SeedSelector()
-
+                HStack {
+                    NetworkList()
+                    SeedSelector()
+                }
+                HStack {
+                    TextField("find keys", text: $data.searchKey)
+                        .autocapitalization(.none)
+                        .disableAutocorrection(true)
+                        .font(.title)
+                        .background(/*@START_MENU_TOKEN@*//*@PLACEHOLDER=View@*/Color("textFieldColor")/*@END_MENU_TOKEN@*/)
+                        .foregroundColor(/*@START_MENU_TOKEN@*/Color("textEntryColor")/*@END_MENU_TOKEN@*/)
+                        .background(/*@START_MENU_TOKEN@*//*@PLACEHOLDER=View@*/Color("textFieldColor")/*@END_MENU_TOKEN@*/)
+                        .border(/*@START_MENU_TOKEN@*/Color("borderSignalColor")/*@END_MENU_TOKEN@*/, width: /*@START_MENU_TOKEN@*/1/*@END_MENU_TOKEN@*/)
+                    if (data.searchKey != "") {
+                        Button(action:{data.searchKey = ""}) {
+                            Image(systemName: "clear").imageScale(.large)
+                        }
+                    } else {
+                        Image(systemName: "doc.text.magnifyingglass").imageScale(.large).foregroundColor(Color("AccentColor"))
+                    }
+                }.padding(.horizontal)
                 ScrollView {
                     LazyVStack {
                         ForEach(data.identities, id: \.public_key) {
                             identity in
-                            IdentityCard(identity: identity)
-                                .padding(.vertical, 2)
+                            if (identity.name.contains(data.searchKey) || identity.path.contains(data.searchKey) || data.searchKey == "" ) {
+                                IdentityCard(identity: identity)
+                                    .padding(.vertical, 2)
+                                
+                            }
                         }
                     }
                 }
- 
+                
                 Spacer()
-            }.padding(.bottom, 100)
-            
-            //Modal to export public key
-            if data.exportIdentity {
+            }
+            switch data.keyManagerModal {
+            case .showKey:
                 ExportIdentity()
-            }
-            
-            //Modal to create new key
-            if data.newIdentity {
+            case .newKey:
                 NewIdentityScreen()
-            }
-            
-            //Modal to create new seed
-            if data.newSeed {
+            case .newSeed:
                 NewSeedScreen()
-            }
-            VStack {
-                Spacer()
-                Footer(caller: "KeyManager")
-            }
-    }
-        .navigationTitle("Manage identities")
-        .navigationBarTitleDisplayMode(.inline)
-        .toolbar {
-            ToolbarItem(placement: .navigationBarTrailing) {
-                NavbarShield()
+            case .seedBackup:
+                SeedBackup()
+            case .keyDeleteConfirm:
+                //not used yet - primitive alert dialog works well enough
+                EmptyView()
+            case .none:
+                EmptyView()
+                
             }
         }
         .background(/*@START_MENU_TOKEN@*//*@PLACEHOLDER=View@*/Color("backgroundColor")/*@END_MENU_TOKEN@*/)
@@ -62,10 +73,12 @@ struct KeyManager: View {
     }
 }
 
-struct KeyManager_Previews: PreviewProvider {
-    static var previews: some View {
-        NavigationView {
-            KeyManager()
-        }
-    }
-}
+/*
+ struct KeyManager_Previews: PreviewProvider {
+ static var previews: some View {
+ NavigationView {
+ KeyManager()
+ }
+ }
+ }
+ */

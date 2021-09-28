@@ -1,6 +1,7 @@
 use hex;
 use sled::{Db, Tree};
-use definitions::{network_specs::Verifier, transactions::{LoadTypes, Transaction, UpdGeneralVerifier}, types::TypeEntry, constants::{ADDGENERALVERIFIER, LOADTYPES, SETTREE, TRANSACTION}, history::Event};
+use constants::{ADDGENERALVERIFIER, LOADTYPES, SETTREE, TRANSACTION};
+use definitions::{network_specs::Verifier, transactions::{LoadTypes, Transaction, UpdGeneralVerifier}, types::TypeEntry, history::Event};
 use parity_scale_codec::{Decode, Encode};
 use blake2_rfc::blake2b::blake2b;
 

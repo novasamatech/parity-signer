@@ -24,21 +24,21 @@ struct SeedSelector: View {
                         Text(seed)
                     }
                 }
+                Button(
+                    action: {data.keyManagerModal = .newSeed}) {
+                    Text(" + New seed")
+                }
             } label: {
                 if data.selectedSeed == "" {
                     Text("Select seed")
-                        .font(.title)
+                        .font(.headline)
                 } else {
-                    Text(data.selectedSeed)
-                        .font(.title)
+                    VStack {
+                        Text("seed").font(.footnote)
+                        Text(data.selectedSeed)
+                            .font(.headline)
+                    }
                 }
-            }
-            Spacer()
-            Button(
-                action: {data.newSeed = true}) {
-                Text("New seed")
-                    .font(.title)
-                    .foregroundColor(Color("AccentColor"))
             }
         }
         .padding()

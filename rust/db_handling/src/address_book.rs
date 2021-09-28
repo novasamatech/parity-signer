@@ -1,5 +1,6 @@
 use parity_scale_codec::Encode;
-use definitions::{constants::ADDRESS_BOOK, defaults::get_default_address_book};
+use constants::ADDRESS_BOOK;
+use definitions::defaults::get_default_address_book;
 use anyhow;
 
 use crate::helpers::{open_db, open_tree, flush_db, clear_tree, insert_into_tree};

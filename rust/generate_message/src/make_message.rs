@@ -1,4 +1,5 @@
-use definitions::{constants::EXPORT_FOLDER, metadata::VersionDecoded, network_specs::ChainSpecsToSend, types::TypeEntry};
+use constants::EXPORT_FOLDER;
+use definitions::{metadata::VersionDecoded, network_specs::ChainSpecsToSend, types::TypeEntry};
 use meta_reading::{decode_metadata::get_meta_const};
 use hex;
 use sp_core::{Pair, ed25519, sr25519, ecdsa};
@@ -6,7 +7,7 @@ use std::convert::TryInto;
 use qrcode_rtx::transform_into_qr_apng;
 use parity_scale_codec::Decode;
 
-use super::parser::{Make, Goal, Crypto, VerifierKind, Msg};
+use crate::parser::{Make, Goal, Crypto, VerifierKind, Msg};
 
 const ALICE_WORDS: &str = "bottom drive obey lake curtain smoke basket hold race lonely fit walk//Alice";
 

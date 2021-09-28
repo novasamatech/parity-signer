@@ -16,20 +16,23 @@ pub fn make_all_cards() -> String {
 
     let mut all_cards: Vec<Card> = Vec::new();
     
-    all_cards.push(Card::Call{pallet: "test_Pallet", method: "test_Method"});
+    all_cards.push(Card::Call{pallet: "test_Pallet", method: "test_Method", docs: "test docs description"});
+    all_cards.push(Card::Pallet("test_pallet_v14"));
     all_cards.push(Card::Varname("test_Varname"));
     all_cards.push(Card::Default("12345"));
+    all_cards.push(Card::PathDocs {path: r#"["frame_system","pallet","Call"]"#, docs: "test docs"});
     all_cards.push(Card::Id("5FHneW46xGXgs5mUiveU4sbTyGBzmstUspZC92UhjJM694ty"));
     all_cards.push(Card::None);
     all_cards.push(Card::IdentityField("Twitter"));
     
     let bv: BitVec<Lsb0, u8> = BitVec::from_vec(vec![32, 4, 155]);
-    all_cards.push(Card::BitVec(bv));
+    all_cards.push(Card::BitVec(bv.to_string()));
     
     all_cards.push(Card::Balance{number: "300.000000", units: "KULU"});
-    all_cards.push(Card::FieldName("test_FieldName"));
-    all_cards.push(Card::FieldNumber(1));
-    all_cards.push(Card::EnumVariantName("test_EnumVariantName"));
+    all_cards.push(Card::FieldName{name: "test_FieldName", docs: ""});
+    all_cards.push(Card::FieldNumber{number: 1, docs: ""});
+    all_cards.push(Card::EnumVariantName{name: "test_EnumVariantName", docs: ""});
+    all_cards.push(Card::Range{start: "3".to_string(), end: "14".to_string(), inclusive: false});
     all_cards.push(Card::EraImmortalNonce(4980));
     all_cards.push(Card::EraMortalNonce{phase: 55, period: 64, nonce: 89});
     all_cards.push(Card::Tip{number: "0", units: "pWND"});
@@ -88,8 +91,8 @@ pub fn make_all_cards() -> String {
     all_cards.push(Card::Warning(Warning::MetaAlreadyThereUpdBothVerifiers));
     all_cards.push(Card::Warning(Warning::MetaAlreadyThereUpdMetaVerifier));
     all_cards.push(Card::Warning(Warning::MetaAlreadyThereUpdGeneralVerifier));
-    all_cards.push(Card::Warning(Warning::AddNetworkNotVerified));
     all_cards.push(Card::Warning(Warning::NetworkAlreadyHasEntries));
+    all_cards.push(Card::Warning(Warning::AddNetworkNotVerified));
     
     all_cards.push(Card::Error(Error::BadInputData(BadInputData::TooShort)));
     all_cards.push(Card::Error(Error::BadInputData(BadInputData::NotSubstrate)));
@@ -116,9 +119,12 @@ pub fn make_all_cards() -> String {
     
     all_cards.push(Card::Error(Error::UnableToDecode(UnableToDecode::MethodAndExtrinsicsFailure)));
     all_cards.push(Card::Error(Error::UnableToDecode(UnableToDecode::NeedPalletAndMethod)));
+    all_cards.push(Card::Error(Error::UnableToDecode(UnableToDecode::NeedPallet)));
     all_cards.push(Card::Error(Error::UnableToDecode(UnableToDecode::MethodNotFound{method_index: 2, pallet_name: "test_Pallet".to_string()})));
     all_cards.push(Card::Error(Error::UnableToDecode(UnableToDecode::PalletNotFound(3))));
     all_cards.push(Card::Error(Error::UnableToDecode(UnableToDecode::MethodIndexTooHigh{method_index: 5, pallet_index: 3, total: 4})));
+    all_cards.push(Card::Error(Error::UnableToDecode(UnableToDecode::NoCallsInPallet("test_pallet_v14".to_string()))));
+    all_cards.push(Card::Error(Error::UnableToDecode(UnableToDecode::V14TypeNotResolved)));
     all_cards.push(Card::Error(Error::UnableToDecode(UnableToDecode::ArgumentTypeError)));
     all_cards.push(Card::Error(Error::UnableToDecode(UnableToDecode::ArgumentNameError)));
     all_cards.push(Card::Error(Error::UnableToDecode(UnableToDecode::NotPrimitive(String::from("Option<u8>")))));
@@ -128,11 +134,16 @@ pub fn make_all_cards() -> String {
     all_cards.push(Card::Error(Error::UnableToDecode(UnableToDecode::UnexpectedOptionVariant)));
     all_cards.push(Card::Error(Error::UnableToDecode(UnableToDecode::IdFields)));
     all_cards.push(Card::Error(Error::UnableToDecode(UnableToDecode::Array)));
-    all_cards.push(Card::Error(Error::UnableToDecode(UnableToDecode::BalanceNotDescribed(String::from("MyNewBalanceType")))));
+    all_cards.push(Card::Error(Error::UnableToDecode(UnableToDecode::BalanceNotDescribed)));
     all_cards.push(Card::Error(Error::UnableToDecode(UnableToDecode::UnexpectedEnumVariant)));
     all_cards.push(Card::Error(Error::UnableToDecode(UnableToDecode::UnexpectedCompactInsides)));
     all_cards.push(Card::Error(Error::UnableToDecode(UnableToDecode::CompactNotPrimitive)));
     all_cards.push(Card::Error(Error::UnableToDecode(UnableToDecode::UnknownType(String::from("T::SomeUnknownType")))));
+    all_cards.push(Card::Error(Error::UnableToDecode(UnableToDecode::NotBitStoreType)));
+    all_cards.push(Card::Error(Error::UnableToDecode(UnableToDecode::NotBitOrderType)));
+    all_cards.push(Card::Error(Error::UnableToDecode(UnableToDecode::BitVecFailure)));
+    all_cards.push(Card::Error(Error::UnableToDecode(UnableToDecode::NotRangeIndex)));
+    all_cards.push(Card::Error(Error::UnableToDecode(UnableToDecode::RangeFailure)));
     
     all_cards.push(Card::Error(Error::DatabaseError(DatabaseError::Internal(sled::Error::CollectionNotFound(IVec::from(vec![1]))))));
     all_cards.push(Card::Error(Error::DatabaseError(DatabaseError::Internal(sled::Error::Unsupported(String::from("Something Unsupported."))))));

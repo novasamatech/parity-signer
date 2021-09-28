@@ -8,21 +8,35 @@
 import SwiftUI
 
 struct TCEnumVariantName: View {
-    var text: String
+    var value: EnumVariantName
+    @State private var showDoc = false
     var body: some View {
-        HStack {
-            Text(text)
-                .foregroundColor(Color("textMainColor"))
-            Spacer()
+        Button (action: {
+            self.showDoc.toggle()
+        }) {
+            HStack {
+                Text(value.name)
+                    .foregroundColor(Color("textMainColor"))
+                Spacer()
+                if value.docs != "" {
+                    Text("?")
+                        .foregroundColor(Color("AccentColor"))
+                }
+            }
+            .background(/*@START_MENU_TOKEN@*//*@PLACEHOLDER=View@*/Color("backgroundCard")/*@END_MENU_TOKEN@*/)
+            if showDoc {
+                Text(String(decoding: Data(fromHexEncodedString: value.docs) ?? Data(), as: UTF8.self))
+                    .foregroundColor(Color("textMainColor"))
+                    .background(/*@START_MENU_TOKEN@*//*@PLACEHOLDER=View@*/Color("backgroundCard")/*@END_MENU_TOKEN@*/)
+            }
         }
-        .background(/*@START_MENU_TOKEN@*//*@PLACEHOLDER=View@*/Color("backgroundCard")/*@END_MENU_TOKEN@*/)
     }
 }
 
 /*
-struct TCEnumVariantName_Previews: PreviewProvider {
-    static var previews: some View {
-        TCEnumVariantName()
-    }
-}
-*/
+ struct TCEnumVariantName_Previews: PreviewProvider {
+ static var previews: some View {
+ TCEnumVariantName()
+ }
+ }
+ */

@@ -1,5 +1,6 @@
 use std::env;
-use definitions::{constants::FOLDER, users::SufficientCrypto};
+use constants::FOLDER;
+use definitions::users::SufficientCrypto;
 use parity_scale_codec::Decode;
 
 /// Expected typical run commands:

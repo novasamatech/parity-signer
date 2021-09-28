@@ -8,6 +8,10 @@
 import Foundation
 import Network
 
+/**
+ * This is background network indicator. It will paint the shield icon red and write to history
+ * NOTE: This might sometimes crash transaction; it is intended although not defined behavior for now
+ */
 class Canary: ObservableObject {
     @Published var dead: Bool = false
     let monitor = NWPathMonitor()
@@ -22,7 +26,7 @@ class Canary: ObservableObject {
             } else {
                 DispatchQueue.main.async {
                     let dbName = NSHomeDirectory() + "/Documents/Database"
-                    device_was_online(nil, dbName)
+                    //TODO: uncomment (ipod dev is impossible with airplane mode) device_was_online(nil, dbName)
                     self.dead = true
                 }
             }

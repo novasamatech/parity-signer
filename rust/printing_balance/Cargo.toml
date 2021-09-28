@@ -8,3 +8,7 @@ edition = "2018"
 
 [dependencies]
 
+[lib]
+name = "printing_balance"
+crate-type = ["lib"]
+

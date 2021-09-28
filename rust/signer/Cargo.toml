@@ -25,3 +25,4 @@ crate-type = ["staticlib", "cdylib"]
 
 [features]
 default = ["jni"]
+

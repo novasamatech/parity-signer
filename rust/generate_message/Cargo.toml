@@ -11,6 +11,9 @@ sp-core = "3.0.0"
 hex = "0.4.3"
 qrcode_rtx = {path = "../qrcode_rtx"}
 meta_reading = {path = "../meta_reading"}
-parity-scale-codec = "2.1.1"
+parity-scale-codec = "2.2.0"
 sled = "0.34.6"
 definitions = {path = "../definitions"}
+db_handling = {path = "../db_handling"}
+constants = {path = "../constants"}
+
