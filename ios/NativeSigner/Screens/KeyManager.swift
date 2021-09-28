@@ -36,10 +36,10 @@ struct KeyManager: View {
                 }.padding(.horizontal)
                 ScrollView {
                     LazyVStack {
-                        ForEach(data.identities, id: \.public_key) {
-                            identity in
-                            if (identity.name.contains(data.searchKey) || identity.path.contains(data.searchKey) || data.searchKey == "" ) {
-                                IdentityCard(identity: identity)
+                        ForEach(data.addresses, id: \.public_key) {
+                            address in
+                            if (address.name.contains(data.searchKey) || address.path.contains(data.searchKey) || data.searchKey == "" ) {
+                                IdentityCard(identity: address)
                                     .padding(.vertical, 2)
                                 
                             }
@@ -62,7 +62,7 @@ struct KeyManager: View {
             }
             switch data.keyManagerModal {
             case .showKey:
-                ExportIdentity()
+                ExportAddress()
             case .newKey:
                 NewIdentityScreen()
             case .newSeed:

@@ -9,15 +9,15 @@ import SwiftUI
 
 struct IdentityCard: View {
     @EnvironmentObject var data: SignerDataModel
-    var identity: Identity
+    var identity: Address
     @State var delete = false
     var body: some View {
         VStack {
             Button(action:{
-                if data.selectedIdentity == identity {
-                    data.selectedIdentity = nil
+                if data.selectedAddress == identity {
+                    data.selectedAddress = nil
                 } else {
-                    data.selectedIdentity = identity
+                    data.selectedAddress = identity
                 }
             }) {
                 HStack {
@@ -43,7 +43,7 @@ struct IdentityCard: View {
                     Spacer()
                 }
             }
-            if data.selectedIdentity == identity {
+            if data.selectedAddress == identity {
                 HStack{
                     Button(action: {
                         //
@@ -54,11 +54,11 @@ struct IdentityCard: View {
                     .alert(isPresented: $delete, content: {
                         Alert(
                             title: Text("Delete key?"),
-                            message: Text("You are about to delete key " + data.selectedIdentity!.name),
+                            message: Text("You are about to delete key " + data.selectedAddress!.name),
                             primaryButton: .cancel(),
                             secondaryButton: .destructive(
                                 Text("Delete"),
-                                action: { data.deleteActiveIdentity()
+                                action: { data.deleteSelectedAddress()
                                 }
                             )
                         )
@@ -71,7 +71,7 @@ struct IdentityCard: View {
                     }
                     Spacer()
                     Button(action: {
-                        data.selectSeed(seedName: data.selectedIdentity!.seed_name)
+                        data.selectSeed(seedName: data.selectedAddress!.seed_name)
                         data.proposeIncrement()
                         data.keyManagerModal = .newKey
                     }) {
@@ -79,7 +79,7 @@ struct IdentityCard: View {
                     }
                     Spacer()
                     Button(action: {
-                        data.selectSeed(seedName: data.selectedIdentity!.seed_name)
+                        data.selectSeed(seedName: data.selectedAddress!.seed_name)
                         data.proposeDerive()
                         data.keyManagerModal = .newKey
                     }) {
@@ -88,7 +88,7 @@ struct IdentityCard: View {
                 }
             }
         }.padding(5)
-        .background(Color(data.selectedIdentity == identity ? "backgroundActive" : "backgroundCard"))
+        .background(Color(data.selectedAddress == identity ? "backgroundActive" : "backgroundCard"))
     }
 }
 

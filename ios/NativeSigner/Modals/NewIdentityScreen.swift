@@ -67,7 +67,7 @@ struct NewIdentityScreen: View {
                         Text("password (repeat)").foregroundColor(Color("textMainColor")).font(.footnote)
                         SignerTextInput(text: $passwordCheck, focus: $passwordCheckFocus, placeholder: "Repeat password", autocapitalization: .none, returnKeyType: .done, keyboardType: .asciiCapable, onReturn: {
                             if password == passwordCheck {
-                                data.createIdentity(password: password)
+                                data.createAddress(password: password)
                                 if data.lastError == "" {
                                     data.keyManagerModal = .none
                                 }
@@ -85,7 +85,7 @@ struct NewIdentityScreen: View {
                     }
                     Spacer()
                     Button(action: {
-                        data.createIdentity(password: password)
+                        data.createAddress(password: password)
                         if data.lastError == "" {
                             data.keyManagerModal = .none
                         }
