@@ -39,7 +39,7 @@ struct KeyManager: View {
                         ForEach(data.addresses, id: \.public_key) {
                             address in
                             if (address.name.contains(data.searchKey) || address.path.contains(data.searchKey) || data.searchKey == "" ) {
-                                IdentityCard(identity: address)
+                                AddressCard(identity: address)
                                     .padding(.vertical, 2)
                                 
                             }

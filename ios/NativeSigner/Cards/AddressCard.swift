@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-struct IdentityCard: View {
+struct AddressCard: View {
     @EnvironmentObject var data: SignerDataModel
     var identity: Address
     @State var delete = false

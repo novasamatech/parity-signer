@@ -12,7 +12,7 @@ if [ "$1" == "android" ]
 
     if [ -z ${NDK_HOME+x} ];
       then
-        printf 'Please install android-ndk or export NDK_HOME\n\n'
+        printf 'Please install android-ndk or export NDK_HOME (use absolute path)\n\n'
         printf 'from https://developer.android.com/ndk/downloads or with sdkmanager'
         exit 1
       else
