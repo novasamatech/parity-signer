@@ -16,7 +16,6 @@ sp-core = "3.0.0"
 sp-runtime = "3.0.0"
 anyhow = "1.0.42"
 
-
 [lib]
 name = "definitions"
 crate-type = ["lib"]
