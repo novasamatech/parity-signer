@@ -45,6 +45,7 @@ extension SignerDataModel {
                     return
                 }
                 signer_destroy_string(res!)
+                self.cards = []
                 self.cards.append(contentsOf: (transactionPreview.warning ?? []))
                 self.cards.append(contentsOf: (transactionPreview.types_info ?? []))
                 self.cards.append(contentsOf: (transactionPreview.author ?? []))
@@ -64,6 +65,7 @@ extension SignerDataModel {
                     }
                 }
                 //print(self.author ?? "no author")
+                //print(self.cards)
                 self.transactionState = .preview
             } else {
                 signer_destroy_string(res!)

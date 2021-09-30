@@ -27,7 +27,7 @@ struct TCCall: View {
                         .foregroundColor(Color("AccentColor"))
                 }
                 if showDoc {
-                    Text(String(decoding: Data(fromHexEncodedString: value.docs) ?? Data(), as: UTF8.self))
+                    Text(AttributedString(fromHexDocs: value.docs) ?? "docs parsing error in iOS, please refer to other sources")
                         .foregroundColor(Color("textMainColor"))
                         .background(/*@START_MENU_TOKEN@*//*@PLACEHOLDER=View@*/Color("backgroundCard")/*@END_MENU_TOKEN@*/)
                 }
