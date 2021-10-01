@@ -46,7 +46,7 @@ pub fn get_default_chainspecs() -> Vec<ChainSpecs> {
             color: String::from("#6f36dc"),
             decimals: 12,
             encryption: Encryption::Sr25519,
-            genesis_hash: hex::decode("853faffbfc6713c1f899bf16547fcfbf733ae8361b8ca0129699d01d4f2181fd").expect("known value").try_into().expect("known value"),
+            genesis_hash: hex::decode("f6e9983c37baf68846fedafe21e56718790e39fb1c582abc408b81bc7b208f9a").expect("known value").try_into().expect("known value"),
             logo: String::from("rococo"),
             name: String::from("rococo"),
             order: 3,
@@ -238,7 +238,8 @@ pub fn get_default_address_book() -> Vec<AddressBookEntry> {
         },
         AddressBookEntry {
             name: String::from("rococo"),
-            genesis_hash: hex::decode("853faffbfc6713c1f899bf16547fcfbf733ae8361b8ca0129699d01d4f2181fd").expect("known value").try_into().expect("known value"),
+            genesis_hash: hex::decode("f6e9983c37baf68846fedafe21e56718790e39fb1c582abc408b81bc7b208f9a").expect("known value").try_into().expect("known value"),
+            // previous value: "853faffbfc6713c1f899bf16547fcfbf733ae8361b8ca0129699d01d4f2181fd" changed 2021-09-30
             // previous value: "f9ab3847dec02d434b38c057756d0cb19e5ec5c307419634938c397b1346eb41" changed 2021-09-16
             // previous value: "e7c3d5edde7db964317cd9b51a3a059d7cd99f81bdbce14990047354334c9779" changed 2021-09-06
             address: String::from("wss://rococo-rpc.polkadot.io"),

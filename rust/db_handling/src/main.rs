@@ -5,7 +5,7 @@ use anyhow;
 fn main() -> anyhow::Result<()> {
     
 //    default_hot()?;
-//    default_cold_release()?;
+    default_cold_release()?;
     transfer_metadata(HOT_DB_NAME, COLD_DB_NAME)?;
     Ok(())
 }
