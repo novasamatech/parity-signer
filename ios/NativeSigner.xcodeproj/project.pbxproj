@@ -47,8 +47,6 @@
 		2D7A7BF126C50F950053C1E0 /* NetworkSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D7A7BF026C50F950053C1E0 /* NetworkSettings.swift */; };
 		2D7A7BF326C519990053C1E0 /* MetadataCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D7A7BF226C519990053C1E0 /* MetadataCard.swift */; };
 		2D7A7BF526C58E9E0053C1E0 /* History.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D7A7BF426C58E9E0053C1E0 /* History.swift */; };
-		2D7A7BF726C650F50053C1E0 /* HistoryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D7A7BF626C650F50053C1E0 /* HistoryView.swift */; };
-		2D7A7BF926C6620B0053C1E0 /* HistoryExpanded.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D7A7BF826C6620B0053C1E0 /* HistoryExpanded.swift */; };
 		2D7A7BFB26C6621D0053C1E0 /* HistoryCollapsed.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D7A7BFA26C6621D0053C1E0 /* HistoryCollapsed.swift */; };
 		2D7A7BFD26C675D30053C1E0 /* HistoryCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D7A7BFC26C675D30053C1E0 /* HistoryCard.swift */; };
 		2D7A7C0026CA97B00053C1E0 /* TCAuthor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D7A7BFF26CA97B00053C1E0 /* TCAuthor.swift */; };
@@ -69,6 +67,9 @@
 		2D7A7C2926CBC3C70053C1E0 /* TCCall.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D7A7C2426CBC3C70053C1E0 /* TCCall.swift */; };
 		2D7A7C2A26CBC3C70053C1E0 /* TCEraImmortalNonce.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D7A7C2526CBC3C70053C1E0 /* TCEraImmortalNonce.swift */; };
 		2DB037B426FCB06A00A318B2 /* TCPallet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2DB037B326FCB06A00A318B2 /* TCPallet.swift */; };
+		2DB037B6270B2E0B00A318B2 /* HistoryScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2DB037B5270B2E0A00A318B2 /* HistoryScreen.swift */; };
+		2DB037BA270D801400A318B2 /* HistoryCardTemplate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2DB037B9270D801400A318B2 /* HistoryCardTemplate.swift */; };
+		2DB037BC270ECF7300A318B2 /* SearchKeys.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2DB037BB270ECF7300A318B2 /* SearchKeys.swift */; };
 		2DE72BC226A588C7002BB752 /* NativeSignerApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2DE72BC126A588C7002BB752 /* NativeSignerApp.swift */; };
 		2DE72BC426A588C7002BB752 /* MainScreenContainer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2DE72BC326A588C7002BB752 /* MainScreenContainer.swift */; };
 		2DE72BC626A588C9002BB752 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 2DE72BC526A588C9002BB752 /* Assets.xcassets */; };
@@ -146,8 +147,6 @@
 		2D7A7BF026C50F950053C1E0 /* NetworkSettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = NetworkSettings.swift; path = NativeSigner/Modals/NetworkSettings.swift; sourceTree = SOURCE_ROOT; };
 		2D7A7BF226C519990053C1E0 /* MetadataCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MetadataCard.swift; sourceTree = "<group>"; };
 		2D7A7BF426C58E9E0053C1E0 /* History.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = History.swift; sourceTree = "<group>"; };
-		2D7A7BF626C650F50053C1E0 /* HistoryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = HistoryView.swift; path = NativeSigner/Models/HistoryView.swift; sourceTree = SOURCE_ROOT; };
-		2D7A7BF826C6620B0053C1E0 /* HistoryExpanded.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HistoryExpanded.swift; sourceTree = "<group>"; };
 		2D7A7BFA26C6621D0053C1E0 /* HistoryCollapsed.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HistoryCollapsed.swift; sourceTree = "<group>"; };
 		2D7A7BFC26C675D30053C1E0 /* HistoryCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = HistoryCard.swift; path = NativeSigner/Components/HistoryCard.swift; sourceTree = SOURCE_ROOT; };
 		2D7A7BFF26CA97B00053C1E0 /* TCAuthor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TCAuthor.swift; sourceTree = "<group>"; };
@@ -168,6 +167,9 @@
 		2D7A7C2426CBC3C70053C1E0 /* TCCall.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TCCall.swift; sourceTree = "<group>"; };
 		2D7A7C2526CBC3C70053C1E0 /* TCEraImmortalNonce.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TCEraImmortalNonce.swift; sourceTree = "<group>"; };
 		2DB037B326FCB06A00A318B2 /* TCPallet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TCPallet.swift; sourceTree = "<group>"; };
+		2DB037B5270B2E0A00A318B2 /* HistoryScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HistoryScreen.swift; sourceTree = "<group>"; };
+		2DB037B9270D801400A318B2 /* HistoryCardTemplate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HistoryCardTemplate.swift; sourceTree = "<group>"; };
+		2DB037BB270ECF7300A318B2 /* SearchKeys.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchKeys.swift; sourceTree = "<group>"; };
 		2DE72BBE26A588C7002BB752 /* NativeSigner.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = NativeSigner.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		2DE72BC126A588C7002BB752 /* NativeSignerApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NativeSignerApp.swift; sourceTree = "<group>"; };
 		2DE72BC326A588C7002BB752 /* MainScreenContainer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainScreenContainer.swift; sourceTree = "<group>"; };
@@ -227,6 +229,7 @@
 			children = (
 				2D7A7BFE26CA97920053C1E0 /* TransactionCards */,
 				2D7A7BFC26C675D30053C1E0 /* HistoryCard.swift */,
+				2DB037B9270D801400A318B2 /* HistoryCardTemplate.swift */,
 				2DE72BF426A59C59002BB752 /* NetworkCard.swift */,
 				2D7A7BC126B9D3360053C1E0 /* AddressCard.swift */,
 				2D7A7BDB26C2613F0053C1E0 /* TransactionCardView.swift */,
@@ -240,6 +243,7 @@
 			children = (
 				2D7A7BD126BBCE6F0053C1E0 /* TransactionScreen.swift */,
 				2DE72BC326A588C7002BB752 /* MainScreenContainer.swift */,
+				2DB037B5270B2E0A00A318B2 /* HistoryScreen.swift */,
 				2D7A7BB726B28D350053C1E0 /* SettingsScreen.swift */,
 				2DE72BF626A5AC68002BB752 /* KeyManager.swift */,
 			);
@@ -249,7 +253,6 @@
 		2D7A7BC726BA97A50053C1E0 /* Modals */ = {
 			isa = PBXGroup;
 			children = (
-				2D7A7BF626C650F50053C1E0 /* HistoryView.swift */,
 				2D7A7BEA26C4149E0053C1E0 /* DocumentModal.swift */,
 				2D7A7BEC26C50AB80053C1E0 /* NetworkManager.swift */,
 				2D7A7BEE26C50ACB0053C1E0 /* SeedManager.swift */,
@@ -269,12 +272,12 @@
 		2D7A7BC826BA97AE0053C1E0 /* Components */ = {
 			isa = PBXGroup;
 			children = (
+				2DB037BB270ECF7300A318B2 /* SearchKeys.swift */,
 				2D7A7BC926BACFFB0053C1E0 /* QRView.swift */,
 				2DE72BF226A59BAB002BB752 /* NetworkList.swift */,
 				2D7A7BAF26B00A3E0053C1E0 /* NavbarShield.swift */,
 				2D7A7BB326B02B700053C1E0 /* SeedSelector.swift */,
 				2DE72C0326A6CDC5002BB752 /* CameraPreview.swift */,
-				2D7A7BF826C6620B0053C1E0 /* HistoryExpanded.swift */,
 				2D7A7BFA26C6621D0053C1E0 /* HistoryCollapsed.swift */,
 				2D7A7BA426AE9E680053C1E0 /* Footer.swift */,
 				2D7A7BF226C519990053C1E0 /* MetadataCard.swift */,
@@ -579,6 +582,7 @@
 				2D7A7C1C26CB97F50053C1E0 /* TCEnumVariantName.swift in Sources */,
 				2DE72BF926A5C360002BB752 /* CameraView.swift in Sources */,
 				2D7A7BD626C1126C0053C1E0 /* Utils.swift in Sources */,
+				2DB037B6270B2E0B00A318B2 /* HistoryScreen.swift in Sources */,
 				2DE72BC426A588C7002BB752 /* MainScreenContainer.swift in Sources */,
 				2D7A7BB826B28D350053C1E0 /* SettingsScreen.swift in Sources */,
 				2D7A7C1A26CB97B30053C1E0 /* TCID.swift in Sources */,
@@ -586,10 +590,10 @@
 				2DE72BC226A588C7002BB752 /* NativeSignerApp.swift in Sources */,
 				2D7A7C1426CB96180053C1E0 /* TCTip.swift in Sources */,
 				2D7A7C2626CBC3C70053C1E0 /* TCBalance.swift in Sources */,
-				2D7A7BF926C6620B0053C1E0 /* HistoryExpanded.swift in Sources */,
 				2D7A7BEF26C50ACB0053C1E0 /* SeedManager.swift in Sources */,
 				2D0D5E7A26F09A5600B0EF9D /* TransactionCommentInput.swift in Sources */,
 				2D7A7C2A26CBC3C70053C1E0 /* TCEraImmortalNonce.swift in Sources */,
+				2DB037BC270ECF7300A318B2 /* SearchKeys.swift in Sources */,
 				2DE72C0426A6CDC5002BB752 /* CameraPreview.swift in Sources */,
 				2D7A7BD426BBEAF00053C1E0 /* Canary.swift in Sources */,
 				2D7A7BD826C163110053C1E0 /* TransactionPreview.swift in Sources */,
@@ -610,6 +614,7 @@
 				2DE72BF326A59BAB002BB752 /* NetworkList.swift in Sources */,
 				2D682A6B26F34F3D00A315F6 /* SignerTextInput.swift in Sources */,
 				2D72B4F826EF427C0081E879 /* Header.swift in Sources */,
+				2DB037BA270D801400A318B2 /* HistoryCardTemplate.swift in Sources */,
 				2D7A7BFB26C6621D0053C1E0 /* HistoryCollapsed.swift in Sources */,
 				2D7A7BD226BBCE6F0053C1E0 /* TransactionScreen.swift in Sources */,
 				2D7A7BB426B02B700053C1E0 /* SeedSelector.swift in Sources */,
@@ -619,7 +624,6 @@
 				2D7A7BE026C3AC350053C1E0 /* TransactionTypes.swift in Sources */,
 				2D7A7C1E26CB98310053C1E0 /* TCVarName.swift in Sources */,
 				2D7A7BEB26C4149E0053C1E0 /* DocumentModal.swift in Sources */,
-				2D7A7BF726C650F50053C1E0 /* HistoryView.swift in Sources */,
 				2DE72C0F26A99885002BB752 /* RustNative.swift in Sources */,
 				2D7A7C0026CA97B00053C1E0 /* TCAuthor.swift in Sources */,
 				2D7A7BFD26C675D30053C1E0 /* HistoryCard.swift in Sources */,
@@ -717,7 +721,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 14.5;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
@@ -772,7 +776,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 14.5;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
 				SDKROOT = iphoneos;

@@ -14,7 +14,7 @@ import Foundation
  * Struct to store main navstate of the screen
  */
 enum SignerScreen {
-    case home
+    case scan
     case keys
     case settings
     case history
@@ -48,7 +48,6 @@ enum KeyManagerModal {
  */
 enum SettingsModal {
     case none
-    case showHistory
     case showSeedManager
     case showNetworkManager
     case showDocument(ShownDocument)

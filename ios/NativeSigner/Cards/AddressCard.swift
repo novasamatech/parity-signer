@@ -21,8 +21,9 @@ struct AddressCard: View {
                 }
             }) {
                 HStack {
-                    //TODO: always fetch and mode into model; requires rust code modifications; this is a stub
-                    Image(uiImage: UIImage(data: Data(fromHexEncodedString: String(cString: base58_identicon(nil, identity.ss58, 32)))!)!)
+                    Image(uiImage: UIImage(data: Data(fromHexEncodedString: String(cString: base58_identicon(nil, identity.ss58, 32))) ?? Data()) ?? UIImage())
+                        .resizable(resizingMode: .stretch)
+                        .frame(width: 28, height: 28)
                     VStack (alignment: .leading) {
                         Text(identity.name)
                             .foregroundColor(Color("AccentColor"))
@@ -30,13 +31,13 @@ struct AddressCard: View {
                             Text(identity.seed_name)
                                 .foregroundColor(Color("AccentColor"))
                             Text(identity.path)
-                                .foregroundColor(Color("textMainColor"))
+                                .foregroundColor(Color("cryptoColor"))
                             if identity.has_password == "true" {
                                 Image(systemName: "lock")
                                     .foregroundColor(Color("AccentColor"))
                             }
                         }
-                        Text(identity.ss58)
+                        Text(identity.ss58.prefix(4) + "..." + identity.ss58.suffix(4))
                             .font(.caption2)
                             .foregroundColor(Color("textMainColor"))
                     }
@@ -87,7 +88,7 @@ struct AddressCard: View {
                     }
                 }
             }
-        }.padding(5)
+        }.padding(8)
         .background(Color(data.selectedAddress == identity ? "backgroundActive" : "backgroundCard"))
     }
 }

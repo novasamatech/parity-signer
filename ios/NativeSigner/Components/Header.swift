@@ -11,16 +11,16 @@ struct Header: View {
     @EnvironmentObject var data: SignerDataModel
     var body: some View {
         HStack {
-            if ((data.transactionState != .none) && (data.signerScreen != .home)) {
+            if ((data.transactionState != .none) && (data.signerScreen != .scan)) {
                 Button(action: {
                     data.totalRefresh()
-                    data.signerScreen = .home
+                    data.signerScreen = .scan
                 }) {
                     Text("Back")
                 }}
             Spacer()
             switch data.signerScreen {
-            case .home:
+            case .scan:
                 switch data.transactionState {
                 case .none:
                     Text("Home")

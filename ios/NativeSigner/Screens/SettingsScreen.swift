@@ -16,11 +16,6 @@ struct SettingsScreen: View {
                 //Main buttons block
                 VStack {
                     Button(action: {
-                        data.settingsModal = .showHistory
-                    }) {
-                        Text("Show log")
-                    }.padding()
-                    Button(action: {
                         data.settingsModal = .showSeedManager
                     }) {
                         Text("Manage seeds")
@@ -76,8 +71,6 @@ struct SettingsScreen: View {
             }
             .background(/*@START_MENU_TOKEN@*//*@PLACEHOLDER=View@*/Color("backgroundColor")/*@END_MENU_TOKEN@*/)
             switch(data.settingsModal) {
-            case .showHistory:
-                HistoryView()
             case .showSeedManager:
                 SeedManager()
             case .showNetworkManager:

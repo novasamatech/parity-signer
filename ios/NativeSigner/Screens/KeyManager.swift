@@ -17,23 +17,6 @@ struct KeyManager: View {
                     NetworkList()
                     SeedSelector()
                 }
-                HStack {
-                    TextField("find keys", text: $data.searchKey)
-                        .autocapitalization(.none)
-                        .disableAutocorrection(true)
-                        .font(.title)
-                        .background(/*@START_MENU_TOKEN@*//*@PLACEHOLDER=View@*/Color("textFieldColor")/*@END_MENU_TOKEN@*/)
-                        .foregroundColor(/*@START_MENU_TOKEN@*/Color("textEntryColor")/*@END_MENU_TOKEN@*/)
-                        .background(/*@START_MENU_TOKEN@*//*@PLACEHOLDER=View@*/Color("textFieldColor")/*@END_MENU_TOKEN@*/)
-                        .border(/*@START_MENU_TOKEN@*/Color("borderSignalColor")/*@END_MENU_TOKEN@*/, width: /*@START_MENU_TOKEN@*/1/*@END_MENU_TOKEN@*/)
-                    if (data.searchKey != "") {
-                        Button(action:{data.searchKey = ""}) {
-                            Image(systemName: "clear").imageScale(.large)
-                        }
-                    } else {
-                        Image(systemName: "doc.text.magnifyingglass").imageScale(.large).foregroundColor(Color("AccentColor"))
-                    }
-                }.padding(.horizontal)
                 ScrollView {
                     LazyVStack {
                         ForEach(data.addresses, id: \.public_key) {
@@ -59,6 +42,7 @@ struct KeyManager: View {
                 }
                 
                 Spacer()
+                SearchKeys()
             }
             switch data.keyManagerModal {
             case .showKey:

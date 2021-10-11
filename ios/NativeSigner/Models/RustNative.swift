@@ -30,7 +30,7 @@ class SignerDataModel: ObservableObject {
     @Published var history: [History] = []
     
     //Navigation
-    @Published var signerScreen: SignerScreen = .home
+    @Published var signerScreen: SignerScreen = .history
     @Published var keyManagerModal: KeyManagerModal = .none
     @Published var settingsModal: SettingsModal = .none
     @Published var transactionState: TransactionState = .none
@@ -86,7 +86,7 @@ class SignerDataModel: ObservableObject {
             self.keyManagerModal = .none
         }
         self.settingsModal = .none
-        if self.signerScreen == .home {
+        if self.signerScreen == .scan {
             self.resetCamera = true
         }
         self.searchKey = ""

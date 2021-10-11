@@ -48,7 +48,7 @@ struct ExportAddress: View {
             DragGesture(minimumDistance: 50)
                 .onEnded {amount in
                     print(amount)
-                    if amount.translation.width > 0 {
+                    if amount.translation.height > 0 {
                     data.selectNextAddress()
                     } else {
                         data.selectPreviousAddress()
@@ -61,8 +61,10 @@ struct ExportAddress: View {
     }
 }
 
+/*
 struct ExportIdentity_Previews: PreviewProvider {
     static var previews: some View {
         ExportAddress()
     }
 }
+*/

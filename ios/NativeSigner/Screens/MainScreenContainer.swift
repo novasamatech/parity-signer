@@ -16,12 +16,14 @@ struct MainScreenContainer: View {
             VStack {
                 Header()
                 switch (data.signerScreen) {
-                case .home :
+                case .scan :
                     TransactionScreen()
                 case .keys :
                     KeyManager()
                 case .settings :
                     SettingsScreen()
+                case .history :
+                    HistoryScreen()
                 default:
                     VStack {
                         Text("Please wait")
