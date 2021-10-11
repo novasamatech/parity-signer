@@ -37,7 +37,7 @@ struct NewIdentityScreen: View {
                 }
                 VStack (alignment: .leading) {
                     Text("path").foregroundColor(Color("textMainColor")).font(.footnote)
-                    SignerTextInput(text: $data.suggestedPath, focus: $pathFocus, placeholder: "Path: //hard/soft", autocapitalization: .none, returnKeyType: .done, keyboardType: .default, onReturn: {})
+                    SignerTextInput(text: $data.suggestedPath, focus: $pathFocus, placeholder: "Path: //hard/soft", autocapitalization: .none, returnKeyType: .done, keyboardType: .asciiCapable, onReturn: {})
                         .onChange(of: data.suggestedPath) {path in
                             data.suggestedName = String(cString:  suggest_name(nil, path)) //this function does not fail
                             data.lastError = ""
@@ -53,7 +53,7 @@ struct NewIdentityScreen: View {
                 }
                 VStack (alignment: .leading) {
                     Text("password").foregroundColor(Color("textMainColor")).font(.footnote)
-                    SignerTextInput(text: $password, focus: $passwordFocus, placeholder: "password (optional)", autocapitalization: .none, returnKeyType: .next, keyboardType: .default, onReturn: {
+                    SignerTextInput(text: $password, focus: $passwordFocus, placeholder: "password (optional)", autocapitalization: .none, returnKeyType: .next, keyboardType: .asciiCapable, onReturn: {
                         if password != "" {
                             passwordCheckFocus = true
                         }
@@ -65,9 +65,9 @@ struct NewIdentityScreen: View {
                 if password != "" {
                     VStack (alignment: .leading) {
                         Text("password (repeat)").foregroundColor(Color("textMainColor")).font(.footnote)
-                        SignerTextInput(text: $passwordCheck, focus: $passwordCheckFocus, placeholder: "Repeat password", autocapitalization: .none, returnKeyType: .done, keyboardType: .default, onReturn: {
+                        SignerTextInput(text: $passwordCheck, focus: $passwordCheckFocus, placeholder: "Repeat password", autocapitalization: .none, returnKeyType: .done, keyboardType: .asciiCapable, onReturn: {
                             if password == passwordCheck {
-                                data.createIdentity(password: password)
+                                data.createAddress(password: password)
                                 if data.lastError == "" {
                                     data.keyManagerModal = .none
                                 }
@@ -85,7 +85,7 @@ struct NewIdentityScreen: View {
                     }
                     Spacer()
                     Button(action: {
-                        data.createIdentity(password: password)
+                        data.createAddress(password: password)
                         if data.lastError == "" {
                             data.keyManagerModal = .none
                         }

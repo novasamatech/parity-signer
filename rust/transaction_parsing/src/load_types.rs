@@ -1,8 +1,8 @@
 use hex;
 use sled::{Db, Tree};
 use constants::{ADDGENERALVERIFIER, LOADTYPES, SETTREE, TRANSACTION};
-use definitions::{network_specs::Verifier, transactions::{LoadTypes, Transaction, UpdGeneralVerifier}, types::TypeEntry, history::Event};
-use parity_scale_codec::{Decode, Encode};
+use definitions::{network_specs::Verifier, transactions::{LoadTypes, Transaction, UpdGeneralVerifier}, types::TypeEntry, history::Event, qr_transfers::ContentLoadTypes};
+use parity_scale_codec::Encode;
 use blake2_rfc::blake2b::blake2b;
 
 use crate::cards::{Action, Card, Warning};
@@ -25,7 +25,7 @@ pub fn load_types (data_hex: &str, dbname: &str) -> Result<String, Error> {
     
     let checked_info = pass_crypto(&data_hex)?;
     
-    let new_types = match <Vec<TypeEntry>>::decode(&mut &checked_info.message[..]) {
+    let new_types = match ContentLoadTypes::from_vec(&checked_info.message).types() {
         Ok(x) => x,
         Err(_) => return Err(Error::BadInputData(BadInputData::UnableToDecodeTypes)),
     };

@@ -1,9 +1,10 @@
 use anyhow;
 use constants::{HISTORY, SIGNTRANS, TRANSACTION};
-use definitions::{history::Event, network_specs::Verifier, transactions::{Transaction, SignDisplay}, users::Encryption};
+use definitions::{crypto::Encryption, history::Event, network_specs::Verifier, transactions::{Transaction, SignDisplay}};
 use parity_scale_codec::Decode;
 use db_handling::{helpers::{open_db, open_tree, flush_db, remove_from_tree}, manage_history::enter_events_into_tree};
 use qrcode_static::png_qr_from_string;
+use sp_runtime::MultiSigner;
 
 use crate::sign_message::sign_as_address_key;
 use crate::error::{Error, ActionFailure, CryptoError};
@@ -35,56 +36,37 @@ pub fn create_signature (seed_phrase: &str, pwd_entry: &str, user_comment: &str,
     };
     
     let mut events = action.history;
-    let hex_key = hex::encode(&action.address_key);
+    let (author_line, encryption) = match <MultiSigner>::decode(&mut &action.address_key[..]) {
+        Ok(MultiSigner::Ed25519(public)) => (Verifier::Ed25519(hex::encode(public)).show_card(), Encryption::Ed25519),
+        Ok(MultiSigner::Sr25519(public)) => (Verifier::Sr25519(hex::encode(public)).show_card(), Encryption::Sr25519),
+        Ok(MultiSigner::Ecdsa(public)) => (Verifier::Ecdsa(hex::encode(public)).show_card(), Encryption::Ecdsa),
+        Err(_) => return Err(Error::AddressKeyDecoding.show()),
+    };
     
 // get full address with derivation path, used for signature preparation
 // TODO zeroize
     let full_address = seed_phrase.to_owned() + &action.path;
     
-    match sign_as_address_key(&action.transaction, action.address_key, &action.encryption, &full_address, pwd) {
+    match sign_as_address_key(&action.transaction, action.address_key, &full_address, pwd) {
         Ok(s) => {
             let hex_signature = hex::encode(s);
             
             remove_from_tree(SIGNTRANS.to_vec(), &transaction)?;
             flush_db(&database)?;
-    
-            match action.encryption {
-                Encryption::Ed25519 => {
-                    let sign_display = SignDisplay {
-                        transaction: &hex_signature,
-                        author_line: Verifier::Ed25519(hex_key).show_card(),
-                        user_comment,
-                    }.show();
-                    events.push(Event::TransactionSigned(sign_display));
-                    enter_events_into_tree(&history, events)?;
-                    flush_db(&database)?;
-                    
-                    Ok(format!("00{}", hex_signature))
-                },
-                Encryption::Sr25519 => {
-                    let sign_display = SignDisplay {
-                        transaction: &hex_signature,
-                        author_line: Verifier::Sr25519(hex_key).show_card(),
-                        user_comment,
-                    }.show();
-                    events.push(Event::TransactionSigned(sign_display));
-                    enter_events_into_tree(&history, events)?;
-                    flush_db(&database)?;
-                    
-                    Ok(format!("01{}", hex_signature))
-                },
-                Encryption::Ecdsa => {
-                    let sign_display = SignDisplay {
-                        transaction: &hex_signature,
-                        author_line: Verifier::Ecdsa(hex_key).show_card(),
-                        user_comment,
-                    }.show();
-                    events.push(Event::TransactionSigned(sign_display));
-                    enter_events_into_tree(&history, events)?;
-                    flush_db(&database)?;
-                    
-                    Ok(format!("02{}", hex_signature))
-                },
+            
+            let sign_display = SignDisplay {
+                transaction: &hex_signature,
+                author_line,
+                user_comment,
+            }.show();
+            events.push(Event::TransactionSigned(sign_display));
+            enter_events_into_tree(&history, events)?;
+            flush_db(&database)?;
+            
+            match encryption {
+                Encryption::Ed25519 => Ok(format!("00{}", hex_signature)),
+                Encryption::Sr25519 => Ok(format!("01{}", hex_signature)),
+                Encryption::Ecdsa => Ok(format!("02{}", hex_signature)),
             }
         },
         Err(e) => {

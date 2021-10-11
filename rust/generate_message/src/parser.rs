@@ -1,15 +1,18 @@
 use std::env;
 use constants::FOLDER;
-use definitions::users::SufficientCrypto;
+use definitions::crypto::{Encryption, SufficientCrypto};
 use parity_scale_codec::Decode;
+use anyhow;
+use db_handling::{helpers::unhex, error::NotHex};
+
+use crate::error::{Error, NotDecodeable, NeedArgument, DoubleKey, NeedKey, BadArgument, Unexpected};
 
 /// Expected typical run commands:
-/// `$ cargo run show -database`
-/// `$ cargo run show -address_book`
-/// `$ cargo run load -n -s polkadot westend`
-/// `$ cargo run load -d -n polkadot`
-/// `$ cargo run -p -a`
-/// `$ cargo run add -t -u wss://westend-rpc.polkadot.io`
+/// `$ cargo run show database`
+/// `$ cargo run show address_book`
+/// `$ cargo run load_metadata -n westend`
+/// `$ cargo run add_specs -d -n -ed25519 westend`
+/// `$ cargo run add_network -u wss://unknown-network.eu -ecdsa`
 
 
 /// Enum to describe the incoming command contents
@@ -18,7 +21,10 @@ pub enum Command {
     Types,
     Load(Instruction),
     Add(Instruction),
+    Specs(Instruction),
     Make(Make),
+    Remove(Remove),
+    RestoreDefaults,
 }
 
 pub enum Show {
@@ -30,12 +36,13 @@ pub struct Instruction {
     pub set: Set,
     pub content: Content,
     pub pass_errors: bool,
+    pub encryption_override: Option<Encryption>,
 }
 
 pub enum Content {
     All,
-    Name(Vec<String>),
-    Address(Vec<String>),
+    Name(String),
+    Address(String),
 }
 
 pub enum Set {
@@ -75,6 +82,7 @@ pub enum Msg {
     LoadTypes(Vec<u8>),
     LoadMetadata(Vec<u8>),
     AddNetwork(Vec<u8>),
+    AddSpecs(Vec<u8>),
 }
 
 enum CryptoType {
@@ -88,6 +96,7 @@ enum MsgType {
     LoadTypes,
     LoadMetadata,
     AddNetwork,
+    AddSpecs
 }
 
 enum VerKey {
@@ -101,9 +110,14 @@ enum Entry {
     File(String),
 }
 
+pub enum Remove {
+    Title(String),
+    SpecNameVersion{name: String, version: u32},
+}
+
 impl Command {
     /// FUnction to interpret command line input
-    pub fn new(mut args: env::Args) -> Result<Command, &'static str> {
+    pub fn new(mut args: env::Args) -> anyhow::Result<Command> {
         args.next();
 
         match args.next() {
@@ -114,17 +128,18 @@ impl Command {
                             Some(show) => match show.as_str() {
                                 "-database" => Ok(Command::Show(Show::Database)),
                                 "-address_book" => Ok(Command::Show(Show::AddressBook)),
-                                _ => return Err("Requested show command is not supported."),
+                                _ => {return Err(Error::UnexpectedKeyArgumentSequence.show())},
                             },
-                            None => return Err("Show command requires argument.")
+                            None => return Err(Error::NeedKey(NeedKey::Show).show())
                         }
                     },
-                    "types" => Ok(Command::Types),
-                    "load"|"add" => {
+                    "load_types" => Ok(Command::Types),
+                    "load_metadata"|"add_network"|"add_specs" => {
                         let mut set_key = None;
                         let mut content_key = None;
                         let mut pass_errors = true;
-                        let mut names: Vec<String> = Vec::new();
+                        let mut name = None;
+                        let mut encryption_override_key = None;
                         
                         loop {
                             match args.next() {
@@ -133,23 +148,31 @@ impl Command {
                                         match x.as_str() {
                                             "-a"|"-n"|"-u" => {
                                                 match content_key {
-                                                    Some(_) => {return Err("Only one content key allowed: -a, -n or -u.")},
+                                                    Some(_) => {return Err(Error::DoubleKey(DoubleKey::Content).show())},
                                                     None => {content_key = Some(x)}
                                                 }
                                             },
                                             "-d"|"-f"|"-k"|"-p"|"-t" => {
                                                 match set_key {
-                                                    Some(_) => {return Err("Maximum one setting key allowed: -d, -f, -k, -p, -t.")},
+                                                    Some(_) => {return Err(Error::DoubleKey(DoubleKey::Set).show())},
                                                     None => {set_key = Some(x)}
                                                 }
                                             },
                                             "-s" => {pass_errors = false},
-                                            _ => return Err("Unknown key.")
+                                            "-ed25519"|"-sr25519"|"-ecdsa" => {
+                                                match encryption_override_key {
+                                                    Some(_) =>  {return Err(Error::DoubleKey(DoubleKey::CryptoOverride).show())},
+                                                    None => {encryption_override_key = Some(x)}
+                                                }
+                                            },
+                                            _ => {return Err(Error::UnexpectedKeyArgumentSequence.show())},
                                         }
                                     }
                                     else {
-                                    // name or address are recorded only once
-                                        if !names.contains(&x) {names.push(x)}
+                                        match name {
+                                            Some(_) => return Err(Error::OnlyOneNetworkId.show()),
+                                            None => {name = Some(x)}
+                                        }
                                     }
                                 },
                                 None => break,
@@ -164,44 +187,62 @@ impl Command {
                                     "-k" => Set::K,
                                     "-p" => Set::P,
                                     "-t" => Set::T,
-                                    _ => return Err("Unexpected set key.")
+                                    _ => unreachable!(),
                                 }
                             },
                             None => Set::T,
+                        };
+                        
+                        let encryption_override = match encryption_override_key {
+                            Some(x) => {
+                                match x.as_str() {
+                                    "-ed25519" => Some(Encryption::Ed25519),
+                                    "-sr25519" => Some(Encryption::Sr25519),
+                                    "-ecdsa" => Some(Encryption::Ecdsa),
+                                    _ => unreachable!(),
+                                }
+                            },
+                            None => None,
                         };
                         
                         let content = match content_key {
                             Some(x) => {
                                 match x.as_str() {
                                     "-a" => {
-                                        if names.len() != 0 {return Err("Key -a is used to process all, name was not expected.")}
-                                        else {Content::All}
+                                        if let Some(_) = name {return Err(Error::Unexpected(Unexpected::KeyAContent).show())}
+                                        Content::All
                                     },
                                     "-n" => {
-                                        if names.len() == 0 {return Err("Expected to get some network names with key -n.")}
-                                        else {Content::Name(names)}
-                                    },
-                                    "-u" => {
-                                        if names.len() == 0 {return Err("Expected to get some url addresses with key -u.")}
-                                        else {
-                                            if let Set::F = set {return Err("Could not process url addresses without rpc queries.")}
-                                            else {Content::Address(names)}
+                                        match name {
+                                            Some(n) => Content::Name(n),
+                                            None => return Err(Error::NeedArgument(NeedArgument::NetworkName).show())
                                         }
                                     },
-                                    _ => return Err("Unexpected content key.")
+                                    "-u" => {
+                                        match name {
+                                            Some(a) => Content::Address(a),
+                                            None => return Err(Error::NeedArgument(NeedArgument::NetworkUrl).show())
+                                        }
+                                    },
+                                    _ => unreachable!(),
                                 }
                             },
-                            None => {return Err("Expected some content key.")}
+                            None => {return Err(Error::NeedKey(NeedKey::Content).show())}
                         };
                         
                         let instruction = Instruction {
                             set,
                             content,
                             pass_errors,
+                            encryption_override,
                         };
                         
-                        if arg == "load" {Ok(Command::Load(instruction))}
-                        else {Ok(Command::Add(instruction))}
+                        match arg.as_str() {
+                            "load_metadata" => Ok(Command::Load(instruction)),
+                            "add_network" => Ok(Command::Add(instruction)),
+                            "add_specs" => Ok(Command::Specs(instruction)),
+                            _ => unreachable!(),
+                        }
                     },
                     "make" => {
                         let mut goal = Goal::Both; // default option for `make`
@@ -220,7 +261,7 @@ impl Command {
                                     _ => (),
                                 }
                             },
-                            None => {return Err("Not enough arguments.")}
+                            None => {return Err(Error::NeedArgument(NeedArgument::Make).show())}
                         }
                         let mut crypto_type_found = None;
                         let mut msg_type_found = None;
@@ -233,163 +274,97 @@ impl Command {
                                 Some(x) => {
                                     match x.as_str() {
                                         "-crypto" => {
-                                            match args.next() {
+                                            if let Some(_) = crypto_type_found {return Err(Error::DoubleKey(DoubleKey::CryptoKey).show())}
+                                            crypto_type_found = match args.next() {
                                                 Some(x) => {
                                                     match x.as_str() {
-                                                        "ed25519" => {
-                                                            crypto_type_found = match crypto_type_found {
-                                                                Some(_) => {return Err("`-crypto` key could be used only once.")},
-                                                                None => Some(CryptoType::Ed25519),
-                                                            };
-                                                        },
-                                                        "sr25519" => {
-                                                            crypto_type_found = match crypto_type_found {
-                                                                Some(_) => {return Err("`-crypto` key could be used only once.")},
-                                                                None => Some(CryptoType::Sr25519),
-                                                            };
-                                                        },
-                                                        "ecdsa" => {
-                                                            crypto_type_found = match crypto_type_found {
-                                                                Some(_) => {return Err("`-crypto` key could be used only once.")},
-                                                                None => Some(CryptoType::Ecdsa),
-                                                            };
-                                                        },
-                                                        "none" => {
-                                                            crypto_type_found = match crypto_type_found {
-                                                                Some(_) => {return Err("`-crypto` key could be used only once.")},
-                                                                None => Some(CryptoType::None),
-                                                            };
-                                                        },
-                                                        _ => {return Err("Invalid `-crypto` key argument.")}
+                                                        "ed25519" => Some(CryptoType::Ed25519),
+                                                        "sr25519" => Some(CryptoType::Sr25519),
+                                                        "ecdsa" => Some(CryptoType::Ecdsa),
+                                                        "none" => Some(CryptoType::None),
+                                                        _ => {return Err(Error::BadArgument(BadArgument::CryptoKey).show())}
                                                     }
                                                 },
-                                                None => {return Err("`-crypto` key must be followed by an argument.")},
-                                            }
+                                                None => {return Err(Error::NeedArgument(NeedArgument::CryptoKey).show())},
+                                            };
                                         },
                                         "-msgtype" => {
-                                            match args.next() {
+                                            if let Some(_) = msg_type_found {return Err(Error::DoubleKey(DoubleKey::MsgType).show())}
+                                            msg_type_found = match args.next() {
                                                 Some(x) => {
                                                     match x.as_str() {
-                                                        "load_types" => {
-                                                            msg_type_found = match msg_type_found {
-                                                                Some(_) => {return Err("`-msgtype` key could be used only once.")},
-                                                                None => Some(MsgType::LoadTypes),
-                                                            };
-                                                        },
-                                                        "load_metadata" => {
-                                                            msg_type_found = match msg_type_found {
-                                                                Some(_) => {return Err("`-msgtype` key could be used only once.")},
-                                                                None => Some(MsgType::LoadMetadata),
-                                                            };
-                                                        },
-                                                        "add_network" => {
-                                                            msg_type_found = match msg_type_found {
-                                                                Some(_) => {return Err("`-msgtype` key could be used only once.")},
-                                                                None => Some(MsgType::AddNetwork),
-                                                            };
-                                                        },
-                                                        _ => {return Err("Invalid `-msgtype` key argument.")}
+                                                        "load_types" => Some(MsgType::LoadTypes),
+                                                        "load_metadata" => Some(MsgType::LoadMetadata),
+                                                        "add_network" => Some(MsgType::AddNetwork),
+                                                        "add_specs" => Some(MsgType::AddSpecs),
+                                                        _ => {return Err(Error::BadArgument(BadArgument::MsgType).show())}
                                                     }
                                                 },
-                                                None => {return Err("`-msgtype` key must be followed by an argument.")},
-                                            }
+                                                None => {return Err(Error::NeedArgument(NeedArgument::MsgType).show())},
+                                            };
                                         },
                                         "-verifier" => {
-                                            match args.next() {
+                                            if let Some(_) = verifier_found {return Err(Error::DoubleKey(DoubleKey::Verifier).show())}
+                                            verifier_found = match args.next() {
                                                 Some(x) => {
                                                     match x.as_str() {
                                                         "-hex" => {
                                                             match args.next() {
-                                                                Some(h) => {
-                                                                    verifier_found = match verifier_found {
-                                                                        Some(_) => {return Err("`-verifier` key could be used maximum once.")},
-                                                                        None => Some(VerKey::Hex(h.to_string())),
-                                                                    };
-                                                                },
-                                                            None => {return Err("Expected hex line for verifier after -verifier -hex sequence.")},
+                                                                Some(h) => Some(VerKey::Hex(h.to_string())),
+                                                                None => {return Err(Error::NeedArgument(NeedArgument::VerifierHex).show())},
                                                             }
                                                         },
                                                         "-file" => {
                                                             match args.next() {
-                                                                Some(f) => {
-                                                                    verifier_found = match verifier_found {
-                                                                        Some(_) => {return Err("`-verifier` key could be used maximum once.")},
-                                                                        None => Some(VerKey::File(f.to_string())),
-                                                                    };
-                                                                },
-                                                                None => {return Err("Expected file name for verifier after -verifier -file sequence.")},
+                                                                Some(f) => Some(VerKey::File(f.to_string())),
+                                                                None => {return Err(Error::NeedArgument(NeedArgument::VerifierFile).show())},
                                                             }
                                                         },
-                                                        "Alice" => {
-                                                        // test verifier Alice
-                                                            verifier_found = match verifier_found {
-                                                                Some(_) => {return Err("`-verifier` key could be used maximum once.")},
-                                                                None => Some(VerKey::Alice),
-                                                            };
-                                                        },
-                                                        _ => {return Err("Invalid `-verifier` key argument.")},
+                                                        "Alice" => Some(VerKey::Alice),
+                                                        _ => {return Err(Error::BadArgument(BadArgument::Verifier).show())}
                                                     }
                                                 },
-                                                None => {return Err("`-verifier` key must be followed by an argument.")},
-                                            }
+                                                None => {return Err(Error::NeedArgument(NeedArgument::Verifier).show())},
+                                            };
                                         },
                                         "-payload" => {
-                                            match args.next() {
-                                                Some(x) => {
-                                                // interpret as filename with payload
-                                                    payload_found = match payload_found {
-                                                        Some(_) => {return Err("`-payload` key could be used only once.")},
-                                                        None => Some(x.to_string()),
-                                                    };
-                                                },
-                                                None => {return Err("`-payload` key must be followed by an argument.")},
-                                            }
+                                            if let Some(_) = payload_found {return Err(Error::DoubleKey(DoubleKey::Payload).show())}
+                                            payload_found = match args.next() {
+                                                Some(x) => Some(x.to_string()),
+                                                None => {return Err(Error::NeedArgument(NeedArgument::Payload).show())},
+                                            };
                                         },
                                         "-signature" => {
-                                            match args.next() {
+                                            if let Some(_) = signature_found {return Err(Error::DoubleKey(DoubleKey::Signature).show())}
+                                            signature_found = match args.next() {
                                                 Some(x) => {
                                                     match x.as_str() {
                                                         "-hex" => {
                                                             match args.next() {
-                                                                Some(h) => {
-                                                                    signature_found = match signature_found {
-                                                                        Some(_) => {return Err("`-signature` key could be used maximum once.")},
-                                                                        None => Some(Entry::Hex(h.to_string())),
-                                                                    };
-                                                                },
-                                                                None => {return Err("Expected hex line for signature after -signature -hex sequence.")},
+                                                                Some(h) => Some(Entry::Hex(h.to_string())),
+                                                                None => {return Err(Error::NeedArgument(NeedArgument::SignatureHex).show())},
                                                             }
                                                         },
                                                         "-file" => {
                                                             match args.next() {
-                                                                Some(f) => {
-                                                                    signature_found = match signature_found {
-                                                                        Some(_) => {return Err("`-signature` key could be used maximum once.")},
-                                                                        None => Some(Entry::File(f.to_string())),
-                                                                    };
-                                                                },
-                                                                None => {return Err("Expected file name for signature after -signature -file sequence.")},
+                                                                Some(f) => Some(Entry::File(f.to_string())),
+                                                                None => {return Err(Error::NeedArgument(NeedArgument::SignatureFile).show())},
                                                             }
                                                         },
-                                                        _ => {return Err("Invalid `-signature` key argument.")},
+                                                        _ => {return Err(Error::BadArgument(BadArgument::Signature).show())}
                                                     }
                                                 },
-                                                None => {return Err("`-signature` key must be followed by an argument.")},
+                                                None => {return Err(Error::NeedArgument(NeedArgument::Signature).show())},
                                             }
                                         },
                                         "-name" => {
-                                            match args.next() {
-                                                Some(x) => {
-                                                // interpret as custom filename for export
-                                                    name = match name {
-                                                        Some(_) => {return Err("`-name` key could be used maximum once.")},
-                                                        None => Some(x.to_string()),
-                                                    };
-                                                },
-                                                None => {return Err("`-name` key must be followed by an argument.")},
-                                            }
+                                            if let Some(_) = name {return Err(Error::DoubleKey(DoubleKey::Name).show())}
+                                            name = match args.next() {
+                                                Some(x) => Some(x.to_string()),
+                                                None => {return Err(Error::NeedArgument(NeedArgument::Name).show())},
+                                            };
                                         },
-                                        _ => {return Err("Unexpected key and argument sequence.")},
+                                        _ => {return Err(Error::UnexpectedKeyArgumentSequence.show())},
                                     }
                                 },
                                 None => break,
@@ -403,23 +378,23 @@ impl Command {
                                     CryptoType::Sr25519 => Crypto::Sr25519(process_verifier_and_signature (verifier_found, signature_found)?),
                                     CryptoType::Ecdsa => Crypto::Ecdsa(process_verifier_and_signature (verifier_found, signature_found)?),
                                     CryptoType::None => {
-                                        if let Some(_) = verifier_found {return Err("No verifier was expected unverified message.")}
-                                        if let Some(_) = signature_found {return Err("No signature was expected unverified message.")}
+                                        if let Some(_) = verifier_found {return Err(Error::Unexpected(Unexpected::VerifierNoCrypto).show())}
+                                        if let Some(_) = signature_found {return Err(Error::Unexpected(Unexpected::SignatureNoCrypto).show())}
                                         Crypto::None
                                     },
                                 }
                             },
-                            None => {return Err("`-crypto` key must have been used.")},
+                            None => {return Err(Error::NeedKey(NeedKey::Crypto).show())},
                         };
                         let payload = match payload_found {
                             Some(x) => {
                                 let filename = format!("{}/{}", FOLDER, x);
                                 match std::fs::read(&filename) {
                                     Ok(a) => a,
-                                    Err(_) => {return Err("Error reading payload file.")} 
+                                    Err(e) => {return Err(Error::InputOutputError(e.to_string()).show())} 
                                 }
                             },
-                            None => {return Err("`-payload` key must have been used.")},
+                            None => {return Err(Error::NeedKey(NeedKey::Payload).show())},
                         };
                         let msg = match msg_type_found {
                             Some(x) => {
@@ -427,9 +402,10 @@ impl Command {
                                     MsgType::LoadTypes => Msg::LoadTypes(payload),
                                     MsgType::LoadMetadata => Msg::LoadMetadata(payload),
                                     MsgType::AddNetwork => Msg::AddNetwork(payload),
+                                    MsgType::AddSpecs => Msg::AddSpecs(payload),
                                 }
                             },
-                            None => {return Err("`-msgtype` key must have been used.")},
+                            None => {return Err(Error::NeedKey(NeedKey::MsgType).show())},
                         };
                         let make = Make {
                             goal,
@@ -456,7 +432,7 @@ impl Command {
                                     _ => (),
                                 }
                             },
-                            None => {return Err("Not enough arguments.")}
+                            None => {return Err(Error::NeedArgument(NeedArgument::Sign).show())}
                         }
                         let mut sufficient_crypto_found = None;
                         let mut msg_type_found = None;
@@ -467,90 +443,58 @@ impl Command {
                                 Some(x) => {
                                     match x.as_str() {
                                         "-sufficient" => {
-                                            match args.next() {
+                                            if let Some(_) = sufficient_crypto_found {return Err(Error::DoubleKey(DoubleKey::SufficientCrypto).show())}
+                                            sufficient_crypto_found = match args.next() {
                                                 Some(x) => {
                                                     match x.as_str() {
                                                         "-hex" => {
                                                             match args.next() {
-                                                                Some(h) => {
-                                                                    sufficient_crypto_found = match sufficient_crypto_found {
-                                                                        Some(_) => {return Err("`-sufficient` key could be used maximum once.")},
-                                                                        None => Some(Entry::Hex(h.to_string())),
-                                                                    };
-                                                                },
-                                                                None => {return Err("Expected hex line with sufficient crypto after -sufficient -hex sequence.")},
+                                                                Some(h) => Some(Entry::Hex(h.to_string())),
+                                                                None => {return Err(Error::NeedArgument(NeedArgument::SufficientCryptoHex).show())},
                                                             }
                                                         },
                                                         "-file" => {
                                                             match args.next() {
-                                                                Some(f) => {
-                                                                    sufficient_crypto_found = match sufficient_crypto_found {
-                                                                        Some(_) => {return Err("`-sufficient` key could be used maximum once.")},
-                                                                        None => Some(Entry::File(f.to_string())),
-                                                                    };
-                                                                },
-                                                                None => {return Err("Expected file name for sufficient crypto after -sufficient -file sequence.")},
+                                                                Some(f) => Some(Entry::File(f.to_string())),
+                                                                None => {return Err(Error::NeedArgument(NeedArgument::SufficientCryptoFile).show())},
                                                             }
                                                         },
-                                                        _ => {return Err("Invalid `-sufficient` key argument.")},
+                                                        _ => {return Err(Error::BadArgument(BadArgument::SufficientCrypto).show())}
                                                     }
                                                 },
-                                                None => {return Err("`-sufficient` key must be followed by an argument.")},
-                                            }
+                                                None => {return Err(Error::NeedArgument(NeedArgument::SufficientCrypto).show())},
+                                            };
                                         },
                                         "-msgtype" => {
-                                            match args.next() {
+                                            if let Some(_) = msg_type_found {return Err(Error::DoubleKey(DoubleKey::MsgType).show())}
+                                            msg_type_found = match args.next() {
                                                 Some(x) => {
                                                     match x.as_str() {
-                                                        "load_types" => {
-                                                            msg_type_found = match msg_type_found {
-                                                                Some(_) => {return Err("`-msgtype` key could be used only once.")},
-                                                                None => Some(MsgType::LoadTypes),
-                                                            };
-                                                        },
-                                                        "load_metadata" => {
-                                                            msg_type_found = match msg_type_found {
-                                                                Some(_) => {return Err("`-msgtype` key could be used only once.")},
-                                                                None => Some(MsgType::LoadMetadata),
-                                                            };
-                                                        },
-                                                        "add_network" => {
-                                                            msg_type_found = match msg_type_found {
-                                                                Some(_) => {return Err("`-msgtype` key could be used only once.")},
-                                                                None => Some(MsgType::AddNetwork),
-                                                            };
-                                                        },
-                                                        _ => {return Err("Invalid `-msgtype` key argument.")}
+                                                        "load_types" => Some(MsgType::LoadTypes),
+                                                        "load_metadata" => Some(MsgType::LoadMetadata),
+                                                        "add_network" => Some(MsgType::AddNetwork),
+                                                        "add_specs" => Some(MsgType::AddSpecs),
+                                                        _ => {return Err(Error::BadArgument(BadArgument::MsgType).show())}
                                                     }
                                                 },
-                                                None => {return Err("`-msgtype` key must be followed by an argument.")},
-                                            }
+                                                None => {return Err(Error::NeedArgument(NeedArgument::MsgType).show())},
+                                            };
                                         },
                                         "-payload" => {
-                                            match args.next() {
-                                                Some(x) => {
-                                                // interpret as filename with payload
-                                                    payload_found = match payload_found {
-                                                        Some(_) => {return Err("`-payload` key could be used only once.")},
-                                                        None => Some(x.to_string()),
-                                                    };
-                                                },
-                                                None => {return Err("`-payload` key must be followed by an argument.")},
-                                            }
+                                            if let Some(_) = payload_found {return Err(Error::DoubleKey(DoubleKey::Payload).show())}
+                                            payload_found = match args.next() {
+                                                Some(x) => Some(x.to_string()),
+                                                None => {return Err(Error::NeedArgument(NeedArgument::Payload).show())},
+                                            };
                                         },
                                         "-name" => {
-                                            match args.next() {
-                                                Some(x) => {
-                                                // interpret as custom filename for export
-                                                    name = match name {
-                                                        Some(_) => {return Err("`-name` key could be used maximum once.")},
-                                                        None => Some(x.to_string()),
-                                                    };
-                                                },
-                                                None => {return Err("`-name` key must be followed by an argument.")},
-                                            }
+                                            if let Some(_) = name {return Err(Error::DoubleKey(DoubleKey::Name).show())}
+                                            name = match args.next() {
+                                                Some(x) => Some(x.to_string()),
+                                                None => {return Err(Error::NeedArgument(NeedArgument::Name).show())},
+                                            };
                                         },
-                                        _ => {return Err("Unexpected key and argument sequence.")},
+                                        _ => {return Err(Error::UnexpectedKeyArgumentSequence.show())},
                                     }
                                 },
                                 None => break,
@@ -560,27 +504,18 @@ impl Command {
                         let crypto = match sufficient_crypto_found {
                             Some(x) => {
                                 let sufficient_crypto_vector = match x {
-                                    Entry::Hex(h) => {
-                                        let hex_vector = {
-                                            if h.starts_with("0x") {h[2..].to_string()}
-                                            else {h}
-                                        };
-                                        match hex::decode(&hex_vector) {
-                                            Ok(a) => a,
-                                            Err(_) => {return Err("Error decoding hex string of sufficient crypto entry.")} 
-                                        }
-                                    },
+                                    Entry::Hex(h) => unhex(&h, NotHex::SufficientCrypto)?,
                                     Entry::File(f) => {
                                         let filename = format!("{}/{}", FOLDER, f);
                                         match std::fs::read(&filename) {
                                             Ok(a) => a,
-                                            Err(_) => {return Err("Error reading provided file with sufficient crypto.")},
+                                            Err(e) => {return Err(Error::InputOutputError(e.to_string()).show())},
                                         }
                                     },
                                 };
                                 let sufficient_crypto = match <SufficientCrypto>::decode(&mut &sufficient_crypto_vector[..]) {
                                     Ok(a) => a,
-                                    Err(_) => {return Err("Error in provided sufficient crypto.")},
+                                    Err(_) => {return Err(Error::NotDecodeable(NotDecodeable::SufficientCrypto).show())},
                                 };
                                 match sufficient_crypto {
                                     SufficientCrypto::Ed25519 {public_key, signature} => {
@@ -594,17 +529,17 @@ impl Command {
                                     },
                                 }
                             },
-                            None => {return Err("`-sufficient` key must have been used.")},
+                            None => {return Err(Error::NeedKey(NeedKey::SufficientCrypto).show())},
                         };
                         let payload = match payload_found {
                             Some(x) => {
                                 let filename = format!("{}/{}", FOLDER, x);
                                 match std::fs::read(&filename) {
                                     Ok(a) => a,
-                                    Err(_) => {return Err("Error reading payload file.")} 
+                                    Err(e) => {return Err(Error::InputOutputError(e.to_string()).show())},
                                 }
                             },
-                            None => {return Err("`-payload` key must have been used.")},
+                            None => {return Err(Error::NeedKey(NeedKey::Payload).show())},
                         };
                         let msg = match msg_type_found {
                             Some(x) => {
@@ -612,9 +547,10 @@ impl Command {
                                     MsgType::LoadTypes => Msg::LoadTypes(payload),
                                     MsgType::LoadMetadata => Msg::LoadMetadata(payload),
                                     MsgType::AddNetwork => Msg::AddNetwork(payload),
+                                    MsgType::AddSpecs => Msg::AddSpecs(payload),
                                 }
                             },
-                            None => {return Err("`-msgtype` key must have been used.")},
+                            None => {return Err(Error::NeedKey(NeedKey::MsgType).show())},
                         };
                         let make = Make {
                             goal,
@@ -623,47 +559,84 @@ impl Command {
                             name,
                         };
                         Ok(Command::Make(make))
+                    },                
+                    "remove" => {
+                        let mut info_found = None;
+                        loop {
+                            match args.next() {
+                                Some(a) => {
+                                    match a.as_str() {
+                                        "-title" => {
+                                            if let Some(_) = info_found {return Err(Error::DoubleKey(DoubleKey::Remove).show())}
+                                            info_found = match args.next() {
+                                                Some(b) => Some(Remove::Title(b.to_string())),
+                                                None => {return Err(Error::NeedArgument(NeedArgument::RemoveTitle).show())},
+                                            };
+                                        },
+                                        "-name" => {
+                                            if let Some(_) = info_found {return Err(Error::DoubleKey(DoubleKey::Remove).show())}
+                                            info_found = match args.next() {
+                                                Some(b) => {
+                                                    let name = b.to_string();
+                                                    match args.next() {
+                                                        Some(c) => {
+                                                            match c.as_str() {
+                                                                "-version" => {
+                                                                    match args.next() {
+                                                                        Some(d) => {
+                                                                            match d.parse::<u32> () {
+                                                                                Ok(version) => Some(Remove::SpecNameVersion{name, version}),
+                                                                                Err(_) => {return Err(Error::Unexpected(Unexpected::VersionFormat).show())},
+                                                                            }
+                                                                        },
+                                                                        None => {return Err(Error::NeedArgument(NeedArgument::RemoveVersion).show())}
+                                                                    }
+                                                                }
+                                                                _ => {return Err(Error::UnexpectedKeyArgumentSequence.show())},
+                                                            }
+                                                        },
+                                                        None => {return Err(Error::NeedKey(NeedKey::RemoveVersion).show())},
+                                                    }
+                                                },
+                                                None => {return Err(Error::NeedArgument(NeedArgument::RemoveName).show())},
+                                            };
+                                        },
+                                        _ => {return Err(Error::UnexpectedKeyArgumentSequence.show())},
+                                    }
+                                },
+                                None => break,
+                            }
+                        }
+                        match info_found {
+                            Some(x) => Ok(Command::Remove(x)),
+                            None => {return Err(Error::NeedKey(NeedKey::Remove).show())}
+                        }                        
                     },
-                    _ => return Err("Command type is not supported."),
+                    "restore_defaults" => Ok(Command::RestoreDefaults),
+                    _ => return Err(Error::UnknownCommand.show()),
                 }
             },
-            None => return Err("Didn't get any command."),
+            None => return Err(Error::NoCommand.show()),
         }
     }
 }
 
 
-fn process_verifier_and_signature (verifier_found: Option<VerKey>, signature_found: Option<Entry>) -> Result<VerifierKind, &'static str> {
+fn process_verifier_and_signature (verifier_found: Option<VerKey>, signature_found: Option<Entry>) -> anyhow::Result<VerifierKind> {
     
     match verifier_found {
         Some(VerKey::Hex(x)) => {
-            let hex_key = {
-                if x.starts_with("0x") {x[2..].to_string()}
-                else {x}
-            };
-            let verifier_public_key = match hex::decode(&hex_key) {
-                Ok(a) => a,
-                Err(_) => {return Err("Error decoding hex public key line.")} 
-            };
+            let verifier_public_key = unhex(&x, NotHex::PublicKey)?;
             let signature = match signature_found {
-                Some(Entry::Hex(t)) => {
-                    let hex_signature = {
-                        if t.starts_with("0x") {t[2..].to_string()}
-                        else {t}
-                    };
-                    match hex::decode(&hex_signature) {
-                        Ok(a) => a,
-                        Err(_) => {return Err("Error decoding hex signature line.")} 
-                    }
-                },
+                Some(Entry::Hex(t)) => unhex(&t, NotHex::Signature)?,
                 Some(Entry::File(t)) => {
                     let signature_filename = format!("{}/{}", FOLDER, t);
                     match std::fs::read(&signature_filename) {
                         Ok(a) => a,
-                        Err(_) => {return Err("Error reading verifier public key file.")},
+                        Err(e) => {return Err(Error::InputOutputError(e.to_string()).show())},
                     }
                 },
-                None => {return Err("`-signature` key must have been used.")},
+                None => {return Err(Error::NeedKey(NeedKey::Signature).show())},
             };
             Ok(VerifierKind::Normal{verifier_public_key, signature})
         },
@@ -671,35 +644,26 @@ fn process_verifier_and_signature (verifier_found: Option<VerKey>, signature_fou
             let verifier_filename = format!("{}/{}", FOLDER, x);
             let verifier_public_key = match std::fs::read(&verifier_filename) {
                 Ok(a) => a,
-                Err(_) => {return Err("Error reading verifier public key file.")},
+                Err(e) => {return Err(Error::InputOutputError(e.to_string()).show())},
             };
             let signature = match signature_found {
-                Some(Entry::Hex(t)) => {
-                    let hex_signature = {
-                        if t.starts_with("0x") {t[2..].to_string()}
-                        else {t}
-                    };
-                    match hex::decode(&hex_signature) {
-                        Ok(a) => a,
-                        Err(_) => {return Err("Error decoding hex signature line.")} 
-                    }
-                },
+                Some(Entry::Hex(t)) => unhex(&t, NotHex::Signature)?,
                 Some(Entry::File(t)) => {
                     let signature_filename = format!("{}/{}", FOLDER, t);
                     match std::fs::read(&signature_filename) {
                         Ok(a) => a,
-                        Err(_) => {return Err("Error reading verifier public key file.")},
+                        Err(e) => {return Err(Error::InputOutputError(e.to_string()).show())},
                     }
                 },
-                None => {return Err("`-signature` key must have been used.")},
+                None => {return Err(Error::NeedKey(NeedKey::Signature).show())},
             };
             Ok(VerifierKind::Normal{verifier_public_key, signature})
         },
         Some(VerKey::Alice) => {
-            if let Some(_) = signature_found {return Err("No signature was expected for verifier Alice.")}
+            if let Some(_) = signature_found {return Err(Error::Unexpected(Unexpected::AliceSignature).show())}
             Ok(VerifierKind::Alice)
         },
-        None => {return Err("`-verifier` key must have been used.")},
+        None => {return Err(Error::NeedKey(NeedKey::Verifier).show())},
     }
     
 }

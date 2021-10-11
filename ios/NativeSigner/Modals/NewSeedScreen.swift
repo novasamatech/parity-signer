@@ -50,6 +50,7 @@ struct NewSeedScreen: View {
                         TextEditor(text: $seedPhrase)
                             .frame(height: 150.0)
                             .autocapitalization(.none)
+                            .keyboardType(.asciiCapable)
                             .disableAutocorrection(true)
                             .font(/*@START_MENU_TOKEN@*/.title/*@END_MENU_TOKEN@*/)
                             .background(/*@START_MENU_TOKEN@*//*@PLACEHOLDER=View@*/Color("textFieldColor")/*@END_MENU_TOKEN@*/)

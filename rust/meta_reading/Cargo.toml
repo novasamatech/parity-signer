@@ -17,8 +17,6 @@ tokio = { version = "1", features = ["full"] }
 serde_json = "1.0.64"
 definitions = {path = "../definitions"}
 
-[patch.crates-io]
-sp-core = { git = 'https://github.com/paritytech/substrate/' }
 
 [lib]
 name = "meta_reading"

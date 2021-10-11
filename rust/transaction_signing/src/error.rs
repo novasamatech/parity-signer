@@ -10,6 +10,9 @@ pub enum Error {
     AddressDetailsNotFound,
     Interpretation(Interpretation),
     CryptoError(CryptoError),
+    AddressKeyDecoding,
+    AddressKeyGeneration(String),
+    EncryptionMismatch,
 }
 
 #[derive(PartialEq)]
@@ -34,11 +37,8 @@ pub enum Interpretation {
 #[derive(PartialEq)]
 pub enum CryptoError {
     KeyGenEd25519,
-    KeyFormatEd25519,
     KeyGenSr25519,
-    KeyFormatSr25519,
     KeyGenEcdsa,
-    KeyFormatEcdsa,
     WrongPassword,
 }
 
@@ -73,13 +73,13 @@ impl Error {
             },
             Error::CryptoError(e) => match e {
                 CryptoError::KeyGenEd25519 => anyhow!("Error generating keys for ed25519 crypto."),
-                CryptoError::KeyFormatEd25519 => anyhow!("Public key not compatible with ed25519 crypto."),
                 CryptoError::KeyGenSr25519 => anyhow!("Error generating keys for sr25519 crypto."),
-                CryptoError::KeyFormatSr25519 => anyhow!("Public key not compatible with sr25519 crypto."),
                 CryptoError::KeyGenEcdsa => anyhow!("Error generating keys for ecdsa crypto."),
-                CryptoError::KeyFormatEcdsa => anyhow!("Public key not compatible with ecdsa crypto."),
                 CryptoError::WrongPassword => anyhow!("Wrong password."),
             },
+            Error::AddressKeyDecoding => anyhow!("Address key could not be decoded."),
+            Error::AddressKeyGeneration(e) => anyhow!("Address key could not be generated. {}", e),
+            Error::EncryptionMismatch => anyhow!("Suggested encryption does not correspond to account details."),
         }
     }
 }

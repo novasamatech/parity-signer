@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-struct ExportIdentity: View {
+struct ExportAddress: View {
     @EnvironmentObject var data: SignerDataModel
     @State var image: UIImage?
     var body: some View {
@@ -26,7 +26,7 @@ struct ExportIdentity: View {
                 HStack {
                     NetworkCard(network: data.selectedNetwork)
                     Spacer()
-                    Text(data.selectedIdentity?.name ?? "none")
+                    Text(data.selectedAddress?.name ?? "none")
                 }.padding()
                 Button(action: {data.keyManagerModal = .none})
                 {
@@ -40,15 +40,29 @@ struct ExportIdentity: View {
         }
         .onAppear {
             data.lastError = ""
-            if data.selectedIdentity != nil {
+            if data.selectedAddress != nil {
                 image = data.exportIdentityQR()
             }
         }
+        .gesture(
+            DragGesture(minimumDistance: 50)
+                .onEnded {amount in
+                    print(amount)
+                    if amount.translation.width > 0 {
+                    data.selectNextAddress()
+                    } else {
+                        data.selectPreviousAddress()
+                    }
+                    if data.selectedAddress != nil {
+                        image = data.exportIdentityQR()
+                    }
+                }
+        )
     }
 }
 
 struct ExportIdentity_Previews: PreviewProvider {
     static var previews: some View {
-        ExportIdentity()
+        ExportAddress()
     }
 }

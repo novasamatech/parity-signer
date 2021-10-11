@@ -1,8 +1,8 @@
 use anyhow;
-use constants::{ADDNETWORK, ADDRTREE, GENERALVERIFIER, HISTORY, METATREE, SETTREE, SPECSTREE, TRANSACTION};
-use definitions::{history::Event, metadata::{MetaValuesDisplay, NetworkDisplay}, network_specs::{ChainSpecs, generate_network_key}, transactions::Transaction, users::IdentityHistory};
+use constants::{ADDNETWORK, ADDRTREE, GENERALVERIFIER, HISTORY, METATREE, SETTREE, SPECSTREE, TRANSACTION, VERIFIERS};
+use definitions::{history::Event, metadata::{MetaValuesDisplay, NetworkDisplay}, network_specs::{ChainSpecs, generate_network_key, generate_verifier_key}, transactions::Transaction, users::IdentityHistory};
 use parity_scale_codec::{Decode, Encode};
-use db_handling::{helpers::{open_db, open_tree, flush_db, insert_into_tree, decode_address_details}, manage_history::enter_events_into_tree};
+use db_handling::{helpers::{open_db, open_tree, flush_db, insert_into_tree, decode_address_details, reverse_address_key}, manage_history::enter_events_into_tree};
 use blake2_rfc::blake2b::blake2b;
 
 use crate::error::{Error, ActionFailure};
@@ -57,11 +57,12 @@ pub fn add_network (database_name: &str, checksum: u32, upd_general: bool) -> an
     let chainspecs = open_tree(&database, SPECSTREE)?;
     
     let order = chainspecs.len() as u8;
-    let network_key = generate_network_key(&action.chainspecs.genesis_hash.to_vec());
+    let network_key = generate_network_key(&action.chainspecs.genesis_hash.to_vec(), action.chainspecs.encryption);
     let new_chainspecs = ChainSpecs {
         base58prefix: action.chainspecs.base58prefix,
         color: action.chainspecs.color,
         decimals: action.chainspecs.decimals,
+        encryption: action.chainspecs.encryption,
         genesis_hash: action.chainspecs.genesis_hash,
         logo: action.chainspecs.logo,
         name: action.chainspecs.name,
@@ -70,9 +71,13 @@ pub fn add_network (database_name: &str, checksum: u32, upd_general: bool) -> an
         secondary_color: action.chainspecs.secondary_color,
         title: action.chainspecs.title,
         unit: action.chainspecs.unit,
-        verifier: action.verifier,
     };
     insert_into_tree(network_key.to_vec(), new_chainspecs.encode(), &chainspecs)?;
+    flush_db(&database)?;
+    
+// creating verifier entry
+    let verifiers = open_tree(&database, VERIFIERS)?;
+    insert_into_tree(generate_verifier_key(&action.chainspecs.genesis_hash.to_vec()), action.verifier.encode(), &verifiers)?;
     flush_db(&database)?;
 
 // adding network in network_id vector of all existing identities records
@@ -82,14 +87,16 @@ pub fn add_network (database_name: &str, checksum: u32, upd_general: bool) -> an
     for x in identities.iter() {
         if let Ok((key, value)) = x {
             let mut address_details = decode_address_details(value)?;
-            if (address_details.path.as_str() == "") && !address_details.has_pwd {
+            let public_key_helper = reverse_address_key(&key.to_vec())?;
+            if (address_details.path.as_str() == "") && !address_details.has_pwd && (public_key_helper.encryption == action.chainspecs.encryption) {
                 address_details.network_id.push(network_key.to_vec());
                 insert_into_tree(key.to_vec(), address_details.encode(), &identities)?;
                 let identity_history_print = IdentityHistory {
                     seed_name: &address_details.seed_name,
-                    public_key: &hex::encode(&key),
+                    public_key: &hex::encode(&public_key_helper.public_key),
+                    encryption: public_key_helper.encryption,
                     path: &address_details.path,
-                    network_key: &hex::encode(&network_key),
+                    network_genesis_hash: &hex::encode(&action.chainspecs.genesis_hash),
                 }.show();
                 events.push(Event::IdentityAdded(identity_history_print));
             }

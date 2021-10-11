@@ -1,5 +1,7 @@
 mod add_network;
     use add_network::add_network;
+//mod add_specs;
+//    use add_specs::add_specs;
 pub mod cards;
     use cards::Card;
 mod check_signature;
@@ -32,9 +34,9 @@ mod utils;
 
 fn handle_scanner_input (payload: &str, dbname: &str) -> Result<String, Error> {
 
-    let data_hex = match payload.starts_with("0x") {
-        true => &payload[2..],
-        false => &payload,
+    let data_hex = {
+        if payload.starts_with("0x") {&payload[2..]}
+        else {&payload}
     };
     
     if data_hex.len() < 6 {return Err(Error::BadInputData(BadInputData::TooShort))}
@@ -48,6 +50,7 @@ fn handle_scanner_input (payload: &str, dbname: &str) -> Result<String, Error> {
         "80" => load_metadata(data_hex, dbname),
         "81" => load_types(data_hex, dbname),
         "c0" => add_network(data_hex, dbname),
+//        "c1" => add_specs(data_hex, dbname),
         "f0" => Ok(make_all_cards()),
         _ => return Err(Error::BadInputData(BadInputData::WrongPayloadType)),
     }

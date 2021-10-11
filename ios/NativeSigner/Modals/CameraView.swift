@@ -29,7 +29,6 @@ struct CameraView: View {
                             print(String(describing: data.transactionState))
                         }
                         data.transactionState = .parsing
-                        print(String(describing: data.transactionState))
                     }
                 })
                 .onReceive(data.$resetCamera, perform: { resetCamera in

@@ -1,8 +1,8 @@
-use constants::{ADDMETAVERIFIER, GENERALVERIFIER, HISTORY, LOADMETA, METATREE, SETTREE, SPECSTREE, TRANSACTION};
+use constants::{ADDMETAVERIFIER, GENERALVERIFIER, HISTORY, LOADMETA, METATREE, SETTREE, VERIFIERS, TRANSACTION};
 use definitions::{history::Event, metadata::{MetaValuesDisplay}, network_specs::NetworkVerifier, transactions::Transaction};
 use parity_scale_codec::{Decode, Encode};
 use anyhow;
-use db_handling::{helpers::{open_db, open_tree, flush_db, insert_into_tree, get_and_decode_chain_specs}, manage_history::{enter_events_into_tree}};
+use db_handling::{helpers::{open_db, open_tree, flush_db, insert_into_tree}, manage_history::{enter_events_into_tree}};
 use blake2_rfc::blake2b::blake2b;
 
 use crate::error::{Error, ActionFailure};
@@ -48,16 +48,14 @@ pub fn accept_metadata (database_name: &str, checksum: u32, upd_general: bool) -
         flush_db(&database)?;
     }
     
-    if let Some(network_key) = action.upd_network {
+    if let Some(verifier_key) = action.upd_network {
         let network_verifier_show = NetworkVerifier {
-            network_key: &hex::encode(&network_key),
+            verifier_key: &hex::encode(&verifier_key),
             verifier_line: action.verifier.show_card(),
         }.show();
         events.push(Event::MetadataVerifierAdded(network_verifier_show));
-        let chainspecs = open_tree(&database, SPECSTREE)?;
-        let mut specs_to_load = get_and_decode_chain_specs(&chainspecs, &network_key.to_vec())?;
-        specs_to_load.verifier = action.verifier;
-        insert_into_tree(network_key.to_vec(), specs_to_load.encode(), &chainspecs)?;
+        let verifiers = open_tree(&database, VERIFIERS)?;
+        insert_into_tree(verifier_key.to_vec(), action.verifier.encode(), &verifiers)?;
         flush_db(&database)?;
     }
     
@@ -92,11 +90,14 @@ pub fn add_meta_verifier (database_name: &str, checksum: u32, upd_general: bool)
     flush_db(&database)?;
     
     let mut events = action.history;
-    let network_verifier_display = NetworkVerifier {
-        network_key: &hex::encode(&action.network_key),
+    let network_verifier_show = NetworkVerifier {
+        verifier_key: &hex::encode(&action.verifier_key),
         verifier_line: action.verifier.show_card(),
     }.show();
-    events.push(Event::MetadataVerifierAdded(network_verifier_display));
+    events.push(Event::MetadataVerifierAdded(network_verifier_show));
+    let verifiers = open_tree(&database, VERIFIERS)?;
+    insert_into_tree(action.verifier_key.to_vec(), action.verifier.encode(), &verifiers)?;
+    flush_db(&database)?;
     
     if upd_general {
         events.push(Event::GeneralVerifierAdded(action.verifier.show_card()));
@@ -104,12 +105,6 @@ pub fn add_meta_verifier (database_name: &str, checksum: u32, upd_general: bool)
         insert_into_tree(GENERALVERIFIER.to_vec(), action.verifier.encode(), &settings)?;
         flush_db(&database)?;
     }
-    
-    let chainspecs = open_tree(&database, SPECSTREE)?;
-    let mut specs_to_load = get_and_decode_chain_specs(&chainspecs, &action.network_key)?;
-    specs_to_load.verifier = action.verifier;
-    insert_into_tree(action.network_key, specs_to_load.encode(), &chainspecs)?;
-    flush_db(&database)?;
     
     enter_events_into_tree(&history, events)?;
     flush_db(&database)?;

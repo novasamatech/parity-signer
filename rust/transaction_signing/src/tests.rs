@@ -88,9 +88,9 @@ mod tests {
         let meta1 = meta_count_test(dbname);
         let specs1 = specs_count_test(dbname);
         
-        let line = fs::read_to_string("for_tests/add_network_westendV9080_unverified.txt").unwrap();
-        let reply = produce_output(&line, dbname);
-        let reply_known_part = r##"{"warning":[{"index":0,"indent":0,"type":"warning","payload":"Received new network information is not verified."}],"new_network":[{"index":1,"indent":0,"type":"new_network","payload":{"specname":"westend","spec_version":"9080","meta_hash":"44e8d52c5af362b3279309ca7476424391902470f363fae097cd8bb620d0e6a7","base58prefix":"42","color":"#660D35","decimals":"12","genesis_hash":"e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e","logo":"westend","name":"westend","path_id":"//westend","secondary_color":"#262626","title":"Westend","unit":"WND","verifier":{"hex":"","encryption":"none"}}}],"action":{"type":"add_network","payload":{"type":"add_network","checksum":""##;
+        let line = fs::read_to_string("for_tests/add_network_westendV9090_unverified.txt").unwrap();
+        let reply = produce_output(&line.trim(), dbname);
+        let reply_known_part = r##"{"warning":[{"index":0,"indent":0,"type":"warning","payload":"Received new network information is not verified."}],"new_network":[{"index":1,"indent":0,"type":"new_network","payload":{"specname":"westend","spec_version":"9090","meta_hash":"62bacaaa3d9bb01313bb882c23615aae6509ab2ef1e7e807581ee0b74c77416b","base58prefix":"42","color":"#660D35","decimals":"12","encryption":"sr25519","genesis_hash":"e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e","logo":"westend","name":"westend","path_id":"//westend","secondary_color":"#262626","title":"Westend","unit":"WND","verifier":{"hex":"","encryption":"none"}}}],"action":{"type":"add_network","payload":{"type":"add_network","checksum":""##;
         assert!(reply.contains(reply_known_part), "Error in action.\nReceived: {}", reply);
         let mock_action_line = get_action_line(&reply);
         let result = handle_action(&mock_action_line, SEED_PHRASE, PWD, USER_COMMENT, dbname);
@@ -99,8 +99,8 @@ mod tests {
         let meta2 = meta_count_test(dbname);
         let specs2 = specs_count_test(dbname);
         
-        let line = fs::read_to_string("for_tests/add_network_westendV9080_Alice.txt").unwrap();
-        let reply = produce_output(&line, dbname);
+        let line = fs::read_to_string("for_tests/add_network_westendV9090_Alice.txt").unwrap();
+        let reply = produce_output(&line.trim(), dbname);
         let reply_known_part = r##"{"verifier":[{"index":0,"indent":0,"type":"verifier","payload":{"hex":"d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d","encryption":"sr25519"}}],"warning":[{"index":1,"indent":0,"type":"warning","payload":"Add network message is received for network that already has some entries in the database."},{"index":2,"indent":0,"type":"warning","payload":"Previously unverified information now received signed by a verifier. If accepted, updating types and adding networks could be verified only by this verifier."},{"index":3,"indent":0,"type":"warning","payload":"Previously unverified network metadata now received signed by a verifier. If accepted, only metadata from same verifier could be received for this network."},{"index":4,"indent":0,"type":"warning","payload":"Received metadata is already in database, both general verifier and network verifier could be added."}],"action":{"type":"add_two_verifiers","payload":{"type":"add_two_verifiers","checksum":""##;
         assert!(reply.contains(reply_known_part), "Error in action.\nReceived: {}", reply);
         let mock_action_line = get_action_line(&reply);
@@ -128,9 +128,9 @@ mod tests {
         let meta1 = meta_count_test(dbname);
         let specs1 = specs_count_test(dbname);
         
-        let line = fs::read_to_string("for_tests/add_network_westendV9080_Alice.txt").unwrap();
-        let reply = produce_output(&line, dbname);
-        let reply_known_part = r##"{"verifier":[{"index":0,"indent":0,"type":"verifier","payload":{"hex":"d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d","encryption":"sr25519"}}],"warning":[{"index":1,"indent":0,"type":"warning","payload":"Previously unverified information now received signed by a verifier. If accepted, updating types and adding networks could be verified only by this verifier."}],"new_network":[{"index":2,"indent":0,"type":"new_network","payload":{"specname":"westend","spec_version":"9080","meta_hash":"44e8d52c5af362b3279309ca7476424391902470f363fae097cd8bb620d0e6a7","base58prefix":"42","color":"#660D35","decimals":"12","genesis_hash":"e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e","logo":"westend","name":"westend","path_id":"//westend","secondary_color":"#262626","title":"Westend","unit":"WND","verifier":{"hex":"d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d","encryption":"sr25519"}}}],"action":{"type":"add_network_and_add_general_verifier","payload":{"type":"add_network_and_add_general_verifier","checksum":""##;
+        let line = fs::read_to_string("for_tests/add_network_westendV9090_Alice.txt").unwrap();
+        let reply = produce_output(&line.trim(), dbname);
+        let reply_known_part = r##"{"verifier":[{"index":0,"indent":0,"type":"verifier","payload":{"hex":"d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d","encryption":"sr25519"}}],"warning":[{"index":1,"indent":0,"type":"warning","payload":"Previously unverified information now received signed by a verifier. If accepted, updating types and adding networks could be verified only by this verifier."}],"new_network":[{"index":2,"indent":0,"type":"new_network","payload":{"specname":"westend","spec_version":"9090","meta_hash":"62bacaaa3d9bb01313bb882c23615aae6509ab2ef1e7e807581ee0b74c77416b","base58prefix":"42","color":"#660D35","decimals":"12","encryption":"sr25519","genesis_hash":"e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e","logo":"westend","name":"westend","path_id":"//westend","secondary_color":"#262626","title":"Westend","unit":"WND","verifier":{"hex":"d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d","encryption":"sr25519"}}}],"action":{"type":"add_network_and_add_general_verifier","payload":{"type":"add_network_and_add_general_verifier","checksum":""##;
         assert!(reply.contains(reply_known_part), "Error in action.\nReceived: {}", reply);
         let mock_action_line = get_action_line(&reply);
         let result = handle_action(&mock_action_line, SEED_PHRASE, PWD, USER_COMMENT, dbname);
@@ -152,8 +152,8 @@ mod tests {
         populate_cold_no_networks(dbname).unwrap();
         
         // real action: add_network
-        let line = fs::read_to_string("for_tests/add_network_westendV9080_unverified.txt").unwrap();
-        let reply = produce_output(&line, dbname);
+        let line = fs::read_to_string("for_tests/add_network_westendV9090_unverified.txt").unwrap();
+        let reply = produce_output(&line.trim(), dbname);
         
         // wrong action: sign_transaction
         let mock_action_line = get_action_line(&reply).replace("add_network", "sign_transaction");
@@ -177,7 +177,7 @@ mod tests {
         
         // real action: sign_transaction
         let line = "530100d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27da40403008eaf04151687736326c9fea17e25fc5287613693c912909cb226aa4794f26a480700e8764817b501b8003223000005000000e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e538a7d7a0ac17eb6dd004578cb8e238c384a10f57c999a3fa1200409cd9b3f33e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e";
-        let reply = produce_output(&line, dbname);
+        let reply = produce_output(&line.trim(), dbname);
         
         // wrong action: load_metadata
         let mock_action_line = get_action_line(&reply).replace("sign_transaction", "load_metadata");
@@ -201,7 +201,7 @@ mod tests {
         
         // real action: sign_transaction
         let line = "530100d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27da40403008eaf04151687736326c9fea17e25fc5287613693c912909cb226aa4794f26a480700e8764817b501b8003223000005000000e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e538a7d7a0ac17eb6dd004578cb8e238c384a10f57c999a3fa1200409cd9b3f33e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e";
-        let reply = produce_output(&line, dbname);
+        let reply = produce_output(&line.trim(), dbname);
         
         // wrong action: add_metadata_verifier
         let mock_action_line = get_action_line(&reply).replace("sign_transaction", "add_metadata_verifier");
@@ -225,7 +225,7 @@ mod tests {
         
         // real action: sign_transaction
         let line = "530100d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27da40403008eaf04151687736326c9fea17e25fc5287613693c912909cb226aa4794f26a480700e8764817b501b8003223000005000000e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e538a7d7a0ac17eb6dd004578cb8e238c384a10f57c999a3fa1200409cd9b3f33e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e";
-        let reply = produce_output(&line, dbname);
+        let reply = produce_output(&line.trim(), dbname);
         
         // wrong action: load_types
         let mock_action_line = get_action_line(&reply).replace("sign_transaction", "load_types");
@@ -249,7 +249,7 @@ mod tests {
         
         // real action: sign_transaction
         let line = "530100d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27da40403008eaf04151687736326c9fea17e25fc5287613693c912909cb226aa4794f26a480700e8764817b501b8003223000005000000e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e538a7d7a0ac17eb6dd004578cb8e238c384a10f57c999a3fa1200409cd9b3f33e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e";
-        let reply = produce_output(&line, dbname);
+        let reply = produce_output(&line.trim(), dbname);
         
         // wrong action: add_general_verifier
         let mock_action_line = get_action_line(&reply).replace("sign_transaction", "add_general_verifier");
@@ -273,7 +273,7 @@ mod tests {
         
         // real action: sign_transaction
         let line = "530100d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27da40403008eaf04151687736326c9fea17e25fc5287613693c912909cb226aa4794f26a480700e8764817b501b8003223000005000000e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e538a7d7a0ac17eb6dd004578cb8e238c384a10f57c999a3fa1200409cd9b3f33e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e";
-        let reply = produce_output(&line, dbname);
+        let reply = produce_output(&line.trim(), dbname);
         
         // wrong action: add_two_verifiers
         let mock_action_line = get_action_line(&reply).replace("sign_transaction", "add_two_verifiers");
@@ -297,7 +297,7 @@ mod tests {
         
         // real action: sign_transaction
         let line = "530100d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27da40403008eaf04151687736326c9fea17e25fc5287613693c912909cb226aa4794f26a480700e8764817b501b8003223000005000000e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e538a7d7a0ac17eb6dd004578cb8e238c384a10f57c999a3fa1200409cd9b3f33e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e";
-        let reply = produce_output(&line, dbname);
+        let reply = produce_output(&line.trim(), dbname);
         
         // wrong action: load_metadata_and_add_general_verifier
         let mock_action_line = get_action_line(&reply).replace("sign_transaction", "load_metadata_and_add_general_verifier");
@@ -321,7 +321,7 @@ mod tests {
         
         // real action: sign_transaction
         let line = "530100d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27da40403008eaf04151687736326c9fea17e25fc5287613693c912909cb226aa4794f26a480700e8764817b501b8003223000005000000e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e538a7d7a0ac17eb6dd004578cb8e238c384a10f57c999a3fa1200409cd9b3f33e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e";
-        let reply = produce_output(&line, dbname);
+        let reply = produce_output(&line.trim(), dbname);
         
         // wrong action: add_network
         let mock_action_line = get_action_line(&reply).replace("sign_transaction", "add_network");
@@ -345,7 +345,7 @@ mod tests {
         
         // real action: sign_transaction
         let line = "530100d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27da40403008eaf04151687736326c9fea17e25fc5287613693c912909cb226aa4794f26a480700e8764817b501b8003223000005000000e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e538a7d7a0ac17eb6dd004578cb8e238c384a10f57c999a3fa1200409cd9b3f33e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e";
-        let reply = produce_output(&line, dbname);
+        let reply = produce_output(&line.trim(), dbname);
         
         // wrong action: add_network_and_add_general_verifier
         let mock_action_line = get_action_line(&reply).replace("sign_transaction", "add_network_and_add_general_verifier");
@@ -373,7 +373,7 @@ mod tests {
         let specs1 = specs_count_test(dbname);
         
         let line = fs::read_to_string("for_tests/network_metadata_westendV9070_None.txt").unwrap();
-        let reply = produce_output(&line, dbname);
+        let reply = produce_output(&line.trim(), dbname);
         
         let reply_known_part = r##"{"warning":[{"index":0,"indent":0,"type":"warning","payload":"Received network metadata is not verified."}],"meta":[{"index":1,"indent":0,"type":"meta","payload":{"specname":"westend","spec_version":"9070","meta_hash":"e281fbc53168a6b87d1ea212923811f4c083e7be7d18df4b8527b9532e5f5fec"}}],"action":{"type":"load_metadata","payload":{"type":"load_metadata","checksum":""##;
         assert!(reply.contains(reply_known_part), "Error in action.\nReceived: {}", reply);
@@ -388,7 +388,7 @@ mod tests {
         assert!(specs2 == specs1, "Number of specs entries somehow changed.");
         
         let line = fs::read_to_string("for_tests/network_metadata_westendV9070_Alice.txt").unwrap();
-        let reply = produce_output(&line, dbname);
+        let reply = produce_output(&line.trim(), dbname);
         
         let reply_known_part = r##"{"verifier":[{"index":0,"indent":0,"type":"verifier","payload":{"hex":"d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d","encryption":"sr25519"}}],"warning":[{"index":1,"indent":0,"type":"warning","payload":"Previously unverified network metadata now received signed by a verifier. If accepted, only metadata from same verifier could be received for this network."},{"index":2,"indent":0,"type":"warning","payload":"Received metadata is already in database, only network verifier could be added."}],"action":{"type":"add_metadata_verifier","payload":{"type":"add_metadata_verifier","checksum":""##;
         assert!(reply.contains(reply_known_part), "Error in action.\nReceived: {}", reply);
@@ -413,7 +413,7 @@ mod tests {
         populate_cold_no_networks(dbname).unwrap();
         
         let line = fs::read_to_string("for_tests/updating_types_info_None.txt").unwrap();
-        let reply = produce_output(&line, dbname);
+        let reply = produce_output(&line.trim(), dbname);
         
         let reply_known_part = r#"{"warning":[{"index":0,"indent":0,"type":"warning","payload":"Received types information is not verified."},{"index":1,"indent":0,"type":"warning","payload":"Updating types (really rare operation)."}],"types_info":[{"index":2,"indent":0,"type":"types_hash","payload":"d2c5b096be10229ce9ea9d219325c4399875b52ceb4264add89b0d7c5e9ad574"}],"action":{"type":"load_types","payload":{"type":"load_types","checksum":""#;
         assert!(reply.contains(reply_known_part), "Error in action.\nReceived: {}", reply);
@@ -422,7 +422,7 @@ mod tests {
         if let Err(e) = result {panic!("Was unable to load types. {}", e)}
         
         let line = fs::read_to_string("for_tests/updating_types_info_Alice.txt").unwrap();
-        let reply = produce_output(&line, dbname);
+        let reply = produce_output(&line.trim(), dbname);
         
         let reply_known_part = r#"{"verifier":[{"index":0,"indent":0,"type":"verifier","payload":{"hex":"d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d","encryption":"sr25519"}}],"warning":[{"index":1,"indent":0,"type":"warning","payload":"Previously unverified information now received signed by a verifier. If accepted, updating types and adding networks could be verified only by this verifier."},{"index":2,"indent":0,"type":"warning","payload":"Received types information is already in database, only verifier could be added."}],"action":{"type":"add_general_verifier","payload":{"type":"add_general_verifier","checksum":""#;
         assert!(reply.contains(reply_known_part), "Error in action.\nReceived: {}", reply);
@@ -441,7 +441,7 @@ mod tests {
         populate_cold_no_meta(dbname, true).unwrap();
 
         let line = fs::read_to_string("for_tests/updating_types_info_Alice.txt").unwrap();
-        let reply = produce_output(&line, dbname);
+        let reply = produce_output(&line.trim(), dbname);
         
         let reply_known_part = r#"{"verifier":[{"index":0,"indent":0,"type":"verifier","payload":{"hex":"d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d","encryption":"sr25519"}}],"warning":[{"index":1,"indent":0,"type":"warning","payload":"Previously unverified information now received signed by a verifier. If accepted, updating types and adding networks could be verified only by this verifier."},{"index":2,"indent":0,"type":"warning","payload":"Updating types (really rare operation)."}],"types_info":[{"index":3,"indent":0,"type":"types_hash","payload":"d2c5b096be10229ce9ea9d219325c4399875b52ceb4264add89b0d7c5e9ad574"}],"action":{"type":"load_types","payload":{"type":"load_types","checksum":""#;
         assert!(reply.contains(reply_known_part), "Error in action.\nReceived: {}", reply);
@@ -451,7 +451,7 @@ mod tests {
 
     // loading metadata without verifier - should work        
         let line = fs::read_to_string("for_tests/network_metadata_westendV9070_None.txt").unwrap();
-        let reply = produce_output(&line, dbname);
+        let reply = produce_output(&line.trim(), dbname);
         
         let reply_known_part = r#"{"warning":[{"index":0,"indent":0,"type":"warning","payload":"Received network metadata is not verified."}],"meta":[{"index":1,"indent":0,"type":"meta","payload":{"specname":"westend","spec_version":"9070","meta_hash":"e281fbc53168a6b87d1ea212923811f4c083e7be7d18df4b8527b9532e5f5fec"}}],"action":{"type":"load_metadata","payload":{"type":"load_metadata","checksum":""#;
         assert!(reply.contains(reply_known_part), "Error in action.\nReceived: {}", reply);
@@ -460,8 +460,8 @@ mod tests {
         if let Err(e) = result {panic!("Was unable to load metadata without signature after general verifier appeared. {}", e)}
         
     // adding network without verifier - should not work
-        let line = fs::read_to_string("for_tests/add_network_westendV9080_unverified.txt").unwrap();
-        let reply = produce_output(&line, dbname);
+        let line = fs::read_to_string("for_tests/add_network_westendV9090_unverified.txt").unwrap();
+        let reply = produce_output(&line.trim(), dbname);
         
         let reply_known = r#"{"error":[{"index":0,"indent":0,"type":"error","payload":"General verifier information exists in the database. Received information could be accepted only from the same general verifier."}]}"#;
         assert!(reply == reply_known, "Error in parsing outcome.\nReceived: {}", reply);

@@ -1,45 +1,47 @@
-use sled::{Db, open, Tree};
 use parity_scale_codec::Decode;
 use constants::{ADDRESS_BOOK, HOT_DB_NAME, METATREE};
-use definitions::metadata::{AddressBookEntry, NameVersioned};
+use definitions::metadata::AddressBookEntry;
+use db_handling::helpers::{open_db, open_tree};
+use anyhow;
 
+use crate::helpers::decode_and_check_meta_entry;
+use crate::error::{Error, NotDecodeable};
 
-pub fn show_database() -> Result<(), Box<dyn std::error::Error>> {
+pub fn show_database() -> anyhow::Result<()> {
     
-    let database: Db = open(HOT_DB_NAME)?;
-    let metadata: Tree = database.open_tree(METATREE)?;
-    
-    if metadata.len() == 0 {println!("No metadata entries in the database.")}
-    else {
-        println!("Database has metadata information for following networks:");
-    
-        for x in metadata.iter() {
-            if let Ok((versioned_name_encoded, _)) = x {
-                let versioned_name = <NameVersioned>::decode(&mut &versioned_name_encoded[..])?;
-                println!("\t{} {}", versioned_name.name, versioned_name.version);
-            }
+    let database = open_db(HOT_DB_NAME)?;
+    let metadata = open_tree(&database, METATREE)?;
+    if metadata.len() == 0 {return Err(Error::MetadataEmpty.show())}
+    println!("Database has metadata information for following networks:");
+    for x in metadata.iter() {
+        if let Ok(a) = x {
+            let meta_values = decode_and_check_meta_entry(a)?;
+            println!("\t{} {}", meta_values.name, meta_values.version);
         }
     }
     Ok(())
 }
 
 
-pub fn show_address_book() -> Result<(), Box<dyn std::error::Error>> {
+pub fn show_address_book() -> anyhow::Result<()> {
     
-    let database: Db = open(HOT_DB_NAME)?;
-    let address_book: Tree = database.open_tree(ADDRESS_BOOK)?;
+    let database = open_db(HOT_DB_NAME)?;
+    let address_book = open_tree(&database, ADDRESS_BOOK)?;
     
-    if address_book.len() == 0 {println!("No address book entries in the database.")}
-    else {
-        println!("Address book has entries for following networks:");
-    
-        for x in address_book.iter() {
-            if let Ok((name_encoded, address_entry_encoded)) = x {
-                let address_entry = <AddressBookEntry>::decode(&mut &address_entry_encoded[..])?;
-                let name = <String>::decode(&mut &name_encoded[..])?;
-                if name == address_entry.name {println!("\t{} at {}", name, address_entry.address);}
-                else {println!("\t{} entry got corrupted, and should be deleted.", name);}
-            }
+    if address_book.len() == 0 {return Err(Error::AddressBookEmpty.show())}
+    println!("Address book has entries for following networks:");
+    for x in address_book.iter() {
+        if let Ok((name_encoded, address_book_entry_encoded)) = x {
+            let address_book_entry = match <AddressBookEntry>::decode(&mut &address_book_entry_encoded[..]) {
+                Ok(a) => a,
+                Err(_) => return Err(Error::NotDecodeable(NotDecodeable::AddressBookEntry).show()),
+            };
+            let title = match <String>::decode(&mut &name_encoded[..]) {
+                Ok(a) => a,
+                Err(_) => return Err(Error::NotDecodeable(NotDecodeable::AddressBookKey).show()),
+            };
+            if address_book_entry.def {println!("\t{} at {}, encryption {} (default)", title, address_book_entry.address, address_book_entry.encryption.show());}
+            else {println!("\t{} at {}, encryption {}", title, address_book_entry.address, address_book_entry.encryption.show());}
         }
     }
     Ok(())
