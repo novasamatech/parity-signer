@@ -59,8 +59,8 @@ struct HistoryCard: View {
                 HistoryCardTemplate(image: "pencil", timestamp: timestamp, color: "cryptoColor", line1: "Types signed", line2: "comment placeholder")
             case .systemEntry(let text):
                 HistoryCardTemplate(image: "square", timestamp: timestamp, color: "cryptoColor", line1: "System record", line2: text)
-            case .transactionSigned(_):
-                HistoryCardTemplate(image: "pencil", timestamp: timestamp, color: "cryptoColor", line1: "Generated signature", line2: "comment placeholder")
+            case .transactionSigned(let value):
+                HistoryCardTemplate(image: "pencil", timestamp: timestamp, color: "cryptoColor", line1: "Generated signature", line2: String(decoding: Data(base64Encoded: value.user_comment) ?? Data(), as: UTF8.self))
             case .typesInfoUpdated(_):
                 HistoryCardTemplate(image: "plus.viewfinder", timestamp: timestamp, color: "cryptoColor", line1: "New types info loaded", line2: "")
             case .userEntry(let text):

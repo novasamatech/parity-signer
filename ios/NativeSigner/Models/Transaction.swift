@@ -92,7 +92,7 @@ extension SignerDataModel {
             return
         }
         let stringAction = String(data: dataAction, encoding: .utf8)
-        let res = handle_action(err_ptr, stringAction, seedPhrase, password, self.comment, self.dbName)
+        let res = handle_action(err_ptr, stringAction, seedPhrase, password, Data(self.comment.utf8).base64EncodedString(), self.dbName)
         if err_ptr.pointee.code == 0 {
             self.result = String(cString: res!)
             signer_destroy_string(res!)
