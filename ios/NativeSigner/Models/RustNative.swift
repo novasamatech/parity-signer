@@ -18,16 +18,22 @@ class SignerDataModel: ObservableObject {
     @Published var seedNames: [String] = []
     @Published var networks: [Network] = []
     @Published var addresses: [Address] = []
+    @Published var onboardingDone: Bool = false
+    @Published var lastError: String = ""
+    @Published var networkSettings: NetworkSettings?
+    
+    //Key manager state
     @Published var selectedSeed: String = ""
     @Published var selectedNetwork: Network?
     @Published var selectedAddress: Address?
     @Published var searchKey: String = ""
     @Published var suggestedPath: String = "//"
     @Published var suggestedName: String = ""
-    @Published var onboardingDone: Bool = false
-    @Published var lastError: String = ""
-    @Published var networkSettings: NetworkSettings?
+    @Published var multiSelected: [Address] = []
+    
+    //History screen data state
     @Published var history: [History] = []
+    @Published var selectedRecord: Event?
     
     //Navigation
     @Published var signerScreen: SignerScreen = .history
@@ -76,8 +82,10 @@ class SignerDataModel: ObservableObject {
         } else {
             print("No networks found; not handled yet")
         }
+        disableMutliSelectionMode()
         self.networkSettings = nil
         self.getHistory()
+        self.selectedRecord = nil
         resetTransaction()
         if self.seedNames.count == 0 {
             self.signerScreen = .keys

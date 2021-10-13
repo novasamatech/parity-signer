@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-struct Network: Codable {
+struct Network: Codable, Hashable {
     var key: String
     var color: String
     var logo: String

@@ -24,7 +24,11 @@ struct SearchKeys: View {
             } else {
                 Image(systemName: "doc.text.magnifyingglass").imageScale(.large).foregroundColor(Color("AccentColor"))
             }
-        }.padding(.horizontal)
+        }
+        .onDisappear {
+            data.searchKey = ""
+        }
+        .background(Color("backgroundUtility"))
     }
 }
 

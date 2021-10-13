@@ -33,6 +33,22 @@ extension Address {
 }
 
 /**
+ * Useful utility functions for address
+ */
+extension Address {
+    /**
+     * Get truncated base58 address representation that fits on screen
+     */
+    func truncateBase58() -> String {
+        return self.ss58.prefix(8) + "..." + self.ss58.suffix(8)
+    }
+    
+    func isRoot() -> Bool {
+        return self.path == "" && self.has_password == "false"
+    }
+}
+
+/**
  * Address-related operations in data model
  */
 extension SignerDataModel {
@@ -190,24 +206,110 @@ extension SignerDataModel {
      */
     func selectNextAddress() {
         if self.selectedAddress != nil {
-            if let current = self.addresses.firstIndex(of: self.selectedAddress!) {
-                if self.addresses.indices.contains(current + 1) {
-                    self.selectedAddress = self.addresses[current+1]
+            if self.multiSelected.isEmpty {
+                if let current = self.addresses.firstIndex(of: self.selectedAddress!) {
+                    if self.addresses.indices.contains(current + 1) {
+                        self.selectedAddress = self.addresses[current+1]
+                    } else {
+                        self.selectedAddress = self.addresses.first
+                    }
+                }
+            } else {
+                if let current = self.multiSelected.firstIndex(of: self.selectedAddress!) {
+                    if self.multiSelected.indices.contains(current + 1) {
+                        self.selectedAddress = self.multiSelected[current+1]
+                    } else {
+                        self.selectedAddress = self.multiSelected.first
+                    }
                 }
             }
         }
     }
-
+    
     /**
      * Selects previous address in key manager
      */
     func selectPreviousAddress() {
         if self.selectedAddress != nil {
-            if let current = self.addresses.firstIndex(of: self.selectedAddress!) {
-                if self.addresses.indices.contains(current - 1) {
-                    self.selectedAddress = self.addresses[current-1]
+            if self.multiSelected.isEmpty {
+                if let current = self.addresses.firstIndex(of: self.selectedAddress!) {
+                    if self.addresses.indices.contains(current - 1) {
+                        self.selectedAddress = self.addresses[current-1]
+                    } else {
+                        self.selectedAddress = self.addresses.last
+                    }
+                }
+            } else {
+                if let current = self.multiSelected.firstIndex(of: self.selectedAddress!) {
+                    if self.multiSelected.indices.contains(current - 1) {
+                        self.selectedAddress = self.multiSelected[current-1]
+                    } else {
+                        self.selectedAddress = self.multiSelected.last
+                    }
                 }
             }
+        }
+    }
+    
+    /**
+     * Returns unpassworded root address
+     * TODO: this should be dropped into Rust
+     */
+    func getRootAddress(seedName: String) -> Address? {
+        if seedName == "" {
+            return nil
+        } else {
+            return self.addresses.first(where: { address in
+                return address.isRoot()
+            })
+        }
+    }
+    
+    /**
+     * Get identicon for root address or empty image if it is not possible
+     */
+    func getRootIdenticon(seedName: String) -> UIImage {
+        if let rootAddress = getRootAddress(seedName: seedName) {
+            return UIImage(data: Data(fromHexEncodedString: String(cString: base58_identicon(nil, rootAddress.ss58, 32))) ?? Data()) ?? UIImage()
+        } else {
+            return UIImage()
+        }
+    }
+    
+    /**
+     * Get something to write below seed name on seed card
+     */
+    func getRootTruncated(seedName: String) -> String {
+        if let rootAddress = getRootAddress(seedName: seedName) {
+            return rootAddress.truncateBase58()
+        } else {
+            return " "
+        }
+    }
+    
+    /**
+     * Unselect all addresses
+     */
+    func disableMutliSelectionMode() {
+        self.multiSelected = []
+    }
+    
+    /**
+     * whether multiselection mode is engaged in key manager
+     */
+    func getMultiSelectionMode() -> Bool {
+        return !self.multiSelected.isEmpty
+    }
+    
+    /**
+     * What should happen when address gets toggled by multiselect action
+     */
+    func multiSelectAction(address: Address) {
+        if self.multiSelected.contains(address) {
+            self.multiSelected.removeAll(where: {element in return element == address})
+        } else {
+            self.multiSelected.append(address)
+            self.selectedAddress = nil
         }
     }
 }

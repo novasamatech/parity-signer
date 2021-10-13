@@ -9,16 +9,15 @@ import SwiftUI
 
 struct HistoryScreen: View {
     @EnvironmentObject var data: SignerDataModel
-    @State var selectedRecord: Event?
     var body: some View {
-        if (selectedRecord == nil) {
+        if (data.selectedRecord == nil) {
             ScrollView {
                 LazyVStack {
                     ForEach(data.history, id: \.order) {history in
                         VStack (alignment: .leading){
                             ForEach(history.events, id: \.self) {event in
                                 Button(action: {
-                                    selectedRecord = event
+                                    data.selectedRecord = event
                                 }) {
                                     HistoryCard(event: event, timestamp: history.timestamp.padding(toLength: 16, withPad: " ", startingAt: 0))
                                         .foregroundColor(/*@START_MENU_TOKEN@*/Color("textMainColor")/*@END_MENU_TOKEN@*/)
@@ -39,11 +38,7 @@ struct HistoryScreen: View {
                 VStack {
                     Text("This is not implemented yet, sorry!")
                         .font(.headline).foregroundColor(Color("dangerColor"))
-                    Text(String(describing: selectedRecord!))
-                    Button(action: {selectedRecord = nil}) {
-                        Text("Back")
-                            .font(.largeTitle)
-                    }
+                    Text(String(describing: data.selectedRecord!))
                 }
             }
         }

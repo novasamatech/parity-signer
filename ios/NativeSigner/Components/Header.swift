@@ -11,13 +11,17 @@ struct Header: View {
     @EnvironmentObject var data: SignerDataModel
     var body: some View {
         HStack {
-            if ((data.transactionState != .none) && (data.signerScreen != .scan)) {
+            if !data.isNavBottom() {
                 Button(action: {
-                    data.totalRefresh()
-                    data.signerScreen = .scan
+                    data.goBack()
                 }) {
                     Text("Back")
                 }}
+            if data.getMultiSelectionMode() && data.keyManagerModal == .none {
+                Button(action: {data.multiSelected = []}) {
+                    Text("Cancel")
+                }
+            }
             Spacer()
             switch data.signerScreen {
             case .scan:
@@ -41,10 +45,15 @@ struct Header: View {
                 Text("History")
             }
             Spacer()
+            if data.getMultiSelectionMode() && data.keyManagerModal == .none {
+                Button(action: {data.multiSelected = data.addresses}) {
+                    Text("Select all")
+                }
+            }
             Button(action: {
                 data.totalRefresh()
                 data.networkSettings = nil
-                data.signerScreen = .settings
+                data.signerScreen = .history
             }) {
                 NavbarShield()
             }

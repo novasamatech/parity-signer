@@ -27,6 +27,13 @@ struct Footer: View {
     @EnvironmentObject var data: SignerDataModel
     var body: some View {
         VStack {
+            if data.signerScreen == .keys && data.keyManagerModal == .none {
+                if data.getMultiSelectionMode() {
+                    MultiselectBottomControl()
+                } else {
+                    SearchKeys()
+                }
+            }
             HStack {
                 Button(action: {
                     data.totalRefresh()
@@ -69,14 +76,16 @@ struct Footer: View {
                     }
                 }
             }
-        }.padding().background(/*@START_MENU_TOKEN@*//*@PLACEHOLDER=View@*/Color("backgroundColor")/*@END_MENU_TOKEN@*/)
+        }
+        .padding()
+        .background(Color("backgroundUtility"))
     }
 }
 
 /*
-struct Footer_Previews: PreviewProvider {
-    static var previews: some View {
-        Footer().previewLayout(.sizeThatFits)
-    }
-}
-*/
+ struct Footer_Previews: PreviewProvider {
+ static var previews: some View {
+ Footer().previewLayout(.sizeThatFits)
+ }
+ }
+ */

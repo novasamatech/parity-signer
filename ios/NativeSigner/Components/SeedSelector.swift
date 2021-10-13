@@ -10,43 +10,32 @@ import SwiftUI
 struct SeedSelector: View {
     @EnvironmentObject var data: SignerDataModel
     var body: some View {
-        HStack {
-            Menu {
-                Button(action: {
-                    data.selectSeed(seedName: "")
-                }) {
-                    Text("Show all")
+        SeedCard(seedName: data.selectedSeed)
+        .gesture(TapGesture()
+                    .onEnded { _ in
+            if data.getMultiSelectionMode() {
+                if let rootAddress = data.getRootAddress(seedName: data.selectedSeed) {
+                    data.multiSelectAction(address: rootAddress)
                 }
-                ForEach(data.seedNames, id: \.self) {seed in
-                    Button(action: {
-                        data.selectSeed(seedName: seed)
-                    }) {
-                        Text(seed)
-                    }
-                }
-                Button(
-                    action: {data.keyManagerModal = .newSeed}) {
-                    Text(" + New seed")
-                }
-            } label: {
-                if data.selectedSeed == "" {
-                    Text("Select seed")
-                        .font(.headline)
-                } else {
-                    VStack {
-                        Text("seed").font(.footnote)
-                        Text(data.selectedSeed)
-                            .font(.headline)
-                    }
-                }
+            } else {
+                data.selectSeed(seedName: "")
+                data.multiSelected = []
+                data.keyManagerModal = .seedSelector
             }
-        }
-        .padding()
+        })
+        .gesture(LongPressGesture()
+                    .onEnded { _ in
+            if let rootAddress = data.getRootAddress(seedName: data.selectedSeed) {
+                data.multiSelectAction(address: rootAddress)
+            }
+        })
     }
 }
 
-struct SeedSelector_Previews: PreviewProvider {
-    static var previews: some View {
-        SeedSelector().previewLayout(.sizeThatFits)
-    }
-}
+/*
+ struct SeedSelector_Previews: PreviewProvider {
+ static var previews: some View {
+ SeedSelector().previewLayout(.sizeThatFits)
+ }
+ }
+ */

@@ -11,28 +11,33 @@ import SwiftUI
 struct MainScreenContainer: View {
     //var testValue = DevTestObject()
     @EnvironmentObject var data: SignerDataModel
+    @GestureState private var dragOffset = CGSize.zero
     var body: some View {
         if data.onboardingDone {
             VStack {
                 Header()
-                switch (data.signerScreen) {
-                case .scan :
-                    TransactionScreen()
-                case .keys :
-                    KeyManager()
-                case .settings :
-                    SettingsScreen()
-                case .history :
-                    HistoryScreen()
-                default:
-                    VStack {
-                        Text("Please wait")
-                            .foregroundColor(Color("textMainColor"))
+                VStack {
+                    switch (data.signerScreen) {
+                    case .scan :
+                        TransactionScreen()
+                    case .keys :
+                        KeyManager()
+                    case .settings :
+                        SettingsScreen()
+                    case .history :
+                        HistoryScreen()
                     }
+                    Spacer()
                 }
-                Spacer()
+                .gesture(
+                    DragGesture().updating($dragOffset, body: { (value, state, transaction) in
+                        if value.startLocation.x < 20 && value.translation.width > 100 {
+                            data.goBack()
+                        }
+                    })
+                )
                 //Certain places are better off without footer
-                if (data.transactionState == .none && (data.keyManagerModal != .showKey || data.signerScreen != .keys )){
+                if (data.transactionState == .none){
                     Footer()
                 }
             }

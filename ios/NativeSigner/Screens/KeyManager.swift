@@ -11,20 +11,16 @@ struct KeyManager: View {
     @EnvironmentObject var data: SignerDataModel
     var body: some View {
         ZStack {
-            
             VStack {
-                HStack {
-                    NetworkList()
-                    SeedSelector()
-                }
+                SeedSelector()
+                NetworkSelector()
                 ScrollView {
                     LazyVStack {
                         ForEach(data.addresses, id: \.public_key) {
                             address in
-                            if (address.name.contains(data.searchKey) || address.path.contains(data.searchKey) || data.searchKey == "" ) {
-                                AddressCard(identity: address)
-                                    .padding(.vertical, 2)
-                                
+                            if ((address.name.contains(data.searchKey) || address.path.contains(data.searchKey) || data.searchKey == "" ) && (!address.isRoot() || data.selectedSeed == "")) {
+                                AddressCard(address: address)
+                                //.padding(.vertical, 2)
                             }
                         }
                         if data.selectedSeed != "" {
@@ -42,13 +38,12 @@ struct KeyManager: View {
                 }
                 
                 Spacer()
-                SearchKeys()
             }
             switch data.keyManagerModal {
             case .showKey:
                 ExportAddress()
             case .newKey:
-                NewIdentityScreen()
+                NewAddressScreen()
             case .newSeed:
                 NewSeedScreen()
             case .seedBackup:
@@ -56,9 +51,12 @@ struct KeyManager: View {
             case .keyDeleteConfirm:
                 //not used yet - primitive alert dialog works well enough
                 EmptyView()
+            case .seedSelector:
+                SeedManager()
+            case .networkManager:
+                NetworkManager()
             case .none:
                 EmptyView()
-                
             }
         }
         .background(/*@START_MENU_TOKEN@*//*@PLACEHOLDER=View@*/Color("backgroundColor")/*@END_MENU_TOKEN@*/)
