@@ -1,7 +1,7 @@
 use hex;
+use definitions::crypto::Encryption;
 
 use crate::error::Error;
-use crate::parse_transaction::AuthorPublicKey;
 
 pub enum Card <'a> {
     Call {pallet: &'a str, method: &'a str, docs: &'a str},
@@ -27,7 +27,7 @@ pub enum Card <'a> {
     TxSpecPlain {gen_hash: &'a str, version: u32, tx_version: u32},
     Author {base58_author: &'a str, seed_name: &'a str, path: &'a str, has_pwd: bool, name: &'a str},
     AuthorPlain (&'a str),
-    AuthorPublicKey (AuthorPublicKey),
+    AuthorPublicKey{author_public_key: Vec<u8>, encryption: Encryption},
     Verifier(String),
     Meta(String), // get String after applying show() to MetaValuesDisplay
     TypesInfo(&'a str),
@@ -104,11 +104,7 @@ impl <'a> Card <'a> {
             Card::TxSpecPlain {gen_hash, version, tx_version} => fancy(index, indent, "tx_spec_plain", &format!("{{\"network_genesis_hash\":\"{}\",\"version\":\"{}\",\"tx_version\":\"{}\"}}", gen_hash, version, tx_version)),
             Card::Author {base58_author, seed_name, path, has_pwd, name} => fancy(index, indent, "author", &format!("{{\"base58\":\"{}\",\"seed\":\"{}\",\"derivation_path\":\"{}\",\"has_password\":{},\"name\":\"{}\"}}", base58_author, seed_name, path, has_pwd, name)),
             Card::AuthorPlain (base58_author) => fancy(index, indent, "author_plain", &format!("{{\"base58\":\"{}\"}}", base58_author)),
-            Card::AuthorPublicKey (author_pub_key) => match author_pub_key {
-                AuthorPublicKey::Ed25519(x) => fancy(index, indent, "author_public_key", &format!("{{\"hex\":\"{}\",\"crypto\":\"ed25519\"}}", &hex::encode(x))),
-                AuthorPublicKey::Sr25519(x) => fancy(index, indent, "author_public_key", &format!("{{\"hex\":\"{}\",\"crypto\":\"sr25519\"}}", &hex::encode(x))),
-                AuthorPublicKey::Ecdsa(x) => fancy(index, indent, "author_public_key", &format!("{{\"hex\":\"{}\",\"crypto\":\"ecdsa\"}}", &hex::encode(x))),
-            },
+            Card::AuthorPublicKey{author_public_key, encryption} => fancy(index, indent, "author_public_key", &format!("{{\"hex\":\"{}\",\"crypto\":\"{}\"}}", hex::encode(author_public_key), encryption.show())),
             Card::Verifier(x) => fancy(index, indent, "verifier", x),
             Card::Meta(x) => fancy(index, indent, "meta", &format!("{{{}}}", x)),
             Card::TypesInfo(x) => fancy(index, indent, "types_hash", &format!("\"{}\"", x)),

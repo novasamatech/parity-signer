@@ -234,8 +234,7 @@ fn decode_big256(data: &Vec<u8>, signed: bool, mut index: u32, indent: u32) -> R
 fn type_is_account_id (current_type: &Type<PortableForm>) -> bool {
     match current_type.path().ident() {
         Some(a) => {
-            if a.as_str() == "AccountId" {true}
-            else {false}
+            a.as_str() == "AccountId32"
         },
         None => false,
     }
@@ -245,8 +244,8 @@ fn type_is_account_id (current_type: &Type<PortableForm>) -> bool {
 // Typical example is (AccountId, Balance) tuple. While AccountId goes through type with "AccountId" in ident,
 // and could be easily detected, Balance is immediately linked to corresponding number.
 // If however, the typeName is searched for word "Balance", numerous false positives are possible.
-fn field_name_is_balance (field_name: &str) -> bool {
-    (field_name == "Balance")||(field_name == "T::Balance")||(field_name == "BalanceOf<T>")||(field_name == "ExtendedBalance")||(field_name == "BalanceOf<T, I>")||(field_name == "DepositBalance")
+fn field_type_name_is_balance (type_name: &str) -> bool {
+    (type_name == "Balance")||(type_name == "T::Balance")||(type_name == "BalanceOf<T>")||(type_name == "ExtendedBalance")||(type_name == "BalanceOf<T, I>")||(type_name == "DepositBalance")
 }
 
 
@@ -272,8 +271,8 @@ pub fn decoding_sci_complete (type_id: u32, compact_flag: bool, balance_flag: bo
     
     let mut path = String::from("[");
     for (i, x) in current_type.path().segments().iter().enumerate() {
-        if i>0 {docs.push_str(",");}
-        docs.push_str(&format!("\"{}\"", x));
+        if i>0 {path.push_str(",");}
+        path.push_str(&format!("\"{}\"", x));
     }
     path.push_str("]");
     
@@ -321,10 +320,12 @@ pub fn decoding_sci_complete (type_id: u32, compact_flag: bool, balance_flag: bo
                     reject_flags(compact_flag, balance_flag)?;
                     decode_type_def_bit_sequence (x, data, &meta_v14, index, indent)?
                 },
-                /*TypeDef::Range(x) => {
+/*
+                TypeDef::Range(x) => {
                     reject_flags(compact_flag, balance_flag)?;
                     decode_type_def_range (x, data, &meta_v14, index, indent)?
-                },*/
+                },
+*/
             }
         }
     };
@@ -601,7 +602,10 @@ fn process_fields (fields: &[Field<PortableForm>], compact_flag: bool, mut data:
                 let fancy_out_prep = format!(",{}", (Card::FieldName{name: &field_name, docs: &field_docs}).card(index, indent));
                 index = index + 1;
                 fancy_out.push_str(&fancy_out_prep);
-                balance_flag = field_name_is_balance (&field_name);
+                balance_flag = match x.type_name() {
+                    Some(a) => field_type_name_is_balance(&a),
+                    None => false,
+                };
             },
             None => {
                 if fields.len()>1 {

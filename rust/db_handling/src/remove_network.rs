@@ -1,11 +1,11 @@
-use constants::{ADDRTREE, HISTORY, METATREE, SPECSTREE};
-use definitions::{history::Event, metadata::{NameVersioned, MetaValuesDisplay}, network_specs::{NetworkKey, generate_network_key}, users::{AddressDetails, IdentityHistory}};
+use constants::{ADDRTREE, HISTORY, METATREE, SPECSTREE, VERIFIERS};
+use definitions::{history::Event, metadata::{NameVersioned, MetaValuesDisplay}, network_specs::{NetworkKey}, users::{AddressDetails, IdentityHistory}};
 use parity_scale_codec::{Decode, Encode};
 use anyhow;
 use blake2_rfc::blake2b::blake2b;
 
 use crate::error::{Error, NotDecodeable, NotFound, NotHex};
-use crate::helpers::{open_db, open_tree, flush_db, insert_into_tree, remove_from_tree, unhex, decode_chain_specs};
+use crate::helpers::{open_db, open_tree, flush_db, insert_into_tree, remove_from_tree, unhex, decode_chain_specs, reverse_address_key, reverse_network_key, get_verifier, remove_verifier, genesis_hash_in_cold_db};
 use crate::manage_history::enter_events_into_tree;
 
 
@@ -14,6 +14,7 @@ pub fn remove_network_by_key (network_key: &NetworkKey, database_name: &str) -> 
     let database = open_db(database_name)?;
     let metadata = open_tree(&database, METATREE)?;
     let chainspecs = open_tree(&database, SPECSTREE)?;
+    let verifiers = open_tree(&database, VERIFIERS)?;
     let identities = open_tree(&database, ADDRTREE)?;
     let history = open_tree(&database, HISTORY)?;
     
@@ -25,8 +26,14 @@ pub fn remove_network_by_key (network_key: &NetworkKey, database_name: &str) -> 
     };
     flush_db(&database)?;
     
+// check if there are networks remaining that need same verifier, and if not, clean up verifiers tree
+    let network_verifier = {
+        if genesis_hash_in_cold_db (network_specs.genesis_hash, &chainspecs)? {get_verifier(network_specs.genesis_hash, &verifiers)?}
+        else {remove_verifier(network_specs.genesis_hash, &verifiers)?}
+    };
+    
 // record that in the history
-    enter_events_into_tree(&history, vec![Event::NetworkRemoved(network_specs.show())])?;
+    enter_events_into_tree(&history, vec![Event::NetworkRemoved(network_specs.show(&network_verifier))])?;
     flush_db(&database)?;
     
 // clean up the existing metadata for this network (with various versions) in metadata tree
@@ -60,11 +67,13 @@ pub fn remove_network_by_key (network_key: &NetworkKey, database_name: &str) -> 
                     return Err(Error::NotDecodeable(NotDecodeable::AddressDetailsDel).show())
                 },
             };
+            let public_key_helper = reverse_address_key(&address_key.to_vec())?;
             let identity_history_print = IdentityHistory {
                 seed_name: &address_details.seed_name,
-                public_key: &hex::encode(&address_key),
+                encryption: public_key_helper.encryption,
+                public_key: &hex::encode(&public_key_helper.public_key),
                 path: &address_details.path,
-                network_key: &hex::encode(&network_key),
+                network_genesis_hash: &hex::encode(&reverse_network_key(&network_key)?.genesis_hash)
             }.show();
             events.push(Event::IdentityRemoved(identity_history_print));
             address_details.network_id = address_details.network_id.into_iter().filter(|id| id != network_key).collect();
@@ -78,11 +87,9 @@ pub fn remove_network_by_key (network_key: &NetworkKey, database_name: &str) -> 
 }
 
 
-pub fn remove_network_by_hex (genesis_hash: &str, database_name: &str) -> anyhow::Result<()> {
-    
-    let network_key = generate_network_key(&unhex(genesis_hash, NotHex::GenesisHash)?);
+pub fn remove_network_by_hex (network_key_string: &str, database_name: &str) -> anyhow::Result<()> {
+    let network_key = unhex(network_key_string, NotHex::NetworkKey)?;
     remove_network_by_key (&network_key, database_name)
-    
 }
 
 
@@ -112,11 +119,11 @@ pub fn remove_metadata (network_name: &str, network_version: u32, database_name:
 
 #[cfg(test)]
 mod tests {
-    use crate::{populate_cold, metadata::transfer_metadata, manage_history::{init_history, print_history_tree}};
+    use crate::{populate_cold, manage_history::{init_history, print_history_tree}};
     use super::*;
     use std::fs;
     use sled::{Db, Tree, open};
-    use constants::HOT_DB_NAME;
+    use definitions::{crypto::Encryption, network_specs::generate_network_key};
     
     const METADATA_FILE: &str = "metadata_database.ts";
     
@@ -130,11 +137,10 @@ mod tests {
     fn remove_all_westend() {
         let dbname = "tests/remove_all_westend";
         populate_cold(dbname, METADATA_FILE, true).unwrap();
-        transfer_metadata(HOT_DB_NAME, dbname).unwrap();
         init_history(dbname).unwrap();
         
         let line = "e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e";
-        let network_key = generate_network_key(&hex::decode(line).unwrap());
+        let network_key = generate_network_key(&hex::decode(line).unwrap(), Encryption::Sr25519);
         remove_network_by_key (&network_key, dbname).unwrap();
         
         let database: Db = open(dbname).unwrap();
@@ -156,7 +162,7 @@ mod tests {
         }
         
         let history_printed = print_history_tree(&database).unwrap();
-        assert!(history_printed.contains(r#""events":[{"event":"database_initiated"}]"#) && history_printed.contains(r##""events":[{"event":"network_removed","payload":{"base58prefix":"42","color":"#660D35","decimals":"12","genesis_hash":"e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e","logo":"westend","name":"westend","order":"2","path_id":"//westend","secondary_color":"#262626","title":"Westend","unit":"WND","verifier":{"hex":"","encryption":"none"}}}]"##) && history_printed.contains(r#""events":[{"event":"metadata_removed","payload":{"specname":"westend","spec_version":"9000","meta_hash":"e80237ad8b2e92b72fcf6beb8f0e4ba4a21043a7115c844d91d6c4f981e469ce"}},{"event":"metadata_removed","payload":{"specname":"westend","spec_version":"9010","meta_hash":"70c99738c27fb32c87883f1c9c94ee454bf0b3d88e4a431a2bbfe1222b46ebdf"}},{"event":"metadata_removed","payload":{"specname":"westend","spec_version":"9080","meta_hash":"44e8d52c5af362b3279309ca7476424391902470f363fae097cd8bb620d0e6a7"}},{"event":"metadata_removed","payload":{"specname":"westend","spec_version":"9090","meta_hash":"62bacaaa3d9bb01313bb882c23615aae6509ab2ef1e7e807581ee0b74c77416b"}}]"#) && history_printed.contains(r#"[{"event":"identity_removed","payload":{"seed_name":"Alice","public_key":"3efeca331d646d8a2986374bb3bb8d6e9e3cfcdd7c45c2b69104fab5d61d3f34","path":"//westend","network_key":"e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e"}},{"event":"identity_removed","payload":{"seed_name":"Alice","public_key":"46ebddef8cd9bb167dc30878d7113b7e168e6f0646beffd77d69d39bad76b47a","path":"","network_key":"e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e"}},{"event":"identity_removed","payload":{"seed_name":"Alice","public_key":"64a31235d4bf9b37cfed3afa8aa60754675f9c4915430454d365c05112784d05","path":"//kusama","network_key":"e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e"}},{"event":"identity_removed","payload":{"seed_name":"Alice","public_key":"96129dcebc2e10f644e81fcf4269a663e521330084b1e447369087dec8017e04","path":"//rococo","network_key":"e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e"}},{"event":"identity_removed","payload":{"seed_name":"Alice","public_key":"d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d","path":"//Alice","network_key":"e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e"}},{"event":"identity_removed","payload":{"seed_name":"Alice","public_key":"f606519cb8726753885cd4d0f518804a69a5e0badf36fee70feadd8044081730","path":"//polkadot","network_key":"e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e"}}]"#), "Expected different history:\n{}", history_printed);
+        assert!(history_printed.contains(r#""events":[{"event":"database_initiated"}]"#) && history_printed.contains(r##""events":[{"event":"network_removed","payload":{"base58prefix":"42","color":"#660D35","decimals":"12","encryption":"sr25519","genesis_hash":"e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e","logo":"westend","name":"westend","order":"2","path_id":"//westend","secondary_color":"#262626","title":"Westend","unit":"WND","verifier":{"hex":"","encryption":"none"}}}]"##) && history_printed.contains(r#""events":[{"event":"metadata_removed","payload":{"specname":"westend","spec_version":"9000","meta_hash":"e80237ad8b2e92b72fcf6beb8f0e4ba4a21043a7115c844d91d6c4f981e469ce"}},{"event":"metadata_removed","payload":{"specname":"westend","spec_version":"9010","meta_hash":"70c99738c27fb32c87883f1c9c94ee454bf0b3d88e4a431a2bbfe1222b46ebdf"}}]"#) && history_printed.contains(r#"[{"event":"identity_removed","payload":{"seed_name":"Alice","encryption":"sr25519","public_key":"3efeca331d646d8a2986374bb3bb8d6e9e3cfcdd7c45c2b69104fab5d61d3f34","path":"//westend","network_genesis_hash":"e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e"}},{"event":"identity_removed","payload":{"seed_name":"Alice","encryption":"sr25519","public_key":"46ebddef8cd9bb167dc30878d7113b7e168e6f0646beffd77d69d39bad76b47a","path":"","network_genesis_hash":"e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e"}},{"event":"identity_removed","payload":{"seed_name":"Alice","encryption":"sr25519","public_key":"64a31235d4bf9b37cfed3afa8aa60754675f9c4915430454d365c05112784d05","path":"//kusama","network_genesis_hash":"e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e"}},{"event":"identity_removed","payload":{"seed_name":"Alice","encryption":"sr25519","public_key":"96129dcebc2e10f644e81fcf4269a663e521330084b1e447369087dec8017e04","path":"//rococo","network_genesis_hash":"e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e"}},{"event":"identity_removed","payload":{"seed_name":"Alice","encryption":"sr25519","public_key":"d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d","path":"//Alice","network_genesis_hash":"e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e"}},{"event":"identity_removed","payload":{"seed_name":"Alice","encryption":"sr25519","public_key":"f606519cb8726753885cd4d0f518804a69a5e0badf36fee70feadd8044081730","path":"//polkadot","network_genesis_hash":"e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e"}}]"#), "Expected different history:\n{}", history_printed);
         
         fs::remove_dir_all(dbname).unwrap();
     }

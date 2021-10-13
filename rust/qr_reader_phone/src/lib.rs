@@ -14,23 +14,43 @@ pub fn get_payload (line: &str, cleaned: bool) -> anyhow::Result<Vec<u8>> {
             Err(_) => return Err(anyhow!("Not hex")),
         }
     } else {
-    if !line.starts_with("4") {return Err(anyhow!("Encountered unexpected qr content start"))}
-    let msg_length_info = match line.get(1..5) {
-        Some(a) => a,
-        None => return Err(anyhow!("Too short")),
-    };
-    let msg_length_piece: [u8; 2] = match hex::decode(&msg_length_info) {
-        Ok(a) => a.try_into().expect("constant slice size, always fits"),
-        Err(_) => return Err(anyhow!("Not hex")),
-    };
-    let msg_length = u16::from_be_bytes(msg_length_piece) as usize;
-    match line.get(5..5+msg_length*2) {
-        Some(a) => match hex::decode(&a) {
-            Ok(b) => Ok(b),
+        if !line.starts_with("4") {return Err(anyhow!("Encountered unexpected qr content start"))}
+        let msg_length_info = match line.get(1..5) {
+            Some(a) => a,
+            None => return Err(anyhow!("Too short")),
+        };
+        let msg_length_piece: [u8; 2] = match hex::decode(&msg_length_info) {
+            Ok(a) => a.try_into().expect("constant slice size, always fits"),
             Err(_) => return Err(anyhow!("Not hex")),
+        };
+        let msg_length = u16::from_be_bytes(msg_length_piece) as usize;
+        match line.get(5..5+msg_length*2) {
+            Some(a) => match hex::decode(&a) {
+                Ok(b) => Ok(b),
+                Err(_) => return Err(anyhow!("Not hex")),
+            },
+            None => {
+                // fast fix for qr codes with version below 10
+                // feels abominable, change later
+                let msg_length_info = match line.get(1..3) {
+                    Some(a) => a,
+                    None => return Err(anyhow!("Too short")),
+                };
+                let msg_length_piece: [u8; 1] = match hex::decode(&msg_length_info) {
+                    Ok(a) => a.try_into().expect("constant slice size, always fits"),
+                    Err(_) => return Err(anyhow!("Not hex")),
+                };
+                let msg_length = u8::from_be_bytes(msg_length_piece) as usize;
+                match line.get(3..3+msg_length*2) {
+                    Some(a) => match hex::decode(&a) {
+                        Ok(b) => Ok(b),
+                        Err(_) => return Err(anyhow!("Not hex")),
+                    },
+                    None => return Err(anyhow!("Length error")),
+                }
+            },
         }
-        None => return Err(anyhow!("Not hex")),
-    }}
+    }
 }
 
 

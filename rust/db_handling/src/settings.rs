@@ -19,7 +19,7 @@ pub fn load_types (database_name: &str) -> anyhow::Result<()> {
         Ok(x) => x,
         Err(e) => return Err(Error::BadTypesFile(e).show()),
     };
-    insert_into_tree(TYPES.to_vec(), types_prep.encode(), &settings)?;
+    insert_into_tree(TYPES.to_vec(), types_prep.store(), &settings)?;
     flush_db(&database)?;
     Ok(())
 }

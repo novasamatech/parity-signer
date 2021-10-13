@@ -466,6 +466,7 @@ dependencies = [
  "serde_json",
  "sled",
  "sp-core",
+ "sp-runtime",
  "tiny-bip39",
  "zeroize",
 ]
@@ -474,12 +475,14 @@ dependencies = [
 name = "definitions"
 version = "0.1.0"
 dependencies = [
+ "anyhow",
  "hex",
  "lazy_static",
  "parity-scale-codec",
  "parity-scale-codec-derive",
  "regex",
  "sp-core",
+ "sp-runtime",
 ]
 
 [[package]]
@@ -2871,6 +2874,7 @@ dependencies = [
  "regex",
  "sled",
  "sp-core",
+ "sp-runtime",
  "transaction_parsing",
 ]
 

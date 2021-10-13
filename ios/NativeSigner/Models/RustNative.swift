@@ -17,10 +17,10 @@ class SignerDataModel: ObservableObject {
     //Data state
     @Published var seedNames: [String] = []
     @Published var networks: [Network] = []
-    @Published var identities: [Identity] = []
+    @Published var addresses: [Address] = []
     @Published var selectedSeed: String = ""
     @Published var selectedNetwork: Network?
-    @Published var selectedIdentity: Identity?
+    @Published var selectedAddress: Address?
     @Published var searchKey: String = ""
     @Published var suggestedPath: String = "//"
     @Published var suggestedName: String = ""

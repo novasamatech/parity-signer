@@ -1,31 +1,14 @@
-use parity_scale_codec_derive::{Decode, Encode};
+use parity_scale_codec::{Decode, Encode};
+use parity_scale_codec_derive;
 use sp_core::{ed25519, sr25519, ecdsa, crypto::{Ss58Codec, Ss58AddressFormat}};
+use sp_runtime::MultiSigner;
 use std::convert::TryInto;
 
+use crate::crypto::Encryption;
 use crate::network_specs::NetworkKey;
 
-
-/// Type of encryption; only allow supported types here - compile-time check for that is happening
-/// here.
-//TODO: check if it is redundant
-//Could not be replaced by sp_core::...::CRYPTO_ID as that doesn't do anything at compile time
-#[derive(Clone, Copy, PartialEq, Debug, Decode, Encode)]
-pub enum Encryption {
-    Ed25519,
-    Sr25519,
-    Ecdsa,
-}
-
-/// Struct to store `sufficient crypto` information
-#[derive(Decode, Encode, PartialEq, Debug)]
-pub enum SufficientCrypto {
-    Ed25519 {public_key: [u8; 32], signature: [u8; 64]},
-    Sr25519 {public_key: [u8; 32], signature: [u8; 64]},
-    Ecdsa {public_key: [u8; 33], signature: [u8; 65]},
-}
-
 /// Struct associated with public address that has secret key available
-#[derive(Decode, Encode, Debug)]
+#[derive(parity_scale_codec_derive::Decode, parity_scale_codec_derive::Encode, Debug)]
 pub struct AddressDetails {
     pub seed_name: String,
     pub path: String,
@@ -48,14 +31,15 @@ pub struct SeedObject {
 /// Struct to store history entry for identity action
 pub struct IdentityHistory <'a> {
     pub seed_name: &'a str,
+    pub encryption: Encryption,
     pub public_key: &'a str,
     pub path: &'a str,
-    pub network_key: &'a str,
+    pub network_genesis_hash: &'a str,
 }
 
 impl <'a> IdentityHistory <'a> {
     pub fn show(&self) -> String {
-        format!("\"seed_name\":\"{}\",\"public_key\":\"{}\",\"path\":\"{}\",\"network_key\":\"{}\"", &self.seed_name, &self.public_key, &self.path, &self.network_key)
+        format!("\"seed_name\":\"{}\",\"encryption\":\"{}\",\"public_key\":\"{}\",\"path\":\"{}\",\"network_genesis_hash\":\"{}\"", &self.seed_name, &self.encryption.show(), &self.public_key, &self.path, &self.network_genesis_hash)
     }
 }
 
@@ -65,8 +49,34 @@ impl <'a> IdentityHistory <'a> {
 pub type AddressKey = Vec<u8>;
 
 /// Generate address key from minimal amount of information
-pub fn generate_address_key (public: &Vec<u8>) -> AddressKey {
-    public.to_vec()
+pub fn generate_address_key (public: &Vec<u8>, encryption: Encryption) -> Result<AddressKey, &'static str> {
+    let out = match encryption {
+        Encryption::Ed25519 => {
+            let into_pubkey: [u8; 32] = match public.to_vec().try_into() {
+                Ok(a) => a,
+                Err(_) => return Err("Public key length does not match encryption."),
+            };
+            let pubkey = ed25519::Public::from_raw(into_pubkey);
+            MultiSigner::Ed25519(pubkey)
+        },
+        Encryption::Sr25519 => {
+            let into_pubkey: [u8; 32] = match public.to_vec().try_into() {
+                Ok(a) => a,
+                Err(_) => return Err("Public key length does not match encryption."),
+            };
+            let pubkey = sr25519::Public::from_raw(into_pubkey);
+            MultiSigner::Sr25519(pubkey)
+        },
+        Encryption::Ecdsa => {
+            let into_pubkey: [u8; 33] = match public.to_vec().try_into() {
+                Ok(a) => a,
+                Err(_) => return Err("Public key length does not match encryption."),
+            };
+            let pubkey = ecdsa::Public::from_raw(into_pubkey);
+            MultiSigner::Ecdsa(pubkey)
+        },
+    }.encode();
+    Ok(out)
 }
 
 
@@ -74,14 +84,14 @@ pub fn generate_address_key (public: &Vec<u8>) -> AddressKey {
 /// if base58prefix is provided, generates custom Ss58AddressFormat,
 /// if not, uses default
 
-pub fn print_as_base58 (address_key: &Vec<u8>, encryption: Encryption, optional_prefix: Option<u16>) -> Result<String, &'static str> {
-    match encryption {
-        Encryption::Ed25519 => {
-            let into_pubkey: [u8; 32] = match address_key.to_vec().try_into() {
-                Ok(a) => a,
-                Err(_) => return Err("Address key length does not match address details encryption."),
-            };
-            let pubkey = ed25519::Public::from_raw(into_pubkey);
+pub fn print_as_base58 (address_key: &AddressKey, encryption: Encryption, optional_prefix: Option<u16>) -> Result<String, &'static str> {
+    let address_key_decoded = match <MultiSigner>::decode(&mut &address_key[..]) {
+        Ok(a) => a,
+        Err(_) => return Err("Error decoding MultiSigner address key."),
+    };
+    match address_key_decoded {
+        MultiSigner::Ed25519(pubkey) => {
+            if encryption != Encryption::Ed25519 {return Err("Encryption algorithm mismatch")}
             match optional_prefix {
                 Some(base58prefix) => {
                     let version_for_base58 = Ss58AddressFormat::Custom(base58prefix);
@@ -90,12 +100,8 @@ pub fn print_as_base58 (address_key: &Vec<u8>, encryption: Encryption, optional_
                 None => Ok(pubkey.to_ss58check()),
             }
         },
-        Encryption::Sr25519 => {
-            let into_pubkey: [u8; 32] = match address_key.to_vec().try_into() {
-                Ok(a) => a,
-                Err(_) => return Err("Address key length does not match address details encryption."),
-            };
-            let pubkey = sr25519::Public::from_raw(into_pubkey);
+        MultiSigner::Sr25519(pubkey) => {
+            if encryption != Encryption::Sr25519 {return Err("Encryption algorithm mismatch")}
             match optional_prefix {
                 Some(base58prefix) => {
                     let version_for_base58 = Ss58AddressFormat::Custom(base58prefix);
@@ -104,12 +110,8 @@ pub fn print_as_base58 (address_key: &Vec<u8>, encryption: Encryption, optional_
                 None => Ok(pubkey.to_ss58check()),
             }
         },
-        Encryption::Ecdsa => {
-            let into_pubkey: [u8; 33] = match address_key.to_vec().try_into() {
-                Ok(a) => a,
-                Err(_) => return Err("Address key length does not match address details encryption."),
-            };
-            let pubkey = ecdsa::Public::from_raw(into_pubkey);
+        MultiSigner::Ecdsa(pubkey) => {
+            if encryption != Encryption::Ecdsa {return Err("Encryption algorithm mismatch")}
             match optional_prefix {
                 Some(base58prefix) => {
                     let version_for_base58 = Ss58AddressFormat::Custom(base58prefix);

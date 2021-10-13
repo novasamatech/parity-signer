@@ -121,7 +121,7 @@ struct NewNetwork: Decodable, Hashable {
 }
 
 struct PathDocs: Decodable {
-    var path: String
+    var path: [String]
     var docs: String
 }
 
