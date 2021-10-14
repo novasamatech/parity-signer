@@ -14,77 +14,77 @@ struct SeedManager: View {
     @State var seedPhrase = ""
     var body: some View {
         ZStack {
-            RoundedRectangle(cornerRadius: 50).foregroundColor(/*@START_MENU_TOKEN@*/Color("backgroundCard")/*@END_MENU_TOKEN@*/)
-            ScrollView {
-                Button(action: {
-                    data.goBack()
-                }) {
-                    HStack {
-                        Text("Show all").font(.largeTitle)
-                        Spacer()
-                    }.padding()
-                }
-                LazyVStack {
-                    ForEach(data.seedNames, id: \.self) {seed in
-                        HStack {
-                            Button(action: {
-                                data.selectSeed(seedName: seed)
-                                data.goBack()
-                            }) {
-                                SeedCard(seedName: seed)
-                            }
-                            Spacer()
-                            Button(action: {
-                                seedPhrase = data.getSeed(seedName: seed, backup: true)
-                                showBackup = !seedPhrase.isEmpty
-                            }) {
-                                VStack {
-                                    Image(systemName: "eye").imageScale(.large)
+            ModalBackdrop()
+            VStack {
+                HeaderBar(line1: "SEEDS", line2: "select seed")
+                ScrollView {
+                    LazyVStack {
+                        ForEach(data.seedNames, id: \.self) {seed in
+                            HStack {
+                                Button(action: {
+                                    data.selectSeed(seedName: seed)
+                                    data.keyManagerModal = .none
+                                }) {
+                                    SeedCardForManager(seedName: seed)
                                 }
-                                .background(Color("backgroundCard"))
-                            }
-                            .alert(isPresented: $showBackup, content: {
-                                Alert(
-                                    title: Text("Backup your seed phrase"),
-                                    message: Text(seedPhrase),
-                                    dismissButton: .default(
-                                        Text("Done"),
-                                        action: {
-                                            seedPhrase = ""
-                                            showBackup = false
-                                        }
-                                    )
-                                )
-                            })
-                            Button(action: {
-                                deleteConfirm = true
-                            }) {
-                                VStack {
-                                    Image(systemName: "trash").imageScale(.large)
+                                Spacer()
+                                Button(action: {
+                                    seedPhrase = data.getSeed(seedName: seed, backup: true)
+                                    showBackup = !seedPhrase.isEmpty
+                                }) {
+                                    VStack {
+                                        Image(systemName: "eye").imageScale(.large)
+                                    }
+                                    .background(Color("backgroundCard"))
                                 }
-                                .background(Color("backgroundCard"))
-                            }
-                            .alert(isPresented: $deleteConfirm, content: {
-                                Alert(
-                                    title: Text("Delete seed?"),
-                                    message: Text("You are about to delete seed " + seed),
-                                    primaryButton: .cancel(),
-                                    secondaryButton: .destructive(
-                                        Text("Delete"),
-                                        action: { data.removeSeed(seedName: seed)
-                                        }
+                                .alert(isPresented: $showBackup, content: {
+                                    Alert(
+                                        title: Text("Backup your seed phrase"),
+                                        message: Text(seedPhrase),
+                                        dismissButton: .default(
+                                            Text("Done"),
+                                            action: {
+                                                seedPhrase = ""
+                                                showBackup = false
+                                            }
+                                        )
                                     )
-                                )
-                            })
+                                })
+                                Button(action: {
+                                    deleteConfirm = true
+                                }) {
+                                    VStack {
+                                        Image(systemName: "trash").imageScale(.large)
+                                    }
+                                    .background(Color("backgroundCard"))
+                                }
+                                .alert(isPresented: $deleteConfirm, content: {
+                                    Alert(
+                                        title: Text("Delete seed?"),
+                                        message: Text("You are about to delete seed " + seed),
+                                        primaryButton: .cancel(),
+                                        secondaryButton: .destructive(
+                                            Text("Delete"),
+                                            action: { data.removeSeed(seedName: seed)
+                                            }
+                                        )
+                                    )
+                                })
+                            }
+                            .background(Color("backgroundCard"))
                         }
-                        .background(Color("backgroundCard"))
                     }
                 }
+                Spacer()
                 Button(
                     action: {data.keyManagerModal = .newSeed}) {
-                        Text(" + New seed").font(.title)
+                        HStack {
+                            Spacer()
+                            Text("New seed").font(.subheadline)
+                            Spacer()
+                        }
                     }
-                Spacer()
+                    .buttonStyle(.bordered)
             }
         }
     }

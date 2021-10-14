@@ -12,20 +12,16 @@ struct ExportAddress: View {
     @State var image: UIImage?
     var body: some View {
         ZStack {
-            RoundedRectangle(cornerRadius: 50).foregroundColor(/*@START_MENU_TOKEN@*/Color("backgroundCard")/*@END_MENU_TOKEN@*/)
+            ModalBackdrop()
             VStack {
+                if data.selectedAddress != nil {
+                    AddressCard(address: data.selectedAddress!)
+                }
                 if image != nil {
                     Image(uiImage: image!)
                         .resizable()
                         .aspectRatio(contentMode: .fit)
                 }
-                HStack {
-                    NetworkCard(network: data.selectedNetwork)
-                    Spacer()
-                    Text(data.selectedAddress?.seed_name ?? "seed")
-                    Text(data.selectedAddress?.path ?? "none")
-                }
-                .padding()
             }
             .foregroundColor(/*@START_MENU_TOKEN@*/Color("textMainColor")/*@END_MENU_TOKEN@*/)
         }

@@ -14,7 +14,7 @@ struct DeleteKeyConfirm: View {
     @EnvironmentObject var data: SignerDataModel
     var body: some View {
         ZStack{
-            RoundedRectangle(cornerRadius: 50).foregroundColor(/*@START_MENU_TOKEN@*/Color("backgroundCard")/*@END_MENU_TOKEN@*/)
+            ModalBackdrop()
             VStack {
                 Text("Delete key?").font(.title)
                 Text("You are about to delete this key").font(.headline)
@@ -26,8 +26,10 @@ struct DeleteKeyConfirm: View {
     }
 }
 
+/*
 struct DeleteKeyConfirm_Previews: PreviewProvider {
     static var previews: some View {
         DeleteKeyConfirm()
     }
 }
+*/

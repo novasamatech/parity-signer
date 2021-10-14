@@ -15,39 +15,20 @@ struct Header: View {
                 Button(action: {
                     data.goBack()
                 }) {
-                    Text("Back")
-                }}
+                    Image(systemName: "chevron.left").imageScale(.large)
+                }
+            }
             if data.getMultiSelectionMode() && data.keyManagerModal == .none {
                 Button(action: {data.multiSelected = []}) {
-                    Text("Cancel")
+                    SmallButton(text: "Cancel")
                 }
             }
             Spacer()
-            switch data.signerScreen {
-            case .scan:
-                switch data.transactionState {
-                case .none:
-                    Text("Home")
-                case .parsing:
-                    Text("Parsing")
-                case .preview:
-                    Text("Payload")
-                case .password:
-                    Text("Password")
-                case .signed:
-                    Text("Scan to publish")
-                }
-            case .keys:
-                Text("Key manager")
-            case .settings:
-                Text("Settings")
-            case .history:
-                Text("History")
-            }
+            Text(data.getScreenName())
             Spacer()
             if data.getMultiSelectionMode() && data.keyManagerModal == .none {
                 Button(action: {data.multiSelected = data.addresses}) {
-                    Text("Select all")
+                    SmallButton(text: "Select all")
                 }
             }
             Button(action: {
@@ -62,8 +43,10 @@ struct Header: View {
     }
 }
 
-struct Header_Previews: PreviewProvider {
-    static var previews: some View {
-        Header().previewLayout(.sizeThatFits)
-    }
-}
+/*
+ struct Header_Previews: PreviewProvider {
+ static var previews: some View {
+ Header().previewLayout(.sizeThatFits)
+ }
+ }
+ */

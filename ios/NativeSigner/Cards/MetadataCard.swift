@@ -10,20 +10,22 @@ import SwiftUI
 struct MetadataCard: View {
     var meta: MetaSpecsNS
     var body: some View {
-        VStack(alignment: .leading) {
-            HStack {
-                Text("spec_version:")
+        HStack {
+            VStack {
+                Text("version")
                     .foregroundColor(Color("AccentColor"))
                 Text(meta.spec_version)
                     .foregroundColor(Color("textMainColor"))
+                Spacer()
             }
-            HStack {
-                Text("metadata hash:")
+            VStack {
+                Text("hash")
                     .foregroundColor(Color("AccentColor"))
                 Text(meta.meta_hash)
                     .foregroundColor(Color("textMainColor"))
+                    .font(.caption2)
             }
-        }.padding()
+        }.padding(.horizontal)
     }
 }
 

@@ -22,7 +22,7 @@ struct NewAddressScreen: View {
     
     var body: some View {
         ZStack {
-            RoundedRectangle(cornerRadius: 50).foregroundColor(/*@START_MENU_TOKEN@*/Color("backgroundCard")/*@END_MENU_TOKEN@*/)
+            ModalBackdrop()
             VStack {
                 Text("New key").font(.title).foregroundColor(Color("AccentColor"))
                 HStack {

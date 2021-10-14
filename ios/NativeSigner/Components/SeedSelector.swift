@@ -18,9 +18,11 @@ struct SeedSelector: View {
                     data.multiSelectAction(address: rootAddress)
                 }
             } else {
-                data.selectSeed(seedName: "")
                 data.multiSelected = []
-                data.keyManagerModal = .seedSelector
+                if let rootAddress = data.getRootAddress(seedName: data.selectedSeed) {
+                    data.selectedAddress = rootAddress
+                    data.keyManagerModal = .showKey
+                }
             }
         })
         .gesture(LongPressGesture()

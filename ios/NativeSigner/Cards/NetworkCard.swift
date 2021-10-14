@@ -31,12 +31,9 @@ struct NetworkCard: View {
                 .foregroundColor(Color("textMainColor"))
             }
             Text(network?.title ?? "None")
-                .font(.title2)
-                .fontWeight(.bold)
+                .font(.headline)
                 .foregroundColor(Color("textMainColor"))
-            Spacer()
         }
-        .padding()
         //.background(Color(data.selectedNetwork == network ? "backgroundActive" : "backgroundCard"))
     }
 }

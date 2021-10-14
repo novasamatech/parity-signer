@@ -14,6 +14,18 @@ struct KeyManager: View {
             VStack {
                 SeedSelector()
                 NetworkSelector()
+                if data.selectedSeed != "" {
+                    HStack {
+                        Text("DERIVED KEYS").foregroundColor(Color("textFadedColor"))
+                        Spacer()
+                        Button(action: {
+                            data.proposeDerive()
+                            data.keyManagerModal = .newKey
+                        }) {
+                            Image(systemName: "plus.square.on.square").imageScale(.large)
+                        }
+                    }
+                }
                 ScrollView {
                     LazyVStack {
                         ForEach(data.addresses, id: \.public_key) {
@@ -21,17 +33,6 @@ struct KeyManager: View {
                             if ((address.name.contains(data.searchKey) || address.path.contains(data.searchKey) || data.searchKey == "" ) && (!address.isRoot() || data.selectedSeed == "")) {
                                 AddressCard(address: address)
                                 //.padding(.vertical, 2)
-                            }
-                        }
-                        if data.selectedSeed != "" {
-                            Button(action:{
-                                data.proposeDerive()
-                                data.keyManagerModal = .newKey
-                            }) {
-                                Text("Add key")
-                                    .font(.largeTitle)
-                                    .foregroundColor(Color("AccentColor"))
-                                    .multilineTextAlignment(.center)
                             }
                         }
                     }
@@ -54,14 +55,16 @@ struct KeyManager: View {
             case .seedSelector:
                 SeedManager()
             case .networkManager:
-                NetworkManager()
+                NetworkManager().frame(height: UIScreen.main.bounds.height).offset(y: 300)
+            case .networkDetails:
+                NetworkDetails()
             case .none:
                 EmptyView()
             }
         }
         .background(/*@START_MENU_TOKEN@*//*@PLACEHOLDER=View@*/Color("backgroundColor")/*@END_MENU_TOKEN@*/)
         .onAppear {
-            data.totalRefresh()
+            //data.totalRefresh()
         }
     }
 }

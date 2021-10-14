@@ -67,7 +67,13 @@ extension SignerDataModel {
                     signer_destroy_string(res!)
                     return
                 }
-                self.addresses = keys.sorted(by: {$0.path < $1.path})
+                self.addresses = keys.sorted(by: {
+                    if $0.seed_name == $1.seed_name {
+                        return $0.path < $1.path
+                    } else {
+                        return $0.seed_name < $1.seed_name
+                    }
+                })
             } else {
                 print("keysJSON corrupted")
             }
