@@ -14,10 +14,6 @@ struct ExportAddress: View {
         ZStack {
             RoundedRectangle(cornerRadius: 50).foregroundColor(/*@START_MENU_TOKEN@*/Color("backgroundCard")/*@END_MENU_TOKEN@*/)
             VStack {
-                Text("Scan to export public key")
-                    .foregroundColor(Color("textMainColor"))
-                    .font(.title)
-                    .padding()
                 if image != nil {
                     Image(uiImage: image!)
                         .resizable()
@@ -26,15 +22,10 @@ struct ExportAddress: View {
                 HStack {
                     NetworkCard(network: data.selectedNetwork)
                     Spacer()
-                    Text(data.selectedAddress?.name ?? "none")
-                }.padding()
-                Button(action: {data.keyManagerModal = .none})
-                {
-                    Text("Done")
-                        .font(.largeTitle)
-                        .foregroundColor(Color("AccentColor"))
-                        .padding()
+                    Text(data.selectedAddress?.seed_name ?? "seed")
+                    Text(data.selectedAddress?.path ?? "none")
                 }
+                .padding()
             }
             .foregroundColor(/*@START_MENU_TOKEN@*/Color("textMainColor")/*@END_MENU_TOKEN@*/)
         }
@@ -45,14 +36,20 @@ struct ExportAddress: View {
             }
         }
         .gesture(
-            DragGesture(minimumDistance: 50)
-                .onEnded {amount in
-                    print(amount)
-                    if amount.translation.width > 0 {
+            TapGesture()
+                .onEnded {
+                    print("tap")
                     data.selectNextAddress()
-                    } else {
-                        data.selectPreviousAddress()
+                    if data.selectedAddress != nil {
+                        image = data.exportIdentityQR()
                     }
+                }
+        )
+        .gesture(
+            LongPressGesture()
+                .onEnded { _ in
+                    print("ltap")
+                    data.selectPreviousAddress()
                     if data.selectedAddress != nil {
                         image = data.exportIdentityQR()
                     }
@@ -61,8 +58,10 @@ struct ExportAddress: View {
     }
 }
 
-struct ExportIdentity_Previews: PreviewProvider {
-    static var previews: some View {
-        ExportAddress()
-    }
-}
+/*
+ struct ExportIdentity_Previews: PreviewProvider {
+ static var previews: some View {
+ ExportAddress()
+ }
+ }
+ */

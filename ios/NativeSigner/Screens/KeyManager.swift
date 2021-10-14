@@ -11,37 +11,16 @@ struct KeyManager: View {
     @EnvironmentObject var data: SignerDataModel
     var body: some View {
         ZStack {
-            
             VStack {
-                HStack {
-                    NetworkList()
-                    SeedSelector()
-                }
-                HStack {
-                    TextField("find keys", text: $data.searchKey)
-                        .autocapitalization(.none)
-                        .disableAutocorrection(true)
-                        .font(.title)
-                        .background(/*@START_MENU_TOKEN@*//*@PLACEHOLDER=View@*/Color("textFieldColor")/*@END_MENU_TOKEN@*/)
-                        .foregroundColor(/*@START_MENU_TOKEN@*/Color("textEntryColor")/*@END_MENU_TOKEN@*/)
-                        .background(/*@START_MENU_TOKEN@*//*@PLACEHOLDER=View@*/Color("textFieldColor")/*@END_MENU_TOKEN@*/)
-                        .border(/*@START_MENU_TOKEN@*/Color("borderSignalColor")/*@END_MENU_TOKEN@*/, width: /*@START_MENU_TOKEN@*/1/*@END_MENU_TOKEN@*/)
-                    if (data.searchKey != "") {
-                        Button(action:{data.searchKey = ""}) {
-                            Image(systemName: "clear").imageScale(.large)
-                        }
-                    } else {
-                        Image(systemName: "doc.text.magnifyingglass").imageScale(.large).foregroundColor(Color("AccentColor"))
-                    }
-                }.padding(.horizontal)
+                SeedSelector()
+                NetworkSelector()
                 ScrollView {
                     LazyVStack {
                         ForEach(data.addresses, id: \.public_key) {
                             address in
-                            if (address.name.contains(data.searchKey) || address.path.contains(data.searchKey) || data.searchKey == "" ) {
-                                AddressCard(identity: address)
-                                    .padding(.vertical, 2)
-                                
+                            if ((address.name.contains(data.searchKey) || address.path.contains(data.searchKey) || data.searchKey == "" ) && (!address.isRoot() || data.selectedSeed == "")) {
+                                AddressCard(address: address)
+                                //.padding(.vertical, 2)
                             }
                         }
                         if data.selectedSeed != "" {
@@ -64,7 +43,7 @@ struct KeyManager: View {
             case .showKey:
                 ExportAddress()
             case .newKey:
-                NewIdentityScreen()
+                NewAddressScreen()
             case .newSeed:
                 NewSeedScreen()
             case .seedBackup:
@@ -72,9 +51,12 @@ struct KeyManager: View {
             case .keyDeleteConfirm:
                 //not used yet - primitive alert dialog works well enough
                 EmptyView()
+            case .seedSelector:
+                SeedManager()
+            case .networkManager:
+                NetworkManager()
             case .none:
                 EmptyView()
-                
             }
         }
         .background(/*@START_MENU_TOKEN@*//*@PLACEHOLDER=View@*/Color("backgroundColor")/*@END_MENU_TOKEN@*/)

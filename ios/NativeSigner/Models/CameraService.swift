@@ -39,10 +39,10 @@ public class CameraService: UIViewController, AVCaptureVideoDataOutputSampleBuff
         }
         
         guard let barcodeDetectionRequest = request as? VNDetectBarcodesRequest,
-              let results = barcodeDetectionRequest.results as? [VNBarcodeObservation] else {
+              let results = barcodeDetectionRequest.results else {
             return
         }
-        barcodeDetectionRequest.symbologies = [VNBarcodeSymbology.QR]
+        barcodeDetectionRequest.symbologies = [VNBarcodeSymbology.qr]
     })]
     
     private var bucketCount = 0
@@ -193,7 +193,7 @@ public class CameraService: UIViewController, AVCaptureVideoDataOutputSampleBuff
             print("Failed to handle \(error)")
         }
 
-        if let result = detectionRequests[0].results as? [VNBarcodeObservation] {
+        if let result = detectionRequests[0].results {
             if result.count != 0 {
                 //uncomment to see how fast qr reader goes brrr
                 //print(String(reflecting: result))

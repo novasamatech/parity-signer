@@ -15,16 +15,6 @@ struct SettingsScreen: View {
             ScrollView {
                 //Main buttons block
                 VStack {
-                    Button(action: {
-                        data.settingsModal = .showHistory
-                    }) {
-                        Text("Show log")
-                    }.padding()
-                    Button(action: {
-                        data.settingsModal = .showSeedManager
-                    }) {
-                        Text("Manage seeds")
-                    }.padding()
                     Button (action: {
                         data.settingsModal = .showNetworkManager
                     }) {
@@ -76,10 +66,6 @@ struct SettingsScreen: View {
             }
             .background(/*@START_MENU_TOKEN@*//*@PLACEHOLDER=View@*/Color("backgroundColor")/*@END_MENU_TOKEN@*/)
             switch(data.settingsModal) {
-            case .showHistory:
-                HistoryView()
-            case .showSeedManager:
-                SeedManager()
             case .showNetworkManager:
                 NetworkManager()
             case .showDocument(let document):

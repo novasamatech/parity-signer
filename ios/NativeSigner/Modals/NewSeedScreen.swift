@@ -8,11 +8,12 @@
 import SwiftUI
 
 struct NewSeedScreen: View {
+    
     @EnvironmentObject var data: SignerDataModel
     @State private var seedName: String = ""
     @State private var seedPhrase: String = ""
     @State private var recover: Bool = false
-    @State private var focusName: Bool = true
+    @FocusState private var nameFocused: Bool
     
     init() {
         UITextView.appearance().backgroundColor = .clear
@@ -22,70 +23,69 @@ struct NewSeedScreen: View {
         ZStack{
             RoundedRectangle(cornerRadius: 50).foregroundColor(/*@START_MENU_TOKEN@*/Color("backgroundCard")/*@END_MENU_TOKEN@*/)
             VStack {
-                VStack {
-                    Text("Seed name")
-                        .font(.title)
+                Text("Seed name")
+                    .font(.title)
+                    .foregroundColor(Color("textMainColor"))
+                TextField("Seed", text: $seedName, prompt: Text("Seed name"))
+                    .foregroundColor(Color("textEntryColor"))
+                    .background(Color("textFieldColor"))
+                    .font(.largeTitle)
+                    .disableAutocorrection(true)
+                    .keyboardType(.asciiCapable)
+                    .submitLabel(.done)
+                    .onChange(of: seedName, perform: { _ in
+                        data.lastError = ""
+                    })
+                    .onAppear(perform: {nameFocused = true})
+                    .focused($nameFocused)
+                    .border(Color("AccentColor"), width: 1)
+                Toggle(isOn: $recover) {
+                    Text("Enter custom seedphrase")
+                        .font(.headline)
                         .foregroundColor(Color("textMainColor"))
-                    SignerTextInput(text: $seedName, focus: $focusName, placeholder: "Seed name", autocapitalization: .words, returnKeyType: .next, keyboardType: .default, onReturn: {})
-                        .frame(height: 40)
-                        .onChange(of: seedName, perform: { _ in
-                            data.lastError = ""
-                        })
-                        .foregroundColor(/*@START_MENU_TOKEN@*/Color("textEntryColor")/*@END_MENU_TOKEN@*/)
-                        .background(/*@START_MENU_TOKEN@*//*@PLACEHOLDER=View@*/Color("textFieldColor")/*@END_MENU_TOKEN@*/)
-                        .border(/*@START_MENU_TOKEN@*/Color("borderSignalColor")/*@END_MENU_TOKEN@*/, width: /*@START_MENU_TOKEN@*/1/*@END_MENU_TOKEN@*/)
-                    Toggle(isOn: $recover) {
-                        Text("Enter custom seedphrase")
-                            .font(.headline)
-                            .foregroundColor(Color("textMainColor"))
+                }
+                if (recover) {
+                    //TODO: make completely custom tool for this
+                    TextEditor(text: $seedPhrase)
+                        .frame(height: 150.0)
+                        .autocapitalization(.none)
+                        .keyboardType(.asciiCapable)
+                        .disableAutocorrection(true)
+                        .font(.title)
+                        .foregroundColor(Color("cryptoColor"))
+                        .background(Color("textFieldColor"))
+                        .border(Color("cryptoColor"), width: /*@START_MENU_TOKEN@*/1/*@END_MENU_TOKEN@*/)
+                }
+                Text(data.lastError).foregroundColor(.red)
+                HStack{
+                    Button(action: {
+                        data.lastError = ""
+                        seedPhrase = ""
+                        data.keyManagerModal = .none
+                    }) {
+                        Text("Cancel").font(.largeTitle)
                     }
-                    if (recover) {
-                        
-                        /*
-                         Text("Seed phrase")
-                         .font(.title)
-                         .foregroundColor(Color("textMainColor"))
-                         */
-                        //TODO: make completely custom tool for this
-                        TextEditor(text: $seedPhrase)
-                            .frame(height: 150.0)
-                            .autocapitalization(.none)
-                            .keyboardType(.asciiCapable)
-                            .disableAutocorrection(true)
-                            .font(/*@START_MENU_TOKEN@*/.title/*@END_MENU_TOKEN@*/)
-                            .background(/*@START_MENU_TOKEN@*//*@PLACEHOLDER=View@*/Color("textFieldColor")/*@END_MENU_TOKEN@*/)
-                            .foregroundColor(/*@START_MENU_TOKEN@*/Color("textEntryColor")/*@END_MENU_TOKEN@*/)
-                            .background(/*@START_MENU_TOKEN@*//*@PLACEHOLDER=View@*/Color("textFieldColor")/*@END_MENU_TOKEN@*/)
-                            .border(/*@START_MENU_TOKEN@*/Color("borderSignalColor")/*@END_MENU_TOKEN@*/, width: /*@START_MENU_TOKEN@*/1/*@END_MENU_TOKEN@*/)
+                    Spacer()
+                    Button(action: {
+                        if !recover {seedPhrase = ""}
+                        data.addSeed(seedName: seedName, seedPhrase: seedPhrase)
+                    }) {
+                        Text("Create")
+                            .font(.largeTitle)
                     }
-                    Text(data.lastError).foregroundColor(.red)
-                    HStack{
-                        Button(action: {
-                            data.lastError = ""
-                            data.keyManagerModal = .none
-                        }) {
-                            Text("Cancel").font(.largeTitle)
-                        }
-                        Spacer()
-                        Button(action: {
-                            if !recover {seedPhrase = ""}
-                            data.addSeed(seedName: seedName, seedPhrase: seedPhrase)
-                        }) {
-                            Text("Create")
-                                .font(.largeTitle)
-                        }
-                    }
-                }.padding()
+                }
+                .padding()
             }
         }
         .background(/*@START_MENU_TOKEN@*//*@PLACEHOLDER=View@*/Color("backgroundColor")/*@END_MENU_TOKEN@*/)
     }
+    
 }
 
 /*
-struct NewSeedScreen_Previews: PreviewProvider {
-    static var previews: some View {
-        NewSeedScreen().previewLayout(.sizeThatFits)
-    }
-}
-*/
+ struct NewSeedScreen_Previews: PreviewProvider {
+ static var previews: some View {
+ NewSeedScreen().previewLayout(.sizeThatFits)
+ }
+ }
+ */

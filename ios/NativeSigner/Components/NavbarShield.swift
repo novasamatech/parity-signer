@@ -12,13 +12,13 @@ struct NavbarShield: View {
     @EnvironmentObject var canary: Canary
     var body: some View {
         if canary.dead {
-            Image(systemName: "shield.fill")
+            Image(systemName: "shield.slash")
                 .imageScale(.large)
-                .foregroundColor(.red)
+                .foregroundColor(Color("dangerColor"))
         } else {
-            Image(systemName: "shield.fill")
+            Image(systemName: "shield")
                 .imageScale(.large)
-                .foregroundColor(.green)
+                .foregroundColor(Color("AccentColor"))
         }
     }
 }

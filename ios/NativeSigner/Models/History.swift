@@ -137,6 +137,7 @@ struct NetworkVerifierEvent: Decodable, Hashable {
 struct SigningEvent: Decodable, Hashable {
     var transaction: String
     var signed_by: Verifier
+    var user_comment: String
 }
 
 struct TypesEvent: Decodable, Hashable {
