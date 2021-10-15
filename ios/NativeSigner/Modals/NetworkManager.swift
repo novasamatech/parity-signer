@@ -10,40 +10,49 @@ import SwiftUI
 struct NetworkManager: View {
     @EnvironmentObject var data: SignerDataModel
     var body: some View {
+        VStack {
+            Spacer()
         ZStack {
-            RoundedRectangle(cornerRadius: 50).foregroundColor(Color("backgroundCard"))
+            RoundedRectangle(cornerRadius: 20.0).foregroundColor(Color("backgroundNetworkModal"))
             VStack {
-                Text("Select network").font(.largeTitle)
+                HeaderBar(line1: "NETWORK", line2: "Select network").padding(.top, 10)
                 ScrollView {
                     LazyVStack {
                         ForEach(data.networks, id: \.self) {network in
+                            ZStack{
+                                RoundedRectangle(cornerRadius: 20).foregroundColor(Color(data.selectedNetwork == network ? "backgroundActive" : "backgroundNetworkModal"))
                             HStack {
                                 Button(action: {
                                     data.selectNetwork(network: network)
-                                    data.goBack()
                                 }) {
                                     NetworkCard(network: network)
                                 }
                                 Spacer()
-                                Button(action: {}) {
-                                    Image(systemName: "eye")
+                                if network == data.selectedNetwork {
+                                    Button(action: {
+                                        data.keyManagerModal = .networkDetails
+                                    }) {
+                                        Image(systemName: "eye").imageScale(.large)
+                                    }
+                                    Button(action: {}) {
+                                        Image(systemName: "trash").imageScale(.large)
+                                    }
                                 }
-                                Button(action: {}) {
-                                    Image(systemName: "trash")
-                                }
-                            }
+                            }.padding(.horizontal, 8)
+                            }.padding(.horizontal, 8)
                         }
                     }
                 }
             }
         }
+        }
     }
 }
 
 /*
-struct NetworkManager_Previews: PreviewProvider {
-    static var previews: some View {
-        NetworkManager()
-    }
-}
-*/
+ struct NetworkManager_Previews: PreviewProvider {
+ static var previews: some View {
+ NetworkManager()
+ }
+ }
+ */

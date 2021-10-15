@@ -12,16 +12,17 @@ struct NetworkSelector: View {
     @EnvironmentObject var data: SignerDataModel
     var body: some View {
         Button(action: {
-            data.keyManagerModal = .networkManager
+            data.multiSelected = []
+            if data.keyManagerModal == .networkManager {
+                data.keyManagerModal = .none
+            } else {
+                data.keyManagerModal = .networkManager
+            }
         })  {
             HStack {
-                NetworkCard(network: data.selectedNetwork)
+                NetworkCard(network: data.selectedNetwork).padding()
+                Image(systemName: data.keyManagerModal == .networkManager ? "chevron.up.circle" : "chevron.down.circle").imageScale(.large).foregroundColor(Color("AccentColor"))
                 Spacer()
-                VStack {
-                    Text("selected").font(.caption2)
-                    Text("network").font(.caption2)
-                }
-                .padding(.horizontal)
             }
         }
     }

@@ -35,15 +35,15 @@ struct SeedCard: View {
             if data.getMultiSelectionMode() {
                 if let rootAddress = data.getRootAddress(seedName: seedName) {
                     if data.multiSelected.contains(rootAddress) {
-                        Image(systemName: "checkmark.circle.fill")
+                        Image(systemName: "checkmark.circle.fill").foregroundColor(Color("AccentColor")).imageScale(.large)
                     } else {
-                        Image(systemName: "circle")
+                        Image(systemName: "circle").foregroundColor(Color("textFadedColor")).imageScale(.large)
                     }
                 }
             }
         }
         .padding(8)
-        .background(Color(seedName == "" ? "backgroundColor" : "backgroundCard"))
+        .background(Color("backgroundCard"))
     }
 }
 

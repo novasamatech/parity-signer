@@ -69,12 +69,35 @@ class SignerDataModel: ObservableObject {
     }
     
     /**
+     * Mild refresh for situations when no interaction with data was really performed.
+     * Should not call stuff in signer.h
+     */
+    func refreshUI() {
+        self.seedBackup = ""
+        self.lastError = ""
+        disableMutliSelectionMode()
+        self.networkSettings = nil
+        self.selectedRecord = nil
+        resetTransaction()
+        if self.seedNames.count == 0 {
+            self.signerScreen = .keys
+            self.keyManagerModal = .newSeed
+        } else {
+            self.keyManagerModal = .seedSelector
+        }
+        self.settingsModal = .none
+        if self.signerScreen == .scan {
+            self.resetCamera = true
+        }
+        self.searchKey = ""
+    }
+    
+    /**
      * refresh everything except for navigation and seedNames
      * should be called as often as reasonably possible - on flow interrupts, changes, events, etc.
      */
     func totalRefresh() {
-        self.seedBackup = ""
-        self.lastError = ""
+        print("heavy reset")
         self.refreshNetworks()
         if self.networks.count > 0 {
             self.selectedNetwork = self.networks[0]
@@ -82,22 +105,9 @@ class SignerDataModel: ObservableObject {
         } else {
             print("No networks found; not handled yet")
         }
-        disableMutliSelectionMode()
-        self.networkSettings = nil
         self.getHistory()
-        self.selectedRecord = nil
         resetTransaction()
-        if self.seedNames.count == 0 {
-            self.signerScreen = .keys
-            self.keyManagerModal = .newSeed
-        } else {
-            self.keyManagerModal = .none
-        }
-        self.settingsModal = .none
-        if self.signerScreen == .scan {
-            self.resetCamera = true
-        }
-        self.searchKey = ""
+        self.refreshUI()
     }
 }
 

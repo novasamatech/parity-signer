@@ -43,6 +43,7 @@ enum KeyManagerModal: Equatable {
     case keyDeleteConfirm
     case seedSelector
     case networkManager
+    case networkDetails
 }
 
 /**
@@ -50,7 +51,6 @@ enum KeyManagerModal: Equatable {
  */
 enum SettingsModal: Equatable {
     case none
-    case showNetworkManager
     case showDocument(ShownDocument)
 }
 
@@ -64,16 +64,56 @@ extension SignerDataModel {
      * Could be more complicated but should it?
      */
     func goBack() {
-        self.transactionState = .none
-        self.keyManagerModal = .none
-        self.settingsModal = .none
-        self.selectedRecord = nil
+        switch self.signerScreen {
+        case .history:
+            self.selectedRecord = nil
+        case .scan:
+            self.transactionState = .none
+        case .keys:
+            switch self.keyManagerModal {
+            case .none:
+                self.keyManagerModal = .seedSelector
+            case .newSeed:
+                self.keyManagerModal = .seedSelector
+            default:
+                self.keyManagerModal = .none
+            }
+        case .settings:
+            self.settingsModal = .none
+        }
     }
     
     /**
      * Returns true if back navigation button should not be shown
      */
     func isNavBottom() -> Bool {
-        return (self.transactionState == .none && self.keyManagerModal == .none && self.settingsModal == .none && self.selectedRecord == nil)
+        return (self.transactionState == .none && self.keyManagerModal == .seedSelector && self.settingsModal == .none && self.selectedRecord == nil)
+    }
+    
+    /**
+     * Logic behind screen name in top bar
+     */
+    func getScreenName() -> String {
+        switch self.signerScreen {
+        case .scan:
+            switch self.transactionState {
+            case .none:
+                return "Scan"
+            case .parsing:
+                return "Parsing"
+            case .preview:
+                return "Payload"
+            case .password:
+                return "Password"
+            case .signed:
+                return "Scan to publish"
+            }
+        case .keys:
+            return ""
+        case .settings:
+            return ""
+        case .history:
+            return ""
+        }
     }
 }

@@ -12,17 +12,17 @@ struct LandingView: View {
     @State var tacAccept = false
     var body: some View {
         ZStack {
-                    RoundedRectangle(cornerRadius: 50).foregroundColor(/*@START_MENU_TOKEN@*/Color("backgroundCard")/*@END_MENU_TOKEN@*/)
-                    VStack {
-                        if (tacAccept) {
-                            ScrollView {
-                                Text(data.getPP())
-                                    .foregroundColor(Color("textMainColor"))
-                            }
-                        } else {
-                            ScrollView {
-                                Text(data.getTaC())
-                                    .foregroundColor(Color("textMainColor"))
+            ModalBackdrop()
+            VStack {
+                if (tacAccept) {
+                    ScrollView {
+                        Text(data.getPP())
+                            .foregroundColor(Color("textMainColor"))
+                    }
+                } else {
+                    ScrollView {
+                        Text(data.getTaC())
+                            .foregroundColor(Color("textMainColor"))
                     }.padding()
                 }
                 Button(action: {
@@ -41,8 +41,8 @@ struct LandingView: View {
 }
 
 /*
-struct LandingView_Previews: PreviewProvider {
-    static var previews: some View {
-        LandingView()
-    }
-}*/
+ struct LandingView_Previews: PreviewProvider {
+ static var previews: some View {
+ LandingView()
+ }
+ }*/

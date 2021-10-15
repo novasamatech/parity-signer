@@ -11,9 +11,15 @@ struct NetworkDetails: View {
     @EnvironmentObject var data: SignerDataModel
     var body: some View {
         ZStack {
-            RoundedRectangle(cornerRadius: 50).foregroundColor(/*@START_MENU_TOKEN@*/Color("backgroundCard")/*@END_MENU_TOKEN@*/)
+            ModalBackdrop()
             VStack {
                 VStack(alignment: .leading) {
+                    HStack {
+                        Text("Network name:")
+                            .foregroundColor(Color("AccentColor"))
+                        Text(data.networkSettings?.title ?? "unknown")
+                            .foregroundColor(Color("textMainColor"))
+                    }
                     HStack {
                         Text("base58 prefix:")
                             .foregroundColor(Color("AccentColor"))
@@ -51,11 +57,6 @@ struct NetworkDetails: View {
                     }
                 }
                 Spacer()
-                Button(action: {
-                    data.settingsModal = .none
-                }) {
-                    Text("Done")
-                }
             }.padding()
         }
         .onAppear {

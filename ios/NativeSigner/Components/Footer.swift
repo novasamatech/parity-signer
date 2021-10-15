@@ -36,7 +36,7 @@ struct Footer: View {
             }
             HStack {
                 Button(action: {
-                    data.totalRefresh()
+                    data.refreshUI()
                     data.signerScreen = .history
                 }) {
                     VStack(alignment: .center) {
@@ -46,7 +46,7 @@ struct Footer: View {
                 }
                 Spacer()
                 Button(action: {
-                    data.totalRefresh()
+                    data.refreshUI()
                     data.signerScreen = .scan
                 }) {
                     VStack {
@@ -56,7 +56,7 @@ struct Footer: View {
                 }
                 Spacer()
                 Button(action: {
-                    data.totalRefresh()
+                    data.refreshUI()
                     data.signerScreen = .keys
                 }) {
                     VStack{
@@ -66,7 +66,7 @@ struct Footer: View {
                 }
                 Spacer()
                 Button(action: {
-                    data.totalRefresh()
+                    data.refreshUI()
                     data.networkSettings = nil
                     data.signerScreen = .settings
                 }) {

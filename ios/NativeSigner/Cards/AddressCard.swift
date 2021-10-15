@@ -22,12 +22,15 @@ struct AddressCard: View {
                     .frame(width: 42, height: 42)
                 VStack (alignment: .leading) {
                     HStack {
-                        Text(address.seed_name)
-                            .foregroundColor(Color("textMainColor"))
-                            .font(.headline)
+                        if address.isRoot() {
+                            Text(address.seed_name)
+                                .foregroundColor(Color("textMainColor"))
+                                .font(.headline)
+                        } else {
                         Text(address.path)
                             .foregroundColor(Color("cryptoColor"))
                             .font(.headline)
+                        }
                         if address.has_password == "true" {
                             Image(systemName: "lock")
                                 .foregroundColor(Color("AccentColor"))
@@ -40,9 +43,9 @@ struct AddressCard: View {
                 Spacer()
                 if data.getMultiSelectionMode() {
                     if data.multiSelected.contains(address) {
-                        Image(systemName: "checkmark.circle.fill")
+                        Image(systemName: "checkmark.circle.fill").foregroundColor(Color("AccentColor")).imageScale(.large)
                     } else {
-                        Image(systemName: "circle")
+                        Image(systemName: "circle").foregroundColor(Color("textFadedColor")).imageScale(.large)
                     }
                 }
             }

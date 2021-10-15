@@ -73,6 +73,10 @@
 		2DB037C12714DB1700A318B2 /* SeedCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2DB037C02714DB1700A318B2 /* SeedCard.swift */; };
 		2DB037C32715BD1100A318B2 /* MultiselectBottomControl.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2DB037C22715BD1100A318B2 /* MultiselectBottomControl.swift */; };
 		2DB037C52716CDAF00A318B2 /* NetworkDetails.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2DB037C42716CDAF00A318B2 /* NetworkDetails.swift */; };
+		2DB037C72717094B00A318B2 /* ModalBackdrop.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2DB037C62717094B00A318B2 /* ModalBackdrop.swift */; };
+		2DB037C9271834BB00A318B2 /* SmallButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2DB037C8271834BB00A318B2 /* SmallButton.swift */; };
+		2DB037CB27183BEF00A318B2 /* SeedCardForManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2DB037CA27183BEF00A318B2 /* SeedCardForManager.swift */; };
+		2DB037CD271843BF00A318B2 /* HeaderBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2DB037CC271843BF00A318B2 /* HeaderBar.swift */; };
 		2DE72BC226A588C7002BB752 /* NativeSignerApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2DE72BC126A588C7002BB752 /* NativeSignerApp.swift */; };
 		2DE72BC426A588C7002BB752 /* MainScreenContainer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2DE72BC326A588C7002BB752 /* MainScreenContainer.swift */; };
 		2DE72BC626A588C9002BB752 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 2DE72BC526A588C9002BB752 /* Assets.xcassets */; };
@@ -176,6 +180,10 @@
 		2DB037C02714DB1700A318B2 /* SeedCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SeedCard.swift; sourceTree = "<group>"; };
 		2DB037C22715BD1100A318B2 /* MultiselectBottomControl.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MultiselectBottomControl.swift; sourceTree = "<group>"; };
 		2DB037C42716CDAF00A318B2 /* NetworkDetails.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkDetails.swift; sourceTree = "<group>"; };
+		2DB037C62717094B00A318B2 /* ModalBackdrop.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ModalBackdrop.swift; sourceTree = "<group>"; };
+		2DB037C8271834BB00A318B2 /* SmallButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SmallButton.swift; sourceTree = "<group>"; };
+		2DB037CA27183BEF00A318B2 /* SeedCardForManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SeedCardForManager.swift; sourceTree = "<group>"; };
+		2DB037CC271843BF00A318B2 /* HeaderBar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HeaderBar.swift; sourceTree = "<group>"; };
 		2DE72BBE26A588C7002BB752 /* NativeSigner.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = NativeSigner.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		2DE72BC126A588C7002BB752 /* NativeSignerApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NativeSignerApp.swift; sourceTree = "<group>"; };
 		2DE72BC326A588C7002BB752 /* MainScreenContainer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainScreenContainer.swift; sourceTree = "<group>"; };
@@ -238,8 +246,10 @@
 				2DB037B9270D801400A318B2 /* HistoryCardTemplate.swift */,
 				2DE72BF426A59C59002BB752 /* NetworkCard.swift */,
 				2D7A7BC126B9D3360053C1E0 /* AddressCard.swift */,
+				2DB037CA27183BEF00A318B2 /* SeedCardForManager.swift */,
 				2DB037C02714DB1700A318B2 /* SeedCard.swift */,
 				2D7A7BDB26C2613F0053C1E0 /* TransactionCardView.swift */,
+				2D7A7BF226C519990053C1E0 /* MetadataCard.swift */,
 				2D7A7C1F26CB99250053C1E0 /* TransactionCardSelector.swift */,
 			);
 			path = Cards;
@@ -282,14 +292,16 @@
 			children = (
 				2DB037BB270ECF7300A318B2 /* SearchKeys.swift */,
 				2D7A7BC926BACFFB0053C1E0 /* QRView.swift */,
+				2DB037C8271834BB00A318B2 /* SmallButton.swift */,
+				2DB037CC271843BF00A318B2 /* HeaderBar.swift */,
 				2DB037C22715BD1100A318B2 /* MultiselectBottomControl.swift */,
 				2DE72BF226A59BAB002BB752 /* NetworkSelector.swift */,
+				2DB037C62717094B00A318B2 /* ModalBackdrop.swift */,
 				2D7A7BAF26B00A3E0053C1E0 /* NavbarShield.swift */,
 				2D7A7BB326B02B700053C1E0 /* SeedSelector.swift */,
 				2DE72C0326A6CDC5002BB752 /* CameraPreview.swift */,
 				2D7A7BFA26C6621D0053C1E0 /* HistoryCollapsed.swift */,
 				2D7A7BA426AE9E680053C1E0 /* Footer.swift */,
-				2D7A7BF226C519990053C1E0 /* MetadataCard.swift */,
 				2D72B4F726EF427C0081E879 /* Header.swift */,
 				2D0D5E7926F09A5600B0EF9D /* TransactionCommentInput.swift */,
 			);
@@ -588,6 +600,7 @@
 				2DE72C1126AAC3D6002BB752 /* LandingView.swift in Sources */,
 				2D7A7C2726CBC3C70053C1E0 /* TCEraMortalNonce.swift in Sources */,
 				2DE72C0026A6ADC5002BB752 /* CameraService.swift in Sources */,
+				2DB037C9271834BB00A318B2 /* SmallButton.swift in Sources */,
 				2DE72BF526A59C59002BB752 /* NetworkCard.swift in Sources */,
 				2D7A7C0826CA9BB00053C1E0 /* TCBlockHash.swift in Sources */,
 				2DB037B426FCB06A00A318B2 /* TCPallet.swift in Sources */,
@@ -621,6 +634,7 @@
 				2DE72BF726A5AC68002BB752 /* KeyManager.swift in Sources */,
 				2D7A7BA526AE9E680053C1E0 /* Footer.swift in Sources */,
 				2D7A7BDC26C2613F0053C1E0 /* TransactionCardView.swift in Sources */,
+				2DB037CD271843BF00A318B2 /* HeaderBar.swift in Sources */,
 				2D0D5E8626F0D0CC00B0EF9D /* TCPathDocs.swift in Sources */,
 				2D7A7BC026B97DB30053C1E0 /* Address.swift in Sources */,
 				2D0D5E7C26F0A4A300B0EF9D /* SeedBackup.swift in Sources */,
@@ -638,11 +652,13 @@
 				2D7A7BD226BBCE6F0053C1E0 /* TransactionScreen.swift in Sources */,
 				2D7A7BB426B02B700053C1E0 /* SeedSelector.swift in Sources */,
 				2DB037C52716CDAF00A318B2 /* NetworkDetails.swift in Sources */,
+				2DB037CB27183BEF00A318B2 /* SeedCardForManager.swift in Sources */,
 				2D7A7BB026B00A3E0053C1E0 /* NavbarShield.swift in Sources */,
 				2D7A7BF326C519990053C1E0 /* MetadataCard.swift in Sources */,
 				2D7A7C0226CA98700053C1E0 /* TCAuthorPlain.swift in Sources */,
 				2D7A7BE026C3AC350053C1E0 /* TransactionTypes.swift in Sources */,
 				2D7A7C1E26CB98310053C1E0 /* TCVarName.swift in Sources */,
+				2DB037C72717094B00A318B2 /* ModalBackdrop.swift in Sources */,
 				2D7A7BEB26C4149E0053C1E0 /* DocumentModal.swift in Sources */,
 				2DE72C0F26A99885002BB752 /* RustNative.swift in Sources */,
 				2D7A7C0026CA97B00053C1E0 /* TCAuthor.swift in Sources */,

@@ -37,7 +37,10 @@ struct MainScreenContainer: View {
                     })
                 )
                 //Certain places are better off without footer
-                if (data.transactionState == .none){
+                if (data.transactionState == .none
+                    && !(data.signerScreen == .keys && (data.keyManagerModal == .networkManager
+                                                        || data.keyManagerModal == .newSeed)
+                        )){
                     Footer()
                 }
             }
