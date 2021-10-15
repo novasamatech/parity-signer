@@ -60,15 +60,23 @@ export! {
         else {return transaction_parsing::produce_output(transaction, dbname)}
     }
 
-    @Java_io_parity_signer_models_SignerDataModel_substrateHandleAction
-	fn handle_action(
-		action: &str,
+    @Java_io_parity_signer_models_SignerDataModel_substrateHandleStub
+	fn handle_stub(
+		checksum: &str,
+        dbname: &str
+	) -> anyhow::Result<(), anyhow::Error> {
+        transaction_signing::handle_stub(checksum, dbname)
+    }
+
+    @Java_io_parity_signer_models_SignerDataModel_substrateHandleSign
+	fn handle_sign(
+		checksum: &str,
         seed_phrase: &str,
         password: &str,
         user_comment: &str,
         dbname: &str
 	) -> anyhow::Result<String, anyhow::Error> {
-        transaction_signing::handle_action(action, seed_phrase, password, user_comment, dbname)
+        transaction_signing::handle_sign(checksum, seed_phrase, password, user_comment, dbname)
     }
 
     @Java_io_parity_signer_models_SignerDataModel_substrateDevelopmentTest
@@ -250,20 +258,6 @@ export! {
         db_handling::manage_history::device_was_online(dbname)
     }
 
-    @Java_io_parity_signer_models_SignerDataModel_historySeedsWereAccessed
-	fn seeds_were_accessed(
-        dbname: &str
-	) -> anyhow::Result<(), anyhow::Error> {
-        db_handling::manage_history::seeds_were_accessed(dbname)
-    }
-
-    @Java_io_parity_signer_models_SignerDataModel_historySeedsWereShown
-	fn seeds_were_shown(
-        dbname: &str
-	) -> anyhow::Result<(), anyhow::Error> {
-        db_handling::manage_history::seeds_were_shown(dbname)
-    }
-
     @Java_io_parity_signer_models_SignerDataModel_historyHistoryEntryUser
 	fn history_entry_user(
         entry: &str,
@@ -285,5 +279,5 @@ ffi_support::define_string_destructor!(signer_destroy_string);
 
 #[cfg(test)]
 mod tests {
-	use super::*;
+	//use super::*;
 }
