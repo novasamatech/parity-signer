@@ -20,7 +20,6 @@ extension SignerDataModel {
                 let tac = try String(contentsOfFile: path, encoding: .utf8)
                 print(tac)
                 let taCMD = try! AttributedString(markdown: tac, options: AttributedString.MarkdownParsingOptions(interpretedSyntax: .inlineOnlyPreservingWhitespace))
-                print(taCMD)
                 return taCMD
             } catch {
                 print("TaC file damaged")

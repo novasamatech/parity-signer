@@ -18,7 +18,7 @@ struct HistoryCard: View {
             case .deviceWasOnline:
                 HistoryCardTemplate(image: "shield.slash", timestamp: timestamp, color: "dangerColor", line1: "Device was connected to network", line2: "")
             case .error(let text):
-                HistoryCardTemplate(image: "exclamationmark.triange.fill", timestamp: timestamp, color: "dangerColor", line1: "Error! " + text, line2: "")
+                HistoryCardTemplate(image: "exclamationmark.triangle.fill", timestamp: timestamp, color: "dangerColor", line1: "Error! " + text, line2: "")
             case .generalVerifierAdded(let value):
                 HistoryCardTemplate(image: "lock.shield.fill", timestamp: timestamp, color: "cryptoColor", line1: "General verifier set", line2: value.hex + " " +  value.encryption)
             case .generalVerifierRemoved(_):
@@ -66,7 +66,7 @@ struct HistoryCard: View {
             case .userEntry(let text):
                 HistoryCardTemplate(image: "square", timestamp: timestamp, color: "cryptoColor", line1: "User record", line2: text)
             case .warning(let text):
-                HistoryCardTemplate(image: "exclamationmark.triange.fill", timestamp: timestamp, color: "dangerColor", line1: "Warning! " + text, line2: "")
+                HistoryCardTemplate(image: "exclamationmark.triangle.fill", timestamp: timestamp, color: "dangerColor", line1: "Warning! " + text, line2: "")
             }
         }
     }

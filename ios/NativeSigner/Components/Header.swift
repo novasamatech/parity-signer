@@ -31,6 +31,14 @@ struct Header: View {
                     SmallButton(text: "Select all")
                 }
             }
+            if (data.keyManagerModal == .seedSelector && data.signerScreen == .keys) {
+                Button(action: {
+                    data.keyManagerModal = .newSeed
+                }) {
+                    Image(systemName: "plus.square.on.square")
+                        .imageScale(.large)
+                }
+            }
             Button(action: {
                 data.totalRefresh()
                 data.networkSettings = nil
