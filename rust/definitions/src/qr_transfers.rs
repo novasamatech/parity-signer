@@ -54,62 +54,11 @@ impl ContentLoadMeta {
             Err(e) => return Err(e.to_string()),
         }
     }
-}
-
-
-/// Struct to process the content of qr codes with add_network messages
-pub struct ContentAddNetwork (Vec<u8>);
-
-#[derive(parity_scale_codec_derive::Decode, parity_scale_codec_derive::Encode)]
-struct DecodedContentAddNetwork {
-    meta: Vec<u8>,
-    specs: ChainSpecsToSend,
-}
-
-impl ContentAddNetwork {
-    /// Function to generate add_network content from metadata and network specs ChainSpecsToSend
-    pub fn generate (meta: &Vec<u8>, specs: &ChainSpecsToSend) -> Self {
-        Self (
-            DecodedContentAddNetwork {
-                meta: meta.to_vec(),
-                specs: specs.to_owned(),
-            }.encode()
-        )
-    }
-    /// Function to transform Vec<u8> into ContentAddNetwork prior to processing
-    pub fn from_vec (vec: &Vec<u8>) -> Self {
-        Self(vec.to_vec())
-    }
-    /// Function to get metadata from add_network content
-    pub fn meta (&self) -> Result<Vec<u8>, &'static str>  {
-        match <DecodedContentAddNetwork>::decode(&mut &self.0[..]) {
-            Ok(a) => Ok(a.meta),
-            Err(_) => return Err("add_network content could not be decoded")
-        }
-    }
-    /// Function to get network specs ChainSpecsToSend from add_network content
-    pub fn specs (&self) -> Result<ChainSpecsToSend, &'static str> {
-        match <DecodedContentAddNetwork>::decode(&mut &self.0[..]) {
-            Ok(a) => Ok(a.specs),
-            Err(_) => return Err("add_network content could not be decoded")
-        }
-    }
-    /// Function to decode add_network message and get both metadata and network specs as a tuple
-    pub fn meta_specs (&self) -> Result<(Vec<u8>, ChainSpecsToSend), &'static str> {
-        match <DecodedContentAddNetwork>::decode(&mut &self.0[..]) {
-            Ok(a) => Ok((a.meta, a.specs)),
-            Err(_) => return Err("add_network content could not be decoded")
-        }
-    }
-    /// Function to export add_network content into file
-    pub fn write (&self, filename: &str) -> Result<(), String> {
-        match std::fs::write(&filename, &self.0) {
-            Ok(_) => Ok(()),
-            Err(e) => return Err(e.to_string()),
-        }
+    /// Function to put load_metadata information into storage as Vec<u8>
+    pub fn store (&self) -> Vec<u8> {
+        self.0.to_vec()
     }
 }
-
 
 /// Struct to process the content of qr codes with add_specs messages
 pub struct ContentAddSpecs (Vec<u8>);
@@ -145,6 +94,10 @@ impl ContentAddSpecs {
             Ok(_) => Ok(()),
             Err(e) => return Err(e.to_string()),
         }
+    }
+    /// Function to put add_specs information into storage as Vec<u8>
+    pub fn store (&self) -> Vec<u8> {
+        self.0.to_vec()
     }
 }
 

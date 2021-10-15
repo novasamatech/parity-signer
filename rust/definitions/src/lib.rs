@@ -1,8 +1,8 @@
 pub mod crypto;
 
-pub mod defaults;
-
 pub mod history;
+
+pub mod keyring;
 
 pub mod metadata;
 

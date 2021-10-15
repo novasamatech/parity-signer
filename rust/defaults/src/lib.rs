@@ -3,17 +3,31 @@ use std::convert::TryInto;
 use std::fs;
 use regex::Regex;
 use lazy_static::lazy_static;
+use definitions::{crypto::Encryption, keyring::VerifierKey, metadata::{AddressBookEntry, MetaValues}, network_specs::{ChainSpecs, ChainSpecsToSend, CurrentVerifier, Verifier}, qr_transfers::ContentLoadTypes, types::{TypeEntry, Description, EnumVariant, EnumVariantType, StructField}};
+use meta_reading::decode_metadata::decode_version;
 
+pub const DEFAULT_GENERAL_VERIFIER: Verifier = Verifier::Sr25519([212, 53, 147, 199, 21, 253, 211, 28, 97, 20, 26, 189, 4, 169, 159, 214, 130, 44, 133, 88, 133, 76, 205, 227, 154, 86, 132, 231, 165, 109, 162, 125]); // everyone trusts Alice until further notice
 
-use crate::crypto::Encryption;
-use crate::network_specs::{ChainSpecs, ChainSpecsToSend, Verifier, VerifierInfo, generate_verifier_key};
-use crate::types::{TypeEntry, Description, EnumVariant, EnumVariantType, StructField};
-use crate::metadata::{AddressBookEntry};
-use crate::qr_transfers::ContentLoadTypes;
+struct DefaultNetworkInfo {
+    address: String,
+    base58prefix: u16,
+    color: String,
+    decimals: u8,
+    encryption: Encryption,
+    genesis_hash: [u8; 32],
+    logo: String,
+    name: String,
+    order: u8,
+    path_id: String,
+    secondary_color: String,
+    title: String,
+    unit: String,
+}
 
-pub fn get_default_chainspecs() -> Vec<ChainSpecs> {
+fn get_default_network_info() -> Vec<DefaultNetworkInfo> {
     vec![
-        ChainSpecs {
+        DefaultNetworkInfo {
+            address: String::from("wss://kusama-rpc.polkadot.io"),
             base58prefix: 2,
             color: String::from("#000"),
             decimals: 12,
@@ -26,8 +40,9 @@ pub fn get_default_chainspecs() -> Vec<ChainSpecs> {
             secondary_color: String::from("#262626"),
             title: String::from("Kusama"),
             unit: String::from("KSM"),
-    	},
-	ChainSpecs {
+        },
+        DefaultNetworkInfo {
+            address: String::from("wss://rpc.polkadot.io"),
             base58prefix: 0,
             color: String::from("#E6027A"),
             decimals: 10,
@@ -40,13 +55,19 @@ pub fn get_default_chainspecs() -> Vec<ChainSpecs> {
             secondary_color: String::from("#262626"),
             title: String::from("Polkadot"),
             unit: String::from("DOT"),
-    	},
-	ChainSpecs {
+        },
+        DefaultNetworkInfo {
+            address: String::from("wss://rococo-rpc.polkadot.io"),
             base58prefix: 42,
             color: String::from("#6f36dc"),
             decimals: 12,
             encryption: Encryption::Sr25519,
             genesis_hash: hex::decode("f6e9983c37baf68846fedafe21e56718790e39fb1c582abc408b81bc7b208f9a").expect("known value").try_into().expect("known value"),
+            // f6e9983c37baf68846fedafe21e56718790e39fb1c582abc408b81bc7b208f9a
+            // previous value: "5fce687da39305dfe682b117f0820b319348e8bb37eb16cf34acbf6a202de9d9" changed 2021-09-30
+            // previous value: "853faffbfc6713c1f899bf16547fcfbf733ae8361b8ca0129699d01d4f2181fd" changed 2021-09-24
+            // previous value: "f9ab3847dec02d434b38c057756d0cb19e5ec5c307419634938c397b1346eb41" changed 2021-09-16
+            // previous value: "e7c3d5edde7db964317cd9b51a3a059d7cd99f81bdbce14990047354334c9779" changed 2021-09-06
             logo: String::from("rococo"),
             name: String::from("rococo"),
             order: 3,
@@ -54,8 +75,9 @@ pub fn get_default_chainspecs() -> Vec<ChainSpecs> {
             secondary_color: String::from("#262626"),
             title: String::from("Rococo"),
             unit: String::from("ROC"),
-    	},
-        ChainSpecs {
+        },
+        DefaultNetworkInfo {
+            address: String::from("wss://westend-rpc.polkadot.io"),
             base58prefix: 42,
             color: String::from("#660D35"),
             decimals: 12,
@@ -72,30 +94,44 @@ pub fn get_default_chainspecs() -> Vec<ChainSpecs> {
     ]
 }
 
-pub fn get_default_verifiers() -> Vec<VerifierInfo> {
-    let specs = get_default_chainspecs();
-    let mut verifier_info_set: Vec<VerifierInfo> = Vec::new();
-    for x in specs.iter() {
-        let new = VerifierInfo {
-            key: generate_verifier_key(&x.genesis_hash.to_vec()),
-            verifier: Verifier::None,
+pub fn get_default_chainspecs() -> Vec<ChainSpecs> {
+    let mut out: Vec<ChainSpecs> = Vec::new();
+    for x in get_default_network_info().iter() {
+        let new = ChainSpecs {
+            base58prefix: x.base58prefix,
+            color: x.color.to_string(),
+            decimals: x.decimals,
+            encryption: x.encryption.clone(),
+            genesis_hash: x.genesis_hash,
+            logo: x.logo.to_string(),
+            name: x.name.to_string(),
+            order: x.order,
+            path_id: x.path_id.to_string(),
+            secondary_color: x.secondary_color.to_string(),
+            title: x.title.to_string(),
+            unit: x.unit.to_string(),
         };
-        verifier_info_set.push(new);
+        out.push(new);
     }
-    verifier_info_set
+    out
 }
 
+pub fn get_default_verifiers() -> Vec<(VerifierKey, CurrentVerifier)> {
+    let mut out: Vec<(VerifierKey, CurrentVerifier)> = Vec::new();
+    for x in get_default_network_info().iter() {
+        out.push((VerifierKey::from_parts(&x.genesis_hash.to_vec()), CurrentVerifier::General));
+    }
+    out
+}
 
 pub fn get_default_chainspecs_to_send() -> Vec<ChainSpecsToSend> {
-    let specs = get_default_chainspecs();
-    let mut specs_to_send: Vec<ChainSpecsToSend> = Vec::new();
-    
-    for x in specs.iter() {
+    let mut out: Vec<ChainSpecsToSend> = Vec::new();
+    for x in get_default_network_info().iter() {
         let new = ChainSpecsToSend {
             base58prefix: x.base58prefix,
             color: x.color.to_string(),
             decimals: x.decimals,
-            encryption: x.encryption,
+            encryption: x.encryption.clone(),
             genesis_hash: x.genesis_hash,
             logo: x.logo.to_string(),
             name: x.name.to_string(),
@@ -104,11 +140,47 @@ pub fn get_default_chainspecs_to_send() -> Vec<ChainSpecsToSend> {
             title: x.title.to_string(),
             unit: x.unit.to_string(),
         };
-        specs_to_send.push(new);
+        out.push(new);
     }
-    specs_to_send
+    out
 }
 
+pub fn get_default_address_book() -> Vec<AddressBookEntry> {
+    let mut out: Vec<AddressBookEntry> = Vec::new();
+    for x in get_default_network_info().iter() {
+        let new = AddressBookEntry {
+            name: x.name.to_string(),
+            genesis_hash: x.genesis_hash,
+            address: x.address.to_string(),
+            encryption: x.encryption.clone(),
+            def: true,
+        };
+        out.push(new);
+    }
+    out
+}
+
+pub fn get_default_metadata() -> Result<Vec<MetaValues>, String> {
+    let mut out: Vec<MetaValues> = Vec::new();
+    let path_set = match std::fs::read_dir("../defaults/default_metadata") {
+        Ok(a) => a,
+        Err(e) => return Err(format!("Error reading folder with default metadata. {}", e)),
+    };
+    for x in path_set {
+        if let Ok(path) = x {
+            let meta_str = match std::fs::read_to_string(path.path()) {
+                Ok(a) => a,
+                Err(e) => return Err(format!("Error reading file with default metadata. {}", e)),
+            };
+            let new = match decode_version(&meta_str.trim()) {
+                Ok(a) => a,
+                Err(e) => return Err(format!("Error decoding default metadata. {}", e)),
+            };
+            out.push(new)
+        }
+    }
+    Ok(out)
+}
 
 lazy_static! {
     static ref REG_STRUCTS_WITH_NAMES: Regex = Regex::new(r#"(pub )?struct (?P<name>.*?)( )?\{(?P<description>(\n +(pub )?\w+: .*(,)?)*\n)\}"#).expect("checked construction");
@@ -124,7 +196,7 @@ lazy_static! {
 
 pub fn get_default_types() -> Result<ContentLoadTypes, String> {
     
-    let filename = "../definitions/data/full_types_information";
+    let filename = "../defaults/default_types/full_types_information";
     let type_info = match fs::read_to_string(filename) {
         Ok(x) => x,
         Err(e) => return Err(format!("Error reading datafile with default types information. {}", e)),
@@ -217,41 +289,4 @@ pub fn get_default_types() -> Result<ContentLoadTypes, String> {
     }
     
     Ok(ContentLoadTypes::generate(&types_prep))
-}
-
-
-pub fn get_default_address_book() -> Vec<AddressBookEntry> {
-    vec![
-        AddressBookEntry {
-            name: String::from("kusama"),
-            genesis_hash: hex::decode("b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe").expect("known value").try_into().expect("known value"),
-            address: String::from("wss://kusama-rpc.polkadot.io"),
-            encryption: Encryption::Sr25519,
-            def: true,
-        },
-        AddressBookEntry {
-            name: String::from("polkadot"),
-            genesis_hash: hex::decode("91b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3").expect("known value").try_into().expect("known value"),
-            address: String::from("wss://rpc.polkadot.io"),
-            encryption: Encryption::Sr25519,
-            def: true,
-        },
-        AddressBookEntry {
-            name: String::from("rococo"),
-            genesis_hash: hex::decode("f6e9983c37baf68846fedafe21e56718790e39fb1c582abc408b81bc7b208f9a").expect("known value").try_into().expect("known value"),
-            // previous value: "853faffbfc6713c1f899bf16547fcfbf733ae8361b8ca0129699d01d4f2181fd" changed 2021-09-30
-            // previous value: "f9ab3847dec02d434b38c057756d0cb19e5ec5c307419634938c397b1346eb41" changed 2021-09-16
-            // previous value: "e7c3d5edde7db964317cd9b51a3a059d7cd99f81bdbce14990047354334c9779" changed 2021-09-06
-            address: String::from("wss://rococo-rpc.polkadot.io"),
-            encryption: Encryption::Sr25519,
-            def: true,
-        },
-        AddressBookEntry {
-            name: String::from("westend"),
-            genesis_hash: hex::decode("e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e").expect("known value").try_into().expect("known value"),
-            address: String::from("wss://westend-rpc.polkadot.io"),
-            encryption: Encryption::Sr25519,
-            def: true,
-        },
-    ]
 }

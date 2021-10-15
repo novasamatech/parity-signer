@@ -21,4 +21,4 @@ sled = "0.34.6"
 parity-scale-codec = "2.2.0"
 anyhow = "1.0.42"
 blake2-rfc = "0.2.18"
-
+zeroize = "1.4.2"

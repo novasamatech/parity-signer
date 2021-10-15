@@ -454,6 +454,7 @@ dependencies = [
  "blake2-rfc",
  "chrono",
  "constants",
+ "defaults",
  "definitions",
  "hex",
  "lazy_static",
@@ -472,10 +473,22 @@ dependencies = [
 ]
 
 [[package]]
+name = "defaults"
+version = "0.1.0"
+dependencies = [
+ "definitions",
+ "hex",
+ "lazy_static",
+ "meta_reading",
+ "regex",
+]
+
+[[package]]
 name = "definitions"
 version = "0.1.0"
 dependencies = [
  "anyhow",
+ "blake2-rfc",
  "hex",
  "lazy_static",
  "parity-scale-codec",
@@ -483,6 +496,7 @@ dependencies = [
  "regex",
  "sp-core",
  "sp-runtime",
+ "zeroize",
 ]
 
 [[package]]
@@ -2876,6 +2890,7 @@ dependencies = [
  "sp-core",
  "sp-runtime",
  "transaction_parsing",
+ "zeroize",
 ]
 
 [[package]]
@@ -3170,9 +3185,9 @@ checksum = "85e60b0d1b5f99db2556934e21937020776a5d31520bf169e851ac44e6420214"
 
 [[package]]
 name = "zeroize"
-version = "1.4.1"
+version = "1.4.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "377db0846015f7ae377174787dd452e1c5f5a9050bc6f954911d01f116daa0cd"
+checksum = "bf68b08513768deaa790264a7fac27a58cbf2705cfcdc9448362229217d7e970"
 dependencies = [
  "zeroize_derive",
 ]

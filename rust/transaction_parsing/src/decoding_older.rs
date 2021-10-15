@@ -25,7 +25,7 @@ use crate::method::{what_next_old, OlderMeta};
 ///
 /// The function outputs the DecodedOut value in case of success.
 
-fn decode_primitive (found_ty: &str, data: &Vec<u8>, index: u32, indent: u32, chain_specs: &ChainSpecs) -> Result<DecodedOut, Error> {
+fn decode_primitive (found_ty: &str, data: &Vec<u8>, index: &mut u32, indent: u32, chain_specs: &ChainSpecs) -> Result<DecodedOut, Error> {
     match found_ty {
         "bool" => decode_known_length::<bool>(data, found_ty, index, indent),
         "u8" => decode_primitive_with_flags::<u8>(data, false, false, found_ty, index, indent, chain_specs),
@@ -72,7 +72,7 @@ fn decode_primitive (found_ty: &str, data: &Vec<u8>, index: u32, indent: u32, ch
 /// Calls and vectors of calls are treated separately here.
 /// All simpler types are processed through decode_simple function.
 
-fn decode_complex (found_ty: &str, mut data: Vec<u8>, meta: &OlderMeta, type_database: &Vec<TypeEntry>, mut index: u32, indent: u32, chain_specs: &ChainSpecs) -> Result<DecodedOut, Error> {
+fn decode_complex (found_ty: &str, mut data: Vec<u8>, meta: &OlderMeta, type_database: &Vec<TypeEntry>, index: &mut u32, indent: u32, chain_specs: &ChainSpecs) -> Result<DecodedOut, Error> {
 
     match found_ty {
         "Box<<T as Config<I>>::Proposal>" | "Box<<T as Config>::Call>" | "Box<<T as Config>::Proposal>" => {
@@ -88,7 +88,6 @@ fn decode_complex (found_ty: &str, mut data: Vec<u8>, meta: &OlderMeta, type_dat
                     data = data[start..].to_vec();
                     for _i in 0..number_of_calls {
                         let after_run = process_as_call(data, meta, type_database, index, indent, chain_specs)?;
-                        index = after_run.index;
                         fancy_output_prep.push_str(&after_run.fancy_out);
                         data = after_run.remaining_vector;
                     }
@@ -99,7 +98,6 @@ fn decode_complex (found_ty: &str, mut data: Vec<u8>, meta: &OlderMeta, type_dat
             }
             Ok(DecodedOut{
                 remaining_vector: data,
-                index,
                 indent,
                 fancy_out: fancy_output_prep,
             })
@@ -136,28 +134,24 @@ fn decode_complex (found_ty: &str, mut data: Vec<u8>, meta: &OlderMeta, type_dat
 /// For each argument the card "varname" with argument name is added to fancy_out,
 /// followed by card(s) of actual decoded argument values.
 
-pub fn process_as_call (mut data: Vec<u8>, meta: &OlderMeta, type_database: &Vec<TypeEntry>, mut index: u32, mut indent: u32, chain_specs: &ChainSpecs) -> Result<DecodedOut, Error> {
+pub fn process_as_call (mut data: Vec<u8>, meta: &OlderMeta, type_database: &Vec<TypeEntry>, index: &mut u32, mut indent: u32, chain_specs: &ChainSpecs) -> Result<DecodedOut, Error> {
     let call_in_processing = what_next_old (data, meta)?;
     data = call_in_processing.data;
     
     let mut fancy_out = format!(",{}", (Card::Call{method: &call_in_processing.method.method_name, pallet: &call_in_processing.method.pallet_name, docs: &call_in_processing.method.docs}).card(index, indent));
-    index = index + 1;
     indent = indent + 1;
     
     for x in call_in_processing.method.arguments.iter() {
         let add_to_fancy_out = format!(",{}", (Card::Varname(&x.name)).card(index, indent));
         fancy_out.push_str(&add_to_fancy_out);
-        index = index + 1;
         
         let decoded_out = decode_complex(&x.ty, data, meta, type_database, index, indent+1, chain_specs)?;
-        index = decoded_out.index;
         data = decoded_out.remaining_vector;
         fancy_out.push_str(&decoded_out.fancy_out);
     }
     
     Ok(DecodedOut{
         remaining_vector: data.to_vec(),
-        index,
         indent,
         fancy_out,
     })
@@ -207,7 +201,7 @@ lazy_static! {
 /// Js cards are of type "none" if the Option<_> is None.
 /// At this moment no special js card for Some(x) is presented, only the card of x itself.
 
-fn deal_with_option (inner_ty: &str, mut data: Vec<u8>, type_database: &Vec<TypeEntry>, mut index: u32, indent: u32, chain_specs: &ChainSpecs) -> Result<DecodedOut, Error> {
+fn deal_with_option (inner_ty: &str, mut data: Vec<u8>, type_database: &Vec<TypeEntry>, index: &mut u32, indent: u32, chain_specs: &ChainSpecs) -> Result<DecodedOut, Error> {
     if inner_ty == "bool" {
     
         let fancy_out = match &data[0] {
@@ -216,14 +210,12 @@ fn deal_with_option (inner_ty: &str, mut data: Vec<u8>, type_database: &Vec<Type
             2 => format!(",{}", (Card::Default("False")).card(index, indent)),
             _ => {return Err(Error::UnableToDecode(UnableToDecode::UnexpectedOptionVariant))},
         };
-        index = index + 1;
         let remaining_vector = {
             if data.len()>1 {(&data[1..]).to_vec()}
             else {Vec::new()}
         };
         Ok(DecodedOut {
             remaining_vector,
-            index,
             indent,
             fancy_out,
         })
@@ -236,10 +228,8 @@ fn deal_with_option (inner_ty: &str, mut data: Vec<u8>, type_database: &Vec<Type
                     else {Vec::new()}
                 };
                 let fancy_out = format!(",{}", (Card::None).card(index, indent));
-                index = index + 1;
                 Ok(DecodedOut {
                     remaining_vector,
-                    index,
                     indent,
                     fancy_out,
                 })
@@ -277,7 +267,7 @@ fn deal_with_option (inner_ty: &str, mut data: Vec<u8>, type_database: &Vec<Type
 ///
 /// The function outputs the DecodedOut value in case of success.
 
-fn deal_with_vector (inner_ty: &str, mut data: Vec<u8>, type_database: &Vec<TypeEntry>, mut index: u32, indent: u32, chain_specs: &ChainSpecs) -> Result<DecodedOut, Error> {
+fn deal_with_vector (inner_ty: &str, mut data: Vec<u8>, type_database: &Vec<TypeEntry>, index: &mut u32, indent: u32, chain_specs: &ChainSpecs) -> Result<DecodedOut, Error> {
     let pre_vector = get_compact::<u32>(&data)?;
     let mut fancy_output_prep = String::new();
     let elements_of_vector = pre_vector.compact_found;
@@ -286,13 +276,11 @@ fn deal_with_vector (inner_ty: &str, mut data: Vec<u8>, type_database: &Vec<Type
             data = data[start..].to_vec();
             for _i in 0..elements_of_vector {
                 let after_run = decode_simple(inner_ty, data, type_database, index, indent, chain_specs)?;
-                index = after_run.index;
                 fancy_output_prep.push_str(&after_run.fancy_out);
                 data = after_run.remaining_vector;
             }
             Ok(DecodedOut {
                 remaining_vector: data,
-                index,
                 indent,
                 fancy_out: fancy_output_prep,
             })
@@ -302,7 +290,6 @@ fn deal_with_vector (inner_ty: &str, mut data: Vec<u8>, type_database: &Vec<Type
             else {
                 Ok(DecodedOut {
                     remaining_vector: Vec::new(),
-                    index,
                     indent,
                     fancy_out: Card::Default("").card(index, indent),
                 })
@@ -332,17 +319,15 @@ fn deal_with_vector (inner_ty: &str, mut data: Vec<u8>, type_database: &Vec<Type
 ///
 /// The function outputs the DecodedOut value in case of success.
 
-fn deal_with_array (inner_ty: &str, number_of_elements: u32, mut data: Vec<u8>, type_database: &Vec<TypeEntry>, mut index: u32, indent: u32, chain_specs: &ChainSpecs) -> Result<DecodedOut, Error> {
+fn deal_with_array (inner_ty: &str, number_of_elements: u32, mut data: Vec<u8>, type_database: &Vec<TypeEntry>, index: &mut u32, indent: u32, chain_specs: &ChainSpecs) -> Result<DecodedOut, Error> {
     let mut fancy_output_prep = String::new();
     for _i in 0..number_of_elements {
         let after_run = decode_simple(inner_ty, data, type_database, index, indent, chain_specs)?;
-        index = after_run.index;
         fancy_output_prep.push_str(&after_run.fancy_out);
         data = after_run.remaining_vector;
     }
     Ok(DecodedOut{
         remaining_vector: data,
-        index,
         indent,
         fancy_out: fancy_output_prep,
     })
@@ -369,7 +354,7 @@ fn deal_with_array (inner_ty: &str, number_of_elements: u32, mut data: Vec<u8>, 
 ///
 /// For each identity field an individual js card "identity_field" is added to fancy_out.
 
-fn special_case_identity_fields (data: Vec<u8>, type_database: &Vec<TypeEntry>, mut index: u32, indent: u32) -> Result<DecodedOut, Error> {
+fn special_case_identity_fields (data: Vec<u8>, type_database: &Vec<TypeEntry>, index: &mut u32, indent: u32) -> Result<DecodedOut, Error> {
     // at the moment, the length is known: 8 units in Vec<u8>
     if data.len() < 8 {return Err(Error::UnableToDecode(UnableToDecode::DataTooShort))}
     let remaining_vector = {
@@ -389,7 +374,6 @@ fn special_case_identity_fields (data: Vec<u8>, type_database: &Vec<TypeEntry>, 
                     if bv[i] {
                         let fancy_output_prep = format!(",{}", (Card::IdentityField(&x.variant_name)).card(index, indent));
                         fancy_out.push_str(&fancy_output_prep);
-                        index = index + 1;
                     };
                 }
             }
@@ -399,7 +383,6 @@ fn special_case_identity_fields (data: Vec<u8>, type_database: &Vec<TypeEntry>, 
     if !found {return Err(Error::UnableToDecode(UnableToDecode::IdFields))}
     Ok(DecodedOut{
         remaining_vector,
-        index,
         indent,
         fancy_out,
     })
@@ -426,7 +409,7 @@ fn special_case_identity_fields (data: Vec<u8>, type_database: &Vec<TypeEntry>, 
 ///
 /// Resulting BitVec is added to fancy_out on js card "bitvec".
 
-fn special_case_bitvec (data: Vec<u8>, mut index: u32, indent: u32) -> Result<DecodedOut, Error> {
+fn special_case_bitvec (data: Vec<u8>, index: &mut u32, indent: u32) -> Result<DecodedOut, Error> {
     // the data is preluded by compact indicating the number of BitVec elements - info from js documentation, decode not implemented for BitVec as is
     let pre_bitvec = get_compact::<u32>(&data)?;
     let actual_length = match pre_bitvec.compact_found % 8 {
@@ -440,14 +423,12 @@ fn special_case_bitvec (data: Vec<u8>, mut index: u32, indent: u32) -> Result<De
             let into_bv = data[start..fin].to_vec();
             let bv: BitVec<Lsb0, u8> = BitVec::from_vec(into_bv);
             let fancy_out = format!(",{}", (Card::BitVec(bv.to_string())).card(index, indent));
-            index = index + 1;
             let remaining_vector = {
                 if data.len() > fin {data[fin..].to_vec()}
                 else {Vec::new()}
             };
             Ok(DecodedOut {
                 remaining_vector,
-                index,
                 indent,
                 fancy_out,
             })
@@ -456,7 +437,6 @@ fn special_case_bitvec (data: Vec<u8>, mut index: u32, indent: u32) -> Result<De
             if actual_length != 0 {return Err(Error::UnableToDecode(UnableToDecode::DataTooShort))}
             Ok(DecodedOut {
                 remaining_vector: Vec::new(),
-                index,
                 indent,
                 fancy_out: Card::Default("").card(index, indent),
             })
@@ -487,7 +467,7 @@ fn goto_balance(found_ty: &str) -> bool {
 ///
 /// Resulting balance is added to fancy_out on js card "balance".
 
-fn special_case_balance (found_ty: &str, data: Vec<u8>, index: u32, indent: u32, chain_specs: &ChainSpecs) -> Result<DecodedOut, Error> {
+fn special_case_balance (found_ty: &str, data: Vec<u8>, index: &mut u32, indent: u32, chain_specs: &ChainSpecs) -> Result<DecodedOut, Error> {
     
     match found_ty {
         "Balance" | "T::Balance" | "BalanceOf<T>" | "BalanceOf<T, I>" => {
@@ -521,7 +501,7 @@ fn special_case_balance (found_ty: &str, data: Vec<u8>, index: u32, indent: u32,
 ///
 /// The function outputs the DecodedOut value in case of success.
 
-fn deal_with_struct (v1: &Vec<StructField>, mut data: Vec<u8>, type_database: &Vec<TypeEntry>, mut index: u32, indent: u32, chain_specs: &ChainSpecs) -> Result<DecodedOut, Error> {
+fn deal_with_struct (v1: &Vec<StructField>, mut data: Vec<u8>, type_database: &Vec<TypeEntry>, index: &mut u32, indent: u32, chain_specs: &ChainSpecs) -> Result<DecodedOut, Error> {
     let mut fancy_out = String::new();
     for (i, y) in v1.iter().enumerate() {
         let fancy_output_prep = match &y.field_name {
@@ -529,15 +509,12 @@ fn deal_with_struct (v1: &Vec<StructField>, mut data: Vec<u8>, type_database: &V
             None => format!(",{}", (Card::FieldNumber{number: i, docs: ""}).card(index, indent)),
         };
         fancy_out.push_str(&fancy_output_prep);
-        index = index + 1;
         let after_run = decode_simple(&y.field_type, data, type_database, index, indent+1, chain_specs)?;
         data = after_run.remaining_vector;
-        index = after_run.index;
         fancy_out.push_str(&after_run.fancy_out);
     }
     Ok(DecodedOut {
         remaining_vector: data,
-        index,
         indent,
         fancy_out,
     })
@@ -563,7 +540,7 @@ fn deal_with_struct (v1: &Vec<StructField>, mut data: Vec<u8>, type_database: &V
 ///
 /// The function outputs the DecodedOut value in case of success.
 
-fn deal_with_enum (v1: &Vec<EnumVariant>, mut data: Vec<u8>, type_database: &Vec<TypeEntry>, mut index: u32, indent: u32, chain_specs: &ChainSpecs) -> Result<DecodedOut, Error> {
+fn deal_with_enum (v1: &Vec<EnumVariant>, mut data: Vec<u8>, type_database: &Vec<TypeEntry>, index: &mut u32, indent: u32, chain_specs: &ChainSpecs) -> Result<DecodedOut, Error> {
     let enum_index = data[0] as usize;
     if enum_index >= v1.len() {return Err(Error::UnableToDecode(UnableToDecode::UnexpectedEnumVariant))}
     let found_variant = &v1[enum_index];
@@ -574,10 +551,8 @@ fn deal_with_enum (v1: &Vec<EnumVariant>, mut data: Vec<u8>, type_database: &Vec
                 else {Vec::new()}
             };
             let fancy_out = format!(",{}", (Card::EnumVariantName{name: &found_variant.variant_name, docs: ""}).card(index, indent));
-            index = index + 1;
             Ok(DecodedOut {
                 remaining_vector,
-                index,
                 indent,
                 fancy_out,
             })
@@ -586,14 +561,11 @@ fn deal_with_enum (v1: &Vec<EnumVariant>, mut data: Vec<u8>, type_database: &Vec
             if data.len()==1 {return Err(Error::UnableToDecode(UnableToDecode::DataTooShort))}
             data=data[1..].to_vec();
             let mut fancy_output_prep = format!(",{}", (Card::EnumVariantName{name: &found_variant.variant_name, docs: ""}).card(index, indent));
-            index = index + 1;
             let after_run = decode_simple(&inner_ty, data, type_database, index, indent+1, chain_specs)?;
-            index = after_run.index;
             fancy_output_prep.push_str(&after_run.fancy_out);
             data = after_run.remaining_vector;
             Ok(DecodedOut {
                 remaining_vector: data,
-                index,
                 indent,
                 fancy_out: fancy_output_prep,
             })
@@ -608,15 +580,12 @@ fn deal_with_enum (v1: &Vec<EnumVariant>, mut data: Vec<u8>, type_database: &Vec
                     None => format!(",{}", (Card::FieldNumber{number: i, docs: ""}).card(index, indent)),
                 };
                 fancy_out.push_str(&fancy_output_prep);
-                index = index + 1;
                 let after_run = decode_simple(&y.field_type, data, type_database, index, indent+1, chain_specs)?;
                 data = after_run.remaining_vector;
-                index = after_run.index;
                 fancy_out.push_str(&after_run.fancy_out);
             }
             Ok(DecodedOut {
                 remaining_vector: data,
-                index,
                 indent,
                 fancy_out,
             })
@@ -643,7 +612,7 @@ fn deal_with_enum (v1: &Vec<EnumVariant>, mut data: Vec<u8>, type_database: &Vec
 ///
 /// The function outputs the DecodedOut value in case of success.
 
-fn decode_simple (found_ty: &str, mut data: Vec<u8>, type_database: &Vec<TypeEntry>, mut index: u32, indent: u32, chain_specs: &ChainSpecs) -> Result<DecodedOut, Error> {
+fn decode_simple (found_ty: &str, mut data: Vec<u8>, type_database: &Vec<TypeEntry>, index: &mut u32, indent: u32, chain_specs: &ChainSpecs) -> Result<DecodedOut, Error> {
 
     if data.len()==0 {return Err(Error::UnableToDecode(UnableToDecode::DataTooShort))}
     match decode_primitive(&found_ty, &data, index, indent, chain_specs) {
@@ -680,10 +649,8 @@ fn decode_simple (found_ty: &str, mut data: Vec<u8>, type_database: &Vec<TypeEnt
                                             Some(x) => {
                                                 let fancy_output_prep = format!(",{}", (Card::FieldNumber{number: i, docs: ""}).card(index, indent));
                                                 fancy_out.push_str(&fancy_output_prep);
-                                                index = index + 1;
                                                 let inner_ty = x.as_str();
                                                 let after_run = decode_simple(inner_ty, data, type_database, index, indent+1, chain_specs)?;
-                                                index = after_run.index;
                                                 fancy_out.push_str(&after_run.fancy_out);
                                                 data = after_run.remaining_vector;
                                             },
@@ -693,7 +660,6 @@ fn decode_simple (found_ty: &str, mut data: Vec<u8>, type_database: &Vec<TypeEnt
                                     }
                                     Ok(DecodedOut{
                                         remaining_vector: data,
-                                        index,
                                         indent,
                                         fancy_out,
                                     })

@@ -1,4 +1,3 @@
-use hex;
 use sp_core::{Pair, ed25519, sr25519, ecdsa};
 use std::convert::TryInto;
 use definitions::network_specs::Verifier;
@@ -26,7 +25,7 @@ pub fn pass_crypto(data_hex: &str) -> Result<InfoPassedCrypto, Error> {
             let into_signature: [u8;64] = data[data.len()-64..].try_into().expect("fixed size should fit in array");
             let signature = ed25519::Signature::from_raw(into_signature);
             if ed25519::Pair::verify(&signature, &message, &pubkey) {
-                let verifier = Verifier::Ed25519(hex::encode(&into_pubkey));
+                let verifier = Verifier::Ed25519(into_pubkey);
                 Ok(InfoPassedCrypto {
                     verifier,
                     message,
@@ -44,7 +43,7 @@ pub fn pass_crypto(data_hex: &str) -> Result<InfoPassedCrypto, Error> {
             let into_signature: [u8;64] = data[data.len()-64..].try_into().expect("fixed size should fit in array");
             let signature = sr25519::Signature::from_raw(into_signature);
             if sr25519::Pair::verify(&signature, &message, &pubkey) {
-                let verifier = Verifier::Sr25519(hex::encode(&into_pubkey));
+                let verifier = Verifier::Sr25519(into_pubkey);
                 Ok(InfoPassedCrypto {
                     verifier,
                     message,
@@ -62,7 +61,7 @@ pub fn pass_crypto(data_hex: &str) -> Result<InfoPassedCrypto, Error> {
             let into_signature: [u8;65] = data[data.len()-65..].try_into().expect("fixed size should fit in array");
             let signature = ecdsa::Signature::from_raw(into_signature);
             if ecdsa::Pair::verify(&signature, &message, &pubkey) {
-                let verifier = Verifier::Ecdsa(hex::encode(&into_pubkey));
+                let verifier = Verifier::Ecdsa(into_pubkey);
                 Ok(InfoPassedCrypto {
                     verifier,
                     message,

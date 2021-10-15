@@ -3,19 +3,20 @@ use definitions::history::{Event, Entry};
 use parity_scale_codec::{Decode, Encode};
 use anyhow;
 use chrono::Utc;
-use sled::{Db, Tree};
+use sled::{Db, Batch};
 
-use crate::helpers::{open_db, open_tree, clear_tree, flush_db, insert_into_tree};
+use crate::db_transactions::TrDbCold;
 use crate::error::{Error, NotDecodeable};
+use crate::helpers::{open_db, open_tree, make_batch_clear_tree};
 
-pub type Order = u64;
+type Order = u64;
 
 pub fn print_history(database_name: &str) -> anyhow::Result<String> {
     let database = open_db(database_name)?;
     print_history_tree(&database)
 }
 
-pub fn print_history_tree(database: &Db) -> anyhow::Result<String> {
+pub (crate) fn print_history_tree(database: &Db) -> anyhow::Result<String> {
     let history = open_tree(&database, HISTORY)?;
     let mut out = String::from("[");
     for x in history.iter() {
@@ -37,42 +38,42 @@ pub fn print_history_tree(database: &Db) -> anyhow::Result<String> {
 }
 
 pub fn clear_history(database_name: &str) -> anyhow::Result<()> {
+    let batch = make_batch_clear_tree(database_name, HISTORY)?;
     let events = vec![Event::HistoryCleared];
-    clear_and_add(database_name, events)
+    TrDbCold::new()
+        .set_history(events_in_batch(&database_name, batch, events)?)
+        .apply(&database_name)
 }
 
 pub fn init_history(database_name: &str) -> anyhow::Result<()> {
+    let batch = make_batch_clear_tree(database_name, HISTORY)?;
     let events = vec![Event::DatabaseInitiated];
-    clear_and_add(database_name, events)
+    TrDbCold::new()
+        .set_history(events_in_batch(&database_name, batch, events)?)
+        .apply(&database_name)
 }
 
-fn clear_and_add(database_name: &str, events: Vec<Event>) -> anyhow::Result<()> {
+pub fn events_to_batch(database_name: &str, events: Vec<Event>) -> anyhow::Result<Batch> {
+    events_in_batch(database_name, Batch::default(), events)
+}
+
+pub fn events_in_batch(database_name: &str, mut out_prep: Batch, events: Vec<Event>) -> anyhow::Result<Batch> {
     let database = open_db(database_name)?;
     let history = open_tree(&database, HISTORY)?;
-    clear_tree(&history)?;
-    flush_db(&database)?;
-    enter_events_into_tree(&history, events)?;
-    flush_db(&database)?;
-    Ok(())
-}
-
-pub fn enter_events(database_name: &str, events: Vec<Event>) -> anyhow::Result<()> {
-    let database = open_db(database_name)?;
-    let history = open_tree(&database, HISTORY)?;
-    enter_events_into_tree(&history, events)?;
-    flush_db(&database)?;
-    Ok(())
-}
-
-pub fn enter_events_into_tree(history: &Tree, events: Vec<Event>) -> anyhow::Result<()> {
     let order = history.len() as Order;
     let timestamp = Utc::now().to_string();
     let history_entry = Entry {
         timestamp,
         events,
     };
-    insert_into_tree(order.encode(), history_entry.encode(), &history)?;
-    Ok(())
+    out_prep.insert(order.encode(), history_entry.encode());
+    Ok(out_prep)
+}
+
+pub fn enter_events(database_name: &str, events: Vec<Event>) -> anyhow::Result<()> {
+    TrDbCold::new()
+        .set_history(events_to_batch(&database_name, events)?)
+        .apply(&database_name)
 }
 
 pub fn history_entry_user(database_name: &str, string_from_user: String) -> anyhow::Result<()> {
@@ -87,21 +88,6 @@ pub fn history_entry_system(database_name: &str, string_from_system: String) -> 
 
 pub fn device_was_online(database_name: &str) -> anyhow::Result<()> {
     let events = vec![Event::DeviceWasOnline];
-    enter_events(database_name, events)
-}
-
-pub fn seeds_were_accessed(database_name: &str) -> anyhow::Result<()> {
-    let events = vec![Event::SeedsWereAccessed];
-    enter_events(database_name, events)
-}
-
-pub fn seed_name_was_accessed(database_name: &str, seed_name: String) -> anyhow::Result<()> {
-    let events = vec![Event::SeedNameWasAccessed(seed_name)];
-    enter_events(database_name, events)
-}
-
-pub fn seeds_were_shown(database_name: &str) -> anyhow::Result<()> {
-    let events = vec![Event::SeedsWereShown];
     enter_events(database_name, events)
 }
 

@@ -1,15 +1,15 @@
-use anyhow;
-use transaction_signing::*;
+use transaction_signing::handle_stub;
 use constants::COLD_DB_NAME;
 
 
-fn main() -> anyhow::Result<()> {
-    let mock_action_line = r#"{"type":"sign_transaction","checksum":"3665731191"}"#;
-    let seed_phrase = "bottom drive obey lake curtain smoke basket hold race lonely fit walk";
-    let pwd_entry = "jaskier";
-    let user_comment = "";
-    let result = handle_action(&mock_action_line, seed_phrase, pwd_entry, user_comment, COLD_DB_NAME)?;
-    println!("{}", result);
-    Ok(())
+fn main() {
+    let mock_stub = "3665731191";
+//    let seed_phrase = "bottom drive obey lake curtain smoke basket hold race lonely fit walk";
+//    let pwd_entry = "jaskier";
+//    let user_comment = "";
+    match handle_stub(&mock_stub, COLD_DB_NAME) {
+        Ok(()) => println!("Success"),
+        Err(e) => println!("Error. {}", e),
+    }
 }
 

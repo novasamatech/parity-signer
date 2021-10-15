@@ -1,4 +1,5 @@
 use sled;
+use definitions::{keyring::{NetworkSpecsKey, VerifierKey}, network_specs::Verifier};
 
 #[derive(PartialEq)]
 pub enum Error {
@@ -15,23 +16,24 @@ pub enum BadInputData {
     NotSubstrate,
     NotHex,
     CryptoNotSupported,
-    UnexpectedImmortality,
-    UnexpectedMortality,
+//    UnexpectedImmortality,
+//    UnexpectedMortality,
     WrongPayloadType,
     GenesisHashMismatch,
     ImmortalHashMismatch,
     SomeDataNotUsed,
+    LoadMetaUnknownNetwork(String),
     NotMeta,
     MetaVersionBelow12,
-    MetaMismatch,
     MetaAlreadyThere,
     MetaTotalMismatch,
     VersionNotDecodeable,
     NoMetaVersion,
     UnableToDecodeMeta,
+    SpecsAlreadyThere,
     UnableToDecodeTypes,
     TypesAlreadyThere,
-    UnableToDecodeAddNetworkMessage,
+    UnableToDecodeAddSpecsMessage,
     UnableToDecodeLoadMetadataMessage,
     ImportantSpecsChanged,
     EncryptionMismatch,
@@ -64,8 +66,8 @@ pub enum UnableToDecode {
     NotBitStoreType,
     NotBitOrderType,
     BitVecFailure,
-    NotRangeIndex,
-    RangeFailure,
+//    NotRangeIndex,
+//    RangeFailure,
 }
 
 #[derive(PartialEq)]
@@ -82,7 +84,12 @@ pub enum DatabaseError {
     DamagedGeneralVerifier,
     NoGeneralVerifier,
     DamagedNetworkVerifier,
-    NoNetworkVerifier ([u8; 32]),
+    NetworkSpecsKeyMismatch (NetworkSpecsKey),
+    UnexpectedlyMetGenesisHash (Vec<u8>),
+    DifferentNamesSameGenesisHash (Vec<u8>),
+    Temporary(String),
+    DeadVerifier(String),
+    CustomVerifierIsGeneral(VerifierKey),
 }
 
 #[derive(PartialEq)]
@@ -100,12 +107,14 @@ pub enum SystemError {
 #[derive(PartialEq)]
 pub enum CryptoError {
     BadSignature,
-    VerifierChanged {old_show: String, new_show: String},
+    AddSpecsVerifierChanged {network_name: String, old: Verifier, new: Verifier},
     VerifierDisappeared,
-    GeneralVerifierChanged {old_show: String, new_show: String},
+    GeneralVerifierChanged {old: Verifier, new: Verifier},
     GeneralVerifierDisappeared,
-    NetworkExistsVerifierDisappeared,
-    
+    LoadMetaUpdVerifier{network_name: String, new_verifier: Verifier},
+    LoadMetaVerifierChanged{network_name: String, old: Verifier, new: Verifier},
+    LoadMetaUpdGeneralVerifier{network_name: String, new_verifier: Verifier},
+    LoadMetaGeneralVerifierChanged{network_name: String, old: Verifier, new: Verifier},
 }
 
 impl Error {
@@ -117,23 +126,24 @@ impl Error {
                     BadInputData::NotSubstrate => String::from("Only Substrate transactions are supported. Transaction is expected to start with 0x53."),
                     BadInputData::NotHex => String::from("Input data not in hex format."),
                     BadInputData::CryptoNotSupported => String::from("Crypto type not supported."),
-                    BadInputData::UnexpectedImmortality => String::from("Expected mortal transaction due to prelude format. Found immortal transaction."),
-                    BadInputData::UnexpectedMortality => String::from("Expected immortal transaction due to prelude format. Found mortal transaction."),
+//                    BadInputData::UnexpectedImmortality => String::from("Expected mortal transaction due to prelude format. Found immortal transaction."),
+//                    BadInputData::UnexpectedMortality => String::from("Expected immortal transaction due to prelude format. Found mortal transaction."),
                     BadInputData::WrongPayloadType => String::from("Wrong payload type, as announced by prelude."),
                     BadInputData::GenesisHashMismatch => String::from("Genesis hash from extrinsics not matching with genesis hash at the transaction end."),
                     BadInputData::ImmortalHashMismatch => String::from("Block hash for immortal transaction not matching genesis hash for the network."),
                     BadInputData::SomeDataNotUsed => String::from("After decoding some data remained unused."),
+                    BadInputData::LoadMetaUnknownNetwork(x) => format!("Network {} in not in the database. Add network before loading the metadata.", x),
                     BadInputData::NotMeta => String::from("First characters in metadata are expected to be 0x6d657461."),
                     BadInputData::MetaVersionBelow12 => String::from("Received metadata could not be decoded. Runtime metadata version is below 12."),
-                    BadInputData::MetaMismatch => String::from("Received metadata specname does not match."),
                     BadInputData::MetaAlreadyThere => String::from("Metadata already in database."),
                     BadInputData::MetaTotalMismatch => String::from("Attempt to load different metadata for same name and version."),
                     BadInputData::VersionNotDecodeable => String::from("Received metadata version could not be decoded."),
                     BadInputData::NoMetaVersion => String::from("No version in received metadata."),
                     BadInputData::UnableToDecodeMeta => String::from("Unable to decode received metadata."),
+                    BadInputData::SpecsAlreadyThere => String::from("Network specs from the message are already in the database."),
                     BadInputData::UnableToDecodeTypes => String::from("Unable to decode received types information."),
                     BadInputData::TypesAlreadyThere => String::from("Types information already in database."),
-                    BadInputData::UnableToDecodeAddNetworkMessage => String::from("Unable to decode received add network message."),
+                    BadInputData::UnableToDecodeAddSpecsMessage => String::from("Unable to decode received add specs message."),
                     BadInputData::UnableToDecodeLoadMetadataMessage => String::from("Unable to decode received load metadata message."),
                     BadInputData::ImportantSpecsChanged => String::from("Network already has entries. Important chainspecs in received add network message are different."),
                     BadInputData::EncryptionMismatch => String::from("Encryption used in message is not supported by the network."),
@@ -166,8 +176,8 @@ impl Error {
                     UnableToDecode::NotBitStoreType => String::from("Error decoding call content. Declared type is not suitable BitStore type for BitVec."),
                     UnableToDecode::NotBitOrderType => String::from("Error decoding call content. Declared type is not suitable BitOrder type for BitVec."),
                     UnableToDecode::BitVecFailure => String::from("Error decoding call content. Could not decode BitVec."),
-                    UnableToDecode::NotRangeIndex => String::from("Error decoding call content. Declared type is not suitable index type for Range."),
-                    UnableToDecode::RangeFailure => String::from("Error decoding call content. Could not decode Range."),
+//                    UnableToDecode::NotRangeIndex => String::from("Error decoding call content. Declared type is not suitable index type for Range."),
+//                    UnableToDecode::RangeFailure => String::from("Error decoding call content. Could not decode Range."),
                 }
             },
             Error::DatabaseError(x) => {
@@ -184,7 +194,12 @@ impl Error {
                     DatabaseError::DamagedGeneralVerifier => String::from("General verifier information from database could not be decoded."),
                     DatabaseError::NoGeneralVerifier => String::from("No general verifier information in the database."),
                     DatabaseError::DamagedNetworkVerifier => String::from("Network verifier is damaged and could not be decoded."),
-                    DatabaseError::NoNetworkVerifier(x) => format!("No network verifier information in the database for genesis hash {}.", hex::encode(x)),
+                    DatabaseError::NetworkSpecsKeyMismatch(x) => format!("Network specs stored under key {} do not match it.", hex::encode(x.key())),
+                    DatabaseError::UnexpectedlyMetGenesisHash(x) => format!("No verifier information corresponding to genesis hash {}, however, genesis hash is encountered in network specs", hex::encode(x)),
+                    DatabaseError::DifferentNamesSameGenesisHash(x) => format!("Different network names in database for same genesis hash {}.", hex::encode(x)),
+                    DatabaseError::Temporary(x) => format!("Error setting stub into storage. {}", x),
+                    DatabaseError::DeadVerifier(x) => format!("Network {} is disabled. It could be enabled again only after complete wipe and re-installation of Signer.", x),
+                    DatabaseError::CustomVerifierIsGeneral(x) => format!("Custom verifier for VerifierKey {} is same as general verifier.", hex::encode(x.key())),
                 }
             },
             Error::SystemError(x) => {
@@ -202,11 +217,14 @@ impl Error {
             Error::CryptoError(x) => {
                 match x {
                     CryptoError::BadSignature => String::from("Corrupted data. Bad signature."),
-                    CryptoError::VerifierChanged {old_show, new_show} => format!("Different verifier was used for this network previously. Previously used {}. Current attempt {}.", old_show, new_show),
-                    CryptoError::VerifierDisappeared => String::from("Saved metadata for this network was signed by a verifier. This metadata is not."),
-                    CryptoError::GeneralVerifierChanged {old_show, new_show} => format!("Different general verifier was used previously. Previously used {}. Current attempt {}.", old_show, new_show),
+                    CryptoError::AddSpecsVerifierChanged {network_name, old, new} => format!("Network {} current verifier is {}. Received add_specs message is verified by {}, which is neither current network verifier not the general verifier. Changing the network verifier to another non-general one would require wipe and reset of Signer.", network_name, old.show_error(), new.show_error()),
+                    CryptoError::VerifierDisappeared => String::from("Saved information for this network was signed by a verifier. Received information is not signed."),
+                    CryptoError::GeneralVerifierChanged {old, new} => format!("Different general verifier was used previously. Previously used {}. Current attempt {}.", old.show_error(), new.show_error()),
                     CryptoError::GeneralVerifierDisappeared => String::from("General verifier information exists in the database. Received information could be accepted only from the same general verifier."),
-                    CryptoError::NetworkExistsVerifierDisappeared => String::from("Network already has specs recorded in database. Received add network message is not signed, previously this network information was signed."),
+                    CryptoError::LoadMetaUpdVerifier{network_name, new_verifier} => format!("Network {} currently has no verifier set up. Received load_metadata message is verified by {}. In order to accept verified metadata, first download properly verified network specs.", network_name, new_verifier.show_error()),
+                    CryptoError::LoadMetaVerifierChanged{network_name, old, new} => format!("Network {} current verifier is {}. Received load_metadata message is verified by {}. Changing verifier for the network would require wipe and reset of Signer.", network_name, old.show_error(), new.show_error()),
+                    CryptoError::LoadMetaUpdGeneralVerifier{network_name, new_verifier} => format!("Network {} is set to be verified by the general verifier, however, no general verifier is set up. Received load_metadata message is verified by {}. In order to accept verified metadata and set up the general verifier, first download properly verified network specs.", network_name, new_verifier.show_error()),
+                    CryptoError::LoadMetaGeneralVerifierChanged{network_name, old, new} => format!("Network {} is verified by the general verifier which currently is {}. Received load_metadata message is verified by {}. Changing the general verifier or changing the network verifier to custom would require wipe and reset of Signer.", network_name, old.show_error(), new.show_error()),
                 }
             },
         }

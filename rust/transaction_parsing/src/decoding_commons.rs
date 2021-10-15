@@ -16,7 +16,6 @@ use crate::error::{Error, SystemError, UnableToDecode};
 
 pub struct DecodedOut {
     pub remaining_vector: Vec<u8>,
-    pub index: u32,
     pub indent: u32,
     pub fancy_out: String,
 }
@@ -75,7 +74,7 @@ pub fn get_compact<T> (data: &Vec<u8>) -> Result<CutCompact<T>, Error>
 ///
 /// The function outputs the DecodedOut value in case of success.
 
-pub fn decode_perthing<T> (data: &Vec<u8>, compact_flag: bool, found_ty: &str, mut index: u32, indent: u32) -> Result<DecodedOut, Error> 
+pub fn decode_perthing<T> (data: &Vec<u8>, compact_flag: bool, found_ty: &str, index: &mut u32, indent: u32) -> Result<DecodedOut, Error> 
     where 
         T: PerThing + Decode + HasCompact,
         Compact<T>: Decode
@@ -104,10 +103,8 @@ pub fn decode_perthing<T> (data: &Vec<u8>, compact_flag: bool, found_ty: &str, m
             }
         }
     };
-    index = index + 1;
     Ok(DecodedOut{
         remaining_vector,
-        index,
         indent,
         fancy_out,
     })
@@ -126,18 +123,16 @@ pub fn decode_perthing<T> (data: &Vec<u8>, compact_flag: bool, found_ty: &str, m
 ///
 /// The function outputs the DecodedOut value in case of success.
 
-pub fn decode_known_length<T: Decode + std::fmt::Display>(data: &Vec<u8>, found_ty: &str, mut index: u32, indent: u32) -> Result<DecodedOut, Error> {
+pub fn decode_known_length<T: Decode + std::fmt::Display>(data: &Vec<u8>, found_ty: &str, index: &mut u32, indent: u32) -> Result<DecodedOut, Error> {
     let length = size_of::<T>();
     if data.len() < length {return Err(Error::UnableToDecode(UnableToDecode::DataTooShort))}
     let decoded_data = <T>::decode(&mut &data[..length]);
     match decoded_data {
         Ok(x) => {
             let fancy_out = format!(",{}", (Card::Default(&x.to_string())).card(index, indent));
-            index = index + 1;
             let remaining_vector = data[length..].to_vec();
             Ok(DecodedOut {
                 remaining_vector,
-                index,
                 indent,
                 fancy_out,
             })
@@ -163,7 +158,7 @@ pub fn decode_known_length<T: Decode + std::fmt::Display>(data: &Vec<u8>, found_
 ///
 /// The function outputs the DecodedOut value in case of success.
 
-pub fn decode_primitive_with_flags <T> (data: &Vec<u8>, compact_flag: bool, balance_flag: bool, found_ty: &str, mut index: u32, indent: u32, chain_specs: &ChainSpecs) -> Result<DecodedOut, Error> 
+pub fn decode_primitive_with_flags <T> (data: &Vec<u8>, compact_flag: bool, balance_flag: bool, found_ty: &str, index: &mut u32, indent: u32, chain_specs: &ChainSpecs) -> Result<DecodedOut, Error> 
     where 
         T: Decode + HasCompact + std::fmt::Display,
         Compact<T>: Decode
@@ -180,14 +175,12 @@ pub fn decode_primitive_with_flags <T> (data: &Vec<u8>, compact_flag: bool, bala
             }
             else {format!(",{}", (Card::Default(&compact_found.compact_found.to_string())).card(index, indent))}
         };
-        index = index + 1;
         let remaining_vector = match compact_found.start_next_unit {
             Some(x) => (data[x..]).to_vec(),
             None => Vec::new(),
         };
         Ok(DecodedOut{
             remaining_vector,
-            index,
             indent,
             fancy_out,
         })
@@ -208,11 +201,9 @@ pub fn decode_primitive_with_flags <T> (data: &Vec<u8>, compact_flag: bool, bala
                     }
                     else {format!(",{}", (Card::Default(&x.to_string())).card(index, indent))}
                 };
-                index = index + 1;
                 let remaining_vector = data[length..].to_vec();
                 Ok(DecodedOut {
                     remaining_vector,
-                    index,
                     indent,
                     fancy_out,
                 })
@@ -239,7 +230,7 @@ pub fn decode_primitive_with_flags <T> (data: &Vec<u8>, compact_flag: bool, bala
 ///
 /// Resulting AccountId in base58 form is added to fancy_out on js card "Id".
 
-pub fn special_case_account_id (data: Vec<u8>, mut index: u32, indent: u32, chain_specs: &ChainSpecs) -> Result<DecodedOut, Error> {
+pub fn special_case_account_id (data: Vec<u8>, index: &mut u32, indent: u32, chain_specs: &ChainSpecs) -> Result<DecodedOut, Error> {
     match data.get(0..32) {
         Some(a) => {
             match <[u8; 32]>::decode(&mut &a[..]) {
@@ -248,10 +239,8 @@ pub fn special_case_account_id (data: Vec<u8>, mut index: u32, indent: u32, chai
                     let account_id = AccountId32::new(x);
                     let base58print = account_id.to_ss58check_with_version(Ss58AddressFormat::Custom(chain_specs.base58prefix));
                     let fancy_out = format!(",{}", (Card::Id(&base58print)).card(index, indent));
-                    index = index + 1;
                     Ok(DecodedOut {
                         remaining_vector,
-                        index,
                         indent,
                         fancy_out,
                     })

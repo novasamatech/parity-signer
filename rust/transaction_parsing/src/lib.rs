@@ -1,8 +1,6 @@
-mod add_network;
-    use add_network::add_network;
-//mod add_specs;
-//    use add_specs::add_specs;
-pub mod cards;
+mod add_specs;
+    use add_specs::add_specs;
+mod cards;
     use cards::Card;
 mod check_signature;
 mod decoding_older;
@@ -18,11 +16,10 @@ mod load_types;
 mod method;
 mod parse_transaction;
     use parse_transaction::parse_transaction;
-pub mod test_all_cards;
+mod test_all_cards;
     use test_all_cards::make_all_cards;
 mod tests;
-mod utils;
-    use utils::purge;
+
 
 
 /// Payload in hex format as it arrives into handling contains following elements:
@@ -43,14 +40,11 @@ fn handle_scanner_input (payload: &str, dbname: &str) -> Result<String, Error> {
     
     if &data_hex[..2] != "53" {return Err(Error::BadInputData(BadInputData::NotSubstrate))}
     
-    purge(dbname)?;
-    
     match &data_hex[4..6] {
         "00"|"02" => parse_transaction(data_hex, dbname),
         "80" => load_metadata(data_hex, dbname),
         "81" => load_types(data_hex, dbname),
-        "c0" => add_network(data_hex, dbname),
-//        "c1" => add_specs(data_hex, dbname),
+        "c1" => add_specs(data_hex, dbname),
         "f0" => Ok(make_all_cards()),
         _ => return Err(Error::BadInputData(BadInputData::WrongPayloadType)),
     }
@@ -59,6 +53,6 @@ fn handle_scanner_input (payload: &str, dbname: &str) -> Result<String, Error> {
 pub fn produce_output (payload: &str, dbname: &str) -> String {
     match handle_scanner_input (payload, dbname) {
         Ok(out) => out,
-        Err(e) => format!("{{\"error\":[{}]}}", Card::Error(e).card(0,0)),
+        Err(e) => format!("{{\"error\":[{}]}}", Card::Error(e).card(&mut 0,0)),
     }
 }
