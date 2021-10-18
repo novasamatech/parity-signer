@@ -16,6 +16,8 @@ struct NetworkSelector: View {
             if data.keyManagerModal == .networkManager {
                 data.keyManagerModal = .none
             } else {
+                print(UIScreen.main.bounds.height)
+                print(UIScreen.main.nativeBounds)
                 data.keyManagerModal = .networkManager
             }
         })  {

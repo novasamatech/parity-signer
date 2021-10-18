@@ -16,7 +16,7 @@ struct HistoryCardTemplate: View {
     
     var body: some View {
         HStack (alignment: .center) {
-            Image(systemName: image).imageScale(.large).foregroundColor(Color(color)).padding()
+            Image(systemName: image).imageScale(.large).foregroundColor(Color(color)).frame(width: 26.0).padding()
             VStack (alignment: .leading) {
                 Text(timestamp)
                 Text(line1)

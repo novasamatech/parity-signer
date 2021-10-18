@@ -71,6 +71,8 @@ extension SignerDataModel {
             self.transactionState = .none
         case .keys:
             switch self.keyManagerModal {
+            case .seedSelector:
+                self.keyManagerModal = .seedSelector
             case .none:
                 self.keyManagerModal = .seedSelector
             case .newSeed:
@@ -109,7 +111,12 @@ extension SignerDataModel {
                 return "Scan to publish"
             }
         case .keys:
-            return ""
+            switch self.keyManagerModal {
+            case .seedSelector:
+                return "Select Seed"
+            default:
+                return ""
+            }
         case .settings:
             return ""
         case .history:
