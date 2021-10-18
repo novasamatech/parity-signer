@@ -45,14 +45,6 @@ pub fn clear_history(database_name: &str) -> anyhow::Result<()> {
         .apply(&database_name)
 }
 
-pub fn init_history(database_name: &str) -> anyhow::Result<()> {
-    let batch = make_batch_clear_tree(database_name, HISTORY)?;
-    let events = vec![Event::DatabaseInitiated];
-    TrDbCold::new()
-        .set_history(events_in_batch(&database_name, batch, events)?)
-        .apply(&database_name)
-}
-
 pub fn events_to_batch(database_name: &str, events: Vec<Event>) -> anyhow::Result<Batch> {
     events_in_batch(database_name, Batch::default(), events)
 }

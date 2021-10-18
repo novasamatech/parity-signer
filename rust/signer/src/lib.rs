@@ -244,12 +244,20 @@ export! {
         db_handling::manage_history::clear_history(dbname)
     }
 
-    @Java_io_parity_signer_models_SignerDataModel_historyInitHistory
-	fn init_history(
+    @Java_io_parity_signer_models_SignerDataModel_historyInitHistoryWithCert
+	fn init_history_with_cert(
         dbname: &str
 	) -> anyhow::Result<(), anyhow::Error> {
-        db_handling::manage_history::init_history(dbname)
+        db_handling::cold_default::signer_init_with_cert(dbname)
     }
+
+    @Java_io_parity_signer_models_SignerDataModel_historyInitHistoryNoCert
+	fn init_history_no_cert(
+        dbname: &str
+	) -> anyhow::Result<(), anyhow::Error> {
+        db_handling::cold_default::signer_init_no_cert(dbname)
+    }
+
 
     @Java_io_parity_signer_models_SignerDataModel_historyDeviceWasOnline
 	fn device_was_online(
@@ -273,6 +281,15 @@ export! {
 	) -> anyhow::Result<(), anyhow::Error> {
         db_handling::manage_history::history_entry_system(dbname, entry.to_string())
     }
+
+    @Java_io_parity_signer_models_SignerDataModel_historyHistorySeedNameWasShown
+	fn history_seed_name_was_shown(
+        seed_name: &str,
+        dbname: &str
+	) -> anyhow::Result<(), anyhow::Error> {
+        db_handling::manage_history::seed_name_was_shown(dbname, seed_name.to_string())
+    }
+
 }
 
 ffi_support::define_string_destructor!(signer_destroy_string);
