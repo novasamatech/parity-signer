@@ -224,9 +224,9 @@ fn create_address (database: &Db, input_batch_prep: &Vec<(AddressKey, AddressDet
                     else {return Err(Error::AddressAlreadyExists{public: public_key.to_vec(), network: network_specs_key.key()}.show())}
                 },
                 Ok(None) => {
-                // Check for collisions in name
-                    let collided = filter_addresses_by_seed_name_and_name(&identities, &seed_name, name)?;
-                    if collided.len() !=0 {return Err(Error::IdentityExists.show())}
+                // Check for collisions in name - disabled
+                    //let collided = filter_addresses_by_seed_name_and_name(&identities, &seed_name, name)?;
+                    //if collided.len() !=0 {return Err(Error::IdentityExists.show())}
                     let cropped_path = match REG_PATH.captures(path) {
                         Some(caps) => match caps.name("path") {
                             Some(a) => a.as_str(),
@@ -630,7 +630,9 @@ mod tests {
         assert!(!check_derivation_format("//путь").expect("valid utf8 abomination"));
     }
 
+    //Duplicate names are actually allowed
     #[test]
+    #[ignore]
     fn must_fail_on_duplicate_identity_name() { 
         let dbname = "tests/must_fail_on_duplicate_name";
         let path_should_fail_0 = "//path-should-fail-0";
