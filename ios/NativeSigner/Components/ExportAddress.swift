@@ -31,6 +31,9 @@ struct ExportAddress: View {
                 image = data.exportIdentityQR()
             }
         }
+        .onDisappear {
+            data.selectedAddress = nil
+        }
         .gesture(
             TapGesture()
                 .onEnded {

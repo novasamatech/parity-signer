@@ -43,6 +43,16 @@ extension Address {
         return self.ss58.prefix(8) + "..." + self.ss58.suffix(8)
     }
     
+    /**
+     * Same as truncateBase58 but shorter for very space-constrained places
+     */
+    func truncateBase58to8() -> String {
+        return self.ss58.prefix(4) + "..." + self.ss58.suffix(4)
+    }
+    
+    /**
+     * Definition of root address
+     */
     func isRoot() -> Bool {
         return self.path == "" && self.has_password == "false"
     }

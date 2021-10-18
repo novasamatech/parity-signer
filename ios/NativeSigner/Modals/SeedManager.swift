@@ -16,7 +16,6 @@ struct SeedManager: View {
         ZStack {
             ModalBackdrop()
             VStack {
-                HeaderBar(line1: "SEEDS", line2: "select seed")
                 ScrollView {
                     LazyVStack {
                         ForEach(data.seedNames, id: \.self) {seed in
@@ -76,15 +75,7 @@ struct SeedManager: View {
                     }
                 }
                 Spacer()
-                Button(
-                    action: {data.keyManagerModal = .newSeed}) {
-                        HStack {
-                            Spacer()
-                            Text("New seed").font(.subheadline)
-                            Spacer()
-                        }
-                    }
-                    .buttonStyle(.bordered)
+                
             }
         }
     }
@@ -97,47 +88,13 @@ struct SeedManager: View {
  }
  }
  
- HStack {
- Button(action:{
- deleteConfirm = true
- }) {
- Text("Delete")
- .font(.largeTitle)
- .foregroundColor(Color("AccentColor"))
- }
- .alert(isPresented: $deleteConfirm, content: {
- Alert(
- title: Text("Delete seed?"),
- message: Text("You are about to delete seed " + seed),
- primaryButton: .cancel(),
- secondaryButton: .destructive(
- Text("Delete"),
- action: { data.removeSeed(seedName: seed)
- }
- )
- )
- })
- Spacer()
- Button(action:{
- seedPhrase = data.getSeed(seedName: data.selectedSeed, backup: true)
- showBackup = !seedPhrase.isEmpty
- }) {
- Text("Backup")
- .font(.largeTitle)
- .foregroundColor(Color("AccentColor"))
- }
- .alert(isPresented: $showBackup, content: {
- Alert(
- title: Text("Backup your seed phrase"),
- message: Text(seedPhrase),
- dismissButton: .default(
- Text("Done"),
- action: {
- seedPhrase = ""
- showBackup = false
- }
- )
- )
- })
- }.padding()
+ Button(
+     action: {data.keyManagerModal = .newSeed}) {
+         HStack {
+             Spacer()
+             Text("New seed").font(.subheadline)
+             Spacer()
+         }
+     }
+     .buttonStyle(.bordered)
  */

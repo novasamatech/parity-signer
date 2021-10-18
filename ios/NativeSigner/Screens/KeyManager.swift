@@ -55,7 +55,7 @@ struct KeyManager: View {
             case .seedSelector:
                 SeedManager()
             case .networkManager:
-                NetworkManager().frame(height: UIScreen.main.bounds.height).offset(y: 300)
+                NetworkManager().frame(height: UIScreen.main.bounds.height - 90.0).offset(y: UIScreen.main.bounds.height - 300.0)
             case .networkDetails:
                 NetworkDetails()
             case .none:
