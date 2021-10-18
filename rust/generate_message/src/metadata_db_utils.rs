@@ -1,8 +1,7 @@
-use sled::Tree;
-use definitions::metadata::{MetaValues, NameVersioned};
-use parity_scale_codec::Encode;
+use constants::{HOT_DB_NAME, METATREE};
+use definitions::{keyring::MetaKey, metadata::MetaValues};
 use anyhow;
-use db_handling::helpers::{clear_tree, insert_into_tree};
+use db_handling::{db_transactions::TrDbHot, helpers::{open_db, open_tree, make_batch_clear_tree}};
 
 use crate::error::Error;
 use crate::helpers::decode_and_check_meta_entry;
@@ -11,7 +10,9 @@ use crate::helpers::decode_and_check_meta_entry;
 
 /// Function to read network metadata entries existing in the metadata tree of the database
 /// into MetaValues vector, and clear the metadata tree after reading.
-fn read_metadata_database (metadata: &Tree) -> anyhow::Result<Vec<MetaValues>> {
+fn read_metadata_database () -> anyhow::Result<Vec<MetaValues>> {
+    let database = open_db(HOT_DB_NAME)?;
+    let metadata = open_tree(&database, METATREE)?;
     let mut out: Vec<MetaValues> = Vec::new();
     for x in metadata.iter() {
         if let Ok(a) = x {out.push(decode_and_check_meta_entry(a)?)}
@@ -148,22 +149,21 @@ pub fn add_new (new: &MetaValues, sorted: &SortedMetaValues) -> anyhow::Result<U
 
 /// Function to collect metadata from metadata tree of the database, clear that tree,
 /// and sort the metadata into newer and older subsets
-pub fn prepare_metadata (metadata: &Tree) -> anyhow::Result<SortedMetaValues> {
-    let known_metavalues = read_metadata_database(metadata)?;
+pub fn prepare_metadata () -> anyhow::Result<SortedMetaValues> {
+    let known_metavalues = read_metadata_database()?;
     sort_metavalues(known_metavalues)
 }
 
 /// Function to write sorted metadata into the database
-pub fn write_metadata (sorted_meta_values: SortedMetaValues, metadata: &Tree) -> anyhow::Result<()> {
-    clear_tree(&metadata)?;
+pub fn write_metadata (sorted_meta_values: SortedMetaValues) -> anyhow::Result<()> {
+    let mut metadata_batch = make_batch_clear_tree(HOT_DB_NAME, METATREE)?;
     let mut all_meta = sorted_meta_values.newer;
     all_meta.extend(sorted_meta_values.older);
     for x in all_meta.iter() {
-        let versioned_name = NameVersioned {
-            name: x.name.to_string(),
-            version: x.version,
-        };
-        insert_into_tree (versioned_name.encode(), x.meta.to_vec(), metadata)?;
+        let meta_key = MetaKey::from_parts(&x.name, x.version);
+        metadata_batch.insert(meta_key.key(), x.meta.to_vec());
     }
-    Ok(())
+    TrDbHot::new()
+        .set_metadata(metadata_batch)
+        .apply(HOT_DB_NAME)
 }

@@ -1,5 +1,5 @@
 use constants::EXPORT_FOLDER;
-use definitions::{crypto::Encryption, metadata::VersionDecoded, qr_transfers::{ContentLoadTypes, ContentLoadMeta, ContentAddNetwork, ContentAddSpecs}};
+use definitions::{crypto::Encryption, metadata::VersionDecoded, qr_transfers::{ContentLoadTypes, ContentLoadMeta, ContentAddSpecs}};
 use meta_reading::decode_metadata::get_meta_const;
 use hex;
 use sp_core::{Pair, ed25519, sr25519, ecdsa};
@@ -40,25 +40,6 @@ pub fn make_message (make: Make) -> anyhow::Result<()> {
                     }
                 },
                 Err(_) => {return Err(Error::NotLoadMetadata.show())},
-            }
-        },
-        Msg::AddNetwork(vec) => {
-            match ContentAddNetwork::from_vec(&vec).meta_specs() {
-                Ok((meta, network_specs)) => {
-                    match get_meta_const(&meta) {
-                        Ok(version_vector) => {
-                            match VersionDecoded::decode(&mut &version_vector[..]) {
-                                Ok(version) => {
-                                    if version.specname != network_specs.name {return Err(Error::MessageNameMismatch{name_meta: version.specname, name_specs: network_specs.name}.show())}
-                                    (vec, format!("add_network_{}V{}", version.specname, version.spec_version), "c0")
-                                },
-                                Err(_) => {return Err(Error::DamagedMetadata.show())},
-                            }
-                        },
-                        Err(_) => {return Err(Error::DamagedMetadata.show())},
-                    }
-                },
-                Err(_) => {return Err(Error::NotAddNetwork.show())},
             }
         },
         Msg::AddSpecs(vec) => {

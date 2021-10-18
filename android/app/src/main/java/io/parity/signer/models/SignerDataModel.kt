@@ -334,10 +334,10 @@ class SignerDataModel : ViewModel() {
 
 	fun signTransaction(password: String) {
 		authentication.authenticate(activity) {
-			signature = performTransaction(
-				sharedPreferences.getString(
+			signature = substrateHandleSign(
+				action.getJSONObject("payload").toString(), sharedPreferences.getString(
 					signingAuthor.getJSONObject("payload").getString("seed"), ""
-				) ?: "", password
+				) ?: "", password, "", dbName
 			)
 			_transactionState.value = TransactionState.Signed
 		}
@@ -347,18 +347,15 @@ class SignerDataModel : ViewModel() {
 		return signature.intoImageBitmap()
 	}
 
-	private fun performTransaction(seedPhrase: String, password: String): String {
-		return try {
-			substrateHandleAction(
+	private fun performTransaction(seedPhrase: String, password: String) {
+		try {
+			substrateHandleStub(
 				action.getJSONObject("payload").toString(),
-				seedPhrase,
-				password,
 				dbName
 			)
 		} catch (e: java.lang.Exception) {
 			Log.e("transaction failed", e.toString())
 			_lastError.value = e.toString()
-			""
 		}
 	}
 
@@ -764,10 +761,13 @@ class SignerDataModel : ViewModel() {
 		dbname: String
 	): String
 
-	external fun substrateHandleAction(
-		action: String,
+	external fun substrateHandleStub(checksum: String, dbname: String)
+
+	external fun substrateHandleSign(
+		checksum: String,
 		seedPhrase: String,
 		password: String,
+		userComment: String,
 		dbname: String
 	): String
 
@@ -828,12 +828,12 @@ class SignerDataModel : ViewModel() {
 	external fun substrateRemoveSeed(seedName: String, dbname: String)
 	external fun historyPrintHistory(dbname: String): String
 	external fun historyClearHistory(dbname: String)
-	external fun historyInitHistory(dbname: String)
+	external fun historyInitHistoryWithCert(dbname: String)
+	external fun historyInitHistoryNoCert(dbname: String)
 	external fun historyDeviceWasOnline(dbname: String)
-	external fun historySeedsWereAccessed(dbname: String)
-	external fun historySeedsWereShown(dbName: String)
 	external fun historyEntryUser(entry: String, dbname: String)
 	external fun historyEntrySystem(entry: String, dbname: String)
+	external fun historyHistorySeedNameWasShown(seedName: String, dbname: String)
 
 	//MARK: rust native section end
 

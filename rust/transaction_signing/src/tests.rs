@@ -1,54 +1,102 @@
-/// Separated new cold test databases are created during the tests,
-/// and removed after test is performed, so the test can run in parallel
-
 #[cfg(test)]
 mod tests {
-    use transaction_parsing::{produce_output, cards::Action};
-    use crate::{handle_action, error::{Error, ActionFailure}, interpretation::interpret_action, sign_transaction::create_signature};
-    use db_handling::{populate_cold, populate_cold_no_networks, populate_cold_no_meta};
-    use constants::{METATREE, SPECSTREE};
+    use hex;
+    use transaction_parsing::produce_output;
+    use crate::{checksum, handle_stub, sign_transaction::create_signature};
+    use db_handling::{cold_default::{populate_cold, populate_cold_no_networks}};
+    use definitions::{keyring::{AddressKey, MetaKey, NetworkSpecsKey, VerifierKey}, network_specs::{CurrentVerifier, ChainSpecs, Verifier}, users::AddressDetails};
+    use constants::{ADDRTREE, GENERALVERIFIER, METATREE, SETTREE, SPECSTREE, VERIFIERS};
+    use parity_scale_codec::Decode;
     use std::fs;
     use sled::{Db, open, Tree};
     use regex::Regex;
     use lazy_static::lazy_static;
     
-    const METADATA_FILE: &str = "for_tests/metadata_database.ts";
     const SEED_PHRASE: &str = "bottom drive obey lake curtain smoke basket hold race lonely fit walk";
     const PWD: &str = "jaskier";
     const USER_COMMENT: &str = "";
+    const ALICE: [u8; 32] = [212, 53, 147, 199, 21, 253, 211, 28, 97, 20, 26, 189, 4, 169, 159, 214, 130, 44, 133, 88, 133, 76, 205, 227, 154, 86, 132, 231, 165, 109, 162, 125];
     
     lazy_static! {
-        static ref ACTION: Regex = Regex::new(r#"(?i)"action":\{.*?,"payload":(?P<action_line>\{[^}]*\})\}"#).expect("constructed from checked static value");
+        static ref ACTION: Regex = Regex::new(r#"(?i)"action":\{"type":"(?P<type>sign|stub)","payload":"(?P<payload>[0-9]+)"\}"#).expect("constructed from checked static value");
     }
     
-    fn get_action_line(reply: &str) -> String {
+    fn get_type_and_checksum(reply: &str) -> (bool, String) {
         let caps = ACTION.captures(&reply).unwrap();
-        caps.name("action_line").unwrap().as_str().to_string()
+        let action_is_sign = match caps.name("type").unwrap().as_str() {
+            "sign" => true,
+            "stub" => false,
+            _ => unreachable!(),
+        };
+        let checksum = caps.name("payload").unwrap().as_str().to_string();
+        (action_is_sign, checksum)
     }
     
-    fn sign_action_test (action_line: &str, seed_phrase: &str, pwd_entry: &str, user_comment: &str, dbname: &str) -> anyhow::Result<String> {
-        let action = interpret_action (action_line)?;
-        if let Action::SignTransaction(checksum) = action {create_signature(seed_phrase, pwd_entry, user_comment, dbname, checksum)}
-        else {return Err(Error::NoAction(ActionFailure::SignTransaction).show())}
+    fn sign_action_test (action_is_sign: bool, checksum_str: &str, seed_phrase: &str, pwd_entry: &str, user_comment: &str, dbname: &str) -> anyhow::Result<String> {
+        if action_is_sign {
+            let checksum = checksum(checksum_str)?;
+            create_signature(seed_phrase, pwd_entry, user_comment, dbname, checksum)
+        }
+        else {panic!("Should have been action `sign`.")}
     }
     
-    fn meta_count_test (dbname: &str) -> usize {
-         let database: Db = open(dbname).unwrap();
-         let metadata: Tree = database.open_tree(METATREE).unwrap();
-         metadata.len()
-    }
-    
-    fn specs_count_test (dbname: &str) -> usize {
-         let database: Db = open(dbname).unwrap();
-         let chainspecs: Tree = database.open_tree(SPECSTREE).unwrap();
-         chainspecs.len()
+    fn print_db_content (dbname: &str) -> String {
+        let database: Db = open(dbname).unwrap();
+        let mut metadata_str = String::new();
+        let metadata: Tree = database.open_tree(METATREE).unwrap();
+        for x in metadata.iter() {
+            if let Ok((meta_key_vec, _)) = x {
+                let meta_key = MetaKey::from_vec(&meta_key_vec.to_vec());
+                let (name, version) = meta_key.name_version().unwrap();
+                metadata_str.push_str(&format!("\n\t{}{}", name, version));
+            }
+        }
+        let mut network_specs_str = String::new();
+        let chainspecs: Tree = database.open_tree(SPECSTREE).unwrap();
+        for x in chainspecs.iter() {
+            if let Ok((network_specs_key_vec, network_specs_encoded)) = x {
+                let network_specs = ChainSpecs::decode(&mut &network_specs_encoded[..]).unwrap();
+                let network_specs_key = NetworkSpecsKey::from_vec(&network_specs_key_vec.to_vec());
+                network_specs_str.push_str(&format!("\n\t{}: {} ({} with {})", hex::encode(network_specs_key.key()), network_specs.title, network_specs.name, network_specs.encryption.show()));
+            }
+        }
+        let settings: Tree = database.open_tree(SETTREE).unwrap();
+        let general_verifier_encoded = settings.get(&GENERALVERIFIER).unwrap().unwrap();
+        let general_verifier = Verifier::decode(&mut &general_verifier_encoded[..]).unwrap();
+        
+        let mut verifiers_str = String::new();
+        let verifiers: Tree = database.open_tree(VERIFIERS).unwrap();
+        for x in verifiers.iter() {
+            if let Ok((verifier_key_vec, current_verifier_encoded)) = x {
+                let verifier_key = VerifierKey::from_vec(&verifier_key_vec.to_vec());
+                let current_verifier = CurrentVerifier::decode(&mut &current_verifier_encoded[..]).unwrap();
+                verifiers_str.push_str(&format!("\n\t{}: {}", hex::encode(verifier_key.key()), current_verifier.show(&general_verifier)));
+            }
+        }
+        
+        let mut identities_str = String::new();
+        let identities: Tree = database.open_tree(ADDRTREE).unwrap();
+        for x in identities.iter() {
+            if let Ok((address_key_vec, address_details_encoded)) = x {
+                let address_key = AddressKey::from_vec(&address_key_vec.to_vec());
+                let address_details = AddressDetails::decode(&mut &address_details_encoded[..]).unwrap();
+                let (public_key, encryption) = address_key.public_key_encryption().unwrap();
+                let mut networks_str = String::new();
+                for y in address_details.network_id.iter() {
+                    networks_str.push_str(&format!("\n\t\t{}", hex::encode(y.key())))
+                }
+                identities_str.push_str(&format!("\n\tpublic_key: {}, encryption: {}, path: {}, available_networks: {}", hex::encode(public_key), encryption.show(), address_details.path, networks_str));
+            }
+        }
+        
+        format!("Database contents:\nMetadata:{}\nNetwork Specs:{}\nVerifiers:{}\nGeneral Verifier: {}\nIdentities: {}", metadata_str, network_specs_str, verifiers_str, general_verifier.show_error(), identities_str)
     }
     
 // can sign a parsed transaction
     #[test]
     fn can_sign_transaction_1() {
         let dbname = "for_tests/can_sign_transaction_1";
-        populate_cold(dbname, METADATA_FILE, true).unwrap();
+        populate_cold(dbname, Verifier::None).unwrap();
         let line = "530100d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27da40403008eaf04151687736326c9fea17e25fc5287613693c912909cb226aa4794f26a480700e8764817b501b8003223000005000000e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e538a7d7a0ac17eb6dd004578cb8e238c384a10f57c999a3fa1200409cd9b3f33e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e";
         let reply = produce_output(line, dbname);
         let reply_known_part = r#"{"author":[{"index":0,"indent":0,"type":"author","payload":{"base58":"5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY","seed":"Alice","derivation_path":"//Alice","has_password":false,"name":"Alice_test_westend"}}],"method":[{"index":1,"indent":0,"type":"call","payload":{"method":"transfer_keep_alive","pallet":"Balances","docs":" Same as the [`transfer`] call, but with a check that the transfer will not kill the
@@ -61,15 +109,15 @@ mod tests {
  - Cheaper than transfer because account cannot be killed.
  - Base Weight: 51.4 µs
  - DB Weight: 1 Read and 1 Write to dest (sender is in overlay already)
- #</weight>"}},{"index":2,"indent":1,"type":"varname","payload":"dest"},{"index":3,"indent":2,"type":"enum_variant_name","payload":{"name":"Id","docs":""}},{"index":4,"indent":3,"type":"Id","payload":"5FHneW46xGXgs5mUiveU4sbTyGBzmstUspZC92UhjJM694ty"},{"index":5,"indent":1,"type":"varname","payload":"value"},{"index":6,"indent":2,"type":"balance","payload":{"amount":"100.000000000","units":"mWND"}}],"extrinsics":[{"index":7,"indent":0,"type":"era_mortal_nonce","payload":{"era":"Mortal","phase":"27","period":"64","nonce":"46"}},{"index":8,"indent":0,"type":"tip","payload":{"amount":"0","units":"pWND"}},{"index":9,"indent":0,"type":"block_hash","payload":"538a7d7a0ac17eb6dd004578cb8e238c384a10f57c999a3fa1200409cd9b3f33"},{"index":10,"indent":0,"type":"tx_spec","payload":{"network":"westend","version":"9010","tx_version":"5"}}],"action":{"type":"sign_transaction","payload":{"type":"sign_transaction","checksum":""#;
+ #</weight>"}},{"index":2,"indent":1,"type":"varname","payload":"dest"},{"index":3,"indent":2,"type":"enum_variant_name","payload":{"name":"Id","docs":""}},{"index":4,"indent":3,"type":"Id","payload":"5FHneW46xGXgs5mUiveU4sbTyGBzmstUspZC92UhjJM694ty"},{"index":5,"indent":1,"type":"varname","payload":"value"},{"index":6,"indent":2,"type":"balance","payload":{"amount":"100.000000000","units":"mWND"}}],"extrinsics":[{"index":7,"indent":0,"type":"era_mortal_nonce","payload":{"era":"Mortal","phase":"27","period":"64","nonce":"46"}},{"index":8,"indent":0,"type":"tip","payload":{"amount":"0","units":"pWND"}},{"index":9,"indent":0,"type":"block_hash","payload":"538a7d7a0ac17eb6dd004578cb8e238c384a10f57c999a3fa1200409cd9b3f33"},{"index":10,"indent":0,"type":"tx_spec","payload":{"network":"westend","version":"9010","tx_version":"5"}}],"action":{"type":"sign","payload":""#;
         assert!(reply.contains(reply_known_part), "Error in action.\nReceived: {}", reply);
-        let mock_action_line = get_action_line(&reply);
-        let result = sign_action_test(&mock_action_line, SEED_PHRASE, PWD, USER_COMMENT, dbname);
+        let (action_is_sign, checksum_str) = get_type_and_checksum(&reply);
+        let result = sign_action_test(action_is_sign, &checksum_str, SEED_PHRASE, PWD, USER_COMMENT, dbname);
         match result {
             Ok(signature) => assert!((signature.len() == 130) && (signature.starts_with("01")), "Wrong signature format,\nReceived:\n{}", signature),
             Err(e) => panic!("Was unable to sign. {}", e),
         }
-        let result = sign_action_test(&mock_action_line, SEED_PHRASE, PWD, USER_COMMENT, dbname);
+        let result = sign_action_test(action_is_sign, &checksum_str, SEED_PHRASE, PWD, USER_COMMENT, dbname);
         if let Err(e) = result {
             let err = e.to_string();
             let expected_err = String::from("Database checksum mismatch.");
@@ -78,395 +126,377 @@ mod tests {
         else {panic!("Checksum should have changed.")}
         fs::remove_dir_all(dbname).unwrap();
     }
-
-// add_network for dock_main without verifier, then add_network with same metadata and with verifier
+  
     #[test]
-    fn add_network_add_two_verifiers_later() {
-        
-        let dbname = "for_tests/add_network_add_two_verifiers_later";
-        populate_cold_no_networks(dbname).unwrap();
-        let meta1 = meta_count_test(dbname);
-        let specs1 = specs_count_test(dbname);
-        
-        let line = fs::read_to_string("for_tests/add_network_westendV9090_unverified.txt").unwrap();
+    fn add_specs_westend_no_network_info_not_signed() {
+        let dbname = "for_tests/add_specs_westend_no_network_info_not_signed";
+        populate_cold_no_networks(dbname, Verifier::None).unwrap();
+        let line = fs::read_to_string("for_tests/add_specs_westend_unverified.txt").unwrap();
         let reply = produce_output(&line.trim(), dbname);
-        let reply_known_part = r##"{"warning":[{"index":0,"indent":0,"type":"warning","payload":"Received new network information is not verified."}],"new_network":[{"index":1,"indent":0,"type":"new_network","payload":{"specname":"westend","spec_version":"9090","meta_hash":"62bacaaa3d9bb01313bb882c23615aae6509ab2ef1e7e807581ee0b74c77416b","base58prefix":"42","color":"#660D35","decimals":"12","encryption":"sr25519","genesis_hash":"e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e","logo":"westend","name":"westend","path_id":"//westend","secondary_color":"#262626","title":"Westend","unit":"WND","verifier":{"hex":"","encryption":"none"}}}],"action":{"type":"add_network","payload":{"type":"add_network","checksum":""##;
-        assert!(reply.contains(reply_known_part), "Error in action.\nReceived: {}", reply);
-        let mock_action_line = get_action_line(&reply);
-        let result = handle_action(&mock_action_line, SEED_PHRASE, PWD, USER_COMMENT, dbname);
-        if let Err(e) = result {panic!("Was unable to add network. {}", e)}
-        
-        let meta2 = meta_count_test(dbname);
-        let specs2 = specs_count_test(dbname);
-        
-        let line = fs::read_to_string("for_tests/add_network_westendV9090_Alice.txt").unwrap();
-        let reply = produce_output(&line.trim(), dbname);
-        let reply_known_part = r##"{"verifier":[{"index":0,"indent":0,"type":"verifier","payload":{"hex":"d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d","encryption":"sr25519"}}],"warning":[{"index":1,"indent":0,"type":"warning","payload":"Add network message is received for network that already has some entries in the database."},{"index":2,"indent":0,"type":"warning","payload":"Previously unverified information now received signed by a verifier. If accepted, updating types and adding networks could be verified only by this verifier."},{"index":3,"indent":0,"type":"warning","payload":"Previously unverified network metadata now received signed by a verifier. If accepted, only metadata from same verifier could be received for this network."},{"index":4,"indent":0,"type":"warning","payload":"Received metadata is already in database, both general verifier and network verifier could be added."}],"action":{"type":"add_two_verifiers","payload":{"type":"add_two_verifiers","checksum":""##;
-        assert!(reply.contains(reply_known_part), "Error in action.\nReceived: {}", reply);
-        let mock_action_line = get_action_line(&reply);
-        let result = handle_action(&mock_action_line, SEED_PHRASE, PWD, USER_COMMENT, dbname);
-        if let Err(e) = result {panic!("Was unable to update two verifiers. {}", e)}
-        
-        let meta3 = meta_count_test(dbname);
-        let specs3 = specs_count_test(dbname);
-        
-        assert!(meta2 == meta1+1, "Did not add metadata to database on first step.");
-        assert!(meta3 == meta2, "Number of meta entries somehow changed on second step.");
-        assert!(specs2 == specs1+1, "Did not add specs to database on first step.");
-        assert!(specs3 == specs2, "Number of specs entries somehow changed on second step.");
-        
-        fs::remove_dir_all(dbname).unwrap();
-    }
-
-// add_network for dock_main with verifier
-    #[test]
-    fn add_network_and_add_general_verifier() {
-    
-        let dbname = "for_tests/add_network_and_add_general_verifier";
-        populate_cold_no_networks(dbname).unwrap();
-        
-        let meta1 = meta_count_test(dbname);
-        let specs1 = specs_count_test(dbname);
-        
-        let line = fs::read_to_string("for_tests/add_network_westendV9090_Alice.txt").unwrap();
-        let reply = produce_output(&line.trim(), dbname);
-        let reply_known_part = r##"{"verifier":[{"index":0,"indent":0,"type":"verifier","payload":{"hex":"d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d","encryption":"sr25519"}}],"warning":[{"index":1,"indent":0,"type":"warning","payload":"Previously unverified information now received signed by a verifier. If accepted, updating types and adding networks could be verified only by this verifier."}],"new_network":[{"index":2,"indent":0,"type":"new_network","payload":{"specname":"westend","spec_version":"9090","meta_hash":"62bacaaa3d9bb01313bb882c23615aae6509ab2ef1e7e807581ee0b74c77416b","base58prefix":"42","color":"#660D35","decimals":"12","encryption":"sr25519","genesis_hash":"e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e","logo":"westend","name":"westend","path_id":"//westend","secondary_color":"#262626","title":"Westend","unit":"WND","verifier":{"hex":"d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d","encryption":"sr25519"}}}],"action":{"type":"add_network_and_add_general_verifier","payload":{"type":"add_network_and_add_general_verifier","checksum":""##;
-        assert!(reply.contains(reply_known_part), "Error in action.\nReceived: {}", reply);
-        let mock_action_line = get_action_line(&reply);
-        let result = handle_action(&mock_action_line, SEED_PHRASE, PWD, USER_COMMENT, dbname);
-        if let Err(e) = result {panic!("Was unable to add network and update general verifier. {}", e)}
-        
-        let meta2 = meta_count_test(dbname);
-        let specs2 = specs_count_test(dbname);
-        
-        assert!(meta2 == meta1+1, "Did not add metadata to database.");
-        assert!(specs2 == specs1+1, "Did not add specs to database.");
-        
-        fs::remove_dir_all(dbname).unwrap();
-    }
-
-    #[test]
-    fn correct_checksum_no_transaction_to_sign() {
-    
-        let dbname = "for_tests/correct_checksum_no_transaction_to_sign";
-        populate_cold_no_networks(dbname).unwrap();
-        
-        // real action: add_network
-        let line = fs::read_to_string("for_tests/add_network_westendV9090_unverified.txt").unwrap();
-        let reply = produce_output(&line.trim(), dbname);
-        
-        // wrong action: sign_transaction
-        let mock_action_line = get_action_line(&reply).replace("add_network", "sign_transaction");
-        
-        match handle_action(&mock_action_line, SEED_PHRASE, PWD, USER_COMMENT, dbname) {
-            Ok(_) => panic!("Should have failed. Parser reply: {}\nMock action line: {}", reply, mock_action_line),
-            Err(e) => {
-                if e.to_string() != Error::NoAction(ActionFailure::SignTransaction).show().to_string() {
-                    panic!("Should have failed\nwith correct checksum and wrong action. Parser reply: {}\nMock action line: {}", reply, mock_action_line)
-                }
-            },
-        }
-        fs::remove_dir_all(dbname).unwrap();
-    }
-
-    #[test]
-    fn correct_checksum_no_approved_metadata() {
-    
-        let dbname = "for_tests/correct_checksum_no_approved_metadata";
-        populate_cold(dbname, METADATA_FILE, true).unwrap();
-        
-        // real action: sign_transaction
-        let line = "530100d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27da40403008eaf04151687736326c9fea17e25fc5287613693c912909cb226aa4794f26a480700e8764817b501b8003223000005000000e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e538a7d7a0ac17eb6dd004578cb8e238c384a10f57c999a3fa1200409cd9b3f33e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e";
-        let reply = produce_output(&line.trim(), dbname);
-        
-        // wrong action: load_metadata
-        let mock_action_line = get_action_line(&reply).replace("sign_transaction", "load_metadata");
-        
-        match handle_action(&mock_action_line, SEED_PHRASE, PWD, USER_COMMENT, dbname) {
-            Ok(_) => panic!("Should have failed. Parser reply: {}\nMock action line: {}", reply, mock_action_line),
-            Err(e) => {
-                if e.to_string() != Error::NoAction(ActionFailure::LoadMeta).show().to_string() {
-                    panic!("Should have failed\nwith correct checksum and wrong action. Parser reply: {}\nMock action line: {}", reply, mock_action_line)
-                }
-            },
-        }
+        let reply_known_part = r##"{"warning":[{"index":0,"indent":0,"type":"warning","payload":"Received network information is not verified."}],"new_specs":[{"index":1,"indent":0,"type":"new_specs","payload":{"base58prefix":"42","color":"#660D35","decimals":"12","encryption":"sr25519","genesis_hash":"e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e","logo":"westend","name":"westend","path_id":"//westend","secondary_color":"#262626","title":"Westend","unit":"WND"}}],"action":{"type":"stub","payload":""##;
+        assert!(reply.contains(reply_known_part), "Expected: {}...\nReceived: {}", reply_known_part, reply);
+        let (action_is_sign, checksum_str) = get_type_and_checksum(&reply);
+        if action_is_sign {panic!("Should have been action `stub`.")}
+        let print_before = print_db_content(&dbname);
+        let expected_print_before = "Database contents:\nMetadata:\nNetwork Specs:\nVerifiers:\nGeneral Verifier: none\nIdentities: ";
+        assert!(print_before == expected_print_before, "Received:\n{}", print_before);
+        handle_stub(&checksum_str, dbname).unwrap();
+        let print_after = print_db_content(&dbname);
+        let expected_print_after = r#"Database contents:
+Metadata:
+Network Specs:
+	0180e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e: Westend (westend with sr25519)
+Verifiers:
+	e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e: {"type":"custom","details":{"hex":"","encryption":"none"}}
+General Verifier: none
+Identities: "#;
+        assert!(print_after == expected_print_after, "Received:\n{}", print_after);
         fs::remove_dir_all(dbname).unwrap();
     }
     
     #[test]
-    fn correct_checksum_no_metadata_verifier() {
-    
-        let dbname = "for_tests/correct_checksum_no_metadata_verifier";
-        populate_cold(dbname, METADATA_FILE, true).unwrap();
-        
-        // real action: sign_transaction
-        let line = "530100d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27da40403008eaf04151687736326c9fea17e25fc5287613693c912909cb226aa4794f26a480700e8764817b501b8003223000005000000e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e538a7d7a0ac17eb6dd004578cb8e238c384a10f57c999a3fa1200409cd9b3f33e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e";
+    fn add_specs_westend_ed25519_not_signed() {
+        let dbname = "for_tests/add_specs_westend_ed25519_not_signed";
+        populate_cold(dbname, Verifier::None).unwrap();
+        let line = fs::read_to_string("for_tests/add_specs_westend-ed25519_unverified.txt").unwrap();
         let reply = produce_output(&line.trim(), dbname);
-        
-        // wrong action: add_metadata_verifier
-        let mock_action_line = get_action_line(&reply).replace("sign_transaction", "add_metadata_verifier");
-        
-        match handle_action(&mock_action_line, SEED_PHRASE, PWD, USER_COMMENT, dbname) {
-            Ok(_) => panic!("Should have failed. Parser reply: {}\nMock action line: {}", reply, mock_action_line),
-            Err(e) => {
-                if e.to_string() != Error::NoAction(ActionFailure::AddVerifier).show().to_string() {
-                    panic!("Should have failed\nwith correct checksum and wrong action. Parser reply: {}\nMock action line: {}", reply, mock_action_line)
-                }
-            },
-        }
+        let reply_known_part = r##"{"warning":[{"index":0,"indent":0,"type":"warning","payload":"Received network information is not verified."}],"new_specs":[{"index":1,"indent":0,"type":"new_specs","payload":{"base58prefix":"42","color":"#660D35","decimals":"12","encryption":"ed25519","genesis_hash":"e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e","logo":"westend","name":"westend","path_id":"//westend","secondary_color":"#262626","title":"westend-ed25519","unit":"WND"}}],"action":{"type":"stub","payload":""##;
+        assert!(reply.contains(reply_known_part), "Expected: {}...\nReceived: {}", reply_known_part, reply);
+        let (action_is_sign, checksum_str) = get_type_and_checksum(&reply);
+        if action_is_sign {panic!("Should have been action `stub`.")}
+        let print_before = print_db_content(&dbname);
+        let expected_print_before = r#"Database contents:
+Metadata:
+	kusama2030
+	westend9000
+	westend9010
+	polkadot30
+Network Specs:
+	018091b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3: Polkadot (polkadot with sr25519)
+	0180b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe: Kusama (kusama with sr25519)
+	0180e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e: Westend (westend with sr25519)
+	0180f6e9983c37baf68846fedafe21e56718790e39fb1c582abc408b81bc7b208f9a: Rococo (rococo with sr25519)
+Verifiers:
+	91b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3: {"type":"general","details":{"hex":"","encryption":"none"}}
+	b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe: {"type":"general","details":{"hex":"","encryption":"none"}}
+	e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e: {"type":"general","details":{"hex":"","encryption":"none"}}
+	f6e9983c37baf68846fedafe21e56718790e39fb1c582abc408b81bc7b208f9a: {"type":"general","details":{"hex":"","encryption":"none"}}
+General Verifier: none
+Identities: 
+	public_key: 3efeca331d646d8a2986374bb3bb8d6e9e3cfcdd7c45c2b69104fab5d61d3f34, encryption: sr25519, path: //westend, available_networks: 
+		0180e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e
+	public_key: 46ebddef8cd9bb167dc30878d7113b7e168e6f0646beffd77d69d39bad76b47a, encryption: sr25519, path: , available_networks: 
+		018091b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3
+		0180b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe
+		0180e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e
+		0180f6e9983c37baf68846fedafe21e56718790e39fb1c582abc408b81bc7b208f9a
+	public_key: 64a31235d4bf9b37cfed3afa8aa60754675f9c4915430454d365c05112784d05, encryption: sr25519, path: //kusama, available_networks: 
+		0180b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe
+	public_key: 96129dcebc2e10f644e81fcf4269a663e521330084b1e447369087dec8017e04, encryption: sr25519, path: //rococo, available_networks: 
+		0180f6e9983c37baf68846fedafe21e56718790e39fb1c582abc408b81bc7b208f9a
+	public_key: c81ebbec0559a6acf184535eb19da51ed3ed8c4ac65323999482aaf9b6696e27, encryption: sr25519, path: //alice, available_networks: 
+		0180f6e9983c37baf68846fedafe21e56718790e39fb1c582abc408b81bc7b208f9a
+	public_key: d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d, encryption: sr25519, path: //Alice, available_networks: 
+		0180e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e
+	public_key: f606519cb8726753885cd4d0f518804a69a5e0badf36fee70feadd8044081730, encryption: sr25519, path: //polkadot, available_networks: 
+		018091b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3"#;
+        assert!(print_before == expected_print_before, "Received:\n{}", print_before);
+        handle_stub(&checksum_str, dbname).unwrap();
+        let print_after = print_db_content(&dbname);
+        let expected_print_after = r#"Database contents:
+Metadata:
+	kusama2030
+	westend9000
+	westend9010
+	polkadot30
+Network Specs:
+	0080e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e: westend-ed25519 (westend with ed25519)
+	018091b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3: Polkadot (polkadot with sr25519)
+	0180b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe: Kusama (kusama with sr25519)
+	0180e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e: Westend (westend with sr25519)
+	0180f6e9983c37baf68846fedafe21e56718790e39fb1c582abc408b81bc7b208f9a: Rococo (rococo with sr25519)
+Verifiers:
+	91b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3: {"type":"general","details":{"hex":"","encryption":"none"}}
+	b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe: {"type":"general","details":{"hex":"","encryption":"none"}}
+	e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e: {"type":"general","details":{"hex":"","encryption":"none"}}
+	f6e9983c37baf68846fedafe21e56718790e39fb1c582abc408b81bc7b208f9a: {"type":"general","details":{"hex":"","encryption":"none"}}
+General Verifier: none
+Identities: 
+	public_key: 3efeca331d646d8a2986374bb3bb8d6e9e3cfcdd7c45c2b69104fab5d61d3f34, encryption: sr25519, path: //westend, available_networks: 
+		0180e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e
+	public_key: 46ebddef8cd9bb167dc30878d7113b7e168e6f0646beffd77d69d39bad76b47a, encryption: sr25519, path: , available_networks: 
+		018091b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3
+		0180b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe
+		0180e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e
+		0180f6e9983c37baf68846fedafe21e56718790e39fb1c582abc408b81bc7b208f9a
+	public_key: 64a31235d4bf9b37cfed3afa8aa60754675f9c4915430454d365c05112784d05, encryption: sr25519, path: //kusama, available_networks: 
+		0180b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe
+	public_key: 96129dcebc2e10f644e81fcf4269a663e521330084b1e447369087dec8017e04, encryption: sr25519, path: //rococo, available_networks: 
+		0180f6e9983c37baf68846fedafe21e56718790e39fb1c582abc408b81bc7b208f9a
+	public_key: c81ebbec0559a6acf184535eb19da51ed3ed8c4ac65323999482aaf9b6696e27, encryption: sr25519, path: //alice, available_networks: 
+		0180f6e9983c37baf68846fedafe21e56718790e39fb1c582abc408b81bc7b208f9a
+	public_key: d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d, encryption: sr25519, path: //Alice, available_networks: 
+		0180e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e
+	public_key: f606519cb8726753885cd4d0f518804a69a5e0badf36fee70feadd8044081730, encryption: sr25519, path: //polkadot, available_networks: 
+		018091b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3"#;
+        assert!(print_after == expected_print_after, "Received:\n{}", print_after);
         fs::remove_dir_all(dbname).unwrap();
     }
     
     #[test]
-    fn correct_checksum_no_types_to_load() {
-    
-        let dbname = "for_tests/correct_checksum_no_types_to_load";
-        populate_cold(dbname, METADATA_FILE, true).unwrap();
-        
-        // real action: sign_transaction
-        let line = "530100d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27da40403008eaf04151687736326c9fea17e25fc5287613693c912909cb226aa4794f26a480700e8764817b501b8003223000005000000e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e538a7d7a0ac17eb6dd004578cb8e238c384a10f57c999a3fa1200409cd9b3f33e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e";
-        let reply = produce_output(&line.trim(), dbname);
-        
-        // wrong action: load_types
-        let mock_action_line = get_action_line(&reply).replace("sign_transaction", "load_types");
-        
-        match handle_action(&mock_action_line, SEED_PHRASE, PWD, USER_COMMENT, dbname) {
-            Ok(_) => panic!("Should have failed. Parser reply: {}\nMock action line: {}", reply, mock_action_line),
-            Err(e) => {
-                if e.to_string() != Error::NoAction(ActionFailure::LoadTypes).show().to_string() {
-                    panic!("Should have failed\nwith correct checksum and wrong action. Parser reply: {}\nMock action line: {}", reply, mock_action_line)
-                }
-            },
-        }
-        fs::remove_dir_all(dbname).unwrap();
-    }
-    
-    #[test]
-    fn correct_checksum_no_general_verifier() {
-    
-        let dbname = "for_tests/correct_checksum_no_general_verifier";
-        populate_cold(dbname, METADATA_FILE, true).unwrap();
-        
-        // real action: sign_transaction
-        let line = "530100d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27da40403008eaf04151687736326c9fea17e25fc5287613693c912909cb226aa4794f26a480700e8764817b501b8003223000005000000e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e538a7d7a0ac17eb6dd004578cb8e238c384a10f57c999a3fa1200409cd9b3f33e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e";
-        let reply = produce_output(&line.trim(), dbname);
-        
-        // wrong action: add_general_verifier
-        let mock_action_line = get_action_line(&reply).replace("sign_transaction", "add_general_verifier");
-        
-        match handle_action(&mock_action_line, SEED_PHRASE, PWD, USER_COMMENT, dbname) {
-            Ok(_) => panic!("Should have failed. Parser reply: {}\nMock action line: {}", reply, mock_action_line),
-            Err(e) => {
-                if e.to_string() != Error::NoAction(ActionFailure::AddGeneralVerifier).show().to_string() {
-                    panic!("Should have failed\nwith correct checksum and wrong action. Parser reply: {}\nMock action line: {}", reply, mock_action_line)
-                }
-            },
-        }
-        fs::remove_dir_all(dbname).unwrap();
-    }
-    
-    #[test]
-    fn correct_checksum_no_two_verifiers() {
-    
-        let dbname = "for_tests/correct_checksum_no_two_verifiers";
-        populate_cold(dbname, METADATA_FILE, true).unwrap();
-        
-        // real action: sign_transaction
-        let line = "530100d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27da40403008eaf04151687736326c9fea17e25fc5287613693c912909cb226aa4794f26a480700e8764817b501b8003223000005000000e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e538a7d7a0ac17eb6dd004578cb8e238c384a10f57c999a3fa1200409cd9b3f33e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e";
-        let reply = produce_output(&line.trim(), dbname);
-        
-        // wrong action: add_two_verifiers
-        let mock_action_line = get_action_line(&reply).replace("sign_transaction", "add_two_verifiers");
-        
-        match handle_action(&mock_action_line, SEED_PHRASE, PWD, USER_COMMENT, dbname) {
-            Ok(_) => panic!("Should have failed. Parser reply: {}\nMock action line: {}", reply, mock_action_line),
-            Err(e) => {
-                if e.to_string() != Error::NoAction(ActionFailure::AddVerifier).show().to_string() {
-                    panic!("Should have failed\nwith correct checksum and wrong action. Parser reply: {}\nMock action line: {}", reply, mock_action_line)
-                }
-            },
-        }
-        fs::remove_dir_all(dbname).unwrap();
-    }
-    
-    #[test]
-    fn correct_checksum_no_load_meta_and_upd_verifier() {
-    
-        let dbname = "for_tests/correct_checksum_no_load_meta_and_upd_verifier";
-        populate_cold(dbname, METADATA_FILE, true).unwrap();
-        
-        // real action: sign_transaction
-        let line = "530100d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27da40403008eaf04151687736326c9fea17e25fc5287613693c912909cb226aa4794f26a480700e8764817b501b8003223000005000000e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e538a7d7a0ac17eb6dd004578cb8e238c384a10f57c999a3fa1200409cd9b3f33e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e";
-        let reply = produce_output(&line.trim(), dbname);
-        
-        // wrong action: load_metadata_and_add_general_verifier
-        let mock_action_line = get_action_line(&reply).replace("sign_transaction", "load_metadata_and_add_general_verifier");
-        
-        match handle_action(&mock_action_line, SEED_PHRASE, PWD, USER_COMMENT, dbname) {
-            Ok(_) => panic!("Should have failed. Parser reply: {}\nMock action line: {}", reply, mock_action_line),
-            Err(e) => {
-                if e.to_string() != Error::NoAction(ActionFailure::LoadMeta).show().to_string() {
-                    panic!("Should have failed\nwith correct checksum and wrong action. Parser reply: {}\nMock action line: {}", reply, mock_action_line)
-                }
-            },
-        }
-        fs::remove_dir_all(dbname).unwrap();
-    }
-    
-    #[test]
-    fn correct_checksum_no_add_network() {
-    
-        let dbname = "for_tests/correct_checksum_no_add_network";
-        populate_cold(dbname, METADATA_FILE, true).unwrap();
-        
-        // real action: sign_transaction
-        let line = "530100d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27da40403008eaf04151687736326c9fea17e25fc5287613693c912909cb226aa4794f26a480700e8764817b501b8003223000005000000e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e538a7d7a0ac17eb6dd004578cb8e238c384a10f57c999a3fa1200409cd9b3f33e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e";
-        let reply = produce_output(&line.trim(), dbname);
-        
-        // wrong action: add_network
-        let mock_action_line = get_action_line(&reply).replace("sign_transaction", "add_network");
-        
-        match handle_action(&mock_action_line, SEED_PHRASE, PWD, USER_COMMENT, dbname) {
-            Ok(_) => panic!("Should have failed. Parser reply: {}\nMock action line: {}", reply, mock_action_line),
-            Err(e) => {
-                if e.to_string() != Error::NoAction(ActionFailure::AddNetwork).show().to_string() {
-                    panic!("Should have failed\nwith correct checksum and wrong action. Parser reply: {}\nMock action line: {}", reply, mock_action_line)
-                }
-            },
-        }
-        fs::remove_dir_all(dbname).unwrap();
-    }
-    
-    #[test]
-    fn correct_checksum_no_add_network_and_general_verifier() {
-    
-        let dbname = "for_tests/correct_checksum_no_add_network_and_general_verifier";
-        populate_cold(dbname, METADATA_FILE, true).unwrap();
-        
-        // real action: sign_transaction
-        let line = "530100d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27da40403008eaf04151687736326c9fea17e25fc5287613693c912909cb226aa4794f26a480700e8764817b501b8003223000005000000e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e538a7d7a0ac17eb6dd004578cb8e238c384a10f57c999a3fa1200409cd9b3f33e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e";
-        let reply = produce_output(&line.trim(), dbname);
-        
-        // wrong action: add_network_and_add_general_verifier
-        let mock_action_line = get_action_line(&reply).replace("sign_transaction", "add_network_and_add_general_verifier");
-        
-        match handle_action(&mock_action_line, SEED_PHRASE, PWD, USER_COMMENT, dbname) {
-            Ok(_) => panic!("Should have failed. Parser reply: {}\nMock action line: {}", reply, mock_action_line),
-            Err(e) => {
-                if e.to_string() != Error::NoAction(ActionFailure::AddNetwork).show().to_string() {
-                    panic!("Should have failed\nwith correct checksum and wrong action. Parser reply: {}\nMock action line: {}", reply, mock_action_line)
-                }
-            },
-        }
-        fs::remove_dir_all(dbname).unwrap();
-        
-    }
-    
-// load_metadata for westend9070 not verified, then load same metadata, but with verifier
-    #[test]
-    fn load_network_unsigned_add_verifier_later() {
-        
-        let dbname = "for_tests/load_network_unsigned_add_verifier_later";
-        populate_cold_no_meta(dbname, true).unwrap();
-        
-        let meta1 = meta_count_test(dbname);
-        let specs1 = specs_count_test(dbname);
-        
+    fn load_westend9070() {
+        let dbname = "for_tests/load_westend9070";
+        populate_cold(dbname, Verifier::None).unwrap();
         let line = fs::read_to_string("for_tests/network_metadata_westendV9070_None.txt").unwrap();
         let reply = produce_output(&line.trim(), dbname);
-        
-        let reply_known_part = r##"{"warning":[{"index":0,"indent":0,"type":"warning","payload":"Received network metadata is not verified."}],"meta":[{"index":1,"indent":0,"type":"meta","payload":{"specname":"westend","spec_version":"9070","meta_hash":"e281fbc53168a6b87d1ea212923811f4c083e7be7d18df4b8527b9532e5f5fec"}}],"action":{"type":"load_metadata","payload":{"type":"load_metadata","checksum":""##;
+        let reply_known_part = r##"{"warning":[{"index":0,"indent":0,"type":"warning","payload":"Received network information is not verified."}],"meta":[{"index":1,"indent":0,"type":"meta","payload":{"specname":"westend","spec_version":"9070","meta_hash":"e281fbc53168a6b87d1ea212923811f4c083e7be7d18df4b8527b9532e5f5fec"}}],"action":{"type":"stub","payload":""##;
         assert!(reply.contains(reply_known_part), "Error in action.\nReceived: {}", reply);
-        let mock_action_line = get_action_line(&reply);
-        let result = handle_action(&mock_action_line, SEED_PHRASE, PWD, USER_COMMENT, dbname);
-        if let Err(e) = result {panic!("Was unable to load metadata for westend 9070 network. {}", e)}
-        
-        let meta2 = meta_count_test(dbname);
-        let specs2 = specs_count_test(dbname);
-        
-        assert!(meta2 == meta1+1, "Did not add metadata to database.");
-        assert!(specs2 == specs1, "Number of specs entries somehow changed.");
-        
-        let line = fs::read_to_string("for_tests/network_metadata_westendV9070_Alice.txt").unwrap();
-        let reply = produce_output(&line.trim(), dbname);
-        
-        let reply_known_part = r##"{"verifier":[{"index":0,"indent":0,"type":"verifier","payload":{"hex":"d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d","encryption":"sr25519"}}],"warning":[{"index":1,"indent":0,"type":"warning","payload":"Previously unverified network metadata now received signed by a verifier. If accepted, only metadata from same verifier could be received for this network."},{"index":2,"indent":0,"type":"warning","payload":"Received metadata is already in database, only network verifier could be added."}],"action":{"type":"add_metadata_verifier","payload":{"type":"add_metadata_verifier","checksum":""##;
-        assert!(reply.contains(reply_known_part), "Error in action.\nReceived: {}", reply);
-        let mock_action_line = get_action_line(&reply);
-        let result = handle_action(&mock_action_line, SEED_PHRASE, PWD, USER_COMMENT, dbname);
-        if let Err(e) = result {panic!("Was unable to add verifier for westend. {}", e)}
-        
-        let meta3 = meta_count_test(dbname);
-        let specs3 = specs_count_test(dbname);
-        
-        assert!(meta3 == meta2, "Number of meta entries somehow changed.");
-        assert!(specs3 == specs2, "Number of specs entries somehow changed.");
-        
+        let (action_is_sign, checksum_str) = get_type_and_checksum(&reply);
+        if action_is_sign {panic!("Should have been action `stub`.")}
+        let print_before = print_db_content(&dbname);
+        let expected_print_before = r#"Database contents:
+Metadata:
+	kusama2030
+	westend9000
+	westend9010
+	polkadot30
+Network Specs:
+	018091b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3: Polkadot (polkadot with sr25519)
+	0180b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe: Kusama (kusama with sr25519)
+	0180e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e: Westend (westend with sr25519)
+	0180f6e9983c37baf68846fedafe21e56718790e39fb1c582abc408b81bc7b208f9a: Rococo (rococo with sr25519)
+Verifiers:
+	91b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3: {"type":"general","details":{"hex":"","encryption":"none"}}
+	b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe: {"type":"general","details":{"hex":"","encryption":"none"}}
+	e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e: {"type":"general","details":{"hex":"","encryption":"none"}}
+	f6e9983c37baf68846fedafe21e56718790e39fb1c582abc408b81bc7b208f9a: {"type":"general","details":{"hex":"","encryption":"none"}}
+General Verifier: none
+Identities: 
+	public_key: 3efeca331d646d8a2986374bb3bb8d6e9e3cfcdd7c45c2b69104fab5d61d3f34, encryption: sr25519, path: //westend, available_networks: 
+		0180e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e
+	public_key: 46ebddef8cd9bb167dc30878d7113b7e168e6f0646beffd77d69d39bad76b47a, encryption: sr25519, path: , available_networks: 
+		018091b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3
+		0180b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe
+		0180e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e
+		0180f6e9983c37baf68846fedafe21e56718790e39fb1c582abc408b81bc7b208f9a
+	public_key: 64a31235d4bf9b37cfed3afa8aa60754675f9c4915430454d365c05112784d05, encryption: sr25519, path: //kusama, available_networks: 
+		0180b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe
+	public_key: 96129dcebc2e10f644e81fcf4269a663e521330084b1e447369087dec8017e04, encryption: sr25519, path: //rococo, available_networks: 
+		0180f6e9983c37baf68846fedafe21e56718790e39fb1c582abc408b81bc7b208f9a
+	public_key: c81ebbec0559a6acf184535eb19da51ed3ed8c4ac65323999482aaf9b6696e27, encryption: sr25519, path: //alice, available_networks: 
+		0180f6e9983c37baf68846fedafe21e56718790e39fb1c582abc408b81bc7b208f9a
+	public_key: d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d, encryption: sr25519, path: //Alice, available_networks: 
+		0180e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e
+	public_key: f606519cb8726753885cd4d0f518804a69a5e0badf36fee70feadd8044081730, encryption: sr25519, path: //polkadot, available_networks: 
+		018091b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3"#;
+        assert!(print_before == expected_print_before, "Received:\n{}", print_before);
+        handle_stub(&checksum_str, dbname).unwrap();
+        let print_after = print_db_content(&dbname);
+        let expected_print_after = r#"Database contents:
+Metadata:
+	kusama2030
+	westend9000
+	westend9010
+	westend9070
+	polkadot30
+Network Specs:
+	018091b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3: Polkadot (polkadot with sr25519)
+	0180b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe: Kusama (kusama with sr25519)
+	0180e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e: Westend (westend with sr25519)
+	0180f6e9983c37baf68846fedafe21e56718790e39fb1c582abc408b81bc7b208f9a: Rococo (rococo with sr25519)
+Verifiers:
+	91b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3: {"type":"general","details":{"hex":"","encryption":"none"}}
+	b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe: {"type":"general","details":{"hex":"","encryption":"none"}}
+	e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e: {"type":"general","details":{"hex":"","encryption":"none"}}
+	f6e9983c37baf68846fedafe21e56718790e39fb1c582abc408b81bc7b208f9a: {"type":"general","details":{"hex":"","encryption":"none"}}
+General Verifier: none
+Identities: 
+	public_key: 3efeca331d646d8a2986374bb3bb8d6e9e3cfcdd7c45c2b69104fab5d61d3f34, encryption: sr25519, path: //westend, available_networks: 
+		0180e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e
+	public_key: 46ebddef8cd9bb167dc30878d7113b7e168e6f0646beffd77d69d39bad76b47a, encryption: sr25519, path: , available_networks: 
+		018091b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3
+		0180b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe
+		0180e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e
+		0180f6e9983c37baf68846fedafe21e56718790e39fb1c582abc408b81bc7b208f9a
+	public_key: 64a31235d4bf9b37cfed3afa8aa60754675f9c4915430454d365c05112784d05, encryption: sr25519, path: //kusama, available_networks: 
+		0180b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe
+	public_key: 96129dcebc2e10f644e81fcf4269a663e521330084b1e447369087dec8017e04, encryption: sr25519, path: //rococo, available_networks: 
+		0180f6e9983c37baf68846fedafe21e56718790e39fb1c582abc408b81bc7b208f9a
+	public_key: c81ebbec0559a6acf184535eb19da51ed3ed8c4ac65323999482aaf9b6696e27, encryption: sr25519, path: //alice, available_networks: 
+		0180f6e9983c37baf68846fedafe21e56718790e39fb1c582abc408b81bc7b208f9a
+	public_key: d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d, encryption: sr25519, path: //Alice, available_networks: 
+		0180e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e
+	public_key: f606519cb8726753885cd4d0f518804a69a5e0badf36fee70feadd8044081730, encryption: sr25519, path: //polkadot, available_networks: 
+		018091b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3"#;
+        assert!(print_after == expected_print_after, "Received:\n{}", print_after);
         fs::remove_dir_all(dbname).unwrap();
     }
-    
-// load_types not verified, then load same types message, but with verifier
+
     #[test]
-    fn load_types_unsigned_add_verifier_later() {
-        
-        let dbname = "for_tests/load_types_unsigned_add_verifier_later";
-        populate_cold_no_networks(dbname).unwrap();
-        
-        let line = fs::read_to_string("for_tests/updating_types_info_None.txt").unwrap();
+    fn load_known_types_upd_general_verifier() {
+        let dbname = "for_tests/load_known_types_upd_general_verifier";
+        populate_cold(dbname, Verifier::None).unwrap();
+        let line = fs::read_to_string("for_tests/types_info_Alice.txt").unwrap();
         let reply = produce_output(&line.trim(), dbname);
-        
-        let reply_known_part = r#"{"warning":[{"index":0,"indent":0,"type":"warning","payload":"Received types information is not verified."},{"index":1,"indent":0,"type":"warning","payload":"Updating types (really rare operation)."}],"types_info":[{"index":2,"indent":0,"type":"types_hash","payload":"d2c5b096be10229ce9ea9d219325c4399875b52ceb4264add89b0d7c5e9ad574"}],"action":{"type":"load_types","payload":{"type":"load_types","checksum":""#;
-        assert!(reply.contains(reply_known_part), "Error in action.\nReceived: {}", reply);
-        let mock_action_line = get_action_line(&reply);
-        let result = handle_action(&mock_action_line, SEED_PHRASE, PWD, USER_COMMENT, dbname);
-        if let Err(e) = result {panic!("Was unable to load types. {}", e)}
-        
+        let reply_known_part = r#"{"verifier":[{"index":0,"indent":0,"type":"verifier","payload":{"hex":"d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d","encryption":"sr25519"}}],"warning":[{"index":1,"indent":0,"type":"warning","payload":"Received message is verified by a new general verifier. Currently no general verifier is set, and proceeding will update the general verifier to the received value. All previously acquired information associated with general verifier will be purged. Affected network specs entries: Polkadot, Kusama, Westend, Rococo; affected metadata entries: polkadot30, kusama2030, westend9000, westend9010. Types information is purged."},{"index":2,"indent":0,"type":"warning","payload":"Received types information is identical to the one that was in the database."}],"types_info":[{"index":3,"indent":0,"type":"types_hash","payload":"d091a5a24a97e18dfe298b167d8fd5a2add10098c8792cba21c39029a9ee0aeb"}],"action":{"type":"stub","payload":""#;
+        assert!(reply.contains(reply_known_part), "Received: \n{}", reply);
+        let (action_is_sign, checksum_str) = get_type_and_checksum(&reply);
+        if action_is_sign {panic!("Should have been action `stub`.")}
+        let print_before = print_db_content(&dbname);
+        let expected_print_before = r#"Database contents:
+Metadata:
+	kusama2030
+	westend9000
+	westend9010
+	polkadot30
+Network Specs:
+	018091b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3: Polkadot (polkadot with sr25519)
+	0180b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe: Kusama (kusama with sr25519)
+	0180e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e: Westend (westend with sr25519)
+	0180f6e9983c37baf68846fedafe21e56718790e39fb1c582abc408b81bc7b208f9a: Rococo (rococo with sr25519)
+Verifiers:
+	91b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3: {"type":"general","details":{"hex":"","encryption":"none"}}
+	b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe: {"type":"general","details":{"hex":"","encryption":"none"}}
+	e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e: {"type":"general","details":{"hex":"","encryption":"none"}}
+	f6e9983c37baf68846fedafe21e56718790e39fb1c582abc408b81bc7b208f9a: {"type":"general","details":{"hex":"","encryption":"none"}}
+General Verifier: none
+Identities: 
+	public_key: 3efeca331d646d8a2986374bb3bb8d6e9e3cfcdd7c45c2b69104fab5d61d3f34, encryption: sr25519, path: //westend, available_networks: 
+		0180e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e
+	public_key: 46ebddef8cd9bb167dc30878d7113b7e168e6f0646beffd77d69d39bad76b47a, encryption: sr25519, path: , available_networks: 
+		018091b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3
+		0180b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe
+		0180e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e
+		0180f6e9983c37baf68846fedafe21e56718790e39fb1c582abc408b81bc7b208f9a
+	public_key: 64a31235d4bf9b37cfed3afa8aa60754675f9c4915430454d365c05112784d05, encryption: sr25519, path: //kusama, available_networks: 
+		0180b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe
+	public_key: 96129dcebc2e10f644e81fcf4269a663e521330084b1e447369087dec8017e04, encryption: sr25519, path: //rococo, available_networks: 
+		0180f6e9983c37baf68846fedafe21e56718790e39fb1c582abc408b81bc7b208f9a
+	public_key: c81ebbec0559a6acf184535eb19da51ed3ed8c4ac65323999482aaf9b6696e27, encryption: sr25519, path: //alice, available_networks: 
+		0180f6e9983c37baf68846fedafe21e56718790e39fb1c582abc408b81bc7b208f9a
+	public_key: d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d, encryption: sr25519, path: //Alice, available_networks: 
+		0180e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e
+	public_key: f606519cb8726753885cd4d0f518804a69a5e0badf36fee70feadd8044081730, encryption: sr25519, path: //polkadot, available_networks: 
+		018091b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3"#;
+        assert!(print_before == expected_print_before, "Received:\n{}", print_before);
+        handle_stub(&checksum_str, dbname).unwrap();
+        let print_after = print_db_content(&dbname);
+        let expected_print_after = r#"Database contents:
+Metadata:
+Network Specs:
+Verifiers:
+	91b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3: {"type":"general","details":{"hex":"d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d","encryption":"sr25519"}}
+	b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe: {"type":"general","details":{"hex":"d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d","encryption":"sr25519"}}
+	e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e: {"type":"general","details":{"hex":"d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d","encryption":"sr25519"}}
+	f6e9983c37baf68846fedafe21e56718790e39fb1c582abc408b81bc7b208f9a: {"type":"general","details":{"hex":"d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d","encryption":"sr25519"}}
+General Verifier: public key: d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d, encryption: sr25519
+Identities: 
+	public_key: 3efeca331d646d8a2986374bb3bb8d6e9e3cfcdd7c45c2b69104fab5d61d3f34, encryption: sr25519, path: //westend, available_networks: 
+		0180e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e
+	public_key: 46ebddef8cd9bb167dc30878d7113b7e168e6f0646beffd77d69d39bad76b47a, encryption: sr25519, path: , available_networks: 
+		018091b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3
+		0180b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe
+		0180e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e
+		0180f6e9983c37baf68846fedafe21e56718790e39fb1c582abc408b81bc7b208f9a
+	public_key: 64a31235d4bf9b37cfed3afa8aa60754675f9c4915430454d365c05112784d05, encryption: sr25519, path: //kusama, available_networks: 
+		0180b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe
+	public_key: 96129dcebc2e10f644e81fcf4269a663e521330084b1e447369087dec8017e04, encryption: sr25519, path: //rococo, available_networks: 
+		0180f6e9983c37baf68846fedafe21e56718790e39fb1c582abc408b81bc7b208f9a
+	public_key: c81ebbec0559a6acf184535eb19da51ed3ed8c4ac65323999482aaf9b6696e27, encryption: sr25519, path: //alice, available_networks: 
+		0180f6e9983c37baf68846fedafe21e56718790e39fb1c582abc408b81bc7b208f9a
+	public_key: d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d, encryption: sr25519, path: //Alice, available_networks: 
+		0180e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e
+	public_key: f606519cb8726753885cd4d0f518804a69a5e0badf36fee70feadd8044081730, encryption: sr25519, path: //polkadot, available_networks: 
+		018091b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3"#;
+        assert!(print_after == expected_print_after, "Received:\n{}", print_after);
+        fs::remove_dir_all(dbname).unwrap();
+    }
+
+    #[test]
+    fn load_new_types_verified() {
+        let dbname = "for_tests/load_new_types_verified";
+        populate_cold(dbname, Verifier::Sr25519(ALICE)).unwrap();
         let line = fs::read_to_string("for_tests/updating_types_info_Alice.txt").unwrap();
         let reply = produce_output(&line.trim(), dbname);
-        
-        let reply_known_part = r#"{"verifier":[{"index":0,"indent":0,"type":"verifier","payload":{"hex":"d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d","encryption":"sr25519"}}],"warning":[{"index":1,"indent":0,"type":"warning","payload":"Previously unverified information now received signed by a verifier. If accepted, updating types and adding networks could be verified only by this verifier."},{"index":2,"indent":0,"type":"warning","payload":"Received types information is already in database, only verifier could be added."}],"action":{"type":"add_general_verifier","payload":{"type":"add_general_verifier","checksum":""#;
-        assert!(reply.contains(reply_known_part), "Error in action.\nReceived: {}", reply);
-        let mock_action_line = get_action_line(&reply);
-        let result = handle_action(&mock_action_line, SEED_PHRASE, PWD, USER_COMMENT, dbname);
-        if let Err(e) = result {panic!("Was unable to add general verifier. {}", e)}
-        
+        let reply_known_part = r#"{"verifier":[{"index":0,"indent":0,"type":"verifier","payload":{"hex":"d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d","encryption":"sr25519"}}],"warning":[{"index":1,"indent":0,"type":"warning","payload":"Updating types (really rare operation)."}],"types_info":[{"index":2,"indent":0,"type":"types_hash","payload":"d2c5b096be10229ce9ea9d219325c4399875b52ceb4264add89b0d7c5e9ad574"}],"action":{"type":"stub","payload":""#;
+        assert!(reply.contains(reply_known_part), "Received: \n{}", reply);
+        let (action_is_sign, checksum_str) = get_type_and_checksum(&reply);
+        if action_is_sign {panic!("Should have been action `stub`.")}
+        let print_before = print_db_content(&dbname);
+        let expected_print_before = r#"Database contents:
+Metadata:
+	kusama2030
+	westend9000
+	westend9010
+	polkadot30
+Network Specs:
+	018091b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3: Polkadot (polkadot with sr25519)
+	0180b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe: Kusama (kusama with sr25519)
+	0180e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e: Westend (westend with sr25519)
+	0180f6e9983c37baf68846fedafe21e56718790e39fb1c582abc408b81bc7b208f9a: Rococo (rococo with sr25519)
+Verifiers:
+	91b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3: {"type":"general","details":{"hex":"d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d","encryption":"sr25519"}}
+	b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe: {"type":"general","details":{"hex":"d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d","encryption":"sr25519"}}
+	e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e: {"type":"general","details":{"hex":"d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d","encryption":"sr25519"}}
+	f6e9983c37baf68846fedafe21e56718790e39fb1c582abc408b81bc7b208f9a: {"type":"general","details":{"hex":"d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d","encryption":"sr25519"}}
+General Verifier: public key: d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d, encryption: sr25519
+Identities: 
+	public_key: 3efeca331d646d8a2986374bb3bb8d6e9e3cfcdd7c45c2b69104fab5d61d3f34, encryption: sr25519, path: //westend, available_networks: 
+		0180e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e
+	public_key: 46ebddef8cd9bb167dc30878d7113b7e168e6f0646beffd77d69d39bad76b47a, encryption: sr25519, path: , available_networks: 
+		018091b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3
+		0180b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe
+		0180e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e
+		0180f6e9983c37baf68846fedafe21e56718790e39fb1c582abc408b81bc7b208f9a
+	public_key: 64a31235d4bf9b37cfed3afa8aa60754675f9c4915430454d365c05112784d05, encryption: sr25519, path: //kusama, available_networks: 
+		0180b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe
+	public_key: 96129dcebc2e10f644e81fcf4269a663e521330084b1e447369087dec8017e04, encryption: sr25519, path: //rococo, available_networks: 
+		0180f6e9983c37baf68846fedafe21e56718790e39fb1c582abc408b81bc7b208f9a
+	public_key: c81ebbec0559a6acf184535eb19da51ed3ed8c4ac65323999482aaf9b6696e27, encryption: sr25519, path: //alice, available_networks: 
+		0180f6e9983c37baf68846fedafe21e56718790e39fb1c582abc408b81bc7b208f9a
+	public_key: d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d, encryption: sr25519, path: //Alice, available_networks: 
+		0180e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e
+	public_key: f606519cb8726753885cd4d0f518804a69a5e0badf36fee70feadd8044081730, encryption: sr25519, path: //polkadot, available_networks: 
+		018091b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3"#;
+        assert!(print_before == expected_print_before, "Received:\n{}", print_before);
+        handle_stub(&checksum_str, dbname).unwrap();
+        let print_after = print_db_content(&dbname);
+        let expected_print_after = r#"Database contents:
+Metadata:
+	kusama2030
+	westend9000
+	westend9010
+	polkadot30
+Network Specs:
+	018091b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3: Polkadot (polkadot with sr25519)
+	0180b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe: Kusama (kusama with sr25519)
+	0180e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e: Westend (westend with sr25519)
+	0180f6e9983c37baf68846fedafe21e56718790e39fb1c582abc408b81bc7b208f9a: Rococo (rococo with sr25519)
+Verifiers:
+	91b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3: {"type":"general","details":{"hex":"d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d","encryption":"sr25519"}}
+	b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe: {"type":"general","details":{"hex":"d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d","encryption":"sr25519"}}
+	e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e: {"type":"general","details":{"hex":"d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d","encryption":"sr25519"}}
+	f6e9983c37baf68846fedafe21e56718790e39fb1c582abc408b81bc7b208f9a: {"type":"general","details":{"hex":"d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d","encryption":"sr25519"}}
+General Verifier: public key: d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d, encryption: sr25519
+Identities: 
+	public_key: 3efeca331d646d8a2986374bb3bb8d6e9e3cfcdd7c45c2b69104fab5d61d3f34, encryption: sr25519, path: //westend, available_networks: 
+		0180e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e
+	public_key: 46ebddef8cd9bb167dc30878d7113b7e168e6f0646beffd77d69d39bad76b47a, encryption: sr25519, path: , available_networks: 
+		018091b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3
+		0180b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe
+		0180e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e
+		0180f6e9983c37baf68846fedafe21e56718790e39fb1c582abc408b81bc7b208f9a
+	public_key: 64a31235d4bf9b37cfed3afa8aa60754675f9c4915430454d365c05112784d05, encryption: sr25519, path: //kusama, available_networks: 
+		0180b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe
+	public_key: 96129dcebc2e10f644e81fcf4269a663e521330084b1e447369087dec8017e04, encryption: sr25519, path: //rococo, available_networks: 
+		0180f6e9983c37baf68846fedafe21e56718790e39fb1c582abc408b81bc7b208f9a
+	public_key: c81ebbec0559a6acf184535eb19da51ed3ed8c4ac65323999482aaf9b6696e27, encryption: sr25519, path: //alice, available_networks: 
+		0180f6e9983c37baf68846fedafe21e56718790e39fb1c582abc408b81bc7b208f9a
+	public_key: d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d, encryption: sr25519, path: //Alice, available_networks: 
+		0180e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e
+	public_key: f606519cb8726753885cd4d0f518804a69a5e0badf36fee70feadd8044081730, encryption: sr25519, path: //polkadot, available_networks: 
+		018091b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3"#;
+        assert!(print_after == expected_print_after, "Received:\n{}", print_after);
         fs::remove_dir_all(dbname).unwrap();
     }
-    
-// load_types with verifier, general verifier appears, still can load metadata without verifier, but cannot add networks unverified
-    #[test]
-    fn load_types_verified_then_test_unverified_load_metadata_and_unverified_add_network() {
-        
-        let dbname = "for_tests/load_types_verified_then_test_unverified_load_metadata_and_unverified_add_network";
-        populate_cold_no_meta(dbname, true).unwrap();
-
-        let line = fs::read_to_string("for_tests/updating_types_info_Alice.txt").unwrap();
-        let reply = produce_output(&line.trim(), dbname);
-        
-        let reply_known_part = r#"{"verifier":[{"index":0,"indent":0,"type":"verifier","payload":{"hex":"d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d","encryption":"sr25519"}}],"warning":[{"index":1,"indent":0,"type":"warning","payload":"Previously unverified information now received signed by a verifier. If accepted, updating types and adding networks could be verified only by this verifier."},{"index":2,"indent":0,"type":"warning","payload":"Updating types (really rare operation)."}],"types_info":[{"index":3,"indent":0,"type":"types_hash","payload":"d2c5b096be10229ce9ea9d219325c4399875b52ceb4264add89b0d7c5e9ad574"}],"action":{"type":"load_types","payload":{"type":"load_types","checksum":""#;
-        assert!(reply.contains(reply_known_part), "Error in action.\nReceived: {}", reply);
-        let mock_action_line = get_action_line(&reply);
-        let result = handle_action(&mock_action_line, SEED_PHRASE, PWD, USER_COMMENT, dbname);
-        if let Err(e) = result {panic!("Was unable to load types with adding general verifier. {}", e)}
-
-    // loading metadata without verifier - should work        
-        let line = fs::read_to_string("for_tests/network_metadata_westendV9070_None.txt").unwrap();
-        let reply = produce_output(&line.trim(), dbname);
-        
-        let reply_known_part = r#"{"warning":[{"index":0,"indent":0,"type":"warning","payload":"Received network metadata is not verified."}],"meta":[{"index":1,"indent":0,"type":"meta","payload":{"specname":"westend","spec_version":"9070","meta_hash":"e281fbc53168a6b87d1ea212923811f4c083e7be7d18df4b8527b9532e5f5fec"}}],"action":{"type":"load_metadata","payload":{"type":"load_metadata","checksum":""#;
-        assert!(reply.contains(reply_known_part), "Error in action.\nReceived: {}", reply);
-        let mock_action_line = get_action_line(&reply);
-        let result = handle_action(&mock_action_line, SEED_PHRASE, PWD, USER_COMMENT, dbname);
-        if let Err(e) = result {panic!("Was unable to load metadata without signature after general verifier appeared. {}", e)}
-        
-    // adding network without verifier - should not work
-        let line = fs::read_to_string("for_tests/add_network_westendV9090_unverified.txt").unwrap();
-        let reply = produce_output(&line.trim(), dbname);
-        
-        let reply_known = r#"{"error":[{"index":0,"indent":0,"type":"error","payload":"General verifier information exists in the database. Received information could be accepted only from the same general verifier."}]}"#;
-        assert!(reply == reply_known, "Error in parsing outcome.\nReceived: {}", reply);
-        
-        fs::remove_dir_all(dbname).unwrap();
-    }
-
 }

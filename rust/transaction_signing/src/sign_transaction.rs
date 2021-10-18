@@ -10,7 +10,7 @@ use crate::error::{Error, CryptoError};
 /// Function to create signatures using RN output action line, and user entered pin and password.
 /// Also needs database name to fetch saved transaction and key.
 
-pub fn create_signature (seed_phrase: &str, pwd_entry: &str, user_comment: &str, database_name: &str, checksum: u32) -> anyhow::Result<String> {
+pub (crate) fn create_signature (seed_phrase: &str, pwd_entry: &str, user_comment: &str, database_name: &str, checksum: u32) -> anyhow::Result<String> {
     let sign = TrDbColdSign::from_storage(&database_name, checksum)?;
     let pwd = {
         if sign.has_pwd() {Some(pwd_entry)}

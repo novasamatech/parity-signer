@@ -1,8 +1,7 @@
 use anyhow;
-use db_handling::default_hot;
+use constants::{COLD_DB_NAME, COLD_DB_NAME_RELEASE, HOT_DB_NAME};
+use db_handling::{default_cold, default_cold_release, default_hot, metadata::transfer_metadata_to_cold};
 
-mod add;
-    use add::gen_add_network;
 mod error;
 mod helpers;
 mod load;
@@ -27,7 +26,6 @@ mod make_message;
 /// Function to process incoming command as interpreted by parser
 
 pub fn full_run (command: Command) -> anyhow::Result<()> {
-    
     match command {
         Command::Show(x) => {
             match x {
@@ -37,11 +35,14 @@ pub fn full_run (command: Command) -> anyhow::Result<()> {
         },
         Command::Types => gen_types(),
         Command::Load(instruction) => gen_load_meta(instruction),
-        Command::Add(instruction) => gen_add_network(instruction),
         Command::Specs(instruction) => gen_add_specs(instruction),
         Command::Make(make) => make_message(make),
         Command::Remove(info) => remove_info(info),
         Command::RestoreDefaults => default_hot(),
+        Command::MakeColdWithIdentities => default_cold(),
+        Command::TransferMeta => transfer_metadata_to_cold(HOT_DB_NAME, COLD_DB_NAME),
+        Command::MakeColdRelease => default_cold_release(),
+        Command::TransferMetaRelease => transfer_metadata_to_cold(HOT_DB_NAME, COLD_DB_NAME_RELEASE),
     }
 }
 

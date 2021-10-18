@@ -6,7 +6,7 @@ mod error;
 pub mod sign_message;
 mod sign_transaction;
     use sign_transaction::create_signature_png;
-//mod tests;
+mod tests;
 
 
 pub fn handle_stub (checksum_str: &str, database_name: &str) -> anyhow::Result<()> {
@@ -20,7 +20,7 @@ pub fn handle_sign (checksum_str: &str, seed_phrase: &str, pwd_entry: &str, user
     create_signature_png(seed_phrase, pwd_entry, user_comment, database_name, checksum)
 }
 
-fn checksum (checksum_str: &str) -> anyhow::Result<u32> {
+pub (crate) fn checksum (checksum_str: &str) -> anyhow::Result<u32> {
     match checksum_str.parse() {
         Ok(a) => Ok(a),
         Err(_) => return Err(Error::ChecksumNotU32.show()),

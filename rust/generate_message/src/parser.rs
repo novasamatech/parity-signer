@@ -20,11 +20,14 @@ pub enum Command {
     Show(Show),
     Types,
     Load(Instruction),
-    Add(Instruction),
     Specs(Instruction),
     Make(Make),
     Remove(Remove),
     RestoreDefaults,
+    MakeColdWithIdentities,
+    TransferMeta,
+    MakeColdRelease,
+    TransferMetaRelease,
 }
 
 pub enum Show {
@@ -81,7 +84,6 @@ pub enum VerifierKind {
 pub enum Msg {
     LoadTypes(Vec<u8>),
     LoadMetadata(Vec<u8>),
-    AddNetwork(Vec<u8>),
     AddSpecs(Vec<u8>),
 }
 
@@ -95,7 +97,6 @@ enum CryptoType {
 enum MsgType {
     LoadTypes,
     LoadMetadata,
-    AddNetwork,
     AddSpecs
 }
 
@@ -134,7 +135,7 @@ impl Command {
                         }
                     },
                     "load_types" => Ok(Command::Types),
-                    "load_metadata"|"add_network"|"add_specs" => {
+                    "load_metadata"|"add_specs" => {
                         let mut set_key = None;
                         let mut content_key = None;
                         let mut pass_errors = true;
@@ -239,7 +240,6 @@ impl Command {
                         
                         match arg.as_str() {
                             "load_metadata" => Ok(Command::Load(instruction)),
-                            "add_network" => Ok(Command::Add(instruction)),
                             "add_specs" => Ok(Command::Specs(instruction)),
                             _ => unreachable!(),
                         }
@@ -295,7 +295,6 @@ impl Command {
                                                     match x.as_str() {
                                                         "load_types" => Some(MsgType::LoadTypes),
                                                         "load_metadata" => Some(MsgType::LoadMetadata),
-                                                        "add_network" => Some(MsgType::AddNetwork),
                                                         "add_specs" => Some(MsgType::AddSpecs),
                                                         _ => {return Err(Error::BadArgument(BadArgument::MsgType).show())}
                                                     }
@@ -401,7 +400,6 @@ impl Command {
                                 match x {
                                     MsgType::LoadTypes => Msg::LoadTypes(payload),
                                     MsgType::LoadMetadata => Msg::LoadMetadata(payload),
-                                    MsgType::AddNetwork => Msg::AddNetwork(payload),
                                     MsgType::AddSpecs => Msg::AddSpecs(payload),
                                 }
                             },
@@ -472,7 +470,6 @@ impl Command {
                                                     match x.as_str() {
                                                         "load_types" => Some(MsgType::LoadTypes),
                                                         "load_metadata" => Some(MsgType::LoadMetadata),
-                                                        "add_network" => Some(MsgType::AddNetwork),
                                                         "add_specs" => Some(MsgType::AddSpecs),
                                                         _ => {return Err(Error::BadArgument(BadArgument::MsgType).show())}
                                                     }
@@ -546,7 +543,6 @@ impl Command {
                                 match x {
                                     MsgType::LoadTypes => Msg::LoadTypes(payload),
                                     MsgType::LoadMetadata => Msg::LoadMetadata(payload),
-                                    MsgType::AddNetwork => Msg::AddNetwork(payload),
                                     MsgType::AddSpecs => Msg::AddSpecs(payload),
                                 }
                             },
@@ -613,6 +609,10 @@ impl Command {
                         }                        
                     },
                     "restore_defaults" => Ok(Command::RestoreDefaults),
+                    "make_cold_with_identities" => Ok(Command::MakeColdWithIdentities),
+                    "transfer_meta_to_cold" => Ok(Command::TransferMeta),
+                    "make_cold_release" => Ok(Command::MakeColdRelease),
+                    "transfer_meta_to_cold_release" => Ok(Command::TransferMetaRelease),
                     _ => return Err(Error::UnknownCommand.show()),
                 }
             },
