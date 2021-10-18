@@ -529,8 +529,10 @@ pub fn export_identity (pub_key: &str, network_specs_key_string: &str, database_
             Ok(a) => a,
             Err(e) => return Err(Error::Base58(e.to_string()).show()),
         };
-        let mut output = format!("substrate:{}:0x{}:{}", address_base58, hex::encode(&network_specs.genesis_hash), address_details.seed_name);
-        if output.len() > 2953 {output = output[..2953].to_string();} // to fit into qr code, cut seed_name if needed
+        let mut output = format!("substrate:{}:0x{}", address_base58, hex::encode(&network_specs.genesis_hash));
+        // seed names removed, cut always - but uncomment this and return :seedname one line above
+        // to revert!
+        // if output.len() > 2953 {output = output[..2953].to_string();} // to fit into qr code, cut seed_name if needed
         Ok(hex::encode(png_qr_from_string(&output)?))
     }
     else {return Err(Error::NotFound(NotFound::NetworkSpecsKey).show())}
