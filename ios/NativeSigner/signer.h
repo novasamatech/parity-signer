@@ -51,16 +51,23 @@ const char * try_decode_qr_sequence(struct ExternError*, const char* data, int8_
 // other than formation of "action" record in db that could be used by handle_action function
 const char * parse_transaction(struct ExternError*, const char* transaction, const char* dbname);
 
-// Handle action;
+// Handle non-signing action;
+// This function performs cryptographic signing or permanently changes Signer's state by modifying
+// networks information
+// Returns QR payload string or plaintext statement of action result
+const char * handle_stub(struct ExternError*, const char* checksum, const char* dbname);
+
+// Handle signing action;
 // This function performs cryptographic signing or permanently changes Signer's state by modifying
 // networks information
 // takes 4 strings
-// action - action descriptor with checksum produced in parse_transaction
+// checksum - checksum produced in parse_transaction
 // seed phrase (plaintext)
 // password - optional derivation password (///password)
+// user comment - arbitrary base64 string provided by user
 // dbname (from OS)
 // Returns QR payload string or plaintext statement of action result
-const char * handle_action(struct ExternError*, const char* action, const char* seed_phrase, const char* password, const char* user_comment, const char* dbname);
+const char * handle_sign(struct ExternError*, const char* checksum, const char* seed_phrase, const char* password, const char* user_comment, const char* dbname);
 
 // Self descriptive: development test for channel
 // TODO: remove for safety
@@ -85,7 +92,7 @@ const char * get_relevant_identities(struct ExternError*, const char* seed_name,
 const char * get_all_identities(struct ExternError*, const char* dbname);
 
 // Function to create new seed
-const char * try_create_seed(struct ExternError*, const char* seed_name, const char* crypto, const char* seed_phrase, int seed_length, const char* dbname);
+const char * try_create_seed(struct ExternError*, const char* seed_name, const char* seed_phrase, int seed_length, const char* dbname);
 
 // Suggest next numbered path
 const char * suggest_n_plus_one(struct ExternError*, const char* path, const char* seed_name, const char* network_id_string, const char* dbname);
@@ -121,21 +128,34 @@ const char * print_history(struct ExternError*, const char* dbname);
 // Clear history (marks history with clearing event time)
 void clear_history(struct ExternError*, const char* dbname);
 
-// Init history - should be called after db copy from resources, marks signer factory reset event
-void init_history(struct ExternError*, const char* dbname);
+// Init history - should be called after db copy from resources, marks signer factory reset event, installs general verifier
+void init_history_with_cert(struct ExternError*, const char* dbname);
+
+// Init history - should be called after db copy from resources, marks signer factory reset event. Use for jailbreak.
+void init_history_no_cert(struct ExternError*, const char* dbname);
 
 // Record going online event
 void device_was_online(struct ExternError*, const char* dbname);
 
-// Call on every successful seeds decoding
-void seeds_were_accessed(struct ExternError*, const char* dbname);
+// Check if warnings are present
+int8_t get_warnings(struct ExternError*, const char* dbname);
 
-// Call on seeds backup
-void seeds_were_shown(struct ExternError*, const char* dbname);
+// Disarm log alert
+void acknowledge_warnings(struct ExternError*, const char* dbname);
 
 // Add custom record to history
 void history_entry_user(struct ExternError*, const char* enrty, const char* dbname);
 
 // Generic function to record system events
 void history_entry_system(struct ExternError*, const char* entry, const char* dbname);
+
+// Call on seed backup
+void seed_name_was_shown(struct ExternError*, const char* seed_name, const char* dbname);
+
+//Functions for self-signed upgrades
+const char * sign_load_types(struct ExternError*, const char* public_key, const char* encryption, const char* seed_phrase, const char* password, const char* dbname);
+
+const char * sign_load_metadata(struct ExternError*, const char* network, const char* version, const char* public_key, const char* encryption, const char* seed_phrase, const char* password, const char* dbname);
+
+const char * sign_load_specs(struct ExternError*, const char* network, const char* public_key, const char* encryption, const char* seed_phrase, const char* password, const char* dbname);
 

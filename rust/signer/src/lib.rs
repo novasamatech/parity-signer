@@ -142,11 +142,11 @@ export! {
     @Java_io_parity_signer_models_SignerDataModel_substrateTryCreateSeed
 	fn try_create_seed(
         seed_name: &str,
-        crypto: &str,
         seed_phrase: &str,
         seed_length: u32,
 		dbname: &str
 	) -> anyhow::Result<String, anyhow::Error> {
+        let crypto = "sr25519";
         db_handling::identities::try_create_seed(seed_name, crypto, seed_phrase, seed_length, dbname)
     }
 
@@ -296,8 +296,8 @@ export! {
         db_handling::manage_history::history_entry_system(dbname, entry.to_string())
     }
 
-    @Java_io_parity_signer_models_SignerDataModel_historyHistorySeedNameWasShown
-	fn history_seed_name_was_shown(
+    @Java_io_parity_signer_models_SignerDataModel_historySeedNameWasShown
+	fn seed_name_was_shown(
         seed_name: &str,
         dbname: &str
 	) -> anyhow::Result<(), anyhow::Error> {
