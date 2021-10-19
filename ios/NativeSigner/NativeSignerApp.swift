@@ -16,7 +16,7 @@ struct NativeSignerApp: App {
             MainScreenContainer()
                 .environmentObject(data)
                 .environmentObject(canary)
-                .background(/*@START_MENU_TOKEN@*//*@PLACEHOLDER=View@*/Color("backgroundColor")/*@END_MENU_TOKEN@*/)
+                .background(.black)
         }
     }
 }

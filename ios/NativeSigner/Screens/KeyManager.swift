@@ -9,6 +9,7 @@ import SwiftUI
 
 struct KeyManager: View {
     @EnvironmentObject var data: SignerDataModel
+    @GestureState private var dragOffset = CGSize.zero
     var body: some View {
         ZStack {
             VStack {
@@ -55,7 +56,14 @@ struct KeyManager: View {
             case .seedSelector:
                 SeedManager()
             case .networkManager:
-                NetworkManager().frame(height: UIScreen.main.bounds.height - 90.0).offset(y: UIScreen.main.bounds.height - 300.0)
+                VStack {
+                    Spacer()
+                    NetworkManager().frame(height: UIScreen.main.bounds.height/3)
+                }.gesture(DragGesture().updating($dragOffset, body: { (value, state, transaction) in
+                    if value.translation.height > 100 {
+                        data.goBack()
+                    }
+                }))
             case .networkDetails:
                 NetworkDetails()
             case .none:
