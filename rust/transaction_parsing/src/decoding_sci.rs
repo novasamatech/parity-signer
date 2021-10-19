@@ -1,5 +1,5 @@
 use parity_scale_codec::Decode;
-use scale_info::{Field, Type, TypeDef, TypeDefPrimitive, TypeDefVariant, TypeDefComposite, TypeDefBitSequence, /*TypeDefRange,*/ form::PortableForm};
+use scale_info::{Field, Type, TypeDef, TypeDefPrimitive, TypeDefVariant, TypeDefComposite, TypeDefBitSequence, form::PortableForm};
 use num_bigint::{BigInt, BigUint};
 use definitions::{network_specs::ChainSpecs};
 use frame_metadata::v14::RuntimeMetadataV14;
@@ -9,22 +9,7 @@ use bitvec::{prelude::{BitVec, Lsb0, Msb0}, store::BitStore, order::BitOrder};
 use crate::cards::Card;
 use crate::decoding_commons::{DecodedOut, get_compact, decode_known_length, decode_primitive_with_flags, special_case_account_id};
 use crate::error::{Error, UnableToDecode};
-/*
-enum SpecialDecodingCases {
-    Option,
-    Compact,
-    Call,
-    IdentityFields,
-    None,
-}
 
-enum SpecialDisplayCases {
-    AccountId,
-    Balance,
-    BitVec,
-    None
-}
-*/
 enum FoundBitOrder {
     Lsb0,
     Msb0,
@@ -241,41 +226,9 @@ fn field_type_name_is_balance (type_name: &str) -> bool {
 }
 
 
-pub fn decoding_sci_complete (type_id: u32, compact_flag: bool, balance_flag: bool, data: Vec<u8>, meta_v14: &RuntimeMetadataV14, index: &mut u32, mut indent: u32, chain_specs: &ChainSpecs) -> Result<DecodedOut, Error> {
-    let current_type = match meta_v14.types.resolve(type_id) {
-        Some(a) => a,
-        None => return Err(Error::UnableToDecode(UnableToDecode::V14TypeNotResolved)),
-    };
-/*
-// checking if the entry is actually a bundled call - this will slightly change output formatting
-    if let Some(x) = current_type.path().ident() {
-        if x.as_str() == "Call" {
-            
-            indent = indent + 1;
-        }
-    }
-*/
-    let mut docs = String::new();
-    for (i, x) in current_type.docs().iter().enumerate() {
-        if i>0 {docs.push_str("\n");}
-        docs.push_str(x);
-    }
+pub fn decoding_sci_complete (current_type: &Type<PortableForm>, compact_flag: bool, balance_flag: bool, data: Vec<u8>, meta_v14: &RuntimeMetadataV14, index: &mut u32, indent: u32, chain_specs: &ChainSpecs) -> Result<DecodedOut, Error> {
     
-    let mut path = String::from("[");
-    for (i, x) in current_type.path().segments().iter().enumerate() {
-        if i>0 {path.push_str(",");}
-        path.push_str(&format!("\"{}\"", x));
-    }
-    path.push_str("]");
-    
-    let mut fancy_out = {
-        if (docs.len()==0)&&(path.len()==2) {String::new()}
-        else {
-            let out = format!(",{}", (Card::PathDocs{path: &path, docs: &docs}.card(index, indent)));
-            indent = indent + 1;
-            out
-        }
-    };
+    let mut fancy_out = String::new();
     let after_run = {
         if type_is_account_id(current_type) {special_case_account_id(data, index, indent, chain_specs)?}
         else {    
@@ -290,11 +243,19 @@ pub fn decoding_sci_complete (type_id: u32, compact_flag: bool, balance_flag: bo
                 },
                 TypeDef::Sequence(x) => {
                     if compact_flag {return Err(Error::UnableToDecode(UnableToDecode::UnexpectedCompactInsides))}
-                    decode_type_def_sequence (x.type_param().id(), balance_flag, data, &meta_v14, index, indent, chain_specs)?
+                    let inner_type = match meta_v14.types.resolve(x.type_param().id()) { // docs?
+                        Some(a) => a,
+                        None => return Err(Error::UnableToDecode(UnableToDecode::V14TypeNotResolved)),
+                    };
+                    decode_type_def_sequence (inner_type, balance_flag, data, &meta_v14, index, indent, chain_specs)?
                 },
                 TypeDef::Array(x) => {
                     if compact_flag {return Err(Error::UnableToDecode(UnableToDecode::UnexpectedCompactInsides))}
-                    decode_type_def_array(x.type_param().id(), x.len(), balance_flag, data, &meta_v14, index, indent, chain_specs)?
+                    let inner_type = match meta_v14.types.resolve(x.type_param().id()) { // docs?
+                        Some(a) => a,
+                        None => return Err(Error::UnableToDecode(UnableToDecode::V14TypeNotResolved)),
+                    };
+                    decode_type_def_array(inner_type, x.len(), balance_flag, data, &meta_v14, index, indent, chain_specs)?
                 },
                 TypeDef::Tuple(x) => {
                     reject_flags(compact_flag, balance_flag)?;
@@ -303,20 +264,17 @@ pub fn decoding_sci_complete (type_id: u32, compact_flag: bool, balance_flag: bo
                 },
                 TypeDef::Primitive(x) => decode_type_def_primitive (x, compact_flag, balance_flag, &data, index, indent, chain_specs)?,
                 TypeDef::Compact(x) => {
-                    let inner_type_id = x.type_param().id();
+                    let inner_type = match meta_v14.types.resolve(x.type_param().id()) { // docs?
+                        Some(a) => a,
+                        None => return Err(Error::UnableToDecode(UnableToDecode::V14TypeNotResolved)),
+                    };
                     let compact_flag = true;
-                    decoding_sci_complete(inner_type_id, compact_flag, balance_flag, data, meta_v14, index, indent, chain_specs)?
+                    decoding_sci_complete(inner_type, compact_flag, balance_flag, data, meta_v14, index, indent, chain_specs)?
                 },
                 TypeDef::BitSequence(x) => {
                     reject_flags(compact_flag, balance_flag)?;
                     decode_type_def_bit_sequence (x, data, &meta_v14, index, indent)?
                 },
-/*
-                TypeDef::Range(x) => {
-                    reject_flags(compact_flag, balance_flag)?;
-                    decode_type_def_range (x, data, &meta_v14, index, indent)?
-                },
-*/
             }
         }
     };
@@ -353,13 +311,15 @@ pub fn decoding_sci_entry_point (mut data: Vec<u8>, meta_v14: &RuntimeMetadataV1
         Some(a) => a,
         None => return Err(Error::UnableToDecode(UnableToDecode::NoCallsInPallet(pallet_name))),
     };
-    let mut fancy_out = format!("{}", (Card::Pallet(&pallet_name)).card(index, indent));
+    let (current_type, path, docs) = type_path_docs(meta_v14, type_id)?;
+    
+    let mut fancy_out = format!("{}", (Card::Pallet{pallet_name: &pallet_name, path: &path, docs: &docs}).card(index, indent));
     indent = indent + 1;
     data = data[1..].to_vec();
     
     let compact_flag = false;
     let balance_flag = false;
-    let decoded_out = decoding_sci_complete(type_id, compact_flag, balance_flag, data, meta_v14, index, indent, chain_specs)?;
+    let decoded_out = decoding_sci_complete(&current_type, compact_flag, balance_flag, data, meta_v14, index, indent, chain_specs)?;
     fancy_out.push_str(&decoded_out.fancy_out);
     
     Ok(DecodedOut{
@@ -370,7 +330,7 @@ pub fn decoding_sci_entry_point (mut data: Vec<u8>, meta_v14: &RuntimeMetadataV1
 }
 
 
-fn decode_type_def_sequence (type_id: u32, balance_flag: bool, mut data: Vec<u8>, meta_v14: &RuntimeMetadataV14, index: &mut u32, indent: u32, chain_specs: &ChainSpecs) -> Result<DecodedOut, Error> {
+fn decode_type_def_sequence (inner_type: &Type<PortableForm>, balance_flag: bool, mut data: Vec<u8>, meta_v14: &RuntimeMetadataV14, index: &mut u32, indent: u32, chain_specs: &ChainSpecs) -> Result<DecodedOut, Error> {
     let pre_vector = get_compact::<u32>(&data)?;
     let mut fancy_output_prep = String::new();
     let elements_of_vector = pre_vector.compact_found;
@@ -379,7 +339,7 @@ fn decode_type_def_sequence (type_id: u32, balance_flag: bool, mut data: Vec<u8>
             data = data[start..].to_vec();
             for _i in 0..elements_of_vector {
                 let compact_flag = false;
-                let after_run = decoding_sci_complete(type_id, compact_flag, balance_flag, data, meta_v14, index, indent, chain_specs)?;
+                let after_run = decoding_sci_complete(inner_type, compact_flag, balance_flag, data, meta_v14, index, indent, chain_specs)?;
                 fancy_output_prep.push_str(&after_run.fancy_out);
                 data = after_run.remaining_vector;
             }
@@ -403,11 +363,11 @@ fn decode_type_def_sequence (type_id: u32, balance_flag: bool, mut data: Vec<u8>
 }
 
 
-fn decode_type_def_array (type_id: u32, len: u32, balance_flag: bool, mut data: Vec<u8>, meta_v14: &RuntimeMetadataV14, index: &mut u32, indent: u32, chain_specs: &ChainSpecs) -> Result<DecodedOut, Error> {
+fn decode_type_def_array (inner_type: &Type<PortableForm>, len: u32, balance_flag: bool, mut data: Vec<u8>, meta_v14: &RuntimeMetadataV14, index: &mut u32, indent: u32, chain_specs: &ChainSpecs) -> Result<DecodedOut, Error> {
     let mut fancy_output_prep = String::new();
     for _i in 0..len {
         let compact_flag = false;
-        let after_run = decoding_sci_complete(type_id, compact_flag, balance_flag, data, meta_v14, index, indent, chain_specs)?;
+        let after_run = decoding_sci_complete(inner_type, compact_flag, balance_flag, data, meta_v14, index, indent, chain_specs)?;
         fancy_output_prep.push_str(&after_run.fancy_out);
         data = after_run.remaining_vector;
     }
@@ -422,11 +382,12 @@ fn decode_type_def_array (type_id: u32, len: u32, balance_flag: bool, mut data: 
 fn decode_type_def_tuple (id_set: Vec<u32>, mut data: Vec<u8>, meta_v14: &RuntimeMetadataV14, index: &mut u32, indent: u32, chain_specs: &ChainSpecs) -> Result<DecodedOut, Error> {
     let mut fancy_out = String::new();
     for (i, type_id) in id_set.iter().enumerate() {
-        let fancy_output_prep = format!(",{}", (Card::FieldNumber{number: i+1, docs: ""}).card(index, indent));
+        let (inner_type, path, docs) = type_path_docs(meta_v14, *type_id)?;
+        let fancy_output_prep = format!(",{}", (Card::FieldNumber{number: i+1, docs_field_number: "", path_type: &path, docs_type: &docs}).card(index, indent));
         fancy_out.push_str(&fancy_output_prep);
         let compact_flag = false;
         let balance_flag = false;
-        let after_run = decoding_sci_complete(*type_id, compact_flag, balance_flag, data, meta_v14, index, indent, chain_specs)?;
+        let after_run = decoding_sci_complete(&inner_type, compact_flag, balance_flag, data, meta_v14, index, indent, chain_specs)?;
         fancy_out.push_str(&after_run.fancy_out);
         data = after_run.remaining_vector;
     }
@@ -473,22 +434,6 @@ fn is_option_bool (found_ty: &TypeDefVariant<PortableForm>, meta_v14: &RuntimeMe
         is_bool,
     }
 }
-
-/*
-fn is_option (found_ty: &TypeDefVariant<PortableForm>) -> bool {
-    let mut got_none = false;
-    let mut got_some = false;
-    let mut out = false;
-    if found_ty.variants().len() == 2 {
-        for x in found_ty.variants().iter() {
-            if x.name().as_str() == "None" {got_none = true;}
-            if x.name().as_str() == "Some" {got_some = true;}
-        }
-        if got_none&&got_some {out = true}
-    }
-    out
-}
-*/
 
 fn decode_type_def_variant (found_ty: &TypeDefVariant<PortableForm>, mut data: Vec<u8>, meta_v14: &RuntimeMetadataV14, index: &mut u32, indent: u32, chain_specs: &ChainSpecs) -> Result<DecodedOut, Error> {
     
@@ -545,7 +490,7 @@ fn decode_type_def_variant (found_ty: &TypeDefVariant<PortableForm>, mut data: V
             if i>0 {variant_docs.push_str("\n");}
             variant_docs.push_str(x);
         }
-        let mut fancy_out = format!(",{}", (Card::EnumVariantName{name: &found_variant.name(), docs: &variant_docs}).card(index, indent));
+        let mut fancy_out = format!(",{}", (Card::EnumVariantName{name: &found_variant.name(), docs_enum_variant: &variant_docs}).card(index, indent));
         data = data[1..].to_vec();
         
         let compact_flag = false;
@@ -571,9 +516,10 @@ fn process_fields (fields: &[Field<PortableForm>], compact_flag: bool, mut data:
             if j>0 {field_docs.push_str("\n");}
             field_docs.push_str(y);
         }
+        let (inner_type, path_type, docs_type) = type_path_docs(meta_v14, x.ty().id())?;
         match x.name() {
             Some(field_name) => {
-                let fancy_out_prep = format!(",{}", (Card::FieldName{name: &field_name, docs: &field_docs}).card(index, indent));
+                let fancy_out_prep = format!(",{}", (Card::FieldName{name: &field_name, docs_field_name: &field_docs, path_type: &path_type, docs_type: &docs_type}).card(index, indent));
                 fancy_out.push_str(&fancy_out_prep);
                 balance_flag = match x.type_name() {
                     Some(a) => field_type_name_is_balance(&a),
@@ -582,12 +528,12 @@ fn process_fields (fields: &[Field<PortableForm>], compact_flag: bool, mut data:
             },
             None => {
                 if fields.len()>1 {
-                    let fancy_out_prep = format!(",{}", (Card::FieldNumber{number: i, docs: &field_docs}).card(index, indent));
+                    let fancy_out_prep = format!(",{}", (Card::FieldNumber{number: i, docs_field_number: &field_docs, path_type: &path_type, docs_type: &docs_type}).card(index, indent));
                     fancy_out.push_str(&fancy_out_prep);
                 }
             },
         }
-        let after_run = decoding_sci_complete(x.ty().id(), compact_flag, balance_flag, data, meta_v14, index, indent+1, chain_specs)?;
+        let after_run = decoding_sci_complete(&inner_type, compact_flag, balance_flag, data, meta_v14, index, indent+1, chain_specs)?;
         fancy_out.push_str(&after_run.fancy_out);
         data = after_run.remaining_vector;
     }
@@ -714,60 +660,21 @@ fn ugly_patch_u64<O: BitOrder> (into_bv_decode: Vec<u8>) -> Result<String, Error
     Ok(out)
 }
 
-/*
-fn decode_type_def_range (found_ty: &TypeDefRange<PortableForm>, data: Vec<u8>, meta_v14: &RuntimeMetadataV14, index: &mut u32, indent: u32) -> Result<DecodedOut, Error> {
-    let inclusive_flag = found_ty.inclusive();
-    let index_type_id = found_ty.index_type().id();
-    let index_type = match meta_v14.types.resolve(index_type_id) {
+fn type_path_docs (meta_v14: &RuntimeMetadataV14, type_id: u32) -> Result<(Type<PortableForm>, String, String), Error> {
+    let current_type = match meta_v14.types.resolve(type_id) {
         Some(a) => a,
         None => return Err(Error::UnableToDecode(UnableToDecode::V14TypeNotResolved)),
     };
-    match index_type.type_def() {
-         TypeDef::Primitive(a) => {
-             match a {
-                 TypeDefPrimitive::U8 => process_range::<u8> (data, index, indent, inclusive_flag),
-                 TypeDefPrimitive::U16 => process_range::<u16> (data, index, indent, inclusive_flag),
-                 TypeDefPrimitive::U32 => process_range::<u32> (data, index, indent, inclusive_flag),
-                 TypeDefPrimitive::U64 => process_range::<u64> (data, index, indent, inclusive_flag),
-                 TypeDefPrimitive::U128 => process_range::<u128> (data, index, indent, inclusive_flag),
-                 TypeDefPrimitive::I8 => process_range::<i8> (data, index, indent, inclusive_flag),
-                 TypeDefPrimitive::I16 => process_range::<i16> (data, index, indent, inclusive_flag),
-                 TypeDefPrimitive::I32 => process_range::<i32> (data, index, indent, inclusive_flag),
-                 TypeDefPrimitive::I64 => process_range::<i64> (data, index, indent, inclusive_flag),
-                 TypeDefPrimitive::I128 => process_range::<i128> (data, index, indent, inclusive_flag),
-                  _ => return Err(Error::UnableToDecode(UnableToDecode::NotRangeIndex)),
-             }
-         },
-         _ => return Err(Error::UnableToDecode(UnableToDecode::NotRangeIndex)),
-     }
+    let mut docs = String::new();
+    for (i, x) in current_type.docs().iter().enumerate() {
+        if i>0 {docs.push_str("\n");}
+        docs.push_str(x);
+    }
+    let mut path = String::new();
+    for (i, x) in current_type.path().segments().iter().enumerate() {
+        if i>0 {path.push_str(" >> ");}
+        path.push_str(&x);
+    }
+    Ok((current_type.to_owned(), path, docs))
 }
 
-fn process_range <T: PartialOrd + std::fmt::Display + Decode> (data: Vec<u8>, index: &mut u32, indent: u32, inclusive_flag: bool) -> Result<DecodedOut, Error> {
-    let length = 2 * size_of::<T>();
-    match data.get(..length) {
-        Some(into_range) => {
-            let remaining_vector = data[length..].to_vec();
-            let fancy_out = {
-                if inclusive_flag {
-                    match <std::ops::RangeInclusive<T>>::decode(&mut &into_range[..]) {
-                        Ok(range) => {format!(",{}", (Card::Range{start: range.start().to_string(), end: range.end().to_string(), inclusive: inclusive_flag}).card(index, indent))},
-                        Err(_) => return Err(Error::UnableToDecode(UnableToDecode::RangeFailure)),
-                    }
-                }
-                else {
-                    match <std::ops::Range<T>>::decode(&mut &into_range[..]) {
-                        Ok(range) => {format!(",{}", (Card::Range{start: range.start.to_string(), end: range.end.to_string(), inclusive: inclusive_flag}).card(index, indent))},
-                        Err(_) => return Err(Error::UnableToDecode(UnableToDecode::RangeFailure)),
-                    }
-                }
-            };
-            Ok(DecodedOut{
-                remaining_vector,
-                indent,
-                fancy_out,
-            })
-        },
-        None => return Err(Error::UnableToDecode(UnableToDecode::DataTooShort)),
-    }
-}
-*/

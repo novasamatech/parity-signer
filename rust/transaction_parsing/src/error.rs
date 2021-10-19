@@ -16,8 +16,8 @@ pub enum BadInputData {
     NotSubstrate,
     NotHex,
     CryptoNotSupported,
-//    UnexpectedImmortality,
-//    UnexpectedMortality,
+    UnexpectedImmortality,
+    UnexpectedMortality,
     WrongPayloadType,
     GenesisHashMismatch,
     ImmortalHashMismatch,
@@ -66,8 +66,6 @@ pub enum UnableToDecode {
     NotBitStoreType,
     NotBitOrderType,
     BitVecFailure,
-//    NotRangeIndex,
-//    RangeFailure,
 }
 
 #[derive(PartialEq)]
@@ -126,8 +124,8 @@ impl Error {
                     BadInputData::NotSubstrate => String::from("Only Substrate transactions are supported. Transaction is expected to start with 0x53."),
                     BadInputData::NotHex => String::from("Input data not in hex format."),
                     BadInputData::CryptoNotSupported => String::from("Crypto type not supported."),
-//                    BadInputData::UnexpectedImmortality => String::from("Expected mortal transaction due to prelude format. Found immortal transaction."),
-//                    BadInputData::UnexpectedMortality => String::from("Expected immortal transaction due to prelude format. Found mortal transaction."),
+                    BadInputData::UnexpectedImmortality => String::from("Expected mortal transaction due to prelude format. Found immortal transaction."),
+                    BadInputData::UnexpectedMortality => String::from("Expected immortal transaction due to prelude format. Found mortal transaction."),
                     BadInputData::WrongPayloadType => String::from("Wrong payload type, as announced by prelude."),
                     BadInputData::GenesisHashMismatch => String::from("Genesis hash from extrinsics not matching with genesis hash at the transaction end."),
                     BadInputData::ImmortalHashMismatch => String::from("Block hash for immortal transaction not matching genesis hash for the network."),
@@ -176,8 +174,6 @@ impl Error {
                     UnableToDecode::NotBitStoreType => String::from("Error decoding call content. Declared type is not suitable BitStore type for BitVec."),
                     UnableToDecode::NotBitOrderType => String::from("Error decoding call content. Declared type is not suitable BitOrder type for BitVec."),
                     UnableToDecode::BitVecFailure => String::from("Error decoding call content. Could not decode BitVec."),
-//                    UnableToDecode::NotRangeIndex => String::from("Error decoding call content. Declared type is not suitable index type for Range."),
-//                    UnableToDecode::RangeFailure => String::from("Error decoding call content. Could not decode Range."),
                 }
             },
             Error::DatabaseError(x) => {

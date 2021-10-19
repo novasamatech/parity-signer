@@ -109,7 +109,7 @@ mod tests {
  - Cheaper than transfer because account cannot be killed.
  - Base Weight: 51.4 µs
  - DB Weight: 1 Read and 1 Write to dest (sender is in overlay already)
- #</weight>"}},{"index":2,"indent":1,"type":"varname","payload":"dest"},{"index":3,"indent":2,"type":"enum_variant_name","payload":{"name":"Id","docs":""}},{"index":4,"indent":3,"type":"Id","payload":"5FHneW46xGXgs5mUiveU4sbTyGBzmstUspZC92UhjJM694ty"},{"index":5,"indent":1,"type":"varname","payload":"value"},{"index":6,"indent":2,"type":"balance","payload":{"amount":"100.000000000","units":"mWND"}}],"extrinsics":[{"index":7,"indent":0,"type":"era_mortal_nonce","payload":{"era":"Mortal","phase":"27","period":"64","nonce":"46"}},{"index":8,"indent":0,"type":"tip","payload":{"amount":"0","units":"pWND"}},{"index":9,"indent":0,"type":"block_hash","payload":"538a7d7a0ac17eb6dd004578cb8e238c384a10f57c999a3fa1200409cd9b3f33"},{"index":10,"indent":0,"type":"tx_spec","payload":{"network":"westend","version":"9010","tx_version":"5"}}],"action":{"type":"sign","payload":""#;
+ #</weight>"}},{"index":2,"indent":1,"type":"varname","payload":"dest"},{"index":3,"indent":2,"type":"enum_variant_name","payload":{"name":"Id","docs_enum_variant":""}},{"index":4,"indent":3,"type":"Id","payload":"5FHneW46xGXgs5mUiveU4sbTyGBzmstUspZC92UhjJM694ty"},{"index":5,"indent":1,"type":"varname","payload":"value"},{"index":6,"indent":2,"type":"balance","payload":{"amount":"100.000000000","units":"mWND"}}],"extrinsics":[{"index":7,"indent":0,"type":"era_mortal_nonce","payload":{"era":"Mortal","phase":"27","period":"64","nonce":"46"}},{"index":8,"indent":0,"type":"tip","payload":{"amount":"0","units":"pWND"}},{"index":9,"indent":0,"type":"block_hash","payload":"538a7d7a0ac17eb6dd004578cb8e238c384a10f57c999a3fa1200409cd9b3f33"},{"index":10,"indent":0,"type":"tx_spec","payload":{"network":"westend","version":"9010","tx_version":"5"}}],"action":{"type":"sign","payload":""#;
         assert!(reply.contains(reply_known_part), "Error in action.\nReceived: {}", reply);
         let (action_is_sign, checksum_str) = get_type_and_checksum(&reply);
         let result = sign_action_test(action_is_sign, &checksum_str, SEED_PHRASE, PWD, USER_COMMENT, dbname);
@@ -168,6 +168,7 @@ Identities: "#;
         let expected_print_before = r#"Database contents:
 Metadata:
 	kusama2030
+	rococo9103
 	westend9000
 	westend9010
 	polkadot30
@@ -206,6 +207,7 @@ Identities:
         let expected_print_after = r#"Database contents:
 Metadata:
 	kusama2030
+	rococo9103
 	westend9000
 	westend9010
 	polkadot30
@@ -257,6 +259,7 @@ Identities:
         let expected_print_before = r#"Database contents:
 Metadata:
 	kusama2030
+	rococo9103
 	westend9000
 	westend9010
 	polkadot30
@@ -295,6 +298,7 @@ Identities:
         let expected_print_after = r#"Database contents:
 Metadata:
 	kusama2030
+	rococo9103
 	westend9000
 	westend9010
 	westend9070
@@ -338,7 +342,7 @@ Identities:
         populate_cold(dbname, Verifier::None).unwrap();
         let line = fs::read_to_string("for_tests/types_info_Alice.txt").unwrap();
         let reply = produce_output(&line.trim(), dbname);
-        let reply_known_part = r#"{"verifier":[{"index":0,"indent":0,"type":"verifier","payload":{"hex":"d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d","encryption":"sr25519"}}],"warning":[{"index":1,"indent":0,"type":"warning","payload":"Received message is verified by a new general verifier. Currently no general verifier is set, and proceeding will update the general verifier to the received value. All previously acquired information associated with general verifier will be purged. Affected network specs entries: Polkadot, Kusama, Westend, Rococo; affected metadata entries: polkadot30, kusama2030, westend9000, westend9010. Types information is purged."},{"index":2,"indent":0,"type":"warning","payload":"Received types information is identical to the one that was in the database."}],"types_info":[{"index":3,"indent":0,"type":"types_hash","payload":"d091a5a24a97e18dfe298b167d8fd5a2add10098c8792cba21c39029a9ee0aeb"}],"action":{"type":"stub","payload":""#;
+        let reply_known_part = r#"{"verifier":[{"index":0,"indent":0,"type":"verifier","payload":{"hex":"d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d","encryption":"sr25519"}}],"warning":[{"index":1,"indent":0,"type":"warning","payload":"Received message is verified by a new general verifier. Currently no general verifier is set, and proceeding will update the general verifier to the received value. All previously acquired information associated with general verifier will be purged. Affected network specs entries: Polkadot, Kusama, Westend, Rococo; affected metadata entries: polkadot30, kusama2030, westend9000, westend9010, rococo9103. Types information is purged."},{"index":2,"indent":0,"type":"warning","payload":"Received types information is identical to the one that was in the database."}],"types_info":[{"index":3,"indent":0,"type":"types_hash","payload":"d091a5a24a97e18dfe298b167d8fd5a2add10098c8792cba21c39029a9ee0aeb"}],"action":{"type":"stub","payload":""#;
         assert!(reply.contains(reply_known_part), "Received: \n{}", reply);
         let (action_is_sign, checksum_str) = get_type_and_checksum(&reply);
         if action_is_sign {panic!("Should have been action `stub`.")}
@@ -346,6 +350,7 @@ Identities:
         let expected_print_before = r#"Database contents:
 Metadata:
 	kusama2030
+	rococo9103
 	westend9000
 	westend9010
 	polkadot30
@@ -426,6 +431,7 @@ Identities:
         let expected_print_before = r#"Database contents:
 Metadata:
 	kusama2030
+	rococo9103
 	westend9000
 	westend9010
 	polkadot30
@@ -464,6 +470,7 @@ Identities:
         let expected_print_after = r#"Database contents:
 Metadata:
 	kusama2030
+	rococo9103
 	westend9000
 	westend9010
 	polkadot30

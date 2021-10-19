@@ -78,15 +78,15 @@ mod tests {
         
         insert_metadata_from_file(dbname_hot, "tests/westend9010");
         assert!(metadata_len(dbname_hot) == 1, "Fresh hot database, should have only the single network added.");
-        assert!(format!("{:?}", metadata_contents(dbname_cold)) == r#"[("kusama", 2030), ("westend", 9000), ("westend", 9010), ("polkadot", 30)]"#, "expected: \n{:?}", metadata_contents(dbname_cold));
+        assert!(format!("{:?}", metadata_contents(dbname_cold)) == r#"[("kusama", 2030), ("rococo", 9103), ("westend", 9000), ("westend", 9010), ("polkadot", 30)]"#, "expected: \n{:?}", metadata_contents(dbname_cold));
         
         transfer_metadata_to_cold(dbname_hot, dbname_cold).unwrap();
-        assert!(format!("{:?}", metadata_contents(dbname_cold)) == r#"[("kusama", 2030), ("westend", 9000), ("westend", 9010), ("polkadot", 30)]"#, "expected: \n{:?}", metadata_contents(dbname_cold));
+        assert!(format!("{:?}", metadata_contents(dbname_cold)) == r#"[("kusama", 2030), ("rococo", 9103), ("westend", 9000), ("westend", 9010), ("polkadot", 30)]"#, "expected: \n{:?}", metadata_contents(dbname_cold));
         
         insert_metadata_from_file(dbname_hot, "tests/westend9090");
         assert!(metadata_len(dbname_hot) == 2, "Now 2 entries in hot db.");
         transfer_metadata_to_cold(dbname_hot, dbname_cold).unwrap();
-        assert!(format!("{:?}", metadata_contents(dbname_cold)) == r#"[("kusama", 2030), ("westend", 9000), ("westend", 9010), ("westend", 9090), ("polkadot", 30)]"#, "expected: \n{:?}", metadata_contents(dbname_cold));
+        assert!(format!("{:?}", metadata_contents(dbname_cold)) == r#"[("kusama", 2030), ("rococo", 9103), ("westend", 9000), ("westend", 9010), ("westend", 9090), ("polkadot", 30)]"#, "expected: \n{:?}", metadata_contents(dbname_cold));
         
         std::fs::remove_dir_all(dbname_hot).unwrap();
         std::fs::remove_dir_all(dbname_cold).unwrap();

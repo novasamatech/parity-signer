@@ -19,10 +19,9 @@ pub fn make_all_cards() -> String {
     let mut all_cards: Vec<String> = Vec::new();
     
     all_cards.push(Card::Call{pallet: "test_Pallet", method: "test_Method", docs: "test docs description"}.card(&mut index,0));
-    all_cards.push(Card::Pallet("test_pallet_v14").card(&mut index,0));
+    all_cards.push(Card::Pallet{pallet_name: "test_pallet_v14", path: "test >> test_test >> TestTest", docs: "test docs"}.card(&mut index,0));
     all_cards.push(Card::Varname("test_Varname").card(&mut index,0));
     all_cards.push(Card::Default("12345").card(&mut index,0));
-    all_cards.push(Card::PathDocs {path: r#"["frame_system","pallet","Call"]"#, docs: "test docs"}.card(&mut index,0));
     all_cards.push(Card::Id("5FHneW46xGXgs5mUiveU4sbTyGBzmstUspZC92UhjJM694ty").card(&mut index,0));
     all_cards.push(Card::None.card(&mut index,0));
     all_cards.push(Card::IdentityField("Twitter").card(&mut index,0));
@@ -31,10 +30,9 @@ pub fn make_all_cards() -> String {
     all_cards.push(Card::BitVec(bv.to_string()).card(&mut index,0));
     
     all_cards.push(Card::Balance{number: "300.000000", units: "KULU"}.card(&mut index,0));
-    all_cards.push(Card::FieldName{name: "test_FieldName", docs: ""}.card(&mut index,0));
-    all_cards.push(Card::FieldNumber{number: 1, docs: ""}.card(&mut index,0));
-    all_cards.push(Card::EnumVariantName{name: "test_EnumVariantName", docs: ""}.card(&mut index,0));
-//    all_cards.push(Card::Range{start: "3".to_string(), end: "14".to_string(), inclusive: false}.card(&mut index,0));
+    all_cards.push(Card::FieldName{name: "test_FieldName", docs_field_name: "a very special field", path_type: "field >> path >> TypePath", docs_type: "type is difficult to describe"}.card(&mut index,0));
+    all_cards.push(Card::FieldNumber{number: 1, docs_field_number: "less special field", path_type: "field >> path >> TypePath", docs_type: "type is just as difficult to describe"}.card(&mut index,0));
+    all_cards.push(Card::EnumVariantName{name: "test_EnumVariantName", docs_enum_variant: ""}.card(&mut index,0));
     all_cards.push(Card::EraImmortalNonce(4980).card(&mut index,0));
     all_cards.push(Card::EraMortalNonce{phase: 55, period: 64, nonce: 89}.card(&mut index,0));
     all_cards.push(Card::Tip{number: "0", units: "pWND"}.card(&mut index,0));
@@ -80,8 +78,8 @@ pub fn make_all_cards() -> String {
     all_cards.push(Card::Error(Error::BadInputData(BadInputData::NotSubstrate)).card(&mut index,0));
     all_cards.push(Card::Error(Error::BadInputData(BadInputData::NotHex)).card(&mut index,0));
     all_cards.push(Card::Error(Error::BadInputData(BadInputData::CryptoNotSupported)).card(&mut index,0));
-//    all_cards.push(Card::Error(Error::BadInputData(BadInputData::UnexpectedImmortality)).card(&mut index,0));
-//    all_cards.push(Card::Error(Error::BadInputData(BadInputData::UnexpectedMortality)).card(&mut index,0));
+    all_cards.push(Card::Error(Error::BadInputData(BadInputData::UnexpectedImmortality)).card(&mut index,0));
+    all_cards.push(Card::Error(Error::BadInputData(BadInputData::UnexpectedMortality)).card(&mut index,0));
     all_cards.push(Card::Error(Error::BadInputData(BadInputData::WrongPayloadType)).card(&mut index,0));
     all_cards.push(Card::Error(Error::BadInputData(BadInputData::GenesisHashMismatch)).card(&mut index,0));
     all_cards.push(Card::Error(Error::BadInputData(BadInputData::ImmortalHashMismatch)).card(&mut index,0));

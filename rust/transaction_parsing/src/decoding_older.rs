@@ -505,8 +505,8 @@ fn deal_with_struct (v1: &Vec<StructField>, mut data: Vec<u8>, type_database: &V
     let mut fancy_out = String::new();
     for (i, y) in v1.iter().enumerate() {
         let fancy_output_prep = match &y.field_name {
-            Some(z) => format!(",{}", (Card::FieldName{name: &z, docs: ""}).card(index, indent)),
-            None => format!(",{}", (Card::FieldNumber{number: i, docs: ""}).card(index, indent)),
+            Some(z) => format!(",{}", (Card::FieldName{name: &z, docs_field_name: "", path_type: "", docs_type: ""}).card(index, indent)),
+            None => format!(",{}", (Card::FieldNumber{number: i, docs_field_number: "", path_type: "", docs_type: ""}).card(index, indent)),
         };
         fancy_out.push_str(&fancy_output_prep);
         let after_run = decode_simple(&y.field_type, data, type_database, index, indent+1, chain_specs)?;
@@ -550,7 +550,7 @@ fn deal_with_enum (v1: &Vec<EnumVariant>, mut data: Vec<u8>, type_database: &Vec
                 if data.len()>1 {(&data[1..]).to_vec()}
                 else {Vec::new()}
             };
-            let fancy_out = format!(",{}", (Card::EnumVariantName{name: &found_variant.variant_name, docs: ""}).card(index, indent));
+            let fancy_out = format!(",{}", (Card::EnumVariantName{name: &found_variant.variant_name, docs_enum_variant: ""}).card(index, indent));
             Ok(DecodedOut {
                 remaining_vector,
                 indent,
@@ -560,7 +560,7 @@ fn deal_with_enum (v1: &Vec<EnumVariant>, mut data: Vec<u8>, type_database: &Vec
         EnumVariantType::Type(inner_ty) => {
             if data.len()==1 {return Err(Error::UnableToDecode(UnableToDecode::DataTooShort))}
             data=data[1..].to_vec();
-            let mut fancy_output_prep = format!(",{}", (Card::EnumVariantName{name: &found_variant.variant_name, docs: ""}).card(index, indent));
+            let mut fancy_output_prep = format!(",{}", (Card::EnumVariantName{name: &found_variant.variant_name, docs_enum_variant: ""}).card(index, indent));
             let after_run = decode_simple(&inner_ty, data, type_database, index, indent+1, chain_specs)?;
             fancy_output_prep.push_str(&after_run.fancy_out);
             data = after_run.remaining_vector;
@@ -576,8 +576,8 @@ fn deal_with_enum (v1: &Vec<EnumVariant>, mut data: Vec<u8>, type_database: &Vec
             let mut fancy_out = String::new();
             for (i, y) in v2.iter().enumerate() {
                 let fancy_output_prep = match &y.field_name {
-                    Some(z) => format!(",{}", (Card::FieldName{name: &z, docs: ""}).card(index, indent)),
-                    None => format!(",{}", (Card::FieldNumber{number: i, docs: ""}).card(index, indent)),
+                    Some(z) => format!(",{}", (Card::FieldName{name: &z, docs_field_name: "", path_type: "", docs_type: ""}).card(index, indent)),
+                    None => format!(",{}", (Card::FieldNumber{number: i, docs_field_number: "", path_type: "", docs_type: ""}).card(index, indent)),
                 };
                 fancy_out.push_str(&fancy_output_prep);
                 let after_run = decode_simple(&y.field_type, data, type_database, index, indent+1, chain_specs)?;
@@ -647,7 +647,7 @@ fn decode_simple (found_ty: &str, mut data: Vec<u8>, type_database: &Vec<TypeEnt
                                         let capture_name = format!("arg{}", i);
                                         match caps.name(&capture_name) {
                                             Some(x) => {
-                                                let fancy_output_prep = format!(",{}", (Card::FieldNumber{number: i, docs: ""}).card(index, indent));
+                                                let fancy_output_prep = format!(",{}", (Card::FieldNumber{number: i, docs_field_number: "", path_type: "", docs_type: ""}).card(index, indent));
                                                 fancy_out.push_str(&fancy_output_prep);
                                                 let inner_ty = x.as_str();
                                                 let after_run = decode_simple(inner_ty, data, type_database, index, indent+1, chain_specs)?;
