@@ -34,39 +34,7 @@ pub fn make_batch_clear_tree (database_name: &str, tree_name: &[u8]) -> anyhow::
     }
     Ok(out)
 }
-/*
-/// Wrapper for `flush` with crate error
-pub fn flush_db (database: &Db) -> anyhow::Result<()> {
-    match database.flush() {
-        Ok(_) => Ok(()),
-        Err(e) => return Err(Error::InternalDatabaseError(e).show()),
-    }
-}
 
-/// Wrapper for `clear` with crate error
-pub fn clear_tree(tree: &Tree) -> anyhow::Result<()> {
-    match tree.clear() {
-        Ok(()) => Ok(()),
-        Err(e) => return Err(Error::InternalDatabaseError(e).show()),
-    }
-}
-
-/// Wrapper for `insert` with crate error, not catching previous value during insertion
-pub fn insert_into_tree(key: Vec<u8>, value: Vec<u8>, tree: &Tree) -> anyhow::Result<()> {
-    match tree.insert(key, value) {
-        Ok(_) => Ok(()),
-        Err(e) => return Err(Error::InternalDatabaseError(e).show()),
-    }
-}
-
-/// Wrapper for `remove` with crate error, not catching previous value during removal
-pub fn remove_from_tree(key: Vec<u8>, tree: &Tree) -> anyhow::Result<()> {
-    match tree.remove(key) {
-        Ok(_) => Ok(()),
-        Err(e) => return Err(Error::InternalDatabaseError(e).show()),
-    }
-}
-*/
 /// Function to decode hex encoded &str into Vec<u8>,
 /// `what` is enum of possible NotHex failures
 pub fn unhex(hex_entry: &str, what: NotHex) -> anyhow::Result<Vec<u8>> {

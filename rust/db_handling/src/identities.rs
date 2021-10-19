@@ -63,7 +63,7 @@ fn filter_addresses_by_seed_name (identities: &Tree, seed_name: &str) -> anyhow:
     }
     Ok(out)
 }
-
+/*
 /// filter identities by given seed_name and name
 fn filter_addresses_by_seed_name_and_name (identities: &Tree, seed_name: &str, name: &str) -> anyhow::Result<Vec<(AddressKey, AddressDetails)>> {
     let mut out: Vec<(AddressKey, AddressDetails)> = Vec::new();
@@ -78,7 +78,7 @@ fn filter_addresses_by_seed_name_and_name (identities: &Tree, seed_name: &str, n
     }
     Ok(out)
 }
-
+*/
 /// get all identities for given seed_name and network_key as hex string
 fn get_relevant_identities (seed_name: &str, network_key_string: &str, database_name: &str) -> anyhow::Result<Vec<(AddressKey, AddressDetails)>> {
     
@@ -529,7 +529,7 @@ pub fn export_identity (pub_key: &str, network_specs_key_string: &str, database_
             Ok(a) => a,
             Err(e) => return Err(Error::Base58(e.to_string()).show()),
         };
-        let mut output = format!("substrate:{}:0x{}", address_base58, hex::encode(&network_specs.genesis_hash));
+        let output = format!("substrate:{}:0x{}", address_base58, hex::encode(&network_specs.genesis_hash));
         // seed names removed, cut always - but uncomment this and return :seedname one line above
         // to revert!
         // if output.len() > 2953 {output = output[..2953].to_string();} // to fit into qr code, cut seed_name if needed
@@ -546,7 +546,7 @@ mod tests {
     use definitions::{crypto::Encryption, keyring::NetworkSpecsKey, network_specs::Verifier};
     use std::fs;
     use sled::{Db, Tree, open, Batch};
-    use crate::{cold_default::populate_cold_no_metadata, helpers::{open_db, open_tree, reverse_address_key, upd_id_batch}, db_transactions::TrDbCold};
+    use crate::{cold_default::{populate_cold_no_metadata, signer_init_with_cert, reset_cold_database_no_addresses}, helpers::{open_db, open_tree, reverse_address_key, upd_id_batch}, db_transactions::TrDbCold, manage_history::print_history};
 
     static SEED: &str = "bottom drive obey lake curtain smoke basket hold race lonely fit walk";
     static ENCRYPTION_NAME: &str = "sr25519";
@@ -783,6 +783,25 @@ mod tests {
             assert_ne!(address_key, key1);
         }
         assert!(flag_to_check_key0_remains, "An address that should have only lost network was removed entirely");
+        fs::remove_dir_all(dbname).unwrap();
+    }
+    
+    #[test]
+    fn history_with_identities() {
+        let dbname = "tests/history_with_identities";
+        reset_cold_database_no_addresses(dbname, Verifier::None).unwrap();
+        signer_init_with_cert(dbname).unwrap();
+        let history_printed = print_history(dbname).unwrap();
+        let element1 = r#"{"event":"database_initiated"}"#;
+        let element2 = r#"{"event":"general_verifier_added","payload":{"verifier":{"hex":"d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d","encryption":"sr25519"}}}"#;
+        assert!(history_printed.contains(element1), "\nReal history:\n{}", history_printed);
+        assert!(history_printed.contains(element2), "\nReal history:\n{}", history_printed);
+        try_create_seed("Alice", ENCRYPTION_NAME, SEED, 0, dbname).unwrap();
+        let history_printed_after_create_seed = print_history(dbname).unwrap();
+        let element3 = r#""events":[{"event":"identity_added","payload":{"seed_name":"Alice","encryption":"sr25519","public_key":"46ebddef8cd9bb167dc30878d7113b7e168e6f0646beffd77d69d39bad76b47a","path":"","network_genesis_hash":"91b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3"}},{"event":"identity_added","payload":{"seed_name":"Alice","encryption":"sr25519","public_key":"f606519cb8726753885cd4d0f518804a69a5e0badf36fee70feadd8044081730","path":"//polkadot","network_genesis_hash":"91b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3"}},{"event":"identity_added","payload":{"seed_name":"Alice","encryption":"sr25519","public_key":"46ebddef8cd9bb167dc30878d7113b7e168e6f0646beffd77d69d39bad76b47a","path":"","network_genesis_hash":"b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe"}},{"event":"identity_added","payload":{"seed_name":"Alice","encryption":"sr25519","public_key":"64a31235d4bf9b37cfed3afa8aa60754675f9c4915430454d365c05112784d05","path":"//kusama","network_genesis_hash":"b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe"}},{"event":"identity_added","payload":{"seed_name":"Alice","encryption":"sr25519","public_key":"46ebddef8cd9bb167dc30878d7113b7e168e6f0646beffd77d69d39bad76b47a","path":"","network_genesis_hash":"e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e"}},{"event":"identity_added","payload":{"seed_name":"Alice","encryption":"sr25519","public_key":"3efeca331d646d8a2986374bb3bb8d6e9e3cfcdd7c45c2b69104fab5d61d3f34","path":"//westend","network_genesis_hash":"e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e"}},{"event":"identity_added","payload":{"seed_name":"Alice","encryption":"sr25519","public_key":"46ebddef8cd9bb167dc30878d7113b7e168e6f0646beffd77d69d39bad76b47a","path":"","network_genesis_hash":"f6e9983c37baf68846fedafe21e56718790e39fb1c582abc408b81bc7b208f9a"}},{"event":"identity_added","payload":{"seed_name":"Alice","encryption":"sr25519","public_key":"96129dcebc2e10f644e81fcf4269a663e521330084b1e447369087dec8017e04","path":"//rococo","network_genesis_hash":"f6e9983c37baf68846fedafe21e56718790e39fb1c582abc408b81bc7b208f9a"}}]}]"#;
+        assert!(history_printed_after_create_seed.contains(element1), "\nReal history:\n{}", history_printed_after_create_seed);
+        assert!(history_printed_after_create_seed.contains(element2), "\nReal history:\n{}", history_printed_after_create_seed);
+        assert!(history_printed_after_create_seed.contains(element3), "\nReal history:\n{}", history_printed_after_create_seed);
         fs::remove_dir_all(dbname).unwrap();
     }
 }

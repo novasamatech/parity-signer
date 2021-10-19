@@ -37,23 +37,25 @@ pub (crate) fn print_history_tree(database: &Db) -> anyhow::Result<String> {
     Ok(out)
 }
 
-/*
 pub fn clear_history(database_name: &str) -> anyhow::Result<()> {
     let batch = make_batch_clear_tree(database_name, HISTORY)?;
     let events = vec![Event::HistoryCleared];
     TrDbCold::new()
-        .set_history(events_in_batch(&database_name, batch, events)?)
+        .set_history(events_in_batch(&database_name, true, batch, events)?)
         .apply(&database_name)
-}*/
-
-pub fn events_to_batch(database_name: &str, events: Vec<Event>) -> anyhow::Result<Batch> {
-    events_in_batch(database_name, Batch::default(), events)
 }
 
-pub fn events_in_batch(database_name: &str, mut out_prep: Batch, events: Vec<Event>) -> anyhow::Result<Batch> {
+pub fn events_to_batch(database_name: &str, events: Vec<Event>) -> anyhow::Result<Batch> {
+    events_in_batch(database_name, false, Batch::default(), events)
+}
+
+pub fn events_in_batch(database_name: &str, start_zero: bool, mut out_prep: Batch, events: Vec<Event>) -> anyhow::Result<Batch> {
     let database = open_db(database_name)?;
     let history = open_tree(&database, HISTORY)?;
-    let order = history.len() as Order;
+    let order = {
+        if start_zero {0 as Order}
+        else {history.len() as Order}
+    };
     let timestamp = Utc::now().to_string();
     let history_entry = Entry {
         timestamp,

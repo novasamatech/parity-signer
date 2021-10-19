@@ -18,7 +18,8 @@ use crate::manage_history::events_in_batch;
 fn default_cold_history (database_name: &str) -> anyhow::Result<Batch> {
     let batch = make_batch_clear_tree(&database_name, HISTORY)?;
     let events = vec![Event::DatabaseInitiated];
-    events_in_batch(&database_name, batch, events)
+    let start_zero = true;
+    events_in_batch(&database_name, start_zero, batch, events)
 }
 
 
@@ -93,7 +94,8 @@ fn signer_init_general_verifier (general_verifier: &Verifier) -> Batch {
 fn signer_init_history (database_name: &str, general_verifier: &Verifier) -> anyhow::Result<Batch> {
     let batch = make_batch_clear_tree(&database_name, HISTORY)?;
     let events = vec![Event::DatabaseInitiated, Event::GeneralVerifierSet(general_verifier.to_owned())];
-    events_in_batch(&database_name, batch, events)
+    let start_zero = true;
+    events_in_batch(&database_name, start_zero, batch, events)
 }
 
 /// Function to reset cold database to defaults without addresses
