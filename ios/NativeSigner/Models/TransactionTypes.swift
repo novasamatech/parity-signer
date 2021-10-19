@@ -148,11 +148,11 @@ struct TxSpecPlain: Decodable {
     var tx_version: String
 }
 
-struct Verifier: Decodable, Hashable {
-    var verifier: VerifierData
+struct VerifierWrap: Decodable, Hashable {
+    var verifier: Verifier
 }
 
-struct VerifierData: Decodable, Hashable {
+struct Verifier: Decodable, Hashable {
     var hex: String
     var encryption: String
 }
@@ -283,6 +283,8 @@ struct TransactionCardSet: Decodable {
     var error: [TransactionCard]?
     var extrinsics: [TransactionCard]?
     var method: [TransactionCard]?
+    var newSpecs: [TransactionCard]?
+    var verifier: [TransactionCard]?
     var warning: [TransactionCard]?
     var types_info: [TransactionCard]?
     var action: Action?

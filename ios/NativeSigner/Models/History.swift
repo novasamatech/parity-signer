@@ -11,8 +11,8 @@ enum Event: Decodable, Hashable, Equatable {
     case databaseInitiated
     case deviceWasOnline
     case error(String)
-    case generalVerifierAdded(Verifier)
-    case generalVerifierRemoved(Verifier)
+    case generalVerifierAdded(VerifierWrap)
+    case generalVerifierRemoved(VerifierWrap)
     case historyCleared
     case identitiesWiped
     case identityAdded(IdentityEvent)
@@ -53,9 +53,9 @@ enum Event: Decodable, Hashable, Equatable {
         case "error":
             self = .error(try values.decode(String.self, forKey: .payload))
         case "general_verifier_added":
-            self = .generalVerifierAdded(try values.decode(Verifier.self, forKey: .payload))
+            self = .generalVerifierAdded(try values.decode(VerifierWrap.self, forKey: .payload))
         case "general_verifier_removed":
-            self = .generalVerifierRemoved(try values.decode(Verifier.self, forKey: .payload))
+            self = .generalVerifierRemoved(try values.decode(VerifierWrap.self, forKey: .payload))
         case "history_cleared":
             self = .historyCleared
         case "identities_wiped":
@@ -172,6 +172,8 @@ extension SignerDataModel {
                     signer_destroy_string(res!)
                     return
                 }
+                print(self.history)
+                print(String(cString: res!))
                 self.history = history.sorted(by: {$0.order > $1.order})
             } else {
                 print("keysJSON corrupted")
