@@ -236,13 +236,14 @@ export! {
 	) -> anyhow::Result<String, anyhow::Error> {
         db_handling::manage_history::print_history(dbname)
     }
-
+/*
     @Java_io_parity_signer_models_SignerDataModel_historyClearHistory
 	fn clear_history(
         dbname: &str
 	) -> anyhow::Result<(), anyhow::Error> {
         db_handling::manage_history::clear_history(dbname)
     }
+*/
 
     @Java_io_parity_signer_models_SignerDataModel_historyInitHistoryWithCert
 	fn init_history_with_cert(
