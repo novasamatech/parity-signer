@@ -27,6 +27,7 @@ enum Card {
     case identityField(String)
     case meta(MetaSpecs)
     case newNetwork(NewNetwork)
+    case newSpecs(NewSpecs)
     case none
     case pallet(String)
     case pathDocs(PathDocs)
@@ -118,6 +119,20 @@ struct NewNetwork: Decodable, Hashable {
     var title: String
     var unit: String
     var verifier: Verifier
+}
+
+struct NewSpecs: Decodable, Hashable {
+    var base58prefix: String
+    var color: String
+    var decimals: String
+    var encryption: String
+    var genesis_hash: String
+    var logo: String
+    var name: String
+    var path_id: String
+    var secondary_color: String
+    var title: String
+    var unit: String
 }
 
 struct PathDocs: Decodable {
@@ -214,6 +229,9 @@ struct TransactionCard: Decodable {
         case "new_network":
             card = .newNetwork(try values.decode(NewNetwork.self, forKey: .payload))
             return
+        case "new_specs":
+            card = .newSpecs(try values.decode(NewSpecs.self, forKey: .payload))
+            return
         case "none":
             card = .none
         case "path_and_docs":
@@ -268,14 +286,9 @@ struct TransactionCard: Decodable {
     }
 }
 
-struct ActionPayload: Decodable, Encodable {
-    var type: String
-    var checksum: String
-}
-
 struct Action: Decodable, Encodable {
     var type: String
-    var payload: ActionPayload
+    var payload: String
 }
 
 struct TransactionCardSet: Decodable {
@@ -283,7 +296,7 @@ struct TransactionCardSet: Decodable {
     var error: [TransactionCard]?
     var extrinsics: [TransactionCard]?
     var method: [TransactionCard]?
-    var newSpecs: [TransactionCard]?
+    var new_specs: [TransactionCard]?
     var verifier: [TransactionCard]?
     var warning: [TransactionCard]?
     var types_info: [TransactionCard]?

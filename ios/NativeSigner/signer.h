@@ -125,8 +125,9 @@ void remove_seed(struct ExternError*, const char* seed_name, const char* dbname)
 // Fetch history for display
 const char * print_history(struct ExternError*, const char* dbname);
 
+/*
 // Clear history (marks history with clearing event time)
-void clear_history(struct ExternError*, const char* dbname);
+void clear_history(struct ExternError*, const char* dbname);*/
 
 // Init history - should be called after db copy from resources, marks signer factory reset event, installs general verifier
 void init_history_with_cert(struct ExternError*, const char* dbname);

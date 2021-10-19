@@ -50,6 +50,8 @@ struct TransactionCardSelector: View {
         case .newNetwork(let value):
             Text(String(describing: value))
                 .foregroundColor(Color("textMainColor"))
+        case .newSpecs(_):
+            Text("newspecsstub")
         case .none:
             EmptyView()
         case .pallet(let text):

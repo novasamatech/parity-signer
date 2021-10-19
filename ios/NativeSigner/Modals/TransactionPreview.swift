@@ -36,7 +36,7 @@ struct TransactionPreview: View {
                             }
                         } else {
                             Button(action: {
-                                data.signTransaction(seedPhrase: "", password: "")
+                                data.handleTransaction()
                                 data.totalRefresh()
                             }) {
                                 Text("Approve")

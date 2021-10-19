@@ -89,7 +89,7 @@ extension SignerDataModel {
         var err = ExternError()
         let err_ptr = UnsafeMutablePointer(&err)
         //TODO!!!
-        let checksum = self.action?.payload.checksum
+        let checksum = self.action?.payload
         let res = handle_sign(err_ptr, checksum, seedPhrase, password, Data(self.comment.utf8).base64EncodedString(), self.dbName)
         if err_ptr.pointee.code == 0 {
             self.result = String(cString: res!)
@@ -100,6 +100,19 @@ extension SignerDataModel {
                 self.transactionError = "QR code generation error"
             }
         } else {
+            self.transactionError = String(cString: err_ptr.pointee.message)
+            print(self.transactionError)
+            signer_destroy_string(err_ptr.pointee.message)
+        }
+    }
+    
+    func handleTransaction() {
+        var err = ExternError()
+        let err_ptr = UnsafeMutablePointer(&err)
+        //TODO!!!
+        let checksum = self.action?.payload
+        handle_stub(err_ptr, checksum, self.dbName)
+        if err_ptr.pointee.code != 0 {
             self.transactionError = String(cString: err_ptr.pointee.message)
             print(self.transactionError)
             signer_destroy_string(err_ptr.pointee.message)
