@@ -51,7 +51,7 @@ if [ "$1" == "android" ]
     for i in "${!ANDROID_ARCHS[@]}";
       do
         mkdir -p -v "../../android/app/src/main/jniLibs/${ANDROID_FOLDER[$i]}"
-        cp "./target/${ANDROID_ARCHS[$i]}/release/lib${LIB_NAME}.so" "../../android/app/src/main/jniLibs/${ANDROID_FOLDER[$i]}/lib${LIB_NAME}.so"
+        cp "../target/${ANDROID_ARCHS[$i]}/release/lib${LIB_NAME}.so" "../../android/app/src/main/jniLibs/${ANDROID_FOLDER[$i]}/lib${LIB_NAME}.so"
     done
 
 fi
