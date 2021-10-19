@@ -1,0 +1,29 @@
+name:                   Rust backend test
+
+on:
+  pull_request:
+  push:
+    branches:
+      - master
+      - stable
+jobs:
+  check:
+    name:               Check
+    runs-on:            macos-latest
+    steps:
+      - name:           Checkout sources
+        uses:           actions/checkout@v2
+        with:
+          fetch-depth:  50
+      - name:           Checkout submodules
+        shell:          bash
+        run:            git submodule update --init --recursive
+      - name:           Install dependencies
+        run:            |
+          brew tap wix/brew
+          brew install applesimutils
+           gem install xcpretty
+      - name:           Rust build
+        shell:          bash
+        run:            cd rust && cargo test && cd ..
+
