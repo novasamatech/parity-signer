@@ -10,6 +10,7 @@ pub enum Error {
     AddressKeyDecoding,
     AddressKeyGeneration(String),
     EncryptionMismatch,
+    CryptoNotSupported
 }
 
 #[derive(PartialEq)]
@@ -35,6 +36,7 @@ impl Error {
             Error::AddressKeyDecoding => anyhow!("Address key could not be decoded."),
             Error::AddressKeyGeneration(e) => anyhow!("Address key could not be generated. {}", e),
             Error::EncryptionMismatch => anyhow!("Suggested encryption does not correspond to account details."),
+            Error::CryptoNotSupported => anyhow!("Encryption not supported"),
         }
     }
 }

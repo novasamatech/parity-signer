@@ -126,7 +126,8 @@ fn get_verifier(s: &SufficientCrypto) -> Verifier {
 /// ** two first symbols denoting encryption algorithm used 00 for ed25519, 01 for sr25519, 02 for ecdsa
 /// <public_key_in_hex> - length depends on encryption algorithm
 /// <signature_in_hex> - length depends on encryption algorithm
-pub fn sufficient_crypto_load_types (public_key: &str, encryption: Encryption, database_name: &str, seed_phrase: &str, pwd_entry: &str) -> anyhow::Result<String> {
+pub fn sufficient_crypto_load_types (public_key: &str, encryption_str: &str, database_name: &str, seed_phrase: &str, pwd_entry: &str) -> anyhow::Result<String> {
+    let encryption = parse_encryption(encryption_str)?;
     let types_content = prep_types(database_name)?;
     match sufficient_crypto (public_key, &encryption, &types_content.store(), database_name, seed_phrase, pwd_entry) {
         Ok(s) => {
@@ -152,7 +153,8 @@ pub fn sufficient_crypto_load_types (public_key: &str, encryption: Encryption, d
 /// ** two first symbols denoting encryption algorithm used 00 for ed25519, 01 for sr25519, 02 for ecdsa
 /// <public_key_in_hex> - length depends on encryption algorithm
 /// <signature_in_hex> - length depends on encryption algorithm
-pub fn sufficient_crypto_load_metadata (network_name: &str, network_version: u32, public_key: &str, encryption: Encryption, database_name: &str, seed_phrase: &str, pwd_entry: &str) -> anyhow::Result<String> {
+pub fn sufficient_crypto_load_metadata (network_name: &str, network_version: u32, public_key: &str, encryption_str: &str, database_name: &str, seed_phrase: &str, pwd_entry: &str) -> anyhow::Result<String> {
+    let encryption = parse_encryption(encryption_str)?;
     let load_meta_content = prep_load_metadata(network_name, network_version, database_name)?;
     match sufficient_crypto (public_key, &encryption, &load_meta_content.store(), database_name, seed_phrase, pwd_entry) {
         Ok(s) => {
@@ -179,7 +181,8 @@ pub fn sufficient_crypto_load_metadata (network_name: &str, network_version: u32
 /// ** two first symbols denoting encryption algorithm used 00 for ed25519, 01 for sr25519, 02 for ecdsa
 /// <public_key_in_hex> - length depends on encryption algorithm
 /// <signature_in_hex> - length depends on encryption algorithm
-pub fn sufficient_crypto_add_specs (network_specs_key_hex: &str, public_key: &str, encryption: Encryption, database_name: &str, seed_phrase: &str, pwd_entry: &str) -> anyhow::Result<String> {
+pub fn sufficient_crypto_add_specs (network_specs_key_hex: &str, public_key: &str, encryption_str: &str, database_name: &str, seed_phrase: &str, pwd_entry: &str) -> anyhow::Result<String> {
+    let encryption = parse_encryption(encryption_str)?;
     let add_specs_content = prep_network_specs(network_specs_key_hex, database_name)?;
     match sufficient_crypto (public_key, &encryption, &add_specs_content.store(), database_name, seed_phrase, pwd_entry) {
         Ok(s) => {
@@ -198,5 +201,14 @@ pub fn sufficient_crypto_add_specs (network_specs_key_hex: &str, public_key: &st
             }
             return Err(e)
         },
+    }
+}
+
+fn parse_encryption (encryption: &str) -> anyhow::Result<Encryption> {
+    match encryption {
+        "ed25519" => Ok(Encryption::Ed25519),
+        "sr25519" => Ok(Encryption::Sr25519),
+        "ecdsa" => Ok(Encryption::Ecdsa),
+        _ => return Err(Error::CryptoNotSupported.show()),
     }
 }

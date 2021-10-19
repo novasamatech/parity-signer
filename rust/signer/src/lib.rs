@@ -266,6 +266,20 @@ export! {
         db_handling::manage_history::device_was_online(dbname)
     }
 
+    @Java_io_parity_signer_models_SignerDataModel_historyGetWarnings
+	fn get_warnings(
+        dbname: &str
+	) -> anyhow::Result<bool, anyhow::Error> {
+        Ok(false)
+    }
+
+    @Java_io_parity_signer_models_SignerDataModel_historyAcknowledgeWarnings
+	fn acknowledge_warnings(
+        dbname: &str
+	) -> anyhow::Result<(), anyhow::Error> {
+        Ok(())
+    }
+
     @Java_io_parity_signer_models_SignerDataModel_historyHistoryEntryUser
 	fn history_entry_user(
         entry: &str,
@@ -288,6 +302,48 @@ export! {
         dbname: &str
 	) -> anyhow::Result<(), anyhow::Error> {
         db_handling::manage_history::seed_name_was_shown(dbname, seed_name.to_string())
+    }
+
+    @Java_io_parity_signer_models_SignerDataModel_signerSignTypes
+	fn sign_load_types(
+        public_key: &str,
+        encryption: &str,
+        seed_phrase: &str,
+        password: &str,
+        dbname: &str
+	) -> anyhow::Result<String, anyhow::Error> {
+        transaction_signing::sign_message::sufficient_crypto_load_types(
+            public_key, encryption, dbname, seed_phrase, password
+        )
+    }
+
+    @Java_io_parity_signer_models_SignerDataModel_signerSignMetadata
+	fn sign_load_metadata(
+        network: &str,
+        version: u32,
+        public_key: &str,
+        encryption: &str,
+        seed_phrase: &str,
+        password: &str,
+        dbname: &str
+	) -> anyhow::Result<String, anyhow::Error> {
+        transaction_signing::sign_message::sufficient_crypto_load_metadata(
+            network, version, public_key, encryption, dbname, seed_phrase, password
+        )
+    }
+
+    @Java_io_parity_signer_models_SignerDataModel_signerSignSpecs
+	fn sign_load_specs(
+        network: &str,
+        public_key: &str,
+        encryption: &str,
+        seed_phrase: &str,
+        password: &str,
+        dbname: &str
+	) -> anyhow::Result<String, anyhow::Error> {
+        transaction_signing::sign_message::sufficient_crypto_add_specs(
+            network, public_key, encryption, dbname, seed_phrase, password
+        )
     }
 
 }
