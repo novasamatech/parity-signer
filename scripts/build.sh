@@ -72,7 +72,7 @@ if [ "$1" == "ios" ]
     done
 
     lipo -create -output "../../ios/NativeSigner/lib${LIB_NAME}.a" target/x86_64-apple-ios/release/libsigner.a target/aarch64-apple-ios/release/libsigner.a
-    lipo -create -output "lib${LIB_NAME}.a" target/x86_64-apple-ios/release/libsigner.a target/aarch64-apple-ios/release/libsigner.a
+    lipo -create -output "lib${LIB_NAME}.a" ../target/x86_64-apple-ios/release/libsigner.a ../target/aarch64-apple-ios/release/libsigner.a
     #unsupported: target/armv7-apple-ios/release/libsigner.a target/armv7s-apple-ios/release/libsigner.a
 
 fi

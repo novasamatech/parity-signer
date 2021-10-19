@@ -87,7 +87,9 @@ android/app/bin
 android/app/src/main/jniLibs
 
 # rust
+rust/target
 rust/*/target
 rust/db_handling/signer_database
 rust/db_handling/tests
 rust/meta_reading/tests
+rust/qrcode_static/*.png
