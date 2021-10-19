@@ -75,7 +75,7 @@ extension SignerDataModel {
             print("Key collision")
             self.lastError = "Seed with this name already exists"
         }
-        let res = try_create_seed(err_ptr, seedName, "sr25519", seedPhrase, 24, dbName)
+        let res = try_create_seed(err_ptr, seedName, seedPhrase, 24, dbName)
         if err_ptr.pointee.code != 0 {
             self.lastError = String(cString: err_ptr.pointee.message)
             print("Rust returned error")
@@ -157,7 +157,7 @@ extension SignerDataModel {
         let status = SecItemCopyMatching(query as CFDictionary, &item)
         if status == errSecSuccess {
             if backup {
-                seeds_were_shown(err_ptr, self.dbName)
+                seed_name_was_shown(err_ptr, seedName, self.dbName)
                 if err_ptr.pointee.code == 0 {
                     return String(data: (item as! CFData) as Data, encoding: .utf8) ?? ""
                 } else {

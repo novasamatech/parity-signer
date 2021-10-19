@@ -135,7 +135,7 @@ extension SignerDataModel {
                     }
                 }
                 try FileManager.default.copyItem(at: source, to: destination)
-                init_history(err_ptr, self.dbName)
+                init_history_with_cert(err_ptr, self.dbName)
                 if (err_ptr.pointee.code == 0) {
                     self.onboardingDone = true
                     self.totalRefresh()

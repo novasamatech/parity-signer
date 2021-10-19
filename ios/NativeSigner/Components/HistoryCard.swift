@@ -20,7 +20,7 @@ struct HistoryCard: View {
             case .error(let text):
                 HistoryCardTemplate(image: "exclamationmark.triangle.fill", timestamp: timestamp, color: "dangerColor", line1: "Error! " + text, line2: "")
             case .generalVerifierAdded(let value):
-                HistoryCardTemplate(image: "lock.shield.fill", timestamp: timestamp, color: "cryptoColor", line1: "General verifier set", line2: value.hex + " " +  value.encryption)
+                HistoryCardTemplate(image: "lock.shield.fill", timestamp: timestamp, color: "cryptoColor", line1: "General verifier set", line2: value.verifier.hex.prefix(4) + " " + value.verifier.encryption)
             case .generalVerifierRemoved(_):
                 HistoryCardTemplate(image: "lock.slash", timestamp: timestamp, color: "dangerColor", line1: "General verifier unset", line2: "Signer wiped")
             case .historyCleared:

@@ -88,11 +88,9 @@ extension SignerDataModel {
     func signTransaction(seedPhrase: String, password: String) {
         var err = ExternError()
         let err_ptr = UnsafeMutablePointer(&err)
-        guard let dataAction = try? JSONEncoder().encode(self.action!.payload) else {
-            return
-        }
-        let stringAction = String(data: dataAction, encoding: .utf8)
-        let res = handle_action(err_ptr, stringAction, seedPhrase, password, Data(self.comment.utf8).base64EncodedString(), self.dbName)
+        //TODO!!!
+        let checksum = self.action?.payload.checksum
+        let res = handle_sign(err_ptr, checksum, seedPhrase, password, Data(self.comment.utf8).base64EncodedString(), self.dbName)
         if err_ptr.pointee.code == 0 {
             self.result = String(cString: res!)
             signer_destroy_string(res!)

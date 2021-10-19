@@ -149,6 +149,10 @@ struct TxSpecPlain: Decodable {
 }
 
 struct Verifier: Decodable, Hashable {
+    var verifier: VerifierData
+}
+
+struct VerifierData: Decodable, Hashable {
     var hex: String
     var encryption: String
 }
