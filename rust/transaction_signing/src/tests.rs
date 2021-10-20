@@ -506,4 +506,622 @@ Identities:
         assert!(print_after == expected_print_after, "Received:\n{}", print_after);
         fs::remove_dir_all(dbname).unwrap();
     }
+    
+    #[test]
+    fn dock_adventures_1() {
+        let dbname = "for_tests/dock_adventures_1";
+        populate_cold(dbname, Verifier::None).unwrap();
+        let line = fs::read_to_string("for_tests/add_specs_dock-pos-main-runtime-sr25519_unverified.txt").unwrap();
+        let reply = produce_output(&line.trim(), dbname);
+        let reply_known_part = r##"{"warning":[{"index":0,"indent":0,"type":"warning","payload":"Received network information is not verified."}],"new_specs":[{"index":1,"indent":0,"type":"new_specs","payload":{"base58prefix":"22","color":"#660D35","decimals":"6","encryption":"sr25519","genesis_hash":"6bfe24dca2a3be10f22212678ac13a6446ec764103c0f3471c71609eac384aae","logo":"dock-pos-main-runtime","name":"dock-pos-main-runtime","path_id":"//dock-pos-main-runtime","secondary_color":"#262626","title":"dock-pos-main-runtime-sr25519","unit":"DOCK"}}],"action":{"type":"stub","payload":""##;
+        assert!(reply.contains(reply_known_part), "Expected: {}...\nReceived: {}", reply_known_part, reply);
+        let (action_is_sign, checksum_str) = get_type_and_checksum(&reply);
+        if action_is_sign {panic!("Should have been action `stub`.")}
+        let print_before = print_db_content(&dbname);
+        let expected_print_before = r#"Database contents:
+Metadata:
+	kusama2030
+	rococo9103
+	westend9000
+	westend9010
+	polkadot30
+Network Specs:
+	018091b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3: Polkadot (polkadot with sr25519)
+	0180b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe: Kusama (kusama with sr25519)
+	0180e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e: Westend (westend with sr25519)
+	0180f6e9983c37baf68846fedafe21e56718790e39fb1c582abc408b81bc7b208f9a: Rococo (rococo with sr25519)
+Verifiers:
+	91b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3: {"type":"general","details":{"hex":"","encryption":"none"}}
+	b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe: {"type":"general","details":{"hex":"","encryption":"none"}}
+	e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e: {"type":"general","details":{"hex":"","encryption":"none"}}
+	f6e9983c37baf68846fedafe21e56718790e39fb1c582abc408b81bc7b208f9a: {"type":"general","details":{"hex":"","encryption":"none"}}
+General Verifier: none
+Identities: 
+	public_key: 3efeca331d646d8a2986374bb3bb8d6e9e3cfcdd7c45c2b69104fab5d61d3f34, encryption: sr25519, path: //westend, available_networks: 
+		0180e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e
+	public_key: 46ebddef8cd9bb167dc30878d7113b7e168e6f0646beffd77d69d39bad76b47a, encryption: sr25519, path: , available_networks: 
+		018091b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3
+		0180b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe
+		0180e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e
+		0180f6e9983c37baf68846fedafe21e56718790e39fb1c582abc408b81bc7b208f9a
+	public_key: 64a31235d4bf9b37cfed3afa8aa60754675f9c4915430454d365c05112784d05, encryption: sr25519, path: //kusama, available_networks: 
+		0180b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe
+	public_key: 96129dcebc2e10f644e81fcf4269a663e521330084b1e447369087dec8017e04, encryption: sr25519, path: //rococo, available_networks: 
+		0180f6e9983c37baf68846fedafe21e56718790e39fb1c582abc408b81bc7b208f9a
+	public_key: c81ebbec0559a6acf184535eb19da51ed3ed8c4ac65323999482aaf9b6696e27, encryption: sr25519, path: //alice, available_networks: 
+		0180f6e9983c37baf68846fedafe21e56718790e39fb1c582abc408b81bc7b208f9a
+	public_key: d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d, encryption: sr25519, path: //Alice, available_networks: 
+		0180e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e
+	public_key: f606519cb8726753885cd4d0f518804a69a5e0badf36fee70feadd8044081730, encryption: sr25519, path: //polkadot, available_networks: 
+		018091b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3"#;
+        assert!(print_before == expected_print_before, "Received:\n{}", print_before);
+        handle_stub(&checksum_str, dbname).unwrap();
+        let print_after = print_db_content(&dbname);
+        let expected_print_after = r#"Database contents:
+Metadata:
+	kusama2030
+	rococo9103
+	westend9000
+	westend9010
+	polkadot30
+Network Specs:
+	01806bfe24dca2a3be10f22212678ac13a6446ec764103c0f3471c71609eac384aae: dock-pos-main-runtime-sr25519 (dock-pos-main-runtime with sr25519)
+	018091b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3: Polkadot (polkadot with sr25519)
+	0180b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe: Kusama (kusama with sr25519)
+	0180e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e: Westend (westend with sr25519)
+	0180f6e9983c37baf68846fedafe21e56718790e39fb1c582abc408b81bc7b208f9a: Rococo (rococo with sr25519)
+Verifiers:
+	6bfe24dca2a3be10f22212678ac13a6446ec764103c0f3471c71609eac384aae: {"type":"custom","details":{"hex":"","encryption":"none"}}
+	91b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3: {"type":"general","details":{"hex":"","encryption":"none"}}
+	b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe: {"type":"general","details":{"hex":"","encryption":"none"}}
+	e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e: {"type":"general","details":{"hex":"","encryption":"none"}}
+	f6e9983c37baf68846fedafe21e56718790e39fb1c582abc408b81bc7b208f9a: {"type":"general","details":{"hex":"","encryption":"none"}}
+General Verifier: none
+Identities: 
+	public_key: 3efeca331d646d8a2986374bb3bb8d6e9e3cfcdd7c45c2b69104fab5d61d3f34, encryption: sr25519, path: //westend, available_networks: 
+		0180e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e
+	public_key: 46ebddef8cd9bb167dc30878d7113b7e168e6f0646beffd77d69d39bad76b47a, encryption: sr25519, path: , available_networks: 
+		018091b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3
+		0180b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe
+		0180e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e
+		0180f6e9983c37baf68846fedafe21e56718790e39fb1c582abc408b81bc7b208f9a
+		01806bfe24dca2a3be10f22212678ac13a6446ec764103c0f3471c71609eac384aae
+	public_key: 64a31235d4bf9b37cfed3afa8aa60754675f9c4915430454d365c05112784d05, encryption: sr25519, path: //kusama, available_networks: 
+		0180b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe
+	public_key: 96129dcebc2e10f644e81fcf4269a663e521330084b1e447369087dec8017e04, encryption: sr25519, path: //rococo, available_networks: 
+		0180f6e9983c37baf68846fedafe21e56718790e39fb1c582abc408b81bc7b208f9a
+	public_key: c81ebbec0559a6acf184535eb19da51ed3ed8c4ac65323999482aaf9b6696e27, encryption: sr25519, path: //alice, available_networks: 
+		0180f6e9983c37baf68846fedafe21e56718790e39fb1c582abc408b81bc7b208f9a
+	public_key: d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d, encryption: sr25519, path: //Alice, available_networks: 
+		0180e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e
+	public_key: f606519cb8726753885cd4d0f518804a69a5e0badf36fee70feadd8044081730, encryption: sr25519, path: //polkadot, available_networks: 
+		018091b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3"#;
+        assert!(print_after == expected_print_after, "Received:\n{}", print_after);
+        
+        let line = fs::read_to_string("for_tests/load_metadata_dock-pos-main-runtimeV31_unverified.txt").unwrap();
+        let reply = produce_output(&line.trim(), dbname);
+        let reply_known_part = r##"{"warning":[{"index":0,"indent":0,"type":"warning","payload":"Received network information is not verified."}],"meta":[{"index":1,"indent":0,"type":"meta","payload":{"specname":"dock-pos-main-runtime","spec_version":"31","meta_hash":"28c25067d5c0c739f64f7779c5f3095ecf57d9075b0c5258f3be2df6d7f323d0"}}],"action":{"type":"stub","payload":""##;
+        assert!(reply.contains(reply_known_part), "Expected: {}...\nReceived: {}", reply_known_part, reply);
+        let (action_is_sign, checksum_str) = get_type_and_checksum(&reply);
+        if action_is_sign {panic!("Should have been action `stub`.")}
+        handle_stub(&checksum_str, dbname).unwrap();
+        let print_after = print_db_content(&dbname);
+        let expected_print_after = r#"Database contents:
+Metadata:
+	kusama2030
+	rococo9103
+	westend9000
+	westend9010
+	polkadot30
+	dock-pos-main-runtime31
+Network Specs:
+	01806bfe24dca2a3be10f22212678ac13a6446ec764103c0f3471c71609eac384aae: dock-pos-main-runtime-sr25519 (dock-pos-main-runtime with sr25519)
+	018091b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3: Polkadot (polkadot with sr25519)
+	0180b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe: Kusama (kusama with sr25519)
+	0180e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e: Westend (westend with sr25519)
+	0180f6e9983c37baf68846fedafe21e56718790e39fb1c582abc408b81bc7b208f9a: Rococo (rococo with sr25519)
+Verifiers:
+	6bfe24dca2a3be10f22212678ac13a6446ec764103c0f3471c71609eac384aae: {"type":"custom","details":{"hex":"","encryption":"none"}}
+	91b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3: {"type":"general","details":{"hex":"","encryption":"none"}}
+	b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe: {"type":"general","details":{"hex":"","encryption":"none"}}
+	e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e: {"type":"general","details":{"hex":"","encryption":"none"}}
+	f6e9983c37baf68846fedafe21e56718790e39fb1c582abc408b81bc7b208f9a: {"type":"general","details":{"hex":"","encryption":"none"}}
+General Verifier: none
+Identities: 
+	public_key: 3efeca331d646d8a2986374bb3bb8d6e9e3cfcdd7c45c2b69104fab5d61d3f34, encryption: sr25519, path: //westend, available_networks: 
+		0180e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e
+	public_key: 46ebddef8cd9bb167dc30878d7113b7e168e6f0646beffd77d69d39bad76b47a, encryption: sr25519, path: , available_networks: 
+		018091b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3
+		0180b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe
+		0180e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e
+		0180f6e9983c37baf68846fedafe21e56718790e39fb1c582abc408b81bc7b208f9a
+		01806bfe24dca2a3be10f22212678ac13a6446ec764103c0f3471c71609eac384aae
+	public_key: 64a31235d4bf9b37cfed3afa8aa60754675f9c4915430454d365c05112784d05, encryption: sr25519, path: //kusama, available_networks: 
+		0180b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe
+	public_key: 96129dcebc2e10f644e81fcf4269a663e521330084b1e447369087dec8017e04, encryption: sr25519, path: //rococo, available_networks: 
+		0180f6e9983c37baf68846fedafe21e56718790e39fb1c582abc408b81bc7b208f9a
+	public_key: c81ebbec0559a6acf184535eb19da51ed3ed8c4ac65323999482aaf9b6696e27, encryption: sr25519, path: //alice, available_networks: 
+		0180f6e9983c37baf68846fedafe21e56718790e39fb1c582abc408b81bc7b208f9a
+	public_key: d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d, encryption: sr25519, path: //Alice, available_networks: 
+		0180e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e
+	public_key: f606519cb8726753885cd4d0f518804a69a5e0badf36fee70feadd8044081730, encryption: sr25519, path: //polkadot, available_networks: 
+		018091b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3"#;
+        assert!(print_after == expected_print_after, "Received:\n{}", print_after);
+        
+        let line = fs::read_to_string("for_tests/add_specs_dock-pos-main-runtime-sr25519_Alice-sr25519.txt").unwrap();
+        let reply = produce_output(&line.trim(), dbname);
+        let reply_known_part = r##"{"verifier":[{"index":0,"indent":0,"type":"verifier","payload":{"hex":"d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d","encryption":"sr25519"}}],"warning":[{"index":1,"indent":0,"type":"warning","payload":"Received message is verified. Currently no verifier is set for network with genesis hash 6bfe24dca2a3be10f22212678ac13a6446ec764103c0f3471c71609eac384aae and no general verifier is set. Proceeding will update the network verifier to general. All previously acquired network information that was received unverified will be purged. Affected network specs entries: dock-pos-main-runtime-sr25519; affected metadata entries: dock-pos-main-runtime31."},{"index":2,"indent":0,"type":"warning","payload":"Received message is verified by a new general verifier. Currently no general verifier is set, and proceeding will update the general verifier to the received value. All previously acquired information associated with general verifier will be purged. Affected network specs entries: Polkadot, Kusama, Westend, Rococo; affected metadata entries: polkadot30, kusama2030, westend9000, westend9010, rococo9103. Types information is purged."},{"index":3,"indent":0,"type":"warning","payload":"Received network specs information for dock-pos-main-runtime-sr25519 is same as the one already in the database."}],"new_specs":[{"index":4,"indent":0,"type":"new_specs","payload":{"base58prefix":"22","color":"#660D35","decimals":"6","encryption":"sr25519","genesis_hash":"6bfe24dca2a3be10f22212678ac13a6446ec764103c0f3471c71609eac384aae","logo":"dock-pos-main-runtime","name":"dock-pos-main-runtime","path_id":"//dock-pos-main-runtime","secondary_color":"#262626","title":"dock-pos-main-runtime-sr25519","unit":"DOCK"}}],"action":{"type":"stub","payload":""##;
+        assert!(reply.contains(reply_known_part), "Expected: {}...\nReceived: {}", reply_known_part, reply);
+        let (action_is_sign, checksum_str) = get_type_and_checksum(&reply);
+        if action_is_sign {panic!("Should have been action `stub`.")}
+        handle_stub(&checksum_str, dbname).unwrap();
+        let print_after = print_db_content(&dbname);
+        let expected_print_after = r#"Database contents:
+Metadata:
+Network Specs:
+	01806bfe24dca2a3be10f22212678ac13a6446ec764103c0f3471c71609eac384aae: dock-pos-main-runtime-sr25519 (dock-pos-main-runtime with sr25519)
+Verifiers:
+	6bfe24dca2a3be10f22212678ac13a6446ec764103c0f3471c71609eac384aae: {"type":"general","details":{"hex":"d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d","encryption":"sr25519"}}
+	91b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3: {"type":"general","details":{"hex":"d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d","encryption":"sr25519"}}
+	b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe: {"type":"general","details":{"hex":"d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d","encryption":"sr25519"}}
+	e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e: {"type":"general","details":{"hex":"d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d","encryption":"sr25519"}}
+	f6e9983c37baf68846fedafe21e56718790e39fb1c582abc408b81bc7b208f9a: {"type":"general","details":{"hex":"d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d","encryption":"sr25519"}}
+General Verifier: public key: d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d, encryption: sr25519
+Identities: 
+	public_key: 3efeca331d646d8a2986374bb3bb8d6e9e3cfcdd7c45c2b69104fab5d61d3f34, encryption: sr25519, path: //westend, available_networks: 
+		0180e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e
+	public_key: 46ebddef8cd9bb167dc30878d7113b7e168e6f0646beffd77d69d39bad76b47a, encryption: sr25519, path: , available_networks: 
+		018091b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3
+		0180b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe
+		0180e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e
+		0180f6e9983c37baf68846fedafe21e56718790e39fb1c582abc408b81bc7b208f9a
+		01806bfe24dca2a3be10f22212678ac13a6446ec764103c0f3471c71609eac384aae
+	public_key: 64a31235d4bf9b37cfed3afa8aa60754675f9c4915430454d365c05112784d05, encryption: sr25519, path: //kusama, available_networks: 
+		0180b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe
+	public_key: 96129dcebc2e10f644e81fcf4269a663e521330084b1e447369087dec8017e04, encryption: sr25519, path: //rococo, available_networks: 
+		0180f6e9983c37baf68846fedafe21e56718790e39fb1c582abc408b81bc7b208f9a
+	public_key: c81ebbec0559a6acf184535eb19da51ed3ed8c4ac65323999482aaf9b6696e27, encryption: sr25519, path: //alice, available_networks: 
+		0180f6e9983c37baf68846fedafe21e56718790e39fb1c582abc408b81bc7b208f9a
+	public_key: d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d, encryption: sr25519, path: //Alice, available_networks: 
+		0180e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e
+	public_key: f606519cb8726753885cd4d0f518804a69a5e0badf36fee70feadd8044081730, encryption: sr25519, path: //polkadot, available_networks: 
+		018091b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3"#;
+        assert!(print_after == expected_print_after, "Received:\n{}", print_after);
+        
+        fs::remove_dir_all(dbname).unwrap();
+    }
+    
+    #[test]
+    fn dock_adventures_2() {
+        let dbname = "for_tests/dock_adventures_2";
+        populate_cold(dbname, Verifier::Sr25519(ALICE)).unwrap();
+        let line = fs::read_to_string("for_tests/add_specs_dock-pos-main-runtime-sr25519_unverified.txt").unwrap();
+        let reply = produce_output(&line.trim(), dbname);
+        let reply_known_part = r##"{"warning":[{"index":0,"indent":0,"type":"warning","payload":"Received network information is not verified."}],"new_specs":[{"index":1,"indent":0,"type":"new_specs","payload":{"base58prefix":"22","color":"#660D35","decimals":"6","encryption":"sr25519","genesis_hash":"6bfe24dca2a3be10f22212678ac13a6446ec764103c0f3471c71609eac384aae","logo":"dock-pos-main-runtime","name":"dock-pos-main-runtime","path_id":"//dock-pos-main-runtime","secondary_color":"#262626","title":"dock-pos-main-runtime-sr25519","unit":"DOCK"}}],"action":{"type":"stub","payload":""##;
+        assert!(reply.contains(reply_known_part), "Expected: {}...\nReceived: {}", reply_known_part, reply);
+        let (action_is_sign, checksum_str) = get_type_and_checksum(&reply);
+        if action_is_sign {panic!("Should have been action `stub`.")}
+        let print_before = print_db_content(&dbname);
+        let expected_print_before = r#"Database contents:
+Metadata:
+	kusama2030
+	rococo9103
+	westend9000
+	westend9010
+	polkadot30
+Network Specs:
+	018091b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3: Polkadot (polkadot with sr25519)
+	0180b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe: Kusama (kusama with sr25519)
+	0180e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e: Westend (westend with sr25519)
+	0180f6e9983c37baf68846fedafe21e56718790e39fb1c582abc408b81bc7b208f9a: Rococo (rococo with sr25519)
+Verifiers:
+	91b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3: {"type":"general","details":{"hex":"d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d","encryption":"sr25519"}}
+	b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe: {"type":"general","details":{"hex":"d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d","encryption":"sr25519"}}
+	e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e: {"type":"general","details":{"hex":"d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d","encryption":"sr25519"}}
+	f6e9983c37baf68846fedafe21e56718790e39fb1c582abc408b81bc7b208f9a: {"type":"general","details":{"hex":"d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d","encryption":"sr25519"}}
+General Verifier: public key: d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d, encryption: sr25519
+Identities: 
+	public_key: 3efeca331d646d8a2986374bb3bb8d6e9e3cfcdd7c45c2b69104fab5d61d3f34, encryption: sr25519, path: //westend, available_networks: 
+		0180e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e
+	public_key: 46ebddef8cd9bb167dc30878d7113b7e168e6f0646beffd77d69d39bad76b47a, encryption: sr25519, path: , available_networks: 
+		018091b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3
+		0180b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe
+		0180e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e
+		0180f6e9983c37baf68846fedafe21e56718790e39fb1c582abc408b81bc7b208f9a
+	public_key: 64a31235d4bf9b37cfed3afa8aa60754675f9c4915430454d365c05112784d05, encryption: sr25519, path: //kusama, available_networks: 
+		0180b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe
+	public_key: 96129dcebc2e10f644e81fcf4269a663e521330084b1e447369087dec8017e04, encryption: sr25519, path: //rococo, available_networks: 
+		0180f6e9983c37baf68846fedafe21e56718790e39fb1c582abc408b81bc7b208f9a
+	public_key: c81ebbec0559a6acf184535eb19da51ed3ed8c4ac65323999482aaf9b6696e27, encryption: sr25519, path: //alice, available_networks: 
+		0180f6e9983c37baf68846fedafe21e56718790e39fb1c582abc408b81bc7b208f9a
+	public_key: d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d, encryption: sr25519, path: //Alice, available_networks: 
+		0180e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e
+	public_key: f606519cb8726753885cd4d0f518804a69a5e0badf36fee70feadd8044081730, encryption: sr25519, path: //polkadot, available_networks: 
+		018091b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3"#;
+        assert!(print_before == expected_print_before, "Received:\n{}", print_before);
+        handle_stub(&checksum_str, dbname).unwrap();
+        let print_after = print_db_content(&dbname);
+        let expected_print_after = r#"Database contents:
+Metadata:
+	kusama2030
+	rococo9103
+	westend9000
+	westend9010
+	polkadot30
+Network Specs:
+	01806bfe24dca2a3be10f22212678ac13a6446ec764103c0f3471c71609eac384aae: dock-pos-main-runtime-sr25519 (dock-pos-main-runtime with sr25519)
+	018091b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3: Polkadot (polkadot with sr25519)
+	0180b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe: Kusama (kusama with sr25519)
+	0180e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e: Westend (westend with sr25519)
+	0180f6e9983c37baf68846fedafe21e56718790e39fb1c582abc408b81bc7b208f9a: Rococo (rococo with sr25519)
+Verifiers:
+	6bfe24dca2a3be10f22212678ac13a6446ec764103c0f3471c71609eac384aae: {"type":"custom","details":{"hex":"","encryption":"none"}}
+	91b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3: {"type":"general","details":{"hex":"d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d","encryption":"sr25519"}}
+	b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe: {"type":"general","details":{"hex":"d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d","encryption":"sr25519"}}
+	e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e: {"type":"general","details":{"hex":"d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d","encryption":"sr25519"}}
+	f6e9983c37baf68846fedafe21e56718790e39fb1c582abc408b81bc7b208f9a: {"type":"general","details":{"hex":"d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d","encryption":"sr25519"}}
+General Verifier: public key: d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d, encryption: sr25519
+Identities: 
+	public_key: 3efeca331d646d8a2986374bb3bb8d6e9e3cfcdd7c45c2b69104fab5d61d3f34, encryption: sr25519, path: //westend, available_networks: 
+		0180e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e
+	public_key: 46ebddef8cd9bb167dc30878d7113b7e168e6f0646beffd77d69d39bad76b47a, encryption: sr25519, path: , available_networks: 
+		018091b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3
+		0180b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe
+		0180e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e
+		0180f6e9983c37baf68846fedafe21e56718790e39fb1c582abc408b81bc7b208f9a
+		01806bfe24dca2a3be10f22212678ac13a6446ec764103c0f3471c71609eac384aae
+	public_key: 64a31235d4bf9b37cfed3afa8aa60754675f9c4915430454d365c05112784d05, encryption: sr25519, path: //kusama, available_networks: 
+		0180b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe
+	public_key: 96129dcebc2e10f644e81fcf4269a663e521330084b1e447369087dec8017e04, encryption: sr25519, path: //rococo, available_networks: 
+		0180f6e9983c37baf68846fedafe21e56718790e39fb1c582abc408b81bc7b208f9a
+	public_key: c81ebbec0559a6acf184535eb19da51ed3ed8c4ac65323999482aaf9b6696e27, encryption: sr25519, path: //alice, available_networks: 
+		0180f6e9983c37baf68846fedafe21e56718790e39fb1c582abc408b81bc7b208f9a
+	public_key: d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d, encryption: sr25519, path: //Alice, available_networks: 
+		0180e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e
+	public_key: f606519cb8726753885cd4d0f518804a69a5e0badf36fee70feadd8044081730, encryption: sr25519, path: //polkadot, available_networks: 
+		018091b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3"#;
+        assert!(print_after == expected_print_after, "Received:\n{}", print_after);
+        
+        let line = fs::read_to_string("for_tests/load_metadata_dock-pos-main-runtimeV31_unverified.txt").unwrap();
+        let reply = produce_output(&line.trim(), dbname);
+        let reply_known_part = r##"{"warning":[{"index":0,"indent":0,"type":"warning","payload":"Received network information is not verified."}],"meta":[{"index":1,"indent":0,"type":"meta","payload":{"specname":"dock-pos-main-runtime","spec_version":"31","meta_hash":"28c25067d5c0c739f64f7779c5f3095ecf57d9075b0c5258f3be2df6d7f323d0"}}],"action":{"type":"stub","payload":""##;
+        assert!(reply.contains(reply_known_part), "Expected: {}...\nReceived: {}", reply_known_part, reply);
+        let (action_is_sign, checksum_str) = get_type_and_checksum(&reply);
+        if action_is_sign {panic!("Should have been action `stub`.")}
+        handle_stub(&checksum_str, dbname).unwrap();
+        let print_after = print_db_content(&dbname);
+        let expected_print_after = r#"Database contents:
+Metadata:
+	kusama2030
+	rococo9103
+	westend9000
+	westend9010
+	polkadot30
+	dock-pos-main-runtime31
+Network Specs:
+	01806bfe24dca2a3be10f22212678ac13a6446ec764103c0f3471c71609eac384aae: dock-pos-main-runtime-sr25519 (dock-pos-main-runtime with sr25519)
+	018091b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3: Polkadot (polkadot with sr25519)
+	0180b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe: Kusama (kusama with sr25519)
+	0180e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e: Westend (westend with sr25519)
+	0180f6e9983c37baf68846fedafe21e56718790e39fb1c582abc408b81bc7b208f9a: Rococo (rococo with sr25519)
+Verifiers:
+	6bfe24dca2a3be10f22212678ac13a6446ec764103c0f3471c71609eac384aae: {"type":"custom","details":{"hex":"","encryption":"none"}}
+	91b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3: {"type":"general","details":{"hex":"d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d","encryption":"sr25519"}}
+	b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe: {"type":"general","details":{"hex":"d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d","encryption":"sr25519"}}
+	e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e: {"type":"general","details":{"hex":"d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d","encryption":"sr25519"}}
+	f6e9983c37baf68846fedafe21e56718790e39fb1c582abc408b81bc7b208f9a: {"type":"general","details":{"hex":"d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d","encryption":"sr25519"}}
+General Verifier: public key: d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d, encryption: sr25519
+Identities: 
+	public_key: 3efeca331d646d8a2986374bb3bb8d6e9e3cfcdd7c45c2b69104fab5d61d3f34, encryption: sr25519, path: //westend, available_networks: 
+		0180e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e
+	public_key: 46ebddef8cd9bb167dc30878d7113b7e168e6f0646beffd77d69d39bad76b47a, encryption: sr25519, path: , available_networks: 
+		018091b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3
+		0180b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe
+		0180e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e
+		0180f6e9983c37baf68846fedafe21e56718790e39fb1c582abc408b81bc7b208f9a
+		01806bfe24dca2a3be10f22212678ac13a6446ec764103c0f3471c71609eac384aae
+	public_key: 64a31235d4bf9b37cfed3afa8aa60754675f9c4915430454d365c05112784d05, encryption: sr25519, path: //kusama, available_networks: 
+		0180b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe
+	public_key: 96129dcebc2e10f644e81fcf4269a663e521330084b1e447369087dec8017e04, encryption: sr25519, path: //rococo, available_networks: 
+		0180f6e9983c37baf68846fedafe21e56718790e39fb1c582abc408b81bc7b208f9a
+	public_key: c81ebbec0559a6acf184535eb19da51ed3ed8c4ac65323999482aaf9b6696e27, encryption: sr25519, path: //alice, available_networks: 
+		0180f6e9983c37baf68846fedafe21e56718790e39fb1c582abc408b81bc7b208f9a
+	public_key: d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d, encryption: sr25519, path: //Alice, available_networks: 
+		0180e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e
+	public_key: f606519cb8726753885cd4d0f518804a69a5e0badf36fee70feadd8044081730, encryption: sr25519, path: //polkadot, available_networks: 
+		018091b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3"#;
+        assert!(print_after == expected_print_after, "Received:\n{}", print_after);
+        
+        let line = fs::read_to_string("for_tests/add_specs_dock-pos-main-runtime-sr25519_Alice-ed25519.txt").unwrap();
+        let reply = produce_output(&line.trim(), dbname);
+        let reply_known_part = r##"{"verifier":[{"index":0,"indent":0,"type":"verifier","payload":{"hex":"88dc3417d5058ec4b4503e0c12ea1a0a89be200fe98922423d4334014fa6b0ee","encryption":"ed25519"}}],"warning":[{"index":1,"indent":0,"type":"warning","payload":"Received message is verified. Currently no verifier is set for network with genesis hash 6bfe24dca2a3be10f22212678ac13a6446ec764103c0f3471c71609eac384aae. Proceeding will update the network verifier to custom verifier. All previously acquired network information that was received unverified will be purged. Affected network specs entries: dock-pos-main-runtime-sr25519; affected metadata entries: dock-pos-main-runtime31."},{"index":2,"indent":0,"type":"warning","payload":"Received network specs information for dock-pos-main-runtime-sr25519 is same as the one already in the database."}],"new_specs":[{"index":3,"indent":0,"type":"new_specs","payload":{"base58prefix":"22","color":"#660D35","decimals":"6","encryption":"sr25519","genesis_hash":"6bfe24dca2a3be10f22212678ac13a6446ec764103c0f3471c71609eac384aae","logo":"dock-pos-main-runtime","name":"dock-pos-main-runtime","path_id":"//dock-pos-main-runtime","secondary_color":"#262626","title":"dock-pos-main-runtime-sr25519","unit":"DOCK"}}],"action":{"type":"stub","payload":""##;
+        assert!(reply.contains(reply_known_part), "Expected: {}...\nReceived: {}", reply_known_part, reply);
+        let (action_is_sign, checksum_str) = get_type_and_checksum(&reply);
+        if action_is_sign {panic!("Should have been action `stub`.")}
+        handle_stub(&checksum_str, dbname).unwrap();
+        let print_after = print_db_content(&dbname);
+        let expected_print_after = r#"Database contents:
+Metadata:
+	kusama2030
+	rococo9103
+	westend9000
+	westend9010
+	polkadot30
+Network Specs:
+	01806bfe24dca2a3be10f22212678ac13a6446ec764103c0f3471c71609eac384aae: dock-pos-main-runtime-sr25519 (dock-pos-main-runtime with sr25519)
+	018091b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3: Polkadot (polkadot with sr25519)
+	0180b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe: Kusama (kusama with sr25519)
+	0180e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e: Westend (westend with sr25519)
+	0180f6e9983c37baf68846fedafe21e56718790e39fb1c582abc408b81bc7b208f9a: Rococo (rococo with sr25519)
+Verifiers:
+	6bfe24dca2a3be10f22212678ac13a6446ec764103c0f3471c71609eac384aae: {"type":"custom","details":{"hex":"88dc3417d5058ec4b4503e0c12ea1a0a89be200fe98922423d4334014fa6b0ee","encryption":"ed25519"}}
+	91b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3: {"type":"general","details":{"hex":"d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d","encryption":"sr25519"}}
+	b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe: {"type":"general","details":{"hex":"d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d","encryption":"sr25519"}}
+	e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e: {"type":"general","details":{"hex":"d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d","encryption":"sr25519"}}
+	f6e9983c37baf68846fedafe21e56718790e39fb1c582abc408b81bc7b208f9a: {"type":"general","details":{"hex":"d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d","encryption":"sr25519"}}
+General Verifier: public key: d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d, encryption: sr25519
+Identities: 
+	public_key: 3efeca331d646d8a2986374bb3bb8d6e9e3cfcdd7c45c2b69104fab5d61d3f34, encryption: sr25519, path: //westend, available_networks: 
+		0180e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e
+	public_key: 46ebddef8cd9bb167dc30878d7113b7e168e6f0646beffd77d69d39bad76b47a, encryption: sr25519, path: , available_networks: 
+		018091b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3
+		0180b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe
+		0180e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e
+		0180f6e9983c37baf68846fedafe21e56718790e39fb1c582abc408b81bc7b208f9a
+		01806bfe24dca2a3be10f22212678ac13a6446ec764103c0f3471c71609eac384aae
+	public_key: 64a31235d4bf9b37cfed3afa8aa60754675f9c4915430454d365c05112784d05, encryption: sr25519, path: //kusama, available_networks: 
+		0180b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe
+	public_key: 96129dcebc2e10f644e81fcf4269a663e521330084b1e447369087dec8017e04, encryption: sr25519, path: //rococo, available_networks: 
+		0180f6e9983c37baf68846fedafe21e56718790e39fb1c582abc408b81bc7b208f9a
+	public_key: c81ebbec0559a6acf184535eb19da51ed3ed8c4ac65323999482aaf9b6696e27, encryption: sr25519, path: //alice, available_networks: 
+		0180f6e9983c37baf68846fedafe21e56718790e39fb1c582abc408b81bc7b208f9a
+	public_key: d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d, encryption: sr25519, path: //Alice, available_networks: 
+		0180e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e
+	public_key: f606519cb8726753885cd4d0f518804a69a5e0badf36fee70feadd8044081730, encryption: sr25519, path: //polkadot, available_networks: 
+		018091b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3"#;
+        assert!(print_after == expected_print_after, "Received:\n{}", print_after);
+        
+        let line = fs::read_to_string("for_tests/add_specs_dock-pos-main-runtime-sr25519_Alice-sr25519.txt").unwrap();
+        let reply = produce_output(&line.trim(), dbname);
+        let reply_known_part = r##"{"verifier":[{"index":0,"indent":0,"type":"verifier","payload":{"hex":"d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d","encryption":"sr25519"}}],"warning":[{"index":1,"indent":0,"type":"warning","payload":"Received message is verified by the general verifier. Current verifier for network with genesis hash 6bfe24dca2a3be10f22212678ac13a6446ec764103c0f3471c71609eac384aae is a custom one, and proceeding will update the network verifier to general. All previously acquired information associated with former custom verifier will be purged. Affected network specs entries: dock-pos-main-runtime-sr25519; affected metadata entries: none."},{"index":2,"indent":0,"type":"warning","payload":"Received network specs information for dock-pos-main-runtime-sr25519 is same as the one already in the database."}],"new_specs":[{"index":3,"indent":0,"type":"new_specs","payload":{"base58prefix":"22","color":"#660D35","decimals":"6","encryption":"sr25519","genesis_hash":"6bfe24dca2a3be10f22212678ac13a6446ec764103c0f3471c71609eac384aae","logo":"dock-pos-main-runtime","name":"dock-pos-main-runtime","path_id":"//dock-pos-main-runtime","secondary_color":"#262626","title":"dock-pos-main-runtime-sr25519","unit":"DOCK"}}],"action":{"type":"stub","payload":""##;
+        assert!(reply.contains(reply_known_part), "Expected: {}...\nReceived: {}", reply_known_part, reply);
+        let (action_is_sign, checksum_str) = get_type_and_checksum(&reply);
+        if action_is_sign {panic!("Should have been action `stub`.")}
+        handle_stub(&checksum_str, dbname).unwrap();
+        let print_after = print_db_content(&dbname);
+        let expected_print_after = r#"Database contents:
+Metadata:
+	kusama2030
+	rococo9103
+	westend9000
+	westend9010
+	polkadot30
+Network Specs:
+	01806bfe24dca2a3be10f22212678ac13a6446ec764103c0f3471c71609eac384aae: dock-pos-main-runtime-sr25519 (dock-pos-main-runtime with sr25519)
+	018091b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3: Polkadot (polkadot with sr25519)
+	0180b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe: Kusama (kusama with sr25519)
+	0180e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e: Westend (westend with sr25519)
+	0180f6e9983c37baf68846fedafe21e56718790e39fb1c582abc408b81bc7b208f9a: Rococo (rococo with sr25519)
+Verifiers:
+	6bfe24dca2a3be10f22212678ac13a6446ec764103c0f3471c71609eac384aae: {"type":"general","details":{"hex":"d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d","encryption":"sr25519"}}
+	91b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3: {"type":"general","details":{"hex":"d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d","encryption":"sr25519"}}
+	b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe: {"type":"general","details":{"hex":"d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d","encryption":"sr25519"}}
+	e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e: {"type":"general","details":{"hex":"d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d","encryption":"sr25519"}}
+	f6e9983c37baf68846fedafe21e56718790e39fb1c582abc408b81bc7b208f9a: {"type":"general","details":{"hex":"d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d","encryption":"sr25519"}}
+General Verifier: public key: d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d, encryption: sr25519
+Identities: 
+	public_key: 3efeca331d646d8a2986374bb3bb8d6e9e3cfcdd7c45c2b69104fab5d61d3f34, encryption: sr25519, path: //westend, available_networks: 
+		0180e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e
+	public_key: 46ebddef8cd9bb167dc30878d7113b7e168e6f0646beffd77d69d39bad76b47a, encryption: sr25519, path: , available_networks: 
+		018091b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3
+		0180b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe
+		0180e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e
+		0180f6e9983c37baf68846fedafe21e56718790e39fb1c582abc408b81bc7b208f9a
+		01806bfe24dca2a3be10f22212678ac13a6446ec764103c0f3471c71609eac384aae
+	public_key: 64a31235d4bf9b37cfed3afa8aa60754675f9c4915430454d365c05112784d05, encryption: sr25519, path: //kusama, available_networks: 
+		0180b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe
+	public_key: 96129dcebc2e10f644e81fcf4269a663e521330084b1e447369087dec8017e04, encryption: sr25519, path: //rococo, available_networks: 
+		0180f6e9983c37baf68846fedafe21e56718790e39fb1c582abc408b81bc7b208f9a
+	public_key: c81ebbec0559a6acf184535eb19da51ed3ed8c4ac65323999482aaf9b6696e27, encryption: sr25519, path: //alice, available_networks: 
+		0180f6e9983c37baf68846fedafe21e56718790e39fb1c582abc408b81bc7b208f9a
+	public_key: d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d, encryption: sr25519, path: //Alice, available_networks: 
+		0180e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e
+	public_key: f606519cb8726753885cd4d0f518804a69a5e0badf36fee70feadd8044081730, encryption: sr25519, path: //polkadot, available_networks: 
+		018091b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3"#;
+        assert!(print_after == expected_print_after, "Received:\n{}", print_after);
+        
+        fs::remove_dir_all(dbname).unwrap();
+    }
+    
+    #[test]
+    fn can_sign_metadata_v14_with_no_types_in_db() {
+        let dbname = "for_tests/can_sign_metadata_v14_with_no_types_in_db";
+        populate_cold(dbname, Verifier::None).unwrap();
+        let line = fs::read_to_string("for_tests/add_specs_rococo-sr25519_Alice-sr25519.txt").unwrap();
+        let reply = produce_output(&line.trim(), dbname);
+        let reply_known_part = r##"{"verifier":[{"index":0,"indent":0,"type":"verifier","payload":{"hex":"d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d","encryption":"sr25519"}}],"warning":[{"index":1,"indent":0,"type":"warning","payload":"Received message is verified by a new general verifier. Currently no general verifier is set, and proceeding will update the general verifier to the received value. All previously acquired information associated with general verifier will be purged. Affected network specs entries: Polkadot, Kusama, Westend, Rococo; affected metadata entries: polkadot30, kusama2030, westend9000, westend9010, rococo9103. Types information is purged."},{"index":2,"indent":0,"type":"warning","payload":"Received network specs information for Rococo is same as the one already in the database."}],"new_specs":[{"index":3,"indent":0,"type":"new_specs","payload":{"base58prefix":"42","color":"#6f36dc","decimals":"12","encryption":"sr25519","genesis_hash":"f6e9983c37baf68846fedafe21e56718790e39fb1c582abc408b81bc7b208f9a","logo":"rococo","name":"rococo","path_id":"//rococo","secondary_color":"#262626","title":"Rococo","unit":"ROC"}}],"action":{"type":"stub","payload":""##;
+        assert!(reply.contains(reply_known_part), "Expected: {}...\nReceived: {}", reply_known_part, reply);
+        let (action_is_sign, checksum_str) = get_type_and_checksum(&reply);
+        if action_is_sign {panic!("Should have been action `stub`.")}
+        let print_before = print_db_content(&dbname);
+        let expected_print_before = r#"Database contents:
+Metadata:
+	kusama2030
+	rococo9103
+	westend9000
+	westend9010
+	polkadot30
+Network Specs:
+	018091b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3: Polkadot (polkadot with sr25519)
+	0180b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe: Kusama (kusama with sr25519)
+	0180e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e: Westend (westend with sr25519)
+	0180f6e9983c37baf68846fedafe21e56718790e39fb1c582abc408b81bc7b208f9a: Rococo (rococo with sr25519)
+Verifiers:
+	91b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3: {"type":"general","details":{"hex":"","encryption":"none"}}
+	b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe: {"type":"general","details":{"hex":"","encryption":"none"}}
+	e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e: {"type":"general","details":{"hex":"","encryption":"none"}}
+	f6e9983c37baf68846fedafe21e56718790e39fb1c582abc408b81bc7b208f9a: {"type":"general","details":{"hex":"","encryption":"none"}}
+General Verifier: none
+Identities: 
+	public_key: 3efeca331d646d8a2986374bb3bb8d6e9e3cfcdd7c45c2b69104fab5d61d3f34, encryption: sr25519, path: //westend, available_networks: 
+		0180e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e
+	public_key: 46ebddef8cd9bb167dc30878d7113b7e168e6f0646beffd77d69d39bad76b47a, encryption: sr25519, path: , available_networks: 
+		018091b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3
+		0180b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe
+		0180e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e
+		0180f6e9983c37baf68846fedafe21e56718790e39fb1c582abc408b81bc7b208f9a
+	public_key: 64a31235d4bf9b37cfed3afa8aa60754675f9c4915430454d365c05112784d05, encryption: sr25519, path: //kusama, available_networks: 
+		0180b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe
+	public_key: 96129dcebc2e10f644e81fcf4269a663e521330084b1e447369087dec8017e04, encryption: sr25519, path: //rococo, available_networks: 
+		0180f6e9983c37baf68846fedafe21e56718790e39fb1c582abc408b81bc7b208f9a
+	public_key: c81ebbec0559a6acf184535eb19da51ed3ed8c4ac65323999482aaf9b6696e27, encryption: sr25519, path: //alice, available_networks: 
+		0180f6e9983c37baf68846fedafe21e56718790e39fb1c582abc408b81bc7b208f9a
+	public_key: d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d, encryption: sr25519, path: //Alice, available_networks: 
+		0180e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e
+	public_key: f606519cb8726753885cd4d0f518804a69a5e0badf36fee70feadd8044081730, encryption: sr25519, path: //polkadot, available_networks: 
+		018091b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3"#;
+        assert!(print_before == expected_print_before, "Received:\n{}", print_before);
+        handle_stub(&checksum_str, dbname).unwrap();
+        let print_after = print_db_content(&dbname);
+        let expected_print_after = r#"Database contents:
+Metadata:
+Network Specs:
+	0180f6e9983c37baf68846fedafe21e56718790e39fb1c582abc408b81bc7b208f9a: Rococo (rococo with sr25519)
+Verifiers:
+	91b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3: {"type":"general","details":{"hex":"d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d","encryption":"sr25519"}}
+	b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe: {"type":"general","details":{"hex":"d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d","encryption":"sr25519"}}
+	e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e: {"type":"general","details":{"hex":"d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d","encryption":"sr25519"}}
+	f6e9983c37baf68846fedafe21e56718790e39fb1c582abc408b81bc7b208f9a: {"type":"general","details":{"hex":"d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d","encryption":"sr25519"}}
+General Verifier: public key: d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d, encryption: sr25519
+Identities: 
+	public_key: 3efeca331d646d8a2986374bb3bb8d6e9e3cfcdd7c45c2b69104fab5d61d3f34, encryption: sr25519, path: //westend, available_networks: 
+		0180e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e
+	public_key: 46ebddef8cd9bb167dc30878d7113b7e168e6f0646beffd77d69d39bad76b47a, encryption: sr25519, path: , available_networks: 
+		018091b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3
+		0180b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe
+		0180e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e
+		0180f6e9983c37baf68846fedafe21e56718790e39fb1c582abc408b81bc7b208f9a
+	public_key: 64a31235d4bf9b37cfed3afa8aa60754675f9c4915430454d365c05112784d05, encryption: sr25519, path: //kusama, available_networks: 
+		0180b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe
+	public_key: 96129dcebc2e10f644e81fcf4269a663e521330084b1e447369087dec8017e04, encryption: sr25519, path: //rococo, available_networks: 
+		0180f6e9983c37baf68846fedafe21e56718790e39fb1c582abc408b81bc7b208f9a
+	public_key: c81ebbec0559a6acf184535eb19da51ed3ed8c4ac65323999482aaf9b6696e27, encryption: sr25519, path: //alice, available_networks: 
+		0180f6e9983c37baf68846fedafe21e56718790e39fb1c582abc408b81bc7b208f9a
+	public_key: d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d, encryption: sr25519, path: //Alice, available_networks: 
+		0180e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e
+	public_key: f606519cb8726753885cd4d0f518804a69a5e0badf36fee70feadd8044081730, encryption: sr25519, path: //polkadot, available_networks: 
+		018091b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3"#;
+        assert!(print_after == expected_print_after, "Received:\n{}", print_after);
+        
+        let line = fs::read_to_string("for_tests/load_metadata_rococoV9103_Alice-sr25519.txt").unwrap();
+        let reply = produce_output(&line.trim(), dbname);
+        let reply_known_part = r##"{"verifier":[{"index":0,"indent":0,"type":"verifier","payload":{"hex":"d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d","encryption":"sr25519"}}],"meta":[{"index":1,"indent":0,"type":"meta","payload":{"specname":"rococo","spec_version":"9103","meta_hash":"bd96af1b9561b124e05980ca9d32707d158be55d8bed115ecea2f31bbba8d270"}}],"action":{"type":"stub","payload":""##;
+        assert!(reply.contains(reply_known_part), "Expected: {}...\nReceived: {}", reply_known_part, reply);
+        let (action_is_sign, checksum_str) = get_type_and_checksum(&reply);
+        if action_is_sign {panic!("Should have been action `stub`.")}
+        handle_stub(&checksum_str, dbname).unwrap();
+        let print_after = print_db_content(&dbname);
+        let expected_print_after = r#"Database contents:
+Metadata:
+	rococo9103
+Network Specs:
+	0180f6e9983c37baf68846fedafe21e56718790e39fb1c582abc408b81bc7b208f9a: Rococo (rococo with sr25519)
+Verifiers:
+	91b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3: {"type":"general","details":{"hex":"d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d","encryption":"sr25519"}}
+	b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe: {"type":"general","details":{"hex":"d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d","encryption":"sr25519"}}
+	e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e: {"type":"general","details":{"hex":"d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d","encryption":"sr25519"}}
+	f6e9983c37baf68846fedafe21e56718790e39fb1c582abc408b81bc7b208f9a: {"type":"general","details":{"hex":"d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d","encryption":"sr25519"}}
+General Verifier: public key: d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d, encryption: sr25519
+Identities: 
+	public_key: 3efeca331d646d8a2986374bb3bb8d6e9e3cfcdd7c45c2b69104fab5d61d3f34, encryption: sr25519, path: //westend, available_networks: 
+		0180e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e
+	public_key: 46ebddef8cd9bb167dc30878d7113b7e168e6f0646beffd77d69d39bad76b47a, encryption: sr25519, path: , available_networks: 
+		018091b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3
+		0180b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe
+		0180e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e
+		0180f6e9983c37baf68846fedafe21e56718790e39fb1c582abc408b81bc7b208f9a
+	public_key: 64a31235d4bf9b37cfed3afa8aa60754675f9c4915430454d365c05112784d05, encryption: sr25519, path: //kusama, available_networks: 
+		0180b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe
+	public_key: 96129dcebc2e10f644e81fcf4269a663e521330084b1e447369087dec8017e04, encryption: sr25519, path: //rococo, available_networks: 
+		0180f6e9983c37baf68846fedafe21e56718790e39fb1c582abc408b81bc7b208f9a
+	public_key: c81ebbec0559a6acf184535eb19da51ed3ed8c4ac65323999482aaf9b6696e27, encryption: sr25519, path: //alice, available_networks: 
+		0180f6e9983c37baf68846fedafe21e56718790e39fb1c582abc408b81bc7b208f9a
+	public_key: d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d, encryption: sr25519, path: //Alice, available_networks: 
+		0180e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e
+	public_key: f606519cb8726753885cd4d0f518804a69a5e0badf36fee70feadd8044081730, encryption: sr25519, path: //polkadot, available_networks: 
+		018091b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3"#;
+        assert!(print_after == expected_print_after, "Received:\n{}", print_after);
+        
+        let line = "530102c81ebbec0559a6acf184535eb19da51ed3ed8c4ac65323999482aaf9b6696e2790040300c81ebbec0559a6acf184535eb19da51ed3ed8c4ac65323999482aaf9b6696e2700b50100008f23000000000000f6e9983c37baf68846fedafe21e56718790e39fb1c582abc408b81bc7b208f9a829eea54e7190c8a23bffafe869f87428f3a1fe1c63cc1ec033c110e5a27eb2ff6e9983c37baf68846fedafe21e56718790e39fb1c582abc408b81bc7b208f9a";
+        let reply = produce_output(&line, dbname);
+        let reply_known_part = r#"{"author":[{"index":0,"indent":0,"type":"author","payload":{"base58":"5Gb6Zfe8K8NSKrkFLCgqs8LUdk7wKweXM5pN296jVqDpdziR","seed":"Alice","derivation_path":"//alice","has_password":false,"name":"Alice_test_rococo"}}],"method":[{"index":1,"indent":0,"type":"pallet","payload":{"pallet_name":"Balances","path":"pallet_balances >> pallet >> Call","docs":"Contains one variant per dispatchable that can be called by an extrinsic."}},{"index":2,"indent":1,"type":"enum_variant_name","payload":{"name":"transfer_keep_alive","docs_enum_variant":"Same as the [`transfer`] call, but with a check that the transfer will not kill the
+origin account.
+
+99% of the time you want [`transfer`] instead.
+
+[`transfer`]: struct.Pallet.html#method.transfer
+# <weight>
+- Cheaper than transfer because account cannot be killed.
+- Base Weight: 51.4 µs
+- DB Weight: 1 Read and 1 Write to dest (sender is in overlay already)
+#</weight>"}},{"index":3,"indent":2,"type":"field_name","payload":{"name":"dest","docs_field_name":"","path_type":"sp_runtime >> multiaddress >> MultiAddress","docs_type":""}},{"index":4,"indent":3,"type":"enum_variant_name","payload":{"name":"Id","docs_enum_variant":""}},{"index":5,"indent":5,"type":"Id","payload":"5Gb6Zfe8K8NSKrkFLCgqs8LUdk7wKweXM5pN296jVqDpdziR"},{"index":6,"indent":2,"type":"field_name","payload":{"name":"value","docs_field_name":"","path_type":"","docs_type":""}},{"index":7,"indent":3,"type":"balance","payload":{"amount":"0","units":"pROC"}}],"extrinsics":[{"index":8,"indent":0,"type":"era_mortal_nonce","payload":{"era":"Mortal","phase":"27","period":"64","nonce":"0"}},{"index":9,"indent":0,"type":"tip","payload":{"amount":"0","units":"pROC"}},{"index":10,"indent":0,"type":"block_hash","payload":"829eea54e7190c8a23bffafe869f87428f3a1fe1c63cc1ec033c110e5a27eb2f"},{"index":11,"indent":0,"type":"tx_spec","payload":{"network":"rococo","version":"9103","tx_version":"0"}}],"action":{"type":"sign","payload":""#;
+        assert!(reply.contains(reply_known_part), "Expected: {}...\nReceived: {}", reply_known_part, reply);
+        
+        let line = fs::read_to_string("for_tests/load_metadata_rococoV9106_Alice-sr25519.txt").unwrap();
+        let reply = produce_output(&line.trim(), dbname);
+        let reply_known_part = r##"{"verifier":[{"index":0,"indent":0,"type":"verifier","payload":{"hex":"d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d","encryption":"sr25519"}}],"meta":[{"index":1,"indent":0,"type":"meta","payload":{"specname":"rococo","spec_version":"9106","meta_hash":"78151026915b5c2301a96289cfee19d860a207df1d6e3497da8ad660b19fedbf"}}],"action":{"type":"stub","payload":""##;
+        assert!(reply.contains(reply_known_part), "Expected: {}...\nReceived: {}", reply_known_part, reply);
+        let (action_is_sign, checksum_str) = get_type_and_checksum(&reply);
+        if action_is_sign {panic!("Should have been action `stub`.")}
+        handle_stub(&checksum_str, dbname).unwrap();
+        let print_after = print_db_content(&dbname);
+        let expected_print_after = r#"Database contents:
+Metadata:
+	rococo9103
+	rococo9106
+Network Specs:
+	0180f6e9983c37baf68846fedafe21e56718790e39fb1c582abc408b81bc7b208f9a: Rococo (rococo with sr25519)
+Verifiers:
+	91b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3: {"type":"general","details":{"hex":"d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d","encryption":"sr25519"}}
+	b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe: {"type":"general","details":{"hex":"d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d","encryption":"sr25519"}}
+	e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e: {"type":"general","details":{"hex":"d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d","encryption":"sr25519"}}
+	f6e9983c37baf68846fedafe21e56718790e39fb1c582abc408b81bc7b208f9a: {"type":"general","details":{"hex":"d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d","encryption":"sr25519"}}
+General Verifier: public key: d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d, encryption: sr25519
+Identities: 
+	public_key: 3efeca331d646d8a2986374bb3bb8d6e9e3cfcdd7c45c2b69104fab5d61d3f34, encryption: sr25519, path: //westend, available_networks: 
+		0180e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e
+	public_key: 46ebddef8cd9bb167dc30878d7113b7e168e6f0646beffd77d69d39bad76b47a, encryption: sr25519, path: , available_networks: 
+		018091b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3
+		0180b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe
+		0180e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e
+		0180f6e9983c37baf68846fedafe21e56718790e39fb1c582abc408b81bc7b208f9a
+	public_key: 64a31235d4bf9b37cfed3afa8aa60754675f9c4915430454d365c05112784d05, encryption: sr25519, path: //kusama, available_networks: 
+		0180b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe
+	public_key: 96129dcebc2e10f644e81fcf4269a663e521330084b1e447369087dec8017e04, encryption: sr25519, path: //rococo, available_networks: 
+		0180f6e9983c37baf68846fedafe21e56718790e39fb1c582abc408b81bc7b208f9a
+	public_key: c81ebbec0559a6acf184535eb19da51ed3ed8c4ac65323999482aaf9b6696e27, encryption: sr25519, path: //alice, available_networks: 
+		0180f6e9983c37baf68846fedafe21e56718790e39fb1c582abc408b81bc7b208f9a
+	public_key: d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d, encryption: sr25519, path: //Alice, available_networks: 
+		0180e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e
+	public_key: f606519cb8726753885cd4d0f518804a69a5e0badf36fee70feadd8044081730, encryption: sr25519, path: //polkadot, available_networks: 
+		018091b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3"#;
+        assert!(print_after == expected_print_after, "Received:\n{}", print_after);
+        
+        let line = "530102c81ebbec0559a6acf184535eb19da51ed3ed8c4ac65323999482aaf9b6696e2790040300c81ebbec0559a6acf184535eb19da51ed3ed8c4ac65323999482aaf9b6696e2700b50100008f23000000000000f6e9983c37baf68846fedafe21e56718790e39fb1c582abc408b81bc7b208f9a829eea54e7190c8a23bffafe869f87428f3a1fe1c63cc1ec033c110e5a27eb2ff6e9983c37baf68846fedafe21e56718790e39fb1c582abc408b81bc7b208f9a";
+        let reply = produce_output(&line, dbname);
+        let reply_known_part = r#"{"author":[{"index":0,"indent":0,"type":"author","payload":{"base58":"5Gb6Zfe8K8NSKrkFLCgqs8LUdk7wKweXM5pN296jVqDpdziR","seed":"Alice","derivation_path":"//alice","has_password":false,"name":"Alice_test_rococo"}}],"warning":[{"index":1,"indent":0,"type":"warning","payload":"Transaction uses outdated runtime version 9103. Latest known available version is 9106."}],"method":[{"index":2,"indent":0,"type":"pallet","payload":{"pallet_name":"Balances","path":"pallet_balances >> pallet >> Call","docs":"Contains one variant per dispatchable that can be called by an extrinsic."}},{"index":3,"indent":1,"type":"enum_variant_name","payload":{"name":"transfer_keep_alive","docs_enum_variant":"Same as the [`transfer`] call, but with a check that the transfer will not kill the
+origin account.
+
+99% of the time you want [`transfer`] instead.
+
+[`transfer`]: struct.Pallet.html#method.transfer
+# <weight>
+- Cheaper than transfer because account cannot be killed.
+- Base Weight: 51.4 µs
+- DB Weight: 1 Read and 1 Write to dest (sender is in overlay already)
+#</weight>"}},{"index":4,"indent":2,"type":"field_name","payload":{"name":"dest","docs_field_name":"","path_type":"sp_runtime >> multiaddress >> MultiAddress","docs_type":""}},{"index":5,"indent":3,"type":"enum_variant_name","payload":{"name":"Id","docs_enum_variant":""}},{"index":6,"indent":5,"type":"Id","payload":"5Gb6Zfe8K8NSKrkFLCgqs8LUdk7wKweXM5pN296jVqDpdziR"},{"index":7,"indent":2,"type":"field_name","payload":{"name":"value","docs_field_name":"","path_type":"","docs_type":""}},{"index":8,"indent":3,"type":"balance","payload":{"amount":"0","units":"pROC"}}],"extrinsics":[{"index":9,"indent":0,"type":"era_mortal_nonce","payload":{"era":"Mortal","phase":"27","period":"64","nonce":"0"}},{"index":10,"indent":0,"type":"tip","payload":{"amount":"0","units":"pROC"}},{"index":11,"indent":0,"type":"block_hash","payload":"829eea54e7190c8a23bffafe869f87428f3a1fe1c63cc1ec033c110e5a27eb2f"},{"index":12,"indent":0,"type":"tx_spec","payload":{"network":"rococo","version":"9103","tx_version":"0"}}],"action":{"type":"sign","payload":""#;
+        assert!(reply.contains(reply_known_part), "Expected: {}...\nReceived: {}", reply_known_part, reply);
+        
+        fs::remove_dir_all(dbname).unwrap();
+    }
 }

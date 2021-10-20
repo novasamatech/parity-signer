@@ -136,10 +136,6 @@ pub fn parse_transaction (data_hex: &str, dbname: &str) -> Result<String, Error>
                                 history.push(Event::Warning(Warning::NewerVersion{used_version: short.metadata_version, latest_version: x}.show()));
                             }
                     
-                        // generate type database to be used in decoding
-                            
-                            let type_database = get_types(&dbname)?;
-                    
                         // action card preparations: vector that should be signed
                             let for_signing = [transaction_decoded.method.to_vec(), transaction_decoded.extrinsics.encode().to_vec()].concat();
                     
@@ -151,6 +147,8 @@ pub fn parse_transaction (data_hex: &str, dbname: &str) -> Result<String, Error>
                                         RuntimeMetadata::V13(meta_v13) => {OlderMeta::V13(meta_v13)},
                                         _ => unreachable!(),
                                     };
+                                // generate type database to be used in decoding
+                                    let type_database = get_types(&dbname)?;
                                     match process_as_call (transaction_decoded.method, &older_meta, &type_database, &mut index, indent, &chain_specs_found) {
                                         Ok(transaction_parsed) => {
                                             let method_cards = &transaction_parsed.fancy_out[1..];
@@ -278,11 +276,6 @@ pub fn parse_transaction (data_hex: &str, dbname: &str) -> Result<String, Error>
                                 let add_this = (Card::Warning(Warning::NewerVersion{used_version: short.metadata_version, latest_version: x})).card(&mut index, indent);
                                 warning_card.push_str(&format!(",{}", add_this));
                             }
-                    
-                        // generate type database to be used in decoding
-                            
-                            let type_database = get_types(&dbname)?;
-
                         // transaction parsing
                             match meta {
                                 RuntimeMetadata::V12(_)|RuntimeMetadata::V13(_) => {
@@ -291,6 +284,8 @@ pub fn parse_transaction (data_hex: &str, dbname: &str) -> Result<String, Error>
                                         RuntimeMetadata::V13(meta_v13) => {OlderMeta::V13(meta_v13)},
                                         _ => unreachable!(),
                                     };
+                                // generate type database to be used in decoding
+                                    let type_database = get_types(&dbname)?;
                                     match process_as_call (transaction_decoded.method, &older_meta, &type_database, &mut index, indent, &chain_specs_found) {
                                         Ok(transaction_parsed) => {
                                             let method_cards = &transaction_parsed.fancy_out[1..];

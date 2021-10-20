@@ -91,7 +91,7 @@ Possible commands are:
         - `-n` followed by one name (network **specname** for load_metadata, i.e. `polkadot`, `westend` etc, the one that goes before version in output of `show -database`; network **title** for add_specs, i.e. `polkadot`, `westend-ed25519`, `rococo-AgainUpdatedGenesisHash` and the likes, whatever title shows in output of`show -address_book` (so far only vanilla names and vanilla names followed by encryption could be encountered))
         - `-u` followed by one url address
     - optional `-s` key to stop the program if any failure occurs. By default the program informs user of unsuccessful attempt and proceeds.  
-    - encryption override keys (maximum one can be used), to be used for networks not in the database, and therefore to be used only for fetches through -u reference key; if multiple addresses are provided, same encryption override key is used for all networks:  
+    - encryption override keys (maximum one can be used), to be used for networks not in the database, and therefore to be used only for fetches through -u reference key:  
         - `-ed25519` if the network operates with ed25519 encryption algorithm  
         - `-sr25519` if the network operates with sr25519 encryption algorithm  
         - `-ecdsa` if the network operates with ecdsa encryption algorithm  

@@ -107,20 +107,43 @@ pub fn add_specs (data_hex: &str, database_name: &str) -> Result<String, Error> 
                                 }
                             }
                             else {
-                                stub = hold.upd_stub(stub, &verifier_key, &custom_verifier, &CurrentVerifier::Custom(checked_info.verifier.to_owned()), HoldRelease::Custom, &database_name)?;
-                                let warning_card_1 = Card::Warning(Warning::VerifierChangingToCustom{verifier_key: &verifier_key, hold: &hold}).card(&mut index,0);
-                                let mut possible_warning = None;
-                                if !specs_are_new(&specs, &database_name)? {
-                                    possible_warning = Some(Card::Warning(Warning::NetworkSpecsAlreadyThere(&specs.title)).card(&mut index,0));
-                                    stub = stub.new_history_entry(Event::Warning(Warning::NetworkSpecsAlreadyThere(&specs.title).show()));
-                                };
-                                stub = stub_add_network_specs(stub, &specs, &CurrentVerifier::Custom(checked_info.verifier.to_owned()), &general_verifier, &database_name)?;
-                                let specs_card = Card::NewSpecs(&specs).card(&mut index, 0);
-                                let checksum = stub_store_and_get_checksum(stub, &database_name)?;
-                                let action_card = Action::Stub(checksum).card();
-                                match possible_warning {
-                                    None => Ok(format!("{{\"verifier\":[{}],\"warning\":[{}],\"new_specs\":[{}],{}}}", verifier_card, warning_card_1, specs_card, action_card)),
-                                    Some(warning_card_2) => Ok(format!("{{\"verifier\":[{}],\"warning\":[{},{}],\"new_specs\":[{}],{}}}", verifier_card, warning_card_1, warning_card_2, specs_card, action_card)),
+                                if general_verifier == Verifier::None {
+                                    let new_general_verifier = checked_info.verifier;
+                                    stub = hold.upd_stub(stub, &verifier_key, &custom_verifier, &CurrentVerifier::General, HoldRelease::GeneralSuper, &database_name)?;
+                                    let warning_card_1 = Card::Warning(Warning::VerifierGeneralSuper{verifier_key: &verifier_key, hold: &hold}).card(&mut index,0);
+                                    let general_hold = GeneralHold::get(&database_name)?;
+                                    stub = general_hold.upd_stub(stub, &new_general_verifier, &database_name)?;
+                                    let warning_card_2 = Card::Warning(Warning::GeneralVerifierAppeared(&general_hold)).card(&mut index,0);
+                                    let mut possible_warning = None;
+                                    if !specs_are_new(&specs, &database_name)? {
+                                        possible_warning = Some(Card::Warning(Warning::NetworkSpecsAlreadyThere(&specs.title)).card(&mut index,0));
+                                        stub = stub.new_history_entry(Event::Warning(Warning::NetworkSpecsAlreadyThere(&specs.title).show()));
+                                    };
+                                    stub = stub_add_network_specs(stub, &specs, &CurrentVerifier::General, &general_verifier, &database_name)?;
+                                    let specs_card = Card::NewSpecs(&specs).card(&mut index, 0);
+                                    let checksum = stub_store_and_get_checksum(stub, &database_name)?;
+                                    let action_card = Action::Stub(checksum).card();
+                                    match possible_warning {
+                                        None => Ok(format!("{{\"verifier\":[{}],\"warning\":[{},{}],\"new_specs\":[{}],{}}}", verifier_card, warning_card_1, warning_card_2, specs_card, action_card)),
+                                        Some(warning_card_3) => Ok(format!("{{\"verifier\":[{}],\"warning\":[{},{},{}],\"new_specs\":[{}],{}}}", verifier_card, warning_card_1, warning_card_2, warning_card_3, specs_card, action_card)),
+                                    }
+                                }
+                                else {
+                                    stub = hold.upd_stub(stub, &verifier_key, &custom_verifier, &CurrentVerifier::Custom(checked_info.verifier.to_owned()), HoldRelease::Custom, &database_name)?;
+                                    let warning_card_1 = Card::Warning(Warning::VerifierChangingToCustom{verifier_key: &verifier_key, hold: &hold}).card(&mut index,0);
+                                    let mut possible_warning = None;
+                                    if !specs_are_new(&specs, &database_name)? {
+                                        possible_warning = Some(Card::Warning(Warning::NetworkSpecsAlreadyThere(&specs.title)).card(&mut index,0));
+                                        stub = stub.new_history_entry(Event::Warning(Warning::NetworkSpecsAlreadyThere(&specs.title).show()));
+                                    };
+                                    stub = stub_add_network_specs(stub, &specs, &CurrentVerifier::Custom(checked_info.verifier.to_owned()), &general_verifier, &database_name)?;
+                                    let specs_card = Card::NewSpecs(&specs).card(&mut index, 0);
+                                    let checksum = stub_store_and_get_checksum(stub, &database_name)?;
+                                    let action_card = Action::Stub(checksum).card();
+                                    match possible_warning {
+                                        None => Ok(format!("{{\"verifier\":[{}],\"warning\":[{}],\"new_specs\":[{}],{}}}", verifier_card, warning_card_1, specs_card, action_card)),
+                                        Some(warning_card_2) => Ok(format!("{{\"verifier\":[{}],\"warning\":[{},{}],\"new_specs\":[{}],{}}}", verifier_card, warning_card_1, warning_card_2, specs_card, action_card)),
+                                    }
                                 }
                             }
                         },

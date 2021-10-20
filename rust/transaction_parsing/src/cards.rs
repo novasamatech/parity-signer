@@ -46,6 +46,7 @@ pub (crate) enum Warning <'a> {
     GeneralVerifierAppeared(&'a GeneralHold),
     VerifierChangingToGeneral{verifier_key: &'a VerifierKey, hold: &'a Hold},
     VerifierChangingToCustom{verifier_key: &'a VerifierKey, hold: &'a Hold},
+    VerifierGeneralSuper{verifier_key: &'a VerifierKey, hold: &'a Hold},
     TypesAlreadyThere,
     NetworkSpecsAlreadyThere(&'a str), // network title
 }
@@ -62,6 +63,7 @@ impl <'a> Warning <'a> {
             Warning::GeneralVerifierAppeared(x) => format!("Received message is verified by a new general verifier. Currently no general verifier is set, and proceeding will update the general verifier to the received value. All previously acquired information associated with general verifier will be purged. {}", x.show()),
             Warning::VerifierChangingToGeneral{verifier_key, hold} => format!("Received message is verified by the general verifier. Current verifier for network with genesis hash {} is a custom one, and proceeding will update the network verifier to general. All previously acquired information associated with former custom verifier will be purged. {}", hex::encode(verifier_key.genesis_hash()), hold.show()),
             Warning::VerifierChangingToCustom{verifier_key, hold} => format!("Received message is verified. Currently no verifier is set for network with genesis hash {}. Proceeding will update the network verifier to custom verifier. All previously acquired network information that was received unverified will be purged. {}", hex::encode(verifier_key.genesis_hash()), hold.show()),
+            Warning::VerifierGeneralSuper{verifier_key, hold} => format!("Received message is verified. Currently no verifier is set for network with genesis hash {} and no general verifier is set. Proceeding will update the network verifier to general. All previously acquired network information that was received unverified will be purged. {}", hex::encode(verifier_key.genesis_hash()), hold.show()),
             Warning::TypesAlreadyThere => String::from("Received types information is identical to the one that was in the database."),
             Warning::NetworkSpecsAlreadyThere (x) => format!("Received network specs information for {} is same as the one already in the database.", x),
         }

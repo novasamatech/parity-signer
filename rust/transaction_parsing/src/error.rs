@@ -130,7 +130,7 @@ impl Error {
                     BadInputData::GenesisHashMismatch => String::from("Genesis hash from extrinsics not matching with genesis hash at the transaction end."),
                     BadInputData::ImmortalHashMismatch => String::from("Block hash for immortal transaction not matching genesis hash for the network."),
                     BadInputData::SomeDataNotUsed => String::from("After decoding some data remained unused."),
-                    BadInputData::LoadMetaUnknownNetwork(x) => format!("Network {} in not in the database. Add network before loading the metadata.", x),
+                    BadInputData::LoadMetaUnknownNetwork(x) => format!("Network {} is not in the database. Add network before loading the metadata.", x),
                     BadInputData::NotMeta => String::from("First characters in metadata are expected to be 0x6d657461."),
                     BadInputData::MetaVersionBelow12 => String::from("Received metadata could not be decoded. Runtime metadata version is below 12."),
                     BadInputData::MetaAlreadyThere => String::from("Metadata already in database."),

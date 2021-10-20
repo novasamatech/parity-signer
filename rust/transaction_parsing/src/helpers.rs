@@ -470,6 +470,7 @@ impl Hold {
         let warning = match hold_release {
             HoldRelease::General => Warning::VerifierChangingToGeneral{verifier_key, hold: &self}.show(),
             HoldRelease::Custom => Warning::VerifierChangingToCustom{verifier_key, hold: &self}.show(),
+            HoldRelease::GeneralSuper => Warning::VerifierGeneralSuper{verifier_key, hold: &self}.show(),
         };
         out = out.new_history_entry(Event::Warning(warning));
         for x in self.metadata_set.iter() {out = out.remove_metadata(x)}
@@ -481,7 +482,8 @@ impl Hold {
 
 pub (crate) enum HoldRelease {
     General,
-    Custom
+    Custom,
+    GeneralSuper,
 }
 
 #[cfg(test)]

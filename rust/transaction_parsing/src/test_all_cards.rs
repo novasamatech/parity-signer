@@ -71,6 +71,7 @@ pub fn make_all_cards() -> String {
     all_cards.push(Card::Warning(Warning::GeneralVerifierAppeared(&GeneralHold{metadata_set: Vec::new(), network_specs_set: Vec::new(), types: true})).card(&mut index,0));
     all_cards.push(Card::Warning(Warning::VerifierChangingToGeneral{verifier_key: &VerifierKey::from_parts(&network_specs_westend.genesis_hash.to_vec()), hold: &Hold{metadata_set: Vec::new(), network_specs_set: Vec::new()}}).card(&mut index,0));
     all_cards.push(Card::Warning(Warning::VerifierChangingToCustom{verifier_key: &VerifierKey::from_parts(&network_specs_westend.genesis_hash.to_vec()), hold: &Hold{metadata_set: Vec::new(), network_specs_set: Vec::new()}}).card(&mut index,0));
+    all_cards.push(Card::Warning(Warning::VerifierGeneralSuper{verifier_key: &VerifierKey::from_parts(&network_specs_westend.genesis_hash.to_vec()), hold: &Hold{metadata_set: Vec::new(), network_specs_set: Vec::new()}}).card(&mut index,0));
     all_cards.push(Card::Warning(Warning::TypesAlreadyThere).card(&mut index,0));
     all_cards.push(Card::Warning(Warning::NetworkSpecsAlreadyThere(&network_specs_westend.title)).card(&mut index,0));
     

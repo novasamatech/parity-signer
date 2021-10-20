@@ -27,15 +27,6 @@ pub const GENERALVERIFIER: &[u8] = b"general_verifier";
 pub const STUB: &[u8] = b"stub";
 pub const SIGN: &[u8] = b"sign";
 
-pub const SIGNTRANS: &[u8] = b"sign_transaction";
-pub const LOADMETA: &[u8] = b"load_metadata";
-pub const ADDMETAVERIFIER: &[u8] = b"add_metadata_verifier";
-pub const LOADTYPES: &[u8] = b"load_types";
-pub const ADDGENERALVERIFIER: &[u8] = b"add_general_verifier";
-pub const ADDNETWORK: &[u8] = b"add_network";
-pub const ADDSPECS: &[u8] = b"add_specs";
-
-
 /// HOT database on external device:  
 ///
 /// Contains:
