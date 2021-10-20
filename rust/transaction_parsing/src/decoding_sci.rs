@@ -15,7 +15,6 @@ enum FoundBitOrder {
     Msb0,
 }
 
-
 /// Function to decode types that are variants of TypeDefPrimitive enum.
 ///
 /// The function decodes only given type found_ty, removes already decoded part of input data Vec<u8>,
@@ -27,7 +26,6 @@ enum FoundBitOrder {
 /// - index and indent that are used for creating properly formatted js cards.
 ///
 /// The function outputs the DecodedOut value in case of success.
-
 fn decode_type_def_primitive (found_ty: &TypeDefPrimitive, compact_flag: bool, balance_flag: bool, data: &Vec<u8>, index: &mut u32, indent: u32, chain_specs: &ChainSpecs) -> Result<DecodedOut, Error> {
     match found_ty {
         TypeDefPrimitive::Bool => {
@@ -97,7 +95,6 @@ fn reject_flags (compact_flag: bool, balance_flag: bool) -> Result<(), Error> {
 /// - index and indent that are used for creating properly formatted output cards.
 ///
 /// The function outputs the DecodedOut value in case of success.
-
 fn decode_char(data: &Vec<u8>, index: &mut u32, indent: u32) -> Result<DecodedOut, Error> {
     match data.get(0..4) {
         Some(slice_to_char) => {
@@ -109,7 +106,6 @@ fn decode_char(data: &Vec<u8>, index: &mut u32, indent: u32) -> Result<DecodedOu
                             let remaining_vector = (data[4..]).to_vec();
                             Ok(DecodedOut {
                                 remaining_vector,
-                                indent,
                                 fancy_out,
                             })
                         },
@@ -136,7 +132,6 @@ fn decode_char(data: &Vec<u8>, index: &mut u32, indent: u32) -> Result<DecodedOu
 /// - index and indent that are used for creating properly formatted output cards.
 ///
 /// The function outputs the DecodedOut value in case of success.
-
 fn decode_str(data: &Vec<u8>, index: &mut u32, indent: u32) -> Result<DecodedOut, Error> {
     let pre_str = get_compact::<u32>(&data)?;
     let str_length = pre_str.compact_found as usize;
@@ -152,7 +147,6 @@ fn decode_str(data: &Vec<u8>, index: &mut u32, indent: u32) -> Result<DecodedOut
                     let remaining_vector = data[start+str_length..].to_vec();
                     Ok(DecodedOut {
                         remaining_vector,
-                        indent,
                         fancy_out,
                     })
                 },
@@ -166,7 +160,6 @@ fn decode_str(data: &Vec<u8>, index: &mut u32, indent: u32) -> Result<DecodedOut
                 let remaining_vector = Vec::new();
                 Ok(DecodedOut {
                     remaining_vector,
-                    indent,
                     fancy_out,
                 })
             }
@@ -189,7 +182,6 @@ fn decode_str(data: &Vec<u8>, index: &mut u32, indent: u32) -> Result<DecodedOut
 /// - index and indent that are used for creating properly formatted output cards.
 ///
 /// The function outputs the DecodedOut value in case of success.
-
 fn decode_big256(data: &Vec<u8>, signed: bool, index: &mut u32, indent: u32) -> Result<DecodedOut, Error> {
     match data.get(0..32) {
         Some(slice_to_big256) => {
@@ -200,7 +192,6 @@ fn decode_big256(data: &Vec<u8>, signed: bool, index: &mut u32, indent: u32) -> 
             let remaining_vector = (data[32..]).to_vec();
             Ok(DecodedOut {
                 remaining_vector,
-                indent,
                 fancy_out,
             })
         },
@@ -281,7 +272,6 @@ pub fn decoding_sci_complete (current_type: &Type<PortableForm>, compact_flag: b
     fancy_out.push_str(&after_run.fancy_out);
     Ok(DecodedOut{
         remaining_vector: after_run.remaining_vector,
-        indent,
         fancy_out,
     })
 }
@@ -324,7 +314,6 @@ pub fn decoding_sci_entry_point (mut data: Vec<u8>, meta_v14: &RuntimeMetadataV1
     
     Ok(DecodedOut{
         remaining_vector: decoded_out.remaining_vector,
-        indent,
         fancy_out,
     })
 }
@@ -345,7 +334,6 @@ fn decode_type_def_sequence (inner_type: &Type<PortableForm>, balance_flag: bool
             }
             Ok(DecodedOut {
                 remaining_vector: data,
-                indent,
                 fancy_out: fancy_output_prep,
             })
         },
@@ -354,7 +342,6 @@ fn decode_type_def_sequence (inner_type: &Type<PortableForm>, balance_flag: bool
             else {
                 Ok(DecodedOut {
                     remaining_vector: Vec::new(),
-                    indent,
                     fancy_out: Card::Default("").card(index, indent),
                 })
             }
@@ -373,7 +360,6 @@ fn decode_type_def_array (inner_type: &Type<PortableForm>, len: u32, balance_fla
     }
     Ok(DecodedOut{
         remaining_vector: data,
-        indent,
         fancy_out: fancy_output_prep,
     })
 }
@@ -393,7 +379,6 @@ fn decode_type_def_tuple (id_set: Vec<u32>, mut data: Vec<u8>, meta_v14: &Runtim
     }
     Ok(DecodedOut{
         remaining_vector: data,
-        indent,
         fancy_out,
     })
 }
@@ -454,7 +439,6 @@ fn decode_type_def_variant (found_ty: &TypeDefVariant<PortableForm>, mut data: V
             let remaining_vector = data[1..].to_vec();
             Ok(DecodedOut {
                 remaining_vector,
-                indent,
                 fancy_out,
             })
         }
@@ -465,7 +449,6 @@ fn decode_type_def_variant (found_ty: &TypeDefVariant<PortableForm>, mut data: V
                     let remaining_vector = data[1..].to_vec();
                     Ok(DecodedOut {
                         remaining_vector,
-                        indent,
                         fancy_out,
                     })
                 },
@@ -500,7 +483,6 @@ fn decode_type_def_variant (found_ty: &TypeDefVariant<PortableForm>, mut data: V
 
         Ok(DecodedOut {
             remaining_vector: data,
-            indent,
             fancy_out,
         })
     }
@@ -539,7 +521,6 @@ fn process_fields (fields: &[Field<PortableForm>], compact_flag: bool, mut data:
     }
     Ok(DecodedOut {
         remaining_vector: data,
-        indent,
         fancy_out,
     })
 }
@@ -610,7 +591,6 @@ fn decode_type_def_bit_sequence (bit_ty: &TypeDefBitSequence<PortableForm>, data
             let remaining_vector = data[fin..].to_vec();
             Ok(DecodedOut {
                 remaining_vector,
-                indent,
                 fancy_out,
             })
         },
@@ -618,7 +598,6 @@ fn decode_type_def_bit_sequence (bit_ty: &TypeDefBitSequence<PortableForm>, data
             if actual_length != 0 {return Err(Error::UnableToDecode(UnableToDecode::DataTooShort))}
             Ok(DecodedOut {
                 remaining_vector: Vec::new(),
-                indent,
                 fancy_out: Card::Default("").card(index, indent),
             })
         }

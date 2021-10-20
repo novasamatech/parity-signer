@@ -463,7 +463,6 @@ name = "db_handling"
 version = "0.1.0"
 dependencies = [
  "anyhow",
- "base58",
  "blake2-rfc",
  "chrono",
  "constants",
@@ -476,8 +475,6 @@ dependencies = [
  "parity-scale-codec-derive",
  "qrcode_static",
  "regex",
- "serde",
- "serde_json",
  "sled",
  "sp-core",
  "sp-runtime",
@@ -2945,7 +2942,6 @@ dependencies = [
 name = "transaction_parsing"
 version = "0.1.0"
 dependencies = [
- "base58",
  "bitvec",
  "blake2-rfc",
  "constants",
@@ -2972,7 +2968,6 @@ name = "transaction_signing"
 version = "0.1.0"
 dependencies = [
  "anyhow",
- "blake2-rfc",
  "constants",
  "db_handling",
  "definitions",

@@ -22,6 +22,7 @@ pub const HISTORY: &[u8] = b"history";
 /// Key names used for settings tree:  
 pub const TYPES: &[u8] = b"types";
 pub const GENERALVERIFIER: &[u8] = b"general_verifier";
+pub const DANGER: &[u8] = b"dangerous_encounter";
 
 /// Key names used for transaction tree:  
 pub const STUB: &[u8] = b"stub";

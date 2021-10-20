@@ -126,8 +126,6 @@ pub fn make_all_cards() -> String {
     all_cards.push(Card::Error(Error::UnableToDecode(UnableToDecode::NotBitStoreType)).card(&mut index,0));
     all_cards.push(Card::Error(Error::UnableToDecode(UnableToDecode::NotBitOrderType)).card(&mut index,0));
     all_cards.push(Card::Error(Error::UnableToDecode(UnableToDecode::BitVecFailure)).card(&mut index,0));
-//    all_cards.push(Card::Error(Error::UnableToDecode(UnableToDecode::NotRangeIndex)).card(&mut index,0));
-//    all_cards.push(Card::Error(Error::UnableToDecode(UnableToDecode::RangeFailure)).card(&mut index,0));
     
     all_cards.push(Card::Error(Error::DatabaseError(DatabaseError::Internal(sled::Error::CollectionNotFound(IVec::from(vec![1]))))).card(&mut index,0));
     all_cards.push(Card::Error(Error::DatabaseError(DatabaseError::Internal(sled::Error::Unsupported(String::from("Something Unsupported."))))).card(&mut index,0));

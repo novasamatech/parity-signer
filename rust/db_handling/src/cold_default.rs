@@ -1,8 +1,8 @@
 use sled::Batch;
 use parity_scale_codec::Encode;
-use constants::{ADDRTREE, GENERALVERIFIER, HISTORY, METATREE, SETTREE, SPECSTREE, TRANSACTION, TYPES, VERIFIERS};
+use constants::{ADDRTREE, DANGER, GENERALVERIFIER, HISTORY, METATREE, SETTREE, SPECSTREE, TRANSACTION, TYPES, VERIFIERS};
 use defaults::{DEFAULT_GENERAL_VERIFIER, get_default_chainspecs, get_default_types, get_default_metadata, get_default_verifiers};
-use definitions::{history::Event, keyring::{MetaKey, NetworkSpecsKey}, network_specs::Verifier};
+use definitions::{danger::DangerRecord, history::Event, keyring::{MetaKey, NetworkSpecsKey}, network_specs::Verifier};
 use anyhow;
 
 use crate::db_transactions::TrDbCold;
@@ -68,6 +68,7 @@ fn default_cold_settings (database_name: &str, general_verifier: Verifier) -> an
     };
     batch.insert(TYPES.to_vec(), types_prep.store());
     batch.insert(GENERALVERIFIER.to_vec(), general_verifier.encode());
+    batch.insert(DANGER.to_vec(), DangerRecord::safe().store());
     Ok(batch)
 }
 

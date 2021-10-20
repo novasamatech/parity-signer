@@ -1,5 +1,7 @@
 pub mod crypto;
 
+pub mod danger;
+
 pub mod history;
 
 pub mod keyring;

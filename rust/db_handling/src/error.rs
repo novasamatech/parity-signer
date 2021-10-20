@@ -53,6 +53,7 @@ pub enum NotFound {
     CurrentVerifier,
     Stub,
     Sign,
+    DangerStatus,
 }
 
 #[derive(PartialEq)]
@@ -71,6 +72,7 @@ pub enum NotDecodeable {
     CurrentVerifier,
     Stub,
     Sign,
+    DangerStatus,
 }
 
 #[derive(PartialEq)]
@@ -112,6 +114,7 @@ impl Error {
                     NotFound::CurrentVerifier => anyhow!("Current network verifier not found"),
                     NotFound::Stub => anyhow!("No database transaction stub in the transaction tree"),
                     NotFound::Sign => anyhow!("No sign preparation stored in the transaction tree"),
+                    NotFound::DangerStatus => anyhow!("Danger status not found in the database"),
                 }
             },
             Error::NotDecodeable(e) => {
@@ -130,6 +133,7 @@ impl Error {
                     NotDecodeable::CurrentVerifier => anyhow!("Current network verifier could not be decoded."),
                     NotDecodeable::Stub => anyhow!("Database transaction stub from the transaction tree could not be decoded"),
                     NotDecodeable::Sign => anyhow!("Sign preparation unit from the transaction tree could not be decoded"),
+                    NotDecodeable::DangerStatus => anyhow!("Danger status could not be decoded"),
                 }
             },
             Error::GenesisHashMismatch => anyhow!("Genesis hash mismatch."),

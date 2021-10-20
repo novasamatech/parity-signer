@@ -146,8 +146,7 @@ export! {
         seed_length: u32,
 		dbname: &str
 	) -> anyhow::Result<String, anyhow::Error> {
-        let crypto = "sr25519";
-        db_handling::identities::try_create_seed(seed_name, crypto, seed_phrase, seed_length, dbname)
+        db_handling::identities::try_create_seed(seed_name, seed_phrase, seed_length, dbname)
     }
 
     @Java_io_parity_signer_models_SignerDataModel_substrateSuggestNPlusOne
@@ -236,14 +235,13 @@ export! {
 	) -> anyhow::Result<String, anyhow::Error> {
         db_handling::manage_history::print_history(dbname)
     }
-/*
+
     @Java_io_parity_signer_models_SignerDataModel_historyClearHistory
 	fn clear_history(
         dbname: &str
 	) -> anyhow::Result<(), anyhow::Error> {
         db_handling::manage_history::clear_history(dbname)
     }
-*/
 
     @Java_io_parity_signer_models_SignerDataModel_historyInitHistoryWithCert
 	fn init_history_with_cert(
@@ -271,14 +269,14 @@ export! {
 	fn get_warnings(
         dbname: &str
 	) -> anyhow::Result<bool, anyhow::Error> {
-        Ok(false)
+        db_handling::helpers::get_danger_status(dbname)
     }
 
     @Java_io_parity_signer_models_SignerDataModel_historyAcknowledgeWarnings
 	fn acknowledge_warnings(
         dbname: &str
 	) -> anyhow::Result<(), anyhow::Error> {
-        Ok(())
+        db_handling::manage_history::reset_danger_status_to_safe(dbname)
     }
 
     @Java_io_parity_signer_models_SignerDataModel_historyHistoryEntryUser

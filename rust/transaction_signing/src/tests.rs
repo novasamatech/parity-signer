@@ -3,7 +3,7 @@ mod tests {
     use hex;
     use transaction_parsing::produce_output;
     use crate::{checksum, handle_stub, sign_transaction::create_signature};
-    use db_handling::{cold_default::{populate_cold, populate_cold_no_networks}};
+    use db_handling::{cold_default::{populate_cold, populate_cold_no_networks}, identities::try_create_seed};
     use definitions::{keyring::{AddressKey, MetaKey, NetworkSpecsKey, VerifierKey}, network_specs::{CurrentVerifier, ChainSpecs, Verifier}, users::AddressDetails};
     use constants::{ADDRTREE, GENERALVERIFIER, METATREE, SETTREE, SPECSTREE, VERIFIERS};
     use parity_scale_codec::Decode;
@@ -242,6 +242,52 @@ Identities:
 	public_key: f606519cb8726753885cd4d0f518804a69a5e0badf36fee70feadd8044081730, encryption: sr25519, path: //polkadot, available_networks: 
 		018091b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3"#;
         assert!(print_after == expected_print_after, "Received:\n{}", print_after);
+        
+        try_create_seed("Alice", SEED_PHRASE, 0, dbname).unwrap();
+        let print_after = print_db_content(&dbname);
+        let expected_print_after = r#"Database contents:
+Metadata:
+	kusama2030
+	rococo9103
+	westend9000
+	westend9010
+	polkadot30
+Network Specs:
+	0080e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e: westend-ed25519 (westend with ed25519)
+	018091b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3: Polkadot (polkadot with sr25519)
+	0180b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe: Kusama (kusama with sr25519)
+	0180e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e: Westend (westend with sr25519)
+	0180f6e9983c37baf68846fedafe21e56718790e39fb1c582abc408b81bc7b208f9a: Rococo (rococo with sr25519)
+Verifiers:
+	91b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3: {"type":"general","details":{"hex":"","encryption":"none"}}
+	b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe: {"type":"general","details":{"hex":"","encryption":"none"}}
+	e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e: {"type":"general","details":{"hex":"","encryption":"none"}}
+	f6e9983c37baf68846fedafe21e56718790e39fb1c582abc408b81bc7b208f9a: {"type":"general","details":{"hex":"","encryption":"none"}}
+General Verifier: none
+Identities: 
+	public_key: 345071da55e5dccefaaa440339415ef9f2663338a38f7da0df21be5ab4e055ef, encryption: ed25519, path: , available_networks: 
+		0080e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e
+	public_key: a52095ee77497ba94588d61c3f71c4cfa0d6a4f389cef43ebadc76c29c4f42de, encryption: ed25519, path: //westend, available_networks: 
+		0080e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e
+	public_key: 3efeca331d646d8a2986374bb3bb8d6e9e3cfcdd7c45c2b69104fab5d61d3f34, encryption: sr25519, path: //westend, available_networks: 
+		0180e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e
+	public_key: 46ebddef8cd9bb167dc30878d7113b7e168e6f0646beffd77d69d39bad76b47a, encryption: sr25519, path: , available_networks: 
+		018091b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3
+		0180b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe
+		0180e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e
+		0180f6e9983c37baf68846fedafe21e56718790e39fb1c582abc408b81bc7b208f9a
+	public_key: 64a31235d4bf9b37cfed3afa8aa60754675f9c4915430454d365c05112784d05, encryption: sr25519, path: //kusama, available_networks: 
+		0180b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe
+	public_key: 96129dcebc2e10f644e81fcf4269a663e521330084b1e447369087dec8017e04, encryption: sr25519, path: //rococo, available_networks: 
+		0180f6e9983c37baf68846fedafe21e56718790e39fb1c582abc408b81bc7b208f9a
+	public_key: c81ebbec0559a6acf184535eb19da51ed3ed8c4ac65323999482aaf9b6696e27, encryption: sr25519, path: //alice, available_networks: 
+		0180f6e9983c37baf68846fedafe21e56718790e39fb1c582abc408b81bc7b208f9a
+	public_key: d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d, encryption: sr25519, path: //Alice, available_networks: 
+		0180e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e
+	public_key: f606519cb8726753885cd4d0f518804a69a5e0badf36fee70feadd8044081730, encryption: sr25519, path: //polkadot, available_networks: 
+		018091b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3"#;
+        assert!(print_after == expected_print_after, "Received:\n{}", print_after);
+        
         fs::remove_dir_all(dbname).unwrap();
     }
     

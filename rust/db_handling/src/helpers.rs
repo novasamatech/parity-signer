@@ -1,7 +1,7 @@
 use sled::{Db, Tree, Batch, open, IVec};
 use anyhow;
-use constants::{GENERALVERIFIER, SETTREE, VERIFIERS};
-use definitions::{crypto::Encryption, metadata::VersionDecoded, keyring::{AddressKey, NetworkSpecsKey, VerifierKey}, network_specs::{ChainSpecs, CurrentVerifier, Verifier}, users::{AddressDetails}};
+use constants::{DANGER, GENERALVERIFIER, SETTREE, VERIFIERS};
+use definitions::{crypto::Encryption, danger::DangerRecord, metadata::VersionDecoded, keyring::{AddressKey, NetworkSpecsKey, VerifierKey}, network_specs::{ChainSpecs, CurrentVerifier, Verifier}, users::{AddressDetails}};
 use meta_reading::decode_metadata::get_meta_const;
 use parity_scale_codec::{Decode, Encode};
 
@@ -125,23 +125,7 @@ pub fn reverse_network_specs_key (network_specs_key: &NetworkSpecsKey) -> anyhow
         Err(_) => return Err(Error::NotDecodeable(NotDecodeable::NetworkSpecsKey).show()),
     }
 }
-/*
-/// Function to determine if there are entries with similar genesis hash left in the database;
-/// searches through chainspecs tree of the cold database for the given genesis hash
-pub fn genesis_hash_in_cold_db (genesis_hash: [u8; 32], chainspecs: &Tree) -> anyhow::Result<bool> {
-    let mut out = false;
-    for x in chainspecs.iter() {
-        if let Ok((network_specs_key_vec, chain_specs_encoded)) = x {
-            let network_specs = decode_chain_specs(chain_specs_encoded, &NetworkSpecsKey::from_vec(&network_specs_key_vec.to_vec()))?;
-            if network_specs.genesis_hash == genesis_hash {
-                out = true;
-                break;
-            }
-        }
-    }
-    Ok(out)
-}
-*/
+
 /// Function to get Verifier from the database for network using VerifierKey
 pub fn get_current_verifier (verifier_key: &VerifierKey, database_name: &str) -> anyhow::Result<CurrentVerifier> {
     let database = open_db(&database_name)?;
@@ -186,3 +170,38 @@ pub fn verify_checksum (database: &Db, checksum: u32) -> anyhow::Result<()> {
     Ok(())
 }
 
+/// Function to get the danger status from the database
+pub fn get_danger_status(database_name: &str) -> anyhow::Result<bool> {
+    let database = open_db(&database_name)?;
+    let settings = open_tree(&database, SETTREE)?;
+    match settings.get(DANGER.to_vec()) {
+        Ok(Some(danger_stored)) => match DangerRecord::from_vec(&danger_stored.to_vec()).device_was_online() {
+            Ok(a) => Ok(a),
+            Err(_) => return Err(Error::NotDecodeable(NotDecodeable::DangerStatus).show()),
+        },
+        Ok(None) => return Err(Error::NotFound(NotFound::DangerStatus).show()),
+        Err(e) => return Err(Error::InternalDatabaseError(e).show()),
+    }
+}
+
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use definitions::network_specs::Verifier;
+    use std::fs;
+    use crate::{cold_default::{reset_cold_database_no_addresses, signer_init_no_cert}, manage_history::{device_was_online, reset_danger_status_to_safe}};
+
+    #[test]
+    fn get_danger_status_properly () {
+        let dbname = "tests/get_danger_status_properly";
+        reset_cold_database_no_addresses(dbname, Verifier::None).unwrap();
+        signer_init_no_cert(dbname).unwrap();
+        assert!(get_danger_status(dbname).unwrap() == false, "Expected danger status = false after the database initiation.");
+        device_was_online(dbname).unwrap();
+        assert!(get_danger_status(dbname).unwrap() == true, "Expected danger status = true after the reported exposure.");
+        reset_danger_status_to_safe(dbname).unwrap();
+        assert!(get_danger_status(dbname).unwrap() == false, "Expected danger status = false after the danger reset.");
+        fs::remove_dir_all(dbname).unwrap();
+    }
+}

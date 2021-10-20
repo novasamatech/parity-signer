@@ -194,7 +194,7 @@ fn create_address (database: &Db, input_batch_prep: &Vec<(AddressKey, AddressDet
                 number_in_current = Some(i);
                 break;
             }
-            else {return Err(Error::AddressAlreadyExists{public: public_key.to_vec(), network: network_specs_key.key()}.show())}
+//            else {return Err(Error::AddressAlreadyExists{public: public_key.to_vec(), network: network_specs_key.key()}.show())}
         }
     }
     
@@ -219,9 +219,9 @@ fn create_address (database: &Db, input_batch_prep: &Vec<(AddressKey, AddressDet
                     if !address_details.network_id.contains(&network_specs_key) {
                         address_details.network_id.push(network_specs_key);
                         output_batch_prep.push((address_key, address_details));
-                        Ok((output_batch_prep, output_events))
                     }
-                    else {return Err(Error::AddressAlreadyExists{public: public_key.to_vec(), network: network_specs_key.key()}.show())}
+                    Ok((output_batch_prep, output_events))
+//                    else {return Err(Error::AddressAlreadyExists{public: public_key.to_vec(), network: network_specs_key.key()}.show())}
                 },
                 Ok(None) => {
                 // Check for collisions in name - disabled
@@ -255,7 +255,6 @@ fn create_address (database: &Db, input_batch_prep: &Vec<(AddressKey, AddressDet
 /// Create addresses for all default paths in all default networks, and insert them in the database
 fn populate_addresses (database: &Db, entry_batch: Batch, seed_object: &SeedObject) -> anyhow::Result<(Batch, Vec<Event>)> {
 // TODO: check zeroize
-// TODO: compatibility with atomic operations
     
     let mut identity_adds: Vec<(AddressKey, AddressDetails)> = Vec::new();
     let mut current_events: Vec<Event> = Vec::new();
@@ -265,7 +264,7 @@ fn populate_addresses (database: &Db, entry_batch: Batch, seed_object: &SeedObje
         if let Ok((network_key_vec, network_specs_encoded)) = x {
             let network_specs_key = NetworkSpecsKey::from_vec(&network_key_vec.to_vec());
             let network_specs = decode_chain_specs(network_specs_encoded, &network_specs_key)?;
-            match create_address (database, &identity_adds, &current_events, "", network_specs_key.to_owned(), "root address", seed_object, false) {
+            match create_address (database, &identity_adds, &current_events, "", network_specs_key.to_owned(), "", seed_object, false) {
                 Ok((adds, events)) => {
                     identity_adds = adds;
                     current_events = events;
@@ -275,7 +274,7 @@ fn populate_addresses (database: &Db, entry_batch: Batch, seed_object: &SeedObje
                     else {return Err(e)}
                 },
             }
-            match create_address (database, &identity_adds, &current_events, &network_specs.path_id, network_specs_key.to_owned(), &format!("{} root address", network_specs.name), seed_object, false) {
+            match create_address (database, &identity_adds, &current_events, &network_specs.path_id, network_specs_key.to_owned(), "", seed_object, false) {
                 Ok((adds, events)) => {
                     identity_adds = adds;
                     current_events = events;
@@ -288,7 +287,7 @@ fn populate_addresses (database: &Db, entry_batch: Batch, seed_object: &SeedObje
 }
 
 /// Generate new seed and populate all known networks with default accounts
-pub fn try_create_seed (seed_name: &str, encryption_name: &str, seed_phrase_proposal: &str, seed_length: u32, database_name: &str) -> anyhow::Result<String> {
+pub fn try_create_seed (seed_name: &str, seed_phrase_proposal: &str, seed_length: u32, database_name: &str) -> anyhow::Result<String> {
     let seed_phrase = match seed_phrase_proposal { // TODO: check zeroizing (including upstream)
         "" => generate_random_phrase(seed_length)?,
         string => {
@@ -296,28 +295,26 @@ pub fn try_create_seed (seed_name: &str, encryption_name: &str, seed_phrase_prop
             string.to_owned()
         }
     };
-    let (identity_batch, events) = {
-        let database = open_db(database_name)?;
-        let encryption = match encryption_name {
-            "ed25519" => Encryption::Ed25519,
-            "sr25519" => Encryption::Sr25519,
-            "ecdsa" => Encryption::Ecdsa,
-            _ => return Err(Error::UnknownEncryption.show()),
-        };
-        let seed_object = SeedObject {
-            seed_name: seed_name.to_string(),
-            seed_phrase: seed_phrase.to_string(),
-            encryption: encryption,
-        };
-        populate_addresses(&database, Batch::default(), &seed_object)?
-    };
-    
+    let (id_batch_1, events_ed25519) = populate_addresses_with_encryption (database_name, Encryption::Ed25519, seed_name, &seed_phrase, Batch::default())?;
+    let (id_batch_2, events_sr25519) = populate_addresses_with_encryption (database_name, Encryption::Sr25519, seed_name, &seed_phrase, id_batch_1)?;
+    let (identity_batch_full, events_ecdsa) = populate_addresses_with_encryption (database_name, Encryption::Ecdsa, seed_name, &seed_phrase, id_batch_2)?;
+    let events = [events_ed25519, events_sr25519, events_ecdsa].concat();
     TrDbCold::new()
-        .set_addresses(identity_batch) // add addresses just made in populate_addresses
+        .set_addresses(identity_batch_full) // add addresses just made in populate_addresses
         .set_history(events_to_batch(&database_name, events)?) // add corresponding history
         .apply(&database_name)?;
-
     Ok(seed_phrase)
+}
+
+/// Shortcut for the function try_create_seed above
+fn populate_addresses_with_encryption (database_name: &str, encryption: Encryption, seed_name: &str, seed_phrase: &str, incoming_id_batch: Batch) -> anyhow::Result<(Batch, Vec<Event>)> {
+    let database = open_db(database_name)?;
+    let seed_object = SeedObject {
+        seed_name: seed_name.to_string(),
+        seed_phrase: seed_phrase.to_string(),
+        encryption,
+    };
+    populate_addresses(&database, incoming_id_batch, &seed_object)
 }
 
 /// Sanitize numbers in path (only for name suggestions!)
@@ -550,7 +547,6 @@ mod tests {
 
     static SEED: &str = "bottom drive obey lake curtain smoke basket hold race lonely fit walk";
     static ENCRYPTION_NAME: &str = "sr25519";
-    static FALSE_ENCRYPTION_NAME: &str = "ecdsa";
 
     #[test]
     fn test_generate_random_seed_phrase() {
@@ -574,21 +570,10 @@ mod tests {
     fn test_generate_random_account() {
         let dbname = "tests/test_generate_random_account";
         populate_cold_no_metadata(dbname, Verifier::None).unwrap();
-        try_create_seed("Randy", ENCRYPTION_NAME, "", 24, dbname).unwrap();
+        try_create_seed("Randy", "", 24, dbname).unwrap();
         let chainspecs = get_default_chainspecs();
         let random_addresses = get_relevant_identities("Randy", &hex::encode(NetworkSpecsKey::from_parts(&chainspecs[0].genesis_hash.to_vec(), &Encryption::Sr25519).key()), dbname).unwrap();
         assert!(random_addresses.len()>0);
-        fs::remove_dir_all(dbname).unwrap();
-    }
-    
-    #[test]
-    fn test_generate_random_account_bad_crypto() {
-        let dbname = "tests/test_generate_random_account_bad_crypto";
-        populate_cold_no_metadata(dbname, Verifier::None).unwrap();
-        try_create_seed("Kevin", FALSE_ENCRYPTION_NAME, "", 24, dbname).unwrap();
-        let chainspecs = get_default_chainspecs();
-        let random_addresses = get_relevant_identities("Kevin", &hex::encode(NetworkSpecsKey::from_parts(&chainspecs[0].genesis_hash.to_vec(), &Encryption::Sr25519).key()), dbname).unwrap();
-        assert!(random_addresses.len()==0);
         fs::remove_dir_all(dbname).unwrap();
     }
 
@@ -596,7 +581,7 @@ mod tests {
     fn test_generate_default_addresses_for_alice() {
         let dbname = "tests/test_generate_default_addresses_for_Alice";
         populate_cold_no_metadata(dbname, Verifier::None).unwrap();
-        try_create_seed("Alice", ENCRYPTION_NAME, SEED, 0, dbname).unwrap();
+        try_create_seed("Alice", SEED, 0, dbname).unwrap();
         {
             let database = open_db(dbname).unwrap();
             let addresses = open_tree(&database, ADDRTREE).unwrap();
@@ -608,7 +593,7 @@ mod tests {
         println!("===");
         let default_addresses = get_relevant_identities("Alice", &hex::encode(NetworkSpecsKey::from_parts(&chainspecs[0].genesis_hash.to_vec(), &Encryption::Sr25519).key()), dbname).unwrap();
         assert!(default_addresses.len()>0);
-        assert_eq!(r#"[(AddressKey([1, 70, 235, 221, 239, 140, 217, 187, 22, 125, 195, 8, 120, 215, 17, 59, 126, 22, 142, 111, 6, 70, 190, 255, 215, 125, 105, 211, 155, 173, 118, 180, 122]), AddressDetails { seed_name: "Alice", path: "", has_pwd: false, name: "root address", network_id: [NetworkSpecsKey([1, 128, 145, 177, 113, 187, 21, 142, 45, 56, 72, 250, 35, 169, 241, 194, 81, 130, 251, 142, 32, 49, 59, 44, 30, 180, 146, 25, 218, 122, 112, 206, 144, 195]), NetworkSpecsKey([1, 128, 176, 168, 212, 147, 40, 92, 45, 247, 50, 144, 223, 183, 230, 31, 135, 15, 23, 180, 24, 1, 25, 122, 20, 156, 169, 54, 84, 73, 158, 163, 218, 254]), NetworkSpecsKey([1, 128, 225, 67, 242, 56, 3, 172, 80, 232, 246, 248, 230, 38, 149, 209, 206, 158, 78, 29, 104, 170, 54, 193, 205, 44, 253, 21, 52, 2, 19, 243, 66, 62]), NetworkSpecsKey([1, 128, 246, 233, 152, 60, 55, 186, 246, 136, 70, 254, 218, 254, 33, 229, 103, 24, 121, 14, 57, 251, 28, 88, 42, 188, 64, 139, 129, 188, 123, 32, 143, 154])], encryption: Sr25519 }), (AddressKey([1, 100, 163, 18, 53, 212, 191, 155, 55, 207, 237, 58, 250, 138, 166, 7, 84, 103, 95, 156, 73, 21, 67, 4, 84, 211, 101, 192, 81, 18, 120, 77, 5]), AddressDetails { seed_name: "Alice", path: "//kusama", has_pwd: false, name: "kusama root address", network_id: [NetworkSpecsKey([1, 128, 176, 168, 212, 147, 40, 92, 45, 247, 50, 144, 223, 183, 230, 31, 135, 15, 23, 180, 24, 1, 25, 122, 20, 156, 169, 54, 84, 73, 158, 163, 218, 254])], encryption: Sr25519 })]"#, format!("{:?}", default_addresses)); //because JSON export is what we care about
+        assert_eq!(r#"[(AddressKey([1, 70, 235, 221, 239, 140, 217, 187, 22, 125, 195, 8, 120, 215, 17, 59, 126, 22, 142, 111, 6, 70, 190, 255, 215, 125, 105, 211, 155, 173, 118, 180, 122]), AddressDetails { seed_name: "Alice", path: "", has_pwd: false, name: "", network_id: [NetworkSpecsKey([1, 128, 145, 177, 113, 187, 21, 142, 45, 56, 72, 250, 35, 169, 241, 194, 81, 130, 251, 142, 32, 49, 59, 44, 30, 180, 146, 25, 218, 122, 112, 206, 144, 195]), NetworkSpecsKey([1, 128, 176, 168, 212, 147, 40, 92, 45, 247, 50, 144, 223, 183, 230, 31, 135, 15, 23, 180, 24, 1, 25, 122, 20, 156, 169, 54, 84, 73, 158, 163, 218, 254]), NetworkSpecsKey([1, 128, 225, 67, 242, 56, 3, 172, 80, 232, 246, 248, 230, 38, 149, 209, 206, 158, 78, 29, 104, 170, 54, 193, 205, 44, 253, 21, 52, 2, 19, 243, 66, 62]), NetworkSpecsKey([1, 128, 246, 233, 152, 60, 55, 186, 246, 136, 70, 254, 218, 254, 33, 229, 103, 24, 121, 14, 57, 251, 28, 88, 42, 188, 64, 139, 129, 188, 123, 32, 143, 154])], encryption: Sr25519 }), (AddressKey([1, 100, 163, 18, 53, 212, 191, 155, 55, 207, 237, 58, 250, 138, 166, 7, 84, 103, 95, 156, 73, 21, 67, 4, 84, 211, 101, 192, 81, 18, 120, 77, 5]), AddressDetails { seed_name: "Alice", path: "//kusama", has_pwd: false, name: "", network_id: [NetworkSpecsKey([1, 128, 176, 168, 212, 147, 40, 92, 45, 247, 50, 144, 223, 183, 230, 31, 135, 15, 23, 180, 24, 1, 25, 122, 20, 156, 169, 54, 84, 73, 158, 163, 218, 254])], encryption: Sr25519 })]"#, format!("{:?}", default_addresses)); //because JSON export is what we care about
         let database: Db = open(dbname).unwrap();
         let identities: Tree = database.open_tree(ADDRTREE).unwrap();
         let test_key = generate_address_key(&hex::decode("46ebddef8cd9bb167dc30878d7113b7e168e6f0646beffd77d69d39bad76b47a").unwrap(), &Encryption::Sr25519).unwrap();
@@ -642,7 +627,7 @@ mod tests {
         let path_should_fail_1 = "//path-should-fail-1";
         let chainspecs = get_default_chainspecs();
         populate_cold_no_metadata(dbname, Verifier::None).unwrap();
-        try_create_seed("Alice", ENCRYPTION_NAME, SEED, 0, dbname).unwrap();
+        try_create_seed("Alice", SEED, 0, dbname).unwrap();
         assert!(try_create_address("root address", "Alice", SEED, ENCRYPTION_NAME, path_should_fail_0, &hex::encode(NetworkSpecsKey::from_parts(&chainspecs[0].genesis_hash.to_vec(), &Encryption::Sr25519).key()), false, dbname).is_err());
         try_create_address("clone", "Alice", SEED, ENCRYPTION_NAME, path_should_succeed, &hex::encode(NetworkSpecsKey::from_parts(&chainspecs[0].genesis_hash.to_vec(), &Encryption::Sr25519).key()), false, dbname).expect("creating unique address that should prohibit creation of similarly named adderss soon");
         assert!(try_create_address("clone", "Alice", SEED, ENCRYPTION_NAME, path_should_fail_1, &hex::encode(NetworkSpecsKey::from_parts(&chainspecs[0].genesis_hash.to_vec(), &Encryption::Sr25519).key()), false, dbname).is_err());
@@ -668,7 +653,7 @@ mod tests {
         let both_networks = vec![network_id_0.to_owned(), network_id_1.to_owned()];
         let only_one_network = vec![network_id_0.to_owned()];
 
-        try_create_seed(seed_name, ENCRYPTION_NAME, SEED, 0, dbname).unwrap();
+        try_create_seed(seed_name, SEED, 0, dbname).unwrap();
         let seed_object = SeedObject {
             seed_name: seed_name.to_string(),
             seed_phrase: SEED.to_string(),
@@ -716,7 +701,7 @@ mod tests {
     fn test_suggest_n_plus_one() { 
         let dbname = "tests/test_suggest_n_plus_one";
         populate_cold_no_metadata(dbname, Verifier::None).unwrap();
-        try_create_seed("Alice", ENCRYPTION_NAME, SEED, 0, dbname).unwrap();
+        try_create_seed("Alice", SEED, 0, dbname).unwrap();
         let chainspecs = get_default_chainspecs();
         let network_id_string_0 = hex::encode(NetworkSpecsKey::from_parts(&chainspecs[0].genesis_hash.to_vec(), &Encryption::Sr25519).key());
         try_create_address("clone", "Alice", SEED, ENCRYPTION_NAME, "//Alice//10", &network_id_string_0, false, dbname).expect("create a valid address //Alice//10");
@@ -757,7 +742,7 @@ mod tests {
     fn test_identity_deletion() {
         let dbname = "tests/test_identity_deletion";
         populate_cold_no_metadata(dbname, Verifier::None).unwrap();
-        try_create_seed("Alice", ENCRYPTION_NAME, SEED, 0, dbname).unwrap();
+        try_create_seed("Alice", SEED, 0, dbname).unwrap();
         let chainspecs = get_default_chainspecs();
         let network_id_string_0 = hex::encode(NetworkSpecsKey::from_parts(&chainspecs[0].genesis_hash.to_vec(), &Encryption::Sr25519).key());
         let network_id_string_1 = hex::encode(NetworkSpecsKey::from_parts(&chainspecs[1].genesis_hash.to_vec(), &Encryption::Sr25519).key());
@@ -796,7 +781,7 @@ mod tests {
         let element2 = r#"{"event":"general_verifier_added","payload":{"verifier":{"hex":"d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d","encryption":"sr25519"}}}"#;
         assert!(history_printed.contains(element1), "\nReal history:\n{}", history_printed);
         assert!(history_printed.contains(element2), "\nReal history:\n{}", history_printed);
-        try_create_seed("Alice", ENCRYPTION_NAME, SEED, 0, dbname).unwrap();
+        try_create_seed("Alice", SEED, 0, dbname).unwrap();
         let history_printed_after_create_seed = print_history(dbname).unwrap();
         let element3 = r#""events":[{"event":"identity_added","payload":{"seed_name":"Alice","encryption":"sr25519","public_key":"46ebddef8cd9bb167dc30878d7113b7e168e6f0646beffd77d69d39bad76b47a","path":"","network_genesis_hash":"91b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3"}},{"event":"identity_added","payload":{"seed_name":"Alice","encryption":"sr25519","public_key":"f606519cb8726753885cd4d0f518804a69a5e0badf36fee70feadd8044081730","path":"//polkadot","network_genesis_hash":"91b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3"}},{"event":"identity_added","payload":{"seed_name":"Alice","encryption":"sr25519","public_key":"46ebddef8cd9bb167dc30878d7113b7e168e6f0646beffd77d69d39bad76b47a","path":"","network_genesis_hash":"b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe"}},{"event":"identity_added","payload":{"seed_name":"Alice","encryption":"sr25519","public_key":"64a31235d4bf9b37cfed3afa8aa60754675f9c4915430454d365c05112784d05","path":"//kusama","network_genesis_hash":"b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe"}},{"event":"identity_added","payload":{"seed_name":"Alice","encryption":"sr25519","public_key":"46ebddef8cd9bb167dc30878d7113b7e168e6f0646beffd77d69d39bad76b47a","path":"","network_genesis_hash":"e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e"}},{"event":"identity_added","payload":{"seed_name":"Alice","encryption":"sr25519","public_key":"3efeca331d646d8a2986374bb3bb8d6e9e3cfcdd7c45c2b69104fab5d61d3f34","path":"//westend","network_genesis_hash":"e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e"}},{"event":"identity_added","payload":{"seed_name":"Alice","encryption":"sr25519","public_key":"46ebddef8cd9bb167dc30878d7113b7e168e6f0646beffd77d69d39bad76b47a","path":"","network_genesis_hash":"f6e9983c37baf68846fedafe21e56718790e39fb1c582abc408b81bc7b208f9a"}},{"event":"identity_added","payload":{"seed_name":"Alice","encryption":"sr25519","public_key":"96129dcebc2e10f644e81fcf4269a663e521330084b1e447369087dec8017e04","path":"//rococo","network_genesis_hash":"f6e9983c37baf68846fedafe21e56718790e39fb1c582abc408b81bc7b208f9a"}}]}]"#;
         assert!(history_printed_after_create_seed.contains(element1), "\nReal history:\n{}", history_printed_after_create_seed);

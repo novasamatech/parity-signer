@@ -11,18 +11,14 @@ use crate::error::{Error, SystemError, UnableToDecode};
 /// Struct to store the decoded data, used for data storage between decoding iterations.
 /// decoded_string is short json-like format,
 /// fancy_out is format used for js output cards (the one really going out at this point)
-/// index and indent are parameters for js output cards, already modified for the next decoding iteration, 
 /// and remaining vector contains the input data not yet used after the last decoding iteration.
-
 pub struct DecodedOut {
     pub remaining_vector: Vec<u8>,
-    pub indent: u32,
     pub fancy_out: String,
 }
 
 /// Struct to store results of searching Vec<u8> for encoded compact:
 /// consists of actual number decoded, and, if it exists, the beginning position for data after the compact
-
 pub struct CutCompact<T: HasCompact> {
     pub compact_found: T,
     pub start_next_unit: Option<usize>,
@@ -31,7 +27,6 @@ pub struct CutCompact<T: HasCompact> {
 
 /// Function to search Vec<u8> for shortest compact <T> by brute force.
 /// Outputs CutCompact value in case of success.
-
 pub fn get_compact<T> (data: &Vec<u8>) -> Result<CutCompact<T>, Error> 
     where 
         T: HasCompact,
@@ -73,7 +68,6 @@ pub fn get_compact<T> (data: &Vec<u8>) -> Result<CutCompact<T>, Error>
 /// - index and indent that are used for creating properly formatted js cards,
 ///
 /// The function outputs the DecodedOut value in case of success.
-
 pub fn decode_perthing<T> (data: &Vec<u8>, compact_flag: bool, found_ty: &str, index: &mut u32, indent: u32) -> Result<DecodedOut, Error> 
     where 
         T: PerThing + Decode + HasCompact,
@@ -105,7 +99,6 @@ pub fn decode_perthing<T> (data: &Vec<u8>, compact_flag: bool, found_ty: &str, i
     };
     Ok(DecodedOut{
         remaining_vector,
-        indent,
         fancy_out,
     })
 }
@@ -122,7 +115,6 @@ pub fn decode_perthing<T> (data: &Vec<u8>, compact_flag: bool, found_ty: &str, i
 /// - index and indent that are used for creating properly formatted js cards.
 ///
 /// The function outputs the DecodedOut value in case of success.
-
 pub fn decode_known_length<T: Decode + std::fmt::Display>(data: &Vec<u8>, found_ty: &str, index: &mut u32, indent: u32) -> Result<DecodedOut, Error> {
     let length = size_of::<T>();
     if data.len() < length {return Err(Error::UnableToDecode(UnableToDecode::DataTooShort))}
@@ -133,7 +125,6 @@ pub fn decode_known_length<T: Decode + std::fmt::Display>(data: &Vec<u8>, found_
             let remaining_vector = data[length..].to_vec();
             Ok(DecodedOut {
                 remaining_vector,
-                indent,
                 fancy_out,
             })
         },
@@ -157,7 +148,6 @@ pub fn decode_known_length<T: Decode + std::fmt::Display>(data: &Vec<u8>, found_
 /// - ChainSpecs to format the balance properly if the balance is involved.
 ///
 /// The function outputs the DecodedOut value in case of success.
-
 pub fn decode_primitive_with_flags <T> (data: &Vec<u8>, compact_flag: bool, balance_flag: bool, found_ty: &str, index: &mut u32, indent: u32, chain_specs: &ChainSpecs) -> Result<DecodedOut, Error> 
     where 
         T: Decode + HasCompact + std::fmt::Display,
@@ -181,7 +171,6 @@ pub fn decode_primitive_with_flags <T> (data: &Vec<u8>, compact_flag: bool, bala
         };
         Ok(DecodedOut{
             remaining_vector,
-            indent,
             fancy_out,
         })
     }
@@ -204,7 +193,6 @@ pub fn decode_primitive_with_flags <T> (data: &Vec<u8>, compact_flag: bool, bala
                 let remaining_vector = data[length..].to_vec();
                 Ok(DecodedOut {
                     remaining_vector,
-                    indent,
                     fancy_out,
                 })
             },
@@ -229,7 +217,6 @@ pub fn decode_primitive_with_flags <T> (data: &Vec<u8>, compact_flag: bool, bala
 /// The function outputs the DecodedOut value in case of success.
 ///
 /// Resulting AccountId in base58 form is added to fancy_out on js card "Id".
-
 pub fn special_case_account_id (data: Vec<u8>, index: &mut u32, indent: u32, chain_specs: &ChainSpecs) -> Result<DecodedOut, Error> {
     match data.get(0..32) {
         Some(a) => {
@@ -241,7 +228,6 @@ pub fn special_case_account_id (data: Vec<u8>, index: &mut u32, indent: u32, cha
                     let fancy_out = format!(",{}", (Card::Id(&base58print)).card(index, indent));
                     Ok(DecodedOut {
                         remaining_vector,
-                        indent,
                         fancy_out,
                     })
                 },
