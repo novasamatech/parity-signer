@@ -13,7 +13,7 @@ struct SettingsScreen: View {
     @State var jailbreak = false
     var body: some View {
         ZStack {
-            ScrollView {
+            //ScrollView {
                 //Main buttons block
                 VStack {
                     Button(action: {
@@ -71,17 +71,16 @@ struct SettingsScreen: View {
                     }
                     .padding()
                     Spacer()
-                    //TODO
                     HStack {
-                        Image(uiImage: UIImage(data: Data(fromHexEncodedString: String(cString: identicon(nil, "", 32))) ?? Data()) ?? UIImage())
+                        Image(uiImage: UIImage(data: Data(fromHexEncodedString: String(cString: identicon(nil, data.generalVerifier?.hex ?? "", 32))) ?? Data()) ?? UIImage())
                             .resizable(resizingMode: .stretch)
                             .frame(width: 42, height: 42)
                         VStack {
                             Text("General verifier certificate").foregroundColor(Color("textMainColor"))
-                            Text("111").foregroundColor(Color("cryptoColor"))
-                            Text("encryption: " + "lol").foregroundColor(Color("textFadedColor"))
+                            Text(data.generalVerifier?.hex ?? "unknown").foregroundColor(Color("cryptoColor"))
+                            Text("encryption: " + (data.generalVerifier?.encryption ?? "unknown")).foregroundColor(Color("textFadedColor"))
                         }
-                    }
+                    }.padding().background(Color("backgroundCard"))
                 }
             }
             .background(/*@START_MENU_TOKEN@*//*@PLACEHOLDER=View@*/Color("backgroundColor")/*@END_MENU_TOKEN@*/)
@@ -90,7 +89,7 @@ struct SettingsScreen: View {
                 DocumentModal(document: document)
             case .none:
                 EmptyView()
-            }
+            //}
         }
     }
 }

@@ -37,7 +37,7 @@ struct TCFieldName: View {
                     }
                 }
             }
-        }
+        }.disabled(value.docs_field_name + value.path_type + value.docs_type == "")
     }
 }
 

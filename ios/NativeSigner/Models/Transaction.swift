@@ -52,6 +52,8 @@ extension SignerDataModel {
                 self.cards.append(contentsOf: (transactionPreview.error ?? []))
                 self.cards.append(contentsOf: (transactionPreview.extrinsics ?? []))
                 self.cards.append(contentsOf: (transactionPreview.method ?? []))
+                self.cards.append(contentsOf: (transactionPreview.new_specs ?? []))
+                self.cards.append(contentsOf: (transactionPreview.verifier ?? []))
                 self.cards = self.cards.sorted(by: {$0.index < $1.index})
                 //print(self.cards)
                 self.action = transactionPreview.action

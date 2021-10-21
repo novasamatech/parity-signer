@@ -11,16 +11,17 @@ struct Header: View {
     @EnvironmentObject var data: SignerDataModel
     var body: some View {
         HStack {
-            if !data.isNavBottom() {
-                Button(action: {
-                    data.goBack()
-                }) {
-                    Image(systemName: "chevron.left").imageScale(.large)
-                }
-            }
             if data.getMultiSelectionMode() && data.keyManagerModal == .none {
                 Button(action: {data.multiSelected = []}) {
                     SmallButton(text: "Cancel")
+                }
+            } else {
+                if !data.isNavBottom() {
+                    Button(action: {
+                        data.goBack()
+                    }) {
+                        Image(systemName: "chevron.left").imageScale(.large)
+                    }
                 }
             }
             Spacer()

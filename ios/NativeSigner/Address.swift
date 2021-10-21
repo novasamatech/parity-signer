@@ -274,7 +274,7 @@ extension SignerDataModel {
             return nil
         } else {
             return self.addresses.first(where: { address in
-                return address.isRoot()
+                return (address.isRoot() && address.seed_name == seedName)
             })
         }
     }

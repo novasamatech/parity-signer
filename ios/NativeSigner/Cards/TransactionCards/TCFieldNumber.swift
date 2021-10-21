@@ -35,7 +35,7 @@ struct TCFieldNumber: View {
                         .background(/*@START_MENU_TOKEN@*//*@PLACEHOLDER=View@*/Color("backgroundCard")/*@END_MENU_TOKEN@*/)
                 }
             }
-        }
+        }.disabled(value.docs_field_number + value.path_type + value.docs_type == "")
     }
 }
 

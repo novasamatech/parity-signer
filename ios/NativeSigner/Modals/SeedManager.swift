@@ -25,8 +25,8 @@ struct SeedManager: View {
                                     data.keyManagerModal = .none
                                 }) {
                                     SeedCardForManager(seedName: seed)
+                                    Spacer()
                                 }
-                                Spacer()
                                 Button(action: {
                                     seedPhrase = data.getSeed(seedName: seed, backup: true)
                                     showBackup = !seedPhrase.isEmpty
@@ -39,7 +39,7 @@ struct SeedManager: View {
                                 .alert(isPresented: $showBackup, content: {
                                     Alert(
                                         title: Text("Backup your seed phrase"),
-                                        message: Text(seedPhrase),
+                                        message: Text(seedPhrase).font(.title2),
                                         dismissButton: .default(
                                             Text("Done"),
                                             action: {
@@ -69,14 +69,16 @@ struct SeedManager: View {
                                         )
                                     )
                                 })
+                                .padding(.horizontal)
                             }
                             .background(Color("backgroundCard"))
                         }
                     }
                 }
                 Spacer()
-                
             }
+        }.onAppear {
+            data.selectSeed(seedName: "")
         }
     }
 }

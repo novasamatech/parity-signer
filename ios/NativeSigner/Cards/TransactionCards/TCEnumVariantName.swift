@@ -31,7 +31,7 @@ struct TCEnumVariantName: View {
                         .background(/*@START_MENU_TOKEN@*//*@PLACEHOLDER=View@*/Color("backgroundCard")/*@END_MENU_TOKEN@*/)
                 }
             }
-        }
+        }.disabled(value.docs_enum_variant == "")
     }
 }
 

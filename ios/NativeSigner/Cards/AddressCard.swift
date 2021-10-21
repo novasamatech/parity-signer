@@ -17,7 +17,8 @@ struct AddressCard: View {
     @GestureState private var dragOffset = CGSize.zero
     let rowHeight: CGFloat = 42
     var body: some View {
-        VStack {
+        ZStack {
+            RoundedRectangle(cornerRadius: 4).foregroundColor(Color(data.selectedAddress == address ? "backgroundActive" : "backgroundCard")).frame(height: 60)
             HStack {
                 Image(uiImage: UIImage(data: Data(fromHexEncodedString: String(cString: base58_identicon(nil, address.ss58, 32))) ?? Data()) ?? UIImage())
                     .resizable(resizingMode: .stretch)
@@ -49,10 +50,8 @@ struct AddressCard: View {
                 if (data.keyManagerModal == .showKey && data.getMultiSelectionMode()) {
                     Text(String((data.multiSelected.firstIndex(of: address) ?? -1) + 1) + "/" + String(data.multiSelected.count))
                 }
-            }
-            
+            }.padding(8)
         }
-        .padding(8)
         .gesture(
             TapGesture()
                 .onEnded { _ in
@@ -83,7 +82,6 @@ struct AddressCard: View {
                     }
                 })
         )
-        .background(Color(data.selectedAddress == address ? "backgroundActive" : "backgroundCard"))
     }
 }
 

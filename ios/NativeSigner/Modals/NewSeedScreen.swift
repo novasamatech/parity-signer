@@ -23,63 +23,60 @@ struct NewSeedScreen: View {
         ZStack{
             ModalBackdrop()
             VStack {
-                Text("Seed name")
-                    .font(.title)
-                    .foregroundColor(Color("textMainColor"))
-                TextField("Seed", text: $seedName, prompt: Text("Seed name"))
-                    .foregroundColor(Color("textEntryColor"))
-                    .background(Color("textFieldColor"))
-                    .font(.largeTitle)
-                    .disableAutocorrection(true)
-                    .keyboardType(.asciiCapable)
-                    .submitLabel(.done)
-                    .onChange(of: seedName, perform: { _ in
-                        data.lastError = ""
-                    })
-                    .onAppear(perform: {nameFocused = true})
-                    .focused($nameFocused)
-                    .border(Color("AccentColor"), width: 1)
-                Toggle(isOn: $recover) {
-                    Text("Enter custom seedphrase")
-                        .font(.headline)
-                        .foregroundColor(Color("textMainColor"))
-                }
-                if (recover) {
-                    //TODO: make completely custom tool for this
-                    TextEditor(text: $seedPhrase)
-                        .frame(height: 150.0)
-                        .autocapitalization(.none)
-                        .keyboardType(.asciiCapable)
-                        .disableAutocorrection(true)
-                        .font(.title)
-                        .foregroundColor(Color("cryptoColor"))
+                VStack {
+                    Text("New Seed").font(.title)
+                    TextField("Seed", text: $seedName, prompt: Text("Seed name"))
+                        .foregroundColor(Color("textEntryColor"))
                         .background(Color("textFieldColor"))
-                        .border(Color("cryptoColor"), width: /*@START_MENU_TOKEN@*/1/*@END_MENU_TOKEN@*/)
-                }
-                Text(data.lastError).foregroundColor(.red)
-                HStack{
-                    Button(action: {
-                        data.lastError = ""
-                        seedPhrase = ""
-                        data.keyManagerModal = .none
-                    }) {
-                        Text("Cancel").font(.largeTitle)
+                        .font(.largeTitle)
+                        .disableAutocorrection(true)
+                        .keyboardType(.asciiCapable)
+                        .submitLabel(.done)
+                        .onChange(of: seedName, perform: { _ in
+                            data.lastError = ""
+                        })
+                        .onAppear(perform: {nameFocused = true})
+                        .focused($nameFocused)
+                        .border(Color("AccentColor"), width: 1)
+                    Toggle(isOn: $recover) {
+                        Text("Recover seed phrase?")
+                            .font(.headline)
+                            .foregroundColor(Color("textMainColor"))
                     }
-                    Spacer()
-                    Button(action: {
-                        if !recover {seedPhrase = ""}
-                        data.addSeed(seedName: seedName, seedPhrase: seedPhrase)
-                    }) {
-                        Text("Create")
-                            .font(.largeTitle)
+                    if (recover) {
+                        //TODO: make completely custom tool for this
+                        TextEditor(text: $seedPhrase)
+                            .frame(height: 150.0)
+                            .autocapitalization(.none)
+                            .keyboardType(.asciiCapable)
+                            .disableAutocorrection(true)
+                            .font(.title)
+                            .foregroundColor(Color("cryptoColor"))
+                            .background(Color("textFieldColor"))
+                            .border(Color("cryptoColor"), width: /*@START_MENU_TOKEN@*/1/*@END_MENU_TOKEN@*/)
                     }
-                }
-                .padding()
+                    Text(data.lastError).foregroundColor(.red)
+                    HStack{
+                        Button(action: {
+                            data.lastError = ""
+                            seedPhrase = ""
+                            data.keyManagerModal = .none
+                        }) {
+                            Text("Cancel").font(.largeTitle)
+                        }
+                        Spacer()
+                        Button(action: {
+                            if !recover {seedPhrase = ""}
+                            data.addSeed(seedName: seedName, seedPhrase: seedPhrase)
+                        }) {
+                            Text("Create")
+                                .font(.largeTitle)
+                        }
+                    }
+                }.padding()
             }
         }
-        .background(/*@START_MENU_TOKEN@*//*@PLACEHOLDER=View@*/Color("backgroundColor")/*@END_MENU_TOKEN@*/)
     }
-    
 }
 
 /*

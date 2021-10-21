@@ -19,7 +19,9 @@ struct TransactionPreview: View {
                             TransactionCardView(card: card)
                         }
                     }
-                    TransactionCommentInput()
+                    if (data.action?.type == "sign_transaction") {
+                        TransactionCommentInput()
+                    }
                 }
                 Spacer()
                 HStack {
@@ -48,6 +50,9 @@ struct TransactionPreview: View {
             }
         }
         .background(/*@START_MENU_TOKEN@*//*@PLACEHOLDER=View@*/Color("backgroundColor")/*@END_MENU_TOKEN@*/)
+        .onAppear{
+            print(data.cards)
+        }
     }
 }
 /*

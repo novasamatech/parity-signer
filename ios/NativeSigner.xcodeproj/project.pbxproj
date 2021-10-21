@@ -76,6 +76,9 @@
 		2DB037CB27183BEF00A318B2 /* SeedCardForManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2DB037CA27183BEF00A318B2 /* SeedCardForManager.swift */; };
 		2DB037CD271843BF00A318B2 /* HeaderBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2DB037CC271843BF00A318B2 /* HeaderBar.swift */; };
 		2DB037CF27197C4100A318B2 /* AddressCardControls.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2DB037CE27197C4100A318B2 /* AddressCardControls.swift */; };
+		2DB037D12721D31600A318B2 /* FooterBlock.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2DB037D02721D31600A318B2 /* FooterBlock.swift */; };
+		2DB037D32721DBF900A318B2 /* TCNewSpecs.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2DB037D22721DBF800A318B2 /* TCNewSpecs.swift */; };
+		2DB037D52721DF8800A318B2 /* TCVerifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2DB037D42721DF8800A318B2 /* TCVerifier.swift */; };
 		2DE72BC226A588C7002BB752 /* NativeSignerApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2DE72BC126A588C7002BB752 /* NativeSignerApp.swift */; };
 		2DE72BC426A588C7002BB752 /* MainScreenContainer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2DE72BC326A588C7002BB752 /* MainScreenContainer.swift */; };
 		2DE72BC626A588C9002BB752 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 2DE72BC526A588C9002BB752 /* Assets.xcassets */; };
@@ -182,6 +185,9 @@
 		2DB037CA27183BEF00A318B2 /* SeedCardForManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SeedCardForManager.swift; sourceTree = "<group>"; };
 		2DB037CC271843BF00A318B2 /* HeaderBar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HeaderBar.swift; sourceTree = "<group>"; };
 		2DB037CE27197C4100A318B2 /* AddressCardControls.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddressCardControls.swift; sourceTree = "<group>"; };
+		2DB037D02721D31600A318B2 /* FooterBlock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FooterBlock.swift; sourceTree = "<group>"; };
+		2DB037D22721DBF800A318B2 /* TCNewSpecs.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TCNewSpecs.swift; sourceTree = "<group>"; };
+		2DB037D42721DF8800A318B2 /* TCVerifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TCVerifier.swift; sourceTree = "<group>"; };
 		2DE72BBE26A588C7002BB752 /* NativeSigner.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = NativeSigner.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		2DE72BC126A588C7002BB752 /* NativeSignerApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NativeSignerApp.swift; sourceTree = "<group>"; };
 		2DE72BC326A588C7002BB752 /* MainScreenContainer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainScreenContainer.swift; sourceTree = "<group>"; };
@@ -301,6 +307,7 @@
 				2DE72C0326A6CDC5002BB752 /* CameraPreview.swift */,
 				2D7A7BFA26C6621D0053C1E0 /* HistoryCollapsed.swift */,
 				2D7A7BA426AE9E680053C1E0 /* Footer.swift */,
+				2DB037D02721D31600A318B2 /* FooterBlock.swift */,
 				2D72B4F726EF427C0081E879 /* Header.swift */,
 				2D0D5E7926F09A5600B0EF9D /* TransactionCommentInput.swift */,
 			);
@@ -321,6 +328,8 @@
 			children = (
 				2D7A7C2326CBC3C70053C1E0 /* TCAuthorPublicKey.swift */,
 				2D7A7C2126CBC3C70053C1E0 /* TCBalance.swift */,
+				2DB037D22721DBF800A318B2 /* TCNewSpecs.swift */,
+				2DB037D42721DF8800A318B2 /* TCVerifier.swift */,
 				2D7A7C2426CBC3C70053C1E0 /* TCCall.swift */,
 				2D7A7C2526CBC3C70053C1E0 /* TCEraImmortalNonce.swift */,
 				2D7A7C2226CBC3C70053C1E0 /* TCEraMortalNonce.swift */,
@@ -639,6 +648,7 @@
 				2D7A7C2026CB99250053C1E0 /* TransactionCardSelector.swift in Sources */,
 				2D7A7BD026BBC72D0053C1E0 /* Transaction.swift in Sources */,
 				2D7A7C1826CB96C70053C1E0 /* TCError.swift in Sources */,
+				2DB037D32721DBF900A318B2 /* TCNewSpecs.swift in Sources */,
 				2DE72BF326A59BAB002BB752 /* NetworkSelector.swift in Sources */,
 				2D72B4F826EF427C0081E879 /* Header.swift in Sources */,
 				2DB037C12714DB1700A318B2 /* SeedCard.swift in Sources */,
@@ -647,6 +657,7 @@
 				2D7A7BD226BBCE6F0053C1E0 /* TransactionScreen.swift in Sources */,
 				2D7A7BB426B02B700053C1E0 /* SeedSelector.swift in Sources */,
 				2DB037C52716CDAF00A318B2 /* NetworkDetails.swift in Sources */,
+				2DB037D52721DF8800A318B2 /* TCVerifier.swift in Sources */,
 				2DB037CB27183BEF00A318B2 /* SeedCardForManager.swift in Sources */,
 				2D7A7BB026B00A3E0053C1E0 /* NavbarShield.swift in Sources */,
 				2D7A7BF326C519990053C1E0 /* MetadataCard.swift in Sources */,
@@ -661,6 +672,7 @@
 				2DE72BF126A59834002BB752 /* Network.swift in Sources */,
 				2D72B4F626EF3BC50081E879 /* Navigator.swift in Sources */,
 				2D0D5E7E26F0B1D900B0EF9D /* DeleteKeyConfirm.swift in Sources */,
+				2DB037D12721D31600A318B2 /* FooterBlock.swift in Sources */,
 				2D7A7BC426BA8B350053C1E0 /* NewAddressScreen.swift in Sources */,
 				2D7A7BF526C58E9E0053C1E0 /* History.swift in Sources */,
 				2DB037CF27197C4100A318B2 /* AddressCardControls.swift in Sources */,

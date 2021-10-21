@@ -70,12 +70,11 @@ struct ExportAddress: View {
                 }
         )
         .gesture(
-            DragGesture().updating($dragOffset, body: {
-                (value, state, transaction) in
-                if value.translation.height > 300 {
+            DragGesture().onEnded {drag in
+                if drag.translation.height > 200 {
                     showDetails.toggle()
                 }
-            })
+            }
         )
     }
 }

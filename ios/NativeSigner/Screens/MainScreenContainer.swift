@@ -39,9 +39,13 @@ struct MainScreenContainer: View {
                 //Certain places are better off without footer
                 if (data.transactionState == .none
                     && !(data.signerScreen == .keys && (data.keyManagerModal == .networkManager
-                                                        || data.keyManagerModal == .newSeed)
+                                                        || data.keyManagerModal == .newSeed
+                                                        || data.keyManagerModal == .newKey)
                         )){
-                    Footer()
+                    FooterBlock()
+                        .padding(.horizontal)
+                        .padding(.vertical, 8)
+                        .background(Color("backgroundUtility"))
                 }
             }
         } else {

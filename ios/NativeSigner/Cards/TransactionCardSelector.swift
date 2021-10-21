@@ -47,8 +47,8 @@ struct TransactionCardSelector: View {
         case .meta(let value):
             Text(String(describing: value))
                 .foregroundColor(Color("textMainColor"))
-        case .newSpecs(_):
-            Text("newspecsstub")
+        case .newSpecs(let value):
+            TCNewSpecs(value: value)
         case .none:
             EmptyView()
         case .pallet(let value):
@@ -67,8 +67,7 @@ struct TransactionCardSelector: View {
         case .varName(let text):
             TCVarName(text: text)
         case .verifier(let value):
-            Text(String(describing: value))
-                .foregroundColor(Color("textMainColor"))
+            TCVerifier(value: value)
         case .warning(let text):
             TCWarning(text: text)
         }

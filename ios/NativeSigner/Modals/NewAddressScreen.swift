@@ -24,7 +24,6 @@ struct NewAddressScreen: View {
         ZStack {
             ModalBackdrop()
             VStack {
-                Text("New key").font(.title).foregroundColor(Color("AccentColor"))
                 HStack {
                     NetworkCard(network: data.selectedNetwork)
                     Spacer()
@@ -90,12 +89,6 @@ struct NewAddressScreen: View {
                             .border(Color("AccentColor"), width: 1)
                     }}
                 HStack {
-                    Button(action: {
-                        data.keyManagerModal = .none
-                    }) {
-                        Text("Cancel").font(.largeTitle)
-                    }
-                    Spacer()
                     Button(action: {
                         data.createAddress(password: password)
                         if data.lastError == "" {

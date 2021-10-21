@@ -114,6 +114,8 @@ extension SignerDataModel {
             switch self.keyManagerModal {
             case .seedSelector:
                 return "Select Seed"
+            case .newKey:
+                return "New Derived Key"
             default:
                 return ""
             }

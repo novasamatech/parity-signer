@@ -25,7 +25,7 @@ struct KeyManager: View {
                         }) {
                             Image(systemName: "plus.square.on.square").imageScale(.large)
                         }
-                    }
+                    }.padding(.horizontal, 8)
                 }
                 ScrollView {
                     LazyVStack {
@@ -58,7 +58,7 @@ struct KeyManager: View {
             case .networkManager:
                 VStack {
                     Spacer()
-                    NetworkManager().frame(height: UIScreen.main.bounds.height/3)
+                    NetworkManager().frame(height: UIScreen.main.bounds.height*0.4)
                 }.gesture(DragGesture().updating($dragOffset, body: { (value, state, transaction) in
                     if value.translation.height > 100 {
                         data.goBack()
