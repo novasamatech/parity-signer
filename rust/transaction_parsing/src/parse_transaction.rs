@@ -4,7 +4,7 @@ use parity_scale_codec::{Decode, Encode};
 use parity_scale_codec_derive;
 use printing_balance::{PrettyOutput, convert_balance_pretty};
 use db_handling::db_transactions::TrDbColdSign;
-use definitions::{crypto::Encryption, history::Event, keyring::{AddressKey, NetworkSpecsKey}};
+use definitions::{crypto::Encryption, history::Event, keyring::{AddressKey, NetworkSpecsKey}, users::AddressDetails};
 use sp_runtime::generic::Era;
 
 use crate::cards::{Action, Card, Warning};
@@ -44,6 +44,11 @@ struct ExtrinsicValues {
     block_hash: [u8; 32],
 }
 
+/// Enum to move around cards in preparatory stage (author_card and warning_card)
+enum CardsPrep {
+    SignProceed (String, Option<String>, AddressDetails), 
+    ShowOnly (String, String),
+}
 
 /// function to print full extrinsics cards
 fn print_full_extrinsics (index: &mut u32, indent: u32, tip_output: &PrettyOutput, short: &ExtrinsicValues, chain_name: &str) -> String {
@@ -114,236 +119,99 @@ pub fn parse_transaction (data_hex: &str, dbname: &str) -> Result<String, Error>
             if encryption != chain_specs_found.encryption {return Err(Error::BadInputData(BadInputData::EncryptionMismatch))}
             
             let address_key = AddressKey::from_parts(&author_public_key, &encryption).expect("already matched encryption type and author public key length, should always work");
-            let author = address_key.print_as_base58(&encryption, Some(chain_prefix)).expect("just generated address_key, should always work");
-        // search for this base58 address in existing accounts, get address details
-            match checked_address_details(&address_key, &dbname)? {
+            let author = address_key.print_as_base58(&encryption, Some(chain_prefix)).expect("just generated address_key, should always work");let mut history: Vec<Event> = Vec::new();
+        // search for this address key in existing accounts, get address details
+            let mut cards_prep = match checked_address_details(&address_key, &dbname)? {
                 Some(address_details) => {
                     let author_card = (Card::Author{base58_author: &author, seed_name: &address_details.seed_name, path: &address_details.path, has_pwd: address_details.has_pwd, name: &address_details.name}).card(&mut index, indent);
-                    
-                // current network is among allowed networks for this address key;
-                    let warn_network_not_allowed = {
-                        if address_details.network_id.contains(&network_specs_key) {None}
-                        else {Some(Card::Warning(Warning::NoNetworkID).card(&mut index, indent))}
-                    };
-
-                // fetch chain metadata in RuntimeMetadataV12 format
-                    match find_meta(&chain_name, short.metadata_version, &dbname) {
-                        Ok((meta, ver)) => {
-                            let mut warning_card = None;
-                            let mut history: Vec<Event> = Vec::new();
-                            if let Some(x) = ver {
-                                warning_card = Some(Card::Warning(Warning::NewerVersion{used_version: short.metadata_version, latest_version: x}).card(&mut index, indent));
-                                history.push(Event::Warning(Warning::NewerVersion{used_version: short.metadata_version, latest_version: x}.show()));
-                            }
-                    
-                        // action card preparations: vector that should be signed
-                            let for_signing = [transaction_decoded.method.to_vec(), transaction_decoded.extrinsics.encode().to_vec()].concat();
-                    
-                        // transaction parsing
-                            match meta {
-                                RuntimeMetadata::V12(_)|RuntimeMetadata::V13(_) => {
-                                    let older_meta = match meta {
-                                        RuntimeMetadata::V12(meta_v12) => {OlderMeta::V12(meta_v12)},
-                                        RuntimeMetadata::V13(meta_v13) => {OlderMeta::V13(meta_v13)},
-                                        _ => unreachable!(),
-                                    };
-                                // generate type database to be used in decoding
-                                    let type_database = get_types(&dbname)?;
-                                    match process_as_call (transaction_decoded.method, &older_meta, &type_database, &mut index, indent, &chain_specs_found) {
-                                        Ok(transaction_parsed) => {
-                                            let method_cards = &transaction_parsed.fancy_out[1..];
-                                            if transaction_parsed.remaining_vector.len() != 0 {return Err(Error::BadInputData(BadInputData::SomeDataNotUsed))}
-
-                                        // make extrinsics card set
-                                            let extrinsics_cards = print_full_extrinsics (&mut index, indent, &tip_output, &short, chain_name);
-                                    
-                                            match warn_network_not_allowed {
-                                                None => {
-                                                // network is among the allowed ones for this address key; can sign;
-                                                // making action entry into database
-                                                    let sign = TrDbColdSign::generate(&for_signing, &address_details.path, address_details.has_pwd, &address_key, history);
-                                                    let checksum = sign_store_and_get_checksum (sign, &dbname)?;
-                                                    let action_card = Action::Sign(checksum).card();
-                                                // full cards set
-                                                    let cards = match warning_card {
-                                                        Some(warn) => format!("{{\"author\":[{}],\"warning\":[{}],\"method\":[{}],\"extrinsics\":[{}],{}}}", author_card, warn, method_cards, extrinsics_cards, action_card),
-                                                        None => format!("{{\"author\":[{}],\"method\":[{}],\"extrinsics\":[{}],{}}}", author_card, method_cards, extrinsics_cards, action_card),
-                                                    };
-                                                    Ok(cards)
-                                                },
-                                                Some(warn_no_network_id) => {
-                                                // network is NOT among the allowed ones for this address key; should not happen; can decode, not allowed to sign
-                                                    let cards = match warning_card {
-                                                        Some(warn) => format!("{{\"author\":[{}],\"warning\":[{},{}],\"method\":[{}],\"extrinsics\":[{}]}}", author_card, warn_no_network_id, warn, method_cards, extrinsics_cards),
-                                                        None => format!("{{\"author\":[{}],\"warning\":[{}],\"method\":[{}],\"extrinsics\":[{}]}}", author_card, warn_no_network_id, method_cards, extrinsics_cards),
-                                                    };
-                                                    Ok(cards)
-                                                },
-                                            }
-                                        },
-                                        Err(e) => {
-                                        // was unable to decode transaction properly, produced one of known decoding errors
-                                        // no action possible
-                                            let error_card = (Card::Error(e)).card(&mut index, indent);
-                                        // make extrinsics card set
-                                            let extrinsics_cards = print_full_extrinsics (&mut index, indent, &tip_output, &short, chain_name);
-                                        // full cards set
-                                            let cards = match warning_card {
-                                                Some(warn) => format!("{{\"author\":[{}],\"warning\":[{}],\"error\":[{}],\"extrinsics\":[{}]}}", author_card, warn, error_card, extrinsics_cards),
-                                                None => format!("{{\"author\":[{}],\"error\":[{}],\"extrinsics\":[{}]}}", author_card, error_card, extrinsics_cards),
-                                            };
-                                            Ok(cards)
-                                        },
-                                    }
+                    if address_details.network_id.contains(&network_specs_key) {CardsPrep::SignProceed(author_card, None, address_details)}
+                    else {CardsPrep::ShowOnly(author_card, Card::Warning(Warning::NoNetworkID).card(&mut index, indent))}
+                }
+                None => {
+                    CardsPrep::ShowOnly((Card::AuthorPlain(&author)).card(&mut index, indent),(Card::Warning(Warning::AuthorNotFound)).card(&mut index, indent))
+                }
+            };
+        // preparing info that should be signed in case of success
+            let for_signing = [transaction_decoded.method.to_vec(), transaction_decoded.extrinsics.encode().to_vec()].concat();
+            let index_backup = index;
+        // fetch network metadata as RuntimeMetadata
+            let method_cards_result = match find_meta(&chain_name, short.metadata_version, &dbname) {
+                Ok((meta, ver)) => {
+                    if let Some(x) = ver {
+                        history.push(Event::Warning(Warning::NewerVersion{used_version: short.metadata_version, latest_version: x}.show()));
+                        let add = Card::Warning(Warning::NewerVersion{used_version: short.metadata_version, latest_version: x}).card(&mut index, indent);
+                        cards_prep = match cards_prep {
+                            CardsPrep::SignProceed(author_card, _, address_details) => CardsPrep::SignProceed(author_card, Some(add), address_details),
+                            CardsPrep::ShowOnly(author_card, warning_card) => CardsPrep::ShowOnly(author_card, format!("{},{}", warning_card, add)),
+                        };
+                    }
+                // transaction parsing
+                    match meta {
+                        RuntimeMetadata::V12(_)|RuntimeMetadata::V13(_) => {
+                            let older_meta = match meta {
+                                RuntimeMetadata::V12(meta_v12) => {OlderMeta::V12(meta_v12)},
+                                RuntimeMetadata::V13(meta_v13) => {OlderMeta::V13(meta_v13)},
+                                _ => unreachable!(),
+                            };
+                            // get types to be used in decoding
+                            let type_database = get_types(&dbname)?;
+                            match process_as_call (transaction_decoded.method, &older_meta, &type_database, &mut index, indent, &chain_specs_found) {
+                                Ok(transaction_parsed) => {
+                                    if transaction_parsed.remaining_vector.len() != 0 {Err(Error::BadInputData(BadInputData::SomeDataNotUsed))}
+                                    else {Ok(transaction_parsed.fancy_out[1..].to_string())}
                                 },
-                                RuntimeMetadata::V14(meta_v14) => {
-                                    match decoding_sci_entry_point (transaction_decoded.method, &meta_v14, &mut index, indent, &chain_specs_found) {
-                                        Ok(transaction_parsed) => {
-                                            let method_cards = &transaction_parsed.fancy_out;
-                                            if transaction_parsed.remaining_vector.len() != 0 {return Err(Error::BadInputData(BadInputData::SomeDataNotUsed))}
-
-                                        // make extrinsics card set
-                                            let extrinsics_cards = print_full_extrinsics (&mut index, indent, &tip_output, &short, chain_name);
-                                    
-                                            match warn_network_not_allowed {
-                                                None => {
-                                                // network is among the allowed ones for this address key; can sign;
-                                                // making action entry into database
-                                                    let sign = TrDbColdSign::generate(&for_signing, &address_details.path, address_details.has_pwd, &address_key, history);
-                                                    let checksum = sign_store_and_get_checksum (sign, &dbname)?;
-                                                    let action_card = Action::Sign(checksum).card();
-
-                                                // full cards set
-                                                    let cards = match warning_card {
-                                                        Some(warn) => format!("{{\"author\":[{}],\"warning\":[{}],\"method\":[{}],\"extrinsics\":[{}],{}}}", author_card, warn, method_cards, extrinsics_cards, action_card),
-                                                        None => format!("{{\"author\":[{}],\"method\":[{}],\"extrinsics\":[{}],{}}}", author_card, method_cards, extrinsics_cards, action_card),
-                                                    };
-                                                    Ok(cards)
-                                                },
-                                                Some(warn_no_network_id) => {
-                                                // network is NOT among the allowed ones for this address key; should not happen; can decode, not allowed to sign
-                                                    let cards = match warning_card {
-                                                        Some(warn) => format!("{{\"author\":[{}],\"warning\":[{},{}],\"method\":[{}],\"extrinsics\":[{}]}}", author_card, warn_no_network_id, warn, method_cards, extrinsics_cards),
-                                                        None => format!("{{\"author\":[{}],\"warning\":[{}],\"method\":[{}],\"extrinsics\":[{}]}}", author_card, warn_no_network_id, method_cards, extrinsics_cards),
-                                                    };
-                                                    Ok(cards)
-                                                },
-                                            }
-                                        },
-                                        Err(e) => {
-                                        // was unable to decode transaction properly, produced one of known decoding errors
-                                        // no action possible
-                                            let error_card = (Card::Error(e)).card(&mut index, indent);
-                                        // make extrinsics card set
-                                            let extrinsics_cards = print_full_extrinsics (&mut index, indent, &tip_output, &short, chain_name);
-                                        // full cards set
-                                            let cards = match warning_card {
-                                                Some(warn) => format!("{{\"author\":[{}],\"warning\":[{}],\"error\":[{}],\"extrinsics\":[{}]}}", author_card, warn, error_card, extrinsics_cards),
-                                                None => format!("{{\"author\":[{}],\"error\":[{}],\"extrinsics\":[{}]}}", author_card, error_card, extrinsics_cards),
-                                            };
-                                            Ok(cards)
-                                        },
-                                    }
-                                },
-                                _ => return Err(Error::SystemError(SystemError::MetaVersionBelow12)),
+                                Err(e) => Err(e),
                             }
                         },
-                        Err(e) => {
-                        // run failed on finding/decoding metadata step, produced one of known errors
-                            if (e == Error::DatabaseError(DatabaseError::NoMetaThisVersion))||(e == Error::DatabaseError(DatabaseError::NoMetaAtAll)) {
-                                let error_card = (Card::Error(e)).card(&mut index, indent);
-                            // make extrinsics card set
-                                let extrinsics_cards = print_full_extrinsics (&mut index, indent, &tip_output, &short, chain_name);
-                            // full cards set
-                                let cards = format!("{{\"author\":[{}],\"error\":[{}],\"extrinsics\":[{}]}}", author_card, error_card, extrinsics_cards);
-                                Ok(cards)
+                        RuntimeMetadata::V14(meta_v14) => {
+                             match decoding_sci_entry_point (transaction_decoded.method, &meta_v14, &mut index, indent, &chain_specs_found) {
+                                Ok(transaction_parsed) => {
+                                    if transaction_parsed.remaining_vector.len() != 0 {Err(Error::BadInputData(BadInputData::SomeDataNotUsed))}
+                                    else {Ok(transaction_parsed.fancy_out)}
+                                },
+                                Err(e) => Err(e),
                             }
-                            else {return Err(e)}
+                        },
+                        _ => return Err(Error::SystemError(SystemError::MetaVersionBelow12)),
+                    }
+                },
+                Err(e) => {
+                // run failed on finding/decoding metadata step, produced one of known errors
+                    if (e == Error::DatabaseError(DatabaseError::NoMetaThisVersion))||(e == Error::DatabaseError(DatabaseError::NoMetaAtAll)) {Err(e)}
+                    else {return Err(e)}
+                },
+            };
+            match method_cards_result {
+                Ok(method_cards) => {
+                    let extrinsics_cards = print_full_extrinsics (&mut index, indent, &tip_output, &short, chain_name);
+                    match cards_prep {
+                        CardsPrep::SignProceed(author_card, possible_warning, address_details) => {
+                            let sign = TrDbColdSign::generate(&for_signing, &address_details.path, address_details.has_pwd, &address_key, history);
+                            let checksum = sign_store_and_get_checksum (sign, &dbname)?;
+                            let action_card = Action::Sign(checksum).card();
+                            match possible_warning {
+                                Some(warning_card) => Ok(format!("{{\"author\":[{}],\"warning\":[{}],\"method\":[{}],\"extrinsics\":[{}],{}}}", author_card, warning_card, method_cards, extrinsics_cards, action_card)),
+                                None => Ok(format!("{{\"author\":[{}],\"method\":[{}],\"extrinsics\":[{}],{}}}", author_card, method_cards, extrinsics_cards, action_card))
+                            }
+                        },
+                        CardsPrep::ShowOnly(author_card, warning_card) => {
+                            Ok(format!("{{\"author\":[{}],\"warning\":[{}],\"method\":[{}],\"extrinsics\":[{}]}}", author_card, warning_card, method_cards, extrinsics_cards))
                         },
                     }
                 },
-                None => {
-                // identity not found in database
-                // try to decode the transaction anyways
-                // no action card made, no signing possible
-                    let author_card = (Card::AuthorPlain(&author)).card(&mut index, indent);
-                    let mut warning_card = (Card::Warning(Warning::AuthorNotFound)).card(&mut index, indent);
-                    
-                    // fetch chain metadata in RuntimeMetadataV12 format
-                    match find_meta(&chain_name, short.metadata_version, &dbname) {
-                        Ok((meta, ver)) => {
-                            if let Some(x) = ver {
-                                let add_this = (Card::Warning(Warning::NewerVersion{used_version: short.metadata_version, latest_version: x})).card(&mut index, indent);
-                                warning_card.push_str(&format!(",{}", add_this));
-                            }
-                        // transaction parsing
-                            match meta {
-                                RuntimeMetadata::V12(_)|RuntimeMetadata::V13(_) => {
-                                    let older_meta = match meta {
-                                        RuntimeMetadata::V12(meta_v12) => {OlderMeta::V12(meta_v12)},
-                                        RuntimeMetadata::V13(meta_v13) => {OlderMeta::V13(meta_v13)},
-                                        _ => unreachable!(),
-                                    };
-                                // generate type database to be used in decoding
-                                    let type_database = get_types(&dbname)?;
-                                    match process_as_call (transaction_decoded.method, &older_meta, &type_database, &mut index, indent, &chain_specs_found) {
-                                        Ok(transaction_parsed) => {
-                                            let method_cards = &transaction_parsed.fancy_out[1..];
-                                            if transaction_parsed.remaining_vector.len() != 0 {return Err(Error::BadInputData(BadInputData::SomeDataNotUsed))}
-
-                                        // make extrinsics card set
-                                            let extrinsics_cards = print_full_extrinsics (&mut index, indent, &tip_output, &short, chain_name);
-                                        // full cards set
-                                            let cards = format!("{{\"author\":[{}],\"warning\":[{}],\"method\":[{}],\"extrinsics\":[{}]}}", author_card, warning_card, method_cards, extrinsics_cards);
-                                            Ok(cards)
-                                        },
-                                        Err(e) => {
-                                        // was unable to decode transaction properly, produced one of known decoding errors
-                                        // no action possible
-                                            let error_card = (Card::Error(e)).card(&mut index, indent);
-                                        // make extrinsics card set
-                                            let extrinsics_cards = print_full_extrinsics (&mut index, indent, &tip_output, &short, chain_name);
-                                            let cards = format!("{{\"author\":[{}],\"warning\":[{}],\"error\":[{}],\"extrinsics\":[{}]}}", author_card, warning_card, error_card, extrinsics_cards);
-                                            Ok(cards)
-                                        },
-                                    }
-                                },
-                                RuntimeMetadata::V14(meta_v14) => {
-                                    match decoding_sci_entry_point (transaction_decoded.method, &meta_v14, &mut index, indent, &chain_specs_found) {
-                                        Ok(transaction_parsed) => {
-                                            let method_cards = &transaction_parsed.fancy_out;
-                                            if transaction_parsed.remaining_vector.len() != 0 {return Err(Error::BadInputData(BadInputData::SomeDataNotUsed))}
-
-                                        // make extrinsics card set
-                                            let extrinsics_cards = print_full_extrinsics (&mut index, indent, &tip_output, &short, chain_name);
-                                        // full cards set
-                                            let cards = format!("{{\"author\":[{}],\"warning\":[{}],\"method\":[{}],\"extrinsics\":[{}]}}", author_card, warning_card, method_cards, extrinsics_cards);
-                                            Ok(cards)
-                                        },
-                                        Err(e) => {
-                                        // was unable to decode transaction properly, produced one of known decoding errors
-                                        // no action possible
-                                            let error_card = (Card::Error(e)).card(&mut index, indent);
-                                        // make extrinsics card set
-                                            let extrinsics_cards = print_full_extrinsics (&mut index, indent, &tip_output, &short, chain_name);
-                                            let cards = format!("{{\"author\":[{}],\"warning\":[{}],\"error\":[{}],\"extrinsics\":[{}]}}", author_card, warning_card, error_card, extrinsics_cards);
-                                            Ok(cards)
-                                        },
-                                    }
-                                },
-                                _ => return Err(Error::SystemError(SystemError::MetaVersionBelow12)),
+                Err(e) => {
+                    index = index_backup;
+                    let error_card = (Card::Error(e)).card(&mut index, indent);
+                    let extrinsics_cards = print_full_extrinsics (&mut index, indent, &tip_output, &short, chain_name);
+                    match cards_prep {
+                        CardsPrep::SignProceed(author_card, possible_warning, _) => {
+                            match possible_warning {
+                                Some(warning_card) => Ok(format!("{{\"author\":[{}],\"warning\":[{}],\"error\":[{}],\"extrinsics\":[{}]}}", author_card, warning_card, error_card, extrinsics_cards)),
+                                None => Ok(format!("{{\"author\":[{}],\"error\":[{}],\"extrinsics\":[{}]}}", author_card, error_card, extrinsics_cards)),
                             }
                         },
-                        Err(e) => {
-                        // run failed on finding/decoding metadata step, produced one of known errors
-                            if (e == Error::DatabaseError(DatabaseError::NoMetaThisVersion))||(e == Error::DatabaseError(DatabaseError::NoMetaAtAll)) {
-                                let error_card = (Card::Error(e)).card(&mut index, indent);
-                            // make extrinsics card set
-                                let extrinsics_cards = print_full_extrinsics (&mut index, indent, &tip_output, &short, chain_name);
-                                let cards = format!("{{\"author\":[{}],\"warning\":[{}],\"error\":[{}],\"extrinsics\":[{}]}}", author_card, warning_card, error_card, extrinsics_cards);
-                                Ok(cards)
-                            }
-                            else {return Err(e)}
+                        CardsPrep::ShowOnly(author_card, warning_card) => {
+                            Ok(format!("{{\"author\":[{}],\"warning\":[{}],\"error\":[{}],\"extrinsics\":[{}]}}", author_card, warning_card, error_card, extrinsics_cards))
                         },
                     }
                 },
@@ -358,9 +226,7 @@ pub fn parse_transaction (data_hex: &str, dbname: &str) -> Result<String, Error>
                 Era::Immortal => format!("{},{},{}", (Card::EraImmortalNonce(short.nonce)).card(&mut index, indent), (Card::TipPlain(short.tip)).card(&mut index, indent), (Card::TxSpecPlain{gen_hash: &hex::encode(transaction_decoded.genesis_hash), version: short.metadata_version, tx_version: short.tx_version}).card(&mut index, indent)),
                 Era::Mortal(period, phase) => format!("{},{},{},{}", (Card::EraMortalNonce{phase, period, nonce: short.nonce}).card(&mut index, indent), (Card::TipPlain(short.tip)).card(&mut index, indent), (Card::BlockHash(&hex::encode(short.block_hash))).card(&mut index, indent), (Card::TxSpecPlain{gen_hash: &hex::encode(transaction_decoded.genesis_hash), version: short.metadata_version, tx_version: short.tx_version}).card(&mut index, indent)),
             };
-
-            let cards = format!("{{\"author\":[{}],\"error\":[{}],\"extrinsics\":[{}]}}", author_card, error_card, extrinsics_cards);
-            Ok(cards)
+            Ok(format!("{{\"author\":[{}],\"error\":[{}],\"extrinsics\":[{}]}}", author_card, error_card, extrinsics_cards))
         },
     }
 }

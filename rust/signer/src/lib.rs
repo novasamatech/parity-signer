@@ -289,8 +289,8 @@ export! {
     @Java_io_parity_signer_models_SignerDataModel_dbGetGeneralVerifier
 	fn get_general_certificate(
         dbname: &str
-    ) -> String {
-        return "{{\"hex\":\"ff\",\"encryption\":\"caesar\"}}".to_string()
+	) -> anyhow::Result<String, anyhow::Error> {
+        db_handling::helpers::display_general_verifier(dbname)
     }
 
     @Java_io_parity_signer_models_SignerDataModel_signerSignTypes

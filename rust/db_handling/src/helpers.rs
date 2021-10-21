@@ -154,6 +154,12 @@ pub fn get_general_verifier (database_name: &str) -> anyhow::Result<Verifier> {
     }
 }
 
+/// Function to display general Verifier from the database
+pub fn display_general_verifier (database_name: &str) -> anyhow::Result<String> {
+    let general_verifier = get_general_verifier(database_name)?;
+    Ok(general_verifier.show_card())
+}
+
 /// Function to modify existing batch for ADDRTREE with incoming vector of additions
 pub (crate) fn upd_id_batch (mut batch: Batch, adds: Vec<(AddressKey, AddressDetails)>) -> Batch {
     for (address_key, address_details) in adds.iter() {batch.insert(address_key.key(), address_details.encode());}
@@ -190,7 +196,7 @@ mod tests {
     use super::*;
     use definitions::network_specs::Verifier;
     use std::fs;
-    use crate::{cold_default::{reset_cold_database_no_addresses, signer_init_no_cert}, manage_history::{device_was_online, reset_danger_status_to_safe}};
+    use crate::{cold_default::{reset_cold_database_no_addresses, signer_init_no_cert, signer_init_with_cert}, manage_history::{device_was_online, reset_danger_status_to_safe}};
 
     #[test]
     fn get_danger_status_properly () {
@@ -202,6 +208,18 @@ mod tests {
         assert!(get_danger_status(dbname).unwrap() == true, "Expected danger status = true after the reported exposure.");
         reset_danger_status_to_safe(dbname).unwrap();
         assert!(get_danger_status(dbname).unwrap() == false, "Expected danger status = false after the danger reset.");
+        fs::remove_dir_all(dbname).unwrap();
+    }
+    
+    #[test]
+    fn display_general_verifier_properly() {
+        let dbname = "tests/display_general_verifier_properly";
+        reset_cold_database_no_addresses(dbname, Verifier::None).unwrap();
+        let print = display_general_verifier(dbname).unwrap();
+        assert!(print == r#"{"hex":"","encryption":"none"}"#, "Got: {}", print);
+        signer_init_with_cert(dbname).unwrap();
+        let print = display_general_verifier(dbname).unwrap();
+        assert!(print == r#"{"hex":"d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d","encryption":"sr25519"}"#, "Got: {}", print);
         fs::remove_dir_all(dbname).unwrap();
     }
 }
