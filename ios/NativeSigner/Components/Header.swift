@@ -31,7 +31,7 @@ struct Header: View {
                     SmallButton(text: "Select all")
                 }
             }
-            if (data.keyManagerModal == .seedSelector && data.signerScreen == .keys) {
+            if (data.keyManagerModal == .seedSelector && data.signerScreen == .keys && !data.alert) {
                 Button(action: {
                     data.keyManagerModal = .newSeed
                 }) {
@@ -39,13 +39,7 @@ struct Header: View {
                         .imageScale(.large)
                 }
             }
-            Button(action: {
-                data.totalRefresh()
-                data.networkSettings = nil
-                data.signerScreen = .history
-            }) {
-                NavbarShield()
-            }
+            NavbarShield()
         }
         .padding().background(/*@START_MENU_TOKEN@*//*@PLACEHOLDER=View@*/Color("backgroundColor")/*@END_MENU_TOKEN@*/)
     }

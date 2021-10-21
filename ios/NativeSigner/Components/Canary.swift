@@ -12,26 +12,43 @@ import Network
  * This is background network indicator. It will paint the shield icon red and write to history
  * NOTE: This might sometimes crash transaction; it is intended although not defined behavior for now
  */
-class Canary: ObservableObject {
-    @Published var dead: Bool = false
-    let monitor = NWPathMonitor()
-    let queue = DispatchQueue.global(qos: .background)
-    
-    init() {
-        self.monitor.pathUpdateHandler = {path in
-            if path.availableInterfaces.count == 0 {
-                DispatchQueue.main.async {
-                    self.dead = false
-                }
+extension SignerDataModel {
+    /**
+     * Check if alert was triggered
+     */
+    func checkAlert() {
+        var err = ExternError()
+        let err_ptr: UnsafeMutablePointer<ExternError> = UnsafeMutablePointer(&err)
+        let res = get_warnings(err_ptr, dbName)
+        if (err_ptr.pointee.code == 0) {
+            if res == 1 {
+                self.alert = true
             } else {
-                DispatchQueue.main.async {
-                    let dbName = NSHomeDirectory() + "/Documents/Database"
-                    //TODO: uncomment (ipod dev is impossible with airplane mode) device_was_online(nil, dbName)
-                    self.dead = true
-                }
+                self.alert = false
             }
+        } else {
+            print("History init failed! This will not do.")
+            print(String(cString: err_ptr.pointee.message))
+            signer_destroy_string(err_ptr.pointee.message)
+            self.alert = true
         }
-        
-        monitor.start(queue: self.queue)
+        getHistory()
+    }
+    
+    /**
+     * Acknowledge alert and reset it
+     */
+    func resetAlert() {
+        var err = ExternError()
+        let err_ptr: UnsafeMutablePointer<ExternError> = UnsafeMutablePointer(&err)
+        acknowledge_warnings(err_ptr, dbName)
+        if (err_ptr.pointee.code == 0) {
+            self.checkAlert()
+        } else {
+            print("History init failed! This will not do.")
+            print(String(cString: err_ptr.pointee.message))
+            signer_destroy_string(err_ptr.pointee.message)
+            self.alert = true
+        }
     }
 }
