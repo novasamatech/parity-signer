@@ -10,6 +10,7 @@ import SwiftUI
 struct SettingsScreen: View {
     @EnvironmentObject var data: SignerDataModel
     @State var wipe = false
+    @State var jailbreak = false
     var body: some View {
         ZStack {
             ScrollView {
@@ -34,6 +35,30 @@ struct SettingsScreen: View {
                                 Text("Wipe"),
                                 action: {
                                     data.wipe()
+                                }
+                            )
+                        )
+                    })
+                    .padding()
+                    Button(action: {
+                        //TODO: add some alerts to make sure the operation was successful
+                        jailbreak = true
+                    }) {
+                        HStack{
+                            Image(systemName: "exclamationmark.triangle.fill").imageScale(.large)
+                            Text("Remove general certificate")
+                            Image(systemName: "exclamationmark.triangle.fill").imageScale(.large)
+                        }.foregroundColor(Color("dangerColor"))
+                    }
+                    .alert(isPresented: $jailbreak, content: {
+                        Alert(
+                            title: Text("Wipe ALL data?"),
+                            message: Text("Remove all data and set general verifier blank so that it could be set later. This operation can not be reverted. Do not proceed unless you absolutely know what you are doing, there is no need to use this procedure in most cases. Misusing this feature may lead to loss of funds!"),
+                            primaryButton: .cancel(),
+                            secondaryButton: .destructive(
+                                Text("I understand"),
+                                action: {
+                                    data.jailbreak()
                                 }
                             )
                         )

@@ -121,11 +121,10 @@ extension SignerDataModel {
     func proposeDerive() {
         self.lastError = ""
         if self.selectedAddress == nil {
-            self.suggestedPath = "//"
+            self.suggestedPath = ""
         } else {
             self.suggestedPath = self.selectedAddress!.path
         }
-        self.suggestedName = String(cString: suggest_name(nil, self.suggestedPath))
     }
     
     /**
@@ -136,7 +135,7 @@ extension SignerDataModel {
         let err_ptr: UnsafeMutablePointer<ExternError> = UnsafeMutablePointer(&err)
         self.lastError = ""
         if self.selectedAddress == nil {  //this should be impossible but plug it anyway
-            self.suggestedPath = "//"
+            self.suggestedPath = ""
         } else {
             let res = suggest_n_plus_one(err_ptr, self.selectedAddress!.path, self.selectedSeed, self.selectedNetwork!.key, self.dbName)
             if err_ptr.pointee.code == 0 {
@@ -148,7 +147,6 @@ extension SignerDataModel {
                 signer_destroy_string(err_ptr.pointee.message)
             }
         }
-        self.suggestedName = String(cString: suggest_name(nil, self.suggestedPath))
     }
     
     /**
@@ -177,7 +175,7 @@ extension SignerDataModel {
             print("password was entered in path field")
             return
         }
-        try_create_identity(err_ptr, self.suggestedName, self.selectedSeed, self.getSeed(seedName: self.selectedSeed), "sr25519", fullPath, self.selectedNetwork!.key, res, self.dbName)
+        try_create_identity(err_ptr, self.selectedSeed, self.getSeed(seedName: self.selectedSeed), "sr25519", fullPath, self.selectedNetwork!.key, res, self.dbName)
         if err_ptr.pointee.code == 0 {
             print("Identity added!")
             self.fetchKeys()

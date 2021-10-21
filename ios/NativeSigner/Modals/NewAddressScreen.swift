@@ -50,7 +50,6 @@ struct NewAddressScreen: View {
                         .keyboardType(.asciiCapable)
                         .submitLabel(.done)
                         .onChange(of: data.suggestedPath) {path in
-                            data.suggestedName = String(cString:  suggest_name(nil, path)) //this function does not fail
                             data.lastError = ""
                         }
                         .focused($focusedField, equals: .path)

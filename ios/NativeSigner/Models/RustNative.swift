@@ -118,7 +118,7 @@ extension SignerDataModel {
      * Should be called once on factory-new state of the app
      * Populates database with starting values
      */
-    func onboard() {
+    func onboard(jailbreak: Bool = false) {
         var err = ExternError()
         let err_ptr: UnsafeMutablePointer<ExternError> = UnsafeMutablePointer(&err)
         do {
@@ -135,7 +135,11 @@ extension SignerDataModel {
                     }
                 }
                 try FileManager.default.copyItem(at: source, to: destination)
-                init_history_with_cert(err_ptr, self.dbName)
+                if jailbreak {
+                    init_history_no_cert(err_ptr, self.dbName)
+                } else {
+                    init_history_with_cert(err_ptr, self.dbName)
+                }
                 if (err_ptr.pointee.code == 0) {
                     self.onboardingDone = true
                     self.totalRefresh()
@@ -171,7 +175,13 @@ extension SignerDataModel {
         ] as CFDictionary
         SecItemDelete(query)
         self.onboardingDone = false
+        self.seedNames = []
         self.signerScreen = .keys
         self.keyManagerModal = .newSeed
+    }
+    
+    func jailbreak() {
+        self.wipe()
+        self.onboard(jailbreak: true)
     }
 }

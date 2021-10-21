@@ -11,7 +11,7 @@ struct TCAuthorPlain: View {
     var value: AuthorPlain
     var body: some View {
         HStack {
-            Image(uiImage: UIImage(data: Data(fromHexEncodedString: String(cString: development_test(nil, value.base58)))!)!)
+            Image(uiImage: UIImage(data: Data(fromHexEncodedString: String(cString: base58_identicon(nil, value.base58, 32)))!)!)
             Text("From: ")
                 .foregroundColor(Color("textMainColor"))
             Text(value.base58).foregroundColor(Color("textMainColor"))
