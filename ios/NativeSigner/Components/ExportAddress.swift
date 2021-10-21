@@ -9,7 +9,9 @@ import SwiftUI
 
 struct ExportAddress: View {
     @EnvironmentObject var data: SignerDataModel
+    @GestureState private var dragOffset = CGSize.zero
     @State var image: UIImage?
+    @State var showDetails = false
     var body: some View {
         ZStack {
             ModalBackdrop()
@@ -17,13 +19,26 @@ struct ExportAddress: View {
                 if data.selectedAddress != nil {
                     AddressCard(address: data.selectedAddress!)
                 }
-                if image != nil {
+                if image == nil || showDetails {
+                    HStack {
+                        Text("Base58 key: ")
+                        Text(data.selectedAddress?.ss58 ?? "unknown")
+                    }.padding()
+                    HStack {
+                        Text("Hex key: ")
+                        Text(data.selectedAddress?.public_key ?? "unknown")
+                    }.padding()
+                    HStack {
+                        Text("Seed name: ")
+                        Text(data.selectedAddress?.seed_name ?? "unknown")
+                    }.padding()
+                } else {
                     Image(uiImage: image!)
                         .resizable()
                         .aspectRatio(contentMode: .fit)
                 }
             }
-            .foregroundColor(/*@START_MENU_TOKEN@*/Color("textMainColor")/*@END_MENU_TOKEN@*/)
+            .foregroundColor(Color("textMainColor"))
         }
         .onAppear {
             data.lastError = ""
@@ -53,6 +68,14 @@ struct ExportAddress: View {
                         image = data.exportIdentityQR()
                     }
                 }
+        )
+        .gesture(
+            DragGesture().updating($dragOffset, body: {
+                (value, state, transaction) in
+                if value.translation.height > 300 {
+                    showDetails.toggle()
+                }
+            })
         )
     }
 }
