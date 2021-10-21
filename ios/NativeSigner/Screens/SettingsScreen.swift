@@ -71,6 +71,17 @@ struct SettingsScreen: View {
                     }
                     .padding()
                     Spacer()
+                    //TODO
+                    HStack {
+                        Image(uiImage: UIImage(data: Data(fromHexEncodedString: String(cString: identicon(nil, "", 32))) ?? Data()) ?? UIImage())
+                            .resizable(resizingMode: .stretch)
+                            .frame(width: 42, height: 42)
+                        VStack {
+                            Text("General verifier certificate").foregroundColor(Color("textMainColor"))
+                            Text("111").foregroundColor(Color("cryptoColor"))
+                            Text("encryption: " + "lol").foregroundColor(Color("textFadedColor"))
+                        }
+                    }
                 }
             }
             .background(/*@START_MENU_TOKEN@*//*@PLACEHOLDER=View@*/Color("backgroundColor")/*@END_MENU_TOKEN@*/)

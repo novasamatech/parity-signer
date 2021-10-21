@@ -286,6 +286,13 @@ export! {
         db_handling::manage_history::seed_name_was_shown(dbname, seed_name.to_string())
     }
 
+    @Java_io_parity_signer_models_SignerDataModel_dbGetGeneralVerifier
+	fn get_general_certificate(
+        dbname: &str
+    ) -> String {
+        return "{{\"hex\":\"ff\",\"encryption\":\"caesar\"}}".to_string()
+    }
+
     @Java_io_parity_signer_models_SignerDataModel_signerSignTypes
 	fn sign_load_types(
         public_key: &str,
@@ -327,6 +334,7 @@ export! {
             network, public_key, encryption, dbname, seed_phrase, password
         )
     }
+
     @Java_io_parity_signer_models_SignerDataModel_testGetAllTXCards
 	fn get_all_tx_cards() -> String {
         return transaction_parsing::test_all_cards::make_all_cards()
@@ -338,6 +346,8 @@ export! {
         //return transaction_parsing::test_all_cards::make_all_cards()
         return "not ready".to_string()
     }
+
+
 }
 
 ffi_support::define_string_destructor!(signer_destroy_string);

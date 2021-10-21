@@ -145,6 +145,8 @@ void history_entry_system(struct ExternError*, const char* entry, const char* db
 // Call on seed backup
 void seed_name_was_shown(struct ExternError*, const char* seed_name, const char* dbname);
 
+const char * get_general_certificate(struct ExternError*, const char* dbname);
+
 //Functions for self-signed upgrades
 const char * sign_load_types(struct ExternError*, const char* public_key, const char* encryption, const char* seed_phrase, const char* password, const char* dbname);
 

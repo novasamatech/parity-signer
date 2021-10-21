@@ -101,7 +101,7 @@ enum Event: Decodable, Hashable, Equatable {
     }
 }
 
-struct currentVerifier: Decodable, Hashable {
+struct CurrentVerifier: Decodable, Hashable {
     var type: String
     var details: Verifier
 }
@@ -127,7 +127,7 @@ struct NetworkDisplay: Decodable, Hashable {
     var secondary_color: String
     var title: String
     var unit: String
-    var current_verifier: currentVerifier
+    var current_verifier: CurrentVerifier
 }
 
 struct NetworkSigned: Decodable, Hashable {

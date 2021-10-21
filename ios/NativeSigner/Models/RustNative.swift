@@ -22,7 +22,7 @@ class SignerDataModel: ObservableObject {
     @Published var onboardingDone: Bool = false
     @Published var lastError: String = ""
     @Published var networkSettings: NetworkSettings?
-    @Published var alert: Bool = false
+    @Published var generalVerifier: Verifier?
     
     //Key manager state
     @Published var selectedSeed: String = ""
@@ -65,6 +65,7 @@ class SignerDataModel: ObservableObject {
     @Published var canaryDead: Bool = false
     let monitor = NWPathMonitor()
     let queue = DispatchQueue.global(qos: .background)
+    @Published var alert: Bool = false
     
     init() {
         self.dbName = NSHomeDirectory() + "/Documents/Database"
@@ -129,6 +130,7 @@ class SignerDataModel: ObservableObject {
             print("No networks found; not handled yet")
         }
         self.getHistory()
+        self.getGeneralVerifier()
         resetTransaction()
         self.refreshUI()
     }
@@ -214,8 +216,22 @@ extension SignerDataModel {
         self.onboard(jailbreak: true)
     }
     
-
-
-    
+    func getGeneralVerifier() {
+        var err = ExternError()
+        let err_ptr: UnsafeMutablePointer<ExternError> = UnsafeMutablePointer(&err)
+        let res = get_general_certificate(err_ptr, dbName)
+        if (err_ptr.pointee.code == 0) {
+            if let generalCert = String(cString: res!).data(using: .utf8) {
+                self.generalVerifier = try? JSONDecoder().decode(Verifier.self, from: generalCert)
+            } else {
+                print("General verifier corrupted")
+            }
+            signer_destroy_string(res!)
+        } else {
+            print("General verifier fetch failed")
+            print(String(cString: err_ptr.pointee.message))
+            signer_destroy_string(err_ptr.pointee.message)
+        }
+    }
 }
 
