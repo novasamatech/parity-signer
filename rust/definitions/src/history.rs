@@ -231,7 +231,7 @@ impl Event {
             Event::NetworkSpecsAdded(x) => format!("{{\"event\":\"network_specs_added\",\"payload\":{{{}}}}}", x.show()),
             Event::NetworkSpecsRemoved(x) => format!("{{\"event\":\"network_removed\",\"payload\":{{{}}}}}", x.show()),
             Event::NetworkVerifierSet(x) => format!("{{\"event\":\"network_verifier_set\",\"payload\":{{{}}}}}", x.show()),
-            Event::GeneralVerifierSet(x) => format!("{{\"event\":\"general_verifier_added\",\"payload\":{{\"verifier\":{}}}}}", x.show_card()),
+            Event::GeneralVerifierSet(x) => format!("{{\"event\":\"general_verifier_added\",\"payload\":{}}}", x.show_card()),
             Event::TypesAdded(x) => format!("{{\"event\":\"types_added\",\"payload\":{{{}}}}}", x.show()),
             Event::TypesRemoved(x) => format!("{{\"event\":\"types_removed\",\"payload\":{{{}}}}}", x.show()),
             Event::SignedTypes(x) => format!("{{\"event\":\"load_types_message_signed\",\"payload\":{{{}}}}}", x.show_export()),
