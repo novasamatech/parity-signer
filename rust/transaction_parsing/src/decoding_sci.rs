@@ -490,6 +490,7 @@ fn decode_type_def_variant (found_ty: &TypeDefVariant<PortableForm>, mut data: V
 
 
 fn process_fields (fields: &[Field<PortableForm>], compact_flag: bool, mut data: Vec<u8>, meta_v14: &RuntimeMetadataV14, index: &mut u32, indent: u32, chain_specs: &ChainSpecs) -> Result<DecodedOut, Error> {
+    let mut indent_skipped = false;
     let mut fancy_out = String::new();
     for (i, x) in fields.iter().enumerate() {
         let mut balance_flag = false;
@@ -513,9 +514,14 @@ fn process_fields (fields: &[Field<PortableForm>], compact_flag: bool, mut data:
                     let fancy_out_prep = format!(",{}", (Card::FieldNumber{number: i, docs_field_number: &field_docs, path_type: &path_type, docs_type: &docs_type}).card(index, indent));
                     fancy_out.push_str(&fancy_out_prep);
                 }
+                else {indent_skipped = true;}
             },
         }
-        let after_run = decoding_sci_complete(&inner_type, compact_flag, balance_flag, data, meta_v14, index, indent+1, chain_specs)?;
+        let indent = {
+            if indent_skipped {indent}
+            else {indent+1}
+        };
+        let after_run = decoding_sci_complete(&inner_type, compact_flag, balance_flag, data, meta_v14, index, indent, chain_specs)?;
         fancy_out.push_str(&after_run.fancy_out);
         data = after_run.remaining_vector;
     }
