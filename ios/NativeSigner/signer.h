@@ -40,13 +40,13 @@ const char * try_decode_qr_sequence(struct ExternError*, const char* data, int8_
 // takes 2 strings:
 // transaction, dbname (from OS)
 // Returns decoded payload as serialized payload cards contents with following structure (JSON):
-// {author:[...], warning:[...], error:[...], method:[...], extrinsic:[...]}
+// {"author":[...],"warning":[...],"error":[...],"method":[...],"extrinsic":[...],"new_specs":[...],"verifier":[...],"types_info":[...],"action":{"type":"...","payload":"..."}}
 // Each card has following fields:
 // index - to sort cards on screen, use as key in flatlist env
 // indent - indentation to visualize cards hierarchy
 // type - type of card
 // payload - contents of card
-// In addition to these cards, an action object is produced that should be passed to handle_action function
+// In addition to these cards, an action object is produced; it's payload is a checksum that should be passed to executing function
 // This function does not perform crypto operations and does not produce any side-effects
 // other than formation of "action" record in db that could be used by handle_action function
 const char * parse_transaction(struct ExternError*, const char* transaction, const char* dbname);
@@ -68,10 +68,6 @@ const char * handle_stub(struct ExternError*, const char* checksum, const char* 
 // dbname (from OS)
 // Returns QR payload string or plaintext statement of action result
 const char * handle_sign(struct ExternError*, const char* checksum, const char* seed_phrase, const char* password, const char* user_comment, const char* dbname);
-
-// Self descriptive: development test for channel
-// TODO: remove for safety
-const char * development_test(struct ExternError*, const char* input);
 
 // Generate identicon from base58 address
 const char * base58_identicon(struct ExternError*, const char* base58, int size);
@@ -101,10 +97,7 @@ const char * suggest_n_plus_one(struct ExternError*, const char* path, const cha
 int8_t check_path(struct ExternError*, const char* path);
 
 // Function to create new address
-void try_create_identity(struct ExternError*, const char* id_name, const char* seed_name, const char* seed_phrase, const char* crypto, const char* path, const char* network, int8_t has_password, const char* dbname);
-
-// Suggest convenient name for new identity created
-const char * suggest_name(struct ExternError*, const char* path);
+void try_create_identity(struct ExternError*, const char* seed_name, const char* seed_phrase, const char* crypto, const char* path, const char* network, int8_t has_password, const char* dbname);
 
 // Delete identity (really removes network from allowed networks list and trims identities with no networks)
 void delete_identity(struct ExternError*, const char* pub_key, const char* network, const char* dbname);
@@ -125,9 +118,8 @@ void remove_seed(struct ExternError*, const char* seed_name, const char* dbname)
 // Fetch history for display
 const char * print_history(struct ExternError*, const char* dbname);
 
-/*
 // Clear history (marks history with clearing event time)
-void clear_history(struct ExternError*, const char* dbname);*/
+void clear_history(struct ExternError*, const char* dbname);
 
 // Init history - should be called after db copy from resources, marks signer factory reset event, installs general verifier
 void init_history_with_cert(struct ExternError*, const char* dbname);
@@ -160,3 +152,7 @@ const char * sign_load_metadata(struct ExternError*, const char* network, const 
 
 const char * sign_load_specs(struct ExternError*, const char* network, const char* public_key, const char* encryption, const char* seed_phrase, const char* password, const char* dbname);
 
+// FFI tests
+const char * get_all_tx_cards(struct ExternError*);
+
+const char * get_all_log_cards(struct ExternError*);

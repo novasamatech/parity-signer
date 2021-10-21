@@ -79,15 +79,6 @@ export! {
         transaction_signing::handle_sign(checksum, seed_phrase, password, user_comment, dbname)
     }
 
-    @Java_io_parity_signer_models_SignerDataModel_substrateDevelopmentTest
-	fn development_test(
-		input: &str
-	) -> anyhow::Result<String, anyhow::Error> {
-        //let output = Ok(std::env::consts::OS.to_string());
-        let picture = plot_icon::png_data_from_base58(input, 32)?;
-        Ok(hex::encode(picture))
-    }
-
     @Java_io_parity_signer_models_SignerDataModel_substrateBase58Identicon
 	fn base58_identicon(
 		base58: &str,
@@ -168,7 +159,6 @@ export! {
 
     @Java_io_parity_signer_models_SignerDataModel_substrateTryCreateIdentity
 	fn try_create_identity(
-        id_name: &str,
         seed_name: &str,
         seed_phrase: &str,
         crypto: &str,
@@ -177,14 +167,7 @@ export! {
         has_password: bool,
 		dbname: &str
 	) -> anyhow::Result<(), anyhow::Error> {
-        db_handling::identities::try_create_address(id_name, seed_name, seed_phrase, crypto, path, network, has_password, dbname)
-    }
-
-    @Java_io_parity_signer_models_SignerDataModel_substrateSuggestName
-	fn suggest_name(
-        path: &str
-	) -> String {
-        db_handling::identities::suggest_path_name(path)
+        db_handling::identities::try_create_address("", seed_name, seed_phrase, crypto, path, network, has_password, dbname)
     }
 
     @Java_io_parity_signer_models_SignerDataModel_substrateDeleteIdentity
@@ -344,7 +327,17 @@ export! {
             network, public_key, encryption, dbname, seed_phrase, password
         )
     }
+    @Java_io_parity_signer_models_SignerDataModel_testGetAllTXCards
+	fn get_all_tx_cards() -> String {
+        return transaction_parsing::test_all_cards::make_all_cards()
+    }
 
+    @Java_io_parity_signer_models_SignerDataModel_testGetAllLogCards
+	fn get_all_log_cards() -> String {
+        //TODO
+        //return transaction_parsing::test_all_cards::make_all_cards()
+        return "not ready".to_string()
+    }
 }
 
 ffi_support::define_string_destructor!(signer_destroy_string);
