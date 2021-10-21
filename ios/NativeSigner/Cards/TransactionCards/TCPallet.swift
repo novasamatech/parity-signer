@@ -8,14 +8,31 @@
 import SwiftUI
 
 struct TCPallet: View {
-    let text: String
+    let value: Pallet
+    @State private var showDoc = false
     var body: some View {
-        HStack {
-            Text(text)
-                .foregroundColor(Color("AccentColor"))
-            Spacer()
+        Button (action: {
+            self.showDoc.toggle()
+        }) {
+            VStack {
+                HStack {
+                    Text("Pallet").foregroundColor(Color("AccentColor"))
+                    Text(value.pallet_name)
+                        .foregroundColor(Color("textMainColor"))
+                    Spacer()
+                    Text("?")
+                        .foregroundColor(Color("AccentColor"))
+                }
+                if showDoc {
+                    VStack {
+                        Text("Path: " + value.path).foregroundColor(Color("textMainColor"))
+                        Text(AttributedString(fromHexDocs: value.docs) ?? "docs parsing error in iOS, please refer to other sources")
+                        .foregroundColor(Color("textMainColor"))
+                        .background(/*@START_MENU_TOKEN@*//*@PLACEHOLDER=View@*/Color("backgroundCard")/*@END_MENU_TOKEN@*/)
+                    }
+                }
+            }
         }
-        .background(/*@START_MENU_TOKEN@*//*@PLACEHOLDER=View@*/Color("backgroundCard")/*@END_MENU_TOKEN@*/)
     }
 }
 

@@ -47,19 +47,12 @@ struct TransactionCardSelector: View {
         case .meta(let value):
             Text(String(describing: value))
                 .foregroundColor(Color("textMainColor"))
-        case .newNetwork(let value):
-            Text(String(describing: value))
-                .foregroundColor(Color("textMainColor"))
         case .newSpecs(_):
             Text("newspecsstub")
         case .none:
             EmptyView()
-        case .pallet(let text):
-            TCPallet(text: text)
-        case .pathDocs(let value):
-            TCPathDocs(value: value)
-        case .range(let value):
-            TCTXRange(value: value)
+        case .pallet(let value):
+            TCPallet(value: value)
         case .tip(let value):
             TCTip(value: value)
         case .tipPlain(let text):

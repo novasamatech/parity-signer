@@ -26,12 +26,9 @@ enum Card {
     case id(String)
     case identityField(String)
     case meta(MetaSpecs)
-    case newNetwork(NewNetwork)
     case newSpecs(NewSpecs)
     case none
-    case pallet(String)
-    case pathDocs(PathDocs)
-    case range(TxRange)
+    case pallet(Pallet)
     case tip(Currency)
     case tipPlain(String)
     case txSpec(TxSpec)
@@ -72,7 +69,7 @@ struct Currency: Decodable {
 
 struct EnumVariantName: Decodable {
     var name: String
-    var docs: String
+    var docs_enum_variant: String
 }
 
 //TODO: manual decoders for these two
@@ -90,35 +87,22 @@ struct EraMortalNonce: Decodable {
 
 struct FieldName: Decodable {
     var name: String
-    var docs: String
+    var docs_field_name: String
+    var path_type: String
+    var docs_type: String
 }
 
 struct FieldNumber: Decodable {
     var number: String
-    var docs: String
+    var docs_field_number: String
+    var path_type: String
+    var docs_type: String
 }
 
 struct MetaSpecs: Decodable, Hashable {
     var specname: String
     var spec_version: String
     var meta_hash: String
-}
-
-struct NewNetwork: Decodable, Hashable {
-    var specname: String
-    var spec_version: String
-    var meta_hash: String
-    var base58prefix: String
-    var color: String
-    var decimals: String
-    var genesis_hash: String
-    var logo: String
-    var name: String
-    var path_id: String
-    var secondary_colod: String
-    var title: String
-    var unit: String
-    var verifier: Verifier
 }
 
 struct NewSpecs: Decodable, Hashable {
@@ -135,15 +119,10 @@ struct NewSpecs: Decodable, Hashable {
     var unit: String
 }
 
-struct PathDocs: Decodable {
-    var path: [String]
+struct Pallet: Decodable {
+    var pallet_name: String
+    var path: String
     var docs: String
-}
-
-struct TxRange: Decodable {
-    var start: String
-    var end: String
-    var inclusive: String
 }
 
 struct Tip: Decodable {
@@ -161,10 +140,6 @@ struct TxSpecPlain: Decodable {
     var network_genesis_hash: String
     var version: String
     var tx_version: String
-}
-
-struct VerifierWrap: Decodable, Hashable {
-    var verifier: Verifier
 }
 
 struct Verifier: Decodable, Hashable {
@@ -226,19 +201,14 @@ struct TransactionCard: Decodable {
         case "meta":
             card = .meta(try values.decode(MetaSpecs.self, forKey: .payload))
             return
-        case "new_network":
-            card = .newNetwork(try values.decode(NewNetwork.self, forKey: .payload))
-            return
         case "new_specs":
             card = .newSpecs(try values.decode(NewSpecs.self, forKey: .payload))
             return
         case "none":
             card = .none
-        case "path_and_docs":
-            card = .pathDocs(try values.decode(PathDocs.self, forKey: .payload))
             return
-        case "range":
-            card = .range(try values.decode(TxRange.self, forKey: .payload))
+        case "pallet":
+            card = .pallet(try values.decode(Pallet.self, forKey: .payload))
             return
         case "tip":
             card = .tip(try values.decode(Currency.self, forKey: .payload))
@@ -270,8 +240,6 @@ struct TransactionCard: Decodable {
             card = .id(content)
         case "identity_field":
             card = .identityField(content)
-        case "pallet":
-            card = .pallet(content)
         case "tip_plain":
             card = .tipPlain(content)
         case "types_hash":

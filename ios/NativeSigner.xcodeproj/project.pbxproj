@@ -12,8 +12,6 @@
 		2D0D5E7E26F0B1D900B0EF9D /* DeleteKeyConfirm.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D0D5E7D26F0B1D900B0EF9D /* DeleteKeyConfirm.swift */; };
 		2D0D5E8026F0CFB100B0EF9D /* TCFieldName.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D0D5E7F26F0CFB100B0EF9D /* TCFieldName.swift */; };
 		2D0D5E8226F0CFEB00B0EF9D /* TCFieldNumber.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D0D5E8126F0CFEB00B0EF9D /* TCFieldNumber.swift */; };
-		2D0D5E8426F0D01800B0EF9D /* TCTXRange.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D0D5E8326F0D01800B0EF9D /* TCTXRange.swift */; };
-		2D0D5E8626F0D0CC00B0EF9D /* TCPathDocs.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D0D5E8526F0D0CC00B0EF9D /* TCPathDocs.swift */; };
 		2D72B4F626EF3BC50081E879 /* Navigator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D72B4F526EF3BC50081E879 /* Navigator.swift */; };
 		2D72B4F826EF427C0081E879 /* Header.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D72B4F726EF427C0081E879 /* Header.swift */; };
 		2D72B4FA26EF7D1C0081E879 /* Seeds.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D72B4F926EF7D1C0081E879 /* Seeds.swift */; };
@@ -120,8 +118,6 @@
 		2D0D5E7D26F0B1D900B0EF9D /* DeleteKeyConfirm.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeleteKeyConfirm.swift; sourceTree = "<group>"; };
 		2D0D5E7F26F0CFB100B0EF9D /* TCFieldName.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TCFieldName.swift; sourceTree = "<group>"; };
 		2D0D5E8126F0CFEB00B0EF9D /* TCFieldNumber.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TCFieldNumber.swift; sourceTree = "<group>"; };
-		2D0D5E8326F0D01800B0EF9D /* TCTXRange.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TCTXRange.swift; sourceTree = "<group>"; };
-		2D0D5E8526F0D0CC00B0EF9D /* TCPathDocs.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TCPathDocs.swift; sourceTree = "<group>"; };
 		2D72B4F526EF3BC50081E879 /* Navigator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Navigator.swift; sourceTree = "<group>"; };
 		2D72B4F726EF427C0081E879 /* Header.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Header.swift; sourceTree = "<group>"; };
 		2D72B4F926EF7D1C0081E879 /* Seeds.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Seeds.swift; sourceTree = "<group>"; };
@@ -324,7 +320,6 @@
 			isa = PBXGroup;
 			children = (
 				2D7A7C2326CBC3C70053C1E0 /* TCAuthorPublicKey.swift */,
-				2D0D5E8326F0D01800B0EF9D /* TCTXRange.swift */,
 				2D7A7C2126CBC3C70053C1E0 /* TCBalance.swift */,
 				2D7A7C2426CBC3C70053C1E0 /* TCCall.swift */,
 				2D7A7C2526CBC3C70053C1E0 /* TCEraImmortalNonce.swift */,
@@ -342,7 +337,6 @@
 				2D7A7C0726CA9BB00053C1E0 /* TCBlockHash.swift */,
 				2D0D5E7F26F0CFB100B0EF9D /* TCFieldName.swift */,
 				2D0D5E8126F0CFEB00B0EF9D /* TCFieldNumber.swift */,
-				2D0D5E8526F0D0CC00B0EF9D /* TCPathDocs.swift */,
 				2DB037B326FCB06A00A318B2 /* TCPallet.swift */,
 			);
 			path = TransactionCards;
@@ -638,12 +632,10 @@
 				2D7A7BA526AE9E680053C1E0 /* Footer.swift in Sources */,
 				2D7A7BDC26C2613F0053C1E0 /* TransactionCardView.swift in Sources */,
 				2DB037CD271843BF00A318B2 /* HeaderBar.swift in Sources */,
-				2D0D5E8626F0D0CC00B0EF9D /* TCPathDocs.swift in Sources */,
 				2D7A7BC026B97DB30053C1E0 /* Address.swift in Sources */,
 				2D0D5E7C26F0A4A300B0EF9D /* SeedBackup.swift in Sources */,
 				2D7A7C2926CBC3C70053C1E0 /* TCCall.swift in Sources */,
 				2D7A7BCA26BACFFB0053C1E0 /* QRView.swift in Sources */,
-				2D0D5E8426F0D01800B0EF9D /* TCTXRange.swift in Sources */,
 				2D7A7C2026CB99250053C1E0 /* TransactionCardSelector.swift in Sources */,
 				2D7A7BD026BBC72D0053C1E0 /* Transaction.swift in Sources */,
 				2D7A7C1826CB96C70053C1E0 /* TCError.swift in Sources */,
