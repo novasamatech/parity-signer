@@ -17,7 +17,7 @@ struct HistoryScreen: View {
                         VStack (alignment: .leading){
                             ForEach(history.events, id: \.self) {event in
                                 Button(action: {
-                                    data.selectedRecord = event
+                                    //data.selectedRecord = event
                                 }) {
                                     HistoryCard(event: event, timestamp: history.timestamp.padding(toLength: 16, withPad: " ", startingAt: 0))
                                         .foregroundColor(/*@START_MENU_TOKEN@*/Color("textMainColor")/*@END_MENU_TOKEN@*/)
