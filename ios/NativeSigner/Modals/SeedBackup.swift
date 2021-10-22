@@ -23,6 +23,7 @@ struct SeedBackup: View {
                         .foregroundColor(Color("cryptoColor"))
                         .padding(8)
                 }
+                Spacer()
             }
         }.onDisappear {
             data.seedBackup = ""

@@ -36,7 +36,7 @@ struct Header: View {
                 Button(action: {
                     data.keyManagerModal = .newSeed
                 }) {
-                    Image(systemName: "plus.square.on.square")
+                    Image(systemName: "plus.circle")
                         .imageScale(.large)
                 }
             }

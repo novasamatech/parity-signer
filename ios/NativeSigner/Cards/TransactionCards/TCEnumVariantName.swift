@@ -26,7 +26,7 @@ struct TCEnumVariantName: View {
                 }
                 .background(/*@START_MENU_TOKEN@*//*@PLACEHOLDER=View@*/Color("backgroundCard")/*@END_MENU_TOKEN@*/)
                 if showDoc {
-                    Text(AttributedString(fromHexDocs: value.docs_enum_variant) ?? "docs parsing error in iOS, please refer to other sources")
+                    Text(String(fromHexDocs: value.docs_enum_variant) ?? "docs parsing error in iOS, please refer to other sources")
                         .foregroundColor(Color("textMainColor"))
                         .background(/*@START_MENU_TOKEN@*//*@PLACEHOLDER=View@*/Color("backgroundCard")/*@END_MENU_TOKEN@*/)
                 }

@@ -27,10 +27,10 @@ struct TCFieldNumber: View {
             if showDoc {
                 VStack {
                     Text("Path: " + value.path_type)
-                    Text(AttributedString(fromHexDocs: value.docs_field_number) ?? "docs parsing error in iOS, please refer to other sources")
+                    Text(String(fromHexDocs: value.docs_field_number) ?? "docs parsing error in iOS, please refer to other sources")
                         .foregroundColor(Color("textMainColor"))
                         .background(/*@START_MENU_TOKEN@*//*@PLACEHOLDER=View@*/Color("backgroundCard")/*@END_MENU_TOKEN@*/)
-                    Text(AttributedString(fromHexDocs: value.docs_type) ?? "docs parsing error in iOS, please refer to other sources")
+                    Text(String(fromHexDocs: value.docs_type) ?? "docs parsing error in iOS, please refer to other sources")
                         .foregroundColor(Color("textMainColor"))
                         .background(/*@START_MENU_TOKEN@*//*@PLACEHOLDER=View@*/Color("backgroundCard")/*@END_MENU_TOKEN@*/)
                 }

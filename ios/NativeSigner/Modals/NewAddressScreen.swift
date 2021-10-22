@@ -18,7 +18,7 @@ struct NewAddressScreen: View {
     @EnvironmentObject var data: SignerDataModel
     @State private var password: String = ""
     @State private var passwordCheck: String = ""
-    @FocusState private var focusedField: Field?
+    //@FocusState private var focusedField: Field?
     
     var body: some View {
         ZStack {
@@ -42,17 +42,17 @@ struct NewAddressScreen: View {
                     Text("PATH").foregroundColor(Color("textMainColor")).font(.footnote)
                     ZStack {
                     RoundedRectangle(cornerRadius: 8).stroke(Color("AccentColor")).foregroundColor(Color("backgroundColor")).frame(height: 39)
-                    TextField("Path", text: $data.suggestedPath, prompt: Text("Path: //hard/soft"))
+                    TextField("Path", text: $data.suggestedPath/*, prompt: Text("Path: //hard/soft")*/)
                         .foregroundColor(Color("textEntryColor"))
                         .font(.system(size: 15, design: .monospaced))
                         .disableAutocorrection(true)
                         .autocapitalization(.none)
                         .keyboardType(.asciiCapable)
-                        .submitLabel(.done)
+                        //.submitLabel(.done)
                         .onChange(of: data.suggestedPath) {path in
                             data.lastError = ""
                         }
-                        .focused($focusedField, equals: .path)
+                        //.focused($focusedField, equals: .path)
                         .padding(8)
                     }
                 }
@@ -60,19 +60,19 @@ struct NewAddressScreen: View {
                     Text("OPTIONAL PASSWORD").foregroundColor(Color("textMainColor")).font(.footnote)
                     ZStack {
                         RoundedRectangle(cornerRadius: 8).stroke(Color("AccentColor")).foregroundColor(Color("backgroundColor")).frame(height: 39)
-                    TextField("Password", text: $password, prompt: Text("(optional)"))
+                    TextField("Password", text: $password/*, prompt: Text("(optional)")*/)
                         .foregroundColor(Color("textEntryColor"))
                         .font(.system(size: 15, design: .monospaced))
                         .disableAutocorrection(true)
                         .autocapitalization(.none)
                         .keyboardType(.asciiCapable)
-                        .submitLabel(.next)
+                        //.submitLabel(.next)
                         .onChange(of: data.suggestedName, perform: {_ in data.lastError = ""
                         })
-                        .focused($focusedField, equals: .password)
-                        .onSubmit({if password != "" {
-                            focusedField = .passwordCheck
-                        }})
+                        //.focused($focusedField, equals: .password)
+                        //.onSubmit({if password != "" {
+                        //    focusedField = .passwordCheck
+                        //}})
                         .padding(8)
                     }
                 }
@@ -81,16 +81,16 @@ struct NewAddressScreen: View {
                         Text("REPEAT PASSWORD").foregroundColor(Color("textMainColor")).font(.footnote)
                         ZStack {
                             RoundedRectangle(cornerRadius: 8).stroke(Color("AccentColor")).foregroundColor(Color("backgroundColor")).frame(height: 39)
-                        TextField("Repeat", text: $passwordCheck, prompt: Text("password"))
+                        TextField("Repeat", text: $passwordCheck/*, prompt: Text("password")*/)
                             .foregroundColor(Color("textEntryColor"))
                             .font(.system(size: 15, design: .monospaced))
                             .disableAutocorrection(true)
                             .autocapitalization(.none)
                             .keyboardType(.asciiCapable)
-                            .submitLabel(.done)
+                            //.submitLabel(.done)
                             .onChange(of: data.suggestedName, perform: {_ in data.lastError = ""
                             })
-                            .focused($focusedField, equals: .passwordCheck)
+                            //.focused($focusedField, equals: .passwordCheck)
                             .padding(8)
                         }
                     }}
@@ -110,7 +110,7 @@ struct NewAddressScreen: View {
         }
         .onAppear {
             data.lastError = ""
-            focusedField = .path
+            //focusedField = .path
         }
         .background(/*@START_MENU_TOKEN@*//*@PLACEHOLDER=View@*/Color("backgroundColor")/*@END_MENU_TOKEN@*/)
     }

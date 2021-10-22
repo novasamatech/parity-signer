@@ -26,7 +26,7 @@ struct TCPallet: View {
                 if showDoc {
                     VStack {
                         Text("Path: " + value.path).foregroundColor(Color("textMainColor"))
-                        Text(AttributedString(fromHexDocs: value.docs) ?? "docs parsing error in iOS, please refer to other sources")
+                        Text(String(fromHexDocs: value.docs) ?? "docs parsing error in iOS, please refer to other sources")
                         .foregroundColor(Color("textMainColor"))
                         .background(/*@START_MENU_TOKEN@*//*@PLACEHOLDER=View@*/Color("backgroundCard")/*@END_MENU_TOKEN@*/)
                     }

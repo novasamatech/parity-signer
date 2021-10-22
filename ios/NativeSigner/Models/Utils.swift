@@ -40,9 +40,9 @@ extension Data {
     }
 }
 
-extension AttributedString {
+extension String {
     init?(fromHexDocs string: String) {
-        try? self.init(markdown: Data(fromHexEncodedString: string) ?? Data(), options: AttributedString.MarkdownParsingOptions(interpretedSyntax: .inlineOnlyPreservingWhitespace, failurePolicy: .returnPartiallyParsedIfPossible))
+        self.init(decoding: (Data(fromHexEncodedString: string) ?? Data()), as: UTF8.self)
     }
 }
 

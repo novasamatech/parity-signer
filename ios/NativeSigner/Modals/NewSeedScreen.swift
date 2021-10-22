@@ -13,7 +13,7 @@ struct NewSeedScreen: View {
     @State private var seedName: String = ""
     @State private var seedPhrase: String = ""
     @State private var recover: Bool = false
-    @FocusState private var nameFocused: Bool
+    //@FocusState private var nameFocused: Bool
     
     init() {
         UITextView.appearance().backgroundColor = .clear
@@ -28,18 +28,18 @@ struct NewSeedScreen: View {
                     Text("DISPLAY NAME").font(.callout)
                     ZStack {
                         RoundedRectangle(cornerRadius: 8).stroke(Color("AccentColor")).foregroundColor(Color("backgroundColor")).frame(height: 39)
-                    TextField("Seed", text: $seedName, prompt: Text("Seed name"))
+                    TextField("Seed", text: $seedName/*, prompt: Text("Seed name")*/)
                         .foregroundColor(Color("textEntryColor"))
                         .background(Color("backgroundColor"))
                         .font(.system(size: 16, weight: .regular))
                         .disableAutocorrection(true)
                         .keyboardType(.asciiCapable)
-                        .submitLabel(.done)
+                        //.submitLabel(.done)
                         .onChange(of: seedName, perform: { _ in
                             data.lastError = ""
                         })
-                        .onAppear(perform: {nameFocused = true})
-                        .focused($nameFocused)
+                        //.onAppear(perform: {nameFocused = true})
+                        //.focused($nameFocused)
                         .padding(.horizontal, 8)
                     }
                     Text("Display name visible only to you").font(.callout)
@@ -56,7 +56,7 @@ struct NewSeedScreen: View {
                                 .onChange(of: seedPhrase, perform: { _ in
                                     if seedPhrase.contains("\n") {
                                         seedPhrase = seedPhrase.replacingOccurrences(of: "\n", with: "")
-                                        nameFocused = true
+                                        //nameFocused = true
                                     }
                                 })
                             .autocapitalization(.none)

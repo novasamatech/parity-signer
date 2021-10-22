@@ -11,7 +11,7 @@ struct TransactionReady: View {
     @EnvironmentObject var data: SignerDataModel
     @State var seedPhrase: String = ""
     @State var password: String = ""
-    @FocusState private var passwordFocus: Bool
+    //@FocusState private var passwordFocus: Bool
     var body: some View {
         ZStack {
             VStack {
@@ -47,18 +47,17 @@ struct TransactionReady: View {
                     Text("Enter password")
                         .font(.body)
                         .foregroundColor(Color("textMainColor"))
-                    TextField("Password", text: $password, prompt: Text("(optional)"))
+                    TextField("Password", text: $password/*, prompt: Text("(optional)")*/) {data.signTransaction(seedPhrase: seedPhrase, password: password)}
                         .foregroundColor(Color("textEntryColor"))
                         .background(Color("textFieldColor"))
                         .font(.largeTitle)
                         .disableAutocorrection(true)
                         .autocapitalization(.none)
                         .keyboardType(.asciiCapable)
-                        .submitLabel(.next)
+                        //.submitLabel(.next)
                         .onChange(of: data.suggestedName, perform: {_ in data.lastError = ""
                         })
-                        .focused($passwordFocus)
-                        .onSubmit({data.signTransaction(seedPhrase: seedPhrase, password: password)})
+                        //.focused($passwordFocus)
                         .border(Color("AccentColor"), width: 1)
                     Spacer()
                     HStack {
@@ -87,7 +86,7 @@ struct TransactionReady: View {
             if data.author?.has_password == false {
                 data.signTransaction(seedPhrase: seedPhrase, password: password)
             } else {
-                passwordFocus = true
+                //passwordFocus = true
             }
         }
         .onDisappear {
