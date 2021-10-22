@@ -77,6 +77,8 @@ extension SignerDataModel {
                 self.keyManagerModal = .seedSelector
             case .newSeed:
                 self.keyManagerModal = .seedSelector
+            case .seedBackup:
+                self.keyManagerModal = .seedSelector
             default:
                 self.keyManagerModal = .none
             }
@@ -116,6 +118,10 @@ extension SignerDataModel {
                 return "Select Seed"
             case .newKey:
                 return "New Derived Key"
+            case .showKey:
+                return (self.selectedAddress?.isRoot() ?? false) ? "Seed Key" : "Derived Key"
+            case .seedBackup:
+                return "Backup seed"
             default:
                 return ""
             }

@@ -36,7 +36,7 @@ struct NetworkManager: View {
                                             Button(action: {
                                                 data.keyManagerModal = .networkDetails
                                             }) {
-                                                Image(systemName: "eye").imageScale(.large)
+                                                Image(systemName: "ellipsis.circle").imageScale(.large)
                                             }
                                             Button(action: {
                                                 deleteConfirm = true

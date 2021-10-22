@@ -15,10 +15,10 @@ struct AddressCard: View {
     @EnvironmentObject var data: SignerDataModel
     var address: Address
     @GestureState private var dragOffset = CGSize.zero
-    let rowHeight: CGFloat = 42
+    let rowHeight: CGFloat = 28
     var body: some View {
         ZStack {
-            RoundedRectangle(cornerRadius: 4).foregroundColor(Color(data.selectedAddress == address ? "backgroundActive" : "backgroundCard")).frame(height: 60)
+            RoundedRectangle(cornerRadius: 4).foregroundColor(Color(data.selectedAddress == address ? "backgroundActive" : "backgroundCard")).frame(height: 44)
             HStack {
                 Image(uiImage: UIImage(data: Data(fromHexEncodedString: String(cString: base58_identicon(nil, address.ss58, 32))) ?? Data()) ?? UIImage())
                     .resizable(resizingMode: .stretch)
@@ -28,57 +28,69 @@ struct AddressCard: View {
                         if address.isRoot() {
                             Text(address.seed_name)
                                 .foregroundColor(Color("textMainColor"))
-                                .font(.headline)
                         } else {
                             Text(address.path)
                                 .foregroundColor(Color("cryptoColor"))
-                                .font(.headline)
                         }
                         if address.has_password == "true" {
                             Image(systemName: "lock")
                                 .foregroundColor(Color("AccentColor"))
                         }
-                    }
-                    Text((data.selectedAddress == address && data.keyManagerModal == .none) ? address.truncateBase58to8() : address.truncateBase58())
-                        .font(.headline)
+                    }.font(.system(size: 12, weight: .semibold, design: .monospaced))
+                    //Here we could have shortened base58 address when buttons are shown, but we don't need to
+                    Text((data.selectedAddress == address && data.keyManagerModal == .none) ? address.truncateBase58() : address.truncateBase58())
                         .foregroundColor(Color("textFadedColor"))
+                        .font(.system(size: 12, design: .monospaced))
                 }
                 Spacer()
                 if data.keyManagerModal == .none {
-                    AddressCardControls(address: address, rowHeight: rowHeight)
+                    AddressCardControls(address: address, rowHeight: rowHeight+11)
                 }
                 if (data.keyManagerModal == .showKey && data.getMultiSelectionMode()) {
                     Text(String((data.multiSelected.firstIndex(of: address) ?? -1) + 1) + "/" + String(data.multiSelected.count))
                 }
-            }.padding(8)
+            }.padding(.horizontal, 8)
         }
         .gesture(
             TapGesture()
                 .onEnded { _ in
-                    if data.getMultiSelectionMode() {
-                        data.multiSelectAction(address: address)
+                    if data.keyManagerModal == .showKey {
+                        //we can do something here
                     } else {
-                        if address.isRoot() {
-                            data.selectSeed(seedName: address.seed_name)
+                        if data.getMultiSelectionMode() {
+                            data.multiSelectAction(address: address)
                         } else {
-                            data.selectedAddress = address
-                            data.keyManagerModal = .showKey
+                            if address.isRoot() {
+                                data.selectSeed(seedName: address.seed_name)
+                            } else {
+                                data.selectedAddress = address
+                                data.keyManagerModal = .showKey
+                            }
                         }
                     }
                 })
         .gesture(
             LongPressGesture()
                 .onEnded { _ in
-                    data.multiSelectAction(address: address)})
+                    if data.keyManagerModal == .showKey {
+                        //we can do something here
+                    } else {
+                        data.multiSelectAction(address: address)
+                    }
+                })
         .gesture(
             DragGesture()
                 .updating($dragOffset, body: { (value, state, transaction) in
-                    if value.translation.width < -20 {
-                        data.multiSelected = []
-                        data.selectedAddress = address
-                    }
-                    if value.translation.width > 20 {
-                        data.selectedAddress = nil
+                    if data.keyManagerModal == .showKey {
+                        //we can do something here
+                    } else {
+                        if value.translation.width < -20 {
+                            data.multiSelected = []
+                            data.selectedAddress = address
+                        }
+                        if value.translation.width > 20 {
+                            data.selectedAddress = nil
+                        }
                     }
                 })
         )

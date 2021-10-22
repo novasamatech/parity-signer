@@ -40,7 +40,9 @@ struct MainScreenContainer: View {
                 if (data.transactionState == .none
                     && !(data.signerScreen == .keys && (data.keyManagerModal == .networkManager
                                                         || data.keyManagerModal == .newSeed
-                                                        || data.keyManagerModal == .newKey)
+                                                        || data.keyManagerModal == .newKey
+                                                        || data.keyManagerModal == .seedBackup
+                                                       )
                         )){
                     FooterBlock()
                         .padding(.horizontal)

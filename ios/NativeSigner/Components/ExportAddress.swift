@@ -16,6 +16,7 @@ struct ExportAddress: View {
         ZStack {
             ModalBackdrop()
             VStack {
+                NetworkCard(network: data.selectedNetwork)
                 if data.selectedAddress != nil {
                     AddressCard(address: data.selectedAddress!)
                 }
@@ -50,29 +51,19 @@ struct ExportAddress: View {
             data.selectedAddress = nil
         }
         .gesture(
-            TapGesture()
-                .onEnded {
-                    print("tap")
-                    data.selectNextAddress()
-                    if data.selectedAddress != nil {
-                        image = data.exportIdentityQR()
-                    }
-                }
-        )
-        .gesture(
-            LongPressGesture()
-                .onEnded { _ in
-                    print("ltap")
-                    data.selectPreviousAddress()
-                    if data.selectedAddress != nil {
-                        image = data.exportIdentityQR()
-                    }
-                }
-        )
-        .gesture(
             DragGesture().onEnded {drag in
-                if drag.translation.height > 200 {
+                if abs(drag.translation.height) > 200 {
                     showDetails.toggle()
+                } else {
+                    if drag.translation.width > 20 {
+                        data.selectNextAddress()
+                    }
+                    if drag.translation.width < -20 {
+                        data.selectPreviousAddress()
+                    }
+                    if data.selectedAddress != nil {
+                        image = data.exportIdentityQR()
+                    }
                 }
             }
         )

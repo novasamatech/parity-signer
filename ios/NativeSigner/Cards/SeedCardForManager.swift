@@ -12,21 +12,21 @@ struct SeedCardForManager: View {
     var seedName: String
     var body: some View {
         ZStack {
-            RoundedRectangle(cornerRadius: 4).foregroundColor(Color("backgroundCard")).frame(height: 60)
+            RoundedRectangle(cornerRadius: 4).foregroundColor(Color("backgroundCard")).frame(height: 44)
             HStack {
                 Image(uiImage: data.getRootIdenticon(seedName: seedName))
                     .resizable(resizingMode: .stretch)
-                    .frame(width: 42, height: 42)
+                    .frame(width: 28, height: 28)
                 
                 if seedName == "" {
                     Text("Select seed")
                         .foregroundColor(Color("textMainColor"))
-                        .font(.largeTitle)
+                        .font(.title2)
                 } else {
                     VStack (alignment: .leading) {
                         Text(seedName)
                             .foregroundColor(Color("textMainColor"))
-                            .font(.headline)
+                            .font(.callout)
                     }
                 }
                 Spacer()

@@ -12,23 +12,23 @@ struct SeedCard: View {
     var seedName: String
     var body: some View {
         ZStack {
-            RoundedRectangle(cornerRadius: 4).foregroundColor(Color("backgroundCard")).frame(height: 60)
+            RoundedRectangle(cornerRadius: 4).foregroundColor(Color("backgroundCard")).frame(height: 44)
             HStack {
                 Image(uiImage: data.getRootIdenticon(seedName: seedName))
                     .resizable(resizingMode: .stretch)
-                    .frame(width: 42, height: 42)
+                    .frame(width: 28, height: 28)
                 
-                if seedName == "" {
+                if seedName == "" { //should never happen but just in case
                     Text("Select seed")
                         .foregroundColor(Color("textMainColor"))
-                        .font(.largeTitle)
+                        .font(.title2)
                 } else {
                     VStack (alignment: .leading) {
                         Text(seedName)
                             .foregroundColor(Color("textMainColor"))
-                            .font(.headline)
+                            .font(.callout)
                         Text(data.getRootTruncated(seedName: seedName))
-                            .font(.headline)
+                            .font(.system(size: 12, design: .monospaced))
                             .foregroundColor(Color("textFadedColor"))
                     }
                 }
@@ -37,9 +37,9 @@ struct SeedCard: View {
                 if data.getMultiSelectionMode() {
                     if let rootAddress = data.getRootAddress(seedName: seedName) {
                         if data.multiSelected.contains(rootAddress) {
-                            Image(systemName: "checkmark.circle.fill").foregroundColor(Color("AccentColor")).imageScale(.large)
+                            Image(systemName: "checkmark.circle.fill").foregroundColor(Color("AccentColor")).imageScale(.medium)
                         } else {
-                            Image(systemName: "circle").foregroundColor(Color("textFadedColor")).imageScale(.large)
+                            Image(systemName: "circle").foregroundColor(Color("textFadedColor")).imageScale(.medium)
                         }
                     }
                 }

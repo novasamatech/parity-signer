@@ -10,7 +10,7 @@ import SwiftUI
 struct KeySymbol: View {
     var body: some View {
         VStack{
-            Image(systemName: "key").imageScale(.medium)
+            Image(systemName: "circle.hexagongrid.fill").imageScale(.medium)
         }
     }
 }
@@ -18,7 +18,7 @@ struct KeySymbol: View {
 struct WrenchSymbol: View {
     var body: some View {
         VStack{
-            Image(systemName: "wrench").imageScale(.medium)
+            Image(systemName: "gearshape.fill").imageScale(.medium)
         }
     }
 }
@@ -32,7 +32,7 @@ struct Footer: View {
                 data.signerScreen = .history
             }) {
                 VStack(alignment: .center) {
-                    Image(systemName: "scroll").imageScale(.medium).foregroundColor(data.signerScreen == .history ? Color("buttonActive") : Color("buttonPassiveImage"))
+                    Image(systemName: "rectangle.grid.1x2.fill").imageScale(.medium).foregroundColor(data.signerScreen == .history ? Color("buttonActive") : Color("buttonPassiveImage"))
                     Text("Log").foregroundColor(data.signerScreen == .history ? Color("buttonActive") : Color("buttonPassiveText"))
                 }
             }
@@ -42,8 +42,8 @@ struct Footer: View {
                 data.signerScreen = .scan
             }) {
                 VStack {
-                    Image(systemName: "qrcode.viewfinder").imageScale(.medium).foregroundColor(data.signerScreen == .scan ? Color("buttonActive") : Color("buttonPassiveImage"))
-                    Text("Scan").foregroundColor(data.signerScreen == .scan ? Color("buttonActive") : Color("buttonPassiveText"))
+                    Image(systemName: "viewfinder").imageScale(.medium).foregroundColor(data.signerScreen == .scan ? Color("buttonActive") : Color("buttonPassiveImage"))
+                    Text("Scanner").foregroundColor(data.signerScreen == .scan ? Color("buttonActive") : Color("buttonPassiveText"))
                 }
             }
             Spacer()

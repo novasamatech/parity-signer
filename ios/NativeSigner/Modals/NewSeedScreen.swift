@@ -23,12 +23,15 @@ struct NewSeedScreen: View {
         ZStack{
             ModalBackdrop()
             VStack {
-                VStack {
+                VStack(alignment: .leading) {
                     Text("New Seed").font(.title)
+                    Text("DISPLAY NAME").font(.callout)
+                    ZStack {
+                        RoundedRectangle(cornerRadius: 8).stroke(Color("AccentColor")).foregroundColor(Color("backgroundColor")).frame(height: 39)
                     TextField("Seed", text: $seedName, prompt: Text("Seed name"))
                         .foregroundColor(Color("textEntryColor"))
-                        .background(Color("textFieldColor"))
-                        .font(.largeTitle)
+                        .background(Color("backgroundColor"))
+                        .font(.system(size: 16, weight: .regular))
                         .disableAutocorrection(true)
                         .keyboardType(.asciiCapable)
                         .submitLabel(.done)
@@ -37,41 +40,46 @@ struct NewSeedScreen: View {
                         })
                         .onAppear(perform: {nameFocused = true})
                         .focused($nameFocused)
-                        .border(Color("AccentColor"), width: 1)
+                        .padding(.horizontal, 8)
+                    }
+                    Text("Display name visible only to you").font(.callout)
                     Toggle(isOn: $recover) {
                         Text("Recover seed phrase?")
                             .font(.headline)
                             .foregroundColor(Color("textMainColor"))
                     }
                     if (recover) {
+                        ZStack {
+                            RoundedRectangle(cornerRadius: 8).stroke(Color("AccentColor")).foregroundColor(Color("backgroundColor")).frame(height: 150)
                         //TODO: make completely custom tool for this
                         TextEditor(text: $seedPhrase)
-                            .frame(height: 150.0)
+                                .onChange(of: seedPhrase, perform: { _ in
+                                    if seedPhrase.contains("\n") {
+                                        seedPhrase = seedPhrase.replacingOccurrences(of: "\n", with: "")
+                                        nameFocused = true
+                                    }
+                                })
                             .autocapitalization(.none)
                             .keyboardType(.asciiCapable)
                             .disableAutocorrection(true)
-                            .font(.title)
+                            .font(.system(size: 16, design: .monospaced))
                             .foregroundColor(Color("cryptoColor"))
-                            .background(Color("textFieldColor"))
-                            .border(Color("cryptoColor"), width: /*@START_MENU_TOKEN@*/1/*@END_MENU_TOKEN@*/)
+                            .background(Color("backgroundColor"))
+                            .frame(height: 150)
+                            .padding(8)
+                        }
                     }
                     Text(data.lastError).foregroundColor(.red)
-                    HStack{
-                        Button(action: {
-                            data.lastError = ""
-                            seedPhrase = ""
-                            data.keyManagerModal = .none
-                        }) {
-                            Text("Cancel").font(.largeTitle)
-                        }
+                    HStack {
                         Spacer()
                         Button(action: {
                             if !recover {seedPhrase = ""}
                             data.addSeed(seedName: seedName, seedPhrase: seedPhrase)
                         }) {
                             Text("Create")
-                                .font(.largeTitle)
+                                .font(.system(size: 22))
                         }
+                        .disabled(seedName == "")
                     }
                 }.padding()
             }

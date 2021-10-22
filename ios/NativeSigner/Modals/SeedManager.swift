@@ -28,27 +28,14 @@ struct SeedManager: View {
                                     Spacer()
                                 }
                                 Button(action: {
-                                    seedPhrase = data.getSeed(seedName: seed, backup: true)
-                                    showBackup = !seedPhrase.isEmpty
+                                    data.selectSeed(seedName: seed)
+                                    data.keyManagerModal = .seedBackup
                                 }) {
                                     VStack {
-                                        Image(systemName: "eye").imageScale(.large)
+                                        Image(systemName: "rectangle.and.pencil.and.ellipsis").imageScale(.large)
                                     }
                                     .background(Color("backgroundCard"))
                                 }
-                                .alert(isPresented: $showBackup, content: {
-                                    Alert(
-                                        title: Text("Backup your seed phrase"),
-                                        message: Text(seedPhrase).font(.title2),
-                                        dismissButton: .default(
-                                            Text("Done"),
-                                            action: {
-                                                seedPhrase = ""
-                                                showBackup = false
-                                            }
-                                        )
-                                    )
-                                })
                                 Button(action: {
                                     deleteConfirm = true
                                 }) {

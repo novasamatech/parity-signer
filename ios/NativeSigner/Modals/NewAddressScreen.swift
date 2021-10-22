@@ -32,18 +32,19 @@ struct NewAddressScreen: View {
                         Text(data.selectedSeed)
                             .font(.headline)
                     }
-                }
+                }.padding(.bottom, 40)
                 if !data.lastError.isEmpty {
                     Text(data.lastError)
                         .foregroundColor(.red)
                         .lineLimit(nil)
                 }
                 VStack (alignment: .leading) {
-                    Text("Path").foregroundColor(Color("textMainColor")).font(.footnote)
+                    Text("PATH").foregroundColor(Color("textMainColor")).font(.footnote)
+                    ZStack {
+                    RoundedRectangle(cornerRadius: 8).stroke(Color("AccentColor")).foregroundColor(Color("backgroundColor")).frame(height: 39)
                     TextField("Path", text: $data.suggestedPath, prompt: Text("Path: //hard/soft"))
                         .foregroundColor(Color("textEntryColor"))
-                        .background(Color("textFieldColor"))
-                        .font(.largeTitle)
+                        .font(.system(size: 15, design: .monospaced))
                         .disableAutocorrection(true)
                         .autocapitalization(.none)
                         .keyboardType(.asciiCapable)
@@ -52,14 +53,16 @@ struct NewAddressScreen: View {
                             data.lastError = ""
                         }
                         .focused($focusedField, equals: .path)
-                        .border(Color("AccentColor"), width: 1)
+                        .padding(8)
+                    }
                 }
                 VStack (alignment: .leading) {
-                    Text("Password (optional)").foregroundColor(Color("textMainColor")).font(.footnote)
+                    Text("OPTIONAL PASSWORD").foregroundColor(Color("textMainColor")).font(.footnote)
+                    ZStack {
+                        RoundedRectangle(cornerRadius: 8).stroke(Color("AccentColor")).foregroundColor(Color("backgroundColor")).frame(height: 39)
                     TextField("Password", text: $password, prompt: Text("(optional)"))
                         .foregroundColor(Color("textEntryColor"))
-                        .background(Color("textFieldColor"))
-                        .font(.largeTitle)
+                        .font(.system(size: 15, design: .monospaced))
                         .disableAutocorrection(true)
                         .autocapitalization(.none)
                         .keyboardType(.asciiCapable)
@@ -70,23 +73,26 @@ struct NewAddressScreen: View {
                         .onSubmit({if password != "" {
                             focusedField = .passwordCheck
                         }})
-                        .border(Color("AccentColor"), width: 1)
+                        .padding(8)
+                    }
                 }
                 if password != "" {
                     VStack (alignment: .leading) {
-                        Text("Repeat password").foregroundColor(Color("textMainColor")).font(.footnote)
+                        Text("REPEAT PASSWORD").foregroundColor(Color("textMainColor")).font(.footnote)
+                        ZStack {
+                            RoundedRectangle(cornerRadius: 8).stroke(Color("AccentColor")).foregroundColor(Color("backgroundColor")).frame(height: 39)
                         TextField("Repeat", text: $passwordCheck, prompt: Text("password"))
                             .foregroundColor(Color("textEntryColor"))
-                            .background(Color("textFieldColor"))
-                            .font(.largeTitle)
+                            .font(.system(size: 15, design: .monospaced))
                             .disableAutocorrection(true)
                             .autocapitalization(.none)
                             .keyboardType(.asciiCapable)
                             .submitLabel(.done)
                             .onChange(of: data.suggestedName, perform: {_ in data.lastError = ""
                             })
-                            //.focused($focusedField, equals: .passwordCheck)
-                            .border(Color("AccentColor"), width: 1)
+                            .focused($focusedField, equals: .passwordCheck)
+                            .padding(8)
+                        }
                     }}
                 HStack {
                     Button(action: {

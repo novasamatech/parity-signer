@@ -13,20 +13,27 @@ struct SeedBackup: View {
         ZStack{
             ModalBackdrop()
             VStack {
+                SeedCardForManager(seedName: data.selectedSeed)
                 Text("Backup your seed phrase!").font(.headline)
-                Text("Keep your seed phrase in safe place; anyone could restore accounts using this seed phrase; there is no other way to restore accounts.").font(.subheadline)
-                Text(data.getRememberedSeedPhrate()).font(.callout).padding()
-                Button(action: {data.totalRefresh()}) {
-                    Text("Done").font(.largeTitle)
+                Text("Keep your seed phrase in safe place; anyone could restore accounts using this seed phrase; there is no other way to restore accounts.").font(.footnote)
+                ZStack {
+                    RoundedRectangle(cornerRadius: 8).stroke(Color("AccentColor")).foregroundColor(Color("backgroundColor")).frame(height: 200)
+                    Text(data.selectedSeed == "" ? "" : data.getRememberedSeedPhrate())
+                        .font(.system(size: 16, weight: .semibold, design: .monospaced))
+                        .foregroundColor(Color("cryptoColor"))
+                        .padding(8)
                 }
             }
+        }.onDisappear {
+            data.seedBackup = ""
+            data.selectSeed(seedName: "")
         }
     }
 }
 
 /*
-struct SeedBackup_Previews: PreviewProvider {
-    static var previews: some View {
-        SeedBackup()
-    }
-}*/
+ struct SeedBackup_Previews: PreviewProvider {
+ static var previews: some View {
+ SeedBackup()
+ }
+ }*/

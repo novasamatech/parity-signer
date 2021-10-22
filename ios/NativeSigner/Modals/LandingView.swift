@@ -11,17 +11,12 @@ struct LandingView: View {
     @EnvironmentObject var data: SignerDataModel
     @State var tacAccept = false
     @State var ppAccept = false
-    @State var tacAcceptAlert = false
-    @State var ppAcceptAlert = false
+    @State var accept = false
     var body: some View {
         VStack {
             DocumentModal(document: .toc)
             Button(action: {
-                if tacAccept {
-                    tacAccept = false
-                } else {
-                    tacAcceptAlert = true
-                }
+                tacAccept.toggle()
             }) {
                 HStack {
                     Image(systemName: tacAccept ? "checkmark.square" : "square").imageScale(.large)
@@ -29,20 +24,8 @@ struct LandingView: View {
                     Spacer()
                 }
             }
-            .alert(isPresented: $tacAcceptAlert, content: {
-                Alert(
-                    title: Text("Accept terms and conditions?"),
-                    message: Text("Do you accept terms and conditions?"),
-                    primaryButton: .cancel(),
-                    secondaryButton: .default(Text("Accept"), action: {tacAccept = true})
-                )
-            })
             Button(action: {
-                if ppAccept {
-                    ppAccept = false
-                } else {
-                    ppAcceptAlert = true
-                }
+                ppAccept.toggle()
             }) {
                 HStack {
                     Image(systemName: ppAccept ? "checkmark.square" : "square").imageScale(.large)
@@ -50,20 +33,23 @@ struct LandingView: View {
                     Spacer()
                 }
             }
-            .alert(isPresented: $ppAcceptAlert, content: {
-                Alert(
-                    title: Text("Accept privacy policy?"),
-                    message: Text("Do you accept privacy policy?"),
-                    primaryButton: .cancel(),
-                    secondaryButton: .default(Text("Accept"), action: {ppAccept = true})
-                )
-            }).padding(.vertical, 10)
+            .padding(.vertical, 10)
             Button(action: {
-                data.onboard()
+                accept = true
             }) {
                 Text("Next")
                     .font(.largeTitle)
-            }.padding().disabled(!(tacAccept && ppAccept))
+            }
+            .padding()
+            .disabled(!(tacAccept && ppAccept))
+            .alert(isPresented: $accept, content: {
+                Alert(
+                    title: Text("Accept privacy policy?"),
+                    message: Text("Do you accept privacy policy?"),
+                    primaryButton: .destructive(Text("Decline")),
+                    secondaryButton: .default(Text("Accept"), action: {data.onboard()})
+                )
+            })
         }
     }
 }

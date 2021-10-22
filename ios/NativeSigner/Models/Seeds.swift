@@ -137,6 +137,9 @@ extension SignerDataModel {
      * This is simple explicit "get" for showing plaintext seedBackup value after it was fetched
      */
     func getRememberedSeedPhrate() -> String {
+        if self.seedBackup == "" {
+            self.seedBackup = getSeed(seedName: self.selectedSeed, backup: true)
+        }
         return self.seedBackup
     }
     
