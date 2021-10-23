@@ -838,7 +838,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 4649;
 				DEVELOPMENT_ASSET_PATHS = "\"NativeSigner/Preview Content\"";
-				DEVELOPMENT_TEAM = P2PX3JU8FT;
+				DEVELOPMENT_TEAM = 4GK8JWU7P9;
 				ENABLE_BITCODE = NO;
 				ENABLE_PREVIEWS = YES;
 				"EXCLUDED_ARCHS[sdk=iphonesimulator*]" = arm64;
@@ -853,7 +853,7 @@
 					"$(PROJECT_DIR)/NativeSigner",
 				);
 				MARKETING_VERSION = 4.6.4;
-				PRODUCT_BUNDLE_IDENTIFIER = io.parity.NativeSigner;
+				PRODUCT_BUNDLE_IDENTIFIER = parity.NativeSigner;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_OBJC_BRIDGING_HEADER = "$(PROJECT_DIR)/NativeSigner/NativeSigner-Bridging-Header.h";
 				SWIFT_VERSION = 5.0;
@@ -870,7 +870,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 4649;
 				DEVELOPMENT_ASSET_PATHS = "\"NativeSigner/Preview Content\"";
-				DEVELOPMENT_TEAM = P2PX3JU8FT;
+				DEVELOPMENT_TEAM = 4GK8JWU7P9;
 				ENABLE_BITCODE = NO;
 				ENABLE_PREVIEWS = YES;
 				INFOPLIST_FILE = NativeSigner/Info.plist;
@@ -884,7 +884,7 @@
 					"$(PROJECT_DIR)/NativeSigner",
 				);
 				MARKETING_VERSION = 4.6.4;
-				PRODUCT_BUNDLE_IDENTIFIER = io.parity.NativeSigner;
+				PRODUCT_BUNDLE_IDENTIFIER = parity.NativeSigner;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_OBJC_BRIDGING_HEADER = "$(PROJECT_DIR)/NativeSigner/NativeSigner-Bridging-Header.h";
 				SWIFT_VERSION = 5.0;
