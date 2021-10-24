@@ -8,6 +8,26 @@
 
 ![Parity Signer](./tutorials/images/logo-parity-signer.jpg)
 
+==========================================================
+
+# !!! This readme documents development app !!!
+
+**[THE REAL DOCS ARE HERE](https://github.com/paritytech/parity-signer/tree/legacy-4.6.2)**
+
+**If you have a Signer from official store, please use [release branch documentation here](https://github.com/paritytech/parity-signer/tree/legacy-4.6.2)**
+
+==========================================================
+
+==========================================================
+
+==========================================================
+
+==========================================================
+
+==========================================================
+
+==========================================================
+
 **Please read instructions in [Getting started](#getting-started) before building or using the Signer**
 
 Parity Signer is a mobile application that allows any smartphone to act as an air-gapped crypto wallet. This is also known as "cold storage".
