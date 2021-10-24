@@ -6,7 +6,40 @@ use lazy_static::lazy_static;
 use definitions::{crypto::Encryption, keyring::VerifierKey, metadata::{AddressBookEntry, MetaValues}, network_specs::{ChainSpecs, ChainSpecsToSend, CurrentVerifier, Verifier}, qr_transfers::ContentLoadTypes, types::{TypeEntry, Description, EnumVariant, EnumVariantType, StructField}};
 use meta_reading::decode_metadata::decode_version;
 
-pub const DEFAULT_GENERAL_VERIFIER: Verifier = Verifier::Sr25519([212, 53, 147, 199, 21, 253, 211, 28, 97, 20, 26, 189, 4, 169, 159, 214, 130, 44, 133, 88, 133, 76, 205, 227, 154, 86, 132, 231, 165, 109, 162, 125]); // everyone trusts Alice until further notice
+pub const DEFAULT_GENERAL_VERIFIER: Verifier = Verifier::Sr25519([
+                                                                 0xc4,
+                                                                 0x6a,
+                                                                 0x22,
+                                                                 0xb9,
+                                                                 0xda,
+                                                                 0x19,
+                                                                 0x54,
+                                                                 0x0a,
+                                                                 0x77,
+                                                                 0xcb,
+                                                                 0xde,
+                                                                 0x23,
+                                                                 0x19,
+                                                                 0x7e,
+                                                                 0x5f,
+                                                                 0xd9,
+                                                                 0x04,
+                                                                 0x85,
+                                                                 0xc7,
+                                                                 0x2b,
+                                                                 0x4e,
+                                                                 0xcf,
+                                                                 0x3c,
+                                                                 0x59,
+                                                                 0x9e,
+                                                                 0xcc,
+                                                                 0xa6,
+                                                                 0x99,
+                                                                 0x8f,
+                                                                 0x39,
+                                                                 0xbd,
+                                                                 0x57
+                                                                 ]);//Real Parity key!
 
 struct DefaultNetworkInfo {
     address: String,
