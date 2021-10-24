@@ -10,11 +10,13 @@
 
 ==========================================================
 
-# !!! This readme documents development app !!!
+# !!! Parity Signer is being refactored from the groud up !!!
 
-**[THE REAL DOCS ARE HERE](https://github.com/paritytech/parity-signer/tree/legacy-4.6.2)**
+The legacy app is still fully functional and the latest release is available on the apps store,
+and the source for this is available in [legacy-4.6.2 branch]https://github.com/paritytech/parity-signer/tree/legacy-4.6.2)*
 
-**If you have a Signer from official store, please use [release branch documentation here](https://github.com/paritytech/parity-signer/tree/legacy-4.6.2)**
+[The legacy documentation for the published app is here](https://github.com/paritytech/parity-signer/tree/legacy-4.6.2/docs)
+
 
 ==========================================================
 
