@@ -180,7 +180,15 @@ fn create_address (database: &Db, input_batch_prep: &Vec<(AddressKey, AddressDet
     };
     full_address.zeroize();
     
-    let identity_history = IdentityHistory::get(&seed_object.seed_name, &encryption, &public_key, &path, &genesis_hash);
+    let cropped_path = match REG_PATH.captures(path) {
+        Some(caps) => match caps.name("path") {
+            Some(a) => a.as_str(),
+            None => "",
+        },
+        None => "",
+    };
+    
+    let identity_history = IdentityHistory::get(&seed_object.seed_name, &encryption, &public_key, &cropped_path, &genesis_hash);
     output_events.push(Event::IdentityAdded(identity_history));
     
     let address_key = generate_address_key(&public_key, &seed_object.encryption)?;
@@ -227,13 +235,7 @@ fn create_address (database: &Db, input_batch_prep: &Vec<(AddressKey, AddressDet
                 // Check for collisions in name - disabled
                     //let collided = filter_addresses_by_seed_name_and_name(&identities, &seed_name, name)?;
                     //if collided.len() !=0 {return Err(Error::IdentityExists.show())}
-                    let cropped_path = match REG_PATH.captures(path) {
-                        Some(caps) => match caps.name("path") {
-                            Some(a) => a.as_str(),
-                            None => "",
-                        },
-                        None => "",
-                    };
+                    
                     let address_details = AddressDetails {
                         seed_name,
                         path: cropped_path.to_string(),
@@ -778,7 +780,7 @@ mod tests {
         signer_init_with_cert(dbname).unwrap();
         let history_printed = print_history(dbname).unwrap();
         let element1 = r#"{"event":"database_initiated"}"#;
-        let element2 = r#"{"event":"general_verifier_added","payload":{"hex":"d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d","encryption":"sr25519"}}"#;
+        let element2 = r#"{"event":"general_verifier_added","payload":{"hex":"c46a22b9da19540a77cbde23197e5fd90485c72b4ecf3c599ecca6998f39bd57","encryption":"sr25519"}}"#;
         assert!(history_printed.contains(element1), "\nReal history:\n{}", history_printed);
         assert!(history_printed.contains(element2), "\nReal history:\n{}", history_printed);
         try_create_seed("Alice", SEED, 0, dbname).unwrap();

@@ -219,7 +219,7 @@ mod tests {
         assert!(print == r#"{"hex":"","encryption":"none"}"#, "Got: {}", print);
         signer_init_with_cert(dbname).unwrap();
         let print = display_general_verifier(dbname).unwrap();
-        assert!(print == r#"{"hex":"d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d","encryption":"sr25519"}"#, "Got: {}", print);
+        assert!(print == r#"{"hex":"c46a22b9da19540a77cbde23197e5fd90485c72b4ecf3c599ecca6998f39bd57","encryption":"sr25519"}"#, "Got: {}", print);
         fs::remove_dir_all(dbname).unwrap();
     }
 }
