@@ -771,7 +771,6 @@ class SignerDataModel : ViewModel() {
 		dbname: String
 	): String
 
-	external fun substrateDevelopmentTest(input: String): String
 	external fun substrateBase58Identicon(base58: String, size: Int): String
 	external fun substrateIdenticon(key: String, size: Int): String
 	external fun dbGetNetwork(genesisHash: String, dbname: String): String

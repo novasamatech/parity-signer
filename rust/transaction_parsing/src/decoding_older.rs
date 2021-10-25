@@ -134,8 +134,8 @@ pub fn process_as_call (mut data: Vec<u8>, meta: &OlderMeta, type_database: &Vec
     let call_in_processing = what_next_old (data, meta)?;
     data = call_in_processing.data;
     
-    let mut fancy_out = format!(",{}", (Card::Call{method: &call_in_processing.method.method_name, pallet: &call_in_processing.method.pallet_name, docs: &call_in_processing.method.docs}).card(index, indent));
-    indent = indent + 1;
+    let mut fancy_out = format!(",{},{}", Card::Pallet(&call_in_processing.method.pallet_name).card(index, indent), Card::Method{method_name: &call_in_processing.method.method_name, docs: &call_in_processing.method.docs}.card(index, indent+1));
+    indent = indent + 2;
     
     for x in call_in_processing.method.arguments.iter() {
         let add_to_fancy_out = format!(",{}", (Card::Varname(&x.name)).card(index, indent));

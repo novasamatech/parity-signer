@@ -15,6 +15,23 @@ enum FoundBitOrder {
     Msb0,
 }
 
+#[derive(Clone, Copy)]
+enum CallExpectation {
+    None,
+    Pallet,
+    Method,
+}
+
+impl CallExpectation {
+    fn add(self) -> Self {
+        match self {
+            CallExpectation::None => CallExpectation::Pallet,
+            CallExpectation::Pallet => CallExpectation::Method,
+            CallExpectation::Method => CallExpectation::Method,
+        }
+    }
+}
+
 /// Function to decode types that are variants of TypeDefPrimitive enum.
 ///
 /// The function decodes only given type found_ty, removes already decoded part of input data Vec<u8>,
@@ -217,8 +234,14 @@ fn field_type_name_is_balance (type_name: &str) -> bool {
 }
 
 
-pub fn decoding_sci_complete (current_type: &Type<PortableForm>, compact_flag: bool, balance_flag: bool, data: Vec<u8>, meta_v14: &RuntimeMetadataV14, index: &mut u32, indent: u32, chain_specs: &ChainSpecs) -> Result<DecodedOut, Error> {
-    
+fn decoding_sci_complete (current_type: &Type<PortableForm>, compact_flag: bool, balance_flag: bool, call_expectation: &CallExpectation, data: Vec<u8>, meta_v14: &RuntimeMetadataV14, index: &mut u32, indent: u32, chain_specs: &ChainSpecs) -> Result<DecodedOut, Error> {
+    let call_expectation = {
+        if let Some(a) = current_type.path().ident() {
+            if a == "Call" {call_expectation.add()}
+            else {CallExpectation::None}
+        }
+        else {CallExpectation::None}
+    };
     let mut fancy_out = String::new();
     let after_run = {
         if type_is_account_id(current_type) {special_case_account_id(data, index, indent, chain_specs)?}
@@ -230,7 +253,7 @@ pub fn decoding_sci_complete (current_type: &Type<PortableForm>, compact_flag: b
                 },
                 TypeDef::Variant(x) => {
                     reject_flags(compact_flag, balance_flag)?;
-                    decode_type_def_variant (x, data, &meta_v14, index, indent, chain_specs)?
+                    decode_type_def_variant (x, &call_expectation, data, &meta_v14, index, indent, chain_specs)?
                 },
                 TypeDef::Sequence(x) => {
                     if compact_flag {return Err(Error::UnableToDecode(UnableToDecode::UnexpectedCompactInsides))}
@@ -238,7 +261,7 @@ pub fn decoding_sci_complete (current_type: &Type<PortableForm>, compact_flag: b
                         Some(a) => a,
                         None => return Err(Error::UnableToDecode(UnableToDecode::V14TypeNotResolved)),
                     };
-                    decode_type_def_sequence (inner_type, balance_flag, data, &meta_v14, index, indent, chain_specs)?
+                    decode_type_def_sequence (inner_type, balance_flag, &call_expectation, data, &meta_v14, index, indent, chain_specs)?
                 },
                 TypeDef::Array(x) => {
                     if compact_flag {return Err(Error::UnableToDecode(UnableToDecode::UnexpectedCompactInsides))}
@@ -260,7 +283,7 @@ pub fn decoding_sci_complete (current_type: &Type<PortableForm>, compact_flag: b
                         None => return Err(Error::UnableToDecode(UnableToDecode::V14TypeNotResolved)),
                     };
                     let compact_flag = true;
-                    decoding_sci_complete(inner_type, compact_flag, balance_flag, data, meta_v14, index, indent, chain_specs)?
+                    decoding_sci_complete(inner_type, compact_flag, balance_flag, &CallExpectation::None, data, meta_v14, index, indent, chain_specs)?
                 },
                 TypeDef::BitSequence(x) => {
                     reject_flags(compact_flag, balance_flag)?;
@@ -301,15 +324,15 @@ pub fn decoding_sci_entry_point (mut data: Vec<u8>, meta_v14: &RuntimeMetadataV1
         Some(a) => a,
         None => return Err(Error::UnableToDecode(UnableToDecode::NoCallsInPallet(pallet_name))),
     };
-    let (current_type, path, docs) = type_path_docs(meta_v14, type_id)?;
+    let (current_type, _, _) = type_path_docs(meta_v14, type_id)?;
     
-    let mut fancy_out = format!("{}", (Card::Pallet{pallet_name: &pallet_name, path: &path, docs: &docs}).card(index, indent));
+    let mut fancy_out = format!("{}", (Card::Pallet(&pallet_name)).card(index, indent));
     indent = indent + 1;
     data = data[1..].to_vec();
     
     let compact_flag = false;
     let balance_flag = false;
-    let decoded_out = decoding_sci_complete(&current_type, compact_flag, balance_flag, data, meta_v14, index, indent, chain_specs)?;
+    let decoded_out = decoding_sci_complete(&current_type, compact_flag, balance_flag, &CallExpectation::Pallet, data, meta_v14, index, indent, chain_specs)?;
     fancy_out.push_str(&decoded_out.fancy_out);
     
     Ok(DecodedOut{
@@ -319,7 +342,7 @@ pub fn decoding_sci_entry_point (mut data: Vec<u8>, meta_v14: &RuntimeMetadataV1
 }
 
 
-fn decode_type_def_sequence (inner_type: &Type<PortableForm>, balance_flag: bool, mut data: Vec<u8>, meta_v14: &RuntimeMetadataV14, index: &mut u32, indent: u32, chain_specs: &ChainSpecs) -> Result<DecodedOut, Error> {
+fn decode_type_def_sequence (inner_type: &Type<PortableForm>, balance_flag: bool, call_expectation: &CallExpectation, mut data: Vec<u8>, meta_v14: &RuntimeMetadataV14, index: &mut u32, indent: u32, chain_specs: &ChainSpecs) -> Result<DecodedOut, Error> {
     let pre_vector = get_compact::<u32>(&data)?;
     let mut fancy_output_prep = String::new();
     let elements_of_vector = pre_vector.compact_found;
@@ -328,7 +351,7 @@ fn decode_type_def_sequence (inner_type: &Type<PortableForm>, balance_flag: bool
             data = data[start..].to_vec();
             for _i in 0..elements_of_vector {
                 let compact_flag = false;
-                let after_run = decoding_sci_complete(inner_type, compact_flag, balance_flag, data, meta_v14, index, indent, chain_specs)?;
+                let after_run = decoding_sci_complete(inner_type, compact_flag, balance_flag, call_expectation, data, meta_v14, index, indent, chain_specs)?;
                 fancy_output_prep.push_str(&after_run.fancy_out);
                 data = after_run.remaining_vector;
             }
@@ -354,7 +377,7 @@ fn decode_type_def_array (inner_type: &Type<PortableForm>, len: u32, balance_fla
     let mut fancy_output_prep = String::new();
     for _i in 0..len {
         let compact_flag = false;
-        let after_run = decoding_sci_complete(inner_type, compact_flag, balance_flag, data, meta_v14, index, indent, chain_specs)?;
+        let after_run = decoding_sci_complete(inner_type, compact_flag, balance_flag, &CallExpectation::None, data, meta_v14, index, indent, chain_specs)?;
         fancy_output_prep.push_str(&after_run.fancy_out);
         data = after_run.remaining_vector;
     }
@@ -373,7 +396,7 @@ fn decode_type_def_tuple (id_set: Vec<u32>, mut data: Vec<u8>, meta_v14: &Runtim
         fancy_out.push_str(&fancy_output_prep);
         let compact_flag = false;
         let balance_flag = false;
-        let after_run = decoding_sci_complete(&inner_type, compact_flag, balance_flag, data, meta_v14, index, indent, chain_specs)?;
+        let after_run = decoding_sci_complete(&inner_type, compact_flag, balance_flag, &CallExpectation::None, data, meta_v14, index, indent, chain_specs)?;
         fancy_out.push_str(&after_run.fancy_out);
         data = after_run.remaining_vector;
     }
@@ -420,12 +443,12 @@ fn is_option_bool (found_ty: &TypeDefVariant<PortableForm>, meta_v14: &RuntimeMe
     }
 }
 
-fn decode_type_def_variant (found_ty: &TypeDefVariant<PortableForm>, mut data: Vec<u8>, meta_v14: &RuntimeMetadataV14, index: &mut u32, indent: u32, chain_specs: &ChainSpecs) -> Result<DecodedOut, Error> {
+fn decode_type_def_variant (found_ty: &TypeDefVariant<PortableForm>, call_expectation: &CallExpectation, mut data: Vec<u8>, meta_v14: &RuntimeMetadataV14, index: &mut u32, indent: u32, chain_specs: &ChainSpecs) -> Result<DecodedOut, Error> {
     
     let enum_index = match data.get(0) {
         Some(x) => *x,
         None => return Err(Error::UnableToDecode(UnableToDecode::DataTooShort)),
-    } as usize;
+    };
     
     let check = is_option_bool(found_ty, meta_v14);
     if check.is_option {
@@ -457,14 +480,21 @@ fn decode_type_def_variant (found_ty: &TypeDefVariant<PortableForm>, mut data: V
                     data = data[1..].to_vec();
                     let found_variant = &found_ty.variants()[1];
                     let compact_flag = false;
-                    process_fields(found_variant.fields(), compact_flag, data, meta_v14, index, indent, chain_specs)
+                    process_fields(found_variant.fields(), &CallExpectation::None, compact_flag, data, meta_v14, index, indent, chain_specs)
                 },
                 _ => {return Err(Error::UnableToDecode(UnableToDecode::UnexpectedOptionVariant))},
             }
         }
     }
     else {
-        let found_variant = match found_ty.variants().get(enum_index) {
+        let mut found_variant = None;
+        for x in found_ty.variants().iter() {
+            if x.index() == enum_index {
+                found_variant = Some(x);
+                break;
+            }
+        }
+        let found_variant = match found_variant {
             Some(a) => a,
             None => return Err(Error::UnableToDecode(UnableToDecode::UnexpectedEnumVariant)),
         };
@@ -473,11 +503,15 @@ fn decode_type_def_variant (found_ty: &TypeDefVariant<PortableForm>, mut data: V
             if i>0 {variant_docs.push_str("\n");}
             variant_docs.push_str(x);
         }
-        let mut fancy_out = format!(",{}", (Card::EnumVariantName{name: &found_variant.name(), docs_enum_variant: &variant_docs}).card(index, indent));
+        let mut fancy_out = match call_expectation {
+            CallExpectation::None => format!(",{}", (Card::EnumVariantName{name: &found_variant.name(), docs_enum_variant: &variant_docs}).card(index, indent)),
+            CallExpectation::Pallet => format!(",{}", (Card::Pallet(&found_variant.name())).card(index, indent)),
+            CallExpectation::Method => format!(",{}", (Card::Method{method_name: &found_variant.name(), docs: &variant_docs}).card(index, indent)),
+        };
         data = data[1..].to_vec();
         
         let compact_flag = false;
-        let fields_processed = process_fields(found_variant.fields(), compact_flag, data, meta_v14, index, indent+1, chain_specs)?;
+        let fields_processed = process_fields(found_variant.fields(), call_expectation, compact_flag, data, meta_v14, index, indent+1, chain_specs)?;
         fancy_out.push_str(&fields_processed.fancy_out);
         data = fields_processed.remaining_vector;
 
@@ -489,7 +523,7 @@ fn decode_type_def_variant (found_ty: &TypeDefVariant<PortableForm>, mut data: V
 }
 
 
-fn process_fields (fields: &[Field<PortableForm>], compact_flag: bool, mut data: Vec<u8>, meta_v14: &RuntimeMetadataV14, index: &mut u32, indent: u32, chain_specs: &ChainSpecs) -> Result<DecodedOut, Error> {
+fn process_fields (fields: &[Field<PortableForm>], call_expectation: &CallExpectation, compact_flag: bool, mut data: Vec<u8>, meta_v14: &RuntimeMetadataV14, index: &mut u32, indent: u32, chain_specs: &ChainSpecs) -> Result<DecodedOut, Error> {
     let mut indent_skipped = false;
     let mut fancy_out = String::new();
     for (i, x) in fields.iter().enumerate() {
@@ -521,7 +555,7 @@ fn process_fields (fields: &[Field<PortableForm>], compact_flag: bool, mut data:
             if indent_skipped {indent}
             else {indent+1}
         };
-        let after_run = decoding_sci_complete(&inner_type, compact_flag, balance_flag, data, meta_v14, index, indent, chain_specs)?;
+        let after_run = decoding_sci_complete(&inner_type, compact_flag, balance_flag, call_expectation, data, meta_v14, index, indent, chain_specs)?;
         fancy_out.push_str(&after_run.fancy_out);
         data = after_run.remaining_vector;
     }
@@ -533,7 +567,7 @@ fn process_fields (fields: &[Field<PortableForm>], compact_flag: bool, mut data:
 
 fn decode_type_def_composite (composite_ty: &TypeDefComposite<PortableForm>, compact_flag: bool, data: Vec<u8>, meta_v14: &RuntimeMetadataV14, index: &mut u32, indent: u32, chain_specs: &ChainSpecs) -> Result<DecodedOut, Error> {
     if compact_flag && (composite_ty.fields().len()>1) {return Err(Error::UnableToDecode(UnableToDecode::UnexpectedCompactInsides))}
-    process_fields (composite_ty.fields(), compact_flag, data, meta_v14, index, indent, chain_specs)
+    process_fields (composite_ty.fields(), &CallExpectation::None, compact_flag, data, meta_v14, index, indent, chain_specs)
 }
 
 fn decode_type_def_bit_sequence (bit_ty: &TypeDefBitSequence<PortableForm>, data: Vec<u8>, meta_v14: &RuntimeMetadataV14, index: &mut u32, indent: u32) -> Result<DecodedOut, Error> {

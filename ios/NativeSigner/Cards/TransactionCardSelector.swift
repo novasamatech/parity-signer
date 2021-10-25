@@ -51,8 +51,8 @@ struct TransactionCardSelector: View {
             TCNewSpecs(value: value)
         case .none:
             EmptyView()
-        case .pallet(let value):
-            TCPallet(value: value)
+        case .pallet(let text):
+            TCPallet(text: text)
         case .tip(let value):
             TCTip(value: value)
         case .tipPlain(let text):

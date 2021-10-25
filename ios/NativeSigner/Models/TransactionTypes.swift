@@ -28,7 +28,7 @@ enum Card {
     case meta(MetaSpecs)
     case newSpecs(NewSpecs)
     case none
-    case pallet(Pallet)
+    case pallet(String)
     case tip(Currency)
     case tipPlain(String)
     case txSpec(TxSpec)
@@ -57,8 +57,7 @@ struct AuthorPublicKey: Decodable {
 }
 
 struct Call: Decodable {
-    var pallet: String
-    var method: String
+    var method_name: String
     var docs: String
 }
 
@@ -119,12 +118,6 @@ struct NewSpecs: Decodable, Hashable {
     var unit: String
 }
 
-struct Pallet: Decodable {
-    var pallet_name: String
-    var path: String
-    var docs: String
-}
-
 struct Tip: Decodable {
     var amount: String
     var units: String
@@ -180,7 +173,7 @@ struct TransactionCard: Decodable {
         case "balance":
             card = .balance(try values.decode(Currency.self, forKey: .payload))
             return
-        case "call":
+        case "method":
             card = .call(try values.decode(Call.self, forKey: .payload))
             return
         case "enum_variant_name":
@@ -206,9 +199,6 @@ struct TransactionCard: Decodable {
             return
         case "none":
             card = .none
-            return
-        case "pallet":
-            card = .pallet(try values.decode(Pallet.self, forKey: .payload))
             return
         case "tip":
             card = .tip(try values.decode(Currency.self, forKey: .payload))
@@ -240,6 +230,8 @@ struct TransactionCard: Decodable {
             card = .id(content)
         case "identity_field":
             card = .identityField(content)
+        case "pallet":
+            card = .pallet(content)
         case "tip_plain":
             card = .tipPlain(content)
         case "types_hash":

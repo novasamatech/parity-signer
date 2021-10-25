@@ -18,8 +18,8 @@ pub fn make_all_cards() -> String {
     let mut index = 0;
     let mut all_cards: Vec<String> = Vec::new();
     
-    all_cards.push(Card::Call{pallet: "test_Pallet", method: "test_Method", docs: "test docs description"}.card(&mut index,0));
-    all_cards.push(Card::Pallet{pallet_name: "test_pallet_v14", path: "test >> test_test >> TestTest", docs: "test docs"}.card(&mut index,0));
+    all_cards.push(Card::Pallet("test_pallet").card(&mut index,0));
+    all_cards.push(Card::Method{method_name: "test_method", docs: "verbose \ndescription \nof \nthe \nmethod"}.card(&mut index,0));
     all_cards.push(Card::Varname("test_Varname").card(&mut index,0));
     all_cards.push(Card::Default("12345").card(&mut index,0));
     all_cards.push(Card::Id("5FHneW46xGXgs5mUiveU4sbTyGBzmstUspZC92UhjJM694ty").card(&mut index,0));

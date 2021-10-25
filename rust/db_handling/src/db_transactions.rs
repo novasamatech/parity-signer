@@ -473,7 +473,7 @@ impl TrDbColdSign {
         }
     }
     /// function to apply TrDbColdStub to database
-    pub fn apply(self, wrond_password: bool, user_comment: &str, database_name: &str) -> anyhow::Result<()> {
+    pub fn apply(self, wrong_password: bool, user_comment: &str, database_name: &str) -> anyhow::Result<()> {
         let (public_key, encryption) = reverse_address_key(&self.address_key)?;
         let signed_by = match encryption {
             Encryption::Ed25519 => Verifier::Ed25519(public_key.try_into().expect("just decoded successfully, length is correct.")),
@@ -482,8 +482,8 @@ impl TrDbColdSign {
         };
         let mut history = self.history;
         let sign_display = SignDisplay::get(&self.transaction, &signed_by, &user_comment);
-        if wrond_password {history.push(Event::TransactionSigned(sign_display))}
-        else {history.push(Event::TransactionSignError(sign_display))}
+        if wrong_password {history.push(Event::TransactionSignError(sign_display))}
+        else {history.push(Event::TransactionSigned(sign_display))}
         TrDbCold::new()
             .set_history(events_to_batch(&database_name, history)?)
             .apply(&database_name)

@@ -6,8 +6,8 @@ use crate::error::Error;
 use crate::helpers::{GeneralHold, Hold};
 
 pub (crate) enum Card <'a> {
-    Call {pallet: &'a str, method: &'a str, docs: &'a str},
-    Pallet {pallet_name: &'a str, path: &'a str, docs: &'a str},
+    Pallet (&'a str), // pallet name
+    Method {method_name: &'a str, docs: &'a str},
     Varname (&'a str),
     Default (&'a str),
     Id (&'a str),
@@ -79,8 +79,8 @@ fn fancy (index: &mut u32, indent: u32, card_type: &str, decoded_string: &str) -
 impl <'a> Card <'a> {
     pub (crate) fn card (&self, index: &mut u32, indent: u32) -> String {
         match &self {
-            Card::Call {pallet, method, docs} => fancy(index, indent, "call", &format!("{{\"method\":\"{}\",\"pallet\":\"{}\",\"docs\":\"{}\"}}", method, pallet, hex::encode(docs.as_bytes()))),
-            Card::Pallet {pallet_name, path, docs} => fancy(index, indent, "pallet", &format!("{{\"pallet_name\":\"{}\",\"path\":\"{}\",\"docs\":\"{}\"}}", pallet_name, path, hex::encode(docs.as_bytes()))),
+            Card::Pallet (pallet_name) => fancy(index, indent, "pallet", &format!("\"{}\"", pallet_name)),
+            Card::Method {method_name, docs} => fancy(index, indent, "method", &format!("{{\"method_name\":\"{}\",\"docs\":\"{}\"}}", method_name, hex::encode(docs.as_bytes()))),
             Card::Varname (varname) => fancy(index, indent, "varname", &format!("\"{}\"", varname)),
             Card::Default (decoded_string) => fancy(index, indent, "default", &format!("\"{}\"", decoded_string)),
             Card::Id (base58_id) => fancy(index, indent, "Id", &format!("\"{}\"", base58_id)),

@@ -16,11 +16,8 @@ struct TCCall: View {
         }) {
             VStack {
                 HStack {
-                    Text(value.method)
-                        .foregroundColor(Color("textMainColor"))
-                    Text(" from ")
-                        .foregroundColor(Color("AccentColor"))
-                    Text(value.pallet)
+                    Text("Method").foregroundColor(Color("AccentColor"))
+                    Text(value.method_name)
                         .foregroundColor(Color("textMainColor"))
                     Spacer()
                     if value.docs != "" {
