@@ -112,3 +112,15 @@ fn process_qr_image (img: &ImageBuffer<Luma<u8>, Vec<u8>>, decoding: InProgress)
     }
 }
 
+pub fn arg_check(args: Vec<String>) -> (usize, bool)
+{
+    if args.len() > 1 {
+        match args[1].parse() {
+            Ok(num) => (num, false),
+            Err(_) => (0,true),
+        }
+    }
+    else {
+        (0,true)
+    }
+}
