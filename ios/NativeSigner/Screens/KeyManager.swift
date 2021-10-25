@@ -23,7 +23,7 @@ struct KeyManager: View {
                             data.proposeDerive()
                             data.keyManagerModal = .newKey
                         }) {
-                            Image(systemName: "plus.square.on.square").imageScale(.large)
+                            Image(systemName: "plus.circle").imageScale(.large)
                         }
                     }.padding(.horizontal, 8)
                 }

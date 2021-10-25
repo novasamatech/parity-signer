@@ -29,6 +29,7 @@ struct NewSeedScreen: View {
                     ZStack {
                         RoundedRectangle(cornerRadius: 8).stroke(Color("AccentColor")).foregroundColor(Color("backgroundColor")).frame(height: 39)
                     TextField("Seed", text: $seedName, prompt: Text("Seed name"))
+                        .focused($nameFocused)
                         .foregroundColor(Color("textEntryColor"))
                         .background(Color("backgroundColor"))
                         .font(.system(size: 16, weight: .regular))
@@ -39,7 +40,6 @@ struct NewSeedScreen: View {
                             data.lastError = ""
                         })
                         .onAppear(perform: {nameFocused = true})
-                        .focused($nameFocused)
                         .padding(.horizontal, 8)
                     }
                     Text("Display name visible only to you").font(.callout)
