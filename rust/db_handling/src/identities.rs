@@ -780,7 +780,7 @@ mod tests {
         signer_init_with_cert(dbname).unwrap();
         let history_printed = print_history(dbname).unwrap();
         let element1 = r#"{"event":"database_initiated"}"#;
-        let element2 = r#"{"event":"general_verifier_added","payload":{"hex":"d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d","encryption":"sr25519"}}"#;
+        let element2 = r#"{"event":"general_verifier_added","payload":{"hex":"c46a22b9da19540a77cbde23197e5fd90485c72b4ecf3c599ecca6998f39bd57","encryption":"sr25519"}}"#;
         assert!(history_printed.contains(element1), "\nReal history:\n{}", history_printed);
         assert!(history_printed.contains(element2), "\nReal history:\n{}", history_printed);
         try_create_seed("Alice", SEED, 0, dbname).unwrap();
