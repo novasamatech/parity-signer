@@ -19,7 +19,7 @@ struct TransactionPreview: View {
                             TransactionCardView(card: card)
                         }
                     }
-                    if (data.action?.type == "sign_transaction") {
+                    if (data.action?.type == "sign") {
                         TransactionCommentInput()
                     }
                 }
@@ -31,7 +31,7 @@ struct TransactionPreview: View {
                     }
                     Spacer()
                     if data.action != nil {
-                        if data.action!.type == "sign_transaction" {
+                        if data.action!.type == "sign" {
                             Button(action: {data.transactionState = .signed}) {
                                 Text("Sign")
                                     .font(.largeTitle)
