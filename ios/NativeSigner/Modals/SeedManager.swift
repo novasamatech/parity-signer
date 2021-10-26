@@ -12,6 +12,7 @@ struct SeedManager: View {
     @State var showBackup = false
     @State var deleteConfirm = false
     @State var seedPhrase = ""
+    @State var removeSeed = ""
     var body: some View {
         ZStack {
             ModalBackdrop()
@@ -37,6 +38,7 @@ struct SeedManager: View {
                                     .background(Color("backgroundCard"))
                                 }
                                 Button(action: {
+                                    removeSeed = seed
                                     deleteConfirm = true
                                 }) {
                                     VStack {
@@ -47,11 +49,13 @@ struct SeedManager: View {
                                 .alert(isPresented: $deleteConfirm, content: {
                                     Alert(
                                         title: Text("Delete seed?"),
-                                        message: Text("You are about to delete seed " + seed),
+                                        message: Text("You are about to delete seed " + removeSeed),
                                         primaryButton: .cancel(),
                                         secondaryButton: .destructive(
                                             Text("Delete"),
-                                            action: { data.removeSeed(seedName: seed)
+                                            action: {
+                                                data.removeSeed(seedName: removeSeed)
+                                                removeSeed = ""
                                             }
                                         )
                                     )
