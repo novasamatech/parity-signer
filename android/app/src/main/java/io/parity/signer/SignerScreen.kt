@@ -1,13 +1,10 @@
 package io.parity.signer
 
-import androidx.compose.runtime.Composable
-import io.parity.signer.screens.HomeScreen
-
 /**
  * All screens metadata for navigation
  */
 enum class SignerScreen() {
-	Home, Keys, Settings;
+	Scan, Keys, Settings, Log;
 }
 
 enum class TransactionState {
@@ -15,7 +12,7 @@ enum class TransactionState {
 }
 
 enum class KeyManagerModal {
-	None, NewSeed, NewKey, ShowKey, SeedBackup, KeyDeleteConfirm;
+	None, NewSeed, NewKey, ShowKey, SeedBackup, KeyDeleteConfirm, SeedSelector, NetworkManager, NetworkDetails;
 }
 
 enum class SettingsModal {

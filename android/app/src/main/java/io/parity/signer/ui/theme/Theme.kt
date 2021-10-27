@@ -8,44 +8,48 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 
 private val DarkColorPalette = darkColors(
-        primary = MainColor,
-        primaryVariant = MainColor,
-        secondary = SecondaryColor,
-				background = BackgroundAppColor,
-				onSecondary = Color.White,
-				onBackground = Color.White
-	)
+	primary = Color.Black,
+	primaryVariant = MainColor,
+	secondary = SecondaryColor,
+	background = BackgroundAppColor,
+	onPrimary = Color.White,
+	onSecondary = Color.White,
+	onBackground = Color.White
+)
 
 private val LightColorPalette = lightColors(
-        primary = MainColor,
-        primaryVariant = MainColor,
-        secondary = SecondaryColor,
-				background = BackgroundAppColor,
-				onSecondary = Color.White,
-				onBackground = Color.White
+	primary = MainColor,
+	primaryVariant = MainColor,
+	secondary = SecondaryColor,
+	background = BackgroundAppColor,
+	onSecondary = Color.Black,
+	onBackground = Color.Black
 
-        /* Other default colors to override
-    background = Color.White,
-    surface = Color.White,
-    onPrimary = Color.White,
-    onSecondary = Color.Black,
-    onBackground = Color.Black,
-    onSurface = Color.Black,
-    */
+	/* Other default colors to override
+background = Color.White,
+surface = Color.White,
+onPrimary = Color.White,
+onSecondary = Color.Black,
+onBackground = Color.Black,
+onSurface = Color.Black,
+*/
 )
 
 @Composable
-fun ParitySignerTheme(darkTheme: Boolean = isSystemInDarkTheme(), content: @Composable() () -> Unit) {
-    val colors = if (darkTheme) {
-        DarkColorPalette
-    } else {
-        LightColorPalette
-    }
+fun ParitySignerTheme(
+	darkTheme: Boolean = isSystemInDarkTheme(),
+	content: @Composable() () -> Unit
+) {
+	val colors = if (darkTheme) {
+		DarkColorPalette
+	} else {
+		LightColorPalette
+	}
 
-    MaterialTheme(
-            colors = colors,
-            typography = Typography,
-            shapes = Shapes,
-            content = content
-    )
+	MaterialTheme(
+		colors = colors,
+		typography = Typography,
+		shapes = Shapes,
+		content = content
+	)
 }

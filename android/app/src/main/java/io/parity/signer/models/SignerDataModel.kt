@@ -15,10 +15,7 @@ import androidx.security.crypto.EncryptedSharedPreferences
 import androidx.security.crypto.MasterKey
 import com.google.mlkit.vision.barcode.BarcodeScanner
 import com.google.mlkit.vision.common.InputImage
-import io.parity.signer.KeyManagerModal
-import io.parity.signer.OnBoardingState
-import io.parity.signer.SettingsModal
-import io.parity.signer.TransactionState
+import io.parity.signer.*
 import io.parity.signer.components.Authentication
 import org.json.JSONArray
 import org.json.JSONObject
@@ -80,6 +77,9 @@ class SignerDataModel : ViewModel() {
 	//Error
 	private val _lastError = MutableLiveData("")
 
+	//Navigator
+	private val _signerScreen = MutableLiveData(SignerScreen.Log)
+
 	//States of important modals
 	private val _keyManagerModal = MutableLiveData(KeyManagerModal.None)
 	private val _settingsModal = MutableLiveData(SettingsModal.None)
@@ -118,6 +118,7 @@ class SignerDataModel : ViewModel() {
 	//Observables for screens state
 
 	val onBoardingDone: LiveData<OnBoardingState> = _onBoardingDone
+	val signerScreen: LiveData<SignerScreen> = _signerScreen
 	val keyManagerModal: LiveData<KeyManagerModal> = _keyManagerModal
 	val settingsModal: LiveData<SettingsModal> = _settingsModal
 	val transactionState: LiveData<TransactionState> = _transactionState
@@ -246,7 +247,7 @@ class SignerDataModel : ViewModel() {
 	fun refreshHistory() {
 		try {
 			_history.value = sortHistory(JSONArray(historyPrintHistory(dbName)))
-		} catch(e:java.lang.Exception) {
+		} catch (e: java.lang.Exception) {
 			Log.e("History refresh error!", e.toString())
 		}
 	}
@@ -300,7 +301,16 @@ class SignerDataModel : ViewModel() {
 			}
 			Log.d("action", action.toString())
 			_transaction.value =
-				sortCards(concatJSONArray(author, warnings, error, typesInfo, method, extrinsics))
+				sortCards(
+					concatJSONArray(
+						author,
+						warnings,
+						error,
+						typesInfo,
+						method,
+						extrinsics
+					)
+				)
 			_transactionState.value = TransactionState.Preview
 		} catch (e: java.lang.Exception) {
 			Log.e("Transaction parsing failed", e.toString())
@@ -423,7 +433,8 @@ class SignerDataModel : ViewModel() {
 								}
 							}
 							_captured.value = bucket.size
-							_progress.value = ((captured.value?:0).toFloat() / ((total.value?:1).toFloat()))
+							_progress.value = ((captured.value ?: 0).toFloat() / ((total.value
+								?: 1).toFloat()))
 							Log.d("captured", captured.value.toString())
 						}
 					}
@@ -666,6 +677,64 @@ class SignerDataModel : ViewModel() {
 
 	//MARK: Key management end
 
+	//MARK: Navigation begin
+
+	/**
+	 * Bottom navigation action
+	 */
+	fun navigate(screen: SignerScreen) {
+		_signerScreen.value = screen
+	}
+
+	/**
+	 * Handle back button
+	 */
+	fun goBack() {
+		when (signerScreen.value) {
+			SignerScreen.Log -> {
+				totalRefresh()
+			}
+			SignerScreen.Scan -> {
+				clearTransaction()
+			}
+			SignerScreen.Keys -> {
+				when (keyManagerModal.value) {
+					KeyManagerModal.None -> {
+						_keyManagerModal.value = KeyManagerModal.SeedSelector
+					}
+					KeyManagerModal.NewSeed -> {
+						_keyManagerModal.value = KeyManagerModal.SeedSelector
+					}
+					KeyManagerModal.NewKey -> {
+						_keyManagerModal.value = KeyManagerModal.None
+					}
+					KeyManagerModal.ShowKey -> {
+						_keyManagerModal.value = KeyManagerModal.None
+					}
+					KeyManagerModal.SeedBackup -> {
+						_keyManagerModal.value = KeyManagerModal.SeedSelector
+					}
+					KeyManagerModal.KeyDeleteConfirm -> {
+						_keyManagerModal.value = KeyManagerModal.None
+					}
+					KeyManagerModal.SeedSelector -> {
+					}
+					KeyManagerModal.NetworkManager -> {
+						_keyManagerModal.value = KeyManagerModal.None
+					}
+					KeyManagerModal.NetworkDetails -> {
+						_keyManagerModal.value = KeyManagerModal.None
+					}
+				}
+			}
+			SignerScreen.Settings -> {
+				_settingsModal.value = SettingsModal.None
+			}
+		}
+	}
+
+	//MARK: Navigation end
+
 	//MARK: Modals control begin
 
 	//KeyManager
@@ -817,9 +886,33 @@ class SignerDataModel : ViewModel() {
 	external fun historyEntrySystem(entry: String, dbname: String)
 	external fun historyHistorySeedNameWasShown(seedName: String, dbname: String)
 	external fun dbGetGeneralVerifier(dbname: String): String
-	external fun signerSignTypes(publicKey: String, encryption: String, seedPhrase: String, password: String, dbname: String): String
-	external fun signerSignMetadata(network: String, version: Int, publicKey: String, encryption: String, seedPhrase: String, password: String, dbname: String): String
-	external fun signerSignSpecs(network: String, publicKey: String, encryption: String, seedPhrase: String, password: String, dbname: String): String
+	external fun signerSignTypes(
+		publicKey: String,
+		encryption: String,
+		seedPhrase: String,
+		password: String,
+		dbname: String
+	): String
+
+	external fun signerSignMetadata(
+		network: String,
+		version: Int,
+		publicKey: String,
+		encryption: String,
+		seedPhrase: String,
+		password: String,
+		dbname: String
+	): String
+
+	external fun signerSignSpecs(
+		network: String,
+		publicKey: String,
+		encryption: String,
+		seedPhrase: String,
+		password: String,
+		dbname: String
+	): String
+
 	external fun testGetAllTXCards(dbname: String): String
 	external fun testGetAllLogCards(dbname: String): String
 
