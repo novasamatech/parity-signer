@@ -27,13 +27,7 @@ fun NewKeyModal(signerDataModel: SignerDataModel, increment: Boolean) {
 				signerDataModel.proposeDerivePath()
 		)
 	}
-	var keyName by remember {
-		mutableStateOf(
-			signerDataModel.proposeName(
-				derivationPath
-			)
-		)
-	}
+
 	var password by remember { mutableStateOf("") }
 	var passwordRepeat by remember { mutableStateOf("") }
 	val lastError = signerDataModel.lastError.observeAsState()
@@ -50,28 +44,9 @@ fun NewKeyModal(signerDataModel: SignerDataModel, increment: Boolean) {
 			value = derivationPath,
 			onValueChange = {
 				derivationPath = it
-				keyName = signerDataModel.proposeName(derivationPath)
 				signerDataModel.clearError()
 			},
 			label = { Text("Derivation path") },
-			singleLine = true,
-			keyboardOptions = KeyboardOptions(
-				autoCorrect = false,
-				capitalization = KeyboardCapitalization.None,
-				keyboardType = KeyboardType.Text,
-				imeAction = ImeAction.Done
-			),
-			keyboardActions = KeyboardActions(
-				onDone = { focusManager.clearFocus() }
-			)
-		)
-		TextField(
-			value = keyName,
-			onValueChange = {
-				keyName = it
-				signerDataModel.clearError()
-			},
-			label = { Text("Key name") },
 			singleLine = true,
 			keyboardOptions = KeyboardOptions(
 				autoCorrect = false,
@@ -131,7 +106,6 @@ fun NewKeyModal(signerDataModel: SignerDataModel, increment: Boolean) {
 					password = ""
 					passwordRepeat = ""
 					derivationPath = signerDataModel.proposeIncrement()
-					keyName = signerDataModel.proposeName(derivationPath)
 				},
 				enabled = true
 			) {
@@ -143,7 +117,7 @@ fun NewKeyModal(signerDataModel: SignerDataModel, increment: Boolean) {
 					contentColor = MaterialTheme.colors.onBackground
 				),
 				onClick = {
-					signerDataModel.addKey(derivationPath, keyName, password)
+					signerDataModel.addKey(derivationPath, password)
 				},
 				enabled = (password == passwordRepeat || password.isEmpty()) && !derivationPath.isEmpty() && lastError.value?.isEmpty() as Boolean
 			) {

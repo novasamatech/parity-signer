@@ -243,17 +243,6 @@ class SignerDataModel : ViewModel() {
 		clearTransaction()
 	}
 
-	//TODO: development function; should be removed on release
-	fun callNative(input: String): String {
-		var test: String
-		try {
-			test = substrateDevelopmentTest(input)
-		} catch (e: Exception) {
-			test = e.toString()
-		}
-		return test
-	}
-
 	fun refreshHistory() {
 		try {
 			_history.value = sortHistory(JSONArray(historyPrintHistory(dbName)))
@@ -488,7 +477,7 @@ class SignerDataModel : ViewModel() {
 			try {
 				//Create relevant keys - should make sure this works before saving key
 				var finalSeedPhrase =
-					substrateTryCreateSeed(seedName, "sr25519", seedPhrase, 24, dbName)
+					substrateTryCreateSeed(seedName, seedPhrase, 24, dbName)
 
 				//Encrypt and save seed
 				with(sharedPreferences.edit()) {
@@ -578,7 +567,7 @@ class SignerDataModel : ViewModel() {
 	/**
 	 * Add key to database; uses phone crypto to fetch seeds!
 	 */
-	fun addKey(path: String, name: String, password: String) {
+	fun addKey(path: String, password: String) {
 		if (selectedSeed.value?.isEmpty() as Boolean) selectSeed(
 			selectedIdentity.value?.get(
 				"seed_name"
@@ -601,7 +590,6 @@ class SignerDataModel : ViewModel() {
 		authentication.authenticate(activity) {
 			try {
 				substrateTryCreateIdentity(
-					name,
 					selectedSeed.value!!,
 					getSeed(),
 					"sr25519",
@@ -660,10 +648,6 @@ class SignerDataModel : ViewModel() {
 				""
 			}
 		}
-	}
-
-	fun proposeName(path: String): String {
-		return substrateSuggestName(path)
 	}
 
 	fun exportPublicKey(): ImageBitmap {
@@ -784,7 +768,6 @@ class SignerDataModel : ViewModel() {
 	external fun dbGetAllIdentities(dbname: String): String
 	external fun substrateTryCreateSeed(
 		seedName: String,
-		crypto: String,
 		seedPhrase: String,
 		seedLength: Int,
 		dbname: String
@@ -799,7 +782,6 @@ class SignerDataModel : ViewModel() {
 
 	external fun substrateCheckPath(path: String): Boolean
 	external fun substrateTryCreateIdentity(
-		idName: String,
 		seedName: String,
 		seedPhrase: String,
 		crypto: String,
@@ -809,7 +791,6 @@ class SignerDataModel : ViewModel() {
 		dbname: String
 	)
 
-	external fun substrateSuggestName(path: String): String
 	external fun substrateDeleteIdentity(
 		pubKey: String,
 		network: String,
@@ -830,9 +811,17 @@ class SignerDataModel : ViewModel() {
 	external fun historyInitHistoryWithCert(dbname: String)
 	external fun historyInitHistoryNoCert(dbname: String)
 	external fun historyDeviceWasOnline(dbname: String)
+	external fun historyGetWarnings(dbname: String): Boolean
+	external fun historyAcknowledgeWarnings(dbname: String)
 	external fun historyEntryUser(entry: String, dbname: String)
 	external fun historyEntrySystem(entry: String, dbname: String)
 	external fun historyHistorySeedNameWasShown(seedName: String, dbname: String)
+	external fun dbGetGeneralVerifier(dbname: String): String
+	external fun signerSignTypes(publicKey: String, encryption: String, seedPhrase: String, password: String, dbname: String): String
+	external fun signerSignMetadata(network: String, version: Int, publicKey: String, encryption: String, seedPhrase: String, password: String, dbname: String): String
+	external fun signerSignSpecs(network: String, publicKey: String, encryption: String, seedPhrase: String, password: String, dbname: String): String
+	external fun testGetAllTXCards(dbname: String): String
+	external fun testGetAllLogCards(dbname: String): String
 
 	//MARK: rust native section end
 
