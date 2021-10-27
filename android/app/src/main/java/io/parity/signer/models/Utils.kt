@@ -53,7 +53,7 @@ fun sortHistory(array: JSONArray): JSONArray {
 	for(i in 0 until array.length()) {
 		sortable += array.getJSONObject(i)
 	}
-	return JSONArray(sortable.sortedBy{ item -> item.getInt("index") }.reversed() )
+	return JSONArray(sortable.sortedBy{ item -> item.getInt("order") }.reversed() )
 }
 
 /**
