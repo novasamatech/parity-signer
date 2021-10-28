@@ -35,7 +35,7 @@ class SignerDataModel: ObservableObject {
     
     //History screen data state
     @Published var history: [History] = []
-    @Published var selectedRecord: Event?
+    @Published var selectedRecord: History?
     
     //Navigation
     @Published var signerScreen: SignerScreen = .history

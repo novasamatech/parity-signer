@@ -24,8 +24,10 @@ struct HistoryCardTemplate: View {
                     .frame(width: 26.0)
                     .padding(8)
                 VStack (alignment: .leading) {
-                    Text(timestamp)
-                        .font(.system(size: 13))
+                    if (timestamp != "") {
+                        Text(timestamp)
+                            .font(.system(size: 13))
+                    }
                     Text(line1)
                         .foregroundColor(Color(color))
                         .font(.system(size: 13, weight: .bold))

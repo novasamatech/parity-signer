@@ -128,7 +128,11 @@ extension SignerDataModel {
         case .settings:
             return ""
         case .history:
-            return ""
+            if self.selectedRecord == nil {
+                return ""
+            } else {
+                return "Event"
+            }
         }
     }
 }

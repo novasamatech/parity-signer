@@ -15,6 +15,8 @@
 		2D72B4F626EF3BC50081E879 /* Navigator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D72B4F526EF3BC50081E879 /* Navigator.swift */; };
 		2D72B4F826EF427C0081E879 /* Header.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D72B4F726EF427C0081E879 /* Header.swift */; };
 		2D72B4FA26EF7D1C0081E879 /* Seeds.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D72B4F926EF7D1C0081E879 /* Seeds.swift */; };
+		2D72D50A272A9E95004BA7C9 /* EventDetails.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D72D509272A9E95004BA7C9 /* EventDetails.swift */; };
+		2D72D50C272AA043004BA7C9 /* HistoryCardExtended.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D72D50B272AA043004BA7C9 /* HistoryCardExtended.swift */; };
 		2D7A7BA526AE9E680053C1E0 /* Footer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D7A7BA426AE9E680053C1E0 /* Footer.swift */; };
 		2D7A7BAA26AED2500053C1E0 /* Database in Resources */ = {isa = PBXBuildFile; fileRef = 2D7A7BA926AED2500053C1E0 /* Database */; };
 		2D7A7BB026B00A3E0053C1E0 /* NavbarShield.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D7A7BAF26B00A3E0053C1E0 /* NavbarShield.swift */; };
@@ -124,6 +126,8 @@
 		2D72B4F526EF3BC50081E879 /* Navigator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Navigator.swift; sourceTree = "<group>"; };
 		2D72B4F726EF427C0081E879 /* Header.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Header.swift; sourceTree = "<group>"; };
 		2D72B4F926EF7D1C0081E879 /* Seeds.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Seeds.swift; sourceTree = "<group>"; };
+		2D72D509272A9E95004BA7C9 /* EventDetails.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EventDetails.swift; sourceTree = "<group>"; };
+		2D72D50B272AA043004BA7C9 /* HistoryCardExtended.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HistoryCardExtended.swift; sourceTree = "<group>"; };
 		2D7A7BA426AE9E680053C1E0 /* Footer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Footer.swift; sourceTree = "<group>"; };
 		2D7A7BA926AED2500053C1E0 /* Database */ = {isa = PBXFileReference; lastKnownFileType = folder; path = Database; sourceTree = "<group>"; };
 		2D7A7BAF26B00A3E0053C1E0 /* NavbarShield.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NavbarShield.swift; sourceTree = "<group>"; };
@@ -247,6 +251,7 @@
 			children = (
 				2D7A7BFE26CA97920053C1E0 /* TransactionCards */,
 				2D7A7BFC26C675D30053C1E0 /* HistoryCard.swift */,
+				2D72D50B272AA043004BA7C9 /* HistoryCardExtended.swift */,
 				2DB037B9270D801400A318B2 /* HistoryCardTemplate.swift */,
 				2DE72BF426A59C59002BB752 /* NetworkCard.swift */,
 				2D7A7BC126B9D3360053C1E0 /* AddressCard.swift */,
@@ -276,6 +281,7 @@
 			children = (
 				2D7A7BEA26C4149E0053C1E0 /* DocumentModal.swift */,
 				2D7A7BEC26C50AB80053C1E0 /* NetworkManager.swift */,
+				2D72D509272A9E95004BA7C9 /* EventDetails.swift */,
 				2DB037C42716CDAF00A318B2 /* NetworkDetails.swift */,
 				2D7A7BEE26C50ACB0053C1E0 /* SeedManager.swift */,
 				2D7A7BCB26BAD02A0053C1E0 /* ExportAddress.swift */,
@@ -621,6 +627,7 @@
 				2D7A7BD626C1126C0053C1E0 /* Utils.swift in Sources */,
 				2DB037B6270B2E0B00A318B2 /* HistoryScreen.swift in Sources */,
 				2DE72BC426A588C7002BB752 /* MainScreenContainer.swift in Sources */,
+				2D72D50A272A9E95004BA7C9 /* EventDetails.swift in Sources */,
 				2D7A7BB826B28D350053C1E0 /* SettingsScreen.swift in Sources */,
 				2D7A7C1A26CB97B30053C1E0 /* TCID.swift in Sources */,
 				2D7A7BB626B136970053C1E0 /* NewSeedScreen.swift in Sources */,
@@ -651,6 +658,7 @@
 				2DB037D32721DBF900A318B2 /* TCNewSpecs.swift in Sources */,
 				2DE72BF326A59BAB002BB752 /* NetworkSelector.swift in Sources */,
 				2D72B4F826EF427C0081E879 /* Header.swift in Sources */,
+				2D72D50C272AA043004BA7C9 /* HistoryCardExtended.swift in Sources */,
 				2DB037C12714DB1700A318B2 /* SeedCard.swift in Sources */,
 				2DB037BA270D801400A318B2 /* HistoryCardTemplate.swift in Sources */,
 				2D7A7BFB26C6621D0053C1E0 /* HistoryCollapsed.swift in Sources */,
