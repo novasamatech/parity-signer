@@ -1,19 +1,19 @@
-use qr_reader_pc::{run_with_camera, arg_check};
-use nokhwa::{query_devices, CaptureAPIBackend};
 use std::env;
+use qr_reader_pc::{run_with_camera, arg_parser};
 
-fn main() {
-    let args: Vec<String> = env::args().collect();
-    let (camera_num, camera_request) = arg_check(args);
+fn main() -> Result<(), String> {
+   
+    let camera_num = match arg_parser(env::args()) {
+        Ok(x) => x,
+        Err(e) => return Err(format!("{}", e)),
+    };
     
-    if camera_request {
-        println!("{:?}", query_devices(CaptureAPIBackend::Video4Linux).unwrap());
+    match run_with_camera(camera_num) {
+        Ok(line) => println!("Result HEX: {}", line),
+        Err(e) => return Err(format!("QR reading error. {}", e)),
     }
-    else {
-        match run_with_camera(camera_num) {
-            Ok(line) => println!("Success! {}", line),
-            Err(e) => println!("Error. {}", e),
-        }
-    }
+
+    Ok(())
+
 }
 

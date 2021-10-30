@@ -1,16 +1,28 @@
+#![deny(missing_docs)]
+
+//! # QR reader crate for PC
+//!
+//! `qr_reader_pc` is a utility to scan (via webcam) QR codes from Signer
+//! and extracting data from it.
+
 extern crate minifb;
 use minifb::{Window, WindowOptions};
 
 use nokhwa::{Camera, CameraFormat, FrameFormat};
+use nokhwa::{query_devices, CaptureAPIBackend};
+
 use image::{Pixel, Luma, ImageBuffer, GrayImage};
 use quircs;
 use hex;
 use qr_reader_phone::process_payload::{process_decoded_payload, Ready, InProgress};
 use anyhow::anyhow;
+use std::env;
 
 const WIDTH: u32 = 640;
 const HEIGHT: u32 = 480;
 
+/// Main cycle of video input reading.
+/// 
 pub fn run_with_camera(camera_num : usize) -> anyhow::Result<String> {
 
     let mut camera = match Camera::new(camera_num, Some(CameraFormat::new_from(WIDTH, HEIGHT, FrameFormat::MJPEG, 30)),) {
@@ -112,15 +124,27 @@ fn process_qr_image (img: &ImageBuffer<Luma<u8>, Vec<u8>>, decoding: InProgress)
     }
 }
 
-pub fn arg_check(args: Vec<String>) -> (usize, bool)
+/// Program's argument parser.
+///
+pub fn arg_parser(mut args: env::Args) -> anyhow::Result<usize>
 {
-    if args.len() > 1 {
-        match args[1].parse() {
-            Ok(num) => (num, false),
-            Err(_) => (0,true),
-        }
-    }
-    else {
-        (0,true)
+    args.next(); // skip program name
+
+    match (args.next(), args.next()) {
+        (Some(argument), Some(camera_index)) if argument == "d" => match camera_index.trim().parse() {
+            Ok(index) => Ok(index),
+            Err(e) => Err(anyhow!("Index parsing error: {}", e)),
+        },        
+        (Some(_), _) => Err(anyhow!("Can`t recognize arguments.")),
+        (None, _) => {
+            println!("Not enough arguments. Use 'd' argument to set index of camera. Example: cargo run d 0 \n");
+            println!("List of available devices:");
+            if let Ok(list) = query_devices(CaptureAPIBackend::Video4Linux) {
+                for device in list {
+                    println!("{:?}", device);
+                };
+                println!();
+            };
+            Err(anyhow!("Error parsing arguments."))},
     }
 }
