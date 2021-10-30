@@ -18,22 +18,26 @@ use qr_reader_phone::process_payload::{process_decoded_payload, Ready, InProgres
 use anyhow::anyhow;
 use std::env;
 
-const WIDTH: u32 = 640;
-const HEIGHT: u32 = 480;
+const DEFAULT_WIDTH: u32 = 640;
+const DEFAULT_HEIGHT: u32 = 480;
+const DEFAULT_FRAME_FORMAT: FrameFormat = FrameFormat::YUYV;
+const DEFAULT_FPS: u32 = 30;
 
 /// Main cycle of video input reading.
 /// 
-pub fn run_with_camera(camera_num : usize) -> anyhow::Result<String> {
+pub fn run_with_camera(camera_settings : CameraSettings) -> anyhow::Result<String> {
 
-    let mut camera = match Camera::new(camera_num, Some(CameraFormat::new_from(WIDTH, HEIGHT, FrameFormat::MJPEG, 30)),) {
+    let mut camera = match Camera::new(camera_settings.index, 
+        Some(CameraFormat::new_from(DEFAULT_WIDTH, DEFAULT_HEIGHT, camera_settings.frame_format, camera_settings.fps)),) {
+
         Ok(x) => x,
         Err(e) => return Err(anyhow!("Error opening camera. {}", e)),
     };   
 
     let mut window = match Window::new(
-        "Test - ESC to exit",
-        WIDTH as usize,
-        HEIGHT as usize,
+        "Camera capture",
+        DEFAULT_WIDTH as usize,
+        DEFAULT_HEIGHT as usize,
         WindowOptions::default(),
     ) {
         Ok(x) => x,
@@ -79,10 +83,10 @@ fn camera_capture(camera: &mut Camera, window: &mut Window) -> anyhow::Result<Im
     };
 
     let mut out_buf: Vec<u32> = Vec::new();
-    let mut gray_img: GrayImage = ImageBuffer::new(WIDTH, HEIGHT);
+    let mut gray_img: GrayImage = ImageBuffer::new(DEFAULT_WIDTH, DEFAULT_HEIGHT);
 
-    for y in 0..HEIGHT {
-        for x in 0..WIDTH {
+    for y in 0..DEFAULT_HEIGHT {
+        for x in 0..DEFAULT_WIDTH {
             let new_pixel = frame.get_pixel(x, y).to_luma();
             let buf_pix = frame.get_pixel(x, y).0;
             let buf_col = u32::from_be_bytes([0,buf_pix[0], buf_pix[1], buf_pix[2]]);
@@ -91,7 +95,7 @@ fn camera_capture(camera: &mut Camera, window: &mut Window) -> anyhow::Result<Im
         }            
     }
 
-    match window.update_with_buffer(&out_buf[..], 640, 480) {
+    match window.update_with_buffer(&out_buf[..], DEFAULT_WIDTH as usize, DEFAULT_HEIGHT as usize) {
         Ok(x) => x,
         Err(e) => return Err(anyhow!("Error writing videobuffer. {}", e)),
     };
@@ -124,20 +128,52 @@ fn process_qr_image (img: &ImageBuffer<Luma<u8>, Vec<u8>>, decoding: InProgress)
     }
 }
 
+/// Structure for camera settings.
+///
+pub struct CameraSettings {
+    index: usize,
+    frame_format: FrameFormat,
+    fps: u32,
+}
+
 /// Program's argument parser.
 ///
-pub fn arg_parser(mut args: env::Args) -> anyhow::Result<usize>
+pub fn arg_parser(mut args: env::Args) -> anyhow::Result<CameraSettings>
 {
     args.next(); // skip program name
 
     match (args.next(), args.next()) {
-        (Some(argument), Some(camera_index)) if argument == "d" => match camera_index.trim().parse() {
-            Ok(index) => Ok(index),
-            Err(e) => Err(anyhow!("Index parsing error: {}", e)),
-        },        
-        (Some(_), _) => Err(anyhow!("Can`t recognize arguments.")),
-        (None, _) => {
-            println!("Not enough arguments. Use 'd' argument to set index of camera. Example: cargo run d 0 \n");
+
+        (Some(argument), Some(camera_index)) if argument == "d" => { 
+
+            let index = match camera_index.trim().parse() {
+                Ok(index) => index,
+                Err(e) => return Err(anyhow!("Index parsing error: {}", e)),
+            };  
+
+            let frame_format = match args.next() {
+                Some(argument) if argument == "YUYV" => FrameFormat::YUYV,
+                Some(argument) if argument == "MJPEG" => FrameFormat::MJPEG,
+                _ => {println!("Frame format parsing error. Set default frame format"); DEFAULT_FRAME_FORMAT},
+            };  
+            
+            let fps = match args.next() {
+                Some(fps) => match fps.trim().parse() {
+                        Ok(fps) => fps,
+                        Err(_) => {println!("FPS parsing error. Set default framerate"); DEFAULT_FPS},
+                    },
+                None => {println!("FPS parsing error. Set default framerate"); DEFAULT_FPS},
+            };                    
+
+            Ok(CameraSettings {index, frame_format, fps})
+        }
+        (Some(_), ..) => Err(anyhow!("Can`t recognize arguments.")),
+        (None, ..) => {
+            println!("\nNot enough arguments. Use 'd' argument to set index of camera, frame format (YUYV or MJPEG) and fps.\
+            \nExample: cargo run d 0 MJPEG 30\
+            \nYou can only provide index. Default frame format: YUYV, default fps: 30, hardcoded framesize: 640x480\
+            \nExample: cargo run d 0");
+
             println!("List of available devices:");
             if let Ok(list) = query_devices(CaptureAPIBackend::Video4Linux) {
                 for device in list {
