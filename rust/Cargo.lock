@@ -1592,6 +1592,29 @@ dependencies = [
 ]
 
 [[package]]
+name = "parser"
+version = "0.1.0"
+dependencies = [
+ "bitvec",
+ "db_handling",
+ "defaults",
+ "definitions",
+ "frame-metadata",
+ "hex",
+ "lazy_static",
+ "meta_reading",
+ "num-bigint 0.4.2",
+ "parity-scale-codec",
+ "parity-scale-codec-derive",
+ "printing_balance",
+ "regex",
+ "scale-info",
+ "sp-arithmetic",
+ "sp-core",
+ "sp-runtime",
+]
+
+[[package]]
 name = "paste"
 version = "1.0.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"

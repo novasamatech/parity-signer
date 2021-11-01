@@ -36,9 +36,27 @@ pub struct ChainSpecsToSend {
     pub unit: String,
 }
 
+#[derive(Decode, Encode, PartialEq, Debug, Clone)]
+pub struct ShortSpecs {
+    pub base58prefix: u16,
+    pub decimals: u8,
+    pub genesis_hash: [u8; 32],
+    pub name: String,
+    pub unit: String,
+}
+
 impl ChainSpecs {
     pub fn show(&self, current_verifier: &CurrentVerifier, general_verifier: &Verifier) -> String {
         format!("\"base58prefix\":\"{}\",\"color\":\"{}\",\"decimals\":\"{}\",\"encryption\":\"{}\",\"genesis_hash\":\"{}\",\"logo\":\"{}\",\"name\":\"{}\",\"order\":\"{}\",\"path_id\":\"{}\",\"secondary_color\":\"{}\",\"title\":\"{}\",\"unit\":\"{}\",\"current_verifier\":{}", &self.base58prefix, &self.color, &self.decimals, &self.encryption.show(), hex::encode(&self.genesis_hash), &self.logo, &self.name, &self.order, &self.path_id, &self.secondary_color, &self.title, &self.unit, current_verifier.show(general_verifier))
+    }
+    pub fn short(&self) -> ShortSpecs {
+        ShortSpecs {
+            base58prefix: self.base58prefix,
+            decimals: self.decimals,
+            genesis_hash: self.genesis_hash,
+            name: self.name.to_string(),
+            unit: self.unit.to_string(),
+        }
     }
 }
 
