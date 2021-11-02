@@ -1,5 +1,6 @@
 package io.parity.signer.modals
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -27,26 +28,10 @@ fun TransactionPreview(signerDataModel: SignerDataModel) {
 			}
 		}
 		Row(
-			horizontalArrangement = Arrangement.SpaceBetween,
-			modifier = Modifier.fillMaxWidth()
+			horizontalArrangement = Arrangement.Center,
+			modifier = Modifier.fillMaxWidth().clickable { signerDataModel.acceptTransaction() }
 		) {
-			Button(
-				colors = ButtonDefaults.buttonColors(
-					backgroundColor = MaterialTheme.colors.secondary,
-					contentColor = MaterialTheme.colors.onSecondary,
-				),
-				onClick = { signerDataModel.totalRefresh() }
-			) { Text("Reject") }
-			Button(
-				colors = ButtonDefaults.buttonColors(
-					backgroundColor = MaterialTheme.colors.secondary,
-					contentColor = MaterialTheme.colors.onSecondary,
-				),
-				onClick = {
-					signerDataModel.acceptTransaction()
-				},
-				enabled = actionable.value as Boolean
-			) { Text("Accept") }
+			Text("Accept")
 		}
 	}
 }

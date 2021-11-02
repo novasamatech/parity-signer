@@ -361,9 +361,11 @@ class SignerDataModel : ViewModel() {
 			val method = (transactionObject.optJSONArray("method") ?: JSONArray())
 			val extrinsics =
 				(transactionObject.optJSONArray("extrinsics") ?: JSONArray())
+			val newSpecs = (transactionObject.optJSONArray("new_specs") ?: JSONArray())
+			val verifier = (transactionObject.optJSONArray("verifier") ?: JSONArray())
 			action = transactionObject.optJSONObject("action") ?: JSONObject()
 			_actionable.value = !action.isNull("type")
-			if (action.optString("type") == "sign_transaction") {
+			if (action.optString("type") == "sign") {
 				signingAuthor = author.getJSONObject(0)
 			}
 			Log.d("action", action.toString())
@@ -375,7 +377,9 @@ class SignerDataModel : ViewModel() {
 						error,
 						typesInfo,
 						method,
-						extrinsics
+						extrinsics,
+						newSpecs,
+						verifier
 					)
 				)
 			_transactionState.value = TransactionState.Preview
@@ -386,7 +390,8 @@ class SignerDataModel : ViewModel() {
 	}
 
 	fun acceptTransaction() {
-		if (action.getString("type") == "sign_transaction") {
+		if (action.getString("type") == "sign") {
+			Log.d("authorcard", signingAuthor.toString())
 			if (signingAuthor.getJSONObject("payload").getBoolean("has_password")) {
 				_transactionState.value = TransactionState.Password
 			} else {
@@ -401,7 +406,8 @@ class SignerDataModel : ViewModel() {
 	fun signTransaction(password: String) {
 		authentication.authenticate(activity) {
 			signature = substrateHandleSign(
-				action.getJSONObject("payload").toString(), sharedPreferences.getString(
+				action.getString(
+					"payload"), sharedPreferences.getString(
 					signingAuthor.getJSONObject("payload").getString("seed"), ""
 				) ?: "", password, "", dbName
 			)
@@ -416,7 +422,7 @@ class SignerDataModel : ViewModel() {
 	private fun performTransaction(seedPhrase: String, password: String) {
 		try {
 			substrateHandleStub(
-				action.getJSONObject("payload").toString(),
+				action.getString("payload"),
 				dbName
 			)
 		} catch (e: java.lang.Exception) {
