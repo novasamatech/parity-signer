@@ -1,9 +1,6 @@
 yarn-error.log
 *.log
 
-# typescript output directory
-dist/
-
 # jest cache
 test/.jest/
 
@@ -20,9 +17,6 @@ rust/.cargo
 # OSX
 #
 .DS_Store
-
-# CocoaPods
-/ios/Pods/
 
 # Xcode
 #
@@ -54,11 +48,6 @@ gen/
 *.hprof
 !debug.keystore
 
-# node.js
-#
-node_modules/
-npm-debug.log
-
 # BUCK
 buck-out/
 \.buckd/
@@ -85,6 +74,10 @@ android/.project
 android/app/.project
 android/app/bin
 android/app/src/main/jniLibs
+android/app/src/main/assets/Database/*
+
+# iOS
+ios/NativeSigner/Database/Database/*
 
 # rust
 rust/target
