@@ -54,6 +54,8 @@ if [ "$1" == "android" ]
         cp "../target/${ANDROID_ARCHS[$i]}/release/lib${LIB_NAME}.so" "../../android/app/src/main/jniLibs/${ANDROID_FOLDER[$i]}/lib${LIB_NAME}.so"
     done
 
+    rm -rf ../../android/app/src/main/assets/Database/*
+    cp -r ../database/database_cold_release/* ../../android/app/src/main/assets/Database/
 fi
 
 if [ "$1" == "ios" ]
@@ -75,6 +77,8 @@ if [ "$1" == "ios" ]
     lipo -create -output "lib${LIB_NAME}.a" ../target/x86_64-apple-ios/release/libsigner.a ../target/aarch64-apple-ios/release/libsigner.a
     #unsupported: target/armv7-apple-ios/release/libsigner.a target/armv7s-apple-ios/release/libsigner.a
 
+    rm -rf ../../ios/NativeSigner/Database/Database/*
+    cp -r ../database/database_cold_release/* ../../ios/NativeSigner/Database/Database/*
 fi
 
 #echo "hello tom" > read.txt
