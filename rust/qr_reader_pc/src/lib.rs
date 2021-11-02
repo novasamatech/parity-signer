@@ -5,26 +5,29 @@
 //! `qr_reader_pc` is a utility to scan (via webcam) QR codes from Signer
 //! and extracting data from it.
 
-extern crate minifb;
 use minifb::{Window, WindowOptions};
-
 use nokhwa::{query_devices, CaptureAPIBackend};
 use nokhwa::{Camera, CameraFormat, FrameFormat};
-
 use anyhow::anyhow;
-use hex;
 use image::{GrayImage, ImageBuffer, Luma, Pixel};
 use qr_reader_phone::process_payload::{process_decoded_payload, InProgress, Ready};
-use quircs;
 use std::env;
+// use quircs;
+// use hex;
 
+// Default camera settings
 const DEFAULT_WIDTH: u32 = 640;
 const DEFAULT_HEIGHT: u32 = 480;
 const DEFAULT_FRAME_FORMAT: FrameFormat = FrameFormat::YUYV;
 const DEFAULT_FPS: u32 = 30;
+const DEFAULT_BACKEND: CaptureAPIBackend = CaptureAPIBackend::Video4Linux;
 
-/// Main cycle of video input reading.
+/// Main cycle of video capture.
+/// Returns a string with decoded QR message in HEX format or error
 ///
+/// # Arguments
+///
+/// * `camera_settings` - A CameraSettings struct that holds the camera parameters
 pub fn run_with_camera(camera_settings: CameraSettings) -> anyhow::Result<String> {
     let mut camera = match Camera::new(
         camera_settings.index.unwrap(),
@@ -97,7 +100,7 @@ fn camera_capture(camera: &mut Camera, window: &mut Window,) -> anyhow::Result<I
             gray_img.put_pixel(x, y, new_pixel);
             out_buf.push(buf_col);
         }
-    }
+    };
 
     match window.update_with_buffer(
         &out_buf[..],
@@ -115,28 +118,21 @@ fn process_qr_image(img: &ImageBuffer<Luma<u8>, Vec<u8>>, decoding: InProgress,)
     let mut qr_decoder = quircs::Quirc::new();
     let codes = qr_decoder.identify(img.width() as usize, img.height() as usize, img);
     match codes.last() {
-        Some(x) => {
-            if let Ok(code) = x {
-                match code.decode() {
-                    Ok(decoded) => process_decoded_payload(decoded.payload, decoding),
-                    Err(_) => {
-                        //                        println!("Error with this scan: {}", e);
-                        Ok(Ready::NotYet(decoding))
-                    }
+        Some(Ok(code)) => {
+            match code.decode() {
+                Ok(decoded) => process_decoded_payload(decoded.payload, decoding),
+                Err(_) => {
+                    Ok(Ready::NotYet(decoding))
                 }
-            } else {
-                Ok(Ready::NotYet(decoding))
             }
-        }
-        None => {
-            //            println!("no qr in this scan");
+        },
+        None | Some(Err(_)) => {
             Ok(Ready::NotYet(decoding))
-        }
+        },
     }
 }
 
-/// Structure for camera settings.
-///
+/// Structure for storing camera settings.
 pub struct CameraSettings {
     index: Option<usize>,
     frame_format: FrameFormat,
@@ -145,7 +141,7 @@ pub struct CameraSettings {
 
 fn print_list_of_cameras() {
     println!("List of available devices:");
-    match query_devices(CaptureAPIBackend::Video4Linux) {
+    match query_devices(DEFAULT_BACKEND) {
         Ok(list) => {
             for device in list {
                 println!("{:?}", device);
@@ -156,7 +152,8 @@ fn print_list_of_cameras() {
 }
 
 /// Program's argument parser.
-///
+/// Parser initialize CameraSettings struct with default values or program arguments.
+/// The program arguments are described in the readme.md file.
 pub fn arg_parser(mut args: env::Args) -> anyhow::Result<CameraSettings> {
     args.next(); // skip program name
 
@@ -190,7 +187,7 @@ pub fn arg_parser(mut args: env::Args) -> anyhow::Result<CameraSettings> {
             },
 
             "h" | "-h" | "--help" => {
-                // TODO
+                // TODO. The reference to the readme.md implemented now.
             }
 
             _ => return Err(anyhow!("Argument parsing error.")),
