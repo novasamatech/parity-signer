@@ -6,6 +6,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
 import io.parity.signer.SignerScreen
 import io.parity.signer.models.SignerDataModel
 
@@ -16,7 +17,8 @@ import io.parity.signer.models.SignerDataModel
 fun BottomBar(
 	signerDataModel: SignerDataModel,
 ) {
-	BottomAppBar {
+	BottomAppBar (elevation = 0.dp,
+		modifier = Modifier.height(80.dp)) {
 		BottomBarButton(
 			signerDataModel = signerDataModel,
 			image = Icons.Default.Home,

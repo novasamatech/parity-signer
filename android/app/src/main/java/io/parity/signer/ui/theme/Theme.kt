@@ -23,6 +23,7 @@ private val LightColorPalette = lightColors(
 	primaryVariant = MainColor,
 	secondary = SecondaryColor,
 	background = BackgroundAppColor,
+	onPrimary = Color.Black,
 	onSecondary = Color.Black,
 	onBackground = Color.Black
 
