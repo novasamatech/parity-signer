@@ -5,6 +5,15 @@ set -e
 
 cd "$(dirname "${0}")/../rust/signer"
 
+if [ "$1" != "android" ] && [ "$1" != "ios" ]
+then
+	printf 'Please select target OS\n'
+	printf 'build.sh android\n'
+	printf 'or\n'
+	printf 'build.sh ios\n'
+	exit 1
+fi
+
 if [ "$1" == "android" ]
   then
 
@@ -13,7 +22,7 @@ if [ "$1" == "android" ]
     if [ -z ${NDK_HOME+x} ];
       then
         printf 'Please install android-ndk or export NDK_HOME (use absolute path)\n\n'
-        printf 'from https://developer.android.com/ndk/downloads or with sdkmanager'
+        printf 'from https://developer.android.com/ndk/downloads or with sdkmanager\n'
         exit 1
       else
         printf "Building Andriod targets...";
