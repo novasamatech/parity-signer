@@ -11,3 +11,4 @@ data class Network(
 	val secondaryColor: String,
 	val title: String
 )
+

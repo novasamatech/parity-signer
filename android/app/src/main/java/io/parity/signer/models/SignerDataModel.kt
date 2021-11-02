@@ -21,6 +21,13 @@ import org.json.JSONArray
 import org.json.JSONObject
 import java.io.File
 import java.io.FileOutputStream
+import android.content.Intent
+
+import android.content.BroadcastReceiver
+
+import android.content.IntentFilter
+import android.provider.Settings
+
 
 //TODO: chop this monster in chunks
 
@@ -35,6 +42,9 @@ class SignerDataModel : ViewModel() {
 	lateinit var activity: FragmentActivity
 	lateinit var masterKey: MasterKey
 	private var hasStrongbox: Boolean = false
+
+	//Alert
+	private val _alert = MutableLiveData(SignerAlert.None)
 
 	//Authenticator to call!
 	var authentication: Authentication = Authentication()
@@ -122,6 +132,7 @@ class SignerDataModel : ViewModel() {
 	val keyManagerModal: LiveData<KeyManagerModal> = _keyManagerModal
 	val settingsModal: LiveData<SettingsModal> = _settingsModal
 	val transactionState: LiveData<TransactionState> = _transactionState
+	val alert: LiveData<SignerAlert> = _alert
 
 	//MARK: init boilerplate begin
 
@@ -144,6 +155,20 @@ class SignerDataModel : ViewModel() {
 			context.packageManager.hasSystemFeature(PackageManager.FEATURE_STRONGBOX_KEYSTORE)
 
 		Log.d("strongbox available", hasStrongbox.toString())
+
+		//Airplane mode detector
+		isAirplaneOn()
+
+		val intentFilter = IntentFilter("android.intent.action.AIRPLANE_MODE")
+
+		val receiver: BroadcastReceiver = object : BroadcastReceiver() {
+			override fun onReceive(context: Context, intent: Intent) {
+				Log.d("AirplaneMode", "Service state changed")
+				isAirplaneOn()
+			}
+		}
+
+		context.registerReceiver(receiver, intentFilter)
 
 		//Init crypto for seeds:
 		//https://developer.android.com/training/articles/keystore
@@ -168,17 +193,30 @@ class SignerDataModel : ViewModel() {
 
 	/**
 	 * Populate database!
+	 * This is normal onboarding
 	 */
 	fun onBoard() {
 		copyAsset("")
+		historyInitHistoryWithCert(dbName)
 		totalRefresh()
 	}
 
 	/**
-	 * TODO: wipe all data!
+	 * Init database with no general certificate
+	 */
+	fun jailbreak() {
+		wipe()
+		copyAsset("")
+		historyInitHistoryNoCert(dbName)
+		totalRefresh()
+	}
+
+	/**
+	 * Wipes all data
 	 */
 	fun wipe() {
-		File(dbName).delete()
+		deleteDir(File(dbName))
+		sharedPreferences.edit().clear().commit()
 	}
 
 	/**
@@ -212,6 +250,31 @@ class SignerDataModel : ViewModel() {
 		}
 	}
 
+	/**
+	 * Util to remove directory
+	 */
+	private fun deleteDir(fileOrDirectory: File) {
+		if (fileOrDirectory.isDirectory()) for (child in fileOrDirectory.listFiles()) deleteDir(
+			child
+		)
+		fileOrDirectory.delete()
+	}
+
+	/**
+	 * Checks if airplane mode was off
+	 */
+	private fun isAirplaneOn() {
+		if (Settings.Global.getInt(context.contentResolver, Settings.Global.AIRPLANE_MODE_ON, 0) == 0) {
+			if (alert.value != SignerAlert.Active) {
+				_alert.value = SignerAlert.Active
+				historyDeviceWasOnline(dbName)
+			}
+		} else {
+			if (alert.value == SignerAlert.Active) {
+				_alert.value = SignerAlert.Past
+			}
+		}
+	}
 	//MARK: Init boilerplate end
 
 	//MARK: General utils begin
@@ -244,9 +307,13 @@ class SignerDataModel : ViewModel() {
 		clearTransaction()
 	}
 
+	/**
+	 * Get history from db; should bhe run on log screen appearance
+	 */
 	fun refreshHistory() {
 		try {
 			_history.value = sortHistory(JSONArray(historyPrintHistory(dbName)))
+			_alert.value = if (historyGetWarnings(dbName)) {SignerAlert.Past} else {SignerAlert.None}
 		} catch (e: java.lang.Exception) {
 			Log.e("History refresh error!", e.toString())
 		}
@@ -514,11 +581,30 @@ class SignerDataModel : ViewModel() {
 	 */
 	fun selectSeed(seedName: String) {
 		_selectedSeed.value = seedName
-		totalRefresh() //should we?
+		fetchKeys()
 	}
 
+	/**
+	 * Fetch seed from strongbox; must be in unlocked scope
+	 */
 	fun getSeed(): String {
 		return sharedPreferences.getString(selectedSeed.value, "") ?: ""
+	}
+
+	/**
+	 * Selects seed key, if available
+	 */
+	fun getRootIdentity(seedName: String): JSONObject {
+		for (i in 0 until identities.value!!.length()) {
+			val identity = identities.value!!.getJSONObject(i)
+			if (identity.getString("seed_name") == seedName && identity.getString("path") == "" && identity.getString(
+					"has_password"
+				) == "false"
+			) {
+				return identity
+			}
+		}
+		return JSONObject()
 	}
 
 	//MARK: Seed management end
@@ -684,6 +770,12 @@ class SignerDataModel : ViewModel() {
 	 */
 	fun navigate(screen: SignerScreen) {
 		_signerScreen.value = screen
+		if (screen == SignerScreen.Keys) {
+			selectSeedEngage()
+		}
+		if (screen == SignerScreen.Log) {
+			engageHistoryScreen()
+		}
 	}
 
 	/**
@@ -700,39 +792,72 @@ class SignerDataModel : ViewModel() {
 			SignerScreen.Keys -> {
 				when (keyManagerModal.value) {
 					KeyManagerModal.None -> {
-						_keyManagerModal.value = KeyManagerModal.SeedSelector
+						selectSeedEngage()
 					}
 					KeyManagerModal.NewSeed -> {
-						_keyManagerModal.value = KeyManagerModal.SeedSelector
+						selectSeedEngage()
 					}
 					KeyManagerModal.NewKey -> {
-						_keyManagerModal.value = KeyManagerModal.None
+						clearKeyManagerScreen()
 					}
 					KeyManagerModal.ShowKey -> {
-						_keyManagerModal.value = KeyManagerModal.None
+						clearKeyManagerScreen()
 					}
 					KeyManagerModal.SeedBackup -> {
-						_keyManagerModal.value = KeyManagerModal.SeedSelector
+						selectSeedEngage()
 					}
 					KeyManagerModal.KeyDeleteConfirm -> {
-						_keyManagerModal.value = KeyManagerModal.None
+						clearKeyManagerScreen()
 					}
 					KeyManagerModal.SeedSelector -> {
+						selectSeedEngage()
 					}
 					KeyManagerModal.NetworkManager -> {
-						_keyManagerModal.value = KeyManagerModal.None
+						clearKeyManagerScreen()
 					}
 					KeyManagerModal.NetworkDetails -> {
-						_keyManagerModal.value = KeyManagerModal.None
+						clearKeyManagerScreen()
 					}
 				}
 			}
 			SignerScreen.Settings -> {
-				_settingsModal.value = SettingsModal.None
+				clearHistoryScreen()
 			}
 		}
 	}
 
+	fun isBottom(): Boolean {
+		return (settingsModal.value == SettingsModal.None && keyManagerModal.value == KeyManagerModal.SeedSelector && transactionState.value == TransactionState.None)
+	}
+
+	fun getScreenName(): String {
+		Log.d("getscreenname", "called")
+		return when (signerScreen.value) {
+			SignerScreen.Scan -> ""
+			SignerScreen.Keys -> when (keyManagerModal.value) {
+				KeyManagerModal.None -> ""
+				KeyManagerModal.NewSeed -> ""
+				KeyManagerModal.NewKey -> "New Derived Key"
+				KeyManagerModal.ShowKey -> if (selectedIdentity.value == getRootIdentity(
+						selectedSeed.value ?: ""
+					)
+				) {
+					"Seed key"
+				} else {
+					"Derived Key"
+				}
+				KeyManagerModal.SeedBackup -> "Backup Seed"
+				KeyManagerModal.KeyDeleteConfirm -> ""
+				KeyManagerModal.SeedSelector -> "Select Seed"
+				KeyManagerModal.NetworkManager -> ""
+				KeyManagerModal.NetworkDetails -> ""
+				null -> "error"
+			}
+			SignerScreen.Settings -> ""
+			SignerScreen.Log -> ""
+			null -> "error"
+		}
+	}
 	//MARK: Navigation end
 
 	//MARK: Modals control begin
@@ -746,6 +871,14 @@ class SignerDataModel : ViewModel() {
 	fun acknowledgeBackup() {
 		_backupSeedPhrase.value = ""
 		clearKeyManagerScreen()
+	}
+
+	/**
+	 * Use this to bring up seed selection screen in key manager
+	 */
+	fun selectSeedEngage() {
+		selectSeed("")
+		_keyManagerModal.value = KeyManagerModal.SeedSelector
 	}
 
 	/**
@@ -773,7 +906,11 @@ class SignerDataModel : ViewModel() {
 	 * Remove key manager modals
 	 */
 	fun clearKeyManagerScreen() {
-		_keyManagerModal.value = KeyManagerModal.None
+		_keyManagerModal.value = if (selectedSeed.value == "") {
+			KeyManagerModal.SeedSelector
+		} else {
+			KeyManagerModal.None
+		}
 	}
 
 	/**
@@ -786,7 +923,8 @@ class SignerDataModel : ViewModel() {
 	//Settings
 
 	fun engageHistoryScreen() {
-		_settingsModal.value = SettingsModal.History
+		refreshHistory()
+		_signerScreen.value = SignerScreen.Log
 	}
 
 	fun clearHistoryScreen() {

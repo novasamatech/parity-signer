@@ -13,6 +13,14 @@ fun String.decodeHex(): ByteArray {
 	return chunked(2).map { it.toInt(16).toByte() }.toByteArray()
 }
 
+fun String.abbreviateString(length: Int): String {
+	return if (this.length > length*2) {
+		this.substring(0, length) + "..." + this.substring(this.length - length, this.length)
+	} else {
+		this
+	}
+}
+
 /**
  * Encodes number array into string
  */

@@ -29,8 +29,18 @@ fun SettingsScreen(signerDataModel: SignerDataModel) {
 						backgroundColor = MaterialTheme.colors.secondary,
 						contentColor = MaterialTheme.colors.onSecondary,
 					),
-					onClick = { signerDataModel.engageHistoryScreen() }
-				) { Text("History") }
+					onClick = {
+						signerDataModel.wipe()
+						signerDataModel.totalRefresh()
+					}
+				) { Text("Wipe Signer") }
+				Button(
+					colors = ButtonDefaults.buttonColors(
+						backgroundColor = MaterialTheme.colors.secondary,
+						contentColor = MaterialTheme.colors.onSecondary,
+					),
+					onClick = { signerDataModel.jailbreak() }
+				) { Text("Wipe general certificate") }
 			}
 		}
 		SettingsModal.History -> {

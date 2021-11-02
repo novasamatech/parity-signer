@@ -22,6 +22,8 @@ import io.parity.signer.screens.SettingsScreen
 import io.parity.signer.ui.theme.ParitySignerTheme
 import android.Manifest
 import android.content.pm.PackageManager
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.core.app.ActivityCompat
 import io.parity.signer.components.BottomBar
 import io.parity.signer.components.TopBar
@@ -82,20 +84,23 @@ fun SignerApp(signerDataModel: SignerDataModel) {
 					bottomBar = {
 						BottomBar(signerDataModel = signerDataModel)
 					}
-				) { _ ->
-					when (signerScreen.value) {
-						SignerScreen.Scan -> {
-							HomeScreen(
-								signerDataModel = signerDataModel)
-						}
-						SignerScreen.Keys -> {
-							KeyManager(signerDataModel = signerDataModel)
-						}
-						SignerScreen.Settings -> {
-							SettingsScreen(signerDataModel = signerDataModel)
-						}
-						SignerScreen.Log -> {
-							HistoryScreen(signerDataModel = signerDataModel)
+				) { innerPadding ->
+					Box(modifier = Modifier.padding(innerPadding)) {
+						when (signerScreen.value) {
+							SignerScreen.Scan -> {
+								HomeScreen(
+									signerDataModel = signerDataModel
+								)
+							}
+							SignerScreen.Keys -> {
+								KeyManager(signerDataModel = signerDataModel)
+							}
+							SignerScreen.Settings -> {
+								SettingsScreen(signerDataModel = signerDataModel)
+							}
+							SignerScreen.Log -> {
+								HistoryScreen(signerDataModel = signerDataModel)
+							}
 						}
 					}
 				}

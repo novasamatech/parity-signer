@@ -22,3 +22,7 @@ enum class SettingsModal {
 enum class OnBoardingState {
 	InProgress, No, Yes;
 }
+
+enum class SignerAlert {
+	None, Active, Past
+}
