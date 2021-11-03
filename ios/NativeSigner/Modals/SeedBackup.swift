@@ -9,6 +9,7 @@ import SwiftUI
 
 struct SeedBackup: View {
     @EnvironmentObject var data: SignerDataModel
+    @State var phrase = ""
     var body: some View {
         ZStack{
             ModalBackdrop()
@@ -18,14 +19,18 @@ struct SeedBackup: View {
                 Text("Keep your seed phrase in safe place; anyone could restore accounts using this seed phrase; there is no other way to restore accounts.").font(.footnote)
                 ZStack {
                     RoundedRectangle(cornerRadius: 8).stroke(Color("AccentColor")).foregroundColor(Color("backgroundColor")).frame(height: 200)
-                    Text(data.selectedSeed == "" ? "" : data.getRememberedSeedPhrate())
+                    Text(phrase)
                         .font(.system(size: 16, weight: .semibold, design: .monospaced))
                         .foregroundColor(Color("cryptoColor"))
                         .padding(8)
                 }
                 Spacer()
             }
-        }.onDisappear {
+        }
+        .onAppear {
+            phrase = data.selectedSeed == "" ? "" : data.getRememberedSeedPhrate()
+        }
+        .onDisappear {
             data.seedBackup = ""
             data.selectSeed(seedName: "")
         }

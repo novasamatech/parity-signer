@@ -74,6 +74,12 @@ extension SignerDataModel {
         if checkSeedCollision(seedName: seedName) {
             print("Key collision")
             self.lastError = "Seed with this name already exists"
+            return
+        }
+        if checkSeedPhraseCollision(seedPhrase: seedPhrase) {
+            print("Key collision")
+            self.lastError = "Seed with this name already exists"
+            return
         }
         let res = try_create_seed(err_ptr, seedName, seedPhrase, 24, dbName)
         if err_ptr.pointee.code != 0 {
@@ -118,7 +124,20 @@ extension SignerDataModel {
     func checkSeedCollision(seedName: String) -> Bool {
         let query: [String: Any] = [
             kSecClass as String: kSecClassGenericPassword,
-            kSecAttrAccount as String: seedName,
+            kSecValueData as String: seedName,
+            kSecMatchLimit as String: kSecMatchLimitOne
+        ]
+        let status = SecItemCopyMatching(query as CFDictionary, nil)
+        return status == errSecSuccess
+    }
+    
+    /**
+     * Check if proposed seed phrase is already saved. But mostly require auth on seed creation.
+     */
+    func checkSeedPhraseCollision(seedPhrase: String) -> Bool {
+        let query: [String: Any] = [
+            kSecClass as String: kSecClassGenericPassword,
+            kSecAttrAccount as String: seedPhrase,
             kSecMatchLimit as String: kSecMatchLimitOne
         ]
         let status = SecItemCopyMatching(query as CFDictionary, nil)
@@ -139,6 +158,9 @@ extension SignerDataModel {
     func getRememberedSeedPhrate() -> String {
         if self.seedBackup == "" {
             self.seedBackup = getSeed(seedName: self.selectedSeed, backup: true)
+        }
+        if self.seedBackup == "" {
+            goBack()
         }
         return self.seedBackup
     }
