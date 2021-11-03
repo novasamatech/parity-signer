@@ -8,10 +8,11 @@ edition = "2018"
 
 [dependencies]
 hex = "0.4.3"
-nokhwa = {version = "0.8.0", features = ["input-v4l"]}
+#nokhwa = {version = "0.8.0", features = ["input-v4l"]}
+opencv = { version = "0.58", features = ["clang-runtime"]}
 image = "0.23.14"
 raptorq = "1.6.4"
 qr_reader_phone = {path = "../qr_reader_phone"}
-quircs = "0.10.0"
+#quircs = "0.10.0"
 anyhow = "1.0.42"
-minifb = "0.19.3"
+#minifb = "0.19.3"
