@@ -147,6 +147,7 @@ extension SignerDataModel {
         var err = ExternError()
         let err_ptr: UnsafeMutablePointer<ExternError> = UnsafeMutablePointer(&err)
         do {
+            print("onboarding...")
             if let source = Bundle.main.url(forResource: "Database", withExtension: "") {
                 print(source)
                 var destination = try FileManager.default.url(for: .documentDirectory, in: .userDomainMask, appropriateFor: nil, create: false)
