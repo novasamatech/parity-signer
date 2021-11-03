@@ -4,7 +4,7 @@ use sp_arithmetic::{Percent, Perbill, PerU16};
 use bitvec::prelude::{BitVec, Lsb0};
 use definitions::{network_specs::ShortSpecs, types::{TypeEntry, Description, EnumVariant, EnumVariantType, StructField}};
 
-use crate::cards::{MethodCard};
+use crate::cards::{ParserCard};
 use crate::decoding_commons::{OutputCard, DecodedOut, get_compact, decode_known_length, special_case_account_id, decode_perthing, decode_primitive_with_flags};
 use crate::error::{ParserError,  DecodingError, SystemError};
 use crate::method::{what_next_old, OlderMeta};
@@ -134,11 +134,11 @@ pub (crate) fn process_as_call (mut data: Vec<u8>, meta: &OlderMeta, type_databa
     let call_in_processing = what_next_old (data, meta)?;
     data = call_in_processing.data;
     
-    let mut fancy_out = vec![OutputCard{card: MethodCard::Pallet(call_in_processing.method.pallet_name), indent}, OutputCard{card: MethodCard::Method{method_name: call_in_processing.method.method_name, docs: call_in_processing.method.docs}, indent: indent+1}];
+    let mut fancy_out = vec![OutputCard{card: ParserCard::Pallet(call_in_processing.method.pallet_name), indent}, OutputCard{card: ParserCard::Method{method_name: call_in_processing.method.method_name, docs: call_in_processing.method.docs}, indent: indent+1}];
     indent = indent + 2;
     
     for x in call_in_processing.method.arguments.iter() {
-        fancy_out.push(OutputCard{card: MethodCard::Varname(x.name.to_string()), indent});
+        fancy_out.push(OutputCard{card: ParserCard::Varname(x.name.to_string()), indent});
         
         let decoded_out = decode_complex(&x.ty, data, meta, type_database, indent+1, short_specs)?;
         data = decoded_out.remaining_vector;
@@ -196,9 +196,9 @@ lazy_static! {
 fn deal_with_option (inner_ty: &str, mut data: Vec<u8>, type_database: &Vec<TypeEntry>, indent: u32, short_specs: &ShortSpecs) -> Result<DecodedOut, ParserError> {
     if inner_ty == "bool" {
         let fancy_out = match &data[0] {
-            0 => vec![OutputCard{card: MethodCard::None, indent}],
-            1 => vec![OutputCard{card: MethodCard::Default(String::from("True")), indent}],
-            2 => vec![OutputCard{card: MethodCard::Default(String::from("False")), indent}],
+            0 => vec![OutputCard{card: ParserCard::None, indent}],
+            1 => vec![OutputCard{card: ParserCard::Default(String::from("True")), indent}],
+            2 => vec![OutputCard{card: ParserCard::Default(String::from("False")), indent}],
             _ => {return Err(ParserError::Decoding(DecodingError::UnexpectedOptionVariant))},
         };
         let remaining_vector = {
@@ -217,7 +217,7 @@ fn deal_with_option (inner_ty: &str, mut data: Vec<u8>, type_database: &Vec<Type
                     if data.len()>1 {(&data[1..]).to_vec()}
                     else {Vec::new()}
                 };
-                let fancy_out = vec![OutputCard{card: MethodCard::None, indent}];
+                let fancy_out = vec![OutputCard{card: ParserCard::None, indent}];
                 Ok(DecodedOut {
                     remaining_vector,
                     fancy_out,
@@ -277,7 +277,7 @@ fn deal_with_vector (inner_ty: &str, mut data: Vec<u8>, type_database: &Vec<Type
             else {
                 Ok(DecodedOut {
                     remaining_vector: Vec::new(),
-                    fancy_out: vec![OutputCard{card: MethodCard::Default(String::new()), indent}],
+                    fancy_out: vec![OutputCard{card: ParserCard::Default(String::new()), indent}],
                 })
             }
         },
@@ -355,7 +355,7 @@ fn special_case_identity_fields (data: Vec<u8>, type_database: &Vec<TypeEntry>, 
                 found = true;
                 for (i, x) in v1.iter().enumerate() {
                     if bv[i] {
-                        fancy_out.push(OutputCard{card: MethodCard::IdentityField(x.variant_name.to_string()), indent});
+                        fancy_out.push(OutputCard{card: ParserCard::IdentityField(x.variant_name.to_string()), indent});
                     };
                 }
             }
@@ -402,7 +402,7 @@ fn special_case_bitvec (data: Vec<u8>, indent: u32) -> Result<DecodedOut, Parser
             if data.len() < fin {return Err(ParserError::Decoding(DecodingError::DataTooShort))}
             let into_bv = data[start..fin].to_vec();
             let bv: BitVec<Lsb0, u8> = BitVec::from_vec(into_bv);
-            let fancy_out = vec![OutputCard{card: MethodCard::BitVec(bv.to_string()), indent}];
+            let fancy_out = vec![OutputCard{card: ParserCard::BitVec(bv.to_string()), indent}];
             let remaining_vector = {
                 if data.len() > fin {data[fin..].to_vec()}
                 else {Vec::new()}
@@ -416,7 +416,7 @@ fn special_case_bitvec (data: Vec<u8>, indent: u32) -> Result<DecodedOut, Parser
             if actual_length != 0 {return Err(ParserError::Decoding(DecodingError::DataTooShort))}
             Ok(DecodedOut {
                 remaining_vector: Vec::new(),
-                fancy_out: vec![OutputCard{card: MethodCard::Default(String::new()), indent}],
+                fancy_out: vec![OutputCard{card: ParserCard::Default(String::new()), indent}],
             })
         }
     }
@@ -480,8 +480,8 @@ fn deal_with_struct (v1: &Vec<StructField>, mut data: Vec<u8>, type_database: &V
     let mut fancy_out: Vec<OutputCard> = Vec::new();
     for (i, y) in v1.iter().enumerate() {
         let fancy_output_prep = match &y.field_name {
-            Some(z) => OutputCard{card: MethodCard::FieldName{name: z.to_string(), docs_field_name: String::new(), path_type: String::new(), docs_type: String::new()}, indent},
-            None => OutputCard{card: MethodCard::FieldNumber{number: i, docs_field_number: String::new(), path_type: String::new(), docs_type: String::new()}, indent},
+            Some(z) => OutputCard{card: ParserCard::FieldName{name: z.to_string(), docs_field_name: String::new(), path_type: String::new(), docs_type: String::new()}, indent},
+            None => OutputCard{card: ParserCard::FieldNumber{number: i, docs_field_number: String::new(), path_type: String::new(), docs_type: String::new()}, indent},
         };
         fancy_out.push(fancy_output_prep);
         let after_run = decode_simple(&y.field_type, data, type_database, indent+1, short_specs)?;
@@ -523,7 +523,7 @@ fn deal_with_enum (v1: &Vec<EnumVariant>, mut data: Vec<u8>, type_database: &Vec
                 if data.len()>1 {(&data[1..]).to_vec()}
                 else {Vec::new()}
             };
-            let fancy_out = vec![OutputCard{card: MethodCard::EnumVariantName{name: found_variant.variant_name.to_string(), docs_enum_variant: String::new()}, indent}];
+            let fancy_out = vec![OutputCard{card: ParserCard::EnumVariantName{name: found_variant.variant_name.to_string(), docs_enum_variant: String::new()}, indent}];
             Ok(DecodedOut {
                 remaining_vector,
                 fancy_out,
@@ -532,7 +532,7 @@ fn deal_with_enum (v1: &Vec<EnumVariant>, mut data: Vec<u8>, type_database: &Vec
         EnumVariantType::Type(inner_ty) => {
             if data.len()==1 {return Err(ParserError::Decoding(DecodingError::DataTooShort))}
             data=data[1..].to_vec();
-            let mut fancy_output_prep = vec![OutputCard{card: MethodCard::EnumVariantName{name: found_variant.variant_name.to_string(), docs_enum_variant: String::new()}, indent}];
+            let mut fancy_output_prep = vec![OutputCard{card: ParserCard::EnumVariantName{name: found_variant.variant_name.to_string(), docs_enum_variant: String::new()}, indent}];
             let after_run = decode_simple(&inner_ty, data, type_database, indent+1, short_specs)?;
             fancy_output_prep.extend_from_slice(&after_run.fancy_out);
             data = after_run.remaining_vector;
@@ -547,8 +547,8 @@ fn deal_with_enum (v1: &Vec<EnumVariant>, mut data: Vec<u8>, type_database: &Vec
             let mut fancy_out: Vec<OutputCard> = Vec::new();
             for (i, y) in v2.iter().enumerate() {
                 let fancy_output_prep = match &y.field_name {
-                    Some(z) => OutputCard{card: MethodCard::FieldName{name: z.to_string(), docs_field_name: String::new(), path_type: String::new(), docs_type: String::new()}, indent},
-                    None => OutputCard{card: MethodCard::FieldNumber{number: i, docs_field_number: String::new(), path_type: String::new(), docs_type: String::new()}, indent},
+                    Some(z) => OutputCard{card: ParserCard::FieldName{name: z.to_string(), docs_field_name: String::new(), path_type: String::new(), docs_type: String::new()}, indent},
+                    None => OutputCard{card: ParserCard::FieldNumber{number: i, docs_field_number: String::new(), path_type: String::new(), docs_type: String::new()}, indent},
                 };
                 fancy_out.push(fancy_output_prep);
                 let after_run = decode_simple(&y.field_type, data, type_database, indent+1, short_specs)?;
@@ -616,7 +616,7 @@ fn decode_simple (found_ty: &str, mut data: Vec<u8>, type_database: &Vec<TypeEnt
                                         let capture_name = format!("arg{}", i);
                                         match caps.name(&capture_name) {
                                             Some(x) => {
-                                                fancy_out.push(OutputCard{card: MethodCard::FieldNumber{number: i, docs_field_number: String::new(), path_type: String::new(), docs_type: String::new()}, indent});
+                                                fancy_out.push(OutputCard{card: ParserCard::FieldNumber{number: i, docs_field_number: String::new(), path_type: String::new(), docs_type: String::new()}, indent});
                                                 let inner_ty = x.as_str();
                                                 let after_run = decode_simple(inner_ty, data, type_database, indent+1, short_specs)?;
                                                 fancy_out.extend_from_slice(&after_run.fancy_out);

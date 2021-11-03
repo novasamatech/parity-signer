@@ -5,7 +5,7 @@ use definitions::{network_specs::ShortSpecs};
 use frame_metadata::v14::RuntimeMetadataV14;
 use bitvec::{prelude::{BitVec, Lsb0, Msb0}, store::BitStore, order::BitOrder};
 
-use crate::cards::{MethodCard};
+use crate::cards::{ParserCard};
 use crate::decoding_commons::{OutputCard, DecodedOut, get_compact, decode_known_length, decode_primitive_with_flags, special_case_account_id};
 use crate::decoding_sci_ext::{Ext, SpecialExt, Hash, special_case_era, special_case_hash};
 use crate::error::{ParserError,  DecodingError, MetadataError};
@@ -119,7 +119,7 @@ fn decode_char(data: &Vec<u8>, indent: u32) -> Result<DecodedOut, ParserError> {
                 Ok(a) => {
                     match char::from_u32(a) {
                         Some(b) => {
-                            let fancy_out = vec![OutputCard{card: MethodCard::Default(b.to_string()), indent}];
+                            let fancy_out = vec![OutputCard{card: ParserCard::Default(b.to_string()), indent}];
                             let remaining_vector = (data[4..]).to_vec();
                             Ok(DecodedOut {
                                 remaining_vector,
@@ -160,7 +160,7 @@ fn decode_str(data: &Vec<u8>, indent: u32) -> Result<DecodedOut, ParserError> {
                         Ok(b) => b,
                         Err(_) => return Err(ParserError::Decoding(DecodingError::PrimitiveFailure("str".to_string()))),
                     };
-                    let fancy_out = vec![OutputCard{card: MethodCard::Default(text), indent}];
+                    let fancy_out = vec![OutputCard{card: ParserCard::Default(text), indent}];
                     let remaining_vector = data[start+str_length..].to_vec();
                     Ok(DecodedOut {
                         remaining_vector,
@@ -173,7 +173,7 @@ fn decode_str(data: &Vec<u8>, indent: u32) -> Result<DecodedOut, ParserError> {
         None => {
             if str_length != 0 {return Err(ParserError::Decoding(DecodingError::DataTooShort))}
             else {
-                let fancy_out = vec![OutputCard{card: MethodCard::Default(String::new()), indent}];
+                let fancy_out = vec![OutputCard{card: ParserCard::Default(String::new()), indent}];
                 let remaining_vector = Vec::new();
                 Ok(DecodedOut {
                     remaining_vector,
@@ -203,8 +203,8 @@ fn decode_big256(data: &Vec<u8>, signed: bool, indent: u32) -> Result<DecodedOut
     match data.get(0..32) {
         Some(slice_to_big256) => {
             let fancy_out = {
-                if signed {vec![OutputCard{card: MethodCard::Default(BigInt::from_signed_bytes_le(slice_to_big256).to_string()), indent}]} // I256
-                else {vec![OutputCard{card: MethodCard::Default(BigUint::from_bytes_le(slice_to_big256).to_string()), indent}]} // U256
+                if signed {vec![OutputCard{card: ParserCard::Default(BigInt::from_signed_bytes_le(slice_to_big256).to_string()), indent}]} // I256
+                else {vec![OutputCard{card: ParserCard::Default(BigUint::from_bytes_le(slice_to_big256).to_string()), indent}]} // U256
             };
             let remaining_vector = (data[32..]).to_vec();
             Ok(DecodedOut {
@@ -344,7 +344,7 @@ pub (crate) fn decoding_sci_entry_point (mut data: Vec<u8>, meta_v14: &RuntimeMe
     };
     let (current_type, _, _) = type_path_docs(meta_v14, type_id)?;
     
-    let mut fancy_out = vec![OutputCard{card: MethodCard::Pallet(pallet_name), indent}];
+    let mut fancy_out = vec![OutputCard{card: ParserCard::Pallet(pallet_name), indent}];
     indent = indent + 1;
     data = data[1..].to_vec();
     
@@ -383,7 +383,7 @@ fn decode_type_def_sequence (inner_type: &Type<PortableForm>, possible_ext: &mut
             else {
                 Ok(DecodedOut {
                     remaining_vector: Vec::new(),
-                    fancy_out: vec![OutputCard{card: MethodCard::Default(String::new()), indent}],
+                    fancy_out: vec![OutputCard{card: ParserCard::Default(String::new()), indent}],
                 })
             }
         },
@@ -410,7 +410,7 @@ fn decode_type_def_tuple (id_set: Vec<u32>, possible_ext: &mut Option<&mut Ext>,
     let mut fancy_out: Vec<OutputCard> = Vec::new();
     for (i, type_id) in id_set.iter().enumerate() {
         let (inner_type, path, docs) = type_path_docs(meta_v14, *type_id)?;
-        fancy_out.push(OutputCard{card: MethodCard::FieldNumber{number: i+1, docs_field_number: String::new(), path_type: path, docs_type: docs}, indent});
+        fancy_out.push(OutputCard{card: ParserCard::FieldNumber{number: i+1, docs_field_number: String::new(), path_type: path, docs_type: docs}, indent});
         let compact_flag = false;
         let after_run = decoding_sci_complete(&inner_type, possible_ext, compact_flag, balance_flag, &CallExpectation::None, data, meta_v14, indent, short_specs)?;
         fancy_out.extend_from_slice(&after_run.fancy_out);
@@ -470,9 +470,9 @@ fn decode_type_def_variant (found_ty: &TypeDefVariant<PortableForm>, possible_ex
     if check.is_option {
         if check.is_bool {
             let fancy_out = match enum_index {
-                0 => vec![OutputCard{card: MethodCard::None, indent}],
-                1 => vec![OutputCard{card: MethodCard::Default(String::from("True")), indent}],
-                2 => vec![OutputCard{card: MethodCard::Default(String::from("False")), indent}],
+                0 => vec![OutputCard{card: ParserCard::None, indent}],
+                1 => vec![OutputCard{card: ParserCard::Default(String::from("True")), indent}],
+                2 => vec![OutputCard{card: ParserCard::Default(String::from("False")), indent}],
                 _ => {return Err(ParserError::Decoding(DecodingError::UnexpectedOptionVariant))},
             };
             let remaining_vector = data[1..].to_vec();
@@ -484,7 +484,7 @@ fn decode_type_def_variant (found_ty: &TypeDefVariant<PortableForm>, possible_ex
         else {
             match enum_index {
                 0 => {
-                    let fancy_out = vec![OutputCard{card: MethodCard::None, indent}];
+                    let fancy_out = vec![OutputCard{card: ParserCard::None, indent}];
                     let remaining_vector = data[1..].to_vec();
                     Ok(DecodedOut {
                         remaining_vector,
@@ -521,9 +521,9 @@ fn decode_type_def_variant (found_ty: &TypeDefVariant<PortableForm>, possible_ex
             variant_docs.push_str(x);
         }
         let mut fancy_out = match call_expectation {
-            CallExpectation::None => vec![OutputCard{card: MethodCard::EnumVariantName{name: found_variant.name().to_string(), docs_enum_variant: variant_docs}, indent}],
-            CallExpectation::Pallet => vec![OutputCard{card: MethodCard::Pallet(found_variant.name().to_string()), indent}],
-            CallExpectation::Method => vec![OutputCard{card: MethodCard::Method{method_name: found_variant.name().to_string(), docs: variant_docs}, indent}],
+            CallExpectation::None => vec![OutputCard{card: ParserCard::EnumVariantName{name: found_variant.name().to_string(), docs_enum_variant: variant_docs}, indent}],
+            CallExpectation::Pallet => vec![OutputCard{card: ParserCard::Pallet(found_variant.name().to_string()), indent}],
+            CallExpectation::Method => vec![OutputCard{card: ParserCard::Method{method_name: found_variant.name().to_string(), docs: variant_docs}, indent}],
         };
         data = data[1..].to_vec();
         
@@ -553,11 +553,11 @@ fn process_fields (fields: &[Field<PortableForm>], possible_ext: &mut Option<&mu
         let (inner_type, path_type, docs_type) = type_path_docs(meta_v14, x.ty().id())?;
         match x.name() {
             Some(field_name) => {
-                fancy_out.push(OutputCard{card: MethodCard::FieldName{name: field_name.to_string(), docs_field_name: field_docs, path_type: path_type, docs_type: docs_type}, indent});
+                fancy_out.push(OutputCard{card: ParserCard::FieldName{name: field_name.to_string(), docs_field_name: field_docs, path_type: path_type, docs_type: docs_type}, indent});
             },
             None => {
                 if fields.len()>1 {
-                    fancy_out.push(OutputCard{card: MethodCard::FieldNumber{number: i, docs_field_number: field_docs, path_type: path_type, docs_type: docs_type}, indent});
+                    fancy_out.push(OutputCard{card: ParserCard::FieldNumber{number: i, docs_field_number: field_docs, path_type: path_type, docs_type: docs_type}, indent});
                 }
                 else {indent_skipped = true;}
             },
@@ -642,7 +642,7 @@ fn decode_type_def_bit_sequence (bit_ty: &TypeDefBitSequence<PortableForm>, data
                 _ => return Err(ParserError::Decoding(DecodingError::NotBitStoreType)),
             };
             
-            let fancy_out = vec![OutputCard{card: MethodCard::BitVec(card_prep), indent}];
+            let fancy_out = vec![OutputCard{card: ParserCard::BitVec(card_prep), indent}];
             let remaining_vector = data[fin..].to_vec();
             Ok(DecodedOut {
                 remaining_vector,
@@ -653,7 +653,7 @@ fn decode_type_def_bit_sequence (bit_ty: &TypeDefBitSequence<PortableForm>, data
             if actual_length != 0 {return Err(ParserError::Decoding(DecodingError::DataTooShort))}
             Ok(DecodedOut {
                 remaining_vector: Vec::new(),
-                fancy_out: vec![OutputCard{card: MethodCard::Default(String::new()), indent}],
+                fancy_out: vec![OutputCard{card: ParserCard::Default(String::new()), indent}],
             })
         }
     }

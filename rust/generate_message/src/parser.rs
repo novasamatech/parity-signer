@@ -123,10 +123,11 @@ impl Command {
 
         match args.next() {
             Some(arg) => {
+                let arg = arg.to_lowercase();
                 match arg.as_str() {
                     "show" => {
                         match args.next() {
-                            Some(show) => match show.as_str() {
+                            Some(show) => match show.to_lowercase().as_str() {
                                 "-database" => Ok(Command::Show(Show::Database)),
                                 "-address_book" => Ok(Command::Show(Show::AddressBook)),
                                 _ => {return Err(Error::UnexpectedKeyArgumentSequence.show())},
@@ -145,6 +146,7 @@ impl Command {
                         loop {
                             match args.next() {
                                 Some(x) => {
+                                    let x = x.to_lowercase();
                                     if x.starts_with("-") {
                                         match x.as_str() {
                                             "-a"|"-n"|"-u" => {
@@ -249,7 +251,7 @@ impl Command {
                         let mut args = args.peekable();
                         match args.peek() {
                             Some(x) => {
-                                match x.as_str() {
+                                match x.to_lowercase().as_str() {
                                     "-qr" => {
                                         goal = Goal::Qr;
                                         args.next();
@@ -272,12 +274,13 @@ impl Command {
                         loop {
                             match args.next() {
                                 Some(x) => {
+                                    let x = x.to_lowercase();
                                     match x.as_str() {
                                         "-crypto" => {
                                             if let Some(_) = crypto_type_found {return Err(Error::DoubleKey(DoubleKey::CryptoKey).show())}
                                             crypto_type_found = match args.next() {
                                                 Some(x) => {
-                                                    match x.as_str() {
+                                                    match x.to_lowercase().as_str() {
                                                         "ed25519" => Some(CryptoType::Ed25519),
                                                         "sr25519" => Some(CryptoType::Sr25519),
                                                         "ecdsa" => Some(CryptoType::Ecdsa),
@@ -292,7 +295,7 @@ impl Command {
                                             if let Some(_) = msg_type_found {return Err(Error::DoubleKey(DoubleKey::MsgType).show())}
                                             msg_type_found = match args.next() {
                                                 Some(x) => {
-                                                    match x.as_str() {
+                                                    match x.to_lowercase().as_str() {
                                                         "load_types" => Some(MsgType::LoadTypes),
                                                         "load_metadata" => Some(MsgType::LoadMetadata),
                                                         "add_specs" => Some(MsgType::AddSpecs),
@@ -306,7 +309,7 @@ impl Command {
                                             if let Some(_) = verifier_found {return Err(Error::DoubleKey(DoubleKey::Verifier).show())}
                                             verifier_found = match args.next() {
                                                 Some(x) => {
-                                                    match x.as_str() {
+                                                    match x.to_lowercase().as_str() {
                                                         "-hex" => {
                                                             match args.next() {
                                                                 Some(h) => Some(VerKey::Hex(h.to_string())),
@@ -319,7 +322,7 @@ impl Command {
                                                                 None => {return Err(Error::NeedArgument(NeedArgument::VerifierFile).show())},
                                                             }
                                                         },
-                                                        "Alice" => Some(VerKey::Alice),
+                                                        "alice" => Some(VerKey::Alice),
                                                         _ => {return Err(Error::BadArgument(BadArgument::Verifier).show())}
                                                     }
                                                 },
@@ -418,7 +421,7 @@ impl Command {
                         let mut args = args.peekable();
                         match args.peek() {
                             Some(x) => {
-                                match x.as_str() {
+                                match x.to_lowercase().as_str() {
                                     "-qr" => {
                                         goal = Goal::Qr;
                                         args.next();
@@ -439,12 +442,13 @@ impl Command {
                         loop {
                             match args.next() {
                                 Some(x) => {
+                                    let x = x.to_lowercase();
                                     match x.as_str() {
                                         "-sufficient" => {
                                             if let Some(_) = sufficient_crypto_found {return Err(Error::DoubleKey(DoubleKey::SufficientCrypto).show())}
                                             sufficient_crypto_found = match args.next() {
                                                 Some(x) => {
-                                                    match x.as_str() {
+                                                    match x.to_lowercase().as_str() {
                                                         "-hex" => {
                                                             match args.next() {
                                                                 Some(h) => Some(Entry::Hex(h.to_string())),
@@ -467,7 +471,7 @@ impl Command {
                                             if let Some(_) = msg_type_found {return Err(Error::DoubleKey(DoubleKey::MsgType).show())}
                                             msg_type_found = match args.next() {
                                                 Some(x) => {
-                                                    match x.as_str() {
+                                                    match x.to_lowercase().as_str() {
                                                         "load_types" => Some(MsgType::LoadTypes),
                                                         "load_metadata" => Some(MsgType::LoadMetadata),
                                                         "add_specs" => Some(MsgType::AddSpecs),

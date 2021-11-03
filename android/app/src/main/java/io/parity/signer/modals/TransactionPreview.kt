@@ -22,14 +22,19 @@ fun TransactionPreview(signerDataModel: SignerDataModel) {
 	val actionable = signerDataModel.actionable.observeAsState()
 
 	Column {
-		LazyColumn (modifier = Modifier.weight(1f)) {
+		LazyColumn(modifier = Modifier.weight(1f)) {
 			items(transaction.value!!.length()) { item ->
-				TransactionCard(card = transaction.value!!.getJSONObject(item), signerDataModel)
+				TransactionCard(
+					card = transaction.value!!.getJSONObject(item),
+					signerDataModel
+				)
 			}
 		}
 		Row(
 			horizontalArrangement = Arrangement.Center,
-			modifier = Modifier.fillMaxWidth().clickable { signerDataModel.acceptTransaction() }
+			modifier = Modifier
+				.fillMaxWidth()
+				.clickable { signerDataModel.acceptTransaction() }
 		) {
 			Text("Accept")
 		}

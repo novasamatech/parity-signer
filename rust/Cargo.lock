@@ -2977,6 +2977,7 @@ dependencies = [
  "num-bigint 0.4.2",
  "parity-scale-codec",
  "parity-scale-codec-derive",
+ "parser",
  "printing_balance",
  "regex",
  "scale-info",

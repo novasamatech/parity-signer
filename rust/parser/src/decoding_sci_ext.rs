@@ -4,7 +4,7 @@ use scale_info::{Type, form::PortableForm};
 use parity_scale_codec::Decode;
 use sp_runtime::generic::Era;
 
-use crate::cards::MethodCard;
+use crate::cards::ParserCard;
 use crate::decoding_commons::{DecodedOut, OutputCard};
 use crate::decoding_sci::{CallExpectation, decoding_sci_complete};
 use crate::error::{ParserError, DecodingError};
@@ -120,12 +120,12 @@ pub (crate) fn special_case_hash (data: Vec<u8>, found_ext: &mut FoundExt, inden
                     let fancy_out = match hash {
                         Hash::GenesisHash => {
                             found_ext.genesis_hash = Some(x);
-                            if x == short_specs.genesis_hash {vec![OutputCard{card: MethodCard::NetworkName(short_specs.name.to_string()), indent}]}
+                            if x == short_specs.genesis_hash {vec![OutputCard{card: ParserCard::NetworkName(short_specs.name.to_string()), indent}]}
                             else {return Err(ParserError::Decoding(DecodingError::GenesisHashMismatch))}
                         },
                         Hash::BlockHash => {
                             found_ext.block_hash = Some(x);
-                            vec![OutputCard{card: MethodCard::BlockHash(x), indent}]
+                            vec![OutputCard{card: ParserCard::BlockHash(x), indent}]
                         },
                     };
                     Ok(DecodedOut {
@@ -154,7 +154,7 @@ pub (crate) fn special_case_era (data: Vec<u8>, found_ext: &mut FoundExt, indent
     match Era::decode(&mut &era_data[..]) {
         Ok(a) => {
             found_ext.era = Some(a);
-            Ok(DecodedOut{remaining_vector, fancy_out: vec![OutputCard{card: MethodCard::Era(a), indent}]})
+            Ok(DecodedOut{remaining_vector, fancy_out: vec![OutputCard{card: ParserCard::Era(a), indent}]})
         },
         Err(_) => return Err(ParserError::Decoding(DecodingError::Era)),
     }

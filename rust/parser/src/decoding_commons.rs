@@ -5,7 +5,7 @@ use definitions::network_specs::ShortSpecs;
 use printing_balance::convert_balance_pretty;
 use sp_core::crypto::{Ss58Codec, Ss58AddressFormat, AccountId32};
 
-use crate::cards::{MethodCard};
+use crate::cards::{ParserCard};
 use crate::error::{ParserError, DecodingError, MetadataError, SystemError};
 use crate::decoding_sci_ext::{Ext, SpecialExt};
 
@@ -20,7 +20,7 @@ pub (crate) struct DecodedOut {
 
 #[derive(Clone)]
 pub struct OutputCard {
-    pub card: MethodCard,
+    pub card: ParserCard,
     pub indent: u32,
 }
 
@@ -83,7 +83,7 @@ pub (crate) fn decode_perthing<T> (data: &Vec<u8>, compact_flag: bool, found_ty:
     let (fancy_out, remaining_vector) = {
         if compact_flag {
             let compact_found = get_compact::<T>(data)?;
-            let fancy_out = vec![OutputCard{card: MethodCard::Default(compact_found.compact_found.deconstruct().into().to_string()), indent}];
+            let fancy_out = vec![OutputCard{card: ParserCard::Default(compact_found.compact_found.deconstruct().into().to_string()), indent}];
             let remaining_vector = match compact_found.start_next_unit {
                 Some(x) => (data[x..]).to_vec(),
                 None => Vec::new(),
@@ -96,7 +96,7 @@ pub (crate) fn decode_perthing<T> (data: &Vec<u8>, compact_flag: bool, found_ty:
             let decoded_data = <T>::decode(&mut &data[..length]);
             match decoded_data {
                 Ok(x) => {
-                    let fancy_out = vec![OutputCard{card: MethodCard::Default(x.deconstruct().into().to_string()), indent}];
+                    let fancy_out = vec![OutputCard{card: ParserCard::Default(x.deconstruct().into().to_string()), indent}];
                     let remaining_vector = data[length..].to_vec();
                     (fancy_out, remaining_vector)
                 },
@@ -128,7 +128,7 @@ pub (crate) fn decode_known_length<T: Decode + std::fmt::Display>(data: &Vec<u8>
     let decoded_data = <T>::decode(&mut &data[..length]);
     match decoded_data {
         Ok(x) => {
-            let fancy_out = vec![OutputCard{card: MethodCard::Default(x.to_string()), indent}];
+            let fancy_out = vec![OutputCard{card: ParserCard::Default(x.to_string()), indent}];
             let remaining_vector = data[length..].to_vec();
             Ok(DecodedOut {
                 remaining_vector,
@@ -201,8 +201,8 @@ fn process_balance (balance: &str, possible_ext: &mut Option<&mut Ext>, indent: 
         Ok(x) => x,
         Err(_) => return Err(ParserError::SystemError(SystemError::BalanceFail)),
     };
-    let out_balance = vec![OutputCard{card: MethodCard::Balance{number: balance_output.number.to_string(), units: balance_output.units.to_string()}, indent}];
-    let out_tip = vec![OutputCard{card: MethodCard::Tip{number: balance_output.number.to_string(), units: balance_output.units.to_string()}, indent}];
+    let out_balance = vec![OutputCard{card: ParserCard::Balance{number: balance_output.number.to_string(), units: balance_output.units.to_string()}, indent}];
+    let out_tip = vec![OutputCard{card: ParserCard::Tip{number: balance_output.number.to_string(), units: balance_output.units.to_string()}, indent}];
     if let Some(ext) = possible_ext {
         if let SpecialExt::Tip = ext.specialty {Ok(out_tip)}
         else {Ok(out_balance)}
@@ -213,19 +213,19 @@ fn process_balance (balance: &str, possible_ext: &mut Option<&mut Ext>, indent: 
 fn process_number (number: String, possible_ext: &mut Option<&mut Ext>, indent: u32) -> Result<Vec<OutputCard>, ParserError> {
     if let Some(ext) = possible_ext {
         match ext.specialty {
-            SpecialExt::Nonce => Ok(vec![OutputCard{card: MethodCard::Nonce(number), indent}]),
+            SpecialExt::Nonce => Ok(vec![OutputCard{card: ParserCard::Nonce(number), indent}]),
             SpecialExt::SpecVersion => {
                 ext.found_ext.network_version_printed = match ext.found_ext.network_version_printed {
                     Some(_) => return Err(ParserError::FundamentallyBadV14Metadata(MetadataError::SpecVersionTwice)),
                     None => Some(number.to_string()),
                 };
-                Ok(vec![OutputCard{card: MethodCard::SpecVersion(number), indent}])
+                Ok(vec![OutputCard{card: ParserCard::SpecVersion(number), indent}])
             },
-            SpecialExt::TxVersion => Ok(vec![OutputCard{card: MethodCard::TxVersion(number), indent}]),
-            _ => Ok(vec![OutputCard{card: MethodCard::Default(number), indent}]),
+            SpecialExt::TxVersion => Ok(vec![OutputCard{card: ParserCard::TxVersion(number), indent}]),
+            _ => Ok(vec![OutputCard{card: ParserCard::Default(number), indent}]),
         }
     }
-    else {Ok(vec![OutputCard{card: MethodCard::Default(number), indent}])}
+    else {Ok(vec![OutputCard{card: ParserCard::Default(number), indent}])}
 }
 
 /// Function to decode of AccountId special case and transform the result into base58 format.
@@ -250,7 +250,7 @@ pub (crate) fn special_case_account_id (data: Vec<u8>, indent: u32, short_specs:
                     let remaining_vector = data[32..].to_vec();
                     let account_id = AccountId32::new(x);
                     let base58print = account_id.to_ss58check_with_version(Ss58AddressFormat::Custom(short_specs.base58prefix));
-                    let fancy_out = vec![OutputCard{card: MethodCard::Id(base58print), indent}];
+                    let fancy_out = vec![OutputCard{card: ParserCard::Id(base58print), indent}];
                     Ok(DecodedOut {
                         remaining_vector,
                         fancy_out,

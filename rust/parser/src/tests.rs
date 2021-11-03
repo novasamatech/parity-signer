@@ -25,7 +25,7 @@ mod tests {
     #[test]
     fn tr_1() {
         let data = hex::decode("4d0210020806000046ebddef8cd9bb167dc30878d7113b7e168e6f0646beffd77d69d39bad76b47a07001b2c3ef70006050c0008264834504a64ace1373f0c8ed5d57381ddf54a2f67a318fa42b1352681606d00aebb0211dbb07b4d335a657257b8ac5e53794c901e4f616d4a254f2490c43934009ae581fef1fc06828723715731adcf810e42ce4dadad629b1b7fa5c3c144a81d550008009723000007000000e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e5b1d91c89d3de85a4d6eee76ecf3a303cf38b59e7d81522eb7cd24b02eb161ff").unwrap();
-        let reply = parse_and_display_set(data, &metadata("for_tests/westend9111"), &specs());
+        let reply = parse_and_display_set(&data, &metadata("for_tests/westend9111"), &specs()).unwrap();
         let reply_known = r#"
 Method:
 
@@ -54,7 +54,7 @@ pallet: Utility,
 
 Extensions:
 
-era: Mortal, phase: 64, period: 5,
+era: Mortal, phase: 5, period: 64,
 nonce: 2,
 tip: 0 pWND,
 version: 9111,
@@ -67,8 +67,64 @@ block_hash: 5b1d91c89d3de85a4d6eee76ecf3a303cf38b59e7d81522eb7cd24b02eb161ff"#;
     #[test]
     fn tr_2() {
         let data = hex::decode("4d0210020806000046ebddef8cd9bb167dc30878d7113b7e168e6f0646beffd77d69d39bad76b47a07001b2c3ef70006050c0008264834504a64ace1373f0c8ed5d57381ddf54a2f67a318fa42b1352681606d00aebb0211dbb07b4d335a657257b8ac5e53794c901e4f616d4a254f2490c43934009ae581fef1fc06828723715731adcf810e42ce4dadad629b1b7fa5c3c144a81d550008009723000007000000e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e5b1d91c89d3de85a4d6eee76ecf3a303cf38b59e7d81522eb7cd24b02eb161ff").unwrap();
-        let reply = parse_and_display_set(data, &metadata("for_tests/westend9120"), &specs());
-        let reply_known = "Metadata network spec version (9111) differs from the version in extensions (9120).";
+        let reply = parse_and_display_set(&data, &metadata("for_tests/westend9120"), &specs()).unwrap_err();
+        let reply_known = "Network spec version decoded from extensions (9111) differs from the version in metadata (9120).";
+        assert!(reply == reply_known, "Expected: {}\nReceived: {}", reply_known, reply);
+    }
+    
+    #[test]
+    fn tr_3() {
+        let data = hex::decode("a40403008eaf04151687736326c9fea17e25fc5287613693c912909cb226aa4794f26a480700e8764817b501b8003223000005000000e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e538a7d7a0ac17eb6dd004578cb8e238c384a10f57c999a3fa1200409cd9b3f33").unwrap();
+        let reply = parse_and_display_set(&data, &metadata("for_tests/westend9010"), &specs()).unwrap();
+        let reply_known = "
+Method:
+
+pallet: Balances,
+  method: transfer_keep_alive,
+    varname: dest,
+      enum_variant_name: Id,
+        Id: 5FHneW46xGXgs5mUiveU4sbTyGBzmstUspZC92UhjJM694ty,
+    varname: value,
+      balance: 100.000000000 mWND
+
+
+Extensions:
+
+era: Mortal, phase: 27, period: 64,
+nonce: 46,
+tip: 0 pWND,
+network: westend,
+version: 9010,
+tx_version: 5,
+block_hash: 538a7d7a0ac17eb6dd004578cb8e238c384a10f57c999a3fa1200409cd9b3f33";
+        assert!(reply == reply_known, "Expected: {}\nReceived: {}", reply_known, reply);
+    }
+    
+    #[test]
+    fn tr_4() {
+        let data = hex::decode("9c0403008eaf04151687736326c9fea17e25fc5287613693c912909cb226aa4794f26a480284d717d5031504025a62029723000007000000e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e98a8ee9e389043cd8a9954b254d822d34138b9ae97d3b7f50dc6781b13df8d84").unwrap();
+        let reply = parse_and_display_set(&data, &metadata("for_tests/westend9111"), &specs()).unwrap();
+        let reply_known = "
+Method:
+
+pallet: Balances,
+  method: transfer_keep_alive,
+    field_name: dest,
+      enum_variant_name: Id,
+        Id: 5FHneW46xGXgs5mUiveU4sbTyGBzmstUspZC92UhjJM694ty,
+    field_name: value,
+      balance: 100.000000 uWND
+
+
+Extensions:
+
+era: Mortal, phase: 61, period: 64,
+nonce: 261,
+tip: 10.000000 uWND,
+version: 9111,
+tx_version: 7,
+network: westend,
+block_hash: 98a8ee9e389043cd8a9954b254d822d34138b9ae97d3b7f50dc6781b13df8d84";
         assert!(reply == reply_known, "Expected: {}\nReceived: {}", reply_known, reply);
     }
 }

@@ -23,8 +23,8 @@ pub struct NextDecodeOld {
 
 /// Enum to transfer around older metadata (V12 and V13)
 pub enum OlderMeta {
-    V12(RuntimeMetadataV12),
-    V13(RuntimeMetadataV13),
+    V12(&RuntimeMetadataV12),
+    V13(&RuntimeMetadataV13),
 }
 
 /// Function to search through metadata version V12 for method with given pallet index and method index,

@@ -6,8 +6,9 @@ use definitions::{history::Event, keyring::{AddressKey, MetaKey, MetaKeyPrefix, 
 use parity_scale_codec::Decode;
 use frame_metadata::RuntimeMetadata;
 use meta_reading::decode_metadata::{get_meta_const_light};
+use parser::{MetadataBundle, method::OlderMeta};
 
-use crate::{cards::Warning, error::{Error, BadInputData, DatabaseError, SystemError}};
+use crate::{cards::Warning, error::{Error, BadInputData, DatabaseError}};
 
 /// Wrapper for `open` with crate error (card)
 fn open_db (database_name: &str) -> Result<Db, Error> {
@@ -41,7 +42,10 @@ pub (crate) fn checked_network_specs (network_specs_key: &NetworkSpecsKey, datab
     match get_from_tree(&network_specs_key.key(), &chainspecs)? {
         Some(encoded_network_specs) => {
             match <ChainSpecs>::decode(&mut &encoded_network_specs[..]) {
-                Ok(a) => Ok(Some(a)),
+                Ok(a) => {
+                    if network_specs_key != &NetworkSpecsKey::from_parts(&a.genesis_hash.to_vec(), &a.encryption) {return Err(Error::DatabaseError(DatabaseError::NetworkSpecsKeyMismatch (network_specs_key.to_owned())))}
+                    Ok(Some(a))
+                },
                 Err(_) => return Err(Error::DatabaseError(DatabaseError::DamagedChainSpecs)),
             }
         },
@@ -134,24 +138,18 @@ fn genesis_hash_in_specs (verifier_key: &VerifierKey, database: &Db) -> Result<b
     Ok(out)
 }
 
+pub struct MetaSetElement {
+    pub version: u32,
+    pub runtime_metadata: RuntimeMetadata,
+}
 
-/// Function searches for full metadata for certain chain name and version in metadata database tree.
-/// Checks that found full metadata indeed corresponds to the queried name and version;
-/// in case of successful find produces a tuple of corresponding RuntimeMetadata and Option<u32>;
-/// Option is None if the version of chain is the latest known one,
-/// and Some(latest_version) if there are later versions available.
-pub fn find_meta(network_name: &str, network_version: u32, database_name: &str) -> Result<(RuntimeMetadata, Option<u32>), Error> {
-    
+pub fn find_meta_set(network_name: &str, database_name: &str) -> Result<Vec<MetaSetElement>, Error> {
     let database = open_db(&database_name)?;
     let metadata = open_tree(&database, METATREE)?;
-    
-    let mut meta = None;
-    let mut other = false;
-    let mut latest_version = network_version;
-    
+    let mut out: Vec<MetaSetElement> = Vec::new();
     let meta_key_prefix = MetaKeyPrefix::from_name(&network_name);
     for x in metadata.scan_prefix(meta_key_prefix.prefix()) {
-        let (meta_key_vec, meta_found) = match x {
+        let (meta_key_vec, meta) = match x {
             Ok(t) => t,
             Err(e) => return Err(Error::DatabaseError(DatabaseError::Internal(e))),
         };
@@ -159,46 +157,40 @@ pub fn find_meta(network_name: &str, network_version: u32, database_name: &str) 
             Ok(t) => t,
             Err(_) => return Err(Error::DatabaseError(DatabaseError::DamagedVersName)),
         };
-        if version == network_version {meta = Some(meta_found)}
-        else {
-            other = true;
-            if version > latest_version {latest_version = version}
+        if !meta.starts_with(&vec![109, 101, 116, 97]) {return Err(Error::DatabaseError(DatabaseError::NotMeta))}
+        if meta[4] < 12 {return Err(Error::DatabaseError(DatabaseError::MetaVersionBelow12))}
+        match RuntimeMetadata::decode(&mut &meta[4..]) {
+            Ok(runtime_metadata) => {
+        // check if the name and version are same in metadata, i.e. the database is not damaged
+                match get_meta_const_light(&runtime_metadata) {
+                    Ok(x) => {
+                        match VersionDecoded::decode(&mut &x[..]) {
+                            Ok(y) => {
+                                if y.spec_version != version||y.specname != network_name {return Err(Error::DatabaseError(DatabaseError::MetaMismatch))}
+                                out.push(MetaSetElement {
+                                    version,
+                                    runtime_metadata,
+                                })
+                            },
+                            Err(_) => return Err(Error::DatabaseError(DatabaseError::VersionNotDecodeable))
+                        }
+                    },
+                    Err(_) => return Err(Error::DatabaseError(DatabaseError::NoVersion)),
+                }
+            },
+            Err(_) => return Err(Error::DatabaseError(DatabaseError::UnableToDecodeMeta)),
         }
     }
-    
-    match meta {
-        Some(m) => {
-            if !m.starts_with(&vec![109, 101, 116, 97]) {return Err(Error::SystemError(SystemError::NotMeta))}
-            if m[4] < 12 {
-                return Err(Error::SystemError(SystemError::MetaVersionBelow12));
-            }
-            let data_back = RuntimeMetadata::decode(&mut &m[4..]);
-            match data_back {
-                Ok(metadata) => {
-                // check if the name and version are same in metadata, i.e. the database is not damaged
-                    match get_meta_const_light(&metadata) {
-                        Ok(x) => {
-                            match VersionDecoded::decode(&mut &x[..]) {
-                                Ok(y) => {
-                                    if (y.spec_version != network_version) || (y.specname != network_name) {return Err(Error::SystemError(SystemError::MetaMismatch))}
-                                },
-                                Err(_) => return Err(Error::SystemError(SystemError::VersionNotDecodeable))
-                            }
-                        },
-                        Err(_) => return Err(Error::SystemError(SystemError::NoVersion))
-                    };
-                    if network_version < latest_version {
-                        Ok((metadata, Some(latest_version)))
-                    }
-                    else {Ok((metadata, None))}
-                },
-                Err(_) => return Err(Error::SystemError(SystemError::UnableToDecodeMeta)),
-            }
-        },
-        None => {
-            if other {return Err(Error::DatabaseError(DatabaseError::NoMetaThisVersion))}
-            else {return Err(Error::DatabaseError(DatabaseError::NoMetaAtAll))}
-        },
+    out.sort_by(|a, b| b.version.cmp(&a.version));
+    Ok(out)
+}
+
+pub fn bundle_from_meta_set_element <'a> (meta_set_element: &'a MetaSetElement, database_name: &'a str) -> Result<MetadataBundle <'a>, Error> {
+    match meta_set_element.runtime_metadata {
+        RuntimeMetadata::V12(ref meta_v12) => Ok(MetadataBundle::Older{older_meta: OlderMeta::V12(&meta_v12), types: get_types (database_name)?, network_version: meta_set_element.version}),
+        RuntimeMetadata::V13(ref meta_v13) => Ok(MetadataBundle::Older{older_meta: OlderMeta::V13(&meta_v13), types: get_types (database_name)?, network_version: meta_set_element.version}),
+        RuntimeMetadata::V14(ref meta_v14) => Ok(MetadataBundle::Sci{meta_v14: &meta_v14, network_version: meta_set_element.version}),
+        _ => return Err(Error::DatabaseError(DatabaseError::RuntimeVersionIncompatible)),
     }
 }
 
@@ -371,7 +363,7 @@ fn collect_set (verifier_key: &VerifierKey, chainspecs: &Tree, metadata: &Tree) 
                 };
                 let meta = match check_metadata(meta_stored.to_vec(), &name, version) {
                     Ok(a) => a,
-                    Err(_) => return Err(Error::SystemError(SystemError::MetaMismatch)),
+                    Err(_) => return Err(Error::DatabaseError(DatabaseError::MetaMismatch)),
                 };
                 metadata_set.push(MetaValues{name, version, meta});
             }

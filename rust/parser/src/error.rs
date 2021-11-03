@@ -1,10 +1,7 @@
 #[derive(PartialEq)]
-pub enum ParserError {
-    Arguments(ArgumentsError), // errors related to metadata and short_specs arguments input by user; this should not be encountered in internal signer decoding
-    Decoding(DecodingError), // errors occuring during the decoding procedure
-    FundamentallyBadV14Metadata(MetadataError), // errors occuring because the metadata is legit, but not acceptable in existing safety paradigm, for example, in V14 has no mention of network spec version in extrinsics
-    SystemError(SystemError), // very much unexpected internal errors not related directly to parsing
-    WrongNetworkVersion {as_decoded: String, in_metadata: u32},
+pub enum Error {
+    Parser(ParserError),
+    Arguments(ArgumentsError), // errors related to metadata and short_specs arguments input by user
 }
 
 #[derive(PartialEq)]
@@ -17,7 +14,17 @@ pub enum ArgumentsError {
 }
 
 #[derive(PartialEq)]
+pub enum ParserError {
+    Decoding(DecodingError), // errors occuring during the decoding procedure
+    FundamentallyBadV14Metadata(MetadataError), // errors occuring because the metadata is legit, but not acceptable in existing safety paradigm, for example, in V14 has no mention of network spec version in extrinsics
+    SystemError(SystemError), // very much unexpected internal errors not related directly to parsing
+    WrongNetworkVersion {as_decoded: String, in_metadata: u32},
+}
+
+#[derive(PartialEq)]
 pub enum DecodingError {
+    UnexpectedImmortality,
+    UnexpectedMortality,
     GenesisHashMismatch,
     ImmortalHashMismatch,
     ExtensionsOlder,
@@ -68,18 +75,10 @@ pub enum SystemError {
 impl ParserError {
     pub fn show (&self) -> String {
         match &self {
-            ParserError::Arguments(x) => {
-                let insert = match x {
-                    ArgumentsError::MetaSpecVersionNotDecodeable => String::from("Version constant from the metadata could not be decoded."),
-                    ArgumentsError::NetworkNameMismatch {name_metadata, name_network_specs} => format!("Network name mismatch. In metadata: {}, in network specs: {}", name_metadata, name_network_specs),
-                    ArgumentsError::NoMetaSpecVersion => String::from("No version in the metadata."),
-                    ArgumentsError::NoTypes => String::from("Decoding transactions with metadata V12 and V13 uses pre-existing types info. Error generating default types info."),
-                    ArgumentsError::RuntimeVersionIncompatible => String::from("Runtime metadata version is incompatible. Supported are V12, V13, and V14."),
-                };
-                format!("Arguments error. {}", insert)
-            },
             ParserError::Decoding(x) => {
                 let insert = match x {
+                    DecodingError::UnexpectedImmortality => String::from("Expected mortal transaction due to prelude format. Found immortal transaction."),
+                    DecodingError::UnexpectedMortality => String::from("Expected immortal transaction due to prelude format. Found mortal transaction."),
                     DecodingError::GenesisHashMismatch => String::from("Genesis hash values from decoded extensions and from used network specs do not match."),
                     DecodingError::ImmortalHashMismatch => String::from("Block hash for immortal transaction not matching genesis hash for the network."),
                     DecodingError::ExtensionsOlder => String::from("Unable to decode extensions for V12/V13 metadata using standard extensions set."),
@@ -109,7 +108,7 @@ impl ParserError {
                     DecodingError::SomeDataNotUsedMethod => String::from("After decoding the method some data remained unused."),
                     DecodingError::SomeDataNotUsedExtensions => String::from("After decoding the extensions some data remained unused."),
                 };
-                format!("Decoding error. {}.", insert)
+                format!("Metadata spec version matches. Error decoding transaction content. {}", insert)
             },
             ParserError::FundamentallyBadV14Metadata(x) => {
                 let insert = match x {
@@ -121,16 +120,34 @@ impl ParserError {
                     MetadataError::BlockHashTwice => String::from("Block hash is encountered more than once."),
                     MetadataError::SpecVersionTwice => String::from("Metadata spec version is encountered more than once."),
                 };
-                format!("Signed extensions are not compatible with Signer (v14 metadata). {}", insert)
+                format!("Metadata spec version matches. Signed extensions are not compatible with Signer (v14 metadata). {}", insert)
             },
             ParserError::SystemError(x) => {
                 let insert = match x {
                     SystemError::BalanceFail => String::from("Balance printing failed."),
                     SystemError::RegexError => String::from("Unexpected regular expressions error."),
                 };
-                format!("System error. {}", insert)
+                format!("Metadata spec version matches. System error. {}", insert)
             },
-            ParserError::WrongNetworkVersion{as_decoded, in_metadata} => format!("Metadata network spec version ({}) differs from the version in extensions ({}).", as_decoded, in_metadata),
+            ParserError::WrongNetworkVersion{as_decoded, in_metadata} => format!("Network spec version decoded from extensions ({}) differs from the version in metadata ({}).", as_decoded, in_metadata),
+        }
+    }
+}
+
+impl Error {
+    pub fn show (&self) -> String {
+        match &self {
+            Error::Parser(x) => x.show(),
+            Error::Arguments(x) => {
+                let insert = match x {
+                    ArgumentsError::MetaSpecVersionNotDecodeable => String::from("Version constant from the metadata could not be decoded."),
+                    ArgumentsError::NetworkNameMismatch {name_metadata, name_network_specs} => format!("Network name mismatch. In metadata: {}, in network specs: {}", name_metadata, name_network_specs),
+                    ArgumentsError::NoMetaSpecVersion => String::from("No version in the metadata."),
+                    ArgumentsError::NoTypes => String::from("Decoding transactions with metadata V12 and V13 uses pre-existing types info. Error generating default types info."),
+                    ArgumentsError::RuntimeVersionIncompatible => String::from("Runtime metadata version is incompatible. Supported are V12, V13, and V14."),
+                };
+                format!("Arguments error. {}", insert)
+            },
         }
     }
 }
