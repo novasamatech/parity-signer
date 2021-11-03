@@ -64,7 +64,7 @@ if [ "$1" == "android" ]
     done
 
     rm -rf ../../android/app/src/main/assets/Database/*
-    cp -R ../database/database_cold_release/* ../../android/app/src/main/assets/Database/
+    cp -R ../database/database_cold_release/ ../../android/app/src/main/assets/Database/
 fi
 
 if [ "$1" == "ios" ]
