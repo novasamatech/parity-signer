@@ -8,13 +8,20 @@ It prints a string with decoded QR message in HEX format on display (and to file
 
 ### Dependencies
 
-You need to install `OpenCV`. You can check this manual: https://crates.io/crates/opencv and https://docs.opencv.org
+The main requirement is the OpenCV. You can check this manuals: https://crates.io/crates/opencv and https://docs.opencv.org.
 
-#### Linux
+#### Arch Linux:
 
-* For Debian/Ubuntu you need: `clang` and `libclang-dev`
-* For Gentoo/Fedora you need: `clang`
-* For Linux system, it is preferable to build latest version of opencv+opencv_contrib from source. OpenCV package from the system repository may not contain the necessary libraries. Use this manual: https://docs.opencv.org/4.5.3/d7/d9f/tutorial_linux_install.html
+OpenCV package in Arch is suitable for this crate. It requires some dependencies.
+
+* `pacman -S clang gt5-base vtk glew openmpi pugixml opencv`
+
+#### Other Linux systems:
+
+* For Debian/Ubuntu also you need: `clang` and `libclang-dev`
+* For Gentoo/Fedora also you need: `clang`
+* It is preferable to build latest version of opencv+opencv_contrib from source. OpenCV package from the system repository may not contain the necessary libraries.\
+Use this manual: https://docs.opencv.org/4.5.3/d7/d9f/tutorial_linux_install.html
 
 ### Executing program
 
@@ -32,7 +39,7 @@ Camera resolution is hardcoded (640x480).
 
 #### Examples
 
-* `cargo run d 0` : camera index = 0,
+* `cargo run d 0` (camera index = 0),
 * `cargo run l`
 
 
