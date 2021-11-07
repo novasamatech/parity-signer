@@ -4,7 +4,9 @@ use std::env;
 
 fn main() -> Result<(), String> {
 
-    let camera_setings = match arg_parser(env::args()) {
+    let arguments = env::args().collect();
+
+    let camera_setings = match arg_parser(arguments) {
         Ok(x) => x,
         Err(e) => return Err(format!("{}", e)),
     };

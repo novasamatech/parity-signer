@@ -19,6 +19,7 @@ You need to install `OpenCV`. You can check this manual: https://crates.io/crate
 ### Executing program
 
 * Run the program: `cargo run` + arguments
+* Press any key to stop
 
 #### Arguments
 

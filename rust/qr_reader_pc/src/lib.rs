@@ -7,7 +7,7 @@
 
 use anyhow::anyhow;
 use qr_reader_phone::process_payload::{process_decoded_payload, InProgress, Ready};
-use std::env;
+use image::{Luma, GrayImage, ImageBuffer};
 
 use opencv::{
 	highgui,
@@ -15,7 +15,7 @@ use opencv::{
 	Result,
 	videoio,
     videoio::{CAP_PROP_FRAME_HEIGHT, CAP_PROP_FRAME_WIDTH,},
-    objdetect::QRCodeDetector,
+    imgproc::{COLOR_BGR2GRAY, cvt_color,},
 };
 
 // Default camera settings
@@ -24,16 +24,17 @@ const DEFAULT_HEIGHT: u32 = 480;
 const MAX_CAMERA_INDEX: i32 = 6;
 
 /// Structure for storing camera settings.
+#[derive(Debug)]
 pub struct CameraSettings {
     index: Option<i32>,
 }
 
 /// Main cycle of video capture.
-/// Returns a string with decoded QR message in HEX format or error
+/// Returns a string with decoded QR message in HEX format or error.
 ///
 /// # Arguments
 ///
-/// * `camera_settings` - A CameraSettings struct that holds the camera parameters
+/// * `camera_settings` - CameraSettings struct that holds the camera parameters
 pub fn run_with_camera(camera_settings: CameraSettings) -> anyhow::Result<String> {
     
     let camera_index = match camera_settings.index {
@@ -66,6 +67,11 @@ pub fn run_with_camera(camera_settings: CameraSettings) -> anyhow::Result<String
                 break;
             },
         }
+        
+        if highgui::wait_key(10)? > 0 {
+            println!("Exit");
+            break;
+        };
     }
     Ok(line)
 }
@@ -79,13 +85,8 @@ fn create_camera(camera_index: i32, width: u32, height: u32) -> anyhow::Result<v
 	
     match videoio::VideoCapture::is_opened(&camera) {
         Ok(opened) if opened => {
-            match (
-                camera.set(CAP_PROP_FRAME_WIDTH, width.into()),
-                camera.set(CAP_PROP_FRAME_HEIGHT, height.into()),
-            ) {
-                (Ok(_), Ok(_)) => println!("Resolution setted."),
-                (_,_) => return Err(anyhow!("Can not set camera resolution.")),
-            }
+                camera.set(CAP_PROP_FRAME_WIDTH, width.into())?;
+                camera.set(CAP_PROP_FRAME_HEIGHT, height.into())?;
         },
         Ok(_) => return Err(anyhow!("Camera already opened.")),
         Err(e) => return Err(anyhow!("Can`t open camera. {}", e)),
@@ -100,7 +101,7 @@ fn create_camera(camera_index: i32, width: u32, height: u32) -> anyhow::Result<v
     }
 }
 
-fn camera_capture(camera: &mut videoio::VideoCapture, window: &str) -> Result<Mat> {
+fn camera_capture(camera: &mut videoio::VideoCapture, window: &str) -> Result<GrayImage> {
     let mut frame = Mat::default();
     camera.read(&mut frame)?;
 
@@ -108,23 +109,45 @@ fn camera_capture(camera: &mut videoio::VideoCapture, window: &str) -> Result<Ma
         highgui::imshow(window, &frame)?;
     };
 
-    if highgui::wait_key(10)? > 0 {
-        println!("Ok");
+    let mut image: GrayImage = ImageBuffer::new(DEFAULT_WIDTH, DEFAULT_HEIGHT);
+    let mut ocv_gray_image = Mat::default();
+    
+    cvt_color(&frame, &mut ocv_gray_image, COLOR_BGR2GRAY, 0)?;
+
+    for y in 0..ocv_gray_image.rows() {
+        for x in 0..ocv_gray_image.cols() {
+            let pixel : Luma<u8> = Luma([*ocv_gray_image.at_2d(y,x)?]);
+            image.put_pixel(x as u32, y as u32, pixel);
+        };
     };
 
-    Ok(frame) 
+    Ok(image) 
 }
 
-fn process_qr_image(frame: &Mat, decoding: InProgress,) -> anyhow::Result<Ready> {   
-        
-    let mut qr_detector = QRCodeDetector::default()?;
-    let mut points = Mat::default();
-    let mut rect_image = Mat::default();
-    let code = qr_detector.detect_and_decode(&frame, &mut points, &mut rect_image);
+/// Function for decoding QR grayscale image.
+/// Returns a string with decoded QR message in HEX format or error.
+/// 
+/// # Arguments
+///
+/// * `image` - Grayscale image containing QR and background
+/// * `decoding` - Stores accumulated payload data for animated QR.
+pub fn process_qr_image(image: &GrayImage, decoding: InProgress,) -> anyhow::Result<Ready> {              
+    let mut qr_decoder = quircs::Quirc::new();
+    let codes = qr_decoder.identify(image.width() as usize, image.height() as usize, image);
 
-    match code {
-        Ok(code) if !code.is_empty() => process_decoded_payload(code.into_bytes(), decoding),
-        Ok(_) | Err(_) => Ok(Ready::NotYet(decoding)),
+    match codes.last() {
+        Some(Ok(code)) => {
+            match code.decode() {
+                Ok(decoded) => {
+                    process_decoded_payload(decoded.payload, decoding)
+                },
+                Err(_) => {
+                    Ok(Ready::NotYet(decoding))
+                }
+            }
+        },
+        Some(_) => Ok(Ready::NotYet(decoding)),
+        None => Ok(Ready::NotYet(decoding)),
     }
 }
 
@@ -141,10 +164,11 @@ fn print_list_of_cameras() {
     }
 }
 
-/// Program's argument parser.
-/// Parser initialize CameraSettings struct with default values or program arguments.
-/// The program arguments are described in the readme.md file.
-pub fn arg_parser(mut args: env::Args) -> anyhow::Result<CameraSettings> {
+/// The program's argument parser.
+/// The parser initializes the CameraSettings structure with program`s arguments
+/// (described in the readme.md file). 
+pub fn arg_parser(arguments: Vec<String>) -> anyhow::Result<CameraSettings> {
+    let mut args = arguments.into_iter(); 
     args.next(); // skip program name
 
     let mut settings = CameraSettings {
@@ -171,5 +195,20 @@ pub fn arg_parser(mut args: env::Args) -> anyhow::Result<CameraSettings> {
     match settings.index {
         Some(_) => Ok(settings),
         None => Err(anyhow!("Need to provide camera index. Please read readme.md file.")),
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn get_camera_index() {
+        let arguments: Vec<String> = vec!(
+            String::from("program_name"),
+            String::from("d"),
+            String::from("0"));
+        let result = arg_parser(arguments).unwrap();
+        assert_eq!(result.index, Some(0));        
     }
 }
