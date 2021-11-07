@@ -14,7 +14,7 @@ The main requirement is the OpenCV. You can check this manuals: https://crates.i
 
 OpenCV package in Arch is suitable for this crate. It requires some dependencies.
 
-* `pacman -S clang gt5-base vtk glew openmpi pugixml opencv`
+* `pacman -S clang qt5-base opencv`
 
 #### Other Linux systems:
 
