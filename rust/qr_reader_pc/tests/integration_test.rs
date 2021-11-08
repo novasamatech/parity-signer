@@ -30,5 +30,5 @@ fn check_single_qr_hex() -> Result<(), String> {
         Err(String::from("Incorrect result"))
     } else {
         Ok(())
-    }       
+    } 
 }
