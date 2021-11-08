@@ -1,6 +1,6 @@
 [package]
 name = "qr_reader_pc"
-version = "0.1.0"
+version = "0.2.0"
 authors = ["vera"]
 edition = "2018"
 
