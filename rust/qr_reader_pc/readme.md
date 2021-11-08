@@ -8,8 +8,13 @@ Prints on display (and to file "decoded_output.txt") a string with decoded QR me
 
 ### Dependencies
 
-* Only Linux is the current supported platform,
-* minifb (video output) crate dependencies for debian/ubuntu: `sudo apt install libxkbcommon-dev libwayland-cursor0 libwayland-dev`,
+#### Arch Linux:
+
+* `pacman -S clang`
+
+#### Other Linux systems:
+
+* You may need to install these dependencies first: `sudo apt install clang libxkbcommon-dev libwayland-cursor0 libwayland-dev`
 
 ### Executing program
 
@@ -19,10 +24,10 @@ To check available camera parameters: `v4l2-ctl --list-formats-ext`
 
 ### Arguments
 
-* When you run program without arguments, program provide a list of available cameras for v4l backend,
-* `d`/`-d`/`--device` : set index of camera (from list of available cameras),
-* `ff`/`-ff` : set frame format for camera, `YUYV` and `MJPEG` are suported,
-* `fps`/`-fps` : set fps parameter for camera,
+* `d`|`-d`|`--device` : set index of camera (from list of available cameras)
+* `l` | `-l` | `--list` : get a list of available camera indexes
+* `ff`|`-ff` : set frame format for camera, `YUYV` and `MJPEG` are suported
+* `fps`|`-fps` : set fps parameter for camera
 
 You can only provide camera index. Other parameters will be setted by default (YUYV frame format and 30 fps).
 Camera resolution is hardcoded (640x480).
