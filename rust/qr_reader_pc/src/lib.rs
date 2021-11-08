@@ -2,18 +2,15 @@
 
 //! # QR reader crate for PC
 //!
-//! `qr_reader_pc` is a utility to scan (via webcam) QR codes from Signer
+//! `qr_reader_pc` is a utility to capture (via webcam) QR codes from Signer
 //! and extracting data from it.
 
 use minifb::{Window, WindowOptions};
 use nokhwa::{query_devices, CaptureAPIBackend};
 use nokhwa::{Camera, CameraFormat, FrameFormat};
 use anyhow::anyhow;
-use image::{GrayImage, ImageBuffer, Luma, Pixel};
+use image::{GrayImage, ImageBuffer, Pixel};
 use qr_reader_phone::process_payload::{process_decoded_payload, InProgress, Ready};
-use std::env;
-// use quircs;
-// use hex;
 
 // Default camera settings
 const DEFAULT_WIDTH: u32 = 640;
@@ -22,12 +19,20 @@ const DEFAULT_FRAME_FORMAT: FrameFormat = FrameFormat::YUYV;
 const DEFAULT_FPS: u32 = 30;
 const DEFAULT_BACKEND: CaptureAPIBackend = CaptureAPIBackend::Video4Linux;
 
+/// Structure for storing camera settings.
+#[derive(Debug)]
+pub struct CameraSettings {
+    index: Option<usize>,
+    frame_format: FrameFormat,
+    fps: u32,
+}
+
 /// Main cycle of video capture.
-/// Returns a string with decoded QR message in HEX format or error
+/// Returns a string with decoded QR message in HEX format or error.
 ///
 /// # Arguments
 ///
-/// * `camera_settings` - A CameraSettings struct that holds the camera parameters
+/// * `camera_settings` - CameraSettings struct that holds the camera parameters
 pub fn run_with_camera(camera_settings: CameraSettings) -> anyhow::Result<String> {
     let mut camera = match Camera::new(
         camera_settings.index.unwrap(),
@@ -83,7 +88,7 @@ pub fn run_with_camera(camera_settings: CameraSettings) -> anyhow::Result<String
     Ok(line)
 }
 
-fn camera_capture(camera: &mut Camera, window: &mut Window,) -> anyhow::Result<ImageBuffer<Luma<u8>, Vec<u8>>> {
+fn camera_capture(camera: &mut Camera, window: &mut Window,) -> anyhow::Result<GrayImage> {
     let frame = match camera.frame() {
         Ok(x) => x,
         Err(e) => return Err(anyhow!("Error with camera capture. {}", e)),
@@ -114,30 +119,33 @@ fn camera_capture(camera: &mut Camera, window: &mut Window,) -> anyhow::Result<I
     Ok(gray_img)
 }
 
-fn process_qr_image(img: &ImageBuffer<Luma<u8>, Vec<u8>>, decoding: InProgress,) -> anyhow::Result<Ready> {    
+/// Function for decoding QR grayscale image.
+/// Returns a string with decoded QR message in HEX format or error.
+/// 
+/// # Arguments
+///
+/// * `image` - Grayscale image containing QR and background
+/// * `decoding` - Stores accumulated payload data for animated QR.
+pub fn process_qr_image(image: &GrayImage, decoding: InProgress,) -> anyhow::Result<Ready> {              
     let mut qr_decoder = quircs::Quirc::new();
-    let codes = qr_decoder.identify(img.width() as usize, img.height() as usize, img);
+    let codes = qr_decoder.identify(image.width() as usize, image.height() as usize, image);
+
     match codes.last() {
         Some(Ok(code)) => {
             match code.decode() {
-                Ok(decoded) => process_decoded_payload(decoded.payload, decoding),
+                Ok(decoded) => {
+                    process_decoded_payload(decoded.payload, decoding)
+                },
                 Err(_) => {
                     Ok(Ready::NotYet(decoding))
                 }
             }
         },
-        None | Some(Err(_)) => {
-            Ok(Ready::NotYet(decoding))
-        },
+        Some(_) => Ok(Ready::NotYet(decoding)),
+        None => Ok(Ready::NotYet(decoding)),
     }
 }
 
-/// Structure for storing camera settings.
-pub struct CameraSettings {
-    index: Option<usize>,
-    frame_format: FrameFormat,
-    fps: u32,
-}
 
 fn print_list_of_cameras() {
     println!("List of available devices:");
@@ -151,10 +159,11 @@ fn print_list_of_cameras() {
     };
 }
 
-/// Program's argument parser.
-/// Parser initialize CameraSettings struct with default values or program arguments.
-/// The program arguments are described in the readme.md file.
-pub fn arg_parser(mut args: env::Args) -> anyhow::Result<CameraSettings> {
+/// The program's argument parser.
+/// The parser initializes the CameraSettings structure with program`s arguments
+/// (described in the readme.md file). 
+pub fn arg_parser(arguments: Vec<String>) -> anyhow::Result<CameraSettings> {
+    let mut args = arguments.into_iter(); 
     args.next(); // skip program name
 
     let mut settings = CameraSettings {
@@ -186,9 +195,9 @@ pub fn arg_parser(mut args: env::Args) -> anyhow::Result<CameraSettings> {
                 Err(_) => println!("FPS parsing error. Set default framerate."),
             },
 
-            "h" | "-h" | "--help" => {
-                // TODO. The reference to the readme.md implemented now.
-            }
+            "l" | "-l" | "--list" => print_list_of_cameras(),
+
+            "h" | "-h" | "--help" => println!("Please read readme.md file."),
 
             _ => return Err(anyhow!("Argument parsing error.")),
         };
@@ -197,10 +206,24 @@ pub fn arg_parser(mut args: env::Args) -> anyhow::Result<CameraSettings> {
     match settings.index {
         Some(_) => Ok(settings),
         None => {
-            print_list_of_cameras();
             Err(anyhow!(
                 "Need to provide camera index. Please read readme.md file."
             ))
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn get_camera_index() {
+        let arguments: Vec<String> = vec!(
+            String::from("program_name"),
+            String::from("d"),
+            String::from("0"));
+        let result = arg_parser(arguments).unwrap();
+        assert_eq!(result.index, Some(0));        
     }
 }
