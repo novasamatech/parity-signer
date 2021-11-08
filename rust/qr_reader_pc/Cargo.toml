@@ -16,4 +16,4 @@ quircs = "0.10.0"
 [dependencies.opencv]
 version = "0.60"
 default-features = false
-features = ["clang-runtime", "videoio", "imgproc", "highgui"]
+features = ["clang-runtime", "videoio", "imgproc", "highgui", "objdetect", "imgcodecs"]

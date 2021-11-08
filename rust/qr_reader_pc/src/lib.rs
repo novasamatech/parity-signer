@@ -7,7 +7,6 @@
 
 use anyhow::anyhow;
 use qr_reader_phone::process_payload::{process_decoded_payload, InProgress, Ready};
-use image::{Luma, GrayImage, ImageBuffer};
 
 use opencv::{
 	highgui,
@@ -15,7 +14,7 @@ use opencv::{
 	Result,
 	videoio,
     videoio::{CAP_PROP_FRAME_HEIGHT, CAP_PROP_FRAME_WIDTH,},
-    imgproc::{COLOR_BGR2GRAY, cvt_color,},
+    objdetect::QRCodeDetector,
 };
 
 // Default camera settings
@@ -121,6 +120,8 @@ fn camera_capture(camera: &mut videoio::VideoCapture, window: &str) -> Result<Ma
 /// * `decoding` - Stores accumulated payload data for animated QR.
 pub fn process_qr_image(frame: &Mat, decoding: InProgress,) -> anyhow::Result<Ready> {                
     let mut qr_decoder = QRCodeDetector::default()?;
+    let mut points = Mat::default();
+    let mut rect_image = Mat::default();
     let code = qr_decoder.detect_and_decode(&frame, &mut points, &mut rect_image);
 
     match code {

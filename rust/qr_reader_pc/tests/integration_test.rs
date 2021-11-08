@@ -1,6 +1,6 @@
 use qr_reader_pc::{process_qr_image};
-use image::{open};
 use qr_reader_phone::process_payload::{InProgress, Ready};
+use opencv::imgcodecs::{imread,  IMREAD_COLOR};
 
 #[test]
 fn check_single_qr_hex() -> Result<(), String> {
@@ -9,14 +9,14 @@ fn check_single_qr_hex() -> Result<(), String> {
     13bf399b097dad0a8064c45e79a8bc50978f6a8a5db0775bcb4c335897\
     8ca625496e056f2e7ddf724cf0040e5ff106d06f54efbd95389");
     
-    let gray_img = match open("./tests/test_qr_1.jpg") {
-        Ok(x) => x.into_luma8(),
+    let img = match imread("./tests/test_qr_1.jpg",  IMREAD_COLOR) {
+        Ok(x) => x,
         Err(_) => return Err(String::from("File reading error.")),
     };
 
     let mut result = String::new();
 
-    match process_qr_image(&gray_img, InProgress::None) {
+    match process_qr_image(&img, InProgress::None) {
         Ok(x) => match x {
             Ready::Yes(a) => result.push_str(&hex::encode(&a)),
             Ready::NotYet(_) => return Err(String::from("Waiting animated QR.")),
