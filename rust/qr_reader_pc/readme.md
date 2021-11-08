@@ -30,16 +30,15 @@ Use this manual: https://docs.opencv.org/4.5.3/d7/d9f/tutorial_linux_install.htm
 
 #### Arguments
 
-* When you run program without arguments, program provide a list of available cameras for v4l backend,
-* `d` | `-d` | `--device` : set index of camera (from list of available cameras),
-* `l` | `-l` | `--list` : get a list of available camera indexes,
-* `h` | `-h` | `--help` : refers to this manual,
+* `d` | `-d` | `--device` : set index of camera (from list of available cameras)
+* `l` | `-l` | `--list` : get a list of available camera indexes
+* `h` | `-h` | `--help` : refers to this manual
 
 Camera resolution is hardcoded (640x480).
 
 #### Examples
 
-* `cargo run d 0` (camera index = 0),
+* `cargo run d 0` (camera index = 0)
 * `cargo run l`
 
 
