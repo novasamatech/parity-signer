@@ -101,27 +101,15 @@ fn create_camera(camera_index: i32, width: u32, height: u32) -> anyhow::Result<v
     }
 }
 
-fn camera_capture(camera: &mut videoio::VideoCapture, window: &str) -> Result<GrayImage> {
+fn camera_capture(camera: &mut videoio::VideoCapture, window: &str) -> Result<Mat> {
     let mut frame = Mat::default();
     camera.read(&mut frame)?;
 
     if frame.size()?.width > 0 {        
         highgui::imshow(window, &frame)?;
     };
-
-    let mut image: GrayImage = ImageBuffer::new(DEFAULT_WIDTH, DEFAULT_HEIGHT);
-    let mut ocv_gray_image = Mat::default();
-    
-    cvt_color(&frame, &mut ocv_gray_image, COLOR_BGR2GRAY, 0)?;
-
-    for y in 0..ocv_gray_image.rows() {
-        for x in 0..ocv_gray_image.cols() {
-            let pixel : Luma<u8> = Luma([*ocv_gray_image.at_2d(y,x)?]);
-            image.put_pixel(x as u32, y as u32, pixel);
-        };
-    };
-
-    Ok(image) 
+	
+    Ok(frame) 
 }
 
 /// Function for decoding QR grayscale image.
@@ -131,23 +119,13 @@ fn camera_capture(camera: &mut videoio::VideoCapture, window: &str) -> Result<Gr
 ///
 /// * `image` - Grayscale image containing QR and background
 /// * `decoding` - Stores accumulated payload data for animated QR.
-pub fn process_qr_image(image: &GrayImage, decoding: InProgress,) -> anyhow::Result<Ready> {              
-    let mut qr_decoder = quircs::Quirc::new();
-    let codes = qr_decoder.identify(image.width() as usize, image.height() as usize, image);
+pub fn process_qr_image(frame: &Mat, decoding: InProgress,) -> anyhow::Result<Ready> {                
+    let mut qr_decoder = QRCodeDetector::default()?;
+    let code = qr_decoder.detect_and_decode(&frame, &mut points, &mut rect_image);
 
-    match codes.last() {
-        Some(Ok(code)) => {
-            match code.decode() {
-                Ok(decoded) => {
-                    process_decoded_payload(decoded.payload, decoding)
-                },
-                Err(_) => {
-                    Ok(Ready::NotYet(decoding))
-                }
-            }
-        },
-        Some(_) => Ok(Ready::NotYet(decoding)),
-        None => Ok(Ready::NotYet(decoding)),
+    match code {
+        Ok(code) if !code.is_empty() => process_decoded_payload(code.into_bytes(), decoding),
+        Ok(_) | Err(_) => Ok(Ready::NotYet(decoding)),
     }
 }
 
