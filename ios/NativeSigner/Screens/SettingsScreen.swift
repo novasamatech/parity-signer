@@ -16,21 +16,6 @@ struct SettingsScreen: View {
                 //Main buttons block
                 VStack {
                     Button(action: {
-                        data.settingsModal = .showHistory
-                    }) {
-                        Text("Show log")
-                    }.padding()
-                    Button(action: {
-                        data.settingsModal = .showSeedManager
-                    }) {
-                        Text("Manage seeds")
-                    }.padding()
-                    Button (action: {
-                        data.settingsModal = .showNetworkManager
-                    }) {
-                        Text("Network settings")
-                    }.padding()
-                    Button(action: {
                         //TODO: add some alerts to make sure the operation was successful
                         wipe = true
                     }) {
@@ -57,18 +42,7 @@ struct SettingsScreen: View {
                     Button(action: {
                         data.settingsModal = .showDocument(.about)
                     }) {
-                        Text("About")
-                    }
-                    .padding()
-                    Button(action: {
-                        data.settingsModal = .showDocument(.toc)
-                    }) {
-                        Text("Terms and conditions")
-                    }
-                    .padding()
-                    Button(action: {
-                            data.settingsModal = .showDocument(.pp)}) {
-                        Text("Privacy statement")
+                        Text("Documentation")
                     }
                     .padding()
                     Spacer()
@@ -76,12 +50,6 @@ struct SettingsScreen: View {
             }
             .background(/*@START_MENU_TOKEN@*//*@PLACEHOLDER=View@*/Color("backgroundColor")/*@END_MENU_TOKEN@*/)
             switch(data.settingsModal) {
-            case .showHistory:
-                HistoryView()
-            case .showSeedManager:
-                SeedManager()
-            case .showNetworkManager:
-                NetworkManager()
             case .showDocument(let document):
                 DocumentModal(document: document)
             case .none:

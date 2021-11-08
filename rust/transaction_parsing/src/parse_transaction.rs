@@ -4,9 +4,8 @@ use parity_scale_codec::{Decode, Encode};
 use parity_scale_codec_derive;
 use printing_balance::{PrettyOutput, convert_balance_pretty};
 use constants::{SPECSTREE, METATREE, ADDRTREE, SETTREE, SIGNTRANS, TRANSACTION};
-use definitions::{network_specs::{ChainSpecs, generate_network_key}, transactions::{Transaction, Sign}, users::{AddressDetails, Encryption, generate_address_key, print_as_base58}, history::Event};
+use definitions::{crypto::Encryption, network_specs::{ChainSpecs, generate_network_key}, transactions::{Transaction, Sign}, users::{AddressDetails, generate_address_key, print_as_base58}, history::Event};
 use sp_runtime::generic::Era;
-use std::convert::TryInto;
 
 use crate::utils::{find_meta, get_types};
 use crate::cards::{Action, Card, Warning};
@@ -31,13 +30,6 @@ struct TransactionParts {
     genesis_hash: [u8; 32],
 }
 
-/// Enum to record author public key depending on crypto used:
-/// so far ed25519, sr25519, and ecdsa should be supported
-pub enum AuthorPublicKey {
-    Ed25519([u8; 32]),
-    Sr25519([u8; 32]),
-    Ecdsa([u8; 33]),
-}
 
 /// Struct to decode extrinsics
 #[derive(Debug, parity_scale_codec_derive::Decode, parity_scale_codec_derive::Encode)]
@@ -87,10 +79,10 @@ pub fn parse_transaction (data_hex: &str, dbname: &str) -> Result<String, Error>
 
     let data = unhex(&data_hex)?;
     
-    let (author_pub_key, data) = match &data_hex[2..4] {
-        "00" => (AuthorPublicKey::Ed25519(data[3..35].try_into().expect("fixed size should fit in array")), &data[35..]),
-        "01" => (AuthorPublicKey::Sr25519(data[3..35].try_into().expect("fixed size should fit in array")), &data[35..]),
-        "02" => (AuthorPublicKey::Ecdsa(data[3..36].try_into().expect("fixed size should fit in array")), &data[36..]),
+    let (author_public_key, encryption, data) = match &data_hex[2..4] {
+        "00" => (data[3..35].to_vec(), Encryption::Ed25519, &data[35..]),
+        "01" => (data[3..35].to_vec(), Encryption::Sr25519, &data[35..]),
+        "02" => (data[3..36].to_vec(), Encryption::Ecdsa, &data[36..]),
         _ => return Err(Error::BadInputData(BadInputData::CryptoNotSupported))
     };
     
@@ -114,7 +106,7 @@ pub fn parse_transaction (data_hex: &str, dbname: &str) -> Result<String, Error>
 
     if let Era::Immortal = short.era {if short.genesis_hash != short.block_hash {return Err(Error::BadInputData(BadInputData::ImmortalHashMismatch))}}
     
-    let network_key = generate_network_key(&transaction_decoded.genesis_hash.to_vec());
+    let network_key = generate_network_key(&transaction_decoded.genesis_hash.to_vec(), encryption);
     
     let chainspecs_db_reply = get_from_tree(&network_key, &chainspecs)?;
     match chainspecs_db_reply {
@@ -132,14 +124,11 @@ pub fn parse_transaction (data_hex: &str, dbname: &str) -> Result<String, Error>
                 Err(_) => return Err(Error::SystemError(SystemError::BalanceFail)),
             };
 
-        // transform public key into base58 address and get encryption for action card exporting
-            let (address_vector, encryption) = match author_pub_key {
-                AuthorPublicKey::Ed25519(t) => (t.to_vec(), Encryption::Ed25519),
-                AuthorPublicKey::Sr25519(t) => (t.to_vec(), Encryption::Sr25519),
-                AuthorPublicKey::Ecdsa(t) => (t.to_vec(), Encryption::Ecdsa),
-            };
-            let address_key = generate_address_key(&address_vector);
-            let author = print_as_base58(&address_vector, encryption, Some(chain_prefix)).expect("just matched encryption type and address key length, should always fit");
+        // check that the network is compatible with provided encryption
+            if encryption != chain_specs_found.encryption {return Err(Error::BadInputData(BadInputData::EncryptionMismatch))}
+            
+            let address_key = generate_address_key(&author_public_key, encryption).expect("already matched encryption type and author public key length, should always work");
+            let author = print_as_base58(&address_key, encryption, Some(chain_prefix)).expect("just generated address_key, should always work");
         // search for this base58 address in existing accounts, get address details
             let addresses_db_reply = get_from_tree(&address_key, &addresses)?;
             match addresses_db_reply {
@@ -202,7 +191,6 @@ pub fn parse_transaction (data_hex: &str, dbname: &str) -> Result<String, Error>
                                                 // network is among the allowed ones for this address key; can sign;
                                                 // making action entry into database
                                                     let action_into_db = Transaction::Sign(Sign{
-                                                        encryption,
                                                         path: address_details.path,
                                                         transaction: for_signing,
                                                         has_pwd: address_details.has_pwd,
@@ -264,7 +252,6 @@ pub fn parse_transaction (data_hex: &str, dbname: &str) -> Result<String, Error>
                                                 // network is among the allowed ones for this address key; can sign;
                                                 // making action entry into database
                                                     let action_into_db = Transaction::Sign(Sign{
-                                                        encryption,
                                                         path: address_details.path,
                                                         transaction: for_signing,
                                                         has_pwd: address_details.has_pwd,
@@ -430,7 +417,7 @@ pub fn parse_transaction (data_hex: &str, dbname: &str) -> Result<String, Error>
         },
         None => {
         // did not find network with matching genesis hash in database
-            let author_card = (Card::AuthorPublicKey(author_pub_key)).card(index, indent);
+            let author_card = (Card::AuthorPublicKey{author_public_key, encryption}).card(index, indent);
             index = index + 1;
             let error_card = (Card::Error(Error::DatabaseError(DatabaseError::NoNetwork))).card(index, indent);
             index = index + 1;

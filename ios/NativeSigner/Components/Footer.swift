@@ -27,34 +27,65 @@ struct Footer: View {
     @EnvironmentObject var data: SignerDataModel
     var body: some View {
         VStack {
-            Button(action: {
-                data.totalRefresh()
-                data.signerScreen = .home
-            }) {
-                Image("HomeButton").offset(y: -30).padding(.bottom, -30)
+            if data.signerScreen == .keys && data.keyManagerModal == .none {
+                if data.getMultiSelectionMode() {
+                    MultiselectBottomControl()
+                } else {
+                    SearchKeys()
+                }
             }
             HStack {
                 Button(action: {
-                    data.totalRefresh()
-                    data.signerScreen = .keys
+                    data.refreshUI()
+                    data.signerScreen = .history
                 }) {
-                    KeySymbol()
+                    VStack(alignment: .center) {
+                        Image(systemName: "scroll").imageScale(.large).foregroundColor(data.signerScreen == .history ? Color("buttonActive") : Color("buttonPassiveImage"))
+                        Text("Log").foregroundColor(data.signerScreen == .history ? Color("buttonActive") : Color("buttonPassiveText"))
+                    }
                 }
                 Spacer()
                 Button(action: {
-                    data.totalRefresh()
+                    data.refreshUI()
+                    data.signerScreen = .scan
+                }) {
+                    VStack {
+                        Image(systemName: "qrcode.viewfinder").imageScale(.large).foregroundColor(data.signerScreen == .scan ? Color("buttonActive") : Color("buttonPassiveImage"))
+                        Text("Scan").foregroundColor(data.signerScreen == .scan ? Color("buttonActive") : Color("buttonPassiveText"))
+                    }
+                }
+                Spacer()
+                Button(action: {
+                    data.refreshUI()
+                    data.signerScreen = .keys
+                }) {
+                    VStack{
+                        KeySymbol().foregroundColor(data.signerScreen == .keys ? Color("buttonActive") : Color("buttonPassiveImage"))
+                        Text("Keys").foregroundColor(data.signerScreen == .keys ? Color("buttonActive") : Color("buttonPassiveText"))
+                    }
+                }
+                Spacer()
+                Button(action: {
+                    data.refreshUI()
                     data.networkSettings = nil
                     data.signerScreen = .settings
                 }) {
-                    WrenchSymbol()
+                    VStack {
+                        WrenchSymbol().foregroundColor(data.signerScreen == .settings ? Color("buttonActive") : Color("buttonPassiveImage"))
+                        Text("Settings").foregroundColor(data.signerScreen == .settings ? Color("buttonActive") : Color("buttonPassiveText"))
+                    }
                 }
             }
-        }.padding().background(/*@START_MENU_TOKEN@*//*@PLACEHOLDER=View@*/Color("backgroundColor")/*@END_MENU_TOKEN@*/)
+        }
+        .padding()
+        .background(Color("backgroundUtility"))
     }
 }
 
-struct Footer_Previews: PreviewProvider {
-    static var previews: some View {
-        Footer().previewLayout(.sizeThatFits)
-    }
-}
+/*
+ struct Footer_Previews: PreviewProvider {
+ static var previews: some View {
+ Footer().previewLayout(.sizeThatFits)
+ }
+ }
+ */

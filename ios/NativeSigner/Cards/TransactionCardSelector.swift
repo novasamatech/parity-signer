@@ -53,8 +53,7 @@ struct TransactionCardSelector: View {
         case .none:
             EmptyView()
         case .pallet(let text):
-            Text(text)
-                .foregroundColor(Color("textMainColor"))
+            TCPallet(text: text)
         case .pathDocs(let value):
             TCPathDocs(value: value)
         case .range(let value):

@@ -10,7 +10,7 @@ pub mod metadata;
 use metadata::load_metadata;
 
 pub mod chainspecs;
-use chainspecs::{load_chainspecs, load_chainspecs_to_send};
+use chainspecs::{load_chainspecs, load_chainspecs_to_send, load_network_verifiers};
 
 pub mod error;
 use error::Error;
@@ -73,6 +73,7 @@ pub fn populate_cold_no_meta (database_name: &str, testing: bool) -> anyhow::Res
     
     populate_cold_no_networks(database_name)?;
     load_chainspecs(database_name)?;
+    load_network_verifiers(database_name)?;
     if testing {load_test_identities(database_name)?}
     Ok(())
     

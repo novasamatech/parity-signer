@@ -17,6 +17,11 @@ pub struct FetchedInfoWithChainSpecs {
     pub properties: Map<String, JsonValue>,
 }
 
+pub struct FetchedChainSpecs {
+    pub genesis_hash: String,
+    pub properties: Map<String, JsonValue>,
+}
+
 /// Function to fetch the metadata as String and genesis hash as String from given address,
 /// actually fetches stuff, is slow
 
@@ -39,7 +44,7 @@ pub async fn fetch_info(str_address: &str) -> Result<FetchedInfo, Box<dyn std::e
     })
 }
 
-/// Function to fetch the metadata as String and genesis hash as String from given address,
+/// Function to fetch the metadata as String, genesis hash as String, and network specs from given address,
 /// actually fetches stuff, is slow
 
 #[tokio::main]

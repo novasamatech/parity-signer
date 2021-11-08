@@ -11,7 +11,7 @@ struct SeedBackup: View {
     @EnvironmentObject var data: SignerDataModel
     var body: some View {
         ZStack{
-            RoundedRectangle(cornerRadius: 50).foregroundColor(/*@START_MENU_TOKEN@*/Color("backgroundCard")/*@END_MENU_TOKEN@*/)
+            ModalBackdrop()
             VStack {
                 Text("Backup your seed phrase!").font(.headline)
                 Text("Keep your seed phrase in safe place; anyone could restore accounts using this seed phrase; there is no other way to restore accounts.").font(.subheadline)

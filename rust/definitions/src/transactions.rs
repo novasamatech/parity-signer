@@ -2,9 +2,9 @@ use parity_scale_codec_derive::{Decode, Encode};
 
 use crate::history::Event;
 use crate::metadata::NameVersioned;
-use crate::network_specs::{ChainSpecsToSend, Verifier, NetworkKey};
+use crate::network_specs::{ChainSpecsToSend, Verifier, VerifierKey};
 use crate::types::TypeEntry;
-use crate::users::{Encryption, AddressKey};
+use crate::users::AddressKey;
 
 /// Enum to classify possible actions, and store corresponding information in the database
 #[derive(Decode, Encode)]
@@ -20,7 +20,6 @@ pub enum Transaction {
 /// Struct to store sign_transaction action information
 #[derive(Decode, Encode)]
 pub struct Sign {
-    pub encryption: Encryption,
     pub path: String,
     pub transaction: Vec<u8>,
     pub has_pwd: bool,
@@ -45,7 +44,7 @@ impl <'a> SignDisplay <'a> {
 pub struct LoadMeta {
     pub versioned_name: NameVersioned,
     pub meta: Vec<u8>, // metadata
-    pub upd_network: Option<NetworkKey>, // network key if the network verifier should be updated
+    pub upd_network: Option<VerifierKey>, // verifier key if the network verifier should be updated
     pub verifier: Verifier, // transaction verifier, whether this goes anywhere after approval is determined by the action card type
     pub history: Vec<Event>,
 }
@@ -56,7 +55,7 @@ pub struct LoadMeta {
 /// the exact type of action is determined by the action card type
 #[derive(Decode, Encode)]
 pub struct UpdMetaVerifier {
-    pub network_key: NetworkKey,
+    pub verifier_key: VerifierKey,
     pub verifier: Verifier,
     pub history: Vec<Event>,
 }

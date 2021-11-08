@@ -9,138 +9,73 @@ import SwiftUI
 
 struct HistoryCard: View {
     var event: Event
+    var timestamp: String
     var body: some View {
-        VStack {
+        HStack {
             switch event {
             case .databaseInitiated:
-                Text("Database initiated")
-                    .foregroundColor(Color.red)
-                Text("The Signer was factory-reset here.")
+                HistoryCardTemplate(image: "1.square", timestamp: timestamp, color: "dangerColor", line1: "Database initiated", line2: "")
             case .deviceWasOnline:
-                Text("Device was online!")
-                    .foregroundColor(Color.red)
-                Text("You might want to consider all keys compromised at this point; please follow your security protocol")
-                //TODO: add nervous icon and this button function
-                Button(action: {}) {
-                    Text("Acknowledge and dismiss")
-                        .font(.largeTitle)
-                        .foregroundColor(Color("AccentColor"))
-                }
+                HistoryCardTemplate(image: "shield.slash", timestamp: timestamp, color: "dangerColor", line1: "Device was connected to network", line2: "")
             case .error(let text):
-                Text("Error! " + text)
-                    .foregroundColor(Color.red)
+                HistoryCardTemplate(image: "exclamationmark.triangle.fill", timestamp: timestamp, color: "dangerColor", line1: "Error! " + text, line2: "")
             case .generalVerifierAdded(let value):
-                Text("New general verifier key")
-                HStack {
-                    Text("Encryption algorithm: ")
-                    Text(value.encryption)
-                }
-                HStack {
-                    Text("Public key: ")
-                    Text(value.hex)
-                }
-                Text("This is signature of trusted party that verifies general updates for this Signer from now on. No other sources of updates will be accepted unless you reset this key.")
-            case .generalVerifierRemoved(let value):
-                Text("Removed general verifier key")
-                HStack {
-                    Text("Encryption algorithm: ")
-                    Text(value.encryption)
-                }
-                HStack {
-                    Text("Public key: ")
-                    Text(value.hex)
-                }
-                Text("You have removed the key of trusted party that could verify updates for this Signer. This is very rare operation you should not have performed without knowing ecavtly its purpose and consequences. Please proceed with great care.")
+                HistoryCardTemplate(image: "lock.shield.fill", timestamp: timestamp, color: "cryptoColor", line1: "General verifier set", line2: value.hex + " " +  value.encryption)
+            case .generalVerifierRemoved(_):
+                HistoryCardTemplate(image: "lock.slash", timestamp: timestamp, color: "dangerColor", line1: "General verifier unset", line2: "Signer wiped")
             case .historyCleared:
-                Text("History cleared")
-                    .foregroundColor(Color.red)
-                Text("You've cleared the log here; there should be no records below this one.")
+                HistoryCardTemplate(image: "1.square", timestamp: timestamp, color: "dangerColor", line1: "History cleared", line2: "")
             case .identitiesWiped:
-                Text("Identities wipe")
-                Text("You have deleted all your identities here")
+                HistoryCardTemplate(image: "key.filled", timestamp: timestamp, color: "cryptoColor", line1: "All keys were wiped", line2: "")
             case .identityAdded(let value):
-                Text("New identity created")
-                HStack {
-                    Text("Seed name: ")
-                    Text(value.seed_name)
-                }
-                HStack {
-                    Text("Public key: ")
-                    Text(value.public_key)
-                }
-                HStack {
-                    Text("Derivation path: ")
-                    Text(value.path)
-                }
-                HStack {
-                    Text("Network key: ")
-                    Text(value.network_key)
-                }
-                //TODO: fill below
+                HistoryCardTemplate(image: "key", timestamp: timestamp, color: "cryptoColor", line1: "Key created", line2: value.seed_name + value.path)
             case .identityRemoved(let value):
-                Text("Removed identity")
-                HStack {
-                    Text("Seed name: ")
-                    Text(value.seed_name)
-                }
-                HStack {
-                    Text("Public key: ")
-                    Text(value.public_key)
-                }
-                HStack {
-                    Text("Derivation path: ")
-                    Text(value.path)
-                }
-                HStack {
-                    Text("Network key: ")
-                    Text(value.network_key)
-                }
-            case .metadataAdded(_):
-                Text("New metadata loaded")
-            case .metadataRemoved(_):
-                Text("Remove metadata")
-            case .metadataVerifierAdded(_):
-                Text("New network verifier accepted")
+                HistoryCardTemplate(image: "key", timestamp: timestamp, color: "cryptoColor", line1: "Key removed", line2: value.seed_name + value.path)
+            case .metadataAdded(let value):
+                HistoryCardTemplate(image: "plus.viewfinder", timestamp: timestamp, color: "cryptoColor", line1: "Metadata added", line2: value.specname + " version " +  value.spec_version)
+            case .metadataRemoved(let value):
+                HistoryCardTemplate(image: "minus.square", timestamp: timestamp, color: "cryptoColor", line1: "Metadata removed", line2: value.specname + " version " +  value.spec_version)
+            case .metadataVerifierAdded(let value):
+                HistoryCardTemplate(image: "lock.shield.fill", timestamp: timestamp, color: "cryptoColor", line1: "Network verifier set", line2: value.specname)
             case .metadataVerifierRemoved(_):
-                Text("Removed network verifier")
-            case .networkAdded(_):
-                Text("New network loaded")
-            case .networkRemoved(_):
-                Text("Removed network")
+                HistoryCardTemplate(image: "lock.shield.fill", timestamp: timestamp, color: "cryptoColor", line1: "Network verifier was cleared", line2: "this is error, report a bug") //TODO: this should not be possible!
+            case .networkAdded(let value):
+                HistoryCardTemplate(image: "plus.viewfinder", timestamp: timestamp, color: "cryptoColor", line1: "Network added", line2: value.specname)
+            case .networkRemoved(let value):
+                HistoryCardTemplate(image: "minus.square", timestamp: timestamp, color: "cryptoColor", line1: "Network removed", line2: value.title)
             case .seedNameWasAccessed(let text):
-                Text("Seed was accessed: " + text)
+                HistoryCardTemplate(image: "key", timestamp: timestamp, color: "cryptoColor", line1: "Seed was accessed", line2: text)
             case .seedNameWasShown(let text):
-                Text("Seed was shown: " + text)
+                HistoryCardTemplate(image: "key", timestamp: timestamp, color: "cryptoColor", line1: "Seed was shown", line2: text)
             case .seedsWereAccessed:
-                Text("Seeds were accessed")
+                HistoryCardTemplate(image: "key", timestamp: timestamp, color: "cryptoColor", line1: "Seeds were accessed", line2: "")
             case .seedsWereShown:
-                Text("Seeds were shown")
+                HistoryCardTemplate(image: "key", timestamp: timestamp, color: "cryptoColor", line1: "Seeds were shown", line2: "")
             case .signedAddNetwork(_):
-                Text("Network specs signed")
+                HistoryCardTemplate(image: "pencil", timestamp: timestamp, color: "cryptoColor", line1: "Network specs signed", line2: "comment placeholder")
             case .signedLoadMetadata(_):
-                Text("Metadata signed")
+                HistoryCardTemplate(image: "pencil", timestamp: timestamp, color: "cryptoColor", line1: "Metadata signed", line2: "comment placeholder")
             case .signedTypes(_):
-                Text("Type specs signed")
+                HistoryCardTemplate(image: "pencil", timestamp: timestamp, color: "cryptoColor", line1: "Types signed", line2: "comment placeholder")
             case .systemEntry(let text):
-                Text("System: " + text)
-            case .transactionSigned(_):
-                Text("Transaction signed")
+                HistoryCardTemplate(image: "square", timestamp: timestamp, color: "cryptoColor", line1: "System record", line2: text)
+            case .transactionSigned(let value):
+                HistoryCardTemplate(image: "pencil", timestamp: timestamp, color: "cryptoColor", line1: "Generated signature", line2: String(decoding: Data(base64Encoded: value.user_comment) ?? Data(), as: UTF8.self))
             case .typesInfoUpdated(_):
-                Text("New types information loaded")
+                HistoryCardTemplate(image: "plus.viewfinder", timestamp: timestamp, color: "cryptoColor", line1: "New types info loaded", line2: "")
             case .userEntry(let text):
-                Text("Note: " + text)
+                HistoryCardTemplate(image: "square", timestamp: timestamp, color: "cryptoColor", line1: "User record", line2: text)
             case .warning(let text):
-                Text("Warning: " + text)
-                    .foregroundColor(Color.red)
+                HistoryCardTemplate(image: "exclamationmark.triangle.fill", timestamp: timestamp, color: "dangerColor", line1: "Warning! " + text, line2: "")
             }
         }
     }
 }
 
 /*
-struct HistoryCard_Previews: PreviewProvider {
-    static var previews: some View {
-        HistoryCard()
-    }
-}
-*/
+ struct HistoryCard_Previews: PreviewProvider {
+ static var previews: some View {
+ HistoryCard()
+ }
+ }
+ */

@@ -1,7 +1,7 @@
 use hex;
 use sled::{Db, Tree};
-use constants::{ADDGENERALVERIFIER, ADDMETAVERIFIER, LOADMETA, METATREE, SPECSTREE, TRANSACTION};
-use definitions::{network_specs::{Verifier, generate_network_key}, transactions::{Transaction, LoadMeta, UpdMetaVerifier, UpdGeneralVerifier}, metadata::{MetaValuesDisplay, NameVersioned, VersionDecoded}, history::Event};
+use constants::{ADDGENERALVERIFIER, ADDMETAVERIFIER, LOADMETA, METATREE, TRANSACTION, VERIFIERS};
+use definitions::{network_specs::{Verifier, generate_verifier_key, VerifierKey}, transactions::{Transaction, LoadMeta, UpdMetaVerifier, UpdGeneralVerifier}, metadata::{MetaValuesDisplay, NameVersioned, VersionDecoded}, history::Event, qr_transfers::ContentLoadMeta};
 use meta_reading::decode_metadata::get_meta_const_light;
 use parity_scale_codec::{Decode, Encode};
 use blake2_rfc::blake2b::blake2b;
@@ -10,12 +10,76 @@ use frame_metadata::RuntimeMetadata;
 use crate::cards::{Action, Card, Warning};
 use crate::check_signature::pass_crypto;
 use crate::error::{Error, BadInputData, CryptoError};
-use crate::helpers::{open_db, open_tree, flush_db, insert_into_tree, get_checksum, get_from_tree};
-use crate::utils::get_chainspecs;
+use crate::helpers::{open_db, open_tree, flush_db, insert_into_tree, get_checksum, get_from_tree, get_verifier};
+
+
+pub fn load_metadata (data_hex: &str, dbname: &str) -> Result<String, Error> {
+
+// loading the database and removing the previous (if any) load_metadata saves
+    let database = open_db(dbname)?;
+    let metadata = open_tree(&database, METATREE)?;
+    let transaction = open_tree(&database, TRANSACTION)?;
+    let verifiers = open_tree(&database, VERIFIERS)?;
+    
+    let checked_info = pass_crypto(&data_hex)?;
+    
+    let (meta, gen_hash) = match ContentLoadMeta::from_vec(&checked_info.message).meta_genhash() {
+        Ok(x) => x,
+        Err(_) => return Err(Error::BadInputData(BadInputData::UnableToDecodeLoadMetadataMessage)),
+    };
+    
+    let verifier = checked_info.verifier;
+    let current_verifier = get_verifier (gen_hash, &verifiers)?;
+    
+    match verifier {
+        Verifier::None => {
+            if current_verifier == Verifier::None {
+            // action appears only if the metadata is actually uploaded
+            // "only verifier" warning is not possible
+                let index = 1;
+                let upd_network = None;
+                let upd_general = false;
+                let history: Vec<Event> = vec![Event::Warning(Warning::NotVerified.show())];
+                let (meta_card, action_card) = process_received_metadata(meta, None, history, index, upd_network, upd_general, verifier, &metadata, &transaction, &database)?;
+                Ok(format!("{{\"warning\":[{}],\"meta\":[{}],{}}}", Card::Warning(Warning::NotVerified).card(0,0), meta_card, action_card))
+            }
+            else {return Err(Error::CryptoError(CryptoError::VerifierDisappeared))}
+        },
+        _ => {
+            let verifier_card = Card::Verifier(verifier.show_card()).card(0,0);
+            if current_verifier == verifier {
+            // action appears only if the metadata is actually uploaded
+            // "only verifier" warning is not possible
+                let index = 1;
+                let upd_network = None;
+                let upd_general = false;
+                let history: Vec<Event> = Vec::new();
+                let (meta_card, action_card) = process_received_metadata(meta, None, history, index, upd_network, upd_general, verifier, &metadata, &transaction, &database)?;
+                Ok(format!("{{\"verifier\":[{}],\"meta\":[{}],{}}}", verifier_card, meta_card, action_card))
+            }
+            else {
+                if current_verifier == Verifier::None {
+                // action could be either uploading of metadata or only updating of the network verifier
+                    let warning_card = Card::Warning(Warning::VerifierAppeared).card(1,0);
+                    let possible_warning = Card::Warning(Warning::MetaAlreadyThereUpdMetaVerifier).card(2, 0);
+                    let index = 2;
+                    let upd_network = Some(generate_verifier_key(&gen_hash.to_vec()));
+                    let upd_general = false;
+                    let history: Vec<Event> = vec![Event::Warning(Warning::VerifierAppeared.show())];
+                    let (meta_card, action_card) = process_received_metadata(meta, None, history, index, upd_network, upd_general, verifier, &metadata, &transaction, &database)?;
+                    if meta_card == possible_warning {Ok(format!("{{\"verifier\":[{}],\"warning\":[{},{}],{}}}", verifier_card, warning_card, meta_card, action_card))}
+                    else {Ok(format!("{{\"verifier\":[{}],\"warning\":[{}],\"meta\":[{}],{}}}", verifier_card, warning_card, meta_card, action_card))}
+                }
+                else {return Err(Error::CryptoError(CryptoError::VerifierChanged{old_show: current_verifier.show_error(), new_show: verifier.show_error()}))}
+            }
+        },
+        
+    }
+}
 
 
 /// Function to check incoming metadata, and prepare info card and database entry
-pub fn process_received_metadata (meta: Vec<u8>, name: &str, history: Vec<Event>, index: u32, upd_network: Option<Vec<u8>>, upd_general: bool, verifier: Verifier, metadata: &Tree, transaction: &Tree, database: &Db) -> Result<(String, String), Error> {
+pub fn process_received_metadata (meta: Vec<u8>, name_to_check: Option<&str>, history: Vec<Event>, index: u32, upd_network: Option<VerifierKey>, upd_general: bool, verifier: Verifier, metadata: &Tree, transaction: &Tree, database: &Db) -> Result<(String, String), Error> {
     if !meta.starts_with(&vec![109, 101, 116, 97]) {return Err(Error::BadInputData(BadInputData::NotMeta))}
     if meta[4] < 12 {return Err(Error::BadInputData(BadInputData::MetaVersionBelow12))}
     match RuntimeMetadata::decode(&mut &meta[4..]) {
@@ -24,7 +88,9 @@ pub fn process_received_metadata (meta: Vec<u8>, name: &str, history: Vec<Event>
                 Ok(x) => {
                     match VersionDecoded::decode(&mut &x[..]) {
                         Ok(y) => {
-                            if y.specname != name {return Err(Error::BadInputData(BadInputData::MetaMismatch))}
+                            if let Some(name) = name_to_check {
+                                if y.specname != name {return Err(Error::BadInputData(BadInputData::MetaMismatch))}
+                            }
                             let received_versioned_name = NameVersioned {
                                 name: y.specname.to_string(),
                                 version: y.spec_version,
@@ -36,10 +102,10 @@ pub fn process_received_metadata (meta: Vec<u8>, name: &str, history: Vec<Event>
                                     if a[..] == meta[..] {
                                     // same versioned name found, and metadata equal
                                         match upd_network {
-                                            Some(network_key) => {
+                                            Some(verifier_key) => {
                                             // preparing action entry
                                                 let mut upd_meta_verifier = UpdMetaVerifier {
-                                                    network_key,
+                                                    verifier_key,
                                                     verifier,
                                                     history,
                                                 };
@@ -97,7 +163,7 @@ pub fn process_received_metadata (meta: Vec<u8>, name: &str, history: Vec<Event>
                                 None => {
                                 // same versioned name NOT found
                                     let new_meta = MetaValuesDisplay {
-                                        name,
+                                        name: &y.specname,
                                         version: y.spec_version,
                                         meta_hash: &hex::encode(blake2b(32, &[], &meta).as_bytes()),
                                     }.show();
@@ -131,70 +197,3 @@ pub fn process_received_metadata (meta: Vec<u8>, name: &str, history: Vec<Event>
     }
 }
 
-
-pub fn load_metadata (data_hex: &str, dbname: &str) -> Result<String, Error> {
-
-// loading the database and removing the previous (if any) load_metadata saves
-    let database = open_db(dbname)?;
-    let chainspecs = open_tree(&database, SPECSTREE)?;
-    let metadata = open_tree(&database, METATREE)?;
-    let transaction = open_tree(&database, TRANSACTION)?;
-    
-    let checked_info = pass_crypto(&data_hex)?;
-    
-// minimal length is 32 - the length of genesis hash
-    if checked_info.message.len() < 32 {return Err(Error::BadInputData(BadInputData::TooShort))}
-    let meta = checked_info.message[..checked_info.message.len()-32].to_vec();
-    let gen_hash = checked_info.message[checked_info.message.len()-32..].to_vec();
-    
-    let network_key = generate_network_key(&gen_hash);
-    
-    let chain_specs_found = get_chainspecs(&network_key, &chainspecs)?;
-    
-    let verifier = checked_info.verifier;
-    
-    match verifier {
-        Verifier::None => {
-            if chain_specs_found.verifier == Verifier::None {
-            // action appears only if the metadata is actually uploaded
-            // "only verifier" warning is not possible
-                let index = 1;
-                let upd_network = None;
-                let upd_general = false;
-                let history: Vec<Event> = vec![Event::Warning(Warning::NotVerified.show())];
-                let (meta_card, action_card) = process_received_metadata(meta, &chain_specs_found.name, history, index, upd_network, upd_general, verifier, &metadata, &transaction, &database)?;
-                Ok(format!("{{\"warning\":[{}],\"meta\":[{}],{}}}", Card::Warning(Warning::NotVerified).card(0,0), meta_card, action_card))
-            }
-            else {return Err(Error::CryptoError(CryptoError::VerifierDisappeared))}
-        },
-        _ => {
-            let verifier_card = Card::Verifier(verifier.show_card()).card(0,0);
-            if chain_specs_found.verifier == verifier {
-            // action appears only if the metadata is actually uploaded
-            // "only verifier" warning is not possible
-                let index = 1;
-                let upd_network = None;
-                let upd_general = false;
-                let history: Vec<Event> = Vec::new();
-                let (meta_card, action_card) = process_received_metadata(meta, &chain_specs_found.name, history, index, upd_network, upd_general, verifier, &metadata, &transaction, &database)?;
-                Ok(format!("{{\"verifier\":[{}],\"meta\":[{}],{}}}", verifier_card, meta_card, action_card))
-            }
-            else {
-                if chain_specs_found.verifier == Verifier::None {
-                // action could be either uploading of metadata or only updating of the network verifier
-                    let warning_card = Card::Warning(Warning::VerifierAppeared).card(1,0);
-                    let possible_warning = Card::Warning(Warning::MetaAlreadyThereUpdMetaVerifier).card(2, 0);
-                    let index = 2;
-                    let upd_network = Some(network_key);
-                    let upd_general = false;
-                    let history: Vec<Event> = vec![Event::Warning(Warning::VerifierAppeared.show())];
-                    let (meta_card, action_card) = process_received_metadata(meta, &chain_specs_found.name, history, index, upd_network, upd_general, verifier, &metadata, &transaction, &database)?;
-                    if meta_card == possible_warning {Ok(format!("{{\"verifier\":[{}],\"warning\":[{},{}],{}}}", verifier_card, warning_card, meta_card, action_card))}
-                    else {Ok(format!("{{\"verifier\":[{}],\"warning\":[{}],\"meta\":[{}],{}}}", verifier_card, warning_card, meta_card, action_card))}
-                }
-                else {return Err(Error::CryptoError(CryptoError::VerifierChanged{old_show: chain_specs_found.verifier.show_error(), new_show: verifier.show_error()}))}
-            }
-        },
-        
-    }
-}

@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-struct Network: Codable {
+struct Network: Codable, Hashable {
     var key: String
     var color: String
     var logo: String
@@ -44,7 +44,9 @@ extension SignerDataModel {
                     signer_destroy_string(res!)
                     return
                 }
-                self.networks = networks
+                self.networks = networks.sorted(by: {
+                    $0.order < $1.order
+                })
             } else {
                     print("networksJSON corrupted")
                     print(String(cString: res!))
