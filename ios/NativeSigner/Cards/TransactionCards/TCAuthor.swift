@@ -13,7 +13,7 @@ struct TCAuthor: View {
         HStack {
             Image(uiImage: UIImage(data: Data(fromHexEncodedString: String(cString: development_test(nil, author.base58)))!)!)
             VStack (alignment: .leading) {
-                Text("From: " + author.name)
+                Text("From:")
                     .foregroundColor(Color("AccentColor"))
                 Text(author.seed + author.derivation_path)
                     .foregroundColor(Color("textMainColor"))

@@ -11,7 +11,7 @@ struct TransactionReady: View {
     @EnvironmentObject var data: SignerDataModel
     @State var seedPhrase: String = ""
     @State var password: String = ""
-    @State var passwordFocus: Bool = true
+    @FocusState private var passwordFocus: Bool
     var body: some View {
         ZStack {
             VStack {
@@ -47,9 +47,19 @@ struct TransactionReady: View {
                     Text("Enter password")
                         .font(.body)
                         .foregroundColor(Color("textMainColor"))
-                    SignerTextInput(text: $password, focus: $passwordFocus, placeholder: "password (optional)", autocapitalization: .none, returnKeyType: .done, keyboardType: .default, onReturn: {
-                        data.signTransaction(seedPhrase: seedPhrase, password: password)
-                    }).border(/*@START_MENU_TOKEN@*/Color("borderSignalColor")/*@END_MENU_TOKEN@*/, width: /*@START_MENU_TOKEN@*/1/*@END_MENU_TOKEN@*/)
+                    TextField("Password", text: $password, prompt: Text("(optional)"))
+                        .foregroundColor(Color("textEntryColor"))
+                        .background(Color("textFieldColor"))
+                        .font(.largeTitle)
+                        .disableAutocorrection(true)
+                        .autocapitalization(.none)
+                        .keyboardType(.asciiCapable)
+                        .submitLabel(.next)
+                        .onChange(of: data.suggestedName, perform: {_ in data.lastError = ""
+                        })
+                        .focused($passwordFocus)
+                        .onSubmit({data.signTransaction(seedPhrase: seedPhrase, password: password)})
+                        .border(Color("AccentColor"), width: 1)
                     Spacer()
                     HStack {
                         Button(action: {
@@ -76,6 +86,8 @@ struct TransactionReady: View {
             //TODO: maybe graceful crash
             if data.author?.has_password == false {
                 data.signTransaction(seedPhrase: seedPhrase, password: password)
+            } else {
+                passwordFocus = true
             }
         }
         .onDisappear {

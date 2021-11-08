@@ -40,3 +40,11 @@ extension Data {
     }
 }
 
+extension AttributedString {
+    init?(fromHexDocs string: String) {
+        try? self.init(markdown: Data(fromHexEncodedString: string) ?? Data(), options: AttributedString.MarkdownParsingOptions(interpretedSyntax: .inlineOnlyPreservingWhitespace, failurePolicy: .returnPartiallyParsedIfPossible))
+    }
+}
+
+//Getting font:
+//Text("kusama").font(Font.custom("Web3-Regular", size: 24))

@@ -1,10 +1,9 @@
 use bitvec::prelude::{BitVec, Lsb0};
 use sled::IVec;
-use definitions::{metadata::{MetaValuesDisplay, NetworkDisplay}, network_specs::{Verifier, ChainSpecsToSend}};
+use definitions::{crypto::Encryption, metadata::{MetaValuesDisplay, NetworkDisplay}, network_specs::{Verifier, ChainSpecsToSend}};
 use hex;
 use std::convert::TryInto;
 
-use crate::parse_transaction::AuthorPublicKey;
 use crate::cards::{Card, Warning};
 use crate::error::{Error, BadInputData, UnableToDecode, DatabaseError, SystemError, CryptoError};
 
@@ -42,7 +41,9 @@ pub fn make_all_cards() -> String {
     all_cards.push(Card::TxSpecPlain{gen_hash: "a8dfb73a4b44e6bf84affe258954c12db1fe8e8cf00b965df2af2f49c1ec11cd", version: 50, tx_version: 5});
     all_cards.push(Card::Author{base58_author: "5FHneW46xGXgs5mUiveU4sbTyGBzmstUspZC92UhjJM694ty", seed_name: "Alice", path: "//Alice", has_pwd: false, name: ""});
     all_cards.push(Card::AuthorPlain("5FHneW46xGXgs5mUiveU4sbTyGBzmstUspZC92UhjJM694ty"));
-    all_cards.push(Card::AuthorPublicKey(AuthorPublicKey::Sr25519([142, 175, 4, 21, 22, 135, 115, 99, 38, 201, 254, 161, 126, 37, 252, 82, 135, 97, 54, 147, 201, 18, 144, 156, 178, 38, 170, 71, 148, 242, 106, 72])));
+    
+    let author_public_key = vec![142, 175, 4, 21, 22, 135, 115, 99, 38, 201, 254, 161, 126, 37, 252, 82, 135, 97, 54, 147, 201, 18, 144, 156, 178, 38, 170, 71, 148, 242, 106, 72];
+    all_cards.push(Card::AuthorPublicKey{author_public_key, encryption: Encryption::Sr25519});
     all_cards.push(Card::Verifier(Verifier::Sr25519(String::from("d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d")).show_card()));
     
     let new_meta = MetaValuesDisplay {
@@ -58,6 +59,7 @@ pub fn make_all_cards() -> String {
         base58prefix: 42,
         color: String::from("#660D35"),
         decimals: 12,
+        encryption: Encryption::Sr25519,
         genesis_hash: hex::decode("e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e").expect("known value").try_into().expect("known value"),
         logo: String::from("westend"),
         name: String::from("westend"),

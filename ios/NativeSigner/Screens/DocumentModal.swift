@@ -12,21 +12,38 @@ struct DocumentModal: View {
     var document: ShownDocument
     var body: some View {
         ZStack {
-            RoundedRectangle(cornerRadius: 50).foregroundColor(/*@START_MENU_TOKEN@*/Color("backgroundCard")/*@END_MENU_TOKEN@*/)
+            ModalBackdrop()
             VStack {
+                HStack {
+                    Button(action: {data.settingsModal = .showDocument(.about)}) {
+                        Text("About")
+                    }
+                    Spacer()
+                    Button(action: {data.settingsModal = .showDocument(.toc)}) {
+                        Text("Terms")
+                    }
+                    Spacer()
+                    Button(action: {data.settingsModal = .showDocument(.pp)}) {
+                        Text("Privacy")
+                    }
+                }
+                .padding()
                 switch document {
                 case .pp:
                     ScrollView {
                         Text(data.getPP())
                             .foregroundColor(Color("textMainColor"))
-                        }
+                    }
                 case .toc:
                     ScrollView {
                         Text(data.getTaC())
                             .foregroundColor(Color("textMainColor"))
                     }.padding()
                 case .about:
-                    Text("About")
+                    ScrollView {
+                        Text("About")
+                        Text("lorem ipsum")
+                    }
                 }
                 Spacer()
             }.padding()
@@ -35,9 +52,9 @@ struct DocumentModal: View {
 }
 
 /*
-struct DocumentModal_Previews: PreviewProvider {
-    static var previews: some View {
-        DocumentModal()
-    }
-}
-*/
+ struct DocumentModal_Previews: PreviewProvider {
+ static var previews: some View {
+ DocumentModal()
+ }
+ }
+ */

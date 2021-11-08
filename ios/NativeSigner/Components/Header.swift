@@ -11,40 +11,38 @@ struct Header: View {
     @EnvironmentObject var data: SignerDataModel
     var body: some View {
         HStack {
-            if ((data.transactionState != .none) && (data.signerScreen != .home)) {
+            if !data.isNavBottom() {
                 Button(action: {
-                    data.totalRefresh()
-                    data.signerScreen = .home
+                    data.goBack()
                 }) {
-                    Text("Back")
-                }}
-            Spacer()
-            switch data.signerScreen {
-            case .home:
-                switch data.transactionState {
-                case .none:
-                    Text("Home")
-                case .parsing:
-                    Text("Parsing")
-                case .preview:
-                    Text("Payload")
-                case .password:
-                    Text("Password")
-                case .signed:
-                    Text("Scan to publish")
+                    Image(systemName: "chevron.left").imageScale(.large)
                 }
-            case .keys:
-                Text("Key manager")
-            case .settings:
-                Text("Settings")
-            case .history:
-                Text("History")
+            }
+            if data.getMultiSelectionMode() && data.keyManagerModal == .none {
+                Button(action: {data.multiSelected = []}) {
+                    SmallButton(text: "Cancel")
+                }
             }
             Spacer()
+            Text(data.getScreenName())
+            Spacer()
+            if data.getMultiSelectionMode() && data.keyManagerModal == .none {
+                Button(action: {data.multiSelected = data.addresses}) {
+                    SmallButton(text: "Select all")
+                }
+            }
+            if (data.keyManagerModal == .seedSelector && data.signerScreen == .keys) {
+                Button(action: {
+                    data.keyManagerModal = .newSeed
+                }) {
+                    Image(systemName: "plus.square.on.square")
+                        .imageScale(.large)
+                }
+            }
             Button(action: {
                 data.totalRefresh()
                 data.networkSettings = nil
-                data.signerScreen = .settings
+                data.signerScreen = .history
             }) {
                 NavbarShield()
             }
@@ -53,8 +51,10 @@ struct Header: View {
     }
 }
 
-struct Header_Previews: PreviewProvider {
-    static var previews: some View {
-        Header().previewLayout(.sizeThatFits)
-    }
-}
+/*
+ struct Header_Previews: PreviewProvider {
+ static var previews: some View {
+ Header().previewLayout(.sizeThatFits)
+ }
+ }
+ */

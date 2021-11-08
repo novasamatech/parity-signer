@@ -45,6 +45,7 @@ extension SignerDataModel {
                     return
                 }
                 signer_destroy_string(res!)
+                self.cards = []
                 self.cards.append(contentsOf: (transactionPreview.warning ?? []))
                 self.cards.append(contentsOf: (transactionPreview.types_info ?? []))
                 self.cards.append(contentsOf: (transactionPreview.author ?? []))
@@ -52,7 +53,7 @@ extension SignerDataModel {
                 self.cards.append(contentsOf: (transactionPreview.extrinsics ?? []))
                 self.cards.append(contentsOf: (transactionPreview.method ?? []))
                 self.cards = self.cards.sorted(by: {$0.index < $1.index})
-                print(self.cards)
+                //print(self.cards)
                 self.action = transactionPreview.action
                 if transactionPreview.author != nil {
                     let authorCard = transactionPreview.author![0].card
@@ -63,7 +64,8 @@ extension SignerDataModel {
                         print("author not found; should not be actionable")
                     }
                 }
-                print(self.author ?? "no author")
+                //print(self.author ?? "no author")
+                //print(self.cards)
                 self.transactionState = .preview
             } else {
                 signer_destroy_string(res!)
@@ -90,7 +92,7 @@ extension SignerDataModel {
             return
         }
         let stringAction = String(data: dataAction, encoding: .utf8)
-        let res = handle_action(err_ptr, stringAction, seedPhrase, password, self.comment, self.dbName)
+        let res = handle_action(err_ptr, stringAction, seedPhrase, password, Data(self.comment.utf8).base64EncodedString(), self.dbName)
         if err_ptr.pointee.code == 0 {
             self.result = String(cString: res!)
             signer_destroy_string(res!)

@@ -14,98 +14,87 @@ struct SeedManager: View {
     @State var seedPhrase = ""
     var body: some View {
         ZStack {
-            RoundedRectangle(cornerRadius: 50).foregroundColor(/*@START_MENU_TOKEN@*/Color("backgroundCard")/*@END_MENU_TOKEN@*/)
+            ModalBackdrop()
             VStack {
-                Text("Seeds")
-                    .font(.largeTitle)
-                    .foregroundColor(Color("AccentColor"))
-            ScrollView {
-                LazyVStack {
-                    ForEach(data.seedNames, id: \.self) {seed in
-                        VStack {
-                            if(seed == data.selectedSeed) {
+                ScrollView {
+                    LazyVStack {
+                        ForEach(data.seedNames, id: \.self) {seed in
+                            HStack {
                                 Button(action: {
-                                        data.selectedSeed = ""
+                                    data.selectSeed(seedName: seed)
+                                    data.keyManagerModal = .none
                                 }) {
-                                    Text(seed)
-                                        .font(.largeTitle)
-                                        .foregroundColor(Color("AccentColor"))
+                                    SeedCardForManager(seedName: seed)
                                 }
-                                HStack {
-                                    Button(action:{
-                                        deleteConfirm = true
-                                    }) {
-                                        Text("Delete")
-                                            .font(.largeTitle)
-                                            .foregroundColor(Color("AccentColor"))
-                                    }
-                                    .alert(isPresented: $deleteConfirm, content: {
-                                        Alert(
-                                            title: Text("Delete seed?"),
-                                            message: Text("You are about to delete seed " + seed),
-                                            primaryButton: .cancel(),
-                                            secondaryButton: .destructive(
-                                                Text("Delete"),
-                                                action: { data.removeSeed(seedName: seed)
-                                                }
-                                            )
-                                        )
-                                    })
-                                    Spacer()
-                                    Button(action:{
-                                        seedPhrase = data.getSeed(seedName: data.selectedSeed, backup: true)
-                                        showBackup = !seedPhrase.isEmpty
-                                    }) {
-                                        Text("Backup")
-                                            .font(.largeTitle)
-                                            .foregroundColor(Color("AccentColor"))
-                                    }
-                                    .alert(isPresented: $showBackup, content: {
-                                        Alert(
-                                            title: Text("Backup your seed phrase"),
-                                            message: Text(seedPhrase),
-                                            dismissButton: .default(
-                                                Text("Done"),
-                                                action: {
-                                                    seedPhrase = ""
-                                                    showBackup = false
-                                                }
-                                            )
-                                        )
-                                    })
-                                }.padding()
-                            } else {
+                                Spacer()
                                 Button(action: {
-                                        data.selectSeed(seedName: seed)
+                                    seedPhrase = data.getSeed(seedName: seed, backup: true)
+                                    showBackup = !seedPhrase.isEmpty
                                 }) {
-                                    Text(seed)
-                                        .font(.largeTitle)
-                                        .foregroundColor(Color("AccentColor"))
+                                    VStack {
+                                        Image(systemName: "eye").imageScale(.large)
+                                    }
+                                    .background(Color("backgroundCard"))
                                 }
+                                .alert(isPresented: $showBackup, content: {
+                                    Alert(
+                                        title: Text("Backup your seed phrase"),
+                                        message: Text(seedPhrase),
+                                        dismissButton: .default(
+                                            Text("Done"),
+                                            action: {
+                                                seedPhrase = ""
+                                                showBackup = false
+                                            }
+                                        )
+                                    )
+                                })
+                                Button(action: {
+                                    deleteConfirm = true
+                                }) {
+                                    VStack {
+                                        Image(systemName: "trash").imageScale(.large)
+                                    }
+                                    .background(Color("backgroundCard"))
+                                }
+                                .alert(isPresented: $deleteConfirm, content: {
+                                    Alert(
+                                        title: Text("Delete seed?"),
+                                        message: Text("You are about to delete seed " + seed),
+                                        primaryButton: .cancel(),
+                                        secondaryButton: .destructive(
+                                            Text("Delete"),
+                                            action: { data.removeSeed(seedName: seed)
+                                            }
+                                        )
+                                    )
+                                })
                             }
+                            .background(Color("backgroundCard"))
                         }
                     }
                 }
-            }
                 Spacer()
-                Button(action: {data.settingsModal = .none})
-                    {
-                    Text("Back")
-                        .font(.largeTitle)
-                        .foregroundColor(Color("AccentColor"))
-                }
+                
             }
-        }
-        .onDisappear {
-            seedPhrase = ""
         }
     }
 }
 
 /*
-struct SeedManager_Previews: PreviewProvider {
-    static var previews: some View {
-        SeedManager()
-    }
-}
-*/
+ struct SeedManager_Previews: PreviewProvider {
+ static var previews: some View {
+ SeedManager()
+ }
+ }
+ 
+ Button(
+     action: {data.keyManagerModal = .newSeed}) {
+         HStack {
+             Spacer()
+             Text("New seed").font(.subheadline)
+             Spacer()
+         }
+     }
+     .buttonStyle(.bordered)
+ */

@@ -1,5 +1,6 @@
 use parity_scale_codec_derive::{Decode, Encode};
 use crate::network_specs::ChainSpecsToSend;
+use crate::crypto::Encryption;
 
 /// Struct used to store the network metadata name and version in the database
 #[derive(Decode, Encode, PartialEq)]
@@ -10,6 +11,7 @@ pub struct NameVersioned {
 
 /// Struct to store the metadata values (network name, network
 /// version, full metadata as Vec<u8>)
+#[derive(PartialEq, Clone)]
 pub struct MetaValues {
     pub name: String,
     pub version: u32,
@@ -72,11 +74,13 @@ pub struct VersionDecoded {
     trans_version: u32,
 }
 
-/// Struct to store newtork information needed for metadata and network specs fetching
+/// Struct to store network information needed for metadata and network specs fetching
 #[derive(Decode, Encode)]
 pub struct AddressBookEntry {
     pub name: String,
     pub genesis_hash: [u8; 32],
     pub address: String,
+    pub encryption: Encryption,
+    pub def: bool,
 }
 

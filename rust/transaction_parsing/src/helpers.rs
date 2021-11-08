@@ -1,5 +1,7 @@
 use sled::{Db, Tree, open, IVec};
 use hex;
+use definitions::network_specs::{Verifier, generate_verifier_key};
+use parity_scale_codec::Decode;
 
 use crate::error::{Error, BadInputData, DatabaseError};
 
@@ -68,5 +70,17 @@ pub fn unhex(hex_entry: &str) -> Result<Vec<u8>, Error> {
     match hex::decode(hex_entry) {
         Ok(x) => Ok(x),
         Err(_) => return Err(Error::BadInputData(BadInputData::NotHex)),
+    }
+}
+
+/// Function to get verifier for network with given genesis hash, with crate error (card)
+pub fn get_verifier (genesis_hash: [u8; 32], verifiers: &Tree) -> Result<Verifier, Error> {
+    match verifiers.get(&generate_verifier_key(&genesis_hash.to_vec())) {
+        Ok(Some(verifier_encoded)) => match <Verifier>::decode(&mut &verifier_encoded[..]) {
+            Ok(a) => Ok(a),
+            Err(_) => return Err(Error::DatabaseError(DatabaseError::DamagedNetworkVerifier)),
+        },
+        Ok(None) => return Err(Error::DatabaseError(DatabaseError::NoNetworkVerifier(genesis_hash))),
+        Err(e) => return Err(Error::DatabaseError(DatabaseError::Internal(e))),
     }
 }
