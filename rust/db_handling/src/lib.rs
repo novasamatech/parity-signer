@@ -21,7 +21,7 @@ pub mod remove_network;
 /// This database should be copied into Signer's resources.
 pub fn default_cold_release () -> anyhow::Result<()> {
     let database_name = COLD_DB_NAME_RELEASE;
-    reset_cold_database_no_addresses(&database_name, Verifier::None)
+    reset_cold_database_no_addresses(&database_name, Verifier(None))
 }
 
 /// Function to re-populate default "cold" database with default values.
@@ -29,7 +29,7 @@ pub fn default_cold_release () -> anyhow::Result<()> {
 /// and needs Alice & Co identities
 pub fn default_cold () -> anyhow::Result<()> {
     let database_name = COLD_DB_NAME;
-    populate_cold(&database_name, Verifier::None)
+    populate_cold(&database_name, Verifier(None))
 }
 
 /// Function to reset default "hot" database.

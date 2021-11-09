@@ -1,5 +1,4 @@
 use anyhow;
-use definitions::crypto::Encryption;
 use db_handling::db_transactions::{TrDbColdSign, SignContent};
 use parity_scale_codec::Encode;
 use qrcode_static::png_qr_from_string;
@@ -17,25 +16,16 @@ pub (crate) fn create_signature (seed_phrase: &str, pwd_entry: &str, user_commen
         if sign.has_pwd() {Some(pwd_entry)}
         else {None}
     };
-    let encryption = match sign.address_key().public_key_encryption() {
-        Ok((_, a)) => a,
-        Err(_) => return Err(Error::AddressKeyDecoding.show()),
-    };
     let content_vec = match sign.content() {
-        SignContent::Transaction(a) => a.to_vec(),
+        SignContent::Transaction{method, extensions} => [method.to_vec(), extensions.to_vec()].concat(),
         SignContent::Message(a) => a.encode(),
     };
     let mut full_address = seed_phrase.to_owned() + &sign.path();
     match sign_as_address_key(&content_vec, sign.address_key(), &full_address, pwd) {
         Ok(s) => {
             full_address.zeroize();
-            let hex_signature = hex::encode(s);
             sign.apply(false, user_comment, &database_name)?;
-            match encryption {
-                Encryption::Ed25519 => Ok(format!("00{}", hex_signature)),
-                Encryption::Sr25519 => Ok(format!("01{}", hex_signature)),
-                Encryption::Ecdsa => Ok(format!("02{}", hex_signature)),
-            }
+            Ok(hex::encode(s.encode()))
         },
         Err(e) => {
             full_address.zeroize();

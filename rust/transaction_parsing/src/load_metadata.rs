@@ -27,12 +27,12 @@ pub fn load_metadata(data_hex: &str, database_name: &str) -> Result<String, Erro
     let mut index = 0;
     
     let first_card = {
-        if checked_info.verifier == Verifier::None {
+        if checked_info.verifier == Verifier(None) {
             stub = stub.new_history_entry(Event::Warning(Warning::NotVerified.show()));
             match current_verifier {
-                CurrentVerifier::Custom(Verifier::None) => (),
+                CurrentVerifier::Custom(Verifier(None)) => (),
                 CurrentVerifier::Custom(_) => return Err(Error::CryptoError(CryptoError::VerifierDisappeared)),
-                CurrentVerifier::General => if general_verifier != Verifier::None {return Err(Error::CryptoError(CryptoError::GeneralVerifierDisappeared))},
+                CurrentVerifier::General => if general_verifier != Verifier(None) {return Err(Error::CryptoError(CryptoError::GeneralVerifierDisappeared))},
                 CurrentVerifier::Dead => return Err(Error::DatabaseError(DatabaseError::DeadVerifier(meta_values.name))),
             }
             FirstCard::WarningCard(Card::Warning(Warning::NotVerified).card(&mut index,0))
@@ -41,13 +41,13 @@ pub fn load_metadata(data_hex: &str, database_name: &str) -> Result<String, Erro
             match current_verifier {
                 CurrentVerifier::Custom(a) => {
                     if checked_info.verifier != a {
-                        if a == Verifier::None {return Err(Error::CryptoError(CryptoError::LoadMetaUpdVerifier{network_name: meta_values.name, new_verifier: checked_info.verifier}))}
+                        if a == Verifier(None) {return Err(Error::CryptoError(CryptoError::LoadMetaUpdVerifier{network_name: meta_values.name, new_verifier: checked_info.verifier}))}
                         else {return Err(Error::CryptoError(CryptoError::LoadMetaVerifierChanged{network_name: meta_values.name, old: a, new: checked_info.verifier}))}
                     }
                 },
                 CurrentVerifier::General => {
                     if checked_info.verifier != general_verifier {
-                        if general_verifier == Verifier::None {return Err(Error::CryptoError(CryptoError::LoadMetaUpdGeneralVerifier{network_name: meta_values.name, new_verifier: checked_info.verifier}))}
+                        if general_verifier == Verifier(None) {return Err(Error::CryptoError(CryptoError::LoadMetaUpdGeneralVerifier{network_name: meta_values.name, new_verifier: checked_info.verifier}))}
                         else {return Err(Error::CryptoError(CryptoError::LoadMetaGeneralVerifierChanged{network_name: meta_values.name, old: general_verifier, new: checked_info.verifier}))}
                     }
                 },

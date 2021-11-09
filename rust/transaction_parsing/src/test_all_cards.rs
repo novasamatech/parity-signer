@@ -1,16 +1,25 @@
 use bitvec::prelude::{BitVec, Lsb0};
 use sled::IVec;
-use definitions::{crypto::Encryption, history::MetaValuesDisplay, keyring::{NetworkSpecsKey, VerifierKey}, metadata::MetaValues, network_specs::{Verifier, ChainSpecsToSend}, qr_transfers::ContentLoadTypes};
+use definitions::{crypto::Encryption, history::MetaValuesDisplay, keyring::{NetworkSpecsKey, VerifierKey}, metadata::MetaValues, network_specs::{Verifier, VerifierValue, ChainSpecsToSend}, qr_transfers::ContentLoadTypes};
 use hex;
 use std::convert::TryInto;
 use parser::{cards::ParserCard, error::{ParserError, DecodingError, MetadataError, SystemError}};
-use sp_runtime::generic::Era;
+use sp_core;
+use sp_runtime::{generic::Era, MultiSigner};
 
 use crate::cards::{Card, Warning};
 use crate::error::{Error, BadInputData, DatabaseError, CryptoError};
 use crate::helpers::{GeneralHold, Hold};
 
 const PUBLIC: [u8; 32] = [142, 175, 4, 21, 22, 135, 115, 99, 38, 201, 254, 161, 126, 37, 252, 82, 135, 97, 54, 147, 201, 18, 144, 156, 178, 38, 170, 71, 148, 242, 106, 72];
+
+fn verifier_sr25519() -> Verifier {
+    Verifier(Some(VerifierValue::Standard(MultiSigner::Sr25519(sp_core::sr25519::Public::from_raw(PUBLIC)))))
+}
+    
+fn verifier_ed25519() -> Verifier {
+    Verifier(Some(VerifierValue::Standard(MultiSigner::Ed25519(sp_core::ed25519::Public::from_raw(PUBLIC)))))
+}
 
 /// Function to pring all types of cards.
 /// Should be used to check how the cards are printed in the app.
@@ -57,10 +66,13 @@ pub fn make_all_cards() -> String {
     all_cards.push(Card::Author{base58_author: "5FHneW46xGXgs5mUiveU4sbTyGBzmstUspZC92UhjJM694ty", seed_name: "Alice", path: "//Alice", has_pwd: false, name: ""}.card(&mut index,0));
     all_cards.push(Card::AuthorPlain("5FHneW46xGXgs5mUiveU4sbTyGBzmstUspZC92UhjJM694ty").card(&mut index,0));
     all_cards.push(Card::AuthorPublicKey{author_public_key: PUBLIC.to_vec(), encryption: Encryption::Sr25519}.card(&mut index,0));
-    all_cards.push(Card::Verifier(&Verifier::Sr25519(PUBLIC)).card(&mut index,0));
+    all_cards.push(Card::Verifier(&verifier_sr25519()).card(&mut index,0));
     all_cards.push(Card::Meta(MetaValuesDisplay::get(&MetaValues{name: String::from("westend"), version: 9100, meta: Vec::new()})).card(&mut index,0));
     all_cards.push(Card::TypesInfo(ContentLoadTypes::generate(&Vec::new())).card(&mut index,0));
     all_cards.push(Card::NewSpecs(&network_specs_westend).card(&mut index,0));
+    all_cards.push(Card::Message("Hello!").card(&mut index,0));
+    all_cards.push(Card::NetworkName("westend").card(&mut index,0));
+    all_cards.push(Card::NetworkGenesisHash(&network_specs_westend.genesis_hash.to_vec()).card(&mut index,0));
 
     all_cards.push(Card::Warning(Warning::AuthorNotFound).card(&mut index,0));
     all_cards.push(Card::Warning(Warning::NewerVersion{used_version: 50, latest_version: 9010}).card(&mut index,0));
@@ -172,14 +184,14 @@ pub fn make_all_cards() -> String {
     all_cards.push(Card::Error(Error::DatabaseError(DatabaseError::RuntimeVersionIncompatible)).card(&mut index,0));
     
     all_cards.push(Card::Error(Error::CryptoError(CryptoError::BadSignature)).card(&mut index,0));
-    all_cards.push(Card::Error(Error::CryptoError(CryptoError::AddSpecsVerifierChanged{network_name: network_specs_westend.name.to_string(), old: Verifier::Sr25519(PUBLIC), new: Verifier::Ed25519(PUBLIC)})).card(&mut index,0));
+    all_cards.push(Card::Error(Error::CryptoError(CryptoError::AddSpecsVerifierChanged{network_name: network_specs_westend.name.to_string(), old: verifier_sr25519(), new: verifier_ed25519()})).card(&mut index,0));
     all_cards.push(Card::Error(Error::CryptoError(CryptoError::VerifierDisappeared)).card(&mut index,0));
-    all_cards.push(Card::Error(Error::CryptoError(CryptoError::GeneralVerifierChanged{old: Verifier::Sr25519(PUBLIC), new: Verifier::Ed25519(PUBLIC)})).card(&mut index,0));
+    all_cards.push(Card::Error(Error::CryptoError(CryptoError::GeneralVerifierChanged{old: verifier_sr25519(), new: verifier_ed25519()})).card(&mut index,0));
     all_cards.push(Card::Error(Error::CryptoError(CryptoError::GeneralVerifierDisappeared)).card(&mut index,0));
-    all_cards.push(Card::Error(Error::CryptoError(CryptoError::LoadMetaUpdVerifier{network_name: network_specs_westend.name.to_string(), new_verifier: Verifier::Sr25519(PUBLIC)})).card(&mut index,0));
-    all_cards.push(Card::Error(Error::CryptoError(CryptoError::LoadMetaVerifierChanged{network_name: network_specs_westend.name.to_string(), old: Verifier::Sr25519(PUBLIC), new: Verifier::Ed25519(PUBLIC)})).card(&mut index,0));
-    all_cards.push(Card::Error(Error::CryptoError(CryptoError::LoadMetaUpdGeneralVerifier{network_name: network_specs_westend.name.to_string(), new_verifier: Verifier::Sr25519(PUBLIC)})).card(&mut index,0));
-    all_cards.push(Card::Error(Error::CryptoError(CryptoError::LoadMetaGeneralVerifierChanged{network_name: network_specs_westend.name.to_string(), old: Verifier::Sr25519(PUBLIC), new: Verifier::Ed25519(PUBLIC)})).card(&mut index,0));
+    all_cards.push(Card::Error(Error::CryptoError(CryptoError::LoadMetaUpdVerifier{network_name: network_specs_westend.name.to_string(), new_verifier: verifier_sr25519()})).card(&mut index,0));
+    all_cards.push(Card::Error(Error::CryptoError(CryptoError::LoadMetaVerifierChanged{network_name: network_specs_westend.name.to_string(), old: verifier_sr25519(), new: verifier_ed25519()})).card(&mut index,0));
+    all_cards.push(Card::Error(Error::CryptoError(CryptoError::LoadMetaUpdGeneralVerifier{network_name: network_specs_westend.name.to_string(), new_verifier: verifier_sr25519()})).card(&mut index,0));
+    all_cards.push(Card::Error(Error::CryptoError(CryptoError::LoadMetaGeneralVerifierChanged{network_name: network_specs_westend.name.to_string(), old: verifier_sr25519(), new: verifier_ed25519()})).card(&mut index,0));
     
     let mut output_cards = String::from("{\"method\":[");
     

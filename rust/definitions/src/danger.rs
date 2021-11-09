@@ -34,7 +34,7 @@ impl DangerRecord {
     pub fn device_was_online (&self) -> Result<bool, &'static str>  {
         match <DecodedDangerRecord>::decode(&mut &self.0[..]) {
             Ok(a) => Ok(a.device_was_online),
-            Err(_) => return Err("load_metadata content could not be decoded")
+            Err(_) => return Err("danger indicator content could not be decoded")
         }
     }
     /// Function to prepare the danger record information into storage as Vec<u8>

@@ -23,8 +23,10 @@ defaults = {path = "../defaults"}
 definitions = {path = "../definitions"}
 meta_reading = {path = "../meta_reading"}
 qrcode_static = {path = "../qrcode_static"}
+parser = {path = "../parser"}
 anyhow = "1.0.42"
 chrono = "0.4.19"
+frame-metadata = { version = "14.0.0", default-features = false, features = ["v12", "v13", "v14", "std"]}
 
 [lib]
 name = "db_handling"

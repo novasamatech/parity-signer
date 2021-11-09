@@ -1,12 +1,13 @@
 use constants::{DANGER, HISTORY, HISTORY_PAGE_SIZE};
-use definitions::{history::{Event, Entry}, danger::DangerRecord};
+use definitions::{danger::DangerRecord, history::{Event, Entry}, network_specs::ShortSpecs};
+use parser::{parse_set, MetadataBundle};
 use parity_scale_codec::{Decode, Encode};
 use anyhow;
 use chrono::Utc;
 use sled::Batch;
 
 use crate::db_transactions::TrDbCold;
-use crate::error::{Error, NotDecodeable};
+use crate::error::{Error, NotDecodeable, NotFound};
 use crate::helpers::{open_db, open_tree, make_batch_clear_tree};
 
 type Order = u32;
@@ -50,7 +51,71 @@ pub fn print_history_page(page_number: u32, database_name: &str) -> anyhow::Resu
     out.push_str("]");
     Ok(out)
 }
-
+/*
+pub fn decode_transaction_from_history (order: u32, database_name: &str) -> anyhow::Result<String> {
+    let entry = get_history_entry_by_order(order, database_name)?;
+    let mut found_signable = None;
+    for x in entry.events.iter() {
+        match x {
+            Event::TransactionSigned(x) => {
+                found_signable = match found_signable {
+                    Some(_) => return Err(Error::TwoTransInEntry.show()),
+                    None => Some(x),
+                };
+            },
+            Event::TransactionSignError(x) => {
+                found_signable = match found_signable {
+                    Some(_) => return Err(Error::TwoTransInEntry(order).show()),
+                    None => Some(x),
+                };
+            },
+            _ => (),
+        }
+    }
+    let (parser_vec, network_name, encryption) = match found_signable {
+        Some(a) => a.transaction_name_encryption(),
+        None => return Err(Error::NoTransEvents(order).show())
+    };
+    let all_network_specs = get_all_networks(database_name)?;
+    let mut found_short_specs = None;
+    for x in all_network_specs.iter {
+        if (x.encryption == encryption)&&(x.name == network_name) {
+            found_short_specs = Some(x.short());
+            break;
+        }
+    }
+    let short_specs = match found_short_specs {
+        Some(a) => a,
+        None => return Err(Error::SpecsHistoricalDecoding{network_name, encryption}.show()),
+    };
+    let mut meta_set: Vec<(u32, RuntimeMetadata)> = Vec::new();
+    {
+        let meta_key_prefix = MetaKeyPrefix::from_name(&network_name);
+        let database = open_db(&database_name)?;
+        let metadata = open_tree(&database, METATREE)?;
+        for x in metadata.scan_prefix(meta_key_prefix.prefix()) {
+            if let Ok((meta_key_vec, meta)) = x {
+                let (name, version) = match MetaKey::from_vec(&meta_key_vec.to_vec()).name_version() {
+                    Ok(a) => a,
+                    Err(_) => return Err(Error::NotDecodeable(NotDecodeable::NameVersioned).show()),
+                };
+                let metadata = decode_and_check_metadata(meta.to_vec(), &name, version)?;
+                meta_set.push((version, metadata));
+            }
+        }
+    }
+    let mut found_solution = None;
+    let mut error_collection: Vec<(String, u32, ParserError)> = Vec::new();
+    for x in meta_set.iter() {
+        let metadata_bundle = match meta_set_element.runtime_metadata {
+            RuntimeMetadata::V12(ref meta_v12) => Ok(MetadataBundle::Older{older_meta: OlderMeta::V12(&meta_v12), types: get_types (database_name)?, network_version: meta_set_element.version}),
+            RuntimeMetadata::V13(ref meta_v13) => Ok(MetadataBundle::Older{older_meta: OlderMeta::V13(&meta_v13), types: get_types (database_name)?, network_version: meta_set_element.version}),
+            RuntimeMetadata::V14(ref meta_v14) => Ok(MetadataBundle::Sci{meta_v14: &meta_v14, network_version: meta_set_element.version}),
+            _ => return Err(Error::Placeholder.show()),
+        };
+    }
+}
+*/
 fn get_history(database_name: &str) -> anyhow::Result<Vec<(Order, Entry)>> {
     let database = open_db(database_name)?;
     let history = open_tree(&database, HISTORY)?;
@@ -70,6 +135,34 @@ fn get_history(database_name: &str) -> anyhow::Result<Vec<(Order, Entry)>> {
     }
     out.sort_by(|a, b| b.0.cmp(&a.0));
     Ok(out)
+}
+
+fn get_history_entry_by_order(order: u32, database_name: &str) -> anyhow::Result<Entry> {
+    let database = open_db(database_name)?;
+    let history = open_tree(&database, HISTORY)?;
+    let mut found = None;
+    for x in history.iter() {
+        if let Ok((order_encoded, history_entry_encoded)) = x {
+            match <Order>::decode(&mut &order_encoded[..]) {
+                Ok(a) => {
+                    if a == order {
+                        match <Entry>::decode(&mut &history_entry_encoded[..]) {
+                            Ok(b) => {
+                                found = Some(b);
+                                break;
+                            },
+                            Err(_) => return Err(Error::NotDecodeable(NotDecodeable::Entry).show()),
+                        }
+                    }
+                },
+                Err(_) => return Err(Error::NotDecodeable(NotDecodeable::EntryOrder).show()),
+            }
+        }
+    }
+    match found {
+        Some(a) => Ok(a),
+        None => return Err(Error::NotFound(NotFound::Order(order)).show()),
+    }
 }
 
 pub fn clear_history(database_name: &str) -> anyhow::Result<()> {
@@ -153,7 +246,7 @@ mod tests {
         let events = all_events_preview();
         enter_events(dbname, events).unwrap();
         let history = print_history(dbname).unwrap();
-        let expected_history_part = r##""events":[{"event":"metadata_added","payload":{"specname":"westend","spec_version":"9000","meta_hash":"0e5751c026e543b2e8ab2eb06099daa1d1e5df47778f7787faab45cdf12fe3a8"}},{"event":"metadata_removed","payload":{"specname":"westend","spec_version":"9000","meta_hash":"0e5751c026e543b2e8ab2eb06099daa1d1e5df47778f7787faab45cdf12fe3a8"}},{"event":"network_specs_added","payload":{"base58prefix":"42","color":"#660D35","decimals":"12","encryption":"sr25519","genesis_hash":"e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e","logo":"westend","name":"westend","order":"3","path_id":"//westend","secondary_color":"#262626","title":"Westend","unit":"WND","current_verifier":{"type":"general","details":{"hex":"8eaf04151687736326c9fea17e25fc5287613693c912909cb226aa4794f26a48","encryption":"sr25519"}}}},{"event":"network_removed","payload":{"base58prefix":"42","color":"#660D35","decimals":"12","encryption":"sr25519","genesis_hash":"e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e","logo":"westend","name":"westend","order":"3","path_id":"//westend","secondary_color":"#262626","title":"Westend","unit":"WND","current_verifier":{"type":"general","details":{"hex":"8eaf04151687736326c9fea17e25fc5287613693c912909cb226aa4794f26a48","encryption":"sr25519"}}}},{"event":"network_verifier_set","payload":{"genesis_hash":"e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e","current_verifier":{"type":"general","details":{"hex":"8eaf04151687736326c9fea17e25fc5287613693c912909cb226aa4794f26a48","encryption":"sr25519"}}}},{"event":"general_verifier_added","payload":{"hex":"8eaf04151687736326c9fea17e25fc5287613693c912909cb226aa4794f26a48","encryption":"sr25519"}},{"event":"types_added","payload":{"types_hash":"0e5751c026e543b2e8ab2eb06099daa1d1e5df47778f7787faab45cdf12fe3a8","verifier":{"hex":"8eaf04151687736326c9fea17e25fc5287613693c912909cb226aa4794f26a48","encryption":"sr25519"}}},{"event":"types_removed","payload":{"types_hash":"0e5751c026e543b2e8ab2eb06099daa1d1e5df47778f7787faab45cdf12fe3a8","verifier":{"hex":"8eaf04151687736326c9fea17e25fc5287613693c912909cb226aa4794f26a48","encryption":"sr25519"}}},{"event":"load_types_message_signed","payload":{"types_hash":"0e5751c026e543b2e8ab2eb06099daa1d1e5df47778f7787faab45cdf12fe3a8","signed_by":{"hex":"8eaf04151687736326c9fea17e25fc5287613693c912909cb226aa4794f26a48","encryption":"sr25519"}}},{"event":"load_metadata_message_signed","payload":{"specname":"westend","spec_version":"9000","meta_hash":"0e5751c026e543b2e8ab2eb06099daa1d1e5df47778f7787faab45cdf12fe3a8","signed_by":{"hex":"8eaf04151687736326c9fea17e25fc5287613693c912909cb226aa4794f26a48","encryption":"sr25519"}}},{"event":"add_specs_message_signed","payload":{"base58prefix":"42","color":"#660D35","decimals":"12","encryption":"sr25519","genesis_hash":"e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e","logo":"westend","name":"westend","path_id":"//westend","secondary_color":"#262626","title":"Westend","unit":"WND","signed_by":{"hex":"8eaf04151687736326c9fea17e25fc5287613693c912909cb226aa4794f26a48","encryption":"sr25519"}}},{"event":"transaction_signed","payload":{"transaction":"","network_name":"westend","signed_by":{"hex":"8eaf04151687736326c9fea17e25fc5287613693c912909cb226aa4794f26a48","encryption":"sr25519"},"user_comment":"send to Alice"}},{"event":"transaction_sign_error","payload":{"transaction":"","network_name":"westend","signed_by":{"hex":"8eaf04151687736326c9fea17e25fc5287613693c912909cb226aa4794f26a48","encryption":"sr25519"},"user_comment":"send to Alice","error":"wrong_password_entered"}},{"event":"message_signed","payload":{"message":"5468697320697320416c6963650a526f676572","network_name":"westend","signed_by":{"hex":"8eaf04151687736326c9fea17e25fc5287613693c912909cb226aa4794f26a48","encryption":"sr25519"},"user_comment":"send to Alice"}},{"event":"message_sign_error","payload":{"message":"5468697320697320416c6963650a526f676572","network_name":"westend","signed_by":{"hex":"8eaf04151687736326c9fea17e25fc5287613693c912909cb226aa4794f26a48","encryption":"sr25519"},"user_comment":"send to Alice","error":"wrong_password_entered"}},{"event":"identity_added","payload":{"seed_name":"Alice","encryption":"sr25519","public_key":"8eaf04151687736326c9fea17e25fc5287613693c912909cb226aa4794f26a48","path":"//","network_genesis_hash":"e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e"}},{"event":"identity_removed","payload":{"seed_name":"Alice","encryption":"sr25519","public_key":"8eaf04151687736326c9fea17e25fc5287613693c912909cb226aa4794f26a48","path":"//","network_genesis_hash":"e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e"}},{"event":"identities_wiped"},{"event":"device_online"},{"event":"reset_danger_record"},{"event":"seed_name_shown","payload":"AliceSecretSeed"},{"event":"warning","payload":"Received network information is not verified."},{"event":"wrong_password_entered"},{"event":"user_entered_event","payload":"Lalala!!!"},{"event":"system_entered_event","payload":"Blip blop"},{"event":"history_cleared"},{"event":"database_initiated"}]"##;
+        let expected_history_part = r##""events":[{"event":"metadata_added","payload":{"specname":"westend","spec_version":"9000","meta_hash":"0e5751c026e543b2e8ab2eb06099daa1d1e5df47778f7787faab45cdf12fe3a8"}},{"event":"metadata_removed","payload":{"specname":"westend","spec_version":"9000","meta_hash":"0e5751c026e543b2e8ab2eb06099daa1d1e5df47778f7787faab45cdf12fe3a8"}},{"event":"load_metadata_message_signed","payload":{"specname":"westend","spec_version":"9000","meta_hash":"0e5751c026e543b2e8ab2eb06099daa1d1e5df47778f7787faab45cdf12fe3a8","signed_by":{"hex":"8eaf04151687736326c9fea17e25fc5287613693c912909cb226aa4794f26a48","encryption":"sr25519"}}},{"event":"network_specs_added","payload":{"base58prefix":"42","color":"#660D35","decimals":"12","encryption":"sr25519","genesis_hash":"e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e","logo":"westend","name":"westend","order":"3","path_id":"//westend","secondary_color":"#262626","title":"Westend","unit":"WND","current_verifier":{"type":"general","details":{"hex":"8eaf04151687736326c9fea17e25fc5287613693c912909cb226aa4794f26a48","encryption":"sr25519"}}}},{"event":"network_removed","payload":{"base58prefix":"42","color":"#660D35","decimals":"12","encryption":"sr25519","genesis_hash":"e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e","logo":"westend","name":"westend","order":"3","path_id":"//westend","secondary_color":"#262626","title":"Westend","unit":"WND","current_verifier":{"type":"general","details":{"hex":"8eaf04151687736326c9fea17e25fc5287613693c912909cb226aa4794f26a48","encryption":"sr25519"}}}},{"event":"add_specs_message_signed","payload":{"base58prefix":"42","color":"#660D35","decimals":"12","encryption":"sr25519","genesis_hash":"e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e","logo":"westend","name":"westend","path_id":"//westend","secondary_color":"#262626","title":"Westend","unit":"WND","signed_by":{"hex":"8eaf04151687736326c9fea17e25fc5287613693c912909cb226aa4794f26a48","encryption":"sr25519"}}},{"event":"network_verifier_set","payload":{"genesis_hash":"e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e","current_verifier":{"type":"general","details":{"hex":"8eaf04151687736326c9fea17e25fc5287613693c912909cb226aa4794f26a48","encryption":"sr25519"}}}},{"event":"general_verifier_added","payload":{"hex":"8eaf04151687736326c9fea17e25fc5287613693c912909cb226aa4794f26a48","encryption":"sr25519"}},{"event":"types_added","payload":{"types_hash":"0e5751c026e543b2e8ab2eb06099daa1d1e5df47778f7787faab45cdf12fe3a8","verifier":{"hex":"8eaf04151687736326c9fea17e25fc5287613693c912909cb226aa4794f26a48","encryption":"sr25519"}}},{"event":"types_removed","payload":{"types_hash":"0e5751c026e543b2e8ab2eb06099daa1d1e5df47778f7787faab45cdf12fe3a8","verifier":{"hex":"8eaf04151687736326c9fea17e25fc5287613693c912909cb226aa4794f26a48","encryption":"sr25519"}}},{"event":"load_types_message_signed","payload":{"types_hash":"0e5751c026e543b2e8ab2eb06099daa1d1e5df47778f7787faab45cdf12fe3a8","signed_by":{"hex":"8eaf04151687736326c9fea17e25fc5287613693c912909cb226aa4794f26a48","encryption":"sr25519"}}},{"event":"transaction_signed","payload":{"transaction":"","network_name":"westend","signed_by":{"hex":"8eaf04151687736326c9fea17e25fc5287613693c912909cb226aa4794f26a48","encryption":"sr25519"},"user_comment":"send to Alice"}},{"event":"transaction_sign_error","payload":{"transaction":"","network_name":"westend","signed_by":{"hex":"8eaf04151687736326c9fea17e25fc5287613693c912909cb226aa4794f26a48","encryption":"sr25519"},"user_comment":"send to Alice","error":"wrong_password_entered"}},{"event":"message_signed","payload":{"message":"5468697320697320416c6963650a526f676572","network_name":"westend","signed_by":{"hex":"8eaf04151687736326c9fea17e25fc5287613693c912909cb226aa4794f26a48","encryption":"sr25519"},"user_comment":"send to Alice"}},{"event":"message_sign_error","payload":{"message":"5468697320697320416c6963650a526f676572","network_name":"westend","signed_by":{"hex":"8eaf04151687736326c9fea17e25fc5287613693c912909cb226aa4794f26a48","encryption":"sr25519"},"user_comment":"send to Alice","error":"wrong_password_entered"}},{"event":"identity_added","payload":{"seed_name":"Alice","encryption":"sr25519","public_key":"8eaf04151687736326c9fea17e25fc5287613693c912909cb226aa4794f26a48","path":"//","network_genesis_hash":"e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e"}},{"event":"identity_removed","payload":{"seed_name":"Alice","encryption":"sr25519","public_key":"8eaf04151687736326c9fea17e25fc5287613693c912909cb226aa4794f26a48","path":"//","network_genesis_hash":"e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e"}},{"event":"identities_wiped"},{"event":"device_online"},{"event":"reset_danger_record"},{"event":"seed_name_shown","payload":"AliceSecretSeed"},{"event":"warning","payload":"Received network information is not verified."},{"event":"wrong_password_entered"},{"event":"user_entered_event","payload":"Lalala!!!"},{"event":"system_entered_event","payload":"Blip blop"},{"event":"history_cleared"},{"event":"database_initiated"}]"##;
         assert!(history.contains(expected_history_part), "\nHistory generated:\n{}", history);
         std::fs::remove_dir_all(dbname).unwrap();
     }

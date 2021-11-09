@@ -1,4 +1,5 @@
 use parity_scale_codec_derive::{Decode, Encode};
+use sp_runtime::MultiSigner;
 
 use crate::crypto::Encryption;
 
@@ -73,31 +74,43 @@ pub struct ChainProperties {
     pub unit: String,
 }
 
-/// Verifier for both network metadata and for types information,
-/// String is hexadecimal representation of verifier public key
+/// Verifier for both network metadata and for types information
 #[derive(Decode, Encode, PartialEq, Debug, Clone)]
-pub enum Verifier {
-    Ed25519([u8;32]),
-    Sr25519([u8;32]),
-    Ecdsa([u8;33]),
-    None,
+pub struct Verifier (pub Option<VerifierValue>);
+
+#[derive(Decode, Encode, PartialEq, Debug, Clone)]
+pub enum VerifierValue {
+    Standard (MultiSigner),
 }
 
 impl Verifier {
     pub fn show_card(&self) -> String {
+        match &self.0 {
+            Some(a) => a.show_card(),
+            None => String::from("{\"hex\":\"\",\"encryption\":\"none\"}"),
+        }
+    }
+    pub fn show_error(&self) -> String {
+        match &self.0 {
+            Some(a) => a.show_error(),
+            None => String::from("none"),
+        }
+    }
+}
+
+impl VerifierValue {
+    pub fn show_card(&self) -> String {
         match &self {
-            Verifier::Ed25519(x) => format!("{{\"hex\":\"{}\",\"encryption\":\"ed25519\"}}", hex::encode(x)),
-            Verifier::Sr25519(x) => format!("{{\"hex\":\"{}\",\"encryption\":\"sr25519\"}}", hex::encode(x)),
-            Verifier::Ecdsa(x) => format!("{{\"hex\":\"{}\",\"encryption\":\"ecdsa\"}}", hex::encode(x)),
-            Verifier::None => String::from("{\"hex\":\"\",\"encryption\":\"none\"}"),
+            VerifierValue::Standard(MultiSigner::Ed25519(x)) => format!("{{\"hex\":\"{}\",\"encryption\":\"ed25519\"}}", hex::encode(x.0)),
+            VerifierValue::Standard(MultiSigner::Sr25519(x)) => format!("{{\"hex\":\"{}\",\"encryption\":\"sr25519\"}}", hex::encode(x.0)),
+            VerifierValue::Standard(MultiSigner::Ecdsa(x)) => format!("{{\"hex\":\"{}\",\"encryption\":\"ecdsa\"}}", hex::encode(x.0)),
         }
     }
     pub fn show_error(&self) -> String {
         match &self {
-            Verifier::Ed25519(x) => format!("public key: {}, encryption: ed25519", hex::encode(x)),
-            Verifier::Sr25519(x) => format!("public key: {}, encryption: sr25519", hex::encode(x)),
-            Verifier::Ecdsa(x) => format!("public key: {}, encryption: ecdsa", hex::encode(x)),
-            Verifier::None => String::from("none"),
+            VerifierValue::Standard(MultiSigner::Ed25519(x)) => format!("public key: {}, encryption: ed25519", hex::encode(x.0)),
+            VerifierValue::Standard(MultiSigner::Sr25519(x)) => format!("public key: {}, encryption: sr25519", hex::encode(x.0)),
+            VerifierValue::Standard(MultiSigner::Ecdsa(x)) => format!("public key: {}, encryption: ecdsa", hex::encode(x.0)),
         }
     }
 }

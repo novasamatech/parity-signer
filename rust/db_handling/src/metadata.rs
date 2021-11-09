@@ -74,7 +74,7 @@ mod tests {
         let dbname_hot = "tests/test_metadata_transfer_mock_hot";
         reset_hot_database(dbname_hot).unwrap();
         let dbname_cold = "tests/test_metadata_transfer_mock_cold";
-        reset_cold_database_no_addresses(dbname_cold, Verifier::None).unwrap();
+        reset_cold_database_no_addresses(dbname_cold, Verifier(None)).unwrap();
         
         insert_metadata_from_file(dbname_hot, "tests/westend9010");
         assert!(metadata_len(dbname_hot) == 1, "Fresh hot database, should have only the single network added.");

@@ -520,13 +520,13 @@ impl Command {
                                 };
                                 match sufficient_crypto {
                                     SufficientCrypto::Ed25519 {public_key, signature} => {
-                                        Crypto::Ed25519(VerifierKind::Normal {verifier_public_key: public_key.to_vec(), signature: signature.to_vec()})
+                                        Crypto::Ed25519(VerifierKind::Normal {verifier_public_key: public_key.to_vec(), signature: signature.0.to_vec()})
                                     },
                                     SufficientCrypto::Sr25519 {public_key, signature} => {
-                                        Crypto::Sr25519(VerifierKind::Normal {verifier_public_key: public_key.to_vec(), signature: signature.to_vec()})
+                                        Crypto::Sr25519(VerifierKind::Normal {verifier_public_key: public_key.to_vec(), signature: signature.0.to_vec()})
                                     },
                                     SufficientCrypto::Ecdsa {public_key, signature} => {
-                                        Crypto::Ecdsa(VerifierKind::Normal {verifier_public_key: public_key.to_vec(), signature: signature.to_vec()})
+                                        Crypto::Ecdsa(VerifierKind::Normal {verifier_public_key: public_key.0.to_vec(), signature: signature.0.to_vec()})
                                     },
                                 }
                             },

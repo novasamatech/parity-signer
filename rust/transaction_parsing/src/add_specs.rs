@@ -22,10 +22,10 @@ pub fn add_specs (data_hex: &str, database_name: &str) -> Result<String, Error> 
     match possible_current_verifier {
         None => {
             match checked_info.verifier {
-                Verifier::None => {
+                Verifier(None) => {
                     stub = stub.new_history_entry(Event::Warning(Warning::NotVerified.show()));
-                    stub = stub_add_network_specs(stub, &specs, &CurrentVerifier::Custom(Verifier::None), &general_verifier, &database_name)?;
-                    stub = stub.new_network_verifier(&verifier_key, &CurrentVerifier::Custom(Verifier::None), &general_verifier);
+                    stub = stub_add_network_specs(stub, &specs, &CurrentVerifier::Custom(Verifier(None)), &general_verifier, &database_name)?;
+                    stub = stub.new_network_verifier(&verifier_key, &CurrentVerifier::Custom(Verifier(None)), &general_verifier);
                     let checksum = stub_store_and_get_checksum(stub, &database_name)?;
                     let warning_card = Card::Warning(Warning::NotVerified).card(&mut index,0);
                     let specs_card = Card::NewSpecs(&specs).card(&mut index, 0);
@@ -35,7 +35,7 @@ pub fn add_specs (data_hex: &str, database_name: &str) -> Result<String, Error> 
                 _ => {
                     let verifier_card = Card::Verifier(&checked_info.verifier).card(&mut index,0);
                     match general_verifier {
-                        Verifier::None => {
+                        Verifier(None) => {
                             let new_general_verifier = checked_info.verifier;
                             let general_hold = GeneralHold::get(&database_name)?;
                             stub = general_hold.upd_stub(stub, &new_general_verifier, &database_name)?;
@@ -70,15 +70,15 @@ pub fn add_specs (data_hex: &str, database_name: &str) -> Result<String, Error> 
             }
         },
         Some(CurrentVerifier::Custom(custom_verifier)) => {
-            if (custom_verifier == general_verifier)&&(general_verifier != Verifier::None) {return Err(Error::DatabaseError(DatabaseError::CustomVerifierIsGeneral(verifier_key)))}
+            if (custom_verifier == general_verifier)&&(general_verifier != Verifier(None)) {return Err(Error::DatabaseError(DatabaseError::CustomVerifierIsGeneral(verifier_key)))}
             match custom_verifier {
-                Verifier::None => {
+                Verifier(None) => {
                     match checked_info.verifier {
-                        Verifier::None => {
+                        Verifier(None) => {
                             stub = stub.new_history_entry(Event::Warning(Warning::NotVerified.show()));
                             let warning_card = Card::Warning(Warning::NotVerified).card(&mut index,0);
                             if specs_are_new(&specs, &database_name)? {
-                                stub = stub_add_network_specs(stub, &specs, &CurrentVerifier::Custom(Verifier::None), &general_verifier, &database_name)?;
+                                stub = stub_add_network_specs(stub, &specs, &CurrentVerifier::Custom(Verifier(None)), &general_verifier, &database_name)?;
                                 let checksum = stub_store_and_get_checksum(stub, &database_name)?;
                                 let specs_card = Card::NewSpecs(&specs).card(&mut index, 0);
                                 let action_card = Action::Stub(checksum).card();
@@ -107,7 +107,7 @@ pub fn add_specs (data_hex: &str, database_name: &str) -> Result<String, Error> 
                                 }
                             }
                             else {
-                                if general_verifier == Verifier::None {
+                                if general_verifier == Verifier(None) {
                                     let new_general_verifier = checked_info.verifier;
                                     stub = hold.upd_stub(stub, &verifier_key, &custom_verifier, &CurrentVerifier::General, HoldRelease::GeneralSuper, &database_name)?;
                                     let warning_card_1 = Card::Warning(Warning::VerifierGeneralSuper{verifier_key: &verifier_key, hold: &hold}).card(&mut index,0);
@@ -151,7 +151,7 @@ pub fn add_specs (data_hex: &str, database_name: &str) -> Result<String, Error> 
                 },
                 _ => {
                     match checked_info.verifier {
-                        Verifier::None => return Err(Error::CryptoError(CryptoError::VerifierDisappeared)),
+                        Verifier(None) => return Err(Error::CryptoError(CryptoError::VerifierDisappeared)),
                         _ => {
                             let verifier_card = Card::Verifier(&checked_info.verifier).card(&mut index,0);
                             if checked_info.verifier == general_verifier {
@@ -192,8 +192,8 @@ pub fn add_specs (data_hex: &str, database_name: &str) -> Result<String, Error> 
         },
         Some(CurrentVerifier::General) => {
             match general_verifier {
-                Verifier::None => {
-                    if checked_info.verifier == Verifier::None {
+                Verifier(None) => {
+                    if checked_info.verifier == Verifier(None) {
                         let warning_card = Card::Warning(Warning::NotVerified).card(&mut index,0);
                         stub = stub.new_history_entry(Event::Warning(Warning::NotVerified.show()));
                         if specs_are_new(&specs, &database_name)? {
@@ -239,7 +239,7 @@ pub fn add_specs (data_hex: &str, database_name: &str) -> Result<String, Error> 
                         else {return Err(Error::BadInputData(BadInputData::SpecsAlreadyThere))}
                     }
                     else {
-                       if checked_info.verifier == Verifier::None {return Err(Error::CryptoError(CryptoError::GeneralVerifierDisappeared))}
+                       if checked_info.verifier == Verifier(None) {return Err(Error::CryptoError(CryptoError::GeneralVerifierDisappeared))}
                        else {return Err(Error::CryptoError(CryptoError::GeneralVerifierChanged{old: general_verifier, new: checked_info.verifier}))}
                     }
                 }

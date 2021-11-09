@@ -18,8 +18,8 @@ pub fn load_types(data_hex: &str, database_name: &str) -> Result<String, Error> 
     let general_verifier = get_general_verifier(&database_name)?;
     let mut stub = TrDbColdStub::new();
     let mut index = 0;
-    if checked_info.verifier == Verifier::None {
-        if general_verifier == Verifier::None {
+    if checked_info.verifier == Verifier(None) {
+        if general_verifier == Verifier(None) {
             if new_types == old_types {return Err(Error::BadInputData(BadInputData::TypesAlreadyThere))}
             else {
                 stub = stub.new_history_entry(Event::Warning(Warning::TypesNotVerified.show()));
@@ -56,7 +56,7 @@ pub fn load_types(data_hex: &str, database_name: &str) -> Result<String, Error> 
             }
         }
         else {
-            if general_verifier == Verifier::None {
+            if general_verifier == Verifier(None) {
                 let new_general_verifier = checked_info.verifier;
                 let general_hold = GeneralHold::get(&database_name)?;
                 stub = general_hold.upd_stub(stub, &new_general_verifier, &database_name)?;

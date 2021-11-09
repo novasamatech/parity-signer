@@ -310,7 +310,7 @@ pub fn sign_store_and_get_checksum (sign: TrDbColdSign, database_name: &str) -> 
 /// function to process hex data and get from it author_public_key, encryption,
 /// data to process (either transaction to parse or message to decode),
 /// and network specs key
-pub fn author_encryption_msg_genesis (data_hex: &str) -> Result<(Vec<u8>, Encryption, Vec<u8>, NetworkSpecsKey), Error> {
+pub fn author_encryption_msg_genesis (data_hex: &str) -> Result<(Vec<u8>, Encryption, Vec<u8>, Vec<u8>), Error> {
     let data = unhex(&data_hex)?;
     let (author_public_key, encryption, data) = match &data_hex[2..4] {
         "00" => match data.get(3..35) {
@@ -330,8 +330,7 @@ pub fn author_encryption_msg_genesis (data_hex: &str) -> Result<(Vec<u8>, Encryp
     if data.len()<32 {return Err(Error::BadInputData(BadInputData::TooShort))}
     let genesis_hash_vec = data[data.len()-32..].to_vec(); // network genesis hash
     let msg = data[..data.len()-32].to_vec();
-    let network_specs_key = NetworkSpecsKey::from_parts(&genesis_hash_vec, &encryption);
-    Ok((author_public_key, encryption, msg, network_specs_key))
+    Ok((author_public_key, encryption, msg, genesis_hash_vec))
 }
 
 fn print_affected (metadata_set: &Vec<MetaValues>, network_specs_set: &Vec<ChainSpecs>) -> String {
@@ -516,7 +515,7 @@ mod tests {
     #[test]
     fn find_westend_verifier() {
         let dbname = "for_tests/find_westend_verifier";
-        populate_cold_no_metadata(dbname, Verifier::None).unwrap();
+        populate_cold_no_metadata(dbname, Verifier(None)).unwrap();
         let verifier_key = VerifierKey::from_parts(&hex::decode("e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e").unwrap());
         let westend_verifier = match get_current_verifier(&verifier_key, &dbname) {
             Ok(a) => a,
@@ -529,7 +528,7 @@ mod tests {
     #[test]
     fn not_find_mock_verifier() {
         let dbname = "for_tests/not_find_mock_verifier";
-        populate_cold_no_metadata(dbname, Verifier::None).unwrap();
+        populate_cold_no_metadata(dbname, Verifier(None)).unwrap();
         let verifier_key = VerifierKey::from_parts(&hex::decode("62bacaaa3d9bb01313bb882c23615aae6509ab2ef1e7e807581ee0b74c77416b").unwrap());
         match get_current_verifier(&verifier_key, &dbname) {
             Ok(Some(_)) => panic!("Found network key that should not be in database."),

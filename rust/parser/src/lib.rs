@@ -105,7 +105,7 @@ pub fn parse_extensions (extensions_data: Vec<u8>, metadata_bundle: &MetadataBun
     Ok(cards)
 }
 
-pub fn parse_set (data: &Vec<u8>, metadata_bundle: &MetadataBundle, short_specs: &ShortSpecs, optional_mortal_flag: Option<bool>) -> Result<(Result<Vec<OutputCard>, ParserError>, Vec<OutputCard>), ParserError> {
+pub fn parse_set (data: &Vec<u8>, metadata_bundle: &MetadataBundle, short_specs: &ShortSpecs, optional_mortal_flag: Option<bool>) -> Result<(Result<Vec<OutputCard>, ParserError>, Vec<OutputCard>, Vec<u8>, Vec<u8>), ParserError> {
     let pre_method = get_compact::<u32>(data)?;
     let method_length = pre_method.compact_found as usize;
     let (method_data, extensions_data) = match pre_method.start_next_unit {
@@ -120,9 +120,9 @@ pub fn parse_set (data: &Vec<u8>, metadata_bundle: &MetadataBundle, short_specs:
             (Vec::new(), data.to_vec())
         },
     };
-    let extensions_cards = parse_extensions (extensions_data, metadata_bundle, short_specs, optional_mortal_flag)?;
-    let method_cards = parse_method (method_data, metadata_bundle, short_specs);
-    Ok((method_cards, extensions_cards))
+    let extensions_cards = parse_extensions (extensions_data.to_vec(), metadata_bundle, short_specs, optional_mortal_flag)?;
+    let method_cards = parse_method (method_data.to_vec(), metadata_bundle, short_specs);
+    Ok((method_cards, extensions_cards, method_data, extensions_data))
 }
 
 pub fn parse_and_display_set (data: &Vec<u8>, metadata: &RuntimeMetadata, short_specs: &ShortSpecs) -> Result<String, String> {
@@ -157,7 +157,7 @@ pub fn parse_and_display_set (data: &Vec<u8>, metadata: &RuntimeMetadata, short_
         _ => return Err(Error::Arguments(ArgumentsError::RuntimeVersionIncompatible).show()),
     };
     match parse_set (data, &metadata_bundle, short_specs, None) {
-        Ok((method_cards_result, extensions_cards)) => {
+        Ok((method_cards_result, extensions_cards, _, _)) => {
             let mut method = String::new();
             let mut extensions = String::new();
             match method_cards_result {

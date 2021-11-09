@@ -1,7 +1,7 @@
 use sled::Batch;
 use parity_scale_codec::Encode;
 use constants::{ADDRTREE, DANGER, GENERALVERIFIER, HISTORY, METATREE, SETTREE, SPECSTREE, TRANSACTION, TYPES, VERIFIERS};
-use defaults::{DEFAULT_GENERAL_VERIFIER, get_default_chainspecs, get_default_types, get_default_metadata, get_default_verifiers};
+use defaults::{default_general_verifier, get_default_chainspecs, get_default_types, get_default_metadata, get_default_verifiers};
 use definitions::{danger::DangerRecord, history::Event, keyring::{MetaKey, NetworkSpecsKey}, network_specs::Verifier};
 use anyhow;
 
@@ -124,14 +124,14 @@ fn signer_init (database_name: &str, general_verifier: Verifier) -> anyhow::Resu
         .apply(&database_name)
 }
 
-/// Function to initiate signer with DEFAULT_GENERAL_VERIFIER
+/// Function to initiate signer with default general verifier
 pub fn signer_init_with_cert (database_name: &str) -> anyhow::Result<()> {
-    signer_init(&database_name, DEFAULT_GENERAL_VERIFIER)
+    signer_init(&database_name, default_general_verifier())
 }
 
 /// Function to initiate signer with Verifier::None as a general verifier
 pub fn signer_init_no_cert (database_name: &str) -> anyhow::Result<()> {
-    signer_init(&database_name, Verifier::None)
+    signer_init(&database_name, Verifier(None))
 }
 
 /// Function to populate cold database without adding any networks.

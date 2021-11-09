@@ -17,6 +17,8 @@ pub (crate) enum Card <'a> {
     TypesInfo(ContentLoadTypes),
     NewSpecs(&'a ChainSpecsToSend),
     Message(&'a str),
+    NetworkName(&'a str),
+    NetworkGenesisHash(&'a Vec<u8>),
     Warning (Warning <'a>),
     Error (Error),
 }
@@ -95,6 +97,8 @@ impl <'a> Card <'a> {
             Card::TypesInfo(x) => fancy(index, indent, "types_hash", &format!("\"{}\"", hex::encode(blake2b(32, &[], &x.store()).as_bytes()))),
             Card::NewSpecs(x) => fancy(index, indent, "new_specs", &format!("{{{}}}", x.show())),
             Card::Message(x) => fancy(index, indent, "message", &format!("\"{}\"", hex::encode(x.as_bytes()))),
+            Card::NetworkName(x) => fancy(index, indent, "network_name", &format!("\"{}\"", x)),
+            Card::NetworkGenesisHash(x) => fancy(index, indent, "network_genesis_hash", &format!("\"{}\"", hex::encode(x))),
             Card::Warning (warn) => fancy(index, indent, "warning", &format!("\"{}\"", warn.show())),
             Card::Error (err) => fancy(index, indent, "error", &format!("\"{}\"", err.show())),
         }

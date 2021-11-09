@@ -1,5 +1,5 @@
 use db_handling::db_transactions::{TrDbColdSign, SignContent};
-use definitions::{history::Event, keyring::{AddressKey}, users::AddressDetails};
+use definitions::{history::Event, keyring::{AddressKey, NetworkSpecsKey}, users::AddressDetails};
 use parser::{parse_set, error::ParserError, decoding_commons::OutputCard};
 
 use crate::cards::{Action, Card, Warning};
@@ -30,7 +30,8 @@ enum CardsPrep {
 
 pub fn parse_transaction (data_hex: &str, dbname: &str) -> Result<String, Error> {
 
-    let (author_public_key, encryption, parser_data, network_specs_key) = author_encryption_msg_genesis(data_hex)?;
+    let (author_public_key, encryption, parser_data, genesis_hash_vec) = author_encryption_msg_genesis(data_hex)?;
+    let network_specs_key = NetworkSpecsKey::from_parts(&genesis_hash_vec, &encryption);
 
 // this should be here by the standard; should stay commented for now, since the test transactions apparently do not comply to standard.
     let optional_mortal_flag = None; /*match &data_hex[4..6] {
@@ -69,7 +70,7 @@ pub fn parse_transaction (data_hex: &str, dbname: &str) -> Result<String, Error>
             for (i,x) in meta_set.iter().enumerate() {
                 let used_version = x.version;
                 match parse_set(&parser_data, &bundle_from_meta_set_element(x, &dbname)?, &short_specs, optional_mortal_flag) {
-                    Ok((method_cards_result, extensions_cards)) => {
+                    Ok((method_cards_result, extensions_cards, method_vec, extensions_vec)) => {
                         if i>0 {
                             history.push(Event::Warning(Warning::NewerVersion{used_version, latest_version}.show()));
                             let add = Card::Warning(Warning::NewerVersion{used_version, latest_version}).card(&mut index, indent);
@@ -84,7 +85,7 @@ pub fn parse_transaction (data_hex: &str, dbname: &str) -> Result<String, Error>
                                 let extensions = into_cards(&extensions_cards, &mut index);
                                 found_solution = match cards_prep {
                                     CardsPrep::SignProceed(author_card, possible_warning, address_details) => {
-                                        let sign = TrDbColdSign::generate(SignContent::Transaction(parser_data), &network_specs.name, &address_details.path, address_details.has_pwd, &address_key, history);
+                                        let sign = TrDbColdSign::generate(SignContent::Transaction{method: method_vec, extensions: extensions_vec}, &network_specs.name, &address_details.path, address_details.has_pwd, &address_key, history);
                                         let checksum = sign_store_and_get_checksum (sign, &dbname)?;
                                         let action_card = Action::Sign(checksum).card();
                                         match possible_warning {

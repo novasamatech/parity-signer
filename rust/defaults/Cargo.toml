@@ -12,6 +12,8 @@ definitions = {path = "../definitions"}
 hex = "0.4.3"
 regex = "1.4.5"
 lazy_static = "1.4.0"
+sp-runtime = "3.0.0"
+sp-core = "3.0.0"
 
 [lib]
 name = "defaults"

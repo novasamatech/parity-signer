@@ -1,45 +1,51 @@
 use hex;
+use sp_core;
+use sp_runtime::MultiSigner;
 use std::convert::TryInto;
 use std::fs;
 use regex::Regex;
 use lazy_static::lazy_static;
-use definitions::{crypto::Encryption, keyring::VerifierKey, metadata::{AddressBookEntry, MetaValues}, network_specs::{ChainSpecs, ChainSpecsToSend, CurrentVerifier, Verifier}, qr_transfers::ContentLoadTypes, types::{TypeEntry, Description, EnumVariant, EnumVariantType, StructField}};
+use definitions::{crypto::Encryption, keyring::VerifierKey, metadata::{AddressBookEntry, MetaValues}, network_specs::{ChainSpecs, ChainSpecsToSend, CurrentVerifier, Verifier, VerifierValue}, qr_transfers::ContentLoadTypes, types::{TypeEntry, Description, EnumVariant, EnumVariantType, StructField}};
 use meta_reading::decode_metadata::decode_version;
 
-pub const DEFAULT_GENERAL_VERIFIER: Verifier = Verifier::Sr25519([
-                                                                 0xc4,
-                                                                 0x6a,
-                                                                 0x22,
-                                                                 0xb9,
-                                                                 0xda,
-                                                                 0x19,
-                                                                 0x54,
-                                                                 0x0a,
-                                                                 0x77,
-                                                                 0xcb,
-                                                                 0xde,
-                                                                 0x23,
-                                                                 0x19,
-                                                                 0x7e,
-                                                                 0x5f,
-                                                                 0xd9,
-                                                                 0x04,
-                                                                 0x85,
-                                                                 0xc7,
-                                                                 0x2b,
-                                                                 0x4e,
-                                                                 0xcf,
-                                                                 0x3c,
-                                                                 0x59,
-                                                                 0x9e,
-                                                                 0xcc,
-                                                                 0xa6,
-                                                                 0x99,
-                                                                 0x8f,
-                                                                 0x39,
-                                                                 0xbd,
-                                                                 0x57
-                                                                 ]);//Real Parity key!
+pub const DEFAULT_VERIFIER_PUBLIC: [u8;32] = [
+    0xc4,
+    0x6a,
+    0x22,
+    0xb9,
+    0xda,
+    0x19,
+    0x54,
+    0x0a,
+    0x77,
+    0xcb,
+    0xde,
+    0x23,
+    0x19,
+    0x7e,
+    0x5f,
+    0xd9,
+    0x04,
+    0x85,
+    0xc7,
+    0x2b,
+    0x4e,
+    0xcf,
+    0x3c,
+    0x59,
+    0x9e,
+    0xcc,
+    0xa6,
+    0x99,
+    0x8f,
+    0x39,
+    0xbd,
+    0x57
+    ];//Real Parity key!
+
+pub fn default_general_verifier() -> Verifier {
+    Verifier(Some(VerifierValue::Standard(MultiSigner::Sr25519(sp_core::sr25519::Public::from_raw(DEFAULT_VERIFIER_PUBLIC)))))
+}
 
 struct DefaultNetworkInfo {
     address: String,

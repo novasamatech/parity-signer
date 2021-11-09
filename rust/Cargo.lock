@@ -468,11 +468,13 @@ dependencies = [
  "constants",
  "defaults",
  "definitions",
+ "frame-metadata",
  "hex",
  "lazy_static",
  "meta_reading",
  "parity-scale-codec",
  "parity-scale-codec-derive",
+ "parser",
  "qrcode_static",
  "regex",
  "sled",
@@ -491,6 +493,8 @@ dependencies = [
  "lazy_static",
  "meta_reading",
  "regex",
+ "sp-core",
+ "sp-runtime",
 ]
 
 [[package]]
@@ -1596,7 +1600,6 @@ name = "parser"
 version = "0.1.0"
 dependencies = [
  "bitvec",
- "db_handling",
  "defaults",
  "definitions",
  "frame-metadata",

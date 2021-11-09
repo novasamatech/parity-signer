@@ -13,7 +13,7 @@ use crate::manage_history::events_to_batch;
 /// Removes network specs for all entries with same genesis hash.
 /// Removes all metadata entries for corresponding network specname.
 /// Removes all addresses corresponding to the networks removed (all encryptions).
-/// If CurrentVerifier is Custom(Verifier::None), leave it as that. If CurrentVerifier is General, leave it as General.
+/// If CurrentVerifier is Custom(Verifier(None)), leave it as that. If CurrentVerifier is General, leave it as General.
 /// If CurrentVerifier is Custom with some Verifier set, transform it into CurrentVerifier::Dead to disable the network
 /// permanently until Signer is wiped altogether.
 pub fn remove_network_by_key (network_specs_key: &NetworkSpecsKey, database_name: &str) -> anyhow::Result<()> {
@@ -47,7 +47,7 @@ pub fn remove_network_by_key (network_specs_key: &NetworkSpecsKey, database_name
                         CurrentVerifier::General => (),
                         CurrentVerifier::Custom(ref b) => {
                             match b {
-                                Verifier::None => (),
+                                Verifier(None) => (),
                                 _ => {
                                     verifiers_batch.remove(verifier_key.key());
                                     verifiers_batch.insert(verifier_key.key(), (CurrentVerifier::Dead).encode());
@@ -161,7 +161,7 @@ mod tests {
     #[test]
     fn remove_all_westend() {
         let dbname = "tests/remove_all_westend";
-        reset_cold_database_no_addresses(dbname, Verifier::None).unwrap();
+        reset_cold_database_no_addresses(dbname, Verifier(None)).unwrap();
         generate_test_identities(dbname).unwrap();
         
         let line = "e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e";
@@ -197,7 +197,7 @@ mod tests {
     #[test]
     fn remove_westend_9010() {
         let dbname = "tests/remove_westend_9010";
-        reset_cold_database_no_addresses(dbname, Verifier::None).unwrap();
+        reset_cold_database_no_addresses(dbname, Verifier(None)).unwrap();
         
         let network_name = "westend";
         let network_version = 9010;

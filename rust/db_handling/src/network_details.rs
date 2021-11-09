@@ -72,7 +72,7 @@ mod tests {
     #[test]
     fn print_westend() {
         let dbname = "tests/print_westend";
-        reset_cold_database_no_addresses(dbname, Verifier::None).unwrap();
+        reset_cold_database_no_addresses(dbname, Verifier(None)).unwrap();
         
         let network_specs_key_string = hex::encode(NetworkSpecsKey::from_parts(&hex::decode("e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e").expect("known value"), &Encryption::Sr25519).key());
         assert!(network_specs_key_string == "0180e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e", "\nExpected:\n0180e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e\nReceived:\n{}", network_specs_key_string);

@@ -21,7 +21,7 @@ pub fn print_network (database_name: &str, network_specs_key_string: &str) -> an
 }
 
 /// Fetch ChainSpecs for all saved networks
-fn get_all_networks (database_name: &str) -> anyhow::Result<Vec<ChainSpecs>> {
+pub (crate) fn get_all_networks (database_name: &str) -> anyhow::Result<Vec<ChainSpecs>> {
     let database = open_db(database_name)?;
     let chainspecs = open_tree(&database, SPECSTREE)?;
     let mut out: Vec<ChainSpecs> = Vec::new();

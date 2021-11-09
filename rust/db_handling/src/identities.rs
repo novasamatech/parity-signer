@@ -587,7 +587,7 @@ mod tests {
     #[test]
     fn test_generate_random_account() {
         let dbname = "tests/test_generate_random_account";
-        populate_cold_no_metadata(dbname, Verifier::None).unwrap();
+        populate_cold_no_metadata(dbname, Verifier(None)).unwrap();
         try_create_seed("Randy", "", 24, dbname).unwrap();
         let chainspecs = get_default_chainspecs();
         let random_addresses = get_relevant_identities("Randy", &hex::encode(NetworkSpecsKey::from_parts(&chainspecs[0].genesis_hash.to_vec(), &Encryption::Sr25519).key()), dbname).unwrap();
@@ -598,7 +598,7 @@ mod tests {
     #[test]
     fn test_generate_default_addresses_for_alice() {
         let dbname = "tests/test_generate_default_addresses_for_Alice";
-        populate_cold_no_metadata(dbname, Verifier::None).unwrap();
+        populate_cold_no_metadata(dbname, Verifier(None)).unwrap();
         try_create_seed("Alice", SEED, 0, dbname).unwrap();
         {
             let database = open_db(dbname).unwrap();
@@ -644,7 +644,7 @@ mod tests {
         let path_should_succeed = "//path-should-succeed";
         let path_should_fail_1 = "//path-should-fail-1";
         let chainspecs = get_default_chainspecs();
-        populate_cold_no_metadata(dbname, Verifier::None).unwrap();
+        populate_cold_no_metadata(dbname, Verifier(None)).unwrap();
         try_create_seed("Alice", SEED, 0, dbname).unwrap();
         assert!(try_create_address("root address", "Alice", SEED, ENCRYPTION_NAME, path_should_fail_0, &hex::encode(NetworkSpecsKey::from_parts(&chainspecs[0].genesis_hash.to_vec(), &Encryption::Sr25519).key()), false, dbname).is_err());
         try_create_address("clone", "Alice", SEED, ENCRYPTION_NAME, path_should_succeed, &hex::encode(NetworkSpecsKey::from_parts(&chainspecs[0].genesis_hash.to_vec(), &Encryption::Sr25519).key()), false, dbname).expect("creating unique address that should prohibit creation of similarly named adderss soon");
@@ -662,7 +662,7 @@ mod tests {
     #[test]
     fn test_derive() { 
         let dbname = "tests/test_derive";
-        populate_cold_no_metadata(dbname, Verifier::None).unwrap();
+        populate_cold_no_metadata(dbname, Verifier(None)).unwrap();
         let chainspecs = get_default_chainspecs();
         println!("[0]: {:?}, [1]: {:?}", chainspecs[0].name, chainspecs[1].name);
         let seed_name = "Alice";
@@ -718,7 +718,7 @@ mod tests {
     #[test]
     fn test_suggest_n_plus_one() { 
         let dbname = "tests/test_suggest_n_plus_one";
-        populate_cold_no_metadata(dbname, Verifier::None).unwrap();
+        populate_cold_no_metadata(dbname, Verifier(None)).unwrap();
         try_create_seed("Alice", SEED, 0, dbname).unwrap();
         let chainspecs = get_default_chainspecs();
         let network_id_string_0 = hex::encode(NetworkSpecsKey::from_parts(&chainspecs[0].genesis_hash.to_vec(), &Encryption::Sr25519).key());
@@ -759,7 +759,7 @@ mod tests {
     #[test]
     fn test_identity_deletion() {
         let dbname = "tests/test_identity_deletion";
-        populate_cold_no_metadata(dbname, Verifier::None).unwrap();
+        populate_cold_no_metadata(dbname, Verifier(None)).unwrap();
         try_create_seed("Alice", SEED, 0, dbname).unwrap();
         let chainspecs = get_default_chainspecs();
         let network_id_string_0 = hex::encode(NetworkSpecsKey::from_parts(&chainspecs[0].genesis_hash.to_vec(), &Encryption::Sr25519).key());
@@ -792,7 +792,7 @@ mod tests {
     #[test]
     fn history_with_identities() {
         let dbname = "tests/history_with_identities";
-        reset_cold_database_no_addresses(dbname, Verifier::None).unwrap();
+        reset_cold_database_no_addresses(dbname, Verifier(None)).unwrap();
         signer_init_with_cert(dbname).unwrap();
         let history_printed = print_history(dbname).unwrap();
         let element1 = r#"{"event":"database_initiated"}"#;
