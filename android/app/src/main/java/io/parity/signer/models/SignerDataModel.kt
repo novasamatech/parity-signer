@@ -398,7 +398,7 @@ class SignerDataModel : ViewModel() {
 				signTransaction("")
 			}
 		} else {
-			performTransaction("", "")
+			performTransaction()
 			clearTransaction()
 		}
 	}
@@ -419,7 +419,7 @@ class SignerDataModel : ViewModel() {
 		return signature.intoImageBitmap()
 	}
 
-	private fun performTransaction(seedPhrase: String, password: String) {
+	private fun performTransaction() {
 		try {
 			substrateHandleStub(
 				action.getString("payload"),

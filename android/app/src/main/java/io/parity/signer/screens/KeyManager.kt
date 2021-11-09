@@ -11,6 +11,7 @@ import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.unit.dp
 import androidx.fragment.app.FragmentActivity
 import io.parity.signer.KeyManagerModal
 import io.parity.signer.components.KeySelector
@@ -43,7 +44,7 @@ fun KeyManager(signerDataModel: SignerDataModel) {
 					signerDataModel = signerDataModel
 				)}
 				NetworkSelector(signerDataModel = signerDataModel)
-				Row(modifier = Modifier.fillMaxWidth(1f)) {
+				Row(modifier = Modifier.fillMaxWidth(1f).padding(horizontal = 8.dp)) {
 					Text("DERIVED KEYS")
 					Spacer(Modifier.weight(1f, true))
 					IconButton(onClick = { signerDataModel.newKeyScreenEngage() }) {

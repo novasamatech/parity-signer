@@ -11,6 +11,7 @@ import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.unit.dp
 import io.parity.signer.models.SignerDataModel
 import org.json.JSONObject
 
@@ -37,7 +38,9 @@ fun KeySelector(signerDataModel: SignerDataModel) {
 
 							}
 						)
-					}) {
+					}
+						.padding(horizontal = 8.dp)
+					) {
 						KeyCard(
 							identities.value!!.getJSONObject(item),
 							signerDataModel = signerDataModel
