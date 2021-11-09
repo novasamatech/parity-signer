@@ -1,10 +1,9 @@
 use sled::{Batch, Transactional};
 use anyhow;
 use constants::{ADDRESS_BOOK, ADDRTREE, GENERALVERIFIER, HISTORY, METATREE, SETTREE, SIGN, SPECSTREE, SPECSTREEPREP, STUB, TRANSACTION, TYPES, VERIFIERS};
-use definitions::{crypto::Encryption, history::{Event, IdentityHistory, MetaValuesDisplay, NetworkSpecsDisplay, NetworkVerifierDisplay, SignDisplay, SignMessageDisplay, TypesDisplay}, keyring::{AddressKey, MetaKey, NetworkSpecsKey, VerifierKey}, metadata::MetaValues, network_specs::{ChainSpecs, ChainSpecsToSend, CurrentVerifier, Verifier}, qr_transfers::ContentLoadTypes};
+use definitions::{history::{Event, IdentityHistory, MetaValuesDisplay, NetworkSpecsDisplay, NetworkVerifierDisplay, SignDisplay, SignMessageDisplay, TypesDisplay}, keyring::{AddressKey, MetaKey, NetworkSpecsKey, VerifierKey}, metadata::MetaValues, network_specs::{ChainSpecs, ChainSpecsToSend, CurrentVerifier, Verifier, VerifierValue}, qr_transfers::ContentLoadTypes};
 use parity_scale_codec::{Decode, Encode};
 use parity_scale_codec_derive;
-use std::convert::TryInto;
 
 use crate::error::{Error, NotDecodeable, NotFound};
 use crate::helpers::{decode_address_details, make_batch_clear_tree, open_db, open_tree, reverse_address_key, verify_checksum};
@@ -415,7 +414,7 @@ pub struct TrDbColdSign {
 
 #[derive(parity_scale_codec_derive::Decode, parity_scale_codec_derive::Encode)]
 pub enum SignContent {
-    Transaction(Vec<u8>),
+    Transaction{method: Vec<u8>, extensions: Vec<u8>},
     Message(String),
 }
 
@@ -482,15 +481,15 @@ impl TrDbColdSign {
     }
     /// function to apply TrDbColdSign to database
     pub fn apply(self, wrong_password: bool, user_comment: &str, database_name: &str) -> anyhow::Result<()> {
-        let (public_key, encryption) = reverse_address_key(&self.address_key)?;
-        let signed_by = match encryption {
-            Encryption::Ed25519 => Verifier::Ed25519(public_key.try_into().expect("just decoded successfully, length is correct.")),
-            Encryption::Sr25519 => Verifier::Sr25519(public_key.try_into().expect("just decoded successfully, length is correct.")),
-            Encryption::Ecdsa => Verifier::Ecdsa(public_key.try_into().expect("just decoded successfully, length is correct.")),
+        let multi_signer = match self.address_key.multi_signer() {
+            Ok(a) => a,
+            Err(_) => return Err(Error::NotDecodeable(NotDecodeable::AddressKey).show()),
         };
+        let signed_by = VerifierValue::Standard(multi_signer);
         let mut history = self.history;
         match self.content {
-            SignContent::Transaction(transaction) => {
+            SignContent::Transaction{method, extensions} => {
+                let transaction = [method.encode(), extensions].concat();
                 let sign_display = SignDisplay::get(&transaction, &self.network_name, &signed_by, &user_comment);
                 if wrong_password {history.push(Event::TransactionSignError(sign_display))}
                 else {history.push(Event::TransactionSigned(sign_display))}
