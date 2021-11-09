@@ -1,10 +1,10 @@
-use db_handling::db_transactions::TrDbColdSign;
-use definitions::{crypto::Encryption, history::Event, keyring::{AddressKey, NetworkSpecsKey}, users::AddressDetails};
+use db_handling::db_transactions::{TrDbColdSign, SignContent};
+use definitions::{history::Event, keyring::{AddressKey}, users::AddressDetails};
 use parser::{parse_set, error::ParserError, decoding_commons::OutputCard};
 
 use crate::cards::{Action, Card, Warning};
-use crate::error::{Error, BadInputData, DatabaseError};
-use crate::helpers::{checked_address_details, checked_network_specs, unhex, find_meta_set, bundle_from_meta_set_element, sign_store_and_get_checksum};
+use crate::error::{Error, DatabaseError};
+use crate::helpers::{author_encryption_msg_genesis, checked_address_details, checked_network_specs, find_meta_set, bundle_from_meta_set_element, sign_store_and_get_checksum};
 
 /// Transaction payload in hex format as it arrives into parsing program contains following elements:
 /// - prelude, length 6 symbols ("53" stands for substrate, ** - crypto type, 00 or 02 - transaction type),
@@ -29,30 +29,15 @@ enum CardsPrep {
 /// followed by extrinsics, concluded with chain genesis hash
 
 pub fn parse_transaction (data_hex: &str, dbname: &str) -> Result<String, Error> {
-    
-// input hex data of correct size should have at least 6 + 64 + 64 symbols (prelude + author public key minimal size + genesis hash)
-    if data_hex.len() < 134 {return Err(Error::BadInputData(BadInputData::TooShort))}
 
-    let data = unhex(&data_hex)?;
-    
-    let (author_public_key, encryption, data) = match &data_hex[2..4] {
-        "00" => (data[3..35].to_vec(), Encryption::Ed25519, &data[35..]),
-        "01" => (data[3..35].to_vec(), Encryption::Sr25519, &data[35..]),
-        "02" => (data[3..36].to_vec(), Encryption::Ecdsa, &data[36..]),
-        _ => return Err(Error::BadInputData(BadInputData::CryptoNotSupported))
-    };
-    
+    let (author_public_key, encryption, parser_data, network_specs_key) = author_encryption_msg_genesis(data_hex)?;
+
 // this should be here by the standard; should stay commented for now, since the test transactions apparently do not comply to standard.
     let optional_mortal_flag = None; /*match &data_hex[4..6] {
         "00" => Some(true), // expect transaction to be mortal
         "02" => Some(false), // expect transaction to be immortal
         _ => unreachable!(),
     };*/
-    
-    let genesis_hash_vec = data[data.len()-32..].to_vec(); // network genesis hash
-    let parser_data = data[..data.len()-32].to_vec(); // data to be parsed, method and extensions
-    
-    let network_specs_key = NetworkSpecsKey::from_parts(&genesis_hash_vec, &encryption);
 
 // initialize index and indent
     let mut index: u32 = 0;
@@ -99,7 +84,7 @@ pub fn parse_transaction (data_hex: &str, dbname: &str) -> Result<String, Error>
                                 let extensions = into_cards(&extensions_cards, &mut index);
                                 found_solution = match cards_prep {
                                     CardsPrep::SignProceed(author_card, possible_warning, address_details) => {
-                                        let sign = TrDbColdSign::generate(&parser_data, &address_details.path, address_details.has_pwd, &address_key, history);
+                                        let sign = TrDbColdSign::generate(SignContent::Transaction(parser_data), &network_specs.name, &address_details.path, address_details.has_pwd, &address_key, history);
                                         let checksum = sign_store_and_get_checksum (sign, &dbname)?;
                                         let action_card = Action::Sign(checksum).card();
                                         match possible_warning {

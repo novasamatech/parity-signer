@@ -166,23 +166,51 @@ impl IdentityHistory {
 #[derive(Decode, Encode, PartialEq, Clone)]
 pub struct SignDisplay {
     transaction: Vec<u8>, // transaction
+    network_name: String, // network name
     signed_by: Verifier, // signature author
     user_comment: String, // user entered comment for transaction
 }
 
 impl SignDisplay {
-    pub fn get(transaction: &Vec<u8>, signed_by: &Verifier, user_comment: &str) -> Self {
+    pub fn get(transaction: &Vec<u8>, network_name: &str, signed_by: &Verifier, user_comment: &str) -> Self {
         Self {
             transaction: transaction.to_vec(),
+            network_name: network_name.to_string(),
             signed_by: signed_by.to_owned(),
             user_comment: user_comment.to_string(),
         }
     }
     pub fn success(&self) -> String {
-        format!("\"transaction\":\"{}\",\"signed_by\":{},\"user_comment\":\"{}\"", hex::encode(&self.transaction), &self.signed_by.show_card(), &self.user_comment)
+        format!("\"transaction\":\"{}\",\"network_name\":\"{}\",\"signed_by\":{},\"user_comment\":\"{}\"", hex::encode(&self.transaction), &self.network_name, &self.signed_by.show_card(), &self.user_comment)
     }
     pub fn pwd_failure(&self) -> String {
-        format!("\"transaction\":\"{}\",\"signed_by\":{},\"user_comment\":\"{}\",\"error\":\"wrong_password_entered\"", hex::encode(&self.transaction), &self.signed_by.show_card(), &self.user_comment)
+        format!("\"transaction\":\"{}\",\"network_name\":\"{}\",\"signed_by\":{},\"user_comment\":\"{}\",\"error\":\"wrong_password_entered\"", hex::encode(&self.transaction), &self.network_name, &self.signed_by.show_card(), &self.user_comment)
+    }
+}
+
+/// Struct to store information about signed transactions
+#[derive(Decode, Encode, PartialEq, Clone)]
+pub struct SignMessageDisplay {
+    message: String, // message
+    network_name: String, // network name
+    signed_by: Verifier, // signature author
+    user_comment: String, // user entered comment for transaction
+}
+
+impl SignMessageDisplay {
+    pub fn get(message: &str, network_name: &str, signed_by: &Verifier, user_comment: &str) -> Self {
+        Self {
+            message: message.to_string(),
+            network_name: network_name.to_string(),
+            signed_by: signed_by.to_owned(),
+            user_comment: user_comment.to_string(),
+        }
+    }
+    pub fn success(&self) -> String {
+        format!("\"message\":\"{}\",\"network_name\":\"{}\",\"signed_by\":{},\"user_comment\":\"{}\"", hex::encode(&self.message.as_bytes()), &self.network_name, &self.signed_by.show_card(), &self.user_comment)
+    }
+    pub fn pwd_failure(&self) -> String {
+        format!("\"message\":\"{}\",\"network_name\":\"{}\",\"signed_by\":{},\"user_comment\":\"{}\",\"error\":\"wrong_password_entered\"", hex::encode(&self.message.as_bytes()), &self.network_name, &self.signed_by.show_card(), &self.user_comment)
     }
 }
 
@@ -202,6 +230,9 @@ pub enum Event {
     SignedLoadMetadata(MetaValuesExport),
     SignedAddNetworkSpecs(NetworkSpecsExport),
     TransactionSigned(SignDisplay),
+    TransactionSignError(SignDisplay),
+    MessageSigned(SignMessageDisplay),
+    MessageSignError(SignMessageDisplay),
     IdentityAdded(IdentityHistory),
     IdentityRemoved(IdentityHistory),
     IdentitiesWiped,
@@ -209,7 +240,6 @@ pub enum Event {
     ResetDangerRecord,
     SeedNameWasShown(String), // for individual seed_name
     Warning(String), // TODO change to actual crate warning
-    TransactionSignError(SignDisplay),
     WrongPassword,
     UserEntry(String),
     SystemEntry(String),
@@ -238,6 +268,9 @@ impl Event {
             Event::SignedLoadMetadata(x) => format!("{{\"event\":\"load_metadata_message_signed\",\"payload\":{{{}}}}}", x.show()),
             Event::SignedAddNetworkSpecs(x) => format!("{{\"event\":\"add_specs_message_signed\",\"payload\":{{{}}}}}", x.show()),
             Event::TransactionSigned(x) => format!("{{\"event\":\"transaction_signed\",\"payload\":{{{}}}}}", x.success()),
+            Event::TransactionSignError(x) => format!("{{\"event\":\"transaction_sign_error\",\"payload\":{{{}}}}}", x.pwd_failure()),
+            Event::MessageSigned(x) => format!("{{\"event\":\"message_signed\",\"payload\":{{{}}}}}", x.success()),
+            Event::MessageSignError(x) => format!("{{\"event\":\"message_sign_error\",\"payload\":{{{}}}}}", x.pwd_failure()),
             Event::IdentityAdded(x) => format!("{{\"event\":\"identity_added\",\"payload\":{{{}}}}}", x.show()),
             Event::IdentityRemoved(x) => format!("{{\"event\":\"identity_removed\",\"payload\":{{{}}}}}", x.show()),
             Event::IdentitiesWiped => String::from("{\"event\":\"identities_wiped\"}"),
@@ -245,7 +278,6 @@ impl Event {
             Event::ResetDangerRecord => String::from("{\"event\":\"reset_danger_record\"}"),
             Event::SeedNameWasShown(seed_name) => format!("{{\"event\":\"seed_name_shown\",\"payload\":\"{}\"}}", seed_name),
             Event::Warning(x) => format!("{{\"event\":\"warning\",\"payload\":\"{}\"}}", x),
-            Event::TransactionSignError(x) => format!("{{\"event\":\"sign_error\",\"payload\":{{{}}}}}", x.pwd_failure()),
             Event::WrongPassword => String::from("{\"event\":\"wrong_password_entered\"}"),
             Event::UserEntry(x) => format!("{{\"event\":\"user_entered_event\",\"payload\":\"{}\"}}", x),
             Event::SystemEntry(x) => format!("{{\"event\":\"system_entered_event\",\"payload\":\"{}\"}}", x),
@@ -315,7 +347,10 @@ pub fn all_events_preview() -> Vec<Event> {
     events.push(Event::SignedTypes(TypesDisplay::get(&ContentLoadTypes::from_vec(&Vec::new()), &general_verifier)));
     events.push(Event::SignedLoadMetadata(MetaValuesExport::get(&meta_values, &general_verifier)));
     events.push(Event::SignedAddNetworkSpecs(NetworkSpecsExport::get(&network_specs_to_send, &general_verifier)));
-    events.push(Event::TransactionSigned(SignDisplay::get(&Vec::new(), &general_verifier, "send to Alice")));
+    events.push(Event::TransactionSigned(SignDisplay::get(&Vec::new(), "westend", &general_verifier, "send to Alice")));
+    events.push(Event::TransactionSignError(SignDisplay::get(&Vec::new(), "westend", &general_verifier, "send to Alice")));
+    events.push(Event::MessageSigned(SignMessageDisplay::get("This is Alice\nRoger", "westend", &general_verifier, "send to Alice")));
+    events.push(Event::MessageSignError(SignMessageDisplay::get("This is Alice\nRoger", "westend", &general_verifier, "send to Alice")));
     events.push(Event::IdentityAdded(IdentityHistory::get("Alice", &Encryption::Sr25519, &public.to_vec(), "//", &network_specs.genesis_hash.to_vec())));
     events.push(Event::IdentityRemoved(IdentityHistory::get("Alice", &Encryption::Sr25519, &public.to_vec(), "//", &network_specs.genesis_hash.to_vec())));
     events.push(Event::IdentitiesWiped);
@@ -323,7 +358,6 @@ pub fn all_events_preview() -> Vec<Event> {
     events.push(Event::ResetDangerRecord);
     events.push(Event::SeedNameWasShown(String::from("AliceSecretSeed")));
     events.push(Event::Warning(String::from("Received network information is not verified.")));
-    events.push(Event::TransactionSignError(SignDisplay::get(&Vec::new(), &general_verifier, "send to Alice")));
     events.push(Event::WrongPassword);
     events.push(Event::UserEntry(String::from("Lalala!!!")));
     events.push(Event::SystemEntry(String::from("Blip blop")));

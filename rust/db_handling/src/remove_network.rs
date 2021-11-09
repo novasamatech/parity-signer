@@ -145,7 +145,7 @@ pub fn remove_metadata (network_name: &str, network_version: u32, database_name:
 
 #[cfg(test)]
 mod tests {
-    use crate::{cold_default::reset_cold_database_no_addresses, identities::generate_test_identities, manage_history::{print_history_tree}};
+    use crate::{cold_default::reset_cold_database_no_addresses, identities::generate_test_identities, manage_history::{print_history}};
     use super::*;
     use std::fs;
     use sled::{Db, Tree, open};
@@ -168,25 +168,27 @@ mod tests {
         let network_specs_key = NetworkSpecsKey::from_parts(&hex::decode(line).unwrap(), &Encryption::Sr25519);
         remove_network_by_key (&network_specs_key, dbname).unwrap();
         
-        let database: Db = open(dbname).unwrap();
+        {
+            let database: Db = open(dbname).unwrap();
         
-        let chainspecs: Tree = database.open_tree(SPECSTREE).unwrap();
-        assert!(chainspecs.get(&network_specs_key.key()).unwrap() == None, "Westend network specs were not deleted");
+            let chainspecs: Tree = database.open_tree(SPECSTREE).unwrap();
+            assert!(chainspecs.get(&network_specs_key.key()).unwrap() == None, "Westend network specs were not deleted");
         
-        let metadata: Tree = database.open_tree(METATREE).unwrap();
-        let prefix_meta = String::from("westend").encode();
-        assert!(metadata.scan_prefix(&prefix_meta).next() == None, "Some westend metadata was not deleted");
+            let metadata: Tree = database.open_tree(METATREE).unwrap();
+            let prefix_meta = String::from("westend").encode();
+            assert!(metadata.scan_prefix(&prefix_meta).next() == None, "Some westend metadata was not deleted");
         
-        let identities: Tree = database.open_tree(ADDRTREE).unwrap();
-        for x in identities.iter() {
-            if let Ok((_, address_details_encoded)) = x {
-                let address_details = <AddressDetails>::decode(&mut &address_details_encoded[..]).unwrap();
-                assert!(!address_details.network_id.contains(&network_specs_key), "Some westend identities still remain.");
-                assert!(address_details.network_id.len() != 0, "Did not remove address key entried with no network keys associated");
+            let identities: Tree = database.open_tree(ADDRTREE).unwrap();
+            for x in identities.iter() {
+                if let Ok((_, address_details_encoded)) = x {
+                    let address_details = <AddressDetails>::decode(&mut &address_details_encoded[..]).unwrap();
+                    assert!(!address_details.network_id.contains(&network_specs_key), "Some westend identities still remain.");
+                    assert!(address_details.network_id.len() != 0, "Did not remove address key entried with no network keys associated");
+                }
             }
         }
         
-        let history_printed = print_history_tree(&database).unwrap();
+        let history_printed = print_history(dbname).unwrap();
         assert!(history_printed.contains(r#"{"event":"database_initiated"}"#) && history_printed.contains(r##"{"event":"network_removed","payload":{"base58prefix":"42","color":"#660D35","decimals":"12","encryption":"sr25519","genesis_hash":"e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e","logo":"westend","name":"westend","order":"2","path_id":"//westend","secondary_color":"#262626","title":"Westend","unit":"WND","current_verifier":{"type":"general","details":{"hex":"","encryption":"none"}}}}"##) && history_printed.contains(r#"{"event":"metadata_removed","payload":{"specname":"westend","spec_version":"9000","meta_hash":"e80237ad8b2e92b72fcf6beb8f0e4ba4a21043a7115c844d91d6c4f981e469ce"}}"#) && history_printed.contains(r#"{"event":"metadata_removed","payload":{"specname":"westend","spec_version":"9010","meta_hash":"70c99738c27fb32c87883f1c9c94ee454bf0b3d88e4a431a2bbfe1222b46ebdf"}}"#) && history_printed.contains(r#"{"event":"identity_removed","payload":{"seed_name":"Alice","encryption":"sr25519","public_key":"3efeca331d646d8a2986374bb3bb8d6e9e3cfcdd7c45c2b69104fab5d61d3f34","path":"//westend","network_genesis_hash":"e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e"}}"#) && history_printed.contains(r#"{"event":"identity_removed","payload":{"seed_name":"Alice","encryption":"sr25519","public_key":"46ebddef8cd9bb167dc30878d7113b7e168e6f0646beffd77d69d39bad76b47a","path":"","network_genesis_hash":"e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e"}}"#) && history_printed.contains(r#"{"event":"identity_removed","payload":{"seed_name":"Alice","encryption":"sr25519","public_key":"d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d","path":"//Alice","network_genesis_hash":"e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e"}}"#), "Expected different history:\n{}", history_printed);
         
         fs::remove_dir_all(dbname).unwrap();

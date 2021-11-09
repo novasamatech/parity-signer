@@ -32,6 +32,7 @@ pub enum BadInputData {
     UnableToDecodeAddSpecsMessage,
     UnableToDecodeLoadMetadataMessage,
     ImportantSpecsChanged,
+    MessageNotReadable,
 }
 
 #[derive(PartialEq)]
@@ -108,6 +109,7 @@ impl Error {
                     BadInputData::UnableToDecodeAddSpecsMessage => String::from("Unable to decode received add specs message."),
                     BadInputData::UnableToDecodeLoadMetadataMessage => String::from("Unable to decode received load metadata message."),
                     BadInputData::ImportantSpecsChanged => String::from("Network already has entries. Important chainspecs in received add network message are different."),
+                    BadInputData::MessageNotReadable => String::from("Received message could not be read."),
                 };
                 format!("Bad input data. {}", insert)
             },

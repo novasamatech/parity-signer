@@ -2,7 +2,7 @@ use sled::{Db, Tree, open, IVec};
 use hex;
 use constants::{ADDRTREE, GENERALVERIFIER, METATREE, SETTREE, SPECSTREE, TYPES, VERIFIERS};
 use db_handling::{db_transactions::{TrDbColdSign, TrDbColdStub}, helpers::check_metadata};
-use definitions::{history::Event, keyring::{AddressKey, MetaKey, MetaKeyPrefix, NetworkSpecsKey, VerifierKey}, metadata::{MetaValues, VersionDecoded}, network_specs::{ChainSpecs, ChainSpecsToSend, CurrentVerifier, Verifier}, qr_transfers::ContentLoadTypes, types::TypeEntry, users::AddressDetails};
+use definitions::{crypto::Encryption, history::Event, keyring::{AddressKey, MetaKey, MetaKeyPrefix, NetworkSpecsKey, VerifierKey}, metadata::{MetaValues, VersionDecoded}, network_specs::{ChainSpecs, ChainSpecsToSend, CurrentVerifier, Verifier}, qr_transfers::ContentLoadTypes, types::TypeEntry, users::AddressDetails};
 use parity_scale_codec::Decode;
 use frame_metadata::RuntimeMetadata;
 use meta_reading::decode_metadata::{get_meta_const_light};
@@ -305,6 +305,33 @@ pub fn sign_store_and_get_checksum (sign: TrDbColdSign, database_name: &str) -> 
         Ok(a) => Ok(a),
         Err(e) => return Err(Error::DatabaseError(DatabaseError::Temporary(e.to_string()))),
     }
+}
+
+/// function to process hex data and get from it author_public_key, encryption,
+/// data to process (either transaction to parse or message to decode),
+/// and network specs key
+pub fn author_encryption_msg_genesis (data_hex: &str) -> Result<(Vec<u8>, Encryption, Vec<u8>, NetworkSpecsKey), Error> {
+    let data = unhex(&data_hex)?;
+    let (author_public_key, encryption, data) = match &data_hex[2..4] {
+        "00" => match data.get(3..35) {
+            Some(a) => (a.to_vec(), Encryption::Ed25519, &data[35..]),
+            None => {return Err(Error::BadInputData(BadInputData::TooShort))},
+        },
+        "01" => match data.get(3..35) {
+            Some(a) => (a.to_vec(), Encryption::Sr25519, &data[35..]),
+            None => {return Err(Error::BadInputData(BadInputData::TooShort))},
+        },
+        "02" => match data.get(3..36) {
+            Some(a) => (a.to_vec(), Encryption::Ecdsa, &data[36..]),
+            None => {return Err(Error::BadInputData(BadInputData::TooShort))},
+        },
+        _ => return Err(Error::BadInputData(BadInputData::CryptoNotSupported)),
+    };
+    if data.len()<32 {return Err(Error::BadInputData(BadInputData::TooShort))}
+    let genesis_hash_vec = data[data.len()-32..].to_vec(); // network genesis hash
+    let msg = data[..data.len()-32].to_vec();
+    let network_specs_key = NetworkSpecsKey::from_parts(&genesis_hash_vec, &encryption);
+    Ok((author_public_key, encryption, msg, network_specs_key))
 }
 
 fn print_affected (metadata_set: &Vec<MetaValues>, network_specs_set: &Vec<ChainSpecs>) -> String {

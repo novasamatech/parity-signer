@@ -18,10 +18,9 @@ pub enum ParserCard {
     EnumVariantName {name: String, docs_enum_variant: String},
     Era(Era),
     Nonce (String),
-    NetworkName (String),
     BlockHash ([u8; 32]),
     Tip {number: String, units: String},
-    SpecVersion (String),
+    NetworkNameVersion {name: String, version: String},
     TxVersion (String),
 }
 
@@ -45,10 +44,9 @@ impl ParserCard {
                 Era::Mortal(period, phase)  => readable(indent, "era", &format!("Mortal, phase: {}, period: {}", phase, period)),
             },
             ParserCard::Nonce (nonce) => readable(indent, "nonce", &nonce),
-            ParserCard::NetworkName (network_name) => readable(indent, "network", &network_name),
             ParserCard::BlockHash (block_hash) => readable(indent, "block_hash", &hex::encode(block_hash)),
             ParserCard::Tip {number, units} => readable(indent, "tip", &format!("{} {}", number, units)),
-            ParserCard::SpecVersion (x) => readable(indent, "version", &x),
+            ParserCard::NetworkNameVersion {name, version} => readable(indent, "network", &format!("{}{}", name, version)),
             ParserCard::TxVersion (x) => readable(indent, "tx_version", &x),
         }
     }

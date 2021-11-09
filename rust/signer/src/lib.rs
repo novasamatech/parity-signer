@@ -130,6 +130,13 @@ export! {
         db_handling::identities::print_all_identities(dbname)
     }
 
+    @Java_io_parity_signer_models_SignerDataModel_substrateGuessWord
+    fn guess_word (
+        part: &str
+    ) -> String {
+        db_handling::identities::guess(part)
+    }
+
     @Java_io_parity_signer_models_SignerDataModel_substrateTryCreateSeed
 	fn try_create_seed(
         seed_name: &str,
@@ -218,6 +225,22 @@ export! {
 	) -> anyhow::Result<String, anyhow::Error> {
         db_handling::manage_history::print_history(dbname)
     }
+
+    @Java_io_parity_signer_models_SignerDataModel_historyPrintHistoryPage
+    fn print_history_page(
+        page: u32,
+        dbname: &str
+    ) -> Result<String, anyhow::Error> {
+        db_handling::manage_history::print_history_page(page, dbname)
+    }
+
+    @Java_io_parity_signer_models_SignerDataModel_historyTotalPages
+    fn history_total_pages(
+        dbname: &str
+    ) -> Result<u32, anyhow::Error> {
+        db_handling::manage_history::history_total_pages(dbname)
+    }
+
 
     @Java_io_parity_signer_models_SignerDataModel_historyClearHistory
 	fn clear_history(

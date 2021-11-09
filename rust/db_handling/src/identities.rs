@@ -7,7 +7,7 @@ use sled::{Db, Tree, Batch};
 use sp_core::{Pair, ed25519, sr25519, ecdsa};
 use parity_scale_codec::Encode;
 use regex::Regex;
-use constants::{ADDRTREE, SPECSTREE};
+use constants::{ADDRTREE, MAX_WORDS_DISPLAY, SPECSTREE};
 use definitions::{crypto::Encryption, history::{Event, IdentityHistory}, keyring::{NetworkSpecsKey, AddressKey}, users::{AddressDetails, SeedObject}};
 use bip39::{Language, Mnemonic, MnemonicType};
 use zeroize::Zeroize;
@@ -537,6 +537,22 @@ pub fn export_identity (pub_key: &str, network_specs_key_string: &str, database_
     else {return Err(Error::NotFound(NotFound::NetworkSpecsKey).show())}
 }
 
+/// function to get possible English words from allowed words list,
+/// starting with already entered piece;
+/// for easier seed recovery
+pub fn guess (word_part: &str) -> String {
+    let dictionary = Language::English.wordlist();
+    let words = dictionary.get_words_by_prefix(word_part);
+    let mut out = String::from("[");
+    for (i,x) in words.iter().enumerate() {
+        if i==MAX_WORDS_DISPLAY {break;}
+        if i>0 {out.push_str(",");}
+        out.push_str(&format!("\"{}\"", x));
+    }
+    out.push_str("]");
+    out
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -781,15 +797,79 @@ mod tests {
         let history_printed = print_history(dbname).unwrap();
         let element1 = r#"{"event":"database_initiated"}"#;
         let element2 = r#"{"event":"general_verifier_added","payload":{"hex":"c46a22b9da19540a77cbde23197e5fd90485c72b4ecf3c599ecca6998f39bd57","encryption":"sr25519"}}"#;
-        assert!(history_printed.contains(element1), "\nReal history:\n{}", history_printed);
-        assert!(history_printed.contains(element2), "\nReal history:\n{}", history_printed);
+        assert!(history_printed.contains(element1), "\nReal history check1:\n{}", history_printed);
+        assert!(history_printed.contains(element2), "\nReal history check2:\n{}", history_printed);
         try_create_seed("Alice", SEED, 0, dbname).unwrap();
         let history_printed_after_create_seed = print_history(dbname).unwrap();
-        let element3 = r#""events":[{"event":"identity_added","payload":{"seed_name":"Alice","encryption":"sr25519","public_key":"46ebddef8cd9bb167dc30878d7113b7e168e6f0646beffd77d69d39bad76b47a","path":"","network_genesis_hash":"91b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3"}},{"event":"identity_added","payload":{"seed_name":"Alice","encryption":"sr25519","public_key":"f606519cb8726753885cd4d0f518804a69a5e0badf36fee70feadd8044081730","path":"//polkadot","network_genesis_hash":"91b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3"}},{"event":"identity_added","payload":{"seed_name":"Alice","encryption":"sr25519","public_key":"46ebddef8cd9bb167dc30878d7113b7e168e6f0646beffd77d69d39bad76b47a","path":"","network_genesis_hash":"b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe"}},{"event":"identity_added","payload":{"seed_name":"Alice","encryption":"sr25519","public_key":"64a31235d4bf9b37cfed3afa8aa60754675f9c4915430454d365c05112784d05","path":"//kusama","network_genesis_hash":"b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe"}},{"event":"identity_added","payload":{"seed_name":"Alice","encryption":"sr25519","public_key":"46ebddef8cd9bb167dc30878d7113b7e168e6f0646beffd77d69d39bad76b47a","path":"","network_genesis_hash":"c196f81260cf1686172b47a79cf002120735d7cb0eb1474e8adce56618456fff"}},{"event":"identity_added","payload":{"seed_name":"Alice","encryption":"sr25519","public_key":"96129dcebc2e10f644e81fcf4269a663e521330084b1e447369087dec8017e04","path":"//rococo","network_genesis_hash":"c196f81260cf1686172b47a79cf002120735d7cb0eb1474e8adce56618456fff"}},{"event":"identity_added","payload":{"seed_name":"Alice","encryption":"sr25519","public_key":"46ebddef8cd9bb167dc30878d7113b7e168e6f0646beffd77d69d39bad76b47a","path":"","network_genesis_hash":"e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e"}},{"event":"identity_added","payload":{"seed_name":"Alice","encryption":"sr25519","public_key":"3efeca331d646d8a2986374bb3bb8d6e9e3cfcdd7c45c2b69104fab5d61d3f34","path":"//westend","network_genesis_hash":"e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e"}}]}]"#;
-        assert!(history_printed_after_create_seed.contains(element1), "\nReal history:\n{}", history_printed_after_create_seed);
-        assert!(history_printed_after_create_seed.contains(element2), "\nReal history:\n{}", history_printed_after_create_seed);
-        assert!(history_printed_after_create_seed.contains(element3), "\nReal history:\n{}", history_printed_after_create_seed);
+        let element3 = r#""events":[{"event":"identity_added","payload":{"seed_name":"Alice","encryption":"sr25519","public_key":"46ebddef8cd9bb167dc30878d7113b7e168e6f0646beffd77d69d39bad76b47a","path":"","network_genesis_hash":"91b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3"}},{"event":"identity_added","payload":{"seed_name":"Alice","encryption":"sr25519","public_key":"f606519cb8726753885cd4d0f518804a69a5e0badf36fee70feadd8044081730","path":"//polkadot","network_genesis_hash":"91b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3"}},{"event":"identity_added","payload":{"seed_name":"Alice","encryption":"sr25519","public_key":"46ebddef8cd9bb167dc30878d7113b7e168e6f0646beffd77d69d39bad76b47a","path":"","network_genesis_hash":"b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe"}},{"event":"identity_added","payload":{"seed_name":"Alice","encryption":"sr25519","public_key":"64a31235d4bf9b37cfed3afa8aa60754675f9c4915430454d365c05112784d05","path":"//kusama","network_genesis_hash":"b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe"}},{"event":"identity_added","payload":{"seed_name":"Alice","encryption":"sr25519","public_key":"46ebddef8cd9bb167dc30878d7113b7e168e6f0646beffd77d69d39bad76b47a","path":"","network_genesis_hash":"c196f81260cf1686172b47a79cf002120735d7cb0eb1474e8adce56618456fff"}},{"event":"identity_added","payload":{"seed_name":"Alice","encryption":"sr25519","public_key":"96129dcebc2e10f644e81fcf4269a663e521330084b1e447369087dec8017e04","path":"//rococo","network_genesis_hash":"c196f81260cf1686172b47a79cf002120735d7cb0eb1474e8adce56618456fff"}},{"event":"identity_added","payload":{"seed_name":"Alice","encryption":"sr25519","public_key":"46ebddef8cd9bb167dc30878d7113b7e168e6f0646beffd77d69d39bad76b47a","path":"","network_genesis_hash":"e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e"}},{"event":"identity_added","payload":{"seed_name":"Alice","encryption":"sr25519","public_key":"3efeca331d646d8a2986374bb3bb8d6e9e3cfcdd7c45c2b69104fab5d61d3f34","path":"//westend","network_genesis_hash":"e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e"}}]"#;
+        assert!(history_printed_after_create_seed.contains(element1), "\nReal history check3:\n{}", history_printed_after_create_seed);
+        assert!(history_printed_after_create_seed.contains(element2), "\nReal history check4:\n{}", history_printed_after_create_seed);
+        assert!(history_printed_after_create_seed.contains(element3), "\nReal history check5:\n{}", history_printed_after_create_seed);
         fs::remove_dir_all(dbname).unwrap();
+    }
+    
+    #[test]
+    fn word_search_1() {
+        let word_part = "dri";
+        let out = guess(word_part);
+        let out_expected = r#"["drift","drill","drink","drip","drive"]"#;
+        assert!(out == out_expected, "Found different word set:\n{:?}", out);
+    }
+    
+    #[test]
+    fn word_search_2() {
+        let word_part = "umbra";
+        let out = guess(word_part);
+        let out_expected = r#"[]"#;
+        assert!(out == out_expected, "Found different word set:\n{:?}", out);
+    }
+    
+    #[test]
+    fn word_search_3() {
+        let word_part = "котик";
+        let out = guess(word_part);
+        let out_expected = r#"[]"#;
+        assert!(out == out_expected, "Found different word set:\n{:?}", out);
+    }
+    
+    #[test]
+    fn word_search_4() {
+        let word_part = "";
+        let out = guess(word_part);
+        let out_expected = r#"["abandon","ability","able","about","above","absent","absorb","abstract"]"#;
+        assert!(out == out_expected, "Found different word set:\n{:?}", out);
+    }
+    
+    #[test]
+    fn word_search_5() {
+        let word_part = " ";
+        let out = guess(word_part);
+        let out_expected = r#"[]"#;
+        assert!(out == out_expected, "Found different word set:\n{:?}", out);
+    }
+    
+    #[test]
+    fn word_search_6() {
+        let word_part = "s";
+        let out = guess(word_part);
+        let out_expected = r#"["sad","saddle","sadness","safe","sail","salad","salmon","salon"]"#;
+        assert!(out == out_expected, "Found different word set:\n{:?}", out);
+    }
+    
+    #[test]
+    fn word_search_7() {
+        let word_part = "se";
+        let out = guess(word_part);
+        let out_expected = r#"["sea","search","season","seat","second","secret","section","security"]"#;
+        assert!(out == out_expected, "Found different word set:\n{:?}", out);
+    }
+    
+    #[test]
+    fn word_search_8() {
+        let word_part = "sen";
+        let out = guess(word_part);
+        let out_expected = r#"["senior","sense","sentence"]"#;
+        assert!(out == out_expected, "Found different word set:\n{:?}", out);
     }
 }
 

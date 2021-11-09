@@ -164,7 +164,7 @@ pub (crate) fn decode_primitive_with_flags <T> (data: &Vec<u8>, possible_ext: &m
         let compact_found = get_compact::<T>(data)?;
         let fancy_out = {
             if balance_flag {process_balance(&compact_found.compact_found.to_string(), possible_ext, indent, short_specs)?}
-            else {process_number(compact_found.compact_found.to_string(), possible_ext, indent)?}
+            else {process_number(compact_found.compact_found.to_string(), possible_ext, indent, short_specs)?}
         };
         let remaining_vector = match compact_found.start_next_unit {
             Some(x) => (data[x..]).to_vec(),
@@ -183,7 +183,7 @@ pub (crate) fn decode_primitive_with_flags <T> (data: &Vec<u8>, possible_ext: &m
             Ok(x) => {
                 let fancy_out = {
                     if balance_flag {process_balance(&x.to_string(), possible_ext, indent, short_specs)?}
-                    else {process_number(x.to_string(), possible_ext, indent)?}
+                    else {process_number(x.to_string(), possible_ext, indent, short_specs)?}
                 };
                 let remaining_vector = data[length..].to_vec();
                 Ok(DecodedOut {
@@ -210,7 +210,7 @@ fn process_balance (balance: &str, possible_ext: &mut Option<&mut Ext>, indent: 
     else {Ok(out_balance)}
 }
 
-fn process_number (number: String, possible_ext: &mut Option<&mut Ext>, indent: u32) -> Result<Vec<OutputCard>, ParserError> {
+fn process_number (number: String, possible_ext: &mut Option<&mut Ext>, indent: u32, short_specs: &ShortSpecs) -> Result<Vec<OutputCard>, ParserError> {
     if let Some(ext) = possible_ext {
         match ext.specialty {
             SpecialExt::Nonce => Ok(vec![OutputCard{card: ParserCard::Nonce(number), indent}]),
@@ -219,7 +219,7 @@ fn process_number (number: String, possible_ext: &mut Option<&mut Ext>, indent: 
                     Some(_) => return Err(ParserError::FundamentallyBadV14Metadata(MetadataError::SpecVersionTwice)),
                     None => Some(number.to_string()),
                 };
-                Ok(vec![OutputCard{card: ParserCard::SpecVersion(number), indent}])
+                Ok(vec![OutputCard{card: ParserCard::NetworkNameVersion{name: short_specs.name.to_string(), version: number}, indent}])
             },
             SpecialExt::TxVersion => Ok(vec![OutputCard{card: ParserCard::TxVersion(number), indent}]),
             _ => Ok(vec![OutputCard{card: ParserCard::Default(number), indent}]),

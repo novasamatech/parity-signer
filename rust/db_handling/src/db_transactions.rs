@@ -1,7 +1,7 @@
 use sled::{Batch, Transactional};
 use anyhow;
 use constants::{ADDRESS_BOOK, ADDRTREE, GENERALVERIFIER, HISTORY, METATREE, SETTREE, SIGN, SPECSTREE, SPECSTREEPREP, STUB, TRANSACTION, TYPES, VERIFIERS};
-use definitions::{crypto::Encryption, history::{Event, IdentityHistory, MetaValuesDisplay, NetworkSpecsDisplay, NetworkVerifierDisplay, SignDisplay, TypesDisplay}, keyring::{AddressKey, MetaKey, NetworkSpecsKey, VerifierKey}, metadata::MetaValues, network_specs::{ChainSpecs, ChainSpecsToSend, CurrentVerifier, Verifier}, qr_transfers::ContentLoadTypes};
+use definitions::{crypto::Encryption, history::{Event, IdentityHistory, MetaValuesDisplay, NetworkSpecsDisplay, NetworkVerifierDisplay, SignDisplay, SignMessageDisplay, TypesDisplay}, keyring::{AddressKey, MetaKey, NetworkSpecsKey, VerifierKey}, metadata::MetaValues, network_specs::{ChainSpecs, ChainSpecsToSend, CurrentVerifier, Verifier}, qr_transfers::ContentLoadTypes};
 use parity_scale_codec::{Decode, Encode};
 use parity_scale_codec_derive;
 use std::convert::TryInto;
@@ -405,18 +405,26 @@ impl TrDbColdStub {
 /// It is stored SCALE encoded in transaction tree of the cold database with key SIGN.
 #[derive(parity_scale_codec_derive::Decode, parity_scale_codec_derive::Encode)]
 pub struct TrDbColdSign {
-    transaction: Vec<u8>,
+    content: SignContent,
+    network_name: String,
     path: String,
     has_pwd: bool,
     address_key: AddressKey,
     history: Vec<Event>,
 }
 
+#[derive(parity_scale_codec_derive::Decode, parity_scale_codec_derive::Encode)]
+pub enum SignContent {
+    Transaction(Vec<u8>),
+    Message(String),
+}
+
 impl TrDbColdSign {
     /// function to generate TrDbColdSign
-    pub fn generate(transaction: &Vec<u8>, path: &str, has_pwd: bool, address_key: &AddressKey, history: Vec<Event>) -> Self {
+    pub fn generate(content: SignContent, network_name: &str, path: &str, has_pwd: bool, address_key: &AddressKey, history: Vec<Event>) -> Self {
         Self {
-            transaction: transaction.to_vec(),
+            content,
+            network_name: network_name.to_string(),
             path: path.to_string(),
             has_pwd,
             address_key: address_key.to_owned(),
@@ -444,8 +452,8 @@ impl TrDbColdSign {
         }
     }
     /// function to get transaction content
-    pub fn transaction(&self) -> Vec<u8> {
-        self.transaction.to_vec()
+    pub fn content(&self) -> &SignContent {
+        &self.content
     }
     /// function to get path
     pub fn path(&self) -> String {
@@ -459,7 +467,7 @@ impl TrDbColdSign {
     pub fn address_key(&self) -> AddressKey {
         self.address_key.to_owned()
     }
-    /// function to put TrDbColdStub into storage in the database
+    /// function to put TrDbColdSign into storage in the database
     pub fn store_and_get_checksum(&self, database_name: &str) -> anyhow::Result<u32> {
         let mut transaction_batch = make_batch_clear_tree(database_name, TRANSACTION)?;
         transaction_batch.insert(SIGN, self.encode());
@@ -472,7 +480,7 @@ impl TrDbColdSign {
             Err(e) => return Err(Error::InternalDatabaseError(e).show()),
         }
     }
-    /// function to apply TrDbColdStub to database
+    /// function to apply TrDbColdSign to database
     pub fn apply(self, wrong_password: bool, user_comment: &str, database_name: &str) -> anyhow::Result<()> {
         let (public_key, encryption) = reverse_address_key(&self.address_key)?;
         let signed_by = match encryption {
@@ -481,9 +489,18 @@ impl TrDbColdSign {
             Encryption::Ecdsa => Verifier::Ecdsa(public_key.try_into().expect("just decoded successfully, length is correct.")),
         };
         let mut history = self.history;
-        let sign_display = SignDisplay::get(&self.transaction, &signed_by, &user_comment);
-        if wrong_password {history.push(Event::TransactionSignError(sign_display))}
-        else {history.push(Event::TransactionSigned(sign_display))}
+        match self.content {
+            SignContent::Transaction(transaction) => {
+                let sign_display = SignDisplay::get(&transaction, &self.network_name, &signed_by, &user_comment);
+                if wrong_password {history.push(Event::TransactionSignError(sign_display))}
+                else {history.push(Event::TransactionSigned(sign_display))}
+            },
+            SignContent::Message(message) => {
+                let sign_message_display = SignMessageDisplay::get(&message, &self.network_name, &signed_by, &user_comment);
+                if wrong_password {history.push(Event::MessageSignError(sign_message_display))}
+                else {history.push(Event::MessageSigned(sign_message_display))}
+            },
+        }
         TrDbCold::new()
             .set_history(events_to_batch(&database_name, history)?)
             .apply(&database_name)

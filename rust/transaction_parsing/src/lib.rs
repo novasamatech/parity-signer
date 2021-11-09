@@ -10,6 +10,8 @@ mod load_metadata;
     use load_metadata::load_metadata;
 mod load_types;
     use load_types::load_types;
+mod message;
+    use message::process_message;
 mod parse_transaction;
     use parse_transaction::parse_transaction;
 pub mod test_all_cards;
@@ -38,6 +40,7 @@ fn handle_scanner_input (payload: &str, dbname: &str) -> Result<String, Error> {
     
     match &data_hex[4..6] {
         "00"|"02" => parse_transaction(data_hex, dbname),
+        "03" => process_message(data_hex, dbname),
         "80" => load_metadata(data_hex, dbname),
         "81" => load_types(data_hex, dbname),
         "c1" => add_specs(data_hex, dbname),

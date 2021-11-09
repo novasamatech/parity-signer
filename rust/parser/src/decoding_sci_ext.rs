@@ -120,8 +120,8 @@ pub (crate) fn special_case_hash (data: Vec<u8>, found_ext: &mut FoundExt, inden
                     let fancy_out = match hash {
                         Hash::GenesisHash => {
                             found_ext.genesis_hash = Some(x);
-                            if x == short_specs.genesis_hash {vec![OutputCard{card: ParserCard::NetworkName(short_specs.name.to_string()), indent}]}
-                            else {return Err(ParserError::Decoding(DecodingError::GenesisHashMismatch))}
+                            if x != short_specs.genesis_hash {return Err(ParserError::Decoding(DecodingError::GenesisHashMismatch))}
+                            Vec::new()
                         },
                         Hash::BlockHash => {
                             found_ext.block_hash = Some(x);

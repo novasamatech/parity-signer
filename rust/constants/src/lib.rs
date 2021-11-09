@@ -28,6 +28,10 @@ pub const DANGER: &[u8] = b"dangerous_encounter";
 pub const STUB: &[u8] = b"stub";
 pub const SIGN: &[u8] = b"sign";
 
+/// Display constants
+pub const MAX_WORDS_DISPLAY: usize = 8;
+pub const HISTORY_PAGE_SIZE: usize = 20;
+
 /// HOT database on external device:  
 ///
 /// Contains:

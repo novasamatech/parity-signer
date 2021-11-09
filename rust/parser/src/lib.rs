@@ -69,8 +69,7 @@ pub fn parse_extensions (extensions_data: Vec<u8>, metadata_bundle: &MetadataBun
                 OutputCard{card: ParserCard::Era(ext.era), indent},
                 OutputCard{card: ParserCard::Nonce(ext.nonce.to_string()), indent},
                 OutputCard{card: ParserCard::Tip{number: tip.number.to_string(), units: tip.units.to_string()}, indent},
-                OutputCard{card: ParserCard::NetworkName(short_specs.name.to_string()), indent},
-                OutputCard{card: ParserCard::SpecVersion(network_version.to_string()), indent},
+                OutputCard{card: ParserCard::NetworkNameVersion{name: short_specs.name.to_string(), version: network_version.to_string()}, indent},
                 OutputCard{card: ParserCard::TxVersion(ext.tx_version.to_string()), indent},
                 OutputCard{card: ParserCard::BlockHash(ext.block_hash), indent},
             ];

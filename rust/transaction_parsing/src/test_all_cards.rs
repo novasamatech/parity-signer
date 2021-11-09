@@ -49,10 +49,9 @@ pub fn make_all_cards() -> String {
     all_cards.push(Card::ParserCard(&ParserCard::Era(Era::Immortal)).card(&mut index,0));
     all_cards.push(Card::ParserCard(&ParserCard::Era(Era::Mortal(64, 31))).card(&mut index,0));
     all_cards.push(Card::ParserCard(&ParserCard::Nonce("15".to_string())).card(&mut index,0));
-    all_cards.push(Card::ParserCard(&ParserCard::NetworkName(network_specs_westend.name.to_string())).card(&mut index,0));
     all_cards.push(Card::ParserCard(&ParserCard::BlockHash(hex::decode("a8dfb73a4b44e6bf84affe258954c12db1fe8e8cf00b965df2af2f49c1ec11cd").expect("checked value").try_into().expect("checked value"))).card(&mut index,0));
     all_cards.push(Card::ParserCard(&ParserCard::Tip{number: "0".to_string(), units: "pWND".to_string()}).card(&mut index,0));
-    all_cards.push(Card::ParserCard(&ParserCard::SpecVersion("9110".to_string())).card(&mut index,0));
+    all_cards.push(Card::ParserCard(&ParserCard::NetworkNameVersion{name: "westend".to_string(), version: "9110".to_string()}).card(&mut index,0));
     all_cards.push(Card::ParserCard(&ParserCard::TxVersion("5".to_string())).card(&mut index,0));
     
     all_cards.push(Card::Author{base58_author: "5FHneW46xGXgs5mUiveU4sbTyGBzmstUspZC92UhjJM694ty", seed_name: "Alice", path: "//Alice", has_pwd: false, name: ""}.card(&mut index,0));

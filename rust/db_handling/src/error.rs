@@ -29,6 +29,7 @@ pub enum Error {
     EncryptionMismatchId,
     EncryptionMismatchNetwork,
     DeadVerifier,
+    PageOutOfRange{given_page_number: u32, total_page_number: u32},
 }
 
 #[derive(PartialEq)]
@@ -163,6 +164,7 @@ impl Error {
             Error::EncryptionMismatchId => anyhow!("Identity encryption algorithm not matching network encryption algorithm"),
             Error::EncryptionMismatchNetwork => anyhow!("Encryption algorithm from network specs not matching the one from network key"),
             Error::DeadVerifier => anyhow!("Network is locked. Wipe clean and reset Signer to be able to re-install this network"),
+            Error::PageOutOfRange{given_page_number, total_page_number} => anyhow!("Requested history page {} does not exist. Total number of pages {}.", given_page_number, total_page_number),
         }
     }
 }

@@ -1,6 +1,7 @@
 use anyhow;
 use definitions::crypto::Encryption;
-use db_handling::db_transactions::TrDbColdSign;
+use db_handling::db_transactions::{TrDbColdSign, SignContent};
+use parity_scale_codec::Encode;
 use qrcode_static::png_qr_from_string;
 use zeroize::Zeroize;
 
@@ -20,22 +21,29 @@ pub (crate) fn create_signature (seed_phrase: &str, pwd_entry: &str, user_commen
         Ok((_, a)) => a,
         Err(_) => return Err(Error::AddressKeyDecoding.show()),
     };
+    let content_vec = match sign.content() {
+        SignContent::Transaction(a) => a.to_vec(),
+        SignContent::Message(a) => a.encode(),
+    };
     let mut full_address = seed_phrase.to_owned() + &sign.path();
-    let hex_signature = match sign_as_address_key(&sign.transaction(), sign.address_key(), &full_address, pwd) {
-        Ok(s) => hex::encode(s),
+    match sign_as_address_key(&content_vec, sign.address_key(), &full_address, pwd) {
+        Ok(s) => {
+            full_address.zeroize();
+            let hex_signature = hex::encode(s);
+            sign.apply(false, user_comment, &database_name)?;
+            match encryption {
+                Encryption::Ed25519 => Ok(format!("00{}", hex_signature)),
+                Encryption::Sr25519 => Ok(format!("01{}", hex_signature)),
+                Encryption::Ecdsa => Ok(format!("02{}", hex_signature)),
+            }
+        },
         Err(e) => {
+            full_address.zeroize();
             if e.to_string() == Error::CryptoError(CryptoError::WrongPassword).show().to_string() {
                 sign.apply(true, user_comment, &database_name)?;
             }
             return Err(e)
         },
-    };
-    full_address.zeroize();
-    sign.apply(false, user_comment, &database_name)?;
-    match encryption {
-        Encryption::Ed25519 => Ok(format!("00{}", hex_signature)),
-        Encryption::Sr25519 => Ok(format!("01{}", hex_signature)),
-        Encryption::Ecdsa => Ok(format!("02{}", hex_signature)),
     }
 }
 

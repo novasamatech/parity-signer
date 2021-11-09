@@ -16,6 +16,7 @@ pub (crate) enum Card <'a> {
     Meta(MetaValuesDisplay),
     TypesInfo(ContentLoadTypes),
     NewSpecs(&'a ChainSpecsToSend),
+    Message(&'a str),
     Warning (Warning <'a>),
     Error (Error),
 }
@@ -81,10 +82,9 @@ impl <'a> Card <'a> {
                     Era::Mortal(period, phase)  => fancy(index, indent, "era", &format!("{{\"era\":\"Mortal\",\"phase\":\"{}\",\"period\":\"{}\"}}", phase, period)),
                 },
                 ParserCard::Nonce (nonce) => fancy(index, indent, "nonce", &format!("\"{}\"", nonce)),
-                ParserCard::NetworkName (network_name) => fancy(index, indent, "network", &format!("\"{}\"", network_name)),
                 ParserCard::BlockHash (block_hash) => fancy(index, indent, "block_hash", &format!("\"{}\"", hex::encode(block_hash))),
                 ParserCard::Tip {number, units} => fancy(index, indent, "tip", &format!("{{\"amount\":\"{}\",\"units\":\"{}\"}}", number, units)),
-                ParserCard::SpecVersion (x) => fancy(index, indent, "version", &format!("\"{}\"", x)),
+                ParserCard::NetworkNameVersion {name, version} => fancy(index, indent, "name_version", &format!("{{\"name\":\"{}\",\"version\":\"{}\"}}", name, version)),
                 ParserCard::TxVersion (x) => fancy(index, indent, "tx_version", &format!("\"{}\"", x)),
             },
             Card::Author {base58_author, seed_name, path, has_pwd, name} => fancy(index, indent, "author", &format!("{{\"base58\":\"{}\",\"seed\":\"{}\",\"derivation_path\":\"{}\",\"has_password\":{},\"name\":\"{}\"}}", base58_author, seed_name, path, has_pwd, name)),
@@ -94,6 +94,7 @@ impl <'a> Card <'a> {
             Card::Meta(x) => fancy(index, indent, "meta", &format!("{{{}}}", x.show())),
             Card::TypesInfo(x) => fancy(index, indent, "types_hash", &format!("\"{}\"", hex::encode(blake2b(32, &[], &x.store()).as_bytes()))),
             Card::NewSpecs(x) => fancy(index, indent, "new_specs", &format!("{{{}}}", x.show())),
+            Card::Message(x) => fancy(index, indent, "message", &format!("\"{}\"", hex::encode(x.as_bytes()))),
             Card::Warning (warn) => fancy(index, indent, "warning", &format!("\"{}\"", warn.show())),
             Card::Error (err) => fancy(index, indent, "error", &format!("\"{}\"", err.show())),
         }
