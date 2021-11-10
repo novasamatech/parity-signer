@@ -7,29 +7,22 @@
 
 import SwiftUI
 
-struct TCEraMortalNonce: View {
-    var eraMortalNonce: EraMortalNonce
+struct TCEraMortal: View {
+    var eraMortal: EraMortal
     var body: some View {
         HStack {
             Spacer()
             VStack {
                 Text("phase")
                     .foregroundColor(Color("AccentColor"))
-                Text(eraMortalNonce.phase)
+                Text(eraMortal.phase)
                     .foregroundColor(Color("textMainColor"))
             }
             Spacer()
             VStack {
                 Text("period")
                     .foregroundColor(Color("AccentColor"))
-                Text(eraMortalNonce.period)
-                    .foregroundColor(Color("textMainColor"))
-            }
-            Spacer()
-            VStack {
-                Text("nonce")
-                    .foregroundColor(Color("AccentColor"))
-                Text(eraMortalNonce.nonce)
+                Text(eraMortal.period)
                     .foregroundColor(Color("textMainColor"))
             }
             Spacer()

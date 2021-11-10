@@ -1,21 +1,21 @@
 //
-//  TCEraImmortalNonce.swift
+//  TCNameVersion.swift
 //  NativeSigner
 //
-//  Created by Alexander Slesarev on 16.8.2021.
+//  Created by Alexander Slesarev on 10.11.2021.
 //
 
 import SwiftUI
 
-struct TCEraImmortalNonce: View {
-    var eraImmortalNonce: EraImmortalNonce
+struct TCNameVersion: View {
+    let value: NameVersion
     var body: some View {
         HStack {
             Spacer()
             VStack {
-                Text("nonce")
+                Text(value.name)
                     .foregroundColor(Color("AccentColor"))
-                Text(eraImmortalNonce.nonce)
+                Text(value.version)
                     .foregroundColor(Color("textMainColor"))
             }
             Spacer()
@@ -25,9 +25,9 @@ struct TCEraImmortalNonce: View {
 }
 
 /*
-struct TCEraImmortalNonce_Previews: PreviewProvider {
+struct TCNameVersion_Previews: PreviewProvider {
     static var previews: some View {
-        TCEraImmortalNonce()
+        TCNameVersion()
     }
 }
 */

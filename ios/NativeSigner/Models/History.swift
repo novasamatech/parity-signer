@@ -227,7 +227,7 @@ func recoverTransaction(transaction: String) -> [TransactionCard] {
     cards.append(contentsOf: (transactionPreview.types_info ?? []))
     cards.append(contentsOf: (transactionPreview.author ?? []))
     cards.append(contentsOf: (transactionPreview.error ?? []))
-    cards.append(contentsOf: (transactionPreview.extrinsics ?? []))
+    cards.append(contentsOf: (transactionPreview.extensions ?? []))
     cards.append(contentsOf: (transactionPreview.method ?? []))
     cards.append(contentsOf: (transactionPreview.new_specs ?? []))
     cards.append(contentsOf: (transactionPreview.verifier ?? []))

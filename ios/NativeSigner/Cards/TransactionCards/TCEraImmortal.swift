@@ -1,22 +1,19 @@
 //
-//  TCTXSpec.swift
+//  TCEraImmortalNonce.swift
 //  NativeSigner
 //
-//  Created by Alexander Slesarev on 17.8.2021.
+//  Created by Alexander Slesarev on 16.8.2021.
 //
 
 import SwiftUI
 
-struct TCTXSpec: View {
-    let value: String
+struct TCEraImmortal: View {
     var body: some View {
         HStack {
             Spacer()
             VStack {
-                Text("network")
+                Text("Immortal")
                     .foregroundColor(Color("AccentColor"))
-                Text(value)
-                    .foregroundColor(Color("textMainColor"))
             }
             Spacer()
         }
@@ -25,9 +22,9 @@ struct TCTXSpec: View {
 }
 
 /*
-struct TCTXSpec_Previews: PreviewProvider {
+struct TCEraImmortalNonce_Previews: PreviewProvider {
     static var previews: some View {
-        TCTXSpec()
+        TCEraImmortalNonce()
     }
 }
 */

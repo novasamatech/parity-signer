@@ -30,10 +30,10 @@ struct TransactionCardSelector: View {
             Text(text).foregroundColor(Color("textMainColor"))
         case .enumVariantName(let value):
             TCEnumVariantName(value: value)
-        case .eraImmortalNonce(let eraImmortalNonce):
-            TCEraImmortalNonce(eraImmortalNonce: eraImmortalNonce)
-        case .eraMortalNonce(let eraMortalNonce):
-            TCEraMortalNonce(eraMortalNonce: eraMortalNonce)
+        case .eraImmortal:
+            TCEraImmortal()
+        case .eraMortal(let eraMortal):
+            TCEraMortal(eraMortal: eraMortal)
         case .error(let text):
             TCError(text: text)
         case .fieldName(let value):
@@ -47,8 +47,12 @@ struct TransactionCardSelector: View {
         case .meta(let value):
             Text(String(describing: value))
                 .foregroundColor(Color("textMainColor"))
+        case .nameVersion(let value):
+            TCNameVersion(value: value)
         case .newSpecs(let value):
             TCNewSpecs(value: value)
+        case .nonce(let text):
+            Text("Nonce: " + text)
         case .none:
             EmptyView()
         case .pallet(let text):
@@ -72,6 +76,10 @@ struct TransactionCardSelector: View {
             TCVerifier(value: value)
         case .warning(let text):
             TCWarning(text: text)
+        case .networkGenesisHash(let text):
+            Text("Genesis hash: " + text)
+        case .networkName(let text):
+            Text("Network name: " + text)
         }
     }
 }
