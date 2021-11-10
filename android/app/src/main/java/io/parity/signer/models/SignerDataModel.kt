@@ -359,8 +359,8 @@ class SignerDataModel : ViewModel() {
 			val typesInfo =
 				transactionObject.optJSONArray("types_info") ?: JSONArray()
 			val method = (transactionObject.optJSONArray("method") ?: JSONArray())
-			val extrinsics =
-				(transactionObject.optJSONArray("extrinsics") ?: JSONArray())
+			val extensions =
+				(transactionObject.optJSONArray("extensions") ?: JSONArray())
 			val newSpecs = (transactionObject.optJSONArray("new_specs") ?: JSONArray())
 			val verifier = (transactionObject.optJSONArray("verifier") ?: JSONArray())
 			action = transactionObject.optJSONObject("action") ?: JSONObject()
@@ -377,7 +377,7 @@ class SignerDataModel : ViewModel() {
 						error,
 						typesInfo,
 						method,
-						extrinsics,
+						extensions,
 						newSpecs,
 						verifier
 					)

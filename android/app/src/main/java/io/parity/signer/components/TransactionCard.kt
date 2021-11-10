@@ -15,6 +15,7 @@ import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.unit.dp
 import io.parity.signer.components.TransactionCards.*
 import io.parity.signer.models.SignerDataModel
+import io.parity.signer.models.decodeHex
 import org.json.JSONObject
 
 @Composable
@@ -48,6 +49,9 @@ fun TransactionCard(card: JSONObject, signerDataModel: SignerDataModel) {
 			}
 			"Id" -> {
 				TCID(card.getString("payload"), signerDataModel)
+			}
+			"text" -> {
+				Text(String(card.getString("payload").decodeHex()))
 			}
 			"tip" -> {
 				TCTip(card.getJSONObject("payload"))

@@ -13,6 +13,11 @@ fun String.decodeHex(): ByteArray {
 	return chunked(2).map { it.toInt(16).toByte() }.toByteArray()
 }
 
+/**
+ * Replace middle of long string with "..."
+ * length: number of symbols to keep on either side
+ * if message is too short, does not modify it
+ */
 fun String.abbreviateString(length: Int): String {
 	return if (this.length > length*2) {
 		this.substring(0, length) + "..." + this.substring(this.length - length, this.length)

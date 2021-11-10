@@ -555,7 +555,7 @@ fn process_fields (fields: &[Field<PortableForm>], possible_ext: &mut Option<&mu
         match x.name() {
             Some(field_name) => {
                 fancy_out.push(OutputCard{card: ParserCard::FieldName{name: field_name.to_string(), docs_field_name: field_docs, path_type: path_type, docs_type: docs_type}, indent});
-                if field_name == "remark" {field_is_str = true;}
+                if (field_name == "remark")||(field_name == "remark_with_event") {field_is_str = true;}
             },
             None => {
                 if fields.len()>1 {
