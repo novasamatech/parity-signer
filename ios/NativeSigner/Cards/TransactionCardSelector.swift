@@ -53,6 +53,8 @@ struct TransactionCardSelector: View {
             EmptyView()
         case .pallet(let text):
             TCPallet(text: text)
+        case .text(let text):
+            TCText(text: text)
         case .tip(let value):
             TCTip(value: value)
         case .tipPlain(let text):

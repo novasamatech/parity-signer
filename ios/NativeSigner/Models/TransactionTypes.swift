@@ -29,6 +29,7 @@ enum Card {
     case newSpecs(NewSpecs)
     case none
     case pallet(String)
+    case text(String)
     case tip(Currency)
     case tipPlain(String)
     case txSpec(TxSpec)
@@ -232,6 +233,8 @@ struct TransactionCard: Decodable {
             card = .identityField(content)
         case "pallet":
             card = .pallet(content)
+        case "text":
+            card = .text(content)
         case "tip_plain":
             card = .tipPlain(content)
         case "types_hash":
