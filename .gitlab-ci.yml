@@ -21,7 +21,7 @@ workflow:
 
 android-build-release:
   stage:                           build
-  image:                           paritytech/parity-signer:latest
+  image:                           paritytech/signer-android-builder:latest
   rules:
     - if: $CI_PIPELINE_SOURCE == "web"
     - if: $CI_PIPELINE_SOURCE == "schedule"
@@ -32,8 +32,8 @@ android-build-release:
     paths:
       - signer-app-release-signed.apk
   script:
-    - cat "$KEYSTORE_DATA" | base64 -d > /tmp/gitlab-ci.keystore
-    - wc /tmp/gitlab-ci.keystore
-    - ./scripts/build-release.sh /tmp/gitlab-ci.keystore "$KEYSTORE_ALIAS" "$KEYSTORE_PASS"
+    - scripts/build.sh android
+    - cd android; ./gradlew assembleRelease
+      # - ./scripts/build-release.sh /tmp/gitlab-ci.keystore "$KEYSTORE_ALIAS" "$KEYSTORE_PASS"
   tags:
     - linux-docker
