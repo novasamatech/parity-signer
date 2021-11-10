@@ -178,7 +178,10 @@ struct TransactionCard: Decodable {
             return
         case "era":
             do {card = .eraMortal(try values.decode(EraMortal.self, forKey: .payload))}
-            catch {card = .eraImmortal}
+            catch {
+                card = .eraImmortal
+                return
+            }
             return
         case "field_name":
             card = .fieldName(try values.decode(FieldName.self, forKey: .payload))
@@ -191,6 +194,7 @@ struct TransactionCard: Decodable {
             return
         case "name_version":
             card = .nameVersion(try values.decode(NameVersion.self, forKey: .payload))
+            return
         case "new_specs":
             card = .newSpecs(try values.decode(NewSpecs.self, forKey: .payload))
             return

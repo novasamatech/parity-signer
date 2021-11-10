@@ -13,7 +13,7 @@ struct TCTXSpec: View {
         HStack {
             Spacer()
             VStack {
-                Text("network")
+                Text("TX version")
                     .foregroundColor(Color("AccentColor"))
                 Text(value)
                     .foregroundColor(Color("textMainColor"))
