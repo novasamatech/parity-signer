@@ -1,6 +1,7 @@
 use db_handling::db_transactions::{TrDbColdSign, SignContent};
 use definitions::keyring::{AddressKey, NetworkSpecsKey};
 use parity_scale_codec::Decode;
+use parser::cards::ParserCard;
 
 use crate::cards::{Action, Card, Warning};
 use crate::error::{Error, BadInputData, DatabaseError};
@@ -32,7 +33,7 @@ pub fn process_message (data_hex: &str, dbname: &str) -> Result<String, Error> {
                 Some(address_details) => {
                     let author_card = Card::Author{base58_author: &author, seed_name: &address_details.seed_name, path: &address_details.path, has_pwd: address_details.has_pwd, name: &address_details.name}.card(&mut index, indent);
                     if address_details.network_id.contains(&network_specs_key) {
-                        let message_card = Card::Message(&message).card(&mut index, indent);
+                        let message_card = Card::ParserCard(&ParserCard::Text(message.to_string())).card(&mut index, indent);
                         let network_card = Card::NetworkName(&network_specs.name).card(&mut index, indent);
                         let sign = TrDbColdSign::generate(SignContent::Message(message), &network_specs.name, &address_details.path, address_details.has_pwd, &address_key, Vec::new());
                         let checksum = sign_store_and_get_checksum (sign, &dbname)?;
@@ -41,7 +42,7 @@ pub fn process_message (data_hex: &str, dbname: &str) -> Result<String, Error> {
                     }
                     else {
                         let warning_card = Card::Warning(Warning::NoNetworkID).card(&mut index, indent);
-                        let message_card = Card::Message(&message).card(&mut index, indent);
+                        let message_card = Card::ParserCard(&ParserCard::Text(message.to_string())).card(&mut index, indent);
                         let network_card = Card::NetworkName(&network_specs.name).card(&mut index, indent);
                         Ok(format!("{{\"author\":[{}],\"warning\":[{}],\"message\":[{},{}]}}", author_card, warning_card, message_card, network_card))
                     }
@@ -49,7 +50,7 @@ pub fn process_message (data_hex: &str, dbname: &str) -> Result<String, Error> {
                 None => {
                     let author_card = Card::AuthorPlain(&author).card(&mut index, indent);
                     let warning_card = Card::Warning(Warning::AuthorNotFound).card(&mut index, indent);
-                    let message_card = Card::Message(&message).card(&mut index, indent);
+                    let message_card = Card::ParserCard(&ParserCard::Text(message.to_string())).card(&mut index, indent);
                     let network_card = Card::NetworkName(&network_specs.name).card(&mut index, indent);
                     Ok(format!("{{\"author\":[{}],\"warning\":[{}],\"message\":[{},{}]}}", author_card, warning_card, message_card, network_card))
                 }
@@ -58,7 +59,7 @@ pub fn process_message (data_hex: &str, dbname: &str) -> Result<String, Error> {
         None => {
             let author_card = Card::AuthorPublicKey{author_public_key, encryption}.card(&mut index, indent);
             let error_card = Card::Error(Error::DatabaseError(DatabaseError::NoNetwork)).card(&mut index, indent);
-            let message_card = Card::Message(&message).card(&mut index, indent);
+            let message_card = Card::ParserCard(&ParserCard::Text(message.to_string())).card(&mut index, indent);
             let network_card = Card::NetworkGenesisHash(&genesis_hash_vec).card(&mut index, indent);
             Ok(format!("{{\"author\":[{}],\"error\":[{}],\"message\":[{},{}]}}", author_card, error_card, message_card, network_card))
         },

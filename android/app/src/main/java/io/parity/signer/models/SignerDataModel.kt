@@ -346,6 +346,10 @@ class SignerDataModel : ViewModel() {
 
 	//MARK: Transaction utils begin
 
+	/**
+	 * Send scanned QR to backend and rearrange cards nicely
+	 * We should probably simplify this once UI development is done
+	 */
 	fun parseTransaction() {
 		_transactionState.value = TransactionState.Parsing
 		try {

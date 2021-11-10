@@ -74,7 +74,7 @@ Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deseru
     all_cards.push(Card::Meta(MetaValuesDisplay::get(&MetaValues{name: String::from("westend"), version: 9100, meta: Vec::new()})).card(&mut index,0));
     all_cards.push(Card::TypesInfo(ContentLoadTypes::generate(&Vec::new())).card(&mut index,0));
     all_cards.push(Card::NewSpecs(&network_specs_westend).card(&mut index,0));
-    all_cards.push(Card::Message("Hello!").card(&mut index,0));
+//    all_cards.push(Card::Message("Hello!").card(&mut index,0));
     all_cards.push(Card::NetworkName("westend").card(&mut index,0));
     all_cards.push(Card::NetworkGenesisHash(&network_specs_westend.genesis_hash.to_vec()).card(&mut index,0));
 
