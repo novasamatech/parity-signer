@@ -23,3 +23,7 @@ anyhow = "1.0.42"
 zeroize = "1.4.2"
 blake2-rfc = "0.2.18"
 
+
+[lib]
+name = "transaction_signing"
+crate-type = ["lib"]

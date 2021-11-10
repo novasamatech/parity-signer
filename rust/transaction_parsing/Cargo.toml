@@ -28,3 +28,6 @@ definitions = {path = "../definitions"}
 meta_reading = {path = "../meta_reading"}
 parser = {path = "../parser"}
 
+[lib]
+name = "transaction_parsing"
+crate-type = ["lib"]

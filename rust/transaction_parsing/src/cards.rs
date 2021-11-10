@@ -71,6 +71,7 @@ impl <'a> Card <'a> {
                 ParserCard::Method {method_name, docs} => fancy(index, indent, "method", &format!("{{\"method_name\":\"{}\",\"docs\":\"{}\"}}", method_name, hex::encode(docs.as_bytes()))),
                 ParserCard::Varname (varname) => fancy(index, indent, "varname", &format!("\"{}\"", varname)),
                 ParserCard::Default (decoded_string) => fancy(index, indent, "default", &format!("\"{}\"", decoded_string)),
+                ParserCard::Text (decoded_text) => fancy(index, indent, "text", &format!("\"{}\"", hex::encode(decoded_text.as_bytes()))),
                 ParserCard::Id (base58_id) => fancy(index, indent, "Id", &format!("\"{}\"", base58_id)),
                 ParserCard::None => fancy(index, indent, "none", "\"\""),
                 ParserCard::IdentityField (variant) => fancy(index, indent, "identity_field", &format!("\"{}\"", variant)),

@@ -1,9 +1,9 @@
 use anyhow;
+use blake2_rfc::blake2b::blake2b;
 use db_handling::db_transactions::{TrDbColdSign, SignContent};
 use parity_scale_codec::Encode;
 use qrcode_static::png_qr_from_string;
 use zeroize::Zeroize;
-use blake2_rfc::blake2b::blake2b;
 
 use crate::sign_message::sign_as_address_key;
 use crate::error::{Error, CryptoError};
@@ -21,15 +21,13 @@ pub (crate) fn create_signature (seed_phrase: &str, pwd_entry: &str, user_commen
         SignContent::Transaction{method, extensions} => [method.to_vec(), extensions.to_vec()].concat(),
         SignContent::Message(a) => a.encode(),
     };
-
-    //For larger transactions, their hash should be signed instead; this is not implemented
-    //upstream so we put it here
+    
+// For larger transactions, their hash should be signed instead; this is not implemented
+// upstream so we put it here
     let content_vec = {
-        if content_vec.len() > 257 {
-            blake2b(32, &[], &content_vec).as_bytes().to_vec()
-        } else { content_vec }
+        if content_vec.len() > 257 {blake2b(32, &[], &content_vec).as_bytes().to_vec()}
+        else {content_vec}
     };
-
     let mut full_address = seed_phrase.to_owned() + &sign.path();
     match sign_as_address_key(&content_vec, sign.address_key(), &full_address, pwd) {
         Ok(s) => {

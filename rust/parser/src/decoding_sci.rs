@@ -160,7 +160,7 @@ fn decode_str(data: &Vec<u8>, indent: u32) -> Result<DecodedOut, ParserError> {
                         Ok(b) => b,
                         Err(_) => return Err(ParserError::Decoding(DecodingError::PrimitiveFailure("str".to_string()))),
                     };
-                    let fancy_out = vec![OutputCard{card: ParserCard::Default(text), indent}];
+                    let fancy_out = vec![OutputCard{card: ParserCard::Text(text), indent}];
                     let remaining_vector = data[start+str_length..].to_vec();
                     Ok(DecodedOut {
                         remaining_vector,
@@ -173,7 +173,7 @@ fn decode_str(data: &Vec<u8>, indent: u32) -> Result<DecodedOut, ParserError> {
         None => {
             if str_length != 0 {return Err(ParserError::Decoding(DecodingError::DataTooShort))}
             else {
-                let fancy_out = vec![OutputCard{card: ParserCard::Default(String::new()), indent}];
+                let fancy_out = vec![OutputCard{card: ParserCard::Text(String::new()), indent}];
                 let remaining_vector = Vec::new();
                 Ok(DecodedOut {
                     remaining_vector,
@@ -543,6 +543,7 @@ fn decode_type_def_variant (found_ty: &TypeDefVariant<PortableForm>, possible_ex
 
 fn process_fields (fields: &[Field<PortableForm>], possible_ext: &mut Option<&mut Ext>, call_expectation: &CallExpectation, compact_flag: bool, mut balance_flag: bool, mut data: Vec<u8>, meta_v14: &RuntimeMetadataV14, indent: u32, short_specs: &ShortSpecs) -> Result<DecodedOut, ParserError> {
     let mut indent_skipped = false;
+    let mut field_is_str = false;
     let mut fancy_out: Vec<OutputCard> = Vec::new();
     for (i, x) in fields.iter().enumerate() {
         let mut field_docs = String::new();
@@ -554,6 +555,7 @@ fn process_fields (fields: &[Field<PortableForm>], possible_ext: &mut Option<&mu
         match x.name() {
             Some(field_name) => {
                 fancy_out.push(OutputCard{card: ParserCard::FieldName{name: field_name.to_string(), docs_field_name: field_docs, path_type: path_type, docs_type: docs_type}, indent});
+                if field_name == "remark" {field_is_str = true;}
             },
             None => {
                 if fields.len()>1 {
@@ -570,7 +572,10 @@ fn process_fields (fields: &[Field<PortableForm>], possible_ext: &mut Option<&mu
             if indent_skipped {indent}
             else {indent+1}
         };
-        let after_run = decoding_sci_complete(&inner_type, possible_ext, compact_flag, balance_flag, call_expectation, data, meta_v14, indent, short_specs)?;
+        let after_run = {
+            if field_is_str {decode_str(&data, indent)?}
+            else {decoding_sci_complete(&inner_type, possible_ext, compact_flag, balance_flag, call_expectation, data, meta_v14, indent, short_specs)?}
+        };
         fancy_out.extend_from_slice(&after_run.fancy_out);
         data = after_run.remaining_vector;
     }
