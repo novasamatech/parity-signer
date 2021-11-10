@@ -2,8 +2,7 @@ use sled::{Db, Tree, Batch, open, IVec};
 use anyhow;
 use constants::{DANGER, GENERALVERIFIER, SETTREE, VERIFIERS};
 use definitions::{crypto::Encryption, danger::DangerRecord, metadata::VersionDecoded, keyring::{AddressKey, NetworkSpecsKey, VerifierKey}, network_specs::{ChainSpecs, CurrentVerifier, Verifier}, users::{AddressDetails}};
-use frame_metadata::RuntimeMetadata;
-use meta_reading::decode_metadata::{get_meta_const, get_meta_const_light};
+use meta_reading::decode_metadata::{get_meta_const};
 use parity_scale_codec::{Decode, Encode};
 
 use crate::error::{Error, NotDecodeable, NotFound, NotHex};
@@ -93,28 +92,6 @@ pub fn check_metadata(meta: Vec<u8>, network_name: &str, network_version: u32) -
     if version.specname != network_name {return Err(Error::MetadataNameMismatch.show())}
     if version.spec_version != network_version {return Err(Error::MetadataVersionMismatch.show())}
     Ok(meta)
-}
-
-/// Function to check metadata vector from the database, and output if it's ok
-pub fn decode_and_check_metadata(meta: Vec<u8>, network_name: &str, network_version: u32) -> anyhow::Result<RuntimeMetadata> {
-    if !meta.starts_with(&vec![109, 101, 116, 97]) {return Err(Error::Placeholder.show())}
-    if meta[4] < 12 { return Err(Error::Placeholder.show())}
-    
-    let metadata = match RuntimeMetadata::decode(&mut &meta[4..]) {
-        Ok(x) => x,
-        Err(_) => return Err(Error::Placeholder.show()),
-    };
-    let version_vector = match get_meta_const_light(&metadata) {
-        Ok(a) => a,
-        Err(_) => return Err(Error::NotDecodeable(NotDecodeable::Metadata).show()),
-    };
-    let version = match VersionDecoded::decode(&mut &version_vector[..]) {
-        Ok(a) => a,
-        Err(_) => return Err(Error::NotDecodeable(NotDecodeable::Version).show()),
-    };
-    if version.specname != network_name {return Err(Error::MetadataNameMismatch.show())}
-    if version.spec_version != network_version {return Err(Error::MetadataVersionMismatch.show())}
-    Ok(metadata)
 }
 
 /// Function to find encryption algorithm corresponding to network with known network key

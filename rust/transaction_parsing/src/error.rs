@@ -1,5 +1,5 @@
 use sled;
-use definitions::{keyring::{NetworkSpecsKey, VerifierKey}, network_specs::Verifier};
+use definitions::{crypto::Encryption, keyring::{NetworkSpecsKey, VerifierKey}, network_specs::Verifier};
 use parser::error::ParserError;
 
 #[derive(PartialEq)]
@@ -61,6 +61,12 @@ pub enum DatabaseError {
     VersionNotDecodeable,
     UnableToDecodeMeta,
     RuntimeVersionIncompatible,
+    EntryByOrder,
+    TwoTransInEntry(u32),
+    NoTransEvents(u32),
+    SpecsCollision{name: String, encryption: Encryption},
+    HistoryMissingNetworkSpecs{name: String, encryption: Encryption},
+    HistoryNoMetaAtAll,
 }
 
 #[derive(PartialEq)]
@@ -139,6 +145,12 @@ impl Error {
                     DatabaseError::VersionNotDecodeable => String::from("Version block of metadata in storage could not be decoded."),
                     DatabaseError::UnableToDecodeMeta => String::from("Metadata in storage could not be decoded."),
                     DatabaseError::RuntimeVersionIncompatible => String::from("Metadata runtime version in database is not v12, v13, or v14."),
+                    DatabaseError::EntryByOrder => String::from("Unable to get history entry by given order."),
+                    DatabaseError::TwoTransInEntry(x) => format!("Entry with order {} contains more than one transaction-related event. This should not be possible in current Signer and likely indicates database corruption.", x),
+                    DatabaseError::NoTransEvents(x) => format!("Entry with order {} contains no transaction-related events.", x),
+                    DatabaseError::SpecsCollision{name, encryption} => format!("There are more than one entry for network specs containing name {} and encryption {}.", name, encryption.show()),
+                    DatabaseError::HistoryMissingNetworkSpecs{name, encryption} => format!("Network specs for {} with encryption {} that are needed to decode historical transaction not found.", name, encryption.show()),
+                    DatabaseError::HistoryNoMetaAtAll => String::from("Decoding historical transaction is not possible. No metadata remaining on file for this network."),
                 };
                 format!("Database error. {}", insert)
             },

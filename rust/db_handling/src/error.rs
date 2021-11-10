@@ -31,10 +31,7 @@ pub enum Error {
     EncryptionMismatchNetwork,
     DeadVerifier,
     PageOutOfRange{given_page_number: u32, total_page_number: u32},
-    TwoTransInEntry(u32),
-    NoTransEvents(u32),
     SpecsHistoricalDecoding{network_name: String, encryption: Encryption},
-    Placeholder,
 }
 
 #[derive(PartialEq)]
@@ -172,10 +169,7 @@ impl Error {
             Error::EncryptionMismatchNetwork => anyhow!("Encryption algorithm from network specs not matching the one from network key"),
             Error::DeadVerifier => anyhow!("Network is locked. Wipe clean and reset Signer to be able to re-install this network"),
             Error::PageOutOfRange{given_page_number, total_page_number} => anyhow!("Requested history page {} does not exist. Total number of pages {}.", given_page_number, total_page_number),
-            Error::TwoTransInEntry(x) => anyhow!("Entry with order {} contains more than one transaction-related event. This should not be possible in current Signer and likely indicates database corruption.", x),
-            Error::NoTransEvents(x) => anyhow!("Entry with order {} contains no transaction-related events.", x),
             Error::SpecsHistoricalDecoding{network_name, encryption} => anyhow!("Historical transaction could not be decoded. Missing network specs for {}, encryption {}.", network_name, encryption.show()),
-            Error::Placeholder => anyhow!("Placeholder error. Should not be here."),
         }
     }
 }

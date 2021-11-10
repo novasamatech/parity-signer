@@ -47,6 +47,10 @@ pub fn make_all_cards() -> String {
     all_cards.push(Card::ParserCard(&ParserCard::Method{method_name: "test_method".to_string(), docs: "verbose \ndescription \nof \nthe \nmethod".to_string()}).card(&mut index,0));
     all_cards.push(Card::ParserCard(&ParserCard::Varname("test_Varname".to_string())).card(&mut index,0));
     all_cards.push(Card::ParserCard(&ParserCard::Default("12345".to_string())).card(&mut index,0));
+    all_cards.push(Card::ParserCard(&ParserCard::Text("Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
+Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
+Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.
+Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.".to_string())).card(&mut index,0));
     all_cards.push(Card::ParserCard(&ParserCard::Id("5FHneW46xGXgs5mUiveU4sbTyGBzmstUspZC92UhjJM694ty".to_string())).card(&mut index,0));
     all_cards.push(Card::ParserCard(&ParserCard::None).card(&mut index,0));
     all_cards.push(Card::ParserCard(&ParserCard::IdentityField("Twitter".to_string())).card(&mut index,0));

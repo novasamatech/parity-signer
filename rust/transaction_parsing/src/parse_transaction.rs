@@ -1,10 +1,10 @@
-use db_handling::db_transactions::{TrDbColdSign, SignContent};
+use db_handling::{db_transactions::{TrDbColdSign, SignContent}, manage_history::get_history_entry_by_order};
 use definitions::{history::Event, keyring::{AddressKey, NetworkSpecsKey}, users::AddressDetails};
 use parser::{parse_set, error::ParserError, decoding_commons::OutputCard};
 
 use crate::cards::{Action, Card, Warning};
 use crate::error::{Error, DatabaseError};
-use crate::helpers::{author_encryption_msg_genesis, checked_address_details, checked_network_specs, find_meta_set, bundle_from_meta_set_element, sign_store_and_get_checksum};
+use crate::helpers::{author_encryption_msg_genesis, checked_address_details, checked_network_specs, find_meta_set, bundle_from_meta_set_element, sign_store_and_get_checksum, specs_by_name};
 
 /// Transaction payload in hex format as it arrives into parsing program contains following elements:
 /// - prelude, length 6 symbols ("53" stands for substrate, ** - crypto type, 00 or 02 - transaction type),
@@ -28,7 +28,7 @@ enum CardsPrep {
 /// i.e. it starts with 53****, followed by author address, followed by actual transaction piece,
 /// followed by extrinsics, concluded with chain genesis hash
 
-pub fn parse_transaction (data_hex: &str, dbname: &str) -> Result<String, Error> {
+pub (crate) fn parse_transaction (data_hex: &str, dbname: &str) -> Result<String, Error> {
 
     let (author_public_key, encryption, parser_data, genesis_hash_vec) = author_encryption_msg_genesis(data_hex)?;
     let network_specs_key = NetworkSpecsKey::from_parts(&genesis_hash_vec, &encryption);
@@ -136,4 +136,68 @@ fn into_cards (set: &Vec<OutputCard>, index: &mut u32) -> String {
         out.push_str(&Card::ParserCard(&x.card).card(index, x.indent));
     }
     out
+}
+
+pub fn decode_transaction_from_history (order: u32, database_name: &str) -> Result<String, Error> {
+    let entry = match get_history_entry_by_order(order, database_name) {
+        Ok(a) => a,
+        Err(_) => return Err(Error::DatabaseError(DatabaseError::EntryByOrder)),
+    };
+    let mut found_signable = None;
+    for x in entry.events.iter() {
+        match x {
+            Event::TransactionSigned(x) => {
+                found_signable = match found_signable {
+                    Some(_) => return Err(Error::DatabaseError(DatabaseError::TwoTransInEntry(order))),
+                    None => Some(x),
+                };
+            },
+            Event::TransactionSignError(x) => {
+                found_signable = match found_signable {
+                    Some(_) => return Err(Error::DatabaseError(DatabaseError::TwoTransInEntry(order))),
+                    None => Some(x),
+                };
+            },
+            _ => (),
+        }
+    }
+    let (parser_data, network_name, encryption) = match found_signable {
+        Some(a) => a.transaction_network_encryption(),
+        None => return Err(Error::DatabaseError(DatabaseError::NoTransEvents(order)))
+    };
+    
+    let short_specs = specs_by_name(&network_name, &encryption, &database_name)?.short();
+    let meta_set = find_meta_set(&network_name, &database_name)?;
+    if meta_set.len() == 0 {return Err(Error::DatabaseError(DatabaseError::HistoryNoMetaAtAll))}
+    
+    let mut found_solution = None;
+    let mut error_collection: Vec<(String, u32, ParserError)> = Vec::new();
+    let mut index = 0;
+    let indent = 0;
+    
+    for x in meta_set.iter() {
+        let used_version = x.version;
+        match parse_set(&parser_data, &bundle_from_meta_set_element(x, &database_name)?, &short_specs, None) {
+            Ok((method_cards_result, extensions_cards, _, _)) => {
+                match method_cards_result {
+                    Ok(a) => {
+                        let method = into_cards(&a, &mut index);
+                        let extensions = into_cards(&extensions_cards, &mut index);
+                        found_solution = Some(format!("{{\"method\":[{}],\"extensions\":[{}]}}", method, extensions));
+                    },
+                    Err(e) => {
+                        let method_error = Card::Error(Error::Parser(e)).card(&mut index, indent);
+                        let extensions = into_cards(&extensions_cards, &mut index);
+                        found_solution = Some(format!("{{\"error\":[{}],\"extensions\":[{}]}}", method_error, extensions));
+                    },
+                }
+                break;
+            },
+            Err(e) => error_collection.push((network_name.to_string(), used_version, e)),
+        }
+    }
+    match found_solution {
+        Some(a) => Ok(a),
+        None => return Err(Error::AllParsingFailed(error_collection))
+    }
 }

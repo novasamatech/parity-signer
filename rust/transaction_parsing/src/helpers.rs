@@ -53,6 +53,35 @@ pub (crate) fn checked_network_specs (network_specs_key: &NetworkSpecsKey, datab
     }
 }
 
+/// Function to get the network specs from the database
+/// by network name and encryption
+pub (crate) fn specs_by_name (network_name: &str, encryption: &Encryption, database_name: &str) -> Result<ChainSpecs, Error> {
+    let database = open_db(&database_name)?;
+    let chainspecs = open_tree(&database, SPECSTREE)?;
+    let mut found_network_specs = None;
+    for x in chainspecs.iter() {
+        if let Ok((network_specs_key_vec, encoded_network_specs)) = x {
+            match <ChainSpecs>::decode(&mut &encoded_network_specs[..]) {
+                Ok(a) => {
+                    let network_specs_key = NetworkSpecsKey::from_vec(&network_specs_key_vec.to_vec());
+                    if network_specs_key != NetworkSpecsKey::from_parts(&a.genesis_hash.to_vec(), &a.encryption) {return Err(Error::DatabaseError(DatabaseError::NetworkSpecsKeyMismatch (network_specs_key.to_owned())))}
+                    if (a.name == network_name)&&(&a.encryption == encryption) {
+                        match found_network_specs {
+                            Some(_) => return Err(Error::DatabaseError(DatabaseError::SpecsCollision{name: network_name.to_string(), encryption: encryption.to_owned()})),
+                            None => {found_network_specs = Some(a);},
+                        }
+                    }
+                },
+                Err(_) => return Err(Error::DatabaseError(DatabaseError::DamagedChainSpecs)),
+            }
+        }
+    }
+    match found_network_specs {
+        Some(a) => Ok(a),
+        None => return Err(Error::DatabaseError(DatabaseError::HistoryMissingNetworkSpecs{name: network_name.to_string(), encryption: encryption.to_owned()})),
+    }
+}
+
 /// Function to get the address details from the database or
 /// return None if no details are on record, with crate error (card)
 pub (crate) fn checked_address_details (address_key: &AddressKey, database_name: &str) -> Result<Option<AddressDetails>, Error> {
@@ -232,18 +261,7 @@ pub fn accept_meta_values (meta_values: &MetaValues, database_name: &str) -> Res
         Err(e) => return Err(Error::DatabaseError(DatabaseError::Internal(e))),
     }
 }
-/*
-/// Function to search for network_specs_key in chainspecs database tree
-pub fn get_chainspecs (network_specs_key: &NetworkSpecsKey, chainspecs: &Tree) -> Result<ChainSpecs, Error> {
-    match get_from_tree(&network_specs_key.key(), chainspecs)? {
-        Some(x) => match <ChainSpecs>::decode(&mut &x[..]) {
-            Ok(y) => Ok(y),
-            Err(_) => return Err(Error::DatabaseError(DatabaseError::DamagedChainSpecs)),
-        },
-        None => return Err(Error::DatabaseError(DatabaseError::NoNetwork)),
-    }
-}
-*/
+
 /// Function to check if the chaispecs are already in the database
 pub fn specs_are_new (network_specs: &ChainSpecsToSend, database_name: &str) -> Result<bool, Error> {
     let network_specs_key = NetworkSpecsKey::from_parts(&network_specs.genesis_hash.to_vec(), &network_specs.encryption);

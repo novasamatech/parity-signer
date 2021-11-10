@@ -1,6 +1,5 @@
 use constants::{DANGER, HISTORY, HISTORY_PAGE_SIZE};
-use definitions::{danger::DangerRecord, history::{Event, Entry}, network_specs::ShortSpecs};
-use parser::{parse_set, MetadataBundle};
+use definitions::{danger::DangerRecord, history::{Event, Entry}};
 use parity_scale_codec::{Decode, Encode};
 use anyhow;
 use chrono::Utc;
@@ -51,71 +50,7 @@ pub fn print_history_page(page_number: u32, database_name: &str) -> anyhow::Resu
     out.push_str("]");
     Ok(out)
 }
-/*
-pub fn decode_transaction_from_history (order: u32, database_name: &str) -> anyhow::Result<String> {
-    let entry = get_history_entry_by_order(order, database_name)?;
-    let mut found_signable = None;
-    for x in entry.events.iter() {
-        match x {
-            Event::TransactionSigned(x) => {
-                found_signable = match found_signable {
-                    Some(_) => return Err(Error::TwoTransInEntry.show()),
-                    None => Some(x),
-                };
-            },
-            Event::TransactionSignError(x) => {
-                found_signable = match found_signable {
-                    Some(_) => return Err(Error::TwoTransInEntry(order).show()),
-                    None => Some(x),
-                };
-            },
-            _ => (),
-        }
-    }
-    let (parser_vec, network_name, encryption) = match found_signable {
-        Some(a) => a.transaction_name_encryption(),
-        None => return Err(Error::NoTransEvents(order).show())
-    };
-    let all_network_specs = get_all_networks(database_name)?;
-    let mut found_short_specs = None;
-    for x in all_network_specs.iter {
-        if (x.encryption == encryption)&&(x.name == network_name) {
-            found_short_specs = Some(x.short());
-            break;
-        }
-    }
-    let short_specs = match found_short_specs {
-        Some(a) => a,
-        None => return Err(Error::SpecsHistoricalDecoding{network_name, encryption}.show()),
-    };
-    let mut meta_set: Vec<(u32, RuntimeMetadata)> = Vec::new();
-    {
-        let meta_key_prefix = MetaKeyPrefix::from_name(&network_name);
-        let database = open_db(&database_name)?;
-        let metadata = open_tree(&database, METATREE)?;
-        for x in metadata.scan_prefix(meta_key_prefix.prefix()) {
-            if let Ok((meta_key_vec, meta)) = x {
-                let (name, version) = match MetaKey::from_vec(&meta_key_vec.to_vec()).name_version() {
-                    Ok(a) => a,
-                    Err(_) => return Err(Error::NotDecodeable(NotDecodeable::NameVersioned).show()),
-                };
-                let metadata = decode_and_check_metadata(meta.to_vec(), &name, version)?;
-                meta_set.push((version, metadata));
-            }
-        }
-    }
-    let mut found_solution = None;
-    let mut error_collection: Vec<(String, u32, ParserError)> = Vec::new();
-    for x in meta_set.iter() {
-        let metadata_bundle = match meta_set_element.runtime_metadata {
-            RuntimeMetadata::V12(ref meta_v12) => Ok(MetadataBundle::Older{older_meta: OlderMeta::V12(&meta_v12), types: get_types (database_name)?, network_version: meta_set_element.version}),
-            RuntimeMetadata::V13(ref meta_v13) => Ok(MetadataBundle::Older{older_meta: OlderMeta::V13(&meta_v13), types: get_types (database_name)?, network_version: meta_set_element.version}),
-            RuntimeMetadata::V14(ref meta_v14) => Ok(MetadataBundle::Sci{meta_v14: &meta_v14, network_version: meta_set_element.version}),
-            _ => return Err(Error::Placeholder.show()),
-        };
-    }
-}
-*/
+
 fn get_history(database_name: &str) -> anyhow::Result<Vec<(Order, Entry)>> {
     let database = open_db(database_name)?;
     let history = open_tree(&database, HISTORY)?;
@@ -137,7 +72,7 @@ fn get_history(database_name: &str) -> anyhow::Result<Vec<(Order, Entry)>> {
     Ok(out)
 }
 
-fn get_history_entry_by_order(order: u32, database_name: &str) -> anyhow::Result<Entry> {
+pub fn get_history_entry_by_order(order: u32, database_name: &str) -> anyhow::Result<Entry> {
     let database = open_db(database_name)?;
     let history = open_tree(&database, HISTORY)?;
     let mut found = None;

@@ -13,7 +13,7 @@ mod load_types;
 mod message;
     use message::process_message;
 mod parse_transaction;
-    use parse_transaction::parse_transaction;
+    use parse_transaction::{parse_transaction, decode_transaction_from_history};
 pub mod test_all_cards;
     use test_all_cards::make_all_cards;
 mod tests;
@@ -51,6 +51,13 @@ fn handle_scanner_input (payload: &str, dbname: &str) -> Result<String, Error> {
 
 pub fn produce_output (payload: &str, dbname: &str) -> String {
     match handle_scanner_input (payload, dbname) {
+        Ok(out) => out,
+        Err(e) => format!("{{\"error\":[{}]}}", Card::Error(e).card(&mut 0,0)),
+    }
+}
+
+pub fn produce_historic_output (order: u32, dbname: &str) -> String {
+    match decode_transaction_from_history (order, dbname) {
         Ok(out) => out,
         Err(e) => format!("{{\"error\":[{}]}}", Card::Error(e).card(&mut 0,0)),
     }
