@@ -9,7 +9,7 @@ android {
 	defaultConfig {
 		applicationId "io.parity.signer"
 		minSdk 23
-		targetSdk 30
+		targetSdk 31
 		versionCode 4604
 		versionName "5.0.0-alpha"
 		ndk {
@@ -41,7 +41,6 @@ android {
 	}
 	composeOptions {
 		kotlinCompilerExtensionVersion compose_version
-		kotlinCompilerVersion '1.5.21'
 	}
 	packagingOptions {
 		pickFirst "lib/armeabi-v7a/libc++_shared.so"
