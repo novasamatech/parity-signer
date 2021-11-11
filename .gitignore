@@ -75,6 +75,8 @@ android/app/.project
 android/app/bin
 android/app/src/main/jniLibs
 android/app/src/main/assets/Database/*
+android/app/release
+android/app/debug
 
 # iOS
 ios/NativeSigner/Database/Database/*
