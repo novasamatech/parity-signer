@@ -30,8 +30,8 @@ import io.parity.signer.components.TopBar
 import io.parity.signer.screens.HistoryScreen
 
 class MainActivity : AppCompatActivity() {
-	private val REQUIRED_PERMISSIONS = arrayOf(Manifest.permission.CAMERA)
-	private val REQUEST_CODE_PERMISSIONS = 10
+
+
 
 	private val signerDataModel by viewModels<SignerDataModel>()
 
@@ -40,26 +40,14 @@ class MainActivity : AppCompatActivity() {
 		signerDataModel.context = applicationContext
 		signerDataModel.activity = this
 
-		//TODO: testing to make sure this goes smoothly
-		if (!allPermissionsGranted()) {
-			ActivityCompat.requestPermissions(
-				this,
-				REQUIRED_PERMISSIONS,
-				REQUEST_CODE_PERMISSIONS
-			)
-		}
-
 		signerDataModel.lateInit()
+
 		setContent {
 			SignerApp(signerDataModel)
 		}
 	}
 
-	private fun allPermissionsGranted() = REQUIRED_PERMISSIONS.all {
-		ContextCompat.checkSelfPermission(
-			baseContext, it
-		) == PackageManager.PERMISSION_GRANTED
-	}
+
 
 
 }

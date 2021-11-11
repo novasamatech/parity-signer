@@ -3,6 +3,7 @@ package io.parity.signer.screens
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.material.Button
 import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.MaterialTheme
@@ -22,6 +23,7 @@ import io.parity.signer.models.SignerDataModel
 @Composable
 fun SettingsScreen(signerDataModel: SignerDataModel) {
 	val settingsModal = signerDataModel.settingsModal.observeAsState()
+	val generalCertificate = signerDataModel.generalCertificate.observeAsState()
 
 	when (settingsModal.value) {
 		SettingsModal.None -> {
@@ -32,6 +34,9 @@ fun SettingsScreen(signerDataModel: SignerDataModel) {
 				) { Text("Wipe Signer") }
 				Row( Modifier.clickable{ signerDataModel.jailbreak() }
 				) { Text("Wipe general certificate") }
+
+				Text("General certificate")
+				Text(generalCertificate.value.toString())
 			}
 		}
 		SettingsModal.History -> {

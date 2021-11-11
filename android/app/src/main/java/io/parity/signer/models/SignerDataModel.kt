@@ -1,5 +1,6 @@
 package io.parity.signer.models
 
+import android.Manifest
 import android.annotation.SuppressLint
 import android.content.Context
 import android.content.SharedPreferences
@@ -27,6 +28,8 @@ import android.content.BroadcastReceiver
 
 import android.content.IntentFilter
 import android.provider.Settings
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 
 
 //TODO: chop this monster in chunks
@@ -35,13 +38,16 @@ import android.provider.Settings
  * This is single object to handle all interactions with backend
  */
 class SignerDataModel : ViewModel() {
+	private val REQUIRED_PERMISSIONS = arrayOf(Manifest.permission.CAMERA)
+	private val REQUEST_CODE_PERMISSIONS = 10
+
 	//Internal model values
 	private val _onBoardingDone = MutableLiveData(OnBoardingState.InProgress)
-	private val _developmentTest = MutableLiveData("")
 	lateinit var context: Context
 	lateinit var activity: FragmentActivity
 	lateinit var masterKey: MasterKey
 	private var hasStrongbox: Boolean = false
+	private var _generalCertificate = MutableLiveData(JSONObject())
 
 	//Alert
 	private val _alert = MutableLiveData(SignerAlert.None)
@@ -98,12 +104,9 @@ class SignerDataModel : ViewModel() {
 	//Data storage locations
 	private var dbName: String = ""
 	private val keyStore = "AndroidKeyStore"
-	private val keyStoreName = "SignerSeedStorage"
 	private lateinit var sharedPreferences: SharedPreferences
 
 	//Observables for model data
-	val developmentTest: LiveData<String> = _developmentTest
-
 	val total: LiveData<Int?> = _total
 	val captured: LiveData<Int?> = _captured
 	val progress: LiveData<Float> = _progress
@@ -122,6 +125,8 @@ class SignerDataModel : ViewModel() {
 	val backupSeedPhrase: LiveData<String> = _backupSeedPhrase
 
 	val history: LiveData<JSONArray> = _history
+
+	var generalCertificate: LiveData<JSONObject> = _generalCertificate
 
 	val lastError: LiveData<String> = _lastError
 
@@ -275,6 +280,24 @@ class SignerDataModel : ViewModel() {
 			}
 		}
 	}
+
+	/**
+	 * Gets general verifier value from db
+	 */
+	private fun getGeneralVerifier() {
+		try {
+			_generalCertificate.value = JSONObject(dbGetGeneralVerifier(dbName))
+		} catch (e: java.lang.Exception) {
+			Log.e("General verifier fetch error", e.toString())
+		}
+	}
+
+	private fun allPermissionsGranted() = REQUIRED_PERMISSIONS.all {
+		ContextCompat.checkSelfPermission(
+			context, it
+		) == PackageManager.PERMISSION_GRANTED
+	}
+
 	//MARK: Init boilerplate end
 
 	//MARK: General utils begin
@@ -780,6 +803,16 @@ class SignerDataModel : ViewModel() {
 	 */
 	fun navigate(screen: SignerScreen) {
 		_signerScreen.value = screen
+		if (screen == SignerScreen.Scan) {
+			//TODO: testing to make sure this goes smoothly
+			if (!allPermissionsGranted()) {
+				ActivityCompat.requestPermissions(
+					activity,
+					REQUIRED_PERMISSIONS,
+					REQUEST_CODE_PERMISSIONS
+				)
+			}
+		}
 		if (screen == SignerScreen.Keys) {
 			selectSeedEngage()
 		}
@@ -934,6 +967,7 @@ class SignerDataModel : ViewModel() {
 
 	fun engageHistoryScreen() {
 		refreshHistory()
+		getGeneralVerifier()
 		_signerScreen.value = SignerScreen.Log
 	}
 
