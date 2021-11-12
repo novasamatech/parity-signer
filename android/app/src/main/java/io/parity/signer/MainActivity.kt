@@ -6,33 +6,20 @@ import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material.icons.filled.Lock
-import androidx.compose.material.icons.filled.Settings
 import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Modifier
-import androidx.core.content.ContextCompat
 import io.parity.signer.modals.WaitingScreen
 import io.parity.signer.models.SignerDataModel
-import io.parity.signer.screens.HomeScreen
+import io.parity.signer.screens.ScanScreen
 import io.parity.signer.screens.KeyManager
 import io.parity.signer.screens.SettingsScreen
 import io.parity.signer.ui.theme.ParitySignerTheme
-import android.Manifest
-import android.content.pm.PackageManager
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.core.app.ActivityCompat
 import io.parity.signer.components.BottomBar
 import io.parity.signer.components.TopBar
 import io.parity.signer.screens.HistoryScreen
 
 class MainActivity : AppCompatActivity() {
-
-
-
 	private val signerDataModel by viewModels<SignerDataModel>()
 
 	override fun onCreate(savedInstanceState: Bundle?) {
@@ -46,10 +33,6 @@ class MainActivity : AppCompatActivity() {
 			SignerApp(signerDataModel)
 		}
 	}
-
-
-
-
 }
 
 /**
@@ -58,7 +41,6 @@ class MainActivity : AppCompatActivity() {
 @Composable
 fun SignerApp(signerDataModel: SignerDataModel) {
 	ParitySignerTheme {
-		//val allScreens = SignerScreen.values().toList()
 		var onBoardingDone = signerDataModel.onBoardingDone.observeAsState()
 		var signerScreen = signerDataModel.signerScreen.observeAsState()
 
@@ -76,7 +58,7 @@ fun SignerApp(signerDataModel: SignerDataModel) {
 					Box(modifier = Modifier.padding(innerPadding)) {
 						when (signerScreen.value) {
 							SignerScreen.Scan -> {
-								HomeScreen(
+								ScanScreen(
 									signerDataModel = signerDataModel
 								)
 							}
@@ -94,6 +76,7 @@ fun SignerApp(signerDataModel: SignerDataModel) {
 				}
 			}
 			OnBoardingState.No -> {
+				//TODO: onboarding
 				AlertDialog(
 					onDismissRequest = { /*TODO: make sure it is nothing*/ },
 					buttons = {
@@ -117,41 +100,5 @@ fun SignerApp(signerDataModel: SignerDataModel) {
 				WaitingScreen()
 			}
 		}
-
-		/*
-		Surface(color = MaterialTheme.colors.background) {
-			MainScreen(signerDataModel)
-		}
-		{
-				TopBar(SignerScreen.Home, navBack = { navController.navigateUp() })
-			},
-			BottomBar(
-					signerDataModel = signerDataModel,
-					navToKeys = { navController.navigate(SignerScreen.Keys.name) },
-					navToSettings = { navController.navigate(SignerScreen.Settings.name) })
-		*/
 	}
 }
-
-/**
- * TODO: remove junk
- */
-
-/*
-@Preview(showBackground = true)
-@Composable
-fun DefaultPreview() {
-	val signerDataModel by viewModels<SignerDataModel>()
-	ParitySignerTheme {
-				MainScreen(signerDataModel)
-    }
-}
-
-val navState: NavState by signerDataModel.navState.observeAsState(NavState.home)
-		when (signerDataModel.navState.value) {
-				NavState.home -> HomeScreen(signerDataModel = signerDataModel)
-				NavState.keys -> Text("keymanager")
-				NavState.scan -> Text("Brrrrr!")
-				NavState.settings -> Text("Settings")
-		}
-*/

@@ -1,4 +1,4 @@
-package io.parity.signer.components.TransactionCards
+package io.parity.signer.components.transactionCards
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -7,22 +7,17 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.focus.focusModifier
 import org.json.JSONObject
 
 @Composable
-fun TCEraMortalNonce(payload: JSONObject) {
+fun TCEraImmortalNonce(payload: JSONObject) {
 	Row(
 		horizontalArrangement = Arrangement.SpaceEvenly,
 		modifier = Modifier.fillMaxWidth()
 	) {
 		Column {
-			Text("phase")
-			Text(payload.getString("phase"))
-		}
-		Column {
-			Text("period")
-			Text(payload.getString("period"))
+			Text("Immortal")
+			Text("era")
 		}
 		Column {
 			Text("nonce")

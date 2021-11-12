@@ -8,12 +8,9 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.shadow
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.unit.dp
-import io.parity.signer.components.TransactionCards.*
+import io.parity.signer.components.transactionCards.*
 import io.parity.signer.models.SignerDataModel
 import io.parity.signer.models.decodeHex
 import org.json.JSONObject

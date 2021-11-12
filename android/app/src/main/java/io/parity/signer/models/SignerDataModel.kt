@@ -28,6 +28,7 @@ import android.content.BroadcastReceiver
 
 import android.content.IntentFilter
 import android.provider.Settings
+import androidx.compose.foundation.Image
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 
@@ -45,7 +46,7 @@ class SignerDataModel : ViewModel() {
 	private val _onBoardingDone = MutableLiveData(OnBoardingState.InProgress)
 	lateinit var context: Context
 	lateinit var activity: FragmentActivity
-	lateinit var masterKey: MasterKey
+	private lateinit var masterKey: MasterKey
 	private var hasStrongbox: Boolean = false
 	private var _generalCertificate = MutableLiveData(JSONObject())
 
@@ -53,14 +54,14 @@ class SignerDataModel : ViewModel() {
 	private val _alert = MutableLiveData(SignerAlert.None)
 
 	//Authenticator to call!
-	var authentication: Authentication = Authentication()
+	private var authentication: Authentication = Authentication()
 
 	//Camera stuff
 	private var bucket = arrayOf<String>()
 	private var payload: String = ""
 	private val _total = MutableLiveData<Int?>(null)
 	private val _captured = MutableLiveData<Int?>(null)
-	private val _progress = MutableLiveData<Float>(0.0f)
+	private val _progress = MutableLiveData(0.0f)
 
 	//Transaction
 	private val _transaction = MutableLiveData(JSONArray())
@@ -107,8 +108,8 @@ class SignerDataModel : ViewModel() {
 	private lateinit var sharedPreferences: SharedPreferences
 
 	//Observables for model data
-	val total: LiveData<Int?> = _total
-	val captured: LiveData<Int?> = _captured
+	private val total: LiveData<Int?> = _total
+	private val captured: LiveData<Int?> = _captured
 	val progress: LiveData<Float> = _progress
 
 	val transaction: LiveData<JSONArray> = _transaction
@@ -221,17 +222,17 @@ class SignerDataModel : ViewModel() {
 	 */
 	fun wipe() {
 		deleteDir(File(dbName))
-		sharedPreferences.edit().clear().commit()
+		sharedPreferences.edit().clear().commit() //No, not apply(), do it now!
 	}
 
 	/**
 	 * Util to copy single Assets file
 	 */
 	private fun copyFileAsset(path: String) {
-		var file = File(dbName, path)
+		val file = File(dbName, path)
 		file.createNewFile()
-		var input = context.assets.open("Database$path")
-		var output = FileOutputStream(file)
+		val input = context.assets.open("Database$path")
+		val output = FileOutputStream(file)
 		val buffer = ByteArray(1024)
 		var read = input.read(buffer)
 		while (read != -1) {
@@ -259,7 +260,7 @@ class SignerDataModel : ViewModel() {
 	 * Util to remove directory
 	 */
 	private fun deleteDir(fileOrDirectory: File) {
-		if (fileOrDirectory.isDirectory()) for (child in fileOrDirectory.listFiles()) deleteDir(
+		if (fileOrDirectory.isDirectory) for (child in fileOrDirectory.listFiles()) deleteDir(
 			child
 		)
 		fileOrDirectory.delete()
@@ -333,7 +334,7 @@ class SignerDataModel : ViewModel() {
 	/**
 	 * Get history from db; should bhe run on log screen appearance
 	 */
-	fun refreshHistory() {
+	private fun refreshHistory() {
 		try {
 			_history.value = sortHistory(JSONArray(historyPrintHistory(dbName)))
 			_alert.value = if (historyGetWarnings(dbName)) {SignerAlert.Past} else {SignerAlert.None}
@@ -373,7 +374,7 @@ class SignerDataModel : ViewModel() {
 	 * Send scanned QR to backend and rearrange cards nicely
 	 * We should probably simplify this once UI development is done
 	 */
-	fun parseTransaction() {
+	private fun parseTransaction() {
 		_transactionState.value = TransactionState.Parsing
 		try {
 			val transactionString = substrateParseTransaction(payload, dbName)
@@ -461,7 +462,7 @@ class SignerDataModel : ViewModel() {
 	/**
 	 * Clear all transaction progress side effects
 	 */
-	fun clearTransaction() {
+	private fun clearTransaction() {
 		signature = ""
 		action = JSONObject()
 		signingAuthor = JSONObject()
@@ -499,7 +500,7 @@ class SignerDataModel : ViewModel() {
 								if (proposeTotal == 1) {
 									try {
 										payload = qrparserTryDecodeQrSequence(
-											"[\"" + payloadString + "\"]",
+											"[\"$payloadString\"]",
 											true
 										)
 										resetScan()
@@ -524,7 +525,7 @@ class SignerDataModel : ViewModel() {
 										true
 									)
 									Log.d("multiframe payload", payload)
-									if (!payload.isEmpty()) {
+									if (payload.isNotEmpty()) {
 										resetScan()
 										parseTransaction()
 									}
@@ -551,8 +552,8 @@ class SignerDataModel : ViewModel() {
 	/**
 	 * Clears camera progress
 	 */
-	fun resetScan() {
-		bucket = arrayOf<String>()
+	private fun resetScan() {
+		bucket = arrayOf()
 		_captured.value = null
 		_total.value = null
 		_progress.value = 0.0f
@@ -568,7 +569,7 @@ class SignerDataModel : ViewModel() {
 	 * authentication.authenticate(activity) {refreshSeedNames()}
 	 * which is somewhat asynchronous
 	 */
-	fun refreshSeedNames() {
+	private fun refreshSeedNames() {
 		clearError()
 		_seedNames.value = sharedPreferences.all.keys.toTypedArray()
 	}
@@ -587,7 +588,7 @@ class SignerDataModel : ViewModel() {
 		authentication.authenticate(activity) {
 			try {
 				//Create relevant keys - should make sure this works before saving key
-				var finalSeedPhrase =
+				val finalSeedPhrase =
 					substrateTryCreateSeed(seedName, seedPhrase, 24, dbName)
 
 				//Encrypt and save seed
@@ -620,7 +621,7 @@ class SignerDataModel : ViewModel() {
 	/**
 	 * Fetch seed from strongbox; must be in unlocked scope
 	 */
-	fun getSeed(): String {
+	private fun getSeed(): String {
 		return sharedPreferences.getString(selectedSeed.value, "") ?: ""
 	}
 
@@ -648,7 +649,7 @@ class SignerDataModel : ViewModel() {
 	 * Get network list updated; call after any networks-altering operation
 	 * and on init and on refresh just in case
 	 */
-	fun refreshNetworks() {
+	private fun refreshNetworks() {
 		try {
 			val networkJSON = dbGetAllNetworksForNetworkSelector(dbName)
 			_networks.value = JSONArray(networkJSON)
@@ -671,7 +672,7 @@ class SignerDataModel : ViewModel() {
 	/**
 	 * Refresh keys relevant for other parameters
 	 */
-	fun fetchKeys() {
+	private fun fetchKeys() {
 		try {
 			Log.d("selectedNetwork", selectedNetwork.value.toString())
 			Log.d("Selected seed", selectedSeed.value.toString())
@@ -704,8 +705,8 @@ class SignerDataModel : ViewModel() {
 			).toString()
 		)
 		var fullPath = path
-		val hasPassword = !password.isEmpty()
-		if (hasPassword) fullPath += "///" + password
+		val hasPassword = password.isNotEmpty()
+		if (hasPassword) fullPath += "///$password"
 		try {
 			if (substrateCheckPath(path) != hasPassword) {
 				_lastError.value =
@@ -897,7 +898,7 @@ class SignerDataModel : ViewModel() {
 				null -> "error"
 			}
 			SignerScreen.Settings -> ""
-			SignerScreen.Log -> ""
+			SignerScreen.Log -> "History"
 			null -> "error"
 		}
 	}
@@ -919,7 +920,7 @@ class SignerDataModel : ViewModel() {
 	/**
 	 * Use this to bring up seed selection screen in key manager
 	 */
-	fun selectSeedEngage() {
+	private fun selectSeedEngage() {
 		selectSeed("")
 		_keyManagerModal.value = KeyManagerModal.SeedSelector
 	}
@@ -965,13 +966,13 @@ class SignerDataModel : ViewModel() {
 
 	//Settings
 
-	fun engageHistoryScreen() {
+	private fun engageHistoryScreen() {
 		refreshHistory()
 		getGeneralVerifier()
 		_signerScreen.value = SignerScreen.Log
 	}
 
-	fun clearHistoryScreen() {
+	private fun clearHistoryScreen() {
 		_settingsModal.value = SettingsModal.None
 	}
 

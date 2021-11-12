@@ -1,4 +1,4 @@
-package io.parity.signer.components.TransactionCards
+package io.parity.signer.components.transactionCards
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Column
@@ -6,7 +6,6 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import io.parity.signer.models.SignerDataModel
-import io.parity.signer.ui.theme.Typography
 
 @Composable
 fun TCID(id: String, signerDataModel: SignerDataModel) {

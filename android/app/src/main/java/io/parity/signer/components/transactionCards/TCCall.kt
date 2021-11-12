@@ -1,4 +1,4 @@
-package io.parity.signer.components.TransactionCards
+package io.parity.signer.components.transactionCards
 
 import androidx.compose.foundation.layout.Row
 import androidx.compose.material.Text

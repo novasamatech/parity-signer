@@ -6,24 +6,33 @@ import androidx.camera.core.ImageAnalysis
 import androidx.camera.core.Preview
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.camera.view.PreviewView
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.LinearProgressIndicator
+import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.ContextCompat
 import com.google.mlkit.vision.barcode.BarcodeScanning
+import io.parity.signer.components.ScanProgressBar
 import io.parity.signer.models.SignerDataModel
+import io.parity.signer.ui.theme.BackgroundAppColor
+import io.parity.signer.ui.theme.CryptoColor
+import io.parity.signer.ui.theme.ParitySignerTheme
+import kotlin.contracts.Effect
 
 @Composable
 fun CameraModal(signerDataModel: SignerDataModel) {
@@ -31,12 +40,10 @@ fun CameraModal(signerDataModel: SignerDataModel) {
 	val context = LocalContext.current
 	val cameraProviderFuture =
 		remember { ProcessCameraProvider.getInstance(context) }
-	val progress = signerDataModel.progress.observeAsState()
 
-	Box {
+	Column (Modifier.fillMaxSize()) {
 		Box(
-			modifier = Modifier
-				.fillMaxSize()
+			Modifier.padding(8.dp)
 		) {
 			//TODO: use all the cores needed to make this smooth
 			AndroidView(
@@ -74,15 +81,21 @@ fun CameraModal(signerDataModel: SignerDataModel) {
 					}, executor)
 					previewView
 				},
-				modifier = Modifier.fillMaxSize()
+				Modifier
+					.padding(bottom = 16.dp)
+					.border(
+						BorderStroke(1.dp, Color.Blue),
+						RoundedCornerShape(8.dp)
+					)
+					.clip(RoundedCornerShape(8.dp))
+					.matchParentSize()
 			)
+			Column(
+				verticalArrangement = Arrangement.Bottom,
+				modifier = Modifier.fillMaxSize()
+			) {
+				ScanProgressBar(signerDataModel = signerDataModel)
+			}
 		}
-		LinearProgressIndicator(
-			progress = progress.value!!,
-			color = Color.Red,
-			backgroundColor = Color.White,
-			modifier = Modifier.fillMaxWidth()
-		)
-		Text("Scanning progress: " + ((progress.value?:0.0f) * 100.0f).toInt().toString() + "%")
 	}
 }
