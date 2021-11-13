@@ -22,6 +22,7 @@ use opencv::{
 const DEFAULT_WIDTH: u32 = 640;
 const DEFAULT_HEIGHT: u32 = 480;
 const MAX_CAMERA_INDEX: i32 = 6;
+const SKIPPED_FRAMES_QTY: u32 = 10;
 
 /// Structure for storing camera settings.
 #[derive(Debug)]
@@ -46,6 +47,7 @@ pub fn run_with_camera(camera_settings: CameraSettings) -> anyhow::Result<String
 	highgui::named_window(window, 1)?;
 
     let mut camera = create_camera(camera_index, DEFAULT_WIDTH, DEFAULT_HEIGHT)?;
+    skip_frames(&mut camera); // clearing old frames if they are in the camera buffer
 
     let mut out = Ready::NotYet(InProgress::None);
     let mut line = String::new();
@@ -104,7 +106,7 @@ fn create_camera(camera_index: i32, width: u32, height: u32) -> anyhow::Result<v
 fn camera_capture(camera: &mut videoio::VideoCapture, window: &str) -> Result<GrayImage> {
     let mut frame = Mat::default();
     camera.read(&mut frame)?;
-
+    
     if frame.size()?.width > 0 {        
         highgui::imshow(window, &frame)?;
     };
@@ -113,14 +115,14 @@ fn camera_capture(camera: &mut videoio::VideoCapture, window: &str) -> Result<Gr
     let mut ocv_gray_image = Mat::default();
     
     cvt_color(&frame, &mut ocv_gray_image, COLOR_BGR2GRAY, 0)?;
-
+    
     for y in 0..ocv_gray_image.rows() {
         for x in 0..ocv_gray_image.cols() {
             let pixel : Luma<u8> = Luma([*ocv_gray_image.at_2d(y,x)?]);
             image.put_pixel(x as u32, y as u32, pixel);
         };
     };
-
+    
     Ok(image) 
 }
 
@@ -161,6 +163,14 @@ fn print_list_of_cameras() {
     println!("\nList of available devices:");
     for index in indexes {
         println!("Camera index: {}", index);
+    }
+}
+
+fn skip_frames(camera: &mut videoio::VideoCapture) {    
+    for _x in 0..SKIPPED_FRAMES_QTY {
+        if let Ok(false) | Err(_) = camera.grab() {
+            break;
+        }
     }
 }
 
