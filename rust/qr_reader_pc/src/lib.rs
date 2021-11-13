@@ -18,6 +18,7 @@ const DEFAULT_HEIGHT: u32 = 480;
 const DEFAULT_FRAME_FORMAT: FrameFormat = FrameFormat::YUYV;
 const DEFAULT_FPS: u32 = 30;
 const DEFAULT_BACKEND: CaptureAPIBackend = CaptureAPIBackend::Video4Linux;
+const SKIPPED_FRAMES_QTY: u32 = 10;
 
 /// Structure for storing camera settings.
 #[derive(Debug)]
@@ -46,6 +47,7 @@ pub fn run_with_camera(camera_settings: CameraSettings) -> anyhow::Result<String
         Ok(x) => x,
         Err(e) => return Err(anyhow!("Error opening camera. {}", e)),
     };
+    skip_frames(&mut camera);
 
     let mut window = match Window::new(
         "Camera capture",
@@ -146,7 +148,6 @@ pub fn process_qr_image(image: &GrayImage, decoding: InProgress,) -> anyhow::Res
     }
 }
 
-
 fn print_list_of_cameras() {
     println!("List of available devices:");
     match query_devices(DEFAULT_BACKEND) {
@@ -157,6 +158,14 @@ fn print_list_of_cameras() {
         }
         Err(_) => println!("Can`t capture list of cameras."),
     };
+}
+
+fn skip_frames(camera: &mut Camera) {    
+    for _x in 0..SKIPPED_FRAMES_QTY {
+        if camera.frame().is_err() {
+            break;
+        };
+    }
 }
 
 /// The program's argument parser.
