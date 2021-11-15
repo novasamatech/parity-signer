@@ -29,8 +29,7 @@ import androidx.core.content.ContextCompat
 import com.google.mlkit.vision.barcode.BarcodeScanning
 import io.parity.signer.components.ScanProgressBar
 import io.parity.signer.models.SignerDataModel
-import io.parity.signer.ui.theme.BackgroundAppColor
-import io.parity.signer.ui.theme.CryptoColor
+import io.parity.signer.ui.theme.Crypto400
 import io.parity.signer.ui.theme.ParitySignerTheme
 import kotlin.contracts.Effect
 
@@ -82,9 +81,9 @@ fun CameraModal(signerDataModel: SignerDataModel) {
 					previewView
 				},
 				Modifier
-					.padding(bottom = 16.dp)
+					.padding(bottom = 24.dp)
 					.border(
-						BorderStroke(1.dp, Color.Blue),
+						BorderStroke(1.dp, Crypto400),
 						RoundedCornerShape(8.dp)
 					)
 					.clip(RoundedCornerShape(8.dp))

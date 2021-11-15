@@ -30,12 +30,12 @@ fun TransactionPassword(signerDataModel: SignerDataModel) {
 				password = it
 				signerDataModel.clearError()
 			},
-			label = { Text("Password (optional)") },
+			label = { Text("Password") },
 			singleLine = true,
 			keyboardOptions = KeyboardOptions(
 				autoCorrect = false,
 				capitalization = KeyboardCapitalization.None,
-				keyboardType = KeyboardType.Text,
+				keyboardType = KeyboardType.Password,
 				imeAction = ImeAction.Done
 			),
 			keyboardActions = KeyboardActions(

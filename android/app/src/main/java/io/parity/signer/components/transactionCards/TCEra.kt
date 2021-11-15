@@ -10,22 +10,29 @@ import androidx.compose.ui.Modifier
 import org.json.JSONObject
 
 @Composable
-fun TCEraMortalNonce(payload: JSONObject) {
+fun TCEra(payload: JSONObject) {
 	Row(
 		horizontalArrangement = Arrangement.SpaceEvenly,
 		modifier = Modifier.fillMaxWidth()
 	) {
-		Column {
-			Text("phase")
-			Text(payload.getString("phase"))
-		}
-		Column {
-			Text("period")
-			Text(payload.getString("period"))
-		}
-		Column {
-			Text("nonce")
-			Text(payload.getString("nonce"))
+		when(payload.getString("era")) {
+			"Mortal" -> {
+				Text("Mortality: ")
+				Column {
+					Text("phase")
+					Text(payload.getString("phase"))
+				}
+				Column {
+					Text("period")
+					Text(payload.getString("period"))
+				}
+			}
+			"Immortal" -> {
+				Text("Immortal transaction")
+			}
+			else -> {
+				Text("Era invalid, file a bug report")
+			}
 		}
 	}
 }

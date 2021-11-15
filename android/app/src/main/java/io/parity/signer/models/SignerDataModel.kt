@@ -67,7 +67,7 @@ class SignerDataModel : ViewModel() {
 	private val _transaction = MutableLiveData(JSONArray())
 	private var action = JSONObject()
 	private val _actionable = MutableLiveData(false)
-	private var signingAuthor = JSONObject()
+	var signingAuthor = JSONObject()
 	private var signature = ""
 
 	//Internal storage for model data:
@@ -322,12 +322,16 @@ class SignerDataModel : ViewModel() {
 			refreshSeedNames()
 			_transactionState.value = TransactionState.None
 			_settingsModal.value = SettingsModal.None
-			if (seedNames.value?.isEmpty() as Boolean) _keyManagerModal.value =
-				KeyManagerModal.NewSeed else _keyManagerModal.value =
+			if (seedNames.value?.isEmpty() as Boolean) {
+				_keyManagerModal.value =
+					KeyManagerModal.NewSeed
+				_signerScreen.value = SignerScreen.Keys
+			} else _keyManagerModal.value =
 				KeyManagerModal.None
 			fetchKeys()
 			refreshHistory()
 		}
+		getGeneralVerifier()
 		clearTransaction()
 	}
 
@@ -400,7 +404,6 @@ class SignerDataModel : ViewModel() {
 			_transaction.value =
 				sortCards(
 					concatJSONArray(
-						author,
 						warnings,
 						error,
 						typesInfo,

@@ -73,7 +73,7 @@ fun NewSeedModal(signerDataModel: SignerDataModel) {
 					singleLine = true,
 					keyboardOptions = KeyboardOptions(
 						autoCorrect = false,
-						keyboardType = KeyboardType.Ascii,
+						keyboardType = KeyboardType.Password,
 						capitalization = KeyboardCapitalization.None,
 						imeAction = ImeAction.Done
 					),

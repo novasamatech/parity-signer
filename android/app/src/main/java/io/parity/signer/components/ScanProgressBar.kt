@@ -4,6 +4,7 @@ import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.runtime.Composable
@@ -22,32 +23,26 @@ import io.parity.signer.models.SignerDataModel
 @Composable
 fun ScanProgressBar(signerDataModel: SignerDataModel) {
 	val progress = signerDataModel.progress.observeAsState()
+	val frontColor = MaterialTheme.colors.onSecondary
+	val backgroundColor = MaterialTheme.colors.background
 
 	progress.value?.let {
-		Canvas(modifier = Modifier.height(16.dp).fillMaxWidth()) {
-			drawLine(
-				Color.Blue,
-				Offset.Zero.copy(x = 4.dp.toPx(), y = 12.dp.toPx()),
-				Offset.Zero.copy(x = this.size.width - 4.dp.toPx(), y = 12.dp.toPx()),
-				8.dp.toPx(),
-				StrokeCap.Round
+		Canvas(modifier = Modifier
+			.height(24.dp)
+			.fillMaxWidth()) {
+			drawRect(
+				frontColor,
+				Offset.Zero.copy(x = 0.dp.toPx(), y = 8.dp.toPx()),
+				Size(width = this.size.width, height = 8.dp.toPx()),
+				style = Stroke()
 			)
-			drawLine(
-				Color.Black,
-				Offset.Zero.copy(x = 5.dp.toPx(), y = 13.dp.toPx()),
-				Offset.Zero.copy(
-					x = this.size.width - 5.dp.toPx(),
-					y = 13.dp.toPx()
-				),
-				6.dp.toPx(),
-				StrokeCap.Round
-			)
-			drawLine(
-				Color.Blue,
-				Offset.Zero.copy(x = 5.dp.toPx(), y = 13.dp.toPx()),
-				Offset.Zero.copy(x = (this.size.width - 5.dp.toPx()) * it, y = 13.dp.toPx()),
-				6.dp.toPx(),
-				StrokeCap.Round
+			drawRect(
+				frontColor,
+				Offset.Zero.copy(x = 0.dp.toPx(), y = 8.dp.toPx()),
+				Size(
+					width = this.size.width * it,
+					height = 8.dp.toPx()
+				)
 			)
 		}
 	}

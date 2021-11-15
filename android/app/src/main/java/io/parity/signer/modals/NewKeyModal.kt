@@ -69,7 +69,7 @@ fun NewKeyModal(signerDataModel: SignerDataModel, increment: Boolean) {
 			keyboardOptions = KeyboardOptions(
 				autoCorrect = false,
 				capitalization = KeyboardCapitalization.None,
-				keyboardType = KeyboardType.Text,
+				keyboardType = KeyboardType.Password,
 				imeAction = ImeAction.Done
 			),
 			keyboardActions = KeyboardActions(
@@ -88,7 +88,7 @@ fun NewKeyModal(signerDataModel: SignerDataModel, increment: Boolean) {
 				keyboardOptions = KeyboardOptions(
 					autoCorrect = false,
 					capitalization = KeyboardCapitalization.None,
-					keyboardType = KeyboardType.Text,
+					keyboardType = KeyboardType.Password,
 					imeAction = ImeAction.Done
 				),
 				keyboardActions = KeyboardActions(

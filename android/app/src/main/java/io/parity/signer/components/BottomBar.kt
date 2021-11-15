@@ -18,7 +18,7 @@ fun BottomBar(
 	signerDataModel: SignerDataModel,
 ) {
 	BottomAppBar (elevation = 0.dp,
-		modifier = Modifier.height(80.dp)) {
+		modifier = Modifier.height(60.dp)) {
 		BottomBarButton(
 			signerDataModel = signerDataModel,
 			image = Icons.Default.Home,

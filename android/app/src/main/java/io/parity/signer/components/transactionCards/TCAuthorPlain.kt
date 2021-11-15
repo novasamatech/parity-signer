@@ -5,6 +5,8 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.scale
 import io.parity.signer.models.SignerDataModel
 import io.parity.signer.ui.theme.Typography
 import org.json.JSONObject
@@ -12,7 +14,7 @@ import org.json.JSONObject
 @Composable
 fun TCAuthorPlain(payload: JSONObject, signerDataModel: SignerDataModel) {
 	Row {
-		Image(signerDataModel.getIdenticon(payload.getString("base58"), 80), "identicon")
+		Image(signerDataModel.getIdenticon(payload.getString("base58"), 64), "identicon", modifier = Modifier.scale(0.75f))
 		Column {
 			Text("From: ")
 			Text(payload.getString("base58"), style = Typography.body2)
