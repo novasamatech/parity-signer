@@ -851,9 +851,11 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 46600;
 				DEVELOPMENT_ASSET_PATHS = "\"NativeSigner/Preview Content\"";
-				DEVELOPMENT_TEAM = 4GK8JWU7P9;
+				DEVELOPMENT_TEAM = P2PX3JU8FT;
 				ENABLE_BITCODE = NO;
 				ENABLE_PREVIEWS = YES;
 				"EXCLUDED_ARCHS[sdk=iphonesimulator*]" = arm64;
@@ -867,8 +869,10 @@
 					"$(inherited)",
 					"$(PROJECT_DIR)/NativeSigner",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = parity.NativeSigner;
+				MARKETING_VERSION = 4.6.6;
+				PRODUCT_BUNDLE_IDENTIFIER = io.parity.NativeSigner;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_OBJC_BRIDGING_HEADER = "$(PROJECT_DIR)/NativeSigner/NativeSigner-Bridging-Header.h";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -881,9 +885,11 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 46600;
 				DEVELOPMENT_ASSET_PATHS = "\"NativeSigner/Preview Content\"";
-				DEVELOPMENT_TEAM = 4GK8JWU7P9;
+				DEVELOPMENT_TEAM = P2PX3JU8FT;
 				ENABLE_BITCODE = NO;
 				ENABLE_PREVIEWS = YES;
 				INFOPLIST_FILE = NativeSigner/Info.plist;
@@ -896,8 +902,10 @@
 					"$(inherited)",
 					"$(PROJECT_DIR)/NativeSigner",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = parity.NativeSigner;
+				MARKETING_VERSION = 4.6.6;
+				PRODUCT_BUNDLE_IDENTIFIER = io.parity.NativeSigner;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_OBJC_BRIDGING_HEADER = "$(PROJECT_DIR)/NativeSigner/NativeSigner-Bridging-Header.h";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";

@@ -28,7 +28,6 @@ import android.content.BroadcastReceiver
 
 import android.content.IntentFilter
 import android.provider.Settings
-import androidx.compose.foundation.Image
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 
@@ -303,13 +302,25 @@ class SignerDataModel : ViewModel() {
 
 	//MARK: General utils begin
 
+	fun refreshGUI() {
+		_backupSeedPhrase.value = ""
+		clearError()
+		_transactionState.value = TransactionState.None
+		_settingsModal.value = SettingsModal.None
+		if (seedNames.value?.isEmpty() as Boolean) {
+			_keyManagerModal.value =
+				KeyManagerModal.NewSeed
+			_signerScreen.value = SignerScreen.Keys
+		} else _keyManagerModal.value =
+			KeyManagerModal.None
+	}
+
 	/**
 	 * This returns the app into starting state; should be called
 	 * on all "back"-like events and new screen spawns just in case
 	 */
 	fun totalRefresh() {
 		_backupSeedPhrase.value = ""
-		clearError()
 		val checkRefresh = File(dbName).exists()
 		if (checkRefresh) _onBoardingDone.value =
 			OnBoardingState.Yes else _onBoardingDone.value = OnBoardingState.No
@@ -317,22 +328,16 @@ class SignerDataModel : ViewModel() {
 			refreshNetworks()
 			//TODO: support state with all networks deleted (low priority)
 			if (true) {
-				_selectedNetwork.value = networks.value!!.get(0) as JSONObject
+				_selectedNetwork.value = networks.value?.optJSONObject(0)
+					?: JSONObject()
 			}
 			refreshSeedNames()
-			_transactionState.value = TransactionState.None
-			_settingsModal.value = SettingsModal.None
-			if (seedNames.value?.isEmpty() as Boolean) {
-				_keyManagerModal.value =
-					KeyManagerModal.NewSeed
-				_signerScreen.value = SignerScreen.Keys
-			} else _keyManagerModal.value =
-				KeyManagerModal.None
 			fetchKeys()
 			refreshHistory()
+			refreshGUI()
+			getGeneralVerifier()
+			clearTransaction()
 		}
-		getGeneralVerifier()
-		clearTransaction()
 	}
 
 	/**
@@ -1105,19 +1110,3 @@ class SignerDataModel : ViewModel() {
 	//MARK: rust native section end
 
 }
-
-/*
-		.setKeyGenParameterSpec(
-			KeyGenParameterSpec
-				.Builder(
-					MasterKey.DEFAULT_MASTER_KEY_ALIAS,
-					KeyProperties.PURPOSE_ENCRYPT or KeyProperties.PURPOSE_DECRYPT
-				)
-				.setBlockModes(KeyProperties.BLOCK_MODE_GCM)
-				.setEncryptionPaddings(KeyProperties.ENCRYPTION_PADDING_NONE)
-				.setKeySize(MasterKey.DEFAULT_AES_GCM_MASTER_KEY_SIZE)
-				//.setUserAuthenticationParameters(1, KeyProperties.AUTH_DEVICE_CREDENTIAL)
-				//.setUserAuthenticationRequired(true)
-				.setIsStrongBoxBacked(hasStrongbox)
-				.build()
-		)*/

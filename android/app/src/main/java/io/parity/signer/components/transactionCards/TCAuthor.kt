@@ -19,8 +19,9 @@ fun TCAuthor(payload: JSONObject, signerDataModel: SignerDataModel) {
 	Row {
 		Image(signerDataModel.getIdenticon(payload.getString("base58"), 64), "identicon", modifier = Modifier.scale(0.75f))
 		Column {
-			Text("From: " + payload.getString("name"))
+
 			Row {
+				Text("From: ")
 				Text(payload.getString("seed"), style = Typography.body1)
 				Text(payload.getString("derivation_path").toString(), style = Typography.body1)
 				if (payload.getBoolean("has_password")) Icon(Icons.Default.Lock, contentDescription = "Password protected account")

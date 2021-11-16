@@ -13,8 +13,8 @@ import org.json.JSONObject
 @Composable
 fun NetworkSelector(signerDataModel: SignerDataModel) {
 
-	var selectedNetwork = signerDataModel.selectedNetwork.observeAsState()
-	var networks = signerDataModel.networks.observeAsState()
+	val selectedNetwork = signerDataModel.selectedNetwork.observeAsState()
+	val networks = signerDataModel.networks.observeAsState()
 
 	var expanded by remember { mutableStateOf(false) }
 
@@ -25,7 +25,7 @@ fun NetworkSelector(signerDataModel: SignerDataModel) {
 		),
 		onClick = { expanded = true }) {
 		Row{
-			Text(selectedNetwork.value!!.get("title").toString())
+			NetworkCard(selectedNetwork.value?: JSONObject())
 			Icon(Icons.Default.ArrowDropDown, "Dropdown network selector indicator")
 		}
 	}

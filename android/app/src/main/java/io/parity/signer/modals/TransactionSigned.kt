@@ -19,12 +19,6 @@ import io.parity.signer.models.SignerDataModel
 fun TransactionSigned(signerDataModel: SignerDataModel) {
 
 	Column (modifier = Modifier.fillMaxSize()) {
-		Image(
-			bitmap = signerDataModel.getSignedQR(),
-			contentDescription = "Signed transaction",
-			contentScale = ContentScale.FillWidth,
-			modifier = Modifier.fillMaxWidth()
-		)
 		Spacer(modifier = Modifier.padding(8.dp))
 		when (signerDataModel.signingAuthor.optString("type")) {
 			"author" -> {
@@ -43,5 +37,14 @@ fun TransactionSigned(signerDataModel: SignerDataModel) {
 				Text(signerDataModel.signingAuthor.toString())
 			}
 		}
+		Text("Your signature")
+		Text("Scan this into your application")
+		Image(
+			bitmap = signerDataModel.getSignedQR(),
+			contentDescription = "Signed transaction",
+			contentScale = ContentScale.FillWidth,
+			modifier = Modifier.fillMaxWidth()
+		)
+
 	}
 }

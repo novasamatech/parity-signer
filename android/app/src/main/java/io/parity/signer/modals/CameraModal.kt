@@ -87,7 +87,6 @@ fun CameraModal(signerDataModel: SignerDataModel) {
 						RoundedCornerShape(8.dp)
 					)
 					.clip(RoundedCornerShape(8.dp))
-					.matchParentSize()
 			)
 			Column(
 				verticalArrangement = Arrangement.Bottom,

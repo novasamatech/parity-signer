@@ -24,7 +24,6 @@ import io.parity.signer.models.SignerDataModel
 fun ScanProgressBar(signerDataModel: SignerDataModel) {
 	val progress = signerDataModel.progress.observeAsState()
 	val frontColor = MaterialTheme.colors.onSecondary
-	val backgroundColor = MaterialTheme.colors.background
 
 	progress.value?.let {
 		Canvas(modifier = Modifier
