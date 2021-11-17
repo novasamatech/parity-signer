@@ -13,6 +13,12 @@ variables:
 
 default:
   cache:                           {}
+  retry:
+    max: 2
+    when:
+      - runner_system_failure
+      - unknown_failure
+      - api_failure
 
 workflow:
   rules:
