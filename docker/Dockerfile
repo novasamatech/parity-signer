@@ -22,6 +22,10 @@ RUN cd /opt \
 
 ENV PATH ${PATH}:${ANDROID_SDK_ROOT}/platform-tools:${ANDROID_SDK_ROOT}/cmdline-tools/latest/bin
 
+RUN yes | sdkmanager --licenses
+# We need at least one set of build-tools installed for apksigner
+RUN yes | sdkmanager "build-tools;30.0.3"
+
 RUN mkdir /opt/android-ndk-tmp && \
     cd /opt/android-ndk-tmp && \
     wget -q https://dl.google.com/android/repository/android-ndk-${ANDROID_NDK_VERSION}-linux-x86_64.zip && \
