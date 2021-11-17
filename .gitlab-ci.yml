@@ -38,7 +38,7 @@ android-build-release:
     - if: $CI_COMMIT_REF_NAME =~ /^[0-9]+$/                         # PRs
   artifacts:
     paths:
-      - signer-app-release-signed.apk
+      - signer-ci-build.apk
   script:
     - cat "$KEYSTORE_DATA" | base64 -d > /tmp/gitlab-ci.keystore
     - wc /tmp/gitlab-ci.keystore

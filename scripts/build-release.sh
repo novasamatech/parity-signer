@@ -17,5 +17,6 @@ pushd "$(dirname "${0}")"/../android
   echo "[+] Running Gradle"
   ./gradlew assembleRelease
   echo "[+] Build complete! Signing bundle"
-  "$ANDROID_BUILD_TOOLS_PATH/apksigner" sign --ks "$keystore" --key-pass "env:$keypass" app/build/outputs/apk/release/app-release-unsigned.apk
+  "$ANDROID_BUILD_TOOLS_PATH/apksigner" sign --ks "$keystore" --ks-pass "pass:$keypass" app/build/outputs/apk/release/app-release-unsigned.apk
+  cp app/build/outputs/apk/release/app-release-unsigned.apk ../signer-ci-build.apk
 popd
