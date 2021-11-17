@@ -3,6 +3,8 @@
 keystore="$(readlink -f "$1")"
 keypass="$2"
 
+cat "$keypass" | wc
+
 # Get latest android-sdk-linux version for apksigner path
 ANDROID_BUILD_TOOLS_PATH=$(find /opt/android-sdk-linux/build-tools/ -maxdepth 1 -type d | sort -V | tail -n 1)
 
