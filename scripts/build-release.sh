@@ -1,18 +1,21 @@
 #!/usr/bin/env bash
 
 keystore="$(readlink -f "$1")"
-keyalias=$2
-keypass_arg="${3:+-storepass $3}"
+keypass="$2"
+
+# Get latest android-sdk-linux version for apksigner path
+ANDROID_BUILD_TOOLS_PATH=$(find /opt/android-sdk-linux/build-tools/ -maxdepth 1 -type d | sort -V | tail -n 1)
 
 set -e
-echo "[+] Building rust components"
-"$(dirname "${0}")"/build.sh android
-echo "[+] Moving to android directory to build app..."
-yarn install
+
+# Build rust lib
+pushd "$(dirname "${0}")"/..
+  ./scripts/build.sh android
+popd
+
 pushd "$(dirname "${0}")"/../android
   echo "[+] Running Gradle"
   ./gradlew assembleRelease
   echo "[+] Build complete! Signing bundle"
-  jarsigner -verbose -sigalg SHA1withRSA -digestalg SHA1 -keystore "$keystore" $keypass_arg app/build/outputs/apk/release/app-release-unsigned.apk "$keyalias"
-  zipalign -p 4 app/build/outputs/apk/release/app-release-unsigned.apk ../signer-app-release-signed.apk
+  "$ANDROID_BUILD_TOOLS_PATH/apksigner" sign --ks "$keystore" --key-pass "env:$keypass" app/build/outputs/apk/release/app-release-unsigned.apk
 popd
