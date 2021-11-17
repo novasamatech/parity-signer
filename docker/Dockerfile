@@ -1,3 +1,4 @@
+# Base on Bitrise but prune everything we don't want
 FROM bitriseio/android-ndk:latest
 MAINTAINER Parity Technologies <admin@parity.io>
 
@@ -15,3 +16,10 @@ ENV JAVA_HOME=/usr/lib/jvm/java-11-openjdk-amd64/
 COPY scripts /tmp/scripts/
 RUN bash /tmp/scripts/init.sh
 
+# Cleanup
+RUN rm -rf /opt/android-sdk/system-images; \
+    rm -rf /opt/android-sdk/build-tools/*; \
+    rm -rf /tmp/scripts ;\
+    apt-get autoremote -y ; \
+    apt-get clean ; \
+    rm -rf /var/lib/apt/lists/*
