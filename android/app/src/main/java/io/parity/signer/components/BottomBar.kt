@@ -9,6 +9,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import io.parity.signer.SignerScreen
 import io.parity.signer.models.SignerDataModel
+import io.parity.signer.ui.theme.Bg000
 
 /**
  * Bar to be shown on the bottom of screen;
@@ -17,26 +18,25 @@ import io.parity.signer.models.SignerDataModel
 fun BottomBar(
 	signerDataModel: SignerDataModel,
 ) {
-	BottomAppBar (elevation = 0.dp,
-		modifier = Modifier.height(60.dp)) {
+	BottomAppBar (
+		backgroundColor = Bg000,
+		elevation = 0.dp,
+		modifier = Modifier.height(54.dp)) {
 		BottomBarButton(
 			signerDataModel = signerDataModel,
 			image = Icons.Default.Home,
 			screen = SignerScreen.Log
 		)
-		Spacer(Modifier.weight(1f, true))
 		BottomBarButton(
 			signerDataModel = signerDataModel,
 			image = Icons.Default.Star,
 			screen = SignerScreen.Scan
 		)
-		Spacer(Modifier.weight(1f, true))
 		BottomBarButton(
 			signerDataModel = signerDataModel,
 			image = Icons.Default.AccountCircle,
 			screen = SignerScreen.Keys
 		)
-		Spacer(Modifier.weight(1f, true))
 		BottomBarButton(
 			signerDataModel = signerDataModel,
 			image = Icons.Default.Settings,

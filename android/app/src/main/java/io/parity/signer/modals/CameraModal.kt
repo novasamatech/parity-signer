@@ -29,6 +29,7 @@ import androidx.core.content.ContextCompat
 import com.google.mlkit.vision.barcode.BarcodeScanning
 import io.parity.signer.components.ScanProgressBar
 import io.parity.signer.models.SignerDataModel
+import io.parity.signer.models.processFrame
 import io.parity.signer.ui.theme.Crypto400
 import io.parity.signer.ui.theme.ParitySignerTheme
 import kotlin.contracts.Effect

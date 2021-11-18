@@ -13,6 +13,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import io.parity.signer.components.TransactionCard
 import io.parity.signer.components.transactionCards.TCAuthor
 import io.parity.signer.models.SignerDataModel
+import io.parity.signer.models.signTransaction
 
 @Composable
 fun TransactionPassword(signerDataModel: SignerDataModel) {

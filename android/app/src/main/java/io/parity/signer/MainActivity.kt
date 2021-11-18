@@ -4,6 +4,7 @@ import android.os.Bundle
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
 import androidx.compose.runtime.*
@@ -19,6 +20,8 @@ import io.parity.signer.components.BottomBar
 import io.parity.signer.components.TopBar
 import io.parity.signer.screens.HistoryScreen
 
+@ExperimentalMaterialApi
+@ExperimentalAnimationApi
 class MainActivity : AppCompatActivity() {
 	private val signerDataModel by viewModels<SignerDataModel>()
 
@@ -38,6 +41,8 @@ class MainActivity : AppCompatActivity() {
 /**
  * Main app component - hosts navhost, Rust-based source of truth, etc.
  */
+@ExperimentalMaterialApi
+@ExperimentalAnimationApi
 @Composable
 fun SignerApp(signerDataModel: SignerDataModel) {
 	ParitySignerTheme {

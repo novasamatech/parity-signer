@@ -31,15 +31,12 @@ import android.provider.Settings
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 
-
-//TODO: chop this monster in chunks
-
 /**
  * This is single object to handle all interactions with backend
  */
 class SignerDataModel : ViewModel() {
-	private val REQUIRED_PERMISSIONS = arrayOf(Manifest.permission.CAMERA)
-	private val REQUEST_CODE_PERMISSIONS = 10
+	internal val REQUIRED_PERMISSIONS = arrayOf(Manifest.permission.CAMERA)
+	internal val REQUEST_CODE_PERMISSIONS = 10
 
 	//Internal model values
 	private val _onBoardingDone = MutableLiveData(OnBoardingState.InProgress)
@@ -53,62 +50,62 @@ class SignerDataModel : ViewModel() {
 	private val _alert = MutableLiveData(SignerAlert.None)
 
 	//Authenticator to call!
-	private var authentication: Authentication = Authentication()
+	internal var authentication: Authentication = Authentication()
 
 	//Camera stuff
-	private var bucket = arrayOf<String>()
-	private var payload: String = ""
-	private val _total = MutableLiveData<Int?>(null)
-	private val _captured = MutableLiveData<Int?>(null)
-	private val _progress = MutableLiveData(0.0f)
+	internal var bucket = arrayOf<String>()
+	internal var payload: String = ""
+	internal val _total = MutableLiveData<Int?>(null)
+	internal val _captured = MutableLiveData<Int?>(null)
+	internal val _progress = MutableLiveData(0.0f)
 
 	//Transaction
-	private val _transaction = MutableLiveData(JSONArray())
-	private var action = JSONObject()
-	private val _actionable = MutableLiveData(false)
+	internal val _transaction = MutableLiveData(JSONArray())
+	internal var action = JSONObject()
+	internal val _actionable = MutableLiveData(false)
 	var signingAuthor = JSONObject()
-	private var signature = ""
+	internal var signature = ""
 
 	//Internal storage for model data:
 	//TODO: hard types for these
 
 	//Keys
-	private val _identities = MutableLiveData(JSONArray())
-	private val _selectedIdentity = MutableLiveData(JSONObject())
+	internal val _identities = MutableLiveData(JSONArray())
+	internal val _selectedIdentity = MutableLiveData(JSONObject())
 
 	//Networks
-	private val _networks = MutableLiveData(JSONArray())
-	private val _selectedNetwork = MutableLiveData(JSONObject())
+	internal val _networks = MutableLiveData(JSONArray())
+	internal val _selectedNetwork = MutableLiveData(JSONObject())
 
 	//Seeds
-	private val _seedNames = MutableLiveData(arrayOf<String>())
-	private val _selectedSeed = MutableLiveData("")
+	internal val _seedNames = MutableLiveData(arrayOf<String>())
+	internal val _selectedSeed = MutableLiveData("")
 
 	//TODO: keeping super secret seeds in questionably managed observable must be studied critically
-	private val _backupSeedPhrase = MutableLiveData("")
+	internal val _backupSeedPhrase = MutableLiveData("")
 
 	//History
 	private val _history = MutableLiveData(JSONArray())
 
 	//Error
-	private val _lastError = MutableLiveData("")
+	internal val _lastError = MutableLiveData("")
 
 	//Navigator
-	private val _signerScreen = MutableLiveData(SignerScreen.Log)
+	internal val _signerScreen = MutableLiveData(SignerScreen.Log)
 
 	//States of important modals
-	private val _keyManagerModal = MutableLiveData(KeyManagerModal.None)
-	private val _settingsModal = MutableLiveData(SettingsModal.None)
-	private val _transactionState = MutableLiveData(TransactionState.None)
+	internal val _keyManagerModal = MutableLiveData(KeyManagerModal.None)
+	internal val _settingsModal = MutableLiveData(SettingsModal.None)
+	internal val _transactionState = MutableLiveData(TransactionState.None)
 
 	//Data storage locations
-	private var dbName: String = ""
+	internal var dbName: String = ""
 	private val keyStore = "AndroidKeyStore"
-	private lateinit var sharedPreferences: SharedPreferences
+	internal lateinit var sharedPreferences: SharedPreferences
 
 	//Observables for model data
-	private val total: LiveData<Int?> = _total
-	private val captured: LiveData<Int?> = _captured
+	internal val total: LiveData<Int?> = _total
+	internal val captured: LiveData<Int?> = _captured
 	val progress: LiveData<Float> = _progress
 
 	val transaction: LiveData<JSONArray> = _transaction
@@ -284,7 +281,7 @@ class SignerDataModel : ViewModel() {
 	/**
 	 * Gets general verifier value from db
 	 */
-	private fun getGeneralVerifier() {
+	internal fun getGeneralVerifier() {
 		try {
 			_generalCertificate.value = JSONObject(dbGetGeneralVerifier(dbName))
 		} catch (e: java.lang.Exception) {
@@ -292,7 +289,7 @@ class SignerDataModel : ViewModel() {
 		}
 	}
 
-	private fun allPermissionsGranted() = REQUIRED_PERMISSIONS.all {
+	internal fun allPermissionsGranted() = REQUIRED_PERMISSIONS.all {
 		ContextCompat.checkSelfPermission(
 			context, it
 		) == PackageManager.PERMISSION_GRANTED
@@ -312,7 +309,7 @@ class SignerDataModel : ViewModel() {
 				KeyManagerModal.NewSeed
 			_signerScreen.value = SignerScreen.Keys
 		} else _keyManagerModal.value =
-			KeyManagerModal.None
+			KeyManagerModal.SeedSelector
 	}
 
 	/**
@@ -343,7 +340,7 @@ class SignerDataModel : ViewModel() {
 	/**
 	 * Get history from db; should bhe run on log screen appearance
 	 */
-	private fun refreshHistory() {
+	internal fun refreshHistory() {
 		try {
 			_history.value = sortHistory(JSONArray(historyPrintHistory(dbName)))
 			_alert.value = if (historyGetWarnings(dbName)) {SignerAlert.Past} else {SignerAlert.None}
@@ -376,615 +373,6 @@ class SignerDataModel : ViewModel() {
 	}
 
 	//MARK: General utils end
-
-	//MARK: Transaction utils begin
-
-	/**
-	 * Send scanned QR to backend and rearrange cards nicely
-	 * We should probably simplify this once UI development is done
-	 */
-	private fun parseTransaction() {
-		_transactionState.value = TransactionState.Parsing
-		try {
-			val transactionString = substrateParseTransaction(payload, dbName)
-			Log.d("transaction string", transactionString)
-			val transactionObject = JSONObject(transactionString)
-			//TODO: something here
-			val author = (transactionObject.optJSONArray("author") ?: JSONArray())
-			val warnings = transactionObject.optJSONArray("warning") ?: JSONArray()
-			val error = (transactionObject.optJSONArray("error") ?: JSONArray())
-			val typesInfo =
-				transactionObject.optJSONArray("types_info") ?: JSONArray()
-			val method = (transactionObject.optJSONArray("method") ?: JSONArray())
-			val extensions =
-				(transactionObject.optJSONArray("extensions") ?: JSONArray())
-			val newSpecs = (transactionObject.optJSONArray("new_specs") ?: JSONArray())
-			val verifier = (transactionObject.optJSONArray("verifier") ?: JSONArray())
-			action = transactionObject.optJSONObject("action") ?: JSONObject()
-			_actionable.value = !action.isNull("type")
-			if (action.optString("type") == "sign") {
-				signingAuthor = author.getJSONObject(0)
-			}
-			Log.d("action", action.toString())
-			_transaction.value =
-				sortCards(
-					concatJSONArray(
-						warnings,
-						error,
-						typesInfo,
-						method,
-						extensions,
-						newSpecs,
-						verifier
-					)
-				)
-			_transactionState.value = TransactionState.Preview
-		} catch (e: java.lang.Exception) {
-			Log.e("Transaction parsing failed", e.toString())
-			_transactionState.value = TransactionState.None
-		}
-	}
-
-	fun acceptTransaction() {
-		if (action.getString("type") == "sign") {
-			Log.d("authorcard", signingAuthor.toString())
-			if (signingAuthor.getJSONObject("payload").getBoolean("has_password")) {
-				_transactionState.value = TransactionState.Password
-			} else {
-				signTransaction("")
-			}
-		} else {
-			performTransaction()
-			clearTransaction()
-		}
-	}
-
-	fun signTransaction(password: String) {
-		authentication.authenticate(activity) {
-			signature = substrateHandleSign(
-				action.getString(
-					"payload"), sharedPreferences.getString(
-					signingAuthor.getJSONObject("payload").getString("seed"), ""
-				) ?: "", password, "", dbName
-			)
-			_transactionState.value = TransactionState.Signed
-		}
-	}
-
-	fun getSignedQR(): ImageBitmap {
-		return signature.intoImageBitmap()
-	}
-
-	private fun performTransaction() {
-		try {
-			substrateHandleStub(
-				action.getString("payload"),
-				dbName
-			)
-		} catch (e: java.lang.Exception) {
-			Log.e("transaction failed", e.toString())
-			_lastError.value = e.toString()
-		}
-	}
-
-	/**
-	 * Clear all transaction progress side effects
-	 */
-	private fun clearTransaction() {
-		signature = ""
-		action = JSONObject()
-		signingAuthor = JSONObject()
-		_transaction.value = JSONArray()
-		_actionable.value = false
-		_transactionState.value = TransactionState.None
-		resetScan()
-	}
-
-	//MARK: Transaction utils end
-
-	//MARK: Camera tools begin
-
-	/**
-	 * Barcode detecting function.
-	 * This uses experimental features
-	 */
-	@SuppressLint("UnsafeOptInUsageError")
-	fun processFrame(barcodeScanner: BarcodeScanner, imageProxy: ImageProxy) {
-		val inputImage = InputImage.fromMediaImage(
-			imageProxy.image,
-			imageProxy.imageInfo.rotationDegrees
-		)
-
-		barcodeScanner.process(inputImage)
-			.addOnSuccessListener { barcodes ->
-				barcodes.forEach {
-					val payloadString = it?.rawBytes?.encodeHex()
-					Log.d("QR", payloadString ?: "empty")
-					if (!(bucket.contains(payloadString) || payloadString.isNullOrEmpty())) {
-						if (total.value == null) {
-							try {
-								val proposeTotal = qrparserGetPacketsTotal(payloadString, true)
-								Log.d("estimate total", proposeTotal.toString())
-								if (proposeTotal == 1) {
-									try {
-										payload = qrparserTryDecodeQrSequence(
-											"[\"$payloadString\"]",
-											true
-										)
-										resetScan()
-										parseTransaction()
-										Log.d("payload", payload)
-									} catch (e: java.lang.Exception) {
-										Log.e("Single frame decode failed", e.toString())
-									}
-								} else {
-									bucket += payloadString
-									_total.value = proposeTotal
-								}
-							} catch (e: java.lang.Exception) {
-								Log.e("QR sequence length estimation", e.toString())
-							}
-						} else {
-							bucket += payloadString
-							if (bucket.size >= total.value ?: 0) {
-								try {
-									payload = qrparserTryDecodeQrSequence(
-										"[\"" + bucket.joinToString(separator = "\",\"") + "\"]",
-										true
-									)
-									Log.d("multiframe payload", payload)
-									if (payload.isNotEmpty()) {
-										resetScan()
-										parseTransaction()
-									}
-								} catch (e: java.lang.Exception) {
-									Log.e("failed to parse sequence", e.toString())
-								}
-							}
-							_captured.value = bucket.size
-							_progress.value = ((captured.value ?: 0).toFloat() / ((total.value
-								?: 1).toFloat()))
-							Log.d("captured", captured.value.toString())
-						}
-					}
-				}
-			}
-			.addOnFailureListener {
-				Log.e("Scan failed", it.message.toString())
-			}
-			.addOnCompleteListener {
-				imageProxy.close()
-			}
-	}
-
-	/**
-	 * Clears camera progress
-	 */
-	private fun resetScan() {
-		bucket = arrayOf()
-		_captured.value = null
-		_total.value = null
-		_progress.value = 0.0f
-	}
-
-	//MARK: Camera tools end
-
-	//MARK: Seed management begin
-
-	/**
-	 * Refresh seed names list
-	 * should be called within authentication envelope
-	 * authentication.authenticate(activity) {refreshSeedNames()}
-	 * which is somewhat asynchronous
-	 */
-	private fun refreshSeedNames() {
-		clearError()
-		_seedNames.value = sharedPreferences.all.keys.toTypedArray()
-	}
-
-	/**
-	 * Add seed, encrypt it, and create default accounts
-	 */
-	fun addSeed(seedName: String, seedPhrase: String) {
-
-		//Check if seed name already exists
-		if (seedNames.value?.contains(seedName) as Boolean) {
-			_lastError.value = "Seed with this name already exists!"
-		}
-
-		//Run standard login prompt!
-		authentication.authenticate(activity) {
-			try {
-				//Create relevant keys - should make sure this works before saving key
-				val finalSeedPhrase =
-					substrateTryCreateSeed(seedName, seedPhrase, 24, dbName)
-
-				//Encrypt and save seed
-				with(sharedPreferences.edit()) {
-					putString(seedName, finalSeedPhrase)
-					apply()
-				}
-
-				//Refresh model
-				refreshSeedNames()
-				selectSeed(seedName)
-				_backupSeedPhrase.value = finalSeedPhrase
-				_keyManagerModal.value = KeyManagerModal.SeedBackup
-			} catch (e: java.lang.Exception) {
-				_lastError.value = e.toString()
-				Log.e("Seed creation error", e.toString())
-			}
-		}
-	}
-
-	/**
-	 * Seed selector; does not check if seedname is valid
-	 * TODO: check that all related operations are done
-	 */
-	fun selectSeed(seedName: String) {
-		_selectedSeed.value = seedName
-		fetchKeys()
-	}
-
-	/**
-	 * Fetch seed from strongbox; must be in unlocked scope
-	 */
-	private fun getSeed(): String {
-		return sharedPreferences.getString(selectedSeed.value, "") ?: ""
-	}
-
-	/**
-	 * Selects seed key, if available
-	 */
-	fun getRootIdentity(seedName: String): JSONObject {
-		for (i in 0 until identities.value!!.length()) {
-			val identity = identities.value!!.getJSONObject(i)
-			if (identity.getString("seed_name") == seedName && identity.getString("path") == "" && identity.getString(
-					"has_password"
-				) == "false"
-			) {
-				return identity
-			}
-		}
-		return JSONObject()
-	}
-
-	//MARK: Seed management end
-
-	//MARK: Network management begin
-
-	/**
-	 * Get network list updated; call after any networks-altering operation
-	 * and on init and on refresh just in case
-	 */
-	private fun refreshNetworks() {
-		try {
-			val networkJSON = dbGetAllNetworksForNetworkSelector(dbName)
-			_networks.value = JSONArray(networkJSON)
-			fetchKeys()
-		} catch (e: java.lang.Exception) {
-			Log.e("Refresh network error", e.toString())
-		}
-	}
-
-
-	fun selectNetwork(network: JSONObject) {
-		_selectedNetwork.value = network
-		fetchKeys()
-	}
-
-	//MARK: Network management end
-
-	//MARK: Key management begin
-
-	/**
-	 * Refresh keys relevant for other parameters
-	 */
-	private fun fetchKeys() {
-		try {
-			Log.d("selectedNetwork", selectedNetwork.value.toString())
-			Log.d("Selected seed", selectedSeed.value.toString())
-			_identities.value = JSONArray(
-				dbGetRelevantIdentities(
-					selectedSeed.value ?: "",
-					selectedNetwork.value?.get("key").toString(),
-					dbName
-				)
-			)
-		} catch (e: java.lang.Exception) {
-			Log.e("fetch keys error", e.toString())
-		}
-	}
-
-	/**
-	 * Just set key for filtering
-	 */
-	fun selectKey(key: JSONObject) {
-		_selectedIdentity.value = key
-	}
-
-	/**
-	 * Add key to database; uses phone crypto to fetch seeds!
-	 */
-	fun addKey(path: String, password: String) {
-		if (selectedSeed.value?.isEmpty() as Boolean) selectSeed(
-			selectedIdentity.value?.get(
-				"seed_name"
-			).toString()
-		)
-		var fullPath = path
-		val hasPassword = password.isNotEmpty()
-		if (hasPassword) fullPath += "///$password"
-		try {
-			if (substrateCheckPath(path) != hasPassword) {
-				_lastError.value =
-					"The sequence /// is not allowed in path; use password field to include password (omitting ///)"
-				Log.e("Add key preparation error", "password in path field")
-				return
-			}
-		} catch (e: java.lang.Exception) {
-			_lastError.value = e.toString()
-			Log.e("Add key path check error", e.toString())
-		}
-		authentication.authenticate(activity) {
-			try {
-				substrateTryCreateIdentity(
-					selectedSeed.value!!,
-					getSeed(),
-					"sr25519",
-					path,
-					selectedNetwork.value?.get("key").toString(),
-					hasPassword,
-					dbName
-				)
-				fetchKeys()
-				clearKeyManagerScreen()
-			} catch (e: java.lang.Exception) {
-				Log.e("Add key error", e.toString())
-				_lastError.value = e.toString()
-			}
-		}
-	}
-
-	/**
-	 * delete selected key for selected network
-	 */
-	fun deleteKey() {
-		try {
-			substrateDeleteIdentity(
-				selectedIdentity.value?.get("public_key").toString(),
-				selectedNetwork.value?.get("key").toString(),
-				dbName
-			)
-			fetchKeys()
-			clearKeyManagerScreen()
-		} catch (e: java.lang.Exception) {
-			Log.e("key deletion error", e.toString())
-		}
-	}
-
-	fun proposeDerivePath(): String {
-		return if (selectedIdentity.value?.isNull("path") as Boolean)
-			"//"
-		else
-			selectedIdentity.value?.get("path").toString()
-	}
-
-	fun proposeIncrement(): String {
-		if (selectedIdentity.value?.isNull("path") as Boolean)
-			return ""
-		else {
-			return try {
-				substrateSuggestNPlusOne(
-					selectedIdentity.value?.get("path").toString(),
-					selectedSeed.value.toString(),
-					selectedNetwork.value?.get("key").toString(),
-					dbName
-				)
-			} catch (e: java.lang.Exception) {
-				_lastError.value = e.toString()
-				Log.e("Increment error", e.toString())
-				""
-			}
-		}
-	}
-
-	fun exportPublicKey(): ImageBitmap {
-		return try {
-			substrateExportPubkey(
-				selectedIdentity.value?.get("public_key").toString(),
-				selectedNetwork.value?.get("key").toString(),
-				dbName
-			).intoImageBitmap()
-		} catch (e: java.lang.Exception) {
-			Log.d("QR export error", e.toString())
-			_lastError.value = e.toString()
-			ImageBitmap(1, 1)
-		}
-	}
-
-	//MARK: Key management end
-
-	//MARK: Navigation begin
-
-	/**
-	 * Bottom navigation action
-	 */
-	fun navigate(screen: SignerScreen) {
-		_signerScreen.value = screen
-		if (screen == SignerScreen.Scan) {
-			//TODO: testing to make sure this goes smoothly
-			if (!allPermissionsGranted()) {
-				ActivityCompat.requestPermissions(
-					activity,
-					REQUIRED_PERMISSIONS,
-					REQUEST_CODE_PERMISSIONS
-				)
-			}
-		}
-		if (screen == SignerScreen.Keys) {
-			selectSeedEngage()
-		}
-		if (screen == SignerScreen.Log) {
-			engageHistoryScreen()
-		}
-	}
-
-	/**
-	 * Handle back button
-	 */
-	fun goBack() {
-		when (signerScreen.value) {
-			SignerScreen.Log -> {
-				totalRefresh()
-			}
-			SignerScreen.Scan -> {
-				clearTransaction()
-			}
-			SignerScreen.Keys -> {
-				when (keyManagerModal.value) {
-					KeyManagerModal.None -> {
-						selectSeedEngage()
-					}
-					KeyManagerModal.NewSeed -> {
-						selectSeedEngage()
-					}
-					KeyManagerModal.NewKey -> {
-						clearKeyManagerScreen()
-					}
-					KeyManagerModal.ShowKey -> {
-						clearKeyManagerScreen()
-					}
-					KeyManagerModal.SeedBackup -> {
-						selectSeedEngage()
-					}
-					KeyManagerModal.KeyDeleteConfirm -> {
-						clearKeyManagerScreen()
-					}
-					KeyManagerModal.SeedSelector -> {
-						selectSeedEngage()
-					}
-					KeyManagerModal.NetworkManager -> {
-						clearKeyManagerScreen()
-					}
-					KeyManagerModal.NetworkDetails -> {
-						clearKeyManagerScreen()
-					}
-				}
-			}
-			SignerScreen.Settings -> {
-				clearHistoryScreen()
-			}
-		}
-	}
-
-	fun isBottom(): Boolean {
-		return (settingsModal.value == SettingsModal.None && keyManagerModal.value == KeyManagerModal.SeedSelector && transactionState.value == TransactionState.None)
-	}
-
-	fun getScreenName(): String {
-		Log.d("getscreenname", "called")
-		return when (signerScreen.value) {
-			SignerScreen.Scan -> ""
-			SignerScreen.Keys -> when (keyManagerModal.value) {
-				KeyManagerModal.None -> ""
-				KeyManagerModal.NewSeed -> ""
-				KeyManagerModal.NewKey -> "New Derived Key"
-				KeyManagerModal.ShowKey -> if (selectedIdentity.value == getRootIdentity(
-						selectedSeed.value ?: ""
-					)
-				) {
-					"Seed key"
-				} else {
-					"Derived Key"
-				}
-				KeyManagerModal.SeedBackup -> "Backup Seed"
-				KeyManagerModal.KeyDeleteConfirm -> ""
-				KeyManagerModal.SeedSelector -> "Select Seed"
-				KeyManagerModal.NetworkManager -> ""
-				KeyManagerModal.NetworkDetails -> ""
-				null -> "error"
-			}
-			SignerScreen.Settings -> ""
-			SignerScreen.Log -> "History"
-			null -> "error"
-		}
-	}
-	//MARK: Navigation end
-
-	//MARK: Modals control begin
-
-	//KeyManager
-
-	/**
-	 * This happens when backup seed acknowledge button is pressed in seed creation screen.
-	 * TODO: This might misfire
-	 */
-	fun acknowledgeBackup() {
-		_backupSeedPhrase.value = ""
-		clearKeyManagerScreen()
-	}
-
-	/**
-	 * Use this to bring up seed selection screen in key manager
-	 */
-	private fun selectSeedEngage() {
-		selectSeed("")
-		_keyManagerModal.value = KeyManagerModal.SeedSelector
-	}
-
-	/**
-	 * Activate new seed screen on KeyManager screen
-	 */
-	fun newSeedScreenEngage() {
-		_keyManagerModal.value = KeyManagerModal.NewSeed
-	}
-
-	/**
-	 * Derive new key
-	 */
-	fun newKeyScreenEngage() {
-		_keyManagerModal.value = KeyManagerModal.NewKey
-	}
-
-	/**
-	 * Show public key QR screen
-	 */
-	fun exportPublicKeyEngage() {
-		_keyManagerModal.value = KeyManagerModal.ShowKey
-	}
-
-	/**
-	 * Remove key manager modals
-	 */
-	fun clearKeyManagerScreen() {
-		_keyManagerModal.value = if (selectedSeed.value == "") {
-			KeyManagerModal.SeedSelector
-		} else {
-			KeyManagerModal.None
-		}
-	}
-
-	/**
-	 * Key deletion confirmation
-	 */
-	fun deleteKeyConfirmation() {
-		_keyManagerModal.value = KeyManagerModal.KeyDeleteConfirm
-	}
-
-	//Settings
-
-	private fun engageHistoryScreen() {
-		refreshHistory()
-		getGeneralVerifier()
-		_signerScreen.value = SignerScreen.Log
-	}
-
-	private fun clearHistoryScreen() {
-		_settingsModal.value = SettingsModal.None
-	}
-
-	//MARK: Modals control end
 
 	//MARK: rust native section begin
 

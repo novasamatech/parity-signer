@@ -16,6 +16,9 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
 import io.parity.signer.models.SignerDataModel
+import io.parity.signer.models.addKey
+import io.parity.signer.models.proposeDerivePath
+import io.parity.signer.models.proposeIncrement
 
 @Composable
 fun NewKeyModal(signerDataModel: SignerDataModel, increment: Boolean) {

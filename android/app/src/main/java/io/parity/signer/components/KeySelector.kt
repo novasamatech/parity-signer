@@ -1,5 +1,6 @@
 package io.parity.signer.components
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -13,6 +14,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.unit.dp
 import io.parity.signer.models.SignerDataModel
+import io.parity.signer.models.exportPublicKeyEngage
+import io.parity.signer.models.getRootIdentity
+import io.parity.signer.models.selectKey
+import io.parity.signer.ui.theme.Bg200
 import org.json.JSONObject
 
 @Composable
@@ -27,19 +32,31 @@ fun KeySelector(signerDataModel: SignerDataModel) {
 					signerDataModel.selectedSeed.value ?: ""
 				)
 			) {
-				Row( verticalAlignment = Alignment.CenterVertically) {
-					Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.pointerInput(Unit) {
-						detectTapGestures(
-							onTap = {
-								signerDataModel.selectKey(identities.value!!.getJSONObject(item)?: JSONObject())
-								signerDataModel.exportPublicKeyEngage()
-							},
-							onLongPress = {
+				Row(
+					verticalAlignment = Alignment.CenterVertically,
+					modifier = Modifier
+						.padding(top = 3.dp, start = 12.dp, end = 12.dp)
+						.background(Bg200)
+				) {
+					Row(
+						verticalAlignment = Alignment.CenterVertically,
+						modifier = Modifier
+							.pointerInput(Unit) {
+								detectTapGestures(
+									onTap = {
+										signerDataModel.selectKey(
+											identities.value!!.getJSONObject(
+												item
+											) ?: JSONObject()
+										)
+										signerDataModel.exportPublicKeyEngage()
+									},
+									onLongPress = {
 
+									}
+								)
 							}
-						)
-					}
-						.padding(horizontal = 8.dp)
+							.padding(horizontal = 8.dp)
 					) {
 						KeyCard(
 							identities.value!!.getJSONObject(item),

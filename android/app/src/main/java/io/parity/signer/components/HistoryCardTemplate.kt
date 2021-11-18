@@ -1,5 +1,6 @@
 package io.parity.signer.components
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -12,9 +13,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
-import io.parity.signer.ui.theme.BaseDanger
-import io.parity.signer.ui.theme.Crypto400
-import io.parity.signer.ui.theme.Text300
+import io.parity.signer.ui.theme.*
 
 @Composable
 fun HistoryCardTemplate(
@@ -24,6 +23,7 @@ fun HistoryCardTemplate(
 	line3: String,
 	danger: Boolean = false
 ) {
+	val color1 = Text500
 	val color2 = if (danger) {
 		BaseDanger
 	} else {
@@ -34,19 +34,21 @@ fun HistoryCardTemplate(
 	Row(
 		verticalAlignment = Alignment.CenterVertically,
 		modifier = Modifier
-			.padding(8.dp)
+			.padding(top = 3.dp, start = 12.dp, end = 12.dp)
 			.fillMaxWidth(1f)
+			.background(Bg200)
+			.padding(8.dp)
 	) {
 		Icon(image, "history event icon", modifier = Modifier, tint = color2)
 		Column(
 			modifier = Modifier.padding(horizontal = 8.dp)
 		) {
-			Text(line1.substring(0, 16), style = MaterialTheme.typography.overline)
-			Text(line2, color = color2, style = MaterialTheme.typography.overline)
+			Text(line1.substring(0, 16), color = color1, style = MaterialTheme.typography.subtitle2)
+			Text(line2, color = color2, style = MaterialTheme.typography.subtitle2)
 			if (line3.isNotBlank()) Text(
 				line3,
 				color = color3,
-				style = MaterialTheme.typography.overline
+				style = CryptoTypography.body2
 			)
 		}
 	}

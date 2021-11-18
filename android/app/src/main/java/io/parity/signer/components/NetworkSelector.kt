@@ -7,6 +7,7 @@ import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
 import io.parity.signer.models.SignerDataModel
+import io.parity.signer.models.selectNetwork
 import io.parity.signer.ui.theme.Typography
 import org.json.JSONObject
 
