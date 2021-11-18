@@ -20,28 +20,44 @@ default:
       - unknown_failure
       - api_failure
 
-workflow:
-  rules:
-    - if: $CI_COMMIT_TAG
-    - if: $CI_COMMIT_BRANCH
+# workflow:
+  # rules:
+    # - if: $CI_COMMIT_TAG
+    # - if: $CI_COMMIT_BRANCH
 
-android-build-release:
-  stage:                           build
-  image:                           paritytech/signer-android-builder:latest
+android-build:
+  stage: build
+  image: paritytech/signer-android-builder:latest
   rules:
-    - if: $CI_PIPELINE_SOURCE == "web"
-    - if: $CI_PIPELINE_SOURCE == "schedule"
+      # TODO: Remove before merge with master
+    - if: $CI_COMMIT_REF_NAME == "mp-ci-revamp"
+    - if: $CI_COMMIT_REF_NAME =~ /^[0-9]+$/ # PRs
+  artifacts:
+    paths:
+      - android/app/build/outputs/apk/release/app-release-unsigned.apk
+  script:
+    - ./scripts/build.sh android
+    - cd android
+    - ./gradlew assembleRelease
+  tags:
+    - linux-docker
+
+android-build-and-sign:
+  stage: build
+  image: paritytech/signer-android-builder:latest
+  rules:
     - if: $CI_COMMIT_REF_NAME == "master"
       # TODO: Remove before merge with master
     - if: $CI_COMMIT_REF_NAME == "mp-ci-revamp"
-    - if: $CI_COMMIT_REF_NAME =~ /^v[0-9]+\.[0-9]+.*$/              # i.e. v1.0, v2.1rc1
-    - if: $CI_COMMIT_REF_NAME =~ /^[0-9]+$/                         # PRs
   artifacts:
     paths:
       - signer-ci-build.apk
   script:
     - cat "$KEYSTORE_DATA" | base64 -d > /tmp/gitlab-ci.keystore
     - wc /tmp/gitlab-ci.keystore
-    - ./scripts/build-release.sh /tmp/gitlab-ci.keystore "$KEYSTORE_PASS"
+    - ./scripts/build.sh android
+    - cd android
+    - ./gradlew assembleRelease
+    - ./scripts/sign_android.sh /tmp/gitlab-ci.keystore "$KEYSTORE_PASS"
   tags:
     - linux-docker
