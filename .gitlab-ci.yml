@@ -29,8 +29,6 @@ android-build:
   stage: build
   image: paritytech/signer-android-builder:latest
   rules:
-      # TODO: Remove before merge with master
-    - if: $CI_COMMIT_REF_NAME == "mp-ci-revamp"
     - if: $CI_COMMIT_REF_NAME =~ /^[0-9]+$/ # PRs
   artifacts:
     paths:
@@ -46,8 +44,6 @@ android-build-and-sign:
   image: paritytech/signer-android-builder:latest
   rules:
     - if: $CI_COMMIT_REF_NAME == "master"
-      # TODO: Remove before merge with master
-    - if: $CI_COMMIT_REF_NAME == "mp-ci-revamp"
   artifacts:
     paths:
       - signer-ci-build.apk
