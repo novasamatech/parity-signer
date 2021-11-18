@@ -5,7 +5,7 @@ MAINTAINER Parity Technologies <admin@parity.io>
 ENV ANDROID_SDK_ROOT /opt/android-sdk-linux
 ENV ANDROID_HOME /opt/android-sdk-linux
 ENV NDK_HOME /opt/android-ndk
-ENV ANDROID_NDK_VERSION r22
+ENV ANDROID_NDK_VERSION r23b
 ENV JAVA_HOME /usr/lib/jvm/java-11-openjdk-amd64/
 
 RUN apt-get -y update && apt-get -y install default-jdk wget unzip curl clang
@@ -28,9 +28,9 @@ RUN yes | sdkmanager "build-tools;30.0.3"
 
 RUN mkdir /opt/android-ndk-tmp && \
     cd /opt/android-ndk-tmp && \
-    wget -q https://dl.google.com/android/repository/android-ndk-${ANDROID_NDK_VERSION}-linux-x86_64.zip && \
+    wget -q https://dl.google.com/android/repository/android-ndk-${ANDROID_NDK_VERSION}-linux.zip && \
 # uncompress
-    unzip -q android-ndk-${ANDROID_NDK_VERSION}-linux-x86_64.zip && \
+    unzip -q android-ndk-${ANDROID_NDK_VERSION}-linux.zip && \
 # move to its final location
     mv ./android-ndk-${ANDROID_NDK_VERSION} ${NDK_HOME} && \
 # remove temp dir
