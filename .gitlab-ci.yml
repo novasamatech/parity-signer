@@ -37,8 +37,7 @@ android-build:
       - android/app/build/outputs/apk/release/app-release-unsigned.apk
   script:
     - ./scripts/build.sh android
-    - cd android
-    - ./gradlew assembleRelease
+    - cd android; ./gradlew assembleRelease
   tags:
     - linux-docker
 
@@ -56,8 +55,7 @@ android-build-and-sign:
     - cat "$KEYSTORE_DATA" | base64 -d > /tmp/gitlab-ci.keystore
     - wc /tmp/gitlab-ci.keystore
     - ./scripts/build.sh android
-    - cd android
-    - ./gradlew assembleRelease
+    - cd android; ./gradlew assembleRelease; cd ..
     - ./scripts/sign_android.sh /tmp/gitlab-ci.keystore "$KEYSTORE_PASS"
   tags:
     - linux-docker
