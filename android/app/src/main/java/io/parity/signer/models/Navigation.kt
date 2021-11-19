@@ -106,6 +106,10 @@ fun SignerDataModel.getScreenName(): String {
 			KeyManagerModal.NetworkManager -> ""
 			KeyManagerModal.NetworkDetails -> ""
 			null -> "error"
+			KeyManagerModal.NewSeedSelect -> "Create new seed?"
+			KeyManagerModal.RestoreSeed -> "Restore seed"
+			KeyManagerModal.SeedDeleteConfirm -> "Delete seed?"
+			KeyManagerModal.AllKeySelector -> "Select key for signing"
 		}
 		SignerScreen.Settings -> ""
 		SignerScreen.Log -> "History"
@@ -154,6 +158,13 @@ fun SignerDataModel.newKeyScreenEngage() {
  */
 fun SignerDataModel.exportPublicKeyEngage() {
 	_keyManagerModal.value = KeyManagerModal.ShowKey
+}
+
+/**
+ * Key backup
+ */
+fun SignerDataModel.backupEngage() {
+	_keyManagerModal.value = KeyManagerModal.SeedBackup
 }
 
 /**

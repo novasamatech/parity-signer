@@ -4,25 +4,49 @@ package io.parity.signer
  * All screens metadata for navigation
  */
 enum class SignerScreen() {
-	Scan, Keys, Settings, Log;
+	Scan,
+	Keys,
+	Settings,
+	Log;
 }
 
 enum class TransactionState {
-	None, Parsing, Preview, Password, Signed;
+	None,
+	Parsing,
+	Preview,
+	Password,
+	Signed;
 }
 
 enum class KeyManagerModal {
-	None, NewSeed, NewKey, ShowKey, SeedBackup, KeyDeleteConfirm, SeedSelector, NetworkManager, NetworkDetails;
+	None,
+	NewSeedSelect,
+	NewSeed,
+	RestoreSeed,
+	NewKey,
+	ShowKey,
+	SeedBackup,
+	SeedDeleteConfirm,
+	KeyDeleteConfirm,
+	SeedSelector,
+	NetworkManager,
+	NetworkDetails,
+	AllKeySelector;
 }
 
 enum class SettingsModal {
-	None, History;
+	None,
+	History;
 }
 
 enum class OnBoardingState {
-	InProgress, No, Yes;
+	InProgress,
+	No,
+	Yes;
 }
 
 enum class SignerAlert {
-	None, Active, Past
+	None,
+	Active,
+	Past
 }

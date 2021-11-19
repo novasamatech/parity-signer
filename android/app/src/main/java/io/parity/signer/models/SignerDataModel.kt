@@ -27,6 +27,7 @@ import android.content.Intent
 import android.content.BroadcastReceiver
 
 import android.content.IntentFilter
+import android.os.Build
 import android.provider.Settings
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
@@ -153,8 +154,11 @@ class SignerDataModel : ViewModel() {
 		//Define local database name
 		dbName = context.applicationContext.filesDir.toString() + "/Database"
 		authentication.context = context
-		hasStrongbox =
+		hasStrongbox = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
 			context.packageManager.hasSystemFeature(PackageManager.FEATURE_STRONGBOX_KEYSTORE)
+		} else {
+			false
+		}
 
 		Log.d("strongbox available", hasStrongbox.toString())
 
@@ -266,7 +270,12 @@ class SignerDataModel : ViewModel() {
 	 * Checks if airplane mode was off
 	 */
 	private fun isAirplaneOn() {
-		if (Settings.Global.getInt(context.contentResolver, Settings.Global.AIRPLANE_MODE_ON, 0) == 0) {
+		if (Settings.Global.getInt(
+				context.contentResolver,
+				Settings.Global.AIRPLANE_MODE_ON,
+				0
+			) == 0
+		) {
 			if (alert.value != SignerAlert.Active) {
 				_alert.value = SignerAlert.Active
 				historyDeviceWasOnline(dbName)
@@ -343,7 +352,11 @@ class SignerDataModel : ViewModel() {
 	internal fun refreshHistory() {
 		try {
 			_history.value = sortHistory(JSONArray(historyPrintHistory(dbName)))
-			_alert.value = if (historyGetWarnings(dbName)) {SignerAlert.Past} else {SignerAlert.None}
+			_alert.value = if (historyGetWarnings(dbName)) {
+				SignerAlert.Past
+			} else {
+				SignerAlert.None
+			}
 		} catch (e: java.lang.Exception) {
 			Log.e("History refresh error!", e.toString())
 		}

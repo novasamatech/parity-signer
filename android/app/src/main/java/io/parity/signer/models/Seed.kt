@@ -84,4 +84,7 @@ fun SignerDataModel.getRootIdentity(seedName: String): JSONObject {
 	return JSONObject()
 }
 
+fun SignerDataModel.removeSeed() {
+
+}
 //MARK: Seed management end

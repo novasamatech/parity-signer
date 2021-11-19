@@ -19,6 +19,7 @@ import androidx.compose.ui.unit.dp
 import io.parity.signer.KeyManagerModal
 import io.parity.signer.components.SeedCard
 import io.parity.signer.models.SignerDataModel
+import io.parity.signer.models.backupEngage
 import io.parity.signer.models.clearKeyManagerScreen
 import io.parity.signer.models.selectSeed
 import io.parity.signer.ui.theme.Bg200
@@ -50,6 +51,7 @@ fun SeedManager(signerDataModel: SignerDataModel) {
 				}
 				IconButton(onClick = {
 					signerDataModel.selectSeed(seedNames.value!![item])
+					signerDataModel.backupEngage()
 				}) {
 					Icon(Icons.Default.List, contentDescription = "Backup seed")
 				}

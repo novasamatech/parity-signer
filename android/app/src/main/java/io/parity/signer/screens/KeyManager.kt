@@ -78,9 +78,13 @@ fun KeyManager(signerDataModel: SignerDataModel) {
 		KeyManagerModal.KeyDeleteConfirm -> {
 			KeyDelete(signerDataModel)
 		}
-		null -> WaitingScreen()
 		KeyManagerModal.SeedSelector -> SeedManager(signerDataModel = signerDataModel)
 		KeyManagerModal.NetworkManager -> NetworkManager(signerDataModel = signerDataModel)
 		KeyManagerModal.NetworkDetails -> NetworkDetails(signerDataModel = signerDataModel)
+		KeyManagerModal.NewSeedSelect -> TODO()
+		KeyManagerModal.RestoreSeed -> TODO()
+		KeyManagerModal.SeedDeleteConfirm -> TODO()
+		KeyManagerModal.AllKeySelector -> TODO()
+		null -> WaitingScreen()
 	}
 }
