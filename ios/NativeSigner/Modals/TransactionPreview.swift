@@ -19,7 +19,9 @@ struct TransactionPreview: View {
                             TransactionCardView(card: card)
                         }
                     }
-                    TransactionCommentInput()
+                    if (data.action?.type == "sign") {
+                        TransactionCommentInput()
+                    }
                 }
                 Spacer()
                 HStack {
@@ -29,14 +31,14 @@ struct TransactionPreview: View {
                     }
                     Spacer()
                     if data.action != nil {
-                        if data.action!.type == "sign_transaction" {
+                        if data.action!.type == "sign" {
                             Button(action: {data.transactionState = .signed}) {
                                 Text("Sign")
                                     .font(.largeTitle)
                             }
                         } else {
                             Button(action: {
-                                data.signTransaction(seedPhrase: "", password: "")
+                                data.handleTransaction()
                                 data.totalRefresh()
                             }) {
                                 Text("Approve")
@@ -48,6 +50,9 @@ struct TransactionPreview: View {
             }
         }
         .background(/*@START_MENU_TOKEN@*//*@PLACEHOLDER=View@*/Color("backgroundColor")/*@END_MENU_TOKEN@*/)
+        .onAppear{
+            print(data.cards)
+        }
     }
 }
 /*

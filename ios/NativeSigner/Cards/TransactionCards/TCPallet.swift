@@ -9,20 +9,23 @@ import SwiftUI
 
 struct TCPallet: View {
     let text: String
+    @State private var showDoc = false
     var body: some View {
-        HStack {
-            Text(text)
-                .foregroundColor(Color("AccentColor"))
-            Spacer()
+        VStack {
+            HStack {
+                Text("Pallet").foregroundColor(Color("AccentColor"))
+                Text(text)
+                    .foregroundColor(Color("textMainColor"))
+                Spacer()
+            }
         }
-        .background(/*@START_MENU_TOKEN@*//*@PLACEHOLDER=View@*/Color("backgroundCard")/*@END_MENU_TOKEN@*/)
     }
 }
 
 /*
-struct TCPallet_Previews: PreviewProvider {
-    static var previews: some View {
-        TCPallet()
-    }
-}
-*/
+ struct TCPallet_Previews: PreviewProvider {
+ static var previews: some View {
+ TCPallet()
+ }
+ }
+ */

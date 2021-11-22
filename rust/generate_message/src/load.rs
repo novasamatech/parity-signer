@@ -1,9 +1,8 @@
 use constants::{ADDRESS_BOOK, HOT_DB_NAME, METATREE};
-use sled::Tree;
 use anyhow;
 use db_handling::helpers::{open_db, open_tree};
-use parity_scale_codec::{Decode, Encode};
-use definitions::metadata::AddressBookEntry;
+use parity_scale_codec::Decode;
+use definitions::{keyring::MetaKeyPrefix, metadata::AddressBookEntry};
 
 use crate::parser::{Instruction, Content, Set};
 use crate::metadata_db_utils::{add_new, SortedMetaValues, prepare_metadata, write_metadata};
@@ -18,31 +17,28 @@ use crate::output_prep::load_meta_print;
 
 pub fn gen_load_meta (instruction: Instruction) -> anyhow::Result<()> {
     
-    let database = open_db(HOT_DB_NAME)?;
-    let address_book = open_tree(&database, ADDRESS_BOOK)?;
-    let metadata = open_tree(&database, METATREE)?;
     if let Some(_) = instruction.encryption_override {return Err(Error::NotSupported.show())}
     match instruction.set {
         Set::F => {
             match instruction.content {
                 Content::All => {
-                    let set = get_address_book_set(&address_book)?;
+                    let set = get_address_book_set()?;
                     for x in set.iter() {
-                        match meta_f_a_element (x, &metadata) {
+                        match meta_f_a_element (x) {
                             Ok(()) => (),
                             Err(e) => error_occured(e, instruction.pass_errors)?,
                         }
                     }
                     Ok(())
                 },
-                Content::Name(name) => meta_f_n (&name, &address_book, &metadata),
+                Content::Name(name) => meta_f_n (&name),
                 Content::Address(_) => return Err(Error::NotSupported.show()),
             }
         },
         Set::D => {
             match instruction.content {
                 Content::All => {
-                    let set = get_address_book_set(&address_book)?;
+                    let set = get_address_book_set()?;
                     for x in set.iter() {
                         match meta_d_a_element (x) {
                             Ok(()) => (),
@@ -51,31 +47,31 @@ pub fn gen_load_meta (instruction: Instruction) -> anyhow::Result<()> {
                     }
                     Ok(())
                 },
-                Content::Name(name) => meta_d_n (&name, &address_book),
+                Content::Name(name) => meta_d_n (&name),
                 Content::Address(address) => meta_d_u (&address),
             }
         },
         Set::K => {
             let write = Write::OnlyNew;
             match instruction.content {
-                Content::All => meta_kpt_a(&address_book, &metadata, &write, instruction.pass_errors),
-                Content::Name(name) => meta_kpt_n (&name, &write, &address_book, &metadata),
+                Content::All => meta_kpt_a(&write, instruction.pass_errors),
+                Content::Name(name) => meta_kpt_n (&name, &write),
                 Content::Address(_) => return Err(Error::NotSupported.show()),
             }
         },
         Set::P => {
             let write = Write::None;
             match instruction.content {
-                Content::All => meta_kpt_a(&address_book, &metadata, &write, instruction.pass_errors),
-                Content::Name(name) => meta_kpt_n (&name, &write, &address_book, &metadata),
+                Content::All => meta_kpt_a(&write, instruction.pass_errors),
+                Content::Name(name) => meta_kpt_n (&name, &write),
                 Content::Address(_) => return Err(Error::NotSupported.show()),
             }
         },
         Set::T => {
             let write = Write::All;
             match instruction.content {
-                Content::All => meta_kpt_a(&address_book, &metadata, &write, instruction.pass_errors),
-                Content::Name(name) => meta_kpt_n (&name, &write, &address_book, &metadata),
+                Content::All => meta_kpt_a(&write, instruction.pass_errors),
+                Content::Name(name) => meta_kpt_n (&name, &write),
                 Content::Address(_) => return Err(Error::NotSupported.show()),
             }
         },
@@ -88,10 +84,13 @@ pub fn gen_load_meta (instruction: Instruction) -> anyhow::Result<()> {
 /// to get all versions available in the database (max 2),
 /// check meta_values integrity (network specname and spec_version),
 /// and print into `sign_me` output file.  
-fn meta_f_a_element (set_element: &NameHashAddress, metadata: &Tree) -> anyhow::Result<()> {
-    for x in metadata.scan_prefix(set_element.name.encode()) {
-        if let Ok((versioned_name_encoded, meta)) = x {
-            let meta_values = decode_and_check_meta_entry((versioned_name_encoded, meta))?;
+fn meta_f_a_element (set_element: &NameHashAddress) -> anyhow::Result<()> {
+    let meta_key_prefix = MetaKeyPrefix::from_name(&set_element.name);
+    let database = open_db(HOT_DB_NAME)?;
+    let metadata = open_tree(&database, METATREE)?;
+    for x in metadata.scan_prefix(meta_key_prefix.prefix()) {
+        if let Ok(a) = x {
+            let meta_values = decode_and_check_meta_entry(a)?;
             let shortcut = MetaShortCut {
                 meta_values,
                 genesis_hash: set_element.genesis_hash,
@@ -113,8 +112,8 @@ fn meta_f_a_element (set_element: &NameHashAddress, metadata: &Tree) -> anyhow::
 /// to get all versions available in the database (max 2),
 /// check `meta_values` integrity (network specname and `spec_version`),
 /// and print into `sign_me` output file.  
-fn meta_f_n (name: &str, address_book: &Tree, metadata: &Tree) -> anyhow::Result<()> {
-    meta_f_a_element(&search_name(name, address_book)?, metadata)
+fn meta_f_n (name: &str) -> anyhow::Result<()> {
+    meta_f_a_element(&search_name(name)?)
 }
 
 /// Function to process individual address book entry in `load_metadata -d -a` run.
@@ -132,8 +131,8 @@ fn meta_d_a_element (set_element: &NameHashAddress) -> anyhow::Result<()> {
 /// search through this set for the entry corresponding to the requested name,
 /// fetch information from address, check it,
 /// and print into `sign_me` output file.
-fn meta_d_n (name: &str, address_book: &Tree) -> anyhow::Result<()> {
-    meta_d_a_element(&search_name(name, address_book)?)
+fn meta_d_n (name: &str) -> anyhow::Result<()> {
+    meta_d_a_element(&search_name(name)?)
 }
 
 /// Function to process `load_metadata -d -u url` run.
@@ -153,9 +152,9 @@ fn meta_d_u (address: &str) -> anyhow::Result<()> {
 /// max 2 most recent metadata entries for each network),
 /// record resulting metadata into database.
 /// `write` determines which `sign_me` files are produced.
-fn meta_kpt_a (address_book: &Tree, metadata: &Tree, write: &Write, pass_errors: bool) -> anyhow::Result<()> {
-    let set = get_address_book_set(&address_book)?;
-    let mut sorted_meta_values = prepare_metadata(&metadata)?;
+fn meta_kpt_a (write: &Write, pass_errors: bool) -> anyhow::Result<()> {
+    let set = get_address_book_set()?;
+    let mut sorted_meta_values = prepare_metadata()?;
     for x in set.iter() {
         sorted_meta_values = match meta_kpt_a_element (x, write, &sorted_meta_values) {
             Ok(a) => a,
@@ -165,7 +164,7 @@ fn meta_kpt_a (address_book: &Tree, metadata: &Tree, write: &Write, pass_errors:
             },
         };
     }
-    write_metadata(sorted_meta_values, &metadata)
+    write_metadata(sorted_meta_values)
 }
 
 /// Function to process an individual element of
@@ -194,10 +193,10 @@ fn meta_kpt_a_element (set_element: &NameHashAddress, write: &Write, sorted_meta
 /// fetch information from address, check it, insert into sorted metadata
 /// and print into `sign_me` output file depending on `write` value,
 /// record resulting metadata into database.
-fn meta_kpt_n (name: &str, write: &Write, address_book: &Tree, metadata: &Tree) -> anyhow::Result<()> {
-    let mut sorted_meta_values = prepare_metadata(&metadata)?;
-    sorted_meta_values = meta_kpt_a_element(&search_name(name, address_book)?, write, &sorted_meta_values)?;
-    write_metadata(sorted_meta_values, &metadata)
+fn meta_kpt_n (name: &str, write: &Write) -> anyhow::Result<()> {
+    let mut sorted_meta_values = prepare_metadata()?;
+    sorted_meta_values = meta_kpt_a_element(&search_name(name)?, write, &sorted_meta_values)?;
+    write_metadata(sorted_meta_values)
 }
 
 /// Struct to collect network specname, genesis hash and fetching address from address book
@@ -209,7 +208,9 @@ struct NameHashAddress {
 }
 
 /// Function to collect a vector of unique NameHashAddress entries from address book
-fn get_address_book_set (address_book: &Tree) -> anyhow::Result<Vec<NameHashAddress>> {
+fn get_address_book_set () -> anyhow::Result<Vec<NameHashAddress>> {
+    let database = open_db(HOT_DB_NAME)?;
+    let address_book = open_tree(&database, ADDRESS_BOOK)?;
     let mut set: Vec<NameHashAddress> = Vec::new();
     for x in address_book.iter() {
         if let Ok((_, address_book_entry_encoded)) = x {
@@ -239,8 +240,8 @@ fn get_address_book_set (address_book: &Tree) -> anyhow::Result<Vec<NameHashAddr
 /// Function to collect a vector of unique NameHashAddress entries from address book
 /// and search for particular name in it,
 /// outputs NameHashAddress
-fn search_name (name: &str, address_book: &Tree) -> anyhow::Result<NameHashAddress> {
-    let set = get_address_book_set(&address_book)?;
+fn search_name (name: &str) -> anyhow::Result<NameHashAddress> {
+    let set = get_address_book_set()?;
     let mut found = None;
     for x in set.into_iter() {
         if x.name == name {

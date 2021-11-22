@@ -37,14 +37,3 @@ pub struct StructField {
     pub field_type: String,
 }
 
-/// Struct to store types updates in history log
-pub struct TypesUpdate {
-    pub types_hash: String,
-    pub verifier_line: String,
-}
-
-impl TypesUpdate {
-    pub fn show(&self) -> String {
-        format!("\"types_hash\":\"{}\",\"verifier\":{}", &self.types_hash, &self.verifier_line)
-    }
-}

@@ -1,91 +1,66 @@
 use constants::{METATREE, SETTREE, SPECSTREE, TYPES};
-use definitions::{metadata::{MetaValues, NameVersioned}, network_specs::{ChainSpecsToSend}, qr_transfers::ContentLoadTypes};
-use parity_scale_codec::{Decode, Encode};
+use definitions::{keyring::{MetaKey, NetworkSpecsKey}, network_specs::{ChainSpecsToSend}, qr_transfers::{ContentLoadTypes, ContentLoadMeta, ContentAddSpecs}};
 use anyhow;
 
-use crate::error::{Error, NotFound, NotDecodeable};
-use crate::helpers::{open_db, open_tree, decode_chain_specs, check_metadata};
+use crate::error::{Error, NotFound, NotDecodeable, NotHex};
+use crate::helpers::{open_db, open_tree, decode_chain_specs, check_metadata, unhex};
 
 
 /// Function to get types info from the database
-
 pub fn prep_types (database_name: &str) -> anyhow::Result<ContentLoadTypes> {
-    
     let database = open_db(database_name)?;
     let settings = open_tree(&database, SETTREE)?;
-    
     let types_info_encoded = match settings.get(TYPES) {
         Ok(Some(a)) => a.to_vec(),
         Ok(None) => return Err(Error::NotFound(NotFound::Types).show()),
         Err(e) => return Err(Error::InternalDatabaseError(e).show()),
     };
-    
     let out = ContentLoadTypes::from_vec(&types_info_encoded);
-    
     match out.types() {
         Ok(_) => Ok(out),
         Err(_) => return Err(Error::NotDecodeable(NotDecodeable::Types).show()),
     }
 }
 
-
 /// Function to get encoded ChainSpecsToSend from the cold (!!!) database searching by network name
 /// !!! for cold db only !!!
 /// Cuts off the verifier and order, used for preparation of messages
-
-pub fn get_network_specs (network_name: &str, database_name: &str) -> anyhow::Result<ChainSpecsToSend> {
-    
+pub fn prep_network_specs (network_specs_key_hex: &str, database_name: &str) -> anyhow::Result<ContentAddSpecs> {
     let database = open_db(database_name)?;
     let chainspecs = open_tree(&database, SPECSTREE)?;
-    
-    let mut found_network_specs = None;
-    
-    for x in chainspecs.iter() {
-        if let Ok((network_key, network_specs_encoded)) = x {
-            let network_specs = decode_chain_specs(network_specs_encoded, &network_key.to_vec())?;
-            if network_specs.name == network_name {
-                found_network_specs = Some(network_specs);
-                break;
-            }
-        }
-    }
-    match found_network_specs {
-        Some(network_specs) => {
-            let network_specs_to_send = ChainSpecsToSend {
-                base58prefix: network_specs.base58prefix,
-                color: network_specs.color,
-                decimals: network_specs.decimals,
-                encryption: network_specs.encryption,
-                genesis_hash: network_specs.genesis_hash,
-                logo: network_specs.logo,
-                name: network_specs.name,
-                path_id: network_specs.path_id,
-                secondary_color: network_specs.secondary_color,
-                title: network_specs.title,
-                unit: network_specs.unit,
-            };
-            Ok(network_specs_to_send)
-        },
-        None => return Err(Error::NotFound(NotFound::NetworkSpecs(network_name.to_string())).show()),
-    }
-    
+    let network_specs_key = NetworkSpecsKey::from_vec(&unhex(network_specs_key_hex, NotHex::NetworkSpecsKey)?);
+    let network_specs = match chainspecs.get(&network_specs_key.key()) {
+        Ok(Some(network_specs_encoded)) => decode_chain_specs(network_specs_encoded, &network_specs_key)?,
+        Ok(None) => return Err(Error::NotFound(NotFound::NetworkSpecsKey).show()),
+        Err(e) => return Err(Error::InternalDatabaseError(e).show()),
+    };
+    let network_specs_to_send = ChainSpecsToSend {
+        base58prefix: network_specs.base58prefix,
+        color: network_specs.color,
+        decimals: network_specs.decimals,
+        encryption: network_specs.encryption,
+        genesis_hash: network_specs.genesis_hash,
+        logo: network_specs.logo,
+        name: network_specs.name,
+        path_id: network_specs.path_id,
+        secondary_color: network_specs.secondary_color,
+        title: network_specs.title,
+        unit: network_specs.unit,
+    };
+    Ok(ContentAddSpecs::generate(&network_specs_to_send))
 }
 
 
 /// Function to get genesis hash from the database searching by network name, for cold db only.
-
-pub fn get_genesis_hash (network_name: &str, database_name: &str) -> anyhow::Result<Vec<u8>> {
-    
+pub fn get_genesis_hash (network_name: &str, database_name: &str) -> anyhow::Result<[u8;32]> {
     let database = open_db(database_name)?;
     let chainspecs = open_tree(&database, SPECSTREE)?;
-    
     let mut found_genesis_hash = None;
-    
     for x in chainspecs.iter() {
-        if let Ok((network_key, network_specs_encoded)) = x {
-            let network_specs = decode_chain_specs(network_specs_encoded, &network_key.to_vec())?;
+        if let Ok((network_specs_key_vec, network_specs_encoded)) = x {
+            let network_specs = decode_chain_specs(network_specs_encoded, &NetworkSpecsKey::from_vec(&network_specs_key_vec.to_vec()))?;
             if network_specs.name == network_name {
-                found_genesis_hash = Some(network_specs.genesis_hash.to_vec());
+                found_genesis_hash = Some(network_specs.genesis_hash);
                 break;
             }
         }
@@ -94,120 +69,25 @@ pub fn get_genesis_hash (network_name: &str, database_name: &str) -> anyhow::Res
         Some(a) => Ok(a),
         None => return Err(Error::NotFound(NotFound::NetworkSpecs(network_name.to_string())).show()),
     }
-    
 }
 
 
 /// Function to get metadata from the database searching by network name and version
-
 pub fn get_metadata (network_name: &str, network_version: u32, database_name: &str) -> anyhow::Result<Vec<u8>> {
-    
     let database = open_db(database_name)?;
     let metadata = open_tree(&database, METATREE)?;
-    
-    let versioned_name = NameVersioned {
-        name: network_name.to_string(),
-        version: network_version,
-    };
-    
-    match metadata.get(versioned_name.encode()) {
-        Ok(Some(meta)) => {
-            check_metadata(meta.to_vec(), &versioned_name)
-        },
-        Ok(None) => return Err(Error::NotFound(NotFound::NameVersioned(versioned_name)).show()),
+    let meta_key = MetaKey::from_parts(network_name, network_version);
+    match metadata.get(meta_key.key()) {
+        Ok(Some(meta)) => {check_metadata(meta.to_vec(), network_name, network_version)},
+        Ok(None) => return Err(Error::NotFound(NotFound::NameVersioned{name: network_name.to_string(), version: network_version}).show()),
         Err(e) => return Err(Error::InternalDatabaseError(e).show()),
     }
-    
 }
-
-
-/// Function to get LATEST metadata from the database searching by network name
-
-pub fn get_latest_metadata (network_name: &str, database_name: &str) -> anyhow::Result<(Vec<u8>, u32)> {
-    
-    let database = open_db(database_name)?;
-    let metadata = open_tree(&database, METATREE)?;
-    
-    let mut latest_version_meta_values: Option<MetaValues> = None;
-    
-    for x in metadata.scan_prefix(network_name.encode()) {
-        if let Ok((versioned_name_encoded, meta)) = x {
-            let versioned_name = match <NameVersioned>::decode(&mut &versioned_name_encoded[..]) {
-                Ok(a) => a,
-                Err(_) => return Err(Error::NotDecodeable(NotDecodeable::NameVersioned).show()),
-            };
-            let meta = check_metadata(meta.to_vec(), &versioned_name)?;
-            
-            latest_version_meta_values = match latest_version_meta_values {
-                Some(a) => {
-                    if a.version < versioned_name.version {
-                        Some (MetaValues {
-                            name: network_name.to_string(),
-                            version: versioned_name.version,
-                            meta,
-                        })
-                    }
-                    else {Some(a)}
-                },
-                None => {
-                    Some (MetaValues {
-                        name: network_name.to_string(),
-                        version: versioned_name.version,
-                        meta,
-                    })
-                }
-            };
-        }
-    }
-    
-    match latest_version_meta_values {
-        Some(a) => Ok((a.meta, a.version)),
-        None => return Err(Error::NotFound(NotFound::MetaFromName(network_name.to_string())).show()),
-    }
-}
-
 
 /// Function to get contents for load_metadata message from the database
-
-pub fn prep_load_metadata (network_name: &str, network_version: u32, database_name: &str) -> anyhow::Result<Vec<u8>> {
+pub fn prep_load_metadata (network_name: &str, network_version: u32, database_name: &str) -> anyhow::Result<ContentLoadMeta> {
     let metadata_vector = get_metadata (network_name, network_version, database_name)?;
-    let genesis_hash_vector = get_genesis_hash (network_name, database_name)?;
-    Ok([metadata_vector, genesis_hash_vector].concat())
+    let genesis_hash = get_genesis_hash (network_name, database_name)?;
+    Ok(ContentLoadMeta::generate(&metadata_vector, &genesis_hash))
 }
 
-
-pub struct PrepAddNetwork {
-    pub name: String,
-    pub version: u32,
-    pub meta: Vec<u8>,
-    pub network_specs: ChainSpecsToSend,
-}
-
-/// Function to get contents for load_metadata message from the database
-
-pub fn prep_add_network_versioned (network_name: &str, network_version: u32, database_name: &str) -> anyhow::Result<PrepAddNetwork> {
-    let metadata_vector = get_metadata (network_name, network_version, database_name)?;
-    let network_specs = get_network_specs (network_name, database_name)?;
-    let prep_add_network = PrepAddNetwork {
-        name: network_name.to_string(),
-        version: network_version,
-        meta: metadata_vector,
-        network_specs,
-    };
-    Ok(prep_add_network)
-}
-
-
-/// Function to get contents for load_metadata message from the database
-
-pub fn prep_add_network_latest (network_name: &str, database_name: &str) -> anyhow::Result<PrepAddNetwork> {
-    let (metadata_vector, version) = get_latest_metadata (network_name, database_name)?;
-    let network_specs = get_network_specs (network_name, database_name)?;
-    let prep_add_network = PrepAddNetwork {
-        name: network_name.to_string(),
-        version,
-        meta: metadata_vector,
-        network_specs,
-    };
-    Ok(prep_add_network)
-}

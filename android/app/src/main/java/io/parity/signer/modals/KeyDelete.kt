@@ -3,6 +3,8 @@ package io.parity.signer.modals
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable
 import io.parity.signer.models.SignerDataModel
+import io.parity.signer.models.clearKeyManagerScreen
+import io.parity.signer.models.deleteKey
 
 @Composable
 fun KeyDelete(signerDataModel: SignerDataModel) {

@@ -15,7 +15,7 @@ struct HeaderBar: View {
             Text(line1).foregroundColor(Color("textMainColor"))
             Text(line2).foregroundColor(Color("textFadedColor"))
             Divider()
-        }.padding(.horizontal)
+        }.padding(.horizontal).font(.caption)
     }
 }
 

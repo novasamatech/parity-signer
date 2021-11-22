@@ -23,63 +23,68 @@ struct NewSeedScreen: View {
         ZStack{
             ModalBackdrop()
             VStack {
-                Text("Seed name")
-                    .font(.title)
-                    .foregroundColor(Color("textMainColor"))
-                TextField("Seed", text: $seedName, prompt: Text("Seed name"))
-                    .foregroundColor(Color("textEntryColor"))
-                    .background(Color("textFieldColor"))
-                    .font(.largeTitle)
-                    .disableAutocorrection(true)
-                    .keyboardType(.asciiCapable)
-                    .submitLabel(.done)
-                    .onChange(of: seedName, perform: { _ in
-                        data.lastError = ""
-                    })
-                    .onAppear(perform: {nameFocused = true})
-                    .focused($nameFocused)
-                    .border(Color("AccentColor"), width: 1)
-                Toggle(isOn: $recover) {
-                    Text("Enter custom seedphrase")
-                        .font(.headline)
-                        .foregroundColor(Color("textMainColor"))
-                }
-                if (recover) {
-                    //TODO: make completely custom tool for this
-                    TextEditor(text: $seedPhrase)
-                        .frame(height: 150.0)
-                        .autocapitalization(.none)
-                        .keyboardType(.asciiCapable)
+                VStack(alignment: .leading) {
+                    Text("New Seed").font(.title)
+                    Text("DISPLAY NAME").font(.callout)
+                    ZStack {
+                        RoundedRectangle(cornerRadius: 8).stroke(Color("AccentColor")).foregroundColor(Color("backgroundColor")).frame(height: 39)
+                    TextField("Seed", text: $seedName, prompt: Text("Seed name"))
+                        .focused($nameFocused)
+                        .foregroundColor(Color("textEntryColor"))
+                        .background(Color("backgroundColor"))
+                        .font(.system(size: 16, weight: .regular))
                         .disableAutocorrection(true)
-                        .font(.title)
-                        .foregroundColor(Color("cryptoColor"))
-                        .background(Color("textFieldColor"))
-                        .border(Color("cryptoColor"), width: /*@START_MENU_TOKEN@*/1/*@END_MENU_TOKEN@*/)
-                }
-                Text(data.lastError).foregroundColor(.red)
-                HStack{
-                    Button(action: {
-                        data.lastError = ""
-                        seedPhrase = ""
-                        data.keyManagerModal = .none
-                    }) {
-                        Text("Cancel").font(.largeTitle)
+                        .keyboardType(.asciiCapable)
+                        .submitLabel(.done)
+                        .onChange(of: seedName, perform: { _ in
+                            data.lastError = ""
+                        })
+                        .onAppear(perform: {nameFocused = true})
+                        .padding(.horizontal, 8)
                     }
-                    Spacer()
-                    Button(action: {
-                        if !recover {seedPhrase = ""}
-                        data.addSeed(seedName: seedName, seedPhrase: seedPhrase)
-                    }) {
-                        Text("Create")
-                            .font(.largeTitle)
+                    Text("Display name visible only to you").font(.callout)
+                    Toggle(isOn: $recover) {
+                        Text("Recover seed phrase?")
+                            .font(.headline)
+                            .foregroundColor(Color("textMainColor"))
                     }
-                }
-                .padding()
+                    if (recover) {
+                        ZStack {
+                            RoundedRectangle(cornerRadius: 8).stroke(Color("AccentColor")).foregroundColor(Color("backgroundColor")).frame(height: 150)
+                        //TODO: make completely custom tool for this
+                        TextEditor(text: $seedPhrase)
+                                .onChange(of: seedPhrase, perform: { _ in
+                                    if seedPhrase.contains("\n") {
+                                        seedPhrase = seedPhrase.replacingOccurrences(of: "\n", with: "")
+                                        nameFocused = true
+                                    }
+                                })
+                            .autocapitalization(.none)
+                            .keyboardType(.asciiCapable)
+                            .disableAutocorrection(true)
+                            .font(.system(size: 16, design: .monospaced))
+                            .foregroundColor(Color("cryptoColor"))
+                            .background(Color("backgroundColor"))
+                            .frame(height: 150)
+                            .padding(8)
+                        }
+                    }
+                    Text(data.lastError).foregroundColor(.red)
+                    HStack {
+                        Spacer()
+                        Button(action: {
+                            if !recover {seedPhrase = ""}
+                            data.addSeed(seedName: seedName, seedPhrase: seedPhrase)
+                        }) {
+                            Text("Create")
+                                .font(.system(size: 22))
+                        }
+                        .disabled(seedName == "")
+                    }
+                }.padding()
             }
         }
-        .background(/*@START_MENU_TOKEN@*//*@PLACEHOLDER=View@*/Color("backgroundColor")/*@END_MENU_TOKEN@*/)
     }
-    
 }
 
 /*

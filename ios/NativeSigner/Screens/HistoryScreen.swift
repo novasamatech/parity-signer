@@ -17,7 +17,7 @@ struct HistoryScreen: View {
                         VStack (alignment: .leading){
                             ForEach(history.events, id: \.self) {event in
                                 Button(action: {
-                                    data.selectedRecord = event
+                                    data.selectedRecord = history
                                 }) {
                                     HistoryCard(event: event, timestamp: history.timestamp.padding(toLength: 16, withPad: " ", startingAt: 0))
                                         .foregroundColor(/*@START_MENU_TOKEN@*/Color("textMainColor")/*@END_MENU_TOKEN@*/)
@@ -35,11 +35,7 @@ struct HistoryScreen: View {
             //TODO
             ZStack {
                 RoundedRectangle(cornerRadius: 50).foregroundColor(/*@START_MENU_TOKEN@*/Color("backgroundCard")/*@END_MENU_TOKEN@*/)
-                VStack {
-                    Text("This is not implemented yet, sorry!")
-                        .font(.headline).foregroundColor(Color("dangerColor"))
-                    Text(String(describing: data.selectedRecord!))
-                }
+                EventDetails()
             }
         }
     }

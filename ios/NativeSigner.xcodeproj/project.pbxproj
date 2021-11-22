@@ -12,13 +12,15 @@
 		2D0D5E7E26F0B1D900B0EF9D /* DeleteKeyConfirm.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D0D5E7D26F0B1D900B0EF9D /* DeleteKeyConfirm.swift */; };
 		2D0D5E8026F0CFB100B0EF9D /* TCFieldName.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D0D5E7F26F0CFB100B0EF9D /* TCFieldName.swift */; };
 		2D0D5E8226F0CFEB00B0EF9D /* TCFieldNumber.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D0D5E8126F0CFEB00B0EF9D /* TCFieldNumber.swift */; };
-		2D0D5E8426F0D01800B0EF9D /* TCTXRange.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D0D5E8326F0D01800B0EF9D /* TCTXRange.swift */; };
-		2D0D5E8626F0D0CC00B0EF9D /* TCPathDocs.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D0D5E8526F0D0CC00B0EF9D /* TCPathDocs.swift */; };
 		2D72B4F626EF3BC50081E879 /* Navigator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D72B4F526EF3BC50081E879 /* Navigator.swift */; };
 		2D72B4F826EF427C0081E879 /* Header.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D72B4F726EF427C0081E879 /* Header.swift */; };
 		2D72B4FA26EF7D1C0081E879 /* Seeds.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D72B4F926EF7D1C0081E879 /* Seeds.swift */; };
+		2D72D50A272A9E95004BA7C9 /* EventDetails.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D72D509272A9E95004BA7C9 /* EventDetails.swift */; };
+		2D72D50C272AA043004BA7C9 /* HistoryCardExtended.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D72D50B272AA043004BA7C9 /* HistoryCardExtended.swift */; };
+		2D72D52A2732B8A7004BA7C9 /* Database in Resources */ = {isa = PBXBuildFile; fileRef = 2D72D5292732B8A7004BA7C9 /* Database */; };
+		2D72D52C273BF660004BA7C9 /* TCText.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D72D52B273BF660004BA7C9 /* TCText.swift */; };
+		2D72D52E273C0B7C004BA7C9 /* TCNameVersion.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D72D52D273C0B7C004BA7C9 /* TCNameVersion.swift */; };
 		2D7A7BA526AE9E680053C1E0 /* Footer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D7A7BA426AE9E680053C1E0 /* Footer.swift */; };
-		2D7A7BAA26AED2500053C1E0 /* Database in Resources */ = {isa = PBXBuildFile; fileRef = 2D7A7BA926AED2500053C1E0 /* Database */; };
 		2D7A7BB026B00A3E0053C1E0 /* NavbarShield.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D7A7BAF26B00A3E0053C1E0 /* NavbarShield.swift */; };
 		2D7A7BB426B02B700053C1E0 /* SeedSelector.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D7A7BB326B02B700053C1E0 /* SeedSelector.swift */; };
 		2D7A7BB626B136970053C1E0 /* NewSeedScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D7A7BB526B136970053C1E0 /* NewSeedScreen.swift */; };
@@ -61,10 +63,10 @@
 		2D7A7C1E26CB98310053C1E0 /* TCVarName.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D7A7C1D26CB98310053C1E0 /* TCVarName.swift */; };
 		2D7A7C2026CB99250053C1E0 /* TransactionCardSelector.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D7A7C1F26CB99250053C1E0 /* TransactionCardSelector.swift */; };
 		2D7A7C2626CBC3C70053C1E0 /* TCBalance.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D7A7C2126CBC3C70053C1E0 /* TCBalance.swift */; };
-		2D7A7C2726CBC3C70053C1E0 /* TCEraMortalNonce.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D7A7C2226CBC3C70053C1E0 /* TCEraMortalNonce.swift */; };
+		2D7A7C2726CBC3C70053C1E0 /* TCEraMortal.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D7A7C2226CBC3C70053C1E0 /* TCEraMortal.swift */; };
 		2D7A7C2826CBC3C70053C1E0 /* TCAuthorPublicKey.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D7A7C2326CBC3C70053C1E0 /* TCAuthorPublicKey.swift */; };
 		2D7A7C2926CBC3C70053C1E0 /* TCCall.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D7A7C2426CBC3C70053C1E0 /* TCCall.swift */; };
-		2D7A7C2A26CBC3C70053C1E0 /* TCEraImmortalNonce.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D7A7C2526CBC3C70053C1E0 /* TCEraImmortalNonce.swift */; };
+		2D7A7C2A26CBC3C70053C1E0 /* TCEraImmortal.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D7A7C2526CBC3C70053C1E0 /* TCEraImmortal.swift */; };
 		2DB037B426FCB06A00A318B2 /* TCPallet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2DB037B326FCB06A00A318B2 /* TCPallet.swift */; };
 		2DB037B6270B2E0B00A318B2 /* HistoryScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2DB037B5270B2E0A00A318B2 /* HistoryScreen.swift */; };
 		2DB037BA270D801400A318B2 /* HistoryCardTemplate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2DB037B9270D801400A318B2 /* HistoryCardTemplate.swift */; };
@@ -78,6 +80,9 @@
 		2DB037CB27183BEF00A318B2 /* SeedCardForManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2DB037CA27183BEF00A318B2 /* SeedCardForManager.swift */; };
 		2DB037CD271843BF00A318B2 /* HeaderBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2DB037CC271843BF00A318B2 /* HeaderBar.swift */; };
 		2DB037CF27197C4100A318B2 /* AddressCardControls.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2DB037CE27197C4100A318B2 /* AddressCardControls.swift */; };
+		2DB037D12721D31600A318B2 /* FooterBlock.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2DB037D02721D31600A318B2 /* FooterBlock.swift */; };
+		2DB037D32721DBF900A318B2 /* TCNewSpecs.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2DB037D22721DBF800A318B2 /* TCNewSpecs.swift */; };
+		2DB037D52721DF8800A318B2 /* TCVerifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2DB037D42721DF8800A318B2 /* TCVerifier.swift */; };
 		2DE72BC226A588C7002BB752 /* NativeSignerApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2DE72BC126A588C7002BB752 /* NativeSignerApp.swift */; };
 		2DE72BC426A588C7002BB752 /* MainScreenContainer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2DE72BC326A588C7002BB752 /* MainScreenContainer.swift */; };
 		2DE72BC626A588C9002BB752 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 2DE72BC526A588C9002BB752 /* Assets.xcassets */; };
@@ -120,13 +125,15 @@
 		2D0D5E7D26F0B1D900B0EF9D /* DeleteKeyConfirm.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeleteKeyConfirm.swift; sourceTree = "<group>"; };
 		2D0D5E7F26F0CFB100B0EF9D /* TCFieldName.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TCFieldName.swift; sourceTree = "<group>"; };
 		2D0D5E8126F0CFEB00B0EF9D /* TCFieldNumber.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TCFieldNumber.swift; sourceTree = "<group>"; };
-		2D0D5E8326F0D01800B0EF9D /* TCTXRange.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TCTXRange.swift; sourceTree = "<group>"; };
-		2D0D5E8526F0D0CC00B0EF9D /* TCPathDocs.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TCPathDocs.swift; sourceTree = "<group>"; };
 		2D72B4F526EF3BC50081E879 /* Navigator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Navigator.swift; sourceTree = "<group>"; };
 		2D72B4F726EF427C0081E879 /* Header.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Header.swift; sourceTree = "<group>"; };
 		2D72B4F926EF7D1C0081E879 /* Seeds.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Seeds.swift; sourceTree = "<group>"; };
+		2D72D509272A9E95004BA7C9 /* EventDetails.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EventDetails.swift; sourceTree = "<group>"; };
+		2D72D50B272AA043004BA7C9 /* HistoryCardExtended.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HistoryCardExtended.swift; sourceTree = "<group>"; };
+		2D72D5292732B8A7004BA7C9 /* Database */ = {isa = PBXFileReference; lastKnownFileType = folder; path = Database; sourceTree = "<group>"; };
+		2D72D52B273BF660004BA7C9 /* TCText.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TCText.swift; sourceTree = "<group>"; };
+		2D72D52D273C0B7C004BA7C9 /* TCNameVersion.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TCNameVersion.swift; sourceTree = "<group>"; };
 		2D7A7BA426AE9E680053C1E0 /* Footer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Footer.swift; sourceTree = "<group>"; };
-		2D7A7BA926AED2500053C1E0 /* Database */ = {isa = PBXFileReference; lastKnownFileType = folder; path = Database; sourceTree = "<group>"; };
 		2D7A7BAF26B00A3E0053C1E0 /* NavbarShield.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NavbarShield.swift; sourceTree = "<group>"; };
 		2D7A7BB326B02B700053C1E0 /* SeedSelector.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SeedSelector.swift; sourceTree = "<group>"; };
 		2D7A7BB526B136970053C1E0 /* NewSeedScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; lineEnding = 1; path = NewSeedScreen.swift; sourceTree = "<group>"; };
@@ -169,10 +176,10 @@
 		2D7A7C1D26CB98310053C1E0 /* TCVarName.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TCVarName.swift; sourceTree = "<group>"; };
 		2D7A7C1F26CB99250053C1E0 /* TransactionCardSelector.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransactionCardSelector.swift; sourceTree = "<group>"; };
 		2D7A7C2126CBC3C70053C1E0 /* TCBalance.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TCBalance.swift; sourceTree = "<group>"; };
-		2D7A7C2226CBC3C70053C1E0 /* TCEraMortalNonce.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TCEraMortalNonce.swift; sourceTree = "<group>"; };
+		2D7A7C2226CBC3C70053C1E0 /* TCEraMortal.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TCEraMortal.swift; sourceTree = "<group>"; };
 		2D7A7C2326CBC3C70053C1E0 /* TCAuthorPublicKey.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TCAuthorPublicKey.swift; sourceTree = "<group>"; };
 		2D7A7C2426CBC3C70053C1E0 /* TCCall.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TCCall.swift; sourceTree = "<group>"; };
-		2D7A7C2526CBC3C70053C1E0 /* TCEraImmortalNonce.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TCEraImmortalNonce.swift; sourceTree = "<group>"; };
+		2D7A7C2526CBC3C70053C1E0 /* TCEraImmortal.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TCEraImmortal.swift; sourceTree = "<group>"; };
 		2DB037B326FCB06A00A318B2 /* TCPallet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TCPallet.swift; sourceTree = "<group>"; };
 		2DB037B5270B2E0A00A318B2 /* HistoryScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HistoryScreen.swift; sourceTree = "<group>"; };
 		2DB037B9270D801400A318B2 /* HistoryCardTemplate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HistoryCardTemplate.swift; sourceTree = "<group>"; };
@@ -186,6 +193,9 @@
 		2DB037CA27183BEF00A318B2 /* SeedCardForManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SeedCardForManager.swift; sourceTree = "<group>"; };
 		2DB037CC271843BF00A318B2 /* HeaderBar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HeaderBar.swift; sourceTree = "<group>"; };
 		2DB037CE27197C4100A318B2 /* AddressCardControls.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddressCardControls.swift; sourceTree = "<group>"; };
+		2DB037D02721D31600A318B2 /* FooterBlock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FooterBlock.swift; sourceTree = "<group>"; };
+		2DB037D22721DBF800A318B2 /* TCNewSpecs.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TCNewSpecs.swift; sourceTree = "<group>"; };
+		2DB037D42721DF8800A318B2 /* TCVerifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TCVerifier.swift; sourceTree = "<group>"; };
 		2DE72BBE26A588C7002BB752 /* NativeSigner.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = NativeSigner.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		2DE72BC126A588C7002BB752 /* NativeSignerApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NativeSignerApp.swift; sourceTree = "<group>"; };
 		2DE72BC326A588C7002BB752 /* MainScreenContainer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainScreenContainer.swift; sourceTree = "<group>"; };
@@ -245,6 +255,7 @@
 			children = (
 				2D7A7BFE26CA97920053C1E0 /* TransactionCards */,
 				2D7A7BFC26C675D30053C1E0 /* HistoryCard.swift */,
+				2D72D50B272AA043004BA7C9 /* HistoryCardExtended.swift */,
 				2DB037B9270D801400A318B2 /* HistoryCardTemplate.swift */,
 				2DE72BF426A59C59002BB752 /* NetworkCard.swift */,
 				2D7A7BC126B9D3360053C1E0 /* AddressCard.swift */,
@@ -274,6 +285,7 @@
 			children = (
 				2D7A7BEA26C4149E0053C1E0 /* DocumentModal.swift */,
 				2D7A7BEC26C50AB80053C1E0 /* NetworkManager.swift */,
+				2D72D509272A9E95004BA7C9 /* EventDetails.swift */,
 				2DB037C42716CDAF00A318B2 /* NetworkDetails.swift */,
 				2D7A7BEE26C50ACB0053C1E0 /* SeedManager.swift */,
 				2D7A7BCB26BAD02A0053C1E0 /* ExportAddress.swift */,
@@ -305,6 +317,7 @@
 				2DE72C0326A6CDC5002BB752 /* CameraPreview.swift */,
 				2D7A7BFA26C6621D0053C1E0 /* HistoryCollapsed.swift */,
 				2D7A7BA426AE9E680053C1E0 /* Footer.swift */,
+				2DB037D02721D31600A318B2 /* FooterBlock.swift */,
 				2D72B4F726EF427C0081E879 /* Header.swift */,
 				2D0D5E7926F09A5600B0EF9D /* TransactionCommentInput.swift */,
 			);
@@ -324,11 +337,14 @@
 			isa = PBXGroup;
 			children = (
 				2D7A7C2326CBC3C70053C1E0 /* TCAuthorPublicKey.swift */,
-				2D0D5E8326F0D01800B0EF9D /* TCTXRange.swift */,
 				2D7A7C2126CBC3C70053C1E0 /* TCBalance.swift */,
+				2D72D52B273BF660004BA7C9 /* TCText.swift */,
+				2DB037D22721DBF800A318B2 /* TCNewSpecs.swift */,
+				2DB037D42721DF8800A318B2 /* TCVerifier.swift */,
 				2D7A7C2426CBC3C70053C1E0 /* TCCall.swift */,
-				2D7A7C2526CBC3C70053C1E0 /* TCEraImmortalNonce.swift */,
-				2D7A7C2226CBC3C70053C1E0 /* TCEraMortalNonce.swift */,
+				2D7A7C2526CBC3C70053C1E0 /* TCEraImmortal.swift */,
+				2D7A7C2226CBC3C70053C1E0 /* TCEraMortal.swift */,
+				2D72D52D273C0B7C004BA7C9 /* TCNameVersion.swift */,
 				2D7A7C1126CB94520053C1E0 /* TCTypesInfo.swift */,
 				2D7A7C1526CB96840053C1E0 /* TCWarning.swift */,
 				2D7A7C1726CB96C70053C1E0 /* TCError.swift */,
@@ -342,7 +358,6 @@
 				2D7A7C0726CA9BB00053C1E0 /* TCBlockHash.swift */,
 				2D0D5E7F26F0CFB100B0EF9D /* TCFieldName.swift */,
 				2D0D5E8126F0CFEB00B0EF9D /* TCFieldNumber.swift */,
-				2D0D5E8526F0D0CC00B0EF9D /* TCPathDocs.swift */,
 				2DB037B326FCB06A00A318B2 /* TCPallet.swift */,
 			);
 			path = TransactionCards;
@@ -458,7 +473,7 @@
 		2DE72C1226AACB25002BB752 /* Database */ = {
 			isa = PBXGroup;
 			children = (
-				2D7A7BA926AED2500053C1E0 /* Database */,
+				2D72D5292732B8A7004BA7C9 /* Database */,
 			);
 			path = Database;
 			sourceTree = "<group>";
@@ -568,9 +583,9 @@
 			files = (
 				2D7A7BCE26BBC5690053C1E0 /* LaunchScreen.xib in Resources */,
 				2D7A7BE726C410FF0053C1E0 /* privacy-policy.txt in Resources */,
+				2D72D52A2732B8A7004BA7C9 /* Database in Resources */,
 				2DB037BF270F12DF00A318B2 /* Web3-Regular.otf in Resources */,
 				2DE72BC926A588C9002BB752 /* Preview Assets.xcassets in Resources */,
-				2D7A7BAA26AED2500053C1E0 /* Database in Resources */,
 				2DE72BC626A588C9002BB752 /* Assets.xcassets in Resources */,
 				2D7A7BE326C3FC250053C1E0 /* terms-and-conditions.txt in Resources */,
 			);
@@ -601,7 +616,7 @@
 				2D7A7BE526C3FE260053C1E0 /* Documents.swift in Sources */,
 				2D7A7C0E26CB929B0053C1E0 /* TCTXSpec.swift in Sources */,
 				2DE72C1126AAC3D6002BB752 /* LandingView.swift in Sources */,
-				2D7A7C2726CBC3C70053C1E0 /* TCEraMortalNonce.swift in Sources */,
+				2D7A7C2726CBC3C70053C1E0 /* TCEraMortal.swift in Sources */,
 				2DE72C0026A6ADC5002BB752 /* CameraService.swift in Sources */,
 				2DB037C9271834BB00A318B2 /* SmallButton.swift in Sources */,
 				2DE72BF526A59C59002BB752 /* NetworkCard.swift in Sources */,
@@ -618,6 +633,7 @@
 				2D7A7BD626C1126C0053C1E0 /* Utils.swift in Sources */,
 				2DB037B6270B2E0B00A318B2 /* HistoryScreen.swift in Sources */,
 				2DE72BC426A588C7002BB752 /* MainScreenContainer.swift in Sources */,
+				2D72D50A272A9E95004BA7C9 /* EventDetails.swift in Sources */,
 				2D7A7BB826B28D350053C1E0 /* SettingsScreen.swift in Sources */,
 				2D7A7C1A26CB97B30053C1E0 /* TCID.swift in Sources */,
 				2D7A7BB626B136970053C1E0 /* NewSeedScreen.swift in Sources */,
@@ -626,7 +642,8 @@
 				2D7A7C2626CBC3C70053C1E0 /* TCBalance.swift in Sources */,
 				2D7A7BEF26C50ACB0053C1E0 /* SeedManager.swift in Sources */,
 				2D0D5E7A26F09A5600B0EF9D /* TransactionCommentInput.swift in Sources */,
-				2D7A7C2A26CBC3C70053C1E0 /* TCEraImmortalNonce.swift in Sources */,
+				2D7A7C2A26CBC3C70053C1E0 /* TCEraImmortal.swift in Sources */,
+				2D72D52C273BF660004BA7C9 /* TCText.swift in Sources */,
 				2DB037BC270ECF7300A318B2 /* SearchKeys.swift in Sources */,
 				2DE72C0426A6CDC5002BB752 /* CameraPreview.swift in Sources */,
 				2D7A7BD426BBEAF00053C1E0 /* Canary.swift in Sources */,
@@ -638,23 +655,24 @@
 				2D7A7BA526AE9E680053C1E0 /* Footer.swift in Sources */,
 				2D7A7BDC26C2613F0053C1E0 /* TransactionCardView.swift in Sources */,
 				2DB037CD271843BF00A318B2 /* HeaderBar.swift in Sources */,
-				2D0D5E8626F0D0CC00B0EF9D /* TCPathDocs.swift in Sources */,
 				2D7A7BC026B97DB30053C1E0 /* Address.swift in Sources */,
 				2D0D5E7C26F0A4A300B0EF9D /* SeedBackup.swift in Sources */,
 				2D7A7C2926CBC3C70053C1E0 /* TCCall.swift in Sources */,
 				2D7A7BCA26BACFFB0053C1E0 /* QRView.swift in Sources */,
-				2D0D5E8426F0D01800B0EF9D /* TCTXRange.swift in Sources */,
 				2D7A7C2026CB99250053C1E0 /* TransactionCardSelector.swift in Sources */,
 				2D7A7BD026BBC72D0053C1E0 /* Transaction.swift in Sources */,
 				2D7A7C1826CB96C70053C1E0 /* TCError.swift in Sources */,
+				2DB037D32721DBF900A318B2 /* TCNewSpecs.swift in Sources */,
 				2DE72BF326A59BAB002BB752 /* NetworkSelector.swift in Sources */,
 				2D72B4F826EF427C0081E879 /* Header.swift in Sources */,
+				2D72D50C272AA043004BA7C9 /* HistoryCardExtended.swift in Sources */,
 				2DB037C12714DB1700A318B2 /* SeedCard.swift in Sources */,
 				2DB037BA270D801400A318B2 /* HistoryCardTemplate.swift in Sources */,
 				2D7A7BFB26C6621D0053C1E0 /* HistoryCollapsed.swift in Sources */,
 				2D7A7BD226BBCE6F0053C1E0 /* TransactionScreen.swift in Sources */,
 				2D7A7BB426B02B700053C1E0 /* SeedSelector.swift in Sources */,
 				2DB037C52716CDAF00A318B2 /* NetworkDetails.swift in Sources */,
+				2DB037D52721DF8800A318B2 /* TCVerifier.swift in Sources */,
 				2DB037CB27183BEF00A318B2 /* SeedCardForManager.swift in Sources */,
 				2D7A7BB026B00A3E0053C1E0 /* NavbarShield.swift in Sources */,
 				2D7A7BF326C519990053C1E0 /* MetadataCard.swift in Sources */,
@@ -666,9 +684,11 @@
 				2DE72C0F26A99885002BB752 /* RustNative.swift in Sources */,
 				2D7A7C0026CA97B00053C1E0 /* TCAuthor.swift in Sources */,
 				2D7A7BFD26C675D30053C1E0 /* HistoryCard.swift in Sources */,
+				2D72D52E273C0B7C004BA7C9 /* TCNameVersion.swift in Sources */,
 				2DE72BF126A59834002BB752 /* Network.swift in Sources */,
 				2D72B4F626EF3BC50081E879 /* Navigator.swift in Sources */,
 				2D0D5E7E26F0B1D900B0EF9D /* DeleteKeyConfirm.swift in Sources */,
+				2DB037D12721D31600A318B2 /* FooterBlock.swift in Sources */,
 				2D7A7BC426BA8B350053C1E0 /* NewAddressScreen.swift in Sources */,
 				2D7A7BF526C58E9E0053C1E0 /* History.swift in Sources */,
 				2DB037CF27197C4100A318B2 /* AddressCardControls.swift in Sources */,
@@ -831,9 +851,11 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 46600;
 				DEVELOPMENT_ASSET_PATHS = "\"NativeSigner/Preview Content\"";
-				DEVELOPMENT_TEAM = 4GK8JWU7P9;
+				DEVELOPMENT_TEAM = P2PX3JU8FT;
 				ENABLE_BITCODE = NO;
 				ENABLE_PREVIEWS = YES;
 				"EXCLUDED_ARCHS[sdk=iphonesimulator*]" = arm64;
@@ -847,8 +869,10 @@
 					"$(inherited)",
 					"$(PROJECT_DIR)/NativeSigner",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = parity.NativeSigner;
+				MARKETING_VERSION = 4.6.6;
+				PRODUCT_BUNDLE_IDENTIFIER = io.parity.NativeSigner;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_OBJC_BRIDGING_HEADER = "$(PROJECT_DIR)/NativeSigner/NativeSigner-Bridging-Header.h";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -861,9 +885,11 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 46600;
 				DEVELOPMENT_ASSET_PATHS = "\"NativeSigner/Preview Content\"";
-				DEVELOPMENT_TEAM = 4GK8JWU7P9;
+				DEVELOPMENT_TEAM = P2PX3JU8FT;
 				ENABLE_BITCODE = NO;
 				ENABLE_PREVIEWS = YES;
 				INFOPLIST_FILE = NativeSigner/Info.plist;
@@ -876,8 +902,10 @@
 					"$(inherited)",
 					"$(PROJECT_DIR)/NativeSigner",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = parity.NativeSigner;
+				MARKETING_VERSION = 4.6.6;
+				PRODUCT_BUNDLE_IDENTIFIER = io.parity.NativeSigner;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_OBJC_BRIDGING_HEADER = "$(PROJECT_DIR)/NativeSigner/NativeSigner-Bridging-Header.h";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -893,7 +921,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = 4GK8JWU7P9;
 				INFOPLIST_FILE = NativeSignerTests/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -915,7 +943,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = 4GK8JWU7P9;
 				INFOPLIST_FILE = NativeSignerTests/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",

@@ -9,21 +9,37 @@ import SwiftUI
 
 struct ExportAddress: View {
     @EnvironmentObject var data: SignerDataModel
+    @GestureState private var dragOffset = CGSize.zero
     @State var image: UIImage?
+    @State var showDetails = false
     var body: some View {
         ZStack {
             ModalBackdrop()
             VStack {
+                NetworkCard(network: data.selectedNetwork)
                 if data.selectedAddress != nil {
                     AddressCard(address: data.selectedAddress!)
                 }
-                if image != nil {
+                if image == nil || showDetails {
+                    HStack {
+                        Text("Base58 key: ")
+                        Text(data.selectedAddress?.ss58 ?? "unknown")
+                    }.padding()
+                    HStack {
+                        Text("Hex key: ")
+                        Text(data.selectedAddress?.public_key ?? "unknown")
+                    }.padding()
+                    HStack {
+                        Text("Seed name: ")
+                        Text(data.selectedAddress?.seed_name ?? "unknown")
+                    }.padding()
+                } else {
                     Image(uiImage: image!)
                         .resizable()
                         .aspectRatio(contentMode: .fit)
                 }
             }
-            .foregroundColor(/*@START_MENU_TOKEN@*/Color("textMainColor")/*@END_MENU_TOKEN@*/)
+            .foregroundColor(Color("textMainColor"))
         }
         .onAppear {
             data.lastError = ""
@@ -35,24 +51,21 @@ struct ExportAddress: View {
             data.selectedAddress = nil
         }
         .gesture(
-            TapGesture()
-                .onEnded {
-                    print("tap")
-                    data.selectNextAddress()
+            DragGesture().onEnded {drag in
+                if abs(drag.translation.height) > 200 {
+                    showDetails.toggle()
+                } else {
+                    if drag.translation.width > 20 {
+                        data.selectNextAddress()
+                    }
+                    if drag.translation.width < -20 {
+                        data.selectPreviousAddress()
+                    }
                     if data.selectedAddress != nil {
                         image = data.exportIdentityQR()
                     }
                 }
-        )
-        .gesture(
-            LongPressGesture()
-                .onEnded { _ in
-                    print("ltap")
-                    data.selectPreviousAddress()
-                    if data.selectedAddress != nil {
-                        image = data.exportIdentityQR()
-                    }
-                }
+            }
         )
     }
 }

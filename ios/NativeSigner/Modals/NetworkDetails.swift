@@ -44,6 +44,22 @@ struct NetworkDetails: View {
                         Text(data.networkSettings?.genesis_hash ?? "unknown")
                             .foregroundColor(Color("textMainColor"))
                     }
+                    HStack {
+                        Text("Verifier certificate: ").foregroundColor(Color("AccentColor"))
+                        switch data.networkSettings?.current_verifier.type {
+                        case "general":
+                            Text("General").foregroundColor(Color("cryptoColor"))
+                        case "network":
+                            VStack {
+                                Text("custom")
+                                Text(String(describing: data.networkSettings?.current_verifier.details))
+                            }.foregroundColor(Color("cryptoColor"))
+                        case "none":
+                            Text("none").foregroundColor(Color("dangerColor"))
+                        default:
+                            Text("unknown").foregroundColor(Color("dangerColor"))
+                        }
+                    }
                 }
                 Text("Metadata available:")
                     .font(.title)

@@ -9,6 +9,7 @@
 
 import Foundation
 import UIKit //for converting raw png to UIImage
+import Network //to detect network connection and raise alert
 
 /**
  * Object to store all data; since the data really is mostly stored in RustNative side, just one object (to describe it) is used here.
@@ -21,6 +22,7 @@ class SignerDataModel: ObservableObject {
     @Published var onboardingDone: Bool = false
     @Published var lastError: String = ""
     @Published var networkSettings: NetworkSettings?
+    @Published var generalVerifier: Verifier?
     
     //Key manager state
     @Published var selectedSeed: String = ""
@@ -33,7 +35,7 @@ class SignerDataModel: ObservableObject {
     
     //History screen data state
     @Published var history: [History] = []
-    @Published var selectedRecord: Event?
+    @Published var selectedRecord: History?
     
     //Navigation
     @Published var signerScreen: SignerScreen = .history
@@ -59,10 +61,31 @@ class SignerDataModel: ObservableObject {
     //This is the secret - thus it's made non-reactive
     var seedBackup: String = ""
     
+    //Alert indicator
+    @Published var canaryDead: Bool = false
+    let monitor = NWPathMonitor()
+    let queue = DispatchQueue.global(qos: .background)
+    @Published var alert: Bool = false
+    
     init() {
         self.dbName = NSHomeDirectory() + "/Documents/Database"
         self.onboardingDone = FileManager.default.fileExists(atPath: NSHomeDirectory() + "/Documents/Database")
         if self.onboardingDone {
+            self.monitor.pathUpdateHandler = {path in
+                if path.availableInterfaces.count == 0 {
+                    DispatchQueue.main.async {
+                        self.canaryDead = false
+                    }
+                } else {
+                    DispatchQueue.main.async {
+                        device_was_online(nil, self.dbName)
+                        self.canaryDead = true
+                        self.alert = true
+                    }
+                }
+            }
+            
+            monitor.start(queue: self.queue)
             self.refreshSeeds()
             self.totalRefresh()
         }
@@ -98,6 +121,7 @@ class SignerDataModel: ObservableObject {
      */
     func totalRefresh() {
         print("heavy reset")
+        self.checkAlert()
         self.refreshNetworks()
         if self.networks.count > 0 {
             self.selectedNetwork = self.networks[0]
@@ -106,6 +130,7 @@ class SignerDataModel: ObservableObject {
             print("No networks found; not handled yet")
         }
         self.getHistory()
+        self.getGeneralVerifier()
         resetTransaction()
         self.refreshUI()
     }
@@ -118,10 +143,11 @@ extension SignerDataModel {
      * Should be called once on factory-new state of the app
      * Populates database with starting values
      */
-    func onboard() {
+    func onboard(jailbreak: Bool = false) {
         var err = ExternError()
         let err_ptr: UnsafeMutablePointer<ExternError> = UnsafeMutablePointer(&err)
         do {
+            print("onboarding...")
             if let source = Bundle.main.url(forResource: "Database", withExtension: "") {
                 print(source)
                 var destination = try FileManager.default.url(for: .documentDirectory, in: .userDomainMask, appropriateFor: nil, create: false)
@@ -135,9 +161,16 @@ extension SignerDataModel {
                     }
                 }
                 try FileManager.default.copyItem(at: source, to: destination)
-                init_history(err_ptr, self.dbName)
+                if jailbreak {
+                    init_history_no_cert(err_ptr, self.dbName)
+                } else {
+                    init_history_with_cert(err_ptr, self.dbName)
+                }
                 if (err_ptr.pointee.code == 0) {
                     self.onboardingDone = true
+                    if self.canaryDead {
+                        device_was_online(nil, self.dbName)
+                    }
                     self.totalRefresh()
                     self.refreshSeeds()
                 } else {
@@ -171,7 +204,35 @@ extension SignerDataModel {
         ] as CFDictionary
         SecItemDelete(query)
         self.onboardingDone = false
+        self.seedNames = []
         self.signerScreen = .keys
         self.keyManagerModal = .newSeed
     }
+    
+    /**
+     * Remove general verifier; wipes everything, obviously
+     */
+    func jailbreak() {
+        self.wipe()
+        self.onboard(jailbreak: true)
+    }
+    
+    func getGeneralVerifier() {
+        var err = ExternError()
+        let err_ptr: UnsafeMutablePointer<ExternError> = UnsafeMutablePointer(&err)
+        let res = get_general_certificate(err_ptr, dbName)
+        if (err_ptr.pointee.code == 0) {
+            if let generalCert = String(cString: res!).data(using: .utf8) {
+                self.generalVerifier = try? JSONDecoder().decode(Verifier.self, from: generalCert)
+            } else {
+                print("General verifier corrupted")
+            }
+            signer_destroy_string(res!)
+        } else {
+            print("General verifier fetch failed")
+            print(String(cString: err_ptr.pointee.message))
+            signer_destroy_string(err_ptr.pointee.message)
+        }
+    }
 }
+
