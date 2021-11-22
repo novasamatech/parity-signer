@@ -1,6 +1,6 @@
 [package]
 name = "qr_reader_pc"
-version = "0.1.0"
+version = "0.2.0"
 authors = ["vera"]
 edition = "2018"
 
@@ -8,9 +8,12 @@ edition = "2018"
 
 [dependencies]
 hex = "0.4.3"
-rscam = "0.5.5"
-image = "0.23.14"
-raptorq = "1.6.4"
 qr_reader_phone = {path = "../qr_reader_phone"}
-quircs = "0.10.0"
 anyhow = "1.0.42"
+image = "0.23.14"
+quircs = "0.10.0"
+
+[dependencies.opencv]
+version = "0.60"
+default-features = false
+features = ["clang-runtime", "videoio", "imgproc", "highgui"]
