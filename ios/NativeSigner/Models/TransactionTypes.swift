@@ -18,22 +18,25 @@ enum Card {
     case call(Call)
     case defaultCard(String)
     case enumVariantName(EnumVariantName)
-    case eraImmortalNonce(EraImmortalNonce)
-    case eraMortalNonce(EraMortalNonce)
+    case eraImmortal
+    case eraMortal(EraMortal)
     case error(String)
     case fieldName(FieldName)
     case fieldNumber(FieldNumber)
     case id(String)
     case identityField(String)
     case meta(MetaSpecs)
-    case newNetwork(NewNetwork)
+    case nameVersion(NameVersion)
+    case networkGenesisHash(String)
+    case networkName(String)
+    case newSpecs(NewSpecs)
+    case nonce(String)
     case none
     case pallet(String)
-    case pathDocs(PathDocs)
-    case range(TxRange)
+    case text(String)
     case tip(Currency)
     case tipPlain(String)
-    case txSpec(TxSpec)
+    case txSpec(String)
     case txSpecPlain(TxSpecPlain)
     case typesInfo(String)
     case varName(String)
@@ -59,8 +62,7 @@ struct AuthorPublicKey: Decodable {
 }
 
 struct Call: Decodable {
-    var pallet: String
-    var method: String
+    var method_name: String
     var docs: String
 }
 
@@ -71,30 +73,27 @@ struct Currency: Decodable {
 
 struct EnumVariantName: Decodable {
     var name: String
-    var docs: String
+    var docs_enum_variant: String
 }
 
-//TODO: manual decoders for these two
-struct EraImmortalNonce: Decodable {
-    var era: String
-    var nonce: String
-}
-
-struct EraMortalNonce: Decodable {
+struct EraMortal: Decodable {
     var era: String
     var phase: String
     var period: String
-    var nonce: String
 }
 
 struct FieldName: Decodable {
     var name: String
-    var docs: String
+    var docs_field_name: String
+    var path_type: String
+    var docs_type: String
 }
 
 struct FieldNumber: Decodable {
     var number: String
-    var docs: String
+    var docs_field_number: String
+    var path_type: String
+    var docs_type: String
 }
 
 struct MetaSpecs: Decodable, Hashable {
@@ -103,43 +102,28 @@ struct MetaSpecs: Decodable, Hashable {
     var meta_hash: String
 }
 
-struct NewNetwork: Decodable, Hashable {
-    var specname: String
-    var spec_version: String
-    var meta_hash: String
+struct NameVersion: Decodable, Hashable {
+    var name: String
+    var version: String
+}
+
+struct NewSpecs: Decodable, Hashable {
     var base58prefix: String
     var color: String
     var decimals: String
+    var encryption: String
     var genesis_hash: String
     var logo: String
     var name: String
     var path_id: String
-    var secondary_colod: String
+    var secondary_color: String
     var title: String
     var unit: String
-    var verifier: Verifier
-}
-
-struct PathDocs: Decodable {
-    var path: [String]
-    var docs: String
-}
-
-struct TxRange: Decodable {
-    var start: String
-    var end: String
-    var inclusive: String
 }
 
 struct Tip: Decodable {
     var amount: String
     var units: String
-}
-
-struct TxSpec: Decodable {
-    var network: String
-    var version: String
-    var tx_version: String
 }
 
 struct TxSpecPlain: Decodable {
@@ -186,17 +170,18 @@ struct TransactionCard: Decodable {
         case "balance":
             card = .balance(try values.decode(Currency.self, forKey: .payload))
             return
-        case "call":
+        case "method":
             card = .call(try values.decode(Call.self, forKey: .payload))
             return
         case "enum_variant_name":
             card = .enumVariantName(try values.decode(EnumVariantName.self, forKey: .payload))
             return
-        case "era_mortal_nonce":
-            card = .eraMortalNonce(try values.decode(EraMortalNonce.self, forKey: .payload))
-            return
-        case "era_immortal_nonce":
-            card = .eraImmortalNonce(try values.decode(EraImmortalNonce.self, forKey: .payload))
+        case "era":
+            do {card = .eraMortal(try values.decode(EraMortal.self, forKey: .payload))}
+            catch {
+                card = .eraImmortal
+                return
+            }
             return
         case "field_name":
             card = .fieldName(try values.decode(FieldName.self, forKey: .payload))
@@ -207,22 +192,17 @@ struct TransactionCard: Decodable {
         case "meta":
             card = .meta(try values.decode(MetaSpecs.self, forKey: .payload))
             return
-        case "new_network":
-            card = .newNetwork(try values.decode(NewNetwork.self, forKey: .payload))
+        case "name_version":
+            card = .nameVersion(try values.decode(NameVersion.self, forKey: .payload))
+            return
+        case "new_specs":
+            card = .newSpecs(try values.decode(NewSpecs.self, forKey: .payload))
             return
         case "none":
             card = .none
-        case "path_and_docs":
-            card = .pathDocs(try values.decode(PathDocs.self, forKey: .payload))
-            return
-        case "range":
-            card = .range(try values.decode(TxRange.self, forKey: .payload))
             return
         case "tip":
             card = .tip(try values.decode(Currency.self, forKey: .payload))
-            return
-        case "tx_spec":
-            card = .txSpec(try values.decode(TxSpec.self, forKey: .payload))
             return
         case "tx_spec_plain":
             card = .txSpecPlain(try values.decode(TxSpecPlain.self, forKey: .payload))
@@ -248,10 +228,20 @@ struct TransactionCard: Decodable {
             card = .id(content)
         case "identity_field":
             card = .identityField(content)
+        case "network_genesis_hash":
+            card = .networkGenesisHash(content)
+        case "network_name":
+            card = .networkName(content)
+        case "nonce":
+            card = .nonce(content)
         case "pallet":
             card = .pallet(content)
+        case "text":
+            card = .text(content)
         case "tip_plain":
             card = .tipPlain(content)
+        case "tx_version":
+            card = .txSpec(content)
         case "types_hash":
             card = .typesInfo(content)
         case "varname":
@@ -264,21 +254,19 @@ struct TransactionCard: Decodable {
     }
 }
 
-struct ActionPayload: Decodable, Encodable {
-    var type: String
-    var checksum: String
-}
-
 struct Action: Decodable, Encodable {
     var type: String
-    var payload: ActionPayload
+    var payload: String
 }
 
 struct TransactionCardSet: Decodable {
     var author: [TransactionCard]?
     var error: [TransactionCard]?
-    var extrinsics: [TransactionCard]?
+    var extensions: [TransactionCard]?
+    var message: [TransactionCard]?
     var method: [TransactionCard]?
+    var new_specs: [TransactionCard]?
+    var verifier: [TransactionCard]?
     var warning: [TransactionCard]?
     var types_info: [TransactionCard]?
     var action: Action?

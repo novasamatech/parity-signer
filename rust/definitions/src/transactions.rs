@@ -1,21 +1,15 @@
 use parity_scale_codec_derive::{Decode, Encode};
 
 use crate::history::Event;
-use crate::metadata::NameVersioned;
-use crate::network_specs::{ChainSpecsToSend, Verifier, VerifierKey};
-use crate::types::TypeEntry;
-use crate::users::AddressKey;
+use crate::keyring::{AddressKey};
+
 
 /// Enum to classify possible actions, and store corresponding information in the database
 #[derive(Decode, Encode)]
 pub enum Transaction {
     Sign(Sign),
-    LoadMeta(LoadMeta),
-    UpdMetaVerifier(UpdMetaVerifier),
-    UpdGeneralVerifier(UpdGeneralVerifier),
-    LoadTypes(LoadTypes),
-    AddNetwork(AddNetwork),
 }
+
 
 /// Struct to store sign_transaction action information
 #[derive(Decode, Encode)]
@@ -27,18 +21,7 @@ pub struct Sign {
     pub history: Vec<Event>,
 }
 
-pub struct SignDisplay <'a> {
-    pub transaction: &'a str, // hex encoded transaction
-    pub author_line: String, // signature author in Verifier.show_card() format
-    pub user_comment: &'a str, // user entered comment for transaction
-}
-
-impl <'a> SignDisplay <'a> {
-    pub fn show(&self) -> String {
-        format!("\"transaction\":\"{}\",\"signed_by\":{},\"user_comment\":\"{}\"", &self.transaction, &self.author_line, &self.user_comment)
-    }
-}
-
+/*
 /// Struct to store load_metadata action information
 #[derive(Decode, Encode)]
 pub struct LoadMeta {
@@ -86,3 +69,12 @@ pub struct AddNetwork {
     pub history: Vec<Event>,
 }
 
+/// Struct to store add_specs action information
+#[derive(Decode, Encode)]
+pub struct AddSpecs {
+    pub specs: ChainSpecsToSend,
+    pub verifier: Verifier,
+    pub history: Vec<Event>,
+}
+
+*/

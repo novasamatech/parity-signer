@@ -1,10 +1,13 @@
 use parity_scale_codec_derive::{Decode, Encode};
+use sp_core;
+use zeroize::Zeroize;
 
 /// Type of encryption; only allow supported types here - compile-time check for that is happening
 /// here.
 //TODO: check if it is redundant
 //Could not be replaced by sp_core::...::CRYPTO_ID as that doesn't do anything at compile time
-#[derive(Clone, Copy, PartialEq, Debug, Decode, Encode)]
+#[derive(Clone, PartialEq, Debug, Decode, Encode, Zeroize)]
+#[zeroize(drop)]
 pub enum Encryption {
     Ed25519,
     Sr25519,
@@ -24,8 +27,7 @@ impl Encryption {
 /// Struct to store `sufficient crypto` information
 #[derive(Decode, Encode, PartialEq, Debug)]
 pub enum SufficientCrypto {
-    Ed25519 {public_key: [u8; 32], signature: [u8; 64]},
-    Sr25519 {public_key: [u8; 32], signature: [u8; 64]},
-    Ecdsa {public_key: [u8; 33], signature: [u8; 65]},
+    Ed25519 {public_key: sp_core::ed25519::Public, signature: sp_core::ed25519::Signature},
+    Sr25519 {public_key: sp_core::sr25519::Public, signature: sp_core::sr25519::Signature},
+    Ecdsa {public_key: sp_core::ecdsa::Public, signature: sp_core::ecdsa::Signature},
 }
-

@@ -1,6 +1,6 @@
 use parity_scale_codec::Decode;
 use constants::{ADDRESS_BOOK, HOT_DB_NAME, METATREE};
-use definitions::metadata::AddressBookEntry;
+use definitions::{keyring::AddressBookKey, metadata::AddressBookEntry};
 use db_handling::helpers::{open_db, open_tree};
 use anyhow;
 
@@ -31,12 +31,12 @@ pub fn show_address_book() -> anyhow::Result<()> {
     if address_book.len() == 0 {return Err(Error::AddressBookEmpty.show())}
     println!("Address book has entries for following networks:");
     for x in address_book.iter() {
-        if let Ok((name_encoded, address_book_entry_encoded)) = x {
+        if let Ok((address_book_key_vec, address_book_entry_encoded)) = x {
             let address_book_entry = match <AddressBookEntry>::decode(&mut &address_book_entry_encoded[..]) {
                 Ok(a) => a,
                 Err(_) => return Err(Error::NotDecodeable(NotDecodeable::AddressBookEntry).show()),
             };
-            let title = match <String>::decode(&mut &name_encoded[..]) {
+            let title = match AddressBookKey::from_vec(&address_book_key_vec.to_vec()).title() {
                 Ok(a) => a,
                 Err(_) => return Err(Error::NotDecodeable(NotDecodeable::AddressBookKey).show()),
             };

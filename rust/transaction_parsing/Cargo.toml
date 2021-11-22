@@ -8,7 +8,6 @@ edition = "2018"
 
 [dependencies]
 scale-info = "1.0.0"
-base58 = "0.1.0"
 hex = "0.4.3"
 parity-scale-codec = { version = "2.2.0", default-features = false, features = ["std", "bit-vec"], optional = false}
 parity-scale-codec-derive = "2.2.0"
@@ -27,4 +26,8 @@ constants = {path = "../constants"}
 db_handling = {path = "../db_handling"}
 definitions = {path = "../definitions"}
 meta_reading = {path = "../meta_reading"}
+parser = {path = "../parser"}
 
+[lib]
+name = "transaction_parsing"
+crate-type = ["lib"]

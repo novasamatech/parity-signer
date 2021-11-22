@@ -64,4 +64,17 @@ extension SignerDataModel {
         self.selectedNetwork = network
         self.fetchKeys()
     }
+    
+    func removeNetwork() {
+        var err = ExternError()
+        let err_ptr: UnsafeMutablePointer<ExternError> = UnsafeMutablePointer(&err)
+        remove_network(err_ptr, self.selectedNetwork!.key, dbName)
+        if (err_ptr.pointee.code == 0) {
+            totalRefresh()
+        } else {
+            print("Network removal failed")
+            print(String(cString: err_ptr.pointee.message))
+            signer_destroy_string(err_ptr.pointee.message)
+        }
+    }
 }

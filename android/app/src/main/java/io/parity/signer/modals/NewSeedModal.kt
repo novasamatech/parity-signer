@@ -18,6 +18,7 @@ import androidx.compose.ui.text.input.ImeOptions
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
 import io.parity.signer.models.SignerDataModel
+import io.parity.signer.models.addSeed
 
 @Composable
 fun NewSeedModal(signerDataModel: SignerDataModel) {
@@ -73,7 +74,7 @@ fun NewSeedModal(signerDataModel: SignerDataModel) {
 					singleLine = true,
 					keyboardOptions = KeyboardOptions(
 						autoCorrect = false,
-						keyboardType = KeyboardType.Ascii,
+						keyboardType = KeyboardType.Password,
 						capitalization = KeyboardCapitalization.None,
 						imeAction = ImeAction.Done
 					),

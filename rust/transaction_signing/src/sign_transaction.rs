@@ -1,79 +1,44 @@
 use anyhow;
-use constants::{HISTORY, SIGNTRANS, TRANSACTION};
-use definitions::{crypto::Encryption, history::Event, network_specs::Verifier, transactions::{Transaction, SignDisplay}};
-use parity_scale_codec::Decode;
-use db_handling::{helpers::{open_db, open_tree, flush_db, remove_from_tree}, manage_history::enter_events_into_tree};
+use blake2_rfc::blake2b::blake2b;
+use db_handling::db_transactions::{TrDbColdSign, SignContent};
+use parity_scale_codec::Encode;
 use qrcode_static::png_qr_from_string;
-use sp_runtime::MultiSigner;
+use zeroize::Zeroize;
 
 use crate::sign_message::sign_as_address_key;
-use crate::error::{Error, ActionFailure, CryptoError};
-use crate::helpers::verify_checksum;
+use crate::error::{Error, CryptoError};
 
 /// Function to create signatures using RN output action line, and user entered pin and password.
 /// Also needs database name to fetch saved transaction and key.
 
-pub fn create_signature (seed_phrase: &str, pwd_entry: &str, user_comment: &str, database_name: &str, checksum: u32) -> anyhow::Result<String> {
-    
-    let database = open_db(database_name)?;
-    verify_checksum(&database, checksum)?;
-    let transaction = open_tree(&database, TRANSACTION)?;
-    let history = open_tree(&database, HISTORY)?;
-    
-    let action = match transaction.get(SIGNTRANS) {
-        Ok(Some(encoded_action)) => match <Transaction>::decode(&mut &encoded_action[..]) {
-            Ok(Transaction::Sign(x)) => x,
-            Ok(_) => return Err(Error::NoAction(ActionFailure::SignTransaction).show()),
-            Err(_) => return Err(Error::BadActionDecode(ActionFailure::SignTransaction).show()),
-        },
-        Ok(None) => return Err(Error::NoAction(ActionFailure::SignTransaction).show()),
-        Err(e) => return Err(Error::InternalDatabaseError(e).show()),
-    };
-    
+pub (crate) fn create_signature (seed_phrase: &str, pwd_entry: &str, user_comment: &str, database_name: &str, checksum: u32) -> anyhow::Result<String> {
+    let sign = TrDbColdSign::from_storage(&database_name, checksum)?;
     let pwd = {
-        if action.has_pwd {Some(pwd_entry)}
+        if sign.has_pwd() {Some(pwd_entry)}
         else {None}
     };
-    
-    let mut events = action.history;
-    let (author_line, encryption) = match <MultiSigner>::decode(&mut &action.address_key[..]) {
-        Ok(MultiSigner::Ed25519(public)) => (Verifier::Ed25519(hex::encode(public)).show_card(), Encryption::Ed25519),
-        Ok(MultiSigner::Sr25519(public)) => (Verifier::Sr25519(hex::encode(public)).show_card(), Encryption::Sr25519),
-        Ok(MultiSigner::Ecdsa(public)) => (Verifier::Ecdsa(hex::encode(public)).show_card(), Encryption::Ecdsa),
-        Err(_) => return Err(Error::AddressKeyDecoding.show()),
+    let content_vec = match sign.content() {
+        SignContent::Transaction{method, extensions} => [method.to_vec(), extensions.to_vec()].concat(),
+        SignContent::Message(a) => a.encode(),
     };
     
-// get full address with derivation path, used for signature preparation
-// TODO zeroize
-    let full_address = seed_phrase.to_owned() + &action.path;
-    
-    match sign_as_address_key(&action.transaction, action.address_key, &full_address, pwd) {
+// For larger transactions, their hash should be signed instead; this is not implemented
+// upstream so we put it here
+    let content_vec = {
+        if content_vec.len() > 257 {blake2b(32, &[], &content_vec).as_bytes().to_vec()}
+        else {content_vec}
+    };
+    let mut full_address = seed_phrase.to_owned() + &sign.path();
+    match sign_as_address_key(&content_vec, sign.address_key(), &full_address, pwd) {
         Ok(s) => {
-            let hex_signature = hex::encode(s);
-            
-            remove_from_tree(SIGNTRANS.to_vec(), &transaction)?;
-            flush_db(&database)?;
-            
-            let sign_display = SignDisplay {
-                transaction: &hex_signature,
-                author_line,
-                user_comment,
-            }.show();
-            events.push(Event::TransactionSigned(sign_display));
-            enter_events_into_tree(&history, events)?;
-            flush_db(&database)?;
-            
-            match encryption {
-                Encryption::Ed25519 => Ok(format!("00{}", hex_signature)),
-                Encryption::Sr25519 => Ok(format!("01{}", hex_signature)),
-                Encryption::Ecdsa => Ok(format!("02{}", hex_signature)),
-            }
+            full_address.zeroize();
+            sign.apply(false, user_comment, &database_name)?;
+            Ok(hex::encode(s.encode()))
         },
         Err(e) => {
+            full_address.zeroize();
             if e.to_string() == Error::CryptoError(CryptoError::WrongPassword).show().to_string() {
-                events.push(Event::Error(e.to_string()));
-                enter_events_into_tree(&history, events)?;
-                flush_db(&database)?;
+                sign.apply(true, user_comment, &database_name)?;
             }
             return Err(e)
         },

@@ -1,16 +1,20 @@
+use definitions::crypto::Encryption;
 use sled;
-use definitions::metadata::NameVersioned;
 use anyhow::anyhow;
+use hex;
 
 #[derive(PartialEq)]
 pub enum Error {
     InternalDatabaseError(sled::Error),
+    DatabaseTransactionError(sled::transaction::TransactionError),
+    ChecksumMismatch,
     NotHex(NotHex),
     NotFound(NotFound),
     NotDecodeable(NotDecodeable),
     GenesisHashMismatch,
-    NetworkKeyMismatch,
+    NetworkSpecsKeyMismatch,
     BadTypesFile(String),
+    BadDefaultMetadata(String),
     MetadataNameMismatch,
     MetadataVersionMismatch,
     MetadataDefaultFile(String),
@@ -18,12 +22,16 @@ pub enum Error {
     Base58(String),
     CreateAddress(CreateAddress),
     AddressKeyCollision {name: String, seed_name: String},
+    AddressAlreadyExists{public: Vec<u8>, network: Vec<u8>},
     IdentityExists,
     InvalidDerivation,
     UnknownEncryption,
     AddressKey(String),
     EncryptionMismatchId,
     EncryptionMismatchNetwork,
+    DeadVerifier,
+    PageOutOfRange{given_page_number: u32, total_page_number: u32},
+    SpecsHistoricalDecoding{network_name: String, encryption: Encryption},
 }
 
 #[derive(PartialEq)]
@@ -32,25 +40,29 @@ pub enum NotHex {
     DefaultMeta,
     PublicKey,
     Signature,
-    NetworkKey,
+    NetworkSpecsKey,
     SufficientCrypto,
 }
 
 #[derive(PartialEq)]
 pub enum NotFound {
-    NetworkKey,
-    NameVersioned(NameVersioned),
+    NetworkSpecsKey,
+    NameVersioned{name: String, version: u32},
     Types,
     NetworkSpecs(String),
     MetaFromName(String),
     Address,
-    Verifier,
+    GeneralVerifier,
+    CurrentVerifier,
+    Stub,
+    Sign,
+    DangerStatus,
+    Order(u32),
 }
 
 #[derive(PartialEq)]
 pub enum NotDecodeable {
     ChainSpecs,
-    AddressDetailsDel,
     AddressDetails,
     AddressKey,
     Types,
@@ -59,8 +71,12 @@ pub enum NotDecodeable {
     NameVersioned,
     EntryOrder,
     Entry,
-    NetworkKey,
-    Verifier,
+    NetworkSpecsKey,
+    GeneralVerifier,
+    CurrentVerifier,
+    Stub,
+    Sign,
+    DangerStatus,
 }
 
 #[derive(PartialEq)]
@@ -77,32 +93,38 @@ impl Error {
     pub fn show (&self) -> anyhow::Error {
         match &self {
             Error::InternalDatabaseError(e) => anyhow!("Database internal error. {}", e),
+            Error::DatabaseTransactionError(e) => anyhow!("Database transaction error. {}", e),
+            Error::ChecksumMismatch => anyhow!("Database checksum mismatch."),
             Error::NotHex(a) => {
                 let ins = match a {
                     NotHex::GenesisHash => "Genesis hash",
                     NotHex::DefaultMeta => "Default metadata string",
                     NotHex::PublicKey => "Public key",
                     NotHex::Signature => "Signature",
-                    NotHex::NetworkKey => "Network key",
+                    NotHex::NetworkSpecsKey => "Network key",
                     NotHex::SufficientCrypto => "Sufficient crypto",
                 };
                 anyhow!("{} could not be decoded as hex.", ins)
             },
             Error::NotFound(e) => {
                 match e {
-                    NotFound::NetworkKey => anyhow!("Network not found."),
-                    NotFound::NameVersioned(x) => anyhow!("Metadata for {} version {} not in the database.", x.name, x.version),
+                    NotFound::NetworkSpecsKey => anyhow!("Network not found."),
+                    NotFound::NameVersioned{name, version} => anyhow!("Metadata for {} version {} not in the database.", name, version),
                     NotFound::Types => anyhow!("Types not found."),
                     NotFound::NetworkSpecs(name) => anyhow!("No network specs found in the database for {}", name),
                     NotFound::MetaFromName(name) => anyhow!("No metadata entries found in the database for {}", name),
                     NotFound::Address => anyhow!("This address does not exist in the database"),
-                    NotFound::Verifier => anyhow!("Network verifier not found"),
+                    NotFound::GeneralVerifier => anyhow!("General verifier not found"),
+                    NotFound::CurrentVerifier => anyhow!("Current network verifier not found"),
+                    NotFound::Stub => anyhow!("No database transaction stub in the transaction tree"),
+                    NotFound::Sign => anyhow!("No sign preparation stored in the transaction tree"),
+                    NotFound::DangerStatus => anyhow!("Danger status not found in the database"),
+                    NotFound::Order(x) => anyhow!("Entry with order {} not found in history record.", x),
                 }
             },
             Error::NotDecodeable(e) => {
                 match e {
                     NotDecodeable::ChainSpecs => anyhow!("Network specs are damaged and could not be decoded."),
-                    NotDecodeable::AddressDetailsDel => anyhow!("Address details were damaged and not decodeable. Removed the record from identities tree."),
                     NotDecodeable::AddressDetails => anyhow!("Address details were damaged and not decodeable."),
                     NotDecodeable::AddressKey => anyhow!("Address key could not be decoded."),
                     NotDecodeable::Types => anyhow!("Types information from the database could not be decoded."),
@@ -111,13 +133,18 @@ impl Error {
                     NotDecodeable::NameVersioned => anyhow!("Versioned name (the key for metadata) could not be decoded."),
                     NotDecodeable::EntryOrder => anyhow!("History entry order (storage key) from the database could not be decoded."),
                     NotDecodeable::Entry => anyhow!("History entry from the database could not be decoded."),
-                    NotDecodeable::NetworkKey => anyhow!("Network key could not be decoded."),
-                    NotDecodeable::Verifier => anyhow!("Network verifier could not be decoded."),
+                    NotDecodeable::NetworkSpecsKey => anyhow!("Network key could not be decoded."),
+                    NotDecodeable::GeneralVerifier => anyhow!("General verifier could not be decoded."),
+                    NotDecodeable::CurrentVerifier => anyhow!("Current network verifier could not be decoded."),
+                    NotDecodeable::Stub => anyhow!("Database transaction stub from the transaction tree could not be decoded"),
+                    NotDecodeable::Sign => anyhow!("Sign preparation unit from the transaction tree could not be decoded"),
+                    NotDecodeable::DangerStatus => anyhow!("Danger status could not be decoded"),
                 }
             },
             Error::GenesisHashMismatch => anyhow!("Genesis hash mismatch."),
-            Error::NetworkKeyMismatch => anyhow!("Network key does not match genesis hash and encryption algorithm."),
+            Error::NetworkSpecsKeyMismatch => anyhow!("Network key does not match genesis hash and encryption algorithm."),
             Error::BadTypesFile(e) => anyhow!("Error loading default types. {}", e),
+            Error::BadDefaultMetadata(e) => anyhow!("Error loading default metadata. {}", e),
             Error::MetadataNameMismatch => anyhow!("Database records damaged. Name decoded from version constant does not match the name from database key."),
             Error::MetadataVersionMismatch => anyhow!("Database records damaged. Metadata version decoded from version constant does not match the version from database key."),
             Error::MetadataDefaultFile(e) => anyhow!("Error loading default metadata. {}", e),
@@ -133,12 +160,16 @@ impl Error {
                 }
             },
             Error::AddressKeyCollision {name, seed_name} => anyhow!("Address key collision with existing identity {} of seed {}", name, seed_name),
-            Error::IdentityExists => anyhow!("Identity with this name already exists"),
+            Error::AddressAlreadyExists {public, network} => anyhow!("Address with public key {} already exists for network key {}", hex::encode(public), hex::encode(network)),
+            Error::IdentityExists => anyhow!("Identity already exists"),
             Error::InvalidDerivation => anyhow!("Invalid derivation format"),
             Error::UnknownEncryption => anyhow!("System error: unknown encryption algorithm"),
             Error::AddressKey(x) => anyhow!("Error generating address key. {}", x),
             Error::EncryptionMismatchId => anyhow!("Identity encryption algorithm not matching network encryption algorithm"),
             Error::EncryptionMismatchNetwork => anyhow!("Encryption algorithm from network specs not matching the one from network key"),
+            Error::DeadVerifier => anyhow!("Network is locked. Wipe clean and reset Signer to be able to re-install this network"),
+            Error::PageOutOfRange{given_page_number, total_page_number} => anyhow!("Requested history page {} does not exist. Total number of pages {}.", given_page_number, total_page_number),
+            Error::SpecsHistoricalDecoding{network_name, encryption} => anyhow!("Historical transaction could not be decoded. Missing network specs for {}, encryption {}.", network_name, encryption.show()),
         }
     }
 }

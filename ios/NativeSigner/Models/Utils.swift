@@ -46,5 +46,18 @@ extension AttributedString {
     }
 }
 
+extension String {
+    /**
+     * St...ng
+     */
+    func truncateMiddle(length: Int) -> String {
+        if (self.count) > length*2 {
+            return self.prefix(length) + "..." + self.suffix(length)
+        } else {
+            return self
+        }
+    }
+}
+
 //Getting font:
 //Text("kusama").font(Font.custom("Web3-Regular", size: 24))

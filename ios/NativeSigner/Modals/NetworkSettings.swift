@@ -27,6 +27,7 @@ struct NetworkSettings: Decodable {
     var base58prefix: String
     var color: String
     var decimals: String
+    var encryption: String
     var genesis_hash: String
     var logo: String
     var name: String
@@ -35,7 +36,7 @@ struct NetworkSettings: Decodable {
     var secondary_color: String
     var title: String
     var unit: String
-    var verifier: Verifier
+    var current_verifier: CurrentVerifier
     var meta: [MetaSpecsNS]
 }
 

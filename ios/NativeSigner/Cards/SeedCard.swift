@@ -11,39 +11,41 @@ struct SeedCard: View {
     @EnvironmentObject var data: SignerDataModel
     var seedName: String
     var body: some View {
-        HStack {
-            Image(uiImage: data.getRootIdenticon(seedName: seedName))
-                .resizable(resizingMode: .stretch)
-                .frame(width: 42, height: 42)
-            
-            if seedName == "" {
-                Text("Select seed")
-                    .foregroundColor(Color("textMainColor"))
-                    .font(.largeTitle)
-            } else {
-                VStack (alignment: .leading) {
-                    Text(seedName)
+        ZStack {
+            RoundedRectangle(cornerRadius: 4).foregroundColor(Color("backgroundCard")).frame(height: 44)
+            HStack {
+                Image(uiImage: data.getRootIdenticon(seedName: seedName))
+                    .resizable(resizingMode: .stretch)
+                    .frame(width: 28, height: 28)
+                
+                if seedName == "" { //should never happen but just in case
+                    Text("Select seed")
                         .foregroundColor(Color("textMainColor"))
-                        .font(.headline)
-                    Text(data.getRootTruncated(seedName: seedName))
-                        .font(.headline)
-                        .foregroundColor(Color("textFadedColor"))
+                        .font(.title2)
+                } else {
+                    VStack (alignment: .leading) {
+                        Text(seedName)
+                            .foregroundColor(Color("textMainColor"))
+                            .font(.callout)
+                        Text(data.getRootTruncated(seedName: seedName))
+                            .font(.system(size: 12, design: .monospaced))
+                            .foregroundColor(Color("textFadedColor"))
+                    }
                 }
-            }
-            
-            Spacer()
-            if data.getMultiSelectionMode() {
-                if let rootAddress = data.getRootAddress(seedName: seedName) {
-                    if data.multiSelected.contains(rootAddress) {
-                        Image(systemName: "checkmark.circle.fill").foregroundColor(Color("AccentColor")).imageScale(.large)
-                    } else {
-                        Image(systemName: "circle").foregroundColor(Color("textFadedColor")).imageScale(.large)
+                
+                Spacer()
+                if data.getMultiSelectionMode() {
+                    if let rootAddress = data.getRootAddress(seedName: seedName) {
+                        if data.multiSelected.contains(rootAddress) {
+                            Image(systemName: "checkmark.circle.fill").foregroundColor(Color("AccentColor")).imageScale(.medium)
+                        } else {
+                            Image(systemName: "circle").foregroundColor(Color("textFadedColor")).imageScale(.medium)
+                        }
                     }
                 }
             }
+            .padding(8)
         }
-        .padding(8)
-        .background(Color("backgroundCard"))
     }
 }
 

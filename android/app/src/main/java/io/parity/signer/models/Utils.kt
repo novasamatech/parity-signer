@@ -14,6 +14,19 @@ fun String.decodeHex(): ByteArray {
 }
 
 /**
+ * Replace middle of long string with "..."
+ * length: number of symbols to keep on either side
+ * if message is too short, does not modify it
+ */
+fun String.abbreviateString(length: Int): String {
+	return if (this.length > length*2) {
+		this.substring(0, length) + "..." + this.substring(this.length - length, this.length)
+	} else {
+		this
+	}
+}
+
+/**
  * Encodes number array into string
  */
 fun ByteArray.encodeHex(): String {
@@ -53,7 +66,7 @@ fun sortHistory(array: JSONArray): JSONArray {
 	for(i in 0 until array.length()) {
 		sortable += array.getJSONObject(i)
 	}
-	return JSONArray(sortable.sortedBy{ item -> item.getInt("index") }.reversed() )
+	return JSONArray(sortable.sortedBy{ item -> item.getInt("order") }.reversed() )
 }
 
 /**

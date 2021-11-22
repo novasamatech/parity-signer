@@ -1,18 +1,23 @@
 package io.parity.signer.components
 
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.background
+import androidx.compose.foundation.gestures.detectTapGestures
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.material.Button
-import androidx.compose.material.ButtonDefaults
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Text
+import androidx.compose.material.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.unit.dp
 import io.parity.signer.models.SignerDataModel
+import io.parity.signer.models.exportPublicKeyEngage
+import io.parity.signer.models.getRootIdentity
+import io.parity.signer.models.selectKey
+import io.parity.signer.ui.theme.Bg200
 import org.json.JSONObject
 
 @Composable
@@ -23,64 +28,101 @@ fun KeySelector(signerDataModel: SignerDataModel) {
 	LazyColumn {
 		//keys should be defined already, can't panic
 		items(identities.value!!.length()) { item ->
-			Column {
-				Button(
-					colors = ButtonDefaults.buttonColors(
-						backgroundColor = MaterialTheme.colors.secondary,
-						contentColor = MaterialTheme.colors.onSecondary,
-					),
-					onClick = {
-						if (identities.value!!.getJSONObject(item) == selectedIdentity.value) {
-							signerDataModel.selectKey(JSONObject())
-						} else {
-							signerDataModel.selectKey(identities.value!!.getJSONObject(item))
-						}
-					}
+			if (identities.value!!.getJSONObject(item) != signerDataModel.getRootIdentity(
+					signerDataModel.selectedSeed.value ?: ""
+				)
+			) {
+				Row(
+					verticalAlignment = Alignment.CenterVertically,
+					modifier = Modifier
+						.padding(top = 3.dp, start = 12.dp, end = 12.dp)
+						.background(Bg200)
 				) {
-					KeyCard(
-						identities.value!!.getJSONObject(item),
-						signerDataModel = signerDataModel
-					)
-				}
-				if (identities.value!!.getJSONObject(item) == selectedIdentity.value) {
 					Row(
-						horizontalArrangement = Arrangement.SpaceBetween,
-						modifier = Modifier.fillMaxWidth()
-					) {
-						Button(
-							colors = ButtonDefaults.buttonColors(
-								backgroundColor = MaterialTheme.colors.secondary,
-								contentColor = MaterialTheme.colors.onSecondary,
-							),
-							onClick = { signerDataModel.deleteKeyConfirmation() }
-						) { Text("delete") }
-						Button(
-							colors = ButtonDefaults.buttonColors(
-								backgroundColor = MaterialTheme.colors.secondary,
-								contentColor = MaterialTheme.colors.onSecondary,
-							),
-							onClick = {
-								signerDataModel.exportPublicKeyEngage()
+						verticalAlignment = Alignment.CenterVertically,
+						modifier = Modifier
+							.pointerInput(Unit) {
+								detectTapGestures(
+									onTap = {
+										signerDataModel.selectKey(
+											identities.value!!.getJSONObject(
+												item
+											) ?: JSONObject()
+										)
+										signerDataModel.exportPublicKeyEngage()
+									},
+									onLongPress = {
+
+									}
+								)
 							}
-						) { Text("export") }
-						Button(
-							colors = ButtonDefaults.buttonColors(
-								backgroundColor = MaterialTheme.colors.secondary,
-								contentColor = MaterialTheme.colors.onSecondary,
-							),
-							onClick = { signerDataModel.newKeyScreenEngage() /*TODO*/ }
-						) { Text("N+1") }
-						Button(
-							colors = ButtonDefaults.buttonColors(
-								backgroundColor = MaterialTheme.colors.secondary,
-								contentColor = MaterialTheme.colors.onSecondary,
-							),
-							onClick = { signerDataModel.newKeyScreenEngage() }
-						) { Text("new") }
+							.padding(horizontal = 8.dp)
+					) {
+						KeyCard(
+							identities.value!!.getJSONObject(item),
+							signerDataModel = signerDataModel
+						)
+						Spacer(modifier = Modifier.weight(1f, true))
+						Icon(Icons.Default.CheckCircle, "Address selected")
 					}
-					//TODO: Relevant history
+
 				}
 			}
 		}
 	}
 }
+
+/*
+if (identities.value!!.getJSONObject(item) == selectedIdentity.value) {
+						Row(
+							horizontalArrangement = Arrangement.SpaceBetween,
+							modifier = Modifier.fillMaxWidth()
+						) {
+							Button(
+								colors = ButtonDefaults.buttonColors(
+									backgroundColor = MaterialTheme.colors.secondary,
+									contentColor = MaterialTheme.colors.onSecondary,
+								),
+								onClick = { signerDataModel.deleteKeyConfirmation() }
+							) { Text("delete") }
+							Button(
+								colors = ButtonDefaults.buttonColors(
+									backgroundColor = MaterialTheme.colors.secondary,
+									contentColor = MaterialTheme.colors.onSecondary,
+								),
+								onClick = {
+									signerDataModel.exportPublicKeyEngage()
+								}
+							) { Text("export") }
+							Button(
+								colors = ButtonDefaults.buttonColors(
+									backgroundColor = MaterialTheme.colors.secondary,
+									contentColor = MaterialTheme.colors.onSecondary,
+								),
+								onClick = { signerDataModel.newKeyScreenEngage() /*TODO*/ }
+							) { Text("N+1") }
+							Button(
+								colors = ButtonDefaults.buttonColors(
+									backgroundColor = MaterialTheme.colors.secondary,
+									contentColor = MaterialTheme.colors.onSecondary,
+								),
+								onClick = { signerDataModel.newKeyScreenEngage() }
+							) { Text("new") }
+						}
+					}
+
+
+					Button(
+						colors = ButtonDefaults.buttonColors(
+							backgroundColor = MaterialTheme.colors.secondary,
+							contentColor = MaterialTheme.colors.onSecondary,
+						),
+						onClick = {
+							if (identities.value!!.getJSONObject(item) == selectedIdentity.value) {
+								signerDataModel.selectKey(JSONObject())
+							} else {
+								signerDataModel.selectKey(identities.value!!.getJSONObject(item))
+							}
+						}
+					)
+ */

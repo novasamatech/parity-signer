@@ -1,17 +1,21 @@
 package io.parity.signer.components
 
+import androidx.compose.foundation.layout.Row
 import androidx.compose.material.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
 import io.parity.signer.models.SignerDataModel
+import io.parity.signer.models.selectNetwork
 import io.parity.signer.ui.theme.Typography
 import org.json.JSONObject
 
 @Composable
 fun NetworkSelector(signerDataModel: SignerDataModel) {
 
-	var selectedNetwork = signerDataModel.selectedNetwork.observeAsState()
-	var networks = signerDataModel.networks.observeAsState()
+	val selectedNetwork = signerDataModel.selectedNetwork.observeAsState()
+	val networks = signerDataModel.networks.observeAsState()
 
 	var expanded by remember { mutableStateOf(false) }
 
@@ -21,7 +25,10 @@ fun NetworkSelector(signerDataModel: SignerDataModel) {
 			contentColor = MaterialTheme.colors.onBackground,
 		),
 		onClick = { expanded = true }) {
-		Text(selectedNetwork.value!!.get("title").toString())
+		Row{
+			NetworkCard(selectedNetwork.value?: JSONObject())
+			Icon(Icons.Default.ArrowDropDown, "Dropdown network selector indicator")
+		}
 	}
 	DropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
 		for (i in 0 .. (networks.value!!.length()-1)) {

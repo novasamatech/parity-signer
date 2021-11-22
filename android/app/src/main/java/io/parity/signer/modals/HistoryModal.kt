@@ -13,10 +13,11 @@ fun HistoryModal(signerDataModel: SignerDataModel) {
 	val history = signerDataModel.history.observeAsState()
 
 	Column{
-		Text("History")
 		LazyColumn {
-			items(history.value!!.length()) { item ->
-				HistoryCard(history.value!!.getJSONObject(item))
+			for(i in 0 until history.value!!.length()) {
+				items(history.value!!.getJSONObject(i).getJSONArray("events").length()) { item ->
+					HistoryCard(history.value!!.getJSONObject(i).getJSONArray("events").getJSONObject(item), history.value!!.getJSONObject(i).getString("timestamp"))
+				}
 			}
 		}
 	}

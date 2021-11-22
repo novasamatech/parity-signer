@@ -1,36 +1,28 @@
 use anyhow;
-use transaction_parsing::cards::Action;
+use db_handling::db_transactions::{TrDbColdStub};
 
-mod accept_metadata;
-    use accept_metadata::{accept_metadata, add_meta_verifier};
-mod accept_network;
-    use accept_network::add_network;
-mod accept_types;
-    use accept_types::{accept_types, add_general_verifier};
 mod error;
-mod helpers;
-mod interpretation;
-    use interpretation::interpret_action;
+    use error::Error;
 pub mod sign_message;
 mod sign_transaction;
     use sign_transaction::create_signature_png;
 mod tests;
 
-/// Function process action card from RN.
 
-pub fn handle_action (action_line: &str, seed_phrase: &str, pwd_entry: &str, user_comment: &str, dbname: &str) -> anyhow::Result<String> {
+pub fn handle_stub (checksum_str: &str, database_name: &str) -> anyhow::Result<()> {
+    let checksum = checksum(checksum_str)?;
+    TrDbColdStub::from_storage(&database_name, checksum)?
+        .apply(&database_name)
+}
 
-    let action = interpret_action (action_line)?;
-    
-    match action {
-        Action::SignTransaction(checksum) => create_signature_png(seed_phrase, pwd_entry, user_comment, dbname, checksum),
-        Action::LoadMetadata(checksum) => accept_metadata(dbname, checksum, false),
-        Action::AddMetadataVerifier(checksum) => add_meta_verifier(dbname, checksum, false),
-        Action::LoadTypes(checksum) => accept_types(dbname, checksum),
-        Action::AddGeneralVerifier(checksum) => add_general_verifier(dbname, checksum),
-        Action::AddTwoVerifiers(checksum) => add_meta_verifier(dbname, checksum, true),
-        Action::LoadMetadataAndAddGeneralVerifier(checksum) => accept_metadata (dbname, checksum, true),
-        Action::AddNetwork(checksum) => add_network (dbname, checksum, false),
-        Action::AddNetworkAndAddGeneralVerifier(checksum) => add_network (dbname, checksum, true),
+pub fn handle_sign (checksum_str: &str, seed_phrase: &str, pwd_entry: &str, user_comment: &str, database_name: &str) -> anyhow::Result<String> {
+    let checksum = checksum(checksum_str)?;
+    create_signature_png(seed_phrase, pwd_entry, user_comment, database_name, checksum)
+}
+
+pub (crate) fn checksum (checksum_str: &str) -> anyhow::Result<u32> {
+    match checksum_str.parse() {
+        Ok(a) => Ok(a),
+        Err(_) => return Err(Error::ChecksumNotU32.show()),
     }
 }

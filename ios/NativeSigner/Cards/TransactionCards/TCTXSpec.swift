@@ -8,28 +8,14 @@
 import SwiftUI
 
 struct TCTXSpec: View {
-    let value: TxSpec
+    let value: String
     var body: some View {
         HStack {
             Spacer()
             VStack {
-                Text("network")
+                Text("TX version")
                     .foregroundColor(Color("AccentColor"))
-                Text(value.network)
-                    .foregroundColor(Color("textMainColor"))
-            }
-            Spacer()
-            VStack {
-                Text("spec version")
-                    .foregroundColor(Color("AccentColor"))
-                Text(value.version)
-                    .foregroundColor(Color("textMainColor"))
-            }
-            Spacer()
-            VStack {
-                Text("tx version")
-                    .foregroundColor(Color("AccentColor"))
-                Text(value.tx_version)
+                Text(value)
                     .foregroundColor(Color("textMainColor"))
             }
             Spacer()

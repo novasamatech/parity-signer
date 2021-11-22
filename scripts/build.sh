@@ -5,6 +5,15 @@ set -e
 
 cd "$(dirname "${0}")/../rust/signer"
 
+if [ "$1" != "android" ] && [ "$1" != "ios" ]
+then
+	printf 'Please select target OS\n'
+	printf 'build.sh android\n'
+	printf 'or\n'
+	printf 'build.sh ios\n'
+	exit 1
+fi
+
 if [ "$1" == "android" ]
   then
 
@@ -13,7 +22,7 @@ if [ "$1" == "android" ]
     if [ -z ${NDK_HOME+x} ];
       then
         printf 'Please install android-ndk or export NDK_HOME (use absolute path)\n\n'
-        printf 'from https://developer.android.com/ndk/downloads or with sdkmanager'
+        printf 'from https://developer.android.com/ndk/downloads or with sdkmanager\n'
         exit 1
       else
         printf "Building Andriod targets...";
@@ -51,9 +60,12 @@ if [ "$1" == "android" ]
     for i in "${!ANDROID_ARCHS[@]}";
       do
         mkdir -p -v "../../android/app/src/main/jniLibs/${ANDROID_FOLDER[$i]}"
-        cp "./target/${ANDROID_ARCHS[$i]}/release/lib${LIB_NAME}.so" "../../android/app/src/main/jniLibs/${ANDROID_FOLDER[$i]}/lib${LIB_NAME}.so"
+        cp "../target/${ANDROID_ARCHS[$i]}/release/lib${LIB_NAME}.so" "../../android/app/src/main/jniLibs/${ANDROID_FOLDER[$i]}/lib${LIB_NAME}.so"
     done
 
+    rm -rf ../../android/app/src/main/assets/Database/*
+    mkdir -p ../../android/app/src/main/assets/Database/
+    cp -R ../database/database_cold_release/* ../../android/app/src/main/assets/Database/
 fi
 
 if [ "$1" == "ios" ]
@@ -71,10 +83,14 @@ if [ "$1" == "ios" ]
         cargo build --target "$i" --release --no-default-features
     done
 
-    lipo -create -output "../../ios/NativeSigner/lib${LIB_NAME}.a" target/x86_64-apple-ios/release/libsigner.a target/aarch64-apple-ios/release/libsigner.a
-    lipo -create -output "lib${LIB_NAME}.a" target/x86_64-apple-ios/release/libsigner.a target/aarch64-apple-ios/release/libsigner.a
+    lipo -create -output "../../ios/NativeSigner/lib${LIB_NAME}.a" ../target/x86_64-apple-ios/release/libsigner.a ../target/aarch64-apple-ios/release/libsigner.a
+    lipo -create -output "lib${LIB_NAME}.a" ../target/x86_64-apple-ios/release/libsigner.a ../target/aarch64-apple-ios/release/libsigner.a
     #unsupported: target/armv7-apple-ios/release/libsigner.a target/armv7s-apple-ios/release/libsigner.a
 
+    rm -rf ../../ios/NativeSigner/Database
+    mkdir ../../ios/NativeSigner/Database/
+    mkdir ../../ios/NativeSigner/Database/Database/
+    cp -R ../database/database_cold_release/ ../../ios/NativeSigner/Database/Database
 fi
 
 #echo "hello tom" > read.txt

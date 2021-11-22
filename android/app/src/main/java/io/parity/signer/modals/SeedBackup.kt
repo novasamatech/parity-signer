@@ -8,6 +8,7 @@ import androidx.compose.material.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.livedata.observeAsState
 import io.parity.signer.models.SignerDataModel
+import io.parity.signer.models.acknowledgeBackup
 
 /**
  * Modal to show seed phrase. Dangerous place.

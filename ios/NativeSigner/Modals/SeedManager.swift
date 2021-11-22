@@ -12,6 +12,7 @@ struct SeedManager: View {
     @State var showBackup = false
     @State var deleteConfirm = false
     @State var seedPhrase = ""
+    @State var removeSeed = ""
     var body: some View {
         ZStack {
             ModalBackdrop()
@@ -25,31 +26,19 @@ struct SeedManager: View {
                                     data.keyManagerModal = .none
                                 }) {
                                     SeedCardForManager(seedName: seed)
+                                    Spacer()
                                 }
-                                Spacer()
                                 Button(action: {
-                                    seedPhrase = data.getSeed(seedName: seed, backup: true)
-                                    showBackup = !seedPhrase.isEmpty
+                                    data.selectSeed(seedName: seed)
+                                    data.keyManagerModal = .seedBackup
                                 }) {
                                     VStack {
-                                        Image(systemName: "eye").imageScale(.large)
+                                        Image(systemName: "rectangle.and.pencil.and.ellipsis").imageScale(.large)
                                     }
                                     .background(Color("backgroundCard"))
                                 }
-                                .alert(isPresented: $showBackup, content: {
-                                    Alert(
-                                        title: Text("Backup your seed phrase"),
-                                        message: Text(seedPhrase),
-                                        dismissButton: .default(
-                                            Text("Done"),
-                                            action: {
-                                                seedPhrase = ""
-                                                showBackup = false
-                                            }
-                                        )
-                                    )
-                                })
                                 Button(action: {
+                                    removeSeed = seed
                                     deleteConfirm = true
                                 }) {
                                     VStack {
@@ -60,23 +49,27 @@ struct SeedManager: View {
                                 .alert(isPresented: $deleteConfirm, content: {
                                     Alert(
                                         title: Text("Delete seed?"),
-                                        message: Text("You are about to delete seed " + seed),
+                                        message: Text("You are about to delete seed " + removeSeed),
                                         primaryButton: .cancel(),
                                         secondaryButton: .destructive(
                                             Text("Delete"),
-                                            action: { data.removeSeed(seedName: seed)
+                                            action: {
+                                                data.removeSeed(seedName: removeSeed)
+                                                removeSeed = ""
                                             }
                                         )
                                     )
                                 })
+                                .padding(.horizontal)
                             }
                             .background(Color("backgroundCard"))
                         }
                     }
                 }
                 Spacer()
-                
             }
+        }.onAppear {
+            data.selectSeed(seedName: "")
         }
     }
 }

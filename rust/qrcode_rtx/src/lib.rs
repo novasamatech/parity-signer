@@ -3,11 +3,11 @@ use raptorq;
 use qrcodegen::{QrCode, QrCodeEcc};
 use apng_encoder;
 use constants::{CHUNK_SIZE, BORDER, SCALING, FPS_NOM, FPS_DEN, MAIN_COLOR, BACK_COLOR};
+use qrcode_static::png_qr;
 
 /// function to take data as Vec<u8>, apply raptorq to get Vec<EncodingPacket>
 /// and serialize it to get Vec<u8> output
-
-pub fn make_data_packs (input: &Vec<u8>) -> Result<Vec<Vec<u8>>, &'static str> {
+fn make_data_packs (input: &Vec<u8>) -> Result<Vec<Vec<u8>>, &'static str> {
 
 // checking that data is not too long, set limit for now at 2^31 bit
     if input.len() >= 0x80000000 { 
@@ -41,8 +41,7 @@ pub fn make_data_packs (input: &Vec<u8>) -> Result<Vec<Vec<u8>>, &'static str> {
 }
 
 /// function to take data as Vec<Vec<u8>> with all stuff added and make Vec<QrCode>
-
-pub fn make_qr_codes (data: Vec<Vec<u8>>) -> Result<Vec<QrCode>, Box<dyn std::error::Error>> {
+fn make_qr_codes (data: Vec<Vec<u8>>) -> Result<Vec<QrCode>, Box<dyn std::error::Error>> {
     let mut out: Vec<QrCode> = Vec::new();
     for x in data.iter() {
         let new = QrCode::encode_binary(&x, QrCodeEcc::Low)?;
@@ -51,7 +50,7 @@ pub fn make_qr_codes (data: Vec<Vec<u8>>) -> Result<Vec<QrCode>, Box<dyn std::er
     Ok(out)
 }
 
-pub fn make_apng (data: Vec<QrCode>, output_name: &str) -> Result<(), Box<dyn std::error::Error>> {
+fn make_apng (data: Vec<QrCode>, output_name: &str) -> Result<(), Box<dyn std::error::Error>> {
     let mut output_file = fs::File::create(output_name)?;
     let frames_count: u32 = data.len() as u32;
     let border_size = BORDER*SCALING;
@@ -69,17 +68,12 @@ pub fn make_apng (data: Vec<QrCode>, output_name: &str) -> Result<(), Box<dyn st
     };
     let mut apng_encoder = match apng_encoder::Encoder::create(&mut output_file, apng_meta) {
         Ok(a) => a,
-        Err(e) => {
-            let err_text = format!("Apng encoder error. {}", e);
-            let err: Box<dyn std::error::Error> = From::from(err_text);
-            return Err(err)
-        },
+        Err(e) => return Err(Box::from(format!("Apng encoder error. {}", e))),
     };
 
 // making actual apng
 // qr.get_module(x,y) = false corresponds to back color (white by default)
 // qr.get_module(x,y) = true corresponds to main color (black by default)
-
     for qr in data.iter() {
         let mut buffer: Vec<u8> = Vec::new();
         for y in 0..size {
@@ -94,28 +88,31 @@ pub fn make_apng (data: Vec<QrCode>, output_name: &str) -> Result<(), Box<dyn st
         }
         match apng_encoder.write_frame(&buffer, Some(&apng_frame), None, None) {
             Ok(a) => a,
-            Err(e) => {
-                let err_text = format!("Apng encoder error. {}", e);
-                let err: Box<dyn std::error::Error> = From::from(err_text);
-                return Err(err)
-            },
+            Err(e) => return Err(Box::from(format!("Apng encoder error. {}", e))),
         }
     }
     match apng_encoder.finish() {
         Ok(a) => a,
-        Err(e) => {
-            let err_text = format!("Apng encoder error. {}", e);
-            let err: Box<dyn std::error::Error> = From::from(err_text);
-            return Err(err)
-        },
+        Err(e) => return Err(Box::from(format!("Apng encoder error. {}", e))),
     }
     Ok(())
 }
 
 /// Function to transform input Vec<u8> into fountain qr-code
-
-pub fn transform_into_qr_apng (input: &Vec<u8>, output_name: &str) -> Result<(), Box<dyn std::error::Error>> {
+fn transform_into_qr_apng (input: &Vec<u8>, output_name: &str) -> Result<(), Box<dyn std::error::Error>> {
     let data_packs = make_data_packs(input)?;
     make_apng(make_qr_codes(data_packs)?, output_name)?;
     Ok(())
+}
+
+/// Function to make appropriately sized qr code, apng or static
+pub fn make_pretty_qr (input: &Vec<u8>, output_name: &str) -> Result<(), Box<dyn std::error::Error>> {
+    if input.len() <= 2953 {
+        let qr = png_qr (input)?;
+        match std::fs::write(output_name, &qr) {
+            Ok(_) => Ok(()),
+            Err(e) => {return Err(Box::from(format!("Output error {}", e)))}
+        }
+    }
+    else {transform_into_qr_apng(input, output_name)}
 }

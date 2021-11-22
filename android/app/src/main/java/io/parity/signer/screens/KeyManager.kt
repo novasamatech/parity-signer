@@ -1,48 +1,63 @@
 package io.parity.signer.screens
 
+import android.widget.ImageButton
+import androidx.compose.animation.ExperimentalAnimationApi
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.AddCircle
 import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.scale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.unit.dp
 import androidx.fragment.app.FragmentActivity
 import io.parity.signer.KeyManagerModal
 import io.parity.signer.components.KeySelector
 import io.parity.signer.components.NetworkSelector
-import io.parity.signer.components.SeedSelector
+import io.parity.signer.components.SeedCard
 import io.parity.signer.modals.*
-import io.parity.signer.models.SignerDataModel
+import io.parity.signer.models.*
+import io.parity.signer.ui.theme.Bg100
+import io.parity.signer.ui.theme.Bg200
 
 /**
  * Key manager screen; here all key/identity/seed creation and deletion
  * operations should happen. This is final point in navigation:
  * all subsequent interactions should be in modals or drop-down menus
  */
+@ExperimentalMaterialApi
+@ExperimentalAnimationApi
 @Composable
 fun KeyManager(signerDataModel: SignerDataModel) {
 	val keyManagerModal = signerDataModel.keyManagerModal.observeAsState()
+	val seedName = signerDataModel.selectedSeed.observeAsState()
 
 	when (keyManagerModal.value) {
 		KeyManagerModal.None -> {
-			Column {
-				NetworkSelector(signerDataModel = signerDataModel)
-				Row(
-					horizontalArrangement = Arrangement.SpaceBetween,
-					modifier = Modifier.fillMaxWidth()
+			Column() {
+				Row(Modifier.clickable {
+					signerDataModel.selectKey(signerDataModel.getRootIdentity(seedName.value?:""))
+					signerDataModel.exportPublicKeyEngage()
+				}
+					.padding(top = 3.dp, start = 12.dp, end = 12.dp)
+					.background(Bg200)
+					.fillMaxWidth()
 				) {
-					SeedSelector(signerDataModel = signerDataModel)
-					Button(
-						colors = ButtonDefaults.buttonColors(
-							backgroundColor = MaterialTheme.colors.background,
-							contentColor = MaterialTheme.colors.onBackground
-						),
-						//Copypaste for toast
-						onClick = {
-							signerDataModel.newSeedScreenEngage()
-						}
-					) {
-						Text(text = "New seed")
+				SeedCard(
+					seedName = seedName.value ?: "",
+					seedSelector = true,
+					signerDataModel = signerDataModel
+				)}
+				NetworkSelector(signerDataModel = signerDataModel)
+				Row(modifier = Modifier.fillMaxWidth(1f).padding(horizontal = 8.dp)) {
+					Text("DERIVED KEYS")
+					Spacer(Modifier.weight(1f, true))
+					IconButton(onClick = { signerDataModel.newKeyScreenEngage() }) {
+						Icon(Icons.Default.AddCircle, contentDescription = "New derived key")
 					}
 				}
 				KeySelector(signerDataModel)
@@ -63,35 +78,13 @@ fun KeyManager(signerDataModel: SignerDataModel) {
 		KeyManagerModal.KeyDeleteConfirm -> {
 			KeyDelete(signerDataModel)
 		}
+		KeyManagerModal.SeedSelector -> SeedManager(signerDataModel = signerDataModel)
+		KeyManagerModal.NetworkManager -> NetworkManager(signerDataModel = signerDataModel)
+		KeyManagerModal.NetworkDetails -> NetworkDetails(signerDataModel = signerDataModel)
+		KeyManagerModal.NewSeedSelect -> TODO()
+		KeyManagerModal.RestoreSeed -> TODO()
+		KeyManagerModal.SeedDeleteConfirm -> TODO()
+		KeyManagerModal.AllKeySelector -> TODO()
 		null -> WaitingScreen()
 	}
 }
-
-/*
-Button(
-				colors = ButtonDefaults.buttonColors(
-					backgroundColor = MaterialTheme.colors.background,
-					contentColor = MaterialTheme.colors.onBackground
-				),
-				//Copypaste for toast
-				onClick = {
-					Toast.makeText(
-						signerDataModel.context,
-						signerDataModel.callNative("000000"),
-						LENGTH_LONG
-					).show()
-				}
-			) {
-				Text(text = "Settings")
-			}
-			Button(
-				colors = ButtonDefaults.buttonColors(
-					backgroundColor = MaterialTheme.colors.background,
-					contentColor = MaterialTheme.colors.onBackground
-				),
-				onClick = { signerDataModel.authentication.authenticate(context) {} }
-			) {
-				Text(text = "Eat me!")
-			}
-
-*/
