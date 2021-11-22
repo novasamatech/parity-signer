@@ -1,12 +1,10 @@
 package io.parity.signer.models
 
 import android.Manifest
-import android.annotation.SuppressLint
 import android.content.Context
 import android.content.SharedPreferences
 import android.content.pm.PackageManager
 import android.util.Log
-import androidx.camera.core.ImageProxy
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.LiveData
@@ -14,8 +12,6 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.security.crypto.EncryptedSharedPreferences
 import androidx.security.crypto.MasterKey
-import com.google.mlkit.vision.barcode.BarcodeScanner
-import com.google.mlkit.vision.common.InputImage
 import io.parity.signer.*
 import io.parity.signer.components.Authentication
 import org.json.JSONArray
@@ -29,7 +25,6 @@ import android.content.BroadcastReceiver
 import android.content.IntentFilter
 import android.os.Build
 import android.provider.Settings
-import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 
 /**
@@ -41,6 +36,8 @@ class SignerDataModel : ViewModel() {
 
 	//Internal model values
 	private val _onBoardingDone = MutableLiveData(OnBoardingState.InProgress)
+
+	//TODO: something about this
 	lateinit var context: Context
 	lateinit var activity: FragmentActivity
 	private lateinit var masterKey: MasterKey
@@ -155,6 +152,12 @@ class SignerDataModel : ViewModel() {
 		dbName = context.applicationContext.filesDir.toString() + "/Database"
 		authentication.context = context
 		hasStrongbox = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+			Log.d("checking strongbox", "blip")
+			Log.d(
+				"checking strongbox",
+				context.packageManager.hasSystemFeature(PackageManager.FEATURE_STRONGBOX_KEYSTORE)
+					.toString()
+			)
 			context.packageManager.hasSystemFeature(PackageManager.FEATURE_STRONGBOX_KEYSTORE)
 		} else {
 			false
@@ -178,11 +181,18 @@ class SignerDataModel : ViewModel() {
 
 		//Init crypto for seeds:
 		//https://developer.android.com/training/articles/keystore
-		masterKey = MasterKey.Builder(context)
-			.setKeyScheme(MasterKey.KeyScheme.AES256_GCM)
-			.setRequestStrongBoxBacked(hasStrongbox) // this must be default, but...
-			.setUserAuthenticationRequired(true)
-			.build()
+		masterKey = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+			MasterKey.Builder(context)
+				.setKeyScheme(MasterKey.KeyScheme.AES256_GCM)
+				.setRequestStrongBoxBacked(true) //This might cause failures but shouldn't
+				.setUserAuthenticationRequired(true)
+				.build()
+		} else {
+			MasterKey.Builder(context)
+				.setKeyScheme(MasterKey.KeyScheme.AES256_GCM)
+				.setUserAuthenticationRequired(true)
+				.build()
+		}
 
 		//Imitate ios behavior
 		authentication.authenticate(activity) {
@@ -260,9 +270,12 @@ class SignerDataModel : ViewModel() {
 	 * Util to remove directory
 	 */
 	private fun deleteDir(fileOrDirectory: File) {
-		if (fileOrDirectory.isDirectory) for (child in fileOrDirectory.listFiles()) deleteDir(
-			child
-		)
+		if (fileOrDirectory.isDirectory) {
+			val listFiles = fileOrDirectory.listFiles()
+			if (!listFiles.isNullOrEmpty()) {
+				for (child in listFiles) deleteDir(child)
+			}
+		}
 		fileOrDirectory.delete()
 	}
 
@@ -332,11 +345,8 @@ class SignerDataModel : ViewModel() {
 			OnBoardingState.Yes else _onBoardingDone.value = OnBoardingState.No
 		if (checkRefresh) {
 			refreshNetworks()
-			//TODO: support state with all networks deleted (low priority)
-			if (true) {
-				_selectedNetwork.value = networks.value?.optJSONObject(0)
-					?: JSONObject()
-			}
+			_selectedNetwork.value = networks.value?.optJSONObject(0)
+				?: JSONObject()
 			refreshSeedNames()
 			fetchKeys()
 			refreshHistory()
@@ -383,6 +393,27 @@ class SignerDataModel : ViewModel() {
 			ImageBitmap(size, size)
 		}
 		//TODO
+	}
+
+	fun getHexIdenticon(value: String, size: Int): ImageBitmap {
+		return try {
+			substrateIdenticon(value, size).intoImageBitmap()
+		} catch (e: java.lang.Exception) {
+			Log.d("Identicon did not render", e.toString())
+			ImageBitmap(size, size)
+		}
+		//TODO
+	}
+
+	fun isStrongBoxProtected(): Boolean {
+		return masterKey.isStrongBoxBacked
+	}
+
+	fun getAppVersion(): String {
+		return context.packageManager.getPackageInfo(
+			context.packageName,
+			0
+		).versionName
 	}
 
 	//MARK: General utils end
