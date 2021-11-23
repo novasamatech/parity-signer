@@ -131,6 +131,7 @@ fun SignerDataModel.getScreenName(): String {
 		SignerScreen.Settings -> ""
 		SignerScreen.Log -> "History"
 		null -> "error"
+		else -> ""
 	}
 }
 //MARK: Navigation end
