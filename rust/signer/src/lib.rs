@@ -28,7 +28,7 @@ mod export;
 
 export! {
     @Java_io_parity_signer_models_SignerDataModel_backendAction
-    fn action(
+    fn act(
         origin: &str,
         action: &str,
         details: &str

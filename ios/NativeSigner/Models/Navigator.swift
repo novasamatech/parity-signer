@@ -10,14 +10,18 @@
 
 import Foundation
 
+struct ActionResult: Decodable {
+    var screen: SignerScreen?
+}
+
 /**
  * Struct to store main navstate of the screen
  */
-enum SignerScreen: Equatable {
-    case scan
-    case keys
-    case settings
-    case history
+enum SignerScreen: String, Decodable {
+    case Scan
+    case Keys
+    case Settings
+    case Log
 }
 
 /**
@@ -54,22 +58,53 @@ enum SettingsModal: Equatable {
     case showDocument(ShownDocument)
 }
 
+enum ButtonID {
+    case NavbarLog
+    case NavbarScan
+    case NavbarKeys
+    case NavbarSettings
+}
+
 /**
  * Slightly non-trivial navigation
  * We should keep this to minimum
  */
 extension SignerDataModel {
+    func pushButton(buttonID: ButtonID) {
+        var err = ExternError()
+        let err_ptr: UnsafeMutablePointer<ExternError> = UnsafeMutablePointer(&err)
+        let res = act(err_ptr, String(describing: self.signerScreen), String(describing: buttonID), "")
+        if (err_ptr.pointee.code == 0) {
+            print(String(cString: res!))
+            if let actionResultJSON = String(cString: res!).data(using: .utf8) {
+                print(actionResultJSON)
+                if let actionResult = try? JSONDecoder().decode(ActionResult.self, from: actionResultJSON)
+                {
+                    print(actionResult)
+                    if (actionResult.screen != nil) {
+                        signerScreen = actionResult.screen!
+                    }
+                } else {
+                    print("bushing button failed on decoding!")
+                }
+            }
+            signer_destroy_string(res!)
+        } else {
+            print("pushing button failed")
+        }
+    }
+    
     /**
      * Event for back action
      * Could be more complicated but should it?
      */
     func goBack() {
         switch self.signerScreen {
-        case .history:
+        case .Log:
             self.selectedRecord = nil
-        case .scan:
+        case .Scan:
             self.transactionState = .none
-        case .keys:
+        case .Keys:
             switch self.keyManagerModal {
             case .seedSelector:
                 self.keyManagerModal = .seedSelector
@@ -82,7 +117,7 @@ extension SignerDataModel {
             default:
                 self.keyManagerModal = .none
             }
-        case .settings:
+        case .Settings:
             self.settingsModal = .none
         }
     }
@@ -99,7 +134,7 @@ extension SignerDataModel {
      */
     func getScreenName() -> String {
         switch self.signerScreen {
-        case .scan:
+        case .Scan:
             switch self.transactionState {
             case .none:
                 return "Scan"
@@ -112,7 +147,7 @@ extension SignerDataModel {
             case .signed:
                 return "Scan to publish"
             }
-        case .keys:
+        case .Keys:
             switch self.keyManagerModal {
             case .seedSelector:
                 return "Select Seed"
@@ -125,9 +160,9 @@ extension SignerDataModel {
             default:
                 return ""
             }
-        case .settings:
+        case .Settings:
             return ""
-        case .history:
+        case .Log:
             if self.selectedRecord == nil {
                 return ""
             } else {

@@ -47,7 +47,7 @@ struct NavbarShield: View {
                     )
                 })
             } else {
-                if (data.signerScreen == .history) {
+                if (data.signerScreen == .Log) {
                     Button(action: {
                         alert = true
                     }) {

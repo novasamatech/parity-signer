@@ -32,7 +32,7 @@ struct Header: View {
                     SmallButton(text: "Select all")
                 }
             }
-            if (data.keyManagerModal == .seedSelector && data.signerScreen == .keys && !data.alert) {
+            if (data.keyManagerModal == .seedSelector && data.signerScreen == .Keys && !data.alert) {
                 Button(action: {
                     data.keyManagerModal = .newSeed
                 }) {

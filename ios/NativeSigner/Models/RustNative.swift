@@ -38,7 +38,7 @@ class SignerDataModel: ObservableObject {
     @Published var selectedRecord: History?
     
     //Navigation
-    @Published var signerScreen: SignerScreen = .history
+    @Published var signerScreen: SignerScreen = .Log
     @Published var keyManagerModal: KeyManagerModal = .none
     @Published var settingsModal: SettingsModal = .none
     @Published var transactionState: TransactionState = .none
@@ -103,13 +103,13 @@ class SignerDataModel: ObservableObject {
         self.selectedRecord = nil
         resetTransaction()
         if self.seedNames.count == 0 {
-            self.signerScreen = .keys
+            self.signerScreen = .Keys
             self.keyManagerModal = .newSeed
         } else {
             self.keyManagerModal = .seedSelector
         }
         self.settingsModal = .none
-        if self.signerScreen == .scan {
+        if self.signerScreen == .Scan {
             self.resetCamera = true
         }
         self.searchKey = ""
@@ -205,7 +205,7 @@ extension SignerDataModel {
         SecItemDelete(query)
         self.onboardingDone = false
         self.seedNames = []
-        self.signerScreen = .keys
+        self.signerScreen = .Keys
         self.keyManagerModal = .newSeed
     }
     

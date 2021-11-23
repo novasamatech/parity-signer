@@ -18,13 +18,13 @@ struct MainScreenContainer: View {
                 Header()
                 VStack {
                     switch (data.signerScreen) {
-                    case .scan :
+                    case .Scan :
                         TransactionScreen()
-                    case .keys :
+                    case .Keys :
                         KeyManager()
-                    case .settings :
+                    case .Settings :
                         SettingsScreen()
-                    case .history :
+                    case .Log :
                         HistoryScreen()
                     }
                     Spacer()
@@ -38,7 +38,7 @@ struct MainScreenContainer: View {
                 )
                 //Certain places are better off without footer
                 if (data.transactionState == .none
-                    && !(data.signerScreen == .keys && (data.keyManagerModal == .networkManager
+                    && !(data.signerScreen == .Keys && (data.keyManagerModal == .networkManager
                                                         || data.keyManagerModal == .newSeed
                                                         || data.keyManagerModal == .newKey
                                                         || data.keyManagerModal == .seedBackup

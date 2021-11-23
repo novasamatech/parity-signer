@@ -10,7 +10,7 @@ import SwiftUI
 struct FooterBlock: View {
     @EnvironmentObject var data: SignerDataModel
     var body: some View {
-        if data.signerScreen == .keys && data.keyManagerModal == .none {
+        if data.signerScreen == .Keys && data.keyManagerModal == .none {
             if data.getMultiSelectionMode() {
                 MultiselectBottomControl()
             } else {

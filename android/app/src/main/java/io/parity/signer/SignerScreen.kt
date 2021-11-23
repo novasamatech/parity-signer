@@ -4,10 +4,21 @@ package io.parity.signer
  * All screens metadata for navigation
  */
 enum class SignerScreen() {
+	Log,
+	LogDetails,
 	Scan,
+	Transaction,
+	SeedSelector,
 	Keys,
+	KeyDetails,
+	Backup,
+	NewSeed,
+	RecoverSeedName,
+	RecoverSeedPhrase,
+	DeriveKey,
 	Settings,
-	Log;
+	Verifier,
+	ManageNetwork;
 }
 
 enum class TransactionState {

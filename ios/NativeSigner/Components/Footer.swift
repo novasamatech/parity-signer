@@ -29,42 +29,47 @@ struct Footer: View {
         HStack {
             Button(action: {
                 data.refreshUI()
-                data.signerScreen = .history
+                //data.signerScreen = .Log
+                data.pushButton(buttonID: ButtonID.NavbarLog)
             }) {
                 VStack(alignment: .center) {
-                    Image(systemName: "rectangle.grid.1x2.fill").imageScale(.medium).foregroundColor(data.signerScreen == .history ? Color("buttonActive") : Color("buttonPassiveImage"))
-                    Text("Log").foregroundColor(data.signerScreen == .history ? Color("buttonActive") : Color("buttonPassiveText"))
+                    Image(systemName: "rectangle.grid.1x2.fill").imageScale(.medium).foregroundColor(data.signerScreen == .Log ? Color("buttonActive") : Color("buttonPassiveImage"))
+                    Text("Log").foregroundColor(data.signerScreen == .Log ? Color("buttonActive") : Color("buttonPassiveText"))
                 }
             }
             Spacer()
             Button(action: {
                 data.refreshUI()
-                data.signerScreen = .scan
+                //data.signerScreen = .Scan
+                data.pushButton(buttonID: ButtonID.NavbarScan)
+
             }) {
                 VStack {
-                    Image(systemName: "viewfinder").imageScale(.medium).foregroundColor(data.signerScreen == .scan ? Color("buttonActive") : Color("buttonPassiveImage"))
-                    Text("Scanner").foregroundColor(data.signerScreen == .scan ? Color("buttonActive") : Color("buttonPassiveText"))
+                    Image(systemName: "viewfinder").imageScale(.medium).foregroundColor(data.signerScreen == .Scan ? Color("buttonActive") : Color("buttonPassiveImage"))
+                    Text("Scanner").foregroundColor(data.signerScreen == .Scan ? Color("buttonActive") : Color("buttonPassiveText"))
                 }
             }
             Spacer()
             Button(action: {
                 data.refreshUI()
-                data.signerScreen = .keys
+                //data.signerScreen = .Keys
+                data.pushButton(buttonID: ButtonID.NavbarKeys)
             }) {
                 VStack{
-                    KeySymbol().foregroundColor(data.signerScreen == .keys ? Color("buttonActive") : Color("buttonPassiveImage"))
-                    Text("Keys").foregroundColor(data.signerScreen == .keys ? Color("buttonActive") : Color("buttonPassiveText"))
+                    KeySymbol().foregroundColor(data.signerScreen == .Keys ? Color("buttonActive") : Color("buttonPassiveImage"))
+                    Text("Keys").foregroundColor(data.signerScreen == .Keys ? Color("buttonActive") : Color("buttonPassiveText"))
                 }
             }
             Spacer()
             Button(action: {
                 data.refreshUI()
                 data.networkSettings = nil
-                data.signerScreen = .settings
+                //data.signerScreen = .Settings
+                data.pushButton(buttonID: ButtonID.NavbarSettings)
             }) {
                 VStack {
-                    WrenchSymbol().foregroundColor(data.signerScreen == .settings ? Color("buttonActive") : Color("buttonPassiveImage"))
-                    Text("Settings").foregroundColor(data.signerScreen == .settings ? Color("buttonActive") : Color("buttonPassiveText"))
+                    WrenchSymbol().foregroundColor(data.signerScreen == .Settings ? Color("buttonActive") : Color("buttonPassiveImage"))
+                    Text("Settings").foregroundColor(data.signerScreen == .Settings ? Color("buttonActive") : Color("buttonPassiveText"))
                 }
             }
         }.font(.footnote)
