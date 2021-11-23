@@ -1,13 +1,30 @@
 package io.parity.signer.models
 
+import android.util.JsonWriter
 import android.util.Log
 import androidx.core.app.ActivityCompat
-import io.parity.signer.KeyManagerModal
-import io.parity.signer.SettingsModal
-import io.parity.signer.SignerScreen
-import io.parity.signer.TransactionState
+import io.parity.signer.*
+import org.json.JSONObject
+import org.json.JSONStringer
+import org.json.JSONTokener
 
 //MARK: Navigation begin
+
+fun SignerDataModel.pushButton(button: ButtonID) {
+	Log.d("push button", button.toString())
+	val actionResult =
+		backendAction(signerScreen.value?.name ?: "", button.name, "")
+	Log.d("action result", actionResult)
+	val actionResultObject = JSONObject(actionResult)
+	//Here we just list all possible arguments coming from backend
+	actionResultObject.optString("screen")?.let {
+		try {
+			_signerScreen.value = SignerScreen.valueOf(it)
+		} catch (e: java.lang.Exception) {
+			Log.e("Navigation error", e.toString())
+		}
+	}
+}
 
 /**
  * Bottom navigation action

@@ -22,10 +22,20 @@ use db_handling;
 use transaction_parsing;
 use transaction_signing;
 use qr_reader_phone;
+use navigator;
 
 mod export;
 
 export! {
+    @Java_io_parity_signer_models_SignerDataModel_backendAction
+    fn action(
+        origin: &str,
+        action: &str,
+        details: &str
+    ) -> String {
+        navigator::do_action(origin, action, details)
+    }
+
 	@Java_io_parity_signer_models_SignerDataModel_substrateExportPubkey
 	fn export_pubkey(
 		address: &str,

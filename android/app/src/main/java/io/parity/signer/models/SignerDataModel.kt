@@ -420,6 +420,12 @@ class SignerDataModel : ViewModel() {
 
 	//MARK: rust native section begin
 
+	external fun backendAction(
+		origin: String,
+		action: String,
+		details: String
+	): String
+
 	external fun substrateExportPubkey(
 		address: String,
 		network: String,

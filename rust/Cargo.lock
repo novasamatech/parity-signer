@@ -1376,6 +1376,10 @@ dependencies = [
 ]
 
 [[package]]
+name = "navigator"
+version = "0.1.0"
+
+[[package]]
 name = "nodrop"
 version = "0.1.14"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2332,6 +2336,7 @@ dependencies = [
  "hex",
  "jni",
  "libc",
+ "navigator",
  "plot_icon",
  "qr_reader_phone",
  "rustc-hex",

@@ -7,6 +7,7 @@ import androidx.compose.material.icons.filled.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import io.parity.signer.ButtonID
 import io.parity.signer.SignerScreen
 import io.parity.signer.models.SignerDataModel
 import io.parity.signer.ui.theme.Bg000
@@ -25,22 +26,22 @@ fun BottomBar(
 		BottomBarButton(
 			signerDataModel = signerDataModel,
 			image = Icons.Default.Home,
-			screen = SignerScreen.Log
+			buttonID = ButtonID.NavbarLog
 		)
 		BottomBarButton(
 			signerDataModel = signerDataModel,
 			image = Icons.Default.Star,
-			screen = SignerScreen.Scan
+			buttonID = ButtonID.NavbarScan
 		)
 		BottomBarButton(
 			signerDataModel = signerDataModel,
 			image = Icons.Default.AccountCircle,
-			screen = SignerScreen.Keys
+			buttonID = ButtonID.NavbarKeys
 		)
 		BottomBarButton(
 			signerDataModel = signerDataModel,
 			image = Icons.Default.Settings,
-			screen = SignerScreen.Settings
+			buttonID = ButtonID.NavbarSettings
 		)
 	}
 }

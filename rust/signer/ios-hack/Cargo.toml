@@ -11,6 +11,7 @@ db_handling = {path = "../db_handling"}
 ffi-support = "0.4"
 hex = "0.4.3"
 libc = "0.2"
+navigator = {path = "../navigator"}
 plot_icon = { git = "https://github.com/paritytech/polkadot-identicon-rust" }
 qr_reader_phone = {path = "..//qr_reader_phone"}
 rustc-hex = "2.1.0"
