@@ -12,13 +12,9 @@ import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Modifier
 import io.parity.signer.modals.WaitingScreen
 import io.parity.signer.models.SignerDataModel
-import io.parity.signer.screens.ScanScreen
-import io.parity.signer.screens.KeyManager
-import io.parity.signer.screens.SettingsScreen
 import io.parity.signer.ui.theme.ParitySignerTheme
 import io.parity.signer.components.BottomBar
 import io.parity.signer.components.TopBar
-import io.parity.signer.screens.HistoryScreen
 
 @ExperimentalMaterialApi
 @ExperimentalAnimationApi
@@ -48,6 +44,7 @@ fun SignerApp(signerDataModel: SignerDataModel) {
 	ParitySignerTheme {
 		val onBoardingDone = signerDataModel.onBoardingDone.observeAsState()
 		val signerScreen = signerDataModel.signerScreen.observeAsState()
+		val signerModal = signerDataModel.signerModal.observeAsState()
 
 		when (onBoardingDone.value) {
 			OnBoardingState.Yes -> {
@@ -61,22 +58,8 @@ fun SignerApp(signerDataModel: SignerDataModel) {
 					}
 				) { innerPadding ->
 					Box(modifier = Modifier.padding(innerPadding)) {
-						when (signerScreen.value) {
-							SignerScreen.Scan -> {
-								ScanScreen(
-									signerDataModel = signerDataModel
-								)
-							}
-							SignerScreen.Keys -> {
-								KeyManager(signerDataModel = signerDataModel)
-							}
-							SignerScreen.Settings -> {
-								SettingsScreen(signerDataModel = signerDataModel)
-							}
-							SignerScreen.Log -> {
-								HistoryScreen(signerDataModel = signerDataModel)
-							}
-						}
+						ScreenSelector(signerScreen.value, signerDataModel)
+						ModalSelector(modal = signerModal.value?: SignerModal.None, signerDataModel = signerDataModel)
 					}
 				}
 			}

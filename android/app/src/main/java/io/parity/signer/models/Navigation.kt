@@ -1,218 +1,40 @@
 package io.parity.signer.models
 
-import android.util.JsonWriter
 import android.util.Log
-import androidx.core.app.ActivityCompat
+import android.widget.Toast
 import io.parity.signer.*
 import org.json.JSONObject
-import org.json.JSONStringer
-import org.json.JSONTokener
 
-//MARK: Navigation begin
-
+/**
+ * This pretty much offloads all navigation to backend!
+ */
 fun SignerDataModel.pushButton(button: ButtonID) {
 	Log.d("push button", button.toString())
 	val actionResult =
 		backendAction(signerScreen.value?.name ?: "", button.name, "")
 	Log.d("action result", actionResult)
-	val actionResultObject = JSONObject(actionResult)
 	//Here we just list all possible arguments coming from backend
-	actionResultObject.optString("screen")?.let {
-		try {
-			_signerScreen.value = SignerScreen.valueOf(it)
-		} catch (e: java.lang.Exception) {
-			Log.e("Navigation error", e.toString())
-		}
-	}
-}
-
-/**
- * Bottom navigation action
- */
-fun SignerDataModel.navigate(screen: SignerScreen) {
-	_signerScreen.value = screen
-	if (screen == SignerScreen.Scan) {
-		//TODO: testing to make sure this goes smoothly
-		if (!allPermissionsGranted()) {
-			ActivityCompat.requestPermissions(
-				activity,
-				REQUIRED_PERMISSIONS,
-				REQUEST_CODE_PERMISSIONS
-			)
-		}
-	}
-	if (screen == SignerScreen.Keys) {
-		selectSeedEngage()
-	}
-	if (screen == SignerScreen.Log) {
-		engageHistoryScreen()
-	}
-}
-
-/**
- * Handle back button
- */
-fun SignerDataModel.goBack() {
-	when (signerScreen.value) {
-		SignerScreen.Log -> {
-			totalRefresh()
-		}
-		SignerScreen.Scan -> {
-			clearTransaction()
-		}
-		SignerScreen.Keys -> {
-			when (keyManagerModal.value) {
-				KeyManagerModal.None -> {
-					selectSeedEngage()
-				}
-				KeyManagerModal.NewSeed -> {
-					selectSeedEngage()
-				}
-				KeyManagerModal.NewKey -> {
-					clearKeyManagerScreen()
-				}
-				KeyManagerModal.ShowKey -> {
-					clearKeyManagerScreen()
-				}
-				KeyManagerModal.SeedBackup -> {
-					selectSeedEngage()
-				}
-				KeyManagerModal.KeyDeleteConfirm -> {
-					clearKeyManagerScreen()
-				}
-				KeyManagerModal.SeedSelector -> {
-					selectSeedEngage()
-				}
-				KeyManagerModal.NetworkManager -> {
-					clearKeyManagerScreen()
-				}
-				KeyManagerModal.NetworkDetails -> {
-					clearKeyManagerScreen()
-				}
+	try {
+		val actionResultObject = JSONObject(actionResult)
+		actionResultObject.optString("screen").let { screen ->
+			_signerScreen.value = SignerScreen.valueOf(screen)
+			actionResultObject.getString("screenLabel").let {
+				_screenName.value = it
+			}
+			actionResultObject.getBoolean("back").let {
+				_backButton.value = it
 			}
 		}
-		SignerScreen.Settings -> {
-			clearHistoryScreen()
-		}
+	} catch (e: java.lang.Exception) {
+		Log.e("Navigation error", e.toString())
+		Toast.makeText(context, actionResult, Toast.LENGTH_SHORT).show()
 	}
 }
-
-fun SignerDataModel.isBottom(): Boolean {
-	return (settingsModal.value == SettingsModal.None && keyManagerModal.value == KeyManagerModal.SeedSelector && transactionState.value == TransactionState.None)
-}
-
-fun SignerDataModel.getScreenName(): String {
-	Log.d("getscreenname", "called")
-	return when (signerScreen.value) {
-		SignerScreen.Scan -> ""
-		SignerScreen.Keys -> when (keyManagerModal.value) {
-			KeyManagerModal.None -> ""
-			KeyManagerModal.NewSeed -> ""
-			KeyManagerModal.NewKey -> "New Derived Key"
-			KeyManagerModal.ShowKey -> if (selectedIdentity.value == getRootIdentity(
-					selectedSeed.value ?: ""
-				)
-			) {
-				"Seed key"
-			} else {
-				"Derived Key"
-			}
-			KeyManagerModal.SeedBackup -> "Backup Seed"
-			KeyManagerModal.KeyDeleteConfirm -> ""
-			KeyManagerModal.SeedSelector -> "Select Seed"
-			KeyManagerModal.NetworkManager -> ""
-			KeyManagerModal.NetworkDetails -> ""
-			null -> "error"
-			KeyManagerModal.NewSeedSelect -> "Create new seed?"
-			KeyManagerModal.RestoreSeed -> "Restore seed"
-			KeyManagerModal.SeedDeleteConfirm -> "Delete seed?"
-			KeyManagerModal.AllKeySelector -> "Select key for signing"
-		}
-		SignerScreen.Settings -> ""
-		SignerScreen.Log -> "History"
-		null -> "error"
-		else -> ""
-	}
-}
-//MARK: Navigation end
-
-//MARK: Modals control begin
-
-//KeyManager
 
 /**
  * This happens when backup seed acknowledge button is pressed in seed creation screen.
- * TODO: This might misfire
+ * TODO: This might misfire - replace with explicit getter and lifetime bound thing
  */
 fun SignerDataModel.acknowledgeBackup() {
 	_backupSeedPhrase.value = ""
-	clearKeyManagerScreen()
 }
-
-/**
- * Use this to bring up seed selection screen in key manager
- */
-private fun SignerDataModel.selectSeedEngage() {
-	selectSeed("")
-	_keyManagerModal.value = KeyManagerModal.SeedSelector
-}
-
-/**
- * Activate new seed screen on KeyManager screen
- */
-fun SignerDataModel.newSeedScreenEngage() {
-	_keyManagerModal.value = KeyManagerModal.NewSeed
-}
-
-/**
- * Derive new key
- */
-fun SignerDataModel.newKeyScreenEngage() {
-	_keyManagerModal.value = KeyManagerModal.NewKey
-}
-
-/**
- * Show public key QR screen
- */
-fun SignerDataModel.exportPublicKeyEngage() {
-	_keyManagerModal.value = KeyManagerModal.ShowKey
-}
-
-/**
- * Key backup
- */
-fun SignerDataModel.backupEngage() {
-	_keyManagerModal.value = KeyManagerModal.SeedBackup
-}
-
-/**
- * Remove key manager modals
- */
-fun SignerDataModel.clearKeyManagerScreen() {
-	_keyManagerModal.value = if (selectedSeed.value == "") {
-		KeyManagerModal.SeedSelector
-	} else {
-		KeyManagerModal.None
-	}
-}
-
-/**
- * Key deletion confirmation
- */
-fun SignerDataModel.deleteKeyConfirmation() {
-	_keyManagerModal.value = KeyManagerModal.KeyDeleteConfirm
-}
-
-//Settings
-
-private fun SignerDataModel.engageHistoryScreen() {
-	refreshHistory()
-	getGeneralVerifier()
-	_signerScreen.value = SignerScreen.Log
-}
-
-private fun SignerDataModel.clearHistoryScreen() {
-	_settingsModal.value = SettingsModal.None
-}
-
-//MARK: Modals control end

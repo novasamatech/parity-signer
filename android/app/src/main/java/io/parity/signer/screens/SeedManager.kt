@@ -1,14 +1,11 @@
 package io.parity.signer.modals
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.material.Button
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
-import androidx.compose.material.MaterialTheme
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.List
@@ -16,11 +13,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import io.parity.signer.KeyManagerModal
 import io.parity.signer.components.SeedCard
 import io.parity.signer.models.SignerDataModel
-import io.parity.signer.models.backupEngage
-import io.parity.signer.models.clearKeyManagerScreen
 import io.parity.signer.models.selectSeed
 import io.parity.signer.ui.theme.Bg200
 
@@ -40,7 +34,6 @@ fun SeedManager(signerDataModel: SignerDataModel) {
 					Modifier
 						.clickable {
 							signerDataModel.selectSeed(seedNames.value!![item])
-							signerDataModel.clearKeyManagerScreen()
 						}
 						.weight(1f, true)
 				) {
@@ -51,7 +44,6 @@ fun SeedManager(signerDataModel: SignerDataModel) {
 				}
 				IconButton(onClick = {
 					signerDataModel.selectSeed(seedNames.value!![item])
-					signerDataModel.backupEngage()
 				}) {
 					Icon(Icons.Default.List, contentDescription = "Backup seed")
 				}

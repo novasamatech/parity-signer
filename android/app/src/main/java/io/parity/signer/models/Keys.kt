@@ -12,8 +12,6 @@ import org.json.JSONObject
  */
 internal fun SignerDataModel.fetchKeys() {
 	try {
-		Log.d("selectedNetwork", selectedNetwork.value.toString())
-		Log.d("Selected seed", selectedSeed.value.toString())
 		_identities.value = JSONArray(
 			dbGetRelevantIdentities(
 				selectedSeed.value ?: "",
@@ -58,6 +56,7 @@ fun SignerDataModel.addKey(path: String, password: String) {
 	}
 	authentication.authenticate(activity) {
 		try {
+			//TODO: this should result in navigation event
 			substrateTryCreateIdentity(
 				selectedSeed.value!!,
 				getSeed(),
@@ -68,7 +67,6 @@ fun SignerDataModel.addKey(path: String, password: String) {
 				dbName
 			)
 			fetchKeys()
-			clearKeyManagerScreen()
 		} catch (e: java.lang.Exception) {
 			Log.e("Add key error", e.toString())
 			_lastError.value = e.toString()
@@ -81,13 +79,13 @@ fun SignerDataModel.addKey(path: String, password: String) {
  */
 fun SignerDataModel.deleteKey() {
 	try {
+		//TODO: this should result in navigation event
 		substrateDeleteIdentity(
 			selectedIdentity.value?.get("public_key").toString(),
 			selectedNetwork.value?.get("key").toString(),
 			dbName
 		)
 		fetchKeys()
-		clearKeyManagerScreen()
 	} catch (e: java.lang.Exception) {
 		Log.e("key deletion error", e.toString())
 	}

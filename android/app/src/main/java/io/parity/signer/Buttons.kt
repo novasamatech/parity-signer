@@ -7,7 +7,8 @@ enum class ButtonID {
 	NavbarLog,
 	NavbarScan,
 	NavbarKeys,
-	NavbarSettings;
+	NavbarSettings,
+	GoBack;
 
 	fun getName(): String {
 		return when(this) {
@@ -15,6 +16,7 @@ enum class ButtonID {
 			NavbarScan -> "Scan"
 			NavbarKeys -> "Keys"
 			NavbarSettings -> "Settings"
+			GoBack -> "<"
 		}
 	}
 }

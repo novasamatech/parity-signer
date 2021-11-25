@@ -3,7 +3,6 @@ package io.parity.signer.modals
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable
 import io.parity.signer.models.SignerDataModel
-import io.parity.signer.models.clearKeyManagerScreen
 import io.parity.signer.models.deleteKey
 
 @Composable
@@ -14,7 +13,7 @@ fun KeyDelete(signerDataModel: SignerDataModel) {
 	val networkName = signerDataModel.selectedNetwork.value?.get("title").toString()
 
 	AlertDialog(
-		onDismissRequest = { signerDataModel.clearKeyManagerScreen() },
+		onDismissRequest = {  },
 		buttons = {
 			Button(
 				colors = ButtonDefaults.buttonColors(
@@ -22,7 +21,7 @@ fun KeyDelete(signerDataModel: SignerDataModel) {
 					contentColor = MaterialTheme.colors.onBackground,
 				),
 				onClick = {
-					signerDataModel.clearKeyManagerScreen()
+
 				}
 			) {
 				Text("Cancel")
@@ -34,7 +33,6 @@ fun KeyDelete(signerDataModel: SignerDataModel) {
 				),
 				onClick = {
 					signerDataModel.deleteKey()
-					signerDataModel.clearKeyManagerScreen()
 				}
 			) {
 				Text("Delete")

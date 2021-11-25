@@ -1,7 +1,6 @@
 package io.parity.signer.models
 
 import android.util.Log
-import io.parity.signer.KeyManagerModal
 import org.json.JSONObject
 
 //MARK: Seed management begin
@@ -44,7 +43,7 @@ fun SignerDataModel.addSeed(seedName: String, seedPhrase: String) {
 			refreshSeedNames()
 			selectSeed(seedName)
 			_backupSeedPhrase.value = finalSeedPhrase
-			_keyManagerModal.value = KeyManagerModal.SeedBackup
+			//TODO: shis should result in navigation event
 		} catch (e: java.lang.Exception) {
 			_lastError.value = e.toString()
 			Log.e("Seed creation error", e.toString())

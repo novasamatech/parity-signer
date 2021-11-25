@@ -14,7 +14,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.unit.dp
 import io.parity.signer.models.SignerDataModel
-import io.parity.signer.models.exportPublicKeyEngage
 import io.parity.signer.models.getRootIdentity
 import io.parity.signer.models.selectKey
 import io.parity.signer.ui.theme.Bg200
@@ -23,7 +22,6 @@ import org.json.JSONObject
 @Composable
 fun KeySelector(signerDataModel: SignerDataModel) {
 	val identities = signerDataModel.identities.observeAsState()
-	val selectedIdentity = signerDataModel.selectedIdentity.observeAsState()
 
 	LazyColumn {
 		//keys should be defined already, can't panic
@@ -49,7 +47,6 @@ fun KeySelector(signerDataModel: SignerDataModel) {
 												item
 											) ?: JSONObject()
 										)
-										signerDataModel.exportPublicKeyEngage()
 									},
 									onLongPress = {
 
@@ -71,58 +68,3 @@ fun KeySelector(signerDataModel: SignerDataModel) {
 		}
 	}
 }
-
-/*
-if (identities.value!!.getJSONObject(item) == selectedIdentity.value) {
-						Row(
-							horizontalArrangement = Arrangement.SpaceBetween,
-							modifier = Modifier.fillMaxWidth()
-						) {
-							Button(
-								colors = ButtonDefaults.buttonColors(
-									backgroundColor = MaterialTheme.colors.secondary,
-									contentColor = MaterialTheme.colors.onSecondary,
-								),
-								onClick = { signerDataModel.deleteKeyConfirmation() }
-							) { Text("delete") }
-							Button(
-								colors = ButtonDefaults.buttonColors(
-									backgroundColor = MaterialTheme.colors.secondary,
-									contentColor = MaterialTheme.colors.onSecondary,
-								),
-								onClick = {
-									signerDataModel.exportPublicKeyEngage()
-								}
-							) { Text("export") }
-							Button(
-								colors = ButtonDefaults.buttonColors(
-									backgroundColor = MaterialTheme.colors.secondary,
-									contentColor = MaterialTheme.colors.onSecondary,
-								),
-								onClick = { signerDataModel.newKeyScreenEngage() /*TODO*/ }
-							) { Text("N+1") }
-							Button(
-								colors = ButtonDefaults.buttonColors(
-									backgroundColor = MaterialTheme.colors.secondary,
-									contentColor = MaterialTheme.colors.onSecondary,
-								),
-								onClick = { signerDataModel.newKeyScreenEngage() }
-							) { Text("new") }
-						}
-					}
-
-
-					Button(
-						colors = ButtonDefaults.buttonColors(
-							backgroundColor = MaterialTheme.colors.secondary,
-							contentColor = MaterialTheme.colors.onSecondary,
-						),
-						onClick = {
-							if (identities.value!!.getJSONObject(item) == selectedIdentity.value) {
-								signerDataModel.selectKey(JSONObject())
-							} else {
-								signerDataModel.selectKey(identities.value!!.getJSONObject(item))
-							}
-						}
-					)
- */

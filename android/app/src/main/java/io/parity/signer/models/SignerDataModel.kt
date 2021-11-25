@@ -38,6 +38,8 @@ class SignerDataModel : ViewModel() {
 	private val _onBoardingDone = MutableLiveData(OnBoardingState.InProgress)
 
 	//TODO: something about this
+	// It leaks context objects,
+	// but is really quite convenient in composable things
 	lateinit var context: Context
 	lateinit var activity: FragmentActivity
 	private lateinit var masterKey: MasterKey
@@ -90,10 +92,12 @@ class SignerDataModel : ViewModel() {
 
 	//Navigator
 	internal val _signerScreen = MutableLiveData(SignerScreen.Log)
+	internal val _screenName = MutableLiveData("")
+	internal val _backButton = MutableLiveData(false)
+	internal var screenInfo = JSONObject()
 
 	//States of important modals
-	internal val _keyManagerModal = MutableLiveData(KeyManagerModal.None)
-	internal val _settingsModal = MutableLiveData(SettingsModal.None)
+	internal val _signerModal = MutableLiveData(SignerModal.None)
 	internal val _transactionState = MutableLiveData(TransactionState.None)
 
 	//Data storage locations
@@ -129,10 +133,11 @@ class SignerDataModel : ViewModel() {
 
 	val onBoardingDone: LiveData<OnBoardingState> = _onBoardingDone
 	val signerScreen: LiveData<SignerScreen> = _signerScreen
-	val keyManagerModal: LiveData<KeyManagerModal> = _keyManagerModal
-	val settingsModal: LiveData<SettingsModal> = _settingsModal
+	val signerModal: LiveData<SignerModal> = _signerModal
 	val transactionState: LiveData<TransactionState> = _transactionState
 	val alert: LiveData<SignerAlert> = _alert
+	val screenName: LiveData<String> = _screenName
+	val backButton: LiveData<Boolean> = _backButton
 
 	//MARK: init boilerplate begin
 
@@ -152,18 +157,12 @@ class SignerDataModel : ViewModel() {
 		dbName = context.applicationContext.filesDir.toString() + "/Database"
 		authentication.context = context
 		hasStrongbox = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
-			Log.d("checking strongbox", "blip")
-			Log.d(
-				"checking strongbox",
-				context.packageManager.hasSystemFeature(PackageManager.FEATURE_STRONGBOX_KEYSTORE)
-					.toString()
-			)
 			context.packageManager.hasSystemFeature(PackageManager.FEATURE_STRONGBOX_KEYSTORE)
 		} else {
 			false
 		}
 
-		Log.d("strongbox available", hasStrongbox.toString())
+		Log.d("strongbox available:", hasStrongbox.toString())
 
 		//Airplane mode detector
 		isAirplaneOn()
@@ -325,13 +324,8 @@ class SignerDataModel : ViewModel() {
 		_backupSeedPhrase.value = ""
 		clearError()
 		_transactionState.value = TransactionState.None
-		_settingsModal.value = SettingsModal.None
-		if (seedNames.value?.isEmpty() as Boolean) {
-			_keyManagerModal.value =
-				KeyManagerModal.NewSeed
-			_signerScreen.value = SignerScreen.Keys
-		} else _keyManagerModal.value =
-			KeyManagerModal.SeedSelector
+		_signerScreen.value = if (seedNames.value?.isEmpty() as Boolean)
+			 SignerScreen.NewSeed else SignerScreen.Log
 	}
 
 	/**
@@ -353,6 +347,7 @@ class SignerDataModel : ViewModel() {
 			refreshGUI()
 			getGeneralVerifier()
 			clearTransaction()
+			if (signerScreen.value == null) pushButton(ButtonID.NavbarLog)
 		}
 	}
 

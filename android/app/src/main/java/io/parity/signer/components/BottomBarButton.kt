@@ -18,7 +18,6 @@ import androidx.compose.ui.unit.dp
 import io.parity.signer.ButtonID
 import io.parity.signer.SignerScreen
 import io.parity.signer.models.SignerDataModel
-import io.parity.signer.models.navigate
 import io.parity.signer.models.pushButton
 import io.parity.signer.ui.theme.Text300
 import io.parity.signer.ui.theme.Text400
