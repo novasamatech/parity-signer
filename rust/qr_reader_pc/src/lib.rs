@@ -125,7 +125,7 @@ pub fn process_qr_image(frame: &Mat, decoding: InProgress,) -> anyhow::Result<Re
     let code = qr_decoder.detect_and_decode(&frame, &mut points, &mut rect_image);
 
     match code {
-        Ok(code) if !code.is_empty() => process_decoded_payload(code.into_bytes(), decoding),
+        Ok(code) if !code.is_empty() => process_decoded_payload(code, decoding),
         Ok(_) | Err(_) => Ok(Ready::NotYet(decoding)),
     }
 }
