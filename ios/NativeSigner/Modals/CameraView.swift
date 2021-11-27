@@ -13,6 +13,8 @@ struct CameraView: View {
     @EnvironmentObject var data: SignerDataModel
     var body: some View {
         ZStack {
+            VStack {
+            Spacer()
             CameraPreview(session: model.session)
                 .onAppear {
                     model.configure()
@@ -37,11 +39,18 @@ struct CameraView: View {
                         data.resetCamera = false
                     }
                 })
-            VStack {
-                Spacer()
-                ProgressView(value: min(Float(model.captured ?? 0)/(Float(model.total ?? -1) + 2), 1)).padding().background(/*@START_MENU_TOKEN@*//*@PLACEHOLDER=View@*/Color("backgroundColor")/*@END_MENU_TOKEN@*/)
+                .padding(.horizontal, 8)
+                //.overlay(RoundedRectangle(cornerRadius: 8).stroke(Color("cryptoColor")))
+
+                ProgressView(value: min(Float(model.captured ?? 0)/(Float(model.total ?? -1) + 2), 1))
+                    .border(Color("cryptoColor"))
+                    .frame(height: 7.0)
+                    .foregroundColor(Color("cryptoColor"))
+                    .padding(8)
+                    .background(Color("backgroundColor"))
+                    
             }
-        }.background(/*@START_MENU_TOKEN@*//*@PLACEHOLDER=View@*/Color.black/*@END_MENU_TOKEN@*/)
+        }.background(Color("backgroundColor"))
     }
 }
 

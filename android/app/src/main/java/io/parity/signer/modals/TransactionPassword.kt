@@ -11,7 +11,9 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
 import io.parity.signer.components.TransactionCard
+import io.parity.signer.components.transactionCards.TCAuthor
 import io.parity.signer.models.SignerDataModel
+import io.parity.signer.models.signTransaction
 
 @Composable
 fun TransactionPassword(signerDataModel: SignerDataModel) {
@@ -20,8 +22,7 @@ fun TransactionPassword(signerDataModel: SignerDataModel) {
 	val lastError = signerDataModel.lastError.observeAsState()
 
 	Column {
-		//TODO: replace with proper author card
-		TransactionCard(transaction.value!!.getJSONObject(0), signerDataModel)
+		TCAuthor(payload = signerDataModel.signingAuthor, signerDataModel = signerDataModel)
 		Text(lastError.value.toString())
 		Text("Enter password")
 		TextField(
@@ -30,12 +31,12 @@ fun TransactionPassword(signerDataModel: SignerDataModel) {
 				password = it
 				signerDataModel.clearError()
 			},
-			label = { Text("Password (optional)") },
+			label = { Text("Password") },
 			singleLine = true,
 			keyboardOptions = KeyboardOptions(
 				autoCorrect = false,
 				capitalization = KeyboardCapitalization.None,
-				keyboardType = KeyboardType.Text,
+				keyboardType = KeyboardType.Password,
 				imeAction = ImeAction.Done
 			),
 			keyboardActions = KeyboardActions(

@@ -20,11 +20,14 @@ pub enum Command {
     Show(Show),
     Types,
     Load(Instruction),
-    Add(Instruction),
     Specs(Instruction),
     Make(Make),
     Remove(Remove),
     RestoreDefaults,
+    MakeColdWithIdentities,
+    TransferMeta,
+    MakeColdRelease,
+    TransferMetaRelease,
 }
 
 pub enum Show {
@@ -81,7 +84,6 @@ pub enum VerifierKind {
 pub enum Msg {
     LoadTypes(Vec<u8>),
     LoadMetadata(Vec<u8>),
-    AddNetwork(Vec<u8>),
     AddSpecs(Vec<u8>),
 }
 
@@ -95,7 +97,6 @@ enum CryptoType {
 enum MsgType {
     LoadTypes,
     LoadMetadata,
-    AddNetwork,
     AddSpecs
 }
 
@@ -122,10 +123,11 @@ impl Command {
 
         match args.next() {
             Some(arg) => {
+                let arg = arg.to_lowercase();
                 match arg.as_str() {
                     "show" => {
                         match args.next() {
-                            Some(show) => match show.as_str() {
+                            Some(show) => match show.to_lowercase().as_str() {
                                 "-database" => Ok(Command::Show(Show::Database)),
                                 "-address_book" => Ok(Command::Show(Show::AddressBook)),
                                 _ => {return Err(Error::UnexpectedKeyArgumentSequence.show())},
@@ -134,7 +136,7 @@ impl Command {
                         }
                     },
                     "load_types" => Ok(Command::Types),
-                    "load_metadata"|"add_network"|"add_specs" => {
+                    "load_metadata"|"add_specs" => {
                         let mut set_key = None;
                         let mut content_key = None;
                         let mut pass_errors = true;
@@ -144,6 +146,7 @@ impl Command {
                         loop {
                             match args.next() {
                                 Some(x) => {
+                                    let x = x.to_lowercase();
                                     if x.starts_with("-") {
                                         match x.as_str() {
                                             "-a"|"-n"|"-u" => {
@@ -239,7 +242,6 @@ impl Command {
                         
                         match arg.as_str() {
                             "load_metadata" => Ok(Command::Load(instruction)),
-                            "add_network" => Ok(Command::Add(instruction)),
                             "add_specs" => Ok(Command::Specs(instruction)),
                             _ => unreachable!(),
                         }
@@ -249,7 +251,7 @@ impl Command {
                         let mut args = args.peekable();
                         match args.peek() {
                             Some(x) => {
-                                match x.as_str() {
+                                match x.to_lowercase().as_str() {
                                     "-qr" => {
                                         goal = Goal::Qr;
                                         args.next();
@@ -272,12 +274,13 @@ impl Command {
                         loop {
                             match args.next() {
                                 Some(x) => {
+                                    let x = x.to_lowercase();
                                     match x.as_str() {
                                         "-crypto" => {
                                             if let Some(_) = crypto_type_found {return Err(Error::DoubleKey(DoubleKey::CryptoKey).show())}
                                             crypto_type_found = match args.next() {
                                                 Some(x) => {
-                                                    match x.as_str() {
+                                                    match x.to_lowercase().as_str() {
                                                         "ed25519" => Some(CryptoType::Ed25519),
                                                         "sr25519" => Some(CryptoType::Sr25519),
                                                         "ecdsa" => Some(CryptoType::Ecdsa),
@@ -292,10 +295,9 @@ impl Command {
                                             if let Some(_) = msg_type_found {return Err(Error::DoubleKey(DoubleKey::MsgType).show())}
                                             msg_type_found = match args.next() {
                                                 Some(x) => {
-                                                    match x.as_str() {
+                                                    match x.to_lowercase().as_str() {
                                                         "load_types" => Some(MsgType::LoadTypes),
                                                         "load_metadata" => Some(MsgType::LoadMetadata),
-                                                        "add_network" => Some(MsgType::AddNetwork),
                                                         "add_specs" => Some(MsgType::AddSpecs),
                                                         _ => {return Err(Error::BadArgument(BadArgument::MsgType).show())}
                                                     }
@@ -307,7 +309,7 @@ impl Command {
                                             if let Some(_) = verifier_found {return Err(Error::DoubleKey(DoubleKey::Verifier).show())}
                                             verifier_found = match args.next() {
                                                 Some(x) => {
-                                                    match x.as_str() {
+                                                    match x.to_lowercase().as_str() {
                                                         "-hex" => {
                                                             match args.next() {
                                                                 Some(h) => Some(VerKey::Hex(h.to_string())),
@@ -320,7 +322,7 @@ impl Command {
                                                                 None => {return Err(Error::NeedArgument(NeedArgument::VerifierFile).show())},
                                                             }
                                                         },
-                                                        "Alice" => Some(VerKey::Alice),
+                                                        "alice" => Some(VerKey::Alice),
                                                         _ => {return Err(Error::BadArgument(BadArgument::Verifier).show())}
                                                     }
                                                 },
@@ -401,7 +403,6 @@ impl Command {
                                 match x {
                                     MsgType::LoadTypes => Msg::LoadTypes(payload),
                                     MsgType::LoadMetadata => Msg::LoadMetadata(payload),
-                                    MsgType::AddNetwork => Msg::AddNetwork(payload),
                                     MsgType::AddSpecs => Msg::AddSpecs(payload),
                                 }
                             },
@@ -420,7 +421,7 @@ impl Command {
                         let mut args = args.peekable();
                         match args.peek() {
                             Some(x) => {
-                                match x.as_str() {
+                                match x.to_lowercase().as_str() {
                                     "-qr" => {
                                         goal = Goal::Qr;
                                         args.next();
@@ -441,12 +442,13 @@ impl Command {
                         loop {
                             match args.next() {
                                 Some(x) => {
+                                    let x = x.to_lowercase();
                                     match x.as_str() {
                                         "-sufficient" => {
                                             if let Some(_) = sufficient_crypto_found {return Err(Error::DoubleKey(DoubleKey::SufficientCrypto).show())}
                                             sufficient_crypto_found = match args.next() {
                                                 Some(x) => {
-                                                    match x.as_str() {
+                                                    match x.to_lowercase().as_str() {
                                                         "-hex" => {
                                                             match args.next() {
                                                                 Some(h) => Some(Entry::Hex(h.to_string())),
@@ -469,10 +471,9 @@ impl Command {
                                             if let Some(_) = msg_type_found {return Err(Error::DoubleKey(DoubleKey::MsgType).show())}
                                             msg_type_found = match args.next() {
                                                 Some(x) => {
-                                                    match x.as_str() {
+                                                    match x.to_lowercase().as_str() {
                                                         "load_types" => Some(MsgType::LoadTypes),
                                                         "load_metadata" => Some(MsgType::LoadMetadata),
-                                                        "add_network" => Some(MsgType::AddNetwork),
                                                         "add_specs" => Some(MsgType::AddSpecs),
                                                         _ => {return Err(Error::BadArgument(BadArgument::MsgType).show())}
                                                     }
@@ -519,13 +520,13 @@ impl Command {
                                 };
                                 match sufficient_crypto {
                                     SufficientCrypto::Ed25519 {public_key, signature} => {
-                                        Crypto::Ed25519(VerifierKind::Normal {verifier_public_key: public_key.to_vec(), signature: signature.to_vec()})
+                                        Crypto::Ed25519(VerifierKind::Normal {verifier_public_key: public_key.to_vec(), signature: signature.0.to_vec()})
                                     },
                                     SufficientCrypto::Sr25519 {public_key, signature} => {
-                                        Crypto::Sr25519(VerifierKind::Normal {verifier_public_key: public_key.to_vec(), signature: signature.to_vec()})
+                                        Crypto::Sr25519(VerifierKind::Normal {verifier_public_key: public_key.to_vec(), signature: signature.0.to_vec()})
                                     },
                                     SufficientCrypto::Ecdsa {public_key, signature} => {
-                                        Crypto::Ecdsa(VerifierKind::Normal {verifier_public_key: public_key.to_vec(), signature: signature.to_vec()})
+                                        Crypto::Ecdsa(VerifierKind::Normal {verifier_public_key: public_key.0.to_vec(), signature: signature.0.to_vec()})
                                     },
                                 }
                             },
@@ -546,7 +547,6 @@ impl Command {
                                 match x {
                                     MsgType::LoadTypes => Msg::LoadTypes(payload),
                                     MsgType::LoadMetadata => Msg::LoadMetadata(payload),
-                                    MsgType::AddNetwork => Msg::AddNetwork(payload),
                                     MsgType::AddSpecs => Msg::AddSpecs(payload),
                                 }
                             },
@@ -613,6 +613,10 @@ impl Command {
                         }                        
                     },
                     "restore_defaults" => Ok(Command::RestoreDefaults),
+                    "make_cold_with_identities" => Ok(Command::MakeColdWithIdentities),
+                    "transfer_meta_to_cold" => Ok(Command::TransferMeta),
+                    "make_cold_release" => Ok(Command::MakeColdRelease),
+                    "transfer_meta_to_cold_release" => Ok(Command::TransferMetaRelease),
                     _ => return Err(Error::UnknownCommand.show()),
                 }
             },

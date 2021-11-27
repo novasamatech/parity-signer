@@ -60,24 +60,23 @@ export! {
         else {return transaction_parsing::produce_output(transaction, dbname)}
     }
 
-    @Java_io_parity_signer_models_SignerDataModel_substrateHandleAction
-	fn handle_action(
-		action: &str,
+    @Java_io_parity_signer_models_SignerDataModel_substrateHandleStub
+	fn handle_stub(
+		checksum: &str,
+        dbname: &str
+	) -> anyhow::Result<(), anyhow::Error> {
+        transaction_signing::handle_stub(checksum, dbname)
+    }
+
+    @Java_io_parity_signer_models_SignerDataModel_substrateHandleSign
+	fn handle_sign(
+		checksum: &str,
         seed_phrase: &str,
         password: &str,
         user_comment: &str,
         dbname: &str
 	) -> anyhow::Result<String, anyhow::Error> {
-        transaction_signing::handle_action(action, seed_phrase, password, user_comment, dbname)
-    }
-
-    @Java_io_parity_signer_models_SignerDataModel_substrateDevelopmentTest
-	fn development_test(
-		input: &str
-	) -> anyhow::Result<String, anyhow::Error> {
-        //let output = Ok(std::env::consts::OS.to_string());
-        let picture = plot_icon::png_data_from_base58(input, 32)?;
-        Ok(hex::encode(picture))
+        transaction_signing::handle_sign(checksum, seed_phrase, password, user_comment, dbname)
     }
 
     @Java_io_parity_signer_models_SignerDataModel_substrateBase58Identicon
@@ -131,15 +130,21 @@ export! {
         db_handling::identities::print_all_identities(dbname)
     }
 
+    @Java_io_parity_signer_models_SignerDataModel_substrateGuessWord
+    fn guess_word (
+        part: &str
+    ) -> String {
+        db_handling::identities::guess(part)
+    }
+
     @Java_io_parity_signer_models_SignerDataModel_substrateTryCreateSeed
 	fn try_create_seed(
         seed_name: &str,
-        crypto: &str,
         seed_phrase: &str,
         seed_length: u32,
 		dbname: &str
 	) -> anyhow::Result<String, anyhow::Error> {
-        db_handling::identities::try_create_seed(seed_name, crypto, seed_phrase, seed_length, dbname)
+        db_handling::identities::try_create_seed(seed_name, seed_phrase, seed_length, dbname)
     }
 
     @Java_io_parity_signer_models_SignerDataModel_substrateSuggestNPlusOne
@@ -161,7 +166,6 @@ export! {
 
     @Java_io_parity_signer_models_SignerDataModel_substrateTryCreateIdentity
 	fn try_create_identity(
-        id_name: &str,
         seed_name: &str,
         seed_phrase: &str,
         crypto: &str,
@@ -170,14 +174,7 @@ export! {
         has_password: bool,
 		dbname: &str
 	) -> anyhow::Result<(), anyhow::Error> {
-        db_handling::identities::try_create_address(id_name, seed_name, seed_phrase, crypto, path, network, has_password, dbname)
-    }
-
-    @Java_io_parity_signer_models_SignerDataModel_substrateSuggestName
-	fn suggest_name(
-        path: &str
-	) -> String {
-        db_handling::identities::suggest_path_name(path)
+        db_handling::identities::try_create_address("", seed_name, seed_phrase, crypto, path, network, has_password, dbname)
     }
 
     @Java_io_parity_signer_models_SignerDataModel_substrateDeleteIdentity
@@ -229,6 +226,22 @@ export! {
         db_handling::manage_history::print_history(dbname)
     }
 
+    @Java_io_parity_signer_models_SignerDataModel_historyPrintHistoryPage
+    fn print_history_page(
+        page: u32,
+        dbname: &str
+    ) -> Result<String, anyhow::Error> {
+        db_handling::manage_history::print_history_page(page, dbname)
+    }
+
+    @Java_io_parity_signer_models_SignerDataModel_historyTotalPages
+    fn history_total_pages(
+        dbname: &str
+    ) -> Result<u32, anyhow::Error> {
+        db_handling::manage_history::history_total_pages(dbname)
+    }
+
+
     @Java_io_parity_signer_models_SignerDataModel_historyClearHistory
 	fn clear_history(
         dbname: &str
@@ -236,12 +249,20 @@ export! {
         db_handling::manage_history::clear_history(dbname)
     }
 
-    @Java_io_parity_signer_models_SignerDataModel_historyInitHistory
-	fn init_history(
+    @Java_io_parity_signer_models_SignerDataModel_historyInitHistoryWithCert
+	fn init_history_with_cert(
         dbname: &str
 	) -> anyhow::Result<(), anyhow::Error> {
-        db_handling::manage_history::init_history(dbname)
+        db_handling::cold_default::signer_init_with_cert(dbname)
     }
+
+    @Java_io_parity_signer_models_SignerDataModel_historyInitHistoryNoCert
+	fn init_history_no_cert(
+        dbname: &str
+	) -> anyhow::Result<(), anyhow::Error> {
+        db_handling::cold_default::signer_init_no_cert(dbname)
+    }
+
 
     @Java_io_parity_signer_models_SignerDataModel_historyDeviceWasOnline
 	fn device_was_online(
@@ -250,18 +271,18 @@ export! {
         db_handling::manage_history::device_was_online(dbname)
     }
 
-    @Java_io_parity_signer_models_SignerDataModel_historySeedsWereAccessed
-	fn seeds_were_accessed(
+    @Java_io_parity_signer_models_SignerDataModel_historyGetWarnings
+	fn get_warnings(
         dbname: &str
-	) -> anyhow::Result<(), anyhow::Error> {
-        db_handling::manage_history::seeds_were_accessed(dbname)
+	) -> anyhow::Result<bool, anyhow::Error> {
+        db_handling::helpers::get_danger_status(dbname)
     }
 
-    @Java_io_parity_signer_models_SignerDataModel_historySeedsWereShown
-	fn seeds_were_shown(
+    @Java_io_parity_signer_models_SignerDataModel_historyAcknowledgeWarnings
+	fn acknowledge_warnings(
         dbname: &str
 	) -> anyhow::Result<(), anyhow::Error> {
-        db_handling::manage_history::seeds_were_shown(dbname)
+        db_handling::manage_history::reset_danger_status_to_safe(dbname)
     }
 
     @Java_io_parity_signer_models_SignerDataModel_historyHistoryEntryUser
@@ -279,11 +300,82 @@ export! {
 	) -> anyhow::Result<(), anyhow::Error> {
         db_handling::manage_history::history_entry_system(dbname, entry.to_string())
     }
+
+    @Java_io_parity_signer_models_SignerDataModel_historySeedNameWasShown
+	fn seed_name_was_shown(
+        seed_name: &str,
+        dbname: &str
+	) -> anyhow::Result<(), anyhow::Error> {
+        db_handling::manage_history::seed_name_was_shown(dbname, seed_name.to_string())
+    }
+
+    @Java_io_parity_signer_models_SignerDataModel_dbGetGeneralVerifier
+	fn get_general_certificate(
+        dbname: &str
+	) -> anyhow::Result<String, anyhow::Error> {
+        db_handling::helpers::display_general_verifier(dbname)
+    }
+
+    @Java_io_parity_signer_models_SignerDataModel_signerSignTypes
+	fn sign_load_types(
+        public_key: &str,
+        encryption: &str,
+        seed_phrase: &str,
+        password: &str,
+        dbname: &str
+	) -> anyhow::Result<String, anyhow::Error> {
+        transaction_signing::sign_message::sufficient_crypto_load_types(
+            public_key, encryption, dbname, seed_phrase, password
+        )
+    }
+
+    @Java_io_parity_signer_models_SignerDataModel_signerSignMetadata
+	fn sign_load_metadata(
+        network: &str,
+        version: u32,
+        public_key: &str,
+        encryption: &str,
+        seed_phrase: &str,
+        password: &str,
+        dbname: &str
+	) -> anyhow::Result<String, anyhow::Error> {
+        transaction_signing::sign_message::sufficient_crypto_load_metadata(
+            network, version, public_key, encryption, dbname, seed_phrase, password
+        )
+    }
+
+    @Java_io_parity_signer_models_SignerDataModel_signerSignSpecs
+	fn sign_load_specs(
+        network: &str,
+        public_key: &str,
+        encryption: &str,
+        seed_phrase: &str,
+        password: &str,
+        dbname: &str
+	) -> anyhow::Result<String, anyhow::Error> {
+        transaction_signing::sign_message::sufficient_crypto_add_specs(
+            network, public_key, encryption, dbname, seed_phrase, password
+        )
+    }
+
+    @Java_io_parity_signer_models_SignerDataModel_testGetAllTXCards
+	fn get_all_tx_cards() -> String {
+        return transaction_parsing::test_all_cards::make_all_cards()
+    }
+
+    @Java_io_parity_signer_models_SignerDataModel_testGetAllLogCards
+	fn get_all_log_cards() -> String {
+        //TODO
+        //return transaction_parsing::test_all_cards::make_all_cards()
+        return "not ready".to_string()
+    }
+
+
 }
 
 ffi_support::define_string_destructor!(signer_destroy_string);
 
 #[cfg(test)]
 mod tests {
-	use super::*;
+	//use super::*;
 }

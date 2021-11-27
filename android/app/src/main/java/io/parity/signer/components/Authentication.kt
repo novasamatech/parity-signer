@@ -1,21 +1,31 @@
 package io.parity.signer.components
 
 import android.content.Context
+import android.os.Build
 import android.widget.Toast
-import androidx.biometric.BiometricManager.Authenticators.DEVICE_CREDENTIAL
+import androidx.biometric.BiometricManager
 import androidx.biometric.BiometricPrompt
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.FragmentActivity
 
 
 class Authentication {
-	private val promptInfo = BiometricPrompt.PromptInfo.Builder()
-		.setTitle("UNLOCK SEED")
-		.setSubtitle("Please authenticate yourself")
-		.setAllowedAuthenticators(DEVICE_CREDENTIAL)
-		.build()
+	private val promptInfo = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+		BiometricPrompt.PromptInfo.Builder()
+			.setTitle("UNLOCK SEED")
+			.setSubtitle("Please authenticate yourself")
+			.setAllowedAuthenticators(BiometricManager.Authenticators.DEVICE_CREDENTIAL)
+			.build()
+	} else {
+		BiometricPrompt.PromptInfo.Builder()
+			.setTitle("UNLOCK SEED")
+			.setSubtitle("Please authenticate yourself")
+			.setNegativeButtonText("Cancel")
+			.setAllowedAuthenticators(BiometricManager.Authenticators.BIOMETRIC_STRONG)
+			.build()
+	}
 
-	lateinit var biometricPrompt: BiometricPrompt
+	private lateinit var biometricPrompt: BiometricPrompt
 	lateinit var context: Context
 
 	fun authenticate(activity: FragmentActivity, onSuccess: () -> Unit) {
@@ -35,9 +45,6 @@ class Authentication {
 				override fun onAuthenticationSucceeded(
 					result: BiometricPrompt.AuthenticationResult) {
 					super.onAuthenticationSucceeded(result)
-					Toast.makeText(context,
-						"Authentication succeeded!", Toast.LENGTH_SHORT)
-						.show()
 					onSuccess()
 				}
 

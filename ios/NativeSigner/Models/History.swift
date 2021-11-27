@@ -11,30 +11,29 @@ enum Event: Decodable, Hashable, Equatable {
     case databaseInitiated
     case deviceWasOnline
     case error(String)
-    case generalVerifierAdded(Verifier)
-    case generalVerifierRemoved(Verifier)
+    case generalVerifierSet(Verifier)
     case historyCleared
     case identitiesWiped
     case identityAdded(IdentityEvent)
     case identityRemoved(IdentityEvent)
     case metadataAdded(MetaSpecs)
     case metadataRemoved(MetaSpecs)
-    case metadataVerifierAdded(NetworkVerifierEvent)
-    case metadataVerifierRemoved(NetworkVerifierEvent)
-    case networkAdded(NewNetwork)
-    case networkRemoved(NetworkRemovedEvent)
-    case seedNameWasAccessed(String)
+    case networkAdded(NetworkDisplay)
+    case networkRemoved(NetworkDisplay)
+    case networkVerifierSet(NetworkVerifierDisplay)
+    case resetDangerRecord
     case seedNameWasShown(String)
-    case seedsWereAccessed
-    case seedsWereShown
-    case signedAddNetwork(NewNetwork)
-    case signedLoadMetadata(VerifiedMetadataEvent)
-    case signedTypes(TypesEvent)
+    case signedAddNetwork(NetworkSigned)
+    case signedLoadMetadata(MetadataSigned)
+    case signedTypes(TypesSigned)
     case systemEntry(String)
-    case transactionSigned(SigningEvent)
-    case typesInfoUpdated(TypesEvent)
+    case transactionSignError(SignDisplayError)
+    case transactionSigned(SignDisplay)
+    case typesAdded(TypesDisplay)
+    case typesRemoved(TypesDisplay)
     case userEntry(String)
     case warning(String)
+    case wrongPassword
     
     enum CodingKeys: String, CodingKey {
         case event
@@ -50,12 +49,8 @@ enum Event: Decodable, Hashable, Equatable {
             self = .databaseInitiated
         case "device_online":
             self = .deviceWasOnline
-        case "error":
-            self = .error(try values.decode(String.self, forKey: .payload))
         case "general_verifier_added":
-            self = .generalVerifierAdded(try values.decode(Verifier.self, forKey: .payload))
-        case "general_verifier_removed":
-            self = .generalVerifierRemoved(try values.decode(Verifier.self, forKey: .payload))
+            self = .generalVerifierSet(try values.decode(Verifier.self, forKey: .payload))
         case "history_cleared":
             self = .historyCleared
         case "identities_wiped":
@@ -68,42 +63,47 @@ enum Event: Decodable, Hashable, Equatable {
             self = .metadataAdded(try values.decode(MetaSpecs.self, forKey: .payload))
         case "metadata_removed":
             self = .metadataRemoved(try values.decode(MetaSpecs.self, forKey: .payload))
-        case "metadata_verifier_added":
-            self = .metadataVerifierAdded(try values.decode(NetworkVerifierEvent.self, forKey: .payload))
-        case "metadata_verifier_removed":
-            self = .metadataVerifierRemoved(try values.decode(NetworkVerifierEvent.self, forKey: .payload))
         case "network_added":
-            self = .networkAdded(try values.decode(NewNetwork.self, forKey: .payload))
+            self = .networkAdded(try values.decode(NetworkDisplay.self, forKey: .payload))
         case "network_removed":
-            self = .networkRemoved(try values.decode(NetworkRemovedEvent.self, forKey: .payload))
-        case "seed_name_accessed":
-            self = .seedNameWasAccessed(try values.decode(String.self, forKey: .payload))
+            self = .networkRemoved(try values.decode(NetworkDisplay.self, forKey: .payload))
+        case "network_verifier_set":
+            self = .networkVerifierSet(try values.decode(NetworkVerifierDisplay.self, forKey: .payload))
+        case "reset_danger_record":
+            self = .resetDangerRecord
         case "seed_name_shown":
             self = .seedNameWasShown(try values.decode(String.self, forKey: .payload))
-        case "seeds_accessed":
-            self = .seedsWereAccessed
-        case "seeds_shown":
-            self = .seedsWereShown
         case "add_network_message_signed":
-            self = .signedAddNetwork(try values.decode(NewNetwork.self, forKey: .payload))
+            self = .signedAddNetwork(try values.decode(NetworkSigned.self, forKey: .payload))
         case "load_metadata_message_signed":
-            self = .signedLoadMetadata(try values.decode(VerifiedMetadataEvent.self, forKey: .payload))
+            self = .signedLoadMetadata(try values.decode(MetadataSigned.self, forKey: .payload))
         case "load_types_message_signed":
-            self = .signedTypes(try values.decode(TypesEvent.self, forKey: .payload))
+            self = .signedTypes(try values.decode(TypesSigned.self, forKey: .payload))
         case "system_entered_event":
             self = .systemEntry(try values.decode(String.self, forKey: .payload))
+        case "sign_error":
+            self = .transactionSignError(try values.decode(SignDisplayError.self, forKey: .payload))
         case "transaction_signed":
-            self = .transactionSigned(try values.decode(SigningEvent.self, forKey: .payload))
+            self = .transactionSigned(try values.decode(SignDisplay.self, forKey: .payload))
         case "types_info_updated":
-            self = .typesInfoUpdated(try values.decode(TypesEvent.self, forKey: .payload))
+            self = .typesAdded(try values.decode(TypesDisplay.self, forKey: .payload))
+        case "types_removed":
+            self = .typesRemoved(try values.decode(TypesDisplay.self, forKey: .payload))
         case "user_entered_event":
             self = .userEntry(try values.decode(String.self, forKey: .payload))
         case "warning":
             self = .warning(try values.decode(String.self, forKey: .payload))
+        case "wrong_password_entered":
+            self = .wrongPassword
         default:
             self = .error(try values.decode(String.self, forKey: .payload))
         }
     }
+}
+
+struct CurrentVerifier: Decodable, Hashable {
+    var type: String
+    var details: Verifier
 }
 
 struct IdentityEvent: Decodable, Hashable {
@@ -114,10 +114,11 @@ struct IdentityEvent: Decodable, Hashable {
     var network_genesis_hash: String
 }
 
-struct NetworkRemovedEvent: Decodable, Hashable {
+struct NetworkDisplay: Decodable, Hashable {
     var base58prefix: String
     var color: String
     var decimals: String
+    var encryption: String
     var genesis_hash: String
     var logo: String
     var name: String
@@ -126,30 +127,57 @@ struct NetworkRemovedEvent: Decodable, Hashable {
     var secondary_color: String
     var title: String
     var unit: String
-    var verifier: Verifier
+    var current_verifier: CurrentVerifier
 }
 
-struct NetworkVerifierEvent: Decodable, Hashable {
-    var specname: String
-    var verifier: Verifier
+struct NetworkSigned: Decodable, Hashable {
+    var base58prefix: String
+    var color: String
+    var decimals: String
+    var encryption: String
+    var genesis_hash: String
+    var logo: String
+    var name: String
+    var path_id: String
+    var secondary_color: String
+    var title: String
+    var unit: String
+    var signed_by: Verifier
 }
 
-struct SigningEvent: Decodable, Hashable {
+struct NetworkVerifierDisplay: Decodable, Hashable {
+    var genesis_hash: String
+    var current_verifier: Verifier
+}
+
+struct SignDisplay: Decodable, Hashable {
     var transaction: String
     var signed_by: Verifier
     var user_comment: String
 }
 
-struct TypesEvent: Decodable, Hashable {
+struct SignDisplayError: Decodable, Hashable {
+    var transaction: String
+    var signed_by: Verifier
+    var user_comment: String
+    var error: String
+}
+
+struct TypesDisplay: Decodable, Hashable {
     var types_hash: String
     var verifier: Verifier
 }
 
-struct VerifiedMetadataEvent: Decodable, Hashable {
+struct TypesSigned: Decodable, Hashable {
+    var types_hash: String
+    var signed_by: Verifier
+}
+
+struct MetadataSigned: Decodable, Hashable {
     var specname: String
     var spec_version: String
     var meta_hash: String
-    var verifier: Verifier
+    var signed_by: Verifier
 }
 
 struct History: Decodable {
@@ -172,6 +200,8 @@ extension SignerDataModel {
                     signer_destroy_string(res!)
                     return
                 }
+                print(self.history)
+                print(String(cString: res!))
                 self.history = history.sorted(by: {$0.order > $1.order})
             } else {
                 print("keysJSON corrupted")
@@ -183,4 +213,24 @@ extension SignerDataModel {
             signer_destroy_string(err_ptr.pointee.message)
         }
     }
+}
+
+func recoverTransaction(transaction: String) -> [TransactionCard] {
+    print(transaction)
+    
+    guard let transactionPreview = try? JSONDecoder().decode(TransactionCardSet.self, from: transaction.data(using: .utf8) ?? Data())
+    else {
+        return []
+    }
+    var cards: [TransactionCard] = []
+    cards.append(contentsOf: (transactionPreview.warning ?? []))
+    cards.append(contentsOf: (transactionPreview.types_info ?? []))
+    cards.append(contentsOf: (transactionPreview.author ?? []))
+    cards.append(contentsOf: (transactionPreview.error ?? []))
+    cards.append(contentsOf: (transactionPreview.extensions ?? []))
+    cards.append(contentsOf: (transactionPreview.method ?? []))
+    cards.append(contentsOf: (transactionPreview.new_specs ?? []))
+    cards.append(contentsOf: (transactionPreview.verifier ?? []))
+    cards = cards.sorted(by: {$0.index < $1.index})
+    return cards
 }

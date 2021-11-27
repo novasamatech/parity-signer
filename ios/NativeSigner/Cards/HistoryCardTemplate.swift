@@ -15,25 +15,37 @@ struct HistoryCardTemplate: View {
     var line2: String
     
     var body: some View {
-        HStack (alignment: .center) {
-            Image(systemName: image).imageScale(.large).foregroundColor(Color(color)).frame(width: 26.0).padding()
-            VStack (alignment: .leading) {
-                Text(timestamp)
-                Text(line1)
+        ZStack {
+            RoundedRectangle(cornerRadius: 4).foregroundColor(Color("backgroundCard"))
+            HStack (alignment: .center) {
+                Image(systemName: image)
+                    .imageScale(.medium)
                     .foregroundColor(Color(color))
-                Text(line2).foregroundColor(Color("textFadedColor"))
+                    .frame(width: 26.0)
+                    .padding(8)
+                VStack (alignment: .leading) {
+                    if (timestamp != "") {
+                        Text(timestamp)
+                            .font(.system(size: 13))
+                    }
+                    Text(line1)
+                        .foregroundColor(Color(color))
+                        .font(.system(size: 13, weight: .bold))
+                    Text(line2)
+                        .foregroundColor(Color("textFadedColor"))
+                        .font(.system(size: 12, weight: .semibold, design: .monospaced))
+                }
+                Spacer()
             }
-            Spacer()
+            .padding(8)
         }
-        .padding(8)
-        .background(Color("backgroundCard"))
     }
 }
 
 /*
-struct HistoryCardTemplate_Previews: PreviewProvider {
-    static var previews: some View {
-        HistoryCardTemplate()
-    }
-}
-*/
+ struct HistoryCardTemplate_Previews: PreviewProvider {
+ static var previews: some View {
+ HistoryCardTemplate()
+ }
+ }
+ */

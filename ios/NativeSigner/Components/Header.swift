@@ -11,16 +11,17 @@ struct Header: View {
     @EnvironmentObject var data: SignerDataModel
     var body: some View {
         HStack {
-            if !data.isNavBottom() {
-                Button(action: {
-                    data.goBack()
-                }) {
-                    Image(systemName: "chevron.left").imageScale(.large)
-                }
-            }
             if data.getMultiSelectionMode() && data.keyManagerModal == .none {
                 Button(action: {data.multiSelected = []}) {
                     SmallButton(text: "Cancel")
+                }
+            } else {
+                if !data.isNavBottom() {
+                    Button(action: {
+                        data.goBack()
+                    }) {
+                        Image(systemName: "chevron.left").imageScale(.large)
+                    }
                 }
             }
             Spacer()
@@ -31,21 +32,15 @@ struct Header: View {
                     SmallButton(text: "Select all")
                 }
             }
-            if (data.keyManagerModal == .seedSelector && data.signerScreen == .keys) {
+            if (data.keyManagerModal == .seedSelector && data.signerScreen == .keys && !data.alert) {
                 Button(action: {
                     data.keyManagerModal = .newSeed
                 }) {
-                    Image(systemName: "plus.square.on.square")
+                    Image(systemName: "plus.circle")
                         .imageScale(.large)
                 }
             }
-            Button(action: {
-                data.totalRefresh()
-                data.networkSettings = nil
-                data.signerScreen = .history
-            }) {
-                NavbarShield()
-            }
+            NavbarShield()
         }
         .padding().background(/*@START_MENU_TOKEN@*//*@PLACEHOLDER=View@*/Color("backgroundColor")/*@END_MENU_TOKEN@*/)
     }

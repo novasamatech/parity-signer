@@ -74,8 +74,14 @@ extension SignerDataModel {
         if checkSeedCollision(seedName: seedName) {
             print("Key collision")
             self.lastError = "Seed with this name already exists"
+            return
         }
-        let res = try_create_seed(err_ptr, seedName, "sr25519", seedPhrase, 24, dbName)
+        if checkSeedPhraseCollision(seedPhrase: seedPhrase) {
+            print("Key collision")
+            self.lastError = "Seed with this name already exists"
+            return
+        }
+        let res = try_create_seed(err_ptr, seedName, seedPhrase, 24, dbName)
         if err_ptr.pointee.code != 0 {
             self.lastError = String(cString: err_ptr.pointee.message)
             print("Rust returned error")
@@ -118,7 +124,20 @@ extension SignerDataModel {
     func checkSeedCollision(seedName: String) -> Bool {
         let query: [String: Any] = [
             kSecClass as String: kSecClassGenericPassword,
-            kSecAttrAccount as String: seedName,
+            kSecValueData as String: seedName,
+            kSecMatchLimit as String: kSecMatchLimitOne
+        ]
+        let status = SecItemCopyMatching(query as CFDictionary, nil)
+        return status == errSecSuccess
+    }
+    
+    /**
+     * Check if proposed seed phrase is already saved. But mostly require auth on seed creation.
+     */
+    func checkSeedPhraseCollision(seedPhrase: String) -> Bool {
+        let query: [String: Any] = [
+            kSecClass as String: kSecClassGenericPassword,
+            kSecAttrAccount as String: seedPhrase,
             kSecMatchLimit as String: kSecMatchLimitOne
         ]
         let status = SecItemCopyMatching(query as CFDictionary, nil)
@@ -137,6 +156,12 @@ extension SignerDataModel {
      * This is simple explicit "get" for showing plaintext seedBackup value after it was fetched
      */
     func getRememberedSeedPhrate() -> String {
+        if self.seedBackup == "" {
+            self.seedBackup = getSeed(seedName: self.selectedSeed, backup: true)
+        }
+        if self.seedBackup == "" {
+            goBack()
+        }
         return self.seedBackup
     }
     
@@ -157,7 +182,7 @@ extension SignerDataModel {
         let status = SecItemCopyMatching(query as CFDictionary, &item)
         if status == errSecSuccess {
             if backup {
-                seeds_were_shown(err_ptr, self.dbName)
+                seed_name_was_shown(err_ptr, seedName, self.dbName)
                 if err_ptr.pointee.code == 0 {
                     return String(data: (item as! CFData) as Data, encoding: .utf8) ?? ""
                 } else {

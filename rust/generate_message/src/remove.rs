@@ -1,54 +1,45 @@
-use constants::{ADDRESS_BOOK, HOT_DB_NAME, METATREE, SPECSTREEPREP};
-use sled::IVec;
+use constants::{HOT_DB_NAME, METATREE};
+use sled::{Batch};
 use anyhow;
-use db_handling::helpers::{open_db, open_tree};
-use parity_scale_codec::{Decode, Encode};
-use definitions::{metadata::{AddressBookEntry, NameVersioned}, network_specs::generate_network_key};
+use db_handling::{db_transactions::TrDbHot, helpers::{open_db, open_tree}};
+use definitions::{keyring::{AddressBookKey, MetaKey, MetaKeyPrefix, NetworkSpecsKey}};
 
 use crate::parser::Remove;
-use crate::error::{Error, NotFound, NotDecodeable};
-use crate::helpers::specname_in_db;
+use crate::helpers::{get_and_decode_address_book_entry, specname_in_db};
 
 
 /// Function to remove information from the database.
 pub fn remove_info (info: Remove) -> anyhow::Result<()> {
-    
-    let database = open_db(HOT_DB_NAME)?;
-    let metadata = open_tree(&database, METATREE)?;
-    
     match info {
         Remove::Title(network_title) => {
-            let address_book = open_tree(&database, ADDRESS_BOOK)?;
-            let chainspecs = open_tree(&database, SPECSTREEPREP)?;
-            let address_book_entry_encoded = match address_book.remove(&network_title.encode()) {
-                Ok(Some(a)) => a,
-                Ok(None) => return Err(Error::NotFound(NotFound::AddressBookKey(network_title)).show()),
-                Err(e) => return Err(Error::InternalDatabaseError(e).show()),
-            };
-            let address_book_entry = match <AddressBookEntry>::decode(&mut &address_book_entry_encoded[..]) {
-                Ok(a) => a,
-                Err(_) => return Err(Error::NotDecodeable(NotDecodeable::AddressBookEntry).show()),
-            };
-            let network_key = generate_network_key(&address_book_entry.genesis_hash.to_vec(), address_book_entry.encryption);
-            match chainspecs.remove(&network_key) {
-                Ok(Some(_)) => (),
-                Ok(None) => return Err(Error::NotFound(NotFound::NetworkKey).show()),
-                Err(e) => return Err(Error::InternalDatabaseError(e).show()),
+            let mut address_book_batch = Batch::default();
+            let mut metadata_batch = Batch::default();
+            let mut network_specs_prep_batch = Batch::default();
+            let address_book_entry = get_and_decode_address_book_entry(&network_title)?;
+            let network_specs_key = NetworkSpecsKey::from_parts(&address_book_entry.genesis_hash.to_vec(), &address_book_entry.encryption);
+            address_book_batch.remove(AddressBookKey::from_title(&network_title).key());
+            network_specs_prep_batch.remove(network_specs_key.key());
+            let mut meta_to_del: Vec<MetaKey> = Vec::new();
+            if !specname_in_db(&address_book_entry.name, &network_title)? {
+                let database = open_db(HOT_DB_NAME)?;
+                let metadata = open_tree(&database, METATREE)?;
+                let meta_key_prefix = MetaKeyPrefix::from_name(&address_book_entry.name);
+                for x in metadata.scan_prefix(meta_key_prefix.prefix()) {if let Ok((a, _)) = x {meta_to_del.push(MetaKey::from_vec(&a.to_vec()))}}
             }
-            if !specname_in_db(&address_book_entry.name, &address_book)? {
-                let mut to_del: Vec<IVec> = Vec::new();
-                for x in metadata.scan_prefix(address_book_entry.name.encode()) {if let Ok((a, _)) = x {to_del.push(a)}}
-                for x in to_del.iter() {if let Err(e) = metadata.remove(x) {return Err(Error::InternalDatabaseError(e).show())}}
-            }
-            Ok(())
+            for x in meta_to_del.iter() {metadata_batch.remove(x.key())}
+            TrDbHot::new()
+                .set_address_book(address_book_batch)
+                .set_metadata(metadata_batch)
+                .set_network_specs_prep(network_specs_prep_batch)
+                .apply(HOT_DB_NAME)
         },
         Remove::SpecNameVersion{name, version} => {
-            let versioned_name = NameVersioned {name, version};
-            match metadata.remove(&versioned_name.encode()) {
-                Ok(Some(_)) => Ok(()),
-                Ok(None) => return Err(Error::NotFound(NotFound::NameVersioned(versioned_name)).show()),
-                Err(e) => return Err(Error::InternalDatabaseError(e).show()),
-            }
+            let mut metadata_batch = Batch::default();
+            let meta_key = MetaKey::from_parts(&name, version);
+            metadata_batch.remove(meta_key.key());
+            TrDbHot::new()
+                .set_metadata(metadata_batch)
+                .apply(HOT_DB_NAME)
         },
     }
 }

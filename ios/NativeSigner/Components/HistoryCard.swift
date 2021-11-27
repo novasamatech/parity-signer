@@ -19,10 +19,8 @@ struct HistoryCard: View {
                 HistoryCardTemplate(image: "shield.slash", timestamp: timestamp, color: "dangerColor", line1: "Device was connected to network", line2: "")
             case .error(let text):
                 HistoryCardTemplate(image: "exclamationmark.triangle.fill", timestamp: timestamp, color: "dangerColor", line1: "Error! " + text, line2: "")
-            case .generalVerifierAdded(let value):
-                HistoryCardTemplate(image: "lock.shield.fill", timestamp: timestamp, color: "cryptoColor", line1: "General verifier set", line2: value.hex + " " +  value.encryption)
-            case .generalVerifierRemoved(_):
-                HistoryCardTemplate(image: "lock.slash", timestamp: timestamp, color: "dangerColor", line1: "General verifier unset", line2: "Signer wiped")
+            case .generalVerifierSet(let value):
+                HistoryCardTemplate(image: "lock.shield.fill", timestamp: timestamp, color: "cryptoColor", line1: "General verifier set", line2: value.hex.truncateMiddle(length: 8) + "\n" + value.encryption)
             case .historyCleared:
                 HistoryCardTemplate(image: "1.square", timestamp: timestamp, color: "dangerColor", line1: "History cleared", line2: "")
             case .identitiesWiped:
@@ -35,22 +33,16 @@ struct HistoryCard: View {
                 HistoryCardTemplate(image: "plus.viewfinder", timestamp: timestamp, color: "cryptoColor", line1: "Metadata added", line2: value.specname + " version " +  value.spec_version)
             case .metadataRemoved(let value):
                 HistoryCardTemplate(image: "minus.square", timestamp: timestamp, color: "cryptoColor", line1: "Metadata removed", line2: value.specname + " version " +  value.spec_version)
-            case .metadataVerifierAdded(let value):
-                HistoryCardTemplate(image: "lock.shield.fill", timestamp: timestamp, color: "cryptoColor", line1: "Network verifier set", line2: value.specname)
-            case .metadataVerifierRemoved(_):
-                HistoryCardTemplate(image: "lock.shield.fill", timestamp: timestamp, color: "cryptoColor", line1: "Network verifier was cleared", line2: "this is error, report a bug") //TODO: this should not be possible!
             case .networkAdded(let value):
-                HistoryCardTemplate(image: "plus.viewfinder", timestamp: timestamp, color: "cryptoColor", line1: "Network added", line2: value.specname)
+                HistoryCardTemplate(image: "plus.viewfinder", timestamp: timestamp, color: "cryptoColor", line1: "Network added", line2: value.title)
             case .networkRemoved(let value):
                 HistoryCardTemplate(image: "minus.square", timestamp: timestamp, color: "cryptoColor", line1: "Network removed", line2: value.title)
-            case .seedNameWasAccessed(let text):
-                HistoryCardTemplate(image: "key", timestamp: timestamp, color: "cryptoColor", line1: "Seed was accessed", line2: text)
+            case .networkVerifierSet(let value):
+                HistoryCardTemplate(image: "lock.shield.fill", timestamp: timestamp, color: "cryptoColor", line1: "Network verifier set", line2: value.genesis_hash)
+            case .resetDangerRecord:
+                HistoryCardTemplate(image: "checkmark.shield", timestamp: timestamp, color: "dangerColor", line1: "Warnings acknowledged", line2: "")
             case .seedNameWasShown(let text):
                 HistoryCardTemplate(image: "key", timestamp: timestamp, color: "cryptoColor", line1: "Seed was shown", line2: text)
-            case .seedsWereAccessed:
-                HistoryCardTemplate(image: "key", timestamp: timestamp, color: "cryptoColor", line1: "Seeds were accessed", line2: "")
-            case .seedsWereShown:
-                HistoryCardTemplate(image: "key", timestamp: timestamp, color: "cryptoColor", line1: "Seeds were shown", line2: "")
             case .signedAddNetwork(_):
                 HistoryCardTemplate(image: "pencil", timestamp: timestamp, color: "cryptoColor", line1: "Network specs signed", line2: "comment placeholder")
             case .signedLoadMetadata(_):
@@ -59,14 +51,20 @@ struct HistoryCard: View {
                 HistoryCardTemplate(image: "pencil", timestamp: timestamp, color: "cryptoColor", line1: "Types signed", line2: "comment placeholder")
             case .systemEntry(let text):
                 HistoryCardTemplate(image: "square", timestamp: timestamp, color: "cryptoColor", line1: "System record", line2: text)
+            case .transactionSignError(let value):
+                HistoryCardTemplate(image: "pencil", timestamp: timestamp, color: "dangerColor", line1: "Signing failure", line2: String(decoding: Data(base64Encoded: value.user_comment) ?? Data(), as: UTF8.self))
             case .transactionSigned(let value):
                 HistoryCardTemplate(image: "pencil", timestamp: timestamp, color: "cryptoColor", line1: "Generated signature", line2: String(decoding: Data(base64Encoded: value.user_comment) ?? Data(), as: UTF8.self))
-            case .typesInfoUpdated(_):
+            case .typesAdded(_):
                 HistoryCardTemplate(image: "plus.viewfinder", timestamp: timestamp, color: "cryptoColor", line1: "New types info loaded", line2: "")
+            case .typesRemoved(_):
+                HistoryCardTemplate(image: "minus.square", timestamp: timestamp, color: "dangerColor", line1: "Types info removed", line2: "")
             case .userEntry(let text):
                 HistoryCardTemplate(image: "square", timestamp: timestamp, color: "cryptoColor", line1: "User record", line2: text)
             case .warning(let text):
                 HistoryCardTemplate(image: "exclamationmark.triangle.fill", timestamp: timestamp, color: "dangerColor", line1: "Warning! " + text, line2: "")
+            case .wrongPassword:
+                HistoryCardTemplate(image: "exclamationmark.shield", timestamp: timestamp, color: "dangerColor", line1: "Wrong password entered", line2: "operation was declined")
             }
         }
     }

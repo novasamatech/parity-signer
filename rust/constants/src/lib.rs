@@ -8,6 +8,7 @@
 /// transaction information
 
 pub const COLD_DB_NAME: &str = "../database/database_cold";
+pub const COLD_DB_NAME_RELEASE: &str = "../database/database_cold_release";
 
 /// Tree names:  
 pub const SPECSTREE: &[u8] = b"chainspecs";
@@ -21,15 +22,15 @@ pub const HISTORY: &[u8] = b"history";
 /// Key names used for settings tree:  
 pub const TYPES: &[u8] = b"types";
 pub const GENERALVERIFIER: &[u8] = b"general_verifier";
+pub const DANGER: &[u8] = b"dangerous_encounter";
 
 /// Key names used for transaction tree:  
-pub const SIGNTRANS: &[u8] = b"sign_transaction";
-pub const LOADMETA: &[u8] = b"load_metadata";
-pub const ADDMETAVERIFIER: &[u8] = b"add_metadata_verifier";
-pub const LOADTYPES: &[u8] = b"load_types";
-pub const ADDGENERALVERIFIER: &[u8] = b"add_general_verifier";
-pub const ADDNETWORK: &[u8] = b"add_network";
+pub const STUB: &[u8] = b"stub";
+pub const SIGN: &[u8] = b"sign";
 
+/// Display constants
+pub const MAX_WORDS_DISPLAY: usize = 8;
+pub const HISTORY_PAGE_SIZE: usize = 20;
 
 /// HOT database on external device:  
 ///
@@ -74,5 +75,5 @@ pub const MAIN_COLOR: u8 = 0x00;
 pub const BACK_COLOR: u8 = 0xFF;
 pub const SCALING: i32 = 4;
 pub const FPS_NOM: u16 = 1;
-pub const FPS_DEN: u16 = 32;
+pub const FPS_DEN: u16 = 30;
 pub const BORDER: i32 = 4;

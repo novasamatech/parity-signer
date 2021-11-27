@@ -30,10 +30,10 @@ struct TransactionCardSelector: View {
             Text(text).foregroundColor(Color("textMainColor"))
         case .enumVariantName(let value):
             TCEnumVariantName(value: value)
-        case .eraImmortalNonce(let eraImmortalNonce):
-            TCEraImmortalNonce(eraImmortalNonce: eraImmortalNonce)
-        case .eraMortalNonce(let eraMortalNonce):
-            TCEraMortalNonce(eraMortalNonce: eraMortalNonce)
+        case .eraImmortal:
+            TCEraImmortal()
+        case .eraMortal(let eraMortal):
+            TCEraMortal(eraMortal: eraMortal)
         case .error(let text):
             TCError(text: text)
         case .fieldName(let value):
@@ -47,17 +47,18 @@ struct TransactionCardSelector: View {
         case .meta(let value):
             Text(String(describing: value))
                 .foregroundColor(Color("textMainColor"))
-        case .newNetwork(let value):
-            Text(String(describing: value))
-                .foregroundColor(Color("textMainColor"))
+        case .nameVersion(let value):
+            TCNameVersion(value: value)
+        case .newSpecs(let value):
+            TCNewSpecs(value: value)
+        case .nonce(let text):
+            Text("Nonce: " + text)
         case .none:
             EmptyView()
         case .pallet(let text):
             TCPallet(text: text)
-        case .pathDocs(let value):
-            TCPathDocs(value: value)
-        case .range(let value):
-            TCTXRange(value: value)
+        case .text(let text):
+            TCText(text: text)
         case .tip(let value):
             TCTip(value: value)
         case .tipPlain(let text):
@@ -72,10 +73,13 @@ struct TransactionCardSelector: View {
         case .varName(let text):
             TCVarName(text: text)
         case .verifier(let value):
-            Text(String(describing: value))
-                .foregroundColor(Color("textMainColor"))
+            TCVerifier(value: value)
         case .warning(let text):
             TCWarning(text: text)
+        case .networkGenesisHash(let text):
+            Text("Genesis hash: " + text)
+        case .networkName(let text):
+            Text("Network name: " + text)
         }
     }
 }

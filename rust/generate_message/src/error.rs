@@ -1,6 +1,6 @@
 use sled;
 use anyhow::anyhow;
-use definitions::{crypto::Encryption, metadata::NameVersioned};
+use definitions::{crypto::Encryption};
 
 pub enum Error {
     InternalDatabaseError(sled::Error),
@@ -10,7 +10,7 @@ pub enum Error {
     AddressBookEmpty,
     MetadataEmpty,
     InputOutputError(String),
-    NetworkKeyMismatch(String),
+    NetworkSpecsKeyMismatch(String),
     TwoEntriesAddressEncryption{address: String, encryption: Encryption},
     TwoDefaultsAddress(String),
     SpecsInDb{name: String, encryption: Encryption},
@@ -35,8 +35,6 @@ pub enum Error {
     NotLoadTypes,
     NotLoadMetadata,
     DamagedMetadata,
-    NotAddNetwork,
-    MessageNameMismatch{name_meta: String, name_specs: String},
     NotAddSpecs,
     WrongLengthPublicKey,
     WrongLengthSignature,
@@ -64,11 +62,10 @@ pub enum NotDecodeable {
 }
 
 pub enum NotFound {
-    NetworkKey,
+    NetworkSpecsKey,
     AddressBookKey(String),
     Url(String),
     AddressBookNetworkName(String),
-    NameVersioned(NameVersioned),
 }
 
 pub enum NeedArgument {
@@ -153,18 +150,17 @@ impl Error {
             },
             Error::NotFound(x) => {
                 match x {
-                    NotFound::NetworkKey => anyhow!("Network key missing in the database."),
+                    NotFound::NetworkSpecsKey => anyhow!("Network specs key missing in the database."),
                     NotFound::AddressBookKey(name) => anyhow!("Address book key {} not found in the database.", name),
                     NotFound::Url(url) => anyhow!("Networks corresponding to url {} not found in the database.", url),
                     NotFound::AddressBookNetworkName(name) => anyhow!("Network {} not found in the address book.", name),
-                    NotFound::NameVersioned(x) => anyhow!("Metadata for {} version {} not in the database.", x.name, x.version),
                 }
             },
             Error::NotSupported => anyhow!("Key combination is not supported. Please file a ticket."),
             Error::AddressBookEmpty => anyhow!("Address book empty."),
             Error::MetadataEmpty => anyhow!("No metadata on record."),
             Error::InputOutputError(e) => anyhow!("IO error. {}", e),
-            Error::NetworkKeyMismatch(network_name) => anyhow!("Network key mismatch in chainspecs in the database for {}.", network_name),
+            Error::NetworkSpecsKeyMismatch(network_name) => anyhow!("Network specs key mismatch in chainspecs in the database for {}.", network_name),
             Error::TwoEntriesAddressEncryption{address, encryption} => anyhow!("Database contains two entries for network with url {} and encryption {}.", address, encryption.show()),
             Error::TwoDefaultsAddress(url) => anyhow!("Database contains two default entries for network with url {}.", url),
             Error::SpecsInDb{name, encryption} => anyhow!("Network specs entry for {} and encryption {} is already in database.", name, encryption.show()),
@@ -189,8 +185,6 @@ impl Error {
             Error::NotLoadTypes => anyhow!("Provided message has no load_types content."),
             Error::NotLoadMetadata => anyhow!("Provided message has no load_metadata content."),
             Error::DamagedMetadata => anyhow!("Metadata in the message is damaged."),
-            Error::NotAddNetwork => anyhow!("Provided message has no add_network content."),
-            Error::MessageNameMismatch{name_meta, name_specs} => anyhow!("Network name in metadata {} does not match the name in network specs {}.", name_meta, name_specs),
             Error::NotAddSpecs => anyhow!("Provided message has no add_specs content."),
             Error::WrongLengthPublicKey => anyhow!("Provided verifier public key has wrong length."),
             Error::WrongLengthSignature => anyhow!("Provided signature has wrong length."),

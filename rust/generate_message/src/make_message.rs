@@ -1,10 +1,10 @@
 use constants::EXPORT_FOLDER;
-use definitions::{crypto::Encryption, metadata::VersionDecoded, qr_transfers::{ContentLoadTypes, ContentLoadMeta, ContentAddNetwork, ContentAddSpecs}};
+use definitions::{crypto::Encryption, metadata::VersionDecoded, qr_transfers::{ContentLoadTypes, ContentLoadMeta, ContentAddSpecs}};
 use meta_reading::decode_metadata::get_meta_const;
 use hex;
 use sp_core::{Pair, ed25519, sr25519, ecdsa};
 use std::convert::TryInto;
-use qrcode_rtx::transform_into_qr_apng;
+use qrcode_rtx::make_pretty_qr;
 use parity_scale_codec::Decode;
 use anyhow;
 
@@ -42,28 +42,9 @@ pub fn make_message (make: Make) -> anyhow::Result<()> {
                 Err(_) => {return Err(Error::NotLoadMetadata.show())},
             }
         },
-        Msg::AddNetwork(vec) => {
-            match ContentAddNetwork::from_vec(&vec).meta_specs() {
-                Ok((meta, network_specs)) => {
-                    match get_meta_const(&meta) {
-                        Ok(version_vector) => {
-                            match VersionDecoded::decode(&mut &version_vector[..]) {
-                                Ok(version) => {
-                                    if version.specname != network_specs.name {return Err(Error::MessageNameMismatch{name_meta: version.specname, name_specs: network_specs.name}.show())}
-                                    (vec, format!("add_network_{}V{}", version.specname, version.spec_version), "c0")
-                                },
-                                Err(_) => {return Err(Error::DamagedMetadata.show())},
-                            }
-                        },
-                        Err(_) => {return Err(Error::DamagedMetadata.show())},
-                    }
-                },
-                Err(_) => {return Err(Error::NotAddNetwork.show())},
-            }
-        },
         Msg::AddSpecs(vec) => {
             match ContentAddSpecs::from_vec(&vec).specs() {
-                Ok(network_specs) => (vec, format!("add_specs_{}", network_specs.name), "c1"),
+                Ok(network_specs) => (vec, format!("add_specs_{}-{}", network_specs.name, network_specs.encryption.show()), "c1"),
                 Err(_) => {return Err(Error::NotAddSpecs.show())},
             }
         },
@@ -83,7 +64,7 @@ pub fn make_message (make: Make) -> anyhow::Result<()> {
                     };
                     let signature = ed25519_pair.sign(&message[..]).0.to_vec();
                     let complete_message = [hex::decode(prelude).expect("known value"), ed25519_pair.public().to_vec(), message, signature].concat();
-                    (complete_message, format!("{}_Alice", name_stub))
+                    (complete_message, format!("{}_Alice-ed25519", name_stub))
                 },
                 VerifierKind::Normal {verifier_public_key, signature} => {
                     let into_pubkey: [u8;32] = match verifier_public_key.try_into() {
@@ -115,7 +96,7 @@ pub fn make_message (make: Make) -> anyhow::Result<()> {
                     };
                     let signature = sr25519_pair.sign(&message[..]).0.to_vec();
                     let complete_message = [hex::decode(prelude).expect("known value"), sr25519_pair.public().to_vec(), message, signature].concat();
-                    (complete_message, format!("{}_Alice", name_stub))
+                    (complete_message, format!("{}_Alice-sr25519", name_stub))
                 },
                 VerifierKind::Normal {verifier_public_key, signature} => {
                     let into_pubkey: [u8;32] = match verifier_public_key.try_into() {
@@ -147,7 +128,7 @@ pub fn make_message (make: Make) -> anyhow::Result<()> {
                     };
                     let signature = ecdsa_pair.sign(&message[..]).0.to_vec();
                     let complete_message = [hex::decode(prelude).expect("known value"), ecdsa_pair.public().0.to_vec(), message, signature].concat();
-                    (complete_message, format!("{}_Alice", name_stub))
+                    (complete_message, format!("{}_Alice-ecdsa", name_stub))
                 },
                 VerifierKind::Normal {verifier_public_key, signature} => {
                     let into_pubkey: [u8;33] = match verifier_public_key.try_into() {
@@ -183,14 +164,14 @@ pub fn make_message (make: Make) -> anyhow::Result<()> {
     
     match make.goal {
         Goal::Qr => {
-            if let Err(e) = transform_into_qr_apng(&complete_message, &output_name) {return Err(Error::Qr(e.to_string()).show())}
+            if let Err(e) = make_pretty_qr(&complete_message, &output_name) {return Err(Error::Qr(e.to_string()).show())}
         },
         Goal::Text => {
             if let Err(e) = std::fs::write(&format!("{}.txt", output_name), &hex::encode(&complete_message)) {return Err(Error::InputOutputError(e.to_string()).show())}
         },
         Goal::Both => {
             if let Err(e) = std::fs::write(&format!("{}.txt", output_name), &hex::encode(&complete_message)) {return Err(Error::InputOutputError(e.to_string()).show())}
-            if let Err(e) = transform_into_qr_apng(&complete_message, &output_name) {return Err(Error::Qr(e.to_string()).show())}
+            if let Err(e) = make_pretty_qr(&complete_message, &output_name) {return Err(Error::Qr(e.to_string()).show())}
         },
     }
     

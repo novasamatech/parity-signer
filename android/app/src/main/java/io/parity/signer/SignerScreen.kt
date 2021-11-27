@@ -1,27 +1,52 @@
 package io.parity.signer
 
-import androidx.compose.runtime.Composable
-import io.parity.signer.screens.HomeScreen
-
 /**
  * All screens metadata for navigation
  */
 enum class SignerScreen() {
-	Home, Keys, Settings;
+	Scan,
+	Keys,
+	Settings,
+	Log;
 }
 
 enum class TransactionState {
-	None, Parsing, Preview, Password, Signed;
+	None,
+	Parsing,
+	Preview,
+	Password,
+	Signed;
 }
 
 enum class KeyManagerModal {
-	None, NewSeed, NewKey, ShowKey, SeedBackup, KeyDeleteConfirm;
+	None,
+	NewSeedSelect,
+	NewSeed,
+	RestoreSeed,
+	NewKey,
+	ShowKey,
+	SeedBackup,
+	SeedDeleteConfirm,
+	KeyDeleteConfirm,
+	SeedSelector,
+	NetworkManager,
+	NetworkDetails,
+	AllKeySelector;
 }
 
 enum class SettingsModal {
-	None, History;
+	None,
+	History;
 }
 
 enum class OnBoardingState {
-	InProgress, No, Yes;
+	InProgress,
+	No,
+	Yes;
+}
+
+enum class SignerAlert {
+	None,
+	Active,
+	Past
 }

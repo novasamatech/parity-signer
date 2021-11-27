@@ -16,15 +16,14 @@ struct TCCall: View {
         }) {
             VStack {
                 HStack {
-                    Text(value.method)
-                        .foregroundColor(Color("textMainColor"))
-                    Text(" from ")
-                        .foregroundColor(Color("AccentColor"))
-                    Text(value.pallet)
+                    Text("Method").foregroundColor(Color("AccentColor"))
+                    Text(value.method_name)
                         .foregroundColor(Color("textMainColor"))
                     Spacer()
-                    Text("?")
+                    if value.docs != "" {
+                        Text("?")
                         .foregroundColor(Color("AccentColor"))
+                    }
                 }
                 if showDoc {
                     Text(AttributedString(fromHexDocs: value.docs) ?? "docs parsing error in iOS, please refer to other sources")
@@ -32,7 +31,7 @@ struct TCCall: View {
                         .background(/*@START_MENU_TOKEN@*//*@PLACEHOLDER=View@*/Color("backgroundCard")/*@END_MENU_TOKEN@*/)
                 }
             }
-        }
+        }.disabled(value.docs == "")
     }
 }
 

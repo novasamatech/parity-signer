@@ -50,8 +50,11 @@ extension SignerDataModel {
                 self.cards.append(contentsOf: (transactionPreview.types_info ?? []))
                 self.cards.append(contentsOf: (transactionPreview.author ?? []))
                 self.cards.append(contentsOf: (transactionPreview.error ?? []))
-                self.cards.append(contentsOf: (transactionPreview.extrinsics ?? []))
+                self.cards.append(contentsOf: (transactionPreview.extensions ?? []))
                 self.cards.append(contentsOf: (transactionPreview.method ?? []))
+                self.cards.append(contentsOf: (transactionPreview.message ?? []))
+                self.cards.append(contentsOf: (transactionPreview.new_specs ?? []))
+                self.cards.append(contentsOf: (transactionPreview.verifier ?? []))
                 self.cards = self.cards.sorted(by: {$0.index < $1.index})
                 //print(self.cards)
                 self.action = transactionPreview.action
@@ -88,11 +91,9 @@ extension SignerDataModel {
     func signTransaction(seedPhrase: String, password: String) {
         var err = ExternError()
         let err_ptr = UnsafeMutablePointer(&err)
-        guard let dataAction = try? JSONEncoder().encode(self.action!.payload) else {
-            return
-        }
-        let stringAction = String(data: dataAction, encoding: .utf8)
-        let res = handle_action(err_ptr, stringAction, seedPhrase, password, Data(self.comment.utf8).base64EncodedString(), self.dbName)
+        //TODO!!!
+        let checksum = self.action?.payload
+        let res = handle_sign(err_ptr, checksum, seedPhrase, password, Data(self.comment.utf8).base64EncodedString(), self.dbName)
         if err_ptr.pointee.code == 0 {
             self.result = String(cString: res!)
             signer_destroy_string(res!)
@@ -102,6 +103,19 @@ extension SignerDataModel {
                 self.transactionError = "QR code generation error"
             }
         } else {
+            self.transactionError = String(cString: err_ptr.pointee.message)
+            print(self.transactionError)
+            signer_destroy_string(err_ptr.pointee.message)
+        }
+    }
+    
+    func handleTransaction() {
+        var err = ExternError()
+        let err_ptr = UnsafeMutablePointer(&err)
+        //TODO!!!
+        let checksum = self.action?.payload
+        handle_stub(err_ptr, checksum, self.dbName)
+        if err_ptr.pointee.code != 0 {
             self.transactionError = String(cString: err_ptr.pointee.message)
             print(self.transactionError)
             signer_destroy_string(err_ptr.pointee.message)

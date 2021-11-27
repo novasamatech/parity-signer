@@ -12,7 +12,7 @@ struct TCID: View {
     var body: some View {
         HStack {
             //TODO: handle error
-            Image(uiImage: UIImage(data: Data(fromHexEncodedString: String(cString: development_test(nil, text)))!)!)
+            Image(uiImage: UIImage(data: Data(fromHexEncodedString: String(cString: base58_identicon(nil, text, 32)))!)!)
             Text(text)
                 .foregroundColor(Color("textMainColor"))
             Spacer()

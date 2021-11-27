@@ -11,12 +11,15 @@ struct SearchKeys: View {
     @EnvironmentObject var data: SignerDataModel
     var body: some View {
         HStack {
+            ZStack {
+                RoundedRectangle(cornerRadius: 8).stroke(Color(data.searchKey == "" ? "buttonPassiveImage" : "buttonActive")).foregroundColor(Color("backgroundColor")).frame(height: 39)
             TextField("find keys", text: $data.searchKey)
                 .autocapitalization(.none)
                 .disableAutocorrection(true)
-                .font(.title)
-                .textFieldStyle(.roundedBorder)
+                .font(.system(size: 12, design: .monospaced))
                 .foregroundColor(Color("textEntryColor"))
+                .padding(8)
+            }
             if (data.searchKey != "") {
                 Button(action:{data.searchKey = ""}) {
                     Image(systemName: "clear").imageScale(.large)

@@ -19,19 +19,25 @@ struct TCFieldName: View {
                     Text(value.name)
                         .foregroundColor(Color("textMainColor"))
                     Spacer()
-                    if value.docs != "" {
+                    if value.docs_field_name + value.path_type + value.docs_type != "" {
                         Text("?")
                             .foregroundColor(Color("AccentColor"))
                     }
                 }
                 .background(/*@START_MENU_TOKEN@*//*@PLACEHOLDER=View@*/Color("backgroundCard")/*@END_MENU_TOKEN@*/)
                 if showDoc {
-                    Text(AttributedString(fromHexDocs: value.docs) ?? "docs parsing error in iOS, please refer to other sources")
-                        .foregroundColor(Color("textMainColor"))
-                        .background(/*@START_MENU_TOKEN@*//*@PLACEHOLDER=View@*/Color("backgroundCard")/*@END_MENU_TOKEN@*/)
+                    VStack {
+                        Text("Path: " + value.path_type)
+                        Text(AttributedString(fromHexDocs: value.docs_field_name) ?? "docs parsing error in iOS, please refer to other sources")
+                            .foregroundColor(Color("textMainColor"))
+                            .background(/*@START_MENU_TOKEN@*//*@PLACEHOLDER=View@*/Color("backgroundCard")/*@END_MENU_TOKEN@*/)
+                        Text(AttributedString(fromHexDocs: value.docs_type) ?? "docs parsing error in iOS, please refer to other sources")
+                            .foregroundColor(Color("textMainColor"))
+                            .background(/*@START_MENU_TOKEN@*//*@PLACEHOLDER=View@*/Color("backgroundCard")/*@END_MENU_TOKEN@*/)
+                    }
                 }
             }
-        }
+        }.disabled(value.docs_field_name + value.path_type + value.docs_type == "")
     }
 }
 

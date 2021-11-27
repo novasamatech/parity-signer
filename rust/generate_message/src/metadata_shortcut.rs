@@ -1,4 +1,3 @@
-use sled::Tree;
 use meta_reading::{decode_metadata::decode_version, fetch_metadata::{fetch_info, fetch_info_with_chainspecs}, interpret_chainspecs::interpret_properties};
 use constants::{COLOR, SECONDARY_COLOR};
 use definitions::{crypto::Encryption, metadata::MetaValues, network_specs::ChainSpecsToSend};
@@ -46,9 +45,9 @@ pub struct MetaSpecsShortCut {
 
 /// Function to process address as &str, fetch metadata, genesis hash, and chainspecs
 /// for it, and output MetaSpecsShortCut value in case of success
-pub fn meta_specs_shortcut (address: &str, address_book: &Tree, chainspecs: &Tree, encryption: Encryption) -> anyhow::Result<MetaSpecsShortCut> {
+pub fn meta_specs_shortcut (address: &str, encryption: Encryption) -> anyhow::Result<MetaSpecsShortCut> {
 
-    let entries = filter_address_book_by_url(address, address_book)?;
+    let entries = filter_address_book_by_url(address)?;
     let new_info = match fetch_info_with_chainspecs(address) {
         Ok(a) => a,
         Err(e) => return Err(Error::FetchFailed{address: address.to_string(), error: e.to_string()}.show()),
@@ -63,12 +62,12 @@ pub fn meta_specs_shortcut (address: &str, address_book: &Tree, chainspecs: &Tre
         Err(e) => return Err(Error::BadNetworkProperties{address: address.to_string(), error: e.to_string()}.show()),
     };
     if entries.len() == 0 {
-        if genesis_hash_in_hot_db (genesis_hash, chainspecs)? {return Err(Error::NoEntriesExpected(address.to_string()).show())}
+        if genesis_hash_in_hot_db (genesis_hash)? {return Err(Error::NoEntriesExpected(address.to_string()).show())}
         let specs = ChainSpecsToSend {
             base58prefix: new_properties.base58prefix,
             color: COLOR.to_string(),
             decimals: new_properties.decimals,
-            encryption,
+            encryption: encryption.clone(),
             genesis_hash,
             logo: meta_values.name.to_string(),
             name: meta_values.name.to_string(),
@@ -84,7 +83,7 @@ pub fn meta_specs_shortcut (address: &str, address_book: &Tree, chainspecs: &Tre
         })
     }
     else {
-        let (specs, update) = process_indices(&entries, chainspecs, encryption)?;
+        let (specs, update) = process_indices(&entries, encryption)?;
         if specs.base58prefix != new_properties.base58prefix {return Err(Error::Base58Changed(address.to_string()).show())}
         if specs.decimals != new_properties.decimals {return Err(Error::DecimalsChanged(address.to_string()).show())}
         if specs.unit != new_properties.unit {return Err(Error::UnitChanged(address.to_string()).show())}

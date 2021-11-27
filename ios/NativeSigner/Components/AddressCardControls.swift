@@ -27,15 +27,15 @@ struct AddressCardControls: View {
                     data.createAddress(password: "")
                 }) {
                     ZStack {
-                        RoundedRectangle(cornerRadius: 10).foregroundColor(Color("backgroundButtonSafe"))
-                        Text("N+1").foregroundColor(Color("cryptoColor"))
+                        RoundedRectangle(cornerRadius: 6).foregroundColor(Color("backgroundButtonSafe"))
+                        Text("N+1").foregroundColor(Color("cryptoColor")).font(.system(size: 12, design: .monospaced))
                     }.frame(width: rowHeight, height: rowHeight)
                 }
                 Button(action: {
                     delete = true
                 }) {
                     ZStack {
-                        RoundedRectangle(cornerRadius: 10).foregroundColor(Color("backgroundButtonDanger"))
+                        RoundedRectangle(cornerRadius: 6).foregroundColor(Color("backgroundButtonDanger"))
                         Image(systemName: "trash.slash").foregroundColor(Color("dangerColor"))
                     }
                     .frame(width: rowHeight, height: rowHeight)
