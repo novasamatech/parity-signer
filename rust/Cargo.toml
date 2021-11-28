@@ -9,6 +9,7 @@ members = [
 	"meta_reading",
 	"parser",
 	"printing_balance",
+	"qr_reader_pc",
 	"qr_reader_phone",
 	"qrcode_rtx",
 	"qrcode_static",
