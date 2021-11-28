@@ -21,6 +21,7 @@ use opencv::{
 const DEFAULT_WIDTH: u32 = 640;
 const DEFAULT_HEIGHT: u32 = 480;
 const MAX_CAMERA_INDEX: i32 = 6;
+const SKIPPED_FRAMES_QTY: u32 = 10;
 
 /// Structure for storing camera settings.
 #[derive(Debug)]
@@ -45,6 +46,7 @@ pub fn run_with_camera(camera_settings: CameraSettings) -> anyhow::Result<String
 	highgui::named_window(window, 1)?;
 
     let mut camera = create_camera(camera_index, DEFAULT_WIDTH, DEFAULT_HEIGHT)?;
+    skip_frames(&mut camera);
 
     let mut out = Ready::NotYet(InProgress::None);
     let mut line = String::new();
@@ -140,6 +142,14 @@ fn print_list_of_cameras() {
     println!("\nList of available devices:");
     for index in indexes {
         println!("Camera index: {}", index);
+    }
+}
+
+fn skip_frames(camera: &mut videoio::VideoCapture) {    
+    for _x in 0..SKIPPED_FRAMES_QTY {
+        if let Ok(false) | Err(_) = camera.grab() {
+            break;
+        }
     }
 }
 
