@@ -63,7 +63,6 @@ extension SignerDataModel {
     
     func addSeed(seedName: String, seedPhrase: String) {
         var err = ExternError()
-        let err_ptr: UnsafeMutablePointer<ExternError> = UnsafeMutablePointer(&err)
         guard let accessFlags = SecAccessControlCreateWithFlags(kCFAllocatorDefault, kSecAttrAccessibleWhenPasscodeSetThisDeviceOnly, .devicePasscode, &error) else {
             print("Access flags could not be allocated")
             print(error ?? "no error code")
@@ -81,41 +80,43 @@ extension SignerDataModel {
             self.lastError = "Seed with this name already exists"
             return
         }
-        let res = try_create_seed(err_ptr, seedName, seedPhrase, 24, dbName)
-        if err_ptr.pointee.code != 0 {
-            self.lastError = String(cString: err_ptr.pointee.message)
-            print("Rust returned error")
-            print(self.lastError)
-            signer_destroy_string(err_ptr.pointee.message)
-            return
+        withUnsafeMutablePointer(to: &err) {err_ptr in
+            let res = try_create_seed(err_ptr, seedName, seedPhrase, 24, dbName)
+            if err_ptr.pointee.code != 0 {
+                self.lastError = String(cString: err_ptr.pointee.message)
+                print("Rust returned error")
+                print(self.lastError)
+                signer_destroy_string(err_ptr.pointee.message)
+                return
+            }
+            let finalSeedPhraseString = String(cString: res!)
+            guard let finalSeedPhrase = finalSeedPhraseString.data(using: .utf8) else {
+                print("could not encode seed phrase")
+                self.lastError = "Seed phrase contains non-0unicode symbols"
+                return
+            }
+            signer_destroy_string(res)
+            print(finalSeedPhrase)
+            let query: [String: Any] = [
+                kSecClass as String: kSecClassGenericPassword,
+                kSecAttrAccessControl as String: accessFlags,
+                kSecAttrAccount as String: seedName,
+                kSecValueData as String: finalSeedPhrase,
+                kSecReturnData as String: true
+            ]
+            var resultAdd: AnyObject?
+            let status = SecItemAdd(query as CFDictionary, &resultAdd)
+            guard status == errSecSuccess else {
+                print("key add failure")
+                print(status)
+                self.lastError = SecCopyErrorMessageString(status, nil)! as String
+                return
+            }
+            self.refreshSeeds()
+            self.selectSeed(seedName: seedName)
+            self.seedBackup = finalSeedPhraseString
+            self.keyManagerModal = .seedBackup
         }
-        let finalSeedPhraseString = String(cString: res!)
-        guard let finalSeedPhrase = finalSeedPhraseString.data(using: .utf8) else {
-            print("could not encode seed phrase")
-            self.lastError = "Seed phrase contains non-0unicode symbols"
-            return
-        }
-        signer_destroy_string(res)
-        print(finalSeedPhrase)
-        let query: [String: Any] = [
-            kSecClass as String: kSecClassGenericPassword,
-            kSecAttrAccessControl as String: accessFlags,
-            kSecAttrAccount as String: seedName,
-            kSecValueData as String: finalSeedPhrase,
-            kSecReturnData as String: true
-        ]
-        var resultAdd: AnyObject?
-        let status = SecItemAdd(query as CFDictionary, &resultAdd)
-        guard status == errSecSuccess else {
-            print("key add failure")
-            print(status)
-            self.lastError = SecCopyErrorMessageString(status, nil)! as String
-            return
-        }
-        self.refreshSeeds()
-        self.selectSeed(seedName: seedName)
-        self.seedBackup = finalSeedPhraseString
-        self.keyManagerModal = .seedBackup
     }
     
     /**
@@ -149,7 +150,8 @@ extension SignerDataModel {
      */
     func selectSeed(seedName: String) {
         self.selectedSeed = seedName
-        self.fetchKeys()
+        //TODO: this all should be part of backend event
+        //self.fetchKeys()
     }
     
     /**
@@ -160,7 +162,8 @@ extension SignerDataModel {
             self.seedBackup = getSeed(seedName: self.selectedSeed, backup: true)
         }
         if self.seedBackup == "" {
-            goBack()
+            //TODO: improve this
+            pushButton(buttonID: .GoBack)
         }
         return self.seedBackup
     }
@@ -171,8 +174,8 @@ extension SignerDataModel {
      */
     func getSeed(seedName: String, backup: Bool = false) -> String {
         var err = ExternError()
-        let err_ptr: UnsafeMutablePointer<ExternError> = UnsafeMutablePointer(&err)
         var item: CFTypeRef?
+        var logSuccess = true
         let query: [String: Any] = [
             kSecClass as String: kSecClassGenericPassword,
             kSecAttrAccount as String: seedName,
@@ -182,22 +185,22 @@ extension SignerDataModel {
         let status = SecItemCopyMatching(query as CFDictionary, &item)
         if status == errSecSuccess {
             if backup {
-                seed_name_was_shown(err_ptr, seedName, self.dbName)
-                if err_ptr.pointee.code == 0 {
-                    return String(data: (item as! CFData) as Data, encoding: .utf8) ?? ""
-                } else {
-                    print("Seed access logging error! This system is broken and should not be used anymore.")
-                    self.lastError = String(cString: err_ptr.pointee.message)
-                    print(self.lastError)
-                    signer_destroy_string(err_ptr.pointee.message)
-                    //Attempt to log this anyway one last time;
-                    //if this fails too - complain to joulu pukki
-                    history_entry_system(nil, "Seed access logging failed!", self.dbName)
-                    return ""
+                withUnsafeMutablePointer(to: &err) {err_ptr in
+                    seed_name_was_shown(err_ptr, seedName, self.dbName)
+                    if err_ptr.pointee.code != 0 {
+                        print("Seed access logging error! This system is broken and should not be used anymore.")
+                        self.lastError = String(cString: err_ptr.pointee.message)
+                        print(self.lastError)
+                        signer_destroy_string(err_ptr.pointee.message)
+                        //Attempt to log this anyway one last time;
+                        //if this fails too - complain to joulu pukki
+                        history_entry_system(nil, "Seed access logging failed!", self.dbName)
+                        logSuccess = false
+                    }
                 }
-            } else {
-                return String(data: (item as! CFData) as Data, encoding: .utf8) ?? ""
+                return logSuccess ? String(data: (item as! CFData) as Data, encoding: .utf8) ?? "" : ""
             }
+            return String(data: (item as! CFData) as Data, encoding: .utf8) ?? ""
         } else {
             self.lastError = SecCopyErrorMessageString(status, nil)! as String
             return ""
@@ -209,7 +212,6 @@ extension SignerDataModel {
      */
     func removeSeed(seedName: String) {
         var err = ExternError()
-        let err_ptr: UnsafeMutablePointer<ExternError> = UnsafeMutablePointer(&err)
         
         let query = [
             kSecClass as String: kSecClassGenericPassword,
@@ -218,16 +220,18 @@ extension SignerDataModel {
         let status = SecItemDelete(query)
         print(status.description)
         if status == errSecSuccess {
-            remove_seed(err_ptr, seedName, dbName)
-            if err_ptr.pointee.code == 0 {
-                self.seedNames = self.seedNames.filter {
-                    $0 != seedName
+            withUnsafeMutablePointer(to: &err) {err_ptr in
+                remove_seed(err_ptr, seedName, dbName)
+                if err_ptr.pointee.code == 0 {
+                    self.seedNames = self.seedNames.filter {
+                        $0 != seedName
+                    }
+                    self.selectedSeed = ""
+                    //self.fetchKeys()
+                } else {
+                    self.lastError = String(cString: err_ptr.pointee.message)
+                    print(self.lastError)
                 }
-                self.selectedSeed = ""
-                self.fetchKeys()
-            } else {
-                self.lastError = String(cString: err_ptr.pointee.message)
-                print(self.lastError)
             }
         } else {
             print(seedName)

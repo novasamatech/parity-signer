@@ -21,7 +21,6 @@ struct NewSeedScreen: View {
     
     var body: some View {
         ZStack{
-            ModalBackdrop()
             VStack {
                 VStack(alignment: .leading) {
                     Text("New Seed").font(.title)

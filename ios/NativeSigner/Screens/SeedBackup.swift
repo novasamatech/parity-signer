@@ -12,7 +12,6 @@ struct SeedBackup: View {
     @State var phrase = ""
     var body: some View {
         ZStack{
-            ModalBackdrop()
             VStack {
                 SeedCardForManager(seedName: data.selectedSeed)
                 Text("Backup your seed phrase!").font(.headline)

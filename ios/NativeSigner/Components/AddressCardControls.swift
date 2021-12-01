@@ -13,7 +13,8 @@ struct AddressCardControls: View {
     var rowHeight: CGFloat
     @State private var delete = false
     var body: some View {
-        if data.getMultiSelectionMode() {
+        Text("multicontrol")
+        /*if data.getMultiSelectionMode() {
             if data.multiSelected.contains(address) {
                 Image(systemName: "checkmark.circle.fill").foregroundColor(Color("AccentColor")).imageScale(.large)
             } else {
@@ -54,6 +55,7 @@ struct AddressCardControls: View {
                 }
             }
         }
+         */
     }
 }
 

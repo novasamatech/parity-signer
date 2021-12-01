@@ -29,26 +29,22 @@ struct MultiselectBottomControl: View {
                         secondaryButton: .destructive(
                             Text("Delete"),
                             action: {
-                                let cruncher = data.multiSelected
-                                data.multiSelected = []
-                                for i in cruncher {
-                                    data.selectedAddress = i
-                                    data.deleteSelectedAddress()
-                                }
+                                //TODO: buttonpush
                             }
                         )
                     )
                 })
                 Spacer()
                 Button(action: {
-                    data.selectedAddress = data.multiSelected.first
-                    data.keyManagerModal = .showKey
+                    //TODO: buttonpush
+                    //data.selectedAddress = data.multiSelected.first
+                    //data.keyManagerModal = .showKey
                 }) {
                     Text("Export")
                 }
             }
             HStack {
-                Text(String(data.multiSelected.count))
+                Text(String(0 /*data.multiSelected.count*/))
                 Text("addresses selected")
             }
         }

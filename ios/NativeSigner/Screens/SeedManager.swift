@@ -15,7 +15,6 @@ struct SeedManager: View {
     @State var removeSeed = ""
     var body: some View {
         ZStack {
-            ModalBackdrop()
             VStack {
                 ScrollView {
                     LazyVStack {

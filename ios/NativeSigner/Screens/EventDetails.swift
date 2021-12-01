@@ -11,6 +11,7 @@ struct EventDetails: View {
     @EnvironmentObject var data: SignerDataModel
     var body: some View {
         VStack {
+            /*
         Text(data.selectedRecord?.timestamp ?? "Timing error")
         ScrollView {
             LazyVStack {
@@ -20,10 +21,12 @@ struct EventDetails: View {
                         .padding(.horizontal, 8)
                 }
             }
+             */
+            Text("Details")
         }
     }
 }
-}
+
 
 /*
  struct EventDetails_Previews: PreviewProvider {

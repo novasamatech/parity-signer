@@ -57,11 +57,12 @@ extension Address {
         return self.path == "" && self.has_password == "false"
     }
 }
-
+/*
 /**
  * Address-related operations in data model
  */
 extension SignerDataModel {
+    
     /**
      * Refresh list of known addresses
      */
@@ -326,4 +327,5 @@ extension SignerDataModel {
             self.selectedAddress = nil
         }
     }
-}
+     
+}*/

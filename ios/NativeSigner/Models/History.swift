@@ -186,35 +186,6 @@ struct History: Decodable {
     var events: [Event]
 }
 
-extension SignerDataModel {
-    func getHistory() {
-        var err = ExternError()
-        let err_ptr: UnsafeMutablePointer<ExternError> = UnsafeMutablePointer(&err)
-        let res = print_history(err_ptr, self.dbName)
-        if err_ptr.pointee.code == 0 {
-            if let historyJSON = String(cString: res!).data(using: .utf8) {
-                guard let history = try? JSONDecoder().decode([History].self, from: historyJSON) else {
-                    print("JSON decoder failed on history")
-                    print(String(cString: res!))
-                    print(historyJSON)
-                    signer_destroy_string(res!)
-                    return
-                }
-                print(self.history)
-                print(String(cString: res!))
-                self.history = history.sorted(by: {$0.order > $1.order})
-            } else {
-                print("keysJSON corrupted")
-            }
-            signer_destroy_string(res!)
-        } else {
-            self.lastError = String(cString: err_ptr.pointee.message)
-            print(self.lastError)
-            signer_destroy_string(err_ptr.pointee.message)
-        }
-    }
-}
-
 func recoverTransaction(transaction: String) -> [TransactionCard] {
     print(transaction)
     

@@ -18,7 +18,7 @@ struct AddressCard: View {
     let rowHeight: CGFloat = 28
     var body: some View {
         ZStack {
-            RoundedRectangle(cornerRadius: 4).foregroundColor(Color(data.selectedAddress == address ? "backgroundActive" : "backgroundCard")).frame(height: 44)
+            RoundedRectangle(cornerRadius: 4).foregroundColor(Color(false ? "backgroundActive" : "backgroundCard")).frame(height: 44)
             HStack {
                 Image(uiImage: UIImage(data: Data(fromHexEncodedString: String(cString: base58_identicon(nil, address.ss58, 32))) ?? Data()) ?? UIImage())
                     .resizable(resizingMode: .stretch)
@@ -38,7 +38,7 @@ struct AddressCard: View {
                         }
                     }.font(.system(size: 12, weight: .semibold, design: .monospaced))
                     //Here we could have shortened base58 address when buttons are shown, but we don't need to
-                    Text((data.selectedAddress == address && data.keyManagerModal == .none) ? address.truncateBase58() : address.truncateBase58())
+                    Text(address.truncateBase58())
                         .foregroundColor(Color("textFadedColor"))
                         .font(.system(size: 12, design: .monospaced))
                 }
@@ -46,11 +46,12 @@ struct AddressCard: View {
                 if data.keyManagerModal == .none {
                     AddressCardControls(address: address, rowHeight: rowHeight+11)
                 }
+                /*
                 if (data.keyManagerModal == .showKey && data.getMultiSelectionMode()) {
                     Text(String((data.multiSelected.firstIndex(of: address) ?? -1) + 1) + "/" + String(data.multiSelected.count))
-                }
+                }*/
             }.padding(.horizontal, 8)
-        }
+        }/*
         .gesture(
             TapGesture()
                 .onEnded { _ in
@@ -93,14 +94,6 @@ struct AddressCard: View {
                         }
                     }
                 })
-        )
+        )*/
     }
 }
-
-/*
- struct IdentityCard_Previews: PreviewProvider {
- static var previews: some View {
- IdentityCard(identity: Identity.identityData[0]).previewLayout(.sizeThatFits)
- }
- }
- */

@@ -15,44 +15,37 @@ import Network //to detect network connection and raise alert
  * Object to store all data; since the data really is mostly stored in RustNative side, just one object (to describe it) is used here.
  */
 class SignerDataModel: ObservableObject {
+    
+    //Action handler
+    var actionAvailable = true //debouncer
+    @Published var actionResult: ActionResult = ActionResult() //Screen state should pretty much be here
+    let debounceTime: Double = 0.2 //Debounce time
+    
     //Data state
     @Published var seedNames: [String] = []
-    @Published var networks: [Network] = []
-    @Published var addresses: [Address] = []
     @Published var onboardingDone: Bool = false
     @Published var lastError: String = ""
-    @Published var networkSettings: NetworkSettings?
-    @Published var generalVerifier: Verifier?
     
     //Key manager state
     @Published var selectedSeed: String = ""
-    @Published var selectedNetwork: Network?
-    @Published var selectedAddress: Address?
     @Published var searchKey: String = ""
     @Published var suggestedPath: String = "//"
     @Published var suggestedName: String = ""
-    @Published var multiSelected: [Address] = []
-    
-    //History screen data state
-    @Published var history: [History] = []
-    @Published var selectedRecord: History?
     
     //Navigation
-    @Published var signerScreen: SignerScreen = .Log
     @Published var keyManagerModal: KeyManagerModal = .none
-    @Published var settingsModal: SettingsModal = .none
     @Published var transactionState: TransactionState = .none
     
     //Transaction content
-    @Published var cards: [TransactionCard] = []
     @Published var payloadStr: String = ""
     @Published var transactionError: String = ""
-    @Published var action: Action?
     @Published var qr: UIImage?
     @Published var result: String? //TODO: remove this?
-    @Published var author: Author?
     @Published var comment: String = ""
     @Published var resetCamera: Bool = false
+    @Published var cards: [TransactionCard] = []
+    @Published var action: Action?
+    @Published var author: Author?
     
     //internal boilerplate
     var error: Unmanaged<CFError>?
@@ -96,23 +89,6 @@ class SignerDataModel: ObservableObject {
      * Should not call stuff in signer.h
      */
     func refreshUI() {
-        self.seedBackup = ""
-        self.lastError = ""
-        disableMutliSelectionMode()
-        self.networkSettings = nil
-        self.selectedRecord = nil
-        resetTransaction()
-        if self.seedNames.count == 0 {
-            self.signerScreen = .Keys
-            self.keyManagerModal = .newSeed
-        } else {
-            self.keyManagerModal = .seedSelector
-        }
-        self.settingsModal = .none
-        if self.signerScreen == .Scan {
-            self.resetCamera = true
-        }
-        self.searchKey = ""
     }
     
     /**
@@ -122,16 +98,6 @@ class SignerDataModel: ObservableObject {
     func totalRefresh() {
         print("heavy reset")
         self.checkAlert()
-        self.refreshNetworks()
-        if self.networks.count > 0 {
-            self.selectedNetwork = self.networks[0]
-            self.fetchKeys()
-        } else {
-            print("No networks found; not handled yet")
-        }
-        self.getHistory()
-        self.getGeneralVerifier()
-        resetTransaction()
         self.refreshUI()
     }
 }
@@ -145,7 +111,6 @@ extension SignerDataModel {
      */
     func onboard(jailbreak: Bool = false) {
         var err = ExternError()
-        let err_ptr: UnsafeMutablePointer<ExternError> = UnsafeMutablePointer(&err)
         do {
             print("onboarding...")
             if let source = Bundle.main.url(forResource: "Database", withExtension: "") {
@@ -161,22 +126,24 @@ extension SignerDataModel {
                     }
                 }
                 try FileManager.default.copyItem(at: source, to: destination)
-                if jailbreak {
-                    init_history_no_cert(err_ptr, self.dbName)
-                } else {
-                    init_history_with_cert(err_ptr, self.dbName)
-                }
-                if (err_ptr.pointee.code == 0) {
-                    self.onboardingDone = true
-                    if self.canaryDead {
-                        device_was_online(nil, self.dbName)
+                withUnsafeMutablePointer(to: &err) {err_ptr in
+                    if jailbreak {
+                        init_history_no_cert(err_ptr, self.dbName)
+                    } else {
+                        init_history_with_cert(err_ptr, self.dbName)
                     }
-                    self.totalRefresh()
-                    self.refreshSeeds()
-                } else {
-                    print("History init failed! This will not do.")
-                    print(String(cString: err_ptr.pointee.message))
-                    signer_destroy_string(err_ptr.pointee.message)
+                    if (err_ptr.pointee.code == 0) {
+                        self.onboardingDone = true
+                        if self.canaryDead {
+                            device_was_online(nil, self.dbName)
+                        }
+                        self.totalRefresh()
+                        self.refreshSeeds()
+                    } else {
+                        print("History init failed! This will not do.")
+                        print(String(cString: err_ptr.pointee.message))
+                        signer_destroy_string(err_ptr.pointee.message)
+                    }
                 }
             }
         } catch {
@@ -205,8 +172,6 @@ extension SignerDataModel {
         SecItemDelete(query)
         self.onboardingDone = false
         self.seedNames = []
-        self.signerScreen = .Keys
-        self.keyManagerModal = .newSeed
     }
     
     /**
@@ -215,24 +180,6 @@ extension SignerDataModel {
     func jailbreak() {
         self.wipe()
         self.onboard(jailbreak: true)
-    }
-    
-    func getGeneralVerifier() {
-        var err = ExternError()
-        let err_ptr: UnsafeMutablePointer<ExternError> = UnsafeMutablePointer(&err)
-        let res = get_general_certificate(err_ptr, dbName)
-        if (err_ptr.pointee.code == 0) {
-            if let generalCert = String(cString: res!).data(using: .utf8) {
-                self.generalVerifier = try? JSONDecoder().decode(Verifier.self, from: generalCert)
-            } else {
-                print("General verifier corrupted")
-            }
-            signer_destroy_string(res!)
-        } else {
-            print("General verifier fetch failed")
-            print(String(cString: err_ptr.pointee.message))
-            signer_destroy_string(err_ptr.pointee.message)
-        }
     }
 }
 

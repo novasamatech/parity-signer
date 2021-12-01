@@ -20,16 +20,17 @@ extension Network {
     static var networkData: [Network] {
         [
             Network(key: "111111", color: "0xFFFFFF", logo: "1", order: "0", secondaryColor: "0xFFFFFF", title: "Ololonet"),
-            Network(key: "111111", color: "0xFFFFFF", logo: "2", order: "1", secondaryColor: "0xFFFFFF", title: "Pyshpysh"),
-            Network(key: "111111", color: "0xFFFFFF", logo: "3", order: "2", secondaryColor: "0xFFFFFF", title: "Kekeke"),
-            Network(key: "111111", color: "0xFFFFFF", logo: "4", order: "3", secondaryColor: "0xFFFFFF", title: "Kuskuskus")
+            Network(key: "111112", color: "0xFFFFFF", logo: "2", order: "1", secondaryColor: "0xFFFFFF", title: "Pyshpysh"),
+            Network(key: "111113", color: "0xFFFFFF", logo: "3", order: "2", secondaryColor: "0xFFFFFF", title: "Kekeke"),
+            Network(key: "111114", color: "0xFFFFFF", logo: "4", order: "3", secondaryColor: "0xFFFFFF", title: "Kuskuskus")
         ]
     }
 }
-
+/*
 //MARK: network management
 
 extension SignerDataModel {
+    
     func refreshNetworks() {
         var err = ExternError()
         let err_ptr: UnsafeMutablePointer<ExternError> = UnsafeMutablePointer(&err)
@@ -77,4 +78,6 @@ extension SignerDataModel {
             signer_destroy_string(err_ptr.pointee.message)
         }
     }
+     
 }
+*/

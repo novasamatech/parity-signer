@@ -15,15 +15,15 @@ struct DocumentModal: View {
             ModalBackdrop()
             VStack {
                 HStack {
-                    Button(action: {data.settingsModal = .showDocument(.about)}) {
+                    Button(action: {}) {
                         Text("About")
                     }
                     Spacer()
-                    Button(action: {data.settingsModal = .showDocument(.toc)}) {
+                    Button(action: {}) {
                         Text("Terms")
                     }
                     Spacer()
-                    Button(action: {data.settingsModal = .showDocument(.pp)}) {
+                    Button(action: {}) {
                         Text("Privacy")
                     }
                 }

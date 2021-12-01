@@ -65,30 +65,26 @@ struct SettingsScreen: View {
                 })
                 .padding()
                 Button(action: {
-                    data.settingsModal = .showDocument(.about)
+                    //TODO
                 }) {
                     Text("Documentation")
                 }
                 .padding()
                 Spacer()
+                /*
                 HStack {
-                    Image(uiImage: UIImage(data: Data(fromHexEncodedString: String(cString: identicon(nil, data.generalVerifier?.hex ?? "", 32))) ?? Data()) ?? UIImage())
+                    Image(uiImage: UIImage(data: Data(fromHexEncodedString: String(cString: identicon(nil, "", 32))) ?? Data()) ?? UIImage())
                         .resizable(resizingMode: .stretch)
                         .frame(width: 42, height: 42)
                     VStack {
                         Text("General verifier certificate").foregroundColor(Color("textMainColor"))
-                        Text(data.generalVerifier?.hex ?? "unknown").foregroundColor(Color("cryptoColor"))
-                        Text("encryption: " + (data.generalVerifier?.encryption ?? "unknown")).foregroundColor(Color("textFadedColor"))
+                        //Text(data.generalVerifier?.hex ?? "unknown").foregroundColor(Color("cryptoColor"))
+                        //Text("encryption: " + (data.generalVerifier?.encryption ?? "unknown")).foregroundColor(Color("textFadedColor"))
                     }
                 }.padding().background(Color("backgroundCard"))
+                 */
             }
             .background(/*@START_MENU_TOKEN@*//*@PLACEHOLDER=View@*/Color("backgroundColor")/*@END_MENU_TOKEN@*/)
-            switch(data.settingsModal) {
-            case .showDocument(let document):
-                DocumentModal(document: document)
-            case .none:
-                EmptyView()
-            }
         }
     }
 }

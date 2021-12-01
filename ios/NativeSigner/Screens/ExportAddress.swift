@@ -14,24 +14,24 @@ struct ExportAddress: View {
     @State var showDetails = false
     var body: some View {
         ZStack {
-            ModalBackdrop()
             VStack {
+                /*
                 NetworkCard(network: data.selectedNetwork)
                 if data.selectedAddress != nil {
                     AddressCard(address: data.selectedAddress!)
-                }
+                }*/
                 if image == nil || showDetails {
                     HStack {
                         Text("Base58 key: ")
-                        Text(data.selectedAddress?.ss58 ?? "unknown")
+                        //Text(data.selectedAddress?.ss58 ?? "unknown")
                     }.padding()
                     HStack {
                         Text("Hex key: ")
-                        Text(data.selectedAddress?.public_key ?? "unknown")
+                        //Text(data.selectedAddress?.public_key ?? "unknown")
                     }.padding()
                     HStack {
                         Text("Seed name: ")
-                        Text(data.selectedAddress?.seed_name ?? "unknown")
+                        //Text(data.selectedAddress?.seed_name ?? "unknown")
                     }.padding()
                 } else {
                     Image(uiImage: image!)
@@ -42,13 +42,13 @@ struct ExportAddress: View {
             .foregroundColor(Color("textMainColor"))
         }
         .onAppear {
-            data.lastError = ""
+            /*data.lastError = ""
             if data.selectedAddress != nil {
                 image = data.exportIdentityQR()
-            }
+            }*/
         }
         .onDisappear {
-            data.selectedAddress = nil
+            //data.selectedAddress = nil
         }
         .gesture(
             DragGesture().onEnded {drag in
@@ -56,14 +56,15 @@ struct ExportAddress: View {
                     showDetails.toggle()
                 } else {
                     if drag.translation.width > 20 {
-                        data.selectNextAddress()
+                        //data.selectNextAddress()
                     }
                     if drag.translation.width < -20 {
-                        data.selectPreviousAddress()
+                        //data.selectPreviousAddress()
                     }
+                    /*
                     if data.selectedAddress != nil {
                         image = data.exportIdentityQR()
-                    }
+                    }*/
                 }
             }
         )

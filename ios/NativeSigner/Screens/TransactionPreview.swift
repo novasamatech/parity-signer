@@ -19,9 +19,10 @@ struct TransactionPreview: View {
                             TransactionCardView(card: card)
                         }
                     }
+                    /*
                     if (data.action?.type == "sign") {
                         TransactionCommentInput()
-                    }
+                    }*/
                 }
                 Spacer()
                 HStack {

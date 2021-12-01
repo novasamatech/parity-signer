@@ -11,7 +11,16 @@
 import Foundation
 
 struct ActionResult: Decodable {
-    var screen: SignerScreen?
+    var screen: SignerScreen
+    var screenLabel: String
+    var back: Bool
+    
+    //TODO: maybe replace explicits with rust call
+    init() {
+        screen = .Log
+        screenLabel = "Log"
+        back = false
+    }
 }
 
 /**
@@ -22,6 +31,17 @@ enum SignerScreen: String, Decodable {
     case Keys
     case Settings
     case Log
+    case LogDetails
+    case Transaction
+    case SeedSelector
+    case KeyDetails
+    case Backup
+    case NewSeed
+    case RecoverSeedName
+    case RecoverSeedPhrase
+    case DeriveKey
+    case Verifier
+    case ManageNetwork
 }
 
 /**
@@ -50,19 +70,12 @@ enum KeyManagerModal: Equatable {
     case networkDetails
 }
 
-/**
- * Modals shown in settings screen
- */
-enum SettingsModal: Equatable {
-    case none
-    case showDocument(ShownDocument)
-}
-
 enum ButtonID {
     case NavbarLog
     case NavbarScan
     case NavbarKeys
     case NavbarSettings
+    case GoBack
 }
 
 /**
@@ -71,103 +84,34 @@ enum ButtonID {
  */
 extension SignerDataModel {
     func pushButton(buttonID: ButtonID) {
-        var err = ExternError()
-        let err_ptr: UnsafeMutablePointer<ExternError> = UnsafeMutablePointer(&err)
-        let res = act(err_ptr, String(describing: self.signerScreen), String(describing: buttonID), "")
-        if (err_ptr.pointee.code == 0) {
-            print(String(cString: res!))
-            if let actionResultJSON = String(cString: res!).data(using: .utf8) {
-                print(actionResultJSON)
-                if let actionResult = try? JSONDecoder().decode(ActionResult.self, from: actionResultJSON)
-                {
-                    print(actionResult)
-                    if (actionResult.screen != nil) {
-                        signerScreen = actionResult.screen!
+        print(buttonID)
+        //Poor man's mutex; just because it's really managed by UI abstraction
+        if actionAvailable {
+            /** No returns below or things will stall! **/
+            actionAvailable = false
+            var err = ExternError()
+            withUnsafeMutablePointer(to: &err) {err_ptr in
+                let res = act(err_ptr, "", String(describing: buttonID), "")
+                if (err_ptr.pointee.code == 0) {
+                    print(String(cString: res!))
+                    if let actionResultJSON = String(cString: res!).data(using: .utf8) {
+                        print(actionResultJSON)
+                        if let newActionResult = try? JSONDecoder().decode(ActionResult.self, from: actionResultJSON)
+                        {
+                            print(newActionResult)
+                            actionResult = newActionResult
+                        } else {
+                            print("bushing button failed on decoding!")
+                        }
                     }
+                    signer_destroy_string(res!)
                 } else {
-                    print("bushing button failed on decoding!")
+                    print("pushing button failed")
                 }
             }
-            signer_destroy_string(res!)
-        } else {
-            print("pushing button failed")
-        }
-    }
-    
-    /**
-     * Event for back action
-     * Could be more complicated but should it?
-     */
-    func goBack() {
-        switch self.signerScreen {
-        case .Log:
-            self.selectedRecord = nil
-        case .Scan:
-            self.transactionState = .none
-        case .Keys:
-            switch self.keyManagerModal {
-            case .seedSelector:
-                self.keyManagerModal = .seedSelector
-            case .none:
-                self.keyManagerModal = .seedSelector
-            case .newSeed:
-                self.keyManagerModal = .seedSelector
-            case .seedBackup:
-                self.keyManagerModal = .seedSelector
-            default:
-                self.keyManagerModal = .none
-            }
-        case .Settings:
-            self.settingsModal = .none
-        }
-    }
-    
-    /**
-     * Returns true if back navigation button should not be shown
-     */
-    func isNavBottom() -> Bool {
-        return (self.transactionState == .none && self.keyManagerModal == .seedSelector && self.settingsModal == .none && self.selectedRecord == nil)
-    }
-    
-    /**
-     * Logic behind screen name in top bar
-     */
-    func getScreenName() -> String {
-        switch self.signerScreen {
-        case .Scan:
-            switch self.transactionState {
-            case .none:
-                return "Scan"
-            case .parsing:
-                return "Parsing"
-            case .preview:
-                return "Payload"
-            case .password:
-                return "Password"
-            case .signed:
-                return "Scan to publish"
-            }
-        case .Keys:
-            switch self.keyManagerModal {
-            case .seedSelector:
-                return "Select Seed"
-            case .newKey:
-                return "New Derived Key"
-            case .showKey:
-                return (self.selectedAddress?.isRoot() ?? false) ? "Seed Key" : "Derived Key"
-            case .seedBackup:
-                return "Backup seed"
-            default:
-                return ""
-            }
-        case .Settings:
-            return ""
-        case .Log:
-            if self.selectedRecord == nil {
-                return ""
-            } else {
-                return "Event"
-            }
+            //Boink! debounce is here
+            Timer.scheduledTimer(withTimeInterval: debounceTime, repeats: false, block: {_ in self.actionAvailable = true})
+            /** Return is allowed again **/
         }
     }
 }

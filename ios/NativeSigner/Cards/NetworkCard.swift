@@ -28,7 +28,7 @@ struct NetworkCard: View {
             Text(network?.title ?? "None")
                 .font(.headline)
                 .foregroundColor(Color("textMainColor"))
-        }.foregroundColor(Color(network == data.selectedNetwork ? "textMainColor" : "textFadedColor"))
+        }.foregroundColor(Color(true ? "textMainColor" : "textFadedColor"))
         //.background(Color(data.selectedNetwork == network ? "backgroundActive" : "backgroundCard"))
     }
 }

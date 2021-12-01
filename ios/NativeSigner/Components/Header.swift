@@ -11,28 +11,34 @@ struct Header: View {
     @EnvironmentObject var data: SignerDataModel
     var body: some View {
         HStack {
-            if data.getMultiSelectionMode() && data.keyManagerModal == .none {
-                Button(action: {data.multiSelected = []}) {
+            /*
+            if false{
+                Button(action: {
+                    //TODO: buttonpush
+                }) {
                     SmallButton(text: "Cancel")
                 }
             } else {
-                if !data.isNavBottom() {
+                if data.actionResult.back {
                     Button(action: {
-                        data.goBack()
+                        data.pushButton(buttonID: .GoBack)
                     }) {
                         Image(systemName: "chevron.left").imageScale(.large)
                     }
                 }
-            }
+            }*/
             Spacer()
-            Text(data.getScreenName())
+            Text(data.actionResult.screenLabel)
             Spacer()
-            if data.getMultiSelectionMode() && data.keyManagerModal == .none {
-                Button(action: {data.multiSelected = data.addresses}) {
+            /*
+            if false {
+                Button(action: {
+                    //TODO: Buttonpush
+                }) {
                     SmallButton(text: "Select all")
                 }
-            }
-            if (data.keyManagerModal == .seedSelector && data.signerScreen == .Keys && !data.alert) {
+            }*/
+            if (true) {
                 Button(action: {
                     data.keyManagerModal = .newSeed
                 }) {

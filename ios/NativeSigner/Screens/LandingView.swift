@@ -14,12 +14,13 @@ struct LandingView: View {
     @State var accept = false
     var body: some View {
         VStack {
+            /*
             switch data.settingsModal {
             case .showDocument(let doc):
                 DocumentModal(document: doc)
             default:
                 Text("Documentation Error")
-            }
+            }*/
             Button(action: {
                 tacAccept.toggle()
             }) {
@@ -55,9 +56,6 @@ struct LandingView: View {
                     secondaryButton: .default(Text("Accept"), action: {data.onboard()})
                 )
             })
-        }
-        .onAppear {
-            data.settingsModal = .showDocument(.toc)
         }
     }
 }

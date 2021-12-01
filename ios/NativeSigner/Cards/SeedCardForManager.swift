@@ -14,10 +14,11 @@ struct SeedCardForManager: View {
         ZStack {
             RoundedRectangle(cornerRadius: 4).foregroundColor(Color("backgroundCard")).frame(height: 44)
             HStack {
+                /*
                 Image(uiImage: data.getRootIdenticon(seedName: seedName))
                     .resizable(resizingMode: .stretch)
                     .frame(width: 28, height: 28)
-                
+                */
                 if seedName == "" {
                     Text("Select seed")
                         .foregroundColor(Color("textMainColor"))

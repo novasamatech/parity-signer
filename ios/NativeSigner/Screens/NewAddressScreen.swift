@@ -22,11 +22,10 @@ struct NewAddressScreen: View {
     
     var body: some View {
         ZStack {
-            ModalBackdrop()
             ScrollView {
                 Text("FROM").font(.footnote).foregroundColor(Color("textMainColor"))
                 SeedCardForManager(seedName: data.selectedSeed)
-                NetworkCard(network: data.selectedNetwork).padding(.bottom, 10)
+                //NetworkCard(network: data.selectedNetwork).padding(.bottom, 10)
                 if !data.lastError.isEmpty {
                     Text(data.lastError)
                         .foregroundColor(.red)
@@ -93,10 +92,7 @@ struct NewAddressScreen: View {
                 }.padding()
                 HStack {
                     Button(action: {
-                        data.createAddress(password: password)
-                        if data.lastError == "" {
-                            data.keyManagerModal = .none
-                        }
+                        //TODO: buttonpush
                     }) {
                         Text("Create")
                             .font(.system(size: 15))

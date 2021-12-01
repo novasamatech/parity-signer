@@ -47,22 +47,20 @@ struct NavbarShield: View {
                     )
                 })
             } else {
-                if (data.signerScreen == .Log) {
-                    Button(action: {
-                        alert = true
-                    }) {
-                        Image(systemName: "shield")
-                            .imageScale(.large)
-                            .foregroundColor(Color("AccentColor"))
-                    }
-                    .alert(isPresented: $alert, content: {
-                        Alert(
-                            title: Text("Signer is secure"),
-                            message: Text("Please proceed"),
-                            dismissButton: .cancel(Text("Ok"))
-                        )
-                    })
+                Button(action: {
+                    alert = true
+                }) {
+                    Image(systemName: "shield")
+                        .imageScale(.large)
+                        .foregroundColor(Color("AccentColor"))
                 }
+                .alert(isPresented: $alert, content: {
+                    Alert(
+                        title: Text("Signer is secure"),
+                        message: Text("Please proceed"),
+                        dismissButton: .cancel(Text("Ok"))
+                    )
+                })
             }
         }
     }
