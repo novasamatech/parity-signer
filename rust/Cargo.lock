@@ -1379,7 +1379,11 @@ dependencies = [
 name = "navigator"
 version = "0.1.0"
 dependencies = [
+ "db_handling",
  "lazy_static",
+ "plot_icon",
+ "transaction_parsing",
+ "transaction_signing",
 ]
 
 [[package]]

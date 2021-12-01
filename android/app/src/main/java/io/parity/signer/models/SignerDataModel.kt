@@ -84,9 +84,6 @@ class SignerDataModel : ViewModel() {
 	//TODO: keeping super secret seeds in questionably managed observable must be studied critically
 	internal val _backupSeedPhrase = MutableLiveData("")
 
-	//History
-	private val _history = MutableLiveData(JSONArray())
-
 	//Error
 	internal val _lastError = MutableLiveData("")
 
@@ -122,8 +119,6 @@ class SignerDataModel : ViewModel() {
 	val seedNames: LiveData<Array<String>> = _seedNames
 	val selectedSeed: LiveData<String> = _selectedSeed
 	val backupSeedPhrase: LiveData<String> = _backupSeedPhrase
-
-	val history: LiveData<JSONArray> = _history
 
 	var generalCertificate: LiveData<JSONObject> = _generalCertificate
 
@@ -338,32 +333,17 @@ class SignerDataModel : ViewModel() {
 		if (checkRefresh) _onBoardingDone.value =
 			OnBoardingState.Yes else _onBoardingDone.value = OnBoardingState.No
 		if (checkRefresh) {
+			initNavigation(dbName, seedNames.value?.joinToString(",")?:"")
+			pushButton(ButtonID.NavbarLog)
 			refreshNetworks()
 			_selectedNetwork.value = networks.value?.optJSONObject(0)
 				?: JSONObject()
 			refreshSeedNames()
 			fetchKeys()
-			refreshHistory()
 			refreshGUI()
 			getGeneralVerifier()
 			clearTransaction()
 			if (signerScreen.value == null) pushButton(ButtonID.NavbarLog)
-		}
-	}
-
-	/**
-	 * Get history from db; should bhe run on log screen appearance
-	 */
-	internal fun refreshHistory() {
-		try {
-			_history.value = sortHistory(JSONArray(historyPrintHistory(dbName)))
-			_alert.value = if (historyGetWarnings(dbName)) {
-				SignerAlert.Past
-			} else {
-				SignerAlert.None
-			}
-		} catch (e: java.lang.Exception) {
-			Log.e("History refresh error!", e.toString())
 		}
 	}
 
@@ -416,10 +396,14 @@ class SignerDataModel : ViewModel() {
 	//MARK: rust native section begin
 
 	external fun backendAction(
-		origin: String,
 		action: String,
 		details: String
 	): String
+
+	external fun initNavigation(
+		dbname: String,
+		seedNames: String
+	);
 
 	external fun substrateExportPubkey(
 		address: String,
@@ -499,7 +483,6 @@ class SignerDataModel : ViewModel() {
 	)
 
 	external fun substrateRemoveSeed(seedName: String, dbname: String)
-	external fun historyPrintHistory(dbname: String): String
 	external fun historyClearHistory(dbname: String)
 	external fun historyInitHistoryWithCert(dbname: String)
 	external fun historyInitHistoryNoCert(dbname: String)

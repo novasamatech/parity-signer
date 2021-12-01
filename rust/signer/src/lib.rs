@@ -29,12 +29,20 @@ mod export;
 export! {
     @Java_io_parity_signer_models_SignerDataModel_backendAction
     fn act(
-        origin: &str,
         action: &str,
         details: &str
     ) -> String {
-        navigator::do_action(origin, action, details)
+        navigator::do_action(action, details)
     }
+
+    @Java_io_parity_signer_models_SignerDataModel_initNavigation
+    fn init_navigation(
+        dbname: &str,
+        seed_names: &str
+    ) -> () {
+        navigator::init_navigation(dbname, seed_names)
+    }
+
 
 	@Java_io_parity_signer_models_SignerDataModel_substrateExportPubkey
 	fn export_pubkey(

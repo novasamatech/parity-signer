@@ -8,8 +8,11 @@ use lazy_static::lazy_static;
 pub mod screens;
 use screens::Screen;
 
+pub mod modals;
+use modals::Modal;
+
 mod navstate;
-use navstate::Navstate;
+use navstate::{Navstate, State};
 
 mod actions;
 use actions::Action;
@@ -20,30 +23,32 @@ lazy_static!{
 ///
 ///Navigation state is unsafe either way, since it has to persist
 ///No matter if here or beyond FFI
-   pub static ref STATE: Mutex<Navstate> = Mutex::new(Navstate{
-        screen: Screen::Log,
-    });
+    pub static ref STATE: Mutex<State> = Mutex::new(
+        State{
+            navstate: Navstate {
+                screen: Screen::Log,
+                modal: Modal::Empty,
+            },
+            dbname: None,
+            seed_names: Vec::new(),
+        }
+    );
 }
 
 ///This should be called from UI; returns new UI information as JSON
 pub fn do_action(
-    _origin_str: &str,
     action_str: &str,
     details_str: &str,
 ) -> String {
-    let mut process_navstate = Navstate{
-        screen: Screen::Log,
-    };
-   
-    //guard should have proper lifetime to lock mutex
+    //If can't lock - debounce failed, ignore action
+    //
+    //guard is defined here to outline lifetime properly
     let mut guard = STATE.try_lock();
     match guard {
-        Ok(mut navstate) => {
-            process_navstate = *navstate;
-            let origin = process_navstate.screen; 
+        Ok(mut state) => {
             let action = Action::parse(action_str);
-            *navstate = action.perform(*navstate, details_str);
-            (*navstate).generate_json()
+            let details = (*state).perform(action, details_str);
+            (*state).generate_json(details)
         },
         Err(TryLockError::Poisoned(_)) => {
             //TODO: maybe more grace here?
@@ -54,6 +59,25 @@ pub fn do_action(
     }
 }
 
+///Should be called in the beginning to recall things stored only by phone
+pub fn init_navigation(
+    dbname: &str,
+    seed_names: &str,
+) -> () {
+    //This operation has to happen; lock thread and do not ignore.
+    let guard = STATE.lock();
+    match guard {
+        Ok(mut navstate) => {
+            (*navstate).dbname = Some(dbname.to_string());
+            (*navstate).seed_names = seed_names.split(",").map(|a| a.to_string()).collect();
+        },
+        Err(_) => {
+            //TODO: maybe more grace here?
+            //Maybe just silently restart navstate? But is it safe?
+            panic!("Concurrency error! Restart the app.");
+         },
+    }
+}
 
 #[cfg(test)]
 mod tests {

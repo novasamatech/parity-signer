@@ -11,7 +11,7 @@ import org.json.JSONObject
 fun SignerDataModel.pushButton(button: ButtonID) {
 	Log.d("push button", button.toString())
 	val actionResult =
-		backendAction(signerScreen.value?.name ?: "", button.name, "")
+		backendAction(button.name, "")
 	Log.d("action result", actionResult)
 	//Here we just list all possible arguments coming from backend
 	try {
@@ -25,6 +25,7 @@ fun SignerDataModel.pushButton(button: ButtonID) {
 				_backButton.value = it
 			}
 		}
+		screenInfo = actionResultObject.getJSONObject("content")
 	} catch (e: java.lang.Exception) {
 		Log.e("Navigation error", e.toString())
 		Toast.makeText(context, actionResult, Toast.LENGTH_SHORT).show()

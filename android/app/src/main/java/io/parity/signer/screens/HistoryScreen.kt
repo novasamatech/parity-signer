@@ -10,13 +10,13 @@ import io.parity.signer.models.SignerDataModel
 
 @Composable
 fun HistoryScreen(signerDataModel: SignerDataModel) {
-	val history = signerDataModel.history.observeAsState()
+	val history = signerDataModel.screenInfo.getJSONArray("log")
 
 	Column{
 		LazyColumn {
-			for(i in 0 until history.value!!.length()) {
-				items(history.value!!.getJSONObject(i).getJSONArray("events").length()) { item ->
-					HistoryCard(history.value!!.getJSONObject(i).getJSONArray("events").getJSONObject(item), history.value!!.getJSONObject(i).getString("timestamp"))
+			for(i in 0 until history.length()) {
+				items(history.getJSONObject(i).getJSONArray("events").length()) { item ->
+					HistoryCard(history.getJSONObject(i).getJSONArray("events").getJSONObject(item), history.getJSONObject(i).getString("timestamp"))
 				}
 			}
 		}
