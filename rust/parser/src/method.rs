@@ -1,5 +1,5 @@
 use frame_metadata::{v12::RuntimeMetadataV12, v13::RuntimeMetadataV13, decode_different::DecodeDifferent};
-use crate::error::{ParserError, DecodingError};
+use definitions::error::{ParserError, ParserDecodingError};
 
 /// Struct to store the method information
 pub (crate) struct MethodOld {
@@ -45,7 +45,7 @@ fn find_method_v12 (pallet_index: u8, method_index: u8, meta: &RuntimeMetadataV1
                     found_pallet_name = Some(name.to_string());
                 }
                 if let Some(DecodeDifferent::Decoded(calls)) = &y.calls {
-                    if calls.len() <= method_index.into() {return Err(ParserError::Decoding(DecodingError::MethodIndexTooHigh{method_index, pallet_index, total: calls.len()}));}
+                    if calls.len() <= method_index.into() {return Err(ParserError::Decoding(ParserDecodingError::MethodIndexTooHigh{method_index, pallet_index, total: calls.len()}));}
                     if let DecodeDifferent::Decoded(nm) = &calls[method_index as usize].name {
                         found_method_name = Some(nm.to_string());
                     }
@@ -67,10 +67,10 @@ fn find_method_v12 (pallet_index: u8, method_index: u8, meta: &RuntimeMetadataV1
                                         Some(y) => {
                                             arguments.push(Argument{name: x, ty: y});
                                         },
-                                        None => {return Err(ParserError::Decoding(DecodingError::ArgumentTypeError))},
+                                        None => {return Err(ParserError::Decoding(ParserDecodingError::ArgumentTypeError))},
                                     }
                                 },
-                                None => {return Err(ParserError::Decoding(DecodingError::ArgumentNameError))},
+                                None => {return Err(ParserError::Decoding(ParserDecodingError::ArgumentNameError))},
                             }
                         }
                     }
@@ -91,10 +91,10 @@ fn find_method_v12 (pallet_index: u8, method_index: u8, meta: &RuntimeMetadataV1
                     };
                     Ok(out)
                 },
-                None => return Err(ParserError::Decoding(DecodingError::MethodNotFound{method_index, pallet_name: x})),
+                None => return Err(ParserError::Decoding(ParserDecodingError::MethodNotFound{method_index, pallet_name: x})),
             }
         },
-        None => return Err(ParserError::Decoding(DecodingError::PalletNotFound(pallet_index))),
+        None => return Err(ParserError::Decoding(ParserDecodingError::PalletNotFound(pallet_index))),
     }
 }
 
@@ -116,7 +116,7 @@ fn find_method_v13 (pallet_index: u8, method_index: u8, meta: &RuntimeMetadataV1
                     found_pallet_name = Some(name.to_string());
                 }
                 if let Some(DecodeDifferent::Decoded(calls)) = &y.calls {
-                    if calls.len() <= method_index.into() {return Err(ParserError::Decoding(DecodingError::MethodIndexTooHigh{method_index, pallet_index, total: calls.len()}));}
+                    if calls.len() <= method_index.into() {return Err(ParserError::Decoding(ParserDecodingError::MethodIndexTooHigh{method_index, pallet_index, total: calls.len()}));}
                     if let DecodeDifferent::Decoded(nm) = &calls[method_index as usize].name {
                         found_method_name = Some(nm.to_string());
                     }
@@ -138,10 +138,10 @@ fn find_method_v13 (pallet_index: u8, method_index: u8, meta: &RuntimeMetadataV1
                                         Some(y) => {
                                             arguments.push(Argument{name: x, ty: y});
                                         },
-                                        None => {return Err(ParserError::Decoding(DecodingError::ArgumentTypeError))},
+                                        None => {return Err(ParserError::Decoding(ParserDecodingError::ArgumentTypeError))},
                                     }
                                 },
-                                None => {return Err(ParserError::Decoding(DecodingError::ArgumentNameError))},
+                                None => {return Err(ParserError::Decoding(ParserDecodingError::ArgumentNameError))},
                             }
                         }
                     }
@@ -162,10 +162,10 @@ fn find_method_v13 (pallet_index: u8, method_index: u8, meta: &RuntimeMetadataV1
                     };
                     Ok(out)
                 },
-                None => return Err(ParserError::Decoding(DecodingError::MethodNotFound{method_index, pallet_name: x})),
+                None => return Err(ParserError::Decoding(ParserDecodingError::MethodNotFound{method_index, pallet_name: x})),
             }
         },
-        None => return Err(ParserError::Decoding(DecodingError::PalletNotFound(pallet_index))),
+        None => return Err(ParserError::Decoding(ParserDecodingError::PalletNotFound(pallet_index))),
     }
 }
 
@@ -174,7 +174,7 @@ fn find_method_v13 (pallet_index: u8, method_index: u8, meta: &RuntimeMetadataV1
 /// Outputs NextDecode value.
 
 pub (crate) fn what_next_old (data: Vec<u8>, meta: &OlderMeta) -> Result<NextDecodeOld, ParserError> {
-    if data.len() < 2 {return Err(ParserError::Decoding(DecodingError::DataTooShort));}
+    if data.len() < 2 {return Err(ParserError::Decoding(ParserDecodingError::DataTooShort));}
     let pallet_index = data[0];
     let method_index = data[1];
     let method = match meta {

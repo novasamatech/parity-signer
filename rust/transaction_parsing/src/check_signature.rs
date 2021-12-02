@@ -1,25 +1,22 @@
 use sp_core::{Pair, ed25519, sr25519, ecdsa};
 use sp_runtime::MultiSigner;
 use std::convert::TryInto;
-use definitions::network_specs::{Verifier, VerifierValue};
-
-use crate::error::{Error, BadInputData, CryptoError};
-use crate::helpers::unhex;
+use definitions::{error::{ErrorSigner, InputSigner, NotHexSigner, Signer}, helpers::unhex, network_specs::{Verifier, VerifierValue}};
 
 pub struct InfoPassedCrypto {
     pub verifier: Verifier,
     pub message: Vec<u8>,
 }
 
-pub fn pass_crypto(data_hex: &str) -> Result<InfoPassedCrypto, Error> {
+pub fn pass_crypto(data_hex: &str) -> Result<InfoPassedCrypto, ErrorSigner> {
     
-    let data = unhex(&data_hex)?;
+    let data = unhex::<Signer>(&data_hex, NotHexSigner::InputContent)?;
     
     match &data_hex[2..4] {
         "00" => {
         // Ed25519 crypto was used by the verifier
         // minimal possible data length is 3 + 32 + 64 (prelude, public key in ed25519, signature in ed25519)
-            if data.len() < 99 {return Err(Error::BadInputData(BadInputData::TooShort))}
+            if data.len() < 99 {return Err(ErrorSigner::Input(InputSigner::TooShort))}
             let into_pubkey: [u8;32] = data[3..35].try_into().expect("fixed size should fit in array");
             let pubkey = ed25519::Public::from_raw(into_pubkey);
             let message = data[35..data.len()-64].to_vec();
@@ -32,12 +29,12 @@ pub fn pass_crypto(data_hex: &str) -> Result<InfoPassedCrypto, Error> {
                     message,
                 })
             }
-            else {return Err(Error::CryptoError(CryptoError::BadSignature))}
+            else {return Err(ErrorSigner::Input(InputSigner::BadSignature))}
         },
         "01" => {
         // Sr25519 crypto was used by the verifier
         // minimal possible data length is 3 + 32 + 64 (prelude, public key in sr25519, signature in sr25519)
-            if data.len() < 99 {return Err(Error::BadInputData(BadInputData::TooShort))}
+            if data.len() < 99 {return Err(ErrorSigner::Input(InputSigner::TooShort))}
             let into_pubkey: [u8;32] = data[3..35].try_into().expect("fixed size should fit in array");
             let pubkey = sr25519::Public::from_raw(into_pubkey);
             let message = data[35..data.len()-64].to_vec();
@@ -50,12 +47,12 @@ pub fn pass_crypto(data_hex: &str) -> Result<InfoPassedCrypto, Error> {
                     message,
                 })
             }
-            else {return Err(Error::CryptoError(CryptoError::BadSignature))}
+            else {return Err(ErrorSigner::Input(InputSigner::BadSignature))}
         },
         "02" => {
         // Ecdsa crypto was used by the verifier
         // minimal possible data length is 3 + 33 + 65 (prelude, public key in ecdsa, network genesis hash, signature in ecdsa)
-            if data.len() < 101 {return Err(Error::BadInputData(BadInputData::TooShort))}
+            if data.len() < 101 {return Err(ErrorSigner::Input(InputSigner::TooShort))}
             let into_pubkey: [u8;33] = data[3..36].try_into().expect("fixed size should fit in array");
             let pubkey = ecdsa::Public::from_raw(into_pubkey);
             let message = data[36..data.len()-65].to_vec();
@@ -68,12 +65,12 @@ pub fn pass_crypto(data_hex: &str) -> Result<InfoPassedCrypto, Error> {
                     message,
                 })
             }
-            else {return Err(Error::CryptoError(CryptoError::BadSignature))}
+            else {return Err(ErrorSigner::Input(InputSigner::BadSignature))}
         },
         "ff" => {
         // Received info was not signed
         // minimal possible data length is 3 (prelude, network genesis hash)
-            if data.len() < 3 {return Err(Error::BadInputData(BadInputData::TooShort))}
+            if data.len() < 3 {return Err(ErrorSigner::Input(InputSigner::TooShort))}
             let message = data[3..].to_vec();
             let verifier = Verifier(None);
             Ok(InfoPassedCrypto {
@@ -81,6 +78,6 @@ pub fn pass_crypto(data_hex: &str) -> Result<InfoPassedCrypto, Error> {
                 message,
             })
         },
-        _ => return Err(Error::BadInputData(BadInputData::CryptoNotSupported))
+        _ => return Err(ErrorSigner::Input(InputSigner::EncryptionNotSupported(data_hex[2..4].to_string()))),
     }
 }

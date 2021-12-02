@@ -1,14 +1,13 @@
 use parity_scale_codec::Decode;
 use scale_info::{Field, Type, TypeDef, TypeDefPrimitive, TypeDefVariant, TypeDefComposite, TypeDefBitSequence, form::PortableForm};
 use num_bigint::{BigInt, BigUint};
-use definitions::{network_specs::ShortSpecs};
+use definitions::{error::{ParserError, ParserDecodingError, ParserMetadataError}, network_specs::ShortSpecs};
 use frame_metadata::v14::RuntimeMetadataV14;
 use bitvec::{prelude::{BitVec, Lsb0, Msb0}, store::BitStore, order::BitOrder};
 
 use crate::cards::{ParserCard};
 use crate::decoding_commons::{OutputCard, DecodedOut, get_compact, decode_known_length, decode_primitive_with_flags, special_case_account_id};
 use crate::decoding_sci_ext::{Ext, SpecialExt, Hash, special_case_era, special_case_hash};
-use crate::error::{ParserError,  DecodingError, MetadataError};
 
 enum FoundBitOrder {
     Lsb0,
@@ -95,8 +94,8 @@ fn decode_type_def_primitive (found_ty: &TypeDefPrimitive, possible_ext: &mut Op
 
 
 fn reject_flags (compact_flag: bool, balance_flag: bool) -> Result<(), ParserError> {
-    if compact_flag {return Err(ParserError::Decoding(DecodingError::UnexpectedCompactInsides))}
-    if balance_flag {return Err(ParserError::Decoding(DecodingError::BalanceNotDescribed))}
+    if compact_flag {return Err(ParserError::Decoding(ParserDecodingError::UnexpectedCompactInsides))}
+    if balance_flag {return Err(ParserError::Decoding(ParserDecodingError::BalanceNotDescribed))}
     Ok(())
 }
 
@@ -126,13 +125,13 @@ fn decode_char(data: &Vec<u8>, indent: u32) -> Result<DecodedOut, ParserError> {
                                 fancy_out,
                             })
                         },
-                        None => return Err(ParserError::Decoding(DecodingError::PrimitiveFailure("char".to_string()))),
+                        None => return Err(ParserError::Decoding(ParserDecodingError::PrimitiveFailure("char".to_string()))),
                     }
                 },
-                Err(_) => return Err(ParserError::Decoding(DecodingError::PrimitiveFailure("char".to_string()))),
+                Err(_) => return Err(ParserError::Decoding(ParserDecodingError::PrimitiveFailure("char".to_string()))),
             }
         },
-        None => return Err(ParserError::Decoding(DecodingError::DataTooShort)),
+        None => return Err(ParserError::Decoding(ParserDecodingError::DataTooShort)),
     }
 }
 
@@ -158,7 +157,7 @@ fn decode_str(data: &Vec<u8>, indent: u32) -> Result<DecodedOut, ParserError> {
                 Some(a) => {
                     let text = match String::from_utf8(a.to_vec()) {
                         Ok(b) => b,
-                        Err(_) => return Err(ParserError::Decoding(DecodingError::PrimitiveFailure("str".to_string()))),
+                        Err(_) => return Err(ParserError::Decoding(ParserDecodingError::PrimitiveFailure("str".to_string()))),
                     };
                     let fancy_out = vec![OutputCard{card: ParserCard::Text(text), indent}];
                     let remaining_vector = data[start+str_length..].to_vec();
@@ -167,11 +166,11 @@ fn decode_str(data: &Vec<u8>, indent: u32) -> Result<DecodedOut, ParserError> {
                         fancy_out,
                     })
                 },
-                None => return Err(ParserError::Decoding(DecodingError::DataTooShort)),
+                None => return Err(ParserError::Decoding(ParserDecodingError::DataTooShort)),
             }
         },
         None => {
-            if str_length != 0 {return Err(ParserError::Decoding(DecodingError::DataTooShort))}
+            if str_length != 0 {return Err(ParserError::Decoding(ParserDecodingError::DataTooShort))}
             else {
                 let fancy_out = vec![OutputCard{card: ParserCard::Text(String::new()), indent}];
                 let remaining_vector = Vec::new();
@@ -212,7 +211,7 @@ fn decode_big256(data: &Vec<u8>, signed: bool, indent: u32) -> Result<DecodedOut
                 fancy_out,
             })
         },
-        None => return Err(ParserError::Decoding(DecodingError::DataTooShort)),
+        None => return Err(ParserError::Decoding(ParserDecodingError::DataTooShort)),
     }
 }
 
@@ -257,7 +256,7 @@ pub (crate) fn decoding_sci_complete (current_type: &Type<PortableForm>, possibl
         _ => {
             if let Some(ext) = possible_ext {
                 if let SpecialExt::Era = ext.specialty {
-                    if let Some(_) = ext.found_ext.era {return Err(ParserError::FundamentallyBadV14Metadata(MetadataError::EraTwice))}
+                    if let Some(_) = ext.found_ext.era {return Err(ParserError::FundamentallyBadV14Metadata(ParserMetadataError::EraTwice))}
                     else {return special_case_era (data, &mut ext.found_ext, indent)}
                 }
             }
@@ -270,10 +269,10 @@ pub (crate) fn decoding_sci_complete (current_type: &Type<PortableForm>, possibl
                     decode_type_def_variant (x, possible_ext, &call_expectation, data, &meta_v14, indent, short_specs)
                 },
                 TypeDef::Sequence(x) => {
-                    if compact_flag {return Err(ParserError::Decoding(DecodingError::UnexpectedCompactInsides))}
+                    if compact_flag {return Err(ParserError::Decoding(ParserDecodingError::UnexpectedCompactInsides))}
                     let inner_type = match meta_v14.types.resolve(x.type_param().id()) { // docs?
                         Some(a) => a,
-                        None => return Err(ParserError::Decoding(DecodingError::V14TypeNotResolved)),
+                        None => return Err(ParserError::Decoding(ParserDecodingError::V14TypeNotResolved)),
                     };
                     decode_type_def_sequence (inner_type, possible_ext, balance_flag, &call_expectation, data, &meta_v14, indent, short_specs)
                 },
@@ -281,21 +280,21 @@ pub (crate) fn decoding_sci_complete (current_type: &Type<PortableForm>, possibl
                     if let Some(ext) = possible_ext {
                         if let SpecialExt::Hash(ref hash) = ext.specialty {
                             match hash {
-                                Hash::GenesisHash => {if let Some(_) = ext.found_ext.genesis_hash {return Err(ParserError::FundamentallyBadV14Metadata(MetadataError::GenesisHashTwice))}},
-                                Hash::BlockHash => {if let Some(_) = ext.found_ext.block_hash {return Err(ParserError::FundamentallyBadV14Metadata(MetadataError::BlockHashTwice))}},
+                                Hash::GenesisHash => {if let Some(_) = ext.found_ext.genesis_hash {return Err(ParserError::FundamentallyBadV14Metadata(ParserMetadataError::GenesisHashTwice))}},
+                                Hash::BlockHash => {if let Some(_) = ext.found_ext.block_hash {return Err(ParserError::FundamentallyBadV14Metadata(ParserMetadataError::BlockHashTwice))}},
                             }
                             return special_case_hash(data, &mut ext.found_ext, indent, short_specs, &hash)
                         }
                     }
-                    if compact_flag {return Err(ParserError::Decoding(DecodingError::UnexpectedCompactInsides))}
+                    if compact_flag {return Err(ParserError::Decoding(ParserDecodingError::UnexpectedCompactInsides))}
                     let inner_type = match meta_v14.types.resolve(x.type_param().id()) { // docs?
                         Some(a) => a,
-                        None => return Err(ParserError::Decoding(DecodingError::V14TypeNotResolved)),
+                        None => return Err(ParserError::Decoding(ParserDecodingError::V14TypeNotResolved)),
                     };
                     decode_type_def_array(inner_type, x.len(), possible_ext, balance_flag, data, &meta_v14, indent, short_specs)
                 },
                 TypeDef::Tuple(x) => {
-                    if compact_flag {return Err(ParserError::Decoding(DecodingError::UnexpectedCompactInsides))}
+                    if compact_flag {return Err(ParserError::Decoding(ParserDecodingError::UnexpectedCompactInsides))}
                     let id_set = x.fields().iter().map(|a| a.id()).collect();
                     decode_type_def_tuple(id_set, possible_ext, balance_flag, data, &meta_v14, indent, short_specs)
                 },
@@ -303,7 +302,7 @@ pub (crate) fn decoding_sci_complete (current_type: &Type<PortableForm>, possibl
                 TypeDef::Compact(x) => {
                     let inner_type = match meta_v14.types.resolve(x.type_param().id()) { // docs?
                         Some(a) => a,
-                        None => return Err(ParserError::Decoding(DecodingError::V14TypeNotResolved)),
+                        None => return Err(ParserError::Decoding(ParserDecodingError::V14TypeNotResolved)),
                     };
                     let compact_flag = true;
                     decoding_sci_complete(inner_type, possible_ext, compact_flag, balance_flag, &CallExpectation::None, data, meta_v14, indent, short_specs)
@@ -322,7 +321,7 @@ pub (crate) fn decoding_sci_complete (current_type: &Type<PortableForm>, possibl
 pub (crate) fn decoding_sci_entry_point (mut data: Vec<u8>, meta_v14: &RuntimeMetadataV14, mut indent: u32, short_specs: &ShortSpecs) -> Result<DecodedOut, ParserError> {
     let pallet_index: u8 = match data.get(0) {
         Some(x) => *x,
-        None => return Err(ParserError::Decoding(DecodingError::DataTooShort)),
+        None => return Err(ParserError::Decoding(ParserDecodingError::DataTooShort)),
     };
     
     let mut found_call_type: Option<u32> = None;
@@ -336,11 +335,11 @@ pub (crate) fn decoding_sci_entry_point (mut data: Vec<u8>, meta_v14: &RuntimeMe
     }
     let pallet_name = match found_pallet_name {
         Some(a) => a,
-        None => return Err(ParserError::Decoding(DecodingError::PalletNotFound(pallet_index))),
+        None => return Err(ParserError::Decoding(ParserDecodingError::PalletNotFound(pallet_index))),
     };
     let type_id = match found_call_type {
         Some(a) => a,
-        None => return Err(ParserError::Decoding(DecodingError::NoCallsInPallet(pallet_name))),
+        None => return Err(ParserError::Decoding(ParserDecodingError::NoCallsInPallet(pallet_name))),
     };
     let (current_type, _, _) = type_path_docs(meta_v14, type_id)?;
     
@@ -379,7 +378,7 @@ fn decode_type_def_sequence (inner_type: &Type<PortableForm>, possible_ext: &mut
             })
         },
         None => {
-            if elements_of_vector != 0 {return Err(ParserError::Decoding(DecodingError::DataTooShort))}
+            if elements_of_vector != 0 {return Err(ParserError::Decoding(ParserDecodingError::DataTooShort))}
             else {
                 Ok(DecodedOut {
                     remaining_vector: Vec::new(),
@@ -463,7 +462,7 @@ fn decode_type_def_variant (found_ty: &TypeDefVariant<PortableForm>, possible_ex
     
     let enum_index = match data.get(0) {
         Some(x) => *x,
-        None => return Err(ParserError::Decoding(DecodingError::DataTooShort)),
+        None => return Err(ParserError::Decoding(ParserDecodingError::DataTooShort)),
     };
     
     let check = is_option_bool(found_ty, meta_v14);
@@ -473,7 +472,7 @@ fn decode_type_def_variant (found_ty: &TypeDefVariant<PortableForm>, possible_ex
                 0 => vec![OutputCard{card: ParserCard::None, indent}],
                 1 => vec![OutputCard{card: ParserCard::Default(String::from("True")), indent}],
                 2 => vec![OutputCard{card: ParserCard::Default(String::from("False")), indent}],
-                _ => {return Err(ParserError::Decoding(DecodingError::UnexpectedOptionVariant))},
+                _ => {return Err(ParserError::Decoding(ParserDecodingError::UnexpectedOptionVariant))},
             };
             let remaining_vector = data[1..].to_vec();
             Ok(DecodedOut {
@@ -492,14 +491,14 @@ fn decode_type_def_variant (found_ty: &TypeDefVariant<PortableForm>, possible_ex
                     })
                 },
                 1 => {
-                    if data.len()==1 {return Err(ParserError::Decoding(DecodingError::DataTooShort))}
+                    if data.len()==1 {return Err(ParserError::Decoding(ParserDecodingError::DataTooShort))}
                     data = data[1..].to_vec();
                     let found_variant = &found_ty.variants()[1];
                     let compact_flag = false;
                     let balance_flag = false;
                     process_fields(found_variant.fields(), possible_ext, &CallExpectation::None, compact_flag, balance_flag, data, meta_v14, indent, short_specs)
                 },
-                _ => {return Err(ParserError::Decoding(DecodingError::UnexpectedOptionVariant))},
+                _ => {return Err(ParserError::Decoding(ParserDecodingError::UnexpectedOptionVariant))},
             }
         }
     }
@@ -513,7 +512,7 @@ fn decode_type_def_variant (found_ty: &TypeDefVariant<PortableForm>, possible_ex
         }
         let found_variant = match found_variant {
             Some(a) => a,
-            None => return Err(ParserError::Decoding(DecodingError::UnexpectedEnumVariant)),
+            None => return Err(ParserError::Decoding(ParserDecodingError::UnexpectedEnumVariant)),
         };
         let mut variant_docs = String::new();
         for (i, x) in found_variant.docs().iter().enumerate() {
@@ -586,7 +585,7 @@ fn process_fields (fields: &[Field<PortableForm>], possible_ext: &mut Option<&mu
 }
 
 fn decode_type_def_composite (composite_ty: &TypeDefComposite<PortableForm>, possible_ext: &mut Option<&mut Ext>, compact_flag: bool, balance_flag: bool, data: Vec<u8>, meta_v14: &RuntimeMetadataV14, indent: u32, short_specs: &ShortSpecs) -> Result<DecodedOut, ParserError> {
-    if compact_flag && (composite_ty.fields().len()>1) {return Err(ParserError::Decoding(DecodingError::UnexpectedCompactInsides))}
+    if compact_flag && (composite_ty.fields().len()>1) {return Err(ParserError::Decoding(ParserDecodingError::UnexpectedCompactInsides))}
     process_fields (composite_ty.fields(), possible_ext, &CallExpectation::None, compact_flag, balance_flag, data, meta_v14, indent, short_specs)
 }
 
@@ -602,12 +601,12 @@ fn decode_type_def_bit_sequence (bit_ty: &TypeDefBitSequence<PortableForm>, data
             let fin = start + (actual_length as usize);
             let into_bv_decode = match data.get(..fin) {
                 Some(a) => a.to_vec(),
-                None => return Err(ParserError::Decoding(DecodingError::DataTooShort)),
+                None => return Err(ParserError::Decoding(ParserDecodingError::DataTooShort)),
             };
             let bitorder_type_id = bit_ty.bit_order_type().id();
             let bitorder_type = match meta_v14.types.resolve(bitorder_type_id) {
                 Some(a) => a,
-                None => return Err(ParserError::Decoding(DecodingError::V14TypeNotResolved)),
+                None => return Err(ParserError::Decoding(ParserDecodingError::V14TypeNotResolved)),
             };
             let bitorder = match bitorder_type.type_def() {
                 TypeDef::Composite(_) => match bitorder_type.path().ident() {
@@ -615,18 +614,18 @@ fn decode_type_def_bit_sequence (bit_ty: &TypeDefBitSequence<PortableForm>, data
                         match x.as_str() {
                             "Lsb0" => FoundBitOrder::Lsb0,
                             "Msb0" => FoundBitOrder::Msb0,
-                            _ => return Err(ParserError::Decoding(DecodingError::NotBitOrderType)),
+                            _ => return Err(ParserError::Decoding(ParserDecodingError::NotBitOrderType)),
                         }
                     },
-                    None => return Err(ParserError::Decoding(DecodingError::NotBitOrderType)),
+                    None => return Err(ParserError::Decoding(ParserDecodingError::NotBitOrderType)),
                 },
-                _ => return Err(ParserError::Decoding(DecodingError::NotBitOrderType)),
+                _ => return Err(ParserError::Decoding(ParserDecodingError::NotBitOrderType)),
             };
             
             let bitstore_type_id = bit_ty.bit_store_type().id();
             let bitstore_type = match meta_v14.types.resolve(bitstore_type_id) {
                 Some(a) => a,
-                None => return Err(ParserError::Decoding(DecodingError::V14TypeNotResolved)),
+                None => return Err(ParserError::Decoding(ParserDecodingError::V14TypeNotResolved)),
             };
             let card_prep = match bitstore_type.type_def() {
                 TypeDef::Primitive(a) => {
@@ -641,10 +640,10 @@ fn decode_type_def_bit_sequence (bit_ty: &TypeDefBitSequence<PortableForm>, data
                             FoundBitOrder::Lsb0 => ugly_patch_u64::<Lsb0> (into_bv_decode)?,
                             FoundBitOrder::Msb0 => ugly_patch_u64::<Msb0> (into_bv_decode)?,
                         },
-                        _ => return Err(ParserError::Decoding(DecodingError::NotBitStoreType)),
+                        _ => return Err(ParserError::Decoding(ParserDecodingError::NotBitStoreType)),
                     }
                 },
-                _ => return Err(ParserError::Decoding(DecodingError::NotBitStoreType)),
+                _ => return Err(ParserError::Decoding(ParserDecodingError::NotBitStoreType)),
             };
             
             let fancy_out = vec![OutputCard{card: ParserCard::BitVec(card_prep), indent}];
@@ -655,7 +654,7 @@ fn decode_type_def_bit_sequence (bit_ty: &TypeDefBitSequence<PortableForm>, data
             })
         },
         None => {
-            if actual_length != 0 {return Err(ParserError::Decoding(DecodingError::DataTooShort))}
+            if actual_length != 0 {return Err(ParserError::Decoding(ParserDecodingError::DataTooShort))}
             Ok(DecodedOut {
                 remaining_vector: Vec::new(),
                 fancy_out: vec![OutputCard{card: ParserCard::Default(String::new()), indent}],
@@ -670,13 +669,13 @@ fn process_bitvec<T: BitStore + Decode> (bitorder: FoundBitOrder, into_bv_decode
         FoundBitOrder::Lsb0 => {
             match <BitVec<Lsb0, T>>::decode(&mut &into_bv_decode[..]) {
                 Ok(b) => Ok(b.to_string()),
-                Err(_) => return Err(ParserError::Decoding(DecodingError::BitVecFailure)),
+                Err(_) => return Err(ParserError::Decoding(ParserDecodingError::BitVecFailure)),
             }
         },
         FoundBitOrder::Msb0 => {
             match <BitVec<Msb0, T>>::decode(&mut &into_bv_decode[..]) {
                 Ok(b) => Ok(b.to_string()),
-                Err(_) => return Err(ParserError::Decoding(DecodingError::BitVecFailure)),
+                Err(_) => return Err(ParserError::Decoding(ParserDecodingError::BitVecFailure)),
             }
         },
     }
@@ -685,7 +684,7 @@ fn process_bitvec<T: BitStore + Decode> (bitorder: FoundBitOrder, into_bv_decode
 fn ugly_patch_u64<O: BitOrder> (into_bv_decode: Vec<u8>) -> Result<String, ParserError> {
     let bitvec_decoded = match <BitVec<O, u32>>::decode(&mut &into_bv_decode[..]) {
         Ok(b) => b,
-        Err(_) => return Err(ParserError::Decoding(DecodingError::BitVecFailure)),
+        Err(_) => return Err(ParserError::Decoding(ParserDecodingError::BitVecFailure)),
     };
     let vec = bitvec_decoded.into_vec();
     let mut out = String::from("[");
@@ -702,7 +701,7 @@ fn ugly_patch_u64<O: BitOrder> (into_bv_decode: Vec<u8>) -> Result<String, Parse
 fn type_path_docs (meta_v14: &RuntimeMetadataV14, type_id: u32) -> Result<(Type<PortableForm>, String, String), ParserError> {
     let current_type = match meta_v14.types.resolve(type_id) {
         Some(a) => a,
-        None => return Err(ParserError::Decoding(DecodingError::V14TypeNotResolved)),
+        None => return Err(ParserError::Decoding(ParserDecodingError::V14TypeNotResolved)),
     };
     let mut docs = String::new();
     for (i, x) in current_type.docs().iter().enumerate() {

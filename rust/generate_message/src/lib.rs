@@ -1,9 +1,10 @@
-use anyhow;
-use constants::{COLD_DB_NAME, COLD_DB_NAME_RELEASE, HOT_DB_NAME};
-use db_handling::{default_cold, default_cold_release, default_hot, metadata::transfer_metadata_to_cold};
+use constants::{COLD_DB_NAME, COLD_DB_NAME_RELEASE, HOT_DB_NAME, TYLO};
+use db_handling::{default_cold, default_cold_release, default_hot, metadata::transfer_metadata_to_cold, prep_messages::prep_types};
+use definitions::error::{Active, ErrorActive};
 
-mod error;
+mod fetch_metadata;
 mod helpers;
+mod interpret_specs;
 mod load;
     use load::gen_load_meta;
 pub mod parser;
@@ -14,8 +15,6 @@ mod show;
     use show::{show_database, show_address_book};
 mod specs;
     use specs::gen_add_specs;
-mod types;
-    use types::gen_types;
 mod metadata_db_utils;
 mod metadata_shortcut;
 mod output_prep;
@@ -25,7 +24,7 @@ mod make_message;
 
 /// Function to process incoming command as interpreted by parser
 
-pub fn full_run (command: Command) -> anyhow::Result<()> {
+pub fn full_run (command: Command) -> Result<(), ErrorActive> {
     match command {
         Command::Show(x) => {
             match x {
@@ -33,7 +32,7 @@ pub fn full_run (command: Command) -> anyhow::Result<()> {
                 Show::AddressBook => show_address_book(),
             }
         },
-        Command::Types => gen_types(),
+        Command::Types => prep_types::<Active>(HOT_DB_NAME)?.write(TYLO),
         Command::Load(instruction) => gen_load_meta(instruction),
         Command::Specs(instruction) => gen_add_specs(instruction),
         Command::Make(make) => make_message(make),

@@ -1,4 +1,4 @@
-use definitions::network_specs::ShortSpecs;
+use definitions::{error::{ParserError, ParserDecodingError}, network_specs::ShortSpecs};
 use frame_metadata::v14::RuntimeMetadataV14;
 use scale_info::{Type, form::PortableForm};
 use parity_scale_codec::Decode;
@@ -7,7 +7,6 @@ use sp_runtime::generic::Era;
 use crate::cards::ParserCard;
 use crate::decoding_commons::{DecodedOut, OutputCard};
 use crate::decoding_sci::{CallExpectation, decoding_sci_complete};
-use crate::error::{ParserError, DecodingError};
 
 pub (crate) fn decode_ext_attempt (data: &Vec<u8>, ext: &mut Ext, meta_v14: &RuntimeMetadataV14, indent: u32, short_specs: &ShortSpecs) -> Result<DecodedOut, ParserError> {
     let mut data = data.to_vec();
@@ -16,7 +15,7 @@ pub (crate) fn decode_ext_attempt (data: &Vec<u8>, ext: &mut Ext, meta_v14: &Run
         ext.identifier = x.identifier.to_string();
         let current_type = match meta_v14.types.resolve(x.ty.id()) {
             Some(a) => a,
-            None => return Err(ParserError::Decoding(DecodingError::V14TypeNotResolved)),
+            None => return Err(ParserError::Decoding(ParserDecodingError::V14TypeNotResolved)),
         };
         let decoded_out = decoding_sci_complete (current_type, &mut Some(ext), false, false, &CallExpectation::None, data, meta_v14, indent, short_specs)?;
         fancy_out.extend_from_slice(&decoded_out.fancy_out);
@@ -26,7 +25,7 @@ pub (crate) fn decode_ext_attempt (data: &Vec<u8>, ext: &mut Ext, meta_v14: &Run
         ext.identifier = x.identifier.to_string();
         let current_type = match meta_v14.types.resolve(x.additional_signed.id()) {
             Some(a) => a,
-            None => return Err(ParserError::Decoding(DecodingError::V14TypeNotResolved)),
+            None => return Err(ParserError::Decoding(ParserDecodingError::V14TypeNotResolved)),
         };
         let decoded_out = decoding_sci_complete (current_type, &mut Some(ext), false, false, &CallExpectation::None, data, meta_v14, indent, short_specs)?;
         fancy_out.extend_from_slice(&decoded_out.fancy_out);
@@ -120,7 +119,7 @@ pub (crate) fn special_case_hash (data: Vec<u8>, found_ext: &mut FoundExt, inden
                     let fancy_out = match hash {
                         Hash::GenesisHash => {
                             found_ext.genesis_hash = Some(x);
-                            if x != short_specs.genesis_hash {return Err(ParserError::Decoding(DecodingError::GenesisHashMismatch))}
+                            if x != short_specs.genesis_hash {return Err(ParserError::Decoding(ParserDecodingError::GenesisHashMismatch))}
                             Vec::new()
                         },
                         Hash::BlockHash => {
@@ -133,10 +132,10 @@ pub (crate) fn special_case_hash (data: Vec<u8>, found_ext: &mut FoundExt, inden
                         fancy_out,
                     })
                 },
-                Err(_) => return Err(ParserError::Decoding(DecodingError::Array)),
+                Err(_) => return Err(ParserError::Decoding(ParserDecodingError::Array)),
             }
         },
-        None => return Err(ParserError::Decoding(DecodingError::DataTooShort)),
+        None => return Err(ParserError::Decoding(ParserDecodingError::DataTooShort)),
     }
 }
 
@@ -146,17 +145,17 @@ pub (crate) fn special_case_era (data: Vec<u8>, found_ext: &mut FoundExt, indent
         Some(_) => {
             match data.get(0..2) {
                 Some(a) => (a.to_vec(), data[2..].to_vec()),
-                None => return Err(ParserError::Decoding(DecodingError::DataTooShort)),
+                None => return Err(ParserError::Decoding(ParserDecodingError::DataTooShort)),
             }
         },
-        None => return Err(ParserError::Decoding(DecodingError::DataTooShort)),
+        None => return Err(ParserError::Decoding(ParserDecodingError::DataTooShort)),
     };
     match Era::decode(&mut &era_data[..]) {
         Ok(a) => {
             found_ext.era = Some(a);
             Ok(DecodedOut{remaining_vector, fancy_out: vec![OutputCard{card: ParserCard::Era(a), indent}]})
         },
-        Err(_) => return Err(ParserError::Decoding(DecodingError::Era)),
+        Err(_) => return Err(ParserError::Decoding(ParserDecodingError::Era)),
     }
 }
 

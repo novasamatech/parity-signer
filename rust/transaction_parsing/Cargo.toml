@@ -25,7 +25,6 @@ sp-core = "3.0.0"
 constants = {path = "../constants"}
 db_handling = {path = "../db_handling"}
 definitions = {path = "../definitions"}
-meta_reading = {path = "../meta_reading"}
 parser = {path = "../parser"}
 
 [lib]

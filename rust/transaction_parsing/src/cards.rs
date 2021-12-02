@@ -1,25 +1,24 @@
 use hex;
-use definitions::{crypto::Encryption, history::MetaValuesDisplay, keyring::VerifierKey, network_specs::{ChainSpecsToSend, Verifier}, qr_transfers::ContentLoadTypes};
+use definitions::{crypto::Encryption, error::{ErrorSigner, ErrorSource, Signer}, history::MetaValuesDisplay, keyring::VerifierKey, network_specs::{NetworkSpecsToSend, VerifierValue}, qr_transfers::ContentLoadTypes};
 use blake2_rfc::blake2b::blake2b;
-use sp_runtime::generic::Era;
+use sp_runtime::{generic::Era, MultiSigner};
 use parser::cards::ParserCard;
 
-use crate::error::Error;
-use crate::helpers::{GeneralHold, Hold};
+use crate::holds::{GeneralHold, Hold};
 
 pub (crate) enum Card <'a> {
     ParserCard(&'a ParserCard),
-    Author {base58_author: &'a str, seed_name: &'a str, path: &'a str, has_pwd: bool, name: &'a str},
+    Author {base58_author: &'a str, seed_name: &'a str, path: &'a str, has_pwd: bool},
     AuthorPlain (&'a str),
-    AuthorPublicKey{author_public_key: Vec<u8>, encryption: Encryption},
-    Verifier(&'a Verifier),
+    AuthorPublicKey(&'a MultiSigner),
+    Verifier(&'a VerifierValue),
     Meta(MetaValuesDisplay),
     TypesInfo(ContentLoadTypes),
-    NewSpecs(&'a ChainSpecsToSend),
+    NewSpecs(&'a NetworkSpecsToSend),
     NetworkName(&'a str),
     NetworkGenesisHash(&'a Vec<u8>),
     Warning (Warning <'a>),
-    Error (Error),
+    Error (ErrorSigner),
 }
 
 pub (crate) enum Warning <'a> {
@@ -89,9 +88,16 @@ impl <'a> Card <'a> {
                 ParserCard::NetworkNameVersion {name, version} => fancy(index, indent, "name_version", &format!("{{\"name\":\"{}\",\"version\":\"{}\"}}", name, version)),
                 ParserCard::TxVersion (x) => fancy(index, indent, "tx_version", &format!("\"{}\"", x)),
             },
-            Card::Author {base58_author, seed_name, path, has_pwd, name} => fancy(index, indent, "author", &format!("{{\"base58\":\"{}\",\"seed\":\"{}\",\"derivation_path\":\"{}\",\"has_password\":{},\"name\":\"{}\"}}", base58_author, seed_name, path, has_pwd, name)),
+            Card::Author {base58_author, seed_name, path, has_pwd} => fancy(index, indent, "author", &format!("{{\"base58\":\"{}\",\"seed\":\"{}\",\"derivation_path\":\"{}\",\"has_password\":{}}}", base58_author, seed_name, path, has_pwd)),
             Card::AuthorPlain (base58_author) => fancy(index, indent, "author_plain", &format!("{{\"base58\":\"{}\"}}", base58_author)),
-            Card::AuthorPublicKey{author_public_key, encryption} => fancy(index, indent, "author_public_key", &format!("{{\"hex\":\"{}\",\"crypto\":\"{}\"}}", hex::encode(author_public_key), encryption.show())),
+            Card::AuthorPublicKey(author_multi_signer) => {
+                let insert = match author_multi_signer {
+                    MultiSigner::Ed25519(p) => format!("{{\"hex\":\"{}\",\"crypto\":\"{}\"}}", hex::encode(p.to_vec()), Encryption::Ed25519.show()),
+                    MultiSigner::Sr25519(p) => format!("{{\"hex\":\"{}\",\"crypto\":\"{}\"}}", hex::encode(p.to_vec()), Encryption::Sr25519.show()),
+                    MultiSigner::Ecdsa(p) => format!("{{\"hex\":\"{}\",\"crypto\":\"{}\"}}", hex::encode(p.0.to_vec()), Encryption::Ecdsa.show()),
+                };
+                fancy(index, indent, "author_public_key", &insert)
+            },
             Card::Verifier(x) => fancy(index, indent, "verifier", &x.show_card()),
             Card::Meta(x) => fancy(index, indent, "meta", &format!("{{{}}}", x.show())),
             Card::TypesInfo(x) => fancy(index, indent, "types_hash", &format!("\"{}\"", hex::encode(blake2b(32, &[], &x.store()).as_bytes()))),
@@ -99,7 +105,7 @@ impl <'a> Card <'a> {
             Card::NetworkName(x) => fancy(index, indent, "network_name", &format!("\"{}\"", x)),
             Card::NetworkGenesisHash(x) => fancy(index, indent, "network_genesis_hash", &format!("\"{}\"", hex::encode(x))),
             Card::Warning (warn) => fancy(index, indent, "warning", &format!("\"{}\"", warn.show())),
-            Card::Error (err) => fancy(index, indent, "error", &format!("\"{}\"", err.show())),
+            Card::Error (err) => fancy(index, indent, "error", &format!("\"{}\"", <Signer>::show(&err))),
         }
     }
 }

@@ -1,10 +1,13 @@
 use parity_scale_codec_derive;
 use parity_scale_codec::{Decode, Encode};
+use sled::IVec;
 use sp_core::{ed25519, sr25519, ecdsa, crypto::{Ss58Codec, Ss58AddressFormat}};
 use sp_runtime::MultiSigner;
 use std::convert::TryInto;
 
 use crate::crypto::Encryption;
+use crate::error::{AddressKeySource, DatabaseActive, ErrorActive, ErrorSigner, ErrorSource, InterfaceSigner, KeyDecodingActive, NotHexSigner, Signer, SpecsKeySource};
+use crate::helpers::unhex;
 use crate::metadata::NameVersioned;
 
 /// NetworkSpecsKey is the database storage key used to search for 
@@ -31,19 +34,23 @@ impl NetworkSpecsKey {
         };
         Self(network_key_content.encode())
     }
-    /// Function to transform Vec<u8> into NetworkSpecsKey prior to processing
-    pub fn from_vec (vec: &Vec<u8>) -> Self {
-        Self(vec.to_vec())
+    /// Function to transform IVec (database key) into NetworkSpecsKey
+    pub fn from_ivec (ivec: &IVec) -> Self {
+        Self(ivec.to_vec())
+    }
+    /// Function to transform hex entered key into NetworkSpecsKey
+    pub fn from_hex(hex_line: &str) -> Result<Self, ErrorSigner> {
+        Ok(Self(unhex::<Signer>(hex_line, NotHexSigner::NetworkSpecsKey{input: hex_line.to_string()})?))
     }
     /// Function to get genesis hash and encryption from the NetworkSpecsKey
-    pub fn genesis_hash_encryption (&self) -> Result<(Vec<u8>, Encryption), &'static str> {
+    pub fn genesis_hash_encryption<T: ErrorSource>(&self, source: SpecsKeySource<T>) -> Result<(Vec<u8>, Encryption), T::Error> {
         match <NetworkSpecsKeyContent>::decode(&mut &self.0[..]) {
             Ok(a) => match a {
                 NetworkSpecsKeyContent::Ed25519(b) => Ok((b, Encryption::Ed25519)),
                 NetworkSpecsKeyContent::Sr25519(b) => Ok((b, Encryption::Sr25519)),
                 NetworkSpecsKeyContent::Ecdsa(b) => Ok((b, Encryption::Ecdsa)),
             },
-            Err(_) => return Err("network specs key could not be parced")
+            Err(_) => return Err(<T>::specs_key_to_error(self, source))
         }
     }
     /// Function to get the key that can be used for the database search from the NetworkSpecsKey
@@ -55,7 +62,7 @@ impl NetworkSpecsKey {
 
 /// VerifierKey is the database storage key used to search for 
 /// network verifier information NetworkVerifier (HOT database, network verifiers tree VERIFIERS)
-#[derive(parity_scale_codec_derive::Decode, parity_scale_codec_derive::Encode, PartialEq)]
+#[derive(parity_scale_codec_derive::Decode, parity_scale_codec_derive::Encode, Debug, Clone, PartialEq)]
 pub struct VerifierKey (Vec<u8>);
 
 impl VerifierKey {
@@ -64,8 +71,8 @@ impl VerifierKey {
         Self(genesis_hash.to_vec())
     }
     /// Function to transform Vec<u8> into VerifierKey prior to processing
-    pub fn from_vec (vec: &Vec<u8>) -> Self {
-        Self(vec.to_vec())
+    pub fn from_ivec (ivec: &IVec) -> Self {
+        Self(ivec.to_vec())
     }
     /// Function to get genesis hash from the VerifierKey
     pub fn genesis_hash (&self) -> Vec<u8> {
@@ -88,102 +95,120 @@ pub struct AddressKey (Vec<u8>);
 struct AddressKeyContent (MultiSigner);
 
 impl AddressKey {
-    /// Function to generate NetworkSpecsKey from parts: network genesis hash and network encryption
-    pub fn from_parts (public: &Vec<u8>, encryption: &Encryption) -> Result<Self, &'static str> {
-        let address_key_content = match encryption {
+    /// Function to generate AddressKey from corresponding MultiSigner value
+    pub fn from_multisigner (multisigner: &MultiSigner) -> Self {
+        Self(AddressKeyContent(multisigner.to_owned()).encode())
+    }
+    /// Function to generate AddressKey from parts: public key vector and network encryption
+    pub fn from_parts (public: &Vec<u8>, encryption: &Encryption) -> Result<Self, ErrorSigner> {
+        let multisigner = match encryption {
             Encryption::Ed25519 => {
                 let into_pubkey: [u8; 32] = match public.to_vec().try_into() {
                     Ok(a) => a,
-                    Err(_) => return Err("Public key length does not match encryption."),
+                    Err(_) => return Err(ErrorSigner::Interface(InterfaceSigner::PublicKeyLength)),
                 };
-                let pubkey = ed25519::Public::from_raw(into_pubkey);
-                AddressKeyContent(MultiSigner::Ed25519(pubkey))
+                MultiSigner::Ed25519(ed25519::Public::from_raw(into_pubkey))
             },
             Encryption::Sr25519 => {
                 let into_pubkey: [u8; 32] = match public.to_vec().try_into() {
                     Ok(a) => a,
-                    Err(_) => return Err("Public key length does not match encryption."),
+                    Err(_) => return Err(ErrorSigner::Interface(InterfaceSigner::PublicKeyLength)),
                 };
-                let pubkey = sr25519::Public::from_raw(into_pubkey);
-                AddressKeyContent(MultiSigner::Sr25519(pubkey))
+                MultiSigner::Sr25519(sr25519::Public::from_raw(into_pubkey))
             },
             Encryption::Ecdsa => {
                 let into_pubkey: [u8; 33] = match public.to_vec().try_into() {
                     Ok(a) => a,
-                    Err(_) => return Err("Public key length does not match encryption."),
+                    Err(_) => return Err(ErrorSigner::Interface(InterfaceSigner::PublicKeyLength)),
                 };
-                let pubkey = ecdsa::Public::from_raw(into_pubkey);
-                AddressKeyContent(MultiSigner::Ecdsa(pubkey))
+                MultiSigner::Ecdsa(ecdsa::Public::from_raw(into_pubkey))
             },
         };
-        Ok(Self(address_key_content.encode()))
+        Ok(Self::from_multisigner(&multisigner))
     }
-    /// Function to transform Vec<u8> into AddressKey prior to processing
-    pub fn from_vec (vec: &Vec<u8>) -> Self {
-        Self(vec.to_vec())
+    /// Function to generate AddressKey from parts: hexadecimal public key and network encryption
+    pub fn from_hex_public (hex_public: &str, encryption: &Encryption) -> Result<Self, ErrorSigner> {
+        let public = unhex::<Signer>(hex_public, NotHexSigner::PublicKey{input: hex_public.to_string()})?;
+        Self::from_parts(&public, encryption)
+    }
+    /// Function to transform IVec into AddressKey
+    pub fn from_ivec (ivec: &IVec) -> Self {
+        Self(ivec.to_vec())
+    }
+    /// Function to transform Vec<u8> into AddressKey
+    pub fn from_vec (vec: Vec<u8>) -> Self {
+        Self(vec)
     }
     /// Function to get public key and encryption from the AddressKey
-    pub fn public_key_encryption (&self) -> Result<(Vec<u8>, Encryption), &'static str> {
-        match &self.multi_signer()? {
+    pub fn public_key_encryption<T: ErrorSource>(&self, source: AddressKeySource<T>) -> Result<(Vec<u8>, Encryption), T::Error> {
+        match &self.multi_signer(source)? {
             MultiSigner::Ed25519(b) => Ok((b.to_vec(), Encryption::Ed25519)),
             MultiSigner::Sr25519(b) => Ok((b.to_vec(), Encryption::Sr25519)),
             MultiSigner::Ecdsa(b) => Ok((b.0.to_vec(), Encryption::Ecdsa)),
         }
     }
     /// Function to get MultiSigner from the AddressKey
-    pub fn multi_signer (&self) -> Result<MultiSigner, &'static str> {
+    pub fn multi_signer<T: ErrorSource>(&self, source: AddressKeySource<T>) -> Result<MultiSigner, T::Error> {
         match <AddressKeyContent>::decode(&mut &self.0[..]) {
             Ok(a) => Ok(a.0),
-            Err(_) => return Err("address key could not be parced")
+            Err(_) => return Err(<T>::address_key_to_error(&self, source)),
         }
     }
     /// Function to get the key that can be used for the database search from the NetworkSpecsKey
     pub fn key(&self) -> Vec<u8> {
         self.0.to_vec()
     }
-    /// Function to make base58 address for known public address with known encryption;
+    /// Function to make base58 address;
     /// if base58prefix is provided, generates custom Ss58AddressFormat,
     /// if not, uses default
-    pub fn print_as_base58 (&self, encryption: &Encryption, optional_prefix: Option<u16>) -> Result<String, &'static str> {
-        let multi_signer = &self.multi_signer()?;
-        match multi_signer {
-            MultiSigner::Ed25519(pubkey) => {
-                if encryption != &Encryption::Ed25519 {return Err("Encryption algorithm mismatch")}
-                match optional_prefix {
-                    Some(base58prefix) => {
-                        let version_for_base58 = Ss58AddressFormat::Custom(base58prefix);
-                        Ok(pubkey.to_ss58check_with_version(version_for_base58))
-                    },
-                    None => Ok(pubkey.to_ss58check()),
+    pub fn print_as_base58(&self, optional_prefix: Option<u16>, source: AddressKeySource<Signer>) -> Result<String, ErrorSigner> {
+        let multi_signer = self.multi_signer::<Signer>(source)?;
+        Ok(print_multisigner_as_base58(&multi_signer, optional_prefix))
+    }
+    /// function to get public address as a vector, encryption, and base58 address printed
+    /// if base58prefix is provided, generates custom Ss58AddressFormat,
+    /// if not, uses default
+    pub fn public_encryption_base58(&self, optional_prefix: Option<u16>, source: AddressKeySource<Signer>) -> Result<(Vec<u8>, Encryption, String), ErrorSigner> {
+        let multi_signer = self.multi_signer::<Signer>(source)?;
+        match optional_prefix {
+            Some(base58prefix) => {
+                let version_for_base58 = Ss58AddressFormat::Custom(base58prefix);
+                match multi_signer {
+                    MultiSigner::Ed25519(pubkey) => Ok((pubkey.0.to_vec(), Encryption::Ed25519, pubkey.to_ss58check_with_version(version_for_base58))),
+                    MultiSigner::Sr25519(pubkey) => Ok((pubkey.0.to_vec(), Encryption::Sr25519, pubkey.to_ss58check_with_version(version_for_base58))),
+                    MultiSigner::Ecdsa(pubkey) => Ok((pubkey.0.to_vec(), Encryption::Ecdsa, pubkey.to_ss58check_with_version(version_for_base58))),
                 }
             },
-            MultiSigner::Sr25519(pubkey) => {
-                if encryption != &Encryption::Sr25519 {return Err("Encryption algorithm mismatch")}
-                match optional_prefix {
-                    Some(base58prefix) => {
-                        let version_for_base58 = Ss58AddressFormat::Custom(base58prefix);
-                        Ok(pubkey.to_ss58check_with_version(version_for_base58))
-                    },
-                    None => Ok(pubkey.to_ss58check()),
-                }
-            },
-            MultiSigner::Ecdsa(pubkey) => {
-                if encryption != &Encryption::Ecdsa {return Err("Encryption algorithm mismatch")}
-                match optional_prefix {
-                    Some(base58prefix) => {
-                        let version_for_base58 = Ss58AddressFormat::Custom(base58prefix);
-                        Ok(pubkey.to_ss58check_with_version(version_for_base58))
-                    },
-                    None => Ok(pubkey.to_ss58check()),
-                }
-            },
+            None => match multi_signer {
+                MultiSigner::Ed25519(pubkey) => Ok((pubkey.0.to_vec(), Encryption::Ed25519, pubkey.to_ss58check())),
+                MultiSigner::Sr25519(pubkey) => Ok((pubkey.0.to_vec(), Encryption::Sr25519, pubkey.to_ss58check())),
+                MultiSigner::Ecdsa(pubkey) => Ok((pubkey.0.to_vec(), Encryption::Ecdsa, pubkey.to_ss58check())),
+            }
         }
     }
 }
 
+pub fn print_multisigner_as_base58 (multi_signer: &MultiSigner, optional_prefix: Option<u16>) -> String {
+    match optional_prefix {
+        Some(base58prefix) => {
+            let version_for_base58 = Ss58AddressFormat::Custom(base58prefix);
+            match multi_signer {
+                MultiSigner::Ed25519(pubkey) => pubkey.to_ss58check_with_version(version_for_base58),
+                MultiSigner::Sr25519(pubkey) => pubkey.to_ss58check_with_version(version_for_base58),
+                MultiSigner::Ecdsa(pubkey) => pubkey.to_ss58check_with_version(version_for_base58),
+            }
+        },
+        None => match multi_signer {
+            MultiSigner::Ed25519(pubkey) => pubkey.to_ss58check(),
+            MultiSigner::Sr25519(pubkey) => pubkey.to_ss58check(),
+            MultiSigner::Ecdsa(pubkey) => pubkey.to_ss58check(),
+        }
+    }
+}
 
 /// MetaKey is the database storage key used to search for 
 /// metadata entries (COLD and HOT databases, metadata tree METATREE)
+#[derive(Debug, Clone)]
 pub struct MetaKey (Vec<u8>);
 
 /// Struct for decoded MetaKey content
@@ -197,14 +222,14 @@ impl MetaKey {
         Self(meta_key_content.encode())
     }
     /// Function to transform Vec<u8> into MetaKey prior to processing
-    pub fn from_vec (vec: &Vec<u8>) -> Self {
-        Self(vec.to_vec())
+    pub fn from_ivec (ivec: &IVec) -> Self {
+        Self(ivec.to_vec())
     }
     /// Function to get genesis hash and encryption from the MetaKey
-    pub fn name_version (&self) -> Result<(String, u32), &'static str> {
+    pub fn name_version<T: ErrorSource>(&self) -> Result<(String, u32), T::Error> {
         match <MetaKeyContent>::decode(&mut &self.0[..]) {
             Ok(a) => Ok((a.0.name, a.0.version)),
-            Err(_) => return Err("metadata key could not be parced")
+            Err(_) => return Err(<T>::meta_key_to_error(self)),
         }
     }
     /// Function to get the key that can be used for the database search from the MetaKey
@@ -217,6 +242,7 @@ impl MetaKey {
 /// metadata entries (COLD and HOT databases, metadata tree METATREE)
 /// prefix is derived from network name alone, and is intended to find all metadata entries,
 /// i.e. all versions available
+#[derive(Debug)]
 pub struct MetaKeyPrefix (Vec<u8>);
 
 /// Struct for decoded MetaKey content
@@ -237,6 +263,7 @@ impl MetaKeyPrefix {
 
 /// AddressBookKey is the database storage key used to search for 
 /// address book entries (HOT database, address book tree ADDRESS_BOOK)
+#[derive(Debug, Clone)]
 pub struct AddressBookKey (Vec<u8>);
 
 /// Struct for decoded MetaKey content
@@ -250,19 +277,43 @@ impl AddressBookKey {
         Self(address_book_key_content.encode())
     }
     /// Function to transform Vec<u8> into AddressBookKey prior to processing
-    pub fn from_vec (vec: &Vec<u8>) -> Self {
-        Self(vec.to_vec())
+    pub fn from_ivec (ivec: &IVec) -> Self {
+        Self(ivec.to_vec())
     }
-    /// Function to get genesis hash and encryption from the AddressBookKey
-    pub fn title (&self) -> Result<String, &'static str> {
+    /// Function to get the network title from the AddressBookKey
+    pub fn title (&self) -> Result<String, ErrorActive> {
         match <AddressBookKeyContent>::decode(&mut &self.0[..]) {
             Ok(a) => Ok(a.0),
-            Err(_) => return Err("address book key could not be parced")
+            Err(_) => return Err(ErrorActive::Database(DatabaseActive::KeyDecoding(KeyDecodingActive::AddressBookKey(self.to_owned()))))
         }
     }
     /// Function to get the key that can be used for the database search from the AddressBookKey
     pub fn key(&self) -> Vec<u8> {
         self.0.to_vec()
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::error::{Active, SpecsKeySource, ExtraSpecsKeySourceSigner};
+    
+    #[test]
+    fn error_in_network_specs_key() {
+        let network_specs_key_hex = "0350e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e";
+        let network_specs_key = NetworkSpecsKey::from_hex(network_specs_key_hex).unwrap();
+        let error = network_specs_key.genesis_hash_encryption::<Signer>(SpecsKeySource::Extra(ExtraSpecsKeySourceSigner::Interface)).unwrap_err();
+        let error_print = <Signer>::show(&error);
+        let expected_error_print = "Error on the interface. Unable to parse network specs key 0350e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e passed through the interface.";
+        assert!( error_print == expected_error_print, "Received: \n{}", error_print);
+        let error = network_specs_key.genesis_hash_encryption::<Signer>(SpecsKeySource::SpecsTree).unwrap_err();
+        let error_print = <Signer>::show(&error);
+        let expected_error_print = "Database error. Unable to parse network specs key 0350e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e from the database.";
+        assert!( error_print == expected_error_print, "Received: \n{}", error_print);
+        let error = network_specs_key.genesis_hash_encryption::<Active>(SpecsKeySource::SpecsTree).unwrap_err();
+        let error_print = <Active>::show(&error);
+        let expected_error_print = "Database error. Unable to parse network specs key 0350e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e from the database.";
+        assert!( error_print == expected_error_print, "Received: \n{}", error_print);
     }
 }
 

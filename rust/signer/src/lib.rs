@@ -122,14 +122,14 @@ export! {
 		genesis_hash: &str,
         dbname: &str
 	) -> anyhow::Result<String, anyhow::Error> {
-        db_handling::chainspecs::print_network(dbname, genesis_hash)
+        db_handling::network_details::print_network(dbname, genesis_hash)
     }
 
     @Java_io_parity_signer_models_SignerDataModel_dbGetAllNetworksForNetworkSelector
 	fn get_all_networks_for_network_selector(
         dbname: &str
     ) -> anyhow::Result<String, anyhow::Error> {
-        db_handling::chainspecs::print_all_networks(dbname)
+        db_handling::network_details::print_all_networks(dbname)
     }
 
     @Java_io_parity_signer_models_SignerDataModel_dbGetRelevantIdentities
@@ -159,10 +159,10 @@ export! {
 	fn try_create_seed(
         seed_name: &str,
         seed_phrase: &str,
-        seed_length: u32,
+        _seed_length: u32,
 		dbname: &str
 	) -> anyhow::Result<String, anyhow::Error> {
-        db_handling::identities::try_create_seed(seed_name, seed_phrase, seed_length, dbname)
+        db_handling::identities::try_create_seed_phrase_proposal(seed_name, seed_phrase, dbname)
     }
 
     @Java_io_parity_signer_models_SignerDataModel_substrateSuggestNPlusOne
@@ -186,13 +186,13 @@ export! {
 	fn try_create_identity(
         seed_name: &str,
         seed_phrase: &str,
-        crypto: &str,
+        _crypto: &str,
         path: &str,
         network: &str,
         has_password: bool,
 		dbname: &str
 	) -> anyhow::Result<(), anyhow::Error> {
-        db_handling::identities::try_create_address("", seed_name, seed_phrase, crypto, path, network, has_password, dbname)
+        db_handling::identities::try_create_address(seed_name, seed_phrase, path, network, has_password, dbname)
     }
 
     @Java_io_parity_signer_models_SignerDataModel_substrateDeleteIdentity
@@ -293,7 +293,7 @@ export! {
 	fn get_warnings(
         dbname: &str
 	) -> anyhow::Result<bool, anyhow::Error> {
-        db_handling::helpers::get_danger_status(dbname)
+        db_handling::helpers::display_danger_status(dbname)
     }
 
     @Java_io_parity_signer_models_SignerDataModel_historyAcknowledgeWarnings
@@ -336,14 +336,14 @@ export! {
 
     @Java_io_parity_signer_models_SignerDataModel_signerSignTypes
 	fn sign_load_types(
-        public_key: &str,
-        encryption: &str,
+        address_key: &str,
+        _encryption: &str,
         seed_phrase: &str,
         password: &str,
         dbname: &str
 	) -> anyhow::Result<String, anyhow::Error> {
-        transaction_signing::sign_message::sufficient_crypto_load_types(
-            public_key, encryption, dbname, seed_phrase, password
+        transaction_signing::sign_load_types(
+            address_key, dbname, seed_phrase, password
         )
     }
 
@@ -351,28 +351,28 @@ export! {
 	fn sign_load_metadata(
         network: &str,
         version: u32,
-        public_key: &str,
-        encryption: &str,
+        address_key: &str,
+        _encryption: &str,
         seed_phrase: &str,
         password: &str,
         dbname: &str
 	) -> anyhow::Result<String, anyhow::Error> {
-        transaction_signing::sign_message::sufficient_crypto_load_metadata(
-            network, version, public_key, encryption, dbname, seed_phrase, password
+        transaction_signing::sign_load_metadata(
+            network, version, address_key, dbname, seed_phrase, password
         )
     }
 
     @Java_io_parity_signer_models_SignerDataModel_signerSignSpecs
 	fn sign_load_specs(
         network: &str,
-        public_key: &str,
-        encryption: &str,
+        address_key: &str,
+        _encryption: &str,
         seed_phrase: &str,
         password: &str,
         dbname: &str
 	) -> anyhow::Result<String, anyhow::Error> {
-        transaction_signing::sign_message::sufficient_crypto_add_specs(
-            network, public_key, encryption, dbname, seed_phrase, password
+        transaction_signing::sign_add_specs(
+            network, address_key, dbname, seed_phrase, password
         )
     }
 

@@ -5,8 +5,7 @@ use std::convert::TryInto;
 use std::fs;
 use regex::Regex;
 use lazy_static::lazy_static;
-use definitions::{crypto::Encryption, keyring::VerifierKey, metadata::{AddressBookEntry, MetaValues}, network_specs::{ChainSpecs, ChainSpecsToSend, CurrentVerifier, Verifier, VerifierValue}, qr_transfers::ContentLoadTypes, types::{TypeEntry, Description, EnumVariant, EnumVariantType, StructField}};
-use meta_reading::decode_metadata::decode_version;
+use definitions::{crypto::Encryption, error::{DefaultLoading, ErrorActive, IncomingMetadataSourceActive}, keyring::VerifierKey, metadata::{AddressBookEntry, MetaValues}, network_specs::{NetworkSpecs, NetworkSpecsToSend, CurrentVerifier, ValidCurrentVerifier, Verifier, VerifierValue}, qr_transfers::ContentLoadTypes, types::{TypeEntry, Description, EnumVariant, EnumVariantType, StructField}};
 
 pub const DEFAULT_VERIFIER_PUBLIC: [u8;32] = [
     0xc4,
@@ -133,10 +132,10 @@ fn get_default_network_info() -> Vec<DefaultNetworkInfo> {
     ]
 }
 
-pub fn get_default_chainspecs() -> Vec<ChainSpecs> {
-    let mut out: Vec<ChainSpecs> = Vec::new();
+pub fn get_default_chainspecs() -> Vec<NetworkSpecs> {
+    let mut out: Vec<NetworkSpecs> = Vec::new();
     for x in get_default_network_info().iter() {
-        let new = ChainSpecs {
+        let new = NetworkSpecs {
             base58prefix: x.base58prefix,
             color: x.color.to_string(),
             decimals: x.decimals,
@@ -158,15 +157,15 @@ pub fn get_default_chainspecs() -> Vec<ChainSpecs> {
 pub fn get_default_verifiers() -> Vec<(VerifierKey, CurrentVerifier)> {
     let mut out: Vec<(VerifierKey, CurrentVerifier)> = Vec::new();
     for x in get_default_network_info().iter() {
-        out.push((VerifierKey::from_parts(&x.genesis_hash.to_vec()), CurrentVerifier::General));
+        out.push((VerifierKey::from_parts(&x.genesis_hash.to_vec()), CurrentVerifier::Valid(ValidCurrentVerifier::General)));
     }
     out
 }
 
-pub fn get_default_chainspecs_to_send() -> Vec<ChainSpecsToSend> {
-    let mut out: Vec<ChainSpecsToSend> = Vec::new();
+pub fn get_default_chainspecs_to_send() -> Vec<NetworkSpecsToSend> {
+    let mut out: Vec<NetworkSpecsToSend> = Vec::new();
     for x in get_default_network_info().iter() {
-        let new = ChainSpecsToSend {
+        let new = NetworkSpecsToSend {
             base58prefix: x.base58prefix,
             color: x.color.to_string(),
             decimals: x.decimals,
@@ -199,23 +198,22 @@ pub fn get_default_address_book() -> Vec<AddressBookEntry> {
     out
 }
 
-pub fn get_default_metadata() -> Result<Vec<MetaValues>, String> {
+pub fn get_default_metadata() -> Result<Vec<MetaValues>, ErrorActive> {
     let mut out: Vec<MetaValues> = Vec::new();
     let path_set = match std::fs::read_dir("../defaults/default_metadata") {
         Ok(a) => a,
-        Err(e) => return Err(format!("Error reading folder with default metadata. {}", e)),
+        Err(e) => return Err(ErrorActive::DefaultLoading(DefaultLoading::MetadataFolder(e))),
     };
     for x in path_set {
         if let Ok(path) = x {
-            let meta_str = match std::fs::read_to_string(path.path()) {
-                Ok(a) => a,
-                Err(e) => return Err(format!("Error reading file with default metadata. {}", e)),
-            };
-            let new = match decode_version(&meta_str.trim()) {
-                Ok(a) => a,
-                Err(e) => return Err(format!("Error decoding default metadata. {}", e)),
-            };
-            out.push(new)
+            if let Some(name) = path.path().to_str() {
+                let meta_str = match std::fs::read_to_string(path.path()) {
+                    Ok(a) => a,
+                    Err(e) => return Err(ErrorActive::DefaultLoading(DefaultLoading::MetadataFile(e))),
+                };
+                let new = MetaValues::from_str_metadata(&meta_str.trim(), IncomingMetadataSourceActive::Default{filename: name.to_string()})?;
+                out.push(new)
+            }
         }
     }
     Ok(out)
@@ -233,12 +231,12 @@ lazy_static! {
     static ref REG_TYPES: Regex = Regex::new(r#"(?m)(pub )?type (?P<name>.*) = (?P<description>.*);$"#).expect("checked construction");
 }
 
-pub fn get_default_types() -> Result<ContentLoadTypes, String> {
+pub fn get_default_types_vec() -> Result<Vec<TypeEntry>, ErrorActive> {
     
     let filename = "../defaults/default_types/full_types_information";
     let type_info = match fs::read_to_string(filename) {
         Ok(x) => x,
-        Err(e) => return Err(format!("Error reading datafile with default types information. {}", e)),
+        Err(e) => return Err(ErrorActive::DefaultLoading(DefaultLoading::TypesFile(e))),
     };
     
     let mut types_prep: Vec<TypeEntry> = Vec::new();
@@ -327,5 +325,9 @@ pub fn get_default_types() -> Result<ContentLoadTypes, String> {
         types_prep.push(new_entry);
     }
     
-    Ok(ContentLoadTypes::generate(&types_prep))
+    Ok(types_prep)
+}
+
+pub fn get_default_types_content() -> Result<ContentLoadTypes, ErrorActive> {
+    Ok(ContentLoadTypes::generate(&get_default_types_vec()?))
 }

@@ -470,7 +470,6 @@ dependencies = [
  "definitions",
  "hex",
  "lazy_static",
- "meta_reading",
  "parity-scale-codec",
  "parity-scale-codec-derive",
  "qrcode_static",
@@ -489,7 +488,6 @@ dependencies = [
  "definitions",
  "hex",
  "lazy_static",
- "meta_reading",
  "regex",
  "sp-core",
  "sp-runtime",
@@ -501,13 +499,16 @@ version = "0.1.0"
 dependencies = [
  "anyhow",
  "blake2-rfc",
+ "frame-metadata",
  "hex",
  "lazy_static",
  "parity-scale-codec",
  "parity-scale-codec-derive",
  "regex",
+ "sled",
  "sp-core",
  "sp-runtime",
+ "sp-version",
  "zeroize",
 ]
 
@@ -867,16 +868,18 @@ dependencies = [
 name = "generate_message"
 version = "0.1.0"
 dependencies = [
- "anyhow",
  "constants",
  "db_handling",
  "definitions",
  "hex",
- "meta_reading",
+ "jsonrpsee-types",
+ "jsonrpsee-ws-client",
  "parity-scale-codec",
  "qrcode_rtx",
+ "serde_json",
  "sled",
  "sp-core",
+ "tokio",
 ]
 
 [[package]]
@@ -1320,21 +1323,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "meta_reading"
-version = "0.1.0"
-dependencies = [
- "definitions",
- "frame-metadata",
- "hex",
- "jsonrpsee-types",
- "jsonrpsee-ws-client",
- "parity-scale-codec",
- "serde",
- "serde_json",
- "tokio",
-]
-
-[[package]]
 name = "miniz_oxide"
 version = "0.3.7"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1616,7 +1604,6 @@ dependencies = [
  "frame-metadata",
  "hex",
  "lazy_static",
- "meta_reading",
  "num-bigint 0.4.2",
  "parity-scale-codec",
  "parity-scale-codec-derive",
@@ -2675,6 +2662,19 @@ dependencies = [
 ]
 
 [[package]]
+name = "sp-version"
+version = "3.0.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "dbeffa538a13d715d30e01d57a2636ba32845b737a29a3ea32403576588222e7"
+dependencies = [
+ "impl-serde",
+ "parity-scale-codec",
+ "serde",
+ "sp-runtime",
+ "sp-std",
+]
+
+[[package]]
 name = "sp-wasm-interface"
 version = "3.0.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2988,7 +2988,6 @@ dependencies = [
  "frame-metadata",
  "hex",
  "lazy_static",
- "meta_reading",
  "num-bigint 0.4.2",
  "parity-scale-codec",
  "parity-scale-codec-derive",

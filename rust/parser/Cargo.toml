@@ -22,7 +22,6 @@ sp-runtime = "3.0.0"
 sp-core = "3.0.0"
 defaults = {path = "../defaults"}
 definitions = {path = "../definitions"}
-meta_reading = {path = "../meta_reading"}
 
 
 [lib]

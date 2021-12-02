@@ -1,7 +1,9 @@
 use parity_scale_codec::{Decode, Encode};
 use parity_scale_codec_derive;
 
-use crate::{network_specs::ChainSpecsToSend, types::TypeEntry};
+use crate::error::{ErrorActive, ErrorSource, TransferContent};
+use crate::network_specs::NetworkSpecsToSend;
+use crate::types::TypeEntry;
 
 /// Struct to process the content of qr codes with load_metadata messages
 pub struct ContentLoadMeta (Vec<u8>);
@@ -27,31 +29,31 @@ impl ContentLoadMeta {
         Self(vec.to_vec())
     }
     /// Function to get metadata from load_metadata content
-    pub fn meta (&self) -> Result<Vec<u8>, &'static str>  {
+    pub fn meta<T: ErrorSource>(&self) -> Result<Vec<u8>, T::Error>  {
         match <DecodedContentLoadMeta>::decode(&mut &self.0[..]) {
             Ok(a) => Ok(a.meta),
-            Err(_) => return Err("load_metadata content could not be decoded")
+            Err(_) => return Err(<T>::transfer_content_error(TransferContent::LoadMeta)),
         }
     }
     /// Function to get genesis hash from load_metadata content
-    pub fn genesis_hash (&self) -> Result<[u8; 32], &'static str> {
+    pub fn genesis_hash<T: ErrorSource> (&self) -> Result<[u8; 32], T::Error> {
         match <DecodedContentLoadMeta>::decode(&mut &self.0[..]) {
             Ok(a) => Ok(a.genesis_hash),
-            Err(_) => return Err("load_metadata content could not be decoded")
+            Err(_) => return Err(<T>::transfer_content_error(TransferContent::LoadMeta)),
         }
     }
     /// Function to decode load_metadata message and get both metadata and network genesis hash as a tuple
-    pub fn meta_genhash (&self) -> Result<(Vec<u8>, [u8; 32]), &'static str> {
+    pub fn meta_genhash<T: ErrorSource> (&self) -> Result<(Vec<u8>, [u8; 32]), T::Error> {
         match <DecodedContentLoadMeta>::decode(&mut &self.0[..]) {
             Ok(a) => Ok((a.meta, a.genesis_hash)),
-            Err(_) => return Err("load_metadata content could not be decoded")
+            Err(_) => return Err(<T>::transfer_content_error(TransferContent::LoadMeta)),
         }
     }
     /// Function to export load_metadata content into file
-    pub fn write (&self, filename: &str) -> Result<(), String> {
+    pub fn write (&self, filename: &str) -> Result<(), ErrorActive> {
         match std::fs::write(&filename, &self.0) {
             Ok(_) => Ok(()),
-            Err(e) => return Err(e.to_string()),
+            Err(e) => return Err(ErrorActive::Output(e)),
         }
     }
     /// Function to put load_metadata information into storage as Vec<u8>
@@ -65,12 +67,12 @@ pub struct ContentAddSpecs (Vec<u8>);
 
 #[derive(parity_scale_codec_derive::Decode, parity_scale_codec_derive::Encode)]
 struct DecodedContentAddSpecs {
-    specs: ChainSpecsToSend,
+    specs: NetworkSpecsToSend,
 }
 
 impl ContentAddSpecs {
-    /// Function to generate add_specs content from network specs ChainSpecsToSend
-    pub fn generate (specs: &ChainSpecsToSend) -> Self {
+    /// Function to generate add_specs content from network specs NetworkSpecsToSend
+    pub fn generate (specs: &NetworkSpecsToSend) -> Self {
         Self (
             DecodedContentAddSpecs {
                 specs: specs.to_owned(),
@@ -81,18 +83,18 @@ impl ContentAddSpecs {
     pub fn from_vec (vec: &Vec<u8>) -> Self {
         Self(vec.to_vec())
     }
-    /// Function to get network specs ChainSpecsToSend from add_specs content
-    pub fn specs (&self) -> Result<ChainSpecsToSend, &'static str> {
+    /// Function to get network specs NetworkSpecsToSend from add_specs content
+    pub fn specs<T: ErrorSource> (&self) -> Result<NetworkSpecsToSend, T::Error> {
         match <DecodedContentAddSpecs>::decode(&mut &self.0[..]) {
             Ok(a) => Ok(a.specs),
-            Err(_) => return Err("add_specs content could not be decoded")
+            Err(_) => return Err(<T>::transfer_content_error(TransferContent::AddSpecs)),
         }
     }
     /// Function to export add_specs content into file
-    pub fn write (&self, filename: &str) -> Result<(), String> {
+    pub fn write (&self, filename: &str) -> Result<(), ErrorActive> {
         match std::fs::write(&filename, &self.0) {
             Ok(_) => Ok(()),
-            Err(e) => return Err(e.to_string()),
+            Err(e) => return Err(ErrorActive::Output(e)),
         }
     }
     /// Function to put add_specs information into storage as Vec<u8>
@@ -124,17 +126,17 @@ impl ContentLoadTypes {
         Self(vec.to_vec())
     }
     /// Function to get vector Vec<TypeEntry> from load_types content
-    pub fn types (&self) -> Result<Vec<TypeEntry>, &'static str> {
+    pub fn types<T: ErrorSource> (&self) -> Result<Vec<TypeEntry>, T::Error> {
         match <DecodedContentLoadTypes>::decode(&mut &self.0[..]) {
             Ok(a) => Ok(a.types),
-            Err(_) => return Err("load_types content could not be decoded")
+            Err(_) => return Err(<T>::transfer_content_error(TransferContent::LoadTypes)),
         }
     }
     /// Function to export load_types content into file
-    pub fn write (&self, filename: &str) -> Result<(), String> {
+    pub fn write (&self, filename: &str) -> Result<(), ErrorActive> {
         match std::fs::write(&filename, &self.0) {
             Ok(_) => Ok(()),
-            Err(e) => return Err(e.to_string()),
+            Err(e) => return Err(ErrorActive::Output(e)),
         }
     }
     /// Function to put types information into storage as Vec<u8>

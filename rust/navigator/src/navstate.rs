@@ -215,9 +215,14 @@ impl State {
             },
             _ => "".to_string(),
         };
-
-        self.navstate = new_navstate;
-        let mut output = format!("{}{}", screen_details, modal_details);
+        let mut output = String::new();
+        if new_navstate.modal == Modal::Error {
+            self.navstate.modal = Modal::Error;
+            output = format!("{}", modal_details);
+        } else {
+            self.navstate = new_navstate;
+            output = format!("{}{}", screen_details, modal_details);
+        }
         output.pop();
         output
         } else {

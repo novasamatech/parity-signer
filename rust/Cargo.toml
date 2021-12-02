@@ -6,7 +6,6 @@ members = [
 	"defaults",
 	"definitions",
 	"generate_message",
-	"meta_reading",
 	"navigator",
 	"parser",
 	"printing_balance",

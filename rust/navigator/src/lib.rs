@@ -73,7 +73,7 @@ pub fn init_navigation(
             (*navstate).seed_names = seed_names.split(",").map(|a| a.to_string()).collect();
             (*navstate).seed_names.sort();
             (*navstate).seed_names.dedup();
-            match db_handling::chainspecs::get_all_networks(dbname) {
+            match db_handling::network_details::get_all_networks(dbname) {
                 Ok(a) => for x in a.iter() {
                     (*navstate).networks.push(NetworkSpecsKey::from_parts(&x.genesis_hash.to_vec(), &x.encryption));
                 },

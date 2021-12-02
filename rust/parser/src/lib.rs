@@ -1,7 +1,6 @@
-use defaults::get_default_types;
-use definitions::{metadata::VersionDecoded, network_specs::ShortSpecs, types::TypeEntry};
+use defaults::get_default_types_vec;
+use definitions::{error::{ParserError, ParserDecodingError, ParserMetadataError}, metadata::name_versioned_from_metadata, network_specs::ShortSpecs, types::TypeEntry};
 use frame_metadata::{RuntimeMetadata, v14::RuntimeMetadataV14};
-use meta_reading::decode_metadata::get_meta_const_light;
 use parity_scale_codec::Decode;
 use printing_balance::{convert_balance_pretty};
 use sp_runtime::generic::Era;
@@ -16,8 +15,8 @@ mod decoding_sci;
     use decoding_sci::decoding_sci_entry_point;
 mod decoding_sci_ext;
     use decoding_sci_ext::{decode_ext_attempt, Ext};
-pub mod error;
-    use error::{Error, ParserError, ArgumentsError, DecodingError, MetadataError, SystemError};
+mod error;
+    use error::{Error, ArgumentsError};
 pub mod method;
     use method::OlderMeta;
 mod tests;
@@ -32,7 +31,7 @@ pub fn parse_method (method_data: Vec<u8>, metadata_bundle: &MetadataBundle, sho
         MetadataBundle::Older {older_meta, types, network_version: _} => process_as_call (method_data, &older_meta, &types, start_indent, &short_specs)?,
         MetadataBundle::Sci {meta_v14, network_version: _} => decoding_sci_entry_point (method_data, &meta_v14, start_indent, &short_specs)?,
     };
-    if method_decoded.remaining_vector.len() != 0 {return Err(ParserError::Decoding(DecodingError::SomeDataNotUsedMethod))}
+    if method_decoded.remaining_vector.len() != 0 {return Err(ParserError::Decoding(ParserDecodingError::SomeDataNotUsedMethod))}
     Ok(method_decoded.fancy_out)
 }
 
@@ -57,14 +56,11 @@ pub fn parse_extensions (extensions_data: Vec<u8>, metadata_bundle: &MetadataBun
         MetadataBundle::Older {older_meta: _, types: _, network_version} => {
             let ext = match <ExtValues>::decode(&mut &extensions_data[..]) {
                 Ok(a) => a,
-                Err(_) => return Err(ParserError::Decoding(DecodingError::ExtensionsOlder)),
+                Err(_) => return Err(ParserError::Decoding(ParserDecodingError::ExtensionsOlder)),
             };
-            if ext.genesis_hash != short_specs.genesis_hash {return Err(ParserError::Decoding(DecodingError::GenesisHashMismatch))}
+            if ext.genesis_hash != short_specs.genesis_hash {return Err(ParserError::Decoding(ParserDecodingError::GenesisHashMismatch))}
             if network_version != &ext.metadata_version {return Err(ParserError::WrongNetworkVersion{as_decoded: ext.metadata_version.to_string(), in_metadata: network_version.to_owned()})}
-            let tip = match convert_balance_pretty (&ext.tip.to_string(), short_specs.decimals, &short_specs.unit) {
-                Ok(x) => x,
-                Err(_) => return Err(ParserError::SystemError(SystemError::BalanceFail)),
-            };
+            let tip = convert_balance_pretty (&ext.tip.to_string(), short_specs.decimals, &short_specs.unit);
             let cards = vec![
                 OutputCard{card: ParserCard::Era(ext.era), indent},
                 OutputCard{card: ParserCard::Nonce(ext.nonce.to_string()), indent},
@@ -78,29 +74,29 @@ pub fn parse_extensions (extensions_data: Vec<u8>, metadata_bundle: &MetadataBun
         MetadataBundle::Sci {meta_v14, network_version} => {
             let mut ext = Ext::init();
             let extensions_decoded = decode_ext_attempt (&extensions_data, &mut ext, &meta_v14, indent, short_specs)?;
-            if let Some(genesis_hash) = ext.found_ext.genesis_hash {if genesis_hash != short_specs.genesis_hash {return Err(ParserError::Decoding(DecodingError::GenesisHashMismatch))}}
+            if let Some(genesis_hash) = ext.found_ext.genesis_hash {if genesis_hash != short_specs.genesis_hash {return Err(ParserError::Decoding(ParserDecodingError::GenesisHashMismatch))}}
             let block_hash = match ext.found_ext.block_hash {
                 Some(a) => a,
-                None => return Err(ParserError::FundamentallyBadV14Metadata(MetadataError::NoBlockHash)),
+                None => return Err(ParserError::FundamentallyBadV14Metadata(ParserMetadataError::NoBlockHash)),
             };
             let era = match ext.found_ext.era {
                 Some(a) => a,
-                None => return Err(ParserError::FundamentallyBadV14Metadata(MetadataError::NoEra)),
+                None => return Err(ParserError::FundamentallyBadV14Metadata(ParserMetadataError::NoEra)),
             };
             match ext.found_ext.network_version_printed {
                 Some(a) => if a != network_version.to_string() {return Err(ParserError::WrongNetworkVersion{as_decoded: a, in_metadata: network_version.to_owned()})},
-                None => return Err(ParserError::FundamentallyBadV14Metadata(MetadataError::NoVersionExt)),
+                None => return Err(ParserError::FundamentallyBadV14Metadata(ParserMetadataError::NoVersionExt)),
             }
-            if extensions_decoded.remaining_vector.len() != 0 {return Err(ParserError::Decoding(DecodingError::SomeDataNotUsedExtensions))}
+            if extensions_decoded.remaining_vector.len() != 0 {return Err(ParserError::Decoding(ParserDecodingError::SomeDataNotUsedExtensions))}
             (era, block_hash, extensions_decoded.fancy_out)
         },
     };
     if let Era::Immortal = era {
-        if short_specs.genesis_hash != block_hash {return Err(ParserError::Decoding(DecodingError::ImmortalHashMismatch))}
-        if let Some(true) = optional_mortal_flag {return Err(ParserError::Decoding(DecodingError::UnexpectedImmortality))}
+        if short_specs.genesis_hash != block_hash {return Err(ParserError::Decoding(ParserDecodingError::ImmortalHashMismatch))}
+        if let Some(true) = optional_mortal_flag {return Err(ParserError::Decoding(ParserDecodingError::UnexpectedImmortality))}
     }
     if let Era::Mortal(_, _) = era {
-        if let Some(false) = optional_mortal_flag {return Err(ParserError::Decoding(DecodingError::UnexpectedMortality))}
+        if let Some(false) = optional_mortal_flag {return Err(ParserError::Decoding(ParserDecodingError::UnexpectedMortality))}
     }
     Ok(cards)
 }
@@ -112,11 +108,11 @@ pub fn parse_set (data: &Vec<u8>, metadata_bundle: &MetadataBundle, short_specs:
         Some(start) => {
             match data.get(start..start+method_length) {
                 Some(a) => (a.to_vec(), data[start+method_length..].to_vec()),
-                None => {return Err(ParserError::Decoding(DecodingError::DataTooShort))}
+                None => {return Err(ParserError::Decoding(ParserDecodingError::DataTooShort))}
             }
         },
         None => {
-            if method_length != 0 {return Err(ParserError::Decoding(DecodingError::DataTooShort))}
+            if method_length != 0 {return Err(ParserError::Decoding(ParserDecodingError::DataTooShort))}
             (Vec::new(), data.to_vec())
         },
     };
@@ -126,16 +122,11 @@ pub fn parse_set (data: &Vec<u8>, metadata_bundle: &MetadataBundle, short_specs:
 }
 
 pub fn parse_and_display_set (data: &Vec<u8>, metadata: &RuntimeMetadata, short_specs: &ShortSpecs) -> Result<String, String> {
-    let (network_name, network_version) = match get_meta_const_light(&metadata) {
-        Ok(x) => {
-            match VersionDecoded::decode(&mut &x[..]) {
-                Ok(y) => (y.specname, y.spec_version),
-                Err(_) => return Err(Error::Arguments(ArgumentsError::MetaSpecVersionNotDecodeable).show())
-            }
-        },
-        Err(_) => return Err(Error::Arguments(ArgumentsError::NoMetaSpecVersion).show())
+    let name_versioned = match name_versioned_from_metadata(&metadata) {
+        Ok(x) => x,
+        Err(e) => return Err(Error::Arguments(ArgumentsError::Metadata(e)).show())
     };
-    if network_name != short_specs.name {return Err(Error::Arguments(ArgumentsError::NetworkNameMismatch {name_metadata: network_name, name_network_specs: short_specs.name.to_string()}).show())}
+    if name_versioned.name != short_specs.name {return Err(Error::Arguments(ArgumentsError::NetworkNameMismatch {name_metadata: name_versioned.name.to_string(), name_network_specs: short_specs.name.to_string()}).show())}
     let metadata_bundle = match metadata {
         RuntimeMetadata::V12(_)|RuntimeMetadata::V13(_) => {
             let older_meta = match metadata {
@@ -143,18 +134,17 @@ pub fn parse_and_display_set (data: &Vec<u8>, metadata: &RuntimeMetadata, short_
                 RuntimeMetadata::V13(meta_v13) => {OlderMeta::V13(meta_v13)},
                 _ => unreachable!(),
             };
-            let types = match get_default_types() {
+            let types = match get_default_types_vec() {
                 Ok(a) => {
-                    let out = a.types().expect("just generated types set");
-                    if out.len() == 0 {return Err(Error::Arguments(ArgumentsError::NoTypes).show())}
-                    out
+                    if a.len() == 0 {return Err(Error::Arguments(ArgumentsError::NoTypes).show())}
+                    a
                 },
-                Err(_) => return Err(Error::Arguments(ArgumentsError::NoTypes).show())
+                Err(_) => return Err(Error::Arguments(ArgumentsError::DefaultTypes).show())
             };
-            MetadataBundle::Older{older_meta, types, network_version}
+            MetadataBundle::Older{older_meta, types, network_version: name_versioned.version}
         },
-        RuntimeMetadata::V14(meta_v14) => MetadataBundle::Sci{meta_v14, network_version},
-        _ => return Err(Error::Arguments(ArgumentsError::RuntimeVersionIncompatible).show()),
+        RuntimeMetadata::V14(meta_v14) => MetadataBundle::Sci{meta_v14, network_version: name_versioned.version},
+        _ => unreachable!(), // just checked in the name_versioned_from_metadata function if the metadata is acceptable one
     };
     match parse_set (data, &metadata_bundle, short_specs, None) {
         Ok((method_cards_result, extensions_cards, _, _)) => {

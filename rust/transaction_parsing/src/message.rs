@@ -1,15 +1,14 @@
-use db_handling::db_transactions::{TrDbColdSign, SignContent};
-use definitions::keyring::{AddressKey, NetworkSpecsKey};
+use db_handling::{db_transactions::{TrDbColdSign, SignContent}, helpers::{try_get_network_specs, try_get_address_details}};
+use definitions::{error::{ErrorSigner, InputSigner}, keyring::{AddressKey, NetworkSpecsKey, print_multisigner_as_base58}};
 use parity_scale_codec::Decode;
 use parser::cards::ParserCard;
 
 use crate::cards::{Action, Card, Warning};
-use crate::error::{Error, BadInputData, DatabaseError};
-use crate::helpers::{author_encryption_msg_genesis, checked_address_details, checked_network_specs, sign_store_and_get_checksum};
+use crate::helpers::multisigner_msg_genesis_encryption;
 
-pub fn process_message (data_hex: &str, dbname: &str) -> Result<String, Error> {
+pub fn process_message (data_hex: &str, dbname: &str) -> Result<String, ErrorSigner> {
 
-    let (author_public_key, encryption, message_vec, genesis_hash_vec) = author_encryption_msg_genesis(data_hex)?;
+    let (author_multi_signer, message_vec, genesis_hash_vec, encryption) = multisigner_msg_genesis_encryption(data_hex)?;
     let network_specs_key = NetworkSpecsKey::from_parts(&genesis_hash_vec, &encryption);
     
 // this is a standard decoding of String, with utf8 conversion;
@@ -18,25 +17,25 @@ pub fn process_message (data_hex: &str, dbname: &str) -> Result<String, Error> {
 // note that some invisible symbols may thus sneak into the message;
     let message = match String::decode(&mut &message_vec[..]) {
         Ok(a) => a,
-        Err(_) => return Err(Error::BadInputData(BadInputData::MessageNotReadable))
+        Err(_) => return Err(ErrorSigner::Input(InputSigner::MessageNotReadable)),
     };
     
 // initialize index and indent
     let mut index: u32 = 0;
     let indent: u32 = 0;
     
-    match checked_network_specs(&network_specs_key, &dbname)? {
+    match try_get_network_specs(&dbname, &network_specs_key)? {
         Some(network_specs) => {
-            let address_key = AddressKey::from_parts(&author_public_key, &encryption).expect("already matched encryption type and author public key length, should always work");
-            let author = address_key.print_as_base58(&encryption, Some(network_specs.base58prefix)).expect("just generated address_key, should always work");
-            match checked_address_details(&address_key, &dbname)? {
+            let address_key = AddressKey::from_multisigner(&author_multi_signer);
+            let author = print_multisigner_as_base58(&author_multi_signer, Some(network_specs.base58prefix));
+            match try_get_address_details(&dbname, &address_key)? {
                 Some(address_details) => {
-                    let author_card = Card::Author{base58_author: &author, seed_name: &address_details.seed_name, path: &address_details.path, has_pwd: address_details.has_pwd, name: &address_details.name}.card(&mut index, indent);
+                    let author_card = Card::Author{base58_author: &author, seed_name: &address_details.seed_name, path: &address_details.path, has_pwd: address_details.has_pwd}.card(&mut index, indent);
                     if address_details.network_id.contains(&network_specs_key) {
                         let message_card = Card::ParserCard(&ParserCard::Text(message.to_string())).card(&mut index, indent);
                         let network_card = Card::NetworkName(&network_specs.name).card(&mut index, indent);
                         let sign = TrDbColdSign::generate(SignContent::Message(message), &network_specs.name, &address_details.path, address_details.has_pwd, &address_key, Vec::new());
-                        let checksum = sign_store_and_get_checksum (sign, &dbname)?;
+                        let checksum = sign.store_and_get_checksum (&dbname)?;
                         let action_card = Action::Sign(checksum).card();
                         Ok(format!("{{\"author\":[{}],\"message\":[{},{}],{}}}", author_card, message_card, network_card, action_card))
                     }
@@ -57,8 +56,8 @@ pub fn process_message (data_hex: &str, dbname: &str) -> Result<String, Error> {
             }
         },
         None => {
-            let author_card = Card::AuthorPublicKey{author_public_key, encryption}.card(&mut index, indent);
-            let error_card = Card::Error(Error::DatabaseError(DatabaseError::NoNetwork)).card(&mut index, indent);
+            let author_card = Card::AuthorPublicKey(&author_multi_signer).card(&mut index, indent);
+            let error_card = Card::Error(ErrorSigner::Input(InputSigner::UnknownNetwork{genesis_hash: genesis_hash_vec.to_vec(), encryption})).card(&mut index, indent);
             let message_card = Card::ParserCard(&ParserCard::Text(message.to_string())).card(&mut index, indent);
             let network_card = Card::NetworkGenesisHash(&genesis_hash_vec).card(&mut index, indent);
             Ok(format!("{{\"author\":[{}],\"error\":[{}],\"message\":[{},{}]}}", author_card, error_card, message_card, network_card))

@@ -1,25 +1,19 @@
 use constants::{HOT_DB_NAME, METATREE};
-use definitions::{keyring::MetaKey, metadata::MetaValues};
-use anyhow;
+use definitions::{error::{Active, DatabaseActive, ErrorActive, Fetch}, keyring::MetaKey, metadata::MetaValues};
 use db_handling::{db_transactions::TrDbHot, helpers::{open_db, open_tree, make_batch_clear_tree}};
-
-use crate::error::Error;
-use crate::helpers::decode_and_check_meta_entry;
-
 
 
 /// Function to read network metadata entries existing in the metadata tree of the database
 /// into MetaValues vector, and clear the metadata tree after reading.
-fn read_metadata_database () -> anyhow::Result<Vec<MetaValues>> {
-    let database = open_db(HOT_DB_NAME)?;
-    let metadata = open_tree(&database, METATREE)?;
+fn read_metadata_database () -> Result<Vec<MetaValues>, ErrorActive> {
+    let database = open_db::<Active>(HOT_DB_NAME)?;
+    let metadata = open_tree::<Active>(&database, METATREE)?;
     let mut out: Vec<MetaValues> = Vec::new();
     for x in metadata.iter() {
-        if let Ok(a) = x {out.push(decode_and_check_meta_entry(a)?)}
+        if let Ok(a) = x {out.push(MetaValues::from_entry_checked::<Active>(a)?)}
     }
     Ok(out)
 }
-
 
 /// Struct used to sort the metadata entries:
 /// newer has newest MetaValues entry from the database,
@@ -34,7 +28,7 @@ pub struct SortedMetaValues {
 /// with maximum one older version for each of the networks;
 /// at the moment it is agreed to have no more than two entries for each of the networks,
 /// function throws error if finds the third one
-fn sort_metavalues (meta_values: Vec<MetaValues>) -> anyhow::Result<SortedMetaValues> {
+fn sort_metavalues (meta_values: Vec<MetaValues>) -> Result<SortedMetaValues, ErrorActive> {
     let mut newer: Vec<MetaValues> = Vec::new();
     let mut older: Vec<MetaValues> = Vec::new();
     for x in meta_values.iter() {
@@ -43,14 +37,14 @@ fn sort_metavalues (meta_values: Vec<MetaValues>) -> anyhow::Result<SortedMetaVa
         for (i, y) in newer.iter().enumerate() {
             if x.name == y.name {
                 for z in older.iter() {
-                    if x.name == z.name {return Err(Error::DatabaseMetadataOverTwoEntries(x.name.to_string()).show())}
+                    if x.name == z.name {return Err(ErrorActive::Database(DatabaseActive::HotDatabaseMetadataOverTwoEntries{name: x.name.to_string()}))}
                 }
                 found_in_new = true;
                 if x.version < y.version {
                     older.push(x.to_owned());
                 }
                 else {
-                    if x.version == y.version {return Err(Error::DatabaseMetadataSameVersionTwice{name: x.name.to_string(), version: x.version}.show())}
+                    if x.version == y.version {return Err(ErrorActive::Database(DatabaseActive::HotDatabaseMetadataSameVersionTwice{name: x.name.to_string(), version: x.version}))}
                     else {
                         num_new = Some(i);
                     }
@@ -72,20 +66,18 @@ fn sort_metavalues (meta_values: Vec<MetaValues>) -> anyhow::Result<SortedMetaVa
     })
 }
 
-
 /// Struct to store sorted metavalues and a flag indicating if the entry was added
 pub struct UpdSortedMetaValues {
     pub sorted: SortedMetaValues,
     pub upd_done: bool,
 }
 
-
 /// Function to add new MetaValues entry to SortedMetaValues
 /// If the fetched metadata is good and has later version than the ones in SortedMetaValues,
 /// it is added to newer group of metavalues, any previous value from newer is moved to older,
 /// if there was any value in older, it gets kicked out.
 /// flag upd_done indicates if any update was done to the SortedMetaValues
-pub fn add_new (new: &MetaValues, sorted: &SortedMetaValues) -> anyhow::Result<UpdSortedMetaValues> {
+pub fn add_new (new: &MetaValues, sorted: &SortedMetaValues) -> Result<UpdSortedMetaValues, ErrorActive> {
     let mut upd_done = false;
     let mut num_new = None;
     let mut num_old = None;
@@ -93,7 +85,7 @@ pub fn add_new (new: &MetaValues, sorted: &SortedMetaValues) -> anyhow::Result<U
     for (i, x) in sorted.newer.iter().enumerate() {
         if &new.name == &x.name {
             found_in_newer = true;
-            if new.version < x.version {return Err(Error::FetchedEarlierVersion{name: x.name.to_string(), old_version: x.version, new_version: new.version}.show())}
+            if new.version < x.version {return Err(ErrorActive::Fetch(Fetch::EarlierVersion{name: x.name.to_string(), old_version: x.version, new_version: new.version}))}
             else {
                 if new.version == x.version {
                     if new.meta != x.meta {
@@ -107,7 +99,7 @@ pub fn add_new (new: &MetaValues, sorted: &SortedMetaValues) -> anyhow::Result<U
                             }
                         }
                         println!("new: {:?}, in db: {:?}", sus1, sus2);
-                        return Err(Error::SameVersionDifferentMetadata{name: new.name.to_string(), version: new.version}.show())
+                        return Err(ErrorActive::Fetch(Fetch::SameVersionDifferentMetadata{name: new.name.to_string(), version: new.version}))
                     }
                 }
                 else {
@@ -149,16 +141,16 @@ pub fn add_new (new: &MetaValues, sorted: &SortedMetaValues) -> anyhow::Result<U
 
 /// Function to collect metadata from metadata tree of the database, clear that tree,
 /// and sort the metadata into newer and older subsets
-pub fn prepare_metadata () -> anyhow::Result<SortedMetaValues> {
+pub fn prepare_metadata () -> Result<SortedMetaValues, ErrorActive> {
     let known_metavalues = read_metadata_database()?;
     sort_metavalues(known_metavalues)
 }
 
 /// Function to write sorted metadata into the database
-pub fn write_metadata (sorted_meta_values: SortedMetaValues) -> anyhow::Result<()> {
-    let mut metadata_batch = make_batch_clear_tree(HOT_DB_NAME, METATREE)?;
+pub fn write_metadata (sorted_meta_values: SortedMetaValues) -> Result<(), ErrorActive> {
+    let mut metadata_batch = make_batch_clear_tree::<Active>(HOT_DB_NAME, METATREE)?;
     let mut all_meta = sorted_meta_values.newer;
-    all_meta.extend(sorted_meta_values.older);
+    all_meta.extend_from_slice(&sorted_meta_values.older);
     for x in all_meta.iter() {
         let meta_key = MetaKey::from_parts(&x.name, x.version);
         metadata_batch.insert(meta_key.key(), x.meta.to_vec());
@@ -167,3 +159,4 @@ pub fn write_metadata (sorted_meta_values: SortedMetaValues) -> anyhow::Result<(
         .set_metadata(metadata_batch)
         .apply(HOT_DB_NAME)
 }
+

@@ -50,7 +50,10 @@ fun KeyManager(signerDataModel: SignerDataModel) {
 		}
 		IconButton(
 			onClick = { signerDataModel.pushButton(ButtonID.NetworkSelector) },
-			modifier = Modifier.fillMaxWidth()
+			modifier = Modifier
+				.padding(top = 3.dp, start = 12.dp, end = 12.dp)
+				.background(Bg200)
+				.fillMaxWidth()
 		) {
 			Row {
 				NetworkCard(signerDataModel.selectedNetwork.value?: JSONObject())

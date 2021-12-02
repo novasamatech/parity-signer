@@ -1,12 +1,11 @@
 use parity_scale_codec::{Decode, HasCompact, Compact};
 use sp_arithmetic::{PerThing};
 use std::mem::size_of;
-use definitions::network_specs::ShortSpecs;
+use definitions::{error::{ParserError, ParserDecodingError, ParserMetadataError}, network_specs::ShortSpecs};
 use printing_balance::convert_balance_pretty;
 use sp_core::crypto::{Ss58Codec, Ss58AddressFormat, AccountId32};
 
 use crate::cards::{ParserCard};
-use crate::error::{ParserError, DecodingError, MetadataError, SystemError};
 use crate::decoding_sci_ext::{Ext, SpecialExt};
 
 /// Struct to store the decoded data, used for data storage between decoding iterations.
@@ -39,7 +38,7 @@ pub (crate) fn get_compact<T> (data: &Vec<u8>) -> Result<CutCompact<T>, ParserEr
         T: HasCompact,
         Compact<T>: Decode
 {
-    if data.len()==0 {return Err(ParserError::Decoding(DecodingError::DataTooShort))}
+    if data.len()==0 {return Err(ParserError::Decoding(ParserDecodingError::DataTooShort))}
     let mut out = None;
     for i in 1..data.len()+1 {
         let hippo = &data[..i];
@@ -56,7 +55,7 @@ pub (crate) fn get_compact<T> (data: &Vec<u8>) -> Result<CutCompact<T>, ParserEr
     }
     match out {
         Some(c) => Ok(c),
-        None => return Err(ParserError::Decoding(DecodingError::NoCompact)),
+        None => return Err(ParserError::Decoding(ParserDecodingError::NoCompact)),
     }
 }
 
@@ -92,7 +91,7 @@ pub (crate) fn decode_perthing<T> (data: &Vec<u8>, compact_flag: bool, found_ty:
         }
         else {
             let length = size_of::<T>();
-            if data.len() < length {return Err(ParserError::Decoding(DecodingError::DataTooShort))}
+            if data.len() < length {return Err(ParserError::Decoding(ParserDecodingError::DataTooShort))}
             let decoded_data = <T>::decode(&mut &data[..length]);
             match decoded_data {
                 Ok(x) => {
@@ -100,7 +99,7 @@ pub (crate) fn decode_perthing<T> (data: &Vec<u8>, compact_flag: bool, found_ty:
                     let remaining_vector = data[length..].to_vec();
                     (fancy_out, remaining_vector)
                 },
-                Err(_) => return Err(ParserError::Decoding(DecodingError::PrimitiveFailure(found_ty.to_string()))),
+                Err(_) => return Err(ParserError::Decoding(ParserDecodingError::PrimitiveFailure(found_ty.to_string()))),
             }
         }
     };
@@ -124,7 +123,7 @@ pub (crate) fn decode_perthing<T> (data: &Vec<u8>, compact_flag: bool, found_ty:
 /// The function outputs the DecodedOut value in case of success.
 pub (crate) fn decode_known_length<T: Decode + std::fmt::Display>(data: &Vec<u8>, found_ty: &str, indent: u32) -> Result<DecodedOut, ParserError> {
     let length = size_of::<T>();
-    if data.len() < length {return Err(ParserError::Decoding(DecodingError::DataTooShort))}
+    if data.len() < length {return Err(ParserError::Decoding(ParserDecodingError::DataTooShort))}
     let decoded_data = <T>::decode(&mut &data[..length]);
     match decoded_data {
         Ok(x) => {
@@ -135,7 +134,7 @@ pub (crate) fn decode_known_length<T: Decode + std::fmt::Display>(data: &Vec<u8>
                 fancy_out,
             })
         },
-        Err(_) => return Err(ParserError::Decoding(DecodingError::PrimitiveFailure(found_ty.to_string()))),
+        Err(_) => return Err(ParserError::Decoding(ParserDecodingError::PrimitiveFailure(found_ty.to_string()))),
     }
 }
 
@@ -177,7 +176,7 @@ pub (crate) fn decode_primitive_with_flags <T> (data: &Vec<u8>, possible_ext: &m
     }
     else {
         let length = size_of::<T>();
-        if data.len() < length {return Err(ParserError::Decoding(DecodingError::DataTooShort))}
+        if data.len() < length {return Err(ParserError::Decoding(ParserDecodingError::DataTooShort))}
         let decoded_data = <T>::decode(&mut &data[..length]);
         match decoded_data {
             Ok(x) => {
@@ -191,16 +190,13 @@ pub (crate) fn decode_primitive_with_flags <T> (data: &Vec<u8>, possible_ext: &m
                     fancy_out,
                 })
             },
-            Err(_) => return Err(ParserError::Decoding(DecodingError::PrimitiveFailure(found_ty.to_string()))),
+            Err(_) => return Err(ParserError::Decoding(ParserDecodingError::PrimitiveFailure(found_ty.to_string()))),
         }
     }
 }
 
 fn process_balance (balance: &str, possible_ext: &mut Option<&mut Ext>, indent: u32, short_specs: &ShortSpecs) -> Result<Vec<OutputCard>, ParserError> {
-    let balance_output = match convert_balance_pretty (balance, short_specs.decimals, &short_specs.unit) {
-        Ok(x) => x,
-        Err(_) => return Err(ParserError::SystemError(SystemError::BalanceFail)),
-    };
+    let balance_output = convert_balance_pretty (balance, short_specs.decimals, &short_specs.unit);
     let out_balance = vec![OutputCard{card: ParserCard::Balance{number: balance_output.number.to_string(), units: balance_output.units.to_string()}, indent}];
     let out_tip = vec![OutputCard{card: ParserCard::Tip{number: balance_output.number.to_string(), units: balance_output.units.to_string()}, indent}];
     if let Some(ext) = possible_ext {
@@ -216,7 +212,7 @@ fn process_number (number: String, possible_ext: &mut Option<&mut Ext>, indent: 
             SpecialExt::Nonce => Ok(vec![OutputCard{card: ParserCard::Nonce(number), indent}]),
             SpecialExt::SpecVersion => {
                 ext.found_ext.network_version_printed = match ext.found_ext.network_version_printed {
-                    Some(_) => return Err(ParserError::FundamentallyBadV14Metadata(MetadataError::SpecVersionTwice)),
+                    Some(_) => return Err(ParserError::FundamentallyBadV14Metadata(ParserMetadataError::SpecVersionTwice)),
                     None => Some(number.to_string()),
                 };
                 Ok(vec![OutputCard{card: ParserCard::NetworkNameVersion{name: short_specs.name.to_string(), version: number}, indent}])
@@ -256,10 +252,10 @@ pub (crate) fn special_case_account_id (data: Vec<u8>, indent: u32, short_specs:
                         fancy_out,
                     })
                 },
-                Err(_) => return Err(ParserError::Decoding(DecodingError::Array)),
+                Err(_) => return Err(ParserError::Decoding(ParserDecodingError::Array)),
             }
         },
-        None => return Err(ParserError::Decoding(DecodingError::DataTooShort)),
+        None => return Err(ParserError::Decoding(ParserDecodingError::DataTooShort)),
     }
 }
 

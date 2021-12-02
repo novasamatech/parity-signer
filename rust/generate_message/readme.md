@@ -127,8 +127,6 @@ Possible commands are:
         - `load_metadata`  
         - `add_specs`
     - key `-payload` followed by `****` - file name to read message content as Vec<u8> from file named `****` from folder `../files/for_signing/`  
-    - key `-signature` followed by:  
-        
     - optional key `-name` followed by `****` - name override to save file named `****` for apng export and file named `****.txt` into folder `../files/signed/`  
 
 - `remove` with following keys  

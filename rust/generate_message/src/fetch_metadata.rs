@@ -11,13 +11,8 @@ pub struct FetchedInfo {
     pub genesis_hash: String,
 }
 
-pub struct FetchedInfoWithChainSpecs {
+pub struct FetchedInfoWithNetworkSpecs {
     pub meta: String,
-    pub genesis_hash: String,
-    pub properties: Map<String, JsonValue>,
-}
-
-pub struct FetchedChainSpecs {
     pub genesis_hash: String,
     pub properties: Map<String, JsonValue>,
 }
@@ -48,7 +43,7 @@ pub async fn fetch_info(str_address: &str) -> Result<FetchedInfo, Box<dyn std::e
 /// actually fetches stuff, is slow
 
 #[tokio::main]
-pub async fn fetch_info_with_chainspecs(str_address: &str) -> Result<FetchedInfoWithChainSpecs, Box<dyn std::error::Error>> {
+pub async fn fetch_info_with_network_specs(str_address: &str) -> Result<FetchedInfoWithNetworkSpecs, Box<dyn std::error::Error>> {
     let client = WsClientBuilder::default().build(str_address).await?;
     let response: JsonValue = client.request("state_getMetadata", JsonRpcParams::NoParams).await?;
     let meta = match response {
@@ -65,7 +60,7 @@ pub async fn fetch_info_with_chainspecs(str_address: &str) -> Result<FetchedInfo
         JsonValue::Object(x) => x,
         _ => return Err(Box::from("Unexpected system properties format")),
     };
-    Ok(FetchedInfoWithChainSpecs{
+    Ok(FetchedInfoWithNetworkSpecs{
         meta,
         genesis_hash,
         properties,
