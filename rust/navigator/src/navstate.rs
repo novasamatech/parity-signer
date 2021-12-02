@@ -218,7 +218,7 @@ impl State {
         let mut output = String::new();
         if new_navstate.modal == Modal::Error {
             self.navstate.modal = Modal::Error;
-            output = format!("{}", modal_details);
+            output = format!("{}{}", screen_details, modal_details);
         } else {
             self.navstate = new_navstate;
             output = format!("{}{}", screen_details, modal_details);
