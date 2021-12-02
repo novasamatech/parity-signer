@@ -23,10 +23,20 @@ val Typography = Typography(
 		fontWeight = FontWeight(700),
 		fontSize = 19.sp
 	),
+	h2 = TextStyle(
+		fontFamily = InterFontFamily,
+		fontWeight = FontWeight(600),
+		fontSize = 19.sp
+	),
+	h3 = TextStyle(
+		fontFamily = InterFontFamily,
+		fontWeight = FontWeight(500),
+		fontSize = 16.sp
+	),
 	h4 = TextStyle(
 		fontFamily = InterFontFamily,
-		fontWeight = FontWeight(400),
-		fontSize = 17.sp
+		fontWeight = FontWeight(500),
+		fontSize = 14.sp
 	),
 	body1 = TextStyle(
 		fontFamily = InterFontFamily,
@@ -46,12 +56,12 @@ val Typography = Typography(
 	subtitle1 = TextStyle(
 		fontFamily = InterFontFamily,
 		fontWeight = FontWeight(500),
-		fontSize = 15.sp
+		fontSize = 14.sp
 	),
 	subtitle2 = TextStyle(
 		fontFamily = InterFontFamily,
-		fontWeight = FontWeight(500),
-		fontSize = 13.sp
+		fontWeight = FontWeight(400),
+		fontSize = 12.sp
 	),
 	overline = TextStyle(
 		fontFamily = InterFontFamily,
@@ -75,4 +85,14 @@ val CryptoTypography = Typography (
 
 //Special font for network labels
 //TODO: labels could be stored in db instead!
-val Web3Font = Font(R.font.web3_regular)
+private val Web3Font = Font(R.font.web3_regular)
+private val Web3FontFamily = FontFamily(Web3Font)
+
+val Web3Typography = Typography (
+	defaultFontFamily = Web3FontFamily,
+	h4 = TextStyle(
+		fontFamily = Web3FontFamily,
+		fontWeight = FontWeight(400),
+		fontSize = 17.sp
+	)
+)

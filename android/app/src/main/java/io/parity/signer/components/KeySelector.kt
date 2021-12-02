@@ -21,12 +21,11 @@ import org.json.JSONObject
 
 @Composable
 fun KeySelector(signerDataModel: SignerDataModel) {
-	val identities = signerDataModel.identities.observeAsState()
-
+	val addresses = signerDataModel.screenInfo.getJSONArray("keys")
 	LazyColumn {
 		//keys should be defined already, can't panic
-		items(identities.value!!.length()) { item ->
-			if (identities.value!!.getJSONObject(item) != signerDataModel.getRootIdentity(
+		items(addresses.length()) { item ->
+			if (addresses.getJSONObject(item) != signerDataModel.getRootIdentity(
 					signerDataModel.selectedSeed.value ?: ""
 				)
 			) {
@@ -43,7 +42,7 @@ fun KeySelector(signerDataModel: SignerDataModel) {
 								detectTapGestures(
 									onTap = {
 										signerDataModel.selectKey(
-											identities.value!!.getJSONObject(
+											addresses.getJSONObject(
 												item
 											) ?: JSONObject()
 										)
@@ -56,7 +55,7 @@ fun KeySelector(signerDataModel: SignerDataModel) {
 							.padding(horizontal = 8.dp)
 					) {
 						KeyCard(
-							identities.value!!.getJSONObject(item),
+							addresses.getJSONObject(item),
 							signerDataModel = signerDataModel
 						)
 						Spacer(modifier = Modifier.weight(1f, true))

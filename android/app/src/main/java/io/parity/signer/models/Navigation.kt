@@ -8,10 +8,10 @@ import org.json.JSONObject
 /**
  * This pretty much offloads all navigation to backend!
  */
-fun SignerDataModel.pushButton(button: ButtonID) {
+fun SignerDataModel.pushButton(button: ButtonID, details: String = "") {
 	Log.d("push button", button.toString())
 	val actionResult =
-		backendAction(button.name, "")
+		backendAction(button.name, details)
 	Log.d("action result", actionResult)
 	//Here we just list all possible arguments coming from backend
 	try {
@@ -24,7 +24,17 @@ fun SignerDataModel.pushButton(button: ButtonID) {
 			actionResultObject.getBoolean("back").let {
 				_backButton.value = it
 			}
+			actionResultObject.getString("footerButton").let {
+				_footerButton.value = it
+			}
+			actionResultObject.getString("rightButton").let {
+				_rightButton.value = it
+			}
+			actionResultObject.getString("screenNameType").let {
+				_screenNameType.value = it
+			}
 		}
+		_signerModal.value = SignerModal.valueOf(actionResultObject.getString("modal"))
 		screenInfo = actionResultObject.getJSONObject("content")
 	} catch (e: java.lang.Exception) {
 		Log.e("Navigation error", e.toString())

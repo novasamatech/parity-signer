@@ -59,7 +59,7 @@ fun SignerApp(signerDataModel: SignerDataModel) {
 				) { innerPadding ->
 					Box(modifier = Modifier.padding(innerPadding)) {
 						ScreenSelector(signerScreen.value, signerDataModel)
-						ModalSelector(modal = signerModal.value?: SignerModal.None, signerDataModel = signerDataModel)
+						ModalSelector(modal = signerModal.value?: SignerModal.Empty, signerDataModel = signerDataModel)
 					}
 				}
 			}

@@ -1380,6 +1380,8 @@ name = "navigator"
 version = "0.1.0"
 dependencies = [
  "db_handling",
+ "definitions",
+ "hex",
  "lazy_static",
  "plot_icon",
  "transaction_parsing",

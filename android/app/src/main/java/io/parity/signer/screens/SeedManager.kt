@@ -13,18 +13,21 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import io.parity.signer.ButtonID
 import io.parity.signer.components.SeedCard
 import io.parity.signer.models.SignerDataModel
+import io.parity.signer.models.pushButton
 import io.parity.signer.models.selectSeed
 import io.parity.signer.ui.theme.Bg200
 
 @Composable
 fun SeedManager(signerDataModel: SignerDataModel) {
 	val seedNames = signerDataModel.seedNames.observeAsState()
+	val cards = signerDataModel.screenInfo.getJSONArray("seedNameCards")
 
 	LazyColumn {
 		//keys should be defined already, can't panic
-		items(seedNames.value!!.size) { item ->
+		items(cards.length()) { item ->
 			Row(
 				Modifier
 					.padding(top = 3.dp, start = 12.dp, end = 12.dp)
@@ -33,24 +36,14 @@ fun SeedManager(signerDataModel: SignerDataModel) {
 				Row(
 					Modifier
 						.clickable {
-							signerDataModel.selectSeed(seedNames.value!![item])
+							signerDataModel.pushButton(ButtonID.SelectSeed, details = cards.getString(item))
 						}
 						.weight(1f, true)
 				) {
 					SeedCard(
-						seedName = seedNames.value!![item],
+						seedName = cards.getString(item),
 						signerDataModel = signerDataModel
 					)
-				}
-				IconButton(onClick = {
-					signerDataModel.selectSeed(seedNames.value!![item])
-				}) {
-					Icon(Icons.Default.List, contentDescription = "Backup seed")
-				}
-				IconButton(onClick = {
-
-				}) {
-					Icon(Icons.Default.Delete, contentDescription = "Remove seed")
 				}
 			}
 		}

@@ -32,7 +32,7 @@ fun BottomBarButton(
 	image: ImageVector,
 	buttonID: ButtonID
 ) {
-	val selected = signerDataModel.signerScreen.observeAsState().value?.name == buttonID.getName()
+	val selected = signerDataModel.footerButton.observeAsState().value == buttonID.getName()
 	val tint = if (selected) {
 		Text600
 	} else {
@@ -49,11 +49,11 @@ fun BottomBarButton(
 			signerDataModel.pushButton(buttonID)
 			//signerDataModel.navigate(buttonID.getName())
 		},
-		modifier = Modifier.width(100.dp)
+		modifier = Modifier.width(66.dp)
 	) {
 		Column(
 			horizontalAlignment = Alignment.CenterHorizontally,
-			modifier = Modifier.width(100.dp)
+			modifier = Modifier.width(66.dp)
 		) {
 			Icon(image, contentDescription = buttonID.getName(), tint = tint)
 			Text(

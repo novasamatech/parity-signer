@@ -7,6 +7,8 @@ edition = "2021"
 
 [dependencies]
 db_handling = {path = "../db_handling"}
+definitions = {path = "../definitions"}
+hex = "0.4.3"
 lazy_static = "1.4.0"
 plot_icon = { git = "https://github.com/paritytech/polkadot-identicon-rust" }
 transaction_parsing = {path = "../transaction_parsing"}

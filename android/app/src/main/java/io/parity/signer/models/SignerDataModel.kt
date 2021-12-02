@@ -91,10 +91,14 @@ class SignerDataModel : ViewModel() {
 	internal val _signerScreen = MutableLiveData(SignerScreen.Log)
 	internal val _screenName = MutableLiveData("")
 	internal val _backButton = MutableLiveData(false)
+	internal val _footerButton = MutableLiveData("")
+	internal val _footer = MutableLiveData(false)
+	internal val _rightButton = MutableLiveData("None")
+	internal val _screenNameType = MutableLiveData("h4")
 	internal var screenInfo = JSONObject()
 
 	//States of important modals
-	internal val _signerModal = MutableLiveData(SignerModal.None)
+	internal val _signerModal = MutableLiveData(SignerModal.Empty)
 	internal val _transactionState = MutableLiveData(TransactionState.None)
 
 	//Data storage locations
@@ -133,6 +137,10 @@ class SignerDataModel : ViewModel() {
 	val alert: LiveData<SignerAlert> = _alert
 	val screenName: LiveData<String> = _screenName
 	val backButton: LiveData<Boolean> = _backButton
+	val footer: LiveData<Boolean> = _footer
+	val footerButton: LiveData<String> = _footerButton
+	val rightButton: LiveData<String> = _rightButton
+	val screenNameType: LiveData<String> = _screenNameType
 
 	//MARK: init boilerplate begin
 
@@ -334,7 +342,7 @@ class SignerDataModel : ViewModel() {
 			OnBoardingState.Yes else _onBoardingDone.value = OnBoardingState.No
 		if (checkRefresh) {
 			initNavigation(dbName, seedNames.value?.joinToString(",")?:"")
-			pushButton(ButtonID.NavbarLog)
+			pushButton(ButtonID.Start)
 			refreshNetworks()
 			_selectedNetwork.value = networks.value?.optJSONObject(0)
 				?: JSONObject()

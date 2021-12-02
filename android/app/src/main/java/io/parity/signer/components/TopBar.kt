@@ -6,6 +6,10 @@ import androidx.compose.material.*
 import androidx.compose.material.ButtonDefaults.buttonColors
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AddCircle
+import androidx.compose.material.icons.filled.AddCircleOutline
+import androidx.compose.material.icons.filled.List
+import androidx.compose.material.icons.filled.MoreVert
+import androidx.compose.material.icons.outlined.AddCircle
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Modifier
@@ -17,18 +21,18 @@ import io.parity.signer.ui.theme.Text500
 
 @Composable
 fun TopBar(signerDataModel: SignerDataModel) {
-	val screen = signerDataModel.signerScreen.observeAsState()
-	val screenName = signerDataModel.screenName.observeAsState()
 	val backButton = signerDataModel.backButton.observeAsState()
-	val keymodal = signerDataModel.signerModal.observeAsState()
-	val alert = signerDataModel.alert.observeAsState()
+	val screenName = signerDataModel.screenName.observeAsState()
+	val screenNameType = signerDataModel.screenNameType.observeAsState()
+	val rightButton = signerDataModel.rightButton.observeAsState()
 
 	TopAppBar(
 		backgroundColor = Bg100
 	) {
 		Row(
 			horizontalArrangement = Arrangement.Start,
-			modifier = Modifier.weight(0.3f, fill = true)) {
+			modifier = Modifier.weight(0.3f, fill = true)
+		) {
 			if (backButton.value == true) {
 				Button(
 					colors = buttonColors(
@@ -36,8 +40,8 @@ fun TopBar(signerDataModel: SignerDataModel) {
 						backgroundColor = Bg100
 					),
 					onClick = {
-					signerDataModel.pushButton(ButtonID.GoBack)
-				}) {
+						signerDataModel.pushButton(ButtonID.GoBack)
+					}) {
 					Text("Back")
 				}
 			}
@@ -45,21 +49,35 @@ fun TopBar(signerDataModel: SignerDataModel) {
 		Row(
 			horizontalArrangement = Arrangement.Center,
 			modifier = Modifier.weight(0.4f, fill = true)
-		){
-		Text(
-			signerDataModel.screenName.value?:""
-		)
+		) {
+			Text(
+				screenName.value ?: "",
+				style = if (screenNameType.value == "h4") {
+					MaterialTheme.typography.h4
+				} else {
+					MaterialTheme.typography.h1
+				}
+			)
 		}
 		Row(
 			horizontalArrangement = Arrangement.End,
 			modifier = Modifier.weight(0.3f, fill = true)
 		) {
-			if (screen.value == SignerScreen.SeedSelector) {
-				IconButton(onClick = { TODO() }) {
-					Icon(Icons.Default.AddCircle, "New Seed")
+			IconButton(onClick = { signerDataModel.pushButton(ButtonID.RightButton) }) {
+				when (rightButton.value) {
+					"NewSeed" -> {
+						Icon(Icons.Default.AddCircleOutline, "New Seed")
+					}
+					"Backup" -> {
+						Icon(Icons.Default.MoreVert, "Seed backup")
+					}
+					else -> {
+					}
 				}
 			}
-			NavbarShield(signerDataModel = signerDataModel)
+			IconButton(onClick = { signerDataModel.pushButton(ButtonID.Shield) }) {
+				NavbarShield(signerDataModel = signerDataModel)
+			}
 		}
 	}
 }

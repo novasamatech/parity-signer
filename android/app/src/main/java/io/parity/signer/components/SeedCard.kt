@@ -20,7 +20,7 @@ import io.parity.signer.ui.theme.Typography
 @Composable
 fun SeedCard(
 	seedName: String,
-	seedSelector: Boolean = false,
+	seedSelector: Boolean = true,
 	signerDataModel: SignerDataModel
 ) {
 	Log.d("seed", "seed " + seedName)
@@ -28,16 +28,18 @@ fun SeedCard(
 		modifier = Modifier
 			.padding(8.dp)
 	) {
+		/*
 		Image(
 			signerDataModel.getIdenticon(
 				signerDataModel.getRootIdentity(seedName)
 					.optString("ss58", "failonthis"), 64
 			), "identicon", modifier = Modifier.scale(0.75f)
 		)
+		 */
 		Spacer(modifier = Modifier.width(10.dp))
 		Column {
 			Text(seedName, color = Text600, style = MaterialTheme.typography.subtitle1)
-			if (seedSelector) {
+			if (!seedSelector) {
 				Text(
 					signerDataModel.getRootIdentity(seedName).optString("ss58")
 						.abbreviateString(8), color = Text300, style = CryptoTypography.body2

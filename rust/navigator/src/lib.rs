@@ -5,6 +5,9 @@
 use std::sync::{Mutex, TryLockError};
 use lazy_static::lazy_static;
 
+use db_handling;
+use definitions::keyring::NetworkSpecsKey;
+
 pub mod screens;
 use screens::Screen;
 
@@ -25,12 +28,10 @@ lazy_static!{
 ///No matter if here or beyond FFI
     pub static ref STATE: Mutex<State> = Mutex::new(
         State{
-            navstate: Navstate {
-                screen: Screen::Log,
-                modal: Modal::Empty,
-            },
+            navstate: Navstate::new(),
             dbname: None,
             seed_names: Vec::new(),
+            networks: Vec::new(),
         }
     );
 }
@@ -70,10 +71,17 @@ pub fn init_navigation(
         Ok(mut navstate) => {
             (*navstate).dbname = Some(dbname.to_string());
             (*navstate).seed_names = seed_names.split(",").map(|a| a.to_string()).collect();
+            (*navstate).seed_names.sort();
+            (*navstate).seed_names.dedup();
+            match db_handling::chainspecs::get_all_networks(dbname) {
+                Ok(a) => for x in a.iter() {
+                    (*navstate).networks.push(NetworkSpecsKey::from_parts(&x.genesis_hash.to_vec(), &x.encryption));
+                },
+                Err(e) => println!("No networks could be fetched: {:?}", e),
+            };
         },
         Err(_) => {
             //TODO: maybe more grace here?
-            //Maybe just silently restart navstate? But is it safe?
             panic!("Concurrency error! Restart the app.");
          },
     }

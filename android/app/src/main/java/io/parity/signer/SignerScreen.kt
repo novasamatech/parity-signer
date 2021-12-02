@@ -62,10 +62,13 @@ fun ScreenSelector(screen: SignerScreen?, signerDataModel: SignerDataModel) {
 @Composable
 fun ModalSelector(modal: SignerModal, signerDataModel: SignerDataModel) {
 	when(modal) {
-		SignerModal.None -> {}
-		SignerModal.Error -> TODO()
+		SignerModal.Empty -> {}
+		SignerModal.Error -> ErrorModal(error = signerDataModel.screenInfo.optString("error")?: "unknown error", signerDataModel = signerDataModel)
+		SignerModal.Shield -> ShieldModal(signerDataModel)
 		SignerModal.SeedDeleteConfirm -> TODO()
 		SignerModal.KeyDeleteConfirm -> KeyDelete(signerDataModel = signerDataModel)
+		SignerModal.NewSeedMenu -> NewSeedMenu(signerDataModel = signerDataModel)
+		SignerModal.SeedMenu -> TODO()
 	}
 }
 
@@ -99,8 +102,11 @@ enum class TransactionState {
 }
 
 enum class SignerModal {
-	None,
+	Empty,
 	Error,
+	Shield,
+	NewSeedMenu,
+	SeedMenu,
 	SeedDeleteConfirm,
 	KeyDeleteConfirm;
 }

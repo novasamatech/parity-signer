@@ -22,26 +22,31 @@ fun BottomBar(
 	BottomAppBar (
 		backgroundColor = Bg000,
 		elevation = 0.dp,
-		modifier = Modifier.height(54.dp)) {
+		modifier = Modifier.height(57.dp)) {
+		Spacer(Modifier.weight(1f))
 		BottomBarButton(
 			signerDataModel = signerDataModel,
-			image = Icons.Default.Home,
+			image = Icons.Default.CalendarViewDay,
 			buttonID = ButtonID.NavbarLog
 		)
+		Spacer(Modifier.weight(1f))
 		BottomBarButton(
 			signerDataModel = signerDataModel,
-			image = Icons.Default.Star,
+			image = Icons.Default.CropFree,
 			buttonID = ButtonID.NavbarScan
 		)
+		Spacer(Modifier.weight(1f))
 		BottomBarButton(
 			signerDataModel = signerDataModel,
-			image = Icons.Default.AccountCircle,
+			image = Icons.Default.Pattern,
 			buttonID = ButtonID.NavbarKeys
 		)
+		Spacer(Modifier.weight(1f))
 		BottomBarButton(
 			signerDataModel = signerDataModel,
 			image = Icons.Default.Settings,
 			buttonID = ButtonID.NavbarSettings
 		)
+		Spacer(Modifier.weight(1f))
 	}
 }

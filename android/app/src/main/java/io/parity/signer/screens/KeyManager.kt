@@ -7,17 +7,21 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AddCircle
+import androidx.compose.material.icons.filled.ArrowCircleDown
 import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import io.parity.signer.ButtonID
 import io.parity.signer.SignerModal
 import io.parity.signer.components.KeySelector
+import io.parity.signer.components.NetworkCard
 import io.parity.signer.components.NetworkSelector
 import io.parity.signer.components.SeedCard
 import io.parity.signer.modals.*
 import io.parity.signer.models.*
 import io.parity.signer.ui.theme.Bg200
+import org.json.JSONObject
 
 /**
  * Key manager screen; here all key/identity/seed creation and deletion
@@ -28,31 +32,32 @@ import io.parity.signer.ui.theme.Bg200
 @ExperimentalAnimationApi
 @Composable
 fun KeyManager(signerDataModel: SignerDataModel) {
-	val keyManagerModal = signerDataModel.signerModal.observeAsState()
-	val seedName = signerDataModel.selectedSeed.observeAsState()
-
 	Column() {
 		Row(
 			Modifier
 				.clickable {
-					signerDataModel.selectKey(
-						signerDataModel.getRootIdentity(
-							seedName.value ?: ""
-						)
-					)
-					//TODO: export seed
+					signerDataModel.pushButton(ButtonID.SelectKey, "")
 				}
 				.padding(top = 3.dp, start = 12.dp, end = 12.dp)
 				.background(Bg200)
 				.fillMaxWidth()
 		) {
 			SeedCard(
-				seedName = seedName.value ?: "",
+				seedName = "TODO",
 				seedSelector = true,
 				signerDataModel = signerDataModel
 			)
 		}
-		NetworkSelector(signerDataModel = signerDataModel)
+		IconButton(
+			onClick = { signerDataModel.pushButton(ButtonID.NetworkSelector) },
+			modifier = Modifier.fillMaxWidth()
+		) {
+			Row {
+				NetworkCard(signerDataModel.selectedNetwork.value?: JSONObject())
+				Icon(Icons.Default.ArrowCircleDown, "More networks")
+				Spacer(modifier = Modifier.weight(1f))
+			}
+		}
 		Row(modifier = Modifier
 			.fillMaxWidth(1f)
 			.padding(horizontal = 8.dp)) {
