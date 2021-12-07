@@ -9,7 +9,7 @@ use crate::alerts::Alert;
 
 use plot_icon;
 use db_handling;
-use definitions::keyring::NetworkSpecsKey;
+use definitions::{error::{ErrorSource, Signer}, keyring::NetworkSpecsKey};
 use transaction_parsing;
 use transaction_signing;
 
@@ -170,10 +170,15 @@ impl State {
             Screen::Scan => "".to_string(),
             //Screen::Transaction => "",
             Screen::SeedSelector => {
-                //TODO: seed selector cards
-                
-                let mut seed_pack = self.seed_names.join("\",\"");
-                format!("\"seedNameCards\":[\"{}\"],", seed_pack)
+                let cards = match db_handling::identities::print_all_seed_names_with_identicons(&dbname) {
+                    Ok(a) => a,
+                    Err(e) => {
+                        new_navstate.modal = Modal::Error;
+                        errorline.push_str(&<Signer>::show(&e));
+                        "[]".to_string()
+                    },
+                };
+                format!("\"seedNameCards\":{},", cards)
             },
             Screen::Keys(keystate) => {
                 //TODO: separate seed key
