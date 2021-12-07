@@ -73,6 +73,14 @@
 		2DA5F89027590B3A00D8DD29 /* DocumentModal.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2DA5F88F27590B3A00D8DD29 /* DocumentModal.swift */; };
 		2DA5F89227590B4F00D8DD29 /* Documents.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2DA5F89127590B4F00D8DD29 /* Documents.swift */; };
 		2DA5F8962759576B00D8DD29 /* MLog.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2DA5F8952759576B00D8DD29 /* MLog.swift */; };
+		2DA5F898275F865400D8DD29 /* ModalSelector.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2DA5F897275F865400D8DD29 /* ModalSelector.swift */; };
+		2DA5F89B275F86DA00D8DD29 /* AlertSelector.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2DA5F89A275F86DA00D8DD29 /* AlertSelector.swift */; };
+		2DA5F89D275F874D00D8DD29 /* NetworkManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2DA5F89C275F874D00D8DD29 /* NetworkManager.swift */; };
+		2DA5F89F275F885400D8DD29 /* NewSeedMenu.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2DA5F89E275F885400D8DD29 /* NewSeedMenu.swift */; };
+		2DA5F8A1275F889400D8DD29 /* HeaderBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2DA5F8A0275F889400D8DD29 /* HeaderBar.swift */; };
+		2DA5F8A5275F8B1300D8DD29 /* inter.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 2DA5F8A2275F8B1300D8DD29 /* inter.ttf */; };
+		2DA5F8A6275F8B1300D8DD29 /* robotomono_regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 2DA5F8A3275F8B1300D8DD29 /* robotomono_regular.ttf */; };
+		2DA5F8A7275F8B1300D8DD29 /* robotomono_thin.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 2DA5F8A4275F8B1300D8DD29 /* robotomono_thin.ttf */; };
 		2DB037BF270F12DF00A318B2 /* Web3-Regular.otf in Resources */ = {isa = PBXBuildFile; fileRef = 2DB037BE270F12DF00A318B2 /* Web3-Regular.otf */; };
 		2DE72BC226A588C7002BB752 /* NativeSignerApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2DE72BC126A588C7002BB752 /* NativeSignerApp.swift */; };
 		2DE72BC426A588C7002BB752 /* MainScreenContainer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2DE72BC326A588C7002BB752 /* MainScreenContainer.swift */; };
@@ -169,6 +177,14 @@
 		2DA5F88F27590B3A00D8DD29 /* DocumentModal.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DocumentModal.swift; sourceTree = "<group>"; };
 		2DA5F89127590B4F00D8DD29 /* Documents.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Documents.swift; sourceTree = "<group>"; };
 		2DA5F8952759576B00D8DD29 /* MLog.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MLog.swift; sourceTree = "<group>"; };
+		2DA5F897275F865400D8DD29 /* ModalSelector.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ModalSelector.swift; sourceTree = "<group>"; };
+		2DA5F89A275F86DA00D8DD29 /* AlertSelector.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlertSelector.swift; sourceTree = "<group>"; };
+		2DA5F89C275F874D00D8DD29 /* NetworkManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NetworkManager.swift; sourceTree = "<group>"; };
+		2DA5F89E275F885400D8DD29 /* NewSeedMenu.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewSeedMenu.swift; sourceTree = "<group>"; };
+		2DA5F8A0275F889400D8DD29 /* HeaderBar.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HeaderBar.swift; sourceTree = "<group>"; };
+		2DA5F8A2275F8B1300D8DD29 /* inter.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = inter.ttf; sourceTree = "<group>"; };
+		2DA5F8A3275F8B1300D8DD29 /* robotomono_regular.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = robotomono_regular.ttf; sourceTree = "<group>"; };
+		2DA5F8A4275F8B1300D8DD29 /* robotomono_thin.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = robotomono_thin.ttf; sourceTree = "<group>"; };
 		2DB037BE270F12DF00A318B2 /* Web3-Regular.otf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Web3-Regular.otf"; sourceTree = "<group>"; };
 		2DE72BBE26A588C7002BB752 /* NativeSigner.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = NativeSigner.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		2DE72BC126A588C7002BB752 /* NativeSignerApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NativeSignerApp.swift; sourceTree = "<group>"; };
@@ -255,6 +271,9 @@
 		2D7A7BC726BA97A50053C1E0 /* Modals */ = {
 			isa = PBXGroup;
 			children = (
+				2DA5F897275F865400D8DD29 /* ModalSelector.swift */,
+				2DA5F89E275F885400D8DD29 /* NewSeedMenu.swift */,
+				2DA5F89C275F874D00D8DD29 /* NetworkManager.swift */,
 			);
 			path = Modals;
 			sourceTree = "<group>";
@@ -264,6 +283,7 @@
 			children = (
 				2DA5F820275652EE00D8DD29 /* Footer.swift */,
 				2DA5F8302756652600D8DD29 /* CameraView.swift */,
+				2DA5F8A0275F889400D8DD29 /* HeaderBar.swift */,
 				2DA5F8852756A44600D8DD29 /* AddressCardControls.swift */,
 				2DA5F88F27590B3A00D8DD29 /* DocumentModal.swift */,
 				2DA5F8322756653B00D8DD29 /* CameraPreview.swift */,
@@ -327,10 +347,21 @@
 			path = ModalModels;
 			sourceTree = "<group>";
 		};
+		2DA5F899275F86B600D8DD29 /* Alerts */ = {
+			isa = PBXGroup;
+			children = (
+				2DA5F89A275F86DA00D8DD29 /* AlertSelector.swift */,
+			);
+			path = Alerts;
+			sourceTree = "<group>";
+		};
 		2DB037BD270F12BB00A318B2 /* Fonts */ = {
 			isa = PBXGroup;
 			children = (
 				2DB037BE270F12DF00A318B2 /* Web3-Regular.otf */,
+				2DA5F8A2275F8B1300D8DD29 /* inter.ttf */,
+				2DA5F8A3275F8B1300D8DD29 /* robotomono_regular.ttf */,
+				2DA5F8A4275F8B1300D8DD29 /* robotomono_thin.ttf */,
 			);
 			path = Fonts;
 			sourceTree = "<group>";
@@ -360,6 +391,7 @@
 		2DE72BC026A588C7002BB752 /* NativeSigner */ = {
 			isa = PBXGroup;
 			children = (
+				2DA5F899275F86B600D8DD29 /* Alerts */,
 				2D7A7BE126C3FB680053C1E0 /* Docs */,
 				2D7A7BC826BA97AE0053C1E0 /* Components */,
 				2D7A7BC726BA97A50053C1E0 /* Modals */,
@@ -552,7 +584,10 @@
 				2DB037BF270F12DF00A318B2 /* Web3-Regular.otf in Resources */,
 				2DE72BC926A588C9002BB752 /* Preview Assets.xcassets in Resources */,
 				2DE72BC626A588C9002BB752 /* Assets.xcassets in Resources */,
+				2DA5F8A6275F8B1300D8DD29 /* robotomono_regular.ttf in Resources */,
 				2D7A7BE326C3FC250053C1E0 /* terms-and-conditions.txt in Resources */,
+				2DA5F8A5275F8B1300D8DD29 /* inter.ttf in Resources */,
+				2DA5F8A7275F8B1300D8DD29 /* robotomono_thin.ttf in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -577,6 +612,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				2DA5F89D275F874D00D8DD29 /* NetworkManager.swift in Sources */,
 				2DA5F87627566D7C00D8DD29 /* TransactionPreview.swift in Sources */,
 				2DA5F85E27566C3600D8DD29 /* TCFieldName.swift in Sources */,
 				2DA5F86827566C3600D8DD29 /* TCAuthor.swift in Sources */,
@@ -585,6 +621,7 @@
 				2DA5F8372756657600D8DD29 /* TransactionTypes.swift in Sources */,
 				2DA5F8882756A70300D8DD29 /* SeedBackup.swift in Sources */,
 				2DA5F85F27566C3600D8DD29 /* TCTypesInfo.swift in Sources */,
+				2DA5F8A1275F889400D8DD29 /* HeaderBar.swift in Sources */,
 				2DA5F82D2756634900D8DD29 /* SettingsScreen.swift in Sources */,
 				2DA5F88E2757694A00D8DD29 /* LandingView.swift in Sources */,
 				2DA5F8782756749B00D8DD29 /* SeedManager.swift in Sources */,
@@ -602,6 +639,7 @@
 				2DA5F86727566C3600D8DD29 /* TCVerifier.swift in Sources */,
 				2DA5F8392756666C00D8DD29 /* EventDetails.swift in Sources */,
 				2DA5F8292756630900D8DD29 /* TransactionScreen.swift in Sources */,
+				2DA5F89F275F885400D8DD29 /* NewSeedMenu.swift in Sources */,
 				2DA5F87027566C3600D8DD29 /* TCNameVersion.swift in Sources */,
 				2DA5F89027590B3A00D8DD29 /* DocumentModal.swift in Sources */,
 				2DE72BC426A588C7002BB752 /* MainScreenContainer.swift in Sources */,
@@ -616,6 +654,7 @@
 				2DE72BC226A588C7002BB752 /* NativeSignerApp.swift in Sources */,
 				2DA5F8232756621F00D8DD29 /* Header.swift in Sources */,
 				2D7A7BD426BBEAF00053C1E0 /* Canary.swift in Sources */,
+				2DA5F89B275F86DA00D8DD29 /* AlertSelector.swift in Sources */,
 				2DA5F8352756656E00D8DD29 /* Transaction.swift in Sources */,
 				2DA5F86527566C3600D8DD29 /* TCID.swift in Sources */,
 				2DA5F86227566C3600D8DD29 /* TCEnumVariantName.swift in Sources */,
@@ -635,6 +674,7 @@
 				2DA5F86127566C3600D8DD29 /* TCBalance.swift in Sources */,
 				2DA5F87127566C3600D8DD29 /* TCVarName.swift in Sources */,
 				2DA5F86C27566C3600D8DD29 /* TCPallet.swift in Sources */,
+				2DA5F898275F865400D8DD29 /* ModalSelector.swift in Sources */,
 				2DA5F87327566C3600D8DD29 /* TCBlockHash.swift in Sources */,
 				2DA5F83B275666A200D8DD29 /* HistoryCardExtended.swift in Sources */,
 				2DA5F86027566C3600D8DD29 /* TCAuthorPublicKey.swift in Sources */,

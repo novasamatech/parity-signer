@@ -19,7 +19,7 @@ struct ActionResult: Decodable {
     var rightButton: String
     var screenNameType: String
     var modal: SignerModal
-    //var alert: SignerAlert
+    var alert: SignerAlert
     
     //TODO: maybe replace explicits with rust call
     init() {
@@ -31,7 +31,7 @@ struct ActionResult: Decodable {
         rightButton = ""
         screenNameType = "h1"
         modal = .Empty
-        //alert = .Empty
+        alert = .Empty
     }
 }
 
@@ -80,9 +80,10 @@ enum SignerModal: String, Equatable, Decodable {
     case seedSelector
     case networkManager
     case networkDetails
+    case NewSeedMenu
 }
 
-enum SignerAlert: Equatable, Decodable {
+enum SignerAlert: String, Equatable, Decodable {
     case Empty
     case Error
     case keyDeleteConfirm

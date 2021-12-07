@@ -11,6 +11,8 @@ struct NetworkManager: View {
     @EnvironmentObject var data: SignerDataModel
     @State var deleteConfirm: Bool = false
     var body: some View {
+        EmptyView()
+        /*
         VStack {
             ZStack {
                 RoundedRectangle(cornerRadius: 20.0).foregroundColor(Color("backgroundNetworkModal"))
@@ -63,7 +65,7 @@ struct NetworkManager: View {
                     }
                 }
             }
-        }
+        }*/
     }
 }
 
