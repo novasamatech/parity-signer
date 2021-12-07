@@ -17,14 +17,13 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.ImeOptions
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
+import io.parity.signer.ButtonID
 import io.parity.signer.models.SignerDataModel
 import io.parity.signer.models.addSeed
 
 @Composable
-fun NewSeedModal(signerDataModel: SignerDataModel) {
+fun NewSeedScreen(button: (button: ButtonID, details: String) -> Unit, signerDataModel: SignerDataModel) {
 	var seedName by remember { mutableStateOf("") }
-	var seedPhrase by remember { mutableStateOf("") }
-	var recover by remember { mutableStateOf(false) }
 	val lastError = signerDataModel.lastError.observeAsState()
 	val focusManager = LocalFocusManager.current
 
@@ -50,38 +49,11 @@ fun NewSeedModal(signerDataModel: SignerDataModel) {
 					imeAction = ImeAction.Done
 				),
 				keyboardActions = KeyboardActions(
-					onDone = { focusManager.clearFocus() }
+					onDone = { button(ButtonID.GoForward, seedName) }
 				)
 			)
 			Row {
 				Text("Custom seed")
-				Switch(
-					checked = recover,
-					onCheckedChange = {
-						recover = it
-						signerDataModel.clearError()
-					}
-				)
-			}
-			if (recover) {
-				TextField(
-					value = seedPhrase,
-					onValueChange = {
-						seedPhrase = it
-						signerDataModel.clearError()
-					},
-					label = { Text("Seed phrase") },
-					singleLine = true,
-					keyboardOptions = KeyboardOptions(
-						autoCorrect = false,
-						keyboardType = KeyboardType.Password,
-						capitalization = KeyboardCapitalization.None,
-						imeAction = ImeAction.Done
-					),
-					keyboardActions = KeyboardActions(
-						onDone = { focusManager.clearFocus() }
-					)
-				)
 			}
 			TextButton(
 				colors = ButtonDefaults.buttonColors(
@@ -89,7 +61,7 @@ fun NewSeedModal(signerDataModel: SignerDataModel) {
 					contentColor = MaterialTheme.colors.onBackground
 				),
 				onClick = {
-					signerDataModel.addSeed(seedName, seedPhrase)
+					button(ButtonID.GoForward, seedName)
 				},
 				enabled = !seedName.isEmpty() && lastError.value?.isEmpty() as Boolean
 			) {

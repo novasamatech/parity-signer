@@ -44,6 +44,7 @@ fun KeyManager(signerDataModel: SignerDataModel) {
 		) {
 			SeedCard(
 				seedName = "TODO",
+				identicon = "",
 				seedSelector = true,
 				signerDataModel = signerDataModel
 			)

@@ -58,182 +58,182 @@ impl State {
                     if seed_names.len() == 0 {
                         new_navstate.screen = Screen::SeedSelector;
                         new_navstate.modal = Modal::NewSeedMenu;
+                        new_navstate.alert = Alert::Empty;
                     } else {
-                        new_navstate.screen = Screen::Log;
-                        new_navstate.modal = Modal::Empty;
+                        new_navstate = Navstate::clean_screen(Screen::Log);
                     }
                 },
 
                 //Simple navigation commands
                 Action::NavbarLog => {
-                    new_navstate.screen = Screen::Log;
-                    new_navstate.modal = Modal::Empty;
+                    new_navstate = Navstate::clean_screen(Screen::Log);
                 },
                 Action::NavbarScan => {
-                    new_navstate.screen = Screen::Scan;
-                    new_navstate.modal = Modal::Empty;
+                    new_navstate = Navstate::clean_screen(Screen::Scan);
                 },
                 Action::NavbarKeys => {
-                    new_navstate.screen = Screen::SeedSelector;
-                    new_navstate.modal = Modal::Empty;
+                    new_navstate = Navstate::clean_screen(Screen::SeedSelector);
                 },
                 Action::NavbarSettings => {
-                    new_navstate.screen = Screen::Settings;
-                    new_navstate.modal = Modal::Empty;
+                    new_navstate = Navstate::clean_screen(Screen::Settings);
                 },
 
                 //General back action is defined here
                 Action::GoBack => {
-                    if self.navstate.modal == Modal::Empty {
-                        match self.navstate.screen {
-                            Screen::LogDetails => {
-                                new_navstate.screen = Screen::Log;
-                            },
-                            Screen::Transaction => {
-                                new_navstate.screen = Screen::Scan;
-                            },
-                            Screen::Keys(_) => {
-                                new_navstate.screen = Screen::SeedSelector;
-                            },
-                            Screen::KeyDetails(a) => {
-                                new_navstate.screen = Screen::Keys(a.get_keys_state());
-                            },
-                            Screen::NewSeed => {
-                                new_navstate.screen = Screen::SeedSelector;
-                            },
-                            Screen::RecoverSeedName => {
-                                new_navstate.screen = Screen::SeedSelector;
-                            },
-                            Screen::RecoverSeedPhrase => {
-                                new_navstate.screen = Screen::RecoverSeedName;
-                            },
-                            Screen::DeriveKey(a) => {
-                                new_navstate.screen = Screen::Keys(a.get_keys_state());
-                            },
-                            Screen::Verifier => {
-                                new_navstate.screen = Screen::Settings;
-                            },
-                            Screen::ManageNetwork => {
-                                new_navstate.screen = Screen::Settings;
-                            },
-                            _ => {
-                                println!("Back button pressed at the bottom of navigation");
-                            },
-                        };
+                    if self.navstate.alert == Alert::Empty {
+                        if self.navstate.modal == Modal::Empty {
+                            match self.navstate.screen {
+                                Screen::LogDetails => {
+                                    new_navstate.screen = Screen::Log;
+                                },
+                                Screen::Transaction => {
+                                    new_navstate.screen = Screen::Scan;
+                                },
+                                Screen::Keys(_) => {
+                                    new_navstate.screen = Screen::SeedSelector;
+                                },
+                                Screen::KeyDetails(a) => {
+                                    new_navstate.screen = Screen::Keys(a.get_keys_state());
+                                },
+                                    Screen::NewSeed => {
+                                    new_navstate.screen = Screen::SeedSelector;
+                                },
+                                Screen::RecoverSeedName => {
+                                    new_navstate.screen = Screen::SeedSelector;
+                                },
+                                Screen::RecoverSeedPhrase => {
+                                    new_navstate.screen = Screen::RecoverSeedName;
+                                },
+                                Screen::DeriveKey(a) => {
+                                    new_navstate.screen = Screen::Keys(a.get_keys_state());
+                                },
+                                Screen::Verifier => {
+                                    new_navstate.screen = Screen::Settings;
+                                },
+                                Screen::ManageNetwork => {
+                                    new_navstate.screen = Screen::Settings;
+                                },
+                                _ => {
+                                    println!("Back button pressed at the bottom of navigation");
+                                },
+                            };
+                        } else {
+                            new_navstate.modal = Modal::Empty;
+                        }
                     } else {
-                        new_navstate.modal = Modal::Empty;
+                        new_navstate.alert = Alert::Empty;
                     }
-            },
-            Action::SelectSeed => {
-                match seed_names.binary_search(&details_str.to_string()) {
-                    Ok(index) => {
-                        new_navstate.screen = Screen::Keys(KeysState::new(index));
-                        new_navstate.modal = Modal::Empty;
-                    },
-                    Err(e) => {
-                        new_navstate.modal = Modal::Error;
-                        errorline.push_str(&e.to_string());
-                    },
-                }
-            },
-            Action::RightButton => {
-                match self.navstate.screen {
-                    Screen::SeedSelector => new_navstate.modal = Modal::NewSeedMenu,
-                    Screen::Keys(a) => new_navstate.modal = Modal::SeedMenu,
-                    _ => {},
-                }
-            },
-            Action::Shield => {
-                new_navstate.modal = Modal::Shield;
-            },
-            Action::Nothing => {
-                println!("no action was passed in action");
-            },
-        };
+                },
+                Action::SelectSeed => {
+                    match seed_names.binary_search(&details_str.to_string()) {
+                        Ok(index) => {
+                            new_navstate.screen = Screen::Keys(KeysState::new(index));
+                            new_navstate.modal = Modal::Empty;
+                        },
+                        Err(e) => {
+                            new_navstate.modal = Modal::Error;
+                            errorline.push_str(&e.to_string());
+                        },
+                    }
+                },
+                Action::RightButton => {
+                    match self.navstate.screen {
+                        Screen::SeedSelector => new_navstate.modal = Modal::NewSeedMenu,
+                        Screen::Keys(a) => new_navstate.modal = Modal::SeedMenu,
+                        _ => {},
+                    }
+                },
+                Action::Shield => {
+                    new_navstate.modal = Modal::Shield;
+                },
+                Action::Nothing => {
+                    println!("no action was passed in action");
+                },
+            };
 
-        //Prepare screen details
-        let screen_details = match new_navstate.screen {
-            Screen::Log => {
-                let log_pack = match db_handling::manage_history::print_history_page(0, &dbname) {
-                    Ok(a) => {
-                        format!("\"log\":{},", a)
-                    },
-                    Err(e) => {
-                        new_navstate.modal = Modal::Error;
-                        errorline.push_str(&e.to_string());
-                        "".to_string()
-                    },
-                };
-                format!("{}", log_pack)
-            },
-            //Screen::LogDetails => "",
-            Screen::Scan => "".to_string(),
-            //Screen::Transaction => "",
-            Screen::SeedSelector => {
-                let cards = match db_handling::identities::print_all_seed_names_with_identicons(&dbname) {
-                    Ok(a) => a,
-                    Err(e) => {
-                        new_navstate.modal = Modal::Error;
-                        errorline.push_str(&<Signer>::show(&e));
-                        "[]".to_string()
-                    },
-                };
-                format!("\"seedNameCards\":{},", cards)
-            },
-            Screen::Keys(keystate) => {
-                //TODO: separate seed key
-                if let Some(seed_name) = self.seed_names.get(keystate.seed_name) {
-                    if let Some(network_key) = self.networks.get(keystate.network) {
-                        let keys_pack = match db_handling::identities::print_relevant_identities(seed_name, &hex::encode(network_key.key()), dbname) {
-                            Ok(a) => a,
-                            Err(e) => {
-                                new_navstate.modal = Modal::Error;
-                                errorline.push_str(&e.to_string());
-                                "".to_string()
-                            },
-                        };
-                        format!("\"keys\":{},\"seed\":\"{}\",", keys_pack, seed_name)
+            //Prepare screen details
+            let screen_details = match new_navstate.screen {
+                Screen::Log => {
+                    let log_pack = match db_handling::manage_history::print_history_page(0, &dbname) {
+                        Ok(a) => {
+                            format!("\"log\":{}", a)
+                        },
+                        Err(e) => {
+                            new_navstate.alert = Alert::Error;
+                            errorline.push_str(&e.to_string());
+                            "".to_string()
+                        },
+                    };
+                    format!("{}", log_pack)
+                },
+                //Screen::LogDetails => "",
+                Screen::Scan => "".to_string(),
+                //Screen::Transaction => "",
+                Screen::SeedSelector => {
+                    let cards = match db_handling::identities::print_all_seed_names_with_identicons(&dbname) {
+                        Ok(a) => a,
+                        Err(e) => {
+                            new_navstate.modal = Modal::Error;
+                            errorline.push_str(&<Signer>::show(&e));
+                            "[]".to_string()
+                        },
+                    };
+                    format!("\"seedNameCards\":{}", cards)
+                },
+                Screen::Keys(keystate) => {
+                    //TODO: separate seed key
+                    if let Some(seed_name) = self.seed_names.get(keystate.seed_name) {
+                        if let Some(network_key) = self.networks.get(keystate.network) {
+                            let keys_pack = match db_handling::identities::print_relevant_identities(seed_name, &hex::encode(network_key.key()), dbname) {
+                                Ok(a) => a,
+                                Err(e) => {
+                                    new_navstate.alert = Alert::Error;
+                                    errorline.push_str(&e.to_string());
+                                    "".to_string()
+                                },
+                            };
+                            format!("\"keys\":{},\"seed\":\"{}\"", keys_pack, seed_name)
+                        } else {
+                            new_navstate.alert = Alert::Error;
+                            errorline.push_str("Network was lost, report a bug");
+                            "".to_string()
+                        }
                     } else {
-                        new_navstate.modal = Modal::Error;
-                        errorline.push_str("Network was lost, report a bug");
+                        new_navstate.alert = Alert::Error;
+                        errorline.push_str("Seed was lost, report a bug");
                         "".to_string()
-                    }
-                } else {
-                    new_navstate.modal = Modal::Error;
-                    errorline.push_str("Seed was lost, report a bug");
-                    "".to_string()
-                } 
-            },
-            //Screen::KeyDetails => "Key",
-            //Screen::Backup => "this should be popover",
-            //Screen::NewSeed => "",
-            //Screen::RecoverSeedName => "Recover Seed",
-            //Screen::RecoverSeedPhrase => "Recover Seed",
-            //Screen::DeriveKey => "",
-            //Screen::Settings => "Settings",
-            //Screen::Verifier => "VERIFIER CERTIFICATE",
-            //Screen::ManageNetwork => "MANAGE NETWORKS",
-            Screen::Nowhere => "".to_string(),
-            _ => "".to_string(),
-        };
+                    } 
+                },
+                //Screen::KeyDetails => "Key",
+                //Screen::Backup => "this should be popover",
+                //Screen::NewSeed => "",
+                //Screen::RecoverSeedName => "Recover Seed",
+                //Screen::RecoverSeedPhrase => "Recover Seed",
+                //Screen::DeriveKey => "",
+                //Screen::Settings => "Settings",
+                //Screen::Verifier => "VERIFIER CERTIFICATE",
+                //Screen::ManageNetwork => "MANAGE NETWORKS",
+                Screen::Nowhere => "".to_string(),
+                _ => "".to_string(),
+            };
 
-        //Prepare modal details
-        let modal_details = match new_navstate.modal {
-            Modal::Error => {
-                format!("\"error\":\"{}\",", errorline)
-            },
-            _ => "".to_string(),
-        };
-        let mut output = String::new();
-        if new_navstate.modal == Modal::Error {
-            self.navstate.modal = Modal::Error;
-            output = format!("{}{}", screen_details, modal_details);
-        } else {
+            //Prepare modal details
+            let modal_details = match new_navstate.modal {
+                _ => "".to_string(),
+            };
+            
+            //Prepare alert details
+            //Important! No errors could be handled in this block!
+            let alert_details = match new_navstate.alert {
+                Alert::Error => format!("\"error\":\"{}\"", errorline),
+                Alert::Empty => "".to_string(),
+                Alert::Shield => "\"shield_state\":\"unknown\"".to_string(),
+            };
+
+            let mut output = String::new();
             self.navstate = new_navstate;
-            output = format!("{}{}", screen_details, modal_details);
-        }
-        output.pop();
-        output
+            output = format!("\"screenData\":{{{}}},\"modalData\":{{{}}},\"alertData\":{{{}}}", screen_details, modal_details, alert_details);
+            output
         } else {
             "\"error\":\"db not initialized\"".to_string()
         }
@@ -242,15 +242,17 @@ impl State {
 
     ///This converts state into renderable block
     //TODO: clean this up
-    pub fn generate_json(&self, details: String) -> String {
+    pub fn generate_json(&self, details: &str) -> String {
         let mut output = String::from("{");
         let screen = self.navstate.screen;
         let modal = self.navstate.modal;
+        let alert = self.navstate.alert;
         if let Some(screen_name) = screen.get_name() {
             output.push_str(&format!("\"screen\":\"{}\",\"screenLabel\":\"{}\",\"back\":{},\"footer\":{},\"footerButton\":\"{}\",\"rightButton\":\"{}\",\"screenNameType\":\"{}\",", screen_name, self.get_screen_label(), screen.has_back(), true, self.get_active_navbutton(), self.get_right_button(), self.get_screen_name_type()));
         }
         output.push_str(&format!("\"modal\":\"{}\",", modal.get_name()));
-        output.push_str(&format!("\"content\":{{{}}}", details));
+        output.push_str(&format!("\"alert\":\"{}\",", alert.get_name()));
+        output.push_str(details);
         output.push_str("}");
         output
     }
@@ -322,6 +324,16 @@ impl State {
             Screen::Nowhere => "h4",
         }.to_string()
 
+    }
+}
+
+impl Navstate {
+    pub fn clean_screen(screen: Screen) -> Navstate {
+        Navstate {
+            screen: screen,
+            modal: Modal::Empty,
+            alert: Alert::Empty,
+        }
     }
 }
 

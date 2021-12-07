@@ -45,6 +45,7 @@ fun SignerApp(signerDataModel: SignerDataModel) {
 		val onBoardingDone = signerDataModel.onBoardingDone.observeAsState()
 		val signerScreen = signerDataModel.signerScreen.observeAsState()
 		val signerModal = signerDataModel.signerModal.observeAsState()
+		val signerAlert = signerDataModel.signerAlert.observeAsState()
 
 		when (onBoardingDone.value) {
 			OnBoardingState.Yes -> {
@@ -60,6 +61,7 @@ fun SignerApp(signerDataModel: SignerDataModel) {
 					Box(modifier = Modifier.padding(innerPadding)) {
 						ScreenSelector(signerScreen.value, signerDataModel)
 						ModalSelector(modal = signerModal.value?: SignerModal.Empty, signerDataModel = signerDataModel)
+						AlertSelector(alert = signerAlert.value?: SignerAlert.Empty, signerDataModel = signerDataModel)
 					}
 				}
 			}

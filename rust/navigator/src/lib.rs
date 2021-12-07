@@ -51,7 +51,7 @@ pub fn do_action(
         Ok(mut state) => {
             let action = Action::parse(action_str);
             let details = (*state).perform(action, details_str);
-            (*state).generate_json(details)
+            (*state).generate_json(&details)
         },
         Err(TryLockError::Poisoned(_)) => {
             //TODO: maybe more grace here?

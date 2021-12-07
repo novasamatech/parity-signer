@@ -4,7 +4,7 @@ import androidx.compose.material.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.livedata.observeAsState
 import io.parity.signer.ButtonID
-import io.parity.signer.SignerAlert
+import io.parity.signer.ShieldAlert
 import io.parity.signer.models.SignerDataModel
 import io.parity.signer.models.pushButton
 
@@ -12,7 +12,7 @@ import io.parity.signer.models.pushButton
 fun ShieldModal(signerDataModel: SignerDataModel) {
 	val alert = signerDataModel.alert.observeAsState()
 	when (alert.value) {
-		 SignerAlert.None -> {
+		 ShieldAlert.None -> {
 			AlertDialog(
 				onDismissRequest = {
 					signerDataModel.pushButton(ButtonID.GoBack)
@@ -34,7 +34,7 @@ fun ShieldModal(signerDataModel: SignerDataModel) {
 				text = { Text("Safe to use") }
 			)
 		}
-		SignerAlert.Active -> {
+		ShieldAlert.Active -> {
 			AlertDialog(
 				onDismissRequest = {
 					signerDataModel.pushButton(ButtonID.GoBack)
@@ -56,7 +56,7 @@ fun ShieldModal(signerDataModel: SignerDataModel) {
 				text = { Text("Turn off network") }
 			)
 		}
-		SignerAlert.Past -> {
+		ShieldAlert.Past -> {
 			AlertDialog(
 				onDismissRequest = {
 					signerDataModel.pushButton(ButtonID.GoBack)

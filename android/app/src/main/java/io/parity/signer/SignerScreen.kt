@@ -42,13 +42,13 @@ fun ScreenSelector(screen: SignerScreen?, signerDataModel: SignerDataModel) {
 			SeedBackup(signerDataModel = signerDataModel)
 		}
 		SignerScreen.NewSeed -> {
-			NewSeedModal(signerDataModel = signerDataModel)
+			NewSeedScreen(signerDataModel = signerDataModel)
 		}
 		SignerScreen.RecoverSeedName -> {
-			NewSeedModal(signerDataModel = signerDataModel)
+			NewSeedScreen(signerDataModel = signerDataModel)
 		}
 		SignerScreen.RecoverSeedPhrase -> {
-			NewSeedModal(signerDataModel = signerDataModel)
+			NewSeedScreen(signerDataModel = signerDataModel)
 		}
 		SignerScreen.DeriveKey -> {
 			NewKeyModal(signerDataModel = signerDataModel, increment = false)
@@ -63,14 +63,26 @@ fun ScreenSelector(screen: SignerScreen?, signerDataModel: SignerDataModel) {
 fun ModalSelector(modal: SignerModal, signerDataModel: SignerDataModel) {
 	when(modal) {
 		SignerModal.Empty -> {}
-		SignerModal.Error -> ErrorModal(error = signerDataModel.screenInfo.optString("error")?: "unknown error", signerDataModel = signerDataModel)
-		SignerModal.Shield -> ShieldModal(signerDataModel)
 		SignerModal.SeedDeleteConfirm -> TODO()
 		SignerModal.KeyDeleteConfirm -> KeyDelete(signerDataModel = signerDataModel)
 		SignerModal.NewSeedMenu -> NewSeedMenu(signerDataModel = signerDataModel)
 		SignerModal.SeedMenu -> TODO()
 	}
 }
+
+@Composable
+fun AlertSelector(alert: SignerAlert, signerDataModel: SignerDataModel) {
+	when(alert) {
+		SignerAlert.Empty -> {}
+		SignerAlert.Error -> ErrorModal(
+			error = signerDataModel.screenData.optString(
+				"error"
+			) ?: "unknown error", signerDataModel = signerDataModel
+		)
+		SignerAlert.Shield -> ShieldModal(signerDataModel)
+	}
+}
+
 
 /**
  * All screens metadata for navigation
@@ -103,12 +115,16 @@ enum class TransactionState {
 
 enum class SignerModal {
 	Empty,
-	Error,
-	Shield,
 	NewSeedMenu,
 	SeedMenu,
 	SeedDeleteConfirm,
 	KeyDeleteConfirm;
+}
+
+enum class SignerAlert {
+	Empty,
+	Error,
+	Shield;
 }
 
 enum class OnBoardingState {
@@ -117,7 +133,7 @@ enum class OnBoardingState {
 	Yes;
 }
 
-enum class SignerAlert {
+enum class ShieldAlert {
 	None,
 	Active,
 	Past

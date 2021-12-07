@@ -10,6 +10,6 @@ import io.parity.signer.models.SignerDataModel
 fun NewSeedMenu(signerDataModel: SignerDataModel) {
 	Column {
 		Spacer(Modifier.weight(1f))
-
+		
 	}
 }

@@ -47,7 +47,7 @@ class SignerDataModel : ViewModel() {
 	private var _generalCertificate = MutableLiveData(JSONObject())
 
 	//Alert
-	private val _alert = MutableLiveData(SignerAlert.None)
+	private val _alert = MutableLiveData(ShieldAlert.None)
 
 	//Authenticator to call!
 	internal var authentication: Authentication = Authentication()
@@ -95,11 +95,15 @@ class SignerDataModel : ViewModel() {
 	internal val _footer = MutableLiveData(false)
 	internal val _rightButton = MutableLiveData("None")
 	internal val _screenNameType = MutableLiveData("h4")
-	internal var screenInfo = JSONObject()
+	internal var screenData = JSONObject()
+	internal var modalData = JSONObject()
+	internal var alertData = JSONObject()
 
 	//States of important modals
 	internal val _signerModal = MutableLiveData(SignerModal.Empty)
 	internal val _transactionState = MutableLiveData(TransactionState.None)
+
+	internal val _signerAlert = MutableLiveData(SignerAlert.Empty)
 
 	//Data storage locations
 	internal var dbName: String = ""
@@ -133,8 +137,9 @@ class SignerDataModel : ViewModel() {
 	val onBoardingDone: LiveData<OnBoardingState> = _onBoardingDone
 	val signerScreen: LiveData<SignerScreen> = _signerScreen
 	val signerModal: LiveData<SignerModal> = _signerModal
+	val signerAlert: LiveData<SignerAlert> = _signerAlert
 	val transactionState: LiveData<TransactionState> = _transactionState
-	val alert: LiveData<SignerAlert> = _alert
+	val alert: LiveData<ShieldAlert> = _alert
 	val screenName: LiveData<String> = _screenName
 	val backButton: LiveData<Boolean> = _backButton
 	val footer: LiveData<Boolean> = _footer
@@ -291,13 +296,13 @@ class SignerDataModel : ViewModel() {
 				0
 			) == 0
 		) {
-			if (alert.value != SignerAlert.Active) {
-				_alert.value = SignerAlert.Active
+			if (alert.value != ShieldAlert.Active) {
+				_alert.value = ShieldAlert.Active
 				historyDeviceWasOnline(dbName)
 			}
 		} else {
-			if (alert.value == SignerAlert.Active) {
-				_alert.value = SignerAlert.Past
+			if (alert.value == ShieldAlert.Active) {
+				_alert.value = ShieldAlert.Past
 			}
 		}
 	}
