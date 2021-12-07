@@ -5,6 +5,7 @@ use hex;
 use crate::screens::{Screen, KeysState};
 use crate::modals::Modal;
 use crate::actions::Action;
+use crate::alerts::Alert;
 
 use plot_icon;
 use db_handling;
@@ -26,6 +27,7 @@ pub struct State {
 pub struct Navstate {
     pub screen: Screen,
     pub modal: Modal,
+    pub alert: Alert,
 }
 
 impl Navstate {
@@ -33,6 +35,7 @@ impl Navstate {
         Navstate {
             screen: Screen::Log,
             modal: Modal::Empty,
+            alert: Alert::Empty,
         }
     }
 }
@@ -163,15 +166,16 @@ impl State {
                 };
                 format!("{}", log_pack)
             },
-        	//Screen::LogDetails => "",
-        	Screen::Scan => "".to_string(),
-        	//Screen::Transaction => "",
-        	Screen::SeedSelector => {
+            //Screen::LogDetails => "",
+            Screen::Scan => "".to_string(),
+            //Screen::Transaction => "",
+            Screen::SeedSelector => {
                 //TODO: seed selector cards
+                
                 let mut seed_pack = self.seed_names.join("\",\"");
                 format!("\"seedNameCards\":[\"{}\"],", seed_pack)
             },
-        	Screen::Keys(keystate) => {
+            Screen::Keys(keystate) => {
                 //TODO: separate seed key
                 if let Some(seed_name) = self.seed_names.get(keystate.seed_name) {
                     if let Some(network_key) = self.networks.get(keystate.network) {
@@ -195,15 +199,15 @@ impl State {
                     "".to_string()
                 } 
             },
-        	//Screen::KeyDetails => "Key",
-        	//Screen::Backup => "this should be popover",
-        	//Screen::NewSeed => "",
-        	//Screen::RecoverSeedName => "Recover Seed",
-        	//Screen::RecoverSeedPhrase => "Recover Seed",
-        	//Screen::DeriveKey => "",
-        	//Screen::Settings => "Settings",
-        	//Screen::Verifier => "VERIFIER CERTIFICATE",
-        	//Screen::ManageNetwork => "MANAGE NETWORKS",
+            //Screen::KeyDetails => "Key",
+            //Screen::Backup => "this should be popover",
+            //Screen::NewSeed => "",
+            //Screen::RecoverSeedName => "Recover Seed",
+            //Screen::RecoverSeedPhrase => "Recover Seed",
+            //Screen::DeriveKey => "",
+            //Screen::Settings => "Settings",
+            //Screen::Verifier => "VERIFIER CERTIFICATE",
+            //Screen::ManageNetwork => "MANAGE NETWORKS",
             Screen::Nowhere => "".to_string(),
             _ => "".to_string(),
         };
@@ -255,19 +259,19 @@ impl State {
     fn get_active_navbutton(&self) -> String {
         match self.navstate.screen {
             Screen::Log => "Log",
-        	Screen::LogDetails => "Log",
-        	Screen::Scan => "Scan",
-        	Screen::Transaction => "Scan",
-        	Screen::SeedSelector => "Keys",
-        	Screen::Keys(_) => "Keys",
-        	Screen::KeyDetails(_) => "Keys",
-        	Screen::NewSeed => "Keys",
-        	Screen::RecoverSeedName => "Keys",
-        	Screen::RecoverSeedPhrase => "Keys",
-        	Screen::DeriveKey(_) => "Keys",
-        	Screen::Settings => "Settings",
-        	Screen::Verifier => "Srttings",
-        	Screen::ManageNetwork => "Settings",
+            Screen::LogDetails => "Log",
+            Screen::Scan => "Scan",
+            Screen::Transaction => "Scan",
+            Screen::SeedSelector => "Keys",
+            Screen::Keys(_) => "Keys",
+            Screen::KeyDetails(_) => "Keys",
+            Screen::NewSeed => "Keys",
+            Screen::RecoverSeedName => "Keys",
+            Screen::RecoverSeedPhrase => "Keys",
+            Screen::DeriveKey(_) => "Keys",
+            Screen::Settings => "Settings",
+            Screen::Verifier => "Srttings",
+            Screen::ManageNetwork => "Settings",
             Screen::Nowhere => "None",
         }.to_string()
     }
@@ -276,19 +280,19 @@ impl State {
     fn get_right_button(&self) -> String {
         match self.navstate.screen {
             Screen::Log => "None",
-        	Screen::LogDetails => "None",
-        	Screen::Scan => "None",
-        	Screen::Transaction => "None",
-        	Screen::SeedSelector => "NewSeed",
-        	Screen::Keys(_) => "Backup",
-        	Screen::KeyDetails(_) => "None",
-        	Screen::NewSeed => "None",
-        	Screen::RecoverSeedName => "None",
-        	Screen::RecoverSeedPhrase => "None",
-        	Screen::DeriveKey(_) => "None",
-        	Screen::Settings => "None",
-        	Screen::Verifier => "None",
-        	Screen::ManageNetwork => "None",
+            Screen::LogDetails => "None",
+            Screen::Scan => "None",
+            Screen::Transaction => "None",
+            Screen::SeedSelector => "NewSeed",
+            Screen::Keys(_) => "Backup",
+            Screen::KeyDetails(_) => "None",
+            Screen::NewSeed => "None",
+            Screen::RecoverSeedName => "None",
+            Screen::RecoverSeedPhrase => "None",
+            Screen::DeriveKey(_) => "None",
+            Screen::Settings => "None",
+            Screen::Verifier => "None",
+            Screen::ManageNetwork => "None",
             Screen::Nowhere => "None",
         }.to_string()
     }
@@ -297,19 +301,19 @@ impl State {
     fn get_screen_name_type(&self) -> String {
         match self.navstate.screen {
             Screen::Log => "h4",
-        	Screen::LogDetails => "h4",
-        	Screen::Scan => "h1",
-        	Screen::Transaction => "h1",
-        	Screen::SeedSelector => "h4",
-        	Screen::Keys(_) => "h4",
-        	Screen::KeyDetails(_) => "h4",
-        	Screen::NewSeed => "h1",
-        	Screen::RecoverSeedName => "h1",
-        	Screen::RecoverSeedPhrase => "h1",
-        	Screen::DeriveKey(_) => "h1",
-        	Screen::Settings => "h4",
-        	Screen::Verifier => "h4",
-        	Screen::ManageNetwork => "h4",
+            Screen::LogDetails => "h4",
+            Screen::Scan => "h1",
+            Screen::Transaction => "h1",
+            Screen::SeedSelector => "h4",
+            Screen::Keys(_) => "h4",
+            Screen::KeyDetails(_) => "h4",
+            Screen::NewSeed => "h1",
+            Screen::RecoverSeedName => "h1",
+            Screen::RecoverSeedPhrase => "h1",
+            Screen::DeriveKey(_) => "h1",
+            Screen::Settings => "h4",
+            Screen::Verifier => "h4",
+            Screen::ManageNetwork => "h4",
             Screen::Nowhere => "h4",
         }.to_string()
 

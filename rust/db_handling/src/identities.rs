@@ -4,18 +4,21 @@
 //! Zeroization is mostly delegated to os
 
 use sled::{Db, Batch};
+use std::collections::HashMap;
 use sp_core::{Pair, ed25519, sr25519, ecdsa};
 use parity_scale_codec::Encode;
 use regex::Regex;
-use constants::{ADDRTREE, MAX_WORDS_DISPLAY, SPECSTREE};
+use constants::{ADDRTREE, HALFSIZE, MAX_WORDS_DISPLAY, SPECSTREE};
 use defaults::get_default_chainspecs;
-use definitions::{crypto::Encryption, error::{Active, AddressGeneration, AddressGenerationCommon, AddressKeySource, ErrorActive, ErrorSigner, ErrorSource, ExtraAddressGenerationSigner, NotFoundSigner, NotHexSigner, Signer, SpecsKeySource}, helpers::unhex, history::{Event, IdentityHistory}, keyring::{NetworkSpecsKey, AddressKey}, network_specs::NetworkSpecs, print::{export_plain_vector, export_complex_vector_with_error}, users::{AddressDetails, SeedObject}};
+use definitions::{crypto::Encryption, error::{Active, AddressGeneration, AddressGenerationCommon, ErrorActive, ErrorSigner, ErrorSource, ExtraAddressGenerationSigner, NotFoundSigner, NotHexSigner, Signer, SpecsKeySource}, helpers::{get_multisigner, multisigner_to_public, unhex}, history::{Event, IdentityHistory}, keyring::{NetworkSpecsKey, AddressKey, print_multisigner_as_base58}, network_specs::NetworkSpecs, print::{export_plain_vector, export_complex_vector, export_complex_vector_with_error}, users::{AddressDetails, SeedObject}};
 use bip39::{Language, Mnemonic, MnemonicType};
 use zeroize::Zeroize;
 use lazy_static::lazy_static;
 use anyhow;
 use qrcode_static::png_qr_from_string;
 use sp_runtime::MultiSigner;
+
+use plot_icon::png_data_from_vec;
 
 use crate::db_transactions::TrDbCold;
 use crate::helpers::{open_db, open_tree, make_batch_clear_tree, upd_id_batch, get_network_specs, get_address_details};
@@ -32,30 +35,63 @@ lazy_static! {
 
 /// Get all identities from database.
 /// Function gets used only on the Signer side.
-fn get_all_addresses (database_name: &str) -> Result<Vec<(AddressKey, AddressDetails)>, ErrorSigner> {
+fn get_all_addresses (database_name: &str) -> Result<Vec<(MultiSigner, AddressDetails)>, ErrorSigner> {
     let database = open_db::<Signer>(database_name)?;
     let identities = open_tree::<Signer>(&database, ADDRTREE)?;
-    let mut out: Vec<(AddressKey, AddressDetails)> = Vec::new();
+    let mut out: Vec<(MultiSigner, AddressDetails)> = Vec::new();
     for x in identities.iter() {
         if let Ok((address_key_vec, address_entry)) = x {
             let address_key = AddressKey::from_ivec(&address_key_vec);
-            let address_details = AddressDetails::from_entry_with_key_checked::<Signer>(&address_key, address_entry)?;
-            out.push((address_key, address_details));
+            let (multisigner, address_details) = AddressDetails::process_entry_with_key_checked::<Signer>(&address_key, address_entry)?;
+            out.push((multisigner, address_details));
         }
     }
     Ok(out)
 }
 
+/// Function to print all seed names with identicons
+/// Gets used only on the Signer side, interacts with the user interface.
+pub fn print_all_seed_names_with_identicons (database_name: &str) -> Result<String, ErrorSigner> {
+    let mut data_set: HashMap<String, Option<MultiSigner>> = HashMap::new();
+    for (multisigner, address_details) in get_all_addresses(database_name)?.into_iter() {
+        if (address_details.path == "")&&(!address_details.has_pwd) {
+            match data_set.get(&address_details.seed_name) {
+                Some(Some(_)) => (),
+                _ => {
+                    data_set.insert(address_details.seed_name.to_string(), Some(multisigner));
+                },
+            }
+        }
+        else {
+            if let None = data_set.get(&address_details.seed_name) {data_set.insert(address_details.seed_name.to_string(), None);}
+        }
+    }
+    let mut print_set: Vec<String> = Vec::new();
+    for (seed_name, possible_multisigner) in data_set.iter() {
+        match possible_multisigner {
+            Some(multisigner) => {
+                match png_data_from_vec(&multisigner_to_public(&multisigner), HALFSIZE) {
+                    Ok(a) => print_set.push(format!("\"identicon\":\"{}\",\"seed_name\":\"{}\"", hex::encode(a), seed_name)),
+                    Err(e) => return Err(ErrorSigner::PngGeneration(e)),
+                }
+            },
+            None => print_set.push(format!("\"identicon\":\"\",\"seed_name\":\"{}\"", seed_name)),
+        };
+        
+    }
+    Ok(export_complex_vector(&print_set, |a| a.to_string()))
+}
+
 /// Filter identities by given seed_name.
 /// Function gets used only on the Signer side.
-fn get_addresses_by_seed_name (database_name: &str, seed_name: &str) -> Result<Vec<(AddressKey, AddressDetails)>, ErrorSigner> {
+fn get_addresses_by_seed_name (database_name: &str, seed_name: &str) -> Result<Vec<(MultiSigner, AddressDetails)>, ErrorSigner> {
     Ok(get_all_addresses(database_name)?.into_iter().filter(|(_, address_details)| address_details.seed_name == seed_name).collect())
 }
 
 /// Get all identities for given seed_name and network_key as hex string.
 /// If empty seed name is given, gets all existing identities.
 /// Function gets used only on the Signer side.
-fn get_relevant_identities (seed_name: &str, network_key_string: &str, database_name: &str) -> Result<Vec<(AddressKey, AddressDetails)>, ErrorSigner> {
+fn get_relevant_identities (seed_name: &str, network_key_string: &str, database_name: &str) -> Result<Vec<(MultiSigner, AddressDetails)>, ErrorSigner> {
     let network_specs_key = NetworkSpecsKey::from_hex(network_key_string)?;
     let identities_out = {
         if seed_name == "" {get_all_addresses(database_name)?}
@@ -71,7 +107,7 @@ fn get_relevant_identities (seed_name: &str, network_key_string: &str, database_
 pub fn print_relevant_identities (seed_name: &str, network_key_string: &str, database_name: &str) -> anyhow::Result<String> {
     let relevant_identities = get_relevant_identities (seed_name, network_key_string, database_name).map_err(|e| e.anyhow())?;
     let network_specs = get_network_specs_by_hex_key(database_name, network_key_string).map_err(|e| e.anyhow())?;
-    export_complex_vector_with_error(&relevant_identities, |(address_key, address_details)| address_details.print(&address_key, Some(network_specs.base58prefix))).map_err(|e| e.anyhow())
+    export_complex_vector_with_error(&relevant_identities, |(multisigner, address_details)| address_details.print(&multisigner, Some(network_specs.base58prefix))).map_err(|e| e.anyhow())
 }
 
 /// Function to print all identities for all seed names.
@@ -80,7 +116,7 @@ pub fn print_relevant_identities (seed_name: &str, network_key_string: &str, dat
 /// Open to user interface.
 pub fn print_all_identities (database_name: &str) -> anyhow::Result<String> {
     let all_identities = get_all_addresses (database_name).map_err(|e| e.anyhow())?;
-    export_complex_vector_with_error(&all_identities, |(address_key, address_details)| address_details.print(&address_key, None)).map_err(|e| e.anyhow())
+    export_complex_vector_with_error(&all_identities, |(multisigner, address_details)| address_details.print(&multisigner, None)).map_err(|e| e.anyhow())
 }
 
 /// Generate random phrase with given number of words.
@@ -432,9 +468,10 @@ pub fn remove_identities_for_seed (seed_name: &str, database_name: &str) -> anyh
     let mut identity_batch = Batch::default();
     let mut events: Vec<Event> = Vec::new();
     let id_set = get_addresses_by_seed_name(database_name, seed_name).map_err(|e| e.anyhow())?;
-    for (address_key, address_details) in id_set.iter() {
+    for (multisigner, address_details) in id_set.iter() {
+        let address_key = AddressKey::from_multisigner(multisigner);
         identity_batch.remove(address_key.key());
-        let (public_key, _) = address_key.public_key_encryption::<Signer>(AddressKeySource::AddrTree).map_err(|e| e.anyhow())?;
+        let public_key = multisigner_to_public(&multisigner);
         for network_specs_key in address_details.network_id.iter() {
             let (genesis_hash_vec, _) = network_specs_key.genesis_hash_encryption::<Signer>(SpecsKeySource::AddrTree(address_key.to_owned())).map_err(|e| e.anyhow())?;
             let identity_history = IdentityHistory::get(&seed_name, &address_details.encryption, &public_key, &address_details.path, &genesis_hash_vec);
@@ -457,10 +494,11 @@ pub fn remove_identities_for_seed (seed_name: &str, database_name: &str) -> anyh
 pub fn export_identity (pub_key: &str, network_specs_key_string: &str, database_name: &str) -> anyhow::Result<String> {
     let network_specs_key = NetworkSpecsKey::from_hex(network_specs_key_string).map_err(|e| e.anyhow())?;
     let network_specs = get_network_specs(database_name, &network_specs_key).map_err(|e| e.anyhow())?;
-    let address_key = AddressKey::from_hex_public(pub_key, &network_specs.encryption).map_err(|e| e.anyhow())?;
+    let multisigner = get_multisigner(&unhex::<Signer>(pub_key, NotHexSigner::PublicKey{input: pub_key.to_string()}).map_err(|e| e.anyhow())?, &network_specs.encryption).map_err(|e| e.anyhow())?;
+    let address_key = AddressKey::from_multisigner(&multisigner);
     let address_details = get_address_details(database_name, &address_key).map_err(|e| e.anyhow())?;
     if address_details.network_id.contains(&network_specs_key) {
-        let address_base58 = address_key.print_as_base58(Some(network_specs.base58prefix), AddressKeySource::AddrTree).map_err(|e| e.anyhow())?;
+        let address_base58 = print_multisigner_as_base58(&multisigner, Some(network_specs.base58prefix));
         let qr_prep = match png_qr_from_string(&format!("substrate:{}:0x{}", address_base58, hex::encode(&network_specs.genesis_hash))) {
             Ok(a) => a,
             Err(e) => return Err(ErrorSigner::Qr(e.to_string()).anyhow()),
@@ -491,7 +529,7 @@ mod tests {
     use definitions::{crypto::Encryption, keyring::{AddressKey, NetworkSpecsKey}, network_specs::Verifier};
     use std::fs;
     use sled::{Db, Tree, open, Batch};
-    use crate::{cold_default::{populate_cold_no_metadata, signer_init_with_cert, reset_cold_database_no_addresses}, helpers::{open_db, open_tree, upd_id_batch}, db_transactions::TrDbCold, manage_history::print_history};
+    use crate::{cold_default::{populate_cold, populate_cold_no_metadata, signer_init_with_cert, reset_cold_database_no_addresses}, helpers::{open_db, open_tree, upd_id_batch}, db_transactions::TrDbCold, manage_history::print_history};
 
     static SEED: &str = "bottom drive obey lake curtain smoke basket hold race lonely fit walk";
 
@@ -540,10 +578,10 @@ mod tests {
         println!("===");
         let default_addresses = get_relevant_identities("Alice", &hex::encode(NetworkSpecsKey::from_parts(&chainspecs[0].genesis_hash.to_vec(), &Encryption::Sr25519).key()), dbname).unwrap();
         assert!(default_addresses.len()>0);
-        assert_eq!(r#"[(AddressKey([1, 70, 235, 221, 239, 140, 217, 187, 22, 125, 195, 8, 120, 215, 17, 59, 126, 22, 142, 111, 6, 70, 190, 255, 215, 125, 105, 211, 155, 173, 118, 180, 122]), AddressDetails { seed_name: "Alice", path: "", has_pwd: false, network_id: [NetworkSpecsKey([1, 128, 145, 177, 113, 187, 21, 142, 45, 56, 72, 250, 35, 169, 241, 194, 81, 130, 251, 142, 32, 49, 59, 44, 30, 180, 146, 25, 218, 122, 112, 206, 144, 195]), NetworkSpecsKey([1, 128, 176, 168, 212, 147, 40, 92, 45, 247, 50, 144, 223, 183, 230, 31, 135, 15, 23, 180, 24, 1, 25, 122, 20, 156, 169, 54, 84, 73, 158, 163, 218, 254]), NetworkSpecsKey([1, 128, 193, 150, 248, 18, 96, 207, 22, 134, 23, 43, 71, 167, 156, 240, 2, 18, 7, 53, 215, 203, 14, 177, 71, 78, 138, 220, 229, 102, 24, 69, 111, 255]), NetworkSpecsKey([1, 128, 225, 67, 242, 56, 3, 172, 80, 232, 246, 248, 230, 38, 149, 209, 206, 158, 78, 29, 104, 170, 54, 193, 205, 44, 253, 21, 52, 2, 19, 243, 66, 62])], encryption: Sr25519 }), (AddressKey([1, 100, 163, 18, 53, 212, 191, 155, 55, 207, 237, 58, 250, 138, 166, 7, 84, 103, 95, 156, 73, 21, 67, 4, 84, 211, 101, 192, 81, 18, 120, 77, 5]), AddressDetails { seed_name: "Alice", path: "//kusama", has_pwd: false, network_id: [NetworkSpecsKey([1, 128, 176, 168, 212, 147, 40, 92, 45, 247, 50, 144, 223, 183, 230, 31, 135, 15, 23, 180, 24, 1, 25, 122, 20, 156, 169, 54, 84, 73, 158, 163, 218, 254])], encryption: Sr25519 })]"#, format!("{:?}", default_addresses)); //because JSON export is what we care about
+        assert_eq!("[(MultiSigner::Sr25519(46ebddef8cd9bb167dc30878d7113b7e168e6f0646beffd77d69d39bad76b47a (5DfhGyQd...)), AddressDetails { seed_name: \"Alice\", path: \"\", has_pwd: false, network_id: [NetworkSpecsKey([1, 128, 145, 177, 113, 187, 21, 142, 45, 56, 72, 250, 35, 169, 241, 194, 81, 130, 251, 142, 32, 49, 59, 44, 30, 180, 146, 25, 218, 122, 112, 206, 144, 195]), NetworkSpecsKey([1, 128, 176, 168, 212, 147, 40, 92, 45, 247, 50, 144, 223, 183, 230, 31, 135, 15, 23, 180, 24, 1, 25, 122, 20, 156, 169, 54, 84, 73, 158, 163, 218, 254]), NetworkSpecsKey([1, 128, 193, 150, 248, 18, 96, 207, 22, 134, 23, 43, 71, 167, 156, 240, 2, 18, 7, 53, 215, 203, 14, 177, 71, 78, 138, 220, 229, 102, 24, 69, 111, 255]), NetworkSpecsKey([1, 128, 225, 67, 242, 56, 3, 172, 80, 232, 246, 248, 230, 38, 149, 209, 206, 158, 78, 29, 104, 170, 54, 193, 205, 44, 253, 21, 52, 2, 19, 243, 66, 62])], encryption: Sr25519 }), (MultiSigner::Sr25519(64a31235d4bf9b37cfed3afa8aa60754675f9c4915430454d365c05112784d05 (5ELf63sL...)), AddressDetails { seed_name: \"Alice\", path: \"//kusama\", has_pwd: false, network_id: [NetworkSpecsKey([1, 128, 176, 168, 212, 147, 40, 92, 45, 247, 50, 144, 223, 183, 230, 31, 135, 15, 23, 180, 24, 1, 25, 122, 20, 156, 169, 54, 84, 73, 158, 163, 218, 254])], encryption: Sr25519 })]", format!("{:?}", default_addresses));
         let database: Db = open(dbname).unwrap();
         let identities: Tree = database.open_tree(ADDRTREE).unwrap();
-        let test_key = AddressKey::from_hex_public("46ebddef8cd9bb167dc30878d7113b7e168e6f0646beffd77d69d39bad76b47a", &Encryption::Sr25519).unwrap();
+        let test_key = AddressKey::from_parts(&hex::decode("46ebddef8cd9bb167dc30878d7113b7e168e6f0646beffd77d69d39bad76b47a").unwrap(), &Encryption::Sr25519).unwrap();
         assert!(identities.contains_key(test_key.key()).unwrap());
         fs::remove_dir_all(dbname).unwrap();
     }
@@ -671,9 +709,9 @@ mod tests {
         let mut identities = get_relevant_identities("Alice", &network_id_string_0, dbname).expect("Alice should have some addresses by default");
         println!("{:?}", identities);
         let (key0, _) = identities.remove(0); //TODO: this should be root key
-        let (public_key0, _) = key0.public_key_encryption::<Signer>(AddressKeySource::AddrTree).unwrap();
+        let public_key0 = multisigner_to_public(&key0);
         let (key1, _) = identities.remove(0); //TODO: this should be network-specific key
-        let (public_key1, _) = key1.public_key_encryption::<Signer>(AddressKeySource::AddrTree).unwrap();
+        let public_key1 = multisigner_to_public(&key1);
         delete_address(&hex::encode(&public_key0), &network_id_string_0, dbname).expect("delete an address");
         delete_address(&hex::encode(&public_key1), &network_id_string_0, dbname).expect("delete another address");
         let identities = get_relevant_identities("Alice", &network_id_string_0, dbname).expect("Alice still should have some addresses after deletion of two");
@@ -774,6 +812,16 @@ mod tests {
         let out = guess(word_part);
         let out_expected = r#"["senior","sense","sentence"]"#;
         assert!(out == out_expected, "Found different word set:\n{:?}", out);
+    }
+    
+    #[test]
+    fn print_identicons() {
+        let dbname = "for_tests/print_identicons";
+        populate_cold (dbname, Verifier(None)).unwrap();
+        let horrible_print = print_all_seed_names_with_identicons(dbname).unwrap();
+        let expected_print = r#"[{"identicon":"89504e470d0a1a0a0000000d4948445200000065000000650806000000547c2dcf0000045949444154789cedda2d72544114c5f1b08458140b8806051852b8b00236814150280a11934db002e2a8c40414e82c00159b25843e459daacccbcd9df7bafb7eccbcfe8bf3ec54fd5cdf797277777730cad54ea0dcdede76fb918787874fca277529517a226c2b23520a144f846d65400a45c984312d1227042533c6b4081c57945dc298e689e382b2cb18d33c704c51f609639a258e19ca3e83302b1813144f900f5fafca6e76f6e975599f2c60baa2786220098479c2a09e38dd503281b05d85e982e20d8232a2a01e30cd281120282b0a6a8569428902419951500b4c354a2408ca8e826a61aa50a2419806130dc26a6016a3640161124c1610b61466118a05c8c9fbd3b29b9d7ffb58d6a7df973765377bf1e669d9be2d810945914098078c04c27ac398a07882304b180d8445c1cc42e90d82d68882e6c06c45b100416b4541db60068a524a142b10b46614a4c184a1200dc6128469309620a80ac51a8449301e204c82b106618fc134a37cb8fa5176b3b3d76fcbfa7474fcaaec66d7173fcbfad4f2a2b008a5058479c04820cc034602612d30d5281a08b384d14098258c06c2e6c0cc4299038206ca5559bd3928680a33502a7343990b8206ca5559bdb928e83ecc40a92c250ad2602c4198066309c234982520a81b0a92603c409804e301c22498a5204844a901e9d1cba3e3b29bfdbabe28eb5334eafd08138a2281300f18098445c084a36820cc12460361de3003253b8a37081a28728019284a034568a004a4c15882300d26020485a32009c6038449305120a80bcabb9387e7dcefe77ee7dce87a9fb39b512410b606180984d5c234a168206c9f613410560333501a1a28091b28091b28094b898234987d06611a4c0d086a464112cc1a409804530b82baa0b47673f9f760dad337cf0ebc8a7e5198168e2281300f18098445c184a26820cc12460361113003654b034568d528c81b66a03c0c20e5f3ff468f06cac356878234184b10a6c17883a014284882f10061124c04087a80826a604e4e3f97ddecfce397b23e45a3f6fa2f354150138a04c23c602410e6012381b0a5305d5034106609a381304b180d842d8119281d7243417361064a3f94fb2068a054e68a82e6c00c943e285310548d8234184b10a6c15882300d660e089a8d825a603c409804e301c224981610d48cd2daf3e3a3b29bfdb9b82eeb53e4397b310ab286914098078c04c2ac611e034161281a08b384d14098254c350ab28259338a0682068a525a146401b356946d2068160aea0db34694392068360af284b104611a4c14080a4541128c070893607a832033146401d352f48bc29c9680a0c528280b8c04c2b2c02c05415528281a460361d1303520a81a0545c26447a905414d28280a26334a0b086a4641113059515a41501714e40d9311a50708ea868232c1ec2a08ea8ac23c7124184f909e18cc040579c244650182cc50d03ec35881205314b64f389618cc0585ed328e0706734561bb84e389c1425058669c080c168ac232e14462b01428d33c9132204c4b8932ad27524684693b81b2b6fe01d569a07324f485730000000049454e44ae426082","seed_name":"Alice"}]"#;
+        assert!(horrible_print == expected_print, "/nReceived: /n{}", horrible_print);
+        fs::remove_dir_all(dbname).unwrap();
     }
 }
 

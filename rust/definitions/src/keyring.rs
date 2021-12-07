@@ -1,13 +1,12 @@
 use parity_scale_codec_derive;
 use parity_scale_codec::{Decode, Encode};
 use sled::IVec;
-use sp_core::{ed25519, sr25519, ecdsa, crypto::{Ss58Codec, Ss58AddressFormat}};
+use sp_core::crypto::{Ss58Codec, Ss58AddressFormat};
 use sp_runtime::MultiSigner;
-use std::convert::TryInto;
 
 use crate::crypto::Encryption;
-use crate::error::{AddressKeySource, DatabaseActive, ErrorActive, ErrorSigner, ErrorSource, InterfaceSigner, KeyDecodingActive, NotHexSigner, Signer, SpecsKeySource};
-use crate::helpers::unhex;
+use crate::error::{AddressKeySource, DatabaseActive, ErrorActive, ErrorSigner, ErrorSource, KeyDecodingActive, NotHexSigner, Signer, SpecsKeySource};
+use crate::helpers::{get_multisigner, unhex};
 use crate::metadata::NameVersioned;
 
 /// NetworkSpecsKey is the database storage key used to search for 
@@ -101,35 +100,8 @@ impl AddressKey {
     }
     /// Function to generate AddressKey from parts: public key vector and network encryption
     pub fn from_parts (public: &Vec<u8>, encryption: &Encryption) -> Result<Self, ErrorSigner> {
-        let multisigner = match encryption {
-            Encryption::Ed25519 => {
-                let into_pubkey: [u8; 32] = match public.to_vec().try_into() {
-                    Ok(a) => a,
-                    Err(_) => return Err(ErrorSigner::Interface(InterfaceSigner::PublicKeyLength)),
-                };
-                MultiSigner::Ed25519(ed25519::Public::from_raw(into_pubkey))
-            },
-            Encryption::Sr25519 => {
-                let into_pubkey: [u8; 32] = match public.to_vec().try_into() {
-                    Ok(a) => a,
-                    Err(_) => return Err(ErrorSigner::Interface(InterfaceSigner::PublicKeyLength)),
-                };
-                MultiSigner::Sr25519(sr25519::Public::from_raw(into_pubkey))
-            },
-            Encryption::Ecdsa => {
-                let into_pubkey: [u8; 33] = match public.to_vec().try_into() {
-                    Ok(a) => a,
-                    Err(_) => return Err(ErrorSigner::Interface(InterfaceSigner::PublicKeyLength)),
-                };
-                MultiSigner::Ecdsa(ecdsa::Public::from_raw(into_pubkey))
-            },
-        };
+        let multisigner = get_multisigner(public, encryption)?;
         Ok(Self::from_multisigner(&multisigner))
-    }
-    /// Function to generate AddressKey from parts: hexadecimal public key and network encryption
-    pub fn from_hex_public (hex_public: &str, encryption: &Encryption) -> Result<Self, ErrorSigner> {
-        let public = unhex::<Signer>(hex_public, NotHexSigner::PublicKey{input: hex_public.to_string()})?;
-        Self::from_parts(&public, encryption)
     }
     /// Function to transform IVec into AddressKey
     pub fn from_ivec (ivec: &IVec) -> Self {
@@ -157,34 +129,6 @@ impl AddressKey {
     /// Function to get the key that can be used for the database search from the NetworkSpecsKey
     pub fn key(&self) -> Vec<u8> {
         self.0.to_vec()
-    }
-    /// Function to make base58 address;
-    /// if base58prefix is provided, generates custom Ss58AddressFormat,
-    /// if not, uses default
-    pub fn print_as_base58(&self, optional_prefix: Option<u16>, source: AddressKeySource<Signer>) -> Result<String, ErrorSigner> {
-        let multi_signer = self.multi_signer::<Signer>(source)?;
-        Ok(print_multisigner_as_base58(&multi_signer, optional_prefix))
-    }
-    /// function to get public address as a vector, encryption, and base58 address printed
-    /// if base58prefix is provided, generates custom Ss58AddressFormat,
-    /// if not, uses default
-    pub fn public_encryption_base58(&self, optional_prefix: Option<u16>, source: AddressKeySource<Signer>) -> Result<(Vec<u8>, Encryption, String), ErrorSigner> {
-        let multi_signer = self.multi_signer::<Signer>(source)?;
-        match optional_prefix {
-            Some(base58prefix) => {
-                let version_for_base58 = Ss58AddressFormat::Custom(base58prefix);
-                match multi_signer {
-                    MultiSigner::Ed25519(pubkey) => Ok((pubkey.0.to_vec(), Encryption::Ed25519, pubkey.to_ss58check_with_version(version_for_base58))),
-                    MultiSigner::Sr25519(pubkey) => Ok((pubkey.0.to_vec(), Encryption::Sr25519, pubkey.to_ss58check_with_version(version_for_base58))),
-                    MultiSigner::Ecdsa(pubkey) => Ok((pubkey.0.to_vec(), Encryption::Ecdsa, pubkey.to_ss58check_with_version(version_for_base58))),
-                }
-            },
-            None => match multi_signer {
-                MultiSigner::Ed25519(pubkey) => Ok((pubkey.0.to_vec(), Encryption::Ed25519, pubkey.to_ss58check())),
-                MultiSigner::Sr25519(pubkey) => Ok((pubkey.0.to_vec(), Encryption::Sr25519, pubkey.to_ss58check())),
-                MultiSigner::Ecdsa(pubkey) => Ok((pubkey.0.to_vec(), Encryption::Ecdsa, pubkey.to_ss58check())),
-            }
-        }
     }
 }
 

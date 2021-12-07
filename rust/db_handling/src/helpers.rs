@@ -237,7 +237,6 @@ pub fn display_danger_status(database_name: &str) -> anyhow::Result<bool> {
     get_danger_status(database_name).map_err(|e| e.anyhow())
 }
 
-
 #[cfg(test)]
 mod tests {
     

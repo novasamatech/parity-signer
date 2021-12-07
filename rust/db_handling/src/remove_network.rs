@@ -1,6 +1,6 @@
 use anyhow;
 use constants::{ADDRTREE, METATREE, SPECSTREE};
-use definitions::{error::{ErrorSigner, ErrorSource, NotFoundSigner, Signer}, history::{Event, IdentityHistory, MetaValuesDisplay, NetworkSpecsDisplay}, keyring::{AddressKey, NetworkSpecsKey, VerifierKey, MetaKeyPrefix, MetaKey}, metadata::MetaValues, network_specs::{CurrentVerifier, NetworkSpecs, ValidCurrentVerifier, Verifier}, users::AddressDetails};
+use definitions::{error::{ErrorSigner, ErrorSource, NotFoundSigner, Signer}, helpers::multisigner_to_public, history::{Event, IdentityHistory, MetaValuesDisplay, NetworkSpecsDisplay}, keyring::{AddressKey, NetworkSpecsKey, VerifierKey, MetaKeyPrefix, MetaKey}, metadata::MetaValues, network_specs::{CurrentVerifier, NetworkSpecs, ValidCurrentVerifier, Verifier}, users::AddressDetails};
 use parity_scale_codec::Encode;
 use sled::Batch;
 
@@ -76,10 +76,10 @@ fn remove_network (network_specs_key_string: &str, database_name: &str) -> Resul
         for x in identities.iter() {
             if let Ok((address_key_vec, entry)) = x {
                 let address_key = AddressKey::from_ivec(&address_key_vec);
-                let (encryption, public_key, mut address_details) = AddressDetails::process_entry_checked::<Signer>((address_key_vec, entry))?;
+                let (multisigner, mut address_details) = AddressDetails::process_entry_checked::<Signer>((address_key_vec, entry))?;
                 for key in keys_to_wipe.iter() {
                     if address_details.network_id.contains(key) {
-                        let identity_history = IdentityHistory::get(&address_details.seed_name, &encryption, &public_key, &address_details.path, &network_specs.genesis_hash.to_vec());
+                        let identity_history = IdentityHistory::get(&address_details.seed_name, &address_details.encryption, &multisigner_to_public(&multisigner), &address_details.path, &network_specs.genesis_hash.to_vec());
                         events.push(Event::IdentityRemoved(identity_history));
                         address_details.network_id = address_details.network_id.into_iter().filter(|id| id != key).collect();
                     }
@@ -169,7 +169,7 @@ mod tests {
             let identities: Tree = database.open_tree(ADDRTREE).unwrap();
             for x in identities.iter() {
                 if let Ok(a) = x {
-                    let (_, _, address_details) = <AddressDetails>::process_entry_checked::<Signer>(a).unwrap();
+                    let (_, address_details) = AddressDetails::process_entry_checked::<Signer>(a).unwrap();
                     assert!(!address_details.network_id.contains(&network_specs_key), "Some westend identities still remain.");
                     assert!(address_details.network_id.len() != 0, "Did not remove address key entried with no network keys associated");
                 }

@@ -1,6 +1,6 @@
 use sled::{Batch, Transactional};
 use constants::{ADDRESS_BOOK, ADDRTREE, GENERALVERIFIER, HISTORY, METATREE, SETTREE, SIGN, SPECSTREE, SPECSTREEPREP, STUB, TRANSACTION, TYPES, VERIFIERS};
-use definitions::{error::{Active, AddressKeySource, DatabaseSigner, EntryDecodingSigner, ErrorActive, ErrorSigner, ErrorSource, NotFoundSigner, Signer}, history::{Event, IdentityHistory, MetaValuesDisplay, NetworkSpecsDisplay, NetworkVerifierDisplay, SignDisplay, SignMessageDisplay, TypesDisplay}, keyring::{AddressKey, MetaKey, NetworkSpecsKey, VerifierKey}, metadata::MetaValues, network_specs::{NetworkSpecs, NetworkSpecsToSend, CurrentVerifier, ValidCurrentVerifier, Verifier, VerifierValue}, qr_transfers::ContentLoadTypes, users::AddressDetails};
+use definitions::{error::{Active, AddressKeySource, DatabaseSigner, EntryDecodingSigner, ErrorActive, ErrorSigner, ErrorSource, NotFoundSigner, Signer}, helpers::multisigner_to_public, history::{Event, IdentityHistory, MetaValuesDisplay, NetworkSpecsDisplay, NetworkVerifierDisplay, SignDisplay, SignMessageDisplay, TypesDisplay}, keyring::{AddressKey, MetaKey, NetworkSpecsKey, VerifierKey}, metadata::MetaValues, network_specs::{NetworkSpecs, NetworkSpecsToSend, CurrentVerifier, ValidCurrentVerifier, Verifier, VerifierValue}, qr_transfers::ContentLoadTypes, users::AddressDetails};
 use parity_scale_codec::{Decode, Encode};
 use parity_scale_codec_derive;
 
@@ -321,11 +321,11 @@ impl TrDbColdStub {
             for x in identities.iter() {
                 if let Ok((address_key_vec, address_entry)) = x {
                     let address_key = AddressKey::from_ivec(&address_key_vec);
-                    let (encryption, public_key, mut address_details) = AddressDetails::process_entry_with_key_checked::<Signer>(&address_key, address_entry)?;
-                    if (address_details.path.as_str() == "") && !address_details.has_pwd && (encryption == network_specs.encryption) && !address_details.network_id.contains(&network_specs_key) {
+                    let (multisigner, mut address_details) = AddressDetails::process_entry_with_key_checked::<Signer>(&address_key, address_entry)?;
+                    if (address_details.path.as_str() == "") && !address_details.has_pwd && (address_details.encryption == network_specs.encryption) && !address_details.network_id.contains(&network_specs_key) {
                         address_details.network_id.push(network_specs_key.to_owned());
                         self.addresses_stub = self.addresses_stub.new_addition(address_key.key(), address_details.encode());
-                        self.history_stub.push(Event::IdentityAdded(IdentityHistory::get(&address_details.seed_name, &encryption, &public_key, &address_details.path, &network_specs.genesis_hash.to_vec())));
+                        self.history_stub.push(Event::IdentityAdded(IdentityHistory::get(&address_details.seed_name, &address_details.encryption, &multisigner_to_public(&multisigner), &address_details.path, &network_specs.genesis_hash.to_vec())));
                     }
                 }
             }

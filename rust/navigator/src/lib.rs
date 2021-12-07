@@ -11,6 +11,8 @@ use definitions::keyring::NetworkSpecsKey;
 pub mod screens;
 use screens::Screen;
 
+pub mod alerts;
+
 pub mod modals;
 use modals::Modal;
 

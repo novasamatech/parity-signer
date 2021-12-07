@@ -1,5 +1,6 @@
 use anyhow::anyhow;
 use hex;
+use png;
 use sled;
 use sp_core::crypto::SecretStringError;
 
@@ -963,6 +964,7 @@ impl ErrorSource for Signer {
             },
             ErrorSigner::AddressUse(e) => format!("Error with secret string of existing address: {}.", bad_secret_string(e)),
             ErrorSigner::WrongPassword => String::from("Wrong password."),
+            ErrorSigner::PngGeneration(e) => format!("Error generating png. {}", e),
         }
     }
 }
@@ -981,6 +983,7 @@ pub enum ErrorSigner {
     AllParsingFailed(Vec<(String, u32, ParserError)>),
     AddressUse(SecretStringError),
     WrongPassword,
+    PngGeneration(png::EncodingError),
 }
 
 /// Signer side errors could be exported into native interface,
