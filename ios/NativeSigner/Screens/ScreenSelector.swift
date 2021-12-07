@@ -43,8 +43,6 @@ struct ScreenSelector: View {
         case .ManageNetwork:
             Text("details of network")
             //NetworkDetails()
-        default: //TODO: remove
-            Text("fallback")
         }
     }
 }

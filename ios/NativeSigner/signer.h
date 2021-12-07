@@ -28,7 +28,10 @@ struct ExternError {
 void signer_destroy_string(const char* cstring);
 
 //Main action that should replace all logic
-const char * act(struct ExternError*, const char* origin, const char* action, const char* details);
+const char * act(struct ExternError*, const char* action, const char* details);
+
+//Init navigation
+void init_navigation(struct ExternError*, const char* dbname, const char* seed_names);
 
 // Show QR with key name, public key and network ID
 const char * export_pubkey(struct ExternError*, const char* address, const char* network, const char* dbname);

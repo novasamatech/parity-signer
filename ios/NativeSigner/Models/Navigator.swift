@@ -14,12 +14,24 @@ struct ActionResult: Decodable {
     var screen: SignerScreen
     var screenLabel: String
     var back: Bool
+    var footer: Bool
+    var footerButton: String
+    var rightButton: String
+    var screenNameType: String
+    var modal: SignerModal
+    //var alert: SignerAlert
     
     //TODO: maybe replace explicits with rust call
     init() {
         screen = .Log
         screenLabel = "Log"
         back = false
+        footer = true
+        footerButton = "Log"
+        rightButton = ""
+        screenNameType = "h1"
+        modal = .Empty
+        //alert = .Empty
     }
 }
 
@@ -58,9 +70,9 @@ enum TransactionState: Equatable {
 /**
  * Modals shown in key management screen
  */
-enum KeyManagerModal: Equatable {
-    case none
-    case newSeed
+enum SignerModal: String, Equatable, Decodable {
+    case Empty
+    case Error
     case newKey
     case showKey
     case seedBackup
@@ -70,12 +82,29 @@ enum KeyManagerModal: Equatable {
     case networkDetails
 }
 
+enum SignerAlert: Equatable, Decodable {
+    case Empty
+    case Error
+    case keyDeleteConfirm
+}
+
 enum ButtonID {
+    case Start
     case NavbarLog
     case NavbarScan
     case NavbarKeys
     case NavbarSettings
     case GoBack
+    case SelectSeed
+    case RightButton
+    case Shield
+    case SelectKey
+    case GoForward
+    case Derive
+    case Delete
+    case NewSeed
+    case RecoverSeed
+    case NewtorkSelector
 }
 
 /**
@@ -83,7 +112,7 @@ enum ButtonID {
  * We should keep this to minimum
  */
 extension SignerDataModel {
-    func pushButton(buttonID: ButtonID) {
+    func pushButton(buttonID: ButtonID, details: String = "") {
         print(buttonID)
         //Poor man's mutex; just because it's really managed by UI abstraction
         if actionAvailable {
@@ -91,7 +120,7 @@ extension SignerDataModel {
             actionAvailable = false
             var err = ExternError()
             withUnsafeMutablePointer(to: &err) {err_ptr in
-                let res = act(err_ptr, "", String(describing: buttonID), "")
+                let res = act(err_ptr, String(describing: buttonID), details)
                 if (err_ptr.pointee.code == 0) {
                     print(String(cString: res!))
                     if let actionResultJSON = String(cString: res!).data(using: .utf8) {

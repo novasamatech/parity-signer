@@ -14,13 +14,7 @@ struct LandingView: View {
     @State var accept = false
     var body: some View {
         VStack {
-            /*
-            switch data.settingsModal {
-            case .showDocument(let doc):
-                DocumentModal(document: doc)
-            default:
-                Text("Documentation Error")
-            }*/
+            DocumentModal()
             Button(action: {
                 tacAccept.toggle()
             }) {

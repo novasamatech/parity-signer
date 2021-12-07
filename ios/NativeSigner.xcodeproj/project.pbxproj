@@ -70,6 +70,9 @@
 		2DA5F88A2757692F00D8DD29 /* NewSeedScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2DA5F8892757692F00D8DD29 /* NewSeedScreen.swift */; };
 		2DA5F88C2757693600D8DD29 /* NewAddressScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2DA5F88B2757693600D8DD29 /* NewAddressScreen.swift */; };
 		2DA5F88E2757694A00D8DD29 /* LandingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2DA5F88D2757694A00D8DD29 /* LandingView.swift */; };
+		2DA5F89027590B3A00D8DD29 /* DocumentModal.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2DA5F88F27590B3A00D8DD29 /* DocumentModal.swift */; };
+		2DA5F89227590B4F00D8DD29 /* Documents.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2DA5F89127590B4F00D8DD29 /* Documents.swift */; };
+		2DA5F8962759576B00D8DD29 /* MLog.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2DA5F8952759576B00D8DD29 /* MLog.swift */; };
 		2DB037BF270F12DF00A318B2 /* Web3-Regular.otf in Resources */ = {isa = PBXBuildFile; fileRef = 2DB037BE270F12DF00A318B2 /* Web3-Regular.otf */; };
 		2DE72BC226A588C7002BB752 /* NativeSignerApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2DE72BC126A588C7002BB752 /* NativeSignerApp.swift */; };
 		2DE72BC426A588C7002BB752 /* MainScreenContainer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2DE72BC326A588C7002BB752 /* MainScreenContainer.swift */; };
@@ -163,6 +166,9 @@
 		2DA5F8892757692F00D8DD29 /* NewSeedScreen.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NewSeedScreen.swift; sourceTree = "<group>"; };
 		2DA5F88B2757693600D8DD29 /* NewAddressScreen.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NewAddressScreen.swift; sourceTree = "<group>"; };
 		2DA5F88D2757694A00D8DD29 /* LandingView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LandingView.swift; sourceTree = "<group>"; };
+		2DA5F88F27590B3A00D8DD29 /* DocumentModal.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DocumentModal.swift; sourceTree = "<group>"; };
+		2DA5F89127590B4F00D8DD29 /* Documents.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Documents.swift; sourceTree = "<group>"; };
+		2DA5F8952759576B00D8DD29 /* MLog.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MLog.swift; sourceTree = "<group>"; };
 		2DB037BE270F12DF00A318B2 /* Web3-Regular.otf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Web3-Regular.otf"; sourceTree = "<group>"; };
 		2DE72BBE26A588C7002BB752 /* NativeSigner.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = NativeSigner.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		2DE72BC126A588C7002BB752 /* NativeSignerApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NativeSignerApp.swift; sourceTree = "<group>"; };
@@ -259,6 +265,7 @@
 				2DA5F820275652EE00D8DD29 /* Footer.swift */,
 				2DA5F8302756652600D8DD29 /* CameraView.swift */,
 				2DA5F8852756A44600D8DD29 /* AddressCardControls.swift */,
+				2DA5F88F27590B3A00D8DD29 /* DocumentModal.swift */,
 				2DA5F8322756653B00D8DD29 /* CameraPreview.swift */,
 				2DA5F8222756621F00D8DD29 /* Header.swift */,
 				2DA5F8242756624000D8DD29 /* NavbarShield.swift */,
@@ -303,6 +310,21 @@
 				2DA5F85D27566C3600D8DD29 /* TCEraMortal.swift */,
 			);
 			path = TransactionCards;
+			sourceTree = "<group>";
+		};
+		2DA5F8932759573800D8DD29 /* ScreenModels */ = {
+			isa = PBXGroup;
+			children = (
+				2DA5F8952759576B00D8DD29 /* MLog.swift */,
+			);
+			path = ScreenModels;
+			sourceTree = "<group>";
+		};
+		2DA5F8942759575300D8DD29 /* ModalModels */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = ModalModels;
 			sourceTree = "<group>";
 		};
 		2DB037BD270F12BB00A318B2 /* Fonts */ = {
@@ -389,6 +411,8 @@
 				2DA5F80C2756304B00D8DD29 /* Camera.swift */,
 				2DE72BFF26A6ADC5002BB752 /* CameraService.swift */,
 				2D7A7BD326BBEAF00053C1E0 /* Canary.swift */,
+				2DA5F8942759575300D8DD29 /* ModalModels */,
+				2DA5F8932759573800D8DD29 /* ScreenModels */,
 				2DA5F87F2756A2CA00D8DD29 /* Network.swift */,
 				2DE72C0E26A99885002BB752 /* RustNative.swift */,
 				2D7A7BD526C1126C0053C1E0 /* Utils.swift */,
@@ -398,6 +422,7 @@
 				2DA5F8342756656E00D8DD29 /* Transaction.swift */,
 				2DA5F83C275667AC00D8DD29 /* History.swift */,
 				2D72B4F926EF7D1C0081E879 /* Seeds.swift */,
+				2DA5F89127590B4F00D8DD29 /* Documents.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -578,6 +603,7 @@
 				2DA5F8392756666C00D8DD29 /* EventDetails.swift in Sources */,
 				2DA5F8292756630900D8DD29 /* TransactionScreen.swift in Sources */,
 				2DA5F87027566C3600D8DD29 /* TCNameVersion.swift in Sources */,
+				2DA5F89027590B3A00D8DD29 /* DocumentModal.swift in Sources */,
 				2DE72BC426A588C7002BB752 /* MainScreenContainer.swift in Sources */,
 				2DA5F86B27566C3600D8DD29 /* TCTip.swift in Sources */,
 				2DA5F8272756629600D8DD29 /* ScreenSelector.swift in Sources */,
@@ -585,6 +611,7 @@
 				2DA5F8802756A2CA00D8DD29 /* Network.swift in Sources */,
 				2DA5F8332756653B00D8DD29 /* CameraPreview.swift in Sources */,
 				2DA5F8862756A44600D8DD29 /* AddressCardControls.swift in Sources */,
+				2DA5F8962759576B00D8DD29 /* MLog.swift in Sources */,
 				2DA5F82F2756635A00D8DD29 /* HistoryScreen.swift in Sources */,
 				2DE72BC226A588C7002BB752 /* NativeSignerApp.swift in Sources */,
 				2DA5F8232756621F00D8DD29 /* Header.swift in Sources */,
@@ -593,6 +620,7 @@
 				2DA5F86527566C3600D8DD29 /* TCID.swift in Sources */,
 				2DA5F86227566C3600D8DD29 /* TCEnumVariantName.swift in Sources */,
 				2DA5F87A275676B600D8DD29 /* SeedCardForManager.swift in Sources */,
+				2DA5F89227590B4F00D8DD29 /* Documents.swift in Sources */,
 				2DA5F80D2756304B00D8DD29 /* Camera.swift in Sources */,
 				2DA5F8842756A37800D8DD29 /* Address.swift in Sources */,
 				2DA5F84327566BE300D8DD29 /* TransactionCardSelector.swift in Sources */,

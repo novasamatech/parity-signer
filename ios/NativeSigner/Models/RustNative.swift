@@ -33,7 +33,7 @@ class SignerDataModel: ObservableObject {
     @Published var suggestedName: String = ""
     
     //Navigation
-    @Published var keyManagerModal: KeyManagerModal = .none
+    @Published var keyManagerModal: SignerModal = .Empty
     @Published var transactionState: TransactionState = .none
     
     //Transaction content
@@ -79,7 +79,11 @@ class SignerDataModel: ObservableObject {
             }
             
             monitor.start(queue: self.queue)
+            
             self.refreshSeeds()
+            
+            init_navigation(nil, dbName, seedNames.joined(separator: ","))
+            
             self.totalRefresh()
         }
     }
@@ -97,6 +101,7 @@ class SignerDataModel: ObservableObject {
      */
     func totalRefresh() {
         print("heavy reset")
+        act(nil, "Start", "")
         self.checkAlert()
         self.refreshUI()
     }
@@ -137,6 +142,7 @@ extension SignerDataModel {
                         if self.canaryDead {
                             device_was_online(nil, self.dbName)
                         }
+                        init_navigation(nil, dbName, seedNames.joined(separator: ","))
                         self.totalRefresh()
                         self.refreshSeeds()
                     } else {

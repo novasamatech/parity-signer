@@ -21,44 +21,11 @@ struct SeedManager: View {
                         ForEach(data.seedNames, id: \.self) {seed in
                             HStack {
                                 Button(action: {
-                                    data.selectSeed(seedName: seed)
-                                    data.keyManagerModal = .none
+                                    data.pushButton(buttonID: .SelectSeed, details: seed)
                                 }) {
                                     SeedCardForManager(seedName: seed)
                                     Spacer()
                                 }
-                                Button(action: {
-                                    data.selectSeed(seedName: seed)
-                                    data.keyManagerModal = .seedBackup
-                                }) {
-                                    VStack {
-                                        Image(systemName: "rectangle.and.pencil.and.ellipsis").imageScale(.large)
-                                    }
-                                    .background(Color("backgroundCard"))
-                                }
-                                Button(action: {
-                                    removeSeed = seed
-                                    deleteConfirm = true
-                                }) {
-                                    VStack {
-                                        Image(systemName: "trash").imageScale(.large)
-                                    }
-                                    .background(Color("backgroundCard"))
-                                }
-                                .alert(isPresented: $deleteConfirm, content: {
-                                    Alert(
-                                        title: Text("Delete seed?"),
-                                        message: Text("You are about to delete seed " + removeSeed),
-                                        primaryButton: .cancel(),
-                                        secondaryButton: .destructive(
-                                            Text("Delete"),
-                                            action: {
-                                                data.removeSeed(seedName: removeSeed)
-                                                removeSeed = ""
-                                            }
-                                        )
-                                    )
-                                })
                                 .padding(.horizontal)
                             }
                             .background(Color("backgroundCard"))

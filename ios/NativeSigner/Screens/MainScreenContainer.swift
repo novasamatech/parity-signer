@@ -35,8 +35,7 @@ struct MainScreenContainer: View {
                     .background(Color("backgroundUtility"))
             }
         } else {
-            Text("Landing")
-            //LandingView().background(/*@START_MENU_TOKEN@*//*@PLACEHOLDER=View@*/Color("backgroundColor")/*@END_MENU_TOKEN@*/)
+            LandingView().background(/*@START_MENU_TOKEN@*//*@PLACEHOLDER=View@*/Color("backgroundColor")/*@END_MENU_TOKEN@*/)
         }
     }
 }

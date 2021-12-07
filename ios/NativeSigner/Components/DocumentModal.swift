@@ -9,21 +9,20 @@ import SwiftUI
 
 struct DocumentModal: View {
     @EnvironmentObject var data: SignerDataModel
-    var document: ShownDocument
+    @State var document: ShownDocument = .about
     var body: some View {
         ZStack {
-            ModalBackdrop()
             VStack {
                 HStack {
-                    Button(action: {}) {
+                    Button(action: {document = .about}) {
                         Text("About")
                     }
                     Spacer()
-                    Button(action: {}) {
+                    Button(action: {document = .toc}) {
                         Text("Terms")
                     }
                     Spacer()
-                    Button(action: {}) {
+                    Button(action: {document = .pp}) {
                         Text("Privacy")
                     }
                 }
