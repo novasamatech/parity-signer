@@ -5,6 +5,7 @@ import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.runtime.Composable
 import io.parity.signer.modals.*
 import io.parity.signer.models.SignerDataModel
+import io.parity.signer.models.pushButton
 import io.parity.signer.screens.KeyManager
 import io.parity.signer.screens.ScanScreen
 import io.parity.signer.screens.SettingsScreen
@@ -42,13 +43,13 @@ fun ScreenSelector(screen: SignerScreen?, signerDataModel: SignerDataModel) {
 			SeedBackup(signerDataModel = signerDataModel)
 		}
 		SignerScreen.NewSeed -> {
-			NewSeedScreen(signerDataModel = signerDataModel)
+			NewSeedScreen(signerDataModel::pushButton, signerDataModel = signerDataModel)
 		}
 		SignerScreen.RecoverSeedName -> {
-			NewSeedScreen(signerDataModel = signerDataModel)
+			RecoverSeedScreen(signerDataModel = signerDataModel)
 		}
 		SignerScreen.RecoverSeedPhrase -> {
-			NewSeedScreen(signerDataModel = signerDataModel)
+			RecoverSeedScreen(signerDataModel = signerDataModel)
 		}
 		SignerScreen.DeriveKey -> {
 			NewKeyModal(signerDataModel = signerDataModel, increment = false)
@@ -79,7 +80,7 @@ fun AlertSelector(alert: SignerAlert, signerDataModel: SignerDataModel) {
 				"error"
 			) ?: "unknown error", signerDataModel = signerDataModel
 		)
-		SignerAlert.Shield -> ShieldModal(signerDataModel)
+		SignerAlert.Shield -> ShieldAlert(signerDataModel)
 	}
 }
 

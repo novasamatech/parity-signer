@@ -144,7 +144,7 @@ impl State {
                     }
                 },
                 Action::Shield => {
-                    new_navstate.modal = Modal::Shield;
+                    new_navstate.alert = Alert::Shield;
                 },
                 Action::Nothing => {
                     println!("no action was passed in action");

@@ -35,6 +35,7 @@ fun SignerDataModel.pushButton(button: ButtonID, details: String = "") {
 			}
 		}
 		_signerModal.value = SignerModal.valueOf(actionResultObject.getString("modal"))
+		_signerAlert.value = SignerAlert.valueOf(actionResultObject.getString("alert"))
 		screenData = actionResultObject.getJSONObject("screenData")
 		modalData = actionResultObject.getJSONObject("modalData")
 		alertData = actionResultObject.getJSONObject("alertData")

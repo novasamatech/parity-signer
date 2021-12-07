@@ -9,7 +9,7 @@ import io.parity.signer.models.SignerDataModel
 import io.parity.signer.models.pushButton
 
 @Composable
-fun ShieldModal(signerDataModel: SignerDataModel) {
+fun ShieldAlert(signerDataModel: SignerDataModel) {
 	val alert = signerDataModel.alert.observeAsState()
 	when (alert.value) {
 		 ShieldAlert.None -> {
