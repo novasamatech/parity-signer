@@ -21,23 +21,25 @@ struct NewSeedScreen: View {
         ZStack{
             VStack {
                 VStack(alignment: .leading) {
-                    Text("New Seed").font(.title)
-                    Text("DISPLAY NAME").font(.callout)
+                    Text("DISPLAY NAME").font(FBase(style: .overline)).foregroundColor(Color("Text500"))
                     ZStack {
-                        RoundedRectangle(cornerRadius: 8).stroke(Color("AccentColor")).foregroundColor(Color("backgroundColor")).frame(height: 39)
-                    TextField("Seed", text: $seedName, prompt: Text("Seed name"))
-                        .focused($nameFocused)
-                        .foregroundColor(Color("textEntryColor"))
-                        .background(Color("backgroundColor"))
-                        .font(.system(size: 16, weight: .regular))
-                        .disableAutocorrection(true)
-                        .keyboardType(.asciiCapable)
-                        .submitLabel(.done)
-                        .onChange(of: seedName, perform: { _ in
-                            data.lastError = ""
-                        })
-                        .onAppear(perform: {nameFocused = true})
-                        .padding(.horizontal, 8)
+                        RoundedRectangle(cornerRadius: 8).stroke(Color("Borders400")).foregroundColor(Color("Borders400")).frame(height: 39)
+                        TextField("Seed", text: $seedName, prompt: Text("Seed name"))
+                            .focused($nameFocused)
+                            .foregroundColor(Color("Text600"))
+                        //.background(Color("backgroundColor"))
+                            .font(FBase(style: .body2))
+                            .disableAutocorrection(true)
+                            .keyboardType(.asciiCapable)
+                            .submitLabel(.done)
+                            .onChange(of: seedName, perform: { _ in
+                                data.lastError = ""
+                            })
+                            .onSubmit {
+                                data.addSeed(seedName: seedName, seedPhrase: "")
+                            }
+                            .onAppear(perform: {nameFocused = true})
+                            .padding(.horizontal, 8)
                     }
                     Text("Display name visible only to you").font(.callout)
                     Text(data.lastError).foregroundColor(.red)

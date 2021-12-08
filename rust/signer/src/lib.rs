@@ -158,11 +158,11 @@ export! {
     @Java_io_parity_signer_models_SignerDataModel_substrateTryCreateSeed
 	fn try_create_seed(
         seed_name: &str,
-        seed_phrase: &str,
-        _seed_length: u32,
+        _seed_phrase: &str,
+        seed_length: u32,
 		dbname: &str
 	) -> anyhow::Result<String, anyhow::Error> {
-        db_handling::identities::try_create_seed_phrase_proposal(seed_name, seed_phrase, dbname)
+        db_handling::identities::try_create_seed_with_length(seed_name, seed_length, dbname)
     }
 
     @Java_io_parity_signer_models_SignerDataModel_substrateSuggestNPlusOne

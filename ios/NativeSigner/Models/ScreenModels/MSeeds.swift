@@ -12,6 +12,6 @@ struct MSeeds: Decodable, Hashable {
 }
 
 struct SeedNameCard: Decodable, Hashable {
-    var seedName: String
+    var seed_name: String
     var identicon: String
 }

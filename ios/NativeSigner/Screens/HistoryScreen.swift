@@ -11,7 +11,6 @@ struct HistoryScreen: View {
     @EnvironmentObject var data: SignerDataModel
     var content: MLog
     var body: some View {
-        Text("History")
         ScrollView {
             LazyVStack {
                 ForEach(content.log, id: \.order) {history in

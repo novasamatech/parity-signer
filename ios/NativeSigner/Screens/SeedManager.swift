@@ -15,28 +15,22 @@ struct SeedManager: View {
     @State var seedPhrase = ""
     @State var removeSeed = ""
     var body: some View {
-        ZStack {
-            VStack {
-                ScrollView {
-                    LazyVStack {
-                        ForEach(content.seedNameCards, id: \.seedName) {seedNameCard in
-                            HStack {
-                                Button(action: {
-                                    data.pushButton(buttonID: .SelectSeed, details: seedNameCard.seedName)
-                                }) {
-                                    SeedCardForManager(seedNameCard: seedNameCard)
-                                    Spacer()
-                                }
-                                .padding(.horizontal)
+        VStack {
+            ScrollView {
+                LazyVStack {
+                    ForEach(content.seedNameCards, id: \.seed_name) {seedNameCard in
+                        HStack {
+                            Button(action: {
+                                data.pushButton(buttonID: .SelectSeed, details: seedNameCard.seed_name)
+                            }) {
+                                SeedCardForManager(seedNameCard: seedNameCard)
+                                Spacer()
                             }
-                            .background(Color("backgroundCard"))
                         }
                     }
                 }
-                Spacer()
             }
-        }.onAppear {
-            data.selectSeed(seedName: "")
+            Spacer()
         }
     }
 }
@@ -46,15 +40,4 @@ struct SeedManager: View {
  static var previews: some View {
  SeedManager()
  }
- }
- 
- Button(
-     action: {data.keyManagerModal = .newSeed}) {
-         HStack {
-             Spacer()
-             Text("New seed").font(.subheadline)
-             Spacer()
-         }
-     }
-     .buttonStyle(.bordered)
  */
