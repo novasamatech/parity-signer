@@ -100,7 +100,9 @@ fn get_default_network_info() -> Vec<DefaultNetworkInfo> {
             color: String::from("#6f36dc"),
             decimals: 12,
             encryption: Encryption::Sr25519,
-            genesis_hash: hex::decode("c196f81260cf1686172b47a79cf002120735d7cb0eb1474e8adce56618456fff").expect("known value").try_into().expect("known value"),
+            genesis_hash: hex::decode("037f5f3c8e67b314062025fc886fcd6238ea25a4a9b45dce8d246815c9ebe770").expect("known value").try_into().expect("known value"),
+            // 
+            // previous value: "c196f81260cf1686172b47a79cf002120735d7cb0eb1474e8adce56618456fff" changed 2021-12-07
             // previous value: "f6e9983c37baf68846fedafe21e56718790e39fb1c582abc408b81bc7b208f9a" changed 2021-11-02
             // previous value: "5fce687da39305dfe682b117f0820b319348e8bb37eb16cf34acbf6a202de9d9" changed 2021-09-30
             // previous value: "853faffbfc6713c1f899bf16547fcfbf733ae8361b8ca0129699d01d4f2181fd" changed 2021-09-24

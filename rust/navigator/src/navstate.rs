@@ -49,12 +49,15 @@ impl State {
         let mut go_back_allowed = false;
         let mut screen_details = String::new();
 
+        let mut seed_phrase = String::new();
+
         let mut errorline = String::new();
         if let Some(dbname) = &self.dbname {
            //Try to perform action
             match action {
                 //App init
                 Action::Start => {
+                    println!("Seednames: {:?}, total: {}", seed_names, seed_names.len());
                     if seed_names.len() == 0 {
                         new_navstate.screen = Screen::SeedSelector;
                         new_navstate.modal = Modal::NewSeedMenu;
@@ -95,7 +98,7 @@ impl State {
                                 Screen::KeyDetails(a) => {
                                     new_navstate.screen = Screen::Keys(a.get_keys_state());
                                 },
-                                    Screen::NewSeed => {
+                                Screen::NewSeed => {
                                     new_navstate.screen = Screen::SeedSelector;
                                 },
                                 Screen::RecoverSeedName => {
@@ -124,27 +127,62 @@ impl State {
                         new_navstate.alert = Alert::Empty;
                     }
                 },
+                Action::GoForward => {
+                    match self.navstate.screen {
+                        Screen::NewSeed => {
+                            //TODO: check zeroize here!
+                            match db_handling::identities::try_create_seed_with_length(details_str, 24, dbname) {
+                                Ok(a) => {
+                                    seed_phrase = a;
+
+                                },
+                                Err(e) => {
+                                    new_navstate.alert = Alert::Error;
+                                    errorline.push_str(&e.to_string());
+                                },
+                            };
+                        },
+                        _ => println!("GoForward does nothing here"),
+                    };
+                },
                 Action::SelectSeed => {
                     match seed_names.binary_search(&details_str.to_string()) {
                         Ok(index) => {
-                            new_navstate.screen = Screen::Keys(KeysState::new(index));
-                            new_navstate.modal = Modal::Empty;
+                            new_navstate = Navstate::clean_screen(Screen::Keys(KeysState::new(index)));
                         },
                         Err(e) => {
-                            new_navstate.modal = Modal::Error;
+                            new_navstate.alert = Alert::Error;
                             errorline.push_str(&e.to_string());
                         },
                     }
                 },
                 Action::RightButton => {
                     match self.navstate.screen {
-                        Screen::SeedSelector => new_navstate.modal = Modal::NewSeedMenu,
+                        Screen::SeedSelector => 
+                            if self.navstate.modal == Modal::NewSeedMenu {
+                                new_navstate.modal = Modal::Empty;
+                            } else {
+                                new_navstate.modal = Modal::NewSeedMenu;
+                            },
                         Screen::Keys(a) => new_navstate.modal = Modal::SeedMenu,
                         _ => {},
                     }
                 },
                 Action::Shield => {
                     new_navstate.alert = Alert::Shield;
+                },
+                Action::NewSeed => {
+                    new_navstate = Navstate::clean_screen(Screen::NewSeed);
+                },
+                Action::RecoverSeed => {
+                    new_navstate = Navstate::clean_screen(Screen::RecoverSeedName);
+                },
+                Action::NetworkSelector => {
+                    if self.navstate.modal == Modal::NetworkSelector {
+                        new_navstate.modal = Modal::Empty;
+                    } else {
+                        new_navstate.modal = Modal::NetworkSelector;
+                    }
                 },
                 Action::Nothing => {
                     println!("no action was passed in action");
@@ -173,7 +211,7 @@ impl State {
                     let cards = match db_handling::identities::print_all_seed_names_with_identicons(&dbname) {
                         Ok(a) => a,
                         Err(e) => {
-                            new_navstate.modal = Modal::Error;
+                            new_navstate.alert = Alert::Error;
                             errorline.push_str(&<Signer>::show(&e));
                             "[]".to_string()
                         },

@@ -86,7 +86,7 @@ mod tests {
         let dbname = "for_tests/print_all_network_specs";
         populate_cold_no_metadata(dbname, Verifier(None)).unwrap();
         let print = print_all_networks(dbname).unwrap();
-        let print_expected = r##"[{"key":"018091b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3","color":"#E6027A","logo":"polkadot","order":"0","secondary_color":"#262626","title":"Polkadot"},{"key":"0180b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe","color":"#000","logo":"kusama","order":"1","secondary_color":"#262626","title":"Kusama"},{"key":"0180c196f81260cf1686172b47a79cf002120735d7cb0eb1474e8adce56618456fff","color":"#6f36dc","logo":"rococo","order":"3","secondary_color":"#262626","title":"Rococo"},{"key":"0180e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e","color":"#660D35","logo":"westend","order":"2","secondary_color":"#262626","title":"Westend"}]"##;
+        let print_expected = r##"[{"key":"0180037f5f3c8e67b314062025fc886fcd6238ea25a4a9b45dce8d246815c9ebe770","color":"#6f36dc","logo":"rococo","order":"3","secondary_color":"#262626","title":"Rococo"},{"key":"018091b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3","color":"#E6027A","logo":"polkadot","order":"0","secondary_color":"#262626","title":"Polkadot"},{"key":"0180b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe","color":"#000","logo":"kusama","order":"1","secondary_color":"#262626","title":"Kusama"},{"key":"0180e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e","color":"#660D35","logo":"westend","order":"2","secondary_color":"#262626","title":"Westend"}]"##;
         assert!(print == print_expected, "Received print: \n{}", print);
         fs::remove_dir_all(dbname).unwrap();
     }

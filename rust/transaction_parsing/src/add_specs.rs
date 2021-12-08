@@ -1,5 +1,5 @@
 use db_handling::{db_transactions::TrDbColdStub, helpers::{try_get_valid_current_verifier, get_general_verifier}};
-use definitions::{error::{ErrorSigner, GeneralVerifierForContent, InputSigner, Signer}, history::Event, keyring::{VerifierKey}, network_specs::{ValidCurrentVerifier, Verifier}, qr_transfers::ContentAddSpecs};
+use definitions::{error::{ErrorSigner, GeneralVerifierForContent, InputSigner, Signer, TransferContent}, history::Event, keyring::{VerifierKey}, network_specs::{ValidCurrentVerifier, Verifier}, qr_transfers::ContentAddSpecs};
 
 use crate::cards::{Action, Card, Warning};
 use crate::check_signature::pass_crypto;
@@ -8,7 +8,7 @@ use crate::helpers::{specs_are_new};
 use crate::holds::{GeneralHold, Hold, HoldRelease};
 
 pub fn add_specs (data_hex: &str, database_name: &str) -> Result<String, ErrorSigner> {
-    let checked_info = pass_crypto(&data_hex)?;
+    let checked_info = pass_crypto(&data_hex, TransferContent::AddSpecs)?;
     let specs = ContentAddSpecs::from_vec(&checked_info.message).specs::<Signer>()?;
     let verifier_key = VerifierKey::from_parts(&specs.genesis_hash.to_vec());
     let possible_valid_current_verifier = try_get_valid_current_verifier (&verifier_key, &database_name)?;

@@ -14,21 +14,24 @@ const ALICE_WORDS: &str = "bottom drive obey lake curtain smoke basket hold race
 pub fn make_message (make: Make) -> Result<(), ErrorActive> {
 
 // check message content for consistency
-    let (message, name_stub, msg_type_code) = match make.msg {
+    let (message_to_verify, message_to_transfer, name_stub, msg_type_code) = match make.msg {
         Msg::LoadTypes(vec) => {
-            ContentLoadTypes::from_vec(&vec).types::<Active>()?;
-            (vec, String::from("load_types"), "81")
+            let content = ContentLoadTypes::from_vec(&vec);
+            content.types::<Active>()?;
+            (content.to_sign(), content.to_transfer(), String::from("load_types"), "81")
         },
         Msg::LoadMetadata(vec) => {
-            let meta = ContentLoadMeta::from_vec(&vec).meta::<Active>()?;
+            let content = ContentLoadMeta::from_vec(&vec);
+            let meta = content.meta::<Active>()?;
             match MetaValues::from_vec_metadata(&meta) {
-                Ok(meta_values) => (vec, format!("load_metadata_{}V{}", meta_values.name, meta_values.version), "80"),
+                Ok(meta_values) => (content.to_sign(), content.to_transfer(), format!("load_metadata_{}V{}", meta_values.name, meta_values.version), "80"),
                 Err(e) => return Err(ErrorActive::Input(InputActive::FaultyMetadataInPayload(e))),
             }
         },
         Msg::AddSpecs(vec) => {
-            let network_specs = ContentAddSpecs::from_vec(&vec).specs::<Active>()?;
-            (vec, format!("add_specs_{}-{}", network_specs.name, network_specs.encryption.show()), "c1")
+            let content = ContentAddSpecs::from_vec(&vec);
+            let network_specs = content.specs::<Active>()?;
+            (content.to_sign(), content.to_transfer(), format!("add_specs_{}-{}", network_specs.name, network_specs.encryption.show()), "c1")
         },
     };
     
@@ -41,24 +44,24 @@ pub fn make_message (make: Make) -> Result<(), ErrorActive> {
                     let crypto_type_code = "00";
                     let prelude = format!("53{}{}", crypto_type_code, msg_type_code);
                     let ed25519_pair = ed25519::Pair::from_string(ALICE_WORDS, None).expect("known Alice secret");
-                    let signature = ed25519_pair.sign(&message[..]).0.to_vec();
-                    let complete_message = [hex::decode(prelude).expect("known value"), ed25519_pair.public().to_vec(), message, signature].concat();
+                    let signature = ed25519_pair.sign(&message_to_verify[..]).0.to_vec();
+                    let complete_message = [hex::decode(prelude).expect("known value"), ed25519_pair.public().to_vec(), message_to_transfer, signature].concat();
                     (complete_message, format!("{}_Alice-ed25519", name_stub))
                 },
                 Encryption::Sr25519 => {
                     let crypto_type_code = "01";
                     let prelude = format!("53{}{}", crypto_type_code, msg_type_code);
                     let sr25519_pair = sr25519::Pair::from_string(ALICE_WORDS, None).expect("known Alice secret");
-                    let signature = sr25519_pair.sign(&message[..]).0.to_vec();
-                    let complete_message = [hex::decode(prelude).expect("known value"), sr25519_pair.public().to_vec(), message, signature].concat();
+                    let signature = sr25519_pair.sign(&message_to_verify[..]).0.to_vec();
+                    let complete_message = [hex::decode(prelude).expect("known value"), sr25519_pair.public().to_vec(), message_to_transfer, signature].concat();
                     (complete_message, format!("{}_Alice-sr25519", name_stub))
                 },
                 Encryption::Ecdsa => {
                     let crypto_type_code = "02";
                     let prelude = format!("53{}{}", crypto_type_code, msg_type_code);
                     let ecdsa_pair = ecdsa::Pair::from_string(ALICE_WORDS, None).expect("known Alice secret");
-                    let signature = ecdsa_pair.sign(&message[..]).0.to_vec();
-                    let complete_message = [hex::decode(prelude).expect("known value"), ecdsa_pair.public().0.to_vec(), message, signature].concat();
+                    let signature = ecdsa_pair.sign(&message_to_verify[..]).0.to_vec();
+                    let complete_message = [hex::decode(prelude).expect("known value"), ecdsa_pair.public().0.to_vec(), message_to_transfer, signature].concat();
                     (complete_message, format!("{}_Alice-ecdsa", name_stub))
                 },
             }
@@ -66,7 +69,7 @@ pub fn make_message (make: Make) -> Result<(), ErrorActive> {
         Crypto::None => {
             let crypto_type_code = "ff";
             let prelude = format!("53{}{}", crypto_type_code, msg_type_code);
-            let complete_message = [hex::decode(prelude).expect("known value"), message].concat();
+            let complete_message = [hex::decode(prelude).expect("known value"), message_to_transfer].concat();
             (complete_message, format!("{}_unverified", name_stub))
         },
         Crypto::Sufficient(sufficient_crypto) => {
@@ -74,8 +77,8 @@ pub fn make_message (make: Make) -> Result<(), ErrorActive> {
                 SufficientCrypto::Ed25519{public, signature} => {
                     let crypto_type_code = "00";
                     let prelude = format!("53{}{}", crypto_type_code, msg_type_code);
-                    if ed25519::Pair::verify(&signature, &message, &public) {
-                        let complete_message = [hex::decode(prelude).expect("known value"), public.to_vec(), message, signature.0.to_vec()].concat();
+                    if ed25519::Pair::verify(&signature, &message_to_verify, &public) {
+                        let complete_message = [hex::decode(prelude).expect("known value"), public.to_vec(), message_to_transfer, signature.0.to_vec()].concat();
                         (complete_message, name_stub)
                     }
                     else {return Err(ErrorActive::Input(InputActive::BadSignature))}
@@ -83,8 +86,8 @@ pub fn make_message (make: Make) -> Result<(), ErrorActive> {
                 SufficientCrypto::Sr25519{public, signature} => {
                     let crypto_type_code = "01";
                     let prelude = format!("53{}{}", crypto_type_code, msg_type_code);
-                    if sr25519::Pair::verify(&signature, &message, &public) {
-                        let complete_message = [hex::decode(prelude).expect("known value"), public.to_vec(), message, signature.0.to_vec()].concat();
+                    if sr25519::Pair::verify(&signature, &message_to_verify, &public) {
+                        let complete_message = [hex::decode(prelude).expect("known value"), public.to_vec(), message_to_transfer, signature.0.to_vec()].concat();
                         (complete_message, name_stub)
                     }
                     else {return Err(ErrorActive::Input(InputActive::BadSignature))}
@@ -92,8 +95,8 @@ pub fn make_message (make: Make) -> Result<(), ErrorActive> {
                 SufficientCrypto::Ecdsa{public, signature} => {
                     let crypto_type_code = "02";
                     let prelude = format!("53{}{}", crypto_type_code, msg_type_code);
-                    if ecdsa::Pair::verify(&signature, &message, &public) {
-                        let complete_message = [hex::decode(prelude).expect("known value"), public.0.to_vec(), message, signature.0.to_vec()].concat();
+                    if ecdsa::Pair::verify(&signature, &message_to_verify, &public) {
+                        let complete_message = [hex::decode(prelude).expect("known value"), public.0.to_vec(), message_to_transfer, signature.0.to_vec()].concat();
                         (complete_message, name_stub)
                     }
                     else {return Err(ErrorActive::Input(InputActive::BadSignature))}

@@ -2,22 +2,20 @@
 
 #[derive(PartialEq, Debug, Copy, Clone)]
 pub enum Modal {
-    Shield,
+    Backup,
     NewSeedMenu,
     SeedMenu,
+    NetworkSelector,
     Empty,
-    Error,
-    Message,
 }
 
 impl Modal {
     pub fn get_name(&self) -> String {
         match self {
-            Modal::Shield => String::from("Shield"),
+            Modal::Backup => String::from("Backup"),
             Modal::NewSeedMenu => String::from("NewSeedMenu"),
             Modal::SeedMenu => String::from("SeedMenu"),
-            Modal::Error => String::from("Error"),
-            Modal::Message => String::from("Message"),
+            Modal::NetworkSelector => String::from("NetworkSelector"),
             Modal::Empty => String::from("Empty"),
         }
     }

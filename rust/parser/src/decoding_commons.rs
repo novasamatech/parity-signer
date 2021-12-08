@@ -25,15 +25,15 @@ pub struct OutputCard {
 
 /// Struct to store results of searching Vec<u8> for encoded compact:
 /// consists of actual number decoded, and, if it exists, the beginning position for data after the compact
-pub (crate) struct CutCompact<T: HasCompact> {
-    pub (crate) compact_found: T,
-    pub (crate) start_next_unit: Option<usize>,
+pub struct CutCompact<T: HasCompact> {
+    pub compact_found: T,
+    pub start_next_unit: Option<usize>,
 }
 
 
 /// Function to search Vec<u8> for shortest compact <T> by brute force.
 /// Outputs CutCompact value in case of success.
-pub (crate) fn get_compact<T> (data: &Vec<u8>) -> Result<CutCompact<T>, ParserError> 
+pub fn get_compact<T> (data: &Vec<u8>) -> Result<CutCompact<T>, ParserError> 
     where 
         T: HasCompact,
         Compact<T>: Decode

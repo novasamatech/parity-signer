@@ -1,5 +1,5 @@
 use db_handling::{db_transactions::TrDbColdStub, helpers::{try_get_types, get_general_verifier}};
-use definitions::{error::{ErrorSigner, GeneralVerifierForContent, InputSigner, Signer}, network_specs::Verifier, history::Event, qr_transfers::ContentLoadTypes, types::TypeEntry};
+use definitions::{error::{ErrorSigner, GeneralVerifierForContent, InputSigner, Signer, TransferContent}, network_specs::Verifier, history::Event, qr_transfers::ContentLoadTypes, types::TypeEntry};
 
 use crate::cards::{Action, Card, Warning};
 use crate::check_signature::pass_crypto;
@@ -7,7 +7,7 @@ use crate::holds::{GeneralHold};
 
 
 pub fn load_types(data_hex: &str, database_name: &str) -> Result<String, ErrorSigner> {
-    let checked_info = pass_crypto(&data_hex)?;
+    let checked_info = pass_crypto(&data_hex, TransferContent::LoadTypes)?;
     let content_new_types = ContentLoadTypes::from_vec(&checked_info.message);
     let new_types = content_new_types.types::<Signer>()?;
     let old_types: Vec<TypeEntry> = match try_get_types::<Signer>(&database_name)? {

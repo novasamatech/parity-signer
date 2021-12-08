@@ -1,5 +1,5 @@
 use db_handling::{db_transactions::TrDbColdStub, helpers::{genesis_hash_in_specs, get_general_verifier, open_db, try_get_valid_current_verifier}};
-use definitions::{error::{ErrorSigner, ErrorSource, IncomingMetadataSourceSigner, InputSigner, GeneralVerifierForContent, MetadataSource, Signer}, keyring::VerifierKey, metadata::MetaValues, network_specs::{ValidCurrentVerifier, Verifier}, history::{Event, MetaValuesDisplay}, qr_transfers::ContentLoadMeta};
+use definitions::{error::{ErrorSigner, ErrorSource, IncomingMetadataSourceSigner, InputSigner, GeneralVerifierForContent, MetadataSource, Signer, TransferContent}, keyring::VerifierKey, metadata::MetaValues, network_specs::{ValidCurrentVerifier, Verifier}, history::{Event, MetaValuesDisplay}, qr_transfers::ContentLoadMeta};
 
 use crate::cards::{Action, Card, Warning};
 use crate::check_signature::pass_crypto;
@@ -11,7 +11,7 @@ enum FirstCard {
 }
 
 pub fn load_metadata(data_hex: &str, database_name: &str) -> Result<String, ErrorSigner> {
-    let checked_info = pass_crypto(&data_hex)?;
+    let checked_info = pass_crypto(&data_hex, TransferContent::LoadMeta)?;
     let (meta, genesis_hash) = ContentLoadMeta::from_vec(&checked_info.message).meta_genhash::<Signer>()?;
     let meta_values = match MetaValues::from_vec_metadata(&meta) {
         Ok(a) => a,

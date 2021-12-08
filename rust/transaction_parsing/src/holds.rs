@@ -48,6 +48,8 @@ fn collect_set (verifier_key: &VerifierKey, chainspecs: &Tree, metadata: &Tree) 
             if let Ok(a) = y {metadata_set.push(MetaValues::from_entry_checked::<Signer>(a)?)}
         }
     }
+    metadata_set.sort_by(|a, b| a.version.cmp(&b.version));
+    network_specs_set.sort_by(|a, b| a.title.cmp(&b.title));
     Ok((metadata_set, network_specs_set))
 }
 
@@ -94,6 +96,8 @@ impl GeneralHold {
             Ok(a) => a,
             Err(e) => return Err(<Signer>::db_internal(e)),
         };
+        metadata_set.sort_by(|a, b| a.name.cmp(&b.name));
+        network_specs_set.sort_by(|a, b| a.title.cmp(&b.title));
         Ok(Self{
             metadata_set,
             network_specs_set,

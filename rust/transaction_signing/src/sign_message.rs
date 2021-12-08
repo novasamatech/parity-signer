@@ -66,7 +66,7 @@ fn sufficient_crypto (address_key_hex: &str, to_sign: &Vec<u8>, database_name: &
 /// Function to generate hex line of qr data corresponding to `sufficient_crypto` for load_types message
 pub fn sufficient_crypto_load_types (address_key_hex: &str, database_name: &str, seed_phrase: &str, pwd_entry: &str) -> Result<String, ErrorSigner> {
     let types_content = prep_types::<Signer>(database_name)?;
-    match sufficient_crypto (address_key_hex, &types_content.store(), database_name, seed_phrase, pwd_entry) {
+    match sufficient_crypto (address_key_hex, &types_content.to_sign(), database_name, seed_phrase, pwd_entry) {
         Ok(s) => {
             TrDbCold::new()
                 .set_history(events_to_batch::<Signer>(&database_name, vec![Event::TypesSigned(TypesExport::get(&types_content, &s.get_verifier_value()))])?)
@@ -89,7 +89,7 @@ pub fn sufficient_crypto_load_metadata (network_name: &str, network_version: u32
     let meta_values = get_meta_values_by_name_version::<Signer>(database_name, network_name, network_version)?;
     let genesis_hash = get_genesis_hash(network_name, database_name)?;
     let load_meta_content = ContentLoadMeta::generate(&meta_values.meta, &genesis_hash);
-    match sufficient_crypto (address_key_hex, &load_meta_content.store(), database_name, seed_phrase, pwd_entry) {
+    match sufficient_crypto (address_key_hex, &load_meta_content.to_sign(), database_name, seed_phrase, pwd_entry) {
         Ok(s) => {
             TrDbCold::new()
                 .set_history(events_to_batch::<Signer>(&database_name, vec![Event::MetadataSigned(MetaValuesExport::get(&meta_values, &s.get_verifier_value()))])?)
@@ -111,7 +111,7 @@ pub fn sufficient_crypto_load_metadata (network_name: &str, network_version: u32
 pub fn sufficient_crypto_add_specs (network_specs_key_hex: &str, address_key_hex: &str, database_name: &str, seed_phrase: &str, pwd_entry: &str) -> Result<String, ErrorSigner> {
     let network_specs_to_send = get_network_specs_by_hex_key(database_name, network_specs_key_hex)?.to_send();
     let add_specs_content = ContentAddSpecs::generate(&network_specs_to_send);
-    match sufficient_crypto (address_key_hex, &add_specs_content.store(), database_name, seed_phrase, pwd_entry) {
+    match sufficient_crypto (address_key_hex, &add_specs_content.to_sign(), database_name, seed_phrase, pwd_entry) {
         Ok(s) => {
             TrDbCold::new()
                 .set_history(events_to_batch::<Signer>(&database_name, vec![Event::NetworkSpecsSigned(NetworkSpecsExport::get(&network_specs_to_send, &s.get_verifier_value()))])?)

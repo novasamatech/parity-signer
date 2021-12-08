@@ -47,55 +47,75 @@ mod tests {
     
     fn print_db_content (dbname: &str) -> String {
         let database: Db = open(dbname).unwrap();
-        let mut metadata_str = String::new();
+        
+        let mut metadata_set: Vec<String> = Vec::new();
         let metadata: Tree = database.open_tree(METATREE).unwrap();
         for x in metadata.iter() {
             if let Ok((meta_key_vec, _)) = x {
                 let meta_key = MetaKey::from_ivec(&meta_key_vec);
                 let (name, version) = meta_key.name_version::<Signer>().unwrap();
-                metadata_str.push_str(&format!("\n\t{}{}", name, version));
+                metadata_set.push(format!("{}{}", name, version));
             }
         }
-        let mut network_specs_str = String::new();
+        metadata_set.sort();
+        let mut metadata_str = String::new();
+        for x in metadata_set.iter() {metadata_str.push_str(&format!("\n\t{}", x))}
+        
+        let mut network_specs_set: Vec<String> = Vec::new();
         let chainspecs: Tree = database.open_tree(SPECSTREE).unwrap();
         for x in chainspecs.iter() {
             if let Ok((network_specs_key_vec, network_specs_encoded)) = x {
                 let network_specs_key = NetworkSpecsKey::from_ivec(&network_specs_key_vec);
                 let network_specs = NetworkSpecs::from_entry_with_key_checked::<Signer>(&network_specs_key, network_specs_encoded).unwrap();
-                network_specs_str.push_str(&format!("\n\t{}: {} ({} with {})", hex::encode(network_specs_key.key()), network_specs.title, network_specs.name, network_specs.encryption.show()));
+                network_specs_set.push(format!("{}: {} ({} with {})", hex::encode(network_specs_key.key()), network_specs.title, network_specs.name, network_specs.encryption.show()));
             }
         }
+        network_specs_set.sort();
+        let mut network_specs_str = String::new();
+        for x in network_specs_set.iter() {network_specs_str.push_str(&format!("\n\t{}", x))}
+        
         let settings: Tree = database.open_tree(SETTREE).unwrap();
         let general_verifier_encoded = settings.get(&GENERALVERIFIER).unwrap().unwrap();
         let general_verifier = Verifier::decode(&mut &general_verifier_encoded[..]).unwrap();
         
-        let mut verifiers_str = String::new();
+        let mut verifiers_set: Vec<String> = Vec::new();
         let verifiers: Tree = database.open_tree(VERIFIERS).unwrap();
         for x in verifiers.iter() {
             if let Ok((verifier_key_vec, current_verifier_encoded)) = x {
                 let verifier_key = VerifierKey::from_ivec(&verifier_key_vec);
                 let current_verifier = CurrentVerifier::decode(&mut &current_verifier_encoded[..]).unwrap();
                 match current_verifier {
-                    CurrentVerifier::Valid(a) => verifiers_str.push_str(&format!("\n\t{}: {}", hex::encode(verifier_key.key()), a.show(&general_verifier))),
-                    CurrentVerifier::Dead => verifiers_str.push_str(&format!("\n\t{}: network inactivated", hex::encode(verifier_key.key()))),
+                    CurrentVerifier::Valid(a) => verifiers_set.push(format!("{}: {}", hex::encode(verifier_key.key()), a.show(&general_verifier))),
+                    CurrentVerifier::Dead => verifiers_set.push(format!("{}: network inactivated", hex::encode(verifier_key.key()))),
                 }
             }
         }
+        verifiers_set.sort();
+        let mut verifiers_str = String::new();
+        for x in verifiers_set.iter() {verifiers_str.push_str(&format!("\n\t{}", x))}
         
-        let mut identities_str = String::new();
+        let mut identities_set: Vec<String> = Vec::new();
         let identities: Tree = database.open_tree(ADDRTREE).unwrap();
         for x in identities.iter() {
             if let Ok((address_key_vec, address_details_encoded)) = x {
                 let address_key = AddressKey::from_ivec(&address_key_vec);
                 let address_details = AddressDetails::decode(&mut &address_details_encoded[..]).unwrap();
                 let (public_key, encryption) = address_key.public_key_encryption::<Signer>(AddressKeySource::AddrTree).unwrap();
-                let mut networks_str = String::new();
+                
+                let mut networks_set: Vec<String> = Vec::new();
                 for y in address_details.network_id.iter() {
-                    networks_str.push_str(&format!("\n\t\t{}", hex::encode(y.key())))
+                    networks_set.push(hex::encode(y.key()))
                 }
-                identities_str.push_str(&format!("\n\tpublic_key: {}, encryption: {}, path: {}, available_networks: {}", hex::encode(public_key), encryption.show(), address_details.path, networks_str));
+                networks_set.sort();
+                let mut networks_str = String::new();
+                for y in networks_set.iter() {networks_str.push_str(&format!("\n\t\t{}", y))}
+                
+                identities_set.push(format!("public_key: {}, encryption: {}, path: {}, available_networks: {}", hex::encode(public_key), encryption.show(), address_details.path, networks_str));
             }
         }
+        identities_set.sort();
+        let mut identities_str = String::new();
+        for x in identities_set.iter() {identities_str.push_str(&format!("\n\t{}", x))}
         
         format!("Database contents:\nMetadata:{}\nNetwork Specs:{}\nVerifiers:{}\nGeneral Verifier: {}\nIdentities: {}", metadata_str, network_specs_str, verifiers_str, general_verifier.show_error(), identities_str)
     }
@@ -202,35 +222,35 @@ Identities: "#;
         let expected_print_before = r#"Database contents:
 Metadata:
 	kusama2030
+	polkadot30
 	rococo9103
 	westend9000
 	westend9010
-	polkadot30
 Network Specs:
+	0180037f5f3c8e67b314062025fc886fcd6238ea25a4a9b45dce8d246815c9ebe770: Rococo (rococo with sr25519)
 	018091b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3: Polkadot (polkadot with sr25519)
 	0180b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe: Kusama (kusama with sr25519)
-	0180c196f81260cf1686172b47a79cf002120735d7cb0eb1474e8adce56618456fff: Rococo (rococo with sr25519)
 	0180e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e: Westend (westend with sr25519)
 Verifiers:
+	037f5f3c8e67b314062025fc886fcd6238ea25a4a9b45dce8d246815c9ebe770: {"type":"general","details":{"hex":"","encryption":"none"}}
 	91b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3: {"type":"general","details":{"hex":"","encryption":"none"}}
 	b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe: {"type":"general","details":{"hex":"","encryption":"none"}}
-	c196f81260cf1686172b47a79cf002120735d7cb0eb1474e8adce56618456fff: {"type":"general","details":{"hex":"","encryption":"none"}}
 	e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e: {"type":"general","details":{"hex":"","encryption":"none"}}
 General Verifier: none
 Identities: 
 	public_key: 3efeca331d646d8a2986374bb3bb8d6e9e3cfcdd7c45c2b69104fab5d61d3f34, encryption: sr25519, path: //westend, available_networks: 
 		0180e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e
 	public_key: 46ebddef8cd9bb167dc30878d7113b7e168e6f0646beffd77d69d39bad76b47a, encryption: sr25519, path: , available_networks: 
+		0180037f5f3c8e67b314062025fc886fcd6238ea25a4a9b45dce8d246815c9ebe770
 		018091b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3
 		0180b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe
-		0180c196f81260cf1686172b47a79cf002120735d7cb0eb1474e8adce56618456fff
 		0180e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e
 	public_key: 64a31235d4bf9b37cfed3afa8aa60754675f9c4915430454d365c05112784d05, encryption: sr25519, path: //kusama, available_networks: 
 		0180b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe
 	public_key: 96129dcebc2e10f644e81fcf4269a663e521330084b1e447369087dec8017e04, encryption: sr25519, path: //rococo, available_networks: 
-		0180c196f81260cf1686172b47a79cf002120735d7cb0eb1474e8adce56618456fff
+		0180037f5f3c8e67b314062025fc886fcd6238ea25a4a9b45dce8d246815c9ebe770
 	public_key: c81ebbec0559a6acf184535eb19da51ed3ed8c4ac65323999482aaf9b6696e27, encryption: sr25519, path: //alice, available_networks: 
-		0180c196f81260cf1686172b47a79cf002120735d7cb0eb1474e8adce56618456fff
+		0180037f5f3c8e67b314062025fc886fcd6238ea25a4a9b45dce8d246815c9ebe770
 	public_key: d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d, encryption: sr25519, path: //Alice, available_networks: 
 		0180e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e
 	public_key: f606519cb8726753885cd4d0f518804a69a5e0badf36fee70feadd8044081730, encryption: sr25519, path: //polkadot, available_networks: 
@@ -241,36 +261,36 @@ Identities:
         let expected_print_after = r#"Database contents:
 Metadata:
 	kusama2030
+	polkadot30
 	rococo9103
 	westend9000
 	westend9010
-	polkadot30
 Network Specs:
 	0080e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e: westend-ed25519 (westend with ed25519)
+	0180037f5f3c8e67b314062025fc886fcd6238ea25a4a9b45dce8d246815c9ebe770: Rococo (rococo with sr25519)
 	018091b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3: Polkadot (polkadot with sr25519)
 	0180b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe: Kusama (kusama with sr25519)
-	0180c196f81260cf1686172b47a79cf002120735d7cb0eb1474e8adce56618456fff: Rococo (rococo with sr25519)
 	0180e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e: Westend (westend with sr25519)
 Verifiers:
+	037f5f3c8e67b314062025fc886fcd6238ea25a4a9b45dce8d246815c9ebe770: {"type":"general","details":{"hex":"","encryption":"none"}}
 	91b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3: {"type":"general","details":{"hex":"","encryption":"none"}}
 	b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe: {"type":"general","details":{"hex":"","encryption":"none"}}
-	c196f81260cf1686172b47a79cf002120735d7cb0eb1474e8adce56618456fff: {"type":"general","details":{"hex":"","encryption":"none"}}
 	e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e: {"type":"general","details":{"hex":"","encryption":"none"}}
 General Verifier: none
 Identities: 
 	public_key: 3efeca331d646d8a2986374bb3bb8d6e9e3cfcdd7c45c2b69104fab5d61d3f34, encryption: sr25519, path: //westend, available_networks: 
 		0180e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e
 	public_key: 46ebddef8cd9bb167dc30878d7113b7e168e6f0646beffd77d69d39bad76b47a, encryption: sr25519, path: , available_networks: 
+		0180037f5f3c8e67b314062025fc886fcd6238ea25a4a9b45dce8d246815c9ebe770
 		018091b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3
 		0180b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe
-		0180c196f81260cf1686172b47a79cf002120735d7cb0eb1474e8adce56618456fff
 		0180e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e
 	public_key: 64a31235d4bf9b37cfed3afa8aa60754675f9c4915430454d365c05112784d05, encryption: sr25519, path: //kusama, available_networks: 
 		0180b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe
 	public_key: 96129dcebc2e10f644e81fcf4269a663e521330084b1e447369087dec8017e04, encryption: sr25519, path: //rococo, available_networks: 
-		0180c196f81260cf1686172b47a79cf002120735d7cb0eb1474e8adce56618456fff
+		0180037f5f3c8e67b314062025fc886fcd6238ea25a4a9b45dce8d246815c9ebe770
 	public_key: c81ebbec0559a6acf184535eb19da51ed3ed8c4ac65323999482aaf9b6696e27, encryption: sr25519, path: //alice, available_networks: 
-		0180c196f81260cf1686172b47a79cf002120735d7cb0eb1474e8adce56618456fff
+		0180037f5f3c8e67b314062025fc886fcd6238ea25a4a9b45dce8d246815c9ebe770
 	public_key: d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d, encryption: sr25519, path: //Alice, available_networks: 
 		0180e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e
 	public_key: f606519cb8726753885cd4d0f518804a69a5e0badf36fee70feadd8044081730, encryption: sr25519, path: //polkadot, available_networks: 
@@ -282,40 +302,40 @@ Identities:
         let expected_print_after = r#"Database contents:
 Metadata:
 	kusama2030
+	polkadot30
 	rococo9103
 	westend9000
 	westend9010
-	polkadot30
 Network Specs:
 	0080e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e: westend-ed25519 (westend with ed25519)
+	0180037f5f3c8e67b314062025fc886fcd6238ea25a4a9b45dce8d246815c9ebe770: Rococo (rococo with sr25519)
 	018091b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3: Polkadot (polkadot with sr25519)
 	0180b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe: Kusama (kusama with sr25519)
-	0180c196f81260cf1686172b47a79cf002120735d7cb0eb1474e8adce56618456fff: Rococo (rococo with sr25519)
 	0180e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e: Westend (westend with sr25519)
 Verifiers:
+	037f5f3c8e67b314062025fc886fcd6238ea25a4a9b45dce8d246815c9ebe770: {"type":"general","details":{"hex":"","encryption":"none"}}
 	91b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3: {"type":"general","details":{"hex":"","encryption":"none"}}
 	b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe: {"type":"general","details":{"hex":"","encryption":"none"}}
-	c196f81260cf1686172b47a79cf002120735d7cb0eb1474e8adce56618456fff: {"type":"general","details":{"hex":"","encryption":"none"}}
 	e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e: {"type":"general","details":{"hex":"","encryption":"none"}}
 General Verifier: none
 Identities: 
 	public_key: 345071da55e5dccefaaa440339415ef9f2663338a38f7da0df21be5ab4e055ef, encryption: ed25519, path: , available_networks: 
 		0080e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e
-	public_key: a52095ee77497ba94588d61c3f71c4cfa0d6a4f389cef43ebadc76c29c4f42de, encryption: ed25519, path: //westend, available_networks: 
-		0080e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e
 	public_key: 3efeca331d646d8a2986374bb3bb8d6e9e3cfcdd7c45c2b69104fab5d61d3f34, encryption: sr25519, path: //westend, available_networks: 
 		0180e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e
 	public_key: 46ebddef8cd9bb167dc30878d7113b7e168e6f0646beffd77d69d39bad76b47a, encryption: sr25519, path: , available_networks: 
+		0180037f5f3c8e67b314062025fc886fcd6238ea25a4a9b45dce8d246815c9ebe770
 		018091b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3
 		0180b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe
-		0180c196f81260cf1686172b47a79cf002120735d7cb0eb1474e8adce56618456fff
 		0180e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e
 	public_key: 64a31235d4bf9b37cfed3afa8aa60754675f9c4915430454d365c05112784d05, encryption: sr25519, path: //kusama, available_networks: 
 		0180b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe
 	public_key: 96129dcebc2e10f644e81fcf4269a663e521330084b1e447369087dec8017e04, encryption: sr25519, path: //rococo, available_networks: 
-		0180c196f81260cf1686172b47a79cf002120735d7cb0eb1474e8adce56618456fff
+		0180037f5f3c8e67b314062025fc886fcd6238ea25a4a9b45dce8d246815c9ebe770
+	public_key: a52095ee77497ba94588d61c3f71c4cfa0d6a4f389cef43ebadc76c29c4f42de, encryption: ed25519, path: //westend, available_networks: 
+		0080e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e
 	public_key: c81ebbec0559a6acf184535eb19da51ed3ed8c4ac65323999482aaf9b6696e27, encryption: sr25519, path: //alice, available_networks: 
-		0180c196f81260cf1686172b47a79cf002120735d7cb0eb1474e8adce56618456fff
+		0180037f5f3c8e67b314062025fc886fcd6238ea25a4a9b45dce8d246815c9ebe770
 	public_key: d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d, encryption: sr25519, path: //Alice, available_networks: 
 		0180e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e
 	public_key: f606519cb8726753885cd4d0f518804a69a5e0badf36fee70feadd8044081730, encryption: sr25519, path: //polkadot, available_networks: 
@@ -339,35 +359,35 @@ Identities:
         let expected_print_before = r#"Database contents:
 Metadata:
 	kusama2030
+	polkadot30
 	rococo9103
 	westend9000
 	westend9010
-	polkadot30
 Network Specs:
+	0180037f5f3c8e67b314062025fc886fcd6238ea25a4a9b45dce8d246815c9ebe770: Rococo (rococo with sr25519)
 	018091b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3: Polkadot (polkadot with sr25519)
 	0180b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe: Kusama (kusama with sr25519)
-	0180c196f81260cf1686172b47a79cf002120735d7cb0eb1474e8adce56618456fff: Rococo (rococo with sr25519)
 	0180e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e: Westend (westend with sr25519)
 Verifiers:
+	037f5f3c8e67b314062025fc886fcd6238ea25a4a9b45dce8d246815c9ebe770: {"type":"general","details":{"hex":"","encryption":"none"}}
 	91b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3: {"type":"general","details":{"hex":"","encryption":"none"}}
 	b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe: {"type":"general","details":{"hex":"","encryption":"none"}}
-	c196f81260cf1686172b47a79cf002120735d7cb0eb1474e8adce56618456fff: {"type":"general","details":{"hex":"","encryption":"none"}}
 	e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e: {"type":"general","details":{"hex":"","encryption":"none"}}
 General Verifier: none
 Identities: 
 	public_key: 3efeca331d646d8a2986374bb3bb8d6e9e3cfcdd7c45c2b69104fab5d61d3f34, encryption: sr25519, path: //westend, available_networks: 
 		0180e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e
 	public_key: 46ebddef8cd9bb167dc30878d7113b7e168e6f0646beffd77d69d39bad76b47a, encryption: sr25519, path: , available_networks: 
+		0180037f5f3c8e67b314062025fc886fcd6238ea25a4a9b45dce8d246815c9ebe770
 		018091b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3
 		0180b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe
-		0180c196f81260cf1686172b47a79cf002120735d7cb0eb1474e8adce56618456fff
 		0180e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e
 	public_key: 64a31235d4bf9b37cfed3afa8aa60754675f9c4915430454d365c05112784d05, encryption: sr25519, path: //kusama, available_networks: 
 		0180b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe
 	public_key: 96129dcebc2e10f644e81fcf4269a663e521330084b1e447369087dec8017e04, encryption: sr25519, path: //rococo, available_networks: 
-		0180c196f81260cf1686172b47a79cf002120735d7cb0eb1474e8adce56618456fff
+		0180037f5f3c8e67b314062025fc886fcd6238ea25a4a9b45dce8d246815c9ebe770
 	public_key: c81ebbec0559a6acf184535eb19da51ed3ed8c4ac65323999482aaf9b6696e27, encryption: sr25519, path: //alice, available_networks: 
-		0180c196f81260cf1686172b47a79cf002120735d7cb0eb1474e8adce56618456fff
+		0180037f5f3c8e67b314062025fc886fcd6238ea25a4a9b45dce8d246815c9ebe770
 	public_key: d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d, encryption: sr25519, path: //Alice, available_networks: 
 		0180e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e
 	public_key: f606519cb8726753885cd4d0f518804a69a5e0badf36fee70feadd8044081730, encryption: sr25519, path: //polkadot, available_networks: 
@@ -378,36 +398,36 @@ Identities:
         let expected_print_after = r#"Database contents:
 Metadata:
 	kusama2030
+	polkadot30
 	rococo9103
 	westend9000
 	westend9010
 	westend9070
-	polkadot30
 Network Specs:
+	0180037f5f3c8e67b314062025fc886fcd6238ea25a4a9b45dce8d246815c9ebe770: Rococo (rococo with sr25519)
 	018091b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3: Polkadot (polkadot with sr25519)
 	0180b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe: Kusama (kusama with sr25519)
-	0180c196f81260cf1686172b47a79cf002120735d7cb0eb1474e8adce56618456fff: Rococo (rococo with sr25519)
 	0180e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e: Westend (westend with sr25519)
 Verifiers:
+	037f5f3c8e67b314062025fc886fcd6238ea25a4a9b45dce8d246815c9ebe770: {"type":"general","details":{"hex":"","encryption":"none"}}
 	91b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3: {"type":"general","details":{"hex":"","encryption":"none"}}
 	b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe: {"type":"general","details":{"hex":"","encryption":"none"}}
-	c196f81260cf1686172b47a79cf002120735d7cb0eb1474e8adce56618456fff: {"type":"general","details":{"hex":"","encryption":"none"}}
 	e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e: {"type":"general","details":{"hex":"","encryption":"none"}}
 General Verifier: none
 Identities: 
 	public_key: 3efeca331d646d8a2986374bb3bb8d6e9e3cfcdd7c45c2b69104fab5d61d3f34, encryption: sr25519, path: //westend, available_networks: 
 		0180e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e
 	public_key: 46ebddef8cd9bb167dc30878d7113b7e168e6f0646beffd77d69d39bad76b47a, encryption: sr25519, path: , available_networks: 
+		0180037f5f3c8e67b314062025fc886fcd6238ea25a4a9b45dce8d246815c9ebe770
 		018091b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3
 		0180b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe
-		0180c196f81260cf1686172b47a79cf002120735d7cb0eb1474e8adce56618456fff
 		0180e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e
 	public_key: 64a31235d4bf9b37cfed3afa8aa60754675f9c4915430454d365c05112784d05, encryption: sr25519, path: //kusama, available_networks: 
 		0180b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe
 	public_key: 96129dcebc2e10f644e81fcf4269a663e521330084b1e447369087dec8017e04, encryption: sr25519, path: //rococo, available_networks: 
-		0180c196f81260cf1686172b47a79cf002120735d7cb0eb1474e8adce56618456fff
+		0180037f5f3c8e67b314062025fc886fcd6238ea25a4a9b45dce8d246815c9ebe770
 	public_key: c81ebbec0559a6acf184535eb19da51ed3ed8c4ac65323999482aaf9b6696e27, encryption: sr25519, path: //alice, available_networks: 
-		0180c196f81260cf1686172b47a79cf002120735d7cb0eb1474e8adce56618456fff
+		0180037f5f3c8e67b314062025fc886fcd6238ea25a4a9b45dce8d246815c9ebe770
 	public_key: d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d, encryption: sr25519, path: //Alice, available_networks: 
 		0180e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e
 	public_key: f606519cb8726753885cd4d0f518804a69a5e0badf36fee70feadd8044081730, encryption: sr25519, path: //polkadot, available_networks: 
@@ -422,7 +442,7 @@ Identities:
         populate_cold(dbname, Verifier(None)).unwrap();
         let line = fs::read_to_string("for_tests/types_info_Alice.txt").unwrap();
         let reply = produce_output(&line.trim(), dbname);
-        let reply_known_part = r#"{"verifier":[{"index":0,"indent":0,"type":"verifier","payload":{"hex":"d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d","encryption":"sr25519"}}],"warning":[{"index":1,"indent":0,"type":"warning","payload":"Received message is verified by a new general verifier. Currently no general verifier is set, and proceeding will update the general verifier to the received value. All previously acquired information associated with general verifier will be purged. Affected network specs entries: Polkadot, Kusama, Rococo, Westend; affected metadata entries: polkadot30, kusama2030, rococo9103, westend9000, westend9010. Types information is purged."},{"index":2,"indent":0,"type":"warning","payload":"Received types information is identical to the one that was in the database."}],"types_info":[{"index":3,"indent":0,"type":"types_hash","payload":"d091a5a24a97e18dfe298b167d8fd5a2add10098c8792cba21c39029a9ee0aeb"}],"action":{"type":"stub","payload":""#;
+        let reply_known_part = r#"{"verifier":[{"index":0,"indent":0,"type":"verifier","payload":{"hex":"d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d","encryption":"sr25519"}}],"warning":[{"index":1,"indent":0,"type":"warning","payload":"Received message is verified by a new general verifier. Currently no general verifier is set, and proceeding will update the general verifier to the received value. All previously acquired information associated with general verifier will be purged. Affected network specs entries: Kusama, Polkadot, Rococo, Westend; affected metadata entries: kusama2030, polkadot30, rococo9103, westend9000, westend9010. Types information is purged."},{"index":2,"indent":0,"type":"warning","payload":"Received types information is identical to the one that was in the database."}],"types_info":[{"index":3,"indent":0,"type":"types_hash","payload":"d091a5a24a97e18dfe298b167d8fd5a2add10098c8792cba21c39029a9ee0aeb"}],"action":{"type":"stub","payload":""#;
         assert!(reply.contains(reply_known_part), "Received: \n{}", reply);
         let (action_is_sign, checksum_str) = get_type_and_checksum(&reply);
         if action_is_sign {panic!("Should have been action `stub`.")}
@@ -430,35 +450,35 @@ Identities:
         let expected_print_before = r#"Database contents:
 Metadata:
 	kusama2030
+	polkadot30
 	rococo9103
 	westend9000
 	westend9010
-	polkadot30
 Network Specs:
+	0180037f5f3c8e67b314062025fc886fcd6238ea25a4a9b45dce8d246815c9ebe770: Rococo (rococo with sr25519)
 	018091b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3: Polkadot (polkadot with sr25519)
 	0180b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe: Kusama (kusama with sr25519)
-	0180c196f81260cf1686172b47a79cf002120735d7cb0eb1474e8adce56618456fff: Rococo (rococo with sr25519)
 	0180e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e: Westend (westend with sr25519)
 Verifiers:
+	037f5f3c8e67b314062025fc886fcd6238ea25a4a9b45dce8d246815c9ebe770: {"type":"general","details":{"hex":"","encryption":"none"}}
 	91b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3: {"type":"general","details":{"hex":"","encryption":"none"}}
 	b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe: {"type":"general","details":{"hex":"","encryption":"none"}}
-	c196f81260cf1686172b47a79cf002120735d7cb0eb1474e8adce56618456fff: {"type":"general","details":{"hex":"","encryption":"none"}}
 	e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e: {"type":"general","details":{"hex":"","encryption":"none"}}
 General Verifier: none
 Identities: 
 	public_key: 3efeca331d646d8a2986374bb3bb8d6e9e3cfcdd7c45c2b69104fab5d61d3f34, encryption: sr25519, path: //westend, available_networks: 
 		0180e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e
 	public_key: 46ebddef8cd9bb167dc30878d7113b7e168e6f0646beffd77d69d39bad76b47a, encryption: sr25519, path: , available_networks: 
+		0180037f5f3c8e67b314062025fc886fcd6238ea25a4a9b45dce8d246815c9ebe770
 		018091b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3
 		0180b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe
-		0180c196f81260cf1686172b47a79cf002120735d7cb0eb1474e8adce56618456fff
 		0180e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e
 	public_key: 64a31235d4bf9b37cfed3afa8aa60754675f9c4915430454d365c05112784d05, encryption: sr25519, path: //kusama, available_networks: 
 		0180b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe
 	public_key: 96129dcebc2e10f644e81fcf4269a663e521330084b1e447369087dec8017e04, encryption: sr25519, path: //rococo, available_networks: 
-		0180c196f81260cf1686172b47a79cf002120735d7cb0eb1474e8adce56618456fff
+		0180037f5f3c8e67b314062025fc886fcd6238ea25a4a9b45dce8d246815c9ebe770
 	public_key: c81ebbec0559a6acf184535eb19da51ed3ed8c4ac65323999482aaf9b6696e27, encryption: sr25519, path: //alice, available_networks: 
-		0180c196f81260cf1686172b47a79cf002120735d7cb0eb1474e8adce56618456fff
+		0180037f5f3c8e67b314062025fc886fcd6238ea25a4a9b45dce8d246815c9ebe770
 	public_key: d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d, encryption: sr25519, path: //Alice, available_networks: 
 		0180e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e
 	public_key: f606519cb8726753885cd4d0f518804a69a5e0badf36fee70feadd8044081730, encryption: sr25519, path: //polkadot, available_networks: 
@@ -470,25 +490,25 @@ Identities:
 Metadata:
 Network Specs:
 Verifiers:
+	037f5f3c8e67b314062025fc886fcd6238ea25a4a9b45dce8d246815c9ebe770: {"type":"general","details":{"hex":"d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d","encryption":"sr25519"}}
 	91b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3: {"type":"general","details":{"hex":"d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d","encryption":"sr25519"}}
 	b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe: {"type":"general","details":{"hex":"d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d","encryption":"sr25519"}}
-	c196f81260cf1686172b47a79cf002120735d7cb0eb1474e8adce56618456fff: {"type":"general","details":{"hex":"d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d","encryption":"sr25519"}}
 	e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e: {"type":"general","details":{"hex":"d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d","encryption":"sr25519"}}
 General Verifier: public key: d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d, encryption: sr25519
 Identities: 
 	public_key: 3efeca331d646d8a2986374bb3bb8d6e9e3cfcdd7c45c2b69104fab5d61d3f34, encryption: sr25519, path: //westend, available_networks: 
 		0180e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e
 	public_key: 46ebddef8cd9bb167dc30878d7113b7e168e6f0646beffd77d69d39bad76b47a, encryption: sr25519, path: , available_networks: 
+		0180037f5f3c8e67b314062025fc886fcd6238ea25a4a9b45dce8d246815c9ebe770
 		018091b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3
 		0180b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe
-		0180c196f81260cf1686172b47a79cf002120735d7cb0eb1474e8adce56618456fff
 		0180e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e
 	public_key: 64a31235d4bf9b37cfed3afa8aa60754675f9c4915430454d365c05112784d05, encryption: sr25519, path: //kusama, available_networks: 
 		0180b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe
 	public_key: 96129dcebc2e10f644e81fcf4269a663e521330084b1e447369087dec8017e04, encryption: sr25519, path: //rococo, available_networks: 
-		0180c196f81260cf1686172b47a79cf002120735d7cb0eb1474e8adce56618456fff
+		0180037f5f3c8e67b314062025fc886fcd6238ea25a4a9b45dce8d246815c9ebe770
 	public_key: c81ebbec0559a6acf184535eb19da51ed3ed8c4ac65323999482aaf9b6696e27, encryption: sr25519, path: //alice, available_networks: 
-		0180c196f81260cf1686172b47a79cf002120735d7cb0eb1474e8adce56618456fff
+		0180037f5f3c8e67b314062025fc886fcd6238ea25a4a9b45dce8d246815c9ebe770
 	public_key: d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d, encryption: sr25519, path: //Alice, available_networks: 
 		0180e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e
 	public_key: f606519cb8726753885cd4d0f518804a69a5e0badf36fee70feadd8044081730, encryption: sr25519, path: //polkadot, available_networks: 
@@ -511,35 +531,35 @@ Identities:
         let expected_print_before = r#"Database contents:
 Metadata:
 	kusama2030
+	polkadot30
 	rococo9103
 	westend9000
 	westend9010
-	polkadot30
 Network Specs:
+	0180037f5f3c8e67b314062025fc886fcd6238ea25a4a9b45dce8d246815c9ebe770: Rococo (rococo with sr25519)
 	018091b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3: Polkadot (polkadot with sr25519)
 	0180b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe: Kusama (kusama with sr25519)
-	0180c196f81260cf1686172b47a79cf002120735d7cb0eb1474e8adce56618456fff: Rococo (rococo with sr25519)
 	0180e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e: Westend (westend with sr25519)
 Verifiers:
+	037f5f3c8e67b314062025fc886fcd6238ea25a4a9b45dce8d246815c9ebe770: {"type":"general","details":{"hex":"d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d","encryption":"sr25519"}}
 	91b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3: {"type":"general","details":{"hex":"d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d","encryption":"sr25519"}}
 	b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe: {"type":"general","details":{"hex":"d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d","encryption":"sr25519"}}
-	c196f81260cf1686172b47a79cf002120735d7cb0eb1474e8adce56618456fff: {"type":"general","details":{"hex":"d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d","encryption":"sr25519"}}
 	e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e: {"type":"general","details":{"hex":"d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d","encryption":"sr25519"}}
 General Verifier: public key: d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d, encryption: sr25519
 Identities: 
 	public_key: 3efeca331d646d8a2986374bb3bb8d6e9e3cfcdd7c45c2b69104fab5d61d3f34, encryption: sr25519, path: //westend, available_networks: 
 		0180e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e
 	public_key: 46ebddef8cd9bb167dc30878d7113b7e168e6f0646beffd77d69d39bad76b47a, encryption: sr25519, path: , available_networks: 
+		0180037f5f3c8e67b314062025fc886fcd6238ea25a4a9b45dce8d246815c9ebe770
 		018091b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3
 		0180b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe
-		0180c196f81260cf1686172b47a79cf002120735d7cb0eb1474e8adce56618456fff
 		0180e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e
 	public_key: 64a31235d4bf9b37cfed3afa8aa60754675f9c4915430454d365c05112784d05, encryption: sr25519, path: //kusama, available_networks: 
 		0180b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe
 	public_key: 96129dcebc2e10f644e81fcf4269a663e521330084b1e447369087dec8017e04, encryption: sr25519, path: //rococo, available_networks: 
-		0180c196f81260cf1686172b47a79cf002120735d7cb0eb1474e8adce56618456fff
+		0180037f5f3c8e67b314062025fc886fcd6238ea25a4a9b45dce8d246815c9ebe770
 	public_key: c81ebbec0559a6acf184535eb19da51ed3ed8c4ac65323999482aaf9b6696e27, encryption: sr25519, path: //alice, available_networks: 
-		0180c196f81260cf1686172b47a79cf002120735d7cb0eb1474e8adce56618456fff
+		0180037f5f3c8e67b314062025fc886fcd6238ea25a4a9b45dce8d246815c9ebe770
 	public_key: d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d, encryption: sr25519, path: //Alice, available_networks: 
 		0180e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e
 	public_key: f606519cb8726753885cd4d0f518804a69a5e0badf36fee70feadd8044081730, encryption: sr25519, path: //polkadot, available_networks: 
@@ -550,35 +570,35 @@ Identities:
         let expected_print_after = r#"Database contents:
 Metadata:
 	kusama2030
+	polkadot30
 	rococo9103
 	westend9000
 	westend9010
-	polkadot30
 Network Specs:
+	0180037f5f3c8e67b314062025fc886fcd6238ea25a4a9b45dce8d246815c9ebe770: Rococo (rococo with sr25519)
 	018091b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3: Polkadot (polkadot with sr25519)
 	0180b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe: Kusama (kusama with sr25519)
-	0180c196f81260cf1686172b47a79cf002120735d7cb0eb1474e8adce56618456fff: Rococo (rococo with sr25519)
 	0180e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e: Westend (westend with sr25519)
 Verifiers:
+	037f5f3c8e67b314062025fc886fcd6238ea25a4a9b45dce8d246815c9ebe770: {"type":"general","details":{"hex":"d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d","encryption":"sr25519"}}
 	91b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3: {"type":"general","details":{"hex":"d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d","encryption":"sr25519"}}
 	b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe: {"type":"general","details":{"hex":"d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d","encryption":"sr25519"}}
-	c196f81260cf1686172b47a79cf002120735d7cb0eb1474e8adce56618456fff: {"type":"general","details":{"hex":"d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d","encryption":"sr25519"}}
 	e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e: {"type":"general","details":{"hex":"d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d","encryption":"sr25519"}}
 General Verifier: public key: d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d, encryption: sr25519
 Identities: 
 	public_key: 3efeca331d646d8a2986374bb3bb8d6e9e3cfcdd7c45c2b69104fab5d61d3f34, encryption: sr25519, path: //westend, available_networks: 
 		0180e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e
 	public_key: 46ebddef8cd9bb167dc30878d7113b7e168e6f0646beffd77d69d39bad76b47a, encryption: sr25519, path: , available_networks: 
+		0180037f5f3c8e67b314062025fc886fcd6238ea25a4a9b45dce8d246815c9ebe770
 		018091b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3
 		0180b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe
-		0180c196f81260cf1686172b47a79cf002120735d7cb0eb1474e8adce56618456fff
 		0180e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e
 	public_key: 64a31235d4bf9b37cfed3afa8aa60754675f9c4915430454d365c05112784d05, encryption: sr25519, path: //kusama, available_networks: 
 		0180b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe
 	public_key: 96129dcebc2e10f644e81fcf4269a663e521330084b1e447369087dec8017e04, encryption: sr25519, path: //rococo, available_networks: 
-		0180c196f81260cf1686172b47a79cf002120735d7cb0eb1474e8adce56618456fff
+		0180037f5f3c8e67b314062025fc886fcd6238ea25a4a9b45dce8d246815c9ebe770
 	public_key: c81ebbec0559a6acf184535eb19da51ed3ed8c4ac65323999482aaf9b6696e27, encryption: sr25519, path: //alice, available_networks: 
-		0180c196f81260cf1686172b47a79cf002120735d7cb0eb1474e8adce56618456fff
+		0180037f5f3c8e67b314062025fc886fcd6238ea25a4a9b45dce8d246815c9ebe770
 	public_key: d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d, encryption: sr25519, path: //Alice, available_networks: 
 		0180e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e
 	public_key: f606519cb8726753885cd4d0f518804a69a5e0badf36fee70feadd8044081730, encryption: sr25519, path: //polkadot, available_networks: 
@@ -601,35 +621,35 @@ Identities:
         let expected_print_before = r#"Database contents:
 Metadata:
 	kusama2030
+	polkadot30
 	rococo9103
 	westend9000
 	westend9010
-	polkadot30
 Network Specs:
+	0180037f5f3c8e67b314062025fc886fcd6238ea25a4a9b45dce8d246815c9ebe770: Rococo (rococo with sr25519)
 	018091b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3: Polkadot (polkadot with sr25519)
 	0180b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe: Kusama (kusama with sr25519)
-	0180c196f81260cf1686172b47a79cf002120735d7cb0eb1474e8adce56618456fff: Rococo (rococo with sr25519)
 	0180e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e: Westend (westend with sr25519)
 Verifiers:
+	037f5f3c8e67b314062025fc886fcd6238ea25a4a9b45dce8d246815c9ebe770: {"type":"general","details":{"hex":"","encryption":"none"}}
 	91b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3: {"type":"general","details":{"hex":"","encryption":"none"}}
 	b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe: {"type":"general","details":{"hex":"","encryption":"none"}}
-	c196f81260cf1686172b47a79cf002120735d7cb0eb1474e8adce56618456fff: {"type":"general","details":{"hex":"","encryption":"none"}}
 	e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e: {"type":"general","details":{"hex":"","encryption":"none"}}
 General Verifier: none
 Identities: 
 	public_key: 3efeca331d646d8a2986374bb3bb8d6e9e3cfcdd7c45c2b69104fab5d61d3f34, encryption: sr25519, path: //westend, available_networks: 
 		0180e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e
 	public_key: 46ebddef8cd9bb167dc30878d7113b7e168e6f0646beffd77d69d39bad76b47a, encryption: sr25519, path: , available_networks: 
+		0180037f5f3c8e67b314062025fc886fcd6238ea25a4a9b45dce8d246815c9ebe770
 		018091b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3
 		0180b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe
-		0180c196f81260cf1686172b47a79cf002120735d7cb0eb1474e8adce56618456fff
 		0180e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e
 	public_key: 64a31235d4bf9b37cfed3afa8aa60754675f9c4915430454d365c05112784d05, encryption: sr25519, path: //kusama, available_networks: 
 		0180b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe
 	public_key: 96129dcebc2e10f644e81fcf4269a663e521330084b1e447369087dec8017e04, encryption: sr25519, path: //rococo, available_networks: 
-		0180c196f81260cf1686172b47a79cf002120735d7cb0eb1474e8adce56618456fff
+		0180037f5f3c8e67b314062025fc886fcd6238ea25a4a9b45dce8d246815c9ebe770
 	public_key: c81ebbec0559a6acf184535eb19da51ed3ed8c4ac65323999482aaf9b6696e27, encryption: sr25519, path: //alice, available_networks: 
-		0180c196f81260cf1686172b47a79cf002120735d7cb0eb1474e8adce56618456fff
+		0180037f5f3c8e67b314062025fc886fcd6238ea25a4a9b45dce8d246815c9ebe770
 	public_key: d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d, encryption: sr25519, path: //Alice, available_networks: 
 		0180e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e
 	public_key: f606519cb8726753885cd4d0f518804a69a5e0badf36fee70feadd8044081730, encryption: sr25519, path: //polkadot, available_networks: 
@@ -640,38 +660,38 @@ Identities:
         let expected_print_after = r#"Database contents:
 Metadata:
 	kusama2030
+	polkadot30
 	rococo9103
 	westend9000
 	westend9010
-	polkadot30
 Network Specs:
+	0180037f5f3c8e67b314062025fc886fcd6238ea25a4a9b45dce8d246815c9ebe770: Rococo (rococo with sr25519)
 	01806bfe24dca2a3be10f22212678ac13a6446ec764103c0f3471c71609eac384aae: dock-pos-main-runtime-sr25519 (dock-pos-main-runtime with sr25519)
 	018091b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3: Polkadot (polkadot with sr25519)
 	0180b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe: Kusama (kusama with sr25519)
-	0180c196f81260cf1686172b47a79cf002120735d7cb0eb1474e8adce56618456fff: Rococo (rococo with sr25519)
 	0180e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e: Westend (westend with sr25519)
 Verifiers:
+	037f5f3c8e67b314062025fc886fcd6238ea25a4a9b45dce8d246815c9ebe770: {"type":"general","details":{"hex":"","encryption":"none"}}
 	6bfe24dca2a3be10f22212678ac13a6446ec764103c0f3471c71609eac384aae: {"type":"custom","details":{"hex":"","encryption":"none"}}
 	91b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3: {"type":"general","details":{"hex":"","encryption":"none"}}
 	b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe: {"type":"general","details":{"hex":"","encryption":"none"}}
-	c196f81260cf1686172b47a79cf002120735d7cb0eb1474e8adce56618456fff: {"type":"general","details":{"hex":"","encryption":"none"}}
 	e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e: {"type":"general","details":{"hex":"","encryption":"none"}}
 General Verifier: none
 Identities: 
 	public_key: 3efeca331d646d8a2986374bb3bb8d6e9e3cfcdd7c45c2b69104fab5d61d3f34, encryption: sr25519, path: //westend, available_networks: 
 		0180e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e
 	public_key: 46ebddef8cd9bb167dc30878d7113b7e168e6f0646beffd77d69d39bad76b47a, encryption: sr25519, path: , available_networks: 
+		0180037f5f3c8e67b314062025fc886fcd6238ea25a4a9b45dce8d246815c9ebe770
+		01806bfe24dca2a3be10f22212678ac13a6446ec764103c0f3471c71609eac384aae
 		018091b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3
 		0180b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe
-		0180c196f81260cf1686172b47a79cf002120735d7cb0eb1474e8adce56618456fff
 		0180e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e
-		01806bfe24dca2a3be10f22212678ac13a6446ec764103c0f3471c71609eac384aae
 	public_key: 64a31235d4bf9b37cfed3afa8aa60754675f9c4915430454d365c05112784d05, encryption: sr25519, path: //kusama, available_networks: 
 		0180b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe
 	public_key: 96129dcebc2e10f644e81fcf4269a663e521330084b1e447369087dec8017e04, encryption: sr25519, path: //rococo, available_networks: 
-		0180c196f81260cf1686172b47a79cf002120735d7cb0eb1474e8adce56618456fff
+		0180037f5f3c8e67b314062025fc886fcd6238ea25a4a9b45dce8d246815c9ebe770
 	public_key: c81ebbec0559a6acf184535eb19da51ed3ed8c4ac65323999482aaf9b6696e27, encryption: sr25519, path: //alice, available_networks: 
-		0180c196f81260cf1686172b47a79cf002120735d7cb0eb1474e8adce56618456fff
+		0180037f5f3c8e67b314062025fc886fcd6238ea25a4a9b45dce8d246815c9ebe770
 	public_key: d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d, encryption: sr25519, path: //Alice, available_networks: 
 		0180e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e
 	public_key: f606519cb8726753885cd4d0f518804a69a5e0badf36fee70feadd8044081730, encryption: sr25519, path: //polkadot, available_networks: 
@@ -688,40 +708,40 @@ Identities:
         let print_after = print_db_content(&dbname);
         let expected_print_after = r#"Database contents:
 Metadata:
+	dock-pos-main-runtime31
 	kusama2030
+	polkadot30
 	rococo9103
 	westend9000
 	westend9010
-	polkadot30
-	dock-pos-main-runtime31
 Network Specs:
+	0180037f5f3c8e67b314062025fc886fcd6238ea25a4a9b45dce8d246815c9ebe770: Rococo (rococo with sr25519)
 	01806bfe24dca2a3be10f22212678ac13a6446ec764103c0f3471c71609eac384aae: dock-pos-main-runtime-sr25519 (dock-pos-main-runtime with sr25519)
 	018091b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3: Polkadot (polkadot with sr25519)
 	0180b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe: Kusama (kusama with sr25519)
-	0180c196f81260cf1686172b47a79cf002120735d7cb0eb1474e8adce56618456fff: Rococo (rococo with sr25519)
 	0180e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e: Westend (westend with sr25519)
 Verifiers:
+	037f5f3c8e67b314062025fc886fcd6238ea25a4a9b45dce8d246815c9ebe770: {"type":"general","details":{"hex":"","encryption":"none"}}
 	6bfe24dca2a3be10f22212678ac13a6446ec764103c0f3471c71609eac384aae: {"type":"custom","details":{"hex":"","encryption":"none"}}
 	91b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3: {"type":"general","details":{"hex":"","encryption":"none"}}
 	b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe: {"type":"general","details":{"hex":"","encryption":"none"}}
-	c196f81260cf1686172b47a79cf002120735d7cb0eb1474e8adce56618456fff: {"type":"general","details":{"hex":"","encryption":"none"}}
 	e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e: {"type":"general","details":{"hex":"","encryption":"none"}}
 General Verifier: none
 Identities: 
 	public_key: 3efeca331d646d8a2986374bb3bb8d6e9e3cfcdd7c45c2b69104fab5d61d3f34, encryption: sr25519, path: //westend, available_networks: 
 		0180e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e
 	public_key: 46ebddef8cd9bb167dc30878d7113b7e168e6f0646beffd77d69d39bad76b47a, encryption: sr25519, path: , available_networks: 
+		0180037f5f3c8e67b314062025fc886fcd6238ea25a4a9b45dce8d246815c9ebe770
+		01806bfe24dca2a3be10f22212678ac13a6446ec764103c0f3471c71609eac384aae
 		018091b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3
 		0180b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe
-		0180c196f81260cf1686172b47a79cf002120735d7cb0eb1474e8adce56618456fff
 		0180e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e
-		01806bfe24dca2a3be10f22212678ac13a6446ec764103c0f3471c71609eac384aae
 	public_key: 64a31235d4bf9b37cfed3afa8aa60754675f9c4915430454d365c05112784d05, encryption: sr25519, path: //kusama, available_networks: 
 		0180b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe
 	public_key: 96129dcebc2e10f644e81fcf4269a663e521330084b1e447369087dec8017e04, encryption: sr25519, path: //rococo, available_networks: 
-		0180c196f81260cf1686172b47a79cf002120735d7cb0eb1474e8adce56618456fff
+		0180037f5f3c8e67b314062025fc886fcd6238ea25a4a9b45dce8d246815c9ebe770
 	public_key: c81ebbec0559a6acf184535eb19da51ed3ed8c4ac65323999482aaf9b6696e27, encryption: sr25519, path: //alice, available_networks: 
-		0180c196f81260cf1686172b47a79cf002120735d7cb0eb1474e8adce56618456fff
+		0180037f5f3c8e67b314062025fc886fcd6238ea25a4a9b45dce8d246815c9ebe770
 	public_key: d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d, encryption: sr25519, path: //Alice, available_networks: 
 		0180e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e
 	public_key: f606519cb8726753885cd4d0f518804a69a5e0badf36fee70feadd8044081730, encryption: sr25519, path: //polkadot, available_networks: 
@@ -730,7 +750,7 @@ Identities:
         
         let line = fs::read_to_string("for_tests/add_specs_dock-pos-main-runtime-sr25519_Alice-sr25519.txt").unwrap();
         let reply = produce_output(&line.trim(), dbname);
-        let reply_known_part = r##"{"verifier":[{"index":0,"indent":0,"type":"verifier","payload":{"hex":"d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d","encryption":"sr25519"}}],"warning":[{"index":1,"indent":0,"type":"warning","payload":"Received message is verified. Currently no verifier is set for network with genesis hash 6bfe24dca2a3be10f22212678ac13a6446ec764103c0f3471c71609eac384aae and no general verifier is set. Proceeding will update the network verifier to general. All previously acquired network information that was received unverified will be purged. Affected network specs entries: dock-pos-main-runtime-sr25519; affected metadata entries: dock-pos-main-runtime31."},{"index":2,"indent":0,"type":"warning","payload":"Received message is verified by a new general verifier. Currently no general verifier is set, and proceeding will update the general verifier to the received value. All previously acquired information associated with general verifier will be purged. Affected network specs entries: Polkadot, Kusama, Rococo, Westend; affected metadata entries: polkadot30, kusama2030, rococo9103, westend9000, westend9010. Types information is purged."},{"index":3,"indent":0,"type":"warning","payload":"Received network specs information for dock-pos-main-runtime-sr25519 is same as the one already in the database."}],"new_specs":[{"index":4,"indent":0,"type":"new_specs","payload":{"base58prefix":"22","color":"#660D35","decimals":"6","encryption":"sr25519","genesis_hash":"6bfe24dca2a3be10f22212678ac13a6446ec764103c0f3471c71609eac384aae","logo":"dock-pos-main-runtime","name":"dock-pos-main-runtime","path_id":"//dock-pos-main-runtime","secondary_color":"#262626","title":"dock-pos-main-runtime-sr25519","unit":"DOCK"}}],"action":{"type":"stub","payload":""##;
+        let reply_known_part = r##"{"verifier":[{"index":0,"indent":0,"type":"verifier","payload":{"hex":"d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d","encryption":"sr25519"}}],"warning":[{"index":1,"indent":0,"type":"warning","payload":"Received message is verified. Currently no verifier is set for network with genesis hash 6bfe24dca2a3be10f22212678ac13a6446ec764103c0f3471c71609eac384aae and no general verifier is set. Proceeding will update the network verifier to general. All previously acquired network information that was received unverified will be purged. Affected network specs entries: dock-pos-main-runtime-sr25519; affected metadata entries: dock-pos-main-runtime31."},{"index":2,"indent":0,"type":"warning","payload":"Received message is verified by a new general verifier. Currently no general verifier is set, and proceeding will update the general verifier to the received value. All previously acquired information associated with general verifier will be purged. Affected network specs entries: Kusama, Polkadot, Rococo, Westend; affected metadata entries: kusama2030, polkadot30, rococo9103, westend9000, westend9010. Types information is purged."},{"index":3,"indent":0,"type":"warning","payload":"Received network specs information for dock-pos-main-runtime-sr25519 is same as the one already in the database."}],"new_specs":[{"index":4,"indent":0,"type":"new_specs","payload":{"base58prefix":"22","color":"#660D35","decimals":"6","encryption":"sr25519","genesis_hash":"6bfe24dca2a3be10f22212678ac13a6446ec764103c0f3471c71609eac384aae","logo":"dock-pos-main-runtime","name":"dock-pos-main-runtime","path_id":"//dock-pos-main-runtime","secondary_color":"#262626","title":"dock-pos-main-runtime-sr25519","unit":"DOCK"}}],"action":{"type":"stub","payload":""##;
         assert!(reply.contains(reply_known_part), "Expected: {}...\nReceived: {}", reply_known_part, reply);
         let (action_is_sign, checksum_str) = get_type_and_checksum(&reply);
         if action_is_sign {panic!("Should have been action `stub`.")}
@@ -741,27 +761,27 @@ Metadata:
 Network Specs:
 	01806bfe24dca2a3be10f22212678ac13a6446ec764103c0f3471c71609eac384aae: dock-pos-main-runtime-sr25519 (dock-pos-main-runtime with sr25519)
 Verifiers:
+	037f5f3c8e67b314062025fc886fcd6238ea25a4a9b45dce8d246815c9ebe770: {"type":"general","details":{"hex":"d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d","encryption":"sr25519"}}
 	6bfe24dca2a3be10f22212678ac13a6446ec764103c0f3471c71609eac384aae: {"type":"general","details":{"hex":"d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d","encryption":"sr25519"}}
 	91b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3: {"type":"general","details":{"hex":"d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d","encryption":"sr25519"}}
 	b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe: {"type":"general","details":{"hex":"d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d","encryption":"sr25519"}}
-	c196f81260cf1686172b47a79cf002120735d7cb0eb1474e8adce56618456fff: {"type":"general","details":{"hex":"d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d","encryption":"sr25519"}}
 	e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e: {"type":"general","details":{"hex":"d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d","encryption":"sr25519"}}
 General Verifier: public key: d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d, encryption: sr25519
 Identities: 
 	public_key: 3efeca331d646d8a2986374bb3bb8d6e9e3cfcdd7c45c2b69104fab5d61d3f34, encryption: sr25519, path: //westend, available_networks: 
 		0180e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e
 	public_key: 46ebddef8cd9bb167dc30878d7113b7e168e6f0646beffd77d69d39bad76b47a, encryption: sr25519, path: , available_networks: 
+		0180037f5f3c8e67b314062025fc886fcd6238ea25a4a9b45dce8d246815c9ebe770
+		01806bfe24dca2a3be10f22212678ac13a6446ec764103c0f3471c71609eac384aae
 		018091b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3
 		0180b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe
-		0180c196f81260cf1686172b47a79cf002120735d7cb0eb1474e8adce56618456fff
 		0180e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e
-		01806bfe24dca2a3be10f22212678ac13a6446ec764103c0f3471c71609eac384aae
 	public_key: 64a31235d4bf9b37cfed3afa8aa60754675f9c4915430454d365c05112784d05, encryption: sr25519, path: //kusama, available_networks: 
 		0180b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe
 	public_key: 96129dcebc2e10f644e81fcf4269a663e521330084b1e447369087dec8017e04, encryption: sr25519, path: //rococo, available_networks: 
-		0180c196f81260cf1686172b47a79cf002120735d7cb0eb1474e8adce56618456fff
+		0180037f5f3c8e67b314062025fc886fcd6238ea25a4a9b45dce8d246815c9ebe770
 	public_key: c81ebbec0559a6acf184535eb19da51ed3ed8c4ac65323999482aaf9b6696e27, encryption: sr25519, path: //alice, available_networks: 
-		0180c196f81260cf1686172b47a79cf002120735d7cb0eb1474e8adce56618456fff
+		0180037f5f3c8e67b314062025fc886fcd6238ea25a4a9b45dce8d246815c9ebe770
 	public_key: d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d, encryption: sr25519, path: //Alice, available_networks: 
 		0180e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e
 	public_key: f606519cb8726753885cd4d0f518804a69a5e0badf36fee70feadd8044081730, encryption: sr25519, path: //polkadot, available_networks: 
@@ -785,35 +805,35 @@ Identities:
         let expected_print_before = r#"Database contents:
 Metadata:
 	kusama2030
+	polkadot30
 	rococo9103
 	westend9000
 	westend9010
-	polkadot30
 Network Specs:
+	0180037f5f3c8e67b314062025fc886fcd6238ea25a4a9b45dce8d246815c9ebe770: Rococo (rococo with sr25519)
 	018091b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3: Polkadot (polkadot with sr25519)
 	0180b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe: Kusama (kusama with sr25519)
-	0180c196f81260cf1686172b47a79cf002120735d7cb0eb1474e8adce56618456fff: Rococo (rococo with sr25519)
 	0180e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e: Westend (westend with sr25519)
 Verifiers:
+	037f5f3c8e67b314062025fc886fcd6238ea25a4a9b45dce8d246815c9ebe770: {"type":"general","details":{"hex":"d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d","encryption":"sr25519"}}
 	91b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3: {"type":"general","details":{"hex":"d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d","encryption":"sr25519"}}
 	b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe: {"type":"general","details":{"hex":"d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d","encryption":"sr25519"}}
-	c196f81260cf1686172b47a79cf002120735d7cb0eb1474e8adce56618456fff: {"type":"general","details":{"hex":"d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d","encryption":"sr25519"}}
 	e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e: {"type":"general","details":{"hex":"d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d","encryption":"sr25519"}}
 General Verifier: public key: d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d, encryption: sr25519
 Identities: 
 	public_key: 3efeca331d646d8a2986374bb3bb8d6e9e3cfcdd7c45c2b69104fab5d61d3f34, encryption: sr25519, path: //westend, available_networks: 
 		0180e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e
 	public_key: 46ebddef8cd9bb167dc30878d7113b7e168e6f0646beffd77d69d39bad76b47a, encryption: sr25519, path: , available_networks: 
+		0180037f5f3c8e67b314062025fc886fcd6238ea25a4a9b45dce8d246815c9ebe770
 		018091b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3
 		0180b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe
-		0180c196f81260cf1686172b47a79cf002120735d7cb0eb1474e8adce56618456fff
 		0180e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e
 	public_key: 64a31235d4bf9b37cfed3afa8aa60754675f9c4915430454d365c05112784d05, encryption: sr25519, path: //kusama, available_networks: 
 		0180b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe
 	public_key: 96129dcebc2e10f644e81fcf4269a663e521330084b1e447369087dec8017e04, encryption: sr25519, path: //rococo, available_networks: 
-		0180c196f81260cf1686172b47a79cf002120735d7cb0eb1474e8adce56618456fff
+		0180037f5f3c8e67b314062025fc886fcd6238ea25a4a9b45dce8d246815c9ebe770
 	public_key: c81ebbec0559a6acf184535eb19da51ed3ed8c4ac65323999482aaf9b6696e27, encryption: sr25519, path: //alice, available_networks: 
-		0180c196f81260cf1686172b47a79cf002120735d7cb0eb1474e8adce56618456fff
+		0180037f5f3c8e67b314062025fc886fcd6238ea25a4a9b45dce8d246815c9ebe770
 	public_key: d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d, encryption: sr25519, path: //Alice, available_networks: 
 		0180e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e
 	public_key: f606519cb8726753885cd4d0f518804a69a5e0badf36fee70feadd8044081730, encryption: sr25519, path: //polkadot, available_networks: 
@@ -824,38 +844,38 @@ Identities:
         let expected_print_after = r#"Database contents:
 Metadata:
 	kusama2030
+	polkadot30
 	rococo9103
 	westend9000
 	westend9010
-	polkadot30
 Network Specs:
+	0180037f5f3c8e67b314062025fc886fcd6238ea25a4a9b45dce8d246815c9ebe770: Rococo (rococo with sr25519)
 	01806bfe24dca2a3be10f22212678ac13a6446ec764103c0f3471c71609eac384aae: dock-pos-main-runtime-sr25519 (dock-pos-main-runtime with sr25519)
 	018091b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3: Polkadot (polkadot with sr25519)
 	0180b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe: Kusama (kusama with sr25519)
-	0180c196f81260cf1686172b47a79cf002120735d7cb0eb1474e8adce56618456fff: Rococo (rococo with sr25519)
 	0180e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e: Westend (westend with sr25519)
 Verifiers:
+	037f5f3c8e67b314062025fc886fcd6238ea25a4a9b45dce8d246815c9ebe770: {"type":"general","details":{"hex":"d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d","encryption":"sr25519"}}
 	6bfe24dca2a3be10f22212678ac13a6446ec764103c0f3471c71609eac384aae: {"type":"custom","details":{"hex":"","encryption":"none"}}
 	91b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3: {"type":"general","details":{"hex":"d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d","encryption":"sr25519"}}
 	b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe: {"type":"general","details":{"hex":"d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d","encryption":"sr25519"}}
-	c196f81260cf1686172b47a79cf002120735d7cb0eb1474e8adce56618456fff: {"type":"general","details":{"hex":"d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d","encryption":"sr25519"}}
 	e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e: {"type":"general","details":{"hex":"d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d","encryption":"sr25519"}}
 General Verifier: public key: d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d, encryption: sr25519
 Identities: 
 	public_key: 3efeca331d646d8a2986374bb3bb8d6e9e3cfcdd7c45c2b69104fab5d61d3f34, encryption: sr25519, path: //westend, available_networks: 
 		0180e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e
 	public_key: 46ebddef8cd9bb167dc30878d7113b7e168e6f0646beffd77d69d39bad76b47a, encryption: sr25519, path: , available_networks: 
+		0180037f5f3c8e67b314062025fc886fcd6238ea25a4a9b45dce8d246815c9ebe770
+		01806bfe24dca2a3be10f22212678ac13a6446ec764103c0f3471c71609eac384aae
 		018091b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3
 		0180b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe
-		0180c196f81260cf1686172b47a79cf002120735d7cb0eb1474e8adce56618456fff
 		0180e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e
-		01806bfe24dca2a3be10f22212678ac13a6446ec764103c0f3471c71609eac384aae
 	public_key: 64a31235d4bf9b37cfed3afa8aa60754675f9c4915430454d365c05112784d05, encryption: sr25519, path: //kusama, available_networks: 
 		0180b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe
 	public_key: 96129dcebc2e10f644e81fcf4269a663e521330084b1e447369087dec8017e04, encryption: sr25519, path: //rococo, available_networks: 
-		0180c196f81260cf1686172b47a79cf002120735d7cb0eb1474e8adce56618456fff
+		0180037f5f3c8e67b314062025fc886fcd6238ea25a4a9b45dce8d246815c9ebe770
 	public_key: c81ebbec0559a6acf184535eb19da51ed3ed8c4ac65323999482aaf9b6696e27, encryption: sr25519, path: //alice, available_networks: 
-		0180c196f81260cf1686172b47a79cf002120735d7cb0eb1474e8adce56618456fff
+		0180037f5f3c8e67b314062025fc886fcd6238ea25a4a9b45dce8d246815c9ebe770
 	public_key: d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d, encryption: sr25519, path: //Alice, available_networks: 
 		0180e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e
 	public_key: f606519cb8726753885cd4d0f518804a69a5e0badf36fee70feadd8044081730, encryption: sr25519, path: //polkadot, available_networks: 
@@ -872,40 +892,40 @@ Identities:
         let print_after = print_db_content(&dbname);
         let expected_print_after = r#"Database contents:
 Metadata:
+	dock-pos-main-runtime31
 	kusama2030
+	polkadot30
 	rococo9103
 	westend9000
 	westend9010
-	polkadot30
-	dock-pos-main-runtime31
 Network Specs:
+	0180037f5f3c8e67b314062025fc886fcd6238ea25a4a9b45dce8d246815c9ebe770: Rococo (rococo with sr25519)
 	01806bfe24dca2a3be10f22212678ac13a6446ec764103c0f3471c71609eac384aae: dock-pos-main-runtime-sr25519 (dock-pos-main-runtime with sr25519)
 	018091b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3: Polkadot (polkadot with sr25519)
 	0180b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe: Kusama (kusama with sr25519)
-	0180c196f81260cf1686172b47a79cf002120735d7cb0eb1474e8adce56618456fff: Rococo (rococo with sr25519)
 	0180e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e: Westend (westend with sr25519)
 Verifiers:
+	037f5f3c8e67b314062025fc886fcd6238ea25a4a9b45dce8d246815c9ebe770: {"type":"general","details":{"hex":"d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d","encryption":"sr25519"}}
 	6bfe24dca2a3be10f22212678ac13a6446ec764103c0f3471c71609eac384aae: {"type":"custom","details":{"hex":"","encryption":"none"}}
 	91b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3: {"type":"general","details":{"hex":"d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d","encryption":"sr25519"}}
 	b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe: {"type":"general","details":{"hex":"d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d","encryption":"sr25519"}}
-	c196f81260cf1686172b47a79cf002120735d7cb0eb1474e8adce56618456fff: {"type":"general","details":{"hex":"d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d","encryption":"sr25519"}}
 	e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e: {"type":"general","details":{"hex":"d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d","encryption":"sr25519"}}
 General Verifier: public key: d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d, encryption: sr25519
 Identities: 
 	public_key: 3efeca331d646d8a2986374bb3bb8d6e9e3cfcdd7c45c2b69104fab5d61d3f34, encryption: sr25519, path: //westend, available_networks: 
 		0180e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e
 	public_key: 46ebddef8cd9bb167dc30878d7113b7e168e6f0646beffd77d69d39bad76b47a, encryption: sr25519, path: , available_networks: 
+		0180037f5f3c8e67b314062025fc886fcd6238ea25a4a9b45dce8d246815c9ebe770
+		01806bfe24dca2a3be10f22212678ac13a6446ec764103c0f3471c71609eac384aae
 		018091b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3
 		0180b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe
-		0180c196f81260cf1686172b47a79cf002120735d7cb0eb1474e8adce56618456fff
 		0180e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e
-		01806bfe24dca2a3be10f22212678ac13a6446ec764103c0f3471c71609eac384aae
 	public_key: 64a31235d4bf9b37cfed3afa8aa60754675f9c4915430454d365c05112784d05, encryption: sr25519, path: //kusama, available_networks: 
 		0180b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe
 	public_key: 96129dcebc2e10f644e81fcf4269a663e521330084b1e447369087dec8017e04, encryption: sr25519, path: //rococo, available_networks: 
-		0180c196f81260cf1686172b47a79cf002120735d7cb0eb1474e8adce56618456fff
+		0180037f5f3c8e67b314062025fc886fcd6238ea25a4a9b45dce8d246815c9ebe770
 	public_key: c81ebbec0559a6acf184535eb19da51ed3ed8c4ac65323999482aaf9b6696e27, encryption: sr25519, path: //alice, available_networks: 
-		0180c196f81260cf1686172b47a79cf002120735d7cb0eb1474e8adce56618456fff
+		0180037f5f3c8e67b314062025fc886fcd6238ea25a4a9b45dce8d246815c9ebe770
 	public_key: d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d, encryption: sr25519, path: //Alice, available_networks: 
 		0180e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e
 	public_key: f606519cb8726753885cd4d0f518804a69a5e0badf36fee70feadd8044081730, encryption: sr25519, path: //polkadot, available_networks: 
@@ -923,38 +943,38 @@ Identities:
         let expected_print_after = r#"Database contents:
 Metadata:
 	kusama2030
+	polkadot30
 	rococo9103
 	westend9000
 	westend9010
-	polkadot30
 Network Specs:
+	0180037f5f3c8e67b314062025fc886fcd6238ea25a4a9b45dce8d246815c9ebe770: Rococo (rococo with sr25519)
 	01806bfe24dca2a3be10f22212678ac13a6446ec764103c0f3471c71609eac384aae: dock-pos-main-runtime-sr25519 (dock-pos-main-runtime with sr25519)
 	018091b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3: Polkadot (polkadot with sr25519)
 	0180b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe: Kusama (kusama with sr25519)
-	0180c196f81260cf1686172b47a79cf002120735d7cb0eb1474e8adce56618456fff: Rococo (rococo with sr25519)
 	0180e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e: Westend (westend with sr25519)
 Verifiers:
+	037f5f3c8e67b314062025fc886fcd6238ea25a4a9b45dce8d246815c9ebe770: {"type":"general","details":{"hex":"d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d","encryption":"sr25519"}}
 	6bfe24dca2a3be10f22212678ac13a6446ec764103c0f3471c71609eac384aae: {"type":"custom","details":{"hex":"88dc3417d5058ec4b4503e0c12ea1a0a89be200fe98922423d4334014fa6b0ee","encryption":"ed25519"}}
 	91b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3: {"type":"general","details":{"hex":"d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d","encryption":"sr25519"}}
 	b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe: {"type":"general","details":{"hex":"d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d","encryption":"sr25519"}}
-	c196f81260cf1686172b47a79cf002120735d7cb0eb1474e8adce56618456fff: {"type":"general","details":{"hex":"d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d","encryption":"sr25519"}}
 	e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e: {"type":"general","details":{"hex":"d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d","encryption":"sr25519"}}
 General Verifier: public key: d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d, encryption: sr25519
 Identities: 
 	public_key: 3efeca331d646d8a2986374bb3bb8d6e9e3cfcdd7c45c2b69104fab5d61d3f34, encryption: sr25519, path: //westend, available_networks: 
 		0180e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e
 	public_key: 46ebddef8cd9bb167dc30878d7113b7e168e6f0646beffd77d69d39bad76b47a, encryption: sr25519, path: , available_networks: 
+		0180037f5f3c8e67b314062025fc886fcd6238ea25a4a9b45dce8d246815c9ebe770
+		01806bfe24dca2a3be10f22212678ac13a6446ec764103c0f3471c71609eac384aae
 		018091b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3
 		0180b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe
-		0180c196f81260cf1686172b47a79cf002120735d7cb0eb1474e8adce56618456fff
 		0180e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e
-		01806bfe24dca2a3be10f22212678ac13a6446ec764103c0f3471c71609eac384aae
 	public_key: 64a31235d4bf9b37cfed3afa8aa60754675f9c4915430454d365c05112784d05, encryption: sr25519, path: //kusama, available_networks: 
 		0180b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe
 	public_key: 96129dcebc2e10f644e81fcf4269a663e521330084b1e447369087dec8017e04, encryption: sr25519, path: //rococo, available_networks: 
-		0180c196f81260cf1686172b47a79cf002120735d7cb0eb1474e8adce56618456fff
+		0180037f5f3c8e67b314062025fc886fcd6238ea25a4a9b45dce8d246815c9ebe770
 	public_key: c81ebbec0559a6acf184535eb19da51ed3ed8c4ac65323999482aaf9b6696e27, encryption: sr25519, path: //alice, available_networks: 
-		0180c196f81260cf1686172b47a79cf002120735d7cb0eb1474e8adce56618456fff
+		0180037f5f3c8e67b314062025fc886fcd6238ea25a4a9b45dce8d246815c9ebe770
 	public_key: d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d, encryption: sr25519, path: //Alice, available_networks: 
 		0180e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e
 	public_key: f606519cb8726753885cd4d0f518804a69a5e0badf36fee70feadd8044081730, encryption: sr25519, path: //polkadot, available_networks: 
@@ -972,38 +992,38 @@ Identities:
         let expected_print_after = r#"Database contents:
 Metadata:
 	kusama2030
+	polkadot30
 	rococo9103
 	westend9000
 	westend9010
-	polkadot30
 Network Specs:
+	0180037f5f3c8e67b314062025fc886fcd6238ea25a4a9b45dce8d246815c9ebe770: Rococo (rococo with sr25519)
 	01806bfe24dca2a3be10f22212678ac13a6446ec764103c0f3471c71609eac384aae: dock-pos-main-runtime-sr25519 (dock-pos-main-runtime with sr25519)
 	018091b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3: Polkadot (polkadot with sr25519)
 	0180b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe: Kusama (kusama with sr25519)
-	0180c196f81260cf1686172b47a79cf002120735d7cb0eb1474e8adce56618456fff: Rococo (rococo with sr25519)
 	0180e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e: Westend (westend with sr25519)
 Verifiers:
+	037f5f3c8e67b314062025fc886fcd6238ea25a4a9b45dce8d246815c9ebe770: {"type":"general","details":{"hex":"d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d","encryption":"sr25519"}}
 	6bfe24dca2a3be10f22212678ac13a6446ec764103c0f3471c71609eac384aae: {"type":"general","details":{"hex":"d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d","encryption":"sr25519"}}
 	91b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3: {"type":"general","details":{"hex":"d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d","encryption":"sr25519"}}
 	b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe: {"type":"general","details":{"hex":"d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d","encryption":"sr25519"}}
-	c196f81260cf1686172b47a79cf002120735d7cb0eb1474e8adce56618456fff: {"type":"general","details":{"hex":"d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d","encryption":"sr25519"}}
 	e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e: {"type":"general","details":{"hex":"d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d","encryption":"sr25519"}}
 General Verifier: public key: d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d, encryption: sr25519
 Identities: 
 	public_key: 3efeca331d646d8a2986374bb3bb8d6e9e3cfcdd7c45c2b69104fab5d61d3f34, encryption: sr25519, path: //westend, available_networks: 
 		0180e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e
 	public_key: 46ebddef8cd9bb167dc30878d7113b7e168e6f0646beffd77d69d39bad76b47a, encryption: sr25519, path: , available_networks: 
+		0180037f5f3c8e67b314062025fc886fcd6238ea25a4a9b45dce8d246815c9ebe770
+		01806bfe24dca2a3be10f22212678ac13a6446ec764103c0f3471c71609eac384aae
 		018091b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3
 		0180b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe
-		0180c196f81260cf1686172b47a79cf002120735d7cb0eb1474e8adce56618456fff
 		0180e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e
-		01806bfe24dca2a3be10f22212678ac13a6446ec764103c0f3471c71609eac384aae
 	public_key: 64a31235d4bf9b37cfed3afa8aa60754675f9c4915430454d365c05112784d05, encryption: sr25519, path: //kusama, available_networks: 
 		0180b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe
 	public_key: 96129dcebc2e10f644e81fcf4269a663e521330084b1e447369087dec8017e04, encryption: sr25519, path: //rococo, available_networks: 
-		0180c196f81260cf1686172b47a79cf002120735d7cb0eb1474e8adce56618456fff
+		0180037f5f3c8e67b314062025fc886fcd6238ea25a4a9b45dce8d246815c9ebe770
 	public_key: c81ebbec0559a6acf184535eb19da51ed3ed8c4ac65323999482aaf9b6696e27, encryption: sr25519, path: //alice, available_networks: 
-		0180c196f81260cf1686172b47a79cf002120735d7cb0eb1474e8adce56618456fff
+		0180037f5f3c8e67b314062025fc886fcd6238ea25a4a9b45dce8d246815c9ebe770
 	public_key: d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d, encryption: sr25519, path: //Alice, available_networks: 
 		0180e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e
 	public_key: f606519cb8726753885cd4d0f518804a69a5e0badf36fee70feadd8044081730, encryption: sr25519, path: //polkadot, available_networks: 
@@ -1027,35 +1047,35 @@ Identities:
         let expected_print_before = r#"Database contents:
 Metadata:
 	kusama2030
+	polkadot30
 	rococo9103
 	westend9000
 	westend9010
-	polkadot30
 Network Specs:
+	0180037f5f3c8e67b314062025fc886fcd6238ea25a4a9b45dce8d246815c9ebe770: Rococo (rococo with sr25519)
 	018091b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3: Polkadot (polkadot with sr25519)
 	0180b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe: Kusama (kusama with sr25519)
-	0180c196f81260cf1686172b47a79cf002120735d7cb0eb1474e8adce56618456fff: Rococo (rococo with sr25519)
 	0180e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e: Westend (westend with sr25519)
 Verifiers:
+	037f5f3c8e67b314062025fc886fcd6238ea25a4a9b45dce8d246815c9ebe770: {"type":"general","details":{"hex":"","encryption":"none"}}
 	91b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3: {"type":"general","details":{"hex":"","encryption":"none"}}
 	b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe: {"type":"general","details":{"hex":"","encryption":"none"}}
-	c196f81260cf1686172b47a79cf002120735d7cb0eb1474e8adce56618456fff: {"type":"general","details":{"hex":"","encryption":"none"}}
 	e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e: {"type":"general","details":{"hex":"","encryption":"none"}}
 General Verifier: none
 Identities: 
 	public_key: 3efeca331d646d8a2986374bb3bb8d6e9e3cfcdd7c45c2b69104fab5d61d3f34, encryption: sr25519, path: //westend, available_networks: 
 		0180e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e
 	public_key: 46ebddef8cd9bb167dc30878d7113b7e168e6f0646beffd77d69d39bad76b47a, encryption: sr25519, path: , available_networks: 
+		0180037f5f3c8e67b314062025fc886fcd6238ea25a4a9b45dce8d246815c9ebe770
 		018091b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3
 		0180b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe
-		0180c196f81260cf1686172b47a79cf002120735d7cb0eb1474e8adce56618456fff
 		0180e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e
 	public_key: 64a31235d4bf9b37cfed3afa8aa60754675f9c4915430454d365c05112784d05, encryption: sr25519, path: //kusama, available_networks: 
 		0180b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe
 	public_key: 96129dcebc2e10f644e81fcf4269a663e521330084b1e447369087dec8017e04, encryption: sr25519, path: //rococo, available_networks: 
-		0180c196f81260cf1686172b47a79cf002120735d7cb0eb1474e8adce56618456fff
+		0180037f5f3c8e67b314062025fc886fcd6238ea25a4a9b45dce8d246815c9ebe770
 	public_key: c81ebbec0559a6acf184535eb19da51ed3ed8c4ac65323999482aaf9b6696e27, encryption: sr25519, path: //alice, available_networks: 
-		0180c196f81260cf1686172b47a79cf002120735d7cb0eb1474e8adce56618456fff
+		0180037f5f3c8e67b314062025fc886fcd6238ea25a4a9b45dce8d246815c9ebe770
 	public_key: d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d, encryption: sr25519, path: //Alice, available_networks: 
 		0180e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e
 	public_key: f606519cb8726753885cd4d0f518804a69a5e0badf36fee70feadd8044081730, encryption: sr25519, path: //polkadot, available_networks: 
@@ -1066,36 +1086,36 @@ Identities:
         let expected_print_after = r#"Database contents:
 Metadata:
 	kusama2030
+	polkadot30
 	rococo9103
 	westend9000
 	westend9010
 	westend9111
-	polkadot30
 Network Specs:
+	0180037f5f3c8e67b314062025fc886fcd6238ea25a4a9b45dce8d246815c9ebe770: Rococo (rococo with sr25519)
 	018091b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3: Polkadot (polkadot with sr25519)
 	0180b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe: Kusama (kusama with sr25519)
-	0180c196f81260cf1686172b47a79cf002120735d7cb0eb1474e8adce56618456fff: Rococo (rococo with sr25519)
 	0180e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e: Westend (westend with sr25519)
 Verifiers:
+	037f5f3c8e67b314062025fc886fcd6238ea25a4a9b45dce8d246815c9ebe770: {"type":"general","details":{"hex":"","encryption":"none"}}
 	91b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3: {"type":"general","details":{"hex":"","encryption":"none"}}
 	b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe: {"type":"general","details":{"hex":"","encryption":"none"}}
-	c196f81260cf1686172b47a79cf002120735d7cb0eb1474e8adce56618456fff: {"type":"general","details":{"hex":"","encryption":"none"}}
 	e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e: {"type":"general","details":{"hex":"","encryption":"none"}}
 General Verifier: none
 Identities: 
 	public_key: 3efeca331d646d8a2986374bb3bb8d6e9e3cfcdd7c45c2b69104fab5d61d3f34, encryption: sr25519, path: //westend, available_networks: 
 		0180e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e
 	public_key: 46ebddef8cd9bb167dc30878d7113b7e168e6f0646beffd77d69d39bad76b47a, encryption: sr25519, path: , available_networks: 
+		0180037f5f3c8e67b314062025fc886fcd6238ea25a4a9b45dce8d246815c9ebe770
 		018091b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3
 		0180b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe
-		0180c196f81260cf1686172b47a79cf002120735d7cb0eb1474e8adce56618456fff
 		0180e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e
 	public_key: 64a31235d4bf9b37cfed3afa8aa60754675f9c4915430454d365c05112784d05, encryption: sr25519, path: //kusama, available_networks: 
 		0180b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe
 	public_key: 96129dcebc2e10f644e81fcf4269a663e521330084b1e447369087dec8017e04, encryption: sr25519, path: //rococo, available_networks: 
-		0180c196f81260cf1686172b47a79cf002120735d7cb0eb1474e8adce56618456fff
+		0180037f5f3c8e67b314062025fc886fcd6238ea25a4a9b45dce8d246815c9ebe770
 	public_key: c81ebbec0559a6acf184535eb19da51ed3ed8c4ac65323999482aaf9b6696e27, encryption: sr25519, path: //alice, available_networks: 
-		0180c196f81260cf1686172b47a79cf002120735d7cb0eb1474e8adce56618456fff
+		0180037f5f3c8e67b314062025fc886fcd6238ea25a4a9b45dce8d246815c9ebe770
 	public_key: d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d, encryption: sr25519, path: //Alice, available_networks: 
 		0180e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e
 	public_key: f606519cb8726753885cd4d0f518804a69a5e0badf36fee70feadd8044081730, encryption: sr25519, path: //polkadot, available_networks: 
@@ -1156,7 +1176,7 @@ Identities:
         handle_stub(&checksum_str, dbname).unwrap();
         let line = fs::read_to_string("for_tests/types_info_Alice.txt").unwrap();
         let reply = produce_output(&line.trim(), dbname);
-        let reply_known_part = r#"{"verifier":[{"index":0,"indent":0,"type":"verifier","payload":{"hex":"d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d","encryption":"sr25519"}}],"warning":[{"index":1,"indent":0,"type":"warning","payload":"Received message is verified by a new general verifier. Currently no general verifier is set, and proceeding will update the general verifier to the received value. All previously acquired information associated with general verifier will be purged. Affected network specs entries: Polkadot, Kusama, Rococo, westend-ed25519, Westend; affected metadata entries: polkadot30, kusama2030, rococo9103, westend9000, westend9010. Types information is purged."},{"index":2,"indent":0,"type":"warning","payload":"Received types information is identical to the one that was in the database."}],"types_info":[{"index":3,"indent":0,"type":"types_hash","payload":"d091a5a24a97e18dfe298b167d8fd5a2add10098c8792cba21c39029a9ee0aeb"}],"action":{"type":"stub","payload":""#;
+        let reply_known_part = r#"{"verifier":[{"index":0,"indent":0,"type":"verifier","payload":{"hex":"d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d","encryption":"sr25519"}}],"warning":[{"index":1,"indent":0,"type":"warning","payload":"Received message is verified by a new general verifier. Currently no general verifier is set, and proceeding will update the general verifier to the received value. All previously acquired information associated with general verifier will be purged. Affected network specs entries: Kusama, Polkadot, Rococo, Westend, westend-ed25519; affected metadata entries: kusama2030, polkadot30, rococo9103, westend9000, westend9010. Types information is purged."},{"index":2,"indent":0,"type":"warning","payload":"Received types information is identical to the one that was in the database."}],"types_info":[{"index":3,"indent":0,"type":"types_hash","payload":"d091a5a24a97e18dfe298b167d8fd5a2add10098c8792cba21c39029a9ee0aeb"}],"action":{"type":"stub","payload":""#;
         assert!(reply.contains(reply_known_part), "Received: \n{}", reply);
         fs::remove_dir_all(dbname).unwrap();
     }
@@ -1170,29 +1190,29 @@ Identities:
         let expected_print_before = r#"Database contents:
 Metadata:
 	kusama2030
-	rococo9103
 	polkadot30
+	rococo9103
 Network Specs:
+	0180037f5f3c8e67b314062025fc886fcd6238ea25a4a9b45dce8d246815c9ebe770: Rococo (rococo with sr25519)
 	018091b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3: Polkadot (polkadot with sr25519)
 	0180b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe: Kusama (kusama with sr25519)
-	0180c196f81260cf1686172b47a79cf002120735d7cb0eb1474e8adce56618456fff: Rococo (rococo with sr25519)
 Verifiers:
+	037f5f3c8e67b314062025fc886fcd6238ea25a4a9b45dce8d246815c9ebe770: {"type":"general","details":{"hex":"d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d","encryption":"sr25519"}}
 	91b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3: {"type":"general","details":{"hex":"d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d","encryption":"sr25519"}}
 	b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe: {"type":"general","details":{"hex":"d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d","encryption":"sr25519"}}
-	c196f81260cf1686172b47a79cf002120735d7cb0eb1474e8adce56618456fff: {"type":"general","details":{"hex":"d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d","encryption":"sr25519"}}
 	e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e: {"type":"general","details":{"hex":"d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d","encryption":"sr25519"}}
 General Verifier: public key: d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d, encryption: sr25519
 Identities: 
 	public_key: 46ebddef8cd9bb167dc30878d7113b7e168e6f0646beffd77d69d39bad76b47a, encryption: sr25519, path: , available_networks: 
+		0180037f5f3c8e67b314062025fc886fcd6238ea25a4a9b45dce8d246815c9ebe770
 		018091b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3
 		0180b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe
-		0180c196f81260cf1686172b47a79cf002120735d7cb0eb1474e8adce56618456fff
 	public_key: 64a31235d4bf9b37cfed3afa8aa60754675f9c4915430454d365c05112784d05, encryption: sr25519, path: //kusama, available_networks: 
 		0180b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe
 	public_key: 96129dcebc2e10f644e81fcf4269a663e521330084b1e447369087dec8017e04, encryption: sr25519, path: //rococo, available_networks: 
-		0180c196f81260cf1686172b47a79cf002120735d7cb0eb1474e8adce56618456fff
+		0180037f5f3c8e67b314062025fc886fcd6238ea25a4a9b45dce8d246815c9ebe770
 	public_key: c81ebbec0559a6acf184535eb19da51ed3ed8c4ac65323999482aaf9b6696e27, encryption: sr25519, path: //alice, available_networks: 
-		0180c196f81260cf1686172b47a79cf002120735d7cb0eb1474e8adce56618456fff
+		0180037f5f3c8e67b314062025fc886fcd6238ea25a4a9b45dce8d246815c9ebe770
 	public_key: f606519cb8726753885cd4d0f518804a69a5e0badf36fee70feadd8044081730, encryption: sr25519, path: //polkadot, available_networks: 
 		018091b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3"#;
         assert!(print_before == expected_print_before, "Received:\n{}", print_before);
@@ -1223,40 +1243,40 @@ Identities:
         let print_before = print_db_content(&dbname);
         let expected_print_before = r#"Database contents:
 Metadata:
+	dock-pos-main-runtime34
 	kusama2030
+	polkadot30
 	rococo9103
 	westend9000
 	westend9010
-	polkadot30
-	dock-pos-main-runtime34
 Network Specs:
+	0180037f5f3c8e67b314062025fc886fcd6238ea25a4a9b45dce8d246815c9ebe770: Rococo (rococo with sr25519)
 	01806bfe24dca2a3be10f22212678ac13a6446ec764103c0f3471c71609eac384aae: dock-pos-main-runtime-sr25519 (dock-pos-main-runtime with sr25519)
 	018091b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3: Polkadot (polkadot with sr25519)
 	0180b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe: Kusama (kusama with sr25519)
-	0180c196f81260cf1686172b47a79cf002120735d7cb0eb1474e8adce56618456fff: Rococo (rococo with sr25519)
 	0180e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e: Westend (westend with sr25519)
 Verifiers:
+	037f5f3c8e67b314062025fc886fcd6238ea25a4a9b45dce8d246815c9ebe770: {"type":"general","details":{"hex":"d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d","encryption":"sr25519"}}
 	6bfe24dca2a3be10f22212678ac13a6446ec764103c0f3471c71609eac384aae: {"type":"custom","details":{"hex":"88dc3417d5058ec4b4503e0c12ea1a0a89be200fe98922423d4334014fa6b0ee","encryption":"ed25519"}}
 	91b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3: {"type":"general","details":{"hex":"d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d","encryption":"sr25519"}}
 	b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe: {"type":"general","details":{"hex":"d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d","encryption":"sr25519"}}
-	c196f81260cf1686172b47a79cf002120735d7cb0eb1474e8adce56618456fff: {"type":"general","details":{"hex":"d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d","encryption":"sr25519"}}
 	e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e: {"type":"general","details":{"hex":"d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d","encryption":"sr25519"}}
 General Verifier: public key: d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d, encryption: sr25519
 Identities: 
 	public_key: 3efeca331d646d8a2986374bb3bb8d6e9e3cfcdd7c45c2b69104fab5d61d3f34, encryption: sr25519, path: //westend, available_networks: 
 		0180e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e
 	public_key: 46ebddef8cd9bb167dc30878d7113b7e168e6f0646beffd77d69d39bad76b47a, encryption: sr25519, path: , available_networks: 
+		0180037f5f3c8e67b314062025fc886fcd6238ea25a4a9b45dce8d246815c9ebe770
+		01806bfe24dca2a3be10f22212678ac13a6446ec764103c0f3471c71609eac384aae
 		018091b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3
 		0180b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe
-		0180c196f81260cf1686172b47a79cf002120735d7cb0eb1474e8adce56618456fff
 		0180e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e
-		01806bfe24dca2a3be10f22212678ac13a6446ec764103c0f3471c71609eac384aae
 	public_key: 64a31235d4bf9b37cfed3afa8aa60754675f9c4915430454d365c05112784d05, encryption: sr25519, path: //kusama, available_networks: 
 		0180b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe
 	public_key: 96129dcebc2e10f644e81fcf4269a663e521330084b1e447369087dec8017e04, encryption: sr25519, path: //rococo, available_networks: 
-		0180c196f81260cf1686172b47a79cf002120735d7cb0eb1474e8adce56618456fff
+		0180037f5f3c8e67b314062025fc886fcd6238ea25a4a9b45dce8d246815c9ebe770
 	public_key: c81ebbec0559a6acf184535eb19da51ed3ed8c4ac65323999482aaf9b6696e27, encryption: sr25519, path: //alice, available_networks: 
-		0180c196f81260cf1686172b47a79cf002120735d7cb0eb1474e8adce56618456fff
+		0180037f5f3c8e67b314062025fc886fcd6238ea25a4a9b45dce8d246815c9ebe770
 	public_key: d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d, encryption: sr25519, path: //Alice, available_networks: 
 		0180e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e
 	public_key: f606519cb8726753885cd4d0f518804a69a5e0badf36fee70feadd8044081730, encryption: sr25519, path: //polkadot, available_networks: 
@@ -1269,36 +1289,36 @@ Identities:
         let expected_print_after = r#"Database contents:
 Metadata:
 	kusama2030
+	polkadot30
 	rococo9103
 	westend9000
 	westend9010
-	polkadot30
 Network Specs:
+	0180037f5f3c8e67b314062025fc886fcd6238ea25a4a9b45dce8d246815c9ebe770: Rococo (rococo with sr25519)
 	018091b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3: Polkadot (polkadot with sr25519)
 	0180b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe: Kusama (kusama with sr25519)
-	0180c196f81260cf1686172b47a79cf002120735d7cb0eb1474e8adce56618456fff: Rococo (rococo with sr25519)
 	0180e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e: Westend (westend with sr25519)
 Verifiers:
+	037f5f3c8e67b314062025fc886fcd6238ea25a4a9b45dce8d246815c9ebe770: {"type":"general","details":{"hex":"d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d","encryption":"sr25519"}}
 	6bfe24dca2a3be10f22212678ac13a6446ec764103c0f3471c71609eac384aae: network inactivated
 	91b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3: {"type":"general","details":{"hex":"d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d","encryption":"sr25519"}}
 	b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe: {"type":"general","details":{"hex":"d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d","encryption":"sr25519"}}
-	c196f81260cf1686172b47a79cf002120735d7cb0eb1474e8adce56618456fff: {"type":"general","details":{"hex":"d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d","encryption":"sr25519"}}
 	e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e: {"type":"general","details":{"hex":"d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d","encryption":"sr25519"}}
 General Verifier: public key: d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d, encryption: sr25519
 Identities: 
 	public_key: 3efeca331d646d8a2986374bb3bb8d6e9e3cfcdd7c45c2b69104fab5d61d3f34, encryption: sr25519, path: //westend, available_networks: 
 		0180e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e
 	public_key: 46ebddef8cd9bb167dc30878d7113b7e168e6f0646beffd77d69d39bad76b47a, encryption: sr25519, path: , available_networks: 
+		0180037f5f3c8e67b314062025fc886fcd6238ea25a4a9b45dce8d246815c9ebe770
 		018091b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3
 		0180b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe
-		0180c196f81260cf1686172b47a79cf002120735d7cb0eb1474e8adce56618456fff
 		0180e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e
 	public_key: 64a31235d4bf9b37cfed3afa8aa60754675f9c4915430454d365c05112784d05, encryption: sr25519, path: //kusama, available_networks: 
 		0180b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe
 	public_key: 96129dcebc2e10f644e81fcf4269a663e521330084b1e447369087dec8017e04, encryption: sr25519, path: //rococo, available_networks: 
-		0180c196f81260cf1686172b47a79cf002120735d7cb0eb1474e8adce56618456fff
+		0180037f5f3c8e67b314062025fc886fcd6238ea25a4a9b45dce8d246815c9ebe770
 	public_key: c81ebbec0559a6acf184535eb19da51ed3ed8c4ac65323999482aaf9b6696e27, encryption: sr25519, path: //alice, available_networks: 
-		0180c196f81260cf1686172b47a79cf002120735d7cb0eb1474e8adce56618456fff
+		0180037f5f3c8e67b314062025fc886fcd6238ea25a4a9b45dce8d246815c9ebe770
 	public_key: d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d, encryption: sr25519, path: //Alice, available_networks: 
 		0180e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e
 	public_key: f606519cb8726753885cd4d0f518804a69a5e0badf36fee70feadd8044081730, encryption: sr25519, path: //polkadot, available_networks: 

@@ -51,18 +51,23 @@ impl ContentLoadMeta {
     }
     /// Function to export load_metadata content into file
     pub fn write (&self, filename: &str) -> Result<(), ErrorActive> {
-        match std::fs::write(&filename, &self.0) {
+        match std::fs::write(&filename, &self.to_sign()) {
             Ok(_) => Ok(()),
             Err(e) => return Err(ErrorActive::Output(e)),
         }
     }
-    /// Function to put load_metadata information into storage as Vec<u8>
-    pub fn store (&self) -> Vec<u8> {
+    /// Function to prepare Vec<u8> to be signed from load_metadata information
+    pub fn to_sign (&self) -> Vec<u8> {
+        self.0.to_vec()
+    }
+    /// Function to prepare load_metadata information for transfer as Vec<u8>
+    pub fn to_transfer (&self) -> Vec<u8> {
         self.0.to_vec()
     }
 }
 
 /// Struct to process the content of qr codes with add_specs messages
+#[derive(parity_scale_codec_derive::Decode, parity_scale_codec_derive::Encode)]
 pub struct ContentAddSpecs (Vec<u8>);
 
 #[derive(parity_scale_codec_derive::Decode, parity_scale_codec_derive::Encode)]
@@ -92,19 +97,24 @@ impl ContentAddSpecs {
     }
     /// Function to export add_specs content into file
     pub fn write (&self, filename: &str) -> Result<(), ErrorActive> {
-        match std::fs::write(&filename, &self.0) {
+        match std::fs::write(&filename, &self.to_sign()) {
             Ok(_) => Ok(()),
             Err(e) => return Err(ErrorActive::Output(e)),
         }
     }
-    /// Function to put add_specs information into storage as Vec<u8>
-    pub fn store (&self) -> Vec<u8> {
+    /// Function to prepare Vec<u8> to be signed from add_specs information
+    pub fn to_sign (&self) -> Vec<u8> {
         self.0.to_vec()
+    }
+    /// Function to prepare add_specs information for transfer as encoded Vec<u8>
+    pub fn to_transfer (&self) -> Vec<u8> {
+        self.encode()
     }
 }
 
 
 /// Struct to process the content of qr codes with load_types messages
+#[derive(parity_scale_codec_derive::Decode, parity_scale_codec_derive::Encode)]
 pub struct ContentLoadTypes (Vec<u8>);
 
 #[derive(parity_scale_codec_derive::Decode, parity_scale_codec_derive::Encode)]
@@ -134,14 +144,22 @@ impl ContentLoadTypes {
     }
     /// Function to export load_types content into file
     pub fn write (&self, filename: &str) -> Result<(), ErrorActive> {
-        match std::fs::write(&filename, &self.0) {
+        match std::fs::write(&filename, &self.to_sign()) {
             Ok(_) => Ok(()),
             Err(e) => return Err(ErrorActive::Output(e)),
         }
     }
-    /// Function to put types information into storage as Vec<u8>
+    /// Function to put types information into database storage as Vec<u8>
     pub fn store (&self) -> Vec<u8> {
         self.0.to_vec()
+    }
+    /// Function to prepare Vec<u8> to be signed from load_types information
+    pub fn to_sign (&self) -> Vec<u8> {
+        self.0.to_vec()
+    }
+    /// Function to prepare load_types information for transfer as encoded Vec<u8>
+    pub fn to_transfer (&self) -> Vec<u8> {
+        self.encode()
     }
 }
 

@@ -12,9 +12,13 @@ pub enum Action {
     NavbarKeys,
     NavbarSettings,
     GoBack,
+    GoForward,
     SelectSeed,
     RightButton,
     Shield,
+    NewSeed,
+    RecoverSeed,
+    NetworkSelector,
     Nothing,
 }
 
@@ -28,9 +32,13 @@ impl Action {
             "NavbarKeys" => Action::NavbarKeys,
             "NavbarSettings" => Action::NavbarSettings,
             "GoBack" => Action::GoBack,
+            "GoForward" => Action::GoForward,
             "SelectSeed" => Action::SelectSeed,
             "RightButton" => Action::RightButton,
             "Shield" => Action::Shield,
+            "NewSeed" => Action::NewSeed,
+            "RecoverSeed" => Action::RecoverSeed,
+            "NetworkSelector" => Action::NetworkSelector,
             _ => Action::Nothing,
         }
     }
