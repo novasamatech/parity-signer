@@ -1,8 +1,11 @@
 use sled::{Db, Tree, Batch, open};
 use anyhow;
-use constants::{ADDRTREE, DANGER, GENERALVERIFIER, METATREE, SETTREE, SPECSTREE, TYPES, VERIFIERS};
-use definitions::{danger::DangerRecord, error::{DatabaseSigner, EntryDecodingSigner, ErrorSigner, ErrorSource, NotFoundSigner, Signer}, keyring::{AddressKey, MetaKey, MetaKeyPrefix, NetworkSpecsKey, VerifierKey}, metadata::MetaValues, network_specs::{CurrentVerifier, NetworkSpecs, ValidCurrentVerifier, Verifier}, types::TypeEntry, users::{AddressDetails}};
+use constants::{ADDRTREE, DANGER, GENERALVERIFIER, HALFSIZE, METATREE, SETTREE, SPECSTREE, TYPES, VERIFIERS};
+use definitions::{danger::DangerRecord, error::{DatabaseSigner, EntryDecodingSigner, ErrorSigner, ErrorSource, NotFoundSigner, Signer}, helpers::multisigner_to_public, keyring::{AddressKey, MetaKey, MetaKeyPrefix, NetworkSpecsKey, VerifierKey}, metadata::MetaValues, network_specs::{CurrentVerifier, NetworkSpecs, ValidCurrentVerifier, Verifier}, types::TypeEntry, users::{AddressDetails}};
 use parity_scale_codec::{Decode, Encode};
+use sp_runtime::MultiSigner;
+
+use plot_icon::png_data_from_vec;
 
 /// Wrapper for `open`
 pub fn open_db <T: ErrorSource> (database_name: &str) -> Result<Db, T::Error> {
@@ -236,6 +239,15 @@ fn get_danger_status(database_name: &str) -> Result<bool, ErrorSigner> {
 pub fn display_danger_status(database_name: &str) -> anyhow::Result<bool> {
     get_danger_status(database_name).map_err(|e| e.anyhow())
 }
+
+/// Helper function to print identicon from the multisigner
+pub fn make_identicon_from_multisigner(multisigner: &MultiSigner) -> Result<Vec<u8>, ErrorSigner> {
+    match png_data_from_vec(&multisigner_to_public(&multisigner), HALFSIZE) {
+        Ok(a) => Ok(a),
+        Err(e) => return Err(ErrorSigner::PngGeneration(e)),
+    }
+}
+
 
 #[cfg(test)]
 mod tests {

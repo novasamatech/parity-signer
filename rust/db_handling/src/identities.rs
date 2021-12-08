@@ -4,21 +4,18 @@
 //! Zeroization is mostly delegated to os
 
 use sled::{Db, Batch};
-use std::collections::HashMap;
 use sp_core::{Pair, ed25519, sr25519, ecdsa};
 use parity_scale_codec::Encode;
 use regex::Regex;
-use constants::{ADDRTREE, HALFSIZE, MAX_WORDS_DISPLAY, SPECSTREE};
+use constants::{ADDRTREE, MAX_WORDS_DISPLAY, SPECSTREE};
 use defaults::get_default_chainspecs;
-use definitions::{crypto::Encryption, error::{Active, AddressGeneration, AddressGenerationCommon, ErrorActive, ErrorSigner, ErrorSource, ExtraAddressGenerationSigner, NotFoundSigner, NotHexSigner, Signer, SpecsKeySource}, helpers::{get_multisigner, multisigner_to_public, unhex}, history::{Event, IdentityHistory}, keyring::{NetworkSpecsKey, AddressKey, print_multisigner_as_base58}, network_specs::NetworkSpecs, print::{export_plain_vector, export_complex_vector, export_complex_vector_with_error}, users::{AddressDetails, SeedObject}};
+use definitions::{crypto::Encryption, error::{Active, AddressGeneration, AddressGenerationCommon, ErrorActive, ErrorSigner, ErrorSource, ExtraAddressGenerationSigner, NotFoundSigner, NotHexSigner, Signer, SpecsKeySource}, helpers::{get_multisigner, multisigner_to_public, unhex}, history::{Event, IdentityHistory}, keyring::{NetworkSpecsKey, AddressKey, print_multisigner_as_base58}, network_specs::NetworkSpecs, print::{export_plain_vector, export_complex_vector_with_error}, users::{AddressDetails, SeedObject}};
 use bip39::{Language, Mnemonic, MnemonicType};
 use zeroize::Zeroize;
 use lazy_static::lazy_static;
 use anyhow;
 use qrcode_static::png_qr_from_string;
 use sp_runtime::MultiSigner;
-
-use plot_icon::png_data_from_vec;
 
 use crate::db_transactions::TrDbCold;
 use crate::helpers::{open_db, open_tree, make_batch_clear_tree, upd_id_batch, get_network_specs, get_address_details};
@@ -35,7 +32,7 @@ lazy_static! {
 
 /// Get all identities from database.
 /// Function gets used only on the Signer side.
-fn get_all_addresses (database_name: &str) -> Result<Vec<(MultiSigner, AddressDetails)>, ErrorSigner> {
+pub (crate) fn get_all_addresses (database_name: &str) -> Result<Vec<(MultiSigner, AddressDetails)>, ErrorSigner> {
     let database = open_db::<Signer>(database_name)?;
     let identities = open_tree::<Signer>(&database, ADDRTREE)?;
     let mut out: Vec<(MultiSigner, AddressDetails)> = Vec::new();
@@ -49,42 +46,9 @@ fn get_all_addresses (database_name: &str) -> Result<Vec<(MultiSigner, AddressDe
     Ok(out)
 }
 
-/// Function to print all seed names with identicons
-/// Gets used only on the Signer side, interacts with the user interface.
-pub fn print_all_seed_names_with_identicons (database_name: &str) -> Result<String, ErrorSigner> {
-    let mut data_set: HashMap<String, Option<MultiSigner>> = HashMap::new();
-    for (multisigner, address_details) in get_all_addresses(database_name)?.into_iter() {
-        if (address_details.path == "")&&(!address_details.has_pwd) {
-            match data_set.get(&address_details.seed_name) {
-                Some(Some(_)) => (),
-                _ => {
-                    data_set.insert(address_details.seed_name.to_string(), Some(multisigner));
-                },
-            }
-        }
-        else {
-            if let None = data_set.get(&address_details.seed_name) {data_set.insert(address_details.seed_name.to_string(), None);}
-        }
-    }
-    let mut print_set: Vec<String> = Vec::new();
-    for (seed_name, possible_multisigner) in data_set.iter() {
-        match possible_multisigner {
-            Some(multisigner) => {
-                match png_data_from_vec(&multisigner_to_public(&multisigner), HALFSIZE) {
-                    Ok(a) => print_set.push(format!("\"identicon\":\"{}\",\"seed_name\":\"{}\"", hex::encode(a), seed_name)),
-                    Err(e) => return Err(ErrorSigner::PngGeneration(e)),
-                }
-            },
-            None => print_set.push(format!("\"identicon\":\"\",\"seed_name\":\"{}\"", seed_name)),
-        };
-        
-    }
-    Ok(export_complex_vector(&print_set, |a| a.to_string()))
-}
-
 /// Filter identities by given seed_name.
 /// Function gets used only on the Signer side.
-fn get_addresses_by_seed_name (database_name: &str, seed_name: &str) -> Result<Vec<(MultiSigner, AddressDetails)>, ErrorSigner> {
+pub (crate) fn get_addresses_by_seed_name (database_name: &str, seed_name: &str) -> Result<Vec<(MultiSigner, AddressDetails)>, ErrorSigner> {
     Ok(get_all_addresses(database_name)?.into_iter().filter(|(_, address_details)| address_details.seed_name == seed_name).collect())
 }
 
@@ -529,7 +493,7 @@ mod tests {
     use definitions::{crypto::Encryption, keyring::{AddressKey, NetworkSpecsKey}, network_specs::Verifier};
     use std::fs;
     use sled::{Db, Tree, open, Batch};
-    use crate::{cold_default::{populate_cold, populate_cold_no_metadata, signer_init_with_cert, reset_cold_database_no_addresses}, helpers::{open_db, open_tree, upd_id_batch}, db_transactions::TrDbCold, manage_history::print_history};
+    use crate::{cold_default::{populate_cold_no_metadata, signer_init_with_cert, reset_cold_database_no_addresses}, helpers::{open_db, open_tree, upd_id_batch}, db_transactions::TrDbCold, manage_history::print_history};
 
     static SEED: &str = "bottom drive obey lake curtain smoke basket hold race lonely fit walk";
 
@@ -813,15 +777,6 @@ mod tests {
         let out_expected = r#"["senior","sense","sentence"]"#;
         assert!(out == out_expected, "Found different word set:\n{:?}", out);
     }
-    
-    #[test]
-    fn print_identicons() {
-        let dbname = "for_tests/print_identicons";
-        populate_cold (dbname, Verifier(None)).unwrap();
-        let horrible_print = print_all_seed_names_with_identicons(dbname).unwrap();
-        let expected_print = r#"[{"identicon":"89504e470d0a1a0a0000000d4948445200000065000000650806000000547c2dcf0000045949444154789cedda2d72544114c5f1b08458140b8806051852b8b00236814150280a11934db002e2a8c40414e82c00159b25843e459daacccbcd9df7bafb7eccbcfe8bf3ec54fd5cdf797277777730cad54ea0dcdede76fb918787874fca277529517a226c2b23520a144f846d65400a45c984312d1227042533c6b4081c57945dc298e689e382b2cb18d33c704c51f609639a258e19ca3e83302b1813144f900f5fafca6e76f6e975599f2c60baa2786220098479c2a09e38dd503281b05d85e982e20d8232a2a01e30cd281120282b0a6a8569428902419951500b4c354a2408ca8e826a61aa50a2419806130dc26a6016a3640161124c1610b61466118a05c8c9fbd3b29b9d7ffb58d6a7df973765377bf1e669d9be2d810945914098078c04c27ac398a07882304b180d8445c1cc42e90d82d68882e6c06c45b100416b4541db60068a524a142b10b46614a4c184a1200dc6128469309620a80ac51a8449301e204c82b106618fc134a37cb8fa5176b3b3d76fcbfa7474fcaaec66d7173fcbfad4f2a2b008a5058479c04820cc034602612d30d5281a08b384d14098258c06c2e6c0cc4299038206ca5559bd3928680a33502a7343990b8206ca5559bdb928e83ecc40a92c250ad2602c4198066309c234982520a81b0a92603c409804e301c22498a5204844a901e9d1cba3e3b29bfdbabe28eb5334eafd08138a2281300f18098445c084a36820cc12460361de3003253b8a37081a28728019284a034568a004a4c15882300d26020485a32009c6038449305120a80bcabb9387e7dcefe77ee7dce87a9fb39b512410b606180984d5c234a168206c9f613410560333501a1a28091b28091b28094b898234987d06611a4c0d086a464112cc1a409804530b82baa0b47673f9f760dad337cf0ebc8a7e5198168e2281300f18098445c184a26820cc12460361113003654b034568d528c81b66a03c0c20e5f3ff468f06cac356878234184b10a6c17883a014284882f10061124c04087a80826a604e4e3f97ddecfce397b23e45a3f6fa2f354150138a04c23c602410e6012381b0a5305d5034106609a381304b180d842d8119281d7243417361064a3f94fb2068a054e68a82e6c00c943e285310548d8234184b10a6c15882300d660e089a8d825a603c409804e301c224981610d48cd2daf3e3a3b29bfdb9b82eeb53e4397b310ab286914098078c04c2ac611e034161281a08b384d14098254c350ab28259338a0682068a525a146401b356946d2068160aea0db34694392068360af284b104611a4c14080a4541128c070893607a832033146401d352f48bc29c9680a0c528280b8c04c2b2c02c05415528281a460361d1303520a81a0545c26447a905414d28280a26334a0b086a4641113059515a41501714e40d9311a50708ea868232c1ec2a08ea8ac23c7124184f909e18cc040579c244650182cc50d03ec35881205314b64f389618cc0585ed328e0706734561bb84e389c1425058669c080c168ac232e14462b01428d33c9132204c4b8932ad27524684693b81b2b6fe01d569a07324f485730000000049454e44ae426082","seed_name":"Alice"}]"#;
-        assert!(horrible_print == expected_print, "/nReceived: /n{}", horrible_print);
-        fs::remove_dir_all(dbname).unwrap();
-    }
+
 }
 

@@ -208,7 +208,7 @@ impl State {
                 Screen::Scan => "".to_string(),
                 //Screen::Transaction => "",
                 Screen::SeedSelector => {
-                    let cards = match db_handling::identities::print_all_seed_names_with_identicons(&dbname) {
+                    let cards = match db_handling::interface_signer::print_all_seed_names_with_identicons(&dbname) {
                         Ok(a) => a,
                         Err(e) => {
                             new_navstate.alert = Alert::Error;

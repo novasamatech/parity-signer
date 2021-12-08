@@ -8,6 +8,7 @@ pub mod helpers;
 mod hot_default;
     use hot_default::reset_hot_database;
 pub mod identities;
+pub mod interface_signer;
 pub mod manage_history;
 pub mod metadata;
 pub mod network_details;
