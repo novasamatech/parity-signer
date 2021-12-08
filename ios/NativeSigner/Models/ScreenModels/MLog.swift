@@ -8,5 +8,5 @@
 import Foundation
 
 struct MLog: Decodable {
-    var log: [History]
+    var log: [History] = []
 }

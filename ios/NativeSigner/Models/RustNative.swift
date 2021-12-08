@@ -96,7 +96,7 @@ class SignerDataModel: ObservableObject {
     }
     
     /**
-     * refresh everything except for navigation and seedNames
+     * refresh everything except for seedNames
      * should be called as often as reasonably possible - on flow interrupts, changes, events, etc.
      */
     func totalRefresh() {

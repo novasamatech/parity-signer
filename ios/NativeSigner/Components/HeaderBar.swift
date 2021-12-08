@@ -12,8 +12,8 @@ struct HeaderBar: View {
     var line2: String
     var body: some View {
         VStack (alignment: .leading) {
-            Text(line1).foregroundColor(Color("textMainColor"))
-            Text(line2).foregroundColor(Color("textFadedColor"))
+            Text(line1).foregroundColor(Color("Text600"))
+            Text(line2).foregroundColor(Color("Text400"))
             Divider()
         }.padding(.horizontal).font(.caption)
     }

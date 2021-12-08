@@ -9,27 +9,26 @@ import SwiftUI
 
 struct HistoryScreen: View {
     @EnvironmentObject var data: SignerDataModel
+    var content: MLog
     var body: some View {
         Text("History")
-        /*
         ScrollView {
             LazyVStack {
-                ForEach(data.history, id: \.order) {history in
+                ForEach(content.log, id: \.order) {history in
                     VStack (alignment: .leading){
                         ForEach(history.events, id: \.self) {event in
                             Button(action: {
-                                data.selectedRecord = history
+                                
                             }) {
                                 HistoryCard(event: event, timestamp: history.timestamp.padding(toLength: 16, withPad: " ", startingAt: 0))
-                                    .foregroundColor(/*@START_MENU_TOKEN@*/Color("textMainColor")/*@END_MENU_TOKEN@*/)
+                                    .foregroundColor(Color("Text400"))
                                     .padding(.horizontal, 8)
-                            }
+                            }.disabled(true)
                         }
                     }
                 }
             }
         }
-         */
     }
 }
 

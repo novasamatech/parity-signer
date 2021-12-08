@@ -13,7 +13,7 @@ struct SeedBackup: View {
     var body: some View {
         ZStack{
             VStack {
-                SeedCardForManager(seedName: data.selectedSeed)
+                //SeedCardForManager(seedName: data.selectedSeed)
                 Text("Backup your seed phrase!").font(.headline)
                 Text("Keep your seed phrase in safe place; anyone could restore accounts using this seed phrase; there is no other way to restore accounts.").font(.footnote)
                 ZStack {

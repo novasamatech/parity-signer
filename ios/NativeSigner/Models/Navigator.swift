@@ -11,41 +11,103 @@
 import Foundation
 
 struct ActionResult: Decodable {
-    var screen: SignerScreen
-    var screenLabel: String
-    var back: Bool
-    var footer: Bool
-    var footerButton: String
-    var rightButton: String
-    var screenNameType: String
-    var modal: SignerModal
-    var alert: SignerAlert
+    var screen: SignerScreen = .Log(MLog())
+    var screenLabel: String = ""
+    var back: Bool = false
+    var footer: Bool = true
+    var footerButton: String = ""
+    var rightButton: String = ""
+    var screenNameType: String = ""
+    var modal: SignerModal = .Empty
+    var alert: SignerAlert = .Empty
+    
+    enum CodingKeys: String, CodingKey {
+        case screen
+        case screenLabel
+        case back
+        case footer
+        case footerButton
+        case rightButton
+        case screenNameType
+        case modal
+        case alert
+        case screenData
+        case modalData
+        case alertData
+    }
+    
+    init() {}
     
     //TODO: maybe replace explicits with rust call
-    init() {
-        screen = .Log
-        screenLabel = "Log"
-        back = false
-        footer = true
-        footerButton = "Log"
-        rightButton = ""
-        screenNameType = "h1"
-        modal = .Empty
-        alert = .Empty
+    init(from decoder: Decoder) throws {
+        let values = try decoder.container(keyedBy: CodingKeys.self)
+        screenLabel = try values.decode(String.self, forKey: .screenLabel)
+        back = try values.decode(Bool.self, forKey: .back)
+        footer = try values.decode(Bool.self, forKey: .footer)
+        footerButton = try values.decode(String.self, forKey: .footerButton)
+        rightButton = try values.decode(String.self, forKey: .rightButton)
+        screenNameType = try values.decode(String.self, forKey: .screenNameType)
+        alert = try values.decode(SignerAlert.self, forKey: .alert)
+        let modalType = try values.decode(String.self, forKey: .modal)
+        let screenType = try values.decode(String.self, forKey: .screen)
+        
+        switch screenType {
+        case "Scan":
+            screen = .Scan
+        case "Keys":
+            screen = .Keys
+        case "Settings":
+            screen = .Settings
+        case "Log":
+            screen = .Log(try values.decode(MLog.self, forKey: .screenData))
+        case "LogDetails":
+            screen = .LogDetails
+        case "Transaction":
+            screen = .Transaction
+        case "SeedSelector":
+            screen = .SeedSelector(try values.decode(MSeeds.self, forKey: .screenData))
+        case "KeyDetails":
+            screen = .KeyDetails
+        case "Backup":
+            screen = .Backup
+        case "NewSeed":
+            screen = .NewSeed
+        case "RecoverSeedName":
+            screen = .RecoverSeedName
+        case "RecoverSeedPhrase":
+            screen = .RecoverSeedPhrase
+        case "DeriveKey":
+            screen = .DeriveKey
+        case "Verifier":
+            screen = .Verifier
+        case "ManageNetwork":
+            screen = .ManageNetwork
+        default:
+            screen = .Log(MLog())
+        }
+        
+        switch modalType {
+        case "Empty":
+            modal = .Empty
+        case "NewSeedMenu":
+            modal = .NewSeedMenu
+        default:
+            modal = .Empty
+        }
     }
 }
 
 /**
  * Struct to store main navstate of the screen
  */
-enum SignerScreen: String, Decodable {
+enum SignerScreen: Decodable {
     case Scan
     case Keys
     case Settings
-    case Log
+    case Log(MLog)
     case LogDetails
     case Transaction
-    case SeedSelector
+    case SeedSelector(MSeeds)
     case KeyDetails
     case Backup
     case NewSeed
@@ -72,20 +134,13 @@ enum TransactionState: Equatable {
  */
 enum SignerModal: String, Equatable, Decodable {
     case Empty
-    case Error
-    case newKey
-    case showKey
-    case seedBackup
-    case keyDeleteConfirm
-    case seedSelector
-    case networkManager
-    case networkDetails
     case NewSeedMenu
 }
 
 enum SignerAlert: String, Equatable, Decodable {
     case Empty
     case Error
+    case Shield
     case keyDeleteConfirm
 }
 

@@ -10,7 +10,10 @@ import SwiftUI
 struct KeySymbol: View {
     var body: some View {
         VStack{
+            Text("account").font(Font.custom("Web3-Regular", size: 24))
+            /*
             Image(systemName: "circle.hexagongrid.fill").imageScale(.medium)
+             */
         }
     }
 }
@@ -31,40 +34,54 @@ struct Footer: View {
                 data.pushButton(buttonID: ButtonID.NavbarLog)
             }) {
                 VStack(alignment: .center) {
-                    Image(systemName: "rectangle.grid.1x2.fill").imageScale(.medium).foregroundColor(data.actionResult.screen == .Log ? Color("buttonActive") : Color("buttonPassiveImage"))
-                    Text("Log").foregroundColor(data.actionResult.screen == .Log ? Color("buttonActive") : Color("buttonPassiveText"))
+                    Image(systemName: "rectangle.grid.1x2.fill").imageScale(.medium)
+                    Text("Log")
                 }
+                .foregroundColor(buttonColor(active: data.actionResult.footerButton == "Log"))
             }
             Spacer()
             Button(action: {
                 data.pushButton(buttonID: ButtonID.NavbarScan)
             }) {
                 VStack {
-                    Image(systemName: "viewfinder").imageScale(.medium).foregroundColor(data.actionResult.screen == .Scan ? Color("buttonActive") : Color("buttonPassiveImage"))
-                    Text("Scanner").foregroundColor(data.actionResult.screen == .Scan ? Color("buttonActive") : Color("buttonPassiveText"))
+                    Image(systemName: "viewfinder").imageScale(.medium)
+                    Text("Scanner")
                 }
+                .foregroundColor(buttonColor(active: data.actionResult.footerButton == "Scan"))
             }
             Spacer()
             Button(action: {
                 data.pushButton(buttonID: ButtonID.NavbarKeys)
             }) {
                 VStack{
-                    KeySymbol().foregroundColor(data.actionResult.screen == .Keys ? Color("buttonActive") : Color("buttonPassiveImage"))
-                    Text("Keys").foregroundColor(data.actionResult.screen == .Keys ? Color("buttonActive") : Color("buttonPassiveText"))
+                    KeySymbol()
+                    Text("Keys")
                 }
+                .foregroundColor(buttonColor(active: data.actionResult.footerButton == "Keys"))
             }
             Spacer()
             Button(action: {
                 data.pushButton(buttonID: ButtonID.NavbarSettings)
             }) {
                 VStack {
-                    WrenchSymbol().foregroundColor(data.actionResult.screen == .Settings ? Color("buttonActive") : Color("buttonPassiveImage"))
-                    Text("Settings").foregroundColor(data.actionResult.screen == .Settings ? Color("buttonActive") : Color("buttonPassiveText"))
+                    WrenchSymbol()
+                    Text("Settings")
                 }
+                .foregroundColor(buttonColor(active: data.actionResult.footerButton == "Settings"))
             }
         }.font(.footnote)
     }
 }
+
+func buttonColor(active: Bool) -> Color {
+    return active ? Color("Text600") : Color("Text300")
+}
+
+/*
+func buttonLabelColor(active: Bool) -> Color {
+    return active ? Color("Text600") : Color("Text300")
+}
+ */
 
 /*
  struct Footer_Previews: PreviewProvider {

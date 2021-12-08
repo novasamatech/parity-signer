@@ -24,7 +24,7 @@ struct NewAddressScreen: View {
         ZStack {
             ScrollView {
                 Text("FROM").font(.footnote).foregroundColor(Color("textMainColor"))
-                SeedCardForManager(seedName: data.selectedSeed)
+                //SeedCardForManager(seedName: data.selectedSeed)
                 //NetworkCard(network: data.selectedNetwork).padding(.bottom, 10)
                 if !data.lastError.isEmpty {
                     Text(data.lastError)

@@ -115,7 +115,7 @@ extension SignerDataModel {
             self.refreshSeeds()
             self.selectSeed(seedName: seedName)
             self.seedBackup = finalSeedPhraseString
-            self.keyManagerModal = .seedBackup
+            //TODO
         }
     }
     

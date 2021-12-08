@@ -11,7 +11,6 @@ struct TransactionScreen: View {
     @EnvironmentObject var data: SignerDataModel
     var body: some View {
         CameraView()
-        Text("Camera")
     }
 }
 

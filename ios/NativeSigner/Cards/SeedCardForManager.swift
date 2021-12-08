@@ -9,25 +9,18 @@ import SwiftUI
 
 struct SeedCardForManager: View {
     @EnvironmentObject var data: SignerDataModel
-    var seedName: String
+    var seedNameCard: SeedNameCard
     var body: some View {
         ZStack {
             RoundedRectangle(cornerRadius: 4).foregroundColor(Color("backgroundCard")).frame(height: 44)
             HStack {
-                /*
-                Image(uiImage: data.getRootIdenticon(seedName: seedName))
+                Image(uiImage: UIImage(data: Data(fromHexEncodedString: seedNameCard.identicon) ?? Data()) ?? UIImage())
                     .resizable(resizingMode: .stretch)
                     .frame(width: 28, height: 28)
-                */
-                if seedName == "" {
-                    Text("Select seed")
-                        .foregroundColor(Color("textMainColor"))
-                        .font(.title2)
-                } else {
-                    VStack (alignment: .leading) {
-                        Text(seedName)
-                            .foregroundColor(Color("textMainColor"))
-                            .font(.callout)
+                VStack (alignment: .leading) {
+                    Text(seedNameCard.seedName)
+                            .foregroundColor(Color("Text600"))
+                            .font(FBase(style: .subtitle1))
                     }
                 }
                 Spacer()
@@ -36,7 +29,6 @@ struct SeedCardForManager: View {
             .background(Color("backgroundCard"))
         }
     }
-}
 
 /*
  struct AddressCardSelector_Previews: PreviewProvider {

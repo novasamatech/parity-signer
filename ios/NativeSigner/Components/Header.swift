@@ -15,7 +15,7 @@ struct Header: View {
                 Button(action: {
                     data.pushButton(buttonID: .GoBack)
                 }) {
-                    Image(systemName: "chevron.left").imageScale(.large)
+                    Image(systemName: "chevron.left").imageScale(.large).foregroundColor(Color("Text500"))
                 }
             }
             /*if data.actionResult.back {
@@ -26,7 +26,8 @@ struct Header: View {
              }
              } else {*/
             Spacer()
-            Text(data.actionResult.screenLabel)
+            Text(data.actionResult.screenLabel).foregroundColor(Color("Text600"))
+                .font(data.actionResult.screenNameType == "h1" ? FBase(style: .h1) : FBase(style: .h4))
             Spacer()
             /*
              if false {
@@ -41,9 +42,9 @@ struct Header: View {
             }) {
                 switch(data.actionResult.rightButton) {
                 case "NewSeed":
-                    Image(systemName: "plus.circle").imageScale(.large)
+                    Image(systemName: "plus.circle").imageScale(.large).foregroundColor(Color("Action400"))
                 case "Backup":
-                    Image(systemName: "ellipsis").imageScale(.large)
+                    Image(systemName: "ellipsis").imageScale(.large).foregroundColor(Color("Action400"))
                 default:
                     EmptyView()
                 }

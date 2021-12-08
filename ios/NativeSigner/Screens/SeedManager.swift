@@ -9,6 +9,7 @@ import SwiftUI
 
 struct SeedManager: View {
     @EnvironmentObject var data: SignerDataModel
+    var content: MSeeds
     @State var showBackup = false
     @State var deleteConfirm = false
     @State var seedPhrase = ""
@@ -18,12 +19,12 @@ struct SeedManager: View {
             VStack {
                 ScrollView {
                     LazyVStack {
-                        ForEach(data.seedNames, id: \.self) {seed in
+                        ForEach(content.seedNameCards, id: \.seedName) {seedNameCard in
                             HStack {
                                 Button(action: {
-                                    data.pushButton(buttonID: .SelectSeed, details: seed)
+                                    data.pushButton(buttonID: .SelectSeed, details: seedNameCard.seedName)
                                 }) {
-                                    SeedCardForManager(seedName: seed)
+                                    SeedCardForManager(seedNameCard: seedNameCard)
                                     Spacer()
                                 }
                                 .padding(.horizontal)

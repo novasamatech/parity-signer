@@ -18,14 +18,14 @@ struct ScreenSelector: View {
             KeyManager()
         case .Settings :
             SettingsScreen()
-        case .Log :
-            HistoryScreen()
+        case .Log(let value) :
+            HistoryScreen(content: value)
         case .LogDetails:
             EventDetails()
         case .Transaction:
             TransactionPreview()
-        case .SeedSelector:
-            SeedManager()
+        case .SeedSelector(let value):
+            SeedManager(content: value)
         case .KeyDetails:
             ExportAddress()
         case .Backup:
@@ -33,9 +33,9 @@ struct ScreenSelector: View {
         case .NewSeed:
             NewSeedScreen()
         case .RecoverSeedName:
-            NewSeedScreen()
+            RecoverSeedName()
         case .RecoverSeedPhrase:
-            NewSeedScreen()
+            RecoverSeedName()
         case .DeriveKey:
             NewAddressScreen()
         case .Verifier:

@@ -13,7 +13,16 @@ struct NewSeedMenu: View {
         VStack {
             Spacer()
             HeaderBar(line1: "ADD SEED", line2: "Select seed addition method" )
-            Text("Buttonees")
+            Button(action: {
+                data.pushButton(buttonID: .NewSeed)
+            }) {
+                Text("New seed")
+            }
+            Button(action: {
+                data.pushButton(buttonID: .RecoverSeed)
+            }) {
+                Text("Recover seed")
+            }
         }
     }
 }

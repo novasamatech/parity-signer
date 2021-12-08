@@ -34,7 +34,7 @@ struct MainScreenContainer: View {
                 Footer()
                     .padding(.horizontal)
                     .padding(.vertical, 8)
-                    .background(Color("backgroundUtility"))
+                    .background(Color("Bg000"))
             }
         } else {
             LandingView().background(/*@START_MENU_TOKEN@*//*@PLACEHOLDER=View@*/Color("backgroundColor")/*@END_MENU_TOKEN@*/)

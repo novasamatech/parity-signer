@@ -18,7 +18,7 @@ struct NavbarShield: View {
             }) {
                 Image(systemName: "shield.slash")
                     .imageScale(.large)
-                    .foregroundColor(Color("dangerColor"))
+                    .foregroundColor(Color("SignalDanger"))
             }
             .alert(isPresented: $alert, content: {
                 Alert(
@@ -34,7 +34,7 @@ struct NavbarShield: View {
                 }) {
                     Image(systemName: "exclamationmark.shield")
                         .imageScale(.large)
-                        .foregroundColor(Color("dangerColor"))
+                        .foregroundColor(Color("SignalWarning"))
                 }
                 .alert(isPresented: $alert, content: {
                     Alert(
@@ -50,9 +50,9 @@ struct NavbarShield: View {
                 Button(action: {
                     alert = true
                 }) {
-                    Image(systemName: "shield")
+                    Image(systemName: "lock.shield.fill")
                         .imageScale(.large)
-                        .foregroundColor(Color("AccentColor"))
+                        .foregroundColor(Color("Crypto400"))
                 }
                 .alert(isPresented: $alert, content: {
                     Alert(

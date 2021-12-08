@@ -7,6 +7,10 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		2D48F35127609CDE004B27BE /* HistoryCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D48F35027609CDE004B27BE /* HistoryCard.swift */; };
+		2D48F3532760A2D8004B27BE /* Fonts.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D48F3522760A2D8004B27BE /* Fonts.swift */; };
+		2D48F3552760AF9D004B27BE /* MSeeds.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D48F3542760AF9D004B27BE /* MSeeds.swift */; };
+		2D48F3572760BBEC004B27BE /* RecoverSeedName.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D48F3562760BBEC004B27BE /* RecoverSeedName.swift */; };
 		2D72B4F626EF3BC50081E879 /* Navigator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D72B4F526EF3BC50081E879 /* Navigator.swift */; };
 		2D72B4FA26EF7D1C0081E879 /* Seeds.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D72B4F926EF7D1C0081E879 /* Seeds.swift */; };
 		2D72D52A2732B8A7004BA7C9 /* Database in Resources */ = {isa = PBXBuildFile; fileRef = 2D72D5292732B8A7004BA7C9 /* Database */; };
@@ -29,7 +33,6 @@
 		2DA5F8352756656E00D8DD29 /* Transaction.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2DA5F8342756656E00D8DD29 /* Transaction.swift */; };
 		2DA5F8372756657600D8DD29 /* TransactionTypes.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2DA5F8362756657600D8DD29 /* TransactionTypes.swift */; };
 		2DA5F8392756666C00D8DD29 /* EventDetails.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2DA5F8382756666C00D8DD29 /* EventDetails.swift */; };
-		2DA5F83B275666A200D8DD29 /* HistoryCardExtended.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2DA5F83A275666A200D8DD29 /* HistoryCardExtended.swift */; };
 		2DA5F83D275667AC00D8DD29 /* History.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2DA5F83C275667AC00D8DD29 /* History.swift */; };
 		2DA5F83F275667CF00D8DD29 /* HistoryCardTemplate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2DA5F83E275667CF00D8DD29 /* HistoryCardTemplate.swift */; };
 		2DA5F8412756687200D8DD29 /* TransactionCardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2DA5F8402756687200D8DD29 /* TransactionCardView.swift */; };
@@ -111,6 +114,10 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		2D48F35027609CDE004B27BE /* HistoryCard.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HistoryCard.swift; sourceTree = "<group>"; };
+		2D48F3522760A2D8004B27BE /* Fonts.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Fonts.swift; sourceTree = "<group>"; };
+		2D48F3542760AF9D004B27BE /* MSeeds.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MSeeds.swift; sourceTree = "<group>"; };
+		2D48F3562760BBEC004B27BE /* RecoverSeedName.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecoverSeedName.swift; sourceTree = "<group>"; };
 		2D72B4F526EF3BC50081E879 /* Navigator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Navigator.swift; sourceTree = "<group>"; };
 		2D72B4F926EF7D1C0081E879 /* Seeds.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Seeds.swift; sourceTree = "<group>"; };
 		2D72D5292732B8A7004BA7C9 /* Database */ = {isa = PBXFileReference; lastKnownFileType = folder; path = Database; sourceTree = "<group>"; };
@@ -133,7 +140,6 @@
 		2DA5F8342756656E00D8DD29 /* Transaction.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Transaction.swift; sourceTree = "<group>"; };
 		2DA5F8362756657600D8DD29 /* TransactionTypes.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TransactionTypes.swift; sourceTree = "<group>"; };
 		2DA5F8382756666C00D8DD29 /* EventDetails.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = EventDetails.swift; sourceTree = "<group>"; };
-		2DA5F83A275666A200D8DD29 /* HistoryCardExtended.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HistoryCardExtended.swift; sourceTree = "<group>"; };
 		2DA5F83C275667AC00D8DD29 /* History.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = History.swift; sourceTree = "<group>"; };
 		2DA5F83E275667CF00D8DD29 /* HistoryCardTemplate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HistoryCardTemplate.swift; sourceTree = "<group>"; };
 		2DA5F8402756687200D8DD29 /* TransactionCardView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TransactionCardView.swift; sourceTree = "<group>"; };
@@ -235,7 +241,6 @@
 		2D7A7BC526BA96D00053C1E0 /* Cards */ = {
 			isa = PBXGroup;
 			children = (
-				2DA5F83A275666A200D8DD29 /* HistoryCardExtended.swift */,
 				2DA5F8402756687200D8DD29 /* TransactionCardView.swift */,
 				2DA5F879275676B600D8DD29 /* SeedCardForManager.swift */,
 				2DA5F87D2756A28A00D8DD29 /* NetworkCard.swift */,
@@ -257,6 +262,7 @@
 				2DA5F88D2757694A00D8DD29 /* LandingView.swift */,
 				2DA5F88B2757693600D8DD29 /* NewAddressScreen.swift */,
 				2DA5F8892757692F00D8DD29 /* NewSeedScreen.swift */,
+				2D48F3562760BBEC004B27BE /* RecoverSeedName.swift */,
 				2DA5F87527566D7C00D8DD29 /* TransactionPreview.swift */,
 				2DA5F82E2756635A00D8DD29 /* HistoryScreen.swift */,
 				2DA5F8772756749B00D8DD29 /* SeedManager.swift */,
@@ -284,6 +290,7 @@
 				2DA5F820275652EE00D8DD29 /* Footer.swift */,
 				2DA5F8302756652600D8DD29 /* CameraView.swift */,
 				2DA5F8A0275F889400D8DD29 /* HeaderBar.swift */,
+				2D48F35027609CDE004B27BE /* HistoryCard.swift */,
 				2DA5F8852756A44600D8DD29 /* AddressCardControls.swift */,
 				2DA5F88F27590B3A00D8DD29 /* DocumentModal.swift */,
 				2DA5F8322756653B00D8DD29 /* CameraPreview.swift */,
@@ -336,6 +343,7 @@
 			isa = PBXGroup;
 			children = (
 				2DA5F8952759576B00D8DD29 /* MLog.swift */,
+				2D48F3542760AF9D004B27BE /* MSeeds.swift */,
 			);
 			path = ScreenModels;
 			sourceTree = "<group>";
@@ -359,6 +367,7 @@
 			isa = PBXGroup;
 			children = (
 				2DB037BE270F12DF00A318B2 /* Web3-Regular.otf */,
+				2D48F3522760A2D8004B27BE /* Fonts.swift */,
 				2DA5F8A2275F8B1300D8DD29 /* inter.ttf */,
 				2DA5F8A3275F8B1300D8DD29 /* robotomono_regular.ttf */,
 				2DA5F8A4275F8B1300D8DD29 /* robotomono_thin.ttf */,
@@ -617,6 +626,7 @@
 				2DA5F85E27566C3600D8DD29 /* TCFieldName.swift in Sources */,
 				2DA5F86827566C3600D8DD29 /* TCAuthor.swift in Sources */,
 				2DA5F87427566C3600D8DD29 /* TCEraMortal.swift in Sources */,
+				2D48F35127609CDE004B27BE /* HistoryCard.swift in Sources */,
 				2DA5F86327566C3600D8DD29 /* TCCall.swift in Sources */,
 				2DA5F8372756657600D8DD29 /* TransactionTypes.swift in Sources */,
 				2DA5F8882756A70300D8DD29 /* SeedBackup.swift in Sources */,
@@ -627,6 +637,8 @@
 				2DA5F8782756749B00D8DD29 /* SeedManager.swift in Sources */,
 				2DA5F8822756A2DE00D8DD29 /* AddressCard.swift in Sources */,
 				2DA5F8252756624000D8DD29 /* NavbarShield.swift in Sources */,
+				2D48F3572760BBEC004B27BE /* RecoverSeedName.swift in Sources */,
+				2D48F3532760A2D8004B27BE /* Fonts.swift in Sources */,
 				2DE72C0026A6ADC5002BB752 /* CameraService.swift in Sources */,
 				2DA5F8312756652600D8DD29 /* CameraView.swift in Sources */,
 				2DA5F86F27566C3600D8DD29 /* TCTXSpec.swift in Sources */,
@@ -676,9 +688,9 @@
 				2DA5F86C27566C3600D8DD29 /* TCPallet.swift in Sources */,
 				2DA5F898275F865400D8DD29 /* ModalSelector.swift in Sources */,
 				2DA5F87327566C3600D8DD29 /* TCBlockHash.swift in Sources */,
-				2DA5F83B275666A200D8DD29 /* HistoryCardExtended.swift in Sources */,
 				2DA5F86027566C3600D8DD29 /* TCAuthorPublicKey.swift in Sources */,
 				2DA5F87C2756A21200D8DD29 /* ExportAddress.swift in Sources */,
+				2D48F3552760AF9D004B27BE /* MSeeds.swift in Sources */,
 				2DA5F821275652EE00D8DD29 /* Footer.swift in Sources */,
 				2DA5F88C2757693600D8DD29 /* NewAddressScreen.swift in Sources */,
 				2DA5F83F275667CF00D8DD29 /* HistoryCardTemplate.swift in Sources */,

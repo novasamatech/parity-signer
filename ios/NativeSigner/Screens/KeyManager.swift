@@ -20,8 +20,7 @@ struct KeyManager: View {
                         Text("DERIVED KEYS").foregroundColor(Color("textFadedColor"))
                         Spacer()
                         Button(action: {
-                            //data.proposeDerive()
-                            data.keyManagerModal = .newKey
+                            //TODO
                         }) {
                             Image(systemName: "plus.circle").imageScale(.large)
                         }
