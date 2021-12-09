@@ -164,6 +164,8 @@ enum ButtonID {
     case NewSeed
     case RecoverSeed
     case NetworkSelector
+    case NextUnit
+    case PreviousUnit
     case NewKey
 }
 

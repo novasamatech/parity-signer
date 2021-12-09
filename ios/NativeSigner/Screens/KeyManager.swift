@@ -14,7 +14,9 @@ struct KeyManager: View {
     var body: some View {
         ZStack {
             VStack {
-                Button(action: {}){
+                Button(action: {
+                    data.pushButton(buttonID: .SelectKey, details: content.root.address_key)
+                }){
                     SeedKeyCard(seedCard: content.root)
                 }.padding(2)
                 Button(action: {data.pushButton(buttonID: .NetworkSelector)}) {
@@ -33,7 +35,9 @@ struct KeyManager: View {
                     LazyVStack {
                         ForEach(content.set, id: \.address_key) {
                             address in
-                            Button(action: {}){
+                            Button(action: {
+                                data.pushButton(buttonID: .SelectKey, details: address.address_key)
+                            }){
                                 AddressCard(address: address)
                             }.padding(2)
                         }

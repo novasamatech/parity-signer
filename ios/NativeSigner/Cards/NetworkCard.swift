@@ -14,7 +14,7 @@ struct NetworkCard: View {
         //TODO: implement png or svg import intercompatible with fontnames
         HStack {
             Text(content.logo).font(FWeb3(style: .h4))
-            Text(content.name).font(FBase(style: .h3))
+            Text(content.title).font(FBase(style: .h3))
             Spacer()
         }
         .foregroundColor(Color("Text600"))
