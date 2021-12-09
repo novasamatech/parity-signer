@@ -1,7 +1,10 @@
 //!List of all screens
 
+use db_handling::interface_signer::first_network;
+use definitions::{error::ErrorSigner, keyring::{AddressKey, NetworkSpecsKey}};
+
 ///All screens
-#[derive(PartialEq, Debug, Copy, Clone)]
+#[derive(PartialEq, Debug, Clone)]
 pub enum Screen {
     Log,
     LogDetails,
@@ -22,34 +25,50 @@ pub enum Screen {
 
 //TODO: store references instead of indices?
 ///State of keys screen
-#[derive(PartialEq, Debug, Copy, Clone)]
+#[derive(PartialEq, Debug, Clone)]
 pub struct KeysState {
-    pub seed_name: usize,
-    pub network: usize,
+    seed_name: String,
+    network: NetworkSpecsKey,
 }
 
 ///State of screen with 1 key
 ///
 ///More general KeysState could always be determined as subset of this
-#[derive(PartialEq, Debug, Copy, Clone)]
+#[derive(PartialEq, Debug, Clone)]
 pub struct AddressState {
     keys_state: KeysState,
-    key: usize, //TODO: actual key here
+    key: AddressKey, //TODO: actual key here
 }
 
 impl KeysState {
-    pub fn new(seed_name: usize) -> KeysState {
-        KeysState {
-            seed_name: seed_name,
-            network: 0,
-        }
+    pub fn new(seed_name: &str, database_name: &str) -> Result<Self, ErrorSigner> {
+        let network_specs = first_network(database_name)?;
+        Ok(Self {
+            seed_name: seed_name.to_string(),
+            network: NetworkSpecsKey::from_parts(&network_specs.genesis_hash.to_vec(), &network_specs.encryption),
+        })
+    }
+    pub fn seed_name(&self) -> String {
+        self.seed_name.to_owned()
+    }
+    pub fn network_specs_key(&self) -> NetworkSpecsKey {
+        self.network.to_owned()
     }
 }
 
 impl AddressState {
     ///Do this to go up
     pub fn get_keys_state(&self) -> KeysState {
-        self.keys_state
+        self.keys_state.to_owned()
+    }
+    pub fn seed_name(&self) -> String {
+        self.keys_state.seed_name()
+    }
+    pub fn network_specs_key(&self) -> NetworkSpecsKey {
+        self.keys_state.network_specs_key()
+    }
+    pub fn address_key(&self) -> AddressKey {
+        self.key.to_owned()
     }
 }
 

@@ -23,7 +23,7 @@ pub struct State {
 }
 
 ///Navigation state is completely defined here
-#[derive(PartialEq, Debug, Copy, Clone)]
+#[derive(PartialEq, Debug, Clone)]
 pub struct Navstate {
     pub screen: Screen,
     pub modal: Modal,
@@ -43,8 +43,8 @@ impl Navstate {
 impl State {
     ///Decide what to do and do it!
     pub fn perform(&mut self, action: Action, details_str: &str) -> String {
-        let mut new_navstate = (*self).navstate;
-        let mut new_screen = (*self).navstate.screen;
+        let mut new_navstate = self.navstate.to_owned();
+        let mut new_screen = self.navstate.screen.to_owned();
         let mut seed_names = &(*self).seed_names;
         let mut go_back_allowed = false;
         let mut screen_details = String::new();
@@ -85,7 +85,7 @@ impl State {
                 Action::GoBack => {
                     if self.navstate.alert == Alert::Empty {
                         if self.navstate.modal == Modal::Empty {
-                            match self.navstate.screen {
+                            match &self.navstate.screen {
                                 Screen::LogDetails => {
                                     new_navstate.screen = Screen::Log;
                                 },
@@ -146,18 +146,18 @@ impl State {
                     };
                 },
                 Action::SelectSeed => {
-                    match seed_names.binary_search(&details_str.to_string()) {
-                        Ok(index) => {
-                            new_navstate = Navstate::clean_screen(Screen::Keys(KeysState::new(index)));
+                    match KeysState::new(details_str, dbname) {
+                        Ok(a) => {
+                            new_navstate = Navstate::clean_screen(Screen::Keys(a));
                         },
                         Err(e) => {
                             new_navstate.alert = Alert::Error;
-                            errorline.push_str(&e.to_string());
+                            errorline.push_str(&<Signer>::show(&e));
                         },
                     }
                 },
                 Action::RightButton => {
-                    match self.navstate.screen {
+                    match &self.navstate.screen {
                         Screen::SeedSelector => 
                             if self.navstate.modal == Modal::NewSeedMenu {
                                 new_navstate.modal = Modal::Empty;
@@ -218,31 +218,26 @@ impl State {
                     };
                     format!("\"seedNameCards\":{}", cards)
                 },
-                Screen::Keys(keystate) => {
-                    //TODO: separate seed key
-                    if let Some(seed_name) = self.seed_names.get(keystate.seed_name) {
-                        if let Some(network_key) = self.networks.get(keystate.network) {
-                            let keys_pack = match db_handling::identities::print_relevant_identities(seed_name, &hex::encode(network_key.key()), dbname) {
-                                Ok(a) => a,
-                                Err(e) => {
-                                    new_navstate.alert = Alert::Error;
-                                    errorline.push_str(&e.to_string());
-                                    "".to_string()
-                                },
-                            };
-                            format!("\"keys\":{},\"seed\":\"{}\"", keys_pack, seed_name)
-                        } else {
+                Screen::Keys(ref k) => {
+                    match db_handling::interface_signer::print_identities_for_seed_name_and_network(dbname, &k.seed_name(), &k.network_specs_key()) {
+                        Ok(a) => a,
+                        Err(e) => {
                             new_navstate.alert = Alert::Error;
-                            errorline.push_str("Network was lost, report a bug");
+                            errorline.push_str(&<Signer>::show(&e));
                             "".to_string()
-                        }
-                    } else {
-                        new_navstate.alert = Alert::Error;
-                        errorline.push_str("Seed was lost, report a bug");
-                        "".to_string()
-                    } 
+                        },
+                    }
                 },
-                //Screen::KeyDetails => "Key",
+                Screen::KeyDetails(ref a) => {
+                    match db_handling::interface_signer::export_key (dbname, &a.address_key(), &a.seed_name(), &a.network_specs_key()) {
+                        Ok(a) => a,
+                        Err(e) => {
+                            new_navstate.alert = Alert::Error;
+                            errorline.push_str(&<Signer>::show(&e));
+                            "".to_string()
+                        },
+                    }
+                }
                 //Screen::Backup => "this should be popover",
                 //Screen::NewSeed => "",
                 //Screen::RecoverSeedName => "Recover Seed",
@@ -282,7 +277,7 @@ impl State {
     //TODO: clean this up
     pub fn generate_json(&self, details: &str) -> String {
         let mut output = String::from("{");
-        let screen = self.navstate.screen;
+        let screen = self.navstate.screen.to_owned();
         let modal = self.navstate.modal;
         let alert = self.navstate.alert;
         if let Some(screen_name) = screen.get_name() {

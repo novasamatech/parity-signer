@@ -823,7 +823,8 @@ impl ErrorSource for Signer {
                     },
                     InterfaceSigner::PublicKeyLength => String::from("Public key length does not match the encryption."),
                     InterfaceSigner::HistoryPageOutOfRange{page_number, total_pages} => format!("Requested history page {} does not exist. Total number of pages {}.", page_number, total_pages),
-                    InterfaceSigner::ChecksumNotU32 => String::from("Checksum is not u32.")
+                    InterfaceSigner::ChecksumNotU32 => String::from("Checksum is not u32."),
+                    InterfaceSigner::SeedNameNotMatching{address_key, expected_seed_name, real_seed_name} => format!("Expected seed name {} for address key {}. Address details in database have {} name.", expected_seed_name, hex::encode(address_key.key()), real_seed_name),
                 };
                 format!("Error on the interface. {}", insert)
             },
@@ -966,6 +967,7 @@ impl ErrorSource for Signer {
             ErrorSigner::AddressUse(e) => format!("Error with secret string of existing address: {}.", bad_secret_string(e)),
             ErrorSigner::WrongPassword => String::from("Wrong password."),
             ErrorSigner::PngGeneration(e) => format!("Error generating png. {}", e),
+            ErrorSigner::NoNetworksAvailable => String::from("No networks available. Please load networks information to proceed."),
         }
     }
 }
@@ -985,6 +987,7 @@ pub enum ErrorSigner {
     AddressUse(SecretStringError),
     WrongPassword,
     PngGeneration(png::EncodingError),
+    NoNetworksAvailable,
 }
 
 /// Signer side errors could be exported into native interface,
@@ -1004,6 +1007,7 @@ pub enum InterfaceSigner {
     PublicKeyLength,
     HistoryPageOutOfRange{page_number: u32, total_pages: u32},
     ChecksumNotU32,
+    SeedNameNotMatching{address_key: AddressKey, expected_seed_name: String, real_seed_name: String},
 }
 
 /// NotHex errors occuring on the Signer side
