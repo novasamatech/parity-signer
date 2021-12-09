@@ -37,8 +37,8 @@ struct Header: View {
                 Spacer()
                 Text(data.actionResult.screenLabel)
                     .foregroundColor(Color("Text600"))
-                    .font(data.actionResult.screenNameType == "h1" ? FBase(style: .h1) : FBase(style: .h4))
-                    .tracking(0.2)
+                    .font(data.actionResult.screenNameType == "h1" ? FBase(style: .h2) : FBase(style: .h4))
+                    .tracking(0.1)
                 /*
                  if false {
                  Button(action: {

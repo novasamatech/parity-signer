@@ -32,25 +32,25 @@ enum Fontstyle {
 func FBase(style: Fontstyle) -> Font {
     switch style {
     case .h1:
-        return Font.custom("inter", size:19).weight(.bold)
+        return Font.custom("Inter-Bold", size:19)
     case .h2:
-        return Font.custom("inter", size:19).weight(.semibold)
+        return Font.custom("Inter-Semibold", size:19)
     case .h3:
-        return Font.custom("inter", size:16).weight(.semibold)
+        return Font.custom("Inter-Semibold", size:16)
     case .h4:
-        return Font.custom("inter", size:16).weight(.medium)
+        return Font.custom("Inter-Medium", size:16)
     case .button:
-        return Font.custom("inter", size:16).weight(.semibold)
+        return Font.custom("Inter-Semibold", size:16)
     case .body1:
-        return Font.custom("inter", size:16).weight(.regular)
+        return Font.custom("Inter-Regular", size:16)
     case .body2:
-        return Font.custom("inter", size:15).weight(.regular)
+        return Font.custom("Inter-Regular", size:15)
     case .overline:
-        return Font.custom("inter", size:12).weight(.medium)
+        return Font.custom("Inter-Medium", size:12)
     case .subtitle1:
-        return Font.custom("inter", size:14).weight(.medium)
+        return Font.custom("Inter-Medium", size:14)
     case .subtitle2:
-        return Font.custom("inter", size:13).weight(.regular)
+        return Font.custom("Inter-Regular", size:13)
     }
 }
 
@@ -84,24 +84,24 @@ func FCrypto(style: Fontstyle) -> Font {
 func FWeb3(style: Fontstyle) -> Font {
     switch style {
     case .h1:
-        return Font.custom("Web3-Regular", size:19).weight(.bold)
+        return Font.custom("Web3-Regular", size:19)
     case .h2:
-        return Font.custom("Web3-Regular", size:19).weight(.semibold)
+        return Font.custom("Web3-Regular", size:19)
     case .h3:
-        return Font.custom("Web3-Regular", size:16).weight(.semibold)
+        return Font.custom("Web3-Regular", size:16)
     case .h4:
-        return Font.custom("Web3-Regular", size:16).weight(.medium)
+        return Font.custom("Web3-Regular", size:16)
     case .button:
-        return Font.custom("Web3-Regular", size:16).weight(.semibold)
+        return Font.custom("Web3-Regular", size:16)
     case .body1:
-        return Font.custom("Web3-Regular", size:16).weight(.regular)
+        return Font.custom("Web3-Regular", size:16)
     case .body2:
-        return Font.custom("Web3-Regular", size:15).weight(.regular)
+        return Font.custom("Web3-Regular", size:15)
     case .overline:
-        return Font.custom("Web3-Regular", size:12).weight(.medium)
+        return Font.custom("Web3-Regular", size:12)
     case .subtitle1:
-        return Font.custom("Web3-Regular", size:14).weight(.medium)
+        return Font.custom("Web3-Regular", size:14)
     case .subtitle2:
-        return Font.custom("Web3-Regular", size:13).weight(.regular)
+        return Font.custom("Web3-Regular", size:13)
     }
 }
