@@ -1,17 +1,17 @@
 //! Navigation state of the app
 
-use hex;
+//use hex;
 
-use crate::screens::{Screen, KeysState};
+use crate::screens::{AddressState, KeysState, Screen};
 use crate::modals::Modal;
 use crate::actions::Action;
 use crate::alerts::Alert;
 
-use plot_icon;
+//use plot_icon;
 use db_handling;
 use definitions::{error::{ErrorSource, Signer}, keyring::NetworkSpecsKey};
-use transaction_parsing;
-use transaction_signing;
+//use transaction_parsing;
+//use transaction_signing;
 
 ///State of the app as remembered by backend
 #[derive(PartialEq, Debug, Clone)]
@@ -156,6 +156,22 @@ impl State {
                         },
                     }
                 },
+                Action::SelectKey => {
+                    match self.navstate.screen {
+                        Screen::Keys(ref keys_state) => {
+                            match AddressState::new(details_str, keys_state, dbname) {
+                                Ok(a) => {
+                                    new_navstate = Navstate::clean_screen(Screen::KeyDetails(a));
+                                },
+                                Err(e) => {
+                                    new_navstate.alert = Alert::Error;
+                                    errorline.push_str(&<Signer>::show(&e));
+                                },
+                            }
+                        },
+                        _ => println!("SelectKey does nothing here"),
+                    }
+                },
                 Action::RightButton => {
                     match &self.navstate.screen {
                         Screen::SeedSelector => 
@@ -182,6 +198,22 @@ impl State {
                         new_navstate.modal = Modal::Empty;
                     } else {
                         new_navstate.modal = Modal::NetworkSelector;
+                    }
+                },
+                Action::NextUnit => {
+                    match self.navstate.screen {
+                        Screen::KeyDetails(ref address_state) => {
+                            new_navstate = Navstate::clean_screen(Screen::KeyDetails(address_state.next()));
+                        },
+                        _ => println!("NextUnit does nothing here"),
+                    }
+                },
+                Action::PreviousUnit => {
+                    match self.navstate.screen {
+                        Screen::KeyDetails(ref address_state) => {
+                            new_navstate = Navstate::clean_screen(Screen::KeyDetails(address_state.previous()));
+                        },
+                        _ => println!("PreviousUnit does nothing here"),
                     }
                 },
                 Action::Nothing => {
@@ -229,7 +261,7 @@ impl State {
                     }
                 },
                 Screen::KeyDetails(ref a) => {
-                    match db_handling::interface_signer::export_key (dbname, &a.address_key(), &a.seed_name(), &a.network_specs_key()) {
+                    match db_handling::interface_signer::export_key (dbname, &a.multisigner(), &a.seed_name(), &a.network_specs_key()) {
                         Ok(a) => a,
                         Err(e) => {
                             new_navstate.alert = Alert::Error;

@@ -1,7 +1,7 @@
 //!List of all interactive actions in app
 
-use super::screens::Screen;
-use crate::navstate::{Navstate, State};
+//use super::screens::Screen;
+//use crate::navstate::{Navstate, State};
 
 ///All actions
 #[derive(PartialEq, Debug)]
@@ -14,11 +14,14 @@ pub enum Action {
     GoBack,
     GoForward,
     SelectSeed,
+    SelectKey,
     RightButton,
     Shield,
     NewSeed,
     RecoverSeed,
     NetworkSelector,
+    NextUnit,
+    PreviousUnit,
     Nothing,
 }
 
@@ -34,11 +37,14 @@ impl Action {
             "GoBack" => Action::GoBack,
             "GoForward" => Action::GoForward,
             "SelectSeed" => Action::SelectSeed,
+            "SelectKey" => Action::SelectKey,
             "RightButton" => Action::RightButton,
             "Shield" => Action::Shield,
             "NewSeed" => Action::NewSeed,
             "RecoverSeed" => Action::RecoverSeed,
             "NetworkSelector" => Action::NetworkSelector,
+            "NextUnit" => Action::NextUnit,
+            "PreviousUnit" => Action::PreviousUnit,
             _ => Action::Nothing,
         }
     }

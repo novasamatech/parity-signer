@@ -75,8 +75,8 @@ fn all_parsing_failed_set() -> Vec<(String, u32, ParserError)> {
 
 pub fn signer_errors() -> Vec<ErrorSigner> {
     
-    let address_key_bad = AddressKey::from_vec(hex::decode("0350e7c3d5edde7db964317cd9b51a3a059d7cd99f81bdbce14990047354334c9779").unwrap());
-    let address_key_good = AddressKey::from_vec(hex::decode("0150e7c3d5edde7db964317cd9b51a3a059d7cd99f81bdbce14990047354334c9779").unwrap());
+    let address_key_bad = AddressKey::from_hex("0350e7c3d5edde7db964317cd9b51a3a059d7cd99f81bdbce14990047354334c9779").unwrap();
+    let address_key_good = AddressKey::from_hex("0150e7c3d5edde7db964317cd9b51a3a059d7cd99f81bdbce14990047354334c9779").unwrap();
     let entry_order_vec: Vec<u8> = vec![100, 4, 85];
     let genesis_hash: Vec<u8> = hex::decode("e143f23803ca50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e").unwrap();
     let meta_key = MetaKey::from_parts("westend", 9122);

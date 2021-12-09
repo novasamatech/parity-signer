@@ -108,8 +108,8 @@ impl AddressKey {
         Self(ivec.to_vec())
     }
     /// Function to transform Vec<u8> into AddressKey
-    pub fn from_vec (vec: Vec<u8>) -> Self {
-        Self(vec)
+    pub fn from_hex (hex_address_key: &str) -> Result<Self, ErrorSigner> {
+        Ok(Self(unhex::<Signer>(hex_address_key, NotHexSigner::AddressKey{input: hex_address_key.to_string()})?))
     }
     /// Function to get public key and encryption from the AddressKey
     pub fn public_key_encryption<T: ErrorSource>(&self, source: AddressKeySource<T>) -> Result<(Vec<u8>, Encryption), T::Error> {

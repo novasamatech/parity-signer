@@ -825,6 +825,7 @@ impl ErrorSource for Signer {
                     InterfaceSigner::HistoryPageOutOfRange{page_number, total_pages} => format!("Requested history page {} does not exist. Total number of pages {}.", page_number, total_pages),
                     InterfaceSigner::ChecksumNotU32 => String::from("Checksum is not u32."),
                     InterfaceSigner::SeedNameNotMatching{address_key, expected_seed_name, real_seed_name} => format!("Expected seed name {} for address key {}. Address details in database have {} name.", expected_seed_name, hex::encode(address_key.key()), real_seed_name),
+                    InterfaceSigner::AddressKeyNotInSet{address_key, seed_name} => format!("Address key {} was expected and not found in address key set for seed name {}.", hex::encode(address_key.key()), seed_name),
                 };
                 format!("Error on the interface. {}", insert)
             },
@@ -1008,6 +1009,7 @@ pub enum InterfaceSigner {
     HistoryPageOutOfRange{page_number: u32, total_pages: u32},
     ChecksumNotU32,
     SeedNameNotMatching{address_key: AddressKey, expected_seed_name: String, real_seed_name: String},
+    AddressKeyNotInSet{address_key: AddressKey, seed_name: String},
 }
 
 /// NotHex errors occuring on the Signer side

@@ -14,8 +14,8 @@ struct ScreenSelector: View {
         switch (data.actionResult.screen) {
         case .Scan :
             TransactionScreen()
-        case .Keys :
-            KeyManager()
+        case .Keys(let value):
+            KeyManager(content: value)
         case .Settings :
             SettingsScreen()
         case .Log(let value) :

@@ -13,6 +13,8 @@
 		2D48F3572760BBEC004B27BE /* RecoverSeedName.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D48F3562760BBEC004B27BE /* RecoverSeedName.swift */; };
 		2D48F35B2760E5DF004B27BE /* RecoverSeedPhrase.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D48F35A2760E5DF004B27BE /* RecoverSeedPhrase.swift */; };
 		2D48F35D2760ED38004B27BE /* MKeys.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D48F35C2760ED38004B27BE /* MKeys.swift */; };
+		2D48F36127620F49004B27BE /* SeedKeyCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D48F36027620F49004B27BE /* SeedKeyCard.swift */; };
+		2D48F36327622C54004B27BE /* MNetworkMenu.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D48F36227622C54004B27BE /* MNetworkMenu.swift */; };
 		2D72B4F626EF3BC50081E879 /* Navigator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D72B4F526EF3BC50081E879 /* Navigator.swift */; };
 		2D72B4FA26EF7D1C0081E879 /* Seeds.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D72B4F926EF7D1C0081E879 /* Seeds.swift */; };
 		2D72D52A2732B8A7004BA7C9 /* Database in Resources */ = {isa = PBXBuildFile; fileRef = 2D72D5292732B8A7004BA7C9 /* Database */; };
@@ -122,6 +124,8 @@
 		2D48F3562760BBEC004B27BE /* RecoverSeedName.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecoverSeedName.swift; sourceTree = "<group>"; };
 		2D48F35A2760E5DF004B27BE /* RecoverSeedPhrase.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RecoverSeedPhrase.swift; sourceTree = "<group>"; };
 		2D48F35C2760ED38004B27BE /* MKeys.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MKeys.swift; sourceTree = "<group>"; };
+		2D48F36027620F49004B27BE /* SeedKeyCard.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SeedKeyCard.swift; sourceTree = "<group>"; };
+		2D48F36227622C54004B27BE /* MNetworkMenu.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MNetworkMenu.swift; sourceTree = "<group>"; };
 		2D72B4F526EF3BC50081E879 /* Navigator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Navigator.swift; sourceTree = "<group>"; };
 		2D72B4F926EF7D1C0081E879 /* Seeds.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Seeds.swift; sourceTree = "<group>"; };
 		2D72D5292732B8A7004BA7C9 /* Database */ = {isa = PBXFileReference; lastKnownFileType = folder; path = Database; sourceTree = "<group>"; };
@@ -247,6 +251,7 @@
 			children = (
 				2DA5F8402756687200D8DD29 /* TransactionCardView.swift */,
 				2DA5F879275676B600D8DD29 /* SeedCardForManager.swift */,
+				2D48F36027620F49004B27BE /* SeedKeyCard.swift */,
 				2DA5F87D2756A28A00D8DD29 /* NetworkCard.swift */,
 				2DA5F84627566C3600D8DD29 /* TransactionCards */,
 				2DA5F84227566BE300D8DD29 /* TransactionCardSelector.swift */,
@@ -357,6 +362,7 @@
 		2DA5F8942759575300D8DD29 /* ModalModels */ = {
 			isa = PBXGroup;
 			children = (
+				2D48F36227622C54004B27BE /* MNetworkMenu.swift */,
 			);
 			path = ModalModels;
 			sourceTree = "<group>";
@@ -664,6 +670,7 @@
 				2DA5F86B27566C3600D8DD29 /* TCTip.swift in Sources */,
 				2DA5F8272756629600D8DD29 /* ScreenSelector.swift in Sources */,
 				2DA5F87E2756A28B00D8DD29 /* NetworkCard.swift in Sources */,
+				2D48F36327622C54004B27BE /* MNetworkMenu.swift in Sources */,
 				2DA5F8802756A2CA00D8DD29 /* Network.swift in Sources */,
 				2DA5F8332756653B00D8DD29 /* CameraPreview.swift in Sources */,
 				2DA5F8862756A44600D8DD29 /* AddressCardControls.swift in Sources */,
@@ -698,6 +705,7 @@
 				2DA5F86027566C3600D8DD29 /* TCAuthorPublicKey.swift in Sources */,
 				2D48F35B2760E5DF004B27BE /* RecoverSeedPhrase.swift in Sources */,
 				2DA5F87C2756A21200D8DD29 /* ExportAddress.swift in Sources */,
+				2D48F36127620F49004B27BE /* SeedKeyCard.swift in Sources */,
 				2D48F3552760AF9D004B27BE /* MSeeds.swift in Sources */,
 				2DA5F821275652EE00D8DD29 /* Footer.swift in Sources */,
 				2DA5F88C2757693600D8DD29 /* NewAddressScreen.swift in Sources */,

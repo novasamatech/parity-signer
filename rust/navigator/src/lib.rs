@@ -9,12 +9,12 @@ use db_handling;
 use definitions::keyring::NetworkSpecsKey;
 
 pub mod screens;
-use screens::Screen;
+//use screens::Screen;
 
 pub mod alerts;
 
 pub mod modals;
-use modals::Modal;
+//use modals::Modal;
 
 mod navstate;
 use navstate::{Navstate, State};
@@ -72,9 +72,11 @@ pub fn init_navigation(
     match guard {
         Ok(mut navstate) => {
             (*navstate).dbname = Some(dbname.to_string());
-            (*navstate).seed_names = seed_names.split(",").map(|a| a.to_string()).collect();
-            (*navstate).seed_names.sort();
-            (*navstate).seed_names.dedup();
+            if seed_names != "" {
+                (*navstate).seed_names = seed_names.split(",").map(|a| a.to_string()).collect();
+                (*navstate).seed_names.sort();
+                (*navstate).seed_names.dedup();
+            }
             match db_handling::network_details::get_all_networks(dbname) {
                 Ok(a) => for x in a.iter() {
                     (*navstate).networks.push(NetworkSpecsKey::from_parts(&x.genesis_hash.to_vec(), &x.encryption));

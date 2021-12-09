@@ -13,4 +13,5 @@ lazy_static = "1.4.0"
 plot_icon = { git = "https://github.com/paritytech/polkadot-identicon-rust" }
 transaction_parsing = {path = "../transaction_parsing"}
 transaction_signing = {path = "../transaction_signing"}
+sp-runtime = "3.0.0"
 

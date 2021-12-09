@@ -16,8 +16,8 @@ struct ModalSelector: View {
             EmptyView()
         case .NewSeedMenu:
             NewSeedMenu()
-        default:
-            EmptyView()
+        case .NetworkMenu(let value):
+            NetworkManager(content: value)
         }
     }
 }

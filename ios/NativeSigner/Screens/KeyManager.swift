@@ -10,36 +10,35 @@ import SwiftUI
 struct KeyManager: View {
     @EnvironmentObject var data: SignerDataModel
     @GestureState private var dragOffset = CGSize.zero
+    var content: MKeys
     var body: some View {
         ZStack {
             VStack {
-                //SeedSelector()
-                //NetworkSelector()
-                if data.selectedSeed != "" {
-                    HStack {
-                        Text("DERIVED KEYS").foregroundColor(Color("textFadedColor"))
+                Button(action: {}){
+                    SeedKeyCard(seedCard: content.root)
+                }.padding(2)
+                Button(action: {data.pushButton(buttonID: .NetworkSelector)}) {
+                    NetworkCard(content: content.network)
+                }
+                HStack {
+                        Text("DERIVED KEYS").foregroundColor(Color("Text600"))
                         Spacer()
                         Button(action: {
                             //TODO
                         }) {
-                            Image(systemName: "plus.circle").imageScale(.large)
+                            Image(systemName: "plus.circle").imageScale(.large).foregroundColor(Color("Action400"))
                         }
                     }.padding(.horizontal, 8)
-                }
-                /*
                 ScrollView {
                     LazyVStack {
-                        ForEach(data.addresses, id: \.public_key) {
+                        ForEach(content.set, id: \.address_key) {
                             address in
-                            if ((address.name.contains(data.searchKey) || address.path.contains(data.searchKey) || data.searchKey == "" ) && (!address.isRoot() || data.selectedSeed == "")) {
+                            Button(action: {}){
                                 AddressCard(address: address)
-                                //.padding(.vertical, 2)
-                            }
+                            }.padding(2)
                         }
                     }
                 }
-                */
-                Text("Keys")
                 Spacer()
             }
         }

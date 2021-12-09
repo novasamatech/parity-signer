@@ -13,39 +13,30 @@ import SwiftUI
  */
 struct AddressCard: View {
     @EnvironmentObject var data: SignerDataModel
-    var address: Address
+    var address: MKeysKeyCard
     @GestureState private var dragOffset = CGSize.zero
     let rowHeight: CGFloat = 28
     var body: some View {
         ZStack {
-            RoundedRectangle(cornerRadius: 4).foregroundColor(Color(false ? "backgroundActive" : "backgroundCard")).frame(height: 44)
+            RoundedRectangle(cornerRadius: 4).foregroundColor(Color("Bg200")).frame(height: 44)
             HStack {
-                Image(uiImage: UIImage(data: Data(fromHexEncodedString: String(cString: base58_identicon(nil, address.ss58, 32))) ?? Data()) ?? UIImage())
+                Image(uiImage: UIImage(data: Data(fromHexEncodedString: address.identicon) ?? Data()) ?? UIImage())
                     .resizable(resizingMode: .stretch)
                     .frame(width: rowHeight, height: rowHeight)
                 VStack (alignment: .leading) {
                     HStack {
-                        if address.isRoot() {
-                            Text(address.seed_name)
-                                .foregroundColor(Color("textMainColor"))
-                        } else {
                             Text(address.path)
-                                .foregroundColor(Color("cryptoColor"))
-                        }
-                        if address.has_password == "true" {
+                        if address.has_pwd {
+                            Text("///")
                             Image(systemName: "lock")
-                                .foregroundColor(Color("AccentColor"))
                         }
-                    }.font(.system(size: 12, weight: .semibold, design: .monospaced))
+                    }.foregroundColor(Color("Crypto400"))
+                        .font(FCrypto(style: .body2))
                     //Here we could have shortened base58 address when buttons are shown, but we don't need to
-                    Text(address.truncateBase58())
-                        .foregroundColor(Color("textFadedColor"))
-                        .font(.system(size: 12, design: .monospaced))
+                    Text(address.base58.truncateMiddle(length: 8)).foregroundColor(Color("Text400"))
+                        .font(FCrypto(style: .body1))
                 }
                 Spacer()
-                if data.keyManagerModal == .none {
-                    AddressCardControls(address: address, rowHeight: rowHeight+11)
-                }
                 /*
                 if (data.keyManagerModal == .showKey && data.getMultiSelectionMode()) {
                     Text(String((data.multiSelected.firstIndex(of: address) ?? -1) + 1) + "/" + String(data.multiSelected.count))

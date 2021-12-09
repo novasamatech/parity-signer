@@ -1,7 +1,7 @@
 use hex;
 use sp_core::{Pair, ed25519, sr25519, ecdsa};
 use sp_runtime::{MultiSigner, MultiSignature};
-use definitions::{crypto::SufficientCrypto, error::{AddressKeySource, ErrorSigner, ExtraAddressKeySourceSigner, NotHexSigner, Signer}, helpers::{unhex}, history::{Event, MetaValuesExport, NetworkSpecsExport, TypesExport}, keyring::AddressKey, qr_transfers::{ContentAddSpecs, ContentLoadMeta}};
+use definitions::{crypto::SufficientCrypto, error::{AddressKeySource, ErrorSigner, ExtraAddressKeySourceSigner, Signer}, history::{Event, MetaValuesExport, NetworkSpecsExport, TypesExport}, keyring::AddressKey, qr_transfers::{ContentAddSpecs, ContentLoadMeta}};
 use parity_scale_codec::Encode;
 use db_handling::{db_transactions::TrDbCold, helpers::{get_address_details, get_meta_values_by_name_version}, manage_history::{events_to_batch}, network_details::get_network_specs_by_hex_key, prep_messages::{prep_types, get_genesis_hash}};
 use qrcode_static::png_qr;
@@ -44,7 +44,7 @@ pub fn sign_as_address_key (to_sign: &Vec<u8>, address_key: AddressKey, full_add
 
 /// Function to generate `sufficient crypto line` for given public key
 fn sufficient_crypto (address_key_hex: &str, to_sign: &Vec<u8>, database_name: &str, seed_phrase: &str, pwd_entry: &str) -> Result<SufficientCrypto, ErrorSigner> {
-    let address_key = AddressKey::from_vec(unhex::<Signer>(address_key_hex, NotHexSigner::AddressKey{input: address_key_hex.to_string()})?);
+    let address_key = AddressKey::from_hex(address_key_hex)?;
     let address_details = get_address_details(database_name, &address_key)?;
     let pwd = {
         if address_details.has_pwd {Some(pwd_entry)}

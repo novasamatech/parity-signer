@@ -1,7 +1,8 @@
 //!List of all screens
+use sp_runtime::MultiSigner;
 
-use db_handling::interface_signer::first_network;
-use definitions::{error::ErrorSigner, keyring::{AddressKey, NetworkSpecsKey}};
+use db_handling::{identities::get_addresses_by_seed_name, interface_signer::first_network};
+use definitions::{error::{AddressKeySource, ErrorSigner, ExtraAddressKeySourceSigner, InterfaceSigner, Signer}, keyring::{AddressKey, NetworkSpecsKey}};
 
 ///All screens
 #[derive(PartialEq, Debug, Clone)]
@@ -23,7 +24,6 @@ pub enum Screen {
     Nowhere,
 }
 
-//TODO: store references instead of indices?
 ///State of keys screen
 #[derive(PartialEq, Debug, Clone)]
 pub struct KeysState {
@@ -37,7 +37,8 @@ pub struct KeysState {
 #[derive(PartialEq, Debug, Clone)]
 pub struct AddressState {
     keys_state: KeysState,
-    key: AddressKey, //TODO: actual key here
+    selected: usize,
+    set: Vec<MultiSigner>,
 }
 
 impl KeysState {
@@ -57,7 +58,23 @@ impl KeysState {
 }
 
 impl AddressState {
-    ///Do this to go up
+    pub fn new(hex_address_key: &str, keys_state: &KeysState, database_name: &str) -> Result<Self, ErrorSigner> {
+        let address_key = AddressKey::from_hex(hex_address_key)?;
+        let multisigner = address_key.multi_signer::<Signer>(AddressKeySource::Extra(ExtraAddressKeySourceSigner::Interface))?;
+        let seed_name = keys_state.seed_name();
+        let mut whole_set = get_addresses_by_seed_name(database_name, &seed_name)?;
+        whole_set.sort_by(|(_, a), (_, b)| a.path.cmp(&b.path));
+        let set: Vec<MultiSigner> = whole_set.into_iter().map(|(multisigner, _)| multisigner).collect();
+        let selected = match set.iter().position(|a| a == &multisigner) {
+            Some(a) => a,
+            None => return Err(ErrorSigner::Interface(InterfaceSigner::AddressKeyNotInSet{address_key: address_key, seed_name}))
+        };
+        Ok(Self {
+            keys_state: keys_state.to_owned(),
+            selected,
+            set
+        })
+    }
     pub fn get_keys_state(&self) -> KeysState {
         self.keys_state.to_owned()
     }
@@ -67,8 +84,33 @@ impl AddressState {
     pub fn network_specs_key(&self) -> NetworkSpecsKey {
         self.keys_state.network_specs_key()
     }
-    pub fn address_key(&self) -> AddressKey {
-        self.key.to_owned()
+    pub fn multisigner(&self) -> MultiSigner {
+        self.set[self.selected].to_owned()
+    }
+    pub fn set(&self) -> Vec<MultiSigner> {
+        self.set.to_owned()
+    }
+    pub fn next(&self) -> Self {
+        let selected = {
+            if self.selected+1 == self.set.len() {0}
+            else {self.selected+1}
+        };
+        Self {
+            keys_state: self.keys_state.to_owned(),
+            selected,
+            set: self.set.to_owned(),
+        }
+    }
+    pub fn previous(&self) -> Self {
+        let selected = {
+            if self.selected == 0 {self.set.len()-1}
+            else {self.selected-1}
+        };
+        Self {
+            keys_state: self.keys_state.to_owned(),
+            selected,
+            set: self.set.to_owned(),
+        }
     }
 }
 
@@ -137,5 +179,5 @@ impl Screen {
 
 #[cfg(test)]
 mod tests {
-    use super::*;
+//    use super::*;
 }

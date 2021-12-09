@@ -32,7 +32,7 @@ lazy_static! {
 
 /// Get all identities from database.
 /// Function gets used only on the Signer side.
-pub (crate) fn get_all_addresses (database_name: &str) -> Result<Vec<(MultiSigner, AddressDetails)>, ErrorSigner> {
+pub fn get_all_addresses (database_name: &str) -> Result<Vec<(MultiSigner, AddressDetails)>, ErrorSigner> {
     let database = open_db::<Signer>(database_name)?;
     let identities = open_tree::<Signer>(&database, ADDRTREE)?;
     let mut out: Vec<(MultiSigner, AddressDetails)> = Vec::new();
@@ -48,7 +48,7 @@ pub (crate) fn get_all_addresses (database_name: &str) -> Result<Vec<(MultiSigne
 
 /// Filter identities by given seed_name.
 /// Function gets used only on the Signer side.
-pub (crate) fn get_addresses_by_seed_name (database_name: &str, seed_name: &str) -> Result<Vec<(MultiSigner, AddressDetails)>, ErrorSigner> {
+pub fn get_addresses_by_seed_name (database_name: &str, seed_name: &str) -> Result<Vec<(MultiSigner, AddressDetails)>, ErrorSigner> {
     Ok(get_all_addresses(database_name)?.into_iter().filter(|(_, address_details)| address_details.seed_name == seed_name).collect())
 }
 

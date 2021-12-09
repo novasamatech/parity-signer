@@ -22,14 +22,14 @@ struct MainScreenContainer: View {
                     }
                     ModalSelector()
                     AlertSelector()
-                }/*
-                  .gesture(
-                  DragGesture().updating($dragOffset, body: { (value, state, transaction) in
-                  if value.startLocation.x < 20 && value.translation.width > 100 {
-                  data.pushButton(buttonID: .GoBack)
-                  }
-                  })
-                  )*/
+                }
+                .gesture(
+                    DragGesture().updating($dragOffset, body: { (value, state, transaction) in
+                        if value.startLocation.x < 20 && value.translation.width > 100 {
+                            data.pushButton(buttonID: .GoBack)
+                        }
+                    })
+                )
                 //Certain places are better off without footer
                 Footer()
                     .padding(.horizontal)

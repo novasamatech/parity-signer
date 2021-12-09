@@ -55,7 +55,7 @@ struct ActionResult: Decodable {
         case "Scan":
             screen = .Scan
         case "Keys":
-            screen = .Keys
+            screen = .Keys(try values.decode(MKeys.self, forKey: .screenData))
         case "Settings":
             screen = .Settings
         case "Log":
@@ -91,6 +91,8 @@ struct ActionResult: Decodable {
             modal = .Empty
         case "NewSeedMenu":
             modal = .NewSeedMenu
+        case "NetworkSelector":
+            modal = .NetworkMenu(try values.decode(MNetworkMenu.self, forKey: .modalData))
         default:
             modal = .Empty
         }
@@ -102,7 +104,7 @@ struct ActionResult: Decodable {
  */
 enum SignerScreen: Decodable {
     case Scan
-    case Keys
+    case Keys(MKeys)
     case Settings
     case Log(MLog)
     case LogDetails
@@ -132,9 +134,10 @@ enum TransactionState: Equatable {
 /**
  * Modals shown in key management screen
  */
-enum SignerModal: String, Equatable, Decodable {
+enum SignerModal: Equatable, Decodable {
     case Empty
     case NewSeedMenu
+    case NetworkMenu(MNetworkMenu)
 }
 
 enum SignerAlert: String, Equatable, Decodable {
@@ -160,7 +163,8 @@ enum ButtonID {
     case Delete
     case NewSeed
     case RecoverSeed
-    case NewtorkSelector
+    case NetworkSelector
+    case NewKey
 }
 
 /**
