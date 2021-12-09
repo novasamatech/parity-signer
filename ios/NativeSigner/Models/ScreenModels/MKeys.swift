@@ -29,6 +29,6 @@ struct MSeedKeyCard: Decodable {
 }
 
 struct MNetworkCard: Decodable {
-    var name: String
+    var title: String
     var logo: String
 }
