@@ -26,8 +26,8 @@ struct ScreenSelector: View {
             TransactionPreview()
         case .SeedSelector(let value):
             SeedManager(content: value)
-        case .KeyDetails:
-            ExportAddress()
+        case .KeyDetails(let value):
+            ExportAddress(content: value)
         case .Backup:
             SeedBackup()
         case .NewSeed:

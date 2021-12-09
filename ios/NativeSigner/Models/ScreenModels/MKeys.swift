@@ -19,6 +19,16 @@ struct MKeysKeyCard: Decodable, Hashable {
     var identicon: String
     var has_pwd: Bool
     var path: String
+    
+    func intoAddress() -> Address {
+        return Address(
+            base58: self.base58,
+            path: self.path,
+            has_pwd: self.has_pwd,
+            identicon: self.identicon,
+            seed_name: ""
+        )
+    }
 }
 
 struct MSeedKeyCard: Decodable {

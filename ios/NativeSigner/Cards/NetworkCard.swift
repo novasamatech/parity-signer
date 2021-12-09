@@ -9,12 +9,13 @@ import SwiftUI
 
 struct NetworkCard: View {
     @EnvironmentObject var data: SignerDataModel
-    let content: MNetworkCard
+    let title: String
+    let logo: String
     var body: some View {
         //TODO: implement png or svg import intercompatible with fontnames
         HStack {
-            Text(content.logo).font(FWeb3(style: .h4))
-            Text(content.title).font(FBase(style: .h3))
+            Text(logo).font(FWeb3(style: .h4))
+            Text(title).font(FBase(style: .h3))
             Spacer()
         }
         .foregroundColor(Color("Text600"))

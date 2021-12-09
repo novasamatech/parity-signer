@@ -21,7 +21,6 @@ struct MainScreenContainer: View {
                         Spacer()
                     }
                     ModalSelector()
-                    AlertSelector()
                 }
                 .gesture(
                     DragGesture().updating($dragOffset, body: { (value, state, transaction) in

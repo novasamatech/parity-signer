@@ -12,14 +12,14 @@ import SwiftUI
  * Displayable information about a public key within a network
  */
 struct Address: Codable, Equatable {
-    var public_key: String
-    var ss58: String
+    var base58: String
     var path: String
-    var has_password: String
-    var name: String
+    var has_pwd: Bool
+    var identicon: String
     var seed_name: String
 }
 
+/*
 /**
  * Mock test sample
  */
@@ -31,7 +31,8 @@ extension Address {
         ]
     }
 }
-
+*/
+ 
 /**
  * Useful utility functions for address
  */
@@ -40,21 +41,21 @@ extension Address {
      * Get truncated base58 address representation that fits on screen
      */
     func truncateBase58() -> String {
-        return self.ss58.prefix(8) + "..." + self.ss58.suffix(8)
+        return self.base58.prefix(8) + "..." + self.base58.suffix(8)
     }
     
     /**
      * Same as truncateBase58 but shorter for very space-constrained places
      */
     func truncateBase58to8() -> String {
-        return self.ss58.prefix(4) + "..." + self.ss58.suffix(4)
+        return self.base58.prefix(4) + "..." + self.base58.suffix(4)
     }
     
     /**
      * Definition of root address
      */
     func isRoot() -> Bool {
-        return self.path == "" && self.has_password == "false"
+        return self.path == "" && !self.has_pwd
     }
 }
 /*

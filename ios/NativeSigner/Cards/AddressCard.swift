@@ -13,7 +13,7 @@ import SwiftUI
  */
 struct AddressCard: View {
     @EnvironmentObject var data: SignerDataModel
-    var address: MKeysKeyCard
+    var address: Address
     @GestureState private var dragOffset = CGSize.zero
     let rowHeight: CGFloat = 28
     var body: some View {
@@ -25,10 +25,13 @@ struct AddressCard: View {
                     .frame(width: rowHeight, height: rowHeight)
                 VStack (alignment: .leading) {
                     HStack {
+                        Text(address.seed_name)
                             Text(address.path)
                         if address.has_pwd {
-                            Text("///")
-                            Image(systemName: "lock")
+                            Text("///").foregroundColor(Color("Crypto400"))
+                                .font(FCrypto(style: .body2))
+                            Image(systemName: "lock").foregroundColor(Color("Crypto400"))
+                                .font(FCrypto(style: .body2))
                         }
                     }.foregroundColor(Color("Crypto400"))
                         .font(FCrypto(style: .body2))

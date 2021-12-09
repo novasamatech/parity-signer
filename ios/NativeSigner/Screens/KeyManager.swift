@@ -20,7 +20,7 @@ struct KeyManager: View {
                     SeedKeyCard(seedCard: content.root)
                 }.padding(2)
                 Button(action: {data.pushButton(buttonID: .NetworkSelector)}) {
-                    NetworkCard(content: content.network)
+                    NetworkCard(title: content.network.title, logo: content.network.logo)
                 }
                 HStack {
                         Text("DERIVED KEYS").foregroundColor(Color("Text600"))
@@ -38,7 +38,7 @@ struct KeyManager: View {
                             Button(action: {
                                 data.pushButton(buttonID: .SelectKey, details: address.address_key)
                             }){
-                                AddressCard(address: address)
+                                AddressCard(address: address.intoAddress())
                             }.padding(2)
                         }
                     }

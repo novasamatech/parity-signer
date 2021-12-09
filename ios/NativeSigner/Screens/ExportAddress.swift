@@ -12,15 +12,17 @@ struct ExportAddress: View {
     @GestureState private var dragOffset = CGSize.zero
     @State var image: UIImage?
     @State var showDetails = false
+    var content: MKeyDetails
     var body: some View {
-        ZStack {
+        ScrollView {
             VStack {
-                /*
-                NetworkCard(network: data.selectedNetwork)
-                if data.selectedAddress != nil {
-                    AddressCard(address: data.selectedAddress!)
-                }*/
-                if image == nil || showDetails {
+                AddressCard(address: content.intoAddress())
+                NetworkCard(title: content.network_title, logo: content.network_logo)
+                Image(uiImage: UIImage(data: Data(fromHexEncodedString: content.qr) ?? Data()) ?? UIImage())
+                    .resizable()
+                    .aspectRatio(contentMode: .fit).padding(12)
+                HeaderBar(line1: "KEY DETAILS", line2: "Key key details details")
+                VStack {
                     HStack {
                         Text("Base58 key: ")
                         //Text(data.selectedAddress?.ss58 ?? "unknown")
@@ -33,22 +35,9 @@ struct ExportAddress: View {
                         Text("Seed name: ")
                         //Text(data.selectedAddress?.seed_name ?? "unknown")
                     }.padding()
-                } else {
-                    Image(uiImage: image!)
-                        .resizable()
-                        .aspectRatio(contentMode: .fit)
                 }
+                .foregroundColor(Color("Crypto400"))
             }
-            .foregroundColor(Color("textMainColor"))
-        }
-        .onAppear {
-            /*data.lastError = ""
-            if data.selectedAddress != nil {
-                image = data.exportIdentityQR()
-            }*/
-        }
-        .onDisappear {
-            //data.selectedAddress = nil
         }
         .gesture(
             DragGesture().onEnded {drag in
@@ -56,15 +45,11 @@ struct ExportAddress: View {
                     showDetails.toggle()
                 } else {
                     if drag.translation.width > 20 {
-                        //data.selectNextAddress()
+                        data.pushButton(buttonID: .NextUnit)
                     }
                     if drag.translation.width < -20 {
-                        //data.selectPreviousAddress()
+                        data.pushButton(buttonID: .PreviousUnit)
                     }
-                    /*
-                    if data.selectedAddress != nil {
-                        image = data.exportIdentityQR()
-                    }*/
                 }
             }
         )
