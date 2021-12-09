@@ -10,10 +10,7 @@ import SwiftUI
 struct KeySymbol: View {
     var body: some View {
         VStack{
-            Text("account").font(Font.custom("Web3-Regular", size: 24))
-            /*
-            Image(systemName: "circle.hexagongrid.fill").imageScale(.medium)
-             */
+            Text("accounts").font(Font.custom("Web3-Regular", size: 20))
         }
     }
 }
@@ -35,7 +32,10 @@ struct Footer: View {
             }) {
                 VStack(alignment: .center) {
                     Image(systemName: "rectangle.grid.1x2.fill").imageScale(.medium)
+                        .padding(.top, 4.0)
+                        .padding(.bottom, 1.0)
                     Text("Log")
+                        
                 }
                 .foregroundColor(buttonColor(active: data.actionResult.footerButton == "Log"))
             }
@@ -45,6 +45,8 @@ struct Footer: View {
             }) {
                 VStack {
                     Image(systemName: "viewfinder").imageScale(.medium)
+                        .padding(.top, 4.0)
+                        .padding(.bottom, 1.0)
                     Text("Scanner")
                 }
                 .foregroundColor(buttonColor(active: data.actionResult.footerButton == "Scan"))
@@ -65,6 +67,8 @@ struct Footer: View {
             }) {
                 VStack {
                     WrenchSymbol()
+                        .padding(.top, 4.0)
+                        .padding(.bottom, 1.0)
                     Text("Settings")
                 }
                 .foregroundColor(buttonColor(active: data.actionResult.footerButton == "Settings"))
