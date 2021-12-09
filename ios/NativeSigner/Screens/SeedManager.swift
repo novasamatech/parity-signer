@@ -12,7 +12,6 @@ struct SeedManager: View {
     var content: MSeeds
     @State var showBackup = false
     @State var deleteConfirm = false
-    @State var screenNameType = "h1"
     @State var seedPhrase = ""
     @State var removeSeed = ""
     var body: some View {
