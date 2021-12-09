@@ -29,6 +29,12 @@
 	<key>UIAppFonts</key>
 	<array>
 		<string>Web3-Regular.otf</string>
+		<string>Inter-Bold.otf</string>
+		<string>Inter-Medium.otf</string>
+		<string>Inter-Regular.otf</string>
+		<string>Inter-SemiBold.otf</string>
+		<string>robotomono_regular.ttf</string>
+		<string>robotomono_thin.ttf</string>
 	</array>
 	<key>UIApplicationSceneManifest</key>
 	<dict>

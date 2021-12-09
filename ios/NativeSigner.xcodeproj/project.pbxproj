@@ -7,6 +7,10 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		0452BC522762679F00C6DD37 /* Inter-Bold.otf in Resources */ = {isa = PBXBuildFile; fileRef = 0452BC4E2762679F00C6DD37 /* Inter-Bold.otf */; };
+		0452BC532762679F00C6DD37 /* Inter-SemiBold.otf in Resources */ = {isa = PBXBuildFile; fileRef = 0452BC4F2762679F00C6DD37 /* Inter-SemiBold.otf */; };
+		0452BC542762679F00C6DD37 /* Inter-Medium.otf in Resources */ = {isa = PBXBuildFile; fileRef = 0452BC502762679F00C6DD37 /* Inter-Medium.otf */; };
+		0452BC552762679F00C6DD37 /* Inter-Regular.otf in Resources */ = {isa = PBXBuildFile; fileRef = 0452BC512762679F00C6DD37 /* Inter-Regular.otf */; };
 		2D48F35127609CDE004B27BE /* HistoryCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D48F35027609CDE004B27BE /* HistoryCard.swift */; };
 		2D48F3532760A2D8004B27BE /* Fonts.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D48F3522760A2D8004B27BE /* Fonts.swift */; };
 		2D48F3552760AF9D004B27BE /* MSeeds.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D48F3542760AF9D004B27BE /* MSeeds.swift */; };
@@ -85,7 +89,6 @@
 		2DA5F89D275F874D00D8DD29 /* NetworkManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2DA5F89C275F874D00D8DD29 /* NetworkManager.swift */; };
 		2DA5F89F275F885400D8DD29 /* NewSeedMenu.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2DA5F89E275F885400D8DD29 /* NewSeedMenu.swift */; };
 		2DA5F8A1275F889400D8DD29 /* HeaderBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2DA5F8A0275F889400D8DD29 /* HeaderBar.swift */; };
-		2DA5F8A5275F8B1300D8DD29 /* inter.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 2DA5F8A2275F8B1300D8DD29 /* inter.ttf */; };
 		2DA5F8A6275F8B1300D8DD29 /* robotomono_regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 2DA5F8A3275F8B1300D8DD29 /* robotomono_regular.ttf */; };
 		2DA5F8A7275F8B1300D8DD29 /* robotomono_thin.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 2DA5F8A4275F8B1300D8DD29 /* robotomono_thin.ttf */; };
 		2DB037BF270F12DF00A318B2 /* Web3-Regular.otf in Resources */ = {isa = PBXBuildFile; fileRef = 2DB037BE270F12DF00A318B2 /* Web3-Regular.otf */; };
@@ -118,6 +121,10 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		0452BC4E2762679F00C6DD37 /* Inter-Bold.otf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Inter-Bold.otf"; sourceTree = "<group>"; };
+		0452BC4F2762679F00C6DD37 /* Inter-SemiBold.otf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Inter-SemiBold.otf"; sourceTree = "<group>"; };
+		0452BC502762679F00C6DD37 /* Inter-Medium.otf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Inter-Medium.otf"; sourceTree = "<group>"; };
+		0452BC512762679F00C6DD37 /* Inter-Regular.otf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Inter-Regular.otf"; sourceTree = "<group>"; };
 		2D48F35027609CDE004B27BE /* HistoryCard.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HistoryCard.swift; sourceTree = "<group>"; };
 		2D48F3522760A2D8004B27BE /* Fonts.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Fonts.swift; sourceTree = "<group>"; };
 		2D48F3542760AF9D004B27BE /* MSeeds.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MSeeds.swift; sourceTree = "<group>"; };
@@ -196,7 +203,6 @@
 		2DA5F89C275F874D00D8DD29 /* NetworkManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NetworkManager.swift; sourceTree = "<group>"; };
 		2DA5F89E275F885400D8DD29 /* NewSeedMenu.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewSeedMenu.swift; sourceTree = "<group>"; };
 		2DA5F8A0275F889400D8DD29 /* HeaderBar.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HeaderBar.swift; sourceTree = "<group>"; };
-		2DA5F8A2275F8B1300D8DD29 /* inter.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = inter.ttf; sourceTree = "<group>"; };
 		2DA5F8A3275F8B1300D8DD29 /* robotomono_regular.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = robotomono_regular.ttf; sourceTree = "<group>"; };
 		2DA5F8A4275F8B1300D8DD29 /* robotomono_thin.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = robotomono_thin.ttf; sourceTree = "<group>"; };
 		2DB037BE270F12DF00A318B2 /* Web3-Regular.otf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Web3-Regular.otf"; sourceTree = "<group>"; };
@@ -378,9 +384,12 @@
 		2DB037BD270F12BB00A318B2 /* Fonts */ = {
 			isa = PBXGroup;
 			children = (
+				0452BC4E2762679F00C6DD37 /* Inter-Bold.otf */,
+				0452BC502762679F00C6DD37 /* Inter-Medium.otf */,
+				0452BC512762679F00C6DD37 /* Inter-Regular.otf */,
+				0452BC4F2762679F00C6DD37 /* Inter-SemiBold.otf */,
 				2DB037BE270F12DF00A318B2 /* Web3-Regular.otf */,
 				2D48F3522760A2D8004B27BE /* Fonts.swift */,
-				2DA5F8A2275F8B1300D8DD29 /* inter.ttf */,
 				2DA5F8A3275F8B1300D8DD29 /* robotomono_regular.ttf */,
 				2DA5F8A4275F8B1300D8DD29 /* robotomono_thin.ttf */,
 			);
@@ -605,10 +614,13 @@
 				2DB037BF270F12DF00A318B2 /* Web3-Regular.otf in Resources */,
 				2DE72BC926A588C9002BB752 /* Preview Assets.xcassets in Resources */,
 				2DE72BC626A588C9002BB752 /* Assets.xcassets in Resources */,
+				0452BC522762679F00C6DD37 /* Inter-Bold.otf in Resources */,
 				2DA5F8A6275F8B1300D8DD29 /* robotomono_regular.ttf in Resources */,
 				2D7A7BE326C3FC250053C1E0 /* terms-and-conditions.txt in Resources */,
-				2DA5F8A5275F8B1300D8DD29 /* inter.ttf in Resources */,
 				2DA5F8A7275F8B1300D8DD29 /* robotomono_thin.ttf in Resources */,
+				0452BC552762679F00C6DD37 /* Inter-Regular.otf in Resources */,
+				0452BC532762679F00C6DD37 /* Inter-SemiBold.otf in Resources */,
+				0452BC542762679F00C6DD37 /* Inter-Medium.otf in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

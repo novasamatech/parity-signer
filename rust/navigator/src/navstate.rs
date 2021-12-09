@@ -376,7 +376,7 @@ impl State {
             Screen::LogDetails => "h4",
             Screen::Scan => "h1",
             Screen::Transaction => "h1",
-            Screen::SeedSelector => "h4",
+            Screen::SeedSelector => "h1",
             Screen::Keys(_) => "h4",
             Screen::KeyDetails(_) => "h4",
             Screen::NewSeed => "h1",
