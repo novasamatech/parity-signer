@@ -1,7 +1,7 @@
 //!List of all screens
 use sp_runtime::MultiSigner;
 
-use db_handling::{identities::get_addresses_by_seed_name, interface_signer::first_network};
+use db_handling::interface_signer::{addresses_set_seed_name_network, first_network};
 use definitions::{error::{AddressKeySource, ErrorSigner, ExtraAddressKeySourceSigner, InterfaceSigner, Signer}, keyring::{AddressKey, NetworkSpecsKey}};
 
 ///All screens
@@ -49,6 +49,12 @@ impl KeysState {
             network: NetworkSpecsKey::from_parts(&network_specs.genesis_hash.to_vec(), &network_specs.encryption),
         })
     }
+    pub fn change_network(&self, network_specs_key: &NetworkSpecsKey) -> Self {
+        Self {
+            seed_name: self.seed_name(),
+            network: network_specs_key.to_owned(),
+        }
+    }
     pub fn seed_name(&self) -> String {
         self.seed_name.to_owned()
     }
@@ -62,7 +68,7 @@ impl AddressState {
         let address_key = AddressKey::from_hex(hex_address_key)?;
         let multisigner = address_key.multi_signer::<Signer>(AddressKeySource::Extra(ExtraAddressKeySourceSigner::Interface))?;
         let seed_name = keys_state.seed_name();
-        let mut whole_set = get_addresses_by_seed_name(database_name, &seed_name)?;
+        let mut whole_set = addresses_set_seed_name_network(database_name, &seed_name, &keys_state.network_specs_key())?;
         whole_set.sort_by(|(_, a), (_, b)| a.path.cmp(&b.path));
         let set: Vec<MultiSigner> = whole_set.into_iter().map(|(multisigner, _)| multisigner).collect();
         let selected = match set.iter().position(|a| a == &multisigner) {

@@ -36,10 +36,7 @@ pub fn print_all_seed_names_with_identicons (database_name: &str) -> Result<Stri
 /// Is used only on the Signer side, interacts only with navigation.
 pub fn print_identities_for_seed_name_and_network (database_name: &str, seed_name: &str, network_specs_key: &NetworkSpecsKey) -> Result<String, ErrorSigner> {
     let network_specs = get_network_specs(database_name, network_specs_key)?;
-    let identities: Vec<(MultiSigner, AddressDetails)> = get_addresses_by_seed_name(database_name, seed_name)?
-        .into_iter()
-        .filter(|(_, address_details)| address_details.network_id.contains(network_specs_key))
-        .collect();
+    let identities = addresses_set_seed_name_network (database_name, seed_name, network_specs_key)?;
     let mut root_id = None;
     let mut other_id: Vec<(MultiSigner, AddressDetails, Vec<u8>)> = Vec::new();
     for (multisigner, address_details) in identities.into_iter() {
@@ -59,6 +56,14 @@ pub fn print_identities_for_seed_name_and_network (database_name: &str, seed_nam
     let other_print = export_complex_vector(&other_id, |(multisigner, address_details, identicon)| format!("\"address_key\":\"{}\",\"base58\":\"{}\",\"identicon\":\"{}\",\"has_pwd\":{},\"path\":\"{}\"", hex::encode(AddressKey::from_multisigner(&multisigner).key()), print_multisigner_as_base58(&multisigner, Some(network_specs.base58prefix)), hex::encode(identicon), address_details.has_pwd, address_details.path));
     
     Ok(format!("\"root\":{{{}}},\"set\":{},\"network\":{{\"title\":\"{}\",\"logo\":\"{}\"}}", root_print, other_print, network_specs.title, network_specs.logo))
+}
+
+/// Function to get addresses for given seed name and network specs key
+pub fn addresses_set_seed_name_network (database_name: &str, seed_name: &str, network_specs_key: &NetworkSpecsKey) -> Result<Vec<(MultiSigner, AddressDetails)>, ErrorSigner> {
+    Ok(get_addresses_by_seed_name(database_name, seed_name)?
+        .into_iter()
+        .filter(|(_, address_details)| address_details.network_id.contains(network_specs_key))
+        .collect())
 }
 
 /// Function to print all networks, with bool indicator which one is currently selected
@@ -124,7 +129,7 @@ mod tests {
         assert!(horrible_print == expected_print, "\nReceived: \n{}", horrible_print);
         fs::remove_dir_all(dbname).unwrap();
     }
-
+    
     #[test]
     fn print_ids_seed_name_network() {
         let dbname = "for_tests/print_ids_seed_name_network";
@@ -134,7 +139,7 @@ mod tests {
         assert!(horrible_print == expected_print, "\nReceived: \n{}", horrible_print);
         fs::remove_dir_all(dbname).unwrap();
     }
-
+    
     #[test]
     fn show_all_networks_flag_westend() {
         let dbname = "for_tests/show_all_networks_flag_westend";
@@ -144,7 +149,7 @@ mod tests {
         assert!(print == expected_print, "\nReceived: \n{}", print);
         fs::remove_dir_all(dbname).unwrap();
     }
-
+    
     #[test]
     fn first_standard_network() {
         let dbname = "for_tests/first_standard_network";
@@ -153,7 +158,7 @@ mod tests {
         assert!(specs.name == "polkadot", "\nReceived: \n{:?}", specs);
         fs::remove_dir_all(dbname).unwrap();
     }
-
+    
     #[test]
     fn export_alice_westend() {
         let dbname = "for_tests/export_alice_westend";
@@ -165,3 +170,6 @@ mod tests {
         fs::remove_dir_all(dbname).unwrap();
     }
 }
+
+
+

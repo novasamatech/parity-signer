@@ -1,11 +1,13 @@
 //! List of all modals
 
-#[derive(PartialEq, Debug, Copy, Clone)]
+use definitions::keyring::NetworkSpecsKey;
+
+#[derive(PartialEq, Debug, Clone)]
 pub enum Modal {
     Backup,
     NewSeedMenu,
     SeedMenu,
-    NetworkSelector,
+    NetworkSelector(NetworkSpecsKey), 
     Empty,
 }
 
@@ -15,7 +17,7 @@ impl Modal {
             Modal::Backup => String::from("Backup"),
             Modal::NewSeedMenu => String::from("NewSeedMenu"),
             Modal::SeedMenu => String::from("SeedMenu"),
-            Modal::NetworkSelector => String::from("NetworkSelector"),
+            Modal::NetworkSelector(_) => String::from("NetworkSelector"),
             Modal::Empty => String::from("Empty"),
         }
     }

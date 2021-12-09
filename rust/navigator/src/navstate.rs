@@ -194,10 +194,15 @@ impl State {
                     new_navstate = Navstate::clean_screen(Screen::RecoverSeedName);
                 },
                 Action::NetworkSelector => {
-                    if self.navstate.modal == Modal::NetworkSelector {
+                    if let Modal::NetworkSelector(_) = self.navstate.modal {
                         new_navstate.modal = Modal::Empty;
                     } else {
-                        new_navstate.modal = Modal::NetworkSelector;
+                        match &self.navstate.screen {
+                            Screen::Keys(ref keys_state) => {
+                                new_navstate.modal = Modal::NetworkSelector(keys_state.network_specs_key());
+                            },
+                            _ => println!("NetworkSelector does nothing here"),
+                        }
                     }
                 },
                 Action::NextUnit => {
@@ -214,6 +219,18 @@ impl State {
                             new_navstate = Navstate::clean_screen(Screen::KeyDetails(address_state.previous()));
                         },
                         _ => println!("PreviousUnit does nothing here"),
+                    }
+                },
+                Action::ChangeNetwork => {
+                    match NetworkSpecsKey::from_hex(details_str) {
+                        Ok(network_specs_key) => {
+                            if let Screen::Keys(ref k) = self.navstate.screen {new_navstate.screen = Screen::Keys(k.change_network(&network_specs_key));}
+                            if let Modal::NetworkSelector(_) = self.navstate.modal {new_navstate.modal = Modal::NetworkSelector(network_specs_key);}
+                        },
+                        Err(e) => {
+                            new_navstate.alert = Alert::Error;
+                            errorline.push_str(&<Signer>::show(&e));
+                        },
                     }
                 },
                 Action::Nothing => {
@@ -284,6 +301,14 @@ impl State {
 
             //Prepare modal details
             let modal_details = match new_navstate.modal {
+                Modal::NetworkSelector(ref network_specs_key) => match db_handling::interface_signer::show_all_networks_with_flag (dbname, &network_specs_key) {
+                    Ok(a) => a,
+                    Err(e) => {
+                        new_navstate.alert = Alert::Error;
+                        errorline.push_str(&<Signer>::show(&e));
+                        "".to_string()
+                    },
+                },
                 _ => "".to_string(),
             };
             
@@ -310,7 +335,7 @@ impl State {
     pub fn generate_json(&self, details: &str) -> String {
         let mut output = String::from("{");
         let screen = self.navstate.screen.to_owned();
-        let modal = self.navstate.modal;
+        let modal = self.navstate.modal.to_owned();
         let alert = self.navstate.alert;
         if let Some(screen_name) = screen.get_name() {
             output.push_str(&format!("\"screen\":\"{}\",\"screenLabel\":\"{}\",\"back\":{},\"footer\":{},\"footerButton\":\"{}\",\"rightButton\":\"{}\",\"screenNameType\":\"{}\",", screen_name, self.get_screen_label(), screen.has_back(), true, self.get_active_navbutton(), self.get_right_button(), self.get_screen_name_type()));

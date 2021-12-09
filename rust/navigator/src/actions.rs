@@ -22,6 +22,7 @@ pub enum Action {
     NetworkSelector,
     NextUnit,
     PreviousUnit,
+    ChangeNetwork,
     Nothing,
 }
 
@@ -45,6 +46,7 @@ impl Action {
             "NetworkSelector" => Action::NetworkSelector,
             "NextUnit" => Action::NextUnit,
             "PreviousUnit" => Action::PreviousUnit,
+            "ChangeNetwork" => Action::ChangeNetwork,
             _ => Action::Nothing,
         }
     }

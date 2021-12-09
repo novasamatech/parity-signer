@@ -25,15 +25,15 @@ struct ExportAddress: View {
                 VStack {
                     HStack {
                         Text("Base58 key: ")
-                        //Text(data.selectedAddress?.ss58 ?? "unknown")
+                        Text(content.base58)
                     }.padding()
                     HStack {
                         Text("Hex key: ")
-                        //Text(data.selectedAddress?.public_key ?? "unknown")
+                        Text(content.pubkey)
                     }.padding()
                     HStack {
                         Text("Seed name: ")
-                        //Text(data.selectedAddress?.seed_name ?? "unknown")
+                        Text(content.seed_name)
                     }.padding()
                 }
                 .foregroundColor(Color("Crypto400"))

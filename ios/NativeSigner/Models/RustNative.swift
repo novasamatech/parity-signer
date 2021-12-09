@@ -60,6 +60,9 @@ class SignerDataModel: ObservableObject {
     let queue = DispatchQueue.global(qos: .background)
     @Published var alert: Bool = false
     
+    //version
+    let appVersion = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String
+    
     init() {
         self.dbName = NSHomeDirectory() + "/Documents/Database"
         self.onboardingDone = FileManager.default.fileExists(atPath: NSHomeDirectory() + "/Documents/Database")
