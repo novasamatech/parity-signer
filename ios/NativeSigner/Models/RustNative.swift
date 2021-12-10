@@ -10,6 +10,7 @@
 import Foundation
 import UIKit //for converting raw png to UIImage
 import Network //to detect network connection and raise alert
+import LocalAuthentication //to detect if password is set
 
 /**
  * Object to store all data; since the data really is mostly stored in RustNative side, just one object (to describe it) is used here.
@@ -63,23 +64,27 @@ class SignerDataModel: ObservableObject {
     //version
     let appVersion = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String
     
+    //did user set up password?
+    let protected = LAContext().canEvaluatePolicy(.deviceOwnerAuthentication, error: nil)
+    
     init() {
         self.dbName = NSHomeDirectory() + "/Documents/Database"
         self.onboardingDone = FileManager.default.fileExists(atPath: NSHomeDirectory() + "/Documents/Database")
-        if self.onboardingDone {
-            self.monitor.pathUpdateHandler = {path in
-                if path.availableInterfaces.count == 0 {
-                    DispatchQueue.main.async {
-                        self.canaryDead = false
-                    }
-                } else {
-                    DispatchQueue.main.async {
-                        device_was_online(nil, self.dbName)
-                        self.canaryDead = true
-                        self.alert = true
-                    }
+        self.monitor.pathUpdateHandler = {path in
+            if path.availableInterfaces.count == 0 {
+                DispatchQueue.main.async {
+                    self.canaryDead = false
+                }
+            } else {
+                DispatchQueue.main.async {
+                    device_was_online(nil, self.dbName)
+                    self.canaryDead = true
+                    self.alert = true
                 }
             }
+        }
+        if self.onboardingDone {
+            
             
             monitor.start(queue: self.queue)
             

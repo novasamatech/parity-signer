@@ -36,7 +36,11 @@ struct MainScreenContainer: View {
                     .background(Color("Bg000"))
             }
         } else {
-            LandingView().background(/*@START_MENU_TOKEN@*//*@PLACEHOLDER=View@*/Color("backgroundColor")/*@END_MENU_TOKEN@*/)
+            if (data.protected) {
+                LandingView()
+            } else {
+                Text("Please protect device with pin or password!")
+            }
         }
     }
 }

@@ -26,7 +26,7 @@ struct CameraPreview: UIViewRepresentable {
         view.videoPreviewLayer.cornerRadius = 4
         view.videoPreviewLayer.session = session
         view.videoPreviewLayer.connection?.videoOrientation = .portrait
-        view.videoPreviewLayer.borderColor = UIColor(Color("cryptoColor")).cgColor
+        view.videoPreviewLayer.borderColor = UIColor(Color("Crypto400")).cgColor
         view.videoPreviewLayer.borderWidth = 1
         
         return view
