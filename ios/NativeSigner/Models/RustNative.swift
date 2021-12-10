@@ -77,21 +77,18 @@ class SignerDataModel: ObservableObject {
                 }
             } else {
                 DispatchQueue.main.async {
-                    device_was_online(nil, self.dbName)
+                    if self.onboardingDone {
+                        device_was_online(nil, self.dbName)
+                        self.alert = true
+                    }
                     self.canaryDead = true
-                    self.alert = true
                 }
             }
         }
+        monitor.start(queue: self.queue)
         if self.onboardingDone {
-            
-            
-            monitor.start(queue: self.queue)
-            
             self.refreshSeeds()
-            
             init_navigation(nil, dbName, seedNames.joined(separator: ","))
-            
             self.totalRefresh()
         }
     }
@@ -109,9 +106,9 @@ class SignerDataModel: ObservableObject {
      */
     func totalRefresh() {
         print("heavy reset")
-        act(nil, "Start", "")
+        pushButton(buttonID: .Start)
         self.checkAlert()
-        self.refreshUI()
+        //self.refreshUI()
     }
 }
 
@@ -124,44 +121,47 @@ extension SignerDataModel {
      */
     func onboard(jailbreak: Bool = false) {
         var err = ExternError()
-        do {
-            print("onboarding...")
-            if let source = Bundle.main.url(forResource: "Database", withExtension: "") {
-                print(source)
-                var destination = try FileManager.default.url(for: .documentDirectory, in: .userDomainMask, appropriateFor: nil, create: false)
-                destination.appendPathComponent("Database")
-                if FileManager.default.fileExists(atPath: NSHomeDirectory() + "/Documents/Database") {
-                    do {
-                        try FileManager.default.removeItem(at: destination)
-                    } catch {
-                        print("db exists but could not be removed; please report bug")
-                        return
-                    }
-                }
-                try FileManager.default.copyItem(at: source, to: destination)
-                withUnsafeMutablePointer(to: &err) {err_ptr in
-                    if jailbreak {
-                        init_history_no_cert(err_ptr, self.dbName)
-                    } else {
-                        init_history_with_cert(err_ptr, self.dbName)
-                    }
-                    if (err_ptr.pointee.code == 0) {
-                        self.onboardingDone = true
-                        if self.canaryDead {
-                            device_was_online(nil, self.dbName)
+        if !self.canaryDead {
+            do {
+                print("onboarding...")
+                if let source = Bundle.main.url(forResource: "Database", withExtension: "") {
+                    print(source)
+                    var destination = try FileManager.default.url(for: .documentDirectory, in: .userDomainMask, appropriateFor: nil, create: false)
+                    destination.appendPathComponent("Database")
+                    if FileManager.default.fileExists(atPath: NSHomeDirectory() + "/Documents/Database") {
+                        do {
+                            try FileManager.default.removeItem(at: destination)
+                        } catch {
+                            print("db exists but could not be removed; please report bug")
+                            return
                         }
-                        init_navigation(nil, dbName, seedNames.joined(separator: ","))
-                        self.totalRefresh()
-                        self.refreshSeeds()
-                    } else {
-                        print("History init failed! This will not do.")
-                        print(String(cString: err_ptr.pointee.message))
-                        signer_destroy_string(err_ptr.pointee.message)
+                    }
+                    try FileManager.default.copyItem(at: source, to: destination)
+                    withUnsafeMutablePointer(to: &err) {err_ptr in
+                        if jailbreak {
+                            init_history_no_cert(err_ptr, self.dbName)
+                        } else {
+                            init_history_with_cert(err_ptr, self.dbName)
+                        }
+                        if (err_ptr.pointee.code == 0) {
+                            self.onboardingDone = true
+                            /* Mean app mode:
+                             if self.canaryDead {
+                             device_was_online(nil, self.dbName)
+                             }*/
+                            init_navigation(nil, dbName, seedNames.joined(separator: ","))
+                            self.totalRefresh()
+                            self.refreshSeeds()
+                        } else {
+                            print("History init failed! This will not do.")
+                            print(String(cString: err_ptr.pointee.message))
+                            signer_destroy_string(err_ptr.pointee.message)
+                        }
                     }
                 }
+            } catch {
+                print("DB init failed")
             }
-        } catch {
-            print("DB init failed")
         }
     }
     

@@ -167,6 +167,7 @@ enum ButtonID {
     case NextUnit
     case PreviousUnit
     case NewKey
+    case BackupSeed
 }
 
 /**

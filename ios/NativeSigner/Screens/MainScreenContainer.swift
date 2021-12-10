@@ -37,7 +37,11 @@ struct MainScreenContainer: View {
             }
         } else {
             if (data.protected) {
-                LandingView()
+                if (data.canaryDead) {
+                    Text("Please enable airplane mode and disconnect all cables!")
+                } else {
+                    LandingView()
+                }
             } else {
                 Text("Please protect device with pin or password!")
             }
