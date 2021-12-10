@@ -193,6 +193,17 @@ impl State {
                 Action::RecoverSeed => {
                     new_navstate = Navstate::clean_screen(Screen::RecoverSeedName);
                 },
+                Action::BackupSeed => {
+                    if details_str == "" {
+                        match &self.navstate.screen {
+                            Screen::Keys(ref keys_state) => {
+                                new_navstate.modal = Modal::Backup(keys_state.seed_name());
+                            },
+                            _ => println!("BackupSeed without seed_name does nothing here"),
+                        }
+                    }
+                    else {new_navstate.modal = Modal::Backup(details_str.to_string())}
+                },
                 Action::NetworkSelector => {
                     if let Modal::NetworkSelector(_) = self.navstate.modal {
                         new_navstate.modal = Modal::Empty;
@@ -301,6 +312,14 @@ impl State {
 
             //Prepare modal details
             let modal_details = match new_navstate.modal {
+                Modal::Backup(ref seed_name) => match db_handling::interface_signer::backup_prep(dbname, &seed_name) {
+                    Ok(a) => a,
+                    Err(e) => {
+                        new_navstate.alert = Alert::Error;
+                        errorline.push_str(&<Signer>::show(&e));
+                        "".to_string()
+                    },
+                }
                 Modal::NetworkSelector(ref network_specs_key) => match db_handling::interface_signer::show_all_networks_with_flag (dbname, &network_specs_key) {
                     Ok(a) => a,
                     Err(e) => {
