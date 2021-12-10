@@ -94,7 +94,10 @@ const char * get_relevant_identities(struct ExternError*, const char* seed_name,
 const char * get_all_identities(struct ExternError*, const char* dbname);
 
 // Function to create new seed
-const char * try_create_seed(struct ExternError*, const char* seed_name, const char* seed_phrase, int seed_length, const char* dbname);
+const char * try_create_seed(struct ExternError*, const char* seed_name, int seed_length, const char* dbname);
+
+// Function to create new seed
+const char * try_restore_seed(struct ExternError*, const char* seed_name, const char* seed_phrase, const char* dbname);
 
 // Suggest next numbered path
 const char * suggest_n_plus_one(struct ExternError*, const char* path, const char* seed_name, const char* network_id_string, const char* dbname);

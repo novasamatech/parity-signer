@@ -61,7 +61,7 @@ extension SignerDataModel {
         self.seedNames = seedNames.sorted()
     }
     
-    func addSeed(seedName: String, seedPhrase: String) {
+    func addSeed(seedName: String, seedLength: Int32) {
         var err = ExternError()
         guard let accessFlags = SecAccessControlCreateWithFlags(kCFAllocatorDefault, kSecAttrAccessibleWhenPasscodeSetThisDeviceOnly, .devicePasscode, &error) else {
             print("Access flags could not be allocated")
@@ -75,13 +75,13 @@ extension SignerDataModel {
             self.lastError = "Seed with this name already exists"
             return
         }
-        if checkSeedPhraseCollision(seedPhrase: seedPhrase) {
+        if checkSeedPhraseCollision(seedPhrase: "") {
             print("Key collision")
             self.lastError = "Seed with this name already exists"
             return
         }
         withUnsafeMutablePointer(to: &err) {err_ptr in
-            let res = try_create_seed(err_ptr, seedName, seedPhrase, 24, dbName)
+            let res = try_create_seed(err_ptr, seedName, seedLength, dbName)
             if err_ptr.pointee.code != 0 {
                 self.lastError = String(cString: err_ptr.pointee.message)
                 print("Rust returned error")
@@ -113,8 +113,66 @@ extension SignerDataModel {
                 return
             }
             self.refreshSeeds()
-            self.selectSeed(seedName: seedName)
             self.seedBackup = finalSeedPhraseString
+            self.pushButton(buttonID: .BackupSeed, details: seedName)
+            //TODO
+        }
+    }
+    
+    func restoreSeed(seedName: String, seedPhrase: String) {
+        var err = ExternError()
+        guard let accessFlags = SecAccessControlCreateWithFlags(kCFAllocatorDefault, kSecAttrAccessibleWhenPasscodeSetThisDeviceOnly, .devicePasscode, &error) else {
+            print("Access flags could not be allocated")
+            print(error ?? "no error code")
+            self.lastError = "iOS key manager error, report a bug"
+            return
+        }
+        print(accessFlags)
+        if checkSeedCollision(seedName: seedName) {
+            print("Key collision")
+            self.lastError = "Seed with this name already exists"
+            return
+        }
+        if checkSeedPhraseCollision(seedPhrase: seedPhrase) {
+            print("Key collision")
+            self.lastError = "Seed with this name already exists"
+            return
+        }
+        withUnsafeMutablePointer(to: &err) {err_ptr in
+            let res = try_restore_seed(err_ptr, seedName, seedPhrase, dbName)
+            if err_ptr.pointee.code != 0 {
+                self.lastError = String(cString: err_ptr.pointee.message)
+                print("Rust returned error")
+                print(self.lastError)
+                signer_destroy_string(err_ptr.pointee.message)
+                return
+            }
+            let finalSeedPhraseString = String(cString: res!)
+            guard let finalSeedPhrase = finalSeedPhraseString.data(using: .utf8) else {
+                print("could not encode seed phrase")
+                self.lastError = "Seed phrase contains non-0unicode symbols"
+                return
+            }
+            signer_destroy_string(res)
+            print(finalSeedPhrase)
+            let query: [String: Any] = [
+                kSecClass as String: kSecClassGenericPassword,
+                kSecAttrAccessControl as String: accessFlags,
+                kSecAttrAccount as String: seedName,
+                kSecValueData as String: finalSeedPhrase,
+                kSecReturnData as String: true
+            ]
+            var resultAdd: AnyObject?
+            let status = SecItemAdd(query as CFDictionary, &resultAdd)
+            guard status == errSecSuccess else {
+                print("key add failure")
+                print(status)
+                self.lastError = SecCopyErrorMessageString(status, nil)! as String
+                return
+            }
+            self.refreshSeeds()
+            self.seedBackup = finalSeedPhraseString
+            self.pushButton(buttonID: .BackupSeed, details: seedName)
             //TODO
         }
     }

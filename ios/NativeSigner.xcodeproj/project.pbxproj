@@ -20,6 +20,9 @@
 		2D48F36127620F49004B27BE /* SeedKeyCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D48F36027620F49004B27BE /* SeedKeyCard.swift */; };
 		2D48F36327622C54004B27BE /* MNetworkMenu.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D48F36227622C54004B27BE /* MNetworkMenu.swift */; };
 		2D48F3652762407A004B27BE /* MKeyDetais.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D48F3642762407A004B27BE /* MKeyDetais.swift */; };
+		2D48F36927636036004B27BE /* SeedMenu.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D48F36827636036004B27BE /* SeedMenu.swift */; };
+		2D48F36B2763604F004B27BE /* Backup.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D48F36A2763604F004B27BE /* Backup.swift */; };
+		2D48F36D27636092004B27BE /* MBackup.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D48F36C27636092004B27BE /* MBackup.swift */; };
 		2D72B4F626EF3BC50081E879 /* Navigator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D72B4F526EF3BC50081E879 /* Navigator.swift */; };
 		2D72B4FA26EF7D1C0081E879 /* Seeds.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D72B4F926EF7D1C0081E879 /* Seeds.swift */; };
 		2D72D52A2732B8A7004BA7C9 /* Database in Resources */ = {isa = PBXBuildFile; fileRef = 2D72D5292732B8A7004BA7C9 /* Database */; };
@@ -134,6 +137,9 @@
 		2D48F36027620F49004B27BE /* SeedKeyCard.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SeedKeyCard.swift; sourceTree = "<group>"; };
 		2D48F36227622C54004B27BE /* MNetworkMenu.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MNetworkMenu.swift; sourceTree = "<group>"; };
 		2D48F3642762407A004B27BE /* MKeyDetais.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MKeyDetais.swift; sourceTree = "<group>"; };
+		2D48F36827636036004B27BE /* SeedMenu.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SeedMenu.swift; sourceTree = "<group>"; };
+		2D48F36A2763604F004B27BE /* Backup.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Backup.swift; sourceTree = "<group>"; };
+		2D48F36C27636092004B27BE /* MBackup.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MBackup.swift; sourceTree = "<group>"; };
 		2D72B4F526EF3BC50081E879 /* Navigator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Navigator.swift; sourceTree = "<group>"; };
 		2D72B4F926EF7D1C0081E879 /* Seeds.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Seeds.swift; sourceTree = "<group>"; };
 		2D72D5292732B8A7004BA7C9 /* Database */ = {isa = PBXFileReference; lastKnownFileType = folder; path = Database; sourceTree = "<group>"; };
@@ -296,6 +302,8 @@
 				2DA5F897275F865400D8DD29 /* ModalSelector.swift */,
 				2DA5F89E275F885400D8DD29 /* NewSeedMenu.swift */,
 				2DA5F89C275F874D00D8DD29 /* NetworkManager.swift */,
+				2D48F36827636036004B27BE /* SeedMenu.swift */,
+				2D48F36A2763604F004B27BE /* Backup.swift */,
 			);
 			path = Modals;
 			sourceTree = "<group>";
@@ -370,6 +378,7 @@
 			isa = PBXGroup;
 			children = (
 				2D48F36227622C54004B27BE /* MNetworkMenu.swift */,
+				2D48F36C27636092004B27BE /* MBackup.swift */,
 			);
 			path = ModalModels;
 			sourceTree = "<group>";
@@ -651,8 +660,10 @@
 				2DA5F86827566C3600D8DD29 /* TCAuthor.swift in Sources */,
 				2DA5F87427566C3600D8DD29 /* TCEraMortal.swift in Sources */,
 				2D48F35127609CDE004B27BE /* HistoryCard.swift in Sources */,
+				2D48F36927636036004B27BE /* SeedMenu.swift in Sources */,
 				2DA5F86327566C3600D8DD29 /* TCCall.swift in Sources */,
 				2DA5F8372756657600D8DD29 /* TransactionTypes.swift in Sources */,
+				2D48F36D27636092004B27BE /* MBackup.swift in Sources */,
 				2DA5F8882756A70300D8DD29 /* SeedBackup.swift in Sources */,
 				2DA5F85F27566C3600D8DD29 /* TCTypesInfo.swift in Sources */,
 				2DA5F8A1275F889400D8DD29 /* HeaderBar.swift in Sources */,
@@ -721,6 +732,7 @@
 				2D48F3552760AF9D004B27BE /* MSeeds.swift in Sources */,
 				2DA5F821275652EE00D8DD29 /* Footer.swift in Sources */,
 				2DA5F88C2757693600D8DD29 /* NewAddressScreen.swift in Sources */,
+				2D48F36B2763604F004B27BE /* Backup.swift in Sources */,
 				2DA5F83F275667CF00D8DD29 /* HistoryCardTemplate.swift in Sources */,
 				2D72B4F626EF3BC50081E879 /* Navigator.swift in Sources */,
 			);
@@ -881,7 +893,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 46600;
+				CURRENT_PROJECT_VERSION = 50000;
 				DEVELOPMENT_ASSET_PATHS = "\"NativeSigner/Preview Content\"";
 				DEVELOPMENT_TEAM = P2PX3JU8FT;
 				ENABLE_BITCODE = NO;
@@ -897,7 +909,7 @@
 					"$(inherited)",
 					"$(PROJECT_DIR)/NativeSigner",
 				);
-				MARKETING_VERSION = 4.6.6;
+				MARKETING_VERSION = 5.0.0;
 				PRODUCT_BUNDLE_IDENTIFIER = io.parity.NativeSigner;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -915,7 +927,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 46600;
+				CURRENT_PROJECT_VERSION = 50000;
 				DEVELOPMENT_ASSET_PATHS = "\"NativeSigner/Preview Content\"";
 				DEVELOPMENT_TEAM = P2PX3JU8FT;
 				ENABLE_BITCODE = NO;
@@ -930,7 +942,7 @@
 					"$(inherited)",
 					"$(PROJECT_DIR)/NativeSigner",
 				);
-				MARKETING_VERSION = 4.6.6;
+				MARKETING_VERSION = 5.0.0;
 				PRODUCT_BUNDLE_IDENTIFIER = io.parity.NativeSigner;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";

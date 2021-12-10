@@ -48,7 +48,7 @@ struct SettingsScreen: View {
                         Image(systemName: "exclamationmark.triangle.fill").imageScale(.large)
                         Text("Remove general certificate")
                         Image(systemName: "exclamationmark.triangle.fill").imageScale(.large)
-                    }.foregroundColor(Color("dangerColor"))
+                    }.foregroundColor(Color("SignalDanger"))
                 }
                 .alert(isPresented: $jailbreak, content: {
                     Alert(

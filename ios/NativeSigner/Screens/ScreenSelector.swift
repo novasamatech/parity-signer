@@ -35,7 +35,7 @@ struct ScreenSelector: View {
         case .RecoverSeedName:
             RecoverSeedName()
         case .RecoverSeedPhrase:
-            RecoverSeedName()
+            RecoverSeedPhrase()
         case .DeriveKey:
             NewAddressScreen()
         case .Verifier:

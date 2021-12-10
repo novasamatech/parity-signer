@@ -36,7 +36,7 @@ struct NewSeedScreen: View {
                                 data.lastError = ""
                             })
                             .onSubmit {
-                                data.addSeed(seedName: seedName, seedPhrase: "")
+                                data.addSeed(seedName: seedName, seedLength: 24)
                             }
                             .onAppear(perform: {nameFocused = true})
                             .padding(.horizontal, 8)
@@ -46,7 +46,7 @@ struct NewSeedScreen: View {
                     HStack {
                         Spacer()
                         Button(action: {
-                            data.addSeed(seedName: seedName, seedPhrase: "")
+                            data.addSeed(seedName: seedName, seedLength: 24)
                         }) {
                             Text("Create")
                                 .font(.system(size: 22))

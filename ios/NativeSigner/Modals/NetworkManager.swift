@@ -12,7 +12,6 @@ struct NetworkManager: View {
     var content: MNetworkMenu
     var body: some View {
         VStack {
-            
                 Spacer().frame(height: UIScreen.main.bounds.height/2)
             ZStack {
                 RoundedRectangle(cornerRadius: 20.0).foregroundColor(Color("Bg000"))

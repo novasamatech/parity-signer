@@ -18,14 +18,18 @@ struct ModalSelector: View {
             NewSeedMenu()
         case .NetworkMenu(let value):
             NetworkManager(content: value)
+        case .SeedMenu:
+            SeedMenu()
+        case .Backup(let value):
+            Backup(content: value)
         }
     }
 }
 
 /*
-struct ModalSelector_Previews: PreviewProvider {
-    static var previews: some View {
-        ModalSelector()
-    }
-}
+ struct ModalSelector_Previews: PreviewProvider {
+ static var previews: some View {
+ ModalSelector()
+ }
+ }
  */
