@@ -26,7 +26,7 @@ struct KeyManager: View {
                         Text("DERIVED KEYS").foregroundColor(Color("Text600"))
                         Spacer()
                         Button(action: {
-                            //TODO
+                            data.pushButton(buttonID: .NewKey)
                         }) {
                             Image(systemName: "plus.circle").imageScale(.large).foregroundColor(Color("Action400"))
                         }

@@ -36,8 +36,8 @@ struct ScreenSelector: View {
             RecoverSeedName()
         case .RecoverSeedPhrase:
             RecoverSeedPhrase()
-        case .DeriveKey:
-            NewAddressScreen()
+        case .DeriveKey(let value):
+            NewAddressScreen(content: value)
         case .Verifier:
             Text("Verifier")
         case .ManageNetwork:

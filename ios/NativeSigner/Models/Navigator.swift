@@ -77,7 +77,7 @@ struct ActionResult: Decodable {
         case "RecoverSeedPhrase":
             screen = .RecoverSeedPhrase
         case "DeriveKey":
-            screen = .DeriveKey
+            screen = .DeriveKey(try values.decode(MDeriveKey.self, forKey: .screenData))
         case "Verifier":
             screen = .Verifier
         case "ManageNetwork":
@@ -121,7 +121,7 @@ enum SignerScreen: Decodable {
     case NewSeed
     case RecoverSeedName
     case RecoverSeedPhrase
-    case DeriveKey
+    case DeriveKey(MDeriveKey)
     case Verifier
     case ManageNetwork
 }
@@ -177,6 +177,7 @@ enum ButtonID {
     case PreviousUnit
     case NewKey
     case BackupSeed
+    case CheckPassword
 }
 
 /**
@@ -184,7 +185,7 @@ enum ButtonID {
  * We should keep this to minimum
  */
 extension SignerDataModel {
-    func pushButton(buttonID: ButtonID, details: String = "") {
+    func pushButton(buttonID: ButtonID, details: String = "", seedPhrase: String = "") {
         print(buttonID)
         //Poor man's mutex; just because it's really managed by UI abstraction
         if actionAvailable {
@@ -192,7 +193,7 @@ extension SignerDataModel {
             actionAvailable = false
             var err = ExternError()
             withUnsafeMutablePointer(to: &err) {err_ptr in
-                let res = act(err_ptr, String(describing: buttonID), details)
+                let res = act(err_ptr, String(describing: buttonID), details, seedPhrase)
                 if (err_ptr.pointee.code == 0) {
                     print(String(cString: res!))
                     if let actionResultJSON = String(cString: res!).data(using: .utf8) {

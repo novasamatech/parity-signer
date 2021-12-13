@@ -28,7 +28,7 @@ struct ExternError {
 void signer_destroy_string(const char* cstring);
 
 //Main action that should replace all logic
-const char * act(struct ExternError*, const char* action, const char* details);
+const char * act(struct ExternError*, const char* action, const char* details, const char* seed_phrase);
 
 //Init navigation
 void init_navigation(struct ExternError*, const char* dbname, const char* seed_names);
