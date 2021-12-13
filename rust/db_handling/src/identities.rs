@@ -9,7 +9,7 @@ use parity_scale_codec::Encode;
 use regex::Regex;
 use constants::{ADDRTREE, MAX_WORDS_DISPLAY, SPECSTREE};
 use defaults::get_default_chainspecs;
-use definitions::{crypto::Encryption, error::{Active, AddressGeneration, AddressGenerationCommon, ErrorActive, ErrorSigner, ErrorSource, ExtraAddressGenerationSigner, NotFoundSigner, NotHexSigner, Signer, SpecsKeySource}, helpers::{get_multisigner, multisigner_to_public, unhex}, history::{Event, IdentityHistory}, keyring::{NetworkSpecsKey, AddressKey, print_multisigner_as_base58}, network_specs::NetworkSpecs, print::{export_plain_vector, export_complex_vector_with_error}, users::{AddressDetails, SeedObject}};
+use definitions::{crypto::Encryption, error::{Active, AddressGeneration, AddressGenerationCommon, ErrorActive, ErrorSigner, ErrorSource, ExtraAddressGenerationSigner, InterfaceSigner, NotFoundSigner, NotHexSigner, Signer, SpecsKeySource}, helpers::{get_multisigner, multisigner_to_public, unhex}, history::{Event, IdentityHistory}, keyring::{NetworkSpecsKey, AddressKey, print_multisigner_as_base58}, network_specs::NetworkSpecs, print::{export_plain_vector, export_complex_vector_with_error}, users::{AddressDetails, SeedObject}};
 use bip39::{Language, Mnemonic, MnemonicType};
 use zeroize::Zeroize;
 use lazy_static::lazy_static;
@@ -375,13 +375,18 @@ pub fn check_derivation_format(path: &str) -> anyhow::Result<bool> {
     }
 }
 
-/// Function to check if derivation is valid and return the password to be verified later
-pub fn check_derivation_cut_pwd(path: &str) -> Result<Option<String>, ErrorSigner> {
+/// Function to cut the password to be verified later in UI.
+/// Expects password, if sees no password, returns error.
+pub fn cut_path(path: &str) -> Result<(String, String), ErrorSigner> {
     match REG_PATH.captures(path) {
         Some(caps) => {
+            let cropped_path = match caps.name("path") {
+                Some(a) => a.as_str().to_string(),
+                None => "".to_string(),
+            };
             match caps.name("password") {
-                Some(pwd) => Ok(Some(pwd.as_str().to_string())),
-                None => Ok(None),
+                Some(pwd) => Ok((cropped_path, pwd.as_str().to_string())),
+                None => return Err(ErrorSigner::Interface(InterfaceSigner::LostPwd)),
             }
         },
         None => return Err(ErrorSigner::AddressGeneration(AddressGeneration::Extra(ExtraAddressGenerationSigner::InvalidDerivation))),

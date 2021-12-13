@@ -278,22 +278,8 @@ impl State {
                 Action::CheckPassword => {
                     match self.navstate.screen {
                         Screen::DeriveKey(ref derive_state) => {
-                            let mut path = derive_state.path();
-                            match db_handling::identities::check_derivation_cut_pwd(&path) {
-                                Ok(Some(pwd)) => {
-                                    new_navstate.modal = Modal::PasswordConfirm(pwd.to_string());
-                                },
-                                Ok(None) => {
-                                    path.zeroize();
-                                    new_navstate.alert = Alert::Error;
-                                    errorline.push_str("Password lost in UI");
-                                },
-                                Err(e) => {
-                                    path.zeroize();
-                                    new_navstate.alert = Alert::Error;
-                                    errorline.push_str(&<Signer>::show(&e));
-                                },
-                            }
+                            new_navstate.screen = Screen::DeriveKey(derive_state.update(details_str));
+                            new_navstate.modal = Modal::PasswordConfirm;
                         },
                         _ => println!("No password to check"),
                     }
@@ -390,6 +376,26 @@ impl State {
                         errorline.push_str(&<Signer>::show(&e));
                         "".to_string()
                     },
+                },
+                Modal::PasswordConfirm => {
+                    match new_navstate.screen {
+                        Screen::DeriveKey(ref derive_state) => {
+                            let mut path = derive_state.path();
+                            match db_handling::identities::cut_path(&path) {
+                                Ok((cropped_path, pwd)) => {
+                                    path.zeroize();
+                                    format!("\"seed_name\":\"{}\",\"cropped_path\":\"{}\",\"pwd\":\"{}\"", derive_state.seed_name(), cropped_path, pwd)
+                                },
+                                Err(e) => {
+                                    path.zeroize();
+                                    new_navstate.alert = Alert::Error;
+                                    errorline.push_str(&<Signer>::show(&e));
+                                    "".to_string()
+                                },
+                            }
+                        },
+                        _ => "".to_string(),
+                    }
                 },
                 _ => "".to_string(),
             };

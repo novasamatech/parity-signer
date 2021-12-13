@@ -152,6 +152,12 @@ impl DeriveState {
     pub fn path(&self) -> String {
         self.entered_info.0.to_owned()
     }
+    pub fn update(&self, new_entered_string: &str) -> Self {
+        Self {
+            entered_info: EnteredInfo(new_entered_string.to_string()),
+            keys_state: self.get_keys_state(),
+        }
+    }
 }
 
 impl Screen {
