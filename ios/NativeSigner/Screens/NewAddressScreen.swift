@@ -51,24 +51,6 @@ struct NewAddressScreen: View {
                     Text("use // for hard derivations and / for soft derivations").font(.footnote).foregroundColor(Color("textFadedColor"))
                 }.padding()
                 VStack (alignment: .leading) {
-                    Text("OPTIONAL PASSWORD").foregroundColor(Color("textMainColor")).font(.footnote)
-                    ZStack {
-                        RoundedRectangle(cornerRadius: 8).stroke(Color("AccentColor")).foregroundColor(Color("backgroundColor")).frame(height: 39)
-                        TextField("Password", text: $password, prompt: Text("(optional)"))
-                            .foregroundColor(Color("textEntryColor"))
-                            .font(.system(size: 15, design: .monospaced))
-                            .disableAutocorrection(true)
-                            .autocapitalization(.none)
-                            .keyboardType(.asciiCapable)
-                            .submitLabel(.next)
-                            .onChange(of: data.suggestedName, perform: {_ in data.lastError = ""
-                            })
-                            .focused($focusedField, equals: .password)
-                            .onSubmit({if password != "" {
-                                focusedField = .passwordCheck
-                            }})
-                            .padding(8)
-                    }
                     if password != "" {
                         Text("REPEAT PASSWORD").foregroundColor(Color("textMainColor")).font(.footnote)
                         ZStack {
@@ -86,9 +68,6 @@ struct NewAddressScreen: View {
                                 .padding(8)
                         }
                     }
-                    Text("Optional password added after /// to the end of your path").font(.footnote).foregroundColor(Color("textFadedColor"))
-                    
-                    
                 }.padding()
                 HStack {
                     Button(action: {

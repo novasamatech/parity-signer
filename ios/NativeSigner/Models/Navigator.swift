@@ -97,6 +97,8 @@ struct ActionResult: Decodable {
             modal = .SeedMenu
         case "Backup":
             modal = .Backup(try values.decode(MBackup.self, forKey: .modalData))
+        case "PasswordConfirm":
+            modal = .PasswordConfirm(try values.decode(MPasswordConfirm.self, forKey: .modalData))
         default:
             modal = .Empty
         }
@@ -144,6 +146,7 @@ enum SignerModal: Equatable, Decodable {
     case NetworkMenu(MNetworkMenu)
     case SeedMenu
     case Backup(MBackup)
+    case PasswordConfirm(MPasswordConfirm)
 }
 
 enum SignerAlert: String, Equatable, Decodable {

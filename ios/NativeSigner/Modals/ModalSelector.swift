@@ -22,6 +22,8 @@ struct ModalSelector: View {
             SeedMenu()
         case .Backup(let value):
             Backup(content: value)
+        case .PasswordConfirm(let value):
+            PasswordConfirm(content: value)
         }
     }
 }

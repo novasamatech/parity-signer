@@ -23,6 +23,8 @@
 		2D48F36927636036004B27BE /* SeedMenu.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D48F36827636036004B27BE /* SeedMenu.swift */; };
 		2D48F36B2763604F004B27BE /* Backup.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D48F36A2763604F004B27BE /* Backup.swift */; };
 		2D48F36D27636092004B27BE /* MBackup.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D48F36C27636092004B27BE /* MBackup.swift */; };
+		2D48F36F2767419D004B27BE /* PasswordConfirm.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D48F36E2767419D004B27BE /* PasswordConfirm.swift */; };
+		2D48F3712767514B004B27BE /* MPasswordConfirm.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D48F3702767514B004B27BE /* MPasswordConfirm.swift */; };
 		2D72B4F626EF3BC50081E879 /* Navigator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D72B4F526EF3BC50081E879 /* Navigator.swift */; };
 		2D72B4FA26EF7D1C0081E879 /* Seeds.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D72B4F926EF7D1C0081E879 /* Seeds.swift */; };
 		2D72D52A2732B8A7004BA7C9 /* Database in Resources */ = {isa = PBXBuildFile; fileRef = 2D72D5292732B8A7004BA7C9 /* Database */; };
@@ -140,6 +142,8 @@
 		2D48F36827636036004B27BE /* SeedMenu.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SeedMenu.swift; sourceTree = "<group>"; };
 		2D48F36A2763604F004B27BE /* Backup.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Backup.swift; sourceTree = "<group>"; };
 		2D48F36C27636092004B27BE /* MBackup.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MBackup.swift; sourceTree = "<group>"; };
+		2D48F36E2767419D004B27BE /* PasswordConfirm.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PasswordConfirm.swift; sourceTree = "<group>"; };
+		2D48F3702767514B004B27BE /* MPasswordConfirm.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MPasswordConfirm.swift; sourceTree = "<group>"; };
 		2D72B4F526EF3BC50081E879 /* Navigator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Navigator.swift; sourceTree = "<group>"; };
 		2D72B4F926EF7D1C0081E879 /* Seeds.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Seeds.swift; sourceTree = "<group>"; };
 		2D72D5292732B8A7004BA7C9 /* Database */ = {isa = PBXFileReference; lastKnownFileType = folder; path = Database; sourceTree = "<group>"; };
@@ -303,6 +307,7 @@
 				2DA5F89E275F885400D8DD29 /* NewSeedMenu.swift */,
 				2DA5F89C275F874D00D8DD29 /* NetworkManager.swift */,
 				2D48F36827636036004B27BE /* SeedMenu.swift */,
+				2D48F36E2767419D004B27BE /* PasswordConfirm.swift */,
 				2D48F36A2763604F004B27BE /* Backup.swift */,
 			);
 			path = Modals;
@@ -379,6 +384,7 @@
 			children = (
 				2D48F36227622C54004B27BE /* MNetworkMenu.swift */,
 				2D48F36C27636092004B27BE /* MBackup.swift */,
+				2D48F3702767514B004B27BE /* MPasswordConfirm.swift */,
 			);
 			path = ModalModels;
 			sourceTree = "<group>";
@@ -657,6 +663,7 @@
 				2DA5F89D275F874D00D8DD29 /* NetworkManager.swift in Sources */,
 				2DA5F87627566D7C00D8DD29 /* TransactionPreview.swift in Sources */,
 				2DA5F85E27566C3600D8DD29 /* TCFieldName.swift in Sources */,
+				2D48F3712767514B004B27BE /* MPasswordConfirm.swift in Sources */,
 				2DA5F86827566C3600D8DD29 /* TCAuthor.swift in Sources */,
 				2DA5F87427566C3600D8DD29 /* TCEraMortal.swift in Sources */,
 				2D48F35127609CDE004B27BE /* HistoryCard.swift in Sources */,
@@ -726,6 +733,7 @@
 				2DA5F898275F865400D8DD29 /* ModalSelector.swift in Sources */,
 				2DA5F87327566C3600D8DD29 /* TCBlockHash.swift in Sources */,
 				2DA5F86027566C3600D8DD29 /* TCAuthorPublicKey.swift in Sources */,
+				2D48F36F2767419D004B27BE /* PasswordConfirm.swift in Sources */,
 				2D48F35B2760E5DF004B27BE /* RecoverSeedPhrase.swift in Sources */,
 				2DA5F87C2756A21200D8DD29 /* ExportAddress.swift in Sources */,
 				2D48F36127620F49004B27BE /* SeedKeyCard.swift in Sources */,
