@@ -98,7 +98,7 @@ fn generate_random_phrase (words_number: u32) -> anyhow::Result<String> {
 /// Create address from seed and path and insert it into the database.
 /// Helper gets used both on Active side (when generating test cold database with well-known addresses)
 /// and on Signer side (when real addresses are actually created by the user).
-fn create_address<T: ErrorSource> (database: &Db, input_batch_prep: &Vec<(AddressKey, AddressDetails)>, input_events: &Vec<Event>, path: &str, network_specs: &NetworkSpecs, seed_object: &SeedObject, has_pwd: bool, specs_encryption_skip: bool) -> Result<(Vec<(AddressKey, AddressDetails)>, Vec<Event>), T::Error> {
+fn create_address<T: ErrorSource> (database: &Db, input_batch_prep: &Vec<(AddressKey, AddressDetails)>, input_events: &Vec<Event>, path: &str, network_specs: &NetworkSpecs, seed_object: &SeedObject, specs_encryption_skip: bool) -> Result<(Vec<(AddressKey, AddressDetails)>, Vec<Event>), T::Error> {
     
     let mut output_batch_prep = input_batch_prep.to_vec();
     let mut output_events = input_events.to_vec();
@@ -147,12 +147,12 @@ fn create_address<T: ErrorSource> (database: &Db, input_batch_prep: &Vec<(Addres
             }
         },
     };
-    let cropped_path = match REG_PATH.captures(path) {
+    let (cropped_path, has_pwd) = match REG_PATH.captures(path) {
         Some(caps) => match caps.name("path") {
-            Some(a) => a.as_str(),
-            None => "",
+            Some(a) => (a.as_str(), caps.name("password").is_some()),
+            None => ("", caps.name("password").is_some()),
         },
-        None => "",
+        None => ("", false),
     };
     
     let identity_history = IdentityHistory::get(&seed_object.seed_name, &seed_object.encryption, &public_key, &cropped_path, &network_specs.genesis_hash.to_vec());
@@ -217,10 +217,10 @@ fn populate_addresses<T: ErrorSource> (database_name: &str, entry_batch: Batch, 
     for x in chainspecs.iter() {
         if let Ok(a) = x {
             let network_specs = NetworkSpecs::from_entry_checked::<T>(a)?;
-            let (adds, events) = create_address::<T> (&database, &identity_adds, &current_events, "", &network_specs, seed_object, false, true)?;
+            let (adds, events) = create_address::<T> (&database, &identity_adds, &current_events, "", &network_specs, seed_object, true)?;
             identity_adds = adds;
             current_events = events;
-            if let Ok((adds, events)) = create_address::<T> (&database, &identity_adds, &current_events, &network_specs.path_id, &network_specs, seed_object, false, true) {
+            if let Ok((adds, events)) = create_address::<T> (&database, &identity_adds, &current_events, &network_specs.path_id, &network_specs, seed_object, true) {
                 identity_adds = adds;
                 current_events = events;
             }
@@ -375,22 +375,34 @@ pub fn check_derivation_format(path: &str) -> anyhow::Result<bool> {
     }
 }
 
+/// Function to check if derivation is valid and return the password to be verified later
+pub fn check_derivation_cut_pwd(path: &str) -> Result<Option<String>, ErrorSigner> {
+    match REG_PATH.captures(path) {
+        Some(caps) => {
+            match caps.name("password") {
+                Some(pwd) => Ok(Some(pwd.as_str().to_string())),
+                None => Ok(None),
+            }
+        },
+        None => return Err(ErrorSigner::AddressGeneration(AddressGeneration::Extra(ExtraAddressGenerationSigner::InvalidDerivation))),
+    }
+}
+
 /// Generate new identity (api for create_address())
 /// Function is open to user interface
-pub fn try_create_address (seed_name: &str, seed_phrase: &str, path: &str, network_specs_key_string: &str, has_pwd: bool, database_name: &str) -> anyhow::Result<()> {
-    let network_specs = get_network_specs_by_hex_key(database_name, network_specs_key_string).map_err(|e| e.anyhow())?;
+pub fn try_create_address (seed_name: &str, seed_phrase: &str, path: &str, network_specs_key: &NetworkSpecsKey, database_name: &str) -> Result<(), ErrorSigner> {
+    let network_specs = get_network_specs(database_name, network_specs_key)?;
     let seed_object = SeedObject {
         seed_name: seed_name.to_string(),
         seed_phrase: seed_phrase.to_string(),
         encryption: network_specs.encryption.to_owned(),
     };
-    let (adds, events) = create_address::<Signer>(&open_db::<Signer>(database_name).map_err(|e| e.anyhow())?, &Vec::new(), &Vec::new(), path, &network_specs, &seed_object, has_pwd, false).map_err(|e| e.anyhow())?;
+    let (adds, events) = create_address::<Signer>(&open_db::<Signer>(database_name)?, &Vec::new(), &Vec::new(), path, &network_specs, &seed_object, false)?;
     let id_batch = upd_id_batch(Batch::default(), adds);
     TrDbCold::new()
         .set_addresses(id_batch) // add created address
-        .set_history(events_to_batch::<Signer>(&database_name, events).map_err(|e| e.anyhow())?) // add corresponding history
+        .set_history(events_to_batch::<Signer>(&database_name, events)?) // add corresponding history
         .apply::<Signer>(&database_name)
-        .map_err(|e| e.anyhow())
 }
 
 /// Function to generate identities batch with Alice information
@@ -408,12 +420,12 @@ pub fn generate_test_identities (database_name: &str) -> Result<(), ErrorActive>
         let database = open_db::<Active>(database_name)?;
         for network_specs in get_default_chainspecs().iter() {
             if (network_specs.name == "westend")&&(network_specs.encryption == Encryption::Sr25519) {
-                let (adds, updated_events) = create_address::<Active>(&database, &Vec::new(), &events, "//Alice", network_specs, &alice_seed_object, false, false)?;
+                let (adds, updated_events) = create_address::<Active>(&database, &Vec::new(), &events, "//Alice", network_specs, &alice_seed_object, false)?;
                 id_batch = upd_id_batch(id_batch, adds);
                 events = updated_events;
             }
             if (network_specs.name == "rococo")&&(network_specs.encryption == Encryption::Sr25519) {
-                let (adds, updated_events) = create_address::<Active>(&database, &Vec::new(), &events, "//alice", network_specs, &alice_seed_object, false, false)?;
+                let (adds, updated_events) = create_address::<Active>(&database, &Vec::new(), &events, "//alice", network_specs, &alice_seed_object, false)?;
                 id_batch = upd_id_batch(id_batch, adds);
                 events = updated_events;
             }
@@ -586,7 +598,7 @@ mod tests {
         };
         let (adds1, events1) = {
             let database: Db = open(dbname).unwrap();
-            create_address::<Signer>(&database, &Vec::new(), &Vec::new(), "//Alice", &chainspecs[0], &seed_object, false, false).unwrap()
+            create_address::<Signer>(&database, &Vec::new(), &Vec::new(), "//Alice", &chainspecs[0], &seed_object, false).unwrap()
         };
         TrDbCold::new()
             .set_addresses(upd_id_batch(Batch::default(), adds1)) // modify addresses
@@ -594,7 +606,7 @@ mod tests {
             .apply::<Signer>(&dbname).unwrap();
         let (adds2, events2) = {
             let database: Db = open(dbname).unwrap();
-            create_address::<Signer>(&database, &Vec::new(), &Vec::new(), "//Alice", &chainspecs[1], &seed_object, false, false).unwrap()
+            create_address::<Signer>(&database, &Vec::new(), &Vec::new(), "//Alice", &chainspecs[1], &seed_object, false).unwrap()
         };
         TrDbCold::new()
             .set_addresses(upd_id_batch(Batch::default(), adds2)) // modify addresses
@@ -602,7 +614,7 @@ mod tests {
             .apply::<Signer>(&dbname).unwrap();
         let (adds3, events3) = {
             let database: Db = open(dbname).unwrap();
-            create_address::<Signer>(&database, &Vec::new(), &Vec::new(), "//Alice/1", &chainspecs[0], &seed_object, false, false).unwrap()
+            create_address::<Signer>(&database, &Vec::new(), &Vec::new(), "//Alice/1", &chainspecs[0], &seed_object, false).unwrap()
         };
         TrDbCold::new()
             .set_addresses(upd_id_batch(Batch::default(), adds3)) // modify addresses
@@ -627,9 +639,9 @@ mod tests {
         populate_cold_no_metadata(dbname, Verifier(None)).unwrap();
         try_create_seed_phrase_proposal("Alice", SEED, dbname).unwrap();
         let chainspecs = get_default_chainspecs();
-        let network_id_string_0 = hex::encode(NetworkSpecsKey::from_parts(&chainspecs[0].genesis_hash.to_vec(), &Encryption::Sr25519).key());
-        try_create_address("Alice", SEED, "//Alice//10", &network_id_string_0, false, dbname).expect("create a valid address //Alice//10");
-        assert_eq!("//Alice//11", suggest_n_plus_one("//Alice", "Alice", &network_id_string_0, dbname).expect("at least some suggestion about new name should be produced unless db read resulted in a failure"));
+        let network_id_0 = NetworkSpecsKey::from_parts(&chainspecs[0].genesis_hash.to_vec(), &Encryption::Sr25519);
+        try_create_address("Alice", SEED, "//Alice//10", &network_id_0, dbname).expect("create a valid address //Alice//10");
+        assert_eq!("//Alice//11", suggest_n_plus_one("//Alice", "Alice", &hex::encode(network_id_0.key()), dbname).expect("at least some suggestion about new name should be produced unless db read resulted in a failure"));
         fs::remove_dir_all(dbname).unwrap();
     }
 

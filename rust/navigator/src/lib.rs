@@ -42,6 +42,7 @@ lazy_static!{
 pub fn do_action(
     action_str: &str,
     details_str: &str,
+    secret_seed_phrase: &str,
 ) -> String {
     //If can't lock - debounce failed, ignore action
     //
@@ -50,7 +51,7 @@ pub fn do_action(
     match guard {
         Ok(mut state) => {
             let action = Action::parse(action_str);
-            let details = (*state).perform(action, details_str);
+            let details = (*state).perform(action, details_str, secret_seed_phrase);
             (*state).generate_json(&details)
         },
         Err(TryLockError::Poisoned(_)) => {

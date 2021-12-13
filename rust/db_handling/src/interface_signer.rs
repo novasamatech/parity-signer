@@ -69,12 +69,12 @@ pub fn addresses_set_seed_name_network (database_name: &str, seed_name: &str, ne
 /// Function to print all networks, with bool indicator which one is currently selected
 pub fn show_all_networks_with_flag (database_name: &str, network_specs_key: &NetworkSpecsKey) -> Result<String, ErrorSigner> {
     let networks = get_all_networks(database_name)?;
-    Ok(export_complex_vector(&networks, |a| 
+    Ok(format!("\"networks\":{}", export_complex_vector(&networks, |a| 
         {
             let network_specs_key_current = NetworkSpecsKey::from_parts(&a.genesis_hash.to_vec(), &a.encryption);
             format!("\"key\":\"{}\",\"title\":\"{}\",\"logo\":\"{}\",\"order\":{},\"selected\":{}", hex::encode(network_specs_key_current.key()), a.title, a.logo, a.order, &network_specs_key_current == network_specs_key)
         }
-    ))
+    )))
 }
 
 /// Function to sort networks by the order and get the network specs for the first network on the list.
@@ -124,6 +124,13 @@ pub fn backup_prep (database_name: &str, seed_name: &str) -> Result<String, Erro
     Ok(format!("\"seed_name\":\"{}\",\"derivations\":{}", seed_name, export_complex_vector(&export, |(specs, id_set)| format!("\"network_title\":\"{}\",\"network_logo\":\"{}\",\"network_order\":{},\"id_set\":{}", specs.title, specs.logo, specs.order, export_complex_vector(&id_set, |a| format!("\"path\":\"{}\",\"has_pwd\":{}", a.path, a.has_pwd))))))
 }
 
+/// Function to prepare key derivation screen.
+/// Gets seed name, network specs key and suggested derivation
+pub fn derive_prep (database_name: &str, seed_name: &str, network_specs_key: &NetworkSpecsKey, suggest: &str) -> Result<String, ErrorSigner> {
+    let network_specs = get_network_specs(database_name, network_specs_key)?;
+    Ok(format!("\"seed_name\":\"{}\",\"network_title\":\"{}\",\"network_logo\":\"{}\",\"suggested_derivation\":\"{}\"", seed_name, network_specs.title, network_specs.logo, suggest))
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -158,7 +165,7 @@ mod tests {
         let dbname = "for_tests/show_all_networks_flag_westend";
         populate_cold (dbname, Verifier(None)).unwrap();
         let print = show_all_networks_with_flag(dbname, &NetworkSpecsKey::from_parts(&hex::decode("e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e").unwrap(), &Encryption::Sr25519)).unwrap();
-        let expected_print = r#"[{"key":"0180037f5f3c8e67b314062025fc886fcd6238ea25a4a9b45dce8d246815c9ebe770","title":"Rococo","logo":"rococo","order":3,"selected":false},{"key":"018091b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3","title":"Polkadot","logo":"polkadot","order":0,"selected":false},{"key":"0180b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe","title":"Kusama","logo":"kusama","order":1,"selected":false},{"key":"0180e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e","title":"Westend","logo":"westend","order":2,"selected":true}]"#;
+        let expected_print = r#""networks":[{"key":"0180037f5f3c8e67b314062025fc886fcd6238ea25a4a9b45dce8d246815c9ebe770","title":"Rococo","logo":"rococo","order":3,"selected":false},{"key":"018091b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3","title":"Polkadot","logo":"polkadot","order":0,"selected":false},{"key":"0180b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe","title":"Kusama","logo":"kusama","order":1,"selected":false},{"key":"0180e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e","title":"Westend","logo":"westend","order":2,"selected":true}]"#;
         assert!(print == expected_print, "\nReceived: \n{}", print);
         fs::remove_dir_all(dbname).unwrap();
     }
@@ -189,6 +196,16 @@ mod tests {
         populate_cold (dbname, Verifier(None)).unwrap();
         let print = backup_prep(dbname, "Alice").unwrap();
         let expected_print = r#""seed_name":"Alice","derivations":[{"network_title":"Rococo","network_logo":"rococo","network_order":3,"id_set":[{"path":"","has_pwd":false},{"path":"//rococo","has_pwd":false},{"path":"//alice","has_pwd":false}]},{"network_title":"Polkadot","network_logo":"polkadot","network_order":0,"id_set":[{"path":"","has_pwd":false},{"path":"//polkadot","has_pwd":false}]},{"network_title":"Kusama","network_logo":"kusama","network_order":1,"id_set":[{"path":"","has_pwd":false},{"path":"//kusama","has_pwd":false}]},{"network_title":"Westend","network_logo":"westend","network_order":2,"id_set":[{"path":"//westend","has_pwd":false},{"path":"","has_pwd":false},{"path":"//Alice","has_pwd":false}]}]"#;
+        assert!(print == expected_print, "\nReceived: \n{}", print);
+        fs::remove_dir_all(dbname).unwrap();
+    }
+    
+    #[test]
+    fn derive_prep_alice() {
+        let dbname = "for_tests/derive_prep_alice";
+        populate_cold (dbname, Verifier(None)).unwrap();
+        let print = derive_prep(dbname, "Alice", &NetworkSpecsKey::from_parts(&hex::decode("e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e").unwrap(), &Encryption::Sr25519), "//secret//derive").unwrap();
+        let expected_print = r#""seed_name":"Alice","network_title":"Westend","network_logo":"westend","suggested_derivation":"//secret//derive""#;
         assert!(print == expected_print, "\nReceived: \n{}", print);
         fs::remove_dir_all(dbname).unwrap();
     }

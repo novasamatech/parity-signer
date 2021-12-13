@@ -1,5 +1,6 @@
 //!List of all screens
 use sp_runtime::MultiSigner;
+use zeroize::Zeroize;
 
 use db_handling::interface_signer::{addresses_set_seed_name_network, first_network};
 use definitions::{error::{AddressKeySource, ErrorSigner, ExtraAddressKeySourceSigner, InterfaceSigner, Signer}, keyring::{AddressKey, NetworkSpecsKey}};
@@ -17,7 +18,7 @@ pub enum Screen {
     NewSeed,
     RecoverSeedName,
     RecoverSeedPhrase,
-    DeriveKey(AddressState),
+    DeriveKey(DeriveState),
     Settings,
     Verifier,
     ManageNetwork,
@@ -40,6 +41,18 @@ pub struct AddressState {
     selected: usize,
     set: Vec<MultiSigner>,
 }
+
+///State of derive key screen
+#[derive(PartialEq, Debug, Clone)]
+pub struct DeriveState {
+    entered_info: EnteredInfo,
+    keys_state: KeysState,
+}
+
+///EnteredInfo, path+pwd entered by the user, zeroizeable
+#[derive(PartialEq, Debug, Clone, Zeroize)]
+#[zeroize(drop)]
+pub struct EnteredInfo (pub String);
 
 impl KeysState {
     pub fn new(seed_name: &str, database_name: &str) -> Result<Self, ErrorSigner> {
@@ -117,6 +130,27 @@ impl AddressState {
             selected,
             set: self.set.to_owned(),
         }
+    }
+}
+
+impl DeriveState {
+    pub fn new (entered_string: &str, keys_state: &KeysState) -> Self {
+        Self {
+            entered_info: EnteredInfo(entered_string.to_string()),
+            keys_state: keys_state.to_owned(),
+        }
+    }
+    pub fn get_keys_state(&self) -> KeysState {
+        self.keys_state.to_owned()
+    }
+    pub fn seed_name(&self) -> String {
+        self.keys_state.seed_name()
+    }
+    pub fn network_specs_key(&self) -> NetworkSpecsKey {
+        self.keys_state.network_specs_key()
+    }
+    pub fn path(&self) -> String {
+        self.entered_info.0.to_owned()
     }
 }
 

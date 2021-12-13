@@ -30,9 +30,10 @@ export! {
     @Java_io_parity_signer_models_SignerDataModel_backendAction
     fn act(
         action: &str,
-        details: &str
+        details: &str,
+        seed_phrase: &str
     ) -> String {
-        navigator::do_action(action, details)
+        navigator::do_action(action, details, seed_phrase)
     }
 
     @Java_io_parity_signer_models_SignerDataModel_initNavigation
@@ -188,19 +189,6 @@ export! {
         path: &str
 	) -> anyhow::Result<bool, anyhow::Error> {
         db_handling::identities::check_derivation_format(path)
-    }
-
-    @Java_io_parity_signer_models_SignerDataModel_substrateTryCreateIdentity
-	fn try_create_identity(
-        seed_name: &str,
-        seed_phrase: &str,
-        _crypto: &str,
-        path: &str,
-        network: &str,
-        has_password: bool,
-		dbname: &str
-	) -> anyhow::Result<(), anyhow::Error> {
-        db_handling::identities::try_create_address(seed_name, seed_phrase, path, network, has_password, dbname)
     }
 
     @Java_io_parity_signer_models_SignerDataModel_substrateDeleteIdentity

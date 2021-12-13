@@ -1,8 +1,9 @@
 //! Navigation state of the app
 
 //use hex;
+use zeroize::Zeroize;
 
-use crate::screens::{AddressState, KeysState, Screen};
+use crate::screens::{AddressState, DeriveState, KeysState, Screen};
 use crate::modals::Modal;
 use crate::actions::Action;
 use crate::alerts::Alert;
@@ -42,7 +43,7 @@ impl Navstate {
 
 impl State {
     ///Decide what to do and do it!
-    pub fn perform(&mut self, action: Action, details_str: &str) -> String {
+    pub fn perform(&mut self, action: Action, details_str: &str, secret_seed_phrase: &str) -> String {
         let mut new_navstate = self.navstate.to_owned();
         let mut new_screen = self.navstate.screen.to_owned();
         let mut seed_names = &(*self).seed_names;
@@ -107,8 +108,8 @@ impl State {
                                 Screen::RecoverSeedPhrase => {
                                     new_navstate.screen = Screen::RecoverSeedName;
                                 },
-                                Screen::DeriveKey(a) => {
-                                    new_navstate.screen = Screen::Keys(a.get_keys_state());
+                                Screen::DeriveKey(d) => {
+                                    new_navstate.screen = Screen::Keys(d.get_keys_state());
                                 },
                                 Screen::Verifier => {
                                     new_navstate.screen = Screen::Settings;
@@ -142,6 +143,28 @@ impl State {
                                 },
                             };
                         },
+                        Screen::DeriveKey(ref derive_state) => {
+                            let mut path = derive_state.path();
+                            match db_handling::identities::try_create_address (&derive_state.seed_name(), &secret_seed_phrase, &path, &derive_state.network_specs_key(), dbname) {
+                                Ok(()) => {
+                                    match KeysState::new(&derive_state.seed_name(), dbname) {
+                                        Ok(a) => {
+                                            new_navstate = Navstate::clean_screen(Screen::Keys(a))
+                                        },
+                                        Err(e) => {
+                                            path.zeroize();
+                                            new_navstate.alert = Alert::Error;
+                                            errorline.push_str(&<Signer>::show(&e));
+                                        },
+                                    }
+                                },
+                                Err(e) => {
+                                    path.zeroize();
+                                    new_navstate.alert = Alert::Error;
+                                    errorline.push_str(&<Signer>::show(&e));
+                                },
+                            }
+                        },
                         _ => println!("GoForward does nothing here"),
                     };
                 },
@@ -170,6 +193,14 @@ impl State {
                             }
                         },
                         _ => println!("SelectKey does nothing here"),
+                    }
+                },
+                Action::NewKey => {
+                    match self.navstate.screen {
+                        Screen::Keys(ref keys_state) => {
+                           new_navstate = Navstate::clean_screen(Screen::DeriveKey(DeriveState::new(details_str, keys_state)));
+                        },
+                        _ => println!("NewKey does nothing here"),
                     }
                 },
                 Action::RightButton => {
@@ -244,6 +275,29 @@ impl State {
                         },
                     }
                 },
+                Action::CheckPassword => {
+                    match self.navstate.screen {
+                        Screen::DeriveKey(ref derive_state) => {
+                            let mut path = derive_state.path();
+                            match db_handling::identities::check_derivation_cut_pwd(&path) {
+                                Ok(Some(pwd)) => {
+                                    new_navstate.modal = Modal::PasswordConfirm(pwd.to_string());
+                                },
+                                Ok(None) => {
+                                    path.zeroize();
+                                    new_navstate.alert = Alert::Error;
+                                    errorline.push_str("Password lost in UI");
+                                },
+                                Err(e) => {
+                                    path.zeroize();
+                                    new_navstate.alert = Alert::Error;
+                                    errorline.push_str(&<Signer>::show(&e));
+                                },
+                            }
+                        },
+                        _ => println!("No password to check"),
+                    }
+                }
                 Action::Nothing => {
                     println!("no action was passed in action");
                 },
@@ -302,7 +356,16 @@ impl State {
                 //Screen::NewSeed => "",
                 //Screen::RecoverSeedName => "Recover Seed",
                 //Screen::RecoverSeedPhrase => "Recover Seed",
-                //Screen::DeriveKey => "",
+                Screen::DeriveKey(ref d) => {
+                    match db_handling::interface_signer::derive_prep (dbname, &d.seed_name(), &d.network_specs_key(), &details_str) {
+                        Ok(a) => a,
+                        Err(e) => {
+                            new_navstate.alert = Alert::Error;
+                            errorline.push_str(&<Signer>::show(&e));
+                            "".to_string()
+                        },
+                    }
+                },
                 //Screen::Settings => "Settings",
                 //Screen::Verifier => "VERIFIER CERTIFICATE",
                 //Screen::ManageNetwork => "MANAGE NETWORKS",

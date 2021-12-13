@@ -15,6 +15,7 @@ pub enum Action {
     GoForward,
     SelectSeed,
     SelectKey,
+    NewKey,
     RightButton,
     Shield,
     NewSeed,
@@ -24,6 +25,7 @@ pub enum Action {
     NextUnit,
     PreviousUnit,
     ChangeNetwork,
+    CheckPassword,
     Nothing,
 }
 
@@ -40,6 +42,7 @@ impl Action {
             "GoForward" => Action::GoForward,
             "SelectSeed" => Action::SelectSeed,
             "SelectKey" => Action::SelectKey,
+            "NewKey" => Action::NewKey,
             "RightButton" => Action::RightButton,
             "Shield" => Action::Shield,
             "NewSeed" => Action::NewSeed,
@@ -49,6 +52,7 @@ impl Action {
             "NextUnit" => Action::NextUnit,
             "PreviousUnit" => Action::PreviousUnit,
             "ChangeNetwork" => Action::ChangeNetwork,
+            "CheckPassword" => Action::CheckPassword,
             _ => Action::Nothing,
         }
     }

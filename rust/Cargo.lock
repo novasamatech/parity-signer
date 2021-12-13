@@ -1318,6 +1318,7 @@ dependencies = [
  "sp-runtime",
  "transaction_parsing",
  "transaction_signing",
+ "zeroize",
 ]
 
 [[package]]
