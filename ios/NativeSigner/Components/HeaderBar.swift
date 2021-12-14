@@ -15,7 +15,8 @@ struct HeaderBar: View {
             Text(line1).foregroundColor(Color("Text600")).font(FBase(style: .overline))
             Text(line2).foregroundColor(Color("Text400")).font(FBase(style: .subtitle2))
             Divider()
-        }.padding(.horizontal).font(.caption)
+        }
+        .font(.caption)
     }
 }
 
