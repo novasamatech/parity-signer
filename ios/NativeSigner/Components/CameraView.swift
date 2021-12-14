@@ -25,12 +25,9 @@ struct CameraView: View {
                 }
                 .onReceive(model.$payload, perform: { payload in
                     if payload != nil {
-                        data.payloadStr = payload ?? ""
                         DispatchQueue.main.async {
-                            data.parse()
-                            print(String(describing: data.transactionState))
+                            data.pushButton(buttonID: .TransactionFetched, details: payload ?? "")
                         }
-                        data.transactionState = .parsing
                     }
                 })
                 .onReceive(data.$resetCamera, perform: { resetCamera in

@@ -20,11 +20,13 @@ struct RecoverSeedName: View {
         VStack(alignment: .leading) {
             Text("DISPLAY NAME").font(FBase(style: .overline))
             ZStack {
-                RoundedRectangle(cornerRadius: 8).stroke(Color("Borders400")).foregroundColor(Color("Borders400")).frame(height: 39)
+                RoundedRectangle(cornerRadius: 8)
+                    .stroke(Color("Borders400"))
+                    .foregroundColor(Color("Borders400"))
+                    .frame(height: 39)
                 TextField("Seed", text: $seedName, prompt: Text("Seed name"))
                     .focused($nameFocused)
                     .foregroundColor(Color("Text600"))
-                //.background(Color("backgroundColor"))
                     .font(FBase(style: .body2))
                     .disableAutocorrection(true)
                     .keyboardType(.asciiCapable)
@@ -39,7 +41,7 @@ struct RecoverSeedName: View {
                     .padding(.horizontal, 8)
             }
             Text("Display name visible only to you").font(.callout)
-            Text(data.lastError).foregroundColor(.red)
+            Text(data.lastError).foregroundColor(Color("SignalDanger"))
             BigButton(
                 text: "Next",
                 action: {

@@ -23,7 +23,7 @@ enum Card {
     case error(String)
     case fieldName(FieldName)
     case fieldNumber(FieldNumber)
-    case id(String)
+    case id(Id)
     case identityField(String)
     case meta(MetaSpecs)
     case nameVersion(NameVersion)
@@ -50,15 +50,18 @@ struct Author: Decodable {
     var derivation_path: String
     var has_password: Bool
     var name: String
+    var identicon: String
 }
 
 struct AuthorPlain: Decodable {
     var base58: String
+    var identicon: String
 }
 
 struct AuthorPublicKey: Decodable {
     var hex: String
     var crypto: String
+    var identicon: String
 }
 
 struct Call: Decodable {
@@ -94,6 +97,11 @@ struct FieldNumber: Decodable {
     var docs_field_number: String
     var path_type: String
     var docs_type: String
+}
+
+struct Id: Decodable {
+    var base58: String
+    var identicon: String
 }
 
 struct MetaSpecs: Decodable, Hashable {
@@ -189,6 +197,9 @@ struct TransactionCard: Decodable {
         case "field_number":
             card = .fieldNumber(try values.decode(FieldNumber.self, forKey: .payload))
             return
+        case "Id":
+            card = .id(try values.decode(Id.self, forKey: .payload))
+            return
         case "meta":
             card = .meta(try values.decode(MetaSpecs.self, forKey: .payload))
             return
@@ -224,8 +235,6 @@ struct TransactionCard: Decodable {
             card = .defaultCard(content)
         case "error":
             card = .error(content)
-        case "Id":
-            card = .id(content)
         case "identity_field":
             card = .identityField(content)
         case "network_genesis_hash":

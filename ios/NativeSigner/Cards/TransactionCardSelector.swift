@@ -40,8 +40,8 @@ struct TransactionCardSelector: View {
             TCFieldName(value: value)
         case .fieldNumber(let value):
             TCFieldNumber(value: value)
-        case .id(let text):
-            TCID(text: text)
+        case .id(let value):
+            TCID(value: value)
         case .identityField(let text):
             Text(text).foregroundColor(Color("textMainColor"))
         case .meta(let value):

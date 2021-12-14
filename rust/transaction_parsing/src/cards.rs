@@ -1,15 +1,19 @@
 use hex;
-use definitions::{crypto::Encryption, error::{ErrorSigner, ErrorSource, Signer}, history::MetaValuesDisplay, keyring::VerifierKey, network_specs::{NetworkSpecsToSend, VerifierValue}, qr_transfers::ContentLoadTypes};
 use blake2_rfc::blake2b::blake2b;
+use sp_core::crypto::{Ss58Codec, Ss58AddressFormat};
 use sp_runtime::{generic::Era, MultiSigner};
+
+use constants::HALFSIZE;
+use definitions::{crypto::Encryption, error::{ErrorSigner, ErrorSource, Signer}, helpers::make_identicon_from_multisigner, history::MetaValuesDisplay, keyring::{print_multisigner_as_base58, VerifierKey}, network_specs::{NetworkSpecsToSend, VerifierValue}, qr_transfers::ContentLoadTypes};
 use parser::cards::ParserCard;
+use plot_icon::png_data_from_vec;
 
 use crate::holds::{GeneralHold, Hold};
 
 pub (crate) enum Card <'a> {
     ParserCard(&'a ParserCard),
-    Author {base58_author: &'a str, seed_name: &'a str, path: &'a str, has_pwd: bool},
-    AuthorPlain (&'a str),
+    Author {author: &'a MultiSigner, base58prefix: u16, seed_name: &'a str, path: &'a str, has_pwd: bool},
+    AuthorPlain {author: &'a MultiSigner, base58prefix: u16},
     AuthorPublicKey(&'a MultiSigner),
     Verifier(&'a VerifierValue),
     Meta(MetaValuesDisplay),
@@ -70,7 +74,13 @@ impl <'a> Card <'a> {
                 ParserCard::Varname (varname) => fancy(index, indent, "varname", &format!("\"{}\"", varname)),
                 ParserCard::Default (decoded_string) => fancy(index, indent, "default", &format!("\"{}\"", decoded_string)),
                 ParserCard::Text (decoded_text) => fancy(index, indent, "text", &format!("\"{}\"", hex::encode(decoded_text.as_bytes()))),
-                ParserCard::Id (base58_id) => fancy(index, indent, "Id", &format!("\"{}\"", base58_id)),
+                ParserCard::Id {id, base58prefix} => {
+                    let hex_identicon = match png_data_from_vec(&<[u8;32]>::from(id.to_owned()).to_vec(), HALFSIZE) {
+                        Ok(a) => hex::encode(a),
+                        Err(_) => "".to_string(),
+                    };
+                    fancy(index, indent, "Id", &format!("{{\"base58\":\"{}\",\"identicon\":\"{}\"}}", id.to_ss58check_with_version(Ss58AddressFormat::Custom(*base58prefix)), hex_identicon))
+                },
                 ParserCard::None => fancy(index, indent, "none", "\"\""),
                 ParserCard::IdentityField (variant) => fancy(index, indent, "identity_field", &format!("\"{}\"", variant)),
                 ParserCard::BitVec (bv) => fancy(index, indent, "bitvec", &format!("\"{}\"", bv)),
@@ -88,13 +98,29 @@ impl <'a> Card <'a> {
                 ParserCard::NetworkNameVersion {name, version} => fancy(index, indent, "name_version", &format!("{{\"name\":\"{}\",\"version\":\"{}\"}}", name, version)),
                 ParserCard::TxVersion (x) => fancy(index, indent, "tx_version", &format!("\"{}\"", x)),
             },
-            Card::Author {base58_author, seed_name, path, has_pwd} => fancy(index, indent, "author", &format!("{{\"base58\":\"{}\",\"seed\":\"{}\",\"derivation_path\":\"{}\",\"has_password\":{}}}", base58_author, seed_name, path, has_pwd)),
-            Card::AuthorPlain (base58_author) => fancy(index, indent, "author_plain", &format!("{{\"base58\":\"{}\"}}", base58_author)),
-            Card::AuthorPublicKey(author_multi_signer) => {
-                let insert = match author_multi_signer {
-                    MultiSigner::Ed25519(p) => format!("{{\"hex\":\"{}\",\"crypto\":\"{}\"}}", hex::encode(p.to_vec()), Encryption::Ed25519.show()),
-                    MultiSigner::Sr25519(p) => format!("{{\"hex\":\"{}\",\"crypto\":\"{}\"}}", hex::encode(p.to_vec()), Encryption::Sr25519.show()),
-                    MultiSigner::Ecdsa(p) => format!("{{\"hex\":\"{}\",\"crypto\":\"{}\"}}", hex::encode(p.0.to_vec()), Encryption::Ecdsa.show()),
+            Card::Author {author, base58prefix, seed_name, path, has_pwd} => {
+                let hex_identicon = match make_identicon_from_multisigner(author) {
+                    Ok(a) => hex::encode(a),
+                    Err(_) => "".to_string(),
+                };
+                fancy(index, indent, "author", &format!("{{\"base58\":\"{}\",\"identicon\":\"{}\",\"seed\":\"{}\",\"derivation_path\":\"{}\",\"has_password\":{}}}", print_multisigner_as_base58(&author, Some(*base58prefix)), hex_identicon, seed_name, path, has_pwd))
+            },
+            Card::AuthorPlain {author, base58prefix} => {
+                let hex_identicon = match make_identicon_from_multisigner(author) {
+                    Ok(a) => hex::encode(a),
+                    Err(_) => "".to_string(),
+                };
+                fancy(index, indent, "author_plain", &format!("{{\"base58\":\"{}\",\"identicon\":\"{}\"}}", print_multisigner_as_base58(&author, Some(*base58prefix)), hex_identicon))
+            },
+            Card::AuthorPublicKey(author) => {
+                let hex_identicon = match make_identicon_from_multisigner(author) {
+                    Ok(a) => hex::encode(a),
+                    Err(_) => "".to_string(),
+                };
+                let insert = match author {
+                    MultiSigner::Ed25519(p) => format!("{{\"hex\":\"{}\",\"crypto\":\"{}\",\"identicon\":\"{}\"}}", hex::encode(p.to_vec()), Encryption::Ed25519.show(), hex_identicon),
+                    MultiSigner::Sr25519(p) => format!("{{\"hex\":\"{}\",\"crypto\":\"{}\",\"identicon\":\"{}\"}}", hex::encode(p.to_vec()), Encryption::Sr25519.show(), hex_identicon),
+                    MultiSigner::Ecdsa(p) => format!("{{\"hex\":\"{}\",\"crypto\":\"{}\",\"identicon\":\"{}\"}}", hex::encode(p.0.to_vec()), Encryption::Ecdsa.show(), hex_identicon),
                 };
                 fancy(index, indent, "author_public_key", &insert)
             },

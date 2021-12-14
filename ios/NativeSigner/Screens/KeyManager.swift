@@ -26,14 +26,14 @@ struct KeyManager: View {
                         Text("DERIVED KEYS").foregroundColor(Color("Text600"))
                         Spacer()
                         Button(action: {
-                            //TODO
+                            data.pushButton(buttonID: .NewKey)
                         }) {
                             Image(systemName: "plus.circle").imageScale(.large).foregroundColor(Color("Action400"))
                         }
                     }.padding(.horizontal, 8)
                 ScrollView {
                     LazyVStack {
-                        ForEach(content.set, id: \.address_key) {
+                        ForEach(content.set.sorted(by: {$0.path < $1.path}), id: \.address_key) {
                             address in
                             Button(action: {
                                 data.pushButton(buttonID: .SelectKey, details: address.address_key)

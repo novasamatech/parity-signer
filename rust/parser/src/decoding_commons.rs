@@ -3,7 +3,7 @@ use sp_arithmetic::{PerThing};
 use std::mem::size_of;
 use definitions::{error::{ParserError, ParserDecodingError, ParserMetadataError}, network_specs::ShortSpecs};
 use printing_balance::convert_balance_pretty;
-use sp_core::crypto::{Ss58Codec, Ss58AddressFormat, AccountId32};
+use sp_core::crypto::AccountId32;
 
 use crate::cards::{ParserCard};
 use crate::decoding_sci_ext::{Ext, SpecialExt};
@@ -245,8 +245,7 @@ pub (crate) fn special_case_account_id (data: Vec<u8>, indent: u32, short_specs:
                 Ok(x) => {
                     let remaining_vector = data[32..].to_vec();
                     let account_id = AccountId32::new(x);
-                    let base58print = account_id.to_ss58check_with_version(Ss58AddressFormat::Custom(short_specs.base58prefix));
-                    let fancy_out = vec![OutputCard{card: ParserCard::Id(base58print), indent}];
+                    let fancy_out = vec![OutputCard{card: ParserCard::Id{id: account_id, base58prefix: short_specs.base58prefix}, indent}];
                     Ok(DecodedOut {
                         remaining_vector,
                         fancy_out,

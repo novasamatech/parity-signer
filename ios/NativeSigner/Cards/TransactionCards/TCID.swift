@@ -8,12 +8,14 @@
 import SwiftUI
 
 struct TCID: View {
-    var text: String
+    var value: Id
     var body: some View {
         HStack {
             //TODO: handle error
-            Image(uiImage: UIImage(data: Data(fromHexEncodedString: String(cString: base58_identicon(nil, text, 32)))!)!)
-            Text(text)
+            Image(uiImage: UIImage(data: Data(fromHexEncodedString: value.identicon) ?? Data()) ?? UIImage())
+                .resizable(resizingMode: .stretch)
+                .frame(width: 28, height: 28)
+            Text(value.base58)
                 .foregroundColor(Color("textMainColor"))
             Spacer()
         }

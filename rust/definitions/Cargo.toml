@@ -20,7 +20,9 @@ zeroize = "1.4.2"
 blake2-rfc = "0.2.18"
 sled = "0.34.6"
 frame-metadata = { version = "14.0.0", default-features = false, features = ["v12", "v13", "v14", "std"]}
+plot_icon = { git = "https://github.com/paritytech/polkadot-identicon-rust" }
 png = "0.16.8"
+constants = {path = "../constants"}
 
 [lib]
 name = "definitions"

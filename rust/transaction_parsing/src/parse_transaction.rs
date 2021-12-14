@@ -1,5 +1,5 @@
 use db_handling::{db_transactions::{TrDbColdSign, SignContent}, helpers::{try_get_network_specs, try_get_address_details}, manage_history::get_history_entry_by_order};
-use definitions::{error::{DatabaseSigner, ErrorSigner, InputSigner, NotFoundSigner, ParserError}, history::Event, keyring::{AddressKey, NetworkSpecsKey, print_multisigner_as_base58}, users::AddressDetails};
+use definitions::{error::{DatabaseSigner, ErrorSigner, InputSigner, NotFoundSigner, ParserError}, history::Event, keyring::{AddressKey, NetworkSpecsKey}, users::AddressDetails};
 use parser::{parse_set, decoding_commons::OutputCard};
 
 use crate::cards::{Action, Card, Warning};
@@ -46,17 +46,16 @@ pub (crate) fn parse_transaction (data_hex: &str, dbname: &str) -> Result<String
     match try_get_network_specs(&dbname, &network_specs_key)? {
         Some(network_specs) => {
             let address_key = AddressKey::from_multisigner(&author_multi_signer);
-            let author = print_multisigner_as_base58(&author_multi_signer, Some(network_specs.base58prefix));
             let mut history: Vec<Event> = Vec::new();
 
             let mut cards_prep = match try_get_address_details(&dbname, &address_key)? {
                 Some(address_details) => {
-                    let author_card = (Card::Author{base58_author: &author, seed_name: &address_details.seed_name, path: &address_details.path, has_pwd: address_details.has_pwd}).card(&mut index, indent);
+                    let author_card = (Card::Author{author: &author_multi_signer, base58prefix: network_specs.base58prefix, seed_name: &address_details.seed_name, path: &address_details.path, has_pwd: address_details.has_pwd}).card(&mut index, indent);
                     if address_details.network_id.contains(&network_specs_key) {CardsPrep::SignProceed(author_card, None, address_details)}
                     else {CardsPrep::ShowOnly(author_card, Card::Warning(Warning::NoNetworkID).card(&mut index, indent))}
                 }
                 None => {
-                    CardsPrep::ShowOnly((Card::AuthorPlain(&author)).card(&mut index, indent),(Card::Warning(Warning::AuthorNotFound)).card(&mut index, indent))
+                    CardsPrep::ShowOnly((Card::AuthorPlain{author: &author_multi_signer, base58prefix: network_specs.base58prefix}).card(&mut index, indent),(Card::Warning(Warning::AuthorNotFound)).card(&mut index, indent))
                 }
             };
 

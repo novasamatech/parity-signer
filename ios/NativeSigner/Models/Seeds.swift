@@ -297,4 +297,18 @@ extension SignerDataModel {
             print("remove seed from secure storage error: " + self.lastError)
         }
     }
+    
+    /*
+     * Guess possible seed word(s) from user input
+     */
+    func guessWord(word: String) -> [String] {
+        let res = guess_word(nil, word)
+        if let wordsJSON = String(cString: res!).data(using: .utf8) {
+            guard let words = try? JSONDecoder().decode([String].self, from: wordsJSON)
+            else { return [] }
+            return words
+        } else {
+            return []
+        }
+    }
 }

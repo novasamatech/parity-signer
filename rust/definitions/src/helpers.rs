@@ -3,6 +3,9 @@ use sp_core::{ed25519, sr25519, ecdsa};
 use sp_runtime::MultiSigner;
 use std::convert::TryInto;
 
+use constants::HALFSIZE;
+use plot_icon::png_data_from_vec;
+
 use crate::crypto::Encryption;
 use crate::error::{ErrorSigner, ErrorSource, InterfaceSigner};
 
@@ -34,6 +37,15 @@ pub fn multisigner_to_encryption (m: &MultiSigner) -> Encryption {
         MultiSigner::Ed25519(_) => Encryption::Ed25519,
         MultiSigner::Sr25519(_) => Encryption::Sr25519,
         MultiSigner::Ecdsa(_) => Encryption::Ecdsa,
+    }
+}
+
+
+/// Helper function to print identicon from the multisigner
+pub fn make_identicon_from_multisigner(multisigner: &MultiSigner) -> Result<Vec<u8>, ErrorSigner> {
+    match png_data_from_vec(&multisigner_to_public(&multisigner), HALFSIZE) {
+        Ok(a) => Ok(a),
+        Err(e) => return Err(ErrorSigner::PngGeneration(e)),
     }
 }
 

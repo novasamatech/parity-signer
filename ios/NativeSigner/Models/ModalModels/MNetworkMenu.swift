@@ -8,5 +8,6 @@
 import Foundation
 
 struct MNetworkMenu: Decodable, Hashable {
-    //var networks: [Network]
+    var networks: [Network]
 }
+

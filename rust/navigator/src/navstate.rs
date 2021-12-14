@@ -11,7 +11,7 @@ use crate::alerts::Alert;
 //use plot_icon;
 use db_handling;
 use definitions::{error::{ErrorSource, Signer}, keyring::NetworkSpecsKey};
-//use transaction_parsing;
+use transaction_parsing;
 //use transaction_signing;
 
 ///State of the app as remembered by backend
@@ -90,7 +90,7 @@ impl State {
                                 Screen::LogDetails => {
                                     new_navstate.screen = Screen::Log;
                                 },
-                                Screen::Transaction => {
+                                Screen::Transaction(_) => {
                                     new_navstate.screen = Screen::Scan;
                                 },
                                 Screen::Keys(_) => {
@@ -144,22 +144,20 @@ impl State {
                             };
                         },
                         Screen::DeriveKey(ref derive_state) => {
-                            let mut path = derive_state.path();
-                            match db_handling::identities::try_create_address (&derive_state.seed_name(), &secret_seed_phrase, &path, &derive_state.network_specs_key(), dbname) {
+                            new_navstate.screen = Screen::DeriveKey(derive_state.update(details_str));
+                            match db_handling::identities::try_create_address (&derive_state.seed_name(), &secret_seed_phrase, details_str, &derive_state.network_specs_key(), dbname) {
                                 Ok(()) => {
                                     match KeysState::new(&derive_state.seed_name(), dbname) {
                                         Ok(a) => {
                                             new_navstate = Navstate::clean_screen(Screen::Keys(a))
                                         },
                                         Err(e) => {
-                                            path.zeroize();
                                             new_navstate.alert = Alert::Error;
                                             errorline.push_str(&<Signer>::show(&e));
                                         },
                                     }
                                 },
                                 Err(e) => {
-                                    path.zeroize();
                                     new_navstate.alert = Alert::Error;
                                     errorline.push_str(&<Signer>::show(&e));
                                 },
@@ -283,6 +281,9 @@ impl State {
                         },
                         _ => println!("No password to check"),
                     }
+                },
+                Action::TransactionFetched => {
+                    new_navstate = Navstate::clean_screen(Screen::Transaction(details_str.to_string()));
                 }
                 Action::Nothing => {
                     println!("no action was passed in action");
@@ -306,7 +307,9 @@ impl State {
                 },
                 //Screen::LogDetails => "",
                 Screen::Scan => "".to_string(),
-                //Screen::Transaction => "",
+                Screen::Transaction(ref payload) => {
+                    transaction_parsing::produce_output(payload, dbname)
+                },
                 Screen::SeedSelector => {
                     let cards = match db_handling::interface_signer::print_all_seed_names_with_identicons(&dbname) {
                         Ok(a) => a,
@@ -446,7 +449,7 @@ impl State {
             Screen::Log => "Log",
             Screen::LogDetails => "Log",
             Screen::Scan => "Scan",
-            Screen::Transaction => "Scan",
+            Screen::Transaction(_) => "Scan",
             Screen::SeedSelector => "Keys",
             Screen::Keys(_) => "Keys",
             Screen::KeyDetails(_) => "Keys",
@@ -467,7 +470,7 @@ impl State {
             Screen::Log => "None",
             Screen::LogDetails => "None",
             Screen::Scan => "None",
-            Screen::Transaction => "None",
+            Screen::Transaction(_) => "None",
             Screen::SeedSelector => "NewSeed",
             Screen::Keys(_) => "Backup",
             Screen::KeyDetails(_) => "None",
@@ -488,7 +491,7 @@ impl State {
             Screen::Log => "h4",
             Screen::LogDetails => "h4",
             Screen::Scan => "h1",
-            Screen::Transaction => "h1",
+            Screen::Transaction(_) => "h1",
             Screen::SeedSelector => "h1",
             Screen::Keys(_) => "h4",
             Screen::KeyDetails(_) => "h4",
