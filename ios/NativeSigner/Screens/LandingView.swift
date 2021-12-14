@@ -15,42 +15,46 @@ struct LandingView: View {
     var body: some View {
         VStack {
             DocumentModal()
-            Button(action: {
-                tacAccept.toggle()
-            }) {
-                HStack {
-                    Image(systemName: tacAccept ? "checkmark.square" : "square").imageScale(.large)
-                    Text("I agree to the terms and conditions")
-                    Spacer()
+            VStack(spacing: 16) {
+                Button(action: {
+                    tacAccept.toggle()
+                }) {
+                    HStack {
+                        Image(systemName: tacAccept ? "checkmark.square" : "square").imageScale(.large)
+                        Text("I agree to the terms and conditions")
+                            .multilineTextAlignment(.leading)
+                        Spacer()
+                    }
                 }
-            }
-            Button(action: {
-                ppAccept.toggle()
-            }) {
-                HStack {
-                    Image(systemName: ppAccept ? "checkmark.square" : "square").imageScale(.large)
-                    Text("I agree to the privacy policy")
-                    Spacer()
+                Button(action: {
+                    ppAccept.toggle()
+                }) {
+                    HStack {
+                        Image(systemName: ppAccept ? "checkmark.square" : "square").imageScale(.large)
+                        Text("I agree to the privacy policy")
+                            .multilineTextAlignment(.leading)
+                        Spacer()
+                    }
                 }
-            }
-            .padding(.vertical, 10)
-            Button(action: {
-                accept = true
-            }) {
-                Text("Next")
-                    .font(.largeTitle)
-            }
-            .padding()
-            .disabled(!(tacAccept && ppAccept))
-            .alert(isPresented: $accept, content: {
-                Alert(
-                    title: Text("Accept privacy policy?"),
-                    message: Text("Do you accept privacy policy?"),
-                    primaryButton: .destructive(Text("Decline")),
-                    secondaryButton: .default(Text("Accept"), action: {data.onboard()})
+                BigButton(
+                    text: "Next",
+                    action: {
+                        accept = true
+                    },
+                    isDisabled: !(tacAccept && ppAccept)
                 )
-            })
+                .padding(.top, 16.0)
+                .alert(isPresented: $accept, content: {
+                    Alert(
+                        title: Text("Accept privacy policy?"),
+                        message: Text("Do you accept privacy policy?"),
+                        primaryButton: .destructive(Text("Decline")),
+                        secondaryButton: .default(Text("Accept"), action: {data.onboard()})
+                    )
+                })
+            }
         }
+        .padding()
     }
 }
 
