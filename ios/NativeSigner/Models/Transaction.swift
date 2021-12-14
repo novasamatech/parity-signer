@@ -27,6 +27,7 @@ extension SignerDataModel {
         self.comment = ""
     }
     
+    /*
     /**
      * Parse decoded payload from QR parser (saved in the model)
      */
@@ -123,5 +124,5 @@ extension SignerDataModel {
                 signer_destroy_string(err_ptr.pointee.message)
             }
         }
-    }
+    }*/
 }

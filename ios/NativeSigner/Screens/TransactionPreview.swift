@@ -39,7 +39,7 @@ struct TransactionPreview: View {
                             }
                         } else {
                             Button(action: {
-                                data.handleTransaction()
+                                //data.handleTransaction()
                                 data.totalRefresh()
                             }) {
                                 Text("Approve")

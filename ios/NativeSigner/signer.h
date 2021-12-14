@@ -42,39 +42,6 @@ int get_packets_total(struct ExternError*, const char* data, int8_t cleaned);
 // qr fountain decoder
 const char * try_decode_qr_sequence(struct ExternError*, const char* data, int8_t cleaned);
 
-// Parse transaction
-// takes 2 strings:
-// transaction, dbname (from OS)
-// Returns decoded payload as serialized payload cards contents with following structure (JSON):
-// {"author":[...],"warning":[...],"error":[...],"method":[...],"extrinsic":[...],"new_specs":[...],"verifier":[...],"types_info":[...],"action":{"type":"...","payload":"..."}}
-// Each card has following fields:
-// index - to sort cards on screen, use as key in flatlist env
-// indent - indentation to visualize cards hierarchy
-// type - type of card
-// payload - contents of card
-// In addition to these cards, an action object is produced; it's payload is a checksum that should be passed to executing function
-// This function does not perform crypto operations and does not produce any side-effects
-// other than formation of "action" record in db that could be used by handle_action function
-const char * parse_transaction(struct ExternError*, const char* transaction, const char* dbname);
-
-// Handle non-signing action;
-// This function performs cryptographic signing or permanently changes Signer's state by modifying
-// networks information
-// Returns QR payload string or plaintext statement of action result
-const char * handle_stub(struct ExternError*, const char* checksum, const char* dbname);
-
-// Handle signing action;
-// This function performs cryptographic signing or permanently changes Signer's state by modifying
-// networks information
-// takes 4 strings
-// checksum - checksum produced in parse_transaction
-// seed phrase (plaintext)
-// password - optional derivation password (///password)
-// user comment - arbitrary base64 string provided by user
-// dbname (from OS)
-// Returns QR payload string or plaintext statement of action result
-const char * handle_sign(struct ExternError*, const char* checksum, const char* seed_phrase, const char* password, const char* user_comment, const char* dbname);
-
 // Generate identicon from base58 address
 const char * base58_identicon(struct ExternError*, const char* base58, int size);
 
@@ -159,14 +126,4 @@ void seed_name_was_shown(struct ExternError*, const char* seed_name, const char*
 
 const char * get_general_certificate(struct ExternError*, const char* dbname);
 
-//Functions for self-signed upgrades
-const char * sign_load_types(struct ExternError*, const char* public_key, const char* encryption, const char* seed_phrase, const char* password, const char* dbname);
 
-const char * sign_load_metadata(struct ExternError*, const char* network, const char* version, const char* public_key, const char* encryption, const char* seed_phrase, const char* password, const char* dbname);
-
-const char * sign_load_specs(struct ExternError*, const char* network, const char* public_key, const char* encryption, const char* seed_phrase, const char* password, const char* dbname);
-
-// FFI tests
-const char * get_all_tx_cards(struct ExternError*);
-
-const char * get_all_log_cards(struct ExternError*);

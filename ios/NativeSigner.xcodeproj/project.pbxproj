@@ -27,6 +27,11 @@
 		2D48F36F2767419D004B27BE /* PasswordConfirm.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D48F36E2767419D004B27BE /* PasswordConfirm.swift */; };
 		2D48F3712767514B004B27BE /* MPasswordConfirm.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D48F3702767514B004B27BE /* MPasswordConfirm.swift */; };
 		2D48F373276793D3004B27BE /* MDeriveKey.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D48F372276793D3004B27BE /* MDeriveKey.swift */; };
+		2D48F38127691C05004B27BE /* AlertSelector.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D48F38027691C05004B27BE /* AlertSelector.swift */; };
+		2D48F38327691C0A004B27BE /* ConfirmAlert.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D48F38227691C0A004B27BE /* ConfirmAlert.swift */; };
+		2D48F38527691C0F004B27BE /* ErrorAlert.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D48F38427691C0F004B27BE /* ErrorAlert.swift */; };
+		2D48F38727691C12004B27BE /* ShieldAlert.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D48F38627691C12004B27BE /* ShieldAlert.swift */; };
+		2D48F38A27691C3B004B27BE /* MError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D48F38927691C3B004B27BE /* MError.swift */; };
 		2D72B4F626EF3BC50081E879 /* Navigator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D72B4F526EF3BC50081E879 /* Navigator.swift */; };
 		2D72B4FA26EF7D1C0081E879 /* Seeds.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D72B4F926EF7D1C0081E879 /* Seeds.swift */; };
 		2D72D52A2732B8A7004BA7C9 /* Database in Resources */ = {isa = PBXBuildFile; fileRef = 2D72D5292732B8A7004BA7C9 /* Database */; };
@@ -148,6 +153,11 @@
 		2D48F36E2767419D004B27BE /* PasswordConfirm.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PasswordConfirm.swift; sourceTree = "<group>"; };
 		2D48F3702767514B004B27BE /* MPasswordConfirm.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MPasswordConfirm.swift; sourceTree = "<group>"; };
 		2D48F372276793D3004B27BE /* MDeriveKey.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MDeriveKey.swift; sourceTree = "<group>"; };
+		2D48F38027691C05004B27BE /* AlertSelector.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AlertSelector.swift; sourceTree = "<group>"; };
+		2D48F38227691C0A004B27BE /* ConfirmAlert.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ConfirmAlert.swift; sourceTree = "<group>"; };
+		2D48F38427691C0F004B27BE /* ErrorAlert.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ErrorAlert.swift; sourceTree = "<group>"; };
+		2D48F38627691C12004B27BE /* ShieldAlert.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ShieldAlert.swift; sourceTree = "<group>"; };
+		2D48F38927691C3B004B27BE /* MError.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MError.swift; sourceTree = "<group>"; };
 		2D72B4F526EF3BC50081E879 /* Navigator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Navigator.swift; sourceTree = "<group>"; };
 		2D72B4F926EF7D1C0081E879 /* Seeds.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Seeds.swift; sourceTree = "<group>"; };
 		2D72D5292732B8A7004BA7C9 /* Database */ = {isa = PBXFileReference; lastKnownFileType = folder; path = Database; sourceTree = "<group>"; };
@@ -266,6 +276,14 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		2D48F38827691C3B004B27BE /* AlertModels */ = {
+			isa = PBXGroup;
+			children = (
+				2D48F38927691C3B004B27BE /* MError.swift */,
+			);
+			path = AlertModels;
+			sourceTree = "<group>";
+		};
 		2D7A7BC526BA96D00053C1E0 /* Cards */ = {
 			isa = PBXGroup;
 			children = (
@@ -398,6 +416,10 @@
 		2DA5F899275F86B600D8DD29 /* Alerts */ = {
 			isa = PBXGroup;
 			children = (
+				2D48F38627691C12004B27BE /* ShieldAlert.swift */,
+				2D48F38427691C0F004B27BE /* ErrorAlert.swift */,
+				2D48F38227691C0A004B27BE /* ConfirmAlert.swift */,
+				2D48F38027691C05004B27BE /* AlertSelector.swift */,
 			);
 			path = Alerts;
 			sourceTree = "<group>";
@@ -492,6 +514,7 @@
 			isa = PBXGroup;
 			children = (
 				2DA5F80C2756304B00D8DD29 /* Camera.swift */,
+				2D48F38827691C3B004B27BE /* AlertModels */,
 				2DE72BFF26A6ADC5002BB752 /* CameraService.swift */,
 				2D7A7BD326BBEAF00053C1E0 /* Canary.swift */,
 				2DA5F8942759575300D8DD29 /* ModalModels */,
@@ -667,6 +690,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				2DA5F89D275F874D00D8DD29 /* NetworkManager.swift in Sources */,
+				2D48F38727691C12004B27BE /* ShieldAlert.swift in Sources */,
 				2DA5F87627566D7C00D8DD29 /* TransactionPreview.swift in Sources */,
 				2DA5F85E27566C3600D8DD29 /* TCFieldName.swift in Sources */,
 				2D48F3712767514B004B27BE /* MPasswordConfirm.swift in Sources */,
@@ -703,6 +727,7 @@
 				2DA5F89F275F885400D8DD29 /* NewSeedMenu.swift in Sources */,
 				2DA5F87027566C3600D8DD29 /* TCNameVersion.swift in Sources */,
 				2DA5F89027590B3A00D8DD29 /* DocumentModal.swift in Sources */,
+				2D48F38527691C0F004B27BE /* ErrorAlert.swift in Sources */,
 				2DE72BC426A588C7002BB752 /* MainScreenContainer.swift in Sources */,
 				2DA5F86B27566C3600D8DD29 /* TCTip.swift in Sources */,
 				2DA5F8272756629600D8DD29 /* ScreenSelector.swift in Sources */,
@@ -710,6 +735,7 @@
 				2D48F36327622C54004B27BE /* MNetworkMenu.swift in Sources */,
 				2DA5F8802756A2CA00D8DD29 /* Network.swift in Sources */,
 				2DA5F8332756653B00D8DD29 /* CameraPreview.swift in Sources */,
+				2D48F38A27691C3B004B27BE /* MError.swift in Sources */,
 				2DA5F8862756A44600D8DD29 /* AddressCardControls.swift in Sources */,
 				2DA5F8962759576B00D8DD29 /* MLog.swift in Sources */,
 				2DA5F82F2756635A00D8DD29 /* HistoryScreen.swift in Sources */,
@@ -721,6 +747,7 @@
 				2DA5F86527566C3600D8DD29 /* TCID.swift in Sources */,
 				2DA5F86227566C3600D8DD29 /* TCEnumVariantName.swift in Sources */,
 				2DA5F87A275676B600D8DD29 /* SeedCardForManager.swift in Sources */,
+				2D48F38127691C05004B27BE /* AlertSelector.swift in Sources */,
 				2DA5F89227590B4F00D8DD29 /* Documents.swift in Sources */,
 				2DA5F80D2756304B00D8DD29 /* Camera.swift in Sources */,
 				2DA5F8842756A37800D8DD29 /* Address.swift in Sources */,
@@ -747,6 +774,7 @@
 				2D48F36127620F49004B27BE /* SeedKeyCard.swift in Sources */,
 				2D48F3552760AF9D004B27BE /* MSeeds.swift in Sources */,
 				2DA5F821275652EE00D8DD29 /* Footer.swift in Sources */,
+				2D48F38327691C0A004B27BE /* ConfirmAlert.swift in Sources */,
 				2DA5F88C2757693600D8DD29 /* NewAddressScreen.swift in Sources */,
 				2D48F36B2763604F004B27BE /* Backup.swift in Sources */,
 				2DA5F83F275667CF00D8DD29 /* HistoryCardTemplate.swift in Sources */,
