@@ -179,6 +179,7 @@ enum ButtonID {
     case BackupSeed
     case CheckPassword
     case ChangeNetwork
+    case TransactionFetched
 }
 
 /**

@@ -41,7 +41,7 @@ struct RecoverSeedName: View {
                             .padding(.horizontal, 8)
                     }
                     Text("Display name visible only to you").font(.callout)
-                    Text(data.lastError).foregroundColor(.red)
+                    Text(data.lastError).foregroundColor(Color("SignalDanger"))
                     HStack {
                         Spacer()
                         Button(action: {

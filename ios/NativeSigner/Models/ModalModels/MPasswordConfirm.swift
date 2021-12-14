@@ -8,5 +8,7 @@
 import Foundation
 
 struct MPasswordConfirm: Decodable, Equatable {
-    var password: String
+    var pwd: String
+    var seed_name: String
+    var cropped_path: String
 }

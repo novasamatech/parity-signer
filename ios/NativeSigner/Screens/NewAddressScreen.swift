@@ -49,6 +49,7 @@ struct NewAddressScreen: View {
                 }.padding()
                 HStack {
                     Button(action: {
+                        focusedField = false
                         if derivationState.hasPassword {
                             data.pushButton(buttonID: .CheckPassword, details: path)
                         } else {
