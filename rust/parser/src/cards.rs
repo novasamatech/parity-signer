@@ -1,4 +1,5 @@
 use hex;
+use sp_core::crypto::{Ss58Codec, Ss58AddressFormat, AccountId32};
 use sp_runtime::generic::Era;
 
 
@@ -9,7 +10,7 @@ pub enum ParserCard {
     Varname (String),
     Default (String),
     Text (String),
-    Id (String),
+    Id {id: AccountId32, base58prefix: u16},
     None,
     IdentityField (String),
     BitVec (String), // String from printing BitVec
@@ -33,7 +34,7 @@ impl ParserCard {
             ParserCard::Varname (varname) => readable(indent, "varname", &varname),
             ParserCard::Default (decoded_string) => readable(indent, "default", &decoded_string),
             ParserCard::Text (decoded_text) => readable(indent, "text", &decoded_text),
-            ParserCard::Id (base58_id) => readable(indent, "Id", &base58_id),
+            ParserCard::Id {id, base58prefix} => readable(indent, "Id", &id.to_ss58check_with_version(Ss58AddressFormat::Custom(*base58prefix))),
             ParserCard::None => readable(indent, "none", ""),
             ParserCard::IdentityField (variant) => readable(indent, "identity_field", &variant),
             ParserCard::BitVec (bv) => readable(indent, "bitvec", &bv),

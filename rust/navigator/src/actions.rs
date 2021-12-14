@@ -26,6 +26,7 @@ pub enum Action {
     PreviousUnit,
     ChangeNetwork,
     CheckPassword,
+    TransactionFetched,
     Nothing,
 }
 
@@ -53,6 +54,7 @@ impl Action {
             "PreviousUnit" => Action::PreviousUnit,
             "ChangeNetwork" => Action::ChangeNetwork,
             "CheckPassword" => Action::CheckPassword,
+            "TransactionFetched" => Action::TransactionFetched,
             _ => Action::Nothing,
         }
     }

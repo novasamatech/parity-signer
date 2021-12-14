@@ -1,5 +1,5 @@
 use db_handling::{db_transactions::{TrDbColdSign, SignContent}, helpers::{try_get_network_specs, try_get_address_details}};
-use definitions::{error::{ErrorSigner, InputSigner}, keyring::{AddressKey, NetworkSpecsKey, print_multisigner_as_base58}};
+use definitions::{error::{ErrorSigner, InputSigner}, keyring::{AddressKey, NetworkSpecsKey}};
 use parity_scale_codec::Decode;
 use parser::cards::ParserCard;
 
@@ -27,10 +27,9 @@ pub fn process_message (data_hex: &str, dbname: &str) -> Result<String, ErrorSig
     match try_get_network_specs(&dbname, &network_specs_key)? {
         Some(network_specs) => {
             let address_key = AddressKey::from_multisigner(&author_multi_signer);
-            let author = print_multisigner_as_base58(&author_multi_signer, Some(network_specs.base58prefix));
             match try_get_address_details(&dbname, &address_key)? {
                 Some(address_details) => {
-                    let author_card = Card::Author{base58_author: &author, seed_name: &address_details.seed_name, path: &address_details.path, has_pwd: address_details.has_pwd}.card(&mut index, indent);
+                    let author_card = Card::Author{author: &author_multi_signer, base58prefix: network_specs.base58prefix, seed_name: &address_details.seed_name, path: &address_details.path, has_pwd: address_details.has_pwd}.card(&mut index, indent);
                     if address_details.network_id.contains(&network_specs_key) {
                         let message_card = Card::ParserCard(&ParserCard::Text(message.to_string())).card(&mut index, indent);
                         let network_card = Card::NetworkName(&network_specs.name).card(&mut index, indent);
@@ -47,7 +46,7 @@ pub fn process_message (data_hex: &str, dbname: &str) -> Result<String, ErrorSig
                     }
                 }
                 None => {
-                    let author_card = Card::AuthorPlain(&author).card(&mut index, indent);
+                    let author_card = Card::AuthorPlain{author: &author_multi_signer, base58prefix: network_specs.base58prefix}.card(&mut index, indent);
                     let warning_card = Card::Warning(Warning::AuthorNotFound).card(&mut index, indent);
                     let message_card = Card::ParserCard(&ParserCard::Text(message.to_string())).card(&mut index, indent);
                     let network_card = Card::NetworkName(&network_specs.name).card(&mut index, indent);

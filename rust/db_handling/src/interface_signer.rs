@@ -1,10 +1,10 @@
 use sp_runtime::MultiSigner;
 use std::collections::HashMap;
 
-use definitions::{error::{DatabaseSigner, ErrorSigner, InterfaceSigner, NotFoundSigner}, helpers::{multisigner_to_public}, keyring::{NetworkSpecsKey, AddressKey, print_multisigner_as_base58}, network_specs::NetworkSpecs, print::export_complex_vector, users::AddressDetails};
+use definitions::{error::{DatabaseSigner, ErrorSigner, InterfaceSigner, NotFoundSigner}, helpers::{multisigner_to_public, make_identicon_from_multisigner}, keyring::{NetworkSpecsKey, AddressKey, print_multisigner_as_base58}, network_specs::NetworkSpecs, print::export_complex_vector, users::AddressDetails};
 use qrcode_static::png_qr_from_string;
 
-use crate::helpers::{get_address_details, get_network_specs, make_identicon_from_multisigner};
+use crate::helpers::{get_address_details, get_network_specs};
 use crate::identities::{get_all_addresses, get_addresses_by_seed_name};
 use crate::network_details::get_all_networks;
 

@@ -4,7 +4,7 @@ use definitions::{crypto::Encryption, history::MetaValuesDisplay, keyring::Verif
 use hex;
 use std::convert::TryInto;
 use parser::cards::ParserCard;
-use sp_core;
+use sp_core::crypto::AccountId32;
 use sp_runtime::{generic::Era, MultiSigner};
 
 use crate::cards::{Card, Warning};
@@ -46,7 +46,7 @@ pub fn make_all_cards() -> String {
 Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
 Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.
 Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.".to_string())).card(&mut index,0));
-    all_cards.push(Card::ParserCard(&ParserCard::Id("5FHneW46xGXgs5mUiveU4sbTyGBzmstUspZC92UhjJM694ty".to_string())).card(&mut index,0));
+    all_cards.push(Card::ParserCard(&ParserCard::Id{id: AccountId32::new(PUBLIC), base58prefix: 42}).card(&mut index,0));
     all_cards.push(Card::ParserCard(&ParserCard::None).card(&mut index,0));
     all_cards.push(Card::ParserCard(&ParserCard::IdentityField("Twitter".to_string())).card(&mut index,0));
     all_cards.push(Card::ParserCard(&ParserCard::BitVec(bv.to_string())).card(&mut index,0));
@@ -62,8 +62,8 @@ Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deseru
     all_cards.push(Card::ParserCard(&ParserCard::NetworkNameVersion{name: "westend".to_string(), version: "9110".to_string()}).card(&mut index,0));
     all_cards.push(Card::ParserCard(&ParserCard::TxVersion("5".to_string())).card(&mut index,0));
     
-    all_cards.push(Card::Author{base58_author: "5FHneW46xGXgs5mUiveU4sbTyGBzmstUspZC92UhjJM694ty", seed_name: "Alice", path: "//Alice", has_pwd: false}.card(&mut index,0));
-    all_cards.push(Card::AuthorPlain("5FHneW46xGXgs5mUiveU4sbTyGBzmstUspZC92UhjJM694ty").card(&mut index,0));
+    all_cards.push(Card::Author{author: &MultiSigner::Sr25519(sp_core::sr25519::Public::from_raw(PUBLIC)), base58prefix: 42, seed_name: "Alice", path: "//Alice", has_pwd: false}.card(&mut index,0));
+    all_cards.push(Card::AuthorPlain{author: &MultiSigner::Sr25519(sp_core::sr25519::Public::from_raw(PUBLIC)), base58prefix: 42}.card(&mut index,0));
     all_cards.push(Card::AuthorPublicKey(&MultiSigner::Sr25519(sp_core::sr25519::Public::from_raw(PUBLIC))).card(&mut index,0));
     all_cards.push(Card::Verifier(&verifier_value_sr25519()).card(&mut index,0));
     all_cards.push(Card::Meta(MetaValuesDisplay::get(&MetaValues{name: String::from("westend"), version: 9100, meta: Vec::new()})).card(&mut index,0));
