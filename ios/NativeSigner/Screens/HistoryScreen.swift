@@ -13,7 +13,7 @@ struct HistoryScreen: View {
     var body: some View {
         ScrollView {
             LazyVStack {
-                ForEach(content.log.sorted(by: {$0.order < $1.order}), id: \.order) {history in
+                ForEach(content.log.sorted(by: {$0.order > $1.order}), id: \.order) {history in
                     VStack (alignment: .leading){
                         ForEach(history.events, id: \.self) {event in
                             Button(action: {
