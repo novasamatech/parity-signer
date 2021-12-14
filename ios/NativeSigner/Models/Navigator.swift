@@ -47,7 +47,7 @@ struct ActionResult: Decodable {
         footerButton = try values.decode(String.self, forKey: .footerButton)
         rightButton = try values.decode(String.self, forKey: .rightButton)
         screenNameType = try values.decode(String.self, forKey: .screenNameType)
-        alert = try values.decode(SignerAlert.self, forKey: .alert)
+        let alertType = try values.decode(String.self, forKey: .alert)
         let modalType = try values.decode(String.self, forKey: .modal)
         let screenType = try values.decode(String.self, forKey: .screen)
         
@@ -102,6 +102,15 @@ struct ActionResult: Decodable {
         default:
             modal = .Empty
         }
+        
+        switch alertType {
+        case "Empty":
+            alert = .Empty
+        case "Error":
+            alert = .Error(try values.decode(MError.self, forKey: .alertData))
+        default:
+            alert = .Empty
+        }
     }
 }
 
@@ -149,9 +158,9 @@ enum SignerModal: Equatable, Decodable {
     case PasswordConfirm(MPasswordConfirm)
 }
 
-enum SignerAlert: String, Equatable, Decodable {
+enum SignerAlert: Equatable, Decodable {
     case Empty
-    case Error
+    case Error(MError)
     case Shield
     case keyDeleteConfirm
 }
