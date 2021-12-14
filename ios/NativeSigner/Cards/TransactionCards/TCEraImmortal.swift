@@ -13,7 +13,7 @@ struct TCEraImmortal: View {
             Spacer()
             VStack {
                 Text("Immortal")
-                    .foregroundColor(Color("AccentColor"))
+                    .foregroundColor(Color("Action400"))
             }
             Spacer()
         }

@@ -62,8 +62,6 @@ struct ActionResult: Decodable {
             screen = .Log(try values.decode(MLog.self, forKey: .screenData))
         case "LogDetails":
             screen = .LogDetails
-        case "Transaction":
-            screen = .Transaction
         case "SeedSelector":
             screen = .SeedSelector(try values.decode(MSeeds.self, forKey: .screenData))
         case "KeyDetails":
@@ -76,6 +74,8 @@ struct ActionResult: Decodable {
             screen = .RecoverSeedName
         case "RecoverSeedPhrase":
             screen = .RecoverSeedPhrase
+        case "Transaction":
+            screen = .Transaction(try values.decode(TransactionCardSet.self, forKey: .screenData))
         case "DeriveKey":
             screen = .DeriveKey(try values.decode(MDeriveKey.self, forKey: .screenData))
         case "Verifier":
@@ -123,7 +123,7 @@ enum SignerScreen: Decodable {
     case Settings
     case Log(MLog)
     case LogDetails
-    case Transaction
+    case Transaction(TransactionCardSet)
     case SeedSelector(MSeeds)
     case KeyDetails(MKeyDetails)
     case Backup

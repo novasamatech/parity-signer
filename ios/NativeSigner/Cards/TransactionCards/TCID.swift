@@ -16,7 +16,7 @@ struct TCID: View {
                 .resizable(resizingMode: .stretch)
                 .frame(width: 28, height: 28)
             Text(value.base58)
-                .foregroundColor(Color("textMainColor"))
+                .foregroundColor(Color("Text600"))
             Spacer()
         }
         .background(/*@START_MENU_TOKEN@*//*@PLACEHOLDER=View@*/Color("backgroundCard")/*@END_MENU_TOKEN@*/)

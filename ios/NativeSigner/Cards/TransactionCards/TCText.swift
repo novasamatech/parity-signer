@@ -12,7 +12,7 @@ struct TCText: View {
     var body: some View {
         HStack {
             Text(AttributedString(fromHexDocs: text) ?? AttributedString(text))
-                .foregroundColor(Color("textMainColor"))
+                .foregroundColor(Color("Text600"))
             Spacer()
         }
         .background(/*@START_MENU_TOKEN@*//*@PLACEHOLDER=View@*/Color("AccentColor")/*@END_MENU_TOKEN@*/)

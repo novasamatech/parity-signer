@@ -49,7 +49,6 @@ struct Author: Decodable {
     var seed: String
     var derivation_path: String
     var has_password: Bool
-    var name: String
     var identicon: String
 }
 
@@ -278,5 +277,5 @@ struct TransactionCardSet: Decodable {
     var verifier: [TransactionCard]?
     var warning: [TransactionCard]?
     var types_info: [TransactionCard]?
-    var action: Action?
+    //var action: Action?
 }

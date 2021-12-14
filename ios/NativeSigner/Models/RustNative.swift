@@ -186,6 +186,7 @@ extension SignerDataModel {
         SecItemDelete(query)
         self.onboardingDone = false
         self.seedNames = []
+        init_navigation(nil, dbName, seedNames.joined(separator: ","))
     }
     
     /**

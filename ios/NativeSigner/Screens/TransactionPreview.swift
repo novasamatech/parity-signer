@@ -10,12 +10,15 @@ import SwiftUI
 struct TransactionPreview: View {
     @EnvironmentObject var data: SignerDataModel
     @State private var comment = ""
+    let content: TransactionCardSet
     var body: some View {
         ZStack {
             VStack {
                 ScrollView {
                     LazyVStack {
-                        ForEach(data.cards, id: \.index) { card in
+                        ForEach(content.method?.sorted(by: {
+                            $0.index < $1.index
+                        }) ?? [], id: \.index) { card in
                             TransactionCardView(card: card)
                         }
                     }
@@ -26,7 +29,7 @@ struct TransactionPreview: View {
                 }
                 Spacer()
                 HStack {
-                    Button(action: {data.transactionState = .none}) {
+                    Button(action: {data.pushButton(buttonID: .GoBack)}) {
                         Text("Decline")
                             .font(.largeTitle)
                     }

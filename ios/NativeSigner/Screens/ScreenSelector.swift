@@ -22,8 +22,8 @@ struct ScreenSelector: View {
             HistoryScreen(content: value)
         case .LogDetails:
             EventDetails()
-        case .Transaction:
-            TransactionPreview()
+        case .Transaction(let value):
+            TransactionPreview(content: value)
         case .SeedSelector(let value):
             SeedManager(content: value)
         case .KeyDetails(let value):
@@ -33,7 +33,7 @@ struct ScreenSelector: View {
         case .NewSeed:
             NewSeedScreen()
         case .RecoverSeedName:
-            RecoverSeedName()
+            RecoverSeedPhrase()
         case .RecoverSeedPhrase:
             RecoverSeedPhrase()
         case .DeriveKey(let value):

@@ -14,12 +14,12 @@ struct TCAuthor: View {
             Image(uiImage: UIImage(data: Data(fromHexEncodedString: String(cString: base58_identicon(nil, author.base58, 32)))!)!)
             VStack (alignment: .leading) {
                 Text("From:")
-                    .foregroundColor(Color("AccentColor"))
+                    .foregroundColor(Color("Action400"))
                 Text(author.seed + author.derivation_path)
-                    .foregroundColor(Color("textMainColor"))
+                    .foregroundColor(Color("Text600"))
                 Text(author.base58)
                     .font(.caption2)
-                    .foregroundColor(Color("textMainColor"))
+                    .foregroundColor(Color("Text600"))
             }
             Spacer()
         }

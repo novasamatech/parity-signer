@@ -12,9 +12,9 @@ struct TCTypesInfo: View {
     var body: some View {
         HStack {
             Text("Types hash:")
-                .foregroundColor(Color("AccentColor"))
+                .foregroundColor(Color("Action400"))
             Text(text)
-                .foregroundColor(Color("textMainColor"))
+                .foregroundColor(Color("Text600"))
             Spacer()
         }
         .background(/*@START_MENU_TOKEN@*//*@PLACEHOLDER=View@*/Color("backgroundCard")/*@END_MENU_TOKEN@*/)

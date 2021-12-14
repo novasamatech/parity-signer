@@ -11,19 +11,19 @@ struct TCVerifier: View {
     var value: Verifier
     var body: some View {
         VStack {
-            Text("VERIFIER CERTIFICATE").foregroundColor(Color("textMainColor"))
+            Text("VERIFIER CERTIFICATE").foregroundColor(Color("Text600"))
             VStack(alignment: .leading) {
                 HStack {
                     Text("key:")
-                        .foregroundColor(Color("textMainColor"))
+                        .foregroundColor(Color("Text600"))
                     Text(value.hex)
-                        .foregroundColor(Color("cryptoColor"))
+                        .foregroundColor(Color("Crypto400"))
                 }
                 HStack {
                     Text("crypto:")
-                        .foregroundColor(Color("textMainColor"))
+                        .foregroundColor(Color("Text600"))
                     Text(value.encryption)
-                        .foregroundColor(Color("cryptoColor"))
+                        .foregroundColor(Color("Crypto400"))
                 }
             }
         }

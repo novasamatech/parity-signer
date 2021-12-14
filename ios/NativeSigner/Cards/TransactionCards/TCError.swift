@@ -12,9 +12,9 @@ struct TCError: View {
     var body: some View {
         HStack {
             Text("Error! ")
-                .foregroundColor(Color("textMainColor"))
+                .foregroundColor(Color("Text600"))
             Text(text)
-                .foregroundColor(Color("textMainColor"))
+                .foregroundColor(Color("Text600"))
             Spacer()
         }
         .background(/*@START_MENU_TOKEN@*//*@PLACEHOLDER=View@*/Color("borderSignalColor")/*@END_MENU_TOKEN@*/)
