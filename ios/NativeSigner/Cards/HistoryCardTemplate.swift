@@ -17,12 +17,7 @@ struct HistoryCardTemplate: View {
     var body: some View {
         ZStack {
             RoundedRectangle(cornerRadius: 4).foregroundColor(Color(danger ? "BgDanger" : "Bg200"))
-            HStack (alignment: .center) {
-                Image(systemName: image)
-                    .imageScale(.medium)
-                    .foregroundColor(Color(danger ? "SignelDanger" : "Text400"))
-                    .frame(width: 26.0)
-                    .padding(8)
+            HStack {
                 VStack (alignment: .leading) {
                     if (timestamp != "") {
                         Text(timestamp)
@@ -36,6 +31,9 @@ struct HistoryCardTemplate: View {
                         .font(FCrypto(style: .body1))
                 }
                 Spacer()
+                Image(systemName: image)
+                    .imageScale(.medium)
+                    .foregroundColor(Color(danger ? "SignalDanger" : "Text400"))
             }
             .padding(8)
         }

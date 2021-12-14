@@ -14,15 +14,17 @@ struct HistoryScreen: View {
         ScrollView {
             LazyVStack {
                 ForEach(content.log.sorted(by: {$0.order > $1.order}), id: \.order) {history in
-                    VStack (alignment: .leading){
+                    VStack {
                         ForEach(history.events, id: \.self) {event in
                             Button(action: {
                                 
                             }) {
-                                HistoryCard(event: event, timestamp: history.timestamp.padding(toLength: 16, withPad: " ", startingAt: 0))
+                                HistoryCard(
+                                    event: event,
+                                    timestamp: history.timestamp.padding(toLength: 16, withPad: " ", startingAt: 0))
                                     .foregroundColor(Color("Text400"))
-                                    .padding(.horizontal, 8)
-                            }.disabled(true)
+                            }
+                            .disabled(true)
                         }
                     }
                 }
