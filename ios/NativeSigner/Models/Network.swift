@@ -9,13 +9,13 @@ import SwiftUI
 
 struct Network: Codable, Hashable {
     var key: String
-    var color: String
     var logo: String
-    var order: String
-    var secondaryColor: String
+    var order: Int
+    var selected: Bool
     var title: String
 }
 
+/*
 extension Network {
     static var networkData: [Network] {
         [
@@ -26,6 +26,7 @@ extension Network {
         ]
     }
 }
+ */
 /*
 //MARK: network management
 

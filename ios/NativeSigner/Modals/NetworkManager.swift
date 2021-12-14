@@ -12,7 +12,7 @@ struct NetworkManager: View {
     var content: MNetworkMenu
     var body: some View {
         VStack {
-                Spacer().frame(height: UIScreen.main.bounds.height/2)
+                Spacer().frame(height: UIScreen.main.bounds.height/3)
             ZStack {
                 RoundedRectangle(cornerRadius: 20.0).foregroundColor(Color("Bg000"))
                 VStack {
@@ -21,26 +21,25 @@ struct NetworkManager: View {
                 }
                 VStack {
                     HeaderBar(line1: "NETWORK", line2: "Select network").padding(.top, 10)
-                    /*
                     ScrollView {
                         LazyVStack {
-                            ForEach(content.networks, id: \.self) {network in
+                            ForEach(content.networks.sorted(by: {$0.order < $1.order}), id: \.order) {network in
                                 ZStack (alignment: .bottom) {
                                     HStack {
                                         Button(action: {
-                                           
+                                            data.pushButton(buttonID: .ChangeNetwork, details: network.key)
                                         }) {
-                                            //NetworkCard(network.toCard())
+                                            NetworkCard(title: network.title, logo: network.logo)
                                         }
                                         Spacer()
-                                        if true {
+                                        if network.selected {
                                             Image(systemName: "checkmark")
                                         }
                                     }.padding(.horizontal, 8)
                                 }.padding(.horizontal, 8)
                             }
                         }
-                    }*/
+                    }
                 }
             }
         }

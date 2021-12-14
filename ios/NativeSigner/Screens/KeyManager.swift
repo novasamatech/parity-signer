@@ -33,7 +33,7 @@ struct KeyManager: View {
                     }.padding(.horizontal, 8)
                 ScrollView {
                     LazyVStack {
-                        ForEach(content.set, id: \.address_key) {
+                        ForEach(content.set.sorted(by: {$0.path < $1.path}), id: \.address_key) {
                             address in
                             Button(action: {
                                 data.pushButton(buttonID: .SelectKey, details: address.address_key)

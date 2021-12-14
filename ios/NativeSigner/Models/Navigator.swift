@@ -178,6 +178,7 @@ enum ButtonID {
     case NewKey
     case BackupSeed
     case CheckPassword
+    case ChangeNetwork
 }
 
 /**
