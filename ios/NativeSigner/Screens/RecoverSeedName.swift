@@ -42,6 +42,7 @@ struct RecoverSeedName: View {
             }
             Text("Display name visible only to you").font(.callout)
             Text(data.lastError).foregroundColor(Color("SignalDanger"))
+            Spacer()
             BigButton(
                 text: "Next",
                 action: {
@@ -49,6 +50,7 @@ struct RecoverSeedName: View {
                 },
                 isDisabled: seedName == ""
             )
+            Spacer()
         }.padding()
     }
 }

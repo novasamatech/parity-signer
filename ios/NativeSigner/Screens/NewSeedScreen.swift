@@ -42,6 +42,7 @@ struct NewSeedScreen: View {
             }
             Text("Display name visible only to you").font(.callout)
             Text(data.lastError).foregroundColor(.red)
+            Spacer()
             BigButton(
                 text: "Generate seed phrase",
                 action: {
@@ -49,6 +50,7 @@ struct NewSeedScreen: View {
                 },
                 isDisabled: seedName == ""
             )
+            Spacer()
         }.padding()
     }
 }
