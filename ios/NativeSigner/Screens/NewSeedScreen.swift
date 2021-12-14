@@ -20,11 +20,13 @@ struct NewSeedScreen: View {
         VStack(alignment: .leading) {
             Text("DISPLAY NAME").font(FBase(style: .overline)).foregroundColor(Color("Text500"))
             ZStack {
-                RoundedRectangle(cornerRadius: 8).stroke(Color("Borders400")).foregroundColor(Color("Borders400")).frame(height: 39)
+                RoundedRectangle(cornerRadius: 8)
+                    .stroke(Color("Borders400"))
+                    .foregroundColor(Color("Borders400"))
+                    .frame(height: 39)
                 TextField("Seed", text: $seedName, prompt: Text("Seed name"))
                     .focused($nameFocused)
                     .foregroundColor(Color("Text600"))
-                //.background(Color("backgroundColor"))
                     .font(FBase(style: .body2))
                     .disableAutocorrection(true)
                     .keyboardType(.asciiCapable)
