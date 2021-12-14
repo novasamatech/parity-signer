@@ -308,7 +308,11 @@ impl State {
                 //Screen::LogDetails => "",
                 Screen::Scan => "".to_string(),
                 Screen::Transaction(ref payload) => {
-                    transaction_parsing::produce_output(payload, dbname)
+                    match transaction_parsing::produce_output(payload, dbname) {
+                        transaction_parsing::Action::Sign(printed_cards, checksum) => {printed_cards},
+                        transaction_parsing::Action::Stub(printed_cards, checksum) => {printed_cards},
+                        transaction_parsing::Action::Read(printed_cards) => {printed_cards},
+                    }
                 },
                 Screen::SeedSelector => {
                     let cards = match db_handling::interface_signer::print_all_seed_names_with_identicons(&dbname) {

@@ -7,6 +7,7 @@ use parser::cards::ParserCard;
 use sp_core::crypto::AccountId32;
 use sp_runtime::{generic::Era, MultiSigner};
 
+use crate::Action;
 use crate::cards::{Card, Warning};
 use crate::holds::{GeneralHold, Hold};
 
@@ -19,7 +20,7 @@ fn verifier_value_sr25519() -> VerifierValue {
 /// Function to pring all types of cards.
 /// Should be used to check how the cards are printed in the app.
 
-pub fn make_all_cards() -> String {
+pub fn make_all_cards() -> Action {
     
     let mut index = 0;
     let mut all_cards: Vec<String> = Vec::new();
@@ -87,13 +88,13 @@ Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deseru
     
     for e in signer_errors().into_iter() {all_cards.push(Card::Error(e).card(&mut index, 0));}
 
-    let mut output_cards = String::from("{\"method\":[");
+    let mut output_cards = String::from("\"method\":[");
     
     for (i,x) in all_cards.iter().enumerate() {
         if i > 0 {output_cards.push_str(",")}
         output_cards.push_str(&x);
     }
     
-    output_cards.push_str("]}");
-    output_cards
+    output_cards.push_str("]");
+    Action::Read(output_cards)
 }

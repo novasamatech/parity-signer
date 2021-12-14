@@ -19,6 +19,14 @@ pub mod test_all_cards;
     use test_all_cards::make_all_cards;
 mod tests;
 
+/// Enum containing card sets for three different outcomes:
+/// signing (Sign), accepting (Stub) and reading, for example, in case of an error (Read)
+#[derive(PartialEq, Debug)]
+pub enum Action {
+    Sign(String, u32),
+    Stub(String, u32),
+    Read(String),
+}
 
 /// Payload in hex format as it arrives into handling contains following elements:
 /// - prelude, length 6 symbols ("53" stands for substrate, ** - crypto type, ** - transaction type),
@@ -27,7 +35,7 @@ mod tests;
 /// actual content is handled individually depending on prelude
 
 
-fn handle_scanner_input (payload: &str, dbname: &str) -> Result<String, ErrorSigner> {
+fn handle_scanner_input (payload: &str, dbname: &str) -> Result<Action, ErrorSigner> {
 
     let data_hex = {
         if payload.starts_with("0x") {&payload[2..]}
@@ -49,17 +57,17 @@ fn handle_scanner_input (payload: &str, dbname: &str) -> Result<String, ErrorSig
     }
 }
 
-pub fn produce_output (payload: &str, dbname: &str) -> String {
+pub fn produce_output (payload: &str, dbname: &str) -> Action {
     match handle_scanner_input (payload, dbname) {
         Ok(out) => out,
-        Err(e) => format!("{{\"error\":[{}]}}", Card::Error(e).card(&mut 0,0)),
+        Err(e) => Action::Read(format!("\"error\":[{}]", Card::Error(e).card(&mut 0,0))),
     }
 }
 
 pub fn produce_historic_output (order: u32, dbname: &str) -> String {
     match decode_transaction_from_history (order, dbname) {
         Ok(out) => out,
-        Err(e) => format!("{{\"error\":[{}]}}", Card::Error(e).card(&mut 0,0)),
+        Err(e) => format!("\"error\":[{}]", Card::Error(e).card(&mut 0,0)),
     }
 }
 

@@ -8,7 +8,7 @@ use qrcode_static::png_qr;
 use zeroize::Zeroize;
 
 
-pub fn sign_as_address_key (to_sign: &Vec<u8>, address_key: AddressKey, full_address: &str, pwd: Option<&str>) -> Result<SufficientCrypto, ErrorSigner> {
+pub (crate) fn sign_as_address_key (to_sign: &Vec<u8>, address_key: AddressKey, full_address: &str, pwd: Option<&str>) -> Result<SufficientCrypto, ErrorSigner> {
     match address_key.multi_signer::<Signer>(AddressKeySource::Extra(ExtraAddressKeySourceSigner::Interface))? {
         MultiSigner::Ed25519(public) => {
             let ed25519_pair = match ed25519::Pair::from_string(full_address, pwd) {

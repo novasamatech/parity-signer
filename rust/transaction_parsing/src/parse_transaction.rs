@@ -2,7 +2,8 @@ use db_handling::{db_transactions::{TrDbColdSign, SignContent}, helpers::{try_ge
 use definitions::{error::{DatabaseSigner, ErrorSigner, InputSigner, NotFoundSigner, ParserError}, history::Event, keyring::{AddressKey, NetworkSpecsKey}, users::AddressDetails};
 use parser::{parse_set, decoding_commons::OutputCard};
 
-use crate::cards::{Action, Card, Warning};
+use crate::Action;
+use crate::cards::{Card, Warning};
 use crate::helpers::{bundle_from_meta_set_element, find_meta_set, multisigner_msg_genesis_encryption, specs_by_name};
 
 /// Transaction payload in hex format as it arrives into parsing program contains following elements:
@@ -27,7 +28,7 @@ enum CardsPrep {
 /// i.e. it starts with 53****, followed by author address, followed by actual transaction piece,
 /// followed by extrinsics, concluded with chain genesis hash
 
-pub (crate) fn parse_transaction (data_hex: &str, dbname: &str) -> Result<String, ErrorSigner> {
+pub (crate) fn parse_transaction (data_hex: &str, dbname: &str) -> Result<Action, ErrorSigner> {
 
     let (author_multi_signer, parser_data, genesis_hash_vec, encryption) = multisigner_msg_genesis_encryption(data_hex)?;
     let network_specs_key = NetworkSpecsKey::from_parts(&genesis_hash_vec, &encryption);
@@ -85,13 +86,12 @@ pub (crate) fn parse_transaction (data_hex: &str, dbname: &str) -> Result<String
                                     CardsPrep::SignProceed(author_card, possible_warning, address_details) => {
                                         let sign = TrDbColdSign::generate(SignContent::Transaction{method: method_vec, extensions: extensions_vec}, &network_specs.name, &address_details.path, address_details.has_pwd, &address_key, history);
                                         let checksum = sign.store_and_get_checksum (&dbname)?;
-                                        let action_card = Action::Sign(checksum).card();
                                         match possible_warning {
-                                            Some(warning_card) => Some(format!("{{\"author\":[{}],\"warning\":[{}],\"method\":[{}],\"extensions\":[{}],{}}}", author_card, warning_card, method, extensions, action_card)),
-                                            None => Some(format!("{{\"author\":[{}],\"method\":[{}],\"extensions\":[{}],{}}}", author_card, method, extensions, action_card)),
+                                            Some(warning_card) => Some(Action::Sign(format!("\"author\":[{}],\"warning\":[{}],\"method\":[{}],\"extensions\":[{}]", author_card, warning_card, method, extensions), checksum)),
+                                            None => Some(Action::Sign(format!("\"author\":[{}],\"method\":[{}],\"extensions\":[{}]", author_card, method, extensions), checksum)),
                                         }
                                     },
-                                    CardsPrep::ShowOnly(author_card, warning_card) => Some(format!("{{\"author\":[{}],\"warning\":[{}],\"method\":[{}],\"extensions\":[{}]}}", author_card, warning_card, method, extensions))
+                                    CardsPrep::ShowOnly(author_card, warning_card) => Some(Action::Read(format!("\"author\":[{}],\"warning\":[{}],\"method\":[{}],\"extensions\":[{}]", author_card, warning_card, method, extensions)))
                                 };
                             },
                             Err(e) => {
@@ -100,11 +100,11 @@ pub (crate) fn parse_transaction (data_hex: &str, dbname: &str) -> Result<String
                                 found_solution = match cards_prep {
                                     CardsPrep::SignProceed(author_card, possible_warning, _) => {
                                         match possible_warning {
-                                            Some(warning_card) => Some(format!("{{\"author\":[{}],\"warning\":[{}],\"error\":[{}],\"extensions\":[{}]}}", author_card, warning_card, method_error, extensions)),
-                                            None => Some(format!("{{\"author\":[{}],\"error\":[{}],\"extensions\":[{}]}}", author_card, method_error, extensions)),
+                                            Some(warning_card) => Some(Action::Read(format!("\"author\":[{}],\"warning\":[{}],\"error\":[{}],\"extensions\":[{}]", author_card, warning_card, method_error, extensions))),
+                                            None => Some(Action::Read(format!("\"author\":[{}],\"error\":[{}],\"extensions\":[{}]", author_card, method_error, extensions))),
                                         }
                                     },
-                                    CardsPrep::ShowOnly(author_card, warning_card) => Some(format!("{{\"author\":[{}],\"warning\":[{}],\"error\":[{}],\"extensions\":[{}]}}", author_card, warning_card, method_error, extensions))
+                                    CardsPrep::ShowOnly(author_card, warning_card) => Some(Action::Read(format!("\"author\":[{}],\"warning\":[{}],\"error\":[{}],\"extensions\":[{}]", author_card, warning_card, method_error, extensions)))
                                 };
                             },
                         }
@@ -122,7 +122,7 @@ pub (crate) fn parse_transaction (data_hex: &str, dbname: &str) -> Result<String
         // did not find network with matching genesis hash in database
             let author_card = Card::AuthorPublicKey(&author_multi_signer).card(&mut index, indent);
             let error_card = Card::Error(ErrorSigner::Input(InputSigner::UnknownNetwork{genesis_hash: genesis_hash_vec.to_vec(), encryption})).card(&mut index, indent);
-            Ok(format!("{{\"author\":[{}],\"error\":[{}]}}", author_card, error_card))
+            Ok(Action::Read(format!("\"author\":[{}],\"error\":[{}]", author_card, error_card)))
         },
     }
 }
@@ -178,12 +178,12 @@ pub fn decode_transaction_from_history (order: u32, database_name: &str) -> Resu
                     Ok(a) => {
                         let method = into_cards(&a, &mut index);
                         let extensions = into_cards(&extensions_cards, &mut index);
-                        found_solution = Some(format!("{{\"method\":[{}],\"extensions\":[{}]}}", method, extensions));
+                        found_solution = Some(format!("\"method\":[{}],\"extensions\":[{}]", method, extensions));
                     },
                     Err(e) => {
                         let method_error = Card::Error(ErrorSigner::Parser(e)).card(&mut index, indent);
                         let extensions = into_cards(&extensions_cards, &mut index);
-                        found_solution = Some(format!("{{\"error\":[{}],\"extensions\":[{}]}}", method_error, extensions));
+                        found_solution = Some(format!("\"error\":[{}],\"extensions\":[{}]", method_error, extensions));
                     },
                 }
                 break;

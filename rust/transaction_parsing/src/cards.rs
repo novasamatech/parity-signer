@@ -135,22 +135,3 @@ impl <'a> Card <'a> {
         }
     }
 }
-
-
-pub enum Action {
-    Sign (u32),
-    Stub (u32),
-}
-
-fn print_action (action: &str, checksum: &u32) -> String {
-    format!("\"action\":{{\"type\":\"{}\",\"payload\":\"{}\"}}", action, checksum)
-}
-
-impl Action {
-    pub fn card (&self) -> String {
-        match &self {
-            Action::Sign(x) => print_action("sign", x),
-            Action::Stub(x) => print_action("stub", x),
-        }
-    }
-}

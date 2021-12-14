@@ -232,7 +232,10 @@ fn populate_addresses<T: ErrorSource> (database_name: &str, entry_batch: Batch, 
 /// Generate new seed and populate all known networks with default accounts
 pub fn try_create_seed_phrase_proposal (seed_name: &str, seed_phrase_proposal: &str, database_name: &str) -> anyhow::Result<String> {
     let mut seed_phrase = {
-        Mnemonic::validate(seed_phrase_proposal, Language::English)?;
+        match Mnemonic::validate(seed_phrase_proposal, Language::English) {
+            Ok(_) => (),
+            Err(e) => return Err(ErrorSigner::AddressGeneration(AddressGeneration::Extra(ExtraAddressGenerationSigner::RandomPhraseGeneration(e))).anyhow()),
+        };
         seed_phrase_proposal.to_owned()
     };
     match try_create_seed(seed_name, &seed_phrase, database_name) {
