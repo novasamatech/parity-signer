@@ -8,7 +8,6 @@
 import SwiftUI
 
 struct NewSeedScreen: View {
-    
     @EnvironmentObject var data: SignerDataModel
     @State private var seedName: String = ""
     @FocusState private var nameFocused: Bool
@@ -18,44 +17,41 @@ struct NewSeedScreen: View {
     }
     
     var body: some View {
-        ZStack{
-            VStack {
-                VStack(alignment: .leading) {
-                    Text("DISPLAY NAME").font(FBase(style: .overline)).foregroundColor(Color("Text500"))
-                    ZStack {
-                        RoundedRectangle(cornerRadius: 8).stroke(Color("Borders400")).foregroundColor(Color("Borders400")).frame(height: 39)
-                        TextField("Seed", text: $seedName, prompt: Text("Seed name"))
-                            .focused($nameFocused)
-                            .foregroundColor(Color("Text600"))
-                        //.background(Color("backgroundColor"))
-                            .font(FBase(style: .body2))
-                            .disableAutocorrection(true)
-                            .keyboardType(.asciiCapable)
-                            .submitLabel(.done)
-                            .onChange(of: seedName, perform: { _ in
-                                data.lastError = ""
-                            })
-                            .onSubmit {
-                                data.addSeed(seedName: seedName, seedLength: 24)
-                            }
-                            .onAppear(perform: {nameFocused = true})
-                            .padding(.horizontal, 8)
+        VStack(alignment: .leading) {
+            Text("DISPLAY NAME").font(FBase(style: .overline)).foregroundColor(Color("Text500"))
+            ZStack {
+                RoundedRectangle(cornerRadius: 8)
+                    .stroke(Color("Borders400"))
+                    .foregroundColor(Color("Borders400"))
+                    .frame(height: 39)
+                TextField("Seed", text: $seedName, prompt: Text("Seed name"))
+                    .focused($nameFocused)
+                    .foregroundColor(Color("Text600"))
+                    .font(FBase(style: .body2))
+                    .disableAutocorrection(true)
+                    .keyboardType(.asciiCapable)
+                    .submitLabel(.done)
+                    .onChange(of: seedName, perform: { _ in
+                        data.lastError = ""
+                    })
+                    .onSubmit {
+                        data.addSeed(seedName: seedName, seedLength: 24)
                     }
-                    Text("Display name visible only to you").font(.callout)
-                    Text(data.lastError).foregroundColor(.red)
-                    HStack {
-                        Spacer()
-                        Button(action: {
-                            data.addSeed(seedName: seedName, seedLength: 24)
-                        }) {
-                            Text("Create")
-                                .font(.system(size: 22))
-                        }
-                        .disabled(seedName == "")
-                    }
-                }.padding()
+                    .onAppear(perform: {nameFocused = true})
+                    .padding(.horizontal, 8)
             }
-        }
+            Text("Display name visible only to you").font(.callout)
+            Text(data.lastError).foregroundColor(.red)
+            Spacer()
+            BigButton(
+                text: "Generate seed phrase",
+                action: {
+                    data.addSeed(seedName: seedName, seedLength: 24)
+                },
+                isDisabled: seedName == ""
+            )
+            Spacer()
+        }.padding()
     }
 }
 

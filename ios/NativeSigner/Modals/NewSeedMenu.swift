@@ -12,17 +12,28 @@ struct NewSeedMenu: View {
     var body: some View {
         VStack {
             Spacer()
-            HeaderBar(line1: "ADD SEED", line2: "Select seed addition method" )
-            Button(action: {
-                data.pushButton(buttonID: .NewSeed)
-            }) {
-                Text("New seed")
+            VStack {
+                HeaderBar(line1: "ADD SEED", line2: "Select seed addition method" )
+                VStack (spacing: 16) {
+                    BigButton(
+                        text: "New seed",
+                        action: {
+                            data.pushButton(buttonID: .NewSeed)
+                        }
+                    )
+                    BigButton(
+                        text: "Recover seed",
+                        isShaded: true,
+                        action: {
+                            data.pushButton(buttonID: .RecoverSeed)
+                        }
+                    )
+                }
+                .padding(.top, 12)
             }
-            Button(action: {
-                data.pushButton(buttonID: .RecoverSeed)
-            }) {
-                Text("Recover seed")
-            }
+            .padding([.leading, .trailing, .top], 16)
+            .padding(.bottom, 24)
+            .background(Color("Bg000"))
         }
     }
 }
