@@ -93,6 +93,9 @@ const char * get_relevant_identities(struct ExternError*, const char* seed_name,
 // Show all keys
 const char * get_all_identities(struct ExternError*, const char* dbname);
 
+// Guess next word for seed
+const char * guess_word(struct ExternError*, const char* part);
+
 // Function to create new seed
 const char * try_create_seed(struct ExternError*, const char* seed_name, int seed_length, const char* dbname);
 
