@@ -19,7 +19,7 @@ struct HistoryCardTemplate: View {
             RoundedRectangle(cornerRadius: 4)
                 .foregroundColor(Color(danger ? "BgDanger" : "Bg200"))
             HStack {
-                VStack (alignment: .leading) {
+                VStack (alignment: .leading, spacing: 2) {
                     if (timestamp != "") {
                         Text(timestamp)
                             .foregroundColor(Color("Text400"))
