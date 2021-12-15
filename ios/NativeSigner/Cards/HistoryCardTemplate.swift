@@ -16,26 +16,27 @@ struct HistoryCardTemplate: View {
     
     var body: some View {
         ZStack {
-            RoundedRectangle(cornerRadius: 4).foregroundColor(Color(danger ? "BgDanger" : "Bg200"))
-            HStack (alignment: .center) {
-                Image(systemName: image)
-                    .imageScale(.medium)
-                    .foregroundColor(Color(danger ? "SignelDanger" : "Text400"))
-                    .frame(width: 26.0)
-                    .padding(8)
+            RoundedRectangle(cornerRadius: 4)
+                .foregroundColor(Color(danger ? "BgDanger" : "Bg200"))
+            HStack {
                 VStack (alignment: .leading) {
                     if (timestamp != "") {
                         Text(timestamp)
-                            .font(FBase(style: .subtitle2)).foregroundColor(Color("Text400"))
+                            .foregroundColor(Color("Text400"))
+                            .font(FBase(style: .subtitle2))
                     }
                     Text(line1)
                         .foregroundColor(Color("Text600"))
                         .font(FBase(style: .subtitle1))
+                        .tracking(0.1)
                     Text(line2)
                         .foregroundColor(Color("Crypto400"))
                         .font(FCrypto(style: .body1))
                 }
                 Spacer()
+                Image(systemName: image)
+                    .imageScale(.medium)
+                    .foregroundColor(Color(danger ? "SignalDanger" : "Text400"))
             }
             .padding(8)
         }
