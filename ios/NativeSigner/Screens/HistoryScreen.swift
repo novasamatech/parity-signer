@@ -15,11 +15,16 @@ struct HistoryScreen: View {
             LazyVStack (spacing: 8) {
                 ForEach(content.log.sorted(by: {$0.order > $1.order}), id: \.order) { history in
                     ForEach(history.events, id: \.self) { event in
-                        HistoryCard(
-                            event: event,
-                            timestamp: history.timestamp
-                                .padding(toLength: 16, withPad: " ", startingAt: 0))
-                                .foregroundColor(Color("Text400"))
+                        Button(action: {
+                            
+                        }) {
+                            HistoryCard(
+                                event: event,
+                                timestamp: history.timestamp.padding(toLength: 16, withPad: " ", startingAt: 0)
+                            )
+                            .foregroundColor(Color("Text400"))
+                        }
+                        .disabled(true)
                     }
                 }
             }
