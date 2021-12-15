@@ -300,8 +300,25 @@ impl State {
                             },
                             _ => println!("BackupSeed without seed_name does nothing here"),
                         }
+                    } else {
+                        new_navstate = match KeysState::new(details_str, dbname) {
+                            Ok(a) => {
+                                Navstate {
+                                    screen: Screen::Keys(a),
+                                    modal: Modal::Backup(details_str.to_string()),
+                                    alert: Alert::Empty,
+                                }
+                            },
+                            Err(e) => {
+                                errorline.push_str(&<Signer>::show(&e));
+                                Navstate {
+                                    screen: Screen::Log,
+                                    modal: Modal::Empty,
+                                    alert: Alert::Error,
+                                }
+                            },
+                        };
                     }
-                    else {new_navstate.modal = Modal::Backup(details_str.to_string())}
                 },
                 Action::NetworkSelector => {
                     if let Modal::NetworkSelector(_) = self.navstate.modal {
