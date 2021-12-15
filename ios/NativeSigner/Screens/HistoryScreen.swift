@@ -12,24 +12,23 @@ struct HistoryScreen: View {
     var content: MLog
     var body: some View {
         ScrollView {
-            LazyVStack {
-                ForEach(content.log.sorted(by: {$0.order > $1.order}), id: \.order) {history in
-                    VStack {
-                        ForEach(history.events, id: \.self) {event in
-                            Button(action: {
-                                
-                            }) {
-                                HistoryCard(
-                                    event: event,
-                                    timestamp: history.timestamp
-                                        .padding(toLength: 16, withPad: " ", startingAt: 0))
-                                        .foregroundColor(Color("Text400"))
-                            }
-                            .disabled(true)
+            LazyVStack (spacing: 8) {
+                ForEach(content.log.sorted(by: {$0.order > $1.order}), id: \.order) { history in
+                    ForEach(history.events, id: \.self) { event in
+                        Button(action: {
+                            
+                        }) {
+                            HistoryCard(
+                                event: event,
+                                timestamp: history.timestamp.padding(toLength: 16, withPad: " ", startingAt: 0)
+                            )
+                            .foregroundColor(Color("Text400"))
                         }
+                        .disabled(true)
                     }
                 }
             }
+            .padding(.horizontal, 8)
         }
     }
 }

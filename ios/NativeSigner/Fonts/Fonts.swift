@@ -48,7 +48,7 @@ func FBase(style: Fontstyle) -> Font {
     case .overline:
         return Font.custom("Inter-Medium", size:12)
     case .subtitle1:
-        return Font.custom("Inter-Medium", size:14)
+        return Font.custom("Inter-Medium", size:15)
     case .subtitle2:
         return Font.custom("Inter-Regular", size:13)
     }
