@@ -10,19 +10,19 @@ import SwiftUI
 struct TransactionPreview: View {
     @EnvironmentObject var data: SignerDataModel
     @State private var comment = ""
-    let content: TransactionCardSet
+    let content: MTransaction
     var body: some View {
         ZStack {
             VStack {
                 ScrollView {
                     LazyVStack {
-                        ForEach(content.assemble(), id: \.index) { card in
+                        ForEach(content.content.assemble(), id: \.index) { card in
                             TransactionCardView(card: card)
                         }
                     }
                 }
-                if (content.action?.type == "sign") {
-                    if let address = content.getAuthor()?.intoAddress() {
+                if (content.type == .sign) {
+                    if let address = content.content.getAuthor()?.intoAddress() {
                         AddressCard(address: address)
                     }
                     Text("Comment (not published)")
@@ -37,22 +37,23 @@ struct TransactionPreview: View {
                             .font(.largeTitle)
                     }
                     Spacer()
-                    if data.action != nil {
-                        if data.action!.type == "sign" {
-                            Button(action: {
-                                data.pushButton(buttonID: .GoForward, details: comment, seedPhrase: data.getSeed(seedName: content.getAuthor()?.seed ?? ""))
-                            }) {
-                                Text("Sign")
-                                    .font(.largeTitle)
-                            }
-                        } else {
-                            Button(action: {
-                                data.pushButton(buttonID: .GoForward)
-                            }) {
-                                Text("Approve")
-                                    .font(.largeTitle)
-                            }
+                    switch content.type {
+                    case .sign:
+                        Button(action: {
+                            data.pushButton(buttonID: .GoForward, details: comment, seedPhrase: data.getSeed(seedName: content.content.getAuthor()?.seed ?? ""))
+                        }) {
+                            Text("Sign")
+                                .font(.largeTitle)
                         }
+                    case .stub:
+                        Button(action: {
+                            data.pushButton(buttonID: .GoForward)
+                        }) {
+                            Text("Approve")
+                                .font(.largeTitle)
+                        }
+                    case .read:
+                        EmptyView()
                     }
                 }.padding()
             }

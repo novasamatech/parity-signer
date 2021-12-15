@@ -287,7 +287,7 @@ struct TransactionCardSet: Decodable {
     var verifier: [TransactionCard]?
     var warning: [TransactionCard]?
     var types_info: [TransactionCard]?
-    var action: Action?
+    //var action: Action?
     
     /**
      * Prepares transaction cards to be shown in a frame
