@@ -58,25 +58,25 @@ func FBase(style: Fontstyle) -> Font {
 func FCrypto(style: Fontstyle) -> Font {
     switch style {
     case .h1:
-        return Font.custom("robotomono_regular", size:19).weight(.bold)
+        return Font.custom("RobotoMono-Medium", size:19)
     case .h2:
-        return Font.custom("robotomono_regular", size:19).weight(.semibold)
+        return Font.custom("RobotoMono-Medium", size:19)
     case .h3:
-        return Font.custom("robotomono_regular", size:16).weight(.semibold)
+        return Font.custom("RobotoMono-Medium", size:16)
     case .h4:
-        return Font.custom("robotomono_regular", size:16).weight(.medium)
+        return Font.custom("RobotoMono-Medium", size:16)
     case .button:
-        return Font.custom("robotomono_regular", size:16).weight(.semibold)
+        return Font.custom("RobotoMono-Medium", size:16)
     case .body1:
-        return Font.custom("robotomono_regular", size:12).weight(.medium)
+        return Font.custom("RobotoMono-Medium", size:12)
     case .body2:
-        return Font.custom("robotomono_regular", size:13).weight(.light)
+        return Font.custom("RobotoMono-Light", size:12)
     case .overline:
-        return Font.custom("robotomono_regular", size:12).weight(.medium)
+        return Font.custom("RobotoMono-Medium", size:12)
     case .subtitle1:
-        return Font.custom("robotomono_regular", size:14).weight(.medium)
+        return Font.custom("RobotoMono-Medium", size:14)
     case .subtitle2:
-        return Font.custom("robotomono_regular", size:13).weight(.regular)
+        return Font.custom("RobotoMono-Medium", size:13)
     }
 }
 
