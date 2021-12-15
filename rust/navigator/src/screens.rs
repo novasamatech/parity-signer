@@ -4,6 +4,9 @@ use zeroize::Zeroize;
 
 use db_handling::interface_signer::{addresses_set_seed_name_network, first_network};
 use definitions::{error::{AddressKeySource, ErrorSigner, ExtraAddressKeySourceSigner, InterfaceSigner, Signer}, keyring::{AddressKey, NetworkSpecsKey}};
+use transaction_parsing;
+
+const MAX_COUNT_SET: u8 = 3;
 
 ///All screens
 #[derive(PartialEq, Debug, Clone)]
@@ -11,7 +14,7 @@ pub enum Screen {
     Log,
     LogDetails,
     Scan,
-    Transaction(String),
+    Transaction(TransactionState),
     SeedSelector,
     Keys(KeysState),
     KeyDetails(AddressState),
@@ -47,6 +50,15 @@ pub struct AddressState {
 pub struct DeriveState {
     entered_info: EnteredInfo,
     keys_state: KeysState,
+}
+
+///State of transaction screen
+#[derive(PartialEq, Debug, Clone)]
+pub struct TransactionState {
+    entered_info: EnteredInfo,
+    action: transaction_parsing::Action,
+    comment: String,
+    counter: u8,
 }
 
 ///EnteredInfo, path+pwd entered by the user, zeroizeable
@@ -152,11 +164,61 @@ impl DeriveState {
     pub fn path(&self) -> String {
         self.entered_info.0.to_owned()
     }
-    pub fn update(&self, new_entered_string: &str) -> Self {
+    pub fn update(&self, new_secret_string: &str) -> Self {
         Self {
-            entered_info: EnteredInfo(new_entered_string.to_string()),
+            entered_info: EnteredInfo(new_secret_string.to_string()),
             keys_state: self.get_keys_state(),
         }
+    }
+}
+
+impl TransactionState {
+    pub fn new(details_str: &str, dbname: &str) -> Self {
+        Self {
+            entered_info: EnteredInfo("".to_string()),
+            action: transaction_parsing::produce_output(details_str, dbname),
+            comment: "".to_string(),
+            counter: 0,
+        }
+    }
+    pub fn update_seed(&self, new_secret_string: &str) -> Self {
+        Self {
+            entered_info: EnteredInfo(new_secret_string.to_string()),
+            action: self.action(),
+            comment: self.comment.to_string(),
+            counter: self.counter,
+        }
+    }
+    pub fn add_comment(&self, comment: &str) -> Self {
+        Self {
+            entered_info: self.entered_info.to_owned(),
+            action: self.action(),
+            comment: comment.to_string(),
+            counter: self.counter,
+        }
+    }
+    pub fn action(&self) -> transaction_parsing::Action {
+        self.action.to_owned()
+    }
+    pub fn seed(&self) -> String {
+        self.entered_info.0.to_string()
+    }
+    pub fn get_comment(&self) -> String {
+        self.comment.to_owned()
+    }
+    pub fn plus_one(&self) -> Self {
+        Self {
+            entered_info: self.entered_info.to_owned(),
+            action: self.action(),
+            comment: self.get_comment(),
+            counter: self.counter + 1,
+        }
+    }
+    pub fn ok(&self) -> bool {
+        self.counter < MAX_COUNT_SET
+    }
+    pub fn counter(&self) -> u8 {
+        self.counter
     }
 }
 
@@ -191,7 +253,7 @@ impl Screen {
             Screen::SeedSelector => "Select seed",
             Screen::Keys(_) => "",
             Screen::KeyDetails(_) => "Key",
-            Screen::NewSeed => "New Seed",
+            Screen::NewSeed => "",
             Screen::RecoverSeedName => "Recover Seed",
             Screen::RecoverSeedPhrase => "Recover Seed",
             Screen::DeriveKey(_) => "",

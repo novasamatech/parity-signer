@@ -1,6 +1,6 @@
 use bitvec::prelude::{BitVec, Lsb0};
 //use sled::IVec;
-use definitions::{crypto::Encryption, history::MetaValuesDisplay, keyring::VerifierKey, metadata::MetaValues, network_specs::{VerifierValue, NetworkSpecsToSend}, qr_transfers::ContentLoadTypes, test_all_errors_signer::signer_errors};
+use definitions::{crypto::Encryption, history::MetaValuesDisplay, keyring::VerifierKey, metadata::MetaValues, network_specs::{VerifierValue, NetworkSpecs}, qr_transfers::ContentLoadTypes, test_all_errors_signer::signer_errors};
 use hex;
 use std::convert::TryInto;
 use parser::cards::ParserCard;
@@ -24,7 +24,7 @@ pub fn make_all_cards() -> Action {
     
     let mut index = 0;
     let mut all_cards: Vec<String> = Vec::new();
-    let network_specs_westend = NetworkSpecsToSend {
+    let network_specs_westend = NetworkSpecs {
         base58prefix: 42,
         color: String::from("#660D35"),
         decimals: 12,
@@ -32,6 +32,7 @@ pub fn make_all_cards() -> Action {
         genesis_hash: hex::decode("e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e").expect("known value").try_into().expect("known value"),
         logo: String::from("westend"),
         name: String::from("westend"),
+        order: 3,
         path_id: String::from("//westend"),
         secondary_color: String::from("#262626"),
         title: String::from("Westend"),
@@ -69,8 +70,8 @@ Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deseru
     all_cards.push(Card::Verifier(&verifier_value_sr25519()).card(&mut index,0));
     all_cards.push(Card::Meta(MetaValuesDisplay::get(&MetaValues{name: String::from("westend"), version: 9100, meta: Vec::new()})).card(&mut index,0));
     all_cards.push(Card::TypesInfo(ContentLoadTypes::generate(&Vec::new())).card(&mut index,0));
-    all_cards.push(Card::NewSpecs(&network_specs_westend).card(&mut index,0));
-    all_cards.push(Card::NetworkName("westend").card(&mut index,0));
+    all_cards.push(Card::NewSpecs(&network_specs_westend.to_send()).card(&mut index,0));
+    all_cards.push(Card::NetworkInfo(&network_specs_westend).card(&mut index,0));
     all_cards.push(Card::NetworkGenesisHash(&network_specs_westend.genesis_hash.to_vec()).card(&mut index,0));
 
     all_cards.push(Card::Warning(Warning::AuthorNotFound).card(&mut index,0));

@@ -9,6 +9,8 @@ pub enum Modal {
     SeedMenu,
     NetworkSelector(NetworkSpecsKey), 
     PasswordConfirm,
+    SignatureReady(String),
+    EnterPassword,
     Empty,
 }
 
@@ -20,6 +22,8 @@ impl Modal {
             Modal::SeedMenu => String::from("SeedMenu"),
             Modal::NetworkSelector(_) => String::from("NetworkSelector"),
             Modal::PasswordConfirm => String::from("PasswordConfirm"),
+            Modal::SignatureReady(_) => String::from("SignatureReady"),
+            Modal::EnterPassword => String::from("EnterPassword"),
             Modal::Empty => String::from("Empty"),
         }
     }

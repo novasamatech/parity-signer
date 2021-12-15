@@ -4,7 +4,7 @@ use sp_core::crypto::{Ss58Codec, Ss58AddressFormat};
 use sp_runtime::{generic::Era, MultiSigner};
 
 use constants::HALFSIZE;
-use definitions::{crypto::Encryption, error::{ErrorSigner, ErrorSource, Signer}, helpers::make_identicon_from_multisigner, history::MetaValuesDisplay, keyring::{print_multisigner_as_base58, VerifierKey}, network_specs::{NetworkSpecsToSend, VerifierValue}, qr_transfers::ContentLoadTypes};
+use definitions::{crypto::Encryption, error::{ErrorSigner, ErrorSource, Signer}, helpers::make_identicon_from_multisigner, history::MetaValuesDisplay, keyring::{print_multisigner_as_base58, VerifierKey}, network_specs::{NetworkSpecs, NetworkSpecsToSend, VerifierValue}, qr_transfers::ContentLoadTypes};
 use parser::cards::ParserCard;
 use plot_icon::png_data_from_vec;
 
@@ -19,7 +19,7 @@ pub (crate) enum Card <'a> {
     Meta(MetaValuesDisplay),
     TypesInfo(ContentLoadTypes),
     NewSpecs(&'a NetworkSpecsToSend),
-    NetworkName(&'a str),
+    NetworkInfo(&'a NetworkSpecs),
     NetworkGenesisHash(&'a Vec<u8>),
     Warning (Warning <'a>),
     Error (ErrorSigner),
@@ -128,7 +128,7 @@ impl <'a> Card <'a> {
             Card::Meta(x) => fancy(index, indent, "meta", &format!("{{{}}}", x.show())),
             Card::TypesInfo(x) => fancy(index, indent, "types_hash", &format!("\"{}\"", hex::encode(blake2b(32, &[], &x.store()).as_bytes()))),
             Card::NewSpecs(x) => fancy(index, indent, "new_specs", &format!("{{{}}}", x.show())),
-            Card::NetworkName(x) => fancy(index, indent, "network_name", &format!("\"{}\"", x)),
+            Card::NetworkInfo(x) => fancy(index, indent, "network_info", &format!("{{\"network_title\":\"{}\",\"network_logo\":\"{}\"}}", x.title, x.logo)),
             Card::NetworkGenesisHash(x) => fancy(index, indent, "network_genesis_hash", &format!("\"{}\"", hex::encode(x))),
             Card::Warning (warn) => fancy(index, indent, "warning", &format!("\"{}\"", warn.show())),
             Card::Error (err) => fancy(index, indent, "error", &format!("\"{}\"", <Signer>::show(&err))),

@@ -21,9 +21,9 @@ mod tests;
 
 /// Enum containing card sets for three different outcomes:
 /// signing (Sign), accepting (Stub) and reading, for example, in case of an error (Read)
-#[derive(PartialEq, Debug)]
+#[derive(PartialEq, Debug, Clone)]
 pub enum Action {
-    Sign(String, u32),
+    Sign{content: String, checksum: u32, has_pwd: bool, network_info: String},
     Stub(String, u32),
     Read(String),
 }

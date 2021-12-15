@@ -86,9 +86,10 @@ pub (crate) fn parse_transaction (data_hex: &str, dbname: &str) -> Result<Action
                                     CardsPrep::SignProceed(author_card, possible_warning, address_details) => {
                                         let sign = TrDbColdSign::generate(SignContent::Transaction{method: method_vec, extensions: extensions_vec}, &network_specs.name, &address_details.path, address_details.has_pwd, &address_key, history);
                                         let checksum = sign.store_and_get_checksum (&dbname)?;
+                                        let network_info = format!("\"network_title\":\"{}\",\"network_logo\":\"{}\"", network_specs.title, network_specs.logo);
                                         match possible_warning {
-                                            Some(warning_card) => Some(Action::Sign(format!("\"author\":[{}],\"warning\":[{}],\"method\":[{}],\"extensions\":[{}]", author_card, warning_card, method, extensions), checksum)),
-                                            None => Some(Action::Sign(format!("\"author\":[{}],\"method\":[{}],\"extensions\":[{}]", author_card, method, extensions), checksum)),
+                                            Some(warning_card) => Some(Action::Sign{content: format!("\"author\":[{}],\"warning\":[{}],\"method\":[{}],\"extensions\":[{}]", author_card, warning_card, method, extensions), checksum, has_pwd: address_details.has_pwd, network_info}),
+                                            None => Some(Action::Sign{content: format!("\"author\":[{}],\"method\":[{}],\"extensions\":[{}]", author_card, method, extensions), checksum, has_pwd: address_details.has_pwd, network_info}),
                                         }
                                     },
                                     CardsPrep::ShowOnly(author_card, warning_card) => Some(Action::Read(format!("\"author\":[{}],\"warning\":[{}],\"method\":[{}],\"extensions\":[{}]", author_card, warning_card, method, extensions)))

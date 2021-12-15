@@ -3,7 +3,7 @@
 //use hex;
 use zeroize::Zeroize;
 
-use crate::screens::{AddressState, DeriveState, KeysState, Screen};
+use crate::screens::{AddressState, DeriveState, KeysState, Screen, TransactionState};
 use crate::modals::Modal;
 use crate::actions::Action;
 use crate::alerts::Alert;
@@ -12,7 +12,7 @@ use crate::alerts::Alert;
 use db_handling;
 use definitions::{error::{ErrorSource, Signer}, keyring::NetworkSpecsKey};
 use transaction_parsing;
-//use transaction_signing;
+use transaction_signing;
 
 ///State of the app as remembered by backend
 #[derive(PartialEq, Debug, Clone)]
@@ -163,6 +163,61 @@ impl State {
                                 },
                             }
                         },
+                        Screen::Transaction(ref t) => {
+                            match t.action() {
+                                transaction_parsing::Action::Sign{content: _, checksum, has_pwd, network_info: _} => {
+                                    if has_pwd {
+                                        match self.navstate.modal {
+                                            Modal::EnterPassword => {
+                                                if t.ok() {
+                                                    new_navstate.screen = Screen::Transaction(t.plus_one());
+                                                    let mut seed = t.seed();
+                                                    match transaction_signing::handle_sign(checksum, &seed, details_str, &t.get_comment(), dbname) {
+                                                         Ok(a) => {
+                                                             seed.zeroize();
+                                                             new_navstate.modal = Modal::SignatureReady(a);
+                                                         },
+                                                         Err(e) => {
+                                                             seed.zeroize();
+                                                             new_navstate.alert = Alert::Error;
+                                                             errorline.push_str(&<Signer>::show(&e));
+                                                         },
+                                                     }
+                                                }
+                                                else {new_navstate = Navstate::clean_screen(Screen::Log);}
+                                            },
+                                            _ => {
+                                                new_navstate.screen = Screen::Transaction(t.add_comment(details_str).update_seed(secret_seed_phrase));
+                                                new_navstate.modal = Modal::EnterPassword;
+                                            },
+                                        }
+                                    }
+                                    else {
+                                        match transaction_signing::handle_sign(checksum, secret_seed_phrase, "", details_str, dbname) {
+                                            Ok(a) => {
+                                                new_navstate.modal = Modal::SignatureReady(a);
+                                            },
+                                            Err(e) => {
+                                                new_navstate.alert = Alert::Error;
+                                                errorline.push_str(&<Signer>::show(&e));
+                                            },
+                                        }
+                                    }
+                                },
+                                transaction_parsing::Action::Stub(_, checksum) => {
+                                    match transaction_signing::handle_stub(checksum, dbname) {
+                                        Ok(()) => {
+                                            new_navstate = Navstate::clean_screen(Screen::Log);
+                                        },
+                                        Err(e) => {
+                                            new_navstate.alert = Alert::Error;
+                                            errorline.push_str(&<Signer>::show(&e));
+                                        },
+                                    }
+                                },
+                                transaction_parsing::Action::Read(_) => println!("GoForward does nothing here"),
+                            }
+                        },
                         _ => println!("GoForward does nothing here"),
                     };
                 },
@@ -283,7 +338,7 @@ impl State {
                     }
                 },
                 Action::TransactionFetched => {
-                    new_navstate = Navstate::clean_screen(Screen::Transaction(details_str.to_string()));
+                    new_navstate = Navstate::clean_screen(Screen::Transaction(TransactionState::new(details_str, dbname)));
                 }
                 Action::Nothing => {
                     println!("no action was passed in action");
@@ -307,12 +362,12 @@ impl State {
                 },
                 //Screen::LogDetails => "",
                 Screen::Scan => "".to_string(),
-                Screen::Transaction(ref payload) => {
-                    match transaction_parsing::produce_output(payload, dbname) {
-                        transaction_parsing::Action::Sign(printed_cards, checksum) => {printed_cards},
-                        transaction_parsing::Action::Stub(printed_cards, checksum) => {printed_cards},
-                        transaction_parsing::Action::Read(printed_cards) => {printed_cards},
-                    }
+                Screen::Transaction(ref t) => {
+                    match t.action() {
+                        transaction_parsing::Action::Sign{content, checksum: _, has_pwd: _, network_info: _} => content,
+                        transaction_parsing::Action::Stub(content, _) => content,
+                        transaction_parsing::Action::Read(content) => content,
+                    }.to_string()
                 },
                 Screen::SeedSelector => {
                     let cards = match db_handling::interface_signer::print_all_seed_names_with_identicons(&dbname) {
@@ -400,6 +455,16 @@ impl State {
                                     "".to_string()
                                 },
                             }
+                        },
+                        _ => "".to_string(),
+                    }
+                },
+                Modal::SignatureReady(ref a) => a.to_string(),
+                Modal::EnterPassword => {
+                    match new_navstate.screen {
+                        Screen::Transaction(ref t) => {
+                            if let transaction_parsing::Action::Sign{content, checksum: _, has_pwd: _, network_info: _} = t.action() {format!("\"content\":{{{}}},\"counter\":{}", content, t.counter())}
+                            else {"".to_string()}
                         },
                         _ => "".to_string(),
                     }
