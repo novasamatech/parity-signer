@@ -24,6 +24,10 @@ struct ModalSelector: View {
             Backup(content: value)
         case .PasswordConfirm(let value):
             PasswordConfirm(content: value)
+        case .SignatureReady(let value):
+            SignatureReady(content: value)
+        case .EnterPassword(_):
+            EnterPassword()
         }
     }
 }

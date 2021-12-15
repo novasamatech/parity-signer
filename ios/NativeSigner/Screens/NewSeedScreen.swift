@@ -38,6 +38,9 @@ struct NewSeedScreen: View {
                         data.addSeed(seedName: seedName, seedLength: 24)
                     }
                     .onAppear(perform: {nameFocused = true})
+                    .onDisappear {
+                        nameFocused = false
+                    }
                     .padding(.horizontal, 8)
             }
             Text("Display name visible only to you").font(.callout)

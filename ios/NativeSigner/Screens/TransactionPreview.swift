@@ -10,6 +10,7 @@ import SwiftUI
 struct TransactionPreview: View {
     @EnvironmentObject var data: SignerDataModel
     @State private var comment = ""
+    @FocusState private var focus: Bool
     let content: MTransaction
     var body: some View {
         ZStack {
@@ -28,7 +29,12 @@ struct TransactionPreview: View {
                     Text("Comment (not published)")
                     TextField("comment", text: $comment, prompt: Text("enter comment"))
                         .foregroundColor(Color("Text400"))
-                        .background(Color("Bg100")).border(Color("Borders400"), width: 1)
+                        .background(Color("Bg100"))
+                        .border(Color("Borders400"), width: 1)
+                        .focused($focus)
+                        .onDisappear {
+                            focus = false
+                        }
                 }
                 Spacer()
                 HStack {

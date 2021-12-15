@@ -35,6 +35,10 @@
 		2D48F38727691C12004B27BE /* ShieldAlert.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D48F38627691C12004B27BE /* ShieldAlert.swift */; };
 		2D48F38A27691C3B004B27BE /* MError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D48F38927691C3B004B27BE /* MError.swift */; };
 		2D48F390276A1527004B27BE /* MTransaction.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D48F38F276A1527004B27BE /* MTransaction.swift */; };
+		2D48F392276A1D12004B27BE /* MSignatureReady.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D48F391276A1D12004B27BE /* MSignatureReady.swift */; };
+		2D48F394276A1D20004B27BE /* MEnterPassword.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D48F393276A1D20004B27BE /* MEnterPassword.swift */; };
+		2D48F396276A2003004B27BE /* SignatureReady.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D48F395276A2003004B27BE /* SignatureReady.swift */; };
+		2D48F398276A200F004B27BE /* EnterPassword.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D48F397276A200F004B27BE /* EnterPassword.swift */; };
 		2D72B4F626EF3BC50081E879 /* Navigator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D72B4F526EF3BC50081E879 /* Navigator.swift */; };
 		2D72B4FA26EF7D1C0081E879 /* Seeds.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D72B4F926EF7D1C0081E879 /* Seeds.swift */; };
 		2D72D52A2732B8A7004BA7C9 /* Database in Resources */ = {isa = PBXBuildFile; fileRef = 2D72D5292732B8A7004BA7C9 /* Database */; };
@@ -162,6 +166,10 @@
 		2D48F38627691C12004B27BE /* ShieldAlert.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ShieldAlert.swift; sourceTree = "<group>"; };
 		2D48F38927691C3B004B27BE /* MError.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MError.swift; sourceTree = "<group>"; };
 		2D48F38F276A1527004B27BE /* MTransaction.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MTransaction.swift; sourceTree = "<group>"; };
+		2D48F391276A1D12004B27BE /* MSignatureReady.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MSignatureReady.swift; sourceTree = "<group>"; };
+		2D48F393276A1D20004B27BE /* MEnterPassword.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MEnterPassword.swift; sourceTree = "<group>"; };
+		2D48F395276A2003004B27BE /* SignatureReady.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignatureReady.swift; sourceTree = "<group>"; };
+		2D48F397276A200F004B27BE /* EnterPassword.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EnterPassword.swift; sourceTree = "<group>"; };
 		2D72B4F526EF3BC50081E879 /* Navigator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Navigator.swift; sourceTree = "<group>"; };
 		2D72B4F926EF7D1C0081E879 /* Seeds.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Seeds.swift; sourceTree = "<group>"; };
 		2D72D5292732B8A7004BA7C9 /* Database */ = {isa = PBXFileReference; lastKnownFileType = folder; path = Database; sourceTree = "<group>"; };
@@ -332,6 +340,8 @@
 				2DA5F89C275F874D00D8DD29 /* NetworkManager.swift */,
 				2D48F36827636036004B27BE /* SeedMenu.swift */,
 				2D48F36E2767419D004B27BE /* PasswordConfirm.swift */,
+				2D48F395276A2003004B27BE /* SignatureReady.swift */,
+				2D48F397276A200F004B27BE /* EnterPassword.swift */,
 				2D48F36A2763604F004B27BE /* Backup.swift */,
 			);
 			path = Modals;
@@ -411,6 +421,8 @@
 			children = (
 				2D48F36227622C54004B27BE /* MNetworkMenu.swift */,
 				2D48F36C27636092004B27BE /* MBackup.swift */,
+				2D48F391276A1D12004B27BE /* MSignatureReady.swift */,
+				2D48F393276A1D20004B27BE /* MEnterPassword.swift */,
 				2D48F3702767514B004B27BE /* MPasswordConfirm.swift */,
 			);
 			path = ModalModels;
@@ -766,9 +778,12 @@
 				2DA5F86627566C3600D8DD29 /* TCText.swift in Sources */,
 				2DA5F82B2756631D00D8DD29 /* KeyManager.swift in Sources */,
 				2DE72C0F26A99885002BB752 /* RustNative.swift in Sources */,
+				2D48F394276A1D20004B27BE /* MEnterPassword.swift in Sources */,
 				2DA5F86127566C3600D8DD29 /* TCBalance.swift in Sources */,
 				2DA5F87127566C3600D8DD29 /* TCVarName.swift in Sources */,
+				2D48F398276A200F004B27BE /* EnterPassword.swift in Sources */,
 				2DA5F86C27566C3600D8DD29 /* TCPallet.swift in Sources */,
+				2D48F396276A2003004B27BE /* SignatureReady.swift in Sources */,
 				2DA5F898275F865400D8DD29 /* ModalSelector.swift in Sources */,
 				2DA5F87327566C3600D8DD29 /* TCBlockHash.swift in Sources */,
 				2DA5F86027566C3600D8DD29 /* TCAuthorPublicKey.swift in Sources */,
@@ -776,6 +791,7 @@
 				2D48F35B2760E5DF004B27BE /* RecoverSeedPhrase.swift in Sources */,
 				2DA5F87C2756A21200D8DD29 /* ExportAddress.swift in Sources */,
 				2D48F36127620F49004B27BE /* SeedKeyCard.swift in Sources */,
+				2D48F392276A1D12004B27BE /* MSignatureReady.swift in Sources */,
 				2D48F3552760AF9D004B27BE /* MSeeds.swift in Sources */,
 				2DA5F821275652EE00D8DD29 /* Footer.swift in Sources */,
 				2D48F38327691C0A004B27BE /* ConfirmAlert.swift in Sources */,

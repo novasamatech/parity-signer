@@ -99,6 +99,10 @@ struct ActionResult: Decodable {
             modal = .Backup(try values.decode(MBackup.self, forKey: .modalData))
         case "PasswordConfirm":
             modal = .PasswordConfirm(try values.decode(MPasswordConfirm.self, forKey: .modalData))
+        case "EnterPassword":
+            modal = .EnterPassword(try values.decode(MEnterPassword.self, forKey: .modalData))
+        case "SignatureReady":
+            modal = .SignatureReady(try values.decode(MSignatureReady.self, forKey: .modalData))
         default:
             modal = .Empty
         }
@@ -136,29 +140,20 @@ enum SignerScreen: Decodable {
 }
 
 /**
- * State of transaction progress - flow starts on successful scan
- */
-enum TransactionState: Equatable {
-    case none
-    case parsing
-    case preview
-    case password
-    case signed
-}
-
-/**
  * Modals shown in key management screen
  */
-enum SignerModal: Equatable, Decodable {
+enum SignerModal: Decodable {
     case Empty
     case NewSeedMenu
     case NetworkMenu(MNetworkMenu)
     case SeedMenu
     case Backup(MBackup)
     case PasswordConfirm(MPasswordConfirm)
+    case SignatureReady(MSignatureReady)
+    case EnterPassword(MEnterPassword)
 }
 
-enum SignerAlert: Equatable, Decodable {
+enum SignerAlert: Decodable {
     case Empty
     case Error(MError)
     case Shield

@@ -35,7 +35,6 @@ class SignerDataModel: ObservableObject {
     
     //Navigation
     @Published var keyManagerModal: SignerModal = .Empty
-    @Published var transactionState: TransactionState = .none
     
     //Transaction content
     @Published var payloadStr: String = ""

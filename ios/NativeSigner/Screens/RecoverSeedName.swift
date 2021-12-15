@@ -39,6 +39,9 @@ struct RecoverSeedName: View {
                     }
                     .onAppear(perform: {nameFocused = true})
                     .padding(.horizontal, 8)
+                    .onDisappear {
+                        nameFocused = false
+                    }
             }
             Text("Display name visible only to you").font(.callout)
             Text(data.lastError).foregroundColor(Color("SignalDanger"))

@@ -12,7 +12,7 @@ struct RecoverSeedPhrase: View {
     @State private var seedPhrase: [String] = []
     @State private var seedWord: String = ">"
     @State private var guessWord: [String] = []
-    @FocusState private var nameFocused: Bool
+    @FocusState private var focus: Bool
     let allowedLendth = [12, 24]
     
     init() {
@@ -38,7 +38,7 @@ struct RecoverSeedPhrase: View {
                     ZStack {
                         RoundedRectangle(cornerRadius: 8).stroke(Color("Borders400")).foregroundColor(Color("Borders400")).frame(height: 39)
                         TextField("Seed", text: $seedWord, prompt: Text("Seed name"))
-                            .focused($nameFocused)
+                            .focused($focus)
                             .foregroundColor(Color("Text600"))
                         //.background(Color("backgroundColor"))
                             .font(FBase(style: .body2))
@@ -66,9 +66,12 @@ struct RecoverSeedPhrase: View {
                             }
                             .onAppear(perform: {
                                 guessWord = data.guessWord(word: "")
-                                nameFocused = true
+                                focus = true
                             })
                             .padding(.horizontal, 8)
+                            .onDisappear {
+                                focus = false
+                            }
                     }
                     ScrollView(.horizontal) {
                         LazyHStack {
@@ -86,7 +89,7 @@ struct RecoverSeedPhrase: View {
                         }
                     }
                     Text(data.lastError).foregroundColor(.red)
-                    if (!nameFocused) {
+                    if (!focus) {
                     HStack {
                         Button(action: {
                             data.restoreSeed(seedName: "test", seedPhrase: seedPhrase.joined(separator: " "))

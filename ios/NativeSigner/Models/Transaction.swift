@@ -16,7 +16,6 @@ extension SignerDataModel {
      * Clears all transaction data; should be called on all resets, cancels, etc.
      */
     func resetTransaction() {
-        self.transactionState = .none
         self.cards = []
         self.payloadStr = ""
         self.transactionError = ""
