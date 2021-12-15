@@ -257,7 +257,7 @@ impl Screen {
             Screen::RecoverSeedName => "Recover Seed",
             Screen::RecoverSeedPhrase(_) => "Recover Seed",
             Screen::DeriveKey(_) => "",
-            Screen::Settings => "Settings",
+            Screen::Settings => "",
             Screen::Verifier => "VERIFIER CERTIFICATE",
             Screen::ManageNetwork => "MANAGE NETWORKS",
             Screen::Nowhere => "",
