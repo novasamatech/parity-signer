@@ -31,11 +31,13 @@ struct RecoverSeedName: View {
                     .disableAutocorrection(true)
                     .keyboardType(.asciiCapable)
                     .submitLabel(.done)
-                    .onChange(of: seedName, perform: { _ in
+                    .onChange(of: seedName, perform: { newName in
                         data.lastError = ""
                     })
                     .onSubmit {
-                        data.pushButton(buttonID: .RecoverSeed, details: seedName)
+                        if seedName != "" {
+                            data.pushButton(buttonID: .GoForward, details: seedName)
+                        }
                     }
                     .onAppear(perform: {nameFocused = true})
                     .padding(.horizontal, 8)
@@ -49,7 +51,7 @@ struct RecoverSeedName: View {
             BigButton(
                 text: "Next",
                 action: {
-                    data.pushButton(buttonID: .RecoverSeed, details: seedName)
+                    data.pushButton(buttonID: .GoForward, details: seedName)
                 },
                 isDisabled: seedName == ""
             )
@@ -59,9 +61,9 @@ struct RecoverSeedName: View {
 }
 
 /*
-struct RecoverSeedName_Previews: PreviewProvider {
-    static var previews: some View {
-        RecoverSeedName()
-    }
-}
-*/
+ struct RecoverSeedName_Previews: PreviewProvider {
+ static var previews: some View {
+ RecoverSeedName()
+ }
+ }
+ */

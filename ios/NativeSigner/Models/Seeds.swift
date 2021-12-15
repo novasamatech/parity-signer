@@ -127,12 +127,6 @@ extension SignerDataModel {
             self.lastError = "iOS key manager error, report a bug"
             return
         }
-        print(accessFlags)
-        if checkSeedCollision(seedName: seedName) {
-            print("Key collision")
-            self.lastError = "Seed with this name already exists"
-            return
-        }
         if checkSeedPhraseCollision(seedPhrase: seedPhrase) {
             print("Key collision")
             self.lastError = "Seed with this name already exists"
@@ -181,6 +175,7 @@ extension SignerDataModel {
      * Each seed name should be unique, obviously. We do not want to overwrite old seeds.
      */
     func checkSeedCollision(seedName: String) -> Bool {
+        print("blip")
         let query: [String: Any] = [
             kSecClass as String: kSecClassGenericPassword,
             kSecValueData as String: seedName,

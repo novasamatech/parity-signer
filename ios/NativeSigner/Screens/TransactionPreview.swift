@@ -46,7 +46,7 @@ struct TransactionPreview: View {
                     switch content.type {
                     case .sign:
                         Button(action: {
-                            data.pushButton(buttonID: .GoForward, details: comment, seedPhrase: data.getSeed(seedName: content.content.getAuthor()?.seed ?? ""))
+                            data.pushButton(buttonID: .GoForward, details: Data(comment.utf8).base64EncodedString(), seedPhrase: data.getSeed(seedName: content.content.getAuthor()?.seed ?? ""))
                         }) {
                             Text("Sign")
                                 .font(.largeTitle)

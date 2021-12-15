@@ -33,7 +33,7 @@ struct ScreenSelector: View {
         case .NewSeed:
             NewSeedScreen()
         case .RecoverSeedName:
-            RecoverSeedPhrase()
+            RecoverSeedName()
         case .RecoverSeedPhrase:
             RecoverSeedPhrase()
         case .DeriveKey(let value):

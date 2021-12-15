@@ -46,6 +46,7 @@ struct RecoverSeedPhrase: View {
                             .keyboardType(.asciiCapable)
                             .submitLabel(.done)
                             .onChange(of: seedWord, perform: { word in
+                                data.lastError = ""
                                 if word == "" {
                                     if seedPhrase.count > 0 {
                                         seedPhrase.removeLast()
@@ -62,7 +63,6 @@ struct RecoverSeedPhrase: View {
                                 }
                             })
                             .onSubmit {
-                                data.pushButton(buttonID: .RecoverSeed, details: seedPhrase.joined(separator: " "))
                             }
                             .onAppear(perform: {
                                 guessWord = data.guessWord(word: "")
