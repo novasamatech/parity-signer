@@ -253,7 +253,7 @@ impl Screen {
             Screen::SeedSelector => "Select seed",
             Screen::Keys(_) => "",
             Screen::KeyDetails(_) => "Key",
-            Screen::NewSeed => "",
+            Screen::NewSeed => "New Seed",
             Screen::RecoverSeedName => "Recover Seed",
             Screen::RecoverSeedPhrase => "Recover Seed",
             Screen::DeriveKey(_) => "",
