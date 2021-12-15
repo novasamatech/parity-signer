@@ -21,8 +21,9 @@ struct HistoryScreen: View {
                             }) {
                                 HistoryCard(
                                     event: event,
-                                    timestamp: history.timestamp.padding(toLength: 16, withPad: " ", startingAt: 0))
-                                    .foregroundColor(Color("Text400"))
+                                    timestamp: history.timestamp
+                                        .padding(toLength: 16, withPad: " ", startingAt: 0))
+                                        .foregroundColor(Color("Text400"))
                             }
                             .disabled(true)
                         }

@@ -184,7 +184,7 @@ impl Screen {
 
     pub fn get_default_label(&self) -> String {
         match self {
-            Screen::Log => "Log",
+            Screen::Log => "",
             Screen::LogDetails => "Event details",
             Screen::Scan => "",
             Screen::Transaction(_) => "",
