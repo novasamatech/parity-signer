@@ -364,10 +364,10 @@ impl State {
                 Screen::Scan => "".to_string(),
                 Screen::Transaction(ref t) => {
                     match t.action() {
-                        transaction_parsing::Action::Sign{content, checksum: _, has_pwd: _, network_info: _} => content,
-                        transaction_parsing::Action::Stub(content, _) => content,
-                        transaction_parsing::Action::Read(content) => content,
-                    }.to_string()
+                        transaction_parsing::Action::Sign{content, checksum: _, has_pwd: _, network_info: _} => format!("\"content\":{{{}}},\"type\":\"sign\"", content),
+                        transaction_parsing::Action::Stub(content, _) => format!("\"content\":{{{}}},\"type\":\"stub\"", content),
+                        transaction_parsing::Action::Read(content) => format!("\"content\":{{{}}},\"type\":\"read\"", content),
+                    }
                 },
                 Screen::SeedSelector => {
                     let cards = match db_handling::interface_signer::print_all_seed_names_with_identicons(&dbname) {
