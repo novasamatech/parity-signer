@@ -21,7 +21,7 @@ struct SettingsScreen: View {
             Button(action: {
                 //TODO: to SeedSelect to SeedBackup
             }) {
-                SettingsCardTemplate(text: "BackupKeys")
+                SettingsCardTemplate(text: "Backup keys")
             }
             VStack {
                 HStack {
