@@ -19,8 +19,10 @@ struct TransactionCommentInput: View {
     }
 }
 
+/*
 struct TransactionCommentInput_Previews: PreviewProvider {
     static var previews: some View {
         TransactionCommentInput()
     }
 }
+*/

@@ -12,9 +12,9 @@ struct TCWarning: View {
     var body: some View {
         HStack {
             Text("Warning! ")
-                .foregroundColor(Color("textMainColor"))
+                .foregroundColor(Color("SignalDanger"))
             Text(text)
-                .foregroundColor(Color("textMainColor"))
+                .foregroundColor(Color("SignalDanger"))
             Spacer()
         }
         .background(/*@START_MENU_TOKEN@*//*@PLACEHOLDER=View@*/Color("AccentColor")/*@END_MENU_TOKEN@*/)

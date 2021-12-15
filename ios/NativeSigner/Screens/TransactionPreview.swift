@@ -16,16 +16,19 @@ struct TransactionPreview: View {
             VStack {
                 ScrollView {
                     LazyVStack {
-                        ForEach(content.method?.sorted(by: {
-                            $0.index < $1.index
-                        }) ?? [], id: \.index) { card in
+                        ForEach(content.assemble(), id: \.index) { card in
                             TransactionCardView(card: card)
                         }
                     }
-                    /*
-                    if (data.action?.type == "sign") {
-                        TransactionCommentInput()
-                    }*/
+                }
+                if (content.action?.type == "sign") {
+                    if let address = content.getAuthor()?.intoAddress() {
+                        AddressCard(address: address)
+                    }
+                    Text("Comment (not published)")
+                    TextField("comment", text: $comment, prompt: Text("enter comment"))
+                        .foregroundColor(Color("Text400"))
+                        .background(Color("Bg100")).border(Color("Borders400"), width: 1)
                 }
                 Spacer()
                 HStack {
@@ -36,14 +39,15 @@ struct TransactionPreview: View {
                     Spacer()
                     if data.action != nil {
                         if data.action!.type == "sign" {
-                            Button(action: {data.transactionState = .signed}) {
+                            Button(action: {
+                                data.pushButton(buttonID: .GoForward, details: comment, seedPhrase: data.getSeed(seedName: content.getAuthor()?.seed ?? ""))
+                            }) {
                                 Text("Sign")
                                     .font(.largeTitle)
                             }
                         } else {
                             Button(action: {
-                                //data.handleTransaction()
-                                data.totalRefresh()
+                                data.pushButton(buttonID: .GoForward)
                             }) {
                                 Text("Approve")
                                     .font(.largeTitle)
@@ -60,9 +64,9 @@ struct TransactionPreview: View {
     }
 }
 /*
-struct TransactionPreview_Previews: PreviewProvider {
-    static var previews: some View {
-        TransactionPreview()
-    }
-}
-*/
+ struct TransactionPreview_Previews: PreviewProvider {
+ static var previews: some View {
+ TransactionPreview()
+ }
+ }
+ */

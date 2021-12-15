@@ -12,9 +12,9 @@ struct TCBlockHash: View {
     var body: some View {
         HStack {
             Text("Block hash: ")
-                .foregroundColor(Color("AccentColor"))
+                .foregroundColor(Color("Text400"))
             Text(text)
-                .foregroundColor(Color("textMainColor"))
+                .foregroundColor(Color("Text600"))
             Spacer()
         }
         .background(/*@START_MENU_TOKEN@*//*@PLACEHOLDER=View@*/Color("backgroundCard")/*@END_MENU_TOKEN@*/)

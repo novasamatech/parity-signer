@@ -13,9 +13,9 @@ struct TCPallet: View {
     var body: some View {
         VStack {
             HStack {
-                Text("Pallet").foregroundColor(Color("AccentColor"))
+                Text("Pallet").foregroundColor(Color("Text400"))
                 Text(text)
-                    .foregroundColor(Color("textMainColor"))
+                    .foregroundColor(Color("Text600"))
                 Spacer()
             }
         }

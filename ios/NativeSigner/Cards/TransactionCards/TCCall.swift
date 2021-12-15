@@ -16,7 +16,7 @@ struct TCCall: View {
         }) {
             VStack {
                 HStack {
-                    Text("Method").foregroundColor(Color("Action400"))
+                    Text("Method").foregroundColor(Color("Text400"))
                     Text(value.method_name)
                         .foregroundColor(Color("Text600"))
                     Spacer()

@@ -14,8 +14,8 @@ struct TCAuthorPlain: View {
             Image(uiImage: UIImage(data: Data(fromHexEncodedString: String(cString: base58_identicon(nil, value.base58, 32)))!)!)
             VStack (alignment: .leading) {
                 Text("From: ")
-                    .foregroundColor(Color("textMainColor"))
-                Text(value.base58).foregroundColor(Color("textMainColor"))
+                    .foregroundColor(Color("Text400"))
+                Text(value.base58).foregroundColor(Color("Text600"))
             }
             Spacer()
         }

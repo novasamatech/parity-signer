@@ -14,16 +14,16 @@ struct TCEraMortal: View {
             Spacer()
             VStack {
                 Text("phase")
-                    .foregroundColor(Color("AccentColor"))
+                    .foregroundColor(Color("Text400"))
                 Text(eraMortal.phase)
-                    .foregroundColor(Color("textMainColor"))
+                    .foregroundColor(Color("Text600"))
             }
             Spacer()
             VStack {
                 Text("period")
-                    .foregroundColor(Color("AccentColor"))
+                    .foregroundColor(Color("Text400"))
                 Text(eraMortal.period)
-                    .foregroundColor(Color("textMainColor"))
+                    .foregroundColor(Color("Text600"))
             }
             Spacer()
         }

@@ -50,6 +50,16 @@ struct Author: Decodable {
     var derivation_path: String
     var has_password: Bool
     var identicon: String
+    
+    func intoAddress() -> Address {
+        return Address(
+            base58: self.base58,
+            path: self.derivation_path,
+            has_pwd: self.has_password,
+            identicon: self.identicon,
+            seed_name: seed
+        )
+    }
 }
 
 struct AuthorPlain: Decodable {
@@ -277,5 +287,31 @@ struct TransactionCardSet: Decodable {
     var verifier: [TransactionCard]?
     var warning: [TransactionCard]?
     var types_info: [TransactionCard]?
-    //var action: Action?
+    var action: Action?
+    
+    /**
+     * Prepares transaction cards to be shown in a frame
+     */
+    func assemble() -> [TransactionCard] {
+        var assembled: [TransactionCard] = []
+        assembled.append(contentsOf: self.error ?? [])
+        assembled.append(contentsOf: self.extensions ?? [])
+        assembled.append(contentsOf: self.message ?? [])
+        assembled.append(contentsOf: self.method ?? [])
+        assembled.append(contentsOf: self.new_specs ?? [])
+        assembled.append(contentsOf: self.verifier ?? [])
+        assembled.append(contentsOf: self.warning ?? [])
+        assembled.append(contentsOf: self.types_info ?? [])
+        return assembled.sorted(by: {
+            $0.index < $1.index
+        })
+    }
+    
+    func getAuthor() -> Author? {
+        switch self.author?[0].card ?? .error("") {
+        case .author(let author):
+            return author
+        default: return nil
+        }
+    }
 }

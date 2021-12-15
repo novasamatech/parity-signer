@@ -14,9 +14,9 @@ struct TCTXSpec: View {
             Spacer()
             VStack {
                 Text("TX version")
-                    .foregroundColor(Color("AccentColor"))
+                    .foregroundColor(Color("Text400"))
                 Text(value)
-                    .foregroundColor(Color("textMainColor"))
+                    .foregroundColor(Color("Text600"))
             }
             Spacer()
         }

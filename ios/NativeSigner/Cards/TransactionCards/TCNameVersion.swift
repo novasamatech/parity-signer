@@ -14,9 +14,9 @@ struct TCNameVersion: View {
             Spacer()
             VStack {
                 Text(value.name)
-                    .foregroundColor(Color("AccentColor"))
+                    .foregroundColor(Color("Text400"))
                 Text(value.version)
-                    .foregroundColor(Color("textMainColor"))
+                    .foregroundColor(Color("Text600"))
             }
             Spacer()
         }
