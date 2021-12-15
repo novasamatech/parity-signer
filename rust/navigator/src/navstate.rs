@@ -105,7 +105,7 @@ impl State {
                                 Screen::RecoverSeedName => {
                                     new_navstate.screen = Screen::SeedSelector;
                                 },
-                                Screen::RecoverSeedPhrase => {
+                                Screen::RecoverSeedPhrase(_) => {
                                     new_navstate.screen = Screen::RecoverSeedName;
                                 },
                                 Screen::DeriveKey(d) => {
@@ -143,6 +143,21 @@ impl State {
                                 },
                             };
                         },
+                        Screen::RecoverSeedName => {
+                            match db_handling::identities::get_addresses_by_seed_name(dbname, details_str) {
+                                Ok(a) => {
+                                    if a.len() == 0 {new_navstate = Navstate::clean_screen(Screen::RecoverSeedPhrase(details_str.to_string()))}
+                                    else {
+                                        new_navstate.alert = Alert::Error;
+                                        errorline.push_str("Seed name already exists.");
+                                    }
+                                },
+                                Err(e) => {
+                                    new_navstate.alert = Alert::Error;
+                                    errorline.push_str(&<Signer>::show(&e));
+                                },
+                            }
+                        },
                         Screen::DeriveKey(ref derive_state) => {
                             new_navstate.screen = Screen::DeriveKey(derive_state.update(details_str));
                             match db_handling::identities::try_create_address (&derive_state.seed_name(), &secret_seed_phrase, details_str, &derive_state.network_specs_key(), dbname) {
@@ -165,7 +180,7 @@ impl State {
                         },
                         Screen::Transaction(ref t) => {
                             match t.action() {
-                                transaction_parsing::Action::Sign{content: _, checksum, has_pwd, network_info: _} => {
+                                transaction_parsing::Action::Sign{content: _, checksum, has_pwd, author_info: _, network_info: _} => {
                                     if has_pwd {
                                         match self.navstate.modal {
                                             Modal::EnterPassword => {
@@ -364,7 +379,7 @@ impl State {
                 Screen::Scan => "".to_string(),
                 Screen::Transaction(ref t) => {
                     match t.action() {
-                        transaction_parsing::Action::Sign{content, checksum: _, has_pwd: _, network_info: _} => format!("\"content\":{{{}}},\"type\":\"sign\"", content),
+                        transaction_parsing::Action::Sign{content, checksum: _, has_pwd: _, author_info, network_info} => format!("\"content\":{{{}}},\"author_info\":{{{}}},\"network_info\":{{{}}},\"type\":\"sign\"", content, author_info, network_info),
                         transaction_parsing::Action::Stub(content, _) => format!("\"content\":{{{}}},\"type\":\"stub\"", content),
                         transaction_parsing::Action::Read(content) => format!("\"content\":{{{}}},\"type\":\"read\"", content),
                     }
@@ -459,11 +474,11 @@ impl State {
                         _ => "".to_string(),
                     }
                 },
-                Modal::SignatureReady(ref a) => a.to_string(),
+                Modal::SignatureReady(ref a) => format!("\"signature\":\"{}\"", a),
                 Modal::EnterPassword => {
                     match new_navstate.screen {
                         Screen::Transaction(ref t) => {
-                            if let transaction_parsing::Action::Sign{content, checksum: _, has_pwd: _, network_info: _} = t.action() {format!("\"content\":{{{}}},\"counter\":{}", content, t.counter())}
+                            if let transaction_parsing::Action::Sign{content: _, checksum: _, has_pwd: _, author_info, network_info: _} = t.action() {format!("\"author_info\":{{{}}},\"counter\":{}", author_info, t.counter())}
                             else {"".to_string()}
                         },
                         _ => "".to_string(),
@@ -524,7 +539,7 @@ impl State {
             Screen::KeyDetails(_) => "Keys",
             Screen::NewSeed => "Keys",
             Screen::RecoverSeedName => "Keys",
-            Screen::RecoverSeedPhrase => "Keys",
+            Screen::RecoverSeedPhrase(_) => "Keys",
             Screen::DeriveKey(_) => "Keys",
             Screen::Settings => "Settings",
             Screen::Verifier => "Srttings",
@@ -545,7 +560,7 @@ impl State {
             Screen::KeyDetails(_) => "None",
             Screen::NewSeed => "None",
             Screen::RecoverSeedName => "None",
-            Screen::RecoverSeedPhrase => "None",
+            Screen::RecoverSeedPhrase(_) => "None",
             Screen::DeriveKey(_) => "None",
             Screen::Settings => "None",
             Screen::Verifier => "None",
@@ -566,7 +581,7 @@ impl State {
             Screen::KeyDetails(_) => "h4",
             Screen::NewSeed => "h1",
             Screen::RecoverSeedName => "h1",
-            Screen::RecoverSeedPhrase => "h1",
+            Screen::RecoverSeedPhrase(_) => "h1",
             Screen::DeriveKey(_) => "h1",
             Screen::Settings => "h4",
             Screen::Verifier => "h4",

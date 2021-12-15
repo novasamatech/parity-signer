@@ -1,6 +1,6 @@
 use bitvec::prelude::{BitVec, Lsb0};
 //use sled::IVec;
-use definitions::{crypto::Encryption, history::MetaValuesDisplay, keyring::VerifierKey, metadata::MetaValues, network_specs::{VerifierValue, NetworkSpecs}, qr_transfers::ContentLoadTypes, test_all_errors_signer::signer_errors};
+use definitions::{crypto::Encryption, history::MetaValuesDisplay, keyring::VerifierKey, metadata::MetaValues, network_specs::{VerifierValue, NetworkSpecs}, qr_transfers::ContentLoadTypes, test_all_errors_signer::signer_errors, users::AddressDetails};
 use hex;
 use std::convert::TryInto;
 use parser::cards::ParserCard;
@@ -38,6 +38,13 @@ pub fn make_all_cards() -> Action {
         title: String::from("Westend"),
         unit: String::from("WND"),
     };
+    let address_details = AddressDetails {
+        seed_name: String::from("Alice"),
+        path: String::from("//Alice"),
+        has_pwd: false,
+        network_id: Vec::new(),
+        encryption: Encryption::Sr25519,
+    };
     let bv: BitVec<Lsb0, u8> = BitVec::from_vec(vec![32, 4, 155]);
     
     all_cards.push(Card::ParserCard(&ParserCard::Pallet("test_pallet".to_string())).card(&mut index,0));
@@ -64,7 +71,7 @@ Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deseru
     all_cards.push(Card::ParserCard(&ParserCard::NetworkNameVersion{name: "westend".to_string(), version: "9110".to_string()}).card(&mut index,0));
     all_cards.push(Card::ParserCard(&ParserCard::TxVersion("5".to_string())).card(&mut index,0));
     
-    all_cards.push(Card::Author{author: &MultiSigner::Sr25519(sp_core::sr25519::Public::from_raw(PUBLIC)), base58prefix: 42, seed_name: "Alice", path: "//Alice", has_pwd: false}.card(&mut index,0));
+    all_cards.push(Card::Author{author: &MultiSigner::Sr25519(sp_core::sr25519::Public::from_raw(PUBLIC)), base58prefix: 42, address_details: &address_details}.card(&mut index,0));
     all_cards.push(Card::AuthorPlain{author: &MultiSigner::Sr25519(sp_core::sr25519::Public::from_raw(PUBLIC)), base58prefix: 42}.card(&mut index,0));
     all_cards.push(Card::AuthorPublicKey(&MultiSigner::Sr25519(sp_core::sr25519::Public::from_raw(PUBLIC))).card(&mut index,0));
     all_cards.push(Card::Verifier(&verifier_value_sr25519()).card(&mut index,0));
