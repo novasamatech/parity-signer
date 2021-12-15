@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		04197D20276A0890003485D2 /* RobotoMono-Light.otf in Resources */ = {isa = PBXBuildFile; fileRef = 04197D1E276A0890003485D2 /* RobotoMono-Light.otf */; };
 		04197D21276A0890003485D2 /* RobotoMono-Medium.otf in Resources */ = {isa = PBXBuildFile; fileRef = 04197D1F276A0890003485D2 /* RobotoMono-Medium.otf */; };
+		04197D27276A41E7003485D2 /* SettingsCardTemplate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04197D26276A41E7003485D2 /* SettingsCardTemplate.swift */; };
 		0452BC522762679F00C6DD37 /* Inter-Bold.otf in Resources */ = {isa = PBXBuildFile; fileRef = 0452BC4E2762679F00C6DD37 /* Inter-Bold.otf */; };
 		0452BC532762679F00C6DD37 /* Inter-SemiBold.otf in Resources */ = {isa = PBXBuildFile; fileRef = 0452BC4F2762679F00C6DD37 /* Inter-SemiBold.otf */; };
 		0452BC542762679F00C6DD37 /* Inter-Medium.otf in Resources */ = {isa = PBXBuildFile; fileRef = 0452BC502762679F00C6DD37 /* Inter-Medium.otf */; };
@@ -140,6 +141,7 @@
 /* Begin PBXFileReference section */
 		04197D1E276A0890003485D2 /* RobotoMono-Light.otf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "RobotoMono-Light.otf"; sourceTree = "<group>"; };
 		04197D1F276A0890003485D2 /* RobotoMono-Medium.otf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "RobotoMono-Medium.otf"; sourceTree = "<group>"; };
+		04197D26276A41E7003485D2 /* SettingsCardTemplate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SettingsCardTemplate.swift; sourceTree = "<group>"; };
 		0452BC4E2762679F00C6DD37 /* Inter-Bold.otf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Inter-Bold.otf"; sourceTree = "<group>"; };
 		0452BC4F2762679F00C6DD37 /* Inter-SemiBold.otf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Inter-SemiBold.otf"; sourceTree = "<group>"; };
 		0452BC502762679F00C6DD37 /* Inter-Medium.otf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Inter-Medium.otf"; sourceTree = "<group>"; };
@@ -305,6 +307,7 @@
 				2DA5F84227566BE300D8DD29 /* TransactionCardSelector.swift */,
 				2DA5F8812756A2DE00D8DD29 /* AddressCard.swift */,
 				2DA5F83E275667CF00D8DD29 /* HistoryCardTemplate.swift */,
+				04197D26276A41E7003485D2 /* SettingsCardTemplate.swift */,
 			);
 			path = Cards;
 			sourceTree = "<group>";
@@ -764,6 +767,7 @@
 				2DA5F86227566C3600D8DD29 /* TCEnumVariantName.swift in Sources */,
 				2DA5F87A275676B600D8DD29 /* SeedCardForManager.swift in Sources */,
 				2D48F38127691C05004B27BE /* AlertSelector.swift in Sources */,
+				04197D27276A41E7003485D2 /* SettingsCardTemplate.swift in Sources */,
 				2DA5F89227590B4F00D8DD29 /* Documents.swift in Sources */,
 				2DA5F80D2756304B00D8DD29 /* Camera.swift in Sources */,
 				2DA5F8842756A37800D8DD29 /* Address.swift in Sources */,

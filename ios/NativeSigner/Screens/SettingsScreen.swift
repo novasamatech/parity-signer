@@ -20,11 +20,10 @@ struct SettingsScreen: View {
                     //TODO: add some alerts to make sure the operation was successful
                     wipe = true
                 }) {
-                    HStack{
-                        Image(systemName: "exclamationmark.triangle.fill").imageScale(.large)
-                        Text("Wipe all data")
-                        Image(systemName: "exclamationmark.triangle.fill").imageScale(.large)
-                    }
+                    SettingsCardTemplate(
+                        text: "Wipe all data",
+                        danger: true
+                    )
                 }
                 .alert(isPresented: $wipe, content: {
                     Alert(
@@ -39,16 +38,14 @@ struct SettingsScreen: View {
                         )
                     )
                 })
-                .padding()
                 Button(action: {
                     //TODO: add some alerts to make sure the operation was successful
                     jailbreak = true
                 }) {
-                    HStack{
-                        Image(systemName: "exclamationmark.triangle.fill").imageScale(.large)
-                        Text("Remove general certificate")
-                        Image(systemName: "exclamationmark.triangle.fill").imageScale(.large)
-                    }.foregroundColor(Color("SignalDanger"))
+                    SettingsCardTemplate(
+                        text: "Remove general certificate",
+                        danger: true
+                    )
                 }
                 .alert(isPresented: $jailbreak, content: {
                     Alert(
@@ -63,18 +60,16 @@ struct SettingsScreen: View {
                         )
                     )
                 })
-                .padding()
                 Button(action: {
                     //TODO
                 }) {
-                    Text("Documentation")
+                    SettingsCardTemplate(text: "About")
                 }
-                .padding()
-                HStack {
-                    Text("App version:")
-                    Text(data.appVersion ?? "Unknown!")
-                }
-                Spacer()
+                SettingsCardTemplate(
+                    text: "App version: " + (data.appVersion ?? "Unknown!"),
+                    withIcon: false,
+                    withBackground: false
+                )
                 /*
                  HStack {
                  Image(uiImage: UIImage(data: Data(fromHexEncodedString: String(cString: identicon(nil, "", 32))) ?? Data()) ?? UIImage())
@@ -88,7 +83,6 @@ struct SettingsScreen: View {
                  }.padding().background(Color("backgroundCard"))
                  */
             }
-            .background(/*@START_MENU_TOKEN@*//*@PLACEHOLDER=View@*/Color("backgroundColor")/*@END_MENU_TOKEN@*/)
         }
     }
 }
