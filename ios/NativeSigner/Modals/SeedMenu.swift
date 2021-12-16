@@ -20,14 +20,23 @@ struct SeedMenu: View {
                 }
                 VStack {
                     HeaderBar(line1: "SEED MENU", line2: "Select action").padding(.top, 10)
-                    Button(action:{data.pushButton(buttonID: .BackupSeed)}) {
-                        Text("Backup")
-                    }
-                    Button(action:{data.pushButton(buttonID: .NewKey)}) {
-                        Text("Derive new key")
-                    }
-                    Button(action:{}) {
-                        Text("Forget this seed forever")
+                    MenuButtonsStack {
+                        BigButton(
+                            text: "Backup",
+                            action: {data.pushButton(buttonID: .BackupSeed)}
+                        )
+                        BigButton(
+                            text: "Derive new key",
+                            isShaded: true,
+                            isCrypto: true,
+                            action:{data.pushButton(buttonID: .NewKey)}
+                        )
+                        BigButton(
+                            text: "Forget this seed forever",
+                            isShaded: true,
+                            isDangerous: true,
+                            action: {}
+                        )
                     }
                 }
             }

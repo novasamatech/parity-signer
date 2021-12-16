@@ -28,16 +28,21 @@ struct BigButtonStyle: ButtonStyle {
 struct BigButton: View {
     var text: String
     var isShaded: Bool = false
+    var isCrypto: Bool = false
+    var isDangerous: Bool = false
     var action: ()->Void
     var isDisabled: Bool = false
     
     var body: some View {
+        let accentColor = isCrypto ? Color("Action400") : Color("Crypto400")
         let bgColor = isDisabled
             ? Color("Bg200")
-            : isShaded ? Color("Bg300") : Color("Action400")
+            : isShaded ? Color("Bg300") : accentColor
         let fgColor = isDisabled
             ? Color("Text300")
-            : isShaded ? Color("Action400") : Color("Action600")
+            : isShaded
+                ? isDangerous ? Color("SignalDanger") : accentColor
+                : Color("Action600")
         
         Button(action: action) {
             HStack {
