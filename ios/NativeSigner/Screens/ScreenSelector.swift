@@ -30,12 +30,12 @@ struct ScreenSelector: View {
             ExportAddress(content: value)
         case .Backup:
             SeedBackup()
-        case .NewSeed:
-            NewSeedScreen()
-        case .RecoverSeedName:
-            RecoverSeedName()
-        case .RecoverSeedPhrase:
-            RecoverSeedPhrase()
+        case .NewSeed(let value):
+            NewSeedScreen(content: value)
+        case .RecoverSeedName(let value):
+            RecoverSeedName(content: value)
+        case .RecoverSeedPhrase(let value):
+            RecoverSeedPhrase(content: value)
         case .DeriveKey(let value):
             NewAddressScreen(content: value)
         case .Verifier:

@@ -69,11 +69,11 @@ struct ActionResult: Decodable {
         case "Backup":
             screen = .Backup
         case "NewSeed":
-            screen = .NewSeed
+            screen = .NewSeed(try values.decode(MNewSeed.self, forKey: .screenData))
         case "RecoverSeedName":
-            screen = .RecoverSeedName
+            screen = .RecoverSeedName(try values.decode(MRecoverSeedName.self, forKey: .screenData))
         case "RecoverSeedPhrase":
-            screen = .RecoverSeedPhrase
+            screen = .RecoverSeedPhrase(try values.decode(MRecoverSeedPhrase.self, forKey: .screenData))
         case "Transaction":
             screen = .Transaction(try values.decode(MTransaction.self, forKey: .screenData))
         case "DeriveKey":
@@ -131,9 +131,9 @@ enum SignerScreen: Decodable {
     case SeedSelector(MSeeds)
     case KeyDetails(MKeyDetails)
     case Backup
-    case NewSeed
-    case RecoverSeedName
-    case RecoverSeedPhrase
+    case NewSeed(MNewSeed)
+    case RecoverSeedName(MRecoverSeedName)
+    case RecoverSeedPhrase(MRecoverSeedPhrase)
     case DeriveKey(MDeriveKey)
     case Verifier
     case ManageNetwork

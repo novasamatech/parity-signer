@@ -96,7 +96,6 @@ pub fn signer_errors() -> Vec<ErrorSigner> {
     error_set.push(ErrorSigner::Interface(InterfaceSigner::KeyDecoding(KeyDecodingSignerInterface::NetworkSpecsKey(network_specs_key_bad.to_owned()))));
     error_set.push(ErrorSigner::Interface(InterfaceSigner::PublicKeyLength));
     error_set.push(ErrorSigner::Interface(InterfaceSigner::HistoryPageOutOfRange{page_number: 14, total_pages: 10}));
-    error_set.push(ErrorSigner::Interface(InterfaceSigner::ChecksumNotU32));
     
     error_set.push(ErrorSigner::Database(DatabaseSigner::KeyDecoding(KeyDecodingSignerDb::AddressKey(address_key_bad.to_owned()))));
     error_set.push(ErrorSigner::Database(DatabaseSigner::KeyDecoding(KeyDecodingSignerDb::EntryOrder(entry_order_vec.to_owned()))));
@@ -177,6 +176,7 @@ pub fn signer_errors() -> Vec<ErrorSigner> {
     error_set.push(ErrorSigner::AddressGeneration(AddressGeneration::Common(AddressGenerationCommon::KeyCollision{seed_name: String::from("Alice super secret seed")})));
     for e in secret_string_error_set().into_iter() {error_set.push(ErrorSigner::AddressGeneration(AddressGeneration::Common(AddressGenerationCommon::SecretString(e))));}
     error_set.push(ErrorSigner::AddressGeneration(AddressGeneration::Extra(ExtraAddressGenerationSigner::RandomPhraseGeneration(anyhow!("Mnemonic generator refuses to work with a valid excuse.")))));
+    error_set.push(ErrorSigner::AddressGeneration(AddressGeneration::Extra(ExtraAddressGenerationSigner::RandomPhraseValidation(anyhow!("Mnemonic generator rejects your phrase with a valid excuse.")))));
     error_set.push(ErrorSigner::AddressGeneration(AddressGeneration::Extra(ExtraAddressGenerationSigner::InvalidDerivation)));
     
     error_set.push(ErrorSigner::Qr(String::from("QR generator refuses to work with a valid excuse.")));
@@ -247,7 +247,6 @@ mod tests {
 "Error on the interface. Unable to parse network specs key 0350e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e passed through the interface."
 "Error on the interface. Public key length does not match the encryption."
 "Error on the interface. Requested history page 14 does not exist. Total number of pages 10."
-"Error on the interface. Checksum is not u32."
 "Database error. Unable to parse address key 0350e7c3d5edde7db964317cd9b51a3a059d7cd99f81bdbce14990047354334c9779 from the database."
 "Database error. Unable to parse history entry order 640455 from the database."
 "Database error. Unable to parse meta key 1c77657374656e64a2230000 from the database."
@@ -332,12 +331,12 @@ mod tests {
 "Could not find address details for address key 0150e7c3d5edde7db964317cd9b51a3a059d7cd99f81bdbce14990047354334c9779."
 "Could not find metadata entry for westend9120."
 "Could not find danger status information."
-"Could not find database temporary entry with information needed for accepting approved information.."
-"Could not find database temporary entry with information needed for signing approved transaction.."
+"Could not find database temporary entry with information needed for accepting approved information."
+"Could not find database temporary entry with information needed for signing approved transaction."
 "Could not find history entry with order 135."
-"Could not find Network specs for westend with encryption ed25519 needed to decode historical transaction are not found.."
-"Could not find Entry with order 280 contains no transaction-related events.."
-"Could not find Historical transaction was generated in network kulupu and processed. Currently there are no metadata entries for the network, and transaction could not be processed again. Add network metadata.."
+"Could not find network specs for westend with encryption ed25519 needed to decode historical transaction."
+"Entry with order 280 contains no transaction-related events."
+"Historical transaction was generated in network kulupu and processed. Currently there are no metadata entries for the network, and transaction could not be processed again. Add network metadata."
 "Network with genesis hash 853faffbfc6713c1f899bf16547fcfbf733ae8361b8ca0129699d01d4f2181fd is disabled. It could be enabled again only after complete wipe and re-installation of Signer."
 "Error generating address. Network encryption sr25519 is different from seed object encryption ed25519."
 "Error generating address. Address key collision for seed name Alice super secret seed"
@@ -348,7 +347,8 @@ mod tests {
 "Error generating address. Bad secret string: invalid seed length."
 "Error generating address. Bad secret string: invalid path."
 "Error generating address. Could not create random phrase. Mnemonic generator refuses to work with a valid excuse."
-"Error generating address. Invalid derivation format"
+"Error generating address. Proposed random phrase is invalid. Mnemonic generator rejects your phrase with a valid excuse."
+"Error generating address. Invalid derivation format."
 "Error generating qr code. QR generator refuses to work with a valid excuse."
 "Error parsing incoming transaction. Metadata spec version matches. Error decoding transaction content. Expected mortal transaction due to prelude format. Found immortal transaction."
 "Error parsing incoming transaction. Metadata spec version matches. Error decoding transaction content. Expected immortal transaction due to prelude format. Found mortal transaction."

@@ -165,8 +165,7 @@ extension SignerDataModel {
                 return
             }
             self.refreshSeeds()
-            self.seedBackup = finalSeedPhraseString
-            self.pushButton(buttonID: .BackupSeed, details: seedName)
+            self.pushButton(buttonID: .GoForward)
             //TODO
         }
     }
@@ -175,7 +174,6 @@ extension SignerDataModel {
      * Each seed name should be unique, obviously. We do not want to overwrite old seeds.
      */
     func checkSeedCollision(seedName: String) -> Bool {
-        print("blip")
         let query: [String: Any] = [
             kSecClass as String: kSecClassGenericPassword,
             kSecValueData as String: seedName,

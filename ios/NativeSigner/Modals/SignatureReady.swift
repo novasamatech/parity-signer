@@ -30,7 +30,7 @@ struct SignatureReady: View {
                     self.offset = drag.translation.height
                 }
                 .onEnded{drag in
-                    self.oldOffset = drag.translation.height
+                    self.oldOffset += drag.translation.height
                     self.offset = 0
                 }
         )

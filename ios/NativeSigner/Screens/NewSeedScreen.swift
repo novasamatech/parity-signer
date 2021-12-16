@@ -11,10 +11,7 @@ struct NewSeedScreen: View {
     @EnvironmentObject var data: SignerDataModel
     @State private var seedName: String = ""
     @FocusState private var nameFocused: Bool
-    
-    init() {
-        UITextView.appearance().backgroundColor = .clear
-    }
+    var content: MNewSeed
     
     var body: some View {
         VStack(alignment: .leading) {
@@ -37,9 +34,8 @@ struct NewSeedScreen: View {
                     .onSubmit {
                         data.addSeed(seedName: seedName, seedLength: 24)
                     }
-                    .onAppear(perform: {nameFocused = true})
+                    .onAppear(perform: {nameFocused = content.keyboard})
                     .onDisappear {
-                        nameFocused = false
                     }
                     .padding(.horizontal, 8)
             }
@@ -49,6 +45,7 @@ struct NewSeedScreen: View {
             BigButton(
                 text: "Generate seed phrase",
                 action: {
+                    nameFocused = false
                     data.addSeed(seedName: seedName, seedLength: 24)
                 },
                 isDisabled: seedName == ""

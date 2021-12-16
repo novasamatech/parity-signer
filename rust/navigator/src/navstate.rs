@@ -158,6 +158,19 @@ impl State {
                                 },
                             }
                         },
+                        Screen::RecoverSeedPhrase(ref seed_name) => {
+                            new_navstate = match KeysState::new(details_str, dbname) {
+                                Ok(a) => Navstate::clean_screen(Screen::Keys(a)),
+                                Err(e) => {
+                                    errorline.push_str(&<Signer>::show(&e));
+                                    Navstate {
+                                        screen: Screen::Log,
+                                        modal: Modal::Empty,
+                                        alert: Alert::Error,
+                                    }
+                                },
+                            };
+                        },
                         Screen::DeriveKey(ref derive_state) => {
                             new_navstate.screen = Screen::DeriveKey(derive_state.update(details_str));
                             match db_handling::identities::try_create_address (&derive_state.seed_name(), &secret_seed_phrase, details_str, &derive_state.network_specs_key(), dbname) {
@@ -300,8 +313,25 @@ impl State {
                             },
                             _ => println!("BackupSeed without seed_name does nothing here"),
                         }
+                    } else {
+                        new_navstate = match KeysState::new(details_str, dbname) {
+                            Ok(a) => {
+                                Navstate {
+                                    screen: Screen::Keys(a),
+                                    modal: Modal::Backup(details_str.to_string()),
+                                    alert: Alert::Empty,
+                                }
+                            },
+                            Err(e) => {
+                                errorline.push_str(&<Signer>::show(&e));
+                                Navstate {
+                                    screen: Screen::Log,
+                                    modal: Modal::Empty,
+                                    alert: Alert::Error,
+                                }
+                            },
+                        };
                     }
-                    else {new_navstate.modal = Modal::Backup(details_str.to_string())}
                 },
                 Action::NetworkSelector => {
                     if let Modal::NetworkSelector(_) = self.navstate.modal {
@@ -416,16 +446,18 @@ impl State {
                     }
                 }
                 //Screen::Backup => "this should be popover",
-                //Screen::NewSeed => "",
-                //Screen::RecoverSeedName => "Recover Seed",
-                //Screen::RecoverSeedPhrase => "Recover Seed",
+                Screen::NewSeed => format!("\"keyboard\":{}", new_navstate.keyboard()),
+                Screen::RecoverSeedName => format!("\"keyboard\":{}", new_navstate.keyboard()),
+                Screen::RecoverSeedPhrase(_) => format!("\"keyboard\":{}", new_navstate.keyboard()),
                 Screen::DeriveKey(ref d) => {
                     match db_handling::interface_signer::derive_prep (dbname, &d.seed_name(), &d.network_specs_key(), &details_str) {
-                        Ok(a) => a,
+                        Ok(a) => {
+                            format!("{},\"keyboard\":{}", a, new_navstate.keyboard())
+                        },
                         Err(e) => {
                             new_navstate.alert = Alert::Error;
                             errorline.push_str(&<Signer>::show(&e));
-                            "".to_string()
+                            String::from("\"keyboard\":false")
                         },
                     }
                 },
@@ -599,6 +631,15 @@ impl Navstate {
             modal: Modal::Empty,
             alert: Alert::Empty,
         }
+    }
+    
+    ///Check if keyboard should be shown
+    fn keyboard(&self) -> bool {
+        if let Modal::Empty = self.modal {
+            if let Alert::Empty = self.alert {true}
+            else {false}
+        }
+        else {false}
     }
 }
 
