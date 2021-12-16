@@ -14,13 +14,8 @@ struct BigButtonStyle: ButtonStyle {
     func makeBody(configuration: Self.Configuration) -> some View {
         configuration.label
             .padding(12)
-            .background(
-                RoundedRectangle(
-                    cornerRadius: 8,
-                    style: .continuous
-                )
-                .fill(bgColor)
-            )
+            .background(bgColor)
+            .cornerRadius(8)
             .foregroundColor(fgColor)
     }
 }

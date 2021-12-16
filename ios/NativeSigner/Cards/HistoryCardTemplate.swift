@@ -15,31 +15,29 @@ struct HistoryCardTemplate: View {
     var line2: String
     
     var body: some View {
-        ZStack {
-            RoundedRectangle(cornerRadius: 4)
-                .foregroundColor(Color(danger ? "BgDanger" : "Bg200"))
-            HStack {
-                VStack (alignment: .leading, spacing: 2) {
-                    if (timestamp != "") {
-                        Text(timestamp)
-                            .foregroundColor(Color("Text400"))
-                            .font(FBase(style: .subtitle2))
-                    }
-                    Text(line1)
-                        .foregroundColor(Color("Text600"))
-                        .font(FBase(style: .subtitle1))
-                        .tracking(0.1)
-                    Text(line2)
-                        .foregroundColor(Color("Crypto400"))
-                        .font(FCrypto(style: .body1))
+        HStack {
+            VStack (alignment: .leading, spacing: 2) {
+                if (timestamp != "") {
+                    Text(timestamp)
+                        .foregroundColor(Color("Text400"))
+                        .font(FBase(style: .subtitle2))
                 }
-                Spacer()
-                Image(systemName: image)
-                    .imageScale(.medium)
-                    .foregroundColor(Color(danger ? "SignalDanger" : "Text400"))
+                Text(line1)
+                    .foregroundColor(Color("Text600"))
+                    .font(FBase(style: .subtitle1))
+                    .tracking(0.1)
+                Text(line2)
+                    .foregroundColor(Color("Crypto400"))
+                    .font(FCrypto(style: .body1))
             }
-            .padding(8)
+            Spacer()
+            Image(systemName: image)
+                .imageScale(.medium)
+                .foregroundColor(Color(danger ? "SignalDanger" : "Text400"))
         }
+        .padding(8)
+        .cornerRadius(8)
+        .background(Color(danger ? "BgDanger" : "Bg200"))
     }
 }
 
