@@ -42,6 +42,13 @@ struct NewAddressScreen: View {
                                 .onChange(of: path) {pathNew in
                                     derivationState = pathNew.checkAsDerivation()
                                 }
+                                .onSubmit {
+                                    if derivationState.hasPassword {
+                                        data.pushButton(buttonID: .CheckPassword, details: path)
+                                    } else {
+                                        data.createAddress(path: path, seedName: content.seed_name)
+                                    }
+                                }
                                 .focused($focusedField)
                                 .padding(8)
                         }
@@ -49,7 +56,6 @@ struct NewAddressScreen: View {
                 }.padding()
                 HStack {
                     Button(action: {
-                        focusedField = false
                         if derivationState.hasPassword {
                             data.pushButton(buttonID: .CheckPassword, details: path)
                         } else {
@@ -65,7 +71,7 @@ struct NewAddressScreen: View {
         .onAppear {
             path = content.suggested_derivation
             derivationState = path.checkAsDerivation()
-            focusedField = true
+            focusedField = content.keyboard
         }
         .background(/*@START_MENU_TOKEN@*//*@PLACEHOLDER=View@*/Color("backgroundColor")/*@END_MENU_TOKEN@*/)
     }

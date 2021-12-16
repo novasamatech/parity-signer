@@ -165,8 +165,7 @@ extension SignerDataModel {
                 return
             }
             self.refreshSeeds()
-            self.seedBackup = finalSeedPhraseString
-            self.pushButton(buttonID: .BackupSeed, details: seedName)
+            self.pushButton(buttonID: .GoForward)
             //TODO
         }
     }

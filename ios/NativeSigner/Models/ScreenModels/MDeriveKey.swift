@@ -12,4 +12,5 @@ struct MDeriveKey: Decodable, Equatable {
     var network_title: String
     var network_logo: String
     var suggested_derivation: String
+    var keyboard: Bool
 }

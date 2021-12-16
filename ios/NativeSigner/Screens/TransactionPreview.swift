@@ -23,8 +23,11 @@ struct TransactionPreview: View {
                     }
                 }
                 if (content.type == .sign) {
-                    if let address = content.content.getAuthor()?.intoAddress() {
-                        AddressCard(address: address)
+                    if let address = content.author_info {
+                        AddressCard(address: address.intoAddress())
+                    }
+                    if let network = content.network_info {
+                        NetworkCard(title: network.network_title, logo: network.network_logo)
                     }
                     Text("Comment (not published)")
                     TextField("comment", text: $comment, prompt: Text("enter comment"))
@@ -46,7 +49,7 @@ struct TransactionPreview: View {
                     switch content.type {
                     case .sign:
                         Button(action: {
-                            data.pushButton(buttonID: .GoForward, details: Data(comment.utf8).base64EncodedString(), seedPhrase: data.getSeed(seedName: content.content.getAuthor()?.seed ?? ""))
+                            data.pushButton(buttonID: .GoForward, details: Data(comment.utf8).base64EncodedString(), seedPhrase: data.getSeed(seedName: content.author_info?.seed ?? ""))
                         }) {
                             Text("Sign")
                                 .font(.largeTitle)
