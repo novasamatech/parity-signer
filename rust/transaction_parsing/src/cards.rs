@@ -4,7 +4,7 @@ use sp_core::crypto::{Ss58Codec, Ss58AddressFormat};
 use sp_runtime::{generic::Era, MultiSigner};
 
 use constants::HALFSIZE;
-use definitions::{crypto::Encryption, error::{ErrorSigner, ErrorSource, Signer}, helpers::make_identicon_from_multisigner, history::MetaValuesDisplay, keyring::{print_multisigner_as_base58, VerifierKey}, network_specs::{NetworkSpecs, NetworkSpecsToSend, VerifierValue}, qr_transfers::ContentLoadTypes, users::AddressDetails};
+use definitions::{crypto::Encryption, error::{ErrorSigner, ErrorSource, Signer}, helpers::make_identicon_from_multisigner, history::MetaValuesDisplay, keyring::{print_multisigner_as_base58, VerifierKey}, network_specs::{NetworkSpecs, NetworkSpecsToSend, VerifierValue}, print::export_complex_single, qr_transfers::ContentLoadTypes, users::AddressDetails};
 use parser::cards::ParserCard;
 use plot_icon::png_data_from_vec;
 
@@ -118,7 +118,7 @@ impl <'a> Card <'a> {
                 };
                 fancy(index, indent, "author_public_key", &insert)
             },
-            Card::Verifier(x) => fancy(index, indent, "verifier", &x.show_card()),
+            Card::Verifier(x) => fancy(index, indent, "verifier", &export_complex_single(x, |a| a.show_card())),
             Card::Meta(x) => fancy(index, indent, "meta", &format!("{{{}}}", x.show())),
             Card::TypesInfo(x) => fancy(index, indent, "types_hash", &format!("\"{}\"", hex::encode(blake2b(32, &[], &x.store()).as_bytes()))),
             Card::NewSpecs(x) => fancy(index, indent, "new_specs", &format!("{{{}}}", x.show())),

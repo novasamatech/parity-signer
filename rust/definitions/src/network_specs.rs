@@ -5,7 +5,9 @@ use sp_runtime::MultiSigner;
 
 use crate::crypto::Encryption;
 use crate::error::{Active, DatabaseActive, EntryDecodingActive, ErrorActive, ErrorSource, MismatchActive, SpecsKeySource};
+use crate::helpers::{multisigner_to_public, multisigner_to_encryption, make_identicon_from_multisigner};
 use crate::keyring::NetworkSpecsKey;
+use crate::print::export_complex_single;
 
 //TODO: rename fields to make them more clear
 #[derive(parity_scale_codec_derive::Decode, parity_scale_codec_derive::Encode, PartialEq, Debug, Clone)]
@@ -51,7 +53,7 @@ pub struct ShortSpecs {
 
 impl NetworkSpecs {
     pub fn show(&self, valid_current_verifier: &ValidCurrentVerifier, general_verifier: &Verifier) -> String {
-        format!("\"base58prefix\":\"{}\",\"color\":\"{}\",\"decimals\":\"{}\",\"encryption\":\"{}\",\"genesis_hash\":\"{}\",\"logo\":\"{}\",\"name\":\"{}\",\"order\":\"{}\",\"path_id\":\"{}\",\"secondary_color\":\"{}\",\"title\":\"{}\",\"unit\":\"{}\",\"current_verifier\":{}", &self.base58prefix, &self.color, &self.decimals, &self.encryption.show(), hex::encode(&self.genesis_hash), &self.logo, &self.name, &self.order, &self.path_id, &self.secondary_color, &self.title, &self.unit, valid_current_verifier.show(general_verifier))
+        format!("\"base58prefix\":\"{}\",\"color\":\"{}\",\"decimals\":\"{}\",\"encryption\":\"{}\",\"genesis_hash\":\"{}\",\"logo\":\"{}\",\"name\":\"{}\",\"order\":\"{}\",\"path_id\":\"{}\",\"secondary_color\":\"{}\",\"title\":\"{}\",\"unit\":\"{}\",\"current_verifier\":{}", &self.base58prefix, &self.color, &self.decimals, &self.encryption.show(), hex::encode(&self.genesis_hash), &self.logo, &self.name, &self.order, &self.path_id, &self.secondary_color, &self.title, &self.unit, export_complex_single(valid_current_verifier, |a| a.show(general_verifier)))
     }
     pub fn print_single(&self) -> String {
         format!("\"color\":\"{}\",\"logo\":\"{}\",\"secondary_color\":\"{}\",\"title\":\"{}\"", &self.color, &self.logo, &self.secondary_color, &self.title)
@@ -155,7 +157,7 @@ impl Verifier {
     pub fn show_card(&self) -> String {
         match &self.0 {
             Some(a) => a.show_card(),
-            None => String::from("{\"hex\":\"\",\"encryption\":\"none\"}"),
+            None => String::from("\"hex\":\"\",\"identicon\":\"\",\"encryption\":\"none\""),
         }
     }
     pub fn show_error(&self) -> String {
@@ -169,9 +171,15 @@ impl Verifier {
 impl VerifierValue {
     pub fn show_card(&self) -> String {
         match &self {
-            VerifierValue::Standard(MultiSigner::Ed25519(x)) => format!("{{\"hex\":\"{}\",\"encryption\":\"ed25519\"}}", hex::encode(x.0)),
-            VerifierValue::Standard(MultiSigner::Sr25519(x)) => format!("{{\"hex\":\"{}\",\"encryption\":\"sr25519\"}}", hex::encode(x.0)),
-            VerifierValue::Standard(MultiSigner::Ecdsa(x)) => format!("{{\"hex\":\"{}\",\"encryption\":\"ecdsa\"}}", hex::encode(x.0)),
+            VerifierValue::Standard(m) => {
+                let hex_public = hex::encode(multisigner_to_public(m));
+                let encryption = multisigner_to_encryption(m);
+                let hex_identicon = match make_identicon_from_multisigner(m) {
+                    Ok(a) => hex::encode(a),
+                    Err(_) => String::new(),
+                };
+                format!("\"hex\":\"{}\",\"identicon\":\"{}\",\"encryption\":\"{}\"", hex_public, hex_identicon, encryption.show())
+            },
         }
     }
     pub fn show_error(&self) -> String {
@@ -202,8 +210,8 @@ pub enum ValidCurrentVerifier {
 impl ValidCurrentVerifier {
     pub fn show(&self, general_verifier: &Verifier) -> String {
         match &self {
-            ValidCurrentVerifier::General => format!("{{\"type\":\"general\",\"details\":{}}}", general_verifier.show_card()),
-            ValidCurrentVerifier::Custom(a) => format!("{{\"type\":\"custom\",\"details\":{}}}", a.show_card()),
+            ValidCurrentVerifier::General => format!("\"type\":\"general\",\"details\":{}", export_complex_single(general_verifier, |a| a.show_card())),
+            ValidCurrentVerifier::Custom(a) => format!("\"type\":\"custom\",\"details\":{}", export_complex_single(a, |a| a.show_card())),
         }
     }
 }

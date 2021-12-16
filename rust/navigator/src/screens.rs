@@ -24,7 +24,9 @@ pub enum Screen {
     DeriveKey(DeriveState),
     Settings,
     Verifier,
-    ManageNetwork,
+    ManageNetworks,
+    NetworkDetails(NetworkSpecsKey),
+    SelectSeedForBackup,
     Nowhere,
 }
 
@@ -239,7 +241,9 @@ impl Screen {
             Screen::DeriveKey(_) => Some(String::from("DeriveKey")),
             Screen::Settings => Some(String::from("Settings")),
             Screen::Verifier => Some(String::from("Verifier")),
-            Screen::ManageNetwork => Some(String::from("ManageNetwork")),
+            Screen::ManageNetworks => Some(String::from("ManageNetworks")),
+            Screen::NetworkDetails(_) => Some(String::from("NetworkDetails")),
+            Screen::SelectSeedForBackup => Some(String::from("SelectSeedForBackup")),
             Screen::Nowhere => None,
         }
     }
@@ -259,7 +263,9 @@ impl Screen {
             Screen::DeriveKey(_) => "",
             Screen::Settings => "",
             Screen::Verifier => "VERIFIER CERTIFICATE",
-            Screen::ManageNetwork => "MANAGE NETWORKS",
+            Screen::ManageNetworks => "MANAGE NETWORKS",
+            Screen::NetworkDetails(_) => "Network details",
+            Screen::SelectSeedForBackup => "Select seed",
             Screen::Nowhere => "",
         }.to_string()
     }
@@ -279,7 +285,9 @@ impl Screen {
             Screen::DeriveKey(_) => true,
             Screen::Settings => false,
             Screen::Verifier => true,
-            Screen::ManageNetwork => true,
+            Screen::ManageNetworks => true,
+            Screen::NetworkDetails(_) => true,
+            Screen::SelectSeedForBackup => true,
             Screen::Nowhere => false,
         }
     }

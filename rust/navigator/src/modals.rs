@@ -11,6 +11,7 @@ pub enum Modal {
     PasswordConfirm,
     SignatureReady(String),
     EnterPassword,
+    LogRight,
     Empty,
 }
 
@@ -24,6 +25,7 @@ impl Modal {
             Modal::PasswordConfirm => String::from("PasswordConfirm"),
             Modal::SignatureReady(_) => String::from("SignatureReady"),
             Modal::EnterPassword => String::from("EnterPassword"),
+            Modal::LogRight => String::from("LogRight"),
             Modal::Empty => String::from("Empty"),
         }
     }

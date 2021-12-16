@@ -114,7 +114,13 @@ impl State {
                                 Screen::Verifier => {
                                     new_navstate.screen = Screen::Settings;
                                 },
-                                Screen::ManageNetwork => {
+                                Screen::ManageNetworks => {
+                                    new_navstate.screen = Screen::Settings;
+                                },
+                                Screen::NetworkDetails(_) => {
+                                    new_navstate.screen = Screen::ManageNetworks;
+                                },
+                                Screen::SelectSeedForBackup => {
                                     new_navstate.screen = Screen::Settings;
                                 },
                                 _ => {
@@ -286,6 +292,7 @@ impl State {
                 },
                 Action::RightButton => {
                     match &self.navstate.screen {
+                        Screen::Log => new_navstate.modal = Modal::LogRight,
                         Screen::SeedSelector => 
                             if self.navstate.modal == Modal::NewSeedMenu {
                                 new_navstate.modal = Modal::Empty;
@@ -310,6 +317,9 @@ impl State {
                         match &self.navstate.screen {
                             Screen::Keys(ref keys_state) => {
                                 new_navstate.modal = Modal::Backup(keys_state.seed_name());
+                            },
+                            Screen::Settings => {
+                                new_navstate = Navstate::clean_screen(Screen::SelectSeedForBackup);
                             },
                             _ => println!("BackupSeed without seed_name does nothing here"),
                         }
@@ -384,7 +394,23 @@ impl State {
                 },
                 Action::TransactionFetched => {
                     new_navstate = Navstate::clean_screen(Screen::Transaction(TransactionState::new(details_str, dbname)));
-                }
+                },
+                Action::GenerateSufficientCrypto => {
+                    match self.navstate.screen {
+                        Screen::ManageNetworks => {
+                            match NetworkSpecsKey::from_hex(details_str) {
+                                Ok(network_specs_key) => {
+                                    new_navstate = Navstate::clean_screen(Screen::NetworkDetails(network_specs_key))
+                                },
+                                Err(e) => {
+                                    new_navstate.alert = Alert::Error;
+                                    errorline.push_str(&<Signer>::show(&e));
+                                },
+                            }
+                        },
+                        _ => println!("GenerateSufficientCrypto does nothing here"),
+                    }
+                },
                 Action::Nothing => {
                     println!("no action was passed in action");
                 },
@@ -445,10 +471,9 @@ impl State {
                         },
                     }
                 }
-                //Screen::Backup => "this should be popover",
                 Screen::NewSeed => format!("\"keyboard\":{}", new_navstate.keyboard()),
                 Screen::RecoverSeedName => format!("\"keyboard\":{}", new_navstate.keyboard()),
-                Screen::RecoverSeedPhrase(_) => format!("\"keyboard\":{}", new_navstate.keyboard()),
+                Screen::RecoverSeedPhrase(ref seed_name) => format!("\"seed_name\":\"{}\",\"keyboard\":{}", seed_name, new_navstate.keyboard()),
                 Screen::DeriveKey(ref d) => {
                     match db_handling::interface_signer::derive_prep (dbname, &d.seed_name(), &d.network_specs_key(), &details_str) {
                         Ok(a) => {
@@ -462,8 +487,28 @@ impl State {
                     }
                 },
                 //Screen::Settings => "Settings",
-                //Screen::Verifier => "VERIFIER CERTIFICATE",
-                //Screen::ManageNetwork => "MANAGE NETWORKS",
+                Screen::Verifier => {
+                    match db_handling::helpers::get_general_verifier(dbname) {
+                        Ok(a) => a.show_card(),
+                        Err(e) => {
+                            new_navstate.alert = Alert::Error;
+                            errorline.push_str(&<Signer>::show(&e));
+                            "".to_string()
+                        },
+                    }
+                },
+                Screen::ManageNetworks => {
+                    match db_handling::interface_signer::show_all_networks(dbname) {
+                        Ok(a) => a,
+                        Err(e) => {
+                            new_navstate.alert = Alert::Error;
+                            errorline.push_str(&<Signer>::show(&e));
+                            "".to_string()
+                        },
+                    }
+                },
+                //Screen::NetworkDetails(ref network_specs_key) => {
+                //},
                 Screen::Nowhere => "".to_string(),
                 _ => "".to_string(),
             };
@@ -545,7 +590,7 @@ impl State {
         let modal = self.navstate.modal.to_owned();
         let alert = self.navstate.alert;
         if let Some(screen_name) = screen.get_name() {
-            output.push_str(&format!("\"screen\":\"{}\",\"screenLabel\":\"{}\",\"back\":{},\"footer\":{},\"footerButton\":\"{}\",\"rightButton\":\"{}\",\"screenNameType\":\"{}\",", screen_name, self.get_screen_label(), screen.has_back(), true, self.get_active_navbutton(), self.get_right_button(), self.get_screen_name_type()));
+            output.push_str(&format!("\"screen\":\"{}\",\"screenLabel\":\"{}\",\"back\":{},\"footer\":{},\"footerButton\":\"{}\",\"rightButton\":\"{}\",\"screenNameType\":\"{}\",", screen_name, self.get_screen_label(), screen.has_back(), self.get_footer(), self.get_active_navbutton(), self.get_right_button(), self.get_screen_name_type()));
         }
         output.push_str(&format!("\"modal\":\"{}\",", modal.get_name()));
         output.push_str(&format!("\"alert\":\"{}\",", alert.get_name()));
@@ -557,6 +602,28 @@ impl State {
     ///Generate screen label taking into account state
     fn get_screen_label(&self) -> String {
         self.navstate.screen.get_default_label()
+    }
+    
+    fn get_footer(&self) -> bool {
+        match self.navstate.screen {
+            Screen::Log => true,
+            Screen::LogDetails => true,
+            Screen::Scan => true,
+            Screen::Transaction(_) => false,
+            Screen::SeedSelector => true,
+            Screen::Keys(_) => true,
+            Screen::KeyDetails(_) => false,
+            Screen::NewSeed => false,
+            Screen::RecoverSeedName => false,
+            Screen::RecoverSeedPhrase(_) => false,
+            Screen::DeriveKey(_) => false,
+            Screen::Settings => true,
+            Screen::Verifier => false,
+            Screen::ManageNetworks => false,
+            Screen::NetworkDetails(_) => false,
+            Screen::SelectSeedForBackup => false,
+            Screen::Nowhere => true,
+        }
     }
 
     ///Decide which footer button should shine
@@ -574,8 +641,10 @@ impl State {
             Screen::RecoverSeedPhrase(_) => "Keys",
             Screen::DeriveKey(_) => "Keys",
             Screen::Settings => "Settings",
-            Screen::Verifier => "Srttings",
-            Screen::ManageNetwork => "Settings",
+            Screen::Verifier => "Settings",
+            Screen::ManageNetworks => "Settings",
+            Screen::NetworkDetails(_) => "Settings",
+            Screen::SelectSeedForBackup => "Settings",
             Screen::Nowhere => "None",
         }.to_string()
     }
@@ -583,7 +652,7 @@ impl State {
     ///Should header have some button on the right?
     fn get_right_button(&self) -> String {
         match self.navstate.screen {
-            Screen::Log => "None",
+            Screen::Log => "LogRight",
             Screen::LogDetails => "None",
             Screen::Scan => "None",
             Screen::Transaction(_) => "None",
@@ -596,7 +665,9 @@ impl State {
             Screen::DeriveKey(_) => "None",
             Screen::Settings => "None",
             Screen::Verifier => "None",
-            Screen::ManageNetwork => "None",
+            Screen::ManageNetworks => "None",
+            Screen::NetworkDetails(_) => "None",
+            Screen::SelectSeedForBackup => "Backup",
             Screen::Nowhere => "None",
         }.to_string()
     }
@@ -617,7 +688,9 @@ impl State {
             Screen::DeriveKey(_) => "h1",
             Screen::Settings => "h4",
             Screen::Verifier => "h4",
-            Screen::ManageNetwork => "h4",
+            Screen::ManageNetworks => "h4",
+            Screen::NetworkDetails(_) => "h4",
+            Screen::SelectSeedForBackup => "h4",
             Screen::Nowhere => "h4",
         }.to_string()
 

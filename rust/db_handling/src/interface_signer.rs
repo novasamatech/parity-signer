@@ -77,6 +77,17 @@ pub fn show_all_networks_with_flag (database_name: &str, network_specs_key: &Net
     )))
 }
 
+/// Function to print all networks without any selection
+pub fn show_all_networks (database_name: &str) -> Result<String, ErrorSigner> {
+    let networks = get_all_networks(database_name)?;
+    Ok(format!("\"networks\":{}", export_complex_vector(&networks, |a| 
+        {
+            let network_specs_key_current = NetworkSpecsKey::from_parts(&a.genesis_hash.to_vec(), &a.encryption);
+            format!("\"key\":\"{}\",\"title\":\"{}\",\"logo\":\"{}\",\"order\":{}", hex::encode(network_specs_key_current.key()), a.title, a.logo, a.order)
+        }
+    )))
+}
+
 /// Function to sort networks by the order and get the network specs for the first network on the list.
 /// If no networks in the system, throws error
 pub fn first_network (database_name: &str) -> Result<NetworkSpecs, ErrorSigner> {

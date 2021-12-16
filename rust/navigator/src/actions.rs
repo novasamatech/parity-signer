@@ -27,6 +27,7 @@ pub enum Action {
     ChangeNetwork,
     CheckPassword,
     TransactionFetched,
+    GenerateSufficientCrypto,
     Nothing,
 }
 
@@ -55,6 +56,7 @@ impl Action {
             "ChangeNetwork" => Action::ChangeNetwork,
             "CheckPassword" => Action::CheckPassword,
             "TransactionFetched" => Action::TransactionFetched,
+            "GenerateSufficientCrypto" => Action::GenerateSufficientCrypto,
             _ => Action::Nothing,
         }
     }

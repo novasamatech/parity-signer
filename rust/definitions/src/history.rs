@@ -50,7 +50,7 @@ impl MetaValuesExport {
         }
     }
     pub fn show(&self) -> String {
-        format!("\"specname\":\"{}\",\"spec_version\":\"{}\",\"meta_hash\":\"{}\",\"signed_by\":{}", &self.name, &self.version, hex::encode(&self.meta_hash), &self.signed_by.show_card())
+        format!("\"specname\":\"{}\",\"spec_version\":\"{}\",\"meta_hash\":\"{}\",\"signed_by\":{}", &self.name, &self.version, hex::encode(&self.meta_hash), export_complex_single(&self.signed_by, |a| a.show_card()))
     }
 }
 
@@ -92,7 +92,7 @@ impl NetworkSpecsExport {
         }
     }
     pub fn show(&self) -> String {
-        format!("{},\"signed_by\":{}", &self.specs_to_send.show(), &self.signed_by.show_card())
+        format!("{},\"signed_by\":{}", &self.specs_to_send.show(), export_complex_single(&self.signed_by, |a| a.show_card()))
     }
 }
 
@@ -113,7 +113,7 @@ impl NetworkVerifierDisplay {
         }
     }
     pub fn show(&self) -> String {
-        format!("\"genesis_hash\":\"{}\",\"current_verifier\":{}", hex::encode(&self.genesis_hash), &self.valid_current_verifier.show(&self.general_verifier))
+        format!("\"genesis_hash\":\"{}\",\"current_verifier\":{}", hex::encode(&self.genesis_hash), export_complex_single(&self.valid_current_verifier, |a| a.show(&self.general_verifier)))
     }
 }
 
@@ -132,7 +132,7 @@ impl TypesDisplay {
         }
     }
     pub fn show(&self) -> String {
-        format!("\"types_hash\":\"{}\",\"verifier\":{}", hex::encode(&self.types_hash), &self.verifier.show_card())
+        format!("\"types_hash\":\"{}\",\"verifier\":{}", hex::encode(&self.types_hash), export_complex_single(&self.verifier, |a| a.show_card()))
     }
 }
 
@@ -153,7 +153,7 @@ impl TypesExport {
         }
     }
     pub fn show(&self) -> String {
-        format!("\"types_hash\":\"{}\",\"signed_by\":{}", hex::encode(&self.types_hash), &self.signed_by.show_card())
+        format!("\"types_hash\":\"{}\",\"signed_by\":{}", hex::encode(&self.types_hash), export_complex_single(&self.signed_by, |a| a.show_card()))
     }
 }
 
@@ -211,10 +211,10 @@ impl SignDisplay {
         (self.transaction.to_vec(), self.network_name.to_string(), encryption)
     }
     pub fn success(&self) -> String {
-        format!("\"transaction\":\"{}\",\"network_name\":\"{}\",\"signed_by\":{},\"user_comment\":\"{}\"", hex::encode(&self.transaction), &self.network_name, &self.signed_by.show_card(), &self.user_comment)
+        format!("\"transaction\":\"{}\",\"network_name\":\"{}\",\"signed_by\":{},\"user_comment\":\"{}\"", hex::encode(&self.transaction), &self.network_name, export_complex_single(&self.signed_by, |a| a.show_card()), &self.user_comment)
     }
     pub fn pwd_failure(&self) -> String {
-        format!("\"transaction\":\"{}\",\"network_name\":\"{}\",\"signed_by\":{},\"user_comment\":\"{}\",\"error\":\"wrong_password_entered\"", hex::encode(&self.transaction), &self.network_name, &self.signed_by.show_card(), &self.user_comment)
+        format!("\"transaction\":\"{}\",\"network_name\":\"{}\",\"signed_by\":{},\"user_comment\":\"{}\",\"error\":\"wrong_password_entered\"", hex::encode(&self.transaction), &self.network_name, export_complex_single(&self.signed_by, |a| a.show_card()), &self.user_comment)
     }
 }
 
@@ -238,10 +238,10 @@ impl SignMessageDisplay {
         }
     }
     pub fn success(&self) -> String {
-        format!("\"message\":\"{}\",\"network_name\":\"{}\",\"signed_by\":{},\"user_comment\":\"{}\"", hex::encode(&self.message.as_bytes()), &self.network_name, &self.signed_by.show_card(), &self.user_comment)
+        format!("\"message\":\"{}\",\"network_name\":\"{}\",\"signed_by\":{},\"user_comment\":\"{}\"", hex::encode(&self.message.as_bytes()), &self.network_name, export_complex_single(&self.signed_by, |a| a.show_card()), &self.user_comment)
     }
     pub fn pwd_failure(&self) -> String {
-        format!("\"message\":\"{}\",\"network_name\":\"{}\",\"signed_by\":{},\"user_comment\":\"{}\",\"error\":\"wrong_password_entered\"", hex::encode(&self.message.as_bytes()), &self.network_name, &self.signed_by.show_card(), &self.user_comment)
+        format!("\"message\":\"{}\",\"network_name\":\"{}\",\"signed_by\":{},\"user_comment\":\"{}\",\"error\":\"wrong_password_entered\"", hex::encode(&self.message.as_bytes()), &self.network_name, export_complex_single(&self.signed_by, |a| a.show_card()), &self.user_comment)
     }
 }
 
@@ -294,7 +294,7 @@ impl Event {
             Event::NetworkSpecsRemoved(x) => format!("\"event\":\"network_removed\",\"payload\":{}", export_complex_single(x, |a| a.show())),
             Event::NetworkSpecsSigned(x) => format!("\"event\":\"add_specs_message_signed\",\"payload\":{}", export_complex_single(x, |a| a.show())),
             Event::NetworkVerifierSet(x) => format!("\"event\":\"network_verifier_set\",\"payload\":{}", export_complex_single(x, |a| a.show())),
-            Event::GeneralVerifierSet(x) => format!("\"event\":\"general_verifier_added\",\"payload\":{}", x.show_card()),
+            Event::GeneralVerifierSet(x) => format!("\"event\":\"general_verifier_added\",\"payload\":{}", export_complex_single(x, |a| a.show_card())),
             Event::TypesAdded(x) => format!("\"event\":\"types_added\",\"payload\":{}", export_complex_single(x, |a| a.show())),
             Event::TypesRemoved(x) => format!("\"event\":\"types_removed\",\"payload\":{}", export_complex_single(x, |a| a.show())),
             Event::TypesSigned(x) => format!("\"event\":\"load_types_message_signed\",\"payload\":{}", export_complex_single(x, |a| a.show())),
