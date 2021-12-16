@@ -823,7 +823,6 @@ impl ErrorSource for Signer {
                     },
                     InterfaceSigner::PublicKeyLength => String::from("Public key length does not match the encryption."),
                     InterfaceSigner::HistoryPageOutOfRange{page_number, total_pages} => format!("Requested history page {} does not exist. Total number of pages {}.", page_number, total_pages),
-                    InterfaceSigner::ChecksumNotU32 => String::from("Checksum is not u32."),
                     InterfaceSigner::SeedNameNotMatching{address_key, expected_seed_name, real_seed_name} => format!("Expected seed name {} for address key {}. Address details in database have {} name.", expected_seed_name, hex::encode(address_key.key()), real_seed_name),
                     InterfaceSigner::AddressKeyNotInSet{address_key, seed_name} => format!("Address key {} was expected and not found in address key set for seed name {}.", hex::encode(address_key.key()), seed_name),
                     InterfaceSigner::LostPwd => String::from("Derivation had password, then lost it."),
@@ -928,31 +927,31 @@ impl ErrorSource for Signer {
                 format!("Bad input data. {}", insert)
             },
             ErrorSigner::NotFound(a) => {
-                let insert = match a {
-                    NotFoundSigner::CurrentVerifier(verifier_key) => format!("current verifier for network with genesis hash {}", hex::encode(verifier_key.genesis_hash())),
-                    NotFoundSigner::GeneralVerifier => String::from("general verifier"),
-                    NotFoundSigner::Types => String::from("types information"),
-                    NotFoundSigner::NetworkSpecs(network_specs_key) => format!("network specs for network specs key {}", hex::encode(network_specs_key.key())),
-                    NotFoundSigner::NetworkSpecsForName(name) => format!("network specs for {}", name),
-                    NotFoundSigner::NetworkSpecsKeyForAddress{network_specs_key, address_key} => format!("network specs key {} in address details with key {}", hex::encode(network_specs_key.key()), hex::encode(address_key.key())),
-                    NotFoundSigner::AddressDetails(address_key) => format!("address details for address key {}", hex::encode(address_key.key())),
-                    NotFoundSigner::Metadata{name, version} => format!("metadata entry for {}{}", name, version),
-                    NotFoundSigner::DangerStatus => String::from("danger status information"),
-                    NotFoundSigner::Stub => String::from("database temporary entry with information needed for accepting approved information."),
-                    NotFoundSigner::Sign => String::from("database temporary entry with information needed for signing approved transaction."),
-                    NotFoundSigner::HistoryEntry(x) => format!("history entry with order {}", x),
-                    NotFoundSigner::HistoryNetworkSpecs{name, encryption} => format!("Network specs for {} with encryption {} needed to decode historical transaction are not found.", name, encryption.show()),
+                match a {
+                    NotFoundSigner::CurrentVerifier(verifier_key) => format!("Could not find current verifier for network with genesis hash {}.", hex::encode(verifier_key.genesis_hash())),
+                    NotFoundSigner::GeneralVerifier => String::from("Could not find general verifier."),
+                    NotFoundSigner::Types => String::from("Could not find types information."),
+                    NotFoundSigner::NetworkSpecs(network_specs_key) => format!("Could not find network specs for network specs key {}.", hex::encode(network_specs_key.key())),
+                    NotFoundSigner::NetworkSpecsForName(name) => format!("Could not find network specs for {}.", name),
+                    NotFoundSigner::NetworkSpecsKeyForAddress{network_specs_key, address_key} => format!("Could not find network specs key {} in address details with key {}.", hex::encode(network_specs_key.key()), hex::encode(address_key.key())),
+                    NotFoundSigner::AddressDetails(address_key) => format!("Could not find address details for address key {}.", hex::encode(address_key.key())),
+                    NotFoundSigner::Metadata{name, version} => format!("Could not find metadata entry for {}{}.", name, version),
+                    NotFoundSigner::DangerStatus => String::from("Could not find danger status information."),
+                    NotFoundSigner::Stub => String::from("Could not find database temporary entry with information needed for accepting approved information."),
+                    NotFoundSigner::Sign => String::from("Could not find database temporary entry with information needed for signing approved transaction."),
+                    NotFoundSigner::HistoryEntry(x) => format!("Could not find history entry with order {}.", x),
+                    NotFoundSigner::HistoryNetworkSpecs{name, encryption} => format!("Could not find network specs for {} with encryption {} needed to decode historical transaction.", name, encryption.show()),
                     NotFoundSigner::TransactionEvent(x) => format!("Entry with order {} contains no transaction-related events.", x),
                     NotFoundSigner::HistoricalMetadata{name} => format!("Historical transaction was generated in network {} and processed. Currently there are no metadata entries for the network, and transaction could not be processed again. Add network metadata.", name),
-                };
-                format!("Could not find {}.", insert)
+                }
             },
             ErrorSigner::DeadVerifier(key) => format!("Network with genesis hash {} is disabled. It could be enabled again only after complete wipe and re-installation of Signer.", hex::encode(key.genesis_hash())),
             ErrorSigner::AddressGeneration(a) => {
                 let insert = match a {
                     AddressGeneration::Common(a) => a.show(),
                     AddressGeneration::Extra(ExtraAddressGenerationSigner::RandomPhraseGeneration(e)) => format!("Could not create random phrase. {}", e),
-                    AddressGeneration::Extra(ExtraAddressGenerationSigner::InvalidDerivation) =>  String::from("Invalid derivation format"),
+                    AddressGeneration::Extra(ExtraAddressGenerationSigner::RandomPhraseValidation(e)) => format!("Proposed random phrase is invalid. {}", e),
+                    AddressGeneration::Extra(ExtraAddressGenerationSigner::InvalidDerivation) =>  String::from("Invalid derivation format."),
                 };
                 format!("Error generating address. {}", insert)
             },
@@ -1008,7 +1007,6 @@ pub enum InterfaceSigner {
     KeyDecoding(KeyDecodingSignerInterface),
     PublicKeyLength,
     HistoryPageOutOfRange{page_number: u32, total_pages: u32},
-    ChecksumNotU32,
     SeedNameNotMatching{address_key: AddressKey, expected_seed_name: String, real_seed_name: String},
     AddressKeyNotInSet{address_key: AddressKey, seed_name: String},
     LostPwd,
@@ -1161,6 +1159,7 @@ pub enum NotFoundSigner {
 #[derive(Debug)]
 pub enum ExtraAddressGenerationSigner {
     RandomPhraseGeneration(anyhow::Error),
+    RandomPhraseValidation(anyhow::Error),
     InvalidDerivation,
 }
 
