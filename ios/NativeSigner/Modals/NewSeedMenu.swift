@@ -31,7 +31,7 @@ struct NewSeedMenu: View {
                 }
                 .padding(.top, 12)
             }
-            .padding([.leading, .trailing, .top], 16)
+            .padding([.leading, .trailing, .top])
             .padding(.bottom, 24)
             .background(Color("Bg000"))
         }

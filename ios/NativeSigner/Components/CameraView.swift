@@ -14,7 +14,6 @@ struct CameraView: View {
     var body: some View {
         ZStack {
             VStack {
-                Spacer()
                 CameraPreview(session: model.session)
                     .onAppear {
                         model.configure()
@@ -41,21 +40,30 @@ struct CameraView: View {
                 
                 
                // if model.total ?? 0 > 0 {
-                    VStack {
-                        Text("MULTIPART DATA")
+                
+                    VStack (alignment: .leading) {
+                        HeadingOverline(text: "Multipart data")
                         ProgressView(value: min(Float(model.captured ?? 0)/(Float(model.total ?? -1) + 2), 1))
                             .border(Color("Crypto400"))
                             .frame(height: 7.0)
                             .foregroundColor(Color("Crypto400"))
                             .padding(8)
                             .background(Color("Bg100"))
-                        Text(String(model.captured ?? 0) + "/" + String(model.total ?? 0))
-                        Button (action: {
-                            model.reset()
-                        }) {
-                            Text("Start over")
-                        }
+                        Text(String(model.captured ?? 0) + "/" + String(model.total ?? 0) + " complete")
+                            .font(FBase(style: .subtitle1))
+                            .foregroundColor(Color("Text400"))
+                        BigButton(
+                            text: "Start over",
+                            isShaded: true,
+                            action: {
+                                model.reset()
+                            }
+                        )
+                            .padding(.top, 12)
                     }
+                    .padding([.leading, .trailing, .top])
+                    .padding(.bottom, 24)
+                    .background(Color("Bg000"))
               //  }
             }
         }.background(Color("Bg100"))
