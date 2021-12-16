@@ -63,6 +63,10 @@ struct Header: View {
                             Image(systemName: "ellipsis")
                                 .imageScale(.large)
                                 .foregroundColor(Color("Action400"))
+                        case "LogRightButton":
+                            Image(systemName: "ellipsis")
+                                .imageScale(.large)
+                                .foregroundColor(Color("Action400"))
                         default:
                             EmptyView()
                         }

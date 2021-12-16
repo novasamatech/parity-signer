@@ -11,10 +11,7 @@ struct RecoverSeedName: View {
     @EnvironmentObject var data: SignerDataModel
     @State private var seedName: String = ""
     @FocusState private var nameFocused: Bool
-    
-    init() {
-        UITextView.appearance().backgroundColor = .clear
-    }
+    var content: MRecoverSeedName
     
     var body: some View {
         VStack(alignment: .leading) {
@@ -39,11 +36,8 @@ struct RecoverSeedName: View {
                             data.pushButton(buttonID: .GoForward, details: seedName)
                         }
                     }
-                    .onAppear(perform: {nameFocused = true})
+                    .onAppear(perform: {nameFocused = content.keyboard})
                     .padding(.horizontal, 8)
-                    .onDisappear {
-                        nameFocused = false
-                    }
             }
             Text("Display name visible only to you").font(.callout)
             Text(data.lastError).foregroundColor(Color("SignalDanger"))

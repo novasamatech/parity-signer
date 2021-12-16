@@ -40,6 +40,9 @@
 		2D48F394276A1D20004B27BE /* MEnterPassword.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D48F393276A1D20004B27BE /* MEnterPassword.swift */; };
 		2D48F396276A2003004B27BE /* SignatureReady.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D48F395276A2003004B27BE /* SignatureReady.swift */; };
 		2D48F398276A200F004B27BE /* EnterPassword.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D48F397276A200F004B27BE /* EnterPassword.swift */; };
+		2D48F39A276B5916004B27BE /* MNewSeed.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D48F399276B5916004B27BE /* MNewSeed.swift */; };
+		2D48F39C276B5C0C004B27BE /* MRecoverSeedName.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D48F39B276B5C0C004B27BE /* MRecoverSeedName.swift */; };
+		2D48F39E276B5C1A004B27BE /* MRecoverSeedPhrase.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D48F39D276B5C1A004B27BE /* MRecoverSeedPhrase.swift */; };
 		2D72B4F626EF3BC50081E879 /* Navigator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D72B4F526EF3BC50081E879 /* Navigator.swift */; };
 		2D72B4FA26EF7D1C0081E879 /* Seeds.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D72B4F926EF7D1C0081E879 /* Seeds.swift */; };
 		2D72D52A2732B8A7004BA7C9 /* Database in Resources */ = {isa = PBXBuildFile; fileRef = 2D72D5292732B8A7004BA7C9 /* Database */; };
@@ -172,6 +175,9 @@
 		2D48F393276A1D20004B27BE /* MEnterPassword.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MEnterPassword.swift; sourceTree = "<group>"; };
 		2D48F395276A2003004B27BE /* SignatureReady.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignatureReady.swift; sourceTree = "<group>"; };
 		2D48F397276A200F004B27BE /* EnterPassword.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EnterPassword.swift; sourceTree = "<group>"; };
+		2D48F399276B5916004B27BE /* MNewSeed.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MNewSeed.swift; sourceTree = "<group>"; };
+		2D48F39B276B5C0C004B27BE /* MRecoverSeedName.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MRecoverSeedName.swift; sourceTree = "<group>"; };
+		2D48F39D276B5C1A004B27BE /* MRecoverSeedPhrase.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MRecoverSeedPhrase.swift; sourceTree = "<group>"; };
 		2D72B4F526EF3BC50081E879 /* Navigator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Navigator.swift; sourceTree = "<group>"; };
 		2D72B4F926EF7D1C0081E879 /* Seeds.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Seeds.swift; sourceTree = "<group>"; };
 		2D72D5292732B8A7004BA7C9 /* Database */ = {isa = PBXFileReference; lastKnownFileType = folder; path = Database; sourceTree = "<group>"; };
@@ -410,7 +416,10 @@
 			isa = PBXGroup;
 			children = (
 				2DA5F8952759576B00D8DD29 /* MLog.swift */,
+				2D48F399276B5916004B27BE /* MNewSeed.swift */,
 				2D48F372276793D3004B27BE /* MDeriveKey.swift */,
+				2D48F39B276B5C0C004B27BE /* MRecoverSeedName.swift */,
+				2D48F39D276B5C1A004B27BE /* MRecoverSeedPhrase.swift */,
 				2D48F3642762407A004B27BE /* MKeyDetais.swift */,
 				2D48F38F276A1527004B27BE /* MTransaction.swift */,
 				2D48F35C2760ED38004B27BE /* MKeys.swift */,
@@ -709,6 +718,7 @@
 			files = (
 				2DA5F89D275F874D00D8DD29 /* NetworkManager.swift in Sources */,
 				2D48F38727691C12004B27BE /* ShieldAlert.swift in Sources */,
+				2D48F39C276B5C0C004B27BE /* MRecoverSeedName.swift in Sources */,
 				2DA5F87627566D7C00D8DD29 /* TransactionPreview.swift in Sources */,
 				2DA5F85E27566C3600D8DD29 /* TCFieldName.swift in Sources */,
 				2D48F3712767514B004B27BE /* MPasswordConfirm.swift in Sources */,
@@ -727,6 +737,7 @@
 				2DA5F88E2757694A00D8DD29 /* LandingView.swift in Sources */,
 				2DA5F8782756749B00D8DD29 /* SeedManager.swift in Sources */,
 				2DA5F8822756A2DE00D8DD29 /* AddressCard.swift in Sources */,
+				2D48F39E276B5C1A004B27BE /* MRecoverSeedPhrase.swift in Sources */,
 				2DA5F8252756624000D8DD29 /* NavbarShield.swift in Sources */,
 				2D48F3572760BBEC004B27BE /* RecoverSeedName.swift in Sources */,
 				2D48F3532760A2D8004B27BE /* Fonts.swift in Sources */,
@@ -782,6 +793,7 @@
 				2DA5F86627566C3600D8DD29 /* TCText.swift in Sources */,
 				2DA5F82B2756631D00D8DD29 /* KeyManager.swift in Sources */,
 				2DE72C0F26A99885002BB752 /* RustNative.swift in Sources */,
+				2D48F39A276B5916004B27BE /* MNewSeed.swift in Sources */,
 				2D48F394276A1D20004B27BE /* MEnterPassword.swift in Sources */,
 				2DA5F86127566C3600D8DD29 /* TCBalance.swift in Sources */,
 				2DA5F87127566C3600D8DD29 /* TCVarName.swift in Sources */,

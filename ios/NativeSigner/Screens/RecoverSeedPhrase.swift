@@ -14,16 +14,13 @@ struct RecoverSeedPhrase: View {
     @State private var guessWord: [String] = []
     @FocusState private var focus: Bool
     let allowedLendth = [12, 24]
-    
-    init() {
-        UITextView.appearance().backgroundColor = .clear
-    }
+    var content: MRecoverSeedPhrase
     
     var body: some View {
         ZStack{
             VStack {
                 //SeedNameCardOfSomeKind
-                Text("Seedname something")
+                //Text(content.seed_name)
                 VStack(alignment: .leading) {
                     Text("SEED PHRASE").font(FBase(style: .overline))
                     ZStack {
@@ -66,12 +63,9 @@ struct RecoverSeedPhrase: View {
                             }
                             .onAppear(perform: {
                                 guessWord = data.guessWord(word: "")
-                                focus = true
+                                focus = content.keyboard
                             })
                             .padding(.horizontal, 8)
-                            .onDisappear {
-                                focus = false
-                            }
                     }
                     ScrollView(.horizontal) {
                         LazyHStack {
