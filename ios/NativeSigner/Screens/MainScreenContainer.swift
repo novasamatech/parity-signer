@@ -30,10 +30,12 @@ struct MainScreenContainer: View {
                     })
                 )
                 //Certain places are better off without footer
-                Footer()
-                    .padding(.horizontal)
-                    .padding(.vertical, 8)
-                    .background(Color("Bg000"))
+                if data.actionResult.footer {
+                    Footer()
+                        .padding(.horizontal)
+                        .padding(.vertical, 8)
+                        .background(Color("Bg000"))
+                }
             }
         } else {
             if (data.protected) {
