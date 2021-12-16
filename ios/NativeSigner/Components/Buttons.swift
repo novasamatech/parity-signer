@@ -13,7 +13,7 @@ struct BigButtonStyle: ButtonStyle {
 
     func makeBody(configuration: Self.Configuration) -> some View {
         configuration.label
-            .padding(10)
+            .padding(12)
             .background(
                 RoundedRectangle(
                     cornerRadius: 8,
@@ -34,7 +34,7 @@ struct BigButton: View {
     var isDisabled: Bool = false
     
     var body: some View {
-        let accentColor = isCrypto ? Color("Action400") : Color("Crypto400")
+        let accentColor = isCrypto ? Color("Crypto400") : Color("Action400")
         let bgColor = isDisabled
             ? Color("Bg200")
             : isShaded ? Color("Bg300") : accentColor
