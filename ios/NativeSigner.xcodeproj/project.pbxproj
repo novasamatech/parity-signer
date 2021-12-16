@@ -10,6 +10,7 @@
 		04197D20276A0890003485D2 /* RobotoMono-Light.otf in Resources */ = {isa = PBXBuildFile; fileRef = 04197D1E276A0890003485D2 /* RobotoMono-Light.otf */; };
 		04197D21276A0890003485D2 /* RobotoMono-Medium.otf in Resources */ = {isa = PBXBuildFile; fileRef = 04197D1F276A0890003485D2 /* RobotoMono-Medium.otf */; };
 		04197D27276A41E7003485D2 /* SettingsCardTemplate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04197D26276A41E7003485D2 /* SettingsCardTemplate.swift */; };
+		04197D2B276BA40C003485D2 /* MenuElements.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04197D2A276BA40C003485D2 /* MenuElements.swift */; };
 		0452BC522762679F00C6DD37 /* Inter-Bold.otf in Resources */ = {isa = PBXBuildFile; fileRef = 0452BC4E2762679F00C6DD37 /* Inter-Bold.otf */; };
 		0452BC532762679F00C6DD37 /* Inter-SemiBold.otf in Resources */ = {isa = PBXBuildFile; fileRef = 0452BC4F2762679F00C6DD37 /* Inter-SemiBold.otf */; };
 		0452BC542762679F00C6DD37 /* Inter-Medium.otf in Resources */ = {isa = PBXBuildFile; fileRef = 0452BC502762679F00C6DD37 /* Inter-Medium.otf */; };
@@ -145,6 +146,7 @@
 		04197D1E276A0890003485D2 /* RobotoMono-Light.otf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "RobotoMono-Light.otf"; sourceTree = "<group>"; };
 		04197D1F276A0890003485D2 /* RobotoMono-Medium.otf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "RobotoMono-Medium.otf"; sourceTree = "<group>"; };
 		04197D26276A41E7003485D2 /* SettingsCardTemplate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SettingsCardTemplate.swift; sourceTree = "<group>"; };
+		04197D2A276BA40C003485D2 /* MenuElements.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MenuElements.swift; sourceTree = "<group>"; };
 		0452BC4E2762679F00C6DD37 /* Inter-Bold.otf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Inter-Bold.otf"; sourceTree = "<group>"; };
 		0452BC4F2762679F00C6DD37 /* Inter-SemiBold.otf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Inter-SemiBold.otf"; sourceTree = "<group>"; };
 		0452BC502762679F00C6DD37 /* Inter-Medium.otf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Inter-Medium.otf"; sourceTree = "<group>"; };
@@ -362,6 +364,7 @@
 				2DA5F820275652EE00D8DD29 /* Footer.swift */,
 				2DA5F8302756652600D8DD29 /* CameraView.swift */,
 				2DA5F8A0275F889400D8DD29 /* Headers.swift */,
+				04197D2A276BA40C003485D2 /* MenuElements.swift */,
 				0452BC562767B26600C6DD37 /* Buttons.swift */,
 				2D48F35027609CDE004B27BE /* HistoryCard.swift */,
 				2DA5F8852756A44600D8DD29 /* AddressCardControls.swift */,
@@ -747,6 +750,7 @@
 				2DA5F8412756687200D8DD29 /* TransactionCardView.swift in Sources */,
 				2DA5F86A27566C3600D8DD29 /* TCNewSpecs.swift in Sources */,
 				2D72B4FA26EF7D1C0081E879 /* Seeds.swift in Sources */,
+				04197D2B276BA40C003485D2 /* MenuElements.swift in Sources */,
 				2D48F3652762407A004B27BE /* MKeyDetais.swift in Sources */,
 				2DA5F86927566C3600D8DD29 /* TCEraImmortal.swift in Sources */,
 				2D7A7BD626C1126C0053C1E0 /* Utils.swift in Sources */,

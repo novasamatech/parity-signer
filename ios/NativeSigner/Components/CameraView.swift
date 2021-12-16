@@ -52,14 +52,15 @@ struct CameraView: View {
                         Text(String(model.captured ?? 0) + "/" + String(model.total ?? 0) + " complete")
                             .font(FBase(style: .subtitle1))
                             .foregroundColor(Color("Text400"))
-                        BigButton(
-                            text: "Start over",
-                            isShaded: true,
-                            action: {
-                                model.reset()
-                            }
-                        )
-                            .padding(.top, 12)
+                        MenuButtonsStack {
+                            BigButton(
+                                text: "Start over",
+                                isShaded: true,
+                                action: {
+                                    model.reset()
+                                }
+                            )
+                        }
                     }
                     .padding([.leading, .trailing, .top])
                     .padding(.bottom, 24)

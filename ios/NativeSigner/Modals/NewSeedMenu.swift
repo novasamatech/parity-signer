@@ -14,7 +14,7 @@ struct NewSeedMenu: View {
             Spacer()
             VStack {
                 HeaderBar(line1: "ADD SEED", line2: "Select seed addition method" )
-                VStack (spacing: 16) {
+                MenuButtonsStack {
                     BigButton(
                         text: "New seed",
                         action: {
@@ -29,7 +29,6 @@ struct NewSeedMenu: View {
                         }
                     )
                 }
-                .padding(.top, 12)
             }
             .padding([.leading, .trailing, .top])
             .padding(.bottom, 24)
