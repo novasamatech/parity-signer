@@ -13,14 +13,9 @@ struct BigButtonStyle: ButtonStyle {
 
     func makeBody(configuration: Self.Configuration) -> some View {
         configuration.label
-            .padding(10)
-            .background(
-                RoundedRectangle(
-                    cornerRadius: 8,
-                    style: .continuous
-                )
-                .fill(bgColor)
-            )
+            .padding(12)
+            .background(bgColor)
+            .cornerRadius(8)
             .foregroundColor(fgColor)
     }
 }
@@ -28,16 +23,21 @@ struct BigButtonStyle: ButtonStyle {
 struct BigButton: View {
     var text: String
     var isShaded: Bool = false
+    var isCrypto: Bool = false
+    var isDangerous: Bool = false
     var action: ()->Void
     var isDisabled: Bool = false
     
     var body: some View {
+        let accentColor = isCrypto ? Color("Crypto400") : Color("Action400")
         let bgColor = isDisabled
             ? Color("Bg200")
-            : isShaded ? Color("Bg300") : Color("Action400")
+            : isShaded ? Color("Bg300") : accentColor
         let fgColor = isDisabled
             ? Color("Text300")
-            : isShaded ? Color("Action400") : Color("Action600")
+            : isShaded
+                ? isDangerous ? Color("SignalDanger") : accentColor
+                : Color("Action600")
         
         Button(action: action) {
             HStack {

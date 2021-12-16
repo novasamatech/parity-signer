@@ -10,6 +10,8 @@
 		04197D20276A0890003485D2 /* RobotoMono-Light.otf in Resources */ = {isa = PBXBuildFile; fileRef = 04197D1E276A0890003485D2 /* RobotoMono-Light.otf */; };
 		04197D21276A0890003485D2 /* RobotoMono-Medium.otf in Resources */ = {isa = PBXBuildFile; fileRef = 04197D1F276A0890003485D2 /* RobotoMono-Medium.otf */; };
 		04197D27276A41E7003485D2 /* SettingsCardTemplate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04197D26276A41E7003485D2 /* SettingsCardTemplate.swift */; };
+		04197D2B276BA40C003485D2 /* MenuElements.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04197D2A276BA40C003485D2 /* MenuElements.swift */; };
+		04197D2D276BB683003485D2 /* StyleModiefiers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04197D2C276BB683003485D2 /* StyleModiefiers.swift */; };
 		0452BC522762679F00C6DD37 /* Inter-Bold.otf in Resources */ = {isa = PBXBuildFile; fileRef = 0452BC4E2762679F00C6DD37 /* Inter-Bold.otf */; };
 		0452BC532762679F00C6DD37 /* Inter-SemiBold.otf in Resources */ = {isa = PBXBuildFile; fileRef = 0452BC4F2762679F00C6DD37 /* Inter-SemiBold.otf */; };
 		0452BC542762679F00C6DD37 /* Inter-Medium.otf in Resources */ = {isa = PBXBuildFile; fileRef = 0452BC502762679F00C6DD37 /* Inter-Medium.otf */; };
@@ -111,7 +113,7 @@
 		2DA5F898275F865400D8DD29 /* ModalSelector.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2DA5F897275F865400D8DD29 /* ModalSelector.swift */; };
 		2DA5F89D275F874D00D8DD29 /* NetworkManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2DA5F89C275F874D00D8DD29 /* NetworkManager.swift */; };
 		2DA5F89F275F885400D8DD29 /* NewSeedMenu.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2DA5F89E275F885400D8DD29 /* NewSeedMenu.swift */; };
-		2DA5F8A1275F889400D8DD29 /* HeaderBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2DA5F8A0275F889400D8DD29 /* HeaderBar.swift */; };
+		2DA5F8A1275F889400D8DD29 /* Headers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2DA5F8A0275F889400D8DD29 /* Headers.swift */; };
 		2DB037BF270F12DF00A318B2 /* Web3-Regular.otf in Resources */ = {isa = PBXBuildFile; fileRef = 2DB037BE270F12DF00A318B2 /* Web3-Regular.otf */; };
 		2DE72BC226A588C7002BB752 /* NativeSignerApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2DE72BC126A588C7002BB752 /* NativeSignerApp.swift */; };
 		2DE72BC426A588C7002BB752 /* MainScreenContainer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2DE72BC326A588C7002BB752 /* MainScreenContainer.swift */; };
@@ -145,6 +147,8 @@
 		04197D1E276A0890003485D2 /* RobotoMono-Light.otf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "RobotoMono-Light.otf"; sourceTree = "<group>"; };
 		04197D1F276A0890003485D2 /* RobotoMono-Medium.otf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "RobotoMono-Medium.otf"; sourceTree = "<group>"; };
 		04197D26276A41E7003485D2 /* SettingsCardTemplate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SettingsCardTemplate.swift; sourceTree = "<group>"; };
+		04197D2A276BA40C003485D2 /* MenuElements.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MenuElements.swift; sourceTree = "<group>"; };
+		04197D2C276BB683003485D2 /* StyleModiefiers.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = StyleModiefiers.swift; sourceTree = "<group>"; };
 		0452BC4E2762679F00C6DD37 /* Inter-Bold.otf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Inter-Bold.otf"; sourceTree = "<group>"; };
 		0452BC4F2762679F00C6DD37 /* Inter-SemiBold.otf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Inter-SemiBold.otf"; sourceTree = "<group>"; };
 		0452BC502762679F00C6DD37 /* Inter-Medium.otf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Inter-Medium.otf"; sourceTree = "<group>"; };
@@ -246,7 +250,7 @@
 		2DA5F897275F865400D8DD29 /* ModalSelector.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ModalSelector.swift; sourceTree = "<group>"; };
 		2DA5F89C275F874D00D8DD29 /* NetworkManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NetworkManager.swift; sourceTree = "<group>"; };
 		2DA5F89E275F885400D8DD29 /* NewSeedMenu.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewSeedMenu.swift; sourceTree = "<group>"; };
-		2DA5F8A0275F889400D8DD29 /* HeaderBar.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HeaderBar.swift; sourceTree = "<group>"; };
+		2DA5F8A0275F889400D8DD29 /* Headers.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Headers.swift; sourceTree = "<group>"; };
 		2DB037BE270F12DF00A318B2 /* Web3-Regular.otf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Web3-Regular.otf"; sourceTree = "<group>"; };
 		2DE72BBE26A588C7002BB752 /* NativeSigner.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = NativeSigner.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		2DE72BC126A588C7002BB752 /* NativeSignerApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NativeSignerApp.swift; sourceTree = "<group>"; };
@@ -361,7 +365,9 @@
 			children = (
 				2DA5F820275652EE00D8DD29 /* Footer.swift */,
 				2DA5F8302756652600D8DD29 /* CameraView.swift */,
-				2DA5F8A0275F889400D8DD29 /* HeaderBar.swift */,
+				2DA5F8A0275F889400D8DD29 /* Headers.swift */,
+				04197D2A276BA40C003485D2 /* MenuElements.swift */,
+				04197D2C276BB683003485D2 /* StyleModiefiers.swift */,
 				0452BC562767B26600C6DD37 /* Buttons.swift */,
 				2D48F35027609CDE004B27BE /* HistoryCard.swift */,
 				2DA5F8852756A44600D8DD29 /* AddressCardControls.swift */,
@@ -732,7 +738,8 @@
 				2D48F36D27636092004B27BE /* MBackup.swift in Sources */,
 				2DA5F8882756A70300D8DD29 /* SeedBackup.swift in Sources */,
 				2DA5F85F27566C3600D8DD29 /* TCTypesInfo.swift in Sources */,
-				2DA5F8A1275F889400D8DD29 /* HeaderBar.swift in Sources */,
+				2DA5F8A1275F889400D8DD29 /* Headers.swift in Sources */,
+				04197D2D276BB683003485D2 /* StyleModiefiers.swift in Sources */,
 				2DA5F82D2756634900D8DD29 /* SettingsScreen.swift in Sources */,
 				2DA5F88E2757694A00D8DD29 /* LandingView.swift in Sources */,
 				2DA5F8782756749B00D8DD29 /* SeedManager.swift in Sources */,
@@ -747,6 +754,7 @@
 				2DA5F8412756687200D8DD29 /* TransactionCardView.swift in Sources */,
 				2DA5F86A27566C3600D8DD29 /* TCNewSpecs.swift in Sources */,
 				2D72B4FA26EF7D1C0081E879 /* Seeds.swift in Sources */,
+				04197D2B276BA40C003485D2 /* MenuElements.swift in Sources */,
 				2D48F3652762407A004B27BE /* MKeyDetais.swift in Sources */,
 				2DA5F86927566C3600D8DD29 /* TCEraImmortal.swift in Sources */,
 				2D7A7BD626C1126C0053C1E0 /* Utils.swift in Sources */,
