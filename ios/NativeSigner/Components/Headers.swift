@@ -22,10 +22,13 @@ struct HeaderBar: View {
     var line1: String
     var line2: String
     var body: some View {
-        VStack (alignment: .leading) {
+        VStack (alignment: .leading, spacing: 2) {
             HeadingOverline(text: line1)
-            Text(line2).foregroundColor(Color("Text400")).font(FBase(style: .subtitle2))
+            Text(line2)
+                .foregroundColor(Color("Text400"))
+                .font(FBase(style: .subtitle2))
             Divider()
+                .padding(.top, 6)
         }
         .font(.caption)
     }

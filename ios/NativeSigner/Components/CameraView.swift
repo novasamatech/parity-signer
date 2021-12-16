@@ -41,14 +41,12 @@ struct CameraView: View {
                 
                // if model.total ?? 0 > 0 {
                 
-                    VStack (alignment: .leading) {
-                        HeadingOverline(text: "Multipart data")
+                    MenuStack {
+                        HeadingOverline(text: "Multipart data").padding(.top, 12)
                         ProgressView(value: min(Float(model.captured ?? 0)/(Float(model.total ?? -1) + 2), 1))
                             .border(Color("Crypto400"))
-                            .frame(height: 7.0)
                             .foregroundColor(Color("Crypto400"))
-                            .padding(8)
-                            .background(Color("Bg100"))
+                            .padding(.vertical, 8)
                         Text(String(model.captured ?? 0) + "/" + String(model.total ?? 0) + " complete")
                             .font(FBase(style: .subtitle1))
                             .foregroundColor(Color("Text400"))
@@ -62,9 +60,6 @@ struct CameraView: View {
                             )
                         }
                     }
-                    .padding([.leading, .trailing, .top])
-                    .padding(.bottom, 24)
-                    .background(Color("Bg000"))
               //  }
             }
         }.background(Color("Bg100"))
