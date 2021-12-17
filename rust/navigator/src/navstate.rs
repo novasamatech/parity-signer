@@ -10,7 +10,7 @@ use crate::alerts::Alert;
 
 //use plot_icon;
 use db_handling;
-use definitions::{error::{ErrorSource, Signer}, keyring::NetworkSpecsKey};
+use definitions::{error::{ErrorSigner, ErrorSource, InterfaceSigner, Signer}, keyring::NetworkSpecsKey};
 use transaction_parsing;
 use transaction_signing;
 
@@ -252,6 +252,17 @@ impl State {
                                 transaction_parsing::Action::Read(_) => println!("GoForward does nothing here"),
                             }
                         },
+                        Screen::ManageNetworks => {
+                            match NetworkSpecsKey::from_hex(details_str) {
+                                Ok(network_specs_key) => {
+                                    new_navstate = Navstate::clean_screen(Screen::NetworkDetails(network_specs_key))
+                                },
+                                Err(e) => {
+                                    new_navstate.alert = Alert::Error;
+                                    errorline.push_str(&<Signer>::show(&e));
+                                },
+                            }
+                        },
                         _ => println!("GoForward does nothing here"),
                     };
                 },
@@ -293,13 +304,21 @@ impl State {
                 Action::RightButton => {
                     match &self.navstate.screen {
                         Screen::Log => new_navstate.modal = Modal::LogRight,
-                        Screen::SeedSelector => 
+                        Screen::SeedSelector => {
                             if self.navstate.modal == Modal::NewSeedMenu {
                                 new_navstate.modal = Modal::Empty;
                             } else {
                                 new_navstate.modal = Modal::NewSeedMenu;
-                            },
-                        Screen::Keys(a) => new_navstate.modal = Modal::SeedMenu,
+                            }
+                        },
+                        Screen::Keys(_) => new_navstate.modal = Modal::SeedMenu,
+                        Screen::NetworkDetails(_) => {
+                            if self.navstate.modal == Modal::NetworkDetailsMenu {
+                                new_navstate.modal = Modal::Empty;
+                            } else {
+                                new_navstate.modal = Modal::NetworkDetailsMenu;
+                            }
+                        },
                         _ => {},
                     }
                 },
@@ -395,12 +414,12 @@ impl State {
                 Action::TransactionFetched => {
                     new_navstate = Navstate::clean_screen(Screen::Transaction(TransactionState::new(details_str, dbname)));
                 },
-                Action::GenerateSufficientCrypto => {
+                Action::RemoveNetwork => {
                     match self.navstate.screen {
-                        Screen::ManageNetworks => {
-                            match NetworkSpecsKey::from_hex(details_str) {
-                                Ok(network_specs_key) => {
-                                    new_navstate = Navstate::clean_screen(Screen::NetworkDetails(network_specs_key))
+                        Screen::NetworkDetails(ref network_specs_key) => {
+                            match db_handling::remove_network::remove_network(&network_specs_key, dbname) {
+                                Ok(()) => {
+                                    new_navstate = Navstate::clean_screen(Screen::Log);
                                 },
                                 Err(e) => {
                                     new_navstate.alert = Alert::Error;
@@ -408,7 +427,69 @@ impl State {
                                 },
                             }
                         },
-                        _ => println!("GenerateSufficientCrypto does nothing here"),
+                        _ => println!("RemoveNetwork does nothing here"),
+                    }
+                },
+                Action::RemoveMetadata => {
+                    match self.navstate.screen {
+                        Screen::NetworkDetails(ref network_specs_key) => {
+                            match self.navstate.modal {
+                                Modal::ManageMetadata(network_version) => {
+                                    match db_handling::remove_network::remove_metadata(&network_specs_key, network_version, dbname) {
+                                        Ok(()) => {
+                                            new_navstate = Navstate::clean_screen(Screen::Log);
+                                        },
+                                        Err(e) => {
+                                            new_navstate.alert = Alert::Error;
+                                            errorline.push_str(&<Signer>::show(&e));
+                                        },
+                                    }
+                                },
+                                _ => println!("RemoveMetadata does nothing here"),
+                            }
+                        },
+                        _ => println!("RemoveMetadata does nothing here"),
+                    }
+                },
+                Action::SignNetworkSpecs => {
+                    match self.navstate.screen {
+                        Screen::NetworkDetails(ref network_specs_key) => {
+                            
+                        },
+                        _ => println!("SignNetworkSpecs does nothing here"),
+                    }
+                },
+                Action::SignMetadata => {},
+                Action::ManageNetworks => {
+                    match self.navstate.screen {
+                        Screen::Settings => {
+                            new_navstate = Navstate::clean_screen(Screen::ManageNetworks);
+                        },
+                        _ => println!("ManageNetworks does nothing here"),
+                    }
+                },
+                Action::ViewGeneralVerifier => {
+                    match self.navstate.screen {
+                        Screen::Settings => {
+                            new_navstate = Navstate::clean_screen(Screen::Verifier);
+                        },
+                        _ => println!("ViewGeneralVerifier does nothing here"),
+                    }
+                },
+                Action::ManageMetadata => {
+                    match self.navstate.screen {
+                        Screen::NetworkDetails(ref network_specs_key) => {
+                            match details_str.parse::<u32>() {
+                                Ok(version) => {
+                                    new_navstate.modal = Modal::ManageMetadata(version);
+                                },
+                                Err(_) => {
+                                    new_navstate.alert = Alert::Error;
+                                    errorline.push_str(&<Signer>::show(&ErrorSigner::Interface(InterfaceSigner::VersionNotU32(details_str.to_string()))));
+                                },
+                            }
+                        },
+                        _ => println!("ManageMetadata does nothing here"),
                     }
                 },
                 Action::Nothing => {
@@ -507,8 +588,16 @@ impl State {
                         },
                     }
                 },
-                //Screen::NetworkDetails(ref network_specs_key) => {
-                //},
+                Screen::NetworkDetails(ref network_specs_key) => {
+                    match db_handling::interface_signer::network_details_by_key(dbname, &network_specs_key) {
+                        Ok(a) => a,
+                        Err(e) => {
+                            new_navstate.alert = Alert::Error;
+                            errorline.push_str(&<Signer>::show(&e));
+                            "".to_string()
+                        },
+                    }
+                },
                 Screen::Nowhere => "".to_string(),
                 _ => "".to_string(),
             };
@@ -557,6 +646,21 @@ impl State {
                         Screen::Transaction(ref t) => {
                             if let transaction_parsing::Action::Sign{content: _, checksum: _, has_pwd: _, author_info, network_info: _} = t.action() {format!("\"author_info\":{{{}}},\"counter\":{}", author_info, t.counter())}
                             else {"".to_string()}
+                        },
+                        _ => "".to_string(),
+                    }
+                },
+                Modal::ManageMetadata(network_version) => {
+                    match new_navstate.screen {
+                        Screen::NetworkDetails(ref network_specs_key) => {
+                            match db_handling::interface_signer::metadata_details(dbname, network_specs_key, network_version) {
+                                Ok(a) => a,
+                                Err(e) => {
+                                    new_navstate.alert = Alert::Error;
+                                    errorline.push_str(&<Signer>::show(&e));
+                                    "".to_string()
+                                },
+                            }
                         },
                         _ => "".to_string(),
                     }

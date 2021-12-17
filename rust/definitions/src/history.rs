@@ -3,8 +3,9 @@ use blake2_rfc::blake2b::blake2b;
 use parity_scale_codec_derive::{Decode, Encode};
 use sp_core;
 use sp_runtime::MultiSigner;
-use crate::{crypto::Encryption, keyring::VerifierKey, metadata::MetaValues, network_specs::{NetworkSpecs, NetworkSpecsToSend, ValidCurrentVerifier, Verifier, VerifierValue}, print::{export_complex_single, export_complex_vector}, qr_transfers::{ContentLoadTypes}};
 use std::convert::TryInto;
+
+use crate::{crypto::Encryption, helpers::{pic_meta, pic_types}, keyring::VerifierKey, metadata::MetaValues, network_specs::{NetworkSpecs, NetworkSpecsToSend, ValidCurrentVerifier, Verifier, VerifierValue}, print::{export_complex_single, export_complex_vector}, qr_transfers::{ContentLoadTypes}};
 
 /// History log entry content for importing or removing metadata of a known network.
 /// Contains network name, network version, metadata hash, verifier.
@@ -24,7 +25,11 @@ impl MetaValuesDisplay {
         }
     }
     pub fn show(&self) -> String {
-        format!("\"specname\":\"{}\",\"spec_version\":\"{}\",\"meta_hash\":\"{}\"", &self.name, &self.version, hex::encode(&self.meta_hash))
+        let meta_id_pic = match pic_meta(&self.meta_hash) {
+            Ok(a) => hex::encode(a),
+            Err(_) => String::new(),
+        };
+        format!("\"specname\":\"{}\",\"spec_version\":\"{}\",\"meta_hash\":\"{}\",\"meta_id_pic\":\"{}\"", &self.name, &self.version, hex::encode(&self.meta_hash), meta_id_pic)
     }
 }
 
@@ -50,7 +55,11 @@ impl MetaValuesExport {
         }
     }
     pub fn show(&self) -> String {
-        format!("\"specname\":\"{}\",\"spec_version\":\"{}\",\"meta_hash\":\"{}\",\"signed_by\":{}", &self.name, &self.version, hex::encode(&self.meta_hash), export_complex_single(&self.signed_by, |a| a.show_card()))
+        let meta_id_pic = match pic_meta(&self.meta_hash) {
+            Ok(a) => hex::encode(a),
+            Err(_) => String::new(),
+        };
+        format!("\"specname\":\"{}\",\"spec_version\":\"{}\",\"meta_hash\":\"{}\",\"meta_id_pic\":\"{}\",\"signed_by\":{}", &self.name, &self.version, hex::encode(&self.meta_hash), meta_id_pic, export_complex_single(&self.signed_by, |a| a.show_card()))
     }
 }
 
@@ -132,7 +141,11 @@ impl TypesDisplay {
         }
     }
     pub fn show(&self) -> String {
-        format!("\"types_hash\":\"{}\",\"verifier\":{}", hex::encode(&self.types_hash), export_complex_single(&self.verifier, |a| a.show_card()))
+        let types_id_pic = match pic_types(&self.types_hash) {
+            Ok(a) => hex::encode(a),
+            Err(_) => String::new(),
+        };
+        format!("\"types_hash\":\"{}\",\"types_id_pic\":\"{}\",\"verifier\":{}", hex::encode(&self.types_hash), types_id_pic, export_complex_single(&self.verifier, |a| a.show_card()))
     }
 }
 
@@ -153,7 +166,11 @@ impl TypesExport {
         }
     }
     pub fn show(&self) -> String {
-        format!("\"types_hash\":\"{}\",\"signed_by\":{}", hex::encode(&self.types_hash), export_complex_single(&self.signed_by, |a| a.show_card()))
+        let types_id_pic = match pic_types(&self.types_hash) {
+            Ok(a) => hex::encode(a),
+            Err(_) => String::new(),
+        };
+        format!("\"types_hash\":\"{}\",\"types_id_pic\":\"{}\",\"signed_by\":{}", hex::encode(&self.types_hash), types_id_pic, export_complex_single(&self.signed_by, |a| a.show_card()))
     }
 }
 

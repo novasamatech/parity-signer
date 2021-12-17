@@ -27,7 +27,13 @@ pub enum Action {
     ChangeNetwork,
     CheckPassword,
     TransactionFetched,
-    GenerateSufficientCrypto,
+    RemoveNetwork,
+    RemoveMetadata,
+    SignNetworkSpecs,
+    SignMetadata,
+    ManageNetworks,
+    ViewGeneralVerifier,
+    ManageMetadata,
     Nothing,
 }
 
@@ -56,7 +62,13 @@ impl Action {
             "ChangeNetwork" => Action::ChangeNetwork,
             "CheckPassword" => Action::CheckPassword,
             "TransactionFetched" => Action::TransactionFetched,
-            "GenerateSufficientCrypto" => Action::GenerateSufficientCrypto,
+            "RemoveNetwork" => Action::RemoveNetwork,
+            "RemoveMetadata" => Action::RemoveMetadata,
+            "SignNetworkSpecs" => Action::SignNetworkSpecs,
+            "SignMetadata" => Action::SignMetadata,
+            "ManageNetworks" => Action::ManageNetworks,
+            "ViewGeneralVerifier" => Action::ViewGeneralVerifier,
+            "ManageMetadata" => Action::ManageMetadata,
             _ => Action::Nothing,
         }
     }

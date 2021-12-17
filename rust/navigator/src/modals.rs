@@ -12,6 +12,8 @@ pub enum Modal {
     SignatureReady(String),
     EnterPassword,
     LogRight,
+    NetworkDetailsMenu,
+    ManageMetadata(u32),
     Empty,
 }
 
@@ -26,6 +28,8 @@ impl Modal {
             Modal::SignatureReady(_) => String::from("SignatureReady"),
             Modal::EnterPassword => String::from("EnterPassword"),
             Modal::LogRight => String::from("LogRight"),
+            Modal::NetworkDetailsMenu => String::from("NetworkDetailsMenu"),
+            Modal::ManageMetadata(_) => String::from("ManageMetadata"),
             Modal::Empty => String::from("Empty"),
         }
     }

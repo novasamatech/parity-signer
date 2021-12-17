@@ -826,6 +826,7 @@ impl ErrorSource for Signer {
                     InterfaceSigner::SeedNameNotMatching{address_key, expected_seed_name, real_seed_name} => format!("Expected seed name {} for address key {}. Address details in database have {} name.", expected_seed_name, hex::encode(address_key.key()), real_seed_name),
                     InterfaceSigner::AddressKeyNotInSet{address_key, seed_name} => format!("Address key {} was expected and not found in address key set for seed name {}.", hex::encode(address_key.key()), seed_name),
                     InterfaceSigner::LostPwd => String::from("Derivation had password, then lost it."),
+                    InterfaceSigner::VersionNotU32(x) => format!("Version {} could not be converted into u32.", x),
                 };
                 format!("Error on the interface. {}", insert)
             },
@@ -1010,6 +1011,7 @@ pub enum InterfaceSigner {
     SeedNameNotMatching{address_key: AddressKey, expected_seed_name: String, real_seed_name: String},
     AddressKeyNotInSet{address_key: AddressKey, seed_name: String},
     LostPwd,
+    VersionNotU32(String),
 }
 
 /// NotHex errors occuring on the Signer side

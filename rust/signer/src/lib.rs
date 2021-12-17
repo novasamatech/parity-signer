@@ -69,7 +69,35 @@ export! {
 	) -> anyhow::Result<String, anyhow::Error> {
         qr_reader_phone::decode_sequence(data, cleaned)
 	}
+/*
+    @Java_io_parity_signer_models_SignerDataModel_substrateParseTransaction
+	fn parse_transaction(
+		transaction: &str,
+        dbname: &str
+	) -> String {
+        if transaction == "test all" {return transaction_parsing::test_all_cards::make_all_cards()}
+        else {return transaction_parsing::produce_output(transaction, dbname)}
+    }
 
+    @Java_io_parity_signer_models_SignerDataModel_substrateHandleStub
+	fn handle_stub(
+		checksum: &str,
+        dbname: &str
+	) -> anyhow::Result<(), anyhow::Error> {
+        transaction_signing::handle_stub(checksum, dbname)
+    }
+
+    @Java_io_parity_signer_models_SignerDataModel_substrateHandleSign
+	fn handle_sign(
+		checksum: &str,
+        seed_phrase: &str,
+        password: &str,
+        user_comment: &str,
+        dbname: &str
+	) -> anyhow::Result<String, anyhow::Error> {
+        transaction_signing::handle_sign(checksum, seed_phrase, password, user_comment, dbname)
+    }
+*/
     @Java_io_parity_signer_models_SignerDataModel_substrateBase58Identicon
 	fn base58_identicon(
 		base58: &str,
@@ -179,7 +207,7 @@ export! {
 	) -> anyhow::Result<String, anyhow::Error> {
         db_handling::network_details::get_network_details_by_hex(network, dbname)
     }
-    
+/*    
     @Java_io_parity_signer_models_SignerDataModel_substrateRemoveNetwork
 	fn remove_network(
         network: &str,
@@ -196,7 +224,7 @@ export! {
 	) -> anyhow::Result<(), anyhow::Error> {
         db_handling::remove_network::remove_metadata(network_name, network_version, dbname)
     }
-
+*/
     @Java_io_parity_signer_models_SignerDataModel_substrateRemoveSeed
 	fn remove_seed(
         seed_name: &str,
@@ -301,6 +329,62 @@ export! {
 	) -> anyhow::Result<String, anyhow::Error> {
         db_handling::helpers::display_general_verifier(dbname)
     }
+/*
+    @Java_io_parity_signer_models_SignerDataModel_signerSignTypes
+	fn sign_load_types(
+        address_key: &str,
+        _encryption: &str,
+        seed_phrase: &str,
+        password: &str,
+        dbname: &str
+	) -> anyhow::Result<String, anyhow::Error> {
+        transaction_signing::sign_load_types(
+            address_key, dbname, seed_phrase, password
+        )
+    }
+
+    @Java_io_parity_signer_models_SignerDataModel_signerSignMetadata
+	fn sign_load_metadata(
+        network: &str,
+        version: u32,
+        address_key: &str,
+        _encryption: &str,
+        seed_phrase: &str,
+        password: &str,
+        dbname: &str
+	) -> anyhow::Result<String, anyhow::Error> {
+        transaction_signing::sign_load_metadata(
+            network, version, address_key, dbname, seed_phrase, password
+        )
+    }
+
+    @Java_io_parity_signer_models_SignerDataModel_signerSignSpecs
+	fn sign_load_specs(
+        network: &str,
+        address_key: &str,
+        _encryption: &str,
+        seed_phrase: &str,
+        password: &str,
+        dbname: &str
+	) -> anyhow::Result<String, anyhow::Error> {
+        transaction_signing::sign_add_specs(
+            network, address_key, dbname, seed_phrase, password
+        )
+    }
+
+    @Java_io_parity_signer_models_SignerDataModel_testGetAllTXCards
+	fn get_all_tx_cards() -> String {
+        return transaction_parsing::test_all_cards::make_all_cards()
+    }
+
+    @Java_io_parity_signer_models_SignerDataModel_testGetAllLogCards
+	fn get_all_log_cards() -> String {
+        //TODO
+        //return transaction_parsing::test_all_cards::make_all_cards()
+        return "not ready".to_string()
+    }
+*/
+
 }
 
 ffi_support::define_string_destructor!(signer_destroy_string);

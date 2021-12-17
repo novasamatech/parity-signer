@@ -75,3 +75,21 @@ pub fn get_multisigner (public: &Vec<u8>, encryption: &Encryption) -> Result<Mul
         },
     }
 }
+
+/// Helper function to print id pic for metadata hash.
+/// Currently uses identicon, could be changed later.
+pub fn pic_meta(meta_hash: &Vec<u8>) -> Result<Vec<u8>, ErrorSigner> {
+    match png_data_from_vec(&meta_hash, HALFSIZE) {
+        Ok(a) => Ok(a),
+        Err(e) => return Err(ErrorSigner::PngGeneration(e)),
+    }
+}
+
+/// Helper function to print id pic for types data hash.
+/// Currently uses identicon, could be changed later.
+pub fn pic_types(types_hash: &Vec<u8>) -> Result<Vec<u8>, ErrorSigner> {
+    match png_data_from_vec(&types_hash, HALFSIZE) {
+        Ok(a) => Ok(a),
+        Err(e) => return Err(ErrorSigner::PngGeneration(e)),
+    }
+}

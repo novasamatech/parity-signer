@@ -1,10 +1,11 @@
+use blake2_rfc::blake2b::blake2b;
 use sp_runtime::MultiSigner;
 use std::collections::HashMap;
 
-use definitions::{error::{DatabaseSigner, ErrorSigner, InterfaceSigner, NotFoundSigner}, helpers::{multisigner_to_public, make_identicon_from_multisigner}, keyring::{NetworkSpecsKey, AddressKey, print_multisigner_as_base58}, network_specs::NetworkSpecs, print::export_complex_vector, users::AddressDetails};
+use definitions::{error::{DatabaseSigner, ErrorSigner, InterfaceSigner, NotFoundSigner, Signer}, helpers::{multisigner_to_public, make_identicon_from_multisigner, pic_meta}, keyring::{AddressKey, NetworkSpecsKey, print_multisigner_as_base58, VerifierKey}, network_specs::NetworkSpecs, print::export_complex_vector, users::AddressDetails};
 use qrcode_static::png_qr_from_string;
 
-use crate::helpers::{get_address_details, get_network_specs};
+use crate::helpers::{get_address_details, get_general_verifier, get_meta_values_by_name, get_meta_values_by_name_version, get_network_specs, get_valid_current_verifier};
 use crate::identities::{get_all_addresses, get_addresses_by_seed_name};
 use crate::network_details::get_all_networks;
 
@@ -142,6 +143,44 @@ pub fn derive_prep (database_name: &str, seed_name: &str, network_specs_key: &Ne
     Ok(format!("\"seed_name\":\"{}\",\"network_title\":\"{}\",\"network_logo\":\"{}\",\"suggested_derivation\":\"{}\"", seed_name, network_specs.title, network_specs.logo, suggest))
 }
 
+/// Print network specs and metadata set information for network with given network specs key.
+pub fn network_details_by_key (database_name: &str, network_specs_key: &NetworkSpecsKey) -> Result<String, ErrorSigner> {
+    let network_specs = get_network_specs(database_name, network_specs_key)?;
+    let verifier_key = VerifierKey::from_parts(&network_specs.genesis_hash.to_vec());
+    let general_verifier = get_general_verifier(&database_name)?;
+    let valid_current_verifier = get_valid_current_verifier(&verifier_key, &database_name)?;
+    let relevant_meta = get_meta_values_by_name::<Signer>(database_name, &network_specs.name)?;
+    let metadata_print = export_complex_vector(&relevant_meta, |a| {
+        let meta_hash = blake2b(32, &[], &a.meta).as_bytes().to_vec();
+        let hex_id_pic = match pic_meta(&meta_hash) {
+            Ok(a) => hex::encode(a),
+            Err(_) => String::new(),
+        };
+        format!("\"spec_version\":\"{}\",\"meta_hash\":\"{}\",\"meta_id_pic\":\"{}\"", a.version, hex::encode(meta_hash), hex_id_pic)
+    });
+    Ok(format!("{},\"meta\":{}", network_specs.show(&valid_current_verifier, &general_verifier), metadata_print))
+}
+
+/// Print metadata details for given network specs key and version.
+pub fn metadata_details (database_name: &str, network_specs_key: &NetworkSpecsKey, network_version: u32) -> Result<String, ErrorSigner> {
+    let network_specs = get_network_specs(database_name, network_specs_key)?;
+    let meta_values = get_meta_values_by_name_version::<Signer>(database_name, &network_specs.name, network_version)?;
+    let relevant_networks = get_all_networks(database_name)?
+        .into_iter()
+        .filter(|a| a.name == network_specs.name)
+        .collect()
+    ;
+    let relevant_networks_print = export_complex_vector(&relevant_networks, |a| {
+        format!("\"title\":\"{}\",\"logo\":\"{}\",\"order\":{},\"current_on_screen\":{}", a.title, a.logo, a.order, &NetworkSpecsKey::from_parts(&a.genesis_hash.to_vec(), &a.encryption) == network_specs_key)
+    });
+    let meta_hash = blake2b(32, &[], &meta_values.meta).as_bytes().to_vec();
+    let hex_id_pic = match pic_meta(&meta_hash) {
+        Ok(a) => hex::encode(a),
+        Err(_) => String::new(),
+    };
+    Ok(format!("\"name\":\"{}\",\"version\":\"{}\",\"meta_hash\":\"{}\",\"meta_id_pic\":\"{}\",\"networks\":{}", network_specs.name, network_version, hex::encode(meta_hash), hex_id_pic, relevant_networks_print))
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -220,6 +259,27 @@ mod tests {
         assert!(print == expected_print, "\nReceived: \n{}", print);
         fs::remove_dir_all(dbname).unwrap();
     }
+    
+    #[test]
+    fn westend_network_details() {
+        let dbname = "for_tests/westend_network_details";
+        populate_cold (dbname, Verifier(None)).unwrap();
+        let print = network_details_by_key(dbname, &NetworkSpecsKey::from_parts(&hex::decode("e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e").unwrap(), &Encryption::Sr25519)).unwrap();
+        let expected_print = r##""base58prefix":"42","color":"#660D35","decimals":"12","encryption":"sr25519","genesis_hash":"e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e","logo":"westend","name":"westend","order":"2","path_id":"//westend","secondary_color":"#262626","title":"Westend","unit":"WND","current_verifier":{"type":"general","details":{"hex":"","identicon":"","encryption":"none"}},"meta":[{"spec_version":"9000","meta_hash":"e80237ad8b2e92b72fcf6beb8f0e4ba4a21043a7115c844d91d6c4f981e469ce","meta_id_pic":"89504e470d0a1a0a0000000d49484452000000410000004108060000008ef7c9450000032f49444154789cedda3d6e534114c571a7a0414a6109c95b70c1265c221640431189928e85d05122a5a0610188d29ba0f0162c21b988444361e6c83af1f8793cf7dcf9b06cf3fec5a4784f37777e456425b9db6eb793ffbdb3206c369be26f329d4eefc297ae7541a8b9b4550f94a6083d2f3fac2546138492cbcf3fbf0ce761ab4f7fc2e9ab05461542c9e5510a809540a01a8c62841e00ecdc104508a500a827022a817021d45c9ef546601e0c19a105003a1702522124040fc0ecc3329c87adbf2ec2b9cb8bf07a7efcfeafd5feb995026122d4023015c202602d219a21e4009805a1023015a20a4105405e04ab960828077112c103802e1d019d8248227801d03520a014848c70ffe24b380f7bfafb319cbbbc08b3c7e3f7d70ffbe75e046b1e93105400a64258002c5e3c076101b0781e1b42980839006641a8002c5e3c05a102b0781eca220c019017c1aa64e95ca5f362881121f48c900240b78a8008d11ce1fec7f1fb4f6ff7cfbd4bcf96c7efaf17d173e7bc381901e5202c00a642c40ba700980a11cf1be64240290815805910f1c239006641c4f3521d2058004a5e042b2f4269801811460427c26cf93019b65e3c4e9817e1fdbb57e13cecdbf7dfe1dce54598ff3cfe64b97ab3ff64792a192105c054080b80a9101600b32024841c00b32054006641a8002c07d105c1ca8b603522844684d04522dce4cf049483b000980a610130152207806404948250019805a102300bc202402e042b2f829517a1b411213422849e11900571f3bf4f403984140053212c00162f9e83b000583c6f988c90036016840ac0e2c553102a008be7c57543b0aa593a55cdbc23049482b8550402a0112174808086105e84abff5b241a22a01c8405c0548878e114005321e279cc44402a840ac02c8878e11c00b320e2796c088064042b2f829517414d46405e886b404801a09308c80371e908a700501601a9105e84abf93f46a422a01c8405c0540815005523a05a08158059102d019084803c10b9bc083529004846402d20ce85a002201702abc1e88de0b93c2b4240a5103d114a00503102ea01716e005485c04a30521025003597674d10580946692d2ecf9a22b09e182d2fcfba200cab41e971e9616741b8f4fe0136d3bfacd01443e90000000049454e44ae426082"},{"spec_version":"9010","meta_hash":"70c99738c27fb32c87883f1c9c94ee454bf0b3d88e4a431a2bbfe1222b46ebdf","meta_id_pic":"89504e470d0a1a0a0000000d49484452000000410000004108060000008ef7c9450000033449444154789cedd93d6e135114c571b284c83414d429116e690129ca365c2121b6902d20242a6f238a04b4b44694a92968b0bc04f38eac1b7bc66fde39f77d8c9c64fec59d6246b2eeaf183d79ceb6dbedb3a7de28089bcd26fb47cecfcfcfc2a5694d104a9666b540a98ad072f97e3531aa20e42cbffe761366b7d9fbab307dd5c02842c8591ec500ac1c085482918dd002c01a1b220b211700b5444039102e8492e5add60896074346a80180c642402a8484e001587d5d84d96dfe6119e62e2fc2fad7f1f3b3d7fbfb2c0582229402582a0403b06a4254434801580c4205b05488220415007911583511500a6210c103804e1d010d414411bc00e82120a018848c70f3671d66b7ab97b330777911fead8f977c3edb2fe54558fc5c85d96df9661e6637094105b054080660a9100cc0522028420ac062102a80c5205400ab0f9144e803202f02cb8bc0ca414087101342e81e2106801e2b023288ea08abc5a730bbcd979fc3dce545b8bcb808b3dbeddd5d98bb46414029080660a9100cc052218600900b01c52054008b41a80016834801a00e020350f222b0bc08b901624298109c08ec24e845787779bce4f7dbfd525e84bf9177cc8b8377cc5032420cc052211880a54230008b41480829008b41a80016835001ac144413049617813521842684d04922b093a017e155e4f9df07f747414029080660a9100cc052215200484640310815c062102a80c52018007221b0bc082c2f426e1342684208dd232006c1be1d7a11d849d08b70fdf64b98ddae7f7c0c73380084cbeeff0494428801582a0403b054080660a52064841480c52054008b41a800d610443304961781551501c5201e2b8201a00921d441407d082f02fb76e8456027c11c8443004411500a8201582a0403b054883e00a208488550012c06a102580c4201403202cb8bc0f222a8c908c80bf11010620068100179204e1d6108002511900ae14560df0e6b22a40050350494826000960aa102a06204540aa102580ca2260092109007229517a1240500c908a806c458082a007221582518ad113ccb5b59082817a225420e00ca46402d20c606404508560e460c2207a06479ab0a829583915b8de5adaa08564b8c9acb5b4d10fa95a0b458badf2808a7de7f10bfbfacc65e85560000000049454e44ae426082"}]"##;
+        assert!(print == expected_print, "\nReceived: \n{}", print);
+        fs::remove_dir_all(dbname).unwrap();
+    }
+    
+    #[test]
+    fn westend_9010_metadata_details() {
+        let dbname = "for_tests/westend_9010_metadata_details";
+        populate_cold (dbname, Verifier(None)).unwrap();
+        let print = metadata_details(dbname, &NetworkSpecsKey::from_parts(&hex::decode("e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e").unwrap(), &Encryption::Sr25519), 9010).unwrap();
+        let expected_print = r#""name":"westend","version":"9010","meta_hash":"70c99738c27fb32c87883f1c9c94ee454bf0b3d88e4a431a2bbfe1222b46ebdf","meta_id_pic":"89504e470d0a1a0a0000000d49484452000000410000004108060000008ef7c9450000033449444154789cedd93d6e135114c571b284c83414d429116e690129ca365c2121b6902d20242a6f238a04b4b44694a92968b0bc04f38eac1b7bc66fde39f77d8c9c64fec59d6246b2eeaf183d79ceb6dbedb3a7de28089bcd26fb47cecfcfcfc2a5694d104a9666b540a98ad072f97e3531aa20e42cbffe761366b7d9fbab307dd5c02842c8591ec500ac1c085482918dd002c01a1b220b211700b5444039102e8492e5add60896074346a80180c642402a8484e001587d5d84d96dfe6119e62e2fc2fad7f1f3b3d7fbfb2c0582229402582a0403b06a4254434801580c4205b05488220415007911583511500a6210c103804e1d010d414411bc00e82120a018848c70f3671d66b7ab97b330777911fead8f977c3edb2fe54558fc5c85d96df9661e6637094105b054080660a9100cc0522028420ac062102a80c5205400ab0f9144e803202f02cb8bc0ca414087101342e81e2106801e2b023288ea08abc5a730bbcd979fc3dce545b8bcb808b3dbeddd5d98bb46414029080660a9100cc052218600900b01c52054008b41a80016834801a00e020350f222b0bc08b901624298109c08ec24e845787779bce4f7dbfd525e84bf9177cc8b8377cc5032420cc052211880a54230008b41480829008b41a80016835001ac144413049617813521842684d04922b093a017e155e4f9df07f747414029080660a9100cc052215200484640310815c062102a80c52018007221b0bc082c2f426e1342684208dd232006c1be1d7a11d849d08b70fdf64b98ddae7f7c0c73380084cbeeff0494428801582a0403b054080660a52064841480c52054008b41a800d610443304961781551501c5201e2b8201a00921d441407d082f02fb76e8456027c11c8443004411500a8201582a0403b054883e00a208488550012c06a102580c4201403202cb8bc0f222a8c908c80bf11010620068100179204e1d6108002511900ae14560df0e6b22a40050350494826000960aa102a06204540aa102580ca2260092109007229517a1240500c908a806c458082a007221582518ad113ccb5b59082817a225420e00ca46402d20c606404508560e460c2207a06479ab0a829583915b8de5adaa08564b8c9acb5b4d10fa95a0b458badf2808a7de7f10bfbfacc65e85560000000049454e44ae426082","networks":[{"title":"Westend","logo":"westend","order":2,"current_on_screen":true}]"#;
+        assert!(print == expected_print, "\nReceived: \n{}", print);
+        fs::remove_dir_all(dbname).unwrap();
+    }
+    
 }
 
 
