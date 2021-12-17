@@ -165,7 +165,7 @@ impl State {
                             }
                         },
                         Screen::RecoverSeedPhrase(ref seed_name) => {
-                            new_navstate = match KeysState::new(details_str, dbname) {
+                            new_navstate = match KeysState::new(&seed_name, dbname) {
                                 Ok(a) => Navstate::clean_screen(Screen::Keys(a)),
                                 Err(e) => {
                                     errorline.push_str(&<Signer>::show(&e));
