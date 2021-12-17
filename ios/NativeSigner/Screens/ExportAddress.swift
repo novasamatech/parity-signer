@@ -10,6 +10,7 @@ import SwiftUI
 struct ExportAddress: View {
     @EnvironmentObject var data: SignerDataModel
     @GestureState private var dragOffset = CGSize.zero
+    @State var offset: CGFloat = 0
     @State var image: UIImage?
     @State var showDetails = false
     var content: MKeyDetails
@@ -39,8 +40,17 @@ struct ExportAddress: View {
                 .foregroundColor(Color("Crypto400"))
             }
         }
+        .onAppear{
+            offset = 0
+        }
+        .offset(x: offset, y:0)
         .gesture(
-            DragGesture().onEnded {drag in
+            DragGesture()
+                .onChanged {drag in
+                    self.offset = drag.translation.width
+                }
+                .onEnded {drag in
+                    offset = 0
                 if abs(drag.translation.height) > 200 {
                     showDetails.toggle()
                 } else {

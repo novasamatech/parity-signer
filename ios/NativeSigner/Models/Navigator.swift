@@ -189,6 +189,7 @@ enum ButtonID {
     case CheckPassword
     case ChangeNetwork
     case TransactionFetched
+    case GenerateSufficientCrypto
     case ClearLog
 }
 

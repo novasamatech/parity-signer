@@ -26,8 +26,8 @@ struct ModalSelector: View {
             PasswordConfirm(content: value)
         case .SignatureReady(let value):
             SignatureReady(content: value)
-        case .EnterPassword(_):
-            EnterPassword()
+        case .EnterPassword(let value):
+            EnterPassword(content: value)
         case .LogRight:
             LogMenu()
         }

@@ -8,5 +8,6 @@
 import Foundation
 
 struct MEnterPassword: Decodable {
-    var content: TransactionCardSet
+    var author_info: TransactionAuthor
+    var counter: Int
 }
