@@ -10,10 +10,12 @@ import SwiftUI
 struct SeedBackup: View {
     @EnvironmentObject var data: SignerDataModel
     @State var phrase = ""
+    let timer = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
+    @State var countdown = 60
+    
     var body: some View {
         ZStack{
             VStack {
-                //SeedCardForManager(seedName: data.selectedSeed)
                 Text("Backup your seed phrase!").font(.headline)
                 Text("Keep your seed phrase in safe place; anyone could restore accounts using this seed phrase; there is no other way to restore accounts.").font(.footnote)
                 ZStack {
@@ -24,6 +26,19 @@ struct SeedBackup: View {
                         .padding(8)
                 }
                 Spacer()
+            }
+            VStack {
+                Spacer()
+                ZStack {
+                    RoundedRectangle(cornerRadius: 8)
+                    Text("Clear in " + String(countdown) + "s")
+                        .onReceive(timer) { input in
+                            countdown -= 1
+                            if countdown == 0 {
+                                phrase = "time out"
+                            }
+                        }
+                }
             }
         }
         .onAppear {

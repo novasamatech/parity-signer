@@ -11,6 +11,8 @@ struct Backup: View {
     @EnvironmentObject var data: SignerDataModel
     let content: MBackup
     @State var secret: String = ""
+    let timer = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
+    @State var countdown = 60
     //TODO: chop chop chop
     var body: some View {
         ZStack {
@@ -28,7 +30,7 @@ struct Backup: View {
                         }
                         .onAppear{
                             if data.seedBackup == "" {
-                            secret = data.getSeed(seedName: content.seed_name)
+                                secret = data.getSeed(seedName: content.seed_name)
                             } else {
                                 secret = data.seedBackup
                             }
@@ -60,6 +62,22 @@ struct Backup: View {
                                 }
                             }
                         }
+                    }
+                }
+            }
+            if countdown > 0 {
+                VStack {
+                    Spacer()
+                    ZStack {
+                        RoundedRectangle(cornerRadius: 8).foregroundColor(Color("Bg300")).frame(height: 40)
+                        Text("Clear in " + String(countdown) + "s")
+                            .onReceive(timer) { input in
+                                countdown -= 1
+                                if countdown == 0 {
+                                    secret = "time out"
+                                }
+                            }
+                            .foregroundColor(Color("Action400"))
                     }
                 }
             }
