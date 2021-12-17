@@ -18,8 +18,8 @@ struct AlertSelector: View {
             ErrorAlert(content: value)
         case .Shield:
             ShieldAlert()
-        case .keyDeleteConfirm:
-            ConfirmAlert()
+        case .Confirm(let value):
+            ConfirmAlert(content: value)
         }
     }
 }

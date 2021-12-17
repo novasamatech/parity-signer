@@ -114,6 +114,8 @@ struct ActionResult: Decodable {
             alert = .Empty
         case "Error":
             alert = .Error(try values.decode(MError.self, forKey: .alertData))
+        case "Confirm":
+            alert = .Confirm(try values.decode(MConfirm.self, forKey: .alertData))
         default:
             alert = .Empty
         }
@@ -160,7 +162,7 @@ enum SignerAlert: Decodable {
     case Empty
     case Error(MError)
     case Shield
-    case keyDeleteConfirm
+    case Confirm(MConfirm)
 }
 
 enum ButtonID {
@@ -213,7 +215,8 @@ extension SignerDataModel {
                             print(newActionResult)
                             actionResult = newActionResult
                         } else {
-                            print("bushing button failed on decoding!")
+                            print("pushing button failed on decoding!")
+                            parsingAlert = true
                         }
                     }
                     signer_destroy_string(res!)

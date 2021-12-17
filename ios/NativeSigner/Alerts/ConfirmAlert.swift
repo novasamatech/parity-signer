@@ -8,8 +8,27 @@
 import SwiftUI
 
 struct ConfirmAlert: View {
+    @EnvironmentObject var data: SignerDataModel
+    let content: MConfirm
     var body: some View {
-        Text(/*@START_MENU_TOKEN@*/"Hello, World!"/*@END_MENU_TOKEN@*/)
+        ZStack {
+            RoundedRectangle(cornerRadius: 8)
+            HeaderBar(line1: content.header, line2: content.subheader)
+            MenuButtonsStack {
+                BigButton(
+                    text: content.yes,
+                    action: {
+                        data.pushButton(buttonID: .GoForward)
+                    }
+                )
+                BigButton(
+                    text: content.no,
+                    action: {
+                        data.pushButton(buttonID: .GoBack)
+                    }
+                )
+            }
+        }
     }
 }
 

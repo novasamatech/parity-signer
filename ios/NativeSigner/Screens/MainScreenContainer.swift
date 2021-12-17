@@ -37,6 +37,7 @@ struct MainScreenContainer: View {
                         .background(Color("Bg000"))
                 }
             }
+            .alert("Navigation error", isPresented: $data.parsingAlert, actions: {})
         } else {
             if (data.protected) {
                 if (data.canaryDead) {
