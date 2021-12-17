@@ -28,6 +28,8 @@ struct ModalSelector: View {
             SignatureReady(content: value)
         case .EnterPassword(_):
             EnterPassword()
+        case .LogRight:
+            LogMenu()
         }
     }
 }

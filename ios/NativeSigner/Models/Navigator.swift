@@ -103,6 +103,8 @@ struct ActionResult: Decodable {
             modal = .EnterPassword(try values.decode(MEnterPassword.self, forKey: .modalData))
         case "SignatureReady":
             modal = .SignatureReady(try values.decode(MSignatureReady.self, forKey: .modalData))
+        case "LogRight":
+            modal = .LogRight
         default:
             modal = .Empty
         }
@@ -151,6 +153,7 @@ enum SignerModal: Decodable {
     case PasswordConfirm(MPasswordConfirm)
     case SignatureReady(MSignatureReady)
     case EnterPassword(MEnterPassword)
+    case LogRight
 }
 
 enum SignerAlert: Decodable {
@@ -184,6 +187,7 @@ enum ButtonID {
     case CheckPassword
     case ChangeNetwork
     case TransactionFetched
+    case ClearLog
 }
 
 /**
