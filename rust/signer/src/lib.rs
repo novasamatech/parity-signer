@@ -19,8 +19,6 @@ use std::convert::TryInto;
 
 use plot_icon;
 use db_handling;
-use transaction_parsing;
-use transaction_signing;
 use qr_reader_phone;
 use navigator;
 

@@ -2311,8 +2311,6 @@ dependencies = [
  "plot_icon",
  "qr_reader_phone",
  "rustc-hex",
- "transaction_parsing",
- "transaction_signing",
  "zeroize",
 ]
 
