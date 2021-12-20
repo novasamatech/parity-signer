@@ -32,7 +32,7 @@ pub fn process_message (data_hex: &str, dbname: &str) -> Result<Action, ErrorSig
                 Some(address_details) => {
                     if address_details.network_id.contains(&network_specs_key) {
                         let message_card = Card::ParserCard(&ParserCard::Text(message.to_string())).card(&mut index, indent);
-                        let sign = TrDbColdSign::generate(SignContent::Message(message), &network_specs.name, &address_details.path, address_details.has_pwd, &address_key, Vec::new());
+                        let sign = TrDbColdSign::generate(SignContent::Message(message), &network_specs.name, &address_details.path, address_details.has_pwd, &author_multi_signer, Vec::new());
                         let checksum = sign.store_and_get_checksum (&dbname)?;
                         let author_info = make_author_info(&author_multi_signer, network_specs.base58prefix, &address_details);
                         let network_info = format!("\"network_title\":\"{}\",\"network_logo\":\"{}\"", network_specs.title, network_specs.logo);

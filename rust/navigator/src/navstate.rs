@@ -1,21 +1,22 @@
 //! Navigation state of the app
 
 //use hex;
+use sp_runtime::MultiSigner;
 use zeroize::Zeroize;
 
-use crate::screens::{AddressState, DeriveState, KeysState, Screen, TransactionState};
+use crate::screens::{AddressState, DeriveState, KeysState, Screen, SufficientCryptoState, TransactionState};
 use crate::modals::Modal;
 use crate::actions::Action;
 use crate::alerts::Alert;
 
 //use plot_icon;
 use db_handling;
-use definitions::{error::{ErrorSigner, ErrorSource, InterfaceSigner, Signer}, keyring::NetworkSpecsKey};
+use definitions::{error::{AddressKeySource, ErrorSigner, ErrorSource, ExtraAddressKeySourceSigner, InterfaceSigner, Signer}, keyring::{AddressKey, NetworkSpecsKey}, users::AddressDetails};
 use transaction_parsing;
 use transaction_signing;
 
 ///State of the app as remembered by backend
-#[derive(PartialEq, Debug, Clone)]
+#[derive(Debug, Clone)]
 pub struct State {
     pub navstate: Navstate,
     pub dbname: Option<String>,
@@ -24,7 +25,7 @@ pub struct State {
 }
 
 ///Navigation state is completely defined here
-#[derive(PartialEq, Debug, Clone)]
+#[derive(Debug, Clone)]
 pub struct Navstate {
     pub screen: Screen,
     pub modal: Modal,
@@ -85,7 +86,7 @@ impl State {
                 //General back action is defined here
                 Action::GoBack => {
                     if self.navstate.alert == Alert::Empty {
-                        if self.navstate.modal == Modal::Empty {
+                        if let Modal::Empty = self.navstate.modal {
                             match &self.navstate.screen {
                                 Screen::LogDetails => {
                                     new_navstate.screen = Screen::Log;
@@ -123,12 +124,35 @@ impl State {
                                 Screen::SelectSeedForBackup => {
                                     new_navstate.screen = Screen::Settings;
                                 },
+                                Screen::SignSufficientCrypto(a) => {
+                                    match a.content() {
+                                        transaction_signing::SufficientContent::AddSpecs(key) => {
+                                            new_navstate.screen = Screen::NetworkDetails(key);
+                                        },
+                                        transaction_signing::SufficientContent::LoadMeta(key, _) => {
+                                            new_navstate.screen = Screen::NetworkDetails(key);
+                                        },
+                                        transaction_signing::SufficientContent::LoadTypes => {
+                                            new_navstate.screen = Screen::Settings;
+                                        },
+                                    }
+                                },
                                 _ => {
                                     println!("Back button pressed at the bottom of navigation");
                                 },
                             };
                         } else {
-                            new_navstate.modal = Modal::Empty;
+                            match &self.navstate.screen {
+                                Screen::Transaction(_) => {
+                                    new_navstate = Navstate::clean_screen(Screen::Log);
+                                },
+                                Screen::SignSufficientCrypto(_) => {
+                                    new_navstate = Navstate::clean_screen(Screen::Settings);
+                                },
+                                _ => {
+                                    new_navstate.modal = Modal::Empty;
+                                },
+                            }
                         }
                     } else {
                         new_navstate.alert = Alert::Empty;
@@ -263,6 +287,60 @@ impl State {
                                 },
                             }
                         },
+                        Screen::SignSufficientCrypto(ref s) => {
+                            match s.key_selected() {
+                                Some((multisigner, address_details, _)) => {
+                                    // can get here only if there is a password
+                                    // details_str is password entry attempt
+                                    if let Modal::EnterPassword = self.navstate.modal {
+                                        if s.ok() {
+                                            new_navstate.screen = Screen::SignSufficientCrypto(s.plus_one());
+                                            let mut seed = s.seed();
+                                            match transaction_signing::sign_content(&multisigner, &address_details, s.content(), dbname, &seed, details_str) {
+                                                Ok(a) => {
+                                                    seed.zeroize();
+                                                    new_navstate.modal = Modal::SufficientCryptoReady(a);
+                                                },
+                                                Err(e) => {
+                                                    seed.zeroize();
+                                                    new_navstate.alert = Alert::Error;
+                                                    errorline.push_str(&<Signer>::show(&e));
+                                                },
+                                            }
+                                        }
+                                        else {new_navstate = Navstate::clean_screen(Screen::Log);}
+                                    }
+                                },
+                                None => {
+                                    // details_str is hex_address_key
+                                    // secret_seed_phrase is seed phrase
+                                    match process_hex_address_key(details_str, dbname) {
+                                        Ok((multisigner, address_details)) => {
+                                            if address_details.has_pwd {
+                                                new_navstate.screen = Screen::SignSufficientCrypto(s.update(&multisigner, &address_details, secret_seed_phrase));
+                                                new_navstate.modal = Modal::EnterPassword;
+                                            }
+                                            else {
+                                                match transaction_signing::sign_content(&multisigner, &address_details, s.content(), dbname, secret_seed_phrase, "") {
+                                                    Ok(a) => {
+                                                        new_navstate.screen = Screen::SignSufficientCrypto(s.update(&multisigner, &address_details, ""));
+                                                        new_navstate.modal = Modal::SufficientCryptoReady(a);
+                                                    },
+                                                    Err(e) => {
+                                                        new_navstate.alert = Alert::Error;
+                                                        errorline.push_str(&<Signer>::show(&e));
+                                                    },
+                                                }
+                                            }
+                                        },
+                                        Err(e) => {
+                                            new_navstate.alert = Alert::Error;
+                                            errorline.push_str(&<Signer>::show(&e));
+                                        },
+                                    }
+                                },
+                            }
+                        },
                         _ => println!("GoForward does nothing here"),
                     };
                 },
@@ -305,7 +383,7 @@ impl State {
                     match &self.navstate.screen {
                         Screen::Log => new_navstate.modal = Modal::LogRight,
                         Screen::SeedSelector => {
-                            if self.navstate.modal == Modal::NewSeedMenu {
+                            if let Modal::NewSeedMenu = self.navstate.modal {
                                 new_navstate.modal = Modal::Empty;
                             } else {
                                 new_navstate.modal = Modal::NewSeedMenu;
@@ -313,7 +391,7 @@ impl State {
                         },
                         Screen::Keys(_) => new_navstate.modal = Modal::SeedMenu,
                         Screen::NetworkDetails(_) => {
-                            if self.navstate.modal == Modal::NetworkDetailsMenu {
+                            if let Modal::NetworkDetailsMenu = self.navstate.modal {
                                 new_navstate.modal = Modal::Empty;
                             } else {
                                 new_navstate.modal = Modal::NetworkDetailsMenu;
@@ -454,12 +532,24 @@ impl State {
                 Action::SignNetworkSpecs => {
                     match self.navstate.screen {
                         Screen::NetworkDetails(ref network_specs_key) => {
-                            
+                            new_navstate = Navstate::clean_screen(Screen::SignSufficientCrypto(SufficientCryptoState::init(transaction_signing::SufficientContent::AddSpecs(network_specs_key.to_owned()))));
                         },
                         _ => println!("SignNetworkSpecs does nothing here"),
                     }
                 },
-                Action::SignMetadata => {},
+                Action::SignMetadata => {
+                    match self.navstate.screen {
+                        Screen::NetworkDetails(ref network_specs_key) => {
+                            match self.navstate.modal {
+                                Modal::ManageMetadata(network_version) => {
+                                    new_navstate = Navstate::clean_screen(Screen::SignSufficientCrypto(SufficientCryptoState::init(transaction_signing::SufficientContent::LoadMeta(network_specs_key.to_owned(), network_version))));
+                                },
+                                _ => println!("SignMetadata does nothing here"),
+                            }
+                        },
+                        _ => println!("SignMetadata does nothing here"),
+                    }
+                },
                 Action::ManageNetworks => {
                     match self.navstate.screen {
                         Screen::Settings => {
@@ -598,6 +688,16 @@ impl State {
                         },
                     }
                 },
+                Screen::SignSufficientCrypto(_) => {
+                    match db_handling::interface_signer::print_all_identities(dbname) {
+                        Ok(a) => format!("identities:{{{}}}", a),
+                        Err(e) => {
+                            new_navstate.alert = Alert::Error;
+                            errorline.push_str(&<Signer>::show(&e));
+                            "".to_string()
+                        },
+                    }
+                },
                 Screen::Nowhere => "".to_string(),
                 _ => "".to_string(),
             };
@@ -647,6 +747,10 @@ impl State {
                             if let transaction_parsing::Action::Sign{content: _, checksum: _, has_pwd: _, author_info, network_info: _} = t.action() {format!("\"author_info\":{{{}}},\"counter\":{}", author_info, t.counter())}
                             else {"".to_string()}
                         },
+                        Screen::SignSufficientCrypto(ref s) => {
+                            if let Some((_, _, author_info)) = s.key_selected() {format!("\"author_info\":{{{}}},\"counter\":{}", author_info, s.counter())}
+                            else {"".to_string()}
+                        },
                         _ => "".to_string(),
                     }
                 },
@@ -661,6 +765,15 @@ impl State {
                                     "".to_string()
                                 },
                             }
+                        },
+                        _ => "".to_string(),
+                    }
+                },
+                Modal::SufficientCryptoReady(ref a) => {
+                    match new_navstate.screen {
+                        Screen::SignSufficientCrypto(ref s) => {
+                            if let Some((_, _, author_info)) = s.key_selected() {format!("\"author_info\":{{{}}},{}", author_info, a)}
+                            else {"".to_string()}
                         },
                         _ => "".to_string(),
                     }
@@ -726,6 +839,7 @@ impl State {
             Screen::ManageNetworks => false,
             Screen::NetworkDetails(_) => false,
             Screen::SelectSeedForBackup => false,
+            Screen::SignSufficientCrypto(_) => false,
             Screen::Nowhere => true,
         }
     }
@@ -749,6 +863,7 @@ impl State {
             Screen::ManageNetworks => "Settings",
             Screen::NetworkDetails(_) => "Settings",
             Screen::SelectSeedForBackup => "Settings",
+            Screen::SignSufficientCrypto(_) => "Settings",
             Screen::Nowhere => "None",
         }.to_string()
     }
@@ -772,6 +887,7 @@ impl State {
             Screen::ManageNetworks => "None",
             Screen::NetworkDetails(_) => "NDMenu",
             Screen::SelectSeedForBackup => "Backup",
+            Screen::SignSufficientCrypto(_) => "None",
             Screen::Nowhere => "None",
         }.to_string()
     }
@@ -795,6 +911,7 @@ impl State {
             Screen::ManageNetworks => "h4",
             Screen::NetworkDetails(_) => "h4",
             Screen::SelectSeedForBackup => "h4",
+            Screen::SignSufficientCrypto(_) => "h1",
             Screen::Nowhere => "h4",
         }.to_string()
 
@@ -818,6 +935,13 @@ impl Navstate {
         }
         else {false}
     }
+}
+
+fn process_hex_address_key (hex_address_key: &str, dbname: &str) -> Result<(MultiSigner, AddressDetails), ErrorSigner> {
+    let address_key = AddressKey::from_hex(hex_address_key)?;
+    let multisigner = address_key.multi_signer::<Signer>(AddressKeySource::Extra(ExtraAddressKeySourceSigner::Interface))?;
+    let address_details = db_handling::helpers::get_address_details(dbname, &address_key)?;
+    Ok((multisigner, address_details))
 }
 
 //TODO: tests should probably be performed here, as static object in lib.rs

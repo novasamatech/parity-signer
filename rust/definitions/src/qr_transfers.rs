@@ -1,7 +1,9 @@
+use blake2_rfc::blake2b::blake2b;
 use parity_scale_codec::{Decode, Encode};
 use parity_scale_codec_derive;
 
 use crate::error::{ErrorActive, ErrorSource, TransferContent};
+use crate::helpers::pic_types;
 use crate::network_specs::NetworkSpecsToSend;
 use crate::types::TypeEntry;
 
@@ -160,6 +162,15 @@ impl ContentLoadTypes {
     /// Function to prepare load_types information for transfer as encoded Vec<u8>
     pub fn to_transfer (&self) -> Vec<u8> {
         self.encode()
+    }
+    /// Function to show encoded types hash and corresponding id pic
+    pub fn show(&self) -> String {
+        let types_hash = blake2b(32, &[], &self.store()).as_bytes().to_vec();
+        let types_id_pic = match pic_types(&types_hash) {
+            Ok(a) => hex::encode(a),
+            Err(_) => String::new(),
+        };
+        format!("\"types_hash\":\"{}\",\"types_id_pic\":\"{}\"", hex::encode(types_hash), types_id_pic)
     }
 }
 

@@ -1,8 +1,10 @@
-use sled::{Batch, Transactional};
-use constants::{ADDRESS_BOOK, ADDRTREE, GENERALVERIFIER, HISTORY, METATREE, SETTREE, SIGN, SPECSTREE, SPECSTREEPREP, STUB, TRANSACTION, TYPES, VERIFIERS};
-use definitions::{error::{Active, AddressKeySource, DatabaseSigner, EntryDecodingSigner, ErrorActive, ErrorSigner, ErrorSource, NotFoundSigner, Signer}, helpers::multisigner_to_public, history::{Event, IdentityHistory, MetaValuesDisplay, NetworkSpecsDisplay, NetworkVerifierDisplay, SignDisplay, SignMessageDisplay, TypesDisplay}, keyring::{AddressKey, MetaKey, NetworkSpecsKey, VerifierKey}, metadata::MetaValues, network_specs::{NetworkSpecs, NetworkSpecsToSend, CurrentVerifier, ValidCurrentVerifier, Verifier, VerifierValue}, qr_transfers::ContentLoadTypes, users::AddressDetails};
 use parity_scale_codec::{Decode, Encode};
 use parity_scale_codec_derive;
+use sled::{Batch, Transactional};
+use sp_runtime::MultiSigner;
+
+use constants::{ADDRESS_BOOK, ADDRTREE, GENERALVERIFIER, HISTORY, METATREE, SETTREE, SIGN, SPECSTREE, SPECSTREEPREP, STUB, TRANSACTION, TYPES, VERIFIERS};
+use definitions::{error::{Active, DatabaseSigner, EntryDecodingSigner, ErrorActive, ErrorSigner, ErrorSource, NotFoundSigner, Signer}, helpers::multisigner_to_public, history::{Event, IdentityHistory, MetaValuesDisplay, NetworkSpecsDisplay, NetworkVerifierDisplay, SignDisplay, SignMessageDisplay, TypesDisplay}, keyring::{AddressKey, MetaKey, NetworkSpecsKey, VerifierKey}, metadata::MetaValues, network_specs::{NetworkSpecs, NetworkSpecsToSend, CurrentVerifier, ValidCurrentVerifier, Verifier, VerifierValue}, qr_transfers::ContentLoadTypes, users::AddressDetails};
 
 use crate::helpers::{make_batch_clear_tree, open_db, open_tree, verify_checksum};
 use crate::manage_history::events_to_batch;
@@ -391,7 +393,7 @@ pub struct TrDbColdSign {
     network_name: String,
     path: String,
     has_pwd: bool,
-    address_key: AddressKey,
+    multisigner: MultiSigner,
     history: Vec<Event>,
 }
 
@@ -403,13 +405,13 @@ pub enum SignContent {
 
 impl TrDbColdSign {
     /// function to generate TrDbColdSign
-    pub fn generate(content: SignContent, network_name: &str, path: &str, has_pwd: bool, address_key: &AddressKey, history: Vec<Event>) -> Self {
+    pub fn generate(content: SignContent, network_name: &str, path: &str, has_pwd: bool, multisigner: &MultiSigner, history: Vec<Event>) -> Self {
         Self {
             content,
             network_name: network_name.to_string(),
             path: path.to_string(),
             has_pwd,
-            address_key: address_key.to_owned(),
+            multisigner: multisigner.to_owned(),
             history,
         }
     }
@@ -446,8 +448,8 @@ impl TrDbColdSign {
         self.has_pwd
     }
     /// function to get address key
-    pub fn address_key(&self) -> AddressKey {
-        self.address_key.to_owned()
+    pub fn multisigner(&self) -> MultiSigner {
+        self.multisigner.to_owned()
     }
     /// function to put TrDbColdSign into storage in the database
     pub fn store_and_get_checksum(&self, database_name: &str) -> Result<u32, ErrorSigner> {
@@ -464,8 +466,7 @@ impl TrDbColdSign {
     }
     /// function to apply TrDbColdSign to database
     pub fn apply(self, wrong_password: bool, user_comment: &str, database_name: &str) -> Result<(), ErrorSigner> {
-        let multi_signer = self.address_key.multi_signer::<Signer>(AddressKeySource::AddrTree)?;
-        let signed_by = VerifierValue::Standard(multi_signer);
+        let signed_by = VerifierValue::Standard(self.multisigner());
         let mut history = self.history;
         match self.content {
             SignContent::Transaction{method, extensions} => {

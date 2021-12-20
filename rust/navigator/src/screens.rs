@@ -3,13 +3,14 @@ use sp_runtime::MultiSigner;
 use zeroize::Zeroize;
 
 use db_handling::interface_signer::{addresses_set_seed_name_network, first_network};
-use definitions::{error::{AddressKeySource, ErrorSigner, ExtraAddressKeySourceSigner, InterfaceSigner, Signer}, keyring::{AddressKey, NetworkSpecsKey}};
+use definitions::{error::{AddressKeySource, ErrorSigner, ExtraAddressKeySourceSigner, InterfaceSigner, Signer}, helpers::{multisigner_to_public, make_identicon_from_multisigner}, keyring::{AddressKey, NetworkSpecsKey}, users::AddressDetails};
 use transaction_parsing;
+use transaction_signing;
 
-const MAX_COUNT_SET: u8 = 3;
+const MAX_COUNT_SET: u8 = 1;
 
 ///All screens
-#[derive(PartialEq, Debug, Clone)]
+#[derive(Debug, Clone)]
 pub enum Screen {
     Log,
     LogDetails,
@@ -27,11 +28,12 @@ pub enum Screen {
     ManageNetworks,
     NetworkDetails(NetworkSpecsKey),
     SelectSeedForBackup,
+    SignSufficientCrypto(SufficientCryptoState),
     Nowhere,
 }
 
 ///State of keys screen
-#[derive(PartialEq, Debug, Clone)]
+#[derive(Debug, Clone)]
 pub struct KeysState {
     seed_name: String,
     network: NetworkSpecsKey,
@@ -40,7 +42,7 @@ pub struct KeysState {
 ///State of screen with 1 key
 ///
 ///More general KeysState could always be determined as subset of this
-#[derive(PartialEq, Debug, Clone)]
+#[derive(Debug, Clone)]
 pub struct AddressState {
     keys_state: KeysState,
     selected: usize,
@@ -48,14 +50,14 @@ pub struct AddressState {
 }
 
 ///State of derive key screen
-#[derive(PartialEq, Debug, Clone)]
+#[derive(Debug, Clone)]
 pub struct DeriveState {
     entered_info: EnteredInfo,
     keys_state: KeysState,
 }
 
 ///State of transaction screen
-#[derive(PartialEq, Debug, Clone)]
+#[derive(Debug, Clone)]
 pub struct TransactionState {
     entered_info: EnteredInfo,
     action: transaction_parsing::Action,
@@ -63,8 +65,17 @@ pub struct TransactionState {
     counter: u8,
 }
 
+///State of screen generating sufficient crypto
+#[derive(Debug, Clone)]
+pub struct SufficientCryptoState {
+    key_selected: Option<(MultiSigner, AddressDetails, String)>,
+    entered_info: EnteredInfo,
+    content: transaction_signing::SufficientContent,
+    counter: u8,
+}
+
 ///EnteredInfo, path+pwd entered by the user, zeroizeable
-#[derive(PartialEq, Debug, Clone, Zeroize)]
+#[derive(Debug, Clone, Zeroize)]
 #[zeroize(drop)]
 pub struct EnteredInfo (pub String);
 
@@ -224,6 +235,53 @@ impl TransactionState {
     }
 }
 
+impl SufficientCryptoState {
+    pub fn init(content: transaction_signing::SufficientContent) -> Self {
+        Self {
+            key_selected: None,
+            entered_info: EnteredInfo("".to_string()),
+            content,
+            counter: 0,
+        }
+    }
+    pub fn content(&self) -> transaction_signing::SufficientContent {
+        self.content.to_owned()
+    }
+    pub fn key_selected(&self) -> Option<(MultiSigner, AddressDetails, String)> {
+        self.key_selected.to_owned()
+    }
+    pub fn update(&self, multisigner: &MultiSigner, address_details: &AddressDetails, new_secret_string: &str) -> Self {
+        let hex_identicon = match make_identicon_from_multisigner(&multisigner) {
+            Ok(a) => hex::encode(a),
+            Err(_) => String::new(),
+        };
+        let author_info = format!("\"public_key\":\"{}\",\"identicon\":\"{}\",\"seed_name\":\"{}\",\"derivation_path\":\"{}\"", hex::encode(multisigner_to_public(&multisigner)), hex_identicon, address_details.seed_name, address_details.path);
+        Self{
+            key_selected: Some((multisigner.to_owned(), address_details.to_owned(), author_info)),
+            entered_info: EnteredInfo(new_secret_string.to_string()),
+            content: self.content(),
+            counter: self.counter,
+        }
+    }
+    pub fn seed(&self) -> String {
+        self.entered_info.0.to_string()
+    }
+    pub fn plus_one(&self) -> Self {
+        Self {
+            key_selected: self.key_selected(),
+            entered_info: self.entered_info.to_owned(),
+            content: self.content(),
+            counter: self.counter + 1,
+        }
+    }
+    pub fn ok(&self) -> bool {
+        self.counter < MAX_COUNT_SET
+    }
+    pub fn counter(&self) -> u8 {
+        self.counter
+    }
+}
+
 impl Screen {
     ///Encode screen name into string for UI
     pub fn get_name(&self) -> Option<String> {
@@ -244,6 +302,7 @@ impl Screen {
             Screen::ManageNetworks => Some(String::from("ManageNetworks")),
             Screen::NetworkDetails(_) => Some(String::from("NetworkDetails")),
             Screen::SelectSeedForBackup => Some(String::from("SelectSeedForBackup")),
+            Screen::SignSufficientCrypto(_) => Some(String::from("SignSufficientCrypto")),
             Screen::Nowhere => None,
         }
     }
@@ -266,6 +325,7 @@ impl Screen {
             Screen::ManageNetworks => "MANAGE NETWORKS",
             Screen::NetworkDetails(_) => "Network details",
             Screen::SelectSeedForBackup => "Select seed",
+            Screen::SignSufficientCrypto(_) => "Sign SufficientCrypto",
             Screen::Nowhere => "",
         }.to_string()
     }
@@ -288,6 +348,7 @@ impl Screen {
             Screen::ManageNetworks => true,
             Screen::NetworkDetails(_) => true,
             Screen::SelectSeedForBackup => true,
+            Screen::SignSufficientCrypto(_) => true,
             Screen::Nowhere => false,
         }
     }

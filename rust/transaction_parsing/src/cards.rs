@@ -1,10 +1,9 @@
 use hex;
-use blake2_rfc::blake2b::blake2b;
 use sp_core::crypto::{Ss58Codec, Ss58AddressFormat};
 use sp_runtime::{generic::Era, MultiSigner};
 
 use constants::HALFSIZE;
-use definitions::{crypto::Encryption, error::{ErrorSigner, ErrorSource, Signer}, helpers::{make_identicon_from_multisigner, pic_types}, history::MetaValuesDisplay, keyring::{print_multisigner_as_base58, VerifierKey}, network_specs::{NetworkSpecs, NetworkSpecsToSend, VerifierValue}, print::export_complex_single, qr_transfers::ContentLoadTypes, users::AddressDetails};
+use definitions::{crypto::Encryption, error::{ErrorSigner, ErrorSource, Signer}, helpers::make_identicon_from_multisigner, history::MetaValuesDisplay, keyring::{print_multisigner_as_base58, VerifierKey}, network_specs::{NetworkSpecs, NetworkSpecsToSend, VerifierValue}, print::export_complex_single, qr_transfers::ContentLoadTypes, users::AddressDetails};
 use parser::cards::ParserCard;
 use plot_icon::png_data_from_vec;
 
@@ -120,14 +119,7 @@ impl <'a> Card <'a> {
             },
             Card::Verifier(x) => fancy(index, indent, "verifier", &export_complex_single(x, |a| a.show_card())),
             Card::Meta(x) => fancy(index, indent, "meta", &format!("{{{}}}", x.show())),
-            Card::TypesInfo(x) => {
-                let types_hash = blake2b(32, &[], &x.store()).as_bytes().to_vec();
-                let types_id_pic = match pic_types(&types_hash) {
-                    Ok(a) => hex::encode(a),
-                    Err(_) => String::new(),
-                };
-                fancy(index, indent, "types", &format!("{{\"types_hash\":\"{}\",\"types_id_pic\":\"{}\"}}", hex::encode(types_hash), types_id_pic))
-            },
+            Card::TypesInfo(x) => fancy(index, indent, "types", &format!("{{{}}}", x.show())),
             Card::NewSpecs(x) => fancy(index, indent, "new_specs", &format!("{{{}}}", x.show())),
             Card::NetworkInfo(x) => fancy(index, indent, "network_info", &format!("{{\"network_title\":\"{}\",\"network_logo\":\"{}\"}}", x.title, x.logo)),
             Card::NetworkGenesisHash(x) => fancy(index, indent, "network_genesis_hash", &format!("\"{}\"", hex::encode(x))),
