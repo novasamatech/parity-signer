@@ -47,6 +47,15 @@
 		2D48F39E276B5C1A004B27BE /* MRecoverSeedPhrase.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D48F39D276B5C1A004B27BE /* MRecoverSeedPhrase.swift */; };
 		2D48F3A0276C8D5E004B27BE /* LogMenu.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D48F39F276C8D5E004B27BE /* LogMenu.swift */; };
 		2D48F3A2276CA49D004B27BE /* MConfirm.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D48F3A1276CA49D004B27BE /* MConfirm.swift */; };
+		2D48F3A427708091004B27BE /* MManageNetworks.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D48F3A327708091004B27BE /* MManageNetworks.swift */; };
+		2D48F3A62770828B004B27BE /* ManageNetworks.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D48F3A52770828B004B27BE /* ManageNetworks.swift */; };
+		2D48F3A827708670004B27BE /* NetworkDetails.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D48F3A727708670004B27BE /* NetworkDetails.swift */; };
+		2D48F3AA27708A3F004B27BE /* MNetworkDetails.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D48F3A927708A3F004B27BE /* MNetworkDetails.swift */; };
+		2D48F3AC277092FD004B27BE /* MetadataCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D48F3AB277092FD004B27BE /* MetadataCard.swift */; };
+		2D48F3AE2770AD6B004B27BE /* NetworkDetailsMenu.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D48F3AD2770AD6B004B27BE /* NetworkDetailsMenu.swift */; };
+		2D48F3B02770AD83004B27BE /* ManageMetadata.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D48F3AF2770AD83004B27BE /* ManageMetadata.swift */; };
+		2D48F3B22770B29C004B27BE /* MManageMetadata.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D48F3B12770B29C004B27BE /* MManageMetadata.swift */; };
+		2D48F3B42770C164004B27BE /* VerifierScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D48F3B32770C164004B27BE /* VerifierScreen.swift */; };
 		2D72B4F626EF3BC50081E879 /* Navigator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D72B4F526EF3BC50081E879 /* Navigator.swift */; };
 		2D72B4FA26EF7D1C0081E879 /* Seeds.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D72B4F926EF7D1C0081E879 /* Seeds.swift */; };
 		2D72D52A2732B8A7004BA7C9 /* Database in Resources */ = {isa = PBXBuildFile; fileRef = 2D72D5292732B8A7004BA7C9 /* Database */; };
@@ -186,6 +195,15 @@
 		2D48F39D276B5C1A004B27BE /* MRecoverSeedPhrase.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MRecoverSeedPhrase.swift; sourceTree = "<group>"; };
 		2D48F39F276C8D5E004B27BE /* LogMenu.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LogMenu.swift; sourceTree = "<group>"; };
 		2D48F3A1276CA49D004B27BE /* MConfirm.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MConfirm.swift; sourceTree = "<group>"; };
+		2D48F3A327708091004B27BE /* MManageNetworks.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MManageNetworks.swift; sourceTree = "<group>"; };
+		2D48F3A52770828B004B27BE /* ManageNetworks.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ManageNetworks.swift; sourceTree = "<group>"; };
+		2D48F3A727708670004B27BE /* NetworkDetails.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NetworkDetails.swift; sourceTree = "<group>"; };
+		2D48F3A927708A3F004B27BE /* MNetworkDetails.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MNetworkDetails.swift; sourceTree = "<group>"; };
+		2D48F3AB277092FD004B27BE /* MetadataCard.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MetadataCard.swift; sourceTree = "<group>"; };
+		2D48F3AD2770AD6B004B27BE /* NetworkDetailsMenu.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkDetailsMenu.swift; sourceTree = "<group>"; };
+		2D48F3AF2770AD83004B27BE /* ManageMetadata.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ManageMetadata.swift; sourceTree = "<group>"; };
+		2D48F3B12770B29C004B27BE /* MManageMetadata.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MManageMetadata.swift; sourceTree = "<group>"; };
+		2D48F3B32770C164004B27BE /* VerifierScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VerifierScreen.swift; sourceTree = "<group>"; };
 		2D72B4F526EF3BC50081E879 /* Navigator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Navigator.swift; sourceTree = "<group>"; };
 		2D72B4F926EF7D1C0081E879 /* Seeds.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Seeds.swift; sourceTree = "<group>"; };
 		2D72D5292732B8A7004BA7C9 /* Database */ = {isa = PBXFileReference; lastKnownFileType = folder; path = Database; sourceTree = "<group>"; };
@@ -323,6 +341,7 @@
 				2DA5F8812756A2DE00D8DD29 /* AddressCard.swift */,
 				2DA5F83E275667CF00D8DD29 /* HistoryCardTemplate.swift */,
 				04197D26276A41E7003485D2 /* SettingsCardTemplate.swift */,
+				2D48F3AB277092FD004B27BE /* MetadataCard.swift */,
 			);
 			path = Cards;
 			sourceTree = "<group>";
@@ -332,6 +351,7 @@
 			children = (
 				2DE72BC326A588C7002BB752 /* MainScreenContainer.swift */,
 				2DA5F8262756629600D8DD29 /* ScreenSelector.swift */,
+				2D48F3B32770C164004B27BE /* VerifierScreen.swift */,
 				2DA5F8872756A70300D8DD29 /* SeedBackup.swift */,
 				2DA5F87B2756A21200D8DD29 /* ExportAddress.swift */,
 				2DA5F88D2757694A00D8DD29 /* LandingView.swift */,
@@ -343,6 +363,8 @@
 				2DA5F82E2756635A00D8DD29 /* HistoryScreen.swift */,
 				2DA5F8772756749B00D8DD29 /* SeedManager.swift */,
 				2DA5F8382756666C00D8DD29 /* EventDetails.swift */,
+				2D48F3A727708670004B27BE /* NetworkDetails.swift */,
+				2D48F3A52770828B004B27BE /* ManageNetworks.swift */,
 				2DA5F82C2756634900D8DD29 /* SettingsScreen.swift */,
 				2DA5F82A2756631D00D8DD29 /* KeyManager.swift */,
 				2DA5F8282756630900D8DD29 /* TransactionScreen.swift */,
@@ -357,6 +379,8 @@
 				2DA5F89E275F885400D8DD29 /* NewSeedMenu.swift */,
 				2DA5F89C275F874D00D8DD29 /* NetworkManager.swift */,
 				2D48F36827636036004B27BE /* SeedMenu.swift */,
+				2D48F3AD2770AD6B004B27BE /* NetworkDetailsMenu.swift */,
+				2D48F3AF2770AD83004B27BE /* ManageMetadata.swift */,
 				2D48F36E2767419D004B27BE /* PasswordConfirm.swift */,
 				2D48F39F276C8D5E004B27BE /* LogMenu.swift */,
 				2D48F395276A2003004B27BE /* SignatureReady.swift */,
@@ -433,6 +457,8 @@
 				2D48F39B276B5C0C004B27BE /* MRecoverSeedName.swift */,
 				2D48F39D276B5C1A004B27BE /* MRecoverSeedPhrase.swift */,
 				2D48F3642762407A004B27BE /* MKeyDetais.swift */,
+				2D48F3A327708091004B27BE /* MManageNetworks.swift */,
+				2D48F3A927708A3F004B27BE /* MNetworkDetails.swift */,
 				2D48F38F276A1527004B27BE /* MTransaction.swift */,
 				2D48F35C2760ED38004B27BE /* MKeys.swift */,
 				2D48F3542760AF9D004B27BE /* MSeeds.swift */,
@@ -447,6 +473,7 @@
 				2D48F36C27636092004B27BE /* MBackup.swift */,
 				2D48F391276A1D12004B27BE /* MSignatureReady.swift */,
 				2D48F393276A1D20004B27BE /* MEnterPassword.swift */,
+				2D48F3B12770B29C004B27BE /* MManageMetadata.swift */,
 				2D48F3702767514B004B27BE /* MPasswordConfirm.swift */,
 			);
 			path = ModalModels;
@@ -731,6 +758,7 @@
 				2DA5F89D275F874D00D8DD29 /* NetworkManager.swift in Sources */,
 				2D48F38727691C12004B27BE /* ShieldAlert.swift in Sources */,
 				2D48F39C276B5C0C004B27BE /* MRecoverSeedName.swift in Sources */,
+				2D48F3A427708091004B27BE /* MManageNetworks.swift in Sources */,
 				2DA5F87627566D7C00D8DD29 /* TransactionPreview.swift in Sources */,
 				2DA5F85E27566C3600D8DD29 /* TCFieldName.swift in Sources */,
 				2D48F3712767514B004B27BE /* MPasswordConfirm.swift in Sources */,
@@ -738,6 +766,7 @@
 				2DA5F87427566C3600D8DD29 /* TCEraMortal.swift in Sources */,
 				2D48F35127609CDE004B27BE /* HistoryCard.swift in Sources */,
 				2D48F390276A1527004B27BE /* MTransaction.swift in Sources */,
+				2D48F3B42770C164004B27BE /* VerifierScreen.swift in Sources */,
 				2D48F36927636036004B27BE /* SeedMenu.swift in Sources */,
 				2DA5F86327566C3600D8DD29 /* TCCall.swift in Sources */,
 				2DA5F8372756657600D8DD29 /* TransactionTypes.swift in Sources */,
@@ -755,6 +784,7 @@
 				2DA5F8252756624000D8DD29 /* NavbarShield.swift in Sources */,
 				2D48F3572760BBEC004B27BE /* RecoverSeedName.swift in Sources */,
 				2D48F3532760A2D8004B27BE /* Fonts.swift in Sources */,
+				2D48F3AC277092FD004B27BE /* MetadataCard.swift in Sources */,
 				2DE72C0026A6ADC5002BB752 /* CameraService.swift in Sources */,
 				2DA5F8312756652600D8DD29 /* CameraView.swift in Sources */,
 				2DA5F86F27566C3600D8DD29 /* TCTXSpec.swift in Sources */,
@@ -762,6 +792,7 @@
 				2DA5F86A27566C3600D8DD29 /* TCNewSpecs.swift in Sources */,
 				2D72B4FA26EF7D1C0081E879 /* Seeds.swift in Sources */,
 				04197D2B276BA40C003485D2 /* MenuElements.swift in Sources */,
+				2D48F3B22770B29C004B27BE /* MManageMetadata.swift in Sources */,
 				2D48F3652762407A004B27BE /* MKeyDetais.swift in Sources */,
 				2DA5F86927566C3600D8DD29 /* TCEraImmortal.swift in Sources */,
 				2D7A7BD626C1126C0053C1E0 /* Utils.swift in Sources */,
@@ -797,10 +828,12 @@
 				2DA5F89227590B4F00D8DD29 /* Documents.swift in Sources */,
 				2DA5F80D2756304B00D8DD29 /* Camera.swift in Sources */,
 				2DA5F8842756A37800D8DD29 /* Address.swift in Sources */,
+				2D48F3B02770AD83004B27BE /* ManageMetadata.swift in Sources */,
 				2DA5F84327566BE300D8DD29 /* TransactionCardSelector.swift in Sources */,
 				2DA5F83D275667AC00D8DD29 /* History.swift in Sources */,
 				2D48F373276793D3004B27BE /* MDeriveKey.swift in Sources */,
 				2DA5F86E27566C3600D8DD29 /* TCWarning.swift in Sources */,
+				2D48F3A62770828B004B27BE /* ManageNetworks.swift in Sources */,
 				2DA5F87227566C3600D8DD29 /* TCFieldNumber.swift in Sources */,
 				2DA5F86D27566C3600D8DD29 /* TCAuthorPlain.swift in Sources */,
 				0452BC572767B26600C6DD37 /* Buttons.swift in Sources */,
@@ -808,11 +841,13 @@
 				2DA5F86627566C3600D8DD29 /* TCText.swift in Sources */,
 				2DA5F82B2756631D00D8DD29 /* KeyManager.swift in Sources */,
 				2DE72C0F26A99885002BB752 /* RustNative.swift in Sources */,
+				2D48F3AE2770AD6B004B27BE /* NetworkDetailsMenu.swift in Sources */,
 				2D48F39A276B5916004B27BE /* MNewSeed.swift in Sources */,
 				2D48F394276A1D20004B27BE /* MEnterPassword.swift in Sources */,
 				2DA5F86127566C3600D8DD29 /* TCBalance.swift in Sources */,
 				2DA5F87127566C3600D8DD29 /* TCVarName.swift in Sources */,
 				2D48F398276A200F004B27BE /* EnterPassword.swift in Sources */,
+				2D48F3A827708670004B27BE /* NetworkDetails.swift in Sources */,
 				2DA5F86C27566C3600D8DD29 /* TCPallet.swift in Sources */,
 				2D48F396276A2003004B27BE /* SignatureReady.swift in Sources */,
 				2DA5F898275F865400D8DD29 /* ModalSelector.swift in Sources */,
@@ -827,6 +862,7 @@
 				2D48F3A2276CA49D004B27BE /* MConfirm.swift in Sources */,
 				2DA5F821275652EE00D8DD29 /* Footer.swift in Sources */,
 				2D48F38327691C0A004B27BE /* ConfirmAlert.swift in Sources */,
+				2D48F3AA27708A3F004B27BE /* MNetworkDetails.swift in Sources */,
 				2DA5F88C2757693600D8DD29 /* NewAddressScreen.swift in Sources */,
 				2D48F36B2763604F004B27BE /* Backup.swift in Sources */,
 				2DA5F83F275667CF00D8DD29 /* HistoryCardTemplate.swift in Sources */,

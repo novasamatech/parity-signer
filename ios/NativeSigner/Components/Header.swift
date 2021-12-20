@@ -67,8 +67,12 @@ struct Header: View {
                             Image(systemName: "ellipsis")
                                 .imageScale(.large)
                                 .foregroundColor(Color("Action400"))
-                        default:
+                        case "None":
                             EmptyView()
+                        default:
+                            Image(systemName: "ellipsis")
+                                .imageScale(.large)
+                                .foregroundColor(Color("Action400"))
                         }
                     }
                     NavbarShield()

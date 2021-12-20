@@ -30,6 +30,10 @@ struct ModalSelector: View {
             EnterPassword(content: value)
         case .LogRight:
             LogMenu()
+        case .NetworkDetailsMenu:
+            NetworkDetailsMenu()
+        case .ManageMetadata(let value):
+            ManageMetadata(content: value)
         }
     }
 }

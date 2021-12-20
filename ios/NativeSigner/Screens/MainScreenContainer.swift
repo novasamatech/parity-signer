@@ -37,6 +37,13 @@ struct MainScreenContainer: View {
                         .background(Color("Bg000"))
                 }
             }
+            .gesture(
+                DragGesture().onEnded{drag in
+                    if drag.translation.width < -20 {
+                        data.pushButton(buttonID: .GoBack)
+                    }
+                }
+            )
             .alert("Navigation error", isPresented: $data.parsingAlert, actions: {})
         } else {
             if (data.protected) {

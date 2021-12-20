@@ -79,9 +79,11 @@ struct ActionResult: Decodable {
         case "DeriveKey":
             screen = .DeriveKey(try values.decode(MDeriveKey.self, forKey: .screenData))
         case "Verifier":
-            screen = .Verifier
-        case "ManageNetwork":
-            screen = .ManageNetwork
+            screen = .Verifier(try values.decode(MVerifierDetails.self, forKey: .screenData))
+        case "ManageNetworks":
+            screen = .ManageNetworks(try values.decode(MManageNetworks.self, forKey: .screenData))
+        case "NetworkDetails":
+            screen = .NetworkDetails(try values.decode(MNetworkDetails.self, forKey: .screenData))
         default:
             screen = .Log(MLog())
         }
@@ -105,6 +107,10 @@ struct ActionResult: Decodable {
             modal = .SignatureReady(try values.decode(MSignatureReady.self, forKey: .modalData))
         case "LogRight":
             modal = .LogRight
+        case "NetworkDetailsMenu":
+            modal = .NetworkDetailsMenu
+        case "ManageMetadata":
+            modal = .ManageMetadata(try values.decode(MManageMetadata.self, forKey: .modalData))
         default:
             modal = .Empty
         }
@@ -139,8 +145,9 @@ enum SignerScreen: Decodable {
     case RecoverSeedName(MRecoverSeedName)
     case RecoverSeedPhrase(MRecoverSeedPhrase)
     case DeriveKey(MDeriveKey)
-    case Verifier
-    case ManageNetwork
+    case Verifier(MVerifierDetails)
+    case ManageNetworks(MManageNetworks)
+    case NetworkDetails(MNetworkDetails)
 }
 
 /**
@@ -156,6 +163,8 @@ enum SignerModal: Decodable {
     case SignatureReady(MSignatureReady)
     case EnterPassword(MEnterPassword)
     case LogRight
+    case NetworkDetailsMenu
+    case ManageMetadata(MManageMetadata)
 }
 
 enum SignerAlert: Decodable {
@@ -189,7 +198,13 @@ enum ButtonID {
     case CheckPassword
     case ChangeNetwork
     case TransactionFetched
-    case GenerateSufficientCrypto
+    case RemoveNetwork
+    case RemoveMetadata
+    case SignNetworkSpecs
+    case SignMetadata
+    case ManageNetworks
+    case ViewGeneralVerifier
+    case ManageMetadata
     case ClearLog
 }
 

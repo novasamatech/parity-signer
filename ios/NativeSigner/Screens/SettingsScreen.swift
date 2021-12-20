@@ -14,7 +14,7 @@ struct SettingsScreen: View {
     var body: some View {
         VStack (spacing: 2) {
             Button(action: {
-                //TODO: to NetworkSelect to NetworkManager
+                data.pushButton(buttonID: .ManageNetworks)
             }) {
                 SettingsCardTemplate(text: "Networks")
             }
@@ -23,6 +23,7 @@ struct SettingsScreen: View {
             }) {
                 SettingsCardTemplate(text: "Backup keys")
             }
+            Button(action: {data.pushButton(buttonID: .ViewGeneralVerifier)}) {
             VStack {
                 HStack {
                     Text("Verifier certificate").font(FBase(style: .h1))
@@ -31,6 +32,7 @@ struct SettingsScreen: View {
                 //TODO: VerifierCard to VarifierManager
             }
             .padding()
+            }
             Button(action: {
                 //TODO: add some alerts to make sure the operation was successful
                 wipe = true

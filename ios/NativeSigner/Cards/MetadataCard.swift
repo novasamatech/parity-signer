@@ -8,24 +8,21 @@
 import SwiftUI
 
 struct MetadataCard: View {
-    var meta: MetaSpecsNS
+    var meta: MMetadataRecord
     var body: some View {
         HStack {
+            Image(uiImage: UIImage(data: Data(fromHexEncodedString: meta.meta_id_pic) ?? Data()) ?? UIImage())
+                .resizable(resizingMode: .stretch)
+                .frame(width: 28, height: 28)
             VStack {
                 Text("version")
-                    .foregroundColor(Color("AccentColor"))
                 Text(meta.spec_version)
-                    .foregroundColor(Color("textMainColor"))
-                Spacer()
             }
             VStack {
                 Text("hash")
-                    .foregroundColor(Color("AccentColor"))
-                Text(meta.meta_hash)
-                    .foregroundColor(Color("textMainColor"))
-                    .font(.caption2)
+                Text(meta.meta_hash.truncateMiddle(length: 8))
             }
-        }.padding(.horizontal)
+        }.padding(.horizontal, 8)
     }
 }
 

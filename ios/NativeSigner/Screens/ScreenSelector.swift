@@ -38,11 +38,12 @@ struct ScreenSelector: View {
             RecoverSeedPhrase(content: value)
         case .DeriveKey(let value):
             NewAddressScreen(content: value)
-        case .Verifier:
-            Text("Verifier")
-        case .ManageNetwork:
-            Text("details of network")
-            //NetworkDetails()
+        case .Verifier(let value):
+            VerifierScreen(content: value)
+        case .ManageNetworks(let value):
+            ManageNetworks(content: value)
+        case .NetworkDetails(let value):
+            NetworkDetails(content: value)
         }
     }
 }
