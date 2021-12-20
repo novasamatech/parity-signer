@@ -770,7 +770,7 @@ impl State {
             Screen::Settings => "None",
             Screen::Verifier => "None",
             Screen::ManageNetworks => "None",
-            Screen::NetworkDetails(_) => "None",
+            Screen::NetworkDetails(_) => "NDMenu",
             Screen::SelectSeedForBackup => "Backup",
             Screen::Nowhere => "None",
         }.to_string()
