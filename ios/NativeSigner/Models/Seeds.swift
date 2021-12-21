@@ -36,6 +36,7 @@ extension SignerDataModel {
             kSecReturnAttributes as String: true,
             kSecReturnData as String: false
         ]
+        print("starting seed names query")
         let status = SecItemCopyMatching(query as CFDictionary, &item)
         print("refresh seeds")
         print(status)

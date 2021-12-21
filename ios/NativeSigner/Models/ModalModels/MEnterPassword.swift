@@ -11,3 +11,4 @@ struct MEnterPassword: Decodable {
     var author_info: TransactionAuthor
     var counter: Int
 }
+

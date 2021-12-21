@@ -12,10 +12,10 @@ struct ErrorAlert: View {
     let content: MError
     var body: some View {
         ZStack {
-            RoundedRectangle(cornerRadius: 20)
+            RoundedRectangle(cornerRadius: 20).foregroundColor(Color("BgDanger"))
             VStack{
-                Text("Error!")
-                Text(content.error)
+                Text("Error!").font(FBase(style: .h1)).foregroundColor(Color("SignalDanger"))
+                Text(content.error).foregroundColor(Color("SignalDanger"))
                 Button(action: {
                     data.pushButton(buttonID: .GoBack)
                 }) {Text("Ok")}
