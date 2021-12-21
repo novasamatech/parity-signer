@@ -34,6 +34,8 @@ pub enum Action {
     ManageNetworks,
     ViewGeneralVerifier,
     ManageMetadata,
+    RemoveKey,
+    RemoveSeed,
     Nothing,
 }
 
@@ -69,6 +71,8 @@ impl Action {
             "ManageNetworks" => Action::ManageNetworks,
             "ViewGeneralVerifier" => Action::ViewGeneralVerifier,
             "ManageMetadata" => Action::ManageMetadata,
+            "RemoveKey" => Action::RemoveKey,
+            "RemoveSeed" => Action::RemoveSeed,
             _ => Action::Nothing,
         }
     }

@@ -47,7 +47,7 @@ pub fn do_action(
     //If can't lock - debounce failed, ignore action
     //
     //guard is defined here to outline lifetime properly
-    let mut guard = STATE.try_lock();
+    let guard = STATE.try_lock();
     match guard {
         Ok(mut state) => {
             let action = Action::parse(action_str);
@@ -86,6 +86,26 @@ pub fn init_navigation(
                 },
                 Err(e) => println!("No networks could be fetched: {:?}", e),
             };
+        },
+        Err(_) => {
+            //TODO: maybe more grace here?
+            panic!("Concurrency error! Restart the app.");
+         },
+    }
+}
+
+///Should be called in the beginning to recall things stored only by phone
+pub fn update_seed_names(seed_names: &str) -> () {
+    let guard = STATE.lock();
+    match guard {
+        Ok(mut navstate) => {
+            if seed_names != "" {
+                (*navstate).seed_names = seed_names.split(",").map(|a| a.to_string()).collect();
+                (*navstate).seed_names.sort();
+                (*navstate).seed_names.dedup();
+            } else {
+                (*navstate).seed_names = Vec::new();
+            }
         },
         Err(_) => {
             //TODO: maybe more grace here?

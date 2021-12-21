@@ -11,7 +11,7 @@ use crate::network_details::get_all_networks;
 
 /// Function to print all seed names with identicons
 /// Gets used only on the Signer side, interacts with the user interface.
-pub fn print_all_seed_names_with_identicons (database_name: &str) -> Result<String, ErrorSigner> {
+pub fn print_all_seed_names_with_identicons (database_name: &str, names_phone_knows: &Vec<String>) -> Result<String, ErrorSigner> {
     let mut data_set: HashMap<String, Option<MultiSigner>> = HashMap::new();
     for (multisigner, address_details) in get_all_addresses(database_name)?.into_iter() {
         if (address_details.path == "")&&(!address_details.has_pwd) {
@@ -22,6 +22,7 @@ pub fn print_all_seed_names_with_identicons (database_name: &str) -> Result<Stri
         }
         else {if let None = data_set.get(&address_details.seed_name) {data_set.insert(address_details.seed_name.to_string(), None);}}
     }
+    for x in names_phone_knows.iter() {if let None = data_set.get(x) {data_set.insert(x.to_string(), None);}}
     let mut print_set: Vec<(String, String)> = Vec::new();
     for (seed_name, possible_multisigner) in data_set.into_iter() {
         let identicon_string = match possible_multisigner {
@@ -30,6 +31,7 @@ pub fn print_all_seed_names_with_identicons (database_name: &str) -> Result<Stri
         };
         print_set.push((identicon_string, seed_name))
     }
+    print_set.sort_by(|a, b| a.1.cmp(&b.1));
     Ok(export_complex_vector(&print_set, |(identicon_string, seed_name)| format!("\"identicon\":\"{}\",\"seed_name\":\"{}\"", identicon_string, seed_name)))
 }
 
@@ -208,8 +210,18 @@ mod tests {
     fn print_seed_names() {
         let dbname = "for_tests/print_seed_names";
         populate_cold (dbname, Verifier(None)).unwrap();
-        let horrible_print = print_all_seed_names_with_identicons(dbname).unwrap();
+        let horrible_print = print_all_seed_names_with_identicons(dbname, &vec![String::from("Alice")]).unwrap();
         let expected_print = r#"[{"identicon":"89504e470d0a1a0a0000000d49484452000000410000004108060000008ef7c9450000033a49444154789cedd8316e1441108561fb084e1d7100c71081135b64e6045cc289034484089cf8129c80cdd03a314410ef01889cee11967a1a9599197aba5e55778fd766fea036989656f505a3d61cee76bb83ffbd5910b6db6df84f8e8e8e0ee5a7694d104a96b66a815215a1e5f2e36a625441882c7ff9f94ee6b09b0fa7327dd5c02842882c8f52005a0402956084115a006873438410a200a825028a40b8104a96d75a23681e0c1aa106009a0b01b110148207e0e2fdb5cc61ab2f5732bbbc083f6fef650e7b75762c938b8130114a013416c202d06a425443c8016816040ba0b11045082c00f22258d54440398849040f00da770434059144f002a0a78080521034c2e5dd3799c36e4edfcaecf2229c9cbf91396cb3fe2eb3cb8b60bd63340a8105d058080b4063212c008d81301172009a05c1026816040ba08d21b2086300e445b0f222584510501f6241901e105200e8b9222085a88ef0fae45ce6b01f9bb5cc2e2f42ea7cfff92c0828076101682c447f41f65c0e620a00b910500a8205d02c88fe62a9e7e3fae7531039003440b00098bc08565e8468805810160427c2bb8b7f6f825f577f6f828f8d60dd54a7a21152001a0be101d072101680664150083900cd8288006829081640cb41344198bb05415a10a4bd44b8bffd7d30eef8ecc54134eb1d330b02ca4158005a042205a0b11039004423a014040ba0792072009a056101201782d56323445b10a405417a404016c4c5f54799c356579f6476791152e7fbcfbd08d6f78e5400909fee7b02ca21a4003416a2bf207b2e0761016839081a2107a05910fdc552cfc7f5cfa72058006d0aa219829517c1aa2a024a413c570405400b8234404063082fc2cbf31399c37ead3732bbbc08d64d3582d007402602ca4158001a0b6101682cc41800990888856001340b8205d02c080600d108565e042b2f021b8d80bc104f012105802611900762df11a600501601b1105e04eb1d5313210780aa21a01c8405a0b1102c002a4640a5102c806641d404401402f240e4f22294c400201a01d580980b8105402e04ad04a3358267792d8480a2102d112200288c805a40cc0d808a10b408460a220250b2bc5605418b6044abb1bc5615416b89517379ad09c2b81294164b8f9b0561dffb036973a4ac27dc44b20000000049454e44ae426082","seed_name":"Alice"}]"#;
+        assert!(horrible_print == expected_print, "\nReceived: \n{}", horrible_print);
+        fs::remove_dir_all(dbname).unwrap();
+    }
+    
+    #[test]
+    fn print_seed_names_with_orphan() {
+        let dbname = "for_tests/print_seed_names_with_orphan";
+        populate_cold (dbname, Verifier(None)).unwrap();
+        let horrible_print = print_all_seed_names_with_identicons(dbname, &vec![String::from("Alice"), String::from("BobGhost")]).unwrap();
+        let expected_print = r#"[{"identicon":"89504e470d0a1a0a0000000d49484452000000410000004108060000008ef7c9450000033a49444154789cedd8316e1441108561fb084e1d7100c71081135b64e6045cc289034484089cf8129c80cdd03a314410ef01889cee11967a1a9599197aba5e55778fd766fea036989656f505a3d61cee76bb83ffbd5910b6db6df84f8e8e8e0ee5a7694d104a96b66a815215a1e5f2e36a625441882c7ff9f94ee6b09b0fa7327dd5c02842882c8f52005a0402956084115a006873438410a200a825028a40b8104a96d75a23681e0c1aa106009a0b01b110148207e0e2fdb5cc61ab2f5732bbbc083f6fef650e7b75762c938b8130114a013416c202d06a425443c8016816040ba0b11045082c00f22258d54440398849040f00da770434059144f002a0a78080521034c2e5dd3799c36e4edfcaecf2229c9cbf91396cb3fe2eb3cb8b60bd63340a8105d058080b4063212c008d81301172009a05c1026816040ba08d21b2086300e445b0f222584510501f6241901e105200e8b9222085a88ef0fae45ce6b01f9bb5cc2e2f42ea7cfff92c0828076101682c447f41f65c0e620a00b910500a8205d02c88fe62a9e7e3fae7531039003440b00098bc08565e8468805810160427c2bb8b7f6f825f577f6f828f8d60dd54a7a21152001a0be101d072101680664150083900cd8288006829081640cb41344198bb05415a10a4bd44b8bffd7d30eef8ecc54134eb1d330b02ca4158005a042205a0b11039004423a014040ba0792072009a056101201782d56323445b10a405417a404016c4c5f54799c356579f6476791152e7fbcfbd08d6f78e5400909fee7b02ca21a4003416a2bf207b2e0761016839081a2107a05910fdc552cfc7f5cfa72058006d0aa219829517c1aa2a024a413c570405400b8234404063082fc2cbf31399c37ead3732bbbc08d64d3582d007402602ca4158001a0b6101682cc41800990888856001340b8205d02c080600d108565e042b2f021b8d80bc104f012105802611900762df11a600501601b1105e04eb1d5313210780aa21a01c8405a0b1102c002a4640a5102c806641d404401402f240e4f22294c400201a01d580980b8105402e04ad04a3358267792d8480a2102d112200288c805a40cc0d808a10b408460a220250b2bc5605418b6044abb1bc5615416b89517379ad09c2b81294164b8f9b0561dffb036973a4ac27dc44b20000000049454e44ae426082","seed_name":"Alice"},{"identicon":"","seed_name":"BobGhost"}]"#;
         assert!(horrible_print == expected_print, "\nReceived: \n{}", horrible_print);
         fs::remove_dir_all(dbname).unwrap();
     }

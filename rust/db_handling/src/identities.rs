@@ -326,6 +326,26 @@ pub fn suggest_path_name(path_all: &str) -> String {
 
 /// Function prepares removal of the address by public key and network id
 /// Function removes network_key from network_id vector for database record with address_key corresponding to given public key
+pub fn remove_key(database_name: &str, multisigner: &MultiSigner, network_specs_key: &NetworkSpecsKey) -> Result<(), ErrorSigner> {
+    let mut id_batch = Batch::default();
+    let mut events: Vec<Event> = Vec::new();
+    let network_specs = get_network_specs(database_name, network_specs_key)?;
+    let public_key = multisigner_to_public(multisigner);
+    let address_key = AddressKey::from_multisigner(multisigner);
+    let mut address_details = get_address_details(database_name, &address_key)?;
+    let identity_history = IdentityHistory::get(&address_details.seed_name, &network_specs.encryption, &public_key, &address_details.path, &network_specs.genesis_hash.to_vec());
+    events.push(Event::IdentityRemoved(identity_history));
+    address_details.network_id = address_details.network_id.into_iter().filter(|id| id != network_specs_key).collect();
+    if address_details.network_id.is_empty() {id_batch.remove(address_key.key())}
+    else {id_batch.insert(address_key.key(), address_details.encode())}
+    TrDbCold::new()
+        .set_addresses(id_batch) // modify existing address entry
+        .set_history(events_to_batch::<Signer>(&database_name, events)?) // add corresponding history
+        .apply::<Signer>(&database_name)
+}
+
+/// Function prepares removal of the address by public key and network id
+/// Function removes network_key from network_id vector for database record with address_key corresponding to given public key
 fn prepare_delete_address(pub_key_hex: &str, network_specs_key_string: &str, database_name: &str) -> Result<(Batch, Vec<Event>), ErrorSigner> {
     let mut id_batch = Batch::default();
     let mut events: Vec<Event> = Vec::new();
@@ -448,25 +468,24 @@ pub fn generate_test_identities (database_name: &str) -> Result<(), ErrorActive>
 
 /// Function to remove all identities associated with given seen_name
 /// Function is open to the user interface
-pub fn remove_identities_for_seed (seed_name: &str, database_name: &str) -> anyhow::Result<()> {
+pub fn remove_seed (database_name: &str, seed_name: &str) -> Result<(), ErrorSigner> {
     let mut identity_batch = Batch::default();
     let mut events: Vec<Event> = Vec::new();
-    let id_set = get_addresses_by_seed_name(database_name, seed_name).map_err(|e| e.anyhow())?;
+    let id_set = get_addresses_by_seed_name(database_name, seed_name)?;
     for (multisigner, address_details) in id_set.iter() {
         let address_key = AddressKey::from_multisigner(multisigner);
         identity_batch.remove(address_key.key());
         let public_key = multisigner_to_public(&multisigner);
         for network_specs_key in address_details.network_id.iter() {
-            let (genesis_hash_vec, _) = network_specs_key.genesis_hash_encryption::<Signer>(SpecsKeySource::AddrTree(address_key.to_owned())).map_err(|e| e.anyhow())?;
+            let (genesis_hash_vec, _) = network_specs_key.genesis_hash_encryption::<Signer>(SpecsKeySource::AddrTree(address_key.to_owned()))?;
             let identity_history = IdentityHistory::get(&seed_name, &address_details.encryption, &public_key, &address_details.path, &genesis_hash_vec);
             events.push(Event::IdentityRemoved(identity_history));
         }
     }
     TrDbCold::new()
         .set_addresses(identity_batch) // modify addresses
-        .set_history(events_to_batch::<Signer>(&database_name, events).map_err(|e| e.anyhow())?) // add corresponding history
+        .set_history(events_to_batch::<Signer>(&database_name, events)?) // add corresponding history
         .apply::<Signer>(&database_name)
-        .map_err(|e| e.anyhow())
 }
 
 /// Function to export identity as qr code readable by polkadot.js

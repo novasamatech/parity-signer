@@ -2,7 +2,7 @@
 
 use definitions::keyring::NetworkSpecsKey;
 
-#[derive(Debug, Clone)]
+#[derive(PartialEq, Debug, Clone)]
 pub enum Modal {
     Backup(String),
     NewSeedMenu,
@@ -15,6 +15,7 @@ pub enum Modal {
     NetworkDetailsMenu,
     ManageMetadata(u32),
     SufficientCryptoReady(String),
+    KeyDetailsAction,
     Empty,
 }
 
@@ -32,6 +33,7 @@ impl Modal {
             Modal::NetworkDetailsMenu => String::from("NetworkDetailsMenu"),
             Modal::ManageMetadata(_) => String::from("ManageMetadata"),
             Modal::SufficientCryptoReady(_) => String::from("SufficientCryptoReady"),
+            Modal::KeyDetailsAction => String::from("KeyDetailsAction"),
             Modal::Empty => String::from("Empty"),
         }
     }

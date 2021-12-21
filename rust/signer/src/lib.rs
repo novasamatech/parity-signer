@@ -205,31 +205,6 @@ export! {
 	) -> anyhow::Result<String, anyhow::Error> {
         db_handling::network_details::get_network_details_by_hex(network, dbname)
     }
-/*    
-    @Java_io_parity_signer_models_SignerDataModel_substrateRemoveNetwork
-	fn remove_network(
-        network: &str,
-        dbname: &str
-	) -> anyhow::Result<(), anyhow::Error> {
-        db_handling::remove_network::remove_network_by_hex(network, dbname)
-    }
-
-    @Java_io_parity_signer_models_SignerDataModel_substrateRemoveMetadata
-	fn remove_metadata(
-        network_name: &str,
-        network_version: u32,
-        dbname: &str
-	) -> anyhow::Result<(), anyhow::Error> {
-        db_handling::remove_network::remove_metadata(network_name, network_version, dbname)
-    }
-*/
-    @Java_io_parity_signer_models_SignerDataModel_substrateRemoveSeed
-	fn remove_seed(
-        seed_name: &str,
-        dbname: &str
-	) -> anyhow::Result<(), anyhow::Error> {
-        db_handling::identities::remove_identities_for_seed(seed_name, dbname)
-    }
 
     @Java_io_parity_signer_models_SignerDataModel_historyPrintHistory
 	fn print_history(

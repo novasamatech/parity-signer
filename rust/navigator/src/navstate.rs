@@ -46,10 +46,7 @@ impl State {
     ///Decide what to do and do it!
     pub fn perform(&mut self, action: Action, details_str: &str, secret_seed_phrase: &str) -> String {
         let mut new_navstate = self.navstate.to_owned();
-        let mut new_screen = self.navstate.screen.to_owned();
-        let mut seed_names = &(*self).seed_names;
-        let mut go_back_allowed = false;
-        let mut screen_details = String::new();
+        let seed_names = &(*self).seed_names;
 
         let mut seed_phrase = String::new();
 
@@ -381,22 +378,11 @@ impl State {
                 },
                 Action::RightButton => {
                     match &self.navstate.screen {
-                        Screen::Log => new_navstate.modal = Modal::LogRight,
-                        Screen::SeedSelector => {
-                            if let Modal::NewSeedMenu = self.navstate.modal {
-                                new_navstate.modal = Modal::Empty;
-                            } else {
-                                new_navstate.modal = Modal::NewSeedMenu;
-                            }
-                        },
-                        Screen::Keys(_) => new_navstate.modal = Modal::SeedMenu,
-                        Screen::NetworkDetails(_) => {
-                            if let Modal::NetworkDetailsMenu = self.navstate.modal {
-                                new_navstate.modal = Modal::Empty;
-                            } else {
-                                new_navstate.modal = Modal::NetworkDetailsMenu;
-                            }
-                        },
+                        Screen::Log => new_navstate.modal = self.toggle_modal(Modal::LogRight),
+                        Screen::SeedSelector => new_navstate.modal = self.toggle_modal(Modal::NewSeedMenu),
+                        Screen::Keys(_) => new_navstate.modal = self.toggle_modal(Modal::SeedMenu),
+                        Screen::KeyDetails(_) => new_navstate.modal = self.toggle_modal(Modal::KeyDetailsAction),
+                        Screen::NetworkDetails(_) => new_navstate.modal = self.toggle_modal(Modal::NetworkDetailsMenu),
                         _ => {},
                     }
                 },
@@ -568,7 +554,7 @@ impl State {
                 },
                 Action::ManageMetadata => {
                     match self.navstate.screen {
-                        Screen::NetworkDetails(ref network_specs_key) => {
+                        Screen::NetworkDetails(_) => {
                             match details_str.parse::<u32>() {
                                 Ok(version) => {
                                     new_navstate.modal = Modal::ManageMetadata(version);
@@ -580,6 +566,44 @@ impl State {
                             }
                         },
                         _ => println!("ManageMetadata does nothing here"),
+                    }
+                },
+                Action::RemoveKey => {
+                    match self.navstate.screen {
+                        Screen::KeyDetails(ref address_state) => {
+                            if let Modal::KeyDetailsAction = self.navstate.modal {
+                                match db_handling::identities::remove_key(dbname, &address_state.multisigner(), &address_state.network_specs_key()) {
+                                    Ok(()) => {
+                                        new_navstate = Navstate::clean_screen(Screen::Log);
+                                    },
+                                    Err(e) => {
+                                        new_navstate.alert = Alert::Error;
+                                        errorline.push_str(&<Signer>::show(&e));
+                                    },
+                                }
+                            }
+                            else {println!("RemoveKey does nothing here")}
+                        },
+                        _ => println!("RemoveKey does nothing here"),
+                    }
+                },
+                Action::RemoveSeed => {
+                    match self.navstate.screen {
+                        Screen::Keys(ref keys_state) => {
+                            if let Modal::SeedMenu = self.navstate.modal {
+                                match db_handling::identities::remove_seed(dbname, &keys_state.seed_name()) {
+                                    Ok(()) => {
+                                        new_navstate = Navstate::clean_screen(Screen::Log);
+                                    },
+                                    Err(e) => {
+                                        new_navstate.alert = Alert::Error;
+                                        errorline.push_str(&<Signer>::show(&e));
+                                    },
+                                }
+                            }
+                            else {println!("RemoveSeed does nothing here")}
+                        },
+                        _ => println!("RemoveSeed does nothing here"),
                     }
                 },
                 Action::Nothing => {
@@ -612,15 +636,14 @@ impl State {
                     }
                 },
                 Screen::SeedSelector => {
-                    let cards = match db_handling::interface_signer::print_all_seed_names_with_identicons(&dbname) {
-                        Ok(a) => a,
+                    match db_handling::interface_signer::print_all_seed_names_with_identicons(dbname, &self.seed_names) {
+                        Ok(a) => format!("\"seedNameCards\":{}", a),
                         Err(e) => {
                             new_navstate.alert = Alert::Error;
                             errorline.push_str(&<Signer>::show(&e));
                             "[]".to_string()
                         },
-                    };
-                    format!("\"seedNameCards\":{}", cards)
+                    }
                 },
                 Screen::Keys(ref k) => {
                     match db_handling::interface_signer::print_identities_for_seed_name_and_network(dbname, &k.seed_name(), &k.network_specs_key()) {
@@ -657,7 +680,16 @@ impl State {
                         },
                     }
                 },
-                //Screen::Settings => "Settings",
+                Screen::Settings => { // for now has same content as Screen::Verifier
+                    match db_handling::helpers::get_general_verifier(dbname) {
+                        Ok(a) => a.show_card(),
+                        Err(e) => {
+                            new_navstate.alert = Alert::Error;
+                            errorline.push_str(&<Signer>::show(&e));
+                            "".to_string()
+                        },
+                    }
+                },
                 Screen::Verifier => {
                     match db_handling::helpers::get_general_verifier(dbname) {
                         Ok(a) => a.show_card(),
@@ -789,13 +821,16 @@ impl State {
                 Alert::Shield => "\"shield_state\":\"unknown\"".to_string(),
             };
 
-            let mut output = String::new();
             self.navstate = new_navstate;
-            output = format!("\"screenData\":{{{}}},\"modalData\":{{{}}},\"alertData\":{{{}}}", screen_details, modal_details, alert_details);
-            output
+            format!("\"screenData\":{{{}}},\"modalData\":{{{}}},\"alertData\":{{{}}}", screen_details, modal_details, alert_details)
         } else {
             "\"error\":\"db not initialized\"".to_string()
         }
+    }
+    
+    fn toggle_modal(&self, modal: Modal) -> Modal {
+        if modal == self.navstate.modal {Modal::Empty}
+        else {modal}
     }
 
 
