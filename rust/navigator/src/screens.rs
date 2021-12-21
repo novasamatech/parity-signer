@@ -255,7 +255,7 @@ impl SufficientCryptoState {
             Ok(a) => hex::encode(a),
             Err(_) => String::new(),
         };
-        let author_info = format!("\"base58\":\"{}\",\"identicon\":\"{}\",\"seed_name\":\"{}\",\"derivation_path\":\"{}\"", hex::encode(multisigner_to_public(&multisigner)), hex_identicon, address_details.seed_name, address_details.path);
+        let author_info = format!("\"base58\":\"{}\",\"identicon\":\"{}\",\"seed\":\"{}\",\"derivation_path\":\"{}\"", hex::encode(multisigner_to_public(&multisigner)), hex_identicon, address_details.seed_name, address_details.path);
         Self{
             key_selected: Some((multisigner.to_owned(), address_details.to_owned(), author_info)),
             entered_info: EnteredInfo(new_secret_string.to_string()),
