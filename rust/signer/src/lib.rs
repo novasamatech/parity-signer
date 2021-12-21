@@ -42,6 +42,12 @@ export! {
         navigator::init_navigation(dbname, seed_names)
     }
 
+    @Java_io_parity_signer_models_SignerDataModel_updateSeedNames
+    fn update_seed_names(
+        seed_names: &str
+    ) -> () {
+        navigator::update_seed_names(seed_names)
+    }
 
 	@Java_io_parity_signer_models_SignerDataModel_substrateExportPubkey
 	fn export_pubkey(
