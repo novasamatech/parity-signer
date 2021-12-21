@@ -9,6 +9,7 @@ import SwiftUI
 
 struct SeedMenu: View {
     @EnvironmentObject var data: SignerDataModel
+    @State var removeConfirm = false
     var body: some View {
         MenuStack {
             HeaderBar(line1: "SEED MENU", line2: "Select action").padding(.top, 10)
@@ -27,11 +28,15 @@ struct SeedMenu: View {
                     text: "Forget this seed forever",
                     isShaded: true,
                     isDangerous: true,
-                    action: {}
+                    action: {
+                        removeConfirm = true
+                    }
                 )
             }
-            
         }
+        .alert(isPresented: $removeConfirm, content: {
+            Alert(title: Text("Forget this seed?"), message: Text("This seed will be removed for all networks. This is not reversible. Are you sure?"), primaryButton: .cancel(Text("Cancel")), secondaryButton: .destructive(Text("Remove seed"), action: {data.removeSeed(seedName: "")}))
+        })
     }
 }
 

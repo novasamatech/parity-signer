@@ -211,6 +211,8 @@ enum ButtonID {
     case ManageNetworks
     case ViewGeneralVerifier
     case ManageMetadata
+    case RemoveKey
+    case RemoveSeed
     case ClearLog
 }
 

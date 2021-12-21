@@ -45,6 +45,7 @@ extension SignerDataModel {
         else {
             print("no seeds available")
             self.seedNames = []
+            update_seed_names(nil, seedNames.joined(separator: ","))
             return
         }
         print("some seeds fetched")
@@ -60,6 +61,7 @@ extension SignerDataModel {
         }
         print(seedNames)
         self.seedNames = seedNames.sorted()
+        update_seed_names(nil, self.seedNames.joined(separator: ","))
     }
     
     func addSeed(seedName: String, seedLength: Int32) {
@@ -259,13 +261,11 @@ extension SignerDataModel {
         }
     }
     
-    /*
+    
     /**
      * Removes seed and all derived keys
      */
     func removeSeed(seedName: String) {
-        var err = ExternError()
-        
         let query = [
             kSecClass as String: kSecClassGenericPassword,
             kSecAttrAccount as String: seedName
@@ -273,26 +273,15 @@ extension SignerDataModel {
         let status = SecItemDelete(query)
         print(status.description)
         if status == errSecSuccess {
-            withUnsafeMutablePointer(to: &err) {err_ptr in
-                remove_seed(err_ptr, seedName, dbName)
-                if err_ptr.pointee.code == 0 {
-                    self.seedNames = self.seedNames.filter {
-                        $0 != seedName
-                    }
-                    self.selectedSeed = ""
-                    //self.fetchKeys()
-                } else {
-                    self.lastError = String(cString: err_ptr.pointee.message)
-                    print(self.lastError)
-                }
-            }
+            pushButton(buttonID: .RemoveSeed)
+            refreshSeeds()
         } else {
             print(seedName)
             self.lastError = SecCopyErrorMessageString(status, nil)! as String
             print("remove seed from secure storage error: " + self.lastError)
         }
     }
-     */
+     
     
     /*
      * Guess possible seed word(s) from user input
