@@ -88,11 +88,6 @@ void delete_identity(struct ExternError*, const char* pub_key, const char* netwo
 const char * get_network_specs(struct ExternError*, const char* network_name, const char* dbname);
 
 // History access operations
-// Fetch history for display
-const char * print_history(struct ExternError*, const char* dbname);
-
-// Clear history (marks history with clearing event time)
-void clear_history(struct ExternError*, const char* dbname);
 
 // Init history - should be called after db copy from resources, marks signer factory reset event, installs general verifier
 void init_history_with_cert(struct ExternError*, const char* dbname);

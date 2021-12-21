@@ -212,36 +212,6 @@ export! {
         db_handling::network_details::get_network_details_by_hex(network, dbname)
     }
 
-    @Java_io_parity_signer_models_SignerDataModel_historyPrintHistory
-	fn print_history(
-        dbname: &str
-	) -> anyhow::Result<String, anyhow::Error> {
-        db_handling::manage_history::print_history(dbname)
-    }
-
-    @Java_io_parity_signer_models_SignerDataModel_historyPrintHistoryPage
-    fn print_history_page(
-        page: u32,
-        dbname: &str
-    ) -> Result<String, anyhow::Error> {
-        db_handling::manage_history::print_history_page(page, dbname)
-    }
-
-    @Java_io_parity_signer_models_SignerDataModel_historyTotalPages
-    fn history_total_pages(
-        dbname: &str
-    ) -> Result<u32, anyhow::Error> {
-        db_handling::manage_history::history_total_pages(dbname)
-    }
-
-
-    @Java_io_parity_signer_models_SignerDataModel_historyClearHistory
-	fn clear_history(
-        dbname: &str
-	) -> anyhow::Result<(), anyhow::Error> {
-        db_handling::manage_history::clear_history(dbname)
-    }
-
     @Java_io_parity_signer_models_SignerDataModel_historyInitHistoryWithCert
 	fn init_history_with_cert(
         dbname: &str

@@ -36,6 +36,7 @@ pub enum Action {
     ManageMetadata,
     RemoveKey,
     RemoveSeed,
+    ClearLog,
     Nothing,
 }
 
@@ -73,6 +74,7 @@ impl Action {
             "ManageMetadata" => Action::ManageMetadata,
             "RemoveKey" => Action::RemoveKey,
             "RemoveSeed" => Action::RemoveSeed,
+            "ClearLog" => Action::ClearLog,
             _ => Action::Nothing,
         }
     }

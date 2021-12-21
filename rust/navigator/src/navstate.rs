@@ -606,6 +606,25 @@ impl State {
                         _ => println!("RemoveSeed does nothing here"),
                     }
                 },
+                Action::ClearLog => {
+                    match self.navstate.screen {
+                        Screen::Log => {
+                            if let Modal::LogRight = self.navstate.modal {
+                                match db_handling::manage_history::clear_history(dbname) {
+                                    Ok(()) => {
+                                        new_navstate = Navstate::clean_screen(Screen::Log);
+                                    },
+                                    Err(e) => {
+                                        new_navstate.alert = Alert::Error;
+                                        errorline.push_str(&<Signer>::show(&e));
+                                    },
+                                }
+                            }
+                            else {println!("ClearLog does nothing here")}
+                        },
+                        _ => println!("ClearLog does nothing here"),
+                    }
+                },
                 Action::Nothing => {
                     println!("no action was passed in action");
                 },
@@ -614,17 +633,14 @@ impl State {
             //Prepare screen details
             let screen_details = match new_navstate.screen {
                 Screen::Log => {
-                    let log_pack = match db_handling::manage_history::print_history_page(0, &dbname) {
-                        Ok(a) => {
-                            format!("\"log\":{}", a)
-                        },
+                    match db_handling::manage_history::print_history_page(0, &dbname) {
+                        Ok(a) => a.to_string(),
                         Err(e) => {
                             new_navstate.alert = Alert::Error;
-                            errorline.push_str(&e.to_string());
+                            errorline.push_str(&<Signer>::show(&e));
                             "".to_string()
                         },
-                    };
-                    format!("{}", log_pack)
+                    }
                 },
                 //Screen::LogDetails => "",
                 Screen::Scan => "".to_string(),
@@ -743,7 +759,13 @@ impl State {
                         errorline.push_str(&<Signer>::show(&e));
                         "".to_string()
                     },
-                }
+                },
+                Modal::SeedMenu => {
+                    match new_navstate.screen {
+                        Screen::Keys(ref keys_state) => format!("\"seed\":\"{}\"", keys_state.seed_name()),
+                        _ => "".to_string(),
+                    }
+                },
                 Modal::NetworkSelector(ref network_specs_key) => match db_handling::interface_signer::show_all_networks_with_flag (dbname, &network_specs_key) {
                     Ok(a) => a,
                     Err(e) => {
