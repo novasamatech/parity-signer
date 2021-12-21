@@ -56,6 +56,10 @@
 		2D48F3B02770AD83004B27BE /* ManageMetadata.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D48F3AF2770AD83004B27BE /* ManageMetadata.swift */; };
 		2D48F3B22770B29C004B27BE /* MManageMetadata.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D48F3B12770B29C004B27BE /* MManageMetadata.swift */; };
 		2D48F3B42770C164004B27BE /* VerifierScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D48F3B32770C164004B27BE /* VerifierScreen.swift */; };
+		2D48F3B62771D046004B27BE /* MSignSufficientCrypto.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D48F3B52771D046004B27BE /* MSignSufficientCrypto.swift */; };
+		2D48F3B82771D250004B27BE /* SignSufficientCrypto.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D48F3B72771D250004B27BE /* SignSufficientCrypto.swift */; };
+		2D48F3BA2771DD66004B27BE /* MSufficientCryptoReady.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D48F3B92771DD66004B27BE /* MSufficientCryptoReady.swift */; };
+		2D48F3BC2771DE24004B27BE /* SufficientCryptoReady.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D48F3BB2771DE24004B27BE /* SufficientCryptoReady.swift */; };
 		2D72B4F626EF3BC50081E879 /* Navigator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D72B4F526EF3BC50081E879 /* Navigator.swift */; };
 		2D72B4FA26EF7D1C0081E879 /* Seeds.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D72B4F926EF7D1C0081E879 /* Seeds.swift */; };
 		2D72D52A2732B8A7004BA7C9 /* Database in Resources */ = {isa = PBXBuildFile; fileRef = 2D72D5292732B8A7004BA7C9 /* Database */; };
@@ -204,6 +208,10 @@
 		2D48F3AF2770AD83004B27BE /* ManageMetadata.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ManageMetadata.swift; sourceTree = "<group>"; };
 		2D48F3B12770B29C004B27BE /* MManageMetadata.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MManageMetadata.swift; sourceTree = "<group>"; };
 		2D48F3B32770C164004B27BE /* VerifierScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VerifierScreen.swift; sourceTree = "<group>"; };
+		2D48F3B52771D046004B27BE /* MSignSufficientCrypto.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MSignSufficientCrypto.swift; sourceTree = "<group>"; };
+		2D48F3B72771D250004B27BE /* SignSufficientCrypto.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignSufficientCrypto.swift; sourceTree = "<group>"; };
+		2D48F3B92771DD66004B27BE /* MSufficientCryptoReady.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MSufficientCryptoReady.swift; sourceTree = "<group>"; };
+		2D48F3BB2771DE24004B27BE /* SufficientCryptoReady.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SufficientCryptoReady.swift; sourceTree = "<group>"; };
 		2D72B4F526EF3BC50081E879 /* Navigator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Navigator.swift; sourceTree = "<group>"; };
 		2D72B4F926EF7D1C0081E879 /* Seeds.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Seeds.swift; sourceTree = "<group>"; };
 		2D72D5292732B8A7004BA7C9 /* Database */ = {isa = PBXFileReference; lastKnownFileType = folder; path = Database; sourceTree = "<group>"; };
@@ -351,6 +359,7 @@
 			children = (
 				2DE72BC326A588C7002BB752 /* MainScreenContainer.swift */,
 				2DA5F8262756629600D8DD29 /* ScreenSelector.swift */,
+				2D48F3B72771D250004B27BE /* SignSufficientCrypto.swift */,
 				2D48F3B32770C164004B27BE /* VerifierScreen.swift */,
 				2DA5F8872756A70300D8DD29 /* SeedBackup.swift */,
 				2DA5F87B2756A21200D8DD29 /* ExportAddress.swift */,
@@ -384,6 +393,7 @@
 				2D48F36E2767419D004B27BE /* PasswordConfirm.swift */,
 				2D48F39F276C8D5E004B27BE /* LogMenu.swift */,
 				2D48F395276A2003004B27BE /* SignatureReady.swift */,
+				2D48F3BB2771DE24004B27BE /* SufficientCryptoReady.swift */,
 				2D48F397276A200F004B27BE /* EnterPassword.swift */,
 				2D48F36A2763604F004B27BE /* Backup.swift */,
 			);
@@ -458,6 +468,7 @@
 				2D48F39D276B5C1A004B27BE /* MRecoverSeedPhrase.swift */,
 				2D48F3642762407A004B27BE /* MKeyDetais.swift */,
 				2D48F3A327708091004B27BE /* MManageNetworks.swift */,
+				2D48F3B52771D046004B27BE /* MSignSufficientCrypto.swift */,
 				2D48F3A927708A3F004B27BE /* MNetworkDetails.swift */,
 				2D48F38F276A1527004B27BE /* MTransaction.swift */,
 				2D48F35C2760ED38004B27BE /* MKeys.swift */,
@@ -472,6 +483,7 @@
 				2D48F36227622C54004B27BE /* MNetworkMenu.swift */,
 				2D48F36C27636092004B27BE /* MBackup.swift */,
 				2D48F391276A1D12004B27BE /* MSignatureReady.swift */,
+				2D48F3B92771DD66004B27BE /* MSufficientCryptoReady.swift */,
 				2D48F393276A1D20004B27BE /* MEnterPassword.swift */,
 				2D48F3B12770B29C004B27BE /* MManageMetadata.swift */,
 				2D48F3702767514B004B27BE /* MPasswordConfirm.swift */,
@@ -817,6 +829,7 @@
 				2DA5F82F2756635A00D8DD29 /* HistoryScreen.swift in Sources */,
 				2DE72BC226A588C7002BB752 /* NativeSignerApp.swift in Sources */,
 				2DA5F8232756621F00D8DD29 /* Header.swift in Sources */,
+				2D48F3BA2771DD66004B27BE /* MSufficientCryptoReady.swift in Sources */,
 				2D7A7BD426BBEAF00053C1E0 /* Canary.swift in Sources */,
 				2DA5F8352756656E00D8DD29 /* Transaction.swift in Sources */,
 				2D48F35D2760ED38004B27BE /* MKeys.swift in Sources */,
@@ -832,6 +845,7 @@
 				2DA5F84327566BE300D8DD29 /* TransactionCardSelector.swift in Sources */,
 				2DA5F83D275667AC00D8DD29 /* History.swift in Sources */,
 				2D48F373276793D3004B27BE /* MDeriveKey.swift in Sources */,
+				2D48F3B82771D250004B27BE /* SignSufficientCrypto.swift in Sources */,
 				2DA5F86E27566C3600D8DD29 /* TCWarning.swift in Sources */,
 				2D48F3A62770828B004B27BE /* ManageNetworks.swift in Sources */,
 				2DA5F87227566C3600D8DD29 /* TCFieldNumber.swift in Sources */,
@@ -865,7 +879,9 @@
 				2D48F3AA27708A3F004B27BE /* MNetworkDetails.swift in Sources */,
 				2DA5F88C2757693600D8DD29 /* NewAddressScreen.swift in Sources */,
 				2D48F36B2763604F004B27BE /* Backup.swift in Sources */,
+				2D48F3BC2771DE24004B27BE /* SufficientCryptoReady.swift in Sources */,
 				2DA5F83F275667CF00D8DD29 /* HistoryCardTemplate.swift in Sources */,
+				2D48F3B62771D046004B27BE /* MSignSufficientCrypto.swift in Sources */,
 				2D72B4F626EF3BC50081E879 /* Navigator.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

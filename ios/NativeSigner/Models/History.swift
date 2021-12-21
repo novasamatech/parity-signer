@@ -73,7 +73,7 @@ enum Event: Decodable, Hashable, Equatable {
             self = .resetDangerRecord
         case "seed_name_shown":
             self = .seedNameWasShown(try values.decode(String.self, forKey: .payload))
-        case "add_network_message_signed":
+        case "add_specs_message_signed":
             self = .signedAddNetwork(try values.decode(NetworkSigned.self, forKey: .payload))
         case "load_metadata_message_signed":
             self = .signedLoadMetadata(try values.decode(MetadataSigned.self, forKey: .payload))

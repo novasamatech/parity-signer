@@ -34,6 +34,8 @@ struct ModalSelector: View {
             NetworkDetailsMenu()
         case .ManageMetadata(let value):
             ManageMetadata(content: value)
+        case .SufficientCryptoReady(let value):
+            SufficientCryptoReady(content: value)
         }
     }
 }

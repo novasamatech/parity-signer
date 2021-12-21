@@ -58,6 +58,3 @@ extension String {
         }
     }
 }
-
-//Getting font:
-//Text("kusama").font(Font.custom("Web3-Regular", size: 24))

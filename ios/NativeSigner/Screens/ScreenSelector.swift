@@ -44,6 +44,8 @@ struct ScreenSelector: View {
             ManageNetworks(content: value)
         case .NetworkDetails(let value):
             NetworkDetails(content: value)
+        case .SignSufficientCrypto(let value):
+            SignSufficientCrypto(content: value)
         }
     }
 }

@@ -84,6 +84,8 @@ struct ActionResult: Decodable {
             screen = .ManageNetworks(try values.decode(MManageNetworks.self, forKey: .screenData))
         case "NetworkDetails":
             screen = .NetworkDetails(try values.decode(MNetworkDetails.self, forKey: .screenData))
+        case "SignSufficientCrypto":
+            screen = .SignSufficientCrypto(try values.decode(MSignSufficientCrypto.self, forKey: .screenData))
         default:
             screen = .Log(MLog())
         }
@@ -111,6 +113,8 @@ struct ActionResult: Decodable {
             modal = .NetworkDetailsMenu
         case "ManageMetadata":
             modal = .ManageMetadata(try values.decode(MManageMetadata.self, forKey: .modalData))
+        case "SufficientCryptoReady":
+            modal = .SufficientCryptoReady(try values.decode(MSufficientCryptoReady.self, forKey: .modalData))
         default:
             modal = .Empty
         }
@@ -148,6 +152,7 @@ enum SignerScreen: Decodable {
     case Verifier(MVerifierDetails)
     case ManageNetworks(MManageNetworks)
     case NetworkDetails(MNetworkDetails)
+    case SignSufficientCrypto(MSignSufficientCrypto)
 }
 
 /**
@@ -165,6 +170,7 @@ enum SignerModal: Decodable {
     case LogRight
     case NetworkDetailsMenu
     case ManageMetadata(MManageMetadata)
+    case SufficientCryptoReady(MSufficientCryptoReady)
 }
 
 enum SignerAlert: Decodable {
