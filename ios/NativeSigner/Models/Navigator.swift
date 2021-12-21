@@ -98,7 +98,7 @@ struct ActionResult: Decodable {
         case "NetworkSelector":
             modal = .NetworkMenu(try values.decode(MNetworkMenu.self, forKey: .modalData))
         case "SeedMenu":
-            modal = .SeedMenu
+            modal = .SeedMenu(try values.decode(MSeedMenu.self, forKey: .modalData))
         case "Backup":
             modal = .Backup(try values.decode(MBackup.self, forKey: .modalData))
         case "PasswordConfirm":
@@ -164,7 +164,7 @@ enum SignerModal: Decodable {
     case Empty
     case NewSeedMenu
     case NetworkMenu(MNetworkMenu)
-    case SeedMenu
+    case SeedMenu(MSeedMenu)
     case Backup(MBackup)
     case PasswordConfirm(MPasswordConfirm)
     case SignatureReady(MSignatureReady)

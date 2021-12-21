@@ -18,8 +18,8 @@ struct ModalSelector: View {
             NewSeedMenu()
         case .NetworkMenu(let value):
             NetworkManager(content: value)
-        case .SeedMenu:
-            SeedMenu()
+        case .SeedMenu(let value):
+            SeedMenu(content: value)
         case .Backup(let value):
             Backup(content: value)
         case .PasswordConfirm(let value):
