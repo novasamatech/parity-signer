@@ -45,7 +45,9 @@ struct TransactionPreview: View {
                 }
                 Spacer()
                 HStack {
-                    Button(action: {data.pushButton(buttonID: .GoBack)}) {
+                    Button(action: {
+                        focus = false
+                        data.pushButton(buttonID: .GoBack)}) {
                         Text("Decline")
                             .font(.largeTitle)
                     }
@@ -53,6 +55,7 @@ struct TransactionPreview: View {
                     switch content.type {
                     case .sign:
                         Button(action: {
+                            focus = false
                             data.pushButton(buttonID: .GoForward, details: Data(comment.utf8).base64EncodedString(), seedPhrase: data.getSeed(seedName: content.author_info?.seed ?? ""))
                         }) {
                             Text("Sign")

@@ -31,12 +31,12 @@ struct DocumentModal: View {
                 case .pp:
                     ScrollView {
                         Text(data.getPP())
-                            .foregroundColor(Color("textMainColor"))
+                            .foregroundColor(Color("Text600"))
                     }
                 case .toc:
                     ScrollView {
                         Text(data.getTaC())
-                            .foregroundColor(Color("textMainColor"))
+                            .foregroundColor(Color("Text600"))
                     }.padding()
                 case .about:
                     ScrollView {

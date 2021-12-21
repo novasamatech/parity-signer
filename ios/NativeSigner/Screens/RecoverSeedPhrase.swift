@@ -20,7 +20,7 @@ struct RecoverSeedPhrase: View {
         ZStack{
             VStack {
                 //SeedNameCardOfSomeKind
-                //Text(content.seed_name)
+                Text(content.seed_name)
                 VStack(alignment: .leading) {
                     Text("SEED PHRASE").font(FBase(style: .overline))
                     ZStack {
@@ -86,7 +86,7 @@ struct RecoverSeedPhrase: View {
                     if (!focus) {
                     HStack {
                         Button(action: {
-                            data.restoreSeed(seedName: "test", seedPhrase: seedPhrase.joined(separator: " "))
+                            data.restoreSeed(seedName: content.seed_name, seedPhrase: seedPhrase.joined(separator: " "))
                         }) {
                             Text("Create")
                                 .font(.system(size: 22))

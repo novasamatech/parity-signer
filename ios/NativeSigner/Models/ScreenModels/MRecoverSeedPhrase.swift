@@ -9,5 +9,5 @@ import Foundation
 
 struct MRecoverSeedPhrase: Decodable {
     var keyboard: Bool
-    //var seed_name: String
+    var seed_name: String
 }
