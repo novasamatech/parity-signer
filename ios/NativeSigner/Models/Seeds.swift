@@ -259,6 +259,7 @@ extension SignerDataModel {
         }
     }
     
+    /*
     /**
      * Removes seed and all derived keys
      */
@@ -291,6 +292,7 @@ extension SignerDataModel {
             print("remove seed from secure storage error: " + self.lastError)
         }
     }
+     */
     
     /*
      * Guess possible seed word(s) from user input

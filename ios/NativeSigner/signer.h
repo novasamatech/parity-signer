@@ -84,15 +84,6 @@ void delete_identity(struct ExternError*, const char* pub_key, const char* netwo
 // Get network specs for settings screen
 const char * get_network_specs(struct ExternError*, const char* network_name, const char* dbname);
 
-// Removes network from db
-void remove_network(struct ExternError*, const char* network_name, const char* dbname);
-
-// Removes metadata record from db
-void remove_metadata(struct ExternError*, const char* network_name, int network_version, const char* dbname);
-
-// Cleans identities after seed removal - deletes identities bound to given seed
-void remove_seed(struct ExternError*, const char* seed_name, const char* dbname);
-
 // History access operations
 // Fetch history for display
 const char * print_history(struct ExternError*, const char* dbname);
