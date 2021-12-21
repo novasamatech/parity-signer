@@ -1,7 +1,7 @@
 use hex;
 use sp_core::{Pair, ed25519, sr25519, ecdsa};
 use sp_runtime::{MultiSigner, MultiSignature};
-use definitions::{crypto::SufficientCrypto, error::{ErrorSigner, Signer}, history::{Event, MetaValuesExport, NetworkSpecsExport, TypesExport}, keyring::NetworkSpecsKey, qr_transfers::{ContentAddSpecs, ContentLoadMeta}, users::AddressDetails};
+use definitions::{crypto::SufficientCrypto, error::{ErrorSigner, Signer}, history::{Event, MetaValuesDisplay, MetaValuesExport, NetworkSpecsExport, TypesExport}, keyring::NetworkSpecsKey, qr_transfers::{ContentAddSpecs, ContentLoadMeta}, users::AddressDetails};
 use parity_scale_codec::Encode;
 use db_handling::{db_transactions::TrDbCold, helpers::{get_meta_values_by_name_version, get_network_specs}, manage_history::{events_to_batch}, prep_messages::{prep_types, get_genesis_hash}};
 use qrcode_static::png_qr;
@@ -64,12 +64,12 @@ fn sufficient_crypto (multisigner: &MultiSigner, address_details: &AddressDetail
 /// Function to generate hex line of qr data corresponding to `sufficient_crypto` for load_types message
 pub (crate) fn sufficient_crypto_load_types (multisigner: &MultiSigner, address_details: &AddressDetails, database_name: &str, seed_phrase: &str, pwd_entry: &str) -> Result<String, ErrorSigner> {
     let types_content = prep_types::<Signer>(database_name)?;
-    match sufficient_crypto (multisigner, address_details, &types_content.to_sign(), seed_phrase, pwd_entry) {
+    let signature = match sufficient_crypto (multisigner, address_details, &types_content.to_sign(), seed_phrase, pwd_entry) {
         Ok(s) => {
             TrDbCold::new()
                 .set_history(events_to_batch::<Signer>(&database_name, vec![Event::TypesSigned(TypesExport::get(&types_content, &s.get_verifier_value()))])?)
                 .apply::<Signer>(&database_name)?;
-            hex_qr_from_signature(s.get_multi_signature())
+            hex_qr_from_signature(s.get_multi_signature())?
         },
         Err(e) => {
             if let ErrorSigner::WrongPassword = e {
@@ -79,7 +79,8 @@ pub (crate) fn sufficient_crypto_load_types (multisigner: &MultiSigner, address_
             }
             return Err(e)
         },
-    }
+    };
+    Ok(format!("\"signature\":\"{}\",\"content\":{{\"type\":\"load_types\",{}}}", signature, types_content.show()))
 }
 
 /// Function to generate hex line of qr data corresponding to `sufficient_crypto` for load_metadata message
@@ -88,12 +89,12 @@ pub (crate) fn sufficient_crypto_load_metadata (network_specs_key: &NetworkSpecs
     let meta_values = get_meta_values_by_name_version::<Signer>(database_name, &network_specs.name, network_version)?;
     let genesis_hash = get_genesis_hash(&network_specs.name, database_name)?;
     let load_meta_content = ContentLoadMeta::generate(&meta_values.meta, &genesis_hash);
-    match sufficient_crypto (multisigner, address_details, &load_meta_content.to_sign(), seed_phrase, pwd_entry) {
+    let signature = match sufficient_crypto (multisigner, address_details, &load_meta_content.to_sign(), seed_phrase, pwd_entry) {
         Ok(s) => {
             TrDbCold::new()
                 .set_history(events_to_batch::<Signer>(&database_name, vec![Event::MetadataSigned(MetaValuesExport::get(&meta_values, &s.get_verifier_value()))])?)
                 .apply::<Signer>(&database_name)?;
-            hex_qr_from_signature(s.get_multi_signature())
+            hex_qr_from_signature(s.get_multi_signature())?
         },
         Err(e) => {
             if let ErrorSigner::WrongPassword = e {
@@ -103,19 +104,20 @@ pub (crate) fn sufficient_crypto_load_metadata (network_specs_key: &NetworkSpecs
             }
             return Err(e)
         },
-    }
+    };
+    Ok(format!("\"signature\":\"{}\",\"content\":{{\"type\":\"load_metadata\",{}}}", signature, MetaValuesDisplay::get(&meta_values).show()))
 }
 
 /// Function to generate hex line of qr data corresponding to `sufficient_crypto` for add_specs message
 pub (crate) fn sufficient_crypto_add_specs (network_specs_key: &NetworkSpecsKey, multisigner: &MultiSigner, address_details: &AddressDetails, database_name: &str, seed_phrase: &str, pwd_entry: &str) -> Result<String, ErrorSigner> {
     let network_specs_to_send = get_network_specs(database_name, network_specs_key)?.to_send();
     let add_specs_content = ContentAddSpecs::generate(&network_specs_to_send);
-    match sufficient_crypto (multisigner, address_details, &add_specs_content.to_sign(), seed_phrase, pwd_entry) {
+    let signature = match sufficient_crypto (multisigner, address_details, &add_specs_content.to_sign(), seed_phrase, pwd_entry) {
         Ok(s) => {
             TrDbCold::new()
                 .set_history(events_to_batch::<Signer>(&database_name, vec![Event::NetworkSpecsSigned(NetworkSpecsExport::get(&network_specs_to_send, &s.get_verifier_value()))])?)
                 .apply::<Signer>(&database_name)?;
-            hex_qr_from_signature(s.get_multi_signature())
+            hex_qr_from_signature(s.get_multi_signature())?
         },
         Err(e) => {
             if let ErrorSigner::WrongPassword = e {
@@ -125,7 +127,8 @@ pub (crate) fn sufficient_crypto_add_specs (network_specs_key: &NetworkSpecsKey,
             }
             return Err(e)
         },
-    }
+    };
+    Ok(format!("\"signature\":\"{}\",\"content\":{{\"type\":\"add_specs\",\"network_title\":\"{}\",\"network_logo\":\"{}\"}}", signature, network_specs_to_send.title, network_specs_to_send.logo))
 }
 
 fn hex_qr_from_signature(signature: MultiSignature) -> Result<String, ErrorSigner> {
