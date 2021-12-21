@@ -60,6 +60,7 @@
 		2D48F3B82771D250004B27BE /* SignSufficientCrypto.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D48F3B72771D250004B27BE /* SignSufficientCrypto.swift */; };
 		2D48F3BA2771DD66004B27BE /* MSufficientCryptoReady.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D48F3B92771DD66004B27BE /* MSufficientCryptoReady.swift */; };
 		2D48F3BC2771DE24004B27BE /* SufficientCryptoReady.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D48F3BB2771DE24004B27BE /* SufficientCryptoReady.swift */; };
+		2D48F3BE27720345004B27BE /* KeyMenu.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D48F3BD27720345004B27BE /* KeyMenu.swift */; };
 		2D72B4F626EF3BC50081E879 /* Navigator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D72B4F526EF3BC50081E879 /* Navigator.swift */; };
 		2D72B4FA26EF7D1C0081E879 /* Seeds.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D72B4F926EF7D1C0081E879 /* Seeds.swift */; };
 		2D72D52A2732B8A7004BA7C9 /* Database in Resources */ = {isa = PBXBuildFile; fileRef = 2D72D5292732B8A7004BA7C9 /* Database */; };
@@ -212,6 +213,7 @@
 		2D48F3B72771D250004B27BE /* SignSufficientCrypto.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignSufficientCrypto.swift; sourceTree = "<group>"; };
 		2D48F3B92771DD66004B27BE /* MSufficientCryptoReady.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MSufficientCryptoReady.swift; sourceTree = "<group>"; };
 		2D48F3BB2771DE24004B27BE /* SufficientCryptoReady.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SufficientCryptoReady.swift; sourceTree = "<group>"; };
+		2D48F3BD27720345004B27BE /* KeyMenu.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyMenu.swift; sourceTree = "<group>"; };
 		2D72B4F526EF3BC50081E879 /* Navigator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Navigator.swift; sourceTree = "<group>"; };
 		2D72B4F926EF7D1C0081E879 /* Seeds.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Seeds.swift; sourceTree = "<group>"; };
 		2D72D5292732B8A7004BA7C9 /* Database */ = {isa = PBXFileReference; lastKnownFileType = folder; path = Database; sourceTree = "<group>"; };
@@ -387,6 +389,7 @@
 				2DA5F897275F865400D8DD29 /* ModalSelector.swift */,
 				2DA5F89E275F885400D8DD29 /* NewSeedMenu.swift */,
 				2DA5F89C275F874D00D8DD29 /* NetworkManager.swift */,
+				2D48F3BD27720345004B27BE /* KeyMenu.swift */,
 				2D48F36827636036004B27BE /* SeedMenu.swift */,
 				2D48F3AD2770AD6B004B27BE /* NetworkDetailsMenu.swift */,
 				2D48F3AF2770AD83004B27BE /* ManageMetadata.swift */,
@@ -877,6 +880,7 @@
 				2DA5F821275652EE00D8DD29 /* Footer.swift in Sources */,
 				2D48F38327691C0A004B27BE /* ConfirmAlert.swift in Sources */,
 				2D48F3AA27708A3F004B27BE /* MNetworkDetails.swift in Sources */,
+				2D48F3BE27720345004B27BE /* KeyMenu.swift in Sources */,
 				2DA5F88C2757693600D8DD29 /* NewAddressScreen.swift in Sources */,
 				2D48F36B2763604F004B27BE /* Backup.swift in Sources */,
 				2D48F3BC2771DE24004B27BE /* SufficientCryptoReady.swift in Sources */,

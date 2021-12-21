@@ -115,6 +115,8 @@ struct ActionResult: Decodable {
             modal = .ManageMetadata(try values.decode(MManageMetadata.self, forKey: .modalData))
         case "SufficientCryptoReady":
             modal = .SufficientCryptoReady(try values.decode(MSufficientCryptoReady.self, forKey: .modalData))
+        case "KeyDetailsAction":
+            modal = .KeyDetailsAction
         default:
             modal = .Empty
         }
@@ -171,6 +173,7 @@ enum SignerModal: Decodable {
     case NetworkDetailsMenu
     case ManageMetadata(MManageMetadata)
     case SufficientCryptoReady(MSufficientCryptoReady)
+    case KeyDetailsAction
 }
 
 enum SignerAlert: Decodable {

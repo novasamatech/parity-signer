@@ -36,6 +36,8 @@ struct ModalSelector: View {
             ManageMetadata(content: value)
         case .SufficientCryptoReady(let value):
             SufficientCryptoReady(content: value)
+        case .KeyDetailsAction:
+            KeyMenu()
         }
     }
 }
