@@ -47,7 +47,7 @@ struct EnterPassword: View {
                     data.pushButton(buttonID: .GoForward, details: password)
                 }) {
                     Text("Next")
-                }.disabled(password != "")
+                }.disabled(password == "")
             }
         }
     }

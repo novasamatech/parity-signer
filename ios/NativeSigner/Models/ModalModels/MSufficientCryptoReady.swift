@@ -14,18 +14,18 @@ struct MSufficientCryptoReady: Decodable {
 }
 
 struct MSCAuthor: Decodable {
-    var public_key: String
+    var base58: String
     var identicon: String
-    var seed_name: String
+    var seed: String
     var derivation_path: String
     
     func intoAddress() -> Address {
         return Address(
-            base58: self.public_key,
+            base58: self.base58,
             path: self.derivation_path,
             has_pwd: false, //TODO: this
             identicon: self.identicon,
-            seed_name: self.seed_name
+            seed_name: self.seed
         )
     }
 }
