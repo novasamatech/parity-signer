@@ -912,7 +912,7 @@ impl State {
             Screen::Transaction(_) => "None",
             Screen::SeedSelector => "NewSeed",
             Screen::Keys(_) => "Backup",
-            Screen::KeyDetails(_) => "None",
+            Screen::KeyDetails(_) => "KeyMenu",
             Screen::NewSeed => "None",
             Screen::RecoverSeedName => "None",
             Screen::RecoverSeedPhrase(_) => "None",
