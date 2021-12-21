@@ -204,12 +204,12 @@ pub fn seed_name_was_shown(database_name: &str, seed_name: String) -> anyhow::Re
 mod tests {
     use definitions::{history::all_events_preview, network_specs::Verifier};
     use super::*;
-    use crate::cold_default::{populate_cold, reset_cold_database_no_addresses};
+    use crate::cold_default::{populate_cold, populate_cold_no_metadata};
     
     #[test]
     fn test_all_events () {
         let dbname = "for_tests/test_all_events";
-        reset_cold_database_no_addresses(dbname, Verifier(None)).unwrap();
+        populate_cold_no_metadata(dbname, Verifier(None)).unwrap();
         let events = all_events_preview();
         enter_events::<Signer>(dbname, events).unwrap();
         let history = print_history(dbname).unwrap();

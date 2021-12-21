@@ -34,7 +34,7 @@ pub fn transfer_metadata_to_cold (database_name_hot: &str, database_name_cold: &
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::{cold_default::reset_cold_database_no_addresses, db_transactions::TrDbCold, helpers::{open_db, open_tree}, hot_default::reset_hot_database};
+    use crate::{cold_default::populate_cold, db_transactions::TrDbCold, helpers::{open_db, open_tree}, hot_default::reset_hot_database};
     use constants::METATREE;
     use definitions::{error::{Active, IncomingMetadataSourceActive}, keyring::MetaKey, metadata::MetaValues, network_specs::Verifier};
     
@@ -71,7 +71,7 @@ mod tests {
         let dbname_hot = "for_tests/test_metadata_transfer_mock_hot";
         reset_hot_database(dbname_hot).unwrap();
         let dbname_cold = "for_tests/test_metadata_transfer_mock_cold";
-        reset_cold_database_no_addresses(dbname_cold, Verifier(None)).unwrap();
+        populate_cold(dbname_cold, Verifier(None)).unwrap();
         
         insert_metadata_from_file(dbname_hot, "for_tests/westend9010");
         assert!(metadata_len(dbname_hot) == 1, "Fresh hot database, should have only the single network added.");

@@ -129,7 +129,7 @@ fn get_batch_remove_unchecked_meta (database_name: &str, network_name: &str, net
 
 #[cfg(test)]
 mod tests {
-    use crate::{cold_default::{populate_cold, reset_cold_database_no_addresses}, manage_history::{print_history}};
+    use crate::{cold_default::{populate_cold}, manage_history::{print_history}};
     use super::*;
     use std::fs;
     use sled::{Db, Tree, open};
@@ -175,7 +175,7 @@ mod tests {
     #[test]
     fn remove_westend_9010() {
         let dbname = "for_tests/remove_westend_9010";
-        reset_cold_database_no_addresses(dbname, Verifier(None)).unwrap();
+        populate_cold(dbname, Verifier(None)).unwrap();
         let genesis_hash = "e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e";
         let network_specs_key = NetworkSpecsKey::from_parts(&hex::decode(genesis_hash).unwrap(), &Encryption::Sr25519);
         let network_version = 9010;

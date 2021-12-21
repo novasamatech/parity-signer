@@ -532,7 +532,7 @@ mod tests {
     use definitions::{crypto::Encryption, keyring::{AddressKey, NetworkSpecsKey}, network_specs::Verifier};
     use std::fs;
     use sled::{Db, Tree, open, Batch};
-    use crate::{cold_default::{populate_cold_no_metadata, signer_init_with_cert, reset_cold_database_no_addresses}, helpers::{open_db, open_tree, upd_id_batch}, db_transactions::TrDbCold, manage_history::print_history};
+    use crate::{cold_default::{populate_cold_no_metadata, Purpose, signer_init_with_cert, reset_cold_database_no_addresses}, helpers::{open_db, open_tree, upd_id_batch}, db_transactions::TrDbCold, manage_history::print_history};
 
     static SEED: &str = "bottom drive obey lake curtain smoke basket hold race lonely fit walk";
 
@@ -737,7 +737,7 @@ mod tests {
     #[test]
     fn history_with_identities() {
         let dbname = "for_tests/history_with_identities";
-        reset_cold_database_no_addresses(dbname, Verifier(None)).unwrap();
+        reset_cold_database_no_addresses(dbname, Verifier(None), Purpose::Test).unwrap();
         signer_init_with_cert(dbname).unwrap();
         let history_printed = print_history(dbname).unwrap();
         let element1 = r#"{"event":"database_initiated"}"#;

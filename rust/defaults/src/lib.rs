@@ -200,9 +200,9 @@ pub fn get_default_address_book() -> Vec<AddressBookEntry> {
     out
 }
 
-pub fn get_default_metadata() -> Result<Vec<MetaValues>, ErrorActive> {
+fn get_metadata(dir: &str) -> Result<Vec<MetaValues>, ErrorActive> {
     let mut out: Vec<MetaValues> = Vec::new();
-    let path_set = match std::fs::read_dir("../defaults/default_metadata") {
+    let path_set = match std::fs::read_dir(dir) {
         Ok(a) => a,
         Err(e) => return Err(ErrorActive::DefaultLoading(DefaultLoading::MetadataFolder(e))),
     };
@@ -219,6 +219,14 @@ pub fn get_default_metadata() -> Result<Vec<MetaValues>, ErrorActive> {
         }
     }
     Ok(out)
+}
+
+pub fn get_test_metadata() -> Result<Vec<MetaValues>, ErrorActive> {
+    get_metadata("../defaults/test_metadata")
+}
+
+pub fn get_release_metadata() -> Result<Vec<MetaValues>, ErrorActive> {
+    get_metadata("../defaults/release_metadata")
 }
 
 lazy_static! {

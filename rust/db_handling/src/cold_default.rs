@@ -1,7 +1,7 @@
 use sled::Batch;
 use parity_scale_codec::Encode;
 use constants::{ADDRTREE, DANGER, GENERALVERIFIER, HISTORY, METATREE, SETTREE, SPECSTREE, TRANSACTION, TYPES, VERIFIERS};
-use defaults::{default_general_verifier, get_default_chainspecs, get_default_types_content, get_default_metadata, get_default_verifiers};
+use defaults::{default_general_verifier, get_default_chainspecs, get_default_types_content, get_release_metadata, get_test_metadata, get_default_verifiers};
 use definitions::{danger::DangerRecord, error::{Active, ErrorActive, ErrorSigner, ErrorSource, Signer}, history::Event, keyring::{MetaKey, NetworkSpecsKey}, network_specs::Verifier};
 use anyhow;
 
@@ -10,6 +10,10 @@ use crate::helpers::make_batch_clear_tree;
 use crate::identities::generate_test_identities;
 use crate::manage_history::events_in_batch;
 
+pub (crate) enum Purpose {
+    Release,
+    Test,
+}
 
 /// Function to set default *start* history in test cold database:
 /// (1) purges all existing entries
@@ -26,9 +30,13 @@ fn default_test_cold_history (database_name: &str) -> Result<Batch, ErrorActive>
 /// (1) purge all existing entries,
 /// (2) add default entries with MetaKey in key form as a key,
 /// and metadata as a value
-fn default_cold_metadata (database_name: &str) -> Result<Batch, ErrorActive> {
+fn default_cold_metadata (database_name: &str, purpose: Purpose) -> Result<Batch, ErrorActive> {
     let mut batch = make_batch_clear_tree::<Active>(&database_name, METATREE)?;
-    for x in get_default_metadata()?.iter() {
+    let metadata_set = match purpose {
+        Purpose::Release => get_release_metadata()?,
+        Purpose::Test => get_test_metadata()?,
+    };
+    for x in metadata_set.iter() {
         let meta_key = MetaKey::from_parts(&x.name, x.version);
         batch.insert(meta_key.key(), x.meta.to_vec());
     }
@@ -93,11 +101,11 @@ fn init_history<T: ErrorSource> (database_name: &str, general_verifier: &Verifie
 }
 
 /// Function to reset cold database to defaults without addresses
-pub fn reset_cold_database_no_addresses (database_name: &str, general_verifier: Verifier) -> Result<(), ErrorActive> {
+pub (crate) fn reset_cold_database_no_addresses (database_name: &str, general_verifier: Verifier, purpose: Purpose) -> Result<(), ErrorActive> {
     TrDbCold::new()
         .set_addresses(make_batch_clear_tree::<Active>(&database_name, ADDRTREE)?) // clear addresses
         .set_history(make_batch_clear_tree::<Active>(&database_name, HISTORY)?) // set *empty* history, database needs initialization before start
-        .set_metadata(default_cold_metadata(&database_name)?) // set default metadata
+        .set_metadata(default_cold_metadata(&database_name, purpose)?) // set default metadata
         .set_network_specs(default_cold_network_specs(&database_name)?) // set default network_specs
         .set_settings(default_cold_settings(&database_name, general_verifier)?) // set general verifier and load default types
         .set_transaction(make_batch_clear_tree::<Active>(&database_name, TRANSACTION)?) // clear transaction
@@ -161,7 +169,7 @@ pub fn populate_cold_no_metadata (database_name: &str, general_verifier: Verifie
 /// Function to populate cold database and set up the test identities.
 /// For tests. History is initialized as in Signer, together with setting of the general verifier.
 pub fn populate_cold (database_name: &str, general_verifier: Verifier) -> Result<(), ErrorActive> {
-    reset_cold_database_no_addresses(&database_name, general_verifier.to_owned())?;
+    reset_cold_database_no_addresses(&database_name, general_verifier.to_owned(), Purpose::Test)?;
     TrDbCold::new()
         .set_history(init_history::<Active>(&database_name, &general_verifier)?) // set *start* history
         .set_settings(init_general_verifier(&general_verifier))
