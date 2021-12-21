@@ -690,7 +690,7 @@ impl State {
                 },
                 Screen::SignSufficientCrypto(_) => {
                     match db_handling::interface_signer::print_all_identities(dbname) {
-                        Ok(a) => format!("identities:{}", a),
+                        Ok(a) => format!("\"identities\":{}", a),
                         Err(e) => {
                             new_navstate.alert = Alert::Error;
                             errorline.push_str(&<Signer>::show(&e));
