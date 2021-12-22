@@ -636,7 +636,7 @@ impl State {
                         transaction_parsing::Action::Read(content) => format!("\"content\":{{{}}},\"type\":\"read\"", content),
                     }
                 },
-                Screen::SeedSelector => {
+                Screen::SeedSelector | Screen::SelectSeedForBackup => {
                     match db_handling::interface_signer::print_all_seed_names_with_identicons(dbname, &self.seed_names) {
                         Ok(a) => format!("\"seedNameCards\":{}", a),
                         Err(e) => {

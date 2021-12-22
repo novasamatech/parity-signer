@@ -111,26 +111,26 @@ struct HistoryCard: View {
                     line1: "Seed was shown",
                     line2: text
                 )
-                case .signedAddNetwork(_): HistoryCardTemplate(
+                case .signedAddNetwork(let value): HistoryCardTemplate(
                     image: "signature",
                     timestamp: timestamp,
                     danger: false,
                     line1: "Network specs signed",
-                    line2: "comment placeholder"
+                    line2: value.title
                 )
-                case .signedLoadMetadata(_): HistoryCardTemplate(
+                case .signedLoadMetadata(let value): HistoryCardTemplate(
                     image: "signature",
                     timestamp: timestamp,
                     danger: false,
                     line1: "Metadata signed",
-                    line2: "comment placeholder"
+                    line2: value.specname + value.spec_version
                 )
                 case .signedTypes(_): HistoryCardTemplate(
                     image: "signature",
                     timestamp: timestamp,
                     danger: false,
                     line1: "Types signed",
-                    line2: "comment placeholder"
+                    line2: ""
                 )
                 case .systemEntry(let text): HistoryCardTemplate(
                     image: "eye.trianglebadge.exclamationmark.fill",
