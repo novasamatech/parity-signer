@@ -225,7 +225,6 @@ impl State {
                                         match self.navstate.modal {
                                             Modal::EnterPassword => {
                                                 if t.ok() {
-                                                    new_navstate.screen = Screen::Transaction(t.plus_one());
                                                     let mut seed = t.seed();
                                                     match transaction_signing::handle_sign(checksum, &seed, details_str, &t.get_comment(), dbname) {
                                                          Ok(a) => {

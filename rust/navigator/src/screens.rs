@@ -216,7 +216,7 @@ impl TransactionState {
             entered_info: self.entered_info.to_owned(),
             action,
             comment: self.comment.to_string(),
-            counter: self.counter,
+            counter: self.counter + 1,
         }
     }
     pub fn action(&self) -> transaction_parsing::Action {
@@ -227,14 +227,6 @@ impl TransactionState {
     }
     pub fn get_comment(&self) -> String {
         self.comment.to_owned()
-    }
-    pub fn plus_one(&self) -> Self {
-        Self {
-            entered_info: self.entered_info.to_owned(),
-            action: self.action(),
-            comment: self.get_comment(),
-            counter: self.counter + 1,
-        }
     }
     pub fn ok(&self) -> bool {
         self.counter < MAX_COUNT_SET
