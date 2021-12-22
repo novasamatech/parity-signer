@@ -120,7 +120,6 @@
 		2DA5F8822756A2DE00D8DD29 /* AddressCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2DA5F8812756A2DE00D8DD29 /* AddressCard.swift */; };
 		2DA5F8842756A37800D8DD29 /* Address.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2DA5F8832756A37800D8DD29 /* Address.swift */; };
 		2DA5F8862756A44600D8DD29 /* AddressCardControls.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2DA5F8852756A44600D8DD29 /* AddressCardControls.swift */; };
-		2DA5F8882756A70300D8DD29 /* SeedBackup.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2DA5F8872756A70300D8DD29 /* SeedBackup.swift */; };
 		2DA5F88A2757692F00D8DD29 /* NewSeedScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2DA5F8892757692F00D8DD29 /* NewSeedScreen.swift */; };
 		2DA5F88C2757693600D8DD29 /* NewAddressScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2DA5F88B2757693600D8DD29 /* NewAddressScreen.swift */; };
 		2DA5F88E2757694A00D8DD29 /* LandingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2DA5F88D2757694A00D8DD29 /* LandingView.swift */; };
@@ -274,7 +273,6 @@
 		2DA5F8812756A2DE00D8DD29 /* AddressCard.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AddressCard.swift; sourceTree = "<group>"; };
 		2DA5F8832756A37800D8DD29 /* Address.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Address.swift; sourceTree = "<group>"; };
 		2DA5F8852756A44600D8DD29 /* AddressCardControls.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AddressCardControls.swift; sourceTree = "<group>"; };
-		2DA5F8872756A70300D8DD29 /* SeedBackup.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SeedBackup.swift; sourceTree = "<group>"; };
 		2DA5F8892757692F00D8DD29 /* NewSeedScreen.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NewSeedScreen.swift; sourceTree = "<group>"; };
 		2DA5F88B2757693600D8DD29 /* NewAddressScreen.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NewAddressScreen.swift; sourceTree = "<group>"; };
 		2DA5F88D2757694A00D8DD29 /* LandingView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LandingView.swift; sourceTree = "<group>"; };
@@ -365,7 +363,6 @@
 				2DA5F8262756629600D8DD29 /* ScreenSelector.swift */,
 				2D48F3B72771D250004B27BE /* SignSufficientCrypto.swift */,
 				2D48F3B32770C164004B27BE /* VerifierScreen.swift */,
-				2DA5F8872756A70300D8DD29 /* SeedBackup.swift */,
 				2DA5F87B2756A21200D8DD29 /* ExportAddress.swift */,
 				2DA5F88D2757694A00D8DD29 /* LandingView.swift */,
 				2DA5F88B2757693600D8DD29 /* NewAddressScreen.swift */,
@@ -790,7 +787,6 @@
 				2DA5F8372756657600D8DD29 /* TransactionTypes.swift in Sources */,
 				2D48F3A0276C8D5E004B27BE /* LogMenu.swift in Sources */,
 				2D48F36D27636092004B27BE /* MBackup.swift in Sources */,
-				2DA5F8882756A70300D8DD29 /* SeedBackup.swift in Sources */,
 				2DA5F85F27566C3600D8DD29 /* TCTypesInfo.swift in Sources */,
 				2DA5F8A1275F889400D8DD29 /* Headers.swift in Sources */,
 				04197D2D276BB683003485D2 /* StyleModiefiers.swift in Sources */,

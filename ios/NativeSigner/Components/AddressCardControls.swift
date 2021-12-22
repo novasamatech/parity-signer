@@ -16,9 +16,9 @@ struct AddressCardControls: View {
         Text("multicontrol")
         /*if data.getMultiSelectionMode() {
             if data.multiSelected.contains(address) {
-                Image(systemName: "checkmark.circle.fill").foregroundColor(Color("AccentColor")).imageScale(.large)
+                Image(systemName: "checkmark.circle.fill").imageScale(.large)
             } else {
-                Image(systemName: "circle").foregroundColor(Color("textFadedColor")).imageScale(.large)
+                Image(systemName: "circle").imageScale(.large)
             }
         } else {
             if (data.selectedAddress == address) {
@@ -28,16 +28,16 @@ struct AddressCardControls: View {
                     data.createAddress(password: "")
                 }) {
                     ZStack {
-                        RoundedRectangle(cornerRadius: 6).foregroundColor(Color("backgroundButtonSafe"))
-                        Text("N+1").foregroundColor(Color("cryptoColor")).font(.system(size: 12, design: .monospaced))
+                        RoundedRectangle(cornerRadius: 6)
+                        Text("N+1").font(.system(size: 12, design: .monospaced))
                     }.frame(width: rowHeight, height: rowHeight)
                 }
                 Button(action: {
                     delete = true
                 }) {
                     ZStack {
-                        RoundedRectangle(cornerRadius: 6).foregroundColor(Color("backgroundButtonDanger"))
-                        Image(systemName: "trash.slash").foregroundColor(Color("dangerColor"))
+                        RoundedRectangle(cornerRadius: 6))
+                        Image(systemName: "trash.slash"))
                     }
                     .frame(width: rowHeight, height: rowHeight)
                     .alert(isPresented: $delete, content: {

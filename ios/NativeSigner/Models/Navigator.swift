@@ -66,8 +66,6 @@ struct ActionResult: Decodable {
             screen = .SeedSelector(try values.decode(MSeeds.self, forKey: .screenData))
         case "KeyDetails":
             screen = .KeyDetails(try values.decode(MKeyDetails.self, forKey: .screenData))
-        case "Backup":
-            screen = .Backup
         case "NewSeed":
             screen = .NewSeed(try values.decode(MNewSeed.self, forKey: .screenData))
         case "RecoverSeedName":
@@ -146,7 +144,6 @@ enum SignerScreen: Decodable {
     case Transaction(MTransaction)
     case SeedSelector(MSeeds)
     case KeyDetails(MKeyDetails)
-    case Backup
     case NewSeed(MNewSeed)
     case RecoverSeedName(MRecoverSeedName)
     case RecoverSeedPhrase(MRecoverSeedPhrase)

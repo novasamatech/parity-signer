@@ -15,7 +15,6 @@ struct TCText: View {
                 .foregroundColor(Color("Text600"))
             Spacer()
         }
-        .background(/*@START_MENU_TOKEN@*//*@PLACEHOLDER=View@*/Color("AccentColor")/*@END_MENU_TOKEN@*/)
     }
 }
 

@@ -28,8 +28,6 @@ struct ScreenSelector: View {
             SeedManager(content: value)
         case .KeyDetails(let value):
             ExportAddress(content: value)
-        case .Backup:
-            SeedBackup()
         case .NewSeed(let value):
             NewSeedScreen(content: value)
         case .RecoverSeedName(let value):

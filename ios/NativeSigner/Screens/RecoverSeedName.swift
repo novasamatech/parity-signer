@@ -18,8 +18,8 @@ struct RecoverSeedName: View {
             Text("DISPLAY NAME").font(FBase(style: .overline))
             ZStack {
                 RoundedRectangle(cornerRadius: 8)
-                    .stroke(Color("Borders400"))
-                    .foregroundColor(Color("Borders400"))
+                    .stroke(Color("Border400"))
+                    //.foregroundColor(Color("Border400"))
                     .frame(height: 39)
                 TextField("Seed", text: $seedName, prompt: Text("Seed name"))
                     .focused($nameFocused)

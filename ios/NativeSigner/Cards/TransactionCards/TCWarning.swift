@@ -17,7 +17,6 @@ struct TCWarning: View {
                 .foregroundColor(Color("SignalDanger"))
             Spacer()
         }
-        .background(/*@START_MENU_TOKEN@*//*@PLACEHOLDER=View@*/Color("AccentColor")/*@END_MENU_TOKEN@*/)
     }
 }
 

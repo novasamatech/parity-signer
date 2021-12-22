@@ -37,7 +37,7 @@ struct TransactionPreview: View {
                     TextField("comment", text: $comment, prompt: Text("enter comment"))
                         .foregroundColor(Color("Text400"))
                         .background(Color("Bg100"))
-                        .border(Color("Borders400"), width: 1)
+                        .border(Color("Border400"), width: 1)
                         .focused($focus)
                         .onDisappear {
                             focus = false

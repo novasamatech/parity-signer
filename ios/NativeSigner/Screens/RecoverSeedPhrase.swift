@@ -33,7 +33,10 @@ struct RecoverSeedPhrase: View {
                             .padding(8)
                     }
                     ZStack {
-                        RoundedRectangle(cornerRadius: 8).stroke(Color("Borders400")).foregroundColor(Color("Borders400")).frame(height: 39)
+                        RoundedRectangle(cornerRadius: 8)
+                            .stroke(Color("Border400"))
+                            //.foregroundColor(Color("Border400"))
+                            .frame(height: 39)
                         TextField("Seed", text: $seedWord, prompt: Text("Seed name"))
                             .focused($focus)
                             .foregroundColor(Color("Text600"))

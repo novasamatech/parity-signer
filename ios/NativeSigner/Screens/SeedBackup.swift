@@ -19,7 +19,7 @@ struct SeedBackup: View {
                 Text("Backup your seed phrase!").font(.headline)
                 Text("Keep your seed phrase in safe place; anyone could restore accounts using this seed phrase; there is no other way to restore accounts.").font(.footnote)
                 ZStack {
-                    RoundedRectangle(cornerRadius: 8).stroke(Color("AccentColor")).foregroundColor(Color("backgroundColor")).frame(height: 200)
+                    RoundedRectangle(cornerRadius: 8).stroke(Color("Border400")).frame(height: 200)
                     Text(phrase)
                         .font(.system(size: 16, weight: .semibold, design: .monospaced))
                         .foregroundColor(Color("cryptoColor"))
