@@ -209,24 +209,22 @@ impl State {
                                     if has_pwd {
                                         match self.navstate.modal {
                                             Modal::EnterPassword => {
-                                                if t.ok() {
-                                                    let mut seed = t.seed();
-                                                    match transaction_signing::handle_sign(checksum, &seed, details_str, &t.get_comment(), dbname) {
-                                                         Ok(a) => {
-                                                             seed.zeroize();
-                                                             new_navstate.modal = Modal::SignatureReady(a);
-                                                         },
-                                                         Err(e) => {
-                                                             seed.zeroize();
-                                                             if let ErrorSigner::WrongPasswordNewChecksum(c) = e {
-                                                                 new_navstate.screen = Screen::Transaction(t.update_checksum_sign(c, content, has_pwd, author_info, network_info));
-                                                             }
-                                                             new_navstate.alert = Alert::Error;
-                                                             errorline.push_str(&<Signer>::show(&e));
-                                                         },
-                                                     }
+                                                let mut seed = t.seed();
+                                                match transaction_signing::handle_sign(checksum, &seed, details_str, &t.get_comment(), dbname) {
+                                                    Ok(a) => {
+                                                        seed.zeroize();
+                                                        new_navstate.modal = Modal::SignatureReady(a);
+                                                    },
+                                                    Err(e) => {
+                                                        seed.zeroize();
+                                                        if let ErrorSigner::WrongPasswordNewChecksum(c) = e {
+                                                            if t.ok() {new_navstate.screen = Screen::Transaction(t.update_checksum_sign(c, content, has_pwd, author_info, network_info));}
+                                                            else {new_navstate = Navstate::clean_screen(Screen::Log);}
+                                                        }
+                                                        new_navstate.alert = Alert::Error;
+                                                        errorline.push_str(&<Signer>::show(&e));
+                                                    },
                                                 }
-                                                else {new_navstate = Navstate::clean_screen(Screen::Log);}
                                             },
                                             _ => {
                                                 new_navstate.screen = Screen::Transaction(t.add_comment(details_str).update_seed(secret_seed_phrase));
@@ -277,22 +275,22 @@ impl State {
                                     // can get here only if there is a password
                                     // details_str is password entry attempt
                                     if let Modal::EnterPassword = self.navstate.modal {
-                                        if s.ok() {
-                                            new_navstate.screen = Screen::SignSufficientCrypto(s.plus_one());
-                                            let mut seed = s.seed();
-                                            match transaction_signing::sign_content(&multisigner, &address_details, s.content(), dbname, &seed, details_str) {
-                                                Ok(a) => {
-                                                    seed.zeroize();
-                                                    new_navstate.modal = Modal::SufficientCryptoReady(a);
-                                                },
-                                                Err(e) => {
-                                                    seed.zeroize();
-                                                    new_navstate.alert = Alert::Error;
-                                                    errorline.push_str(&<Signer>::show(&e));
-                                                },
-                                            }
+                                        let mut seed = s.seed();
+                                        match transaction_signing::sign_content(&multisigner, &address_details, s.content(), dbname, &seed, details_str) {
+                                            Ok(a) => {
+                                                seed.zeroize();
+                                                new_navstate.modal = Modal::SufficientCryptoReady(a);
+                                            },
+                                            Err(e) => {
+                                                seed.zeroize();
+                                                if let ErrorSigner::WrongPassword = e {
+                                                    if s.ok() {new_navstate.screen = Screen::SignSufficientCrypto(s.plus_one());}
+                                                    else {new_navstate = Navstate::clean_screen(Screen::Log);}
+                                                }
+                                                new_navstate.alert = Alert::Error;
+                                                errorline.push_str(&<Signer>::show(&e));
+                                            },
                                         }
-                                        else {new_navstate = Navstate::clean_screen(Screen::Log);}
                                     }
                                 },
                                 None => {
