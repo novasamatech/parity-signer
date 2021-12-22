@@ -24,7 +24,6 @@ struct TCEnumVariantName: View {
                             .foregroundColor(Color("Action400"))
                     }
                 }
-                .background(/*@START_MENU_TOKEN@*//*@PLACEHOLDER=View@*/Color("backgroundCard")/*@END_MENU_TOKEN@*/)
                 if showDoc {
                     Text(AttributedString(fromHexDocs: value.docs_enum_variant) ?? "docs parsing error in iOS, please refer to other sources")
                         .foregroundColor(Color("Text600"))

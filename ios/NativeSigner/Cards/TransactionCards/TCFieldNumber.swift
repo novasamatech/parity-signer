@@ -23,16 +23,13 @@ struct TCFieldNumber: View {
                         .foregroundColor(Color("Text400"))
                 }
             }
-            .background(/*@START_MENU_TOKEN@*//*@PLACEHOLDER=View@*/Color("backgroundCard")/*@END_MENU_TOKEN@*/)
             if showDoc {
                 VStack {
                     Text("Path: " + value.path_type)
                     Text(AttributedString(fromHexDocs: value.docs_field_number) ?? "docs parsing error in iOS, please refer to other sources")
                         .foregroundColor(Color("Text600"))
-                        .background(/*@START_MENU_TOKEN@*//*@PLACEHOLDER=View@*/Color("backgroundCard")/*@END_MENU_TOKEN@*/)
                     Text(AttributedString(fromHexDocs: value.docs_type) ?? "docs parsing error in iOS, please refer to other sources")
                         .foregroundColor(Color("Text600"))
-                        .background(/*@START_MENU_TOKEN@*//*@PLACEHOLDER=View@*/Color("backgroundCard")/*@END_MENU_TOKEN@*/)
                 }
             }
         }.disabled(value.docs_field_number + value.path_type + value.docs_type == "")

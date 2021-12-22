@@ -15,7 +15,6 @@ struct TCVarName: View {
                 .foregroundColor(Color("Text400"))
             Spacer()
         }
-        .background(/*@START_MENU_TOKEN@*//*@PLACEHOLDER=View@*/Color("backgroundCard")/*@END_MENU_TOKEN@*/)
     }
 }
 

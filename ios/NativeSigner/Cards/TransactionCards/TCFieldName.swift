@@ -30,10 +30,8 @@ struct TCFieldName: View {
                         Text("Path: " + value.path_type)
                         Text(AttributedString(fromHexDocs: value.docs_field_name) ?? "docs parsing error in iOS, please refer to other sources")
                             .foregroundColor(Color("Text600"))
-                            .background(/*@START_MENU_TOKEN@*//*@PLACEHOLDER=View@*/Color("backgroundCard")/*@END_MENU_TOKEN@*/)
                         Text(AttributedString(fromHexDocs: value.docs_type) ?? "docs parsing error in iOS, please refer to other sources")
                             .foregroundColor(Color("Text600"))
-                            .background(/*@START_MENU_TOKEN@*//*@PLACEHOLDER=View@*/Color("backgroundCard")/*@END_MENU_TOKEN@*/)
                     }
                 }
             }
