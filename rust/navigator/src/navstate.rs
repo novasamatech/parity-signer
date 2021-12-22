@@ -48,8 +48,6 @@ impl State {
         let mut new_navstate = self.navstate.to_owned();
         let seed_names = &(*self).seed_names;
 
-        let mut seed_phrase = String::new();
-
         let mut errorline = String::new();
         if let Some(dbname) = &self.dbname {
            //Try to perform action
@@ -157,19 +155,6 @@ impl State {
                 },
                 Action::GoForward => {
                     match self.navstate.screen {
-                        Screen::NewSeed => {
-                            //TODO: check zeroize here!
-                            match db_handling::identities::try_create_seed_with_length(details_str, 24, dbname) {
-                                Ok(a) => {
-                                    seed_phrase = a;
-
-                                },
-                                Err(e) => {
-                                    new_navstate.alert = Alert::Error;
-                                    errorline.push_str(&e.to_string());
-                                },
-                            };
-                        },
                         Screen::RecoverSeedName => {
                             match db_handling::identities::get_addresses_by_seed_name(dbname, details_str) {
                                 Ok(a) => {
