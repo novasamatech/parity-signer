@@ -16,6 +16,7 @@ pub enum Modal {
     ManageMetadata(u32),
     SufficientCryptoReady(String),
     KeyDetailsAction,
+    TypesInfo,
     Empty,
 }
 
@@ -34,6 +35,7 @@ impl Modal {
             Modal::ManageMetadata(_) => String::from("ManageMetadata"),
             Modal::SufficientCryptoReady(_) => String::from("SufficientCryptoReady"),
             Modal::KeyDetailsAction => String::from("KeyDetailsAction"),
+            Modal::TypesInfo => String::from("TypesInfo"),
             Modal::Empty => String::from("Empty"),
         }
     }

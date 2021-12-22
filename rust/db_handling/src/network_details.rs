@@ -35,7 +35,8 @@ pub fn get_all_networks (database_name: &str) -> Result<Vec<NetworkSpecs>, Error
 /// Applicable only to the Signer side.
 /// Function gets called from user interface.
 pub fn print_all_networks (database_name: &str) -> anyhow::Result<String> {
-    let network_specs_vec = get_all_networks(database_name).map_err(|e| e.anyhow())?;
+    let mut network_specs_vec = get_all_networks(database_name).map_err(|e| e.anyhow())?;
+    network_specs_vec.sort_by(|a, b| a.order.cmp(&b.order));
     Ok(export_complex_vector(&network_specs_vec, |a| a.print_as_set_part()))
 }
 
@@ -86,7 +87,7 @@ mod tests {
         let dbname = "for_tests/print_all_network_specs";
         populate_cold_no_metadata(dbname, Verifier(None)).unwrap();
         let print = print_all_networks(dbname).unwrap();
-        let print_expected = r##"[{"key":"0180037f5f3c8e67b314062025fc886fcd6238ea25a4a9b45dce8d246815c9ebe770","color":"#6f36dc","logo":"rococo","order":"3","secondary_color":"#262626","title":"Rococo"},{"key":"018091b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3","color":"#E6027A","logo":"polkadot","order":"0","secondary_color":"#262626","title":"Polkadot"},{"key":"0180b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe","color":"#000","logo":"kusama","order":"1","secondary_color":"#262626","title":"Kusama"},{"key":"0180e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e","color":"#660D35","logo":"westend","order":"2","secondary_color":"#262626","title":"Westend"}]"##;
+        let print_expected = r##"[{"key":"018091b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3","color":"#E6027A","logo":"polkadot","order":"0","secondary_color":"#262626","title":"Polkadot"},{"key":"0180b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe","color":"#000","logo":"kusama","order":"1","secondary_color":"#262626","title":"Kusama"},{"key":"0180e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e","color":"#660D35","logo":"westend","order":"2","secondary_color":"#262626","title":"Westend"},{"key":"0180aaf2cd1b74b5f726895921259421b534124726263982522174147046b8827897","color":"#6f36dc","logo":"rococo","order":"3","secondary_color":"#262626","title":"Rococo"}]"##;
         assert!(print == print_expected, "Received print: \n{}", print);
         fs::remove_dir_all(dbname).unwrap();
     }

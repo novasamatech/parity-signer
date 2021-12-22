@@ -178,6 +178,8 @@ fn meta_kpt_a_element (set_element: &NameHashAddress, write: &Write, sorted_meta
         Write::OnlyNew => if upd_sorted.upd_done {load_meta_print(&shortcut)?},
         Write::None => (),
     }
+    if upd_sorted.upd_done {println!("Fetched new metadata {}{}", shortcut.meta_values.name, shortcut.meta_values.version)}
+    else {println!("Fetched previously known metadata {}{}", shortcut.meta_values.name, shortcut.meta_values.version)}
     Ok(upd_sorted.sorted)
 }
 

@@ -183,6 +183,10 @@ impl State {
                                 },
                             };
                         },
+                        Screen::SelectSeedForBackup => {
+                        // details_str is selected seed name
+                            new_navstate.modal = Modal::Backup(details_str.to_string());
+                        },
                         Screen::DeriveKey(ref derive_state) => {
                             new_navstate.screen = Screen::DeriveKey(derive_state.update(details_str));
                             match db_handling::identities::try_create_address (&derive_state.seed_name(), &secret_seed_phrase, details_str, &derive_state.network_specs_key(), dbname) {
@@ -367,6 +371,7 @@ impl State {
                         Screen::SeedSelector => new_navstate.modal = self.toggle_modal(Modal::NewSeedMenu),
                         Screen::Keys(_) => new_navstate.modal = self.toggle_modal(Modal::SeedMenu),
                         Screen::KeyDetails(_) => new_navstate.modal = self.toggle_modal(Modal::KeyDetailsAction),
+                        Screen::ManageNetworks => new_navstate.modal = self.toggle_modal(Modal::TypesInfo),
                         Screen::NetworkDetails(_) => new_navstate.modal = self.toggle_modal(Modal::NetworkDetailsMenu),
                         _ => {},
                     }
@@ -500,6 +505,27 @@ impl State {
                         _ => println!("RemoveMetadata does nothing here"),
                     }
                 },
+                Action::RemoveTypes => {
+                    match self.navstate.screen {
+                        Screen::ManageNetworks => {
+                            match self.navstate.modal {
+                                Modal::TypesInfo => {
+                                    match db_handling::remove_types::remove_types_info(dbname) {
+                                        Ok(()) => {
+                                            new_navstate = Navstate::clean_screen(Screen::Log);
+                                        },
+                                        Err(e) => {
+                                            new_navstate.alert = Alert::Error;
+                                            errorline.push_str(&<Signer>::show(&e));
+                                        },
+                                    }
+                                },
+                                _ => println!("RemoveTypes does nothing here"),
+                            }
+                        },
+                        _ => println!("RemoveTypes does nothing here"),
+                    }
+                },
                 Action::SignNetworkSpecs => {
                     match self.navstate.screen {
                         Screen::NetworkDetails(ref network_specs_key) => {
@@ -519,6 +545,19 @@ impl State {
                             }
                         },
                         _ => println!("SignMetadata does nothing here"),
+                    }
+                },
+                Action::SignTypes => {
+                    match self.navstate.screen {
+                        Screen::ManageNetworks => {
+                            match self.navstate.modal {
+                                Modal::TypesInfo => {
+                                    new_navstate = Navstate::clean_screen(Screen::SignSufficientCrypto(SufficientCryptoState::init(transaction_signing::SufficientContent::LoadTypes)));
+                                },
+                                _ => println!("SignTypes does nothing here"),
+                            }
+                        },
+                        _ => println!("SignTypes does nothing here"),
                     }
                 },
                 Action::ManageNetworks => {
@@ -817,6 +856,16 @@ impl State {
                         _ => "".to_string(),
                     }
                 },
+                Modal::TypesInfo => {
+                    match db_handling::interface_signer::show_types_status(dbname) {
+                        Ok(a) => a,
+                        Err(e) => {
+                            new_navstate.alert = Alert::Error;
+                            errorline.push_str(&<Signer>::show(&e));
+                            "".to_string()
+                        },
+                    }
+                },
                 _ => "".to_string(),
             };
             
@@ -926,7 +975,7 @@ impl State {
             Screen::DeriveKey(_) => "None",
             Screen::Settings => "None",
             Screen::Verifier => "None",
-            Screen::ManageNetworks => "None",
+            Screen::ManageNetworks => "TypesInfo",
             Screen::NetworkDetails(_) => "NDMenu",
             Screen::SelectSeedForBackup => "Backup",
             Screen::SignSufficientCrypto(_) => "None",

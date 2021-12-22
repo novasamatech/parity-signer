@@ -2,10 +2,10 @@ use blake2_rfc::blake2b::blake2b;
 use sp_runtime::MultiSigner;
 use std::collections::HashMap;
 
-use definitions::{error::{DatabaseSigner, ErrorSigner, InterfaceSigner, NotFoundSigner, Signer}, helpers::{multisigner_to_public, make_identicon_from_multisigner, pic_meta}, keyring::{AddressKey, NetworkSpecsKey, print_multisigner_as_base58, VerifierKey}, network_specs::NetworkSpecs, print::export_complex_vector, users::AddressDetails};
+use definitions::{error::{DatabaseSigner, ErrorSigner, InterfaceSigner, NotFoundSigner, Signer}, helpers::{multisigner_to_public, make_identicon_from_multisigner, pic_meta}, keyring::{AddressKey, NetworkSpecsKey, print_multisigner_as_base58, VerifierKey}, network_specs::NetworkSpecs, print::export_complex_vector, qr_transfers::ContentLoadTypes, users::AddressDetails};
 use qrcode_static::png_qr_from_string;
 
-use crate::helpers::{get_address_details, get_general_verifier, get_meta_values_by_name, get_meta_values_by_name_version, get_network_specs, get_valid_current_verifier};
+use crate::helpers::{get_address_details, get_general_verifier, get_meta_values_by_name, get_meta_values_by_name_version, get_network_specs, get_valid_current_verifier, try_get_types};
 use crate::identities::{get_all_addresses, get_addresses_by_seed_name};
 use crate::network_details::get_all_networks;
 
@@ -85,7 +85,8 @@ pub fn addresses_set_seed_name_network (database_name: &str, seed_name: &str, ne
 
 /// Function to print all networks, with bool indicator which one is currently selected
 pub fn show_all_networks_with_flag (database_name: &str, network_specs_key: &NetworkSpecsKey) -> Result<String, ErrorSigner> {
-    let networks = get_all_networks(database_name)?;
+    let mut networks = get_all_networks(database_name)?;
+    networks.sort_by(|a, b| a.order.cmp(&b.order));
     Ok(format!("\"networks\":{}", export_complex_vector(&networks, |a| 
         {
             let network_specs_key_current = NetworkSpecsKey::from_parts(&a.genesis_hash.to_vec(), &a.encryption);
@@ -96,7 +97,8 @@ pub fn show_all_networks_with_flag (database_name: &str, network_specs_key: &Net
 
 /// Function to print all networks without any selection
 pub fn show_all_networks (database_name: &str) -> Result<String, ErrorSigner> {
-    let networks = get_all_networks(database_name)?;
+    let mut networks = get_all_networks(database_name)?;
+    networks.sort_by(|a, b| a.order.cmp(&b.order));
     Ok(format!("\"networks\":{}", export_complex_vector(&networks, |a| 
         {
             let network_specs_key_current = NetworkSpecsKey::from_parts(&a.genesis_hash.to_vec(), &a.encryption);
@@ -149,6 +151,7 @@ pub fn backup_prep (database_name: &str, seed_name: &str) -> Result<String, Erro
         let id_set = addresses_set_seed_name_network (database_name, seed_name, &NetworkSpecsKey::from_parts(&x.genesis_hash.to_vec(), &x.encryption))?;
         if id_set.len() != 0 {export.push((x, id_set.into_iter().map(|(_, a)| a).collect()))}
     }
+    export.sort_by(|(a, _), (b, _)| a.order.cmp(&b.order));
     Ok(format!("\"seed_name\":\"{}\",\"derivations\":{}", seed_name, export_complex_vector(&export, |(specs, id_set)| format!("\"network_title\":\"{}\",\"network_logo\":\"{}\",\"network_order\":{},\"id_set\":{}", specs.title, specs.logo, specs.order, export_complex_vector(&id_set, |a| format!("\"path\":\"{}\",\"has_pwd\":{}", a.path, a.has_pwd))))))
 }
 
@@ -197,6 +200,14 @@ pub fn metadata_details (database_name: &str, network_specs_key: &NetworkSpecsKe
     Ok(format!("\"name\":\"{}\",\"version\":\"{}\",\"meta_hash\":\"{}\",\"meta_id_pic\":\"{}\",\"networks\":{}", network_specs.name, network_version, hex::encode(meta_hash), hex_id_pic, relevant_networks_print))
 }
 
+/// Display types status
+pub fn show_types_status (database_name: &str) -> Result<String, ErrorSigner> {
+    match try_get_types::<Signer>(database_name)? {
+        Some(a) => Ok(format!("\"types_on_file\":true,{}", ContentLoadTypes::generate(&a).show())),
+        None => Ok(String::from("\"types_on_file\":false")),
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -205,6 +216,8 @@ mod tests {
     use std::fs;
     use std::convert::TryInto;
     use crate::cold_default::populate_cold;
+    use crate::manage_history::print_history;
+    use crate::remove_types::remove_types_info;
 
     #[test]
     fn print_seed_names() {
@@ -251,7 +264,17 @@ mod tests {
         let dbname = "for_tests/show_all_networks_flag_westend";
         populate_cold (dbname, Verifier(None)).unwrap();
         let print = show_all_networks_with_flag(dbname, &NetworkSpecsKey::from_parts(&hex::decode("e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e").unwrap(), &Encryption::Sr25519)).unwrap();
-        let expected_print = r#""networks":[{"key":"0180037f5f3c8e67b314062025fc886fcd6238ea25a4a9b45dce8d246815c9ebe770","title":"Rococo","logo":"rococo","order":3,"selected":false},{"key":"018091b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3","title":"Polkadot","logo":"polkadot","order":0,"selected":false},{"key":"0180b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe","title":"Kusama","logo":"kusama","order":1,"selected":false},{"key":"0180e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e","title":"Westend","logo":"westend","order":2,"selected":true}]"#;
+        let expected_print = r#""networks":[{"key":"018091b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3","title":"Polkadot","logo":"polkadot","order":0,"selected":false},{"key":"0180b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe","title":"Kusama","logo":"kusama","order":1,"selected":false},{"key":"0180e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e","title":"Westend","logo":"westend","order":2,"selected":true},{"key":"0180aaf2cd1b74b5f726895921259421b534124726263982522174147046b8827897","title":"Rococo","logo":"rococo","order":3,"selected":false}]"#;
+        assert!(print == expected_print, "\nReceived: \n{}", print);
+        fs::remove_dir_all(dbname).unwrap();
+    }
+    
+    #[test]
+    fn show_all_networks_no_flag() {
+        let dbname = "for_tests/show_all_networks_no_flag";
+        populate_cold (dbname, Verifier(None)).unwrap();
+        let print = show_all_networks(dbname).unwrap();
+        let expected_print = r#""networks":[{"key":"018091b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3","title":"Polkadot","logo":"polkadot","order":0},{"key":"0180b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe","title":"Kusama","logo":"kusama","order":1},{"key":"0180e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e","title":"Westend","logo":"westend","order":2},{"key":"0180aaf2cd1b74b5f726895921259421b534124726263982522174147046b8827897","title":"Rococo","logo":"rococo","order":3}]"#;
         assert!(print == expected_print, "\nReceived: \n{}", print);
         fs::remove_dir_all(dbname).unwrap();
     }
@@ -281,7 +304,7 @@ mod tests {
         let dbname = "for_tests/backup_prep_alice";
         populate_cold (dbname, Verifier(None)).unwrap();
         let print = backup_prep(dbname, "Alice").unwrap();
-        let expected_print = r#""seed_name":"Alice","derivations":[{"network_title":"Rococo","network_logo":"rococo","network_order":3,"id_set":[{"path":"","has_pwd":false},{"path":"//rococo","has_pwd":false},{"path":"//alice","has_pwd":false}]},{"network_title":"Polkadot","network_logo":"polkadot","network_order":0,"id_set":[{"path":"","has_pwd":false},{"path":"//polkadot","has_pwd":false}]},{"network_title":"Kusama","network_logo":"kusama","network_order":1,"id_set":[{"path":"","has_pwd":false},{"path":"//kusama","has_pwd":false}]},{"network_title":"Westend","network_logo":"westend","network_order":2,"id_set":[{"path":"//westend","has_pwd":false},{"path":"","has_pwd":false},{"path":"//Alice","has_pwd":false}]}]"#;
+        let expected_print = r#""seed_name":"Alice","derivations":[{"network_title":"Polkadot","network_logo":"polkadot","network_order":0,"id_set":[{"path":"","has_pwd":false},{"path":"//polkadot","has_pwd":false}]},{"network_title":"Kusama","network_logo":"kusama","network_order":1,"id_set":[{"path":"","has_pwd":false},{"path":"//kusama","has_pwd":false}]},{"network_title":"Westend","network_logo":"westend","network_order":2,"id_set":[{"path":"//westend","has_pwd":false},{"path":"","has_pwd":false},{"path":"//Alice","has_pwd":false}]},{"network_title":"Rococo","network_logo":"rococo","network_order":3,"id_set":[{"path":"","has_pwd":false},{"path":"//rococo","has_pwd":false},{"path":"//alice","has_pwd":false}]}]"#;
         assert!(print == expected_print, "\nReceived: \n{}", print);
         fs::remove_dir_all(dbname).unwrap();
     }
@@ -313,6 +336,27 @@ mod tests {
         let print = metadata_details(dbname, &NetworkSpecsKey::from_parts(&hex::decode("e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e").unwrap(), &Encryption::Sr25519), 9010).unwrap();
         let expected_print = r#""name":"westend","version":"9010","meta_hash":"70c99738c27fb32c87883f1c9c94ee454bf0b3d88e4a431a2bbfe1222b46ebdf","meta_id_pic":"89504e470d0a1a0a0000000d49484452000000410000004108060000008ef7c9450000033449444154789cedd93d6e135114c571b284c83414d429116e690129ca365c2121b6902d20242a6f238a04b4b44694a92968b0bc04f38eac1b7bc66fde39f77d8c9c64fec59d6246b2eeaf183d79ceb6dbedb3a7de28089bcd26fb47cecfcfcfc2a5694d104a9666b540a98ad072f97e3531aa20e42cbffe761366b7d9fbab307dd5c02842c8591ec500ac1c085482918dd002c01a1b220b211700b5444039102e8492e5add60896074346a80180c642402a8484e001587d5d84d96dfe6119e62e2fc2fad7f1f3b3d7fbfb2c0582229402582a0403b06a4254434801580c4205b05488220415007911583511500a6210c103804e1d010d414411bc00e82120a018848c70f3671d66b7ab97b330777911fead8f977c3edb2fe54558fc5c85d96df9661e6637094105b054080660a9100cc0522028420ac062102a80c5205400ab0f9144e803202f02cb8bc0ca414087101342e81e2106801e2b023288ea08abc5a730bbcd979fc3dce545b8bcb808b3dbeddd5d98bb46414029080660a9100cc052218600900b01c52054008b41a80016834801a00e020350f222b0bc08b901624298109c08ec24e845787779bce4f7dbfd525e84bf9177cc8b8377cc5032420cc052211880a54230008b41480829008b41a80016835001ac144413049617813521842684d04922b093a017e155e4f9df07f747414029080660a9100cc052215200484640310815c062102a80c52018007221b0bc082c2f426e1342684208dd232006c1be1d7a11d849d08b70fdf64b98ddae7f7c0c73380084cbeeff0494428801582a0403b054080660a52064841480c52054008b41a800d610443304961781551501c5201e2b8201a00921d441407d082f02fb76e8456027c11c8443004411500a8201582a0403b054883e00a208488550012c06a102580c4201403202cb8bc0f222a8c908c80bf11010620068100179204e1d6108002511900ae14560df0e6b22a40050350494826000960aa102a06204540aa102580ca2260092109007229517a1240500c908a806c458082a007221582518ad113ccb5b59082817a225420e00ca46402d20c606404508560e460c2207a06479ab0a829583915b8de5adaa08564b8c9acb5b4d10fa95a0b458badf2808a7de7f10bfbfacc65e85560000000049454e44ae426082","networks":[{"title":"Westend","logo":"westend","order":2,"current_on_screen":true}]"#;
         assert!(print == expected_print, "\nReceived: \n{}", print);
+        fs::remove_dir_all(dbname).unwrap();
+    }
+    
+    #[test]
+    fn types_status_and_history() {
+        let dbname = "for_tests/types_status_and_history";
+        populate_cold (dbname, Verifier(None)).unwrap();
+        
+        let print = show_types_status(dbname).unwrap();
+        let expected_print = r#""types_on_file":true,"types_hash":"d091a5a24a97e18dfe298b167d8fd5a2add10098c8792cba21c39029a9ee0aeb","types_id_pic":"89504e470d0a1a0a0000000d49484452000000410000004108060000008ef7c9450000035549444154789cedd8dd89144114c57117049fdb140cc18c8c61c3d818ccc8104cc17e1684b50ec35dcfd4debe1f55b79a01fbff30fb304dd5e91f2cac3ebdbebe7ef8df3b0561dff7e14bb66d7b6a3f96b60461e6a5bd56a09422ac7cf9be4a8c12849197fffce55bfbbcefd7cfefed335705c614c2c8cb230d401a81403318c3082b00a4b32186104601d04a043402914298797969358294c108235400a0b310501422849001d87ebcb4cffbf6afcfedf35616c13bcf2b02e122cc02483cdc82f000243ecfcb832843b0064b3c5c838802487c9ed514421400558e46e5e7191087081900543ebaf83c7404a122640150f5e8eaf3240d228c50fd3bfc697bfffceffddff7d9f3bc7d5208210a20f145d6701eac014851083e2fba4fea215c04eb02892fd286f3600b40f220f8bcec3e6422f40068e412ab2c82d7e83e86b8105a6f081a001abde4a847414002518ea0bd24bf94f67d9ff73c7f9fddc785119075115fa00d967878f573d17d7d2904a45dc4175883251eae3def7ddfc7cf7bfbb4ee103c8048d9d15ed5e71d05880be1424822787fb965477f7cd9dae77d7f9ef7f6792b7b9eb7efa830827681c41759c379b006204521f8bce83ead10827581c41769c379b0052079107c5e765fdf1204af2c82d7ecbe0ba17521b4962078bfc35904efbcecbebe1002b22ee20bb4c1120fb7203c0089cf8beed30a2320ed22bec01a2cf1700d220a20f179debea352085ed9d15ed5e71d7521b42e84d61b02f220bc7faf67476bcf7bdff7f1f3de3e2d00b41fb7ff4f4016827681c41759c37970f573d17d7d6104eb02892fd286f360edfb3eef79fe3ebb8f5b86e0a5bd541fbfa4d7ccbe7708488398b944eb511004005d08ad3b04d443642ff1fe72cb2278e765f72106402e02b22ee20bb4c1120fb7203c0089cf8bee935c041485e00bacc1120fd720a200129fe7ed937a001446f0ca8ef6aa3e4f0a23a02c44f5e8eaf39006800e115006a27a74f9790700c844405188ec68ef77387b9e950580ca1090359c076b00521482cff39a4640b3103cd802903c083ecfcb034021049481b0ca22cc140140610454017116421400a510a4198cd5089997978610d028c44a841100348c8056409c0d80a610a4110c0d620460e6e5a51204690463b48a97974a11a49518952f2f2d41e89b4159f1d27da7203c7a7f01d20cbfac205d21400000000049454e44ae426082""#;
+        assert!(print == expected_print, "\nReceived: \n{}", print);
+        
+        remove_types_info(dbname).unwrap();
+        let print = show_types_status(dbname).unwrap();
+        let expected_print = r#""types_on_file":false"#;
+        assert!(print == expected_print, "\nReceived: \n{}", print);
+        
+        let history_printed = print_history(dbname).unwrap();
+        let expected_element = r#"{"event":"types_removed","payload":{"types_hash":"d091a5a24a97e18dfe298b167d8fd5a2add10098c8792cba21c39029a9ee0aeb","types_id_pic":"89504e470d0a1a0a0000000d49484452000000410000004108060000008ef7c9450000035549444154789cedd8dd89144114c57117049fdb140cc18c8c61c3d818ccc8104cc17e1684b50ec35dcfd4debe1f55b79a01fbff30fb304dd5e91f2cac3ebdbebe7ef8df3b0561dff7e14bb66d7b6a3f96b60461e6a5bd56a09422ac7cf9be4a8c12849197fffce55bfbbcefd7cfefed335705c614c2c8cb230d401a81403318c3082b00a4b32186104601d04a043402914298797969358294c108235400a0b310501422849001d87ebcb4cffbf6afcfedf35616c13bcf2b02e122cc02483cdc82f000243ecfcb832843b0064b3c5c838802487c9ed514421400558e46e5e7191087081900543ebaf83c7404a122640150f5e8eaf3240d228c50fd3bfc697bfffceffddff7d9f3bc7d5208210a20f145d6701eac014851083e2fba4fea215c04eb02892fd286f3600b40f220f8bcec3e6422f40068e412ab2c82d7e83e86b8105a6f081a001abde4a847414002518ea0bd24bf94f67d9ff73c7f9fddc785119075115fa00d967878f573d17d7d2904a45dc4175883251eae3def7ddfc7cf7bfbb4ee103c8048d9d15ed5e71d05880be1424822787fb965477f7cd9dae77d7f9ef7f6792b7b9eb7efa830827681c41759c379b006204521f8bce83ead10827581c41769c379b0052079107c5e765fdf1204af2c82d7ecbe0ba17521b4962078bfc35904efbcecbebe1002b22ee20bb4c1120fb7203c0089cf8beed30a2320ed22bec01a2cf1700d220a20f179debea352085ed9d15ed5e71d7521b42e84d61b02f220bc7faf67476bcf7bdff7f1f3de3e2d00b41fb7ff4f4016827681c41759c37970f573d17d7d6104eb02892fd286f360edfb3eef79fe3ebb8f5b86e0a5bd541fbfa4d7ccbe7708488398b944eb511004005d08ad3b04d443642ff1fe72cb2278e765f72106402e02b22ee20bb4c1120fb7203c0089cf8bee935c041485e00bacc1120fd720a200129fe7ed937a001446f0ca8ef6aa3e4f0a23a02c44f5e8eaf39006800e115006a27a74f9790700c844405188ec68ef77387b9e950580ca1090359c076b00521482cff39a4640b3103cd802903c083ecfcb034021049481b0ca22cc140140610454017116421400a510a4198cd5089997978610d028c44a841100348c8056409c0d80a610a4110c0d620460e6e5a51204690463b48a97974a11a49518952f2f2d41e89b4159f1d27da7203c7a7f01d20cbfac205d21400000000049454e44ae426082","verifier":{"hex":"","identicon":"","encryption":"none"}}}"#;
+        assert!(history_printed.contains(expected_element), "\nReceived history: \n{}", history_printed);
+        
         fs::remove_dir_all(dbname).unwrap();
     }
     

@@ -14,6 +14,7 @@ pub mod metadata;
 pub mod network_details;
 pub mod prep_messages;
 pub mod remove_network;
+pub mod remove_types;
 
 
 /// Function to re-populate default "cold" database with default values.
