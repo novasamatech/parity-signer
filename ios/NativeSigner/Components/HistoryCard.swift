@@ -27,13 +27,6 @@ struct HistoryCard: View {
                     line1: "Device was connected to network",
                     line2: ""
                 )
-                case .error(let text): HistoryCardTemplate(
-                    image: "exclamationmark.triangle.fill",
-                    timestamp: timestamp,
-                    danger: true,
-                    line1: "Error! " + text,
-                    line2: ""
-                )
                 case .generalVerifierSet(let value): HistoryCardTemplate(
                     image: "checkmark.shield",
                     timestamp: timestamp,
@@ -195,6 +188,20 @@ struct HistoryCard: View {
                     line1: "Wrong password entered",
                     line2: "operation was declined"
                 )
+            case .messageSignError(let value): HistoryCardTemplate(
+                image: "exclamationmark.triangle.fill",
+                timestamp: timestamp,
+                danger: true,
+                line1: "Message signing error!",
+                line2: value.error
+            )
+            case .messageSigned(let value): HistoryCardTemplate(
+                image: "signature",
+                timestamp: timestamp,
+                danger: false,
+                line1: "Generated signature for message",
+                line2: String(decoding: Data(base64Encoded: value.user_comment) ?? Data(), as: UTF8.self)
+            )
             }
         }
     }

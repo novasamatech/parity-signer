@@ -10,12 +10,13 @@ import Foundation
 enum Event: Decodable, Hashable, Equatable {
     case databaseInitiated
     case deviceWasOnline
-    case error(String)
     case generalVerifierSet(Verifier)
     case historyCleared
     case identitiesWiped
     case identityAdded(IdentityEvent)
     case identityRemoved(IdentityEvent)
+    case messageSignError(SignMessageError)
+    case messageSigned(SignMessage)
     case metadataAdded(MetaSpecs)
     case metadataRemoved(MetaSpecs)
     case networkAdded(NetworkDisplay)
@@ -59,6 +60,10 @@ enum Event: Decodable, Hashable, Equatable {
             self = .identityAdded(try values.decode(IdentityEvent.self, forKey: .payload))
         case "identity_removed":
             self = .identityRemoved(try values.decode(IdentityEvent.self, forKey: .payload))
+        case "message_sign_error":
+            self = .messageSignError(try values.decode(SignMessageError.self, forKey: .payload))
+        case "message_signed":
+            self = .messageSigned(try values.decode(SignMessage.self, forKey: .payload))
         case "metadata_added":
             self = .metadataAdded(try values.decode(MetaSpecs.self, forKey: .payload))
         case "metadata_removed":
@@ -81,7 +86,7 @@ enum Event: Decodable, Hashable, Equatable {
             self = .signedTypes(try values.decode(TypesSigned.self, forKey: .payload))
         case "system_entered_event":
             self = .systemEntry(try values.decode(String.self, forKey: .payload))
-        case "sign_error":
+        case "transaction_sign_error":
             self = .transactionSignError(try values.decode(SignDisplayError.self, forKey: .payload))
         case "transaction_signed":
             self = .transactionSigned(try values.decode(SignDisplay.self, forKey: .payload))
@@ -96,7 +101,7 @@ enum Event: Decodable, Hashable, Equatable {
         case "wrong_password_entered":
             self = .wrongPassword
         default:
-            self = .error(try values.decode(String.self, forKey: .payload))
+            self = .warning("Record corrupted")
         }
     }
 }
@@ -148,6 +153,19 @@ struct NetworkSigned: Decodable, Hashable {
 struct NetworkVerifierDisplay: Decodable, Hashable {
     var genesis_hash: String
     var current_verifier: Verifier
+}
+
+struct SignMessage: Decodable, Hashable {
+    var message: String
+    var signed_by: Verifier
+    var user_comment: String
+}
+
+struct SignMessageError: Decodable, Hashable {
+    var message: String
+    var signed_by: Verifier
+    var user_comment: String
+    var error: String
 }
 
 struct SignDisplay: Decodable, Hashable {
