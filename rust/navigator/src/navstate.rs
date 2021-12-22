@@ -220,7 +220,7 @@ impl State {
                         },
                         Screen::Transaction(ref t) => {
                             match t.action() {
-                                transaction_parsing::Action::Sign{content: _, checksum, has_pwd, author_info: _, network_info: _} => {
+                                transaction_parsing::Action::Sign{content, checksum, has_pwd, author_info, network_info} => {
                                     if has_pwd {
                                         match self.navstate.modal {
                                             Modal::EnterPassword => {
@@ -234,6 +234,9 @@ impl State {
                                                          },
                                                          Err(e) => {
                                                              seed.zeroize();
+                                                             if let ErrorSigner::WrongPasswordNewChecksum(c) = e {
+                                                                 new_navstate.screen = Screen::Transaction(t.update_checksum_sign(c, content, has_pwd, author_info, network_info));
+                                                             }
                                                              new_navstate.alert = Alert::Error;
                                                              errorline.push_str(&<Signer>::show(&e));
                                                          },

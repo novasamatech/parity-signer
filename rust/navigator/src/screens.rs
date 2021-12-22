@@ -7,7 +7,7 @@ use definitions::{error::{AddressKeySource, ErrorSigner, ExtraAddressKeySourceSi
 use transaction_parsing;
 use transaction_signing;
 
-const MAX_COUNT_SET: u8 = 1;
+const MAX_COUNT_SET: u8 = 3;
 
 ///All screens
 #[derive(Debug, Clone)]
@@ -207,6 +207,15 @@ impl TransactionState {
             entered_info: self.entered_info.to_owned(),
             action: self.action(),
             comment: comment.to_string(),
+            counter: self.counter,
+        }
+    }
+    pub fn update_checksum_sign(&self, new_checksum: u32, content: String, has_pwd: bool, author_info: String, network_info: String) -> Self {
+        let action = transaction_parsing::Action::Sign{content, checksum: new_checksum, has_pwd, author_info, network_info};
+        Self {
+            entered_info: self.entered_info.to_owned(),
+            action,
+            comment: self.comment.to_string(),
             counter: self.counter,
         }
     }

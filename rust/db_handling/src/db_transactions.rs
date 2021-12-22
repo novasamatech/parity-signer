@@ -427,9 +427,6 @@ impl TrDbColdSign {
                 Err(e) => return Err(<Signer>::db_internal(e)),
             }
         };
-        TrDbCold::new()
-            .set_transaction(make_batch_clear_tree::<Signer>(&database_name, TRANSACTION)?) // clear transaction tree
-            .apply::<Signer>(&database_name)?;
         match Self::decode(&mut &sign_encoded[..]) {
             Ok(a) => Ok(a),
             Err(_) => return Err(ErrorSigner::Database(DatabaseSigner::EntryDecoding(EntryDecodingSigner::Sign))),
@@ -465,24 +462,38 @@ impl TrDbColdSign {
         }
     }
     /// function to apply TrDbColdSign to database
-    pub fn apply(self, wrong_password: bool, user_comment: &str, database_name: &str) -> Result<(), ErrorSigner> {
+    /// returns database checksum, to be collected and re-used in case of wrong password entry
+    pub fn apply(self, wrong_password: bool, user_comment: &str, database_name: &str) -> Result<u32, ErrorSigner> {
         let signed_by = VerifierValue::Standard(self.multisigner());
         let mut history = self.history;
+        let mut for_transaction = Batch::default();
         match self.content {
             SignContent::Transaction{method, extensions} => {
                 let transaction = [method.encode(), extensions].concat();
                 let sign_display = SignDisplay::get(&transaction, &self.network_name, &signed_by, &user_comment);
                 if wrong_password {history.push(Event::TransactionSignError(sign_display))}
-                else {history.push(Event::TransactionSigned(sign_display))}
+                else {
+                    history.push(Event::TransactionSigned(sign_display));
+                    for_transaction = make_batch_clear_tree::<Signer>(&database_name, TRANSACTION)?;
+                }
             },
             SignContent::Message(message) => {
                 let sign_message_display = SignMessageDisplay::get(&message, &self.network_name, &signed_by, &user_comment);
                 if wrong_password {history.push(Event::MessageSignError(sign_message_display))}
-                else {history.push(Event::MessageSigned(sign_message_display))}
+                else {
+                    history.push(Event::MessageSigned(sign_message_display));
+                    for_transaction = make_batch_clear_tree::<Signer>(&database_name, TRANSACTION)?;
+                }
             },
         }
         TrDbCold::new()
             .set_history(events_to_batch::<Signer>(&database_name, history)?)
-            .apply::<Signer>(&database_name)
+            .set_transaction(for_transaction)
+            .apply::<Signer>(&database_name)?;
+        let database = open_db::<Signer>(&database_name)?;
+        match database.checksum() {
+            Ok(x) => Ok(x),
+            Err(e) => return Err(<Signer>::db_internal(e)),
+        }
     }
 }

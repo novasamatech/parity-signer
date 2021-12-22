@@ -968,6 +968,7 @@ impl ErrorSource for Signer {
             },
             ErrorSigner::AddressUse(e) => format!("Error with secret string of existing address: {}.", bad_secret_string(e)),
             ErrorSigner::WrongPassword => String::from("Wrong password."),
+            ErrorSigner::WrongPasswordNewChecksum(_) => String::from("Wrong password."),
             ErrorSigner::PngGeneration(e) => format!("Error generating png. {}", e),
             ErrorSigner::NoNetworksAvailable => String::from("No networks available. Please load networks information to proceed."),
         }
@@ -988,6 +989,7 @@ pub enum ErrorSigner {
     AllParsingFailed(Vec<(String, u32, ParserError)>),
     AddressUse(SecretStringError),
     WrongPassword,
+    WrongPasswordNewChecksum (u32),
     PngGeneration(png::EncodingError),
     NoNetworksAvailable,
 }

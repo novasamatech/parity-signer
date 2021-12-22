@@ -38,9 +38,10 @@ pub (crate) fn create_signature (seed_phrase: &str, pwd_entry: &str, user_commen
         Err(e) => {
             full_address.zeroize();
             if let ErrorSigner::WrongPassword = e {
-                sign.apply(true, user_comment, &database_name)?;
+                let checksum = sign.apply(true, user_comment, &database_name)?;
+                return Err(ErrorSigner::WrongPasswordNewChecksum(checksum))
             }
-            return Err(e)
+            else {return Err(e)}
         },
     }
 }
