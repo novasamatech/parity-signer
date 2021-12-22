@@ -191,7 +191,7 @@ impl TransactionState {
             entered_info: EnteredInfo("".to_string()),
             action: transaction_parsing::produce_output(details_str, dbname),
             comment: "".to_string(),
-            counter: 0,
+            counter: 1,
         }
     }
     pub fn update_seed(&self, new_secret_string: &str) -> Self {
@@ -242,7 +242,7 @@ impl SufficientCryptoState {
             key_selected: None,
             entered_info: EnteredInfo("".to_string()),
             content,
-            counter: 0,
+            counter: 1,
         }
     }
     pub fn content(&self) -> transaction_signing::SufficientContent {
