@@ -65,6 +65,7 @@
 		2D48F3C227749138004B27BE /* MTypesInfo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D48F3C127749138004B27BE /* MTypesInfo.swift */; };
 		2D48F3C4277492D3004B27BE /* TypesMenu.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D48F3C3277492D3004B27BE /* TypesMenu.swift */; };
 		2D48F3C62774AEE7004B27BE /* SelectSeedForBackup.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D48F3C52774AEE7004B27BE /* SelectSeedForBackup.swift */; };
+		2D48F3C82774CC64004B27BE /* SearchKeys.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D48F3C72774CC64004B27BE /* SearchKeys.swift */; };
 		2D72B4F626EF3BC50081E879 /* Navigator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D72B4F526EF3BC50081E879 /* Navigator.swift */; };
 		2D72B4FA26EF7D1C0081E879 /* Seeds.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D72B4F926EF7D1C0081E879 /* Seeds.swift */; };
 		2D72D52A2732B8A7004BA7C9 /* Database in Resources */ = {isa = PBXBuildFile; fileRef = 2D72D5292732B8A7004BA7C9 /* Database */; };
@@ -221,6 +222,7 @@
 		2D48F3C127749138004B27BE /* MTypesInfo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MTypesInfo.swift; sourceTree = "<group>"; };
 		2D48F3C3277492D3004B27BE /* TypesMenu.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TypesMenu.swift; sourceTree = "<group>"; };
 		2D48F3C52774AEE7004B27BE /* SelectSeedForBackup.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SelectSeedForBackup.swift; sourceTree = "<group>"; };
+		2D48F3C72774CC64004B27BE /* SearchKeys.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SearchKeys.swift; sourceTree = "<group>"; };
 		2D72B4F526EF3BC50081E879 /* Navigator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Navigator.swift; sourceTree = "<group>"; };
 		2D72B4F926EF7D1C0081E879 /* Seeds.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Seeds.swift; sourceTree = "<group>"; };
 		2D72D5292732B8A7004BA7C9 /* Database */ = {isa = PBXFileReference; lastKnownFileType = folder; path = Database; sourceTree = "<group>"; };
@@ -421,6 +423,7 @@
 				0452BC562767B26600C6DD37 /* Buttons.swift */,
 				2D48F35027609CDE004B27BE /* HistoryCard.swift */,
 				2DA5F8852756A44600D8DD29 /* AddressCardControls.swift */,
+				2D48F3C72774CC64004B27BE /* SearchKeys.swift */,
 				2DA5F88F27590B3A00D8DD29 /* DocumentModal.swift */,
 				2DA5F8322756653B00D8DD29 /* CameraPreview.swift */,
 				2DA5F8222756621F00D8DD29 /* Header.swift */,
@@ -843,6 +846,7 @@
 				2DE72BC226A588C7002BB752 /* NativeSignerApp.swift in Sources */,
 				2DA5F8232756621F00D8DD29 /* Header.swift in Sources */,
 				2D48F3BA2771DD66004B27BE /* MSufficientCryptoReady.swift in Sources */,
+				2D48F3C82774CC64004B27BE /* SearchKeys.swift in Sources */,
 				2D7A7BD426BBEAF00053C1E0 /* Canary.swift in Sources */,
 				2DA5F8352756656E00D8DD29 /* Transaction.swift in Sources */,
 				2D48F35D2760ED38004B27BE /* MKeys.swift in Sources */,

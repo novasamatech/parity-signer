@@ -11,6 +11,7 @@ struct KeyManager: View {
     @EnvironmentObject var data: SignerDataModel
     @GestureState private var dragOffset = CGSize.zero
     var content: MKeys
+    @State var searchString: String = ""
     var body: some View {
         ZStack {
             VStack {
@@ -33,20 +34,27 @@ struct KeyManager: View {
                     }.padding(.horizontal, 8)
                 ScrollView {
                     LazyVStack {
-                        ForEach(content.set.sorted(by: {$0.path < $1.path}), id: \.address_key) {
+                        ForEach(content.set.sorted(by: {$0.path < $1.path}).filter{card in
+                            return card.path.contains(searchString) || searchString == ""
+                        }, id: \.address_key) {
                             address in
                             Button(action: {
                                 data.pushButton(buttonID: .SelectKey, details: address.address_key)
                             }){
-                                AddressCard(address: address.intoAddress())
+                                AddressCard(address: address.intoAddress()).gesture(DragGesture()
+                                                                                        .onEnded {drag in
+                                                                    if abs(drag.translation.height) < 20 && abs(drag.translation.width) > 20 {
+                                                                        data.pushButton(buttonID: .Swipe, details: address.address_key)
+                                                                    }
+                                                                })
                             }.padding(2)
                         }
                     }
                 }
                 Spacer()
+                SearchKeys(searchString: $searchString)
             }
         }
-        .background(/*@START_MENU_TOKEN@*//*@PLACEHOLDER=View@*/Color("backgroundColor")/*@END_MENU_TOKEN@*/)
     }
 }
 

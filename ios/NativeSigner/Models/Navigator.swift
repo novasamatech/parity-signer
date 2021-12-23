@@ -222,6 +222,8 @@ enum ButtonID {
     case RemoveKey
     case RemoveSeed
     case ClearLog
+    case Swipe
+    case Increment
 }
 
 /**
