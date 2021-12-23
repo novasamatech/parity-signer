@@ -413,7 +413,7 @@ pub fn create_increment_set(increment: u32, multisigner: &MultiSigner, network_s
     };
     let mut identity_adds: Vec<(AddressKey, AddressDetails)> = Vec::new();
     let mut current_events: Vec<Event> = Vec::new();
-    for i in 0..increment-1 {
+    for i in 0..increment {
         let path = address_details.path.to_string() + "//" + &(last_index+i).to_string();
         let (adds, events) = create_address::<Signer>(&open_db::<Signer>(database_name)?, &identity_adds, &current_events, &path, &network_specs, &seed_object, false)?;
         identity_adds = adds;
@@ -851,6 +851,97 @@ mod tests {
         let out = guess(word_part);
         let out_expected = r#"["senior","sense","sentence"]"#;
         assert!(out == out_expected, "Found different word set:\n{:?}", out);
+    }
+    
+    fn get_multisigner_path_set(dbname: &str) -> Vec<(MultiSigner, String)> {
+        let db = open_db::<Signer>(dbname).unwrap();
+        let identities = open_tree::<Signer>(&db, ADDRTREE).unwrap();
+        let mut multisigner_path_set: Vec<(MultiSigner, String)> = Vec::new();
+        for x in identities.iter() {
+            if let Ok(a) = x {
+                let (multisigner, address_details) = AddressDetails::process_entry_checked::<Signer>(a).unwrap();
+                multisigner_path_set.push((multisigner, address_details.path.to_string()))
+            }
+        }
+        multisigner_path_set
+    }
+    
+    #[test]
+    fn increment_identities_1() {
+        let dbname = "for_tests/increment_identities_1";
+        populate_cold_no_metadata(dbname, Verifier(None)).unwrap();
+        {
+            let db = open_db::<Signer>(dbname).unwrap();
+            let identities = open_tree::<Signer>(&db, ADDRTREE).unwrap();
+            assert!(identities.len()==0);
+        }
+        let chainspecs = get_default_chainspecs();
+        let network_id_0 = NetworkSpecsKey::from_parts(&chainspecs[0].genesis_hash.to_vec(), &Encryption::Sr25519);
+        try_create_address("Alice", SEED, "//Alice", &network_id_0, dbname).unwrap();
+        let multisigner_path_set = get_multisigner_path_set(dbname);
+        assert!(multisigner_path_set.len() == 1, "Wrong number of identities: {:?}", multisigner_path_set);
+        println!("{}", multisigner_path_set[0].1);
+        create_increment_set(4, &multisigner_path_set[0].0, &network_id_0, SEED, dbname).unwrap();
+        let multisigner_path_set = get_multisigner_path_set(dbname);
+        assert!(multisigner_path_set.len() == 5, "Wrong number of identities after increment: {:?}", multisigner_path_set);
+        let path_set: Vec<String> = multisigner_path_set.iter().map(|(_, path)| path.to_string()).collect();
+        assert!(path_set.contains(&String::from("//Alice//0")));
+        assert!(path_set.contains(&String::from("//Alice//1")));
+        assert!(path_set.contains(&String::from("//Alice//2")));
+        assert!(path_set.contains(&String::from("//Alice//3")));
+        fs::remove_dir_all(dbname).unwrap();
+    }
+    
+    #[test]
+    fn increment_identities_2() {
+        let dbname = "for_tests/increment_identities_2";
+        populate_cold_no_metadata(dbname, Verifier(None)).unwrap();
+        {
+            let db = open_db::<Signer>(dbname).unwrap();
+            let identities = open_tree::<Signer>(&db, ADDRTREE).unwrap();
+            assert!(identities.len()==0);
+        }
+        let chainspecs = get_default_chainspecs();
+        let network_id_0 = NetworkSpecsKey::from_parts(&chainspecs[0].genesis_hash.to_vec(), &Encryption::Sr25519);
+        try_create_address("Alice", SEED, "//Alice", &network_id_0, dbname).unwrap();
+        try_create_address("Alice", SEED, "//Alice//1", &network_id_0, dbname).unwrap();
+        let multisigner_path_set = get_multisigner_path_set(dbname);
+        let alice_multisigner_path = multisigner_path_set.iter().find(|(_, path)| path == "//Alice").unwrap();
+        assert!(multisigner_path_set.len() == 2, "Wrong number of identities: {:?}", multisigner_path_set);
+        create_increment_set(3, &alice_multisigner_path.0, &network_id_0, SEED, dbname).unwrap();
+        let multisigner_path_set = get_multisigner_path_set(dbname);
+        assert!(multisigner_path_set.len() == 5, "Wrong number of identities after increment: {:?}", multisigner_path_set);
+        let path_set: Vec<String> = multisigner_path_set.iter().map(|(_, path)| path.to_string()).collect();
+        assert!(path_set.contains(&String::from("//Alice//2")));
+        assert!(path_set.contains(&String::from("//Alice//3")));
+        assert!(path_set.contains(&String::from("//Alice//4")));
+        fs::remove_dir_all(dbname).unwrap();
+    }
+    
+    #[test]
+    fn increment_identities_3() {
+        let dbname = "for_tests/increment_identities_3";
+        populate_cold_no_metadata(dbname, Verifier(None)).unwrap();
+        {
+            let db = open_db::<Signer>(dbname).unwrap();
+            let identities = open_tree::<Signer>(&db, ADDRTREE).unwrap();
+            assert!(identities.len()==0);
+        }
+        let chainspecs = get_default_chainspecs();
+        let network_id_0 = NetworkSpecsKey::from_parts(&chainspecs[0].genesis_hash.to_vec(), &Encryption::Sr25519);
+        try_create_address("Alice", SEED, "//Alice", &network_id_0, dbname).unwrap();
+        try_create_address("Alice", SEED, "//Alice//1", &network_id_0, dbname).unwrap();
+        let multisigner_path_set = get_multisigner_path_set(dbname);
+        let alice_multisigner_path = multisigner_path_set.iter().find(|(_, path)| path == "//Alice//1").unwrap();
+        assert!(multisigner_path_set.len() == 2, "Wrong number of identities: {:?}", multisigner_path_set);
+        create_increment_set(3, &alice_multisigner_path.0, &network_id_0, SEED, dbname).unwrap();
+        let multisigner_path_set = get_multisigner_path_set(dbname);
+        assert!(multisigner_path_set.len() == 5, "Wrong number of identities after increment: {:?}", multisigner_path_set);
+        let path_set: Vec<String> = multisigner_path_set.iter().map(|(_, path)| path.to_string()).collect();
+        assert!(path_set.contains(&String::from("//Alice//1//0")));
+        assert!(path_set.contains(&String::from("//Alice//1//1")));
+        assert!(path_set.contains(&String::from("//Alice//1//2")));
+        fs::remove_dir_all(dbname).unwrap();
     }
 
 }

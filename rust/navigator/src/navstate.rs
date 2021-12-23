@@ -668,7 +668,13 @@ impl State {
                         Screen::Keys(ref k) => {
                             match process_hex_address_key (details_str) {
                                 Ok(multisigner) => {
-                                    new_navstate = Navstate::clean_screen(Screen::Keys(k.swipe(&multisigner)));
+                                    new_navstate = {
+                                        if let Some(ref swiped_multisigner) = k.get_swiped_key() {
+                                            if swiped_multisigner == &multisigner {Navstate::clean_screen(Screen::Keys(k.deselect_swipe()))}
+                                            else {Navstate::clean_screen(Screen::Keys(k.swipe(&multisigner)))}
+                                        }
+                                        else {Navstate::clean_screen(Screen::Keys(k.swipe(&multisigner)))}
+                                    };
                                 },
                                 Err(e) => {
                                     new_navstate.alert = Alert::Error;
