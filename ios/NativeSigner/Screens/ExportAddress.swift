@@ -22,7 +22,11 @@ struct ExportAddress: View {
                 Image(uiImage: UIImage(data: Data(fromHexEncodedString: content.qr) ?? Data()) ?? UIImage())
                     .resizable()
                     .aspectRatio(contentMode: .fit).padding(12)
-                HeaderBar(line1: "KEY DETAILS", line2: "Key key details details")
+                    .offset(x: offset, y:0)
+                    .onAppear{
+                        offset = 0
+                    }
+                HeaderBar(line1: "KEY DETAILS", line2: "Key key details details").padding(.horizontal, 8)
                 VStack {
                     HStack {
                         Text("Base58 key: ")
@@ -40,28 +44,24 @@ struct ExportAddress: View {
                 .foregroundColor(Color("Crypto400"))
             }
         }
-        .onAppear{
-            offset = 0
-        }
-        .offset(x: offset, y:0)
         .gesture(
             DragGesture()
                 .onChanged {drag in
                     self.offset = drag.translation.width
                 }
                 .onEnded {drag in
-                    offset = 0
-                if abs(drag.translation.height) > 200 {
-                    showDetails.toggle()
-                } else {
-                    if drag.translation.width > 20 {
-                        data.pushButton(buttonID: .NextUnit)
-                    }
-                    if drag.translation.width < -20 {
-                        data.pushButton(buttonID: .PreviousUnit)
+                    self.offset = 0
+                    if abs(drag.translation.height) > 200 {
+                        showDetails.toggle()
+                    } else {
+                        if drag.translation.width > 20 {
+                            data.pushButton(buttonID: .NextUnit)
+                        }
+                        if drag.translation.width < -20 {
+                            data.pushButton(buttonID: .PreviousUnit)
+                        }
                     }
                 }
-            }
         )
     }
 }

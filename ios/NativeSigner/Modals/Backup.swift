@@ -30,7 +30,7 @@ struct Backup: View {
                         }
                         .onAppear{
                             if data.seedBackup == "" {
-                                secret = data.getSeed(seedName: content.seed_name)
+                                secret = data.getSeed(seedName: content.seed_name, backup: true)
                             } else {
                                 secret = data.seedBackup
                             }

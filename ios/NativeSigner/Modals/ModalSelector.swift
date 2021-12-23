@@ -38,6 +38,8 @@ struct ModalSelector: View {
             SufficientCryptoReady(content: value)
         case .KeyDetailsAction:
             KeyMenu()
+        case .TypesInfo(let value):
+            TypesMenu(content: value)
         }
     }
 }

@@ -57,7 +57,7 @@ struct ActionResult: Decodable {
         case "Keys":
             screen = .Keys(try values.decode(MKeys.self, forKey: .screenData))
         case "Settings":
-            screen = .Settings
+            screen = .Settings(try values.decode(MVerifierDetails.self, forKey: .screenData))
         case "Log":
             screen = .Log(try values.decode(MLog.self, forKey: .screenData))
         case "LogDetails":
@@ -84,6 +84,8 @@ struct ActionResult: Decodable {
             screen = .NetworkDetails(try values.decode(MNetworkDetails.self, forKey: .screenData))
         case "SignSufficientCrypto":
             screen = .SignSufficientCrypto(try values.decode(MSignSufficientCrypto.self, forKey: .screenData))
+        case "SelectSeedForBackup":
+            screen = .SelectSeedForBackup(try values.decode(MSeeds.self, forKey: .screenData))
         default:
             screen = .Log(MLog())
         }
@@ -115,6 +117,8 @@ struct ActionResult: Decodable {
             modal = .SufficientCryptoReady(try values.decode(MSufficientCryptoReady.self, forKey: .modalData))
         case "KeyDetailsAction":
             modal = .KeyDetailsAction
+        case "TypesInfo":
+            modal = .TypesInfo(try values.decode(MTypesInfo.self, forKey: .modalData))
         default:
             modal = .Empty
         }
@@ -138,7 +142,7 @@ struct ActionResult: Decodable {
 enum SignerScreen: Decodable {
     case Scan
     case Keys(MKeys)
-    case Settings
+    case Settings(MVerifierDetails)
     case Log(MLog)
     case LogDetails
     case Transaction(MTransaction)
@@ -152,6 +156,7 @@ enum SignerScreen: Decodable {
     case ManageNetworks(MManageNetworks)
     case NetworkDetails(MNetworkDetails)
     case SignSufficientCrypto(MSignSufficientCrypto)
+    case SelectSeedForBackup(MSeeds)
 }
 
 /**
@@ -171,6 +176,7 @@ enum SignerModal: Decodable {
     case ManageMetadata(MManageMetadata)
     case SufficientCryptoReady(MSufficientCryptoReady)
     case KeyDetailsAction
+    case TypesInfo(MTypesInfo)
 }
 
 enum SignerAlert: Decodable {
@@ -206,8 +212,10 @@ enum ButtonID {
     case TransactionFetched
     case RemoveNetwork
     case RemoveMetadata
+    case RemoveTypes
     case SignNetworkSpecs
     case SignMetadata
+    case SignTypes
     case ManageNetworks
     case ViewGeneralVerifier
     case ManageMetadata

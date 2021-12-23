@@ -11,6 +11,7 @@ struct SettingsScreen: View {
     @EnvironmentObject var data: SignerDataModel
     @State var wipe = false
     @State var jailbreak = false
+    let content: MVerifierDetails
     var body: some View {
         VStack (spacing: 2) {
             Button(action: {
@@ -19,7 +20,7 @@ struct SettingsScreen: View {
                 SettingsCardTemplate(text: "Networks")
             }
             Button(action: {
-                //TODO: to SeedSelect to SeedBackup
+                data.pushButton(buttonID: .BackupSeed)
             }) {
                 SettingsCardTemplate(text: "Backup keys")
             }
@@ -29,7 +30,15 @@ struct SettingsScreen: View {
                     Text("Verifier certificate").font(FBase(style: .h1))
                     Spacer()
                 }
-                //TODO: VerifierCard to VarifierManager
+                HStack {
+                    Image(uiImage: UIImage(data: Data(fromHexEncodedString: content.identicon) ?? Data()) ?? UIImage())
+                    .resizable(resizingMode: .stretch)
+                    .frame(width: 28, height: 28)
+                    VStack{
+                        Text(content.hex.truncateMiddle(length: 8))
+                        Text("encryption: " + content.encryption)
+                    }.foregroundColor(Color("Crypto400"))
+                }
             }
             .padding()
             }

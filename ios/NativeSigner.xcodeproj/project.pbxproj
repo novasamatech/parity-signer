@@ -62,6 +62,9 @@
 		2D48F3BC2771DE24004B27BE /* SufficientCryptoReady.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D48F3BB2771DE24004B27BE /* SufficientCryptoReady.swift */; };
 		2D48F3BE27720345004B27BE /* KeyMenu.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D48F3BD27720345004B27BE /* KeyMenu.swift */; };
 		2D48F3C027720B7E004B27BE /* MSeedMenu.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D48F3BF27720B7E004B27BE /* MSeedMenu.swift */; };
+		2D48F3C227749138004B27BE /* MTypesInfo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D48F3C127749138004B27BE /* MTypesInfo.swift */; };
+		2D48F3C4277492D3004B27BE /* TypesMenu.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D48F3C3277492D3004B27BE /* TypesMenu.swift */; };
+		2D48F3C62774AEE7004B27BE /* SelectSeedForBackup.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D48F3C52774AEE7004B27BE /* SelectSeedForBackup.swift */; };
 		2D72B4F626EF3BC50081E879 /* Navigator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D72B4F526EF3BC50081E879 /* Navigator.swift */; };
 		2D72B4FA26EF7D1C0081E879 /* Seeds.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D72B4F926EF7D1C0081E879 /* Seeds.swift */; };
 		2D72D52A2732B8A7004BA7C9 /* Database in Resources */ = {isa = PBXBuildFile; fileRef = 2D72D5292732B8A7004BA7C9 /* Database */; };
@@ -215,6 +218,9 @@
 		2D48F3BB2771DE24004B27BE /* SufficientCryptoReady.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SufficientCryptoReady.swift; sourceTree = "<group>"; };
 		2D48F3BD27720345004B27BE /* KeyMenu.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyMenu.swift; sourceTree = "<group>"; };
 		2D48F3BF27720B7E004B27BE /* MSeedMenu.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MSeedMenu.swift; sourceTree = "<group>"; };
+		2D48F3C127749138004B27BE /* MTypesInfo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MTypesInfo.swift; sourceTree = "<group>"; };
+		2D48F3C3277492D3004B27BE /* TypesMenu.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TypesMenu.swift; sourceTree = "<group>"; };
+		2D48F3C52774AEE7004B27BE /* SelectSeedForBackup.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SelectSeedForBackup.swift; sourceTree = "<group>"; };
 		2D72B4F526EF3BC50081E879 /* Navigator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Navigator.swift; sourceTree = "<group>"; };
 		2D72B4F926EF7D1C0081E879 /* Seeds.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Seeds.swift; sourceTree = "<group>"; };
 		2D72D5292732B8A7004BA7C9 /* Database */ = {isa = PBXFileReference; lastKnownFileType = folder; path = Database; sourceTree = "<group>"; };
@@ -370,6 +376,7 @@
 				2D48F3562760BBEC004B27BE /* RecoverSeedName.swift */,
 				2D48F35A2760E5DF004B27BE /* RecoverSeedPhrase.swift */,
 				2DA5F87527566D7C00D8DD29 /* TransactionPreview.swift */,
+				2D48F3C52774AEE7004B27BE /* SelectSeedForBackup.swift */,
 				2DA5F82E2756635A00D8DD29 /* HistoryScreen.swift */,
 				2DA5F8772756749B00D8DD29 /* SeedManager.swift */,
 				2DA5F8382756666C00D8DD29 /* EventDetails.swift */,
@@ -390,6 +397,7 @@
 				2DA5F89C275F874D00D8DD29 /* NetworkManager.swift */,
 				2D48F3BD27720345004B27BE /* KeyMenu.swift */,
 				2D48F36827636036004B27BE /* SeedMenu.swift */,
+				2D48F3C3277492D3004B27BE /* TypesMenu.swift */,
 				2D48F3AD2770AD6B004B27BE /* NetworkDetailsMenu.swift */,
 				2D48F3AF2770AD83004B27BE /* ManageMetadata.swift */,
 				2D48F36E2767419D004B27BE /* PasswordConfirm.swift */,
@@ -485,6 +493,7 @@
 				2D48F36227622C54004B27BE /* MNetworkMenu.swift */,
 				2D48F36C27636092004B27BE /* MBackup.swift */,
 				2D48F391276A1D12004B27BE /* MSignatureReady.swift */,
+				2D48F3C127749138004B27BE /* MTypesInfo.swift */,
 				2D48F3B92771DD66004B27BE /* MSufficientCryptoReady.swift */,
 				2D48F393276A1D20004B27BE /* MEnterPassword.swift */,
 				2D48F3BF27720B7E004B27BE /* MSeedMenu.swift */,
@@ -775,6 +784,7 @@
 				2D48F39C276B5C0C004B27BE /* MRecoverSeedName.swift in Sources */,
 				2D48F3A427708091004B27BE /* MManageNetworks.swift in Sources */,
 				2DA5F87627566D7C00D8DD29 /* TransactionPreview.swift in Sources */,
+				2D48F3C227749138004B27BE /* MTypesInfo.swift in Sources */,
 				2DA5F85E27566C3600D8DD29 /* TCFieldName.swift in Sources */,
 				2D48F3712767514B004B27BE /* MPasswordConfirm.swift in Sources */,
 				2DA5F86827566C3600D8DD29 /* TCAuthor.swift in Sources */,
@@ -787,6 +797,7 @@
 				2DA5F8372756657600D8DD29 /* TransactionTypes.swift in Sources */,
 				2D48F3A0276C8D5E004B27BE /* LogMenu.swift in Sources */,
 				2D48F36D27636092004B27BE /* MBackup.swift in Sources */,
+				2D48F3C62774AEE7004B27BE /* SelectSeedForBackup.swift in Sources */,
 				2DA5F85F27566C3600D8DD29 /* TCTypesInfo.swift in Sources */,
 				2DA5F8A1275F889400D8DD29 /* Headers.swift in Sources */,
 				04197D2D276BB683003485D2 /* StyleModiefiers.swift in Sources */,
@@ -852,6 +863,7 @@
 				2D48F3A62770828B004B27BE /* ManageNetworks.swift in Sources */,
 				2DA5F87227566C3600D8DD29 /* TCFieldNumber.swift in Sources */,
 				2DA5F86D27566C3600D8DD29 /* TCAuthorPlain.swift in Sources */,
+				2D48F3C4277492D3004B27BE /* TypesMenu.swift in Sources */,
 				0452BC572767B26600C6DD37 /* Buttons.swift in Sources */,
 				2DA5F86427566C3600D8DD29 /* TCError.swift in Sources */,
 				2DA5F86627566C3600D8DD29 /* TCText.swift in Sources */,

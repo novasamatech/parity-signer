@@ -1,13 +1,13 @@
 //
-//  SeedManager.swift
+//  SelectSeedForBackup.swift
 //  NativeSigner
 //
-//  Created by Alexander Slesarev on 12.8.2021.
+//  Created by Alexander Slesarev on 23.12.2021.
 //
 
 import SwiftUI
 
-struct SeedManager: View {
+struct SelectSeedForBackup: View {
     @EnvironmentObject var data: SignerDataModel
     var content: MSeeds
     var body: some View {
@@ -17,7 +17,7 @@ struct SeedManager: View {
                     ForEach(content.seedNameCards.sorted(by: {$0.seed_name < $1.seed_name}), id: \.seed_name) {seedNameCard in
                         HStack {
                             Button(action: {
-                                data.pushButton(buttonID: .SelectSeed, details: seedNameCard.seed_name)
+                                data.pushButton(buttonID: .BackupSeed, details: seedNameCard.seed_name)
                             }) {
                                 SeedCardForManager(seedNameCard: seedNameCard)
                                 Spacer()
@@ -32,8 +32,9 @@ struct SeedManager: View {
 }
 
 /*
- struct SeedManager_Previews: PreviewProvider {
- static var previews: some View {
- SeedManager()
- }
- */
+struct SelectSeedForBackup_Previews: PreviewProvider {
+    static var previews: some View {
+        SelectSeedForBackup()
+    }
+}
+*/

@@ -16,8 +16,8 @@ struct ScreenSelector: View {
             TransactionScreen()
         case .Keys(let value):
             KeyManager(content: value)
-        case .Settings :
-            SettingsScreen()
+        case .Settings(let value) :
+            SettingsScreen(content: value)
         case .Log(let value) :
             HistoryScreen(content: value)
         case .LogDetails:
@@ -44,6 +44,8 @@ struct ScreenSelector: View {
             NetworkDetails(content: value)
         case .SignSufficientCrypto(let value):
             SignSufficientCrypto(content: value)
+        case .SelectSeedForBackup(let value):
+            SelectSeedForBackup(content: value)
         }
     }
 }
