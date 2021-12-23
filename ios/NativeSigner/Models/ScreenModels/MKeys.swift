@@ -19,6 +19,7 @@ struct MKeysKeyCard: Decodable, Hashable {
     var identicon: String
     var has_pwd: Bool
     var path: String
+    var swiped: Bool
     
     func intoAddress() -> Address {
         return Address(
@@ -36,6 +37,7 @@ struct MSeedKeyCard: Decodable {
     var identicon: String
     var address_key: String
     var base58: String
+    var swiped: Bool
 }
 
 struct MNetworkCard: Decodable {

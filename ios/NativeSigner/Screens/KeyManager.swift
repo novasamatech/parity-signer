@@ -15,39 +15,54 @@ struct KeyManager: View {
     var body: some View {
         ZStack {
             VStack {
-                Button(action: {
-                    data.pushButton(buttonID: .SelectKey, details: content.root.address_key)
-                }){
-                    SeedKeyCard(seedCard: content.root)
-                }.padding(2)
+                ZStack{
+                    Button(action: {
+                        data.pushButton(buttonID: .SelectKey, details: content.root.address_key)
+                    }){
+                        SeedKeyCard(seedCard: content.root).gesture(DragGesture()
+                                                                        .onEnded {drag in
+                    if abs(drag.translation.height) < 20 && abs(drag.translation.width) > 20 {
+                        data.pushButton(buttonID: .Swipe, details: content.root.address_key)
+                    }
+                })
+                    }.padding(2)
+                    if content.root.swiped {
+                        AddressCardControls(seed_name: content.root.seed_name)
+                    }
+                }
                 Button(action: {data.pushButton(buttonID: .NetworkSelector)}) {
                     NetworkCard(title: content.network.title, logo: content.network.logo)
                 }
                 HStack {
-                        Text("DERIVED KEYS").foregroundColor(Color("Text600"))
-                        Spacer()
-                        Button(action: {
-                            data.pushButton(buttonID: .NewKey)
-                        }) {
-                            Image(systemName: "plus.circle").imageScale(.large).foregroundColor(Color("Action400"))
-                        }
-                    }.padding(.horizontal, 8)
+                    Text("DERIVED KEYS").foregroundColor(Color("Text600"))
+                    Spacer()
+                    Button(action: {
+                        data.pushButton(buttonID: .NewKey)
+                    }) {
+                        Image(systemName: "plus.circle").imageScale(.large).foregroundColor(Color("Action400"))
+                    }
+                }.padding(.horizontal, 8)
                 ScrollView {
                     LazyVStack {
                         ForEach(content.set.sorted(by: {$0.path < $1.path}).filter{card in
                             return card.path.contains(searchString) || searchString == ""
                         }, id: \.address_key) {
                             address in
-                            Button(action: {
-                                data.pushButton(buttonID: .SelectKey, details: address.address_key)
-                            }){
-                                AddressCard(address: address.intoAddress()).gesture(DragGesture()
-                                                                                        .onEnded {drag in
-                                                                    if abs(drag.translation.height) < 20 && abs(drag.translation.width) > 20 {
-                                                                        data.pushButton(buttonID: .Swipe, details: address.address_key)
-                                                                    }
-                                                                })
-                            }.padding(2)
+                            ZStack {
+                                Button(action: {
+                                    data.pushButton(buttonID: .SelectKey, details: address.address_key)
+                                }){
+                                    AddressCard(address: address.intoAddress()).gesture(DragGesture()
+                                                                                            .onEnded {drag in
+                                        if abs(drag.translation.height) < 20 && abs(drag.translation.width) > 20 {
+                                            data.pushButton(buttonID: .Swipe, details: address.address_key)
+                                        }
+                                    })
+                                }.padding(2)
+                                if address.swiped {
+                                    AddressCardControls(seed_name: content.root.seed_name)
+                                }
+                            }
                         }
                     }
                 }
