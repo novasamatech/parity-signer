@@ -749,8 +749,8 @@ impl State {
                     }
                 },
                 Screen::Keys(ref k) => {
-                    match db_handling::interface_signer::print_identities_for_seed_name_and_network(dbname, &k.seed_name(), &k.network_specs_key()) {
-                        Ok(a) => format!("{},\"swiped\":{}", a, k.get_swiped_key().is_some()),
+                    match db_handling::interface_signer::print_identities_for_seed_name_and_network(dbname, &k.seed_name(), &k.network_specs_key(), k.get_swiped_key()) {
+                        Ok(a) => a,
                         Err(e) => {
                             new_navstate.alert = Alert::Error;
                             errorline.push_str(&<Signer>::show(&e));
