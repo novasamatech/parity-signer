@@ -39,6 +39,8 @@ pub enum Action {
     RemoveKey,
     RemoveSeed,
     ClearLog,
+    Swipe,
+    Increment,
     Nothing,
 }
 
@@ -79,6 +81,8 @@ impl Action {
             "RemoveKey" => Action::RemoveKey,
             "RemoveSeed" => Action::RemoveSeed,
             "ClearLog" => Action::ClearLog,
+            "Swipe" => Action::Swipe,
+            "Increment" => Action::Increment,
             _ => Action::Nothing,
         }
     }

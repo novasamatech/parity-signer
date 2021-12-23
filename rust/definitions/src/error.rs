@@ -827,6 +827,7 @@ impl ErrorSource for Signer {
                     InterfaceSigner::AddressKeyNotInSet{address_key, seed_name} => format!("Address key {} was expected and not found in address key set for seed name {}.", hex::encode(address_key.key()), seed_name),
                     InterfaceSigner::LostPwd => String::from("Derivation had password, then lost it."),
                     InterfaceSigner::VersionNotU32(x) => format!("Version {} could not be converted into u32.", x),
+                    InterfaceSigner::IncNotU32(x) => format!("Increment {} could not be converted into u32.", x),
                 };
                 format!("Error on the interface. {}", insert)
             },
@@ -1014,6 +1015,7 @@ pub enum InterfaceSigner {
     AddressKeyNotInSet{address_key: AddressKey, seed_name: String},
     LostPwd,
     VersionNotU32(String),
+    IncNotU32(String),
 }
 
 /// NotHex errors occuring on the Signer side

@@ -19,6 +19,7 @@ use sp_runtime::MultiSigner;
 
 use crate::db_transactions::TrDbCold;
 use crate::helpers::{open_db, open_tree, make_batch_clear_tree, upd_id_batch, get_network_specs, get_address_details};
+use crate::interface_signer::addresses_set_seed_name_network;
 use crate::manage_history::{events_to_batch};
 use crate::network_details::get_network_specs_by_hex_key;
 
@@ -388,6 +389,41 @@ pub fn suggest_n_plus_one(path: &str, seed_name: &str, network_key_string: &str,
         }
     }
     Ok(path.to_string() + "//" + &last_index.to_string())
+}
+
+/// Add a bunch of new derived addresses, N+1, N+2, etc.
+pub fn create_increment_set(increment: u32, multisigner: &MultiSigner, network_specs_key: &NetworkSpecsKey, seed_phrase: &str, database_name: &str) -> Result<(), ErrorSigner> {
+    let address_details = get_address_details(database_name, &AddressKey::from_multisigner(multisigner))?;
+    let existing_identities = addresses_set_seed_name_network(database_name, &address_details.seed_name, network_specs_key)?;
+    let mut last_index = 0;
+    for (_, details) in existing_identities.iter() {
+        if let Some(("", suffix)) = details.path.split_once(&address_details.path) {
+            if let Some(could_be_number) = suffix.get(2..) {
+                if let Ok(index) = could_be_number.parse::<u32>() {
+                    last_index = std::cmp::max(index+1, last_index);
+                }
+            }
+        }
+    }
+    let network_specs = get_network_specs(database_name, network_specs_key)?;
+    let seed_object = SeedObject {
+        seed_name: address_details.seed_name.to_string(),
+        seed_phrase: seed_phrase.to_string(),
+        encryption: network_specs.encryption.to_owned(),
+    };
+    let mut identity_adds: Vec<(AddressKey, AddressDetails)> = Vec::new();
+    let mut current_events: Vec<Event> = Vec::new();
+    for i in 0..increment-1 {
+        let path = address_details.path.to_string() + "//" + &(last_index+i).to_string();
+        let (adds, events) = create_address::<Signer>(&open_db::<Signer>(database_name)?, &identity_adds, &current_events, &path, &network_specs, &seed_object, false)?;
+        identity_adds = adds;
+        current_events = events;
+    }
+    let id_batch = upd_id_batch(Batch::default(), identity_adds);
+    TrDbCold::new()
+        .set_addresses(id_batch) // add created address
+        .set_history(events_to_batch::<Signer>(&database_name, current_events)?) // add corresponding history
+        .apply::<Signer>(&database_name)
 }
 
 /// Check derivation format and determine whether there is a password

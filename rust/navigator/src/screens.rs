@@ -37,6 +37,7 @@ pub enum Screen {
 pub struct KeysState {
     seed_name: String,
     network: NetworkSpecsKey,
+    swiped_key: Option<MultiSigner>,
 }
 
 ///State of screen with 1 key
@@ -85,12 +86,14 @@ impl KeysState {
         Ok(Self {
             seed_name: seed_name.to_string(),
             network: NetworkSpecsKey::from_parts(&network_specs.genesis_hash.to_vec(), &network_specs.encryption),
+            swiped_key: None,
         })
     }
     pub fn change_network(&self, network_specs_key: &NetworkSpecsKey) -> Self {
         Self {
             seed_name: self.seed_name(),
             network: network_specs_key.to_owned(),
+            swiped_key: None,
         }
     }
     pub fn seed_name(&self) -> String {
@@ -98,6 +101,23 @@ impl KeysState {
     }
     pub fn network_specs_key(&self) -> NetworkSpecsKey {
         self.network.to_owned()
+    }
+    pub fn swipe(&self, multisigner: &MultiSigner) -> Self {
+        Self {
+            seed_name: self.seed_name(),
+            network: self.network_specs_key(),
+            swiped_key: Some(multisigner.to_owned()),
+        }
+    }
+    pub fn get_swiped_key(&self) -> Option<MultiSigner> {
+        self.swiped_key.to_owned()
+    }
+    pub fn deselect_swipe(&self) -> Self {
+        Self {
+            seed_name: self.seed_name(),
+            network: self.network_specs_key(),
+            swiped_key: None,
+        }
     }
 }
 
@@ -120,7 +140,11 @@ impl AddressState {
         })
     }
     pub fn get_keys_state(&self) -> KeysState {
-        self.keys_state.to_owned()
+        KeysState {
+            seed_name: self.keys_state.seed_name(),
+            network: self.keys_state.network_specs_key(),
+            swiped_key: None,
+        }
     }
     pub fn seed_name(&self) -> String {
         self.keys_state.seed_name()
@@ -166,7 +190,11 @@ impl DeriveState {
         }
     }
     pub fn get_keys_state(&self) -> KeysState {
-        self.keys_state.to_owned()
+        KeysState {
+            seed_name: self.keys_state.seed_name(),
+            network: self.keys_state.network_specs_key(),
+            swiped_key: None,
+        }
     }
     pub fn seed_name(&self) -> String {
         self.keys_state.seed_name()
@@ -357,5 +385,39 @@ impl Screen {
 
 #[cfg(test)]
 mod tests {
-//    use super::*;
+
+use sp_core::sr25519::Public;
+
+use super::*;
+
+use definitions::{crypto::Encryption, users::AddressDetails};
+
+const PUBLIC: [u8; 32] = [142, 175, 4, 21, 22, 135, 115, 99, 38, 201, 254, 161, 126, 37, 252, 82, 135, 97, 54, 147, 201, 18, 144, 156, 178, 38, 170, 71, 148, 242, 106, 72];
+fn test_address_details() -> AddressDetails {
+    AddressDetails {
+        seed_name: String::from("Alice"),
+        path: String::from("//alice"),
+        has_pwd: false,
+        network_id: Vec::new(),
+        encryption: Encryption::Sr25519,
+    }
+}
+
+    /// EnteredInfo holds String with sensitive information arriving either from Signer phone memory or from the user.
+    /// EnteredInto is used in several structs, and should always be zeroized properly.
+    #[test]
+    fn zeroize_entered_info_in_sufficient_crypto_state() {
+        let secret_ptr: *const u8;
+            // using secret entered info in this scope, zeroize afterwards
+            {
+                let mock_seed = "super secret seed element";
+                let sufficient_crypto_test = SufficientCryptoState::init(transaction_signing::SufficientContent::LoadTypes);
+                let sufficient_crypto_test_updated = sufficient_crypto_test.update(&MultiSigner::Sr25519(Public::from_raw(PUBLIC)), &test_address_details(), mock_seed);
+                secret_ptr = unsafe {sufficient_crypto_test_updated.entered_info.0.as_ptr().offset(-100)};
+            }
+        println!("zeroize should have happened");
+        let memory: &[u8] = unsafe {std::slice::from_raw_parts(secret_ptr, 300)};
+        let memory_string = String::from_utf8_lossy(memory);
+        assert!(!memory_string.contains("super secret seed element"), "\n{:?}", memory_string);
+    }
 }
