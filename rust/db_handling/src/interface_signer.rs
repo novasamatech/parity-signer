@@ -1,12 +1,13 @@
 use blake2_rfc::blake2b::blake2b;
+use sp_core::{Pair, sr25519};
 use sp_runtime::MultiSigner;
 use std::collections::HashMap;
 
-use definitions::{error::{DatabaseSigner, ErrorSigner, InterfaceSigner, NotFoundSigner, Signer}, helpers::{multisigner_to_public, make_identicon_from_multisigner, pic_meta}, keyring::{AddressKey, NetworkSpecsKey, print_multisigner_as_base58, VerifierKey}, network_specs::NetworkSpecs, print::export_complex_vector, qr_transfers::ContentLoadTypes, users::AddressDetails};
+use definitions::{error::{AddressGenerationCommon, DatabaseSigner, ErrorSigner, ErrorSource, InterfaceSigner, NotFoundSigner, Signer}, helpers::{multisigner_to_public, make_identicon_from_multisigner, pic_meta}, keyring::{AddressKey, NetworkSpecsKey, print_multisigner_as_base58, VerifierKey}, network_specs::NetworkSpecs, print::export_complex_vector, qr_transfers::ContentLoadTypes, users::AddressDetails};
 use qrcode_static::png_qr_from_string;
 
 use crate::helpers::{get_address_details, get_general_verifier, get_meta_values_by_name, get_meta_values_by_name_version, get_network_specs, get_valid_current_verifier, try_get_types};
-use crate::identities::{get_all_addresses, get_addresses_by_seed_name};
+use crate::identities::{get_all_addresses, get_addresses_by_seed_name, generate_random_phrase};
 use crate::network_details::get_all_networks;
 
 /// Function to print all seed names with identicons
@@ -214,6 +215,22 @@ pub fn show_types_status (database_name: &str) -> Result<String, ErrorSigner> {
         None => Ok(String::from("\"types_on_file\":false")),
     }
 }
+
+/// Function to generate new random seed phrase, make identicon for sr25519 public key,
+/// and send to Signer screen
+pub fn print_new_seed (seed_name: &str) -> Result<String, ErrorSigner> {
+    let seed_phrase = generate_random_phrase(24)?;
+    let sr25519_pair = match sr25519::Pair::from_string(&seed_phrase, None) {
+        Ok(x) => x,
+        Err(e) => return Err(<Signer>::address_generation_common(AddressGenerationCommon::SecretString(e))),
+    };
+    let hex_identicon = match make_identicon_from_multisigner(&MultiSigner::Sr25519(sr25519_pair.public())) {
+        Ok(a) => hex::encode(a),
+        Err(_) => String::new(),
+    };
+    Ok(format!("\"seed\":\"{}\",\"seed_phrase\":\"{}\",\"identicon\":\"{}\"", seed_name, seed_phrase, hex_identicon))
+}
+
 
 #[cfg(test)]
 mod tests {

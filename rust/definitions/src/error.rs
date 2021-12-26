@@ -828,6 +828,7 @@ impl ErrorSource for Signer {
                     InterfaceSigner::LostPwd => String::from("Derivation had password, then lost it."),
                     InterfaceSigner::VersionNotU32(x) => format!("Version {} could not be converted into u32.", x),
                     InterfaceSigner::IncNotU32(x) => format!("Increment {} could not be converted into u32.", x),
+                    InterfaceSigner::FlagNotBool(x) => format!("Flag {} could not be converted into bool.", x),
                 };
                 format!("Error on the interface. {}", insert)
             },
@@ -1016,6 +1017,7 @@ pub enum InterfaceSigner {
     LostPwd,
     VersionNotU32(String),
     IncNotU32(String),
+    FlagNotBool(String),
 }
 
 /// NotHex errors occuring on the Signer side

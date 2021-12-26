@@ -87,13 +87,23 @@ pub fn print_all_identities (database_name: &str) -> anyhow::Result<String> {
 /// Generate random phrase with given number of words.
 /// Function gets used only on the Signer side.
 /// Open to user interface.
-fn generate_random_phrase (words_number: u32) -> anyhow::Result<String> {
+pub fn generate_random_phrase (words_number: u32) -> Result<String, ErrorSigner> {
     let mnemonic_type = match MnemonicType::for_word_count(words_number as usize) {
         Ok(a) => a,
-        Err(e) => return Err(ErrorSigner::AddressGeneration(AddressGeneration::Extra(ExtraAddressGenerationSigner::RandomPhraseGeneration(e))).anyhow()),
+        Err(e) => return Err(ErrorSigner::AddressGeneration(AddressGeneration::Extra(ExtraAddressGenerationSigner::RandomPhraseGeneration(e)))),
     };
     let mnemonic = Mnemonic::new(mnemonic_type, Language::English);
     Ok(mnemonic.into_phrase())
+}
+
+/// Validate user-proposed random phrase.
+/// Function gets used only on the Signer side.
+/// Open to user interface.
+pub fn validate_phrase (seed_phrase_proposal: &str) -> Result<(), ErrorSigner> {
+    match Mnemonic::validate(seed_phrase_proposal, Language::English) {
+        Ok(_) => Ok(()),
+        Err(e) => return Err(ErrorSigner::AddressGeneration(AddressGeneration::Extra(ExtraAddressGenerationSigner::RandomPhraseValidation(e)))),
+    }
 }
 
 /// Create address from seed and path and insert it into the database.
@@ -209,7 +219,7 @@ fn create_address<T: ErrorSource> (database: &Db, input_batch_prep: &Vec<(Addres
 }
 
 /// Create addresses for all default paths in all default networks, and insert them in the database
-fn populate_addresses<T: ErrorSource> (database_name: &str, entry_batch: Batch, seed_object: &SeedObject) -> Result<(Batch, Vec<Event>), T::Error> {
+fn populate_addresses<T: ErrorSource> (database_name: &str, entry_batch: Batch, seed_object: &SeedObject, roots: bool) -> Result<(Batch, Vec<Event>), T::Error> {
 // TODO: check zeroize
     let database = open_db::<T>(database_name)?;
     let mut identity_adds: Vec<(AddressKey, AddressDetails)> = Vec::new();
@@ -218,9 +228,11 @@ fn populate_addresses<T: ErrorSource> (database_name: &str, entry_batch: Batch, 
     for x in chainspecs.iter() {
         if let Ok(a) = x {
             let network_specs = NetworkSpecs::from_entry_checked::<T>(a)?;
-            let (adds, events) = create_address::<T> (&database, &identity_adds, &current_events, "", &network_specs, seed_object, true)?;
-            identity_adds = adds;
-            current_events = events;
+            if roots {
+                let (adds, events) = create_address::<T> (&database, &identity_adds, &current_events, "", &network_specs, seed_object, true)?;
+                identity_adds = adds;
+                current_events = events;
+            }
             if let Ok((adds, events)) = create_address::<T> (&database, &identity_adds, &current_events, &network_specs.path_id, &network_specs, seed_object, true) {
                 identity_adds = adds;
                 current_events = events;
@@ -231,46 +243,7 @@ fn populate_addresses<T: ErrorSource> (database_name: &str, entry_batch: Batch, 
 }
 
 /// Generate new seed and populate all known networks with default accounts
-pub fn try_create_seed_phrase_proposal (seed_name: &str, seed_phrase_proposal: &str, database_name: &str) -> anyhow::Result<String> {
-    let mut seed_phrase = {
-        match Mnemonic::validate(seed_phrase_proposal, Language::English) {
-            Ok(_) => (),
-            Err(e) => return Err(ErrorSigner::AddressGeneration(AddressGeneration::Extra(ExtraAddressGenerationSigner::RandomPhraseValidation(e))).anyhow()),
-        };
-        seed_phrase_proposal.to_owned()
-    };
-    match try_create_seed(seed_name, &seed_phrase, database_name) {
-        Ok(()) => Ok(seed_phrase),
-        Err(e) => {
-            seed_phrase.zeroize();
-            return Err(e)
-        },
-    }
-}
-
-/// Generate new seed and populate all known networks with default accounts
-pub fn try_create_seed_with_length (seed_name: &str, seed_length: u32, database_name: &str) -> anyhow::Result<String> {
-    let mut seed_phrase = generate_random_phrase(seed_length)?;
-    match try_create_seed(seed_name, &seed_phrase, database_name) {
-        Ok(()) => Ok(seed_phrase),
-        Err(e) => {
-            seed_phrase.zeroize();
-            return Err(e)
-        },
-    }
-}
-
-fn try_create_seed (seed_name: &str, seed_phrase: &str, database_name: &str) -> anyhow::Result<()> {
-    let (id_batch, events) = addresses_three_encryptions(database_name, seed_name, &seed_phrase).map_err(|e| e.anyhow())?;
-    TrDbCold::new()
-        .set_addresses(id_batch) // add addresses just made in populate_addresses
-        .set_history(events_to_batch::<Signer>(&database_name, events).map_err(|e| e.anyhow())?) // add corresponding history
-        .apply::<Signer>(&database_name)
-        .map_err(|e| e.anyhow())
-}
-
-/// Shortcut for the function try_create_seed above
-fn addresses_three_encryptions (database_name: &str, seed_name: &str, seed_phrase: &str) -> Result<(Batch, Vec<Event>), ErrorSigner> {
+pub fn try_create_seed (seed_name: &str, seed_phrase: &str, roots: bool, database_name: &str) -> Result<(), ErrorSigner> {
     let mut id_batch = Batch::default();
     let mut events: Vec<Event> = Vec::new();
     for encryption in vec![Encryption::Ed25519, Encryption::Sr25519, Encryption::Ecdsa].into_iter() {
@@ -279,11 +252,14 @@ fn addresses_three_encryptions (database_name: &str, seed_name: &str, seed_phras
             seed_phrase: seed_phrase.to_string(),
             encryption,
         };
-        let (new_id_batch, new_events) = populate_addresses::<Signer>(database_name, id_batch, &seed_object)?;
+        let (new_id_batch, new_events) = populate_addresses::<Signer>(database_name, id_batch, &seed_object, roots)?;
         id_batch = new_id_batch;
         events.extend_from_slice(&new_events);
     }
-    Ok((id_batch, events))
+    TrDbCold::new()
+        .set_addresses(id_batch) // add addresses just made in populate_addresses
+        .set_history(events_to_batch::<Signer>(&database_name, events)?) // add corresponding history
+        .apply::<Signer>(&database_name)
 }
 
 /// Sanitize numbers in path (only for name suggestions!)
@@ -479,7 +455,7 @@ pub fn generate_test_identities (database_name: &str) -> Result<(), ErrorActive>
             seed_phrase: String::from("bottom drive obey lake curtain smoke basket hold race lonely fit walk"),
             encryption: Encryption::Sr25519,
         };
-        let (mut id_batch, new_events) = populate_addresses::<Active>(database_name, entry_batch, &alice_seed_object)?;
+        let (mut id_batch, new_events) = populate_addresses::<Active>(database_name, entry_batch, &alice_seed_object, true)?;
         events.extend_from_slice(&new_events);
         let database = open_db::<Active>(database_name)?;
         for network_specs in get_default_chainspecs().iter() {
@@ -591,21 +567,10 @@ mod tests {
     }
 
     #[test]
-    fn test_generate_random_account() {
-        let dbname = "for_tests/test_generate_random_account";
-        populate_cold_no_metadata(dbname, Verifier(None)).unwrap();
-        try_create_seed_with_length("Randy", 24, dbname).unwrap();
-        let chainspecs = get_default_chainspecs();
-        let random_addresses = get_relevant_identities("Randy", &hex::encode(NetworkSpecsKey::from_parts(&chainspecs[0].genesis_hash.to_vec(), &Encryption::Sr25519).key()), dbname).unwrap();
-        assert!(random_addresses.len()>0);
-        fs::remove_dir_all(dbname).unwrap();
-    }
-
-    #[test]
     fn test_generate_default_addresses_for_alice() {
         let dbname = "for_tests/test_generate_default_addresses_for_Alice";
         populate_cold_no_metadata(dbname, Verifier(None)).unwrap();
-        try_create_seed_phrase_proposal("Alice", SEED, dbname).unwrap();
+        try_create_seed("Alice", SEED, true, dbname).unwrap();
         {
             let database = open_db::<Signer>(dbname).unwrap();
             let addresses = open_tree::<Signer>(&database, ADDRTREE).unwrap();
@@ -653,7 +618,7 @@ mod tests {
         let both_networks = vec![network_id_0.to_owned(), network_id_1.to_owned()];
         let only_one_network = vec![network_id_0.to_owned()];
 
-        try_create_seed_phrase_proposal(seed_name, SEED, dbname).unwrap();
+        try_create_seed(seed_name, SEED, true, dbname).unwrap();
         let seed_object = SeedObject {
             seed_name: seed_name.to_string(),
             seed_phrase: SEED.to_string(),
@@ -700,7 +665,7 @@ mod tests {
     fn test_suggest_n_plus_one() { 
         let dbname = "for_tests/test_suggest_n_plus_one";
         populate_cold_no_metadata(dbname, Verifier(None)).unwrap();
-        try_create_seed_phrase_proposal("Alice", SEED, dbname).unwrap();
+        try_create_seed("Alice", SEED, true, dbname).unwrap();
         let chainspecs = get_default_chainspecs();
         let network_id_0 = NetworkSpecsKey::from_parts(&chainspecs[0].genesis_hash.to_vec(), &Encryption::Sr25519);
         try_create_address("Alice", SEED, "//Alice//10", &network_id_0, dbname).expect("create a valid address //Alice//10");
@@ -741,7 +706,7 @@ mod tests {
     fn test_identity_deletion() {
         let dbname = "for_tests/test_identity_deletion";
         populate_cold_no_metadata(dbname, Verifier(None)).unwrap();
-        try_create_seed_phrase_proposal("Alice", SEED, dbname).unwrap();
+        try_create_seed("Alice", SEED, true, dbname).unwrap();
         let chainspecs = get_default_chainspecs();
         let network_id_string_0 = hex::encode(NetworkSpecsKey::from_parts(&chainspecs[0].genesis_hash.to_vec(), &Encryption::Sr25519).key());
         let network_id_string_1 = hex::encode(NetworkSpecsKey::from_parts(&chainspecs[1].genesis_hash.to_vec(), &Encryption::Sr25519).key());
@@ -780,7 +745,7 @@ mod tests {
         let element2 = r#"{"event":"general_verifier_added","payload":{"hex":"c46a22b9da19540a77cbde23197e5fd90485c72b4ecf3c599ecca6998f39bd57","identicon":"89504e470d0a1a0a0000000d49484452000000410000004108060000008ef7c9450000035149444154789cedd8c16d14411085611cc2128d33e18ac8802311702403c4954c1c0d1bc2d24f5699ea764dbdaaeeead54acc7f581f76d4fde6932c199e6eb7db87ffbdbb205cafd7e94b2e97cb53fbb1b52d082b2fcdda81528ab0f3e5c72a314a10665efef9f3c7f6d9f7f2eb4ffbcc5581b18430f3f2c802906620d00ac634c20e00e9de105308b3006827029a814821acbcbcb41b41ca6084112a00d0bd1050142284900178f9fefe259fbffd7ba92c023b8f1581a008ab00921eee413000499fc762106508de60490fb720a200923ecf6b09210a802a47a3eaf33c8843840c00aa1e5d7d1e3a823011b200a87a74f57992051146a8fe1dfef9e3d23efbbe7cbdb6cfd7b2e7b17d5208210a20e98bbce17ab005204521f479d17dd2084111bc0b247d91355c0ff6002406a1cfcbee432ec20880662ef1ca22b066f7698813a1f5866001a0d94b8e7a14042410e508d64bea97b2be1f63cfebefb3fb746104e45da42fb0064b7a78f573d17d632904645da42ff0064b7ab8f53cfb7e4c3fcff65975080c20527634abfabca30071229c084904f6975b76f4cb6fe3bc4f0be7917d478511ac0b247d9137bc1b6c00485188eebce03eab10827781a42fb28677831d00894174e725f78d6d4160651158abfb4e84d689d0da82407f879308f4bce4beb11002f22ed2175883a56eb803c100a4eebce03eab3002b22ed2177883a56eb801110590baf3c8bea35208acec6856f579479d08ad13a1f586801804fbf77a76b4f53cfb7e4c3fcff65901a0fd78fdff04e421581748fa226fb81e5cfd5c74df5818c1bb40d21759c3f560ebfb31f6bcfe3ebb4fb70d8165bdd4987e49d6cabe7708c88258b9c4ea511004009d08ad0e018d10d94bd85f6e5904765e761fd200882220ef227d813558d2c33d080620e9f3a2fb248a80a210fa026fb0a4875b105100499fc7f64923000a23b0b2a359d5e74961049485a81e5d7d1eb200d02102ca40548fae3eef0800b908280a911dcd7e87b3e7797900a80c0179c3f5600b408a42e8f358cb086815420ff6002406a1cf6331001442401908af2cc24a11001446401510f7428802a01482b482b11b21f3f2d214029a85d889300380a611d00e887b03a025046906c3829801587979a904419ac198ade2e5a55204692746e5cb4b5b10c6565076bcf4d85d101ebdbfeadfbfac75cbd0ab0000000049454e44ae426082","encryption":"sr25519"}}"#;
         assert!(history_printed.contains(element1), "\nReal history check1:\n{}", history_printed);
         assert!(history_printed.contains(element2), "\nReal history check2:\n{}", history_printed);
-        try_create_seed_phrase_proposal("Alice", SEED, dbname).unwrap();
+        try_create_seed("Alice", SEED, true, dbname).unwrap();
         let history_printed_after_create_seed = print_history(dbname).unwrap();
         let element3 = r#""events":[{"event":"identity_added","payload":{"seed_name":"Alice","encryption":"sr25519","public_key":"46ebddef8cd9bb167dc30878d7113b7e168e6f0646beffd77d69d39bad76b47a","path":"","network_genesis_hash":"91b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3"}},{"event":"identity_added","payload":{"seed_name":"Alice","encryption":"sr25519","public_key":"f606519cb8726753885cd4d0f518804a69a5e0badf36fee70feadd8044081730","path":"//polkadot","network_genesis_hash":"91b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3"}},{"event":"identity_added","payload":{"seed_name":"Alice","encryption":"sr25519","public_key":"46ebddef8cd9bb167dc30878d7113b7e168e6f0646beffd77d69d39bad76b47a","path":"","network_genesis_hash":"aaf2cd1b74b5f726895921259421b534124726263982522174147046b8827897"}},{"event":"identity_added","payload":{"seed_name":"Alice","encryption":"sr25519","public_key":"96129dcebc2e10f644e81fcf4269a663e521330084b1e447369087dec8017e04","path":"//rococo","network_genesis_hash":"aaf2cd1b74b5f726895921259421b534124726263982522174147046b8827897"}},{"event":"identity_added","payload":{"seed_name":"Alice","encryption":"sr25519","public_key":"46ebddef8cd9bb167dc30878d7113b7e168e6f0646beffd77d69d39bad76b47a","path":"","network_genesis_hash":"b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe"}},{"event":"identity_added","payload":{"seed_name":"Alice","encryption":"sr25519","public_key":"64a31235d4bf9b37cfed3afa8aa60754675f9c4915430454d365c05112784d05","path":"//kusama","network_genesis_hash":"b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe"}},{"event":"identity_added","payload":{"seed_name":"Alice","encryption":"sr25519","public_key":"46ebddef8cd9bb167dc30878d7113b7e168e6f0646beffd77d69d39bad76b47a","path":"","network_genesis_hash":"e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e"}},{"event":"identity_added","payload":{"seed_name":"Alice","encryption":"sr25519","public_key":"3efeca331d646d8a2986374bb3bb8d6e9e3cfcdd7c45c2b69104fab5d61d3f34","path":"//westend","network_genesis_hash":"e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e"}}]"#;
         assert!(history_printed_after_create_seed.contains(element1), "\nReal history check3:\n{}", history_printed_after_create_seed);

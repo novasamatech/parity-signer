@@ -3,7 +3,7 @@ mod tests {
     use hex;
     use transaction_parsing::{Action, produce_output, produce_historic_output};
     use crate::{handle_stub, sign_transaction::create_signature};
-    use db_handling::{cold_default::{populate_cold, populate_cold_no_networks}, identities::try_create_seed_phrase_proposal, manage_history::print_history, remove_network::remove_network};
+    use db_handling::{cold_default::{populate_cold, populate_cold_no_networks}, identities::try_create_seed, manage_history::print_history, remove_network::remove_network};
     use definitions::{crypto::Encryption, error::{AddressKeySource, DatabaseSigner, ErrorSigner, ErrorSource, Signer}, keyring::{AddressKey, MetaKey, NetworkSpecsKey, VerifierKey}, network_specs::{CurrentVerifier, NetworkSpecs, Verifier, VerifierValue}, users::AddressDetails};
     use constants::{ADDRTREE, GENERALVERIFIER, METATREE, SETTREE, SPECSTREE, VERIFIERS};
     use parity_scale_codec::{Decode, Encode};
@@ -301,7 +301,7 @@ Identities:
 		018091b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3"#;
             assert!(print_after == expected_print_after, "Received:\n{}", print_after);
         
-            try_create_seed_phrase_proposal("Alice", SEED_PHRASE, dbname).unwrap();
+            try_create_seed("Alice", SEED_PHRASE, true, dbname).unwrap();
             let print_after = print_db_content(&dbname);
             let expected_print_after = r#"Database contents:
 Metadata:

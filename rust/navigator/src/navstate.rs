@@ -155,6 +155,34 @@ impl State {
                 },
                 Action::GoForward => {
                     match self.navstate.screen {
+                        Screen::NewSeed => {
+                        // details_str is new seed name
+                            match self.navstate.modal {
+                                Modal::Empty => new_navstate.modal = Modal::NewSeedBackup(details_str.to_string()),
+                                Modal::NewSeedBackup(ref seed_name) => {
+                                    match details_str.parse::<bool> () {
+                                        Ok(roots) => match db_handling::identities::try_create_seed(&seed_name, secret_seed_phrase, roots, dbname) {
+                                            Ok(()) => match KeysState::new(&seed_name, dbname) {
+                                                Ok(a) => {new_navstate = Navstate::clean_screen(Screen::Keys(a))},
+                                                Err(e) => {
+                                                    new_navstate.alert = Alert::Error;
+                                                    errorline.push_str(&<Signer>::show(&e));
+                                                },
+                                            },
+                                            Err(e) => {
+                                                new_navstate.alert = Alert::Error;
+                                                errorline.push_str(&<Signer>::show(&e));
+                                            },
+                                        },
+                                        Err(_) => {
+                                            new_navstate.alert = Alert::Error;
+                                            errorline.push_str(&<Signer>::show(&ErrorSigner::Interface(InterfaceSigner::FlagNotBool(details_str.to_string()))));
+                                        },
+                                    }
+                                },
+                                _ => println!("GoForward does nothing here"),
+                            }
+                        },
                         Screen::RecoverSeedName => {
                             match db_handling::identities::get_addresses_by_seed_name(dbname, details_str) {
                                 Ok(a) => {
@@ -171,17 +199,25 @@ impl State {
                             }
                         },
                         Screen::RecoverSeedPhrase(ref seed_name) => {
-                            new_navstate = match KeysState::new(&seed_name, dbname) {
-                                Ok(a) => Navstate::clean_screen(Screen::Keys(a)),
-                                Err(e) => {
-                                    errorline.push_str(&<Signer>::show(&e));
-                                    Navstate {
-                                        screen: Screen::Log,
-                                        modal: Modal::Empty,
-                                        alert: Alert::Error,
-                                    }
+                            match details_str.parse::<bool> () {
+                                Ok(roots) => match db_handling::identities::try_create_seed(&seed_name, secret_seed_phrase, roots, dbname) {
+                                    Ok(()) => match KeysState::new(&seed_name, dbname) {
+                                        Ok(a) => {new_navstate = Navstate::clean_screen(Screen::Keys(a))},
+                                        Err(e) => {
+                                            new_navstate.alert = Alert::Error;
+                                            errorline.push_str(&<Signer>::show(&e));
+                                        },
+                                    },
+                                    Err(e) => {
+                                        new_navstate.alert = Alert::Error;
+                                        errorline.push_str(&<Signer>::show(&e));
+                                    },
                                 },
-                            };
+                                Err(_) => {
+                                    new_navstate.alert = Alert::Error;
+                                    errorline.push_str(&<Signer>::show(&ErrorSigner::Interface(InterfaceSigner::FlagNotBool(details_str.to_string()))));
+                                },
+                            }
                         },
                         Screen::SelectSeedForBackup => {
                         // details_str is selected seed name
@@ -189,7 +225,7 @@ impl State {
                         },
                         Screen::DeriveKey(ref derive_state) => {
                             new_navstate.screen = Screen::DeriveKey(derive_state.update(details_str));
-                            match db_handling::identities::try_create_address (&derive_state.seed_name(), &secret_seed_phrase, details_str, &derive_state.network_specs_key(), dbname) {
+                            match db_handling::identities::try_create_address (&derive_state.seed_name(), secret_seed_phrase, details_str, &derive_state.network_specs_key(), dbname) {
                                 Ok(()) => {
                                     match KeysState::new(&derive_state.seed_name(), dbname) {
                                         Ok(a) => {
@@ -862,6 +898,14 @@ impl State {
                         },
                         _ => "".to_string(),
                     }
+                },
+                Modal::NewSeedBackup(ref new_seed_name) => match db_handling::interface_signer::print_new_seed (new_seed_name) {
+                    Ok(a) => a,
+                    Err(e) => {
+                        new_navstate.alert = Alert::Error;
+                        errorline.push_str(&<Signer>::show(&e));
+                        "".to_string()
+                    },
                 },
                 Modal::NetworkSelector(ref network_specs_key) => match db_handling::interface_signer::show_all_networks_with_flag (dbname, &network_specs_key) {
                     Ok(a) => a,

@@ -48,6 +48,9 @@ const char * guess_word(struct ExternError*, const char* part);
 // Check validity of proposed path and find password
 int8_t check_path(struct ExternError*, const char* path);
 
+// Check seed phrase validity
+void validate_phrase(struct ExternError*, const char* seed_phrase);
+
 // History access operations
 
 // Init history - should be called after db copy from resources, marks signer factory reset event, installs general verifier
