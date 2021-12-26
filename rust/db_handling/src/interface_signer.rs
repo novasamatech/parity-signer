@@ -3,7 +3,7 @@ use sp_core::{Pair, sr25519};
 use sp_runtime::MultiSigner;
 use std::collections::HashMap;
 
-use definitions::{error::{AddressGenerationCommon, DatabaseSigner, ErrorSigner, ErrorSource, InterfaceSigner, NotFoundSigner, Signer}, helpers::{multisigner_to_public, make_identicon_from_multisigner, pic_meta}, keyring::{AddressKey, NetworkSpecsKey, print_multisigner_as_base58, VerifierKey}, network_specs::NetworkSpecs, print::export_complex_vector, qr_transfers::ContentLoadTypes, users::AddressDetails};
+use definitions::{error::{AddressGenerationCommon, DatabaseSigner, ErrorSigner, ErrorSource, InterfaceSigner, NotFoundSigner, Signer}, helpers::{make_identicon_from_multisigner, multisigner_to_encryption, multisigner_to_public, pic_meta}, keyring::{AddressKey, NetworkSpecsKey, print_multisigner_as_base58, VerifierKey}, network_specs::NetworkSpecs, print::export_complex_vector, qr_transfers::ContentLoadTypes, users::AddressDetails};
 use qrcode_static::png_qr_from_string;
 
 use crate::helpers::{get_address_details, get_general_verifier, get_meta_values_by_name, get_meta_values_by_name_version, get_network_specs, get_valid_current_verifier, try_get_types};
@@ -13,27 +13,73 @@ use crate::network_details::get_all_networks;
 /// Function to print all seed names with identicons
 /// Gets used only on the Signer side, interacts with the user interface.
 pub fn print_all_seed_names_with_identicons (database_name: &str, names_phone_knows: &Vec<String>) -> Result<String, ErrorSigner> {
-    let mut data_set: HashMap<String, Option<MultiSigner>> = HashMap::new();
+    let mut data_set: HashMap<String, Vec<MultiSigner>> = HashMap::new();
     for (multisigner, address_details) in get_all_addresses(database_name)?.into_iter() {
         if (address_details.path == "")&&(!address_details.has_pwd) {
+        // found a root; could be any of the supported encryptions;
             match data_set.get(&address_details.seed_name) {
-                Some(Some(_)) => return Err(ErrorSigner::Database(DatabaseSigner::TwoRootKeys{seed_name: address_details.seed_name.to_string()})),
-                _ => {data_set.insert(address_details.seed_name.to_string(), Some(multisigner));},
+                Some(root_set) => {
+                    for id in root_set.iter() {
+                        if multisigner_to_encryption(id) == address_details.encryption {
+                            return Err(ErrorSigner::Database(DatabaseSigner::TwoRootKeys{seed_name: address_details.seed_name.to_string(), encryption: address_details.encryption.to_owned()}))
+                        }
+                    }
+                    let mut new_root_set = root_set.to_vec();
+                    new_root_set.push(multisigner);
+                    data_set.insert(address_details.seed_name.to_string(), new_root_set);
+                },
+                None => {data_set.insert(address_details.seed_name.to_string(), vec![multisigner]);},
             }
         }
-        else {if let None = data_set.get(&address_details.seed_name) {data_set.insert(address_details.seed_name.to_string(), None);}}
+        else {if let None = data_set.get(&address_details.seed_name) {data_set.insert(address_details.seed_name.to_string(), Vec::new());}}
     }
-    for x in names_phone_knows.iter() {if let None = data_set.get(x) {data_set.insert(x.to_string(), None);}}
+    for x in names_phone_knows.iter() {if let None = data_set.get(x) {data_set.insert(x.to_string(), Vec::new());}}
     let mut print_set: Vec<(String, String)> = Vec::new();
-    for (seed_name, possible_multisigner) in data_set.into_iter() {
-        let identicon_string = match possible_multisigner {
-            Some(multisigner) => hex::encode(make_identicon_from_multisigner(&multisigner)?),
-            None => String::new(),
-        };
+    for (seed_name, multisigner_set) in data_set.into_iter() {
+        let identicon_string = preferred_multisigner_identicon(&multisigner_set);
         print_set.push((identicon_string, seed_name))
     }
     print_set.sort_by(|a, b| a.1.cmp(&b.1));
     Ok(export_complex_vector(&print_set, |(identicon_string, seed_name)| format!("\"identicon\":\"{}\",\"seed_name\":\"{}\"", identicon_string, seed_name)))
+}
+
+fn preferred_multisigner_identicon(multisigner_set: &Vec<MultiSigner>) -> String {
+    if multisigner_set.len() == 0 {String::new()}
+    else {
+        let mut got_sr25519 = None;
+        let mut got_ed25519 = None;
+        let mut got_ecdsa = None;
+        for x in multisigner_set.iter() {
+            match x {
+                MultiSigner::Ed25519(_) => got_ed25519 = Some(x.to_owned()),
+                MultiSigner::Sr25519(_) => got_sr25519 = Some(x.to_owned()),
+                MultiSigner::Ecdsa(_) => got_ecdsa = Some(x.to_owned()),
+            }
+        }
+        if let Some(a) = got_sr25519 {
+            match make_identicon_from_multisigner(&a) {
+                Ok(b) => hex::encode(b),
+                Err(_) => String::new()
+            }
+        }
+        else {
+            if let Some(a) = got_ed25519 {
+                match make_identicon_from_multisigner(&a) {
+                    Ok(b) => hex::encode(b),
+                    Err(_) => String::new()
+                }
+            }
+            else {
+                if let Some(a) = got_ecdsa {
+                    match make_identicon_from_multisigner(&a) {
+                        Ok(b) => hex::encode(b),
+                        Err(_) => String::new()
+                    }
+                }
+                else {String::new()}
+            }
+        }
+    }
 }
 
 /// Function to print all identities (seed names AND derication paths) with identicons
@@ -69,7 +115,7 @@ pub fn print_identities_for_seed_name_and_network (database_name: &str, seed_nam
             else {false}
         };
         if (address_details.path == "")&&(!address_details.has_pwd) {
-            if let Some(_) = root_id {return Err(ErrorSigner::Database(DatabaseSigner::TwoRootKeys{seed_name: seed_name.to_string()}))}
+            if let Some(_) = root_id {return Err(ErrorSigner::Database(DatabaseSigner::TwoRootKeys{seed_name: seed_name.to_string(), encryption: network_specs.encryption.to_owned()}))}
             root_id = Some(format!("\"seed_name\":\"{}\",\"identicon\":\"{}\",\"address_key\":\"{}\",\"base58\":\"{}\",\"swiped\":{}", seed_name, hex::encode(identicon), hex::encode(address_key.key()), base58, swiped));
         }
         else {other_id.push((multisigner, address_details, identicon, swiped))}

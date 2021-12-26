@@ -877,7 +877,7 @@ impl ErrorSource for Signer {
                     DatabaseSigner::DifferentNamesSameGenesisHash{name1, name2, genesis_hash} => format!("Different network names ({}, {}) in database for same genesis hash {}.", name1, name2, hex::encode(genesis_hash)),
                     DatabaseSigner::TwoTransactionsInEntry(x) => format!("Entry with order {} contains more than one transaction-related event. This should not be possible in current Signer and likely indicates database corruption.", x),
                     DatabaseSigner::CustomVerifierIsGeneral(key) => format!("Network with genesis hash {} verifier is set as a custom one. This custom verifier coinsides the database general verifier and not None. This should not have happened and likely indicates database corruption.", hex::encode(key.genesis_hash())),
-                    DatabaseSigner::TwoRootKeys{seed_name} => format!("More than one root key (i.e. with empty path and without password) found for seed name {}.", seed_name),
+                    DatabaseSigner::TwoRootKeys{seed_name, encryption} => format!("More than one root key (i.e. with empty path and without password) found for seed name {} and encryption {}.", seed_name, encryption.show()),
                 };
                 format!("Database error. {}", insert)
             },
@@ -1068,7 +1068,7 @@ pub enum DatabaseSigner {
     DifferentNamesSameGenesisHash{name1: String, name2: String, genesis_hash: Vec<u8>},
     TwoTransactionsInEntry(u32),
     CustomVerifierIsGeneral(VerifierKey),
-    TwoRootKeys{seed_name: String},
+    TwoRootKeys{seed_name: String, encryption: Encryption},
 }
 
 /// Enum listing possible errors in decoding keys from the database on the Signer side
