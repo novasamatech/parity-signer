@@ -66,6 +66,8 @@
 		2D48F3C4277492D3004B27BE /* TypesMenu.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D48F3C3277492D3004B27BE /* TypesMenu.swift */; };
 		2D48F3C62774AEE7004B27BE /* SelectSeedForBackup.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D48F3C52774AEE7004B27BE /* SelectSeedForBackup.swift */; };
 		2D48F3C82774CC64004B27BE /* SearchKeys.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D48F3C72774CC64004B27BE /* SearchKeys.swift */; };
+		2D48F3CE2777A7EA004B27BE /* MNewSeedBackup.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D48F3CD2777A7EA004B27BE /* MNewSeedBackup.swift */; };
+		2D48F3D02777A823004B27BE /* NewSeedBackupModal.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D48F3CF2777A823004B27BE /* NewSeedBackupModal.swift */; };
 		2D72B4F626EF3BC50081E879 /* Navigator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D72B4F526EF3BC50081E879 /* Navigator.swift */; };
 		2D72B4FA26EF7D1C0081E879 /* Seeds.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D72B4F926EF7D1C0081E879 /* Seeds.swift */; };
 		2D72D52A2732B8A7004BA7C9 /* Database in Resources */ = {isa = PBXBuildFile; fileRef = 2D72D5292732B8A7004BA7C9 /* Database */; };
@@ -223,6 +225,8 @@
 		2D48F3C3277492D3004B27BE /* TypesMenu.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TypesMenu.swift; sourceTree = "<group>"; };
 		2D48F3C52774AEE7004B27BE /* SelectSeedForBackup.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SelectSeedForBackup.swift; sourceTree = "<group>"; };
 		2D48F3C72774CC64004B27BE /* SearchKeys.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SearchKeys.swift; sourceTree = "<group>"; };
+		2D48F3CD2777A7EA004B27BE /* MNewSeedBackup.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MNewSeedBackup.swift; sourceTree = "<group>"; };
+		2D48F3CF2777A823004B27BE /* NewSeedBackupModal.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewSeedBackupModal.swift; sourceTree = "<group>"; };
 		2D72B4F526EF3BC50081E879 /* Navigator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Navigator.swift; sourceTree = "<group>"; };
 		2D72B4F926EF7D1C0081E879 /* Seeds.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Seeds.swift; sourceTree = "<group>"; };
 		2D72D5292732B8A7004BA7C9 /* Database */ = {isa = PBXFileReference; lastKnownFileType = folder; path = Database; sourceTree = "<group>"; };
@@ -402,6 +406,7 @@
 				2D48F3C3277492D3004B27BE /* TypesMenu.swift */,
 				2D48F3AD2770AD6B004B27BE /* NetworkDetailsMenu.swift */,
 				2D48F3AF2770AD83004B27BE /* ManageMetadata.swift */,
+				2D48F3CF2777A823004B27BE /* NewSeedBackupModal.swift */,
 				2D48F36E2767419D004B27BE /* PasswordConfirm.swift */,
 				2D48F39F276C8D5E004B27BE /* LogMenu.swift */,
 				2D48F395276A2003004B27BE /* SignatureReady.swift */,
@@ -502,6 +507,7 @@
 				2D48F3BF27720B7E004B27BE /* MSeedMenu.swift */,
 				2D48F3B12770B29C004B27BE /* MManageMetadata.swift */,
 				2D48F3702767514B004B27BE /* MPasswordConfirm.swift */,
+				2D48F3CD2777A7EA004B27BE /* MNewSeedBackup.swift */,
 			);
 			path = ModalModels;
 			sourceTree = "<group>";
@@ -819,6 +825,7 @@
 				2DA5F8412756687200D8DD29 /* TransactionCardView.swift in Sources */,
 				2DA5F86A27566C3600D8DD29 /* TCNewSpecs.swift in Sources */,
 				2D72B4FA26EF7D1C0081E879 /* Seeds.swift in Sources */,
+				2D48F3CE2777A7EA004B27BE /* MNewSeedBackup.swift in Sources */,
 				04197D2B276BA40C003485D2 /* MenuElements.swift in Sources */,
 				2D48F3B22770B29C004B27BE /* MManageMetadata.swift in Sources */,
 				2D48F3652762407A004B27BE /* MKeyDetais.swift in Sources */,
@@ -852,6 +859,7 @@
 				2D48F35D2760ED38004B27BE /* MKeys.swift in Sources */,
 				2DA5F86527566C3600D8DD29 /* TCID.swift in Sources */,
 				2DA5F86227566C3600D8DD29 /* TCEnumVariantName.swift in Sources */,
+				2D48F3D02777A823004B27BE /* NewSeedBackupModal.swift in Sources */,
 				2DA5F87A275676B600D8DD29 /* SeedCardForManager.swift in Sources */,
 				2D48F38127691C05004B27BE /* AlertSelector.swift in Sources */,
 				04197D27276A41E7003485D2 /* SettingsCardTemplate.swift in Sources */,

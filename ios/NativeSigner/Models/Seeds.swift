@@ -64,7 +64,9 @@ extension SignerDataModel {
         update_seed_names(nil, self.seedNames.joined(separator: ","))
     }
     
-    func addSeed(seedName: String, seedLength: Int32) {
+    
+    /*
+     func addSeed(seedName: String, seedLength: Int32) {
         var err = ExternError()
         guard let accessFlags = SecAccessControlCreateWithFlags(kCFAllocatorDefault, kSecAttrAccessibleWhenPasscodeSetThisDeviceOnly, .devicePasscode, &error) else {
             print("Access flags could not be allocated")
@@ -121,9 +123,9 @@ extension SignerDataModel {
             //TODO
         }
     }
+     */
     
-    func restoreSeed(seedName: String, seedPhrase: String) {
-        var err = ExternError()
+    func restoreSeed(seedName: String, seedPhrase: String, createRoots: Bool) {
         guard let accessFlags = SecAccessControlCreateWithFlags(kCFAllocatorDefault, kSecAttrAccessibleWhenPasscodeSetThisDeviceOnly, .devicePasscode, &error) else {
             print("Access flags could not be allocated")
             print(error ?? "no error code")
@@ -135,42 +137,23 @@ extension SignerDataModel {
             self.lastError = "Seed with this name already exists"
             return
         }
-        withUnsafeMutablePointer(to: &err) {err_ptr in
-            let res = try_restore_seed(err_ptr, seedName, seedPhrase, dbName)
-            if err_ptr.pointee.code != 0 {
-                self.lastError = String(cString: err_ptr.pointee.message)
-                print("Rust returned error")
-                print(self.lastError)
-                signer_destroy_string(err_ptr.pointee.message)
-                return
-            }
-            let finalSeedPhraseString = String(cString: res!)
-            guard let finalSeedPhrase = finalSeedPhraseString.data(using: .utf8) else {
-                print("could not encode seed phrase")
-                self.lastError = "Seed phrase contains non-0unicode symbols"
-                return
-            }
-            signer_destroy_string(res)
-            print(finalSeedPhrase)
-            let query: [String: Any] = [
-                kSecClass as String: kSecClassGenericPassword,
-                kSecAttrAccessControl as String: accessFlags,
-                kSecAttrAccount as String: seedName,
-                kSecValueData as String: finalSeedPhrase,
-                kSecReturnData as String: true
-            ]
-            var resultAdd: AnyObject?
-            let status = SecItemAdd(query as CFDictionary, &resultAdd)
-            guard status == errSecSuccess else {
-                print("key add failure")
-                print(status)
-                self.lastError = SecCopyErrorMessageString(status, nil)! as String
-                return
-            }
-            self.refreshSeeds()
-            self.pushButton(buttonID: .GoForward)
-            //TODO
+        let query: [String: Any] = [
+            kSecClass as String: kSecClassGenericPassword,
+            kSecAttrAccessControl as String: accessFlags,
+            kSecAttrAccount as String: seedName,
+            kSecValueData as String: seedPhrase,
+            kSecReturnData as String: true
+        ]
+        var resultAdd: AnyObject?
+        let status = SecItemAdd(query as CFDictionary, &resultAdd)
+        guard status == errSecSuccess else {
+            print("key add failure")
+            print(status)
+            self.lastError = SecCopyErrorMessageString(status, nil)! as String
+            return
         }
+        self.pushButton(buttonID: .GoForward, details: createRoots ? "true" : "false", seedPhrase: seedPhrase)
+        update_seed_names(nil, self.seedNames.joined(separator: ","))
     }
     
     /**
@@ -281,7 +264,7 @@ extension SignerDataModel {
             print("remove seed from secure storage error: " + self.lastError)
         }
     }
-     
+    
     
     /*
      * Guess possible seed word(s) from user input

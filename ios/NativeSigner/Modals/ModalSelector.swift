@@ -40,6 +40,8 @@ struct ModalSelector: View {
             KeyMenu()
         case .TypesInfo(let value):
             TypesMenu(content: value)
+        case .NewSeedBackup(let value):
+            NewSeedBackupModal(content: value)
         }
     }
 }

@@ -11,7 +11,7 @@ struct TCAuthor: View {
     var author: Author
     var body: some View {
         HStack {
-            Image(uiImage: UIImage(data: Data(fromHexEncodedString: String(cString: base58_identicon(nil, author.base58, 32)))!)!)
+            Image(uiImage: UIImage(data: Data(fromHexEncodedString: author.identicon)!)!)
             VStack (alignment: .leading) {
                 Text("From:")
                     .foregroundColor(Color("Action400"))

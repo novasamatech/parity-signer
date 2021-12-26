@@ -12,6 +12,7 @@ struct RecoverSeedPhrase: View {
     @State private var seedPhrase: [String] = []
     @State private var seedWord: String = ">"
     @State private var guessWord: [String] = []
+    @State private var createRoots: Bool = true
     @FocusState private var focus: Bool
     let allowedLendth = [12, 24]
     var content: MRecoverSeedPhrase
@@ -35,7 +36,7 @@ struct RecoverSeedPhrase: View {
                     ZStack {
                         RoundedRectangle(cornerRadius: 8)
                             .stroke(Color("Border400"))
-                            //.foregroundColor(Color("Border400"))
+                        //.foregroundColor(Color("Border400"))
                             .frame(height: 39)
                         TextField("Seed", text: $seedWord, prompt: Text("Seed name"))
                             .focused($focus)
@@ -86,16 +87,27 @@ struct RecoverSeedPhrase: View {
                         }
                     }
                     Text(data.lastError).foregroundColor(.red)
-                    if (!focus) {
-                    HStack {
-                        Button(action: {
-                            data.restoreSeed(seedName: content.seed_name, seedPhrase: seedPhrase.joined(separator: " "))
-                        }) {
-                            Text("Create")
-                                .font(.system(size: 22))
+                    Button(action: {
+                        createRoots.toggle()
+                    }) {
+                        HStack {
+                            Image(systemName: createRoots ? "checkmark.square" : "square").imageScale(.large)
+                            Text("Create root keys")
+                                .multilineTextAlignment(.leading)
+                            Spacer()
                         }
-                        .disabled(!allowedLendth.contains(seedPhrase.count))
                     }
+                    if (!focus) {
+                        HStack {
+                            BigButton(
+                                text: "Next",
+                                action: {
+                                    data.restoreSeed(seedName: content.seed_name, seedPhrase: seedPhrase.joined(separator: " "), createRoots: createRoots)
+                                },
+                                isDisabled: !allowedLendth.contains(seedPhrase.count)
+                            )
+                                .padding(.top, 16.0)
+                        }
                     }
                 }.padding(.horizontal)
             }

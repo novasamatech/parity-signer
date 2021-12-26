@@ -119,6 +119,8 @@ struct ActionResult: Decodable {
             modal = .KeyDetailsAction
         case "TypesInfo":
             modal = .TypesInfo(try values.decode(MTypesInfo.self, forKey: .modalData))
+        case "MSeedBackup":
+            modal = .NewSeedBackup(try values.decode(MNewSeedBackup.self, forKey: .modalData))
         default:
             modal = .Empty
         }
@@ -177,6 +179,7 @@ enum SignerModal: Decodable {
     case SufficientCryptoReady(MSufficientCryptoReady)
     case KeyDetailsAction
     case TypesInfo(MTypesInfo)
+    case NewSeedBackup(MNewSeedBackup)
 }
 
 enum SignerAlert: Decodable {

@@ -32,7 +32,8 @@ struct NewSeedScreen: View {
                         data.lastError = ""
                     })
                     .onSubmit {
-                        data.addSeed(seedName: seedName, seedLength: 24)
+                        nameFocused = false
+                        data.pushButton(buttonID: .GoForward, details: seedName)
                     }
                     .onAppear(perform: {nameFocused = content.keyboard})
                     .onDisappear {
@@ -46,7 +47,7 @@ struct NewSeedScreen: View {
                 text: "Generate seed phrase",
                 action: {
                     nameFocused = false
-                    data.addSeed(seedName: seedName, seedLength: 24)
+                    data.pushButton(buttonID: .GoForward, details: seedName)
                 },
                 isDisabled: seedName == ""
             )
