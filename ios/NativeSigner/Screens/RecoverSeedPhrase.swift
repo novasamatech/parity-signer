@@ -36,8 +36,8 @@ struct RecoverSeedPhrase: View {
                     }
                     ZStack {
                         RoundedRectangle(cornerRadius: 8)
-                            .stroke(Color("Border400"))
-                        //.foregroundColor(Color("Border400"))
+                            .stroke(guessWord.count == 0 ? Color("SignalDanger") : Color("Border400"))
+                        //.foregroundColor(Color("Border400")
                             .frame(height: 39)
                         TextField("Seed", text: $seedWord, prompt: Text("Seed name"))
                             .focused($focus)
@@ -56,11 +56,21 @@ struct RecoverSeedPhrase: View {
                                     seedWord = ">"
                                     guessWord = data.guessWord(word: "")
                                 } else {
-                                    guessWord = data.guessWord(word: String(seedWord.dropFirst()))
-                                    if guessWord.count == 1 {
-                                        seedPhrase.append(guessWord.popLast()!)
-                                        seedWord = ">"
-                                        guessWord = data.guessWord(word: "")
+                                    if word.last == " " {
+                                        seedWord = String(word.dropLast())
+                                        if guessWord.count == 1 {
+                                            seedPhrase.append(guessWord.popLast()!)
+                                            seedWord = ">"
+                                            guessWord = data.guessWord(word: "")
+                                        } else {
+                                            if guessWord.contains(String(seedWord.dropFirst())) {
+                                                seedPhrase.append(String(seedWord.dropFirst()))
+                                                seedWord = ">"
+                                                guessWord = data.guessWord(word: "")
+                                            }
+                                        }
+                                    } else {
+                                        guessWord = data.guessWord(word: String(seedWord.dropFirst()))
                                     }
                                 }
                                 errorMessage = data.validatePhrase(seedPhrase: seedPhrase.joined(separator: " "))
