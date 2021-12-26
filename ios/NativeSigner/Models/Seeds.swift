@@ -27,7 +27,9 @@ enum KeychainError: Error {
  *  Remember to wipe the app with wipe button in settings.
  */
 extension SignerDataModel {
-    
+    /**
+     * Get all seed names from secure storage
+     */
     func refreshSeeds() {
         var item: CFTypeRef?
         let query: [String: Any] = [
@@ -64,68 +66,13 @@ extension SignerDataModel {
         update_seed_names(nil, self.seedNames.joined(separator: ","))
     }
     
-    
-    /*
-     func addSeed(seedName: String, seedLength: Int32) {
-        var err = ExternError()
-        guard let accessFlags = SecAccessControlCreateWithFlags(kCFAllocatorDefault, kSecAttrAccessibleWhenPasscodeSetThisDeviceOnly, .devicePasscode, &error) else {
-            print("Access flags could not be allocated")
-            print(error ?? "no error code")
-            self.lastError = "iOS key manager error, report a bug"
-            return
-        }
-        print(accessFlags)
-        if checkSeedCollision(seedName: seedName) {
-            print("Key collision")
-            self.lastError = "Seed with this name already exists"
-            return
-        }
-        if checkSeedPhraseCollision(seedPhrase: "") {
-            print("Key collision")
-            self.lastError = "Seed with this name already exists"
-            return
-        }
-        withUnsafeMutablePointer(to: &err) {err_ptr in
-            let res = try_create_seed(err_ptr, seedName, seedLength, dbName)
-            if err_ptr.pointee.code != 0 {
-                self.lastError = String(cString: err_ptr.pointee.message)
-                print("Rust returned error")
-                print(self.lastError)
-                signer_destroy_string(err_ptr.pointee.message)
-                return
-            }
-            let finalSeedPhraseString = String(cString: res!)
-            guard let finalSeedPhrase = finalSeedPhraseString.data(using: .utf8) else {
-                print("could not encode seed phrase")
-                self.lastError = "Seed phrase contains non-0unicode symbols"
-                return
-            }
-            signer_destroy_string(res)
-            print(finalSeedPhrase)
-            let query: [String: Any] = [
-                kSecClass as String: kSecClassGenericPassword,
-                kSecAttrAccessControl as String: accessFlags,
-                kSecAttrAccount as String: seedName,
-                kSecValueData as String: finalSeedPhrase,
-                kSecReturnData as String: true
-            ]
-            var resultAdd: AnyObject?
-            let status = SecItemAdd(query as CFDictionary, &resultAdd)
-            guard status == errSecSuccess else {
-                print("key add failure")
-                print(status)
-                self.lastError = SecCopyErrorMessageString(status, nil)! as String
-                return
-            }
-            self.refreshSeeds()
-            self.seedBackup = finalSeedPhraseString
-            self.pushButton(buttonID: .BackupSeed, details: seedName)
-            //TODO
-        }
-    }
+    /**
+     * Creates seed; this is the only way to create seed.
+     * createRoots: choose whether empty derivations for every network should be created
      */
-    
     func restoreSeed(seedName: String, seedPhrase: String, createRoots: Bool) {
+        print(seedName)
+        print(seedPhrase)
         guard let accessFlags = SecAccessControlCreateWithFlags(kCFAllocatorDefault, kSecAttrAccessibleWhenPasscodeSetThisDeviceOnly, .devicePasscode, &error) else {
             print("Access flags could not be allocated")
             print(error ?? "no error code")
@@ -134,14 +81,19 @@ extension SignerDataModel {
         }
         if checkSeedPhraseCollision(seedPhrase: seedPhrase) {
             print("Key collision")
-            self.lastError = "Seed with this name already exists"
+            self.lastError = "This seed phrase already exists"
+            return
+        }
+        guard let finalSeedPhrase = seedPhrase.data(using: .utf8) else {
+            print("could not encode seed phrase")
+            self.lastError = "Seed phrase contains non-0unicode symbols"
             return
         }
         let query: [String: Any] = [
             kSecClass as String: kSecClassGenericPassword,
             kSecAttrAccessControl as String: accessFlags,
             kSecAttrAccount as String: seedName,
-            kSecValueData as String: seedPhrase,
+            kSecValueData as String: finalSeedPhrase,
             kSecReturnData as String: true
         ]
         var resultAdd: AnyObject?
@@ -150,6 +102,7 @@ extension SignerDataModel {
             print("key add failure")
             print(status)
             self.lastError = SecCopyErrorMessageString(status, nil)! as String
+            print(self.lastError)
             return
         }
         self.pushButton(buttonID: .GoForward, details: createRoots ? "true" : "false", seedPhrase: seedPhrase)
@@ -278,5 +231,22 @@ extension SignerDataModel {
         } else {
             return []
         }
+    }
+    
+    /**
+     * Check if seedphrase is valid; returns error message or nothing
+     */
+    func validatePhrase(seedPhrase: String) -> String? {
+        var err = ExternError()
+        var errorMessage: String? = nil
+        withUnsafeMutablePointer(to: &err) {err_ptr in
+            validate_phrase(err_ptr, seedPhrase)
+            if (err_ptr.pointee.code != 0)
+            {
+                errorMessage = String(cString: err_ptr.pointee.message)
+                signer_destroy_string(err_ptr.pointee.message)
+            }
+        }
+        return errorMessage
     }
 }

@@ -13,6 +13,7 @@ struct RecoverSeedPhrase: View {
     @State private var seedWord: String = ">"
     @State private var guessWord: [String] = []
     @State private var createRoots: Bool = true
+    @State private var errorMessage: String? = ""
     @FocusState private var focus: Bool
     let allowedLendth = [12, 24]
     var content: MRecoverSeedPhrase
@@ -62,6 +63,7 @@ struct RecoverSeedPhrase: View {
                                         guessWord = data.guessWord(word: "")
                                     }
                                 }
+                                errorMessage = data.validatePhrase(seedPhrase: seedPhrase.joined(separator: " "))
                             })
                             .onSubmit {
                             }
@@ -104,7 +106,7 @@ struct RecoverSeedPhrase: View {
                                 action: {
                                     data.restoreSeed(seedName: content.seed_name, seedPhrase: seedPhrase.joined(separator: " "), createRoots: createRoots)
                                 },
-                                isDisabled: !allowedLendth.contains(seedPhrase.count)
+                                isDisabled: errorMessage != nil
                             )
                                 .padding(.top, 16.0)
                         }

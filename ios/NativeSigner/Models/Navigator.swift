@@ -119,7 +119,7 @@ struct ActionResult: Decodable {
             modal = .KeyDetailsAction
         case "TypesInfo":
             modal = .TypesInfo(try values.decode(MTypesInfo.self, forKey: .modalData))
-        case "MSeedBackup":
+        case "NewSeedBackup":
             modal = .NewSeedBackup(try values.decode(MNewSeedBackup.self, forKey: .modalData))
         default:
             modal = .Empty
