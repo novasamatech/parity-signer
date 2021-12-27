@@ -15,7 +15,7 @@ struct CameraView: View {
     @State var captured: Int? = 0
     var body: some View {
         ZStack {
-            VStack {
+            //VStack {
                 CameraPreview(session: model.session)
                     .onAppear {
                         model.configure()
@@ -42,8 +42,6 @@ struct CameraView: View {
                     })
                     .onReceive(model.$captured, perform: {rCaptured in
                         captured = rCaptured
-                        print(captured)
-                        print("====")
                     })
                 //.clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
                     //.padding(.horizontal, 8)
@@ -72,7 +70,7 @@ struct CameraView: View {
                         }
                     }
                 }
-            }
+            //}
         }.background(Color("Bg100"))
     }
 }
