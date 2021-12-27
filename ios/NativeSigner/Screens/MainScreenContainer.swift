@@ -13,6 +13,7 @@ struct MainScreenContainer: View {
     @GestureState private var dragOffset = CGSize.zero
     var body: some View {
         if data.onboardingDone {
+            if data.authenticated {
             VStack {
                 Header()
                 ZStack {
@@ -46,6 +47,17 @@ struct MainScreenContainer: View {
                 }
             )
             .alert("Navigation error", isPresented: $data.parsingAlert, actions: {})
+            } else {
+                Button(action: {data.refreshSeeds()}) {
+                    BigButton(
+                        text: "Unlock app",
+                        action: {
+                            data.refreshSeeds()
+                            data.totalRefresh()
+                        }
+                    )
+                }
+            }
         } else {
             if (data.protected) {
                 if (data.canaryDead) {

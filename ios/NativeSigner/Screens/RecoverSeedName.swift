@@ -45,7 +45,11 @@ struct RecoverSeedName: View {
             BigButton(
                 text: "Next",
                 action: {
-                    data.pushButton(buttonID: .GoForward, details: seedName)
+                    if !data.checkSeedCollision(seedName: seedName) {
+                        data.pushButton(buttonID: .GoForward, details: seedName)
+                    } else {
+                        data.lastError = "This seed name already exists"
+                    }
                 },
                 isDisabled: seedName == ""
             )

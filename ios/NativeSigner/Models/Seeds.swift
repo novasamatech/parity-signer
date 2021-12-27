@@ -41,29 +41,42 @@ extension SignerDataModel {
         print("starting seed names query")
         let status = SecItemCopyMatching(query as CFDictionary, &item)
         print("refresh seeds")
-        print(status)
         print(SecCopyErrorMessageString(status, nil) ?? "Success")
-        guard let itemFound = item as? [[String : Any]]
-        else {
+        switch (status) {
+        case errSecSuccess: do {
+            guard let itemFound = item as? [[String : Any]]
+            else {
+                print("no seeds available")
+                self.seedNames = []
+                update_seed_names(nil, seedNames.joined(separator: ","))
+                return
+            }
+            print("some seeds fetched")
+            print(itemFound)
+            print(kSecAttrAccount)
+            let seedNames = itemFound.map{item -> String in
+                guard let seedName = item[kSecAttrAccount as String] as? String
+                else {
+                    print("seed name decoding error")
+                    return "error!"
+                }
+                return seedName
+            }
+            print(seedNames)
+            self.seedNames = seedNames.sorted()
+            update_seed_names(nil, self.seedNames.joined(separator: ","))
+            self.authenticated = true
+        }
+        case errSecItemNotFound: do {
             print("no seeds available")
             self.seedNames = []
             update_seed_names(nil, seedNames.joined(separator: ","))
+            self.authenticated = true
             return
         }
-        print("some seeds fetched")
-        print(itemFound)
-        print(kSecAttrAccount)
-        let seedNames = itemFound.map{item -> String in
-            guard let seedName = item[kSecAttrAccount as String] as? String
-            else {
-                print("seed name decoding error")
-                return "error!"
-            }
-            return seedName
+        default:
+            self.authenticated = false
         }
-        print(seedNames)
-        self.seedNames = seedNames.sorted()
-        update_seed_names(nil, self.seedNames.joined(separator: ","))
     }
     
     /**
@@ -71,8 +84,7 @@ extension SignerDataModel {
      * createRoots: choose whether empty derivations for every network should be created
      */
     func restoreSeed(seedName: String, seedPhrase: String, createRoots: Bool) {
-        print(seedName)
-        print(seedPhrase)
+        print(seedNames)
         guard let accessFlags = SecAccessControlCreateWithFlags(kCFAllocatorDefault, kSecAttrAccessibleWhenPasscodeSetThisDeviceOnly, .devicePasscode, &error) else {
             print("Access flags could not be allocated")
             print(error ?? "no error code")
@@ -84,6 +96,7 @@ extension SignerDataModel {
             self.lastError = "This seed phrase already exists"
             return
         }
+        if !authenticated { return }
         guard let finalSeedPhrase = seedPhrase.data(using: .utf8) else {
             print("could not encode seed phrase")
             self.lastError = "Seed phrase contains non-0unicode symbols"
@@ -105,34 +118,40 @@ extension SignerDataModel {
             print(self.lastError)
             return
         }
-        self.pushButton(buttonID: .GoForward, details: createRoots ? "true" : "false", seedPhrase: seedPhrase)
+        self.seedNames.append(seedName)
+        self.seedNames = self.seedNames.sorted()
         update_seed_names(nil, self.seedNames.joined(separator: ","))
+        self.pushButton(buttonID: .GoForward, details: createRoots ? "true" : "false", seedPhrase: seedPhrase)
     }
     
     /**
      * Each seed name should be unique, obviously. We do not want to overwrite old seeds.
      */
     func checkSeedCollision(seedName: String) -> Bool {
-        let query: [String: Any] = [
-            kSecClass as String: kSecClassGenericPassword,
-            kSecValueData as String: seedName,
-            kSecMatchLimit as String: kSecMatchLimitOne
-        ]
-        let status = SecItemCopyMatching(query as CFDictionary, nil)
-        return status == errSecSuccess
+        return self.seedNames.contains(seedName)
     }
     
     /**
      * Check if proposed seed phrase is already saved. But mostly require auth on seed creation.
      */
     func checkSeedPhraseCollision(seedPhrase: String) -> Bool {
+        var item: CFTypeRef?
+        guard let finalSeedPhrase = seedPhrase.data(using: .utf8) else {
+            print("could not encode seed phrase")
+            self.lastError = "Seed phrase contains non-unicode symbols"
+            return true
+        }
         let query: [String: Any] = [
             kSecClass as String: kSecClassGenericPassword,
-            kSecAttrAccount as String: seedPhrase,
+            kSecValueData as String: finalSeedPhrase,
             kSecMatchLimit as String: kSecMatchLimitOne
         ]
-        let status = SecItemCopyMatching(query as CFDictionary, nil)
-        return status == errSecSuccess
+        let status = SecItemCopyMatching(query as CFDictionary, &item)
+        if !(status == errSecSuccess || status == errSecItemNotFound) {
+            self.authenticated = false
+            return false
+        }
+        if item == nil { return false } else { return true }
     }
     
     /**
@@ -202,19 +221,26 @@ extension SignerDataModel {
      * Removes seed and all derived keys
      */
     func removeSeed(seedName: String) {
-        let query = [
-            kSecClass as String: kSecClassGenericPassword,
-            kSecAttrAccount as String: seedName
-        ] as CFDictionary
-        let status = SecItemDelete(query)
-        print(status.description)
-        if status == errSecSuccess {
-            pushButton(buttonID: .RemoveSeed)
-            refreshSeeds()
-        } else {
-            print(seedName)
-            self.lastError = SecCopyErrorMessageString(status, nil)! as String
-            print("remove seed from secure storage error: " + self.lastError)
+        refreshSeeds()
+        if self.authenticated {
+            let query = [
+                kSecClass as String: kSecClassGenericPassword,
+                kSecAttrAccount as String: seedName
+            ] as CFDictionary
+            let status = SecItemDelete(query)
+            print(status.description)
+            if status == errSecSuccess {
+                self.seedNames = self.seedNames.filter {element in
+                    return element != seedName
+                }
+                self.seedNames = seedNames.sorted()
+                update_seed_names(nil, self.seedNames.joined(separator: ","))
+                pushButton(buttonID: .RemoveSeed)
+            } else {
+                print(seedName)
+                self.lastError = SecCopyErrorMessageString(status, nil)! as String
+                print("remove seed from secure storage error: " + self.lastError)
+            }
         }
     }
     

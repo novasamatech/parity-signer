@@ -19,7 +19,7 @@ struct NewSeedScreen: View {
             ZStack {
                 RoundedRectangle(cornerRadius: 8)
                     .stroke(Color("Border400"))
-                    //.foregroundColor(Color("Border400"))
+                //.foregroundColor(Color("Border400"))
                     .frame(height: 39)
                 TextField("Seed", text: $seedName, prompt: Text("Seed name"))
                     .focused($nameFocused)
@@ -37,6 +37,7 @@ struct NewSeedScreen: View {
                     }
                     .onAppear(perform: {nameFocused = content.keyboard})
                     .onDisappear {
+                        data.lastError = ""
                     }
                     .padding(.horizontal, 8)
             }
@@ -46,8 +47,12 @@ struct NewSeedScreen: View {
             BigButton(
                 text: "Generate seed phrase",
                 action: {
-                    nameFocused = false
-                    data.pushButton(buttonID: .GoForward, details: seedName)
+                    if !data.checkSeedCollision(seedName: seedName) {
+                        nameFocused = false
+                        data.pushButton(buttonID: .GoForward, details: seedName)
+                    } else {
+                        data.lastError = "This seed name already exists"
+                    }
                 },
                 isDisabled: seedName == ""
             )

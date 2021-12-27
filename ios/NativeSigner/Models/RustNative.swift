@@ -26,6 +26,7 @@ class SignerDataModel: ObservableObject {
     @Published var seedNames: [String] = []
     @Published var onboardingDone: Bool = false
     @Published var lastError: String = ""
+    @Published var authenticated: Bool = false
     
     //Key manager state
     @Published var selectedSeed: String = ""
@@ -170,23 +171,26 @@ extension SignerDataModel {
      * Should be called before app uninstall/upgrade!
      */
     func wipe() {
-        do {
-            var destination = try FileManager.default.url(for: .documentDirectory, in: .userDomainMask, appropriateFor: nil, create: false)
-            destination.appendPathComponent("Database")
-            print(destination)
-            print(self.dbName)
-            try FileManager.default.removeItem(at: destination)
-        } catch {
-            print("FileManager failed to delete db")
-            return
+        refreshSeeds()
+        if authenticated {
+            do {
+                var destination = try FileManager.default.url(for: .documentDirectory, in: .userDomainMask, appropriateFor: nil, create: false)
+                destination.appendPathComponent("Database")
+                print(destination)
+                print(self.dbName)
+                try FileManager.default.removeItem(at: destination)
+            } catch {
+                print("FileManager failed to delete db")
+                return
+            }
+            let query = [
+                kSecClass as String: kSecClassGenericPassword
+            ] as CFDictionary
+            SecItemDelete(query)
+            self.onboardingDone = false
+            self.seedNames = []
+            init_navigation(nil, dbName, seedNames.joined(separator: ","))
         }
-        let query = [
-            kSecClass as String: kSecClassGenericPassword
-        ] as CFDictionary
-        SecItemDelete(query)
-        self.onboardingDone = false
-        self.seedNames = []
-        init_navigation(nil, dbName, seedNames.joined(separator: ","))
     }
     
     /**
@@ -194,7 +198,9 @@ extension SignerDataModel {
      */
     func jailbreak() {
         self.wipe()
-        self.onboard(jailbreak: true)
+        if !onboardingDone {
+            self.onboard(jailbreak: true)
+        }
     }
 }
 
