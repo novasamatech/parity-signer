@@ -794,7 +794,7 @@ impl State {
                     }
                 },
                 Screen::LogDetails(order) => {
-                    match db_handling::manage_history::print_history_entry_by_order(order, dbname) {
+                    match transaction_parsing::print_history_entry_by_order_with_decoding(order, dbname) {
                         Ok(a) => a.to_string(),
                         Err(e) => {
                             new_navstate.alert = Alert::Error;

@@ -1,4 +1,5 @@
-use definitions::error::{ErrorSigner, InputSigner};
+use db_handling::manage_history::get_history_entry_by_order;
+use definitions::{error::{ErrorSigner, InputSigner}, history::Event, print::export_complex_vector_with_error};
 
 mod add_specs;
     use add_specs::add_specs;
@@ -14,7 +15,7 @@ mod load_types;
 mod message;
     use message::process_message;
 mod parse_transaction;
-    use parse_transaction::{parse_transaction, decode_transaction_from_history};
+    use parse_transaction::{parse_transaction, decode_signable_from_history};
 pub mod test_all_cards;
     use test_all_cards::make_all_cards;
 mod tests;
@@ -64,10 +65,15 @@ pub fn produce_output (payload: &str, dbname: &str) -> Action {
     }
 }
 
-pub fn produce_historic_output (order: u32, dbname: &str) -> String {
-    match decode_transaction_from_history (order, dbname) {
-        Ok(out) => out,
-        Err(e) => format!("\"error\":[{}]", Card::Error(e).card(&mut 0,0)),
-    }
+/// Function to print history entry by order for entries without parseable transaction
+pub fn print_history_entry_by_order_with_decoding(order: u32, database_name: &str) -> Result<String, ErrorSigner> {
+    let entry = get_history_entry_by_order(order, database_name)?;
+    let events_chain = export_complex_vector_with_error(&entry.events, |a| {
+        match a {
+            Event::TransactionSigned(signable) => decode_signable_from_history (signable, database_name),
+            Event::TransactionSignError(signable) => decode_signable_from_history (signable, database_name),
+            _ => Ok(a.show()),
+        }
+    })?;
+    Ok(format!("\"timestamp\":\"{}\",\"events\":{}", entry.timestamp, events_chain))
 }
-

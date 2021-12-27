@@ -1,5 +1,5 @@
-use db_handling::{db_transactions::{TrDbColdSign, SignContent}, helpers::{try_get_network_specs, try_get_address_details}, manage_history::get_history_entry_by_order};
-use definitions::{error::{DatabaseSigner, ErrorSigner, InputSigner, NotFoundSigner, ParserError}, history::Event, keyring::{AddressKey, NetworkSpecsKey}, users::AddressDetails};
+use db_handling::{db_transactions::{TrDbColdSign, SignContent}, helpers::{try_get_network_specs, try_get_address_details}};
+use definitions::{error::{ErrorSigner, InputSigner, NotFoundSigner, ParserError}, history::{Event, SignDisplay}, keyring::{AddressKey, NetworkSpecsKey}, users::AddressDetails};
 use parser::{parse_set, decoding_commons::OutputCard};
 
 use crate::Action;
@@ -135,30 +135,9 @@ fn into_cards (set: &Vec<OutputCard>, index: &mut u32) -> String {
     out
 }
 
-pub fn decode_transaction_from_history (order: u32, database_name: &str) -> Result<String, ErrorSigner> {
-    let entry = get_history_entry_by_order(order, database_name)?;
-    let mut found_signable = None;
-    for x in entry.events.iter() {
-        match x {
-            Event::TransactionSigned(x) => {
-                found_signable = match found_signable {
-                    Some(_) => return Err(ErrorSigner::Database(DatabaseSigner::TwoTransactionsInEntry(order))),
-                    None => Some(x),
-                };
-            },
-            Event::TransactionSignError(x) => {
-                found_signable = match found_signable {
-                    Some(_) => return Err(ErrorSigner::Database(DatabaseSigner::TwoTransactionsInEntry(order))),
-                    None => Some(x),
-                };
-            },
-            _ => (),
-        }
-    }
-    let (parser_data, network_name, encryption) = match found_signable {
-        Some(a) => a.transaction_network_encryption(),
-        None => return Err(ErrorSigner::NotFound(NotFoundSigner::TransactionEvent(order)))
-    };
+pub (crate) fn decode_signable_from_history (found_signable: &SignDisplay, database_name: &str) -> Result<String, ErrorSigner> {
+    
+    let (parser_data, network_name, encryption) = found_signable.transaction_network_encryption();
     
     let short_specs = specs_by_name(&network_name, &encryption, &database_name)?.short();
     let meta_set = find_meta_set(&network_name, &database_name)?;
