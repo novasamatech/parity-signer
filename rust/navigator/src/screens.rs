@@ -13,7 +13,7 @@ const MAX_COUNT_SET: u8 = 3;
 #[derive(Debug, Clone)]
 pub enum Screen {
     Log,
-    LogDetails,
+    LogDetails(u32),
     Scan,
     Transaction(TransactionState),
     SeedSelector,
@@ -29,6 +29,7 @@ pub enum Screen {
     NetworkDetails(NetworkSpecsKey),
     SelectSeedForBackup,
     SignSufficientCrypto(SufficientCryptoState),
+    Documents,
     Nowhere,
 }
 
@@ -316,7 +317,7 @@ impl Screen {
     pub fn get_name(&self) -> Option<String> {
         match self {
             Screen::Log => Some(String::from("Log")),
-            Screen::LogDetails => Some(String::from("LogDetails")),
+            Screen::LogDetails(_) => Some(String::from("LogDetails")),
             Screen::Scan => Some(String::from("Scan")),
             Screen::Transaction(_) => Some(String::from("Transaction")),
             Screen::SeedSelector => Some(String::from("SeedSelector")),
@@ -332,6 +333,7 @@ impl Screen {
             Screen::NetworkDetails(_) => Some(String::from("NetworkDetails")),
             Screen::SelectSeedForBackup => Some(String::from("SelectSeedForBackup")),
             Screen::SignSufficientCrypto(_) => Some(String::from("SignSufficientCrypto")),
+            Screen::Documents => Some(String::from("Documents")),
             Screen::Nowhere => None,
         }
     }
@@ -339,7 +341,7 @@ impl Screen {
     pub fn get_default_label(&self) -> String {
         match self {
             Screen::Log => "",
-            Screen::LogDetails => "Event details",
+            Screen::LogDetails(_) => "Event details",
             Screen::Scan => "",
             Screen::Transaction(_) => "",
             Screen::SeedSelector => "Select seed",
@@ -355,6 +357,7 @@ impl Screen {
             Screen::NetworkDetails(_) => "Network details",
             Screen::SelectSeedForBackup => "Select seed",
             Screen::SignSufficientCrypto(_) => "Sign SufficientCrypto",
+            Screen::Documents => "Documents",
             Screen::Nowhere => "",
         }.to_string()
     }
@@ -362,7 +365,7 @@ impl Screen {
     pub fn has_back(&self) -> bool {
         match self {
             Screen::Log => false,
-            Screen::LogDetails => true,
+            Screen::LogDetails(_) => true,
             Screen::Scan => false,
             Screen::Transaction(_) => true,
             Screen::SeedSelector => false,
@@ -378,6 +381,7 @@ impl Screen {
             Screen::NetworkDetails(_) => true,
             Screen::SelectSeedForBackup => true,
             Screen::SignSufficientCrypto(_) => true,
+            Screen::Documents => true,
             Screen::Nowhere => false,
         }
     }

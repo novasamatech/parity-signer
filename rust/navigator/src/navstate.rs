@@ -83,7 +83,7 @@ impl State {
                     if self.navstate.alert == Alert::Empty {
                         if let Modal::Empty = self.navstate.modal {
                             match &self.navstate.screen {
-                                Screen::LogDetails => {
+                                Screen::LogDetails(_) => {
                                     new_navstate.screen = Screen::Log;
                                 },
                                 Screen::Transaction(_) => {
@@ -132,6 +132,7 @@ impl State {
                                         },
                                     }
                                 },
+                                Screen::Documents => {new_navstate = Navstate::clean_screen(Screen::Settings)},
                                 _ => {
                                     println!("Back button pressed at the bottom of navigation");
                                 },
@@ -699,6 +700,21 @@ impl State {
                         _ => println!("ClearLog does nothing here"),
                     }
                 },
+                Action::ShowLogDetails => {
+                    match self.navstate.screen {
+                        Screen::Log => {
+                        // details_str is u32 order which will be shown
+                            match details_str.parse::<u32>() {
+                                Ok(order) => {new_navstate = Navstate::clean_screen(Screen::LogDetails(order))},
+                                Err(_) => {
+                                    new_navstate.alert = Alert::Error;
+                                    errorline.push_str(&<Signer>::show(&ErrorSigner::Interface(InterfaceSigner::OrderNotU32(details_str.to_string()))));
+                                },
+                            }
+                        },
+                        _ => println!("ShowLogDetails does nothing here"),
+                    }
+                },
                 Action::Swipe => {
                     match self.navstate.screen {
                         Screen::Keys(ref k) => {
@@ -754,6 +770,12 @@ impl State {
                         _ => println!("Increment does nothing here"),
                     }
                 },
+                Action::ShowDocuments => {
+                    match self.navstate.screen {
+                        Screen::Settings => new_navstate = Navstate::clean_screen(Screen::Documents),
+                        _ => println!("ShowDocuments does nothing here"),
+                    }
+                },
                 Action::Nothing => {
                     println!("no action was passed in action");
                 },
@@ -771,7 +793,16 @@ impl State {
                         },
                     }
                 },
-                //Screen::LogDetails => "",
+                Screen::LogDetails(order) => {
+                    match db_handling::manage_history::print_history_entry_by_order(order, dbname) {
+                        Ok(a) => a.to_string(),
+                        Err(e) => {
+                            new_navstate.alert = Alert::Error;
+                            errorline.push_str(&<Signer>::show(&e));
+                            "".to_string()
+                        },
+                    }
+                },
                 Screen::Scan => "".to_string(),
                 Screen::Transaction(ref t) => {
                     match t.action() {
@@ -1032,7 +1063,7 @@ impl State {
     fn get_footer(&self) -> bool {
         match self.navstate.screen {
             Screen::Log => true,
-            Screen::LogDetails => true,
+            Screen::LogDetails(_) => true,
             Screen::Scan => true,
             Screen::Transaction(_) => false,
             Screen::SeedSelector => true,
@@ -1048,6 +1079,7 @@ impl State {
             Screen::NetworkDetails(_) => false,
             Screen::SelectSeedForBackup => false,
             Screen::SignSufficientCrypto(_) => false,
+            Screen::Documents => false,
             Screen::Nowhere => true,
         }
     }
@@ -1056,7 +1088,7 @@ impl State {
     fn get_active_navbutton(&self) -> String {
         match self.navstate.screen {
             Screen::Log => "Log",
-            Screen::LogDetails => "Log",
+            Screen::LogDetails(_) => "Log",
             Screen::Scan => "Scan",
             Screen::Transaction(_) => "Scan",
             Screen::SeedSelector => "Keys",
@@ -1072,6 +1104,7 @@ impl State {
             Screen::NetworkDetails(_) => "Settings",
             Screen::SelectSeedForBackup => "Settings",
             Screen::SignSufficientCrypto(_) => "Settings",
+            Screen::Documents => "Settings",
             Screen::Nowhere => "None",
         }.to_string()
     }
@@ -1080,7 +1113,7 @@ impl State {
     fn get_right_button(&self) -> String {
         match self.navstate.screen {
             Screen::Log => "LogRight",
-            Screen::LogDetails => "None",
+            Screen::LogDetails(_) => "None",
             Screen::Scan => "None",
             Screen::Transaction(_) => "None",
             Screen::SeedSelector => "NewSeed",
@@ -1096,6 +1129,7 @@ impl State {
             Screen::NetworkDetails(_) => "NDMenu",
             Screen::SelectSeedForBackup => "Backup",
             Screen::SignSufficientCrypto(_) => "None",
+            Screen::Documents => "None",
             Screen::Nowhere => "None",
         }.to_string()
     }
@@ -1104,7 +1138,7 @@ impl State {
     fn get_screen_name_type(&self) -> String {
         match self.navstate.screen {
             Screen::Log => "h4",
-            Screen::LogDetails => "h4",
+            Screen::LogDetails(_) => "h4",
             Screen::Scan => "h1",
             Screen::Transaction(_) => "h1",
             Screen::SeedSelector => "h1",
@@ -1120,6 +1154,7 @@ impl State {
             Screen::NetworkDetails(_) => "h4",
             Screen::SelectSeedForBackup => "h4",
             Screen::SignSufficientCrypto(_) => "h1",
+            Screen::Documents => "h4",
             Screen::Nowhere => "h4",
         }.to_string()
 
