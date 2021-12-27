@@ -137,6 +137,10 @@ public class CameraService: UIViewController, AVCaptureVideoDataOutputSampleBuff
                 return
             }
             
+            try videoDevice.lockForConfiguration()
+            videoDevice.focusMode = .autoFocus
+            videoDevice.unlockForConfiguration()
+            
             let videoDeviceInput = try AVCaptureDeviceInput(device: videoDevice)
             
             if session.canAddInput(videoDeviceInput) {
@@ -238,6 +242,9 @@ public class CameraService: UIViewController, AVCaptureVideoDataOutputSampleBuff
                             } else { //collect frames and attempt to decode if it seems that enough are collected
                                 self.bucket.append(payloadStr)
                                 print(self.bucket.count)
+                                DispatchQueue.main.async {
+                                    self.captured = self.bucket.count
+                                }
                                 if self.bucket.count >= self.total ?? 0 {
                                     var err = ExternError()
                                     withUnsafeMutablePointer(to: &err) {err_ptr in
@@ -254,9 +261,6 @@ public class CameraService: UIViewController, AVCaptureVideoDataOutputSampleBuff
                                             print(String(cString: err_ptr.pointee.message))
                                             signer_destroy_string(err_ptr.pointee.message)
                                         }
-                                    }
-                                    DispatchQueue.main.async {
-                                        self.captured = self.bucket.count
                                     }
                                 }
                             }

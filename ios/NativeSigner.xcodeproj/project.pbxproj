@@ -68,6 +68,7 @@
 		2D48F3C82774CC64004B27BE /* SearchKeys.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D48F3C72774CC64004B27BE /* SearchKeys.swift */; };
 		2D48F3CE2777A7EA004B27BE /* MNewSeedBackup.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D48F3CD2777A7EA004B27BE /* MNewSeedBackup.swift */; };
 		2D48F3D02777A823004B27BE /* NewSeedBackupModal.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D48F3CF2777A823004B27BE /* NewSeedBackupModal.swift */; };
+		2D48F3D2277A0AB2004B27BE /* HistoryCardExtended.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D48F3D1277A0AB2004B27BE /* HistoryCardExtended.swift */; };
 		2D72B4F626EF3BC50081E879 /* Navigator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D72B4F526EF3BC50081E879 /* Navigator.swift */; };
 		2D72B4FA26EF7D1C0081E879 /* Seeds.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D72B4F926EF7D1C0081E879 /* Seeds.swift */; };
 		2D72D52A2732B8A7004BA7C9 /* Database in Resources */ = {isa = PBXBuildFile; fileRef = 2D72D5292732B8A7004BA7C9 /* Database */; };
@@ -227,6 +228,7 @@
 		2D48F3C72774CC64004B27BE /* SearchKeys.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SearchKeys.swift; sourceTree = "<group>"; };
 		2D48F3CD2777A7EA004B27BE /* MNewSeedBackup.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MNewSeedBackup.swift; sourceTree = "<group>"; };
 		2D48F3CF2777A823004B27BE /* NewSeedBackupModal.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewSeedBackupModal.swift; sourceTree = "<group>"; };
+		2D48F3D1277A0AB2004B27BE /* HistoryCardExtended.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HistoryCardExtended.swift; sourceTree = "<group>"; };
 		2D72B4F526EF3BC50081E879 /* Navigator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Navigator.swift; sourceTree = "<group>"; };
 		2D72B4F926EF7D1C0081E879 /* Seeds.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Seeds.swift; sourceTree = "<group>"; };
 		2D72D5292732B8A7004BA7C9 /* Database */ = {isa = PBXFileReference; lastKnownFileType = folder; path = Database; sourceTree = "<group>"; };
@@ -362,6 +364,7 @@
 				2DA5F84227566BE300D8DD29 /* TransactionCardSelector.swift */,
 				2DA5F8812756A2DE00D8DD29 /* AddressCard.swift */,
 				2DA5F83E275667CF00D8DD29 /* HistoryCardTemplate.swift */,
+				2D48F3D1277A0AB2004B27BE /* HistoryCardExtended.swift */,
 				04197D26276A41E7003485D2 /* SettingsCardTemplate.swift */,
 				2D48F3AB277092FD004B27BE /* MetadataCard.swift */,
 			);
@@ -865,6 +868,7 @@
 				04197D27276A41E7003485D2 /* SettingsCardTemplate.swift in Sources */,
 				2DA5F89227590B4F00D8DD29 /* Documents.swift in Sources */,
 				2DA5F80D2756304B00D8DD29 /* Camera.swift in Sources */,
+				2D48F3D2277A0AB2004B27BE /* HistoryCardExtended.swift in Sources */,
 				2DA5F8842756A37800D8DD29 /* Address.swift in Sources */,
 				2D48F3B02770AD83004B27BE /* ManageMetadata.swift in Sources */,
 				2DA5F84327566BE300D8DD29 /* TransactionCardSelector.swift in Sources */,

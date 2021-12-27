@@ -9,4 +9,5 @@ import Foundation
 
 struct MLog: Decodable {
     var log: [History] = []
+    var total_entries: Int = 0 //This is prepared for lazy history loading
 }

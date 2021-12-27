@@ -29,27 +29,29 @@ struct PasswordConfirm: View {
                         .frame(height: 39)
                     HStack {
                         Text("///").foregroundColor(Color("Crypto400"))
-                    TextField("SECRET PATH", text: $passwordCheck, prompt: Text(""))
-                        .foregroundColor(Color("Crypto400"))
-                        .font(FCrypto(style: .body2))
-                        .disableAutocorrection(true)
-                        .autocapitalization(.none)
-                        .keyboardType(.asciiCapable)
-                        .submitLabel(.done)
-                        .onChange(of: data.suggestedName, perform: {_ in data.lastError = ""
-                        })
-                        .focused($focused)
-                        .padding(8)
-                        .onAppear {
-                            focused = true
-                        }
+                        TextField("SECRET PATH", text: $passwordCheck, prompt: Text(""))
+                            .foregroundColor(Color("Crypto400"))
+                            .font(FCrypto(style: .body2))
+                            .disableAutocorrection(true)
+                            .autocapitalization(.none)
+                            .keyboardType(.asciiCapable)
+                            .submitLabel(.done)
+                            .onChange(of: data.suggestedName, perform: {_ in data.lastError = ""
+                            })
+                            .focused($focused)
+                            .padding(8)
+                            .onAppear {
+                                focused = true
+                            }
                     }
                 }
-                Button(action: {
-                    data.createAddress(path: content.cropped_path+"///"+content.pwd, seedName: content.seed_name)
-                }) {
-                    Text("Next")
-                }.disabled(passwordCheck != content.pwd)
+                BigButton(
+                    text: "Next",
+                    action: {
+                        data.createAddress(path: content.cropped_path+"///"+content.pwd, seedName: content.seed_name)
+                    },
+                    isDisabled: passwordCheck != content.pwd
+                )
             }
         }
     }

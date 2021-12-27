@@ -55,16 +55,16 @@ struct NewAddressScreen: View {
                     }
                 }.padding()
                 HStack {
-                    Button(action: {
+                    BigButton(
+                        text: "Next",
+                        action: {
                         if derivationState.hasPassword {
                             data.pushButton(buttonID: .CheckPassword, details: path)
                         } else {
                             data.createAddress(path: path, seedName: content.seed_name)
                         }
-                    }) {
-                        Text("Next")
-                    }
-                    .disabled(!derivationState.isValid)
+                    },
+                    isDisabled: !derivationState.isValid)
                 }
             }.padding(.horizontal)
         }

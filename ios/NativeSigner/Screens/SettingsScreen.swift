@@ -87,7 +87,7 @@ struct SettingsScreen: View {
                 )
             })
             Button(action: {
-                //TODO
+                data.pushButton(buttonID: .ShowDocuments)
             }) {
                 SettingsCardTemplate(text: "About")
             }

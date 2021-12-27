@@ -61,7 +61,7 @@ struct ActionResult: Decodable {
         case "Log":
             screen = .Log(try values.decode(MLog.self, forKey: .screenData))
         case "LogDetails":
-            screen = .LogDetails
+            screen = .LogDetails(try values.decode(History.self, forKey: .screenData))
         case "SeedSelector":
             screen = .SeedSelector(try values.decode(MSeeds.self, forKey: .screenData))
         case "KeyDetails":
@@ -86,6 +86,8 @@ struct ActionResult: Decodable {
             screen = .SignSufficientCrypto(try values.decode(MSignSufficientCrypto.self, forKey: .screenData))
         case "SelectSeedForBackup":
             screen = .SelectSeedForBackup(try values.decode(MSeeds.self, forKey: .screenData))
+        case "Documents":
+            screen = .Documents
         default:
             screen = .Log(MLog())
         }
@@ -146,7 +148,7 @@ enum SignerScreen: Decodable {
     case Keys(MKeys)
     case Settings(MVerifierDetails)
     case Log(MLog)
-    case LogDetails
+    case LogDetails(History)
     case Transaction(MTransaction)
     case SeedSelector(MSeeds)
     case KeyDetails(MKeyDetails)
@@ -159,6 +161,7 @@ enum SignerScreen: Decodable {
     case NetworkDetails(MNetworkDetails)
     case SignSufficientCrypto(MSignSufficientCrypto)
     case SelectSeedForBackup(MSeeds)
+    case Documents
 }
 
 /**
@@ -225,8 +228,10 @@ enum ButtonID {
     case RemoveKey
     case RemoveSeed
     case ClearLog
+    case ShowLogDetails
     case Swipe
     case Increment
+    case ShowDocuments
 }
 
 /**

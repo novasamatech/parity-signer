@@ -170,6 +170,7 @@ struct SignMessageError: Decodable, Hashable {
 
 struct SignDisplay: Decodable, Hashable {
     var transaction: String
+    var network_name: String
     var signed_by: Verifier
     var user_comment: String
 }

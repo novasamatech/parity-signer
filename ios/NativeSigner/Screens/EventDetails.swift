@@ -9,20 +9,18 @@ import SwiftUI
 
 struct EventDetails: View {
     @EnvironmentObject var data: SignerDataModel
+    let content: History
     var body: some View {
         VStack {
-            /*
-        Text(data.selectedRecord?.timestamp ?? "Timing error")
-        ScrollView {
-            LazyVStack {
-                ForEach(data.selectedRecord?.events ?? [], id: \.self) {event in
-                    HistoryCardExtended(event: event)
-                        .foregroundColor(/*@START_MENU_TOKEN@*/Color("textMainColor")/*@END_MENU_TOKEN@*/)
-                        .padding(.horizontal, 8)
+            Text(content.timestamp)
+            ScrollView {
+                LazyVStack {
+                    ForEach(content.events, id: \.self) {event in
+                        HistoryCardExtended(event: event)
+                            .padding(.horizontal, 8)
+                    }
                 }
             }
-             */
-            Text("Details")
         }
     }
 }

@@ -44,33 +44,32 @@ struct TransactionPreview: View {
                         }
                 }
                 Spacer()
-                HStack {
-                    Button(action: {
-                        focus = false
-                        data.pushButton(buttonID: .GoBack)}) {
-                        Text("Decline")
-                            .font(.largeTitle)
-                    }
-                    Spacer()
+                VStack {
                     switch content.type {
                     case .sign:
-                        Button(action: {
-                            focus = false
-                            data.pushButton(buttonID: .GoForward, details: Data(comment.utf8).base64EncodedString(), seedPhrase: data.getSeed(seedName: content.author_info?.seed ?? ""))
-                        }) {
-                            Text("Sign")
-                                .font(.largeTitle)
-                        }
+                        BigButton(
+                            text: "Sign",
+                            isCrypto: true,
+                            action: {
+                                focus = false
+                                data.pushButton(buttonID: .GoForward, details: Data(comment.utf8).base64EncodedString(), seedPhrase: data.getSeed(seedName: content.author_info?.seed ?? ""))
+                            }
+                        )
                     case .stub:
-                        Button(action: {
+                        BigButton(
+                            text: "Approve",
+                            action: {
                             data.pushButton(buttonID: .GoForward)
-                        }) {
-                            Text("Approve")
-                                .font(.largeTitle)
-                        }
+                        })
                     case .read:
                         EmptyView()
                     }
+                    BigButton(
+                        text: "Decline",
+                        isDangerous: true,
+                        action: {
+                        focus = false
+                        data.pushButton(buttonID: .GoBack)})
                 }.padding()
             }
         }

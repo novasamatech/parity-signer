@@ -20,8 +20,8 @@ struct ScreenSelector: View {
             SettingsScreen(content: value)
         case .Log(let value) :
             HistoryScreen(content: value)
-        case .LogDetails:
-            EventDetails()
+        case .LogDetails(let value):
+            EventDetails(content: value)
         case .Transaction(let value):
             TransactionPreview(content: value)
         case .SeedSelector(let value):
@@ -46,6 +46,8 @@ struct ScreenSelector: View {
             SignSufficientCrypto(content: value)
         case .SelectSeedForBackup(let value):
             SelectSeedForBackup(content: value)
+        case .Documents:
+            DocumentModal()
         }
     }
 }

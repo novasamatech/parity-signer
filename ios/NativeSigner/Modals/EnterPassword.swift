@@ -43,11 +43,14 @@ struct EnterPassword: View {
                         }
                     }
                 }
-                Button(action: {
+                BigButton(
+                    text: "Next",
+                    isCrypto: true,
+                    action: {
                     data.pushButton(buttonID: .GoForward, details: password)
-                }) {
-                    Text("Next")
-                }.disabled(password == "")
+                },
+                    isDisabled: password == ""
+                )
             }
         }
     }
