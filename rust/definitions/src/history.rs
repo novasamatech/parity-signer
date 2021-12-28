@@ -227,11 +227,18 @@ impl SignDisplay {
         };
         (self.transaction.to_vec(), self.network_name.to_string(), encryption)
     }
-    pub fn success(&self) -> String {
-        format!("\"transaction\":\"{}\",\"network_name\":\"{}\",\"signed_by\":{},\"user_comment\":\"{}\"", hex::encode(&self.transaction), &self.network_name, export_complex_single(&self.signed_by, |a| a.show_card()), &self.user_comment)
+    pub fn transaction(&self) -> Vec<u8> {
+        self.transaction.to_vec()
     }
-    pub fn pwd_failure(&self) -> String {
-        format!("\"transaction\":\"{}\",\"network_name\":\"{}\",\"signed_by\":{},\"user_comment\":\"{}\",\"error\":\"wrong_password_entered\"", hex::encode(&self.transaction), &self.network_name, export_complex_single(&self.signed_by, |a| a.show_card()), &self.user_comment)
+    pub fn success<O>(&self, op: O) -> String 
+    where O: Fn(&Self) -> String + Copy,
+    {
+        format!("\"transaction\":\"{}\",\"network_name\":\"{}\",\"signed_by\":{},\"user_comment\":\"{}\"", op(&self), &self.network_name, export_complex_single(&self.signed_by, |a| a.show_card()), &self.user_comment)
+    }
+    pub fn pwd_failure<O>(&self, op: O) -> String 
+    where O: Fn(&Self) -> String + Copy,
+    {
+        format!("\"transaction\":\"{}\",\"network_name\":\"{}\",\"signed_by\":{},\"user_comment\":\"{}\",\"error\":\"wrong_password_entered\"", op(&self), &self.network_name, export_complex_single(&self.signed_by, |a| a.show_card()), &self.user_comment)
     }
 }
 
@@ -302,7 +309,9 @@ pub struct Entry {
 }
 
 impl Event {
-    pub fn show(&self) -> String {
+    pub fn show<O>(&self, op: O) -> String 
+    where O: Fn(&SignDisplay) -> String + Copy,
+    {
         match &self {
             Event::MetadataAdded(x) => format!("\"event\":\"metadata_added\",\"payload\":{}", export_complex_single(x, |a| a.show())),
             Event::MetadataRemoved(x) => format!("\"event\":\"metadata_removed\",\"payload\":{}", export_complex_single(x, |a| a.show())),
@@ -315,8 +324,8 @@ impl Event {
             Event::TypesAdded(x) => format!("\"event\":\"types_added\",\"payload\":{}", export_complex_single(x, |a| a.show())),
             Event::TypesRemoved(x) => format!("\"event\":\"types_removed\",\"payload\":{}", export_complex_single(x, |a| a.show())),
             Event::TypesSigned(x) => format!("\"event\":\"load_types_message_signed\",\"payload\":{}", export_complex_single(x, |a| a.show())),
-            Event::TransactionSigned(x) => format!("\"event\":\"transaction_signed\",\"payload\":{}", export_complex_single(x, |a| a.success())),
-            Event::TransactionSignError(x) => format!("\"event\":\"transaction_sign_error\",\"payload\":{}", export_complex_single(x, |a| a.pwd_failure())),
+            Event::TransactionSigned(x) => format!("\"event\":\"transaction_signed\",\"payload\":{}", export_complex_single(x, |a| a.success(|b| op(b)))),
+            Event::TransactionSignError(x) => format!("\"event\":\"transaction_sign_error\",\"payload\":{}", export_complex_single(x, |a| a.pwd_failure(|b| op(b)))),
             Event::MessageSigned(x) => format!("\"event\":\"message_signed\",\"payload\":{}", export_complex_single(x, |a| a.success())),
             Event::MessageSignError(x) => format!("\"event\":\"message_sign_error\",\"payload\":{}", export_complex_single(x, |a| a.pwd_failure())),
             Event::IdentityAdded(x) => format!("\"event\":\"identity_added\",\"payload\":{}", export_complex_single(x, |a| a.show())),
@@ -336,8 +345,10 @@ impl Event {
 }
 
 impl Entry {
-    pub fn show(&self) -> String {
-        let events_chain = export_complex_vector(&self.events, |a| a.show());
+    pub fn show<O>(&self, op: O) -> String 
+    where O: Fn(&SignDisplay) -> String + Copy,
+    {
+        let events_chain = export_complex_vector(&self.events, |a| a.show(|b| op(b)));
         format!("\"timestamp\":\"{}\",\"events\":{}", self.timestamp, events_chain)
     }
 }

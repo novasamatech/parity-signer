@@ -1,5 +1,5 @@
 use db_handling::manage_history::get_history_entry_by_order;
-use definitions::{error::{ErrorSigner, InputSigner}, history::Event, print::export_complex_vector_with_error};
+use definitions::{error::{ErrorSigner, InputSigner}};
 
 mod add_specs;
     use add_specs::add_specs;
@@ -68,12 +68,10 @@ pub fn produce_output (payload: &str, dbname: &str) -> Action {
 /// Function to print history entry by order for entries without parseable transaction
 pub fn print_history_entry_by_order_with_decoding(order: u32, database_name: &str) -> Result<String, ErrorSigner> {
     let entry = get_history_entry_by_order(order, database_name)?;
-    let events_chain = export_complex_vector_with_error(&entry.events, |a| {
-        match a {
-            Event::TransactionSigned(signable) => decode_signable_from_history (signable, database_name),
-            Event::TransactionSignError(signable) => decode_signable_from_history (signable, database_name),
-            _ => Ok(a.show()),
+    Ok(entry.show(|a| {
+        match decode_signable_from_history (a, database_name) {
+            Ok(b) => b,
+            Err(e) => format!("\"error\":[{}],\"raw_transaction\":\"{}\"", Card::Error(e).card(&mut 0,0), hex::encode(a.transaction()))
         }
-    })?;
-    Ok(format!("\"timestamp\":\"{}\",\"events\":{}", entry.timestamp, events_chain))
+    }))
 }

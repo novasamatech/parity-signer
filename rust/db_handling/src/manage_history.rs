@@ -3,6 +3,7 @@ use definitions::{danger::DangerRecord, error::{DatabaseSigner, EntryDecodingSig
 use parity_scale_codec::{Decode, Encode};
 use anyhow;
 use chrono::Utc;
+use hex;
 use sled::Batch;
 use definitions::print::export_complex_vector;
 
@@ -17,7 +18,7 @@ type Order = u32;
 /// Interacts with user interface.
 pub fn print_history(database_name: &str) -> anyhow::Result<String> {
     let history = get_history(database_name).map_err(|e| e.anyhow())?;
-    Ok(export_complex_vector(&history, |(order, entry)| format!("\"order\":{},{}", order, entry.show())))
+    Ok(export_complex_vector(&history, |(order, entry)| format!("\"order\":{},{}", order, entry.show(|b| hex::encode(b.transaction())))))
 }
 
 /// Function to print total number of pages for pre-set number of entries per page.
@@ -44,7 +45,7 @@ pub fn print_history_page(page_number: u32, database_name: &str) -> Result<Strin
             None => return Err(ErrorSigner::Interface(InterfaceSigner::HistoryPageOutOfRange{page_number, total_pages})),
         },
     };
-    Ok(format!("\"log\":{},\"total_entries\":{}", export_complex_vector(&history_subset, |(order, entry)| format!("\"order\":{},{}", order, entry.show())), history.len()))
+    Ok(format!("\"log\":{},\"total_entries\":{}", export_complex_vector(&history_subset, |(order, entry)| format!("\"order\":{},{}", order, entry.show(|b| hex::encode(b.transaction())))), history.len()))
 }
 
 /// Local helper function to retrieve history entries from the database.
@@ -100,9 +101,10 @@ pub fn get_history_entry_by_order(order: u32, database_name: &str) -> Result<Ent
     }
 }
 
+/// Function to print history entry by order for entries without parseable transaction
 pub fn print_history_entry_by_order(order: u32, database_name: &str) -> Result<String, ErrorSigner> {
     let entry = get_history_entry_by_order(order, database_name)?;
-    Ok(format!("\"order\":{},{}", order, entry.show()))
+    Ok(format!("\"order\":{},{}", order, entry.show(|b| hex::encode(b.transaction()))))
 }
 
 /// Function to clear Signer history.
