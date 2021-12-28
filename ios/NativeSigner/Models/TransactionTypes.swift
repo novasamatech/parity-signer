@@ -154,7 +154,15 @@ struct Verifier: Decodable, Hashable {
     var encryption: String
 }
 
-struct TransactionCard: Decodable {
+struct TransactionCard: Decodable, Hashable {
+    static func == (lhs: TransactionCard, rhs: TransactionCard) -> Bool {
+        return lhs.index == rhs.index //guaranteed in backend
+    }
+    
+    func hash(into hasher: inout Hasher) {
+        hasher.combine(index)
+    }
+    
     var index: Int
     var indent: Int
     var card: Card
@@ -277,8 +285,8 @@ struct Action: Decodable, Encodable {
     var payload: String
 }
 
-struct TransactionCardSet: Decodable {
-    var author: [TransactionCard]?
+struct TransactionCardSet: Decodable, Hashable {
+    
     var error: [TransactionCard]?
     var extensions: [TransactionCard]?
     var message: [TransactionCard]?
@@ -287,7 +295,6 @@ struct TransactionCardSet: Decodable {
     var verifier: [TransactionCard]?
     var warning: [TransactionCard]?
     var types_info: [TransactionCard]?
-    //var action: Action?
     
     /**
      * Prepares transaction cards to be shown in a frame
@@ -305,13 +312,5 @@ struct TransactionCardSet: Decodable {
         return assembled.sorted(by: {
             $0.index < $1.index
         })
-    }
-    
-    func getAuthor() -> Author? {
-        switch self.author?[0].card ?? .error("") {
-        case .author(let author):
-            return author
-        default: return nil
-        }
     }
 }

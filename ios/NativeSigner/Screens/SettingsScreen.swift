@@ -96,18 +96,6 @@ struct SettingsScreen: View {
                 withIcon: false,
                 withBackground: false
             )
-            /*
-             HStack {
-             Image(uiImage: UIImage(data: Data(fromHexEncodedString: String(cString: identicon(nil, "", 32))) ?? Data()) ?? UIImage())
-             .resizable(resizingMode: .stretch)
-             .frame(width: 42, height: 42)
-             VStack {
-             Text("General verifier certificate").foregroundColor(Color("textMainColor"))
-             //Text(data.generalVerifier?.hex ?? "unknown").foregroundColor(Color("cryptoColor"))
-             //Text("encryption: " + (data.generalVerifier?.encryption ?? "unknown")).foregroundColor(Color("textFadedColor"))
-             }
-             }.padding().background(Color("backgroundCard"))
-             */
         }
     }
 }

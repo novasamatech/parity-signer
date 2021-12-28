@@ -70,6 +70,8 @@
 		2D48F3D02777A823004B27BE /* NewSeedBackupModal.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D48F3CF2777A823004B27BE /* NewSeedBackupModal.swift */; };
 		2D48F3D2277A0AB2004B27BE /* HistoryCardExtended.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D48F3D1277A0AB2004B27BE /* HistoryCardExtended.swift */; };
 		2D48F3D4277A5A0E004B27BE /* MLogDetails.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D48F3D3277A5A0E004B27BE /* MLogDetails.swift */; };
+		2D48F3D6277B94C4004B27BE /* Identicon.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D48F3D5277B94C4004B27BE /* Identicon.swift */; };
+		2D48F3D8277B95A3004B27BE /* TransactionBlock.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D48F3D7277B95A3004B27BE /* TransactionBlock.swift */; };
 		2D72B4F626EF3BC50081E879 /* Navigator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D72B4F526EF3BC50081E879 /* Navigator.swift */; };
 		2D72B4FA26EF7D1C0081E879 /* Seeds.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D72B4F926EF7D1C0081E879 /* Seeds.swift */; };
 		2D72D52A2732B8A7004BA7C9 /* Database in Resources */ = {isa = PBXBuildFile; fileRef = 2D72D5292732B8A7004BA7C9 /* Database */; };
@@ -231,6 +233,8 @@
 		2D48F3CF2777A823004B27BE /* NewSeedBackupModal.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewSeedBackupModal.swift; sourceTree = "<group>"; };
 		2D48F3D1277A0AB2004B27BE /* HistoryCardExtended.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HistoryCardExtended.swift; sourceTree = "<group>"; };
 		2D48F3D3277A5A0E004B27BE /* MLogDetails.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MLogDetails.swift; sourceTree = "<group>"; };
+		2D48F3D5277B94C4004B27BE /* Identicon.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Identicon.swift; sourceTree = "<group>"; };
+		2D48F3D7277B95A3004B27BE /* TransactionBlock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransactionBlock.swift; sourceTree = "<group>"; };
 		2D72B4F526EF3BC50081E879 /* Navigator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Navigator.swift; sourceTree = "<group>"; };
 		2D72B4F926EF7D1C0081E879 /* Seeds.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Seeds.swift; sourceTree = "<group>"; };
 		2D72D5292732B8A7004BA7C9 /* Database */ = {isa = PBXFileReference; lastKnownFileType = folder; path = Database; sourceTree = "<group>"; };
@@ -430,6 +434,8 @@
 				2DA5F8A0275F889400D8DD29 /* Headers.swift */,
 				04197D2A276BA40C003485D2 /* MenuElements.swift */,
 				04197D2C276BB683003485D2 /* StyleModiefiers.swift */,
+				2D48F3D5277B94C4004B27BE /* Identicon.swift */,
+				2D48F3D7277B95A3004B27BE /* TransactionBlock.swift */,
 				0452BC562767B26600C6DD37 /* Buttons.swift */,
 				2D48F35027609CDE004B27BE /* HistoryCard.swift */,
 				2DA5F8852756A44600D8DD29 /* AddressCardControls.swift */,
@@ -802,6 +808,7 @@
 				2D48F3C227749138004B27BE /* MTypesInfo.swift in Sources */,
 				2DA5F85E27566C3600D8DD29 /* TCFieldName.swift in Sources */,
 				2D48F3712767514B004B27BE /* MPasswordConfirm.swift in Sources */,
+				2D48F3D8277B95A3004B27BE /* TransactionBlock.swift in Sources */,
 				2DA5F86827566C3600D8DD29 /* TCAuthor.swift in Sources */,
 				2DA5F87427566C3600D8DD29 /* TCEraMortal.swift in Sources */,
 				2D48F35127609CDE004B27BE /* HistoryCard.swift in Sources */,
@@ -823,6 +830,7 @@
 				2D48F39E276B5C1A004B27BE /* MRecoverSeedPhrase.swift in Sources */,
 				2DA5F8252756624000D8DD29 /* NavbarShield.swift in Sources */,
 				2D48F3572760BBEC004B27BE /* RecoverSeedName.swift in Sources */,
+				2D48F3D6277B94C4004B27BE /* Identicon.swift in Sources */,
 				2D48F3532760A2D8004B27BE /* Fonts.swift in Sources */,
 				2D48F3AC277092FD004B27BE /* MetadataCard.swift in Sources */,
 				2DE72C0026A6ADC5002BB752 /* CameraService.swift in Sources */,

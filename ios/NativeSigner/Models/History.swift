@@ -204,23 +204,3 @@ struct History: Decodable {
     var timestamp: String
     var events: [Event]
 }
-
-func recoverTransaction(transaction: String) -> [TransactionCard] {
-    print(transaction)
-    
-    guard let transactionPreview = try? JSONDecoder().decode(TransactionCardSet.self, from: transaction.data(using: .utf8) ?? Data())
-    else {
-        return []
-    }
-    var cards: [TransactionCard] = []
-    cards.append(contentsOf: (transactionPreview.warning ?? []))
-    cards.append(contentsOf: (transactionPreview.types_info ?? []))
-    cards.append(contentsOf: (transactionPreview.author ?? []))
-    cards.append(contentsOf: (transactionPreview.error ?? []))
-    cards.append(contentsOf: (transactionPreview.extensions ?? []))
-    cards.append(contentsOf: (transactionPreview.method ?? []))
-    cards.append(contentsOf: (transactionPreview.new_specs ?? []))
-    cards.append(contentsOf: (transactionPreview.verifier ?? []))
-    cards = cards.sorted(by: {$0.index < $1.index})
-    return cards
-}

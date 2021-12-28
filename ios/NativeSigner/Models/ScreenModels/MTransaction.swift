@@ -20,7 +20,7 @@ enum TransactionType: String, Decodable {
     case read
 }
 
-struct TransactionAuthor: Decodable {
+struct TransactionAuthor: Decodable, Hashable {
     var base58: String
     var identicon: String
     var seed: String
@@ -37,7 +37,7 @@ struct TransactionAuthor: Decodable {
     }
 }
 
-struct TransactionNetworkInfo: Decodable {
+struct TransactionNetworkInfo: Decodable, Hashable {
     var network_title: String
     var network_logo: String
 }

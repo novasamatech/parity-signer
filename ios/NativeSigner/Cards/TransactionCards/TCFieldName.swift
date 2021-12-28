@@ -24,7 +24,6 @@ struct TCFieldName: View {
                             .foregroundColor(Color("Action400"))
                     }
                 }
-                .background(/*@START_MENU_TOKEN@*//*@PLACEHOLDER=View@*/Color("backgroundCard")/*@END_MENU_TOKEN@*/)
                 if showDoc {
                     VStack {
                         Text("Path: " + value.path_type)

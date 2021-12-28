@@ -20,9 +20,7 @@ struct AddressCard: View {
         ZStack {
             RoundedRectangle(cornerRadius: 4).foregroundColor(Color("Bg200")).frame(height: 44)
             HStack {
-                Image(uiImage: UIImage(data: Data(fromHexEncodedString: address.identicon) ?? Data()) ?? UIImage())
-                    .resizable(resizingMode: .stretch)
-                    .frame(width: rowHeight, height: rowHeight)
+                Identicon(identicon: address.identicon)
                 VStack (alignment: .leading) {
                     HStack {
                         Text(address.seed_name)
@@ -40,54 +38,7 @@ struct AddressCard: View {
                         .font(FCrypto(style: .body1))
                 }
                 Spacer()
-                /*
-                if (data.keyManagerModal == .showKey && data.getMultiSelectionMode()) {
-                    Text(String((data.multiSelected.firstIndex(of: address) ?? -1) + 1) + "/" + String(data.multiSelected.count))
-                }*/
             }.padding(.horizontal, 8)
-        }/*
-        .gesture(
-            TapGesture()
-                .onEnded { _ in
-                    if data.keyManagerModal == .showKey {
-                        //we can do something here
-                    } else {
-                        if data.getMultiSelectionMode() {
-                            data.multiSelectAction(address: address)
-                        } else {
-                            if address.isRoot() {
-                                data.selectSeed(seedName: address.seed_name)
-                            } else {
-                                data.selectedAddress = address
-                                data.keyManagerModal = .showKey
-                            }
-                        }
-                    }
-                })
-        .gesture(
-            LongPressGesture()
-                .onEnded { _ in
-                    if data.keyManagerModal == .showKey {
-                        //we can do something here
-                    } else {
-                        data.multiSelectAction(address: address)
-                    }
-                })
-        .gesture(
-            DragGesture()
-                .updating($dragOffset, body: { (value, state, transaction) in
-                    if data.keyManagerModal == .showKey {
-                        //we can do something here
-                    } else {
-                        if value.translation.width < -20 {
-                            data.multiSelected = []
-                            data.selectedAddress = address
-                        }
-                        if value.translation.width > 20 {
-                            data.selectedAddress = nil
-                        }
-                    }
-                })
-        )*/
+        }
     }
 }

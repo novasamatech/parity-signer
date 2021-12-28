@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct HistoryCardExtended: View {
-    var event: Event
+    var event: EventDetailed
     let timestamp = ""
     var body: some View {
         HStack {
@@ -139,23 +139,39 @@ struct HistoryCardExtended: View {
                 line1: "System record",
                 line2: text
             )
-            case .transactionSignError(let value): HistoryCardTemplate(
-                image: "exclamationmark.triangle.fill",
-                timestamp: timestamp,
-                danger: true,
-                line1: "Signing failure",
-                line2: String(decoding: Data(base64Encoded: value.user_comment) ?? Data(), as: UTF8.self)
-            )
+            case .transactionSignError(let value): VStack {
+                Text("Transaction failed")
+                Text(value.error)
+                TransactionBlock(cards: value.transaction.assemble())
+                Text("Signed by: ")
+                HStack {
+                    Identicon(identicon: value.signed_by.identicon)
+                    VStack {
+                        Text(value.signed_by.hex)
+                        Text(value.signed_by.encryption)
+                    }
+                }
+                Text("in network")
+                Text(value.network_name)
+                Text("Comment :")
+                Text(String(decoding: Data(base64Encoded: value.user_comment) ?? Data(), as: UTF8.self))
+            }
             case .transactionSigned(let value):
                 VStack {
-                    Text("Transaction")
-                    Text(value.network_name)
-                    Text(value.user_comment)
-                    Text(value.signed_by.hex)
-                    Text(value.signed_by.encryption)
-                    ForEach(recoverTransaction(transaction: value.transaction), id: \.index) { card in
-                        TransactionCardView(card: card)
+                    Text("Transaction signed")
+                    TransactionBlock(cards: value.transaction.assemble())
+                    Text("Signed by: ")
+                    HStack {
+                        Identicon(identicon: value.signed_by.identicon)
+                        VStack {
+                            Text(value.signed_by.hex)
+                            Text(value.signed_by.encryption)
+                        }
                     }
+                    Text("in network")
+                    Text(value.network_name)
+                    Text("Comment :")
+                    Text(String(decoding: Data(base64Encoded: value.user_comment) ?? Data(), as: UTF8.self))
                 }
             case .typesAdded(_): HistoryCardTemplate(
                 image: "plus.viewfinder",

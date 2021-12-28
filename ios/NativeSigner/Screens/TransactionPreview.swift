@@ -15,17 +15,7 @@ struct TransactionPreview: View {
     var body: some View {
         ZStack {
             VStack {
-                ZStack {
-                    RoundedRectangle(cornerRadius: 8).stroke(Color("Crypto400"))
-                ScrollView {
-                    LazyVStack {
-                        ForEach(content.content.assemble(), id: \.index) { card in
-                            TransactionCardView(card: card)
-                        }
-                    }
-                }
-                    
-                }
+                TransactionBlock(cards: content.content.assemble())
                 if (content.type == .sign) {
                     if let address = content.author_info {
                         AddressCard(address: address.intoAddress())
