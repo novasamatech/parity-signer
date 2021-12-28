@@ -70,7 +70,7 @@ pub fn print_history_entry_by_order_with_decoding(order: u32, database_name: &st
     let entry = get_history_entry_by_order(order, database_name)?;
     Ok(entry.show(|a| {
         match decode_signable_from_history (a, database_name) {
-            Ok(b) => b,
+            Ok(b) => format!("{{{}}}", b),
             Err(e) => format!("\"error\":[{}],\"raw_transaction\":\"{}\"", Card::Error(e).card(&mut 0,0), hex::encode(a.transaction()))
         }
     }))
