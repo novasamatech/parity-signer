@@ -227,17 +227,7 @@ impl State {
                         Screen::DeriveKey(ref derive_state) => {
                             new_navstate.screen = Screen::DeriveKey(derive_state.update(details_str));
                             match db_handling::identities::try_create_address (&derive_state.seed_name(), secret_seed_phrase, details_str, &derive_state.network_specs_key(), dbname) {
-                                Ok(()) => {
-                                    match KeysState::new(&derive_state.seed_name(), dbname) {
-                                        Ok(a) => {
-                                            new_navstate = Navstate::clean_screen(Screen::Keys(a))
-                                        },
-                                        Err(e) => {
-                                            new_navstate.alert = Alert::Error;
-                                            errorline.push_str(&<Signer>::show(&e));
-                                        },
-                                    }
-                                },
+                                Ok(()) => {new_navstate = Navstate::clean_screen(Screen::Keys(KeysState::new_in_network(&derive_state.seed_name(), &derive_state.network_specs_key())))},
                                 Err(e) => {
                                     new_navstate.alert = Alert::Error;
                                     errorline.push_str(&<Signer>::show(&e));

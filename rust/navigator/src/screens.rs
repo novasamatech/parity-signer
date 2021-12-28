@@ -90,6 +90,13 @@ impl KeysState {
             swiped_key: None,
         })
     }
+    pub fn new_in_network(seed_name: &str, network_specs_key: &NetworkSpecsKey) -> Self {
+        Self {
+            seed_name: seed_name.to_string(),
+            network: network_specs_key.to_owned(),
+            swiped_key: None,
+        }
+    }
     pub fn change_network(&self, network_specs_key: &NetworkSpecsKey) -> Self {
         Self {
             seed_name: self.seed_name(),
