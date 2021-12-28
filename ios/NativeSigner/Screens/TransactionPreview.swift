@@ -23,22 +23,28 @@ struct TransactionPreview: View {
                     if let network = content.network_info {
                         NetworkCard(title: network.network_title, logo: network.network_logo)
                     }
-                    Text("Comment (not published)")
-                    TextField("comment", text: $comment, prompt: Text("enter comment"))
+                    //Text("Comment (not published)")
+                    ZStack {
+                        RoundedRectangle(cornerRadius: 8).stroke(Color("Border400")).frame(height: 39)
+                    TextField("comment", text: $comment, prompt: Text("Comment (not published)"))
                         .foregroundColor(Color("Text400"))
                         .background(Color("Bg100"))
-                        .border(Color("Border400"), width: 1)
+                        .font(FBase(style: .body2))
+                        //.border(Color("Border400"), width: 1)
                         .focused($focus)
                         .onDisappear {
                             focus = false
                         }
+                        .padding(.horizontal, 8)
+                    }
                 }
                 Spacer()
                 VStack {
                     switch content.type {
                     case .sign:
                         BigButton(
-                            text: "Sign",
+                            text: "Unlock key and sign",
+                            isShaded: true,
                             isCrypto: true,
                             action: {
                                 focus = false
