@@ -293,6 +293,7 @@ pub enum Event {
     IdentitiesWiped,
     DeviceWasOnline,
     ResetDangerRecord,
+    SeedCreated(String),
     SeedNameWasShown(String), // for individual seed_name
     Warning(String), // TODO change to actual crate warning
     WrongPassword,
@@ -333,6 +334,7 @@ impl Event {
             Event::IdentitiesWiped => String::from("\"event\":\"identities_wiped\""),
             Event::DeviceWasOnline => String::from("\"event\":\"device_online\""),
             Event::ResetDangerRecord => String::from("\"event\":\"reset_danger_record\""),
+            Event::SeedCreated(x) => format!("\"event\":\"seed_created\",\"payload\":\"{}\"", x),
             Event::SeedNameWasShown(seed_name) => format!("\"event\":\"seed_name_shown\",\"payload\":\"{}\"", seed_name),
             Event::Warning(x) => format!("\"event\":\"warning\",\"payload\":\"{}\"", x),
             Event::WrongPassword => String::from("\"event\":\"wrong_password_entered\""),
@@ -399,6 +401,7 @@ pub fn all_events_preview() -> Vec<Event> {
     events.push(Event::IdentitiesWiped);
     events.push(Event::DeviceWasOnline);
     events.push(Event::ResetDangerRecord);
+    events.push(Event::SeedCreated(String::from("Alice")));
     events.push(Event::SeedNameWasShown(String::from("AliceSecretSeed")));
     events.push(Event::Warning(String::from("Received network information is not verified.")));
     events.push(Event::WrongPassword);

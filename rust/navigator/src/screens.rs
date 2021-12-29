@@ -33,12 +33,19 @@ pub enum Screen {
     Nowhere,
 }
 
+#[derive(Debug, Clone)]
+pub enum SpecialtyKeysState {
+    None,
+    Swiped(MultiSigner),
+    MultiSelect(Vec<MultiSigner>),
+}
+
 ///State of keys screen
 #[derive(Debug, Clone)]
 pub struct KeysState {
     seed_name: String,
     network: NetworkSpecsKey,
-    swiped_key: Option<MultiSigner>,
+    specialty: SpecialtyKeysState,
 }
 
 ///State of screen with 1 key
@@ -87,21 +94,21 @@ impl KeysState {
         Ok(Self {
             seed_name: seed_name.to_string(),
             network: NetworkSpecsKey::from_parts(&network_specs.genesis_hash.to_vec(), &network_specs.encryption),
-            swiped_key: None,
+            specialty: SpecialtyKeysState::None,
         })
     }
     pub fn new_in_network(seed_name: &str, network_specs_key: &NetworkSpecsKey) -> Self {
         Self {
             seed_name: seed_name.to_string(),
             network: network_specs_key.to_owned(),
-            swiped_key: None,
+            specialty: SpecialtyKeysState::None,
         }
     }
     pub fn change_network(&self, network_specs_key: &NetworkSpecsKey) -> Self {
         Self {
             seed_name: self.seed_name(),
             network: network_specs_key.to_owned(),
-            swiped_key: None,
+            specialty: SpecialtyKeysState::None,
         }
     }
     pub fn seed_name(&self) -> String {
@@ -110,21 +117,67 @@ impl KeysState {
     pub fn network_specs_key(&self) -> NetworkSpecsKey {
         self.network.to_owned()
     }
+    pub fn get_specialty(&self) -> SpecialtyKeysState {
+        self.specialty.to_owned()
+    }
     pub fn swipe(&self, multisigner: &MultiSigner) -> Self {
+        let specialty = match &self.specialty {
+            SpecialtyKeysState::None => SpecialtyKeysState::Swiped(multisigner.to_owned()),
+            SpecialtyKeysState::Swiped(swiped_multisigner) => {
+                if swiped_multisigner == multisigner {SpecialtyKeysState::None}
+                else {SpecialtyKeysState::Swiped(multisigner.to_owned())}
+            },
+            SpecialtyKeysState::MultiSelect(_) => self.specialty.to_owned(),
+        };
         Self {
             seed_name: self.seed_name(),
             network: self.network_specs_key(),
-            swiped_key: Some(multisigner.to_owned()),
+            specialty,
+        }
+    }
+    pub fn select_single(&self, multisigner: &MultiSigner) -> Self {
+        let specialty = match &self.specialty {
+            SpecialtyKeysState::None => SpecialtyKeysState::MultiSelect(vec![multisigner.to_owned()]),
+            SpecialtyKeysState::Swiped(_) => self.specialty.to_owned(),
+            SpecialtyKeysState::MultiSelect(multiselect) => {
+                let mut new_multiselect = multiselect.to_owned();
+                if multiselect.contains(multisigner) {
+                    new_multiselect = new_multiselect.into_iter().filter(|a| a != multisigner).collect();
+                }
+                else {new_multiselect.push(multisigner.to_owned());}
+                SpecialtyKeysState::MultiSelect(new_multiselect)
+            },
+        };
+        Self {
+            seed_name: self.seed_name(),
+            network: self.network_specs_key(),
+            specialty,
+        }
+    }
+    pub fn select_set(&self, set: Vec<MultiSigner>) -> Self {
+        Self {
+            seed_name: self.seed_name(),
+            network: self.network_specs_key(),
+            specialty: SpecialtyKeysState::MultiSelect(set),
         }
     }
     pub fn get_swiped_key(&self) -> Option<MultiSigner> {
-        self.swiped_key.to_owned()
+        if let SpecialtyKeysState::Swiped(ref multisigner) = self.specialty {Some(multisigner.to_owned())}
+        else {None}
     }
-    pub fn deselect_swipe(&self) -> Self {
+    pub fn get_multiselect_keys(&self) -> Vec<MultiSigner> {
+        if let SpecialtyKeysState::MultiSelect(ref multiselect) = self.specialty {multiselect.to_vec()}
+        else {Vec::new()}
+    }
+    pub fn is_multiselect(&self) -> bool {
+        if let SpecialtyKeysState::MultiSelect(_) = self.specialty {true}
+        else {false}
+    }
+    pub fn deselect_specialty(&self) -> Self {
         Self {
             seed_name: self.seed_name(),
             network: self.network_specs_key(),
-            swiped_key: None,
+            specialty: SpecialtyKeysState::None,
         }
     }
 }
@@ -151,7 +204,7 @@ impl AddressState {
         KeysState {
             seed_name: self.keys_state.seed_name(),
             network: self.keys_state.network_specs_key(),
-            swiped_key: None,
+            specialty: SpecialtyKeysState::None,
         }
     }
     pub fn seed_name(&self) -> String {
@@ -201,7 +254,7 @@ impl DeriveState {
         KeysState {
             seed_name: self.keys_state.seed_name(),
             network: self.keys_state.network_specs_key(),
-            swiped_key: None,
+            specialty: SpecialtyKeysState::None,
         }
     }
     pub fn seed_name(&self) -> String {

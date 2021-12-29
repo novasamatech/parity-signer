@@ -245,7 +245,7 @@ fn populate_addresses<T: ErrorSource> (database_name: &str, entry_batch: Batch, 
 /// Generate new seed and populate all known networks with default accounts
 pub fn try_create_seed (seed_name: &str, seed_phrase: &str, roots: bool, database_name: &str) -> Result<(), ErrorSigner> {
     let mut id_batch = Batch::default();
-    let mut events: Vec<Event> = Vec::new();
+    let mut events: Vec<Event> = vec![Event::SeedCreated(seed_name.to_string())];
     for encryption in vec![Encryption::Ed25519, Encryption::Sr25519, Encryption::Ecdsa].into_iter() {
         let seed_object = SeedObject {
             seed_name: seed_name.to_string(),
@@ -301,22 +301,30 @@ pub fn suggest_path_name(path_all: &str) -> String {
     output
 }
 
-/// Function prepares removal of the address by public key and network id
+/// Function removes address by multisigner identifier and and network id
 /// Function removes network_key from network_id vector for database record with address_key corresponding to given public key
 pub fn remove_key(database_name: &str, multisigner: &MultiSigner, network_specs_key: &NetworkSpecsKey) -> Result<(), ErrorSigner> {
+    remove_keys_set(database_name, &vec![multisigner.to_owned()], network_specs_key)
+}
+
+/// Function removes a set of addresses within one network by set of multisigner identifier and and network id
+/// Function removes network_key from network_id vector for a defined set of database records
+pub fn remove_keys_set(database_name: &str, multiselect: &Vec<MultiSigner>, network_specs_key: &NetworkSpecsKey) -> Result<(), ErrorSigner> {
     let mut id_batch = Batch::default();
     let mut events: Vec<Event> = Vec::new();
     let network_specs = get_network_specs(database_name, network_specs_key)?;
-    let public_key = multisigner_to_public(multisigner);
-    let address_key = AddressKey::from_multisigner(multisigner);
-    let mut address_details = get_address_details(database_name, &address_key)?;
-    let identity_history = IdentityHistory::get(&address_details.seed_name, &network_specs.encryption, &public_key, &address_details.path, &network_specs.genesis_hash.to_vec());
-    events.push(Event::IdentityRemoved(identity_history));
-    address_details.network_id = address_details.network_id.into_iter().filter(|id| id != network_specs_key).collect();
-    if address_details.network_id.is_empty() {id_batch.remove(address_key.key())}
-    else {id_batch.insert(address_key.key(), address_details.encode())}
+    for multisigner in multiselect.iter() {
+        let public_key = multisigner_to_public(multisigner);
+        let address_key = AddressKey::from_multisigner(multisigner);
+        let mut address_details = get_address_details(database_name, &address_key)?;
+        let identity_history = IdentityHistory::get(&address_details.seed_name, &network_specs.encryption, &public_key, &address_details.path, &network_specs.genesis_hash.to_vec());
+        events.push(Event::IdentityRemoved(identity_history));
+        address_details.network_id = address_details.network_id.into_iter().filter(|id| id != network_specs_key).collect();
+        if address_details.network_id.is_empty() {id_batch.remove(address_key.key())}
+        else {id_batch.insert(address_key.key(), address_details.encode())}
+    }
     TrDbCold::new()
-        .set_addresses(id_batch) // modify existing address entry
+        .set_addresses(id_batch) // modify existing address entries
         .set_history(events_to_batch::<Signer>(&database_name, events)?) // add corresponding history
         .apply::<Signer>(&database_name)
 }
@@ -747,7 +755,7 @@ mod tests {
         assert!(history_printed.contains(element2), "\nReal history check2:\n{}", history_printed);
         try_create_seed("Alice", SEED, true, dbname).unwrap();
         let history_printed_after_create_seed = print_history(dbname).unwrap();
-        let element3 = r#""events":[{"event":"identity_added","payload":{"seed_name":"Alice","encryption":"sr25519","public_key":"46ebddef8cd9bb167dc30878d7113b7e168e6f0646beffd77d69d39bad76b47a","path":"","network_genesis_hash":"91b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3"}},{"event":"identity_added","payload":{"seed_name":"Alice","encryption":"sr25519","public_key":"f606519cb8726753885cd4d0f518804a69a5e0badf36fee70feadd8044081730","path":"//polkadot","network_genesis_hash":"91b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3"}},{"event":"identity_added","payload":{"seed_name":"Alice","encryption":"sr25519","public_key":"46ebddef8cd9bb167dc30878d7113b7e168e6f0646beffd77d69d39bad76b47a","path":"","network_genesis_hash":"aaf2cd1b74b5f726895921259421b534124726263982522174147046b8827897"}},{"event":"identity_added","payload":{"seed_name":"Alice","encryption":"sr25519","public_key":"96129dcebc2e10f644e81fcf4269a663e521330084b1e447369087dec8017e04","path":"//rococo","network_genesis_hash":"aaf2cd1b74b5f726895921259421b534124726263982522174147046b8827897"}},{"event":"identity_added","payload":{"seed_name":"Alice","encryption":"sr25519","public_key":"46ebddef8cd9bb167dc30878d7113b7e168e6f0646beffd77d69d39bad76b47a","path":"","network_genesis_hash":"b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe"}},{"event":"identity_added","payload":{"seed_name":"Alice","encryption":"sr25519","public_key":"64a31235d4bf9b37cfed3afa8aa60754675f9c4915430454d365c05112784d05","path":"//kusama","network_genesis_hash":"b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe"}},{"event":"identity_added","payload":{"seed_name":"Alice","encryption":"sr25519","public_key":"46ebddef8cd9bb167dc30878d7113b7e168e6f0646beffd77d69d39bad76b47a","path":"","network_genesis_hash":"e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e"}},{"event":"identity_added","payload":{"seed_name":"Alice","encryption":"sr25519","public_key":"3efeca331d646d8a2986374bb3bb8d6e9e3cfcdd7c45c2b69104fab5d61d3f34","path":"//westend","network_genesis_hash":"e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e"}}]"#;
+        let element3 = r#""events":[{"event":"seed_created","payload":"Alice"},{"event":"identity_added","payload":{"seed_name":"Alice","encryption":"sr25519","public_key":"46ebddef8cd9bb167dc30878d7113b7e168e6f0646beffd77d69d39bad76b47a","path":"","network_genesis_hash":"91b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3"}},{"event":"identity_added","payload":{"seed_name":"Alice","encryption":"sr25519","public_key":"f606519cb8726753885cd4d0f518804a69a5e0badf36fee70feadd8044081730","path":"//polkadot","network_genesis_hash":"91b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3"}},{"event":"identity_added","payload":{"seed_name":"Alice","encryption":"sr25519","public_key":"46ebddef8cd9bb167dc30878d7113b7e168e6f0646beffd77d69d39bad76b47a","path":"","network_genesis_hash":"aaf2cd1b74b5f726895921259421b534124726263982522174147046b8827897"}},{"event":"identity_added","payload":{"seed_name":"Alice","encryption":"sr25519","public_key":"96129dcebc2e10f644e81fcf4269a663e521330084b1e447369087dec8017e04","path":"//rococo","network_genesis_hash":"aaf2cd1b74b5f726895921259421b534124726263982522174147046b8827897"}},{"event":"identity_added","payload":{"seed_name":"Alice","encryption":"sr25519","public_key":"46ebddef8cd9bb167dc30878d7113b7e168e6f0646beffd77d69d39bad76b47a","path":"","network_genesis_hash":"b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe"}},{"event":"identity_added","payload":{"seed_name":"Alice","encryption":"sr25519","public_key":"64a31235d4bf9b37cfed3afa8aa60754675f9c4915430454d365c05112784d05","path":"//kusama","network_genesis_hash":"b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe"}},{"event":"identity_added","payload":{"seed_name":"Alice","encryption":"sr25519","public_key":"46ebddef8cd9bb167dc30878d7113b7e168e6f0646beffd77d69d39bad76b47a","path":"","network_genesis_hash":"e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e"}},{"event":"identity_added","payload":{"seed_name":"Alice","encryption":"sr25519","public_key":"3efeca331d646d8a2986374bb3bb8d6e9e3cfcdd7c45c2b69104fab5d61d3f34","path":"//westend","network_genesis_hash":"e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e"}}]"#;
         assert!(history_printed_after_create_seed.contains(element1), "\nReal history check3:\n{}", history_printed_after_create_seed);
         assert!(history_printed_after_create_seed.contains(element2), "\nReal history check4:\n{}", history_printed_after_create_seed);
         assert!(history_printed_after_create_seed.contains(element3), "\nReal history check5:\n{}", history_printed_after_create_seed);

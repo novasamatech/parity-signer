@@ -119,14 +119,6 @@ export! {
         db_handling::manage_history::reset_danger_status_to_safe(dbname)
     }
 
-    @Java_io_parity_signer_models_SignerDataModel_historyHistoryEntryUser
-	fn history_entry_user(
-        entry: &str,
-        dbname: &str
-	) -> anyhow::Result<(), anyhow::Error> {
-        db_handling::manage_history::history_entry_user(dbname, entry.to_string())
-    }
-
     @Java_io_parity_signer_models_SignerDataModel_historyHistoryEntrySystem
 	fn history_entry_system(
         entry: &str,
@@ -143,12 +135,6 @@ export! {
         db_handling::manage_history::seed_name_was_shown(dbname, seed_name.to_string())
     }
 
-    @Java_io_parity_signer_models_SignerDataModel_dbGetGeneralVerifier
-	fn get_general_certificate(
-        dbname: &str
-	) -> anyhow::Result<String, anyhow::Error> {
-        db_handling::helpers::display_general_verifier(dbname)
-    }
 /*
     @Java_io_parity_signer_models_SignerDataModel_testGetAllTXCards
 	fn get_all_tx_cards() -> String {

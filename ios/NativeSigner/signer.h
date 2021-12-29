@@ -68,9 +68,6 @@ int8_t get_warnings(struct ExternError*, const char* dbname);
 // Disarm log alert
 void acknowledge_warnings(struct ExternError*, const char* dbname);
 
-// Add custom record to history
-void history_entry_user(struct ExternError*, const char* enrty, const char* dbname);
-
 // Generic function to record system events
 void history_entry_system(struct ExternError*, const char* entry, const char* dbname);
 

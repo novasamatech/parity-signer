@@ -16,6 +16,8 @@ navigator = {path = "../navigator"}
 plot_icon = { git = "https://github.com/paritytech/polkadot-identicon-rust" }
 qr_reader_phone = {path = "..//qr_reader_phone"}
 rustc-hex = "2.1.0"
+transaction_parsing = {path = "../transaction_parsing"}
+transaction_signing = {path = "../transaction_signing"}
 zeroize = {version = "1.3.0", features = ["zeroize_derive"]}
 
 [lib]

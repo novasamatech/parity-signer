@@ -4,7 +4,7 @@
 use sp_runtime::MultiSigner;
 use zeroize::Zeroize;
 
-use crate::screens::{AddressState, DeriveState, KeysState, Screen, SufficientCryptoState, TransactionState};
+use crate::screens::{AddressState, DeriveState, KeysState, Screen, SpecialtyKeysState, SufficientCryptoState, TransactionState};
 use crate::modals::Modal;
 use crate::actions::Action;
 use crate::alerts::Alert;
@@ -89,11 +89,14 @@ impl State {
                                 Screen::Transaction(_) => {
                                     new_navstate.screen = Screen::Scan;
                                 },
-                                Screen::Keys(_) => {
-                                    new_navstate.screen = Screen::SeedSelector;
+                                Screen::Keys(ref keys_state) => {
+                                    match keys_state.get_specialty() {
+                                        SpecialtyKeysState::MultiSelect(_) => {new_navstate.screen = Screen::Keys(keys_state.deselect_specialty())},
+                                        _ => {new_navstate.screen = Screen::SeedSelector},
+                                    };
                                 },
-                                Screen::KeyDetails(a) => {
-                                    new_navstate.screen = Screen::Keys(a.get_keys_state());
+                                Screen::KeyDetails(address_state) => {
+                                    new_navstate.screen = Screen::Keys(address_state.get_keys_state());
                                 },
                                 Screen::NewSeed => {
                                     new_navstate.screen = Screen::SeedSelector;
@@ -156,6 +159,21 @@ impl State {
                 },
                 Action::GoForward => {
                     match self.navstate.screen {
+                        Screen::Log => {
+                            match self.navstate.modal {
+                                Modal::LogComment => {
+                                // details_str is user entered comment
+                                    match db_handling::manage_history::history_entry_user(dbname, details_str) {
+                                        Ok(()) => new_navstate = Navstate::clean_screen(Screen::Log),
+                                        Err(e) => {
+                                            new_navstate.alert = Alert::Error;
+                                            errorline.push_str(&<Signer>::show(&e));
+                                        },
+                                    }
+                                },
+                                _ => println!("GoForward does nothing here"),
+                            }
+                        },
                         Screen::NewSeed => {
                         // details_str is new seed name
                             match self.navstate.modal {
@@ -371,14 +389,27 @@ impl State {
                 Action::SelectKey => {
                     match self.navstate.screen {
                         Screen::Keys(ref keys_state) => {
-                            match AddressState::new(details_str, keys_state, dbname) {
-                                Ok(a) => {
-                                    new_navstate = Navstate::clean_screen(Screen::KeyDetails(a));
-                                },
-                                Err(e) => {
-                                    new_navstate.alert = Alert::Error;
-                                    errorline.push_str(&<Signer>::show(&e));
-                                },
+                            if keys_state.is_multiselect() {
+                                match process_hex_address_key (details_str) {
+                                    Ok(multisigner) => {
+                                        new_navstate = Navstate::clean_screen(Screen::Keys(keys_state.select_single(&multisigner)));
+                                    },
+                                    Err(e) => {
+                                        new_navstate.alert = Alert::Error;
+                                        errorline.push_str(&<Signer>::show(&e));
+                                    },
+                                }
+                            }
+                            else {
+                                match AddressState::new(details_str, keys_state, dbname) {
+                                    Ok(a) => {
+                                        new_navstate = Navstate::clean_screen(Screen::KeyDetails(a));
+                                    },
+                                    Err(e) => {
+                                        new_navstate.alert = Alert::Error;
+                                        errorline.push_str(&<Signer>::show(&e));
+                                    },
+                                }
                             }
                         },
                         _ => println!("SelectKey does nothing here"),
@@ -474,7 +505,7 @@ impl State {
                 Action::ChangeNetwork => {
                     match NetworkSpecsKey::from_hex(details_str) {
                         Ok(network_specs_key) => {
-                            if let Screen::Keys(ref k) = self.navstate.screen {new_navstate.screen = Screen::Keys(k.change_network(&network_specs_key));}
+                            if let Screen::Keys(ref keys_state) = self.navstate.screen {new_navstate.screen = Screen::Keys(keys_state.change_network(&network_specs_key));}
                             if let Modal::NetworkSelector(_) = self.navstate.modal {new_navstate.modal = Modal::NetworkSelector(network_specs_key);}
                         },
                         Err(e) => {
@@ -622,18 +653,31 @@ impl State {
                 Action::RemoveKey => {
                     match self.navstate.screen {
                         Screen::Keys(ref key_state) => {
-                            if let Some(multisigner) = key_state.get_swiped_key() {
-                                match db_handling::identities::remove_key(dbname, &multisigner, &key_state.network_specs_key()) {
-                                    Ok(()) => {
-                                        new_navstate = Navstate::clean_screen(Screen::Log);
-                                    },
-                                    Err(e) => {
-                                        new_navstate.alert = Alert::Error;
-                                        errorline.push_str(&<Signer>::show(&e));
-                                    },
-                                }
+                            match key_state.get_specialty() {
+                                SpecialtyKeysState::Swiped(ref multisigner) => {
+                                    match db_handling::identities::remove_key(dbname, &multisigner, &key_state.network_specs_key()) {
+                                        Ok(()) => {
+                                            new_navstate = Navstate::clean_screen(Screen::Log);
+                                        },
+                                        Err(e) => {
+                                            new_navstate.alert = Alert::Error;
+                                            errorline.push_str(&<Signer>::show(&e));
+                                        },
+                                    }
+                                },
+                                SpecialtyKeysState::MultiSelect(ref multiselect) => {
+                                    match db_handling::identities::remove_keys_set(dbname, &multiselect, &key_state.network_specs_key()) {
+                                        Ok(()) => {
+                                            new_navstate = Navstate::clean_screen(Screen::Log);
+                                        },
+                                        Err(e) => {
+                                            new_navstate.alert = Alert::Error;
+                                            errorline.push_str(&<Signer>::show(&e));
+                                        },
+                                    }
+                                },
+                                SpecialtyKeysState::None => println!("RemoveKey does nothing here"),
                             }
-                            else {println!("RemoveKey does nothing here")}
                         },
                         Screen::KeyDetails(ref address_state) => {
                             if let Modal::KeyDetailsAction = self.navstate.modal {
@@ -690,6 +734,17 @@ impl State {
                         _ => println!("ClearLog does nothing here"),
                     }
                 },
+                Action::CreateLogComment => {
+                    match self.navstate.screen {
+                        Screen::Log => {
+                            if let Modal::LogRight = self.navstate.modal {
+                                new_navstate.modal = Modal::LogComment;
+                            }
+                            else {println!("CreateLogComment does nothing here")}
+                        },
+                        _ => println!("CreateLogComment does nothing here"),
+                    }
+                },
                 Action::ShowLogDetails => {
                     match self.navstate.screen {
                         Screen::Log => {
@@ -707,16 +762,10 @@ impl State {
                 },
                 Action::Swipe => {
                     match self.navstate.screen {
-                        Screen::Keys(ref k) => {
+                        Screen::Keys(ref keys_state) => {
                             match process_hex_address_key (details_str) {
                                 Ok(multisigner) => {
-                                    new_navstate = {
-                                        if let Some(ref swiped_multisigner) = k.get_swiped_key() {
-                                            if swiped_multisigner == &multisigner {Navstate::clean_screen(Screen::Keys(k.deselect_swipe()))}
-                                            else {Navstate::clean_screen(Screen::Keys(k.swipe(&multisigner)))}
-                                        }
-                                        else {Navstate::clean_screen(Screen::Keys(k.swipe(&multisigner)))}
-                                    };
+                                    new_navstate = Navstate::clean_screen(Screen::Keys(keys_state.swipe(&multisigner)));
                                 },
                                 Err(e) => {
                                     new_navstate.alert = Alert::Error;
@@ -727,10 +776,54 @@ impl State {
                         _ => println!("Swipe does nothing here"),
                     }
                 },
+                Action::LongTap => {
+                    match self.navstate.screen {
+                        Screen::Keys(ref keys_state) => {
+                            match process_hex_address_key (details_str) {
+                                Ok(multisigner) => {
+                                    new_navstate = Navstate::clean_screen(Screen::Keys(keys_state.select_single(&multisigner)));
+                                },
+                                Err(e) => {
+                                    new_navstate.alert = Alert::Error;
+                                    errorline.push_str(&<Signer>::show(&e));
+                                },
+                            }
+                        },
+                        _ => println!("LongTap does nothing here"),
+                    }
+                },
+                Action::SelectAll => {
+                    match self.navstate.screen {
+                        Screen::Keys(ref keys_state) => {
+                            match keys_state.get_specialty() {
+                                SpecialtyKeysState::MultiSelect(ref multiselect) => {
+                                    match db_handling::interface_signer::addresses_set_seed_name_network(dbname, &keys_state.seed_name(), &keys_state.network_specs_key()) {
+                                        Ok(set) => {
+                                            let all: Vec<MultiSigner> = set.into_iter().map(|(multisigner, _)| multisigner).collect();
+                                            let mut complete = true;
+                                            for multisigner in all.iter() {if !multiselect.contains(multisigner) {complete = false}}
+                                            let new_multiselect = {
+                                                if complete {Vec::new()}
+                                                else {all}
+                                            };
+                                            new_navstate = Navstate::clean_screen(Screen::Keys(keys_state.select_set(new_multiselect)));
+                                        },
+                                        Err(e) => {
+                                            new_navstate.alert = Alert::Error;
+                                            errorline.push_str(&<Signer>::show(&e));
+                                        },
+                                    }
+                                },
+                                _ => println!("SelectAll does nothing here"),
+                            }
+                        },
+                        _ => println!("SelectAll does nothing here"),
+                    }
+                },
                 Action::Increment => {
                     match self.navstate.screen {
                         Screen::Keys(ref key_state) => {
-                            if let Some(multisigner) = key_state.get_swiped_key() {
+                            if let SpecialtyKeysState::Swiped(multisigner) = key_state.get_specialty() {
                                 match details_str.parse::<u32>() {
                                     Ok(increment) => {
                                         match db_handling::identities::create_increment_set(increment, &multisigner, &key_state.network_specs_key(), &secret_seed_phrase, dbname) {
@@ -811,9 +904,9 @@ impl State {
                         },
                     }
                 },
-                Screen::Keys(ref k) => {
-                    match db_handling::interface_signer::print_identities_for_seed_name_and_network(dbname, &k.seed_name(), &k.network_specs_key(), k.get_swiped_key()) {
-                        Ok(a) => a,
+                Screen::Keys(ref keys_state) => {
+                    match db_handling::interface_signer::print_identities_for_seed_name_and_network(dbname, &keys_state.seed_name(), &keys_state.network_specs_key(), keys_state.get_swiped_key(), keys_state.get_multiselect_keys()) {
+                        Ok(a) => format!("{},\"multiselect_mode\":{}", a, keys_state.is_multiselect()),
                         Err(e) => {
                             new_navstate.alert = Alert::Error;
                             errorline.push_str(&<Signer>::show(&e));
@@ -821,8 +914,8 @@ impl State {
                         },
                     }
                 },
-                Screen::KeyDetails(ref a) => {
-                    match db_handling::interface_signer::export_key (dbname, &a.multisigner(), &a.seed_name(), &a.network_specs_key()) {
+                Screen::KeyDetails(ref address_state) => {
+                    match db_handling::interface_signer::export_key (dbname, &address_state.multisigner(), &address_state.seed_name(), &address_state.network_specs_key()) {
                         Ok(a) => a,
                         Err(e) => {
                             new_navstate.alert = Alert::Error;
@@ -834,8 +927,8 @@ impl State {
                 Screen::NewSeed => format!("\"keyboard\":{}", new_navstate.keyboard()),
                 Screen::RecoverSeedName => format!("\"keyboard\":{}", new_navstate.keyboard()),
                 Screen::RecoverSeedPhrase(ref seed_name) => format!("\"seed_name\":\"{}\",\"keyboard\":{}", seed_name, new_navstate.keyboard()),
-                Screen::DeriveKey(ref d) => {
-                    match db_handling::interface_signer::derive_prep (dbname, &d.seed_name(), &d.network_specs_key(), &details_str) {
+                Screen::DeriveKey(ref derive_state) => {
+                    match db_handling::interface_signer::derive_prep (dbname, &derive_state.seed_name(), &derive_state.network_specs_key(), &details_str) {
                         Ok(a) => {
                             format!("{},\"keyboard\":{}", a, new_navstate.keyboard())
                         },
@@ -914,7 +1007,7 @@ impl State {
                     match new_navstate.screen {
                         Screen::Keys(ref keys_state) => {
                             let seed_name = keys_state.seed_name();
-                            new_navstate.screen = Screen::Keys(keys_state.deselect_swipe());
+                            new_navstate.screen = Screen::Keys(keys_state.deselect_specialty());
                             format!("\"seed\":\"{}\"", seed_name)
                         },
                         _ => "".to_string(),
@@ -1107,7 +1200,10 @@ impl State {
             Screen::Scan => "None",
             Screen::Transaction(_) => "None",
             Screen::SeedSelector => "NewSeed",
-            Screen::Keys(_) => "Backup",
+            Screen::Keys(ref keys_state) => {
+                if keys_state.is_multiselect() {"MultiSelect"}
+                else {"Backup"}
+            },
             Screen::KeyDetails(_) => "KeyMenu",
             Screen::NewSeed => "None",
             Screen::RecoverSeedName => "None",
@@ -1147,8 +1243,8 @@ impl State {
             Screen::Documents => "h4",
             Screen::Nowhere => "h4",
         }.to_string()
-
     }
+    
 }
 
 impl Navstate {
