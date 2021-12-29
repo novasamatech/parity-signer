@@ -14,7 +14,7 @@ import org.json.JSONObject
 @Composable
 fun TCAuthorPlain(payload: JSONObject, signerDataModel: SignerDataModel) {
 	Row {
-		Image(signerDataModel.getIdenticon(payload.getString("base58"), 64), "identicon", modifier = Modifier.scale(0.75f))
+		//Image(signerDataModel.getIdenticon(payload.getString("base58"), 64), "identicon", modifier = Modifier.scale(0.75f))
 		Column {
 			Text("From: ")
 			Text(payload.getString("base58"), style = Typography.body2)

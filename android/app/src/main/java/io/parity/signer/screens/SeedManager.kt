@@ -13,11 +13,11 @@ import io.parity.signer.components.SeedCard
 import io.parity.signer.models.SignerDataModel
 import io.parity.signer.models.pushButton
 import io.parity.signer.ui.theme.Bg200
+import org.json.JSONArray
 
 @Composable
 fun SeedManager(signerDataModel: SignerDataModel) {
-	val seedNames = signerDataModel.seedNames.observeAsState()
-	val cards = signerDataModel.screenData.getJSONArray("seedNameCards")
+	val cards = signerDataModel.screenData.value?.getJSONArray("seedNameCards") ?: JSONArray()
 
 	LazyColumn {
 		//keys should be defined already, can't panic

@@ -29,20 +29,18 @@ fun SignerDataModel.addSeed(seedName: String, seedPhrase: String) {
 	//Run standard login prompt!
 	authentication.authenticate(activity) {
 		try {
-			//Create relevant keys - should make sure this works before saving key
-			val finalSeedPhrase =
-				substrateTryCreateSeed(seedName, seedPhrase, 24, dbName)
+
+			TODO() //create keys etc
 
 			//Encrypt and save seed
 			with(sharedPreferences.edit()) {
-				putString(seedName, finalSeedPhrase)
+				putString(seedName, seedPhrase)
 				apply()
 			}
 
 			//Refresh model
 			refreshSeedNames()
-			selectSeed(seedName)
-			_backupSeedPhrase.value = finalSeedPhrase
+
 			//TODO: shis should result in navigation event
 		} catch (e: java.lang.Exception) {
 			_lastError.value = e.toString()
@@ -52,38 +50,8 @@ fun SignerDataModel.addSeed(seedName: String, seedPhrase: String) {
 }
 
 /**
- * Seed selector; does not check if seedname is valid
- * TODO: check that all related operations are done
- */
-fun SignerDataModel.selectSeed(seedName: String) {
-	_selectedSeed.value = seedName
-	fetchKeys()
-}
-
-/**
  * Fetch seed from strongbox; must be in unlocked scope
  */
-internal fun SignerDataModel.getSeed(): String {
-	return sharedPreferences.getString(selectedSeed.value, "") ?: ""
+internal fun SignerDataModel.getSeed(seedName: String): String {
+	return sharedPreferences.getString(seedName, "") ?: ""
 }
-
-/**
- * Selects seed key, if available
- */
-fun SignerDataModel.getRootIdentity(seedName: String): JSONObject {
-	for (i in 0 until identities.value!!.length()) {
-		val identity = identities.value!!.getJSONObject(i)
-		if (identity.getString("seed_name") == seedName && identity.getString("path") == "" && identity.getString(
-				"has_password"
-			) == "false"
-		) {
-			return identity
-		}
-	}
-	return JSONObject()
-}
-
-fun SignerDataModel.removeSeed() {
-
-}
-//MARK: Seed management end

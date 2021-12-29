@@ -11,7 +11,6 @@ import androidx.compose.ui.draw.scale
 import androidx.compose.ui.unit.dp
 import io.parity.signer.models.SignerDataModel
 import io.parity.signer.models.abbreviateString
-import io.parity.signer.models.getRootIdentity
 import io.parity.signer.models.intoImageBitmap
 import io.parity.signer.ui.theme.CryptoTypography
 import io.parity.signer.ui.theme.Text300
@@ -36,12 +35,6 @@ fun SeedCard(
 		Spacer(modifier = Modifier.width(10.dp))
 		Column {
 			Text(seedName, color = Text600, style = MaterialTheme.typography.subtitle1)
-			if (!seedSelector) {
-				Text(
-					signerDataModel.getRootIdentity(seedName).optString("ss58")
-						.abbreviateString(8), color = Text300, style = CryptoTypography.body2
-				)
-			}
 		}
 	}
 }

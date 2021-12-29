@@ -24,7 +24,7 @@ import org.json.JSONObject
 fun KeyCard(identity: JSONObject, signerDataModel: SignerDataModel) {
 	Row (modifier = Modifier
 		.padding(8.dp)) {
-		Image(signerDataModel.getIdenticon(identity.get("ss58").toString(), 64), "identicon", modifier = Modifier.scale(0.75f))
+		//Image(signerDataModel.getIdenticon(identity.get("ss58").toString(), 64), "identicon", modifier = Modifier.scale(0.75f))
 		Spacer(modifier = Modifier.width(10.dp))
 		Column {
 			Text(identity.get("path").toString(), color = MaterialTheme.colors.onBackground, style = CryptoTypography.body2)

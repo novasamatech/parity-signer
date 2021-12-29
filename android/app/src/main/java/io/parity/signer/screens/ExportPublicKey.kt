@@ -18,7 +18,6 @@ import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import io.parity.signer.components.KeyCard
 import io.parity.signer.models.SignerDataModel
-import io.parity.signer.models.exportPublicKey
 import org.json.JSONObject
 import kotlin.math.roundToInt
 import kotlin.math.sign
@@ -27,8 +26,6 @@ import kotlin.math.sign
 @ExperimentalAnimationApi
 @Composable
 fun ExportPublicKey(signerDataModel: SignerDataModel) {
-	val selectedIdentity = signerDataModel.selectedIdentity.observeAsState()
-	val selectedNetwork = signerDataModel.selectedNetwork.observeAsState()
 	val swipeableState = rememberSwipeableState(initialValue = 0)
 
 	Column(
@@ -42,33 +39,9 @@ fun ExportPublicKey(signerDataModel: SignerDataModel) {
 			)
 	) {
 		Column(Modifier.padding(8.dp)) {
-			AnimatedContent(
-				targetState = selectedIdentity
-			) {
-				KeyCard(
-					selectedIdentity.value ?: JSONObject(),
-					signerDataModel = signerDataModel
-				)
-			}
+
 			Spacer(Modifier.padding(8.dp))
-			Text(selectedNetwork.value!!.get("title").toString())
-		}
-		AnimatedContent(
-			targetState = selectedIdentity
-		) {
-			Image(
-				bitmap = signerDataModel.exportPublicKey(),
-				contentDescription = "QR with public key to scan",
-				contentScale = ContentScale.FillWidth,
-				modifier = Modifier
-					.offset {
-						IntOffset(
-							swipeableState.offset.value.roundToInt(),
-							0
-						)
-					}
-					.fillMaxWidth()
-			)
+			//Text(selectedNetwork.value!!.get("title").toString())
 		}
 	}
 }

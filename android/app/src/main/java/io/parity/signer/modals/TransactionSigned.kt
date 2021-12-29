@@ -14,7 +14,6 @@ import androidx.compose.ui.unit.dp
 import io.parity.signer.components.transactionCards.TCAuthor
 import io.parity.signer.components.transactionCards.TCAuthorPlain
 import io.parity.signer.models.SignerDataModel
-import io.parity.signer.models.getSignedQR
 
 @Composable
 fun TransactionSigned(signerDataModel: SignerDataModel) {
@@ -40,12 +39,12 @@ fun TransactionSigned(signerDataModel: SignerDataModel) {
 		}
 		Text("Your signature")
 		Text("Scan this into your application")
-		Image(
+		/*Image(
 			bitmap = signerDataModel.getSignedQR(),
 			contentDescription = "Signed transaction",
 			contentScale = ContentScale.FillWidth,
 			modifier = Modifier.fillMaxWidth()
-		)
+		)*/
 
 	}
 }

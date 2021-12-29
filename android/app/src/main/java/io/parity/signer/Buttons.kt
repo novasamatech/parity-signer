@@ -19,10 +19,34 @@ enum class ButtonID {
 	Delete,
 	NewSeed,
 	RecoverSeed,
-	NetworkSelector;
+	NetworkSelector,
+	NextUnit,
+	PreviousUnit,
+	NewKey,
+	BackupSeed,
+	CheckPassword,
+	ChangeNetwork,
+	TransactionFetched,
+	RemoveNetwork,
+	RemoveMetadata,
+	RemoveTypes,
+	SignNetworkSpecs,
+	SignMetadata,
+	SignTypes,
+	ManageNetworks,
+	ViewGeneralVerifier,
+	ManageMetadata,
+	RemoveKey,
+	RemoveSeed,
+	ClearLog,
+	ShowLogDetails,
+	Swipe,
+	Increment,
+	ShowDocuments;
+
 
 	fun getName(): String {
-		return when(this) {
+		return when (this) {
 			NavbarLog -> "Log"
 			NavbarScan -> "Scan"
 			NavbarKeys -> "Keys"

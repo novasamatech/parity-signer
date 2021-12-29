@@ -16,7 +16,6 @@ import io.parity.signer.ButtonID
 import io.parity.signer.SignerModal
 import io.parity.signer.components.KeySelector
 import io.parity.signer.components.NetworkCard
-import io.parity.signer.components.NetworkSelector
 import io.parity.signer.components.SeedCard
 import io.parity.signer.modals.*
 import io.parity.signer.models.*
@@ -57,7 +56,7 @@ fun KeyManager(signerDataModel: SignerDataModel) {
 				.fillMaxWidth()
 		) {
 			Row {
-				NetworkCard(signerDataModel.selectedNetwork.value?: JSONObject())
+				//NetworkCard(signerDataModel.selectedNetwork.value?: JSONObject())
 				Icon(Icons.Default.ArrowCircleDown, "More networks")
 				Spacer(modifier = Modifier.weight(1f))
 			}

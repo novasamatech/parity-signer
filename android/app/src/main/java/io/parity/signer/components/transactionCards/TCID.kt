@@ -12,7 +12,7 @@ import io.parity.signer.models.SignerDataModel
 @Composable
 fun TCID(id: String, signerDataModel: SignerDataModel) {
 	Row {
-		Image(signerDataModel.getIdenticon(id, 64), "identicon", modifier = Modifier.scale(0.75f))
+		//Image(signerDataModel.getIdenticon(id, 64), "identicon", modifier = Modifier.scale(0.75f))
 		Column {
 			Text(id)
 			//Text(identity.get("public_key").toString(), style = Typography.body2)

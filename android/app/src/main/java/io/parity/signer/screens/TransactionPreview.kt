@@ -19,7 +19,6 @@ import io.parity.signer.components.TransactionCard
 import io.parity.signer.components.transactionCards.TCAuthor
 import io.parity.signer.components.transactionCards.TCAuthorPlain
 import io.parity.signer.models.SignerDataModel
-import io.parity.signer.models.acceptTransaction
 import io.parity.signer.ui.theme.Crypto400
 import io.parity.signer.ui.theme.Text300
 
@@ -69,7 +68,7 @@ fun TransactionPreview(signerDataModel: SignerDataModel) {
 				horizontalArrangement = Arrangement.Center,
 				modifier = Modifier
 					.fillMaxWidth()
-					.clickable { signerDataModel.acceptTransaction() }
+					.clickable {  }
 			) {
 				Text("Accept")
 			}

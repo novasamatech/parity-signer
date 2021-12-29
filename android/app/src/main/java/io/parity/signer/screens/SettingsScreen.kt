@@ -23,7 +23,6 @@ import io.parity.signer.models.SignerDataModel
  */
 @Composable
 fun SettingsScreen(signerDataModel: SignerDataModel) {
-	val generalCertificate = signerDataModel.generalCertificate.observeAsState()
 
 	Column {
 		Row(
@@ -37,6 +36,7 @@ fun SettingsScreen(signerDataModel: SignerDataModel) {
 		) { Text("Wipe general certificate") }
 		Spacer(modifier = Modifier.padding(10.dp))
 		Text("General certificate")
+		/*
 		Row {
 			Image(
 				signerDataModel.getHexIdenticon(
@@ -49,7 +49,7 @@ fun SettingsScreen(signerDataModel: SignerDataModel) {
 				Text(generalCertificate.value?.optString("encryption") ?: "none")
 				Text(generalCertificate.value?.optString("hex") ?: "")
 			}
-		}
+		}*/
 		Spacer(modifier = Modifier.padding(10.dp))
 		Text(
 			"Hardware seed protection: " + signerDataModel.isStrongBoxProtected()

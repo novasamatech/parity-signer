@@ -17,17 +17,12 @@ import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
 import io.parity.signer.models.SignerDataModel
 import io.parity.signer.models.addKey
-import io.parity.signer.models.proposeDerivePath
-import io.parity.signer.models.proposeIncrement
 
 @Composable
 fun NewKeyModal(signerDataModel: SignerDataModel, increment: Boolean) {
 	var derivationPath by remember {
 		mutableStateOf(
-			if (increment)
-				signerDataModel.proposeIncrement()
-			else
-				signerDataModel.proposeDerivePath()
+			""
 		)
 	}
 
@@ -100,20 +95,6 @@ fun NewKeyModal(signerDataModel: SignerDataModel, increment: Boolean) {
 			)
 		}
 		Row {
-			TextButton(
-				colors = ButtonDefaults.buttonColors(
-					backgroundColor = MaterialTheme.colors.background,
-					contentColor = MaterialTheme.colors.onBackground
-				),
-				onClick = {
-					password = ""
-					passwordRepeat = ""
-					derivationPath = signerDataModel.proposeIncrement()
-				},
-				enabled = true
-			) {
-				Text("Suggest N+1")
-			}
 			TextButton(
 				colors = ButtonDefaults.buttonColors(
 					backgroundColor = MaterialTheme.colors.background,

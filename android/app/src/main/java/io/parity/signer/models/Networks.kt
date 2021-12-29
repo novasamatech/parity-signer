@@ -16,22 +16,3 @@ data class Network(
 	val title: String
 )
 
-/**
- * Get network list updated; call after any networks-altering operation
- * and on init and on refresh just in case
- */
-internal fun SignerDataModel.refreshNetworks() {
-	try {
-		val networkJSON = dbGetAllNetworksForNetworkSelector(dbName)
-		_networks.value = JSONArray(networkJSON)
-		fetchKeys()
-	} catch (e: java.lang.Exception) {
-		Log.e("Refresh network error", e.toString())
-	}
-}
-
-fun SignerDataModel.selectNetwork(network: JSONObject) {
-	_selectedNetwork.value = network
-	fetchKeys()
-}
-

@@ -4,7 +4,6 @@ import androidx.compose.material.*
 import androidx.compose.runtime.Composable
 import io.parity.signer.ButtonID
 import io.parity.signer.models.SignerDataModel
-import io.parity.signer.models.deleteKey
 import io.parity.signer.models.pushButton
 
 @Composable

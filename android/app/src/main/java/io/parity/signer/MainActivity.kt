@@ -43,9 +43,9 @@ class MainActivity : AppCompatActivity() {
 fun SignerApp(signerDataModel: SignerDataModel) {
 	ParitySignerTheme {
 		val onBoardingDone = signerDataModel.onBoardingDone.observeAsState()
-		val signerScreen = signerDataModel.signerScreen.observeAsState()
-		val signerModal = signerDataModel.signerModal.observeAsState()
-		val signerAlert = signerDataModel.signerAlert.observeAsState()
+		val signerScreen = signerDataModel.screen.observeAsState()
+		val signerModal = signerDataModel.modal.observeAsState()
+		val signerAlert = signerDataModel.alert.observeAsState()
 
 		when (onBoardingDone.value) {
 			OnBoardingState.Yes -> {

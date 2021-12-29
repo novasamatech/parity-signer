@@ -39,11 +39,11 @@ fun ScreenSelector(screen: SignerScreen?, signerDataModel: SignerDataModel) {
 		SignerScreen.KeyDetails -> {
 			ExportPublicKey(signerDataModel = signerDataModel)
 		}
-		SignerScreen.Backup -> {
-			SeedBackup(signerDataModel = signerDataModel)
-		}
 		SignerScreen.NewSeed -> {
-			NewSeedScreen(signerDataModel::pushButton, signerDataModel = signerDataModel)
+			NewSeedScreen(
+				signerDataModel::pushButton,
+				signerDataModel = signerDataModel
+			)
 		}
 		SignerScreen.RecoverSeedName -> {
 			RecoverSeedScreen(signerDataModel = signerDataModel)
@@ -55,32 +55,47 @@ fun ScreenSelector(screen: SignerScreen?, signerDataModel: SignerDataModel) {
 			NewKeyModal(signerDataModel = signerDataModel, increment = false)
 		}
 		SignerScreen.Verifier -> TODO()
-		SignerScreen.ManageNetwork -> TODO()
 		null -> WaitingScreen()
+		SignerScreen.ManageNetworks -> TODO()
+		SignerScreen.NetworkDetails -> TODO()
+		SignerScreen.SignSufficientCrypto -> TODO()
+		SignerScreen.SelectSeedForBackup -> TODO()
+		SignerScreen.Documents -> TODO()
 	}
 }
 
 @Composable
 fun ModalSelector(modal: SignerModal, signerDataModel: SignerDataModel) {
-	when(modal) {
+	when (modal) {
 		SignerModal.Empty -> {}
-		SignerModal.SeedDeleteConfirm -> TODO()
-		SignerModal.KeyDeleteConfirm -> KeyDelete(signerDataModel = signerDataModel)
 		SignerModal.NewSeedMenu -> NewSeedMenu(signerDataModel = signerDataModel)
 		SignerModal.SeedMenu -> TODO()
+		SignerModal.NetworkMenu -> TODO()
+		SignerModal.Backup -> TODO()
+		SignerModal.PasswordConfirm -> TODO()
+		SignerModal.SignatureReady -> TODO()
+		SignerModal.EnterPassword -> TODO()
+		SignerModal.LogRight -> TODO()
+		SignerModal.NetworkDetailsMenu -> TODO()
+		SignerModal.ManageMetadata -> TODO()
+		SignerModal.SufficientCryptoReady -> TODO()
+		SignerModal.KeyDetailsAction -> TODO()
+		SignerModal.TypesInfo -> TODO()
+		SignerModal.NewSeedBackup -> TODO()
 	}
 }
 
 @Composable
 fun AlertSelector(alert: SignerAlert, signerDataModel: SignerDataModel) {
-	when(alert) {
+	when (alert) {
 		SignerAlert.Empty -> {}
 		SignerAlert.Error -> ErrorModal(
-			error = signerDataModel.screenData.optString(
+			error = signerDataModel.screenData.value?.optString(
 				"error"
 			) ?: "unknown error", signerDataModel = signerDataModel
 		)
 		SignerAlert.Shield -> ShieldAlert(signerDataModel)
+		SignerAlert.Confirm -> TODO()
 	}
 }
 
@@ -89,43 +104,49 @@ fun AlertSelector(alert: SignerAlert, signerDataModel: SignerDataModel) {
  * All screens metadata for navigation
  */
 enum class SignerScreen {
+	Scan,
+	Keys,
+	Settings,
 	Log,
 	LogDetails,
-	Scan,
 	Transaction,
 	SeedSelector,
-	Keys,
 	KeyDetails,
-	Backup,
 	NewSeed,
 	RecoverSeedName,
 	RecoverSeedPhrase,
 	DeriveKey,
-	Settings,
 	Verifier,
-	ManageNetwork;
-}
-
-enum class TransactionState {
-	None,
-	Parsing,
-	Preview,
-	Password,
-	Signed;
+	ManageNetworks,
+	NetworkDetails,
+	SignSufficientCrypto,
+	SelectSeedForBackup,
+	Documents;
 }
 
 enum class SignerModal {
 	Empty,
 	NewSeedMenu,
+	NetworkMenu,
 	SeedMenu,
-	SeedDeleteConfirm,
-	KeyDeleteConfirm;
+	Backup,
+	PasswordConfirm,
+	SignatureReady,
+	EnterPassword,
+	LogRight,
+	NetworkDetailsMenu,
+	ManageMetadata,
+	SufficientCryptoReady,
+	KeyDetailsAction,
+	TypesInfo,
+	NewSeedBackup;
 }
 
 enum class SignerAlert {
 	Empty,
 	Error,
-	Shield;
+	Shield,
+	Confirm;
 }
 
 enum class OnBoardingState {

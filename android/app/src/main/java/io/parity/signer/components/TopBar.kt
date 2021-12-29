@@ -5,24 +5,20 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.material.*
 import androidx.compose.material.ButtonDefaults.buttonColors
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.AddCircle
 import androidx.compose.material.icons.filled.AddCircleOutline
-import androidx.compose.material.icons.filled.List
 import androidx.compose.material.icons.filled.MoreVert
-import androidx.compose.material.icons.outlined.AddCircle
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Modifier
 import io.parity.signer.ButtonID
-import io.parity.signer.SignerScreen
 import io.parity.signer.models.*
 import io.parity.signer.ui.theme.Bg100
 import io.parity.signer.ui.theme.Text500
 
 @Composable
 fun TopBar(signerDataModel: SignerDataModel) {
-	val backButton = signerDataModel.backButton.observeAsState()
-	val screenName = signerDataModel.screenName.observeAsState()
+	val backButton = signerDataModel.back.observeAsState()
+	val screenName = signerDataModel.screenLabel.observeAsState()
 	val screenNameType = signerDataModel.screenNameType.observeAsState()
 	val rightButton = signerDataModel.rightButton.observeAsState()
 

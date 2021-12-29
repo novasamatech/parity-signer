@@ -16,13 +16,11 @@ import io.parity.signer.models.acknowledgeBackup
  */
 @Composable
 fun SeedBackup(signerDataModel: SignerDataModel) {
-	val selectedSeed = signerDataModel.selectedSeed.observeAsState()
-	val backupSeedPhrase = signerDataModel.backupSeedPhrase.observeAsState()
 
 	Column {
 		Text("Please back up seed phrase")
-		Text(selectedSeed.value?:"")
-		Text(backupSeedPhrase.value?:"")
+		//Text(selectedSeed.value?:"")
+		//Text(backupSeedPhrase.value?:"")
 		TextButton(
 			colors = ButtonDefaults.buttonColors(
 				backgroundColor = MaterialTheme.colors.background,

@@ -10,7 +10,7 @@ import io.parity.signer.models.SignerDataModel
 
 @Composable
 fun NavbarShield(signerDataModel: SignerDataModel) {
-	val alert = signerDataModel.alert.observeAsState()
+	val alert = signerDataModel.alertState.observeAsState()
 
 	when(alert.value) {
 		ShieldAlert.None -> Icon(Icons.Default.GppGood, "device is safe")
