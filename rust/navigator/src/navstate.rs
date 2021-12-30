@@ -96,7 +96,7 @@ impl State {
                                     };
                                 },
                                 Screen::KeyDetails(address_state) => {
-                                    new_navstate.screen = Screen::Keys(address_state.get_keys_state());
+                                    new_navstate.screen = Screen::Keys(address_state.get_keys_state().deselect_specialty());
                                 },
                                 Screen::NewSeed => {
                                     new_navstate.screen = Screen::SeedSelector;
@@ -820,6 +820,17 @@ impl State {
                         _ => println!("SelectAll does nothing here"),
                     }
                 },
+                Action::ExportMultiSelect => {
+                    match self.navstate.screen {
+                        Screen::Keys(ref keys_state) => {
+                            if let SpecialtyKeysState::MultiSelect(ref multiselect) = keys_state.get_specialty() {
+                                new_navstate = Navstate::clean_screen(Screen::KeyDetails(AddressState::new_multiselect(keys_state.seed_name(), keys_state.network_specs_key(), multiselect)));
+                            }
+                            else {println!("ExportMultiSelect does nothing here")}
+                        },
+                        _ => println!("ExportMultiSelect does nothing here"),
+                    }
+                },
                 Action::Increment => {
                     match self.navstate.screen {
                         Screen::Keys(ref key_state) => {
@@ -906,7 +917,13 @@ impl State {
                 },
                 Screen::Keys(ref keys_state) => {
                     match db_handling::interface_signer::print_identities_for_seed_name_and_network(dbname, &keys_state.seed_name(), &keys_state.network_specs_key(), keys_state.get_swiped_key(), keys_state.get_multiselect_keys()) {
-                        Ok(a) => format!("{},\"multiselect_mode\":{}", a, keys_state.is_multiselect()),
+                        Ok(a) => {
+                            let count = {
+                                if let SpecialtyKeysState::MultiSelect(ref multiselect) = keys_state.get_specialty() {multiselect.len().to_string()}
+                                else {String::new()}
+                            };
+                            format!("{},\"multiselect_mode\":{},\"multiselect_count\":\"{}\"", a, keys_state.is_multiselect(), count)
+                        },
                         Err(e) => {
                             new_navstate.alert = Alert::Error;
                             errorline.push_str(&<Signer>::show(&e));

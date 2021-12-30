@@ -290,7 +290,7 @@ pub fn history_hex_checksum (database_name: &str) -> Result<String, ErrorSigner>
     let database = open_db::<Signer>(database_name)?;
     let history = open_tree::<Signer>(&database, HISTORY)?;
     let checksum = history.checksum().map_err(|e| ErrorSigner::Database(DatabaseSigner::Internal(e)))?;
-    Ok(format!("\"checksum\":\"{}\"", hex::encode(checksum.encode())))
+    Ok(format!("\"checksum\":\"{}\"", hex::encode(checksum.encode()).to_uppercase()))
 }
 
 #[cfg(test)]

@@ -200,6 +200,17 @@ impl AddressState {
             set
         })
     }
+    pub fn new_multiselect(seed_name: String, network: NetworkSpecsKey, multiselect: &Vec<MultiSigner>) -> Self {
+        Self {
+            keys_state: KeysState {
+                seed_name,
+                network,
+                specialty: SpecialtyKeysState::MultiSelect(multiselect.to_vec()),
+            },
+            selected: 0,
+            set: multiselect.to_owned(),
+        }
+    }
     pub fn get_keys_state(&self) -> KeysState {
         KeysState {
             seed_name: self.keys_state.seed_name(),
