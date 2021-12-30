@@ -19,12 +19,17 @@ struct KeyManager: View {
                     Button(action: {
                         data.pushButton(buttonID: .SelectKey, details: content.root.address_key)
                     }){
-                        SeedKeyCard(seedCard: content.root).gesture(DragGesture()
+                        SeedKeyCard(seedCard: content.root, multiselectMode: content.multiselect_mode).gesture(DragGesture()
                                                                         .onEnded {drag in
-                    if abs(drag.translation.height) < 20 && abs(drag.translation.width) > 20 {
-                        data.pushButton(buttonID: .Swipe, details: content.root.address_key)
-                    }
-                })
+                            if abs(drag.translation.height) < 20 && abs(drag.translation.width) > 20 {
+                                data.pushButton(buttonID: .Swipe, details: content.root.address_key)
+                            }
+                        })
+                            .gesture(LongPressGesture()
+                                        .onEnded {_ in
+                                data.pushButton(buttonID: .LongTap, details: content.root.address_key)
+                            }
+                            )
                     }.padding(2)
                     if content.root.swiped {
                         AddressCardControls(seed_name: content.root.seed_name)
@@ -52,12 +57,17 @@ struct KeyManager: View {
                                 Button(action: {
                                     data.pushButton(buttonID: .SelectKey, details: address.address_key)
                                 }){
-                                    AddressCard(address: address.intoAddress()).gesture(DragGesture()
+                                    AddressCard(address: address.intoAddress(), multiselectMode: content.multiselect_mode).gesture(DragGesture()
                                                                                             .onEnded {drag in
                                         if abs(drag.translation.height) < 20 && abs(drag.translation.width) > 20 {
                                             data.pushButton(buttonID: .Swipe, details: address.address_key)
                                         }
                                     })
+                                        .gesture(LongPressGesture()
+                                                    .onEnded {_ in
+                                            data.pushButton(buttonID: .LongTap, details: address.address_key)
+                                        }
+                                        )
                                 }.padding(2)
                                 if address.swiped {
                                     AddressCardControls(seed_name: content.root.seed_name)
@@ -67,7 +77,11 @@ struct KeyManager: View {
                     }
                 }
                 Spacer()
+                if (content.multiselect_mode) {
+                    MultiselectBottomControl(selectedCount: content.multiselect_count)
+                } else {
                 SearchKeys(searchString: $searchString)
+                }
             }
         }
     }

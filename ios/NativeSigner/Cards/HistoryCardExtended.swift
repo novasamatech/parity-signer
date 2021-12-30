@@ -104,6 +104,14 @@ struct HistoryCardExtended: View {
                 line1: "Warnings acknowledged",
                 line2: ""
             )
+            case .seedCreated(let text):
+                HistoryCardTemplate(
+                    image: "aqi.medium",
+                    timestamp: timestamp,
+                    danger: false,
+                    line1: "Seed created",
+                    line2: text
+                )
             case .seedNameWasShown(let text): HistoryCardTemplate(
                 image: "eye.trianglebadge.exclamationmark.fill",
                 timestamp: timestamp,

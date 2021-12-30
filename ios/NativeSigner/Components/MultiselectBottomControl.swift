@@ -13,14 +13,16 @@ import SwiftUI
 struct MultiselectBottomControl: View {
     @EnvironmentObject var data: SignerDataModel
     @State var delete = false
+    var selectedCount: String
     var body: some View {
         ZStack {
             HStack {
                 Button(action: {
                     delete = true
                 }) {
-                    Text("Delete")
+                    SmallButton(text: "Delete")
                 }
+                .disabled(selectedCount == "0")
                 .alert(isPresented: $delete, content: {
                     Alert(
                         title: Text("Delete key?"),
@@ -29,23 +31,21 @@ struct MultiselectBottomControl: View {
                         secondaryButton: .destructive(
                             Text("Delete"),
                             action: {
-                                //TODO: buttonpush
+                                data.pushButton(buttonID: .RemoveKey)
                             }
                         )
                     )
                 })
                 Spacer()
                 Button(action: {
-                    //TODO: buttonpush
-                    //data.selectedAddress = data.multiSelected.first
-                    //data.keyManagerModal = .showKey
+                    data.pushButton(buttonID: .ExportMultiSelect)
                 }) {
-                    Text("Export")
-                }
+                    SmallButton(text: "Export")
+                }.disabled(selectedCount == "0")
             }
             HStack {
-                Text(String(0 /*data.multiSelected.count*/))
-                Text("addresses selected")
+                Text(selectedCount)
+                Text("items selected")
             }
         }
         .padding(.vertical)

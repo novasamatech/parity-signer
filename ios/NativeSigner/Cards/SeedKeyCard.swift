@@ -10,13 +10,24 @@ import SwiftUI
 struct SeedKeyCard: View {
     @EnvironmentObject var data: SignerDataModel
     var seedCard: MSeedKeyCard
+    var multiselectMode: Bool = false
     var body: some View {
         ZStack {
             RoundedRectangle(cornerRadius: 4).foregroundColor(Color("Bg200")).frame(height: 47)
             HStack {
-                Image(uiImage: UIImage(data: Data(fromHexEncodedString: seedCard.identicon) ?? Data()) ?? UIImage())
-                    .resizable(resizingMode: .stretch)
-                    .frame(width: 30, height: 30)
+                ZStack {
+                    Identicon(identicon: seedCard.identicon)
+                    if multiselectMode {
+                        VStack{
+                            Spacer()
+                            HStack{
+                        Spacer()
+                        Image(systemName: seedCard.multiselect ? "checkmark.circle.fill" : "circle").imageScale(.large)
+                            }
+                            
+                        }
+                    }
+                }.frame(width: 30, height: 30)
                 VStack (alignment: .leading) {
                     Text(seedCard.seed_name)
                         .foregroundColor(Color("Text600"))

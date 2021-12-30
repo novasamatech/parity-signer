@@ -11,6 +11,8 @@ struct MKeys: Decodable {
     var set: [MKeysKeyCard]
     var root: MSeedKeyCard
     var network: MNetworkCard
+    var multiselect_mode: Bool
+    var multiselect_count: String
 }
 
 struct MKeysKeyCard: Decodable, Hashable {
@@ -20,6 +22,7 @@ struct MKeysKeyCard: Decodable, Hashable {
     var has_pwd: Bool
     var path: String
     var swiped: Bool
+    var multiselect: Bool
     
     func intoAddress() -> Address {
         return Address(
@@ -27,7 +30,8 @@ struct MKeysKeyCard: Decodable, Hashable {
             path: self.path,
             has_pwd: self.has_pwd,
             identicon: self.identicon,
-            seed_name: ""
+            seed_name: "",
+            multiselect: self.multiselect
         )
     }
 }
@@ -38,6 +42,7 @@ struct MSeedKeyCard: Decodable {
     var address_key: String
     var base58: String
     var swiped: Bool
+    var multiselect: Bool
 }
 
 struct MNetworkCard: Decodable {

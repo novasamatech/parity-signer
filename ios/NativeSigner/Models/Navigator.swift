@@ -110,7 +110,7 @@ struct ActionResult: Decodable {
         case "SignatureReady":
             modal = .SignatureReady(try values.decode(MSignatureReady.self, forKey: .modalData))
         case "LogRight":
-            modal = .LogRight
+            modal = .LogRight(try values.decode(MLogRight.self, forKey: .modalData))
         case "NetworkDetailsMenu":
             modal = .NetworkDetailsMenu
         case "ManageMetadata":
@@ -176,7 +176,7 @@ enum SignerModal: Decodable {
     case PasswordConfirm(MPasswordConfirm)
     case SignatureReady(MSignatureReady)
     case EnterPassword(MEnterPassword)
-    case LogRight
+    case LogRight(MLogRight)
     case NetworkDetailsMenu
     case ManageMetadata(MManageMetadata)
     case SufficientCryptoReady(MSufficientCryptoReady)
@@ -228,10 +228,14 @@ enum ButtonID {
     case RemoveKey
     case RemoveSeed
     case ClearLog
+    case CreateLogComment
     case ShowLogDetails
     case Swipe
+    case LongTap
+    case SelectAll
     case Increment
     case ShowDocuments
+    case ExportMultiSelect
 }
 
 /**

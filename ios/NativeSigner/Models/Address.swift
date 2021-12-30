@@ -17,6 +17,7 @@ struct Address: Codable, Equatable {
     var has_pwd: Bool
     var identicon: String
     var seed_name: String
+    var multiselect: Bool
 }
 
 /*

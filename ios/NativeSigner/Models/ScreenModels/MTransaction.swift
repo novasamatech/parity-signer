@@ -32,7 +32,8 @@ struct TransactionAuthor: Decodable, Hashable {
             path: self.derivation_path,
             has_pwd: false, //TODO: this
             identicon: self.identicon,
-            seed_name: self.seed
+            seed_name: self.seed,
+            multiselect: false
         )
     }
 }

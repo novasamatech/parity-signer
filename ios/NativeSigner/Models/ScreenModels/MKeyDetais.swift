@@ -24,7 +24,8 @@ struct MKeyDetails: Decodable {
             path: self.path,
             has_pwd: false,
             identicon: self.identicon,
-            seed_name: self.seed_name
+            seed_name: self.seed_name,
+            multiselect: false
         )
     }
 }

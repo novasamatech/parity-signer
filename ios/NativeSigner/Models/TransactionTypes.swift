@@ -57,7 +57,8 @@ struct Author: Decodable {
             path: self.derivation_path,
             has_pwd: self.has_password,
             identicon: self.identicon,
-            seed_name: seed
+            seed_name: seed,
+            multiselect: false
         )
     }
 }

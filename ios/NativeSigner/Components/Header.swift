@@ -18,7 +18,7 @@ struct Header: View {
                         Button(action: {
                             data.pushButton(buttonID: .GoBack)
                         }) {
-                            Image(systemName: "chevron.left")
+                            Image(systemName: data.actionResult.rightButton == "MultiSelect" ? "xmark" : "chevron.left")
                                 .imageScale(.large)
                                 .foregroundColor(Color("Text500"))
                         }
@@ -39,14 +39,14 @@ struct Header: View {
                     .foregroundColor(Color("Text600"))
                     .font(data.actionResult.screenNameType == "h1" ? FBase(style: .h2) : FBase(style: .h4))
                     .tracking(0.1)
-                /*
-                 if false {
+                
+                if data.actionResult.rightButton == "MultiSelect" {
                  Button(action: {
-                 //TODO: Buttonpush
+                     data.pushButton(buttonID: .SelectAll)
                  }) {
                  SmallButton(text: "Select all")
                  }
-                 }*/
+                 }
                 Spacer()
                 
                 HStack(spacing: 8.0) {
@@ -67,6 +67,8 @@ struct Header: View {
                             Image(systemName: "ellipsis")
                                 .imageScale(.large)
                                 .foregroundColor(Color("Action400"))
+                        case "MultiSelect":
+                            EmptyView()
                         case "None":
                             EmptyView()
                         default:

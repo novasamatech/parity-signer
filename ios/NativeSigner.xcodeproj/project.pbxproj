@@ -72,6 +72,9 @@
 		2D48F3D4277A5A0E004B27BE /* MLogDetails.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D48F3D3277A5A0E004B27BE /* MLogDetails.swift */; };
 		2D48F3D6277B94C4004B27BE /* Identicon.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D48F3D5277B94C4004B27BE /* Identicon.swift */; };
 		2D48F3D8277B95A3004B27BE /* TransactionBlock.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D48F3D7277B95A3004B27BE /* TransactionBlock.swift */; };
+		2D48F3DA277E3719004B27BE /* MLogRight.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D48F3D9277E3719004B27BE /* MLogRight.swift */; };
+		2D48F3DC277E3CAA004B27BE /* MultiselectBottomControl.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D48F3DB277E3CAA004B27BE /* MultiselectBottomControl.swift */; };
+		2D48F3DE277E4BEC004B27BE /* SmallButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D48F3DD277E4BEC004B27BE /* SmallButton.swift */; };
 		2D72B4F626EF3BC50081E879 /* Navigator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D72B4F526EF3BC50081E879 /* Navigator.swift */; };
 		2D72B4FA26EF7D1C0081E879 /* Seeds.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D72B4F926EF7D1C0081E879 /* Seeds.swift */; };
 		2D72D52A2732B8A7004BA7C9 /* Database in Resources */ = {isa = PBXBuildFile; fileRef = 2D72D5292732B8A7004BA7C9 /* Database */; };
@@ -235,6 +238,9 @@
 		2D48F3D3277A5A0E004B27BE /* MLogDetails.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MLogDetails.swift; sourceTree = "<group>"; };
 		2D48F3D5277B94C4004B27BE /* Identicon.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Identicon.swift; sourceTree = "<group>"; };
 		2D48F3D7277B95A3004B27BE /* TransactionBlock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransactionBlock.swift; sourceTree = "<group>"; };
+		2D48F3D9277E3719004B27BE /* MLogRight.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MLogRight.swift; sourceTree = "<group>"; };
+		2D48F3DB277E3CAA004B27BE /* MultiselectBottomControl.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MultiselectBottomControl.swift; sourceTree = "<group>"; };
+		2D48F3DD277E4BEC004B27BE /* SmallButton.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SmallButton.swift; sourceTree = "<group>"; };
 		2D72B4F526EF3BC50081E879 /* Navigator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Navigator.swift; sourceTree = "<group>"; };
 		2D72B4F926EF7D1C0081E879 /* Seeds.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Seeds.swift; sourceTree = "<group>"; };
 		2D72D5292732B8A7004BA7C9 /* Database */ = {isa = PBXFileReference; lastKnownFileType = folder; path = Database; sourceTree = "<group>"; };
@@ -436,7 +442,9 @@
 				04197D2C276BB683003485D2 /* StyleModiefiers.swift */,
 				2D48F3D5277B94C4004B27BE /* Identicon.swift */,
 				2D48F3D7277B95A3004B27BE /* TransactionBlock.swift */,
+				2D48F3DB277E3CAA004B27BE /* MultiselectBottomControl.swift */,
 				0452BC562767B26600C6DD37 /* Buttons.swift */,
+				2D48F3DD277E4BEC004B27BE /* SmallButton.swift */,
 				2D48F35027609CDE004B27BE /* HistoryCard.swift */,
 				2DA5F8852756A44600D8DD29 /* AddressCardControls.swift */,
 				2D48F3C72774CC64004B27BE /* SearchKeys.swift */,
@@ -515,6 +523,7 @@
 				2D48F391276A1D12004B27BE /* MSignatureReady.swift */,
 				2D48F3C127749138004B27BE /* MTypesInfo.swift */,
 				2D48F3B92771DD66004B27BE /* MSufficientCryptoReady.swift */,
+				2D48F3D9277E3719004B27BE /* MLogRight.swift */,
 				2D48F393276A1D20004B27BE /* MEnterPassword.swift */,
 				2D48F3BF27720B7E004B27BE /* MSeedMenu.swift */,
 				2D48F3B12770B29C004B27BE /* MManageMetadata.swift */,
@@ -801,6 +810,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				2DA5F89D275F874D00D8DD29 /* NetworkManager.swift in Sources */,
+				2D48F3DE277E4BEC004B27BE /* SmallButton.swift in Sources */,
 				2D48F38727691C12004B27BE /* ShieldAlert.swift in Sources */,
 				2D48F39C276B5C0C004B27BE /* MRecoverSeedName.swift in Sources */,
 				2D48F3A427708091004B27BE /* MManageNetworks.swift in Sources */,
@@ -870,6 +880,7 @@
 				2D48F3C82774CC64004B27BE /* SearchKeys.swift in Sources */,
 				2D7A7BD426BBEAF00053C1E0 /* Canary.swift in Sources */,
 				2DA5F8352756656E00D8DD29 /* Transaction.swift in Sources */,
+				2D48F3DC277E3CAA004B27BE /* MultiselectBottomControl.swift in Sources */,
 				2D48F35D2760ED38004B27BE /* MKeys.swift in Sources */,
 				2DA5F86527566C3600D8DD29 /* TCID.swift in Sources */,
 				2DA5F86227566C3600D8DD29 /* TCEnumVariantName.swift in Sources */,
@@ -887,6 +898,7 @@
 				2D48F373276793D3004B27BE /* MDeriveKey.swift in Sources */,
 				2D48F3B82771D250004B27BE /* SignSufficientCrypto.swift in Sources */,
 				2DA5F86E27566C3600D8DD29 /* TCWarning.swift in Sources */,
+				2D48F3DA277E3719004B27BE /* MLogRight.swift in Sources */,
 				2D48F3A62770828B004B27BE /* ManageNetworks.swift in Sources */,
 				2DA5F87227566C3600D8DD29 /* TCFieldNumber.swift in Sources */,
 				2DA5F86D27566C3600D8DD29 /* TCAuthorPlain.swift in Sources */,

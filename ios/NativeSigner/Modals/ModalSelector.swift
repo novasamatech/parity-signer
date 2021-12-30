@@ -28,8 +28,8 @@ struct ModalSelector: View {
             SignatureReady(content: value)
         case .EnterPassword(let value):
             EnterPassword(content: value)
-        case .LogRight:
-            LogMenu()
+        case .LogRight(let value):
+            LogMenu(content: value)
         case .NetworkDetailsMenu:
             NetworkDetailsMenu()
         case .ManageMetadata(let value):

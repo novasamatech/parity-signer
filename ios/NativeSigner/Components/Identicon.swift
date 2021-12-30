@@ -7,6 +7,9 @@
 
 import SwiftUI
 
+/**
+ * Parse identicon from backend into picture
+ */
 struct Identicon: View {
     let identicon: String
     let rowHeight: CGFloat = 28

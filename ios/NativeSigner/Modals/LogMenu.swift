@@ -10,14 +10,23 @@ import SwiftUI
 struct LogMenu: View {
     @EnvironmentObject var data: SignerDataModel
     @State var clearConfirm = false
+    var content: MLogRight
     var body: some View {
         VStack {
             Spacer()
             VStack {
-                HeaderBar(line1: "LOG", line2: "Manage log" )
+                HeaderBar(line1: "LOG", line2: "Checksum: " + content.checksum)
                 MenuButtonsStack {
                     BigButton(
+                        text: "Add note",
+                        action: {
+                            data.pushButton(buttonID: .CreateLogComment)
+                        }
+                    )
+                    BigButton(
                         text: "Clear log",
+                        isShaded: true,
+                        isDangerous: true,
                         action: {
                             clearConfirm = true
                         }

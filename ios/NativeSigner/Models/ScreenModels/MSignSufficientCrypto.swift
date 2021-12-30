@@ -35,7 +35,8 @@ struct MRawKey: Decodable {
             path: self.path,
             has_pwd: self.has_pwd,
             identicon: self.identicon,
-            seed_name: self.seed_name
+            seed_name: self.seed_name,
+            multiselect: false
         )
     }
 }

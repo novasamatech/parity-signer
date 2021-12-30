@@ -23,6 +23,7 @@ enum Event: Decodable, Hashable, Equatable {
     case networkRemoved(NetworkDisplay)
     case networkVerifierSet(NetworkVerifierDisplay)
     case resetDangerRecord
+    case seedCreated(String)
     case seedNameWasShown(String)
     case signedAddNetwork(NetworkSigned)
     case signedLoadMetadata(MetadataSigned)
@@ -76,6 +77,8 @@ enum Event: Decodable, Hashable, Equatable {
             self = .networkVerifierSet(try values.decode(NetworkVerifierDisplay.self, forKey: .payload))
         case "reset_danger_record":
             self = .resetDangerRecord
+        case "seed_created":
+            self = .seedCreated(try values.decode(String.self, forKey: .payload))
         case "seed_name_shown":
             self = .seedNameWasShown(try values.decode(String.self, forKey: .payload))
         case "add_specs_message_signed":
