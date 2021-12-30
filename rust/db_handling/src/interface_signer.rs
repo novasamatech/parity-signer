@@ -1,12 +1,15 @@
 use blake2_rfc::blake2b::blake2b;
+use hex;
+use parity_scale_codec::Encode;
 use sp_core::{Pair, sr25519};
 use sp_runtime::MultiSigner;
 use std::collections::HashMap;
 
+use constants::HISTORY;
 use definitions::{error::{AddressGenerationCommon, DatabaseSigner, ErrorSigner, ErrorSource, InterfaceSigner, NotFoundSigner, Signer}, helpers::{make_identicon_from_multisigner, multisigner_to_encryption, multisigner_to_public, pic_meta}, keyring::{AddressKey, NetworkSpecsKey, print_multisigner_as_base58, VerifierKey}, network_specs::NetworkSpecs, print::export_complex_vector, qr_transfers::ContentLoadTypes, users::AddressDetails};
 use qrcode_static::png_qr_from_string;
 
-use crate::helpers::{get_address_details, get_general_verifier, get_meta_values_by_name, get_meta_values_by_name_version, get_network_specs, get_valid_current_verifier, try_get_types};
+use crate::helpers::{get_address_details, get_general_verifier, get_meta_values_by_name, get_meta_values_by_name_version, get_network_specs, get_valid_current_verifier, open_db, open_tree, try_get_types};
 use crate::identities::{get_all_addresses, get_addresses_by_seed_name, generate_random_phrase};
 use crate::network_details::get_all_networks;
 
@@ -281,6 +284,14 @@ pub fn print_new_seed (seed_name: &str) -> Result<String, ErrorSigner> {
     Ok(format!("\"seed\":\"{}\",\"seed_phrase\":\"{}\",\"identicon\":\"{}\"", seed_name, seed_phrase, hex_identicon))
 }
 
+
+/// Function to get database history tree checksum to be displayed in log screen
+pub fn history_hex_checksum (database_name: &str) -> Result<String, ErrorSigner> {
+    let database = open_db::<Signer>(database_name)?;
+    let history = open_tree::<Signer>(&database, HISTORY)?;
+    let checksum = history.checksum().map_err(|e| ErrorSigner::Database(DatabaseSigner::Internal(e)))?;
+    Ok(format!("\"checksum\":\"{}\"", hex::encode(checksum.encode())))
+}
 
 #[cfg(test)]
 mod tests {

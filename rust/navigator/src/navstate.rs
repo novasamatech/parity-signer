@@ -1063,6 +1063,16 @@ impl State {
                         _ => "".to_string(),
                     }
                 },
+                Modal::LogRight => {
+                    match db_handling::interface_signer::history_hex_checksum(dbname) {
+                        Ok(a) => a,
+                        Err(e) => {
+                            new_navstate.alert = Alert::Error;
+                            errorline.push_str(&<Signer>::show(&e));
+                            "".to_string() 
+                        },
+                    }
+                },
                 Modal::ManageMetadata(network_version) => {
                     match new_navstate.screen {
                         Screen::NetworkDetails(ref network_specs_key) => {
