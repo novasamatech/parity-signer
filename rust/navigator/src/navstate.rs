@@ -933,7 +933,7 @@ impl State {
                 },
                 Screen::KeyDetails(ref address_state) => {
                     match db_handling::interface_signer::export_key (dbname, &address_state.multisigner(), &address_state.seed_name(), &address_state.network_specs_key()) {
-                        Ok(a) => a,
+                        Ok(a) => format!("{},\"current_number\":\"{}\",\"out_of\":\"{}\"", a, address_state.number(), address_state.out_of()),
                         Err(e) => {
                             new_navstate.alert = Alert::Error;
                             errorline.push_str(&<Signer>::show(&e));

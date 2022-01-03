@@ -252,6 +252,12 @@ impl AddressState {
             set: self.set.to_owned(),
         }
     }
+    pub fn number(&self) -> usize {
+        self.selected+1
+    }
+    pub fn out_of(&self) -> usize {
+        self.set.len()
+    }
 }
 
 impl DeriveState {
