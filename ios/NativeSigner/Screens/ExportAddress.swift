@@ -26,7 +26,7 @@ struct ExportAddress: View {
                     .onAppear{
                         offset = 0
                     }
-                HeaderBar(line1: "KEY DETAILS", line2: "Key key details details").padding(.horizontal, 8)
+                HeaderBar(line1: "KEY DETAILS", line2: "Selected key " + content.current_number + "/" + content.out_of).padding(.horizontal, 8)
                 VStack {
                     HStack {
                         Text("Base58 key: ")

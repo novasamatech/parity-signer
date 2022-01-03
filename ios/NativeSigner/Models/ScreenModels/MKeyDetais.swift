@@ -16,6 +16,8 @@ struct MKeyDetails: Decodable {
     var path: String
     var network_title: String
     var network_logo: String
+    var current_number: String
+    var out_of: String
     
     //TODO: has_pwd!!!
     func intoAddress() -> Address {
