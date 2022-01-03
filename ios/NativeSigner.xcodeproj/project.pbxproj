@@ -75,6 +75,7 @@
 		2D48F3DA277E3719004B27BE /* MLogRight.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D48F3D9277E3719004B27BE /* MLogRight.swift */; };
 		2D48F3DC277E3CAA004B27BE /* MultiselectBottomControl.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D48F3DB277E3CAA004B27BE /* MultiselectBottomControl.swift */; };
 		2D48F3DE277E4BEC004B27BE /* SmallButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D48F3DD277E4BEC004B27BE /* SmallButton.swift */; };
+		2D48F3E0278305AE004B27BE /* LogComment.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D48F3DF278305AE004B27BE /* LogComment.swift */; };
 		2D72B4F626EF3BC50081E879 /* Navigator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D72B4F526EF3BC50081E879 /* Navigator.swift */; };
 		2D72B4FA26EF7D1C0081E879 /* Seeds.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D72B4F926EF7D1C0081E879 /* Seeds.swift */; };
 		2D72D52A2732B8A7004BA7C9 /* Database in Resources */ = {isa = PBXBuildFile; fileRef = 2D72D5292732B8A7004BA7C9 /* Database */; };
@@ -241,6 +242,7 @@
 		2D48F3D9277E3719004B27BE /* MLogRight.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MLogRight.swift; sourceTree = "<group>"; };
 		2D48F3DB277E3CAA004B27BE /* MultiselectBottomControl.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MultiselectBottomControl.swift; sourceTree = "<group>"; };
 		2D48F3DD277E4BEC004B27BE /* SmallButton.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SmallButton.swift; sourceTree = "<group>"; };
+		2D48F3DF278305AE004B27BE /* LogComment.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LogComment.swift; sourceTree = "<group>"; };
 		2D72B4F526EF3BC50081E879 /* Navigator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Navigator.swift; sourceTree = "<group>"; };
 		2D72B4F926EF7D1C0081E879 /* Seeds.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Seeds.swift; sourceTree = "<group>"; };
 		2D72D5292732B8A7004BA7C9 /* Database */ = {isa = PBXFileReference; lastKnownFileType = folder; path = Database; sourceTree = "<group>"; };
@@ -423,6 +425,7 @@
 				2D48F3AF2770AD83004B27BE /* ManageMetadata.swift */,
 				2D48F3CF2777A823004B27BE /* NewSeedBackupModal.swift */,
 				2D48F36E2767419D004B27BE /* PasswordConfirm.swift */,
+				2D48F3DF278305AE004B27BE /* LogComment.swift */,
 				2D48F39F276C8D5E004B27BE /* LogMenu.swift */,
 				2D48F395276A2003004B27BE /* SignatureReady.swift */,
 				2D48F3BB2771DE24004B27BE /* SufficientCryptoReady.swift */,
@@ -896,6 +899,7 @@
 				2DA5F84327566BE300D8DD29 /* TransactionCardSelector.swift in Sources */,
 				2DA5F83D275667AC00D8DD29 /* History.swift in Sources */,
 				2D48F373276793D3004B27BE /* MDeriveKey.swift in Sources */,
+				2D48F3E0278305AE004B27BE /* LogComment.swift in Sources */,
 				2D48F3B82771D250004B27BE /* SignSufficientCrypto.swift in Sources */,
 				2DA5F86E27566C3600D8DD29 /* TCWarning.swift in Sources */,
 				2D48F3DA277E3719004B27BE /* MLogRight.swift in Sources */,

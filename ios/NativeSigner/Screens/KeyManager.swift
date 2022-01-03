@@ -22,15 +22,21 @@ struct KeyManager: View {
                         SeedKeyCard(seedCard: content.root, multiselectMode: content.multiselect_mode).gesture(DragGesture()
                                                                         .onEnded {drag in
                             if abs(drag.translation.height) < 20 && abs(drag.translation.width) > 20 {
+                                if content.root.address_key != "" {
                                 data.pushButton(buttonID: .Swipe, details: content.root.address_key)
+                                }
                             }
                         })
                             .gesture(LongPressGesture()
                                         .onEnded {_ in
-                                data.pushButton(buttonID: .LongTap, details: content.root.address_key)
+                                if content.root.address_key != "" {
+                                    data.pushButton(buttonID: .LongTap, details: content.root.address_key)
+                                }
                             }
                             )
-                    }.padding(2)
+                    }
+                    .disabled(content.root.address_key == "")
+                    .padding(2)
                     if content.root.swiped {
                         AddressCardControls(seed_name: content.root.seed_name)
                     }

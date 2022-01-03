@@ -42,6 +42,8 @@ struct ModalSelector: View {
             TypesMenu(content: value)
         case .NewSeedBackup(let value):
             NewSeedBackupModal(content: value)
+        case .LogComment:
+            LogComment()
         }
     }
 }
