@@ -81,7 +81,8 @@ fun ModalSelector(modal: SignerModal, signerDataModel: SignerDataModel) {
 		SignerModal.SufficientCryptoReady -> TODO()
 		SignerModal.KeyDetailsAction -> TODO()
 		SignerModal.TypesInfo -> TODO()
-		SignerModal.NewSeedBackup -> TODO()
+		SignerModal.NewSeedBackup -> NewSeedBackup(signerDataModel = signerDataModel)
+		SignerModal.LogComment -> TODO()
 	}
 }
 
@@ -139,7 +140,8 @@ enum class SignerModal {
 	SufficientCryptoReady,
 	KeyDetailsAction,
 	TypesInfo,
-	NewSeedBackup;
+	NewSeedBackup,
+	LogComment;
 }
 
 enum class SignerAlert {

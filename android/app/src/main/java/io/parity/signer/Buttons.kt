@@ -41,8 +41,11 @@ enum class ButtonID {
 	ClearLog,
 	ShowLogDetails,
 	Swipe,
+	LongTap,
+	SelectAll,
 	Increment,
-	ShowDocuments;
+	ShowDocuments,
+	ExportMultiselect;
 
 
 	fun getName(): String {

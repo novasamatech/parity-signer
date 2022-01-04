@@ -21,6 +21,7 @@ val Text500 = Color(0xFFD1D1D1)
 val Text400 = Color(0xFFAEAEAE)
 val Text300 = Color(0xFF7E8D95)
 
+val Action600 = Color(0xFFFFFFFF)
 val Action400 = Color(0xFF3996EC)
 val Action300 = Color(0xFF2980D7)
 val Action200 = Color(0xFF0F447A)
