@@ -2,7 +2,8 @@ use blake2_rfc::blake2b::blake2b;
 use parity_scale_codec::{Decode, Encode};
 use parity_scale_codec_derive;
 
-use crate::error::{ErrorActive, ErrorSource, TransferContent};
+use crate::crypto::Encryption;
+use crate::error::{ErrorActive, ErrorSigner, ErrorSource, InputSigner, TransferContent};
 use crate::helpers::pic_types;
 use crate::network_specs::NetworkSpecsToSend;
 use crate::types::TypeEntry;
@@ -174,3 +175,42 @@ impl ContentLoadTypes {
     }
 }
 
+
+/// Struct to process the content of qr codes with load_types messages
+#[derive(parity_scale_codec_derive::Decode, parity_scale_codec_derive::Encode)]
+pub struct ContentDerivations (Vec<u8>);
+
+#[derive(parity_scale_codec_derive::Decode, parity_scale_codec_derive::Encode)]
+struct DecodedContentDerivations {
+    encryption: Encryption,
+    genesis_hash: [u8; 32],
+    derivations: Vec<String>,
+}
+
+impl ContentDerivations {
+    /// Function to generate derivations content from genesis hash and vector of derivations Vec<String>
+    pub fn generate (encryption: &Encryption, genesis_hash: &[u8;32], derivations: &Vec<String>) -> Self {
+        Self (
+            DecodedContentDerivations {
+                encryption: encryption.to_owned(),
+                genesis_hash: genesis_hash.to_owned(),
+                derivations: derivations.to_vec(),
+            }.encode()
+        )
+    }
+    /// Function to transform Vec<u8> into ContentDerivations prior to processing
+    pub fn from_slice (slice: &[u8]) -> Self {
+        Self(slice.to_vec())
+    }
+    /// Function to get tuple of network genesis hash and vector of derivations Vec<String> from ContentDerivations
+    pub fn encryption_genhash_derivations (&self) -> Result<(Encryption, [u8;32], Vec<String>), ErrorSigner> {
+        match <DecodedContentDerivations>::decode(&mut &self.0[..]) {
+            Ok(a) => Ok((a.encryption, a.genesis_hash, a.derivations)),
+            Err(_) => return Err(ErrorSigner::Input(InputSigner::TransferDerivations)),
+        }
+    }
+    /// Function to prepare load_metadata information for transfer as Vec<u8>
+    pub fn to_transfer (&self) -> Vec<u8> {
+        self.0.to_vec()
+    }
+}

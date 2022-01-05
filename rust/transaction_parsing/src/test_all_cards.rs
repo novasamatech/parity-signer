@@ -80,6 +80,7 @@ Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deseru
     all_cards.push(Card::NewSpecs(&network_specs_westend.to_send()).card(&mut index,0));
     all_cards.push(Card::NetworkInfo(&network_specs_westend).card(&mut index,0));
     all_cards.push(Card::NetworkGenesisHash(&network_specs_westend.genesis_hash.to_vec()).card(&mut index,0));
+    all_cards.push(Card::Derivations(&vec!["//Alice".to_string(), "//Alice/2/1".to_string(), "//secret//westend".to_string()]).card(&mut index,0));
 
     all_cards.push(Card::Warning(Warning::AuthorNotFound).card(&mut index,0));
     all_cards.push(Card::Warning(Warning::NewerVersion{used_version: 50, latest_version: 9010}).card(&mut index,0));

@@ -19,6 +19,7 @@ pub enum Modal {
     SufficientCryptoReady(String),
     KeyDetailsAction,
     TypesInfo,
+    SelectSeed,
     Empty,
 }
 
@@ -40,6 +41,7 @@ impl Modal {
             Modal::SufficientCryptoReady(_) => String::from("SufficientCryptoReady"),
             Modal::KeyDetailsAction => String::from("KeyDetailsAction"),
             Modal::TypesInfo => String::from("TypesInfo"),
+            Modal::SelectSeed => String::from("SelectSeed"),
             Modal::Empty => String::from("Empty"),
         }
     }

@@ -6,6 +6,8 @@ mod add_specs;
 pub mod cards;
     use cards::Card;
 mod check_signature;
+mod derivations;
+    use derivations::process_derivations;
 mod helpers;
 mod holds;
 mod load_metadata;
@@ -24,6 +26,7 @@ mod tests;
 /// signing (Sign), accepting (Stub) and reading, for example, in case of an error (Read)
 #[derive(PartialEq, Debug, Clone)]
 pub enum Action {
+    Derivations{content: String, network_info: String, checksum: u32},
     Sign{content: String, checksum: u32, has_pwd: bool, author_info: String, network_info: String},
     Stub(String, u32),
     Read(String),
@@ -53,6 +56,7 @@ fn handle_scanner_input (payload: &str, dbname: &str) -> Result<Action, ErrorSig
         "80" => load_metadata(data_hex, dbname),
         "81" => load_types(data_hex, dbname),
         "c1" => add_specs(data_hex, dbname),
+        "de" => process_derivations(data_hex, dbname),
         "f0" => Ok(make_all_cards()),
         _ => return Err(ErrorSigner::Input(InputSigner::PayloadNotSupported(data_hex[4..6].to_string()))),
     }

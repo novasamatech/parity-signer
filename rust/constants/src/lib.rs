@@ -27,6 +27,7 @@ pub const DANGER: &[u8] = b"dangerous_encounter";
 /// Key names used for transaction tree:  
 pub const STUB: &[u8] = b"stub";
 pub const SIGN: &[u8] = b"sign";
+pub const DRV: &[u8] = b"derivations";
 
 /// Display constants
 pub const MAX_WORDS_DISPLAY: usize = 8;

@@ -18,7 +18,7 @@ use crate::network_details::get_all_networks;
 pub fn print_all_seed_names_with_identicons (database_name: &str, names_phone_knows: &Vec<String>) -> Result<String, ErrorSigner> {
     let mut data_set: HashMap<String, Vec<MultiSigner>> = HashMap::new();
     for (multisigner, address_details) in get_all_addresses(database_name)?.into_iter() {
-        if (address_details.path == "")&&(!address_details.has_pwd) {
+        if address_details.is_root() {
         // found a root; could be any of the supported encryptions;
             match data_set.get(&address_details.seed_name) {
                 Some(root_set) => {
@@ -121,7 +121,7 @@ pub fn print_identities_for_seed_name_and_network (database_name: &str, seed_nam
             if multiselect.contains(&multisigner) {true}
             else {false}
         };
-        if (address_details.path == "")&&(!address_details.has_pwd) {
+        if address_details.is_root() {
             if let Some(_) = root_id {return Err(ErrorSigner::Database(DatabaseSigner::TwoRootKeys{seed_name: seed_name.to_string(), encryption: network_specs.encryption.to_owned()}))}
             root_id = Some(format!("\"seed_name\":\"{}\",\"identicon\":\"{}\",\"address_key\":\"{}\",\"base58\":\"{}\",\"swiped\":{},\"multiselect\":{}", seed_name, hex::encode(identicon), hex::encode(address_key.key()), base58, swiped, multiselect));
         }

@@ -4,7 +4,7 @@
 use sp_runtime::MultiSigner;
 use zeroize::Zeroize;
 
-use crate::screens::{AddressState, DeriveState, KeysState, Screen, SpecialtyKeysState, SufficientCryptoState, TransactionState};
+use crate::screens::{AddressState, AddressStateMulti, DeriveState, KeysState, Screen, SpecialtyKeysState, SufficientCryptoState, TransactionState};
 use crate::modals::Modal;
 use crate::actions::Action;
 use crate::alerts::Alert;
@@ -96,7 +96,10 @@ impl State {
                                     };
                                 },
                                 Screen::KeyDetails(address_state) => {
-                                    new_navstate.screen = Screen::Keys(address_state.get_keys_state().deselect_specialty());
+                                    new_navstate.screen = Screen::Keys(address_state.blank_keys_state());
+                                },
+                                Screen::KeyDetailsMulti(address_state_multi) => {
+                                    new_navstate.screen = Screen::Keys(address_state_multi.blank_keys_state());
                                 },
                                 Screen::NewSeed => {
                                     new_navstate.screen = Screen::SeedSelector;
@@ -108,7 +111,7 @@ impl State {
                                     new_navstate.screen = Screen::RecoverSeedName(seed_name.to_string());
                                 },
                                 Screen::DeriveKey(d) => {
-                                    new_navstate.screen = Screen::Keys(d.get_keys_state());
+                                    new_navstate.screen = Screen::Keys(d.blank_keys_state());
                                 },
                                 Screen::Verifier => {
                                     new_navstate.screen = Screen::Settings;
@@ -305,6 +308,28 @@ impl State {
                                     }
                                 },
                                 transaction_parsing::Action::Read(_) => println!("GoForward does nothing here"),
+                                transaction_parsing::Action::Derivations{content: _, network_info: _, checksum} => {
+                                    match self.navstate.modal {
+                                        Modal::SelectSeed => {
+                                        // details_str is seed_name
+                                        // secret_seed_phrase is seed_phrase
+                                            match db_handling::identities::import_derivations(checksum, details_str, secret_seed_phrase, dbname) {
+                                                Ok(()) => {
+                                                    new_navstate = Navstate::clean_screen(Screen::Log);
+                                                },
+                                                Err(e) => {
+                                                    new_navstate.alert = Alert::Error;
+                                                    errorline.push_str(&<Signer>::show(&e));
+                                                },
+                                            }
+                                        },
+                                        Modal::Empty => {
+                                            new_navstate.modal = Modal::SelectSeed;
+                                        },
+                                        _ => println!("GoForward does nothing here"),
+                                    }
+                                
+                                },
                             }
                         },
                         Screen::ManageNetworks => {
@@ -488,16 +513,16 @@ impl State {
                 },
                 Action::NextUnit => {
                     match self.navstate.screen {
-                        Screen::KeyDetails(ref address_state) => {
-                            new_navstate = Navstate::clean_screen(Screen::KeyDetails(address_state.next()));
+                        Screen::KeyDetailsMulti(ref address_state_multi) => {
+                            new_navstate = Navstate::clean_screen(Screen::KeyDetailsMulti(address_state_multi.next()));
                         },
                         _ => println!("NextUnit does nothing here"),
                     }
                 },
                 Action::PreviousUnit => {
                     match self.navstate.screen {
-                        Screen::KeyDetails(ref address_state) => {
-                            new_navstate = Navstate::clean_screen(Screen::KeyDetails(address_state.previous()));
+                        Screen::KeyDetailsMulti(ref address_state_multi) => {
+                            new_navstate = Navstate::clean_screen(Screen::KeyDetailsMulti(address_state_multi.previous()));
                         },
                         _ => println!("PreviousUnit does nothing here"),
                     }
@@ -824,7 +849,15 @@ impl State {
                     match self.navstate.screen {
                         Screen::Keys(ref keys_state) => {
                             if let SpecialtyKeysState::MultiSelect(ref multiselect) = keys_state.get_specialty() {
-                                new_navstate = Navstate::clean_screen(Screen::KeyDetails(AddressState::new_multiselect(keys_state.seed_name(), keys_state.network_specs_key(), multiselect)));
+                                match AddressStateMulti::new(keys_state.seed_name(), keys_state.network_specs_key(), multiselect, dbname) {
+                                    Ok(a) => {
+                                        new_navstate = Navstate::clean_screen(Screen::KeyDetailsMulti(a))
+                                    },
+                                    Err(e) => {
+                                        new_navstate.alert = Alert::Error;
+                                        errorline.push_str(&<Signer>::show(&e));
+                                    },
+                                }
                             }
                             else {println!("ExportMultiSelect does nothing here")}
                         },
@@ -900,6 +933,7 @@ impl State {
                 Screen::Scan => "".to_string(),
                 Screen::Transaction(ref t) => {
                     match t.action() {
+                        transaction_parsing::Action::Derivations{content, network_info, checksum: _} => format!("\"content\":{{{}}},\"network_info\":{{{}}},\"type\":\"import_derivations\"", content, network_info),
                         transaction_parsing::Action::Sign{content, checksum: _, has_pwd: _, author_info, network_info} => format!("\"content\":{{{}}},\"author_info\":{{{}}},\"network_info\":{{{}}},\"type\":\"sign\"", content, author_info, network_info),
                         transaction_parsing::Action::Stub(content, _) => format!("\"content\":{{{}}},\"type\":\"stub\"", content),
                         transaction_parsing::Action::Read(content) => format!("\"content\":{{{}}},\"type\":\"read\"", content),
@@ -911,7 +945,7 @@ impl State {
                         Err(e) => {
                             new_navstate.alert = Alert::Error;
                             errorline.push_str(&<Signer>::show(&e));
-                            "[]".to_string()
+                            "\"seedNameCards\":[]".to_string()
                         },
                     }
                 },
@@ -933,14 +967,24 @@ impl State {
                 },
                 Screen::KeyDetails(ref address_state) => {
                     match db_handling::interface_signer::export_key (dbname, &address_state.multisigner(), &address_state.seed_name(), &address_state.network_specs_key()) {
-                        Ok(a) => format!("{},\"current_number\":\"{}\",\"out_of\":\"{}\"", a, address_state.number(), address_state.out_of()),
+                        Ok(a) => a,
                         Err(e) => {
                             new_navstate.alert = Alert::Error;
                             errorline.push_str(&<Signer>::show(&e));
                             "".to_string()
                         },
                     }
-                }
+                },
+                Screen::KeyDetailsMulti(ref address_state_multi) => {
+                    match db_handling::interface_signer::export_key (dbname, &address_state_multi.multisigner(), &address_state_multi.seed_name(), &address_state_multi.network_specs_key()) {
+                        Ok(a) => format!("{},\"current_number\":\"{}\",\"out_of\":\"{}\"", a, address_state_multi.number(), address_state_multi.out_of()),
+                        Err(e) => {
+                            new_navstate.alert = Alert::Error;
+                            errorline.push_str(&<Signer>::show(&e));
+                            "".to_string()
+                        },
+                    }
+                },
                 Screen::NewSeed => format!("\"keyboard\":{}", new_navstate.keyboard()),
                 Screen::RecoverSeedName(ref seed_name) => format!("\"seed_name\":\"{}\",\"keyboard\":{}", seed_name, new_navstate.keyboard()),
                 Screen::RecoverSeedPhrase(ref seed_name) => format!("\"seed_name\":\"{}\",\"keyboard\":{}", seed_name, new_navstate.keyboard()),
@@ -1124,6 +1168,16 @@ impl State {
                         },
                     }
                 },
+                Modal::SelectSeed => {
+                    match db_handling::interface_signer::print_all_seed_names_with_identicons(dbname, &self.seed_names) {
+                        Ok(a) => format!("\"seedNameCards\":{}", a),
+                        Err(e) => {
+                            new_navstate.alert = Alert::Error;
+                            errorline.push_str(&<Signer>::show(&e));
+                            "\"seedNameCards\":[]".to_string()
+                        },
+                    }
+                },
                 _ => "".to_string(),
             };
             
@@ -1167,7 +1221,13 @@ impl State {
 
     ///Generate screen label taking into account state
     fn get_screen_label(&self) -> String {
-        self.navstate.screen.get_default_label()
+        match &self.navstate.screen {
+            Screen::KeyDetails(ref address_state) => {
+                if address_state.is_root() {String::from("Seed Key")}
+                else {String::from("Derived Key")}
+            },
+            a => a.get_default_label(),
+        }
     }
     
     fn get_footer(&self) -> bool {
@@ -1179,6 +1239,7 @@ impl State {
             Screen::SeedSelector => true,
             Screen::Keys(_) => true,
             Screen::KeyDetails(_) => false,
+            Screen::KeyDetailsMulti(_) => false,
             Screen::NewSeed => false,
             Screen::RecoverSeedName(_) => false,
             Screen::RecoverSeedPhrase(_) => false,
@@ -1204,6 +1265,7 @@ impl State {
             Screen::SeedSelector => "Keys",
             Screen::Keys(_) => "Keys",
             Screen::KeyDetails(_) => "Keys",
+            Screen::KeyDetailsMulti(_) => "Keys",
             Screen::NewSeed => "Keys",
             Screen::RecoverSeedName(_) => "Keys",
             Screen::RecoverSeedPhrase(_) => "Keys",
@@ -1235,6 +1297,7 @@ impl State {
                 }
             },
             Screen::KeyDetails(_) => "KeyMenu",
+            Screen::KeyDetailsMulti(_) => "KeyMenu",
             Screen::NewSeed => "None",
             Screen::RecoverSeedName(_) => "None",
             Screen::RecoverSeedPhrase(_) => "None",
@@ -1260,6 +1323,7 @@ impl State {
             Screen::SeedSelector => "h1",
             Screen::Keys(_) => "h4",
             Screen::KeyDetails(_) => "h4",
+            Screen::KeyDetailsMulti(_) => "h4",
             Screen::NewSeed => "h1",
             Screen::RecoverSeedName(_) => "h1",
             Screen::RecoverSeedPhrase(_) => "h1",

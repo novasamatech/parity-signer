@@ -8,19 +8,14 @@ use lazy_static::lazy_static;
 use db_handling;
 use definitions::keyring::NetworkSpecsKey;
 
-pub mod screens;
-//use screens::Screen;
-
-pub mod alerts;
-
-pub mod modals;
-//use modals::Modal;
-
-mod navstate;
-use navstate::{Navstate, State};
-
 mod actions;
-use actions::Action;
+    use actions::Action;
+pub mod alerts;
+pub mod modals;
+mod navstate;
+    use navstate::{Navstate, State};
+pub mod screens;
+
 
 //TODO: multithread here some day!
 lazy_static!{
@@ -111,14 +106,5 @@ pub fn update_seed_names(seed_names: &str) -> () {
             //TODO: maybe more grace here?
             panic!("Concurrency error! Restart the app.");
          },
-    }
-}
-
-#[cfg(test)]
-mod tests {
-    #[test]
-    fn it_works() {
-        let result = 2 + 2;
-        assert_eq!(result, 4);
     }
 }

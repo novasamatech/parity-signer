@@ -2,8 +2,8 @@
 use sp_runtime::MultiSigner;
 use zeroize::Zeroize;
 
-use db_handling::interface_signer::{addresses_set_seed_name_network, first_network};
-use definitions::{error::{AddressKeySource, ErrorSigner, ExtraAddressKeySourceSigner, InterfaceSigner, Signer}, helpers::{multisigner_to_public, make_identicon_from_multisigner}, keyring::{AddressKey, NetworkSpecsKey}, users::AddressDetails};
+use db_handling::{helpers::get_address_details, interface_signer::{first_network}};
+use definitions::{error::{AddressKeySource, ErrorSigner, ExtraAddressKeySourceSigner, Signer}, helpers::{multisigner_to_public, make_identicon_from_multisigner}, keyring::{AddressKey, NetworkSpecsKey}, users::AddressDetails};
 use transaction_parsing;
 use transaction_signing;
 
@@ -19,6 +19,7 @@ pub enum Screen {
     SeedSelector,
     Keys(KeysState),
     KeyDetails(AddressState),
+    KeyDetailsMulti(AddressStateMulti),
     NewSeed,
     RecoverSeedName(String),
     RecoverSeedPhrase(String),
@@ -44,18 +45,26 @@ pub enum SpecialtyKeysState {
 #[derive(Debug, Clone)]
 pub struct KeysState {
     seed_name: String,
-    network: NetworkSpecsKey,
+    network_specs_key: NetworkSpecsKey,
     specialty: SpecialtyKeysState,
 }
 
 ///State of screen with 1 key
-///
-///More general KeysState could always be determined as subset of this
 #[derive(Debug, Clone)]
 pub struct AddressState {
-    keys_state: KeysState,
+    seed_name: String,
+    network_specs_key: NetworkSpecsKey,
+    multisigner: MultiSigner,
+    is_root: bool,
+}
+
+///State of screen with multiple keys
+#[derive(Debug, Clone)]
+pub struct AddressStateMulti {
+    seed_name: String,
+    network_specs_key: NetworkSpecsKey,
     selected: usize,
-    set: Vec<MultiSigner>,
+    set: Vec<(MultiSigner, bool)>,
 }
 
 ///State of derive key screen
@@ -93,21 +102,21 @@ impl KeysState {
         let network_specs = first_network(database_name)?;
         Ok(Self {
             seed_name: seed_name.to_string(),
-            network: NetworkSpecsKey::from_parts(&network_specs.genesis_hash.to_vec(), &network_specs.encryption),
+            network_specs_key: NetworkSpecsKey::from_parts(&network_specs.genesis_hash.to_vec(), &network_specs.encryption),
             specialty: SpecialtyKeysState::None,
         })
     }
     pub fn new_in_network(seed_name: &str, network_specs_key: &NetworkSpecsKey) -> Self {
         Self {
             seed_name: seed_name.to_string(),
-            network: network_specs_key.to_owned(),
+            network_specs_key: network_specs_key.to_owned(),
             specialty: SpecialtyKeysState::None,
         }
     }
     pub fn change_network(&self, network_specs_key: &NetworkSpecsKey) -> Self {
         Self {
             seed_name: self.seed_name(),
-            network: network_specs_key.to_owned(),
+            network_specs_key: network_specs_key.to_owned(),
             specialty: SpecialtyKeysState::None,
         }
     }
@@ -115,7 +124,7 @@ impl KeysState {
         self.seed_name.to_owned()
     }
     pub fn network_specs_key(&self) -> NetworkSpecsKey {
-        self.network.to_owned()
+        self.network_specs_key.to_owned()
     }
     pub fn get_specialty(&self) -> SpecialtyKeysState {
         self.specialty.to_owned()
@@ -131,7 +140,7 @@ impl KeysState {
         };
         Self {
             seed_name: self.seed_name(),
-            network: self.network_specs_key(),
+            network_specs_key: self.network_specs_key(),
             specialty,
         }
     }
@@ -150,14 +159,14 @@ impl KeysState {
         };
         Self {
             seed_name: self.seed_name(),
-            network: self.network_specs_key(),
+            network_specs_key: self.network_specs_key(),
             specialty,
         }
     }
     pub fn select_set(&self, set: Vec<MultiSigner>) -> Self {
         Self {
             seed_name: self.seed_name(),
-            network: self.network_specs_key(),
+            network_specs_key: self.network_specs_key(),
             specialty: SpecialtyKeysState::MultiSelect(set),
         }
     }
@@ -176,7 +185,7 @@ impl KeysState {
     pub fn deselect_specialty(&self) -> Self {
         Self {
             seed_name: self.seed_name(),
-            network: self.network_specs_key(),
+            network_specs_key: self.network_specs_key(),
             specialty: SpecialtyKeysState::None,
         }
     }
@@ -186,48 +195,67 @@ impl AddressState {
     pub fn new(hex_address_key: &str, keys_state: &KeysState, database_name: &str) -> Result<Self, ErrorSigner> {
         let address_key = AddressKey::from_hex(hex_address_key)?;
         let multisigner = address_key.multi_signer::<Signer>(AddressKeySource::Extra(ExtraAddressKeySourceSigner::Interface))?;
-        let seed_name = keys_state.seed_name();
-        let mut whole_set = addresses_set_seed_name_network(database_name, &seed_name, &keys_state.network_specs_key())?;
-        whole_set.sort_by(|(_, a), (_, b)| a.path.cmp(&b.path));
-        let set: Vec<MultiSigner> = whole_set.into_iter().map(|(multisigner, _)| multisigner).collect();
-        let selected = match set.iter().position(|a| a == &multisigner) {
-            Some(a) => a,
-            None => return Err(ErrorSigner::Interface(InterfaceSigner::AddressKeyNotInSet{address_key: address_key, seed_name}))
-        };
+        let is_root = get_address_details(database_name, &AddressKey::from_multisigner(&multisigner))?.is_root();
         Ok(Self {
-            keys_state: keys_state.to_owned(),
-            selected,
-            set
+            seed_name: keys_state.seed_name(),
+            network_specs_key: keys_state.network_specs_key(),
+            multisigner,
+            is_root,
         })
     }
-    pub fn new_multiselect(seed_name: String, network: NetworkSpecsKey, multiselect: &Vec<MultiSigner>) -> Self {
-        Self {
-            keys_state: KeysState {
-                seed_name,
-                network,
-                specialty: SpecialtyKeysState::MultiSelect(multiselect.to_vec()),
-            },
-            selected: 0,
-            set: multiselect.to_owned(),
-        }
-    }
-    pub fn get_keys_state(&self) -> KeysState {
+    pub fn blank_keys_state(&self) -> KeysState {
         KeysState {
-            seed_name: self.keys_state.seed_name(),
-            network: self.keys_state.network_specs_key(),
+            seed_name: self.seed_name(),
+            network_specs_key: self.network_specs_key(),
             specialty: SpecialtyKeysState::None,
         }
     }
     pub fn seed_name(&self) -> String {
-        self.keys_state.seed_name()
+        self.seed_name.to_owned()
     }
     pub fn network_specs_key(&self) -> NetworkSpecsKey {
-        self.keys_state.network_specs_key()
+        self.network_specs_key.to_owned()
     }
     pub fn multisigner(&self) -> MultiSigner {
-        self.set[self.selected].to_owned()
+        self.multisigner.to_owned()
     }
-    pub fn set(&self) -> Vec<MultiSigner> {
+    pub fn is_root(&self) -> bool {
+        self.is_root
+    }
+}
+
+
+impl AddressStateMulti {
+    pub fn new(seed_name: String, network_specs_key: NetworkSpecsKey, multiselect: &Vec<MultiSigner>, database_name: &str) -> Result<Self, ErrorSigner> {
+        let mut set: Vec<(MultiSigner, bool)> = Vec::new();
+        for multisigner in multiselect.iter() {
+            let address_details = get_address_details(database_name, &AddressKey::from_multisigner(multisigner))?;
+            set.push((multisigner.to_owned(), address_details.is_root()))
+        }
+        Ok(Self {
+            seed_name,
+            network_specs_key,
+            selected: 0,
+            set,
+        })
+    }
+    pub fn blank_keys_state(&self) -> KeysState {
+        KeysState {
+            seed_name: self.seed_name(),
+            network_specs_key: self.network_specs_key(),
+            specialty: SpecialtyKeysState::None,
+        }
+    }
+    pub fn seed_name(&self) -> String {
+        self.seed_name.to_owned()
+    }
+    pub fn network_specs_key(&self) -> NetworkSpecsKey {
+        self.network_specs_key.to_owned()
+    }
+    pub fn multisigner(&self) -> MultiSigner {
+        self.set[self.selected].0.to_owned()
+    }
+    pub fn set(&self) -> Vec<(MultiSigner, bool)> {
         self.set.to_owned()
     }
     pub fn next(&self) -> Self {
@@ -236,9 +264,10 @@ impl AddressState {
             else {self.selected+1}
         };
         Self {
-            keys_state: self.keys_state.to_owned(),
+            seed_name: self.seed_name(),
+            network_specs_key: self.network_specs_key(),
             selected,
-            set: self.set.to_owned(),
+            set: self.set(),
         }
     }
     pub fn previous(&self) -> Self {
@@ -247,9 +276,10 @@ impl AddressState {
             else {self.selected-1}
         };
         Self {
-            keys_state: self.keys_state.to_owned(),
+            seed_name: self.seed_name(),
+            network_specs_key: self.network_specs_key(),
             selected,
-            set: self.set.to_owned(),
+            set: self.set(),
         }
     }
     pub fn number(&self) -> usize {
@@ -258,7 +288,11 @@ impl AddressState {
     pub fn out_of(&self) -> usize {
         self.set.len()
     }
+    pub fn is_root(&self) -> bool {
+        self.set[self.selected].1
+    }
 }
+
 
 impl DeriveState {
     pub fn new (entered_string: &str, keys_state: &KeysState) -> Self {
@@ -267,10 +301,10 @@ impl DeriveState {
             keys_state: keys_state.to_owned(),
         }
     }
-    pub fn get_keys_state(&self) -> KeysState {
+    pub fn blank_keys_state(&self) -> KeysState {
         KeysState {
             seed_name: self.keys_state.seed_name(),
-            network: self.keys_state.network_specs_key(),
+            network_specs_key: self.keys_state.network_specs_key(),
             specialty: SpecialtyKeysState::None,
         }
     }
@@ -286,7 +320,7 @@ impl DeriveState {
     pub fn update(&self, new_secret_string: &str) -> Self {
         Self {
             entered_info: EnteredInfo(new_secret_string.to_string()),
-            keys_state: self.get_keys_state(),
+            keys_state: self.blank_keys_state(),
         }
     }
 }
@@ -400,6 +434,7 @@ impl Screen {
             Screen::SeedSelector => Some(String::from("SeedSelector")),
             Screen::Keys(_) => Some(String::from("Keys")),
             Screen::KeyDetails(_) => Some(String::from("KeyDetails")),
+            Screen::KeyDetailsMulti(_) => Some(String::from("KeyDetailsMultiSelect")),
             Screen::NewSeed => Some(String::from("NewSeed")),
             Screen::RecoverSeedName(_) => Some(String::from("RecoverSeedName")),
             Screen::RecoverSeedPhrase(_) => Some(String::from("RecoverSeedPhrase")),
@@ -424,10 +459,11 @@ impl Screen {
             Screen::SeedSelector => "Select seed",
             Screen::Keys(_) => "",
             Screen::KeyDetails(_) => "Key",
+            Screen::KeyDetailsMulti(_) => "Key",
             Screen::NewSeed => "New Seed",
             Screen::RecoverSeedName(_) => "Recover Seed",
             Screen::RecoverSeedPhrase(_) => "Recover Seed",
-            Screen::DeriveKey(_) => "Derive key",
+            Screen::DeriveKey(_) => "Derive Key",
             Screen::Settings => "",
             Screen::Verifier => "VERIFIER CERTIFICATE",
             Screen::ManageNetworks => "MANAGE NETWORKS",
@@ -448,6 +484,7 @@ impl Screen {
             Screen::SeedSelector => false,
             Screen::Keys(_) => true,
             Screen::KeyDetails(_) => true,
+            Screen::KeyDetailsMulti(_) => true,
             Screen::NewSeed => true,
             Screen::RecoverSeedName(_) => true,
             Screen::RecoverSeedPhrase(_) => true,

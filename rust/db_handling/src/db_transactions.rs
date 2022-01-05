@@ -3,7 +3,7 @@ use parity_scale_codec_derive;
 use sled::{Batch, Transactional};
 use sp_runtime::MultiSigner;
 
-use constants::{ADDRESS_BOOK, ADDRTREE, GENERALVERIFIER, HISTORY, METATREE, SETTREE, SIGN, SPECSTREE, SPECSTREEPREP, STUB, TRANSACTION, TYPES, VERIFIERS};
+use constants::{ADDRESS_BOOK, ADDRTREE, DRV, GENERALVERIFIER, HISTORY, METATREE, SETTREE, SIGN, SPECSTREE, SPECSTREEPREP, STUB, TRANSACTION, TYPES, VERIFIERS};
 use definitions::{error::{Active, DatabaseSigner, EntryDecodingSigner, ErrorActive, ErrorSigner, ErrorSource, NotFoundSigner, Signer}, helpers::multisigner_to_public, history::{Event, IdentityHistory, MetaValuesDisplay, NetworkSpecsDisplay, NetworkVerifierDisplay, SignDisplay, SignMessageDisplay, TypesDisplay}, keyring::{AddressKey, MetaKey, NetworkSpecsKey, VerifierKey}, metadata::MetaValues, network_specs::{NetworkSpecs, NetworkSpecsToSend, CurrentVerifier, ValidCurrentVerifier, Verifier, VerifierValue}, qr_transfers::ContentLoadTypes, users::AddressDetails};
 
 use crate::helpers::{make_batch_clear_tree, open_db, open_tree, verify_checksum};
@@ -489,6 +489,62 @@ impl TrDbColdSign {
         TrDbCold::new()
             .set_history(events_to_batch::<Signer>(&database_name, history)?)
             .set_transaction(for_transaction)
+            .apply::<Signer>(&database_name)?;
+        let database = open_db::<Signer>(&database_name)?;
+        match database.checksum() {
+            Ok(x) => Ok(x),
+            Err(e) => return Err(<Signer>::db_internal(e)),
+        }
+    }
+}
+
+/// Temporary storage for information needed to import derivations
+/// Secret seed and seed name are required to approve
+#[derive(parity_scale_codec_derive::Decode, parity_scale_codec_derive::Encode)]
+pub struct TrDbColdDerivations {
+    checked_derivations: Vec<String>,
+    network_specs: NetworkSpecs,
+}
+
+impl TrDbColdDerivations {
+    /// function to generate TrDbColdDerivations
+    pub fn generate(checked_derivations: &Vec<String>, network_specs: &NetworkSpecs) -> Self {
+        Self {
+            checked_derivations: checked_derivations.to_owned(),
+            network_specs: network_specs.to_owned(),
+        }
+    }
+    /// function to recover TrDbColdDerivations from storage in the database
+    pub fn from_storage(database_name: &str, checksum: u32) -> Result<Self, ErrorSigner> {
+        let drv_encoded = {
+            let database = open_db::<Signer>(&database_name)?;
+            verify_checksum(&database, checksum)?;
+            let transaction = open_tree::<Signer>(&database, TRANSACTION)?;
+            match transaction.get(DRV) {
+                Ok(Some(a)) => a,
+                Ok(None) => return Err(ErrorSigner::NotFound(NotFoundSigner::Derivations)),
+                Err(e) => return Err(<Signer>::db_internal(e)),
+            }
+        };
+        match Self::decode(&mut &drv_encoded[..]) {
+            Ok(a) => Ok(a),
+            Err(_) => return Err(ErrorSigner::Database(DatabaseSigner::EntryDecoding(EntryDecodingSigner::Derivations))),
+        }
+    }
+    /// function to get checked derivations
+    pub fn checked_derivations(&self) -> &Vec<String> {
+        &self.checked_derivations
+    }
+    /// function to get network specs
+    pub fn network_specs(&self) -> &NetworkSpecs {
+        &self.network_specs
+    }
+    /// function to put TrDbColdDerivations into storage in the database
+    pub fn store_and_get_checksum(&self, database_name: &str) -> Result<u32, ErrorSigner> {
+        let mut transaction_batch = make_batch_clear_tree::<Signer>(database_name, TRANSACTION)?;
+        transaction_batch.insert(DRV, self.encode());
+        TrDbCold::new()
+            .set_transaction(transaction_batch) // clear transaction tree and insert the stub
             .apply::<Signer>(&database_name)?;
         let database = open_db::<Signer>(&database_name)?;
         match database.checksum() {

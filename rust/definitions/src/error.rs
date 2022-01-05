@@ -376,6 +376,7 @@ impl ErrorSource for Active {
                             CommandNeedKey::Verifier => "`-verifier`",
                             CommandNeedKey::Remove => "`-title` or `-name`",
                             CommandNeedKey::RemoveVersion => "`-version`",
+                            CommandNeedKey::DerivationsTitle => "'-title'",
                         };
                         format!("Expected {} key to be used.", insert)
                     },
@@ -392,6 +393,7 @@ impl ErrorSource for Active {
                             CommandDoubleKey::Name => "`-name`",
                             CommandDoubleKey::SufficientCrypto => "`-sufficient`",
                             CommandDoubleKey::Remove => "`-remove`",
+                            CommandDoubleKey::DerivationsTitle => "'-title'",
                         };
                         format!("More than one entry for {} key is not allowed.", insert)
                     },
@@ -412,11 +414,13 @@ impl ErrorSource for Active {
                             CommandNeedArgument::SufficientCrypto => "`-sufficient`",
                             CommandNeedArgument::SufficientCryptoHex => "`-sufficient -hex`",
                             CommandNeedArgument::SufficientCryptoFile => "`-sufficient -file`",
-                            CommandNeedArgument::Make => "make",
-                            CommandNeedArgument::Sign => "sign",
-                            CommandNeedArgument::RemoveTitle => "`-remove -title`",
-                            CommandNeedArgument::RemoveName => "`-remove -name`",
-                            CommandNeedArgument::RemoveVersion => "`-remove -name *** -version`"
+                            CommandNeedArgument::Make => "'make'",
+                            CommandNeedArgument::Sign => "'sign'",
+                            CommandNeedArgument::RemoveTitle => "`remove -title`",
+                            CommandNeedArgument::RemoveName => "`remove -name`",
+                            CommandNeedArgument::RemoveVersion => "`remove -name *** -version`",
+                            CommandNeedArgument::Derivations => "'derivations'",
+                            CommandNeedArgument::DerivationsTitle => "'-title'",
                         };
                         format!("{} must be followed by an agrument.", insert)
                     },
@@ -450,7 +454,8 @@ impl ErrorSource for Active {
                     InputActive::PublicKeyLength => String::from("Provided verifier public key has wrong length."),
                     InputActive::SignatureLength => String::from("Provided signature has wrong length."),
                     InputActive::FaultyMetadataInPayload(e) => format!("Metadata in the message to sign is not suitable. {}", e.show()),
-                    InputActive::BadSignature => format!("Bad signature."),
+                    InputActive::BadSignature => String::from("Bad signature."),
+                    InputActive::NoValidDerivationsToExport => String::from("No valid password-free derivations found to generate ContentDerivations."),
                 }
             },
             ErrorActive::Qr(e) => format!("Error generating qr code. {}", e),
@@ -648,6 +653,7 @@ pub enum CommandNeedKey {
     Verifier,
     Remove,
     RemoveVersion,
+    DerivationsTitle,
 }
 
 /// Enum listing command line parser errors conserning key encountered twice
@@ -664,6 +670,7 @@ pub enum CommandDoubleKey {
     Name,
     SufficientCrypto,
     Remove,
+    DerivationsTitle,
 }
 
 /// Enum listing command line parser errors conserning missing key argument
@@ -689,6 +696,8 @@ pub enum CommandNeedArgument {
     RemoveTitle,
     RemoveName,
     RemoveVersion,
+    Derivations,
+    DerivationsTitle,
 }
 
 /// Enum listing command line parser errors conserning an unsuitable key argument
@@ -720,6 +729,7 @@ pub enum InputActive {
     SignatureLength,
     FaultyMetadataInPayload(MetadataError),
     BadSignature,
+    NoValidDerivationsToExport,
 }
 
 /// Enum-marker indicating that error originates on the Signer side
@@ -824,7 +834,6 @@ impl ErrorSource for Signer {
                     InterfaceSigner::PublicKeyLength => String::from("Public key length does not match the encryption."),
                     InterfaceSigner::HistoryPageOutOfRange{page_number, total_pages} => format!("Requested history page {} does not exist. Total number of pages {}.", page_number, total_pages),
                     InterfaceSigner::SeedNameNotMatching{address_key, expected_seed_name, real_seed_name} => format!("Expected seed name {} for address key {}. Address details in database have {} name.", expected_seed_name, hex::encode(address_key.key()), real_seed_name),
-                    InterfaceSigner::AddressKeyNotInSet{address_key, seed_name} => format!("Address key {} was expected and not found in address key set for seed name {}.", hex::encode(address_key.key()), seed_name),
                     InterfaceSigner::LostPwd => String::from("Derivation had password, then lost it."),
                     InterfaceSigner::VersionNotU32(x) => format!("Version {} could not be converted into u32.", x),
                     InterfaceSigner::IncNotU32(x) => format!("Increment {} could not be converted into u32.", x),
@@ -853,6 +862,7 @@ impl ErrorSource for Signer {
                             EntryDecodingSigner::AddressDetails(x) => format!("address details entry for key {}.", hex::encode(x.key())),
                             EntryDecodingSigner::CurrentVerifier(x) => format!("current verifier entry for key {}.", hex::encode(x.key())),
                             EntryDecodingSigner::DangerStatus => String::from("danger status entry."),
+                            EntryDecodingSigner::Derivations => String::from("temporary entry with information needed to import derivations."),
                             EntryDecodingSigner::GeneralVerifier => String::from("general verifier entry."),
                             EntryDecodingSigner::HistoryEntry(x) => format!("history entry for order {}.", x),
                             EntryDecodingSigner::NetworkSpecs(x) => format!("network specs (NetworkSpecs) entry for key {}.", hex::encode(x.key())),
@@ -885,6 +895,7 @@ impl ErrorSource for Signer {
             ErrorSigner::Input(a) => {
                 let insert = match a {
                     InputSigner::TransferContent(a) => a.show(),
+                    InputSigner::TransferDerivations => String::from("Payload could not be decoded as derivations transfer."),
                     InputSigner::FaultyMetadata(error) => format!("Received metadata is unsuitable. {}", error.show()),
                     InputSigner::TooShort => String::from("Input is too short."),
                     InputSigner::NotSubstrate(code) => format!("Only Substrate transactions are supported. Transaction is expected to start with 0x53, this one starts with 0x{}.", code),
@@ -927,6 +938,8 @@ impl ErrorSource for Signer {
                     InputSigner::NoMetadata{name} => format!("Input transaction is generated in network {}. Currently there are no metadata entries for it, and transaction could not be processed. Add network metadata.", name),
                     InputSigner::SpecsKnown{name, encryption} => format!("Exactly same network specs for network {} with encryption {} are already in the database.", name, encryption.show()),
                     InputSigner::AddSpecsVerifierChanged {name, old_verifier_value, new_verifier_value} => format!("Network {} current verifier is {}. Received add_specs message is verified by {}, which is neither current network verifier not the general verifier. Changing the network verifier to another non-general one would require wipe and reset of Signer.", name, old_verifier_value.show_error(), new_verifier_value.show_error()),
+                    InputSigner::InvalidDerivation(x) => format!("Derivation {} has invalid format.", x),
+                    InputSigner::OnlyNoPwdDerivations => String::from("Only derivations without passwords are allowed in bulk import."),
                 };
                 format!("Bad input data. {}", insert)
             },
@@ -943,10 +956,12 @@ impl ErrorSource for Signer {
                     NotFoundSigner::DangerStatus => String::from("Could not find danger status information."),
                     NotFoundSigner::Stub => String::from("Could not find database temporary entry with information needed for accepting approved information."),
                     NotFoundSigner::Sign => String::from("Could not find database temporary entry with information needed for signing approved transaction."),
+                    NotFoundSigner::Derivations => String::from("Could not find database temporary entry with information needed for importing derivations set."),
                     NotFoundSigner::HistoryEntry(x) => format!("Could not find history entry with order {}.", x),
                     NotFoundSigner::HistoryNetworkSpecs{name, encryption} => format!("Could not find network specs for {} with encryption {} needed to decode historical transaction.", name, encryption.show()),
                     NotFoundSigner::TransactionEvent(x) => format!("Entry with order {} contains no transaction-related events.", x),
                     NotFoundSigner::HistoricalMetadata{name} => format!("Historical transaction was generated in network {} and processed. Currently there are no metadata entries for the network, and transaction could not be processed again. Add network metadata.", name),
+                    NotFoundSigner::NetworkForDerivationsImport{genesis_hash, encryption} => format!("Unable to import derivations for network with genesis hash {} and encryption {}. Network is unknown. Please add corresponding network specs.", hex::encode(genesis_hash), encryption.show()),
                 }
             },
             ErrorSigner::DeadVerifier(key) => format!("Network with genesis hash {} is disabled. It could be enabled again only after complete wipe and re-installation of Signer.", hex::encode(key.genesis_hash())),
@@ -1014,7 +1029,6 @@ pub enum InterfaceSigner {
     PublicKeyLength,
     HistoryPageOutOfRange{page_number: u32, total_pages: u32},
     SeedNameNotMatching{address_key: AddressKey, expected_seed_name: String, real_seed_name: String},
-    AddressKeyNotInSet{address_key: AddressKey, seed_name: String},
     LostPwd,
     VersionNotU32(String),
     IncNotU32(String),
@@ -1089,6 +1103,7 @@ pub enum EntryDecodingSigner {
     AddressDetails(AddressKey),
     CurrentVerifier(VerifierKey),
     DangerStatus,
+    Derivations,
     GeneralVerifier,
     HistoryEntry(u32),
     NetworkSpecs(NetworkSpecsKey),
@@ -1111,6 +1126,7 @@ pub enum MismatchSigner {
 #[derive(Debug)]
 pub enum InputSigner {
     TransferContent(TransferContent),
+    TransferDerivations,
     FaultyMetadata(MetadataError),
     TooShort,
     NotSubstrate(String),
@@ -1135,6 +1151,8 @@ pub enum InputSigner {
     NoMetadata{name: String},
     SpecsKnown{name: String, encryption: Encryption},
     AddSpecsVerifierChanged {name: String, old_verifier_value: VerifierValue, new_verifier_value: VerifierValue},
+    InvalidDerivation(String),
+    OnlyNoPwdDerivations,
 }
 
 #[derive(Debug)]
@@ -1159,10 +1177,12 @@ pub enum NotFoundSigner {
     DangerStatus,
     Stub,
     Sign,
+    Derivations,
     HistoryEntry(u32),
     HistoryNetworkSpecs{name: String, encryption: Encryption},
     TransactionEvent(u32),
     HistoricalMetadata{name: String},
+    NetworkForDerivationsImport{genesis_hash: [u8;32], encryption: Encryption},
 }
 
 /// Enum listing errors that can happen when generating address only on the Signer side

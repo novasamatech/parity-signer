@@ -74,7 +74,7 @@ export! {
 	fn check_path(
         path: &str
 	) -> anyhow::Result<bool, anyhow::Error> {
-        db_handling::identities::check_derivation_format(path)
+        db_handling::identities::check_derivation_format(path).map_err(|e| e.anyhow())
     }
 
     @Java_io_parity_signer_models_SignerDataModel_substrateValidateSeedphrase

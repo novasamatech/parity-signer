@@ -11,6 +11,7 @@ use std::convert::TryInto;
 /// `$ cargo run load_metadata -n westend`
 /// `$ cargo run add_specs -d -n -ed25519 westend`
 /// `$ cargo run add_network -u wss://unknown-network.eu -ecdsa`
+/// `$ cargo run derivations -title westend -payload my_derivations_file`
 
 
 /// Enum to describe the incoming command contents
@@ -26,6 +27,7 @@ pub enum Command {
     TransferMeta,
     MakeColdRelease,
     TransferMetaRelease,
+    Derivations(Derivations),
 }
 
 pub enum Show {
@@ -106,6 +108,12 @@ enum Entry {
 pub enum Remove {
     Title(String),
     SpecNameVersion{name: String, version: u32},
+}
+
+pub struct Derivations {
+    pub goal: Goal,
+    pub title: String,
+    pub derivations: String,
 }
 
 impl Command {
@@ -599,6 +607,66 @@ impl Command {
                     "transfer_meta_to_cold" => Ok(Command::TransferMeta),
                     "make_cold_release" => Ok(Command::MakeColdRelease),
                     "transfer_meta_to_cold_release" => Ok(Command::TransferMetaRelease),
+                    "derivations" => {
+                        let mut goal = Goal::Both; // default option for `derivations`
+                        let mut args = args.peekable();
+                        match args.peek() {
+                            Some(x) => {
+                                match x.to_lowercase().as_str() {
+                                    "-qr" => {
+                                        goal = Goal::Qr;
+                                        args.next();
+                                    },
+                                    "-text" => {
+                                        goal = Goal::Text;
+                                        args.next();
+                                    },
+                                    _ => (),
+                                }
+                            },
+                            None => return Err(ErrorActive::CommandParser(CommandParser::NeedArgument(CommandNeedArgument::Derivations))),
+                        }
+                        let mut found_title = None;
+                        let mut found_payload = None;
+                        loop {
+                            match args.next() {
+                                Some(a) => {
+                                    match a.as_str() {
+                                        "-title" => {
+                                            if let Some(_) = found_title {return Err(ErrorActive::CommandParser(CommandParser::DoubleKey(CommandDoubleKey::DerivationsTitle)))}
+                                            found_title = match args.next() {
+                                                Some(b) => Some(b.to_string()),
+                                                None => return Err(ErrorActive::CommandParser(CommandParser::NeedArgument(CommandNeedArgument::DerivationsTitle))),
+                                            };
+                                        },
+                                        "-payload" => {
+                                            if let Some(_) = found_payload {return Err(ErrorActive::CommandParser(CommandParser::DoubleKey(CommandDoubleKey::Payload)))}
+                                            found_payload = match args.next() {
+                                                Some(b) => {
+                                                    match std::fs::read_to_string(&b) {
+                                                        Ok(c) => Some(c),
+                                                        Err(e) => return Err(ErrorActive::Input(InputActive::File(e))),
+                                                    }
+                                                },
+                                                None => return Err(ErrorActive::CommandParser(CommandParser::NeedArgument(CommandNeedArgument::Payload))),
+                                            };
+                                        },
+                                        _ => return Err(ErrorActive::CommandParser(CommandParser::UnexpectedKeyArgumentSequence)),
+                                    }
+                                },
+                                None => break,
+                            }
+                        }
+                        let title = match found_title {
+                            Some(a) => a,
+                            None => return Err(ErrorActive::CommandParser(CommandParser::NeedKey(CommandNeedKey::DerivationsTitle))),
+                        };
+                        let derivations = match found_payload {
+                            Some(a) => a,
+                            None => return Err(ErrorActive::CommandParser(CommandParser::NeedKey(CommandNeedKey::Payload))),
+                        };
+                        Ok(Command::Derivations(Derivations{goal, title, derivations}))
+                    },
                     _ => return Err(ErrorActive::CommandParser(CommandParser::UnknownCommand)),
                 }
             },

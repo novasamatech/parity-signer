@@ -3,7 +3,7 @@ use sp_core::crypto::{Ss58Codec, Ss58AddressFormat};
 use sp_runtime::{generic::Era, MultiSigner};
 
 use constants::HALFSIZE;
-use definitions::{crypto::Encryption, error::{ErrorSigner, ErrorSource, Signer}, helpers::make_identicon_from_multisigner, history::MetaValuesDisplay, keyring::{print_multisigner_as_base58, VerifierKey}, network_specs::{NetworkSpecs, NetworkSpecsToSend, VerifierValue}, print::export_complex_single, qr_transfers::ContentLoadTypes, users::AddressDetails};
+use definitions::{crypto::Encryption, error::{ErrorSigner, ErrorSource, Signer}, helpers::make_identicon_from_multisigner, history::MetaValuesDisplay, keyring::{print_multisigner_as_base58, VerifierKey}, network_specs::{NetworkSpecs, NetworkSpecsToSend, VerifierValue}, print::{export_complex_single, export_plain_vector}, qr_transfers::ContentLoadTypes, users::AddressDetails};
 use parser::cards::ParserCard;
 use plot_icon::png_data_from_vec;
 
@@ -20,6 +20,7 @@ pub (crate) enum Card <'a> {
     NewSpecs(&'a NetworkSpecsToSend),
     NetworkInfo(&'a NetworkSpecs),
     NetworkGenesisHash(&'a Vec<u8>),
+    Derivations(&'a Vec<String>),
     Warning (Warning <'a>),
     Error (ErrorSigner),
 }
@@ -123,6 +124,7 @@ impl <'a> Card <'a> {
             Card::NewSpecs(x) => fancy(index, indent, "new_specs", &format!("{{{}}}", x.show())),
             Card::NetworkInfo(x) => fancy(index, indent, "network_info", &format!("{{\"network_title\":\"{}\",\"network_logo\":\"{}\"}}", x.title, x.logo)),
             Card::NetworkGenesisHash(x) => fancy(index, indent, "network_genesis_hash", &format!("\"{}\"", hex::encode(x))),
+            Card::Derivations(x) => fancy(index, indent, "derivations", &export_plain_vector(x)),
             Card::Warning (warn) => fancy(index, indent, "warning", &format!("\"{}\"", warn.show())),
             Card::Error (err) => fancy(index, indent, "error", &format!("\"{}\"", <Signer>::show(&err))),
         }

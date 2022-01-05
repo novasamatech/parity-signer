@@ -7,9 +7,9 @@ use sled::{Db, Batch};
 use sp_core::{Pair, ed25519, sr25519, ecdsa};
 use parity_scale_codec::Encode;
 use regex::Regex;
-use constants::{ADDRTREE, MAX_WORDS_DISPLAY, SPECSTREE};
+use constants::{ADDRTREE, MAX_WORDS_DISPLAY, SPECSTREE, TRANSACTION};
 use defaults::get_default_chainspecs;
-use definitions::{crypto::Encryption, error::{Active, AddressGeneration, AddressGenerationCommon, ErrorActive, ErrorSigner, ErrorSource, ExtraAddressGenerationSigner, InterfaceSigner, NotFoundSigner, NotHexSigner, Signer, SpecsKeySource}, helpers::{get_multisigner, multisigner_to_public, unhex}, history::{Event, IdentityHistory}, keyring::{NetworkSpecsKey, AddressKey, print_multisigner_as_base58}, network_specs::NetworkSpecs, print::{export_plain_vector, export_complex_vector_with_error}, users::{AddressDetails, SeedObject}};
+use definitions::{crypto::Encryption, error::{Active, AddressGeneration, AddressGenerationCommon, ErrorActive, ErrorSigner, ErrorSource, ExtraAddressGenerationSigner, InputActive, InputSigner, InterfaceSigner, NotFoundSigner, NotHexSigner, Signer, SpecsKeySource}, helpers::{get_multisigner, multisigner_to_public, unhex}, history::{Event, IdentityHistory}, keyring::{NetworkSpecsKey, AddressKey, print_multisigner_as_base58}, network_specs::NetworkSpecs, print::{export_plain_vector, export_complex_vector_with_error}, qr_transfers::ContentDerivations, users::{AddressDetails, SeedObject}};
 use bip39::{Language, Mnemonic, MnemonicType};
 use zeroize::Zeroize;
 use lazy_static::lazy_static;
@@ -17,7 +17,7 @@ use anyhow;
 use qrcode_static::png_qr_from_string;
 use sp_runtime::MultiSigner;
 
-use crate::db_transactions::TrDbCold;
+use crate::db_transactions::{TrDbCold, TrDbColdDerivations};
 use crate::helpers::{open_db, open_tree, make_batch_clear_tree, upd_id_batch, get_network_specs, get_address_details};
 use crate::interface_signer::addresses_set_seed_name_network;
 use crate::manage_history::{events_to_batch};
@@ -411,10 +411,10 @@ pub fn create_increment_set(increment: u32, multisigner: &MultiSigner, network_s
 }
 
 /// Check derivation format and determine whether there is a password
-pub fn check_derivation_format(path: &str) -> anyhow::Result<bool> {
+pub fn check_derivation_format(path: &str) -> Result<bool, ErrorSigner> {
     match REG_PATH.captures(path) {
         Some(caps) => Ok(caps.name("password").is_some()),
-        None => return Err(ErrorSigner::AddressGeneration(AddressGeneration::Extra(ExtraAddressGenerationSigner::InvalidDerivation)).anyhow()),
+        None => return Err(ErrorSigner::AddressGeneration(AddressGeneration::Extra(ExtraAddressGenerationSigner::InvalidDerivation))),
     }
 }
 
@@ -529,6 +529,67 @@ pub fn export_identity (pub_key: &str, network_specs_key_string: &str, database_
         Ok(hex::encode(qr_prep)) 
     }
     else {return Err(ErrorSigner::NotFound(NotFoundSigner::NetworkSpecsKeyForAddress{network_specs_key, address_key}).anyhow())}
+}
+
+/// Function to import derivations without password into Signer from qr code
+/// i.e. create new (address key + address details) entry,
+/// or add network specs key to the existing one
+pub fn import_derivations (checksum: u32, seed_name: &str, seed_phrase: &str, database_name: &str) -> Result<(), ErrorSigner> {
+    let content_derivations = TrDbColdDerivations::from_storage(database_name, checksum)?;
+    let network_specs = content_derivations.network_specs();
+    let seed_object = SeedObject {
+        seed_name: seed_name.to_string(),
+        seed_phrase: seed_phrase.to_string(),
+        encryption: network_specs.encryption.to_owned(),
+    };
+    let mut adds: Vec<(AddressKey, AddressDetails)> = Vec::new();
+    let mut events: Vec<Event> = Vec::new();
+    for path in content_derivations.checked_derivations().iter() {
+        let (mod_adds, mod_events) = create_address::<Signer>(&open_db::<Signer>(database_name)?, &adds, &events, path, &network_specs, &seed_object, false)?;
+        adds = mod_adds;
+        events = mod_events;
+    }
+    let identity_batch = upd_id_batch(Batch::default(), adds);
+    let transaction_batch = make_batch_clear_tree::<Signer>(database_name, TRANSACTION)?;
+    TrDbCold::new()
+        .set_addresses(identity_batch) // modify addresses
+        .set_history(events_to_batch::<Signer>(&database_name, events)?) // add corresponding history
+        .set_transaction(transaction_batch) // clear transaction tree
+        .apply::<Signer>(&database_name)
+}
+
+/// Function to check derivations before offering user to import them
+pub fn check_derivation_set(derivations: &Vec<String>) -> Result<(), ErrorSigner> {
+    for path in derivations.iter() {
+        match REG_PATH.captures(path) {
+            Some(caps) => if caps.name("password").is_some() {return Err(ErrorSigner::Input(InputSigner::OnlyNoPwdDerivations))},
+            None => return Err(ErrorSigner::Input(InputSigner::InvalidDerivation(path.to_string()))),
+        }
+    }
+    Ok(())
+}
+
+/// Function to prepare derivations export using regex and a text provided by the user
+pub fn prepare_derivations_export (encryption: &Encryption, genesis_hash: &[u8;32], content: &str) -> Result<ContentDerivations, ErrorActive> {
+    let mut derivations: Vec<String> = Vec::new();
+    let content_set: Vec<&str> = content.trim().split('\n').collect();
+    for path in content_set.iter() {
+        if let Some(caps) = REG_PATH.captures(path) {
+            if let Some(p) = caps.name("path") {
+                if caps.name("password").is_none() {
+                    derivations.push(p.as_str().to_string())
+                }
+            }
+        }
+    }
+    if derivations.len() == 0 {return Err(ErrorActive::Input(InputActive::NoValidDerivationsToExport))}
+    else {
+        println!("Found and used {} valid password-free derivations:", derivations.len());
+        for x in derivations.iter() {
+            println!("\"{}\"", x);
+        }
+    }
+    Ok(ContentDerivations::generate(encryption, genesis_hash, &derivations))
 }
 
 /// Function to display possible options of English code words from allowed words list
@@ -916,6 +977,15 @@ mod tests {
         assert!(path_set.contains(&String::from("//Alice//1//2")));
         fs::remove_dir_all(dbname).unwrap();
     }
-
+    
+    #[test]
+    fn checking_derivation_set() {
+        assert!(check_derivation_set(&vec!["/0".to_string(), "//Alice/westend".to_string(), "//secret//westend".to_string()]).is_ok());
+        assert!(check_derivation_set(&vec!["/0".to_string(), "/0".to_string(), "//Alice/westend".to_string(), "//secret//westend".to_string()]).is_ok());
+        assert!(check_derivation_set(&vec!["//remarkably///ugly".to_string()]).is_err());
+        assert!(check_derivation_set(&vec!["no_path_at_all".to_string()]).is_err());
+        assert!(check_derivation_set(&vec!["///".to_string()]).is_err());
+    }
+    
 }
 

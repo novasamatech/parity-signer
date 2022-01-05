@@ -49,6 +49,9 @@ impl AddressDetails {
         let (_, address_details) = AddressDetails::process_entry_with_key_checked::<T>(&address_key, address_details_encoded)?;
         Ok(address_details)
     }
+    pub fn is_root(&self) -> bool {
+        (self.path == "")&&(!self.has_pwd)
+    }
     
 }
 
