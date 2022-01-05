@@ -1228,8 +1228,11 @@ impl State {
             Screen::Transaction(_) => "None",
             Screen::SeedSelector => "NewSeed",
             Screen::Keys(ref keys_state) => {
-                if keys_state.is_multiselect() {"MultiSelect"}
-                else {"Backup"}
+                if let Modal::Backup(_) = self.navstate.modal {"None"}
+                else {
+                    if keys_state.is_multiselect() {"MultiSelect"}
+                    else {"Backup"}
+                }
             },
             Screen::KeyDetails(_) => "KeyMenu",
             Screen::NewSeed => "None",
