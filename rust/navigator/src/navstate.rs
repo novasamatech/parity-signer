@@ -101,11 +101,11 @@ impl State {
                                 Screen::NewSeed => {
                                     new_navstate.screen = Screen::SeedSelector;
                                 },
-                                Screen::RecoverSeedName => {
+                                Screen::RecoverSeedName(_) => {
                                     new_navstate.screen = Screen::SeedSelector;
                                 },
-                                Screen::RecoverSeedPhrase(_) => {
-                                    new_navstate.screen = Screen::RecoverSeedName;
+                                Screen::RecoverSeedPhrase(ref seed_name) => {
+                                    new_navstate.screen = Screen::RecoverSeedName(seed_name.to_string());
                                 },
                                 Screen::DeriveKey(d) => {
                                     new_navstate.screen = Screen::Keys(d.get_keys_state());
@@ -202,7 +202,7 @@ impl State {
                                 _ => println!("GoForward does nothing here"),
                             }
                         },
-                        Screen::RecoverSeedName => {
+                        Screen::RecoverSeedName(_) => {
                             match db_handling::identities::get_addresses_by_seed_name(dbname, details_str) {
                                 Ok(a) => {
                                     if a.len() == 0 {new_navstate = Navstate::clean_screen(Screen::RecoverSeedPhrase(details_str.to_string()))}
@@ -441,7 +441,7 @@ impl State {
                     new_navstate = Navstate::clean_screen(Screen::NewSeed);
                 },
                 Action::RecoverSeed => {
-                    new_navstate = Navstate::clean_screen(Screen::RecoverSeedName);
+                    new_navstate = Navstate::clean_screen(Screen::RecoverSeedName(String::new()));
                 },
                 Action::BackupSeed => {
                     if details_str == "" {
@@ -942,7 +942,7 @@ impl State {
                     }
                 }
                 Screen::NewSeed => format!("\"keyboard\":{}", new_navstate.keyboard()),
-                Screen::RecoverSeedName => format!("\"keyboard\":{}", new_navstate.keyboard()),
+                Screen::RecoverSeedName(ref seed_name) => format!("\"seed_name\":\"{}\",\"keyboard\":{}", seed_name, new_navstate.keyboard()),
                 Screen::RecoverSeedPhrase(ref seed_name) => format!("\"seed_name\":\"{}\",\"keyboard\":{}", seed_name, new_navstate.keyboard()),
                 Screen::DeriveKey(ref derive_state) => {
                     match db_handling::interface_signer::derive_prep (dbname, &derive_state.seed_name(), &derive_state.network_specs_key(), &details_str) {
@@ -1180,7 +1180,7 @@ impl State {
             Screen::Keys(_) => true,
             Screen::KeyDetails(_) => false,
             Screen::NewSeed => false,
-            Screen::RecoverSeedName => false,
+            Screen::RecoverSeedName(_) => false,
             Screen::RecoverSeedPhrase(_) => false,
             Screen::DeriveKey(_) => false,
             Screen::Settings => true,
@@ -1205,7 +1205,7 @@ impl State {
             Screen::Keys(_) => "Keys",
             Screen::KeyDetails(_) => "Keys",
             Screen::NewSeed => "Keys",
-            Screen::RecoverSeedName => "Keys",
+            Screen::RecoverSeedName(_) => "Keys",
             Screen::RecoverSeedPhrase(_) => "Keys",
             Screen::DeriveKey(_) => "Keys",
             Screen::Settings => "Settings",
@@ -1236,7 +1236,7 @@ impl State {
             },
             Screen::KeyDetails(_) => "KeyMenu",
             Screen::NewSeed => "None",
-            Screen::RecoverSeedName => "None",
+            Screen::RecoverSeedName(_) => "None",
             Screen::RecoverSeedPhrase(_) => "None",
             Screen::DeriveKey(_) => "None",
             Screen::Settings => "None",
@@ -1261,7 +1261,7 @@ impl State {
             Screen::Keys(_) => "h4",
             Screen::KeyDetails(_) => "h4",
             Screen::NewSeed => "h1",
-            Screen::RecoverSeedName => "h1",
+            Screen::RecoverSeedName(_) => "h1",
             Screen::RecoverSeedPhrase(_) => "h1",
             Screen::DeriveKey(_) => "h1",
             Screen::Settings => "h4",
