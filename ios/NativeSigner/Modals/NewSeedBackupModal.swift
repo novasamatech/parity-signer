@@ -14,10 +14,10 @@ struct NewSeedBackupModal: View {
     @State var createRoots = true
     var body: some View {
         ZStack {
-            RoundedRectangle(cornerRadius: 8).foregroundColor(Color("Bg000"))
+            RoundedRectangle(cornerRadius: 8).foregroundColor(Color("Bg200"))
             VStack {
                 ZStack {
-                    RoundedRectangle(cornerRadius: 8).stroke(Color("Crypto400")).foregroundColor(Color("Bg000")).frame(height: 200)
+                    RoundedRectangle(cornerRadius: 8).foregroundColor(Color("Crypto100")).frame(height: 200)
                     Text(content.seed_phrase)
                         .font(.system(size: 16, weight: .semibold, design: .monospaced))
                         .foregroundColor(Color("Crypto400"))
@@ -30,7 +30,7 @@ struct NewSeedBackupModal: View {
                         HStack {
                             Image(systemName: confirmBackup ? "checkmark.square" : "square").imageScale(.large)
                             Text("I have written down my seed phrase")
-                                .multilineTextAlignment(.leading)
+                                .multilineTextAlignment(.leading).foregroundColor(Color("Text500"))
                             Spacer()
                         }
                     }
@@ -40,7 +40,7 @@ struct NewSeedBackupModal: View {
                         HStack {
                             Image(systemName: createRoots ? "checkmark.square" : "square").imageScale(.large)
                             Text("Create root keys")
-                                .multilineTextAlignment(.leading)
+                                .multilineTextAlignment(.leading).foregroundColor(Color("Text500"))
                             Spacer()
                         }
                     }
@@ -53,7 +53,7 @@ struct NewSeedBackupModal: View {
                     )
                         .padding(.top, 16.0)
                 }
-            }
+            }.padding(.horizontal, 16)
         }
     }
 }

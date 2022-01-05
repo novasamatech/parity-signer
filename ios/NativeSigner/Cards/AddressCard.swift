@@ -27,7 +27,7 @@ struct AddressCard: View {
                         VStack{
                             Spacer()
                             HStack{
-                        Spacer()
+                                Spacer()
                                 Image(systemName: address.multiselect ? "checkmark.circle.fill" : "circle").imageScale(.large)
                             }
                         }
@@ -35,8 +35,8 @@ struct AddressCard: View {
                 }.frame(width: 30, height: 30)
                 VStack (alignment: .leading) {
                     HStack {
-                        Text(address.seed_name)
-                            Text(address.path)
+                        Text(address.seed_name).foregroundColor(Color("Text600")).font(FBase(style: .subtitle1))
+                        Text(address.path)
                         if address.has_pwd {
                             Text("///").foregroundColor(Color("Crypto400"))
                                 .font(FCrypto(style: .body2))

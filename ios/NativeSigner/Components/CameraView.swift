@@ -13,9 +13,10 @@ struct CameraView: View {
     @EnvironmentObject var data: SignerDataModel
     @State var total: Int? = 0
     @State var captured: Int? = 0
+    let size = UIScreen.main.bounds.size.width
     var body: some View {
         ZStack {
-            //VStack {
+            VStack {
                 CameraPreview(session: model.session)
                     .onAppear {
                         model.configure()
@@ -43,13 +44,27 @@ struct CameraView: View {
                     .onReceive(model.$captured, perform: {rCaptured in
                         captured = rCaptured
                     })
+                    .mask(
+                        VStack {
+                        ZStack {
+                            RoundedRectangle(cornerRadius: 8).padding(12)
+                        }
+                            .frame(width:size, height: size)
+                            Spacer()
+                        }
+                    )
                 //.clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
-                    //.padding(.horizontal, 8)
-                //.overlay(RoundedRectangle(cornerRadius: 8).stroke(Color("Crypto400")))
-                
+                //.padding(.horizontal, 8)
+                    .overlay(
+                        VStack {
+                            RoundedRectangle(cornerRadius: 8).stroke(Color("Crypto400")).padding(12).frame(width: size, height: size)
+                            Spacer()
+                        }
+                            )
+                Spacer()
                 
                 if model.total ?? 0 > 0 {
-                
+                    
                     MenuStack {
                         HeadingOverline(text: "Multipart data").padding(.top, 12)
                         ProgressView(value: min(Float(captured ?? 0)/(Float(total ?? -1) + 2), 1))
@@ -70,7 +85,7 @@ struct CameraView: View {
                         }
                     }
                 }
-            //}
+            }
         }.background(Color("Bg100"))
     }
 }

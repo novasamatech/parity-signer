@@ -38,10 +38,7 @@ extension SignerDataModel {
             kSecReturnAttributes as String: true,
             kSecReturnData as String: false
         ]
-        print("starting seed names query")
         let status = SecItemCopyMatching(query as CFDictionary, &item)
-        print("refresh seeds")
-        print(SecCopyErrorMessageString(status, nil) ?? "Success")
         switch (status) {
         case errSecSuccess: do {
             guard let itemFound = item as? [[String : Any]]
@@ -51,9 +48,6 @@ extension SignerDataModel {
                 update_seed_names(nil, seedNames.joined(separator: ","))
                 return
             }
-            print("some seeds fetched")
-            print(itemFound)
-            print(kSecAttrAccount)
             let seedNames = itemFound.map{item -> String in
                 guard let seedName = item[kSecAttrAccount as String] as? String
                 else {
@@ -62,7 +56,6 @@ extension SignerDataModel {
                 }
                 return seedName
             }
-            print(seedNames)
             self.seedNames = seedNames.sorted()
             update_seed_names(nil, self.seedNames.joined(separator: ","))
             self.authenticated = true
@@ -212,6 +205,7 @@ extension SignerDataModel {
             return String(data: (item as! CFData) as Data, encoding: .utf8) ?? ""
         } else {
             self.lastError = SecCopyErrorMessageString(status, nil)! as String
+            authenticated = false
             return ""
         }
     }

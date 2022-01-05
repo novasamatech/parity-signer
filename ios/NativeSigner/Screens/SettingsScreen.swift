@@ -27,17 +27,13 @@ struct SettingsScreen: View {
             Button(action: {data.pushButton(buttonID: .ViewGeneralVerifier)}) {
             VStack {
                 HStack {
-                    Text("Verifier certificate").font(FBase(style: .h1))
+                    Text("Verifier certificate").font(FBase(style: .h1)).foregroundColor(Color("Text600"))
                     Spacer()
                 }
                 HStack {
-                    Image(uiImage: UIImage(data: Data(fromHexEncodedString: content.identicon) ?? Data()) ?? UIImage())
-                    .resizable(resizingMode: .stretch)
-                    .frame(width: 28, height: 28)
-                    VStack{
-                        Text(content.hex.truncateMiddle(length: 8))
-                        Text("encryption: " + content.encryption)
-                    }.foregroundColor(Color("Crypto400"))
+                    AddressCard(address: Address(
+                        base58: "encryption: " + content.encryption, path: content.hex.truncateMiddle(length: 8), has_pwd: false, identicon: content.identicon, seed_name: "", multiselect: false
+                    ))
                 }
             }
             .padding()
@@ -91,11 +87,13 @@ struct SettingsScreen: View {
             }) {
                 SettingsCardTemplate(text: "About")
             }
+            /*
             SettingsCardTemplate(
                 text: "App version: " + (data.appVersion ?? "Unknown!"),
                 withIcon: false,
                 withBackground: false
             )
+             */
         }
     }
 }

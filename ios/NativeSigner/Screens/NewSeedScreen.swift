@@ -41,7 +41,7 @@ struct NewSeedScreen: View {
                     }
                     .padding(.horizontal, 8)
             }
-            Text("Display name visible only to you").font(.callout)
+            Text("Display name is visible only on this device").font(.callout)
             Text(data.lastError).foregroundColor(.red)
             Spacer()
             BigButton(

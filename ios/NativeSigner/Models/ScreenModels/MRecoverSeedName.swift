@@ -9,4 +9,5 @@ import Foundation
 
 struct MRecoverSeedName: Decodable {
     var keyboard: Bool
+    var seed_name: String
 }

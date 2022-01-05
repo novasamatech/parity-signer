@@ -42,10 +42,14 @@ struct KeyManager: View {
                     }
                 }
                 Button(action: {data.pushButton(buttonID: .NetworkSelector)}) {
+                    HStack {
                     NetworkCard(title: content.network.title, logo: content.network.logo)
+                        Image(systemName: "chevron.down")
+                        Spacer()
+                    }
                 }
                 HStack {
-                    Text("DERIVED KEYS").foregroundColor(Color("Text600"))
+                    Text("DERIVED KEYS").foregroundColor(Color("Text300")).font(FBase(style: .overline))
                     Spacer()
                     Button(action: {
                         data.pushButton(buttonID: .NewKey)
@@ -86,7 +90,8 @@ struct KeyManager: View {
                 if (content.multiselect_mode) {
                     MultiselectBottomControl(selectedCount: content.multiselect_count)
                 } else {
-                SearchKeys(searchString: $searchString)
+                //SearchKeys(searchString: $searchString)
+                    EmptyView()
                 }
             }
         }

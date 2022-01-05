@@ -36,7 +36,10 @@ struct RecoverSeedName: View {
                             data.pushButton(buttonID: .GoForward, details: seedName)
                         }
                     }
-                    .onAppear(perform: {nameFocused = content.keyboard})
+                    .onAppear(perform: {
+                        seedName = content.seed_name
+                        nameFocused = content.keyboard
+                    })
                     .padding(.horizontal, 8)
             }
             Text("Display name visible only to you").font(.callout)

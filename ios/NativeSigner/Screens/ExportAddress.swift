@@ -31,17 +31,17 @@ struct ExportAddress: View {
                     HStack {
                         Text("Base58 key: ")
                         Text(content.base58)
-                    }.padding()
+                    }.padding().foregroundColor(Color("Crypto400")).font(FCrypto(style: .body2))
                     HStack {
                         Text("Hex key: ")
                         Text(content.pubkey)
-                    }.padding()
+                    }.padding().foregroundColor(Color("Crypto400")).font(FCrypto(style: .body2))
                     HStack {
                         Text("Seed name: ")
                         Text(content.seed_name)
-                    }.padding()
+                    }.padding().foregroundColor(Color("Text400")).font(FBase(style: .body2))
                 }
-                .foregroundColor(Color("Crypto400"))
+                
             }
         }
         .gesture(

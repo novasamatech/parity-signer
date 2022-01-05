@@ -70,7 +70,7 @@ func FCrypto(style: Fontstyle) -> Font {
     case .body1:
         return Font.custom("RobotoMono-Medium", size:12)
     case .body2:
-        return Font.custom("RobotoMono-Light", size:12)
+        return Font.custom("RobotoMono-Light", size:12).weight(.medium)
     case .overline:
         return Font.custom("RobotoMono-Medium", size:12)
     case .subtitle1:

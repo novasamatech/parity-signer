@@ -16,38 +16,49 @@ struct Backup: View {
     //TODO: chop chop chop
     var body: some View {
         ZStack {
-            RoundedRectangle(cornerRadius: 20.0).foregroundColor(Color("Bg000"))
+            RoundedRectangle(cornerRadius: 20.0).foregroundColor(Color("Bg200"))
             VStack{
-                HeaderBar(line1: "Backup", line2: content.seed_name)
+                ZStack {
+                    HeaderBar(line1: "Backup", line2: content.seed_name)
+                    HStack {
+                        Spacer()
+                        Button(action: {
+                            data.pushButton(buttonID: .GoBack)
+                        }) {
+                            Image(systemName: "xmark").imageScale(.large).foregroundColor(Color("Text300"))
+                        }
+                    }
+                }
                 ScrollView{
                     VStack {
+                        Text("SEED PHRASE").foregroundColor(Color("Text300")).font(FBase(style: .overline))
                         ZStack {
-                            RoundedRectangle(cornerRadius: 8).stroke(Color("Crypto400")).foregroundColor(Color("Bg000")).frame(height: 200)
+                            RoundedRectangle(cornerRadius: 8).foregroundColor(Color(countdown>0 ? "Crypto100" : "Bg300")).frame(height: 200)
                             Text(secret)
                                 .font(.system(size: 16, weight: .semibold, design: .monospaced))
                                 .foregroundColor(Color("Crypto400"))
                                 .padding(8)
                         }
                         .onAppear{
-                            if data.seedBackup == "" {
-                                secret = data.getSeed(seedName: content.seed_name, backup: true)
-                            } else {
-                                secret = data.seedBackup
-                            }
+                            secret = data.getSeed(seedName: content.seed_name, backup: true)
                         }
                         .onDisappear{
                             secret = ""
                             data.seedBackup = ""
                         }
+                        Text("DERIVED KEYS").foregroundColor(Color("Text300")).font(FBase(style: .overline))
                         LazyVStack {
                             ForEach(content.derivations.sorted(by: {$0.network_order < $1.network_order}), id: \.network_order) {
                                 pack in
                                 VStack {
-                                    NetworkCard(title: pack.network_title, logo: pack.network_logo)
+                                    HStack {
+                                        NetworkCard(title: pack.network_title, logo: pack.network_logo).padding(.top, 10)
+                                        Spacer()
+                                    }
                                     ForEach(pack.id_set.sorted(by: {$0.path < $1.path}), id: \.self) {
                                         record in
                                         HStack{
-                                            Text(record.path)
+                                            Text((record.path == "" && !record.has_pwd) ? "seed key" : record.path)
                                                 .foregroundColor(Color("Crypto400"))
                                                 .font(FCrypto(style: .body2))
                                             if record.has_pwd {
@@ -62,22 +73,38 @@ struct Backup: View {
                                 }
                             }
                         }
-                    }
+                    }.padding(.bottom, 80)
                 }
-            }
+            }.padding(16)
             if countdown > 0 {
                 VStack {
                     Spacer()
                     ZStack {
-                        RoundedRectangle(cornerRadius: 8).foregroundColor(Color("Bg300")).frame(height: 40)
-                        Text("Clear in " + String(countdown) + "s")
-                            .onReceive(timer) { input in
-                                countdown -= 1
-                                if countdown == 0 {
-                                    secret = "time out"
-                                }
+                        BigButton(
+                            text: "Hide seed phrase in " + String(countdown) + "s",
+                            isShaded: true
+                        ) {
+                            countdown = 0
+                            secret = "Time out\n\nCome back again\nto see the seed phrase!"
+                        }
+                        .onReceive(timer) { input in
+                            if countdown > 0 {countdown -= 1}
+                            if countdown == 0 {
+                                secret = "Time out\n\nCome back again\nto see the seed phrase!"
                             }
-                            .foregroundColor(Color("Action400"))
+                        }.padding(.horizontal, 16)
+                        /*
+                         RoundedRectangle(cornerRadius: 8).foregroundColor(Color("Bg300")).frame(height: 40)
+                         Text("Hide seed phrase in " + String(countdown) + "s")
+                         .onReceive(timer) { input in
+                         countdown -= 1
+                         if countdown == 0 {
+                         secret = "Time out\n\nCome back again\nto see the seed phrase!"
+                         }
+                         }
+                         .foregroundColor(Color("Action400"))
+                         .font(FBase(style: .button))
+                         */
                     }
                 }
             }

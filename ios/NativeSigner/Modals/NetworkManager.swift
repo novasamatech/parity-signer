@@ -20,7 +20,7 @@ struct NetworkManager: View {
                     Rectangle().foregroundColor(Color("Bg000")).frame(height: 25)
                 }
                 VStack {
-                    HeaderBar(line1: "NETWORK", line2: "Select network").padding(.top, 10)
+                    HeaderBar(line1: "NETWORK", line2: "Select network").padding(10)
                     ScrollView {
                         LazyVStack {
                             ForEach(content.networks.sorted(by: {$0.order < $1.order}), id: \.order) {network in
