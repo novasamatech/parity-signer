@@ -77,7 +77,6 @@ extension SignerDataModel {
      * createRoots: choose whether empty derivations for every network should be created
      */
     func restoreSeed(seedName: String, seedPhrase: String, createRoots: Bool) {
-        print(seedNames)
         guard let accessFlags = SecAccessControlCreateWithFlags(kCFAllocatorDefault, kSecAttrAccessibleWhenPasscodeSetThisDeviceOnly, .devicePasscode, &error) else {
             print("Access flags could not be allocated")
             print(error ?? "no error code")
@@ -222,7 +221,6 @@ extension SignerDataModel {
                 kSecAttrAccount as String: seedName
             ] as CFDictionary
             let status = SecItemDelete(query)
-            print(status.description)
             if status == errSecSuccess {
                 self.seedNames = self.seedNames.filter {element in
                     return element != seedName
@@ -231,7 +229,6 @@ extension SignerDataModel {
                 update_seed_names(nil, self.seedNames.joined(separator: ","))
                 pushButton(buttonID: .RemoveSeed)
             } else {
-                print(seedName)
                 self.lastError = SecCopyErrorMessageString(status, nil)! as String
                 print("remove seed from secure storage error: " + self.lastError)
             }

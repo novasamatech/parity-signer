@@ -17,12 +17,13 @@ struct NewSeedBackupModal: View {
             RoundedRectangle(cornerRadius: 8).foregroundColor(Color("Bg200"))
             VStack {
                 ZStack {
-                    RoundedRectangle(cornerRadius: 8).foregroundColor(Color("Crypto100")).frame(height: 200)
+                    //RoundedRectangle(cornerRadius: 8).foregroundColor(Color("Crypto100")).frame(height: 200)
                     Text(content.seed_phrase)
                         .font(.system(size: 16, weight: .semibold, design: .monospaced))
                         .foregroundColor(Color("Crypto400"))
                         .padding(8)
                 }
+                .background(RoundedRectangle(cornerRadius: 8).foregroundColor(Color("Crypto100")))
                 VStack(spacing: 16) {
                     Button(action: {
                         confirmBackup.toggle()

@@ -253,7 +253,6 @@ enum ButtonID {
  */
 extension SignerDataModel {
     func pushButton(buttonID: ButtonID, details: String = "", seedPhrase: String = "") {
-        print(buttonID)
         //Poor man's mutex; just because it's really managed by UI abstraction
         if actionAvailable {
             /** No returns below or things will stall! **/
@@ -262,12 +261,12 @@ extension SignerDataModel {
             withUnsafeMutablePointer(to: &err) {err_ptr in
                 let res = act(err_ptr, String(describing: buttonID), details, seedPhrase)
                 if (err_ptr.pointee.code == 0) {
-                    print(String(cString: res!))
+                    //print(String(cString: res!))
                     if let actionResultJSON = String(cString: res!).data(using: .utf8) {
-                        print(actionResultJSON)
+                        //print(actionResultJSON)
                         if let newActionResult = try? JSONDecoder().decode(ActionResult.self, from: actionResultJSON)
                         {
-                            print(newActionResult)
+                            //print(newActionResult)
                             actionResult = newActionResult
                         } else {
                             print("pushing button failed on decoding!")

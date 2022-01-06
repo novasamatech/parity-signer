@@ -25,20 +25,14 @@ struct RecoverSeedPhrase: View {
                 Text(content.seed_name)
                 VStack(alignment: .leading) {
                     Text("SEED PHRASE").font(FBase(style: .overline))
-                    ZStack {
-                        RoundedRectangle(cornerRadius: 8).stroke(Color("Crypto400")).foregroundColor(Color("Bg000"))
+                    VStack {
                         Text(seedPhrase.joined(separator: " "))
                             .lineLimit(nil)
                             .fixedSize(horizontal: false, vertical: true)
                             .font(.system(size: 16, weight: .semibold, design: .monospaced))
                             .foregroundColor(Color("Crypto400"))
-                            .padding(8)
-                    }
-                    ZStack {
-                        RoundedRectangle(cornerRadius: 8)
-                            .stroke(guessWord.count == 0 ? Color("SignalDanger") : Color("Border400"))
-                        //.foregroundColor(Color("Border400")
-                            .frame(height: 39)
+                            .padding(12)
+                        Divider().foregroundColor(Color("Border400"))
                         TextField("Seed", text: $seedWord, prompt: Text("Seed name"))
                             .focused($focus)
                             .foregroundColor(Color("Text600"))
@@ -81,8 +75,11 @@ struct RecoverSeedPhrase: View {
                                 guessWord = data.guessWord(word: "")
                                 focus = content.keyboard
                             })
-                            .padding(.horizontal, 8)
+                            .padding(.horizontal, 12)
+                            .padding(.top, 0)
+                            .padding(.bottom, 10)
                     }
+                    .background(RoundedRectangle(cornerRadius: 8).stroke(Color("Border400")))
                     ScrollView(.horizontal) {
                         LazyHStack {
                             ForEach(guessWord, id: \.self) { guess in
@@ -92,7 +89,7 @@ struct RecoverSeedPhrase: View {
                                         seedWord = ">"
                                         guessWord = data.guessWord(word: "")
                                     }) {
-                                        Text(guess)
+                                        Text(guess).foregroundColor(Color("Crypto400")).font(FCrypto(style: .body2)).padding(.horizontal, 12).padding(.vertical, 4).background(RoundedRectangle(cornerRadius: 4).foregroundColor(Color("Crypto100")))
                                     }
                                 }
                             }

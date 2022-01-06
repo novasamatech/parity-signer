@@ -33,7 +33,7 @@ struct Backup: View {
                     VStack {
                         Text("SEED PHRASE").foregroundColor(Color("Text300")).font(FBase(style: .overline))
                         ZStack {
-                            RoundedRectangle(cornerRadius: 8).foregroundColor(Color(countdown>0 ? "Crypto100" : "Bg300")).frame(height: 200)
+                            //RoundedRectangle(cornerRadius: 8).foregroundColor(Color(countdown>0 ? "Crypto100" : "Bg300")).frame(height: 200)
                             Text(secret)
                                 .font(.system(size: 16, weight: .semibold, design: .monospaced))
                                 .foregroundColor(Color("Crypto400"))
@@ -46,6 +46,7 @@ struct Backup: View {
                             secret = ""
                             data.seedBackup = ""
                         }
+                        .background(RoundedRectangle(cornerRadius: 8).foregroundColor(Color(countdown>0 ? "Crypto100" : "Bg300")))
                         Text("DERIVED KEYS").foregroundColor(Color("Text300")).font(FBase(style: .overline))
                         LazyVStack {
                             ForEach(content.derivations.sorted(by: {$0.network_order < $1.network_order}), id: \.network_order) {

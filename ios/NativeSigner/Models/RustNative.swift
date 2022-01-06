@@ -131,7 +131,7 @@ extension SignerDataModel {
             do {
                 print("onboarding...")
                 if let source = Bundle.main.url(forResource: "Database", withExtension: "") {
-                    print(source)
+                    //print(source)
                     var destination = try FileManager.default.url(for: .documentDirectory, in: .userDomainMask, appropriateFor: nil, create: false)
                     destination.appendPathComponent("Database")
                     if FileManager.default.fileExists(atPath: NSHomeDirectory() + "/Documents/Database") {
@@ -181,8 +181,8 @@ extension SignerDataModel {
             do {
                 var destination = try FileManager.default.url(for: .documentDirectory, in: .userDomainMask, appropriateFor: nil, create: false)
                 destination.appendPathComponent("Database")
-                print(destination)
-                print(self.dbName)
+                //print(destination)
+                //print(self.dbName)
                 try FileManager.default.removeItem(at: destination)
             } catch {
                 print("FileManager failed to delete db")
@@ -244,6 +244,6 @@ class BluetoothDetector: NSObject, CBCentralManagerDelegate {
             }
         }
 
-        print(central.state.rawValue)
+        //print(central.state.rawValue)
     }
 }
