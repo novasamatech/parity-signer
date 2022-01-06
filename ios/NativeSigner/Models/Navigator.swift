@@ -127,6 +127,8 @@ struct ActionResult: Decodable {
             modal = .NewSeedBackup(try values.decode(MNewSeedBackup.self, forKey: .modalData))
         case "LogComment":
             modal = .LogComment
+        case "SelectSeed":
+            modal = .SelectSeed(try values.decode(MSeeds.self, forKey: .modalData))
         default:
             modal = .Empty
         }
@@ -189,6 +191,7 @@ enum SignerModal: Decodable {
     case TypesInfo(MTypesInfo)
     case NewSeedBackup(MNewSeedBackup)
     case LogComment
+    case SelectSeed(MSeeds)
 }
 
 enum SignerAlert: Decodable {

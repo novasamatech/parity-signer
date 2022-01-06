@@ -17,6 +17,7 @@ enum Card {
     case blockHash(String)
     case call(Call)
     case defaultCard(String)
+    case derivations([String])
     case enumVariantName(EnumVariantName)
     case eraImmortal
     case eraMortal(EraMortal)
@@ -196,6 +197,9 @@ struct TransactionCard: Decodable, Hashable {
         case "balance":
             card = .balance(try values.decode(Currency.self, forKey: .payload))
             return
+        case "derivations":
+            card = .derivations(try values.decode([String].self, forKey: .payload))
+            return
         case "method":
             card = .call(try values.decode(Call.self, forKey: .payload))
             return
@@ -290,6 +294,7 @@ struct TransactionCardSet: Decodable, Hashable {
     
     var error: [TransactionCard]?
     var extensions: [TransactionCard]?
+    var importing_derivations: [TransactionCard]?
     var message: [TransactionCard]?
     var method: [TransactionCard]?
     var new_specs: [TransactionCard]?
@@ -304,6 +309,7 @@ struct TransactionCardSet: Decodable, Hashable {
         var assembled: [TransactionCard] = []
         assembled.append(contentsOf: self.error ?? [])
         assembled.append(contentsOf: self.extensions ?? [])
+        assembled.append(contentsOf: self.importing_derivations ?? [])
         assembled.append(contentsOf: self.message ?? [])
         assembled.append(contentsOf: self.method ?? [])
         assembled.append(contentsOf: self.new_specs ?? [])

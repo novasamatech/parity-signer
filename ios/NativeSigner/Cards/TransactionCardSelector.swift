@@ -28,6 +28,8 @@ struct TransactionCardSelector: View {
             TCCall(value: value)
         case .defaultCard(let text):
             Text(text).foregroundColor(Color("textMainColor"))
+        case .derivations(let value):
+            TCDerivations(value: value)
         case .enumVariantName(let value):
             TCEnumVariantName(value: value)
         case .eraImmortal:
@@ -43,10 +45,10 @@ struct TransactionCardSelector: View {
         case .id(let value):
             TCID(value: value)
         case .identityField(let text):
-            Text(text).foregroundColor(Color("textMainColor"))
+            Text(text).foregroundColor(Color("Text600"))
         case .meta(let value):
             Text(String(describing: value))
-                .foregroundColor(Color("textMainColor"))
+                .foregroundColor(Color("Text600"))
         case .nameVersion(let value):
             TCNameVersion(value: value)
         case .newSpecs(let value):
@@ -62,12 +64,12 @@ struct TransactionCardSelector: View {
         case .tip(let value):
             TCTip(value: value)
         case .tipPlain(let text):
-            Text(text).foregroundColor(Color("textMainColor"))
+            Text(text).foregroundColor(Color("Text600"))
         case .txSpec(let value):
             TCTXSpec(value: value)
         case .txSpecPlain(let value):
             Text(String(describing: value))
-                .foregroundColor(Color("textMainColor"))
+                .foregroundColor(Color("Text600"))
         case .typesInfo(let text):
             TCTypesInfo(text: text)
         case .varName(let text):

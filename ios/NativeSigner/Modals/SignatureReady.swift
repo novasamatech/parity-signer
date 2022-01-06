@@ -15,14 +15,15 @@ struct SignatureReady: View {
     var content: MSignatureReady
     var body: some View {
         ZStack{
-            //RoundedRectangle(cornerRadius: 8).foregroundColor(Color("Bg000"))
+            RoundedRectangle(cornerRadius: 8).foregroundColor(Color("Bg000"))
             VStack {
                 HeaderBar(line1: "Your Signature", line2: "Scan it into your application")
                 Image(uiImage: UIImage(data: Data(fromHexEncodedString: content.signature) ?? Data()) ?? UIImage())
                     .resizable()
                     .aspectRatio(contentMode: .fit).padding(12)
+                Spacer()
             }.padding(16)
-        }.background(RoundedRectangle(cornerRadius: 8).foregroundColor(Color("Bg000")))
+        }//.background(RoundedRectangle(cornerRadius: 8).foregroundColor(Color("Bg000")))
         .offset(x: 0, y: offset+oldOffset)
         .gesture(
             DragGesture()

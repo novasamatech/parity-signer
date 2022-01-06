@@ -146,6 +146,8 @@
 		2DA5F8A1275F889400D8DD29 /* Headers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2DA5F8A0275F889400D8DD29 /* Headers.swift */; };
 		2DAA828F2786406D002917C0 /* MKeyDetailsMulti.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2DAA828E2786406D002917C0 /* MKeyDetailsMulti.swift */; };
 		2DAA82912786FA4B002917C0 /* KeyDetailsMulti.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2DAA82902786FA4B002917C0 /* KeyDetailsMulti.swift */; };
+		2DAA829327873027002917C0 /* TCDerivations.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2DAA829227873027002917C0 /* TCDerivations.swift */; };
+		2DAA8299278738C0002917C0 /* SelectSeed.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2DAA8298278738C0002917C0 /* SelectSeed.swift */; };
 		2DB037BF270F12DF00A318B2 /* Web3-Regular.otf in Resources */ = {isa = PBXBuildFile; fileRef = 2DB037BE270F12DF00A318B2 /* Web3-Regular.otf */; };
 		2DE72BC226A588C7002BB752 /* NativeSignerApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2DE72BC126A588C7002BB752 /* NativeSignerApp.swift */; };
 		2DE72BC426A588C7002BB752 /* MainScreenContainer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2DE72BC326A588C7002BB752 /* MainScreenContainer.swift */; };
@@ -315,6 +317,8 @@
 		2DA5F8A0275F889400D8DD29 /* Headers.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Headers.swift; sourceTree = "<group>"; };
 		2DAA828E2786406D002917C0 /* MKeyDetailsMulti.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MKeyDetailsMulti.swift; sourceTree = "<group>"; };
 		2DAA82902786FA4B002917C0 /* KeyDetailsMulti.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyDetailsMulti.swift; sourceTree = "<group>"; };
+		2DAA829227873027002917C0 /* TCDerivations.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TCDerivations.swift; sourceTree = "<group>"; };
+		2DAA8298278738C0002917C0 /* SelectSeed.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SelectSeed.swift; sourceTree = "<group>"; };
 		2DB037BE270F12DF00A318B2 /* Web3-Regular.otf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Web3-Regular.otf"; sourceTree = "<group>"; };
 		2DE72BBE26A588C7002BB752 /* NativeSigner.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = NativeSigner.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		2DE72BC126A588C7002BB752 /* NativeSignerApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NativeSignerApp.swift; sourceTree = "<group>"; };
@@ -429,6 +433,7 @@
 				2D48F3AD2770AD6B004B27BE /* NetworkDetailsMenu.swift */,
 				2D48F3AF2770AD83004B27BE /* ManageMetadata.swift */,
 				2D48F3CF2777A823004B27BE /* NewSeedBackupModal.swift */,
+				2DAA8298278738C0002917C0 /* SelectSeed.swift */,
 				2D48F36E2767419D004B27BE /* PasswordConfirm.swift */,
 				2D48F3DF278305AE004B27BE /* LogComment.swift */,
 				2D48F39F276C8D5E004B27BE /* LogMenu.swift */,
@@ -482,6 +487,7 @@
 				2DA5F84A27566C3600D8DD29 /* TCBalance.swift */,
 				2DA5F84B27566C3600D8DD29 /* TCEnumVariantName.swift */,
 				2DA5F84C27566C3600D8DD29 /* TCCall.swift */,
+				2DAA829227873027002917C0 /* TCDerivations.swift */,
 				2DA5F84D27566C3600D8DD29 /* TCError.swift */,
 				2DA5F84E27566C3600D8DD29 /* TCID.swift */,
 				2DA5F84F27566C3600D8DD29 /* TCText.swift */,
@@ -853,6 +859,7 @@
 				2D48F3532760A2D8004B27BE /* Fonts.swift in Sources */,
 				2D48F3AC277092FD004B27BE /* MetadataCard.swift in Sources */,
 				2DE72C0026A6ADC5002BB752 /* CameraService.swift in Sources */,
+				2DAA829327873027002917C0 /* TCDerivations.swift in Sources */,
 				2DA5F8312756652600D8DD29 /* CameraView.swift in Sources */,
 				2DA5F86F27566C3600D8DD29 /* TCTXSpec.swift in Sources */,
 				2DA5F8412756687200D8DD29 /* TransactionCardView.swift in Sources */,
@@ -904,6 +911,7 @@
 				2DA5F8842756A37800D8DD29 /* Address.swift in Sources */,
 				2D48F3B02770AD83004B27BE /* ManageMetadata.swift in Sources */,
 				2DA5F84327566BE300D8DD29 /* TransactionCardSelector.swift in Sources */,
+				2DAA8299278738C0002917C0 /* SelectSeed.swift in Sources */,
 				2DA5F83D275667AC00D8DD29 /* History.swift in Sources */,
 				2D48F373276793D3004B27BE /* MDeriveKey.swift in Sources */,
 				2D48F3E0278305AE004B27BE /* LogComment.swift in Sources */,

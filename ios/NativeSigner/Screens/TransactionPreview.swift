@@ -52,7 +52,7 @@ struct TransactionPreview: View {
                         case .sign:
                             BigButton(
                                 text: "Unlock key and sign",
-                                isShaded: true,
+                                isShaded: false,
                                 isCrypto: true,
                                 action: {
                                     focus = false
@@ -72,14 +72,24 @@ struct TransactionPreview: View {
                         case .read:
                             EmptyView()
                         case .import_derivations:
-                            Text("Not implemented")
+                            BigButton(
+                                text: "Select seed",
+                                isCrypto: true,
+                                action: {
+                                    data.pushButton(buttonID: .GoForward)
+                                })
+                        case .done:
+                            EmptyView()
                         }
-                        BigButton(
-                            text: "Decline",
-                            isDangerous: true,
-                            action: {
-                                focus = false
-                                data.pushButton(buttonID: .GoBack)})
+                        if content.type != .done {
+                            BigButton(
+                                text: "Decline",
+                                isShaded: true,
+                                isDangerous: true,
+                                action: {
+                                    focus = false
+                                    data.pushButton(buttonID: .GoBack)})
+                        }
                     }
                 }
                 .padding(16)

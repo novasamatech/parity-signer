@@ -19,6 +19,7 @@ enum TransactionType: String, Decodable {
     case stub
     case read
     case import_derivations
+    case done
 }
 
 struct TransactionAuthor: Decodable, Hashable {

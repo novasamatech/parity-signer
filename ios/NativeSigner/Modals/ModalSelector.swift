@@ -44,6 +44,8 @@ struct ModalSelector: View {
             NewSeedBackupModal(content: value)
         case .LogComment:
             LogComment()
+        case .SelectSeed(let value):
+            SelectSeed(content: value)
         }
     }
 }
