@@ -12,7 +12,9 @@ struct NetworkManager: View {
     var content: MNetworkMenu
     var body: some View {
         VStack {
-                Spacer().frame(height: UIScreen.main.bounds.height/3)
+            Rectangle().frame(height: UIScreen.main.bounds.height/3).opacity(0.0001).gesture(TapGesture().onEnded{_ in
+                    data.pushButton(buttonID: .GoBack)
+                })
             ZStack {
                 RoundedRectangle(cornerRadius: 20.0).foregroundColor(Color("Bg000"))
                 VStack {
