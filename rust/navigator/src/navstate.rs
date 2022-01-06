@@ -530,8 +530,7 @@ impl State {
                 Action::ChangeNetwork => {
                     match NetworkSpecsKey::from_hex(details_str) {
                         Ok(network_specs_key) => {
-                            if let Screen::Keys(ref keys_state) = self.navstate.screen {new_navstate.screen = Screen::Keys(keys_state.change_network(&network_specs_key));}
-                            if let Modal::NetworkSelector(_) = self.navstate.modal {new_navstate.modal = Modal::NetworkSelector(network_specs_key);}
+                            if let Screen::Keys(ref keys_state) = self.navstate.screen {new_navstate = Navstate::clean_screen(Screen::Keys(keys_state.change_network(&network_specs_key)));}
                         },
                         Err(e) => {
                             new_navstate.alert = Alert::Error;
