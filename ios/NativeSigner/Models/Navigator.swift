@@ -88,6 +88,8 @@ struct ActionResult: Decodable {
             screen = .SelectSeedForBackup(try values.decode(MSeeds.self, forKey: .screenData))
         case "Documents":
             screen = .Documents
+        case "KeyDetailsMultiSelect":
+            screen = .KeyDetailsMulti(try values.decode(MKeyDetailsMulti.self, forKey: .screenData))
         default:
             screen = .Log(MLog())
         }
@@ -164,6 +166,7 @@ enum SignerScreen: Decodable {
     case SignSufficientCrypto(MSignSufficientCrypto)
     case SelectSeedForBackup(MSeeds)
     case Documents
+    case KeyDetailsMulti(MKeyDetailsMulti)
 }
 
 /**

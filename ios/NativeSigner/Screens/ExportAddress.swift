@@ -9,9 +9,6 @@ import SwiftUI
 
 struct ExportAddress: View {
     @EnvironmentObject var data: SignerDataModel
-    @GestureState private var dragOffset = CGSize.zero
-    @State var offset: CGFloat = 0
-    @State var image: UIImage?
     @State var showDetails = false
     var content: MKeyDetails
     var body: some View {
@@ -22,11 +19,7 @@ struct ExportAddress: View {
                 Image(uiImage: UIImage(data: Data(fromHexEncodedString: content.qr) ?? Data()) ?? UIImage())
                     .resizable()
                     .aspectRatio(contentMode: .fit).padding(12)
-                    .offset(x: offset, y:0)
-                    .onAppear{
-                        offset = 0
-                    }
-                HeaderBar(line1: "KEY DETAILS", line2: "Selected key " + content.current_number + "/" + content.out_of).padding(.horizontal, 8)
+                HeaderBar(line1: "KEY DETAILS", line2: "").padding(.horizontal, 8)
                 VStack {
                     HStack {
                         Text("Base58 key: ")
@@ -44,25 +37,6 @@ struct ExportAddress: View {
                 
             }
         }
-        .gesture(
-            DragGesture()
-                .onChanged {drag in
-                    self.offset = drag.translation.width
-                }
-                .onEnded {drag in
-                    self.offset = 0
-                    if abs(drag.translation.height) > 200 {
-                        showDetails.toggle()
-                    } else {
-                        if drag.translation.width > 20 {
-                            data.pushButton(buttonID: .NextUnit)
-                        }
-                        if drag.translation.width < -20 {
-                            data.pushButton(buttonID: .PreviousUnit)
-                        }
-                    }
-                }
-        )
     }
 }
 

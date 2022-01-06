@@ -48,6 +48,8 @@ struct ScreenSelector: View {
             SelectSeedForBackup(content: value)
         case .Documents:
             DocumentModal()
+        case .KeyDetailsMulti(let value):
+            KeyDetailsMulti(content: value)
         }
     }
 }

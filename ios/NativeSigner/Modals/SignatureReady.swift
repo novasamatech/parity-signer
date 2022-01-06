@@ -11,7 +11,7 @@ struct SignatureReady: View {
     @EnvironmentObject var data: SignerDataModel
     @GestureState private var dragOffset = CGSize.zero
     @State var offset: CGFloat = 0
-    @State var oldOffset: CGFloat = UIScreen.main.bounds.size.width + 40
+    @State var oldOffset: CGFloat = UIScreen.main.bounds.size.width
     var content: MSignatureReady
     var body: some View {
         ZStack{

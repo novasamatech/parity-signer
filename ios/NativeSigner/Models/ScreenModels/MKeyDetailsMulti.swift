@@ -1,4 +1,13 @@
 //
+//  MKeyDetailsMulti.swift
+//  NativeSigner
+//
+//  Created by Alexander Slesarev on 5.1.2022.
+//
+
+import Foundation
+
+//
 //  MKeyDetais.swift
 //  NativeSigner
 //
@@ -7,7 +16,7 @@
 
 import Foundation
 
-struct MKeyDetails: Decodable {
+struct MKeyDetailsMulti: Decodable {
     var qr: String
     var pubkey: String
     var base58: String
@@ -16,6 +25,8 @@ struct MKeyDetails: Decodable {
     var path: String
     var network_title: String
     var network_logo: String
+    var current_number: String
+    var out_of: String
     
     //TODO: has_pwd!!!
     func intoAddress() -> Address {
