@@ -153,6 +153,7 @@ struct TxSpecPlain: Decodable {
 
 struct Verifier: Decodable, Hashable {
     var hex: String
+    var identicon: String?
     var encryption: String
 }
 

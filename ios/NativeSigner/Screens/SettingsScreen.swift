@@ -60,28 +60,7 @@ struct SettingsScreen: View {
                     )
                 )
             })
-            Button(action: {
-                //TODO: add some alerts to make sure the operation was successful
-                jailbreak = true
-            }) {
-                SettingsCardTemplate(
-                    text: "Remove general certificate",
-                    danger: true
-                )
-            }
-            .alert(isPresented: $jailbreak, content: {
-                Alert(
-                    title: Text("Wipe ALL data?"),
-                    message: Text("Remove all data and set general verifier blank so that it could be set later. This operation can not be reverted. Do not proceed unless you absolutely know what you are doing, there is no need to use this procedure in most cases. Misusing this feature may lead to loss of funds!"),
-                    primaryButton: .cancel(),
-                    secondaryButton: .destructive(
-                        Text("I understand"),
-                        action: {
-                            data.jailbreak()
-                        }
-                    )
-                )
-            })
+            
             Button(action: {
                 data.pushButton(buttonID: .ShowDocuments)
             }) {

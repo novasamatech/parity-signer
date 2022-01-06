@@ -11,9 +11,9 @@ struct TCDerivations: View {
     let value: [String]
     var body: some View {
         VStack {
-            Text("Importing derivations:")
+            Text("Importing derivations:").font(FBase(style: .h1)).foregroundColor(Color("Text600"))
             ForEach(value, id: \.self) {derivation in
-                Text(derivation)
+                Text(derivation).font(FCrypto(style: .body2)).foregroundColor(Color("Crypto400"))
             }
         }
     }

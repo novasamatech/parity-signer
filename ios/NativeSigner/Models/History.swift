@@ -69,7 +69,7 @@ enum Event: Decodable, Hashable, Equatable {
             self = .metadataAdded(try values.decode(MetaSpecs.self, forKey: .payload))
         case "metadata_removed":
             self = .metadataRemoved(try values.decode(MetaSpecs.self, forKey: .payload))
-        case "network_added":
+        case "network_specs_added":
             self = .networkAdded(try values.decode(NetworkDisplay.self, forKey: .payload))
         case "network_removed":
             self = .networkRemoved(try values.decode(NetworkDisplay.self, forKey: .payload))
@@ -155,7 +155,7 @@ struct NetworkSigned: Decodable, Hashable {
 
 struct NetworkVerifierDisplay: Decodable, Hashable {
     var genesis_hash: String
-    var current_verifier: Verifier
+    var current_verifier: CurrentVerifier
 }
 
 struct SignMessage: Decodable, Hashable {
