@@ -14,6 +14,7 @@ struct NativeSignerApp: App {
         WindowGroup {
             MainScreenContainer()
                 .environmentObject(data)
+                .font(FBase(style: .body1))
                 .background(Color("Bg100")
             )
         }
