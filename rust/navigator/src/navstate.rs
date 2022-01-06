@@ -933,7 +933,13 @@ impl State {
                 Screen::Transaction(ref t) => {
                     match t.action() {
                         transaction_parsing::Action::Derivations{content, network_info, checksum: _} => format!("\"content\":{{{}}},\"network_info\":{{{}}},\"type\":\"import_derivations\"", content, network_info),
-                        transaction_parsing::Action::Sign{content, checksum: _, has_pwd: _, author_info, network_info} => format!("\"content\":{{{}}},\"author_info\":{{{}}},\"network_info\":{{{}}},\"type\":\"sign\"", content, author_info, network_info),
+                        transaction_parsing::Action::Sign{content, checksum: _, has_pwd: _, author_info, network_info} => {
+                            let action_type = match new_navstate.modal {
+                                Modal::SignatureReady(_) => "done",
+                                _ => "sign",
+                            };
+                            format!("\"content\":{{{}}},\"author_info\":{{{}}},\"network_info\":{{{}}},\"type\":\"{}\"", content, author_info, network_info, action_type)
+                        },
                         transaction_parsing::Action::Stub(content, _) => format!("\"content\":{{{}}},\"type\":\"stub\"", content),
                         transaction_parsing::Action::Read(content) => format!("\"content\":{{{}}},\"type\":\"read\"", content),
                     }
