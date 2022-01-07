@@ -28,12 +28,15 @@ Types of messages that could be generated:
 - 53xx80 `load_metadata` (contains `definitions::qr_transfers::ContentLoadMeta`)  
 - 53xx81 `load_types` (contains `definitions::qr_transfers::ContentLoadTypes`)  
 - 53xxc1 `add_specs` (contains `definitions::qr_transfers::ContentAddSpecs`);  
+- 53ffde `derivations` (contains `definitions::qr_transfers::ContentDerivations`);  
 
 Message `load_metadata` is used to load new versions of metadata for networks already in users database.  
 
 Message `load_types` is used to load types information in users database, and hopefully will go obsolete soon with FrameMetadataV14 integration. Should be used really rarely.  
 
 Message `add_specs` is used to add network specs for networks that are not yet in users database.  
+
+Message `derivations` is used to import a set of user-defined **password-free** derivations, from a text file, for certain network known to the hot database.  
 
 
 ## Possible output formats
@@ -142,6 +145,11 @@ Possible commands are:
 - `make_cold_release` without any keys, to reset in default form the cold database `COLD_DB_NAME_RELEASE` without any identities added  
 
 - `transfer_meta_to_cold_release` without any keys, to transfer metadata from hot database in its current state into cold database `COLD_DB_NAME_RELEASE` without any identities added  
+
+- `derivations` to generate Signer-readable qr code to import derivations, with following keys:  
+    - optional content key: `-qr` will generate only apng qr code, `-text` will generate only text file with hex encoded message; by default, both qr code and text message are generated; content keys are expected immediately after `derivations` command, if at all; keys to follow could go in any order, but with content immediately following the key.  
+    - key `-title` followed by network title, the storage key in address book  
+    - key `-payload` followed by file name to read derivation from, in `../generate_message` folder. Derivations should be on individual line each, empty line count as empty derivations (root ones). See file `../generate_message/standard_derivations_list` for formatting example. All succesfully read derivations will be also printed to user during the run. For now duplicates are allowed when creating transfer, only one entry is made in Signer when accepting the payload.  
 
 
 ## Example commands  
