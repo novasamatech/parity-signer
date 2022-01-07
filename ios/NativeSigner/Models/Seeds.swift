@@ -20,7 +20,6 @@ enum KeychainError: Error {
 
 /**
  * Seeds management operations - these mostly rely on secure enclave
- * However, some rustnative operations happen here as well (default keys creation and associated keys removal)
  *
  *  Seeds are stored in keyring - it has SQL-like api but is backed by secure enclave
  *  IMPORTANT! The keys from keyring are not removed on app uninstall!
@@ -29,6 +28,8 @@ enum KeychainError: Error {
 extension SignerDataModel {
     /**
      * Get all seed names from secure storage
+     *
+     * this is also used as generic auth request operation that will lock the app on failure
      */
     func refreshSeeds() {
         var item: CFTypeRef?
@@ -144,29 +145,6 @@ extension SignerDataModel {
             return false
         }
         if item == nil { return false } else { return true }
-    }
-    
-    /**
-     * Selects seed and updates the model accordingly
-     */
-    func selectSeed(seedName: String) {
-        self.selectedSeed = seedName
-        //TODO: this all should be part of backend event
-        //self.fetchKeys()
-    }
-    
-    /**
-     * This is simple explicit "get" for showing plaintext seedBackup value after it was fetched
-     */
-    func getRememberedSeedPhrase() -> String {
-        if self.seedBackup == "" {
-            self.seedBackup = getSeed(seedName: self.selectedSeed, backup: true)
-        }
-        if self.seedBackup == "" {
-            //TODO: improve this
-            pushButton(buttonID: .GoBack)
-        }
-        return self.seedBackup
     }
     
     /**

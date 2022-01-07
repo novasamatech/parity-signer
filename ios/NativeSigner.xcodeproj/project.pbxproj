@@ -95,7 +95,6 @@
 		2DA5F82F2756635A00D8DD29 /* HistoryScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2DA5F82E2756635A00D8DD29 /* HistoryScreen.swift */; };
 		2DA5F8312756652600D8DD29 /* CameraView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2DA5F8302756652600D8DD29 /* CameraView.swift */; };
 		2DA5F8332756653B00D8DD29 /* CameraPreview.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2DA5F8322756653B00D8DD29 /* CameraPreview.swift */; };
-		2DA5F8352756656E00D8DD29 /* Transaction.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2DA5F8342756656E00D8DD29 /* Transaction.swift */; };
 		2DA5F8372756657600D8DD29 /* TransactionTypes.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2DA5F8362756657600D8DD29 /* TransactionTypes.swift */; };
 		2DA5F8392756666C00D8DD29 /* EventDetails.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2DA5F8382756666C00D8DD29 /* EventDetails.swift */; };
 		2DA5F83D275667AC00D8DD29 /* History.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2DA5F83C275667AC00D8DD29 /* History.swift */; };
@@ -130,7 +129,6 @@
 		2DA5F87A275676B600D8DD29 /* SeedCardForManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2DA5F879275676B600D8DD29 /* SeedCardForManager.swift */; };
 		2DA5F87C2756A21200D8DD29 /* ExportAddress.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2DA5F87B2756A21200D8DD29 /* ExportAddress.swift */; };
 		2DA5F87E2756A28B00D8DD29 /* NetworkCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2DA5F87D2756A28A00D8DD29 /* NetworkCard.swift */; };
-		2DA5F8802756A2CA00D8DD29 /* Network.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2DA5F87F2756A2CA00D8DD29 /* Network.swift */; };
 		2DA5F8822756A2DE00D8DD29 /* AddressCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2DA5F8812756A2DE00D8DD29 /* AddressCard.swift */; };
 		2DA5F8842756A37800D8DD29 /* Address.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2DA5F8832756A37800D8DD29 /* Address.swift */; };
 		2DA5F8862756A44600D8DD29 /* AddressCardControls.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2DA5F8852756A44600D8DD29 /* AddressCardControls.swift */; };
@@ -266,7 +264,6 @@
 		2DA5F82E2756635A00D8DD29 /* HistoryScreen.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HistoryScreen.swift; sourceTree = "<group>"; };
 		2DA5F8302756652600D8DD29 /* CameraView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CameraView.swift; sourceTree = "<group>"; };
 		2DA5F8322756653B00D8DD29 /* CameraPreview.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CameraPreview.swift; sourceTree = "<group>"; };
-		2DA5F8342756656E00D8DD29 /* Transaction.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Transaction.swift; sourceTree = "<group>"; };
 		2DA5F8362756657600D8DD29 /* TransactionTypes.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TransactionTypes.swift; sourceTree = "<group>"; };
 		2DA5F8382756666C00D8DD29 /* EventDetails.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = EventDetails.swift; sourceTree = "<group>"; };
 		2DA5F83C275667AC00D8DD29 /* History.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = History.swift; sourceTree = "<group>"; };
@@ -301,7 +298,6 @@
 		2DA5F879275676B600D8DD29 /* SeedCardForManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SeedCardForManager.swift; sourceTree = "<group>"; };
 		2DA5F87B2756A21200D8DD29 /* ExportAddress.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ExportAddress.swift; sourceTree = "<group>"; };
 		2DA5F87D2756A28A00D8DD29 /* NetworkCard.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NetworkCard.swift; sourceTree = "<group>"; };
-		2DA5F87F2756A2CA00D8DD29 /* Network.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Network.swift; sourceTree = "<group>"; };
 		2DA5F8812756A2DE00D8DD29 /* AddressCard.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AddressCard.swift; sourceTree = "<group>"; };
 		2DA5F8832756A37800D8DD29 /* Address.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Address.swift; sourceTree = "<group>"; };
 		2DA5F8852756A44600D8DD29 /* AddressCardControls.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AddressCardControls.swift; sourceTree = "<group>"; };
@@ -654,13 +650,11 @@
 				2D7A7BD326BBEAF00053C1E0 /* Canary.swift */,
 				2DA5F8942759575300D8DD29 /* ModalModels */,
 				2DA5F8932759573800D8DD29 /* ScreenModels */,
-				2DA5F87F2756A2CA00D8DD29 /* Network.swift */,
 				2DE72C0E26A99885002BB752 /* RustNative.swift */,
 				2D7A7BD526C1126C0053C1E0 /* Utils.swift */,
 				2D72B4F526EF3BC50081E879 /* Navigator.swift */,
 				2DA5F8832756A37800D8DD29 /* Address.swift */,
 				2DA5F8362756657600D8DD29 /* TransactionTypes.swift */,
-				2DA5F8342756656E00D8DD29 /* Transaction.swift */,
 				2DA5F83C275667AC00D8DD29 /* History.swift */,
 				2D72B4F926EF7D1C0081E879 /* Seeds.swift */,
 				2DA5F89127590B4F00D8DD29 /* Documents.swift */,
@@ -885,7 +879,6 @@
 				2DA5F8272756629600D8DD29 /* ScreenSelector.swift in Sources */,
 				2DA5F87E2756A28B00D8DD29 /* NetworkCard.swift in Sources */,
 				2D48F36327622C54004B27BE /* MNetworkMenu.swift in Sources */,
-				2DA5F8802756A2CA00D8DD29 /* Network.swift in Sources */,
 				2DA5F8332756653B00D8DD29 /* CameraPreview.swift in Sources */,
 				2D48F38A27691C3B004B27BE /* MError.swift in Sources */,
 				2DA5F8862756A44600D8DD29 /* AddressCardControls.swift in Sources */,
@@ -896,7 +889,6 @@
 				2D48F3BA2771DD66004B27BE /* MSufficientCryptoReady.swift in Sources */,
 				2D48F3C82774CC64004B27BE /* SearchKeys.swift in Sources */,
 				2D7A7BD426BBEAF00053C1E0 /* Canary.swift in Sources */,
-				2DA5F8352756656E00D8DD29 /* Transaction.swift in Sources */,
 				2D48F3DC277E3CAA004B27BE /* MultiselectBottomControl.swift in Sources */,
 				2D48F35D2760ED38004B27BE /* MKeys.swift in Sources */,
 				2DA5F86527566C3600D8DD29 /* TCID.swift in Sources */,

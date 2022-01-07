@@ -5,6 +5,16 @@
 //  Created by Alexander Slesarev on 12.8.2021.
 //
 
+/**
+ * This is hard-typed decoding of log passed from rust
+ *
+ * This should actually be reduced to very simple 4 or 5 filed object later,
+ * as history screen has very simple cards
+ *
+ * Cards for history details are decoded in screen model but may pull some objects from here
+ * Tread carefully until this mess is organized nicely
+ */
+
 import Foundation
 
 enum Event: Decodable, Hashable, Equatable {
