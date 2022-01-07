@@ -185,9 +185,43 @@ Let's say we want to generate QR code with signed load_metadata message for fres
 Done!  
 
 
-## If the database somehow got corrupted or does not exist:  
+## Restoring hot database:  
 
-The database operated by `generate_message` crate is referred as *hot* both here and in crate `db_handling`. To restore the database to defaults, run through steps 1-2 of **Instruction for a fresh start** in `db_handling` readme.  
+The database operated by `generate_message` crate is referred as *hot* both here and in crate `db_handling`. To restore the database to defaults, run:  
+`$ cargo run restore_defaults`  
+
+This will purge old database, and generate new database with `address_book` and `chainspecs` trees, but with empty `metadata` tree.
+
+To fetch new metadata, run:  
+`$ cargo run load_metadata -a`  
+
+
+## Restoring test cold database, with set of known old metadata and with mock identities:  
+
+To restore test cold database, run:  
+`$ cargo run make_cold_with_identities`  
+
+This will purge old test cold database, and generate new one with default network information and with test ALice identities.
+
+Test cold database already contains some metadata (from `/defaults/test_metadata/` folder). Optionally, to transfer metadata from hot database into test cold one, run:  
+`$ cargo run transfer_meta_to_cold`  
+
+This will add metadata from hot database for default networks into test cold database (only metadata for networks with specs recorded in cold database are transferred).
+
+
+## Restoring release cold database, with set of known latest metadata and no identities:  
+
+To restore release cold database, run:  
+`$ cargo run make_cold_release`  
+
+This will purge old release cold database, and generate new one with default network information.
+
+Release cold database already contains some metadata (from `/defaults/release_metadata/` folder). Normally, all the latest metadata is thus already in the database. However, if needed to transfer metadata from hot database into release cold one, run:  
+`$ cargo run transfer_meta_to_cold_release`  
+
+This will add metadata from hot database for default networks into release cold database (only metadata for networks with specs recorded in cold database are transferred).
+
+Release cold database is the one loaded into Signer.
 
 
 ## List of currently supported command and key combinations (without `make` and `sign` variants)  
@@ -226,5 +260,15 @@ The database operated by `generate_message` crate is referred as *hot* both here
 `$ cargo run remove -name kusama -version 9090`  
 
 `$ cargo run restore_defaults`  
+
+`$ cargo run make_cold_with_identities`  
+
+`$ cargo run transfer_meta_to_cold`  
+
+`$ cargo run make_cold_release`  
+
+`$ cargo run transfer_meta_to_cold_release`  
+
+`$ cargo run derivations -title westend -payload standard_derivations_list` 
 
 (*) encryption override key should correspond to appropriate encryption for the network in question
