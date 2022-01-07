@@ -25,7 +25,9 @@
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
 	<key>NSBluetoothAlwaysUsageDescription</key>
-	<string>Lock app if bluetooth is not disabled</string>
+	<string>This app checks and warns user if bluetooth is not disabled - please disable it in settings</string>
+	<key>NSBluetoothPeripheralUsageDescription</key>
+	<string>This app checks and warns user if bluetooth is not disabled - please disable it in settings</string>
 	<key>NSCameraUsageDescription</key>
 	<string>Use camera to scan QR codes</string>
 	<key>NSMainNibFile</key>
