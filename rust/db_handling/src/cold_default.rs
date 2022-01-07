@@ -10,7 +10,7 @@ use crate::helpers::make_batch_clear_tree;
 use crate::identities::generate_test_identities;
 use crate::manage_history::events_in_batch;
 
-pub (crate) enum Purpose {
+enum Purpose {
     Release,
     Test,
 }
@@ -71,6 +71,18 @@ fn default_cold_settings (database_name: &str, general_verifier: Verifier) -> Re
     Ok(batch)
 }
 
+/// Preparing default settings batch:
+/// (1) purge all existing entries,
+/// (2) add default entry with TYPES as a key,
+/// and ContentLoadTypes (i.e. encoded Vec<TypeEntry>) as a value,
+fn default_cold_settings_init_later (database_name: &str) -> Result<Batch, ErrorActive> {
+    let mut batch = make_batch_clear_tree::<Active>(&database_name, SETTREE)?;
+    let types_prep = get_default_types_content()?;
+    batch.insert(TYPES.to_vec(), types_prep.store());
+    batch.insert(DANGER.to_vec(), DangerRecord::safe().store());
+    Ok(batch)
+}
+
 /// Preparing default verifiers batch:
 /// (1) purge all existing entries,
 /// (2) add default entries with VerifierKey in key form as a key,
@@ -101,13 +113,13 @@ fn init_history<T: ErrorSource> (database_name: &str, general_verifier: &Verifie
 }
 
 /// Function to reset cold database to defaults without addresses
-pub (crate) fn reset_cold_database_no_addresses (database_name: &str, general_verifier: Verifier, purpose: Purpose) -> Result<(), ErrorActive> {
+fn reset_cold_database_no_addresses (database_name: &str, purpose: Purpose) -> Result<(), ErrorActive> {
     TrDbCold::new()
         .set_addresses(make_batch_clear_tree::<Active>(&database_name, ADDRTREE)?) // clear addresses
         .set_history(make_batch_clear_tree::<Active>(&database_name, HISTORY)?) // set *empty* history, database needs initialization before start
         .set_metadata(default_cold_metadata(&database_name, purpose)?) // set default metadata
         .set_network_specs(default_cold_network_specs(&database_name)?) // set default network_specs
-        .set_settings(default_cold_settings(&database_name, general_verifier)?) // set general verifier and load default types
+        .set_settings(default_cold_settings_init_later(&database_name)?) // set general verifier and load default types
         .set_transaction(make_batch_clear_tree::<Active>(&database_name, TRANSACTION)?) // clear transaction
         .set_verifiers(default_cold_verifiers(&database_name)?) // set default verifiers
         .apply::<Active>(&database_name)
@@ -119,7 +131,7 @@ pub (crate) fn reset_cold_database_no_addresses (database_name: &str, general_ve
 /// *does not* clear any other entries
 /// *is not* a wipe
 /// Function is applicable only to Signer side.
-fn signer_init (database_name: &str, general_verifier: Verifier) -> Result<(), ErrorSigner> {
+pub fn signer_init (database_name: &str, general_verifier: Verifier) -> Result<(), ErrorSigner> {
     TrDbCold::new()
         .set_history(init_history::<Signer>(&database_name, &general_verifier)?) // set *start* history
         .set_settings(init_general_verifier(&general_verifier)) // set general_verifier
@@ -166,14 +178,20 @@ pub fn populate_cold_no_metadata (database_name: &str, general_verifier: Verifie
         .apply::<Active>(&database_name)
 }
 
-/// Function to populate cold database and set up the test identities.
+/// Function to populate test cold database and set up the test identities.
 /// For tests. History is initialized as in Signer, together with setting of the general verifier.
 pub fn populate_cold (database_name: &str, general_verifier: Verifier) -> Result<(), ErrorActive> {
-    reset_cold_database_no_addresses(&database_name, general_verifier.to_owned(), Purpose::Test)?;
+    reset_cold_database_no_addresses(&database_name, Purpose::Test)?;
     TrDbCold::new()
         .set_history(init_history::<Active>(&database_name, &general_verifier)?) // set *start* history
         .set_settings(init_general_verifier(&general_verifier))
         .apply::<Active>(&database_name)?;
     generate_test_identities(&database_name)
+}
+
+/// Function to populate release cold database.
+/// No initialization of history is made. For creating database for Signer and for navigation tests.
+pub fn populate_cold_release (database_name: &str) -> Result<(), ErrorActive> {
+    reset_cold_database_no_addresses(&database_name, Purpose::Release)
 }
 

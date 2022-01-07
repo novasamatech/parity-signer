@@ -2,7 +2,7 @@ use constants::{COLD_DB_NAME, COLD_DB_NAME_RELEASE, HOT_DB_NAME};
 use definitions::{error::ErrorActive, network_specs::Verifier};
 
 pub mod cold_default;
-    use cold_default::{reset_cold_database_no_addresses, populate_cold, Purpose};
+    use cold_default::{populate_cold, populate_cold_release};
 pub mod db_transactions;
 pub mod helpers;
 mod hot_default;
@@ -23,7 +23,7 @@ pub mod remove_types;
 /// so ErrorActive is used
 pub fn default_cold_release () -> Result<(), ErrorActive> {
     let database_name = COLD_DB_NAME_RELEASE;
-    reset_cold_database_no_addresses(&database_name, Verifier(None), Purpose::Release)
+    populate_cold_release(&database_name)
 }
 
 /// Function to re-populate default "cold" database with default values.

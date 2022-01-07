@@ -246,12 +246,12 @@ mod tests {
     use hex;
     use std::fs;
     
-    use crate::{cold_default::{populate_cold_no_metadata, Purpose, reset_cold_database_no_addresses, signer_init_no_cert, signer_init_with_cert}, manage_history::{device_was_online, reset_danger_status_to_safe}};
+    use crate::{cold_default::{populate_cold_no_metadata, populate_cold_release, signer_init_no_cert, signer_init_with_cert}, manage_history::{device_was_online, reset_danger_status_to_safe}};
 
     #[test]
     fn get_danger_status_properly () {
         let dbname = "for_tests/get_danger_status_properly";
-        reset_cold_database_no_addresses(dbname, Verifier(None), Purpose::Test).unwrap();
+        populate_cold_release(dbname).unwrap();
         signer_init_no_cert(dbname).unwrap();
         assert!(get_danger_status(dbname).unwrap() == false, "Expected danger status = false after the database initiation.");
         device_was_online(dbname).unwrap();
@@ -264,7 +264,8 @@ mod tests {
     #[test]
     fn display_general_verifier_properly() {
         let dbname = "for_tests/display_general_verifier_properly";
-        reset_cold_database_no_addresses(dbname, Verifier(None), Purpose::Test).unwrap();
+        populate_cold_release(dbname).unwrap();
+        signer_init_no_cert(dbname).unwrap();
         let print = display_general_verifier(dbname).unwrap();
         assert!(print == r#""hex":"","identicon":"","encryption":"none""#, "Got: {}", print);
         signer_init_with_cert(dbname).unwrap();
