@@ -11,6 +11,7 @@ struct ManageMetadata: View {
     @EnvironmentObject var data: SignerDataModel
     var content: MManageMetadata
     @State var removeMetadataAlert = false
+    @State var offset: CGFloat = 0
     var body: some View {
         MenuStack {
             HeaderBar(line1: "MANAGE METADATA", line2: "Select action").padding(.top, 10)
@@ -46,8 +47,14 @@ struct ManageMetadata: View {
                 )
             }
         }
-        .gesture(DragGesture().onEnded{drag in
+        .offset(x: 0, y: offset)
+        .gesture(DragGesture()
+                    .onChanged{drag in
+            self.offset = drag.translation.height
+        }
+                    .onEnded{drag in
             if drag.translation.height > 40 {
+                self.offset = UIScreen.main.bounds.size.height
                 data.pushButton(buttonID: .GoBack)
             }
         })

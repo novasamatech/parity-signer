@@ -66,13 +66,11 @@ struct SettingsScreen: View {
             }) {
                 SettingsCardTemplate(text: "About")
             }
-            /*
             SettingsCardTemplate(
                 text: "App version: " + (data.appVersion ?? "Unknown!"),
                 withIcon: false,
                 withBackground: false
             )
-             */
         }
     }
 }

@@ -22,6 +22,9 @@ struct SignatureReady: View {
                     .resizable()
                     .aspectRatio(contentMode: .fit).padding(12)
                 Spacer()
+                BigButton(text: "Done", action: {
+                    data.pushButton(buttonID: .GoBack)
+                })
             }.padding(16)
         }//.background(RoundedRectangle(cornerRadius: 8).foregroundColor(Color("Bg000")))
         .offset(x: 0, y: offset+oldOffset)
@@ -35,6 +38,10 @@ struct SignatureReady: View {
                     self.offset = 0
                 }
         )
+        .gesture(
+            TapGesture().onEnded{_ in
+                self.oldOffset = 0
+            })
     }
 }
 

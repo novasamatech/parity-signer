@@ -12,14 +12,16 @@ struct ErrorAlert: View {
     let content: MError
     var body: some View {
         ZStack {
-            RoundedRectangle(cornerRadius: 20).foregroundColor(Color("BgDanger"))
+            Rectangle().foregroundColor(Color("BgDanger")).opacity(0.3).gesture(TapGesture().onEnded{_ in
+                    data.pushButton(buttonID: .GoBack)
+                })
             VStack{
                 Text("Error!").font(FBase(style: .h1)).foregroundColor(Color("SignalDanger"))
                 Text(content.error).foregroundColor(Color("SignalDanger"))
                 Button(action: {
                     data.pushButton(buttonID: .GoBack)
                 }) {Text("Ok")}
-            }
+            }.padding().background(RoundedRectangle(cornerRadius: 20).foregroundColor(Color("BgDanger")))
         }
     }
 }
