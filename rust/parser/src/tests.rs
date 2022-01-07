@@ -148,4 +148,38 @@ tx_version: 7,
 block_hash: 1b2b0a177ad4f3f93f9a56dae700e938a40201a5beabbda160a74c70e612c66a";
         assert!(reply == reply_known, "Expected: {}\nReceived: {}", reply_known, reply);
     }
+
+    #[test]
+    fn tr_6() {
+        let data = hex::decode("a80a0000dc621b10081b4b51335553ef8df227feb0327649d00beab6e09c10a1dce973590b00407a10f35a24010000dc07000001000000fc41b9bd8ef8fe53d58c7ea67c794c7ec9a73daf05e6d54b14ff6342c99ba64c5cfeb3e46c080274613bdb80809a3e84fe782ac31ea91e2c778de996f738e620").unwrap();
+        let specs_acala = ShortSpecs {
+            base58prefix: 10,
+            decimals: 12,
+            genesis_hash: [252, 65, 185, 189, 142, 248, 254, 83, 213, 140, 126, 166, 124, 121, 76, 126, 201, 167, 61, 175, 5, 230, 213, 75, 20, 255, 99, 66, 201, 155, 166, 76],
+            name: "acala".to_string(),
+            unit: "ACA".to_string(),
+        };
+        let reply = parse_and_display_set(&data, &metadata("for_tests/acala2012"), &specs_acala).unwrap();
+        let reply_known = r#"
+Method:
+
+pallet: Balances,
+  method: transfer,
+    field_name: dest,
+      enum_variant_name: Id,
+        Id: 25rZGFcFEWz1d81xB98PJN8LQu5cCwjyazAerGkng5NDuk9C,
+    field_name: value,
+      balance: 100.000000000000 ACA
+
+
+Extensions:
+
+era: Mortal, phase: 18, period: 32,
+nonce: 0,
+tip: 0 pACA,
+network: acala2012,
+tx_version: 1,
+block_hash: 5cfeb3e46c080274613bdb80809a3e84fe782ac31ea91e2c778de996f738e620"#;
+        assert!(reply == reply_known, "Expected: {}\nReceived: {}", reply_known, reply);
+    }
 }

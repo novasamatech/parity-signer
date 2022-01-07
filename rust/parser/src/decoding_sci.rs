@@ -239,12 +239,11 @@ fn check_special (current_type: &Type<PortableForm>) -> SpecialType {
 // and could be easily detected, Balance is immediately linked to corresponding number.
 // If however, the typeName is searched for word "Balance", numerous false positives are possible.
 fn field_type_name_is_balance (type_name: &str) -> bool {
-    (type_name == "Balance")||(type_name == "T::Balance")||(type_name == "BalanceOf<T>")||(type_name == "ExtendedBalance")||(type_name == "BalanceOf<T, I>")||(type_name == "DepositBalance")
+    (type_name == "Balance")||(type_name == "T::Balance")||(type_name == "BalanceOf<T>")||(type_name == "ExtendedBalance")||(type_name == "BalanceOf<T, I>")||(type_name == "DepositBalance")||(type_name == "PalletBalanceOf<T>")
 }
 
 
 pub (crate) fn decoding_sci_complete (current_type: &Type<PortableForm>, possible_ext: &mut Option<&mut Ext>, compact_flag: bool, balance_flag: bool, call_expectation: &CallExpectation, data: Vec<u8>, meta_v14: &RuntimeMetadataV14, indent: u32, short_specs: &ShortSpecs) -> Result<DecodedOut, ParserError> {
-//    if let Some(a) = current_type.path().ident() {println!("{:?}", a);}
     if let Some(ext) = possible_ext {ext.check_special(current_type)}
     let special_type = check_special(current_type);
     let call_expectation = {

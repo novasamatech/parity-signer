@@ -159,6 +159,13 @@ pub (crate) fn decode_primitive_with_flags <T> (data: &Vec<u8>, possible_ext: &m
         T: Decode + HasCompact + std::fmt::Display,
         Compact<T>: Decode
 {
+    let balance_flag = {
+        if let Some(ext) = possible_ext {
+            if let SpecialExt::Tip = ext.specialty {true}
+            else {balance_flag}
+        }
+        else {balance_flag}
+    };
     if compact_flag {
         let compact_found = get_compact::<T>(data)?;
         let fancy_out = {
