@@ -241,7 +241,6 @@ public class CameraService: UIViewController, AVCaptureVideoDataOutputSampleBuff
                                 }
                             } else { //collect frames and attempt to decode if it seems that enough are collected
                                 self.bucket.append(payloadStr)
-                                print(self.bucket.count)
                                 DispatchQueue.main.async {
                                     self.captured = self.bucket.count
                                 }

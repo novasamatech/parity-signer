@@ -21,46 +21,6 @@ struct Address: Codable, Equatable {
 }
 
 /*
- /**
-  * Mock test sample
-  */
- extension Address {
- static var addressData: [Address] {
- [
- Address(public_key: "1691a3ce28763a83e094bd5b06835bc5bba4d38d770710f8f327d4f2c71afb21", ss58: "1WbKRCtpZ6XbTdf9w8i7KVwctANhQhQg27qfE54RbamvfrD", path: "", has_password: "false", name: "root address", seed_name: "Pupa"),
- Address(public_key: "1791a3ce28763a83e094bd5b06835bc5bba4d38d770710f8f327d4f2c71afb21", ss58: "11bKRCtpZ6XbTdf9w8i7KVwctANhQhQg27qfE54RbamvfrD", path: "", has_password: "true", name: "Some other address", seed_name: "Lupa")
- ]
- }
- }
- */
-
-/**
- * Useful utility functions for address
- */
-extension Address {
-    /**
-     * Get truncated base58 address representation that fits on screen
-     */
-    func truncateBase58() -> String {
-        return self.base58.prefix(8) + "..." + self.base58.suffix(8)
-    }
-    
-    /**
-     * Same as truncateBase58 but shorter for very space-constrained places
-     */
-    func truncateBase58to8() -> String {
-        return self.base58.prefix(4) + "..." + self.base58.suffix(4)
-    }
-    
-    /**
-     * Definition of root address
-     */
-    func isRoot() -> Bool {
-        return self.path == "" && !self.has_pwd
-    }
-}
-
-/*
  * Checkers for derivation path
  */
 struct DerivationState {

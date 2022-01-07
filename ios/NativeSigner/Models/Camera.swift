@@ -56,7 +56,7 @@ final class CameraViewModel: ObservableObject {
     }
     
     func shutdown() {
-        print(self.payload ?? "Nothing")
+        print(self.payload ?? "No payload catpured by camera")
         service.stop()
     }
     

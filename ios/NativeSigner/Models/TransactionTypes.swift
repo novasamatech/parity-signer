@@ -5,6 +5,12 @@
 //  Created by Alexander Slesarev on 11.8.2021.
 //
 
+/**
+ * This is hard-typed decoding of transaction passed from Rust
+ *
+ * Used in showing transaction content both in signing and log
+ */
+
 import Foundation
 
 //all cards must match Rust code!
@@ -153,10 +159,17 @@ struct TxSpecPlain: Decodable {
 
 struct Verifier: Decodable, Hashable {
     var hex: String
-    var identicon: String?
+    var identicon: String
     var encryption: String
 }
 
+/**
+ * Complex decoder for transaction cards
+ * card format: {index, indent, type, payload}
+ *
+ * where index is used for cards sorting, indent is an offset for rendering on screen,
+ * and payload could be any complex thing needed to render a transaction card
+ */
 struct TransactionCard: Decodable, Hashable {
     static func == (lhs: TransactionCard, rhs: TransactionCard) -> Bool {
         return lhs.index == rhs.index //guaranteed in backend
@@ -291,6 +304,9 @@ struct Action: Decodable, Encodable {
     var payload: String
 }
 
+/**
+ * The JSON object actually passed from Rust is this
+ */
 struct TransactionCardSet: Decodable, Hashable {
     
     var error: [TransactionCard]?
