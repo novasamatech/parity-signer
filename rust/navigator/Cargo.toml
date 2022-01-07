@@ -16,3 +16,6 @@ transaction_signing = {path = "../transaction_signing"}
 sp-runtime = "3.0.0"
 sp-core = "3.0.0"
 zeroize = "1.4.2"
+
+[dev-dependencies]
+regex = "1.4.5"

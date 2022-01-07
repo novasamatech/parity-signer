@@ -401,14 +401,19 @@ impl State {
                     };
                 },
                 Action::SelectSeed => {
-                    match KeysState::new(details_str, dbname) {
-                        Ok(a) => {
-                            new_navstate = Navstate::clean_screen(Screen::Keys(a));
+                    match self.navstate.screen {
+                        Screen::Keys(_) => {
+                            match KeysState::new(details_str, dbname) {
+                                Ok(a) => {
+                                    new_navstate = Navstate::clean_screen(Screen::Keys(a));
+                                },
+                                Err(e) => {
+                                    new_navstate.alert = Alert::Error;
+                                    errorline.push_str(&<Signer>::show(&e));
+                                },
+                            }
                         },
-                        Err(e) => {
-                            new_navstate.alert = Alert::Error;
-                            errorline.push_str(&<Signer>::show(&e));
-                        },
+                        _ => println!("SelectSeed does nothing here"),
                     }
                 },
                 Action::SelectKey => {

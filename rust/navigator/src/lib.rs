@@ -15,6 +15,7 @@ pub mod modals;
 mod navstate;
     use navstate::{Navstate, State};
 pub mod screens;
+mod tests;
 
 
 //TODO: multithread here some day!
