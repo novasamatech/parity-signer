@@ -26,7 +26,7 @@ struct TCFieldName: View {
                 }
                 if showDoc {
                     VStack {
-                        Text("Path: " + value.path_type)
+                        Text("Path: " + value.path_type).foregroundColor(Color("Text600"))
                         Text(AttributedString(fromHexDocs: value.docs_field_name) ?? "docs parsing error in iOS, please refer to other sources")
                             .foregroundColor(Color("Text600"))
                         Text(AttributedString(fromHexDocs: value.docs_type) ?? "docs parsing error in iOS, please refer to other sources")

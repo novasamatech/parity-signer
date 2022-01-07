@@ -58,8 +58,7 @@ struct TCNewSpecs: View {
                 HStack {
                     Text("logo:")
                         .foregroundColor(Color("Text400"))
-                    Text(value.logo)
-                        .foregroundColor(Color("Text600")).font(Font.custom("Web3-Regular", size: 18))
+                    NetworkLogo(logo: value.logo)
                 }
                 HStack {
                     Text("default path:")

@@ -11,12 +11,9 @@ struct TCID: View {
     var value: Id
     var body: some View {
         HStack {
-            //TODO: handle error
-            Image(uiImage: UIImage(data: Data(fromHexEncodedString: value.identicon) ?? Data()) ?? UIImage())
-                .resizable(resizingMode: .stretch)
-                .frame(width: 28, height: 28)
+            Identicon(identicon: value.identicon)
             Text(value.base58)
-                .foregroundColor(Color("Text600"))
+                .foregroundColor(Color("Text600")).font(FCrypto(style: .body2))
             Spacer()
         }
     }

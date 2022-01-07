@@ -12,7 +12,7 @@ struct TCText: View {
     var body: some View {
         HStack {
             Text(AttributedString(fromHexDocs: text) ?? AttributedString(text))
-                .foregroundColor(Color("Text600"))
+                .foregroundColor(Color("Text600")).font(FBase(style: .body2))
             Spacer()
         }
     }

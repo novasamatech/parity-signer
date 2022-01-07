@@ -146,6 +146,17 @@
 		2DAA82912786FA4B002917C0 /* KeyDetailsMulti.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2DAA82902786FA4B002917C0 /* KeyDetailsMulti.swift */; };
 		2DAA829327873027002917C0 /* TCDerivations.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2DAA829227873027002917C0 /* TCDerivations.swift */; };
 		2DAA8299278738C0002917C0 /* SelectSeed.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2DAA8298278738C0002917C0 /* SelectSeed.swift */; };
+		2DAA829B2788596C002917C0 /* TCNonce.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2DAA829A2788596C002917C0 /* TCNonce.swift */; };
+		2DAA829D27885A67002917C0 /* TCMeta.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2DAA829C27885A67002917C0 /* TCMeta.swift */; };
+		2DAA829F27885B39002917C0 /* TCBitVec.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2DAA829E27885B39002917C0 /* TCBitVec.swift */; };
+		2DAA82A127885BAF002917C0 /* TCDefault.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2DAA82A027885BAF002917C0 /* TCDefault.swift */; };
+		2DAA82A327885C2E002917C0 /* TCIdentityField.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2DAA82A227885C2E002917C0 /* TCIdentityField.swift */; };
+		2DAA82A527885D4A002917C0 /* TCTipPlain.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2DAA82A427885D4A002917C0 /* TCTipPlain.swift */; };
+		2DAA82A727885E73002917C0 /* TCNameValueTemplate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2DAA82A627885E73002917C0 /* TCNameValueTemplate.swift */; };
+		2DAA82A927885FCF002917C0 /* TCTXSpecPlain.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2DAA82A827885FCF002917C0 /* TCTXSpecPlain.swift */; };
+		2DAA82AB27886734002917C0 /* TCGenesisHash.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2DAA82AA27886734002917C0 /* TCGenesisHash.swift */; };
+		2DAA82AD2788678F002917C0 /* TCNetworkName.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2DAA82AC2788678F002917C0 /* TCNetworkName.swift */; };
+		2DAA82AF278874F3002917C0 /* NetworkLogo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2DAA82AE278874F3002917C0 /* NetworkLogo.swift */; };
 		2DB037BF270F12DF00A318B2 /* Web3-Regular.otf in Resources */ = {isa = PBXBuildFile; fileRef = 2DB037BE270F12DF00A318B2 /* Web3-Regular.otf */; };
 		2DE72BC226A588C7002BB752 /* NativeSignerApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2DE72BC126A588C7002BB752 /* NativeSignerApp.swift */; };
 		2DE72BC426A588C7002BB752 /* MainScreenContainer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2DE72BC326A588C7002BB752 /* MainScreenContainer.swift */; };
@@ -315,6 +326,17 @@
 		2DAA82902786FA4B002917C0 /* KeyDetailsMulti.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyDetailsMulti.swift; sourceTree = "<group>"; };
 		2DAA829227873027002917C0 /* TCDerivations.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TCDerivations.swift; sourceTree = "<group>"; };
 		2DAA8298278738C0002917C0 /* SelectSeed.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SelectSeed.swift; sourceTree = "<group>"; };
+		2DAA829A2788596C002917C0 /* TCNonce.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TCNonce.swift; sourceTree = "<group>"; };
+		2DAA829C27885A67002917C0 /* TCMeta.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TCMeta.swift; sourceTree = "<group>"; };
+		2DAA829E27885B39002917C0 /* TCBitVec.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TCBitVec.swift; sourceTree = "<group>"; };
+		2DAA82A027885BAF002917C0 /* TCDefault.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TCDefault.swift; sourceTree = "<group>"; };
+		2DAA82A227885C2E002917C0 /* TCIdentityField.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TCIdentityField.swift; sourceTree = "<group>"; };
+		2DAA82A427885D4A002917C0 /* TCTipPlain.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TCTipPlain.swift; sourceTree = "<group>"; };
+		2DAA82A627885E73002917C0 /* TCNameValueTemplate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TCNameValueTemplate.swift; sourceTree = "<group>"; };
+		2DAA82A827885FCF002917C0 /* TCTXSpecPlain.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TCTXSpecPlain.swift; sourceTree = "<group>"; };
+		2DAA82AA27886734002917C0 /* TCGenesisHash.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TCGenesisHash.swift; sourceTree = "<group>"; };
+		2DAA82AC2788678F002917C0 /* TCNetworkName.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TCNetworkName.swift; sourceTree = "<group>"; };
+		2DAA82AE278874F3002917C0 /* NetworkLogo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkLogo.swift; sourceTree = "<group>"; };
 		2DB037BE270F12DF00A318B2 /* Web3-Regular.otf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Web3-Regular.otf"; sourceTree = "<group>"; };
 		2DE72BBE26A588C7002BB752 /* NativeSigner.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = NativeSigner.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		2DE72BC126A588C7002BB752 /* NativeSignerApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NativeSignerApp.swift; sourceTree = "<group>"; };
@@ -456,6 +478,7 @@
 				2D48F3DD277E4BEC004B27BE /* SmallButton.swift */,
 				2D48F35027609CDE004B27BE /* HistoryCard.swift */,
 				2DA5F8852756A44600D8DD29 /* AddressCardControls.swift */,
+				2DAA82AE278874F3002917C0 /* NetworkLogo.swift */,
 				2D48F3C72774CC64004B27BE /* SearchKeys.swift */,
 				2DA5F88F27590B3A00D8DD29 /* DocumentModal.swift */,
 				2DA5F8322756653B00D8DD29 /* CameraPreview.swift */,
@@ -487,14 +510,24 @@
 				2DA5F84D27566C3600D8DD29 /* TCError.swift */,
 				2DA5F84E27566C3600D8DD29 /* TCID.swift */,
 				2DA5F84F27566C3600D8DD29 /* TCText.swift */,
+				2DAA829A2788596C002917C0 /* TCNonce.swift */,
 				2DA5F85027566C3600D8DD29 /* TCVerifier.swift */,
 				2DA5F85127566C3600D8DD29 /* TCAuthor.swift */,
 				2DA5F85227566C3600D8DD29 /* TCEraImmortal.swift */,
 				2DA5F85327566C3600D8DD29 /* TCNewSpecs.swift */,
+				2DAA829C27885A67002917C0 /* TCMeta.swift */,
+				2DAA829E27885B39002917C0 /* TCBitVec.swift */,
 				2DA5F85427566C3600D8DD29 /* TCTip.swift */,
+				2DAA82A427885D4A002917C0 /* TCTipPlain.swift */,
+				2DAA82A827885FCF002917C0 /* TCTXSpecPlain.swift */,
+				2DAA82AA27886734002917C0 /* TCGenesisHash.swift */,
+				2DAA82AC2788678F002917C0 /* TCNetworkName.swift */,
 				2DA5F85527566C3600D8DD29 /* TCPallet.swift */,
+				2DAA82A627885E73002917C0 /* TCNameValueTemplate.swift */,
 				2DA5F85627566C3600D8DD29 /* TCAuthorPlain.swift */,
 				2DA5F85727566C3600D8DD29 /* TCWarning.swift */,
+				2DAA82A027885BAF002917C0 /* TCDefault.swift */,
+				2DAA82A227885C2E002917C0 /* TCIdentityField.swift */,
 				2DA5F85827566C3600D8DD29 /* TCTXSpec.swift */,
 				2DA5F85927566C3600D8DD29 /* TCNameVersion.swift */,
 				2DA5F85A27566C3600D8DD29 /* TCVarName.swift */,
@@ -825,6 +858,7 @@
 				2D48F3A427708091004B27BE /* MManageNetworks.swift in Sources */,
 				2DA5F87627566D7C00D8DD29 /* TransactionPreview.swift in Sources */,
 				2D48F3C227749138004B27BE /* MTypesInfo.swift in Sources */,
+				2DAA82AF278874F3002917C0 /* NetworkLogo.swift in Sources */,
 				2DA5F85E27566C3600D8DD29 /* TCFieldName.swift in Sources */,
 				2D48F3712767514B004B27BE /* MPasswordConfirm.swift in Sources */,
 				2D48F3D8277B95A3004B27BE /* TransactionBlock.swift in Sources */,
@@ -838,6 +872,8 @@
 				2DA5F8372756657600D8DD29 /* TransactionTypes.swift in Sources */,
 				2D48F3A0276C8D5E004B27BE /* LogMenu.swift in Sources */,
 				2D48F36D27636092004B27BE /* MBackup.swift in Sources */,
+				2DAA82A127885BAF002917C0 /* TCDefault.swift in Sources */,
+				2DAA82A327885C2E002917C0 /* TCIdentityField.swift in Sources */,
 				2D48F3C62774AEE7004B27BE /* SelectSeedForBackup.swift in Sources */,
 				2DA5F85F27566C3600D8DD29 /* TCTypesInfo.swift in Sources */,
 				2DA5F8A1275F889400D8DD29 /* Headers.swift in Sources */,
@@ -858,6 +894,7 @@
 				2DA5F86F27566C3600D8DD29 /* TCTXSpec.swift in Sources */,
 				2DA5F8412756687200D8DD29 /* TransactionCardView.swift in Sources */,
 				2DA5F86A27566C3600D8DD29 /* TCNewSpecs.swift in Sources */,
+				2DAA829B2788596C002917C0 /* TCNonce.swift in Sources */,
 				2D72B4FA26EF7D1C0081E879 /* Seeds.swift in Sources */,
 				2D48F3CE2777A7EA004B27BE /* MNewSeedBackup.swift in Sources */,
 				04197D2B276BA40C003485D2 /* MenuElements.swift in Sources */,
@@ -882,8 +919,10 @@
 				2DA5F8332756653B00D8DD29 /* CameraPreview.swift in Sources */,
 				2D48F38A27691C3B004B27BE /* MError.swift in Sources */,
 				2DA5F8862756A44600D8DD29 /* AddressCardControls.swift in Sources */,
+				2DAA82AB27886734002917C0 /* TCGenesisHash.swift in Sources */,
 				2DA5F8962759576B00D8DD29 /* MLog.swift in Sources */,
 				2DA5F82F2756635A00D8DD29 /* HistoryScreen.swift in Sources */,
+				2DAA82A727885E73002917C0 /* TCNameValueTemplate.swift in Sources */,
 				2DE72BC226A588C7002BB752 /* NativeSignerApp.swift in Sources */,
 				2DA5F8232756621F00D8DD29 /* Header.swift in Sources */,
 				2D48F3BA2771DD66004B27BE /* MSufficientCryptoReady.swift in Sources */,
@@ -894,6 +933,7 @@
 				2DA5F86527566C3600D8DD29 /* TCID.swift in Sources */,
 				2DA5F86227566C3600D8DD29 /* TCEnumVariantName.swift in Sources */,
 				2D48F3D02777A823004B27BE /* NewSeedBackupModal.swift in Sources */,
+				2DAA829F27885B39002917C0 /* TCBitVec.swift in Sources */,
 				2DA5F87A275676B600D8DD29 /* SeedCardForManager.swift in Sources */,
 				2D48F38127691C05004B27BE /* AlertSelector.swift in Sources */,
 				04197D27276A41E7003485D2 /* SettingsCardTemplate.swift in Sources */,
@@ -909,6 +949,7 @@
 				2D48F3E0278305AE004B27BE /* LogComment.swift in Sources */,
 				2D48F3B82771D250004B27BE /* SignSufficientCrypto.swift in Sources */,
 				2DA5F86E27566C3600D8DD29 /* TCWarning.swift in Sources */,
+				2DAA82A927885FCF002917C0 /* TCTXSpecPlain.swift in Sources */,
 				2D48F3DA277E3719004B27BE /* MLogRight.swift in Sources */,
 				2D48F3A62770828B004B27BE /* ManageNetworks.swift in Sources */,
 				2DA5F87227566C3600D8DD29 /* TCFieldNumber.swift in Sources */,
@@ -926,12 +967,14 @@
 				2DA5F87127566C3600D8DD29 /* TCVarName.swift in Sources */,
 				2D48F398276A200F004B27BE /* EnterPassword.swift in Sources */,
 				2D48F3A827708670004B27BE /* NetworkDetails.swift in Sources */,
+				2DAA829D27885A67002917C0 /* TCMeta.swift in Sources */,
 				2DA5F86C27566C3600D8DD29 /* TCPallet.swift in Sources */,
 				2D48F396276A2003004B27BE /* SignatureReady.swift in Sources */,
 				2DA5F898275F865400D8DD29 /* ModalSelector.swift in Sources */,
 				2DA5F87327566C3600D8DD29 /* TCBlockHash.swift in Sources */,
 				2DA5F86027566C3600D8DD29 /* TCAuthorPublicKey.swift in Sources */,
 				2D48F36F2767419D004B27BE /* PasswordConfirm.swift in Sources */,
+				2DAA82AD2788678F002917C0 /* TCNetworkName.swift in Sources */,
 				2D48F35B2760E5DF004B27BE /* RecoverSeedPhrase.swift in Sources */,
 				2DA5F87C2756A21200D8DD29 /* ExportAddress.swift in Sources */,
 				2D48F36127620F49004B27BE /* SeedKeyCard.swift in Sources */,
@@ -946,6 +989,7 @@
 				2D48F3BE27720345004B27BE /* KeyMenu.swift in Sources */,
 				2DA5F88C2757693600D8DD29 /* NewAddressScreen.swift in Sources */,
 				2D48F36B2763604F004B27BE /* Backup.swift in Sources */,
+				2DAA82A527885D4A002917C0 /* TCTipPlain.swift in Sources */,
 				2D48F3BC2771DE24004B27BE /* SufficientCryptoReady.swift in Sources */,
 				2D48F3C027720B7E004B27BE /* MSeedMenu.swift in Sources */,
 				2DA5F83F275667CF00D8DD29 /* HistoryCardTemplate.swift in Sources */,

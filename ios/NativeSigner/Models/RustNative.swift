@@ -40,11 +40,6 @@ class SignerDataModel: ObservableObject {
     @Published var parsingAlert: Bool = false
     
     //Transaction content
-    @Published var payloadStr: String = ""
-    @Published var transactionError: String = ""
-    @Published var qr: UIImage?
-    @Published var result: String? //TODO: remove this?
-    @Published var comment: String = ""
     @Published var resetCamera: Bool = false
     @Published var cards: [TransactionCard] = []
     @Published var action: Action?

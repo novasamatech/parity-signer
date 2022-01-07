@@ -17,13 +17,13 @@ struct TransactionPreview: View {
             VStack {
                 TransactionBlock(cards: content.content.assemble())
                 ScrollView {
+                    if let address = content.author_info {
+                        AddressCard(address: address.intoAddress())
+                    }
+                    if let network = content.network_info {
+                        NetworkCard(title: network.network_title, logo: network.network_logo)
+                    }
                     if (content.type == .sign) {
-                        if let address = content.author_info {
-                            AddressCard(address: address.intoAddress())
-                        }
-                        if let network = content.network_info {
-                            NetworkCard(title: network.network_title, logo: network.network_logo)
-                        }
                         HStack {
                             Text("LOG NOTE").font(FBase(style: .overline)).foregroundColor(Color("Text400"))
                             Spacer()
@@ -94,9 +94,6 @@ struct TransactionPreview: View {
                 }
                 .padding(16)
             }
-        }
-        .onAppear{
-            print(data.cards)
         }
     }
 }

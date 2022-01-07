@@ -11,12 +11,12 @@ struct TCAuthor: View {
     var author: Author
     var body: some View {
         HStack {
-            Image(uiImage: UIImage(data: Data(fromHexEncodedString: author.identicon)!)!)
+            Identicon(identicon: author.identicon)
             VStack (alignment: .leading) {
                 Text("From:")
-                    .foregroundColor(Color("Action400"))
-                Text(author.seed + author.derivation_path)
-                    .foregroundColor(Color("Text600"))
+                    .foregroundColor(Color("Text400"))
+                Text(author.seed + author.derivation_path + (author.has_password ? "///" : ""))
+                    .foregroundColor(Color("Crypto400"))
                 Text(author.base58)
                     .font(.caption2)
                     .foregroundColor(Color("Text600"))

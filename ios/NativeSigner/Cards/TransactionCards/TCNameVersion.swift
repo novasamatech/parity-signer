@@ -10,16 +10,7 @@ import SwiftUI
 struct TCNameVersion: View {
     let value: NameVersion
     var body: some View {
-        HStack {
-            Spacer()
-            VStack {
-                Text(value.name)
-                    .foregroundColor(Color("Text400"))
-                Text(value.version)
-                    .foregroundColor(Color("Text600"))
-            }
-            Spacer()
-        }
+        TCNameValueTemplate(name: value.name, value: value.version)
     }
 }
 

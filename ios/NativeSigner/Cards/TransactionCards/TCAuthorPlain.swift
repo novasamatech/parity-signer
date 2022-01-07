@@ -11,13 +11,8 @@ struct TCAuthorPlain: View {
     var value: AuthorPlain
     var body: some View {
         HStack {
-            Image(uiImage: UIImage(data: Data(fromHexEncodedString: value.identicon)!)!)
-            VStack (alignment: .leading) {
-                Text("From: ")
-                    .foregroundColor(Color("Text400"))
-                Text(value.base58).foregroundColor(Color("Text600"))
-            }
-            Spacer()
+            Identicon(identicon: value.identicon)
+            TCNameValueTemplate(name: "From", value: value.base58)
         }
     }
 }

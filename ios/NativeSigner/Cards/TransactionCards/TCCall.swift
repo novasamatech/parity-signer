@@ -16,10 +16,7 @@ struct TCCall: View {
         }) {
             VStack {
                 HStack {
-                    Text("Method").foregroundColor(Color("Text400"))
-                    Text(value.method_name)
-                        .foregroundColor(Color("Text600"))
-                    Spacer()
+                    TCNameValueTemplate(name: "Method", value: value.method_name)
                     if value.docs != "" {
                         Text("?")
                         .foregroundColor(Color("Action400"))
@@ -27,7 +24,7 @@ struct TCCall: View {
                 }
                 if showDoc {
                     Text(AttributedString(fromHexDocs: value.docs) ?? "docs parsing error in iOS, please refer to other sources")
-                        .foregroundColor(Color("Text600"))
+                        .foregroundColor(Color("Text600")).multilineTextAlignment(.leading)
                 }
             }
         }.disabled(value.docs == "")

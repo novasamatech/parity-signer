@@ -125,6 +125,7 @@ struct MetaSpecs: Decodable, Hashable {
     var specname: String
     var spec_version: String
     var meta_hash: String
+    var meta_id_pic: String
 }
 
 struct NameVersion: Decodable, Hashable {

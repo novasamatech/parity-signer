@@ -11,14 +11,7 @@ struct TCPallet: View {
     let text: String
     @State private var showDoc = false
     var body: some View {
-        VStack {
-            HStack {
-                Text("Pallet").foregroundColor(Color("Text400"))
-                Text(text)
-                    .foregroundColor(Color("Text600"))
-                Spacer()
-            }
-        }
+        TCNameValueTemplate(name: "Pallet", value: text)
     }
 }
 

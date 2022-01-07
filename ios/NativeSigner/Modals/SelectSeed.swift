@@ -12,7 +12,7 @@ struct SelectSeed: View {
     var content: MSeeds
     var body: some View {
         ZStack {
-            RoundedRectangle(cornerRadius: 8).foregroundColor(Color("Bg200"))
+            RoundedRectangle(cornerRadius: 8).foregroundColor(Color("Bg100"))
             VStack {
                 ScrollView {
                     LazyVStack {

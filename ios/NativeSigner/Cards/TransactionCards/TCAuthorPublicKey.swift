@@ -11,13 +11,13 @@ struct TCAuthorPublicKey: View {
     var value: AuthorPublicKey
     var body: some View {
         HStack {
-            Image(systemName: "circle.fill").foregroundColor(Color("Action400")).imageScale(.large)
+            Image(systemName: "circle.fill").foregroundColor(Color("Text600")).imageScale(.large)
             VStack (alignment: .leading) {
                 Text("Signed with " + value.crypto)
-                    .foregroundColor(Color("Action400"))
+                    .foregroundColor(Color("Text400")).font(FBase(style: .body2))
                 Text(value.hex)
-                    .font(.caption2)
-                    .foregroundColor(Color("Text600"))
+                    .font(FCrypto(style: .body2))
+                    .foregroundColor(Color("Crypto400"))
             }
             Spacer()
         }

@@ -10,13 +10,7 @@ import SwiftUI
 struct TCTypesInfo: View {
     var text: String
     var body: some View {
-        HStack {
-            Text("Types hash:")
-                .foregroundColor(Color("Action400"))
-            Text(text)
-                .foregroundColor(Color("Text600"))
-            Spacer()
-        }
+        TCNameValueTemplate(name: "Types hash:", value: text)
     }
 }
 

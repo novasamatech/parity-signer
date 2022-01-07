@@ -11,7 +11,7 @@ struct TCTip: View {
     var value: Currency
     var body: some View {
         HStack {
-            Text("Tip: ")
+            Text("Tip")
                 .foregroundColor(Color("Text400"))
             Text(value.amount)
                 .foregroundColor(Color("Text600"))
