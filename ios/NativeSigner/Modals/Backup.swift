@@ -42,7 +42,8 @@ struct Backup: View {
                         .onAppear{
                             secret = data.getSeed(seedName: content.seed_name, backup: true)
                             if secret == "" {
-                                data.pushButton(buttonID: .GoBack)
+                                countdown = -1
+                                secret = "Seeds are not available now! Come back again to access them."
                             }
                         }
                         .onDisappear{

@@ -56,11 +56,15 @@ struct TransactionPreview: View {
                                 isCrypto: true,
                                 action: {
                                     focus = false
-                                    data.pushButton(
-                                        buttonID: .GoForward,
-                                        details: Data(comment.utf8).base64EncodedString(),
-                                        seedPhrase: data.getSeed(seedName: content.author_info?.seed ?? "")
-                                    )
+                                    if data.alert {
+                                        data.alertShow = true
+                                    } else {
+                                        data.pushButton(
+                                            buttonID: .GoForward,
+                                            details: Data(comment.utf8).base64EncodedString(),
+                                            seedPhrase: data.getSeed(seedName: content.author_info?.seed ?? "")
+                                        )
+                                    }
                                 }
                             )
                         case .stub:

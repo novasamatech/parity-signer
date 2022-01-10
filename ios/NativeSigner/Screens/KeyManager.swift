@@ -52,7 +52,11 @@ struct KeyManager: View {
                     Text("DERIVED KEYS").foregroundColor(Color("Text300")).font(FBase(style: .overline))
                     Spacer()
                     Button(action: {
-                        data.pushButton(buttonID: .NewKey)
+                        if data.alert {
+                            data.alertShow = true
+                        } else {
+                            data.pushButton(buttonID: .NewKey)
+                        }
                     }) {
                         Image(systemName: "plus.circle").imageScale(.large).foregroundColor(Color("Action400"))
                     }
