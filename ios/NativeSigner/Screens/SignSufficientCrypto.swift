@@ -17,7 +17,10 @@ struct SignSufficientCrypto: View {
                 LazyVStack {
                     ForEach(content.getSortedKeys(), id: \.address_key) {keyrecord in
                         Button(action: {
-                            data.pushButton(buttonID: .GoForward, details: keyrecord.address_key, seedPhrase: data.getSeed(seedName: keyrecord.seed_name))
+                            let seedPhrase = data.getSeed(seedName: keyrecord.seed_name)
+                            if seedPhrase != "" {
+                                data.pushButton(buttonID: .GoForward, details: keyrecord.address_key, seedPhrase: data.getSeed(seedName: keyrecord.seed_name))
+                            }
                         }) {
                             AddressCard(address: keyrecord.intoAddress())
                         }
@@ -29,9 +32,9 @@ struct SignSufficientCrypto: View {
 }
 
 /*
-struct SignSufficientCrypto_Previews: PreviewProvider {
-    static var previews: some View {
-        SignSufficientCrypto()
-    }
-}
+ struct SignSufficientCrypto_Previews: PreviewProvider {
+ static var previews: some View {
+ SignSufficientCrypto()
+ }
+ }
  */

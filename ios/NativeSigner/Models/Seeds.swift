@@ -153,6 +153,10 @@ extension SignerDataModel {
      * Calls auth screen automatically; no need to call it specially or wrap
      */
     func getSeed(seedName: String, backup: Bool = false) -> String {
+        if self.alert {
+            self.alertShow = true
+            return ""
+        }
         var err = ExternError()
         var item: CFTypeRef?
         var logSuccess = true

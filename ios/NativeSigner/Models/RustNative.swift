@@ -44,6 +44,7 @@ class SignerDataModel: ObservableObject {
     //var bsDetector: BluetoothDetector = BluetoothDetector()
     let queueBT = DispatchQueue.global(qos: .background)
     @Published var alert: Bool = false
+    @Published var alertShow: Bool = false
     
     //version
     let appVersion = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String

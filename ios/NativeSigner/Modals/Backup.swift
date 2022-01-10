@@ -41,6 +41,9 @@ struct Backup: View {
                         }
                         .onAppear{
                             secret = data.getSeed(seedName: content.seed_name, backup: true)
+                            if secret == "" {
+                                data.pushButton(buttonID: .GoBack)
+                            }
                         }
                         .onDisappear{
                             secret = ""

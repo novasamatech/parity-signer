@@ -10,17 +10,16 @@ import Network
 
 struct NavbarShield: View {
     @EnvironmentObject var data: SignerDataModel
-    @State var alert = false
     var body: some View {
         if data.canaryDead /*|| data.bsDetector.canaryDead*/ {
             Button(action: {
-                alert = true
+                data.alertShow = true
             }) {
                 Image(systemName: "shield.slash")
                     .imageScale(.large)
                     .foregroundColor(Color("SignalDanger"))
             }
-            .alert(isPresented: $alert, content: {
+            .alert(isPresented: $data.alertShow, content: {
                 Alert(
                     title: Text("Network connected!"),
                     message: Text("Signer detects currently connected network; please enable airplane mode, disconnect all cables and handle security breach according with your security protocol."),
@@ -30,13 +29,13 @@ struct NavbarShield: View {
         } else {
             if data.alert {
                 Button(action: {
-                    alert = true
+                    data.alertShow = true
                 }) {
                     Image(systemName: "exclamationmark.shield")
                         .imageScale(.large)
                         .foregroundColor(Color("SignalWarning"))
                 }
-                .alert(isPresented: $alert, content: {
+                .alert(isPresented: $data.alertShow, content: {
                     Alert(
                         title: Text("Network was connected!"),
                         message: Text("Your Signer device has connected to a WiFi, tether or Bluetooth network since your last acknowledgement and should be considered unsafe to use. Please follow your security protocol"),
@@ -48,13 +47,13 @@ struct NavbarShield: View {
                 })
             } else {
                 Button(action: {
-                    alert = true
+                    data.alertShow = true
                 }) {
                     Image(systemName: "lock.shield.fill")
                         .imageScale(.large)
                         .foregroundColor(Color("Crypto400"))
                 }
-                .alert(isPresented: $alert, content: {
+                .alert(isPresented: $data.alertShow, content: {
                     Alert(
                         title: Text("Signer is secure"),
                         message: Text("Please proceed"),

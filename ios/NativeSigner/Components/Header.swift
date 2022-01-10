@@ -41,20 +41,26 @@ struct Header: View {
                     .tracking(0.1)
                 
                 if data.actionResult.rightButton == "MultiSelect" {
-                 Button(action: {
-                     data.pushButton(buttonID: .SelectAll)
-                 }) {
-                 SmallButton(text: "Select all")
-                 }
-                 }
+                    Button(action: {
+                        data.pushButton(buttonID: .SelectAll)
+                    }) {
+                        SmallButton(text: "Select all")
+                    }
+                }
                 Spacer()
                 
                 HStack(spacing: 8.0) {
                     Spacer()
                     Button(action: {
-                        data.pushButton(buttonID: .RightButton)
+                        if data.alert && data.actionResult.rightButton == "NewSeed" {
+                            data.alertShow = true
+                        } else {
+                            data.pushButton(buttonID: .RightButton)
+                        }
                     }) {
-                        switch(data.actionResult.rightButton) {
+                        switch(
+                            data.actionResult.rightButton
+                        ) {
                         case "NewSeed":
                             Image(systemName: "plus.circle")
                                 .imageScale(.large)
