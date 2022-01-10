@@ -78,6 +78,7 @@ extension SignerDataModel {
      * createRoots: choose whether empty derivations for every network should be created
      */
     func restoreSeed(seedName: String, seedPhrase: String, createRoots: Bool) {
+        var error: Unmanaged<CFError>?
         guard let accessFlags = SecAccessControlCreateWithFlags(kCFAllocatorDefault, kSecAttrAccessibleWhenPasscodeSetThisDeviceOnly, .devicePasscode, &error) else {
             print("Access flags could not be allocated")
             print(error ?? "no error code")

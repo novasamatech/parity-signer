@@ -44,7 +44,6 @@ struct Backup: View {
                         }
                         .onDisappear{
                             secret = ""
-                            data.seedBackup = ""
                         }
                         .background(RoundedRectangle(cornerRadius: 8).foregroundColor(Color(countdown>0 ? "Crypto100" : "Bg300")))
                         Text("DERIVED KEYS").foregroundColor(Color("Text300")).font(FBase(style: .overline))

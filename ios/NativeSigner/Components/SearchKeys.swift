@@ -7,13 +7,16 @@
 
 import SwiftUI
 
+/**
+ * Text entry to search for keys in keys menu
+ * Gets cleared on button press
+ */
 struct SearchKeys: View {
-    @EnvironmentObject var data: SignerDataModel
     @Binding var searchString: String
     var body: some View {
         HStack {
             ZStack {
-                RoundedRectangle(cornerRadius: 8).stroke(Color(data.searchKey == "" ? "Action100" : "Action400")).frame(height: 39)
+                RoundedRectangle(cornerRadius: 8).stroke(Color(searchString == "" ? "Action100" : "Action400")).frame(height: 39)
             TextField("find keys", text: $searchString)
                 .autocapitalization(.none)
                 .disableAutocorrection(true)

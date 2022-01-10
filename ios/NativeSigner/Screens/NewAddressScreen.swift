@@ -73,7 +73,6 @@ struct NewAddressScreen: View {
             derivationState = path.checkAsDerivation()
             focusedField = content.keyboard
         }
-        .background(/*@START_MENU_TOKEN@*//*@PLACEHOLDER=View@*/Color("backgroundColor")/*@END_MENU_TOKEN@*/)
     }
 }
 

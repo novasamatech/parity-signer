@@ -11,7 +11,7 @@ struct KeyManager: View {
     @EnvironmentObject var data: SignerDataModel
     @GestureState private var dragOffset = CGSize.zero
     var content: MKeys
-    @State var searchString: String = ""
+    @State var searchString: String = "" // This is supposed to be used with search, which is disabled now
     var body: some View {
         ZStack {
             VStack {

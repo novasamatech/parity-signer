@@ -17,6 +17,9 @@
 
 import Foundation
 
+/**
+ * All possible events that could be listed in history
+ */
 enum Event: Decodable, Hashable, Equatable {
     case databaseInitiated
     case deviceWasOnline
@@ -212,6 +215,10 @@ struct MetadataSigned: Decodable, Hashable {
     var signed_by: Verifier
 }
 
+/**
+ * An atomic history db record
+ * All events happened simultaneously
+ */
 struct History: Decodable {
     var order: Int
     var timestamp: String

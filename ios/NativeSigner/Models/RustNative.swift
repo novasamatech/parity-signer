@@ -20,7 +20,8 @@ class SignerDataModel: ObservableObject {
     
     //Action handler
     var actionAvailable = true //debouncer
-    @Published var actionResult: ActionResult = ActionResult() //Screen state should pretty much be here
+    @Published var actionResult: ActionResult = ActionResult() //Screen state is stored here
+    @Published var parsingAlert: Bool = false
     let debounceTime: Double = 0.2 //Debounce time
     
     //Data state
@@ -29,28 +30,11 @@ class SignerDataModel: ObservableObject {
     @Published var lastError: String = ""
     @Published var authenticated: Bool = false
     
-    //Key manager state
-    @Published var selectedSeed: String = ""
-    @Published var searchKey: String = ""
-    @Published var suggestedPath: String = "//"
-    @Published var suggestedName: String = ""
-    
-    //Navigation
-    @Published var keyManagerModal: SignerModal = .Empty
-    @Published var parsingAlert: Bool = false
-    
-    //Transaction content
+    //This just starts camera reset. Could be done cleaner probably.
     @Published var resetCamera: Bool = false
-    @Published var cards: [TransactionCard] = []
-    @Published var action: Action?
-    @Published var author: Author?
     
     //internal boilerplate
-    var error: Unmanaged<CFError>?
     var dbName: String
-    
-    //This is the secret - thus it's made non-reactive
-    var seedBackup: String = ""
     
     //Alert indicator
     @Published var canaryDead: Bool = false
@@ -204,9 +188,16 @@ extension SignerDataModel {
     }
 }
 
+/**
+ * An object to monitor for bluetooth
+ * This should not do anything else, of course
+ */
 class BluetoothDetector: NSObject, CBCentralManagerDelegate {
     @Published var canaryDead = false
     
+    /**
+     * Just mark current bluetooth state
+     */
     func centralManagerDidUpdateState(_ central: CBCentralManager) {
         switch central.state {
         case .unknown:

@@ -10,6 +10,10 @@
 
 import Foundation
 
+/**
+ * This object stores really stores observable backend model
+ * without boilerplate that handles iOS-contained logic
+ */
 struct ActionResult: Decodable {
     var screen: SignerScreen = .Log(MLog())
     var screenLabel: String = ""
@@ -194,6 +198,11 @@ enum SignerModal: Decodable {
     case SelectSeed(MSeeds)
 }
 
+/**
+ * Alerts for showing
+ *
+ * This might be organized differently i iOS and android
+ */
 enum SignerAlert: Decodable {
     case Empty
     case Error(MError)
@@ -201,6 +210,10 @@ enum SignerAlert: Decodable {
     case Confirm(MConfirm)
 }
 
+/**
+ * All possible actions-buttons sent to backend are here
+ * Some should be only pressed by model, not by user (e.g. those that need seed phrase or transaction)
+ */
 enum ButtonID {
     case Start
     case NavbarLog

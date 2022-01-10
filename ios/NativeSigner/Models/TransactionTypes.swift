@@ -13,7 +13,10 @@
 
 import Foundation
 
-//all cards must match Rust code!
+/**
+ * Cards for transaction content
+ * all cards must match Rust code!
+ */
 enum Card {
     case author(Author)
     case authorPlain(AuthorPlain)
@@ -51,6 +54,9 @@ enum Card {
     case warning(String)
 }
 
+/**
+ * Visualization of transaction author
+ */
 struct Author: Decodable {
     var base58: String
     var seed: String
@@ -70,38 +76,59 @@ struct Author: Decodable {
     }
 }
 
+/**
+ * Visualization of address without encryption
+ */
 struct AuthorPlain: Decodable {
     var base58: String
     var identicon: String
 }
 
+/**
+ * Visualization of unknown address
+ */
 struct AuthorPublicKey: Decodable {
     var hex: String
     var crypto: String
     var identicon: String
 }
 
+/**
+ * Call name with docs
+ */
 struct Call: Decodable {
     var method_name: String
     var docs: String
 }
 
+/**
+ * Balance parsed with units
+ */
 struct Currency: Decodable {
     var amount: String
     var units: String
 }
 
+/**
+ * EnumVariantName
+ */
 struct EnumVariantName: Decodable {
     var name: String
     var docs_enum_variant: String
 }
 
+/**
+ * Visualization of finite lifetime
+ */
 struct EraMortal: Decodable {
     var era: String
     var phase: String
     var period: String
 }
 
+/**
+ * FieldName visualization with docs
+ */
 struct FieldName: Decodable {
     var name: String
     var docs_field_name: String
@@ -109,6 +136,9 @@ struct FieldName: Decodable {
     var docs_type: String
 }
 
+/**
+ * FiledNumber visualization with docs
+ */
 struct FieldNumber: Decodable {
     var number: String
     var docs_field_number: String
@@ -116,11 +146,17 @@ struct FieldNumber: Decodable {
     var docs_type: String
 }
 
+/**
+ * Visualization of an address
+ */
 struct Id: Decodable {
     var base58: String
     var identicon: String
 }
 
+/**
+ * Visualization of metadata to add
+ */
 struct MetaSpecs: Decodable, Hashable {
     var specname: String
     var spec_version: String
@@ -128,11 +164,17 @@ struct MetaSpecs: Decodable, Hashable {
     var meta_id_pic: String
 }
 
+/**
+ * Network name and version - this identifies metadata
+ */
 struct NameVersion: Decodable, Hashable {
     var name: String
     var version: String
 }
 
+/**
+ * Description of network specs that are added
+ */
 struct NewSpecs: Decodable, Hashable {
     var base58prefix: String
     var color: String
@@ -147,17 +189,26 @@ struct NewSpecs: Decodable, Hashable {
     var unit: String
 }
 
+/**
+ * Unit-formatted amount of tip
+ */
 struct Tip: Decodable {
     var amount: String
     var units: String
 }
 
+/**
+ * Thansaction information if network was not found
+ */
 struct TxSpecPlain: Decodable {
     var network_genesis_hash: String
     var version: String
     var tx_version: String
 }
 
+/**
+ * Visualization of cerificate issuer info
+ */
 struct Verifier: Decodable, Hashable {
     var hex: String
     var identicon: String
@@ -298,11 +349,6 @@ struct TransactionCard: Decodable, Hashable {
             card = .error("Transaction parsing error!")
         }
     }
-}
-
-struct Action: Decodable, Encodable {
-    var type: String
-    var payload: String
 }
 
 /**

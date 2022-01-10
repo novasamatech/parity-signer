@@ -36,8 +36,6 @@ struct PasswordConfirm: View {
                             .autocapitalization(.none)
                             .keyboardType(.asciiCapable)
                             .submitLabel(.done)
-                            .onChange(of: data.suggestedName, perform: {_ in data.lastError = ""
-                            })
                             .focused($focused)
                             .padding(8)
                             .onAppear {
