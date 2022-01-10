@@ -32,6 +32,15 @@ class NativeSignerTests: XCTestCase {
         print(transactionCards.assemble())
     }
     
+    func testHistoryDecode() throws {
+        let res = get_all_log_cards(nil)
+        let actionResultJSONString = String(cString: res!)
+        print(actionResultJSONString)
+        let actionResultJSON = actionResultJSONString.data(using: .utf8)
+        let eventCards = try JSONDecoder().decode(History.self, from: actionResultJSON!)
+        print(eventCards)
+    }
+    
     func testPerformanceExample() throws {
         // This is an example of a performance test case.
         self.measure {
