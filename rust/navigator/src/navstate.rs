@@ -402,7 +402,7 @@ impl State {
                 },
                 Action::SelectSeed => {
                     match self.navstate.screen {
-                        Screen::Keys(_) => {
+                        Screen::SeedSelector => {
                             match KeysState::new(details_str, dbname) {
                                 Ok(a) => {
                                     new_navstate = Navstate::clean_screen(Screen::Keys(a));
