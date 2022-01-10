@@ -139,7 +139,7 @@ export! {
     @Java_io_parity_signer_models_SignerDataModel_testGetAllTXCards
 	fn get_all_tx_cards() -> String {
         if let transaction_parsing::Action::Read(content) = transaction_parsing::test_all_cards::make_all_cards() {
-            format!("{}", content)
+            format!("{{{}}}", content)
         } else {
             "".to_string()
         }
