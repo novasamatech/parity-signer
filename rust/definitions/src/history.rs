@@ -412,3 +412,12 @@ pub fn all_events_preview() -> Vec<Event> {
     
     events
 }
+
+pub fn print_all_events() -> String {
+    let events = all_events_preview();
+    let entry = Entry {
+        timestamp: String::from("2019-12-15 12:00:0.00000000 UTC"),
+        events,
+    };
+    format!("{{\"order\":0,{}}}", entry.show(|a| format!("\"{}\"", hex::encode(a.transaction()))))
+}

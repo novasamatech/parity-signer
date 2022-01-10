@@ -19,6 +19,7 @@
 use db_handling;
 use qr_reader_phone;
 use navigator;
+use definitions;
 
 mod export;
 
@@ -135,19 +136,19 @@ export! {
         db_handling::manage_history::seed_name_was_shown(dbname, seed_name.to_string())
     }
 
-/*
     @Java_io_parity_signer_models_SignerDataModel_testGetAllTXCards
 	fn get_all_tx_cards() -> String {
-        return transaction_parsing::test_all_cards::make_all_cards()
+        if let transaction_parsing::Action::Read(content) = transaction_parsing::test_all_cards::make_all_cards() {
+            format!("{}", content)
+        } else {
+            "".to_string()
+        }
     }
 
     @Java_io_parity_signer_models_SignerDataModel_testGetAllLogCards
 	fn get_all_log_cards() -> String {
-        //TODO
-        //return transaction_parsing::test_all_cards::make_all_cards()
-        return "not ready".to_string()
+        definitions::history::print_all_events()
     }
-*/
 
 }
 

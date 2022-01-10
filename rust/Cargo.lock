@@ -2305,6 +2305,7 @@ dependencies = [
  "anyhow",
  "base64 0.10.1",
  "db_handling",
+ "definitions",
  "ffi-support",
  "hex",
  "jni",
