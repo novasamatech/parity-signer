@@ -60,7 +60,7 @@ struct MainScreenContainer: View {
             }
         } else {
             if (data.protected) {
-                if (data.canaryDead || data.bsDetector.canaryDead) {
+                if data.canaryDead /* || data.bsDetector.canaryDead)*/ {
                     Text("Please enable airplane mode, turn off bluetooth and wifi connection and disconnect all cables!").background(Color("Bg000"))
                 } else {
                     LandingView()

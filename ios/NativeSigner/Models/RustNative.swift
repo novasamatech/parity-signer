@@ -11,7 +11,7 @@ import Foundation
 import UIKit //for converting raw png to UIImage
 import Network //to detect network connection and raise alert
 import LocalAuthentication //to detect if password is set
-import CoreBluetooth //to check for bluetooth
+//import CoreBluetooth //to check for bluetooth
 
 /**
  * Object to store all data; since the data really is mostly stored in RustNative side, just one object (to describe it) is used here.
@@ -40,8 +40,8 @@ class SignerDataModel: ObservableObject {
     @Published var canaryDead: Bool = false
     let monitor = NWPathMonitor()
     let queue = DispatchQueue.global(qos: .background)
-    var manager: CBCentralManager
-    var bsDetector: BluetoothDetector = BluetoothDetector()
+    //var manager: CBCentralManager
+    //var bsDetector: BluetoothDetector = BluetoothDetector()
     let queueBT = DispatchQueue.global(qos: .background)
     @Published var alert: Bool = false
     
@@ -54,7 +54,7 @@ class SignerDataModel: ObservableObject {
     init() {
         self.dbName = NSHomeDirectory() + "/Documents/Database"
         self.onboardingDone = FileManager.default.fileExists(atPath: NSHomeDirectory() + "/Documents/Database")
-        manager = CBCentralManager(delegate: bsDetector, queue: queueBT, options: [CBCentralManagerOptionShowPowerAlertKey: false])
+        //manager = CBCentralManager(delegate: bsDetector, queue: queueBT, options: [CBCentralManagerOptionShowPowerAlertKey: false])
         self.monitor.pathUpdateHandler = {path in
             if path.availableInterfaces.count == 0 {
                 DispatchQueue.main.async {
@@ -188,6 +188,7 @@ extension SignerDataModel {
     }
 }
 
+/*
 /**
  * An object to monitor for bluetooth
  * This should not do anything else, of course
@@ -233,3 +234,4 @@ class BluetoothDetector: NSObject, CBCentralManagerDelegate {
         //print(central.state.rawValue)
     }
 }
+*/

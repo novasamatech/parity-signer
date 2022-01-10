@@ -12,7 +12,7 @@ struct NavbarShield: View {
     @EnvironmentObject var data: SignerDataModel
     @State var alert = false
     var body: some View {
-        if data.canaryDead || data.bsDetector.canaryDead {
+        if data.canaryDead /*|| data.bsDetector.canaryDead*/ {
             Button(action: {
                 alert = true
             }) {
