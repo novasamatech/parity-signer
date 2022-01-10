@@ -76,6 +76,7 @@
 		2D48F3DC277E3CAA004B27BE /* MultiselectBottomControl.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D48F3DB277E3CAA004B27BE /* MultiselectBottomControl.swift */; };
 		2D48F3DE277E4BEC004B27BE /* SmallButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D48F3DD277E4BEC004B27BE /* SmallButton.swift */; };
 		2D48F3E0278305AE004B27BE /* LogComment.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D48F3DF278305AE004B27BE /* LogComment.swift */; };
+		2D6A9F84278C8275000DAE64 /* TCNetworkInfo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D6A9F83278C8275000DAE64 /* TCNetworkInfo.swift */; };
 		2D72B4F626EF3BC50081E879 /* Navigator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D72B4F526EF3BC50081E879 /* Navigator.swift */; };
 		2D72B4FA26EF7D1C0081E879 /* Seeds.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D72B4F926EF7D1C0081E879 /* Seeds.swift */; };
 		2D72D52A2732B8A7004BA7C9 /* Database in Resources */ = {isa = PBXBuildFile; fileRef = 2D72D5292732B8A7004BA7C9 /* Database */; };
@@ -256,6 +257,7 @@
 		2D48F3DB277E3CAA004B27BE /* MultiselectBottomControl.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MultiselectBottomControl.swift; sourceTree = "<group>"; };
 		2D48F3DD277E4BEC004B27BE /* SmallButton.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SmallButton.swift; sourceTree = "<group>"; };
 		2D48F3DF278305AE004B27BE /* LogComment.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LogComment.swift; sourceTree = "<group>"; };
+		2D6A9F83278C8275000DAE64 /* TCNetworkInfo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TCNetworkInfo.swift; sourceTree = "<group>"; };
 		2D72B4F526EF3BC50081E879 /* Navigator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Navigator.swift; sourceTree = "<group>"; };
 		2D72B4F926EF7D1C0081E879 /* Seeds.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Seeds.swift; sourceTree = "<group>"; };
 		2D72D5292732B8A7004BA7C9 /* Database */ = {isa = PBXFileReference; lastKnownFileType = folder; path = Database; sourceTree = "<group>"; };
@@ -530,6 +532,7 @@
 				2DAA82A227885C2E002917C0 /* TCIdentityField.swift */,
 				2DA5F85827566C3600D8DD29 /* TCTXSpec.swift */,
 				2DA5F85927566C3600D8DD29 /* TCNameVersion.swift */,
+				2D6A9F83278C8275000DAE64 /* TCNetworkInfo.swift */,
 				2DA5F85A27566C3600D8DD29 /* TCVarName.swift */,
 				2DA5F85B27566C3600D8DD29 /* TCFieldNumber.swift */,
 				2DA5F85C27566C3600D8DD29 /* TCBlockHash.swift */,
@@ -896,6 +899,7 @@
 				2DA5F86A27566C3600D8DD29 /* TCNewSpecs.swift in Sources */,
 				2DAA829B2788596C002917C0 /* TCNonce.swift in Sources */,
 				2D72B4FA26EF7D1C0081E879 /* Seeds.swift in Sources */,
+				2D6A9F84278C8275000DAE64 /* TCNetworkInfo.swift in Sources */,
 				2D48F3CE2777A7EA004B27BE /* MNewSeedBackup.swift in Sources */,
 				04197D2B276BA40C003485D2 /* MenuElements.swift in Sources */,
 				2D48F3B22770B29C004B27BE /* MManageMetadata.swift in Sources */,

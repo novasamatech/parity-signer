@@ -15,7 +15,7 @@ struct TCAuthor: View {
             VStack (alignment: .leading) {
                 Text("From:")
                     .foregroundColor(Color("Text400"))
-                Text(author.seed + author.derivation_path + (author.has_password ? "///" : ""))
+                Text(author.seed + author.derivation_path + (author.has_password == true ? "///" : ""))
                     .foregroundColor(Color("Crypto400"))
                 Text(author.base58)
                     .font(.caption2)

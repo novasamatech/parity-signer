@@ -74,3 +74,8 @@ void history_entry_system(struct ExternError*, const char* entry, const char* db
 // Call on seed backup
 void seed_name_was_shown(struct ExternError*, const char* seed_name, const char* dbname);
 
+// Test: get all transaction cards
+const char * get_all_tx_cards(struct ExternError*);
+
+// Test: get all log cards
+const char * get_all_log_cards(struct ExternError*);

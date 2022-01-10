@@ -39,6 +39,7 @@ enum Card {
     case nameVersion(NameVersion)
     case networkGenesisHash(String)
     case networkName(String)
+    case networkInfo(NetworkInfo)
     case newSpecs(NewSpecs)
     case nonce(String)
     case none
@@ -48,7 +49,7 @@ enum Card {
     case tipPlain(String)
     case txSpec(String)
     case txSpecPlain(TxSpecPlain)
-    case typesInfo(String)
+    case typesInfo(TypesInfo)
     case varName(String)
     case verifier(Verifier)
     case warning(String)
@@ -61,14 +62,14 @@ struct Author: Decodable {
     var base58: String
     var seed: String
     var derivation_path: String
-    var has_password: Bool
+    var has_password: Bool?
     var identicon: String
     
     func intoAddress() -> Address {
         return Address(
             base58: self.base58,
             path: self.derivation_path,
-            has_pwd: self.has_password,
+            has_pwd: self.has_password == true,
             identicon: self.identicon,
             seed_name: seed,
             multiselect: false
@@ -172,6 +173,11 @@ struct NameVersion: Decodable, Hashable {
     var version: String
 }
 
+struct NetworkInfo: Decodable, Hashable {
+    var network_title: String
+    var network_logo: String
+}
+
 /**
  * Description of network specs that are added
  */
@@ -204,6 +210,11 @@ struct TxSpecPlain: Decodable {
     var network_genesis_hash: String
     var version: String
     var tx_version: String
+}
+
+struct TypesInfo: Decodable {
+    var types_hash: String
+    var types_id_pic: String
 }
 
 /**
@@ -294,6 +305,9 @@ struct TransactionCard: Decodable, Hashable {
         case "name_version":
             card = .nameVersion(try values.decode(NameVersion.self, forKey: .payload))
             return
+        case "network_info":
+            card = .networkInfo(try values.decode(NetworkInfo.self, forKey: .payload))
+            return
         case "new_specs":
             card = .newSpecs(try values.decode(NewSpecs.self, forKey: .payload))
             return
@@ -305,6 +319,9 @@ struct TransactionCard: Decodable, Hashable {
             return
         case "tx_spec_plain":
             card = .txSpecPlain(try values.decode(TxSpecPlain.self, forKey: .payload))
+            return
+        case "types":
+            card = .typesInfo(try values.decode(TypesInfo.self, forKey: .payload))
             return
         case "verifier":
             card = .verifier(try values.decode(Verifier.self, forKey: .payload))
@@ -339,8 +356,8 @@ struct TransactionCard: Decodable, Hashable {
             card = .tipPlain(content)
         case "tx_version":
             card = .txSpec(content)
-        case "types_hash":
-            card = .typesInfo(content)
+        //case "types_hash":
+           // card = .typesInfo(content)
         case "varname":
             card = .varName(content)
         case "warning":

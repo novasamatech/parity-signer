@@ -51,6 +51,8 @@ struct TransactionCardSelector: View {
             TCMeta(content: value)
         case .nameVersion(let value):
             TCNameVersion(value: value)
+        case .networkInfo(let value):
+            TCNetworkInfo(content: value)
         case .newSpecs(let value):
             TCNewSpecs(value: value)
         case .nonce(let text):
@@ -69,8 +71,8 @@ struct TransactionCardSelector: View {
             TCTXSpec(value: value)
         case .txSpecPlain(let value):
             TCTXSpecPlain(content: value)
-        case .typesInfo(let text):
-            TCTypesInfo(text: text)
+        case .typesInfo(let value):
+            TCTypesInfo(content: value)
         case .varName(let text):
             TCVarName(text: text)
         case .verifier(let value):

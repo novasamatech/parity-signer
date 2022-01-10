@@ -8,16 +8,19 @@
 import SwiftUI
 
 struct TCTypesInfo: View {
-    var text: String
+    var content: TypesInfo
     var body: some View {
-        TCNameValueTemplate(name: "Types hash:", value: text)
+        HStack {
+            Identicon(identicon: content.types_id_pic)
+            TCNameValueTemplate(name: "Types hash:", value: content.types_hash)
+        }
     }
 }
 
 /*
-struct TCTypesInfo_Previews: PreviewProvider {
-    static var previews: some View {
-        TCTypesInfo()
-    }
-}
-*/
+ struct TCTypesInfo_Previews: PreviewProvider {
+ static var previews: some View {
+ TCTypesInfo()
+ }
+ }
+ */
