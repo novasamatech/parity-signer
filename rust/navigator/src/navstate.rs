@@ -241,10 +241,6 @@ impl State {
                                 },
                             }
                         },
-                        Screen::SelectSeedForBackup => {
-                        // details_str is selected seed name
-                            new_navstate.modal = Modal::Backup(details_str.to_string());
-                        },
                         Screen::DeriveKey(ref derive_state) => {
                             new_navstate.screen = Screen::DeriveKey(derive_state.update(details_str));
                             match db_handling::identities::try_create_address (&derive_state.seed_name(), secret_seed_phrase, details_str, &derive_state.network_specs_key(), dbname) {
@@ -468,10 +464,18 @@ impl State {
                     new_navstate.alert = Alert::Shield;
                 },
                 Action::NewSeed => {
-                    new_navstate = Navstate::clean_screen(Screen::NewSeed);
+                    if let Screen::SeedSelector = self.navstate.screen {
+                        if let Modal::NewSeedMenu = self.navstate.modal {
+                            new_navstate = Navstate::clean_screen(Screen::NewSeed);
+                        }
+                    }
                 },
                 Action::RecoverSeed => {
-                    new_navstate = Navstate::clean_screen(Screen::RecoverSeedName(String::new()));
+                    if let Screen::SeedSelector = self.navstate.screen {
+                        if let Modal::NewSeedMenu = self.navstate.modal {
+                            new_navstate = Navstate::clean_screen(Screen::RecoverSeedName(String::new()));
+                        }
+                    }
                 },
                 Action::BackupSeed => {
                     if details_str == "" {
@@ -485,23 +489,25 @@ impl State {
                             _ => println!("BackupSeed without seed_name does nothing here"),
                         }
                     } else {
-                        new_navstate = match KeysState::new(details_str, dbname) {
-                            Ok(a) => {
-                                Navstate {
-                                    screen: Screen::Keys(a),
-                                    modal: Modal::Backup(details_str.to_string()),
-                                    alert: Alert::Empty,
-                                }
-                            },
-                            Err(e) => {
-                                errorline.push_str(&<Signer>::show(&e));
-                                Navstate {
-                                    screen: Screen::Log,
-                                    modal: Modal::Empty,
-                                    alert: Alert::Error,
-                                }
-                            },
-                        };
+                        if let Screen::SelectSeedForBackup = self.navstate.screen {
+                            new_navstate = match KeysState::new(details_str, dbname) {
+                                Ok(a) => {
+                                    Navstate {
+                                        screen: Screen::Keys(a),
+                                        modal: Modal::Backup(details_str.to_string()),
+                                        alert: Alert::Empty,
+                                    }
+                                },
+                                Err(e) => {
+                                    errorline.push_str(&<Signer>::show(&e));
+                                    Navstate {
+                                        screen: Screen::Log,
+                                        modal: Modal::Empty,
+                                        alert: Alert::Error,
+                                    }
+                                },
+                            };
+                        }
                     }
                 },
                 Action::NetworkSelector => {
@@ -553,19 +559,23 @@ impl State {
                     }
                 },
                 Action::TransactionFetched => {
-                    new_navstate = Navstate::clean_screen(Screen::Transaction(TransactionState::new(details_str, dbname)));
+                    if let Screen::Scan = self.navstate.screen {
+                        new_navstate = Navstate::clean_screen(Screen::Transaction(TransactionState::new(details_str, dbname)));
+                    }
                 },
                 Action::RemoveNetwork => {
                     match self.navstate.screen {
                         Screen::NetworkDetails(ref network_specs_key) => {
-                            match db_handling::remove_network::remove_network(&network_specs_key, dbname) {
-                                Ok(()) => {
-                                    new_navstate = Navstate::clean_screen(Screen::Log);
-                                },
-                                Err(e) => {
-                                    new_navstate.alert = Alert::Error;
-                                    errorline.push_str(&<Signer>::show(&e));
-                                },
+                            if let Modal::NetworkDetailsMenu = self.navstate.modal {
+                                match db_handling::remove_network::remove_network(&network_specs_key, dbname) {
+                                    Ok(()) => {
+                                        new_navstate = Navstate::clean_screen(Screen::ManageNetworks);
+                                    },
+                                    Err(e) => {
+                                        new_navstate.alert = Alert::Error;
+                                        errorline.push_str(&<Signer>::show(&e));
+                                    },
+                                }
                             }
                         },
                         _ => println!("RemoveNetwork does nothing here"),
@@ -578,7 +588,7 @@ impl State {
                                 Modal::ManageMetadata(network_version) => {
                                     match db_handling::remove_network::remove_metadata(&network_specs_key, network_version, dbname) {
                                         Ok(()) => {
-                                            new_navstate = Navstate::clean_screen(Screen::Log);
+                                            new_navstate = Navstate::clean_screen(Screen::NetworkDetails(network_specs_key.to_owned()));
                                         },
                                         Err(e) => {
                                             new_navstate.alert = Alert::Error;
@@ -616,7 +626,9 @@ impl State {
                 Action::SignNetworkSpecs => {
                     match self.navstate.screen {
                         Screen::NetworkDetails(ref network_specs_key) => {
-                            new_navstate = Navstate::clean_screen(Screen::SignSufficientCrypto(SufficientCryptoState::init(transaction_signing::SufficientContent::AddSpecs(network_specs_key.to_owned()))));
+                            if let Modal::NetworkDetailsMenu = self.navstate.modal {
+                                new_navstate = Navstate::clean_screen(Screen::SignSufficientCrypto(SufficientCryptoState::init(transaction_signing::SufficientContent::AddSpecs(network_specs_key.to_owned()))));
+                            }
                         },
                         _ => println!("SignNetworkSpecs does nothing here"),
                     }
@@ -624,11 +636,8 @@ impl State {
                 Action::SignMetadata => {
                     match self.navstate.screen {
                         Screen::NetworkDetails(ref network_specs_key) => {
-                            match self.navstate.modal {
-                                Modal::ManageMetadata(network_version) => {
-                                    new_navstate = Navstate::clean_screen(Screen::SignSufficientCrypto(SufficientCryptoState::init(transaction_signing::SufficientContent::LoadMeta(network_specs_key.to_owned(), network_version))));
-                                },
-                                _ => println!("SignMetadata does nothing here"),
+                            if let Modal::ManageMetadata(network_version) =  self.navstate.modal {
+                                new_navstate = Navstate::clean_screen(Screen::SignSufficientCrypto(SufficientCryptoState::init(transaction_signing::SufficientContent::LoadMeta(network_specs_key.to_owned(), network_version))));
                             }
                         },
                         _ => println!("SignMetadata does nothing here"),

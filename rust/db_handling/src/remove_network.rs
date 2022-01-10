@@ -51,11 +51,17 @@ pub fn remove_network (network_specs_key: &NetworkSpecsKey, database_name: &str)
         for x in chainspecs.iter() {
             if let Ok((network_specs_key_vec, entry)) = x {
                 let x_network_specs_key = NetworkSpecsKey::from_ivec(&network_specs_key_vec);
-                let x_network_specs = NetworkSpecs::from_entry_with_key_checked::<Signer>(&x_network_specs_key, entry)?;
+                let mut x_network_specs = NetworkSpecs::from_entry_with_key_checked::<Signer>(&x_network_specs_key, entry)?;
                 if x_network_specs.genesis_hash == network_specs.genesis_hash {
                     network_specs_batch.remove(x_network_specs_key.key());
                     events.push(Event::NetworkSpecsRemoved(NetworkSpecsDisplay::get(&x_network_specs, &valid_current_verifier, &general_verifier)));
                     keys_to_wipe.push(x_network_specs_key);
+                }
+                else {
+                    if x_network_specs.order > network_specs.order {
+                        x_network_specs.order = x_network_specs.order-1;
+                        network_specs_batch.insert(x_network_specs_key.key(), x_network_specs.encode());
+                    }
                 }
             }
         }
