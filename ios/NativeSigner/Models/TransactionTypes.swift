@@ -372,11 +372,12 @@ struct TransactionCard: Decodable, Hashable {
  * The JSON object actually passed from Rust is this
  */
 struct TransactionCardSet: Decodable, Hashable {
-    
+    var author: [TransactionCard]?
     var error: [TransactionCard]?
     var extensions: [TransactionCard]?
     var importing_derivations: [TransactionCard]?
     var message: [TransactionCard]?
+    var meta: [TransactionCard]?
     var method: [TransactionCard]?
     var new_specs: [TransactionCard]?
     var verifier: [TransactionCard]?
@@ -388,10 +389,12 @@ struct TransactionCardSet: Decodable, Hashable {
      */
     func assemble() -> [TransactionCard] {
         var assembled: [TransactionCard] = []
+        assembled.append(contentsOf: self.author ?? [])
         assembled.append(contentsOf: self.error ?? [])
         assembled.append(contentsOf: self.extensions ?? [])
         assembled.append(contentsOf: self.importing_derivations ?? [])
         assembled.append(contentsOf: self.message ?? [])
+        assembled.append(contentsOf: self.meta ?? [])
         assembled.append(contentsOf: self.method ?? [])
         assembled.append(contentsOf: self.new_specs ?? [])
         assembled.append(contentsOf: self.verifier ?? [])
