@@ -1,7 +1,7 @@
 use db_handling::{db_transactions::TrDbColdStub, helpers::{try_get_types, get_general_verifier}};
 use definitions::{error::{ErrorSigner, GeneralVerifierForContent, InputSigner, Signer, TransferContent}, network_specs::Verifier, history::Event, qr_transfers::ContentLoadTypes, types::TypeEntry};
 
-use crate::Action;
+use crate::{Action, StubNav};
 use crate::cards::{Card, Warning};
 use crate::check_signature::pass_crypto;
 use crate::holds::{GeneralHold};
@@ -31,7 +31,7 @@ pub fn load_types(data_hex: &str, database_name: &str) -> Result<Action, ErrorSi
                         let warning_card_1 = Card::Warning(Warning::TypesNotVerified).card(&mut index,0);
                         let warning_card_2 = Card::Warning(Warning::UpdatingTypes).card(&mut index,0);
                         let types_card = Card::TypesInfo(content_new_types).card(&mut index, 0);
-                        Ok(Action::Stub(format!("\"warning\":[{},{}],\"types_info\":[{}]", warning_card_1, warning_card_2, types_card), checksum))
+                        Ok(Action::Stub(format!("\"warning\":[{},{}],\"types_info\":[{}]", warning_card_1, warning_card_2, types_card), checksum, StubNav::LoadTypes))
                     }
                 },
                 Verifier(Some(old_general_verifier_value)) => {
@@ -49,7 +49,7 @@ pub fn load_types(data_hex: &str, database_name: &str) -> Result<Action, ErrorSi
                     let checksum = stub.store_and_get_checksum(&database_name)?;
                     let warning_card = Card::Warning(Warning::UpdatingTypes).card(&mut index,0);
                     let types_card = Card::TypesInfo(content_new_types).card(&mut index, 0);
-                    Ok(Action::Stub(format!("\"verifier\":[{}],\"warning\":[{}],\"types_info\":[{}]", verifier_card, warning_card, types_card), checksum))
+                    Ok(Action::Stub(format!("\"verifier\":[{}],\"warning\":[{}],\"types_info\":[{}]", verifier_card, warning_card, types_card), checksum, StubNav::LoadTypes))
                 }
             }
             else {
@@ -72,7 +72,7 @@ pub fn load_types(data_hex: &str, database_name: &str) -> Result<Action, ErrorSi
                         };
                         let types_card = Card::TypesInfo(content_new_types).card(&mut index, 0);
                         let checksum = stub.store_and_get_checksum(&database_name)?;
-                        Ok(Action::Stub(format!("\"verifier\":[{}],\"warning\":[{},{}],\"types_info\":[{}]", verifier_card, warning_card_1, warning_card_2, types_card), checksum))
+                        Ok(Action::Stub(format!("\"verifier\":[{}],\"warning\":[{},{}],\"types_info\":[{}]", verifier_card, warning_card_1, warning_card_2, types_card), checksum, StubNav::LoadTypes))
                     },
                     Verifier(Some(old_general_verifier_value)) => {
                         return Err(ErrorSigner::Input(InputSigner::GeneralVerifierChanged{content: GeneralVerifierForContent::Types, old_general_verifier_value: old_general_verifier_value.to_owned(), new_general_verifier_value: new_general_verifier_value.to_owned()}))

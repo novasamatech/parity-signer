@@ -1,5 +1,5 @@
 use db_handling::manage_history::get_history_entry_by_order;
-use definitions::{error::{ErrorSigner, InputSigner}};
+use definitions::{error::{ErrorSigner, InputSigner}, keyring::NetworkSpecsKey};
 
 mod add_specs;
     use add_specs::add_specs;
@@ -28,9 +28,22 @@ mod tests;
 pub enum Action {
     Derivations{content: String, network_info: String, checksum: u32},
     Sign{content: String, checksum: u32, has_pwd: bool, author_info: String, network_info: String},
-    Stub(String, u32),
+    Stub(String, u32, StubNav),
     Read(String),
 }
+
+/// Enum describing Stub content.
+/// Is used for proper navigation. Variants:
+/// AddSpecs (with associated NetworkSpecsKey), LoadMeta (with associated 
+/// NetworkSpecsKey for the first by order network using those metadata),
+/// and LoadTypes
+#[derive(PartialEq, Debug, Clone)]
+pub enum StubNav {
+    AddSpecs(NetworkSpecsKey),
+    LoadMeta(NetworkSpecsKey),
+    LoadTypes,
+}
+
 
 /// Payload in hex format as it arrives into handling contains following elements:
 /// - prelude, length 6 symbols ("53" stands for substrate, ** - crypto type, ** - transaction type),

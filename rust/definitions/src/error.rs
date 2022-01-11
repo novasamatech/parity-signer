@@ -940,6 +940,7 @@ impl ErrorSource for Signer {
                     InputSigner::AddSpecsVerifierChanged {name, old_verifier_value, new_verifier_value} => format!("Network {} current verifier is {}. Received add_specs message is verified by {}, which is neither current network verifier not the general verifier. Changing the network verifier to another non-general one would require wipe and reset of Signer.", name, old_verifier_value.show_error(), new_verifier_value.show_error()),
                     InputSigner::InvalidDerivation(x) => format!("Derivation {} has invalid format.", x),
                     InputSigner::OnlyNoPwdDerivations => String::from("Only derivations without passwords are allowed in bulk import."),
+                    InputSigner::SeedNameExists(x) => format!("Seed name {} already exists.", x),
                 };
                 format!("Bad input data. {}", insert)
             },
@@ -1153,6 +1154,7 @@ pub enum InputSigner {
     AddSpecsVerifierChanged {name: String, old_verifier_value: VerifierValue, new_verifier_value: VerifierValue},
     InvalidDerivation(String),
     OnlyNoPwdDerivations,
+    SeedNameExists(String),
 }
 
 #[derive(Debug)]

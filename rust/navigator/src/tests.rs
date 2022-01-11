@@ -25,6 +25,11 @@ mod tests {
     lazy_static! {
         static ref NO_TIME: Regex = Regex::new(r#""timestamp":".*?""#).expect("checked construction");
         static ref NO_CHECKSUM: Regex = Regex::new(r#""checksum":"[0-9A-F]*?""#).expect("checked construction");
+        static ref SEED: Regex = Regex::new(r#""seed_phrase":"(?P<seed_phrase>.*?)""#).expect("checked construction");
+        static ref IDENTICON: Regex = Regex::new(r#""identicon":".*?""#).expect("checked construction");
+        static ref BASE: Regex = Regex::new(r#""base58":".*?""#).expect("checked construction");
+        static ref ADDRESS_KEY: Regex = Regex::new(r#""address_key":".*?""#).expect("checked construction");
+        static ref PUBLIC_KEY: Regex = Regex::new(r#""public_key":".*?""#).expect("checked construction");
     }
     
     fn timeless(current_real_json: &str) -> String {
@@ -32,6 +37,23 @@ mod tests {
     }
     fn cut_checksum(current_real_json: &str) -> String {
         NO_CHECKSUM.replace_all(&current_real_json, r#""checksum":"**""#).to_string()
+    }
+    fn cut_seed(current_real_json: &str) -> (String, String) {
+        let seed_phrase = SEED.captures(&current_real_json).unwrap().name("seed_phrase").unwrap().as_str().to_string();
+        let seedless_json = SEED.replace_all(&current_real_json, r#""seed_phrase":"**""#).to_string();
+        (seedless_json, seed_phrase)
+    }
+    fn cut_identicon(current_real_json: &str) -> String {
+        IDENTICON.replace_all(&current_real_json, r#""identicon":"**""#).to_string()
+    }
+    fn cut_base58(current_real_json: &str) -> String {
+        BASE.replace_all(&current_real_json, r#""base58":"**""#).to_string()
+    }
+    fn cut_address_key(current_real_json: &str) -> String {
+        ADDRESS_KEY.replace_all(&current_real_json, r#""address_key":"**""#).to_string()
+    }
+    fn cut_public_key(current_real_json: &str) -> String {
+        PUBLIC_KEY.replace_all(&current_real_json, r#""public_key":"**""#).to_string()
     }
     
     #[test]
@@ -43,7 +65,7 @@ mod tests {
         
         let real_json = do_action("Start","","");
         let expected_json = r#"{"screen":"SeedSelector","screenLabel":"Select seed","back":false,"footer":true,"footerButton":"Keys","rightButton":"NewSeed","screenNameType":"h1","modal":"NewSeedMenu","alert":"Empty","screenData":{"seedNameCards":[]},"modalData":{},"alertData":{}}"#;
-        assert!(real_json == expected_json, "Initiated with no keys. Started. Expected SeedSelector screen with no modals, got:\n{}", real_json);
+        assert!(real_json == expected_json, "Initiated with no keys. Started. Expected SeedSelector screen with NewSeedMenu modal, got:\n{}", real_json);
         
         let real_json = do_action("NavbarLog","","");
         let cut_real_json = timeless(&real_json);
@@ -220,9 +242,114 @@ mod tests {
         
         do_action("TransactionFetched",&std::fs::read_to_string("for_tests/add_specs_kusama-sr25519_Alice-sr25519.txt").unwrap().trim(),"");
         let real_json = do_action("GoForward","","");
+        let expected_json = r##"{"screen":"NetworkDetails","screenLabel":"Network details","back":true,"footer":false,"footerButton":"Settings","rightButton":"NDMenu","screenNameType":"h4","modal":"Empty","alert":"Empty","screenData":{"base58prefix":"2","color":"#000","decimals":"12","encryption":"sr25519","genesis_hash":"b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe","logo":"kusama","name":"kusama","order":"2","path_id":"//kusama","secondary_color":"#262626","title":"Kusama","unit":"KSM","current_verifier":{"type":"general","details":{"hex":"d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d","identicon":"89504e470d0a1a0a0000000d49484452000000410000004108060000008ef7c9450000030e49444154789cedda4d6a544114c571330e0eb286640782d8ee4090081964033d105c90e0a0379041c020b8035b047790aca10792715b87e644eb59afeeb9f5f1e86edf7f70320cf7075d83a44fb6dbedb3ffbd4910369b4df12f393b3b3b093fbad605a1e668ab1e284d117a1e3fac2546138492e3bf3ede868d7b737a15d6570b8c2a8492e3510a809540a01a8c62841e006c6a8822845200d413019540b8106a8e67bd1198074346680180a642402a8484e001f8717d1f36eee5cd45d85d5e842ff7d761e3de5edc84d552204c845a00a6425800ac254433841c00b3205400a6425421a800c88b60d51201e52046113c0068df11d0184412c10b800e0101a5206484d5e243d8b8e5fa63d85d5e84cbd7e761e3eebe3d84dde54558ac5661e3d6cb65d838094105602a8405c054080b80291026420e8059102a00b32054003684c8220c019017c1ca8b60558280fe869811424f08290074ac088810cd113e25de84f7156fc2cfc49bf0a2f24d603202ca4158004c85b000980a3106805c082805a102300b42056016440e00450816809217c1ca8b501a20668419c189f0ebf6316cdcf3abd3b0bbbc08ef16ff7e863fafff7c86bd08af2ecfc3c67dbf7b089b4f4648013015c202602a8405c02c08092107c02c08158059102a00cb417441b0f22258cd08a11921b4970847f926a01c8405c054080b80a91039002423a014840ac02c081580591016007221587911acbc08a5cd08a11921f484802c88a3ff7b02ca21a400980a61013015c202603908192107c02c08158059102a001b83e88660e545b06a8a805210c78a400034238422043484f0221cfcff22d11001e5202c00a64258004c851802201301a9102a00b3205400664128004846b0f222587911d46404e48538048414001a45401e887d471803405904a44278110ee67b8c48454039080b80a9102a00aa4640b5102a00b3205a0220090179207279116a5200908c805a404c85a002201702abc1e88de0399e1521a052889e082500a81801f580981a005521b0128c14440940cdf1ac09022bc128adc5f1ac2902eb89d1f278d60561580d4a8fa3874d82b0effd06a580bfac7347ad900000000049454e44ae426082","encryption":"sr25519"}},"meta":[]},"modalData":{},"alertData":{}}"##;
+        assert!(real_json == expected_json, "GoForward on Transaction screen with add specs stub. Expected NetworkDetails screen for kusama sr25519, with no modals, got:\n{}", real_json);
+        
+        let real_json = do_action("GoBack","","");
+        let expected_json = r#"{"screen":"ManageNetworks","screenLabel":"MANAGE NETWORKS","back":true,"footer":false,"footerButton":"Settings","rightButton":"TypesInfo","screenNameType":"h4","modal":"Empty","alert":"Empty","screenData":{"networks":[{"key":"018091b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3","title":"Polkadot","logo":"polkadot","order":0},{"key":"0180e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e","title":"Westend","logo":"westend","order":1},{"key":"0180b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe","title":"Kusama","logo":"kusama","order":2}]},"modalData":{},"alertData":{}}"#;
+        assert!(real_json == expected_json, "GoBack on NetworkDetails screen after adding kusama sr25519 specs. Expected ManageNetworks screen with no modals, got:\n{}", real_json);
+        
+        let real_json = do_action("GoBack","","");
+        assert!(real_json == current_settings_json, "GoBack on ManageNetworks screen, to see footer. Expected known Settings screen with no modals, got:\n{}", real_json);
+        
+        let real_json = do_action("NavbarLog","","");
         let cut_real_json = timeless(&real_json);
         let expected_json = r##"{"screen":"Log","screenLabel":"","back":false,"footer":true,"footerButton":"Log","rightButton":"LogRight","screenNameType":"h4","modal":"Empty","alert":"Empty","screenData":{"log":[{"order":1,"timestamp":"**","events":[{"event":"network_specs_added","payload":{"base58prefix":"2","color":"#000","decimals":"12","encryption":"sr25519","genesis_hash":"b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe","logo":"kusama","name":"kusama","order":"2","path_id":"//kusama","secondary_color":"#262626","title":"Kusama","unit":"KSM","current_verifier":{"type":"general","details":{"hex":"d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d","identicon":"89504e470d0a1a0a0000000d49484452000000410000004108060000008ef7c9450000030e49444154789cedda4d6a544114c571330e0eb286640782d8ee4090081964033d105c90e0a0379041c020b8035b047790aca10792715b87e644eb59afeeb9f5f1e86edf7f70320cf7075d83a44fb6dbedb3ffbd4910369b4df12f393b3b3b093fbad605a1e668ab1e284d117a1e3fac2546138492e3bf3ede868d7b737a15d6570b8c2a8492e3510a809540a01a8c62841e006c6a8822845200d413019540b8106a8e67bd1198074346680180a642402a8484e001f8717d1f36eee5cd45d85d5e842ff7d761e3de5edc84d552204c845a00a6425800ac254433841c00b3205400a6425421a800c88b60d51201e52046113c0068df11d0184412c10b800e0101a5206484d5e243d8b8e5fa63d85d5e84cbd7e761e3eebe3d84dde54558ac5661e3d6cb65d838094105602a8405c054080b80291026420e8059102a00b32054003684c8220c019017c1ca8b60558280fe869811424f08290074ac088810cd113e25de84f7156fc2cfc49bf0a2f24d603202ca4158004c85b000980a3106805c082805a102300b42056016440e00450816809217c1ca8b501a20668419c189f0ebf6316cdcf3abd3b0bbbc08ef16ff7e863fafff7c86bd08af2ecfc3c67dbf7b089b4f4648013015c202602a8405c02c08092107c02c08158059102a00cb417441b0f22258cd08a11921b4970847f926a01c8405c054080b80a91039002423a014840ac02c081580591016007221587911acbc08a5cd08a11921f484802c88a3ff7b02ca21a400980a61013015c202603908192107c02c08158059102a001b83e88660e545b06a8a805210c78a400034238422043484f0221cfcff22d11001e5202c00a64258004c851802201301a9102a00b3205400664128004846b0f222587911d46404e48538048414001a45401e887d471803405904a44278110ee67b8c48454039080b80a9102a00aa4640b5102a00b3205a0220090179207279116a5200908c805a404c85a002201702abc1e88de0399e1521a052889e082500a81801f580981a005521b0128c14440940cdf1ac09022bc128adc5f1ac2902eb89d1f278d60561580d4a8fa3874d82b0effd06a580bfac7347ad900000000049454e44ae426082","encryption":"sr25519"}}}}]},{"order":0,"timestamp":"**","events":[{"event":"history_cleared"}]}],"total_entries":2},"modalData":{},"alertData":{}}"##;
-        assert!(cut_real_json == expected_json, "GoForward on Transaction screen with stub. Expected Log screen with no modals, got:\n{}", real_json);
+        assert!(cut_real_json == expected_json, "Switched to Log from ManageNetworks after adding kusama specs. Expected updated Log screen with no modals, got:\n{}", real_json);
+        
+        current_log_json = real_json;
+        
+        let real_json = do_action("NavbarKeys","","");
+        let expected_json = r#"{"screen":"SeedSelector","screenLabel":"Select seed","back":false,"footer":true,"footerButton":"Keys","rightButton":"NewSeed","screenNameType":"h1","modal":"Empty","alert":"Empty","screenData":{"seedNameCards":[]},"modalData":{},"alertData":{}}"#;
+        assert!(real_json == expected_json, "NavbarKeys on Log screen. Expected SeedSelector screen with no modals, got:\n{}", real_json);
+        
+        let mut seed_selector_json = real_json;
+        
+        let real_json = do_action("RightButton","","");
+        let expected_json = r#"{"screen":"SeedSelector","screenLabel":"Select seed","back":false,"footer":true,"footerButton":"Keys","rightButton":"NewSeed","screenNameType":"h1","modal":"NewSeedMenu","alert":"Empty","screenData":{"seedNameCards":[]},"modalData":{},"alertData":{}}"#;
+        assert!(real_json == expected_json, "RightButton on SeedSelector screen. Expected SeedSelector screen with NewSeedMenu modal, got:\n{}", real_json);
+        
+        let real_json = do_action("NewSeed","","");
+        let expected_json = r#"{"screen":"NewSeed","screenLabel":"New Seed","back":true,"footer":false,"footerButton":"Keys","rightButton":"None","screenNameType":"h1","modal":"Empty","alert":"Empty","screenData":{"keyboard":true},"modalData":{},"alertData":{}}"#;
+        assert!(real_json == expected_json, "NewSeed on SeedSelector screen with NewSeedMenu modal. Expected NewSeed screen, got:\n{}", real_json);
+        
+        let new_seed_json = real_json;
+        
+        let real_json = do_action("GoBack","","");
+        assert!(real_json == seed_selector_json, "GoBack on NewSeed screen. Expected SeedSelector screen with no modals, got:\n{}", real_json);
+        
+        do_action("RightButton","","");
+        do_action("NewSeed","","");
+        let real_json = do_action("GoForward","Portia","");
+        let (cut_real_json, _) = cut_seed(&cut_identicon(&real_json));
+        let expected_json = r#"{"screen":"NewSeed","screenLabel":"New Seed","back":true,"footer":false,"footerButton":"Keys","rightButton":"None","screenNameType":"h1","modal":"NewSeedBackup","alert":"Empty","screenData":{"keyboard":false},"modalData":{"seed":"Portia","seed_phrase":"**","identicon":"**"},"alertData":{}}"#;
+        assert!(cut_real_json == expected_json, "GoForward on NewSeed screen with non-empty seed name. Expected NewSeed screen with NewSeedBackup modal, got:\n{}", real_json);
+        
+        let real_json = do_action("GoBack","","");
+        assert!(real_json == new_seed_json, "GoBack on NewSeed screen with generated seed. Expected NewSeed screen with no modals, got:\n{}", real_json);
+        
+        let real_json = do_action("GoBack","","");
+        assert!(real_json == seed_selector_json, "GoBack on NewSeed screen with no modals, to see footer. Expected known SeedSelector screen with no modals, got:\n{}", real_json);
+        
+        let real_json = do_action("NavbarLog","","");
+        assert!(real_json == current_log_json, "Switched to Log from SeedSelector after cancelling seed creation. Expected known Log screen with no modals, got:\n{}", real_json);
+        
+        do_action("NavbarKeys","","");
+        do_action("RightButton","","");
+        do_action("NewSeed","","");
+        let real_json = do_action("GoForward","Portia","");
+        let (cut_real_json, seed_phrase_portia) = cut_seed(&cut_identicon(&real_json));
+        let expected_json = r#"{"screen":"NewSeed","screenLabel":"New Seed","back":true,"footer":false,"footerButton":"Keys","rightButton":"None","screenNameType":"h1","modal":"NewSeedBackup","alert":"Empty","screenData":{"keyboard":false},"modalData":{"seed":"Portia","seed_phrase":"**","identicon":"**"},"alertData":{}}"#;
+        assert!(cut_real_json == expected_json, "GoForward on NewSeed screen with non-empty seed name. Expected NewSeed screen with NewSeedBackup modal, got:\n{}", real_json);
+        
+        let real_json = do_action("GoForward","true",&seed_phrase_portia);
+        let cut_real_json = cut_address_key(&cut_base58(&cut_identicon(&real_json)));
+        let expected_json = r#"{"screen":"Keys","screenLabel":"","back":true,"footer":true,"footerButton":"Keys","rightButton":"Backup","screenNameType":"h4","modal":"Empty","alert":"Empty","screenData":{"root":{"seed_name":"Portia","identicon":"**","address_key":"**","base58":"**","swiped":false,"multiselect":false},"set":[{"address_key":"**","base58":"**","identicon":"**","has_pwd":false,"path":"//polkadot","swiped":false,"multiselect":false}],"network":{"title":"Polkadot","logo":"polkadot"},"multiselect_mode":false,"multiselect_count":""},"modalData":{},"alertData":{}}"#;
+        assert!(cut_real_json == expected_json, "GoForward on NewSeed screen with NewSeedBackup modal active. Expected Keys screen with no modals, got:\n{}", cut_real_json);
+        
+        let real_json = do_action("GoBack","","");
+        let cut_real_json = cut_identicon(&real_json);
+        let expected_json = r#"{"screen":"SeedSelector","screenLabel":"Select seed","back":false,"footer":true,"footerButton":"Keys","rightButton":"NewSeed","screenNameType":"h1","modal":"Empty","alert":"Empty","screenData":{"seedNameCards":[{"identicon":"**","seed_name":"Portia"}]},"modalData":{},"alertData":{}}"#;
+        assert!(cut_real_json == expected_json, "GoBack on Keys screen. Expected updated SeedSelector screen with no modals, got:\n{}", real_json);
+        
+        seed_selector_json = real_json;
+        
+        let real_json = do_action("NavbarLog","","");
+        let cut_real_json = cut_public_key(&timeless(&real_json));
+        let expected_json = r##"{"screen":"Log","screenLabel":"","back":false,"footer":true,"footerButton":"Log","rightButton":"LogRight","screenNameType":"h4","modal":"Empty","alert":"Empty","screenData":{"log":[{"order":2,"timestamp":"**","events":[{"event":"seed_created","payload":"Portia"},{"event":"identity_added","payload":{"seed_name":"Portia","encryption":"sr25519","public_key":"**","path":"","network_genesis_hash":"91b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3"}},{"event":"identity_added","payload":{"seed_name":"Portia","encryption":"sr25519","public_key":"**","path":"//polkadot","network_genesis_hash":"91b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3"}},{"event":"identity_added","payload":{"seed_name":"Portia","encryption":"sr25519","public_key":"**","path":"","network_genesis_hash":"b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe"}},{"event":"identity_added","payload":{"seed_name":"Portia","encryption":"sr25519","public_key":"**","path":"//kusama","network_genesis_hash":"b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe"}},{"event":"identity_added","payload":{"seed_name":"Portia","encryption":"sr25519","public_key":"**","path":"","network_genesis_hash":"e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e"}},{"event":"identity_added","payload":{"seed_name":"Portia","encryption":"sr25519","public_key":"**","path":"//westend","network_genesis_hash":"e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e"}}]},{"order":1,"timestamp":"**","events":[{"event":"network_specs_added","payload":{"base58prefix":"2","color":"#000","decimals":"12","encryption":"sr25519","genesis_hash":"b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe","logo":"kusama","name":"kusama","order":"2","path_id":"//kusama","secondary_color":"#262626","title":"Kusama","unit":"KSM","current_verifier":{"type":"general","details":{"hex":"d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d","identicon":"89504e470d0a1a0a0000000d49484452000000410000004108060000008ef7c9450000030e49444154789cedda4d6a544114c571330e0eb286640782d8ee4090081964033d105c90e0a0379041c020b8035b047790aca10792715b87e644eb59afeeb9f5f1e86edf7f70320cf7075d83a44fb6dbedb3ffbd4910369b4df12f393b3b3b093fbad605a1e668ab1e284d117a1e3fac2546138492e3bf3ede868d7b737a15d6570b8c2a8492e3510a809540a01a8c62841e006c6a8822845200d413019540b8106a8e67bd1198074346680180a642402a8484e001f8717d1f36eee5cd45d85d5e842ff7d761e3de5edc84d552204c845a00a6425800ac254433841c00b3205400a6425421a800c88b60d51201e52046113c0068df11d0184412c10b800e0101a5206484d5e243d8b8e5fa63d85d5e84cbd7e761e3eebe3d84dde54558ac5661e3d6cb65d838094105602a8405c054080b80291026420e8059102a00b32054003684c8220c019017c1ca8b60558280fe869811424f08290074ac088810cd113e25de84f7156fc2cfc49bf0a2f24d603202ca4158004c85b000980a3106805c082805a102300b42056016440e00450816809217c1ca8b501a20668419c189f0ebf6316cdcf3abd3b0bbbc08ef16ff7e863fafff7c86bd08af2ecfc3c67dbf7b089b4f4648013015c202602a8405c02c08092107c02c08158059102a00cb417441b0f22258cd08a11921b4970847f926a01c8405c054080b80a91039002423a014840ac02c081580591016007221587911acbc08a5cd08a11921f484802c88a3ff7b02ca21a400980a61013015c202603908192107c02c08158059102a001b83e88660e545b06a8a805210c78a400034238422043484f0221cfcff22d11001e5202c00a64258004c851802201301a9102a00b3205400664128004846b0f222587911d46404e48538048414001a45401e887d471803405904a44278110ee67b8c48454039080b80a9102a00aa4640b5102a00b3205a0220090179207279116a5200908c805a404c85a002201702abc1e88de0399e1521a052889e082500a81801f580981a005521b0128c14440940cdf1ac09022bc128adc5f1ac2902eb89d1f278d60561580d4a8fa3874d82b0effd06a580bfac7347ad900000000049454e44ae426082","encryption":"sr25519"}}}}]},{"order":0,"timestamp":"**","events":[{"event":"history_cleared"}]}],"total_entries":3},"modalData":{},"alertData":{}}"##;
+        assert!(cut_real_json == expected_json, "Switched to Log from SeedSelector after adding new seed. Expected updated Log screen with no modals, got:\n{}", real_json);
+        
+        do_action("RightButton","","");
+        let real_json = do_action("ClearLog","","");
+        let cut_real_json = timeless(&real_json);
+        let expected_json = r#"{"screen":"Log","screenLabel":"","back":false,"footer":true,"footerButton":"Log","rightButton":"LogRight","screenNameType":"h4","modal":"Empty","alert":"Empty","screenData":{"log":[{"order":0,"timestamp":"**","events":[{"event":"history_cleared"}]}],"total_entries":1},"modalData":{},"alertData":{}}"#;
+        assert!(cut_real_json == expected_json, "ClearLog on Log screen with LogRight modal. Expected updated Log screen with no modals, got:\n{}", real_json);
+        
+        do_action("NavbarKeys","","");
+        do_action("RightButton","","");
+        let real_json = do_action("RecoverSeed","","");
+        let expected_json = r#"{"screen":"RecoverSeedName","screenLabel":"Recover Seed","back":true,"footer":false,"footerButton":"Keys","rightButton":"None","screenNameType":"h1","modal":"Empty","alert":"Empty","screenData":{"seed_name":"","keyboard":true},"modalData":{},"alertData":{}}"#;
+        assert!(real_json == expected_json, "RecoverSeed on SeedSelector screen with NewSeedMenu modal. Expected RecoverSeedName screen with no modals, got:\n{}", real_json);
+        
+        let real_json = do_action("GoBack","","");
+        assert!(real_json == seed_selector_json, "GoBack on RecoverSeedName screen with no modals. Expected known SeedSelector screen, got:\n{}", real_json);
+        
+        do_action("RightButton","","");
+        do_action("RecoverSeed","","");
+        let real_json = do_action("GoForward","Portia","");
+        let expected_json = r#"{"screen":"RecoverSeedName","screenLabel":"Recover Seed","back":true,"footer":false,"footerButton":"Keys","rightButton":"None","screenNameType":"h1","modal":"Empty","alert":"Error","screenData":{"seed_name":"","keyboard":false},"modalData":{},"alertData":{"error":"Bad input data. Seed name Portia already exists."}}"#;
+        assert!(real_json == expected_json, "GoForward on RecoverSeedName screen using existing name. Expected RecoverSeedName screen with error, got:\n{}", real_json);
+        
+        do_action("GoBack","","");
+        let real_json = do_action("GoForward","Alice","");
+        let expected_json = r#"{"screen":"RecoverSeedPhrase","screenLabel":"Recover Seed","back":true,"footer":false,"footerButton":"Keys","rightButton":"None","screenNameType":"h1","modal":"Empty","alert":"Empty","screenData":{"seed_name":"Alice","keyboard":true},"modalData":{},"alertData":{}}"#;
+        assert!(real_json == expected_json, "GoForward on RecoverSeedName screen using new name. Expected RecoverSeedPhrase screen with no modals, got:\n{}", real_json);
+        
+        let real_json = do_action("GoBack","","");
+        let expected_json = r#"{"screen":"RecoverSeedName","screenLabel":"Recover Seed","back":true,"footer":false,"footerButton":"Keys","rightButton":"None","screenNameType":"h1","modal":"Empty","alert":"Empty","screenData":{"seed_name":"Alice","keyboard":true},"modalData":{},"alertData":{}}"#;
+        assert!(real_json == expected_json, "GoBack on RecoverSeedPhrase screen. Expected RecoverSeedName screen with no modals and with retained name, got:\n{}", real_json);
+        
+//        current_log_json = real_json;
         
 /*        
         let current_log_json = real_json;

@@ -11,7 +11,7 @@ use crate::alerts::Alert;
 
 //use plot_icon;
 use db_handling;
-use definitions::{error::{AddressKeySource, ErrorSigner, ErrorSource, ExtraAddressKeySourceSigner, InterfaceSigner, Signer}, keyring::{AddressKey, NetworkSpecsKey}, users::AddressDetails};
+use definitions::{error::{AddressKeySource, ErrorSigner, ErrorSource, ExtraAddressKeySourceSigner, InputSigner, InterfaceSigner, Signer}, keyring::{AddressKey, NetworkSpecsKey}, users::AddressDetails};
 use transaction_parsing;
 use transaction_signing;
 
@@ -55,15 +55,22 @@ impl State {
                 //App init
                 Action::Start => {
                     println!("Seednames: {:?}, total: {}", seed_names, seed_names.len());
-                    if seed_names.len() == 0 {
-                        new_navstate.screen = Screen::SeedSelector;
-                        new_navstate.modal = Modal::NewSeedMenu;
-                        new_navstate.alert = Alert::Empty;
-                    } else {
-                        new_navstate = Navstate::clean_screen(Screen::Log);
+                    match db_handling::interface_signer::purge_transactions(dbname) {
+                        Ok(()) => {
+                            if seed_names.len() == 0 {
+                                 new_navstate.screen = Screen::SeedSelector;
+                                 new_navstate.modal = Modal::NewSeedMenu;
+                                 new_navstate.alert = Alert::Empty;
+                             } else {
+                                 new_navstate = Navstate::clean_screen(Screen::Log);
+                             }
+                        },
+                        Err(e) => {
+                            new_navstate.alert = Alert::Error;
+                            errorline.push_str(&<Signer>::show(&e));
+                        },
                     }
                 },
-
                 //Simple navigation commands
                 Action::NavbarLog => {
                     new_navstate = Navstate::clean_screen(Screen::Log);
@@ -87,7 +94,13 @@ impl State {
                                     new_navstate.screen = Screen::Log;
                                 },
                                 Screen::Transaction(_) => {
-                                    new_navstate.screen = Screen::Scan;
+                                    match db_handling::interface_signer::purge_transactions(dbname) {
+                                        Ok(()) => {new_navstate.screen = Screen::Scan},
+                                        Err(e) => {
+                                            new_navstate.alert = Alert::Error;
+                                            errorline.push_str(&<Signer>::show(&e));
+                                        },
+                                    }
                                 },
                                 Screen::Keys(ref keys_state) => {
                                     match keys_state.get_specialty() {
@@ -146,7 +159,13 @@ impl State {
                         } else {
                             match &self.navstate.screen {
                                 Screen::Transaction(_) => {
-                                    new_navstate = Navstate::clean_screen(Screen::Log);
+                                    match db_handling::interface_signer::purge_transactions(dbname) {
+                                        Ok(()) => {new_navstate = Navstate::clean_screen(Screen::Log)},
+                                        Err(e) => {
+                                            new_navstate.alert = Alert::Error;
+                                            errorline.push_str(&<Signer>::show(&e));
+                                        },
+                                    }
                                 },
                                 Screen::SignSufficientCrypto(_) => {
                                     new_navstate = Navstate::clean_screen(Screen::Settings);
@@ -211,7 +230,7 @@ impl State {
                                     if a.len() == 0 {new_navstate = Navstate::clean_screen(Screen::RecoverSeedPhrase(details_str.to_string()))}
                                     else {
                                         new_navstate.alert = Alert::Error;
-                                        errorline.push_str("Seed name already exists.");
+                                        errorline.push_str(&<Signer>::show(&ErrorSigner::Input(InputSigner::SeedNameExists(details_str.to_string()))));
                                     }
                                 },
                                 Err(e) => {
@@ -292,10 +311,20 @@ impl State {
                                         }
                                     }
                                 },
-                                transaction_parsing::Action::Stub(_, checksum) => {
+                                transaction_parsing::Action::Stub(_, checksum, stub_nav) => {
                                     match transaction_signing::handle_stub(checksum, dbname) {
                                         Ok(()) => {
-                                            new_navstate = Navstate::clean_screen(Screen::Log);
+                                            match stub_nav {
+                                                transaction_parsing::StubNav::AddSpecs(network_specs_key) => {
+                                                    new_navstate = Navstate::clean_screen(Screen::NetworkDetails(network_specs_key));
+                                                },
+                                                transaction_parsing::StubNav::LoadMeta(network_specs_key) => {
+                                                    new_navstate = Navstate::clean_screen(Screen::NetworkDetails(network_specs_key));
+                                                },
+                                                transaction_parsing::StubNav::LoadTypes => {
+                                                    new_navstate = Navstate::clean_screen(Screen::ManageNetworks);
+                                                },
+                                            }
                                         },
                                         Err(e) => {
                                             new_navstate.alert = Alert::Error;
@@ -399,15 +428,19 @@ impl State {
                 Action::SelectSeed => {
                     match self.navstate.screen {
                         Screen::SeedSelector => {
-                            match KeysState::new(details_str, dbname) {
-                                Ok(a) => {
-                                    new_navstate = Navstate::clean_screen(Screen::Keys(a));
-                                },
-                                Err(e) => {
-                                    new_navstate.alert = Alert::Error;
-                                    errorline.push_str(&<Signer>::show(&e));
-                                },
+                            if details_str != "" {
+                            // details_str is seed name
+                                match KeysState::new(details_str, dbname) {
+                                    Ok(a) => {
+                                        new_navstate = Navstate::clean_screen(Screen::Keys(a));
+                                    },
+                                    Err(e) => {
+                                        new_navstate.alert = Alert::Error;
+                                        errorline.push_str(&<Signer>::show(&e));
+                                    },
+                                }
                             }
+                            else {println!("SelectSeed needs non-empty details_str")}
                         },
                         _ => println!("SelectSeed does nothing here"),
                     }
@@ -954,7 +987,7 @@ impl State {
                             };
                             format!("\"content\":{{{}}},\"author_info\":{{{}}},\"network_info\":{{{}}},\"type\":\"{}\"", content, author_info, network_info, action_type)
                         },
-                        transaction_parsing::Action::Stub(content, _) => format!("\"content\":{{{}}},\"type\":\"stub\"", content),
+                        transaction_parsing::Action::Stub(content, _, _) => format!("\"content\":{{{}}},\"type\":\"stub\"", content),
                         transaction_parsing::Action::Read(content) => format!("\"content\":{{{}}},\"type\":\"read\"", content),
                     }
                 },

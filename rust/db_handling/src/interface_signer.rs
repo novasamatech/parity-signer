@@ -5,11 +5,12 @@ use sp_core::{Pair, sr25519};
 use sp_runtime::MultiSigner;
 use std::collections::HashMap;
 
-use constants::HISTORY;
+use constants::{HISTORY, TRANSACTION};
 use definitions::{error::{AddressGenerationCommon, DatabaseSigner, ErrorSigner, ErrorSource, InterfaceSigner, NotFoundSigner, Signer}, helpers::{make_identicon_from_multisigner, multisigner_to_encryption, multisigner_to_public, pic_meta}, keyring::{AddressKey, NetworkSpecsKey, print_multisigner_as_base58, VerifierKey}, network_specs::NetworkSpecs, print::export_complex_vector, qr_transfers::ContentLoadTypes, users::AddressDetails};
 use qrcode_static::png_qr_from_string;
 
-use crate::helpers::{get_address_details, get_general_verifier, get_meta_values_by_name, get_meta_values_by_name_version, get_network_specs, get_valid_current_verifier, open_db, open_tree, try_get_types};
+use crate::db_transactions::TrDbCold;
+use crate::helpers::{get_address_details, get_general_verifier, get_meta_values_by_name, get_meta_values_by_name_version, get_network_specs, get_valid_current_verifier, make_batch_clear_tree, open_db, open_tree, try_get_types};
 use crate::identities::{get_all_addresses, get_addresses_by_seed_name, generate_random_phrase};
 use crate::network_details::get_all_networks;
 
@@ -291,6 +292,15 @@ pub fn history_hex_checksum (database_name: &str) -> Result<String, ErrorSigner>
     let history = open_tree::<Signer>(&database, HISTORY)?;
     let checksum = history.checksum().map_err(|e| ErrorSigner::Database(DatabaseSigner::Internal(e)))?;
     Ok(format!("\"checksum\":\"{}\"", hex::encode(checksum.encode()).to_uppercase()))
+}
+
+
+/// Function to clear transaction tree of the database, for cases when transaction is declined by the user
+/// (e.g. user has scanned something, read it, clicked `back`)
+pub fn purge_transactions (database_name: &str) -> Result<(), ErrorSigner> {
+    TrDbCold::new()
+        .set_transaction(make_batch_clear_tree::<Signer>(&database_name, TRANSACTION)?) // clear transaction
+        .apply::<Signer>(&database_name)
 }
 
 #[cfg(test)]

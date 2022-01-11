@@ -1,7 +1,7 @@
 use db_handling::{db_transactions::TrDbColdStub, helpers::{genesis_hash_in_specs, get_general_verifier, open_db, try_get_valid_current_verifier}};
 use definitions::{error::{ErrorSigner, ErrorSource, IncomingMetadataSourceSigner, InputSigner, GeneralVerifierForContent, MetadataSource, Signer, TransferContent}, keyring::VerifierKey, metadata::MetaValues, network_specs::{ValidCurrentVerifier, Verifier}, history::{Event, MetaValuesDisplay}, qr_transfers::ContentLoadMeta};
 
-use crate::Action;
+use crate::{Action, StubNav};
 use crate::cards::{Card, Warning};
 use crate::check_signature::pass_crypto;
 use crate::helpers::accept_meta_values;
@@ -21,11 +21,12 @@ pub fn load_metadata(data_hex: &str, database_name: &str) -> Result<Action, Erro
     let general_verifier = get_general_verifier(&database_name)?;
     let verifier_key = VerifierKey::from_parts(&genesis_hash.to_vec());
     let valid_current_verifier = match try_get_valid_current_verifier (&verifier_key, &database_name)? {
-        Some(a) => {
-            if let Some(_) = genesis_hash_in_specs(&verifier_key, &open_db::<Signer>(&database_name)?)? {a}
-            else {return Err(ErrorSigner::Input(InputSigner::LoadMetaNoSpecs{name: meta_values.name, valid_current_verifier: a, general_verifier}))}
-        },
+        Some(a) => a,
         None => return Err(ErrorSigner::Input(InputSigner::LoadMetaUnknownNetwork{name: meta_values.name})),
+    };
+    let network_specs_key = match genesis_hash_in_specs(&verifier_key, &open_db::<Signer>(&database_name)?)? {
+        Some(a) => a,
+        None => return Err(ErrorSigner::Input(InputSigner::LoadMetaNoSpecs{name: meta_values.name, valid_current_verifier, general_verifier})),
     };
     let mut stub = TrDbColdStub::new();
     let mut index = 0;
@@ -71,8 +72,8 @@ pub fn load_metadata(data_hex: &str, database_name: &str) -> Result<Action, Erro
         let meta_display = MetaValuesDisplay::get(&meta_values);
         let meta_card = Card::Meta(meta_display).card(&mut index, 0);
         match first_card {
-            FirstCard::WarningCard(warning_card) => Ok(Action::Stub(format!("\"warning\":[{}],\"meta\":[{}]", warning_card, meta_card), checksum)),
-            FirstCard::VerifierCard(verifier_card) => Ok(Action::Stub(format!("\"verifier\":[{}],\"meta\":[{}]", verifier_card, meta_card), checksum)),
+            FirstCard::WarningCard(warning_card) => Ok(Action::Stub(format!("\"warning\":[{}],\"meta\":[{}]", warning_card, meta_card), checksum, StubNav::LoadMeta(network_specs_key))),
+            FirstCard::VerifierCard(verifier_card) => Ok(Action::Stub(format!("\"verifier\":[{}],\"meta\":[{}]", verifier_card, meta_card), checksum, StubNav::LoadMeta(network_specs_key))),
         }
     }
     else {return Err(ErrorSigner::Input(InputSigner::MetadataKnown{name: meta_values.name, version: meta_values.version}))}

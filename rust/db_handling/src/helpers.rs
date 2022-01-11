@@ -70,21 +70,24 @@ pub fn get_valid_current_verifier (verifier_key: &VerifierKey, database_name: &s
 
 /// Function to search for genesis hash corresponding to a given verifier key
 /// in SPECSTREE of the Signer database
+/// If there are more than one network corresponding to the same genesis hash,
+/// outputs network specs key for the network with the lowest order
 pub fn genesis_hash_in_specs (verifier_key: &VerifierKey, database: &Db) -> Result<Option<NetworkSpecsKey>, ErrorSigner> {
     let genesis_hash = verifier_key.genesis_hash();
     let chainspecs = open_tree::<Signer>(&database, SPECSTREE)?;
-    let mut out = None;
+    let mut specs_set: Vec<(NetworkSpecsKey, NetworkSpecs)> = Vec::new();
     for x in chainspecs.iter() {
         if let Ok((network_specs_key_vec, network_specs_encoded)) = x {
             let network_specs_key = NetworkSpecsKey::from_ivec(&network_specs_key_vec);
             let network_specs = NetworkSpecs::from_entry_with_key_checked::<Signer>(&network_specs_key, network_specs_encoded)?;
-            if network_specs.genesis_hash.to_vec() == genesis_hash {
-                out = Some(network_specs_key);
-                break;
-            }
+            if network_specs.genesis_hash.to_vec() == genesis_hash {specs_set.push((network_specs_key, network_specs))}
         }
     }
-    Ok(out)
+    specs_set.sort_by(|a, b| a.1.order.cmp(&b.1.order));
+    match specs_set.get(0) {
+        Some((a, _)) => Ok(Some(a.to_owned())),
+        None => Ok(None),
+    } 
 }
 
 /// Function to get general Verifier from the Signer database
