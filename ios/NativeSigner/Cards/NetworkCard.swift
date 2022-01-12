@@ -11,15 +11,23 @@ struct NetworkCard: View {
     @EnvironmentObject var data: SignerDataModel
     let title: String
     let logo: String
+    var fancy: Bool = false
     var body: some View {
-        //TODO: implement png or svg import intercompatible with fontnames
-        HStack {
-            NetworkLogo(logo: logo)
-            Text(title).font(FBase(style: .h3))
+        ZStack {
+            if fancy {
+                RoundedRectangle(cornerRadius: 4)
+                    .foregroundColor(Color("Bg200"))
+                    .frame(height: 47)
+            }
+            HStack {
+                NetworkLogo(logo: logo)
+                Text(title).font(FBase(style: .h3))
+                if fancy {Spacer()}
+            }
+            .foregroundColor(Color("Text600"))
+            .frame(height: 36)
+            .padding(.horizontal)
         }
-        .foregroundColor(Color("Text600"))
-        .frame(height: 36)
-        .padding(.horizontal)
     }
 }
 

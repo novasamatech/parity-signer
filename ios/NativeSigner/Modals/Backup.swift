@@ -13,6 +13,7 @@ struct Backup: View {
     @State var secret: String = ""
     let timer = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
     @State var countdown = 60
+    @State var failure = false
     //TODO: chop chop chop
     var body: some View {
         ZStack {
@@ -31,17 +32,21 @@ struct Backup: View {
                 }
                 ScrollView{
                     VStack {
-                        Text("SEED PHRASE").foregroundColor(Color("Text300")).font(FBase(style: .overline))
+                        HStack {
+                            Text("SEED PHRASE").foregroundColor(Color("Text300")).font(FBase(style: .overline))
+                            Spacer()
+                        }
                         ZStack {
                             //RoundedRectangle(cornerRadius: 8).foregroundColor(Color(countdown>0 ? "Crypto100" : "Bg300")).frame(height: 200)
                             Text(secret)
                                 .font(.system(size: 16, weight: .semibold, design: .monospaced))
-                                .foregroundColor(Color("Crypto400"))
+                                .foregroundColor(Color(failure ? "SignalDanger" : "Crypto400"))
                                 .padding(8)
                         }
                         .onAppear{
                             secret = data.getSeed(seedName: content.seed_name, backup: true)
                             if secret == "" {
+                                failure = true
                                 countdown = -1
                                 secret = "Seeds are not available now! Come back again to access them."
                             }
@@ -49,14 +54,17 @@ struct Backup: View {
                         .onDisappear{
                             secret = ""
                         }
-                        .background(RoundedRectangle(cornerRadius: 8).foregroundColor(Color(countdown>0 ? "Crypto100" : "Bg300")))
-                        Text("DERIVED KEYS").foregroundColor(Color("Text300")).font(FBase(style: .overline))
+                        .background(RoundedRectangle(cornerRadius: 8).foregroundColor(Color(countdown>0 ? "Crypto100" : failure ? "BgDanger" : "Bg300")))
+                        HStack {
+                            Text("DERIVED KEYS").foregroundColor(Color("Text300")).font(FBase(style: .overline))
+                            Spacer()
+                        }
                         LazyVStack {
                             ForEach(content.derivations.sorted(by: {$0.network_order < $1.network_order}), id: \.network_order) {
                                 pack in
                                 VStack {
                                     HStack {
-                                        NetworkCard(title: pack.network_title, logo: pack.network_logo).padding(.top, 10)
+                                        NetworkCard(title: pack.network_title, logo: pack.network_logo, fancy: true).padding(.top, 10)
                                         Spacer()
                                     }
                                     ForEach(pack.id_set.sorted(by: {$0.path < $1.path}), id: \.self) {

@@ -13,8 +13,8 @@ struct NetworkManager: View {
     var body: some View {
         VStack {
             Rectangle().frame(height: UIScreen.main.bounds.height/3).opacity(0.0001).gesture(TapGesture().onEnded{_ in
-                    data.pushButton(buttonID: .GoBack)
-                })
+                data.pushButton(buttonID: .GoBack)
+            })
             ZStack {
                 RoundedRectangle(cornerRadius: 20.0).foregroundColor(Color("Bg000"))
                 VStack {
@@ -26,13 +26,13 @@ struct NetworkManager: View {
                     ScrollView {
                         LazyVStack {
                             ForEach(content.networks.sorted(by: {$0.order < $1.order}), id: \.order) {network in
-                                ZStack (alignment: .bottom) {
+                                ZStack {
+                                    Button(action: {
+                                        data.pushButton(buttonID: .ChangeNetwork, details: network.key)
+                                    }) {
+                                        NetworkCard(title: network.title, logo: network.logo, fancy: true)
+                                    }
                                     HStack {
-                                        Button(action: {
-                                            data.pushButton(buttonID: .ChangeNetwork, details: network.key)
-                                        }) {
-                                            NetworkCard(title: network.title, logo: network.logo)
-                                        }
                                         Spacer()
                                         if network.selected {
                                             Image(systemName: "checkmark")
