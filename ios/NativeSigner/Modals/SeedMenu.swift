@@ -17,13 +17,19 @@ struct SeedMenu: View {
             MenuButtonsStack {
                 BigButton(
                     text: "Backup",
-                    action: {data.pushButton(buttonID: .BackupSeed)}
+                    action: {
+                        data.pushButton(buttonID: .BackupSeed)å
+                    }
                 )
                 BigButton(
                     text: "Derive new key",
                     isShaded: true,
                     isCrypto: true,
-                    action:{data.pushButton(buttonID: .NewKey)}
+                    action:{
+                        if data.alert { data.alertShow = true } else {
+                            data.pushButton(buttonID: .NewKey)
+                        }
+                    }
                 )
                 BigButton(
                     text: "Forget this seed forever",
@@ -42,9 +48,9 @@ struct SeedMenu: View {
 }
 
 /*
-struct SeedMenu_Previews: PreviewProvider {
-    static var previews: some View {
-        SeedMenu()
-    }
-}
-*/
+ struct SeedMenu_Previews: PreviewProvider {
+ static var previews: some View {
+ SeedMenu()
+ }
+ }
+ */

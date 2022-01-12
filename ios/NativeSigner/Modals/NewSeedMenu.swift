@@ -18,14 +18,18 @@ struct NewSeedMenu: View {
                     BigButton(
                         text: "New seed",
                         action: {
-                            data.pushButton(buttonID: .NewSeed)
+                            if data.alert { data.alertShow = true } else {
+                                data.pushButton(buttonID: .NewSeed)
+                            }
                         }
                     )
                     BigButton(
                         text: "Recover seed",
                         isShaded: true,
                         action: {
-                            data.pushButton(buttonID: .RecoverSeed)
+                            if data.alert { data.alertShow = true } else {
+                                data.pushButton(buttonID: .RecoverSeed)
+                            }
                         }
                     )
                 }
@@ -38,9 +42,9 @@ struct NewSeedMenu: View {
 }
 
 /*
-struct NewSeedMenu_Previews: PreviewProvider {
-    static var previews: some View {
-        NewSeedMenu()
-    }
-}
-*/
+ struct NewSeedMenu_Previews: PreviewProvider {
+ static var previews: some View {
+ NewSeedMenu()
+ }
+ }
+ */
