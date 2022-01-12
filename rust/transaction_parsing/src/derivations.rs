@@ -15,7 +15,7 @@ pub fn process_derivations(data_hex: &str, database_name: &str) -> Result<Action
             let checksum = TrDbColdDerivations::generate(&derivations, &network_specs).store_and_get_checksum(&database_name)?;
             let derivations_card = Card::Derivations(&derivations).card(&mut 0, 0);
             let network_info = format!("\"network_title\":\"{}\",\"network_logo\":\"{}\"", network_specs.title, network_specs.logo);
-            Ok(Action::Derivations{content: format!("\"importing_derivations\":[{}]", derivations_card), network_info, checksum})
+            Ok(Action::Derivations{content: format!("\"importing_derivations\":[{}]", derivations_card), network_info, checksum, network_specs_key})
         },
         None => return Err(ErrorSigner::NotFound(NotFoundSigner::NetworkForDerivationsImport{genesis_hash, encryption})),
     }

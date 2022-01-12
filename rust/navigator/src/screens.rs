@@ -470,7 +470,7 @@ impl Screen {
             Screen::NetworkDetails(_) => "Network details",
             Screen::SelectSeedForBackup => "Select seed",
             Screen::SignSufficientCrypto(_) => "Sign SufficientCrypto",
-            Screen::Documents => "Documents",
+            Screen::Documents => "ABOUT",
             Screen::Nowhere => "",
         }.to_string()
     }

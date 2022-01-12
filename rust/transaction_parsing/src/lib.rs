@@ -26,7 +26,7 @@ mod tests;
 /// signing (Sign), accepting (Stub) and reading, for example, in case of an error (Read)
 #[derive(PartialEq, Debug, Clone)]
 pub enum Action {
-    Derivations{content: String, network_info: String, checksum: u32},
+    Derivations{content: String, network_info: String, checksum: u32, network_specs_key: NetworkSpecsKey},
     Sign{content: String, checksum: u32, has_pwd: bool, author_info: String, network_info: String},
     Stub(String, u32, StubNav),
     Read(String),

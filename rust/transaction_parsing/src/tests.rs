@@ -625,7 +625,7 @@ mod tests {
         let content_known = r#""importing_derivations":[{"index":0,"indent":0,"type":"derivations","payload":["//Alice","//Alice/westend","//Alice/secret//secret","//0","//1"]}]"#;
         let network_info_known = r#""network_title":"Westend","network_logo":"westend""#;
         let output = produce_output(line, dbname);
-        if let Action::Derivations{content, network_info, checksum: _} = output {
+        if let Action::Derivations{content, network_info, checksum: _, network_specs_key: _} = output {
             assert!(content == content_known, "Expected: {}\nReceived: {}", content_known, content);
             assert!(network_info == network_info_known, "Expected: {}\nReceived: {}", network_info_known, network_info);
         }
