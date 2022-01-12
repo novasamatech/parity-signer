@@ -17,10 +17,20 @@ import Foundation
  * Moving it to backend will of course have benetif of reducing code reuse
  * Let's consider it later as now it just works
  */
-enum ShownDocument {
+enum ShownDocument: String, CaseIterable, Identifiable {
     case toc
     case pp
-    case about
+    
+    var id: String {
+        self.rawValue
+    }
+    
+    var label: String {
+        switch (self) {
+        case .toc: return "Terms of service"
+        case .pp: return "Privacy policy"
+        }
+    }
 }
 
 /**
@@ -31,7 +41,6 @@ extension SignerDataModel {
         if let path = Bundle.main.path(forResource: "terms-and-conditions", ofType: "txt") {
             do {
                 let tac = try String(contentsOfFile: path, encoding: .utf8)
-                print(tac)
                 let taCMD = try! AttributedString(markdown: tac, options: AttributedString.MarkdownParsingOptions(interpretedSyntax: .inlineOnlyPreservingWhitespace))
                 return taCMD
             } catch {

@@ -76,6 +76,7 @@
 		2D48F3DC277E3CAA004B27BE /* MultiselectBottomControl.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D48F3DB277E3CAA004B27BE /* MultiselectBottomControl.swift */; };
 		2D48F3DE277E4BEC004B27BE /* SmallButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D48F3DD277E4BEC004B27BE /* SmallButton.swift */; };
 		2D48F3E0278305AE004B27BE /* LogComment.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D48F3DF278305AE004B27BE /* LogComment.swift */; };
+		2D59B9FD278F1D930088057A /* InstructionsSquare.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D59B9FC278F1D930088057A /* InstructionsSquare.swift */; };
 		2D6A9F84278C8275000DAE64 /* TCNetworkInfo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D6A9F83278C8275000DAE64 /* TCNetworkInfo.swift */; };
 		2D72B4F626EF3BC50081E879 /* Navigator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D72B4F526EF3BC50081E879 /* Navigator.swift */; };
 		2D72B4FA26EF7D1C0081E879 /* Seeds.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D72B4F926EF7D1C0081E879 /* Seeds.swift */; };
@@ -257,6 +258,7 @@
 		2D48F3DB277E3CAA004B27BE /* MultiselectBottomControl.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MultiselectBottomControl.swift; sourceTree = "<group>"; };
 		2D48F3DD277E4BEC004B27BE /* SmallButton.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SmallButton.swift; sourceTree = "<group>"; };
 		2D48F3DF278305AE004B27BE /* LogComment.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LogComment.swift; sourceTree = "<group>"; };
+		2D59B9FC278F1D930088057A /* InstructionsSquare.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InstructionsSquare.swift; sourceTree = "<group>"; };
 		2D6A9F83278C8275000DAE64 /* TCNetworkInfo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TCNetworkInfo.swift; sourceTree = "<group>"; };
 		2D72B4F526EF3BC50081E879 /* Navigator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Navigator.swift; sourceTree = "<group>"; };
 		2D72B4F926EF7D1C0081E879 /* Seeds.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Seeds.swift; sourceTree = "<group>"; };
@@ -485,6 +487,7 @@
 				2DA5F88F27590B3A00D8DD29 /* DocumentModal.swift */,
 				2DA5F8322756653B00D8DD29 /* CameraPreview.swift */,
 				2DA5F8222756621F00D8DD29 /* Header.swift */,
+				2D59B9FC278F1D930088057A /* InstructionsSquare.swift */,
 				2DA5F8242756624000D8DD29 /* NavbarShield.swift */,
 			);
 			path = Components;
@@ -935,6 +938,7 @@
 				2D48F3DC277E3CAA004B27BE /* MultiselectBottomControl.swift in Sources */,
 				2D48F35D2760ED38004B27BE /* MKeys.swift in Sources */,
 				2DA5F86527566C3600D8DD29 /* TCID.swift in Sources */,
+				2D59B9FD278F1D930088057A /* InstructionsSquare.swift in Sources */,
 				2DA5F86227566C3600D8DD29 /* TCEnumVariantName.swift in Sources */,
 				2D48F3D02777A823004B27BE /* NewSeedBackupModal.swift in Sources */,
 				2DAA829F27885B39002917C0 /* TCBitVec.swift in Sources */,
