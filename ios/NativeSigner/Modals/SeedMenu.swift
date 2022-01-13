@@ -18,7 +18,7 @@ struct SeedMenu: View {
                 BigButton(
                     text: "Backup",
                     action: {
-                        data.pushButton(buttonID: .BackupSeed)å
+                        data.pushButton(buttonID: .BackupSeed)
                     }
                 )
                 BigButton(
