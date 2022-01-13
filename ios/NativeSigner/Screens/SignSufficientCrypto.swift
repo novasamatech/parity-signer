@@ -19,7 +19,7 @@ struct SignSufficientCrypto: View {
                         Button(action: {
                             let seedPhrase = data.getSeed(seedName: keyrecord.seed_name)
                             if seedPhrase != "" {
-                                data.pushButton(buttonID: .GoForward, details: keyrecord.address_key, seedPhrase: data.getSeed(seedName: keyrecord.seed_name))
+                                data.pushButton(buttonID: .GoForward, details: keyrecord.address_key, seedPhrase: seedPhrase)
                             }
                         }) {
                             AddressCard(address: keyrecord.intoAddress())
