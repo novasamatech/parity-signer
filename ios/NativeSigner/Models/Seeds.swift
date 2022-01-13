@@ -143,9 +143,8 @@ extension SignerDataModel {
         let status = SecItemCopyMatching(query as CFDictionary, &item)
         if !(status == errSecSuccess || status == errSecItemNotFound) {
             self.authenticated = false
-            return false
         }
-        if item == nil { return false } else { return true }
+        return status == errSecSuccess
     }
     
     /**
