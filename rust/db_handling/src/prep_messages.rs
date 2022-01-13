@@ -3,7 +3,6 @@ use definitions::{error::{ErrorSigner, ErrorSource, NotFoundSigner, Signer}, net
 
 use crate::helpers::{open_db, open_tree, get_types};
 
-
 /// Function to get types info from the database.
 /// Gets used both on the Active side (when preparing messages containing `load_types` payload)
 /// and on the Signer side (when preparing SufficientCrypto export qr code for `load_types` payload)

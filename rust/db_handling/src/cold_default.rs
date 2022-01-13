@@ -1,9 +1,9 @@
-use sled::Batch;
 use parity_scale_codec::Encode;
+use sled::Batch;
+
 use constants::{ADDRTREE, DANGER, GENERALVERIFIER, HISTORY, METATREE, SETTREE, SPECSTREE, TRANSACTION, TYPES, VERIFIERS};
 use defaults::{default_general_verifier, get_default_chainspecs, get_default_types_content, get_release_metadata, get_test_metadata, get_default_verifiers};
 use definitions::{danger::DangerRecord, error::{Active, ErrorActive, ErrorSigner, ErrorSource, Signer}, history::Event, keyring::{MetaKey, NetworkSpecsKey}, network_specs::Verifier};
-use anyhow;
 
 use crate::db_transactions::TrDbCold;
 use crate::helpers::make_batch_clear_tree;
@@ -140,14 +140,14 @@ pub fn signer_init (database_name: &str, general_verifier: Verifier) -> Result<(
 
 /// Function to initiate signer with default general verifier
 /// Function is applicable only to Signer side, interacts with user interface.
-pub fn signer_init_with_cert (database_name: &str) -> anyhow::Result<()> {
-    signer_init(&database_name, default_general_verifier()).map_err(|e| e.anyhow())
+pub fn signer_init_with_cert (database_name: &str) -> Result<(), ErrorSigner> {
+    signer_init(&database_name, default_general_verifier())
 }
 
 /// Function to initiate signer with Verifier::None as a general verifier
 /// Function is applicable only to Signer side, interacts with user interface.
-pub fn signer_init_no_cert (database_name: &str) -> anyhow::Result<()> {
-    signer_init(&database_name, Verifier(None)).map_err(|e| e.anyhow())
+pub fn signer_init_no_cert (database_name: &str) -> Result<(), ErrorSigner> {
+    signer_init(&database_name, Verifier(None))
 }
 
 /// Function to populate cold database without adding any networks.

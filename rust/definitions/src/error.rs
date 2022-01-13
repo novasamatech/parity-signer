@@ -817,7 +817,6 @@ impl ErrorSource for Signer {
                 let insert = match a {
                     InterfaceSigner::NotHex(b) => {
                         let insert = match b {
-                            NotHexSigner::PublicKey {input} => format!("Public key {}", input),
                             NotHexSigner::NetworkSpecsKey {input} => format!("Network specs key {}", input),
                             NotHexSigner::InputContent => String::from("Input content"),
                             NotHexSigner::AddressKey {input} => format!("Address key {}", input),
@@ -1040,7 +1039,6 @@ pub enum InterfaceSigner {
 /// NotHex errors occuring on the Signer side
 #[derive(Debug)]
 pub enum NotHexSigner {
-    PublicKey {input: String},
     NetworkSpecsKey {input: String},
     InputContent,
     AddressKey {input: String},

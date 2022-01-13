@@ -58,12 +58,11 @@ impl State {
                     match db_handling::interface_signer::purge_transactions(dbname) {
                         Ok(()) => {
                             if seed_names.len() == 0 {
-                                 new_navstate.screen = Screen::SeedSelector;
-                                 new_navstate.modal = Modal::NewSeedMenu;
-                                 new_navstate.alert = Alert::Empty;
-                             } else {
-                                 new_navstate = Navstate::clean_screen(Screen::Log);
-                             }
+                                 new_navstate = self.correct_seed_selector();
+                            } 
+                            else {
+                                new_navstate = Navstate::clean_screen(Screen::Log);
+                            }
                         },
                         Err(e) => {
                             new_navstate.alert = Alert::Error;
@@ -73,16 +72,16 @@ impl State {
                 },
                 //Simple navigation commands
                 Action::NavbarLog => {
-                    if self.get_footer() {new_navstate = Navstate::clean_screen(Screen::Log);}
+                    if self.get_footer() {new_navstate = Navstate::clean_screen(Screen::Log)}
                 },
                 Action::NavbarScan => {
-                    if self.get_footer() {new_navstate = Navstate::clean_screen(Screen::Scan)};
+                    if self.get_footer() {new_navstate = Navstate::clean_screen(Screen::Scan)}
                 },
                 Action::NavbarKeys => {
-                    if self.get_footer() {new_navstate = Navstate::clean_screen(Screen::SeedSelector)};
+                    if self.get_footer() {new_navstate = self.correct_seed_selector()}
                 },
                 Action::NavbarSettings => {
-                    if self.get_footer() {new_navstate = Navstate::clean_screen(Screen::Settings)};
+                    if self.get_footer() {new_navstate = Navstate::clean_screen(Screen::Settings)}
                 },
 
                 //General back action is defined here
@@ -105,7 +104,7 @@ impl State {
                                 Screen::Keys(ref keys_state) => {
                                     match keys_state.get_specialty() {
                                         SpecialtyKeysState::MultiSelect(_) => {new_navstate.screen = Screen::Keys(keys_state.deselect_specialty())},
-                                        _ => {new_navstate.screen = Screen::SeedSelector},
+                                        _ => {new_navstate = self.correct_seed_selector()},
                                     };
                                 },
                                 Screen::KeyDetails(address_state) => {
@@ -115,10 +114,10 @@ impl State {
                                     new_navstate.screen = Screen::Keys(address_state_multi.blank_keys_state());
                                 },
                                 Screen::NewSeed => {
-                                    new_navstate.screen = Screen::SeedSelector;
+                                    new_navstate = self.correct_seed_selector();
                                 },
                                 Screen::RecoverSeedName(_) => {
-                                    new_navstate.screen = Screen::SeedSelector;
+                                    new_navstate = self.correct_seed_selector();
                                 },
                                 Screen::RecoverSeedPhrase(ref seed_name) => {
                                     new_navstate.screen = Screen::RecoverSeedName(seed_name.to_string());
@@ -955,7 +954,7 @@ impl State {
             //Prepare screen details
             let screen_details = match new_navstate.screen {
                 Screen::Log => {
-                    match db_handling::manage_history::print_history_page(0, &dbname) {
+                    match db_handling::manage_history::print_history(dbname) {
                         Ok(a) => a.to_string(),
                         Err(e) => {
                             new_navstate.alert = Alert::Error;
@@ -1387,6 +1386,19 @@ impl State {
             Screen::Documents => "h4",
             Screen::Nowhere => "h4",
         }.to_string()
+    }
+    
+    fn correct_seed_selector(&self) -> Navstate {
+        if self.seed_names.len() == 0 {
+            Navstate {
+                screen: Screen::SeedSelector,
+                modal: Modal::NewSeedMenu,
+                alert: Alert::Empty,
+            }
+        } 
+        else {
+            Navstate::clean_screen(Screen::SeedSelector)
+        }
     }
     
 }

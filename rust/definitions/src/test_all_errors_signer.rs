@@ -88,7 +88,6 @@ pub fn signer_errors() -> Vec<ErrorSigner> {
     
     let mut error_set: Vec<ErrorSigner> = Vec::new();
     
-    error_set.push(ErrorSigner::Interface(InterfaceSigner::NotHex(NotHexSigner::PublicKey{input: not_hex_string.to_string()})));
     error_set.push(ErrorSigner::Interface(InterfaceSigner::NotHex(NotHexSigner::NetworkSpecsKey{input: not_hex_string.to_string()})));
     error_set.push(ErrorSigner::Interface(InterfaceSigner::NotHex(NotHexSigner::InputContent)));
     error_set.push(ErrorSigner::Interface(InterfaceSigner::NotHex(NotHexSigner::AddressKey{input: not_hex_string.to_string()})));
@@ -233,13 +232,12 @@ mod tests {
     fn print_signer_errors_nicely() {
         let mut print = String::from("\n");
         let signer_errors = signer_errors();
-        assert!(signer_errors.len() == 158, "Different error set length: {}", signer_errors.len());
+        assert!(signer_errors.len() == 157, "Different error set length: {}", signer_errors.len());
         for e in signer_errors.iter() {
             print.push_str(&format!("\"{}\"", <Signer>::show(e)));
             print.push_str("\n");
         }
         let print_expected = r#"
-"Error on the interface. Public key 0xabracadabra is not in hexadecimal format."
 "Error on the interface. Network specs key 0xabracadabra is not in hexadecimal format."
 "Error on the interface. Input content is not in hexadecimal format."
 "Error on the interface. Address key 0xabracadabra is not in hexadecimal format."

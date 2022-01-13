@@ -48,21 +48,21 @@ export! {
         navigator::update_seed_names(seed_names)
     }
 
-	@Java_io_parity_signer_models_SignerDataModel_qrparserGetPacketsTotal
-	fn get_packets_total(
-		data: &str,
+    @Java_io_parity_signer_models_SignerDataModel_qrparserGetPacketsTotal
+    fn get_packets_total(
+        data: &str,
         cleaned: bool
-	) -> anyhow::Result<u32, anyhow::Error> {
+    ) -> anyhow::Result<u32, anyhow::Error> {
         qr_reader_phone::get_length(data, cleaned)
-	}
+    }
 
-	@Java_io_parity_signer_models_SignerDataModel_qrparserTryDecodeQrSequence
-	fn try_decode_qr_sequence(
-		data: &str,
+    @Java_io_parity_signer_models_SignerDataModel_qrparserTryDecodeQrSequence
+    fn try_decode_qr_sequence(
+        data: &str,
         cleaned: bool
-	) -> anyhow::Result<String, anyhow::Error> {
+    ) -> anyhow::Result<String, anyhow::Error> {
         qr_reader_phone::decode_sequence(data, cleaned)
-	}
+    }
 
      @Java_io_parity_signer_models_SignerDataModel_substrateGuessWord
     fn guess_word (
@@ -72,9 +72,9 @@ export! {
     }
 
     @Java_io_parity_signer_models_SignerDataModel_substrateCheckPath
-	fn check_path(
+    fn check_path(
         path: &str
-	) -> anyhow::Result<bool, anyhow::Error> {
+    ) -> anyhow::Result<bool, anyhow::Error> {
         db_handling::identities::check_derivation_format(path).map_err(|e| e.anyhow())
     }
 
@@ -86,58 +86,58 @@ export! {
     }
 
     @Java_io_parity_signer_models_SignerDataModel_historyInitHistoryWithCert
-	fn init_history_with_cert(
+    fn init_history_with_cert(
         dbname: &str
-	) -> anyhow::Result<(), anyhow::Error> {
-        db_handling::cold_default::signer_init_with_cert(dbname)
+    ) -> anyhow::Result<(), anyhow::Error> {
+        db_handling::cold_default::signer_init_with_cert(dbname).map_err(|e| e.anyhow())
     }
 
     @Java_io_parity_signer_models_SignerDataModel_historyInitHistoryNoCert
-	fn init_history_no_cert(
+    fn init_history_no_cert(
         dbname: &str
-	) -> anyhow::Result<(), anyhow::Error> {
-        db_handling::cold_default::signer_init_no_cert(dbname)
+    ) -> anyhow::Result<(), anyhow::Error> {
+        db_handling::cold_default::signer_init_no_cert(dbname).map_err(|e| e.anyhow())
     }
 
     @Java_io_parity_signer_models_SignerDataModel_historyDeviceWasOnline
-	fn device_was_online(
+    fn device_was_online(
         dbname: &str
-	) -> anyhow::Result<(), anyhow::Error> {
-        db_handling::manage_history::device_was_online(dbname)
+    ) -> anyhow::Result<(), anyhow::Error> {
+        db_handling::manage_history::device_was_online(dbname).map_err(|e| e.anyhow())
     }
 
     @Java_io_parity_signer_models_SignerDataModel_historyGetWarnings
-	fn get_warnings(
+    fn get_warnings(
         dbname: &str
-	) -> anyhow::Result<bool, anyhow::Error> {
-        db_handling::helpers::display_danger_status(dbname)
+    ) -> anyhow::Result<bool, anyhow::Error> {
+        db_handling::helpers::get_danger_status(dbname).map_err(|e| e.anyhow())
     }
 
     @Java_io_parity_signer_models_SignerDataModel_historyAcknowledgeWarnings
-	fn acknowledge_warnings(
+    fn acknowledge_warnings(
         dbname: &str
-	) -> anyhow::Result<(), anyhow::Error> {
-        db_handling::manage_history::reset_danger_status_to_safe(dbname)
+    ) -> anyhow::Result<(), anyhow::Error> {
+        db_handling::manage_history::reset_danger_status_to_safe(dbname).map_err(|e| e.anyhow())
     }
 
     @Java_io_parity_signer_models_SignerDataModel_historyHistoryEntrySystem
-	fn history_entry_system(
+    fn history_entry_system(
         entry: &str,
         dbname: &str
-	) -> anyhow::Result<(), anyhow::Error> {
-        db_handling::manage_history::history_entry_system(dbname, entry.to_string())
+    ) -> anyhow::Result<(), anyhow::Error> {
+        db_handling::manage_history::history_entry_system(dbname, entry.to_string()).map_err(|e| e.anyhow())
     }
 
     @Java_io_parity_signer_models_SignerDataModel_historySeedNameWasShown
-	fn seed_name_was_shown(
+    fn seed_name_was_shown(
         seed_name: &str,
         dbname: &str
-	) -> anyhow::Result<(), anyhow::Error> {
-        db_handling::manage_history::seed_name_was_shown(dbname, seed_name.to_string())
+    ) -> anyhow::Result<(), anyhow::Error> {
+        db_handling::manage_history::seed_name_was_shown(dbname, seed_name.to_string()).map_err(|e| e.anyhow())
     }
 
     @Java_io_parity_signer_models_SignerDataModel_testGetAllTXCards
-	fn get_all_tx_cards() -> String {
+    fn get_all_tx_cards() -> String {
         if let transaction_parsing::Action::Read(content) = transaction_parsing::test_all_cards::make_all_cards() {
             format!("{{{}}}", content)
         } else {
@@ -146,7 +146,7 @@ export! {
     }
 
     @Java_io_parity_signer_models_SignerDataModel_testGetAllLogCards
-	fn get_all_log_cards() -> String {
+    fn get_all_log_cards() -> String {
         definitions::history::print_all_events()
     }
 
@@ -156,5 +156,5 @@ ffi_support::define_string_destructor!(signer_destroy_string);
 
 #[cfg(test)]
 mod tests {
-	//use super::*;
+    //use super::*;
 }

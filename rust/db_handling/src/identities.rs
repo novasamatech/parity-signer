@@ -3,25 +3,23 @@
 //! best available tool and here they are only processed in plaintext.
 //! Zeroization is mostly delegated to os
 
-use sled::{Db, Batch};
-use sp_core::{Pair, ed25519, sr25519, ecdsa};
+use bip39::{Language, Mnemonic, MnemonicType};
+use lazy_static::lazy_static;
 use parity_scale_codec::Encode;
 use regex::Regex;
+use sled::{Db, Batch};
+use sp_core::{Pair, ed25519, sr25519, ecdsa};
+use sp_runtime::MultiSigner;
+use zeroize::Zeroize;
+
 use constants::{ADDRTREE, MAX_WORDS_DISPLAY, SPECSTREE, TRANSACTION};
 use defaults::get_default_chainspecs;
-use definitions::{crypto::Encryption, error::{Active, AddressGeneration, AddressGenerationCommon, ErrorActive, ErrorSigner, ErrorSource, ExtraAddressGenerationSigner, InputActive, InputSigner, InterfaceSigner, NotFoundSigner, NotHexSigner, Signer, SpecsKeySource}, helpers::{get_multisigner, multisigner_to_public, unhex}, history::{Event, IdentityHistory}, keyring::{NetworkSpecsKey, AddressKey, print_multisigner_as_base58}, network_specs::NetworkSpecs, print::{export_plain_vector, export_complex_vector_with_error}, qr_transfers::ContentDerivations, users::{AddressDetails, SeedObject}};
-use bip39::{Language, Mnemonic, MnemonicType};
-use zeroize::Zeroize;
-use lazy_static::lazy_static;
-use anyhow;
-use qrcode_static::png_qr_from_string;
-use sp_runtime::MultiSigner;
+use definitions::{crypto::Encryption, error::{Active, AddressGeneration, AddressGenerationCommon, ErrorActive, ErrorSigner, ErrorSource, ExtraAddressGenerationSigner, InputActive, InputSigner, InterfaceSigner, Signer, SpecsKeySource}, helpers::multisigner_to_public, history::{Event, IdentityHistory}, keyring::{NetworkSpecsKey, AddressKey}, network_specs::NetworkSpecs, print::export_plain_vector, qr_transfers::ContentDerivations, users::{AddressDetails, SeedObject}};
 
 use crate::db_transactions::{TrDbCold, TrDbColdDerivations};
 use crate::helpers::{open_db, open_tree, make_batch_clear_tree, upd_id_batch, get_network_specs, get_address_details};
 use crate::interface_signer::addresses_set_seed_name_network;
 use crate::manage_history::{events_to_batch};
-use crate::network_details::get_network_specs_by_hex_key;
 
 
 lazy_static! {
@@ -51,37 +49,6 @@ pub fn get_all_addresses (database_name: &str) -> Result<Vec<(MultiSigner, Addre
 /// Function gets used only on the Signer side.
 pub fn get_addresses_by_seed_name (database_name: &str, seed_name: &str) -> Result<Vec<(MultiSigner, AddressDetails)>, ErrorSigner> {
     Ok(get_all_addresses(database_name)?.into_iter().filter(|(_, address_details)| address_details.seed_name == seed_name).collect())
-}
-
-/// Get all identities for given seed_name and network_key as hex string.
-/// If empty seed name is given, gets all existing identities.
-/// Function gets used only on the Signer side.
-fn get_relevant_identities (seed_name: &str, network_key_string: &str, database_name: &str) -> Result<Vec<(MultiSigner, AddressDetails)>, ErrorSigner> {
-    let network_specs_key = NetworkSpecsKey::from_hex(network_key_string)?;
-    let identities_out = {
-        if seed_name == "" {get_all_addresses(database_name)?}
-        else {get_addresses_by_seed_name(database_name, seed_name)?}
-    };
-    Ok(identities_out.into_iter().filter(|(_, address_details)| address_details.network_id.contains(&network_specs_key)).collect())
-}
-
-/// Function to print all relevant identities for given seed_name and network_key as hex string.
-/// If empty seed name is given, prints all existing identities.
-/// Function gets used only on the Signer side.
-/// Open to user interface.
-pub fn print_relevant_identities (seed_name: &str, network_key_string: &str, database_name: &str) -> anyhow::Result<String> {
-    let relevant_identities = get_relevant_identities (seed_name, network_key_string, database_name).map_err(|e| e.anyhow())?;
-    let network_specs = get_network_specs_by_hex_key(database_name, network_key_string).map_err(|e| e.anyhow())?;
-    export_complex_vector_with_error(&relevant_identities, |(multisigner, address_details)| address_details.print(&multisigner, Some(network_specs.base58prefix))).map_err(|e| e.anyhow())
-}
-
-/// Function to print all identities for all seed names.
-/// ss58 line associated with each of public keys is printed with default base58prefix.
-/// Function gets used only on the Signer side.
-/// Open to user interface.
-pub fn print_all_identities (database_name: &str) -> anyhow::Result<String> {
-    let all_identities = get_all_addresses (database_name).map_err(|e| e.anyhow())?;
-    export_complex_vector_with_error(&all_identities, |(multisigner, address_details)| address_details.print(&multisigner, None)).map_err(|e| e.anyhow())
 }
 
 /// Generate random phrase with given number of words.
@@ -262,45 +229,6 @@ pub fn try_create_seed (seed_name: &str, seed_phrase: &str, roots: bool, databas
         .apply::<Signer>(&database_name)
 }
 
-/// Sanitize numbers in path (only for name suggestions!)
-/// Removes zeroes
-fn sanitize_number(could_be_number: &str) -> String {
-    match could_be_number.parse::<u32>() {
-        Ok(number) => number.to_string(),
-        Err(_) => could_be_number.to_string(),
-    }
-}
-
-/// Suggest name from path
-pub fn suggest_path_name(path_all: &str) -> String {
-    let mut output = String::from("");
-    if let Some(caps) = REG_PATH.captures(path_all) {
-        if let Some(path) = caps.name("path") {
-            if !path.as_str().is_empty() {
-                for hard in path.as_str().split("//") {
-                    let mut softened = hard.split("/");
-                    if let Some(first) = softened.next() {
-                        output.push_str(&sanitize_number(first));
-                        let mut number_of_brackets = 0;
-                        for soft in softened {
-                            number_of_brackets+=1;
-                            output.push_str(" (");
-                            output.push_str(&sanitize_number(soft));
-                        }
-                        if number_of_brackets == 0 {
-                            output.push_str(" ");
-                        } else {
-                            output.push_str(&") ".repeat(number_of_brackets));
-                        }
-                    }
-                }
-            }
-        };
-    }
-    output = output.trim().to_string();
-    output
-}
-
 /// Function removes address by multisigner identifier and and network id
 /// Function removes network_key from network_id vector for database record with address_key corresponding to given public key
 pub fn remove_key(database_name: &str, multisigner: &MultiSigner, network_specs_key: &NetworkSpecsKey) -> Result<(), ErrorSigner> {
@@ -327,52 +255,6 @@ pub fn remove_keys_set(database_name: &str, multiselect: &Vec<MultiSigner>, netw
         .set_addresses(id_batch) // modify existing address entries
         .set_history(events_to_batch::<Signer>(&database_name, events)?) // add corresponding history
         .apply::<Signer>(&database_name)
-}
-
-/// Function prepares removal of the address by public key and network id
-/// Function removes network_key from network_id vector for database record with address_key corresponding to given public key
-fn prepare_delete_address(pub_key_hex: &str, network_specs_key_string: &str, database_name: &str) -> Result<(Batch, Vec<Event>), ErrorSigner> {
-    let mut id_batch = Batch::default();
-    let mut events: Vec<Event> = Vec::new();
-    let network_specs = get_network_specs_by_hex_key(database_name, network_specs_key_string)?;
-    let network_specs_key =  NetworkSpecsKey::from_hex(network_specs_key_string)?;
-    let public_key = unhex::<Signer>(pub_key_hex, NotHexSigner::PublicKey{input: pub_key_hex.to_string()})?;
-    let address_key = AddressKey::from_parts(&public_key, &network_specs.encryption)?;
-    let mut address_details = get_address_details(database_name, &address_key)?;
-    let identity_history = IdentityHistory::get(&address_details.seed_name, &network_specs.encryption, &public_key, &address_details.path, &network_specs.genesis_hash.to_vec());
-    events.push(Event::IdentityRemoved(identity_history));
-    address_details.network_id = address_details.network_id.into_iter().filter(|id| *id != network_specs_key).collect();
-    if address_details.network_id.is_empty() {id_batch.remove(address_key.key())}
-    else {id_batch.insert(address_key.key(), address_details.encode())}
-    Ok((id_batch, events))
-}
-
-/// Function removes identity as seen by user
-/// Function removes network_key from network_id vector for database record with address_key corresponding to given public key
-/// Function is open to user interface.
-pub fn delete_address(pub_key_hex: &str, network_specs_key_string: &str, database_name: &str) -> anyhow::Result<()> {
-    let (id_batch, events) = prepare_delete_address(pub_key_hex, network_specs_key_string, database_name).map_err(|e| e.anyhow())?;
-    TrDbCold::new()
-        .set_addresses(id_batch) // modify existing address entry
-        .set_history(events_to_batch::<Signer>(&database_name, events).map_err(|e| e.anyhow())?) // add corresponding history
-        .apply::<Signer>(&database_name)
-        .map_err(|e| e.anyhow())
-}
-
-/// Suggest address and name for weird N+1 feature request
-pub fn suggest_n_plus_one(path: &str, seed_name: &str, network_key_string: &str, database_name: &str) -> anyhow::Result<String> {
-    let identities = get_relevant_identities(seed_name, network_key_string, database_name).map_err(|e| e.anyhow())?;
-    let mut last_index = 0;
-    for (_, details) in identities.iter() {
-        if let Some(("", suffix)) = details.path.split_once(path) {
-            if let Some(could_be_number) = suffix.get(2..) {
-                if let Ok(index) = could_be_number.parse::<u32>() {
-                    last_index = std::cmp::max(index+1, last_index);
-                }
-            }
-        }
-    }
-    Ok(path.to_string() + "//" + &last_index.to_string())
 }
 
 /// Add a bunch of new derived addresses, N+1, N+2, etc.
@@ -503,29 +385,6 @@ pub fn remove_seed (database_name: &str, seed_name: &str) -> Result<(), ErrorSig
         .apply::<Signer>(&database_name)
 }
 
-/// Function to export identity as qr code readable by polkadot.js
-/// Standard known format:
-/// `substrate:{public_key as as_base58}:0x{network_key}`
-/// String is transformed into bytes, then into png qr code, then qr code
-/// content is hexed so that it could be transferred into app
-/// Function is open to user interface.
-pub fn export_identity (pub_key: &str, network_specs_key_string: &str, database_name: &str) -> anyhow::Result<String> {
-    let network_specs_key = NetworkSpecsKey::from_hex(network_specs_key_string).map_err(|e| e.anyhow())?;
-    let network_specs = get_network_specs(database_name, &network_specs_key).map_err(|e| e.anyhow())?;
-    let multisigner = get_multisigner(&unhex::<Signer>(pub_key, NotHexSigner::PublicKey{input: pub_key.to_string()}).map_err(|e| e.anyhow())?, &network_specs.encryption).map_err(|e| e.anyhow())?;
-    let address_key = AddressKey::from_multisigner(&multisigner);
-    let address_details = get_address_details(database_name, &address_key).map_err(|e| e.anyhow())?;
-    if address_details.network_id.contains(&network_specs_key) {
-        let address_base58 = print_multisigner_as_base58(&multisigner, Some(network_specs.base58prefix));
-        let qr_prep = match png_qr_from_string(&format!("substrate:{}:0x{}", address_base58, hex::encode(&network_specs.genesis_hash))) {
-            Ok(a) => a,
-            Err(e) => return Err(ErrorSigner::Qr(e.to_string()).anyhow()),
-        };
-        Ok(hex::encode(qr_prep)) 
-    }
-    else {return Err(ErrorSigner::NotFound(NotFoundSigner::NetworkSpecsKeyForAddress{network_specs_key, address_key}).anyhow())}
-}
-
 /// Function to import derivations without password into Signer from qr code
 /// i.e. create new (address key + address details) entry,
 /// or add network specs key to the existing one
@@ -602,13 +461,16 @@ pub fn guess (word_part: &str) -> String {
 
 #[cfg(test)]
 mod tests {
-    use super::*;
+    use sled::{Db, Tree, open, Batch};
+    use std::fs;
+    
     use constants::ADDRTREE;
     use defaults::get_default_chainspecs;
     use definitions::{crypto::Encryption, keyring::{AddressKey, NetworkSpecsKey}, network_specs::Verifier};
-    use std::fs;
-    use sled::{Db, Tree, open, Batch};
-    use crate::{cold_default::{populate_cold_no_metadata, signer_init_with_cert, populate_cold_release}, helpers::{open_db, open_tree, upd_id_batch}, db_transactions::TrDbCold, manage_history::print_history};
+    
+    use crate::{cold_default::{populate_cold_no_metadata, signer_init_with_cert, populate_cold_release}, db_transactions::TrDbCold, helpers::{open_db, open_tree, upd_id_batch}, interface_signer::addresses_set_seed_name_network, manage_history::print_history};
+    
+    use super::*;
 
     static SEED: &str = "bottom drive obey lake curtain smoke basket hold race lonely fit walk";
 
@@ -641,10 +503,7 @@ mod tests {
             assert!(addresses.len() == 4, "real addresses length: {}", addresses.len());
         }
         let chainspecs = get_default_chainspecs();
-        println!("===");
-        println!("{}", print_all_identities(dbname).unwrap());
-        println!("===");
-        let default_addresses = get_relevant_identities("Alice", &hex::encode(NetworkSpecsKey::from_parts(&chainspecs[0].genesis_hash.to_vec(), &Encryption::Sr25519).key()), dbname).unwrap();
+        let default_addresses = addresses_set_seed_name_network (dbname, "Alice", &NetworkSpecsKey::from_parts(&chainspecs[0].genesis_hash.to_vec(), &Encryption::Sr25519)).unwrap();
         assert!(default_addresses.len()>0);
         assert!("[(MultiSigner::Sr25519(46ebddef8cd9bb167dc30878d7113b7e168e6f0646beffd77d69d39bad76b47a (5DfhGyQd...)), AddressDetails { seed_name: \"Alice\", path: \"\", has_pwd: false, network_id: [NetworkSpecsKey([1, 128, 145, 177, 113, 187, 21, 142, 45, 56, 72, 250, 35, 169, 241, 194, 81, 130, 251, 142, 32, 49, 59, 44, 30, 180, 146, 25, 218, 122, 112, 206, 144, 195]), NetworkSpecsKey([1, 128, 176, 168, 212, 147, 40, 92, 45, 247, 50, 144, 223, 183, 230, 31, 135, 15, 23, 180, 24, 1, 25, 122, 20, 156, 169, 54, 84, 73, 158, 163, 218, 254]), NetworkSpecsKey([1, 128, 225, 67, 242, 56, 3, 172, 80, 232, 246, 248, 230, 38, 149, 209, 206, 158, 78, 29, 104, 170, 54, 193, 205, 44, 253, 21, 52, 2, 19, 243, 66, 62])], encryption: Sr25519 }), (MultiSigner::Sr25519(64a31235d4bf9b37cfed3afa8aa60754675f9c4915430454d365c05112784d05 (5ELf63sL...)), AddressDetails { seed_name: \"Alice\", path: \"//kusama\", has_pwd: false, network_id: [NetworkSpecsKey([1, 128, 176, 168, 212, 147, 40, 92, 45, 247, 50, 144, 223, 183, 230, 31, 135, 15, 23, 180, 24, 1, 25, 122, 20, 156, 169, 54, 84, 73, 158, 163, 218, 254])], encryption: Sr25519 })]" == format!("{:?}", default_addresses), "Default addresses:\n{:?}", default_addresses);
         let database: Db = open(dbname).unwrap();
@@ -726,68 +585,25 @@ mod tests {
     }
 
     #[test]
-    fn test_suggest_n_plus_one() { 
-        let dbname = "for_tests/test_suggest_n_plus_one";
-        populate_cold_no_metadata(dbname, Verifier(None)).unwrap();
-        try_create_seed("Alice", SEED, true, dbname).unwrap();
-        let chainspecs = get_default_chainspecs();
-        let network_id_0 = NetworkSpecsKey::from_parts(&chainspecs[0].genesis_hash.to_vec(), &Encryption::Sr25519);
-        try_create_address("Alice", SEED, "//Alice//10", &network_id_0, dbname).expect("create a valid address //Alice//10");
-        assert_eq!("//Alice//11", suggest_n_plus_one("//Alice", "Alice", &hex::encode(network_id_0.key()), dbname).expect("at least some suggestion about new name should be produced unless db read resulted in a failure"));
-        fs::remove_dir_all(dbname).unwrap();
-    }
-
-    #[test]
-    fn test_sanitize_number() {
-        assert_eq!("1", sanitize_number("1"));
-        assert_eq!("1", sanitize_number("001"));
-        assert_eq!("1f", sanitize_number("1f"));
-        assert_eq!("a", sanitize_number("a"));
-        assert_eq!("0a", sanitize_number("0a"));
-        assert_eq!("0z", sanitize_number("0z"));
-    }
-    
-    #[test]
-    fn account_name_suggestions() {
-        assert_eq!("Alice", suggest_path_name("//Alice"));
-        assert_eq!("", suggest_path_name(""));
-        assert_eq!("Alice verifier", suggest_path_name("//Alice//verifier"));
-        assert_eq!("Alice", suggest_path_name("//Alice///password"));
-        assert_eq!("Alice (alias)", suggest_path_name("//Alice/alias"));
-        assert_eq!("Alice", suggest_path_name("//Alice///password///password"));
-        assert_eq!("Лазарь Сигизмундович", suggest_path_name("//Лазарь//Сигизмундович"));
-        assert_eq!("Вася (Пупкин)", suggest_path_name("//Вася/Пупкин"));
-        assert_eq!("Антон", suggest_path_name("//Антон///секретный"));
-        assert_eq!("Alice 1", suggest_path_name("//Alice//0001"));
-        assert_eq!("Alice (brackets)", suggest_path_name("//Alice//(brackets)"));
-        assert_eq!("Alice ((brackets))", suggest_path_name("//Alice/(brackets)"));
-        assert_eq!("Alice", suggest_path_name("//Alice///(brackets)"));
-        assert_eq!("(Alice)", suggest_path_name("/Alice"));
-        assert_eq!("", suggest_path_name("///password"));
-    }
-
-    #[test]
     fn test_identity_deletion() {
         let dbname = "for_tests/test_identity_deletion";
         populate_cold_no_metadata(dbname, Verifier(None)).unwrap();
         try_create_seed("Alice", SEED, true, dbname).unwrap();
         let chainspecs = get_default_chainspecs();
-        let network_id_string_0 = hex::encode(NetworkSpecsKey::from_parts(&chainspecs[0].genesis_hash.to_vec(), &Encryption::Sr25519).key());
-        let network_id_string_1 = hex::encode(NetworkSpecsKey::from_parts(&chainspecs[1].genesis_hash.to_vec(), &Encryption::Sr25519).key());
-        let mut identities = get_relevant_identities("Alice", &network_id_string_0, dbname).expect("Alice should have some addresses by default");
+        let network_specs_key_0 = NetworkSpecsKey::from_parts(&chainspecs[0].genesis_hash.to_vec(), &Encryption::Sr25519);
+        let network_specs_key_1 = NetworkSpecsKey::from_parts(&chainspecs[1].genesis_hash.to_vec(), &Encryption::Sr25519);
+        let mut identities = addresses_set_seed_name_network (dbname, "Alice", &network_specs_key_0).expect("Alice should have some addresses by default");
         println!("{:?}", identities);
         let (key0, _) = identities.remove(0); //TODO: this should be root key
-        let public_key0 = multisigner_to_public(&key0);
         let (key1, _) = identities.remove(0); //TODO: this should be network-specific key
-        let public_key1 = multisigner_to_public(&key1);
-        delete_address(&hex::encode(&public_key0), &network_id_string_0, dbname).expect("delete an address");
-        delete_address(&hex::encode(&public_key1), &network_id_string_0, dbname).expect("delete another address");
-        let identities = get_relevant_identities("Alice", &network_id_string_0, dbname).expect("Alice still should have some addresses after deletion of two");
+        remove_key(dbname, &key0, &network_specs_key_0).expect("delete an address");
+        remove_key(dbname, &key1, &network_specs_key_0).expect("delete another address");
+        let identities = addresses_set_seed_name_network (dbname, "Alice", &network_specs_key_0).expect("Alice still should have some addresses after deletion of two");
         for (address_key, _) in identities {
             assert_ne!(address_key, key0);
             assert_ne!(address_key, key1);
         }
-        let identities = get_relevant_identities("Alice", &network_id_string_1, dbname).expect("Alice still should have some addresses after deletion of two");
+        let identities = addresses_set_seed_name_network (dbname, "Alice", &network_specs_key_1).expect("Alice still should have some addresses after deletion of two");
         let mut flag_to_check_key0_remains = false;
         for (address_key, _) in identities {
             if address_key == key0 {

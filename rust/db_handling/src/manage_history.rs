@@ -1,11 +1,10 @@
-use constants::{DANGER, HISTORY, HISTORY_PAGE_SIZE};
-use definitions::{danger::DangerRecord, error::{DatabaseSigner, EntryDecodingSigner, ErrorSigner, ErrorSource, InterfaceSigner, KeyDecodingSignerDb, NotFoundSigner, Signer}, history::{Event, Entry}};
-use parity_scale_codec::{Decode, Encode};
-use anyhow;
 use chrono::Utc;
 use hex;
+use parity_scale_codec::{Decode, Encode};
 use sled::Batch;
-use definitions::print::export_complex_vector;
+
+use constants::{DANGER, HISTORY, HISTORY_PAGE_SIZE};
+use definitions::{danger::DangerRecord, error::{DatabaseSigner, EntryDecodingSigner, ErrorSigner, ErrorSource, InterfaceSigner, KeyDecodingSignerDb, NotFoundSigner, Signer}, history::{Event, Entry}, print::export_complex_vector};
 
 use crate::db_transactions::TrDbCold;
 use crate::helpers::{open_db, open_tree, make_batch_clear_tree};
@@ -16,9 +15,9 @@ type Order = u32;
 
 /// Function to print history entries.
 /// Interacts with user interface.
-pub fn print_history(database_name: &str) -> anyhow::Result<String> {
-    let history = get_history(database_name).map_err(|e| e.anyhow())?;
-    Ok(export_complex_vector(&history, |(order, entry)| format!("\"order\":{},{}", order, entry.show(|b| format!("\"{}\"", hex::encode(b.transaction()))))))
+pub fn print_history(database_name: &str) -> Result<String, ErrorSigner> {
+    let history = get_history(database_name)?;
+    Ok(format!("\"log\":{},\"total_entries\":{}", export_complex_vector(&history, |(order, entry)| format!("\"order\":{},{}", order, entry.show(|b| format!("\"{}\"", hex::encode(b.transaction()))))), history.len()))
 }
 
 /// Function to print total number of pages for pre-set number of entries per page.
@@ -161,45 +160,43 @@ pub fn history_entry_user(database_name: &str, string_from_user: &str) -> Result
 /// Function to add system-generated events during Signer operation.
 /// Applicable only to Signer side.
 /// Interacts with the user interface.
-pub fn history_entry_system(database_name: &str, string_from_system: String) -> anyhow::Result<()> {
+pub fn history_entry_system(database_name: &str, string_from_system: String) -> Result<(), ErrorSigner> {
     let events = vec![Event::SystemEntry(string_from_system)];
-    enter_events::<Signer>(database_name, events).map_err(|e| e.anyhow())
+    enter_events::<Signer>(database_name, events)
 }
 
 /// Function shows if the `device was online` indicator is on
 /// Applicable only to Signer side.
 /// Interacts with the user interface.
-pub fn device_was_online(database_name: &str) -> anyhow::Result<()> {
+pub fn device_was_online(database_name: &str) -> Result<(), ErrorSigner> {
     let events = vec![Event::DeviceWasOnline];
     let mut settings_batch = Batch::default();
     settings_batch.insert(DANGER.to_vec(), DangerRecord::not_safe().store());
     TrDbCold::new()
-        .set_history(events_to_batch::<Signer>(&database_name, events).map_err(|e| e.anyhow())?)
+        .set_history(events_to_batch::<Signer>(&database_name, events)?)
         .set_settings(settings_batch)
         .apply::<Signer>(&database_name)
-        .map_err(|e| e.anyhow())
 }
 
 /// Function to reset the danger status to `safe` - use it wisely.
 /// Applicable only to Signer side.
 /// Interacts with the user interface.
-pub fn reset_danger_status_to_safe(database_name: &str) -> anyhow::Result<()> {
+pub fn reset_danger_status_to_safe(database_name: &str) -> Result<(), ErrorSigner> {
     let events = vec![Event::ResetDangerRecord];
     let mut settings_batch = Batch::default();
     settings_batch.insert(DANGER.to_vec(), DangerRecord::safe().store());
     TrDbCold::new()
-        .set_history(events_to_batch::<Signer>(&database_name, events).map_err(|e| e.anyhow())?)
+        .set_history(events_to_batch::<Signer>(&database_name, events)?)
         .set_settings(settings_batch)
         .apply::<Signer>(&database_name)
-        .map_err(|e| e.anyhow())
 }
 
 /// Function to record in history log the fact that certain seed was shown on Signer screen.
 /// Applicable only to Signer side.
 /// Interacts with the user interface.
-pub fn seed_name_was_shown(database_name: &str, seed_name: String) -> anyhow::Result<()> {
+pub fn seed_name_was_shown(database_name: &str, seed_name: String) -> Result<(), ErrorSigner> {
     let events = vec![Event::SeedNameWasShown(seed_name)];
-    enter_events::<Signer>(database_name, events).map_err(|e| e.anyhow())
+    enter_events::<Signer>(database_name, events)
 }
 
 #[cfg(test)]

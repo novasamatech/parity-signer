@@ -9,7 +9,7 @@ import Foundation
 
 struct MSufficientCryptoReady: Decodable {
     var author_info: MSCAuthor
-    var signature: String
+    var sufficient: String
     var content: MSCContent
 }
 

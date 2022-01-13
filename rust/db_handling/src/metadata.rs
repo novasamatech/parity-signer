@@ -1,6 +1,7 @@
+use sled::Batch;
+
 use constants::{METATREE, SPECSTREE};
 use definitions::{error::{Active, ErrorActive}, keyring::MetaKeyPrefix, network_specs::NetworkSpecs};
-use sled::Batch;
 
 use crate::helpers::{open_db, open_tree};
 use crate::db_transactions::TrDbCold;

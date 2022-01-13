@@ -1,8 +1,8 @@
+use parity_scale_codec::{Decode, Encode};
 use sled::{Db, Tree, Batch, open};
-use anyhow;
+
 use constants::{ADDRTREE, DANGER, GENERALVERIFIER, METATREE, SETTREE, SPECSTREE, TYPES, VERIFIERS};
 use definitions::{danger::DangerRecord, error::{DatabaseSigner, EntryDecodingSigner, ErrorSigner, ErrorSource, NotFoundSigner, Signer}, keyring::{AddressKey, MetaKey, MetaKeyPrefix, NetworkSpecsKey, VerifierKey}, metadata::MetaValues, network_specs::{CurrentVerifier, NetworkSpecs, ValidCurrentVerifier, Verifier}, types::TypeEntry, users::{AddressDetails}};
-use parity_scale_codec::{Decode, Encode};
 
 /// Wrapper for `open`
 pub fn open_db <T: ErrorSource> (database_name: &str) -> Result<Db, T::Error> {
@@ -106,11 +106,8 @@ pub fn get_general_verifier (database_name: &str) -> Result<Verifier, ErrorSigne
 }
 
 /// Function to display general Verifier from the Signer database
-pub fn display_general_verifier (database_name: &str) -> anyhow::Result<String> {
-    match get_general_verifier(database_name) {
-        Ok(general_verifier) => Ok(general_verifier.show_card()),
-        Err(e) => return Err(e.anyhow()),
-    }
+pub fn display_general_verifier (database_name: &str) -> Result<String, ErrorSigner> {
+    Ok(get_general_verifier(database_name)?.show_card())
 }
 
 /// Function to try and get types information from the database
@@ -223,8 +220,9 @@ pub fn verify_checksum (database: &Db, checksum: u32) -> Result<(), ErrorSigner>
     Ok(())
 }
 
-/// Function to get the danger status from the Signer database
-fn get_danger_status(database_name: &str) -> Result<bool, ErrorSigner> {
+/// Function to get the danger status from the Signer database.
+/// Function interacts with user interface.
+pub fn get_danger_status(database_name: &str) -> Result<bool, ErrorSigner> {
     let database = open_db::<Signer>(&database_name)?;
     let settings = open_tree::<Signer>(&database, SETTREE)?;
     match settings.get(DANGER.to_vec()) {
@@ -232,12 +230,6 @@ fn get_danger_status(database_name: &str) -> Result<bool, ErrorSigner> {
         Ok(None) => return Err(ErrorSigner::NotFound(NotFoundSigner::DangerStatus)),
         Err(e) => return Err(<Signer>::db_internal(e)),
     }
-}
-
-/// Function to display the danger status from the database.
-/// Function interacts with user interface.
-pub fn display_danger_status(database_name: &str) -> anyhow::Result<bool> {
-    get_danger_status(database_name).map_err(|e| e.anyhow())
 }
 
 #[cfg(test)]

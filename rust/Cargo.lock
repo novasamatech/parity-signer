@@ -462,7 +462,6 @@ dependencies = [
 name = "db_handling"
 version = "0.1.0"
 dependencies = [
- "anyhow",
  "blake2-rfc",
  "chrono",
  "constants",
