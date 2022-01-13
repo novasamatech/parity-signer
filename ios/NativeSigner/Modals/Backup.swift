@@ -85,7 +85,7 @@ struct Backup: View {
                                 }
                             }
                         }
-                    }.padding(.bottom, 80)
+                    }.padding(.bottom, 132)
                 }
             }.padding(16)
             if countdown > 0 {
@@ -117,7 +117,7 @@ struct Backup: View {
                          .foregroundColor(Color("Action400"))
                          .font(FBase(style: .button))
                          */
-                    }
+                    }.padding(.bottom, 75)
                 }
             }
         }

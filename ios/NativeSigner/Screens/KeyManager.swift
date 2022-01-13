@@ -20,10 +20,10 @@ struct KeyManager: View {
                         data.pushButton(buttonID: .SelectKey, details: content.root.address_key)
                     }){
                         SeedKeyCard(seedCard: content.root, multiselectMode: content.multiselect_mode).gesture(DragGesture()
-                                                                        .onEnded {drag in
+                                                                                                                .onEnded {drag in
                             if abs(drag.translation.height) < 20 && abs(drag.translation.width) > 20 {
                                 if content.root.address_key != "" {
-                                data.pushButton(buttonID: .Swipe, details: content.root.address_key)
+                                    data.pushButton(buttonID: .Swipe, details: content.root.address_key)
                                 }
                             }
                         })
@@ -43,7 +43,7 @@ struct KeyManager: View {
                 }
                 Button(action: {data.pushButton(buttonID: .NetworkSelector)}) {
                     HStack {
-                    NetworkCard(title: content.network.title, logo: content.network.logo)
+                        NetworkCard(title: content.network.title, logo: content.network.logo)
                         Image(systemName: "chevron.down")
                         Spacer()
                     }
@@ -72,7 +72,7 @@ struct KeyManager: View {
                                     data.pushButton(buttonID: .SelectKey, details: address.address_key)
                                 }){
                                     AddressCard(address: address.intoAddress(), multiselectMode: content.multiselect_mode).gesture(DragGesture()
-                                                                                            .onEnded {drag in
+                                                                                                                                    .onEnded {drag in
                                         if abs(drag.translation.height) < 20 && abs(drag.translation.width) > 20 {
                                             data.pushButton(buttonID: .Swipe, details: address.address_key)
                                         }
@@ -89,12 +89,12 @@ struct KeyManager: View {
                             }
                         }
                     }
-                }
+                }.padding(.bottom, -20)
                 Spacer()
                 if (content.multiselect_mode) {
                     MultiselectBottomControl(selectedCount: content.multiselect_count)
                 } else {
-                //SearchKeys(searchString: $searchString)
+                    //SearchKeys(searchString: $searchString)
                     EmptyView()
                 }
             }

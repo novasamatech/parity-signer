@@ -20,6 +20,7 @@ struct RecoverSeedPhrase: View {
     
     var body: some View {
         ZStack{
+            ScrollView {
             VStack {
                 //SeedNameCardOfSomeKind
                 Text(content.seed_name)
@@ -94,7 +95,8 @@ struct RecoverSeedPhrase: View {
                                 }
                             }
                         }
-                    }
+                    }.frame(height: 23)
+                    Spacer()
                     Text(data.lastError).foregroundColor(.red)
                     Button(action: {
                         createRoots.toggle()
@@ -119,6 +121,7 @@ struct RecoverSeedPhrase: View {
                         }
                     }
                 }.padding(.horizontal)
+            }
             }
         }
     }

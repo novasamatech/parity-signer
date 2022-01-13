@@ -96,7 +96,8 @@ struct TransactionPreview: View {
                         }
                     }
                 }
-                .padding(16)
+                .padding(.top, -10)
+                .padding(.horizontal, 16)
             }
         }
     }

@@ -16,6 +16,7 @@ struct NewSeedBackupModal: View {
         ZStack {
             RoundedRectangle(cornerRadius: 8).foregroundColor(Color("Bg200"))
             VStack {
+                HeaderBar(line1: "Backup Seed Phrase", line2: content.seed)
                 ZStack {
                     //RoundedRectangle(cornerRadius: 8).foregroundColor(Color("Crypto100")).frame(height: 200)
                     Text(content.seed_phrase)
@@ -45,6 +46,7 @@ struct NewSeedBackupModal: View {
                             Spacer()
                         }
                     }
+                    Spacer()
                     BigButton(
                         text: "Next",
                         action: {
@@ -52,9 +54,9 @@ struct NewSeedBackupModal: View {
                         },
                         isDisabled: !confirmBackup
                     )
-                        .padding(.top, 16.0)
+                        .padding(.vertical, 16.0)
                 }
-            }.padding(.horizontal, 16)
+            }.padding(16)
         }
     }
 }

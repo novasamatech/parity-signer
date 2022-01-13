@@ -28,7 +28,7 @@ struct HistoryScreen: View {
                 }
             }
             .padding(.horizontal, 8)
-        }
+        }.padding(.bottom, -20)
     }
 }
 

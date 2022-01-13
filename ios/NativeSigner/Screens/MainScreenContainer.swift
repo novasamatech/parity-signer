@@ -14,10 +14,10 @@ struct MainScreenContainer: View {
     var body: some View {
         if data.onboardingDone {
             if data.authenticated {
-            VStack {
+                VStack (spacing: 0) {
                 Header()
                 ZStack {
-                    VStack {
+                    VStack (spacing:0) {
                         ScreenSelector()
                         Spacer()
                     }
