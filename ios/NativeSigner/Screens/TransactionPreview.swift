@@ -43,6 +43,7 @@ struct TransactionPreview: View {
                         }
                         HStack {
                             Text("visible only on this device").font(FBase(style: .subtitle1))
+                                .padding(.bottom)
                             Spacer()
                         }
                     }
