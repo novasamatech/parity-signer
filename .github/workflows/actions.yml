@@ -22,10 +22,13 @@ jobs:
         run:            |
           brew tap wix/brew
           brew install applesimutils
-           gem install xcpretty
+          gem install xcpretty
       - name:           Rust build
         shell:          bash
         run:            cd scripts && ./build.sh ios && cd ..
-      - name:           Detox biuld
-        run:            xcodebuild -workspace ios/NativeSigner.xcodeproj/project.xcworkspace -scheme NativeSigner -configuration Debug -sdk iphonesimulator -derivedDataPath ios/build/NativeSigner -UseModernBuildSystem=YES | xcpretty -t && exit ${PIPESTATUS[0]}
-
+      - name:           Detox build
+        run: |
+          xcodebuild -workspace ios/NativeSigner.xcodeproj/project.xcworkspace \
+            -scheme NativeSigner -configuration Debug -sdk iphonesimulator \
+            -derivedDataPath ios/build/NativeSigner -UseModernBuildSystem=YES | \
+            xcpretty -t && exit ${PIPESTATUS[0]}
