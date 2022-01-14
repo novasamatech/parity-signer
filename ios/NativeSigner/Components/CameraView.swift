@@ -46,21 +46,19 @@ struct CameraView: View {
                     })
                     .mask(
                         VStack {
-                        ZStack {
-                            RoundedRectangle(cornerRadius: 8).padding(12)
-                        }
+                            ZStack {
+                                RoundedRectangle(cornerRadius: 8).padding(12)
+                            }
                             .frame(width:size, height: size)
                             Spacer()
                         }
                     )
-                //.clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
-                //.padding(.horizontal, 8)
                     .overlay(
                         VStack {
                             RoundedRectangle(cornerRadius: 8).stroke(Color("Crypto400")).padding(12).frame(width: size, height: size)
                             Spacer()
                         }
-                            )
+                    )
                 Spacer()
                 
                 if model.total ?? 0 > 0 {

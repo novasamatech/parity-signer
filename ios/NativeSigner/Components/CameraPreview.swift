@@ -24,12 +24,12 @@ struct CameraPreview: UIViewRepresentable {
     
     func makeUIView(context: Context) -> VideoPreviewView {
         let view = VideoPreviewView()
-        view.videoPreviewLayer.cornerRadius = 4
+        //view.videoPreviewLayer.cornerRadius = 4
         view.videoPreviewLayer.session = session
         view.videoPreviewLayer.connection?.videoOrientation = .portrait
-        view.videoPreviewLayer.borderColor = UIColor(Color("Crypto400")).cgColor
-        view.videoPreviewLayer.borderWidth = 1
-        view.videoPreviewLayer.bounds = CGRect(x: 0, y: 0, width: size, height: size)
+        //view.videoPreviewLayer.borderColor = UIColor(Color("Crypto400")).cgColor
+        //view.videoPreviewLayer.borderWidth = 1
+        //view.videoPreviewLayer.bounds = CGRect(x: 0, y: 0, width: size, height: size)
         
         return view
     }
