@@ -33,7 +33,9 @@ struct NewSeedScreen: View {
                     })
                     .onSubmit {
                         nameFocused = false
-                        data.pushButton(buttonID: .GoForward, details: seedName)
+                        if (seedName != "") && (!seedName.contains(",")) {
+                            data.pushButton(buttonID: .GoForward, details: seedName)
+                        }
                     }
                     .onAppear(perform: {nameFocused = content.keyboard})
                     .onDisappear {
@@ -54,7 +56,7 @@ struct NewSeedScreen: View {
                         data.lastError = "This seed name already exists"
                     }
                 },
-                isDisabled: seedName == ""
+                isDisabled: (seedName == "")  || (seedName.contains(","))
             )
             Spacer()
         }.padding()

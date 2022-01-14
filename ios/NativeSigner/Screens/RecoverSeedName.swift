@@ -32,7 +32,7 @@ struct RecoverSeedName: View {
                         data.lastError = ""
                     })
                     .onSubmit {
-                        if seedName != "" {
+                        if (seedName != "") && (!seedName.contains(",")) {
                             data.pushButton(buttonID: .GoForward, details: seedName)
                         }
                     }
@@ -54,7 +54,7 @@ struct RecoverSeedName: View {
                         data.lastError = "This seed name already exists"
                     }
                 },
-                isDisabled: seedName == ""
+                isDisabled: (seedName == "") || (seedName.contains(","))
             )
             Spacer()
         }.padding()
