@@ -9,58 +9,68 @@ import SwiftUI
 
 struct AddressCardControls: View {
     @EnvironmentObject var data: SignerDataModel
-    var address: Address
-    var rowHeight: CGFloat
+    var seed_name: String
+    var rowHeight: CGFloat = 39
     @State private var delete = false
+    @State private var count: CGFloat = 1
     var body: some View {
-        if data.getMultiSelectionMode() {
-            if data.multiSelected.contains(address) {
-                Image(systemName: "checkmark.circle.fill").foregroundColor(Color("AccentColor")).imageScale(.large)
-            } else {
-                Image(systemName: "circle").foregroundColor(Color("textFadedColor")).imageScale(.large)
-            }
-        } else {
-            if (data.selectedAddress == address) {
-                Button(action: {
-                    data.selectSeed(seedName: data.selectedAddress!.seed_name)
-                    data.proposeIncrement()
-                    data.createAddress(password: "")
-                }) {
-                    ZStack {
-                        RoundedRectangle(cornerRadius: 6).foregroundColor(Color("backgroundButtonSafe"))
-                        Text("N+1").foregroundColor(Color("cryptoColor")).font(.system(size: 12, design: .monospaced))
-                    }.frame(width: rowHeight, height: rowHeight)
+        HStack {
+            Spacer()
+            Button(action: {
+                let seed_phrase = data.getSeed(seedName: seed_name)
+                if seed_phrase != "" {
+                    data.pushButton(buttonID: .Increment, details: "1", seedPhrase: seed_phrase)
                 }
-                Button(action: {
-                    delete = true
-                }) {
-                    ZStack {
-                        RoundedRectangle(cornerRadius: 6).foregroundColor(Color("backgroundButtonDanger"))
-                        Image(systemName: "trash.slash").foregroundColor(Color("dangerColor"))
+            }) {
+                ZStack {
+                    RoundedRectangle(cornerRadius: 6).foregroundColor(Color("Crypto100"))
+                    Text("N+"+String(Int(count))).font(FCrypto(style: .body2)).foregroundColor(Color("Crypto400"))
+                }
+                .frame(width: rowHeight, height: rowHeight)
+                .gesture(DragGesture()
+                            .onChanged{drag in
+                    count = exp(abs(drag.translation.height)/50)
+                }
+                            .onEnded{_ in
+                    let seed_phrase = data.getSeed(seedName: seed_name)
+                    if seed_phrase != "" {
+                        data.pushButton(buttonID: .Increment, details: String(Int(count)), seedPhrase: seed_phrase)
                     }
-                    .frame(width: rowHeight, height: rowHeight)
-                    .alert(isPresented: $delete, content: {
-                        Alert(
-                            title: Text("Delete key?"),
-                            message: Text("You are about to delete key " + data.selectedAddress!.path),
-                            primaryButton: .cancel(),
-                            secondaryButton: .destructive(
-                                Text("Delete"),
-                                action: { data.deleteSelectedAddress()
-                                }
-                            )
-                        )
-                    })
+                })
+                .onAppear {
+                    count = 1
                 }
+            }
+            Button(action: {
+                delete = true
+            }) {
+                ZStack {
+                    RoundedRectangle(cornerRadius: 6).foregroundColor(Color("SignalDanger"))
+                    Image(systemName: "trash.slash").foregroundColor(Color("BgDanger"))
+                }
+                .frame(width: rowHeight, height: rowHeight)
+                .alert(isPresented: $delete, content: {
+                    Alert(
+                        title: Text("Delete key?"),
+                        message: Text("You are about to delete key"),
+                        primaryButton: .cancel(),
+                        secondaryButton: .destructive(
+                            Text("Delete"),
+                            action: { data.pushButton(buttonID: .RemoveKey)
+                            }
+                        )
+                    )
+                })
             }
         }
     }
 }
 
+
 /*
-struct AddressCardControls_Previews: PreviewProvider {
-    static var previews: some View {
-        AddressCardControls()
-    }
-}
-*/
+ struct AddressCardControls_Previews: PreviewProvider {
+ static var previews: some View {
+ AddressCardControls()
+ }
+ }
+ */

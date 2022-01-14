@@ -3,8 +3,9 @@ use blake2_rfc::blake2b::blake2b;
 use parity_scale_codec_derive::{Decode, Encode};
 use sp_core;
 use sp_runtime::MultiSigner;
-use crate::{crypto::Encryption, keyring::VerifierKey, metadata::MetaValues, network_specs::{ChainSpecs, ChainSpecsToSend, CurrentVerifier, Verifier, VerifierValue}, qr_transfers::{ContentLoadTypes}};
 use std::convert::TryInto;
+
+use crate::{crypto::Encryption, helpers::{pic_meta, pic_types}, keyring::VerifierKey, metadata::MetaValues, network_specs::{NetworkSpecs, NetworkSpecsToSend, ValidCurrentVerifier, Verifier, VerifierValue}, print::{export_complex_single, export_complex_vector}, qr_transfers::{ContentLoadTypes}};
 
 /// History log entry content for importing or removing metadata of a known network.
 /// Contains network name, network version, metadata hash, verifier.
@@ -24,7 +25,11 @@ impl MetaValuesDisplay {
         }
     }
     pub fn show(&self) -> String {
-        format!("\"specname\":\"{}\",\"spec_version\":\"{}\",\"meta_hash\":\"{}\"", &self.name, &self.version, hex::encode(&self.meta_hash))
+        let meta_id_pic = match pic_meta(&self.meta_hash) {
+            Ok(a) => hex::encode(a),
+            Err(_) => String::new(),
+        };
+        format!("\"specname\":\"{}\",\"spec_version\":\"{}\",\"meta_hash\":\"{}\",\"meta_id_pic\":\"{}\"", &self.name, &self.version, hex::encode(&self.meta_hash), meta_id_pic)
     }
 }
 
@@ -50,28 +55,32 @@ impl MetaValuesExport {
         }
     }
     pub fn show(&self) -> String {
-        format!("\"specname\":\"{}\",\"spec_version\":\"{}\",\"meta_hash\":\"{}\",\"signed_by\":{}", &self.name, &self.version, hex::encode(&self.meta_hash), &self.signed_by.show_card())
+        let meta_id_pic = match pic_meta(&self.meta_hash) {
+            Ok(a) => hex::encode(a),
+            Err(_) => String::new(),
+        };
+        format!("\"specname\":\"{}\",\"spec_version\":\"{}\",\"meta_hash\":\"{}\",\"meta_id_pic\":\"{}\",\"signed_by\":{}", &self.name, &self.version, hex::encode(&self.meta_hash), meta_id_pic, export_complex_single(&self.signed_by, |a| a.show_card()))
     }
 }
 
 /// History log entry content for importing or removing network specs and corresponding network verifier.
 #[derive(Decode, Encode, PartialEq, Clone)]
 pub struct NetworkSpecsDisplay {
-    specs: ChainSpecs,
-    current_verifier: CurrentVerifier,
+    specs: NetworkSpecs,
+    valid_current_verifier: ValidCurrentVerifier,
     general_verifier: Verifier,
 }
 
 impl NetworkSpecsDisplay {
-    pub fn get(specs: &ChainSpecs, current_verifier: &CurrentVerifier, general_verifier: &Verifier) -> Self {
+    pub fn get(specs: &NetworkSpecs, valid_current_verifier: &ValidCurrentVerifier, general_verifier: &Verifier) -> Self {
         Self {
             specs: specs.to_owned(),
-            current_verifier: current_verifier.to_owned(),
+            valid_current_verifier: valid_current_verifier.to_owned(),
             general_verifier: general_verifier.to_owned(),
         }
     }
     pub fn show(&self) -> String {
-        self.specs.show(&self.current_verifier, &self.general_verifier)
+        self.specs.show(&self.valid_current_verifier, &self.general_verifier)
     }
 }
 
@@ -80,19 +89,19 @@ impl NetworkSpecsDisplay {
 /// effectively records that network specs were signed by user.
 #[derive(Decode, Encode, PartialEq, Clone)]
 pub struct NetworkSpecsExport {
-    specs_to_send: ChainSpecsToSend,
+    specs_to_send: NetworkSpecsToSend,
     signed_by: VerifierValue,
 }
 
 impl NetworkSpecsExport {
-    pub fn get(specs_to_send: &ChainSpecsToSend, signed_by: &VerifierValue) -> Self {
+    pub fn get(specs_to_send: &NetworkSpecsToSend, signed_by: &VerifierValue) -> Self {
         Self {
             specs_to_send: specs_to_send.to_owned(),
             signed_by: signed_by.to_owned(),
         }
     }
     pub fn show(&self) -> String {
-        format!("{},\"signed_by\":{}", &self.specs_to_send.show(), &self.signed_by.show_card())
+        format!("{},\"signed_by\":{}", &self.specs_to_send.show(), export_complex_single(&self.signed_by, |a| a.show_card()))
     }
 }
 
@@ -100,20 +109,20 @@ impl NetworkSpecsExport {
 #[derive(Decode, Encode, PartialEq, Clone)]
 pub struct NetworkVerifierDisplay {
     genesis_hash: Vec<u8>,
-    current_verifier: CurrentVerifier,
+    valid_current_verifier: ValidCurrentVerifier,
     general_verifier: Verifier,
 }
 
 impl NetworkVerifierDisplay {
-    pub fn get(verifier_key: &VerifierKey, current_verifier: &CurrentVerifier, general_verifier: &Verifier) -> Self {
+    pub fn get(verifier_key: &VerifierKey, valid_current_verifier: &ValidCurrentVerifier, general_verifier: &Verifier) -> Self {
         Self {
             genesis_hash: verifier_key.genesis_hash(),
-            current_verifier: current_verifier.to_owned(),
+            valid_current_verifier: valid_current_verifier.to_owned(),
             general_verifier: general_verifier.to_owned(),
         }
     }
     pub fn show(&self) -> String {
-        format!("\"genesis_hash\":\"{}\",\"current_verifier\":{}", hex::encode(&self.genesis_hash), &self.current_verifier.show(&self.general_verifier))
+        format!("\"genesis_hash\":\"{}\",\"current_verifier\":{}", hex::encode(&self.genesis_hash), export_complex_single(&self.valid_current_verifier, |a| a.show(&self.general_verifier)))
     }
 }
 
@@ -132,7 +141,11 @@ impl TypesDisplay {
         }
     }
     pub fn show(&self) -> String {
-        format!("\"types_hash\":\"{}\",\"verifier\":{}", hex::encode(&self.types_hash), &self.verifier.show_card())
+        let types_id_pic = match pic_types(&self.types_hash) {
+            Ok(a) => hex::encode(a),
+            Err(_) => String::new(),
+        };
+        format!("\"types_hash\":\"{}\",\"types_id_pic\":\"{}\",\"verifier\":{}", hex::encode(&self.types_hash), types_id_pic, export_complex_single(&self.verifier, |a| a.show_card()))
     }
 }
 
@@ -153,7 +166,11 @@ impl TypesExport {
         }
     }
     pub fn show(&self) -> String {
-        format!("\"types_hash\":\"{}\",\"signed_by\":{}", hex::encode(&self.types_hash), &self.signed_by.show_card())
+        let types_id_pic = match pic_types(&self.types_hash) {
+            Ok(a) => hex::encode(a),
+            Err(_) => String::new(),
+        };
+        format!("\"types_hash\":\"{}\",\"types_id_pic\":\"{}\",\"signed_by\":{}", hex::encode(&self.types_hash), types_id_pic, export_complex_single(&self.signed_by, |a| a.show_card()))
     }
 }
 
@@ -210,11 +227,18 @@ impl SignDisplay {
         };
         (self.transaction.to_vec(), self.network_name.to_string(), encryption)
     }
-    pub fn success(&self) -> String {
-        format!("\"transaction\":\"{}\",\"network_name\":\"{}\",\"signed_by\":{},\"user_comment\":\"{}\"", hex::encode(&self.transaction), &self.network_name, &self.signed_by.show_card(), &self.user_comment)
+    pub fn transaction(&self) -> Vec<u8> {
+        self.transaction.to_vec()
     }
-    pub fn pwd_failure(&self) -> String {
-        format!("\"transaction\":\"{}\",\"network_name\":\"{}\",\"signed_by\":{},\"user_comment\":\"{}\",\"error\":\"wrong_password_entered\"", hex::encode(&self.transaction), &self.network_name, &self.signed_by.show_card(), &self.user_comment)
+    pub fn success<O>(&self, op: O) -> String 
+    where O: Fn(&Self) -> String + Copy,
+    {
+        format!("\"transaction\":{},\"network_name\":\"{}\",\"signed_by\":{},\"user_comment\":\"{}\"", op(&self), &self.network_name, export_complex_single(&self.signed_by, |a| a.show_card()), &self.user_comment)
+    }
+    pub fn pwd_failure<O>(&self, op: O) -> String 
+    where O: Fn(&Self) -> String + Copy,
+    {
+        format!("\"transaction\":{},\"network_name\":\"{}\",\"signed_by\":{},\"user_comment\":\"{}\",\"error\":\"wrong_password_entered\"", op(&self), &self.network_name, export_complex_single(&self.signed_by, |a| a.show_card()), &self.user_comment)
     }
 }
 
@@ -238,10 +262,10 @@ impl SignMessageDisplay {
         }
     }
     pub fn success(&self) -> String {
-        format!("\"message\":\"{}\",\"network_name\":\"{}\",\"signed_by\":{},\"user_comment\":\"{}\"", hex::encode(&self.message.as_bytes()), &self.network_name, &self.signed_by.show_card(), &self.user_comment)
+        format!("\"message\":\"{}\",\"network_name\":\"{}\",\"signed_by\":{},\"user_comment\":\"{}\"", hex::encode(&self.message.as_bytes()), &self.network_name, export_complex_single(&self.signed_by, |a| a.show_card()), &self.user_comment)
     }
     pub fn pwd_failure(&self) -> String {
-        format!("\"message\":\"{}\",\"network_name\":\"{}\",\"signed_by\":{},\"user_comment\":\"{}\",\"error\":\"wrong_password_entered\"", hex::encode(&self.message.as_bytes()), &self.network_name, &self.signed_by.show_card(), &self.user_comment)
+        format!("\"message\":\"{}\",\"network_name\":\"{}\",\"signed_by\":{},\"user_comment\":\"{}\",\"error\":\"wrong_password_entered\"", hex::encode(&self.message.as_bytes()), &self.network_name, export_complex_single(&self.signed_by, |a| a.show_card()), &self.user_comment)
     }
 }
 
@@ -269,6 +293,7 @@ pub enum Event {
     IdentitiesWiped,
     DeviceWasOnline,
     ResetDangerRecord,
+    SeedCreated(String),
     SeedNameWasShown(String), // for individual seed_name
     Warning(String), // TODO change to actual crate warning
     WrongPassword,
@@ -278,54 +303,55 @@ pub enum Event {
     DatabaseInitiated,
 }
 
-#[derive(Decode, Encode)]
+#[derive(Decode, Encode, Clone)]
 pub struct Entry {
     pub timestamp: String,
     pub events: Vec<Event>, // events already in showable form
 }
 
 impl Event {
-    pub fn show(&self) -> String {
+    pub fn show<O>(&self, op: O) -> String 
+    where O: Fn(&SignDisplay) -> String + Copy,
+    {
         match &self {
-            Event::MetadataAdded(x) => format!("{{\"event\":\"metadata_added\",\"payload\":{{{}}}}}", x.show()),
-            Event::MetadataRemoved(x) => format!("{{\"event\":\"metadata_removed\",\"payload\":{{{}}}}}", x.show()),
-            Event::MetadataSigned(x) => format!("{{\"event\":\"load_metadata_message_signed\",\"payload\":{{{}}}}}", x.show()),
-            Event::NetworkSpecsAdded(x) => format!("{{\"event\":\"network_specs_added\",\"payload\":{{{}}}}}", x.show()),
-            Event::NetworkSpecsRemoved(x) => format!("{{\"event\":\"network_removed\",\"payload\":{{{}}}}}", x.show()),
-            Event::NetworkSpecsSigned(x) => format!("{{\"event\":\"add_specs_message_signed\",\"payload\":{{{}}}}}", x.show()),
-            Event::NetworkVerifierSet(x) => format!("{{\"event\":\"network_verifier_set\",\"payload\":{{{}}}}}", x.show()),
-            Event::GeneralVerifierSet(x) => format!("{{\"event\":\"general_verifier_added\",\"payload\":{}}}", x.show_card()),
-            Event::TypesAdded(x) => format!("{{\"event\":\"types_added\",\"payload\":{{{}}}}}", x.show()),
-            Event::TypesRemoved(x) => format!("{{\"event\":\"types_removed\",\"payload\":{{{}}}}}", x.show()),
-            Event::TypesSigned(x) => format!("{{\"event\":\"load_types_message_signed\",\"payload\":{{{}}}}}", x.show()),
-            Event::TransactionSigned(x) => format!("{{\"event\":\"transaction_signed\",\"payload\":{{{}}}}}", x.success()),
-            Event::TransactionSignError(x) => format!("{{\"event\":\"transaction_sign_error\",\"payload\":{{{}}}}}", x.pwd_failure()),
-            Event::MessageSigned(x) => format!("{{\"event\":\"message_signed\",\"payload\":{{{}}}}}", x.success()),
-            Event::MessageSignError(x) => format!("{{\"event\":\"message_sign_error\",\"payload\":{{{}}}}}", x.pwd_failure()),
-            Event::IdentityAdded(x) => format!("{{\"event\":\"identity_added\",\"payload\":{{{}}}}}", x.show()),
-            Event::IdentityRemoved(x) => format!("{{\"event\":\"identity_removed\",\"payload\":{{{}}}}}", x.show()),
-            Event::IdentitiesWiped => String::from("{\"event\":\"identities_wiped\"}"),
-            Event::DeviceWasOnline => String::from("{\"event\":\"device_online\"}"),
-            Event::ResetDangerRecord => String::from("{\"event\":\"reset_danger_record\"}"),
-            Event::SeedNameWasShown(seed_name) => format!("{{\"event\":\"seed_name_shown\",\"payload\":\"{}\"}}", seed_name),
-            Event::Warning(x) => format!("{{\"event\":\"warning\",\"payload\":\"{}\"}}", x),
-            Event::WrongPassword => String::from("{\"event\":\"wrong_password_entered\"}"),
-            Event::UserEntry(x) => format!("{{\"event\":\"user_entered_event\",\"payload\":\"{}\"}}", x),
-            Event::SystemEntry(x) => format!("{{\"event\":\"system_entered_event\",\"payload\":\"{}\"}}", x),
-            Event::HistoryCleared => String::from("{\"event\":\"history_cleared\"}"),
-            Event::DatabaseInitiated => String::from("{\"event\":\"database_initiated\"}"),
+            Event::MetadataAdded(x) => format!("\"event\":\"metadata_added\",\"payload\":{}", export_complex_single(x, |a| a.show())),
+            Event::MetadataRemoved(x) => format!("\"event\":\"metadata_removed\",\"payload\":{}", export_complex_single(x, |a| a.show())),
+            Event::MetadataSigned(x) => format!("\"event\":\"load_metadata_message_signed\",\"payload\":{}", export_complex_single(x, |a| a.show())),
+            Event::NetworkSpecsAdded(x) => format!("\"event\":\"network_specs_added\",\"payload\":{}", export_complex_single(x, |a| a.show())),
+            Event::NetworkSpecsRemoved(x) => format!("\"event\":\"network_removed\",\"payload\":{}", export_complex_single(x, |a| a.show())),
+            Event::NetworkSpecsSigned(x) => format!("\"event\":\"add_specs_message_signed\",\"payload\":{}", export_complex_single(x, |a| a.show())),
+            Event::NetworkVerifierSet(x) => format!("\"event\":\"network_verifier_set\",\"payload\":{}", export_complex_single(x, |a| a.show())),
+            Event::GeneralVerifierSet(x) => format!("\"event\":\"general_verifier_added\",\"payload\":{}", export_complex_single(x, |a| a.show_card())),
+            Event::TypesAdded(x) => format!("\"event\":\"types_added\",\"payload\":{}", export_complex_single(x, |a| a.show())),
+            Event::TypesRemoved(x) => format!("\"event\":\"types_removed\",\"payload\":{}", export_complex_single(x, |a| a.show())),
+            Event::TypesSigned(x) => format!("\"event\":\"load_types_message_signed\",\"payload\":{}", export_complex_single(x, |a| a.show())),
+            Event::TransactionSigned(x) => format!("\"event\":\"transaction_signed\",\"payload\":{}", export_complex_single(x, |a| a.success(|b| op(b)))),
+            Event::TransactionSignError(x) => format!("\"event\":\"transaction_sign_error\",\"payload\":{}", export_complex_single(x, |a| a.pwd_failure(|b| op(b)))),
+            Event::MessageSigned(x) => format!("\"event\":\"message_signed\",\"payload\":{}", export_complex_single(x, |a| a.success())),
+            Event::MessageSignError(x) => format!("\"event\":\"message_sign_error\",\"payload\":{}", export_complex_single(x, |a| a.pwd_failure())),
+            Event::IdentityAdded(x) => format!("\"event\":\"identity_added\",\"payload\":{}", export_complex_single(x, |a| a.show())),
+            Event::IdentityRemoved(x) => format!("\"event\":\"identity_removed\",\"payload\":{}", export_complex_single(x, |a| a.show())),
+            Event::IdentitiesWiped => String::from("\"event\":\"identities_wiped\""),
+            Event::DeviceWasOnline => String::from("\"event\":\"device_online\""),
+            Event::ResetDangerRecord => String::from("\"event\":\"reset_danger_record\""),
+            Event::SeedCreated(x) => format!("\"event\":\"seed_created\",\"payload\":\"{}\"", x),
+            Event::SeedNameWasShown(seed_name) => format!("\"event\":\"seed_name_shown\",\"payload\":\"{}\"", seed_name),
+            Event::Warning(x) => format!("\"event\":\"warning\",\"payload\":\"{}\"", x),
+            Event::WrongPassword => String::from("\"event\":\"wrong_password_entered\""),
+            Event::UserEntry(x) => format!("\"event\":\"user_entered_event\",\"payload\":\"{}\"", x),
+            Event::SystemEntry(x) => format!("\"event\":\"system_entered_event\",\"payload\":\"{}\"", x),
+            Event::HistoryCleared => String::from("\"event\":\"history_cleared\""),
+            Event::DatabaseInitiated => String::from("\"event\":\"database_initiated\""),
         }
     }
 }
 
 impl Entry {
-    pub fn show(&self) -> String {
-        let mut events_chain = String::new();
-        for (i,x) in self.events.iter().enumerate() {
-            if i>0 {events_chain.push_str(",")}
-            events_chain.push_str(&x.show());
-        }
-        format!("\"timestamp\":\"{}\",\"events\":[{}]", self.timestamp, events_chain)
+    pub fn show<O>(&self, op: O) -> String 
+    where O: Fn(&SignDisplay) -> String + Copy,
+    {
+        let events_chain = export_complex_vector(&self.events, |a| a.show(|b| op(b)));
+        format!("\"timestamp\":\"{}\",\"events\":{}", self.timestamp, events_chain)
     }
 }
 
@@ -339,8 +365,8 @@ pub fn all_events_preview() -> Vec<Event> {
     let public = [142, 175, 4, 21, 22, 135, 115, 99, 38, 201, 254, 161, 126, 37, 252, 82, 135, 97, 54, 147, 201, 18, 144, 156, 178, 38, 170, 71, 148, 242, 106, 72];
     let verifier_value = VerifierValue::Standard(MultiSigner::Sr25519(sp_core::sr25519::Public::from_raw(public)));
     let verifier = Verifier(Some(verifier_value.clone()));
-    let current_verifier = CurrentVerifier::General;
-    let network_specs = ChainSpecs {
+    let valid_current_verifier = ValidCurrentVerifier::General;
+    let network_specs = NetworkSpecs {
         base58prefix: 42,
         color: String::from("#660D35"),
         decimals: 12,
@@ -354,27 +380,14 @@ pub fn all_events_preview() -> Vec<Event> {
         title: String::from("Westend"),
         unit: String::from("WND"),
     };
-    let network_specs_to_send = ChainSpecsToSend {
-        base58prefix: 42,
-        color: String::from("#660D35"),
-        decimals: 12,
-        encryption: Encryption::Sr25519,
-        genesis_hash: hex::decode("e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e").expect("known value").try_into().expect("known value"),
-        logo: String::from("westend"),
-        name: String::from("westend"),
-        path_id: String::from("//westend"),
-        secondary_color: String::from("#262626"),
-        title: String::from("Westend"),
-        unit: String::from("WND"),
-    };
     
     events.push(Event::MetadataAdded(MetaValuesDisplay::get(&meta_values)));
     events.push(Event::MetadataRemoved(MetaValuesDisplay::get(&meta_values)));
     events.push(Event::MetadataSigned(MetaValuesExport::get(&meta_values, &verifier_value)));
-    events.push(Event::NetworkSpecsAdded(NetworkSpecsDisplay::get(&network_specs, &current_verifier, &verifier)));
-    events.push(Event::NetworkSpecsRemoved(NetworkSpecsDisplay::get(&network_specs, &current_verifier, &verifier)));
-    events.push(Event::NetworkSpecsSigned(NetworkSpecsExport::get(&network_specs_to_send, &verifier_value)));
-    events.push(Event::NetworkVerifierSet(NetworkVerifierDisplay::get(&VerifierKey::from_parts(&network_specs.genesis_hash.to_vec()), &current_verifier, &verifier)));
+    events.push(Event::NetworkSpecsAdded(NetworkSpecsDisplay::get(&network_specs, &valid_current_verifier, &verifier)));
+    events.push(Event::NetworkSpecsRemoved(NetworkSpecsDisplay::get(&network_specs, &valid_current_verifier, &verifier)));
+    events.push(Event::NetworkSpecsSigned(NetworkSpecsExport::get(&network_specs.to_send(), &verifier_value)));
+    events.push(Event::NetworkVerifierSet(NetworkVerifierDisplay::get(&VerifierKey::from_parts(&network_specs.genesis_hash.to_vec()), &valid_current_verifier, &verifier)));
     events.push(Event::GeneralVerifierSet(verifier.to_owned()));
     events.push(Event::TypesAdded(TypesDisplay::get(&ContentLoadTypes::from_vec(&Vec::new()), &verifier)));
     events.push(Event::TypesRemoved(TypesDisplay::get(&ContentLoadTypes::from_vec(&Vec::new()), &verifier)));
@@ -388,6 +401,7 @@ pub fn all_events_preview() -> Vec<Event> {
     events.push(Event::IdentitiesWiped);
     events.push(Event::DeviceWasOnline);
     events.push(Event::ResetDangerRecord);
+    events.push(Event::SeedCreated(String::from("Alice")));
     events.push(Event::SeedNameWasShown(String::from("AliceSecretSeed")));
     events.push(Event::Warning(String::from("Received network information is not verified.")));
     events.push(Event::WrongPassword);
@@ -397,4 +411,13 @@ pub fn all_events_preview() -> Vec<Event> {
     events.push(Event::DatabaseInitiated);
     
     events
+}
+
+pub fn print_all_events() -> String {
+    let events = all_events_preview();
+    let entry = Entry {
+        timestamp: String::from("2019-12-15 12:00:0.00000000 UTC"),
+        events,
+    };
+    format!("{{\"order\":0,{}}}", entry.show(|a| format!("\"{}\"", hex::encode(a.transaction()))))
 }

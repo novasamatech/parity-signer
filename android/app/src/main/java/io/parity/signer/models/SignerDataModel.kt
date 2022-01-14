@@ -5,7 +5,6 @@ import android.content.Context
 import android.content.SharedPreferences
 import android.content.pm.PackageManager
 import android.util.Log
-import androidx.compose.ui.graphics.ImageBitmap
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -38,6 +37,8 @@ class SignerDataModel : ViewModel() {
 	private val _onBoardingDone = MutableLiveData(OnBoardingState.InProgress)
 
 	//TODO: something about this
+	// It leaks context objects,
+	// but is really quite convenient in composable things
 	lateinit var context: Context
 	lateinit var activity: FragmentActivity
 	private lateinit var masterKey: MasterKey
@@ -45,7 +46,7 @@ class SignerDataModel : ViewModel() {
 	private var _generalCertificate = MutableLiveData(JSONObject())
 
 	//Alert
-	private val _alert = MutableLiveData(SignerAlert.None)
+	private val _alertState = MutableLiveData(ShieldAlert.None)
 
 	//Authenticator to call!
 	internal var authentication: Authentication = Authentication()
@@ -67,34 +68,28 @@ class SignerDataModel : ViewModel() {
 	//Internal storage for model data:
 	//TODO: hard types for these
 
-	//Keys
-	internal val _identities = MutableLiveData(JSONArray())
-	internal val _selectedIdentity = MutableLiveData(JSONObject())
-
-	//Networks
-	internal val _networks = MutableLiveData(JSONArray())
-	internal val _selectedNetwork = MutableLiveData(JSONObject())
-
 	//Seeds
 	internal val _seedNames = MutableLiveData(arrayOf<String>())
-	internal val _selectedSeed = MutableLiveData("")
 
 	//TODO: keeping super secret seeds in questionably managed observable must be studied critically
 	internal val _backupSeedPhrase = MutableLiveData("")
-
-	//History
-	private val _history = MutableLiveData(JSONArray())
 
 	//Error
 	internal val _lastError = MutableLiveData("")
 
 	//Navigator
-	internal val _signerScreen = MutableLiveData(SignerScreen.Log)
-
-	//States of important modals
-	internal val _keyManagerModal = MutableLiveData(KeyManagerModal.None)
-	internal val _settingsModal = MutableLiveData(SettingsModal.None)
-	internal val _transactionState = MutableLiveData(TransactionState.None)
+	internal val _screen = MutableLiveData(SignerScreen.Log)
+	internal val _screenLabel = MutableLiveData("")
+	internal val _back = MutableLiveData(false)
+	internal val _footerButton = MutableLiveData("")
+	internal val _footer = MutableLiveData(false)
+	internal val _rightButton = MutableLiveData("None")
+	internal val _screenNameType = MutableLiveData("h4")
+	internal val _modal = MutableLiveData(SignerModal.Empty)
+	internal val _alert = MutableLiveData(SignerAlert.Empty)
+	internal var _screenData = MutableLiveData(JSONObject())
+	internal var _modalData = MutableLiveData(JSONObject())
+	internal var _alertData = MutableLiveData(JSONObject())
 
 	//Data storage locations
 	internal var dbName: String = ""
@@ -109,30 +104,28 @@ class SignerDataModel : ViewModel() {
 	val transaction: LiveData<JSONArray> = _transaction
 	val actionable: LiveData<Boolean> = _actionable
 
-	val identities: LiveData<JSONArray> = _identities
-	val selectedIdentity: LiveData<JSONObject> = _selectedIdentity
-
-	val networks: LiveData<JSONArray> = _networks
-	val selectedNetwork: LiveData<JSONObject> = _selectedNetwork
-
 	val seedNames: LiveData<Array<String>> = _seedNames
-	val selectedSeed: LiveData<String> = _selectedSeed
-	val backupSeedPhrase: LiveData<String> = _backupSeedPhrase
-
-	val history: LiveData<JSONArray> = _history
-
-	var generalCertificate: LiveData<JSONObject> = _generalCertificate
 
 	val lastError: LiveData<String> = _lastError
 
 	//Observables for screens state
 
 	val onBoardingDone: LiveData<OnBoardingState> = _onBoardingDone
-	val signerScreen: LiveData<SignerScreen> = _signerScreen
-	val keyManagerModal: LiveData<KeyManagerModal> = _keyManagerModal
-	val settingsModal: LiveData<SettingsModal> = _settingsModal
-	val transactionState: LiveData<TransactionState> = _transactionState
+
+	val alertState: LiveData<ShieldAlert> = _alertState
+
+	val screen: LiveData<SignerScreen> = _screen
+	val modal: LiveData<SignerModal> = _modal
 	val alert: LiveData<SignerAlert> = _alert
+	val screenLabel: LiveData<String> = _screenLabel
+	val back: LiveData<Boolean> = _back
+	val footer: LiveData<Boolean> = _footer
+	val footerButton: LiveData<String> = _footerButton
+	val rightButton: LiveData<String> = _rightButton
+	val screenNameType: LiveData<String> = _screenNameType
+	val screenData: LiveData<JSONObject> = _screenData
+	val modalData: LiveData<JSONObject> = _modalData
+	val alertData: LiveData<JSONObject> = _alertData
 
 	//MARK: init boilerplate begin
 
@@ -152,18 +145,12 @@ class SignerDataModel : ViewModel() {
 		dbName = context.applicationContext.filesDir.toString() + "/Database"
 		authentication.context = context
 		hasStrongbox = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
-			Log.d("checking strongbox", "blip")
-			Log.d(
-				"checking strongbox",
-				context.packageManager.hasSystemFeature(PackageManager.FEATURE_STRONGBOX_KEYSTORE)
-					.toString()
-			)
 			context.packageManager.hasSystemFeature(PackageManager.FEATURE_STRONGBOX_KEYSTORE)
 		} else {
 			false
 		}
 
-		Log.d("strongbox available", hasStrongbox.toString())
+		Log.d("strongbox available:", hasStrongbox.toString())
 
 		//Airplane mode detector
 		isAirplaneOn()
@@ -289,25 +276,14 @@ class SignerDataModel : ViewModel() {
 				0
 			) == 0
 		) {
-			if (alert.value != SignerAlert.Active) {
-				_alert.value = SignerAlert.Active
+			if (alertState.value != ShieldAlert.Active) {
+				_alertState.value = ShieldAlert.Active
 				historyDeviceWasOnline(dbName)
 			}
 		} else {
-			if (alert.value == SignerAlert.Active) {
-				_alert.value = SignerAlert.Past
+			if (alertState.value == ShieldAlert.Active) {
+				_alertState.value = ShieldAlert.Past
 			}
-		}
-	}
-
-	/**
-	 * Gets general verifier value from db
-	 */
-	internal fun getGeneralVerifier() {
-		try {
-			_generalCertificate.value = JSONObject(dbGetGeneralVerifier(dbName))
-		} catch (e: java.lang.Exception) {
-			Log.e("General verifier fetch error", e.toString())
 		}
 	}
 
@@ -324,14 +300,6 @@ class SignerDataModel : ViewModel() {
 	fun refreshGUI() {
 		_backupSeedPhrase.value = ""
 		clearError()
-		_transactionState.value = TransactionState.None
-		_settingsModal.value = SettingsModal.None
-		if (seedNames.value?.isEmpty() as Boolean) {
-			_keyManagerModal.value =
-				KeyManagerModal.NewSeed
-			_signerScreen.value = SignerScreen.Keys
-		} else _keyManagerModal.value =
-			KeyManagerModal.SeedSelector
 	}
 
 	/**
@@ -344,31 +312,9 @@ class SignerDataModel : ViewModel() {
 		if (checkRefresh) _onBoardingDone.value =
 			OnBoardingState.Yes else _onBoardingDone.value = OnBoardingState.No
 		if (checkRefresh) {
-			refreshNetworks()
-			_selectedNetwork.value = networks.value?.optJSONObject(0)
-				?: JSONObject()
+			initNavigation(dbName, seedNames.value?.joinToString(",")?:"")
+			pushButton(ButtonID.Start)
 			refreshSeedNames()
-			fetchKeys()
-			refreshHistory()
-			refreshGUI()
-			getGeneralVerifier()
-			clearTransaction()
-		}
-	}
-
-	/**
-	 * Get history from db; should bhe run on log screen appearance
-	 */
-	internal fun refreshHistory() {
-		try {
-			_history.value = sortHistory(JSONArray(historyPrintHistory(dbName)))
-			_alert.value = if (historyGetWarnings(dbName)) {
-				SignerAlert.Past
-			} else {
-				SignerAlert.None
-			}
-		} catch (e: java.lang.Exception) {
-			Log.e("History refresh error!", e.toString())
 		}
 	}
 
@@ -378,31 +324,6 @@ class SignerDataModel : ViewModel() {
 	 */
 	fun clearError() {
 		_lastError.value = ""
-	}
-
-	/**
-	 * Generate identicon from some form of address:
-	 * this is only a wrapper and converter to png.
-	 * This should not fail!
-	 */
-	fun getIdenticon(key: String, size: Int): ImageBitmap {
-		return try {
-			substrateBase58Identicon(key, size).intoImageBitmap()
-		} catch (e: java.lang.Exception) {
-			Log.d("Identicon did not render", e.toString())
-			ImageBitmap(size, size)
-		}
-		//TODO
-	}
-
-	fun getHexIdenticon(value: String, size: Int): ImageBitmap {
-		return try {
-			substrateIdenticon(value, size).intoImageBitmap()
-		} catch (e: java.lang.Exception) {
-			Log.d("Identicon did not render", e.toString())
-			ImageBitmap(size, size)
-		}
-		//TODO
 	}
 
 	fun isStrongBoxProtected(): Boolean {
@@ -420,11 +341,18 @@ class SignerDataModel : ViewModel() {
 
 	//MARK: rust native section begin
 
-	external fun substrateExportPubkey(
-		address: String,
-		network: String,
-		dbname: String
+	external fun backendAction(
+		action: String,
+		details: String,
+		seedPhrase: String
 	): String
+
+	external fun initNavigation(
+		dbname: String,
+		seedNames: String
+	);
+
+	external fun updateSeedNames(seedNames: String);
 
 	external fun qrparserGetPacketsTotal(data: String, cleaned: Boolean): Int
 	external fun qrparserTryDecodeQrSequence(
@@ -432,112 +360,22 @@ class SignerDataModel : ViewModel() {
 		cleaned: Boolean
 	): String
 
-	external fun substrateParseTransaction(
-		transaction: String,
-		dbname: String
-	): String
-
-	external fun substrateHandleStub(checksum: String, dbname: String)
-
-	external fun substrateHandleSign(
-		checksum: String,
-		seedPhrase: String,
-		password: String,
-		userComment: String,
-		dbname: String
-	): String
-
-	external fun substrateBase58Identicon(base58: String, size: Int): String
-	external fun substrateIdenticon(key: String, size: Int): String
-	external fun dbGetNetwork(genesisHash: String, dbname: String): String
-	external fun dbGetAllNetworksForNetworkSelector(dbname: String): String
-	external fun dbGetRelevantIdentities(
-		seedName: String,
-		genesisHash: String,
-		dbname: String
-	): String
-
-	external fun dbGetAllIdentities(dbname: String): String
-	external fun substrateTryCreateSeed(
-		seedName: String,
-		seedPhrase: String,
-		seedLength: Int,
-		dbname: String
-	): String
-
-	external fun substrateSuggestNPlusOne(
-		path: String,
-		seedName: String,
-		networkIdString: String,
-		dbname: String
-	): String
+	external fun substrateGuessWord(part: String): String
 
 	external fun substrateCheckPath(path: String): Boolean
-	external fun substrateTryCreateIdentity(
-		seedName: String,
-		seedPhrase: String,
-		crypto: String,
-		path: String,
-		network: String,
-		hasPassword: Boolean,
-		dbname: String
-	)
 
-	external fun substrateDeleteIdentity(
-		pubKey: String,
-		network: String,
-		dbname: String
-	)
+	external fun substrateValidateSeedphrase(seed_phrase: String)
 
-	external fun substrateGetNetworkSpecs(network: String, dbname: String): String
-	external fun substrateRemoveNetwork(network: String, dbname: String)
-	external fun substrateRemoveMetadata(
-		networkName: String,
-		networkVersion: Int,
-		dbname: String
-	)
-
-	external fun substrateRemoveSeed(seedName: String, dbname: String)
-	external fun historyPrintHistory(dbname: String): String
-	external fun historyClearHistory(dbname: String)
 	external fun historyInitHistoryWithCert(dbname: String)
 	external fun historyInitHistoryNoCert(dbname: String)
 	external fun historyDeviceWasOnline(dbname: String)
 	external fun historyGetWarnings(dbname: String): Boolean
 	external fun historyAcknowledgeWarnings(dbname: String)
-	external fun historyEntryUser(entry: String, dbname: String)
 	external fun historyEntrySystem(entry: String, dbname: String)
 	external fun historyHistorySeedNameWasShown(seedName: String, dbname: String)
-	external fun dbGetGeneralVerifier(dbname: String): String
-	external fun signerSignTypes(
-		publicKey: String,
-		encryption: String,
-		seedPhrase: String,
-		password: String,
-		dbname: String
-	): String
 
-	external fun signerSignMetadata(
-		network: String,
-		version: Int,
-		publicKey: String,
-		encryption: String,
-		seedPhrase: String,
-		password: String,
-		dbname: String
-	): String
-
-	external fun signerSignSpecs(
-		network: String,
-		publicKey: String,
-		encryption: String,
-		seedPhrase: String,
-		password: String,
-		dbname: String
-	): String
-
-	external fun testGetAllTXCards(dbname: String): String
-	external fun testGetAllLogCards(dbname: String): String
+	//external fun testGetAllTXCards(dbname: String): String
+	//external fun testGetAllLogCards(dbname: String): String
 
 	//MARK: rust native section end
 

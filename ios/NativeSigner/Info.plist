@@ -20,6 +20,8 @@
 	<string>$(MARKETING_VERSION)</string>
 	<key>CFBundleVersion</key>
 	<string>$(CURRENT_PROJECT_VERSION)</string>
+	<key>LSApplicationCategoryType</key>
+	<string></string>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
 	<key>NSCameraUsageDescription</key>
@@ -29,6 +31,12 @@
 	<key>UIAppFonts</key>
 	<array>
 		<string>Web3-Regular.otf</string>
+		<string>Inter-Bold.otf</string>
+		<string>Inter-Medium.otf</string>
+		<string>Inter-Regular.otf</string>
+		<string>Inter-SemiBold.otf</string>
+		<string>RobotoMono-Medium.otf</string>
+		<string>RobotoMono-Light.otf</string>
 	</array>
 	<key>UIApplicationSceneManifest</key>
 	<dict>

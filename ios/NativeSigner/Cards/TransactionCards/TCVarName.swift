@@ -10,12 +10,7 @@ import SwiftUI
 struct TCVarName: View {
     var text: String
     var body: some View {
-        HStack {
-            Text(text)
-                .foregroundColor(Color("AccentColor"))
-            Spacer()
-        }
-        .background(/*@START_MENU_TOKEN@*//*@PLACEHOLDER=View@*/Color("backgroundCard")/*@END_MENU_TOKEN@*/)
+        TCNameValueTemplate(name: "", value: text)
     }
 }
 

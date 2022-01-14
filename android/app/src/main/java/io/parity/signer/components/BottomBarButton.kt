@@ -15,9 +15,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
+import io.parity.signer.ButtonID
 import io.parity.signer.SignerScreen
 import io.parity.signer.models.SignerDataModel
-import io.parity.signer.models.navigate
+import io.parity.signer.models.pushButton
 import io.parity.signer.ui.theme.Text300
 import io.parity.signer.ui.theme.Text400
 import io.parity.signer.ui.theme.Text600
@@ -29,9 +30,9 @@ import io.parity.signer.ui.theme.Text600
 fun BottomBarButton(
 	signerDataModel: SignerDataModel,
 	image: ImageVector,
-	screen: SignerScreen
+	buttonID: ButtonID
 ) {
-	val selected = signerDataModel.signerScreen.observeAsState().value == screen
+	val selected = signerDataModel.footerButton.observeAsState().value == buttonID.getName()
 	val tint = if (selected) {
 		Text600
 	} else {
@@ -45,17 +46,18 @@ fun BottomBarButton(
 	IconButton(
 		onClick = {
 			signerDataModel.totalRefresh()
-			signerDataModel.navigate(screen)
+			signerDataModel.pushButton(buttonID)
+			//signerDataModel.navigate(buttonID.getName())
 		},
-		modifier = Modifier.width(100.dp)
+		modifier = Modifier.width(66.dp)
 	) {
 		Column(
 			horizontalAlignment = Alignment.CenterHorizontally,
-			modifier = Modifier.width(100.dp)
+			modifier = Modifier.width(66.dp)
 		) {
-			Icon(image, contentDescription = screen.name, tint = tint)
+			Icon(image, contentDescription = buttonID.getName(), tint = tint)
 			Text(
-				screen.name,
+				buttonID.getName(),
 				color = color,
 				style = MaterialTheme.typography.subtitle2
 			)

@@ -9,35 +9,26 @@ import SwiftUI
 
 struct HistoryScreen: View {
     @EnvironmentObject var data: SignerDataModel
+    var content: MLog
     var body: some View {
-        if (data.selectedRecord == nil) {
-            ScrollView {
-                LazyVStack {
-                    ForEach(data.history, id: \.order) {history in
-                        VStack (alignment: .leading){
-                            ForEach(history.events, id: \.self) {event in
-                                Button(action: {
-                                    data.selectedRecord = history
-                                }) {
-                                    HistoryCard(event: event, timestamp: history.timestamp.padding(toLength: 16, withPad: " ", startingAt: 0))
-                                        .foregroundColor(/*@START_MENU_TOKEN@*/Color("textMainColor")/*@END_MENU_TOKEN@*/)
-                                        .padding(.horizontal, 8)
-                                }
-                            }
-                        }
+        ScrollView {
+            LazyVStack (spacing: 8) {
+                ForEach(content.log.sorted(by: {$0.order > $1.order}), id: \.order) { history in
+                    ForEach(history.events, id: \.self) { event in
+                        Button(action: {
+                            data.pushButton(buttonID: .ShowLogDetails, details: String(history.order))
+                        }) {
+                            HistoryCard(
+                                event: event,
+                                timestamp: history.timestamp.padding(toLength: 16, withPad: " ", startingAt: 0)
+                            )
+                            .foregroundColor(Color("Text400"))
+                        }//.disabled(true)
                     }
                 }
             }
-            .onAppear {
-                data.getHistory()
-            }
-        } else {
-            //TODO
-            ZStack {
-                RoundedRectangle(cornerRadius: 50).foregroundColor(/*@START_MENU_TOKEN@*/Color("backgroundCard")/*@END_MENU_TOKEN@*/)
-                EventDetails()
-            }
-        }
+            .padding(.horizontal, 8)
+        }.padding(.bottom, -20)
     }
 }
 

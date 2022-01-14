@@ -5,8 +5,7 @@ use std::convert::TryInto;
 use std::fs;
 use regex::Regex;
 use lazy_static::lazy_static;
-use definitions::{crypto::Encryption, keyring::VerifierKey, metadata::{AddressBookEntry, MetaValues}, network_specs::{ChainSpecs, ChainSpecsToSend, CurrentVerifier, Verifier, VerifierValue}, qr_transfers::ContentLoadTypes, types::{TypeEntry, Description, EnumVariant, EnumVariantType, StructField}};
-use meta_reading::decode_metadata::decode_version;
+use definitions::{crypto::Encryption, error::{DefaultLoading, ErrorActive, IncomingMetadataSourceActive}, keyring::VerifierKey, metadata::{AddressBookEntry, MetaValues}, network_specs::{NetworkSpecs, NetworkSpecsToSend, CurrentVerifier, ValidCurrentVerifier, Verifier, VerifierValue}, qr_transfers::ContentLoadTypes, types::{TypeEntry, Description, EnumVariant, EnumVariantType, StructField}};
 
 pub const DEFAULT_VERIFIER_PUBLIC: [u8;32] = [
     0xc4,
@@ -96,26 +95,6 @@ fn get_default_network_info() -> Vec<DefaultNetworkInfo> {
             unit: String::from("DOT"),
         },
         DefaultNetworkInfo {
-            address: String::from("wss://rococo-rpc.polkadot.io"),
-            base58prefix: 42,
-            color: String::from("#6f36dc"),
-            decimals: 12,
-            encryption: Encryption::Sr25519,
-            genesis_hash: hex::decode("c196f81260cf1686172b47a79cf002120735d7cb0eb1474e8adce56618456fff").expect("known value").try_into().expect("known value"),
-            // previous value: "f6e9983c37baf68846fedafe21e56718790e39fb1c582abc408b81bc7b208f9a" changed 2021-11-02
-            // previous value: "5fce687da39305dfe682b117f0820b319348e8bb37eb16cf34acbf6a202de9d9" changed 2021-09-30
-            // previous value: "853faffbfc6713c1f899bf16547fcfbf733ae8361b8ca0129699d01d4f2181fd" changed 2021-09-24
-            // previous value: "f9ab3847dec02d434b38c057756d0cb19e5ec5c307419634938c397b1346eb41" changed 2021-09-16
-            // previous value: "e7c3d5edde7db964317cd9b51a3a059d7cd99f81bdbce14990047354334c9779" changed 2021-09-06
-            logo: String::from("rococo"),
-            name: String::from("rococo"),
-            order: 3,
-            path_id: String::from("//rococo"),
-            secondary_color: String::from("#262626"),
-            title: String::from("Rococo"),
-            unit: String::from("ROC"),
-        },
-        DefaultNetworkInfo {
             address: String::from("wss://westend-rpc.polkadot.io"),
             base58prefix: 42,
             color: String::from("#660D35"),
@@ -133,10 +112,10 @@ fn get_default_network_info() -> Vec<DefaultNetworkInfo> {
     ]
 }
 
-pub fn get_default_chainspecs() -> Vec<ChainSpecs> {
-    let mut out: Vec<ChainSpecs> = Vec::new();
+pub fn get_default_chainspecs() -> Vec<NetworkSpecs> {
+    let mut out: Vec<NetworkSpecs> = Vec::new();
     for x in get_default_network_info().iter() {
-        let new = ChainSpecs {
+        let new = NetworkSpecs {
             base58prefix: x.base58prefix,
             color: x.color.to_string(),
             decimals: x.decimals,
@@ -158,15 +137,15 @@ pub fn get_default_chainspecs() -> Vec<ChainSpecs> {
 pub fn get_default_verifiers() -> Vec<(VerifierKey, CurrentVerifier)> {
     let mut out: Vec<(VerifierKey, CurrentVerifier)> = Vec::new();
     for x in get_default_network_info().iter() {
-        out.push((VerifierKey::from_parts(&x.genesis_hash.to_vec()), CurrentVerifier::General));
+        out.push((VerifierKey::from_parts(&x.genesis_hash.to_vec()), CurrentVerifier::Valid(ValidCurrentVerifier::General)));
     }
     out
 }
 
-pub fn get_default_chainspecs_to_send() -> Vec<ChainSpecsToSend> {
-    let mut out: Vec<ChainSpecsToSend> = Vec::new();
+pub fn get_default_chainspecs_to_send() -> Vec<NetworkSpecsToSend> {
+    let mut out: Vec<NetworkSpecsToSend> = Vec::new();
     for x in get_default_network_info().iter() {
-        let new = ChainSpecsToSend {
+        let new = NetworkSpecsToSend {
             base58prefix: x.base58prefix,
             color: x.color.to_string(),
             decimals: x.decimals,
@@ -199,26 +178,33 @@ pub fn get_default_address_book() -> Vec<AddressBookEntry> {
     out
 }
 
-pub fn get_default_metadata() -> Result<Vec<MetaValues>, String> {
+fn get_metadata(dir: &str) -> Result<Vec<MetaValues>, ErrorActive> {
     let mut out: Vec<MetaValues> = Vec::new();
-    let path_set = match std::fs::read_dir("../defaults/default_metadata") {
+    let path_set = match std::fs::read_dir(dir) {
         Ok(a) => a,
-        Err(e) => return Err(format!("Error reading folder with default metadata. {}", e)),
+        Err(e) => return Err(ErrorActive::DefaultLoading(DefaultLoading::MetadataFolder(e))),
     };
     for x in path_set {
         if let Ok(path) = x {
-            let meta_str = match std::fs::read_to_string(path.path()) {
-                Ok(a) => a,
-                Err(e) => return Err(format!("Error reading file with default metadata. {}", e)),
-            };
-            let new = match decode_version(&meta_str.trim()) {
-                Ok(a) => a,
-                Err(e) => return Err(format!("Error decoding default metadata. {}", e)),
-            };
-            out.push(new)
+            if let Some(name) = path.path().to_str() {
+                let meta_str = match std::fs::read_to_string(path.path()) {
+                    Ok(a) => a,
+                    Err(e) => return Err(ErrorActive::DefaultLoading(DefaultLoading::MetadataFile(e))),
+                };
+                let new = MetaValues::from_str_metadata(&meta_str.trim(), IncomingMetadataSourceActive::Default{filename: name.to_string()})?;
+                out.push(new)
+            }
         }
     }
     Ok(out)
+}
+
+pub fn get_test_metadata() -> Result<Vec<MetaValues>, ErrorActive> {
+    get_metadata("../defaults/test_metadata")
+}
+
+pub fn get_release_metadata() -> Result<Vec<MetaValues>, ErrorActive> {
+    get_metadata("../defaults/release_metadata")
 }
 
 lazy_static! {
@@ -233,12 +219,12 @@ lazy_static! {
     static ref REG_TYPES: Regex = Regex::new(r#"(?m)(pub )?type (?P<name>.*) = (?P<description>.*);$"#).expect("checked construction");
 }
 
-pub fn get_default_types() -> Result<ContentLoadTypes, String> {
+pub fn get_default_types_vec() -> Result<Vec<TypeEntry>, ErrorActive> {
     
     let filename = "../defaults/default_types/full_types_information";
     let type_info = match fs::read_to_string(filename) {
         Ok(x) => x,
-        Err(e) => return Err(format!("Error reading datafile with default types information. {}", e)),
+        Err(e) => return Err(ErrorActive::DefaultLoading(DefaultLoading::TypesFile(e))),
     };
     
     let mut types_prep: Vec<TypeEntry> = Vec::new();
@@ -327,5 +313,9 @@ pub fn get_default_types() -> Result<ContentLoadTypes, String> {
         types_prep.push(new_entry);
     }
     
-    Ok(ContentLoadTypes::generate(&types_prep))
+    Ok(types_prep)
+}
+
+pub fn get_default_types_content() -> Result<ContentLoadTypes, ErrorActive> {
+    Ok(ContentLoadTypes::generate(&get_default_types_vec()?))
 }

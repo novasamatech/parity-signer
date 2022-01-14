@@ -1,16 +1,15 @@
-use std::env;
+use definitions::error::{Active, ErrorSource};
 use generate_message::{full_run, parser::Command};
+use std::env;
 
 fn main() -> Result<(), String> {
-
     let command = match Command::new(env::args()) {
-        Ok(x) => x,
-        Err(e) => return Err(format!("Error parsing arguments. {}", e)),
+        Ok(a) => a,
+        Err(e) => return Err(<Active>::show(&e)),
     };
-    
     match full_run(command) {
-        Ok(()) => Ok(()),
-        Err(e) => return Err(format!("Application error. {}", e)),
+        Ok(_) => Ok(()),
+        Err(e) => return Err(<Active>::show(&e)),
     }
-    
 }
+

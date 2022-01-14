@@ -10,35 +10,34 @@ import SwiftUI
 struct HistoryCardTemplate: View {
     var image: String
     var timestamp: String
-    var color: String
+    var danger: Bool
     var line1: String
     var line2: String
     
     var body: some View {
-        ZStack {
-            RoundedRectangle(cornerRadius: 4).foregroundColor(Color("backgroundCard"))
-            HStack (alignment: .center) {
-                Image(systemName: image)
-                    .imageScale(.medium)
-                    .foregroundColor(Color(color))
-                    .frame(width: 26.0)
-                    .padding(8)
-                VStack (alignment: .leading) {
-                    if (timestamp != "") {
-                        Text(timestamp)
-                            .font(.system(size: 13))
-                    }
-                    Text(line1)
-                        .foregroundColor(Color(color))
-                        .font(.system(size: 13, weight: .bold))
-                    Text(line2)
-                        .foregroundColor(Color("textFadedColor"))
-                        .font(.system(size: 12, weight: .semibold, design: .monospaced))
+        HStack {
+            VStack (alignment: .leading, spacing: 2) {
+                if (timestamp != "") {
+                    Text(timestamp)
+                        .foregroundColor(Color("Text400"))
+                        .font(FBase(style: .subtitle2))
                 }
-                Spacer()
+                Text(line1)
+                    .foregroundColor(Color("Text600"))
+                    .font(FBase(style: .subtitle1))
+                    .tracking(0.1)
+                Text(line2)
+                    .foregroundColor(Color("Crypto400"))
+                    .font(FCrypto(style: .body1))
             }
-            .padding(8)
+            Spacer()
+            Image(systemName: image)
+                .imageScale(.medium)
+                .foregroundColor(Color(danger ? "SignalDanger" : "Text400"))
         }
+        .padding(8)
+        .cornerRadius(8)
+        .background(Color(danger ? "BgDanger" : "Bg200"))
     }
 }
 

@@ -14,93 +14,43 @@ import SwiftUI
 struct AddressCard: View {
     @EnvironmentObject var data: SignerDataModel
     var address: Address
+    var multiselectMode: Bool = false
     @GestureState private var dragOffset = CGSize.zero
     let rowHeight: CGFloat = 28
     var body: some View {
         ZStack {
-            RoundedRectangle(cornerRadius: 4).foregroundColor(Color(data.selectedAddress == address ? "backgroundActive" : "backgroundCard")).frame(height: 44)
+            RoundedRectangle(cornerRadius: 4).foregroundColor(Color("Bg200")).frame(height: 44)
             HStack {
-                Image(uiImage: UIImage(data: Data(fromHexEncodedString: String(cString: base58_identicon(nil, address.ss58, 32))) ?? Data()) ?? UIImage())
-                    .resizable(resizingMode: .stretch)
-                    .frame(width: rowHeight, height: rowHeight)
-                VStack (alignment: .leading) {
-                    HStack {
-                        if address.isRoot() {
-                            Text(address.seed_name)
-                                .foregroundColor(Color("textMainColor"))
-                        } else {
-                            Text(address.path)
-                                .foregroundColor(Color("cryptoColor"))
-                        }
-                        if address.has_password == "true" {
-                            Image(systemName: "lock")
-                                .foregroundColor(Color("AccentColor"))
-                        }
-                    }.font(.system(size: 12, weight: .semibold, design: .monospaced))
-                    //Here we could have shortened base58 address when buttons are shown, but we don't need to
-                    Text((data.selectedAddress == address && data.keyManagerModal == .none) ? address.truncateBase58() : address.truncateBase58())
-                        .foregroundColor(Color("textFadedColor"))
-                        .font(.system(size: 12, design: .monospaced))
-                }
-                Spacer()
-                if data.keyManagerModal == .none {
-                    AddressCardControls(address: address, rowHeight: rowHeight+11)
-                }
-                if (data.keyManagerModal == .showKey && data.getMultiSelectionMode()) {
-                    Text(String((data.multiSelected.firstIndex(of: address) ?? -1) + 1) + "/" + String(data.multiSelected.count))
-                }
-            }.padding(.horizontal, 8)
-        }
-        .gesture(
-            TapGesture()
-                .onEnded { _ in
-                    if data.keyManagerModal == .showKey {
-                        //we can do something here
-                    } else {
-                        if data.getMultiSelectionMode() {
-                            data.multiSelectAction(address: address)
-                        } else {
-                            if address.isRoot() {
-                                data.selectSeed(seedName: address.seed_name)
-                            } else {
-                                data.selectedAddress = address
-                                data.keyManagerModal = .showKey
+                ZStack {
+                    Identicon(identicon: address.identicon)
+                    if multiselectMode {
+                        VStack{
+                            Spacer()
+                            HStack{
+                                Spacer()
+                                Image(systemName: address.multiselect ? "checkmark.circle.fill" : "circle").imageScale(.large)
                             }
                         }
                     }
-                })
-        .gesture(
-            LongPressGesture()
-                .onEnded { _ in
-                    if data.keyManagerModal == .showKey {
-                        //we can do something here
-                    } else {
-                        data.multiSelectAction(address: address)
-                    }
-                })
-        .gesture(
-            DragGesture()
-                .updating($dragOffset, body: { (value, state, transaction) in
-                    if data.keyManagerModal == .showKey {
-                        //we can do something here
-                    } else {
-                        if value.translation.width < -20 {
-                            data.multiSelected = []
-                            data.selectedAddress = address
+                }.frame(width: 30, height: 30)
+                VStack (alignment: .leading) {
+                    HStack {
+                        Text(address.seed_name).foregroundColor(Color("Text600")).font(FBase(style: .subtitle1))
+                        Text(address.path)
+                        if address.has_pwd {
+                            Text("///").foregroundColor(Color("Crypto400"))
+                                .font(FCrypto(style: .body2))
+                            Image(systemName: "lock").foregroundColor(Color("Crypto400"))
+                                .font(FCrypto(style: .body2))
                         }
-                        if value.translation.width > 20 {
-                            data.selectedAddress = nil
-                        }
-                    }
-                })
-        )
+                    }.foregroundColor(Color("Crypto400"))
+                        .font(FCrypto(style: .body2))
+                    //Here we could have shortened base58 address when buttons are shown, but we don't need to
+                    Text(address.base58.truncateMiddle(length: 8)).foregroundColor(Color("Text400"))
+                        .font(FCrypto(style: .body1))
+                }
+                Spacer()
+            }.padding(.horizontal, 8)
+        }
     }
 }
-
-/*
- struct IdentityCard_Previews: PreviewProvider {
- static var previews: some View {
- IdentityCard(identity: Identity.identityData[0]).previewLayout(.sizeThatFits)
- }
- }
- */

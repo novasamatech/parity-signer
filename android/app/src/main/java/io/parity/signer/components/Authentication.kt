@@ -10,7 +10,7 @@ import androidx.fragment.app.FragmentActivity
 
 
 class Authentication {
-	private val promptInfo = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+	private val promptInfo = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
 		BiometricPrompt.PromptInfo.Builder()
 			.setTitle("UNLOCK SEED")
 			.setSubtitle("Please authenticate yourself")

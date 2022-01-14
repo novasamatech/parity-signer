@@ -10,83 +10,71 @@
 import Foundation
 import UIKit //for converting raw png to UIImage
 import Network //to detect network connection and raise alert
+import LocalAuthentication //to detect if password is set
+//import CoreBluetooth //to check for bluetooth
 
 /**
  * Object to store all data; since the data really is mostly stored in RustNative side, just one object (to describe it) is used here.
  */
 class SignerDataModel: ObservableObject {
+    
+    //Action handler
+    var actionAvailable = true //debouncer
+    @Published var actionResult: ActionResult = ActionResult() //Screen state is stored here
+    @Published var parsingAlert: Bool = false
+    let debounceTime: Double = 0.2 //Debounce time
+    
     //Data state
     @Published var seedNames: [String] = []
-    @Published var networks: [Network] = []
-    @Published var addresses: [Address] = []
     @Published var onboardingDone: Bool = false
     @Published var lastError: String = ""
-    @Published var networkSettings: NetworkSettings?
-    @Published var generalVerifier: Verifier?
+    @Published var authenticated: Bool = false
     
-    //Key manager state
-    @Published var selectedSeed: String = ""
-    @Published var selectedNetwork: Network?
-    @Published var selectedAddress: Address?
-    @Published var searchKey: String = ""
-    @Published var suggestedPath: String = "//"
-    @Published var suggestedName: String = ""
-    @Published var multiSelected: [Address] = []
-    
-    //History screen data state
-    @Published var history: [History] = []
-    @Published var selectedRecord: History?
-    
-    //Navigation
-    @Published var signerScreen: SignerScreen = .history
-    @Published var keyManagerModal: KeyManagerModal = .none
-    @Published var settingsModal: SettingsModal = .none
-    @Published var transactionState: TransactionState = .none
-    
-    //Transaction content
-    @Published var cards: [TransactionCard] = []
-    @Published var payloadStr: String = ""
-    @Published var transactionError: String = ""
-    @Published var action: Action?
-    @Published var qr: UIImage?
-    @Published var result: String? //TODO: remove this?
-    @Published var author: Author?
-    @Published var comment: String = ""
+    //This just starts camera reset. Could be done cleaner probably.
     @Published var resetCamera: Bool = false
     
     //internal boilerplate
-    var error: Unmanaged<CFError>?
     var dbName: String
-    
-    //This is the secret - thus it's made non-reactive
-    var seedBackup: String = ""
     
     //Alert indicator
     @Published var canaryDead: Bool = false
     let monitor = NWPathMonitor()
     let queue = DispatchQueue.global(qos: .background)
+    //var manager: CBCentralManager
+    //var bsDetector: BluetoothDetector = BluetoothDetector()
+    let queueBT = DispatchQueue.global(qos: .background)
     @Published var alert: Bool = false
+    @Published var alertShow: Bool = false
+    
+    //version
+    let appVersion = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String
+    
+    //did user set up password?
+    let protected = LAContext().canEvaluatePolicy(.deviceOwnerAuthentication, error: nil)
     
     init() {
         self.dbName = NSHomeDirectory() + "/Documents/Database"
         self.onboardingDone = FileManager.default.fileExists(atPath: NSHomeDirectory() + "/Documents/Database")
-        if self.onboardingDone {
-            self.monitor.pathUpdateHandler = {path in
-                if path.availableInterfaces.count == 0 {
-                    DispatchQueue.main.async {
-                        self.canaryDead = false
-                    }
-                } else {
-                    DispatchQueue.main.async {
+        //manager = CBCentralManager(delegate: bsDetector, queue: queueBT, options: [CBCentralManagerOptionShowPowerAlertKey: false])
+        self.monitor.pathUpdateHandler = {path in
+            if path.availableInterfaces.count == 0 {
+                DispatchQueue.main.async {
+                    self.canaryDead = false
+                }
+            } else {
+                DispatchQueue.main.async {
+                    if self.onboardingDone {
                         device_was_online(nil, self.dbName)
-                        self.canaryDead = true
                         self.alert = true
                     }
+                    self.canaryDead = true
                 }
             }
-            
-            monitor.start(queue: self.queue)
+        }
+        monitor.start(queue: self.queue)
+        if self.onboardingDone {
             self.refreshSeeds()
+            init_navigation(nil, dbName, seedNames.joined(separator: ","))
             self.totalRefresh()
         }
     }
@@ -96,43 +84,17 @@ class SignerDataModel: ObservableObject {
      * Should not call stuff in signer.h
      */
     func refreshUI() {
-        self.seedBackup = ""
-        self.lastError = ""
-        disableMutliSelectionMode()
-        self.networkSettings = nil
-        self.selectedRecord = nil
-        resetTransaction()
-        if self.seedNames.count == 0 {
-            self.signerScreen = .keys
-            self.keyManagerModal = .newSeed
-        } else {
-            self.keyManagerModal = .seedSelector
-        }
-        self.settingsModal = .none
-        if self.signerScreen == .scan {
-            self.resetCamera = true
-        }
-        self.searchKey = ""
     }
     
     /**
-     * refresh everything except for navigation and seedNames
+     * refresh everything except for seedNames
      * should be called as often as reasonably possible - on flow interrupts, changes, events, etc.
      */
     func totalRefresh() {
         print("heavy reset")
+        pushButton(buttonID: .Start)
         self.checkAlert()
-        self.refreshNetworks()
-        if self.networks.count > 0 {
-            self.selectedNetwork = self.networks[0]
-            self.fetchKeys()
-        } else {
-            print("No networks found; not handled yet")
-        }
-        self.getHistory()
-        self.getGeneralVerifier()
-        resetTransaction()
-        self.refreshUI()
+        //self.refreshUI()
     }
 }
 
@@ -145,42 +107,47 @@ extension SignerDataModel {
      */
     func onboard(jailbreak: Bool = false) {
         var err = ExternError()
-        let err_ptr: UnsafeMutablePointer<ExternError> = UnsafeMutablePointer(&err)
-        do {
-            print("onboarding...")
-            if let source = Bundle.main.url(forResource: "Database", withExtension: "") {
-                print(source)
-                var destination = try FileManager.default.url(for: .documentDirectory, in: .userDomainMask, appropriateFor: nil, create: false)
-                destination.appendPathComponent("Database")
-                if FileManager.default.fileExists(atPath: NSHomeDirectory() + "/Documents/Database") {
-                    do {
-                        try FileManager.default.removeItem(at: destination)
-                    } catch {
-                        print("db exists but could not be removed; please report bug")
-                        return
+        if !self.canaryDead {
+            do {
+                print("onboarding...")
+                if let source = Bundle.main.url(forResource: "Database", withExtension: "") {
+                    //print(source)
+                    var destination = try FileManager.default.url(for: .documentDirectory, in: .userDomainMask, appropriateFor: nil, create: false)
+                    destination.appendPathComponent("Database")
+                    if FileManager.default.fileExists(atPath: NSHomeDirectory() + "/Documents/Database") {
+                        do {
+                            try FileManager.default.removeItem(at: destination)
+                        } catch {
+                            print("db exists but could not be removed; please report bug")
+                            return
+                        }
+                    }
+                    try FileManager.default.copyItem(at: source, to: destination)
+                    withUnsafeMutablePointer(to: &err) {err_ptr in
+                        if jailbreak {
+                            init_history_no_cert(err_ptr, self.dbName)
+                        } else {
+                            init_history_with_cert(err_ptr, self.dbName)
+                        }
+                        if (err_ptr.pointee.code == 0) {
+                            self.onboardingDone = true
+                            /* Mean app mode:
+                             if self.canaryDead {
+                             device_was_online(nil, self.dbName)
+                             }*/
+                            init_navigation(nil, dbName, seedNames.joined(separator: ","))
+                            self.totalRefresh()
+                            self.refreshSeeds()
+                        } else {
+                            print("History init failed! This will not do.")
+                            print(String(cString: err_ptr.pointee.message))
+                            signer_destroy_string(err_ptr.pointee.message)
+                        }
                     }
                 }
-                try FileManager.default.copyItem(at: source, to: destination)
-                if jailbreak {
-                    init_history_no_cert(err_ptr, self.dbName)
-                } else {
-                    init_history_with_cert(err_ptr, self.dbName)
-                }
-                if (err_ptr.pointee.code == 0) {
-                    self.onboardingDone = true
-                    if self.canaryDead {
-                        device_was_online(nil, self.dbName)
-                    }
-                    self.totalRefresh()
-                    self.refreshSeeds()
-                } else {
-                    print("History init failed! This will not do.")
-                    print(String(cString: err_ptr.pointee.message))
-                    signer_destroy_string(err_ptr.pointee.message)
-                }
+            } catch {
+                print("DB init failed")
             }
-        } catch {
-            print("DB init failed")
         }
     }
     
@@ -189,24 +156,26 @@ extension SignerDataModel {
      * Should be called before app uninstall/upgrade!
      */
     func wipe() {
-        do {
-            var destination = try FileManager.default.url(for: .documentDirectory, in: .userDomainMask, appropriateFor: nil, create: false)
-            destination.appendPathComponent("Database")
-            print(destination)
-            print(self.dbName)
-            try FileManager.default.removeItem(at: destination)
-        } catch {
-            print("FileManager failed to delete db")
-            return
+        refreshSeeds()
+        if authenticated {
+            do {
+                var destination = try FileManager.default.url(for: .documentDirectory, in: .userDomainMask, appropriateFor: nil, create: false)
+                destination.appendPathComponent("Database")
+                //print(destination)
+                //print(self.dbName)
+                try FileManager.default.removeItem(at: destination)
+            } catch {
+                print("FileManager failed to delete db")
+                return
+            }
+            let query = [
+                kSecClass as String: kSecClassGenericPassword
+            ] as CFDictionary
+            SecItemDelete(query)
+            self.onboardingDone = false
+            self.seedNames = []
+            init_navigation(nil, dbName, seedNames.joined(separator: ","))
         }
-        let query = [
-            kSecClass as String: kSecClassGenericPassword
-        ] as CFDictionary
-        SecItemDelete(query)
-        self.onboardingDone = false
-        self.seedNames = []
-        self.signerScreen = .keys
-        self.keyManagerModal = .newSeed
     }
     
     /**
@@ -214,25 +183,56 @@ extension SignerDataModel {
      */
     func jailbreak() {
         self.wipe()
-        self.onboard(jailbreak: true)
-    }
-    
-    func getGeneralVerifier() {
-        var err = ExternError()
-        let err_ptr: UnsafeMutablePointer<ExternError> = UnsafeMutablePointer(&err)
-        let res = get_general_certificate(err_ptr, dbName)
-        if (err_ptr.pointee.code == 0) {
-            if let generalCert = String(cString: res!).data(using: .utf8) {
-                self.generalVerifier = try? JSONDecoder().decode(Verifier.self, from: generalCert)
-            } else {
-                print("General verifier corrupted")
-            }
-            signer_destroy_string(res!)
-        } else {
-            print("General verifier fetch failed")
-            print(String(cString: err_ptr.pointee.message))
-            signer_destroy_string(err_ptr.pointee.message)
+        if !onboardingDone {
+            self.onboard(jailbreak: true)
         }
     }
 }
 
+/*
+/**
+ * An object to monitor for bluetooth
+ * This should not do anything else, of course
+ */
+class BluetoothDetector: NSObject, CBCentralManagerDelegate {
+    @Published var canaryDead = false
+    
+    /**
+     * Just mark current bluetooth state
+     */
+    func centralManagerDidUpdateState(_ central: CBCentralManager) {
+        switch central.state {
+        case .unknown:
+            DispatchQueue.main.async {
+                self.canaryDead = true
+            }
+        case .resetting:
+            DispatchQueue.main.async {
+                self.canaryDead = false
+            }
+        case .unsupported:
+            DispatchQueue.main.async {
+                self.canaryDead = false
+            }
+        case .unauthorized:
+            DispatchQueue.main.async {
+                self.canaryDead = true
+            }
+        case .poweredOff:
+            DispatchQueue.main.async {
+                self.canaryDead = false
+            }
+        case .poweredOn:
+            DispatchQueue.main.async {
+                self.canaryDead = true
+            }
+        @unknown default:
+            DispatchQueue.main.async {
+                self.canaryDead = true
+            }
+        }
+
+        //print(central.state.rawValue)
+    }
+}
+*/

@@ -8,23 +8,19 @@
 import SwiftUI
 
 struct TCTypesInfo: View {
-    var text: String
+    var content: TypesInfo
     var body: some View {
         HStack {
-            Text("Types hash:")
-                .foregroundColor(Color("AccentColor"))
-            Text(text)
-                .foregroundColor(Color("textMainColor"))
-            Spacer()
+            Identicon(identicon: content.types_id_pic)
+            TCNameValueTemplate(name: "Types hash:", value: content.types_hash)
         }
-        .background(/*@START_MENU_TOKEN@*//*@PLACEHOLDER=View@*/Color("backgroundCard")/*@END_MENU_TOKEN@*/)
     }
 }
 
 /*
-struct TCTypesInfo_Previews: PreviewProvider {
-    static var previews: some View {
-        TCTypesInfo()
-    }
-}
-*/
+ struct TCTypesInfo_Previews: PreviewProvider {
+ static var previews: some View {
+ TCTypesInfo()
+ }
+ }
+ */

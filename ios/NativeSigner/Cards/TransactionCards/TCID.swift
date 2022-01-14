@@ -8,16 +8,14 @@
 import SwiftUI
 
 struct TCID: View {
-    var text: String
+    var value: Id
     var body: some View {
         HStack {
-            //TODO: handle error
-            Image(uiImage: UIImage(data: Data(fromHexEncodedString: String(cString: base58_identicon(nil, text, 32)))!)!)
-            Text(text)
-                .foregroundColor(Color("textMainColor"))
+            Identicon(identicon: value.identicon)
+            Text(value.base58)
+                .foregroundColor(Color("Text600")).font(FCrypto(style: .body2))
             Spacer()
         }
-        .background(/*@START_MENU_TOKEN@*//*@PLACEHOLDER=View@*/Color("backgroundCard")/*@END_MENU_TOKEN@*/)
     }
 }
 

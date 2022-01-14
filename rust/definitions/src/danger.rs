@@ -1,5 +1,8 @@
 use parity_scale_codec::{Decode, Encode};
 use parity_scale_codec_derive;
+use sled::IVec;
+
+use crate::error::{ErrorSigner, DatabaseSigner, EntryDecodingSigner};
 
 /// Struct to process the content of qr codes with load_metadata messages
 pub struct DangerRecord (Vec<u8>);
@@ -27,14 +30,14 @@ impl DangerRecord {
         )
     }
     /// Function to get danger record from the corresponding database key
-    pub fn from_vec (vec: &Vec<u8>) -> Self {
-        Self(vec.to_vec())
+    pub fn from_ivec (ivec: &IVec) -> Self {
+        Self(ivec.to_vec())
     }
     /// Function to get `device_was_online` flag
-    pub fn device_was_online (&self) -> Result<bool, &'static str>  {
+    pub fn device_was_online (&self) -> Result<bool, ErrorSigner>  {
         match <DecodedDangerRecord>::decode(&mut &self.0[..]) {
             Ok(a) => Ok(a.device_was_online),
-            Err(_) => return Err("danger indicator content could not be decoded")
+            Err(_) => return Err(ErrorSigner::Database(DatabaseSigner::EntryDecoding(EntryDecodingSigner::DangerStatus))),
         }
     }
     /// Function to prepare the danger record information into storage as Vec<u8>

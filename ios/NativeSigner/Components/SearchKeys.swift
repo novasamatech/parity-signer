@@ -7,31 +7,35 @@
 
 import SwiftUI
 
+/**
+ * Text entry to search for keys in keys menu
+ * Gets cleared on button press
+ */
 struct SearchKeys: View {
-    @EnvironmentObject var data: SignerDataModel
+    @Binding var searchString: String
     var body: some View {
         HStack {
             ZStack {
-                RoundedRectangle(cornerRadius: 8).stroke(Color(data.searchKey == "" ? "buttonPassiveImage" : "buttonActive")).foregroundColor(Color("backgroundColor")).frame(height: 39)
-            TextField("find keys", text: $data.searchKey)
+                RoundedRectangle(cornerRadius: 8).stroke(Color(searchString == "" ? "Action100" : "Action400")).frame(height: 39)
+            TextField("find keys", text: $searchString)
                 .autocapitalization(.none)
                 .disableAutocorrection(true)
                 .font(.system(size: 12, design: .monospaced))
-                .foregroundColor(Color("textEntryColor"))
+                .foregroundColor(Color("Text400"))
                 .padding(8)
             }
-            if (data.searchKey != "") {
-                Button(action:{data.searchKey = ""}) {
+            if (searchString != "") {
+                Button(action:{searchString = ""}) {
                     Image(systemName: "clear").imageScale(.large)
                 }
             } else {
-                Image(systemName: "doc.text.magnifyingglass").imageScale(.large).foregroundColor(Color("AccentColor"))
+                Image(systemName: "doc.text.magnifyingglass").imageScale(.large).foregroundColor(Color("Action400"))
             }
         }
         .onDisappear {
-            data.searchKey = ""
+            searchString = ""
         }
-        .background(Color("backgroundUtility"))
+        .background(Color("Bg000"))
     }
 }
 

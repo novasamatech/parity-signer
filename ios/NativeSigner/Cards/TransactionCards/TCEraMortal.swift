@@ -10,31 +10,17 @@ import SwiftUI
 struct TCEraMortal: View {
     var eraMortal: EraMortal
     var body: some View {
-        HStack {
-            Spacer()
-            VStack {
-                Text("phase")
-                    .foregroundColor(Color("AccentColor"))
-                Text(eraMortal.phase)
-                    .foregroundColor(Color("textMainColor"))
-            }
-            Spacer()
-            VStack {
-                Text("period")
-                    .foregroundColor(Color("AccentColor"))
-                Text(eraMortal.period)
-                    .foregroundColor(Color("textMainColor"))
-            }
-            Spacer()
+        VStack {
+            TCNameValueTemplate(name: "phase", value: eraMortal.phase)
+            TCNameValueTemplate(name: "period", value: eraMortal.period)
         }
-        .background(/*@START_MENU_TOKEN@*//*@PLACEHOLDER=View@*/Color("backgroundCard")/*@END_MENU_TOKEN@*/)
     }
 }
 
 /*
-struct TCEraMortalNonce_Previews: PreviewProvider {
-    static var previews: some View {
-        TCEraMortalNonce()
-    }
-}
-*/
+ struct TCEraMortalNonce_Previews: PreviewProvider {
+ static var previews: some View {
+ TCEraMortalNonce()
+ }
+ }
+ */

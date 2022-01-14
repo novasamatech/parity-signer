@@ -10,17 +10,7 @@ import SwiftUI
 struct TCTXSpec: View {
     let value: String
     var body: some View {
-        HStack {
-            Spacer()
-            VStack {
-                Text("TX version")
-                    .foregroundColor(Color("AccentColor"))
-                Text(value)
-                    .foregroundColor(Color("textMainColor"))
-            }
-            Spacer()
-        }
-        .background(/*@START_MENU_TOKEN@*//*@PLACEHOLDER=View@*/Color("backgroundCard")/*@END_MENU_TOKEN@*/)
+        TCNameValueTemplate(name: "TX version", value: value)
     }
 }
 

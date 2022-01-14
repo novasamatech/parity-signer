@@ -10,21 +10,17 @@ import SwiftUI
 struct TCEraImmortal: View {
     var body: some View {
         HStack {
-            Spacer()
-            VStack {
-                Text("Immortal")
-                    .foregroundColor(Color("AccentColor"))
-            }
+            Text("Immortal transaction")
+                .foregroundColor(Color("Text400"))
             Spacer()
         }
-        .background(/*@START_MENU_TOKEN@*//*@PLACEHOLDER=View@*/Color("backgroundCard")/*@END_MENU_TOKEN@*/)
     }
 }
 
 /*
-struct TCEraImmortalNonce_Previews: PreviewProvider {
-    static var previews: some View {
-        TCEraImmortalNonce()
-    }
-}
-*/
+ struct TCEraImmortalNonce_Previews: PreviewProvider {
+ static var previews: some View {
+ TCEraImmortalNonce()
+ }
+ }
+ */

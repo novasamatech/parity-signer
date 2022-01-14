@@ -11,15 +11,9 @@ struct TCAuthorPlain: View {
     var value: AuthorPlain
     var body: some View {
         HStack {
-            Image(uiImage: UIImage(data: Data(fromHexEncodedString: String(cString: base58_identicon(nil, value.base58, 32)))!)!)
-            VStack (alignment: .leading) {
-                Text("From: ")
-                    .foregroundColor(Color("textMainColor"))
-                Text(value.base58).foregroundColor(Color("textMainColor"))
-            }
-            Spacer()
+            Identicon(identicon: value.identicon)
+            TCNameValueTemplate(name: "From", value: value.base58)
         }
-        .background(/*@START_MENU_TOKEN@*//*@PLACEHOLDER=View@*/Color("backgroundCard")/*@END_MENU_TOKEN@*/)
     }
 }
 

@@ -23,7 +23,7 @@ fn assist (a: String, decimals: u8, order: u8) -> (String, Option<String>, i8) {
 /// Input `balance` has to be a printed number. Likely u128 or u64.
 /// Validity of input is checked elsewhere.
 
-pub fn convert_balance_pretty (balance: &str, decimals: u8, units: &str) -> Result<PrettyOutput, &'static str> {
+pub fn convert_balance_pretty (balance: &str, decimals: u8, units: &str) -> PrettyOutput {
     
     let order = (balance.len() as u8) -1;
     
@@ -174,7 +174,7 @@ pub fn convert_balance_pretty (balance: &str, decimals: u8, units: &str) -> Resu
         4 => "p",
         5 => "f",
         6 => "a",
-        _ => return Err("Error in prefixes"),
+        _ => unreachable!(),
     };
     
     let number = match transformed_number.after_point {
@@ -182,14 +182,14 @@ pub fn convert_balance_pretty (balance: &str, decimals: u8, units: &str) -> Resu
         None => format!("{}", transformed_number.before_point),
     };
     
-    Ok(PrettyOutput {
+    PrettyOutput {
         number,
         units: format!("{}{}", unit_prefix, units),
-    })
+    }
 }
 
 pub fn print_pretty_test (balance: u128, decimals: u8, units: &str) -> String {
-    let out = convert_balance_pretty (&balance.to_string(), decimals, units).unwrap();
+    let out = convert_balance_pretty (&balance.to_string(), decimals, units);
     format!("{} {}", out.number, out.units)
 }
 

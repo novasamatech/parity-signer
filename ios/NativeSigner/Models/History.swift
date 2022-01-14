@@ -5,23 +5,38 @@
 //  Created by Alexander Slesarev on 12.8.2021.
 //
 
+/**
+ * This is hard-typed decoding of log passed from rust
+ *
+ * This should actually be reduced to very simple 4 or 5 filed object later,
+ * as history screen has very simple cards
+ *
+ * Cards for history details are decoded in screen model but may pull some objects from here
+ * Tread carefully until this mess is organized nicely
+ */
+
 import Foundation
 
+/**
+ * All possible events that could be listed in history
+ */
 enum Event: Decodable, Hashable, Equatable {
     case databaseInitiated
     case deviceWasOnline
-    case error(String)
     case generalVerifierSet(Verifier)
     case historyCleared
     case identitiesWiped
     case identityAdded(IdentityEvent)
     case identityRemoved(IdentityEvent)
+    case messageSignError(SignMessageError)
+    case messageSigned(SignMessage)
     case metadataAdded(MetaSpecs)
     case metadataRemoved(MetaSpecs)
     case networkAdded(NetworkDisplay)
     case networkRemoved(NetworkDisplay)
     case networkVerifierSet(NetworkVerifierDisplay)
     case resetDangerRecord
+    case seedCreated(String)
     case seedNameWasShown(String)
     case signedAddNetwork(NetworkSigned)
     case signedLoadMetadata(MetadataSigned)
@@ -59,11 +74,15 @@ enum Event: Decodable, Hashable, Equatable {
             self = .identityAdded(try values.decode(IdentityEvent.self, forKey: .payload))
         case "identity_removed":
             self = .identityRemoved(try values.decode(IdentityEvent.self, forKey: .payload))
+        case "message_sign_error":
+            self = .messageSignError(try values.decode(SignMessageError.self, forKey: .payload))
+        case "message_signed":
+            self = .messageSigned(try values.decode(SignMessage.self, forKey: .payload))
         case "metadata_added":
             self = .metadataAdded(try values.decode(MetaSpecs.self, forKey: .payload))
         case "metadata_removed":
             self = .metadataRemoved(try values.decode(MetaSpecs.self, forKey: .payload))
-        case "network_added":
+        case "network_specs_added":
             self = .networkAdded(try values.decode(NetworkDisplay.self, forKey: .payload))
         case "network_removed":
             self = .networkRemoved(try values.decode(NetworkDisplay.self, forKey: .payload))
@@ -71,9 +90,11 @@ enum Event: Decodable, Hashable, Equatable {
             self = .networkVerifierSet(try values.decode(NetworkVerifierDisplay.self, forKey: .payload))
         case "reset_danger_record":
             self = .resetDangerRecord
+        case "seed_created":
+            self = .seedCreated(try values.decode(String.self, forKey: .payload))
         case "seed_name_shown":
             self = .seedNameWasShown(try values.decode(String.self, forKey: .payload))
-        case "add_network_message_signed":
+        case "add_specs_message_signed":
             self = .signedAddNetwork(try values.decode(NetworkSigned.self, forKey: .payload))
         case "load_metadata_message_signed":
             self = .signedLoadMetadata(try values.decode(MetadataSigned.self, forKey: .payload))
@@ -81,7 +102,7 @@ enum Event: Decodable, Hashable, Equatable {
             self = .signedTypes(try values.decode(TypesSigned.self, forKey: .payload))
         case "system_entered_event":
             self = .systemEntry(try values.decode(String.self, forKey: .payload))
-        case "sign_error":
+        case "transaction_sign_error":
             self = .transactionSignError(try values.decode(SignDisplayError.self, forKey: .payload))
         case "transaction_signed":
             self = .transactionSigned(try values.decode(SignDisplay.self, forKey: .payload))
@@ -96,7 +117,7 @@ enum Event: Decodable, Hashable, Equatable {
         case "wrong_password_entered":
             self = .wrongPassword
         default:
-            self = .error(try values.decode(String.self, forKey: .payload))
+            self = .warning("Record corrupted")
         }
     }
 }
@@ -147,11 +168,25 @@ struct NetworkSigned: Decodable, Hashable {
 
 struct NetworkVerifierDisplay: Decodable, Hashable {
     var genesis_hash: String
-    var current_verifier: Verifier
+    var current_verifier: CurrentVerifier
+}
+
+struct SignMessage: Decodable, Hashable {
+    var message: String
+    var signed_by: Verifier
+    var user_comment: String
+}
+
+struct SignMessageError: Decodable, Hashable {
+    var message: String
+    var signed_by: Verifier
+    var user_comment: String
+    var error: String
 }
 
 struct SignDisplay: Decodable, Hashable {
     var transaction: String
+    var network_name: String
     var signed_by: Verifier
     var user_comment: String
 }
@@ -180,57 +215,12 @@ struct MetadataSigned: Decodable, Hashable {
     var signed_by: Verifier
 }
 
+/**
+ * An atomic history db record
+ * All events happened simultaneously
+ */
 struct History: Decodable {
     var order: Int
     var timestamp: String
     var events: [Event]
-}
-
-extension SignerDataModel {
-    func getHistory() {
-        var err = ExternError()
-        let err_ptr: UnsafeMutablePointer<ExternError> = UnsafeMutablePointer(&err)
-        let res = print_history(err_ptr, self.dbName)
-        if err_ptr.pointee.code == 0 {
-            if let historyJSON = String(cString: res!).data(using: .utf8) {
-                guard let history = try? JSONDecoder().decode([History].self, from: historyJSON) else {
-                    print("JSON decoder failed on history")
-                    print(String(cString: res!))
-                    print(historyJSON)
-                    signer_destroy_string(res!)
-                    return
-                }
-                print(self.history)
-                print(String(cString: res!))
-                self.history = history.sorted(by: {$0.order > $1.order})
-            } else {
-                print("keysJSON corrupted")
-            }
-            signer_destroy_string(res!)
-        } else {
-            self.lastError = String(cString: err_ptr.pointee.message)
-            print(self.lastError)
-            signer_destroy_string(err_ptr.pointee.message)
-        }
-    }
-}
-
-func recoverTransaction(transaction: String) -> [TransactionCard] {
-    print(transaction)
-    
-    guard let transactionPreview = try? JSONDecoder().decode(TransactionCardSet.self, from: transaction.data(using: .utf8) ?? Data())
-    else {
-        return []
-    }
-    var cards: [TransactionCard] = []
-    cards.append(contentsOf: (transactionPreview.warning ?? []))
-    cards.append(contentsOf: (transactionPreview.types_info ?? []))
-    cards.append(contentsOf: (transactionPreview.author ?? []))
-    cards.append(contentsOf: (transactionPreview.error ?? []))
-    cards.append(contentsOf: (transactionPreview.extensions ?? []))
-    cards.append(contentsOf: (transactionPreview.method ?? []))
-    cards.append(contentsOf: (transactionPreview.new_specs ?? []))
-    cards.append(contentsOf: (transactionPreview.verifier ?? []))
-    cards = cards.sorted(by: {$0.index < $1.index})
-    return cards
 }

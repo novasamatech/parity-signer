@@ -9,52 +9,33 @@ import SwiftUI
 
 struct NetworkManager: View {
     @EnvironmentObject var data: SignerDataModel
-    @State var deleteConfirm: Bool = false
+    var content: MNetworkMenu
     var body: some View {
         VStack {
+            Rectangle().frame(height: UIScreen.main.bounds.height/3).opacity(0.0001).gesture(TapGesture().onEnded{_ in
+                data.pushButton(buttonID: .GoBack)
+            })
             ZStack {
-                RoundedRectangle(cornerRadius: 20.0).foregroundColor(Color("backgroundNetworkModal"))
+                RoundedRectangle(cornerRadius: 20.0).foregroundColor(Color("Bg000"))
                 VStack {
                     Spacer()
-                    Rectangle().foregroundColor(Color("backgroundNetworkModal")).frame(height: 25)
+                    Rectangle().foregroundColor(Color("Bg000")).frame(height: 25)
                 }
                 VStack {
-                    HeaderBar(line1: "NETWORK", line2: "Select network").padding(.top, 10)
+                    HeaderBar(line1: "NETWORK", line2: "Select network").padding(10)
                     ScrollView {
                         LazyVStack {
-                            ForEach(data.networks, id: \.self) {network in
-                                ZStack (alignment: .bottom) {
-                                    RoundedRectangle(cornerRadius: 20).foregroundColor(Color(data.selectedNetwork == network ? "backgroundActive" : "backgroundNetworkModal"))
+                            ForEach(content.networks.sorted(by: {$0.order < $1.order}), id: \.order) {network in
+                                ZStack {
+                                    Button(action: {
+                                        data.pushButton(buttonID: .ChangeNetwork, details: network.key)
+                                    }) {
+                                        NetworkCard(title: network.title, logo: network.logo, fancy: true)
+                                    }
                                     HStack {
-                                        Button(action: {
-                                            data.selectNetwork(network: network)
-                                        }) {
-                                            NetworkCard(network: network)
-                                        }
                                         Spacer()
-                                        if network == data.selectedNetwork {
-                                            Button(action: {
-                                                data.keyManagerModal = .networkDetails
-                                            }) {
-                                                Image(systemName: "ellipsis.circle").imageScale(.large)
-                                            }
-                                            Button(action: {
-                                                deleteConfirm = true
-                                            }) {
-                                                Image(systemName: "trash").imageScale(.large)
-                                            }
-                                            .alert(isPresented: $deleteConfirm, content: {
-                                                Alert(
-                                                    title: Text("Delete network?"),
-                                                    message: Text("This will remove network, all metadata and keys. If network had custom certificate, it will be blocked forever. Use this if custom certificate is compromised"),
-                                                    primaryButton: .cancel(),
-                                                    secondaryButton: .destructive(
-                                                        Text("Delete"),
-                                                        action: { data.removeNetwork()
-                                                        }
-                                                    )
-                                                )
-                                            })
+                                        if network.selected {
+                                            Image(systemName: "checkmark")
                                         }
                                     }.padding(.horizontal, 8)
                                 }.padding(.horizontal, 8)

@@ -9,49 +9,65 @@ import SwiftUI
 
 
 struct MainScreenContainer: View {
-    //var testValue = DevTestObject()
     @EnvironmentObject var data: SignerDataModel
     @GestureState private var dragOffset = CGSize.zero
     var body: some View {
         if data.onboardingDone {
-            VStack {
+            if data.authenticated {
+                VStack (spacing: 0) {
                 Header()
-                VStack {
-                    switch (data.signerScreen) {
-                    case .scan :
-                        TransactionScreen()
-                    case .keys :
-                        KeyManager()
-                    case .settings :
-                        SettingsScreen()
-                    case .history :
-                        HistoryScreen()
+                ZStack {
+                    VStack (spacing:0) {
+                        ScreenSelector()
+                        Spacer()
                     }
-                    Spacer()
+                    ModalSelector()
+                    AlertSelector()
                 }
                 .gesture(
                     DragGesture().updating($dragOffset, body: { (value, state, transaction) in
                         if value.startLocation.x < 20 && value.translation.width > 100 {
-                            data.goBack()
+                            data.pushButton(buttonID: .GoBack)
                         }
                     })
                 )
                 //Certain places are better off without footer
-                if (data.transactionState == .none
-                    && !(data.signerScreen == .keys && (data.keyManagerModal == .networkManager
-                                                        || data.keyManagerModal == .newSeed
-                                                        || data.keyManagerModal == .newKey
-                                                        || data.keyManagerModal == .seedBackup
-                                                       )
-                        )){
-                    FooterBlock()
+                if data.actionResult.footer {
+                    Footer()
                         .padding(.horizontal)
                         .padding(.vertical, 8)
-                        .background(Color("backgroundUtility"))
+                        .background(Color("Bg000"))
+                }
+            }
+            .gesture(
+                DragGesture().onEnded{drag in
+                    if drag.translation.width < -20 {
+                        data.pushButton(buttonID: .GoBack)
+                    }
+                }
+            )
+            .alert("Navigation error", isPresented: $data.parsingAlert, actions: {})
+            } else {
+                Button(action: {data.refreshSeeds()}) {
+                    BigButton(
+                        text: "Unlock app",
+                        action: {
+                            data.refreshSeeds()
+                            data.totalRefresh()
+                        }
+                    )
                 }
             }
         } else {
-            LandingView().background(/*@START_MENU_TOKEN@*//*@PLACEHOLDER=View@*/Color("backgroundColor")/*@END_MENU_TOKEN@*/)
+            if (data.protected) {
+                if data.canaryDead /* || data.bsDetector.canaryDead)*/ {
+                    Text("Please enable airplane mode, turn off bluetooth and wifi connection and disconnect all cables!").background(Color("Bg000"))
+                } else {
+                    LandingView()
+                }
+            } else {
+                Text("Please protect device with pin or password!").background(Color("Bg000"))
+            }
         }
     }
 }

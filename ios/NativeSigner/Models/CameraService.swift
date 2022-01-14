@@ -40,8 +40,8 @@ public class CameraService: UIViewController, AVCaptureVideoDataOutputSampleBuff
         
         guard let barcodeDetectionRequest = request as? VNDetectBarcodesRequest,
               let results = barcodeDetectionRequest.results else {
-            return
-        }
+                  return
+              }
         barcodeDetectionRequest.symbologies = [VNBarcodeSymbology.qr]
     })]
     
@@ -137,6 +137,10 @@ public class CameraService: UIViewController, AVCaptureVideoDataOutputSampleBuff
                 return
             }
             
+            try videoDevice.lockForConfiguration()
+            videoDevice.focusMode = .autoFocus
+            videoDevice.unlockForConfiguration()
+            
             let videoDeviceInput = try AVCaptureDeviceInput(device: videoDevice)
             
             if session.canAddInput(videoDeviceInput) {
@@ -192,7 +196,7 @@ public class CameraService: UIViewController, AVCaptureVideoDataOutputSampleBuff
         } catch {
             print("Failed to handle \(error)")
         }
-
+        
         if let result = detectionRequests[0].results {
             if result.count != 0 {
                 //uncomment to see how fast qr reader goes brrr
@@ -208,54 +212,55 @@ public class CameraService: UIViewController, AVCaptureVideoDataOutputSampleBuff
                         if !self.bucket.contains(payloadStr) {
                             if self.total == nil { //init new collection of frames
                                 var err = ExternError()
-                                let err_ptr = UnsafeMutablePointer(&err)
-                                let res = get_packets_total(err_ptr, payloadStr, 0)
-                                if err_ptr.pointee.code == 0 {
-                                    let proposeTotal = Int(res)
-                                    if proposeTotal == 1 { //Special handling for 1-frame payloads
-                                        let process = "[\"" + payloadStr + "\"]" //Decoder expects JSON array
-                                        let res2 = try_decode_qr_sequence(err_ptr, process, 0)
-                                        if err_ptr.pointee.code == 0 {
-                                            DispatchQueue.main.async {
-                                                self.payload = String(cString: res2!)
-                                                self.stop()
+                                withUnsafeMutablePointer(to: &err) {err_ptr in
+                                    let res = get_packets_total(err_ptr, payloadStr, 0)
+                                    if err_ptr.pointee.code == 0 {
+                                        let proposeTotal = Int(res)
+                                        if proposeTotal == 1 { //Special handling for 1-frame payloads
+                                            let process = "[\"" + payloadStr + "\"]" //Decoder expects JSON array
+                                            let res2 = try_decode_qr_sequence(err_ptr, process, 0)
+                                            if err_ptr.pointee.code == 0 {
+                                                DispatchQueue.main.async {
+                                                    self.payload = String(cString: res2!)
+                                                    self.stop()
+                                                }
+                                            } else {
+                                                print(String(cString: err_ptr.pointee.message))
+                                                signer_destroy_string(err_ptr.pointee.message)
                                             }
                                         } else {
-                                            print(String(cString: err_ptr.pointee.message))
-                                            signer_destroy_string(err_ptr.pointee.message)
+                                            DispatchQueue.main.async {
+                                                self.bucket.append(payloadStr)
+                                                self.total = proposeTotal
+                                            }
                                         }
                                     } else {
-                                        DispatchQueue.main.async {
-                                            self.bucket.append(payloadStr)
-                                            self.total = proposeTotal
-                                        }
-                                    }
-                                } else {
-                                    //TODO: reset camera on failure
-                                    signer_destroy_string(err_ptr.pointee.message)
-                                }
-                            } else { //collect frames and attempt to decode if it seems that enough are collected
-                                self.bucket.append(payloadStr)
-                                print(self.bucket.count)
-                                if self.bucket.count >= self.total ?? 0 {
-                                    var err = ExternError()
-                                    let err_ptr = UnsafeMutablePointer(&err)
-                                    let process = "[\"" +  self.bucket.joined(separator: "\",\"") + "\"]" //Decoder expects JSON array
-                                    let res = try_decode_qr_sequence(err_ptr, process, 0)
-                                    if err_ptr.pointee.code == 0 {
-                                        DispatchQueue.main.async {
-                                            self.payload = String(cString: res!)
-                                            signer_destroy_string(res!)
-                                            self.stop()
-                                        }
-                                    } else {
-                                        //TODO: give up when things go badly?
-                                        print(String(cString: err_ptr.pointee.message))
+                                        //TODO: reset camera on failure
                                         signer_destroy_string(err_ptr.pointee.message)
                                     }
                                 }
+                            } else { //collect frames and attempt to decode if it seems that enough are collected
+                                self.bucket.append(payloadStr)
                                 DispatchQueue.main.async {
                                     self.captured = self.bucket.count
+                                }
+                                if self.bucket.count >= self.total ?? 0 {
+                                    var err = ExternError()
+                                    withUnsafeMutablePointer(to: &err) {err_ptr in
+                                        let process = "[\"" +  self.bucket.joined(separator: "\",\"") + "\"]" //Decoder expects JSON array
+                                        let res = try_decode_qr_sequence(err_ptr, process, 0)
+                                        if err_ptr.pointee.code == 0 {
+                                            DispatchQueue.main.async {
+                                                self.payload = String(cString: res!)
+                                                signer_destroy_string(res!)
+                                                self.stop()
+                                            }
+                                        } else {
+                                            //TODO: give up when things go badly?
+                                            print(String(cString: err_ptr.pointee.message))
+                                            signer_destroy_string(err_ptr.pointee.message)
+                                        }
+                                    }
                                 }
                             }
                         }

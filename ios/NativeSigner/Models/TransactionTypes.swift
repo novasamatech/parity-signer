@@ -5,9 +5,18 @@
 //  Created by Alexander Slesarev on 11.8.2021.
 //
 
+/**
+ * This is hard-typed decoding of transaction passed from Rust
+ *
+ * Used in showing transaction content both in signing and log
+ */
+
 import Foundation
 
-//all cards must match Rust code!
+/**
+ * Cards for transaction content
+ * all cards must match Rust code!
+ */
 enum Card {
     case author(Author)
     case authorPlain(AuthorPlain)
@@ -17,18 +26,20 @@ enum Card {
     case blockHash(String)
     case call(Call)
     case defaultCard(String)
+    case derivations([String])
     case enumVariantName(EnumVariantName)
     case eraImmortal
     case eraMortal(EraMortal)
     case error(String)
     case fieldName(FieldName)
     case fieldNumber(FieldNumber)
-    case id(String)
+    case id(Id)
     case identityField(String)
     case meta(MetaSpecs)
     case nameVersion(NameVersion)
     case networkGenesisHash(String)
     case networkName(String)
+    case networkInfo(NetworkInfo)
     case newSpecs(NewSpecs)
     case nonce(String)
     case none
@@ -38,50 +49,87 @@ enum Card {
     case tipPlain(String)
     case txSpec(String)
     case txSpecPlain(TxSpecPlain)
-    case typesInfo(String)
+    case typesInfo(TypesInfo)
     case varName(String)
     case verifier(Verifier)
     case warning(String)
 }
 
+/**
+ * Visualization of transaction author
+ */
 struct Author: Decodable {
     var base58: String
     var seed: String
     var derivation_path: String
-    var has_password: Bool
-    var name: String
+    var has_password: Bool?
+    var identicon: String
+    
+    func intoAddress() -> Address {
+        return Address(
+            base58: self.base58,
+            path: self.derivation_path,
+            has_pwd: self.has_password == true,
+            identicon: self.identicon,
+            seed_name: seed,
+            multiselect: false
+        )
+    }
 }
 
+/**
+ * Visualization of address without encryption
+ */
 struct AuthorPlain: Decodable {
     var base58: String
+    var identicon: String
 }
 
+/**
+ * Visualization of unknown address
+ */
 struct AuthorPublicKey: Decodable {
     var hex: String
     var crypto: String
+    var identicon: String
 }
 
+/**
+ * Call name with docs
+ */
 struct Call: Decodable {
     var method_name: String
     var docs: String
 }
 
+/**
+ * Balance parsed with units
+ */
 struct Currency: Decodable {
     var amount: String
     var units: String
 }
 
+/**
+ * EnumVariantName
+ */
 struct EnumVariantName: Decodable {
     var name: String
     var docs_enum_variant: String
 }
 
+/**
+ * Visualization of finite lifetime
+ */
 struct EraMortal: Decodable {
     var era: String
     var phase: String
     var period: String
 }
 
+/**
+ * FieldName visualization with docs
+ */
 struct FieldName: Decodable {
     var name: String
     var docs_field_name: String
@@ -89,6 +137,9 @@ struct FieldName: Decodable {
     var docs_type: String
 }
 
+/**
+ * FiledNumber visualization with docs
+ */
 struct FieldNumber: Decodable {
     var number: String
     var docs_field_number: String
@@ -96,17 +147,40 @@ struct FieldNumber: Decodable {
     var docs_type: String
 }
 
+/**
+ * Visualization of an address
+ */
+struct Id: Decodable {
+    var base58: String
+    var identicon: String
+}
+
+/**
+ * Visualization of metadata to add
+ */
 struct MetaSpecs: Decodable, Hashable {
     var specname: String
     var spec_version: String
     var meta_hash: String
+    var meta_id_pic: String
 }
 
+/**
+ * Network name and version - this identifies metadata
+ */
 struct NameVersion: Decodable, Hashable {
     var name: String
     var version: String
 }
 
+struct NetworkInfo: Decodable, Hashable {
+    var network_title: String
+    var network_logo: String
+}
+
+/**
+ * Description of network specs that are added
+ */
 struct NewSpecs: Decodable, Hashable {
     var base58prefix: String
     var color: String
@@ -121,23 +195,53 @@ struct NewSpecs: Decodable, Hashable {
     var unit: String
 }
 
+/**
+ * Unit-formatted amount of tip
+ */
 struct Tip: Decodable {
     var amount: String
     var units: String
 }
 
+/**
+ * Thansaction information if network was not found
+ */
 struct TxSpecPlain: Decodable {
     var network_genesis_hash: String
     var version: String
     var tx_version: String
 }
 
+struct TypesInfo: Decodable {
+    var types_hash: String
+    var types_id_pic: String
+}
+
+/**
+ * Visualization of cerificate issuer info
+ */
 struct Verifier: Decodable, Hashable {
     var hex: String
+    var identicon: String
     var encryption: String
 }
 
-struct TransactionCard: Decodable {
+/**
+ * Complex decoder for transaction cards
+ * card format: {index, indent, type, payload}
+ *
+ * where index is used for cards sorting, indent is an offset for rendering on screen,
+ * and payload could be any complex thing needed to render a transaction card
+ */
+struct TransactionCard: Decodable, Hashable {
+    static func == (lhs: TransactionCard, rhs: TransactionCard) -> Bool {
+        return lhs.index == rhs.index //guaranteed in backend
+    }
+    
+    func hash(into hasher: inout Hasher) {
+        hasher.combine(index)
+    }
+    
     var index: Int
     var indent: Int
     var card: Card
@@ -170,6 +274,9 @@ struct TransactionCard: Decodable {
         case "balance":
             card = .balance(try values.decode(Currency.self, forKey: .payload))
             return
+        case "derivations":
+            card = .derivations(try values.decode([String].self, forKey: .payload))
+            return
         case "method":
             card = .call(try values.decode(Call.self, forKey: .payload))
             return
@@ -189,11 +296,17 @@ struct TransactionCard: Decodable {
         case "field_number":
             card = .fieldNumber(try values.decode(FieldNumber.self, forKey: .payload))
             return
+        case "Id":
+            card = .id(try values.decode(Id.self, forKey: .payload))
+            return
         case "meta":
             card = .meta(try values.decode(MetaSpecs.self, forKey: .payload))
             return
         case "name_version":
             card = .nameVersion(try values.decode(NameVersion.self, forKey: .payload))
+            return
+        case "network_info":
+            card = .networkInfo(try values.decode(NetworkInfo.self, forKey: .payload))
             return
         case "new_specs":
             card = .newSpecs(try values.decode(NewSpecs.self, forKey: .payload))
@@ -206,6 +319,9 @@ struct TransactionCard: Decodable {
             return
         case "tx_spec_plain":
             card = .txSpecPlain(try values.decode(TxSpecPlain.self, forKey: .payload))
+            return
+        case "types":
+            card = .typesInfo(try values.decode(TypesInfo.self, forKey: .payload))
             return
         case "verifier":
             card = .verifier(try values.decode(Verifier.self, forKey: .payload))
@@ -224,8 +340,6 @@ struct TransactionCard: Decodable {
             card = .defaultCard(content)
         case "error":
             card = .error(content)
-        case "Id":
-            card = .id(content)
         case "identity_field":
             card = .identityField(content)
         case "network_genesis_hash":
@@ -242,8 +356,8 @@ struct TransactionCard: Decodable {
             card = .tipPlain(content)
         case "tx_version":
             card = .txSpec(content)
-        case "types_hash":
-            card = .typesInfo(content)
+        //case "types_hash":
+           // card = .typesInfo(content)
         case "varname":
             card = .varName(content)
         case "warning":
@@ -254,20 +368,40 @@ struct TransactionCard: Decodable {
     }
 }
 
-struct Action: Decodable, Encodable {
-    var type: String
-    var payload: String
-}
-
-struct TransactionCardSet: Decodable {
+/**
+ * The JSON object actually passed from Rust is this
+ */
+struct TransactionCardSet: Decodable, Hashable {
     var author: [TransactionCard]?
     var error: [TransactionCard]?
     var extensions: [TransactionCard]?
+    var importing_derivations: [TransactionCard]?
     var message: [TransactionCard]?
+    var meta: [TransactionCard]?
     var method: [TransactionCard]?
     var new_specs: [TransactionCard]?
     var verifier: [TransactionCard]?
     var warning: [TransactionCard]?
     var types_info: [TransactionCard]?
-    var action: Action?
+    
+    /**
+     * Prepares transaction cards to be shown in a frame
+     */
+    func assemble() -> [TransactionCard] {
+        var assembled: [TransactionCard] = []
+        assembled.append(contentsOf: self.author ?? [])
+        assembled.append(contentsOf: self.error ?? [])
+        assembled.append(contentsOf: self.extensions ?? [])
+        assembled.append(contentsOf: self.importing_derivations ?? [])
+        assembled.append(contentsOf: self.message ?? [])
+        assembled.append(contentsOf: self.meta ?? [])
+        assembled.append(contentsOf: self.method ?? [])
+        assembled.append(contentsOf: self.new_specs ?? [])
+        assembled.append(contentsOf: self.verifier ?? [])
+        assembled.append(contentsOf: self.warning ?? [])
+        assembled.append(contentsOf: self.types_info ?? [])
+        return assembled.sorted(by: {
+            $0.index < $1.index
+        })
+    }
 }

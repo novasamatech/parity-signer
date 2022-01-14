@@ -11,84 +11,66 @@ struct SettingsScreen: View {
     @EnvironmentObject var data: SignerDataModel
     @State var wipe = false
     @State var jailbreak = false
+    let content: MVerifierDetails
     var body: some View {
-        ZStack {
-            //ScrollView {
-            //Main buttons block
+        VStack (spacing: 2) {
+            Button(action: {
+                data.pushButton(buttonID: .ManageNetworks)
+            }) {
+                SettingsCardTemplate(text: "Networks")
+            }
+            Button(action: {
+                data.pushButton(buttonID: .BackupSeed)
+            }) {
+                SettingsCardTemplate(text: "Backup keys")
+            }
+            Button(action: {data.pushButton(buttonID: .ViewGeneralVerifier)}) {
             VStack {
-                Button(action: {
-                    //TODO: add some alerts to make sure the operation was successful
-                    wipe = true
-                }) {
-                    HStack{
-                        Image(systemName: "exclamationmark.triangle.fill").imageScale(.large)
-                        Text("Wipe all data")
-                        Image(systemName: "exclamationmark.triangle.fill").imageScale(.large)
-                    }
-                }
-                .alert(isPresented: $wipe, content: {
-                    Alert(
-                        title: Text("Wipe ALL data?"),
-                        message: Text("Factory reset the Signer app. This operation can not be reverted!"),
-                        primaryButton: .cancel(),
-                        secondaryButton: .destructive(
-                            Text("Wipe"),
-                            action: {
-                                data.wipe()
-                            }
-                        )
-                    )
-                })
-                .padding()
-                Button(action: {
-                    //TODO: add some alerts to make sure the operation was successful
-                    jailbreak = true
-                }) {
-                    HStack{
-                        Image(systemName: "exclamationmark.triangle.fill").imageScale(.large)
-                        Text("Remove general certificate")
-                        Image(systemName: "exclamationmark.triangle.fill").imageScale(.large)
-                    }.foregroundColor(Color("dangerColor"))
-                }
-                .alert(isPresented: $jailbreak, content: {
-                    Alert(
-                        title: Text("Wipe ALL data?"),
-                        message: Text("Remove all data and set general verifier blank so that it could be set later. This operation can not be reverted. Do not proceed unless you absolutely know what you are doing, there is no need to use this procedure in most cases. Misusing this feature may lead to loss of funds!"),
-                        primaryButton: .cancel(),
-                        secondaryButton: .destructive(
-                            Text("I understand"),
-                            action: {
-                                data.jailbreak()
-                            }
-                        )
-                    )
-                })
-                .padding()
-                Button(action: {
-                    data.settingsModal = .showDocument(.about)
-                }) {
-                    Text("Documentation")
-                }
-                .padding()
-                Spacer()
                 HStack {
-                    Image(uiImage: UIImage(data: Data(fromHexEncodedString: String(cString: identicon(nil, data.generalVerifier?.hex ?? "", 32))) ?? Data()) ?? UIImage())
-                        .resizable(resizingMode: .stretch)
-                        .frame(width: 42, height: 42)
-                    VStack {
-                        Text("General verifier certificate").foregroundColor(Color("textMainColor"))
-                        Text(data.generalVerifier?.hex ?? "unknown").foregroundColor(Color("cryptoColor"))
-                        Text("encryption: " + (data.generalVerifier?.encryption ?? "unknown")).foregroundColor(Color("textFadedColor"))
-                    }
-                }.padding().background(Color("backgroundCard"))
+                    Text("Verifier certificate").font(FBase(style: .h1)).foregroundColor(Color("Text600"))
+                    Spacer()
+                }
+                HStack {
+                    AddressCard(address: Address(
+                        base58: "encryption: " + content.encryption, path: content.hex.truncateMiddle(length: 8), has_pwd: false, identicon: content.identicon, seed_name: "", multiselect: false
+                    ))
+                }
             }
-            .background(/*@START_MENU_TOKEN@*//*@PLACEHOLDER=View@*/Color("backgroundColor")/*@END_MENU_TOKEN@*/)
-            switch(data.settingsModal) {
-            case .showDocument(let document):
-                DocumentModal(document: document)
-            case .none:
-                EmptyView()
+            .padding()
             }
+            Button(action: {
+                //TODO: add some alerts to make sure the operation was successful
+                wipe = true
+            }) {
+                SettingsCardTemplate(
+                    text: "Wipe all data",
+                    danger: true
+                )
+            }
+            .alert(isPresented: $wipe, content: {
+                Alert(
+                    title: Text("Wipe ALL data?"),
+                    message: Text("Factory reset the Signer app. This operation can not be reverted!"),
+                    primaryButton: .cancel(),
+                    secondaryButton: .destructive(
+                        Text("Wipe"),
+                        action: {
+                            data.wipe()
+                        }
+                    )
+                )
+            })
+            
+            Button(action: {
+                data.pushButton(buttonID: .ShowDocuments)
+            }) {
+                SettingsCardTemplate(text: "About")
+            }
+            SettingsCardTemplate(
+                text: "App version: " + (data.appVersion ?? "Unknown!"),
+                withIcon: false,
+                withBackground: false
+            )
         }
     }
 }
@@ -102,3 +84,4 @@ struct SettingsScreen: View {
  }
  }
  */
+  

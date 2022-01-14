@@ -1,11 +1,9 @@
 use std::env;
 use constants::FOLDER;
-use definitions::crypto::{Encryption, SufficientCrypto};
+use definitions::{crypto::{Encryption, SufficientCrypto}, error::{Active, CommandBadArgument, CommandDoubleKey, CommandNeedArgument, CommandNeedKey, CommandParser, CommandUnexpected, ErrorActive, InputActive, NotHexActive}, helpers::unhex};
 use parity_scale_codec::Decode;
-use anyhow;
-use db_handling::{helpers::unhex, error::NotHex};
-
-use crate::error::{Error, NotDecodeable, NeedArgument, DoubleKey, NeedKey, BadArgument, Unexpected};
+use sp_core::{ed25519, sr25519, ecdsa};
+use std::convert::TryInto;
 
 /// Expected typical run commands:
 /// `$ cargo run show database`
@@ -13,6 +11,7 @@ use crate::error::{Error, NotDecodeable, NeedArgument, DoubleKey, NeedKey, BadAr
 /// `$ cargo run load_metadata -n westend`
 /// `$ cargo run add_specs -d -n -ed25519 westend`
 /// `$ cargo run add_network -u wss://unknown-network.eu -ecdsa`
+/// `$ cargo run derivations -title westend -payload my_derivations_file`
 
 
 /// Enum to describe the incoming command contents
@@ -28,6 +27,7 @@ pub enum Command {
     TransferMeta,
     MakeColdRelease,
     TransferMetaRelease,
+    Derivations(Derivations),
 }
 
 pub enum Show {
@@ -70,15 +70,9 @@ pub enum Goal {
 }
 
 pub enum Crypto {
-    Ed25519 (VerifierKind),
-    Sr25519 (VerifierKind),
-    Ecdsa (VerifierKind),
+    Alice(Encryption),
     None,
-}
-
-pub enum VerifierKind {
-    Alice,
-    Normal {verifier_public_key: Vec<u8>, signature: Vec<u8>},
+    Sufficient(SufficientCrypto),
 }
 
 pub enum Msg {
@@ -116,9 +110,15 @@ pub enum Remove {
     SpecNameVersion{name: String, version: u32},
 }
 
+pub struct Derivations {
+    pub goal: Goal,
+    pub title: String,
+    pub derivations: String,
+}
+
 impl Command {
     /// FUnction to interpret command line input
-    pub fn new(mut args: env::Args) -> anyhow::Result<Command> {
+    pub fn new(mut args: env::Args) -> Result<Command, ErrorActive> {
         args.next();
 
         match args.next() {
@@ -130,9 +130,9 @@ impl Command {
                             Some(show) => match show.to_lowercase().as_str() {
                                 "-database" => Ok(Command::Show(Show::Database)),
                                 "-address_book" => Ok(Command::Show(Show::AddressBook)),
-                                _ => {return Err(Error::UnexpectedKeyArgumentSequence.show())},
+                                _ => {return Err(ErrorActive::CommandParser(CommandParser::UnexpectedKeyArgumentSequence))},
                             },
-                            None => return Err(Error::NeedKey(NeedKey::Show).show())
+                            None => return Err(ErrorActive::CommandParser(CommandParser::NeedKey(CommandNeedKey::Show)))
                         }
                     },
                     "load_types" => Ok(Command::Types),
@@ -151,29 +151,29 @@ impl Command {
                                         match x.as_str() {
                                             "-a"|"-n"|"-u" => {
                                                 match content_key {
-                                                    Some(_) => {return Err(Error::DoubleKey(DoubleKey::Content).show())},
+                                                    Some(_) => {return Err(ErrorActive::CommandParser(CommandParser::DoubleKey(CommandDoubleKey::Content)))},
                                                     None => {content_key = Some(x)}
                                                 }
                                             },
                                             "-d"|"-f"|"-k"|"-p"|"-t" => {
                                                 match set_key {
-                                                    Some(_) => {return Err(Error::DoubleKey(DoubleKey::Set).show())},
+                                                    Some(_) => {return Err(ErrorActive::CommandParser(CommandParser::DoubleKey(CommandDoubleKey::Set)))},
                                                     None => {set_key = Some(x)}
                                                 }
                                             },
                                             "-s" => {pass_errors = false},
                                             "-ed25519"|"-sr25519"|"-ecdsa" => {
                                                 match encryption_override_key {
-                                                    Some(_) =>  {return Err(Error::DoubleKey(DoubleKey::CryptoOverride).show())},
+                                                    Some(_) =>  {return Err(ErrorActive::CommandParser(CommandParser::DoubleKey(CommandDoubleKey::CryptoOverride)))},
                                                     None => {encryption_override_key = Some(x)}
                                                 }
                                             },
-                                            _ => {return Err(Error::UnexpectedKeyArgumentSequence.show())},
+                                            _ => {return Err(ErrorActive::CommandParser(CommandParser::UnexpectedKeyArgumentSequence))},
                                         }
                                     }
                                     else {
                                         match name {
-                                            Some(_) => return Err(Error::OnlyOneNetworkId.show()),
+                                            Some(_) => return Err(ErrorActive::CommandParser(CommandParser::OnlyOneNetworkId)),
                                             None => {name = Some(x)}
                                         }
                                     }
@@ -212,25 +212,25 @@ impl Command {
                             Some(x) => {
                                 match x.as_str() {
                                     "-a" => {
-                                        if let Some(_) = name {return Err(Error::Unexpected(Unexpected::KeyAContent).show())}
+                                        if let Some(_) = name {return Err(ErrorActive::CommandParser(CommandParser::Unexpected(CommandUnexpected::KeyAContent)))}
                                         Content::All
                                     },
                                     "-n" => {
                                         match name {
                                             Some(n) => Content::Name(n),
-                                            None => return Err(Error::NeedArgument(NeedArgument::NetworkName).show())
+                                            None => return Err(ErrorActive::CommandParser(CommandParser::NeedArgument(CommandNeedArgument::NetworkName)))
                                         }
                                     },
                                     "-u" => {
                                         match name {
                                             Some(a) => Content::Address(a),
-                                            None => return Err(Error::NeedArgument(NeedArgument::NetworkUrl).show())
+                                            None => return Err(ErrorActive::CommandParser(CommandParser::NeedArgument(CommandNeedArgument::NetworkUrl)))
                                         }
                                     },
                                     _ => unreachable!(),
                                 }
                             },
-                            None => {return Err(Error::NeedKey(NeedKey::Content).show())}
+                            None => return Err(ErrorActive::CommandParser(CommandParser::NeedKey(CommandNeedKey::Content))),
                         };
                         
                         let instruction = Instruction {
@@ -263,7 +263,7 @@ impl Command {
                                     _ => (),
                                 }
                             },
-                            None => {return Err(Error::NeedArgument(NeedArgument::Make).show())}
+                            None => return Err(ErrorActive::CommandParser(CommandParser::NeedArgument(CommandNeedArgument::Make))),
                         }
                         let mut crypto_type_found = None;
                         let mut msg_type_found = None;
@@ -277,7 +277,7 @@ impl Command {
                                     let x = x.to_lowercase();
                                     match x.as_str() {
                                         "-crypto" => {
-                                            if let Some(_) = crypto_type_found {return Err(Error::DoubleKey(DoubleKey::CryptoKey).show())}
+                                            if let Some(_) = crypto_type_found {return Err(ErrorActive::CommandParser(CommandParser::DoubleKey(CommandDoubleKey::CryptoKey)))}
                                             crypto_type_found = match args.next() {
                                                 Some(x) => {
                                                     match x.to_lowercase().as_str() {
@@ -285,88 +285,88 @@ impl Command {
                                                         "sr25519" => Some(CryptoType::Sr25519),
                                                         "ecdsa" => Some(CryptoType::Ecdsa),
                                                         "none" => Some(CryptoType::None),
-                                                        _ => {return Err(Error::BadArgument(BadArgument::CryptoKey).show())}
+                                                        _ => return Err(ErrorActive::CommandParser(CommandParser::BadArgument(CommandBadArgument::CryptoKey))),
                                                     }
                                                 },
-                                                None => {return Err(Error::NeedArgument(NeedArgument::CryptoKey).show())},
+                                                None => return Err(ErrorActive::CommandParser(CommandParser::NeedArgument(CommandNeedArgument::CryptoKey))),
                                             };
                                         },
                                         "-msgtype" => {
-                                            if let Some(_) = msg_type_found {return Err(Error::DoubleKey(DoubleKey::MsgType).show())}
+                                            if let Some(_) = msg_type_found {return Err(ErrorActive::CommandParser(CommandParser::DoubleKey(CommandDoubleKey::MsgType)))}
                                             msg_type_found = match args.next() {
                                                 Some(x) => {
                                                     match x.to_lowercase().as_str() {
                                                         "load_types" => Some(MsgType::LoadTypes),
                                                         "load_metadata" => Some(MsgType::LoadMetadata),
                                                         "add_specs" => Some(MsgType::AddSpecs),
-                                                        _ => {return Err(Error::BadArgument(BadArgument::MsgType).show())}
+                                                        _ => return Err(ErrorActive::CommandParser(CommandParser::BadArgument(CommandBadArgument::MsgType))),
                                                     }
                                                 },
-                                                None => {return Err(Error::NeedArgument(NeedArgument::MsgType).show())},
+                                                None => return Err(ErrorActive::CommandParser(CommandParser::NeedArgument(CommandNeedArgument::MsgType))),
                                             };
                                         },
                                         "-verifier" => {
-                                            if let Some(_) = verifier_found {return Err(Error::DoubleKey(DoubleKey::Verifier).show())}
+                                            if let Some(_) = verifier_found {return Err(ErrorActive::CommandParser(CommandParser::DoubleKey(CommandDoubleKey::Verifier)))}
                                             verifier_found = match args.next() {
                                                 Some(x) => {
                                                     match x.to_lowercase().as_str() {
                                                         "-hex" => {
                                                             match args.next() {
                                                                 Some(h) => Some(VerKey::Hex(h.to_string())),
-                                                                None => {return Err(Error::NeedArgument(NeedArgument::VerifierHex).show())},
+                                                                None => return Err(ErrorActive::CommandParser(CommandParser::NeedArgument(CommandNeedArgument::VerifierHex))),
                                                             }
                                                         },
                                                         "-file" => {
                                                             match args.next() {
                                                                 Some(f) => Some(VerKey::File(f.to_string())),
-                                                                None => {return Err(Error::NeedArgument(NeedArgument::VerifierFile).show())},
+                                                                None => return Err(ErrorActive::CommandParser(CommandParser::NeedArgument(CommandNeedArgument::VerifierFile))),
                                                             }
                                                         },
                                                         "alice" => Some(VerKey::Alice),
-                                                        _ => {return Err(Error::BadArgument(BadArgument::Verifier).show())}
+                                                        _ => return Err(ErrorActive::CommandParser(CommandParser::BadArgument(CommandBadArgument::Verifier))),
                                                     }
                                                 },
-                                                None => {return Err(Error::NeedArgument(NeedArgument::Verifier).show())},
+                                                None => return Err(ErrorActive::CommandParser(CommandParser::NeedArgument(CommandNeedArgument::Verifier))),
                                             };
                                         },
                                         "-payload" => {
-                                            if let Some(_) = payload_found {return Err(Error::DoubleKey(DoubleKey::Payload).show())}
+                                            if let Some(_) = payload_found {return Err(ErrorActive::CommandParser(CommandParser::DoubleKey(CommandDoubleKey::Payload)))}
                                             payload_found = match args.next() {
                                                 Some(x) => Some(x.to_string()),
-                                                None => {return Err(Error::NeedArgument(NeedArgument::Payload).show())},
+                                                None => return Err(ErrorActive::CommandParser(CommandParser::NeedArgument(CommandNeedArgument::Payload))),
                                             };
                                         },
                                         "-signature" => {
-                                            if let Some(_) = signature_found {return Err(Error::DoubleKey(DoubleKey::Signature).show())}
+                                            if let Some(_) = signature_found {return Err(ErrorActive::CommandParser(CommandParser::DoubleKey(CommandDoubleKey::Signature)))}
                                             signature_found = match args.next() {
                                                 Some(x) => {
                                                     match x.as_str() {
                                                         "-hex" => {
                                                             match args.next() {
                                                                 Some(h) => Some(Entry::Hex(h.to_string())),
-                                                                None => {return Err(Error::NeedArgument(NeedArgument::SignatureHex).show())},
+                                                                None => return Err(ErrorActive::CommandParser(CommandParser::NeedArgument(CommandNeedArgument::SignatureHex))),
                                                             }
                                                         },
                                                         "-file" => {
                                                             match args.next() {
                                                                 Some(f) => Some(Entry::File(f.to_string())),
-                                                                None => {return Err(Error::NeedArgument(NeedArgument::SignatureFile).show())},
+                                                                None => return Err(ErrorActive::CommandParser(CommandParser::NeedArgument(CommandNeedArgument::SignatureFile))),
                                                             }
                                                         },
-                                                        _ => {return Err(Error::BadArgument(BadArgument::Signature).show())}
+                                                        _ => return Err(ErrorActive::CommandParser(CommandParser::BadArgument(CommandBadArgument::Signature))),
                                                     }
                                                 },
-                                                None => {return Err(Error::NeedArgument(NeedArgument::Signature).show())},
+                                                None => return Err(ErrorActive::CommandParser(CommandParser::NeedArgument(CommandNeedArgument::Signature))),
                                             }
                                         },
                                         "-name" => {
-                                            if let Some(_) = name {return Err(Error::DoubleKey(DoubleKey::Name).show())}
+                                            if let Some(_) = name {return Err(ErrorActive::CommandParser(CommandParser::DoubleKey(CommandDoubleKey::Name)))}
                                             name = match args.next() {
                                                 Some(x) => Some(x.to_string()),
-                                                None => {return Err(Error::NeedArgument(NeedArgument::Name).show())},
+                                                None => return Err(ErrorActive::CommandParser(CommandParser::NeedArgument(CommandNeedArgument::Name))),
                                             };
                                         },
-                                        _ => {return Err(Error::UnexpectedKeyArgumentSequence.show())},
+                                        _ => return Err(ErrorActive::CommandParser(CommandParser::UnexpectedKeyArgumentSequence)),
                                     }
                                 },
                                 None => break,
@@ -376,27 +376,27 @@ impl Command {
                         let crypto = match crypto_type_found {
                             Some(x) => {
                                 match x {
-                                    CryptoType::Ed25519 => Crypto::Ed25519(process_verifier_and_signature (verifier_found, signature_found)?),
-                                    CryptoType::Sr25519 => Crypto::Sr25519(process_verifier_and_signature (verifier_found, signature_found)?),
-                                    CryptoType::Ecdsa => Crypto::Ecdsa(process_verifier_and_signature (verifier_found, signature_found)?),
+                                    CryptoType::Ed25519 => process_verifier_and_signature (verifier_found, signature_found, Encryption::Ed25519)?,
+                                    CryptoType::Sr25519 => process_verifier_and_signature (verifier_found, signature_found, Encryption::Sr25519)?,
+                                    CryptoType::Ecdsa => process_verifier_and_signature (verifier_found, signature_found, Encryption::Ecdsa)?,
                                     CryptoType::None => {
-                                        if let Some(_) = verifier_found {return Err(Error::Unexpected(Unexpected::VerifierNoCrypto).show())}
-                                        if let Some(_) = signature_found {return Err(Error::Unexpected(Unexpected::SignatureNoCrypto).show())}
+                                        if let Some(_) = verifier_found {return Err(ErrorActive::CommandParser(CommandParser::Unexpected(CommandUnexpected::VerifierNoCrypto)))}
+                                        if let Some(_) = signature_found {return Err(ErrorActive::CommandParser(CommandParser::Unexpected(CommandUnexpected::SignatureNoCrypto)))}
                                         Crypto::None
                                     },
                                 }
                             },
-                            None => {return Err(Error::NeedKey(NeedKey::Crypto).show())},
+                            None => return Err(ErrorActive::CommandParser(CommandParser::NeedKey(CommandNeedKey::Crypto))),
                         };
                         let payload = match payload_found {
                             Some(x) => {
                                 let filename = format!("{}/{}", FOLDER, x);
                                 match std::fs::read(&filename) {
                                     Ok(a) => a,
-                                    Err(e) => {return Err(Error::InputOutputError(e.to_string()).show())} 
+                                    Err(e) => return Err(ErrorActive::Input(InputActive::File(e))),
                                 }
                             },
-                            None => {return Err(Error::NeedKey(NeedKey::Payload).show())},
+                            None => return Err(ErrorActive::CommandParser(CommandParser::NeedKey(CommandNeedKey::Payload))),
                         };
                         let msg = match msg_type_found {
                             Some(x) => {
@@ -406,7 +406,7 @@ impl Command {
                                     MsgType::AddSpecs => Msg::AddSpecs(payload),
                                 }
                             },
-                            None => {return Err(Error::NeedKey(NeedKey::MsgType).show())},
+                            None => return Err(ErrorActive::CommandParser(CommandParser::NeedKey(CommandNeedKey::MsgType))),
                         };
                         let make = Make {
                             goal,
@@ -433,7 +433,7 @@ impl Command {
                                     _ => (),
                                 }
                             },
-                            None => {return Err(Error::NeedArgument(NeedArgument::Sign).show())}
+                            None => return Err(ErrorActive::CommandParser(CommandParser::NeedArgument(CommandNeedArgument::Sign))),
                         }
                         let mut sufficient_crypto_found = None;
                         let mut msg_type_found = None;
@@ -445,57 +445,57 @@ impl Command {
                                     let x = x.to_lowercase();
                                     match x.as_str() {
                                         "-sufficient" => {
-                                            if let Some(_) = sufficient_crypto_found {return Err(Error::DoubleKey(DoubleKey::SufficientCrypto).show())}
+                                            if let Some(_) = sufficient_crypto_found {return Err(ErrorActive::CommandParser(CommandParser::DoubleKey(CommandDoubleKey::SufficientCrypto)))}
                                             sufficient_crypto_found = match args.next() {
                                                 Some(x) => {
                                                     match x.to_lowercase().as_str() {
                                                         "-hex" => {
                                                             match args.next() {
                                                                 Some(h) => Some(Entry::Hex(h.to_string())),
-                                                                None => {return Err(Error::NeedArgument(NeedArgument::SufficientCryptoHex).show())},
+                                                                None => return Err(ErrorActive::CommandParser(CommandParser::NeedArgument(CommandNeedArgument::SufficientCryptoHex))),
                                                             }
                                                         },
                                                         "-file" => {
                                                             match args.next() {
                                                                 Some(f) => Some(Entry::File(f.to_string())),
-                                                                None => {return Err(Error::NeedArgument(NeedArgument::SufficientCryptoFile).show())},
+                                                                None => return Err(ErrorActive::CommandParser(CommandParser::NeedArgument(CommandNeedArgument::SufficientCryptoFile))),
                                                             }
                                                         },
-                                                        _ => {return Err(Error::BadArgument(BadArgument::SufficientCrypto).show())}
+                                                        _ => return Err(ErrorActive::CommandParser(CommandParser::BadArgument(CommandBadArgument::SufficientCrypto))),
                                                     }
                                                 },
-                                                None => {return Err(Error::NeedArgument(NeedArgument::SufficientCrypto).show())},
+                                                None => return Err(ErrorActive::CommandParser(CommandParser::NeedArgument(CommandNeedArgument::SufficientCrypto))),
                                             };
                                         },
                                         "-msgtype" => {
-                                            if let Some(_) = msg_type_found {return Err(Error::DoubleKey(DoubleKey::MsgType).show())}
+                                            if let Some(_) = msg_type_found {return Err(ErrorActive::CommandParser(CommandParser::DoubleKey(CommandDoubleKey::MsgType)))}
                                             msg_type_found = match args.next() {
                                                 Some(x) => {
                                                     match x.to_lowercase().as_str() {
                                                         "load_types" => Some(MsgType::LoadTypes),
                                                         "load_metadata" => Some(MsgType::LoadMetadata),
                                                         "add_specs" => Some(MsgType::AddSpecs),
-                                                        _ => {return Err(Error::BadArgument(BadArgument::MsgType).show())}
+                                                        _ => return Err(ErrorActive::CommandParser(CommandParser::BadArgument(CommandBadArgument::MsgType))),
                                                     }
                                                 },
-                                                None => {return Err(Error::NeedArgument(NeedArgument::MsgType).show())},
+                                                None => return Err(ErrorActive::CommandParser(CommandParser::NeedArgument(CommandNeedArgument::MsgType))),
                                             };
                                         },
                                         "-payload" => {
-                                            if let Some(_) = payload_found {return Err(Error::DoubleKey(DoubleKey::Payload).show())}
+                                            if let Some(_) = payload_found {return Err(ErrorActive::CommandParser(CommandParser::DoubleKey(CommandDoubleKey::Payload)))}
                                             payload_found = match args.next() {
                                                 Some(x) => Some(x.to_string()),
-                                                None => {return Err(Error::NeedArgument(NeedArgument::Payload).show())},
+                                                None => return Err(ErrorActive::CommandParser(CommandParser::NeedArgument(CommandNeedArgument::Payload))),
                                             };
                                         },
                                         "-name" => {
-                                            if let Some(_) = name {return Err(Error::DoubleKey(DoubleKey::Name).show())}
+                                            if let Some(_) = name {return Err(ErrorActive::CommandParser(CommandParser::DoubleKey(CommandDoubleKey::Name)))}
                                             name = match args.next() {
                                                 Some(x) => Some(x.to_string()),
-                                                None => {return Err(Error::NeedArgument(NeedArgument::Name).show())},
+                                                None => return Err(ErrorActive::CommandParser(CommandParser::NeedArgument(CommandNeedArgument::Name))),
                                             };
                                         },
-                                        _ => {return Err(Error::UnexpectedKeyArgumentSequence.show())},
+                                        _ => return Err(ErrorActive::CommandParser(CommandParser::UnexpectedKeyArgumentSequence)),
                                     }
                                 },
                                 None => break,
@@ -505,42 +505,32 @@ impl Command {
                         let crypto = match sufficient_crypto_found {
                             Some(x) => {
                                 let sufficient_crypto_vector = match x {
-                                    Entry::Hex(h) => unhex(&h, NotHex::SufficientCrypto)?,
+                                    Entry::Hex(h) => unhex::<Active>(&h, NotHexActive::InputSufficientCrypto)?,
                                     Entry::File(f) => {
                                         let filename = format!("{}/{}", FOLDER, f);
                                         match std::fs::read(&filename) {
                                             Ok(a) => a,
-                                            Err(e) => {return Err(Error::InputOutputError(e.to_string()).show())},
+                                            Err(e) => return Err(ErrorActive::Input(InputActive::File(e))),
                                         }
                                     },
                                 };
                                 let sufficient_crypto = match <SufficientCrypto>::decode(&mut &sufficient_crypto_vector[..]) {
                                     Ok(a) => a,
-                                    Err(_) => {return Err(Error::NotDecodeable(NotDecodeable::SufficientCrypto).show())},
+                                    Err(_) => return Err(ErrorActive::Input(InputActive::DecodingSufficientCrypto)),
                                 };
-                                match sufficient_crypto {
-                                    SufficientCrypto::Ed25519 {public_key, signature} => {
-                                        Crypto::Ed25519(VerifierKind::Normal {verifier_public_key: public_key.to_vec(), signature: signature.0.to_vec()})
-                                    },
-                                    SufficientCrypto::Sr25519 {public_key, signature} => {
-                                        Crypto::Sr25519(VerifierKind::Normal {verifier_public_key: public_key.to_vec(), signature: signature.0.to_vec()})
-                                    },
-                                    SufficientCrypto::Ecdsa {public_key, signature} => {
-                                        Crypto::Ecdsa(VerifierKind::Normal {verifier_public_key: public_key.0.to_vec(), signature: signature.0.to_vec()})
-                                    },
-                                }
+                                Crypto::Sufficient(sufficient_crypto)
                             },
-                            None => {return Err(Error::NeedKey(NeedKey::SufficientCrypto).show())},
+                            None => return Err(ErrorActive::CommandParser(CommandParser::NeedKey(CommandNeedKey::SufficientCrypto))),
                         };
                         let payload = match payload_found {
                             Some(x) => {
                                 let filename = format!("{}/{}", FOLDER, x);
                                 match std::fs::read(&filename) {
                                     Ok(a) => a,
-                                    Err(e) => {return Err(Error::InputOutputError(e.to_string()).show())},
+                                    Err(e) => return Err(ErrorActive::Input(InputActive::File(e))),
                                 }
                             },
-                            None => {return Err(Error::NeedKey(NeedKey::Payload).show())},
+                            None => return Err(ErrorActive::CommandParser(CommandParser::NeedKey(CommandNeedKey::Payload))),
                         };
                         let msg = match msg_type_found {
                             Some(x) => {
@@ -550,7 +540,7 @@ impl Command {
                                     MsgType::AddSpecs => Msg::AddSpecs(payload),
                                 }
                             },
-                            None => {return Err(Error::NeedKey(NeedKey::MsgType).show())},
+                            None => return Err(ErrorActive::CommandParser(CommandParser::NeedKey(CommandNeedKey::MsgType))),
                         };
                         let make = Make {
                             goal,
@@ -567,14 +557,14 @@ impl Command {
                                 Some(a) => {
                                     match a.as_str() {
                                         "-title" => {
-                                            if let Some(_) = info_found {return Err(Error::DoubleKey(DoubleKey::Remove).show())}
+                                            if let Some(_) = info_found {return Err(ErrorActive::CommandParser(CommandParser::DoubleKey(CommandDoubleKey::Remove)))}
                                             info_found = match args.next() {
                                                 Some(b) => Some(Remove::Title(b.to_string())),
-                                                None => {return Err(Error::NeedArgument(NeedArgument::RemoveTitle).show())},
+                                                None => return Err(ErrorActive::CommandParser(CommandParser::NeedArgument(CommandNeedArgument::RemoveTitle))),
                                             };
                                         },
                                         "-name" => {
-                                            if let Some(_) = info_found {return Err(Error::DoubleKey(DoubleKey::Remove).show())}
+                                            if let Some(_) = info_found {return Err(ErrorActive::CommandParser(CommandParser::DoubleKey(CommandDoubleKey::Remove)))}
                                             info_found = match args.next() {
                                                 Some(b) => {
                                                     let name = b.to_string();
@@ -586,22 +576,22 @@ impl Command {
                                                                         Some(d) => {
                                                                             match d.parse::<u32> () {
                                                                                 Ok(version) => Some(Remove::SpecNameVersion{name, version}),
-                                                                                Err(_) => {return Err(Error::Unexpected(Unexpected::VersionFormat).show())},
+                                                                                Err(_) => return Err(ErrorActive::CommandParser(CommandParser::Unexpected(CommandUnexpected::VersionFormat))),
                                                                             }
                                                                         },
-                                                                        None => {return Err(Error::NeedArgument(NeedArgument::RemoveVersion).show())}
+                                                                        None => return Err(ErrorActive::CommandParser(CommandParser::NeedArgument(CommandNeedArgument::RemoveVersion))),
                                                                     }
                                                                 }
-                                                                _ => {return Err(Error::UnexpectedKeyArgumentSequence.show())},
+                                                                _ => return Err(ErrorActive::CommandParser(CommandParser::UnexpectedKeyArgumentSequence)),
                                                             }
                                                         },
-                                                        None => {return Err(Error::NeedKey(NeedKey::RemoveVersion).show())},
+                                                        None => return Err(ErrorActive::CommandParser(CommandParser::NeedKey(CommandNeedKey::RemoveVersion))),
                                                     }
                                                 },
-                                                None => {return Err(Error::NeedArgument(NeedArgument::RemoveName).show())},
+                                                None => return Err(ErrorActive::CommandParser(CommandParser::NeedArgument(CommandNeedArgument::RemoveName))),
                                             };
                                         },
-                                        _ => {return Err(Error::UnexpectedKeyArgumentSequence.show())},
+                                        _ => return Err(ErrorActive::CommandParser(CommandParser::UnexpectedKeyArgumentSequence)),
                                     }
                                 },
                                 None => break,
@@ -609,7 +599,7 @@ impl Command {
                         }
                         match info_found {
                             Some(x) => Ok(Command::Remove(x)),
-                            None => {return Err(Error::NeedKey(NeedKey::Remove).show())}
+                            None => return Err(ErrorActive::CommandParser(CommandParser::NeedKey(CommandNeedKey::Remove))),
                         }                        
                     },
                     "restore_defaults" => Ok(Command::RestoreDefaults),
@@ -617,57 +607,153 @@ impl Command {
                     "transfer_meta_to_cold" => Ok(Command::TransferMeta),
                     "make_cold_release" => Ok(Command::MakeColdRelease),
                     "transfer_meta_to_cold_release" => Ok(Command::TransferMetaRelease),
-                    _ => return Err(Error::UnknownCommand.show()),
+                    "derivations" => {
+                        let mut goal = Goal::Both; // default option for `derivations`
+                        let mut args = args.peekable();
+                        match args.peek() {
+                            Some(x) => {
+                                match x.to_lowercase().as_str() {
+                                    "-qr" => {
+                                        goal = Goal::Qr;
+                                        args.next();
+                                    },
+                                    "-text" => {
+                                        goal = Goal::Text;
+                                        args.next();
+                                    },
+                                    _ => (),
+                                }
+                            },
+                            None => return Err(ErrorActive::CommandParser(CommandParser::NeedArgument(CommandNeedArgument::Derivations))),
+                        }
+                        let mut found_title = None;
+                        let mut found_payload = None;
+                        loop {
+                            match args.next() {
+                                Some(a) => {
+                                    match a.as_str() {
+                                        "-title" => {
+                                            if let Some(_) = found_title {return Err(ErrorActive::CommandParser(CommandParser::DoubleKey(CommandDoubleKey::DerivationsTitle)))}
+                                            found_title = match args.next() {
+                                                Some(b) => Some(b.to_string()),
+                                                None => return Err(ErrorActive::CommandParser(CommandParser::NeedArgument(CommandNeedArgument::DerivationsTitle))),
+                                            };
+                                        },
+                                        "-payload" => {
+                                            if let Some(_) = found_payload {return Err(ErrorActive::CommandParser(CommandParser::DoubleKey(CommandDoubleKey::Payload)))}
+                                            found_payload = match args.next() {
+                                                Some(b) => {
+                                                    match std::fs::read_to_string(&b) {
+                                                        Ok(c) => Some(c),
+                                                        Err(e) => return Err(ErrorActive::Input(InputActive::File(e))),
+                                                    }
+                                                },
+                                                None => return Err(ErrorActive::CommandParser(CommandParser::NeedArgument(CommandNeedArgument::Payload))),
+                                            };
+                                        },
+                                        _ => return Err(ErrorActive::CommandParser(CommandParser::UnexpectedKeyArgumentSequence)),
+                                    }
+                                },
+                                None => break,
+                            }
+                        }
+                        let title = match found_title {
+                            Some(a) => a,
+                            None => return Err(ErrorActive::CommandParser(CommandParser::NeedKey(CommandNeedKey::DerivationsTitle))),
+                        };
+                        let derivations = match found_payload {
+                            Some(a) => a,
+                            None => return Err(ErrorActive::CommandParser(CommandParser::NeedKey(CommandNeedKey::Payload))),
+                        };
+                        Ok(Command::Derivations(Derivations{goal, title, derivations}))
+                    },
+                    _ => return Err(ErrorActive::CommandParser(CommandParser::UnknownCommand)),
                 }
             },
-            None => return Err(Error::NoCommand.show()),
+            None => return Err(ErrorActive::CommandParser(CommandParser::NoCommand)),
         }
     }
 }
 
 
-fn process_verifier_and_signature (verifier_found: Option<VerKey>, signature_found: Option<Entry>) -> anyhow::Result<VerifierKind> {
-    
+fn process_verifier_and_signature (verifier_found: Option<VerKey>, signature_found: Option<Entry>, encryption: Encryption) -> Result<Crypto, ErrorActive> {
     match verifier_found {
         Some(VerKey::Hex(x)) => {
-            let verifier_public_key = unhex(&x, NotHex::PublicKey)?;
-            let signature = match signature_found {
-                Some(Entry::Hex(t)) => unhex(&t, NotHex::Signature)?,
-                Some(Entry::File(t)) => {
-                    let signature_filename = format!("{}/{}", FOLDER, t);
-                    match std::fs::read(&signature_filename) {
-                        Ok(a) => a,
-                        Err(e) => {return Err(Error::InputOutputError(e.to_string()).show())},
-                    }
-                },
-                None => {return Err(Error::NeedKey(NeedKey::Signature).show())},
-            };
-            Ok(VerifierKind::Normal{verifier_public_key, signature})
+            let verifier_public_key = unhex::<Active>(&x, NotHexActive::InputPublicKey)?;
+            let signature = get_needed_signature(signature_found)?;
+            Ok(Crypto::Sufficient(into_sufficient(verifier_public_key, signature, encryption)?))
         },
         Some(VerKey::File(x)) => {
             let verifier_filename = format!("{}/{}", FOLDER, x);
             let verifier_public_key = match std::fs::read(&verifier_filename) {
                 Ok(a) => a,
-                Err(e) => {return Err(Error::InputOutputError(e.to_string()).show())},
+                Err(e) => return Err(ErrorActive::Input(InputActive::File(e))),
             };
-            let signature = match signature_found {
-                Some(Entry::Hex(t)) => unhex(&t, NotHex::Signature)?,
-                Some(Entry::File(t)) => {
-                    let signature_filename = format!("{}/{}", FOLDER, t);
-                    match std::fs::read(&signature_filename) {
-                        Ok(a) => a,
-                        Err(e) => {return Err(Error::InputOutputError(e.to_string()).show())},
-                    }
-                },
-                None => {return Err(Error::NeedKey(NeedKey::Signature).show())},
-            };
-            Ok(VerifierKind::Normal{verifier_public_key, signature})
+            let signature = get_needed_signature(signature_found)?;
+            Ok(Crypto::Sufficient(into_sufficient(verifier_public_key, signature, encryption)?))
         },
         Some(VerKey::Alice) => {
-            if let Some(_) = signature_found {return Err(Error::Unexpected(Unexpected::AliceSignature).show())}
-            Ok(VerifierKind::Alice)
+            if let Some(_) = signature_found {return Err(ErrorActive::CommandParser(CommandParser::Unexpected(CommandUnexpected::AliceSignature)))}
+            Ok(Crypto::Alice(encryption))
         },
-        None => {return Err(Error::NeedKey(NeedKey::Verifier).show())},
+        None => return Err(ErrorActive::CommandParser(CommandParser::NeedKey(CommandNeedKey::Verifier))),
     }
-    
+}
+
+fn get_needed_signature(signature_found: Option<Entry>) -> Result<Vec<u8>, ErrorActive> {
+    match signature_found {
+        Some(Entry::Hex(t)) => Ok(unhex::<Active>(&t, NotHexActive::InputSignature)?),
+        Some(Entry::File(t)) => {
+            let signature_filename = format!("{}/{}", FOLDER, t);
+            match std::fs::read(&signature_filename) {
+                Ok(a) => Ok(a),
+                Err(e) => return Err(ErrorActive::Input(InputActive::File(e))),
+            }
+        },
+        None => return Err(ErrorActive::CommandParser(CommandParser::NeedKey(CommandNeedKey::Signature))),
+    }
+}
+
+fn into_sufficient (verifier_public_key: Vec<u8>, signature: Vec<u8>, encryption: Encryption) -> Result<SufficientCrypto, ErrorActive> {
+    match encryption {
+        Encryption::Ed25519 => {
+            let into_pubkey: [u8;32] = match verifier_public_key.try_into() {
+                Ok(a) => a,
+                Err(_) => return Err(ErrorActive::Input(InputActive::PublicKeyLength)),
+            };
+            let public = ed25519::Public::from_raw(into_pubkey);
+            let into_sign: [u8;64] = match signature.try_into() {
+                Ok(a) => a,
+                Err(_) => return Err(ErrorActive::Input(InputActive::SignatureLength)),
+            };
+            let signature = ed25519::Signature::from_raw(into_sign);
+            Ok(SufficientCrypto::Ed25519{public, signature})
+        },
+        Encryption::Sr25519 => {
+            let into_pubkey: [u8;32] = match verifier_public_key.try_into() {
+                Ok(a) => a,
+                Err(_) => return Err(ErrorActive::Input(InputActive::PublicKeyLength)),
+            };
+            let public = sr25519::Public::from_raw(into_pubkey);
+            let into_sign: [u8;64] = match signature.try_into() {
+                Ok(a) => a,
+                Err(_) => return Err(ErrorActive::Input(InputActive::SignatureLength)),
+            };
+            let signature = sr25519::Signature::from_raw(into_sign);
+            Ok(SufficientCrypto::Sr25519{public, signature})
+        },
+        Encryption::Ecdsa => {
+            let into_pubkey: [u8;33] = match verifier_public_key.try_into() {
+                Ok(a) => a,
+                Err(_) => return Err(ErrorActive::Input(InputActive::PublicKeyLength)),
+            };
+            let public = ecdsa::Public::from_raw(into_pubkey);
+            let into_sign: [u8;65] = match signature.try_into() {
+                Ok(a) => a,
+                Err(_) => return Err(ErrorActive::Input(InputActive::SignatureLength)),
+            };
+            let signature = ecdsa::Signature::from_raw(into_sign);
+            Ok(SufficientCrypto::Ecdsa{public, signature})
+        },
+    }
 }

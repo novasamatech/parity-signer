@@ -11,13 +11,12 @@ struct TCWarning: View {
     let text: String
     var body: some View {
         HStack {
-            Text("Warning! ")
-                .foregroundColor(Color("textMainColor"))
+            Text("Warning!")
+                .foregroundColor(Color("SignalDanger")).font(FBase(style: .body2))
             Text(text)
-                .foregroundColor(Color("textMainColor"))
+                .foregroundColor(Color("SignalDanger")).font(FBase(style: .body2))
             Spacer()
-        }
-        .background(/*@START_MENU_TOKEN@*//*@PLACEHOLDER=View@*/Color("AccentColor")/*@END_MENU_TOKEN@*/)
+        }.background(Color("BgDanger"))
     }
 }
 

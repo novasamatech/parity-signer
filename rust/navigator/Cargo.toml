@@ -1,0 +1,21 @@
+[package]
+name = "navigator"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+db_handling = {path = "../db_handling"}
+definitions = {path = "../definitions"}
+hex = "0.4.3"
+lazy_static = "1.4.0"
+plot_icon = { git = "https://github.com/paritytech/polkadot-identicon-rust" }
+transaction_parsing = {path = "../transaction_parsing"}
+transaction_signing = {path = "../transaction_signing"}
+sp-runtime = "3.0.0"
+sp-core = "3.0.0"
+zeroize = "1.4.2"
+
+[dev-dependencies]
+regex = "1.4.5"

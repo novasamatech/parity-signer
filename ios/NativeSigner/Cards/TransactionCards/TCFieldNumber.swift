@@ -16,23 +16,20 @@ struct TCFieldNumber: View {
         }) {
             HStack {
                 Text(value.number)
-                    .foregroundColor(Color("textMainColor"))
+                    .foregroundColor(Color("Text600"))
                 Spacer()
                 if value.docs_field_number + value.path_type + value.docs_type != "" {
                     Text("?")
-                        .foregroundColor(Color("AccentColor"))
+                        .foregroundColor(Color("Text400"))
                 }
             }
-            .background(/*@START_MENU_TOKEN@*//*@PLACEHOLDER=View@*/Color("backgroundCard")/*@END_MENU_TOKEN@*/)
             if showDoc {
                 VStack {
                     Text("Path: " + value.path_type)
                     Text(AttributedString(fromHexDocs: value.docs_field_number) ?? "docs parsing error in iOS, please refer to other sources")
-                        .foregroundColor(Color("textMainColor"))
-                        .background(/*@START_MENU_TOKEN@*//*@PLACEHOLDER=View@*/Color("backgroundCard")/*@END_MENU_TOKEN@*/)
+                        .foregroundColor(Color("Text600"))
                     Text(AttributedString(fromHexDocs: value.docs_type) ?? "docs parsing error in iOS, please refer to other sources")
-                        .foregroundColor(Color("textMainColor"))
-                        .background(/*@START_MENU_TOKEN@*//*@PLACEHOLDER=View@*/Color("backgroundCard")/*@END_MENU_TOKEN@*/)
+                        .foregroundColor(Color("Text600"))
                 }
             }
         }.disabled(value.docs_field_number + value.path_type + value.docs_type == "")

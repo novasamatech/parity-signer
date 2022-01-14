@@ -10,14 +10,7 @@ import SwiftUI
 struct TCBlockHash: View {
     var text: String
     var body: some View {
-        HStack {
-            Text("Block hash: ")
-                .foregroundColor(Color("AccentColor"))
-            Text(text)
-                .foregroundColor(Color("textMainColor"))
-            Spacer()
-        }
-        .background(/*@START_MENU_TOKEN@*//*@PLACEHOLDER=View@*/Color("backgroundCard")/*@END_MENU_TOKEN@*/)
+        TCNameValueTemplate(name: "Block hash", value: text)
     }
 }
 

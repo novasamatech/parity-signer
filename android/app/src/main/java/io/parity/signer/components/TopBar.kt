@@ -1,48 +1,45 @@
 package io.parity.signer.components
 
-import androidx.compose.foundation.gestures.draggable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.width
 import androidx.compose.material.*
 import androidx.compose.material.ButtonDefaults.buttonColors
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.AddCircle
-import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.AddCircleOutline
+import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.livedata.observeAsState
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import com.google.android.material.color.MaterialColors
-import io.parity.signer.KeyManagerModal
-import io.parity.signer.SignerAlert
-import io.parity.signer.SignerScreen
+import androidx.compose.ui.unit.dp
+import io.parity.signer.ButtonID
 import io.parity.signer.models.*
 import io.parity.signer.ui.theme.Bg100
 import io.parity.signer.ui.theme.Text500
 
 @Composable
 fun TopBar(signerDataModel: SignerDataModel) {
-	val screen = signerDataModel.signerScreen.observeAsState()
-	val keymodal = signerDataModel.keyManagerModal.observeAsState()
-	val alert = signerDataModel.alert.observeAsState()
+	val backButton = signerDataModel.back.observeAsState()
+	val screenName = signerDataModel.screenLabel.observeAsState()
+	val screenNameType = signerDataModel.screenNameType.observeAsState()
+	val rightButton = signerDataModel.rightButton.observeAsState()
 
 	TopAppBar(
 		backgroundColor = Bg100
 	) {
 		Row(
 			horizontalArrangement = Arrangement.Start,
-			modifier = Modifier.weight(0.3f, fill = true)) {
-			if (!signerDataModel.isBottom()) {
+			modifier = Modifier.weight(0.3f, fill = true).width(72.dp)
+		) {
+			if (backButton.value == true) {
 				Button(
 					colors = buttonColors(
 						contentColor = Text500,
 						backgroundColor = Bg100
 					),
 					onClick = {
-					signerDataModel.goBack()
-				}) {
+						signerDataModel.pushButton(ButtonID.GoBack)
+					}) {
 					Text("Back")
 				}
 			}
@@ -50,21 +47,45 @@ fun TopBar(signerDataModel: SignerDataModel) {
 		Row(
 			horizontalArrangement = Arrangement.Center,
 			modifier = Modifier.weight(0.4f, fill = true)
-		){
-		Text(
-			signerDataModel.getScreenName()
-		)
+		) {
+			Text(
+				screenName.value ?: "",
+				style = if (screenNameType.value == "h4") {
+					MaterialTheme.typography.h4
+				} else {
+					MaterialTheme.typography.h1
+				}
+			)
 		}
 		Row(
 			horizontalArrangement = Arrangement.End,
-			modifier = Modifier.weight(0.3f, fill = true)
+			modifier = Modifier.weight(0.3f, fill = true).width(72.dp)
 		) {
-			if (screen.value == SignerScreen.Keys && keymodal.value == KeyManagerModal.SeedSelector) {
-				IconButton(onClick = { signerDataModel.newSeedScreenEngage() }) {
-					Icon(Icons.Default.AddCircle, "New Seed")
+			IconButton(onClick = { signerDataModel.pushButton(ButtonID.RightButton) }) {
+				when (rightButton.value) {
+					"NewSeed" -> {
+						Icon(Icons.Default.AddCircleOutline, "New Seed")
+					}
+					"Backup" -> {
+						Icon(Icons.Default.MoreVert, "Seed backup")
+					}
+					"LogRight" -> {
+						Icon(Icons.Default.MoreVert, "Seed backup")
+					}
+					"MultiSelect" -> {
+
+					}
+					"None" -> {
+
+					}
+					else -> {
+						Icon(Icons.Default.MoreVert, "Seed backup")
+					}
 				}
 			}
-			NavbarShield(signerDataModel = signerDataModel)
+			IconButton(onClick = { signerDataModel.pushButton(ButtonID.Shield) }) {
+				NavbarShield(signerDataModel = signerDataModel)
+			}
 		}
 	}
 }

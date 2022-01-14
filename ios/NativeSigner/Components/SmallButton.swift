@@ -13,7 +13,7 @@ struct SmallButton: View {
             Text(text)
             .padding(.horizontal, 8)
             .padding(.vertical, 4)
-                .overlay(RoundedRectangle(cornerRadius: 8.0).strokeBorder().foregroundColor(Color("AccentColor")))
+                .overlay(RoundedRectangle(cornerRadius: 8.0).strokeBorder().foregroundColor(Color("Action400")))
     }
 }
 

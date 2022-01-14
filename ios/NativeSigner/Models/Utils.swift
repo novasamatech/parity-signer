@@ -7,8 +7,10 @@
 
 import Foundation
 
-//Util: convert hex string spit out by rust code into data
-//uft16 is used for string-native performance
+/**
+ * Util: convert hex string spit out by rust code into data
+ * uft16 is used for string-native performance
+ */
 extension Data {
     
     func hexCharValue(u: UInt16) -> UInt8? {
@@ -40,6 +42,9 @@ extension Data {
     }
 }
 
+/**
+ * Decode markdown object from hex-encoded string passed in JSON
+ */
 extension AttributedString {
     init?(fromHexDocs string: String) {
         try? self.init(markdown: Data(fromHexEncodedString: string) ?? Data(), options: AttributedString.MarkdownParsingOptions(interpretedSyntax: .inlineOnlyPreservingWhitespace, failurePolicy: .returnPartiallyParsedIfPossible))
@@ -58,6 +63,3 @@ extension String {
         }
     }
 }
-
-//Getting font:
-//Text("kusama").font(Font.custom("Web3-Regular", size: 24))

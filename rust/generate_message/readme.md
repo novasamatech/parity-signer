@@ -28,12 +28,15 @@ Types of messages that could be generated:
 - 53xx80 `load_metadata` (contains `definitions::qr_transfers::ContentLoadMeta`)  
 - 53xx81 `load_types` (contains `definitions::qr_transfers::ContentLoadTypes`)  
 - 53xxc1 `add_specs` (contains `definitions::qr_transfers::ContentAddSpecs`);  
+- 53ffde `derivations` (contains `definitions::qr_transfers::ContentDerivations`);  
 
 Message `load_metadata` is used to load new versions of metadata for networks already in users database.  
 
 Message `load_types` is used to load types information in users database, and hopefully will go obsolete soon with FrameMetadataV14 integration. Should be used really rarely.  
 
 Message `add_specs` is used to add network specs for networks that are not yet in users database.  
+
+Message `derivations` is used to import a set of user-defined **password-free** derivations, from a text file, for certain network known to the hot database.  
 
 
 ## Possible output formats
@@ -127,8 +130,6 @@ Possible commands are:
         - `load_metadata`  
         - `add_specs`
     - key `-payload` followed by `****` - file name to read message content as Vec<u8> from file named `****` from folder `../files/for_signing/`  
-    - key `-signature` followed by:  
-        
     - optional key `-name` followed by `****` - name override to save file named `****` for apng export and file named `****.txt` into folder `../files/signed/`  
 
 - `remove` with following keys  
@@ -144,6 +145,11 @@ Possible commands are:
 - `make_cold_release` without any keys, to reset in default form the cold database `COLD_DB_NAME_RELEASE` without any identities added  
 
 - `transfer_meta_to_cold_release` without any keys, to transfer metadata from hot database in its current state into cold database `COLD_DB_NAME_RELEASE` without any identities added  
+
+- `derivations` to generate Signer-readable qr code to import derivations, with following keys:  
+    - optional content key: `-qr` will generate only apng qr code, `-text` will generate only text file with hex encoded message; by default, both qr code and text message are generated; content keys are expected immediately after `derivations` command, if at all; keys to follow could go in any order, but with content immediately following the key.  
+    - key `-title` followed by network title, the storage key in address book  
+    - key `-payload` followed by file name to read derivation from, in `../generate_message` folder. Derivations should be on individual line each, empty line count as empty derivations (root ones). See file `../generate_message/standard_derivations_list` for formatting example. All succesfully read derivations will be also printed to user during the run. For now duplicates are allowed when creating transfer, only one entry is made in Signer when accepting the payload.  
 
 
 ## Example commands  
@@ -179,9 +185,43 @@ Let's say we want to generate QR code with signed load_metadata message for fres
 Done!  
 
 
-## If the database somehow got corrupted or does not exist:  
+## Restoring hot database:  
 
-The database operated by `generate_message` crate is referred as *hot* both here and in crate `db_handling`. To restore the database to defaults, run through steps 1-2 of **Instruction for a fresh start** in `db_handling` readme.  
+The database operated by `generate_message` crate is referred as *hot* both here and in crate `db_handling`. To restore the database to defaults, run:  
+`$ cargo run restore_defaults`  
+
+This will purge old database, and generate new database with `address_book` and `chainspecs` trees, but with empty `metadata` tree.
+
+To fetch new metadata, run:  
+`$ cargo run load_metadata -a`  
+
+
+## Restoring test cold database, with set of known old metadata and with mock identities:  
+
+To restore test cold database, run:  
+`$ cargo run make_cold_with_identities`  
+
+This will purge old test cold database, and generate new one with default network information and with test ALice identities.
+
+Test cold database already contains some metadata (from `/defaults/test_metadata/` folder). Optionally, to transfer metadata from hot database into test cold one, run:  
+`$ cargo run transfer_meta_to_cold`  
+
+This will add metadata from hot database for default networks into test cold database (only metadata for networks with specs recorded in cold database are transferred).
+
+
+## Restoring release cold database, with set of known latest metadata and no identities:  
+
+To restore release cold database, run:  
+`$ cargo run make_cold_release`  
+
+This will purge old release cold database, and generate new one with default network information.
+
+Release cold database already contains some metadata (from `/defaults/release_metadata/` folder). Normally, all the latest metadata is thus already in the database. However, if needed to transfer metadata from hot database into release cold one, run:  
+`$ cargo run transfer_meta_to_cold_release`  
+
+This will add metadata from hot database for default networks into release cold database (only metadata for networks with specs recorded in cold database are transferred).
+
+Release cold database is the one loaded into Signer.
 
 
 ## List of currently supported command and key combinations (without `make` and `sign` variants)  
@@ -220,5 +260,15 @@ The database operated by `generate_message` crate is referred as *hot* both here
 `$ cargo run remove -name kusama -version 9090`  
 
 `$ cargo run restore_defaults`  
+
+`$ cargo run make_cold_with_identities`  
+
+`$ cargo run transfer_meta_to_cold`  
+
+`$ cargo run make_cold_release`  
+
+`$ cargo run transfer_meta_to_cold_release`  
+
+`$ cargo run derivations -title westend -payload standard_derivations_list` 
 
 (*) encryption override key should correspond to appropriate encryption for the network in question

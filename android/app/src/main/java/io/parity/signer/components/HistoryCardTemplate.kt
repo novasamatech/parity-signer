@@ -1,10 +1,7 @@
 package io.parity.signer.components
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
 import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
@@ -39,7 +36,6 @@ fun HistoryCardTemplate(
 			.background(Bg200)
 			.padding(8.dp)
 	) {
-		Icon(image, "history event icon", modifier = Modifier, tint = color2)
 		Column(
 			modifier = Modifier.padding(horizontal = 8.dp)
 		) {
@@ -51,5 +47,7 @@ fun HistoryCardTemplate(
 				style = CryptoTypography.body2
 			)
 		}
+		Spacer(Modifier.weight(1f))
+		Icon(image, "history event icon", modifier = Modifier, tint = color2)
 	}
 }

@@ -1,12 +1,10 @@
-use meta_reading::{decode_metadata::decode_version, fetch_metadata::{fetch_info, fetch_info_with_chainspecs}, interpret_chainspecs::interpret_properties};
 use constants::{COLOR, SECONDARY_COLOR};
-use definitions::{crypto::Encryption, metadata::MetaValues, network_specs::ChainSpecsToSend};
+use definitions::{crypto::Encryption, error::{Active, Changed, DatabaseActive, ErrorActive, Fetch, IncomingMetadataSourceActive, NotHexActive}, helpers::unhex, metadata::MetaValues, network_specs::NetworkSpecsToSend};
 use std::convert::TryInto;
-use db_handling::{helpers::unhex, error::NotHex};
-use anyhow;
 
-use crate::error::{Error, NotDecodeable};
+use crate::fetch_metadata::{fetch_info, fetch_info_with_network_specs};
 use crate::helpers::{genesis_hash_in_hot_db, filter_address_book_by_url, process_indices};
+use crate::interpret_specs::interpret_properties;
 
 
 /// Struct to store MetaValues and genesis hash for network
@@ -17,53 +15,44 @@ pub struct MetaShortCut {
 
 /// Function to process address as &str, fetch metadata and genesis hash for it,
 /// and output MetaShortCut value in case of success
-pub fn meta_shortcut (address: &str) -> anyhow::Result<MetaShortCut> {
-
+pub fn meta_shortcut (address: &str) -> Result<MetaShortCut, ErrorActive> {
     let new_info = match fetch_info(address) {
         Ok(a) => a,
-        Err(e) => return Err(Error::FetchFailed{address: address.to_string(), error: e.to_string()}.show()),
+        Err(e) => return Err(ErrorActive::Fetch(Fetch::Failed{url: address.to_string(), error: e.to_string()})),
     };
-    let genesis_hash = get_genesis_hash(&new_info.genesis_hash)?;
-    let meta_values = match decode_version(&new_info.meta) {
-        Ok(a) => a,
-        Err(e) => return Err(Error::NotDecodeable(NotDecodeable::FetchedMetadata{address: address.to_string(), error: e.to_string()}).show())
-    };
+    let genesis_hash = get_genesis_hash(address, &new_info.genesis_hash)?;
+    let meta_values = MetaValues::from_str_metadata(&new_info.meta, IncomingMetadataSourceActive::Fetch{url: address.to_string()})?;
     Ok(MetaShortCut{
         meta_values,
         genesis_hash,
     })
 }
 
-
-/// Struct to store MetaValues, genesis hash, and ChainSpecsToSend for network
+/// Struct to store MetaValues, genesis hash, and NetworkSpecsToSend for network
 pub struct MetaSpecsShortCut {
     pub meta_values: MetaValues,
-    pub specs: ChainSpecsToSend,
+    pub specs: NetworkSpecsToSend,
     pub update: bool, // flag to indicate that the database has no exact entry created
 }
 
-
-/// Function to process address as &str, fetch metadata, genesis hash, and chainspecs
+/// Function to process address as &str, fetch metadata, genesis hash, and network specs
 /// for it, and output MetaSpecsShortCut value in case of success
-pub fn meta_specs_shortcut (address: &str, encryption: Encryption) -> anyhow::Result<MetaSpecsShortCut> {
+pub fn meta_specs_shortcut (address: &str, encryption: Encryption) -> Result<MetaSpecsShortCut, ErrorActive> {
 
     let entries = filter_address_book_by_url(address)?;
-    let new_info = match fetch_info_with_chainspecs(address) {
+    let new_info = match fetch_info_with_network_specs(address) {
         Ok(a) => a,
-        Err(e) => return Err(Error::FetchFailed{address: address.to_string(), error: e.to_string()}.show()),
+        Err(e) => return Err(ErrorActive::Fetch(Fetch::Failed{url: address.to_string(), error: e.to_string()})),
     };
-    let genesis_hash = get_genesis_hash(&new_info.genesis_hash)?;
-    let meta_values = match decode_version(&new_info.meta) {
-        Ok(a) => a,
-        Err(e) => return Err(Error::NotDecodeable(NotDecodeable::FetchedMetadata{address: address.to_string(), error: e.to_string()}).show())
-    };
+    let genesis_hash = get_genesis_hash(address, &new_info.genesis_hash)?;
+    let meta_values = MetaValues::from_str_metadata(&new_info.meta, IncomingMetadataSourceActive::Fetch{url: address.to_string()})?;
     let new_properties = match interpret_properties(&new_info.properties) {
         Ok(a) => a,
-        Err(e) => return Err(Error::BadNetworkProperties{address: address.to_string(), error: e.to_string()}.show()),
+        Err(error) => return Err(ErrorActive::Fetch(Fetch::FaultySpecs{url: address.to_string(), error})),
     };
     if entries.len() == 0 {
-        if genesis_hash_in_hot_db (genesis_hash)? {return Err(Error::NoEntriesExpected(address.to_string()).show())}
-        let specs = ChainSpecsToSend {
+        if genesis_hash_in_hot_db (genesis_hash)? {return Err(ErrorActive::Database(DatabaseActive::NewAddressKnownGenesisHash{url: address.to_string(), genesis_hash}))}
+        let specs = NetworkSpecsToSend {
             base58prefix: new_properties.base58prefix,
             color: COLOR.to_string(),
             decimals: new_properties.decimals,
@@ -84,11 +73,12 @@ pub fn meta_specs_shortcut (address: &str, encryption: Encryption) -> anyhow::Re
     }
     else {
         let (specs, update) = process_indices(&entries, encryption)?;
-        if specs.base58prefix != new_properties.base58prefix {return Err(Error::Base58Changed(address.to_string()).show())}
-        if specs.decimals != new_properties.decimals {return Err(Error::DecimalsChanged(address.to_string()).show())}
-        if specs.unit != new_properties.unit {return Err(Error::UnitChanged(address.to_string()).show())}
-        if specs.name != meta_values.name {return Err(Error::NameChanged(address.to_string()).show())}
-        // ChainSpecsToSend are good, can use them
+        let url = address.to_string();
+        if specs.base58prefix != new_properties.base58prefix {return Err(ErrorActive::Fetch(Fetch::ValuesChanged{url, what: Changed::Base58Prefix{old: specs.base58prefix, new: new_properties.base58prefix}}))}
+        if specs.decimals != new_properties.decimals {return Err(ErrorActive::Fetch(Fetch::ValuesChanged{url, what: Changed::Decimals{old: specs.decimals, new: new_properties.decimals}}))}
+        if specs.unit != new_properties.unit {return Err(ErrorActive::Fetch(Fetch::ValuesChanged{url, what: Changed::Unit{old: specs.unit.to_string(), new: new_properties.unit.to_string()}}))}
+        if specs.name != meta_values.name {return Err(ErrorActive::Fetch(Fetch::ValuesChanged{url, what: Changed::Name{old: specs.name.to_string(), new: meta_values.name.to_string()}}))}
+        // NetworkSpecsToSend are good, can use them
         Ok(MetaSpecsShortCut{
             meta_values,
             specs,
@@ -98,11 +88,11 @@ pub fn meta_specs_shortcut (address: &str, encryption: Encryption) -> anyhow::Re
 }
 
 /// Helper function to interpret freshly fetched genesis hash
-fn get_genesis_hash (fetched_genesis_hash: &str) -> anyhow::Result<[u8; 32]> {
-    let genesis_hash_vec = unhex(fetched_genesis_hash, NotHex::GenesisHash)?;
+fn get_genesis_hash (address: &str, fetched_genesis_hash: &str) -> Result<[u8; 32], ErrorActive> {
+    let genesis_hash_vec = unhex::<Active>(fetched_genesis_hash, NotHexActive::FetchedGenesisHash{url: address.to_string()})?;
     let out: [u8; 32] = match genesis_hash_vec.try_into() {
         Ok(a) => a,
-        Err(_) => return Err(Error::UnexpectedGenesisHashFormat.show())
+        Err(_) => return Err(ErrorActive::Fetch(Fetch::UnexpectedFetchedGenesisHashFormat{value: fetched_genesis_hash.to_string()})),
     };
     Ok(out)
 }

@@ -11,6 +11,7 @@ import SwiftUI
 struct TransactionCardSelector: View {
     var card: TransactionCard
     var body: some View {
+        HStack {
         switch card.card {
         case .author(let author):
             TCAuthor(author: author)
@@ -21,13 +22,15 @@ struct TransactionCardSelector: View {
         case .balance(let value):
             TCBalance(value: value)
         case .bitVec(let text):
-            Text(text).foregroundColor(Color("textMainColor"))
+            TCBitVec(content: text)
         case .blockHash(let text):
             TCBlockHash(text: text)
         case .call(let value):
             TCCall(value: value)
         case .defaultCard(let text):
-            Text(text).foregroundColor(Color("textMainColor"))
+            TCDefault(content: text)
+        case .derivations(let value):
+            TCDerivations(value: value)
         case .enumVariantName(let value):
             TCEnumVariantName(value: value)
         case .eraImmortal:
@@ -40,19 +43,20 @@ struct TransactionCardSelector: View {
             TCFieldName(value: value)
         case .fieldNumber(let value):
             TCFieldNumber(value: value)
-        case .id(let text):
-            TCID(text: text)
+        case .id(let value):
+            TCID(value: value)
         case .identityField(let text):
-            Text(text).foregroundColor(Color("textMainColor"))
+            TCIdentityField(content: text)
         case .meta(let value):
-            Text(String(describing: value))
-                .foregroundColor(Color("textMainColor"))
+            TCMeta(content: value)
         case .nameVersion(let value):
             TCNameVersion(value: value)
+        case .networkInfo(let value):
+            TCNetworkInfo(content: value)
         case .newSpecs(let value):
             TCNewSpecs(value: value)
         case .nonce(let text):
-            Text("Nonce: " + text)
+            TCNonce(content: text)
         case .none:
             EmptyView()
         case .pallet(let text):
@@ -62,14 +66,13 @@ struct TransactionCardSelector: View {
         case .tip(let value):
             TCTip(value: value)
         case .tipPlain(let text):
-            Text(text).foregroundColor(Color("textMainColor"))
+            TCTipPlain(content: text)
         case .txSpec(let value):
             TCTXSpec(value: value)
         case .txSpecPlain(let value):
-            Text(String(describing: value))
-                .foregroundColor(Color("textMainColor"))
-        case .typesInfo(let text):
-            TCTypesInfo(text: text)
+            TCTXSpecPlain(content: value)
+        case .typesInfo(let value):
+            TCTypesInfo(content: value)
         case .varName(let text):
             TCVarName(text: text)
         case .verifier(let value):
@@ -77,9 +80,10 @@ struct TransactionCardSelector: View {
         case .warning(let text):
             TCWarning(text: text)
         case .networkGenesisHash(let text):
-            Text("Genesis hash: " + text)
+            TCGenesisHash(content: text)
         case .networkName(let text):
-            Text("Network name: " + text)
+            TCNetworkName(content: text)
+        }
         }
     }
 }

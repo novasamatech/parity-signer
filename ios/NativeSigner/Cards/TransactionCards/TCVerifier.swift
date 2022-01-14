@@ -11,19 +11,22 @@ struct TCVerifier: View {
     var value: Verifier
     var body: some View {
         VStack {
-            Text("VERIFIER CERTIFICATE").foregroundColor(Color("textMainColor"))
-            VStack(alignment: .leading) {
-                HStack {
-                    Text("key:")
-                        .foregroundColor(Color("textMainColor"))
-                    Text(value.hex)
-                        .foregroundColor(Color("cryptoColor"))
-                }
-                HStack {
-                    Text("crypto:")
-                        .foregroundColor(Color("textMainColor"))
-                    Text(value.encryption)
-                        .foregroundColor(Color("cryptoColor"))
+            Text("VERIFIER CERTIFICATE").foregroundColor(Color("Text600"))
+            HStack{
+                Identicon(identicon: value.identicon)
+                VStack(alignment: .leading) {
+                    HStack {
+                        Text("key:")
+                            .foregroundColor(Color("Text600"))
+                        Text(value.hex)
+                            .foregroundColor(Color("Crypto400"))
+                    }
+                    HStack {
+                        Text("crypto:")
+                            .foregroundColor(Color("Text600"))
+                        Text(value.encryption)
+                            .foregroundColor(Color("Crypto400"))
+                    }
                 }
             }
         }
@@ -31,8 +34,8 @@ struct TCVerifier: View {
 }
 
 /*
-struct TCVerifier_Previews: PreviewProvider {
-    static var previews: some View {
-        TCVerifier()
-    }
-}*/
+ struct TCVerifier_Previews: PreviewProvider {
+ static var previews: some View {
+ TCVerifier()
+ }
+ }*/
