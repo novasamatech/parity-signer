@@ -3,8 +3,9 @@ use hex;
 use png;
 use sled;
 use sp_core::crypto::SecretStringError;
+use sp_runtime::MultiSigner;
 
-use crate::{crypto:: Encryption, keyring::{AddressKey, AddressBookKey, MetaKey, NetworkSpecsKey, VerifierKey}, network_specs::{ValidCurrentVerifier, Verifier, VerifierValue}};
+use crate::{crypto:: Encryption, helpers::multisigner_to_public, keyring::{AddressKey, AddressBookKey, MetaKey, NetworkSpecsKey, VerifierKey}, network_specs::{ValidCurrentVerifier, Verifier, VerifierValue}, users::AddressDetails};
 
 /// Trait describing the origin of errors.
 /// ErrorSource is implemented for Active (errors on the active side -
@@ -137,6 +138,7 @@ pub enum AddressGenerationCommon {
     EncryptionMismatch{network_encryption: Encryption, seed_object_encryption: Encryption},
     KeyCollision{seed_name: String},
     SecretString(SecretStringError),
+    DerivationExists(MultiSigner, AddressDetails, NetworkSpecsKey),
 }
 
 fn bad_secret_string(e: &SecretStringError) -> &'static str {
@@ -156,6 +158,15 @@ impl AddressGenerationCommon {
             AddressGenerationCommon::EncryptionMismatch{network_encryption, seed_object_encryption} => format!("Network encryption {} is different from seed object encryption {}.", network_encryption.show(), seed_object_encryption.show()),
             AddressGenerationCommon::KeyCollision{seed_name} => format!("Address key collision for seed name {}", seed_name),
             AddressGenerationCommon::SecretString(e) => format!("Bad secret string: {}.", bad_secret_string(e)),
+            AddressGenerationCommon::DerivationExists(multisigner, address_details, network_specs_key) => {
+                let public_key = multisigner_to_public(&multisigner);
+                if address_details.has_pwd {
+                    format!("Seed {} already has derivation {}///<password> for network specs key {}, public key {}.", address_details.seed_name, address_details.path, hex::encode(network_specs_key.key()), hex::encode(public_key))
+                }
+                else {
+                    format!("Seed {} already has derivation {} for network specs key {}, public key {}.", address_details.seed_name, address_details.path, hex::encode(network_specs_key.key()), hex::encode(public_key))
+                }
+            },
         }
     }
 }

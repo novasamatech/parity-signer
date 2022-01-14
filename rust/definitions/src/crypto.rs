@@ -1,7 +1,6 @@
 use parity_scale_codec_derive::{Decode, Encode};
 use sp_core;
 use sp_runtime::{MultiSigner, MultiSignature};
-use zeroize::Zeroize;
 
 use crate::network_specs::VerifierValue;
 
@@ -9,8 +8,7 @@ use crate::network_specs::VerifierValue;
 /// here.
 //TODO: check if it is redundant
 //Could not be replaced by sp_core::...::CRYPTO_ID as that doesn't do anything at compile time
-#[derive(Clone, PartialEq, Debug, Decode, Encode, Zeroize)]
-#[zeroize(drop)]
+#[derive(Clone, PartialEq, Debug, Decode, Encode)]
 pub enum Encryption {
     Ed25519,
     Sr25519,

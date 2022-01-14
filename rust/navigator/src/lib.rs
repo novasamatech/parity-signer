@@ -6,7 +6,7 @@ use std::sync::{Mutex, TryLockError};
 use lazy_static::lazy_static;
 
 use db_handling;
-use definitions::keyring::NetworkSpecsKey;
+use definitions::{error::Signer, keyring::NetworkSpecsKey};
 
 mod actions;
     use actions::Action;
@@ -76,7 +76,7 @@ pub fn init_navigation(
             } else {
                 (*navstate).seed_names = Vec::new();
             }
-            match db_handling::network_details::get_all_networks(dbname) {
+            match db_handling::network_details::get_all_networks::<Signer>(dbname) {
                 Ok(a) => for x in a.iter() {
                     (*navstate).networks.push(NetworkSpecsKey::from_parts(&x.genesis_hash.to_vec(), &x.encryption));
                 },

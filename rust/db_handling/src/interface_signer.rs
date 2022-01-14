@@ -147,7 +147,7 @@ pub fn addresses_set_seed_name_network (database_name: &str, seed_name: &str, ne
 
 /// Function to print all networks, with bool indicator which one is currently selected
 pub fn show_all_networks_with_flag (database_name: &str, network_specs_key: &NetworkSpecsKey) -> Result<String, ErrorSigner> {
-    let mut networks = get_all_networks(database_name)?;
+    let mut networks = get_all_networks::<Signer>(database_name)?;
     networks.sort_by(|a, b| a.order.cmp(&b.order));
     Ok(format!("\"networks\":{}", export_complex_vector(&networks, |a| 
         {
@@ -159,7 +159,7 @@ pub fn show_all_networks_with_flag (database_name: &str, network_specs_key: &Net
 
 /// Function to print all networks without any selection
 pub fn show_all_networks (database_name: &str) -> Result<String, ErrorSigner> {
-    let mut networks = get_all_networks(database_name)?;
+    let mut networks = get_all_networks::<Signer>(database_name)?;
     networks.sort_by(|a, b| a.order.cmp(&b.order));
     Ok(format!("\"networks\":{}", export_complex_vector(&networks, |a| 
         {
@@ -172,7 +172,7 @@ pub fn show_all_networks (database_name: &str) -> Result<String, ErrorSigner> {
 /// Function to sort networks by the order and get the network specs for the first network on the list.
 /// If no networks in the system, throws error
 pub fn first_network (database_name: &str) -> Result<NetworkSpecs, ErrorSigner> {
-    let mut networks = get_all_networks(database_name)?;
+    let mut networks = get_all_networks::<Signer>(database_name)?;
     if networks.len() == 0 {return Err(ErrorSigner::NoNetworksAvailable)}
     networks.sort_by(|a, b| a.order.cmp(&b.order));
     Ok(networks.remove(0))
@@ -206,7 +206,7 @@ pub fn export_key (database_name: &str, multisigner: &MultiSigner, expected_seed
 /// Function to prepare seed backup screen.
 /// Gets seed name, outputs all known derivations in all networks.
 pub fn backup_prep (database_name: &str, seed_name: &str) -> Result<String, ErrorSigner> {
-    let networks = get_all_networks(database_name)?;
+    let networks = get_all_networks::<Signer>(database_name)?;
     if networks.len() == 0 {return Err(ErrorSigner::NoNetworksAvailable)}
     let mut export: Vec<(NetworkSpecs, Vec<AddressDetails>)> = Vec::new();
     for x in networks.into_iter() {
@@ -246,7 +246,7 @@ pub fn network_details_by_key (database_name: &str, network_specs_key: &NetworkS
 pub fn metadata_details (database_name: &str, network_specs_key: &NetworkSpecsKey, network_version: u32) -> Result<String, ErrorSigner> {
     let network_specs = get_network_specs(database_name, network_specs_key)?;
     let meta_values = get_meta_values_by_name_version::<Signer>(database_name, &network_specs.name, network_version)?;
-    let relevant_networks = get_all_networks(database_name)?
+    let relevant_networks = get_all_networks::<Signer>(database_name)?
         .into_iter()
         .filter(|a| a.name == network_specs.name)
         .collect()

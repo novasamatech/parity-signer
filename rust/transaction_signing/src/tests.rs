@@ -3,7 +3,7 @@ mod tests {
     use hex;
     use transaction_parsing::{Action, produce_output, print_history_entry_by_order_with_decoding, StubNav};
     use crate::{handle_stub, sign_transaction::create_signature};
-    use db_handling::{cold_default::{populate_cold, populate_cold_no_networks}, identities::try_create_seed, manage_history::print_history, remove_network::remove_network};
+    use db_handling::{cold_default::{populate_cold, populate_cold_no_networks}, identities::{remove_seed, try_create_address, try_create_seed}, manage_history::print_history, remove_network::remove_network};
     use definitions::{crypto::Encryption, error::{AddressKeySource, DatabaseSigner, ErrorSigner, ErrorSource, Signer}, keyring::{AddressKey, MetaKey, NetworkSpecsKey, VerifierKey}, network_specs::{CurrentVerifier, NetworkSpecs, Verifier, VerifierValue}, users::AddressDetails};
     use constants::{ADDRTREE, GENERALVERIFIER, METATREE, SETTREE, SPECSTREE, VERIFIERS};
     use parity_scale_codec::{Decode, Encode};
@@ -289,7 +289,8 @@ Identities:
 		018091b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3"#;
             assert!(print_after == expected_print_after, "Received:\n{}", print_after);
         
-            try_create_seed("Alice", SEED_PHRASE, true, dbname).unwrap();
+            try_create_address("Alice", SEED_PHRASE, "", &NetworkSpecsKey::from_parts(&hex::decode("e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e").unwrap(), &Encryption::Ed25519), dbname).unwrap();
+            try_create_address("Alice", SEED_PHRASE, "//westend", &NetworkSpecsKey::from_parts(&hex::decode("e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e").unwrap(), &Encryption::Ed25519), dbname).unwrap();
             let print_after = print_db_content(&dbname);
             let expected_print_after = r#"Database contents:
 Metadata:
@@ -325,6 +326,63 @@ Identities:
 	public_key: f606519cb8726753885cd4d0f518804a69a5e0badf36fee70feadd8044081730, encryption: sr25519, path: //polkadot, available_networks: 
 		018091b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3"#;
             assert!(print_after == expected_print_after, "Received:\n{}", print_after);
+            
+            remove_seed(dbname, "Alice").unwrap();
+            let print_after = print_db_content(&dbname);
+            let expected_print_after = r#"Database contents:
+Metadata:
+	kusama2030
+	polkadot30
+	westend9000
+	westend9010
+Network Specs:
+	0180b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe: Kusama (kusama with sr25519)
+	018091b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3: Polkadot (polkadot with sr25519)
+	0180e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e: Westend (westend with sr25519)
+	0080e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e: westend-ed25519 (westend with ed25519)
+Verifiers:
+	91b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3: "type":"general","details":{"hex":"","identicon":"","encryption":"none"}
+	b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe: "type":"general","details":{"hex":"","identicon":"","encryption":"none"}
+	e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e: "type":"general","details":{"hex":"","identicon":"","encryption":"none"}
+General Verifier: none
+Identities: "#;
+            assert!(print_after == expected_print_after, "Received:\n{}", print_after);
+            
+            try_create_seed("Alice", SEED_PHRASE, true, dbname).unwrap();
+            let print_after = print_db_content(&dbname);
+            let expected_print_after = r#"Database contents:
+Metadata:
+	kusama2030
+	polkadot30
+	westend9000
+	westend9010
+Network Specs:
+	0180b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe: Kusama (kusama with sr25519)
+	018091b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3: Polkadot (polkadot with sr25519)
+	0180e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e: Westend (westend with sr25519)
+	0080e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e: westend-ed25519 (westend with ed25519)
+Verifiers:
+	91b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3: "type":"general","details":{"hex":"","identicon":"","encryption":"none"}
+	b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe: "type":"general","details":{"hex":"","identicon":"","encryption":"none"}
+	e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e: "type":"general","details":{"hex":"","identicon":"","encryption":"none"}
+General Verifier: none
+Identities: 
+	public_key: 345071da55e5dccefaaa440339415ef9f2663338a38f7da0df21be5ab4e055ef, encryption: ed25519, path: , available_networks: 
+		0080e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e
+	public_key: 3efeca331d646d8a2986374bb3bb8d6e9e3cfcdd7c45c2b69104fab5d61d3f34, encryption: sr25519, path: //westend, available_networks: 
+		0180e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e
+	public_key: 46ebddef8cd9bb167dc30878d7113b7e168e6f0646beffd77d69d39bad76b47a, encryption: sr25519, path: , available_networks: 
+		018091b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3
+		0180b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe
+		0180e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e
+	public_key: 64a31235d4bf9b37cfed3afa8aa60754675f9c4915430454d365c05112784d05, encryption: sr25519, path: //kusama, available_networks: 
+		0180b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe
+	public_key: a52095ee77497ba94588d61c3f71c4cfa0d6a4f389cef43ebadc76c29c4f42de, encryption: ed25519, path: //westend, available_networks: 
+		0080e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e
+	public_key: f606519cb8726753885cd4d0f518804a69a5e0badf36fee70feadd8044081730, encryption: sr25519, path: //polkadot, available_networks: 
+		018091b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3"#;
+            assert!(print_after == expected_print_after, "Received:\n{}", print_after);
+            
         }
         else {panic!("Wrong action: {:?}", output)}
         fs::remove_dir_all(dbname).unwrap();

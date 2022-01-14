@@ -513,7 +513,6 @@ dependencies = [
  "sp-core",
  "sp-runtime",
  "sp-version",
- "zeroize",
 ]
 
 [[package]]

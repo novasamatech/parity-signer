@@ -2,7 +2,6 @@ use sled::IVec;
 use parity_scale_codec::Decode;
 use parity_scale_codec_derive;
 use sp_runtime::MultiSigner;
-use zeroize::Zeroize;
 
 use crate::crypto::Encryption;
 use crate::error::{AddressKeySource, ErrorSigner, ErrorSource, SpecsKeySource};
@@ -54,13 +53,3 @@ impl AddressDetails {
     }
     
 }
-
-/// Struct to move seed around
-#[derive(PartialEq, Debug, Zeroize)]
-#[zeroize(drop)]
-pub struct SeedObject {
-    pub seed_name: String,
-    pub seed_phrase: String,
-    pub encryption: Encryption,
-}
-
