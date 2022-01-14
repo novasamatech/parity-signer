@@ -21,4 +21,3 @@ jobs:
       - name:           Rust build
         shell:          bash
         run:            cd rust && cargo test && cd ..
-
