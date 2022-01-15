@@ -3,7 +3,7 @@ mod tests {
 
     use crate::{do_action, init_navigation, update_seed_names};
     
-    use db_handling::cold_default::{populate_cold_release, signer_init};
+    use db_handling::cold_default::{populate_cold_nav_test, signer_init};
     use definitions::network_specs::{Verifier, VerifierValue};
     use lazy_static::lazy_static;
     use regex::Regex;
@@ -61,7 +61,7 @@ mod tests {
     #[test]
     fn flow_test_1() {
         let dbname = "for_tests/flow_test_1";
-        populate_cold_release(dbname).unwrap();
+        populate_cold_nav_test(dbname).unwrap();
         signer_init(dbname, verifier_alice_sr25519()).unwrap();
         init_navigation(dbname, "");
         
