@@ -203,6 +203,10 @@ pub fn get_test_metadata() -> Result<Vec<MetaValues>, ErrorActive> {
     get_metadata("../defaults/test_metadata")
 }
 
+pub fn get_nav_test_metadata() -> Result<Vec<MetaValues>, ErrorActive> {
+    get_metadata("../defaults/nav_test_metadata")
+}
+
 pub fn get_release_metadata() -> Result<Vec<MetaValues>, ErrorActive> {
     get_metadata("../defaults/release_metadata")
 }

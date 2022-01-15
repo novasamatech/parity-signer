@@ -2,7 +2,7 @@ use parity_scale_codec::Encode;
 use sled::Batch;
 
 use constants::{ADDRTREE, DANGER, GENERALVERIFIER, HISTORY, METATREE, SETTREE, SPECSTREE, TRANSACTION, TYPES, VERIFIERS};
-use defaults::{default_general_verifier, get_default_chainspecs, get_default_types_content, get_release_metadata, get_test_metadata, get_default_verifiers};
+use defaults::{default_general_verifier, get_default_chainspecs, get_default_types_content, get_release_metadata, get_nav_test_metadata, get_test_metadata, get_default_verifiers};
 use definitions::{danger::DangerRecord, error::{Active, ErrorActive, ErrorSigner, ErrorSource, Signer}, history::Event, keyring::{MetaKey, NetworkSpecsKey}, network_specs::Verifier};
 
 use crate::db_transactions::TrDbCold;
@@ -13,6 +13,7 @@ use crate::manage_history::events_in_batch;
 enum Purpose {
     Release,
     Test,
+    TestNavigator,
 }
 
 /// Function to set default *start* history in test cold database:
@@ -35,6 +36,7 @@ fn default_cold_metadata (database_name: &str, purpose: Purpose) -> Result<Batch
     let metadata_set = match purpose {
         Purpose::Release => get_release_metadata()?,
         Purpose::Test => get_test_metadata()?,
+        Purpose::TestNavigator => get_nav_test_metadata()?,
     };
     for x in metadata_set.iter() {
         let meta_key = MetaKey::from_parts(&x.name, x.version);
@@ -190,8 +192,13 @@ pub fn populate_cold (database_name: &str, general_verifier: Verifier) -> Result
 }
 
 /// Function to populate release cold database.
-/// No initialization of history is made. For creating database for Signer and for navigation tests.
+/// No initialization of history is made. For creating database for Signer.
 pub fn populate_cold_release (database_name: &str) -> Result<(), ErrorActive> {
     reset_cold_database_no_addresses(&database_name, Purpose::Release)
 }
 
+/// Function to populate navigator test cold database.
+/// No initialization of history is made. For Signer navigation tests.
+pub fn populate_cold_nav_test (database_name: &str) -> Result<(), ErrorActive> {
+    reset_cold_database_no_addresses(&database_name, Purpose::TestNavigator)
+}
