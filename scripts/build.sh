@@ -93,14 +93,13 @@ if [ "$1" == "ios" ]
     cp -R ../database/database_cold_release/ ../../ios/NativeSigner/Database/Database
 
     cd ../..
-    #rm -rf ios/build
-    #xcodebuild -workspace ios/NativeSigner.xcodeproj/project.xcworkspace -scheme NativeSigner -allowProvisioningUpdates -configuration Release -derivedDataPath ios/build/NativeSigner -UseModernBuildSystem=YES | xcpretty -t
+    rm -rf ios/build
+    xcodebuild -workspace ios/NativeSigner.xcodeproj/project.xcworkspace -scheme NativeSigner -allowProvisioningUpdates -configuration Release -derivedDataPath ios/build/NativeSigner -UseModernBuildSystem=YES | xcpretty -t
     #xcodebuild -workspace ios/NativeSigner.xcodeproj/project.xcworkspace -scheme NativeSigner -allowProvisioningUpdates -configuration Debug -sdk iphonesimulator  -derivedDataPath ios/build/NativeSigner -UseModernBuildSystem=YES | xcpretty -t
 
     mkdir -p out
     XCARCHIVE=ios/build/NativeSigner/Build/Products/Release-iphoneos/NativeSigner.xcarchive
-    #xcodebuild -project ios/NativeSigner.xcodeproj -scheme NativeSigner -archivePath $XCARCHIVE archive
-    #PROFILE_UID=P2PX3JU8FT
+    xcodebuild -project ios/NativeSigner.xcodeproj -scheme NativeSigner -archivePath $XCARCHIVE archive
     xcodebuild -allowProvisioningUpdates -exportArchive -archivePath $XCARCHIVE -exportPath out -exportOptionsPlist ios/ExportOptions.plist
 
 fi
