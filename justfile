@@ -31,3 +31,8 @@ doc:
     #!/usr/bin/env bash
     cd rust
     cargo doc -p --workspace -p signer --all-features --no-deps
+
+bump:
+    #!/usr/bin/env bash
+    cd ios
+    agvtool next-version -all
