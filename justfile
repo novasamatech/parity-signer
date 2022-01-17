@@ -1,7 +1,3 @@
-VERSION := `toml get rust/signer/Cargo.toml package.version | jq -r`
-TARGET_DIR := "target/release"
-export TAG:=`toml get cli/Cargo.toml "package.version" | jq -r .`
-
 # List available commands
 _default:
   just --choose --chooser "fzf +s -x --tac --cycle"
