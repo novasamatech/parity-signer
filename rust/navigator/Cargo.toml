@@ -19,3 +19,5 @@ zeroize = "1.4.2"
 
 [dev-dependencies]
 regex = "1.4.5"
+quircs = "0.10.0"
+image = "0.23.14"
