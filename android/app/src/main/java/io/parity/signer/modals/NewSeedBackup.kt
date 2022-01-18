@@ -2,6 +2,7 @@ package io.parity.signer.modals
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.selection.toggleable
 import androidx.compose.material.Checkbox
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
@@ -12,6 +13,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.RoundRect
 import androidx.compose.ui.graphics.RectangleShape
+import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.unit.dp
 import io.parity.signer.ButtonID
 import io.parity.signer.components.BigButton
@@ -36,13 +38,21 @@ fun NewSeedBackup(signerDataModel: SignerDataModel) {
 				style = CryptoTypography.body1,
 				color = Crypto400
 			)
-			Row {
+			Row(Modifier.toggleable(
+				value = confirmBackup.value,
+				role = Role.Checkbox,
+				onValueChange = { confirmBackup.value = it }
+			)) {
 				Checkbox(
 					checked = confirmBackup.value,
-					onCheckedChange = { confirmBackup.value = it })
+					onCheckedChange = null)
 				Text("I have written down my seed phrase")
 			}
-			Row {
+			Row(Modifier.toggleable(
+				value = createRoots.value,
+				role = Role.Checkbox,
+				onValueChange = { createRoots.value = it }
+			)) {
 				Checkbox(
 					checked = createRoots.value,
 					onCheckedChange = { createRoots.value = it })
@@ -57,7 +67,8 @@ fun NewSeedBackup(signerDataModel: SignerDataModel) {
 								.let { seedPhrase ->
 									signerDataModel.addSeed(
 										seedName = seedName,
-										seedPhrase = seedPhrase
+										seedPhrase = seedPhrase,
+										createRoots = createRoots.value
 									)
 								}
 						}

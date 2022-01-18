@@ -20,7 +20,9 @@ import io.parity.signer.components.SeedCard
 import io.parity.signer.modals.*
 import io.parity.signer.models.*
 import io.parity.signer.ui.theme.Bg200
+import org.json.JSONArray
 import org.json.JSONObject
+import kotlin.math.sign
 
 /**
  * Key manager screen; here all key/identity/seed creation and deletion
@@ -31,6 +33,12 @@ import org.json.JSONObject
 @ExperimentalAnimationApi
 @Composable
 fun KeyManager(signerDataModel: SignerDataModel) {
+	val rootKey = signerDataModel.screenData.value?.optJSONObject("root")
+	val keySet = signerDataModel.screenData.value?.optJSONArray("set") ?: JSONArray()
+	val network = signerDataModel.screenData.value?.optJSONObject("network")
+	val multiselectMode = signerDataModel.screenData.value?.optBoolean("multiselect_mode")
+	val multiselectCount = signerDataModel.screenData.value?.optString("multiselect_count")
+
 	Column() {
 		Row(
 			Modifier
@@ -42,9 +50,9 @@ fun KeyManager(signerDataModel: SignerDataModel) {
 				.fillMaxWidth()
 		) {
 			SeedCard(
-				seedName = "TODO",
-				identicon = "",
-				seedSelector = true,
+				seedName = rootKey?.optString("seed_name") ?: "error",
+				identicon = rootKey?.optString("identicon") ?: "",
+				seedSelector = false,
 				signerDataModel = signerDataModel
 			)
 		}
@@ -66,11 +74,11 @@ fun KeyManager(signerDataModel: SignerDataModel) {
 			.padding(horizontal = 8.dp)) {
 			Text("DERIVED KEYS")
 			Spacer(Modifier.weight(1f, true))
-			IconButton(onClick = { /*TODO: export seed*/ }) {
+			IconButton(onClick = { signerDataModel.pushButton(ButtonID.NewKey) }) {
 				Icon(Icons.Default.AddCircle, contentDescription = "New derived key")
 			}
 		}
-		KeySelector(signerDataModel)
+		//KeySelector(signerDataModel)
 	}
 }
 

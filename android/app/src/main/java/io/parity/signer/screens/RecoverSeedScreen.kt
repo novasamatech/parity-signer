@@ -27,74 +27,79 @@ fun RecoverSeedScreen(signerDataModel: SignerDataModel) {
 	var recover by remember { mutableStateOf(false) }
 	val lastError = signerDataModel.lastError.observeAsState()
 	val focusManager = LocalFocusManager.current
+	val createRoots = remember { mutableStateOf(true) }
 
 	Column(
 		horizontalAlignment = Alignment.CenterHorizontally,
 		verticalArrangement = Arrangement.Center,
 		modifier = Modifier.fillMaxSize()
 	) {
-			Text("Create new seed")
-			Text(lastError.value.toString())
+		Text("Create new seed")
+		Text(lastError.value.toString())
+		TextField(
+			value = seedName,
+			onValueChange = {
+				seedName = it
+				signerDataModel.clearError()
+			},
+			label = { Text("Seed name") },
+			singleLine = true,
+			keyboardOptions = KeyboardOptions(
+				autoCorrect = false,
+				capitalization = KeyboardCapitalization.Words,
+				keyboardType = KeyboardType.Text,
+				imeAction = ImeAction.Done
+			),
+			keyboardActions = KeyboardActions(
+				onDone = { focusManager.clearFocus() }
+			)
+		)
+		Row {
+			Text("Custom seed")
+			Switch(
+				checked = recover,
+				onCheckedChange = {
+					recover = it
+					signerDataModel.clearError()
+				}
+			)
+		}
+		if (recover) {
 			TextField(
-				value = seedName,
+				value = seedPhrase,
 				onValueChange = {
-					seedName = it
+					seedPhrase = it
 					signerDataModel.clearError()
 				},
-				label = { Text("Seed name") },
+				label = { Text("Seed phrase") },
 				singleLine = true,
 				keyboardOptions = KeyboardOptions(
 					autoCorrect = false,
-					capitalization = KeyboardCapitalization.Words,
-					keyboardType = KeyboardType.Text,
+					keyboardType = KeyboardType.Password,
+					capitalization = KeyboardCapitalization.None,
 					imeAction = ImeAction.Done
 				),
 				keyboardActions = KeyboardActions(
 					onDone = { focusManager.clearFocus() }
 				)
 			)
-			Row {
-				Text("Custom seed")
-				Switch(
-					checked = recover,
-					onCheckedChange = {
-						recover = it
-						signerDataModel.clearError()
-					}
+		}
+		TextButton(
+			colors = ButtonDefaults.buttonColors(
+				backgroundColor = MaterialTheme.colors.background,
+				contentColor = MaterialTheme.colors.onBackground
+			),
+			onClick = {
+				signerDataModel.addSeed(
+					seedName,
+					seedPhrase,
+					createRoots = createRoots.value
 				)
-			}
-			if (recover) {
-				TextField(
-					value = seedPhrase,
-					onValueChange = {
-						seedPhrase = it
-						signerDataModel.clearError()
-					},
-					label = { Text("Seed phrase") },
-					singleLine = true,
-					keyboardOptions = KeyboardOptions(
-						autoCorrect = false,
-						keyboardType = KeyboardType.Password,
-						capitalization = KeyboardCapitalization.None,
-						imeAction = ImeAction.Done
-					),
-					keyboardActions = KeyboardActions(
-						onDone = { focusManager.clearFocus() }
-					)
-				)
-			}
-			TextButton(
-				colors = ButtonDefaults.buttonColors(
-					backgroundColor = MaterialTheme.colors.background,
-					contentColor = MaterialTheme.colors.onBackground
-				),
-				onClick = {
-					signerDataModel.addSeed(seedName, seedPhrase)
-				},
-				enabled = !seedName.isEmpty() && lastError.value?.isEmpty() as Boolean
-			) {
-				Text("Create")
-			}
+			},
+			enabled = !seedName.isEmpty() && lastError.value?.isEmpty() as Boolean
+		) {
+			Text("Create")
+		}
 
 
 	}

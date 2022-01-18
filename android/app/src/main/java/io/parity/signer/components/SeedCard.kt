@@ -34,7 +34,11 @@ fun SeedCard(
 		)
 		Spacer(modifier = Modifier.width(10.dp))
 		Column {
-			Text(seedName, color = Text600, style = MaterialTheme.typography.subtitle1)
+			Text(
+				seedName,
+				color = Text600,
+				style = MaterialTheme.typography.subtitle1
+			)
 		}
 	}
 }
