@@ -101,21 +101,25 @@ pub fn parse_extensions (extensions_data: Vec<u8>, metadata_bundle: &MetadataBun
     Ok(cards)
 }
 
-pub fn parse_set (data: &Vec<u8>, metadata_bundle: &MetadataBundle, short_specs: &ShortSpecs, optional_mortal_flag: Option<bool>) -> Result<(Result<Vec<OutputCard>, ParserError>, Vec<OutputCard>, Vec<u8>, Vec<u8>), ParserError> {
+pub fn cut_method_extensions(data: &Vec<u8>) -> Result<(Vec<u8>, Vec<u8>), ParserError> {
     let pre_method = get_compact::<u32>(data)?;
     let method_length = pre_method.compact_found as usize;
-    let (method_data, extensions_data) = match pre_method.start_next_unit {
+    match pre_method.start_next_unit {
         Some(start) => {
             match data.get(start..start+method_length) {
-                Some(a) => (a.to_vec(), data[start+method_length..].to_vec()),
+                Some(a) => Ok((a.to_vec(), data[start+method_length..].to_vec())),
                 None => {return Err(ParserError::Decoding(ParserDecodingError::DataTooShort))}
             }
         },
         None => {
             if method_length != 0 {return Err(ParserError::Decoding(ParserDecodingError::DataTooShort))}
-            (Vec::new(), data.to_vec())
+            Ok((Vec::new(), data.to_vec()))
         },
-    };
+    }
+}
+
+pub fn parse_set (data: &Vec<u8>, metadata_bundle: &MetadataBundle, short_specs: &ShortSpecs, optional_mortal_flag: Option<bool>) -> Result<(Result<Vec<OutputCard>, ParserError>, Vec<OutputCard>, Vec<u8>, Vec<u8>), ParserError> {
+    let (method_data, extensions_data) = cut_method_extensions(data)?;
     let extensions_cards = parse_extensions (extensions_data.to_vec(), metadata_bundle, short_specs, optional_mortal_flag)?;
     let method_cards = parse_method (method_data.to_vec(), metadata_bundle, short_specs);
     Ok((method_cards, extensions_cards, method_data, extensions_data))
