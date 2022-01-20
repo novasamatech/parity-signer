@@ -32,3 +32,38 @@ bump:
     #!/usr/bin/env bash
     cd ios
     agvtool next-version -all
+
+# zip artifacts
+zip:
+    #!/usr/bin/env bash
+    BASE_PATH=./ios/build/NativeSigner/Build/Products/Release-iphoneos
+    pushd $BASE_PATH
+    APP=$(ls -d *.app)
+    ARCHIVE=$(ls -d *.xcarchive)
+    zip -r $APP.zip $APP
+    zip -r $ARCHIVE.zip $ARCHIVE
+    shasum -a 256 $APP.zip > $APP.zip.sha256
+    shasum -a 256 $ARCHIVE.zip> $ARCHIVE.zip.sha256
+    du -hd0 *.{app,xcarchive,zip,sha256}
+    popd
+    # ls -al *.xcarchive
+    # ls -al *.zip
+
+# Verify the checksums
+checksum:
+    #!/usr/bin/env bash
+    BASE_PATH=./ios/build/NativeSigner/Build/Products/Release-iphoneos
+    pushd $BASE_PATH
+    for checksum in *.sha256; do
+        shasum -c $checksum
+    done
+    popd
+
+# Open artifacts folder
+open:
+    #!/usr/bin/env bash
+    BASE_PATH=./ios/build/NativeSigner/Build/Products/Release-iphoneos
+    open $BASE_PATH
+
+# Full programm excluding the bump
+release: clean build zip checksum open

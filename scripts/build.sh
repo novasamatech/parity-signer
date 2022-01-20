@@ -100,7 +100,7 @@ if [ "$1" == "ios" ]
     mkdir -p out
     XCARCHIVE=ios/build/NativeSigner/Build/Products/Release-iphoneos/NativeSigner.xcarchive
     xcodebuild -project ios/NativeSigner.xcodeproj -scheme NativeSigner -archivePath $XCARCHIVE archive
-    xcodebuild -allowProvisioningUpdates -exportArchive -archivePath $XCARCHIVE -exportPath out -exportOptionsPlist ios/ExportOptions.plist
+    # xcodebuild -allowProvisioningUpdates -exportArchive -archivePath $XCARCHIVE -exportPath out -exportOptionsPlist ios/ExportOptions.plist
 
 fi
 
