@@ -23,7 +23,7 @@ defaults = {path = "../defaults"}
 definitions = {path = "../definitions"}
 qrcode_static = {path = "../qrcode_static"}
 chrono = "0.4.19"
-plot_icon = { git = "https://github.com/paritytech/polkadot-identicon-rust" }
+plot_icon = "0.1.3"
 png = "0.16.8"
 
 [lib]

@@ -479,7 +479,7 @@ dependencies = [
  "lazy_static",
  "parity-scale-codec",
  "parity-scale-codec-derive",
- "plot_icon",
+ "plot_icon 0.1.3",
  "png",
  "qrcode_static",
  "regex",
@@ -514,7 +514,7 @@ dependencies = [
  "lazy_static",
  "parity-scale-codec",
  "parity-scale-codec-derive",
- "plot_icon",
+ "plot_icon 0.1.3",
  "png",
  "regex",
  "sled",
@@ -1393,7 +1393,7 @@ dependencies = [
  "image",
  "lazy_static",
  "parser",
- "plot_icon",
+ "plot_icon 0.1.2",
  "quircs",
  "regex",
  "sp-core",
@@ -1785,6 +1785,21 @@ checksum = "8b870d8c151b6f2fb93e84a13146138f05d02ed11c7e7c54f8826aaaf7c9f184"
 name = "plot_icon"
 version = "0.1.2"
 source = "git+https://github.com/paritytech/polkadot-identicon-rust#069c12f78d29c70e0fb2422993f44e338cae825e"
+dependencies = [
+ "anyhow",
+ "base58",
+ "blake2-rfc",
+ "hex",
+ "palette",
+ "png",
+ "svg",
+]
+
+[[package]]
+name = "plot_icon"
+version = "0.1.3"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "edd1995324a6b4d6cce1f225c8fd050dc7ac3695756f0435ed2352cf067e336f"
 dependencies = [
  "anyhow",
  "base58",
@@ -2399,7 +2414,6 @@ dependencies = [
  "hex",
  "libc",
  "navigator",
- "plot_icon",
  "qr_reader_phone",
  "rustc-hex",
  "transaction_parsing",
@@ -3068,7 +3082,7 @@ dependencies = [
  "parity-scale-codec",
  "parity-scale-codec-derive",
  "parser",
- "plot_icon",
+ "plot_icon 0.1.3",
  "printing_balance",
  "regex",
  "scale-info",
