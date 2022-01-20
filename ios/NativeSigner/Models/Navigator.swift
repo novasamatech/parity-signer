@@ -156,7 +156,7 @@ struct ActionResult: Decodable {
 enum SignerScreen: Decodable {
     case Scan
     case Keys(MKeys)
-    case Settings(MVerifierDetails)
+    case Settings(MVerifierDetails?)
     case Log(MLog)
     case LogDetails(MLogDetails)
     case Transaction(MTransaction)

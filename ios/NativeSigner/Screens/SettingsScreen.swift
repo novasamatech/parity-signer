@@ -11,7 +11,7 @@ struct SettingsScreen: View {
     @EnvironmentObject var data: SignerDataModel
     @State var wipe = false
     @State var jailbreak = false
-    let content: MVerifierDetails
+    let content: MVerifierDetails?
     var body: some View {
         VStack (spacing: 2) {
             Button(action: {
@@ -31,9 +31,11 @@ struct SettingsScreen: View {
                     Spacer()
                 }
                 HStack {
+                    if let verifier = content {
                     AddressCard(address: Address(
-                        base58: "encryption: " + content.encryption, path: content.hex.truncateMiddle(length: 8), has_pwd: false, identicon: content.identicon, seed_name: "", multiselect: false
+                        base58: "encryption: " + verifier.encryption, path: verifier.hex.truncateMiddle(length: 8), has_pwd: false, identicon: verifier.identicon, seed_name: "", multiselect: false
                     ))
+                    }
                 }
             }
             .padding()

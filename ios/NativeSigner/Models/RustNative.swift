@@ -110,6 +110,7 @@ extension SignerDataModel {
         if !self.canaryDead {
             do {
                 print("onboarding...")
+                wipe()
                 if let source = Bundle.main.url(forResource: "Database", withExtension: "") {
                     //print(source)
                     var destination = try FileManager.default.url(for: .documentDirectory, in: .userDomainMask, appropriateFor: nil, create: false)
