@@ -13,7 +13,6 @@ hex = "0.4.3"
 jni = { version = "0.16.0", optional = true }
 libc = "0.2"
 navigator = {path = "../navigator"}
-plot_icon = { git = "https://github.com/paritytech/polkadot-identicon-rust" }
 qr_reader_phone = {path = "..//qr_reader_phone"}
 rustc-hex = "2.1.0"
 transaction_parsing = {path = "../transaction_parsing"}
