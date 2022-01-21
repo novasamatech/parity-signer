@@ -30,7 +30,7 @@ struct MVerifier: Decodable {
 }
 
 struct MVerifierDetails: Decodable {
-    var hex: String
+    var public_key: String
     var identicon: String
     var encryption: String
 }

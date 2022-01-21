@@ -32,7 +32,7 @@ struct HistoryCardExtended: View {
                 timestamp: timestamp,
                 danger: false,
                 line1: "General verifier set",
-                line2: value.hex.truncateMiddle(length: 8) + "\n" + value.encryption
+                line2: value.public_key.truncateMiddle(length: 8) + "\n" + value.encryption
             )
             case .historyCleared: HistoryCardTemplate(
                 image: "xmark.rectangle.portrait",
