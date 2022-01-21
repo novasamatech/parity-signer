@@ -11,6 +11,7 @@ mod tests {
     use std::convert::TryInto;
     
     use db_handling::cold_default::{populate_cold_nav_test, signer_init};
+    use definitions::error::Signer;
     use definitions::network_specs::{Verifier, VerifierValue};
     use parser;
     
@@ -1049,6 +1050,36 @@ mod tests {
         assert!(cut_real_json == expected_json, "GoForward on Transaction screen for passworded address with correct password. Expected Transaction screen with SignatureReady modal, got:\n{}", real_json);
         
         assert!(signature_is_good(&message_hex, &signature_hex), "Produced bad signature: \n{}", signature_hex);
+        
+        do_action("GoBack","","");
+        
+        {
+            let _database = db_handling::helpers::open_db::<Signer>(dbname).unwrap(); // database got unavailable for some reason
+            
+            let real_json = do_action("NavbarKeys","","");
+            let expected_json = r#"{"screen":"SeedSelector","screenLabel":"Select seed","back":false,"footer":true,"footerButton":"Keys","rightButton":"NewSeed","screenNameType":"h1","modal":"Empty","alert":"ErrorDisplay","screenData":{"seedNameCards":[]},"modalData":{},"alertData":{"error":"Database error. Internal error. IO error: could not acquire lock on "for_tests/flow_test_1/db": Os { code: 11, kind: WouldBlock, message: "Resource temporarily unavailable" }"}}"#;
+            assert!(real_json == expected_json, "Tried to switch from Log to Keys with unavailable database. Expected empty SeedSelector with ErrorDisplay alert, got:\n{}", real_json);
+            
+            let real_json = do_action("GoBack","","");
+            let expected_json = r#"{"screen":"Settings","screenLabel":"","back":false,"footer":true,"footerButton":"Settings","rightButton":"None","screenNameType":"h4","modal":"Empty","alert":"Empty","screenData":{"error":"Database error. Internal error. IO error: could not acquire lock on "for_tests/flow_test_1/db": Os { code: 11, kind: WouldBlock, message: "Resource temporarily unavailable" }"},"modalData":{},"alertData":{}}"#;
+            assert!(real_json == expected_json, "GoBack on SeedSelector with ErrorDisplay alert. Expected Settings screen with error displayed in screen details, got:\n{}", real_json);
+            
+        }
+        
+        // Aaand, we are back
+        let real_json = do_action("NavbarSettings","","");
+        assert!(real_json == current_settings_json, "Reload Settings. Expected known Settings screen with no errors, got:\n{}", real_json);
+        
+        let real_json = do_action("NavbarLog","","");
+        let cut_real_json = cut_public_key(&cut_base58(&cut_identicon(&timeless(&real_json))));
+        let expected_json = r#"{"screen":"Log","screenLabel":"","back":false,"footer":true,"footerButton":"Log","rightButton":"LogRight","screenNameType":"h4","modal":"Empty","alert":"Empty","screenData":{"log":[{"order":1,"timestamp":"**","events":[{"event":"message_signed","payload":{"message":"4c6f72656d20697073756d20646f6c6f722073697420616d65742c20636f6e73656374657475722061646970697363696e6720656c69742c2073656420646f20656975736d6f642074656d706f7220696e6369646964756e74207574206c61626f726520657420646f6c6f7265206d61676e6120616c697175612e20557420656e696d206164206d696e696d2076656e69616d2c2071756973206e6f737472756420657865726369746174696f6e20756c6c616d636f206c61626f726973206e69736920757420616c697175697020657820656120636f6d6d6f646f20636f6e7365717561742e2044756973206175746520697275726520646f6c6f7220696e20726570726568656e646572697420696e20766f6c7570746174652076656c697420657373652063696c6c756d20646f6c6f726520657520667567696174206e756c6c612070617269617475722e204578636570746575722073696e74206f6363616563617420637570696461746174206e6f6e2070726f6964656e742c2073756e7420696e2063756c706120717569206f666669636961206465736572756e74206d6f6c6c697420616e696d20696420657374206c61626f72756d2e","network_name":"westend","signed_by":{"public_key":"**","identicon":"**","encryption":"sr25519"},"user_comment":"Pepper tries better"}}]},{"order":0,"timestamp":"**","events":[{"event":"history_cleared"}]}],"total_entries":2},"modalData":{},"alertData":{}}"#;
+        assert!(cut_real_json == expected_json, "Switched to Log from Settings. Expected Log screen, got:\n{}", real_json);
+        
+        // What if the database is not initiated properly? This should have been a separate test, but mutex.
+        populate_cold_nav_test(dbname).unwrap(); // no init after population
+        let real_json = do_action("NavbarSettings","","");
+        let expected_json = r#"{"screen":"Settings","screenLabel":"","back":false,"footer":true,"footerButton":"Settings","rightButton":"None","screenNameType":"h4","modal":"Empty","alert":"Empty","screenData":{"error":"Could not find general verifier."},"modalData":{},"alertData":{}}"#;
+        assert!(real_json == expected_json, "Switched to Settings from Log with non-initiated database. Expected Settings screen with error on screen, and no alerts (we should still allow to reset Signer), got:\n{}", real_json);
         
         std::fs::remove_dir_all(dbname).unwrap();
     }
