@@ -52,7 +52,8 @@ fun KeyManager(signerDataModel: SignerDataModel) {
 			SeedCard(
 				seedName = rootKey?.optString("seed_name") ?: "error",
 				identicon = rootKey?.optString("identicon") ?: "",
-				seedSelector = false,
+				base58 = rootKey?.optString("base58") ?: "",
+				showAddress = true,
 				signerDataModel = signerDataModel
 			)
 		}
@@ -78,7 +79,7 @@ fun KeyManager(signerDataModel: SignerDataModel) {
 				Icon(Icons.Default.AddCircle, contentDescription = "New derived key")
 			}
 		}
-		//KeySelector(signerDataModel)
+		KeySelector(signerDataModel)
 	}
 }
 

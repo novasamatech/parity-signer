@@ -22,16 +22,15 @@ import org.json.JSONObject
 fun SeedCard(
 	seedName: String,
 	identicon: String,
-	seedSelector: Boolean = true,
+	base58: String = "",
+	showAddress: Boolean = false,
 	signerDataModel: SignerDataModel
 ) {
 	Row(
 		modifier = Modifier
 			.padding(8.dp)
 	) {
-		Image(
-			identicon.intoImageBitmap(), "identicon", modifier = Modifier.scale(0.75f)
-		)
+		Identicon(identicon)
 		Spacer(modifier = Modifier.width(10.dp))
 		Column {
 			Text(
@@ -39,6 +38,9 @@ fun SeedCard(
 				color = Text600,
 				style = MaterialTheme.typography.subtitle1
 			)
+			if (showAddress) {
+				Text(base58)
+			}
 		}
 	}
 }

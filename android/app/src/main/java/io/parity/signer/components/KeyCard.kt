@@ -10,6 +10,7 @@ import androidx.compose.ui.draw.scale
 import androidx.compose.ui.unit.dp
 import io.parity.signer.models.SignerDataModel
 import io.parity.signer.models.abbreviateString
+import io.parity.signer.models.intoImageBitmap
 import io.parity.signer.ui.theme.Bg200
 import io.parity.signer.ui.theme.CryptoTypography
 import io.parity.signer.ui.theme.Text300
@@ -22,13 +23,29 @@ import org.json.JSONObject
  */
 @Composable
 fun KeyCard(identity: JSONObject, signerDataModel: SignerDataModel) {
-	Row (modifier = Modifier
-		.padding(8.dp)) {
-		//Image(signerDataModel.getIdenticon(identity.get("ss58").toString(), 64), "identicon", modifier = Modifier.scale(0.75f))
+	Row(
+		modifier = Modifier
+			.padding(8.dp)
+	) {
+		Identicon(identity.getString("identicon"))
 		Spacer(modifier = Modifier.width(10.dp))
 		Column {
-			Text(identity.get("path").toString(), color = MaterialTheme.colors.onBackground, style = CryptoTypography.body2)
-			Text(identity.get("ss58").toString().abbreviateString(8), color = Text300, style = CryptoTypography.body2)
+			Row {
+				Text(
+					identity.optString("path") ?: "",
+					color = MaterialTheme.colors.onBackground,
+					style = CryptoTypography.body2
+				)
+				if (identity.optBoolean("has_pwd")) {
+					Text("///")
+				}
+			}
+			Text(
+				identity.optString("base58").abbreviateString(8),
+				color = Text300,
+				style = CryptoTypography.body2
+			)
 		}
 	}
 }
+

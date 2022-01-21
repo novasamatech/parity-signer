@@ -2,6 +2,7 @@ package io.parity.signer.models
 
 import android.util.Log
 import io.parity.signer.ButtonID
+import org.json.JSONArray
 import org.json.JSONObject
 
 //MARK: Seed management begin
@@ -12,10 +13,14 @@ import org.json.JSONObject
  * authentication.authenticate(activity) {refreshSeedNames()}
  * which is somewhat asynchronous
  */
-internal fun SignerDataModel.refreshSeedNames() {
+internal fun SignerDataModel.refreshSeedNames(init: Boolean = false) {
 	clearError()
 	val allNames = sharedPreferences.all.keys.sorted().toTypedArray()
-	updateSeedNames(allNames.joinToString(separator = ","))
+	if (init) {
+		initNavigation(dbName, allNames.joinToString(","))
+	} else {
+		updateSeedNames(allNames.joinToString(separator = ","))
+	}
 	_seedNames.value = allNames
 }
 
@@ -65,4 +70,25 @@ fun SignerDataModel.addSeed(
  */
 internal fun SignerDataModel.getSeed(seedName: String): String {
 	return sharedPreferences.getString(seedName, "") ?: ""
+}
+
+/**
+ * Guess possible seed words from user input
+ */
+internal fun SignerDataModel.guessWord(word: String): MutableList<String> {
+	Log.d("Guess query", "[" + word + "]")
+	return JSONArray(substrateGuessWord(word)).toListOfStrings() as MutableList<String>
+}
+
+/**
+ * Check if provided seed phrase is valid
+ */
+internal fun SignerDataModel.validatePhrase(seedPhrase: String): String? {
+	var errorMessage: String? = null
+	try {
+		substrateValidateSeedphrase(seedPhrase)
+	} catch (e: java.lang.Exception) {
+		errorMessage = e.toString()
+	}
+	return errorMessage
 }

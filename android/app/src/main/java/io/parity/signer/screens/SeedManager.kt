@@ -1,5 +1,6 @@
 package io.parity.signer.modals
 
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -17,7 +18,8 @@ import org.json.JSONArray
 
 @Composable
 fun SeedManager(signerDataModel: SignerDataModel) {
-	val cards = signerDataModel.screenData.value?.getJSONArray("seedNameCards") ?: JSONArray()
+	val cards = signerDataModel.screenData.value?.getJSONArray("seedNameCards")
+		?: JSONArray()
 
 	LazyColumn {
 		//keys should be defined already, can't panic
@@ -30,7 +32,18 @@ fun SeedManager(signerDataModel: SignerDataModel) {
 				Row(
 					Modifier
 						.clickable {
-							signerDataModel.pushButton(ButtonID.SelectSeed, details = cards.getString(item))
+							Log.d(
+								"clicked seed",
+								cards
+									.getJSONObject(item)
+									.getString("seed_name")
+							)
+							signerDataModel.pushButton(
+								ButtonID.SelectSeed,
+								details = cards
+									.getJSONObject(item)
+									.getString("seed_name")
+							)
 						}
 						.weight(1f, true)
 				) {

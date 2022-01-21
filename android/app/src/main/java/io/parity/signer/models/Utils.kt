@@ -76,3 +76,11 @@ fun String.intoImageBitmap(): ImageBitmap {
 	val picture = this.decodeHex()
 	return BitmapFactory.decodeByteArray(picture, 0, picture.size).asImageBitmap()
 }
+
+fun JSONArray.toListOfStrings(): List<String> {
+	var output = emptyList<String>()
+	for(i in 0 until this.length()) {
+		output += this.getString(i)
+	}
+	return output
+}

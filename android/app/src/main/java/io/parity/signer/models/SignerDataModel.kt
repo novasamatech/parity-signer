@@ -312,9 +312,8 @@ class SignerDataModel : ViewModel() {
 		if (checkRefresh) _onBoardingDone.value =
 			OnBoardingState.Yes else _onBoardingDone.value = OnBoardingState.No
 		if (checkRefresh) {
-			initNavigation(dbName, seedNames.value?.joinToString(",")?:"")
+			refreshSeedNames(init = true)
 			pushButton(ButtonID.Start)
-			refreshSeedNames()
 		}
 	}
 

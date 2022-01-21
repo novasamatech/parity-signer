@@ -7,6 +7,7 @@ import io.parity.signer.modals.*
 import io.parity.signer.models.SignerDataModel
 import io.parity.signer.models.pushButton
 import io.parity.signer.screens.KeyManager
+import io.parity.signer.screens.RecoverSeedPhrase
 import io.parity.signer.screens.ScanScreen
 import io.parity.signer.screens.SettingsScreen
 
@@ -46,10 +47,16 @@ fun ScreenSelector(screen: SignerScreen?, signerDataModel: SignerDataModel) {
 			)
 		}
 		SignerScreen.RecoverSeedName -> {
-			RecoverSeedScreen(signerDataModel = signerDataModel)
+			RecoverSeedName(
+				signerDataModel::pushButton,
+				signerDataModel = signerDataModel
+			)
 		}
 		SignerScreen.RecoverSeedPhrase -> {
-			RecoverSeedScreen(signerDataModel = signerDataModel)
+			RecoverSeedPhrase(
+				signerDataModel::pushButton,
+				signerDataModel = signerDataModel
+			)
 		}
 		SignerScreen.DeriveKey -> {
 			NewKeyModal(signerDataModel = signerDataModel, increment = false)

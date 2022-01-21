@@ -69,13 +69,14 @@ fun NewSeedScreen(button: (button: ButtonID, details: String) -> Unit, signerDat
 				text = "Generate seed phrase",
 				action = {
 					focusManager.clearFocus()
-					signerDataModel.pushButton(ButtonID.GoForward, details = seedName)}
+					button(ButtonID.GoForward, seedName)}
 			)
 	}
 	DisposableEffect(Unit) {
 		if (signerDataModel.screenData.value?.optBoolean("keyboard") == true) {
 			focusRequester.requestFocus()
 		}
+		seedName = signerDataModel.screenData.value?.optString("seed_name") ?: ""
 		onDispose { focusManager.clearFocus() }
 	}
 }

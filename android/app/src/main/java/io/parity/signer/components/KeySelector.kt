@@ -20,7 +20,7 @@ import org.json.JSONObject
 @Composable
 fun KeySelector(signerDataModel: SignerDataModel) {
 	val addresses =
-		signerDataModel.screenData.value?.getJSONArray("keys") ?: JSONArray()
+		signerDataModel.screenData.value?.optJSONArray("set") ?: JSONArray()
 	LazyColumn {
 		items(addresses.length()) { item ->
 			Row(
