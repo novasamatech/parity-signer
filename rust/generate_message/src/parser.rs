@@ -28,6 +28,7 @@ pub enum Command {
     MakeColdRelease,
     TransferMetaRelease,
     Derivations(Derivations),
+    Unwasm{filename: String, update_db: bool},
 }
 
 pub enum Show {
@@ -514,6 +515,7 @@ impl Command {
                                         }
                                     },
                                 };
+                                println!("sufficient crypto vector: {:?}", sufficient_crypto_vector);
                                 let sufficient_crypto = match <SufficientCrypto>::decode(&mut &sufficient_crypto_vector[..]) {
                                     Ok(a) => a,
                                     Err(_) => return Err(ErrorActive::Input(InputActive::DecodingSufficientCrypto)),
@@ -666,6 +668,32 @@ impl Command {
                             None => return Err(ErrorActive::CommandParser(CommandParser::NeedKey(CommandNeedKey::Payload))),
                         };
                         Ok(Command::Derivations(Derivations{goal, title, derivations}))
+                    },
+                    "unwasm" => {
+                        let mut found_payload = None;
+                        let mut update_db = true;
+                        loop {
+                            match args.next() {
+                                Some(a) => {
+                                    match a.as_str() {
+                                        "-payload" => {
+                                            if let Some(_) = found_payload {return Err(ErrorActive::CommandParser(CommandParser::DoubleKey(CommandDoubleKey::Payload)))}
+                                            found_payload = match args.next() {
+                                                Some(b) => Some(b.to_string()),
+                                                None => return Err(ErrorActive::CommandParser(CommandParser::NeedArgument(CommandNeedArgument::Payload))),
+                                            };
+                                        },
+                                        "-d" => {update_db = false},
+                                        _ => return Err(ErrorActive::CommandParser(CommandParser::UnexpectedKeyArgumentSequence)),
+                                    }
+                                },
+                                None => break,
+                            }
+                        }
+                        match found_payload {
+                            Some(x) => Ok(Command::Unwasm{filename: x, update_db}),
+                            None => return Err(ErrorActive::CommandParser(CommandParser::NeedKey(CommandNeedKey::Payload))),
+                        }                        
                     },
                     _ => return Err(ErrorActive::CommandParser(CommandParser::UnknownCommand)),
                 }

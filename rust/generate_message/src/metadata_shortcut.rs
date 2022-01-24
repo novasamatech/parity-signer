@@ -1,5 +1,5 @@
 use constants::{COLOR, SECONDARY_COLOR};
-use definitions::{crypto::Encryption, error::{Active, Changed, DatabaseActive, ErrorActive, Fetch, IncomingMetadataSourceActive, NotHexActive}, helpers::unhex, metadata::MetaValues, network_specs::NetworkSpecsToSend};
+use definitions::{crypto::Encryption, error::{Active, Changed, DatabaseActive, ErrorActive, Fetch, IncomingMetadataSourceActiveStr, NotHexActive}, helpers::unhex, metadata::MetaValues, network_specs::NetworkSpecsToSend};
 use std::convert::TryInto;
 
 use crate::fetch_metadata::{fetch_info, fetch_info_with_network_specs};
@@ -21,7 +21,7 @@ pub fn meta_shortcut (address: &str) -> Result<MetaShortCut, ErrorActive> {
         Err(e) => return Err(ErrorActive::Fetch(Fetch::Failed{url: address.to_string(), error: e.to_string()})),
     };
     let genesis_hash = get_genesis_hash(address, &new_info.genesis_hash)?;
-    let meta_values = MetaValues::from_str_metadata(&new_info.meta, IncomingMetadataSourceActive::Fetch{url: address.to_string()})?;
+    let meta_values = MetaValues::from_str_metadata(&new_info.meta, IncomingMetadataSourceActiveStr::Fetch{url: address.to_string()})?;
     Ok(MetaShortCut{
         meta_values,
         genesis_hash,
@@ -45,7 +45,7 @@ pub fn meta_specs_shortcut (address: &str, encryption: Encryption) -> Result<Met
         Err(e) => return Err(ErrorActive::Fetch(Fetch::Failed{url: address.to_string(), error: e.to_string()})),
     };
     let genesis_hash = get_genesis_hash(address, &new_info.genesis_hash)?;
-    let meta_values = MetaValues::from_str_metadata(&new_info.meta, IncomingMetadataSourceActive::Fetch{url: address.to_string()})?;
+    let meta_values = MetaValues::from_str_metadata(&new_info.meta, IncomingMetadataSourceActiveStr::Fetch{url: address.to_string()})?;
     let new_properties = match interpret_properties(&new_info.properties) {
         Ok(a) => a,
         Err(error) => return Err(ErrorActive::Fetch(Fetch::FaultySpecs{url: address.to_string(), error})),

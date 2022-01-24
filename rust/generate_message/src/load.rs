@@ -1,6 +1,10 @@
+use std::path::PathBuf;
+use wasm_loader::Source;
+use wasm_testbed::WasmTestBed;
+
 use constants::{ADDRESS_BOOK, HOT_DB_NAME, METATREE};
 use db_handling::helpers::{open_db, open_tree};
-use definitions::{error::{Active, Changed, DatabaseActive, ErrorActive, Fetch, NotFoundActive}, keyring::MetaKeyPrefix, metadata::{AddressBookEntry, MetaValues}};
+use definitions::{error::{Active, Changed, DatabaseActive, ErrorActive, Fetch, IncomingMetadataSourceActive, NotFoundActive, Wasm}, keyring::MetaKeyPrefix, metadata::{AddressBookEntry, MetaValues}};
 
 use crate::parser::{Instruction, Content, Set};
 use crate::metadata_db_utils::{add_new, SortedMetaValues, prepare_metadata, write_metadata};
@@ -262,4 +266,23 @@ fn shortcut_set_element (set_element: &NameHashAddress) -> Result<MetaShortCut, 
     Ok(shortcut)
 }
 
-
+/// Function to process .wasm files into signable entities and add metadata into the database
+pub fn unwasm (filename: String, update_db: bool) -> Result<(), ErrorActive> {
+    let testbed = match WasmTestBed::new(&Source::File(PathBuf::from(&filename))) {
+        Ok(a) => a,
+        Err(e) => return Err(ErrorActive::Wasm(Wasm::WasmTestbed(e))),
+    };
+    let meta_values = MetaValues::from_runtime_metadata(testbed.metadata(), IncomingMetadataSourceActive::Wasm{filename})?;
+    let genesis_hash = search_name(&meta_values.name)?.genesis_hash;
+    if update_db {
+        let upd_sorted = add_new(&meta_values, &prepare_metadata()?)?;
+        if upd_sorted.upd_done {println!("Unwasmed new metadata {}{}", meta_values.name, meta_values.version)}
+        else {println!("Unwasmed previously known metadata {}{}", meta_values.name, meta_values.version)}
+        write_metadata(upd_sorted.sorted)?;
+    }
+    let shortcut = MetaShortCut {
+        meta_values,
+        genesis_hash,
+    };
+    load_meta_print(&shortcut)
+}

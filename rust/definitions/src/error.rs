@@ -4,6 +4,7 @@ use png;
 use sled;
 use sp_core::crypto::SecretStringError;
 use sp_runtime::MultiSigner;
+use wasm_testbed;
 
 use crate::{crypto:: Encryption, helpers::multisigner_to_public, keyring::{AddressKey, AddressBookKey, MetaKey, NetworkSpecsKey, VerifierKey}, network_specs::{ValidCurrentVerifier, Verifier, VerifierValue}, users::AddressDetails};
 
@@ -204,8 +205,9 @@ impl ErrorSource for Active {
     fn faulty_metadata(error: MetadataError, source: MetadataSource<Self>) -> Self::Error {
         match source {
             MetadataSource::Database{name, version} => ErrorActive::Database(DatabaseActive::FaultyMetadata{name, version, error}),
-            MetadataSource::Incoming(IncomingMetadataSourceActive::Fetch{url}) => ErrorActive::Fetch(Fetch::FaultyMetadata{url, error}),
-            MetadataSource::Incoming(IncomingMetadataSourceActive::Default{filename}) => ErrorActive::DefaultLoading(DefaultLoading::FaultyMetadata{filename, error}),
+            MetadataSource::Incoming(IncomingMetadataSourceActive::Str(IncomingMetadataSourceActiveStr::Fetch{url})) => ErrorActive::Fetch(Fetch::FaultyMetadata{url, error}),
+            MetadataSource::Incoming(IncomingMetadataSourceActive::Str(IncomingMetadataSourceActiveStr::Default{filename})) => ErrorActive::DefaultLoading(DefaultLoading::FaultyMetadata{filename, error}),
+            MetadataSource::Incoming(IncomingMetadataSourceActive::Wasm{filename}) => ErrorActive::Wasm(Wasm::FaultyMetadata{filename, error}),
         }
     }
     fn specs_decoding(key: NetworkSpecsKey) -> Self::Error {
@@ -471,6 +473,12 @@ impl ErrorSource for Active {
             },
             ErrorActive::Qr(e) => format!("Error generating qr code. {}", e),
             ErrorActive::NotSupported => String::from("Key combination is not supported. Please file a ticket if you need it."),
+            ErrorActive::Wasm(a) => {
+                match a {
+                    Wasm::WasmTestbed(e) => format!("WasmTestbed error. {}", e),
+                    Wasm::FaultyMetadata{filename, error} => format!("Metadata error in .wasm file {}. {}", filename, error.show()),
+                }
+            },
         }
     }
 }
@@ -490,6 +498,7 @@ pub enum ErrorActive {
     Input(InputActive),
     Qr(String),
     NotSupported,
+    Wasm(Wasm),
 }
 
 /// Active side errors could be displayed standardly
@@ -513,6 +522,13 @@ pub enum NotHexActive {
 /// Origin of unsuitable metadata on the Active side
 #[derive(Debug)]
 pub enum IncomingMetadataSourceActive {
+    Str(IncomingMetadataSourceActiveStr),
+    Wasm{filename: String},
+}
+
+/// Origin of unsuitable metadata on the Active side, in str form
+#[derive(Debug)]
+pub enum IncomingMetadataSourceActiveStr {
     Fetch{url: String},
     Default{filename: String},
 }
@@ -741,6 +757,13 @@ pub enum InputActive {
     FaultyMetadataInPayload(MetadataError),
     BadSignature,
     NoValidDerivationsToExport,
+}
+
+/// Enum listing possible errors with .wasm files processing
+#[derive(Debug)]
+pub enum Wasm {
+    WasmTestbed(wasm_testbed::WasmTestbedError),
+    FaultyMetadata{filename: String, error: MetadataError},
 }
 
 /// Enum-marker indicating that error originates on the Signer side

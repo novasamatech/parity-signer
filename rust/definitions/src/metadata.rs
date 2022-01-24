@@ -1,11 +1,11 @@
-use parity_scale_codec::Decode;
+use parity_scale_codec::{Decode, Encode};
 use parity_scale_codec_derive;
 use frame_metadata::{RuntimeMetadata, decode_different::DecodeDifferent};
 use sled::IVec;
 use sp_version::RuntimeVersion;
 
 use crate::crypto::Encryption;
-use crate::error::{Active, DatabaseActive, EntryDecodingActive, ErrorActive, ErrorSigner, ErrorSource, IncomingMetadataSourceActive, MetadataError, MetadataSource, NotHexActive, Signer};
+use crate::error::{Active, DatabaseActive, EntryDecodingActive, ErrorActive, ErrorSigner, ErrorSource, IncomingMetadataSourceActive, IncomingMetadataSourceActiveStr, MetadataError, MetadataSource, NotHexActive, Signer};
 use crate::helpers::unhex;
 use crate::keyring::{AddressBookKey, MetaKey};
 
@@ -47,19 +47,30 @@ impl MetaValues {
             meta: meta_vec.to_vec(),
         })
     }
+    pub fn from_runtime_metadata(runtime_metadata: &RuntimeMetadata, source: IncomingMetadataSourceActive) -> Result<Self, ErrorActive> {
+        let name_versioned = match name_versioned_from_metadata(runtime_metadata) {
+            Ok(a) => a,
+            Err(e) => return Err(<Active>::faulty_metadata(e, MetadataSource::Incoming(source))),
+        };
+        Ok(Self{
+            name: name_versioned.name.to_string(),
+            version: name_versioned.version,
+            meta: [vec![109, 101, 116, 97], runtime_metadata.encode()].concat(),
+        })
+    }
     /// Function to get MetaValues from metadata in format of hex string.
     /// Is used only on Active side, for:
     /// (a) default and test metadata loading;
     /// (b) decoding and evaluating fetched metadata;
-    pub fn from_str_metadata (meta: &str, source: IncomingMetadataSourceActive) -> Result<Self, ErrorActive> {
+    pub fn from_str_metadata (meta: &str, source: IncomingMetadataSourceActiveStr) -> Result<Self, ErrorActive> {
         let what = match &source {
-            IncomingMetadataSourceActive::Fetch{url} => NotHexActive::FetchedMetadata{url: url.to_string()},
-            IncomingMetadataSourceActive::Default{filename} => NotHexActive::DefaultMetadata{filename: filename.to_string()},
+            IncomingMetadataSourceActiveStr::Fetch{url} => NotHexActive::FetchedMetadata{url: url.to_string()},
+            IncomingMetadataSourceActiveStr::Default{filename} => NotHexActive::DefaultMetadata{filename: filename.to_string()},
         };
         let meta_vec = unhex::<Active>(meta, what)?;
         match Self::from_vec_metadata(&meta_vec) {
             Ok(a) => Ok(a),
-            Err(e) => return Err(<Active>::faulty_metadata(e, MetadataSource::Incoming(source)))
+            Err(e) => return Err(<Active>::faulty_metadata(e, MetadataSource::Incoming(IncomingMetadataSourceActive::Str(source))))
         }
     }
 }
@@ -229,7 +240,7 @@ mod tests {
     fn westend9070() {
         let filename = String::from("for_tests/westend9070");
         let meta = read_to_string(&filename).unwrap();
-        let meta_values = MetaValues::from_str_metadata(&meta.trim(), IncomingMetadataSourceActive::Default{filename}).unwrap();
+        let meta_values = MetaValues::from_str_metadata(&meta.trim(), IncomingMetadataSourceActiveStr::Default{filename}).unwrap();
         assert!(meta_values.name == String::from("westend"), "Unexpected network name: {}", meta_values.name);
         assert!(meta_values.version == 9070, "Unexpected network name: {}", meta_values.version);
     }
@@ -238,7 +249,7 @@ mod tests {
     fn westend9033() {
         let filename = String::from("for_tests/westend9033");
         let meta = read_to_string(&filename).unwrap();
-        let meta_values = MetaValues::from_str_metadata(&meta.trim(), IncomingMetadataSourceActive::Default{filename}).unwrap();
+        let meta_values = MetaValues::from_str_metadata(&meta.trim(), IncomingMetadataSourceActiveStr::Default{filename}).unwrap();
         assert!(meta_values.name == String::from("westend"), "Unexpected network name: {}", meta_values.name);
         assert!(meta_values.version == 9033, "Unexpected network name: {}", meta_values.version);
     }
@@ -247,7 +258,7 @@ mod tests {
     fn westend9030() {
         let filename = String::from("for_tests/westend9030");
         let meta = read_to_string(&filename).unwrap();
-        let meta_values = MetaValues::from_str_metadata(&meta.trim(), IncomingMetadataSourceActive::Default{filename}).unwrap();
+        let meta_values = MetaValues::from_str_metadata(&meta.trim(), IncomingMetadataSourceActiveStr::Default{filename}).unwrap();
         assert!(meta_values.name == String::from("westend"), "Unexpected network name: {}", meta_values.name);
         assert!(meta_values.version == 9030, "Unexpected network name: {}", meta_values.version);
     }
@@ -256,7 +267,7 @@ mod tests {
     fn rococo9004() {
         let filename = String::from("for_tests/rococo9004");
         let meta = read_to_string(&filename).unwrap();
-        let meta_values = MetaValues::from_str_metadata(&meta.trim(), IncomingMetadataSourceActive::Default{filename}).unwrap();
+        let meta_values = MetaValues::from_str_metadata(&meta.trim(), IncomingMetadataSourceActiveStr::Default{filename}).unwrap();
         assert!(meta_values.name == String::from("rococo"), "Unexpected network name: {}", meta_values.name);
         assert!(meta_values.version == 9004, "Unexpected network name: {}", meta_values.version);
     }
@@ -265,7 +276,7 @@ mod tests {
     fn rococo9002() {
         let filename = String::from("for_tests/rococo9002");
         let meta = read_to_string(&filename).unwrap();
-        let meta_values = MetaValues::from_str_metadata(&meta.trim(), IncomingMetadataSourceActive::Default{filename}).unwrap();
+        let meta_values = MetaValues::from_str_metadata(&meta.trim(), IncomingMetadataSourceActiveStr::Default{filename}).unwrap();
         assert!(meta_values.name == String::from("rococo"), "Unexpected network name: {}", meta_values.name);
         assert!(meta_values.version == 9002, "Unexpected network name: {}", meta_values.version);
     }
@@ -274,7 +285,7 @@ mod tests {
     fn polkadot9080() {
         let filename = String::from("for_tests/polkadot9080");
         let meta = read_to_string(&filename).unwrap();
-        let meta_values = MetaValues::from_str_metadata(&meta.trim(), IncomingMetadataSourceActive::Default{filename}).unwrap();
+        let meta_values = MetaValues::from_str_metadata(&meta.trim(), IncomingMetadataSourceActiveStr::Default{filename}).unwrap();
         assert!(meta_values.name == String::from("polkadot"), "Unexpected network name: {}", meta_values.name);
         assert!(meta_values.version == 9080, "Unexpected network name: {}", meta_values.version);
     }
@@ -283,7 +294,7 @@ mod tests {
     fn polkadot30() {
         let filename = String::from("for_tests/polkadot30");
         let meta = read_to_string(&filename).unwrap();
-        let meta_values = MetaValues::from_str_metadata(&meta.trim(), IncomingMetadataSourceActive::Default{filename}).unwrap();
+        let meta_values = MetaValues::from_str_metadata(&meta.trim(), IncomingMetadataSourceActiveStr::Default{filename}).unwrap();
         assert!(meta_values.name == String::from("polkadot"), "Unexpected network name: {}", meta_values.name);
         assert!(meta_values.version == 30, "Unexpected network name: {}", meta_values.version);
     }
@@ -292,7 +303,7 @@ mod tests {
     fn polkadot29() {
         let filename = String::from("for_tests/polkadot29");
         let meta = read_to_string(&filename).unwrap();
-        let meta_values = MetaValues::from_str_metadata(&meta.trim(), IncomingMetadataSourceActive::Default{filename}).unwrap();
+        let meta_values = MetaValues::from_str_metadata(&meta.trim(), IncomingMetadataSourceActiveStr::Default{filename}).unwrap();
         assert!(meta_values.name == String::from("polkadot"), "Unexpected network name: {}", meta_values.name);
         assert!(meta_values.version == 29, "Unexpected network name: {}", meta_values.version);
     }
@@ -301,7 +312,7 @@ mod tests {
     fn kusama9040() {
         let filename = String::from("for_tests/kusama9040");
         let meta = read_to_string(&filename).unwrap();
-        let meta_values = MetaValues::from_str_metadata(&meta.trim(), IncomingMetadataSourceActive::Default{filename}).unwrap();
+        let meta_values = MetaValues::from_str_metadata(&meta.trim(), IncomingMetadataSourceActiveStr::Default{filename}).unwrap();
         assert!(meta_values.name == String::from("kusama"), "Unexpected network name: {}", meta_values.name);
         assert!(meta_values.version == 9040, "Unexpected network name: {}", meta_values.version);
     }
@@ -310,7 +321,7 @@ mod tests {
     fn kusama9010() {
         let filename = String::from("for_tests/kusama9010");
         let meta = read_to_string(&filename).unwrap();
-        let meta_values = MetaValues::from_str_metadata(&meta.trim(), IncomingMetadataSourceActive::Default{filename}).unwrap();
+        let meta_values = MetaValues::from_str_metadata(&meta.trim(), IncomingMetadataSourceActiveStr::Default{filename}).unwrap();
         assert!(meta_values.name == String::from("kusama"), "Unexpected network name: {}", meta_values.name);
         assert!(meta_values.version == 9010, "Unexpected network name: {}", meta_values.version);
     }
@@ -320,7 +331,7 @@ mod tests {
         let filename = String::from("for_tests/edgeware");
         let meta = read_to_string(&filename).unwrap();
         let expected_error = <Active>::show(&ErrorActive::DefaultLoading(DefaultLoading::FaultyMetadata{filename: filename.to_string(), error: MetadataError::NoVersionInConstants}));
-        match MetaValues::from_str_metadata(&meta.trim(), IncomingMetadataSourceActive::Default{filename}) {
+        match MetaValues::from_str_metadata(&meta.trim(), IncomingMetadataSourceActiveStr::Default{filename}) {
             Ok(x) => panic!("Unexpectedly decoded as {} version {}", x.name, x.version),
             Err(e) => {
                 assert!(<Active>::show(&e) == expected_error, "Unexpected kind of error, {}", <Active>::show(&e));
@@ -333,7 +344,7 @@ mod tests {
         let filename = String::from("for_tests/centrifugeAmber");
         let meta = read_to_string(&filename).unwrap();
         let expected_error = <Active>::show(&ErrorActive::DefaultLoading(DefaultLoading::FaultyMetadata{filename: filename.to_string(), error: MetadataError::VersionIncompatible}));
-        match MetaValues::from_str_metadata(&meta.trim(), IncomingMetadataSourceActive::Default{filename}) {
+        match MetaValues::from_str_metadata(&meta.trim(), IncomingMetadataSourceActiveStr::Default{filename}) {
             Ok(x) => panic!("Unexpectedly decoded as {} version {}", x.name, x.version),
             Err(e) => {
                 assert!(<Active>::show(&e) == expected_error, "Unexpected kind of error, {}", <Active>::show(&e));

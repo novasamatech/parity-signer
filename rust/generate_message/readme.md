@@ -151,6 +151,10 @@ Possible commands are:
     - key `-title` followed by network title, the storage key in address book  
     - key `-payload` followed by file name to read derivation from, in `../generate_message` folder. Derivations should be on individual line each, empty line count as empty derivations (root ones). See file `../generate_message/standard_derivations_list` for formatting example. All succesfully read derivations will be also printed to user during the run. For now duplicates are allowed when creating transfer, only one entry is made in Signer when accepting the payload.  
 
+- `unwasm` to read metadata into the database from .wasm files, and to generate `sign_me` intermediate files with `load_metadata` payload.  To be used with pre-release published .wasm files **only** for networks already known to the database. Use with caution with following keys:  
+    - key `-payload` followed by file name for .wasm file, in `../generate_message` folder.  
+    - optional key `-d` to **not** write into the database the result, i.e. only create the intermediate file. By default, the results are written in the database.  
+
 
 ## Example commands  
 
@@ -269,6 +273,8 @@ Release cold database is the one loaded into Signer.
 
 `$ cargo run transfer_meta_to_cold_release`  
 
-`$ cargo run derivations -title westend -payload standard_derivations_list` 
+`$ cargo run derivations -title westend -payload standard_derivations_list`  
+
+`$ cargo run unwasm -payload westend_runtime-v9150.compact.compressed.wasm`  
 
 (*) encryption override key should correspond to appropriate encryption for the network in question

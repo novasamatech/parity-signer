@@ -37,11 +37,11 @@ mod tests {
     use super::*;
     use crate::{cold_default::populate_cold, db_transactions::TrDbCold, helpers::{open_db, open_tree}, hot_default::reset_hot_database};
     use constants::METATREE;
-    use definitions::{error::{Active, IncomingMetadataSourceActive}, keyring::MetaKey, metadata::MetaValues, network_specs::Verifier};
+    use definitions::{error::{Active, IncomingMetadataSourceActiveStr}, keyring::MetaKey, metadata::MetaValues, network_specs::Verifier};
     
     fn insert_metadata_from_file (database_name: &str, filename: &str) {
         let meta_str = std::fs::read_to_string(filename).unwrap();
-        let meta_values = MetaValues::from_str_metadata(&meta_str.trim(), IncomingMetadataSourceActive::Default{filename: filename.to_string()}).unwrap();
+        let meta_values = MetaValues::from_str_metadata(&meta_str.trim(), IncomingMetadataSourceActiveStr::Default{filename: filename.to_string()}).unwrap();
         let mut meta_batch = Batch::default();
         meta_batch.insert(MetaKey::from_parts(&meta_values.name, meta_values.version).key(), meta_values.meta);
         TrDbCold::new()
