@@ -32,7 +32,10 @@ fun ScreenSelector(screen: SignerScreen?, signerDataModel: SignerDataModel) {
 		}
 		SignerScreen.LogDetails -> TODO()
 		SignerScreen.Transaction -> {
-			TransactionPreview(signerDataModel = signerDataModel)
+			TransactionPreview(
+				signerDataModel::pushButton,
+				signerDataModel = signerDataModel
+			)
 		}
 		SignerScreen.SeedSelector -> {
 			SeedManager(signerDataModel = signerDataModel)
@@ -80,7 +83,7 @@ fun ModalSelector(modal: SignerModal, signerDataModel: SignerDataModel) {
 		SignerModal.NetworkMenu -> TODO()
 		SignerModal.Backup -> TODO()
 		SignerModal.PasswordConfirm -> TODO()
-		SignerModal.SignatureReady -> TODO()
+		SignerModal.SignatureReady -> SignatureReady(signerDataModel = signerDataModel)
 		SignerModal.EnterPassword -> TODO()
 		SignerModal.LogRight -> TODO()
 		SignerModal.NetworkDetailsMenu -> TODO()

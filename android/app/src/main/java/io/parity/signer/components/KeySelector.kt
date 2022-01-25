@@ -12,7 +12,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.unit.dp
+import io.parity.signer.ButtonID
 import io.parity.signer.models.SignerDataModel
+import io.parity.signer.models.pushButton
 import io.parity.signer.ui.theme.Bg200
 import org.json.JSONArray
 import org.json.JSONObject
@@ -35,7 +37,12 @@ fun KeySelector(signerDataModel: SignerDataModel) {
 						.pointerInput(Unit) {
 							detectTapGestures(
 								onTap = {
-
+									signerDataModel.pushButton(
+										ButtonID.SelectKey,
+										addresses
+											.getJSONObject(item)
+											.optString("address_key", "")
+									)
 								},
 								onLongPress = {
 

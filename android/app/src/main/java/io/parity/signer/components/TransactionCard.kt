@@ -14,7 +14,7 @@ import io.parity.signer.models.decodeHex
 import org.json.JSONObject
 
 @Composable
-fun TransactionCard(card: JSONObject, signerDataModel: SignerDataModel) {
+fun TransactionCard(card: JSONObject) {
 	Box(
 		modifier = Modifier
 			.padding(start = (card.getInt("indent") * 10).dp)
@@ -40,7 +40,7 @@ fun TransactionCard(card: JSONObject, signerDataModel: SignerDataModel) {
 				Text(card.getJSONObject("payload").getString("name"))
 			}
 			"Id" -> {
-				TCID(card.getString("payload"), signerDataModel)
+				TCID(card.getString("payload"))
 			}
 			"method" -> {
 				TCMethod(card.getJSONObject("payload"))

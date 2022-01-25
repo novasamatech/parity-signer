@@ -10,7 +10,7 @@ import androidx.compose.ui.draw.scale
 import io.parity.signer.models.SignerDataModel
 
 @Composable
-fun TCID(id: String, signerDataModel: SignerDataModel) {
+fun TCID(id: String) {
 	Row {
 		//Image(signerDataModel.getIdenticon(id, 64), "identicon", modifier = Modifier.scale(0.75f))
 		Column {

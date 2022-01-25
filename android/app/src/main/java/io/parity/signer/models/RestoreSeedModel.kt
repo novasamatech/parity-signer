@@ -14,6 +14,12 @@ import androidx.lifecycle.ViewModel
 //TODO: Move logic here?
 /**
  * Seed restore tool logic
+ *
+ * TODO
+ *
+ * This should not be ViewModel though;
+ * Ideally all ViewModels should not hold persistent secrets
+ * as they are prone to silent memory leaks
  */
 class RestoreSeedModel {
 	private var _seedPhrase = MutableLiveData(mutableListOf<String>())
@@ -24,6 +30,10 @@ class RestoreSeedModel {
 	val guessWord: LiveData<List<String>> = _guessWord
 	val seedValid: LiveData<Boolean> = _seedValid
 
+	/**
+	 * This is all that's needed: get a word in user input,
+	 * return proper input state
+	 */
 	fun update(seedWord: String): TextFieldValue {
 		var text: String = seedWord
 

@@ -5,6 +5,7 @@ import android.util.Log
 import androidx.camera.core.ImageProxy
 import com.google.mlkit.vision.barcode.BarcodeScanner
 import com.google.mlkit.vision.common.InputImage
+import io.parity.signer.ButtonID
 
 //MARK: Camera tools begin
 
@@ -39,7 +40,7 @@ fun SignerDataModel.processFrame(
 										true
 									)
 									resetScan()
-									parseTransaction()
+									pushButton(ButtonID.TransactionFetched, payload)
 									Log.d("payload", payload)
 								} catch (e: java.lang.Exception) {
 									Log.e("Single frame decode failed", e.toString())
@@ -62,7 +63,7 @@ fun SignerDataModel.processFrame(
 								Log.d("multiframe payload", payload)
 								if (payload.isNotEmpty()) {
 									resetScan()
-									parseTransaction()
+									pushButton(ButtonID.TransactionFetched, payload)
 								}
 							} catch (e: java.lang.Exception) {
 								Log.e("failed to parse sequence", e.toString())
