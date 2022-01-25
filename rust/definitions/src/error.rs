@@ -309,6 +309,8 @@ impl ErrorSource for Active {
                     DatabaseActive::NewAddressKnownGenesisHash{url, genesis_hash} => format!("Url address {} is not encountered in the hot database entries, however, fetched genesis hash {} is present in hot database entries. To change the network url, delete old entry.", url, hex::encode(genesis_hash)),
                     DatabaseActive::TwoGenesisHashVariantsForName{name} => format!("Two different genesis hash entries for network {} in address book.", name),
                     DatabaseActive::TwoUrlVariantsForName{name} => format!("Two different url entries for network {} in address book.", name),
+                    DatabaseActive::TwoNamesForUrl{url} => format!("Two different network names in entries for url address {} in address book.", url),
+                    DatabaseActive::TwoBase58ForName{name} => format!("Two different base58 entries for network {}.", name),
                     DatabaseActive::AddressBookEmpty => String::from("Address book is empty"),
                 };
                 format!("Database error. {}", insert)
@@ -321,6 +323,7 @@ impl ErrorSource for Active {
                     Fetch::FaultySpecs{url, error} => {
                         let insert = match error {
                             SpecsError::NoBase58Prefix => String::from("No base58 prefix."),
+                            SpecsError::Base58PrefixMismatch{specs, meta} => format!("Base58 prefix from fetched properties {} does not match base58 prefix in fetched metadata {}.", specs, meta),
                             SpecsError::Base58PrefixFormatNotSupported{value} => format!("Base58 prefix {} does not fit into u16.", value),
                             SpecsError::NoDecimals => String::from("No decimals."),
                             SpecsError::DecimalsFormatNotSupported{value} => format!("Decimals value {} does not fit into u8.", value),
@@ -564,6 +567,8 @@ pub enum DatabaseActive {
     NewAddressKnownGenesisHash{url: String, genesis_hash: [u8;32]},
     TwoGenesisHashVariantsForName{name: String},
     TwoUrlVariantsForName{name: String},
+    TwoNamesForUrl{url: String},
+    TwoBase58ForName{name: String},
     AddressBookEmpty,
 }
 
@@ -617,6 +622,7 @@ pub enum Fetch {
 #[derive(Debug)]
 pub enum SpecsError {
     NoBase58Prefix,
+    Base58PrefixMismatch{specs: u16, meta: u16},
     Base58PrefixFormatNotSupported{value: String},
     NoDecimals,
     DecimalsFormatNotSupported{value: String},
@@ -1372,6 +1378,8 @@ pub enum MetadataError {
     NoSystemPallet,
     NoVersionInConstants,
     RuntimeVersionNotDecodeable,
+    Base58PrefixNotDecodeable,
+    Base58PrefixSpecsMismatch{specs: u16, meta: u16},
     NotMeta,
     UnableToDecode,
 }
@@ -1383,6 +1391,8 @@ impl MetadataError {
             MetadataError::NoSystemPallet => String::from("No system pallet in runtime metadata."),
             MetadataError::NoVersionInConstants => String::from("No runtime version in system pallet constants."),
             MetadataError::RuntimeVersionNotDecodeable => String::from("Runtime version from system pallet constants could not be decoded."),
+            MetadataError::Base58PrefixNotDecodeable => String::from("Base58 prefix is found in system pallet constants, but could not be decoded."),
+            MetadataError::Base58PrefixSpecsMismatch{specs, meta} => format!("Base58 prefix {} from system pallet constants does not match the base58 prefix from network specs {}.", meta, specs),
             MetadataError::NotMeta => String::from("Metadata vector does not start with 0x6d657461."),
             MetadataError::UnableToDecode => String::from("Runtime metadata could not be decoded."),
         }

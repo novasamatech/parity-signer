@@ -2,7 +2,7 @@ use parity_scale_codec::Encode;
 use sled::Batch;
 
 use constants::{ADDRTREE, METATREE, SPECSTREE};
-use definitions::{error::{ErrorSigner, ErrorSource, NotFoundSigner, Signer}, helpers::multisigner_to_public, history::{Event, IdentityHistory, MetaValuesDisplay, NetworkSpecsDisplay}, keyring::{AddressKey, NetworkSpecsKey, VerifierKey, MetaKeyPrefix, MetaKey}, metadata::MetaValues, network_specs::{CurrentVerifier, NetworkSpecs, ValidCurrentVerifier, Verifier}, users::AddressDetails};
+use definitions::{error::{ErrorSigner, ErrorSource, NotFoundSigner, Signer}, helpers::multisigner_to_public, history::{Event, IdentityHistory, MetaValuesDisplay, NetworkSpecsDisplay}, keyring::{AddressKey, NetworkSpecsKey, VerifierKey, MetaKeyPrefix, MetaKey}, network_specs::{CurrentVerifier, NetworkSpecs, ValidCurrentVerifier, Verifier}, users::AddressDetails};
 
 use crate::db_transactions::TrDbCold;
 use crate::helpers::{open_db, open_tree, get_network_specs, get_general_verifier, get_valid_current_verifier};
@@ -72,7 +72,7 @@ pub fn remove_network (network_specs_key: &NetworkSpecsKey, database_name: &str)
                 let meta_key = MetaKey::from_ivec(&meta_key_vec);
                 meta_batch.remove(meta_key.key());
                 if let Ok((name, version)) = meta_key.name_version::<Signer>() {
-                    let meta_values_display = MetaValuesDisplay::get(&MetaValues{name, version, meta: meta_stored.to_vec()});
+                    let meta_values_display = MetaValuesDisplay::from_storage(&name, version, meta_stored);
                     events.push(Event::MetadataRemoved(meta_values_display));
                 }
             }
@@ -123,7 +123,7 @@ fn get_batch_remove_unchecked_meta (database_name: &str, network_name: &str, net
         let metadata = open_tree::<Signer>(&database, METATREE)?;
         match metadata.get(meta_key.key()) {
             Ok(Some(meta_stored)) => {
-                let meta_values_display = MetaValuesDisplay::get(&MetaValues{name: network_name.to_string(), version: network_version, meta: meta_stored.to_vec()});
+                let meta_values_display = MetaValuesDisplay::from_storage(network_name, network_version, meta_stored);
                 vec![Event::MetadataRemoved(meta_values_display)]
             },
             Ok(None) => return Err(ErrorSigner::NotFound(NotFoundSigner::Metadata{name: network_name.to_string(), version: network_version})),

@@ -45,7 +45,7 @@ pub fn full_run (command: Command) -> Result<(), ErrorActive> {
         Command::MakeColdRelease => default_cold_release(),
         Command::TransferMetaRelease => transfer_metadata_to_cold(HOT_DB_NAME, COLD_DB_NAME_RELEASE),
         Command::Derivations(x) => process_derivations(x),
-        Command::Unwasm{filename, update_db} => unwasm(filename, update_db),
+        Command::Unwasm{filename, update_db} => unwasm(&filename, update_db),
     }
 }
 

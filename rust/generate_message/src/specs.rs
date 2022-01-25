@@ -88,7 +88,7 @@ pub fn gen_add_specs (instruction: Instruction) -> Result<(), ErrorActive> {
 /// Expected behavior:  
 /// generate network key, by network key find network specs in `chainspecs` database tree, print into `sign_me` output file.  
 fn specs_f_a_element (entry: (IVec, IVec)) -> Result<(), ErrorActive> {
-    let network_specs = network_specs_from_entry(AddressBookEntry::from_entry(entry)?)?;
+    let network_specs = network_specs_from_entry(&AddressBookEntry::from_entry(entry)?)?;
     print_specs(&network_specs)
 }
 
@@ -199,9 +199,15 @@ fn specs_pt_n(title: &str, encryption: Encryption, printing: bool) -> Result<(),
 /// if no entries found, the network is new, and network specs are fetched;
 /// if there are entries, search for appropriate network specs to modify, print `sign_me` file according to the key and update the database.
 fn specs_pt_u(address: &str, encryption: Encryption, printing: bool) -> Result<(), ErrorActive> {
-    let shortcut = meta_specs_shortcut (address, encryption)?;
-    if shortcut.update {update_db (address, &shortcut.specs)?}
-    if printing {print_specs(&shortcut.specs)?}
+    let shortcut = meta_specs_shortcut (address, encryption.to_owned())?;
+    if shortcut.update {
+        update_db (address, &shortcut.specs)?;
+        if printing {print_specs(&shortcut.specs)?}
+    }
+    else {
+        if printing {print_specs(&shortcut.specs)?}
+        else {return Err(ErrorActive::Fetch(Fetch::SpecsInDb{name: shortcut.meta_values.name.to_string(), encryption}))}
+    }
     Ok(())
 }
 

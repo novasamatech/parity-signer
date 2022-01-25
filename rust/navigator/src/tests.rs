@@ -796,7 +796,7 @@ mod tests {
             std::env::set_current_dir("../generate_message").unwrap();
             let command = std::process::Command::new("cargo")
                 .arg("run")
-                .args(["sign", "-qr", "-sufficient", "-hex", &sufficient_hex, "-msgtype", "add_specs", "-payload", "sign_me_add_specs_westend_sr25519"])
+                .args(["sign", "-qr", "-sufficient", "-hex", &sufficient_hex, "-msgtype", "add_specs", "-payload", "navigator_test_files/sign_me_add_specs_westend_sr25519"])
                 .output()
                 .unwrap();
             assert!(command.status.success(), "Produced sufficient crypto did not work. {}.", String::from_utf8(command.stderr).unwrap());
@@ -833,7 +833,7 @@ mod tests {
             std::env::set_current_dir("../generate_message").unwrap();
             let command = std::process::Command::new("cargo")
                 .arg("run")
-                .args(["sign", "-text", "-sufficient", "-hex", &sufficient_hex, "-msgtype", "load_metadata", "-payload", "sign_me_load_metadata_westendV9150"])
+                .args(["sign", "-text", "-sufficient", "-hex", &sufficient_hex, "-msgtype", "load_metadata", "-payload", "navigator_test_files/sign_me_load_metadata_westendV9150"])
                 .output()
                 .unwrap();
             assert!(command.status.success(), "Produced sufficient crypto did not work. {}.", String::from_utf8(command.stderr).unwrap());
@@ -863,7 +863,7 @@ mod tests {
             std::env::set_current_dir("../generate_message").unwrap();
             let command = std::process::Command::new("cargo")
                 .arg("run")
-                .args(["sign", "-text", "-sufficient", "-hex", &sufficient_hex, "-msgtype", "load_types", "-payload", "sign_me_load_types"])
+                .args(["sign", "-text", "-sufficient", "-hex", &sufficient_hex, "-msgtype", "load_types", "-payload", "navigator_test_files/sign_me_load_types"])
                 .output()
                 .unwrap();
             assert!(command.status.success(), "Produced sufficient crypto did not work. {}.", String::from_utf8(command.stderr).unwrap());

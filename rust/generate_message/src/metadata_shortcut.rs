@@ -46,7 +46,7 @@ pub fn meta_specs_shortcut (address: &str, encryption: Encryption) -> Result<Met
     };
     let genesis_hash = get_genesis_hash(address, &new_info.genesis_hash)?;
     let meta_values = MetaValues::from_str_metadata(&new_info.meta, IncomingMetadataSourceActiveStr::Fetch{url: address.to_string()})?;
-    let new_properties = match interpret_properties(&new_info.properties) {
+    let new_properties = match interpret_properties(&new_info.properties, meta_values.optional_base58prefix) {
         Ok(a) => a,
         Err(error) => return Err(ErrorActive::Fetch(Fetch::FaultySpecs{url: address.to_string(), error})),
     };

@@ -9,52 +9,56 @@ use crate::error::{Active, DatabaseActive, EntryDecodingActive, ErrorActive, Err
 use crate::helpers::unhex;
 use crate::keyring::{AddressBookKey, MetaKey};
 
-/// Struct used to store the network metadata name and version in the database
+/// Struct for the network information extracted from the metadata:
+/// name, version, optional base58 prefix
 #[derive(parity_scale_codec_derive::Decode, parity_scale_codec_derive::Encode, PartialEq)]
-pub struct NameVersioned {
+pub struct MetaInfo {
     pub name: String,
     pub version: u32,
+    pub optional_base58prefix: Option<u16>,
 }
 
 /// Struct to store the metadata values (network name, network
-/// version, full metadata as Vec<u8>)
+/// version, optional base58 prefix from metadata, full metadata as Vec<u8>)
 #[derive(PartialEq, Clone)]
 pub struct MetaValues {
     pub name: String,
     pub version: u32,
+    pub optional_base58prefix: Option<u16>,
     pub meta: Vec<u8>,
 }
 
 impl MetaValues {
     pub fn from_entry_name_version_checked<T: ErrorSource>(name: &str, version: u32, meta_encoded: IVec) -> Result<Self, T::Error> {
-        let meta = meta_encoded.to_vec();
-        check_metadata::<T>(&meta, &name, version, MetadataSource::Database{name: name.to_string(), version})?;
-        Ok(Self{
-            name: name.to_string(),
-            version,
-            meta,
-        })
+        let meta_values = match Self::from_vec_metadata(&meta_encoded.to_vec()) {
+            Ok(a) => a,
+            Err(e) => return Err(<T>::faulty_metadata(e, MetadataSource::Database{name: name.to_string(), version}))
+        };
+        if (meta_values.name != name)||(meta_values.version != version) {return Err(<T>::metadata_mismatch(name.to_string(), version, meta_values.name.to_string(), meta_values.version))}
+        Ok(meta_values)
     }
     pub fn from_entry_checked<T: ErrorSource>((meta_key_vec, meta_encoded): (IVec, IVec)) -> Result<Self, T::Error> {
         let (name, version) = MetaKey::from_ivec(&meta_key_vec).name_version::<T>()?;
         Self::from_entry_name_version_checked::<T>(&name, version, meta_encoded)
     }
     pub fn from_vec_metadata(meta_vec: &Vec<u8>) -> Result<Self, MetadataError> {
-        let name_versioned = name_versioned_from_metadata(&runtime_metadata_from_vec(meta_vec)?)?;
+        let meta_info = info_from_metadata(&runtime_metadata_from_vec(meta_vec)?)?;
         Ok(Self{
-            name: name_versioned.name.to_string(),
-            version: name_versioned.version,
+            name: meta_info.name.to_string(),
+            version: meta_info.version,
+            optional_base58prefix: meta_info.optional_base58prefix,
             meta: meta_vec.to_vec(),
         })
     }
     pub fn from_runtime_metadata(runtime_metadata: &RuntimeMetadata, source: IncomingMetadataSourceActive) -> Result<Self, ErrorActive> {
-        let name_versioned = match name_versioned_from_metadata(runtime_metadata) {
+        let meta_info = match info_from_metadata(runtime_metadata) {
             Ok(a) => a,
             Err(e) => return Err(<Active>::faulty_metadata(e, MetadataSource::Incoming(source))),
         };
         Ok(Self{
-            name: name_versioned.name.to_string(),
-            version: name_versioned.version,
+            name: meta_info.name.to_string(),
+            version: meta_info.version,
+            optional_base58prefix: meta_info.optional_base58prefix,
             meta: [vec![109, 101, 116, 97], runtime_metadata.encode()].concat(),
         })
     }
@@ -77,11 +81,11 @@ impl MetaValues {
 
 /// Function to search metadata as RuntimeMetadata for system block,
 /// decode RuntimeVersion constant,
-/// output NameVersioned
-pub fn name_versioned_from_metadata (runtime_metadata: &RuntimeMetadata) -> Result<NameVersioned, MetadataError> {
+/// output MetaInfo
+pub fn info_from_metadata (runtime_metadata: &RuntimeMetadata) -> Result<MetaInfo, MetadataError> {
     let mut runtime_version_encoded: Option<Vec<u8>> = None;
+    let mut base58_prefix_encoded: Option<Vec<u8>> = None;
     let mut system_block = false;
-    let mut constants_version = false;
     match runtime_metadata {
         RuntimeMetadata::V12(metadata_v12) => {
             if let DecodeDifferent::Decoded(meta_vector) = &metadata_v12.modules {
@@ -91,9 +95,10 @@ pub fn name_versioned_from_metadata (runtime_metadata: &RuntimeMetadata) -> Resu
                         if let DecodeDifferent::Decoded(constants_vector) = &x.constants {
                             for y in constants_vector.iter() {
                                 if y.name==DecodeDifferent::Encode("Version") {
-                                    constants_version = true;
                                     if let DecodeDifferent::Decoded(fin) = &y.value {runtime_version_encoded = Some(fin.to_vec());}
-                                    break;
+                                }
+                                if y.name==DecodeDifferent::Encode("SS58Prefix") {
+                                    if let DecodeDifferent::Decoded(fin) = &y.value {base58_prefix_encoded = Some(fin.to_vec());}
                                 }
                             }
                         }
@@ -110,9 +115,10 @@ pub fn name_versioned_from_metadata (runtime_metadata: &RuntimeMetadata) -> Resu
                         if let DecodeDifferent::Decoded(constants_vector) = &x.constants {
                             for y in constants_vector.iter() {
                                 if y.name==DecodeDifferent::Encode("Version") {
-                                    constants_version = true;
                                     if let DecodeDifferent::Decoded(fin) = &y.value {runtime_version_encoded = Some(fin.to_vec());}
-                                    break;
+                                }
+                                if y.name==DecodeDifferent::Encode("SS58Prefix") {
+                                    if let DecodeDifferent::Decoded(fin) = &y.value {base58_prefix_encoded = Some(fin.to_vec());}
                                 }
                             }
                         }
@@ -126,11 +132,8 @@ pub fn name_versioned_from_metadata (runtime_metadata: &RuntimeMetadata) -> Resu
                 if x.name == "System" {
                     system_block = true;
                     for y in x.constants.iter() {
-                        if y.name == "Version" {
-                            constants_version = true;
-                            runtime_version_encoded = Some(y.value.to_vec());
-                            break;
-                        }
+                        if y.name == "Version" {runtime_version_encoded = Some(y.value.to_vec())}
+                        if y.name == "SS58Prefix" {base58_prefix_encoded = Some(y.value.to_vec())}
                     }
                 break;
                 }
@@ -139,7 +142,6 @@ pub fn name_versioned_from_metadata (runtime_metadata: &RuntimeMetadata) -> Resu
         _ => return Err(MetadataError::VersionIncompatible),
     }
     if !system_block {return Err(MetadataError::NoSystemPallet)}
-    if !constants_version {return Err(MetadataError::NoVersionInConstants)}
     let runtime_version_encoded = match runtime_version_encoded {
         Some(x) => x,
         None => return Err(MetadataError::NoVersionInConstants),
@@ -148,20 +150,21 @@ pub fn name_versioned_from_metadata (runtime_metadata: &RuntimeMetadata) -> Resu
         Ok(a) => a,
         Err(_) => return Err(MetadataError::RuntimeVersionNotDecodeable),
     };
-    Ok(NameVersioned {
+    let optional_base58prefix = match base58_prefix_encoded {
+        Some(x) => match <u16>::decode(&mut &x[..]) {
+            Ok(a) => Some(a),
+            Err(_) => match <u8>::decode(&mut &x[..]) { // in some older metadata u8 is used for base58 prefix, likely a legacy thing
+                Ok(a) => Some(a as u16),
+                Err(_) => return Err(MetadataError::Base58PrefixNotDecodeable),
+            },
+        },
+        None => None, 
+    };
+    Ok(MetaInfo {
         name: runtime_version.spec_name.to_string(),
         version: runtime_version.spec_version,
+        optional_base58prefix,
     })
-}
-
-/// Function to check the integrity of the metadata versus given network name and version
-pub fn check_metadata<T: ErrorSource>(meta: &Vec<u8>, network_name: &str, network_version: u32, source: MetadataSource<T>) -> Result<(), T::Error> {
-    let meta_values = match MetaValues::from_vec_metadata(meta) {
-        Ok(a) => a,
-        Err(e) => return Err(<T>::faulty_metadata(e, source))
-    };
-    if (meta_values.name != network_name)||(meta_values.version != network_version) {return Err(<T>::metadata_mismatch(network_name.to_string(), network_version, meta_values.name.to_string(), meta_values.version))}
-    Ok(())
 }
 
 pub fn runtime_metadata_from_vec(meta_vec: &Vec<u8>) -> Result<RuntimeMetadata, MetadataError> {
@@ -187,7 +190,7 @@ impl MetaSetElement {
             Ok(a) => a,
             Err(e) => return Err(<Signer>::faulty_metadata(e, MetadataSource::Database{name: network_name, version: network_version})),
         };
-        let (name, version) = match name_versioned_from_metadata(&runtime_metadata) {
+        let (name, version) = match info_from_metadata(&runtime_metadata) {
             Ok(a) => {
                 if (a.version != network_version)||(a.name != network_name) {return Err(<Signer>::metadata_mismatch(network_name.to_string(), network_version, a.name.to_string(), a.version))}
                 (a.name, a.version)
@@ -203,7 +206,7 @@ impl MetaSetElement {
 }
 
 /// Struct to store network information needed for metadata and network specs fetching
-#[derive(parity_scale_codec_derive::Decode, parity_scale_codec_derive::Encode)]
+#[derive(parity_scale_codec_derive::Decode, parity_scale_codec_derive::Encode, PartialEq)]
 pub struct AddressBookEntry {
     pub name: String,
     pub genesis_hash: [u8; 32],
