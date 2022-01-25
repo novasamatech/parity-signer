@@ -17,8 +17,8 @@ import org.json.JSONObject
 @Composable
 fun NetworkCard(network: JSONObject) {
 	Row {
-		Text(network.optString("logo"), style = Web3Typography.h4)
+		Text(network.optString("logo", network.optString("network_logo")), style = Web3Typography.h4)
 		Spacer(Modifier.width(15.dp))
-		Text(network.optString("title"), style = MaterialTheme.typography.h3)
+		Text(network.optString("title", network.optString("network_title")), style = MaterialTheme.typography.h3)
 	}
 }

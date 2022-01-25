@@ -32,11 +32,11 @@ fun KeyCard(identity: JSONObject, signerDataModel: SignerDataModel) {
 		Column {
 			Row {
 				Text(
-					identity.optString("path") ?: "",
+					identity.optString("path", identity.optString("derivation_path")),
 					color = MaterialTheme.colors.onBackground,
 					style = CryptoTypography.body2
 				)
-				if (identity.optBoolean("has_pwd")) {
+				if (identity.optBoolean("has_pwd", false)) {
 					Text("///")
 				}
 			}

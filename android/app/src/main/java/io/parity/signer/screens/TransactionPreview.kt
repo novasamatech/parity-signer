@@ -4,6 +4,8 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.runtime.Composable
 import io.parity.signer.ButtonID
 import io.parity.signer.components.BigButton
+import io.parity.signer.components.KeyCard
+import io.parity.signer.components.NetworkCard
 import io.parity.signer.components.TransactionPreviewField
 import io.parity.signer.models.SignerDataModel
 import io.parity.signer.models.TransactionType
@@ -23,6 +25,12 @@ fun TransactionPreview(
 
 	Column {
 		TransactionPreviewField(transaction = transaction)
+		signerDataModel.screenData.value!!.getJSONObject("author_info").let {
+			KeyCard(identity = it, signerDataModel = signerDataModel)
+		}
+		signerDataModel.screenData.value!!.getJSONObject("network_info").let {
+			NetworkCard(network = it)
+		}
 		when (action) {
 			TransactionType.sign -> {
 				BigButton(
