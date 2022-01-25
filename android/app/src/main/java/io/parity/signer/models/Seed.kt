@@ -75,9 +75,9 @@ internal fun SignerDataModel.getSeed(seedName: String): String {
 /**
  * Guess possible seed words from user input
  */
-internal fun SignerDataModel.guessWord(word: String): MutableList<String> {
+internal fun SignerDataModel.guessWord(word: String): List<String> {
 	Log.d("Guess query", "[" + word + "]")
-	return JSONArray(substrateGuessWord(word)).toListOfStrings() as MutableList<String>
+	return JSONArray(substrateGuessWord(word)).toListOfStrings()
 }
 
 /**
