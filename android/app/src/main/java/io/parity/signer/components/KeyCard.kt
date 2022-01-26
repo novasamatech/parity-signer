@@ -4,6 +4,8 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Lock
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
@@ -38,6 +40,7 @@ fun KeyCard(identity: JSONObject, signerDataModel: SignerDataModel) {
 				)
 				if (identity.optBoolean("has_pwd", false)) {
 					Text("///")
+					Image(Icons.Default.Lock, contentDescription = "Locked account")
 				}
 			}
 			Text(

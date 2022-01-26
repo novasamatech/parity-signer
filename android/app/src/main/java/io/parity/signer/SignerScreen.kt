@@ -82,7 +82,7 @@ fun ModalSelector(modal: SignerModal, signerDataModel: SignerDataModel) {
 		SignerModal.SeedMenu -> TODO()
 		SignerModal.NetworkMenu -> TODO()
 		SignerModal.Backup -> TODO()
-		SignerModal.PasswordConfirm -> TODO()
+		SignerModal.PasswordConfirm -> PasswordConfirm(signerDataModel = signerDataModel)
 		SignerModal.SignatureReady -> SignatureReady(signerDataModel = signerDataModel)
 		SignerModal.EnterPassword -> TODO()
 		SignerModal.LogRight -> TODO()

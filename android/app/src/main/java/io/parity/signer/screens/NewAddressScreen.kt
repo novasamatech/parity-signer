@@ -23,14 +23,9 @@ import io.parity.signer.models.*
 
 @Composable
 fun NewAddressScreen(signerDataModel: SignerDataModel, increment: Boolean) {
-	var derivationPath by remember {
-		mutableStateOf(
-			""
-		)
-	}
+	var derivationPath by remember { mutableStateOf("") }
 	var derivationState by remember { mutableStateOf(DerivationState()) }
 	val seedName = signerDataModel.screenData.value?.optString("seed_name") ?: ""
-
 	val lastError = signerDataModel.lastError.observeAsState()
 	val focusManager = LocalFocusManager.current
 	val focusRequester = remember { FocusRequester() }
