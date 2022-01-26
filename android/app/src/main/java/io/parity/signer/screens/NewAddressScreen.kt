@@ -19,7 +19,7 @@ import io.parity.signer.models.SignerDataModel
 import io.parity.signer.models.addKey
 
 @Composable
-fun NewKeyModal(signerDataModel: SignerDataModel, increment: Boolean) {
+fun NewAddressScreen(signerDataModel: SignerDataModel, increment: Boolean) {
 	var derivationPath by remember {
 		mutableStateOf(
 			""

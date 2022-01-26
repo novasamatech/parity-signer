@@ -62,7 +62,7 @@ fun ScreenSelector(screen: SignerScreen?, signerDataModel: SignerDataModel) {
 			)
 		}
 		SignerScreen.DeriveKey -> {
-			NewKeyModal(signerDataModel = signerDataModel, increment = false)
+			NewAddressScreen(signerDataModel = signerDataModel, increment = false)
 		}
 		SignerScreen.Verifier -> TODO()
 		null -> WaitingScreen()
