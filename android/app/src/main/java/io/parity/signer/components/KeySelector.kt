@@ -41,7 +41,7 @@ fun KeySelector(signerDataModel: SignerDataModel) {
 										ButtonID.SelectKey,
 										addresses
 											.getJSONObject(item)
-											.optString("address_key", "")
+											.optString("address_key")
 									)
 								},
 								onLongPress = {
