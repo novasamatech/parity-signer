@@ -33,9 +33,10 @@ import kotlin.math.sign
 @ExperimentalAnimationApi
 @Composable
 fun KeyManager(signerDataModel: SignerDataModel) {
+	//val screenData = signerDataModel.screenData.value
 	val rootKey = signerDataModel.screenData.value?.optJSONObject("root")
 	val keySet = signerDataModel.screenData.value?.optJSONArray("set") ?: JSONArray()
-	val network = signerDataModel.screenData.value?.optJSONObject("network")
+	//val network = signerDataModel.screenData.value?.optJSONObject("network")
 	val multiselectMode = signerDataModel.screenData.value?.optBoolean("multiselect_mode")
 	val multiselectCount = signerDataModel.screenData.value?.optString("multiselect_count")
 
@@ -65,7 +66,10 @@ fun KeyManager(signerDataModel: SignerDataModel) {
 				.fillMaxWidth()
 		) {
 			Row {
-				//NetworkCard(signerDataModel.selectedNetwork.value?: JSONObject())
+				signerDataModel.screenData.value?.let { screenData ->
+					screenData.optJSONObject("network")?.let { network ->
+						NetworkCard(network) }
+				}
 				Icon(Icons.Default.ArrowCircleDown, "More networks")
 				Spacer(modifier = Modifier.weight(1f))
 			}

@@ -80,7 +80,7 @@ fun ModalSelector(modal: SignerModal, signerDataModel: SignerDataModel) {
 		SignerModal.Empty -> {}
 		SignerModal.NewSeedMenu -> NewSeedMenu(signerDataModel = signerDataModel)
 		SignerModal.SeedMenu -> TODO()
-		SignerModal.NetworkMenu -> TODO()
+		SignerModal.NetworkSelector -> NetworkSelector(signerDataModel = signerDataModel)
 		SignerModal.Backup -> TODO()
 		SignerModal.PasswordConfirm -> PasswordConfirm(signerDataModel = signerDataModel)
 		SignerModal.SignatureReady -> SignatureReady(signerDataModel = signerDataModel)
@@ -138,7 +138,7 @@ enum class SignerScreen {
 enum class SignerModal {
 	Empty,
 	NewSeedMenu,
-	NetworkMenu,
+	NetworkSelector,
 	SeedMenu,
 	Backup,
 	PasswordConfirm,
