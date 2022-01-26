@@ -354,6 +354,7 @@ impl ErrorSource for Active {
                     DefaultLoading::MetadataFolder(e) => format!("Error with default metadata folder. {}", e),
                     DefaultLoading::MetadataFile(e) => format!("Error with default metadata file. {}", e),
                     DefaultLoading::TypesFile(e) => format!("Error with default types information file. {}", e),
+                    DefaultLoading::OrphanMetadata{name, filename} => format!("Default metadata for {} from {} does not have corresponding default network specs.", name, filename),
                 };
                 format!("Error on loading defaults. {}", insert)
             },
@@ -646,6 +647,7 @@ pub enum DefaultLoading {
     MetadataFolder(std::io::Error),
     MetadataFile(std::io::Error),
     TypesFile(std::io::Error),
+    OrphanMetadata{name: String, filename: String},
 }
 
 /// Enum listing errors for cases when something was needed from the Active database and was not found
@@ -928,6 +930,7 @@ impl ErrorSource for Signer {
                     DatabaseSigner::TwoTransactionsInEntry(x) => format!("Entry with order {} contains more than one transaction-related event. This should not be possible in current Signer and likely indicates database corruption.", x),
                     DatabaseSigner::CustomVerifierIsGeneral(key) => format!("Network with genesis hash {} verifier is set as a custom one. This custom verifier coinsides the database general verifier and not None. This should not have happened and likely indicates database corruption.", hex::encode(key.genesis_hash())),
                     DatabaseSigner::TwoRootKeys{seed_name, encryption} => format!("More than one root key (i.e. with empty path and without password) found for seed name {} and encryption {}.", seed_name, encryption.show()),
+                    DatabaseSigner::DifferentBase58Specs{genesis_hash, base58_1, base58_2} => format!("More than one base58 prefix in network specs database entries for network with genesis hash {}: {} and {}.", hex::encode(genesis_hash), base58_1, base58_2),
                 };
                 format!("Database error. {}", insert)
             },
@@ -942,6 +945,7 @@ impl ErrorSource for Signer {
                     InputSigner::SameNameVersionDifferentMeta{name, version} => format!("Metadata for {}{} is already in the database and is different from the one in received payload.", name, version),
                     InputSigner::MetadataKnown{name, version} => format!("Metadata for {}{} is already in the database.", name, version),
                     InputSigner::ImportantSpecsChanged(key) => format!("Similar network specs are already stored in the database under key {}. Network specs in received payload have different unchangeable values (base58 prefix, decimals, encryption, network name, unit).", hex::encode(key.key())),
+                    InputSigner::DifferentBase58{genesis_hash, base58_database, base58_input} => format!("Network with genesis hash {} already has entries in the database with base58 prefix {}. Received network specs have different base 58 prefix {}.", hex::encode(genesis_hash), base58_database, base58_input),
                     InputSigner::EncryptionNotSupported(code) => format!("Payload with encryption 0x{} is not supported.", code),
                     InputSigner::BadSignature => String::from("Received payload has bad signature."),
                     InputSigner::LoadMetaUnknownNetwork{name} => format!("Network {} is not in the database. Add network specs before loading the metadata.", name),
@@ -1124,6 +1128,7 @@ pub enum DatabaseSigner {
     TwoTransactionsInEntry(u32),
     CustomVerifierIsGeneral(VerifierKey),
     TwoRootKeys{seed_name: String, encryption: Encryption},
+    DifferentBase58Specs{genesis_hash: [u8;32], base58_1: u16, base58_2: u16},
 }
 
 /// Enum listing possible errors in decoding keys from the database on the Signer side
@@ -1173,6 +1178,7 @@ pub enum InputSigner {
     SameNameVersionDifferentMeta{name: String, version: u32},
     MetadataKnown{name: String, version: u32},
     ImportantSpecsChanged(NetworkSpecsKey),
+    DifferentBase58{genesis_hash: [u8;32], base58_database: u16, base58_input: u16},
     EncryptionNotSupported(String),
     BadSignature,
     LoadMetaUnknownNetwork{name: String},

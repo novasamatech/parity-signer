@@ -180,6 +180,7 @@ pub fn runtime_metadata_from_vec(meta_vec: &Vec<u8>) -> Result<RuntimeMetadata, 
 pub struct MetaSetElement {
     pub name: String,
     pub version: u32,
+    pub optional_base58prefix: Option<u16>,
     pub runtime_metadata: RuntimeMetadata,
 }
 
@@ -190,16 +191,17 @@ impl MetaSetElement {
             Ok(a) => a,
             Err(e) => return Err(<Signer>::faulty_metadata(e, MetadataSource::Database{name: network_name, version: network_version})),
         };
-        let (name, version) = match info_from_metadata(&runtime_metadata) {
+        let (name, version, optional_base58prefix) = match info_from_metadata(&runtime_metadata) {
             Ok(a) => {
                 if (a.version != network_version)||(a.name != network_name) {return Err(<Signer>::metadata_mismatch(network_name.to_string(), network_version, a.name.to_string(), a.version))}
-                (a.name, a.version)
+                (a.name, a.version, a.optional_base58prefix)
             },
             Err(e) => return Err(<Signer>::faulty_metadata(e, MetadataSource::Database{name: network_name, version: network_version})),
         };
         Ok(Self{
             name,
             version,
+            optional_base58prefix,
             runtime_metadata,
         })
     }

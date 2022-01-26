@@ -1,4 +1,4 @@
-use db_handling::{db_transactions::TrDbColdStub, helpers::{try_get_valid_current_verifier, get_general_verifier}};
+use db_handling::{db_transactions::TrDbColdStub, helpers::{genesis_hash_in_specs, get_general_verifier, open_db, try_get_valid_current_verifier}};
 use definitions::{error::{ErrorSigner, GeneralVerifierForContent, InputSigner, Signer, TransferContent}, history::Event, keyring::{NetworkSpecsKey, VerifierKey}, network_specs::{ValidCurrentVerifier, Verifier}, qr_transfers::ContentAddSpecs};
 
 use crate::{Action, StubNav};
@@ -15,6 +15,11 @@ pub fn add_specs (data_hex: &str, database_name: &str) -> Result<Action, ErrorSi
     let verifier_key = VerifierKey::from_parts(&specs.genesis_hash.to_vec());
     let possible_valid_current_verifier = try_get_valid_current_verifier (&verifier_key, &database_name)?;
     let general_verifier = get_general_verifier(&database_name)?;
+    if let Some((_, known_network_specs)) = genesis_hash_in_specs(&verifier_key, &open_db::<Signer>(&database_name)?)? {
+        if specs.base58prefix != known_network_specs.base58prefix {
+            return Err(ErrorSigner::Input(InputSigner::DifferentBase58{genesis_hash: specs.genesis_hash, base58_database: known_network_specs.base58prefix, base58_input: specs.base58prefix}))
+        }
+    }
     let mut stub = TrDbColdStub::new();
     let mut index = 0;
     

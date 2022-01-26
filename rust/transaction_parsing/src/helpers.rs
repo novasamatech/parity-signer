@@ -1,6 +1,6 @@
 use constants::{METATREE, SPECSTREE};
 use db_handling::helpers::{open_db, open_tree, get_types};
-use definitions::{crypto::Encryption, error::{DatabaseSigner, ErrorSigner, ErrorSource, InputSigner, MetadataError, MetadataSource, NotFoundSigner, NotHexSigner, Signer}, helpers::unhex, keyring::{MetaKey, MetaKeyPrefix, NetworkSpecsKey}, metadata::{MetaValues, MetaSetElement}, network_specs::{NetworkSpecs, NetworkSpecsToSend}};
+use definitions::{crypto::Encryption, error::{DatabaseSigner, ErrorSigner, ErrorSource, InputSigner, MetadataError, MetadataSource, NotFoundSigner, NotHexSigner, Signer}, helpers::unhex, keyring::{MetaKey, MetaKeyPrefix, NetworkSpecsKey}, metadata::{MetaValues, MetaSetElement}, network_specs::{NetworkSpecs, NetworkSpecsToSend, ShortSpecs}};
 use frame_metadata::RuntimeMetadata;
 use parser::{MetadataBundle, method::OlderMeta};
 use sp_core::{ed25519, sr25519, ecdsa};
@@ -30,13 +30,19 @@ pub (crate) fn specs_by_name (network_name: &str, encryption: &Encryption, datab
     }
 }
 
-pub fn find_meta_set(network_name: &str, database_name: &str) -> Result<Vec<MetaSetElement>, ErrorSigner> {
+pub fn find_meta_set(short_specs: &ShortSpecs, database_name: &str) -> Result<Vec<MetaSetElement>, ErrorSigner> {
     let database = open_db::<Signer>(&database_name)?;
     let metadata = open_tree::<Signer>(&database, METATREE)?;
     let mut out: Vec<MetaSetElement> = Vec::new();
-    let meta_key_prefix = MetaKeyPrefix::from_name(&network_name);
+    let meta_key_prefix = MetaKeyPrefix::from_name(&short_specs.name);
     for x in metadata.scan_prefix(meta_key_prefix.prefix()) {
-        if let Ok(a) = x {out.push(MetaSetElement::from_entry(a)?)}
+        if let Ok(a) = x {
+            let new_element = MetaSetElement::from_entry(a)?;
+            if let Some(found_now) = new_element.optional_base58prefix {
+                if found_now != short_specs.base58prefix {return Err(<Signer>::faulty_metadata(MetadataError::Base58PrefixSpecsMismatch{specs: short_specs.base58prefix, meta: found_now}, MetadataSource::Database{name: short_specs.name.to_string(), version: new_element.version}))}
+            }
+            out.push(new_element);
+        }
     }
     out.sort_by(|a, b| b.version.cmp(&a.version));
     Ok(out)

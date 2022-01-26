@@ -53,7 +53,7 @@ pub fn try_get_valid_current_verifier (verifier_key: &VerifierKey, database_name
             Err(_) => return Err(ErrorSigner::Database(DatabaseSigner::EntryDecoding(EntryDecodingSigner::CurrentVerifier(verifier_key.to_owned())))),
         },
         Ok(None) => {
-            if let Some(network_specs_key) = genesis_hash_in_specs(verifier_key, &database)? {return Err(ErrorSigner::Database(DatabaseSigner::UnexpectedGenesisHash{verifier_key: verifier_key.to_owned(), network_specs_key}))}
+            if let Some((network_specs_key, _)) = genesis_hash_in_specs(verifier_key, &database)? {return Err(ErrorSigner::Database(DatabaseSigner::UnexpectedGenesisHash{verifier_key: verifier_key.to_owned(), network_specs_key}))}
             Ok(None)
         },
         Err(e) => return Err(<Signer>::db_internal(e)),
@@ -72,20 +72,30 @@ pub fn get_valid_current_verifier (verifier_key: &VerifierKey, database_name: &s
 /// in SPECSTREE of the Signer database
 /// If there are more than one network corresponding to the same genesis hash,
 /// outputs network specs key for the network with the lowest order
-pub fn genesis_hash_in_specs (verifier_key: &VerifierKey, database: &Db) -> Result<Option<NetworkSpecsKey>, ErrorSigner> {
+pub fn genesis_hash_in_specs (verifier_key: &VerifierKey, database: &Db) -> Result<Option<(NetworkSpecsKey, NetworkSpecs)>, ErrorSigner> {
     let genesis_hash = verifier_key.genesis_hash();
     let chainspecs = open_tree::<Signer>(&database, SPECSTREE)?;
     let mut specs_set: Vec<(NetworkSpecsKey, NetworkSpecs)> = Vec::new();
+    let mut found_base58prefix = None;
     for x in chainspecs.iter() {
         if let Ok((network_specs_key_vec, network_specs_encoded)) = x {
             let network_specs_key = NetworkSpecsKey::from_ivec(&network_specs_key_vec);
             let network_specs = NetworkSpecs::from_entry_with_key_checked::<Signer>(&network_specs_key, network_specs_encoded)?;
-            if network_specs.genesis_hash.to_vec() == genesis_hash {specs_set.push((network_specs_key, network_specs))}
+            if network_specs.genesis_hash.to_vec() == genesis_hash {
+                found_base58prefix = match found_base58prefix {
+                    Some(base58prefix) => {
+                        if base58prefix == network_specs.base58prefix {Some(base58prefix)}
+                        else {return Err(ErrorSigner::Database(DatabaseSigner::DifferentBase58Specs{genesis_hash: network_specs.genesis_hash, base58_1: base58prefix, base58_2: network_specs.base58prefix}))}
+                    },
+                    None => Some(network_specs.base58prefix),
+                };
+                specs_set.push((network_specs_key, network_specs))
+            }
         }
     }
     specs_set.sort_by(|a, b| a.1.order.cmp(&b.1.order));
     match specs_set.get(0) {
-        Some((a, _)) => Ok(Some(a.to_owned())),
+        Some(a) => Ok(Some(a.to_owned())),
         None => Ok(None),
     } 
 }

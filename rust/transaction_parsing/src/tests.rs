@@ -469,6 +469,20 @@ mod tests {
     }
     
     #[test]
+    fn add_specs_bad_westend_ed25519_not_signed() {
+        let dbname = "for_tests/add_specs_bad_westend_ed25519_not_signed";
+        populate_cold(dbname, Verifier(None)).unwrap();
+        let line = fs::read_to_string("for_tests/add_specs_westend-ed25519_unverified_bad_ones.txt").unwrap();
+        let reply_known = r#""error":[{"index":0,"indent":0,"type":"error","payload":"Bad input data. Network with genesis hash e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e already has entries in the database with base58 prefix 42. Received network specs have different base 58 prefix 115."}]"#;
+        let output = produce_output(&line.trim(), dbname);
+        if let Action::Read(reply) = output {
+            assert!(reply == reply_known, "Expected: {}\nReceived: {}", reply_known, reply);
+        }
+        else {panic!("Wrong action {:?}", output)}
+        fs::remove_dir_all(dbname).unwrap();
+    }
+    
+    #[test]
     fn add_specs_westend_ed25519_alice_signed_db_not_verified() {
         let dbname = "for_tests/add_specs_westend_ed25519_alice_signed_db_not_verified";
         populate_cold(dbname, Verifier(None)).unwrap();
