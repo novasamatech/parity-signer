@@ -11,12 +11,15 @@ import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
-import io.parity.signer.models.SignerDataModel
-import io.parity.signer.models.addKey
+import io.parity.signer.ButtonID
+import io.parity.signer.components.BigButton
+import io.parity.signer.models.*
 
 @Composable
 fun NewAddressScreen(signerDataModel: SignerDataModel, increment: Boolean) {
@@ -25,11 +28,12 @@ fun NewAddressScreen(signerDataModel: SignerDataModel, increment: Boolean) {
 			""
 		)
 	}
+	var derivationState by remember { mutableStateOf(DerivationState()) }
+	val seedName = signerDataModel.screenData.value?.optString("seed_name") ?: ""
 
-	var password by remember { mutableStateOf("") }
-	var passwordRepeat by remember { mutableStateOf("") }
 	val lastError = signerDataModel.lastError.observeAsState()
 	val focusManager = LocalFocusManager.current
+	val focusRequester = remember { FocusRequester() }
 
 	Column(
 		horizontalAlignment = Alignment.CenterHorizontally,
@@ -42,6 +46,7 @@ fun NewAddressScreen(signerDataModel: SignerDataModel, increment: Boolean) {
 			value = derivationPath,
 			onValueChange = {
 				derivationPath = it
+				derivationState = signerDataModel.checkAsDerivation(derivationPath)
 				signerDataModel.clearError()
 			},
 			label = { Text("Derivation path") },
@@ -53,60 +58,47 @@ fun NewAddressScreen(signerDataModel: SignerDataModel, increment: Boolean) {
 				imeAction = ImeAction.Done
 			),
 			keyboardActions = KeyboardActions(
-				onDone = { focusManager.clearFocus() }
-			)
-		)
-		TextField(
-			value = password,
-			onValueChange = {
-				password = it
-				signerDataModel.clearError()
-			},
-			label = { Text("Password (optional)") },
-			singleLine = true,
-			keyboardOptions = KeyboardOptions(
-				autoCorrect = false,
-				capitalization = KeyboardCapitalization.None,
-				keyboardType = KeyboardType.Password,
-				imeAction = ImeAction.Done
+				onDone = {
+					focusManager.clearFocus()
+					if (derivationState.isValid) {
+						if (derivationState.hasPassword) {
+							signerDataModel.pushButton(
+								ButtonID.CheckPassword,
+								details = derivationPath
+							)
+						} else {
+							signerDataModel.addKey(path = derivationPath, seedName = seedName)
+						}
+					}
+				}
 			),
-			keyboardActions = KeyboardActions(
-				onDone = { focusManager.clearFocus() }
-			)
+			modifier = Modifier.focusRequester(focusRequester = focusRequester)
 		)
-		if (!password.isEmpty()) {
-			TextField(
-				value = passwordRepeat,
-				onValueChange = {
-					passwordRepeat = it
-					signerDataModel.clearError()
+		Row {
+			BigButton(
+				text = "Next",
+				action = {
+					if (derivationState.hasPassword) {
+						signerDataModel.pushButton(
+							ButtonID.CheckPassword,
+							details = derivationPath
+						)
+					} else {
+						signerDataModel.addKey(path = derivationPath, seedName = seedName)
+					}
 				},
-				label = { Text("Repeat password") },
-				singleLine = true,
-				keyboardOptions = KeyboardOptions(
-					autoCorrect = false,
-					capitalization = KeyboardCapitalization.None,
-					keyboardType = KeyboardType.Password,
-					imeAction = ImeAction.Done
-				),
-				keyboardActions = KeyboardActions(
-					onDone = { focusManager.clearFocus() }
-				)
+				isDisabled = !derivationState.isValid
 			)
 		}
-		Row {
-			TextButton(
-				colors = ButtonDefaults.buttonColors(
-					backgroundColor = MaterialTheme.colors.background,
-					contentColor = MaterialTheme.colors.onBackground
-				),
-				onClick = {
-					signerDataModel.addKey(derivationPath, password)
-				},
-				enabled = (password == passwordRepeat || password.isEmpty()) && !derivationPath.isEmpty() && lastError.value?.isEmpty() as Boolean
-			) {
-				Text("Create")
-			}
+	}
+	DisposableEffect(Unit) {
+		if (signerDataModel.screenData.value?.optBoolean("keyboard") == true) {
+			focusRequester.requestFocus()
 		}
+		derivationPath =
+			signerDataModel.screenData.value?.optString("suggested_derivation")
+				?: ""
+		derivationState = signerDataModel.checkAsDerivation(derivationPath)
+		onDispose { focusManager.clearFocus() }
 	}
 }

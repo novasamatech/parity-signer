@@ -25,7 +25,7 @@ fun BigButton(
 	val bgColor = if (isDisabled) Bg200 else if (isShaded) Bg300 else accentColor
 	val fgColor = if (isDisabled) Text300 else if (isShaded) if (isDangerous) BaseDanger else accentColor else Action600
 
-	Button(onClick = action) {
+	Button(onClick = action, enabled = !isDisabled) {
 		Row (
 			horizontalArrangement = Arrangement.Center,
 			modifier = Modifier.background(bgColor)
