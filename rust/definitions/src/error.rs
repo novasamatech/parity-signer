@@ -329,8 +329,12 @@ impl ErrorSource for Active {
                             SpecsError::DecimalsFormatNotSupported{value} => format!("Decimals value {} does not fit into u8.", value),
                             SpecsError::NoUnit => String::from("No units."),
                             SpecsError::UnitFormatNotSupported{value} => format!("Units {} are not String.", value),
+                            SpecsError::DecimalsArrayUnitsNot => String::from("Unexpected result for multi-token network. Decimals are fetched as an array, whereas units are not."),
+                            SpecsError::DecimalsUnitsArrayLength{decimals_len, unit_len} => format!("Unexpected result for multi-token network. Length of decimals array {} does not match the length of units array {}.", decimals_len, unit_len),
+                            SpecsError::UnitsArrayDecimalsNot => String::from("Unexpected result for multi-token network. Units are fetched as an array, whereas decimals are not."),
+                            SpecsError::OverrideIgnored => String::from("Fetched single value for token decimals and unit. Token override is not possible."),
                         };
-                        format!("Network specs from {} are not suitable. {}", url, insert)
+                        format!("Problem with network specs from {}. {}", url, insert)
                     },
                     Fetch::Failed{url, error} => format!("Could not make rpc call at {}. {}", url, error),
                     Fetch::ValuesChanged{url, what} => {
@@ -402,6 +406,7 @@ impl ErrorSource for Active {
                             CommandDoubleKey::Content => "content",
                             CommandDoubleKey::Set => "set",
                             CommandDoubleKey::CryptoOverride => "encryption override",
+                            CommandDoubleKey::TokenOverride => "token override",
                             CommandDoubleKey::CryptoKey => "`-crypto`",
                             CommandDoubleKey::MsgType => "`-msgtype`",
                             CommandDoubleKey::Verifier => "`-verifier`",
@@ -416,6 +421,8 @@ impl ErrorSource for Active {
                     },
                     CommandParser::NeedArgument(b) => {
                         let insert = match b {
+                            CommandNeedArgument::TokenUnit => "`-token ***'",
+                            CommandNeedArgument::TokenDecimals => "'-token'",
                             CommandNeedArgument::NetworkName => "`-n`",
                             CommandNeedArgument::NetworkUrl => "`-u`",
                             CommandNeedArgument::CryptoKey => "`-crypto`",
@@ -453,7 +460,8 @@ impl ErrorSource for Active {
                     },
                     CommandParser::Unexpected(b) => {
                         match b {
-                            CommandUnexpected::KeyAContent => String::from("Key -a is used to process all, name or url was not expected."),
+                            CommandUnexpected::DecimalsFormat => String::from("Key `-token` should be followed by u8 decimals value."),
+                            CommandUnexpected::KeyAContent => String::from("Key `-a` is used to process all, name or url was not expected."),
                             CommandUnexpected::VerifierNoCrypto => String::from("No verifier entry was expected for `-crypto none` sequence."),
                             CommandUnexpected::SignatureNoCrypto => String::from("No singature entry was expected for `-crypto none` sequence."),
                             CommandUnexpected::AliceSignature => String::from("No signature was expected for verifier Alice."),
@@ -477,6 +485,7 @@ impl ErrorSource for Active {
             },
             ErrorActive::Qr(e) => format!("Error generating qr code. {}", e),
             ErrorActive::NotSupported => String::from("Key combination is not supported. Please file a ticket if you need it."),
+            ErrorActive::NoTokenOverrideKnownNetwork{url} => format!("Network with corresponding url {} has database records. Token override is not supported.", url),
             ErrorActive::Wasm(a) => {
                 match a {
                     Wasm::WasmTestbed(e) => format!("WasmTestbed error. {}", e),
@@ -502,6 +511,7 @@ pub enum ErrorActive {
     Input(InputActive),
     Qr(String),
     NotSupported,
+    NoTokenOverrideKnownNetwork{url: String},
     Wasm(Wasm),
 }
 
@@ -629,6 +639,10 @@ pub enum SpecsError {
     DecimalsFormatNotSupported{value: String},
     NoUnit,
     UnitFormatNotSupported{value: String},
+    DecimalsArrayUnitsNot,
+    DecimalsUnitsArrayLength{decimals_len: usize, unit_len: usize},
+    UnitsArrayDecimalsNot,
+    OverrideIgnored,
 }
 
 #[derive(Debug)]
@@ -697,6 +711,7 @@ pub enum CommandDoubleKey {
     Content,
     Set,
     CryptoOverride,
+    TokenOverride,
     CryptoKey,
     MsgType,
     Verifier,
@@ -711,6 +726,8 @@ pub enum CommandDoubleKey {
 /// Enum listing command line parser errors conserning missing key argument
 #[derive(Debug)]
 pub enum CommandNeedArgument {
+    TokenUnit,
+    TokenDecimals,
     NetworkName,
     NetworkUrl,
     CryptoKey,
@@ -748,6 +765,7 @@ pub enum CommandBadArgument {
 /// Enum listing command line parser errors conserning unexpected command content
 #[derive(Debug)]
 pub enum CommandUnexpected {
+    DecimalsFormat,
     KeyAContent,
     VerifierNoCrypto,
     SignatureNoCrypto,

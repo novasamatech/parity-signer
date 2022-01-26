@@ -5,6 +5,7 @@ use std::convert::TryInto;
 use crate::fetch_metadata::{fetch_info, fetch_info_with_network_specs};
 use crate::helpers::{genesis_hash_in_hot_db, filter_address_book_by_url, process_indices};
 use crate::interpret_specs::interpret_properties;
+use crate::parser::TokenOverride;
 
 
 /// Struct to store MetaValues and genesis hash for network
@@ -37,16 +38,19 @@ pub struct MetaSpecsShortCut {
 
 /// Function to process address as &str, fetch metadata, genesis hash, and network specs
 /// for it, and output MetaSpecsShortCut value in case of success
-pub fn meta_specs_shortcut (address: &str, encryption: Encryption) -> Result<MetaSpecsShortCut, ErrorActive> {
+pub fn meta_specs_shortcut (address: &str, encryption: Encryption, optional_token_override: Option<TokenOverride>) -> Result<MetaSpecsShortCut, ErrorActive> {
 
     let entries = filter_address_book_by_url(address)?;
+    if entries.len() !=0 {
+        if let Some(_) = optional_token_override {return Err(ErrorActive::NoTokenOverrideKnownNetwork{url: address.to_string()})}
+    }
     let new_info = match fetch_info_with_network_specs(address) {
         Ok(a) => a,
         Err(e) => return Err(ErrorActive::Fetch(Fetch::Failed{url: address.to_string(), error: e.to_string()})),
     };
     let genesis_hash = get_genesis_hash(address, &new_info.genesis_hash)?;
     let meta_values = MetaValues::from_str_metadata(&new_info.meta, IncomingMetadataSourceActiveStr::Fetch{url: address.to_string()})?;
-    let new_properties = match interpret_properties(&new_info.properties, meta_values.optional_base58prefix) {
+    let new_properties = match interpret_properties(&new_info.properties, meta_values.optional_base58prefix, optional_token_override) {
         Ok(a) => a,
         Err(error) => return Err(ErrorActive::Fetch(Fetch::FaultySpecs{url: address.to_string(), error})),
     };

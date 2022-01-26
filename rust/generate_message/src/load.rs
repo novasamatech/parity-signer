@@ -18,7 +18,8 @@ use crate::output_prep::load_meta_print;
 
 pub fn gen_load_meta (instruction: Instruction) -> Result<(), ErrorActive> {
     
-    if let Some(_) = instruction.encryption_override {return Err(ErrorActive::NotSupported)}
+    if let Some(_) = instruction.over.encryption {return Err(ErrorActive::NotSupported)}
+    if let Some(_) = instruction.over.token {return Err(ErrorActive::NotSupported)}
     match instruction.set {
         Set::F => {
             match instruction.content {
