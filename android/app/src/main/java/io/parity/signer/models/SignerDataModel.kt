@@ -48,8 +48,10 @@ class SignerDataModel : ViewModel() {
 	//Alert
 	private val _alertState = MutableLiveData(ShieldAlert.None)
 
+	//State of the app being unlocked
+	internal val _authenticated = MutableLiveData(false)
 	//Authenticator to call!
-	internal var authentication: Authentication = Authentication()
+	internal var authentication: Authentication = Authentication(setAuth = { _authenticated.value = it })
 
 	//Camera stuff
 	internal var bucket = arrayOf<String>()
@@ -59,20 +61,15 @@ class SignerDataModel : ViewModel() {
 	internal val _progress = MutableLiveData(0.0f)
 
 	//Transaction
-	internal val _transaction = MutableLiveData(JSONArray())
 	internal var action = JSONObject()
 	internal val _actionable = MutableLiveData(false)
 	var signingAuthor = JSONObject()
-	internal var signature = ""
 
 	//Internal storage for model data:
 	//TODO: hard types for these
 
 	//Seeds
 	internal val _seedNames = MutableLiveData(arrayOf<String>())
-
-	//TODO: keeping super secret seeds in questionably managed observable must be studied critically
-	internal val _backupSeedPhrase = MutableLiveData("")
 
 	//Error
 	internal val _lastError = MutableLiveData("")
@@ -101,7 +98,6 @@ class SignerDataModel : ViewModel() {
 	internal val captured: LiveData<Int?> = _captured
 	val progress: LiveData<Float> = _progress
 
-	val transaction: LiveData<JSONArray> = _transaction
 	val actionable: LiveData<Boolean> = _actionable
 
 	val seedNames: LiveData<Array<String>> = _seedNames
@@ -111,6 +107,7 @@ class SignerDataModel : ViewModel() {
 	//Observables for screens state
 
 	val onBoardingDone: LiveData<OnBoardingState> = _onBoardingDone
+	val authenticated: LiveData<Boolean> = _authenticated
 
 	val alertState: LiveData<ShieldAlert> = _alertState
 
@@ -297,17 +294,11 @@ class SignerDataModel : ViewModel() {
 
 	//MARK: General utils begin
 
-	fun refreshGUI() {
-		_backupSeedPhrase.value = ""
-		clearError()
-	}
-
 	/**
 	 * This returns the app into starting state; should be called
 	 * on all "back"-like events and new screen spawns just in case
 	 */
 	fun totalRefresh() {
-		_backupSeedPhrase.value = ""
 		val checkRefresh = File(dbName).exists()
 		if (checkRefresh) _onBoardingDone.value =
 			OnBoardingState.Yes else _onBoardingDone.value = OnBoardingState.No

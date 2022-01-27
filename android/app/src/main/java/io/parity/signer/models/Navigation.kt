@@ -51,11 +51,3 @@ fun SignerDataModel.pushButton(
 		Toast.makeText(context, actionResult, Toast.LENGTH_SHORT).show()
 	}
 }
-
-/**
- * This happens when backup seed acknowledge button is pressed in seed creation screen.
- * TODO: This might misfire - replace with explicit getter and lifetime bound thing
- */
-fun SignerDataModel.acknowledgeBackup() {
-	_backupSeedPhrase.value = ""
-}

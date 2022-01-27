@@ -10,6 +10,7 @@ import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Modifier
+import io.parity.signer.components.BigButton
 import io.parity.signer.modals.WaitingScreen
 import io.parity.signer.models.SignerDataModel
 import io.parity.signer.ui.theme.ParitySignerTheme
@@ -43,25 +44,46 @@ class MainActivity : AppCompatActivity() {
 fun SignerApp(signerDataModel: SignerDataModel) {
 	ParitySignerTheme {
 		val onBoardingDone = signerDataModel.onBoardingDone.observeAsState()
+		val authenticated = signerDataModel.authenticated.observeAsState()
 		val signerScreen = signerDataModel.screen.observeAsState()
 		val signerModal = signerDataModel.modal.observeAsState()
 		val signerAlert = signerDataModel.alert.observeAsState()
 
 		when (onBoardingDone.value) {
 			OnBoardingState.Yes -> {
-				//Structure to contain all app
-				Scaffold(
-					topBar = {
-						TopBar(signerDataModel = signerDataModel)
-					},
-					bottomBar = {
-						BottomBar(signerDataModel = signerDataModel)
+				if (authenticated.value == true) {
+					//Structure to contain all app
+					Scaffold(
+						topBar = {
+							TopBar(signerDataModel = signerDataModel)
+						},
+						bottomBar = {
+							BottomBar(signerDataModel = signerDataModel)
+						}
+					) { innerPadding ->
+						Box(modifier = Modifier.padding(innerPadding)) {
+							ScreenSelector(signerScreen.value, signerDataModel)
+							ModalSelector(
+								modal = signerModal.value ?: SignerModal.Empty,
+								signerDataModel = signerDataModel
+							)
+							AlertSelector(
+								alert = signerAlert.value ?: SignerAlert.Empty,
+								signerDataModel = signerDataModel
+							)
+						}
 					}
-				) { innerPadding ->
-					Box(modifier = Modifier.padding(innerPadding)) {
-						ScreenSelector(signerScreen.value, signerDataModel)
-						ModalSelector(modal = signerModal.value?: SignerModal.Empty, signerDataModel = signerDataModel)
-						AlertSelector(alert = signerAlert.value?: SignerAlert.Empty, signerDataModel = signerDataModel)
+				} else {
+					Column(verticalArrangement = Arrangement.Center) {
+						Spacer(Modifier.weight(0.5f))
+						BigButton(
+							text = "Unlock app",
+							action = {
+								signerDataModel.authentication.authenticate(signerDataModel.activity) {
+									signerDataModel.totalRefresh()
+								}
+							})
+						Spacer(Modifier.weight(0.5f))
 					}
 				}
 			}
@@ -87,7 +109,19 @@ fun SignerApp(signerDataModel: SignerDataModel) {
 				)
 			}
 			OnBoardingState.InProgress -> {
-				WaitingScreen()
+				if (authenticated.value == true) {
+					WaitingScreen()
+				} else {
+					Column(verticalArrangement = Arrangement.Center) {
+						Spacer(Modifier.weight(0.5f))
+						BigButton(
+							text = "Unlock app",
+							action = {
+								signerDataModel.lateInit()
+							})
+						Spacer(Modifier.weight(0.5f))
+					}
+				}
 			}
 		}
 	}

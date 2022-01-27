@@ -16,7 +16,6 @@ import io.parity.signer.models.SignerDataModel
 
 @Composable
 fun TransactionPassword(signerDataModel: SignerDataModel) {
-	val transaction = signerDataModel.transaction.observeAsState()
 	var password by remember { mutableStateOf("") }
 	val lastError = signerDataModel.lastError.observeAsState()
 

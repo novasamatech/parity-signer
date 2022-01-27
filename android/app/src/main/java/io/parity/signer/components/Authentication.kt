@@ -9,7 +9,7 @@ import androidx.core.content.ContextCompat
 import androidx.fragment.app.FragmentActivity
 
 
-class Authentication {
+class Authentication(val setAuth: (Boolean) -> Unit) {
 	private val promptInfo = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
 		BiometricPrompt.PromptInfo.Builder()
 			.setTitle("UNLOCK SEED")
@@ -40,11 +40,13 @@ class Authentication {
 					Toast.makeText(context,
 						"Authentication error: $errString", Toast.LENGTH_SHORT)
 						.show()
+					setAuth(false)
 				}
 
 				override fun onAuthenticationSucceeded(
 					result: BiometricPrompt.AuthenticationResult) {
 					super.onAuthenticationSucceeded(result)
+					setAuth(true)
 					onSuccess()
 				}
 
@@ -53,6 +55,7 @@ class Authentication {
 					Toast.makeText(context, "Authentication failed",
 						Toast.LENGTH_SHORT)
 						.show()
+					setAuth(false)
 				}
 			})
 
