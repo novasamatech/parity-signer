@@ -329,9 +329,9 @@ impl ErrorSource for Active {
                             SpecsError::DecimalsFormatNotSupported{value} => format!("Decimals value {} does not fit into u8.", value),
                             SpecsError::NoUnit => String::from("No units."),
                             SpecsError::UnitFormatNotSupported{value} => format!("Units {} are not String.", value),
-                            SpecsError::DecimalsArrayUnitsNot => String::from("Unexpected result for multi-token network. Decimals are fetched as an array, whereas units are not."),
-                            SpecsError::DecimalsUnitsArrayLength{decimals_len, unit_len} => format!("Unexpected result for multi-token network. Length of decimals array {} does not match the length of units array {}.", decimals_len, unit_len),
-                            SpecsError::UnitsArrayDecimalsNot => String::from("Unexpected result for multi-token network. Units are fetched as an array, whereas decimals are not."),
+                            SpecsError::DecimalsArrayUnitsNot => String::from("Unexpected result for multi-token network. Decimals are fetched as an array with more than one element, whereas units are not."),
+                            SpecsError::DecimalsUnitsArrayLength{decimals, unit} => format!("Unexpected result for multi-token network. Length of decimals array {} does not match the length of units array {}.", decimals, unit),
+                            SpecsError::UnitsArrayDecimalsNot => String::from("Unexpected result for multi-token network. Units are fetched as an array with more than one element, whereas decimals are not."),
                             SpecsError::OverrideIgnored => String::from("Fetched single value for token decimals and unit. Token override is not possible."),
                         };
                         format!("Problem with network specs from {}. {}", url, insert)
@@ -640,7 +640,7 @@ pub enum SpecsError {
     NoUnit,
     UnitFormatNotSupported{value: String},
     DecimalsArrayUnitsNot,
-    DecimalsUnitsArrayLength{decimals_len: usize, unit_len: usize},
+    DecimalsUnitsArrayLength{decimals: String, unit: String},
     UnitsArrayDecimalsNot,
     OverrideIgnored,
 }
