@@ -1,6 +1,7 @@
 use hex;
 use blake2_rfc::blake2b::blake2b;
 use parity_scale_codec_derive::{Decode, Encode};
+use sled::IVec;
 use sp_core;
 use sp_runtime::MultiSigner;
 use std::convert::TryInto;
@@ -22,6 +23,13 @@ impl MetaValuesDisplay {
             name: meta_values.name.to_string(),
             version: meta_values.version,
             meta_hash: blake2b(32, &[], &meta_values.meta).as_bytes().to_vec(),
+        }
+    }
+    pub fn from_storage(name: &str, version: u32, meta_stored: IVec) -> Self {
+        Self {
+            name: name.to_string(),
+            version,
+            meta_hash: blake2b(32, &[], &meta_stored).as_bytes().to_vec(),
         }
     }
     pub fn show(&self) -> String {
@@ -360,6 +368,7 @@ pub fn all_events_preview() -> Vec<Event> {
     let meta_values = MetaValues {
         name: String::from("westend"),
         version: 9000,
+        optional_base58prefix: Some(42),
         meta: Vec::new(),
     };
     let public = [142, 175, 4, 21, 22, 135, 115, 99, 38, 201, 254, 161, 126, 37, 252, 82, 135, 97, 54, 147, 201, 18, 144, 156, 178, 38, 170, 71, 148, 242, 106, 72];

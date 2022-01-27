@@ -28,6 +28,7 @@ pub enum Command {
     MakeColdRelease,
     TransferMetaRelease,
     Derivations(Derivations),
+    Unwasm{filename: String, update_db: bool},
 }
 
 pub enum Show {
@@ -39,7 +40,7 @@ pub struct Instruction {
     pub set: Set,
     pub content: Content,
     pub pass_errors: bool,
-    pub encryption_override: Option<Encryption>,
+    pub over: Override,
 }
 
 pub enum Content {
@@ -116,6 +117,16 @@ pub struct Derivations {
     pub derivations: String,
 }
 
+pub struct Override {
+    pub encryption: Option<Encryption>,
+    pub token: Option<TokenOverride>,
+}
+
+pub struct TokenOverride {
+    pub decimals: u8,
+    pub unit: String,
+}
+
 impl Command {
     /// FUnction to interpret command line input
     pub fn new(mut args: env::Args) -> Result<Command, ErrorActive> {
@@ -142,6 +153,7 @@ impl Command {
                         let mut pass_errors = true;
                         let mut name = None;
                         let mut encryption_override_key = None;
+                        let mut token = None;
                         
                         loop {
                             match args.next() {
@@ -163,9 +175,32 @@ impl Command {
                                             },
                                             "-s" => {pass_errors = false},
                                             "-ed25519"|"-sr25519"|"-ecdsa" => {
+                                                if arg == "load_metadata" {return Err(ErrorActive::CommandParser(CommandParser::UnexpectedKeyArgumentSequence))}
                                                 match encryption_override_key {
                                                     Some(_) =>  {return Err(ErrorActive::CommandParser(CommandParser::DoubleKey(CommandDoubleKey::CryptoOverride)))},
                                                     None => {encryption_override_key = Some(x)}
+                                                }
+                                            },
+                                            "-token" => {
+                                                if arg == "load_metadata" {return Err(ErrorActive::CommandParser(CommandParser::UnexpectedKeyArgumentSequence))}
+                                                match token {
+                                                    Some(_) => return Err(ErrorActive::CommandParser(CommandParser::DoubleKey(CommandDoubleKey::TokenOverride))),
+                                                    None => {
+                                                        token = match args.next() {
+                                                            Some(b) => {
+                                                                match b.parse::<u8> () {
+                                                                    Ok(decimals) => {
+                                                                       match args.next() {
+                                                                           Some(c) => Some(TokenOverride{decimals, unit: c.to_string()}),
+                                                                           None => return Err(ErrorActive::CommandParser(CommandParser::NeedArgument(CommandNeedArgument::TokenUnit)))
+                                                                       }
+                                                                    },
+                                                                    Err(_) => return Err(ErrorActive::CommandParser(CommandParser::Unexpected(CommandUnexpected::DecimalsFormat))),
+                                                                }
+                                                            },
+                                                            None => return Err(ErrorActive::CommandParser(CommandParser::NeedArgument(CommandNeedArgument::TokenDecimals)))
+                                                        }
+                                                    },
                                                 }
                                             },
                                             _ => {return Err(ErrorActive::CommandParser(CommandParser::UnexpectedKeyArgumentSequence))},
@@ -196,7 +231,7 @@ impl Command {
                             None => Set::T,
                         };
                         
-                        let encryption_override = match encryption_override_key {
+                        let encryption = match encryption_override_key {
                             Some(x) => {
                                 match x.as_str() {
                                     "-ed25519" => Some(Encryption::Ed25519),
@@ -207,6 +242,7 @@ impl Command {
                             },
                             None => None,
                         };
+                        let over = Override{encryption, token};
                         
                         let content = match content_key {
                             Some(x) => {
@@ -237,7 +273,7 @@ impl Command {
                             set,
                             content,
                             pass_errors,
-                            encryption_override,
+                            over,
                         };
                         
                         match arg.as_str() {
@@ -514,6 +550,7 @@ impl Command {
                                         }
                                     },
                                 };
+                                println!("sufficient crypto vector: {:?}", sufficient_crypto_vector);
                                 let sufficient_crypto = match <SufficientCrypto>::decode(&mut &sufficient_crypto_vector[..]) {
                                     Ok(a) => a,
                                     Err(_) => return Err(ErrorActive::Input(InputActive::DecodingSufficientCrypto)),
@@ -666,6 +703,32 @@ impl Command {
                             None => return Err(ErrorActive::CommandParser(CommandParser::NeedKey(CommandNeedKey::Payload))),
                         };
                         Ok(Command::Derivations(Derivations{goal, title, derivations}))
+                    },
+                    "unwasm" => {
+                        let mut found_payload = None;
+                        let mut update_db = true;
+                        loop {
+                            match args.next() {
+                                Some(a) => {
+                                    match a.as_str() {
+                                        "-payload" => {
+                                            if let Some(_) = found_payload {return Err(ErrorActive::CommandParser(CommandParser::DoubleKey(CommandDoubleKey::Payload)))}
+                                            found_payload = match args.next() {
+                                                Some(b) => Some(b.to_string()),
+                                                None => return Err(ErrorActive::CommandParser(CommandParser::NeedArgument(CommandNeedArgument::Payload))),
+                                            };
+                                        },
+                                        "-d" => {update_db = false},
+                                        _ => return Err(ErrorActive::CommandParser(CommandParser::UnexpectedKeyArgumentSequence)),
+                                    }
+                                },
+                                None => break,
+                            }
+                        }
+                        match found_payload {
+                            Some(x) => Ok(Command::Unwasm{filename: x, update_db}),
+                            None => return Err(ErrorActive::CommandParser(CommandParser::NeedKey(CommandNeedKey::Payload))),
+                        }                        
                     },
                     _ => return Err(ErrorActive::CommandParser(CommandParser::UnknownCommand)),
                 }

@@ -75,7 +75,7 @@ Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deseru
     all_cards.push(Card::AuthorPlain{author: &MultiSigner::Sr25519(sp_core::sr25519::Public::from_raw(PUBLIC)), base58prefix: 42}.card(&mut index,0));
     all_cards.push(Card::AuthorPublicKey(&MultiSigner::Sr25519(sp_core::sr25519::Public::from_raw(PUBLIC))).card(&mut index,0));
     all_cards.push(Card::Verifier(&verifier_value_sr25519()).card(&mut index,0));
-    all_cards.push(Card::Meta(MetaValuesDisplay::get(&MetaValues{name: String::from("westend"), version: 9100, meta: Vec::new()})).card(&mut index,0));
+    all_cards.push(Card::Meta(MetaValuesDisplay::get(&MetaValues{name: String::from("westend"), version: 9100, optional_base58prefix: Some(42), meta: Vec::new()})).card(&mut index,0));
     all_cards.push(Card::TypesInfo(ContentLoadTypes::generate(&Vec::new())).card(&mut index,0));
     all_cards.push(Card::NewSpecs(&network_specs_westend.to_send()).card(&mut index,0));
     all_cards.push(Card::NetworkInfo(&network_specs_westend).card(&mut index,0));

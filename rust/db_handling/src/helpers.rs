@@ -53,7 +53,7 @@ pub fn try_get_valid_current_verifier (verifier_key: &VerifierKey, database_name
             Err(_) => return Err(ErrorSigner::Database(DatabaseSigner::EntryDecoding(EntryDecodingSigner::CurrentVerifier(verifier_key.to_owned())))),
         },
         Ok(None) => {
-            if let Some(network_specs_key) = genesis_hash_in_specs(verifier_key, &database)? {return Err(ErrorSigner::Database(DatabaseSigner::UnexpectedGenesisHash{verifier_key: verifier_key.to_owned(), network_specs_key}))}
+            if let Some((network_specs_key, _)) = genesis_hash_in_specs(verifier_key, &database)? {return Err(ErrorSigner::Database(DatabaseSigner::UnexpectedGenesisHash{verifier_key: verifier_key.to_owned(), network_specs_key}))}
             Ok(None)
         },
         Err(e) => return Err(<Signer>::db_internal(e)),
@@ -72,20 +72,30 @@ pub fn get_valid_current_verifier (verifier_key: &VerifierKey, database_name: &s
 /// in SPECSTREE of the Signer database
 /// If there are more than one network corresponding to the same genesis hash,
 /// outputs network specs key for the network with the lowest order
-pub fn genesis_hash_in_specs (verifier_key: &VerifierKey, database: &Db) -> Result<Option<NetworkSpecsKey>, ErrorSigner> {
+pub fn genesis_hash_in_specs (verifier_key: &VerifierKey, database: &Db) -> Result<Option<(NetworkSpecsKey, NetworkSpecs)>, ErrorSigner> {
     let genesis_hash = verifier_key.genesis_hash();
     let chainspecs = open_tree::<Signer>(&database, SPECSTREE)?;
     let mut specs_set: Vec<(NetworkSpecsKey, NetworkSpecs)> = Vec::new();
+    let mut found_base58prefix = None;
     for x in chainspecs.iter() {
         if let Ok((network_specs_key_vec, network_specs_encoded)) = x {
             let network_specs_key = NetworkSpecsKey::from_ivec(&network_specs_key_vec);
             let network_specs = NetworkSpecs::from_entry_with_key_checked::<Signer>(&network_specs_key, network_specs_encoded)?;
-            if network_specs.genesis_hash.to_vec() == genesis_hash {specs_set.push((network_specs_key, network_specs))}
+            if network_specs.genesis_hash.to_vec() == genesis_hash {
+                found_base58prefix = match found_base58prefix {
+                    Some(base58prefix) => {
+                        if base58prefix == network_specs.base58prefix {Some(base58prefix)}
+                        else {return Err(ErrorSigner::Database(DatabaseSigner::DifferentBase58Specs{genesis_hash: network_specs.genesis_hash, base58_1: base58prefix, base58_2: network_specs.base58prefix}))}
+                    },
+                    None => Some(network_specs.base58prefix),
+                };
+                specs_set.push((network_specs_key, network_specs))
+            }
         }
     }
     specs_set.sort_by(|a, b| a.1.order.cmp(&b.1.order));
     match specs_set.get(0) {
-        Some((a, _)) => Ok(Some(a.to_owned())),
+        Some(a) => Ok(Some(a.to_owned())),
         None => Ok(None),
     } 
 }
@@ -262,10 +272,10 @@ mod tests {
         populate_cold_release(dbname).unwrap();
         signer_init_no_cert(dbname).unwrap();
         let print = display_general_verifier(dbname).unwrap();
-        assert!(print == r#""hex":"","identicon":"","encryption":"none""#, "Got: {}", print);
+        assert!(print == r#""public_key":"","identicon":"","encryption":"none""#, "Got: {}", print);
         signer_init_with_cert(dbname).unwrap();
         let print = display_general_verifier(dbname).unwrap();
-        assert!(print == r#""hex":"c46a22b9da19540a77cbde23197e5fd90485c72b4ecf3c599ecca6998f39bd57","identicon":"89504e470d0a1a0a0000000d49484452000000410000004108060000008ef7c9450000035149444154789cedd8c16d14411085611cc2128d33e18ac8802311702403c4954c1c0d1bc2d24f5699ea764dbdaaeeead54acc7f581f76d4fde6932c199e6eb7db87ffbdbb205cafd7e94b2e97cb53fbb1b52d082b2fcdda81528ab0f3e5c72a314a10665efef9f3c7f6d9f7f2eb4ffbcc5581b18430f3f2c802906620d00ac634c20e00e9de105308b3006827029a814821acbcbcb41b41ca6084112a00d0bd1050142284900178f9fefe259fbffd7ba92c023b8f1581a008ab00921eee413000499fc762106508de60490fb720a200923ecf6b09210a802a47a3eaf33c8843840c00aa1e5d7d1e3a823011b200a87a74f57992051146a8fe1dfef9e3d23efbbe7cbdb6cfd7b2e7b17d5208210a20e98bbce17ab005204521f479d17dd2084111bc0b247d91355c0ff6002406a1cfcbee432ec20880662ef1ca22b066f7698813a1f5866001a0d94b8e7a14042410e508d64bea97b2be1f63cfebefb3fb746104e45da42fb0064b7a78f573d17d632904645da42ff0064b7ab8f53cfb7e4c3fcff65975080c20527634abfabca30071229c084904f6975b76f4cb6fe3bc4f0be7917d478511ac0b247d9137bc1b6c00485188eebce03eab10827781a42fb28677831d00894174e725f78d6d4160651158abfb4e84d689d0da82407f879308f4bce4beb11002f22ed2175883a56eb803c100a4eebce03eab3002b22ed2177883a56eb801110590baf3c8bea35208acec6856f579479d08ad13a1f586801804fbf77a76b4f53cfb7e4c3fcff65901a0fd78fdff04e421581748fa226fb81e5cfd5c74df5818c1bb40d21759c3f560ebfb31f6bcfe3ebb4fb70d8165bdd4987e49d6cabe7708c88258b9c4ea511004009d08ad0e018d10d94bd85f6e5904765e761fd200882220ef227d813558d2c33d080620e9f3a2fb248a80a210fa026fb0a4875b105100499fc7f64923000a23b0b2a359d5e74961049485a81e5d7d1eb200d02102ca40548fae3eef0800b908280a911dcd7e87b3e7797900a80c0179c3f5600b408a42e8f358cb086815420ff6002406a1cf6331001442401908af2cc24a11001446401510f7428802a01482b482b11b21f3f2d214029a85d889300380a611d00e887b03a025046906c3829801587979a904419ac198ade2e5a55204692746e5cb4b5b10c6565076bcf4d85d101ebdbfeadfbfac75cbd0ab0000000049454e44ae426082","encryption":"sr25519""#, "Got: {}", print);
+        assert!(print == r#""public_key":"c46a22b9da19540a77cbde23197e5fd90485c72b4ecf3c599ecca6998f39bd57","identicon":"89504e470d0a1a0a0000000d49484452000000410000004108060000008ef7c9450000035149444154789cedd8c16d14411085611cc2128d33e18ac8802311702403c4954c1c0d1bc2d24f5699ea764dbdaaeeead54acc7f581f76d4fde6932c199e6eb7db87ffbdbb205cafd7e94b2e97cb53fbb1b52d082b2fcdda81528ab0f3e5c72a314a10665efef9f3c7f6d9f7f2eb4ffbcc5581b18430f3f2c802906620d00ac634c20e00e9de105308b3006827029a814821acbcbcb41b41ca6084112a00d0bd1050142284900178f9fefe259fbffd7ba92c023b8f1581a008ab00921eee413000499fc762106508de60490fb720a200923ecf6b09210a802a47a3eaf33c8843840c00aa1e5d7d1e3a823011b200a87a74f57992051146a8fe1dfef9e3d23efbbe7cbdb6cfd7b2e7b17d5208210a20e98bbce17ab005204521f479d17dd2084111bc0b247d91355c0ff6002406a1cfcbee432ec20880662ef1ca22b066f7698813a1f5866001a0d94b8e7a14042410e508d64bea97b2be1f63cfebefb3fb746104e45da42fb0064b7a78f573d17d632904645da42ff0064b7ab8f53cfb7e4c3fcff65975080c20527634abfabca30071229c084904f6975b76f4cb6fe3bc4f0be7917d478511ac0b247d9137bc1b6c00485188eebce03eab10827781a42fb28677831d00894174e725f78d6d4160651158abfb4e84d689d0da82407f879308f4bce4beb11002f22ed2175883a56eb803c100a4eebce03eab3002b22ed2177883a56eb801110590baf3c8bea35208acec6856f579479d08ad13a1f586801804fbf77a76b4f53cfb7e4c3fcff65901a0fd78fdff04e421581748fa226fb81e5cfd5c74df5818c1bb40d21759c3f560ebfb31f6bcfe3ebb4fb70d8165bdd4987e49d6cabe7708c88258b9c4ea511004009d08ad0e018d10d94bd85f6e5904765e761fd200882220ef227d813558d2c33d080620e9f3a2fb248a80a210fa026fb0a4875b105100499fc7f64923000a23b0b2a359d5e74961049485a81e5d7d1eb200d02102ca40548fae3eef0800b908280a911dcd7e87b3e7797900a80c0179c3f5600b408a42e8f358cb086815420ff6002406a1cf6331001442401908af2cc24a11001446401510f7428802a01482b482b11b21f3f2d214029a85d889300380a611d00e887b03a025046906c3829801587979a904419ac198ade2e5a55204692746e5cb4b5b10c6565076bcf4d85d101ebdbfeadfbfac75cbd0ab0000000049454e44ae426082","encryption":"sr25519""#, "Got: {}", print);
         fs::remove_dir_all(dbname).unwrap();
     }
 

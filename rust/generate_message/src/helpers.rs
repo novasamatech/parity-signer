@@ -17,14 +17,14 @@ pub fn get_address_book_entry (title: &str) -> Result<AddressBookEntry, ErrorAct
 
 /// Function to get NetworkSpecsToSend for given address book title
 pub fn network_specs_from_title (title: &str) -> Result<NetworkSpecsToSend, ErrorActive> {
-    network_specs_from_entry (get_address_book_entry(title)?)
+    network_specs_from_entry (&get_address_book_entry(title)?)
 }
 
 /// Function to get NetworkSpecsToSend for given address book entry
-pub fn network_specs_from_entry (address_book_entry: AddressBookEntry) -> Result<NetworkSpecsToSend, ErrorActive> {
+pub fn network_specs_from_entry (address_book_entry: &AddressBookEntry) -> Result<NetworkSpecsToSend, ErrorActive> {
     let network_specs_key = NetworkSpecsKey::from_parts(&address_book_entry.genesis_hash.to_vec(), &address_book_entry.encryption);
     let network_specs = get_network_specs_to_send(&network_specs_key)?;
-    if network_specs.name != address_book_entry.name {return Err(ErrorActive::Database(DatabaseActive::Mismatch(MismatchActive::AddressBookSpecsName{address_book_name: address_book_entry.name, specs_name: network_specs.name})))}
+    if network_specs.name != address_book_entry.name {return Err(ErrorActive::Database(DatabaseActive::Mismatch(MismatchActive::AddressBookSpecsName{address_book_name: address_book_entry.name.to_string(), specs_name: network_specs.name})))}
     Ok(network_specs)
 }
 
@@ -85,10 +85,20 @@ pub fn filter_address_book_by_url (address: &str) -> Result<Vec<AddressBookEntry
     let database = open_db::<Active>(HOT_DB_NAME)?;
     let address_book = open_tree::<Active>(&database, ADDRESS_BOOK)?;
     let mut out: Vec<AddressBookEntry> = Vec::new();
+    let mut found_name = None;
     for x in address_book.iter() {
         if let Ok(a) = x {
             let new_address_book_entry = AddressBookEntry::from_entry(a)?;
-            if new_address_book_entry.address == address {out.push(new_address_book_entry)}
+            if new_address_book_entry.address == address {
+                found_name = match found_name {
+                    Some(name) => {
+                        if name == new_address_book_entry.name {Some(name)}
+                        else {return Err(ErrorActive::Database(DatabaseActive::TwoNamesForUrl{url: address.to_string()}))}
+                    },
+                    None => {Some(new_address_book_entry.name.to_string())},
+                };
+                out.push(new_address_book_entry)
+            }
         }
     }
     Ok(out)

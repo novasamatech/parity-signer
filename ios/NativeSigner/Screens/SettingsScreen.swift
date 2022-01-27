@@ -11,7 +11,7 @@ struct SettingsScreen: View {
     @EnvironmentObject var data: SignerDataModel
     @State var wipe = false
     @State var jailbreak = false
-    let content: MVerifierDetails?
+    let content: MSettings
     var body: some View {
         VStack (spacing: 2) {
             Button(action: {
@@ -30,11 +30,18 @@ struct SettingsScreen: View {
                     Text("Verifier certificate").font(FBase(style: .h1)).foregroundColor(Color("Text600"))
                     Spacer()
                 }
-                HStack {
-                    if let verifier = content {
+                VStack {
+                    if let verifier = content.intoVerifier() {
                     AddressCard(address: Address(
-                        base58: "encryption: " + verifier.encryption, path: verifier.hex.truncateMiddle(length: 8), has_pwd: false, identicon: verifier.identicon, seed_name: "", multiselect: false
+                        base58: "encryption: " + verifier.encryption, path: verifier.public_key.truncateMiddle(length: 8), has_pwd: false, identicon: verifier.identicon, seed_name: "", multiselect: false
                     ))
+                    } else {
+                        Text("Error!").foregroundColor(Color("SignalDanger")).font(FBase(style: .h4))
+                        if let errorMessage = content.error {
+                            Text(errorMessage).foregroundColor(Color("SignalDanger")).font(FBase(style: .body2))
+                        } else {
+                            Text("Navigation error, consider factory reset").foregroundColor(Color("SignalDanger")).font(FBase(style: .body2))
+                        }
                     }
                 }
             }

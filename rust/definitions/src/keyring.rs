@@ -7,7 +7,6 @@ use sp_runtime::MultiSigner;
 use crate::crypto::Encryption;
 use crate::error::{AddressKeySource, DatabaseActive, ErrorActive, ErrorSigner, ErrorSource, KeyDecodingActive, NotHexSigner, Signer, SpecsKeySource};
 use crate::helpers::{get_multisigner, unhex};
-use crate::metadata::NameVersioned;
 
 /// NetworkSpecsKey is the database storage key used to search for 
 /// network specs ChainSpecs (COLD database, network specs tree SPECSTREE)
@@ -157,12 +156,15 @@ pub struct MetaKey (Vec<u8>);
 
 /// Struct for decoded MetaKey content
 #[derive(parity_scale_codec_derive::Decode, parity_scale_codec_derive::Encode)]
-struct MetaKeyContent (NameVersioned);
+struct MetaKeyContent {
+    name: String,
+    version: u32,
+}
 
 impl MetaKey {
     /// Function to generate MetaKey from parts: network genesis hash and network encryption
     pub fn from_parts (name: &str, version: u32) -> Self {
-        let meta_key_content = MetaKeyContent (NameVersioned {name: name.to_string(), version});
+        let meta_key_content = MetaKeyContent {name: name.to_string(), version};
         Self(meta_key_content.encode())
     }
     /// Function to transform Vec<u8> into MetaKey prior to processing
@@ -172,7 +174,7 @@ impl MetaKey {
     /// Function to get genesis hash and encryption from the MetaKey
     pub fn name_version<T: ErrorSource>(&self) -> Result<(String, u32), T::Error> {
         match <MetaKeyContent>::decode(&mut &self.0[..]) {
-            Ok(a) => Ok((a.0.name, a.0.version)),
+            Ok(a) => Ok((a.name, a.version)),
             Err(_) => return Err(<T>::meta_key_to_error(self)),
         }
     }

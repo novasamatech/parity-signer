@@ -13,9 +13,9 @@ struct TCAuthorPublicKey: View {
         HStack {
             Image(systemName: "circle.fill").foregroundColor(Color("Text600")).imageScale(.large)
             VStack (alignment: .leading) {
-                Text("Signed with " + value.crypto)
+                Text("Signed with " + value.encryption)
                     .foregroundColor(Color("Text400")).font(FBase(style: .body2))
-                Text(value.hex)
+                Text(value.public_key)
                     .font(FCrypto(style: .body2))
                     .foregroundColor(Color("Crypto400"))
             }

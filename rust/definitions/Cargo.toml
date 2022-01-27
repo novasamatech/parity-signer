@@ -22,6 +22,7 @@ frame-metadata = { version = "14.0.0", default-features = false, features = ["v1
 plot_icon = "0.1.3"
 png = "0.16.8"
 constants = {path = "../constants"}
+wasm-testbed = "0.13.1"
 
 [lib]
 name = "definitions"

@@ -89,8 +89,8 @@ struct AuthorPlain: Decodable {
  * Visualization of unknown address
  */
 struct AuthorPublicKey: Decodable {
-    var hex: String
-    var crypto: String
+    var public_key: String
+    var encryption: String
     var identicon: String
 }
 
@@ -221,7 +221,7 @@ struct TypesInfo: Decodable {
  * Visualization of cerificate issuer info
  */
 struct Verifier: Decodable, Hashable {
-    var hex: String
+    var public_key: String
     var identicon: String
     var encryption: String
 }
