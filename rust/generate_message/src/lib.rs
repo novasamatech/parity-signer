@@ -4,9 +4,9 @@ use definitions::error::{Active, ErrorActive};
 
 mod derivations;
     use derivations::process_derivations;
-mod fetch_metadata;
+pub mod fetch_metadata;
 mod helpers;
-mod interpret_specs;
+pub mod interpret_specs;
 mod load;
     use load::gen_load_meta;
 pub mod parser;
