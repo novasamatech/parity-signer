@@ -85,7 +85,7 @@ fun ModalSelector(modal: SignerModal, signerDataModel: SignerDataModel) {
 		SignerModal.PasswordConfirm -> PasswordConfirm(signerDataModel = signerDataModel)
 		SignerModal.SignatureReady -> SignatureReady(signerDataModel = signerDataModel)
 		SignerModal.EnterPassword -> TODO()
-		SignerModal.LogRight -> TODO()
+		SignerModal.LogRight -> LogMenu(signerDataModel = signerDataModel)
 		SignerModal.NetworkDetailsMenu -> TODO()
 		SignerModal.ManageMetadata -> TODO()
 		SignerModal.SufficientCryptoReady -> TODO()

@@ -14,19 +14,22 @@ import io.parity.signer.models.pushButton
 import io.parity.signer.ui.theme.Bg000
 
 @Composable
-fun NewSeedMenu(signerDataModel: SignerDataModel) {
-	Column() {
+fun LogMenu(signerDataModel: SignerDataModel) {
+	val checksum = signerDataModel.modalData.value?.optString("checksum")
+
+	Column {
 		Spacer(Modifier.weight(1f))
 		Surface(color = Bg000, shape = MaterialTheme.shapes.large) {
 			Column {
-				HeaderBar(line1 = "ADD SEED", line2 = "Select seed addition method")
+				HeaderBar(line1 = "LOG", line2 = "Checksum: $checksum")
+				BigButton(text = "Add note",
+					action = {
+						signerDataModel.pushButton(ButtonID.CreateLogComment)
+					})
 				BigButton(
-					text = "New seed",
-					action = { signerDataModel.pushButton(ButtonID.NewSeed) })
-				BigButton(
-					text = "Recover seed",
-					action = { signerDataModel.pushButton(ButtonID.RecoverSeed) },
-					isShaded = true
+					text = "Clear log",
+					action = { signerDataModel.pushButton(ButtonID.ClearLog) },
+					isDangerous = true
 				)
 			}
 		}

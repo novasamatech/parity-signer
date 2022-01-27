@@ -39,6 +39,7 @@ enum class ButtonID {
 	RemoveKey,
 	RemoveSeed,
 	ClearLog,
+	CreateLogComment,
 	ShowLogDetails,
 	Swipe,
 	LongTap,
