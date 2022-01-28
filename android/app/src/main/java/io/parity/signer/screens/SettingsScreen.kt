@@ -14,7 +14,10 @@ import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.unit.dp
+import io.parity.signer.ButtonID
+import io.parity.signer.components.SettingsCardTemplate
 import io.parity.signer.models.SignerDataModel
+import io.parity.signer.models.pushButton
 
 /**
  * Settings screen; General purpose stuff like legal info, networks management
@@ -25,17 +28,27 @@ import io.parity.signer.models.SignerDataModel
 fun SettingsScreen(signerDataModel: SignerDataModel) {
 
 	Column {
+		Row(Modifier.clickable { signerDataModel.pushButton(ButtonID.ManageNetworks) }) {
+			SettingsCardTemplate(text = "Networks")
+		}
+		Row(Modifier.clickable { signerDataModel.pushButton(ButtonID.BackupSeed) }) {
+			SettingsCardTemplate(text = "Backup keys")
+		}
+		Column(Modifier.clickable { signerDataModel.pushButton(ButtonID.ViewGeneralVerifier) }) {
+			Row{
+				Text("Verifier certificate")
+				Spacer(Modifier.weight(1f))
+			}
+			//VerifierCard
+		}
 		Row(
 			Modifier.clickable {
 				signerDataModel.wipe()
 				signerDataModel.totalRefresh()
 			}
-		) { Text("Wipe Signer") }
-		Spacer(modifier = Modifier.padding(10.dp))
+		) { SettingsCardTemplate(text = "Wipe signer", danger = true) }
 		Row(Modifier.clickable { signerDataModel.jailbreak() }
-		) { Text("Wipe general certificate") }
-		Spacer(modifier = Modifier.padding(10.dp))
-		Text("General certificate")
+		) { SettingsCardTemplate(text = "Wipe general certificate", danger = true) }
 		/*
 		Row {
 			Image(
@@ -50,11 +63,10 @@ fun SettingsScreen(signerDataModel: SignerDataModel) {
 				Text(generalCertificate.value?.optString("hex") ?: "")
 			}
 		}*/
-		Spacer(modifier = Modifier.padding(10.dp))
-		Text(
+		SettingsCardTemplate(
 			"Hardware seed protection: " + signerDataModel.isStrongBoxProtected()
-				.toString()
+				.toString(), withIcon = false
 		)
-		Text("Version: " + signerDataModel.getAppVersion())
+		SettingsCardTemplate("Version: " + signerDataModel.getAppVersion(), withIcon = false)
 	}
 }
