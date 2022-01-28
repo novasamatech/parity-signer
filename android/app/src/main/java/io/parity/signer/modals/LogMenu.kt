@@ -29,7 +29,8 @@ fun LogMenu(signerDataModel: SignerDataModel) {
 				BigButton(
 					text = "Clear log",
 					action = { signerDataModel.pushButton(ButtonID.ClearLog) },
-					isDangerous = true
+					isDangerous = true,
+					isShaded = true
 				)
 			}
 		}
