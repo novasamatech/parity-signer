@@ -362,7 +362,7 @@ class SignerDataModel : ViewModel() {
 	external fun historyGetWarnings(dbname: String): Boolean
 	external fun historyAcknowledgeWarnings(dbname: String)
 	external fun historyEntrySystem(entry: String, dbname: String)
-	external fun historyHistorySeedNameWasShown(seedName: String, dbname: String)
+	external fun historySeedNameWasShown(seedName: String, dbname: String)
 
 	//external fun testGetAllTXCards(dbname: String): String
 	//external fun testGetAllLogCards(dbname: String): String

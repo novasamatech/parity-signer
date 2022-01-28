@@ -4,7 +4,6 @@ import android.util.Log
 import android.widget.Toast
 import io.parity.signer.ButtonID
 import org.json.JSONArray
-import org.json.JSONObject
 
 //MARK: Seed management begin
 
@@ -69,8 +68,23 @@ fun SignerDataModel.addSeed(
 /**
  * Fetch seed from strongbox; must be in unlocked scope
  */
-internal fun SignerDataModel.getSeed(seedName: String): String {
-	return sharedPreferences.getString(seedName, "") ?: ""
+internal fun SignerDataModel.getSeed(seedName: String, backup: Boolean = false): String {
+	return try {
+		val seedPhrase = sharedPreferences.getString(seedName, "") ?: ""
+		if (seedPhrase.isBlank()) {
+			""
+		} else {
+			if (backup) {
+				historySeedNameWasShown(seedName, dbName)
+			}
+			seedPhrase
+		}
+	} catch (e: java.lang.Exception) {
+		Log.d("get seed failure", e.toString())
+		Toast.makeText(context, "get seed failure: $e", Toast.LENGTH_LONG).show()
+		""
+	}
+
 }
 
 /**
