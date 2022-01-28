@@ -1,0 +1,154 @@
+wss://rpc.polkadot.io					default
+wss://statemint-rpc.polkadot.io				ok
+wss://acala.polkawallet.io				ok, token set
+wss://wss.odyssey.aresprotocol.io			ok
+wss://rpc.astar.network					ok
+wss://rpc-para.clover.finance				ok
+wss://rpc.efinity.io					rejects call (504), seems to be down on polkadot.js as well
+wss://api.interlay.io/parachain				ok, token set
+wss://kuhlii.manta.systems				ok
+wss://wss.api.moonbeam.network				ok
+wss://rpc.parallel.fi					ok
+wss://mainnet.polkadex.trade				ok
+
+wss://kusama-rpc.polkadot.io				default
+wss://statemine-rpc.polkadot.io				ok
+wss://fullnode.altair.centrifuge.io			ok
+wss://rpc-01.basilisk.hydradx.io			ok
+wss://bifrost-rpc.liebi.com/ws				ok, token set
+wss://pioneer-1-rpc.bit.country				ok
+wss://falafel.calamari.systems				ok
+wss://rpc-shadow.crust.network				rejects call (502), seems to be down on polkadot.js as well
+wss://api.kusama.encointer.org				base58 conflict
+wss://kusama.api.integritee.network			ok
+wss://karura.polkawallet.io				ok, token set
+wss://khala-api.phala.network/ws			ok
+wss://spiritnet.kilt.io					ok
+wss://api-kusama.interlay.io/parachain			ok, token set
+wss://rpc.litmus-parachain.litentry.io			rejects call (502), seems to be down on polkadot.js as well
+wss://wss.mars.aresprotocol.io				rejects call (502), seems to be down on polkadot.js as well
+wss://wss.moonriver.moonbeam.network			ok
+wss://heiko-rpc.parallel.fi				ok
+wss://picasso-rpc.composable.finance			ok
+wss://kusama.kylin-node.co.uk				rejects call ("Error in the WebSocket handshake: 0"), seems to be down on polkadot.js as well
+wss://quartz.unique.network				ok
+wss://kusama.rpc.robonomics.network/			ok
+wss://rpc.shiden.astar.network				ok
+wss://ws.parachain-collator-1.c1.sora2.soramitsu.co.jp	no decimals nor units
+wss://gamma.subgame.org/				ok
+wss://rpc.kusama.standard.tech				ok
+
+wss://westend-rpc.polkadot.io				default
+wss://westmint-rpc.polkadot.io				ok
+wss://fullnode-collator.charcoal.centrifuge.io		ok
+wss://api.westend.encointer.org				ok
+wss://teerw1.integritee.network				ok
+wss://westend.kylin-node.co.uk				ok
+wss://rpc.westend.standard.tech				ok
+wss://westend.kilt.io:9977				ok
+
+wss://rococo-rpc.polkadot.io				ok
+wss://rococo-statemint-rpc.polkadot.io			no decimals nor units
+wss://rococo-canvas-rpc.polkadot.io			ok
+
+wss://ws.azero.dev					ok
+wss://api.ata.network					ok
+wss://fullnode.centrifuge.io				incompatible metadata: before v12
+wss://mainnet.chainx.org/ws				incompatible metadata: no runtime version in constants
+wss://node0.competitors.club/wss			ok
+wss://blockchain.crownsterling.io			ok
+wss://rpc.darwinia.network				ok, token set
+wss://crab-rpc.darwinia.network				ok, token set
+wss://mainnet-node.dock.io				ok
+wss://edgeware.api.onfinality.io/public-ws		incompatible metadata: no runtime version in constants
+wss://node.equilibrium.io				specs: [9,9,9,9,9,9,9] vs [\"Unknown\",\"USD\",\"EQ\",\"ETH\",\"BTC\",\"EOS\",\"DOT\",\"CRV\"]
+wss://node.genshiro.io					ok
+wss://rpc-01.snakenet.hydradx.io			ok
+wss://api.solo.integritee.io				ok
+wss://rpc.kulupu.corepaper.org/ws			ok
+wss://ws.kusari.network					ok
+wss://mathchain-asia.maiziqianbao.net/ws		ok
+wss://rpc.neatcoin.org/ws				ok
+wss://mainnet.nftmart.io/rpc/ws				ok
+wss://main3.nodleprotocol.io				ok
+wss://rpc.plasmnet.io					incompatible metadata: before v12
+wss://mainnet.polkadex.trade				duplicate
+wss://mainnet-rpc.polymesh.network			ok
+wss://node.v1.riochain.io				incompatible metadata: no runtime version in constants
+wss://mainnet.sherpax.io				ok
+wss://mof2.sora.org					ok
+wss://mainnet.subgame.org/				ok
+wss://rpc.subsocial.network				ok
+wss://mainnet.uniarts.vip:9443				base58 conflict
+wss://westlake.datahighway.com				ok
+
+wss://ws.test.azero.dev					no decimals, but there are units
+wss://fullnode.amber.centrifuge.io			incompatible metadata: before v12
+wss://arcadia1.nodleprotocol.io				ok
+wss://gladios.aresprotocol.io				ok
+wss://cf-api.ata.network				ok
+wss://beresheet.edgewa.re				base58 conflict
+wss://asgard-rpc.liebi.com/ws				rejects call (502), seems to be down on polkadot.js as well
+wss://tewai-rpc.bit.country				base58 conflict
+wss://api.crust.network/				ok
+wss://trillian.dolphin.red				ok
+wss://mogiway-01.dotmog.com				ok
+wss://rpc.dusty.plasmnet.io/				ok
+wss://gesell.encointer.org				ok
+wss://galois-hk.maiziqianbao.net/ws			ok
+wss://gamepower.io					ok
+wss://testnet.geekcash.org				ok
+wss://api.interlay.io/parachain				duplicate
+wss://ws.jupiter-poa.patract.cn				base58 conflict
+wss://pc-test-3.phala.network/khala/ws			ok
+wss://full-nodes.kilt.io:9944/				ok
+wss://peregrine.kilt.io/parachain-public-ws/		ok
+wss://klugdossier.net/					ok
+wss://testnet.litentry.io				rejects call (502), seems to be down on polkadot.js as well
+wss://mandala.polkawallet.io				ok, token set
+wss://wss.api.moonbase.moonbeam.network			ok
+wss://neumann.api.onfinality.io/public-ws		ok
+wss://staging-ws.nftmart.io				ok
+wss://opal.unique.network				ok
+wss://rpc.opportunity.standard.tech			ok
+wss://parachain-rpc.origin-trail.network		no units, but there are decimals
+wss://pangolin-rpc.darwinia.network			ok, token set
+wss://pangoro-rpc.darwinia.network			ok, token set
+wss://blockchain.polkadex.trade				no decimals nor units
+wss://testnet-rpc.polymesh.live				ok
+wss://testnet.pontem.network/ws				ok
+wss://testnet.psm.link					rejects call(502), seems to be down on polkadot.js as well
+wss://rpc.realis.network/				ok
+wss://sherpax-testnet.chainx.org			ok
+wss://rpc.shibuya.astar.network				ok
+wss://parachain-rpc.snowbridge.network			ok
+wss://ws.stage.sora2.soramitsu.co.jp			ok
+wss://alpha.subdao.org					ok
+wss://staging.subgame.org				ok
+wss://farm-rpc.subspace.network				ok
+wss://test-rpc.subspace.network				ok
+wss://testnet.ternoa.com/				ok
+wss://testnet-node-1.laminar-chain.laminar.one/ws	incompatible metadata: no runtime version in constants
+wss://testnet.uniarts.network				base58 conflict
+wss://testnet2.unique.network				ok
+wss://vodka.rpc.neatcoin.org/ws				ok
+wss://testnet.web3games.org				ok
+wss://test1.zcloak.network				no decimals nor units
+wss://bsr.zeitgeist.pm					ok
+wss://alphaville.zero.io				ok
+
+
+===
+How do I add a custom network into Signer?
+
+`$ cargo run add_specs -d -u wss://rpc.astar.network -sr25519`
+`$ cargo run make -qr -crypto none -msgtype add_specs -payload sign_me_add_specs_astar_sr25519`
+
+Now there is a scannable qr code with network specs in `../files/signed` folder named `add_specs_astar-sr25519_unverified`.
+Scan it to add the network into Signer.
+
+`$ cargo run load_metadata -d -u wss://rpc.astar.network`
+`$ cargo run make -qr -crypto none -msgtype load_metadata -payload sign_me_load_metadata_astarV4`
+
+Now there is a scannable qr movie with network metadata in `../files/signed` folder, named `load_metadata_astarV4_unverified`.
+Scan it to add the metadata into Signer.
