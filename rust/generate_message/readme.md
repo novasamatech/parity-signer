@@ -94,10 +94,11 @@ Possible commands are:
         - `-n` followed by one name (network **specname** for load_metadata, i.e. `polkadot`, `westend` etc, the one that goes before version in output of `show -database`; network **title** for add_specs, i.e. `polkadot`, `westend-ed25519`, `rococo-AgainUpdatedGenesisHash` and the likes, whatever title shows in output of`show -address_book` (so far only vanilla names and vanilla names followed by encryption could be encountered))
         - `-u` followed by one url address
     - optional `-s` key to stop the program if any failure occurs. By default the program informs user of unsuccessful attempt and proceeds.  
-    - encryption override keys (maximum one can be used), to be used for networks not in the database, and therefore to be used only for fetches through -u reference key:  
+    - encryption override keys (maximum one can be used), to set encryption in network specs when generationg `add_specs` message; ideally should be used for networks not in the database with `-u` reference key, other usages are however possible; supported variants:  
         - `-ed25519` if the network operates with ed25519 encryption algorithm  
         - `-sr25519` if the network operates with sr25519 encryption algorithm  
         - `-ecdsa` if the network operates with ecdsa encryption algorithm  
+    - token override key `-token` immediately followed by decimals value (should be `u8`) and unit name; could be used when generating network specs for networks with several supported tokens, when normal fetch returns an array instead of a single value; could be used only with `-u` reference key in `add_specs` generation **only** for networks not known to the database;  
     
 - `make` to `make_message` with following possible keys:  
     - optional content key: `-qr` will generate only apng qr code, `-text` will generate only text file with hex encoded message; by default, both qr code and text message are generated; content keys are expected immediately after `make` command, if at all; keys to follow could go in any order, but with content immediately following the key.  
@@ -150,6 +151,10 @@ Possible commands are:
     - optional content key: `-qr` will generate only apng qr code, `-text` will generate only text file with hex encoded message; by default, both qr code and text message are generated; content keys are expected immediately after `derivations` command, if at all; keys to follow could go in any order, but with content immediately following the key.  
     - key `-title` followed by network title, the storage key in address book  
     - key `-payload` followed by file name to read derivation from, in `../generate_message` folder. Derivations should be on individual line each, empty line count as empty derivations (root ones). See file `../generate_message/standard_derivations_list` for formatting example. All succesfully read derivations will be also printed to user during the run. For now duplicates are allowed when creating transfer, only one entry is made in Signer when accepting the payload.  
+
+- `unwasm` to read metadata into the database from .wasm files, and to generate `sign_me` intermediate files with `load_metadata` payload.  To be used with pre-release published .wasm files **only** for networks already known to the database. Use with caution with following keys:  
+    - key `-payload` followed by file name for .wasm file, in `../generate_message` folder.  
+    - optional key `-d` to **not** write into the database the result, i.e. only create the intermediate file. By default, the results are written in the database.  
 
 
 ## Example commands  
@@ -249,12 +254,16 @@ Release cold database is the one loaded into Signer.
 `$ cargo run add_specs -f -u network_url`  
 `$ cargo run add_specs -f -u network_url -ed25519` (*)  
 `$ cargo run add_specs -d -u network_url -ed25519` (*)  
+`$ cargo run add_specs -d -u network_url -ed25519 -token 12 MEOW` (*) (**)  
 `$ cargo run add_specs -p -n network_title -ed25519` (*)  
 `$ cargo run add_specs -p -u network_url -ed25519` (*)  
+`$ cargo run add_specs -p -u network_url -ed25519 -token 12 MEOW` (*) (**)  
 `$ cargo run add_specs -t -n network_title -ed25519` (*)  
 `$ cargo run add_specs -t -u network_url -ed25519` (*)  
+`$ cargo run add_specs -t -u network_url -ed25519 -token 12 MEOW` (*) (**)  
 `$ cargo run add_specs -n network_title -ed25519` (*)  
 `$ cargo run add_specs -u network_url -ed25519` (*)  
+`$ cargo run add_specs -u network_url -ed25519 -token 12 MEOW` (*) (**)  
 
 `$ cargo run remove -title westend-ed25519`  
 `$ cargo run remove -name kusama -version 9090`  
@@ -269,6 +278,9 @@ Release cold database is the one loaded into Signer.
 
 `$ cargo run transfer_meta_to_cold_release`  
 
-`$ cargo run derivations -title westend -payload standard_derivations_list` 
+`$ cargo run derivations -title westend -payload standard_derivations_list`  
+
+`$ cargo run unwasm -payload westend_runtime-v9150.compact.compressed.wasm`  
 
 (*) encryption override key should correspond to appropriate encryption for the network in question
+(**) token override is possible only for networks that (1) are not in the database and (2) have multiple allowed tokens; use caution;

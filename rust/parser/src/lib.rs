@@ -1,5 +1,5 @@
 use defaults::get_default_types_vec;
-use definitions::{error::{ParserError, ParserDecodingError, ParserMetadataError}, metadata::name_versioned_from_metadata, network_specs::ShortSpecs, types::TypeEntry};
+use definitions::{error::{ParserError, ParserDecodingError, ParserMetadataError}, metadata::info_from_metadata, network_specs::ShortSpecs, types::TypeEntry};
 use frame_metadata::{RuntimeMetadata, v14::RuntimeMetadataV14};
 use parity_scale_codec::Decode;
 use printing_balance::{convert_balance_pretty};
@@ -126,11 +126,11 @@ pub fn parse_set (data: &Vec<u8>, metadata_bundle: &MetadataBundle, short_specs:
 }
 
 pub fn parse_and_display_set (data: &Vec<u8>, metadata: &RuntimeMetadata, short_specs: &ShortSpecs) -> Result<String, String> {
-    let name_versioned = match name_versioned_from_metadata(&metadata) {
+    let meta_info = match info_from_metadata(&metadata) {
         Ok(x) => x,
         Err(e) => return Err(Error::Arguments(ArgumentsError::Metadata(e)).show())
     };
-    if name_versioned.name != short_specs.name {return Err(Error::Arguments(ArgumentsError::NetworkNameMismatch {name_metadata: name_versioned.name.to_string(), name_network_specs: short_specs.name.to_string()}).show())}
+    if meta_info.name != short_specs.name {return Err(Error::Arguments(ArgumentsError::NetworkNameMismatch {name_metadata: meta_info.name.to_string(), name_network_specs: short_specs.name.to_string()}).show())}
     let metadata_bundle = match metadata {
         RuntimeMetadata::V12(_)|RuntimeMetadata::V13(_) => {
             let older_meta = match metadata {
@@ -145,10 +145,10 @@ pub fn parse_and_display_set (data: &Vec<u8>, metadata: &RuntimeMetadata, short_
                 },
                 Err(_) => return Err(Error::Arguments(ArgumentsError::DefaultTypes).show())
             };
-            MetadataBundle::Older{older_meta, types, network_version: name_versioned.version}
+            MetadataBundle::Older{older_meta, types, network_version: meta_info.version}
         },
-        RuntimeMetadata::V14(meta_v14) => MetadataBundle::Sci{meta_v14, network_version: name_versioned.version},
-        _ => unreachable!(), // just checked in the name_versioned_from_metadata function if the metadata is acceptable one
+        RuntimeMetadata::V14(meta_v14) => MetadataBundle::Sci{meta_v14, network_version: meta_info.version},
+        _ => unreachable!(), // just checked in the info_from_metadata function if the metadata is acceptable one
     };
     match parse_set (data, &metadata_bundle, short_specs, None) {
         Ok((method_cards_result, extensions_cards, _, _)) => {

@@ -61,7 +61,7 @@ struct ActionResult: Decodable {
         case "Keys":
             screen = .Keys(try values.decode(MKeys.self, forKey: .screenData))
         case "Settings":
-            screen = .Settings(try values.decode(MVerifierDetails.self, forKey: .screenData))
+            screen = .Settings(try values.decode(MSettings.self, forKey: .screenData))
         case "Log":
             screen = .Log(try values.decode(MLog.self, forKey: .screenData))
         case "LogDetails":
@@ -156,7 +156,7 @@ struct ActionResult: Decodable {
 enum SignerScreen: Decodable {
     case Scan
     case Keys(MKeys)
-    case Settings(MVerifierDetails?)
+    case Settings(MSettings)
     case Log(MLog)
     case LogDetails(MLogDetails)
     case Transaction(MTransaction)

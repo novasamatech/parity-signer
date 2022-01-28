@@ -18,7 +18,7 @@ struct TCVerifier: View {
                     HStack {
                         Text("key:")
                             .foregroundColor(Color("Text600"))
-                        Text(value.hex)
+                        Text(value.public_key)
                             .foregroundColor(Color("Crypto400"))
                     }
                     HStack {

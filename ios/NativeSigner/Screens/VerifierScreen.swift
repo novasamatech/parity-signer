@@ -19,7 +19,7 @@ struct VerifierScreen: View {
                     .frame(width: 42, height: 42)
                 VStack{
                     Text("General verifier certificate")
-                    Text(content.hex)
+                    Text(content.public_key)
                     Text("encryption: " + content.encryption)
                 }
             }

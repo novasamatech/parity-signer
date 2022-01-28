@@ -112,9 +112,9 @@ impl <'a> Card <'a> {
                     Err(_) => "".to_string(),
                 };
                 let insert = match author {
-                    MultiSigner::Ed25519(p) => format!("{{\"hex\":\"{}\",\"crypto\":\"{}\",\"identicon\":\"{}\"}}", hex::encode(p.to_vec()), Encryption::Ed25519.show(), hex_identicon),
-                    MultiSigner::Sr25519(p) => format!("{{\"hex\":\"{}\",\"crypto\":\"{}\",\"identicon\":\"{}\"}}", hex::encode(p.to_vec()), Encryption::Sr25519.show(), hex_identicon),
-                    MultiSigner::Ecdsa(p) => format!("{{\"hex\":\"{}\",\"crypto\":\"{}\",\"identicon\":\"{}\"}}", hex::encode(p.0.to_vec()), Encryption::Ecdsa.show(), hex_identicon),
+                    MultiSigner::Ed25519(p) => format!("{{\"public_key\":\"{}\",\"identicon\":\"{}\",\"encryption\":\"{}\"}}", hex::encode(p.to_vec()), hex_identicon, Encryption::Ed25519.show()),
+                    MultiSigner::Sr25519(p) => format!("{{\"public_key\":\"{}\",\"identicon\":\"{}\",\"encryption\":\"{}\"}}", hex::encode(p.to_vec()), hex_identicon, Encryption::Sr25519.show()),
+                    MultiSigner::Ecdsa(p) => format!("{{\"public_key\":\"{}\",\"identicon\":\"{}\",\"encryption\":\"{}\"}}", hex::encode(p.0.to_vec()), hex_identicon, Encryption::Ecdsa.show()),
                 };
                 fancy(index, indent, "author_public_key", &insert)
             },

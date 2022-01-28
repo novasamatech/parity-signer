@@ -33,7 +33,7 @@ pub (crate) fn parse_transaction (data_hex: &str, dbname: &str) -> Result<Action
     let (author_multi_signer, parser_data, genesis_hash_vec, encryption) = multisigner_msg_genesis_encryption(data_hex)?;
     let network_specs_key = NetworkSpecsKey::from_parts(&genesis_hash_vec, &encryption);
 
-// Some(true/false) should be here by the standard; should stay None for now, as currently existing transactinos apparently do not comply to standard.
+// Some(true/false) should be here by the standard; should stay None for now, as currently existing transactions apparently do not comply to standard.
     let optional_mortal_flag = None; /*match &data_hex[4..6] {
         "00" => Some(true), // expect transaction to be mortal
         "02" => Some(false), // expect transaction to be immortal
@@ -56,14 +56,14 @@ pub (crate) fn parse_transaction (data_hex: &str, dbname: &str) -> Result<Action
                         let author_card = (Card::Author{author: &author_multi_signer, base58prefix: network_specs.base58prefix, address_details: &address_details}).card(&mut index, indent);
                         CardsPrep::ShowOnly(author_card, Card::Warning(Warning::NoNetworkID).card(&mut index, indent))
                     }
-                }
+                },
                 None => {
                     CardsPrep::ShowOnly((Card::AuthorPlain{author: &author_multi_signer, base58prefix: network_specs.base58prefix}).card(&mut index, indent),(Card::Warning(Warning::AuthorNotFound)).card(&mut index, indent))
-                }
+                },
             };
 
             let short_specs = network_specs.short();
-            let meta_set = find_meta_set(&network_specs.name, &dbname)?;
+            let meta_set = find_meta_set(&short_specs, &dbname)?;
             if meta_set.len() == 0 {return Err(ErrorSigner::Input(InputSigner::NoMetadata{name: network_specs.name}))}
             let mut found_solution = None;
             let mut error_collection: Vec<(String, u32, ParserError)> = Vec::new();
@@ -140,7 +140,7 @@ pub (crate) fn decode_signable_from_history (found_signable: &SignDisplay, datab
     let (parser_data, network_name, encryption) = found_signable.transaction_network_encryption();
     
     let short_specs = specs_by_name(&network_name, &encryption, &database_name)?.short();
-    let meta_set = find_meta_set(&network_name, &database_name)?;
+    let meta_set = find_meta_set(&short_specs, &database_name)?;
     if meta_set.len() == 0 {return Err(ErrorSigner::NotFound(NotFoundSigner::HistoricalMetadata{name: network_name}))}
     
     let mut found_solution = None;

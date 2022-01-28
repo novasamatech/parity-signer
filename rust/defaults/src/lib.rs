@@ -5,7 +5,7 @@ use std::convert::TryInto;
 use std::fs;
 use regex::Regex;
 use lazy_static::lazy_static;
-use definitions::{crypto::Encryption, error::{DefaultLoading, ErrorActive, IncomingMetadataSourceActive}, keyring::VerifierKey, metadata::{AddressBookEntry, MetaValues}, network_specs::{NetworkSpecs, NetworkSpecsToSend, CurrentVerifier, ValidCurrentVerifier, Verifier, VerifierValue}, qr_transfers::ContentLoadTypes, types::{TypeEntry, Description, EnumVariant, EnumVariantType, StructField}};
+use definitions::{crypto::Encryption, error::{DefaultLoading, ErrorActive, IncomingMetadataSourceActiveStr}, keyring::VerifierKey, metadata::{AddressBookEntry, MetaValues}, network_specs::{NetworkSpecs, NetworkSpecsToSend, CurrentVerifier, ValidCurrentVerifier, Verifier, VerifierValue}, qr_transfers::ContentLoadTypes, types::{TypeEntry, Description, EnumVariant, EnumVariantType, StructField}};
 
 pub const DEFAULT_VERIFIER_PUBLIC: [u8;32] = [
     0xc4,
@@ -191,7 +191,7 @@ fn get_metadata(dir: &str) -> Result<Vec<MetaValues>, ErrorActive> {
                     Ok(a) => a,
                     Err(e) => return Err(ErrorActive::DefaultLoading(DefaultLoading::MetadataFile(e))),
                 };
-                let new = MetaValues::from_str_metadata(&meta_str.trim(), IncomingMetadataSourceActive::Default{filename: name.to_string()})?;
+                let new = MetaValues::from_str_metadata(&meta_str.trim(), IncomingMetadataSourceActiveStr::Default{filename: name.to_string()})?;
                 out.push(new)
             }
         }

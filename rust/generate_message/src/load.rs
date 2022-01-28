@@ -1,10 +1,14 @@
+use std::path::PathBuf;
+use wasm_loader::Source;
+use wasm_testbed::WasmTestBed;
+
 use constants::{ADDRESS_BOOK, HOT_DB_NAME, METATREE};
 use db_handling::helpers::{open_db, open_tree};
-use definitions::{error::{Active, Changed, DatabaseActive, ErrorActive, Fetch, NotFoundActive}, keyring::MetaKeyPrefix, metadata::{AddressBookEntry, MetaValues}};
+use definitions::{error::{Active, Changed, DatabaseActive, ErrorActive, ErrorSource, Fetch, IncomingMetadataSourceActive, IncomingMetadataSourceActiveStr, MetadataError, MetadataSource, NotFoundActive, Wasm}, keyring::MetaKeyPrefix, metadata::{AddressBookEntry, MetaValues}};
 
 use crate::parser::{Instruction, Content, Set};
 use crate::metadata_db_utils::{add_new, SortedMetaValues, prepare_metadata, write_metadata};
-use crate::helpers::{error_occured, Write};
+use crate::helpers::{error_occured, filter_address_book_by_url, network_specs_from_entry, Write};
 use crate::metadata_shortcut::{MetaShortCut, meta_shortcut};
 use crate::output_prep::load_meta_print;
 
@@ -14,7 +18,8 @@ use crate::output_prep::load_meta_print;
 
 pub fn gen_load_meta (instruction: Instruction) -> Result<(), ErrorActive> {
     
-    if let Some(_) = instruction.encryption_override {return Err(ErrorActive::NotSupported)}
+    if let Some(_) = instruction.over.encryption {return Err(ErrorActive::NotSupported)}
+    if let Some(_) = instruction.over.token {return Err(ErrorActive::NotSupported)}
     match instruction.set {
         Set::F => {
             match instruction.content {
@@ -81,13 +86,18 @@ pub fn gen_load_meta (instruction: Instruction) -> Result<(), ErrorActive> {
 /// to get all versions available in the database (max 2),
 /// check meta_values integrity (network specname and spec_version),
 /// and print into `sign_me` output file.  
-fn meta_f_a_element (set_element: &NameHashAddress) -> Result<(), ErrorActive> {
+fn meta_f_a_element (set_element: &AddressSpecs) -> Result<(), ErrorActive> {
     let meta_key_prefix = MetaKeyPrefix::from_name(&set_element.name);
     let database = open_db::<Active>(HOT_DB_NAME)?;
     let metadata = open_tree::<Active>(&database, METATREE)?;
     for x in metadata.scan_prefix(meta_key_prefix.prefix()) {
         if let Ok(a) = x {
             let meta_values = MetaValues::from_entry_checked::<Active>(a)?;
+            if let Some(prefix_from_meta) = meta_values.optional_base58prefix {
+                if prefix_from_meta != set_element.base58prefix {
+                    return Err(<Active>::faulty_metadata(MetadataError::Base58PrefixSpecsMismatch{specs: set_element.base58prefix, meta: prefix_from_meta}, MetadataSource::Database{name: meta_values.name.to_string(), version: meta_values.version}))
+                }
+            }
             let shortcut = MetaShortCut {
                 meta_values,
                 genesis_hash: set_element.genesis_hash,
@@ -103,7 +113,7 @@ fn meta_f_a_element (set_element: &NameHashAddress) -> Result<(), ErrorActive> {
 /// (since load_metadata message does not contain info about network encryption).
 /// At this moment simple export of only specific version of the metadata is not implemented.
 /// Expected behavior:  
-/// go through `address_book` and collect all unique NameHashAddress entries,
+/// go through `address_book` and `specs_tree` to collect all unique AddressSpecs entries,
 /// search through this set for the entry corresponding to the requested name,
 /// scan prefix in `metadata` database tree in search of network specname
 /// to get all versions available in the database (max 2),
@@ -117,14 +127,14 @@ fn meta_f_n (name: &str) -> Result<(), ErrorActive> {
 /// Expected behavior:  
 /// fetch information from address, check it,
 /// and print into `sign_me` output file.  
-fn meta_d_a_element (set_element: &NameHashAddress) -> Result<(), ErrorActive> {
+fn meta_d_a_element (set_element: &AddressSpecs) -> Result<(), ErrorActive> {
     let shortcut = shortcut_set_element(set_element)?;
     load_meta_print(&shortcut)
 }
 
 /// Function to process `load_metadata -d -n name` run.
 /// Expected behavior:  
-/// go through `address_book` and collect all unique NameHashAddress entries,
+/// go through `address_book` and `specs_tree` to collect all unique AddressSpecs entries,
 /// search through this set for the entry corresponding to the requested name,
 /// fetch information from address, check it,
 /// and print into `sign_me` output file.
@@ -137,13 +147,14 @@ fn meta_d_n (name: &str) -> Result<(), ErrorActive> {
 /// fetch information from address, check it,
 /// and print into `sign_me` output file.
 fn meta_d_u (address: &str) -> Result<(), ErrorActive> {
+    if let Ok(a) = filter_address_book_by_url(address) {if a.len() != 0 {println!("Database contains entries for {} at {}. With `-d` setting key the fetched metadata integrity with existing database entries is not checked.", a[0].name, address)}}
     let shortcut = meta_shortcut(address)?;
     load_meta_print(&shortcut)
 }
 
 /// Function to process `load_metadata -k -a`, `load_metadata -p -a`, `load_metadata -t -a`, `load_metadata -a` runs.
 /// Expected behavior:  
-/// go through `address_book` and collect all unique NameHashAddress entries,
+/// go through `address_book` and `specs_tree` to collect all unique AddressSpecs entries,
 /// collect known metadata from database and sort it, clear metadata from database,
 /// process each element and update sorted metadata set (so that there are
 /// max 2 most recent metadata entries for each network),
@@ -170,7 +181,7 @@ fn meta_kpt_a (write: &Write, pass_errors: bool) -> Result<(), ErrorActive> {
 /// fetch information from address, check it,
 /// insert in the sorted `meta_values`,
 /// and print into `sign_me` output file depending on value of `write`.
-fn meta_kpt_a_element (set_element: &NameHashAddress, write: &Write, sorted_meta_values: &SortedMetaValues) -> Result<SortedMetaValues, ErrorActive> {
+fn meta_kpt_a_element (set_element: &AddressSpecs, write: &Write, sorted_meta_values: &SortedMetaValues) -> Result<SortedMetaValues, ErrorActive> {
     let shortcut = shortcut_set_element(set_element)?;
     let upd_sorted = add_new(&shortcut.meta_values, sorted_meta_values)?;
     match write {
@@ -187,7 +198,7 @@ fn meta_kpt_a_element (set_element: &NameHashAddress, write: &Write, sorted_meta
 /// `load_metadata -t -n name`, `load_metadata -n name` runs.
 /// Expected behavior:  
 /// collect known metadata from database and sort it, clear metadata from database,
-/// go through `address_book` and collect all unique NameHashAddress entries,
+/// go through `address_book` and `specs_tree` to collect all unique AddressSpecs entries,
 /// search through this set for the entry corresponding to the requested name,
 /// fetch information from address, check it, insert into sorted metadata
 /// and print into `sign_me` output file depending on `write` value,
@@ -200,43 +211,52 @@ fn meta_kpt_n (name: &str, write: &Write) -> Result<(), ErrorActive> {
 
 /// Struct to collect network specname, genesis hash and fetching address from address book
 #[derive(PartialEq)]
-struct NameHashAddress {
-    name: String,
-    genesis_hash: [u8; 32],
+struct AddressSpecs {
     address: String,
+    base58prefix: u16,
+    genesis_hash: [u8;32],
+    name: String,
 }
 
-/// Function to collect a vector of unique NameHashAddress entries from address book
-fn get_address_book_set () -> Result<Vec<NameHashAddress>, ErrorActive> {
-    let database = open_db::<Active>(HOT_DB_NAME)?;
-    let address_book = open_tree::<Active>(&database, ADDRESS_BOOK)?;
-    let mut set: Vec<NameHashAddress> = Vec::new();
-    for x in address_book.iter() {
-        if let Ok(a) = x {
-            let address_book_entry = AddressBookEntry::from_entry(a)?;
-            // check that each name gets only one genesis hash
-            for a in set.iter() {
-                if a.name == address_book_entry.name {
-                    if a.genesis_hash != address_book_entry.genesis_hash {return Err(ErrorActive::Database(DatabaseActive::TwoGenesisHashVariantsForName{name: address_book_entry.name.to_string()}))}
-                    if a.address != address_book_entry.address {return Err(ErrorActive::Database(DatabaseActive::TwoUrlVariantsForName{name: address_book_entry.name.to_string()}))}
-                }
+/// Function to collect a vector of unique AddressSpecs entries from address book
+fn get_address_book_set () -> Result<Vec<AddressSpecs>, ErrorActive> {
+    let mut set: Vec<AddressBookEntry> = Vec::new();
+    {
+        let database = open_db::<Active>(HOT_DB_NAME)?;
+        let address_book = open_tree::<Active>(&database, ADDRESS_BOOK)?;
+        for x in address_book.iter() {
+            if let Ok(a) = x {
+                let address_book_entry = AddressBookEntry::from_entry(a)?;
+                set.push(address_book_entry);
             }
-            let new = NameHashAddress{
-                name: address_book_entry.name.to_string(),
-                genesis_hash: address_book_entry.genesis_hash,
-                address: address_book_entry.address.to_string(),
-            };
-            if !set.contains(&new) {set.push(new)}
         }
     }
     if set.len() == 0 {return Err(ErrorActive::Database(DatabaseActive::AddressBookEmpty))}
-    Ok(set)
+    let mut out: Vec<AddressSpecs> = Vec::new();
+    for x in set.iter() {
+        let specs = network_specs_from_entry(x)?;
+        for y in out.iter() {
+            if y.name == specs.name {
+                if y.genesis_hash != specs.genesis_hash {return Err(ErrorActive::Database(DatabaseActive::TwoGenesisHashVariantsForName{name: x.name.to_string()}))}
+                if y.address != x.address {return Err(ErrorActive::Database(DatabaseActive::TwoUrlVariantsForName{name: x.name.to_string()}))}
+                if y.base58prefix != specs.base58prefix {return Err(ErrorActive::Database(DatabaseActive::TwoBase58ForName{name: x.name.to_string()}))}
+            }
+        }
+        let new = AddressSpecs {
+            address: x.address.to_string(),
+            base58prefix: specs.base58prefix,
+            genesis_hash: specs.genesis_hash,
+            name: specs.name.to_string(),
+        };
+        if !out.contains(&new) {out.push(new)}
+    }
+    Ok(out)
 }
 
-/// Function to collect a vector of unique NameHashAddress entries from address book
+/// Function to collect a vector of unique AddressSpecs entries from address book
 /// and search for particular name in it,
-/// outputs NameHashAddress
-fn search_name (name: &str) -> Result<NameHashAddress, ErrorActive> {
+/// outputs AddressSpecs
+fn search_name (name: &str) -> Result<AddressSpecs, ErrorActive> {
     let set = get_address_book_set()?;
     let mut found = None;
     for x in set.into_iter() {
@@ -251,15 +271,45 @@ fn search_name (name: &str) -> Result<NameHashAddress, ErrorActive> {
     }
 }
 
-/// Function to process individual NameHashAddress entry:
+/// Function to process individual AddressSpecs entry:
 /// do fetch, check fetched metadata for version,
 /// check that genesis hash and network name are same in address book and in fetch
 /// output MetaShortCut value
-fn shortcut_set_element (set_element: &NameHashAddress) -> Result<MetaShortCut, ErrorActive> {
+fn shortcut_set_element (set_element: &AddressSpecs) -> Result<MetaShortCut, ErrorActive> {
     let shortcut = meta_shortcut(&set_element.address)?;
     if shortcut.meta_values.name != set_element.name {return Err(ErrorActive::Fetch(Fetch::ValuesChanged{url: set_element.address.to_string(), what: Changed::Name{old: set_element.name.to_string(), new: shortcut.meta_values.name.to_string()}}))}
     if shortcut.genesis_hash != set_element.genesis_hash {return Err(ErrorActive::Fetch(Fetch::ValuesChanged{url: set_element.address.to_string(), what: Changed::GenesisHash{old: set_element.genesis_hash, new: shortcut.genesis_hash}}))}
+    if let Some(prefix_from_meta) = shortcut.meta_values.optional_base58prefix {
+        if prefix_from_meta != set_element.base58prefix {
+            return Err(<Active>::faulty_metadata(MetadataError::Base58PrefixSpecsMismatch{specs: set_element.base58prefix, meta: prefix_from_meta}, MetadataSource::Incoming(IncomingMetadataSourceActive::Str(IncomingMetadataSourceActiveStr::Fetch{url: set_element.address.to_string()}))))
+        }
+    }
     Ok(shortcut)
 }
 
-
+/// Function to process .wasm files into signable entities and add metadata into the database
+pub fn unwasm (filename: &str, update_db: bool) -> Result<(), ErrorActive> {
+    let testbed = match WasmTestBed::new(&Source::File(PathBuf::from(&filename))) {
+        Ok(a) => a,
+        Err(e) => return Err(ErrorActive::Wasm(Wasm::WasmTestbed(e))),
+    };
+    let meta_values = MetaValues::from_runtime_metadata(testbed.metadata(), IncomingMetadataSourceActive::Wasm{filename: filename.to_string()})?;
+    let set_element = search_name(&meta_values.name)?;
+    if let Some(prefix_from_meta) = meta_values.optional_base58prefix {
+        if prefix_from_meta != set_element.base58prefix {
+            return Err(<Active>::faulty_metadata(MetadataError::Base58PrefixSpecsMismatch{specs: set_element.base58prefix, meta: prefix_from_meta}, MetadataSource::Incoming(IncomingMetadataSourceActive::Wasm{filename: filename.to_string()})))
+        }
+    }
+    let genesis_hash = set_element.genesis_hash;
+    if update_db {
+        let upd_sorted = add_new(&meta_values, &prepare_metadata()?)?;
+        if upd_sorted.upd_done {println!("Unwasmed new metadata {}{}", meta_values.name, meta_values.version)}
+        else {println!("Unwasmed previously known metadata {}{}", meta_values.name, meta_values.version)}
+        write_metadata(upd_sorted.sorted)?;
+    }
+    let shortcut = MetaShortCut {
+        meta_values,
+        genesis_hash,
+    };
+    load_meta_print(&shortcut)
+}
