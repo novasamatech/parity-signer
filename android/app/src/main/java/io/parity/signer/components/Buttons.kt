@@ -1,6 +1,5 @@
 package io.parity.signer.components
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable
@@ -20,7 +19,7 @@ fun BigButton(
 	val accentColor = if (isCrypto) Crypto400 else Action400
 	val bgColor = if (isDisabled) Bg200 else if (isShaded) Bg300 else accentColor
 	val fgColor =
-		if (isDisabled) Text300 else if (isShaded) if (isDangerous) BaseDanger else accentColor else Action600
+		if (isDisabled) Text300 else if (isShaded) if (isDangerous) SignalDanger else accentColor else Action600
 
 	Button(
 		onClick = action,

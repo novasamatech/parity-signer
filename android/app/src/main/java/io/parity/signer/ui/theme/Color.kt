@@ -31,5 +31,5 @@ val Crypto400 = Color(0xFF65A8B1)
 val Crypto200 = Color(0xFF3D686D)
 val Crypto100 = Color(0xFF21373A)
 
-val BaseDanger = Color(0xFFFF3B30)
+val SignalDanger = Color(0xFFFF3B30)
 val BaseOn = Color(0xFF32D74B)

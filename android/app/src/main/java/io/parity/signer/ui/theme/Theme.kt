@@ -1,12 +1,10 @@
 package io.parity.signer.ui.theme
 
 import androidx.compose.foundation.isSystemInDarkTheme
-import androidx.compose.material.Colors
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.darkColors
 import androidx.compose.material.lightColors
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.graphics.Color
 
 private val DarkColorPalette = darkColors(
 	primary = Action400,
@@ -15,7 +13,7 @@ private val DarkColorPalette = darkColors(
 	secondaryVariant = Bg500,
 	background = Bg100,
 	surface = Bg200,
-	error = BaseDanger,
+	error = SignalDanger,
 	onPrimary = Text600,
 	onSecondary = Text600,
 	onBackground = Text600,
@@ -30,7 +28,7 @@ private val LightColorPalette = lightColors(
 	secondaryVariant = Bg500,
 	background = Bg200,
 	surface = Bg000,
-	error = BaseDanger,
+	error = SignalDanger,
 	onPrimary = Text600,
 	onSecondary = Crypto400,
 	onBackground = Text600,

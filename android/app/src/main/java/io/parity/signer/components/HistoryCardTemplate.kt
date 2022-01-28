@@ -22,7 +22,7 @@ fun HistoryCardTemplate(
 ) {
 	val color1 = Text500
 	val color2 = if (danger) {
-		BaseDanger
+		SignalDanger
 	} else {
 		Crypto400
 	}

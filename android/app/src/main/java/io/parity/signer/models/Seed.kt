@@ -1,6 +1,7 @@
 package io.parity.signer.models
 
 import android.util.Log
+import android.widget.Toast
 import io.parity.signer.ButtonID
 import org.json.JSONArray
 import org.json.JSONObject
@@ -91,4 +92,17 @@ internal fun SignerDataModel.validatePhrase(seedPhrase: String): String? {
 		errorMessage = e.toString()
 	}
 	return errorMessage
+}
+
+fun SignerDataModel.removeSeed(seedName: String) {
+	authentication.authenticate(activity) {
+		try {
+			sharedPreferences.edit().remove(seedName).apply()
+			refreshSeedNames()
+			pushButton(ButtonID.RemoveSeed)
+		} catch (e: java.lang.Exception) {
+			Log.d("remove seed error", e.toString())
+			Toast.makeText(context, e.toString(), Toast.LENGTH_SHORT).show()
+		}
+	}
 }
