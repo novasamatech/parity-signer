@@ -34,7 +34,7 @@ wss://kusama.kylin-node.co.uk				rejects call ("Error in the WebSocket handshake
 wss://quartz.unique.network				ok
 wss://kusama.rpc.robonomics.network/			ok
 wss://rpc.shiden.astar.network				ok
-wss://ws.parachain-collator-1.c1.sora2.soramitsu.co.jp	no decimals nor units
+wss://ws.parachain-collator-1.c1.sora2.soramitsu.co.jp	ok, no token
 wss://gamma.subgame.org/				ok
 wss://rpc.kusama.standard.tech				ok
 
@@ -48,7 +48,7 @@ wss://rpc.westend.standard.tech				ok
 wss://westend.kilt.io:9977				ok
 
 wss://rococo-rpc.polkadot.io				ok
-wss://rococo-statemint-rpc.polkadot.io			no decimals nor units
+wss://rococo-statemint-rpc.polkadot.io			ok, no token
 wss://rococo-canvas-rpc.polkadot.io			ok
 
 wss://ws.azero.dev					ok
@@ -114,7 +114,7 @@ wss://rpc.opportunity.standard.tech			ok
 wss://parachain-rpc.origin-trail.network		no units, but there are decimals
 wss://pangolin-rpc.darwinia.network			ok, token set
 wss://pangoro-rpc.darwinia.network			ok, token set
-wss://blockchain.polkadex.trade				no decimals nor units
+wss://blockchain.polkadex.trade				ok, no token
 wss://testnet-rpc.polymesh.live				ok
 wss://testnet.pontem.network/ws				ok
 wss://testnet.psm.link					rejects call(502), seems to be down on polkadot.js as well
@@ -133,7 +133,7 @@ wss://testnet.uniarts.network				base58 conflict
 wss://testnet2.unique.network				ok
 wss://vodka.rpc.neatcoin.org/ws				ok
 wss://testnet.web3games.org				ok
-wss://test1.zcloak.network				no decimals nor units
+wss://test1.zcloak.network				ok, no token
 wss://bsr.zeitgeist.pm					ok
 wss://alphaville.zero.io				ok
 

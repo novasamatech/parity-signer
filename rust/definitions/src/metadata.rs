@@ -1,8 +1,9 @@
 use parity_scale_codec::{Decode, Encode};
 use parity_scale_codec_derive;
-use frame_metadata::{RuntimeMetadata, decode_different::DecodeDifferent};
+use frame_metadata::{RuntimeMetadata, decode_different::DecodeDifferent, v14::RuntimeMetadataV14};
 use sled::IVec;
 use sp_version::RuntimeVersion;
+use std::collections::HashSet;
 
 use crate::crypto::Encryption;
 use crate::error::{Active, DatabaseActive, EntryDecodingActive, ErrorActive, ErrorSigner, ErrorSource, IncomingMetadataSourceActive, IncomingMetadataSourceActiveStr, MetadataError, MetadataSource, NotHexActive, Signer};
@@ -16,6 +17,7 @@ pub struct MetaInfo {
     pub name: String,
     pub version: u32,
     pub optional_base58prefix: Option<u16>,
+    pub warn_incomplete_extensions: bool,
 }
 
 /// Struct to store the metadata values (network name, network
@@ -25,6 +27,7 @@ pub struct MetaValues {
     pub name: String,
     pub version: u32,
     pub optional_base58prefix: Option<u16>,
+    pub warn_incomplete_extensions: bool,
     pub meta: Vec<u8>,
 }
 
@@ -47,6 +50,7 @@ impl MetaValues {
             name: meta_info.name.to_string(),
             version: meta_info.version,
             optional_base58prefix: meta_info.optional_base58prefix,
+            warn_incomplete_extensions: meta_info.warn_incomplete_extensions,
             meta: meta_vec.to_vec(),
         })
     }
@@ -59,6 +63,7 @@ impl MetaValues {
             name: meta_info.name.to_string(),
             version: meta_info.version,
             optional_base58prefix: meta_info.optional_base58prefix,
+            warn_incomplete_extensions: meta_info.warn_incomplete_extensions,
             meta: [vec![109, 101, 116, 97], runtime_metadata.encode()].concat(),
         })
     }
@@ -85,6 +90,7 @@ impl MetaValues {
 pub fn info_from_metadata (runtime_metadata: &RuntimeMetadata) -> Result<MetaInfo, MetadataError> {
     let mut runtime_version_encoded: Option<Vec<u8>> = None;
     let mut base58_prefix_encoded: Option<Vec<u8>> = None;
+    let mut warn_incomplete_extensions = false;
     let mut system_block = false;
     match runtime_metadata {
         RuntimeMetadata::V12(metadata_v12) => {
@@ -138,6 +144,7 @@ pub fn info_from_metadata (runtime_metadata: &RuntimeMetadata) -> Result<MetaInf
                 break;
                 }
             }
+            warn_incomplete_extensions = v14_warn(metadata_v14);
         },
         _ => return Err(MetadataError::VersionIncompatible),
     }
@@ -164,6 +171,7 @@ pub fn info_from_metadata (runtime_metadata: &RuntimeMetadata) -> Result<MetaInf
         name: runtime_version.spec_name.to_string(),
         version: runtime_version.spec_version,
         optional_base58prefix,
+        warn_incomplete_extensions,
     })
 }
 
@@ -176,7 +184,23 @@ pub fn runtime_metadata_from_vec(meta_vec: &Vec<u8>) -> Result<RuntimeMetadata, 
     }
 }
 
-/// Struct for processing 
+/// Function to check if the v14 metadata has all signed extensions required for transaction decoding.
+/// True if extensions are incomplete.
+/// Currently, the decoding of the transaction demands that metadata version, network genesis hash,
+/// and era are among signed extensions. Otherwise, a ParserMetadataError would occur on decoding.
+/// However, we can not simply forbid the loading of the metadata without required set of
+/// signed extensions into Signer.
+/// This function should be used for warnings only on generate_message side and during metadata
+/// loading into Signer.
+fn v14_warn (metadata_v14: &RuntimeMetadataV14) -> bool {
+    let mut signed_extensions = HashSet::new();
+    for x in metadata_v14.extrinsic.signed_extensions.iter() {
+        signed_extensions.insert(x.identifier.to_string());
+    }
+    !signed_extensions.contains("CheckSpecVersion") || !signed_extensions.contains("CheckGenesis") || !signed_extensions.contains("CheckMortality")
+}
+
+/// Struct to keep metadata and its info for transaction decoding
 pub struct MetaSetElement {
     pub name: String,
     pub version: u32,

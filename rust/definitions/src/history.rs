@@ -369,6 +369,7 @@ pub fn all_events_preview() -> Vec<Event> {
         name: String::from("westend"),
         version: 9000,
         optional_base58prefix: Some(42),
+        warn_incomplete_extensions: false,
         meta: Vec::new(),
     };
     let public = [142, 175, 4, 21, 22, 135, 115, 99, 38, 201, 254, 161, 126, 37, 252, 82, 135, 97, 54, 147, 201, 18, 144, 156, 178, 38, 170, 71, 148, 242, 106, 72];

@@ -41,14 +41,14 @@ pub fn interpret_properties (x: &Map<String, JsonValue>, optional_prefix_from_me
             }
         },
     };
-    let decimals: u8 = match x.get("tokenDecimals") {
+    let decimals: Option<u8> = match x.get("tokenDecimals") {
         Some(a) => {
             match a {
                 JsonValue::Number(b) => {
                     match b.as_u64() {
                         Some(c) => {
                             match c.try_into() {
-                                Ok(d) => d,
+                                Ok(d) => Some(d),
                                 Err(_) => return Err(SpecsError::DecimalsFormatNotSupported{value: a.to_string()}),
                             }
                         },
@@ -61,7 +61,7 @@ pub fn interpret_properties (x: &Map<String, JsonValue>, optional_prefix_from_me
                             match c.as_u64() {
                                 Some(d) => {
                                     match d.try_into() {
-                                        Ok(f) => f,
+                                        Ok(f) => Some(f),
                                         Err(_) => return Err(SpecsError::DecimalsFormatNotSupported{value: a.to_string()}),
                                     }
                                 },
@@ -73,15 +73,16 @@ pub fn interpret_properties (x: &Map<String, JsonValue>, optional_prefix_from_me
                     else {
                         token_array = Some((a.to_string(), b.len()));
                         if let Some(ref token_override) = optional_token_override {
-                            token_override.decimals
+                            Some(token_override.decimals)
                         }
-                        else {0}
+                        else {Some(0)}
                     }
                 },
+                JsonValue::Null => None,
                 _ => return Err(SpecsError::DecimalsFormatNotSupported{value: a.to_string()}),
             }
         },
-        None => return Err(SpecsError::NoDecimals),
+        None => None,
     };
     let unit = match x.get("tokenSymbol") {
         Some(a) => {
@@ -89,14 +90,14 @@ pub fn interpret_properties (x: &Map<String, JsonValue>, optional_prefix_from_me
                 JsonValue::String(b) => {
                     if let Some(_) = token_array {return Err(SpecsError::DecimalsArrayUnitsNot)}
                     if let Some(_) = optional_token_override {return Err(SpecsError::OverrideIgnored)}
-                    b.to_string()
+                    Some(b.to_string())
                 },
                 JsonValue::Array(b) => {
                     if b.len() == 1 {
                         if let JsonValue::String(c) = &b[0] {
                             if let Some(_) = token_array {return Err(SpecsError::DecimalsArrayUnitsNot)}
                             if let Some(_) = optional_token_override {return Err(SpecsError::OverrideIgnored)}
-                            c.to_string()
+                            Some(c.to_string())
                         }
                         else {return Err(SpecsError::DecimalsFormatNotSupported{value: a.to_string()})}
                     }
@@ -107,11 +108,11 @@ pub fn interpret_properties (x: &Map<String, JsonValue>, optional_prefix_from_me
                                 else {
                                     if let Some(token_override) = optional_token_override {
                                         println!("Network supports several tokens. An array of tokenDecimals {} and an array of tokenSymbol {} were fetched. Through override, the decimals value will be set to {} and unit value will be set to {}. To improve this behavior, please file a ticket.", decimals, a.to_string(), token_override.decimals, token_override.unit);
-                                        token_override.unit
+                                        Some(token_override.unit)
                                     }
                                     else {
                                         println!("Network supports several tokens. An array of tokenDecimals {} and an array of tokenSymbol {} were fetched. By default, decimals value will be set to 0, and unit value will be set to UNIT. To override, use -token <value_decimals> <value_unit>. To improve this behavior, please file a ticket.", decimals, a.to_string());
-                                        String::from("UNIT")
+                                        Some(String::from("UNIT"))
                                     }
                                 }
                             },
@@ -119,10 +120,24 @@ pub fn interpret_properties (x: &Map<String, JsonValue>, optional_prefix_from_me
                         }
                     }
                 },
+                JsonValue::Null => None,
                 _ => return Err(SpecsError::UnitFormatNotSupported{value: a.to_string()}),
             }
         },
-        None => return Err(SpecsError::NoUnit),
+        None => None,
+    };
+    let (decimals, unit) = match decimals {
+        Some(a) => match unit {
+            Some(b) => (a,b),
+            None => return Err(SpecsError::DecimalsNoUnit(a)),
+        },
+        None => match unit {
+            Some(b) => return Err(SpecsError::UnitNoDecimals(b)),
+            None => {
+                println!("Network has no token. By default, decimals value will be set to 0, and unit value will be set to UNIT. To improve this behavior, please file a ticket.");
+                (0, String::from("UNIT"))
+            },
+        },
     };
     Ok(NetworkProperties {
         base58prefix,
