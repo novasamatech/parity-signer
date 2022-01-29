@@ -3,7 +3,7 @@ use parity_scale_codec_derive;
 use frame_metadata::{RuntimeMetadata, decode_different::DecodeDifferent, v14::RuntimeMetadataV14};
 use sled::IVec;
 use sp_version::RuntimeVersion;
-use std::collections::HashSet;
+use std::collections::HashMap;
 
 use crate::crypto::Encryption;
 use crate::error::{Active, DatabaseActive, EntryDecodingActive, ErrorActive, ErrorSigner, ErrorSource, IncomingMetadataSourceActive, IncomingMetadataSourceActiveStr, MetadataError, MetadataSource, NotHexActive, Signer};
@@ -144,7 +144,7 @@ pub fn info_from_metadata (runtime_metadata: &RuntimeMetadata) -> Result<MetaInf
                 break;
                 }
             }
-            warn_incomplete_extensions = v14_warn(metadata_v14);
+            warn_incomplete_extensions = need_v14_warning(metadata_v14);
         },
         _ => return Err(MetadataError::VersionIncompatible),
     }
@@ -192,12 +192,13 @@ pub fn runtime_metadata_from_vec(meta_vec: &Vec<u8>) -> Result<RuntimeMetadata, 
 /// signed extensions into Signer.
 /// This function should be used for warnings only on generate_message side and during metadata
 /// loading into Signer.
-fn v14_warn (metadata_v14: &RuntimeMetadataV14) -> bool {
-    let mut signed_extensions = HashSet::new();
+fn need_v14_warning (metadata_v14: &RuntimeMetadataV14) -> bool {
+    let mut signed_extensions = HashMap::new();
     for x in metadata_v14.extrinsic.signed_extensions.iter() {
-        signed_extensions.insert(x.identifier.to_string());
+        let count = signed_extensions.entry(x.identifier.to_string()).or_insert(0);
+        *count +=1;
     }
-    !signed_extensions.contains("CheckSpecVersion") || !signed_extensions.contains("CheckGenesis") || !signed_extensions.contains("CheckMortality")
+    !(signed_extensions.get("CheckSpecVersion") == Some(&1) && signed_extensions.get("CheckGenesis") == Some(&1) && signed_extensions.get("CheckMortality") == Some(&1)) // no warning needed if each one encountered, and only once
 }
 
 /// Struct to keep metadata and its info for transaction decoding
@@ -379,6 +380,26 @@ mod tests {
                 assert!(<Active>::show(&e) == expected_error, "Unexpected kind of error, {}", <Active>::show(&e));
             }
         }
+    }
+    
+    #[test]
+    fn westend9150() {
+        let filename = String::from("for_tests/westend9150");
+        let meta = read_to_string(&filename).unwrap();
+        let meta_values = MetaValues::from_str_metadata(&meta.trim(), IncomingMetadataSourceActiveStr::Default{filename}).unwrap();
+        assert!(meta_values.name == String::from("westend"), "Unexpected network name: {}", meta_values.name);
+        assert!(meta_values.version == 9150, "Unexpected network name: {}", meta_values.version);
+        assert!(!meta_values.warn_incomplete_extensions, "Expected complete extensions in westend9150.")
+    }
+    
+    #[test]
+    fn shell200() {
+        let filename = String::from("for_tests/shell200");
+        let meta = read_to_string(&filename).unwrap();
+        let meta_values = MetaValues::from_str_metadata(&meta.trim(), IncomingMetadataSourceActiveStr::Default{filename}).unwrap();
+        assert!(meta_values.name == String::from("shell"), "Unexpected network name: {}", meta_values.name);
+        assert!(meta_values.version == 200, "Unexpected network name: {}", meta_values.version);
+        assert!(meta_values.warn_incomplete_extensions, "Expected incomplete extensions warning in shell200.")
     }
 }
 
