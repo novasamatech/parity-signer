@@ -11,7 +11,7 @@ use qrcode_static::png_qr_from_string;
 
 use crate::db_transactions::TrDbCold;
 use crate::helpers::{get_address_details, get_general_verifier, get_meta_values_by_name, get_meta_values_by_name_version, get_network_specs, get_valid_current_verifier, make_batch_clear_tree, open_db, open_tree, try_get_types};
-use crate::identities::{get_all_addresses, get_addresses_by_seed_name, generate_random_phrase};
+use crate::identities::{derivation_no_pwd_exists, get_all_addresses, get_addresses_by_seed_name, generate_random_phrase};
 use crate::network_details::get_all_networks;
 
 /// Function to print all seed names with identicons
@@ -222,6 +222,23 @@ pub fn backup_prep (database_name: &str, seed_name: &str) -> Result<String, Erro
 pub fn derive_prep (database_name: &str, seed_name: &str, network_specs_key: &NetworkSpecsKey, suggest: &str) -> Result<String, ErrorSigner> {
     let network_specs = get_network_specs(database_name, network_specs_key)?;
     Ok(format!("\"seed_name\":\"{}\",\"network_title\":\"{}\",\"network_logo\":\"{}\",\"suggested_derivation\":\"{}\"", seed_name, network_specs.title, network_specs.logo, suggest))
+}
+
+/// Function to show (dynamically) if the derivation with the provided path and no password already exists
+/// and if it exists, prints its details
+pub fn dynamic_path_check (database_name: &str, seed_name: &str, path: &str, network_specs_key: &NetworkSpecsKey) -> Result<String, ErrorSigner> {
+    match derivation_no_pwd_exists (seed_name, path, network_specs_key, database_name)? {
+        Some((multisigner, _)) => {
+            let network_specs = get_network_specs(database_name, network_specs_key)?;
+            let address_base58 = print_multisigner_as_base58(&multisigner, Some(network_specs.base58prefix));
+            let hex_identicon = match make_identicon_from_multisigner(&multisigner) {
+                Ok(a) => hex::encode(a),
+                Err(_) => String::new(),
+            };
+            Ok(format!("\"base58\":\"{}\",\"path\":\"{}\",\"has_pwd\":\"false\",\"identicon\":\"{}\",\"seed_name\":\"{}\"", address_base58, path, hex_identicon, seed_name))
+        },
+        None => Ok(String::new()),
+    }
 }
 
 /// Print network specs and metadata set information for network with given network specs key.
@@ -452,6 +469,26 @@ mod tests {
         let expected_element = r#"{"event":"types_removed","payload":{"types_hash":"d091a5a24a97e18dfe298b167d8fd5a2add10098c8792cba21c39029a9ee0aeb","types_id_pic":"89504e470d0a1a0a0000000d49484452000000410000004108060000008ef7c9450000035549444154789cedd8dd89144114c57117049fdb140cc18c8c61c3d818ccc8104cc17e1684b50ec35dcfd4debe1f55b79a01fbff30fb304dd5e91f2cac3ebdbebe7ef8df3b0561dff7e14bb66d7b6a3f96b60461e6a5bd56a09422ac7cf9be4a8c12849197fffce55bfbbcefd7cfefed335705c614c2c8cb230d401a81403318c3082b00a4b32186104601d04a043402914298797969358294c108235400a0b310501422849001d87ebcb4cffbf6afcfedf35616c13bcf2b02e122cc02483cdc82f000243ecfcb832843b0064b3c5c838802487c9ed514421400558e46e5e7191087081900543ebaf83c7404a122640150f5e8eaf3240d228c50fd3bfc697bfffceffddff7d9f3bc7d5208210a20f145d6701eac014851083e2fba4fea215c04eb02892fd286f3600b40f220f8bcec3e6422f40068e412ab2c82d7e83e86b8105a6f081a001abde4a847414002518ea0bd24bf94f67d9ff73c7f9fddc785119075115fa00d967878f573d17d7d2904a45dc4175883251eae3def7ddfc7cf7bfbb4ee103c8048d9d15ed5e71d05880be1424822787fb965477f7cd9dae77d7f9ef7f6792b7b9eb7efa830827681c41759c379b006204521f8bce83ead10827581c41769c379b0052079107c5e765fdf1204af2c82d7ecbe0ba17521b4962078bfc35904efbcecbebe1002b22ee20bb4c1120fb7203c0089cf8beed30a2320ed22bec01a2cf1700d220a20f179debea352085ed9d15ed5e71d7521b42e84d61b02f220bc7faf67476bcf7bdff7f1f3de3e2d00b41fb7ff4f4016827681c41759c37970f573d17d7d6104eb02892fd286f360edfb3eef79fe3ebb8f5b86e0a5bd541fbfa4d7ccbe7708488398b944eb511004005d08ad3b04d443642ff1fe72cb2278e765f72106402e02b22ee20bb4c1120fb7203c0089cf8bee935c041485e00bacc1120fd720a200129fe7ed937a001446f0ca8ef6aa3e4f0a23a02c44f5e8eaf39006800e115006a27a74f9790700c844405188ec68ef77387b9e950580ca1090359c076b00521482cff39a4640b3103cd802903c083ecfcb034021049481b0ca22cc140140610454017116421400a510a4198cd5089997978610d028c44a841100348c8056409c0d80a610a4110c0d620460e6e5a51204690463b48a97974a11a49518952f2f2d41e89b4159f1d27da7203c7a7f01d20cbfac205d21400000000049454e44ae426082","verifier":{"public_key":"","identicon":"","encryption":"none"}}}"#;
         assert!(history_printed.contains(expected_element), "\nReceived history: \n{}", history_printed);
         
+        fs::remove_dir_all(dbname).unwrap();
+    }
+    
+    #[test]
+    fn path_is_known() {
+        let dbname = "for_tests/path_is_known";
+        populate_cold (dbname, Verifier(None)).unwrap();
+        let print = dynamic_path_check (dbname, "Alice", "//Alice", &NetworkSpecsKey::from_parts(&hex::decode("e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e").unwrap(), &Encryption::Sr25519)).unwrap();
+        let expected_print = r#""base58":"5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY","path":"//Alice","has_pwd":"false","identicon":"89504e470d0a1a0a0000000d49484452000000410000004108060000008ef7c9450000030e49444154789cedda4d6a544114c571330e0eb286640782d8ee4090081964033d105c90e0a0379041c020b8035b047790aca10792715b87e644eb59afeeb9f5f1e86edf7f70320cf7075d83a44fb6dbedb3ffbd4910369b4df12f393b3b3b093fbad605a1e668ab1e284d117a1e3fac2546138492e3bf3ede868d7b737a15d6570b8c2a8492e3510a809540a01a8c62841e006c6a8822845200d413019540b8106a8e67bd1198074346680180a642402a8484e001f8717d1f36eee5cd45d85d5e842ff7d761e3de5edc84d552204c845a00a6425800ac254433841c00b3205400a6425421a800c88b60d51201e52046113c0068df11d0184412c10b800e0101a5206484d5e243d8b8e5fa63d85d5e84cbd7e761e3eebe3d84dde54558ac5661e3d6cb65d838094105602a8405c054080b80291026420e8059102a00b32054003684c8220c019017c1ca8b60558280fe869811424f08290074ac088810cd113e25de84f7156fc2cfc49bf0a2f24d603202ca4158004c85b000980a3106805c082805a102300b42056016440e00450816809217c1ca8b501a20668419c189f0ebf6316cdcf3abd3b0bbbc08ef16ff7e863fafff7c86bd08af2ecfc3c67dbf7b089b4f4648013015c202602a8405c02c08092107c02c08158059102a00cb417441b0f22258cd08a11921b4970847f926a01c8405c054080b80a91039002423a014840ac02c081580591016007221587911acbc08a5cd08a11921f484802c88a3ff7b02ca21a400980a61013015c202603908192107c02c08158059102a001b83e88660e545b06a8a805210c78a400034238422043484f0221cfcff22d11001e5202c00a64258004c851802201301a9102a00b3205400664128004846b0f222587911d46404e48538048414001a45401e887d471803405904a44278110ee67b8c48454039080b80a9102a00aa4640b5102a00b3205a0220090179207279116a5200908c805a404c85a002201702abc1e88de0399e1521a052889e082500a81801f580981a005521b0128c14440940cdf1ac09022bc128adc5f1ac2902eb89d1f278d60561580d4a8fa3874d82b0effd06a580bfac7347ad900000000049454e44ae426082","seed_name":"Alice""#;
+        assert!(print == expected_print, "\nReceived: \n{}", print);
+        fs::remove_dir_all(dbname).unwrap();
+    }
+    
+    #[test]
+    fn path_is_unknown() {
+        let dbname = "for_tests/path_is_unknown";
+        populate_cold (dbname, Verifier(None)).unwrap();
+        let print = dynamic_path_check (dbname, "Alice", "//secret", &NetworkSpecsKey::from_parts(&hex::decode("e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e").unwrap(), &Encryption::Sr25519)).unwrap();
+        let expected_print = r#""#;
+        assert!(print == expected_print, "\nReceived: \n{}", print);
         fs::remove_dir_all(dbname).unwrap();
     }
     
