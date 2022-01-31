@@ -93,6 +93,7 @@ fn meta_f_a_element (set_element: &AddressSpecs) -> Result<(), ErrorActive> {
     for x in metadata.scan_prefix(meta_key_prefix.prefix()) {
         if let Ok(a) = x {
             let meta_values = MetaValues::from_entry_checked::<Active>(a)?;
+            if meta_values.warn_incomplete_extensions {warn(&meta_values.name, meta_values.version);}
             if let Some(prefix_from_meta) = meta_values.optional_base58prefix {
                 if prefix_from_meta != set_element.base58prefix {
                     return Err(<Active>::faulty_metadata(MetadataError::Base58PrefixSpecsMismatch{specs: set_element.base58prefix, meta: prefix_from_meta}, MetadataSource::Database{name: meta_values.name.to_string(), version: meta_values.version}))
@@ -149,6 +150,7 @@ fn meta_d_n (name: &str) -> Result<(), ErrorActive> {
 fn meta_d_u (address: &str) -> Result<(), ErrorActive> {
     if let Ok(a) = filter_address_book_by_url(address) {if a.len() != 0 {println!("Database contains entries for {} at {}. With `-d` setting key the fetched metadata integrity with existing database entries is not checked.", a[0].name, address)}}
     let shortcut = meta_shortcut(address)?;
+    if shortcut.meta_values.warn_incomplete_extensions {warn(&shortcut.meta_values.name, shortcut.meta_values.version);}
     load_meta_print(&shortcut)
 }
 
@@ -284,7 +286,13 @@ fn shortcut_set_element (set_element: &AddressSpecs) -> Result<MetaShortCut, Err
             return Err(<Active>::faulty_metadata(MetadataError::Base58PrefixSpecsMismatch{specs: set_element.base58prefix, meta: prefix_from_meta}, MetadataSource::Incoming(IncomingMetadataSourceActive::Str(IncomingMetadataSourceActiveStr::Fetch{url: set_element.address.to_string()}))))
         }
     }
+    if shortcut.meta_values.warn_incomplete_extensions {warn(&shortcut.meta_values.name, shortcut.meta_values.version);}
     Ok(shortcut)
+}
+
+/// Print warning if the metadata (v14) has incomplete set of signed extensions
+fn warn(name: &str, version: u32) {
+    println!("Warning. Metadata {}{} has incomplete set of signed extensions, and could cause Signer to fail in parsing signable transactions using this metadata.", name, version);
 }
 
 /// Function to process .wasm files into signable entities and add metadata into the database

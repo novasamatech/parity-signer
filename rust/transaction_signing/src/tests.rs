@@ -1385,5 +1385,30 @@ Identities: "#;
         
         fs::remove_dir_all(dbname).unwrap();
     }
+    
+    #[test]
+    fn shell_no_token_warning_on_metadata() {
+        let dbname = "for_tests/shell_no_token_warning_on_metadata";
+        populate_cold_no_networks(dbname, Verifier(None)).unwrap();
+        
+        let line = fs::read_to_string("for_tests/add_specs_shell-sr25519_unverified.txt").unwrap();
+        let output = produce_output(&line.trim(), dbname);
+        if let Action::Stub(_, checksum, _) = output {handle_stub(checksum, dbname).unwrap();}
+        else {panic!("Wrong action: {:?}", output)}
+        
+        let line = fs::read_to_string("for_tests/load_metadata_shellV200_unverified.txt").unwrap();
+        let output = produce_output(&line.trim(), dbname);
+        
+        let reply_known = r##""warning":[{"index":0,"indent":0,"type":"warning","payload":"Received metadata has incomplete set of signed extensions. As a result, Signer may be unable to parse signable transactions using this metadata."},{"index":1,"indent":0,"type":"warning","payload":"Received network information is not verified."}],"meta":[{"index":2,"indent":0,"type":"meta","payload":{"specname":"shell","spec_version":"200","meta_hash":"65f0d394de10396c6c1800092f9a95c48ec1365d9302dbf5df736c5e0c54fde3","meta_id_pic":"89504e470d0a1a0a0000000d49484452000000410000004108060000008ef7c9450000035149444154789cedd83f6e134114c77142aa94b984cf4091928ec2e20048e928e8100d27a041741474913800724147998233f812295d05333f592f99ddccceeff7e6cfca49f65b3c1733d2ea7da4b59c9cecf7fb17cfbd59106e6e6e8a1f727e7e7e123ebad605a16669560f94a6083d971fd712a30942c9f2a7577fc21c767bf93a4c5f2d30aa104a96472900ab0402d5601423f400b0e68628422805403d115009840ba16679ab3782e5c190115a00a0b910900a212178003eac36610efbbe5d8779c88bb0597d0b73d87afb314c2d058222d402582a0403b05a423443c801580c4205b054882a0415007911582d11500e6212c103808e1d014d412411bc00e83120a014848cc0de612fc2db8b5d98c37e5d9f8579c88bb0dafc0c73d876fd2ecc6112820a60a9100cc052211880a54050841c80c52054008b41a800d618228b3006405e049617815582806288052174879002404f150119447384d492f152a9f371f1fddddf8b30879dbdba0ef3d02c082807c100ac7831f55e0ac05221a600900b01a52054002b5e30753f3ecf01580c22078006080c4029b5d4b878499617a134402c080b821381fd72f3226cdeacc21cb6febd0df39017e153e2f95fa3e74d2523a4002c158201582a0403b01884849003b018840a60310815c0ca417441607911580b426841081d25027b87bd085f360fef7f5edf9fcf828072100cc052211880a542e400908c8052102a80c52054008b413000e442607911585e84d21684d08210ba43400c82fdbdee45482d192f953a1f17df3fbdfa17e6b0dbcb97614e0780f071f87f02ca21a4002c15820158f162eabd148095839011720016835001ac78c1d4fdf83c07604d41744360a5961a172fc96a8a8052104f15c100d082101a20a031841781fd72f322fcd83dfc8e797f76ff1d53821003208a8072100cc052211880a5428c011045402a840a60310815c062100a009211585e049617414d46405e88c7809002409308c80371ec085300288b8054082f027b875b22e40050330494836000960aa102a06a04540ba102580ca2250092109007229717a1260500c908a805c45c082a007221583518bd113ccb5b4508a814a2274209002a46403d20e6064055085609460aa204a06679ab09825582515a8be5ada608564f8c96cb5b5d10c6d5a0f4587adc2c08c7de7f432abfac3577b5040000000049454e44ae426082"}}]"##;
+        let stub_nav_known = StubNav::LoadMeta(NetworkSpecsKey::from_parts(&hex::decode("a216666c2d1b8745bbeba02293b6dabbe30685ca29a25f481a82ef8443447258").unwrap(), &Encryption::Sr25519));
+        
+        if let Action::Stub(reply, _, stub_nav) = output {
+            assert!(reply == reply_known, "Error in parsing. Received: \n{}", reply);
+            assert!(stub_nav == stub_nav_known, "Expected: {:?}\nReceived: {:?}", stub_nav_known, stub_nav);
+        }
+        else {panic!("Wrong action: {:?}", output)}
+        
+        fs::remove_dir_all(dbname).unwrap();
+    }
 
 }
