@@ -98,7 +98,7 @@ fun AlertSelector(alert: SignerAlert, signerDataModel: SignerDataModel) {
 	when (alert) {
 		SignerAlert.Empty -> {}
 		SignerAlert.Error -> ErrorModal(
-			error = signerDataModel.screenData.value?.optString(
+			error = signerDataModel.alertData.value?.optString(
 				"error"
 			) ?: "unknown error", signerDataModel = signerDataModel
 		)
