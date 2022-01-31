@@ -47,22 +47,6 @@ fun SettingsScreen(signerDataModel: SignerDataModel) {
 				signerDataModel.totalRefresh()
 			}
 		) { SettingsCardTemplate(text = "Wipe signer", danger = true) }
-		Row(Modifier.clickable { signerDataModel.jailbreak() }
-		) { SettingsCardTemplate(text = "Wipe general certificate", danger = true) }
-		/*
-		Row {
-			Image(
-				signerDataModel.getHexIdenticon(
-					generalCertificate.value?.optString(
-						"hex"
-					) ?: "", 64
-				), "identicon", modifier = Modifier.scale(0.75f)
-			)
-			Column {
-				Text(generalCertificate.value?.optString("encryption") ?: "none")
-				Text(generalCertificate.value?.optString("hex") ?: "")
-			}
-		}*/
 		SettingsCardTemplate(
 			"Hardware seed protection: " + signerDataModel.isStrongBoxProtected()
 				.toString(), withIcon = false

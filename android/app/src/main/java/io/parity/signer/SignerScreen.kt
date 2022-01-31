@@ -6,10 +6,7 @@ import androidx.compose.runtime.Composable
 import io.parity.signer.modals.*
 import io.parity.signer.models.SignerDataModel
 import io.parity.signer.models.pushButton
-import io.parity.signer.screens.KeyManager
-import io.parity.signer.screens.RecoverSeedPhrase
-import io.parity.signer.screens.ScanScreen
-import io.parity.signer.screens.SettingsScreen
+import io.parity.signer.screens.*
 
 @ExperimentalAnimationApi
 @ExperimentalMaterialApi
@@ -64,7 +61,7 @@ fun ScreenSelector(screen: SignerScreen?, signerDataModel: SignerDataModel) {
 		SignerScreen.DeriveKey -> {
 			NewAddressScreen(signerDataModel = signerDataModel, increment = false)
 		}
-		SignerScreen.Verifier -> TODO()
+		SignerScreen.Verifier -> VerifierScreen(signerDataModel)
 		null -> WaitingScreen()
 		SignerScreen.ManageNetworks -> TODO()
 		SignerScreen.NetworkDetails -> TODO()
