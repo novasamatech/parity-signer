@@ -8,15 +8,20 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material.AlertDialog
+import androidx.compose.material.Button
 import androidx.compose.material.Text
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.unit.dp
 import io.parity.signer.ButtonID
+import io.parity.signer.components.Identicon
+import io.parity.signer.components.KeyCard
 import io.parity.signer.components.SettingsCardTemplate
 import io.parity.signer.models.SignerDataModel
+import io.parity.signer.models.abbreviateString
 import io.parity.signer.models.pushButton
 
 /**
@@ -26,6 +31,7 @@ import io.parity.signer.models.pushButton
  */
 @Composable
 fun SettingsScreen(signerDataModel: SignerDataModel) {
+	var confirm by remember { mutableStateOf(false) }
 
 	Column {
 		Row(Modifier.clickable { signerDataModel.pushButton(ButtonID.ManageNetworks) }) {
@@ -39,12 +45,20 @@ fun SettingsScreen(signerDataModel: SignerDataModel) {
 				Text("Verifier certificate")
 				Spacer(Modifier.weight(1f))
 			}
-			//VerifierCard
+			signerDataModel.screenData.value?.let {
+				Row {
+					Identicon(identicon = it.optString("identicon"))
+					Column {
+						Text("General verifier certificate")
+						Text(it.optString("hex").abbreviateString(8))
+						Text("encryption: " + it.optString("encryption"))
+					}
+				}
+			}
 		}
 		Row(
 			Modifier.clickable {
-				signerDataModel.wipe()
-				signerDataModel.totalRefresh()
+				confirm = true
 			}
 		) { SettingsCardTemplate(text = "Wipe signer", danger = true) }
 		Row(Modifier.clickable { signerDataModel.pushButton(ButtonID.ShowDocuments) }) {
@@ -55,5 +69,18 @@ fun SettingsScreen(signerDataModel: SignerDataModel) {
 				.toString(), withIcon = false
 		)
 		SettingsCardTemplate("Version: " + signerDataModel.getAppVersion(), withIcon = false)
+	}
+
+	if (confirm) {
+		AlertDialog(
+			onDismissRequest = { confirm = false },
+			buttons = {
+				Button(onClick = { confirm = false } ) { Text("Cancel") }
+				Button(onClick = { signerDataModel.wipe()
+					signerDataModel.totalRefresh() } ) { Text("Wipe") }
+			},
+			title = { Text("Wipe ALL data?") },
+			text = { Text("Factory reset the Signer app. This operation can not be reverted!") }
+		)
 	}
 }
