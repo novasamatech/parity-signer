@@ -11,7 +11,7 @@ use qrcode_static::png_qr_from_string;
 
 use crate::db_transactions::TrDbCold;
 use crate::helpers::{get_address_details, get_general_verifier, get_meta_values_by_name, get_meta_values_by_name_version, get_network_specs, get_valid_current_verifier, make_batch_clear_tree, open_db, open_tree, try_get_types};
-use crate::identities::{derivation_no_pwd_exists, get_all_addresses, get_addresses_by_seed_name, generate_random_phrase};
+use crate::identities::{derivation_check, DerivationCheck, get_all_addresses, get_addresses_by_seed_name, generate_random_phrase};
 use crate::network_details::get_all_networks;
 
 /// Function to print all seed names with identicons
@@ -237,20 +237,33 @@ pub fn derive_prep (database_name: &str, seed_name: &str, network_specs_key: &Ne
 
 /// Function to show (dynamically) if the derivation with the provided path and no password already exists
 /// and if it exists, prints its details
-pub fn dynamic_path_check (database_name: &str, seed_name: &str, path: &str, network_specs_key_hex: &str) -> Result<String, ErrorSigner> {
-    let network_specs_key = NetworkSpecsKey::from_hex(network_specs_key_hex)?;
-    match derivation_no_pwd_exists (seed_name, path, &network_specs_key, database_name)? {
-        Some((multisigner, _)) => {
-            let network_specs = get_network_specs(database_name, &network_specs_key)?;
-            let address_base58 = print_multisigner_as_base58(&multisigner, Some(network_specs.base58prefix));
-            let hex_identicon = match make_identicon_from_multisigner(&multisigner) {
-                Ok(a) => hex::encode(a),
-                Err(_) => String::new(),
-            };
-            Ok(format!("\"base58\":\"{}\",\"path\":\"{}\",\"has_pwd\":false,\"identicon\":\"{}\",\"seed_name\":\"{}\"", address_base58, path, hex_identicon, seed_name))
+pub fn dynamic_path_check (database_name: &str, seed_name: &str, path: &str, network_specs_key_hex: &str) -> String {
+    let content = match NetworkSpecsKey::from_hex(network_specs_key_hex) {
+        Ok(network_specs_key) => {
+            match get_network_specs(database_name, &network_specs_key) {
+                Ok(network_specs) => {
+                    match derivation_check (seed_name, path, &network_specs_key, database_name) {
+                        Ok(DerivationCheck::BadFormat) => String::from("\"button_good\":false"),
+                        Ok(DerivationCheck::Password) => String::from("\"button_good\":true,\"where_to\":\"pwd\""),
+                        Ok(DerivationCheck::NoPassword(None)) => String::from("\"button_good\":true,\"where_to\":\"pin\""),
+                        Ok(DerivationCheck::NoPassword(Some((multisigner, address_details)))) => {
+                            let address_base58 = print_multisigner_as_base58(&multisigner, Some(network_specs.base58prefix));
+                            let hex_identicon = match make_identicon_from_multisigner(&multisigner) {
+                                Ok(a) => hex::encode(a),
+                                Err(_) => String::new(),
+                            };
+                            let collision_display = format!("\"base58\":\"{}\",\"path\":\"{}\",\"has_pwd\":{},\"identicon\":\"{}\",\"seed_name\":\"{}\"", address_base58, address_details.path, address_details.has_pwd, hex_identicon, seed_name);
+                            format!("\"button_good\":false,\"collision\":{{{}}}", collision_display)
+                        },
+                        Err(e) => format!("\"error\":\"{}\"", <Signer>::show(&e)),
+                    }
+                },
+                Err(e) => format!("\"error\":\"{}\"", <Signer>::show(&e)),
+            }
         },
-        None => Ok(String::new()),
-    }
+        Err(e) => format!("\"error\":\"{}\"", <Signer>::show(&e)),
+    };
+    format!("\"derivation_check\":{{{}}}", content)
 }
 
 /// Print network specs and metadata set information for network with given network specs key.
@@ -455,7 +468,18 @@ mod tests {
         let dbname = "for_tests/derive_prep_alice_collided";
         populate_cold (dbname, Verifier(None)).unwrap();
         let network_specs_key = NetworkSpecsKey::from_parts(&hex::decode("e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e").unwrap(), &Encryption::Sr25519);
-        let print = derive_prep(dbname, "Alice", &network_specs_key, derivation_no_pwd_exists ("Alice", "//Alice", &network_specs_key, dbname).unwrap(), "//Alice").unwrap();
+        let mut collision = None;
+        for (multisigner, address_details) in addresses_set_seed_name_network(dbname, "Alice", &network_specs_key).unwrap().into_iter() {
+            if address_details.path == "//Alice" {
+                collision = Some((multisigner, address_details));
+                break;
+            }
+        }
+        let collision = match collision {
+            Some(a) => a,
+            None => panic!("Did not create address?"),
+        };
+        let print = derive_prep(dbname, "Alice", &network_specs_key, Some(collision), "//Alice").unwrap();
         let expected_print = r#""seed_name":"Alice","network_title":"Westend","network_logo":"westend","suggested_derivation":"//Alice","collision":{"base58":"5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY","path":"//Alice","has_pwd":false,"identicon":"89504e470d0a1a0a0000000d49484452000000410000004108060000008ef7c9450000030e49444154789cedda4d6a544114c571330e0eb286640782d8ee4090081964033d105c90e0a0379041c020b8035b047790aca10792715b87e644eb59afeeb9f5f1e86edf7f70320cf7075d83a44fb6dbedb3ffbd4910369b4df12f393b3b3b093fbad605a1e668ab1e284d117a1e3fac2546138492e3bf3ede868d7b737a15d6570b8c2a8492e3510a809540a01a8c62841e006c6a8822845200d413019540b8106a8e67bd1198074346680180a642402a8484e001f8717d1f36eee5cd45d85d5e842ff7d761e3de5edc84d552204c845a00a6425800ac254433841c00b3205400a6425421a800c88b60d51201e52046113c0068df11d0184412c10b800e0101a5206484d5e243d8b8e5fa63d85d5e84cbd7e761e3eebe3d84dde54558ac5661e3d6cb65d838094105602a8405c054080b80291026420e8059102a00b32054003684c8220c019017c1ca8b60558280fe869811424f08290074ac088810cd113e25de84f7156fc2cfc49bf0a2f24d603202ca4158004c85b000980a3106805c082805a102300b42056016440e00450816809217c1ca8b501a20668419c189f0ebf6316cdcf3abd3b0bbbc08ef16ff7e863fafff7c86bd08af2ecfc3c67dbf7b089b4f4648013015c202602a8405c02c08092107c02c08158059102a00cb417441b0f22258cd08a11921b4970847f926a01c8405c054080b80a91039002423a014840ac02c081580591016007221587911acbc08a5cd08a11921f484802c88a3ff7b02ca21a400980a61013015c202603908192107c02c08158059102a001b83e88660e545b06a8a805210c78a400034238422043484f0221cfcff22d11001e5202c00a64258004c851802201301a9102a00b3205400664128004846b0f222587911d46404e48538048414001a45401e887d471803405904a44278110ee67b8c48454039080b80a9102a00aa4640b5102a00b3205a0220090179207279116a5200908c805a404c85a002201702abc1e88de0399e1521a052889e082500a81801f580981a005521b0128c14440940cdf1ac09022bc128adc5f1ac2902eb89d1f278d60561580d4a8fa3874d82b0effd06a580bfac7347ad900000000049454e44ae426082","seed_name":"Alice"}"#;
         assert!(print == expected_print, "\nReceived: \n{}", print);
         fs::remove_dir_all(dbname).unwrap();
@@ -529,8 +553,8 @@ mod tests {
     fn path_is_known() {
         let dbname = "for_tests/path_is_known";
         populate_cold (dbname, Verifier(None)).unwrap();
-        let print = dynamic_path_check (dbname, "Alice", "//Alice", "0180e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e").unwrap();
-        let expected_print = r#""base58":"5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY","path":"//Alice","has_pwd":false,"identicon":"89504e470d0a1a0a0000000d49484452000000410000004108060000008ef7c9450000030e49444154789cedda4d6a544114c571330e0eb286640782d8ee4090081964033d105c90e0a0379041c020b8035b047790aca10792715b87e644eb59afeeb9f5f1e86edf7f70320cf7075d83a44fb6dbedb3ffbd4910369b4df12f393b3b3b093fbad605a1e668ab1e284d117a1e3fac2546138492e3bf3ede868d7b737a15d6570b8c2a8492e3510a809540a01a8c62841e006c6a8822845200d413019540b8106a8e67bd1198074346680180a642402a8484e001f8717d1f36eee5cd45d85d5e842ff7d761e3de5edc84d552204c845a00a6425800ac254433841c00b3205400a6425421a800c88b60d51201e52046113c0068df11d0184412c10b800e0101a5206484d5e243d8b8e5fa63d85d5e84cbd7e761e3eebe3d84dde54558ac5661e3d6cb65d838094105602a8405c054080b80291026420e8059102a00b32054003684c8220c019017c1ca8b60558280fe869811424f08290074ac088810cd113e25de84f7156fc2cfc49bf0a2f24d603202ca4158004c85b000980a3106805c082805a102300b42056016440e00450816809217c1ca8b501a20668419c189f0ebf6316cdcf3abd3b0bbbc08ef16ff7e863fafff7c86bd08af2ecfc3c67dbf7b089b4f4648013015c202602a8405c02c08092107c02c08158059102a00cb417441b0f22258cd08a11921b4970847f926a01c8405c054080b80a91039002423a014840ac02c081580591016007221587911acbc08a5cd08a11921f484802c88a3ff7b02ca21a400980a61013015c202603908192107c02c08158059102a001b83e88660e545b06a8a805210c78a400034238422043484f0221cfcff22d11001e5202c00a64258004c851802201301a9102a00b3205400664128004846b0f222587911d46404e48538048414001a45401e887d471803405904a44278110ee67b8c48454039080b80a9102a00aa4640b5102a00b3205a0220090179207279116a5200908c805a404c85a002201702abc1e88de0399e1521a052889e082500a81801f580981a005521b0128c14440940cdf1ac09022bc128adc5f1ac2902eb89d1f278d60561580d4a8fa3874d82b0effd06a580bfac7347ad900000000049454e44ae426082","seed_name":"Alice""#;
+        let print = dynamic_path_check (dbname, "Alice", "//Alice", "0180e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e");
+        let expected_print = r#""derivation_check":{"button_good":false,"collision":{"base58":"5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY","path":"//Alice","has_pwd":false,"identicon":"89504e470d0a1a0a0000000d49484452000000410000004108060000008ef7c9450000030e49444154789cedda4d6a544114c571330e0eb286640782d8ee4090081964033d105c90e0a0379041c020b8035b047790aca10792715b87e644eb59afeeb9f5f1e86edf7f70320cf7075d83a44fb6dbedb3ffbd4910369b4df12f393b3b3b093fbad605a1e668ab1e284d117a1e3fac2546138492e3bf3ede868d7b737a15d6570b8c2a8492e3510a809540a01a8c62841e006c6a8822845200d413019540b8106a8e67bd1198074346680180a642402a8484e001f8717d1f36eee5cd45d85d5e842ff7d761e3de5edc84d552204c845a00a6425800ac254433841c00b3205400a6425421a800c88b60d51201e52046113c0068df11d0184412c10b800e0101a5206484d5e243d8b8e5fa63d85d5e84cbd7e761e3eebe3d84dde54558ac5661e3d6cb65d838094105602a8405c054080b80291026420e8059102a00b32054003684c8220c019017c1ca8b60558280fe869811424f08290074ac088810cd113e25de84f7156fc2cfc49bf0a2f24d603202ca4158004c85b000980a3106805c082805a102300b42056016440e00450816809217c1ca8b501a20668419c189f0ebf6316cdcf3abd3b0bbbc08ef16ff7e863fafff7c86bd08af2ecfc3c67dbf7b089b4f4648013015c202602a8405c02c08092107c02c08158059102a00cb417441b0f22258cd08a11921b4970847f926a01c8405c054080b80a91039002423a014840ac02c081580591016007221587911acbc08a5cd08a11921f484802c88a3ff7b02ca21a400980a61013015c202603908192107c02c08158059102a001b83e88660e545b06a8a805210c78a400034238422043484f0221cfcff22d11001e5202c00a64258004c851802201301a9102a00b3205400664128004846b0f222587911d46404e48538048414001a45401e887d471803405904a44278110ee67b8c48454039080b80a9102a00aa4640b5102a00b3205a0220090179207279116a5200908c805a404c85a002201702abc1e88de0399e1521a052889e082500a81801f580981a005521b0128c14440940cdf1ac09022bc128adc5f1ac2902eb89d1f278d60561580d4a8fa3874d82b0effd06a580bfac7347ad900000000049454e44ae426082","seed_name":"Alice"}}"#;
         assert!(print == expected_print, "\nReceived: \n{}", print);
         fs::remove_dir_all(dbname).unwrap();
     }
@@ -539,8 +563,18 @@ mod tests {
     fn path_is_unknown() {
         let dbname = "for_tests/path_is_unknown";
         populate_cold (dbname, Verifier(None)).unwrap();
-        let print = dynamic_path_check (dbname, "Alice", "//secret", "0180e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e").unwrap();
-        let expected_print = r#""#;
+        let print = dynamic_path_check (dbname, "Alice", "//secret", "0180e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e");
+        let expected_print = r#""derivation_check":{"button_good":true,"where_to":"pin"}"#;
+        assert!(print == expected_print, "\nReceived: \n{}", print);
+        fs::remove_dir_all(dbname).unwrap();
+    }
+    
+    #[test]
+    fn path_is_unknown_passworded() {
+        let dbname = "for_tests/path_is_unknown_passworded";
+        populate_cold (dbname, Verifier(None)).unwrap();
+        let print = dynamic_path_check (dbname, "Alice", "//secret///abracadabra", "0180e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e");
+        let expected_print = r#""derivation_check":{"button_good":true,"where_to":"pwd"}"#;
         assert!(print == expected_print, "\nReceived: \n{}", print);
         fs::remove_dir_all(dbname).unwrap();
     }

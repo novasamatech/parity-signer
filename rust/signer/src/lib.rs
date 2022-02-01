@@ -73,19 +73,12 @@ export! {
 
     @Java_io_parity_signer_models_SignerDataModel_substratePathCheck
     fn path_check(
-        path: &str
-    ) -> anyhow::Result<bool, anyhow::Error> {
-        db_handling::identities::check_derivation_format(path).map_err(|e| e.anyhow())
-    }
-
-    @Java_io_parity_signer_models_SignerDataModel_dynamicPathCheck
-    fn dynamic_path_check(
         seed_name: &str,
         path: &str,
         network: &str,
         dbname: &str
-    ) -> anyhow::Result<String, anyhow::Error> {
-        db_handling::interface_signer::dynamic_path_check(dbname, seed_name, path, network).map_err(|e| e.anyhow())
+    ) -> String {
+        db_handling::interface_signer::dynamic_path_check(dbname, seed_name, path, network)
     }
 
     @Java_io_parity_signer_models_SignerDataModel_substrateValidateSeedphrase
