@@ -3,6 +3,7 @@ package io.parity.signer
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.runtime.Composable
+import io.parity.signer.components.Documents
 import io.parity.signer.modals.*
 import io.parity.signer.models.SignerDataModel
 import io.parity.signer.models.pushButton
@@ -27,7 +28,7 @@ fun ScreenSelector(screen: SignerScreen?, signerDataModel: SignerDataModel) {
 		SignerScreen.Log -> {
 			HistoryScreen(signerDataModel = signerDataModel)
 		}
-		SignerScreen.LogDetails -> TODO()
+		SignerScreen.LogDetails -> LogDetails(signerDataModel = signerDataModel)
 		SignerScreen.Transaction -> {
 			TransactionPreview(
 				signerDataModel::pushButton,
@@ -63,11 +64,11 @@ fun ScreenSelector(screen: SignerScreen?, signerDataModel: SignerDataModel) {
 		}
 		SignerScreen.Verifier -> VerifierScreen(signerDataModel)
 		null -> WaitingScreen()
-		SignerScreen.ManageNetworks -> TODO()
-		SignerScreen.NetworkDetails -> TODO()
-		SignerScreen.SignSufficientCrypto -> TODO()
-		SignerScreen.SelectSeedForBackup -> TODO()
-		SignerScreen.Documents -> TODO()
+		SignerScreen.ManageNetworks -> ManageNetworks(signerDataModel = signerDataModel)
+		SignerScreen.NetworkDetails -> NetworkDetails(signerDataModel = signerDataModel)
+		SignerScreen.SignSufficientCrypto -> SignSufficientCrypto(signerDataModel = signerDataModel)
+		SignerScreen.SelectSeedForBackup -> SelectSeedForBackup(signerDataModel = signerDataModel)
+		SignerScreen.Documents -> Documents()
 	}
 }
 

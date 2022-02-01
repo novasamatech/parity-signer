@@ -47,6 +47,9 @@ fun SettingsScreen(signerDataModel: SignerDataModel) {
 				signerDataModel.totalRefresh()
 			}
 		) { SettingsCardTemplate(text = "Wipe signer", danger = true) }
+		Row(Modifier.clickable { signerDataModel.pushButton(ButtonID.ShowDocuments) }) {
+			SettingsCardTemplate(text = "About")
+		}
 		SettingsCardTemplate(
 			"Hardware seed protection: " + signerDataModel.isStrongBoxProtected()
 				.toString(), withIcon = false
