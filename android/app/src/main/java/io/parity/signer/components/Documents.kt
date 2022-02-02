@@ -1,6 +1,8 @@
 package io.parity.signer.components
 
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -10,7 +12,9 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import io.parity.signer.ui.theme.Text600
 import io.parity.signer.ui.theme.Typography
 
 //TODO: everything
@@ -35,19 +39,21 @@ fun Documents() {
 		Column(
 			Modifier
 				.verticalScroll(rememberScrollState())
-				.padding(20.dp)) {
+				.padding(20.dp)
+		) {
 			when (document) {
 				0 -> {
 					InstructionsSquare()
-					Text("Terms and conditions here")
+					TAC()
 				}
 				1 -> {
-					Text("Privacy policy")
+					PP()
 				}
 				else -> {
 					Text("document selection error")
 				}
 			}
+			Spacer(Modifier.height(150.dp))
 		}
 	}
 }
