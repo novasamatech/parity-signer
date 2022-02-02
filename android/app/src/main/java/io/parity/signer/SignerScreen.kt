@@ -69,6 +69,7 @@ fun ScreenSelector(screen: SignerScreen?, signerDataModel: SignerDataModel) {
 		SignerScreen.SignSufficientCrypto -> SignSufficientCrypto(signerDataModel = signerDataModel)
 		SignerScreen.SelectSeedForBackup -> SelectSeedForBackup(signerDataModel = signerDataModel)
 		SignerScreen.Documents -> Documents()
+		SignerScreen.KeyDetailsMulti -> KeyDetailsMulti(signerDataModel = signerDataModel)
 	}
 }
 
@@ -91,6 +92,7 @@ fun ModalSelector(modal: SignerModal, signerDataModel: SignerDataModel) {
 		SignerModal.TypesInfo -> TypesInfo(signerDataModel = signerDataModel)
 		SignerModal.NewSeedBackup -> NewSeedBackup(signerDataModel = signerDataModel)
 		SignerModal.LogComment -> LogComment(signerDataModel = signerDataModel)
+		SignerModal.SelectSeed -> SelectSeed(signerDataModel = signerDataModel)
 	}
 }
 
@@ -130,7 +132,8 @@ enum class SignerScreen {
 	NetworkDetails,
 	SignSufficientCrypto,
 	SelectSeedForBackup,
-	Documents;
+	Documents,
+	KeyDetailsMulti;
 }
 
 enum class SignerModal {
@@ -149,7 +152,8 @@ enum class SignerModal {
 	KeyDetailsAction,
 	TypesInfo,
 	NewSeedBackup,
-	LogComment;
+	LogComment,
+	SelectSeed;
 }
 
 enum class SignerAlert {

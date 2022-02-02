@@ -22,7 +22,6 @@ fun SeedManager(signerDataModel: SignerDataModel) {
 		?: JSONArray()
 
 	LazyColumn {
-		//keys should be defined already, can't panic
 		items(cards.length()) { item ->
 			Row(
 				Modifier
@@ -32,12 +31,6 @@ fun SeedManager(signerDataModel: SignerDataModel) {
 				Row(
 					Modifier
 						.clickable {
-							Log.d(
-								"clicked seed",
-								cards
-									.getJSONObject(item)
-									.getString("seed_name")
-							)
 							signerDataModel.pushButton(
 								ButtonID.SelectSeed,
 								details = cards
