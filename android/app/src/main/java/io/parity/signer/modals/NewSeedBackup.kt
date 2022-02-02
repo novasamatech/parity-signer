@@ -20,6 +20,7 @@ import io.parity.signer.components.BigButton
 import io.parity.signer.models.SignerDataModel
 import io.parity.signer.models.addSeed
 import io.parity.signer.models.pushButton
+import io.parity.signer.ui.theme.Action600
 import io.parity.signer.ui.theme.Bg200
 import io.parity.signer.ui.theme.Crypto400
 import io.parity.signer.ui.theme.CryptoTypography

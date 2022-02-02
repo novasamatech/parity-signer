@@ -16,6 +16,7 @@ import io.parity.signer.models.SignerDataModel
 import io.parity.signer.ui.theme.ParitySignerTheme
 import io.parity.signer.components.BottomBar
 import io.parity.signer.components.TopBar
+import io.parity.signer.screens.LandingView
 
 @ExperimentalMaterialApi
 @ExperimentalAnimationApi
@@ -88,25 +89,7 @@ fun SignerApp(signerDataModel: SignerDataModel) {
 				}
 			}
 			OnBoardingState.No -> {
-				//TODO: onboarding
-				AlertDialog(
-					onDismissRequest = { /*TODO: make sure it is nothing*/ },
-					buttons = {
-						Button(
-							colors = ButtonDefaults.buttonColors(
-								backgroundColor = MaterialTheme.colors.background,
-								contentColor = MaterialTheme.colors.onBackground,
-							),
-							onClick = {
-								signerDataModel.onBoard()
-							}
-						) {
-							Text("Accept")
-						}
-					},
-					title = { Text("Terms and conditions") },
-					text = { Text(onBoardingDone.value.toString()) }
-				)
+				LandingView(signerDataModel = signerDataModel)
 			}
 			OnBoardingState.InProgress -> {
 				if (authenticated.value == true) {
