@@ -17,6 +17,7 @@ import io.parity.signer.ui.theme.ParitySignerTheme
 import io.parity.signer.components.BottomBar
 import io.parity.signer.components.TopBar
 import io.parity.signer.screens.LandingView
+import io.parity.signer.ui.theme.Text600
 
 @ExperimentalMaterialApi
 @ExperimentalAnimationApi
@@ -49,6 +50,7 @@ fun SignerApp(signerDataModel: SignerDataModel) {
 		val signerScreen = signerDataModel.screen.observeAsState()
 		val signerModal = signerDataModel.modal.observeAsState()
 		val signerAlert = signerDataModel.alert.observeAsState()
+		val shieldAlert = signerDataModel.alertState.observeAsState()
 
 		when (onBoardingDone.value) {
 			OnBoardingState.Yes -> {
@@ -89,7 +91,11 @@ fun SignerApp(signerDataModel: SignerDataModel) {
 				}
 			}
 			OnBoardingState.No -> {
-				LandingView(signerDataModel = signerDataModel)
+				if (shieldAlert.value == ShieldAlert.None) {
+					LandingView(signerDataModel = signerDataModel)
+				} else {
+					Text("Please enable airplane mode", color = Text600)
+				}
 			}
 			OnBoardingState.InProgress -> {
 				if (authenticated.value == true) {
