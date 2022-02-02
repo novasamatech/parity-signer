@@ -85,12 +85,12 @@ fun ModalSelector(modal: SignerModal, signerDataModel: SignerDataModel) {
 		SignerModal.EnterPassword -> EnterPassword(signerDataModel = signerDataModel)
 		SignerModal.LogRight -> LogMenu(signerDataModel = signerDataModel)
 		SignerModal.NetworkDetailsMenu -> NetworkDetailsMenu(signerDataModel = signerDataModel)
-		SignerModal.ManageMetadata -> TODO()
-		SignerModal.SufficientCryptoReady -> TODO()
-		SignerModal.KeyDetailsAction -> TODO()
-		SignerModal.TypesInfo -> TODO()
+		SignerModal.ManageMetadata -> ManageMetadata(signerDataModel = signerDataModel)
+		SignerModal.SufficientCryptoReady -> SufficientCryptoReady(signerDataModel = signerDataModel)
+		SignerModal.KeyDetailsAction -> KeyDetailsAction(signerDataModel = signerDataModel)
+		SignerModal.TypesInfo -> TypesInfo(signerDataModel = signerDataModel)
 		SignerModal.NewSeedBackup -> NewSeedBackup(signerDataModel = signerDataModel)
-		SignerModal.LogComment -> TODO()
+		SignerModal.LogComment -> LogComment(signerDataModel = signerDataModel)
 	}
 }
 
@@ -104,7 +104,7 @@ fun AlertSelector(alert: SignerAlert, signerDataModel: SignerDataModel) {
 			) ?: "unknown error", signerDataModel = signerDataModel
 		)
 		SignerAlert.Shield -> ShieldAlert(signerDataModel)
-		SignerAlert.Confirm -> TODO()
+		SignerAlert.Confirm -> Confirm(signerDataModel = signerDataModel)
 	}
 }
 

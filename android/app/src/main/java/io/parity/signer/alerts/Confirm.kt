@@ -2,13 +2,15 @@ package io.parity.signer.modals
 
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable
+import io.parity.signer.ButtonID
 import io.parity.signer.models.SignerDataModel
+import io.parity.signer.models.pushButton
 
 @Composable
-fun KeyDelete(signerDataModel: SignerDataModel) {
+fun Confirm(signerDataModel: SignerDataModel) {
 
 	AlertDialog(
-		onDismissRequest = {  },
+		onDismissRequest = { signerDataModel.pushButton(ButtonID.GoBack) },
 		buttons = {
 			Button(
 				colors = ButtonDefaults.buttonColors(
@@ -16,7 +18,7 @@ fun KeyDelete(signerDataModel: SignerDataModel) {
 					contentColor = MaterialTheme.colors.onBackground,
 				),
 				onClick = {
-
+					signerDataModel.pushButton(ButtonID.GoBack)
 				}
 			) {
 				Text("Cancel")
@@ -27,13 +29,13 @@ fun KeyDelete(signerDataModel: SignerDataModel) {
 					contentColor = MaterialTheme.colors.onBackground,
 				),
 				onClick = {
+					signerDataModel.pushButton(ButtonID.GoForward)
 				}
 			) {
-				Text("Delete")
+				Text("Approve")
 			}
 		},
-		title = { Text("Delete key?") },
-		text = { Text("Are you sure you want to remove key?") }
-	//TODO: special message for roots!
+		title = { Text("Please confirm") },
+		text = { }
 	)
 }

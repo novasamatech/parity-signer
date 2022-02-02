@@ -10,25 +10,19 @@ import io.parity.signer.components.BigButton
 import io.parity.signer.components.HeaderBar
 import io.parity.signer.models.SignerDataModel
 import io.parity.signer.models.pushButton
-import io.parity.signer.models.removeSeed
 import io.parity.signer.ui.theme.Bg000
 
 @Composable
-fun NetworkDetailsMenu(signerDataModel: SignerDataModel) {
+fun KeyDetailsAction(signerDataModel: SignerDataModel) {
 	var confirm by remember { mutableStateOf(false) }
 
 	Column {
 		Spacer(Modifier.weight(1f))
 		Surface(color = Bg000, shape = MaterialTheme.shapes.large) {
 			Column {
-				HeaderBar(line1 = "MANAGE NETWORK", line2 = "Select action")
+				HeaderBar(line1 = "KEY MENU", line2 = "Select action")
 				BigButton(
-					text = "Sign network specs",
-					isShaded = true,
-					isCrypto = true,
-					action = { signerDataModel.pushButton(ButtonID.SignNetworkSpecs) })
-				BigButton(
-					text = "Delete network",
+					text = "Forget this key forever",
 					isShaded = true,
 					isDangerous = true,
 					action = {
@@ -43,14 +37,14 @@ fun NetworkDetailsMenu(signerDataModel: SignerDataModel) {
 			onDismissRequest = { confirm = false },
 			buttons = {
 				Button(onClick = { confirm = false }) { Text("Cancel") }
-				Button(onClick = { signerDataModel.pushButton(ButtonID.RemoveNetwork) }) {
+				Button(onClick = { signerDataModel.pushButton(ButtonID.RemoveKey) }) {
 					Text(
-						"Remove network"
+						"Remove key"
 					)
 				}
 			},
-			title = { Text("Remove network?") },
-			text = { Text("This network will be removed for whole device") }
+			title = { Text("Forget this key?") },
+			text = { Text("This key will be removed for this network. Are you sure?") }
 		)
 	}
 }
