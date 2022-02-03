@@ -84,7 +84,7 @@ fun CameraModal(signerDataModel: SignerDataModel) {
 				Modifier
 					.padding(bottom = 24.dp)
 					.border(
-						BorderStroke(1.dp, Crypto400),
+						BorderStroke(1.dp, MaterialTheme.colors.Crypto400),
 						RoundedCornerShape(8.dp)
 					)
 					.clip(RoundedCornerShape(8.dp))

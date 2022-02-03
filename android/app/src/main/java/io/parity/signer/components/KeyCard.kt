@@ -45,7 +45,7 @@ fun KeyCard(identity: JSONObject, signerDataModel: SignerDataModel) {
 			}
 			Text(
 				identity.optString("base58").abbreviateString(8),
-				color = Text300,
+				color = MaterialTheme.colors.Text300,
 				style = CryptoTypography.body2
 			)
 		}

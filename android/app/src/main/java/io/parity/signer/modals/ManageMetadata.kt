@@ -24,7 +24,7 @@ fun ManageMetadata(signerDataModel: SignerDataModel) {
 
 	Column {
 		Spacer(Modifier.weight(1f))
-		Surface(color = Bg000, shape = MaterialTheme.shapes.large) {
+		Surface(color = MaterialTheme.colors.Bg000, shape = MaterialTheme.shapes.large) {
 			Column {
 				HeaderBar(line1 = "MANAGE METADATA", line2 = "Select action")
 				MetadataCard(content)

@@ -35,7 +35,7 @@ fun SeedCard(
 		Column {
 			Text(
 				seedName,
-				color = Text600,
+				color = MaterialTheme.colors.Text600,
 				style = MaterialTheme.typography.subtitle1
 			)
 			if (showAddress) {

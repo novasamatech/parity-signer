@@ -29,7 +29,7 @@ fun KeySelector(signerDataModel: SignerDataModel) {
 				verticalAlignment = Alignment.CenterVertically,
 				modifier = Modifier
 					.padding(top = 3.dp, start = 12.dp, end = 12.dp)
-					.background(Bg200)
+					.background(MaterialTheme.colors.Bg200)
 			) {
 				Row(
 					verticalAlignment = Alignment.CenterVertically,

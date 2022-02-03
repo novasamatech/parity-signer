@@ -1,5 +1,6 @@
 package io.parity.signer.components
 
+import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import io.parity.signer.ui.theme.Text600
@@ -238,6 +239,6 @@ Statutory information
 - Registered Number: 09760015
 - Registered Office: Ignition Law, Moray House Floor 1, 23-31 Great Titchfield Street, London, United Kingdom, WC1W 7PA.
 						""",
-		style = Typography.body1, color = Text600
+		style = Typography.body1, color = MaterialTheme.colors.Text600
 	)
 }

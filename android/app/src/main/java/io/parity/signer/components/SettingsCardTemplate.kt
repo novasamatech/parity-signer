@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.Icon
+import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ChevronRight
@@ -30,7 +31,7 @@ fun SettingsCardTemplate(
 			.padding(20.dp)
 			.background(
 				color = if (withBackground) {
-					Bg200
+					MaterialTheme.colors.Bg200
 				} else {
 					Color(0x00000000)
 				}
@@ -38,9 +39,9 @@ fun SettingsCardTemplate(
 	) {
 		Text(
 			text, style = Typography.body1, color = if (danger) {
-				SignalDanger
+				MaterialTheme.colors.SignalDanger
 			} else {
-				Text400
+				MaterialTheme.colors.Text400
 			}, modifier = Modifier.padding(8.dp)
 		)
 		Spacer(Modifier.weight(1f))
@@ -48,7 +49,7 @@ fun SettingsCardTemplate(
 			Icon(
 				Icons.Default.ChevronRight,
 				"go forward",
-				tint = Border400,
+				tint = MaterialTheme.colors.Border400,
 				modifier = Modifier.padding(8.dp)
 			)
 		}

@@ -41,7 +41,7 @@ fun PasswordConfirm(signerDataModel: SignerDataModel) {
 	val focusRequester = remember { FocusRequester() }
 
 	Surface(
-		color = Bg200,
+		color = MaterialTheme.colors.Bg200,
 		shape = MaterialTheme.shapes.large,
 		modifier = Modifier.fillMaxSize(1f)
 	) {

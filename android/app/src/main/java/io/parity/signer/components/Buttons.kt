@@ -16,10 +16,10 @@ fun BigButton(
 	action: () -> Unit,
 	isDisabled: Boolean = false
 ) {
-	val accentColor = if (isCrypto) Crypto400 else Action400
-	val bgColor = if (isDisabled) Bg200 else if (isShaded) Bg300 else accentColor
+	val accentColor = if (isCrypto) MaterialTheme.colors.Crypto400 else MaterialTheme.colors.Action400
+	val bgColor = if (isDisabled) MaterialTheme.colors.Bg200 else if (isShaded) MaterialTheme.colors.Bg300 else accentColor
 	val fgColor =
-		if (isDisabled) Text300 else if (isShaded) if (isDangerous) SignalDanger else accentColor else Action600
+		if (isDisabled) MaterialTheme.colors.Text300 else if (isShaded) if (isDangerous) MaterialTheme.colors.SignalDanger else accentColor else MaterialTheme.colors.Action600
 
 	Button(
 		onClick = action,

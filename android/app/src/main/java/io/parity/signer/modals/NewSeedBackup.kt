@@ -30,14 +30,14 @@ fun NewSeedBackup(signerDataModel: SignerDataModel) {
 	val confirmBackup = remember { mutableStateOf(false) }
 	val createRoots = remember { mutableStateOf(true) }
 	Surface(
-		color = Bg200,
+		color = MaterialTheme.colors.Bg200,
 		shape = MaterialTheme.shapes.large
 	) {
 		Column(Modifier.padding(horizontal = 8.dp)) {
 			Text(
 				signerDataModel.modalData.value?.optString("seed_phrase") ?: "",
 				style = CryptoTypography.body1,
-				color = Crypto400
+				color = MaterialTheme.colors.Crypto400
 			)
 			Row(Modifier.toggleable(
 				value = confirmBackup.value,

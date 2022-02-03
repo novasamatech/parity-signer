@@ -26,7 +26,7 @@ fun LandingView(signerDataModel: SignerDataModel) {
 		}
 		Column(Modifier.padding(horizontal = 20.dp)) {
 			Spacer(Modifier.weight(1f))
-			Surface(color = Bg000) {
+			Surface(color = MaterialTheme.colors.Bg000) {
 				Column {
 					Spacer(Modifier.height(16.dp))
 					Row(
@@ -40,7 +40,7 @@ fun LandingView(signerDataModel: SignerDataModel) {
 							checked = tacAccept,
 							onCheckedChange = null
 						)
-						Text("I agree to the terms and conditions", color = Action400)
+						Text("I agree to the terms and conditions", color = MaterialTheme.colors.Action400)
 						Spacer(Modifier.weight(1f))
 					}
 					Spacer(Modifier.height(16.dp))
@@ -55,7 +55,7 @@ fun LandingView(signerDataModel: SignerDataModel) {
 							checked = ppAccept,
 							onCheckedChange = null
 						)
-						Text("I agree to the privacy policy", color = Action400)
+						Text("I agree to the privacy policy", color = MaterialTheme.colors.Action400)
 						Spacer(Modifier.weight(1f))
 					}
 					Spacer(Modifier.height(16.dp))

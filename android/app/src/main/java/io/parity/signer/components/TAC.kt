@@ -1,5 +1,6 @@
 package io.parity.signer.components
 
+import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import io.parity.signer.ui.theme.Text600
@@ -207,6 +208,6 @@ For the purpose of this appendix 1, "**Appstore Provider**" means the provider o
 If the Appstore Provider is Apple, you acknowledge and agree that Apple and its subsidiaries are third party beneficiaries to this EULA. Upon your acceptance of this EULA, Apple will have the right to enforce the EULA against you as a third party beneficiary.
 
 						""",
-		style = Typography.body1, color = Text600
+		style = Typography.body1, color = MaterialTheme.colors.Text600
 	)
 }

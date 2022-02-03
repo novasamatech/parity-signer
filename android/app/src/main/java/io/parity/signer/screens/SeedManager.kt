@@ -5,6 +5,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Modifier
@@ -26,7 +27,7 @@ fun SeedManager(signerDataModel: SignerDataModel) {
 			Row(
 				Modifier
 					.padding(top = 3.dp, start = 12.dp, end = 12.dp)
-					.background(Bg200)
+					.background(MaterialTheme.colors.Bg200)
 			) {
 				Row(
 					Modifier

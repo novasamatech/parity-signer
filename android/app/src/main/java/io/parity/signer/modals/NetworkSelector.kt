@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.Icon
+import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
@@ -37,7 +38,7 @@ fun NetworkSelector(signerDataModel: SignerDataModel) {
 			Column(
 				Modifier
 					.weight(1f)
-					.background(Bg000)
+					.background(MaterialTheme.colors.Bg000)
 			) {
 				HeaderBar(line1 = "NETWORK", line2 = "Select network")
 				LazyColumn {
@@ -54,7 +55,7 @@ fun NetworkSelector(signerDataModel: SignerDataModel) {
 								Icon(
 									Icons.Default.Check,
 									"this network is selected",
-									tint = Action400
+									tint = MaterialTheme.colors.Action400
 								)
 							}
 						}

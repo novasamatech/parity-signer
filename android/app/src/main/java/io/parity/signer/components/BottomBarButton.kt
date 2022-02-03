@@ -34,14 +34,14 @@ fun BottomBarButton(
 ) {
 	val selected = signerDataModel.footerButton.observeAsState().value == buttonID.getName()
 	val tint = if (selected) {
-		Text600
+		MaterialTheme.colors.Text600
 	} else {
-		Text300
+		MaterialTheme.colors.Text300
 	}
 	val color = if (selected) {
-		Text600
+		MaterialTheme.colors.Text600
 	} else {
-		Text400
+		MaterialTheme.colors.Text400
 	}
 	IconButton(
 		onClick = {

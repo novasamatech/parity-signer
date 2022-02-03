@@ -24,13 +24,13 @@ fun SelectSeed(signerDataModel: SignerDataModel) {
 	val cards = signerDataModel.screenData.value?.getJSONArray("seedNameCards")
 		?: JSONArray()
 
-	Surface(color = Bg100, shape = MaterialTheme.shapes.large) {
+	Surface(color = MaterialTheme.colors.Bg100, shape = MaterialTheme.shapes.large) {
 		LazyColumn {
 			items(cards.length()) { item ->
 				Row(
 					Modifier
 						.padding(top = 3.dp, start = 12.dp, end = 12.dp)
-						.background(Bg200)
+						.background(MaterialTheme.colors.Bg200)
 				) {
 					Row(
 						Modifier

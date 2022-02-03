@@ -20,7 +20,7 @@ fun BottomBar(
 	signerDataModel: SignerDataModel,
 ) {
 	BottomAppBar (
-		backgroundColor = Bg000,
+		backgroundColor = MaterialTheme.colors.Bg000,
 		elevation = 0.dp,
 		modifier = Modifier.height(57.dp)) {
 		Spacer(Modifier.weight(1f))

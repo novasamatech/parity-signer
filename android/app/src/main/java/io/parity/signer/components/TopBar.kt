@@ -25,7 +25,7 @@ fun TopBar(signerDataModel: SignerDataModel) {
 	val rightButton = signerDataModel.rightButton.observeAsState()
 
 	TopAppBar(
-		backgroundColor = Bg100
+		backgroundColor = MaterialTheme.colors.Bg100
 	) {
 		Row(
 			horizontalArrangement = Arrangement.Start,
@@ -34,8 +34,8 @@ fun TopBar(signerDataModel: SignerDataModel) {
 			if (backButton.value == true) {
 				Button(
 					colors = buttonColors(
-						contentColor = Text500,
-						backgroundColor = Bg100
+						contentColor = MaterialTheme.colors.Text500,
+						backgroundColor = MaterialTheme.colors.Bg100
 					),
 					onClick = {
 						signerDataModel.pushButton(ButtonID.GoBack)

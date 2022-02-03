@@ -47,7 +47,7 @@ fun KeyManager(signerDataModel: SignerDataModel) {
 					signerDataModel.pushButton(ButtonID.SelectKey, "")
 				}
 				.padding(top = 3.dp, start = 12.dp, end = 12.dp)
-				.background(Bg200)
+				.background(MaterialTheme.colors.Bg200)
 				.fillMaxWidth()
 		) {
 			SeedCard(
@@ -62,7 +62,7 @@ fun KeyManager(signerDataModel: SignerDataModel) {
 			onClick = { signerDataModel.pushButton(ButtonID.NetworkSelector) },
 			modifier = Modifier
 				.padding(top = 3.dp, start = 12.dp, end = 12.dp)
-				.background(Bg200)
+				.background(MaterialTheme.colors.Bg200)
 				.fillMaxWidth()
 		) {
 			Row {

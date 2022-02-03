@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Modifier
@@ -24,7 +25,7 @@ fun TransactionPreviewField(transaction: JSONArray) {
 			.aspectRatio(1f)
 			.padding(8.dp)
 			.border(
-				BorderStroke(1.dp, Crypto400),
+				BorderStroke(1.dp, MaterialTheme.colors.Crypto400),
 				RoundedCornerShape(8.dp)
 			)
 			.clip(RoundedCornerShape(8.dp))

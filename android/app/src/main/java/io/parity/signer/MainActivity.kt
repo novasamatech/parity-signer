@@ -94,7 +94,7 @@ fun SignerApp(signerDataModel: SignerDataModel) {
 				if (shieldAlert.value == ShieldAlert.None) {
 					LandingView(signerDataModel = signerDataModel)
 				} else {
-					Text("Please enable airplane mode", color = Text600)
+					Text("Please enable airplane mode", color = MaterialTheme.colors.Text600)
 				}
 			}
 			OnBoardingState.InProgress -> {

@@ -19,7 +19,7 @@ fun NetworkDetailsMenu(signerDataModel: SignerDataModel) {
 
 	Column {
 		Spacer(Modifier.weight(1f))
-		Surface(color = Bg000, shape = MaterialTheme.shapes.large) {
+		Surface(color = MaterialTheme.colors.Bg000, shape = MaterialTheme.shapes.large) {
 			Column {
 				HeaderBar(line1 = "MANAGE NETWORK", line2 = "Select action")
 				BigButton(

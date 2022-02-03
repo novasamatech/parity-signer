@@ -27,7 +27,7 @@ fun SeedBackup(signerDataModel: SignerDataModel) {
 	var derivations =
 		signerDataModel.modalData.value?.optJSONArray("derivations") ?: JSONArray()
 
-	Surface(color = Bg200, shape = MaterialTheme.shapes.large) {
+	Surface(color = MaterialTheme.colors.Bg200, shape = MaterialTheme.shapes.large) {
 		Column {
 			HeaderBar("Backup", seedName)
 			Text("SEED PHRASE")
@@ -50,7 +50,7 @@ fun SeedBackup(signerDataModel: SignerDataModel) {
 											Text(it.optString("path"))
 											if (it.optBoolean("has_pwd")) {
 												Text("///")
-												Icon(Icons.Default.Lock, "Password protected", tint = Crypto400)
+												Icon(Icons.Default.Lock, "Password protected", tint = MaterialTheme.colors.Crypto400)
 											}
 										}
 									}
@@ -72,7 +72,7 @@ fun SeedBackup(signerDataModel: SignerDataModel) {
 				}
 			}
 		} else {
-			seedPhrase == "Seed phrase is not available now"
+			seedPhrase = "Seed phrase is not available now"
 			error = true
 		}
 		onDispose { seedPhrase = "" }
