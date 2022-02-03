@@ -51,8 +51,7 @@ fun EnterPassword(signerDataModel: SignerDataModel) {
 		) {
 			HeaderBar(line1 = "SECRET PATH", line2 = "///password")
 			KeyCard(
-				identity = content.optJSONObject("author_info") ?: JSONObject(),
-				signerDataModel = signerDataModel
+				identity = content.optJSONObject("author_info") ?: JSONObject()
 			)
 			if (content.optInt("counter") > 0) {
 				Text("Attempt " + content.optInt("counter").toString() + " of 3")

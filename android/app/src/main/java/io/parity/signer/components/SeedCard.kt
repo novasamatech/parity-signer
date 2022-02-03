@@ -23,8 +23,7 @@ fun SeedCard(
 	seedName: String,
 	identicon: String,
 	base58: String = "",
-	showAddress: Boolean = false,
-	signerDataModel: SignerDataModel
+	showAddress: Boolean = false
 ) {
 	Row(
 		modifier = Modifier

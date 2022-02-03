@@ -26,7 +26,7 @@ fun TransactionPreview(
 	Column {
 		TransactionPreviewField(transaction = transaction)
 		signerDataModel.screenData.value!!.getJSONObject("author_info").let {
-			KeyCard(identity = it, signerDataModel = signerDataModel)
+			KeyCard(identity = it)
 		}
 		signerDataModel.screenData.value!!.getJSONObject("network_info").let {
 			NetworkCard(network = it)

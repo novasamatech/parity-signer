@@ -43,8 +43,7 @@ fun SeedManager(signerDataModel: SignerDataModel) {
 				) {
 					SeedCard(
 						seedName = cards.getJSONObject(item).getString("seed_name"),
-						identicon = cards.getJSONObject(item).getString("identicon"),
-						signerDataModel = signerDataModel
+						identicon = cards.getJSONObject(item).getString("identicon")
 					)
 				}
 			}

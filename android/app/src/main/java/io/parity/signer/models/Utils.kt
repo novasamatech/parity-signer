@@ -1,6 +1,7 @@
 package io.parity.signer.models
 
 import android.graphics.BitmapFactory
+import android.util.Log
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asImageBitmap
 import org.json.JSONArray
@@ -74,13 +75,26 @@ fun sortHistory(array: JSONArray): JSONArray {
  */
 fun String.intoImageBitmap(): ImageBitmap {
 	val picture = this.decodeHex()
-	return BitmapFactory.decodeByteArray(picture, 0, picture.size).asImageBitmap()
+	return try {
+		BitmapFactory.decodeByteArray(picture, 0, picture.size).asImageBitmap()
+	} catch (e: java.lang.Exception) {
+		Log.d("image decoding error", e.toString())
+		ImageBitmap(1, 1)
+	}
 }
 
 fun JSONArray.toListOfStrings(): List<String> {
 	var output = emptyList<String>()
 	for(i in 0 until this.length()) {
 		output += this.getString(i)
+	}
+	return output
+}
+
+fun JSONArray.toListOfJSONObjects(): List<JSONObject> {
+	var output = emptyList<JSONObject>()
+	for(i in 0 until this.length()) {
+		output += this.getJSONObject(i)
 	}
 	return output
 }

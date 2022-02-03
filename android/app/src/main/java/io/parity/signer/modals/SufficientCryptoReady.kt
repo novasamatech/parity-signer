@@ -26,7 +26,7 @@ fun SufficientCryptoReady(signerDataModel: SignerDataModel) {
 				contentScale = ContentScale.FillWidth,
 				modifier = Modifier.fillMaxWidth()
 			)
-			KeyCard(identity = signerDataModel.modalData.value?.optJSONObject("author_info") ?: JSONObject(), signerDataModel = signerDataModel)
+			KeyCard(identity = signerDataModel.modalData.value?.optJSONObject("author_info") ?: JSONObject())
 			Text("Payload: " + signerDataModel.modalData.value?.optJSONObject("content")?.optString("type"))
 		}
 	}

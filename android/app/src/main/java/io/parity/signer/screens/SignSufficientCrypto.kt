@@ -37,7 +37,7 @@ fun SignSufficientCrypto(signerDataModel: SignerDataModel) {
 						}
 					}
 				}) {
-					KeyCard(identity = identity, signerDataModel = signerDataModel)
+					KeyCard(identity = identity)
 				}
 			}
 		}

@@ -3,16 +3,20 @@ package io.parity.signer
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import io.parity.signer.components.Documents
 import io.parity.signer.modals.*
 import io.parity.signer.models.SignerDataModel
 import io.parity.signer.models.pushButton
 import io.parity.signer.screens.*
+import org.json.JSONObject
 
 @ExperimentalAnimationApi
 @ExperimentalMaterialApi
 @Composable
 fun ScreenSelector(screen: SignerScreen?, signerDataModel: SignerDataModel) {
+	val screenData by signerDataModel.screenData.observeAsState()
 	when (screen) {
 		SignerScreen.Scan -> {
 			ScanScreen(
@@ -20,7 +24,7 @@ fun ScreenSelector(screen: SignerScreen?, signerDataModel: SignerDataModel) {
 			)
 		}
 		SignerScreen.Keys -> {
-			KeyManager(signerDataModel = signerDataModel)
+			KeyManager(signerDataModel::pushButton, screenData?: JSONObject())
 		}
 		SignerScreen.Settings -> {
 			SettingsScreen(signerDataModel = signerDataModel)

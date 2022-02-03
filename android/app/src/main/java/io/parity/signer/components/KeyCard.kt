@@ -24,12 +24,12 @@ import org.json.JSONObject
  * TODO: paint root keys in scary colors
  */
 @Composable
-fun KeyCard(identity: JSONObject, signerDataModel: SignerDataModel) {
+fun KeyCard(identity: JSONObject) {
 	Row(
 		modifier = Modifier
 			.padding(8.dp)
 	) {
-		Identicon(identity.getString("identicon"))
+		Identicon(identity.optString("identicon"))
 		Spacer(modifier = Modifier.width(10.dp))
 		Column {
 			Row {

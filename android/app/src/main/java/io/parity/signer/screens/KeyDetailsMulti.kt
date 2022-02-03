@@ -39,7 +39,7 @@ fun KeyDetailsMulti(signerDataModel: SignerDataModel) {
 			.fillMaxWidth()
 			.verticalScroll(rememberScrollState())
 	) {
-		KeyCard(identity = address, signerDataModel = signerDataModel)
+		KeyCard(identity = address)
 		NetworkCard(address)
 		Image(
 			address.optString("qr").intoImageBitmap(),

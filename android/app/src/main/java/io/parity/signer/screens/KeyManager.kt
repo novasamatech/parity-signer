@@ -32,44 +32,42 @@ import kotlin.math.sign
 @ExperimentalMaterialApi
 @ExperimentalAnimationApi
 @Composable
-fun KeyManager(signerDataModel: SignerDataModel) {
+fun KeyManager(button: (button: ButtonID, details: String) -> Unit,
+							 screenData: JSONObject) {
 	//val screenData = signerDataModel.screenData.value
-	val rootKey = signerDataModel.screenData.value?.optJSONObject("root")
-	val keySet = signerDataModel.screenData.value?.optJSONArray("set") ?: JSONArray()
+	val rootKey = screenData.optJSONObject("root") ?: JSONObject()
+	val keySet = screenData.optJSONArray("set") ?: JSONArray()
 	//val network = signerDataModel.screenData.value?.optJSONObject("network")
-	val multiselectMode = signerDataModel.screenData.value?.optBoolean("multiselect_mode")
-	val multiselectCount = signerDataModel.screenData.value?.optString("multiselect_count")
+	val multiselectMode = screenData.optBoolean("multiselect_mode")
+	val multiselectCount = screenData.optString("multiselect_count")
 
 	Column() {
 		Row(
 			Modifier
 				.clickable {
-					signerDataModel.pushButton(ButtonID.SelectKey, "")
+					button(ButtonID.SelectKey, rootKey.optString("address_key"))
 				}
 				.padding(top = 3.dp, start = 12.dp, end = 12.dp)
 				.background(MaterialTheme.colors.Bg200)
 				.fillMaxWidth()
 		) {
 			SeedCard(
-				seedName = rootKey?.optString("seed_name") ?: "error",
-				identicon = rootKey?.optString("identicon") ?: "",
-				base58 = rootKey?.optString("base58") ?: "",
-				showAddress = true,
-				signerDataModel = signerDataModel
+				seedName = rootKey.optString("seed_name", "error"),
+				identicon = rootKey.optString("identicon"),
+				base58 = rootKey.optString("base58"),
+				showAddress = true
 			)
 		}
 		IconButton(
-			onClick = { signerDataModel.pushButton(ButtonID.NetworkSelector) },
+			onClick = { button(ButtonID.NetworkSelector, "") },
 			modifier = Modifier
 				.padding(top = 3.dp, start = 12.dp, end = 12.dp)
 				.background(MaterialTheme.colors.Bg200)
 				.fillMaxWidth()
 		) {
 			Row {
-				signerDataModel.screenData.value?.let { screenData ->
 					screenData.optJSONObject("network")?.let { network ->
 						NetworkCard(network) }
-				}
 				Icon(Icons.Default.ArrowCircleDown, "More networks")
 				Spacer(modifier = Modifier.weight(1f))
 			}
@@ -79,11 +77,11 @@ fun KeyManager(signerDataModel: SignerDataModel) {
 			.padding(horizontal = 8.dp)) {
 			Text("DERIVED KEYS")
 			Spacer(Modifier.weight(1f, true))
-			IconButton(onClick = { signerDataModel.pushButton(ButtonID.NewKey) }) {
+			IconButton(onClick = { button(ButtonID.NewKey, "") }) {
 				Icon(Icons.Default.AddCircle, contentDescription = "New derived key")
 			}
 		}
-		KeySelector(signerDataModel)
+		KeySelector(button, screenData)
 	}
 }
 

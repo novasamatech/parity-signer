@@ -1,64 +1,43 @@
 package io.parity.signer.components
 
-import androidx.compose.foundation.background
-import androidx.compose.foundation.gestures.detectTapGestures
-import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.material.*
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.CheckCircle
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.input.pointer.pointerInput
-import androidx.compose.ui.unit.dp
+import androidx.compose.foundation.lazy.LazyListScope
+import androidx.compose.foundation.lazy.items
+import androidx.compose.runtime.*
 import io.parity.signer.ButtonID
-import io.parity.signer.models.SignerDataModel
-import io.parity.signer.models.pushButton
-import io.parity.signer.ui.theme.Bg200
-import org.json.JSONArray
+import io.parity.signer.models.toListOfJSONObjects
 import org.json.JSONObject
 
 @Composable
-fun KeySelector(signerDataModel: SignerDataModel) {
-	val addresses =
-		signerDataModel.screenData.value?.optJSONArray("set") ?: JSONArray()
+fun KeySelector(
+	button: (button: ButtonID, details: String) -> Unit,
+	screenData: JSONObject
+) {
+	val addresses = screenData.optJSONArray("set")?.toListOfJSONObjects() ?: emptyList()
 	LazyColumn {
-		items(addresses.length()) { item ->
-			Row(
-				verticalAlignment = Alignment.CenterVertically,
-				modifier = Modifier
-					.padding(top = 3.dp, start = 12.dp, end = 12.dp)
-					.background(MaterialTheme.colors.Bg200)
-			) {
-				Row(
-					verticalAlignment = Alignment.CenterVertically,
-					modifier = Modifier
-						.pointerInput(Unit) {
-							detectTapGestures(
-								onTap = {
-									signerDataModel.pushButton(
-										ButtonID.SelectKey,
-										addresses
-											.getJSONObject(item)
-											.optString("address_key")
-									)
-								},
-								onLongPress = {
-
-								}
-							)
-						}
-						.padding(horizontal = 8.dp)
-				) {
-					KeyCard(
-						addresses.getJSONObject(item),
-						signerDataModel = signerDataModel
-					)
-					Spacer(modifier = Modifier.weight(1f, true))
-					Icon(Icons.Default.CheckCircle, "Address selected")
-				}
+		this.items(
+			items = addresses,
+			key = {
+				it.optString("address_key")
 			}
+		) { address ->
+			val addressKey = address.optString("address_key")
+			val selectButton by remember { mutableStateOf(
+				{
+				button(
+					ButtonID.SelectKey,
+					addressKey
+				)
+				}
+			)
+			}
+			val longTapButton = {
+				button(
+					ButtonID.LongTap,
+					addressKey
+				)
+			}
+			KeyCardActive(address, selectButton, longTapButton)
 		}
 	}
 }

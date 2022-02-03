@@ -13,12 +13,21 @@ import org.json.JSONArray
 
 @Composable
 fun SelectSeedForBackup(signerDataModel: SignerDataModel) {
-	val content = signerDataModel.screenData.value?.optJSONArray("seedNameCards") ?: JSONArray()
+	val content = signerDataModel.screenData.value?.optJSONArray("seedNameCards")
+		?: JSONArray()
 	LazyColumn {
 		items(content.length()) { index ->
 			val seed = content.getJSONObject(index)
-			Row(Modifier.clickable { signerDataModel.pushButton(ButtonID.BackupSeed, details = seed.optString("seed_name")) }) {
-				SeedCard(seedName = seed.optString("seed_name"), identicon = seed.optString("identicon"), signerDataModel = signerDataModel)
+			Row(Modifier.clickable {
+				signerDataModel.pushButton(
+					ButtonID.BackupSeed,
+					details = seed.optString("seed_name")
+				)
+			}) {
+				SeedCard(
+					seedName = seed.optString("seed_name"),
+					identicon = seed.optString("identicon")
+				)
 			}
 		}
 	}
