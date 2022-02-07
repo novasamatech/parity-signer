@@ -3,9 +3,7 @@ package io.parity.signer.modals
 import androidx.compose.ui.graphics.Color
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
@@ -14,6 +12,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
 import io.parity.signer.ButtonID
 import io.parity.signer.components.HeaderBar
 import io.parity.signer.components.NetworkCard
@@ -35,27 +34,33 @@ fun NetworkSelector(signerDataModel: SignerDataModel) {
 				Modifier
 					.weight(2f)
 					.clickable { signerDataModel.pushButton(ButtonID.GoBack) })
-			Column(
-				Modifier
-					.weight(1f)
-					.background(MaterialTheme.colors.Bg000)
+			Surface(
+				shape = MaterialTheme.shapes.large,
+				color = MaterialTheme.colors.Bg000,
+				modifier = Modifier.weight(1f)
 			) {
-				HeaderBar(line1 = "NETWORK", line2 = "Select network")
-				LazyColumn {
-					items(networks.length()) { item ->
-						Row(Modifier.clickable {
-							signerDataModel.pushButton(
-								ButtonID.ChangeNetwork,
-								networks.getJSONObject(item).optString("key")
-							)
-						}) {
-							NetworkCard(network = networks.getJSONObject(item))
-							Spacer(Modifier.weight(1f))
-							if (networks.getJSONObject(item).optBoolean("selected", false)) {
-								Icon(
-									Icons.Default.Check,
-									"this network is selected",
-									tint = MaterialTheme.colors.Action400
+				Column {
+					HeaderBar(
+						line1 = "NETWORK",
+						line2 = "Select network",
+						modifier = Modifier.padding(10.dp)
+					)
+
+					LazyColumn(
+						contentPadding = PaddingValues(horizontal = 8.dp),
+						verticalArrangement = Arrangement.spacedBy(10.dp)
+						) {
+						items(networks.length()) { item ->
+							Row(Modifier.clickable {
+								signerDataModel.pushButton(
+									ButtonID.ChangeNetwork,
+									networks.getJSONObject(item).optString("key")
+								)
+							}) {
+								NetworkCard(
+									network = networks.getJSONObject(item),
+									selected = networks.getJSONObject(item)
+										.optBoolean("selected", false)
 								)
 							}
 						}

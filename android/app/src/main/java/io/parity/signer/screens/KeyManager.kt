@@ -16,6 +16,7 @@ import io.parity.signer.ButtonID
 import io.parity.signer.SignerModal
 import io.parity.signer.components.KeySelector
 import io.parity.signer.components.NetworkCard
+import io.parity.signer.components.NetworkLogoName
 import io.parity.signer.components.SeedCard
 import io.parity.signer.modals.*
 import io.parity.signer.models.*
@@ -67,7 +68,8 @@ fun KeyManager(button: (button: ButtonID, details: String) -> Unit,
 		) {
 			Row {
 					screenData.optJSONObject("network")?.let { network ->
-						NetworkCard(network) }
+						NetworkLogoName(logo = network.optString("logo"), name = network.optString("title")) }
+				Spacer(Modifier.width(8.dp))
 				Icon(Icons.Default.ArrowCircleDown, "More networks")
 				Spacer(modifier = Modifier.weight(1f))
 			}
