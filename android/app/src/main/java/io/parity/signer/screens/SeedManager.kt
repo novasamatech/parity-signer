@@ -22,11 +22,14 @@ fun SeedManager(signerDataModel: SignerDataModel) {
 	val cards = signerDataModel.screenData.value?.getJSONArray("seedNameCards")
 		?: JSONArray()
 
-	LazyColumn {
+	LazyColumn(
+		contentPadding = PaddingValues(horizontal = 12.dp),
+		verticalArrangement = Arrangement.spacedBy(10.dp)
+	) {
 		items(cards.length()) { item ->
 			Row(
 				Modifier
-					.padding(top = 3.dp, start = 12.dp, end = 12.dp)
+					//.padding(top = 3.dp, start = 12.dp, end = 12.dp)
 					.background(MaterialTheme.colors.Bg200)
 			) {
 				Row(

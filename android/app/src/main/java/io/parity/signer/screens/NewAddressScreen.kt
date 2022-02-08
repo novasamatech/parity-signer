@@ -19,11 +19,12 @@ import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
 import io.parity.signer.ButtonID
 import io.parity.signer.components.BigButton
+import io.parity.signer.components.SingleTextInput
 import io.parity.signer.models.*
 
 @Composable
 fun NewAddressScreen(signerDataModel: SignerDataModel, increment: Boolean) {
-	var derivationPath by remember { mutableStateOf("") }
+	var derivationPath = remember { mutableStateOf("") }
 	var derivationState by remember { mutableStateOf(DerivationState()) }
 	val seedName = signerDataModel.screenData.value?.optString("seed_name") ?: ""
 	val lastError = signerDataModel.lastError.observeAsState()
@@ -37,38 +38,35 @@ fun NewAddressScreen(signerDataModel: SignerDataModel, increment: Boolean) {
 	) {
 		Text("Create new key")
 		Text(lastError.value.toString())
-		TextField(
-			value = derivationPath,
-			onValueChange = {
-				derivationPath = it
-				derivationState = signerDataModel.checkAsDerivation(derivationPath)
+
+		SingleTextInput(
+			content = derivationPath,
+			update = {
+				derivationPath.value = it
+				derivationState = signerDataModel.checkAsDerivation(it)
 				signerDataModel.clearError()
 			},
-			label = { Text("Derivation path") },
-			singleLine = true,
-			keyboardOptions = KeyboardOptions(
-				autoCorrect = false,
-				capitalization = KeyboardCapitalization.None,
-				keyboardType = KeyboardType.Text,
-				imeAction = ImeAction.Done
-			),
-			keyboardActions = KeyboardActions(
-				onDone = {
-					focusManager.clearFocus()
-					if (derivationState.isValid) {
-						if (derivationState.hasPassword) {
-							signerDataModel.pushButton(
-								ButtonID.CheckPassword,
-								details = derivationPath
-							)
-						} else {
-							signerDataModel.addKey(path = derivationPath, seedName = seedName)
-						}
+			capitalize = false,
+			onDone = {
+				focusManager.clearFocus()
+				if (derivationState.isValid) {
+					if (derivationState.hasPassword) {
+						signerDataModel.pushButton(
+							ButtonID.CheckPassword,
+							details = derivationPath.value
+						)
+					} else {
+						signerDataModel.addKey(
+							path = derivationPath.value,
+							seedName = seedName
+						)
 					}
 				}
-			),
-			modifier = Modifier.focusRequester(focusRequester = focusRequester)
+			},
+			focusManager = focusManager,
+			focusRequester = focusRequester
 		)
+
 		Row {
 			BigButton(
 				text = "Next",
@@ -76,10 +74,13 @@ fun NewAddressScreen(signerDataModel: SignerDataModel, increment: Boolean) {
 					if (derivationState.hasPassword) {
 						signerDataModel.pushButton(
 							ButtonID.CheckPassword,
-							details = derivationPath
+							details = derivationPath.value
 						)
 					} else {
-						signerDataModel.addKey(path = derivationPath, seedName = seedName)
+						signerDataModel.addKey(
+							path = derivationPath.value,
+							seedName = seedName
+						)
 					}
 				},
 				isDisabled = !derivationState.isValid
@@ -90,10 +91,10 @@ fun NewAddressScreen(signerDataModel: SignerDataModel, increment: Boolean) {
 		if (signerDataModel.screenData.value?.optBoolean("keyboard") == true) {
 			focusRequester.requestFocus()
 		}
-		derivationPath =
+		derivationPath.value =
 			signerDataModel.screenData.value?.optString("suggested_derivation")
 				?: ""
-		derivationState = signerDataModel.checkAsDerivation(derivationPath)
+		derivationState = signerDataModel.checkAsDerivation(derivationPath.value)
 		onDispose { focusManager.clearFocus() }
 	}
 }

@@ -22,8 +22,10 @@ import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
+import io.parity.signer.ButtonID
 import io.parity.signer.components.BigButton
 import io.parity.signer.components.HeaderBar
+import io.parity.signer.components.SingleTextInput
 import io.parity.signer.models.SignerDataModel
 import io.parity.signer.models.addKey
 import io.parity.signer.models.checkAsDerivation
@@ -32,7 +34,7 @@ import io.parity.signer.ui.theme.Bg200
 
 @Composable
 fun PasswordConfirm(signerDataModel: SignerDataModel) {
-	var passwordCheck by remember { mutableStateOf("") }
+	var passwordCheck = remember { mutableStateOf("") }
 	val pwd = signerDataModel.modalData.value?.optString("pwd")
 	val croppedPath = signerDataModel.modalData.value?.optString("cropped_path")
 	val seedName = signerDataModel.modalData.value?.optString("seed_name") ?: ""
@@ -45,42 +47,34 @@ fun PasswordConfirm(signerDataModel: SignerDataModel) {
 		shape = MaterialTheme.shapes.large,
 		modifier = Modifier.fillMaxSize(1f)
 	) {
-		Column (
+		Column(
 			horizontalAlignment = Alignment.CenterHorizontally
-			) {
+		) {
 			HeaderBar(line1 = "Confirm secret path", line2 = "")
 			Row {
 				Text("$croppedPath///")
 				Image(Icons.Default.Lock, contentDescription = "Locked account")
 			}
 			Text(lastError.value.toString())
-			TextField(
-				value = passwordCheck,
-				onValueChange = {
-					passwordCheck = it
+			SingleTextInput(
+				content = passwordCheck,
+				update = {
+					passwordCheck.value = it
 					signerDataModel.clearError()
 				},
-				label = { Text("Password (optional)") },
-				singleLine = true,
-				keyboardOptions = KeyboardOptions(
-					autoCorrect = false,
-					capitalization = KeyboardCapitalization.None,
-					keyboardType = KeyboardType.Password,
-					imeAction = ImeAction.Done
-				),
-				keyboardActions = KeyboardActions(
-					onDone = {
-						focusManager.clearFocus()
-						if (passwordCheck == pwd) {
-							signerDataModel.addKey(
-								path = "$croppedPath///$pwd",
-								seedName = seedName
-							)
-						}
+				onDone = {
+					if (passwordCheck.value == pwd) {
+						signerDataModel.addKey(
+							path = "$croppedPath///$pwd",
+							seedName = seedName
+						)
 					}
-				),
-				modifier = Modifier.focusRequester(focusRequester = focusRequester)
+				},
+				prefix = { Text("///") },
+				focusManager = focusManager,
+				focusRequester = focusRequester
 			)
+
 			BigButton(
 				text = "Next", action = {
 					signerDataModel.addKey(
@@ -88,7 +82,7 @@ fun PasswordConfirm(signerDataModel: SignerDataModel) {
 						seedName = seedName
 					)
 				},
-				isDisabled = passwordCheck != pwd
+				isDisabled = passwordCheck.value != pwd
 			)
 		}
 	}

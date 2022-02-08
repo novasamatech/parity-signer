@@ -26,6 +26,7 @@ import io.parity.signer.ButtonID
 import io.parity.signer.components.BigButton
 import io.parity.signer.components.HeaderBar
 import io.parity.signer.components.KeyCard
+import io.parity.signer.components.SingleTextInput
 import io.parity.signer.models.SignerDataModel
 import io.parity.signer.models.addKey
 import io.parity.signer.models.pushButton
@@ -34,7 +35,7 @@ import org.json.JSONObject
 
 @Composable
 fun EnterPassword(signerDataModel: SignerDataModel) {
-	val password by remember {
+	val password = remember {
 		mutableStateOf("")
 	}
 	val content = signerDataModel.screenData.value ?: JSONObject()
@@ -56,40 +57,31 @@ fun EnterPassword(signerDataModel: SignerDataModel) {
 			if (content.optInt("counter") > 0) {
 				Text("Attempt " + content.optInt("counter").toString() + " of 3")
 			}
-			Row {
-				Text("///")
-				TextField(
-					value = password,
-					onValueChange = { },
-					label = { Text("SECRET PATH") },
-					singleLine = true,
-					keyboardOptions = KeyboardOptions(
-						autoCorrect = false,
-						capitalization = KeyboardCapitalization.None,
-						keyboardType = KeyboardType.Password,
-						imeAction = ImeAction.Done
-					),
-					keyboardActions = KeyboardActions(
-						onDone = {
-							focusManager.clearFocus()
-							if (password.isNotBlank()) {
-								signerDataModel.pushButton(
-									ButtonID.GoForward,
-									details = password
-								)
-							}
-						}
-					),
-					modifier = Modifier.focusRequester(focusRequester = focusRequester)
-				)
-			}
+			SingleTextInput(
+				content = password,
+				update = { password.value = it },
+				onDone = {
+					if (password.value.isNotBlank()) {
+						signerDataModel.pushButton(
+							ButtonID.GoForward,
+							details = password.value
+						)
+					}
+				},
+				prefix = { Text("///") },
+				focusManager = focusManager,
+				focusRequester = focusRequester
+			)
 			BigButton(
 				text = "Next",
 				isCrypto = true,
 				action = {
-					signerDataModel.pushButton(ButtonID.GoForward, details = password)
+					signerDataModel.pushButton(
+						ButtonID.GoForward,
+						details = password.value
+					)
 				},
-				isDisabled = password.isBlank()
+				isDisabled = password.value.isBlank()
 			)
 		}
 	}

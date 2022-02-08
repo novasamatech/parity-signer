@@ -1,16 +1,19 @@
 package io.parity.signer.modals
 
 import androidx.compose.foundation.layout.*
-import androidx.compose.runtime.Composable
+import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Text
+import androidx.compose.runtime.*
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.platform.LocalFocusManager
 import io.parity.signer.ButtonID
-import io.parity.signer.components.BigButton
-import io.parity.signer.components.KeyCard
-import io.parity.signer.components.NetworkCard
-import io.parity.signer.components.TransactionPreviewField
+import io.parity.signer.components.*
 import io.parity.signer.models.SignerDataModel
 import io.parity.signer.models.TransactionType
 import io.parity.signer.models.getSeed
 import io.parity.signer.models.parseTransaction
+import io.parity.signer.ui.theme.Text400
 
 @Composable
 fun TransactionPreview(
@@ -22,6 +25,9 @@ fun TransactionPreview(
 			.parseTransaction()
 	val action =
 		TransactionType.valueOf(signerDataModel.screenData.value!!.getString("type"))
+  val comment = remember{ mutableStateOf("") }
+	val focusManager = LocalFocusManager.current
+	val focusRequester = remember { FocusRequester() }
 
 	Column {
 		TransactionPreviewField(transaction = transaction)
@@ -33,6 +39,18 @@ fun TransactionPreview(
 		}
 		when (action) {
 			TransactionType.sign -> {
+				Text("LOG NOTE", style = MaterialTheme.typography.overline, color = MaterialTheme.colors.Text400)
+
+				SingleTextInput(
+					content = comment,
+					update = {comment.value = it},
+					onDone = { },
+					focusManager = focusManager,
+					focusRequester = focusRequester
+				)
+
+				Text("visible only on this device", style = MaterialTheme.typography.subtitle1, color = MaterialTheme.colors.Text400)
+
 				BigButton(
 					text = "Unlock key and sign",
 					action = {
@@ -42,7 +60,7 @@ fun TransactionPreview(
 									?.optString("seed") ?: ""
 							)
 							if (seedPhrase.isNotBlank()) {
-								button(ButtonID.GoForward, "", seedPhrase)
+								button(ButtonID.GoForward, comment.value, seedPhrase)
 							}
 						}
 					}

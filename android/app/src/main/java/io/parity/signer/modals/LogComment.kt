@@ -20,12 +20,13 @@ import androidx.compose.ui.text.input.KeyboardType
 import io.parity.signer.ButtonID
 import io.parity.signer.components.BigButton
 import io.parity.signer.components.HeaderBar
+import io.parity.signer.components.SingleTextInput
 import io.parity.signer.models.SignerDataModel
 import io.parity.signer.models.pushButton
 
 @Composable
 fun LogComment(signerDataModel: SignerDataModel) {
-	var comment by remember { mutableStateOf("")}
+	var comment = remember { mutableStateOf("") }
 	val focusManager = LocalFocusManager.current
 	val focusRequester = remember { FocusRequester() }
 
@@ -34,38 +35,22 @@ fun LogComment(signerDataModel: SignerDataModel) {
 		verticalArrangement = Arrangement.Center,
 		modifier = Modifier.fillMaxSize()
 	) {
-HeaderBar(line1 = "COMMENT", line2 = "Enter text")
-		TextField(
-			value = comment,
-			onValueChange = {
-				comment = it
+		HeaderBar(line1 = "COMMENT", line2 = "Enter text")
+		SingleTextInput(
+			content = comment,
+			update = {
+				comment.value = it
 			},
-			label = { Text("COMMENT") },
-			singleLine = true,
-			keyboardOptions = KeyboardOptions(
-				autoCorrect = false,
-				capitalization = KeyboardCapitalization.Words,
-				keyboardType = KeyboardType.Text,
-				imeAction = ImeAction.Done
-			),
-			keyboardActions = KeyboardActions(
-				onDone = {
-					focusManager.clearFocus()
-					signerDataModel.pushButton(ButtonID.GoForward, comment)
-				}
-			),
-			modifier = Modifier.focusRequester(focusRequester = focusRequester)
+			onDone = {
+				signerDataModel.pushButton(ButtonID.GoForward, comment.value)
+			},
+			focusManager = focusManager,
+			focusRequester = focusRequester
 		)
-		Text("Display name visible only to you")
-		BigButton(
-			text = "Done",
-			action = {
-				focusManager.clearFocus()
-				signerDataModel.pushButton(ButtonID.GoForward, comment)}
-		)
+
 	}
 	DisposableEffect(Unit) {
-			focusRequester.requestFocus()
+		focusRequester.requestFocus()
 		onDispose { focusManager.clearFocus() }
 	}
 }

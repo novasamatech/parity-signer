@@ -30,10 +30,14 @@ fun BigButton(
 	Surface(
 		color = bgColor,
 		shape = MaterialTheme.shapes.large,
-		border = BorderStroke(if (isShaded) 1.dp else 0.dp, if (isShaded) fgColor else bgColor),
+		border = BorderStroke(
+			1.dp,
+			if (isShaded) fgColor else bgColor
+		),
 		modifier = Modifier
 			.clickable(onClick = action, enabled = !isDisabled)
-			.padding(8.dp).height(44.dp)
+			.padding(8.dp)
+			.height(44.dp)
 	) {
 		Row(
 			horizontalArrangement = Arrangement.Center,

@@ -24,13 +24,17 @@ import androidx.compose.ui.text.input.KeyboardType
 import io.parity.signer.ButtonID
 import io.parity.signer.components.BigButton
 import io.parity.signer.components.HeaderBar
+import io.parity.signer.components.SingleTextInput
 import io.parity.signer.models.SignerDataModel
 import io.parity.signer.models.addSeed
 import io.parity.signer.models.pushButton
 
 @Composable
-fun NewSeedScreen(button: (button: ButtonID, details: String) -> Unit, signerDataModel: SignerDataModel) {
-	var seedName by remember { mutableStateOf("") }
+fun NewSeedScreen(
+	button: (button: ButtonID, details: String) -> Unit,
+	signerDataModel: SignerDataModel
+) {
+	var seedName = remember { mutableStateOf("") }
 	val lastError = signerDataModel.lastError.observeAsState()
 	val focusManager = LocalFocusManager.current
 	val focusRequester = remember { FocusRequester() }
@@ -40,43 +44,34 @@ fun NewSeedScreen(button: (button: ButtonID, details: String) -> Unit, signerDat
 		verticalArrangement = Arrangement.Center,
 		modifier = Modifier.fillMaxSize()
 	) {
-			Text("DISPLAY NAME", style = MaterialTheme.typography.overline)
-			Text(lastError.value.toString())
-			TextField(
-				value = seedName,
-				onValueChange = {
-					seedName = it
-					signerDataModel.clearError()
-				},
-				label = { Text("Seed name") },
-				singleLine = true,
-				keyboardOptions = KeyboardOptions(
-					autoCorrect = false,
-					capitalization = KeyboardCapitalization.Words,
-					keyboardType = KeyboardType.Text,
-					imeAction = ImeAction.Done
-				),
-				keyboardActions = KeyboardActions(
-					onDone = {
-						focusManager.clearFocus()
-						button(ButtonID.GoForward, seedName)
-					}
-				),
-				modifier = Modifier.focusRequester(focusRequester = focusRequester)
-			)
+		Text("DISPLAY NAME", style = MaterialTheme.typography.overline)
+		Text(lastError.value.toString())
+
+		SingleTextInput(
+			content = seedName,
+			update = {
+				seedName.value = it
+				signerDataModel.clearError()
+			},
+			onDone = { button(ButtonID.GoForward, seedName.value) },
+			focusManager = focusManager,
+			focusRequester = focusRequester
+		)
+
 		Text("Display name visible only to you")
-			BigButton(
-				text = "Generate seed phrase",
-				action = {
-					focusManager.clearFocus()
-					button(ButtonID.GoForward, seedName)}
-			)
+		BigButton(
+			text = "Generate seed phrase",
+			action = {
+				focusManager.clearFocus()
+				button(ButtonID.GoForward, seedName.value)
+			}
+		)
 	}
 	DisposableEffect(Unit) {
 		if (signerDataModel.screenData.value?.optBoolean("keyboard") == true) {
 			focusRequester.requestFocus()
 		}
-		seedName = signerDataModel.screenData.value?.optString("seed_name") ?: ""
+		seedName.value = signerDataModel.screenData.value?.optString("seed_name") ?: ""
 		onDispose { focusManager.clearFocus() }
 	}
 }

@@ -28,11 +28,12 @@ fun SingleTextInput(
 	update: (String) -> Unit,
 	onDone: () -> Unit,
 	capitalize: Boolean = true,
+	prefix: @Composable () -> Unit = {},
 	focusManager: FocusManager,
 	focusRequester: FocusRequester
 ) {
 	Surface(
-		shape = MaterialTheme.shapes.medium,
+		shape = MaterialTheme.shapes.large,
 		color = Color.Transparent,
 		border = BorderStroke(1.dp, MaterialTheme.colors.Border400),
 		modifier = Modifier.padding(20.dp)
@@ -41,6 +42,7 @@ fun SingleTextInput(
 			value = content.value,
 			onValueChange = update,
 			singleLine = true,
+			leadingIcon = {prefix()},
 			keyboardOptions = KeyboardOptions(
 				autoCorrect = false,
 				capitalization = if (capitalize) KeyboardCapitalization.Words else KeyboardCapitalization.None,
