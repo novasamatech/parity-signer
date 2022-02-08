@@ -50,10 +50,10 @@ fun TopBar(signerDataModel: SignerDataModel) {
 		) {
 			Text(
 				screenName.value ?: "",
-				style = if (screenNameType.value == "h4") {
-					MaterialTheme.typography.h4
+				style = if (screenNameType.value == "h1") {
+					MaterialTheme.typography.h2
 				} else {
-					MaterialTheme.typography.h1
+					MaterialTheme.typography.h4
 				}
 			)
 		}

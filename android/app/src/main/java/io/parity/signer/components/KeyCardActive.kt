@@ -48,7 +48,6 @@ fun KeyCardActive(
 				address
 			)
 			Spacer(modifier = Modifier.weight(1f, true))
-			Icon(Icons.Default.CheckCircle, "Address selected")
 		}
 	}
 }

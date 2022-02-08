@@ -4,6 +4,7 @@ import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -23,25 +24,29 @@ fun SeedCard(
 	base58: String = "",
 	showAddress: Boolean = false
 ) {
-	Row(
-		verticalAlignment = Alignment.CenterVertically,
-		modifier = Modifier
-			.padding(8.dp)
+	Surface(
+		shape = MaterialTheme.shapes.medium,
+		color = MaterialTheme.colors.Bg200,
+		modifier = Modifier.heightIn(47.dp).padding(8.dp)
 	) {
-		Identicon(identicon)
-		Spacer(modifier = Modifier.width(10.dp))
-		Column {
-			Text(
-				seedName,
-				color = MaterialTheme.colors.Text600,
-				style = MaterialTheme.typography.subtitle1
-			)
-			if (showAddress) {
+		Row(
+			verticalAlignment = Alignment.CenterVertically,
+		) {
+			Identicon(identicon)
+			Spacer(modifier = Modifier.width(10.dp))
+			Column {
 				Text(
-					base58.abbreviateString(8),
-					color = MaterialTheme.colors.Crypto400,
-					style = CryptoTypography.body1
+					seedName,
+					color = MaterialTheme.colors.Text600,
+					style = MaterialTheme.typography.subtitle1
+				)
+				if (showAddress) {
+					Text(
+						base58.abbreviateString(8),
+						color = MaterialTheme.colors.Text400,
+						style = CryptoTypography.body1
 					)
+				}
 			}
 		}
 	}

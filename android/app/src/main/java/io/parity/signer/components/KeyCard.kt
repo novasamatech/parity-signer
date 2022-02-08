@@ -13,10 +13,7 @@ import androidx.compose.ui.unit.dp
 import io.parity.signer.models.SignerDataModel
 import io.parity.signer.models.abbreviateString
 import io.parity.signer.models.intoImageBitmap
-import io.parity.signer.ui.theme.Bg200
-import io.parity.signer.ui.theme.CryptoTypography
-import io.parity.signer.ui.theme.Text300
-import io.parity.signer.ui.theme.Typography
+import io.parity.signer.ui.theme.*
 import org.json.JSONObject
 
 /**
@@ -34,19 +31,32 @@ fun KeyCard(identity: JSONObject) {
 		Column {
 			Row {
 				Text(
+					identity.optString("seed_name"),
+					color = MaterialTheme.colors.Text600,
+					style = MaterialTheme.typography.subtitle1
+				)
+				Text(
 					identity.optString("path", identity.optString("derivation_path")),
-					color = MaterialTheme.colors.onBackground,
+					color = MaterialTheme.colors.Crypto400,
 					style = CryptoTypography.body2
 				)
 				if (identity.optBoolean("has_pwd", false)) {
-					Text("///")
-					Image(Icons.Default.Lock, contentDescription = "Locked account")
+					Text(
+						"///",
+						color = MaterialTheme.colors.Crypto400,
+						style = CryptoTypography.body2
+					)
+					Icon(
+						Icons.Default.Lock,
+						contentDescription = "Locked account",
+						tint = MaterialTheme.colors.Crypto400
+					)
 				}
 			}
 			Text(
 				identity.optString("base58").abbreviateString(8),
-				color = MaterialTheme.colors.Text300,
-				style = CryptoTypography.body2
+				color = MaterialTheme.colors.Text400,
+				style = CryptoTypography.body1
 			)
 		}
 	}
