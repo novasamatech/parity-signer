@@ -196,6 +196,7 @@ class SignerDataModel : ViewModel() {
 	 * This is normal onboarding
 	 */
 	fun onBoard() {
+		wipe()
 		copyAsset("")
 		historyInitHistoryWithCert(dbName)
 		totalRefresh()

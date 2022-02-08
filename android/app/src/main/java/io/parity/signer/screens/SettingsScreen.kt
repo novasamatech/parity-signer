@@ -4,10 +4,7 @@ import android.content.Context
 import android.os.Build
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
 import androidx.compose.material.AlertDialog
 import androidx.compose.material.Button
 import androidx.compose.material.Text
@@ -33,7 +30,9 @@ import io.parity.signer.models.pushButton
 fun SettingsScreen(signerDataModel: SignerDataModel) {
 	var confirm by remember { mutableStateOf(false) }
 
-	Column {
+	Column (
+		verticalArrangement = Arrangement.spacedBy(4.dp)
+		) {
 		Row(Modifier.clickable { signerDataModel.pushButton(ButtonID.ManageNetworks) }) {
 			SettingsCardTemplate(text = "Networks")
 		}

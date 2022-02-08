@@ -28,7 +28,6 @@ fun SettingsCardTemplate(
 	Row(
 		verticalAlignment = Alignment.CenterVertically,
 		modifier = Modifier
-			.padding(20.dp)
 			.background(
 				color = if (withBackground) {
 					MaterialTheme.colors.Bg200
@@ -38,11 +37,11 @@ fun SettingsCardTemplate(
 			)
 	) {
 		Text(
-			text, style = Typography.body1, color = if (danger) {
+			text, style = MaterialTheme.typography.body1, color = if (danger) {
 				MaterialTheme.colors.SignalDanger
 			} else {
 				MaterialTheme.colors.Text400
-			}, modifier = Modifier.padding(8.dp)
+			}, modifier = Modifier.padding(20.dp)
 		)
 		Spacer(Modifier.weight(1f))
 		if (withIcon) {
@@ -50,7 +49,7 @@ fun SettingsCardTemplate(
 				Icons.Default.ChevronRight,
 				"go forward",
 				tint = MaterialTheme.colors.Border400,
-				modifier = Modifier.padding(8.dp)
+				modifier = Modifier.padding(20.dp)
 			)
 		}
 	}
