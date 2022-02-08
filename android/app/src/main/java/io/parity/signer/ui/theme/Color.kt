@@ -1,6 +1,8 @@
 package io.parity.signer.ui.theme
 
 import androidx.compose.material.Colors
+import androidx.compose.material.MaterialTheme
+import androidx.compose.material.TextFieldDefaults
 import androidx.compose.ui.graphics.Color
 
 val Colors.Border600: Color

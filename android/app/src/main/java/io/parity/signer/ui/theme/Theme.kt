@@ -50,10 +50,10 @@ fun ParitySignerTheme(
 		LightColorPalette
 	}
 
-		MaterialTheme(
-			colors = colors,
-			typography = Typography,
-			shapes = Shapes,
-			content = content
-		)
+	MaterialTheme(
+		colors = colors,
+		typography = Typography,
+		shapes = Shapes,
+		content = content
+	)
 }

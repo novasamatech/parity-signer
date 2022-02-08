@@ -1,10 +1,13 @@
 package io.parity.signer.components
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import io.parity.signer.ui.theme.*
 
@@ -24,18 +27,20 @@ fun BigButton(
 	val fgColor =
 		if (isDisabled) MaterialTheme.colors.Text300 else if (isShaded) if (isDangerous) MaterialTheme.colors.SignalDanger else accentColor else MaterialTheme.colors.Action600
 
-	Button(
-		onClick = action,
-		enabled = !isDisabled,
-		colors = ButtonDefaults.buttonColors(backgroundColor = bgColor),
-		modifier = Modifier.padding(8.dp)
+	Surface(
+		color = bgColor,
+		shape = MaterialTheme.shapes.large,
+		border = BorderStroke(if (isShaded) 1.dp else 0.dp, if (isShaded) fgColor else bgColor),
+		modifier = Modifier
+			.clickable(onClick = action, enabled = !isDisabled)
+			.padding(8.dp).height(44.dp)
 	) {
 		Row(
 			horizontalArrangement = Arrangement.Center,
+			verticalAlignment = Alignment.CenterVertically,
+			modifier = Modifier.fillMaxWidth(1f)
 		) {
-			Spacer(Modifier.weight(1f))
 			Text(text, style = MaterialTheme.typography.button, color = fgColor)
-			Spacer(Modifier.weight(1f))
 		}
 	}
 }
@@ -45,7 +50,7 @@ fun SeedPhraseButton(word: String, select: () -> Unit) {
 	Surface(
 		shape = MaterialTheme.shapes.small,
 		color = MaterialTheme.colors.Crypto100,
-		modifier = Modifier.clickable ( onClick = select )
+		modifier = Modifier.clickable(onClick = select)
 	) {
 		Text(
 			word,

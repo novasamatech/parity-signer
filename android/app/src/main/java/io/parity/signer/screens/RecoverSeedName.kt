@@ -1,9 +1,6 @@
 package io.parity.signer.modals
 
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.*
@@ -19,15 +16,22 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.ImeOptions
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.unit.dp
 import io.parity.signer.ButtonID
 import io.parity.signer.components.BigButton
+import io.parity.signer.components.SingleTextInput
 import io.parity.signer.models.SignerDataModel
 import io.parity.signer.models.addSeed
 import io.parity.signer.models.pushButton
+import io.parity.signer.ui.theme.SignalDanger
+import io.parity.signer.ui.theme.Text600
 
 @Composable
-fun RecoverSeedName(button: (button: ButtonID, details: String) -> Unit, signerDataModel: SignerDataModel) {
-	var seedName by remember { mutableStateOf("") }
+fun RecoverSeedName(
+	button: (button: ButtonID, details: String) -> Unit,
+	signerDataModel: SignerDataModel
+) {
+	var seedName = remember { mutableStateOf("") }
 	val lastError = signerDataModel.lastError.observeAsState()
 	val focusManager = LocalFocusManager.current
 	val focusRequester = remember { FocusRequester() }
@@ -36,38 +40,42 @@ fun RecoverSeedName(button: (button: ButtonID, details: String) -> Unit, signerD
 	Column(
 		horizontalAlignment = Alignment.CenterHorizontally,
 		verticalArrangement = Arrangement.Center,
-		modifier = Modifier.fillMaxSize()
+		modifier = Modifier
+			.fillMaxSize(1f)
+			.padding(20.dp)
 	) {
-		Text("Create new seed")
-		Text(lastError.value.toString())
-		TextField(
-			value = seedName,
-			onValueChange = {
-				seedName = it
+		Text(
+			"DISPLAY NAME",
+			style = MaterialTheme.typography.overline,
+			color = MaterialTheme.colors.Text600
+		)
+		Text(
+			lastError.value.toString(),
+			style = MaterialTheme.typography.caption,
+			color = MaterialTheme.colors.SignalDanger
+		)
+		SingleTextInput(
+			content = seedName,
+			update = {
+				seedName.value = it
 				signerDataModel.clearError()
 			},
-			label = { Text("Seed name") },
-			singleLine = true,
-			keyboardOptions = KeyboardOptions(
-				autoCorrect = false,
-				capitalization = KeyboardCapitalization.Words,
-				keyboardType = KeyboardType.Text,
-				imeAction = ImeAction.Done
-			),
-			keyboardActions = KeyboardActions(
-				onDone = {
-					focusManager.clearFocus()
-					button(ButtonID.GoForward, seedName)
-				}
-			),
-			modifier = Modifier.focusRequester(focusRequester = focusRequester)
+			onDone = { button(ButtonID.GoForward, seedName.value) },
+			capitalize = true,
+			focusManager = focusManager,
+			focusRequester = focusRequester
 		)
-		Text("Display name visible only to you")
+
+		Text("Display name visible only to you",
+		style = MaterialTheme.typography.caption,
+		color = MaterialTheme.colors.Text600)
 		BigButton(
-			text = "Generate seed phrase",
+			text = "Next",
 			action = {
 				focusManager.clearFocus()
-				button(ButtonID.GoForward, seedName)}
+				button(ButtonID.GoForward, seedName.value)
+			},
+		isDisabled = seedName.value.isBlank() || seedName.value.contains(",")
 		)
 
 
@@ -76,7 +84,8 @@ fun RecoverSeedName(button: (button: ButtonID, details: String) -> Unit, signerD
 		if (signerDataModel.screenData.value?.optBoolean("keyboard") == true) {
 			focusRequester.requestFocus()
 		}
-		seedName = signerDataModel.screenData.value?.optString("seed_name") ?: ""
+		seedName.value =
+			signerDataModel.screenData.value?.optString("seed_name") ?: ""
 		onDispose { focusManager.clearFocus() }
 	}
 }
