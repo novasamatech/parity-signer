@@ -40,6 +40,9 @@ class RestoreSeedModel(
 				}
 				guessWord.value = guess("")
 				seedWord.value = TextFieldValue(" ", selection = TextRange(1))
+			} else if (word == " ") {
+				guessWord.value = guess("")
+				seedWord.value = TextFieldValue(" ", selection = TextRange(1))
 			} else {
 				if (word.last() == ' ') {
 					val tempword = word.dropLast(1)

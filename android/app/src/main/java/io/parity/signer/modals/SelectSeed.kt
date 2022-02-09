@@ -25,7 +25,9 @@ fun SelectSeed(signerDataModel: SignerDataModel) {
 		?: JSONArray()
 
 	Surface(color = MaterialTheme.colors.Bg100, shape = MaterialTheme.shapes.large) {
-		LazyColumn {
+		LazyColumn(
+			modifier = Modifier.padding(20.dp)
+		) {
 			items(cards.length()) { item ->
 				Row(
 					Modifier

@@ -11,6 +11,9 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import io.parity.signer.ui.theme.*
 
+/**
+ * Typical huge button that just wants to be pushed
+ */
 @Composable
 fun BigButton(
 	text: String,
@@ -30,13 +33,13 @@ fun BigButton(
 	Surface(
 		color = bgColor,
 		shape = MaterialTheme.shapes.large,
-		border = BorderStroke(
+		/*border = BorderStroke(
 			1.dp,
 			if (isShaded) fgColor else bgColor
-		),
+		),*/
 		modifier = Modifier
 			.clickable(onClick = action, enabled = !isDisabled)
-			.padding(8.dp)
+			.padding(vertical = 8.dp)
 			.height(44.dp)
 	) {
 		Row(
@@ -49,6 +52,9 @@ fun BigButton(
 	}
 }
 
+/**
+ * Suggest buttons for seed phrase recovery screen
+ */
 @Composable
 fun SeedPhraseButton(word: String, select: () -> Unit) {
 	Surface(

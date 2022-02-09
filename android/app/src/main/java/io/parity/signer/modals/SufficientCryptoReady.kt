@@ -17,17 +17,25 @@ import org.json.JSONObject
 @Composable
 fun SufficientCryptoReady(signerDataModel: SignerDataModel) {
 	Surface() {
-		Column (modifier = Modifier.fillMaxSize()) {
-			Spacer(modifier = Modifier.padding(8.dp))
+		Column(modifier = Modifier
+			.fillMaxSize()
+			.padding(20.dp)) {
 			HeaderBar("Your signature", "Scan this into your application")
 			Image(
-				bitmap = signerDataModel.modalData.value?.getString("sufficient")!!.intoImageBitmap(),
+				bitmap = signerDataModel.modalData.value?.getString("sufficient")!!
+					.intoImageBitmap(),
 				contentDescription = "Signed update",
 				contentScale = ContentScale.FillWidth,
 				modifier = Modifier.fillMaxWidth()
 			)
-			KeyCard(identity = signerDataModel.modalData.value?.optJSONObject("author_info") ?: JSONObject())
-			Text("Payload: " + signerDataModel.modalData.value?.optJSONObject("content")?.optString("type"))
+			KeyCard(
+				identity = signerDataModel.modalData.value?.optJSONObject("author_info")
+					?: JSONObject()
+			)
+			Text(
+				"Payload: " + signerDataModel.modalData.value?.optJSONObject("content")
+					?.optString("type")
+			)
 		}
 	}
 }

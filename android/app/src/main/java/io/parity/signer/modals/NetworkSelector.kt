@@ -39,7 +39,9 @@ fun NetworkSelector(signerDataModel: SignerDataModel) {
 				color = MaterialTheme.colors.Bg000,
 				modifier = Modifier.weight(1f)
 			) {
-				Column {
+				Column(
+					modifier = Modifier.padding(20.dp)
+				) {
 					HeaderBar(
 						line1 = "NETWORK",
 						line2 = "Select network",
@@ -49,7 +51,7 @@ fun NetworkSelector(signerDataModel: SignerDataModel) {
 					LazyColumn(
 						contentPadding = PaddingValues(horizontal = 8.dp),
 						verticalArrangement = Arrangement.spacedBy(10.dp)
-						) {
+					) {
 						items(networks.length()) { item ->
 							Row(Modifier.clickable {
 								signerDataModel.pushButton(

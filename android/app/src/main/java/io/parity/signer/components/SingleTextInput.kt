@@ -42,7 +42,7 @@ fun SingleTextInput(
 			value = content.value,
 			onValueChange = update,
 			singleLine = true,
-			leadingIcon = {prefix()},
+			leadingIcon = { prefix() },
 			keyboardOptions = KeyboardOptions(
 				autoCorrect = false,
 				capitalization = if (capitalize) KeyboardCapitalization.Words else KeyboardCapitalization.None,

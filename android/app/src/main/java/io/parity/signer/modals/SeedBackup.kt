@@ -2,13 +2,17 @@ package io.parity.signer.modals
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Lock
 import androidx.compose.runtime.*
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
 import io.parity.signer.components.HeaderBar
 import io.parity.signer.components.NetworkCard
+import io.parity.signer.components.SeedBox
 import io.parity.signer.models.SignerDataModel
 import io.parity.signer.models.getSeed
 import io.parity.signer.ui.theme.Bg200
@@ -27,11 +31,16 @@ fun SeedBackup(signerDataModel: SignerDataModel) {
 	var derivations =
 		signerDataModel.modalData.value?.optJSONArray("derivations") ?: JSONArray()
 
-	Surface(color = MaterialTheme.colors.Bg200, shape = MaterialTheme.shapes.large) {
-		Column {
+	Surface(
+		color = MaterialTheme.colors.Bg200,
+		shape = MaterialTheme.shapes.large
+	) {
+		Column(
+			modifier = Modifier.padding(20.dp)
+		) {
 			HeaderBar("Backup", seedName)
 			Text("SEED PHRASE")
-			Text(seedPhrase)
+			SeedBox(seedPhrase = seedPhrase)
 			Text("DERIVED KEYS")
 			LazyColumn {
 				for (packIndex in 0 until derivations.length()) {
@@ -42,18 +51,22 @@ fun SeedBackup(signerDataModel: SignerDataModel) {
 						derivations.getJSONObject(packIndex).getJSONArray("id_set").length()
 					) { index ->
 						derivations.getJSONObject(packIndex).getJSONArray("id_set")
-								.getJSONObject(index).let {
-									if (it.optString("path").isBlank()) {
-										Text("seed key")
-									} else {
-										Row {
-											Text(it.optString("path"))
-											if (it.optBoolean("has_pwd")) {
-												Text("///")
-												Icon(Icons.Default.Lock, "Password protected", tint = MaterialTheme.colors.Crypto400)
-											}
+							.getJSONObject(index).let {
+								if (it.optString("path").isBlank()) {
+									Text("seed key")
+								} else {
+									Row {
+										Text(it.optString("path"))
+										if (it.optBoolean("has_pwd")) {
+											Text("///")
+											Icon(
+												Icons.Default.Lock,
+												"Password protected",
+												tint = MaterialTheme.colors.Crypto400
+											)
 										}
 									}
+								}
 							}
 					}
 				}

@@ -3,9 +3,11 @@ package io.parity.signer.modals
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
 import io.parity.signer.ButtonID
 import io.parity.signer.components.BigButton
 import io.parity.signer.components.HeaderBar
@@ -22,8 +24,13 @@ fun TypesInfo(signerDataModel: SignerDataModel) {
 
 	Column {
 		Spacer(Modifier.weight(1f))
-		Surface(color = MaterialTheme.colors.Bg000, shape = MaterialTheme.shapes.large) {
-			Column {
+		Surface(
+			color = MaterialTheme.colors.Bg000,
+			shape = MaterialTheme.shapes.large
+		) {
+			Column(
+				modifier = Modifier.padding(20.dp)
+			) {
 				HeaderBar(line1 = "MANAGE TYPES", line2 = "Select action")
 				if (content.optBoolean("types_on_file")) {
 					Row {
