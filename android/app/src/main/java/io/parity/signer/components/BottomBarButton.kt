@@ -1,7 +1,9 @@
 package io.parity.signer.components
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
@@ -13,6 +15,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
 import io.parity.signer.ButtonID
@@ -32,7 +35,8 @@ fun BottomBarButton(
 	image: ImageVector,
 	buttonID: ButtonID
 ) {
-	val selected = signerDataModel.footerButton.observeAsState().value == buttonID.getName()
+	val selected =
+		signerDataModel.footerButton.observeAsState().value == buttonID.getName()
 	val tint = if (selected) {
 		MaterialTheme.colors.Text600
 	} else {
@@ -43,25 +47,18 @@ fun BottomBarButton(
 	} else {
 		MaterialTheme.colors.Text400
 	}
-	IconButton(
-		onClick = {
-			signerDataModel.totalRefresh()
+	Column(
+		horizontalAlignment = Alignment.CenterHorizontally,
+		modifier = Modifier.clickable(onClick = {
 			signerDataModel.pushButton(buttonID)
-			//signerDataModel.navigate(buttonID.getName())
-		},
-		modifier = Modifier.width(66.dp)
+		}).width(66.dp)
 	) {
-		Column(
-			horizontalAlignment = Alignment.CenterHorizontally,
-			modifier = Modifier.width(66.dp)
-		) {
-			Icon(image, contentDescription = buttonID.getName(), tint = tint)
-			Text(
-				buttonID.getName(),
-				color = color,
-				style = MaterialTheme.typography.subtitle2
-			)
-		}
+		Icon(image, contentDescription = buttonID.getName(), tint = tint)
+		Text(
+			buttonID.getName(),
+			color = color,
+			style = MaterialTheme.typography.subtitle2
+		)
 	}
 }
 

@@ -19,34 +19,35 @@ import io.parity.signer.ui.theme.Bg000
 fun BottomBar(
 	signerDataModel: SignerDataModel,
 ) {
-	BottomAppBar (
+	BottomAppBar(
 		backgroundColor = MaterialTheme.colors.Bg000,
 		elevation = 0.dp,
-		modifier = Modifier.height(57.dp)) {
-		Spacer(Modifier.weight(1f))
-		BottomBarButton(
-			signerDataModel = signerDataModel,
-			image = Icons.Default.CalendarViewDay,
-			buttonID = ButtonID.NavbarLog
-		)
-		Spacer(Modifier.weight(1f))
-		BottomBarButton(
-			signerDataModel = signerDataModel,
-			image = Icons.Default.CropFree,
-			buttonID = ButtonID.NavbarScan
-		)
-		Spacer(Modifier.weight(1f))
-		BottomBarButton(
-			signerDataModel = signerDataModel,
-			image = Icons.Default.Pattern,
-			buttonID = ButtonID.NavbarKeys
-		)
-		Spacer(Modifier.weight(1f))
-		BottomBarButton(
-			signerDataModel = signerDataModel,
-			image = Icons.Default.Settings,
-			buttonID = ButtonID.NavbarSettings
-		)
-		Spacer(Modifier.weight(1f))
+		modifier = Modifier.height(56.dp)
+	) {
+		Row(
+			horizontalArrangement = Arrangement.SpaceEvenly,
+			modifier = Modifier.fillMaxWidth(1f)
+		) {
+			BottomBarButton(
+				signerDataModel = signerDataModel,
+				image = Icons.Default.CalendarViewDay,
+				buttonID = ButtonID.NavbarLog
+			)
+			BottomBarButton(
+				signerDataModel = signerDataModel,
+				image = Icons.Default.CropFree,
+				buttonID = ButtonID.NavbarScan
+			)
+			BottomBarButton(
+				signerDataModel = signerDataModel,
+				image = Icons.Default.Pattern,
+				buttonID = ButtonID.NavbarKeys
+			)
+			BottomBarButton(
+				signerDataModel = signerDataModel,
+				image = Icons.Default.Settings,
+				buttonID = ButtonID.NavbarSettings
+			)
+		}
 	}
 }

@@ -16,17 +16,23 @@ import io.parity.signer.models.intoImageBitmap
 @Composable
 fun SignatureReady(signerDataModel: SignerDataModel) {
 
-	Surface() {
-		Column (modifier = Modifier.fillMaxSize().padding(20.dp)) {
-			Text("Your signature")
-			Text("Scan this into your application")
-			Image(
-				bitmap = signerDataModel.modalData.value?.getString("signature")!!.intoImageBitmap(),
-				contentDescription = "Signed transaction",
-				contentScale = ContentScale.FillWidth,
-				modifier = Modifier.fillMaxWidth()
-			)
+	Column(
 
+	) {
+		Surface() {
+			Column(modifier = Modifier
+				.fillMaxSize()
+				.padding(20.dp)) {
+				Text("Your signature")
+				Text("Scan this into your application")
+				Image(
+					bitmap = signerDataModel.modalData.value?.getString("signature")!!
+						.intoImageBitmap(),
+					contentDescription = "Signed transaction",
+					contentScale = ContentScale.FillWidth,
+					modifier = Modifier.fillMaxWidth()
+				)
+			}
 		}
 	}
 }
