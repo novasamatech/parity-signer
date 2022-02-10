@@ -1,8 +1,6 @@
 package io.parity.signer.modals
 
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
@@ -10,13 +8,13 @@ import androidx.compose.material.icons.filled.Lock
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import io.parity.signer.components.HeaderBar
-import io.parity.signer.components.NetworkCard
-import io.parity.signer.components.SeedBox
+import io.parity.signer.components.*
 import io.parity.signer.models.SignerDataModel
 import io.parity.signer.models.getSeed
 import io.parity.signer.ui.theme.Bg200
 import io.parity.signer.ui.theme.Crypto400
+import io.parity.signer.ui.theme.CryptoTypography
+import kotlinx.coroutines.delay
 import org.json.JSONArray
 
 /**
@@ -26,67 +24,110 @@ import org.json.JSONArray
 @Composable
 fun SeedBackup(signerDataModel: SignerDataModel) {
 	val seedName = signerDataModel.modalData.value?.optString("seed_name") ?: ""
-	var seedPhrase by remember { mutableStateOf("Seed phrase is not available now") }
-	var error by remember { mutableStateOf(true) }
-	var derivations =
+	var seedPhrase by remember { mutableStateOf("") }
+	var seedBoxStatus by remember { mutableStateOf(SeedBoxStatus.Locked) }
+	val derivations =
 		signerDataModel.modalData.value?.optJSONArray("derivations") ?: JSONArray()
+	val time = remember { mutableStateOf(60000L) } //Countdown time
 
 	Surface(
 		color = MaterialTheme.colors.Bg200,
 		shape = MaterialTheme.shapes.large
 	) {
-		Column(
-			modifier = Modifier.padding(20.dp)
-		) {
-			HeaderBar("Backup", seedName)
-			Text("SEED PHRASE")
-			SeedBox(seedPhrase = seedPhrase)
-			Text("DERIVED KEYS")
-			LazyColumn {
-				for (packIndex in 0 until derivations.length()) {
-					item {
-						NetworkCard(derivations.getJSONObject(packIndex))
-					}
-					items(
-						derivations.getJSONObject(packIndex).getJSONArray("id_set").length()
-					) { index ->
-						derivations.getJSONObject(packIndex).getJSONArray("id_set")
-							.getJSONObject(index).let {
-								if (it.optString("path").isBlank()) {
-									Text("seed key")
-								} else {
-									Row {
-										Text(it.optString("path"))
-										if (it.optBoolean("has_pwd")) {
-											Text("///")
-											Icon(
-												Icons.Default.Lock,
-												"Password protected",
-												tint = MaterialTheme.colors.Crypto400
+		Box {
+			Column(
+				modifier = Modifier.padding(20.dp)
+			) {
+				HeaderBar("Backup", seedName)
+				HeadingOverline("SEED PHRASE")
+				SeedBox(seedPhrase = seedPhrase, status = seedBoxStatus)
+				HeadingOverline("DERIVED KEYS")
+				LazyColumn {
+					for (packIndex in 0 until derivations.length()) {
+						item {
+							NetworkCard(derivations.getJSONObject(packIndex))
+						}
+						items(
+							derivations.getJSONObject(packIndex).getJSONArray("id_set")
+								.length()
+						) { index ->
+							derivations.getJSONObject(packIndex).getJSONArray("id_set")
+								.getJSONObject(index).let {
+									if (it.optString("path").isBlank()) {
+										Text(
+											"seed key",
+											style = CryptoTypography.body2,
+											color = MaterialTheme.colors.Crypto400
+										)
+									} else {
+										Row {
+											Text(
+												it.optString("path"),
+												style = CryptoTypography.body2,
+												color = MaterialTheme.colors.Crypto400
 											)
+											if (it.optBoolean("has_pwd")) {
+												Text(
+													"///",
+													style = CryptoTypography.body2,
+													color = MaterialTheme.colors.Crypto400
+												)
+												Icon(
+													Icons.Default.Lock,
+													"Password protected",
+													tint = MaterialTheme.colors.Crypto400
+												)
+											}
 										}
 									}
 								}
-							}
+						}
 					}
+				}
+			}
+			if (seedBoxStatus == SeedBoxStatus.Seed) {
+				Column(
+					verticalArrangement = Arrangement.Bottom,
+					modifier = Modifier.fillMaxSize()
+				) {
+					BigButton(
+						text = if (time.value > 0) "Hide seed phrase in " + (time.value/1000L).toString() + "s" else "",
+						action = {
+							seedBoxStatus = SeedBoxStatus.Timeout
+							seedPhrase = ""
+						}
+					)
+					Spacer(Modifier.height(20.dp))
 				}
 			}
 		}
 	}
+
+	LaunchedEffect(key1 = time.value, key2 = seedBoxStatus) {
+		if (seedBoxStatus == SeedBoxStatus.Seed) {
+			if (time.value > 0) {
+				delay(1000L)
+				time.value -= 1000L
+			} else {
+				seedBoxStatus = SeedBoxStatus.Timeout
+			}
+		}
+	}
+
 	DisposableEffect(Unit) {
 		if (signerDataModel.alertState.value == io.parity.signer.ShieldAlert.None) {
 			signerDataModel.authentication.authenticate(signerDataModel.activity) {
 				seedPhrase = signerDataModel.getSeed(seedName, backup = true)
 				if (seedPhrase.isBlank()) {
-					seedPhrase = "Seed phrase is not available now"
-					error = true
+					seedPhrase = ""
+					seedBoxStatus = SeedBoxStatus.Error
 				} else {
-					error = false
+					seedBoxStatus = SeedBoxStatus.Seed
 				}
 			}
 		} else {
-			seedPhrase = "Seed phrase is not available now"
-			error = true
+			seedPhrase = ""
+			seedBoxStatus = SeedBoxStatus.Locked
 		}
 		onDispose { seedPhrase = "" }
 	}

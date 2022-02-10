@@ -63,7 +63,6 @@ fun SeedBox(seedPhrase: String, status: SeedBoxStatus = SeedBoxStatus.Seed) {
 	}
 }
 
-
 enum class SeedBoxStatus {
 	Seed,
 	Timeout,
