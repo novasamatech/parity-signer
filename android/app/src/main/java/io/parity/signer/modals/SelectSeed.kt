@@ -17,6 +17,7 @@ import io.parity.signer.models.getSeed
 import io.parity.signer.models.pushButton
 import io.parity.signer.ui.theme.Bg100
 import io.parity.signer.ui.theme.Bg200
+import io.parity.signer.ui.theme.modal
 import org.json.JSONArray
 
 @Composable
@@ -24,7 +25,10 @@ fun SelectSeed(signerDataModel: SignerDataModel) {
 	val cards = signerDataModel.screenData.value?.getJSONArray("seedNameCards")
 		?: JSONArray()
 
-	Surface(color = MaterialTheme.colors.Bg100, shape = MaterialTheme.shapes.large) {
+	Surface(
+		color = MaterialTheme.colors.Bg100,
+		shape = MaterialTheme.shapes.modal
+	) {
 		LazyColumn(
 			modifier = Modifier.padding(20.dp)
 		) {

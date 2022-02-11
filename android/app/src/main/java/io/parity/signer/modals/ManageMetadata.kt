@@ -17,6 +17,7 @@ import io.parity.signer.components.NetworkCard
 import io.parity.signer.models.SignerDataModel
 import io.parity.signer.models.pushButton
 import io.parity.signer.ui.theme.Bg000
+import io.parity.signer.ui.theme.modal
 import org.json.JSONObject
 
 @Composable
@@ -30,7 +31,7 @@ fun ManageMetadata(signerDataModel: SignerDataModel) {
 		Spacer(Modifier.weight(1f))
 		Surface(
 			color = MaterialTheme.colors.Bg000,
-			shape = MaterialTheme.shapes.large
+			shape = MaterialTheme.shapes.modal
 		) {
 			Column {
 				HeaderBar(line1 = "MANAGE METADATA", line2 = "Select action")

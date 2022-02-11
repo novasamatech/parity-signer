@@ -13,6 +13,7 @@ import io.parity.signer.components.*
 import io.parity.signer.models.SignerDataModel
 import io.parity.signer.models.addSeed
 import io.parity.signer.ui.theme.Bg200
+import io.parity.signer.ui.theme.modal
 
 @Composable
 fun NewSeedBackup(signerDataModel: SignerDataModel) {
@@ -20,7 +21,7 @@ fun NewSeedBackup(signerDataModel: SignerDataModel) {
 	val createRoots = remember { mutableStateOf(true) }
 	Surface(
 		color = MaterialTheme.colors.Bg200,
-		shape = MaterialTheme.shapes.large
+		shape = MaterialTheme.shapes.modal
 	) {
 		Column(
 			verticalArrangement = Arrangement.spacedBy(8.dp),

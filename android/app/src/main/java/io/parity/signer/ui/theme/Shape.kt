@@ -1,5 +1,7 @@
 package io.parity.signer.ui.theme
 
+import android.graphics.drawable.shapes.Shape
+import androidx.compose.foundation.shape.CornerBasedShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Shapes
 import androidx.compose.ui.unit.dp
@@ -9,3 +11,6 @@ val Shapes = Shapes(
         medium = RoundedCornerShape(6.dp),
         large = RoundedCornerShape(8.dp)
 )
+
+val Shapes.modal: CornerBasedShape
+	get() = RoundedCornerShape(20.dp)

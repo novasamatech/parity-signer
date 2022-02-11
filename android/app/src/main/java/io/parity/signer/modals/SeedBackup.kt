@@ -14,6 +14,7 @@ import io.parity.signer.models.getSeed
 import io.parity.signer.ui.theme.Bg200
 import io.parity.signer.ui.theme.Crypto400
 import io.parity.signer.ui.theme.CryptoTypography
+import io.parity.signer.ui.theme.modal
 import kotlinx.coroutines.delay
 import org.json.JSONArray
 
@@ -32,7 +33,7 @@ fun SeedBackup(signerDataModel: SignerDataModel) {
 
 	Surface(
 		color = MaterialTheme.colors.Bg200,
-		shape = MaterialTheme.shapes.large
+		shape = MaterialTheme.shapes.modal
 	) {
 		Box {
 			Column(

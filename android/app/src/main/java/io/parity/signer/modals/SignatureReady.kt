@@ -12,6 +12,8 @@ import io.parity.signer.components.transactionCards.TCAuthor
 import io.parity.signer.components.transactionCards.TCAuthorPlain
 import io.parity.signer.models.SignerDataModel
 import io.parity.signer.models.intoImageBitmap
+import io.parity.signer.ui.theme.Bg000
+import io.parity.signer.ui.theme.modal
 
 @Composable
 fun SignatureReady(signerDataModel: SignerDataModel) {
@@ -19,7 +21,10 @@ fun SignatureReady(signerDataModel: SignerDataModel) {
 	Column(
 
 	) {
-		Surface() {
+		Surface(
+			shape = MaterialTheme.shapes.modal,
+			color = MaterialTheme.colors.Bg000
+		) {
 			Column(modifier = Modifier
 				.fillMaxSize()
 				.padding(20.dp)) {

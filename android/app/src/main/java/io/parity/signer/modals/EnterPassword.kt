@@ -33,6 +33,7 @@ import io.parity.signer.models.SignerDataModel
 import io.parity.signer.models.addKey
 import io.parity.signer.models.pushButton
 import io.parity.signer.ui.theme.Bg200
+import io.parity.signer.ui.theme.modal
 import org.json.JSONObject
 
 @Composable
@@ -46,7 +47,7 @@ fun EnterPassword(signerDataModel: SignerDataModel) {
 
 	Surface(
 		color = MaterialTheme.colors.Bg200,
-		shape = MaterialTheme.shapes.large,
+		shape = MaterialTheme.shapes.modal,
 		modifier = Modifier.fillMaxSize(1f).padding(8.dp)
 	) {
 		Column(

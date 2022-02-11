@@ -20,6 +20,7 @@ import io.parity.signer.models.SignerDataModel
 import io.parity.signer.models.pushButton
 import io.parity.signer.ui.theme.Action400
 import io.parity.signer.ui.theme.Bg000
+import io.parity.signer.ui.theme.modal
 import org.json.JSONArray
 
 @Composable
@@ -35,7 +36,7 @@ fun NetworkSelector(signerDataModel: SignerDataModel) {
 					.weight(2f)
 					.clickable { signerDataModel.pushButton(ButtonID.GoBack) })
 			Surface(
-				shape = MaterialTheme.shapes.large,
+				shape = MaterialTheme.shapes.modal,
 				color = MaterialTheme.colors.Bg000,
 				modifier = Modifier.weight(1f)
 			) {

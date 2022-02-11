@@ -14,6 +14,7 @@ import io.parity.signer.models.SignerDataModel
 import io.parity.signer.models.pushButton
 import io.parity.signer.models.removeSeed
 import io.parity.signer.ui.theme.Bg000
+import io.parity.signer.ui.theme.modal
 
 @Composable
 fun NetworkDetailsMenu(signerDataModel: SignerDataModel) {
@@ -23,7 +24,7 @@ fun NetworkDetailsMenu(signerDataModel: SignerDataModel) {
 		Spacer(Modifier.weight(1f))
 		Surface(
 			color = MaterialTheme.colors.Bg000,
-			shape = MaterialTheme.shapes.large
+			shape = MaterialTheme.shapes.modal
 		) {
 			Column(
 				modifier = Modifier.padding(20.dp)

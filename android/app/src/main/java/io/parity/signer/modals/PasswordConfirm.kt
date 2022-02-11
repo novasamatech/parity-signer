@@ -33,6 +33,7 @@ import io.parity.signer.models.addKey
 import io.parity.signer.models.checkAsDerivation
 import io.parity.signer.models.pushButton
 import io.parity.signer.ui.theme.Bg200
+import io.parity.signer.ui.theme.modal
 
 @Composable
 fun PasswordConfirm(signerDataModel: SignerDataModel) {
@@ -46,7 +47,7 @@ fun PasswordConfirm(signerDataModel: SignerDataModel) {
 
 	Surface(
 		color = MaterialTheme.colors.Bg200,
-		shape = MaterialTheme.shapes.large,
+		shape = MaterialTheme.shapes.modal,
 		modifier = Modifier.fillMaxSize(1f)
 	) {
 		Column(
