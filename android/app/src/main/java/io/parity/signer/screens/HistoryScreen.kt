@@ -4,30 +4,35 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import io.parity.signer.ButtonID
 import io.parity.signer.components.HistoryCard
 import io.parity.signer.models.SignerDataModel
 import io.parity.signer.models.pushButton
+import io.parity.signer.models.toListOfJSONObjects
 import org.json.JSONArray
 
 @Composable
 fun HistoryScreen(signerDataModel: SignerDataModel) {
 	val history =
-		signerDataModel.screenData.value?.optJSONArray("log") ?: JSONArray()
+		signerDataModel.screenData.value?.optJSONArray("log")?.toListOfJSONObjects() ?: emptyList()
 
 	Column {
 		LazyColumn {
-			for (i in 0 until history.length()) {
-				items(
-					history.getJSONObject(i).getJSONArray("events").length()
+			for (recordJSON in history) {
+				val order = recordJSON.optInt("order").toString()
+				val timestamp = recordJSON.optString("timestamp")
+				val record = recordJSON.optJSONArray("events")?.toListOfJSONObjects() ?: emptyList()
+				this.items(
+					items = record,
+					key = { recordJSON.optString("order") + it.toString() }
 				) { item ->
-					Row(Modifier.clickable { signerDataModel.pushButton(ButtonID.ShowLogDetails, details = i.toString()) }) {
+					Row(Modifier.clickable { signerDataModel.pushButton(ButtonID.ShowLogDetails, details = order) }) {
 						HistoryCard(
-							history.getJSONObject(i).getJSONArray("events")
-								.getJSONObject(item),
-							history.getJSONObject(i).getString("timestamp")
+							item,
+							timestamp
 						)
 					}
 				}
