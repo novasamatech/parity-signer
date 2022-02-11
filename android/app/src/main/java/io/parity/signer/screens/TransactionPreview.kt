@@ -31,10 +31,10 @@ fun TransactionPreview(
 
 	Column {
 		TransactionPreviewField(transaction = transaction)
-		signerDataModel.screenData.value!!.getJSONObject("author_info").let {
+		signerDataModel.screenData.value!!.optJSONObject("author_info")?.let {
 			KeyCard(identity = it)
 		}
-		signerDataModel.screenData.value!!.getJSONObject("network_info").let {
+		signerDataModel.screenData.value!!.optJSONObject("network_info")?.let {
 			NetworkCard(network = it)
 		}
 		when (action) {
