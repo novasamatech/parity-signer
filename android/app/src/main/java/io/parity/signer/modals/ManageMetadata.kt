@@ -10,6 +10,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import io.parity.signer.ButtonID
+import io.parity.signer.alerts.AndroidCalledConfirm
 import io.parity.signer.components.BigButton
 import io.parity.signer.components.HeaderBar
 import io.parity.signer.components.MetadataCard
@@ -62,19 +63,14 @@ fun ManageMetadata(signerDataModel: SignerDataModel) {
 			}
 		}
 	}
-	if (confirm) {
-		AlertDialog(
-			onDismissRequest = { confirm = false },
-			buttons = {
-				Button(onClick = { confirm = false }) { Text("Cancel") }
-				Button(onClick = { signerDataModel.pushButton(ButtonID.RemoveNetwork) }) {
-					Text(
-						"Remove metadata"
-					)
-				}
-			},
-			title = { Text("Remove metadata?") },
-			text = { Text("This metadata will be removed for all networks") }
-		)
-	}
+
+	AndroidCalledConfirm(
+		show = confirm,
+		header = "Remove metadata?",
+		text = "This metadata will be removed for all networks",
+		back = { confirm = false },
+		forward = { signerDataModel.pushButton(ButtonID.RemoveNetwork) },
+		backText = "Cancel",
+		forwardText = "Remove metadata"
+	)
 }

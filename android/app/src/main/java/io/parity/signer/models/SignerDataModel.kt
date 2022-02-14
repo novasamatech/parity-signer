@@ -304,6 +304,7 @@ class SignerDataModel : ViewModel() {
 		if (checkRefresh) _onBoardingDone.value =
 			OnBoardingState.Yes else _onBoardingDone.value = OnBoardingState.No
 		if (checkRefresh) {
+			getAlertState()
 			refreshSeedNames(init = true)
 			pushButton(ButtonID.Start)
 		}
@@ -326,6 +327,21 @@ class SignerDataModel : ViewModel() {
 			context.packageName,
 			0
 		).versionName
+	}
+
+	private fun getAlertState() {
+		_alertState.value = if (historyGetWarnings(dbName)) {
+			if (alertState.value == ShieldAlert.Active) ShieldAlert.Active else ShieldAlert.Past
+		} else {
+			ShieldAlert.None
+		}
+	}
+
+	fun acknowledgeWarning() {
+		if (alertState.value == ShieldAlert.Past) {
+			historyAcknowledgeWarnings(dbName)
+			_alertState.value = ShieldAlert.None
+		}
 	}
 
 	//MARK: General utils end

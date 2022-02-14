@@ -8,6 +8,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import io.parity.signer.ButtonID
+import io.parity.signer.alerts.AndroidCalledConfirm
 import io.parity.signer.components.BigButton
 import io.parity.signer.components.HeaderBar
 import io.parity.signer.models.SignerDataModel
@@ -46,19 +47,13 @@ fun NetworkDetailsMenu(signerDataModel: SignerDataModel) {
 			}
 		}
 	}
-	if (confirm) {
-		AlertDialog(
-			onDismissRequest = { confirm = false },
-			buttons = {
-				Button(onClick = { confirm = false }) { Text("Cancel") }
-				Button(onClick = { signerDataModel.pushButton(ButtonID.RemoveNetwork) }) {
-					Text(
-						"Remove network"
-					)
-				}
-			},
-			title = { Text("Remove network?") },
-			text = { Text("This network will be removed for whole device") }
-		)
-	}
+	AndroidCalledConfirm(
+		show = confirm,
+		header = "Remove network?",
+		text = "This network will be removed for whole device",
+		back = { confirm = false },
+		forward = { signerDataModel.pushButton(ButtonID.RemoveNetwork) },
+		backText = "Cancel",
+		forwardText = "Remove network"
+	)
 }

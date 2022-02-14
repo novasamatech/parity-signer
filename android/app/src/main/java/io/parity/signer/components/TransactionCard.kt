@@ -13,6 +13,9 @@ import io.parity.signer.models.SignerDataModel
 import io.parity.signer.models.decodeHex
 import org.json.JSONObject
 
+/**
+ * Selector for transaction card appearance
+ */
 @Composable
 fun TransactionCard(card: JSONObject) {
 	Box(

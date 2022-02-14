@@ -8,6 +8,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import io.parity.signer.ButtonID
+import io.parity.signer.alerts.AndroidCalledConfirm
 import io.parity.signer.components.BigButton
 import io.parity.signer.components.HeaderBar
 import io.parity.signer.models.SignerDataModel
@@ -40,19 +41,13 @@ fun KeyDetailsAction(signerDataModel: SignerDataModel) {
 			}
 		}
 	}
-	if (confirm) {
-		AlertDialog(
-			onDismissRequest = { confirm = false },
-			buttons = {
-				Button(onClick = { confirm = false }) { Text("Cancel") }
-				Button(onClick = { signerDataModel.pushButton(ButtonID.RemoveKey) }) {
-					Text(
-						"Remove key"
-					)
-				}
-			},
-			title = { Text("Forget this key?") },
-			text = { Text("This key will be removed for this network. Are you sure?") }
-		)
-	}
+	AndroidCalledConfirm(
+		show = confirm,
+		header = "Forget this key?",
+		text = "This key will be removed for this network. Are you sure?",
+		back = { confirm = false },
+		forward = { signerDataModel.pushButton(ButtonID.RemoveKey) },
+		backText = "Cancel",
+		forwardText = "Remove key"
+	)
 }

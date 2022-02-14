@@ -13,6 +13,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.unit.dp
 import io.parity.signer.ButtonID
+import io.parity.signer.alerts.AndroidCalledConfirm
 import io.parity.signer.components.Identicon
 import io.parity.signer.components.KeyCard
 import io.parity.signer.components.SettingsCardTemplate
@@ -66,7 +67,11 @@ fun SettingsScreen(signerDataModel: SignerDataModel) {
 								style = CryptoTypography.body2,
 								color = MaterialTheme.colors.Crypto400
 							)
-							Text("encryption: " + it.optString("encryption"), style = CryptoTypography.body1, color = MaterialTheme.colors.Text400)
+							Text(
+								"encryption: " + it.optString("encryption"),
+								style = CryptoTypography.body1,
+								color = MaterialTheme.colors.Text400
+							)
 						}
 					}
 				}
@@ -90,18 +95,16 @@ fun SettingsScreen(signerDataModel: SignerDataModel) {
 		)
 	}
 
-	if (confirm) {
-		AlertDialog(
-			onDismissRequest = { confirm = false },
-			buttons = {
-				Button(onClick = { confirm = false }) { Text("Cancel") }
-				Button(onClick = {
-					signerDataModel.wipe()
-					signerDataModel.totalRefresh()
-				}) { Text("Wipe") }
-			},
-			title = { Text("Wipe ALL data?") },
-			text = { Text("Factory reset the Signer app. This operation can not be reverted!") }
-		)
-	}
+	AndroidCalledConfirm(
+		show = confirm,
+		header = "Wipe ALL data?",
+		text = "Factory reset the Signer app. This operation can not be reverted!",
+		back = { confirm = false },
+		forward = {
+			signerDataModel.wipe()
+			signerDataModel.totalRefresh()
+		},
+		backText = "Cancel",
+		forwardText = "Wipe"
+	)
 }

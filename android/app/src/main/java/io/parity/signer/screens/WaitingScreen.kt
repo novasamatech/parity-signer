@@ -8,6 +8,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.painterResource
 import io.parity.signer.R
 
+/**
+ * Screen that might be shown when user should wait for something
+ */
 @Composable
 fun WaitingScreen() {
 	Column {

@@ -9,6 +9,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import io.parity.signer.ButtonID
+import io.parity.signer.alerts.AndroidCalledConfirm
 import io.parity.signer.components.BigButton
 import io.parity.signer.components.HeaderBar
 import io.parity.signer.components.Identicon
@@ -57,19 +58,13 @@ fun TypesInfo(signerDataModel: SignerDataModel) {
 			}
 		}
 	}
-	if (confirm) {
-		AlertDialog(
-			onDismissRequest = { confirm = false },
-			buttons = {
-				Button(onClick = { confirm = false }) { Text("Cancel") }
-				Button(onClick = { signerDataModel.pushButton(ButtonID.RemoveTypes) }) {
-					Text(
-						"Remove types"
-					)
-				}
-			},
-			title = { Text("Remove types?") },
-			text = { Text("Types information needed for support of pre-v14 metadata will be removed. Are you sure?") }
-		)
-	}
+	AndroidCalledConfirm(
+		show = confirm,
+		header = "Remove tyles?",
+		text = "Types information needed for support of pre-v14 metadata will be removed. Are you sure?",
+		back = { confirm = false },
+		forward = { signerDataModel.pushButton(ButtonID.RemoveTypes) },
+		backText = "Cancel",
+		forwardText = "Remove types"
+	)
 }

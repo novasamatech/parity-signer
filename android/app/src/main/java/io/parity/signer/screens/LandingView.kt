@@ -8,12 +8,16 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.unit.dp
+import io.parity.signer.alerts.AndroidCalledConfirm
 import io.parity.signer.components.BigButton
 import io.parity.signer.components.Documents
 import io.parity.signer.models.SignerDataModel
 import io.parity.signer.ui.theme.Action400
 import io.parity.signer.ui.theme.Bg000
 
+/**
+ * First screen with legal consent request
+ */
 @Composable
 fun LandingView(signerDataModel: SignerDataModel) {
 	var confirm by remember { mutableStateOf(false) }
@@ -68,37 +72,13 @@ fun LandingView(signerDataModel: SignerDataModel) {
 			}
 		}
 	}
-	if (confirm) {
-		AlertDialog(
-			onDismissRequest = { confirm = false },
-			dismissButton = {
-				Button(
-					colors = ButtonDefaults.buttonColors(
-						backgroundColor = MaterialTheme.colors.background,
-						contentColor = MaterialTheme.colors.onBackground,
-					),
-					onClick = {
-						confirm = false
-					}
-				) {
-					Text("Decline")
-				}
-			},
-			confirmButton = {
-				Button(
-					colors = ButtonDefaults.buttonColors(
-						backgroundColor = MaterialTheme.colors.background,
-						contentColor = MaterialTheme.colors.onBackground,
-					),
-					onClick = {
-						signerDataModel.onBoard()
-					}
-				) {
-					Text("Accept")
-				}
-			},
-			title = { Text("Accept terms and conditions and privacy policy?") },
-			text = { }
-		)
-	}
+
+	AndroidCalledConfirm(
+		show = confirm,
+		header = "Accept terms and conditions and privacy policy?",
+		back = { confirm = false },
+		forward = { signerDataModel.onBoard() },
+		backText = "Decline",
+		forwardText = "Accept"
+	)
 }

@@ -35,8 +35,7 @@ import io.parity.signer.ui.theme.ParitySignerTheme
 import kotlin.contracts.Effect
 
 /**
- * This is a simple screen with a single button that
- * triggers transaction sequence starting with camera
+ * Main scanner screen. One of navigation roots.
  */
 @Composable
 fun ScanScreen(signerDataModel: SignerDataModel) {

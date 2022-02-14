@@ -5,10 +5,11 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import io.parity.signer.ButtonID
+import io.parity.signer.alerts.AndroidCalledConfirm
 import io.parity.signer.components.BigButton
 import io.parity.signer.components.HeaderBar
 import io.parity.signer.models.SignerDataModel
@@ -19,6 +20,8 @@ import io.parity.signer.ui.theme.modal
 
 @Composable
 fun SeedMenu(signerDataModel: SignerDataModel) {
+	var confirm by remember { mutableStateOf(false) }
+
 	Column {
 		Spacer(Modifier.weight(1f))
 		Surface(
@@ -51,4 +54,18 @@ fun SeedMenu(signerDataModel: SignerDataModel) {
 			}
 		}
 	}
+
+	AndroidCalledConfirm(
+		show = confirm,
+		header = "Forget this seed forever?",
+		text = "This seed will be removed for all networks. This is not reversible. Are you sure?",
+		back = { confirm = false },
+		forward = {
+			signerDataModel.modalData.value?.optString("seed")?.let {
+				if (it.isNotBlank()) signerDataModel.removeSeed(it)
+			}
+		},
+		backText = "Cancel",
+		forwardText = "Remove seed"
+	)
 }

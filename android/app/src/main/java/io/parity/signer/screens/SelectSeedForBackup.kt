@@ -11,6 +11,9 @@ import io.parity.signer.models.SignerDataModel
 import io.parity.signer.models.pushButton
 import org.json.JSONArray
 
+/**
+ * Select seed for creating derivations
+ */
 @Composable
 fun SelectSeedForBackup(signerDataModel: SignerDataModel) {
 	val content = signerDataModel.screenData.value?.optJSONArray("seedNameCards")
