@@ -18,5 +18,4 @@ fun ErrorModal(error: String, signerDataModel: SignerDataModel) {
 		backText = "Dismiss",
 		showForward = false
 	)
-
 }
