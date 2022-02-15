@@ -147,7 +147,8 @@ fun HistoryCard(card: JSONObject, timestamp: String) {
 				image = Icons.Default.DeleteForever,
 				line1 = timestamp,
 				line2 = "History cleared",
-				line3 = ""
+				line3 = "",
+				danger = true
 			)
 		}
 		"seed_created" -> {
@@ -203,7 +204,8 @@ fun HistoryCard(card: JSONObject, timestamp: String) {
 				image = Icons.Default.Dangerous,
 				line1 = timestamp,
 				line2 = "Signing failure",
-				line3 = card.getJSONObject("payload").getString("user_comment")
+				line3 = card.getJSONObject("payload").getString("user_comment"),
+				danger = true
 			)
 		}
 		"transaction_signed" -> {
@@ -227,7 +229,8 @@ fun HistoryCard(card: JSONObject, timestamp: String) {
 				image = Icons.Default.Remove,
 				line1 = timestamp,
 				line2 = "Types info removed",
-				line3 = ""
+				line3 = "",
+				danger = true
 			)
 		}
 		"user_entered_event" -> {
@@ -243,7 +246,8 @@ fun HistoryCard(card: JSONObject, timestamp: String) {
 				image = Icons.Default.Warning,
 				line1 = timestamp,
 				line2 = "Warning!",
-				line3 = card.optString("payload")
+				line3 = card.optString("payload"),
+				danger = true
 			)
 		}
 		"wrong_password_entered" -> {
@@ -251,7 +255,8 @@ fun HistoryCard(card: JSONObject, timestamp: String) {
 				image = Icons.Default.Warning,
 				line1 = timestamp,
 				line2 = "Wrong password entered",
-				line3 = "operation declined"
+				line3 = "operation declined",
+				danger = true
 			)
 		}
 		else -> {
