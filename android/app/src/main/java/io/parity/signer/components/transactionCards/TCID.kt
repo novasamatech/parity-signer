@@ -7,15 +7,16 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
+import io.parity.signer.components.Identicon
 import io.parity.signer.models.SignerDataModel
+import org.json.JSONObject
 
 @Composable
-fun TCID(id: String) {
+fun TCID(payload: JSONObject) {
 	Row {
-		//Image(signerDataModel.getIdenticon(id, 64), "identicon", modifier = Modifier.scale(0.75f))
+		Identicon(identicon = payload.optString("identicon"))
 		Column {
-			Text(id)
-			//Text(identity.get("public_key").toString(), style = Typography.body2)
+			Text(payload.optString("base58"))
 		}
 	}
 }

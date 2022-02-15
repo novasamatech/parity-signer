@@ -14,6 +14,10 @@ import androidx.compose.ui.unit.dp
 import io.parity.signer.models.abbreviateString
 import org.json.JSONObject
 
+/**
+ * Selector for rendering history cards in general list;
+ * could easily be moved to backend later: TODO
+ */
 @Composable
 fun HistoryCard(card: JSONObject, timestamp: String) {
 	val payload = card.optJSONObject("payload")

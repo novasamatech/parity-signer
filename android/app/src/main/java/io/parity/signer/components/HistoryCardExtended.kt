@@ -18,12 +18,14 @@ import io.parity.signer.models.parseTransaction
 import org.json.JSONArray
 import org.json.JSONObject
 
+/**
+ * Detailed history event description representation selector
+ */
 @Composable
 fun HistoryCardExtended(card: JSONObject) {
 	val timestamp = ""
 	val payload = card.optJSONObject("payload")
 	when (card.getString("event")) {
-
 		"database_initiated" -> {
 			HistoryCardTemplate(
 				image = Icons.Default.Smartphone,

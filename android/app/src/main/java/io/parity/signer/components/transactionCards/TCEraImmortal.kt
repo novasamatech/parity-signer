@@ -10,18 +10,6 @@ import androidx.compose.ui.Modifier
 import org.json.JSONObject
 
 @Composable
-fun TCEraImmortalNonce(payload: JSONObject) {
-	Row(
-		horizontalArrangement = Arrangement.SpaceEvenly,
-		modifier = Modifier.fillMaxWidth()
-	) {
-		Column {
-			Text("Immortal")
-			Text("era")
-		}
-		Column {
-			Text("nonce")
-			Text(payload.getString("nonce"))
-		}
-	}
+fun TCEraImmortal() {
+	Text("Immortal")
 }

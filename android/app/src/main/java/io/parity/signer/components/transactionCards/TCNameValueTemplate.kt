@@ -10,16 +10,15 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import io.parity.signer.ui.theme.Text400
 import io.parity.signer.ui.theme.Text600
-import org.json.JSONObject
 
+/**
+ * This is not a ready card, but a template for typical card with 2 fields
+ */
 @Composable
-fun TCTip(payload: JSONObject) {
+fun TCNameValueTemplate(name: String, value: String) {
 	Row {
-		Text("Tip:", color = MaterialTheme.colors.Text400)
-		Spacer(modifier = Modifier.width(16.dp))
-		Text(
-			payload.getString("amount") + " " + payload.getString("units"),
-			color = MaterialTheme.colors.Text600
-		)
+		Text(name, style = MaterialTheme.typography.body2, color = MaterialTheme.colors.Text400)
+		Spacer(Modifier.width(16.dp))
+		Text(value, style = MaterialTheme.typography.body2, color = MaterialTheme.colors.Text600)
 	}
 }

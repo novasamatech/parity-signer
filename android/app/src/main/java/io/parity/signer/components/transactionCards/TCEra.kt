@@ -11,28 +11,8 @@ import org.json.JSONObject
 
 @Composable
 fun TCEra(payload: JSONObject) {
-	Row(
-		horizontalArrangement = Arrangement.SpaceEvenly,
-		modifier = Modifier.fillMaxWidth()
-	) {
-		when(payload.getString("era")) {
-			"Mortal" -> {
-				Text("Mortality: ")
-				Column {
-					Text("phase")
-					Text(payload.getString("phase"))
-				}
-				Column {
-					Text("period")
-					Text(payload.getString("period"))
-				}
-			}
-			"Immortal" -> {
-				Text("Immortal transaction")
-			}
-			else -> {
-				Text("Era invalid, file a bug report")
-			}
-		}
+	Column {
+		TCNameValueTemplate(name = "phase", value = payload.optString("phase"))
+		TCNameValueTemplate(name = "period", value = payload.optString("period"))
 	}
 }
