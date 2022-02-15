@@ -16,7 +16,7 @@ fun TCAuthorPublicKey(payload: JSONObject) {
 	Row {
 		Identicon(identicon = payload.optString("identicon"))
 		Column {
-			Text("Signed with " + payload.optString("crypto"), style = MaterialTheme.typography.body2, color = MaterialTheme.colors.Text400)
+			Text("Signed with " + payload.optString("encryption"), style = MaterialTheme.typography.body2, color = MaterialTheme.colors.Text400)
 			Text(payload.optString("hex"), style = CryptoTypography.body2, color = MaterialTheme.colors.Crypto400)
 		}
 	}

@@ -18,7 +18,7 @@ fun TCVerifier(payload: JSONObject) {
 			Column {
 				Row {
 					Text("key:")
-					Text(payload.optString("hex"), color = MaterialTheme.colors.Crypto400)
+					Text(payload.optString("public_key"), color = MaterialTheme.colors.Crypto400)
 				}
 				Row {
 					Text("crypto:")

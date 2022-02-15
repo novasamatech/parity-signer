@@ -44,7 +44,7 @@ fun HistoryCard(card: JSONObject, timestamp: String) {
 				image = Icons.Default.Shield,
 				line1 = timestamp,
 				line2 = "General verifier set",
-				line3 = payload?.optString("hex")
+				line3 = payload?.optString("public_key")
 					?.abbreviateString(8) + payload
 					?.optString("encryption")
 			)

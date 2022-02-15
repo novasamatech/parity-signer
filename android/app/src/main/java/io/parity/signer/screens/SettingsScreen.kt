@@ -63,7 +63,7 @@ fun SettingsScreen(signerDataModel: SignerDataModel) {
 						Spacer(Modifier.width(4.dp))
 						Column {
 							Text(
-								it.optString("hex").abbreviateString(8),
+								it.optString("public_key").abbreviateString(8),
 								style = CryptoTypography.body2,
 								color = MaterialTheme.colors.Crypto400
 							)

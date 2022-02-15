@@ -23,7 +23,7 @@ fun VerifierScreen(signerDataModel: SignerDataModel) {
 			Identicon(identicon = verifierDetails.optString("identicon"))
 			Column {
 				Text("General verifier certificate")
-				Text(verifierDetails.optString("hex"))
+				Text(verifierDetails.optString("public_key"))
 				Text("encryption: " + verifierDetails.optString("encryption"))
 			}
 		}
