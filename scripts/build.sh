@@ -76,7 +76,7 @@ if [ "$1" == "ios" ]
 
     printf "Building iOS targets...";
 
-    cp ../os-specific-cargo/ios/Cargo.lock
+    cp ../os-specific-lock/ios/Cargo.lock ../
     cp ios-hack/Cargo.toml .
 
     for i in "${IOS_ARCHS[@]}";
