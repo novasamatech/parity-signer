@@ -5,7 +5,7 @@ mod add_specs;
     use add_specs::add_specs;
 pub mod cards;
     use cards::Card;
-mod check_signature;
+pub mod check_signature;
 mod derivations;
     use derivations::process_derivations;
 mod helpers;

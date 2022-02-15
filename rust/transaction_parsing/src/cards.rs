@@ -38,6 +38,7 @@ pub (crate) enum Warning <'a> {
     VerifierGeneralSuper{verifier_key: &'a VerifierKey, hold: &'a Hold},
     TypesAlreadyThere,
     NetworkSpecsAlreadyThere(&'a str), // network title
+    MetadataExtensionsIncomplete,
 }
 
 impl <'a> Warning <'a> {
@@ -55,6 +56,7 @@ impl <'a> Warning <'a> {
             Warning::VerifierGeneralSuper{verifier_key, hold} => format!("Received message is verified. Currently no verifier is set for network with genesis hash {} and no general verifier is set. Proceeding will update the network verifier to general. All previously acquired network information that was received unverified will be purged. {}", hex::encode(verifier_key.genesis_hash()), hold.show()),
             Warning::TypesAlreadyThere => String::from("Received types information is identical to the one that was in the database."),
             Warning::NetworkSpecsAlreadyThere (x) => format!("Received network specs information for {} is same as the one already in the database.", x),
+            Warning::MetadataExtensionsIncomplete => String::from("Received metadata has incomplete set of signed extensions. As a result, Signer may be unable to parse signable transactions using this metadata."),
         }
     }
 }
@@ -112,9 +114,9 @@ impl <'a> Card <'a> {
                     Err(_) => "".to_string(),
                 };
                 let insert = match author {
-                    MultiSigner::Ed25519(p) => format!("{{\"hex\":\"{}\",\"crypto\":\"{}\",\"identicon\":\"{}\"}}", hex::encode(p.to_vec()), Encryption::Ed25519.show(), hex_identicon),
-                    MultiSigner::Sr25519(p) => format!("{{\"hex\":\"{}\",\"crypto\":\"{}\",\"identicon\":\"{}\"}}", hex::encode(p.to_vec()), Encryption::Sr25519.show(), hex_identicon),
-                    MultiSigner::Ecdsa(p) => format!("{{\"hex\":\"{}\",\"crypto\":\"{}\",\"identicon\":\"{}\"}}", hex::encode(p.0.to_vec()), Encryption::Ecdsa.show(), hex_identicon),
+                    MultiSigner::Ed25519(p) => format!("{{\"public_key\":\"{}\",\"identicon\":\"{}\",\"encryption\":\"{}\"}}", hex::encode(p.to_vec()), hex_identicon, Encryption::Ed25519.show()),
+                    MultiSigner::Sr25519(p) => format!("{{\"public_key\":\"{}\",\"identicon\":\"{}\",\"encryption\":\"{}\"}}", hex::encode(p.to_vec()), hex_identicon, Encryption::Sr25519.show()),
+                    MultiSigner::Ecdsa(p) => format!("{{\"public_key\":\"{}\",\"identicon\":\"{}\",\"encryption\":\"{}\"}}", hex::encode(p.0.to_vec()), hex_identicon, Encryption::Ecdsa.show()),
                 };
                 fancy(index, indent, "author_public_key", &insert)
             },

@@ -157,7 +157,7 @@ impl Verifier {
     pub fn show_card(&self) -> String {
         match &self.0 {
             Some(a) => a.show_card(),
-            None => String::from("\"hex\":\"\",\"identicon\":\"\",\"encryption\":\"none\""),
+            None => String::from("\"public_key\":\"\",\"identicon\":\"\",\"encryption\":\"none\""),
         }
     }
     pub fn show_error(&self) -> String {
@@ -178,7 +178,7 @@ impl VerifierValue {
                     Ok(a) => hex::encode(a),
                     Err(_) => String::new(),
                 };
-                format!("\"hex\":\"{}\",\"identicon\":\"{}\",\"encryption\":\"{}\"", hex_public, hex_identicon, encryption.show())
+                format!("\"public_key\":\"{}\",\"identicon\":\"{}\",\"encryption\":\"{}\"", hex_public, hex_identicon, encryption.show())
             },
         }
     }

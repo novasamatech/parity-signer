@@ -8,6 +8,7 @@
 import Foundation
 
 import Security //for keyring
+import SwiftUI
 
 /**
  * Apple's own crypto boilerplate
@@ -129,7 +130,7 @@ extension SignerDataModel {
      * Check if proposed seed phrase is already saved. But mostly require auth on seed creation.
      */
     func checkSeedPhraseCollision(seedPhrase: String) -> Bool {
-        var item: CFTypeRef?
+        var item: AnyObject?
         guard let finalSeedPhrase = seedPhrase.data(using: .utf8) else {
             print("could not encode seed phrase")
             self.lastError = "Seed phrase contains non-unicode symbols"
@@ -137,14 +138,18 @@ extension SignerDataModel {
         }
         let query: [String: Any] = [
             kSecClass as String: kSecClassGenericPassword,
-            kSecValueData as String: finalSeedPhrase,
-            kSecMatchLimit as String: kSecMatchLimitOne
+            kSecMatchLimit as String: kSecMatchLimitAll,
+            kSecReturnData as String: true
         ]
         let status = SecItemCopyMatching(query as CFDictionary, &item)
         if !(status == errSecSuccess || status == errSecItemNotFound) {
             self.authenticated = false
         }
-        return status == errSecSuccess
+        if status == errSecItemNotFound { return false }
+        if item == nil {return false} else {
+            let found = item as! NSArray
+            return found.contains(finalSeedPhrase)
+        }
     }
     
     /**

@@ -1,5 +1,5 @@
 use defaults::get_default_types_vec;
-use definitions::{error::{ParserError, ParserDecodingError, ParserMetadataError}, metadata::name_versioned_from_metadata, network_specs::ShortSpecs, types::TypeEntry};
+use definitions::{error::{ParserError, ParserDecodingError, ParserMetadataError}, metadata::info_from_metadata, network_specs::ShortSpecs, types::TypeEntry};
 use frame_metadata::{RuntimeMetadata, v14::RuntimeMetadataV14};
 use parity_scale_codec::Decode;
 use printing_balance::{convert_balance_pretty};
@@ -101,32 +101,36 @@ pub fn parse_extensions (extensions_data: Vec<u8>, metadata_bundle: &MetadataBun
     Ok(cards)
 }
 
-pub fn parse_set (data: &Vec<u8>, metadata_bundle: &MetadataBundle, short_specs: &ShortSpecs, optional_mortal_flag: Option<bool>) -> Result<(Result<Vec<OutputCard>, ParserError>, Vec<OutputCard>, Vec<u8>, Vec<u8>), ParserError> {
+pub fn cut_method_extensions(data: &Vec<u8>) -> Result<(Vec<u8>, Vec<u8>), ParserError> {
     let pre_method = get_compact::<u32>(data)?;
     let method_length = pre_method.compact_found as usize;
-    let (method_data, extensions_data) = match pre_method.start_next_unit {
+    match pre_method.start_next_unit {
         Some(start) => {
             match data.get(start..start+method_length) {
-                Some(a) => (a.to_vec(), data[start+method_length..].to_vec()),
+                Some(a) => Ok((a.to_vec(), data[start+method_length..].to_vec())),
                 None => {return Err(ParserError::Decoding(ParserDecodingError::DataTooShort))}
             }
         },
         None => {
             if method_length != 0 {return Err(ParserError::Decoding(ParserDecodingError::DataTooShort))}
-            (Vec::new(), data.to_vec())
+            Ok((Vec::new(), data.to_vec()))
         },
-    };
+    }
+}
+
+pub fn parse_set (data: &Vec<u8>, metadata_bundle: &MetadataBundle, short_specs: &ShortSpecs, optional_mortal_flag: Option<bool>) -> Result<(Result<Vec<OutputCard>, ParserError>, Vec<OutputCard>, Vec<u8>, Vec<u8>), ParserError> {
+    let (method_data, extensions_data) = cut_method_extensions(data)?;
     let extensions_cards = parse_extensions (extensions_data.to_vec(), metadata_bundle, short_specs, optional_mortal_flag)?;
     let method_cards = parse_method (method_data.to_vec(), metadata_bundle, short_specs);
     Ok((method_cards, extensions_cards, method_data, extensions_data))
 }
 
 pub fn parse_and_display_set (data: &Vec<u8>, metadata: &RuntimeMetadata, short_specs: &ShortSpecs) -> Result<String, String> {
-    let name_versioned = match name_versioned_from_metadata(&metadata) {
+    let meta_info = match info_from_metadata(&metadata) {
         Ok(x) => x,
         Err(e) => return Err(Error::Arguments(ArgumentsError::Metadata(e)).show())
     };
-    if name_versioned.name != short_specs.name {return Err(Error::Arguments(ArgumentsError::NetworkNameMismatch {name_metadata: name_versioned.name.to_string(), name_network_specs: short_specs.name.to_string()}).show())}
+    if meta_info.name != short_specs.name {return Err(Error::Arguments(ArgumentsError::NetworkNameMismatch {name_metadata: meta_info.name.to_string(), name_network_specs: short_specs.name.to_string()}).show())}
     let metadata_bundle = match metadata {
         RuntimeMetadata::V12(_)|RuntimeMetadata::V13(_) => {
             let older_meta = match metadata {
@@ -141,10 +145,10 @@ pub fn parse_and_display_set (data: &Vec<u8>, metadata: &RuntimeMetadata, short_
                 },
                 Err(_) => return Err(Error::Arguments(ArgumentsError::DefaultTypes).show())
             };
-            MetadataBundle::Older{older_meta, types, network_version: name_versioned.version}
+            MetadataBundle::Older{older_meta, types, network_version: meta_info.version}
         },
-        RuntimeMetadata::V14(meta_v14) => MetadataBundle::Sci{meta_v14, network_version: name_versioned.version},
-        _ => unreachable!(), // just checked in the name_versioned_from_metadata function if the metadata is acceptable one
+        RuntimeMetadata::V14(meta_v14) => MetadataBundle::Sci{meta_v14, network_version: meta_info.version},
+        _ => unreachable!(), // just checked in the info_from_metadata function if the metadata is acceptable one
     };
     match parse_set (data, &metadata_bundle, short_specs, None) {
         Ok((method_cards_result, extensions_cards, _, _)) => {

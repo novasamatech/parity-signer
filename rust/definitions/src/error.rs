@@ -4,6 +4,7 @@ use png;
 use sled;
 use sp_core::crypto::SecretStringError;
 use sp_runtime::MultiSigner;
+use wasm_testbed;
 
 use crate::{crypto:: Encryption, helpers::multisigner_to_public, keyring::{AddressKey, AddressBookKey, MetaKey, NetworkSpecsKey, VerifierKey}, network_specs::{ValidCurrentVerifier, Verifier, VerifierValue}, users::AddressDetails};
 
@@ -204,8 +205,9 @@ impl ErrorSource for Active {
     fn faulty_metadata(error: MetadataError, source: MetadataSource<Self>) -> Self::Error {
         match source {
             MetadataSource::Database{name, version} => ErrorActive::Database(DatabaseActive::FaultyMetadata{name, version, error}),
-            MetadataSource::Incoming(IncomingMetadataSourceActive::Fetch{url}) => ErrorActive::Fetch(Fetch::FaultyMetadata{url, error}),
-            MetadataSource::Incoming(IncomingMetadataSourceActive::Default{filename}) => ErrorActive::DefaultLoading(DefaultLoading::FaultyMetadata{filename, error}),
+            MetadataSource::Incoming(IncomingMetadataSourceActive::Str(IncomingMetadataSourceActiveStr::Fetch{url})) => ErrorActive::Fetch(Fetch::FaultyMetadata{url, error}),
+            MetadataSource::Incoming(IncomingMetadataSourceActive::Str(IncomingMetadataSourceActiveStr::Default{filename})) => ErrorActive::DefaultLoading(DefaultLoading::FaultyMetadata{filename, error}),
+            MetadataSource::Incoming(IncomingMetadataSourceActive::Wasm{filename}) => ErrorActive::Wasm(Wasm::FaultyMetadata{filename, error}),
         }
     }
     fn specs_decoding(key: NetworkSpecsKey) -> Self::Error {
@@ -307,6 +309,8 @@ impl ErrorSource for Active {
                     DatabaseActive::NewAddressKnownGenesisHash{url, genesis_hash} => format!("Url address {} is not encountered in the hot database entries, however, fetched genesis hash {} is present in hot database entries. To change the network url, delete old entry.", url, hex::encode(genesis_hash)),
                     DatabaseActive::TwoGenesisHashVariantsForName{name} => format!("Two different genesis hash entries for network {} in address book.", name),
                     DatabaseActive::TwoUrlVariantsForName{name} => format!("Two different url entries for network {} in address book.", name),
+                    DatabaseActive::TwoNamesForUrl{url} => format!("Two different network names in entries for url address {} in address book.", url),
+                    DatabaseActive::TwoBase58ForName{name} => format!("Two different base58 entries for network {}.", name),
                     DatabaseActive::AddressBookEmpty => String::from("Address book is empty"),
                 };
                 format!("Database error. {}", insert)
@@ -319,13 +323,18 @@ impl ErrorSource for Active {
                     Fetch::FaultySpecs{url, error} => {
                         let insert = match error {
                             SpecsError::NoBase58Prefix => String::from("No base58 prefix."),
+                            SpecsError::Base58PrefixMismatch{specs, meta} => format!("Base58 prefix from fetched properties {} does not match base58 prefix in fetched metadata {}.", specs, meta),
                             SpecsError::Base58PrefixFormatNotSupported{value} => format!("Base58 prefix {} does not fit into u16.", value),
-                            SpecsError::NoDecimals => String::from("No decimals."),
+                            SpecsError::UnitNoDecimals(x) => format!("Network has units declared: {}, but no decimals.", x),
                             SpecsError::DecimalsFormatNotSupported{value} => format!("Decimals value {} does not fit into u8.", value),
-                            SpecsError::NoUnit => String::from("No units."),
+                            SpecsError::DecimalsNoUnit(x) => format!("Network has decimals declared: {}, but no units.", x),
                             SpecsError::UnitFormatNotSupported{value} => format!("Units {} are not String.", value),
+                            SpecsError::DecimalsArrayUnitsNot => String::from("Unexpected result for multi-token network. Decimals are fetched as an array with more than one element, whereas units are not."),
+                            SpecsError::DecimalsUnitsArrayLength{decimals, unit} => format!("Unexpected result for multi-token network. Length of decimals array {} does not match the length of units array {}.", decimals, unit),
+                            SpecsError::UnitsArrayDecimalsNot => String::from("Unexpected result for multi-token network. Units are fetched as an array with more than one element, whereas decimals are not."),
+                            SpecsError::OverrideIgnored => String::from("Fetched single value for token decimals and unit. Token override is not possible."),
                         };
-                        format!("Network specs from {} are not suitable. {}", url, insert)
+                        format!("Problem with network specs from {}. {}", url, insert)
                     },
                     Fetch::Failed{url, error} => format!("Could not make rpc call at {}. {}", url, error),
                     Fetch::ValuesChanged{url, what} => {
@@ -349,6 +358,7 @@ impl ErrorSource for Active {
                     DefaultLoading::MetadataFolder(e) => format!("Error with default metadata folder. {}", e),
                     DefaultLoading::MetadataFile(e) => format!("Error with default metadata file. {}", e),
                     DefaultLoading::TypesFile(e) => format!("Error with default types information file. {}", e),
+                    DefaultLoading::OrphanMetadata{name, filename} => format!("Default metadata for {} from {} does not have corresponding default network specs.", name, filename),
                 };
                 format!("Error on loading defaults. {}", insert)
             },
@@ -396,6 +406,7 @@ impl ErrorSource for Active {
                             CommandDoubleKey::Content => "content",
                             CommandDoubleKey::Set => "set",
                             CommandDoubleKey::CryptoOverride => "encryption override",
+                            CommandDoubleKey::TokenOverride => "token override",
                             CommandDoubleKey::CryptoKey => "`-crypto`",
                             CommandDoubleKey::MsgType => "`-msgtype`",
                             CommandDoubleKey::Verifier => "`-verifier`",
@@ -410,6 +421,8 @@ impl ErrorSource for Active {
                     },
                     CommandParser::NeedArgument(b) => {
                         let insert = match b {
+                            CommandNeedArgument::TokenUnit => "`-token ***'",
+                            CommandNeedArgument::TokenDecimals => "'-token'",
                             CommandNeedArgument::NetworkName => "`-n`",
                             CommandNeedArgument::NetworkUrl => "`-u`",
                             CommandNeedArgument::CryptoKey => "`-crypto`",
@@ -447,7 +460,8 @@ impl ErrorSource for Active {
                     },
                     CommandParser::Unexpected(b) => {
                         match b {
-                            CommandUnexpected::KeyAContent => String::from("Key -a is used to process all, name or url was not expected."),
+                            CommandUnexpected::DecimalsFormat => String::from("Key `-token` should be followed by u8 decimals value."),
+                            CommandUnexpected::KeyAContent => String::from("Key `-a` is used to process all, name or url was not expected."),
                             CommandUnexpected::VerifierNoCrypto => String::from("No verifier entry was expected for `-crypto none` sequence."),
                             CommandUnexpected::SignatureNoCrypto => String::from("No singature entry was expected for `-crypto none` sequence."),
                             CommandUnexpected::AliceSignature => String::from("No signature was expected for verifier Alice."),
@@ -471,6 +485,13 @@ impl ErrorSource for Active {
             },
             ErrorActive::Qr(e) => format!("Error generating qr code. {}", e),
             ErrorActive::NotSupported => String::from("Key combination is not supported. Please file a ticket if you need it."),
+            ErrorActive::NoTokenOverrideKnownNetwork{url} => format!("Network with corresponding url {} has database records. Token override is not supported.", url),
+            ErrorActive::Wasm(a) => {
+                match a {
+                    Wasm::WasmTestbed(e) => format!("WasmTestbed error. {}", e),
+                    Wasm::FaultyMetadata{filename, error} => format!("Metadata error in .wasm file {}. {}", filename, error.show()),
+                }
+            },
         }
     }
 }
@@ -490,6 +511,8 @@ pub enum ErrorActive {
     Input(InputActive),
     Qr(String),
     NotSupported,
+    NoTokenOverrideKnownNetwork{url: String},
+    Wasm(Wasm),
 }
 
 /// Active side errors could be displayed standardly
@@ -513,6 +536,13 @@ pub enum NotHexActive {
 /// Origin of unsuitable metadata on the Active side
 #[derive(Debug)]
 pub enum IncomingMetadataSourceActive {
+    Str(IncomingMetadataSourceActiveStr),
+    Wasm{filename: String},
+}
+
+/// Origin of unsuitable metadata on the Active side, in str form
+#[derive(Debug)]
+pub enum IncomingMetadataSourceActiveStr {
     Fetch{url: String},
     Default{filename: String},
 }
@@ -548,6 +578,8 @@ pub enum DatabaseActive {
     NewAddressKnownGenesisHash{url: String, genesis_hash: [u8;32]},
     TwoGenesisHashVariantsForName{name: String},
     TwoUrlVariantsForName{name: String},
+    TwoNamesForUrl{url: String},
+    TwoBase58ForName{name: String},
     AddressBookEmpty,
 }
 
@@ -601,11 +633,16 @@ pub enum Fetch {
 #[derive(Debug)]
 pub enum SpecsError {
     NoBase58Prefix,
+    Base58PrefixMismatch{specs: u16, meta: u16},
     Base58PrefixFormatNotSupported{value: String},
-    NoDecimals,
+    UnitNoDecimals(String),
     DecimalsFormatNotSupported{value: String},
-    NoUnit,
+    DecimalsNoUnit(u8),
     UnitFormatNotSupported{value: String},
+    DecimalsArrayUnitsNot,
+    DecimalsUnitsArrayLength{decimals: String, unit: String},
+    UnitsArrayDecimalsNot,
+    OverrideIgnored,
 }
 
 #[derive(Debug)]
@@ -624,6 +661,7 @@ pub enum DefaultLoading {
     MetadataFolder(std::io::Error),
     MetadataFile(std::io::Error),
     TypesFile(std::io::Error),
+    OrphanMetadata{name: String, filename: String},
 }
 
 /// Enum listing errors for cases when something was needed from the Active database and was not found
@@ -673,6 +711,7 @@ pub enum CommandDoubleKey {
     Content,
     Set,
     CryptoOverride,
+    TokenOverride,
     CryptoKey,
     MsgType,
     Verifier,
@@ -687,6 +726,8 @@ pub enum CommandDoubleKey {
 /// Enum listing command line parser errors conserning missing key argument
 #[derive(Debug)]
 pub enum CommandNeedArgument {
+    TokenUnit,
+    TokenDecimals,
     NetworkName,
     NetworkUrl,
     CryptoKey,
@@ -724,6 +765,7 @@ pub enum CommandBadArgument {
 /// Enum listing command line parser errors conserning unexpected command content
 #[derive(Debug)]
 pub enum CommandUnexpected {
+    DecimalsFormat,
     KeyAContent,
     VerifierNoCrypto,
     SignatureNoCrypto,
@@ -741,6 +783,13 @@ pub enum InputActive {
     FaultyMetadataInPayload(MetadataError),
     BadSignature,
     NoValidDerivationsToExport,
+}
+
+/// Enum listing possible errors with .wasm files processing
+#[derive(Debug)]
+pub enum Wasm {
+    WasmTestbed(wasm_testbed::WasmTestbedError),
+    FaultyMetadata{filename: String, error: MetadataError},
 }
 
 /// Enum-marker indicating that error originates on the Signer side
@@ -899,6 +948,7 @@ impl ErrorSource for Signer {
                     DatabaseSigner::TwoTransactionsInEntry(x) => format!("Entry with order {} contains more than one transaction-related event. This should not be possible in current Signer and likely indicates database corruption.", x),
                     DatabaseSigner::CustomVerifierIsGeneral(key) => format!("Network with genesis hash {} verifier is set as a custom one. This custom verifier coinsides the database general verifier and not None. This should not have happened and likely indicates database corruption.", hex::encode(key.genesis_hash())),
                     DatabaseSigner::TwoRootKeys{seed_name, encryption} => format!("More than one root key (i.e. with empty path and without password) found for seed name {} and encryption {}.", seed_name, encryption.show()),
+                    DatabaseSigner::DifferentBase58Specs{genesis_hash, base58_1, base58_2} => format!("More than one base58 prefix in network specs database entries for network with genesis hash {}: {} and {}.", hex::encode(genesis_hash), base58_1, base58_2),
                 };
                 format!("Database error. {}", insert)
             },
@@ -913,6 +963,7 @@ impl ErrorSource for Signer {
                     InputSigner::SameNameVersionDifferentMeta{name, version} => format!("Metadata for {}{} is already in the database and is different from the one in received payload.", name, version),
                     InputSigner::MetadataKnown{name, version} => format!("Metadata for {}{} is already in the database.", name, version),
                     InputSigner::ImportantSpecsChanged(key) => format!("Similar network specs are already stored in the database under key {}. Network specs in received payload have different unchangeable values (base58 prefix, decimals, encryption, network name, unit).", hex::encode(key.key())),
+                    InputSigner::DifferentBase58{genesis_hash, base58_database, base58_input} => format!("Network with genesis hash {} already has entries in the database with base58 prefix {}. Received network specs have different base 58 prefix {}.", hex::encode(genesis_hash), base58_database, base58_input),
                     InputSigner::EncryptionNotSupported(code) => format!("Payload with encryption 0x{} is not supported.", code),
                     InputSigner::BadSignature => String::from("Received payload has bad signature."),
                     InputSigner::LoadMetaUnknownNetwork{name} => format!("Network {} is not in the database. Add network specs before loading the metadata.", name),
@@ -1095,6 +1146,7 @@ pub enum DatabaseSigner {
     TwoTransactionsInEntry(u32),
     CustomVerifierIsGeneral(VerifierKey),
     TwoRootKeys{seed_name: String, encryption: Encryption},
+    DifferentBase58Specs{genesis_hash: [u8;32], base58_1: u16, base58_2: u16},
 }
 
 /// Enum listing possible errors in decoding keys from the database on the Signer side
@@ -1144,6 +1196,7 @@ pub enum InputSigner {
     SameNameVersionDifferentMeta{name: String, version: u32},
     MetadataKnown{name: String, version: u32},
     ImportantSpecsChanged(NetworkSpecsKey),
+    DifferentBase58{genesis_hash: [u8;32], base58_database: u16, base58_input: u16},
     EncryptionNotSupported(String),
     BadSignature,
     LoadMetaUnknownNetwork{name: String},
@@ -1349,6 +1402,8 @@ pub enum MetadataError {
     NoSystemPallet,
     NoVersionInConstants,
     RuntimeVersionNotDecodeable,
+    Base58PrefixNotDecodeable,
+    Base58PrefixSpecsMismatch{specs: u16, meta: u16},
     NotMeta,
     UnableToDecode,
 }
@@ -1360,6 +1415,8 @@ impl MetadataError {
             MetadataError::NoSystemPallet => String::from("No system pallet in runtime metadata."),
             MetadataError::NoVersionInConstants => String::from("No runtime version in system pallet constants."),
             MetadataError::RuntimeVersionNotDecodeable => String::from("Runtime version from system pallet constants could not be decoded."),
+            MetadataError::Base58PrefixNotDecodeable => String::from("Base58 prefix is found in system pallet constants, but could not be decoded."),
+            MetadataError::Base58PrefixSpecsMismatch{specs, meta} => format!("Base58 prefix {} from system pallet constants does not match the base58 prefix from network specs {}.", meta, specs),
             MetadataError::NotMeta => String::from("Metadata vector does not start with 0x6d657461."),
             MetadataError::UnableToDecode => String::from("Runtime metadata could not be decoded."),
         }
