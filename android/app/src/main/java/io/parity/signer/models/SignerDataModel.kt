@@ -30,7 +30,7 @@ import androidx.core.content.ContextCompat
  * This is single object to handle all interactions with backend
  */
 class SignerDataModel : ViewModel() {
-	internal val REQUIRED_PERMISSIONS = arrayOf(Manifest.permission.CAMERA)
+	private val REQUIRED_PERMISSIONS = arrayOf(Manifest.permission.CAMERA)
 	internal val REQUEST_CODE_PERMISSIONS = 10
 
 	//Internal model values

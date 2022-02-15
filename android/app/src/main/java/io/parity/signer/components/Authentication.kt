@@ -12,13 +12,13 @@ import androidx.fragment.app.FragmentActivity
 class Authentication(val setAuth: (Boolean) -> Unit) {
 	private val promptInfo = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
 		BiometricPrompt.PromptInfo.Builder()
-			.setTitle("UNLOCK SEED")
+			.setTitle("UNLOCK SIGNER")
 			.setSubtitle("Please authenticate yourself")
 			.setAllowedAuthenticators(BiometricManager.Authenticators.DEVICE_CREDENTIAL)
 			.build()
 	} else {
 		BiometricPrompt.PromptInfo.Builder()
-			.setTitle("UNLOCK SEED")
+			.setTitle("UNLOCK SIGNER")
 			.setSubtitle("Please authenticate yourself")
 			.setNegativeButtonText("Cancel")
 			.setAllowedAuthenticators(BiometricManager.Authenticators.BIOMETRIC_STRONG)
