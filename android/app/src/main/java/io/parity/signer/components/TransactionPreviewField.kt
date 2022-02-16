@@ -8,14 +8,11 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
-import io.parity.signer.models.SignerDataModel
 import io.parity.signer.ui.theme.Crypto400
 import org.json.JSONArray
-import org.json.JSONObject
 
 @Composable
 fun TransactionPreviewField(transaction: JSONArray) {

@@ -1,22 +1,16 @@
-package io.parity.signer.modals
+package io.parity.signer.screens
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.text.KeyboardActions
-import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
-import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.platform.LocalFocusManager
-import androidx.compose.ui.text.input.ImeAction
-import androidx.compose.ui.text.input.KeyboardCapitalization
-import androidx.compose.ui.text.input.KeyboardType
 import io.parity.signer.ButtonID
 import io.parity.signer.components.BigButton
 import io.parity.signer.components.SingleTextInput
@@ -24,7 +18,7 @@ import io.parity.signer.models.*
 
 @Composable
 fun NewAddressScreen(signerDataModel: SignerDataModel, increment: Boolean) {
-	var derivationPath = remember { mutableStateOf("") }
+	val derivationPath = remember { mutableStateOf("") }
 	var derivationState by remember { mutableStateOf(DerivationState()) }
 	val seedName = signerDataModel.screenData.value?.optString("seed_name") ?: ""
 	val lastError = signerDataModel.lastError.observeAsState()

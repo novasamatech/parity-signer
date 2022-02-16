@@ -1,4 +1,4 @@
-package io.parity.signer.modals
+package io.parity.signer.screens
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.MaterialTheme

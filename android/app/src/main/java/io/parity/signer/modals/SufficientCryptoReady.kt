@@ -2,6 +2,7 @@ package io.parity.signer.modals
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
+import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
@@ -12,11 +13,16 @@ import io.parity.signer.components.HeaderBar
 import io.parity.signer.components.KeyCard
 import io.parity.signer.models.SignerDataModel
 import io.parity.signer.models.intoImageBitmap
+import io.parity.signer.ui.theme.Bg000
+import io.parity.signer.ui.theme.modal
 import org.json.JSONObject
 
 @Composable
 fun SufficientCryptoReady(signerDataModel: SignerDataModel) {
-	Surface() {
+	Surface(
+		shape = MaterialTheme.shapes.modal,
+		color = MaterialTheme.colors.Bg000
+	) {
 		Column(modifier = Modifier
 			.fillMaxSize()
 			.padding(20.dp)) {

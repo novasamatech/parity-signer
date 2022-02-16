@@ -2,7 +2,6 @@ package io.parity.signer.models
 
 import android.util.Log
 import io.parity.signer.ButtonID
-import org.json.JSONObject
 
 /**
  * Add key to database; uses phone crypto to fetch seeds!

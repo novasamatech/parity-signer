@@ -18,8 +18,9 @@ fun SignerDataModel.processFrame(
 	barcodeScanner: BarcodeScanner,
 	imageProxy: ImageProxy
 ) {
+	if (imageProxy.image == null) return
 	val inputImage = InputImage.fromMediaImage(
-		imageProxy.image,
+		imageProxy.image!!,
 		imageProxy.imageInfo.rotationDegrees
 	)
 

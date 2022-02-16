@@ -18,7 +18,7 @@ import io.parity.signer.ui.theme.modal
 
 @Composable
 fun NewSeedMenu(signerDataModel: SignerDataModel) {
-	Column() {
+	Column {
 		Spacer(Modifier.weight(1f))
 		Surface(
 			color = MaterialTheme.colors.Bg000,

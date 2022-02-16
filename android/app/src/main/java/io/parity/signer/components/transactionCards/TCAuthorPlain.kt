@@ -1,18 +1,13 @@
 package io.parity.signer.components.transactionCards
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.scale
 import io.parity.signer.components.Identicon
-import io.parity.signer.models.SignerDataModel
 import io.parity.signer.ui.theme.Text400
 import io.parity.signer.ui.theme.Text600
-import io.parity.signer.ui.theme.Typography
 import org.json.JSONObject
 
 @Composable

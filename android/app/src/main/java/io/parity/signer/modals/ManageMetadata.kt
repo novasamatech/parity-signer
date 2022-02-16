@@ -69,7 +69,7 @@ fun ManageMetadata(signerDataModel: SignerDataModel) {
 		header = "Remove metadata?",
 		text = "This metadata will be removed for all networks",
 		back = { confirm = false },
-		forward = { signerDataModel.pushButton(ButtonID.RemoveNetwork) },
+		forward = { signerDataModel.pushButton(ButtonID.RemoveMetadata) },
 		backText = "Cancel",
 		forwardText = "Remove metadata"
 	)

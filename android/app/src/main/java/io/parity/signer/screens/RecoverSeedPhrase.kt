@@ -1,33 +1,23 @@
 package io.parity.signer.screens
 
-import android.util.Log
-import androidx.activity.viewModels
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.selection.toggleable
-import androidx.compose.foundation.text.KeyboardActions
-import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.*
-import androidx.compose.runtime.*
-import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.material.Checkbox
+import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.focus.FocusRequester
-import androidx.compose.ui.focus.focusRequester
-import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.TextRange
-import androidx.compose.ui.text.input.ImeAction
-import androidx.compose.ui.text.input.KeyboardCapitalization
-import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.TextFieldValue
 import io.parity.signer.ButtonID
-import io.parity.signer.SignerScreen
 import io.parity.signer.components.BigButton
 import io.parity.signer.components.RestoreSeedPhraseBox
 import io.parity.signer.components.RestoreSeedPhraseSuggest
 import io.parity.signer.models.*
-import io.parity.signer.models.guessWord
-import io.parity.signer.models.validatePhrase
 
 @Composable
 fun RecoverSeedPhrase(
@@ -96,7 +86,7 @@ fun RecoverSeedPhrase(
 			Text("Create root keys")
 		}
 		Spacer(Modifier.weight(0.1f))
-		if (true) { //TODO: hide when keyboard is shown
+		//if (true) { //TODO: hide when keyboard is shown
 			BigButton(
 				text = "Next",
 				action = {
@@ -112,7 +102,7 @@ fun RecoverSeedPhrase(
 				},
 				isDisabled = !restoreSeedModel.seedValid.value
 			)
-		}
+		//}
 		Spacer(Modifier.weight(0.1f))
 	}
 

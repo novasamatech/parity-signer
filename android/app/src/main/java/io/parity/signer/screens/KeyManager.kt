@@ -1,6 +1,5 @@
 package io.parity.signer.screens
 
-import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -8,30 +7,22 @@ import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AddCircle
 import androidx.compose.material.icons.filled.ArrowCircleDown
-import androidx.compose.runtime.*
-import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import io.parity.signer.ButtonID
-import io.parity.signer.SignerModal
 import io.parity.signer.components.KeySelector
-import io.parity.signer.components.NetworkCard
 import io.parity.signer.components.NetworkLogoName
 import io.parity.signer.components.SeedCard
-import io.parity.signer.modals.*
-import io.parity.signer.models.*
 import io.parity.signer.ui.theme.Bg200
 import org.json.JSONArray
 import org.json.JSONObject
-import kotlin.math.sign
 
 /**
  * Key manager screen; here all key/identity/seed creation and deletion
  * operations should happen. This is final point in navigation:
  * all subsequent interactions should be in modals or drop-down menus
  */
-@ExperimentalMaterialApi
-@ExperimentalAnimationApi
 @Composable
 fun KeyManager(button: (button: ButtonID, details: String) -> Unit,
 							 screenData: JSONObject) {
@@ -42,7 +33,7 @@ fun KeyManager(button: (button: ButtonID, details: String) -> Unit,
 	val multiselectMode = screenData.optBoolean("multiselect_mode")
 	val multiselectCount = screenData.optString("multiselect_count")
 
-	Column() {
+	Column {
 		Row(
 			Modifier
 				.clickable {

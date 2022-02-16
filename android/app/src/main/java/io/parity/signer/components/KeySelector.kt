@@ -1,9 +1,11 @@
 package io.parity.signer.components
 
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.items
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import io.parity.signer.ButtonID
 import io.parity.signer.models.toListOfJSONObjects
 import org.json.JSONObject

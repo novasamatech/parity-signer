@@ -1,6 +1,5 @@
 package io.parity.signer.components.transactionCards
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.material.Icon
@@ -9,10 +8,7 @@ import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Lock
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.scale
 import io.parity.signer.components.Identicon
-import io.parity.signer.models.SignerDataModel
 import io.parity.signer.ui.theme.Crypto400
 import io.parity.signer.ui.theme.Text400
 import io.parity.signer.ui.theme.Text600

@@ -1,7 +1,5 @@
 package io.parity.signer.models
 
-import android.util.Log
-import androidx.compose.ui.graphics.ImageBitmap
 import org.json.JSONArray
 import org.json.JSONObject
 

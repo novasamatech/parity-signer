@@ -5,6 +5,9 @@ import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
+import io.parity.signer.alerts.Confirm
+import io.parity.signer.alerts.ErrorModal
+import io.parity.signer.alerts.ShieldAlert
 import io.parity.signer.components.Documents
 import io.parity.signer.modals.*
 import io.parity.signer.models.SignerDataModel

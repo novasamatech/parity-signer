@@ -1,28 +1,18 @@
-package io.parity.signer.modals
+package io.parity.signer.screens
 
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.text.KeyboardActions
-import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
-import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.platform.LocalFocusManager
-import androidx.compose.ui.platform.LocalSoftwareKeyboardController
-import androidx.compose.ui.text.input.ImeAction
-import androidx.compose.ui.text.input.ImeOptions
-import androidx.compose.ui.text.input.KeyboardCapitalization
-import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import io.parity.signer.ButtonID
 import io.parity.signer.components.BigButton
 import io.parity.signer.components.SingleTextInput
 import io.parity.signer.models.SignerDataModel
-import io.parity.signer.models.addSeed
-import io.parity.signer.models.pushButton
 import io.parity.signer.ui.theme.SignalDanger
 import io.parity.signer.ui.theme.Text600
 
@@ -31,7 +21,7 @@ fun RecoverSeedName(
 	button: (button: ButtonID, details: String) -> Unit,
 	signerDataModel: SignerDataModel
 ) {
-	var seedName = remember { mutableStateOf("") }
+	val seedName = remember { mutableStateOf("") }
 	val lastError = signerDataModel.lastError.observeAsState()
 	val focusManager = LocalFocusManager.current
 	val focusRequester = remember { FocusRequester() }

@@ -1,24 +1,19 @@
 package io.parity.signer.modals
 
-import androidx.compose.ui.graphics.Color
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Check
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import io.parity.signer.ButtonID
 import io.parity.signer.components.HeaderBar
 import io.parity.signer.components.NetworkCard
 import io.parity.signer.models.SignerDataModel
 import io.parity.signer.models.pushButton
-import io.parity.signer.ui.theme.Action400
 import io.parity.signer.ui.theme.Bg000
 import io.parity.signer.ui.theme.modal
 import org.json.JSONArray

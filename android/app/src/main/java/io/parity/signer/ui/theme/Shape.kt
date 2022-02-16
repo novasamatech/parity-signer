@@ -1,6 +1,7 @@
+@file:Suppress("unused")
+
 package io.parity.signer.ui.theme
 
-import android.graphics.drawable.shapes.Shape
 import androidx.compose.foundation.shape.CornerBasedShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Shapes

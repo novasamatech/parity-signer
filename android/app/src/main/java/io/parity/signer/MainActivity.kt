@@ -11,7 +11,7 @@ import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Modifier
 import io.parity.signer.components.BigButton
-import io.parity.signer.modals.WaitingScreen
+import io.parity.signer.screens.WaitingScreen
 import io.parity.signer.models.SignerDataModel
 import io.parity.signer.ui.theme.ParitySignerTheme
 import io.parity.signer.components.BottomBar
@@ -113,6 +113,7 @@ fun SignerApp(signerDataModel: SignerDataModel) {
 					}
 				}
 			}
+			null -> TODO()
 		}
 	}
 }

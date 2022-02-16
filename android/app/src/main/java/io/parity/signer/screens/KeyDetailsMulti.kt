@@ -1,33 +1,26 @@
 package io.parity.signer.screens
 
-import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.gestures.draggable
 import androidx.compose.foundation.gestures.rememberDraggableState
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.SwipeToDismiss
 import androidx.compose.material.Text
-import androidx.compose.material.rememberSwipeableState
-import androidx.compose.material.swipeable
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import io.parity.signer.ButtonID
-import io.parity.signer.components.HeaderBar
 import io.parity.signer.components.KeyCard
 import io.parity.signer.components.NetworkCard
 import io.parity.signer.models.SignerDataModel
 import io.parity.signer.models.intoImageBitmap
 import io.parity.signer.models.pushButton
 import org.json.JSONObject
-import kotlin.math.absoluteValue
 
 @Composable
 fun KeyDetailsMulti(signerDataModel: SignerDataModel) {

@@ -39,7 +39,7 @@ fun ByteArray.encodeHex(): String {
  * TODO: should abomination not be needed in final version
  */
 fun concatJSONArray(vararg arrays: JSONArray): JSONArray {
-	var result = JSONArray()
+	val result = JSONArray()
 	for (array in arrays) {
 		for (i in 0 until array.length()) {
 			result.put(array.getJSONObject(i))
@@ -52,22 +52,11 @@ fun concatJSONArray(vararg arrays: JSONArray): JSONArray {
  * Sorter for transaction cards
  */
 fun sortCards(array: JSONArray): JSONArray {
-	var sortable = emptyList<JSONObject>()
+	val sortable = emptyList<JSONObject>().toMutableList()
 	for(i in 0 until array.length()) {
 		sortable += array.getJSONObject(i)
 	}
 	return JSONArray(sortable.sortedBy { item -> item.getInt("index") } )
-}
-
-/**
- * Sorter for history
- */
-fun sortHistory(array: JSONArray): JSONArray {
-	var sortable = emptyList<JSONObject>()
-	for(i in 0 until array.length()) {
-		sortable += array.getJSONObject(i)
-	}
-	return JSONArray(sortable.sortedBy{ item -> item.getInt("order") }.reversed() )
 }
 
 /**
@@ -84,7 +73,7 @@ fun String.intoImageBitmap(): ImageBitmap {
 }
 
 fun JSONArray.toListOfStrings(): List<String> {
-	var output = emptyList<String>()
+	val output = emptyList<String>().toMutableList()
 	for(i in 0 until this.length()) {
 		output += this.getString(i)
 	}
@@ -92,7 +81,7 @@ fun JSONArray.toListOfStrings(): List<String> {
 }
 
 fun JSONArray.toListOfJSONObjects(): List<JSONObject> {
-	var output = emptyList<JSONObject>()
+	val output = emptyList<JSONObject>().toMutableList()
 	for(i in 0 until this.length()) {
 		output += this.getJSONObject(i)
 	}

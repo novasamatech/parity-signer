@@ -11,7 +11,7 @@ import org.json.JSONObject
 @Composable
 fun LogDetails(signerDataModel: SignerDataModel) {
 	val content = signerDataModel.screenData.value?: JSONObject()
-	Column() {
+	Column {
 		Text(content.optString("timestamp"))
 		LazyColumn {
 			items(content.optJSONArray("events")?.length() ?: 0) { index ->

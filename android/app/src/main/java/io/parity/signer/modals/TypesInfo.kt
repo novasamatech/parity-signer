@@ -60,7 +60,7 @@ fun TypesInfo(signerDataModel: SignerDataModel) {
 	}
 	AndroidCalledConfirm(
 		show = confirm,
-		header = "Remove tyles?",
+		header = "Remove types?",
 		text = "Types information needed for support of pre-v14 metadata will be removed. Are you sure?",
 		back = { confirm = false },
 		forward = { signerDataModel.pushButton(ButtonID.RemoveTypes) },

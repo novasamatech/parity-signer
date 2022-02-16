@@ -1,19 +1,19 @@
 package io.parity.signer.components
 
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
-import androidx.compose.material.*
+import androidx.compose.material.Icon
+import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Lock
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.scale
 import androidx.compose.ui.unit.dp
-import io.parity.signer.models.SignerDataModel
 import io.parity.signer.models.abbreviateString
-import io.parity.signer.models.intoImageBitmap
-import io.parity.signer.ui.theme.*
+import io.parity.signer.ui.theme.Crypto400
+import io.parity.signer.ui.theme.CryptoTypography
+import io.parity.signer.ui.theme.Text400
+import io.parity.signer.ui.theme.Text600
 import org.json.JSONObject
 
 /**

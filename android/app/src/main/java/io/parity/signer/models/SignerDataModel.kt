@@ -1,10 +1,10 @@
 package io.parity.signer.models
 
-import android.Manifest
 import android.annotation.SuppressLint
-import android.content.Context
-import android.content.SharedPreferences
+import android.content.*
 import android.content.pm.PackageManager
+import android.os.Build
+import android.provider.Settings
 import android.util.Log
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.LiveData
@@ -17,14 +17,6 @@ import io.parity.signer.components.Authentication
 import org.json.JSONObject
 import java.io.File
 import java.io.FileOutputStream
-import android.content.Intent
-
-import android.content.BroadcastReceiver
-
-import android.content.IntentFilter
-import android.os.Build
-import android.provider.Settings
-import androidx.core.content.ContextCompat
 
 /**
  * This is single object to handle all interactions with backend

@@ -1,6 +1,5 @@
 package io.parity.signer.components
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.Icon
@@ -15,8 +14,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import io.parity.signer.ui.theme.Bg200
 import io.parity.signer.ui.theme.Text300
-import io.parity.signer.ui.theme.Typography
 import io.parity.signer.ui.theme.Text600
+import io.parity.signer.ui.theme.Typography
 
 @Composable
 fun InstructionsSquare() {

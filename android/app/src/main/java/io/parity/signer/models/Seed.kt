@@ -91,7 +91,6 @@ internal fun SignerDataModel.getSeed(seedName: String, backup: Boolean = false):
  * Guess possible seed words from user input
  */
 internal fun SignerDataModel.guessWord(word: String): List<String> {
-	Log.d("Guess query", "[" + word + "]")
 	return JSONArray(substrateGuessWord(word)).toListOfStrings()
 }
 

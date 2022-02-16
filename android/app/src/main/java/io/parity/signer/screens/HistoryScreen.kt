@@ -1,4 +1,4 @@
-package io.parity.signer.modals
+package io.parity.signer.screens
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
@@ -12,12 +12,13 @@ import io.parity.signer.components.HistoryCard
 import io.parity.signer.models.SignerDataModel
 import io.parity.signer.models.pushButton
 import io.parity.signer.models.toListOfJSONObjects
-import org.json.JSONArray
 
 @Composable
 fun HistoryScreen(signerDataModel: SignerDataModel) {
 	val history =
-		signerDataModel.screenData.value?.optJSONArray("log")?.toListOfJSONObjects() ?: emptyList()
+		signerDataModel.screenData.value?.optJSONArray("log")?.toListOfJSONObjects()?.sortedBy {
+			it.optInt("order")
+		}?.reversed() ?: emptyList()
 
 	Column {
 		LazyColumn {

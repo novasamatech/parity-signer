@@ -1,7 +1,6 @@
 package io.parity.signer.models
 
-import android.util.Log
-import androidx.compose.runtime.*
+import androidx.compose.runtime.MutableState
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.TextFieldValue
 

@@ -9,12 +9,9 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Tab
 import androidx.compose.material.TabRow
 import androidx.compose.material.Text
-import androidx.compose.runtime.Composable
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import io.parity.signer.ui.theme.Text600
 import io.parity.signer.ui.theme.Typography
 
 //TODO: everything

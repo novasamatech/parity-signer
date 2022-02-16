@@ -1,15 +1,17 @@
 package io.parity.signer.modals
 
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.selection.toggleable
-import androidx.compose.material.*
+import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.unit.dp
-import io.parity.signer.components.*
+import io.parity.signer.components.BigButton
+import io.parity.signer.components.CheckboxTemplate
+import io.parity.signer.components.HeaderBar
+import io.parity.signer.components.SeedBox
 import io.parity.signer.models.SignerDataModel
 import io.parity.signer.models.addSeed
 import io.parity.signer.ui.theme.Bg200

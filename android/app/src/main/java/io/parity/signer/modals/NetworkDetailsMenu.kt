@@ -3,7 +3,8 @@ package io.parity.signer.modals
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.*
+import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Surface
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -13,7 +14,6 @@ import io.parity.signer.components.BigButton
 import io.parity.signer.components.HeaderBar
 import io.parity.signer.models.SignerDataModel
 import io.parity.signer.models.pushButton
-import io.parity.signer.models.removeSeed
 import io.parity.signer.ui.theme.Bg000
 import io.parity.signer.ui.theme.modal
 

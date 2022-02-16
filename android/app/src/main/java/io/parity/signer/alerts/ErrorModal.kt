@@ -1,6 +1,5 @@
-package io.parity.signer.modals
+package io.parity.signer.alerts
 
-import androidx.compose.material.*
 import androidx.compose.runtime.Composable
 import io.parity.signer.ButtonID
 import io.parity.signer.components.AlertComponent

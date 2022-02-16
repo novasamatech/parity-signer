@@ -1,11 +1,8 @@
 package io.parity.signer.screens
 
-import android.app.AlertDialog
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.material.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
+import androidx.compose.material.Text
 import androidx.compose.runtime.*
 import io.parity.signer.alerts.AndroidCalledConfirm
 import io.parity.signer.components.BigButton

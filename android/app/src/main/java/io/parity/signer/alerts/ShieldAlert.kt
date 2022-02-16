@@ -1,11 +1,9 @@
-package io.parity.signer.modals
+package io.parity.signer.alerts
 
-import androidx.compose.material.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.livedata.observeAsState
 import io.parity.signer.ButtonID
 import io.parity.signer.ShieldAlert
-import io.parity.signer.alerts.AndroidCalledConfirm
 import io.parity.signer.components.AlertComponent
 import io.parity.signer.models.SignerDataModel
 import io.parity.signer.models.pushButton
@@ -49,5 +47,6 @@ fun ShieldAlert(signerDataModel: SignerDataModel) {
 				forwardText = "Acknowledge and reset"
 			)
 		}
+		null -> {}
 	}
 }

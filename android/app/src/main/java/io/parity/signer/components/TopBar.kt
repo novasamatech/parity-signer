@@ -15,10 +15,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.unit.dp
 import io.parity.signer.ButtonID
-import io.parity.signer.models.*
+import io.parity.signer.models.SignerDataModel
+import io.parity.signer.models.pushButton
 import io.parity.signer.ui.theme.Action400
 import io.parity.signer.ui.theme.Bg100
-import io.parity.signer.ui.theme.Text500
 
 @Composable
 fun TopBar(signerDataModel: SignerDataModel) {

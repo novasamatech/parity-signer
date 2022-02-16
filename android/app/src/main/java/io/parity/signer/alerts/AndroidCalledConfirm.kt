@@ -1,11 +1,7 @@
 package io.parity.signer.alerts
 
-import androidx.compose.material.*
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.MutableState
-import io.parity.signer.ButtonID
 import io.parity.signer.components.AlertComponent
-import io.parity.signer.models.pushButton
 
 /**
  * Unified alert that is called by Android
