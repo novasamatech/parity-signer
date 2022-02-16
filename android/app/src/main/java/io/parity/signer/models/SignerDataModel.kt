@@ -1,6 +1,7 @@
 package io.parity.signer.models
 
 import android.Manifest
+import android.annotation.SuppressLint
 import android.content.Context
 import android.content.SharedPreferences
 import android.content.pm.PackageManager
@@ -13,7 +14,6 @@ import androidx.security.crypto.EncryptedSharedPreferences
 import androidx.security.crypto.MasterKey
 import io.parity.signer.*
 import io.parity.signer.components.Authentication
-import org.json.JSONArray
 import org.json.JSONObject
 import java.io.File
 import java.io.FileOutputStream
@@ -30,8 +30,8 @@ import androidx.core.content.ContextCompat
  * This is single object to handle all interactions with backend
  */
 class SignerDataModel : ViewModel() {
-	private val REQUIRED_PERMISSIONS = arrayOf(Manifest.permission.CAMERA)
-	internal val REQUEST_CODE_PERMISSIONS = 10
+	//private val REQUIRED_PERMISSIONS = arrayOf(Manifest.permission.CAMERA)
+	//internal val REQUEST_CODE_PERMISSIONS = 10
 
 	//Internal model values
 	private val _onBoardingDone = MutableLiveData(OnBoardingState.InProgress)
@@ -43,13 +43,12 @@ class SignerDataModel : ViewModel() {
 	lateinit var activity: FragmentActivity
 	private lateinit var masterKey: MasterKey
 	private var hasStrongbox: Boolean = false
-	private var _generalCertificate = MutableLiveData(JSONObject())
 
 	//Alert
 	private val _alertState = MutableLiveData(ShieldAlert.None)
 
 	//State of the app being unlocked
-	internal val _authenticated = MutableLiveData(false)
+	private val _authenticated = MutableLiveData(false)
 	//Authenticator to call!
 	internal var authentication: Authentication = Authentication(setAuth = { _authenticated.value = it })
 
@@ -62,8 +61,6 @@ class SignerDataModel : ViewModel() {
 
 	//Transaction
 	internal var action = JSONObject()
-	internal val _actionable = MutableLiveData(false)
-	var signingAuthor = JSONObject()
 
 	//Internal storage for model data:
 	//TODO: hard types for these
@@ -97,8 +94,6 @@ class SignerDataModel : ViewModel() {
 	internal val total: LiveData<Int?> = _total
 	internal val captured: LiveData<Int?> = _captured
 	val progress: LiveData<Float> = _progress
-
-	val actionable: LiveData<Boolean> = _actionable
 
 	val seedNames: LiveData<Array<String>> = _seedNames
 
@@ -215,6 +210,7 @@ class SignerDataModel : ViewModel() {
 	/**
 	 * Wipes all data
 	 */
+	@SuppressLint("ApplySharedPref")
 	fun wipe() {
 		deleteDir(File(dbName))
 		sharedPreferences.edit().clear().commit() //No, not apply(), do it now!
@@ -285,12 +281,13 @@ class SignerDataModel : ViewModel() {
 		}
 	}
 
+	/*
 	internal fun allPermissionsGranted() = REQUIRED_PERMISSIONS.all {
 		ContextCompat.checkSelfPermission(
 			context, it
 		) == PackageManager.PERMISSION_GRANTED
 	}
-
+	*/
 	//MARK: Init boilerplate end
 
 	//MARK: General utils begin
@@ -357,9 +354,9 @@ class SignerDataModel : ViewModel() {
 	external fun initNavigation(
 		dbname: String,
 		seedNames: String
-	);
+	)
 
-	external fun updateSeedNames(seedNames: String);
+	external fun updateSeedNames(seedNames: String)
 
 	external fun qrparserGetPacketsTotal(data: String, cleaned: Boolean): Int
 	external fun qrparserTryDecodeQrSequence(
@@ -373,12 +370,12 @@ class SignerDataModel : ViewModel() {
 
 	external fun substrateValidateSeedphrase(seed_phrase: String)
 
-	external fun historyInitHistoryWithCert(dbname: String)
-	external fun historyInitHistoryNoCert(dbname: String)
-	external fun historyDeviceWasOnline(dbname: String)
-	external fun historyGetWarnings(dbname: String): Boolean
-	external fun historyAcknowledgeWarnings(dbname: String)
-	external fun historyEntrySystem(entry: String, dbname: String)
+	private external fun historyInitHistoryWithCert(dbname: String)
+	private external fun historyInitHistoryNoCert(dbname: String)
+	private external fun historyDeviceWasOnline(dbname: String)
+	private external fun historyGetWarnings(dbname: String): Boolean
+	private external fun historyAcknowledgeWarnings(dbname: String)
+	//external fun historyEntrySystem(entry: String, dbname: String)
 	external fun historySeedNameWasShown(seedName: String, dbname: String)
 
 	//external fun testGetAllTXCards(dbname: String): String

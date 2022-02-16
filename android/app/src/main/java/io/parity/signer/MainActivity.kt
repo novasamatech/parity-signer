@@ -51,6 +51,7 @@ fun SignerApp(signerDataModel: SignerDataModel) {
 		val signerModal = signerDataModel.modal.observeAsState()
 		val signerAlert = signerDataModel.alert.observeAsState()
 		val shieldAlert = signerDataModel.alertState.observeAsState()
+		val footer = signerDataModel.footer.observeAsState()
 
 		when (onBoardingDone.value) {
 			OnBoardingState.Yes -> {
@@ -61,7 +62,7 @@ fun SignerApp(signerDataModel: SignerDataModel) {
 							TopBar(signerDataModel = signerDataModel)
 						},
 						bottomBar = {
-							BottomBar(signerDataModel = signerDataModel)
+							if(footer.value == true) BottomBar(signerDataModel = signerDataModel)
 						}
 					) { innerPadding ->
 						Box(modifier = Modifier.padding(innerPadding)) {
