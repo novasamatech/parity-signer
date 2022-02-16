@@ -12,9 +12,9 @@ use sp_core::{Pair, ed25519, sr25519, ecdsa};
 use sp_runtime::MultiSigner;
 use zeroize::Zeroize;
 
-use constants::{ADDRTREE, MAX_WORDS_DISPLAY, TRANSACTION};
+use constants::{ADDRTREE, TRANSACTION};
 use defaults::get_default_chainspecs;
-use definitions::{crypto::Encryption, error::{Active, AddressGeneration, AddressGenerationCommon, ErrorActive, ErrorSigner, ErrorSource, ExtraAddressGenerationSigner, InputActive, InputSigner, InterfaceSigner, Signer, SpecsKeySource}, helpers::multisigner_to_public, history::{Event, IdentityHistory}, keyring::{NetworkSpecsKey, AddressKey}, network_specs::NetworkSpecs, print::export_plain_vector, qr_transfers::ContentDerivations, users::AddressDetails};
+use definitions::{crypto::Encryption, error::{Active, AddressGeneration, AddressGenerationCommon, ErrorActive, ErrorSigner, ErrorSource, ExtraAddressGenerationSigner, InputActive, InputSigner, InterfaceSigner, Signer, SpecsKeySource}, helpers::multisigner_to_public, history::{Event, IdentityHistory}, keyring::{NetworkSpecsKey, AddressKey}, network_specs::NetworkSpecs, qr_transfers::ContentDerivations, users::AddressDetails};
 
 use crate::db_transactions::{TrDbCold, TrDbColdDerivations};
 use crate::helpers::{open_db, open_tree, make_batch_clear_tree, upd_id_batch, get_network_specs, get_address_details};
@@ -63,16 +63,6 @@ pub fn generate_random_phrase (words_number: u32) -> Result<String, ErrorSigner>
     };
     let mnemonic = Mnemonic::new(mnemonic_type, Language::English);
     Ok(mnemonic.into_phrase())
-}
-
-/// Validate user-proposed random phrase.
-/// Function gets used only on the Signer side.
-/// Open to user interface.
-pub fn validate_phrase (seed_phrase_proposal: &str) -> Result<(), ErrorSigner> {
-    match Mnemonic::validate(seed_phrase_proposal, Language::English) {
-        Ok(_) => Ok(()),
-        Err(e) => return Err(ErrorSigner::AddressGeneration(AddressGeneration::Extra(ExtraAddressGenerationSigner::RandomPhraseValidation(e)))),
-    }
 }
 
 /// Create address from seed and path and insert it into the database.
@@ -280,10 +270,36 @@ pub fn create_increment_set(increment: u32, multisigner: &MultiSigner, network_s
 }
 
 /// Check derivation format and determine whether there is a password
-pub fn check_derivation_format(path: &str) -> Result<bool, ErrorSigner> {
+pub fn is_passworded(path: &str) -> Result<bool, ErrorSigner> {
     match REG_PATH.captures(path) {
         Some(caps) => Ok(caps.name("password").is_some()),
         None => return Err(ErrorSigner::AddressGeneration(AddressGeneration::Extra(ExtraAddressGenerationSigner::InvalidDerivation))),
+    }
+}
+
+/// Enum to describe derivation proposed
+pub enum DerivationCheck {
+    BadFormat, // bad format, still gets json back into UI
+    Password, // passworded, no dynamic checking for collisions
+    NoPassword(Option<(MultiSigner, AddressDetails)>), // no password and optional collision
+}
+
+/// Function to check if proposed address collides,
+/// i.e. if the proposed path for given seed name and network specs key already exists
+pub fn derivation_check (seed_name: &str, path: &str, network_specs_key: &NetworkSpecsKey, database_name: &str) -> Result<DerivationCheck, ErrorSigner> {
+    match is_passworded(path) {
+        Ok(true) => Ok(DerivationCheck::Password),
+        Ok(false) => {
+            let mut found_collision = None;
+            for (multisigner, address_details) in get_all_addresses(database_name)?.into_iter() {
+                if (address_details.seed_name == seed_name)&&(address_details.path == path)&&(address_details.network_id.contains(network_specs_key))&&(!address_details.has_pwd) {
+                    found_collision = Some((multisigner, address_details));
+                    break;
+                }
+            }
+            Ok(DerivationCheck::NoPassword(found_collision))
+        },
+        Err(_) => Ok(DerivationCheck::BadFormat)
     }
 }
 
@@ -308,9 +324,10 @@ pub fn cut_path(path: &str) -> Result<(String, String), ErrorSigner> {
 /// Generate new identity (api for create_address())
 /// Function is open to user interface
 pub fn try_create_address (seed_name: &str, seed_phrase: &str, path: &str, network_specs_key: &NetworkSpecsKey, database_name: &str) -> Result<(), ErrorSigner> {
-    match derivation_no_pwd_exists(seed_name, path, network_specs_key, database_name)? {
-        Some((multisigner, address_details)) => return Err(<Signer>::address_generation_common(AddressGenerationCommon::DerivationExists(multisigner, address_details, network_specs_key.to_owned()))),
-        None => {
+    match derivation_check(seed_name, path, network_specs_key, database_name)? {
+        DerivationCheck::BadFormat => return Err(ErrorSigner::AddressGeneration(AddressGeneration::Extra(ExtraAddressGenerationSigner::InvalidDerivation))),
+        DerivationCheck::NoPassword(Some((multisigner, address_details))) => return Err(<Signer>::address_generation_common(AddressGenerationCommon::DerivationExists(multisigner, address_details, network_specs_key.to_owned()))),
+        _ => {
             let network_specs = get_network_specs(database_name, network_specs_key)?;
             let (adds, events) = create_address::<Signer>(database_name, &Vec::new(), path, &network_specs, seed_name, seed_phrase)?;
             let id_batch = upd_id_batch(Batch::default(), adds);
@@ -319,22 +336,6 @@ pub fn try_create_address (seed_name: &str, seed_phrase: &str, path: &str, netwo
                 .set_history(events_to_batch::<Signer>(&database_name, events)?) // add corresponding history
                 .apply::<Signer>(&database_name)
         },
-    }
-}
-
-/// Function to check if proposed address collides,
-/// i.e. if the proposed path for given seed name and network specs key already exists
-pub fn derivation_no_pwd_exists (seed_name: &str, path: &str, network_specs_key: &NetworkSpecsKey, database_name: &str) -> Result<Option<(MultiSigner, AddressDetails)>, ErrorSigner> {
-    if check_derivation_format(path)? {Ok(None)}
-    else {
-        let mut found_collision = None;
-        for (multisigner, address_details) in get_all_addresses (database_name)?.into_iter() {
-            if (address_details.seed_name == seed_name)&&(address_details.path == path)&&(address_details.network_id.contains(network_specs_key))&&(!address_details.has_pwd) {
-                found_collision = Some((multisigner, address_details));
-                break;
-            }
-        }
-        Ok(found_collision)
     }
 }
 
@@ -443,18 +444,6 @@ pub fn prepare_derivations_export (encryption: &Encryption, genesis_hash: &[u8;3
     Ok(ContentDerivations::generate(encryption, genesis_hash, &derivations))
 }
 
-/// Function to display possible options of English code words from allowed words list
-/// that start with already entered piece; for user requested easier seed recovery
-/// Function interacts with user interface.
-pub fn guess (word_part: &str) -> String {
-    let dictionary = Language::English.wordlist();
-    let words = dictionary.get_words_by_prefix(word_part);
-    let words_set = {
-        if words.len() > MAX_WORDS_DISPLAY {words[..MAX_WORDS_DISPLAY].to_vec()}
-        else {words.to_vec()}
-    };
-    export_plain_vector(&words_set)
-}
 
 #[cfg(test)]
 mod tests {
@@ -510,18 +499,18 @@ mod tests {
 
     #[test]
     fn must_check_for_valid_derivation_phrase() {
-        assert!(!check_derivation_format("").expect("valid empty path"));
-        assert!(check_derivation_format("//").is_err());
-        assert!(!check_derivation_format("//path1").expect("valid path1"));
-        assert!(!check_derivation_format("//path/path").expect("soft derivation"));
-        assert!(!check_derivation_format("//path//path").expect("hard derivation"));
-        assert!(check_derivation_format("//path///password").expect("path with password"));
-        assert!(check_derivation_format("///").is_err());
-        assert!(!check_derivation_format("//$~").expect("weird symbols"));
-        assert!(check_derivation_format("abraca dabre").is_err());
-        assert!(check_derivation_format("////").expect("//// - password is /"));
-        assert!(check_derivation_format("//path///password///password").expect("password///password is a password"));
-        assert!(!check_derivation_format("//путь").expect("valid utf8 abomination"));
+        assert!(!is_passworded("").expect("valid empty path"));
+        assert!(is_passworded("//").is_err());
+        assert!(!is_passworded("//path1").expect("valid path1"));
+        assert!(!is_passworded("//path/path").expect("soft derivation"));
+        assert!(!is_passworded("//path//path").expect("hard derivation"));
+        assert!(is_passworded("//path///password").expect("path with password"));
+        assert!(is_passworded("///").is_err());
+        assert!(!is_passworded("//$~").expect("weird symbols"));
+        assert!(is_passworded("abraca dabre").is_err());
+        assert!(is_passworded("////").expect("//// - password is /"));
+        assert!(is_passworded("//path///password///password").expect("password///password is a password"));
+        assert!(!is_passworded("//путь").expect("valid utf8 abomination"));
     }
 
     #[test]
@@ -620,71 +609,7 @@ mod tests {
         assert!(history_printed_after_create_seed.contains(element3), "\nReal history check5:\n{}", history_printed_after_create_seed);
         fs::remove_dir_all(dbname).unwrap();
     }
-    
-    #[test]
-    fn word_search_1() {
-        let word_part = "dri";
-        let out = guess(word_part);
-        let out_expected = r#"["drift","drill","drink","drip","drive"]"#;
-        assert!(out == out_expected, "Found different word set:\n{:?}", out);
-    }
-    
-    #[test]
-    fn word_search_2() {
-        let word_part = "umbra";
-        let out = guess(word_part);
-        let out_expected = r#"[]"#;
-        assert!(out == out_expected, "Found different word set:\n{:?}", out);
-    }
-    
-    #[test]
-    fn word_search_3() {
-        let word_part = "котик";
-        let out = guess(word_part);
-        let out_expected = r#"[]"#;
-        assert!(out == out_expected, "Found different word set:\n{:?}", out);
-    }
-    
-    #[test]
-    fn word_search_4() {
-        let word_part = "";
-        let out = guess(word_part);
-        let out_expected = r#"["abandon","ability","able","about","above","absent","absorb","abstract"]"#;
-        assert!(out == out_expected, "Found different word set:\n{:?}", out);
-    }
-    
-    #[test]
-    fn word_search_5() {
-        let word_part = " ";
-        let out = guess(word_part);
-        let out_expected = r#"[]"#;
-        assert!(out == out_expected, "Found different word set:\n{:?}", out);
-    }
-    
-    #[test]
-    fn word_search_6() {
-        let word_part = "s";
-        let out = guess(word_part);
-        let out_expected = r#"["sad","saddle","sadness","safe","sail","salad","salmon","salon"]"#;
-        assert!(out == out_expected, "Found different word set:\n{:?}", out);
-    }
-    
-    #[test]
-    fn word_search_7() {
-        let word_part = "se";
-        let out = guess(word_part);
-        let out_expected = r#"["sea","search","season","seat","second","secret","section","security"]"#;
-        assert!(out == out_expected, "Found different word set:\n{:?}", out);
-    }
-    
-    #[test]
-    fn word_search_8() {
-        let word_part = "sen";
-        let out = guess(word_part);
-        let out_expected = r#"["senior","sense","sentence"]"#;
-        assert!(out == out_expected, "Found different word set:\n{:?}", out);
-    }
-    
+
     fn get_multisigner_path_set(dbname: &str) -> Vec<(MultiSigner, String)> {
         let db = open_db::<Signer>(dbname).unwrap();
         let identities = open_tree::<Signer>(&db, ADDRTREE).unwrap();
@@ -792,7 +717,8 @@ mod tests {
         let chainspecs = get_default_chainspecs();
         let network_id_0 = NetworkSpecsKey::from_parts(&chainspecs[0].genesis_hash.to_vec(), &Encryption::Sr25519);
         assert!(try_create_address("Alice", ALICE_SEED_PHRASE, "//Alice", &network_id_0, dbname).is_ok(), "Should be able to create //Alice derivation.");
-        assert!(derivation_no_pwd_exists("Alice", "//Alice", &network_id_0, dbname).unwrap().is_some(), "Derivation should already exist.");
+        if let DerivationCheck::NoPassword(Some(_)) = derivation_check("Alice", "//Alice", &network_id_0, dbname).unwrap() {println!("Found existing");}
+        else {panic!("Derivation should already exist.");}
         match try_create_address("Alice", ALICE_SEED_PHRASE, "//Alice", &network_id_0, dbname) {
             Ok(()) => panic!("Should NOT be able to create //Alice derivation again."),
             Err(e) => assert!(<Signer>::show(&e) == "Error generating address. Seed Alice already has derivation //Alice for network specs key 0180b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe, public key d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d.", "Wrong error: {}", <Signer>::show(&e)),
@@ -807,7 +733,8 @@ mod tests {
         let chainspecs = get_default_chainspecs();
         let network_id_0 = NetworkSpecsKey::from_parts(&chainspecs[0].genesis_hash.to_vec(), &Encryption::Sr25519);
         assert!(try_create_address("Alice", ALICE_SEED_PHRASE, "//Alice///secret", &network_id_0, dbname).is_ok(), "Should be able to create //Alice/// secret derivation.");
-        assert!(derivation_no_pwd_exists("Alice", "//Alice", &network_id_0, dbname).unwrap().is_none(), "Existing derivation has password and is diffenent.");
+        if let DerivationCheck::NoPassword(None) = derivation_check("Alice", "//Alice", &network_id_0, dbname).unwrap() {println!("It did well.");}
+        else {panic!("New derivation has no password, existing derivation has password and is diffenent.");}
         assert!(try_create_address("Alice", ALICE_SEED_PHRASE, "//Alice", &network_id_0, dbname).is_ok(), "Should be able to create //Alice derivation.");
         fs::remove_dir_all(dbname).unwrap();
     }
@@ -819,7 +746,8 @@ mod tests {
         let chainspecs = get_default_chainspecs();
         let network_id_0 = NetworkSpecsKey::from_parts(&chainspecs[0].genesis_hash.to_vec(), &Encryption::Sr25519);
         assert!(try_create_address("Alice", ALICE_SEED_PHRASE, "//Alice", &network_id_0, dbname).is_ok(), "Should be able to create //Alice derivation.");
-        assert!(derivation_no_pwd_exists("Alice", "//Alice///secret", &network_id_0, dbname).unwrap().is_none(), "Existing derivation has no password and is diffenent.");
+        if let DerivationCheck::Password = derivation_check("Alice", "//Alice///secret", &network_id_0, dbname).unwrap() {println!("It did well.");}
+        else {panic!("New derivation has password, existing derivation has no password and is diffenent.");}
         assert!(try_create_address("Alice", ALICE_SEED_PHRASE, "//Alice///secret", &network_id_0, dbname).is_ok(), "Should be able to create //Alice///secret derivation.");
         fs::remove_dir_all(dbname).unwrap();
     }
@@ -831,7 +759,8 @@ mod tests {
         let chainspecs = get_default_chainspecs();
         let network_id_0 = NetworkSpecsKey::from_parts(&chainspecs[0].genesis_hash.to_vec(), &Encryption::Sr25519);
         assert!(try_create_address("Alice", ALICE_SEED_PHRASE, "//Alice///secret1", &network_id_0, dbname).is_ok(), "Should be able to create //Alice///secret1 derivation.");
-        assert!(derivation_no_pwd_exists("Alice", "//Alice///secret2", &network_id_0, dbname).unwrap().is_none(), "Existing derivation has different password.");
+        if let DerivationCheck::Password = derivation_check("Alice", "//Alice///secret2", &network_id_0, dbname).unwrap() {println!("It did well.");}
+        else {panic!("Existing derivation has different password.");}
         assert!(try_create_address("Alice", ALICE_SEED_PHRASE, "//Alice///secret2", &network_id_0, dbname).is_ok(), "Should be able to create //Alice///secret2 derivation.");
         fs::remove_dir_all(dbname).unwrap();
     }
@@ -843,7 +772,8 @@ mod tests {
         let chainspecs = get_default_chainspecs();
         let network_id_0 = NetworkSpecsKey::from_parts(&chainspecs[0].genesis_hash.to_vec(), &Encryption::Sr25519);
         assert!(try_create_address("Alice", ALICE_SEED_PHRASE, "//Alice///secret", &network_id_0, dbname).is_ok(), "Should be able to create //Alice derivation.");
-        assert!(derivation_no_pwd_exists("Alice", "//Alice///secret", &network_id_0, dbname).unwrap().is_none(), "Derivation exists, but has password.");
+        if let DerivationCheck::Password = derivation_check("Alice", "//Alice///secret", &network_id_0, dbname).unwrap() {println!("It did well.");}
+        else {panic!("Derivation exists, but has password.");}
         match try_create_address("Alice", ALICE_SEED_PHRASE, "//Alice///secret", &network_id_0, dbname) {
             Ok(()) => panic!("Should NOT be able to create //Alice///secret derivation again."),
             Err(e) => assert!(<Signer>::show(&e) == "Error generating address. Seed Alice already has derivation //Alice///<password> for network specs key 0180b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe, public key 08a5e583f74f54f3811cb5f7d74e686d473e3a466fd0e95738707a80c3183b15.", "Wrong error: {}", <Signer>::show(&e)),

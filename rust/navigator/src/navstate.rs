@@ -1,17 +1,15 @@
 //! Navigation state of the app
 
-//use hex;
 use sp_runtime::MultiSigner;
 use zeroize::Zeroize;
 
-use crate::screens::{AddressState, AddressStateMulti, DeriveState, KeysState, Screen, SpecialtyKeysState, SufficientCryptoState, TransactionState};
+use crate::screens::{AddressState, AddressStateMulti, DeriveState, KeysState, RecoverSeedPhraseState, Screen, SpecialtyKeysState, SufficientCryptoState, TransactionState};
 use crate::modals::Modal;
 use crate::actions::Action;
 use crate::alerts::Alert;
 
-//use plot_icon;
-use db_handling;
-use definitions::{error::{AddressKeySource, ErrorSigner, ErrorSource, ExtraAddressKeySourceSigner, InputSigner, InterfaceSigner, Signer}, keyring::{AddressKey, NetworkSpecsKey}, users::AddressDetails};
+use db_handling::interface_signer::{BIP_CAP, print_guess, SAFE_RESERVE, WORD_LENGTH};
+use definitions::{error::{AddressGeneration, AddressGenerationCommon, AddressKeySource, ErrorSigner, ErrorSource, ExtraAddressKeySourceSigner, InputSigner, InterfaceSigner, Signer}, keyring::{AddressKey, NetworkSpecsKey}, users::AddressDetails};
 use transaction_parsing;
 use transaction_signing;
 
@@ -120,8 +118,8 @@ impl State {
                                     Screen::RecoverSeedName(_) => {
                                         new_navstate = self.correct_seed_selector();
                                     },
-                                    Screen::RecoverSeedPhrase(ref seed_name) => {
-                                        new_navstate.screen = Screen::RecoverSeedName(seed_name.to_string());
+                                    Screen::RecoverSeedPhrase(ref recover_seed_phrase_state) => {
+                                        new_navstate.screen = Screen::RecoverSeedName(recover_seed_phrase_state.name());
                                     },
                                     Screen::DeriveKey(d) => {
                                         new_navstate.screen = Screen::Keys(d.blank_keys_state());
@@ -230,7 +228,7 @@ impl State {
                         Screen::RecoverSeedName(_) => {
                             match db_handling::identities::get_addresses_by_seed_name(dbname, details_str) {
                                 Ok(a) => {
-                                    if a.len() == 0 {new_navstate = Navstate::clean_screen(Screen::RecoverSeedPhrase(details_str.to_string()))}
+                                    if a.len() == 0 {new_navstate = Navstate::clean_screen(Screen::RecoverSeedPhrase(RecoverSeedPhraseState::new(&details_str)))}
                                     else {
                                         new_navstate.alert = Alert::Error;
                                         errorline.push_str(&<Signer>::show(&ErrorSigner::Input(InputSigner::SeedNameExists(details_str.to_string()))));
@@ -242,7 +240,8 @@ impl State {
                                 },
                             }
                         },
-                        Screen::RecoverSeedPhrase(ref seed_name) => {
+                        Screen::RecoverSeedPhrase(ref recover_seed_phrase_state) => {
+                            let seed_name = recover_seed_phrase_state.name();
                             match details_str.parse::<bool> () {
                                 Ok(roots) => match db_handling::identities::try_create_seed(&seed_name, secret_seed_phrase, roots, dbname) {
                                     Ok(()) => match KeysState::new(&seed_name, dbname) {
@@ -268,8 +267,15 @@ impl State {
                             match db_handling::identities::try_create_address (&derive_state.seed_name(), secret_seed_phrase, details_str, &derive_state.network_specs_key(), dbname) {
                                 Ok(()) => {new_navstate = Navstate::clean_screen(Screen::Keys(KeysState::new_in_network(&derive_state.seed_name(), &derive_state.network_specs_key())))},
                                 Err(e) => {
-                                    new_navstate.alert = Alert::Error;
-                                    errorline.push_str(&<Signer>::show(&e));
+                                    if let ErrorSigner::AddressGeneration(AddressGeneration::Common(AddressGenerationCommon::DerivationExists(ref multisigner, ref address_details, _))) = e {
+                                        new_navstate.screen = Screen::DeriveKey(derive_state.collided_with(&multisigner, &address_details));
+                                        new_navstate.alert = Alert::Error;
+                                        errorline.push_str(&<Signer>::show(&e));
+                                    }
+                                    else {
+                                        new_navstate.alert = Alert::Error;
+                                        errorline.push_str(&<Signer>::show(&e));
+                                    }
                                 },
                             }
                         },
@@ -950,6 +956,24 @@ impl State {
                         _ => println!("ShowDocuments does nothing here"),
                     }
                 },
+                Action::TextEntry => {
+                    match self.navstate.screen {
+                        Screen::RecoverSeedPhrase(ref mut recover_seed_phrase_state) => {
+                            recover_seed_phrase_state.text_entry(&details_str);
+                            new_navstate = Navstate::clean_screen(Screen::RecoverSeedPhrase(recover_seed_phrase_state.to_owned()));
+                        },
+                        _ => println!("TextEntry does nothing here"),
+                    }
+                },
+                Action::PushWord => {
+                    match self.navstate.screen {
+                        Screen::RecoverSeedPhrase(ref mut recover_seed_phrase_state) => {
+                            recover_seed_phrase_state.push_word(&details_str);
+                            new_navstate = Navstate::clean_screen(Screen::RecoverSeedPhrase(recover_seed_phrase_state.to_owned()));
+                        },
+                        _ => println!("PushWord does nothing here"),
+                    }
+                }
                 Action::Nothing => {
                     println!("no action was passed in action");
                 },
@@ -1040,9 +1064,30 @@ impl State {
                 },
                 Screen::NewSeed => format!("\"keyboard\":{}", new_navstate.keyboard()),
                 Screen::RecoverSeedName(ref seed_name) => format!("\"seed_name\":\"{}\",\"keyboard\":{}", seed_name, new_navstate.keyboard()),
-                Screen::RecoverSeedPhrase(ref seed_name) => format!("\"seed_name\":\"{}\",\"keyboard\":{}", seed_name, new_navstate.keyboard()),
+                Screen::RecoverSeedPhrase(ref recover_seed_phrase_state) => {
+                    let draft = recover_seed_phrase_state.draft();
+                    let user_input = draft.user_input();
+                    let guess_set = print_guess(user_input);
+                    let open_part = format!("\"seed_name\":\"{}\",\"keyboard\":{},\"user_input\":\" {}\",\"guess_set\":{},\"draft\":", recover_seed_phrase_state.name(), new_navstate.keyboard(), user_input, guess_set); // first space in user input is intended
+                    let mut out = String::with_capacity(open_part.len() + SAFE_RESERVE + (WORD_LENGTH+1)*BIP_CAP + 15); // fit open part, draft as json, ready seed as str
+                    out.push_str(&open_part);
+                    
+                    let mut seed_draft_print = draft.print();
+                    out.push_str(&seed_draft_print);
+                    seed_draft_print.zeroize();
+                    
+                    let mut seed_finalized = draft.try_finalize();
+                    if let Some(ref s) = seed_finalized {
+                        out.push_str(",\"ready_seed\":\"");
+                        out.push_str(&s);
+                        out.push_str("\"");
+                    }
+                    seed_finalized.zeroize();
+
+                    out
+                },
                 Screen::DeriveKey(ref derive_state) => {
-                    match db_handling::interface_signer::derive_prep (dbname, &derive_state.seed_name(), &derive_state.network_specs_key(), &details_str) {
+                    match db_handling::interface_signer::derive_prep (dbname, &derive_state.seed_name(), &derive_state.network_specs_key(), derive_state.collision(), &details_str) {
                         Ok(a) => {
                             format!("{},\"keyboard\":{}", a, new_navstate.keyboard())
                         },

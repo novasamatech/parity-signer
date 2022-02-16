@@ -2,7 +2,7 @@
 use sp_runtime::MultiSigner;
 use zeroize::Zeroize;
 
-use db_handling::{helpers::get_address_details, interface_signer::{first_network}};
+use db_handling::{helpers::get_address_details, interface_signer::{first_network, SeedDraft}};
 use definitions::{error::{AddressKeySource, ErrorSigner, ExtraAddressKeySourceSigner, Signer}, helpers::{multisigner_to_public, make_identicon_from_multisigner}, keyring::{AddressKey, NetworkSpecsKey}, users::AddressDetails};
 use transaction_parsing;
 use transaction_signing;
@@ -22,7 +22,7 @@ pub enum Screen {
     KeyDetailsMulti(AddressStateMulti),
     NewSeed,
     RecoverSeedName(String),
-    RecoverSeedPhrase(String),
+    RecoverSeedPhrase(RecoverSeedPhraseState),
     DeriveKey(DeriveState),
     Settings,
     Verifier,
@@ -72,6 +72,7 @@ pub struct AddressStateMulti {
 pub struct DeriveState {
     entered_info: EnteredInfo,
     keys_state: KeysState,
+    collision: Option<(MultiSigner, AddressDetails)>,
 }
 
 ///State of transaction screen
@@ -90,6 +91,13 @@ pub struct SufficientCryptoState {
     entered_info: EnteredInfo,
     content: transaction_signing::SufficientContent,
     counter: u8,
+}
+
+///State of screen recover seed phrase
+#[derive(Debug, Clone)]
+pub struct RecoverSeedPhraseState {
+    seed_name: String,
+    seed_draft: SeedDraft,
 }
 
 ///EnteredInfo, path+pwd entered by the user, zeroizeable
@@ -299,6 +307,7 @@ impl DeriveState {
         Self {
             entered_info: EnteredInfo(entered_string.to_string()),
             keys_state: keys_state.to_owned(),
+            collision: None,
         }
     }
     pub fn blank_keys_state(&self) -> KeysState {
@@ -317,10 +326,21 @@ impl DeriveState {
     pub fn path(&self) -> String {
         self.entered_info.0.to_owned()
     }
+    pub fn collision(&self) -> Option<(MultiSigner, AddressDetails)> {
+        self.collision.to_owned()
+    }
     pub fn update(&self, new_secret_string: &str) -> Self {
         Self {
             entered_info: EnteredInfo(new_secret_string.to_string()),
             keys_state: self.blank_keys_state(),
+            collision: self.collision(),
+        }
+    }
+    pub fn collided_with(&self, multisigner: &MultiSigner, address_details: &AddressDetails) -> Self {
+        Self {
+            entered_info: self.entered_info.to_owned(),
+            keys_state: self.blank_keys_state(),
+            collision: Some((multisigner.to_owned(), address_details.to_owned())),
         }
     }
 }
@@ -420,6 +440,27 @@ impl SufficientCryptoState {
     }
     pub fn counter(&self) -> u8 {
         self.counter
+    }
+}
+
+impl RecoverSeedPhraseState {
+    pub fn new(seed_name: &str) -> Self {
+        Self {
+            seed_name: seed_name.to_string(),
+            seed_draft: SeedDraft::new(),
+        }
+    }
+    pub fn name(&self) -> String {
+        self.seed_name.to_string()
+    }
+    pub fn draft(&self) -> &SeedDraft {
+        &self.seed_draft
+    }
+    pub fn text_entry(&mut self, details_str: &str) {
+        self.seed_draft.text_field_update(details_str)
+    }
+    pub fn push_word(&mut self, details_str: &str) {
+        self.seed_draft.added(details_str, None);
     }
 }
 

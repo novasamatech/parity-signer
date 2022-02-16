@@ -63,19 +63,12 @@ export! {
     ) -> anyhow::Result<String, anyhow::Error> {
         qr_reader_phone::decode_sequence(data, cleaned)
     }
-
+/*
      @Java_io_parity_signer_models_SignerDataModel_substrateGuessWord
     fn guess_word (
         part: &str
     ) -> String {
         db_handling::identities::guess(part)
-    }
-
-    @Java_io_parity_signer_models_SignerDataModel_substrateCheckPath
-    fn check_path(
-        path: &str
-    ) -> anyhow::Result<bool, anyhow::Error> {
-        db_handling::identities::check_derivation_format(path).map_err(|e| e.anyhow())
     }
 
     @Java_io_parity_signer_models_SignerDataModel_substrateValidateSeedphrase
@@ -84,7 +77,7 @@ export! {
     ) -> anyhow::Result<(), anyhow::Error> {
         db_handling::identities::validate_phrase(seed_phrase).map_err(|e| e.anyhow())
     }
-
+*/
     @Java_io_parity_signer_models_SignerDataModel_historyInitHistoryWithCert
     fn init_history_with_cert(
         dbname: &str

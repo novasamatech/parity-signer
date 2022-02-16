@@ -175,7 +175,6 @@ pub fn signer_errors() -> Vec<ErrorSigner> {
     error_set.push(ErrorSigner::AddressGeneration(AddressGeneration::Common(AddressGenerationCommon::KeyCollision{seed_name: String::from("Alice super secret seed")})));
     for e in secret_string_error_set().into_iter() {error_set.push(ErrorSigner::AddressGeneration(AddressGeneration::Common(AddressGenerationCommon::SecretString(e))));}
     error_set.push(ErrorSigner::AddressGeneration(AddressGeneration::Extra(ExtraAddressGenerationSigner::RandomPhraseGeneration(anyhow!("Mnemonic generator refuses to work with a valid excuse.")))));
-    error_set.push(ErrorSigner::AddressGeneration(AddressGeneration::Extra(ExtraAddressGenerationSigner::RandomPhraseValidation(anyhow!("Mnemonic generator rejects your phrase with a valid excuse.")))));
     error_set.push(ErrorSigner::AddressGeneration(AddressGeneration::Extra(ExtraAddressGenerationSigner::InvalidDerivation)));
     
     error_set.push(ErrorSigner::Qr(String::from("QR generator refuses to work with a valid excuse.")));
@@ -232,7 +231,7 @@ mod tests {
     fn print_signer_errors_nicely() {
         let mut print = String::from("\n");
         let signer_errors = signer_errors();
-        assert!(signer_errors.len() == 157, "Different error set length: {}", signer_errors.len());
+        assert!(signer_errors.len() == 156, "Different error set length: {}", signer_errors.len());
         for e in signer_errors.iter() {
             print.push_str(&format!("\"{}\"", <Signer>::show(e)));
             print.push_str("\n");
@@ -345,7 +344,6 @@ mod tests {
 "Error generating address. Bad secret string: invalid seed length."
 "Error generating address. Bad secret string: invalid path."
 "Error generating address. Could not create random phrase. Mnemonic generator refuses to work with a valid excuse."
-"Error generating address. Proposed random phrase is invalid. Mnemonic generator rejects your phrase with a valid excuse."
 "Error generating address. Invalid derivation format."
 "Error generating qr code. QR generator refuses to work with a valid excuse."
 "Error parsing incoming transaction. Metadata spec version matches. Error decoding transaction content. Expected mortal transaction due to prelude format. Found immortal transaction."
