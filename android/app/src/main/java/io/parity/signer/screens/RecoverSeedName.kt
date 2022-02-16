@@ -25,7 +25,6 @@ fun RecoverSeedName(
 	val lastError = signerDataModel.lastError.observeAsState()
 	val focusManager = LocalFocusManager.current
 	val focusRequester = remember { FocusRequester() }
-	val createRoots = remember { mutableStateOf(true) }
 
 	Column(
 		horizontalAlignment = Alignment.CenterHorizontally,

@@ -5,15 +5,15 @@ import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.CheckCircle
+import androidx.compose.material.icons.filled.Circle
 import androidx.compose.material.icons.filled.Lock
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import io.parity.signer.models.abbreviateString
-import io.parity.signer.ui.theme.Crypto400
-import io.parity.signer.ui.theme.CryptoTypography
-import io.parity.signer.ui.theme.Text400
-import io.parity.signer.ui.theme.Text600
+import io.parity.signer.ui.theme.*
 import org.json.JSONObject
 
 /**
@@ -21,15 +21,26 @@ import org.json.JSONObject
  * TODO: paint root keys in scary colors
  */
 @Composable
-fun KeyCard(identity: JSONObject) {
+fun KeyCard(identity: JSONObject, multiselectMode: Boolean = false) {
 	Row(
 		modifier = Modifier
 			.padding(8.dp)
 	) {
-		Identicon(identity.optString("identicon"))
+		Box(contentAlignment = Alignment.BottomEnd) {
+			Identicon(identity.optString("identicon"))
+			if (multiselectMode) {
+				if(identity.optBoolean("multiselect")) {
+					Icon(Icons.Default.CheckCircle, "Not multiselected", tint = MaterialTheme.colors.Action400)
+				} else {
+					Icon(Icons.Default.Circle, "Multiselected", tint = MaterialTheme.colors.Action400)
+				}
+			}
+		}
 		Spacer(modifier = Modifier.width(10.dp))
 		Column {
-			Row {
+			Row(
+				verticalAlignment = Alignment.CenterVertically
+			) {
 				Text(
 					identity.optString("seed_name"),
 					color = MaterialTheme.colors.Text600,

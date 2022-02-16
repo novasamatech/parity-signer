@@ -1,25 +1,31 @@
 package io.parity.signer.components
 
 import androidx.compose.foundation.layout.*
+import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.CheckCircle
+import androidx.compose.material.icons.filled.Circle
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import io.parity.signer.models.abbreviateString
-import io.parity.signer.ui.theme.Bg200
-import io.parity.signer.ui.theme.CryptoTypography
-import io.parity.signer.ui.theme.Text400
-import io.parity.signer.ui.theme.Text600
+import io.parity.signer.ui.theme.*
 
 @Composable
 fun SeedCard(
 	seedName: String,
 	identicon: String,
 	base58: String = "",
-	showAddress: Boolean = false
+	showAddress: Boolean = false,
+	multiselectMode: Boolean = false,
+	selected: Boolean = false,
+	swiped: Boolean = false,
+	increment: (Int) -> Unit = {},
+	delete: () -> Unit = {},
 ) {
 	Surface(
 		shape = MaterialTheme.shapes.medium,
@@ -29,7 +35,16 @@ fun SeedCard(
 		Row(
 			verticalAlignment = Alignment.CenterVertically,
 		) {
-			Identicon(identicon)
+			Box {
+				Identicon(identicon)
+				if (multiselectMode) {
+					if(selected) {
+						Icon(Icons.Default.CheckCircle, "Not multiselected", tint = MaterialTheme.colors.Action400)
+					} else {
+						Icon(Icons.Default.Circle, "Multiselected", tint = MaterialTheme.colors.Action400)
+					}
+				}
+			}
 			Spacer(modifier = Modifier.width(10.dp))
 			Column {
 				Text(
@@ -44,6 +59,10 @@ fun SeedCard(
 						style = CryptoTypography.body1
 					)
 				}
+			}
+			if (swiped) {
+				Spacer(Modifier.weight(1f))
+				SwipedButtons(increment, delete)
 			}
 		}
 	}

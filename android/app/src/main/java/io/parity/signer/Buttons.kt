@@ -15,7 +15,6 @@ enum class ButtonID {
 	Shield,
 	SelectKey,
 	GoForward,
-	Derive,
 	Delete,
 	NewSeed,
 	RecoverSeed,
@@ -46,7 +45,7 @@ enum class ButtonID {
 	SelectAll,
 	Increment,
 	ShowDocuments,
-	ExportMultiselect;
+	ExportMultiSelect;
 
 
 	fun getName(): String {

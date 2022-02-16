@@ -1,5 +1,6 @@
 package io.parity.signer.components
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.MaterialTheme
@@ -8,6 +9,7 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import io.parity.signer.ui.theme.*
 
@@ -68,5 +70,20 @@ fun SeedPhraseButton(word: String, select: () -> Unit) {
 			color = MaterialTheme.colors.Crypto400,
 			modifier = Modifier.padding(horizontal = 12.dp, vertical = 4.dp)
 		)
+	}
+}
+
+/**
+ * Small buttons for multiselect screen
+ */
+@Composable
+fun SmallButton(text: String, action: () -> Unit) {
+	Surface(
+		shape = MaterialTheme.shapes.small,
+		border = BorderStroke(1.dp, MaterialTheme.colors.Action400),
+		color = Color.Transparent,
+		modifier = Modifier.clickable(onClick = action)
+	) {
+		Text(text, style = MaterialTheme.typography.caption, color = MaterialTheme.colors.Action400, modifier = Modifier.padding(4.dp))
 	}
 }

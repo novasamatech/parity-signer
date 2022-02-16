@@ -8,14 +8,17 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import io.parity.signer.ButtonID
 import io.parity.signer.models.toListOfJSONObjects
+import org.json.JSONArray
 import org.json.JSONObject
 
 @Composable
 fun KeySelector(
 	button: (button: ButtonID, details: String) -> Unit,
-	screenData: JSONObject
+	increment: (Int) -> Unit,
+	keySet: JSONArray,
+	multiSelectMode: Boolean
 ) {
-	val addresses = screenData.optJSONArray("set")?.toListOfJSONObjects() ?: emptyList()
+	val addresses = keySet.toListOfJSONObjects() ?: emptyList()
 	LazyColumn {
 		this.items(
 			items = addresses,
@@ -24,14 +27,11 @@ fun KeySelector(
 			}
 		) { address ->
 			val addressKey = address.optString("address_key")
-			val selectButton by remember { mutableStateOf(
-				{
+			val selectButton = {
 				button(
 					ButtonID.SelectKey,
 					addressKey
 				)
-				}
-			)
 			}
 			val longTapButton = {
 				button(
@@ -39,7 +39,9 @@ fun KeySelector(
 					addressKey
 				)
 			}
-			KeyCardActive(address, selectButton, longTapButton)
+			val swipe = { button(ButtonID.Swipe, addressKey) }
+			val delete = { button(ButtonID.RemoveKey, "") }
+			KeyCardActive(address, selectButton, longTapButton, swipe, increment, delete, multiSelectMode)
 		}
 	}
 }

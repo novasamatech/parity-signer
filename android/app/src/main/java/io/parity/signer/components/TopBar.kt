@@ -8,6 +8,7 @@ import androidx.compose.material.ButtonDefaults.buttonColors
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AddCircleOutline
 import androidx.compose.material.icons.filled.ChevronLeft
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.livedata.observeAsState
@@ -19,6 +20,7 @@ import io.parity.signer.models.SignerDataModel
 import io.parity.signer.models.pushButton
 import io.parity.signer.ui.theme.Action400
 import io.parity.signer.ui.theme.Bg100
+import io.parity.signer.ui.theme.Text400
 
 @Composable
 fun TopBar(signerDataModel: SignerDataModel) {
@@ -45,12 +47,20 @@ fun TopBar(signerDataModel: SignerDataModel) {
 					onClick = {
 						signerDataModel.pushButton(ButtonID.GoBack)
 					}) {
+					if (rightButton.value == "MultiSelect") {
+						Icon(
+							Icons.Default.Close,
+							"go back",
+							tint = MaterialTheme.colors.Action400,
+							modifier = Modifier.scale(2f)
+						)
+					} else {
 					Icon(
 						Icons.Default.ChevronLeft,
 						"go back",
-						tint = MaterialTheme.colors.Action400,
+						tint = MaterialTheme.colors.Text400,
 						modifier = Modifier.scale(2f)
-					)
+					)}
 				}
 			}
 		}
@@ -66,6 +76,11 @@ fun TopBar(signerDataModel: SignerDataModel) {
 					MaterialTheme.typography.h4
 				}
 			)
+		}
+		if (rightButton.value == "MultiSelect") {
+			SmallButton(text = "Select all") {
+				signerDataModel.pushButton(ButtonID.SelectAll)
+			}
 		}
 		Row(
 			horizontalArrangement = Arrangement.End,

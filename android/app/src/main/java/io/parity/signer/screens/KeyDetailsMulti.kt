@@ -11,6 +11,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Text
 import androidx.compose.runtime.*
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
@@ -24,7 +25,7 @@ import org.json.JSONObject
 
 @Composable
 fun KeyDetailsMulti(signerDataModel: SignerDataModel) {
-	val address = signerDataModel.screenData.value ?: JSONObject()
+	val address = signerDataModel.screenData.observeAsState()
 	var offset by remember { mutableStateOf(0f) }
 
 	Column(
@@ -32,10 +33,10 @@ fun KeyDetailsMulti(signerDataModel: SignerDataModel) {
 			.fillMaxWidth()
 			.verticalScroll(rememberScrollState())
 	) {
-		KeyCard(identity = address)
-		NetworkCard(address)
+		KeyCard(identity = address.value?: JSONObject())
+		NetworkCard(address.value?: JSONObject())
 		Image(
-			address.optString("qr").intoImageBitmap(),
+			(address.value?.optString("qr")?:"").intoImageBitmap(),
 			contentDescription = "QR with address to scan",
 			contentScale = ContentScale.FillWidth,
 			modifier = Modifier
@@ -47,20 +48,19 @@ fun KeyDetailsMulti(signerDataModel: SignerDataModel) {
 						offset += delta
 					},
 					onDragStopped = {
-						if (offset > 100) {
+						if (offset < -100) {
 							signerDataModel.pushButton(ButtonID.NextUnit)
 						} else {
-							if (offset < -100) {
+							if (offset > 100) {
 								signerDataModel.pushButton(ButtonID.PreviousUnit)
-							} else {
-								offset = 0f
 							}
 						}
+						offset = 0f
 					}
 				)
 		)
 		Text(
-			"Key " + address.optString("current_number") + " out of " + address.optString(
+			"Key " + address.value?.optString("current_number") + " out of " + address.value?.optString(
 				"out_of"
 			)
 		)

@@ -11,6 +11,7 @@ import io.parity.signer.alerts.ShieldAlert
 import io.parity.signer.components.Documents
 import io.parity.signer.modals.*
 import io.parity.signer.models.SignerDataModel
+import io.parity.signer.models.increment
 import io.parity.signer.models.pushButton
 import io.parity.signer.screens.*
 import org.json.JSONObject
@@ -27,7 +28,9 @@ fun ScreenSelector(screen: SignerScreen?, signerDataModel: SignerDataModel) {
 			)
 		}
 		SignerScreen.Keys -> {
-			KeyManager(signerDataModel::pushButton, screenData?: JSONObject())
+			KeyManager(signerDataModel::pushButton,
+				signerDataModel::increment,
+				screenData?: JSONObject())
 		}
 		SignerScreen.Settings -> {
 			SettingsScreen(signerDataModel = signerDataModel)
@@ -76,7 +79,7 @@ fun ScreenSelector(screen: SignerScreen?, signerDataModel: SignerDataModel) {
 		SignerScreen.SignSufficientCrypto -> SignSufficientCrypto(signerDataModel = signerDataModel)
 		SignerScreen.SelectSeedForBackup -> SelectSeedForBackup(signerDataModel = signerDataModel)
 		SignerScreen.Documents -> Documents()
-		SignerScreen.KeyDetailsMulti -> KeyDetailsMulti(signerDataModel = signerDataModel)
+		SignerScreen.KeyDetailsMultiSelect -> KeyDetailsMulti(signerDataModel = signerDataModel)
 	}
 }
 
@@ -140,7 +143,7 @@ enum class SignerScreen {
 	SignSufficientCrypto,
 	SelectSeedForBackup,
 	Documents,
-	KeyDetailsMulti;
+	KeyDetailsMultiSelect;
 }
 
 enum class SignerModal {
