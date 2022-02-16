@@ -37,7 +37,11 @@ fun VerifierScreen(signerDataModel: SignerDataModel) {
 		header = "Wipe ALL data?",
 		text = "Remove all data and set general verifier blank so that it could be set later. This operation can not be reverted. Do not proceed unless you absolutely know what you are doing, there is no need to use this procedure in most cases. Misusing this feature may lead to loss of funds!",
 		back = { jailbreakAlert = false },
-		forward = { signerDataModel.jailbreak() },
+		forward = {
+			signerDataModel.authentication.authenticate(signerDataModel.activity) {
+				signerDataModel.jailbreak()
+			}
+		},
 		backText = "Cancel",
 		forwardText = "I understand"
 	)

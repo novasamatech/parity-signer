@@ -97,8 +97,10 @@ fun SettingsScreen(signerDataModel: SignerDataModel) {
 		text = "Factory reset the Signer app. This operation can not be reverted!",
 		back = { confirm = false },
 		forward = {
-			signerDataModel.wipe()
-			signerDataModel.totalRefresh()
+			signerDataModel.authentication.authenticate(signerDataModel.activity){
+				signerDataModel.wipe()
+				signerDataModel.totalRefresh()
+			}
 		},
 		backText = "Cancel",
 		forwardText = "Wipe"
