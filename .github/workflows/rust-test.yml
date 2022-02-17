@@ -18,6 +18,6 @@ jobs:
       - name:           Checkout submodules
         shell:          bash
         run:            git submodule update --init --recursive
-      - name:           Rust build
+      - name:           cargo test
         shell:          bash
         run:            cd rust && cp os-specific-lock/android/Cargo.lock . && cargo test && cp os-specific-lock/ios/Cargo.lock . && cargo test && cd ..
