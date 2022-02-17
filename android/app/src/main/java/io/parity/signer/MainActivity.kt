@@ -1,6 +1,8 @@
 package io.parity.signer
 
 import android.os.Bundle
+import androidx.activity.OnBackPressedCallback
+import androidx.activity.compose.BackHandler
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
@@ -16,6 +18,7 @@ import io.parity.signer.models.SignerDataModel
 import io.parity.signer.ui.theme.ParitySignerTheme
 import io.parity.signer.components.BottomBar
 import io.parity.signer.components.TopBar
+import io.parity.signer.models.pushButton
 import io.parity.signer.screens.LandingView
 import io.parity.signer.ui.theme.Text600
 
@@ -56,6 +59,9 @@ fun SignerApp(signerDataModel: SignerDataModel) {
 		when (onBoardingDone.value) {
 			OnBoardingState.Yes -> {
 				if (authenticated.value == true) {
+					BackHandler {
+						signerDataModel.pushButton(ButtonID.GoBack)
+					}
 					//Structure to contain all app
 					Scaffold(
 						topBar = {
