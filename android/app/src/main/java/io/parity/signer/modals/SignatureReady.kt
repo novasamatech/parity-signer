@@ -1,16 +1,21 @@
 package io.parity.signer.modals
 
+import android.hardware.display.DisplayManager
+import android.util.DisplayMetrics
+import android.view.Display
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.gestures.Orientation
+import androidx.compose.foundation.gestures.scrollable
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.unit.dp
 import io.parity.signer.models.SignerDataModel
 import io.parity.signer.models.intoImageBitmap
@@ -19,15 +24,20 @@ import io.parity.signer.ui.theme.modal
 
 @Composable
 fun SignatureReady(signerDataModel: SignerDataModel) {
-
-	Column {
+	Column(
+		Modifier.verticalScroll(rememberScrollState(LocalConfiguration.current.screenHeightDp))
+	) {
+		Spacer(Modifier.height(LocalConfiguration.current.screenHeightDp.dp).fillMaxWidth())
 		Surface(
 			shape = MaterialTheme.shapes.modal,
-			color = MaterialTheme.colors.Bg000
+			color = MaterialTheme.colors.Bg000,
+			modifier = Modifier.height(LocalConfiguration.current.screenHeightDp.dp)
 		) {
-			Column(modifier = Modifier
-				.fillMaxSize()
-				.padding(20.dp)) {
+			Column(
+				modifier = Modifier
+					.fillMaxSize()
+					.padding(20.dp)
+			) {
 				Text("Your signature")
 				Text("Scan this into your application")
 				Image(
@@ -39,5 +49,6 @@ fun SignatureReady(signerDataModel: SignerDataModel) {
 				)
 			}
 		}
+		Spacer(Modifier.height((LocalConfiguration.current.screenHeightDp - LocalConfiguration.current.screenWidthDp).dp).fillMaxWidth())
 	}
 }

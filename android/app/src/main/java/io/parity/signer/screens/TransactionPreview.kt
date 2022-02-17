@@ -1,10 +1,13 @@
 package io.parity.signer.screens
 
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.*
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.platform.LocalFocusManager
 import io.parity.signer.ButtonID
@@ -29,7 +32,9 @@ fun TransactionPreview(
 	val focusManager = LocalFocusManager.current
 	val focusRequester = remember { FocusRequester() }
 
-	Column {
+	Column(
+		Modifier.verticalScroll(rememberScrollState())
+	) {
 		TransactionPreviewField(transaction = transaction)
 		signerDataModel.screenData.value!!.optJSONObject("author_info")?.let {
 			KeyCard(identity = it)
