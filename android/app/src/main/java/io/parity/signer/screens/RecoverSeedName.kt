@@ -28,7 +28,7 @@ fun RecoverSeedName(
 
 	Column(
 		horizontalAlignment = Alignment.CenterHorizontally,
-		verticalArrangement = Arrangement.Center,
+		verticalArrangement = Arrangement.Top,
 		modifier = Modifier
 			.fillMaxSize(1f)
 			.padding(20.dp)

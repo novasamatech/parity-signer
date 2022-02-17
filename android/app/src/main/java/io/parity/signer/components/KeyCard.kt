@@ -23,6 +23,7 @@ import org.json.JSONObject
 @Composable
 fun KeyCard(identity: JSONObject, multiselectMode: Boolean = false) {
 	Row(
+		verticalAlignment = Alignment.CenterVertically,
 		modifier = Modifier
 			.padding(8.dp)
 	) {

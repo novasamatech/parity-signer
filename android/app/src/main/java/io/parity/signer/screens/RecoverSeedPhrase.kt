@@ -48,7 +48,9 @@ fun RecoverSeedPhrase(
 	}
 	val createRoots = remember { mutableStateOf(true) }
 
-	Column {
+	Column(
+		verticalArrangement = Arrangement.Top
+	) {
 		Row(
 			horizontalArrangement = Arrangement.Center,
 			modifier = Modifier.fillMaxWidth(1f)

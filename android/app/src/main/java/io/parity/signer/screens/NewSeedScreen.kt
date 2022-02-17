@@ -25,7 +25,7 @@ fun NewSeedScreen(
 
 	Column(
 		horizontalAlignment = Alignment.CenterHorizontally,
-		verticalArrangement = Arrangement.Center,
+		verticalArrangement = Arrangement.Top,
 		modifier = Modifier.fillMaxSize()
 	) {
 		Text("DISPLAY NAME", style = MaterialTheme.typography.overline)
