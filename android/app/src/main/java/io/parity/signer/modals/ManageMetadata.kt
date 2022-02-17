@@ -1,5 +1,6 @@
 package io.parity.signer.modals
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -8,6 +9,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import io.parity.signer.ButtonID
 import io.parity.signer.alerts.AndroidCalledConfirm
@@ -26,40 +28,46 @@ fun ManageMetadata(signerDataModel: SignerDataModel) {
 	val content = signerDataModel.modalData.value ?: JSONObject()
 	var confirm by remember { mutableStateOf(false) }
 
-	Column(
-		modifier = Modifier.padding(20.dp)
+	Surface(
+		color = Color.Transparent,
+		modifier = Modifier.clickable { signerDataModel.pushButton(ButtonID.GoBack) }
 	) {
-		Spacer(Modifier.weight(1f))
-		Surface(
-			color = MaterialTheme.colors.Bg000,
-			shape = MaterialTheme.shapes.modal
-		) {
-			Column {
-				HeaderBar(line1 = "MANAGE METADATA", line2 = "Select action")
-				MetadataCard(content)
-				Row {
-					Text("Used for:")
-					LazyColumn {
-						items(content.optJSONArray("networks")?.length() ?: 0) { index ->
-							NetworkCard(
-								network = content.getJSONArray("networks").getJSONObject(index)
-							)
+		Column {
+			Spacer(Modifier.weight(1f))
+			Surface(
+				color = MaterialTheme.colors.Bg000,
+				shape = MaterialTheme.shapes.modal
+			) {
+				Column(
+					modifier = Modifier.padding(20.dp)
+				) {
+					HeaderBar(line1 = "MANAGE METADATA", line2 = "Select action")
+					MetadataCard(content)
+					Row {
+						Text("Used for:")
+						LazyColumn {
+							items(content.optJSONArray("networks")?.length() ?: 0) { index ->
+								NetworkCard(
+									network = content.getJSONArray("networks")
+										.getJSONObject(index)
+								)
+							}
 						}
 					}
+					BigButton(
+						text = "Sign this metadata",
+						isShaded = true,
+						isCrypto = true,
+						action = { signerDataModel.pushButton(ButtonID.SignMetadata) })
+					BigButton(
+						text = "Delete this metadata",
+						isShaded = true,
+						isDangerous = true,
+						action = {
+							confirm = true
+						}
+					)
 				}
-				BigButton(
-					text = "Sign this metadata",
-					isShaded = true,
-					isCrypto = true,
-					action = { signerDataModel.pushButton(ButtonID.SignMetadata) })
-				BigButton(
-					text = "Delete this metadata",
-					isShaded = true,
-					isDangerous = true,
-					action = {
-						confirm = true
-					}
-				)
 			}
 		}
 	}

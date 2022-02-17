@@ -42,7 +42,7 @@ fun NetworkDetails(signerDataModel: SignerDataModel) {
 		}
 		Row {
 			Text("Verifier certificate:")
-			when (content.optJSONObject("current_verifier")?.optString("") ?: "") {
+			when (content.optJSONObject("current_verifier")?.optString("type") ?: "") {
 				"general" -> {
 					Text("general")
 				}
