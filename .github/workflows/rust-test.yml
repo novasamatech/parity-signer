@@ -20,4 +20,4 @@ jobs:
         run:            git submodule update --init --recursive
       - name:           Rust build
         shell:          bash
-        run:            cd rust && cargo test && cd ..
+        run:            cd rust && cp os-specific-lock/android/Cargo.lock . && cargo test && cp os-specific-lock/ios/Cargo.lock . && cargo test && cd ..
