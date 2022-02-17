@@ -44,94 +44,99 @@ fun KeyManager(
 	val multiselectCount = screenData.optString("multiselect_count")
 	var offsetX by remember { mutableStateOf(0f) }
 
-	Column {
-		Row(
-			Modifier
-				.pointerInput(Unit) {
-					detectTapGestures(
-						onTap = {
-							button(ButtonID.SelectKey, rootKey.optString("address_key"))
-						},
-						onLongPress = {
-							button(ButtonID.LongTap, rootKey.optString("address_key"))
-						}
-					)
-				}
-				.draggable(
-					state = rememberDraggableState { delta ->
-						offsetX += delta
-					},
-					orientation = Orientation.Horizontal,
-					onDragStopped = {
-						if (offsetX.absoluteValue > 20f) {
-							button(ButtonID.Swipe, rootKey.optString("address_key"))
-						}
-						offsetX = 0f
+	Box {
+		Column {
+			Row(
+				Modifier
+					.pointerInput(Unit) {
+						detectTapGestures(
+							onTap = {
+								button(ButtonID.SelectKey, rootKey.optString("address_key"))
+							},
+							onLongPress = {
+								button(ButtonID.LongTap, rootKey.optString("address_key"))
+							}
+						)
 					}
-				)
-				.padding(top = 3.dp, start = 12.dp, end = 12.dp)
-				.background(MaterialTheme.colors.Bg200)
-				.fillMaxWidth()
-		) {
-			SeedCard(
-				seedName = rootKey.optString("seed_name", "error"),
-				identicon = rootKey.optString("identicon"),
-				base58 = rootKey.optString("base58"),
-				showAddress = true,
-				multiselectMode = multiselectMode,
-				selected = rootKey.optBoolean("multiselect"),
-				swiped = rootKey.optBoolean("swiped"),
-				increment = { number ->
-					increment(
-						number,
-						rootKey.optString("seed_name")
+					.draggable(
+						state = rememberDraggableState { delta ->
+							offsetX += delta
+						},
+						orientation = Orientation.Horizontal,
+						onDragStopped = {
+							if (offsetX.absoluteValue > 20f) {
+								button(ButtonID.Swipe, rootKey.optString("address_key"))
+							}
+							offsetX = 0f
+						}
 					)
-				},
-				delete = {button(ButtonID.RemoveKey, "")}
+					.padding(top = 3.dp, start = 12.dp, end = 12.dp)
+					.background(MaterialTheme.colors.Bg200)
+					.fillMaxWidth()
+			) {
+				SeedCard(
+					seedName = rootKey.optString("seed_name", "error"),
+					identicon = rootKey.optString("identicon"),
+					base58 = rootKey.optString("base58"),
+					showAddress = true,
+					multiselectMode = multiselectMode,
+					selected = rootKey.optBoolean("multiselect"),
+					swiped = rootKey.optBoolean("swiped"),
+					increment = { number ->
+						increment(
+							number,
+							rootKey.optString("seed_name")
+						)
+					},
+					delete = { button(ButtonID.RemoveKey, "") }
+				)
+			}
+			IconButton(
+				onClick = { button(ButtonID.NetworkSelector, "") },
+				modifier = Modifier
+					.padding(top = 3.dp, start = 12.dp, end = 12.dp)
+					.background(MaterialTheme.colors.Bg200)
+					.fillMaxWidth()
+			) {
+				Row {
+					screenData.optJSONObject("network")?.let { network ->
+						NetworkLogoName(
+							logo = network.optString("logo"),
+							name = network.optString("title")
+						)
+					}
+					Spacer(Modifier.width(8.dp))
+					Icon(Icons.Default.ArrowCircleDown, "More networks")
+					Spacer(modifier = Modifier.weight(1f))
+				}
+			}
+			Row(
+				modifier = Modifier
+					.fillMaxWidth(1f)
+					.padding(horizontal = 8.dp)
+			) {
+				Text("DERIVED KEYS")
+				Spacer(Modifier.weight(1f, true))
+				IconButton(onClick = { button(ButtonID.NewKey, "") }) {
+					Icon(Icons.Default.AddCircle, contentDescription = "New derived key")
+				}
+			}
+			KeySelector(
+				button,
+				{ number -> increment(number, rootKey.optString("seed_name")) },
+				keySet,
+				multiselectMode
 			)
 		}
-		IconButton(
-			onClick = { button(ButtonID.NetworkSelector, "") },
-			modifier = Modifier
-				.padding(top = 3.dp, start = 12.dp, end = 12.dp)
-				.background(MaterialTheme.colors.Bg200)
-				.fillMaxWidth()
-		) {
-			Row {
-				screenData.optJSONObject("network")?.let { network ->
-					NetworkLogoName(
-						logo = network.optString("logo"),
-						name = network.optString("title")
-					)
-				}
-				Spacer(Modifier.width(8.dp))
-				Icon(Icons.Default.ArrowCircleDown, "More networks")
-				Spacer(modifier = Modifier.weight(1f))
-			}
-		}
-		Row(
-			modifier = Modifier
-				.fillMaxWidth(1f)
-				.padding(horizontal = 8.dp)
-		) {
-			Text("DERIVED KEYS")
-			Spacer(Modifier.weight(1f, true))
-			IconButton(onClick = { button(ButtonID.NewKey, "") }) {
-				Icon(Icons.Default.AddCircle, contentDescription = "New derived key")
-			}
-		}
-		KeySelector(
-			button,
-			{ number -> increment(number, rootKey.optString("seed_name")) },
-			keySet,
-			multiselectMode
-		)
 		if (multiselectMode) {
-			Spacer(Modifier.weight(1f))
-			BottomMultiselectBar(
-				count = multiselectCount,
-				delete = { button(ButtonID.RemoveKey, "") },
-				export = { button(ButtonID.ExportMultiSelect, "") })
+			Column {
+				Spacer(Modifier.weight(1f))
+				BottomMultiselectBar(
+					count = multiselectCount,
+					delete = { button(ButtonID.RemoveKey, "") },
+					export = { button(ButtonID.ExportMultiSelect, "") }
+				)
+			}
 		}
 	}
 }

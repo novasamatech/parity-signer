@@ -43,7 +43,7 @@ fun SwipedButtons(
 					},
 					orientation = Orientation.Vertical,
 					onDragStopped = {
-						increment(exp(offsetY.absoluteValue / 50f).toInt())
+						increment(exp(offsetY.absoluteValue / 500f).toInt())
 						offsetY = 0f
 					}
 				)
@@ -52,7 +52,7 @@ fun SwipedButtons(
 		) {
 			Box(contentAlignment = Alignment.Center) {
 				Text(
-					"N+" + exp(offsetY.absoluteValue / 50f).toInt().toString(),
+					"N+" + exp(offsetY.absoluteValue / 500f).toInt().toString(),
 					style = CryptoTypography.body2,
 					color = MaterialTheme.colors.Crypto400
 				)
