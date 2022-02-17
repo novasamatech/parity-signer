@@ -79,6 +79,7 @@ fun SeedBackup(signerDataModel: SignerDataModel) {
 													tint = MaterialTheme.colors.Crypto400
 												)
 											}
+											Spacer(Modifier.weight(1f))
 										}
 									}
 								}
