@@ -7,6 +7,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.runtime.Composable
 import io.parity.signer.models.abbreviateString
+import io.parity.signer.models.decode64
 import io.parity.signer.models.parseTransaction
 import org.json.JSONArray
 import org.json.JSONObject
@@ -96,7 +97,7 @@ fun HistoryCardExtended(card: JSONObject) {
 				image = Icons.Default.Done,
 				line1 = timestamp,
 				line2 = "Generated signature for message",
-				line3 = payload?.optString("user_comment") ?: ""
+				line3 = payload?.optString("user_comment")?.decode64() ?: ""
 			)
 		}
 		"metadata_added" -> {
@@ -205,7 +206,7 @@ fun HistoryCardExtended(card: JSONObject) {
 				image = Icons.Default.Dangerous,
 				line1 = timestamp,
 				line2 = "Signing failure",
-				line3 = card.getJSONObject("payload").getString("user_comment"),
+				line3 = card.optJSONObject("payload")?.optString("user_comment")?.decode64() ?: "",
 				danger = true
 			)
 		}
@@ -227,7 +228,7 @@ fun HistoryCardExtended(card: JSONObject) {
 				Text("In network")
 				Text(content.optString("network_name"))
 				Text("Comment:")
-				Text("placeholder")
+				Text(card.optJSONObject("payload")?.optString("user_comment")?.decode64() ?: "")
 			}
 		}
 		"types_info_updated" -> {

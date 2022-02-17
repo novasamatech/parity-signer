@@ -12,11 +12,10 @@ import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.platform.LocalFocusManager
 import io.parity.signer.ButtonID
 import io.parity.signer.components.*
-import io.parity.signer.models.SignerDataModel
-import io.parity.signer.models.TransactionType
+import io.parity.signer.models.*
 import io.parity.signer.models.getSeed
-import io.parity.signer.models.parseTransaction
 import io.parity.signer.ui.theme.Text400
+import java.util.*
 
 @Composable
 fun TransactionPreview(
@@ -65,7 +64,7 @@ fun TransactionPreview(
 									?.optString("seed") ?: ""
 							)
 							if (seedPhrase.isNotBlank()) {
-								button(ButtonID.GoForward, comment.value, seedPhrase)
+								button(ButtonID.GoForward, comment.value.encode64(), seedPhrase)
 							}
 						}
 					}

@@ -1,6 +1,7 @@
 package io.parity.signer.models
 
 import android.graphics.BitmapFactory
+import android.util.Base64
 import android.util.Log
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asImageBitmap
@@ -12,6 +13,14 @@ import org.json.JSONObject
  */
 fun String.decodeHex(): ByteArray {
 	return chunked(2).map { it.toInt(16).toByte() }.toByteArray()
+}
+
+fun String.encode64(): String {
+	return Base64.encodeToString(this.toByteArray(), Base64.DEFAULT)
+}
+
+fun String.decode64(): String {
+	return Base64.decode(this, Base64.DEFAULT).toString()
 }
 
 /**

@@ -1,9 +1,11 @@
 package io.parity.signer.components
 
+import android.util.Base64
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.runtime.Composable
 import io.parity.signer.models.abbreviateString
+import io.parity.signer.models.decode64
 import org.json.JSONObject
 
 /**
@@ -91,7 +93,7 @@ fun HistoryCard(card: JSONObject, timestamp: String) {
 				image = Icons.Default.Done,
 				line1 = timestamp,
 				line2 = "Generated signature for message",
-				line3 = payload?.optString("user_comment") ?: ""
+				line3 = payload?.optString("user_comment")?.decode64() ?: ""
 			)
 		}
 		"metadata_added" -> {
@@ -200,7 +202,7 @@ fun HistoryCard(card: JSONObject, timestamp: String) {
 				image = Icons.Default.Dangerous,
 				line1 = timestamp,
 				line2 = "Signing failure",
-				line3 = card.getJSONObject("payload").getString("user_comment"),
+				line3 = card.optJSONObject("payload")?.optString("user_comment")?.decode64() ?: "",
 				danger = true
 			)
 		}
@@ -209,7 +211,7 @@ fun HistoryCard(card: JSONObject, timestamp: String) {
 				image = Icons.Default.Done,
 				line1 = timestamp,
 				line2 = "Transaction signed",
-				line3 = card.getJSONObject("payload").getString("user_comment")
+				line3 = card.optJSONObject("payload")?.optString("user_comment")?.decode64() ?: ""
 			)
 		}
 		"types_info_updated" -> {
