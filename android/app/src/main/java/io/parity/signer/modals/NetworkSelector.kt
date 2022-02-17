@@ -23,13 +23,14 @@ fun NetworkSelector(signerDataModel: SignerDataModel) {
 	val networks =
 		signerDataModel.modalData.value?.optJSONArray("networks") ?: JSONArray()
 	Surface(
-		color = Color(0x00000000)
+		color = Color(0x00000000),
+		modifier = Modifier.clickable { signerDataModel.pushButton(ButtonID.GoBack) }
 	) {
 		Column {
 			Spacer(
 				Modifier
 					.weight(2f)
-					.clickable { signerDataModel.pushButton(ButtonID.GoBack) })
+					)
 			Surface(
 				shape = MaterialTheme.shapes.modal,
 				color = MaterialTheme.colors.Bg000,
