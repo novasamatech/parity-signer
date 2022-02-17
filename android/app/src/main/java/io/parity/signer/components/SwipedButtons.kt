@@ -22,7 +22,6 @@ import io.parity.signer.ui.theme.CryptoTypography
 import io.parity.signer.ui.theme.SignalDanger
 import kotlin.math.absoluteValue
 import kotlin.math.exp
-import kotlin.math.log
 
 @Composable
 fun SwipedButtons(

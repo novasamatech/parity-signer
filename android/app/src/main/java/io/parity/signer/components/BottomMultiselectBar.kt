@@ -32,7 +32,7 @@ fun BottomMultiselectBar(
 				confirm = true
 			}
 			Text(
-				count + " items selected",
+				"$count items selected",
 				style = MaterialTheme.typography.body2,
 				color = MaterialTheme.colors.Text600
 			)
