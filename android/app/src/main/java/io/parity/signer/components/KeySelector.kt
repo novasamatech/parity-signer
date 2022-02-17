@@ -22,7 +22,7 @@ fun KeySelector(
 	keySet: JSONArray,
 	multiSelectMode: Boolean
 ) {
-	val addresses = keySet.toListOfJSONObjects() ?: emptyList()
+	val addresses = keySet.toListOfJSONObjects().sortedBy { it.optString("path") }
 	LazyColumn {
 		this.items(
 			items = addresses,

@@ -51,7 +51,7 @@ fun TopBar(signerDataModel: SignerDataModel) {
 						Icon(
 							Icons.Default.Close,
 							"go back",
-							tint = MaterialTheme.colors.Action400,
+							tint = MaterialTheme.colors.Text400,
 							modifier = Modifier.scale(2f)
 						)
 					} else {
