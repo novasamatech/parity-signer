@@ -5,14 +5,14 @@ plugins {
 apply plugin: 'kotlin-android'
 
 android {
-	compileSdk 31
+	compileSdk 32
 
 	defaultConfig {
 		applicationId "io.parity.signer"
 		minSdk 23
 		targetSdk 32
-		versionCode 50000
-		versionName "5.0.0"
+		versionCode 50100
+		versionName "5.0.1"
 		ndk {
 			abiFilters 'armeabi-v7a', 'arm64-v8a', 'x86', 'x86_64'
 		}
