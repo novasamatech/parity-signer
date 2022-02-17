@@ -49,22 +49,28 @@ fun RecoverSeedName(
 				seedName.value = it
 				signerDataModel.clearError()
 			},
-			onDone = { button(ButtonID.GoForward, seedName.value) },
+			onDone = {
+				if (seedName.value.isNotBlank() && !seedName.value.contains(",")) {
+					button(ButtonID.GoForward, seedName.value)
+				}
+			},
 			capitalize = true,
 			focusManager = focusManager,
 			focusRequester = focusRequester
 		)
 
-		Text("Display name visible only to you",
-		style = MaterialTheme.typography.caption,
-		color = MaterialTheme.colors.Text600)
+		Text(
+			"Display name visible only to you",
+			style = MaterialTheme.typography.caption,
+			color = MaterialTheme.colors.Text600
+		)
 		BigButton(
 			text = "Next",
 			action = {
 				focusManager.clearFocus()
 				button(ButtonID.GoForward, seedName.value)
 			},
-		isDisabled = seedName.value.isBlank() || seedName.value.contains(",")
+			isDisabled = seedName.value.isBlank() || seedName.value.contains(",")
 		)
 
 

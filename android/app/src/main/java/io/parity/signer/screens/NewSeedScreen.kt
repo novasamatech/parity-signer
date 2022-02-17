@@ -37,7 +37,11 @@ fun NewSeedScreen(
 				seedName.value = it
 				signerDataModel.clearError()
 			},
-			onDone = { button(ButtonID.GoForward, seedName.value) },
+			onDone = {
+				if (seedName.value.isNotBlank() && !seedName.value.contains(",")) {
+					button(ButtonID.GoForward, seedName.value)
+				}
+			},
 			focusManager = focusManager,
 			focusRequester = focusRequester
 		)
@@ -48,14 +52,16 @@ fun NewSeedScreen(
 			action = {
 				focusManager.clearFocus()
 				button(ButtonID.GoForward, seedName.value)
-			}
+			},
+			isDisabled = seedName.value.isBlank() || seedName.value.contains(",")
 		)
 	}
 	DisposableEffect(Unit) {
 		if (signerDataModel.screenData.value?.optBoolean("keyboard") == true) {
 			focusRequester.requestFocus()
 		}
-		seedName.value = signerDataModel.screenData.value?.optString("seed_name") ?: ""
+		seedName.value =
+			signerDataModel.screenData.value?.optString("seed_name") ?: ""
 		onDispose { focusManager.clearFocus() }
 	}
 }
