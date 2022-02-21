@@ -56,7 +56,7 @@ fun RecoverSeedName(
 		)
 
 		Text(
-			"Display name visible only to you",
+			"Display name visible only on this device",
 			style = MaterialTheme.typography.caption,
 			color = MaterialTheme.colors.Text600
 		)

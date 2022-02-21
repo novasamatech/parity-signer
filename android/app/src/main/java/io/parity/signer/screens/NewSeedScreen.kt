@@ -50,7 +50,7 @@ fun NewSeedScreen(
 			focusRequester = focusRequester
 		)
 
-		Text("Display name visible only to you")
+		Text("Display name visible only on this device")
 		BigButton(
 			text = "Generate seed phrase",
 			action = {

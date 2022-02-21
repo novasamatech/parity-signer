@@ -40,7 +40,7 @@ fun SingleTextInput(
 		shape = MaterialTheme.shapes.large,
 		color = Color.Transparent,
 		border = BorderStroke(1.dp, MaterialTheme.colors.Border400),
-		modifier = Modifier.padding(20.dp)
+		modifier = Modifier.padding(vertical = 10.dp)
 	) {
 		TextField(
 			value = content.value,
