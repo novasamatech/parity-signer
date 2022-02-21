@@ -10,6 +10,7 @@ import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.platform.LocalFocusManager
 import io.parity.signer.ButtonID
 import io.parity.signer.components.BigButton
+import io.parity.signer.components.HeadingOverline
 import io.parity.signer.components.SingleTextInput
 import io.parity.signer.models.SignerDataModel
 
@@ -28,9 +29,10 @@ fun NewSeedScreen(
 		verticalArrangement = Arrangement.Top,
 		modifier = Modifier.fillMaxSize()
 	) {
-		Text("DISPLAY NAME", style = MaterialTheme.typography.overline)
-		Text(lastError.value.toString())
-
+		Row {
+			HeadingOverline("DISPLAY NAME")
+			Spacer(Modifier.weight(1f))
+		}
 		SingleTextInput(
 			content = seedName,
 			update = {

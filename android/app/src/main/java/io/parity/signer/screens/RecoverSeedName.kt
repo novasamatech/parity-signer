@@ -11,6 +11,7 @@ import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.unit.dp
 import io.parity.signer.ButtonID
 import io.parity.signer.components.BigButton
+import io.parity.signer.components.HeadingOverline
 import io.parity.signer.components.SingleTextInput
 import io.parity.signer.models.SignerDataModel
 import io.parity.signer.ui.theme.SignalDanger
@@ -33,16 +34,10 @@ fun RecoverSeedName(
 			.fillMaxSize(1f)
 			.padding(20.dp)
 	) {
-		Text(
-			"DISPLAY NAME",
-			style = MaterialTheme.typography.overline,
-			color = MaterialTheme.colors.Text600
-		)
-		Text(
-			lastError.value.toString(),
-			style = MaterialTheme.typography.caption,
-			color = MaterialTheme.colors.SignalDanger
-		)
+		Row {
+			HeadingOverline("DISPLAY NAME")
+			Spacer(Modifier.weight(1f))
+		}
 		SingleTextInput(
 			content = seedName,
 			update = {
@@ -72,9 +67,8 @@ fun RecoverSeedName(
 			},
 			isDisabled = seedName.value.isBlank() || seedName.value.contains(",")
 		)
-
-
 	}
+
 	DisposableEffect(Unit) {
 		if (signerDataModel.screenData.value?.optBoolean("keyboard") == true) {
 			focusRequester.requestFocus()
