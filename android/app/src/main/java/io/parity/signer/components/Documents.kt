@@ -6,12 +6,14 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Tab
 import androidx.compose.material.TabRow
 import androidx.compose.material.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import io.parity.signer.ui.theme.Bg100
 import io.parity.signer.ui.theme.Typography
 
 //TODO: everything
@@ -23,7 +25,11 @@ fun Documents() {
 		//to make the selector pretty, implement
 		//custom Tab:
 		//https://developer.android.com/reference/kotlin/androidx/compose/material/package-summary#TabRow(kotlin.Int,androidx.compose.ui.Modifier,androidx.compose.ui.graphics.Color,androidx.compose.ui.graphics.Color,kotlin.Function1,kotlin.Function0,kotlin.Function0)
-		TabRow(selectedTabIndex = document, Modifier.padding(horizontal = 20.dp)) {
+		TabRow(
+			selectedTabIndex = document,
+			backgroundColor = MaterialTheme.colors.Bg100,
+			modifier = Modifier.padding(horizontal = 20.dp, vertical = 10.dp)
+		) {
 			Tab(
 				content = { Text("Terms of service", style = Typography.button) },
 				selected = document == 0,

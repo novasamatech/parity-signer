@@ -86,7 +86,7 @@ val CryptoTypography = Typography(
 	),
 	body2 = TextStyle(
 		fontFamily = RobotoFontFamily,
-		fontWeight = FontWeight.Light,
+		fontWeight = FontWeight.Medium,
 		fontSize = 12.sp
 	)
 )

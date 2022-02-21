@@ -14,6 +14,7 @@ import io.parity.signer.components.Documents
 import io.parity.signer.models.SignerDataModel
 import io.parity.signer.ui.theme.Action400
 import io.parity.signer.ui.theme.Bg000
+import io.parity.signer.ui.theme.Bg100
 
 /**
  * First screen with legal consent request
@@ -30,7 +31,7 @@ fun LandingView(signerDataModel: SignerDataModel) {
 		}
 		Column(Modifier.padding(horizontal = 20.dp)) {
 			Spacer(Modifier.weight(1f))
-			Surface(color = MaterialTheme.colors.Bg000) {
+			Surface(color = MaterialTheme.colors.Bg100) {
 				Column {
 					Spacer(Modifier.height(16.dp))
 					Row(
@@ -44,6 +45,7 @@ fun LandingView(signerDataModel: SignerDataModel) {
 							checked = tacAccept,
 							onCheckedChange = null
 						)
+						Spacer(Modifier.width(8.dp))
 						Text("I agree to the terms and conditions", color = MaterialTheme.colors.Action400)
 						Spacer(Modifier.weight(1f))
 					}
@@ -59,6 +61,7 @@ fun LandingView(signerDataModel: SignerDataModel) {
 							checked = ppAccept,
 							onCheckedChange = null
 						)
+						Spacer(Modifier.width(8.dp))
 						Text("I agree to the privacy policy", color = MaterialTheme.colors.Action400)
 						Spacer(Modifier.weight(1f))
 					}
