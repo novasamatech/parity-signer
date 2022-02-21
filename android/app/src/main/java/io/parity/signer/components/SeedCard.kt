@@ -35,7 +35,7 @@ fun SeedCard(
 		Row(
 			verticalAlignment = Alignment.CenterVertically,
 		) {
-			Box {
+			Box(contentAlignment = Alignment.BottomEnd) {
 				Identicon(identicon)
 				if (multiselectMode) {
 					if(selected) {

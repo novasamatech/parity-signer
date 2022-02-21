@@ -1,12 +1,14 @@
 package io.parity.signer.screens
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -17,6 +19,7 @@ import io.parity.signer.components.KeyCard
 import io.parity.signer.components.NetworkCard
 import io.parity.signer.models.SignerDataModel
 import io.parity.signer.models.intoImageBitmap
+import io.parity.signer.ui.theme.Bg200
 import org.json.JSONObject
 
 @Composable
@@ -28,8 +31,21 @@ fun ExportPublicKey(signerDataModel: SignerDataModel) {
 			.fillMaxWidth()
 			.verticalScroll(rememberScrollState())
 	) {
-		KeyCard(identity = address)
-		NetworkCard(address)
+		Row(
+			Modifier
+				.padding(top = 3.dp, start = 12.dp, end = 12.dp)
+				.background(
+					MaterialTheme.colors.Bg200
+				)
+				.fillMaxWidth()
+		) {
+			KeyCard(identity = address)
+		}
+		Row (
+			Modifier.padding(top = 3.dp, start = 12.dp, end = 12.dp)
+			) {
+			NetworkCard(address)
+		}
 		Image(
 			address.optString("qr").intoImageBitmap(),
 			contentDescription = "QR with address to scan",

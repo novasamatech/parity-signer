@@ -61,7 +61,6 @@ fun KeyCardActive(
 						offsetX = 0f
 					}
 				)
-				.padding(horizontal = 8.dp)
 		) {
 			KeyCard(
 				address, multiselectMode

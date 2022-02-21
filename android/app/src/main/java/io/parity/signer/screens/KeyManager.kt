@@ -106,7 +106,7 @@ fun KeyManager(
 					.padding(top = 3.dp, start = 12.dp, end = 12.dp)
 					.background(MaterialTheme.colors.Bg100)
 					.fillMaxWidth()
-					.padding(top = 3.dp, start = 12.dp, end = 12.dp)
+					.padding(top = 8.dp, start = 20.dp, end = 12.dp)
 			) {
 				screenData.optJSONObject("network")?.let { network ->
 					NetworkLogoName(

@@ -1,15 +1,14 @@
 package io.parity.signer.screens
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.gestures.draggable
 import androidx.compose.foundation.gestures.rememberDraggableState
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.offset
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
@@ -22,6 +21,7 @@ import io.parity.signer.components.NetworkCard
 import io.parity.signer.models.SignerDataModel
 import io.parity.signer.models.intoImageBitmap
 import io.parity.signer.models.pushButton
+import io.parity.signer.ui.theme.Bg200
 import org.json.JSONObject
 
 @Composable
@@ -34,10 +34,20 @@ fun KeyDetailsMulti(signerDataModel: SignerDataModel) {
 			.fillMaxWidth()
 			.verticalScroll(rememberScrollState())
 	) {
-		KeyCard(identity = address.value?: JSONObject())
-		NetworkCard(address.value?: JSONObject())
+		Row(
+			Modifier
+				.padding(top = 3.dp, start = 12.dp, end = 12.dp)
+				.background(
+					MaterialTheme.colors.Bg200
+				)
+		) { KeyCard(identity = address.value ?: JSONObject()) }
+		Row (
+			Modifier.padding(top = 3.dp, start = 12.dp, end = 12.dp)
+		) {
+			NetworkCard(address.value ?: JSONObject())
+		}
 		Image(
-			(address.value?.optString("qr")?:"").intoImageBitmap(),
+			(address.value?.optString("qr") ?: "").intoImageBitmap(),
 			contentDescription = "QR with address to scan",
 			contentScale = ContentScale.FillWidth,
 			modifier = Modifier
