@@ -1063,8 +1063,9 @@ mod tests {
             let _database = db_handling::helpers::open_db::<Signer>(dbname).unwrap(); // database got unavailable for some reason
             
             let real_json = do_action("NavbarKeys","","");
-            let expected_json = r#"{"screen":"SeedSelector","screenLabel":"Select seed","back":false,"footer":true,"footerButton":"Keys","rightButton":"NewSeed","screenNameType":"h1","modal":"Empty","alert":"ErrorDisplay","screenData":{"seedNameCards":[]},"modalData":{},"alertData":{"error":"Database error. Internal error. IO error: could not acquire lock on "for_tests/flow_test_1/db": Os { code: 11, kind: WouldBlock, message: "Resource temporarily unavailable" }"}}"#;
-            assert!(real_json == expected_json, "Tried to switch from Log to Keys with unavailable database. Expected empty SeedSelector with ErrorDisplay alert, got:\n{}", real_json);
+            let expected_json = r#"{"screen":"SeedSelector","screenLabel":"Select seed","back":false,"footer":true,"footerButton":"Keys","rightButton":"NewSeed","screenNameType":"h1","modal":"Empty","alert":"ErrorDisplay","screenData":{"seedNameCards":[]},"modalData":{},"alertData":{"error":"Database error. Internal error. IO error: could not acquire lock on "for_tests/flow_test_1/db": Os {**}"}}"#;
+            let cut_real_json = cut_os_msg(&real_json);
+            assert!(cut_real_json == expected_json, "Tried to switch from Log to Keys with unavailable database. Expected empty SeedSelector with ErrorDisplay alert, got:\n{}", real_json);
             
             let real_json = do_action("GoBack","","");
             let expected_json = r#"{"screen":"Settings","screenLabel":"","back":false,"footer":true,"footerButton":"Settings","rightButton":"None","screenNameType":"h4","modal":"Empty","alert":"Empty","screenData":{"error":"Database error. Internal error. IO error: could not acquire lock on "for_tests/flow_test_1/db": Os {**}"},"modalData":{},"alertData":{}}"#;
