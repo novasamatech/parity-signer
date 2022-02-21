@@ -14,30 +14,40 @@ import io.parity.signer.components.BigButton
 import io.parity.signer.components.HeadingOverline
 import io.parity.signer.components.SingleTextInput
 import io.parity.signer.models.*
+import io.parity.signer.ui.theme.Text600
 
 @Composable
 fun NewAddressScreen(signerDataModel: SignerDataModel, increment: Boolean) {
 	val derivationPath = remember { mutableStateOf("") }
 	var derivationState by remember { mutableStateOf(DerivationState()) }
 	val seedName = signerDataModel.screenData.value?.optString("seed_name") ?: ""
-	val lastError = signerDataModel.lastError.observeAsState()
 	val focusManager = LocalFocusManager.current
 	val focusRequester = remember { FocusRequester() }
 
 	Column(
 		horizontalAlignment = Alignment.CenterHorizontally,
 		verticalArrangement = Arrangement.Top,
-		modifier = Modifier.padding(20.dp).fillMaxSize()
+		modifier = Modifier
+			.padding(20.dp)
+			.fillMaxSize()
 	) {
-		Row{
+		Row {
 			HeadingOverline("Create new key")
-		Spacer(Modifier.weight(1f))}
+			Spacer(Modifier.weight(1f))
+		}
 		SingleTextInput(
 			content = derivationPath,
 			update = {
 				derivationPath.value = it
 				derivationState = signerDataModel.checkAsDerivation(it)
 				signerDataModel.clearError()
+			},
+			prefix = {
+				Text(
+					seedName,
+					style = MaterialTheme.typography.body2,
+					color = MaterialTheme.colors.Text600
+				)
 			},
 			isCrypto = true,
 			capitalize = false,
