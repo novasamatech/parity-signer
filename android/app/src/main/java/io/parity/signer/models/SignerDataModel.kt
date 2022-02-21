@@ -1,11 +1,14 @@
 package io.parity.signer.models
 
+import android.Manifest
 import android.annotation.SuppressLint
 import android.content.*
 import android.content.pm.PackageManager
 import android.os.Build
 import android.provider.Settings
 import android.util.Log
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -22,8 +25,8 @@ import java.io.FileOutputStream
  * This is single object to handle all interactions with backend
  */
 class SignerDataModel : ViewModel() {
-	//private val REQUIRED_PERMISSIONS = arrayOf(Manifest.permission.CAMERA)
-	//internal val REQUEST_CODE_PERMISSIONS = 10
+	private val REQUIRED_PERMISSIONS = arrayOf(Manifest.permission.CAMERA)
+	internal val REQUEST_CODE_PERMISSIONS = 10
 
 	//Internal model values
 	private val _onBoardingDone = MutableLiveData(OnBoardingState.InProgress)
@@ -273,13 +276,23 @@ class SignerDataModel : ViewModel() {
 		}
 	}
 
-	/*
+
 	internal fun allPermissionsGranted() = REQUIRED_PERMISSIONS.all {
 		ContextCompat.checkSelfPermission(
 			context, it
 		) == PackageManager.PERMISSION_GRANTED
 	}
-	*/
+
+	internal fun handleCameraPermissions() {
+		if (!allPermissionsGranted()) {
+			ActivityCompat.requestPermissions(
+				activity,
+				REQUIRED_PERMISSIONS,
+				REQUEST_CODE_PERMISSIONS
+			)
+		}
+	}
+
 	//MARK: Init boilerplate end
 
 	//MARK: General utils begin

@@ -1,5 +1,7 @@
 package io.parity.signer.screens
 
+import android.Manifest
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.camera.core.CameraSelector
 import androidx.camera.core.ImageAnalysis
 import androidx.camera.core.Preview
@@ -10,7 +12,9 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -18,12 +22,14 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
+import androidx.core.app.ActivityCompat.requestPermissions
 import androidx.core.content.ContextCompat
 import com.google.mlkit.vision.barcode.BarcodeScanning
 import io.parity.signer.components.ScanProgressBar
 import io.parity.signer.models.SignerDataModel
 import io.parity.signer.models.processFrame
 import io.parity.signer.ui.theme.Crypto400
+import kotlinx.coroutines.DisposableHandle
 
 /**
  * Main scanner screen. One of navigation roots.
@@ -45,6 +51,12 @@ fun ScanScreen(signerDataModel: SignerDataModel) {
 					val executor = ContextCompat.getMainExecutor(context)
 					val previewView = PreviewView(context)
 					val barcodeScanner = BarcodeScanning.getClient()
+
+					//This might be done more elegantly, if needed.
+					//But it's pretty obvious that the app needs camera
+					//and why; also it just works so far and code is tiny.
+					signerDataModel.handleCameraPermissions()
+
 					cameraProviderFuture.addListener({
 						val cameraProvider = cameraProviderFuture.get()
 
