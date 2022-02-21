@@ -1,0 +1,27 @@
+name:                   Rust backend test for ios
+
+on:
+  pull_request:
+  push:
+    branches:
+      - master
+      - stable
+jobs:
+  check:
+    name:               Check
+    runs-on:            macos-latest
+    steps:
+      - name:           Checkout sources
+        uses:           actions/checkout@v2
+        with:
+          fetch-depth:  50
+      - name:           Checkout submodules
+        shell:          bash
+        run:            git submodule update --init --recursive
+      - name:           cargo test
+        shell:          bash
+        run:            |
+                        cd rust
+                        cp os-specific-lock/ios/Cargo.lock .
+                        cargo test
+                        cd ..

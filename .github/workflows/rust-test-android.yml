@@ -1,4 +1,4 @@
-name:                   Rust backend test
+name:                   Rust backend test for android
 
 on:
   pull_request:
@@ -20,4 +20,8 @@ jobs:
         run:            git submodule update --init --recursive
       - name:           cargo test
         shell:          bash
-        run:            cd rust && cp os-specific-lock/android/Cargo.lock . && cargo test && cp os-specific-lock/ios/Cargo.lock . && cargo test && cd ..
+        run:            |
+                        cd rust 
+                        cp os-specific-lock/android/Cargo.lock . 
+                        cargo test 
+                        cd ..
