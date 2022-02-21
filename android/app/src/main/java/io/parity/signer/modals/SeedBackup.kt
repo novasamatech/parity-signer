@@ -2,6 +2,7 @@ package io.parity.signer.modals
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Lock
@@ -11,6 +12,7 @@ import androidx.compose.ui.unit.dp
 import io.parity.signer.components.*
 import io.parity.signer.models.SignerDataModel
 import io.parity.signer.models.getSeed
+import io.parity.signer.models.toListOfJSONObjects
 import io.parity.signer.ui.theme.Bg200
 import io.parity.signer.ui.theme.Crypto400
 import io.parity.signer.ui.theme.CryptoTypography
@@ -28,7 +30,9 @@ fun SeedBackup(signerDataModel: SignerDataModel) {
 	var seedPhrase by remember { mutableStateOf("") }
 	var seedBoxStatus by remember { mutableStateOf(SeedBoxStatus.Locked) }
 	val derivations =
-		signerDataModel.modalData.value?.optJSONArray("derivations") ?: JSONArray()
+		signerDataModel.modalData.value?.optJSONArray("derivations")
+			?.toListOfJSONObjects()?.sortedBy { it.optInt("network_order") }
+			?: listOf()
 	val time = remember { mutableStateOf(60000L) } //Countdown time
 
 	Surface(
@@ -44,45 +48,56 @@ fun SeedBackup(signerDataModel: SignerDataModel) {
 				SeedBox(seedPhrase = seedPhrase, status = seedBoxStatus)
 				HeadingOverline("DERIVED KEYS")
 				LazyColumn {
-					for (packIndex in 0 until derivations.length()) {
+					for (pack in derivations) {
 						item {
-							NetworkCard(derivations.getJSONObject(packIndex))
+							NetworkCard(pack)
 						}
-						items(
-							derivations.getJSONObject(packIndex).getJSONArray("id_set")
-								.length()
-						) { index ->
-							derivations.getJSONObject(packIndex).getJSONArray("id_set")
-								.getJSONObject(index).let {
-									if (it.optString("path").isBlank()) {
+						val networkDerivations =
+							pack.getJSONArray("id_set")
+								.toListOfJSONObjects().sortedBy { it.optString("path") }
+						/*
+						//TODO: this could have been neat items block,
+						//but passworded keys might collide
+						this.items(
+							items = networkDerivations,
+							key = {
+								pack.optString("network_order") + it.optString("seed") + it.optString("path") + it.optBoolean(
+									"has_pwd"
+								).toString()
+							}
+						)*/
+						for (record in networkDerivations) {
+							item {
+								if (record.optString("path").isBlank()) {
+									Text(
+										"seed key",
+										style = CryptoTypography.body2,
+										color = MaterialTheme.colors.Crypto400
+									)
+								} else {
+									Row {
 										Text(
-											"seed key",
+											record.optString("path"),
 											style = CryptoTypography.body2,
 											color = MaterialTheme.colors.Crypto400
 										)
-									} else {
-										Row {
+										if (record.optBoolean("has_pwd")) {
 											Text(
-												it.optString("path"),
+												"///",
 												style = CryptoTypography.body2,
 												color = MaterialTheme.colors.Crypto400
 											)
-											if (it.optBoolean("has_pwd")) {
-												Text(
-													"///",
-													style = CryptoTypography.body2,
-													color = MaterialTheme.colors.Crypto400
-												)
-												Icon(
-													Icons.Default.Lock,
-													"Password protected",
-													tint = MaterialTheme.colors.Crypto400
-												)
-											}
-											Spacer(Modifier.weight(1f))
+											Icon(
+												Icons.Default.Lock,
+												"Password protected",
+												tint = MaterialTheme.colors.Crypto400
+											)
 										}
+										Spacer(Modifier.weight(1f))
 									}
 								}
+
+							}
 						}
 					}
 				}
@@ -93,7 +108,7 @@ fun SeedBackup(signerDataModel: SignerDataModel) {
 					modifier = Modifier.fillMaxSize()
 				) {
 					BigButton(
-						text = if (time.value > 0) "Hide seed phrase in " + (time.value/1000L).toString() + "s" else "",
+						text = if (time.value > 0) "Hide seed phrase in " + (time.value / 1000L).toString() + "s" else "",
 						action = {
 							seedBoxStatus = SeedBoxStatus.Timeout
 							seedPhrase = ""
