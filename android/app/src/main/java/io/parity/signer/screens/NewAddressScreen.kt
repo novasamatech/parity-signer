@@ -40,6 +40,7 @@ fun NewAddressScreen(signerDataModel: SignerDataModel, increment: Boolean) {
 				derivationState = signerDataModel.checkAsDerivation(it)
 				signerDataModel.clearError()
 			},
+			isCrypto = true,
 			capitalize = false,
 			onDone = {
 				focusManager.clearFocus()
