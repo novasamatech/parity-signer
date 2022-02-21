@@ -36,7 +36,9 @@ fun SettingsScreen(signerDataModel: SignerDataModel) {
 		Row(Modifier.clickable { signerDataModel.pushButton(ButtonID.BackupSeed) }) {
 			SettingsCardTemplate(text = "Backup keys")
 		}
-		Column(Modifier.clickable { signerDataModel.pushButton(ButtonID.ViewGeneralVerifier) }) {
+		Column(
+			Modifier.padding(12.dp).clickable { signerDataModel.pushButton(ButtonID.ViewGeneralVerifier) }
+		) {
 			Row {
 				Text(
 					"Verifier certificate",
@@ -53,7 +55,7 @@ fun SettingsScreen(signerDataModel: SignerDataModel) {
 				) {
 					Row(
 						verticalAlignment = Alignment.CenterVertically,
-						modifier = Modifier.fillMaxWidth(1f)
+						modifier = Modifier.padding(8.dp).fillMaxWidth(1f)
 					) {
 						Identicon(identicon = it.optString("identicon"))
 						Spacer(Modifier.width(4.dp))
@@ -97,7 +99,7 @@ fun SettingsScreen(signerDataModel: SignerDataModel) {
 		text = "Factory reset the Signer app. This operation can not be reverted!",
 		back = { confirm = false },
 		forward = {
-			signerDataModel.authentication.authenticate(signerDataModel.activity){
+			signerDataModel.authentication.authenticate(signerDataModel.activity) {
 				signerDataModel.wipe()
 				signerDataModel.totalRefresh()
 			}

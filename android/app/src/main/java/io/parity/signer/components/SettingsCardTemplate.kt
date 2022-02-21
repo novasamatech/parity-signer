@@ -42,7 +42,7 @@ fun SettingsCardTemplate(
 				MaterialTheme.colors.SignalDanger
 			} else {
 				MaterialTheme.colors.Text400
-			}, modifier = Modifier.padding(20.dp)
+			}, modifier = Modifier.padding(12.dp)
 		)
 		Spacer(Modifier.weight(1f))
 		if (withIcon) {
@@ -50,7 +50,7 @@ fun SettingsCardTemplate(
 				Icons.Default.ChevronRight,
 				"go forward",
 				tint = MaterialTheme.colors.Border400,
-				modifier = Modifier.padding(20.dp)
+				modifier = Modifier.padding(16.dp)
 			)
 		}
 	}
