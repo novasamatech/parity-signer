@@ -11,7 +11,9 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
 import io.parity.signer.components.BigButton
 import io.parity.signer.screens.WaitingScreen
 import io.parity.signer.models.SignerDataModel
@@ -101,7 +103,15 @@ fun SignerApp(signerDataModel: SignerDataModel) {
 				if (shieldAlert.value == ShieldAlert.None) {
 					LandingView(signerDataModel = signerDataModel)
 				} else {
-					Text("Please enable airplane mode", color = MaterialTheme.colors.Text600)
+					Box(
+						contentAlignment = Alignment.Center,
+						modifier = Modifier.padding(12.dp)
+					) {
+						Text(
+							"Please enable airplane mode",
+							color = MaterialTheme.colors.Text600
+						)
+					}
 				}
 			}
 			OnBoardingState.InProgress -> {
