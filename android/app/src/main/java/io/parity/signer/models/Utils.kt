@@ -20,7 +20,7 @@ fun String.encode64(): String {
 }
 
 fun String.decode64(): String {
-	return Base64.decode(this, Base64.DEFAULT).toString()
+	return String(Base64.decode(this, Base64.DEFAULT))
 }
 
 /**
