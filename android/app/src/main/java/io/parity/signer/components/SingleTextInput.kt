@@ -21,6 +21,7 @@ import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import io.parity.signer.ui.theme.Border400
+import io.parity.signer.ui.theme.CryptoTypography
 import io.parity.signer.ui.theme.Text400
 import io.parity.signer.ui.theme.Text600
 
@@ -31,6 +32,7 @@ fun SingleTextInput(
 	onDone: () -> Unit,
 	capitalize: Boolean = true,
 	prefix: @Composable () -> Unit = {},
+	isCrypto: Boolean = false,
 	focusManager: FocusManager,
 	focusRequester: FocusRequester
 ) {
@@ -45,6 +47,7 @@ fun SingleTextInput(
 			onValueChange = update,
 			singleLine = true,
 			leadingIcon = { prefix() },
+			textStyle = if (isCrypto) CryptoTypography.body2 else MaterialTheme.typography.body1,
 			keyboardOptions = KeyboardOptions(
 				autoCorrect = false,
 				capitalization = if (capitalize) KeyboardCapitalization.Words else KeyboardCapitalization.None,

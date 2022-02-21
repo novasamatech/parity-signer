@@ -49,6 +49,7 @@ fun RecoverSeedName(
 					button(ButtonID.GoForward, seedName.value)
 				}
 			},
+			isCrypto = true,
 			capitalize = true,
 			focusManager = focusManager,
 			focusRequester = focusRequester

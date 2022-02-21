@@ -44,6 +44,7 @@ fun NewSeedScreen(
 					button(ButtonID.GoForward, seedName.value)
 				}
 			},
+			isCrypto = true,
 			focusManager = focusManager,
 			focusRequester = focusRequester
 		)
