@@ -1,6 +1,7 @@
 package io.parity.signer.screens
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.gestures.draggable
@@ -14,6 +15,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AddCircle
 import androidx.compose.material.icons.filled.ArrowCircleDown
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.unit.dp
@@ -22,6 +24,7 @@ import io.parity.signer.components.BottomMultiselectBar
 import io.parity.signer.components.KeySelector
 import io.parity.signer.components.NetworkLogoName
 import io.parity.signer.components.SeedCard
+import io.parity.signer.ui.theme.Bg100
 import io.parity.signer.ui.theme.Bg200
 import org.json.JSONArray
 import org.json.JSONObject
@@ -93,27 +96,29 @@ fun KeyManager(
 					delete = { button(ButtonID.RemoveKey, "") }
 				)
 			}
-			IconButton(
-				onClick = { button(ButtonID.NetworkSelector, "") },
+			Row(
+				verticalAlignment = Alignment.CenterVertically,
 				modifier = Modifier
+					.clickable { button(ButtonID.NetworkSelector, "") }
 					.padding(top = 3.dp, start = 12.dp, end = 12.dp)
-					.background(MaterialTheme.colors.Bg200)
+					.background(MaterialTheme.colors.Bg100)
 					.fillMaxWidth()
+					.padding(top = 3.dp, start = 12.dp, end = 12.dp)
 			) {
-				Row {
-					screenData.optJSONObject("network")?.let { network ->
-						NetworkLogoName(
-							logo = network.optString("logo"),
-							name = network.optString("title")
-						)
-					}
-					Spacer(Modifier.width(8.dp))
-					Icon(Icons.Default.ArrowCircleDown, "More networks")
-					Spacer(modifier = Modifier.weight(1f))
+				screenData.optJSONObject("network")?.let { network ->
+					NetworkLogoName(
+						logo = network.optString("logo"),
+						name = network.optString("title")
+					)
 				}
+				Spacer(Modifier.width(8.dp))
+				Icon(Icons.Default.ArrowCircleDown, "More networks")
+				Spacer(modifier = Modifier.weight(1f))
 			}
 			Row(
+				verticalAlignment = Alignment.CenterVertically,
 				modifier = Modifier
+					.padding(top = 3.dp, start = 12.dp, end = 12.dp)
 					.fillMaxWidth(1f)
 					.padding(horizontal = 8.dp)
 			) {
