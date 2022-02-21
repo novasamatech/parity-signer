@@ -1,7 +1,9 @@
 package io.parity.signer.modals
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.*
 import androidx.compose.runtime.*
@@ -20,7 +22,9 @@ import io.parity.signer.ui.theme.modal
 fun KeyDetailsAction(signerDataModel: SignerDataModel) {
 	var confirm by remember { mutableStateOf(false) }
 
-	Column {
+	Column (
+		Modifier.clickable { signerDataModel.pushButton(ButtonID.GoBack) }
+		) {
 		Spacer(Modifier.weight(1f))
 		Surface(
 			color = MaterialTheme.colors.Bg000,
