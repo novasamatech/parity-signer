@@ -1,16 +1,20 @@
 package io.parity.signer.modals
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.gestures.Orientation
+import androidx.compose.foundation.gestures.draggable
+import androidx.compose.foundation.gestures.rememberDraggableState
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import io.parity.signer.ButtonID
 import io.parity.signer.components.BigButton
@@ -22,14 +26,24 @@ import io.parity.signer.ui.theme.modal
 
 @Composable
 fun SignatureReady(signerDataModel: SignerDataModel) {
-	Column(
-		Modifier.verticalScroll(rememberScrollState(LocalConfiguration.current.screenHeightDp))
-	) {
-		Spacer(Modifier.height(LocalConfiguration.current.screenHeightDp.dp).fillMaxWidth())
-		Surface(
+	val height = LocalConfiguration.current.screenHeightDp
+	val width = LocalConfiguration.current.screenWidthDp
+	var offset by remember { mutableStateOf(0f) }
+	Surface(
 			shape = MaterialTheme.shapes.modal,
 			color = MaterialTheme.colors.Bg000,
-			modifier = Modifier.height(LocalConfiguration.current.screenHeightDp.dp)
+			modifier = Modifier
+				.height(height.dp)
+				.offset{IntOffset(0, offset.toInt())}
+				.draggable(
+					orientation = Orientation.Vertical,
+					state = rememberDraggableState { delta ->
+						offset += delta
+						if (offset < 0) offset = 0f
+						//if (offset > ) offset = height.toFloat()
+					},
+				)
+
 		) {
 			Column(
 				modifier = Modifier
@@ -54,6 +68,8 @@ fun SignatureReady(signerDataModel: SignerDataModel) {
 				)
 			}
 		}
-		Spacer(Modifier.height((LocalConfiguration.current.screenHeightDp - LocalConfiguration.current.screenWidthDp).dp).fillMaxWidth())
+	DisposableEffect(Unit) {
+		offset = width.toFloat()
+		onDispose { offset = 0f }
 	}
 }

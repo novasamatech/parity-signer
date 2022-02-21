@@ -32,7 +32,6 @@ fun KeyDetailsMulti(signerDataModel: SignerDataModel) {
 	Column(
 		modifier = Modifier
 			.fillMaxWidth()
-			.verticalScroll(rememberScrollState())
 	) {
 		Row(
 			Modifier
