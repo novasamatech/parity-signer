@@ -60,6 +60,7 @@ fun RecoverSeedName(
 			style = MaterialTheme.typography.caption,
 			color = MaterialTheme.colors.Text600
 		)
+		Spacer(Modifier.height(20.dp))
 		BigButton(
 			text = "Next",
 			action = {

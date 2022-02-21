@@ -14,6 +14,7 @@ import io.parity.signer.components.BigButton
 import io.parity.signer.components.HeadingOverline
 import io.parity.signer.components.SingleTextInput
 import io.parity.signer.models.SignerDataModel
+import io.parity.signer.ui.theme.Text600
 
 @Composable
 fun NewSeedScreen(
@@ -50,7 +51,10 @@ fun NewSeedScreen(
 			focusRequester = focusRequester
 		)
 
-		Text("Display name visible only on this device")
+		Text("Display name visible only on this device",
+			style = MaterialTheme.typography.caption,
+			color = MaterialTheme.colors.Text600)
+		Spacer(Modifier.height(20.dp))
 		BigButton(
 			text = "Generate seed phrase",
 			action = {

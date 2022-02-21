@@ -70,7 +70,7 @@ fun NewAddressScreen(signerDataModel: SignerDataModel, increment: Boolean) {
 			focusManager = focusManager,
 			focusRequester = focusRequester
 		)
-
+		Spacer(Modifier.height(20.dp))
 		Row {
 			BigButton(
 				text = "Next",
