@@ -7,6 +7,7 @@ import androidx.compose.foundation.gestures.rememberDraggableState
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.offset
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Text
@@ -41,6 +42,7 @@ fun KeyDetailsMulti(signerDataModel: SignerDataModel) {
 			contentScale = ContentScale.FillWidth,
 			modifier = Modifier
 				.fillMaxWidth(1f)
+				.padding(12.dp)
 				.offset(x = offset.dp)
 				.draggable(
 					orientation = Orientation.Horizontal,

@@ -4,12 +4,14 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.unit.dp
 import io.parity.signer.components.HeaderBar
 import io.parity.signer.components.KeyCard
 import io.parity.signer.components.NetworkCard
@@ -32,7 +34,7 @@ fun ExportPublicKey(signerDataModel: SignerDataModel) {
 			address.optString("qr").intoImageBitmap(),
 			contentDescription = "QR with address to scan",
 			contentScale = ContentScale.FillWidth,
-			modifier = Modifier.fillMaxWidth(1f)
+			modifier = Modifier.padding(12.dp).fillMaxWidth(1f)
 		)
 		HeaderBar(line1 = "KEY DETAILS", line2 = "")
 		Row {
