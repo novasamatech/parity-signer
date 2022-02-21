@@ -43,7 +43,7 @@ fun KeyCard(identity: JSONObject, multiselectMode: Boolean = false) {
 				verticalAlignment = Alignment.CenterVertically
 			) {
 				Text(
-					identity.optString("seed_name"),
+					identity.optString("seed_name", identity.optString("seed")),
 					color = MaterialTheme.colors.Text600,
 					style = MaterialTheme.typography.subtitle1
 				)
