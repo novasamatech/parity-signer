@@ -44,8 +44,10 @@ class SignerDataModel : ViewModel() {
 
 	//State of the app being unlocked
 	private val _authenticated = MutableLiveData(false)
+
 	//Authenticator to call!
-	internal var authentication: Authentication = Authentication(setAuth = { _authenticated.value = it })
+	internal var authentication: Authentication =
+		Authentication(setAuth = { _authenticated.value = it })
 
 	//Camera stuff
 	internal var bucket = arrayOf<String>()
@@ -267,11 +269,14 @@ class SignerDataModel : ViewModel() {
 		) {
 			if (alertState.value != ShieldAlert.Active) {
 				_alertState.value = ShieldAlert.Active
-				historyDeviceWasOnline(dbName)
+				if (onBoardingDone.value == OnBoardingState.Yes) historyDeviceWasOnline(
+					dbName
+				)
 			}
 		} else {
 			if (alertState.value == ShieldAlert.Active) {
-				_alertState.value = ShieldAlert.Past
+				_alertState.value = if (onBoardingDone.value == OnBoardingState.Yes)
+					ShieldAlert.Past else ShieldAlert.None
 			}
 		}
 	}
@@ -380,6 +385,7 @@ class SignerDataModel : ViewModel() {
 	private external fun historyDeviceWasOnline(dbname: String)
 	private external fun historyGetWarnings(dbname: String): Boolean
 	private external fun historyAcknowledgeWarnings(dbname: String)
+
 	//external fun historyEntrySystem(entry: String, dbname: String)
 	external fun historySeedNameWasShown(seedName: String, dbname: String)
 
