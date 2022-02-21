@@ -29,7 +29,7 @@ fun NetworkSelector(signerDataModel: SignerDataModel) {
 		Column {
 			Spacer(
 				Modifier
-					.weight(2f)
+					.weight(1f)
 					)
 			Surface(
 				shape = MaterialTheme.shapes.modal,
@@ -37,7 +37,7 @@ fun NetworkSelector(signerDataModel: SignerDataModel) {
 				modifier = Modifier.weight(1f)
 			) {
 				Column(
-					modifier = Modifier.padding(20.dp)
+					modifier = Modifier.padding(horizontal = 20.dp)
 				) {
 					HeaderBar(
 						line1 = "NETWORK",
