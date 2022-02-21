@@ -28,7 +28,7 @@ fun SeedBox(seedPhrase: String, status: SeedBoxStatus = SeedBoxStatus.Seed) {
 					seedPhrase,
 					style = CryptoTypography.body1,
 					color = MaterialTheme.colors.Crypto400,
-					textAlign = TextAlign.Center,
+					textAlign = TextAlign.Left,
 					modifier = Modifier.padding(8.dp)
 				)
 			}
