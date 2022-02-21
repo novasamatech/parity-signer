@@ -56,10 +56,12 @@ fun KeyManager(
 					.pointerInput(Unit) {
 						detectTapGestures(
 							onTap = {
-								button(ButtonID.SelectKey, rootKey.optString("address_key"))
+								if (rootKey.optString("address_key").isNotBlank())
+									button(ButtonID.SelectKey, rootKey.optString("address_key"))
 							},
 							onLongPress = {
-								button(ButtonID.LongTap, rootKey.optString("address_key"))
+								if (rootKey.optString("address_key").isNotBlank())
+									button(ButtonID.LongTap, rootKey.optString("address_key"))
 							}
 						)
 					}
@@ -70,7 +72,8 @@ fun KeyManager(
 						orientation = Orientation.Horizontal,
 						onDragStopped = {
 							if (offsetX.absoluteValue > 20f) {
-								button(ButtonID.Swipe, rootKey.optString("address_key"))
+								if (rootKey.optString("address_key").isNotBlank())
+									button(ButtonID.Swipe, rootKey.optString("address_key"))
 							}
 							offsetX = 0f
 						}
