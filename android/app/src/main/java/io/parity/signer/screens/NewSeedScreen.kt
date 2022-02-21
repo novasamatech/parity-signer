@@ -8,6 +8,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.unit.dp
 import io.parity.signer.ButtonID
 import io.parity.signer.components.BigButton
 import io.parity.signer.components.HeadingOverline
@@ -27,7 +28,7 @@ fun NewSeedScreen(
 	Column(
 		horizontalAlignment = Alignment.CenterHorizontally,
 		verticalArrangement = Arrangement.Top,
-		modifier = Modifier.fillMaxSize()
+		modifier = Modifier.padding(20.dp).fillMaxSize()
 	) {
 		Row {
 			HeadingOverline("DISPLAY NAME")

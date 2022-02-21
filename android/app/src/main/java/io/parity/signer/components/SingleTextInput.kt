@@ -31,7 +31,7 @@ fun SingleTextInput(
 	update: (String) -> Unit,
 	onDone: () -> Unit,
 	capitalize: Boolean = true,
-	prefix: @Composable () -> Unit = {},
+	prefix: (@Composable () -> Unit)? = null,
 	isCrypto: Boolean = false,
 	focusManager: FocusManager,
 	focusRequester: FocusRequester
@@ -46,7 +46,7 @@ fun SingleTextInput(
 			value = content.value,
 			onValueChange = update,
 			singleLine = true,
-			leadingIcon = { prefix() },
+			leadingIcon = prefix,
 			textStyle = if (isCrypto) CryptoTypography.body2 else MaterialTheme.typography.body1,
 			keyboardOptions = KeyboardOptions(
 				autoCorrect = false,

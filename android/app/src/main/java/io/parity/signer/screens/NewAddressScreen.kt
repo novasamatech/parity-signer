@@ -1,9 +1,6 @@
 package io.parity.signer.screens
 
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
@@ -11,8 +8,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.unit.dp
 import io.parity.signer.ButtonID
 import io.parity.signer.components.BigButton
+import io.parity.signer.components.HeadingOverline
 import io.parity.signer.components.SingleTextInput
 import io.parity.signer.models.*
 
@@ -27,12 +26,12 @@ fun NewAddressScreen(signerDataModel: SignerDataModel, increment: Boolean) {
 
 	Column(
 		horizontalAlignment = Alignment.CenterHorizontally,
-		verticalArrangement = Arrangement.Center,
-		modifier = Modifier.fillMaxSize()
+		verticalArrangement = Arrangement.Top,
+		modifier = Modifier.padding(20.dp).fillMaxSize()
 	) {
-		Text("Create new key")
-		Text(lastError.value.toString())
-
+		Row{
+			HeadingOverline("Create new key")
+		Spacer(Modifier.weight(1f))}
 		SingleTextInput(
 			content = derivationPath,
 			update = {
