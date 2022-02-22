@@ -7,7 +7,7 @@ on:
       - master
       - stable
 jobs:
-  checkk:
+  check:
     name:               Check
     runs-on:            ubuntu-latest
     steps:
@@ -16,11 +16,11 @@ jobs:
         with:
           fetch-depth:  50
 
-      - name: Install system dependancies
+      - name:           Install system dependancies
         run: |
-          sudo apt update
-          sudo apt install -y clang libclang-dev libopencv-dev
-        shell: bash
+                        sudo apt update
+                        sudo apt install -y clang libclang-dev libopencv-dev
+        shell:          bash
 
       - name:           Checkout submodules
         shell:          bash
