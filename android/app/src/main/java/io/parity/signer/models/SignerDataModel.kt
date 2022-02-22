@@ -138,6 +138,7 @@ class SignerDataModel : ViewModel() {
 		} else {
 			false
 		}
+		authentication.strongCredentials = hasStrongbox
 
 		Log.d("strongbox available:", hasStrongbox.toString())
 
