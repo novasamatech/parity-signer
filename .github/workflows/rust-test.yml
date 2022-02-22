@@ -7,7 +7,7 @@ on:
       - master
       - stable
 jobs:
-  check:
+  checkk:
     name:               Check
     runs-on:            ubuntu-latest
     steps:
@@ -15,6 +15,13 @@ jobs:
         uses:           actions/checkout@v2
         with:
           fetch-depth:  50
+
+      - name: Install system dependancies
+        run: |
+          sudo apt update
+          sudo apt install -y clang libclang-dev libopencv-dev
+        shell: bash
+
       - name:           Checkout submodules
         shell:          bash
         run:            git submodule update --init --recursive
