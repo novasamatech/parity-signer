@@ -98,7 +98,11 @@ class Authentication(val setAuth: (Boolean) -> Unit) {
 			BiometricManager.BIOMETRIC_ERROR_NONE_ENROLLED -> {
 				Toast.makeText(
 					context,
-					"Authentication system not enrolled; please enable " + if (strongCredentials) "password or pin code" else "biometric authentication",
+					"Authentication system not enrolled; please enable "
+						+ if (strongCredentials)
+						"password or pin code"
+					else
+						"biometric authentication",
 					Toast.LENGTH_LONG
 				).show()
 				return

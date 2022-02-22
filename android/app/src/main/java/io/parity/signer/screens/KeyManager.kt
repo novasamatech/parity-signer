@@ -13,7 +13,10 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AddCircle
+import androidx.compose.material.icons.filled.AddCircleOutline
 import androidx.compose.material.icons.filled.ArrowCircleDown
+import androidx.compose.material.icons.filled.ExpandCircleDown
+import androidx.compose.material.icons.outlined.ExpandCircleDown
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -24,6 +27,7 @@ import io.parity.signer.components.BottomMultiselectBar
 import io.parity.signer.components.KeySelector
 import io.parity.signer.components.NetworkLogoName
 import io.parity.signer.components.SeedCard
+import io.parity.signer.ui.theme.Action400
 import io.parity.signer.ui.theme.Bg100
 import io.parity.signer.ui.theme.Bg200
 import org.json.JSONArray
@@ -115,7 +119,7 @@ fun KeyManager(
 					)
 				}
 				Spacer(Modifier.width(8.dp))
-				Icon(Icons.Default.ArrowCircleDown, "More networks")
+				Icon(Icons.Outlined.ExpandCircleDown, "More networks", tint = MaterialTheme.colors.Action400)
 				Spacer(modifier = Modifier.weight(1f))
 			}
 			Row(
@@ -128,7 +132,7 @@ fun KeyManager(
 				Text("DERIVED KEYS")
 				Spacer(Modifier.weight(1f, true))
 				IconButton(onClick = { button(ButtonID.NewKey, "") }) {
-					Icon(Icons.Default.AddCircle, contentDescription = "New derived key")
+					Icon(Icons.Default.AddCircleOutline, contentDescription = "New derived key", tint = MaterialTheme.colors.Action400)
 				}
 			}
 			KeySelector(
