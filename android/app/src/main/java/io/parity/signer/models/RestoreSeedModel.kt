@@ -76,5 +76,6 @@ class RestoreSeedModel(
 		seedPhrase.value += word
 		guessWord.value = guess("")
 		seedWord.value = TextFieldValue(" ", selection = TextRange(1))
+		seedValid.value = check(seedPhrase.value.joinToString(" ")).isNullOrBlank()
 	}
 }
