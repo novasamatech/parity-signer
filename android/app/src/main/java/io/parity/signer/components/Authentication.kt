@@ -15,21 +15,7 @@ import androidx.fragment.app.FragmentActivity
 
 class Authentication(val setAuth: (Boolean) -> Unit) {
 	var strongCredentials: Boolean = false
-	private val promptInfo =
-		if (strongCredentials) {
-			BiometricPrompt.PromptInfo.Builder()
-				.setTitle("UNLOCK SIGNER")
-				.setSubtitle("Please authenticate yourself")
-				.setAllowedAuthenticators(BiometricManager.Authenticators.DEVICE_CREDENTIAL)
-				.build()
-		} else {
-			BiometricPrompt.PromptInfo.Builder()
-				.setTitle("UNLOCK SIGNER")
-				.setSubtitle("Please authenticate yourself")
-				.setNegativeButtonText("Cancel")
-				.setAllowedAuthenticators(BiometricManager.Authenticators.BIOMETRIC_STRONG)
-				.build()
-		}
+
 
 	private lateinit var biometricPrompt: BiometricPrompt
 	lateinit var context: Context
@@ -37,6 +23,23 @@ class Authentication(val setAuth: (Boolean) -> Unit) {
 	fun authenticate(activity: FragmentActivity, onSuccess: () -> Unit) {
 		Log.d("auth", "test")
 		val biometricManager = BiometricManager.from(context)
+
+		val promptInfo =
+			if (strongCredentials) {
+				BiometricPrompt.PromptInfo.Builder()
+					.setTitle("UNLOCK SIGNER")
+					.setSubtitle("Please authenticate yourself")
+					.setAllowedAuthenticators(BiometricManager.Authenticators.DEVICE_CREDENTIAL)
+					.build()
+			} else {
+				BiometricPrompt.PromptInfo.Builder()
+					.setTitle("UNLOCK SIGNER")
+					.setSubtitle("Please authenticate yourself")
+					.setNegativeButtonText("Cancel")
+					.setAllowedAuthenticators(BiometricManager.Authenticators.BIOMETRIC_STRONG)
+					.build()
+			}
+
 		when (biometricManager.canAuthenticate(if (strongCredentials) BiometricManager.Authenticators.DEVICE_CREDENTIAL else BiometricManager.Authenticators.BIOMETRIC_STRONG)) {
 			BiometricManager.BIOMETRIC_SUCCESS -> {
 
