@@ -22,7 +22,6 @@ jobs:
         run:            |
           brew tap wix/brew
           brew install applesimutils
-          brew install opencv
            gem install xcpretty
       - name:           Rust build
         shell:          bash
