@@ -6,8 +6,8 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CheckCircle
-import androidx.compose.material.icons.filled.Circle
 import androidx.compose.material.icons.filled.Lock
+import androidx.compose.material.icons.outlined.Circle
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -33,7 +33,7 @@ fun KeyCard(identity: JSONObject, multiselectMode: Boolean = false) {
 				if(identity.optBoolean("multiselect")) {
 					Icon(Icons.Default.CheckCircle, "Not multiselected", tint = MaterialTheme.colors.Action400)
 				} else {
-					Icon(Icons.Default.Circle, "Multiselected", tint = MaterialTheme.colors.Action400)
+					Icon(Icons.Outlined.Circle, "Multiselected", tint = MaterialTheme.colors.Action400)
 				}
 			}
 		}
@@ -68,7 +68,7 @@ fun KeyCard(identity: JSONObject, multiselectMode: Boolean = false) {
 			Text(
 				identity.optString("base58").abbreviateString(8),
 				color = MaterialTheme.colors.Text400,
-				style = CryptoTypography.body1
+				style = CryptoTypography.body2
 			)
 		}
 	}

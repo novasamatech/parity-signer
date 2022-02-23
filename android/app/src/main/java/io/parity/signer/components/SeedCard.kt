@@ -7,7 +7,7 @@ import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CheckCircle
-import androidx.compose.material.icons.filled.Circle
+import androidx.compose.material.icons.outlined.Circle
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -41,7 +41,7 @@ fun SeedCard(
 					if(selected) {
 						Icon(Icons.Default.CheckCircle, "Not multiselected", tint = MaterialTheme.colors.Action400)
 					} else {
-						Icon(Icons.Default.Circle, "Multiselected", tint = MaterialTheme.colors.Action400)
+						Icon(Icons.Outlined.Circle, "Multiselected", tint = MaterialTheme.colors.Action400)
 					}
 				}
 			}

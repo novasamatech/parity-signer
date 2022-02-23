@@ -77,13 +77,22 @@ fun SeedPhraseButton(word: String, select: () -> Unit) {
  * Small buttons for multiselect screen
  */
 @Composable
-fun SmallButton(text: String, action: () -> Unit) {
+fun SmallButton(
+	text: String,
+	isDisabled: Boolean = false,
+	action: () -> Unit
+) {
 	Surface(
 		shape = MaterialTheme.shapes.small,
-		border = BorderStroke(1.dp, MaterialTheme.colors.Action400),
+		border = BorderStroke(1.dp, if (isDisabled) MaterialTheme.colors.Text300 else MaterialTheme.colors.Action400),
 		color = Color.Transparent,
-		modifier = Modifier.clickable(onClick = action)
+		modifier = Modifier.clickable(onClick = action, enabled = !isDisabled)
 	) {
-		Text(text, style = MaterialTheme.typography.caption, color = MaterialTheme.colors.Action400, modifier = Modifier.padding(4.dp))
+		Text(
+			text,
+			style = MaterialTheme.typography.caption,
+			color = if (isDisabled) MaterialTheme.colors.Text300 else MaterialTheme.colors.Action400,
+			modifier = Modifier.padding(4.dp)
+		)
 	}
 }

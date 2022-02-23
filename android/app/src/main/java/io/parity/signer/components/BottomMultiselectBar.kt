@@ -28,7 +28,7 @@ fun BottomMultiselectBar(
 				.fillMaxWidth()
 				.padding(12.dp)
 		) {
-			SmallButton(text = "Delete") {
+			SmallButton(text = "Delete", isDisabled = count == "0") {
 				confirm = true
 			}
 			Text(
@@ -36,7 +36,7 @@ fun BottomMultiselectBar(
 				style = MaterialTheme.typography.body2,
 				color = MaterialTheme.colors.Text600
 			)
-			SmallButton(text = "Export", action = export)
+			SmallButton(text = "Export", isDisabled = count == "0", action = export)
 		}
 	}
 
