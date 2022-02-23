@@ -6,10 +6,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.material.*
 import androidx.compose.material.ButtonDefaults.buttonColors
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.AddCircleOutline
-import androidx.compose.material.icons.filled.ChevronLeft
-import androidx.compose.material.icons.filled.Close
-import androidx.compose.material.icons.filled.MoreVert
+import androidx.compose.material.icons.filled.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Modifier
@@ -51,15 +48,13 @@ fun TopBar(signerDataModel: SignerDataModel) {
 						Icon(
 							Icons.Default.Close,
 							"go back",
-							tint = MaterialTheme.colors.Text400,
-							modifier = Modifier.scale(2f)
+							tint = MaterialTheme.colors.Text400
 						)
 					} else {
 					Icon(
-						Icons.Default.ChevronLeft,
+						Icons.Default.ArrowBack,
 						"go back",
-						tint = MaterialTheme.colors.Text400,
-						modifier = Modifier.scale(2f)
+						tint = MaterialTheme.colors.Text400
 					)}
 				}
 			}
