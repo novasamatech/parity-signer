@@ -37,7 +37,9 @@ fun SettingsScreen(signerDataModel: SignerDataModel) {
 			SettingsCardTemplate(text = "Backup keys")
 		}
 		Column(
-			Modifier.padding(12.dp).clickable { signerDataModel.pushButton(ButtonID.ViewGeneralVerifier) }
+			Modifier
+				.padding(12.dp)
+				.clickable { signerDataModel.pushButton(ButtonID.ViewGeneralVerifier) }
 		) {
 			Row {
 				Text(
@@ -55,7 +57,9 @@ fun SettingsScreen(signerDataModel: SignerDataModel) {
 				) {
 					Row(
 						verticalAlignment = Alignment.CenterVertically,
-						modifier = Modifier.padding(8.dp).fillMaxWidth(1f)
+						modifier = Modifier
+							.padding(8.dp)
+							.fillMaxWidth(1f)
 					) {
 						Identicon(identicon = it.optString("identicon"))
 						Spacer(Modifier.width(4.dp))
@@ -85,11 +89,14 @@ fun SettingsScreen(signerDataModel: SignerDataModel) {
 		}
 		SettingsCardTemplate(
 			"Hardware seed protection: " + signerDataModel.isStrongBoxProtected()
-				.toString(), withIcon = false
+				.toString(),
+			withIcon = false,
+			withBackground = false
 		)
 		SettingsCardTemplate(
 			"Version: " + signerDataModel.getAppVersion(),
-			withIcon = false
+			withIcon = false,
+			withBackground = false
 		)
 	}
 
