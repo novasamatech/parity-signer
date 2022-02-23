@@ -37,6 +37,7 @@ fun KeyDetailsMulti(signerDataModel: SignerDataModel) {
 				.background(
 					MaterialTheme.colors.Bg200
 				)
+				.fillMaxWidth()
 		) { KeyCard(identity = address.value ?: JSONObject()) }
 		Row (
 			Modifier.padding(top = 3.dp, start = 12.dp, end = 12.dp)
