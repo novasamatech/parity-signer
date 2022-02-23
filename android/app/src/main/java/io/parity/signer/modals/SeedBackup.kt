@@ -2,7 +2,6 @@ package io.parity.signer.modals
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Lock
@@ -18,7 +17,6 @@ import io.parity.signer.ui.theme.Crypto400
 import io.parity.signer.ui.theme.CryptoTypography
 import io.parity.signer.ui.theme.modal
 import kotlinx.coroutines.delay
-import org.json.JSONArray
 
 /**
  * Modal to show seed phrase. Dangerous place.
@@ -58,6 +56,9 @@ fun SeedBackup(signerDataModel: SignerDataModel) {
 						/*
 						//TODO: this could have been neat items block,
 						//but passworded keys might collide
+						//
+						//add this to revert:
+						//import androidx.compose.foundation.lazy.items
 						this.items(
 							items = networkDerivations,
 							key = {

@@ -1,21 +1,20 @@
 package io.parity.signer.screens
 
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.platform.LocalFocusManager
 import io.parity.signer.ButtonID
 import io.parity.signer.components.*
 import io.parity.signer.models.*
-import io.parity.signer.models.getSeed
 import io.parity.signer.ui.theme.Text400
-import java.util.*
 
 @Composable
 fun TransactionPreview(

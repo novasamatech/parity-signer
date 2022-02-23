@@ -1,27 +1,29 @@
 package io.parity.signer
 
 import android.os.Bundle
-import androidx.activity.OnBackPressedCallback
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.layout.*
-import androidx.compose.material.*
-import androidx.compose.runtime.*
+import androidx.compose.material.ExperimentalMaterialApi
+import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Scaffold
+import androidx.compose.material.Text
+import androidx.compose.runtime.Composable
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import io.parity.signer.components.BigButton
-import io.parity.signer.screens.WaitingScreen
-import io.parity.signer.models.SignerDataModel
-import io.parity.signer.ui.theme.ParitySignerTheme
 import io.parity.signer.components.BottomBar
 import io.parity.signer.components.TopBar
+import io.parity.signer.models.SignerDataModel
 import io.parity.signer.models.pushButton
 import io.parity.signer.screens.LandingView
+import io.parity.signer.screens.WaitingScreen
+import io.parity.signer.ui.theme.ParitySignerTheme
 import io.parity.signer.ui.theme.Text600
 
 @ExperimentalMaterialApi

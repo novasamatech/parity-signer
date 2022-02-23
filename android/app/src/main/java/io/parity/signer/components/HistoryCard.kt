@@ -1,6 +1,5 @@
 package io.parity.signer.components
 
-import android.util.Base64
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.runtime.Composable

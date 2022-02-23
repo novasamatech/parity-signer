@@ -26,7 +26,7 @@ import java.io.FileOutputStream
  */
 class SignerDataModel : ViewModel() {
 	private val REQUIRED_PERMISSIONS = arrayOf(Manifest.permission.CAMERA)
-	internal val REQUEST_CODE_PERMISSIONS = 10
+	private val REQUEST_CODE_PERMISSIONS = 10
 
 	//Internal model values
 	private val _onBoardingDone = MutableLiveData(OnBoardingState.InProgress)
@@ -149,7 +149,6 @@ class SignerDataModel : ViewModel() {
 
 		val receiver: BroadcastReceiver = object : BroadcastReceiver() {
 			override fun onReceive(context: Context, intent: Intent) {
-				Log.d("AirplaneMode", "Service state changed")
 				isAirplaneOn()
 			}
 		}
@@ -283,7 +282,7 @@ class SignerDataModel : ViewModel() {
 	}
 
 
-	internal fun allPermissionsGranted() = REQUIRED_PERMISSIONS.all {
+	private fun allPermissionsGranted() = REQUIRED_PERMISSIONS.all {
 		ContextCompat.checkSelfPermission(
 			context, it
 		) == PackageManager.PERMISSION_GRANTED

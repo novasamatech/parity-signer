@@ -13,10 +13,8 @@ fun SignerDataModel.pushButton(
 	details: String = "",
 	seedPhrase: String = ""
 ) {
-	Log.d("push button", button.toString())
 	val actionResult =
 		backendAction(button.name, details, seedPhrase)
-	Log.d("action result", actionResult)
 	//Here we just list all possible arguments coming from backend
 	try {
 		val actionResultObject = JSONObject(actionResult)

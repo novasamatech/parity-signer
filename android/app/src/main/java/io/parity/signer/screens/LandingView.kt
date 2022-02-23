@@ -2,7 +2,10 @@ package io.parity.signer.screens
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.selection.toggleable
-import androidx.compose.material.*
+import androidx.compose.material.Checkbox
+import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Surface
+import androidx.compose.material.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -13,7 +16,6 @@ import io.parity.signer.components.BigButton
 import io.parity.signer.components.Documents
 import io.parity.signer.models.SignerDataModel
 import io.parity.signer.ui.theme.Action400
-import io.parity.signer.ui.theme.Bg000
 import io.parity.signer.ui.theme.Bg100
 
 /**

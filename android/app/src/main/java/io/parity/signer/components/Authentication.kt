@@ -1,11 +1,6 @@
 package io.parity.signer.components
 
 import android.content.Context
-import android.content.Intent
-import android.content.pm.PackageManager
-import android.os.Build
-import android.provider.Settings
-import android.util.Log
 import android.widget.Toast
 import androidx.biometric.BiometricManager
 import androidx.biometric.BiometricPrompt
@@ -21,7 +16,6 @@ class Authentication(val setAuth: (Boolean) -> Unit) {
 	lateinit var context: Context
 
 	fun authenticate(activity: FragmentActivity, onSuccess: () -> Unit) {
-		Log.d("auth", "test")
 		val biometricManager = BiometricManager.from(context)
 
 		val promptInfo =
