@@ -66,10 +66,10 @@ fn parser_metadata_error_set() -> Vec<ParserMetadataError> {
     out
 }
 
-fn all_parsing_failed_set() -> Vec<(String, u32, ParserError)> {
+fn all_ext_parsing_failed_set() -> Vec<(u32, ParserError)> {
     vec![
-        (String::from("westend"), 9010, ParserError::WrongNetworkVersion {as_decoded: String::from("9122"), in_metadata: 9010}),
-        (String::from("westend"), 9000, ParserError::WrongNetworkVersion {as_decoded: String::from("9122"), in_metadata: 9000}),
+        (9010, ParserError::WrongNetworkVersion {as_decoded: String::from("9122"), in_metadata: 9010}),
+        (9000, ParserError::WrongNetworkVersion {as_decoded: String::from("9122"), in_metadata: 9000}),
     ]
 }
 
@@ -175,7 +175,6 @@ pub fn signer_errors() -> Vec<ErrorSigner> {
     error_set.push(ErrorSigner::AddressGeneration(AddressGeneration::Common(AddressGenerationCommon::KeyCollision{seed_name: String::from("Alice super secret seed")})));
     for e in secret_string_error_set().into_iter() {error_set.push(ErrorSigner::AddressGeneration(AddressGeneration::Common(AddressGenerationCommon::SecretString(e))));}
     error_set.push(ErrorSigner::AddressGeneration(AddressGeneration::Extra(ExtraAddressGenerationSigner::RandomPhraseGeneration(anyhow!("Mnemonic generator refuses to work with a valid excuse.")))));
-    error_set.push(ErrorSigner::AddressGeneration(AddressGeneration::Extra(ExtraAddressGenerationSigner::RandomPhraseValidation(anyhow!("Mnemonic generator rejects your phrase with a valid excuse.")))));
     error_set.push(ErrorSigner::AddressGeneration(AddressGeneration::Extra(ExtraAddressGenerationSigner::InvalidDerivation)));
     
     error_set.push(ErrorSigner::Qr(String::from("QR generator refuses to work with a valid excuse.")));
@@ -211,10 +210,9 @@ pub fn signer_errors() -> Vec<ErrorSigner> {
     error_set.push(ErrorSigner::Parser(ParserError::Decoding(ParserDecodingError::SomeDataNotUsedMethod)));
     error_set.push(ErrorSigner::Parser(ParserError::Decoding(ParserDecodingError::SomeDataNotUsedExtensions)));
     for e in parser_metadata_error_set().into_iter() {error_set.push(ErrorSigner::Parser(ParserError::FundamentallyBadV14Metadata(e)));}
-    error_set.push(ErrorSigner::Parser(ParserError::RegexError));
     error_set.push(ErrorSigner::Parser(ParserError::WrongNetworkVersion {as_decoded: String::from("9122"), in_metadata: 9010}));
     
-    error_set.push(ErrorSigner::AllParsingFailed(all_parsing_failed_set()));
+    error_set.push(ErrorSigner::AllExtensionsParsingFailed{network_name: String::from("westend"), errors: all_ext_parsing_failed_set()});
     
     for e in secret_string_error_set().into_iter() {error_set.push(ErrorSigner::AddressUse(e));}
     
@@ -232,7 +230,7 @@ mod tests {
     fn print_signer_errors_nicely() {
         let mut print = String::from("\n");
         let signer_errors = signer_errors();
-        assert!(signer_errors.len() == 157, "Different error set length: {}", signer_errors.len());
+        assert!(signer_errors.len() == 155, "Different error set length: {}", signer_errors.len());
         for e in signer_errors.iter() {
             print.push_str(&format!("\"{}\"", <Signer>::show(e)));
             print.push_str("\n");
@@ -345,49 +343,47 @@ mod tests {
 "Error generating address. Bad secret string: invalid seed length."
 "Error generating address. Bad secret string: invalid path."
 "Error generating address. Could not create random phrase. Mnemonic generator refuses to work with a valid excuse."
-"Error generating address. Proposed random phrase is invalid. Mnemonic generator rejects your phrase with a valid excuse."
 "Error generating address. Invalid derivation format."
 "Error generating qr code. QR generator refuses to work with a valid excuse."
-"Error parsing incoming transaction. Metadata spec version matches. Error decoding transaction content. Expected mortal transaction due to prelude format. Found immortal transaction."
-"Error parsing incoming transaction. Metadata spec version matches. Error decoding transaction content. Expected immortal transaction due to prelude format. Found mortal transaction."
-"Error parsing incoming transaction. Metadata spec version matches. Error decoding transaction content. Genesis hash values from decoded extensions and from used network specs do not match."
-"Error parsing incoming transaction. Metadata spec version matches. Error decoding transaction content. Block hash for immortal transaction not matching genesis hash for the network."
-"Error parsing incoming transaction. Metadata spec version matches. Error decoding transaction content. Unable to decode extensions for V12/V13 metadata using standard extensions set."
-"Error parsing incoming transaction. Metadata spec version matches. Error decoding transaction content. Method number 2 not found in pallet test_Pallet."
-"Error parsing incoming transaction. Metadata spec version matches. Error decoding transaction content. Pallet with index 3 not found."
-"Error parsing incoming transaction. Metadata spec version matches. Error decoding transaction content. Method number 5 too high for pallet number 3. Only 4 indices available."
-"Error parsing incoming transaction. Metadata spec version matches. Error decoding transaction content. No calls found in pallet test_pallet_v14."
-"Error parsing incoming transaction. Metadata spec version matches. Error decoding transaction content. Referenced type could not be resolved in v14 metadata."
-"Error parsing incoming transaction. Metadata spec version matches. Error decoding transaction content. Argument type error."
-"Error parsing incoming transaction. Metadata spec version matches. Error decoding transaction content. Argument name error."
-"Error parsing incoming transaction. Metadata spec version matches. Error decoding transaction content. Expected primitive type. Found Option<u8>."
-"Error parsing incoming transaction. Metadata spec version matches. Error decoding transaction content. Expected compact. Not found it."
-"Error parsing incoming transaction. Metadata spec version matches. Error decoding transaction content. Data too short for expected content."
-"Error parsing incoming transaction. Metadata spec version matches. Error decoding transaction content. Unable to decode part of data as u32."
-"Error parsing incoming transaction. Metadata spec version matches. Error decoding transaction content. Encountered unexpected Option<_> variant."
-"Error parsing incoming transaction. Metadata spec version matches. Error decoding transaction content. IdentityField description error."
-"Error parsing incoming transaction. Metadata spec version matches. Error decoding transaction content. Unable to decode part of data as an array."
-"Error parsing incoming transaction. Metadata spec version matches. Error decoding transaction content. Unexpected type encountered for Balance"
-"Error parsing incoming transaction. Metadata spec version matches. Error decoding transaction content. Encountered unexpected enum variant."
-"Error parsing incoming transaction. Metadata spec version matches. Error decoding transaction content. Unexpected type inside compact."
-"Error parsing incoming transaction. Metadata spec version matches. Error decoding transaction content. Type claimed inside compact is not compactable."
-"Error parsing incoming transaction. Metadata spec version matches. Error decoding transaction content. No description found for type T::SomeUnknownType."
-"Error parsing incoming transaction. Metadata spec version matches. Error decoding transaction content. Declared type is not suitable BitStore type for BitVec."
-"Error parsing incoming transaction. Metadata spec version matches. Error decoding transaction content. Declared type is not suitable BitOrder type for BitVec."
-"Error parsing incoming transaction. Metadata spec version matches. Error decoding transaction content. Could not decode BitVec."
-"Error parsing incoming transaction. Metadata spec version matches. Error decoding transaction content. Could not decode Era."
-"Error parsing incoming transaction. Metadata spec version matches. Error decoding transaction content. After decoding the method some data remained unused."
-"Error parsing incoming transaction. Metadata spec version matches. Error decoding transaction content. After decoding the extensions some data remained unused."
-"Error parsing incoming transaction. Metadata spec version matches. Signed extensions are not compatible with Signer (v14 metadata). Era information is missing."
-"Error parsing incoming transaction. Metadata spec version matches. Signed extensions are not compatible with Signer (v14 metadata). Block hash information is missing."
-"Error parsing incoming transaction. Metadata spec version matches. Signed extensions are not compatible with Signer (v14 metadata). Metadata spec version information is missing."
-"Error parsing incoming transaction. Metadata spec version matches. Signed extensions are not compatible with Signer (v14 metadata). Era information is encountered mora than once."
-"Error parsing incoming transaction. Metadata spec version matches. Signed extensions are not compatible with Signer (v14 metadata). Genesis hash is encountered more than once."
-"Error parsing incoming transaction. Metadata spec version matches. Signed extensions are not compatible with Signer (v14 metadata). Block hash is encountered more than once."
-"Error parsing incoming transaction. Metadata spec version matches. Signed extensions are not compatible with Signer (v14 metadata). Metadata spec version is encountered more than once."
-"Error parsing incoming transaction. Metadata spec version matches. Unexpected regular expressions error."
-"Error parsing incoming transaction. Network spec version decoded from extensions (9122) differs from the version in metadata (9010)."
-"All parsing attempts failed with following errors. Parsing with westend9010 metadata: Network spec version decoded from extensions (9122) differs from the version in metadata (9010). Parsing with westend9000 metadata: Network spec version decoded from extensions (9122) differs from the version in metadata (9000)."
+"Error parsing incoming transaction content. Expected mortal transaction due to prelude format. Found immortal transaction."
+"Error parsing incoming transaction content. Expected immortal transaction due to prelude format. Found mortal transaction."
+"Error parsing incoming transaction content. Genesis hash values from decoded extensions and from used network specs do not match."
+"Error parsing incoming transaction content. Block hash for immortal transaction not matching genesis hash for the network."
+"Error parsing incoming transaction content. Unable to decode extensions for V12/V13 metadata using standard extensions set."
+"Error parsing incoming transaction content. Method number 2 not found in pallet test_Pallet."
+"Error parsing incoming transaction content. Pallet with index 3 not found."
+"Error parsing incoming transaction content. Method number 5 too high for pallet number 3. Only 4 indices available."
+"Error parsing incoming transaction content. No calls found in pallet test_pallet_v14."
+"Error parsing incoming transaction content. Referenced type could not be resolved in v14 metadata."
+"Error parsing incoming transaction content. Argument type error."
+"Error parsing incoming transaction content. Argument name error."
+"Error parsing incoming transaction content. Expected primitive type. Found Option<u8>."
+"Error parsing incoming transaction content. Expected compact. Not found it."
+"Error parsing incoming transaction content. Data too short for expected content."
+"Error parsing incoming transaction content. Unable to decode part of data as u32."
+"Error parsing incoming transaction content. Encountered unexpected Option<_> variant."
+"Error parsing incoming transaction content. IdentityField description error."
+"Error parsing incoming transaction content. Unable to decode part of data as an array."
+"Error parsing incoming transaction content. Unexpected type encountered for Balance"
+"Error parsing incoming transaction content. Encountered unexpected enum variant."
+"Error parsing incoming transaction content. Unexpected type inside compact."
+"Error parsing incoming transaction content. Type claimed inside compact is not compactable."
+"Error parsing incoming transaction content. No description found for type T::SomeUnknownType."
+"Error parsing incoming transaction content. Declared type is not suitable BitStore type for BitVec."
+"Error parsing incoming transaction content. Declared type is not suitable BitOrder type for BitVec."
+"Error parsing incoming transaction content. Could not decode BitVec."
+"Error parsing incoming transaction content. Could not decode Era."
+"Error parsing incoming transaction content. After decoding the method some data remained unused."
+"Error parsing incoming transaction content. After decoding the extensions some data remained unused."
+"Error parsing incoming transaction content. Metadata signed extensions are not compatible with Signer (v14 metadata). Era information is missing."
+"Error parsing incoming transaction content. Metadata signed extensions are not compatible with Signer (v14 metadata). Block hash information is missing."
+"Error parsing incoming transaction content. Metadata signed extensions are not compatible with Signer (v14 metadata). Metadata spec version information is missing."
+"Error parsing incoming transaction content. Metadata signed extensions are not compatible with Signer (v14 metadata). Era information is encountered mora than once."
+"Error parsing incoming transaction content. Metadata signed extensions are not compatible with Signer (v14 metadata). Genesis hash is encountered more than once."
+"Error parsing incoming transaction content. Metadata signed extensions are not compatible with Signer (v14 metadata). Block hash is encountered more than once."
+"Error parsing incoming transaction content. Metadata signed extensions are not compatible with Signer (v14 metadata). Metadata spec version is encountered more than once."
+"Error parsing incoming transaction content. Network spec version decoded from extensions (9122) differs from the version in metadata (9010)."
+"Failed to decode extensions. Try updating metadata for westend network. Parsing with westend9010 metadata: Network spec version decoded from extensions (9122) differs from the version in metadata (9010). Parsing with westend9000 metadata: Network spec version decoded from extensions (9122) differs from the version in metadata (9000)."
 "Error with secret string of existing address: invalid overall format."
 "Error with secret string of existing address: invalid bip39 phrase."
 "Error with secret string of existing address: invalid password."

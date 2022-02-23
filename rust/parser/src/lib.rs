@@ -119,10 +119,16 @@ pub fn cut_method_extensions(data: &Vec<u8>) -> Result<(Vec<u8>, Vec<u8>), Parse
 }
 
 pub fn parse_set (data: &Vec<u8>, metadata_bundle: &MetadataBundle, short_specs: &ShortSpecs, optional_mortal_flag: Option<bool>) -> Result<(Result<Vec<OutputCard>, ParserError>, Vec<OutputCard>, Vec<u8>, Vec<u8>), ParserError> {
-    let (method_data, extensions_data) = cut_method_extensions(data)?;
+    // if unable to separate method date and extensions, then some fundamental flaw is in transaction itself
+    let (method_data, extensions_data) = match cut_method_extensions(data) {
+        Ok(a) => a,
+        Err(_) => return Err(ParserError::SeparateMethodExtensions),
+    };
+    // try parsing extensions, if is works, the version and extensions are correct
     let extensions_cards = parse_extensions (extensions_data.to_vec(), metadata_bundle, short_specs, optional_mortal_flag)?;
-    let method_cards = parse_method (method_data.to_vec(), metadata_bundle, short_specs);
-    Ok((method_cards, extensions_cards, method_data, extensions_data))
+    // try parsing method
+    let method_cards_result = parse_method (method_data.to_vec(), metadata_bundle, short_specs);
+    Ok((method_cards_result, extensions_cards, method_data, extensions_data))
 }
 
 pub fn parse_and_display_set (data: &Vec<u8>, metadata: &RuntimeMetadata, short_specs: &ShortSpecs) -> Result<String, String> {

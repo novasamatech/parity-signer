@@ -588,23 +588,11 @@ fn decode_simple (found_ty: &str, mut data: Vec<u8>, type_database: &Vec<TypeEnt
         Err(_) => {
             // check for option
             match REGOPTION.captures(&found_ty) {
-                Some(caps) => {
-                    let inner_ty = match caps.name("arg") {
-                        Some(c) => c.as_str(),
-                        None => return Err(ParserError::RegexError),
-                    };
-                    deal_with_option(inner_ty, data, type_database, indent, short_specs)
-                },
+                Some(caps) => deal_with_option(&caps["arg"], data, type_database, indent, short_specs),
                 None => {
                     // check for vector
                     match REGVECTOR.captures(&found_ty) {
-                        Some(caps) => {
-                            let inner_ty = match caps.name("arg") {
-                                Some(c) => c.as_str(),
-                                None => return Err(ParserError::RegexError),
-                            };
-                            deal_with_vector(inner_ty, data, type_database, indent, short_specs)
-                        },
+                        Some(caps) => deal_with_vector(&caps["arg"], data, type_database, indent, short_specs),
                         None => {
                             // check for tuples
                             match REGTUPLE.captures(&found_ty) {

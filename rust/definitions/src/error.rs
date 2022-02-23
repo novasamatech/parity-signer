@@ -1037,14 +1037,14 @@ impl ErrorSource for Signer {
                 format!("Error generating address. {}", insert)
             },
             ErrorSigner::Qr(e) => format!("Error generating qr code. {}", e),
-            ErrorSigner::Parser(a) => format!("Error parsing incoming transaction. {}", a.show()),
-            ErrorSigner::AllParsingFailed(errors) => {
+            ErrorSigner::Parser(a) => format!("Error parsing incoming transaction content. {}", a.show()),
+            ErrorSigner::AllExtensionsParsingFailed{network_name, errors} => {
                 let mut insert = String::new();
-                for (i,(name, version, parser_error)) in errors.iter().enumerate() {
+                for (i,(version, parser_error)) in errors.iter().enumerate() {
                     if i>0 {insert.push_str(" ")}
-                    insert.push_str(&format!("Parsing with {}{} metadata: {}", name, version, parser_error.show()));
+                    insert.push_str(&format!("Parsing with {}{} metadata: {}", network_name, version, parser_error.show()));
                 }
-                format!("All parsing attempts failed with following errors. {}", insert)
+                format!("Failed to decode extensions. Try updating metadata for {} network. {}", network_name, insert)
             },
             ErrorSigner::AddressUse(e) => format!("Error with secret string of existing address: {}.", bad_secret_string(e)),
             ErrorSigner::WrongPassword => String::from("Wrong password."),
@@ -1066,7 +1066,7 @@ pub enum ErrorSigner {
     AddressGeneration(AddressGeneration<Signer>),
     Qr(String),
     Parser(ParserError),
-    AllParsingFailed(Vec<(String, u32, ParserError)>),
+    AllExtensionsParsingFailed{network_name: String, errors: Vec<(u32, ParserError)>},
     AddressUse(SecretStringError),
     WrongPassword,
     WrongPasswordNewChecksum (u32),
@@ -1260,9 +1260,9 @@ pub enum ExtraAddressGenerationSigner {
 /// Enum listing errors that occur during the transaction parsing
 #[derive(Debug)]
 pub enum ParserError {
+    SeparateMethodExtensions, // can not separate method from extensions, bad transaction
     Decoding(ParserDecodingError), // errors occuring during the decoding procedure
     FundamentallyBadV14Metadata(ParserMetadataError), // errors occuring because the metadata is legit, but not acceptable in existing safety paradigm, for example, in V14 has no mention of network spec version in extrinsics
-    RegexError, // very much unexpected regex errors not related directly to parsing
     WrongNetworkVersion {as_decoded: String, in_metadata: u32},
 }
 
@@ -1320,8 +1320,9 @@ pub enum ParserMetadataError {
 impl ParserError {
     pub fn show (&self) -> String {
         match &self {
+            ParserError::SeparateMethodExtensions => String::from("Unable to separate transaction method and extensions."),
             ParserError::Decoding(x) => {
-                let insert = match x {
+                match x {
                     ParserDecodingError::UnexpectedImmortality => String::from("Expected mortal transaction due to prelude format. Found immortal transaction."),
                     ParserDecodingError::UnexpectedMortality => String::from("Expected immortal transaction due to prelude format. Found mortal transaction."),
                     ParserDecodingError::GenesisHashMismatch => String::from("Genesis hash values from decoded extensions and from used network specs do not match."),
@@ -1352,8 +1353,7 @@ impl ParserError {
                     ParserDecodingError::Era => String::from("Could not decode Era."),
                     ParserDecodingError::SomeDataNotUsedMethod => String::from("After decoding the method some data remained unused."),
                     ParserDecodingError::SomeDataNotUsedExtensions => String::from("After decoding the extensions some data remained unused."),
-                };
-                format!("Metadata spec version matches. Error decoding transaction content. {}", insert)
+                }
             },
             ParserError::FundamentallyBadV14Metadata(x) => {
                 let insert = match x {
@@ -1365,9 +1365,8 @@ impl ParserError {
                     ParserMetadataError::BlockHashTwice => String::from("Block hash is encountered more than once."),
                     ParserMetadataError::SpecVersionTwice => String::from("Metadata spec version is encountered more than once."),
                 };
-                format!("Metadata spec version matches. Signed extensions are not compatible with Signer (v14 metadata). {}", insert)
+                format!("Metadata signed extensions are not compatible with Signer (v14 metadata). {}", insert)
             },
-            ParserError::RegexError => String::from("Metadata spec version matches. Unexpected regular expressions error."),
             ParserError::WrongNetworkVersion{as_decoded, in_metadata} => format!("Network spec version decoded from extensions ({}) differs from the version in metadata ({}).", as_decoded, in_metadata),
         }
     }
