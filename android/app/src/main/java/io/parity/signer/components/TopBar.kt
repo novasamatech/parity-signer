@@ -71,10 +71,10 @@ fun TopBar(signerDataModel: SignerDataModel) {
 					MaterialTheme.typography.h4
 				}
 			)
-		}
-		if (rightButton.value == "MultiSelect") {
-			SmallButton(text = "Select all") {
-				signerDataModel.pushButton(ButtonID.SelectAll)
+			if (rightButton.value == "MultiSelect") {
+				SmallButton(text = "Select all") {
+					signerDataModel.pushButton(ButtonID.SelectAll)
+				}
 			}
 		}
 		Row(
