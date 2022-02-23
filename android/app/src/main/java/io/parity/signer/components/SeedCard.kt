@@ -56,7 +56,7 @@ fun SeedCard(
 					Text(
 						base58.abbreviateString(8),
 						color = MaterialTheme.colors.Text400,
-						style = CryptoTypography.body1
+						style = CryptoTypography.body2
 					)
 				}
 			}
