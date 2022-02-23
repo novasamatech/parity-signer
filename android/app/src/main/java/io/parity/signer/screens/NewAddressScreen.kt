@@ -50,6 +50,7 @@ fun NewAddressScreen(signerDataModel: SignerDataModel, increment: Boolean) {
 				)
 			},
 			isCrypto = true,
+			isCryptoColor = true,
 			capitalize = false,
 			onDone = {
 				focusManager.clearFocus()

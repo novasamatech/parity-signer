@@ -34,8 +34,7 @@ fun RestoreSeedPhraseBox(
 
 	Surface(
 		border = BorderStroke(1.dp, MaterialTheme.colors.Border400),
-		shape = MaterialTheme.shapes.large,
-		modifier = Modifier.padding(12.dp)
+		shape = MaterialTheme.shapes.large
 	) {
 		Column(
 			horizontalAlignment = Alignment.CenterHorizontally,
@@ -45,7 +44,7 @@ fun RestoreSeedPhraseBox(
 				seedPhrase.value.joinToString(" "),
 				style = CryptoTypography.body1,
 				color = MaterialTheme.colors.Crypto400,
-				modifier = Modifier.padding(12.dp)
+				modifier = Modifier.fillMaxWidth().padding(12.dp)
 			)
 			Divider(color = MaterialTheme.colors.Border400)
 			Row(horizontalArrangement = Arrangement.Center) {
@@ -61,6 +60,7 @@ fun RestoreSeedPhraseBox(
 							style = MaterialTheme.typography.body2,
 							color = MaterialTheme.colors.Text400						)
 					},
+					textStyle = CryptoTypography.body2,
 					keyboardOptions = KeyboardOptions(
 						autoCorrect = false,
 						capitalization = KeyboardCapitalization.None,

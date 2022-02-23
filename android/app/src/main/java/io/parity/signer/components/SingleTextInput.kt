@@ -20,10 +20,7 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
-import io.parity.signer.ui.theme.Border400
-import io.parity.signer.ui.theme.CryptoTypography
-import io.parity.signer.ui.theme.Text400
-import io.parity.signer.ui.theme.Text600
+import io.parity.signer.ui.theme.*
 
 @Composable
 fun SingleTextInput(
@@ -33,6 +30,7 @@ fun SingleTextInput(
 	capitalize: Boolean = true,
 	prefix: (@Composable () -> Unit)? = null,
 	isCrypto: Boolean = false,
+	isCryptoColor: Boolean = false,
 	focusManager: FocusManager,
 	focusRequester: FocusRequester
 ) {
@@ -61,7 +59,7 @@ fun SingleTextInput(
 				}
 			),
 			colors = TextFieldDefaults.textFieldColors(
-				textColor = MaterialTheme.colors.Text600,
+				textColor = if (isCryptoColor) MaterialTheme.colors.Crypto400 else MaterialTheme.colors.Text600,
 				backgroundColor = Color.Transparent,
 				cursorColor = MaterialTheme.colors.Text400,
 				leadingIconColor = MaterialTheme.colors.Text400,

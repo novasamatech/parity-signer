@@ -13,8 +13,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.TextFieldValue
+import androidx.compose.ui.unit.dp
 import io.parity.signer.ButtonID
 import io.parity.signer.components.BigButton
+import io.parity.signer.components.HeadingOverline
 import io.parity.signer.components.RestoreSeedPhraseBox
 import io.parity.signer.components.RestoreSeedPhraseSuggest
 import io.parity.signer.models.*
@@ -49,7 +51,8 @@ fun RecoverSeedPhrase(
 	val createRoots = remember { mutableStateOf(true) }
 
 	Column(
-		verticalArrangement = Arrangement.Top
+		verticalArrangement = Arrangement.Top,
+		modifier = Modifier.padding(horizontal = 12.dp)
 	) {
 		Row(
 			horizontalArrangement = Arrangement.Center,
@@ -57,11 +60,13 @@ fun RecoverSeedPhrase(
 		) {
 			Text(
 				signerDataModel.screenData.value?.optString("seed_name")
-					?: "Error: no seed name"
+					?: "Error: no seed name",
+				style = MaterialTheme.typography.subtitle1
 			)
 		}
-		Text("SEED PHRASE", style = MaterialTheme.typography.overline)
+		HeadingOverline("SEED PHRASE")
 
+		Spacer(Modifier.height(12.dp))
 		RestoreSeedPhraseBox(
 			seedPhrase = restoreSeedModel.seedPhrase,
 			seedWord = restoreSeedModel.seedWord,
@@ -70,6 +75,7 @@ fun RecoverSeedPhrase(
 				?: false
 		)
 
+		Spacer(Modifier.height(12.dp))
 		RestoreSeedPhraseSuggest(
 			restoreSeedModel.guessWord,
 			push = restoreSeedModel::select
