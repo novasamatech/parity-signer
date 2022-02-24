@@ -22,7 +22,6 @@ fun NewSeedScreen(
 	signerDataModel: SignerDataModel
 ) {
 	val seedName = remember { mutableStateOf("") }
-	val lastError = signerDataModel.lastError.observeAsState()
 	val focusManager = LocalFocusManager.current
 	val focusRequester = remember { FocusRequester() }
 
@@ -61,7 +60,7 @@ fun NewSeedScreen(
 				focusManager.clearFocus()
 				button(ButtonID.GoForward, seedName.value)
 			},
-			isDisabled = seedName.value.isBlank() || seedName.value.contains(",")
+			isDisabled = seedName.value.isBlank() || seedName.value.contains(",") || (signerDataModel.seedNames.value?.contains(seedName.value) ?: false)
 		)
 	}
 	DisposableEffect(Unit) {
