@@ -1,40 +1,69 @@
 package io.parity.signer.components
 
-import android.util.Log
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
+import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Surface
 import androidx.compose.material.Text
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.CheckCircle
+import androidx.compose.material.icons.outlined.Circle
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.scale
 import androidx.compose.ui.unit.dp
-import io.parity.signer.models.SignerDataModel
 import io.parity.signer.models.abbreviateString
-import io.parity.signer.models.intoImageBitmap
-import io.parity.signer.ui.theme.CryptoTypography
-import io.parity.signer.ui.theme.Text300
-import io.parity.signer.ui.theme.Text600
-import io.parity.signer.ui.theme.Typography
-import org.json.JSONObject
+import io.parity.signer.ui.theme.*
 
 @Composable
 fun SeedCard(
 	seedName: String,
 	identicon: String,
-	seedSelector: Boolean = true,
-	signerDataModel: SignerDataModel
+	base58: String = "",
+	showAddress: Boolean = false,
+	multiselectMode: Boolean = false,
+	selected: Boolean = false,
+	swiped: Boolean = false,
+	increment: (Int) -> Unit = {},
+	delete: () -> Unit = {},
 ) {
-	Row(
-		modifier = Modifier
-			.padding(8.dp)
+	Surface(
+		shape = MaterialTheme.shapes.medium,
+		color = MaterialTheme.colors.Bg200,
+		modifier = Modifier.heightIn(47.dp).padding(8.dp)
 	) {
-		Image(
-			identicon.intoImageBitmap(), "identicon", modifier = Modifier.scale(0.75f)
-		)
-		Spacer(modifier = Modifier.width(10.dp))
-		Column {
-			Text(seedName, color = Text600, style = MaterialTheme.typography.subtitle1)
+		Row(
+			verticalAlignment = Alignment.CenterVertically,
+		) {
+			Box(contentAlignment = Alignment.BottomEnd) {
+				Identicon(identicon)
+				if (multiselectMode) {
+					if(selected) {
+						Icon(Icons.Default.CheckCircle, "Not multiselected", tint = MaterialTheme.colors.Action400)
+					} else {
+						Icon(Icons.Outlined.Circle, "Multiselected", tint = MaterialTheme.colors.Action400)
+					}
+				}
+			}
+			Spacer(modifier = Modifier.width(10.dp))
+			Column {
+				Text(
+					seedName,
+					color = MaterialTheme.colors.Text600,
+					style = MaterialTheme.typography.subtitle1
+				)
+				if (showAddress) {
+					Text(
+						base58.abbreviateString(8),
+						color = MaterialTheme.colors.Text400,
+						style = CryptoTypography.body2
+					)
+				}
+			}
+			if (swiped) {
+				Spacer(Modifier.weight(1f))
+				SwipedButtons(increment, delete)
+			}
 		}
 	}
 }

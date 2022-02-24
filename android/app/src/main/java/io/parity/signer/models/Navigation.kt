@@ -13,10 +13,8 @@ fun SignerDataModel.pushButton(
 	details: String = "",
 	seedPhrase: String = ""
 ) {
-	Log.d("push button", button.toString())
 	val actionResult =
 		backendAction(button.name, details, seedPhrase)
-	Log.d("action result", actionResult)
 	//Here we just list all possible arguments coming from backend
 	try {
 		val actionResultObject = JSONObject(actionResult)
@@ -50,12 +48,4 @@ fun SignerDataModel.pushButton(
 		Log.e("Navigation error", e.toString())
 		Toast.makeText(context, actionResult, Toast.LENGTH_SHORT).show()
 	}
-}
-
-/**
- * This happens when backup seed acknowledge button is pressed in seed creation screen.
- * TODO: This might misfire - replace with explicit getter and lifetime bound thing
- */
-fun SignerDataModel.acknowledgeBackup() {
-	_backupSeedPhrase.value = ""
 }
