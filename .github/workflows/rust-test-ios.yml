@@ -20,10 +20,8 @@ jobs:
         run:            git submodule update --init --recursive
       - name:           Install dependencies
         run:            |
-                        brew tap wix/brew
-                        brew install applesimutils
                         brew install opencv
-                        gem install xcpretty
+                        export DYLD_FALLBACK_LIBRARY_PATH="$(xcode-select --print-path)/Toolchains/XcodeDefault.xctoolchain/usr/lib/"
       - name:           cargo test
         shell:          bash
         run:            |
