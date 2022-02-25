@@ -383,7 +383,7 @@ mod tests {
 "Error parsing incoming transaction content. Metadata signed extensions are not compatible with Signer (v14 metadata). Block hash is encountered more than once."
 "Error parsing incoming transaction content. Metadata signed extensions are not compatible with Signer (v14 metadata). Metadata spec version is encountered more than once."
 "Error parsing incoming transaction content. Network spec version decoded from extensions (9122) differs from the version in metadata (9010)."
-"Failed to decode extensions. Try updating metadata for westend network. Parsing with westend9010 metadata: Network spec version decoded from extensions (9122) differs from the version in metadata (9010). Parsing with westend9000 metadata: Network spec version decoded from extensions (9122) differs from the version in metadata (9000)."
+"Failed to decode extensions. Please try updating metadata for westend network. Parsing with westend9010 metadata: Network spec version decoded from extensions (9122) differs from the version in metadata (9010). Parsing with westend9000 metadata: Network spec version decoded from extensions (9122) differs from the version in metadata (9000)."
 "Error with secret string of existing address: invalid overall format."
 "Error with secret string of existing address: invalid bip39 phrase."
 "Error with secret string of existing address: invalid password."

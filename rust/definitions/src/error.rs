@@ -1044,7 +1044,7 @@ impl ErrorSource for Signer {
                     if i>0 {insert.push_str(" ")}
                     insert.push_str(&format!("Parsing with {}{} metadata: {}", network_name, version, parser_error.show()));
                 }
-                format!("Failed to decode extensions. Try updating metadata for {} network. {}", network_name, insert)
+                format!("Failed to decode extensions. Please try updating metadata for {} network. {}", network_name, insert)
             },
             ErrorSigner::AddressUse(e) => format!("Error with secret string of existing address: {}.", bad_secret_string(e)),
             ErrorSigner::WrongPassword => String::from("Wrong password."),
