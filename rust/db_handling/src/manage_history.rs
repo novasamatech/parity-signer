@@ -53,18 +53,16 @@ fn get_history(database_name: &str) -> Result<Vec<(Order, Entry)>, ErrorSigner> 
     let database = open_db::<Signer>(database_name)?;
     let history = open_tree::<Signer>(&database, HISTORY)?;
     let mut out: Vec<(Order, Entry)> = Vec::new();
-    for x in history.iter() {
-        if let Ok((order_encoded, history_entry_encoded)) = x {
-            let order = match <Order>::decode(&mut &order_encoded[..]) {
-                Ok(a) => a,
-                Err(_) => return Err(ErrorSigner::Database(DatabaseSigner::KeyDecoding(KeyDecodingSignerDb::EntryOrder(order_encoded.to_vec())))),
-            };
-            let history_entry = match <Entry>::decode(&mut &history_entry_encoded[..]) {
-                Ok(a) => a,
-                Err(_) => return Err(ErrorSigner::Database(DatabaseSigner::EntryDecoding(EntryDecodingSigner::HistoryEntry(order)))),
-            };
-            out.push((order, history_entry));
-        }
+    for (order_encoded, history_entry_encoded) in history.iter().flatten() {
+        let order = match <Order>::decode(&mut &order_encoded[..]) {
+            Ok(a) => a,
+            Err(_) => return Err(ErrorSigner::Database(DatabaseSigner::KeyDecoding(KeyDecodingSignerDb::EntryOrder(order_encoded.to_vec())))),
+        };
+        let history_entry = match <Entry>::decode(&mut &history_entry_encoded[..]) {
+            Ok(a) => a,
+            Err(_) => return Err(ErrorSigner::Database(DatabaseSigner::EntryDecoding(EntryDecodingSigner::HistoryEntry(order)))),
+        };
+        out.push((order, history_entry));
     }
     out.sort_by(|a, b| b.0.cmp(&a.0));
     Ok(out)
@@ -76,27 +74,25 @@ pub fn get_history_entry_by_order(order: u32, database_name: &str) -> Result<Ent
     let database = open_db::<Signer>(database_name)?;
     let history = open_tree::<Signer>(&database, HISTORY)?;
     let mut found = None;
-    for x in history.iter() {
-        if let Ok((order_encoded, history_entry_encoded)) = x {
-            match <Order>::decode(&mut &order_encoded[..]) {
-                Ok(a) => {
-                    if a == order {
-                        match <Entry>::decode(&mut &history_entry_encoded[..]) {
-                            Ok(b) => {
-                                found = Some(b);
-                                break;
-                            },
-                            Err(_) => return Err(ErrorSigner::Database(DatabaseSigner::EntryDecoding(EntryDecodingSigner::HistoryEntry(order)))),
-                        }
+    for (order_encoded, history_entry_encoded) in history.iter().flatten() {
+        match <Order>::decode(&mut &order_encoded[..]) {
+            Ok(a) => {
+                if a == order {
+                    match <Entry>::decode(&mut &history_entry_encoded[..]) {
+                        Ok(b) => {
+                            found = Some(b);
+                            break;
+                        },
+                        Err(_) => return Err(ErrorSigner::Database(DatabaseSigner::EntryDecoding(EntryDecodingSigner::HistoryEntry(order)))),
                     }
-                },
-                Err(_) => return Err(ErrorSigner::Database(DatabaseSigner::KeyDecoding(KeyDecodingSignerDb::EntryOrder(order_encoded.to_vec())))),
-            }
+                }
+            },
+            Err(_) => return Err(ErrorSigner::Database(DatabaseSigner::KeyDecoding(KeyDecodingSignerDb::EntryOrder(order_encoded.to_vec())))),
         }
     }
     match found {
         Some(a) => Ok(a),
-        None => return Err(ErrorSigner::NotFound(NotFoundSigner::HistoryEntry(order))),
+        None => Err(ErrorSigner::NotFound(NotFoundSigner::HistoryEntry(order))),
     }
 }
 
@@ -112,10 +108,10 @@ pub fn print_history_entry_by_order(order: u32, database_name: &str) -> Result<S
 pub fn clear_history(database_name: &str) -> Result<(), ErrorSigner> {
     let batch = make_batch_clear_tree::<Signer>(database_name, HISTORY)?;
     let events = vec![Event::HistoryCleared];
-    let for_history = events_in_batch::<Signer>(&database_name, true, batch, events)?;
+    let for_history = events_in_batch::<Signer>(database_name, true, batch, events)?;
     TrDbCold::new()
         .set_history(for_history)
-        .apply::<Signer>(&database_name)
+        .apply::<Signer>(database_name)
 }
 
 /// Function to collect history events set into batch
@@ -145,8 +141,8 @@ pub fn events_in_batch <T: ErrorSource> (database_name: &str, start_zero: bool, 
 /// and for Signer side (loading actual events as part of Signer operation)
 pub fn enter_events <T: ErrorSource> (database_name: &str, events: Vec<Event>) -> Result<(), T::Error> {
     TrDbCold::new()
-        .set_history(events_to_batch::<T>(&database_name, events)?)
-        .apply::<T>(&database_name)
+        .set_history(events_to_batch::<T>(database_name, events)?)
+        .apply::<T>(database_name)
 }
 
 /// Function for Signer user to add events.
@@ -173,9 +169,9 @@ pub fn device_was_online(database_name: &str) -> Result<(), ErrorSigner> {
     let mut settings_batch = Batch::default();
     settings_batch.insert(DANGER.to_vec(), DangerRecord::not_safe().store());
     TrDbCold::new()
-        .set_history(events_to_batch::<Signer>(&database_name, events)?)
+        .set_history(events_to_batch::<Signer>(database_name, events)?)
         .set_settings(settings_batch)
-        .apply::<Signer>(&database_name)
+        .apply::<Signer>(database_name)
 }
 
 /// Function to reset the danger status to `safe` - use it wisely.
@@ -186,9 +182,9 @@ pub fn reset_danger_status_to_safe(database_name: &str) -> Result<(), ErrorSigne
     let mut settings_batch = Batch::default();
     settings_batch.insert(DANGER.to_vec(), DangerRecord::safe().store());
     TrDbCold::new()
-        .set_history(events_to_batch::<Signer>(&database_name, events)?)
+        .set_history(events_to_batch::<Signer>(database_name, events)?)
         .set_settings(settings_batch)
-        .apply::<Signer>(&database_name)
+        .apply::<Signer>(database_name)
 }
 
 /// Function to record in history log the fact that certain seed was shown on Signer screen.

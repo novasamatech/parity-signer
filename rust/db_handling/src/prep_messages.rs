@@ -16,17 +16,15 @@ pub fn get_genesis_hash (network_name: &str, database_name: &str) -> Result<[u8;
     let database = open_db::<Signer>(database_name)?;
     let chainspecs = open_tree::<Signer>(&database, SPECSTREE)?;
     let mut found_genesis_hash = None;
-    for x in chainspecs.iter() {
-        if let Ok(a) = x {
-            let network_specs = NetworkSpecs::from_entry_checked::<Signer>(a)?;
-            if network_specs.name == network_name {
-                found_genesis_hash = Some(network_specs.genesis_hash);
-                break;
-            }
+    for x in chainspecs.iter().flatten() {
+        let network_specs = NetworkSpecs::from_entry_checked::<Signer>(x)?;
+        if network_specs.name == network_name {
+            found_genesis_hash = Some(network_specs.genesis_hash);
+            break;
         }
     }
     match found_genesis_hash {
         Some(a) => Ok(a),
-        None => return Err(ErrorSigner::NotFound(NotFoundSigner::NetworkSpecsForName(network_name.to_string()))),
+        None => Err(ErrorSigner::NotFound(NotFoundSigner::NetworkSpecsForName(network_name.to_string()))),
     }
 }

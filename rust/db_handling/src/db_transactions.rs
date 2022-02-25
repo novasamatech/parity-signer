@@ -127,7 +127,7 @@ impl TrDbHot {
             Ok(())
         }) {
             Ok(()) => Ok(()),
-            Err(e) => return Err(<Active>::db_transaction(e)),
+            Err(e) => Err(<Active>::db_transaction(e)),
         }
     }
 }
@@ -222,7 +222,7 @@ impl TrDbCold {
                 Ok(())
         }) {
             Ok(()) => Ok(()),
-            Err(e) => return Err(<T>::db_transaction(e)),
+            Err(e) => Err(<T>::db_transaction(e)),
         }
     }
 }
@@ -256,7 +256,7 @@ impl TrDbColdStub {
     /// function to recover TrDbColdStub from storage in the Signer database
     pub fn from_storage(database_name: &str, checksum: u32) -> Result<Self, ErrorSigner> {
         let stub_encoded = {
-            let database = open_db::<Signer>(&database_name)?;
+            let database = open_db::<Signer>(database_name)?;
             verify_checksum(&database, checksum)?;
             let transaction = open_tree::<Signer>(&database, TRANSACTION)?;
             match transaction.get(STUB) {
@@ -266,11 +266,11 @@ impl TrDbColdStub {
             }
         };
         TrDbCold::new()
-            .set_transaction(make_batch_clear_tree::<Signer>(&database_name, TRANSACTION)?) // clear transaction tree
-            .apply::<Signer>(&database_name)?;
+            .set_transaction(make_batch_clear_tree::<Signer>(database_name, TRANSACTION)?) // clear transaction tree
+            .apply::<Signer>(database_name)?;
         match Self::decode(&mut &stub_encoded[..]) {
             Ok(a) => Ok(a),
-            Err(_) => return Err(ErrorSigner::Database(DatabaseSigner::EntryDecoding(EntryDecodingSigner::Stub))),
+            Err(_) => Err(ErrorSigner::Database(DatabaseSigner::EntryDecoding(EntryDecodingSigner::Stub))),
         }
     }
     /// function to put TrDbColdStub into storage in the database
@@ -279,11 +279,11 @@ impl TrDbColdStub {
         transaction_batch.insert(STUB, self.encode());
         TrDbCold::new()
             .set_transaction(transaction_batch) // clear transaction tree and insert the stub
-            .apply::<Signer>(&database_name)?;
-        let database = open_db::<Signer>(&database_name)?;
+            .apply::<Signer>(database_name)?;
+        let database = open_db::<Signer>(database_name)?;
         match database.checksum() {
             Ok(x) => Ok(x),
-            Err(e) => return Err(<Signer>::db_internal(e)),
+            Err(e) => Err(<Signer>::db_internal(e)),
         }
     }
     /// function to add new event in history preparation in TrDbColdStub
@@ -310,7 +310,7 @@ impl TrDbColdStub {
     pub fn add_network_specs(mut self, network_specs_to_send: &NetworkSpecsToSend, valid_current_verifier: &ValidCurrentVerifier, general_verifier: &Verifier, database_name: &str) -> Result<Self, ErrorSigner> {
         let network_specs_key = NetworkSpecsKey::from_parts(&network_specs_to_send.genesis_hash.to_vec(), &network_specs_to_send.encryption);
         let order = {
-            let database = open_db::<Signer>(&database_name)?;
+            let database = open_db::<Signer>(database_name)?;
             let chainspecs = open_tree::<Signer>(&database, SPECSTREE)?;
             chainspecs.len()
         } as u8;
@@ -318,7 +318,7 @@ impl TrDbColdStub {
         self.network_specs_stub = self.network_specs_stub.new_addition(network_specs_key.key(), network_specs.encode());
         self.history_stub.push(Event::NetworkSpecsAdded(NetworkSpecsDisplay::get(&network_specs, valid_current_verifier, general_verifier)));
         {
-            let database = open_db::<Signer>(&database_name)?;
+            let database = open_db::<Signer>(database_name)?;
             let identities = open_tree::<Signer>(&database, ADDRTREE)?;
             for x in identities.iter() {
                 if let Ok((address_key_vec, address_entry)) = x {
@@ -371,13 +371,13 @@ impl TrDbColdStub {
     pub fn apply(self, database_name: &str) -> Result<(), ErrorSigner> {
         TrDbCold {
             for_addresses: self.addresses_stub.make_batch(),
-            for_history: events_to_batch::<Signer>(&database_name, self.history_stub)?,
+            for_history: events_to_batch::<Signer>(database_name, self.history_stub)?,
             for_metadata: self.metadata_stub.make_batch(),
             for_network_specs: self.network_specs_stub.make_batch(),
             for_settings: self.settings_stub.make_batch(),
             for_transaction: Batch::default(),
             for_verifiers: self.verifiers_stub.make_batch(),
-        }.apply::<Signer>(&database_name)
+        }.apply::<Signer>(database_name)
     }
 }
 
@@ -418,7 +418,7 @@ impl TrDbColdSign {
     /// function to recover TrDbColdSign from storage in the database
     pub fn from_storage(database_name: &str, checksum: u32) -> Result<Self, ErrorSigner> {
         let sign_encoded = {
-            let database = open_db::<Signer>(&database_name)?;
+            let database = open_db::<Signer>(database_name)?;
             verify_checksum(&database, checksum)?;
             let transaction = open_tree::<Signer>(&database, TRANSACTION)?;
             match transaction.get(SIGN) {
@@ -429,7 +429,7 @@ impl TrDbColdSign {
         };
         match Self::decode(&mut &sign_encoded[..]) {
             Ok(a) => Ok(a),
-            Err(_) => return Err(ErrorSigner::Database(DatabaseSigner::EntryDecoding(EntryDecodingSigner::Sign))),
+            Err(_) => Err(ErrorSigner::Database(DatabaseSigner::EntryDecoding(EntryDecodingSigner::Sign))),
         }
     }
     /// function to get transaction content
@@ -454,11 +454,11 @@ impl TrDbColdSign {
         transaction_batch.insert(SIGN, self.encode());
         TrDbCold::new()
             .set_transaction(transaction_batch) // clear transaction tree and insert the stub
-            .apply::<Signer>(&database_name)?;
-        let database = open_db::<Signer>(&database_name)?;
+            .apply::<Signer>(database_name)?;
+        let database = open_db::<Signer>(database_name)?;
         match database.checksum() {
             Ok(x) => Ok(x),
-            Err(e) => return Err(<Signer>::db_internal(e)),
+            Err(e) => Err(<Signer>::db_internal(e)),
         }
     }
     /// function to apply TrDbColdSign to database
@@ -474,7 +474,7 @@ impl TrDbColdSign {
                 if wrong_password {history.push(Event::TransactionSignError(sign_display))}
                 else {
                     history.push(Event::TransactionSigned(sign_display));
-                    for_transaction = make_batch_clear_tree::<Signer>(&database_name, TRANSACTION)?;
+                    for_transaction = make_batch_clear_tree::<Signer>(database_name, TRANSACTION)?;
                 }
             },
             SignContent::Message(message) => {
@@ -482,18 +482,18 @@ impl TrDbColdSign {
                 if wrong_password {history.push(Event::MessageSignError(sign_message_display))}
                 else {
                     history.push(Event::MessageSigned(sign_message_display));
-                    for_transaction = make_batch_clear_tree::<Signer>(&database_name, TRANSACTION)?;
+                    for_transaction = make_batch_clear_tree::<Signer>(database_name, TRANSACTION)?;
                 }
             },
         }
         TrDbCold::new()
-            .set_history(events_to_batch::<Signer>(&database_name, history)?)
+            .set_history(events_to_batch::<Signer>(database_name, history)?)
             .set_transaction(for_transaction)
-            .apply::<Signer>(&database_name)?;
-        let database = open_db::<Signer>(&database_name)?;
+            .apply::<Signer>(database_name)?;
+        let database = open_db::<Signer>(database_name)?;
         match database.checksum() {
             Ok(x) => Ok(x),
-            Err(e) => return Err(<Signer>::db_internal(e)),
+            Err(e) => Err(<Signer>::db_internal(e)),
         }
     }
 }
@@ -517,7 +517,7 @@ impl TrDbColdDerivations {
     /// function to recover TrDbColdDerivations from storage in the database
     pub fn from_storage(database_name: &str, checksum: u32) -> Result<Self, ErrorSigner> {
         let drv_encoded = {
-            let database = open_db::<Signer>(&database_name)?;
+            let database = open_db::<Signer>(database_name)?;
             verify_checksum(&database, checksum)?;
             let transaction = open_tree::<Signer>(&database, TRANSACTION)?;
             match transaction.get(DRV) {
@@ -528,7 +528,7 @@ impl TrDbColdDerivations {
         };
         match Self::decode(&mut &drv_encoded[..]) {
             Ok(a) => Ok(a),
-            Err(_) => return Err(ErrorSigner::Database(DatabaseSigner::EntryDecoding(EntryDecodingSigner::Derivations))),
+            Err(_) => Err(ErrorSigner::Database(DatabaseSigner::EntryDecoding(EntryDecodingSigner::Derivations))),
         }
     }
     /// function to get checked derivations
@@ -545,11 +545,11 @@ impl TrDbColdDerivations {
         transaction_batch.insert(DRV, self.encode());
         TrDbCold::new()
             .set_transaction(transaction_batch) // clear transaction tree and insert the stub
-            .apply::<Signer>(&database_name)?;
-        let database = open_db::<Signer>(&database_name)?;
+            .apply::<Signer>(database_name)?;
+        let database = open_db::<Signer>(database_name)?;
         match database.checksum() {
             Ok(x) => Ok(x),
-            Err(e) => return Err(<Signer>::db_internal(e)),
+            Err(e) => Err(<Signer>::db_internal(e)),
         }
     }
 }

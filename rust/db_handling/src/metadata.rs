@@ -17,12 +17,10 @@ pub fn transfer_metadata_to_cold (database_name_hot: &str, database_name_cold: &
         let metadata_hot = open_tree::<Active>(&database_hot, METATREE)?;
         let database_cold = open_db::<Active>(database_name_cold)?;
         let chainspecs_cold = open_tree::<Active>(&database_cold, SPECSTREE)?;
-        for x in chainspecs_cold.iter() {
-            if let Ok(a) = x {
-                let network_specs = NetworkSpecs::from_entry_checked::<Active>(a)?;
-                for y in metadata_hot.scan_prefix(MetaKeyPrefix::from_name(&network_specs.name).prefix()) {
-                    if let Ok((key, value)) = y {for_metadata.insert(key, value);}
-                }
+        for x in chainspecs_cold.iter().flatten() {
+            let network_specs = NetworkSpecs::from_entry_checked::<Active>(x)?;
+            for (key, value) in metadata_hot.scan_prefix(MetaKeyPrefix::from_name(&network_specs.name).prefix()).flatten() {
+                for_metadata.insert(key, value)
             }
         }
     }

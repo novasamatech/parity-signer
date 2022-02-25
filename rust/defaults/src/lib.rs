@@ -184,12 +184,12 @@ fn get_metadata(dir: &str) -> Result<Vec<MetaValues>, ErrorActive> {
         Err(e) => return Err(ErrorActive::DefaultLoading(DefaultLoading::MetadataFolder(e))),
     };
     for x in path_set.flatten() {
-        if let Some(name) = x.path().to_str() {
+        if let Some(filename) = x.path().to_str() {
             let meta_str = match std::fs::read_to_string(x.path()) {
                 Ok(a) => a,
                 Err(e) => return Err(ErrorActive::DefaultLoading(DefaultLoading::MetadataFile(e))),
             };
-            let new = MetaValues::from_str_metadata(meta_str.trim(), IncomingMetadataSourceActiveStr::Default{filename: name.to_string()})?;
+            let new = MetaValues::from_str_metadata(meta_str.trim(), IncomingMetadataSourceActiveStr::Default{filename: filename.to_string()})?;
             let mut found = false;
             for a in default_network_info.iter() {
                 if new.name == a.name {
@@ -202,7 +202,7 @@ fn get_metadata(dir: &str) -> Result<Vec<MetaValues>, ErrorActive> {
                     break;
                 }
             }
-            if !found {return Err(ErrorActive::DefaultLoading(DefaultLoading::OrphanMetadata{name: new.name.to_string(), filename: filename.to_string()}))}
+            if !found {return Err(ErrorActive::DefaultLoading(DefaultLoading::OrphanMetadata{name: new.name, filename: filename.to_string()}))}
             out.push(new)
         }
     }

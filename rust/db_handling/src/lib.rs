@@ -23,7 +23,7 @@ pub mod remove_types;
 /// so ErrorActive is used
 pub fn default_cold_release () -> Result<(), ErrorActive> {
     let database_name = COLD_DB_NAME_RELEASE;
-    populate_cold_release(&database_name)
+    populate_cold_release(database_name)
 }
 
 /// Function to re-populate default "cold" database with default values.
@@ -33,13 +33,13 @@ pub fn default_cold_release () -> Result<(), ErrorActive> {
 /// so ErrorActive is used
 pub fn default_cold () -> Result<(), ErrorActive> {
     let database_name = COLD_DB_NAME;
-    populate_cold(&database_name, Verifier(None))
+    populate_cold(database_name, Verifier(None))
 }
 
 /// Function to reset default "hot" database.
 /// Active side operation, ErrorActive is used
 pub fn default_hot () -> Result<(), ErrorActive> {
     let database_name = HOT_DB_NAME;
-    reset_hot_database(&database_name)
+    reset_hot_database(database_name)
 }
 
