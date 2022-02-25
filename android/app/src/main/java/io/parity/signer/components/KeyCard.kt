@@ -1,19 +1,19 @@
 package io.parity.signer.components
 
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
-import androidx.compose.material.*
+import androidx.compose.material.Icon
+import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Text
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.CheckCircle
+import androidx.compose.material.icons.filled.Lock
+import androidx.compose.material.icons.outlined.Circle
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.scale
 import androidx.compose.ui.unit.dp
-import io.parity.signer.models.SignerDataModel
 import io.parity.signer.models.abbreviateString
-import io.parity.signer.ui.theme.Bg200
-import io.parity.signer.ui.theme.CryptoTypography
-import io.parity.signer.ui.theme.Text300
-import io.parity.signer.ui.theme.Typography
+import io.parity.signer.ui.theme.*
 import org.json.JSONObject
 
 /**
@@ -21,14 +21,56 @@ import org.json.JSONObject
  * TODO: paint root keys in scary colors
  */
 @Composable
-fun KeyCard(identity: JSONObject, signerDataModel: SignerDataModel) {
-	Row (modifier = Modifier
-		.padding(8.dp)) {
-		//Image(signerDataModel.getIdenticon(identity.get("ss58").toString(), 64), "identicon", modifier = Modifier.scale(0.75f))
+fun KeyCard(identity: JSONObject, multiselectMode: Boolean = false) {
+	Row(
+		verticalAlignment = Alignment.CenterVertically,
+		modifier = Modifier
+			.padding(8.dp)
+	) {
+		Box(contentAlignment = Alignment.BottomEnd) {
+			Identicon(identity.optString("identicon"))
+			if (multiselectMode) {
+				if(identity.optBoolean("multiselect")) {
+					Icon(Icons.Default.CheckCircle, "Not multiselected", tint = MaterialTheme.colors.Action400)
+				} else {
+					Icon(Icons.Outlined.Circle, "Multiselected", tint = MaterialTheme.colors.Action400)
+				}
+			}
+		}
 		Spacer(modifier = Modifier.width(10.dp))
 		Column {
-			Text(identity.get("path").toString(), color = MaterialTheme.colors.onBackground, style = CryptoTypography.body2)
-			Text(identity.get("ss58").toString().abbreviateString(8), color = Text300, style = CryptoTypography.body2)
+			Row(
+				verticalAlignment = Alignment.CenterVertically
+			) {
+				Text(
+					identity.optString("seed_name", identity.optString("seed")),
+					color = MaterialTheme.colors.Text600,
+					style = MaterialTheme.typography.subtitle1
+				)
+				Text(
+					identity.optString("path", identity.optString("derivation_path")),
+					color = MaterialTheme.colors.Crypto400,
+					style = CryptoTypography.body2
+				)
+				if (identity.optBoolean("has_pwd", false)) {
+					Text(
+						"///",
+						color = MaterialTheme.colors.Crypto400,
+						style = CryptoTypography.body2
+					)
+					Icon(
+						Icons.Default.Lock,
+						contentDescription = "Locked account",
+						tint = MaterialTheme.colors.Crypto400
+					)
+				}
+			}
+			Text(
+				identity.optString("base58").abbreviateString(8),
+				color = MaterialTheme.colors.Text400,
+				style = CryptoTypography.body2
+			)
 		}
 	}
 }
+

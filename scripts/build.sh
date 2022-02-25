@@ -29,6 +29,7 @@ if [ "$1" == "android" ]
     fi
 
     printf "Building ARM64 Android targets...";
+    cp ../os-specific-lock/android/Cargo.lock ../
     cp android-hack/Cargo.toml .
     CC_aarch64_linux_android="${ANDROID_PREBUILD_BIN}/aarch64-linux-android${API_LEVEL}-clang" \
     CXX_aarch64_linux_android="${ANDROID_PREBUILD_BIN}/aarch64-linux-android${API_LEVEL}-clang++" \
@@ -75,6 +76,7 @@ if [ "$1" == "ios" ]
 
     printf "Building iOS targets...";
 
+    cp ../os-specific-lock/ios/Cargo.lock ../
     cp ios-hack/Cargo.toml .
 
     for i in "${IOS_ARCHS[@]}";
