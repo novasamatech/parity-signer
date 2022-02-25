@@ -17,9 +17,9 @@ jobs:
           fetch-depth:  50
 
       - name:           Install system dependancies
-        run: |
-                        sudo apt update
-                        sudo apt install -y clang libclang-dev libopencv-dev
+        run:            |
+          sudo apt update
+          sudo apt install -y clang libclang-dev libopencv-dev
         shell:          bash
 
       - name:           Checkout submodules

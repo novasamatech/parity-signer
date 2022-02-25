@@ -18,6 +18,11 @@ jobs:
       - name:           Checkout submodules
         shell:          bash
         run:            git submodule update --init --recursive
+      - name:           Install dependencies
+        run:            |
+                        brew tap wix/brew
+                        brew install applesimutils
+                        gem install xcpretty
       - name:           cargo test
         shell:          bash
         run:            |
