@@ -20,9 +20,7 @@ jobs:
         run:            git submodule update --init --recursive
       - name:           Install dependencies
         run:            |
-                        brew tap wix/brew
-                        brew install applesimutils
-                        gem install xcpretty
+                        brew install opencv
       - name:           cargo test
         shell:          bash
         run:            |
