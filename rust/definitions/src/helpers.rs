@@ -3,8 +3,7 @@ use sp_core::{ed25519, sr25519, ecdsa};
 use sp_runtime::MultiSigner;
 use std::convert::TryInto;
 
-use constants::HALFSIZE;
-use plot_icon::png_data_from_vec;
+use plot_icon::generate_png_scaled_default;
 
 use crate::crypto::Encryption;
 use crate::error::{ErrorSigner, ErrorSource, InterfaceSigner};
@@ -13,12 +12,12 @@ use crate::error::{ErrorSigner, ErrorSource, InterfaceSigner};
 /// `what` is either of enums (NotHexHot or NotHexSigner) implementing NotHex trait
 pub fn unhex<T: ErrorSource>(hex_entry: &str, what: T::NotHex) -> Result<Vec<u8>, T::Error> {
     let hex_entry = {
-        if hex_entry.starts_with("0x") {&hex_entry[2..]}
+        if let Some(a) = hex_entry.strip_prefix("0x") {a}
         else {hex_entry}
     };
     match hex::decode(hex_entry) {
         Ok(x) => Ok(x),
-        Err(_) => return Err(<T>::hex_to_error(what))
+        Err(_) => Err(<T>::hex_to_error(what))
     }
 }
 
@@ -42,15 +41,12 @@ pub fn multisigner_to_encryption (m: &MultiSigner) -> Encryption {
 
 
 /// Helper function to print identicon from the multisigner
-pub fn make_identicon_from_multisigner(multisigner: &MultiSigner) -> Result<Vec<u8>, ErrorSigner> {
-    match png_data_from_vec(&multisigner_to_public(&multisigner), HALFSIZE) {
-        Ok(a) => Ok(a),
-        Err(e) => return Err(ErrorSigner::PngGeneration(e)),
-    }
+pub fn make_identicon_from_multisigner(multisigner: &MultiSigner) -> Vec<u8> {
+    generate_png_scaled_default(&multisigner_to_public(multisigner))
 }
 
 /// Function to get MultiSigner from public key and Encryption
-pub fn get_multisigner (public: &Vec<u8>, encryption: &Encryption) -> Result<MultiSigner, ErrorSigner> {
+pub fn get_multisigner (public: &[u8], encryption: &Encryption) -> Result<MultiSigner, ErrorSigner> {
     match encryption {
         Encryption::Ed25519 => {
             let into_pubkey: [u8; 32] = match public.to_vec().try_into() {
@@ -78,18 +74,12 @@ pub fn get_multisigner (public: &Vec<u8>, encryption: &Encryption) -> Result<Mul
 
 /// Helper function to print id pic for metadata hash.
 /// Currently uses identicon, could be changed later.
-pub fn pic_meta(meta_hash: &Vec<u8>) -> Result<Vec<u8>, ErrorSigner> {
-    match png_data_from_vec(&meta_hash, HALFSIZE) {
-        Ok(a) => Ok(a),
-        Err(e) => return Err(ErrorSigner::PngGeneration(e)),
-    }
+pub fn pic_meta(meta_hash: &[u8]) -> Vec<u8> {
+    generate_png_scaled_default(meta_hash)
 }
 
 /// Helper function to print id pic for types data hash.
 /// Currently uses identicon, could be changed later.
-pub fn pic_types(types_hash: &Vec<u8>) -> Result<Vec<u8>, ErrorSigner> {
-    match png_data_from_vec(&types_hash, HALFSIZE) {
-        Ok(a) => Ok(a),
-        Err(e) => return Err(ErrorSigner::PngGeneration(e)),
-    }
+pub fn pic_types(types_hash: &[u8]) -> Vec<u8> {
+    generate_png_scaled_default(types_hash)
 }

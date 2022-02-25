@@ -1,5 +1,3 @@
-use hex;
-use sp_core;
 use sp_runtime::MultiSigner;
 use std::convert::TryInto;
 use std::fs;
@@ -185,29 +183,27 @@ fn get_metadata(dir: &str) -> Result<Vec<MetaValues>, ErrorActive> {
         Ok(a) => a,
         Err(e) => return Err(ErrorActive::DefaultLoading(DefaultLoading::MetadataFolder(e))),
     };
-    for x in path_set {
-        if let Ok(path) = x {
-            if let Some(filename) = path.path().to_str() {
-                let meta_str = match std::fs::read_to_string(path.path()) {
-                    Ok(a) => a,
-                    Err(e) => return Err(ErrorActive::DefaultLoading(DefaultLoading::MetadataFile(e))),
-                };
-                let new = MetaValues::from_str_metadata(&meta_str.trim(), IncomingMetadataSourceActiveStr::Default{filename: filename.to_string()})?;
-                let mut found = false;
-                for a in default_network_info.iter() {
-                    if new.name == a.name {
-                        found = true;
-                        if let Some(prefix_from_meta) = new.optional_base58prefix {
-                            if prefix_from_meta != a.base58prefix {
-                                return Err(<Active>::faulty_metadata(MetadataError::Base58PrefixSpecsMismatch{specs: a.base58prefix, meta: prefix_from_meta}, MetadataSource::Incoming(IncomingMetadataSourceActive::Str(IncomingMetadataSourceActiveStr::Default{filename: filename.to_string()}))))
-                            }
+    for x in path_set.flatten() {
+        if let Some(name) = x.path().to_str() {
+            let meta_str = match std::fs::read_to_string(x.path()) {
+                Ok(a) => a,
+                Err(e) => return Err(ErrorActive::DefaultLoading(DefaultLoading::MetadataFile(e))),
+            };
+            let new = MetaValues::from_str_metadata(meta_str.trim(), IncomingMetadataSourceActiveStr::Default{filename: name.to_string()})?;
+            let mut found = false;
+            for a in default_network_info.iter() {
+                if new.name == a.name {
+                    found = true;
+                    if let Some(prefix_from_meta) = new.optional_base58prefix {
+                        if prefix_from_meta != a.base58prefix {
+                            return Err(<Active>::faulty_metadata(MetadataError::Base58PrefixSpecsMismatch{specs: a.base58prefix, meta: prefix_from_meta}, MetadataSource::Incoming(IncomingMetadataSourceActive::Str(IncomingMetadataSourceActiveStr::Default{filename: filename.to_string()}))))
                         }
-                        break;
                     }
+                    break;
                 }
-                if !found {return Err(ErrorActive::DefaultLoading(DefaultLoading::OrphanMetadata{name: new.name.to_string(), filename: filename.to_string()}))}
-                out.push(new)
             }
+            if !found {return Err(ErrorActive::DefaultLoading(DefaultLoading::OrphanMetadata{name: new.name.to_string(), filename: filename.to_string()}))}
+            out.push(new)
         }
     }
     Ok(out)
@@ -282,17 +278,17 @@ pub fn get_default_types_vec() -> Result<Vec<TypeEntry>, ErrorActive> {
             .lines()
             .filter(|line| REG_ENUM_VARIANTS.is_match(line))
             .map(|line| {
-                let caps2 = REG_ENUM_VARIANTS.captures(&line).unwrap();
-                let variant_name = caps2.name("variant_name").unwrap().as_str().to_string();
+                let caps2 = REG_ENUM_VARIANTS.captures(line).expect("just checked it is match");
+                let variant_name = (&caps2["variant_name"]).to_string();
                 let variant_type = match caps2.name("variant_type") {
                     None => EnumVariantType::None,
                     Some(a) => {
                         let x = a.as_str().to_string();
-                        if x.starts_with("(") {
+                        if x.starts_with('(') {
                             // either a single type or a tuple
                             match REG_ENUM_SIMPLE.captures(&x[1..x.len()-1]){
                                 // single type
-                                Some(b) => EnumVariantType::Type(b.name("simple_type").unwrap().as_str().to_string()),
+                                Some(b) => EnumVariantType::Type((&b["simple_type"]).to_string()),
                                 // tuple
                                 None => EnumVariantType::Type(x),
                             }

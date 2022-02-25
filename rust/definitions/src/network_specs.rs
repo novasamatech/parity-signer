@@ -1,5 +1,6 @@
 use parity_scale_codec::Decode;
 use parity_scale_codec_derive;
+use plot_icon::EMPTY_PNG;
 use sled::IVec;
 use sp_runtime::MultiSigner;
 
@@ -157,7 +158,7 @@ impl Verifier {
     pub fn show_card(&self) -> String {
         match &self.0 {
             Some(a) => a.show_card(),
-            None => String::from("\"public_key\":\"\",\"identicon\":\"\",\"encryption\":\"none\""),
+            None => format!("\"public_key\":\"\",\"identicon\":\"{}\",\"encryption\":\"none\"", hex::encode(EMPTY_PNG)),
         }
     }
     pub fn show_error(&self) -> String {
@@ -174,10 +175,7 @@ impl VerifierValue {
             VerifierValue::Standard(m) => {
                 let hex_public = hex::encode(multisigner_to_public(m));
                 let encryption = multisigner_to_encryption(m);
-                let hex_identicon = match make_identicon_from_multisigner(m) {
-                    Ok(a) => hex::encode(a),
-                    Err(_) => String::new(),
-                };
+                let hex_identicon = hex::encode(make_identicon_from_multisigner(m));
                 format!("\"public_key\":\"{}\",\"identicon\":\"{}\",\"encryption\":\"{}\"", hex_public, hex_identicon, encryption.show())
             },
         }

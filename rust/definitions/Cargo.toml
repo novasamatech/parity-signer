@@ -19,8 +19,8 @@ anyhow = "1.0.42"
 blake2-rfc = "0.2.18"
 sled = "0.34.6"
 frame-metadata = { version = "14.0.0", default-features = false, features = ["v12", "v13", "v14", "std"]}
-plot_icon = "0.1.3"
-png = "0.16.8"
+plot_icon = {git = "https://github.com/varovainen/polkadot-identicon-rust"}
+png = "0.17.3"
 constants = {path = "../constants"}
 wasm-testbed = "0.13.1"
 

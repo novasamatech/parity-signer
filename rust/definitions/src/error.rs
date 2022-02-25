@@ -160,7 +160,7 @@ impl AddressGenerationCommon {
             AddressGenerationCommon::KeyCollision{seed_name} => format!("Address key collision for seed name {}", seed_name),
             AddressGenerationCommon::SecretString(e) => format!("Bad secret string: {}.", bad_secret_string(e)),
             AddressGenerationCommon::DerivationExists(multisigner, address_details, network_specs_key) => {
-                let public_key = multisigner_to_public(&multisigner);
+                let public_key = multisigner_to_public(multisigner);
                 if address_details.has_pwd {
                     format!("Seed {} already has derivation {}///<password> for network specs key {}, public key {}.", address_details.seed_name, address_details.path, hex::encode(network_specs_key.key()), hex::encode(public_key))
                 }
@@ -189,7 +189,7 @@ impl ErrorSource for Active {
     fn specs_key_to_error(network_specs_key: &NetworkSpecsKey, source: SpecsKeySource<Self>) -> Self::Error {
         match source {
             SpecsKeySource::SpecsTree => ErrorActive::Database(DatabaseActive::KeyDecoding(KeyDecodingActive::NetworkSpecsKey(network_specs_key.to_owned()))),
-            SpecsKeySource::AddrTree(address_key) => ErrorActive::Database(DatabaseActive::KeyDecoding(KeyDecodingActive::NetworkSpecsKeyAddressDetails{address_key: address_key.to_owned(), network_specs_key: network_specs_key.to_owned()})),
+            SpecsKeySource::AddrTree(address_key) => ErrorActive::Database(DatabaseActive::KeyDecoding(KeyDecodingActive::NetworkSpecsKeyAddressDetails{address_key, network_specs_key: network_specs_key.to_owned()})),
             SpecsKeySource::Extra(_) => unreachable!(),
         }
     }
@@ -809,7 +809,7 @@ impl ErrorSource for Signer {
     fn specs_key_to_error(network_specs_key: &NetworkSpecsKey, source: SpecsKeySource<Self>) -> Self::Error {
         match source {
             SpecsKeySource::SpecsTree => ErrorSigner::Database(DatabaseSigner::KeyDecoding(KeyDecodingSignerDb::NetworkSpecsKey(network_specs_key.to_owned()))),
-            SpecsKeySource::AddrTree(address_key) => ErrorSigner::Database(DatabaseSigner::KeyDecoding(KeyDecodingSignerDb::NetworkSpecsKeyAddressDetails{address_key: address_key.to_owned(), network_specs_key: network_specs_key.to_owned()})),
+            SpecsKeySource::AddrTree(address_key) => ErrorSigner::Database(DatabaseSigner::KeyDecoding(KeyDecodingSignerDb::NetworkSpecsKeyAddressDetails{address_key, network_specs_key: network_specs_key.to_owned()})),
             SpecsKeySource::Extra(ExtraSpecsKeySourceSigner::Interface) => ErrorSigner::Interface(InterfaceSigner::KeyDecoding(KeyDecodingSignerInterface::NetworkSpecsKey(network_specs_key.to_owned()))),
         }
         
@@ -1040,7 +1040,7 @@ impl ErrorSource for Signer {
             ErrorSigner::AllParsingFailed(errors) => {
                 let mut insert = String::new();
                 for (i,(name, version, parser_error)) in errors.iter().enumerate() {
-                    if i>0 {insert.push_str(" ")}
+                    if i>0 {insert.push(' ')}
                     insert.push_str(&format!("Parsing with {}{} metadata: {}", name, version, parser_error.show()));
                 }
                 format!("All parsing attempts failed with following errors. {}", insert)

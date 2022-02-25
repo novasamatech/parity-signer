@@ -37,7 +37,7 @@ impl DangerRecord {
     pub fn device_was_online (&self) -> Result<bool, ErrorSigner>  {
         match <DecodedDangerRecord>::decode(&mut &self.0[..]) {
             Ok(a) => Ok(a.device_was_online),
-            Err(_) => return Err(ErrorSigner::Database(DatabaseSigner::EntryDecoding(EntryDecodingSigner::DangerStatus))),
+            Err(_) => Err(ErrorSigner::Database(DatabaseSigner::EntryDecoding(EntryDecodingSigner::DangerStatus))),
         }
     }
     /// Function to prepare the danger record information into storage as Vec<u8>

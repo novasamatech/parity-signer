@@ -45,11 +45,11 @@ impl AddressDetails {
     }
     
     pub fn from_entry_with_key_checked<T: ErrorSource>(address_key: &AddressKey, address_details_encoded: IVec) -> Result<Self, T::Error> {
-        let (_, address_details) = AddressDetails::process_entry_with_key_checked::<T>(&address_key, address_details_encoded)?;
+        let (_, address_details) = AddressDetails::process_entry_with_key_checked::<T>(address_key, address_details_encoded)?;
         Ok(address_details)
     }
     pub fn is_root(&self) -> bool {
-        (self.path == "")&&(!self.has_pwd)
+        (self.path.is_empty())&&(!self.has_pwd)
     }
     
 }

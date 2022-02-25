@@ -32,7 +32,6 @@ pub const DRV: &[u8] = b"derivations";
 /// Display constants
 pub const MAX_WORDS_DISPLAY: usize = 8;
 pub const HISTORY_PAGE_SIZE: usize = 20;
-pub const HALFSIZE: i32 = 32;
 
 /// HOT database on external device:  
 ///

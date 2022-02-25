@@ -44,7 +44,7 @@ impl MetaValues {
         let (name, version) = MetaKey::from_ivec(&meta_key_vec).name_version::<T>()?;
         Self::from_entry_name_version_checked::<T>(&name, version, meta_encoded)
     }
-    pub fn from_vec_metadata(meta_vec: &Vec<u8>) -> Result<Self, MetadataError> {
+    pub fn from_vec_metadata(meta_vec: &[u8]) -> Result<Self, MetadataError> {
         let meta_info = info_from_metadata(&runtime_metadata_from_vec(meta_vec)?)?;
         Ok(Self{
             name: meta_info.name.to_string(),
@@ -79,7 +79,7 @@ impl MetaValues {
         let meta_vec = unhex::<Active>(meta, what)?;
         match Self::from_vec_metadata(&meta_vec) {
             Ok(a) => Ok(a),
-            Err(e) => return Err(<Active>::faulty_metadata(e, MetadataSource::Incoming(IncomingMetadataSourceActive::Str(source))))
+            Err(e) => Err(<Active>::faulty_metadata(e, MetadataSource::Incoming(IncomingMetadataSourceActive::Str(source))))
         }
     }
 }
@@ -175,12 +175,12 @@ pub fn info_from_metadata (runtime_metadata: &RuntimeMetadata) -> Result<MetaInf
     })
 }
 
-pub fn runtime_metadata_from_vec(meta_vec: &Vec<u8>) -> Result<RuntimeMetadata, MetadataError> {
-    if !meta_vec.starts_with(&vec![109, 101, 116, 97]) {return Err(MetadataError::NotMeta)}
+pub fn runtime_metadata_from_vec(meta_vec: &[u8]) -> Result<RuntimeMetadata, MetadataError> {
+    if !meta_vec.starts_with(&[109, 101, 116, 97]) {return Err(MetadataError::NotMeta)}
     if meta_vec[4] < 12 {return Err(MetadataError::VersionIncompatible)}
     match RuntimeMetadata::decode(&mut &meta_vec[4..]) {
         Ok(x) => Ok(x),
-        Err(_) => return Err(MetadataError::UnableToDecode),
+        Err(_) => Err(MetadataError::UnableToDecode),
     }
 }
 
@@ -218,7 +218,7 @@ impl MetaSetElement {
         };
         let (name, version, optional_base58prefix) = match info_from_metadata(&runtime_metadata) {
             Ok(a) => {
-                if (a.version != network_version)||(a.name != network_name) {return Err(<Signer>::metadata_mismatch(network_name.to_string(), network_version, a.name.to_string(), a.version))}
+                if (a.version != network_version)||(a.name != network_name) {return Err(<Signer>::metadata_mismatch(network_name, network_version, a.name.to_string(), a.version))}
                 (a.name, a.version, a.optional_base58prefix)
             },
             Err(e) => return Err(<Signer>::faulty_metadata(e, MetadataSource::Database{name: network_name, version: network_version})),
@@ -255,7 +255,7 @@ impl AddressBookEntry {
     pub fn from_entry_with_title(title: &str, address_book_entry_encoded: &IVec) -> Result<AddressBookEntry, ErrorActive> {
         match <AddressBookEntry>::decode(&mut &address_book_entry_encoded[..]) {
             Ok(a) => Ok(a),
-            Err(_) => return Err(ErrorActive::Database(DatabaseActive::EntryDecoding(EntryDecodingActive::AddressBookEntryTitle{title: title.to_string()}))),
+            Err(_) => Err(ErrorActive::Database(DatabaseActive::EntryDecoding(EntryDecodingActive::AddressBookEntryTitle{title: title.to_string()}))),
         }
     }
 }

@@ -33,10 +33,7 @@ impl MetaValuesDisplay {
         }
     }
     pub fn show(&self) -> String {
-        let meta_id_pic = match pic_meta(&self.meta_hash) {
-            Ok(a) => hex::encode(a),
-            Err(_) => String::new(),
-        };
+        let meta_id_pic = hex::encode(pic_meta(&self.meta_hash));
         format!("\"specname\":\"{}\",\"spec_version\":\"{}\",\"meta_hash\":\"{}\",\"meta_id_pic\":\"{}\"", &self.name, &self.version, hex::encode(&self.meta_hash), meta_id_pic)
     }
 }
@@ -63,10 +60,7 @@ impl MetaValuesExport {
         }
     }
     pub fn show(&self) -> String {
-        let meta_id_pic = match pic_meta(&self.meta_hash) {
-            Ok(a) => hex::encode(a),
-            Err(_) => String::new(),
-        };
+        let meta_id_pic = hex::encode(pic_meta(&self.meta_hash));
         format!("\"specname\":\"{}\",\"spec_version\":\"{}\",\"meta_hash\":\"{}\",\"meta_id_pic\":\"{}\",\"signed_by\":{}", &self.name, &self.version, hex::encode(&self.meta_hash), meta_id_pic, export_complex_single(&self.signed_by, |a| a.show_card()))
     }
 }
@@ -149,10 +143,7 @@ impl TypesDisplay {
         }
     }
     pub fn show(&self) -> String {
-        let types_id_pic = match pic_types(&self.types_hash) {
-            Ok(a) => hex::encode(a),
-            Err(_) => String::new(),
-        };
+        let types_id_pic = hex::encode(pic_types(&self.types_hash));
         format!("\"types_hash\":\"{}\",\"types_id_pic\":\"{}\",\"verifier\":{}", hex::encode(&self.types_hash), types_id_pic, export_complex_single(&self.verifier, |a| a.show_card()))
     }
 }
@@ -174,10 +165,7 @@ impl TypesExport {
         }
     }
     pub fn show(&self) -> String {
-        let types_id_pic = match pic_types(&self.types_hash) {
-            Ok(a) => hex::encode(a),
-            Err(_) => String::new(),
-        };
+        let types_id_pic = hex::encode(pic_types(&self.types_hash));
         format!("\"types_hash\":\"{}\",\"types_id_pic\":\"{}\",\"signed_by\":{}", hex::encode(&self.types_hash), types_id_pic, export_complex_single(&self.signed_by, |a| a.show_card()))
     }
 }
@@ -194,7 +182,7 @@ pub struct IdentityHistory {
 }
 
 impl IdentityHistory {
-    pub fn get(seed_name: &str, encryption: &Encryption, public_key: &Vec<u8>, path: &str, network_genesis_hash: &Vec<u8>) -> Self {
+    pub fn get(seed_name: &str, encryption: &Encryption, public_key: &[u8], path: &str, network_genesis_hash: &[u8]) -> Self {
         Self {
             seed_name: seed_name.to_string(),
             encryption: encryption.to_owned(),
@@ -219,7 +207,7 @@ pub struct SignDisplay {
 }
 
 impl SignDisplay {
-    pub fn get(transaction: &Vec<u8>, network_name: &str, signed_by: &VerifierValue, user_comment: &str) -> Self {
+    pub fn get(transaction: &[u8], network_name: &str, signed_by: &VerifierValue, user_comment: &str) -> Self {
         Self {
             transaction: transaction.to_vec(),
             network_name: network_name.to_string(),
@@ -241,12 +229,12 @@ impl SignDisplay {
     pub fn success<O>(&self, op: O) -> String 
     where O: Fn(&Self) -> String + Copy,
     {
-        format!("\"transaction\":{},\"network_name\":\"{}\",\"signed_by\":{},\"user_comment\":\"{}\"", op(&self), &self.network_name, export_complex_single(&self.signed_by, |a| a.show_card()), &self.user_comment)
+        format!("\"transaction\":{},\"network_name\":\"{}\",\"signed_by\":{},\"user_comment\":\"{}\"", op(self), &self.network_name, export_complex_single(&self.signed_by, |a| a.show_card()), &self.user_comment)
     }
     pub fn pwd_failure<O>(&self, op: O) -> String 
     where O: Fn(&Self) -> String + Copy,
     {
-        format!("\"transaction\":{},\"network_name\":\"{}\",\"signed_by\":{},\"user_comment\":\"{}\",\"error\":\"wrong_password_entered\"", op(&self), &self.network_name, export_complex_single(&self.signed_by, |a| a.show_card()), &self.user_comment)
+        format!("\"transaction\":{},\"network_name\":\"{}\",\"signed_by\":{},\"user_comment\":\"{}\",\"error\":\"wrong_password_entered\"", op(self), &self.network_name, export_complex_single(&self.signed_by, |a| a.show_card()), &self.user_comment)
     }
 }
 
