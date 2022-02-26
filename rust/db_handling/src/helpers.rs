@@ -54,10 +54,8 @@ pub fn try_get_valid_current_verifier (verifier_key: &VerifierKey, database_name
 
 /// Function to get from the Signer database the current verifier for network using VerifierKey, returns error if not found
 pub fn get_valid_current_verifier (verifier_key: &VerifierKey, database_name: &str) -> Result<ValidCurrentVerifier, ErrorSigner> {
-    match try_get_valid_current_verifier(verifier_key, database_name)? {
-        Some(a) => Ok(a),
-        None => Err(ErrorSigner::NotFound(NotFoundSigner::CurrentVerifier(verifier_key.to_owned()))),
-    }
+    try_get_valid_current_verifier(verifier_key, database_name)?
+        .ok_or_else(|| ErrorSigner::NotFound(NotFoundSigner::CurrentVerifier(verifier_key.to_owned())))
 }
 
 /// Function to search for genesis hash corresponding to a given verifier key
@@ -66,23 +64,21 @@ pub fn get_valid_current_verifier (verifier_key: &VerifierKey, database_name: &s
 /// outputs network specs key for the network with the lowest order
 pub fn genesis_hash_in_specs (verifier_key: &VerifierKey, database: &Db) -> Result<Option<(NetworkSpecsKey, NetworkSpecs)>, ErrorSigner> {
     let genesis_hash = verifier_key.genesis_hash();
-    let chainspecs = open_tree::<Signer>(&database, SPECSTREE)?;
+    let chainspecs = open_tree::<Signer>(database, SPECSTREE)?;
     let mut specs_set: Vec<(NetworkSpecsKey, NetworkSpecs)> = Vec::new();
     let mut found_base58prefix = None;
-    for x in chainspecs.iter() {
-        if let Ok((network_specs_key_vec, network_specs_encoded)) = x {
-            let network_specs_key = NetworkSpecsKey::from_ivec(&network_specs_key_vec);
-            let network_specs = NetworkSpecs::from_entry_with_key_checked::<Signer>(&network_specs_key, network_specs_encoded)?;
-            if network_specs.genesis_hash.to_vec() == genesis_hash {
-                found_base58prefix = match found_base58prefix {
-                    Some(base58prefix) => {
-                        if base58prefix == network_specs.base58prefix {Some(base58prefix)}
-                        else {return Err(ErrorSigner::Database(DatabaseSigner::DifferentBase58Specs{genesis_hash: network_specs.genesis_hash, base58_1: base58prefix, base58_2: network_specs.base58prefix}))}
-                    },
-                    None => Some(network_specs.base58prefix),
-                };
-                specs_set.push((network_specs_key, network_specs))
-            }
+    for (network_specs_key_vec, network_specs_encoded) in chainspecs.iter().flatten() {
+        let network_specs_key = NetworkSpecsKey::from_ivec(&network_specs_key_vec);
+        let network_specs = NetworkSpecs::from_entry_with_key_checked::<Signer>(&network_specs_key, network_specs_encoded)?;
+        if network_specs.genesis_hash.to_vec() == genesis_hash {
+            found_base58prefix = match found_base58prefix {
+                Some(base58prefix) => {
+                    if base58prefix == network_specs.base58prefix {Some(base58prefix)}
+                    else {return Err(ErrorSigner::Database(DatabaseSigner::DifferentBase58Specs{genesis_hash: network_specs.genesis_hash, base58_1: base58prefix, base58_2: network_specs.base58prefix}))}
+                },
+                None => Some(network_specs.base58prefix),
+            };
+            specs_set.push((network_specs_key, network_specs))
         }
     }
     specs_set.sort_by(|a, b| a.1.order.cmp(&b.1.order));
@@ -132,10 +128,8 @@ pub fn try_get_types <T: ErrorSource> (database_name: &str) -> Result<Option<Vec
 /// Function to get types information from the database, returns error if not found
 /// Applicable to both Active side and Signer side
 pub fn get_types <T: ErrorSource> (database_name: &str) -> Result<Vec<TypeEntry>, T::Error> {
-    match try_get_types::<T>(database_name)? {
-        Some(a) => Ok(a),
-        None => Err(<T>::types_not_found()),
-    }
+    try_get_types::<T>(database_name)?
+        .ok_or_else(|| <T>::types_not_found())
 }
 
 /// Function to try and get network specs from the Signer database
@@ -151,10 +145,8 @@ pub fn try_get_network_specs (database_name: &str, network_specs_key: &NetworkSp
 
 /// Function to get network specs from the Signer database, returns error if not found
 pub fn get_network_specs (database_name: &str, network_specs_key: &NetworkSpecsKey) -> Result<NetworkSpecs, ErrorSigner> {
-    match try_get_network_specs(database_name, network_specs_key)? {
-        Some(a) => Ok(a),
-        None => Err(ErrorSigner::NotFound(NotFoundSigner::NetworkSpecs(network_specs_key.to_owned()))),
-    }
+    try_get_network_specs(database_name, network_specs_key)?
+        .ok_or_else(|| ErrorSigner::NotFound(NotFoundSigner::NetworkSpecs(network_specs_key.to_owned())))
 }
 
 /// Function to try and get address details from the Signer database
@@ -170,10 +162,8 @@ pub fn try_get_address_details (database_name: &str, address_key: &AddressKey) -
 
 /// Function to get address details from the Signer database, returns error if not found
 pub fn get_address_details (database_name: &str, address_key: &AddressKey) -> Result<AddressDetails, ErrorSigner> {
-    match try_get_address_details(database_name, address_key)? {
-        Some(a) => Ok(a),
-        None => Err(ErrorSigner::NotFound(NotFoundSigner::AddressDetails(address_key.to_owned()))),
-    }
+    try_get_address_details(database_name, address_key)?
+        .ok_or_else(|| ErrorSigner::NotFound(NotFoundSigner::AddressDetails(address_key.to_owned())))
 }
 
 /// Function to collect MetaValues corresponding to given network name.
@@ -182,7 +172,7 @@ pub fn get_meta_values_by_name <T: ErrorSource> (database_name: &str, network_na
     let database = open_db::<T>(database_name)?;
     let metadata = open_tree::<T>(&database, METATREE)?;
     let mut out: Vec<MetaValues> = Vec::new();
-    let meta_key_prefix = MetaKeyPrefix::from_name(&network_name);
+    let meta_key_prefix = MetaKeyPrefix::from_name(network_name);
     for x in metadata.scan_prefix(meta_key_prefix.prefix()).flatten() {
         let meta_values = MetaValues::from_entry_checked::<T>(x)?;
         if meta_values.name == network_name {out.push(meta_values)}

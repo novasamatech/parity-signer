@@ -447,7 +447,7 @@ impl RecoverSeedPhraseState {
     pub fn new(seed_name: &str) -> Self {
         Self {
             seed_name: seed_name.to_string(),
-            seed_draft: SeedDraft::new(),
+            seed_draft: SeedDraft::initiate(),
         }
     }
     pub fn name(&self) -> String {

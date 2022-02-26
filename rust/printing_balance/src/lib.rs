@@ -15,7 +15,7 @@ const PLUS_MAX: u8 = 4;
 fn assist (a: String, decimals: u8, order: u8) -> (String, Option<String>, i8) {
     let t = decimals-order-MINUS_MIN*3-1;
     let mut out = String::new();
-    for _i in 0..t {out.push_str("0");}
+    for _i in 0..t {out.push('0');}
     out.push_str(&a);
     (String::from("0"), Some(out), MINUS_MIN as i8)
 }
@@ -102,10 +102,8 @@ pub fn convert_balance_pretty (balance: &str, decimals: u8, units: &str) -> Pret
                     }
                     else {assist(balance.to_string(), decimals, order)}
                 }
-                else {
-                    if decimals == 0 {(balance.to_string(), None, 0)}
-                    else {(balance[..2].to_string(), Some(balance[2..].to_string()), 0)}
-                }
+                else if decimals == 0 {(balance.to_string(), None, 0)}
+                else {(balance[..2].to_string(), Some(balance[2..].to_string()), 0)}
             };
             CutNumber {
                 before_point,
@@ -179,7 +177,7 @@ pub fn convert_balance_pretty (balance: &str, decimals: u8, units: &str) -> Pret
     
     let number = match transformed_number.after_point {
         Some(x) => format!("{}.{}", transformed_number.before_point, x),
-        None => format!("{}", transformed_number.before_point),
+        None => transformed_number.before_point.to_string(),
     };
     
     PrettyOutput {

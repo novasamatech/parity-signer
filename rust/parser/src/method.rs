@@ -51,7 +51,7 @@ fn find_method_v12 (pallet_index: u8, method_index: u8, meta: &RuntimeMetadataV1
                     }
                     if let DecodeDifferent::Decoded(docs_found) = &calls[method_index as usize].documentation {
                         for (i, a) in docs_found.iter().enumerate() {
-                            if i>0 {docs.push_str("\n");}
+                            if i>0 {docs.push('\n');}
                             docs.push_str(a);
                         }
                     }
@@ -91,10 +91,10 @@ fn find_method_v12 (pallet_index: u8, method_index: u8, meta: &RuntimeMetadataV1
                     };
                     Ok(out)
                 },
-                None => return Err(ParserError::Decoding(ParserDecodingError::MethodNotFound{method_index, pallet_name: x})),
+                None => Err(ParserError::Decoding(ParserDecodingError::MethodNotFound{method_index, pallet_name: x})),
             }
         },
-        None => return Err(ParserError::Decoding(ParserDecodingError::PalletNotFound(pallet_index))),
+        None => Err(ParserError::Decoding(ParserDecodingError::PalletNotFound(pallet_index))),
     }
 }
 
@@ -122,7 +122,7 @@ fn find_method_v13 (pallet_index: u8, method_index: u8, meta: &RuntimeMetadataV1
                     }
                     if let DecodeDifferent::Decoded(docs_found) = &calls[method_index as usize].documentation {
                         for (i, a) in docs_found.iter().enumerate() {
-                            if i>0 {docs.push_str("\n");}
+                            if i>0 {docs.push('\n');}
                             docs.push_str(a);
                         }
                     }
@@ -157,15 +157,15 @@ fn find_method_v13 (pallet_index: u8, method_index: u8, meta: &RuntimeMetadataV1
                     let out = MethodOld {
                         pallet_name: x,
                         method_name: y,
-                        arguments: arguments,
+                        arguments,
                         docs,
                     };
                     Ok(out)
                 },
-                None => return Err(ParserError::Decoding(ParserDecodingError::MethodNotFound{method_index, pallet_name: x})),
+                None => Err(ParserError::Decoding(ParserDecodingError::MethodNotFound{method_index, pallet_name: x})),
             }
         },
-        None => return Err(ParserError::Decoding(ParserDecodingError::PalletNotFound(pallet_index))),
+        None => Err(ParserError::Decoding(ParserDecodingError::PalletNotFound(pallet_index))),
     }
 }
 

@@ -8,7 +8,7 @@ use crate::cards::ParserCard;
 use crate::decoding_commons::{DecodedOut, OutputCard};
 use crate::decoding_sci::{CallExpectation, decoding_sci_complete};
 
-pub (crate) fn decode_ext_attempt (data: &Vec<u8>, ext: &mut Ext, meta_v14: &RuntimeMetadataV14, indent: u32, short_specs: &ShortSpecs) -> Result<DecodedOut, ParserError> {
+pub (crate) fn decode_ext_attempt (data: &[u8], ext: &mut Ext, meta_v14: &RuntimeMetadataV14, indent: u32, short_specs: &ShortSpecs) -> Result<DecodedOut, ParserError> {
     let mut data = data.to_vec();
     let mut fancy_out: Vec<OutputCard> = Vec::new();
     for x in meta_v14.extrinsic.signed_extensions.iter() {
@@ -112,8 +112,8 @@ pub (crate) enum SpecialExt {
 
 pub (crate) fn special_case_hash (data: Vec<u8>, found_ext: &mut FoundExt, indent: u32, short_specs: &ShortSpecs, hash: &Hash) -> Result<DecodedOut, ParserError> {
     match data.get(0..32) {
-        Some(a) => {
-            match <[u8; 32]>::decode(&mut &a[..]) {
+        Some(mut a) => {
+            match <[u8; 32]>::decode(&mut a) {
                 Ok(x) => {
                     let remaining_vector = data[32..].to_vec();
                     let fancy_out = match hash {
@@ -132,10 +132,10 @@ pub (crate) fn special_case_hash (data: Vec<u8>, found_ext: &mut FoundExt, inden
                         fancy_out,
                     })
                 },
-                Err(_) => return Err(ParserError::Decoding(ParserDecodingError::Array)),
+                Err(_) => Err(ParserError::Decoding(ParserDecodingError::Array)),
             }
         },
-        None => return Err(ParserError::Decoding(ParserDecodingError::DataTooShort)),
+        None => Err(ParserError::Decoding(ParserDecodingError::DataTooShort)),
     }
 }
 
@@ -155,7 +155,7 @@ pub (crate) fn special_case_era (data: Vec<u8>, found_ext: &mut FoundExt, indent
             found_ext.era = Some(a);
             Ok(DecodedOut{remaining_vector, fancy_out: vec![OutputCard{card: ParserCard::Era(a), indent}]})
         },
-        Err(_) => return Err(ParserError::Decoding(ParserDecodingError::Era)),
+        Err(_) => Err(ParserError::Decoding(ParserDecodingError::Era)),
     }
 }
 

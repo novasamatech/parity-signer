@@ -56,11 +56,9 @@ pub fn remove_network (network_specs_key: &NetworkSpecsKey, database_name: &str)
                 events.push(Event::NetworkSpecsRemoved(NetworkSpecsDisplay::get(&x_network_specs, &valid_current_verifier, &general_verifier)));
                 keys_to_wipe.push(x_network_specs_key);
             }
-            else {
-                if x_network_specs.order > network_specs.order {
-                    x_network_specs.order -= 1;
-                    network_specs_batch.insert(x_network_specs_key.key(), x_network_specs.encode());
-                }
+            else if x_network_specs.order > network_specs.order {
+                x_network_specs.order -= 1;
+                network_specs_batch.insert(x_network_specs_key.key(), x_network_specs.encode());
             }
         }
     // scan through metadata tree to mark for removal all networks with target name

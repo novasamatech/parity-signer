@@ -53,9 +53,9 @@ fn default_hot_settings (database_name: &str) -> Result<Batch, ErrorActive> {
 /// metadata empty
 pub fn reset_hot_database (database_name: &str) -> Result<(), ErrorActive> {
     TrDbHot::new()
-        .set_address_book(default_hot_address_book(&database_name)?) // set default address_book
-        .set_metadata(make_batch_clear_tree::<Active>(&database_name, METATREE)?) // clear metadata
-        .set_network_specs_prep(default_hot_network_specs_prep(&database_name)?) // set default network_specs_prep
-        .set_settings(default_hot_settings(&database_name)?) // load default types
-        .apply(&database_name)
+        .set_address_book(default_hot_address_book(database_name)?) // set default address_book
+        .set_metadata(make_batch_clear_tree::<Active>(database_name, METATREE)?) // clear metadata
+        .set_network_specs_prep(default_hot_network_specs_prep(database_name)?) // set default network_specs_prep
+        .set_settings(default_hot_settings(database_name)?) // load default types
+        .apply(database_name)
 }

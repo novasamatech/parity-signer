@@ -29,28 +29,28 @@ pub enum ParserCard {
 impl ParserCard {
     pub fn show_no_docs(&self, indent: u32) -> String {
         match &self {
-            ParserCard::Pallet (pallet_name) => readable(indent, "pallet", &pallet_name),
+            ParserCard::Pallet (pallet_name) => readable(indent, "pallet", pallet_name),
             ParserCard::Method {method_name, docs: _} => readable(indent, "method", method_name),
-            ParserCard::Varname (varname) => readable(indent, "varname", &varname),
-            ParserCard::Default (decoded_string) => readable(indent, "default", &decoded_string),
-            ParserCard::Text (decoded_text) => readable(indent, "text", &decoded_text),
+            ParserCard::Varname (varname) => readable(indent, "varname", varname),
+            ParserCard::Default (decoded_string) => readable(indent, "default", decoded_string),
+            ParserCard::Text (decoded_text) => readable(indent, "text", decoded_text),
             ParserCard::Id {id, base58prefix} => readable(indent, "Id", &id.to_ss58check_with_version(Ss58AddressFormat::Custom(*base58prefix))),
             ParserCard::None => readable(indent, "none", ""),
-            ParserCard::IdentityField (variant) => readable(indent, "identity_field", &variant),
-            ParserCard::BitVec (bv) => readable(indent, "bitvec", &bv),
+            ParserCard::IdentityField (variant) => readable(indent, "identity_field", variant),
+            ParserCard::BitVec (bv) => readable(indent, "bitvec", bv),
             ParserCard::Balance {number, units} => readable(indent, "balance", &format!("{} {}", number, units)),
-            ParserCard::FieldName {name, docs_field_name: _, path_type: _, docs_type: _} => readable(indent, "field_name", &name),
+            ParserCard::FieldName {name, docs_field_name: _, path_type: _, docs_type: _} => readable(indent, "field_name", name),
             ParserCard::FieldNumber {number, docs_field_number: _, path_type: _, docs_type: _} => readable(indent, "field_number", &number.to_string()),
-            ParserCard::EnumVariantName {name, docs_enum_variant: _} => readable(indent, "enum_variant_name", &name),
+            ParserCard::EnumVariantName {name, docs_enum_variant: _} => readable(indent, "enum_variant_name", name),
             ParserCard::Era(era) => match era {
                 Era::Immortal => readable(indent, "era", "Immortal"),
                 Era::Mortal(period, phase)  => readable(indent, "era", &format!("Mortal, phase: {}, period: {}", phase, period)),
             },
-            ParserCard::Nonce (nonce) => readable(indent, "nonce", &nonce),
+            ParserCard::Nonce (nonce) => readable(indent, "nonce", nonce),
             ParserCard::BlockHash (block_hash) => readable(indent, "block_hash", &hex::encode(block_hash)),
             ParserCard::Tip {number, units} => readable(indent, "tip", &format!("{} {}", number, units)),
             ParserCard::NetworkNameVersion {name, version} => readable(indent, "network", &format!("{}{}", name, version)),
-            ParserCard::TxVersion (x) => readable(indent, "tx_version", &x),
+            ParserCard::TxVersion (x) => readable(indent, "tx_version", x),
         }
     }
 }
