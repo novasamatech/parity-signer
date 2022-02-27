@@ -1,13 +1,11 @@
 use std::fs;
-use raptorq;
 use qrcodegen::{QrCode, QrCodeEcc};
-use apng_encoder;
 use constants::{CHUNK_SIZE, BORDER, SCALING, FPS_NOM, FPS_DEN, MAIN_COLOR, BACK_COLOR};
 use qrcode_static::png_qr;
 
 /// function to take data as Vec<u8>, apply raptorq to get Vec<EncodingPacket>
 /// and serialize it to get Vec<u8> output
-fn make_data_packs (input: &Vec<u8>) -> Result<Vec<Vec<u8>>, &'static str> {
+fn make_data_packs (input: &[u8]) -> Result<Vec<Vec<u8>>, &'static str> {
 
 // checking that data is not too long, set limit for now at 2^31 bit
     if input.len() >= 0x80000000 { 
@@ -44,7 +42,7 @@ fn make_data_packs (input: &Vec<u8>) -> Result<Vec<Vec<u8>>, &'static str> {
 fn make_qr_codes (data: Vec<Vec<u8>>) -> Result<Vec<QrCode>, Box<dyn std::error::Error>> {
     let mut out: Vec<QrCode> = Vec::new();
     for x in data.iter() {
-        let new = QrCode::encode_binary(&x, QrCodeEcc::Low)?;
+        let new = QrCode::encode_binary(x, QrCodeEcc::Low)?;
         out.push(new);
     }
     Ok(out)
@@ -99,14 +97,14 @@ fn make_apng (data: Vec<QrCode>, output_name: &str) -> Result<(), Box<dyn std::e
 }
 
 /// Function to transform input Vec<u8> into fountain qr-code
-fn transform_into_qr_apng (input: &Vec<u8>, output_name: &str) -> Result<(), Box<dyn std::error::Error>> {
+fn transform_into_qr_apng (input: &[u8], output_name: &str) -> Result<(), Box<dyn std::error::Error>> {
     let data_packs = make_data_packs(input)?;
     make_apng(make_qr_codes(data_packs)?, output_name)?;
     Ok(())
 }
 
 /// Function to make appropriately sized qr code, apng or static
-pub fn make_pretty_qr (input: &Vec<u8>, output_name: &str) -> Result<(), Box<dyn std::error::Error>> {
+pub fn make_pretty_qr (input: &[u8], output_name: &str) -> Result<(), Box<dyn std::error::Error>> {
     if input.len() <= 2953 {
         let qr = png_qr (input)?;
         match std::fs::write(output_name, &qr) {

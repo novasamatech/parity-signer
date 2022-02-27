@@ -12,7 +12,7 @@ use crate::sign_message::sign_as_address_key;
 /// Also needs database name to fetch saved transaction and key.
 
 pub (crate) fn create_signature (seed_phrase: &str, pwd_entry: &str, user_comment: &str, database_name: &str, checksum: u32) -> Result<MultiSignature, ErrorSigner> {
-    let sign = TrDbColdSign::from_storage(&database_name, checksum)?;
+    let sign = TrDbColdSign::from_storage(database_name, checksum)?;
     let pwd = {
         if sign.has_pwd() {Some(pwd_entry)}
         else {None}
@@ -32,16 +32,16 @@ pub (crate) fn create_signature (seed_phrase: &str, pwd_entry: &str, user_commen
     match sign_as_address_key(&content_vec, &sign.multisigner(), &full_address, pwd) {
         Ok(s) => {
             full_address.zeroize();
-            sign.apply(false, user_comment, &database_name)?;
+            sign.apply(false, user_comment, database_name)?;
             Ok(s.get_multi_signature())
         },
         Err(e) => {
             full_address.zeroize();
             if let ErrorSigner::WrongPassword = e {
-                let checksum = sign.apply(true, user_comment, &database_name)?;
-                return Err(ErrorSigner::WrongPasswordNewChecksum(checksum))
+                let checksum = sign.apply(true, user_comment, database_name)?;
+                Err(ErrorSigner::WrongPasswordNewChecksum(checksum))
             }
-            else {return Err(e)}
+            else {Err(e)}
         },
     }
 }

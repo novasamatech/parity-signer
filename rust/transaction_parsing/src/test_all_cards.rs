@@ -101,10 +101,10 @@ Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deseru
     let mut output_cards = String::from("\"method\":[");
     
     for (i,x) in all_cards.iter().enumerate() {
-        if i > 0 {output_cards.push_str(",")}
-        output_cards.push_str(&x);
+        if i > 0 {output_cards.push(',')}
+        output_cards.push_str(x);
     }
     
-    output_cards.push_str("]");
+    output_cards.push(']');
     Action::Read(output_cards)
 }

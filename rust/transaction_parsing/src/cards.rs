@@ -2,10 +2,9 @@ use hex;
 use sp_core::crypto::{Ss58Codec, Ss58AddressFormat};
 use sp_runtime::{generic::Era, MultiSigner};
 
-use constants::HALFSIZE;
 use definitions::{crypto::Encryption, error::{ErrorSigner, ErrorSource, Signer}, helpers::make_identicon_from_multisigner, history::MetaValuesDisplay, keyring::{print_multisigner_as_base58, VerifierKey}, network_specs::{NetworkSpecs, NetworkSpecsToSend, VerifierValue}, print::{export_complex_single, export_plain_vector}, qr_transfers::ContentLoadTypes, users::AddressDetails};
 use parser::cards::ParserCard;
-use plot_icon::png_data_from_vec;
+use plot_icon::generate_png_scaled_default;
 
 use crate::holds::{GeneralHold, Hold};
 
@@ -63,7 +62,7 @@ impl <'a> Warning <'a> {
 
 fn fancy (index: &mut u32, indent: u32, card_type: &str, decoded_string: &str) -> String {
     let out = format!("{{\"index\":{},\"indent\":{},\"type\":\"{}\",\"payload\":{}}}", index, indent, card_type, decoded_string);
-    *index = *index+1;
+    *index += 1;
     out
 }
 
@@ -76,13 +75,7 @@ impl <'a> Card <'a> {
                 ParserCard::Varname (varname) => fancy(index, indent, "varname", &format!("\"{}\"", varname)),
                 ParserCard::Default (decoded_string) => fancy(index, indent, "default", &format!("\"{}\"", decoded_string)),
                 ParserCard::Text (decoded_text) => fancy(index, indent, "text", &format!("\"{}\"", hex::encode(decoded_text.as_bytes()))),
-                ParserCard::Id {id, base58prefix} => {
-                    let hex_identicon = match png_data_from_vec(&<[u8;32]>::from(id.to_owned()).to_vec(), HALFSIZE) {
-                        Ok(a) => hex::encode(a),
-                        Err(_) => "".to_string(),
-                    };
-                    fancy(index, indent, "Id", &format!("{{\"base58\":\"{}\",\"identicon\":\"{}\"}}", id.to_ss58check_with_version(Ss58AddressFormat::Custom(*base58prefix)), hex_identicon))
-                },
+                ParserCard::Id {id, base58prefix} => fancy(index, indent, "Id", &format!("{{\"base58\":\"{}\",\"identicon\":\"{}\"}}", id.to_ss58check_with_version(Ss58AddressFormat::Custom(*base58prefix)), hex::encode(generate_png_scaled_default(&<[u8;32]>::from(id.to_owned()))))),
                 ParserCard::None => fancy(index, indent, "none", "\"\""),
                 ParserCard::IdentityField (variant) => fancy(index, indent, "identity_field", &format!("\"{}\"", variant)),
                 ParserCard::BitVec (bv) => fancy(index, indent, "bitvec", &format!("\"{}\"", bv)),
@@ -101,18 +94,9 @@ impl <'a> Card <'a> {
                 ParserCard::TxVersion (x) => fancy(index, indent, "tx_version", &format!("\"{}\"", x)),
             },
             Card::Author {author, base58prefix, address_details} => fancy(index, indent, "author", &format!("{{{}}}", make_author_info(author, *base58prefix, address_details))),
-            Card::AuthorPlain {author, base58prefix} => {
-                let hex_identicon = match make_identicon_from_multisigner(author) {
-                    Ok(a) => hex::encode(a),
-                    Err(_) => "".to_string(),
-                };
-                fancy(index, indent, "author_plain", &format!("{{\"base58\":\"{}\",\"identicon\":\"{}\"}}", print_multisigner_as_base58(&author, Some(*base58prefix)), hex_identicon))
-            },
+            Card::AuthorPlain {author, base58prefix} => fancy(index, indent, "author_plain", &format!("{{\"base58\":\"{}\",\"identicon\":\"{}\"}}", print_multisigner_as_base58(author, Some(*base58prefix)), hex::encode(make_identicon_from_multisigner(author)))),
             Card::AuthorPublicKey(author) => {
-                let hex_identicon = match make_identicon_from_multisigner(author) {
-                    Ok(a) => hex::encode(a),
-                    Err(_) => "".to_string(),
-                };
+                let hex_identicon = hex::encode(make_identicon_from_multisigner(author));
                 let insert = match author {
                     MultiSigner::Ed25519(p) => format!("{{\"public_key\":\"{}\",\"identicon\":\"{}\",\"encryption\":\"{}\"}}", hex::encode(p.to_vec()), hex_identicon, Encryption::Ed25519.show()),
                     MultiSigner::Sr25519(p) => format!("{{\"public_key\":\"{}\",\"identicon\":\"{}\",\"encryption\":\"{}\"}}", hex::encode(p.to_vec()), hex_identicon, Encryption::Sr25519.show()),
@@ -128,16 +112,12 @@ impl <'a> Card <'a> {
             Card::NetworkGenesisHash(x) => fancy(index, indent, "network_genesis_hash", &format!("\"{}\"", hex::encode(x))),
             Card::Derivations(x) => fancy(index, indent, "derivations", &export_plain_vector(x)),
             Card::Warning (warn) => fancy(index, indent, "warning", &format!("\"{}\"", warn.show())),
-            Card::Error (err) => fancy(index, indent, "error", &format!("\"{}\"", <Signer>::show(&err))),
+            Card::Error (err) => fancy(index, indent, "error", &format!("\"{}\"", <Signer>::show(err))),
         }
     }
 }
 
 
 pub (crate) fn make_author_info (author: &MultiSigner, base58prefix: u16, address_details: &AddressDetails) -> String {
-    let hex_identicon = match make_identicon_from_multisigner(author) {
-        Ok(a) => hex::encode(a),
-        Err(_) => "".to_string(),
-    };
-    format!("\"base58\":\"{}\",\"identicon\":\"{}\",\"seed\":\"{}\",\"derivation_path\":\"{}\",\"has_pwd\":{}", print_multisigner_as_base58(&author, Some(base58prefix)), hex_identicon, address_details.seed_name, address_details.path, address_details.has_pwd)
+    format!("\"base58\":\"{}\",\"identicon\":\"{}\",\"seed\":\"{}\",\"derivation_path\":\"{}\",\"has_pwd\":{}", print_multisigner_as_base58(author, Some(base58prefix)), hex::encode(make_identicon_from_multisigner(author)), address_details.seed_name, address_details.path, address_details.has_pwd)
 }

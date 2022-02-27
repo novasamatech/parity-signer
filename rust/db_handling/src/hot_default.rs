@@ -30,7 +30,7 @@ fn default_hot_address_book (database_name: &str) -> Result<Batch, ErrorActive> 
 fn default_hot_network_specs_prep (database_name: &str) -> Result<Batch, ErrorActive> {
     let mut batch = make_batch_clear_tree::<Active>(database_name, SPECSTREEPREP)?;
     for x in get_default_chainspecs_to_send().iter() {
-        let network_specs_key = NetworkSpecsKey::from_parts(&x.genesis_hash.to_vec(), &x.encryption);
+        let network_specs_key = NetworkSpecsKey::from_parts(&x.genesis_hash, &x.encryption);
         batch.insert(network_specs_key.key(), x.encode());
     }
     Ok(batch)
@@ -43,7 +43,7 @@ fn default_hot_network_specs_prep (database_name: &str) -> Result<Batch, ErrorAc
 fn default_hot_settings (database_name: &str) -> Result<Batch, ErrorActive> {
     let mut batch = make_batch_clear_tree::<Active>(database_name, SETTREE)?;
     let types_prep = get_default_types_content()?;
-    batch.insert(TYPES.to_vec(), types_prep.store());
+    batch.insert(TYPES, types_prep.store());
     Ok(batch)
 }
 

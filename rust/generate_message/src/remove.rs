@@ -23,7 +23,7 @@ pub fn remove_info (info: Remove) -> Result<(), ErrorActive> {
                 let database = open_db::<Active>(HOT_DB_NAME)?;
                 let metadata = open_tree::<Active>(&database, METATREE)?;
                 let meta_key_prefix = MetaKeyPrefix::from_name(&address_book_entry.name);
-                for x in metadata.scan_prefix(meta_key_prefix.prefix()) {if let Ok((a, _)) = x {meta_to_del.push(MetaKey::from_ivec(&a))}}
+                for (x, _) in metadata.scan_prefix(meta_key_prefix.prefix()).flatten() {meta_to_del.push(MetaKey::from_ivec(&x))}
             }
             for x in meta_to_del.iter() {metadata_batch.remove(x.key())}
             TrDbHot::new()

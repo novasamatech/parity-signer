@@ -385,7 +385,7 @@ pub fn all_events_preview() -> Vec<Event> {
     events.push(Event::NetworkSpecsAdded(NetworkSpecsDisplay::get(&network_specs, &valid_current_verifier, &verifier)));
     events.push(Event::NetworkSpecsRemoved(NetworkSpecsDisplay::get(&network_specs, &valid_current_verifier, &verifier)));
     events.push(Event::NetworkSpecsSigned(NetworkSpecsExport::get(&network_specs.to_send(), &verifier_value)));
-    events.push(Event::NetworkVerifierSet(NetworkVerifierDisplay::get(&VerifierKey::from_parts(&network_specs.genesis_hash.to_vec()), &valid_current_verifier, &verifier)));
+    events.push(Event::NetworkVerifierSet(NetworkVerifierDisplay::get(&VerifierKey::from_parts(&network_specs.genesis_hash), &valid_current_verifier, &verifier)));
     events.push(Event::GeneralVerifierSet(verifier.to_owned()));
     events.push(Event::TypesAdded(TypesDisplay::get(&ContentLoadTypes::from_vec(&Vec::new()), &verifier)));
     events.push(Event::TypesRemoved(TypesDisplay::get(&ContentLoadTypes::from_vec(&Vec::new()), &verifier)));
@@ -394,8 +394,8 @@ pub fn all_events_preview() -> Vec<Event> {
     events.push(Event::TransactionSignError(SignDisplay::get(&Vec::new(), "westend", &verifier_value, "send to Alice")));
     events.push(Event::MessageSigned(SignMessageDisplay::get("This is Alice\nRoger", "westend", &verifier_value, "send to Alice")));
     events.push(Event::MessageSignError(SignMessageDisplay::get("This is Alice\nRoger", "westend", &verifier_value, "send to Alice")));
-    events.push(Event::IdentityAdded(IdentityHistory::get("Alice", &Encryption::Sr25519, &public.to_vec(), "//", &network_specs.genesis_hash.to_vec())));
-    events.push(Event::IdentityRemoved(IdentityHistory::get("Alice", &Encryption::Sr25519, &public.to_vec(), "//", &network_specs.genesis_hash.to_vec())));
+    events.push(Event::IdentityAdded(IdentityHistory::get("Alice", &Encryption::Sr25519, &public, "//", &network_specs.genesis_hash)));
+    events.push(Event::IdentityRemoved(IdentityHistory::get("Alice", &Encryption::Sr25519, &public, "//", &network_specs.genesis_hash)));
     events.push(Event::IdentitiesWiped);
     events.push(Event::DeviceWasOnline);
     events.push(Event::ResetDangerRecord);

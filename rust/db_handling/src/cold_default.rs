@@ -40,7 +40,7 @@ fn default_cold_metadata (database_name: &str, purpose: Purpose) -> Result<Batch
     };
     for x in metadata_set.iter() {
         let meta_key = MetaKey::from_parts(&x.name, x.version);
-        batch.insert(meta_key.key(), x.meta.to_vec());
+        batch.insert(meta_key.key(), &x.meta[..]);
     }
     Ok(batch)
 }
@@ -52,7 +52,7 @@ fn default_cold_metadata (database_name: &str, purpose: Purpose) -> Result<Batch
 fn default_cold_network_specs (database_name: &str) -> Result<Batch, ErrorActive> {
     let mut batch = make_batch_clear_tree::<Active>(database_name, SPECSTREE)?;
     for x in get_default_chainspecs().iter() {
-        let network_specs_key = NetworkSpecsKey::from_parts(&x.genesis_hash.to_vec(), &x.encryption);
+        let network_specs_key = NetworkSpecsKey::from_parts(&x.genesis_hash, &x.encryption);
         batch.insert(network_specs_key.key(), x.encode());
     }
     Ok(batch)
@@ -67,9 +67,9 @@ fn default_cold_network_specs (database_name: &str) -> Result<Batch, ErrorActive
 fn default_cold_settings (database_name: &str, general_verifier: Verifier) -> Result<Batch, ErrorActive> {
     let mut batch = make_batch_clear_tree::<Active>(database_name, SETTREE)?;
     let types_prep = get_default_types_content()?;
-    batch.insert(TYPES.to_vec(), types_prep.store());
-    batch.insert(GENERALVERIFIER.to_vec(), general_verifier.encode());
-    batch.insert(DANGER.to_vec(), DangerRecord::safe().store());
+    batch.insert(TYPES, types_prep.store());
+    batch.insert(GENERALVERIFIER, general_verifier.encode());
+    batch.insert(DANGER, DangerRecord::safe().store());
     Ok(batch)
 }
 
@@ -80,8 +80,8 @@ fn default_cold_settings (database_name: &str, general_verifier: Verifier) -> Re
 fn default_cold_settings_init_later (database_name: &str) -> Result<Batch, ErrorActive> {
     let mut batch = make_batch_clear_tree::<Active>(database_name, SETTREE)?;
     let types_prep = get_default_types_content()?;
-    batch.insert(TYPES.to_vec(), types_prep.store());
-    batch.insert(DANGER.to_vec(), DangerRecord::safe().store());
+    batch.insert(TYPES, types_prep.store());
+    batch.insert(DANGER, DangerRecord::safe().store());
     Ok(batch)
 }
 
@@ -101,7 +101,7 @@ fn default_cold_verifiers (database_name: &str) -> Result<Batch, ErrorActive> {
 /// Function is applicable only to Signer side.
 fn init_general_verifier (general_verifier: &Verifier) -> Batch {
     let mut batch = Batch::default();
-    batch.insert(GENERALVERIFIER.to_vec(), general_verifier.encode());
+    batch.insert(GENERALVERIFIER, general_verifier.encode());
     batch
 }
 

@@ -55,7 +55,7 @@ pub enum StubNav {
 fn handle_scanner_input (payload: &str, dbname: &str) -> Result<Action, ErrorSigner> {
 
     let data_hex = {
-        if payload.starts_with("0x") {&payload[2..]}
+        if let Some(a) = payload.strip_prefix("0x") {a}
         else {&payload}
     };
     
@@ -71,7 +71,7 @@ fn handle_scanner_input (payload: &str, dbname: &str) -> Result<Action, ErrorSig
         "c1" => add_specs(data_hex, dbname),
         "de" => process_derivations(data_hex, dbname),
         "f0" => Ok(make_all_cards()),
-        _ => return Err(ErrorSigner::Input(InputSigner::PayloadNotSupported(data_hex[4..6].to_string()))),
+        _ => Err(ErrorSigner::Input(InputSigner::PayloadNotSupported(data_hex[4..6].to_string()))),
     }
 }
 

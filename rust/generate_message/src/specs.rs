@@ -17,16 +17,14 @@ pub fn gen_add_specs (instruction: Instruction) -> Result<(), ErrorActive> {
         Set::F => {
             match instruction.content {
                 Content::All => {
-                    if let Some(_) = instruction.over.encryption {return Err(ErrorActive::NotSupported)}
-                    if let Some(_) = instruction.over.token {return Err(ErrorActive::NotSupported)}
+                    if instruction.over.encryption.is_some() {return Err(ErrorActive::NotSupported)}
+                    if instruction.over.token.is_some() {return Err(ErrorActive::NotSupported)}
                     let mut address_book_set: Vec<(IVec, IVec)> = Vec::new();
                     {
                         let database = open_db::<Active>(HOT_DB_NAME)?;
                         let address_book = open_tree::<Active>(&database, ADDRESS_BOOK)?;
-                        if address_book.len() == 0 {return Err(ErrorActive::Database(DatabaseActive::AddressBookEmpty))}
-                        for x in address_book.iter() {
-                            if let Ok(a) = x {address_book_set.push(a)}
-                        }
+                        if address_book.is_empty() {return Err(ErrorActive::Database(DatabaseActive::AddressBookEmpty))}
+                        for x in address_book.iter().flatten() {address_book_set.push(x)}
                     }
                     for address_book_entry_encoded in address_book_set.into_iter() {
                         match specs_f_a_element(address_book_entry_encoded) {
@@ -37,51 +35,51 @@ pub fn gen_add_specs (instruction: Instruction) -> Result<(), ErrorActive> {
                     Ok(())
                 },
                 Content::Name(name) => {
-                    if let Some(_) = instruction.over.token {return Err(ErrorActive::NotSupported)}
+                    if instruction.over.token.is_some() {return Err(ErrorActive::NotSupported)}
                     specs_f_n(&name, instruction.over.encryption)
                 },
                 Content::Address(address) => {
-                    if let Some(_) = instruction.over.token {return Err(ErrorActive::NotSupported)}
+                    if instruction.over.token.is_some() {return Err(ErrorActive::NotSupported)}
                     specs_f_u(&address, instruction.over.encryption)
                 },
             }
         },
         Set::D => {
             match instruction.content {
-                Content::All => return Err(ErrorActive::NotSupported),
-                Content::Name(_) => return Err(ErrorActive::NotSupported),
+                Content::All => Err(ErrorActive::NotSupported),
+                Content::Name(_) => Err(ErrorActive::NotSupported),
                 Content::Address(address) => {
                     if let Some(encryption) = instruction.over.encryption {specs_d_u(&address, encryption, instruction.over.token)}
-                    else {return Err(ErrorActive::NotSupported)}
+                    else {Err(ErrorActive::NotSupported)}
                 },
             }
         },
-        Set::K => return Err(ErrorActive::NotSupported),
+        Set::K => Err(ErrorActive::NotSupported),
         Set::P => {
             match instruction.content {
-                Content::All => return Err(ErrorActive::NotSupported),
+                Content::All => Err(ErrorActive::NotSupported),
                 Content::Name(name) => {
-                    if let Some(_) = instruction.over.token {return Err(ErrorActive::NotSupported)}
+                    if instruction.over.token.is_some() {return Err(ErrorActive::NotSupported)}
                     if let Some(encryption) = instruction.over.encryption {specs_pt_n(&name, encryption, false)}
-                    else {return Err(ErrorActive::NotSupported)}
+                    else {Err(ErrorActive::NotSupported)}
                 },
                 Content::Address(address) => {
                     if let Some(encryption) = instruction.over.encryption {specs_pt_u(&address, encryption, instruction.over.token, false)}
-                    else {return Err(ErrorActive::NotSupported)}
+                    else {Err(ErrorActive::NotSupported)}
                 },
             }
         },
         Set::T => {
             match instruction.content {
-                Content::All => return Err(ErrorActive::NotSupported),
+                Content::All => Err(ErrorActive::NotSupported),
                 Content::Name(name) => {
-                    if let Some(_) = instruction.over.token {return Err(ErrorActive::NotSupported)}
+                    if instruction.over.token.is_some() {return Err(ErrorActive::NotSupported)}
                     if let Some(encryption) = instruction.over.encryption {specs_pt_n(&name, encryption, true)}
-                    else {return Err(ErrorActive::NotSupported)}
+                    else {Err(ErrorActive::NotSupported)}
                 },
                 Content::Address(address) => {
                     if let Some(encryption) = instruction.over.encryption {specs_pt_u(&address, encryption, instruction.over.token, true)}
-                    else {return Err(ErrorActive::NotSupported)}
+                    else {Err(ErrorActive::NotSupported)}
                 },
             }
         }
@@ -127,7 +125,7 @@ fn specs_f_n (title: &str, encryption_override: Option<Encryption>) -> Result<()
 /// print into `sign_me` output file.
 fn specs_f_u(address: &str, encryption_override: Option<Encryption>) -> Result<(), ErrorActive> {
     let entries = filter_address_book_by_url(address)?;
-    if entries.len() == 0 {return Err(ErrorActive::NotFound(NotFoundActive::AddressBookEntryWithUrl{url: address.to_string()}))}
+    if entries.is_empty() {return Err(ErrorActive::NotFound(NotFoundActive::AddressBookEntryWithUrl{url: address.to_string()}))}
     match encryption_override {
         Some(encryption) => {
             let network_specs = process_indices(&entries, encryption)?.0;
@@ -135,7 +133,7 @@ fn specs_f_u(address: &str, encryption_override: Option<Encryption>) -> Result<(
         },
         None => {
             for x in entries.iter() {
-                let network_specs_key = NetworkSpecsKey::from_parts(&x.genesis_hash.to_vec(), &x.encryption);
+                let network_specs_key = NetworkSpecsKey::from_parts(&x.genesis_hash, &x.encryption);
                 let network_specs = get_network_specs_to_send(&network_specs_key)?;
                 print_specs(&network_specs)?;
             }
@@ -171,18 +169,18 @@ fn specs_d_u(address: &str, encryption: Encryption, optional_token_override: Opt
 /// and print `sign_me` file according to the key;
 fn specs_pt_n(title: &str, encryption: Encryption, printing: bool) -> Result<(), ErrorActive> {
     let address_book_entry = get_address_book_entry(title)?;
-    let network_specs_key_existing = NetworkSpecsKey::from_parts(&address_book_entry.genesis_hash.to_vec(), &address_book_entry.encryption);
+    let network_specs_key_existing = NetworkSpecsKey::from_parts(&address_book_entry.genesis_hash, &address_book_entry.encryption);
     let network_specs_existing = get_network_specs_to_send(&network_specs_key_existing)?;
     if address_book_entry.encryption == encryption {
         if printing {print_specs(&network_specs_existing)}
-        else {return Err(ErrorActive::Fetch(Fetch::SpecsInDb{name: address_book_entry.name.to_string(), encryption}))}
+        else {Err(ErrorActive::Fetch(Fetch::SpecsInDb{name: address_book_entry.name, encryption}))}
     }
     else {
-        let network_specs_key_possible = NetworkSpecsKey::from_parts(&address_book_entry.genesis_hash.to_vec(), &encryption);
+        let network_specs_key_possible = NetworkSpecsKey::from_parts(&address_book_entry.genesis_hash, &encryption);
         match try_get_network_specs_to_send(&network_specs_key_possible)? {
             Some(network_specs_found) => {
                 if printing {print_specs(&network_specs_found)}
-                else {return Err(ErrorActive::Fetch(Fetch::SpecsInDb{name: address_book_entry.name.to_string(), encryption}))}
+                else {Err(ErrorActive::Fetch(Fetch::SpecsInDb{name: address_book_entry.name, encryption}))}
             },
             None => {
                 // this encryption is not on record
@@ -208,10 +206,8 @@ fn specs_pt_u(address: &str, encryption: Encryption, optional_token_override: Op
         update_db (address, &shortcut.specs)?;
         if printing {print_specs(&shortcut.specs)?}
     }
-    else {
-        if printing {print_specs(&shortcut.specs)?}
-        else {return Err(ErrorActive::Fetch(Fetch::SpecsInDb{name: shortcut.meta_values.name.to_string(), encryption}))}
-    }
+    else if printing {print_specs(&shortcut.specs)?}
+    else {return Err(ErrorActive::Fetch(Fetch::SpecsInDb{name: shortcut.meta_values.name, encryption}))}
     Ok(())
 }
 

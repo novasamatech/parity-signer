@@ -18,8 +18,8 @@ use crate::output_prep::load_meta_print;
 
 pub fn gen_load_meta (instruction: Instruction) -> Result<(), ErrorActive> {
     
-    if let Some(_) = instruction.over.encryption {return Err(ErrorActive::NotSupported)}
-    if let Some(_) = instruction.over.token {return Err(ErrorActive::NotSupported)}
+    if instruction.over.encryption.is_some() {return Err(ErrorActive::NotSupported)}
+    if instruction.over.token.is_some() {return Err(ErrorActive::NotSupported)}
     match instruction.set {
         Set::F => {
             match instruction.content {
@@ -34,7 +34,7 @@ pub fn gen_load_meta (instruction: Instruction) -> Result<(), ErrorActive> {
                     Ok(())
                 },
                 Content::Name(name) => meta_f_n(&name),
-                Content::Address(_) => return Err(ErrorActive::NotSupported),
+                Content::Address(_) => Err(ErrorActive::NotSupported),
             }
         },
         Set::D => {
@@ -58,7 +58,7 @@ pub fn gen_load_meta (instruction: Instruction) -> Result<(), ErrorActive> {
             match instruction.content {
                 Content::All => meta_kpt_a(&write, instruction.pass_errors),
                 Content::Name(name) => meta_kpt_n(&name, &write),
-                Content::Address(_) => return Err(ErrorActive::NotSupported),
+                Content::Address(_) => Err(ErrorActive::NotSupported),
             }
         },
         Set::P => {
@@ -66,7 +66,7 @@ pub fn gen_load_meta (instruction: Instruction) -> Result<(), ErrorActive> {
             match instruction.content {
                 Content::All => meta_kpt_a(&write, instruction.pass_errors),
                 Content::Name(name) => meta_kpt_n(&name, &write),
-                Content::Address(_) => return Err(ErrorActive::NotSupported),
+                Content::Address(_) => Err(ErrorActive::NotSupported),
             }
         },
         Set::T => {
@@ -74,7 +74,7 @@ pub fn gen_load_meta (instruction: Instruction) -> Result<(), ErrorActive> {
             match instruction.content {
                 Content::All => meta_kpt_a(&write, instruction.pass_errors),
                 Content::Name(name) => meta_kpt_n(&name, &write),
-                Content::Address(_) => return Err(ErrorActive::NotSupported),
+                Content::Address(_) => Err(ErrorActive::NotSupported),
             }
         },
     }
@@ -90,21 +90,19 @@ fn meta_f_a_element (set_element: &AddressSpecs) -> Result<(), ErrorActive> {
     let meta_key_prefix = MetaKeyPrefix::from_name(&set_element.name);
     let database = open_db::<Active>(HOT_DB_NAME)?;
     let metadata = open_tree::<Active>(&database, METATREE)?;
-    for x in metadata.scan_prefix(meta_key_prefix.prefix()) {
-        if let Ok(a) = x {
-            let meta_values = MetaValues::from_entry_checked::<Active>(a)?;
-            if meta_values.warn_incomplete_extensions {warn(&meta_values.name, meta_values.version);}
-            if let Some(prefix_from_meta) = meta_values.optional_base58prefix {
-                if prefix_from_meta != set_element.base58prefix {
-                    return Err(<Active>::faulty_metadata(MetadataError::Base58PrefixSpecsMismatch{specs: set_element.base58prefix, meta: prefix_from_meta}, MetadataSource::Database{name: meta_values.name.to_string(), version: meta_values.version}))
-                }
+    for x in metadata.scan_prefix(meta_key_prefix.prefix()).flatten() {
+        let meta_values = MetaValues::from_entry_checked::<Active>(x)?;
+        if meta_values.warn_incomplete_extensions {warn(&meta_values.name, meta_values.version);}
+        if let Some(prefix_from_meta) = meta_values.optional_base58prefix {
+            if prefix_from_meta != set_element.base58prefix {
+                return Err(<Active>::faulty_metadata(MetadataError::Base58PrefixSpecsMismatch{specs: set_element.base58prefix, meta: prefix_from_meta}, MetadataSource::Database{name: meta_values.name.to_string(), version: meta_values.version}))
             }
-            let shortcut = MetaShortCut {
-                meta_values,
-                genesis_hash: set_element.genesis_hash,
-            };
-            load_meta_print(&shortcut)?;
         }
+        let shortcut = MetaShortCut {
+            meta_values,
+            genesis_hash: set_element.genesis_hash,
+        };
+        load_meta_print(&shortcut)?;
     }
     Ok(())
 }
@@ -148,7 +146,7 @@ fn meta_d_n (name: &str) -> Result<(), ErrorActive> {
 /// fetch information from address, check it,
 /// and print into `sign_me` output file.
 fn meta_d_u (address: &str) -> Result<(), ErrorActive> {
-    if let Ok(a) = filter_address_book_by_url(address) {if a.len() != 0 {println!("Database contains entries for {} at {}. With `-d` setting key the fetched metadata integrity with existing database entries is not checked.", a[0].name, address)}}
+    if let Ok(a) = filter_address_book_by_url(address) {if !a.is_empty() {println!("Database contains entries for {} at {}. With `-d` setting key the fetched metadata integrity with existing database entries is not checked.", a[0].name, address)}}
     let shortcut = meta_shortcut(address)?;
     if shortcut.meta_values.warn_incomplete_extensions {warn(&shortcut.meta_values.name, shortcut.meta_values.version);}
     load_meta_print(&shortcut)
@@ -226,14 +224,12 @@ fn get_address_book_set () -> Result<Vec<AddressSpecs>, ErrorActive> {
     {
         let database = open_db::<Active>(HOT_DB_NAME)?;
         let address_book = open_tree::<Active>(&database, ADDRESS_BOOK)?;
-        for x in address_book.iter() {
-            if let Ok(a) = x {
-                let address_book_entry = AddressBookEntry::from_entry(a)?;
-                set.push(address_book_entry);
-            }
+        for x in address_book.iter().flatten() {
+            let address_book_entry = AddressBookEntry::from_entry(x)?;
+            set.push(address_book_entry);
         }
     }
-    if set.len() == 0 {return Err(ErrorActive::Database(DatabaseActive::AddressBookEmpty))}
+    if set.is_empty() {return Err(ErrorActive::Database(DatabaseActive::AddressBookEmpty))}
     let mut out: Vec<AddressSpecs> = Vec::new();
     for x in set.iter() {
         let specs = network_specs_from_entry(x)?;
@@ -269,7 +265,7 @@ fn search_name (name: &str) -> Result<AddressSpecs, ErrorActive> {
     }
     match found {
         Some(a) => Ok(a),
-        None => return Err(ErrorActive::NotFound(NotFoundActive::AddressBookEntryWithName{name: name.to_string()})),
+        None => Err(ErrorActive::NotFound(NotFoundActive::AddressBookEntryWithName{name: name.to_string()})),
     }
 }
 
@@ -279,7 +275,7 @@ fn search_name (name: &str) -> Result<AddressSpecs, ErrorActive> {
 /// output MetaShortCut value
 fn shortcut_set_element (set_element: &AddressSpecs) -> Result<MetaShortCut, ErrorActive> {
     let shortcut = meta_shortcut(&set_element.address)?;
-    if shortcut.meta_values.name != set_element.name {return Err(ErrorActive::Fetch(Fetch::ValuesChanged{url: set_element.address.to_string(), what: Changed::Name{old: set_element.name.to_string(), new: shortcut.meta_values.name.to_string()}}))}
+    if shortcut.meta_values.name != set_element.name {return Err(ErrorActive::Fetch(Fetch::ValuesChanged{url: set_element.address.to_string(), what: Changed::Name{old: set_element.name.to_string(), new: shortcut.meta_values.name}}))}
     if shortcut.genesis_hash != set_element.genesis_hash {return Err(ErrorActive::Fetch(Fetch::ValuesChanged{url: set_element.address.to_string(), what: Changed::GenesisHash{old: set_element.genesis_hash, new: shortcut.genesis_hash}}))}
     if let Some(prefix_from_meta) = shortcut.meta_values.optional_base58prefix {
         if prefix_from_meta != set_element.base58prefix {

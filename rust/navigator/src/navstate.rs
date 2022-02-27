@@ -10,8 +10,6 @@ use crate::alerts::Alert;
 
 use db_handling::interface_signer::{BIP_CAP, print_guess, SAFE_RESERVE, WORD_LENGTH};
 use definitions::{error::{AddressGeneration, AddressGenerationCommon, AddressKeySource, ErrorSigner, ErrorSource, ExtraAddressKeySourceSigner, InputSigner, InterfaceSigner, Signer}, keyring::{AddressKey, NetworkSpecsKey}, users::AddressDetails};
-use transaction_parsing;
-use transaction_signing;
 
 ///State of the app as remembered by backend
 #[derive(Debug, Clone)]
@@ -40,6 +38,12 @@ impl Navstate {
     }
 }
 
+impl Default for Navstate {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl State {
     ///Decide what to do and do it!
     pub fn perform(&mut self, action: Action, details_str: &str, secret_seed_phrase: &str) -> String {
@@ -55,7 +59,7 @@ impl State {
                     println!("Seednames: {:?}, total: {}", seed_names, seed_names.len());
                     match db_handling::interface_signer::purge_transactions(dbname) {
                         Ok(()) => {
-                            if seed_names.len() == 0 {
+                            if seed_names.is_empty() {
                                  new_navstate = self.correct_seed_selector();
                             } 
                             else {
@@ -203,8 +207,8 @@ impl State {
                                 Modal::Empty => new_navstate.modal = Modal::NewSeedBackup(details_str.to_string()),
                                 Modal::NewSeedBackup(ref seed_name) => {
                                     match details_str.parse::<bool> () {
-                                        Ok(roots) => match db_handling::identities::try_create_seed(&seed_name, secret_seed_phrase, roots, dbname) {
-                                            Ok(()) => match KeysState::new(&seed_name, dbname) {
+                                        Ok(roots) => match db_handling::identities::try_create_seed(seed_name, secret_seed_phrase, roots, dbname) {
+                                            Ok(()) => match KeysState::new(seed_name, dbname) {
                                                 Ok(a) => {new_navstate = Navstate::clean_screen(Screen::Keys(a))},
                                                 Err(e) => {
                                                     new_navstate.alert = Alert::Error;
@@ -228,7 +232,7 @@ impl State {
                         Screen::RecoverSeedName(_) => {
                             match db_handling::identities::get_addresses_by_seed_name(dbname, details_str) {
                                 Ok(a) => {
-                                    if a.len() == 0 {new_navstate = Navstate::clean_screen(Screen::RecoverSeedPhrase(RecoverSeedPhraseState::new(&details_str)))}
+                                    if a.is_empty() {new_navstate = Navstate::clean_screen(Screen::RecoverSeedPhrase(RecoverSeedPhraseState::new(details_str)))}
                                     else {
                                         new_navstate.alert = Alert::Error;
                                         errorline.push_str(&<Signer>::show(&ErrorSigner::Input(InputSigner::SeedNameExists(details_str.to_string()))));
@@ -268,7 +272,7 @@ impl State {
                                 Ok(()) => {new_navstate = Navstate::clean_screen(Screen::Keys(KeysState::new_in_network(&derive_state.seed_name(), &derive_state.network_specs_key())))},
                                 Err(e) => {
                                     if let ErrorSigner::AddressGeneration(AddressGeneration::Common(AddressGenerationCommon::DerivationExists(ref multisigner, ref address_details, _))) = e {
-                                        new_navstate.screen = Screen::DeriveKey(derive_state.collided_with(&multisigner, &address_details));
+                                        new_navstate.screen = Screen::DeriveKey(derive_state.collided_with(multisigner, address_details));
                                         new_navstate.alert = Alert::Error;
                                         errorline.push_str(&<Signer>::show(&e));
                                     }
@@ -437,7 +441,7 @@ impl State {
                 Action::SelectSeed => {
                     match self.navstate.screen {
                         Screen::SeedSelector => {
-                            if details_str != "" {
+                            if !details_str.is_empty() {
                             // details_str is seed name
                                 match KeysState::new(details_str, dbname) {
                                     Ok(a) => {
@@ -520,7 +524,7 @@ impl State {
                     }
                 },
                 Action::BackupSeed => {
-                    if details_str == "" {
+                    if details_str.is_empty() {
                         match &self.navstate.screen {
                             Screen::Keys(ref keys_state) => {
                                 if let Modal::SeedMenu = self.navstate.modal {
@@ -532,26 +536,25 @@ impl State {
                             },
                             _ => println!("BackupSeed without seed_name does nothing here"),
                         }
-                    } else {
-                        if let Screen::SelectSeedForBackup = self.navstate.screen {
-                            new_navstate = match KeysState::new(details_str, dbname) {
-                                Ok(a) => {
-                                    Navstate {
-                                        screen: Screen::Keys(a),
-                                        modal: Modal::Backup(details_str.to_string()),
-                                        alert: Alert::Empty,
-                                    }
-                                },
-                                Err(e) => {
-                                    errorline.push_str(&<Signer>::show(&e));
-                                    Navstate {
-                                        screen: Screen::Log,
-                                        modal: Modal::Empty,
-                                        alert: Alert::Error,
-                                    }
-                                },
-                            };
-                        }
+                    }
+                    else if let Screen::SelectSeedForBackup = self.navstate.screen {
+                        new_navstate = match KeysState::new(details_str, dbname) {
+                            Ok(a) => {
+                                Navstate {
+                                    screen: Screen::Keys(a),
+                                    modal: Modal::Backup(details_str.to_string()),
+                                    alert: Alert::Empty,
+                                }
+                            },
+                            Err(e) => {
+                                errorline.push_str(&<Signer>::show(&e));
+                                Navstate {
+                                    screen: Screen::Log,
+                                    modal: Modal::Empty,
+                                    alert: Alert::Error,
+                                }
+                            },
+                        };
                     }
                 },
                 Action::NetworkSelector => {
@@ -613,7 +616,7 @@ impl State {
                     match self.navstate.screen {
                         Screen::NetworkDetails(ref network_specs_key) => {
                             if let Modal::NetworkDetailsMenu = self.navstate.modal {
-                                match db_handling::remove_network::remove_network(&network_specs_key, dbname) {
+                                match db_handling::remove_network::remove_network(network_specs_key, dbname) {
                                     Ok(()) => {
                                         new_navstate = Navstate::clean_screen(Screen::ManageNetworks);
                                     },
@@ -632,7 +635,7 @@ impl State {
                         Screen::NetworkDetails(ref network_specs_key) => {
                             match self.navstate.modal {
                                 Modal::ManageMetadata(network_version) => {
-                                    match db_handling::remove_network::remove_metadata(&network_specs_key, network_version, dbname) {
+                                    match db_handling::remove_network::remove_metadata(network_specs_key, network_version, dbname) {
                                         Ok(()) => {
                                             new_navstate = Navstate::clean_screen(Screen::NetworkDetails(network_specs_key.to_owned()));
                                         },
@@ -739,7 +742,7 @@ impl State {
                         Screen::Keys(ref keys_state) => {
                             match keys_state.get_specialty() {
                                 SpecialtyKeysState::Swiped(ref multisigner) => {
-                                    match db_handling::identities::remove_key(dbname, &multisigner, &keys_state.network_specs_key()) {
+                                    match db_handling::identities::remove_key(dbname, multisigner, &keys_state.network_specs_key()) {
                                         Ok(()) => {
                                             new_navstate = Navstate::clean_screen(Screen::Keys(KeysState::new_in_network(&keys_state.seed_name(), &keys_state.network_specs_key())));
                                         },
@@ -750,7 +753,7 @@ impl State {
                                     }
                                 },
                                 SpecialtyKeysState::MultiSelect(ref multiselect) => {
-                                    match db_handling::identities::remove_keys_set(dbname, &multiselect, &keys_state.network_specs_key()) {
+                                    match db_handling::identities::remove_keys_set(dbname, multiselect, &keys_state.network_specs_key()) {
                                         Ok(()) => {
                                             new_navstate = Navstate::clean_screen(Screen::Keys(KeysState::new_in_network(&keys_state.seed_name(), &keys_state.network_specs_key())));
                                         },
@@ -929,7 +932,7 @@ impl State {
                             if let SpecialtyKeysState::Swiped(multisigner) = keys_state.get_specialty() {
                                 match details_str.parse::<u32>() {
                                     Ok(increment) => {
-                                        match db_handling::identities::create_increment_set(increment, &multisigner, &keys_state.network_specs_key(), &secret_seed_phrase, dbname) {
+                                        match db_handling::identities::create_increment_set(increment, &multisigner, &keys_state.network_specs_key(), secret_seed_phrase, dbname) {
                                             Ok(()) => {
                                                 new_navstate = Navstate::clean_screen(Screen::Keys(KeysState::new_in_network(&keys_state.seed_name(), &keys_state.network_specs_key())));
                                             },
@@ -959,7 +962,7 @@ impl State {
                 Action::TextEntry => {
                     match self.navstate.screen {
                         Screen::RecoverSeedPhrase(ref mut recover_seed_phrase_state) => {
-                            recover_seed_phrase_state.text_entry(&details_str);
+                            recover_seed_phrase_state.text_entry(details_str);
                             new_navstate = Navstate::clean_screen(Screen::RecoverSeedPhrase(recover_seed_phrase_state.to_owned()));
                         },
                         _ => println!("TextEntry does nothing here"),
@@ -968,7 +971,7 @@ impl State {
                 Action::PushWord => {
                     match self.navstate.screen {
                         Screen::RecoverSeedPhrase(ref mut recover_seed_phrase_state) => {
-                            recover_seed_phrase_state.push_word(&details_str);
+                            recover_seed_phrase_state.push_word(details_str);
                             new_navstate = Navstate::clean_screen(Screen::RecoverSeedPhrase(recover_seed_phrase_state.to_owned()));
                         },
                         _ => println!("PushWord does nothing here"),
@@ -983,7 +986,7 @@ impl State {
             let screen_details = match new_navstate.screen {
                 Screen::Log => {
                     match db_handling::manage_history::print_history(dbname) {
-                        Ok(a) => a.to_string(),
+                        Ok(a) => a,
                         Err(e) => {
                             new_navstate.alert = Alert::ErrorDisplay;
                             errorline.push_str(&<Signer>::show(&e));
@@ -993,7 +996,7 @@ impl State {
                 },
                 Screen::LogDetails(order) => {
                     match transaction_parsing::print_history_entry_by_order_with_decoding(order, dbname) {
-                        Ok(a) => a.to_string(),
+                        Ok(a) => a,
                         Err(e) => {
                             new_navstate.alert = Alert::ErrorDisplay;
                             errorline.push_str(&<Signer>::show(&e));
@@ -1079,15 +1082,15 @@ impl State {
                     let mut seed_finalized = draft.try_finalize();
                     if let Some(ref s) = seed_finalized {
                         out.push_str(",\"ready_seed\":\"");
-                        out.push_str(&s);
-                        out.push_str("\"");
+                        out.push_str(s);
+                        out.push('\"');
                     }
                     seed_finalized.zeroize();
 
                     out
                 },
                 Screen::DeriveKey(ref derive_state) => {
-                    match db_handling::interface_signer::derive_prep (dbname, &derive_state.seed_name(), &derive_state.network_specs_key(), derive_state.collision(), &details_str) {
+                    match db_handling::interface_signer::derive_prep (dbname, &derive_state.seed_name(), &derive_state.network_specs_key(), derive_state.collision(), details_str) {
                         Ok(a) => {
                             format!("{},\"keyboard\":{}", a, new_navstate.keyboard())
                         },
@@ -1125,7 +1128,7 @@ impl State {
                     }
                 },
                 Screen::NetworkDetails(ref network_specs_key) => {
-                    match db_handling::interface_signer::network_details_by_key(dbname, &network_specs_key) {
+                    match db_handling::interface_signer::network_details_by_key(dbname, network_specs_key) {
                         Ok(a) => a,
                         Err(e) => {
                             new_navstate.alert = Alert::ErrorDisplay;
@@ -1150,7 +1153,7 @@ impl State {
 
             //Prepare modal details
             let modal_details = match new_navstate.modal {
-                Modal::Backup(ref seed_name) => match db_handling::interface_signer::backup_prep(dbname, &seed_name) {
+                Modal::Backup(ref seed_name) => match db_handling::interface_signer::backup_prep(dbname, seed_name) {
                     Ok(a) => a,
                     Err(e) => {
                         new_navstate.alert = Alert::Error;
@@ -1176,7 +1179,7 @@ impl State {
                         "".to_string()
                     },
                 },
-                Modal::NetworkSelector(ref network_specs_key) => match db_handling::interface_signer::show_all_networks_with_flag (dbname, &network_specs_key) {
+                Modal::NetworkSelector(ref network_specs_key) => match db_handling::interface_signer::show_all_networks_with_flag (dbname, network_specs_key) {
                     Ok(a) => a,
                     Err(e) => {
                         new_navstate.alert = Alert::Error;
@@ -1310,7 +1313,7 @@ impl State {
         output.push_str(&format!("\"modal\":\"{}\",", modal.get_name()));
         output.push_str(&format!("\"alert\":\"{}\",", alert.get_name()));
         output.push_str(details);
-        output.push_str("}");
+        output.push('}');
         output
     }
 
@@ -1386,10 +1389,8 @@ impl State {
             Screen::SeedSelector => "NewSeed",
             Screen::Keys(ref keys_state) => {
                 if let Modal::Backup(_) = self.navstate.modal {"None"}
-                else {
-                    if keys_state.is_multiselect() {"MultiSelect"}
-                    else {"Backup"}
-                }
+                else if keys_state.is_multiselect() {"MultiSelect"}
+                else {"Backup"}
             },
             Screen::KeyDetails(_) => "KeyMenu",
             Screen::KeyDetailsMulti(_) => "KeyMenu",
@@ -1435,7 +1436,7 @@ impl State {
     }
     
     fn correct_seed_selector(&self) -> Navstate {
-        if self.seed_names.len() == 0 {
+        if self.seed_names.is_empty() {
             Navstate {
                 screen: Screen::SeedSelector,
                 modal: Modal::NewSeedMenu,
@@ -1452,7 +1453,7 @@ impl State {
 impl Navstate {
     pub fn clean_screen(screen: Screen) -> Navstate {
         Navstate {
-            screen: screen,
+            screen,
             modal: Modal::Empty,
             alert: Alert::Empty,
         }
@@ -1461,8 +1462,7 @@ impl Navstate {
     ///Check if keyboard should be shown
     fn keyboard(&self) -> bool {
         if let Modal::Empty = self.modal {
-            if let Alert::Empty = self.alert {true}
-            else {false}
+            matches!(self.alert, Alert::Empty)
         }
         else {false}
     }

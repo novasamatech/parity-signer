@@ -70,7 +70,7 @@ fn create_address<T: ErrorSource> (database_name: &str, input_batch_prep: &[(Add
     
     let mut output_batch_prep = input_batch_prep.to_vec();
     let mut output_events: Vec<Event> = Vec::new();
-    let network_specs_key = NetworkSpecsKey::from_parts(&network_specs.genesis_hash.to_vec(), &network_specs.encryption);
+    let network_specs_key = NetworkSpecsKey::from_parts(&network_specs.genesis_hash, &network_specs.encryption);
     
     let mut full_address = seed_phrase.to_owned() + path;
     let multisigner = match network_specs.encryption {
@@ -123,7 +123,7 @@ fn create_address<T: ErrorSource> (database_name: &str, input_batch_prep: &[(Add
         None => ("", false),
     };
     
-    let identity_history = IdentityHistory::get(seed_name, &network_specs.encryption, &public_key, cropped_path, &network_specs.genesis_hash.to_vec());
+    let identity_history = IdentityHistory::get(seed_name, &network_specs.encryption, &public_key, cropped_path, &network_specs.genesis_hash);
     output_events.push(Event::IdentityAdded(identity_history));
     
     let mut number_in_current = None;
@@ -223,7 +223,7 @@ pub fn remove_keys_set(database_name: &str, multiselect: &[MultiSigner], network
         let public_key = multisigner_to_public(multisigner);
         let address_key = AddressKey::from_multisigner(multisigner);
         let mut address_details = get_address_details(database_name, &address_key)?;
-        let identity_history = IdentityHistory::get(&address_details.seed_name, &network_specs.encryption, &public_key, &address_details.path, &network_specs.genesis_hash.to_vec());
+        let identity_history = IdentityHistory::get(&address_details.seed_name, &network_specs.encryption, &public_key, &address_details.path, &network_specs.genesis_hash);
         events.push(Event::IdentityRemoved(identity_history));
         address_details.network_id = address_details.network_id.into_iter().filter(|id| id != network_specs_key).collect();
         if address_details.network_id.is_empty() {id_batch.remove(address_key.key())}
@@ -483,7 +483,7 @@ mod tests {
             assert!(addresses.len() == 4, "real addresses length: {}", addresses.len());
         }
         let chainspecs = get_default_chainspecs();
-        let default_addresses = addresses_set_seed_name_network (dbname, "Alice", &NetworkSpecsKey::from_parts(&chainspecs[0].genesis_hash.to_vec(), &Encryption::Sr25519)).unwrap();
+        let default_addresses = addresses_set_seed_name_network (dbname, "Alice", &NetworkSpecsKey::from_parts(&chainspecs[0].genesis_hash, &Encryption::Sr25519)).unwrap();
         assert!(default_addresses.len()>0);
         assert!("[(MultiSigner::Sr25519(46ebddef8cd9bb167dc30878d7113b7e168e6f0646beffd77d69d39bad76b47a (5DfhGyQd...)), AddressDetails { seed_name: \"Alice\", path: \"\", has_pwd: false, network_id: [NetworkSpecsKey([1, 128, 145, 177, 113, 187, 21, 142, 45, 56, 72, 250, 35, 169, 241, 194, 81, 130, 251, 142, 32, 49, 59, 44, 30, 180, 146, 25, 218, 122, 112, 206, 144, 195]), NetworkSpecsKey([1, 128, 176, 168, 212, 147, 40, 92, 45, 247, 50, 144, 223, 183, 230, 31, 135, 15, 23, 180, 24, 1, 25, 122, 20, 156, 169, 54, 84, 73, 158, 163, 218, 254]), NetworkSpecsKey([1, 128, 225, 67, 242, 56, 3, 172, 80, 232, 246, 248, 230, 38, 149, 209, 206, 158, 78, 29, 104, 170, 54, 193, 205, 44, 253, 21, 52, 2, 19, 243, 66, 62])], encryption: Sr25519 }), (MultiSigner::Sr25519(64a31235d4bf9b37cfed3afa8aa60754675f9c4915430454d365c05112784d05 (5ELf63sL...)), AddressDetails { seed_name: \"Alice\", path: \"//kusama\", has_pwd: false, network_id: [NetworkSpecsKey([1, 128, 176, 168, 212, 147, 40, 92, 45, 247, 50, 144, 223, 183, 230, 31, 135, 15, 23, 180, 24, 1, 25, 122, 20, 156, 169, 54, 84, 73, 158, 163, 218, 254])], encryption: Sr25519 })]" == format!("{:?}", default_addresses), "Default addresses:\n{:?}", default_addresses);
         let database: Db = open(dbname).unwrap();
@@ -516,8 +516,8 @@ mod tests {
         let chainspecs = get_default_chainspecs();
         println!("[0]: {:?}, [1]: {:?}", chainspecs[0].name, chainspecs[1].name);
         let seed_name = "Alice";
-        let network_id_0 = NetworkSpecsKey::from_parts(&chainspecs[0].genesis_hash.to_vec(), &Encryption::Sr25519);
-        let network_id_1 = NetworkSpecsKey::from_parts(&chainspecs[1].genesis_hash.to_vec(), &Encryption::Sr25519);
+        let network_id_0 = NetworkSpecsKey::from_parts(&chainspecs[0].genesis_hash, &Encryption::Sr25519);
+        let network_id_1 = NetworkSpecsKey::from_parts(&chainspecs[1].genesis_hash, &Encryption::Sr25519);
         let both_networks = vec![network_id_0.to_owned(), network_id_1.to_owned()];
         let only_one_network = vec![network_id_0.to_owned()];
 
@@ -562,8 +562,8 @@ mod tests {
         populate_cold_no_metadata(dbname, Verifier(None)).unwrap();
         try_create_seed("Alice", ALICE_SEED_PHRASE, true, dbname).unwrap();
         let chainspecs = get_default_chainspecs();
-        let network_specs_key_0 = NetworkSpecsKey::from_parts(&chainspecs[0].genesis_hash.to_vec(), &Encryption::Sr25519);
-        let network_specs_key_1 = NetworkSpecsKey::from_parts(&chainspecs[1].genesis_hash.to_vec(), &Encryption::Sr25519);
+        let network_specs_key_0 = NetworkSpecsKey::from_parts(&chainspecs[0].genesis_hash, &Encryption::Sr25519);
+        let network_specs_key_1 = NetworkSpecsKey::from_parts(&chainspecs[1].genesis_hash, &Encryption::Sr25519);
         let mut identities = addresses_set_seed_name_network (dbname, "Alice", &network_specs_key_0).expect("Alice should have some addresses by default");
         println!("{:?}", identities);
         let (key0, _) = identities.remove(0); //TODO: this should be root key
@@ -629,7 +629,7 @@ mod tests {
             assert!(identities.len()==0);
         }
         let chainspecs = get_default_chainspecs();
-        let network_id_0 = NetworkSpecsKey::from_parts(&chainspecs[0].genesis_hash.to_vec(), &Encryption::Sr25519);
+        let network_id_0 = NetworkSpecsKey::from_parts(&chainspecs[0].genesis_hash, &Encryption::Sr25519);
         try_create_address("Alice", ALICE_SEED_PHRASE, "//Alice", &network_id_0, dbname).unwrap();
         let multisigner_path_set = get_multisigner_path_set(dbname);
         assert!(multisigner_path_set.len() == 1, "Wrong number of identities: {:?}", multisigner_path_set);
@@ -655,7 +655,7 @@ mod tests {
             assert!(identities.len()==0);
         }
         let chainspecs = get_default_chainspecs();
-        let network_id_0 = NetworkSpecsKey::from_parts(&chainspecs[0].genesis_hash.to_vec(), &Encryption::Sr25519);
+        let network_id_0 = NetworkSpecsKey::from_parts(&chainspecs[0].genesis_hash, &Encryption::Sr25519);
         try_create_address("Alice", ALICE_SEED_PHRASE, "//Alice", &network_id_0, dbname).unwrap();
         try_create_address("Alice", ALICE_SEED_PHRASE, "//Alice//1", &network_id_0, dbname).unwrap();
         let multisigner_path_set = get_multisigner_path_set(dbname);
@@ -681,7 +681,7 @@ mod tests {
             assert!(identities.len()==0);
         }
         let chainspecs = get_default_chainspecs();
-        let network_id_0 = NetworkSpecsKey::from_parts(&chainspecs[0].genesis_hash.to_vec(), &Encryption::Sr25519);
+        let network_id_0 = NetworkSpecsKey::from_parts(&chainspecs[0].genesis_hash, &Encryption::Sr25519);
         try_create_address("Alice", ALICE_SEED_PHRASE, "//Alice", &network_id_0, dbname).unwrap();
         try_create_address("Alice", ALICE_SEED_PHRASE, "//Alice//1", &network_id_0, dbname).unwrap();
         let multisigner_path_set = get_multisigner_path_set(dbname);
@@ -711,7 +711,7 @@ mod tests {
         let dbname = "for_tests/creating_derivation_1";
         populate_cold_no_metadata(dbname, Verifier(None)).unwrap();
         let chainspecs = get_default_chainspecs();
-        let network_id_0 = NetworkSpecsKey::from_parts(&chainspecs[0].genesis_hash.to_vec(), &Encryption::Sr25519);
+        let network_id_0 = NetworkSpecsKey::from_parts(&chainspecs[0].genesis_hash, &Encryption::Sr25519);
         assert!(try_create_address("Alice", ALICE_SEED_PHRASE, "//Alice", &network_id_0, dbname).is_ok(), "Should be able to create //Alice derivation.");
         if let DerivationCheck::NoPassword(Some(_)) = derivation_check("Alice", "//Alice", &network_id_0, dbname).unwrap() {println!("Found existing");}
         else {panic!("Derivation should already exist.");}
@@ -727,7 +727,7 @@ mod tests {
         let dbname = "for_tests/creating_derivation_2";
         populate_cold_no_metadata(dbname, Verifier(None)).unwrap();
         let chainspecs = get_default_chainspecs();
-        let network_id_0 = NetworkSpecsKey::from_parts(&chainspecs[0].genesis_hash.to_vec(), &Encryption::Sr25519);
+        let network_id_0 = NetworkSpecsKey::from_parts(&chainspecs[0].genesis_hash, &Encryption::Sr25519);
         assert!(try_create_address("Alice", ALICE_SEED_PHRASE, "//Alice///secret", &network_id_0, dbname).is_ok(), "Should be able to create //Alice/// secret derivation.");
         if let DerivationCheck::NoPassword(None) = derivation_check("Alice", "//Alice", &network_id_0, dbname).unwrap() {println!("It did well.");}
         else {panic!("New derivation has no password, existing derivation has password and is diffenent.");}
@@ -740,7 +740,7 @@ mod tests {
         let dbname = "for_tests/creating_derivation_3";
         populate_cold_no_metadata(dbname, Verifier(None)).unwrap();
         let chainspecs = get_default_chainspecs();
-        let network_id_0 = NetworkSpecsKey::from_parts(&chainspecs[0].genesis_hash.to_vec(), &Encryption::Sr25519);
+        let network_id_0 = NetworkSpecsKey::from_parts(&chainspecs[0].genesis_hash, &Encryption::Sr25519);
         assert!(try_create_address("Alice", ALICE_SEED_PHRASE, "//Alice", &network_id_0, dbname).is_ok(), "Should be able to create //Alice derivation.");
         if let DerivationCheck::Password = derivation_check("Alice", "//Alice///secret", &network_id_0, dbname).unwrap() {println!("It did well.");}
         else {panic!("New derivation has password, existing derivation has no password and is diffenent.");}
@@ -753,7 +753,7 @@ mod tests {
         let dbname = "for_tests/creating_derivation_4";
         populate_cold_no_metadata(dbname, Verifier(None)).unwrap();
         let chainspecs = get_default_chainspecs();
-        let network_id_0 = NetworkSpecsKey::from_parts(&chainspecs[0].genesis_hash.to_vec(), &Encryption::Sr25519);
+        let network_id_0 = NetworkSpecsKey::from_parts(&chainspecs[0].genesis_hash, &Encryption::Sr25519);
         assert!(try_create_address("Alice", ALICE_SEED_PHRASE, "//Alice///secret1", &network_id_0, dbname).is_ok(), "Should be able to create //Alice///secret1 derivation.");
         if let DerivationCheck::Password = derivation_check("Alice", "//Alice///secret2", &network_id_0, dbname).unwrap() {println!("It did well.");}
         else {panic!("Existing derivation has different password.");}
@@ -766,7 +766,7 @@ mod tests {
         let dbname = "for_tests/creating_derivation_5";
         populate_cold_no_metadata(dbname, Verifier(None)).unwrap();
         let chainspecs = get_default_chainspecs();
-        let network_id_0 = NetworkSpecsKey::from_parts(&chainspecs[0].genesis_hash.to_vec(), &Encryption::Sr25519);
+        let network_id_0 = NetworkSpecsKey::from_parts(&chainspecs[0].genesis_hash, &Encryption::Sr25519);
         assert!(try_create_address("Alice", ALICE_SEED_PHRASE, "//Alice///secret", &network_id_0, dbname).is_ok(), "Should be able to create //Alice derivation.");
         if let DerivationCheck::Password = derivation_check("Alice", "//Alice///secret", &network_id_0, dbname).unwrap() {println!("It did well.");}
         else {panic!("Derivation exists, but has password.");}

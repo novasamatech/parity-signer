@@ -26,7 +26,7 @@ pub fn remove_network (network_specs_key: &NetworkSpecsKey, database_name: &str)
     let general_verifier = get_general_verifier(database_name)?;
     let network_specs = get_network_specs(database_name, network_specs_key)?;
     
-    let verifier_key = VerifierKey::from_parts(&network_specs.genesis_hash.to_vec());
+    let verifier_key = VerifierKey::from_parts(&network_specs.genesis_hash);
     let valid_current_verifier = get_valid_current_verifier(&verifier_key, database_name)?;
 
 // modify verifier as needed    
@@ -77,7 +77,7 @@ pub fn remove_network (network_specs_key: &NetworkSpecsKey, database_name: &str)
             let (multisigner, mut address_details) = AddressDetails::process_entry_checked::<Signer>((address_key_vec, entry))?;
             for key in keys_to_wipe.iter() {
                 if address_details.network_id.contains(key) {
-                    let identity_history = IdentityHistory::get(&address_details.seed_name, &address_details.encryption, &multisigner_to_public(&multisigner), &address_details.path, &network_specs.genesis_hash.to_vec());
+                    let identity_history = IdentityHistory::get(&address_details.seed_name, &address_details.encryption, &multisigner_to_public(&multisigner), &address_details.path, &network_specs.genesis_hash);
                     events.push(Event::IdentityRemoved(identity_history));
                     address_details.network_id = address_details.network_id.into_iter().filter(|id| id != key).collect();
                 }

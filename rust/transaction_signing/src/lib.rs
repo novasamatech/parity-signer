@@ -11,7 +11,7 @@ mod tests;
 
 
 pub fn handle_stub (checksum: u32, database_name: &str) -> Result<(), ErrorSigner> {
-    TrDbColdStub::from_storage(&database_name, checksum)?
+    TrDbColdStub::from_storage(database_name, checksum)?
         .apply(database_name)
 }
 

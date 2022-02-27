@@ -60,7 +60,7 @@ impl NetworkSpecs {
         format!("\"color\":\"{}\",\"logo\":\"{}\",\"secondary_color\":\"{}\",\"title\":\"{}\"", &self.color, &self.logo, &self.secondary_color, &self.title)
     }
     pub fn print_as_set_part(&self) -> String {
-        format!("\"key\":\"{}\",\"color\":\"{}\",\"logo\":\"{}\",\"order\":\"{}\",\"secondary_color\":\"{}\",\"title\":\"{}\"", hex::encode(NetworkSpecsKey::from_parts(&self.genesis_hash.to_vec(), &self.encryption).key()), &self.color, &self.logo, &self.order, &self.secondary_color, &self.title)
+        format!("\"key\":\"{}\",\"color\":\"{}\",\"logo\":\"{}\",\"order\":\"{}\",\"secondary_color\":\"{}\",\"title\":\"{}\"", hex::encode(NetworkSpecsKey::from_parts(&self.genesis_hash, &self.encryption).key()), &self.color, &self.logo, &self.order, &self.secondary_color, &self.title)
     }
     pub fn to_send(&self) -> NetworkSpecsToSend {
         NetworkSpecsToSend {
@@ -92,7 +92,7 @@ impl NetworkSpecs {
             Ok(a) => a,
             Err(_) => return Err(<T>::specs_decoding(network_specs_key.to_owned())),
         };
-        if genesis_hash_vec != network_specs.genesis_hash.to_vec() {return Err(<T>::specs_genesis_hash_mismatch(network_specs_key.to_owned(), network_specs.genesis_hash.to_vec()))}
+        if genesis_hash_vec[..] != network_specs.genesis_hash {return Err(<T>::specs_genesis_hash_mismatch(network_specs_key.to_owned(), network_specs.genesis_hash.to_vec()))}
         if encryption != network_specs.encryption {return Err(<T>::specs_encryption_mismatch(network_specs_key.to_owned(), network_specs.encryption))}
         Ok(network_specs)
     }
@@ -128,7 +128,7 @@ impl NetworkSpecsToSend {
             Ok(a) => a,
             Err(_) => return Err(ErrorActive::Database(DatabaseActive::EntryDecoding(EntryDecodingActive::NetworkSpecsToSend(network_specs_key.to_owned())))),
         };
-        if genesis_hash_vec != network_specs_to_send.genesis_hash.to_vec() {return Err(ErrorActive::Database(DatabaseActive::Mismatch(MismatchActive::SpecsToSendGenesisHash{key: network_specs_key.to_owned(), genesis_hash: network_specs_to_send.genesis_hash.to_vec()})))}
+        if genesis_hash_vec[..] != network_specs_to_send.genesis_hash {return Err(ErrorActive::Database(DatabaseActive::Mismatch(MismatchActive::SpecsToSendGenesisHash{key: network_specs_key.to_owned(), genesis_hash: network_specs_to_send.genesis_hash.to_vec()})))}
         if encryption != network_specs_to_send.encryption {return Err(ErrorActive::Database(DatabaseActive::Mismatch(MismatchActive::SpecsToSendEncryption{key: network_specs_key.to_owned(), encryption: network_specs_to_send.encryption})))}
         Ok(network_specs_to_send)
     }

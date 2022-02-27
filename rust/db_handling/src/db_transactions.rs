@@ -50,10 +50,10 @@ impl BatchStub {
     pub fn extend_batch(&self, batch: Batch) -> Batch {
         let mut out = batch;
         for key in self.removals.iter() {
-            out.remove(key.to_vec())
+            out.remove(&key[..])
         }
         for (key, value) in self.additions.iter() {
-            out.insert(key.to_vec(), value.to_vec())
+            out.insert(&key[..], &value[..])
         }
         out
     }
@@ -320,7 +320,7 @@ impl TrDbColdStub {
     }
     /// function to put network_specs unit in addition queue in TrDbColdStub
     pub fn add_network_specs(mut self, network_specs_to_send: &NetworkSpecsToSend, valid_current_verifier: &ValidCurrentVerifier, general_verifier: &Verifier, database_name: &str) -> Result<Self, ErrorSigner> {
-        let network_specs_key = NetworkSpecsKey::from_parts(&network_specs_to_send.genesis_hash.to_vec(), &network_specs_to_send.encryption);
+        let network_specs_key = NetworkSpecsKey::from_parts(&network_specs_to_send.genesis_hash, &network_specs_to_send.encryption);
         let order = {
             let database = open_db::<Signer>(database_name)?;
             let chainspecs = open_tree::<Signer>(&database, SPECSTREE)?;
@@ -338,7 +338,7 @@ impl TrDbColdStub {
                 if address_details.path.is_empty() && !address_details.has_pwd && (address_details.encryption == network_specs.encryption) && !address_details.network_id.contains(&network_specs_key) {
                     address_details.network_id.push(network_specs_key.to_owned());
                     self.addresses_stub = self.addresses_stub.new_addition(address_key.key(), address_details.encode());
-                    self.history_stub.push(Event::IdentityAdded(IdentityHistory::get(&address_details.seed_name, &address_details.encryption, &multisigner_to_public(&multisigner), &address_details.path, &network_specs.genesis_hash.to_vec())));
+                    self.history_stub.push(Event::IdentityAdded(IdentityHistory::get(&address_details.seed_name, &address_details.encryption, &multisigner_to_public(&multisigner), &address_details.path, &network_specs.genesis_hash)));
                 }
             }
         }
@@ -347,7 +347,7 @@ impl TrDbColdStub {
     /// function to put network_specs_key in removal queue in TrDbColdStub
     /// is used for clean up when the general verifier or network verifier is reset
     pub fn remove_network_specs(mut self, network_specs: &NetworkSpecs, valid_current_verifier: &ValidCurrentVerifier, general_verifier: &Verifier) -> Self {
-        let network_specs_key = NetworkSpecsKey::from_parts(&network_specs.genesis_hash.to_vec(), &network_specs.encryption);
+        let network_specs_key = NetworkSpecsKey::from_parts(&network_specs.genesis_hash, &network_specs.encryption);
         self.network_specs_stub = self.network_specs_stub.new_removal(network_specs_key.key());
         self.history_stub.push(Event::NetworkSpecsRemoved(NetworkSpecsDisplay::get(network_specs, valid_current_verifier, general_verifier)));
         self

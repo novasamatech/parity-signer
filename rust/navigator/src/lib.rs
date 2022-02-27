@@ -5,7 +5,6 @@
 use std::sync::{Mutex, TryLockError};
 use lazy_static::lazy_static;
 
-use db_handling;
 use definitions::{error::Signer, keyring::NetworkSpecsKey};
 
 mod actions;
@@ -55,7 +54,7 @@ pub fn do_action(
             //Maybe just silently restart navstate? But is it safe?
             panic!("Concurrency error! Restart the app.");
          },
-        Err(TryLockError::WouldBlock) => return "".to_string(),
+        Err(TryLockError::WouldBlock) => "".to_string(),
     }
 }
 
@@ -63,14 +62,14 @@ pub fn do_action(
 pub fn init_navigation(
     dbname: &str,
     seed_names: &str,
-) -> () {
+) {
     //This operation has to happen; lock thread and do not ignore.
     let guard = STATE.lock();
     match guard {
         Ok(mut navstate) => {
             (*navstate).dbname = Some(dbname.to_string());
-            if seed_names != "" {
-                (*navstate).seed_names = seed_names.split(",").map(|a| a.to_string()).collect();
+            if !seed_names.is_empty() {
+                (*navstate).seed_names = seed_names.split(',').map(|a| a.to_string()).collect();
                 (*navstate).seed_names.sort();
                 (*navstate).seed_names.dedup();
             } else {
@@ -91,12 +90,12 @@ pub fn init_navigation(
 }
 
 ///Should be called in the beginning to recall things stored only by phone
-pub fn update_seed_names(seed_names: &str) -> () {
+pub fn update_seed_names(seed_names: &str) {
     let guard = STATE.lock();
     match guard {
         Ok(mut navstate) => {
-            if seed_names != "" {
-                (*navstate).seed_names = seed_names.split(",").map(|a| a.to_string()).collect();
+            if !seed_names.is_empty() {
+                (*navstate).seed_names = seed_names.split(',').map(|a| a.to_string()).collect();
                 (*navstate).seed_names.sort();
                 (*navstate).seed_names.dedup();
             } else {

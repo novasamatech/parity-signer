@@ -126,7 +126,7 @@ pub fn show_all_networks_with_flag (database_name: &str, network_specs_key: &Net
     networks.sort_by(|a, b| a.order.cmp(&b.order));
     Ok(format!("\"networks\":{}", export_complex_vector(&networks, |a| 
         {
-            let network_specs_key_current = NetworkSpecsKey::from_parts(&a.genesis_hash.to_vec(), &a.encryption);
+            let network_specs_key_current = NetworkSpecsKey::from_parts(&a.genesis_hash, &a.encryption);
             format!("\"key\":\"{}\",\"title\":\"{}\",\"logo\":\"{}\",\"order\":{},\"selected\":{}", hex::encode(network_specs_key_current.key()), a.title, a.logo, a.order, &network_specs_key_current == network_specs_key)
         }
     )))
@@ -138,7 +138,7 @@ pub fn show_all_networks (database_name: &str) -> Result<String, ErrorSigner> {
     networks.sort_by(|a, b| a.order.cmp(&b.order));
     Ok(format!("\"networks\":{}", export_complex_vector(&networks, |a| 
         {
-            let network_specs_key_current = NetworkSpecsKey::from_parts(&a.genesis_hash.to_vec(), &a.encryption);
+            let network_specs_key_current = NetworkSpecsKey::from_parts(&a.genesis_hash, &a.encryption);
             format!("\"key\":\"{}\",\"title\":\"{}\",\"logo\":\"{}\",\"order\":{}", hex::encode(network_specs_key_current.key()), a.title, a.logo, a.order)
         }
     )))
@@ -185,7 +185,7 @@ pub fn backup_prep (database_name: &str, seed_name: &str) -> Result<String, Erro
     if networks.is_empty() {return Err(ErrorSigner::NoNetworksAvailable)}
     let mut export: Vec<(NetworkSpecs, Vec<AddressDetails>)> = Vec::new();
     for x in networks.into_iter() {
-        let id_set = addresses_set_seed_name_network (database_name, seed_name, &NetworkSpecsKey::from_parts(&x.genesis_hash.to_vec(), &x.encryption))?;
+        let id_set = addresses_set_seed_name_network (database_name, seed_name, &NetworkSpecsKey::from_parts(&x.genesis_hash, &x.encryption))?;
         if !id_set.is_empty() {export.push((x, id_set.into_iter().map(|(_, a)| a).collect()))}
     }
     export.sort_by(|(a, _), (b, _)| a.order.cmp(&b.order));
@@ -238,7 +238,7 @@ pub fn dynamic_path_check (database_name: &str, seed_name: &str, path: &str, net
 /// Print network specs and metadata set information for network with given network specs key.
 pub fn network_details_by_key (database_name: &str, network_specs_key: &NetworkSpecsKey) -> Result<String, ErrorSigner> {
     let network_specs = get_network_specs(database_name, network_specs_key)?;
-    let verifier_key = VerifierKey::from_parts(&network_specs.genesis_hash.to_vec());
+    let verifier_key = VerifierKey::from_parts(&network_specs.genesis_hash);
     let general_verifier = get_general_verifier(database_name)?;
     let valid_current_verifier = get_valid_current_verifier(&verifier_key, database_name)?;
     let relevant_meta = get_meta_values_by_name::<Signer>(database_name, &network_specs.name)?;
@@ -260,7 +260,7 @@ pub fn metadata_details (database_name: &str, network_specs_key: &NetworkSpecsKe
         .collect()
     ;
     let relevant_networks_print = export_complex_vector(&relevant_networks, |a| {
-        format!("\"title\":\"{}\",\"logo\":\"{}\",\"order\":{},\"current_on_screen\":{}", a.title, a.logo, a.order, &NetworkSpecsKey::from_parts(&a.genesis_hash.to_vec(), &a.encryption) == network_specs_key)
+        format!("\"title\":\"{}\",\"logo\":\"{}\",\"order\":{},\"current_on_screen\":{}", a.title, a.logo, a.order, &NetworkSpecsKey::from_parts(&a.genesis_hash, &a.encryption) == network_specs_key)
     });
     let meta_hash = blake2b(32, &[], &meta_values.meta).as_bytes().to_vec();
     let hex_id_pic = hex::encode(pic_meta(&meta_hash));

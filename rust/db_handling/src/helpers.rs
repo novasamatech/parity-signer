@@ -70,7 +70,7 @@ pub fn genesis_hash_in_specs (verifier_key: &VerifierKey, database: &Db) -> Resu
     for (network_specs_key_vec, network_specs_encoded) in chainspecs.iter().flatten() {
         let network_specs_key = NetworkSpecsKey::from_ivec(&network_specs_key_vec);
         let network_specs = NetworkSpecs::from_entry_with_key_checked::<Signer>(&network_specs_key, network_specs_encoded)?;
-        if network_specs.genesis_hash.to_vec() == genesis_hash {
+        if network_specs.genesis_hash == genesis_hash[..] {
             found_base58prefix = match found_base58prefix {
                 Some(base58prefix) => {
                     if base58prefix == network_specs.base58prefix {Some(base58prefix)}
@@ -93,7 +93,7 @@ pub fn genesis_hash_in_specs (verifier_key: &VerifierKey, database: &Db) -> Resu
 pub fn get_general_verifier (database_name: &str) -> Result<Verifier, ErrorSigner> {
     let database = open_db::<Signer>(database_name)?;
     let settings = open_tree::<Signer>(&database, SETTREE)?;
-    match settings.get(GENERALVERIFIER.to_vec()) {
+    match settings.get(GENERALVERIFIER) {
         Ok(Some(verifier_encoded)) => match <Verifier>::decode(&mut &verifier_encoded[..]) {
             Ok(a) => Ok(a),
             Err(_) => Err(ErrorSigner::Database(DatabaseSigner::EntryDecoding(EntryDecodingSigner::GeneralVerifier))),
@@ -215,7 +215,7 @@ pub fn verify_checksum (database: &Db, checksum: u32) -> Result<(), ErrorSigner>
 pub fn get_danger_status(database_name: &str) -> Result<bool, ErrorSigner> {
     let database = open_db::<Signer>(database_name)?;
     let settings = open_tree::<Signer>(&database, SETTREE)?;
-    match settings.get(DANGER.to_vec()) {
+    match settings.get(DANGER) {
         Ok(Some(a)) => DangerRecord::from_ivec(&a).device_was_online(),
         Ok(None) => Err(ErrorSigner::NotFound(NotFoundSigner::DangerStatus)),
         Err(e) => Err(<Signer>::db_internal(e)),

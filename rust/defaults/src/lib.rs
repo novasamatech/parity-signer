@@ -135,7 +135,7 @@ pub fn get_default_chainspecs() -> Vec<NetworkSpecs> {
 pub fn get_default_verifiers() -> Vec<(VerifierKey, CurrentVerifier)> {
     let mut out: Vec<(VerifierKey, CurrentVerifier)> = Vec::new();
     for x in get_default_network_info().iter() {
-        out.push((VerifierKey::from_parts(&x.genesis_hash.to_vec()), CurrentVerifier::Valid(ValidCurrentVerifier::General)));
+        out.push((VerifierKey::from_parts(&x.genesis_hash), CurrentVerifier::Valid(ValidCurrentVerifier::General)));
     }
     out
 }

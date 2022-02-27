@@ -28,7 +28,7 @@ pub async fn fetch_info(str_address: &str) -> Result<FetchedInfo, Box<dyn std::e
         JsonValue::String(x) => x,
         _ => return Err(Box::from("Unexpected metadata format")),
     };
-    let response: JsonValue = client.request("chain_getBlockHash", JsonRpcParams::ArrayRef(&[JsonValue::Number(Number::from(0 as u8))])).await?;
+    let response: JsonValue = client.request("chain_getBlockHash", JsonRpcParams::ArrayRef(&[JsonValue::Number(Number::from(0u8))])).await?;
     let genesis_hash = match response {
         JsonValue::String(x) => x,
         _ => return Err(Box::from("Unexpected genesis hash format")),
@@ -50,7 +50,7 @@ pub async fn fetch_info_with_network_specs(str_address: &str) -> Result<FetchedI
         JsonValue::String(x) => x,
         _ => return Err(Box::from("Unexpected metadata format")),
     };
-    let response: JsonValue = client.request("chain_getBlockHash", JsonRpcParams::ArrayRef(&[JsonValue::Number(Number::from(0 as u8))])).await?;
+    let response: JsonValue = client.request("chain_getBlockHash", JsonRpcParams::ArrayRef(&[JsonValue::Number(Number::from(0u8))])).await?;
     let genesis_hash = match response {
         JsonValue::String(x) => x,
         _ => return Err(Box::from("Unexpected genesis hash format")),

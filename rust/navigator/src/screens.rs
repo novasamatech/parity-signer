@@ -187,8 +187,7 @@ impl KeysState {
         else {Vec::new()}
     }
     pub fn is_multiselect(&self) -> bool {
-        if let SpecialtyKeysState::MultiSelect(_) = self.specialty {true}
-        else {false}
+        matches!(self.specialty, SpecialtyKeysState::MultiSelect(_))
     }
     pub fn deselect_specialty(&self) -> Self {
         Self {
@@ -234,7 +233,7 @@ impl AddressState {
 
 
 impl AddressStateMulti {
-    pub fn new(seed_name: String, network_specs_key: NetworkSpecsKey, multiselect: &Vec<MultiSigner>, database_name: &str) -> Result<Self, ErrorSigner> {
+    pub fn new(seed_name: String, network_specs_key: NetworkSpecsKey, multiselect: &[MultiSigner], database_name: &str) -> Result<Self, ErrorSigner> {
         let mut set: Vec<(MultiSigner, bool)> = Vec::new();
         for multisigner in multiselect.iter() {
             let address_details = get_address_details(database_name, &AddressKey::from_multisigner(multisigner))?;
@@ -412,11 +411,8 @@ impl SufficientCryptoState {
         self.key_selected.to_owned()
     }
     pub fn update(&self, multisigner: &MultiSigner, address_details: &AddressDetails, new_secret_string: &str) -> Self {
-        let hex_identicon = match make_identicon_from_multisigner(&multisigner) {
-            Ok(a) => hex::encode(a),
-            Err(_) => String::new(),
-        };
-        let author_info = format!("\"base58\":\"{}\",\"identicon\":\"{}\",\"seed\":\"{}\",\"derivation_path\":\"{}\"", hex::encode(multisigner_to_public(&multisigner)), hex_identicon, address_details.seed_name, address_details.path);
+        let hex_identicon = hex::encode(make_identicon_from_multisigner(multisigner));
+        let author_info = format!("\"base58\":\"{}\",\"identicon\":\"{}\",\"seed\":\"{}\",\"derivation_path\":\"{}\"", hex::encode(multisigner_to_public(multisigner)), hex_identicon, address_details.seed_name, address_details.path);
         Self{
             key_selected: Some((multisigner.to_owned(), address_details.to_owned(), author_info)),
             entered_info: EnteredInfo(new_secret_string.to_string()),

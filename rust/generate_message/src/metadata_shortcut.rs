@@ -41,9 +41,7 @@ pub struct MetaSpecsShortCut {
 pub fn meta_specs_shortcut (address: &str, encryption: Encryption, optional_token_override: Option<TokenOverride>) -> Result<MetaSpecsShortCut, ErrorActive> {
 
     let entries = filter_address_book_by_url(address)?;
-    if entries.len() !=0 {
-        if let Some(_) = optional_token_override {return Err(ErrorActive::NoTokenOverrideKnownNetwork{url: address.to_string()})}
-    }
+    if !entries.is_empty() && optional_token_override.is_some() {return Err(ErrorActive::NoTokenOverrideKnownNetwork{url: address.to_string()})}
     let new_info = match fetch_info_with_network_specs(address) {
         Ok(a) => a,
         Err(e) => return Err(ErrorActive::Fetch(Fetch::Failed{url: address.to_string(), error: e.to_string()})),
@@ -54,7 +52,7 @@ pub fn meta_specs_shortcut (address: &str, encryption: Encryption, optional_toke
         Ok(a) => a,
         Err(error) => return Err(ErrorActive::Fetch(Fetch::FaultySpecs{url: address.to_string(), error})),
     };
-    if entries.len() == 0 {
+    if entries.is_empty() {
         if genesis_hash_in_hot_db (genesis_hash)? {return Err(ErrorActive::Database(DatabaseActive::NewAddressKnownGenesisHash{url: address.to_string(), genesis_hash}))}
         let specs = NetworkSpecsToSend {
             base58prefix: new_properties.base58prefix,
@@ -67,7 +65,7 @@ pub fn meta_specs_shortcut (address: &str, encryption: Encryption, optional_toke
             path_id: format!("//{}", meta_values.name),
             secondary_color: SECONDARY_COLOR.to_string(),
             title: format!("{}-{}", meta_values.name, encryption.show()),
-            unit: new_properties.unit.to_string(),
+            unit: new_properties.unit,
         };
         Ok(MetaSpecsShortCut{
             meta_values,
@@ -80,8 +78,8 @@ pub fn meta_specs_shortcut (address: &str, encryption: Encryption, optional_toke
         let url = address.to_string();
         if specs.base58prefix != new_properties.base58prefix {return Err(ErrorActive::Fetch(Fetch::ValuesChanged{url, what: Changed::Base58Prefix{old: specs.base58prefix, new: new_properties.base58prefix}}))}
         if specs.decimals != new_properties.decimals {return Err(ErrorActive::Fetch(Fetch::ValuesChanged{url, what: Changed::Decimals{old: specs.decimals, new: new_properties.decimals}}))}
-        if specs.unit != new_properties.unit {return Err(ErrorActive::Fetch(Fetch::ValuesChanged{url, what: Changed::Unit{old: specs.unit.to_string(), new: new_properties.unit.to_string()}}))}
-        if specs.name != meta_values.name {return Err(ErrorActive::Fetch(Fetch::ValuesChanged{url, what: Changed::Name{old: specs.name.to_string(), new: meta_values.name.to_string()}}))}
+        if specs.unit != new_properties.unit {return Err(ErrorActive::Fetch(Fetch::ValuesChanged{url, what: Changed::Unit{old: specs.unit, new: new_properties.unit}}))}
+        if specs.name != meta_values.name {return Err(ErrorActive::Fetch(Fetch::ValuesChanged{url, what: Changed::Name{old: specs.name, new: meta_values.name}}))}
         // NetworkSpecsToSend are good, can use them
         Ok(MetaSpecsShortCut{
             meta_values,
