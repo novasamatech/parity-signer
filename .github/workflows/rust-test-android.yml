@@ -29,9 +29,25 @@ jobs:
           sudo apt update
           sudo apt install -y clang libclang-dev libopencv-dev
 
+      - name:             Install Rust stable toolchain
+        uses:             actions-rs/toolchain@v1.0.7
+        with:
+          profile:        minimal
+          toolchain:      stable
+          override:       true
+
+      - name:             Install cargo-nextest
+        uses:             baptiste0928/cargo-install@v1
+        with:
+          crate:          cargo-nextest
+          version:        0.9
+
+      - name: Rust Cache
+        uses: Swatinem/rust-cache@v1.3.0
+
       - name:             cargo test
         run:              |
           cd rust
           cp os-specific-lock/android/Cargo.lock .
           cp signer/android-hack/Cargo.toml signer
-          cargo test
+          cargo nextest
