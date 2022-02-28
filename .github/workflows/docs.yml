@@ -1,4 +1,4 @@
-name:                   Publish Docs and Check links with linkcheck
+name:                     Check links and Publish Docs
 
 on:
   pull_request:
