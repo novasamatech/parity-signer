@@ -5,16 +5,50 @@ _default:
 clean:
     #!/usr/bin/env bash
     rm -rf ios/build
+    rm -rf android/app/src/main/assets/Database
+    rm -rf ios/NativeSigner/Database
     cd rust
     cargo clean
 
-_build_ios:
+switch_to_android:
+    #!/usr/bin/env bash
+    cp rust/os-specific-lock/android/Cargo.lock rust/
+    cp rust/signer/android-hack/Cargo.toml rust/signer/
+
+switch_to_ios:
+    #!/usr/bin/env bash
+    cp rust/os-specific-lock/ios/Cargo.lock rust/
+    cp rust/signer/ios-hack/Cargo.toml rust/signer/
+
+build_android:
+    #!/usr/bin/env bash
+    cd scripts
+    ./build.sh android
+    cd ..
+
+build_ios:
     #!/usr/bin/env bash
     cd scripts
     ./build.sh ios
+    cd ..
 
-# build all
-build: _build_ios
+# build all - this is probably impossible
+#build: build_ios build_android
+
+#do all automatable tests for ios
+test_rust_ios: switch_to_ios
+    #!/usr/bin/env bash
+    cd rust
+    cargo test
+
+#do all automatable tests 
+test_rust_android: switch_to_android
+    #!/usr/bin/env bash
+    cd rust
+    cargo test
+
+
+test_rust: test_rust_ios test_rust_android
 
 # Test including ignored tests
 test:
@@ -34,7 +68,7 @@ bump:
     agvtool next-version -all
 
 # zip artifacts
-zip:
+zip_ios:
     #!/usr/bin/env bash
     BASE_PATH=./ios/build/NativeSigner/Build/Products/Release-iphoneos
     pushd $BASE_PATH
@@ -50,7 +84,7 @@ zip:
     # ls -al *.zip
 
 # Verify the checksums
-checksum:
+checksum_ios:
     #!/usr/bin/env bash
     BASE_PATH=./ios/build/NativeSigner/Build/Products/Release-iphoneos
     pushd $BASE_PATH
@@ -60,10 +94,10 @@ checksum:
     popd
 
 # Open artifacts folder
-open:
+open_ios:
     #!/usr/bin/env bash
     BASE_PATH=./ios/build/NativeSigner/Build/Products/Release-iphoneos
     open $BASE_PATH
 
 # Full programm excluding the bump
-release: clean build zip checksum open
+release_ios: clean build_ios zip_ios checksum_ios open_ios
