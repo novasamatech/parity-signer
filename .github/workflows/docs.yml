@@ -13,7 +13,7 @@ jobs:
     steps:
 
       - name:             Checkout repository
-        uses:             actions/checkout@v2.4
+        uses:             actions/checkout@v2.4.0
 
       - name:             Setup mdBook
         uses:             peaceiris/actions-mdbook@v1.1.13
