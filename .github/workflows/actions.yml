@@ -8,7 +8,7 @@ on:
       - stable
 jobs:
   check:
-    name:               Check
+    name:               Check on MacOS
     runs-on:            macos-latest
     steps:
 
@@ -32,12 +32,10 @@ jobs:
 
       - name:           Detox build
         run:            |
-          xcodebuild
-            -workspace ios/NativeSigner.xcodeproj/project.xcworkspace
+          xcodebuild -workspace ios/NativeSigner.xcodeproj/project.xcworkspace
             -scheme NativeSigner
             -configuration Debug
             -sdk iphonesimulator
             -derivedDataPath ios/build/NativeSigner
             -UseModernBuildSystem=YES |
-              xcpretty
-              -t && exit ${PIPESTATUS[0]}
+              xcpretty -t && exit ${PIPESTATUS[0]}
