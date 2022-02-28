@@ -18,10 +18,14 @@ jobs:
       - name:           Checkout submodules
         shell:          bash
         run:            git submodule update --init --recursive
+      - name:           Install dependencies
+        run:            |
+                        brew install opencv
       - name:           cargo test
         shell:          bash
         run:            |
                         cd rust
                         cp os-specific-lock/ios/Cargo.lock .
+                        export DYLD_FALLBACK_LIBRARY_PATH="$(xcode-select --print-path)/Toolchains/XcodeDefault.xctoolchain/usr/lib/"
                         cargo test
                         cd ..
