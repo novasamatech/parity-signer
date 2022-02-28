@@ -5,6 +5,9 @@ on:
   push:
     branches:
       - master
+    paths:
+      - '.github/workflows/docs.yml'
+      - 'docs/**'
 
 jobs:
   deploy-docs:
@@ -12,19 +15,36 @@ jobs:
     runs-on:              ubuntu-latest
     steps:
 
+      - name:             Cancel Previous Runs
+        uses:             styfle/cancel-workflow-action@0.9.1
+        with:
+          access_token:   ${{ github.token }}
+
       - name:             Checkout repository
         uses:             actions/checkout@v2.4.0
+
+      - name:             Use Rust toolchain
+        uses:             actions-rs/toolchain@v1
+        with:
+          toolchain:      stable
 
       - name:             Setup mdBook
         uses:             peaceiris/actions-mdbook@v1.1.13
         with:
           mdbook-version: 'latest'
 
-      - name:             Setup mdbook-linkcheck
-        run:              |
-          cargo install mdbook-linkcheck mdbook-mermaid
+      - name:             Install mdbook-linkcheck
+        uses:             baptiste0928/cargo-install@v1
+        with:
+          crate:          mdbook-linkcheck
 
-      - run:              |
+      - name:             Install mdbook-mermaid
+        uses:             baptiste0928/cargo-install@v1
+        with:
+          crate:          mdbook-mermaid
+
+      - name:             Build docs
+        run:              |
           mdbook build docs
 
       - name:             Deploy documentation
@@ -33,4 +53,4 @@ jobs:
         with:
           github_token:   ${{ secrets.GITHUB_TOKEN }}
           publish_branch: gh-pages
-          publish_dir:    docs/book
+          publish_dir:    docs/book/html/
