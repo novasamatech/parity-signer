@@ -91,15 +91,15 @@ pub fn multisigner_msg_genesis_encryption (data_hex: &str) -> Result<(MultiSigne
     let data = unhex::<Signer>(data_hex, NotHexSigner::InputContent)?;
     let (multi_signer, data, encryption) = match &data_hex[2..4] {
         "00" => match data.get(3..35) {
-            Some(a) => (MultiSigner::Ed25519(ed25519::Public::from_raw(a.to_vec().try_into().expect("static length"))), &data[35..], Encryption::Ed25519),
+            Some(a) => (MultiSigner::Ed25519(ed25519::Public::from_raw(a.try_into().expect("static length"))), &data[35..], Encryption::Ed25519),
             None => return Err(ErrorSigner::Input(InputSigner::TooShort)),
         },
         "01" => match data.get(3..35) {
-            Some(a) => (MultiSigner::Sr25519(sr25519::Public::from_raw(a.to_vec().try_into().expect("static length"))), &data[35..], Encryption::Sr25519),
+            Some(a) => (MultiSigner::Sr25519(sr25519::Public::from_raw(a.try_into().expect("static length"))), &data[35..], Encryption::Sr25519),
             None => return Err(ErrorSigner::Input(InputSigner::TooShort)),
         },
         "02" => match data.get(3..36) {
-            Some(a) => (MultiSigner::Ecdsa(ecdsa::Public::from_raw(a.to_vec().try_into().expect("static length"))), &data[36..], Encryption::Ecdsa),
+            Some(a) => (MultiSigner::Ecdsa(ecdsa::Public::from_raw(a.try_into().expect("static length"))), &data[36..], Encryption::Ecdsa),
             None => return Err(ErrorSigner::Input(InputSigner::TooShort)),
         },
         _ => return Err(ErrorSigner::Input(InputSigner::EncryptionNotSupported(data_hex[2..4].to_string()))),

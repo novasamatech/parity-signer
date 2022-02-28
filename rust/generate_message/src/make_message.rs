@@ -16,20 +16,20 @@ pub fn make_message (make: Make) -> Result<(), ErrorActive> {
 // check message content for consistency
     let (message_to_verify, message_to_transfer, name_stub, msg_type_code) = match make.msg {
         Msg::LoadTypes(vec) => {
-            let content = ContentLoadTypes::from_vec(&vec);
+            let content = ContentLoadTypes::from_slice(&vec);
             content.types::<Active>()?;
             (content.to_sign(), content.to_transfer(), String::from("load_types"), "81")
         },
         Msg::LoadMetadata(vec) => {
-            let content = ContentLoadMeta::from_vec(&vec);
+            let content = ContentLoadMeta::from_slice(&vec);
             let meta = content.meta::<Active>()?;
-            match MetaValues::from_vec_metadata(&meta) {
+            match MetaValues::from_slice_metadata(&meta) {
                 Ok(meta_values) => (content.to_sign(), content.to_transfer(), format!("load_metadata_{}V{}", meta_values.name, meta_values.version), "80"),
                 Err(e) => return Err(ErrorActive::Input(InputActive::FaultyMetadataInPayload(e))),
             }
         },
         Msg::AddSpecs(vec) => {
-            let content = ContentAddSpecs::from_vec(&vec);
+            let content = ContentAddSpecs::from_slice(&vec);
             let network_specs = content.specs::<Active>()?;
             (content.to_sign(), content.to_transfer(), format!("add_specs_{}-{}", network_specs.name, network_specs.encryption.show()), "c1")
         },

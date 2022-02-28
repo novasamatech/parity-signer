@@ -387,9 +387,9 @@ pub fn all_events_preview() -> Vec<Event> {
     events.push(Event::NetworkSpecsSigned(NetworkSpecsExport::get(&network_specs.to_send(), &verifier_value)));
     events.push(Event::NetworkVerifierSet(NetworkVerifierDisplay::get(&VerifierKey::from_parts(&network_specs.genesis_hash), &valid_current_verifier, &verifier)));
     events.push(Event::GeneralVerifierSet(verifier.to_owned()));
-    events.push(Event::TypesAdded(TypesDisplay::get(&ContentLoadTypes::from_vec(&Vec::new()), &verifier)));
-    events.push(Event::TypesRemoved(TypesDisplay::get(&ContentLoadTypes::from_vec(&Vec::new()), &verifier)));
-    events.push(Event::TypesSigned(TypesExport::get(&ContentLoadTypes::from_vec(&Vec::new()), &verifier_value)));
+    events.push(Event::TypesAdded(TypesDisplay::get(&ContentLoadTypes::from_slice(&[]), &verifier)));
+    events.push(Event::TypesRemoved(TypesDisplay::get(&ContentLoadTypes::from_slice(&[]), &verifier)));
+    events.push(Event::TypesSigned(TypesExport::get(&ContentLoadTypes::from_slice(&[]), &verifier_value)));
     events.push(Event::TransactionSigned(SignDisplay::get(&Vec::new(), "westend", &verifier_value, "send to Alice")));
     events.push(Event::TransactionSignError(SignDisplay::get(&Vec::new(), "westend", &verifier_value, "send to Alice")));
     events.push(Event::MessageSigned(SignMessageDisplay::get("This is Alice\nRoger", "westend", &verifier_value, "send to Alice")));

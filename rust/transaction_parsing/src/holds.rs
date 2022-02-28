@@ -29,7 +29,7 @@ fn collect_set (verifier_key: &VerifierKey, chainspecs: &Tree, metadata: &Tree) 
     let mut name_found: Option<String> = None;
     for x in chainspecs.iter().flatten() {
         let network_specs = NetworkSpecs::from_entry_checked::<Signer>(x)?;
-        if network_specs.genesis_hash.to_vec() == genesis_hash {
+        if network_specs.genesis_hash == genesis_hash[..] {
             name_found = match name_found {
                 Some(n) => {
                     if n != network_specs.name {return Err(ErrorSigner::Database(DatabaseSigner::DifferentNamesSameGenesisHash{name1: n, name2: network_specs.name, genesis_hash}))}

@@ -149,7 +149,7 @@ pub fn write_metadata (sorted_meta_values: SortedMetaValues) -> Result<(), Error
     all_meta.extend_from_slice(&sorted_meta_values.older);
     for x in all_meta.iter() {
         let meta_key = MetaKey::from_parts(&x.name, x.version);
-        metadata_batch.insert(meta_key.key(), x.meta.to_vec());
+        metadata_batch.insert(meta_key.key(), &x.meta[..]);
     }
     TrDbHot::new()
         .set_metadata(metadata_batch)

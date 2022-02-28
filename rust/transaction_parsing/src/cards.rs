@@ -18,8 +18,8 @@ pub (crate) enum Card <'a> {
     TypesInfo(ContentLoadTypes),
     NewSpecs(&'a NetworkSpecsToSend),
     NetworkInfo(&'a NetworkSpecs),
-    NetworkGenesisHash(&'a Vec<u8>),
-    Derivations(&'a Vec<String>),
+    NetworkGenesisHash(&'a [u8]),
+    Derivations(&'a [String]),
     Warning (Warning <'a>),
     Error (ErrorSigner),
 }
@@ -98,9 +98,9 @@ impl <'a> Card <'a> {
             Card::AuthorPublicKey(author) => {
                 let hex_identicon = hex::encode(make_identicon_from_multisigner(author));
                 let insert = match author {
-                    MultiSigner::Ed25519(p) => format!("{{\"public_key\":\"{}\",\"identicon\":\"{}\",\"encryption\":\"{}\"}}", hex::encode(p.to_vec()), hex_identicon, Encryption::Ed25519.show()),
-                    MultiSigner::Sr25519(p) => format!("{{\"public_key\":\"{}\",\"identicon\":\"{}\",\"encryption\":\"{}\"}}", hex::encode(p.to_vec()), hex_identicon, Encryption::Sr25519.show()),
-                    MultiSigner::Ecdsa(p) => format!("{{\"public_key\":\"{}\",\"identicon\":\"{}\",\"encryption\":\"{}\"}}", hex::encode(p.0.to_vec()), hex_identicon, Encryption::Ecdsa.show()),
+                    MultiSigner::Ed25519(p) => format!("{{\"public_key\":\"{}\",\"identicon\":\"{}\",\"encryption\":\"{}\"}}", hex::encode(&p), hex_identicon, Encryption::Ed25519.show()),
+                    MultiSigner::Sr25519(p) => format!("{{\"public_key\":\"{}\",\"identicon\":\"{}\",\"encryption\":\"{}\"}}", hex::encode(&p), hex_identicon, Encryption::Sr25519.show()),
+                    MultiSigner::Ecdsa(p) => format!("{{\"public_key\":\"{}\",\"identicon\":\"{}\",\"encryption\":\"{}\"}}", hex::encode(&p), hex_identicon, Encryption::Ecdsa.show()),
                 };
                 fancy(index, indent, "author_public_key", &insert)
             },

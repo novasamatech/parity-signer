@@ -15,7 +15,7 @@ pub fn remove_info (info: Remove) -> Result<(), ErrorActive> {
             let mut metadata_batch = Batch::default();
             let mut network_specs_prep_batch = Batch::default();
             let address_book_entry = get_address_book_entry(&network_title)?;
-            let network_specs_key = NetworkSpecsKey::from_parts(&address_book_entry.genesis_hash.to_vec(), &address_book_entry.encryption);
+            let network_specs_key = NetworkSpecsKey::from_parts(&address_book_entry.genesis_hash, &address_book_entry.encryption);
             address_book_batch.remove(AddressBookKey::from_title(&network_title).key());
             network_specs_prep_batch.remove(network_specs_key.key());
             let mut meta_to_del: Vec<MetaKey> = Vec::new();

@@ -8,7 +8,7 @@ pub fn process_derivations(data_hex: &str, database_name: &str) -> Result<Action
     let data = unhex::<Signer>(data_hex, NotHexSigner::InputContent)?;
     let content_derivations = ContentDerivations::from_slice(&data[3..]);
     let (encryption, genesis_hash, derivations) = content_derivations.encryption_genhash_derivations()?;
-    let network_specs_key = NetworkSpecsKey::from_parts(&genesis_hash.to_vec(), &encryption);
+    let network_specs_key = NetworkSpecsKey::from_parts(&genesis_hash, &encryption);
     match try_get_network_specs(database_name, &network_specs_key)? {
         Some(network_specs) => {
             check_derivation_set(&derivations)?;

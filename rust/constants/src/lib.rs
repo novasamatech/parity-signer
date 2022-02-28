@@ -1,3 +1,5 @@
+pub mod test_values;
+
 /// COLD database on Signer device:  
 ///
 /// Contains:

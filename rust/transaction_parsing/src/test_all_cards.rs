@@ -40,7 +40,7 @@ pub fn make_all_cards() -> Action {
     };
     let address_details = AddressDetails {
         seed_name: String::from("Alice"),
-        path: String::from("//Alice"),
+        path: String::from("//Bob"),
         has_pwd: false,
         network_id: Vec::new(),
         encryption: Encryption::Sr25519,
@@ -76,10 +76,10 @@ Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deseru
     all_cards.push(Card::AuthorPublicKey(&MultiSigner::Sr25519(sp_core::sr25519::Public::from_raw(PUBLIC))).card(&mut index,0));
     all_cards.push(Card::Verifier(&verifier_value_sr25519()).card(&mut index,0));
     all_cards.push(Card::Meta(MetaValuesDisplay::get(&MetaValues{name: String::from("westend"), version: 9100, optional_base58prefix: Some(42), warn_incomplete_extensions: false, meta: Vec::new()})).card(&mut index,0));
-    all_cards.push(Card::TypesInfo(ContentLoadTypes::generate(&Vec::new())).card(&mut index,0));
+    all_cards.push(Card::TypesInfo(ContentLoadTypes::from_slice(&[])).card(&mut index,0));
     all_cards.push(Card::NewSpecs(&network_specs_westend.to_send()).card(&mut index,0));
     all_cards.push(Card::NetworkInfo(&network_specs_westend).card(&mut index,0));
-    all_cards.push(Card::NetworkGenesisHash(&network_specs_westend.genesis_hash.to_vec()).card(&mut index,0));
+    all_cards.push(Card::NetworkGenesisHash(&network_specs_westend.genesis_hash).card(&mut index,0));
     all_cards.push(Card::Derivations(&vec!["//Alice".to_string(), "//Alice/2/1".to_string(), "//secret//westend".to_string()]).card(&mut index,0));
 
     all_cards.push(Card::Warning(Warning::AuthorNotFound).card(&mut index,0));
@@ -89,9 +89,9 @@ Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deseru
     all_cards.push(Card::Warning(Warning::UpdatingTypes).card(&mut index,0));
     all_cards.push(Card::Warning(Warning::TypesNotVerified).card(&mut index,0));
     all_cards.push(Card::Warning(Warning::GeneralVerifierAppeared(&GeneralHold{metadata_set: Vec::new(), network_specs_set: Vec::new(), types: true})).card(&mut index,0));
-    all_cards.push(Card::Warning(Warning::VerifierChangingToGeneral{verifier_key: &VerifierKey::from_parts(&network_specs_westend.genesis_hash.to_vec()), hold: &Hold{metadata_set: Vec::new(), network_specs_set: Vec::new()}}).card(&mut index,0));
-    all_cards.push(Card::Warning(Warning::VerifierChangingToCustom{verifier_key: &VerifierKey::from_parts(&network_specs_westend.genesis_hash.to_vec()), hold: &Hold{metadata_set: Vec::new(), network_specs_set: Vec::new()}}).card(&mut index,0));
-    all_cards.push(Card::Warning(Warning::VerifierGeneralSuper{verifier_key: &VerifierKey::from_parts(&network_specs_westend.genesis_hash.to_vec()), hold: &Hold{metadata_set: Vec::new(), network_specs_set: Vec::new()}}).card(&mut index,0));
+    all_cards.push(Card::Warning(Warning::VerifierChangingToGeneral{verifier_key: &VerifierKey::from_parts(&network_specs_westend.genesis_hash), hold: &Hold{metadata_set: Vec::new(), network_specs_set: Vec::new()}}).card(&mut index,0));
+    all_cards.push(Card::Warning(Warning::VerifierChangingToCustom{verifier_key: &VerifierKey::from_parts(&network_specs_westend.genesis_hash), hold: &Hold{metadata_set: Vec::new(), network_specs_set: Vec::new()}}).card(&mut index,0));
+    all_cards.push(Card::Warning(Warning::VerifierGeneralSuper{verifier_key: &VerifierKey::from_parts(&network_specs_westend.genesis_hash), hold: &Hold{metadata_set: Vec::new(), network_specs_set: Vec::new()}}).card(&mut index,0));
     all_cards.push(Card::Warning(Warning::TypesAlreadyThere).card(&mut index,0));
     all_cards.push(Card::Warning(Warning::NetworkSpecsAlreadyThere(&network_specs_westend.title)).card(&mut index,0));
     all_cards.push(Card::Warning(Warning::MetadataExtensionsIncomplete).card(&mut index,0));

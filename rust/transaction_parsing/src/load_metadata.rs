@@ -13,13 +13,13 @@ enum FirstCard {
 
 pub fn load_metadata(data_hex: &str, database_name: &str) -> Result<Action, ErrorSigner> {
     let checked_info = pass_crypto(data_hex, TransferContent::LoadMeta)?;
-    let (meta, genesis_hash) = ContentLoadMeta::from_vec(&checked_info.message).meta_genhash::<Signer>()?;
-    let meta_values = match MetaValues::from_vec_metadata(&meta) {
+    let (meta, genesis_hash) = ContentLoadMeta::from_slice(&checked_info.message).meta_genhash::<Signer>()?;
+    let meta_values = match MetaValues::from_slice_metadata(&meta) {
         Ok(a) => a,
         Err(e) => return Err(<Signer>::faulty_metadata(e, MetadataSource::Incoming(IncomingMetadataSourceSigner::ReceivedData))),
     };
     let general_verifier = get_general_verifier(database_name)?;
-    let verifier_key = VerifierKey::from_parts(&genesis_hash.to_vec());
+    let verifier_key = VerifierKey::from_parts(&genesis_hash);
     let valid_current_verifier = match try_get_valid_current_verifier (&verifier_key, database_name)? {
         Some(a) => a,
         None => return Err(ErrorSigner::Input(InputSigner::LoadMetaUnknownNetwork{name: meta_values.name})),

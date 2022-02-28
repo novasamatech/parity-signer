@@ -28,8 +28,8 @@ impl ContentLoadMeta {
         )
     }
     /// Function to transform Vec<u8> into ContentLoadMeta prior to processing
-    pub fn from_vec (vec: &[u8]) -> Self {
-        Self(vec.to_vec())
+    pub fn from_slice (slice: &[u8]) -> Self {
+        Self(slice.to_vec())
     }
     /// Function to get metadata from load_metadata content
     pub fn meta<T: ErrorSource>(&self) -> Result<Vec<u8>, T::Error>  {
@@ -88,8 +88,8 @@ impl ContentAddSpecs {
         )
     }
     /// Function to transform Vec<u8> into ContentAddSpecs prior to processing
-    pub fn from_vec (vec: &[u8]) -> Self {
-        Self(vec.to_vec())
+    pub fn from_slice (slice: &[u8]) -> Self {
+        Self(slice.to_vec())
     }
     /// Function to get network specs NetworkSpecsToSend from add_specs content
     pub fn specs<T: ErrorSource> (&self) -> Result<NetworkSpecsToSend, T::Error> {
@@ -135,8 +135,8 @@ impl ContentLoadTypes {
         )
     }
     /// Function to transform Vec<u8> into ContentLoadTypes prior to processing
-    pub fn from_vec (vec: &[u8]) -> Self {
-        Self(vec.to_vec())
+    pub fn from_slice (slice: &[u8]) -> Self {
+        Self(slice.to_vec())
     }
     /// Function to get vector Vec<TypeEntry> from load_types content
     pub fn types<T: ErrorSource> (&self) -> Result<Vec<TypeEntry>, T::Error> {
