@@ -1,0 +1,48 @@
+name:                     Check links and Publish Docs
+
+on:
+  push:
+    branches:
+      - master
+    paths:
+      - '.github/workflows/docs.yml'
+      - 'docs/**'
+
+jobs:
+  deploy-docs:
+    name:                 Deploy docs
+    runs-on:              ubuntu-latest
+    steps:
+
+      - name:             Checkout repository
+        uses:             actions/checkout@v2.4.0
+
+      - name:             Use Rust toolchain
+        uses:             actions-rs/toolchain@v1
+        with:
+          toolchain:      stable
+
+      - name:             Setup mdBook
+        uses:             peaceiris/actions-mdbook@v1.1.13
+        with:
+          mdbook-version: 'latest'
+
+      - name:             Install mdbook-linkcheck
+        uses:             baptiste0928/cargo-install@v1
+        with:
+          crate:          mdbook-linkcheck
+
+      - name:             Install mdbook-mermaid
+        uses:             baptiste0928/cargo-install@v1
+        with:
+          crate:          mdbook-mermaid
+
+      - run:              |
+          mdbook build docs
+
+      - name:             Deploy documentation
+        uses:             peaceiris/actions-gh-pages@v3
+        with:
+          github_token:   ${{ secrets.GITHUB_TOKEN }}
+          publish_branch: gh-pages
+          publish_dir:    docs/book/html/
