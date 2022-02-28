@@ -50,4 +50,4 @@ jobs:
           cd rust
           cp os-specific-lock/android/Cargo.lock .
           cp signer/android-hack/Cargo.toml signer
-          cargo nextest
+          cargo nextest run
