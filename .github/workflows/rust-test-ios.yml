@@ -1,4 +1,4 @@
-name:                   Rust backend test for ios
+name:                     Rust backend test for ios
 
 on:
   pull_request:
@@ -9,28 +9,28 @@ on:
 
 jobs:
   check:
-    name:               Cargo test on macOS
-    runs-on:            macos-latest
+    name:                 Cargo test on macOS
+    runs-on:              macos-latest
     steps:
 
-      - name:           Cancel Previous Runs
-        uses:           styfle/cancel-workflow-action@0.9.1
+      - name:             Cancel Previous Runs
+        uses:             styfle/cancel-workflow-action@0.9.1
         with:
-          access_token: ${{ github.token }}
+          access_token:   ${{ github.token }}
 
-      - name:           Checkout sources
-        uses:           actions/checkout@v2.4.0
+      - name:             Checkout sources
+        uses:             actions/checkout@v2.4.0
         with:
-          fetch-depth:  50
-          submodules:   'recursive'
+          fetch-depth:    50
+          submodules:     'recursive'
 
-      - name:           Install dependencies
-        run:            |
+      - name:             Install dependencies
+        run:              |
           brew install opencv
 
-      - name:           cargo test
-        shell:          bash
-        run:            |
+      - name:             cargo test
+        shell:            bash
+        run:              |
           cd rust
           cp os-specific-lock/ios/Cargo.lock .
           cp signer/ios-hack/Cargo.toml signer
