@@ -11,24 +11,33 @@ jobs:
     name:               Check
     runs-on:            macos-latest
     steps:
+
       - name:           Checkout sources
         uses:           actions/checkout@v2
         with:
           fetch-depth:  50
-      - name:           Checkout submodules
-        shell:          bash
-        run:            git submodule update --init --recursive
+          submodules:   'recursive'
+
       - name:           Install dependencies
         run:            |
           brew tap wix/brew
           brew install applesimutils
           gem install xcpretty
+
       - name:           Rust build
         shell:          bash
-        run:            cd scripts && ./build.sh ios && cd ..
+        run:            |
+          cd scripts
+          ./build.sh ios
+
       - name:           Detox build
-        run: |
-          xcodebuild -workspace ios/NativeSigner.xcodeproj/project.xcworkspace \
-            -scheme NativeSigner -configuration Debug -sdk iphonesimulator \
-            -derivedDataPath ios/build/NativeSigner -UseModernBuildSystem=YES | \
-            xcpretty -t && exit ${PIPESTATUS[0]}
+        run:            |
+          xcodebuild
+            -workspace ios/NativeSigner.xcodeproj/project.xcworkspace
+            -scheme NativeSigner
+            -configuration Debug
+            -sdk iphonesimulator
+            -derivedDataPath ios/build/NativeSigner
+            -UseModernBuildSystem=YES |
+              xcpretty
+              -t && exit ${PIPESTATUS[0]}
