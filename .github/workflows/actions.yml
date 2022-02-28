@@ -32,10 +32,11 @@ jobs:
 
       - name:           Detox build
         run:            |
-          xcodebuild -workspace ios/NativeSigner.xcodeproj/project.xcworkspace
-            -scheme NativeSigner
-            -configuration Debug
-            -sdk iphonesimulator
-            -derivedDataPath ios/build/NativeSigner
-            -UseModernBuildSystem=YES |
+          xcodebuild \
+            -workspace ios/NativeSigner.xcodeproj/project.xcworkspace \
+            -scheme NativeSigner \
+            -configuration Debug \
+            -sdk iphonesimulator \
+            -derivedDataPath ios/build/NativeSigner \
+            -UseModernBuildSystem=YES | \
               xcpretty -t && exit ${PIPESTATUS[0]}
