@@ -1,4 +1,4 @@
-name:                   Rust backend test for android
+name:                     Rust backend test for android
 
 on:
   pull_request:
@@ -6,29 +6,48 @@ on:
     branches:
       - master
       - stable
+
 jobs:
   check:
-    name:               Check
-    runs-on:            ubuntu-latest
+    name:                 Cargo test on Ubuntu
+    runs-on:              ubuntu-latest
     steps:
-      - name:           Checkout sources
-        uses:           actions/checkout@v2
-        with:
-          fetch-depth:  50
 
-      - name:           Install system dependancies
-        run:            |
+      - name:             Cancel Previous Runs
+        uses:             styfle/cancel-workflow-action@0.9.1
+        with:
+          access_token:   ${{ github.token }}
+
+      - name:             Checkout sources
+        uses:             actions/checkout@v2.4.0
+        with:
+          fetch-depth:    50
+          submodules:     'recursive'
+
+      - name:             Install system dependancies
+        run:              |
           sudo apt update
           sudo apt install -y clang libclang-dev libopencv-dev
-        shell:          bash
 
-      - name:           Checkout submodules
-        shell:          bash
-        run:            git submodule update --init --recursive
-      - name:           cargo test
-        shell:          bash
-        run:            |
-                        cd rust 
-                        cp os-specific-lock/android/Cargo.lock . 
-                        cargo test 
-                        cd ..
+      - name:             Install Rust stable toolchain
+        uses:             actions-rs/toolchain@v1.0.7
+        with:
+          profile:        minimal
+          toolchain:      stable
+          override:       true
+
+      - name:             Install cargo-nextest
+        uses:             baptiste0928/cargo-install@v1
+        with:
+          crate:          cargo-nextest
+          version:        0.9
+
+      - name: Rust Cache
+        uses: Swatinem/rust-cache@v1.3.0
+
+      - name:             cargo test
+        run:              |
+          cd rust
+          cp os-specific-lock/android/Cargo.lock .
+          cp signer/android-hack/Cargo.toml signer
+          cargo nextest run
