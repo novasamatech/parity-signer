@@ -22,3 +22,4 @@ image = "0.23.14"
 parser = {path = "../parser"}
 quircs = "0.10.0"
 regex = "1.4.5"
+constants = {path = "../constants"}

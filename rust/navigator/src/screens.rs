@@ -110,7 +110,7 @@ impl KeysState {
         let network_specs = first_network(database_name)?;
         Ok(Self {
             seed_name: seed_name.to_string(),
-            network_specs_key: NetworkSpecsKey::from_parts(&network_specs.genesis_hash.to_vec(), &network_specs.encryption),
+            network_specs_key: NetworkSpecsKey::from_parts(&network_specs.genesis_hash, &network_specs.encryption),
             specialty: SpecialtyKeysState::None,
         })
     }

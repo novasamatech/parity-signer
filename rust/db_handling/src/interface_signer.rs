@@ -105,7 +105,7 @@ pub fn print_identities_for_seed_name_and_network (database_name: &str, seed_nam
     }
     let root_print = match root_id {
         Some(a) => a,
-        None => format!("\"seed_name\":\"{}\",\"identicon\":\"{}\",\"address_key\":\"\",\"base58\":\"\",\"swiped\":false,\"multiselect\":false", hex::encode(EMPTY_PNG), seed_name),
+        None => format!("\"seed_name\":\"{}\",\"identicon\":\"{}\",\"address_key\":\"\",\"base58\":\"\",\"swiped\":false,\"multiselect\":false", seed_name, hex::encode(EMPTY_PNG)),
     };
     let other_print = export_complex_vector(&other_id, |(multisigner, address_details, identicon, swiped, is_multiselect)| format!("\"address_key\":\"{}\",\"base58\":\"{}\",\"identicon\":\"{}\",\"has_pwd\":{},\"path\":\"{}\",\"swiped\":{},\"multiselect\":{}", hex::encode(AddressKey::from_multisigner(multisigner).key()), print_multisigner_as_base58(multisigner, Some(network_specs.base58prefix)), hex::encode(identicon), address_details.has_pwd, address_details.path, swiped, is_multiselect));
     
