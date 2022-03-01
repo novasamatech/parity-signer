@@ -1,10 +1,14 @@
 package io.parity.signer.models
 
 import android.Manifest
-import android.content.Context
-import android.content.SharedPreferences
+import android.annotation.SuppressLint
+import android.content.*
 import android.content.pm.PackageManager
+import android.os.Build
+import android.provider.Settings
 import android.util.Log
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -13,25 +17,16 @@ import androidx.security.crypto.EncryptedSharedPreferences
 import androidx.security.crypto.MasterKey
 import io.parity.signer.*
 import io.parity.signer.components.Authentication
-import org.json.JSONArray
 import org.json.JSONObject
 import java.io.File
 import java.io.FileOutputStream
-import android.content.Intent
-
-import android.content.BroadcastReceiver
-
-import android.content.IntentFilter
-import android.os.Build
-import android.provider.Settings
-import androidx.core.content.ContextCompat
 
 /**
  * This is single object to handle all interactions with backend
  */
 class SignerDataModel : ViewModel() {
-	internal val REQUIRED_PERMISSIONS = arrayOf(Manifest.permission.CAMERA)
-	internal val REQUEST_CODE_PERMISSIONS = 10
+	private val REQUIRED_PERMISSIONS = arrayOf(Manifest.permission.CAMERA)
+	private val REQUEST_CODE_PERMISSIONS = 10
 
 	//Internal model values
 	private val _onBoardingDone = MutableLiveData(OnBoardingState.InProgress)
@@ -43,13 +38,16 @@ class SignerDataModel : ViewModel() {
 	lateinit var activity: FragmentActivity
 	private lateinit var masterKey: MasterKey
 	private var hasStrongbox: Boolean = false
-	private var _generalCertificate = MutableLiveData(JSONObject())
 
 	//Alert
 	private val _alertState = MutableLiveData(ShieldAlert.None)
 
+	//State of the app being unlocked
+	private val _authenticated = MutableLiveData(false)
+
 	//Authenticator to call!
-	internal var authentication: Authentication = Authentication()
+	internal var authentication: Authentication =
+		Authentication(setAuth = { _authenticated.value = it })
 
 	//Camera stuff
 	internal var bucket = arrayOf<String>()
@@ -59,20 +57,13 @@ class SignerDataModel : ViewModel() {
 	internal val _progress = MutableLiveData(0.0f)
 
 	//Transaction
-	internal val _transaction = MutableLiveData(JSONArray())
 	internal var action = JSONObject()
-	internal val _actionable = MutableLiveData(false)
-	var signingAuthor = JSONObject()
-	internal var signature = ""
 
 	//Internal storage for model data:
 	//TODO: hard types for these
 
 	//Seeds
 	internal val _seedNames = MutableLiveData(arrayOf<String>())
-
-	//TODO: keeping super secret seeds in questionably managed observable must be studied critically
-	internal val _backupSeedPhrase = MutableLiveData("")
 
 	//Error
 	internal val _lastError = MutableLiveData("")
@@ -101,9 +92,6 @@ class SignerDataModel : ViewModel() {
 	internal val captured: LiveData<Int?> = _captured
 	val progress: LiveData<Float> = _progress
 
-	val transaction: LiveData<JSONArray> = _transaction
-	val actionable: LiveData<Boolean> = _actionable
-
 	val seedNames: LiveData<Array<String>> = _seedNames
 
 	val lastError: LiveData<String> = _lastError
@@ -111,6 +99,7 @@ class SignerDataModel : ViewModel() {
 	//Observables for screens state
 
 	val onBoardingDone: LiveData<OnBoardingState> = _onBoardingDone
+	val authenticated: LiveData<Boolean> = _authenticated
 
 	val alertState: LiveData<ShieldAlert> = _alertState
 
@@ -149,6 +138,7 @@ class SignerDataModel : ViewModel() {
 		} else {
 			false
 		}
+		authentication.strongCredentials = hasStrongbox
 
 		Log.d("strongbox available:", hasStrongbox.toString())
 
@@ -159,7 +149,6 @@ class SignerDataModel : ViewModel() {
 
 		val receiver: BroadcastReceiver = object : BroadcastReceiver() {
 			override fun onReceive(context: Context, intent: Intent) {
-				Log.d("AirplaneMode", "Service state changed")
 				isAirplaneOn()
 			}
 		}
@@ -199,6 +188,7 @@ class SignerDataModel : ViewModel() {
 	 * This is normal onboarding
 	 */
 	fun onBoard() {
+		wipe()
 		copyAsset("")
 		historyInitHistoryWithCert(dbName)
 		totalRefresh()
@@ -217,6 +207,7 @@ class SignerDataModel : ViewModel() {
 	/**
 	 * Wipes all data
 	 */
+	@SuppressLint("ApplySharedPref")
 	fun wipe() {
 		deleteDir(File(dbName))
 		sharedPreferences.edit().clear().commit() //No, not apply(), do it now!
@@ -278,43 +269,51 @@ class SignerDataModel : ViewModel() {
 		) {
 			if (alertState.value != ShieldAlert.Active) {
 				_alertState.value = ShieldAlert.Active
-				historyDeviceWasOnline(dbName)
+				if (onBoardingDone.value == OnBoardingState.Yes) historyDeviceWasOnline(
+					dbName
+				)
 			}
 		} else {
 			if (alertState.value == ShieldAlert.Active) {
-				_alertState.value = ShieldAlert.Past
+				_alertState.value = if (onBoardingDone.value == OnBoardingState.Yes)
+					ShieldAlert.Past else ShieldAlert.None
 			}
 		}
 	}
 
-	internal fun allPermissionsGranted() = REQUIRED_PERMISSIONS.all {
+
+	private fun allPermissionsGranted() = REQUIRED_PERMISSIONS.all {
 		ContextCompat.checkSelfPermission(
 			context, it
 		) == PackageManager.PERMISSION_GRANTED
+	}
+
+	internal fun handleCameraPermissions() {
+		if (!allPermissionsGranted()) {
+			ActivityCompat.requestPermissions(
+				activity,
+				REQUIRED_PERMISSIONS,
+				REQUEST_CODE_PERMISSIONS
+			)
+		}
 	}
 
 	//MARK: Init boilerplate end
 
 	//MARK: General utils begin
 
-	fun refreshGUI() {
-		_backupSeedPhrase.value = ""
-		clearError()
-	}
-
 	/**
 	 * This returns the app into starting state; should be called
 	 * on all "back"-like events and new screen spawns just in case
 	 */
 	fun totalRefresh() {
-		_backupSeedPhrase.value = ""
 		val checkRefresh = File(dbName).exists()
 		if (checkRefresh) _onBoardingDone.value =
 			OnBoardingState.Yes else _onBoardingDone.value = OnBoardingState.No
 		if (checkRefresh) {
-			initNavigation(dbName, seedNames.value?.joinToString(",")?:"")
+			getAlertState()
+			refreshSeedNames(init = true)
 			pushButton(ButtonID.Start)
-			refreshSeedNames()
 		}
 	}
 
@@ -337,6 +336,21 @@ class SignerDataModel : ViewModel() {
 		).versionName
 	}
 
+	private fun getAlertState() {
+		_alertState.value = if (historyGetWarnings(dbName)) {
+			if (alertState.value == ShieldAlert.Active) ShieldAlert.Active else ShieldAlert.Past
+		} else {
+			ShieldAlert.None
+		}
+	}
+
+	fun acknowledgeWarning() {
+		if (alertState.value == ShieldAlert.Past) {
+			historyAcknowledgeWarnings(dbName)
+			_alertState.value = ShieldAlert.None
+		}
+	}
+
 	//MARK: General utils end
 
 	//MARK: rust native section begin
@@ -350,9 +364,9 @@ class SignerDataModel : ViewModel() {
 	external fun initNavigation(
 		dbname: String,
 		seedNames: String
-	);
+	)
 
-	external fun updateSeedNames(seedNames: String);
+	external fun updateSeedNames(seedNames: String)
 
 	external fun qrparserGetPacketsTotal(data: String, cleaned: Boolean): Int
 	external fun qrparserTryDecodeQrSequence(
@@ -366,13 +380,14 @@ class SignerDataModel : ViewModel() {
 
 	external fun substrateValidateSeedphrase(seed_phrase: String)
 
-	external fun historyInitHistoryWithCert(dbname: String)
-	external fun historyInitHistoryNoCert(dbname: String)
-	external fun historyDeviceWasOnline(dbname: String)
-	external fun historyGetWarnings(dbname: String): Boolean
-	external fun historyAcknowledgeWarnings(dbname: String)
-	external fun historyEntrySystem(entry: String, dbname: String)
-	external fun historyHistorySeedNameWasShown(seedName: String, dbname: String)
+	private external fun historyInitHistoryWithCert(dbname: String)
+	private external fun historyInitHistoryNoCert(dbname: String)
+	private external fun historyDeviceWasOnline(dbname: String)
+	private external fun historyGetWarnings(dbname: String): Boolean
+	private external fun historyAcknowledgeWarnings(dbname: String)
+
+	//external fun historyEntrySystem(entry: String, dbname: String)
+	external fun historySeedNameWasShown(seedName: String, dbname: String)
 
 	//external fun testGetAllTXCards(dbname: String): String
 	//external fun testGetAllLogCards(dbname: String): String

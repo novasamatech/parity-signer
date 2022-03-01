@@ -20,26 +20,27 @@ fun HistoryCardTemplate(
 	line3: String,
 	danger: Boolean = false
 ) {
-	val color1 = Text500
+	val color1 = MaterialTheme.colors.Text500
 	val color2 = if (danger) {
-		BaseDanger
+		MaterialTheme.colors.SignalDanger
 	} else {
-		Crypto400
+		MaterialTheme.colors.Crypto400
 	}
-	val color3 = Text300
+	val color3 = MaterialTheme.colors.Text300
+	val line1cut = if (line1.length>16) line1.substring(0, 16) else line1
 
 	Row(
 		verticalAlignment = Alignment.CenterVertically,
 		modifier = Modifier
 			.padding(top = 3.dp, start = 12.dp, end = 12.dp)
 			.fillMaxWidth(1f)
-			.background(Bg200)
+			.background(MaterialTheme.colors.Bg200)
 			.padding(8.dp)
 	) {
 		Column(
 			modifier = Modifier.padding(horizontal = 8.dp)
 		) {
-			Text(line1.substring(0, 16), color = color1, style = MaterialTheme.typography.subtitle2)
+			Text(line1cut, color = color1, style = MaterialTheme.typography.subtitle2)
 			Text(line2, color = color2, style = MaterialTheme.typography.subtitle2)
 			if (line3.isNotBlank()) Text(
 				line3,

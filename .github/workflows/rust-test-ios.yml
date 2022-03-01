@@ -1,0 +1,54 @@
+name:                     Rust backend test for ios
+
+on:
+  pull_request:
+  push:
+    branches:
+      - master
+      - stable
+
+jobs:
+  check:
+    name:                 Cargo test on macOS
+    runs-on:              macos-latest
+    steps:
+
+      - name:             Cancel Previous Runs
+        uses:             styfle/cancel-workflow-action@0.9.1
+        with:
+          access_token:   ${{ github.token }}
+
+      - name:             Checkout sources
+        uses:             actions/checkout@v2.4.0
+        with:
+          fetch-depth:    50
+          submodules:     'recursive'
+
+      - name:             Install dependencies
+        run:              |
+          brew install opencv
+
+      - name:             Install Rust stable toolchain
+        uses:             actions-rs/toolchain@v1.0.7
+        with:
+          profile:        minimal
+          toolchain:      stable
+          override:       true
+
+      - name:             Install cargo-nextest
+        uses:             baptiste0928/cargo-install@v1
+        with:
+          crate:          cargo-nextest
+          version:        0.9
+
+      - name: Rust Cache
+        uses: Swatinem/rust-cache@v1.3.0
+
+      - name:             cargo test
+        shell:            bash
+        run:              |
+          cd rust
+          cp os-specific-lock/ios/Cargo.lock .
+          cp signer/ios-hack/Cargo.toml signer
+          export DYLD_FALLBACK_LIBRARY_PATH="$(xcode-select --print-path)/Toolchains/XcodeDefault.xctoolchain/usr/lib/"
+          cargo nextest run
