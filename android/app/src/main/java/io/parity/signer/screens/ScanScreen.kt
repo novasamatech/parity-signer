@@ -8,7 +8,9 @@ import androidx.camera.view.PreviewView
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
@@ -35,7 +37,7 @@ fun ScanScreen(signerDataModel: SignerDataModel) {
 	val cameraProviderFuture =
 		remember { ProcessCameraProvider.getInstance(context) }
 
-	Column (Modifier.fillMaxSize()) {
+	Column (Modifier.fillMaxSize().verticalScroll(rememberScrollState())) {
 		Box(
 			Modifier.padding(8.dp)
 		) {
