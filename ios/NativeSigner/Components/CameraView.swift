@@ -84,7 +84,7 @@ struct CameraView: View {
                                 }
                             )
                         }
-                    }
+                    }.padding(.bottom, -20)
                 }
             }
         }.background(Color("Bg100"))
