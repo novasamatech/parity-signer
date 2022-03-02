@@ -49,6 +49,8 @@ jobs:
 
       - name:                 Rust Cache
         uses:                 Swatinem/rust-cache@v1.3.0
+        with:
+          working-directory:  scripts
 
       - name:                 Rust build
         shell:                bash
