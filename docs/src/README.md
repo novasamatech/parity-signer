@@ -22,7 +22,7 @@ Any data transfer from or to the app happens using QR code. By doing so, the mos
 
 ## Key features
 
-- This is not a complete cryptowallet in itself. The Signer does not sync with blockchain, so it does not know your account balance, whether transactions were successful or even if the account exists! This is a **cold wallet** app only stores keys, reads and signs messages. It should always be used with **hot wallet** like [polkadot.js](https://polkadot.js.org/apps)
+- This is not a complete cryptowallet in itself. The Signer does not sync with blockchain, so it does not know your account balance, whether transactions were successful or even if the account exists! This is a **cold wallet** app only stores keys, reads and signs messages. It should always be used with **hot wallet** like [polkadot.js](https://polkadot.js.org/apps).
 - The Signer alone does not make your accounts secure. **You must maintain security yourself**. Airgap should be only part of your security protocol, improper use of Signer could still lead to loss of funds and/or secrets.
 - When properly used, Signer provides best achievable security with Substrate networks to-date.
 

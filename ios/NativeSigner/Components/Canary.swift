@@ -18,19 +18,21 @@ extension SignerDataModel {
      */
     func checkAlert() {
         var err = ExternError()
-        withUnsafeMutablePointer(to: &err) {err_ptr in
-            let res = get_warnings(err_ptr, dbName)
-            if (err_ptr.pointee.code == 0) {
-                if res == 1 {
-                    self.alert = true
+        if (self.onboardingDone) {
+            withUnsafeMutablePointer(to: &err) {err_ptr in
+                let res = get_warnings(err_ptr, dbName)
+                if (err_ptr.pointee.code == 0) {
+                    if res == 1 {
+                        self.alert = true
+                    } else {
+                        self.alert = false
+                    }
                 } else {
-                    self.alert = false
+                    print("History init failed! This will not do.")
+                    print(String(cString: err_ptr.pointee.message))
+                    signer_destroy_string(err_ptr.pointee.message)
+                    self.alert = true
                 }
-            } else {
-                print("History init failed! This will not do.")
-                print(String(cString: err_ptr.pointee.message))
-                signer_destroy_string(err_ptr.pointee.message)
-                self.alert = true
             }
         }
     }
