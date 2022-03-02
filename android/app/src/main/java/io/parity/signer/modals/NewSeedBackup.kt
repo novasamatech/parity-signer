@@ -1,37 +1,69 @@
 package io.parity.signer.modals
 
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.material.Checkbox
-import androidx.compose.material.Text
+import androidx.compose.foundation.layout.*
+import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
+import io.parity.signer.components.BigButton
+import io.parity.signer.components.CheckboxTemplate
+import io.parity.signer.components.HeaderBar
+import io.parity.signer.components.SeedBox
 import io.parity.signer.models.SignerDataModel
-import io.parity.signer.ui.theme.Crypto400
-import io.parity.signer.ui.theme.CryptoTypography
+import io.parity.signer.models.addSeed
+import io.parity.signer.ui.theme.Bg200
+import io.parity.signer.ui.theme.modal
 
 @Composable
 fun NewSeedBackup(signerDataModel: SignerDataModel) {
 	val confirmBackup = remember { mutableStateOf(false) }
 	val createRoots = remember { mutableStateOf(true) }
-	Column {
-		Text(
-			signerDataModel.modalData.value?.optString("seed_phrase") ?: "",
-			style = CryptoTypography.body1,
-			color = Crypto400
-		)
-		Row {
-			Checkbox(
+	Surface(
+		color = MaterialTheme.colors.Bg200,
+		shape = MaterialTheme.shapes.modal
+	) {
+		Column(
+			verticalArrangement = Arrangement.spacedBy(8.dp),
+			modifier = Modifier.padding(20.dp)
+		) {
+			HeaderBar("BACKUP SEED PHRASE", signerDataModel.modalData.value?.optString("seed")?: "")
+			SeedBox(
+				seedPhrase = signerDataModel.modalData.value?.optString("seed_phrase")
+					?: ""
+			)
+			CheckboxTemplate(
 				checked = confirmBackup.value,
-				onCheckedChange = { confirmBackup.value = it })
-			Text ("I have written down my seed phrase")
-		}
-		Row {
-			Checkbox(
+				onValueChange = { confirmBackup.value = it },
+				text = "I have written down my seed phrase"
+			)
+			CheckboxTemplate(
 				checked = createRoots.value,
-				onCheckedChange = { createRoots.value = it })
-			Text ("Create root keys")
+				onValueChange = { createRoots.value = it },
+				text = "Create root keys"
+			)
+
+			BigButton(
+				text = "Next",
+				action = {
+					signerDataModel.modalData.value?.let { modalData ->
+						modalData.optString("seed").let { seedName ->
+							modalData.optString("seed_phrase")
+								.let { seedPhrase ->
+									signerDataModel.addSeed(
+										seedName = seedName,
+										seedPhrase = seedPhrase,
+										createRoots = createRoots.value
+									)
+								}
+						}
+					}
+				},
+				isDisabled = !confirmBackup.value
+			)
+			Spacer(Modifier.fillMaxHeight())
 		}
 	}
 }

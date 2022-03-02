@@ -3,17 +3,24 @@ package io.parity.signer
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
+import io.parity.signer.alerts.Confirm
+import io.parity.signer.alerts.ErrorModal
+import io.parity.signer.alerts.ShieldAlert
+import io.parity.signer.components.Documents
 import io.parity.signer.modals.*
 import io.parity.signer.models.SignerDataModel
+import io.parity.signer.models.increment
 import io.parity.signer.models.pushButton
-import io.parity.signer.screens.KeyManager
-import io.parity.signer.screens.ScanScreen
-import io.parity.signer.screens.SettingsScreen
+import io.parity.signer.screens.*
+import org.json.JSONObject
 
 @ExperimentalAnimationApi
 @ExperimentalMaterialApi
 @Composable
 fun ScreenSelector(screen: SignerScreen?, signerDataModel: SignerDataModel) {
+	val screenData by signerDataModel.screenData.observeAsState()
 	when (screen) {
 		SignerScreen.Scan -> {
 			ScanScreen(
@@ -21,7 +28,9 @@ fun ScreenSelector(screen: SignerScreen?, signerDataModel: SignerDataModel) {
 			)
 		}
 		SignerScreen.Keys -> {
-			KeyManager(signerDataModel = signerDataModel)
+			KeyManager(signerDataModel::pushButton,
+				signerDataModel::increment,
+				screenData?: JSONObject())
 		}
 		SignerScreen.Settings -> {
 			SettingsScreen(signerDataModel = signerDataModel)
@@ -29,9 +38,12 @@ fun ScreenSelector(screen: SignerScreen?, signerDataModel: SignerDataModel) {
 		SignerScreen.Log -> {
 			HistoryScreen(signerDataModel = signerDataModel)
 		}
-		SignerScreen.LogDetails -> TODO()
+		SignerScreen.LogDetails -> LogDetails(signerDataModel = signerDataModel)
 		SignerScreen.Transaction -> {
-			TransactionPreview(signerDataModel = signerDataModel)
+			TransactionPreview(
+				signerDataModel::pushButton,
+				signerDataModel = signerDataModel
+			)
 		}
 		SignerScreen.SeedSelector -> {
 			SeedManager(signerDataModel = signerDataModel)
@@ -46,21 +58,28 @@ fun ScreenSelector(screen: SignerScreen?, signerDataModel: SignerDataModel) {
 			)
 		}
 		SignerScreen.RecoverSeedName -> {
-			RecoverSeedScreen(signerDataModel = signerDataModel)
+			RecoverSeedName(
+				signerDataModel::pushButton,
+				signerDataModel = signerDataModel
+			)
 		}
 		SignerScreen.RecoverSeedPhrase -> {
-			RecoverSeedScreen(signerDataModel = signerDataModel)
+			RecoverSeedPhrase(
+				signerDataModel::pushButton,
+				signerDataModel = signerDataModel
+			)
 		}
 		SignerScreen.DeriveKey -> {
-			NewKeyModal(signerDataModel = signerDataModel, increment = false)
+			NewAddressScreen(signerDataModel = signerDataModel, increment = false)
 		}
-		SignerScreen.Verifier -> TODO()
+		SignerScreen.Verifier -> VerifierScreen(signerDataModel)
 		null -> WaitingScreen()
-		SignerScreen.ManageNetworks -> TODO()
-		SignerScreen.NetworkDetails -> TODO()
-		SignerScreen.SignSufficientCrypto -> TODO()
-		SignerScreen.SelectSeedForBackup -> TODO()
-		SignerScreen.Documents -> TODO()
+		SignerScreen.ManageNetworks -> ManageNetworks(signerDataModel = signerDataModel)
+		SignerScreen.NetworkDetails -> NetworkDetails(signerDataModel = signerDataModel)
+		SignerScreen.SignSufficientCrypto -> SignSufficientCrypto(signerDataModel = signerDataModel)
+		SignerScreen.SelectSeedForBackup -> SelectSeedForBackup(signerDataModel = signerDataModel)
+		SignerScreen.Documents -> Documents()
+		SignerScreen.KeyDetailsMultiSelect -> KeyDetailsMulti(signerDataModel = signerDataModel)
 	}
 }
 
@@ -69,20 +88,21 @@ fun ModalSelector(modal: SignerModal, signerDataModel: SignerDataModel) {
 	when (modal) {
 		SignerModal.Empty -> {}
 		SignerModal.NewSeedMenu -> NewSeedMenu(signerDataModel = signerDataModel)
-		SignerModal.SeedMenu -> TODO()
-		SignerModal.NetworkMenu -> TODO()
-		SignerModal.Backup -> TODO()
-		SignerModal.PasswordConfirm -> TODO()
-		SignerModal.SignatureReady -> TODO()
-		SignerModal.EnterPassword -> TODO()
-		SignerModal.LogRight -> TODO()
-		SignerModal.NetworkDetailsMenu -> TODO()
-		SignerModal.ManageMetadata -> TODO()
-		SignerModal.SufficientCryptoReady -> TODO()
-		SignerModal.KeyDetailsAction -> TODO()
-		SignerModal.TypesInfo -> TODO()
+		SignerModal.SeedMenu -> SeedMenu(signerDataModel = signerDataModel)
+		SignerModal.NetworkSelector -> NetworkSelector(signerDataModel = signerDataModel)
+		SignerModal.Backup -> SeedBackup(signerDataModel = signerDataModel)
+		SignerModal.PasswordConfirm -> PasswordConfirm(signerDataModel = signerDataModel)
+		SignerModal.SignatureReady -> SignatureReady(signerDataModel = signerDataModel)
+		SignerModal.EnterPassword -> EnterPassword(signerDataModel = signerDataModel)
+		SignerModal.LogRight -> LogMenu(signerDataModel = signerDataModel)
+		SignerModal.NetworkDetailsMenu -> NetworkDetailsMenu(signerDataModel = signerDataModel)
+		SignerModal.ManageMetadata -> ManageMetadata(signerDataModel = signerDataModel)
+		SignerModal.SufficientCryptoReady -> SufficientCryptoReady(signerDataModel = signerDataModel)
+		SignerModal.KeyDetailsAction -> KeyDetailsAction(signerDataModel = signerDataModel)
+		SignerModal.TypesInfo -> TypesInfo(signerDataModel = signerDataModel)
 		SignerModal.NewSeedBackup -> NewSeedBackup(signerDataModel = signerDataModel)
-		SignerModal.LogComment -> TODO()
+		SignerModal.LogComment -> LogComment(signerDataModel = signerDataModel)
+		SignerModal.SelectSeed -> SelectSeed(signerDataModel = signerDataModel)
 	}
 }
 
@@ -91,12 +111,12 @@ fun AlertSelector(alert: SignerAlert, signerDataModel: SignerDataModel) {
 	when (alert) {
 		SignerAlert.Empty -> {}
 		SignerAlert.Error -> ErrorModal(
-			error = signerDataModel.screenData.value?.optString(
+			error = signerDataModel.alertData.value?.optString(
 				"error"
 			) ?: "unknown error", signerDataModel = signerDataModel
 		)
 		SignerAlert.Shield -> ShieldAlert(signerDataModel)
-		SignerAlert.Confirm -> TODO()
+		SignerAlert.Confirm -> Confirm(signerDataModel = signerDataModel)
 	}
 }
 
@@ -122,13 +142,14 @@ enum class SignerScreen {
 	NetworkDetails,
 	SignSufficientCrypto,
 	SelectSeedForBackup,
-	Documents;
+	Documents,
+	KeyDetailsMultiSelect;
 }
 
 enum class SignerModal {
 	Empty,
 	NewSeedMenu,
-	NetworkMenu,
+	NetworkSelector,
 	SeedMenu,
 	Backup,
 	PasswordConfirm,
@@ -141,7 +162,8 @@ enum class SignerModal {
 	KeyDetailsAction,
 	TypesInfo,
 	NewSeedBackup,
-	LogComment;
+	LogComment,
+	SelectSeed;
 }
 
 enum class SignerAlert {
