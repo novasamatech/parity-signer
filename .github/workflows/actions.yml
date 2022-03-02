@@ -1,4 +1,4 @@
-name:                     E2E Test
+name:                         E2E Test
 
 on:
   pull_request:
@@ -8,56 +8,56 @@ on:
       - stable
 jobs:
   check:
-    name:                 Check on MacOS
-    runs-on:              macos-latest
+    name:                     Check on MacOS
+    runs-on:                  macos-latest
     steps:
 
-      - name:             Cancel Previous Runs
-        uses:             styfle/cancel-workflow-action@0.9.1
+      - name:                 Cancel Previous Runs
+        uses:                 styfle/cancel-workflow-action@0.9.1
         with:
-          access_token:   ${{ github.token }}
+          access_token:       ${{ github.token }}
 
-      - name:             Checkout sources
-        uses:             actions/checkout@v2.4.0
+      - name:                 Checkout sources
+        uses:                 actions/checkout@v2.4.0
         with:
-          fetch-depth:    50
-          submodules:     'recursive'
+          fetch-depth:        50
+          submodules:         'recursive'
 
-      - name:             Install dependencies
-        run:              |
+      - name:                 Install dependencies
+        run:                  |
           brew tap wix/brew
           brew install applesimutils
           gem install xcpretty
 
-      - name:             Install Rust aarch64-apple-ios target
-        uses:             actions-rs/toolchain@v1.0.7
+      - name:                 Install Rust aarch64-apple-ios target
+        uses:                 actions-rs/toolchain@v1.0.7
         with:
-          profile:        minimal
-          toolchain:      stable
-          target:         aarch64-apple-ios
-          components:     rust-std
-          override:       true
+          profile:            minimal
+          toolchain:          stable
+          target:             aarch64-apple-ios
+          components:         rust-std
+          override:           true
 
-      - name:             Install Rust x86_64-apple-ios target
-        uses:             actions-rs/toolchain@v1.0.7
+      - name:                 Install Rust x86_64-apple-ios target
+        uses:                 actions-rs/toolchain@v1.0.7
         with:
-          profile:        minimal
-          toolchain:      stable
-          target:         x86_64-apple-ios
-          components:     rust-std
-          override:       true
+          profile:            minimal
+          toolchain:          stable
+          target:             x86_64-apple-ios
+          components:         rust-std
+          override:           true
 
-      - name: Rust Cache
-        uses: Swatinem/rust-cache@v1.3.0
+      - name:                 Rust Cache
+        uses:                 Swatinem/rust-cache@v1.3.0
 
-      - name:             Rust build
-        shell:            bash
-        run:              |
+      - name:                 Rust build
+        shell:                bash
+        run:                  |
           cd scripts
           ./build.sh ios
 
-      - name:             Detox build
-        run:              |
+      - name:                 Detox build
+        run:                  |
           xcodebuild \
             -workspace ios/NativeSigner.xcodeproj/project.xcworkspace \
             -scheme NativeSigner \
