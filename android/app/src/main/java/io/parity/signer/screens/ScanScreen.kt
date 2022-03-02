@@ -89,12 +89,13 @@ fun ScanScreen(signerDataModel: SignerDataModel) {
 					)
 					.clip(RoundedCornerShape(8.dp))
 			)
-			Column(
-				verticalArrangement = Arrangement.Bottom,
-				modifier = Modifier.fillMaxSize()
-			) {
-				ScanProgressBar(signerDataModel = signerDataModel)
-			}
+
+		}
+		Column(
+			verticalArrangement = Arrangement.Bottom,
+			modifier = Modifier.fillMaxSize()
+		) {
+			ScanProgressBar(signerDataModel = signerDataModel)
 		}
 	}
 }
