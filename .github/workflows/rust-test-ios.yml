@@ -53,4 +53,4 @@ jobs:
           cp os-specific-lock/ios/Cargo.lock .
           cp signer/ios-hack/Cargo.toml signer
           export DYLD_FALLBACK_LIBRARY_PATH="$(xcode-select --print-path)/Toolchains/XcodeDefault.xctoolchain/usr/lib/"
-          cargo nextest run
+          cargo nextest run --retries 2
