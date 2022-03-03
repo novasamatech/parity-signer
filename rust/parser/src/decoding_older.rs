@@ -345,7 +345,7 @@ fn special_case_identity_fields (data: Vec<u8>, type_database: &[TypeEntry], ind
     };
     let into_bv = data[..8].to_vec();
     // make correct Bitvec
-    let bv: BitVec<Lsb0, u8> = BitVec::from_vec(into_bv);
+    let bv: BitVec<u8, Lsb0> = BitVec::from_vec(into_bv);
     let mut found = false;
     let mut fancy_out: Vec<OutputCard> = Vec::new();
     for x in type_database.iter() {
@@ -400,7 +400,7 @@ fn special_case_bitvec (data: Vec<u8>, indent: u32) -> Result<DecodedOut, Parser
             let fin = start + (actual_length as usize);
             if data.len() < fin {return Err(ParserError::Decoding(ParserDecodingError::DataTooShort))}
             let into_bv = data[start..fin].to_vec();
-            let bv: BitVec<Lsb0, u8> = BitVec::from_vec(into_bv);
+            let bv: BitVec<u8, Lsb0> = BitVec::from_vec(into_bv);
             let fancy_out = vec![OutputCard{card: ParserCard::BitVec(bv.to_string()), indent}];
             let remaining_vector = {
                 if data.len() > fin {data[fin..].to_vec()}

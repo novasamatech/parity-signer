@@ -1,6 +1,5 @@
 use sled::IVec;
-use parity_scale_codec::Decode;
-use parity_scale_codec_derive;
+use parity_scale_codec::{Decode, Encode};
 use sp_runtime::MultiSigner;
 
 use crate::crypto::Encryption;
@@ -9,7 +8,7 @@ use crate::helpers::{multisigner_to_public, multisigner_to_encryption};
 use crate::keyring::{AddressKey, NetworkSpecsKey, print_multisigner_as_base58};
 
 /// Struct associated with public address that has secret key available
-#[derive(parity_scale_codec_derive::Decode, parity_scale_codec_derive::Encode, Debug, Clone)]
+#[derive(Decode, Encode, Debug, Clone)]
 pub struct AddressDetails {
     pub seed_name: String,
     pub path: String,

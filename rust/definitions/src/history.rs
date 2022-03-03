@@ -1,8 +1,6 @@
-use hex;
 use blake2_rfc::blake2b::blake2b;
-use parity_scale_codec_derive::{Decode, Encode};
+use parity_scale_codec::{Decode, Encode};
 use sled::IVec;
-use sp_core;
 use sp_runtime::MultiSigner;
 use std::convert::TryInto;
 

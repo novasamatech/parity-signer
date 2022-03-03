@@ -4,20 +4,16 @@ use parity_scale_codec::{Decode, Encode};
 use sled::Batch;
 
 use constants::{DANGER, HISTORY, HISTORY_PAGE_SIZE};
-use definitions::{danger::DangerRecord, error::{DatabaseSigner, EntryDecodingSigner, ErrorSigner, ErrorSource, InterfaceSigner, KeyDecodingSignerDb, NotFoundSigner, Signer}, history::{Event, Entry}, print::export_complex_vector};
+use definitions::{danger::DangerRecord, error::{DatabaseSigner, EntryDecodingSigner, ErrorSigner, ErrorSource, InterfaceSigner, NotFoundSigner, Signer}, history::{Event, Entry}, keyring::Order, print::export_complex_vector};
 
 use crate::db_transactions::TrDbCold;
 use crate::helpers::{open_db, open_tree, make_batch_clear_tree};
-
-/// Key for history entries.
-/// Order in which entries have appeared in the database.
-type Order = u32;
 
 /// Function to print history entries.
 /// Interacts with user interface.
 pub fn print_history(database_name: &str) -> Result<String, ErrorSigner> {
     let history = get_history(database_name)?;
-    Ok(format!("\"log\":{},\"total_entries\":{}", export_complex_vector(&history, |(order, entry)| format!("\"order\":{},{}", order, entry.show(|b| format!("\"{}\"", hex::encode(b.transaction()))))), history.len()))
+    Ok(format!("\"log\":{},\"total_entries\":{}", export_complex_vector(&history, |(order, entry)| format!("\"order\":{},{}", order.stamp(), entry.show(|b| format!("\"{}\"", hex::encode(b.transaction()))))), history.len()))
 }
 
 /// Function to print total number of pages for pre-set number of entries per page.
@@ -44,7 +40,7 @@ pub fn print_history_page(page_number: u32, database_name: &str) -> Result<Strin
             None => return Err(ErrorSigner::Interface(InterfaceSigner::HistoryPageOutOfRange{page_number, total_pages})),
         },
     };
-    Ok(format!("\"log\":{},\"total_entries\":{}", export_complex_vector(&history_subset, |(order, entry)| format!("\"order\":{},{}", order, entry.show(|b| format!("\"{}\"", hex::encode(b.transaction()))))), history.len()))
+    Ok(format!("\"log\":{},\"total_entries\":{}", export_complex_vector(&history_subset, |(order, entry)| format!("\"order\":{},{}", order.stamp(), entry.show(|b| format!("\"{}\"", hex::encode(b.transaction()))))), history.len()))
 }
 
 /// Local helper function to retrieve history entries from the database.
@@ -54,17 +50,14 @@ fn get_history(database_name: &str) -> Result<Vec<(Order, Entry)>, ErrorSigner> 
     let history = open_tree::<Signer>(&database, HISTORY)?;
     let mut out: Vec<(Order, Entry)> = Vec::new();
     for (order_encoded, history_entry_encoded) in history.iter().flatten() {
-        let order = match <Order>::decode(&mut &order_encoded[..]) {
-            Ok(a) => a,
-            Err(_) => return Err(ErrorSigner::Database(DatabaseSigner::KeyDecoding(KeyDecodingSignerDb::EntryOrder(order_encoded.to_vec())))),
-        };
+        let order = Order::from_ivec(&order_encoded)?;
         let history_entry = match <Entry>::decode(&mut &history_entry_encoded[..]) {
             Ok(a) => a,
             Err(_) => return Err(ErrorSigner::Database(DatabaseSigner::EntryDecoding(EntryDecodingSigner::HistoryEntry(order)))),
         };
         out.push((order, history_entry));
     }
-    out.sort_by(|a, b| b.0.cmp(&a.0));
+    out.sort_by(|a, b| b.0.stamp().cmp(&a.0.stamp()));
     Ok(out)
 }
 
@@ -74,20 +67,17 @@ pub fn get_history_entry_by_order(order: u32, database_name: &str) -> Result<Ent
     let database = open_db::<Signer>(database_name)?;
     let history = open_tree::<Signer>(&database, HISTORY)?;
     let mut found = None;
+    let order = Order::from_number(order);
     for (order_encoded, history_entry_encoded) in history.iter().flatten() {
-        match <Order>::decode(&mut &order_encoded[..]) {
-            Ok(a) => {
-                if a == order {
-                    match <Entry>::decode(&mut &history_entry_encoded[..]) {
-                        Ok(b) => {
-                            found = Some(b);
-                            break;
-                        },
-                        Err(_) => return Err(ErrorSigner::Database(DatabaseSigner::EntryDecoding(EntryDecodingSigner::HistoryEntry(order)))),
-                    }
-                }
-            },
-            Err(_) => return Err(ErrorSigner::Database(DatabaseSigner::KeyDecoding(KeyDecodingSignerDb::EntryOrder(order_encoded.to_vec())))),
+        let order_found = Order::from_ivec(&order_encoded)?;
+        if order_found == order {
+            match <Entry>::decode(&mut &history_entry_encoded[..]) {
+                Ok(b) => {
+                    found = Some(b);
+                    break;
+                },
+                Err(_) => return Err(ErrorSigner::Database(DatabaseSigner::EntryDecoding(EntryDecodingSigner::HistoryEntry(order)))),
+            }
         }
     }
     match found {
@@ -124,15 +114,15 @@ pub fn events_in_batch <T: ErrorSource> (database_name: &str, start_zero: bool, 
     let database = open_db::<T>(database_name)?;
     let history = open_tree::<T>(&database, HISTORY)?;
     let order = {
-        if start_zero {0 as Order}
-        else {history.len() as Order}
+        if start_zero {Order::from_number(0u32)}
+        else {Order::from_number(history.len() as u32)}
     };
     let timestamp = Utc::now().to_string();
     let history_entry = Entry {
         timestamp,
         events,
     };
-    out_prep.insert(order.encode(), history_entry.encode());
+    out_prep.insert(order.store(), history_entry.encode());
     Ok(out_prep)
 }
 

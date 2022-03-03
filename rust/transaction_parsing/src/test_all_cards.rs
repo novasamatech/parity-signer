@@ -1,5 +1,4 @@
 use bitvec::prelude::{BitVec, Lsb0};
-//use sled::IVec;
 use definitions::{crypto::Encryption, history::MetaValuesDisplay, keyring::VerifierKey, metadata::MetaValues, network_specs::{VerifierValue, NetworkSpecs}, qr_transfers::ContentLoadTypes, test_all_errors_signer::signer_errors, users::AddressDetails};
 use hex;
 use std::convert::TryInto;
@@ -45,7 +44,7 @@ pub fn make_all_cards() -> Action {
         network_id: Vec::new(),
         encryption: Encryption::Sr25519,
     };
-    let bv: BitVec<Lsb0, u8> = BitVec::from_vec(vec![32, 4, 155]);
+    let bv: BitVec<u8, Lsb0> = BitVec::from_vec(vec![32, 4, 155]);
     
     all_cards.push(Card::ParserCard(&ParserCard::Pallet("test_pallet".to_string())).card(&mut index,0));
     all_cards.push(Card::ParserCard(&ParserCard::Method{method_name: "test_method".to_string(), docs: "verbose \ndescription \nof \nthe \nmethod".to_string()}).card(&mut index,0));
@@ -80,7 +79,7 @@ Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deseru
     all_cards.push(Card::NewSpecs(&network_specs_westend.to_send()).card(&mut index,0));
     all_cards.push(Card::NetworkInfo(&network_specs_westend).card(&mut index,0));
     all_cards.push(Card::NetworkGenesisHash(&network_specs_westend.genesis_hash).card(&mut index,0));
-    all_cards.push(Card::Derivations(&vec!["//Alice".to_string(), "//Alice/2/1".to_string(), "//secret//westend".to_string()]).card(&mut index,0));
+    all_cards.push(Card::Derivations(&["//Alice".to_string(), "//Alice/2/1".to_string(), "//secret//westend".to_string()]).card(&mut index,0));
 
     all_cards.push(Card::Warning(Warning::AuthorNotFound).card(&mut index,0));
     all_cards.push(Card::Warning(Warning::NewerVersion{used_version: 50, latest_version: 9010}).card(&mut index,0));

@@ -7,26 +7,18 @@ edition = "2018"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-scale-info = "1.0.0"
-hex = "0.4.3"
-parity-scale-codec = { version = "2.2.0", default-features = false, features = ["std", "bit-vec"], optional = false}
-parity-scale-codec-derive = "2.2.0"
-regex = "1.4.5"
-blake2-rfc = "0.2.18"
-frame-metadata = { version = "14.0.0", default-features = false, features = ["v12", "v13", "v14", "std"]}
-printing_balance = {path = "../printing_balance"}
-sled = "0.34.6"
-bitvec = "0.20.4"
-num-bigint = "0.4.0"
-lazy_static = "1.4.0"
-sp-arithmetic = "3.0.0"
-sp-runtime = "3.0.0"
-sp-core = "3.0.0"
+bitvec = "1.0.0"
 constants = {path = "../constants"}
 db_handling = {path = "../db_handling"}
 definitions = {path = "../definitions"}
+frame-metadata = {version = "15.0.0", default-features = false}
+hex = "0.4.3"
+parity-scale-codec = "3.0.0"
 parser = {path = "../parser"}
-plot_icon = {git = "https://github.com/varovainen/polkadot-identicon-rust"}
+plot_icon = {git = "https://github.com/varovainen/polkadot-identicon-rust", default-features = false, features = ["pix"]}
+sled = "0.34.6"
+sp-core = {version = "6.0.0", default-features = false, features = ["full_crypto"]}
+sp-runtime = {version = "6.0.0", default-features = false}
 
 [lib]
 name = "transaction_parsing"

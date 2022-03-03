@@ -8,7 +8,7 @@ pub mod fetch_metadata;
 mod helpers;
 pub mod interpret_specs;
 mod load;
-    use load::{gen_load_meta, unwasm};
+    use load::{gen_load_meta/*, unwasm*/};
 pub mod parser;
     use parser::{Command, Show};
 mod remove;
@@ -45,7 +45,7 @@ pub fn full_run (command: Command) -> Result<(), ErrorActive> {
         Command::MakeColdRelease => default_cold_release(),
         Command::TransferMetaRelease => transfer_metadata_to_cold(HOT_DB_NAME, COLD_DB_NAME_RELEASE),
         Command::Derivations(x) => process_derivations(x),
-        Command::Unwasm{filename, update_db} => unwasm(&filename, update_db),
+//        Command::Unwasm{filename, update_db} => unwasm(&filename, update_db),
     }
 }
 

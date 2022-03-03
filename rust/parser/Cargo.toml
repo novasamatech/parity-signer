@@ -7,21 +7,20 @@ edition = "2018"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-scale-info = "1.0.0"
-hex = "0.4.3"
-parity-scale-codec = { version = "2.2.0", default-features = false, features = ["std", "bit-vec"], optional = false}
-parity-scale-codec-derive = "2.2.0"
-regex = "1.4.5"
-frame-metadata = { version = "14.0.0", default-features = false, features = ["v12", "v13", "v14", "std"]}
-printing_balance = {path = "../printing_balance"}
-bitvec = "0.20.4"
-num-bigint = "0.4.0"
-lazy_static = "1.4.0"
-sp-arithmetic = "3.0.0"
-sp-runtime = "3.0.0"
-sp-core = "3.0.0"
+bitvec = "1.0.0"
 defaults = {path = "../defaults"}
 definitions = {path = "../definitions"}
+frame-metadata = { version = "15.0.0", default-features = false, features = ["std", "legacy"]}
+hex = "0.4.3"
+lazy_static = "1.4.0"
+num-bigint = "0.4.3"
+parity-scale-codec = {version = "3.0.0", features = ["derive", "bit-vec"]}
+printing_balance = {path = "../printing_balance"}
+regex = "1.5.4"
+scale-info = "2.0.1"
+sp-arithmetic = "5.0.0"
+sp-core = {version = "6.0.0", default-features = false, features = ["full_crypto"]}
+sp-runtime = {version = "6.0.0", default-features = false}
 
 
 [lib]

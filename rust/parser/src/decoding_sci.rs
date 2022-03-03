@@ -666,13 +666,13 @@ fn decode_type_def_bit_sequence (bit_ty: &TypeDefBitSequence<PortableForm>, data
 fn process_bitvec<T: BitStore + Decode> (bitorder: FoundBitOrder, into_bv_decode: Vec<u8>) -> Result<String, ParserError> {
     match bitorder {
         FoundBitOrder::Lsb0 => {
-            match <BitVec<Lsb0, T>>::decode(&mut &into_bv_decode[..]) {
+            match <BitVec<T, Lsb0>>::decode(&mut &into_bv_decode[..]) {
                 Ok(b) => Ok(b.to_string()),
                 Err(_) => Err(ParserError::Decoding(ParserDecodingError::BitVecFailure)),
             }
         },
         FoundBitOrder::Msb0 => {
-            match <BitVec<Msb0, T>>::decode(&mut &into_bv_decode[..]) {
+            match <BitVec<T, Msb0>>::decode(&mut &into_bv_decode[..]) {
                 Ok(b) => Ok(b.to_string()),
                 Err(_) => Err(ParserError::Decoding(ParserDecodingError::BitVecFailure)),
             }
@@ -681,7 +681,7 @@ fn process_bitvec<T: BitStore + Decode> (bitorder: FoundBitOrder, into_bv_decode
 }
 
 fn ugly_patch_u64<O: BitOrder> (into_bv_decode: Vec<u8>) -> Result<String, ParserError> {
-    let bitvec_decoded = match <BitVec<O, u32>>::decode(&mut &into_bv_decode[..]) {
+    let bitvec_decoded = match <BitVec<u32, O>>::decode(&mut &into_bv_decode[..]) {
         Ok(b) => b,
         Err(_) => return Err(ParserError::Decoding(ParserDecodingError::BitVecFailure)),
     };
@@ -689,8 +689,8 @@ fn ugly_patch_u64<O: BitOrder> (into_bv_decode: Vec<u8>) -> Result<String, Parse
     let mut out = String::from("[");
     for i in 0..vec.len()/2 {
         if i>0 {out.push_str(", ");}
-        let print1 = BitVec::<O, u32>::from_vec(vec![vec[2*i]]).to_string();
-        let print2 = BitVec::<O, u32>::from_vec(vec![vec[2*i+1]]).to_string();
+        let print1 = BitVec::<u32, O>::from_vec(vec![vec[2*i]]).to_string();
+        let print2 = BitVec::<u32, O>::from_vec(vec![vec[2*i+1]]).to_string();
         out.push_str(&format!("{}{}", &print1[1..print1.len()-1], &print2[1..print2.len()-1]));
     }
     out.push(']');

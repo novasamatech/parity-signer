@@ -7,22 +7,19 @@ edition = "2018"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-parity-scale-codec = "2.2.0"
-parity-scale-codec-derive = "2.2.0"
-hex = "0.4.3"
-regex = "1.4.5"
-lazy_static = "1.4.0"
-sp-core = "3.0.0"
-sp-runtime = "3.0.0"
-sp-version = "3.0.0"
-anyhow = "1.0.42"
+anyhow = "1.0.55"
 blake2-rfc = "0.2.18"
-sled = "0.34.6"
-frame-metadata = { version = "14.0.0", default-features = false, features = ["v12", "v13", "v14", "std"]}
-plot_icon = {git = "https://github.com/varovainen/polkadot-identicon-rust"}
-png = "0.17.3"
 constants = {path = "../constants"}
-wasm-testbed = "0.13.1"
+frame-metadata = {version = "15.0.0", features = ["std", "legacy"]}
+hex = "0.4.3"
+parity-scale-codec = {version = "3.0.0", features = ["derive"]}
+plot_icon = {git = "https://github.com/varovainen/polkadot-identicon-rust", default-features = false, features = ["pix"]}
+png = "0.17.3"
+sled = "0.34.6"
+sp-core = {version = "6.0.0", default-features = false, features = ["full_crypto"]}
+sp-runtime = {version = "6.0.0", default-features = false}
+sp-version = "5.0.0"
+#wasm-testbed = "0.13.1"
 
 [lib]
 name = "definitions"

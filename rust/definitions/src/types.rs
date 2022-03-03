@@ -1,4 +1,4 @@
-use parity_scale_codec_derive::{Decode, Encode};
+use parity_scale_codec::{Decode, Encode};
 
 /// Struct to store type name and description
 #[derive(Decode, Encode, PartialEq, Clone)]

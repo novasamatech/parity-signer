@@ -1,7 +1,7 @@
 use defaults::get_default_types_vec;
 use definitions::{error::{ParserError, ParserDecodingError, ParserMetadataError}, metadata::info_from_metadata, network_specs::ShortSpecs, types::TypeEntry};
 use frame_metadata::{RuntimeMetadata, v14::RuntimeMetadataV14};
-use parity_scale_codec::Decode;
+use parity_scale_codec::{Decode, Encode};
 use printing_balance::{convert_balance_pretty};
 use sp_runtime::generic::Era;
 
@@ -37,7 +37,7 @@ pub fn parse_method (method_data: Vec<u8>, metadata_bundle: &MetadataBundle, sho
 
 
 /// Struct to decode pre-determined extensions for transactions with V12 and V13 metadata
-#[derive(Debug, parity_scale_codec_derive::Decode, parity_scale_codec_derive::Encode)]
+#[derive(Debug, Decode, Encode)]
 struct ExtValues {
     era: Era,
 #[codec(compact)]

@@ -34,7 +34,7 @@ impl ParserCard {
             ParserCard::Varname (varname) => readable(indent, "varname", varname),
             ParserCard::Default (decoded_string) => readable(indent, "default", decoded_string),
             ParserCard::Text (decoded_text) => readable(indent, "text", decoded_text),
-            ParserCard::Id {id, base58prefix} => readable(indent, "Id", &id.to_ss58check_with_version(Ss58AddressFormat::Custom(*base58prefix))),
+            ParserCard::Id {id, base58prefix} => readable(indent, "Id", &id.to_ss58check_with_version(Ss58AddressFormat::custom(*base58prefix))),
             ParserCard::None => readable(indent, "none", ""),
             ParserCard::IdentityField (variant) => readable(indent, "identity_field", variant),
             ParserCard::BitVec (bv) => readable(indent, "bitvec", bv),

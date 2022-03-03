@@ -1,21 +1,20 @@
-use parity_scale_codec_derive;
 use parity_scale_codec::{Decode, Encode};
 use sled::IVec;
 use sp_core::crypto::{Ss58Codec, Ss58AddressFormat};
 use sp_runtime::MultiSigner;
 
 use crate::crypto::Encryption;
-use crate::error::{AddressKeySource, DatabaseActive, ErrorActive, ErrorSigner, ErrorSource, KeyDecodingActive, NotHexSigner, Signer, SpecsKeySource};
+use crate::error::{AddressKeySource, DatabaseActive, DatabaseSigner, ErrorActive, ErrorSigner, ErrorSource, KeyDecodingActive, KeyDecodingSignerDb, NotHexSigner, Signer, SpecsKeySource};
 use crate::helpers::{get_multisigner, unhex};
 
 /// NetworkSpecsKey is the database storage key used to search for 
 /// network specs ChainSpecs (COLD database, network specs tree SPECSTREE)
 /// network specs ChainSpecsToSend (HOT database, network specs tree SPECSPREPTREE)
-#[derive(parity_scale_codec_derive::Decode, parity_scale_codec_derive::Encode, PartialEq, Debug, Clone)]
+#[derive(Decode, Encode, PartialEq, Debug, Clone)]
 pub struct NetworkSpecsKey (Vec<u8>);
 
 /// Enum for decoded NetworkSpecsKey content
-#[derive(parity_scale_codec_derive::Decode, parity_scale_codec_derive::Encode)]
+#[derive(Decode, Encode)]
 enum NetworkSpecsKeyContent {
     Ed25519(Vec<u8>),
     Sr25519(Vec<u8>),
@@ -60,7 +59,7 @@ impl NetworkSpecsKey {
 
 /// VerifierKey is the database storage key used to search for 
 /// network verifier information NetworkVerifier (HOT database, network verifiers tree VERIFIERS)
-#[derive(parity_scale_codec_derive::Decode, parity_scale_codec_derive::Encode, Debug, Clone, PartialEq)]
+#[derive(Decode, Encode, Debug, Clone, PartialEq)]
 pub struct VerifierKey (Vec<u8>);
 
 impl VerifierKey {
@@ -85,11 +84,11 @@ impl VerifierKey {
 
 /// AddressKey is the database storage key used to search for
 /// address details AddressDetails (HOT database, identities tree ADDRTREE)
-#[derive(parity_scale_codec_derive::Decode, parity_scale_codec_derive::Encode, Debug, PartialEq, Clone)]
+#[derive(Decode, Encode, Debug, PartialEq, Clone)]
 pub struct AddressKey (Vec<u8>);
 
 /// Struct for decoded AddressKey content
-#[derive(parity_scale_codec_derive::Decode, parity_scale_codec_derive::Encode)]
+#[derive(Decode, Encode)]
 struct AddressKeyContent (MultiSigner);
 
 impl AddressKey {
@@ -134,7 +133,7 @@ impl AddressKey {
 pub fn print_multisigner_as_base58 (multi_signer: &MultiSigner, optional_prefix: Option<u16>) -> String {
     match optional_prefix {
         Some(base58prefix) => {
-            let version_for_base58 = Ss58AddressFormat::Custom(base58prefix);
+            let version_for_base58 = Ss58AddressFormat::custom(base58prefix);
             match multi_signer {
                 MultiSigner::Ed25519(pubkey) => pubkey.to_ss58check_with_version(version_for_base58),
                 MultiSigner::Sr25519(pubkey) => pubkey.to_ss58check_with_version(version_for_base58),
@@ -155,7 +154,7 @@ pub fn print_multisigner_as_base58 (multi_signer: &MultiSigner, optional_prefix:
 pub struct MetaKey (Vec<u8>);
 
 /// Struct for decoded MetaKey content
-#[derive(parity_scale_codec_derive::Decode, parity_scale_codec_derive::Encode)]
+#[derive(Decode, Encode)]
 struct MetaKeyContent {
     name: String,
     version: u32,
@@ -192,7 +191,7 @@ impl MetaKey {
 pub struct MetaKeyPrefix (Vec<u8>);
 
 /// Struct for decoded MetaKey content
-#[derive(parity_scale_codec_derive::Decode, parity_scale_codec_derive::Encode)]
+#[derive(Decode, Encode)]
 struct MetaKeyPrefixContent (String);
 
 impl MetaKeyPrefix {
@@ -207,13 +206,36 @@ impl MetaKeyPrefix {
     }
 }
 
+/// Order is the number of the history entry in the database HISTORY tree.
+/// Encoded order is also the key within the HISTORY tree.
+#[derive(Clone, Debug, PartialEq)]
+pub struct Order(u32);
+
+impl Order {
+    pub fn from_ivec(ivec: &IVec) -> Result<Self, ErrorSigner> {
+        match <u32>::decode(&mut &ivec[..]) {
+           Ok(a) => Ok(Self(a)),
+           Err(_) => Err(ErrorSigner::Database(DatabaseSigner::KeyDecoding(KeyDecodingSignerDb::EntryOrder(ivec.to_vec())))),
+        }
+    }
+    pub fn from_number(n: u32) -> Self {
+        Self(n)
+    }
+    pub fn stamp(&self) -> u32 {
+        self.0
+    }
+    pub fn store(&self) -> Vec<u8> {
+        self.0.encode()
+    }
+}
+
 /// AddressBookKey is the database storage key used to search for 
 /// address book entries (HOT database, address book tree ADDRESS_BOOK)
 #[derive(Debug, Clone)]
 pub struct AddressBookKey (Vec<u8>);
 
 /// Struct for decoded MetaKey content
-#[derive(parity_scale_codec_derive::Decode, parity_scale_codec_derive::Encode)]
+#[derive(Decode, Encode)]
 struct AddressBookKeyContent (String);
 
 impl AddressBookKey {

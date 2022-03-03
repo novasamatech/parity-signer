@@ -1,10 +1,10 @@
-use std::path::PathBuf;
-use wasm_loader::Source;
-use wasm_testbed::WasmTestBed;
+//use std::path::PathBuf;
+//use wasm_loader::Source;
+//use wasm_testbed::WasmTestBed;
 
 use constants::{ADDRESS_BOOK, HOT_DB_NAME, METATREE};
 use db_handling::helpers::{open_db, open_tree};
-use definitions::{error::{Active, Changed, DatabaseActive, ErrorActive, ErrorSource, Fetch, IncomingMetadataSourceActive, IncomingMetadataSourceActiveStr, MetadataError, MetadataSource, NotFoundActive, Wasm}, keyring::MetaKeyPrefix, metadata::{AddressBookEntry, MetaValues}};
+use definitions::{error::{Active, Changed, DatabaseActive, ErrorActive, ErrorSource, Fetch, IncomingMetadataSourceActive, IncomingMetadataSourceActiveStr, MetadataError, MetadataSource, NotFoundActive/*, Wasm*/}, keyring::MetaKeyPrefix, metadata::{AddressBookEntry, MetaValues}};
 
 use crate::parser::{Instruction, Content, Set};
 use crate::metadata_db_utils::{add_new, SortedMetaValues, prepare_metadata, write_metadata};
@@ -290,7 +290,7 @@ fn shortcut_set_element (set_element: &AddressSpecs) -> Result<MetaShortCut, Err
 fn warn(name: &str, version: u32) {
     println!("Warning. Metadata {}{} has incomplete set of signed extensions, and could cause Signer to fail in parsing signable transactions using this metadata.", name, version);
 }
-
+/*
 /// Function to process .wasm files into signable entities and add metadata into the database
 pub fn unwasm (filename: &str, update_db: bool) -> Result<(), ErrorActive> {
     let testbed = match WasmTestBed::new(&Source::File(PathBuf::from(&filename))) {
@@ -317,3 +317,4 @@ pub fn unwasm (filename: &str, update_db: bool) -> Result<(), ErrorActive> {
     };
     load_meta_print(&shortcut)
 }
+*/

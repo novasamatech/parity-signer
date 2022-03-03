@@ -1,5 +1,4 @@
-use parity_scale_codec::Decode;
-use parity_scale_codec_derive;
+use parity_scale_codec::{Decode, Encode};
 use plot_icon::EMPTY_PNG;
 use sled::IVec;
 use sp_runtime::MultiSigner;
@@ -11,7 +10,7 @@ use crate::keyring::NetworkSpecsKey;
 use crate::print::export_complex_single;
 
 //TODO: rename fields to make them more clear
-#[derive(parity_scale_codec_derive::Decode, parity_scale_codec_derive::Encode, PartialEq, Debug, Clone)]
+#[derive(Decode, Encode, PartialEq, Debug, Clone)]
 pub struct NetworkSpecs {
     pub base58prefix: u16,
     pub color: String,
@@ -28,7 +27,7 @@ pub struct NetworkSpecs {
 }
 
 
-#[derive(parity_scale_codec_derive::Decode, parity_scale_codec_derive::Encode, PartialEq, Debug, Clone)]
+#[derive(Decode, Encode, PartialEq, Debug, Clone)]
 pub struct NetworkSpecsToSend {
     pub base58prefix: u16,
     pub color: String,
@@ -43,7 +42,7 @@ pub struct NetworkSpecsToSend {
     pub unit: String,
 }
 
-#[derive(parity_scale_codec_derive::Decode, parity_scale_codec_derive::Encode, PartialEq, Debug, Clone)]
+#[derive(Decode, Encode, PartialEq, Debug, Clone)]
 pub struct ShortSpecs {
     pub base58prefix: u16,
     pub decimals: u8,
@@ -138,7 +137,7 @@ impl NetworkSpecsToSend {
     }
 }
 
-#[derive(parity_scale_codec_derive::Decode, parity_scale_codec_derive::Encode, PartialEq, Debug)]
+#[derive(Decode, Encode, PartialEq, Debug)]
 pub struct NetworkProperties {
     pub base58prefix: u16,
     pub decimals: u8,
@@ -146,10 +145,10 @@ pub struct NetworkProperties {
 }
 
 /// Verifier for both network metadata and for types information
-#[derive(parity_scale_codec_derive::Decode, parity_scale_codec_derive::Encode, PartialEq, Debug, Clone)]
+#[derive(Decode, Encode, PartialEq, Debug, Clone)]
 pub struct Verifier (pub Option<VerifierValue>);
 
-#[derive(parity_scale_codec_derive::Decode, parity_scale_codec_derive::Encode, PartialEq, Debug, Clone)]
+#[derive(Decode, Encode, PartialEq, Debug, Clone)]
 pub enum VerifierValue {
     Standard (MultiSigner),
 }
@@ -192,14 +191,14 @@ impl VerifierValue {
 /// Current network verifier.
 /// Could be general verifier (by default, for networks: kusama, polkadot, westend, rococo),
 /// or could be custom verifier.
-#[derive(parity_scale_codec_derive::Decode, parity_scale_codec_derive::Encode, PartialEq, Debug, Clone)]
+#[derive(Decode, Encode, PartialEq, Debug, Clone)]
 pub enum CurrentVerifier {
     Valid(ValidCurrentVerifier),
     Dead,
 }
 
 /// Possible variants of valid current network verifier.
-#[derive(parity_scale_codec_derive::Decode, parity_scale_codec_derive::Encode, PartialEq, Debug, Clone)]
+#[derive(Decode, Encode, PartialEq, Debug, Clone)]
 pub enum ValidCurrentVerifier {
     General,
     Custom (Verifier),

@@ -1,10 +1,7 @@
-use jsonrpsee_types::{
-    JsonValue, 
-    v2::params::JsonRpcParams,
-    traits::Client,
-};
-use jsonrpsee_ws_client::WsClientBuilder;
-use serde_json::{value::Number, map::Map};
+use jsonrpsee::core::client::ClientT;
+use jsonrpsee::rpc_params;
+use jsonrpsee::ws_client::WsClientBuilder;
+use serde_json::{value::{Number, Value}, map::Map};
 
 pub struct FetchedInfo {
     pub meta: String,
@@ -14,7 +11,7 @@ pub struct FetchedInfo {
 pub struct FetchedInfoWithNetworkSpecs {
     pub meta: String,
     pub genesis_hash: String,
-    pub properties: Map<String, JsonValue>,
+    pub properties: Map<String, Value>,
 }
 
 /// Function to fetch the metadata as String and genesis hash as String from given address,
@@ -23,14 +20,14 @@ pub struct FetchedInfoWithNetworkSpecs {
 #[tokio::main]
 pub async fn fetch_info(str_address: &str) -> Result<FetchedInfo, Box<dyn std::error::Error>> {
     let client = WsClientBuilder::default().build(str_address).await?;
-    let response: JsonValue = client.request("state_getMetadata", JsonRpcParams::NoParams).await?;
+    let response: Value = client.request("state_getMetadata", rpc_params![]).await?;
     let meta = match response {
-        JsonValue::String(x) => x,
+        Value::String(x) => x,
         _ => return Err(Box::from("Unexpected metadata format")),
     };
-    let response: JsonValue = client.request("chain_getBlockHash", JsonRpcParams::ArrayRef(&[JsonValue::Number(Number::from(0u8))])).await?;
+    let response: Value = client.request("chain_getBlockHash", rpc_params![Value::Number(Number::from(0u8))]).await?;
     let genesis_hash = match response {
-        JsonValue::String(x) => x,
+        Value::String(x) => x,
         _ => return Err(Box::from("Unexpected genesis hash format")),
     };
     Ok(FetchedInfo{
@@ -45,19 +42,19 @@ pub async fn fetch_info(str_address: &str) -> Result<FetchedInfo, Box<dyn std::e
 #[tokio::main]
 pub async fn fetch_info_with_network_specs(str_address: &str) -> Result<FetchedInfoWithNetworkSpecs, Box<dyn std::error::Error>> {
     let client = WsClientBuilder::default().build(str_address).await?;
-    let response: JsonValue = client.request("state_getMetadata", JsonRpcParams::NoParams).await?;
+    let response: Value = client.request("state_getMetadata", rpc_params![]).await?;
     let meta = match response {
-        JsonValue::String(x) => x,
+        Value::String(x) => x,
         _ => return Err(Box::from("Unexpected metadata format")),
     };
-    let response: JsonValue = client.request("chain_getBlockHash", JsonRpcParams::ArrayRef(&[JsonValue::Number(Number::from(0u8))])).await?;
+    let response: Value = client.request("chain_getBlockHash", rpc_params![Value::Number(Number::from(0u8))]).await?;
     let genesis_hash = match response {
-        JsonValue::String(x) => x,
+        Value::String(x) => x,
         _ => return Err(Box::from("Unexpected genesis hash format")),
     };
-    let response: JsonValue = client.request("system_properties", JsonRpcParams::NoParams).await?;
+    let response: Value = client.request("system_properties", rpc_params![]).await?;
     let properties = match response {
-        JsonValue::Object(x) => x,
+        Value::Object(x) => x,
         _ => return Err(Box::from("Unexpected system properties format")),
     };
     Ok(FetchedInfoWithNetworkSpecs{

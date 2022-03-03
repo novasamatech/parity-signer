@@ -1,5 +1,4 @@
 use parity_scale_codec::{Decode, Encode};
-use parity_scale_codec_derive;
 use frame_metadata::{RuntimeMetadata, decode_different::DecodeDifferent, v14::RuntimeMetadataV14};
 use sled::IVec;
 use sp_version::RuntimeVersion;
@@ -12,7 +11,7 @@ use crate::keyring::{AddressBookKey, MetaKey};
 
 /// Struct for the network information extracted from the metadata:
 /// name, version, optional base58 prefix
-#[derive(parity_scale_codec_derive::Decode, parity_scale_codec_derive::Encode, PartialEq)]
+#[derive(Decode, Encode, PartialEq)]
 pub struct MetaInfo {
     pub name: String,
     pub version: u32,
@@ -232,7 +231,7 @@ impl MetaSetElement {
 }
 
 /// Struct to store network information needed for metadata and network specs fetching
-#[derive(parity_scale_codec_derive::Decode, parity_scale_codec_derive::Encode, PartialEq)]
+#[derive(Decode, Encode, PartialEq)]
 pub struct AddressBookEntry {
     pub name: String,
     pub genesis_hash: [u8; 32],

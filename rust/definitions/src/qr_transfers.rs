@@ -1,6 +1,5 @@
 use blake2_rfc::blake2b::blake2b;
 use parity_scale_codec::{Decode, Encode};
-use parity_scale_codec_derive;
 
 use crate::crypto::Encryption;
 use crate::error::{ErrorActive, ErrorSigner, ErrorSource, InputSigner, TransferContent};
@@ -11,7 +10,7 @@ use crate::types::TypeEntry;
 /// Struct to process the content of qr codes with load_metadata messages
 pub struct ContentLoadMeta (Vec<u8>);
 
-#[derive(parity_scale_codec_derive::Decode, parity_scale_codec_derive::Encode)]
+#[derive(Decode, Encode)]
 struct DecodedContentLoadMeta {
     meta: Vec<u8>,
     genesis_hash: [u8; 32],
@@ -70,10 +69,10 @@ impl ContentLoadMeta {
 }
 
 /// Struct to process the content of qr codes with add_specs messages
-#[derive(parity_scale_codec_derive::Decode, parity_scale_codec_derive::Encode)]
+#[derive(Decode, Encode)]
 pub struct ContentAddSpecs (Vec<u8>);
 
-#[derive(parity_scale_codec_derive::Decode, parity_scale_codec_derive::Encode)]
+#[derive(Decode, Encode)]
 struct DecodedContentAddSpecs {
     specs: NetworkSpecsToSend,
 }
@@ -117,10 +116,10 @@ impl ContentAddSpecs {
 
 
 /// Struct to process the content of qr codes with load_types messages
-#[derive(parity_scale_codec_derive::Decode, parity_scale_codec_derive::Encode)]
+#[derive(Decode, Encode)]
 pub struct ContentLoadTypes (Vec<u8>);
 
-#[derive(parity_scale_codec_derive::Decode, parity_scale_codec_derive::Encode)]
+#[derive(Decode, Encode)]
 struct DecodedContentLoadTypes {
     types: Vec<TypeEntry>,
 }
@@ -174,10 +173,10 @@ impl ContentLoadTypes {
 
 
 /// Struct to process the content of qr codes with load_types messages
-#[derive(parity_scale_codec_derive::Decode, parity_scale_codec_derive::Encode)]
+#[derive(Decode, Encode)]
 pub struct ContentDerivations (Vec<u8>);
 
-#[derive(parity_scale_codec_derive::Decode, parity_scale_codec_derive::Encode)]
+#[derive(Decode, Encode)]
 struct DecodedContentDerivations {
     encryption: Encryption,
     genesis_hash: [u8; 32],

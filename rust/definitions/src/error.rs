@@ -1,12 +1,9 @@
 use anyhow::anyhow;
-use hex;
-use png;
-use sled;
 use sp_core::crypto::SecretStringError;
 use sp_runtime::MultiSigner;
-use wasm_testbed;
+//use wasm_testbed;
 
-use crate::{crypto:: Encryption, helpers::multisigner_to_public, keyring::{AddressKey, AddressBookKey, MetaKey, NetworkSpecsKey, VerifierKey}, network_specs::{ValidCurrentVerifier, Verifier, VerifierValue}, users::AddressDetails};
+use crate::{crypto:: Encryption, helpers::multisigner_to_public, keyring::{AddressKey, AddressBookKey, MetaKey, NetworkSpecsKey, Order, VerifierKey}, network_specs::{ValidCurrentVerifier, Verifier, VerifierValue}, users::AddressDetails};
 
 /// Trait describing the origin of errors.
 /// ErrorSource is implemented for Active (errors on the active side -
@@ -488,7 +485,7 @@ impl ErrorSource for Active {
             ErrorActive::NoTokenOverrideKnownNetwork{url} => format!("Network with corresponding url {} has database records. Token override is not supported.", url),
             ErrorActive::Wasm(a) => {
                 match a {
-                    Wasm::WasmTestbed(e) => format!("WasmTestbed error. {}", e),
+//                    Wasm::WasmTestbed(e) => format!("WasmTestbed error. {}", e),
                     Wasm::FaultyMetadata{filename, error} => format!("Metadata error in .wasm file {}. {}", filename, error.show()),
                 }
             },
@@ -788,7 +785,7 @@ pub enum InputActive {
 /// Enum listing possible errors with .wasm files processing
 #[derive(Debug)]
 pub enum Wasm {
-    WasmTestbed(wasm_testbed::WasmTestbedError),
+//    WasmTestbed(wasm_testbed::WasmTestbedError),
     FaultyMetadata{filename: String, error: MetadataError},
 }
 
@@ -923,7 +920,7 @@ impl ErrorSource for Signer {
                             EntryDecodingSigner::DangerStatus => String::from("danger status entry."),
                             EntryDecodingSigner::Derivations => String::from("temporary entry with information needed to import derivations."),
                             EntryDecodingSigner::GeneralVerifier => String::from("general verifier entry."),
-                            EntryDecodingSigner::HistoryEntry(x) => format!("history entry for order {}.", x),
+                            EntryDecodingSigner::HistoryEntry(x) => format!("history entry for order {}.", x.stamp()),
                             EntryDecodingSigner::NetworkSpecs(x) => format!("network specs (NetworkSpecs) entry for key {}.", hex::encode(x.key())),
                             EntryDecodingSigner::Sign => String::from("temporary entry with information needed for signing approved transaction."),
                             EntryDecodingSigner::Stub => String::from("temporary entry with information needed for accepting approved information."),
@@ -1019,7 +1016,7 @@ impl ErrorSource for Signer {
                     NotFoundSigner::Stub => String::from("Could not find database temporary entry with information needed for accepting approved information."),
                     NotFoundSigner::Sign => String::from("Could not find database temporary entry with information needed for signing approved transaction."),
                     NotFoundSigner::Derivations => String::from("Could not find database temporary entry with information needed for importing derivations set."),
-                    NotFoundSigner::HistoryEntry(x) => format!("Could not find history entry with order {}.", x),
+                    NotFoundSigner::HistoryEntry(x) => format!("Could not find history entry with order {}.", x.stamp()),
                     NotFoundSigner::HistoryNetworkSpecs{name, encryption} => format!("Could not find network specs for {} with encryption {} needed to decode historical transaction.", name, encryption.show()),
                     NotFoundSigner::TransactionEvent(x) => format!("Entry with order {} contains no transaction-related events.", x),
                     NotFoundSigner::HistoricalMetadata{name} => format!("Historical transaction was generated in network {} and processed. Currently there are no metadata entries for the network, and transaction could not be processed again. Add network metadata.", name),
@@ -1166,7 +1163,7 @@ pub enum EntryDecodingSigner {
     DangerStatus,
     Derivations,
     GeneralVerifier,
-    HistoryEntry(u32),
+    HistoryEntry(Order),
     NetworkSpecs(NetworkSpecsKey),
     Sign,
     Stub,
@@ -1241,7 +1238,7 @@ pub enum NotFoundSigner {
     Stub,
     Sign,
     Derivations,
-    HistoryEntry(u32),
+    HistoryEntry(Order),
     HistoryNetworkSpecs{name: String, encryption: Encryption},
     TransactionEvent(u32),
     HistoricalMetadata{name: String},

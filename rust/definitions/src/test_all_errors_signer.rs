@@ -1,12 +1,11 @@
 use anyhow::anyhow;
-use hex;
 use sled::{IVec, transaction::TransactionError};
 use sp_core::crypto::SecretStringError;
 use sp_runtime::MultiSigner;
 
 use crate::crypto::Encryption;
 use crate::error::{AddressGeneration, AddressGenerationCommon, DatabaseSigner, EntryDecodingSigner, ErrorSigner, ExtraAddressGenerationSigner, GeneralVerifierForContent, InputSigner, InterfaceSigner, KeyDecodingSignerDb, KeyDecodingSignerInterface, MetadataError, MismatchSigner, NotFoundSigner, NotHexSigner, ParserDecodingError, ParserError, ParserMetadataError, TransferContent};
-use crate::keyring::{AddressKey, MetaKey, NetworkSpecsKey, VerifierKey};
+use crate::keyring::{AddressKey, MetaKey, NetworkSpecsKey, Order, VerifierKey};
 use crate::network_specs::{ValidCurrentVerifier, Verifier, VerifierValue};
 
 const PUBLIC: [u8; 32] = [142, 175, 4, 21, 22, 135, 115, 99, 38, 201, 254, 161, 126, 37, 252, 82, 135, 97, 54, 147, 201, 18, 144, 156, 178, 38, 170, 71, 148, 242, 106, 72];
@@ -108,7 +107,7 @@ pub fn signer_errors() -> Vec<ErrorSigner> {
     error_set.push(ErrorSigner::Database(DatabaseSigner::EntryDecoding(EntryDecodingSigner::CurrentVerifier(verifier_key.to_owned()))));
     error_set.push(ErrorSigner::Database(DatabaseSigner::EntryDecoding(EntryDecodingSigner::DangerStatus)));
     error_set.push(ErrorSigner::Database(DatabaseSigner::EntryDecoding(EntryDecodingSigner::GeneralVerifier)));
-    error_set.push(ErrorSigner::Database(DatabaseSigner::EntryDecoding(EntryDecodingSigner::HistoryEntry(135))));
+    error_set.push(ErrorSigner::Database(DatabaseSigner::EntryDecoding(EntryDecodingSigner::HistoryEntry(Order::from_number(135)))));
     error_set.push(ErrorSigner::Database(DatabaseSigner::EntryDecoding(EntryDecodingSigner::NetworkSpecs(network_specs_key_good.to_owned()))));
     error_set.push(ErrorSigner::Database(DatabaseSigner::EntryDecoding(EntryDecodingSigner::Sign)));
     error_set.push(ErrorSigner::Database(DatabaseSigner::EntryDecoding(EntryDecodingSigner::Stub)));
@@ -164,7 +163,7 @@ pub fn signer_errors() -> Vec<ErrorSigner> {
     error_set.push(ErrorSigner::NotFound(NotFoundSigner::DangerStatus));
     error_set.push(ErrorSigner::NotFound(NotFoundSigner::Stub));
     error_set.push(ErrorSigner::NotFound(NotFoundSigner::Sign));
-    error_set.push(ErrorSigner::NotFound(NotFoundSigner::HistoryEntry(135)));
+    error_set.push(ErrorSigner::NotFound(NotFoundSigner::HistoryEntry(Order::from_number(135))));
     error_set.push(ErrorSigner::NotFound(NotFoundSigner::HistoryNetworkSpecs{name: String::from("westend"), encryption: Encryption::Ed25519}));
     error_set.push(ErrorSigner::NotFound(NotFoundSigner::TransactionEvent(280)));
     error_set.push(ErrorSigner::NotFound(NotFoundSigner::HistoricalMetadata{name: String::from("kulupu")}));

@@ -1,5 +1,4 @@
 use parity_scale_codec::{Decode, Encode};
-use parity_scale_codec_derive;
 use sled::{Batch, Transactional};
 use sp_runtime::MultiSigner;
 
@@ -27,7 +26,7 @@ pub struct TrDbHot {
     for_settings: Batch,
 }
 
-#[derive(parity_scale_codec_derive::Decode, parity_scale_codec_derive::Encode)]
+#[derive(Decode, Encode)]
 pub struct BatchStub {
     removals: Vec<Vec<u8>>, // vector of keys to be removed from the database
     additions: Vec<(Vec<u8>, Vec<u8>)>, // vector of (key, value) to be added into the database
@@ -243,7 +242,7 @@ impl Default for TrDbCold {
 /// It contains BatchStubs for address, metadata, network_specs, settings, and verifiers trees,
 /// and Vec<Event> from which the history tree is updated.
 /// It is stored SCALE encoded in transaction tree of the cold database with key STUB.
-#[derive(parity_scale_codec_derive::Decode, parity_scale_codec_derive::Encode)]
+#[derive(Decode, Encode)]
 pub struct TrDbColdStub {
     addresses_stub: BatchStub,
     history_stub: Vec<Event>,
@@ -403,7 +402,7 @@ impl Default for TrDbColdStub {
 /// will signing the transaction (path, has_pwd, address_key),
 /// and relevant history entries.
 /// It is stored SCALE encoded in transaction tree of the cold database with key SIGN.
-#[derive(parity_scale_codec_derive::Decode, parity_scale_codec_derive::Encode)]
+#[derive(Decode, Encode)]
 pub struct TrDbColdSign {
     content: SignContent,
     network_name: String,
@@ -413,7 +412,7 @@ pub struct TrDbColdSign {
     history: Vec<Event>,
 }
 
-#[derive(parity_scale_codec_derive::Decode, parity_scale_codec_derive::Encode)]
+#[derive(Decode, Encode)]
 pub enum SignContent {
     Transaction{method: Vec<u8>, extensions: Vec<u8>},
     Message(String),
@@ -516,7 +515,7 @@ impl TrDbColdSign {
 
 /// Temporary storage for information needed to import derivations
 /// Secret seed and seed name are required to approve
-#[derive(parity_scale_codec_derive::Decode, parity_scale_codec_derive::Encode)]
+#[derive(Decode, Encode)]
 pub struct TrDbColdDerivations {
     checked_derivations: Vec<String>,
     network_specs: NetworkSpecs,

@@ -1,5 +1,4 @@
 use parity_scale_codec::{Decode, Encode};
-use parity_scale_codec_derive;
 use sled::IVec;
 
 use crate::error::{ErrorSigner, DatabaseSigner, EntryDecodingSigner};
@@ -7,7 +6,7 @@ use crate::error::{ErrorSigner, DatabaseSigner, EntryDecodingSigner};
 /// Struct to process the content of qr codes with load_metadata messages
 pub struct DangerRecord (Vec<u8>);
 
-#[derive(parity_scale_codec_derive::Decode, parity_scale_codec_derive::Encode)]
+#[derive(Decode, Encode)]
 struct DecodedDangerRecord {
     device_was_online: bool,
 }
