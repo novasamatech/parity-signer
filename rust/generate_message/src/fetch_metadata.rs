@@ -19,7 +19,9 @@ pub struct FetchedInfoWithNetworkSpecs {
 
 #[tokio::main]
 pub async fn fetch_info(str_address: &str) -> Result<FetchedInfo, Box<dyn std::error::Error>> {
-    let client = WsClientBuilder::default().build(str_address).await?;
+    // note: here the port is set to 443, since default port is unavailable for now;
+    // see for details `https://github.com/paritytech/jsonrpsee/issues/554`
+    let client = WsClientBuilder::default().build(str_address.to_owned() + ":443").await?;
     let response: Value = client.request("state_getMetadata", rpc_params![]).await?;
     let meta = match response {
         Value::String(x) => x,
@@ -41,7 +43,9 @@ pub async fn fetch_info(str_address: &str) -> Result<FetchedInfo, Box<dyn std::e
 
 #[tokio::main]
 pub async fn fetch_info_with_network_specs(str_address: &str) -> Result<FetchedInfoWithNetworkSpecs, Box<dyn std::error::Error>> {
-    let client = WsClientBuilder::default().build(str_address).await?;
+    // note: here the port is set to 443, since default port is unavailable for now;
+    // see for details `https://github.com/paritytech/jsonrpsee/issues/554`
+    let client = WsClientBuilder::default().build(str_address.to_owned() + ":443").await?;
     let response: Value = client.request("state_getMetadata", rpc_params![]).await?;
     let meta = match response {
         Value::String(x) => x,
