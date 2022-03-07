@@ -1,8 +1,17 @@
-use parity_scale_codec::{Decode, Encode};
+use parity_scale_codec::Decode;
+#[cfg(any(feature = "active", feature = "signer"))]
+use parity_scale_codec::Encode;
 use sled::{Db, Tree, Batch, open};
 
-use constants::{ADDRTREE, DANGER, GENERALVERIFIER, METATREE, SETTREE, SPECSTREE, TYPES, VERIFIERS};
-use definitions::{danger::DangerRecord, error::{DatabaseSigner, EntryDecodingSigner, ErrorSigner, ErrorSource, NotFoundSigner, Signer}, keyring::{AddressKey, MetaKey, MetaKeyPrefix, NetworkSpecsKey, VerifierKey}, metadata::MetaValues, network_specs::{CurrentVerifier, NetworkSpecs, ValidCurrentVerifier, Verifier}, types::TypeEntry, users::{AddressDetails}};
+use constants::{METATREE, SETTREE, TYPES};
+#[cfg(feature = "signer")]
+use constants::{ADDRTREE, DANGER, GENERALVERIFIER, SPECSTREE, VERIFIERS};
+
+use definitions::{error::ErrorSource, keyring::{MetaKey, MetaKeyPrefix}, metadata::MetaValues, types::TypeEntry};
+#[cfg(feature = "signer")]
+use definitions::{danger::DangerRecord, error_signer::{DatabaseSigner, EntryDecodingSigner, ErrorSigner, NotFoundSigner, Signer}, keyring::{NetworkSpecsKey, VerifierKey}, network_specs::{CurrentVerifier, NetworkSpecs, ValidCurrentVerifier, Verifier}};
+#[cfg(any(feature = "active", feature = "signer"))]
+use definitions::{keyring::AddressKey, users::AddressDetails};
 
 /// Wrapper for `open`
 pub fn open_db <T: ErrorSource> (database_name: &str) -> Result<Db, T::Error> {
@@ -25,6 +34,7 @@ pub fn make_batch_clear_tree <T: ErrorSource> (database_name: &str, tree_name: &
 }
 
 /// Function to try and get from the Signer database the _valid_ current verifier for network using VerifierKey
+#[cfg(feature = "signer")]
 pub fn try_get_valid_current_verifier (verifier_key: &VerifierKey, database_name: &str) -> Result<Option<ValidCurrentVerifier>, ErrorSigner> {
     let general_verifier = get_general_verifier(database_name)?;
     let database = open_db::<Signer>(database_name)?;
@@ -53,6 +63,7 @@ pub fn try_get_valid_current_verifier (verifier_key: &VerifierKey, database_name
 }
 
 /// Function to get from the Signer database the current verifier for network using VerifierKey, returns error if not found
+#[cfg(feature = "signer")]
 pub fn get_valid_current_verifier (verifier_key: &VerifierKey, database_name: &str) -> Result<ValidCurrentVerifier, ErrorSigner> {
     try_get_valid_current_verifier(verifier_key, database_name)?
         .ok_or_else(|| ErrorSigner::NotFound(NotFoundSigner::CurrentVerifier(verifier_key.to_owned())))
@@ -62,6 +73,7 @@ pub fn get_valid_current_verifier (verifier_key: &VerifierKey, database_name: &s
 /// in SPECSTREE of the Signer database
 /// If there are more than one network corresponding to the same genesis hash,
 /// outputs network specs key for the network with the lowest order
+#[cfg(feature = "signer")]
 pub fn genesis_hash_in_specs (verifier_key: &VerifierKey, database: &Db) -> Result<Option<(NetworkSpecsKey, NetworkSpecs)>, ErrorSigner> {
     let genesis_hash = verifier_key.genesis_hash();
     let chainspecs = open_tree::<Signer>(database, SPECSTREE)?;
@@ -90,6 +102,7 @@ pub fn genesis_hash_in_specs (verifier_key: &VerifierKey, database: &Db) -> Resu
 
 /// Function to get general Verifier from the Signer database
 /// Note that not finding general verifier is always an error.
+#[cfg(feature = "signer")]
 pub fn get_general_verifier (database_name: &str) -> Result<Verifier, ErrorSigner> {
     let database = open_db::<Signer>(database_name)?;
     let settings = open_tree::<Signer>(&database, SETTREE)?;
@@ -104,6 +117,7 @@ pub fn get_general_verifier (database_name: &str) -> Result<Verifier, ErrorSigne
 }
 
 /// Function to display general Verifier from the Signer database
+#[cfg(feature = "signer")]
 pub fn display_general_verifier (database_name: &str) -> Result<String, ErrorSigner> {
     Ok(get_general_verifier(database_name)?.show_card())
 }
@@ -133,6 +147,7 @@ pub fn get_types <T: ErrorSource> (database_name: &str) -> Result<Vec<TypeEntry>
 }
 
 /// Function to try and get network specs from the Signer database
+#[cfg(feature = "signer")]
 pub fn try_get_network_specs (database_name: &str, network_specs_key: &NetworkSpecsKey) -> Result<Option<NetworkSpecs>, ErrorSigner> {
     let database = open_db::<Signer>(database_name)?;
     let chainspecs = open_tree::<Signer>(&database, SPECSTREE)?;
@@ -144,12 +159,14 @@ pub fn try_get_network_specs (database_name: &str, network_specs_key: &NetworkSp
 }
 
 /// Function to get network specs from the Signer database, returns error if not found
+#[cfg(feature = "signer")]
 pub fn get_network_specs (database_name: &str, network_specs_key: &NetworkSpecsKey) -> Result<NetworkSpecs, ErrorSigner> {
     try_get_network_specs(database_name, network_specs_key)?
         .ok_or_else(|| ErrorSigner::NotFound(NotFoundSigner::NetworkSpecs(network_specs_key.to_owned())))
 }
 
 /// Function to try and get address details from the Signer database
+#[cfg(feature = "signer")]
 pub fn try_get_address_details (database_name: &str, address_key: &AddressKey) -> Result<Option<AddressDetails>, ErrorSigner> {
     let database = open_db::<Signer>(database_name)?;
     let identities = open_tree::<Signer>(&database, ADDRTREE)?;
@@ -161,6 +178,7 @@ pub fn try_get_address_details (database_name: &str, address_key: &AddressKey) -
 }
 
 /// Function to get address details from the Signer database, returns error if not found
+#[cfg(feature = "signer")]
 pub fn get_address_details (database_name: &str, address_key: &AddressKey) -> Result<AddressDetails, ErrorSigner> {
     try_get_address_details(database_name, address_key)?
         .ok_or_else(|| ErrorSigner::NotFound(NotFoundSigner::AddressDetails(address_key.to_owned())))
@@ -195,12 +213,14 @@ pub fn get_meta_values_by_name_version <T: ErrorSource> (database_name: &str, ne
 }
 
 /// Function to modify existing batch for ADDRTREE with incoming vector of additions
+#[cfg(any(feature = "active", feature = "signer"))]
 pub (crate) fn upd_id_batch (mut batch: Batch, adds: Vec<(AddressKey, AddressDetails)>) -> Batch {
     for (address_key, address_details) in adds.iter() {batch.insert(address_key.key(), address_details.encode());}
     batch
 }
 
 /// Function to verify checksum in Signer database
+#[cfg(feature = "signer")]
 pub fn verify_checksum (database: &Db, checksum: u32) -> Result<(), ErrorSigner> {
     let real_checksum = match database.checksum() {
         Ok(x) => x,
@@ -212,6 +232,7 @@ pub fn verify_checksum (database: &Db, checksum: u32) -> Result<(), ErrorSigner>
 
 /// Function to get the danger status from the Signer database.
 /// Function interacts with user interface.
+#[cfg(feature = "signer")]
 pub fn get_danger_status(database_name: &str) -> Result<bool, ErrorSigner> {
     let database = open_db::<Signer>(database_name)?;
     let settings = open_tree::<Signer>(&database, SETTREE)?;
@@ -219,70 +240,5 @@ pub fn get_danger_status(database_name: &str) -> Result<bool, ErrorSigner> {
         Ok(Some(a)) => DangerRecord::from_ivec(&a).device_was_online(),
         Ok(None) => Err(ErrorSigner::NotFound(NotFoundSigner::DangerStatus)),
         Err(e) => Err(<Signer>::db_internal(e)),
-    }
-}
-
-#[cfg(test)]
-mod tests {
-    
-    use hex;
-    use std::fs;
-    
-    use constants::test_values::{EMPTY_PNG, REAL_PARITY_VERIFIER};
-    use definitions::{keyring::VerifierKey, network_specs::{ValidCurrentVerifier, Verifier}};
-    
-    use crate::{cold_default::{populate_cold_no_metadata, populate_cold_release, signer_init_no_cert, signer_init_with_cert}, manage_history::{device_was_online, reset_danger_status_to_safe}};
-    
-    use super::*;
-
-    #[test]
-    fn get_danger_status_properly () {
-        let dbname = "for_tests/get_danger_status_properly";
-        populate_cold_release(dbname).unwrap();
-        signer_init_no_cert(dbname).unwrap();
-        assert!(get_danger_status(dbname).unwrap() == false, "Expected danger status = false after the database initiation.");
-        device_was_online(dbname).unwrap();
-        assert!(get_danger_status(dbname).unwrap() == true, "Expected danger status = true after the reported exposure.");
-        reset_danger_status_to_safe(dbname).unwrap();
-        assert!(get_danger_status(dbname).unwrap() == false, "Expected danger status = false after the danger reset.");
-        fs::remove_dir_all(dbname).unwrap();
-    }
-    
-    #[test]
-    fn display_general_verifier_properly() {
-        let dbname = "for_tests/display_general_verifier_properly";
-        populate_cold_release(dbname).unwrap();
-        signer_init_no_cert(dbname).unwrap();
-        let print = display_general_verifier(dbname).unwrap()
-            .replace(EMPTY_PNG, r#"<empty>"#);
-        assert!(print == r#""public_key":"","identicon":"<empty>","encryption":"none""#, "Got: {}", print);
-        signer_init_with_cert(dbname).unwrap();
-        let print = display_general_verifier(dbname).unwrap()
-            .replace(REAL_PARITY_VERIFIER, r#"<real_verifier>"#);
-        assert!(print == r#""public_key":"c46a22b9da19540a77cbde23197e5fd90485c72b4ecf3c599ecca6998f39bd57","identicon":"<real_verifier>","encryption":"sr25519""#, "Got: {}", print);
-        fs::remove_dir_all(dbname).unwrap();
-    }
-
-    #[test]
-    fn find_westend_verifier() {
-        let dbname = "for_tests/find_westend_verifier";
-        populate_cold_no_metadata(dbname, Verifier(None)).unwrap();
-        let verifier_key = VerifierKey::from_parts(&hex::decode("e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e").unwrap());
-        let westend_verifier = try_get_valid_current_verifier(&verifier_key, dbname).unwrap();
-        assert!(westend_verifier == Some(ValidCurrentVerifier::General));
-        fs::remove_dir_all(dbname).unwrap();
-    }
-    
-    #[test]
-    fn not_find_mock_verifier() {
-        let dbname = "for_tests/not_find_mock_verifier";
-        populate_cold_no_metadata(dbname, Verifier(None)).unwrap();
-        let verifier_key = VerifierKey::from_parts(&hex::decode("62bacaaa3d9bb01313bb882c23615aae6509ab2ef1e7e807581ee0b74c77416b").unwrap());
-        match try_get_valid_current_verifier(&verifier_key, dbname) {
-            Ok(Some(_)) => panic!("Found network key that should not be in database."),
-            Ok(None) => (),
-            Err(e) => panic!("Error looking for mock verifier: {}", <Signer>::show(&e)),
-        }
-        fs::remove_dir_all(dbname).unwrap();
     }
 }

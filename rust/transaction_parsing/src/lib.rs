@@ -1,3 +1,5 @@
+#![deny(unused_crate_dependencies)]
+
 use db_handling::manage_history::get_history_entry_by_order;
 use definitions::{error::{ErrorSigner, InputSigner}, keyring::NetworkSpecsKey};
 

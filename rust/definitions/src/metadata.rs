@@ -4,10 +4,11 @@ use sled::IVec;
 use sp_version::RuntimeVersion;
 use std::collections::HashMap;
 
-use crate::crypto::Encryption;
-use crate::error::{Active, DatabaseActive, EntryDecodingActive, ErrorActive, ErrorSigner, ErrorSource, IncomingMetadataSourceActive, IncomingMetadataSourceActiveStr, MetadataError, MetadataSource, NotHexActive, Signer};
-use crate::helpers::unhex;
-use crate::keyring::{AddressBookKey, MetaKey};
+use crate::{error::{ErrorSource, MetadataError, MetadataSource}, keyring::MetaKey};
+#[cfg(feature = "active")]
+use crate::{crypto::Encryption, error_active::{Active, DatabaseActive, EntryDecodingActive, ErrorActive, IncomingMetadataSourceActive, IncomingMetadataSourceActiveStr, NotHexActive}, helpers::unhex, keyring::AddressBookKey};
+#[cfg(feature = "signer")]
+use crate::error_signer::{ErrorSigner, Signer};
 
 /// Struct for the network information extracted from the metadata:
 /// name, version, optional base58 prefix
@@ -53,6 +54,7 @@ impl MetaValues {
             meta: meta_slice.to_vec(),
         })
     }
+    #[cfg(feature = "active")]
     pub fn from_runtime_metadata(runtime_metadata: &RuntimeMetadata, source: IncomingMetadataSourceActive) -> Result<Self, ErrorActive> {
         let meta_info = match info_from_metadata(runtime_metadata) {
             Ok(a) => a,
@@ -70,6 +72,7 @@ impl MetaValues {
     /// Is used only on Active side, for:
     /// (a) default and test metadata loading;
     /// (b) decoding and evaluating fetched metadata;
+    #[cfg(feature = "active")]
     pub fn from_str_metadata (meta: &str, source: IncomingMetadataSourceActiveStr) -> Result<Self, ErrorActive> {
         let what = match &source {
             IncomingMetadataSourceActiveStr::Fetch{url} => NotHexActive::FetchedMetadata{url: url.to_string()},
@@ -200,6 +203,7 @@ fn need_v14_warning (metadata_v14: &RuntimeMetadataV14) -> bool {
 }
 
 /// Struct to keep metadata and its info for transaction decoding
+#[cfg(feature = "signer")]
 pub struct MetaSetElement {
     pub name: String,
     pub version: u32,
@@ -207,6 +211,7 @@ pub struct MetaSetElement {
     pub runtime_metadata: RuntimeMetadata,
 }
 
+#[cfg(feature = "signer")]
 impl MetaSetElement {
     pub fn from_entry ((meta_key_vec, meta_encoded): (IVec, IVec)) -> Result<Self, ErrorSigner> {
         let (network_name, network_version) = MetaKey::from_ivec(&meta_key_vec).name_version::<Signer>()?;
@@ -232,6 +237,7 @@ impl MetaSetElement {
 
 /// Struct to store network information needed for metadata and network specs fetching
 #[derive(Decode, Encode, PartialEq)]
+#[cfg(feature = "active")]
 pub struct AddressBookEntry {
     pub name: String,
     pub genesis_hash: [u8; 32],
@@ -240,6 +246,7 @@ pub struct AddressBookEntry {
     pub def: bool,
 }
 
+#[cfg(feature = "active")]
 impl AddressBookEntry {
     pub fn from_entry((address_book_key_encoded, address_book_entry_encoded): (IVec, IVec)) -> Result<AddressBookEntry, ErrorActive> {
         let title = AddressBookKey::from_ivec(&address_book_key_encoded).title()?;
@@ -259,9 +266,10 @@ impl AddressBookEntry {
 }
 
 #[cfg(test)]
+#[cfg(feature = "test")]
 mod tests {
     use super::*;
-    use crate::error::DefaultLoading;
+    use crate::error_active::DefaultLoading;
     use std::fs::read_to_string;
     
     #[test]

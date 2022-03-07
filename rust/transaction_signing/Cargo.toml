@@ -8,18 +8,19 @@ edition = "2018"
 
 [dependencies]
 blake2-rfc = "0.2.18"
-constants = {path = "../constants"}
 definitions = {path = "../definitions"}
 db_handling = {path = "../db_handling"}
 hex = "0.4.3"
 parity-scale-codec = "3.0.0"
 qrcode_static = {path = "../qrcode_static"}
-sled = "0.34.6"
 sp-core = {version = "6.0.0", default-features = false, features = ["full_crypto"]}
 sp-runtime = {version = "6.0.0", default-features = false}
-transaction_parsing = {path = "../transaction_parsing"}
 zeroize = "1.5.3"
 
+[dev-dependencies]
+constants = {path = "../constants"}
+sled = "0.34.6"
+transaction_parsing = {path = "../transaction_parsing"}
 
 [lib]
 name = "transaction_signing"

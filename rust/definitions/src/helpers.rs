@@ -1,12 +1,17 @@
 use hex;
+#[cfg(feature = "signer")]
 use sp_core::{ed25519, sr25519, ecdsa};
 use sp_runtime::MultiSigner;
+#[cfg(feature = "signer")]
 use std::convert::TryInto;
 
+#[cfg(feature = "signer")]
 use plot_icon::generate_png_scaled_default;
 
 use crate::crypto::Encryption;
-use crate::error::{ErrorSigner, ErrorSource, InterfaceSigner};
+use crate::error::ErrorSource;
+#[cfg(feature = "signer")]
+use crate::error_signer::{ErrorSigner, InterfaceSigner};
 
 /// Function to decode hex encoded &str into Vec<u8>,
 /// `what` is either of enums (NotHexHot or NotHexSigner) implementing NotHex trait
@@ -41,11 +46,13 @@ pub fn multisigner_to_encryption (m: &MultiSigner) -> Encryption {
 
 
 /// Helper function to print identicon from the multisigner
+#[cfg(feature = "signer")]
 pub fn make_identicon_from_multisigner(multisigner: &MultiSigner) -> Vec<u8> {
     generate_png_scaled_default(&multisigner_to_public(multisigner))
 }
 
 /// Function to get MultiSigner from public key and Encryption
+#[cfg(feature = "signer")]
 pub fn get_multisigner (public: &[u8], encryption: &Encryption) -> Result<MultiSigner, ErrorSigner> {
     match encryption {
         Encryption::Ed25519 => {
@@ -74,12 +81,14 @@ pub fn get_multisigner (public: &[u8], encryption: &Encryption) -> Result<MultiS
 
 /// Helper function to print id pic for metadata hash.
 /// Currently uses identicon, could be changed later.
+#[cfg(feature = "signer")]
 pub fn pic_meta(meta_hash: &[u8]) -> Vec<u8> {
     generate_png_scaled_default(meta_hash)
 }
 
 /// Helper function to print id pic for types data hash.
 /// Currently uses identicon, could be changed later.
+#[cfg(feature = "signer")]
 pub fn pic_types(types_hash: &[u8]) -> Vec<u8> {
     generate_png_scaled_default(types_hash)
 }

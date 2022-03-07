@@ -1,16 +1,24 @@
 use chrono::Utc;
-use hex;
-use parity_scale_codec::{Decode, Encode};
+use parity_scale_codec::Encode;
+#[cfg(feature = "signer")]
+use parity_scale_codec::Decode;
 use sled::Batch;
 
-use constants::{DANGER, HISTORY, HISTORY_PAGE_SIZE};
-use definitions::{danger::DangerRecord, error::{DatabaseSigner, EntryDecodingSigner, ErrorSigner, ErrorSource, InterfaceSigner, NotFoundSigner, Signer}, history::{Event, Entry}, keyring::Order, print::export_complex_vector};
+use constants::HISTORY;
+#[cfg(feature = "signer")]
+use constants::{DANGER, HISTORY_PAGE_SIZE};
+use definitions::{error::ErrorSource, history::{Event, Entry}, keyring::Order};
 
-use crate::db_transactions::TrDbCold;
-use crate::helpers::{open_db, open_tree, make_batch_clear_tree};
+#[cfg(feature = "signer")]
+use definitions::{danger::DangerRecord, error_signer::{DatabaseSigner, EntryDecodingSigner, ErrorSigner, InterfaceSigner, NotFoundSigner, Signer}, print::export_complex_vector};
+
+use crate::{db_transactions::TrDbCold, helpers::{open_db, open_tree}};
+#[cfg(feature = "signer")]
+use crate::helpers::make_batch_clear_tree;
 
 /// Function to print history entries.
 /// Interacts with user interface.
+#[cfg(feature = "signer")]
 pub fn print_history(database_name: &str) -> Result<String, ErrorSigner> {
     let history = get_history(database_name)?;
     Ok(format!("\"log\":{},\"total_entries\":{}", export_complex_vector(&history, |(order, entry)| format!("\"order\":{},{}", order.stamp(), entry.show(|b| format!("\"{}\"", hex::encode(b.transaction()))))), history.len()))
@@ -18,6 +26,7 @@ pub fn print_history(database_name: &str) -> Result<String, ErrorSigner> {
 
 /// Function to print total number of pages for pre-set number of entries per page.
 /// Interacts with user interface.
+#[cfg(feature = "signer")]
 pub fn history_total_pages(database_name: &str) -> Result<u32, ErrorSigner> {
     let history = get_history(database_name)?;
     let total_pages = {
@@ -29,6 +38,7 @@ pub fn history_total_pages(database_name: &str) -> Result<u32, ErrorSigner> {
 
 /// Function to print given page number from the history set.
 /// Interacts with user interface.
+#[cfg(feature = "signer")]
 pub fn print_history_page(page_number: u32, database_name: &str) -> Result<String, ErrorSigner> {
     let history = get_history(database_name)?;
     let total_pages = history_total_pages(database_name)?;
@@ -45,6 +55,7 @@ pub fn print_history_page(page_number: u32, database_name: &str) -> Result<Strin
 
 /// Local helper function to retrieve history entries from the database.
 /// Applicable only to Signer side.
+#[cfg(feature = "signer")]
 fn get_history(database_name: &str) -> Result<Vec<(Order, Entry)>, ErrorSigner> {
     let database = open_db::<Signer>(database_name)?;
     let history = open_tree::<Signer>(&database, HISTORY)?;
@@ -63,6 +74,7 @@ fn get_history(database_name: &str) -> Result<Vec<(Order, Entry)>, ErrorSigner> 
 
 /// Function to retrieve history entry by its order.
 /// Applicable only to Signer side.
+#[cfg(feature = "signer")]
 pub fn get_history_entry_by_order(order: u32, database_name: &str) -> Result<Entry, ErrorSigner> {
     let database = open_db::<Signer>(database_name)?;
     let history = open_tree::<Signer>(&database, HISTORY)?;
@@ -87,6 +99,7 @@ pub fn get_history_entry_by_order(order: u32, database_name: &str) -> Result<Ent
 }
 
 /// Function to print history entry by order for entries without parseable transaction
+#[cfg(feature = "signer")]
 pub fn print_history_entry_by_order(order: u32, database_name: &str) -> Result<String, ErrorSigner> {
     let entry = get_history_entry_by_order(order, database_name)?;
     Ok(format!("\"order\":{},{}", order, entry.show(|b| format!("\"{}\"", hex::encode(b.transaction())))))
@@ -95,6 +108,7 @@ pub fn print_history_entry_by_order(order: u32, database_name: &str) -> Result<S
 /// Function to clear Signer history.
 /// Naturally, applicable only to the Signer side.
 /// Interacts with user interface.
+#[cfg(feature = "signer")]
 pub fn clear_history(database_name: &str) -> Result<(), ErrorSigner> {
     let batch = make_batch_clear_tree::<Signer>(database_name, HISTORY)?;
     let events = vec![Event::HistoryCleared];
@@ -138,6 +152,7 @@ pub fn enter_events <T: ErrorSource> (database_name: &str, events: Vec<Event>) -
 /// Function for Signer user to add events.
 /// Applicable only to Signer side.
 /// Interacts with the user interface.
+#[cfg(feature = "signer")]
 pub fn history_entry_user(database_name: &str, string_from_user: &str) -> Result<(), ErrorSigner> {
     let events = vec![Event::UserEntry(string_from_user.to_string())];
     enter_events::<Signer>(database_name, events)
@@ -146,6 +161,7 @@ pub fn history_entry_user(database_name: &str, string_from_user: &str) -> Result
 /// Function to add system-generated events during Signer operation.
 /// Applicable only to Signer side.
 /// Interacts with the user interface.
+#[cfg(feature = "signer")]
 pub fn history_entry_system(database_name: &str, string_from_system: String) -> Result<(), ErrorSigner> {
     let events = vec![Event::SystemEntry(string_from_system)];
     enter_events::<Signer>(database_name, events)
@@ -154,6 +170,7 @@ pub fn history_entry_system(database_name: &str, string_from_system: String) -> 
 /// Function shows if the `device was online` indicator is on
 /// Applicable only to Signer side.
 /// Interacts with the user interface.
+#[cfg(feature = "signer")]
 pub fn device_was_online(database_name: &str) -> Result<(), ErrorSigner> {
     let events = vec![Event::DeviceWasOnline];
     let mut settings_batch = Batch::default();
@@ -167,6 +184,7 @@ pub fn device_was_online(database_name: &str) -> Result<(), ErrorSigner> {
 /// Function to reset the danger status to `safe` - use it wisely.
 /// Applicable only to Signer side.
 /// Interacts with the user interface.
+#[cfg(feature = "signer")]
 pub fn reset_danger_status_to_safe(database_name: &str) -> Result<(), ErrorSigner> {
     let events = vec![Event::ResetDangerRecord];
     let mut settings_batch = Batch::default();
@@ -180,12 +198,14 @@ pub fn reset_danger_status_to_safe(database_name: &str) -> Result<(), ErrorSigne
 /// Function to record in history log the fact that certain seed was shown on Signer screen.
 /// Applicable only to Signer side.
 /// Interacts with the user interface.
+#[cfg(feature = "signer")]
 pub fn seed_name_was_shown(database_name: &str, seed_name: String) -> Result<(), ErrorSigner> {
     let events = vec![Event::SeedNameWasShown(seed_name)];
     enter_events::<Signer>(database_name, events)
 }
 
 #[cfg(test)]
+#[cfg(feature = "test")]
 mod tests {
     use constants::test_values::{BOB, EMPTY_PNG, EMPTY_VEC_HASH_PIC};
     use definitions::{history::all_events_preview, network_specs::Verifier};

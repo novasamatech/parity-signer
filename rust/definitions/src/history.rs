@@ -2,9 +2,12 @@ use blake2_rfc::blake2b::blake2b;
 use parity_scale_codec::{Decode, Encode};
 use sled::IVec;
 use sp_runtime::MultiSigner;
+#[cfg(feature = "signer")]
 use std::convert::TryInto;
 
-use crate::{crypto::Encryption, helpers::{pic_meta, pic_types}, keyring::VerifierKey, metadata::MetaValues, network_specs::{NetworkSpecs, NetworkSpecsToSend, ValidCurrentVerifier, Verifier, VerifierValue}, print::{export_complex_single, export_complex_vector}, qr_transfers::{ContentLoadTypes}};
+use crate::{crypto::Encryption, keyring::VerifierKey, metadata::MetaValues, network_specs::{NetworkSpecs, NetworkSpecsToSend, ValidCurrentVerifier, Verifier, VerifierValue}, qr_transfers::{ContentLoadTypes}};
+#[cfg(feature = "signer")]
+use crate::{helpers::{pic_meta, pic_types}, print::{export_complex_single, export_complex_vector}};
 
 /// History log entry content for importing or removing metadata of a known network.
 /// Contains network name, network version, metadata hash, verifier.
@@ -30,6 +33,7 @@ impl MetaValuesDisplay {
             meta_hash: blake2b(32, &[], &meta_stored).as_bytes().to_vec(),
         }
     }
+    #[cfg(feature = "signer")]
     pub fn show(&self) -> String {
         let meta_id_pic = hex::encode(pic_meta(&self.meta_hash));
         format!("\"specname\":\"{}\",\"spec_version\":\"{}\",\"meta_hash\":\"{}\",\"meta_id_pic\":\"{}\"", &self.name, &self.version, hex::encode(&self.meta_hash), meta_id_pic)
@@ -57,6 +61,7 @@ impl MetaValuesExport {
             signed_by: signed_by.to_owned(),
         }
     }
+    #[cfg(feature = "signer")]
     pub fn show(&self) -> String {
         let meta_id_pic = hex::encode(pic_meta(&self.meta_hash));
         format!("\"specname\":\"{}\",\"spec_version\":\"{}\",\"meta_hash\":\"{}\",\"meta_id_pic\":\"{}\",\"signed_by\":{}", &self.name, &self.version, hex::encode(&self.meta_hash), meta_id_pic, export_complex_single(&self.signed_by, |a| a.show_card()))
@@ -79,6 +84,7 @@ impl NetworkSpecsDisplay {
             general_verifier: general_verifier.to_owned(),
         }
     }
+    #[cfg(feature = "signer")]
     pub fn show(&self) -> String {
         self.specs.show(&self.valid_current_verifier, &self.general_verifier)
     }
@@ -100,6 +106,7 @@ impl NetworkSpecsExport {
             signed_by: signed_by.to_owned(),
         }
     }
+    #[cfg(feature = "signer")]
     pub fn show(&self) -> String {
         format!("{},\"signed_by\":{}", &self.specs_to_send.show(), export_complex_single(&self.signed_by, |a| a.show_card()))
     }
@@ -121,6 +128,7 @@ impl NetworkVerifierDisplay {
             general_verifier: general_verifier.to_owned(),
         }
     }
+    #[cfg(feature = "signer")]
     pub fn show(&self) -> String {
         format!("\"genesis_hash\":\"{}\",\"current_verifier\":{}", hex::encode(&self.genesis_hash), export_complex_single(&self.valid_current_verifier, |a| a.show(&self.general_verifier)))
     }
@@ -140,6 +148,7 @@ impl TypesDisplay {
             verifier: verifier.to_owned(),
         }
     }
+    #[cfg(feature = "signer")]
     pub fn show(&self) -> String {
         let types_id_pic = hex::encode(pic_types(&self.types_hash));
         format!("\"types_hash\":\"{}\",\"types_id_pic\":\"{}\",\"verifier\":{}", hex::encode(&self.types_hash), types_id_pic, export_complex_single(&self.verifier, |a| a.show_card()))
@@ -162,6 +171,7 @@ impl TypesExport {
             signed_by: signed_by.to_owned(),
         }
     }
+    #[cfg(feature = "signer")]
     pub fn show(&self) -> String {
         let types_id_pic = hex::encode(pic_types(&self.types_hash));
         format!("\"types_hash\":\"{}\",\"types_id_pic\":\"{}\",\"signed_by\":{}", hex::encode(&self.types_hash), types_id_pic, export_complex_single(&self.signed_by, |a| a.show_card()))
@@ -189,6 +199,7 @@ impl IdentityHistory {
             network_genesis_hash: network_genesis_hash.to_vec(),
         }
     }
+    #[cfg(feature = "signer")]
     pub fn show(&self) -> String {
         format!("\"seed_name\":\"{}\",\"encryption\":\"{}\",\"public_key\":\"{}\",\"path\":\"{}\",\"network_genesis_hash\":\"{}\"", &self.seed_name, &self.encryption.show(), hex::encode(&self.public_key), &self.path, hex::encode(&self.network_genesis_hash))
     }
@@ -224,11 +235,13 @@ impl SignDisplay {
     pub fn transaction(&self) -> Vec<u8> {
         self.transaction.to_vec()
     }
+    #[cfg(feature = "signer")]
     pub fn success<O>(&self, op: O) -> String 
     where O: Fn(&Self) -> String + Copy,
     {
         format!("\"transaction\":{},\"network_name\":\"{}\",\"signed_by\":{},\"user_comment\":\"{}\"", op(self), &self.network_name, export_complex_single(&self.signed_by, |a| a.show_card()), &self.user_comment)
     }
+    #[cfg(feature = "signer")]
     pub fn pwd_failure<O>(&self, op: O) -> String 
     where O: Fn(&Self) -> String + Copy,
     {
@@ -255,9 +268,11 @@ impl SignMessageDisplay {
             user_comment: user_comment.to_string(),
         }
     }
+    #[cfg(feature = "signer")]
     pub fn success(&self) -> String {
         format!("\"message\":\"{}\",\"network_name\":\"{}\",\"signed_by\":{},\"user_comment\":\"{}\"", hex::encode(&self.message.as_bytes()), &self.network_name, export_complex_single(&self.signed_by, |a| a.show_card()), &self.user_comment)
     }
+    #[cfg(feature = "signer")]
     pub fn pwd_failure(&self) -> String {
         format!("\"message\":\"{}\",\"network_name\":\"{}\",\"signed_by\":{},\"user_comment\":\"{}\",\"error\":\"wrong_password_entered\"", hex::encode(&self.message.as_bytes()), &self.network_name, export_complex_single(&self.signed_by, |a| a.show_card()), &self.user_comment)
     }
@@ -303,6 +318,7 @@ pub struct Entry {
     pub events: Vec<Event>, // events already in showable form
 }
 
+#[cfg(feature = "signer")]
 impl Event {
     pub fn show<O>(&self, op: O) -> String 
     where O: Fn(&SignDisplay) -> String + Copy,
@@ -340,6 +356,7 @@ impl Event {
     }
 }
 
+#[cfg(feature = "signer")]
 impl Entry {
     pub fn show<O>(&self, op: O) -> String 
     where O: Fn(&SignDisplay) -> String + Copy,
@@ -349,6 +366,7 @@ impl Entry {
     }
 }
 
+#[cfg(feature = "signer")]
 pub fn all_events_preview() -> Vec<Event> {
     let mut events: Vec<Event> = Vec::new();
     let meta_values = MetaValues {
@@ -409,6 +427,7 @@ pub fn all_events_preview() -> Vec<Event> {
     events
 }
 
+#[cfg(feature = "signer")]
 pub fn print_all_events() -> String {
     let events = all_events_preview();
     let entry = Entry {

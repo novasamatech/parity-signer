@@ -2,12 +2,14 @@ use sled::IVec;
 use parity_scale_codec::{Decode, Encode};
 use sp_runtime::MultiSigner;
 
-use crate::crypto::Encryption;
-use crate::error::{AddressKeySource, ErrorSigner, ErrorSource, SpecsKeySource};
-use crate::helpers::{multisigner_to_public, multisigner_to_encryption};
-use crate::keyring::{AddressKey, NetworkSpecsKey, print_multisigner_as_base58};
+use crate::{crypto::Encryption, error::{AddressKeySource, ErrorSource, SpecsKeySource}, helpers::multisigner_to_encryption, keyring::{AddressKey, NetworkSpecsKey}};
+#[cfg(feature = "signer")]
+use crate::{error_signer::ErrorSigner, helpers::multisigner_to_public, keyring::print_multisigner_as_base58};
 
-/// Struct associated with public address that has secret key available
+/// Information associated with an address in the database
+///
+/// Info that should be available for any address key. 
+/// No secrets are stored there.
 #[derive(Decode, Encode, Debug, Clone)]
 pub struct AddressDetails {
     pub seed_name: String,
@@ -19,6 +21,7 @@ pub struct AddressDetails {
 
 impl AddressDetails {
 
+    #[cfg(feature = "signer")]
     pub fn print (&self, multisigner: &MultiSigner, optional_prefix: Option<u16>) -> Result<String, ErrorSigner> {
         let base58print = print_multisigner_as_base58(multisigner, optional_prefix);
         Ok(format!("\"public_key\":\"{}\",\"encryption\":\"{}\",\"ss58\":\"{}\",\"path\":\"{}\",\"has_password\":\"{}\",\"seed_name\":\"{}\"", hex::encode(multisigner_to_public(multisigner)), &self.encryption.show(), base58print, &self.path, &self.has_pwd, &self.seed_name))

@@ -1,12 +1,23 @@
 use parity_scale_codec::{Decode, Encode};
 use sled::{Batch, Transactional};
+#[cfg(feature = "signer")]
 use sp_runtime::MultiSigner;
 
-use constants::{ADDRESS_BOOK, ADDRTREE, DRV, GENERALVERIFIER, HISTORY, METATREE, SETTREE, SIGN, SPECSTREE, SPECSTREEPREP, STUB, TRANSACTION, TYPES, VERIFIERS};
-use definitions::{error::{Active, DatabaseSigner, EntryDecodingSigner, ErrorActive, ErrorSigner, ErrorSource, NotFoundSigner, Signer}, helpers::multisigner_to_public, history::{Event, IdentityHistory, MetaValuesDisplay, NetworkSpecsDisplay, NetworkVerifierDisplay, SignDisplay, SignMessageDisplay, TypesDisplay}, keyring::{AddressKey, MetaKey, NetworkSpecsKey, VerifierKey}, metadata::MetaValues, network_specs::{NetworkSpecs, NetworkSpecsToSend, CurrentVerifier, ValidCurrentVerifier, Verifier, VerifierValue}, qr_transfers::ContentLoadTypes, users::AddressDetails};
+use constants::{ADDRTREE, HISTORY, METATREE, SETTREE, SPECSTREE, TRANSACTION, VERIFIERS};
+#[cfg(feature = "active")]
+use constants::{ADDRESS_BOOK, SPECSTREEPREP};
+#[cfg(feature = "signer")]
+use constants::{DRV, GENERALVERIFIER, SIGN, STUB, TYPES};
 
-use crate::helpers::{make_batch_clear_tree, open_db, open_tree, verify_checksum};
-use crate::manage_history::events_to_batch;
+use definitions::error::ErrorSource;
+#[cfg(feature = "active")]
+use definitions::error_active::{Active, ErrorActive};
+#[cfg(feature = "signer")]
+use definitions::{error_signer::{DatabaseSigner, EntryDecodingSigner, ErrorSigner, NotFoundSigner, Signer}, helpers::multisigner_to_public, history::{Event, IdentityHistory, MetaValuesDisplay, NetworkSpecsDisplay, NetworkVerifierDisplay, SignDisplay, SignMessageDisplay, TypesDisplay}, keyring::{AddressKey, MetaKey, NetworkSpecsKey, VerifierKey}, metadata::MetaValues, network_specs::{NetworkSpecs, NetworkSpecsToSend, CurrentVerifier, ValidCurrentVerifier, Verifier, VerifierValue}, qr_transfers::ContentLoadTypes, users::AddressDetails};
+
+use crate::helpers::{open_db, open_tree};
+#[cfg(feature = "signer")]
+use crate::{helpers::{make_batch_clear_tree, verify_checksum}, manage_history::events_to_batch};
 
 
 pub struct TrDbCold {
@@ -19,6 +30,7 @@ pub struct TrDbCold {
     for_verifiers: Batch,
 }
 
+#[cfg(feature = "active")]
 pub struct TrDbHot {
     for_address_book: Batch,
     for_metadata: Batch,
@@ -76,6 +88,7 @@ impl BatchStub {
 /// settings tree, by default containing types information.
 /// Trees address_book, metadata, and network_specs_prep are routinely updated by database users.
 /// Struct TrDbHot contains set of batches that could be aplied to hot database.
+#[cfg(feature = "active")]
 impl TrDbHot {
     /// function to construct new empty TrDbHot
     pub fn new() -> Self {
@@ -131,6 +144,7 @@ impl TrDbHot {
     }
 }
 
+#[cfg(feature = "active")]
 impl Default for TrDbHot {
     fn default() -> Self {
         Self::new()
@@ -243,6 +257,7 @@ impl Default for TrDbCold {
 /// and Vec<Event> from which the history tree is updated.
 /// It is stored SCALE encoded in transaction tree of the cold database with key STUB.
 #[derive(Decode, Encode)]
+#[cfg(feature = "signer")]
 pub struct TrDbColdStub {
     addresses_stub: BatchStub,
     history_stub: Vec<Event>,
@@ -252,6 +267,7 @@ pub struct TrDbColdStub {
     verifiers_stub: BatchStub,
 }
 
+#[cfg(feature = "signer")]
 impl TrDbColdStub {
     /// function to construct new empty TrDbColdStub
     pub fn new() -> Self {
@@ -390,6 +406,7 @@ impl TrDbColdStub {
     }
 }
 
+#[cfg(feature = "signer")]
 impl Default for TrDbColdStub {
     fn default() -> Self {
         Self::new()
@@ -403,6 +420,7 @@ impl Default for TrDbColdStub {
 /// and relevant history entries.
 /// It is stored SCALE encoded in transaction tree of the cold database with key SIGN.
 #[derive(Decode, Encode)]
+#[cfg(feature = "signer")]
 pub struct TrDbColdSign {
     content: SignContent,
     network_name: String,
@@ -413,11 +431,13 @@ pub struct TrDbColdSign {
 }
 
 #[derive(Decode, Encode)]
+#[cfg(feature = "signer")]
 pub enum SignContent {
     Transaction{method: Vec<u8>, extensions: Vec<u8>},
     Message(String),
 }
 
+#[cfg(feature = "signer")]
 impl TrDbColdSign {
     /// function to generate TrDbColdSign
     pub fn generate(content: SignContent, network_name: &str, path: &str, has_pwd: bool, multisigner: &MultiSigner, history: Vec<Event>) -> Self {
@@ -516,11 +536,13 @@ impl TrDbColdSign {
 /// Temporary storage for information needed to import derivations
 /// Secret seed and seed name are required to approve
 #[derive(Decode, Encode)]
+#[cfg(feature = "signer")]
 pub struct TrDbColdDerivations {
     checked_derivations: Vec<String>,
     network_specs: NetworkSpecs,
 }
 
+#[cfg(feature = "signer")]
 impl TrDbColdDerivations {
     /// function to generate TrDbColdDerivations
     pub fn generate(checked_derivations: &[String], network_specs: &NetworkSpecs) -> Self {

@@ -2,7 +2,7 @@ use parity_scale_codec::Encode;
 use sled::Batch;
 
 use constants::{ADDRTREE, METATREE, SPECSTREE};
-use definitions::{error::{ErrorSigner, ErrorSource, NotFoundSigner, Signer}, helpers::multisigner_to_public, history::{Event, IdentityHistory, MetaValuesDisplay, NetworkSpecsDisplay}, keyring::{AddressKey, NetworkSpecsKey, VerifierKey, MetaKeyPrefix, MetaKey}, network_specs::{CurrentVerifier, NetworkSpecs, ValidCurrentVerifier, Verifier}, users::AddressDetails};
+use definitions::{error::ErrorSource, error_signer::{ErrorSigner, NotFoundSigner, Signer}, helpers::multisigner_to_public, history::{Event, IdentityHistory, MetaValuesDisplay, NetworkSpecsDisplay}, keyring::{AddressKey, NetworkSpecsKey, VerifierKey, MetaKeyPrefix, MetaKey}, network_specs::{CurrentVerifier, NetworkSpecs, ValidCurrentVerifier, Verifier}, users::AddressDetails};
 
 use crate::db_transactions::TrDbCold;
 use crate::helpers::{open_db, open_tree, get_network_specs, get_general_verifier, get_valid_current_verifier};
@@ -126,6 +126,7 @@ fn get_batch_remove_unchecked_meta (database_name: &str, network_name: &str, net
 }
 
 #[cfg(test)]
+#[cfg(feature = "test")]
 mod tests {
     
     use sled::{Db, Tree, open};

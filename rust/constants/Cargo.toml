@@ -7,6 +7,13 @@ edition = "2021"
 
 [dependencies]
 
+[features]
+default = ["test"]
+
+active = []
+signer = []
+test = ["active", "signer"]
+
 [lib]
 name = "constants"
 crate-type = ["lib"]

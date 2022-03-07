@@ -1,3 +1,5 @@
+#![deny(unused_crate_dependencies)]
+
 use constants::{COLD_DB_NAME, COLD_DB_NAME_RELEASE, HOT_DB_NAME, TYLO};
 use db_handling::{default_cold, default_cold_release, default_hot, metadata::transfer_metadata_to_cold, prep_messages::prep_types};
 use definitions::error::{Active, ErrorActive};

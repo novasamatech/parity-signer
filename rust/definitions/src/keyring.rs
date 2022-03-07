@@ -3,9 +3,11 @@ use sled::IVec;
 use sp_core::crypto::{Ss58Codec, Ss58AddressFormat};
 use sp_runtime::MultiSigner;
 
-use crate::crypto::Encryption;
-use crate::error::{AddressKeySource, DatabaseActive, DatabaseSigner, ErrorActive, ErrorSigner, ErrorSource, KeyDecodingActive, KeyDecodingSignerDb, NotHexSigner, Signer, SpecsKeySource};
-use crate::helpers::{get_multisigner, unhex};
+use crate::{crypto::Encryption, error::{AddressKeySource, ErrorSource, SpecsKeySource}};
+#[cfg(feature = "active")]
+use crate::error_active::{DatabaseActive, ErrorActive, KeyDecodingActive};
+#[cfg(feature = "signer")]
+use crate::{error_signer::{DatabaseSigner, ErrorSigner, KeyDecodingSignerDb, NotHexSigner, Signer}, helpers::{get_multisigner, unhex}};
 
 /// NetworkSpecsKey is the database storage key used to search for 
 /// network specs ChainSpecs (COLD database, network specs tree SPECSTREE)
@@ -36,6 +38,7 @@ impl NetworkSpecsKey {
         Self(ivec.to_vec())
     }
     /// Function to transform hex entered key into NetworkSpecsKey
+    #[cfg(feature = "signer")]
     pub fn from_hex(hex_line: &str) -> Result<Self, ErrorSigner> {
         Ok(Self(unhex::<Signer>(hex_line, NotHexSigner::NetworkSpecsKey{input: hex_line.to_string()})?))
     }
@@ -97,6 +100,7 @@ impl AddressKey {
         Self(AddressKeyContent(multisigner.to_owned()).encode())
     }
     /// Function to generate AddressKey from parts: public key vector and network encryption
+    #[cfg(feature = "signer")]
     pub fn from_parts (public: &[u8], encryption: &Encryption) -> Result<Self, ErrorSigner> {
         let multisigner = get_multisigner(public, encryption)?;
         Ok(Self::from_multisigner(&multisigner))
@@ -106,6 +110,7 @@ impl AddressKey {
         Self(ivec.to_vec())
     }
     /// Function to transform Vec<u8> into AddressKey
+    #[cfg(feature = "signer")]
     pub fn from_hex (hex_address_key: &str) -> Result<Self, ErrorSigner> {
         Ok(Self(unhex::<Signer>(hex_address_key, NotHexSigner::AddressKey{input: hex_address_key.to_string()})?))
     }
@@ -212,6 +217,7 @@ impl MetaKeyPrefix {
 pub struct Order(u32);
 
 impl Order {
+    #[cfg(feature = "signer")]
     pub fn from_ivec(ivec: &IVec) -> Result<Self, ErrorSigner> {
         match <u32>::decode(&mut &ivec[..]) {
            Ok(a) => Ok(Self(a)),
@@ -232,12 +238,15 @@ impl Order {
 /// AddressBookKey is the database storage key used to search for 
 /// address book entries (HOT database, address book tree ADDRESS_BOOK)
 #[derive(Debug, Clone)]
+#[cfg(feature = "active")]
 pub struct AddressBookKey (Vec<u8>);
 
 /// Struct for decoded MetaKey content
 #[derive(Decode, Encode)]
+#[cfg(feature = "active")]
 struct AddressBookKeyContent (String);
 
+#[cfg(feature = "active")]
 impl AddressBookKey {
     /// Function to generate AddressBookKey from parts: network genesis hash and network encryption
     pub fn from_title (title: &str) -> Self {
@@ -262,26 +271,35 @@ impl AddressBookKey {
 }
 
 #[cfg(test)]
+#[cfg(feature = "test")]
 mod tests {
     use super::*;
-    use crate::error::{Active, SpecsKeySource, ExtraSpecsKeySourceSigner};
+    use crate::error::SpecsKeySource;
+    use crate::error_active::Active;
+    use crate::error_signer::ExtraSpecsKeySourceSigner;
     
     #[test]
-    fn error_in_network_specs_key() {
+    fn error_in_network_specs_key_signer() {
         let network_specs_key_hex = "0350e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e";
         let network_specs_key = NetworkSpecsKey::from_hex(network_specs_key_hex).unwrap();
         let error = network_specs_key.genesis_hash_encryption::<Signer>(SpecsKeySource::Extra(ExtraSpecsKeySourceSigner::Interface)).unwrap_err();
         let error_print = <Signer>::show(&error);
         let expected_error_print = "Error on the interface. Unable to parse network specs key 0350e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e passed through the interface.";
-        assert!( error_print == expected_error_print, "Received: \n{}", error_print);
+        assert!(error_print == expected_error_print, "Received: \n{}", error_print);
         let error = network_specs_key.genesis_hash_encryption::<Signer>(SpecsKeySource::SpecsTree).unwrap_err();
         let error_print = <Signer>::show(&error);
         let expected_error_print = "Database error. Unable to parse network specs key 0350e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e from the database.";
-        assert!( error_print == expected_error_print, "Received: \n{}", error_print);
+        assert!(error_print == expected_error_print, "Received: \n{}", error_print);
+    }
+    
+    #[test]
+    fn error_in_network_specs_key_active() {
+        let network_specs_key_hex = "0350e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e";
+        let network_specs_key = NetworkSpecsKey::from_ivec(&IVec::from(hex::decode(network_specs_key_hex).unwrap()));
         let error = network_specs_key.genesis_hash_encryption::<Active>(SpecsKeySource::SpecsTree).unwrap_err();
         let error_print = <Active>::show(&error);
         let expected_error_print = "Database error. Unable to parse network specs key 0350e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e from the database.";
-        assert!( error_print == expected_error_print, "Received: \n{}", error_print);
+        assert!(error_print == expected_error_print, "Received: \n{}", error_print);
     }
 }
 

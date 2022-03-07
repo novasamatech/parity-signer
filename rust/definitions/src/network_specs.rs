@@ -1,13 +1,14 @@
 use parity_scale_codec::{Decode, Encode};
+#[cfg(feature = "signer")]
 use plot_icon::EMPTY_PNG;
 use sled::IVec;
 use sp_runtime::MultiSigner;
 
-use crate::crypto::Encryption;
-use crate::error::{Active, DatabaseActive, EntryDecodingActive, ErrorActive, ErrorSource, MismatchActive, SpecsKeySource};
-use crate::helpers::{multisigner_to_public, multisigner_to_encryption, make_identicon_from_multisigner};
-use crate::keyring::NetworkSpecsKey;
-use crate::print::export_complex_single;
+use crate::{crypto::Encryption, error::{ErrorSource, SpecsKeySource}, keyring::NetworkSpecsKey};
+#[cfg(feature = "active")]
+use crate::error_active::{Active, DatabaseActive, EntryDecodingActive, ErrorActive, MismatchActive};
+#[cfg(feature = "signer")]
+use crate::{helpers::{make_identicon_from_multisigner, multisigner_to_public, multisigner_to_encryption}, print::export_complex_single};
 
 //TODO: rename fields to make them more clear
 #[derive(Decode, Encode, PartialEq, Debug, Clone)]
@@ -52,12 +53,15 @@ pub struct ShortSpecs {
 }
 
 impl NetworkSpecs {
+    #[cfg(feature = "signer")]
     pub fn show(&self, valid_current_verifier: &ValidCurrentVerifier, general_verifier: &Verifier) -> String {
         format!("\"base58prefix\":\"{}\",\"color\":\"{}\",\"decimals\":\"{}\",\"encryption\":\"{}\",\"genesis_hash\":\"{}\",\"logo\":\"{}\",\"name\":\"{}\",\"order\":\"{}\",\"path_id\":\"{}\",\"secondary_color\":\"{}\",\"title\":\"{}\",\"unit\":\"{}\",\"current_verifier\":{}", &self.base58prefix, &self.color, &self.decimals, &self.encryption.show(), hex::encode(&self.genesis_hash), &self.logo, &self.name, &self.order, &self.path_id, &self.secondary_color, &self.title, &self.unit, export_complex_single(valid_current_verifier, |a| a.show(general_verifier)))
     }
+    #[cfg(feature = "signer")]
     pub fn print_single(&self) -> String {
         format!("\"color\":\"{}\",\"logo\":\"{}\",\"secondary_color\":\"{}\",\"title\":\"{}\"", &self.color, &self.logo, &self.secondary_color, &self.title)
     }
+    #[cfg(feature = "signer")]
     pub fn print_as_set_part(&self) -> String {
         format!("\"key\":\"{}\",\"color\":\"{}\",\"logo\":\"{}\",\"order\":\"{}\",\"secondary_color\":\"{}\",\"title\":\"{}\"", hex::encode(NetworkSpecsKey::from_parts(&self.genesis_hash, &self.encryption).key()), &self.color, &self.logo, &self.order, &self.secondary_color, &self.title)
     }
@@ -102,6 +106,7 @@ impl NetworkSpecs {
 }
 
 impl NetworkSpecsToSend {
+    #[cfg(feature = "signer")]
     pub fn show(&self) -> String {
         format!("\"base58prefix\":\"{}\",\"color\":\"{}\",\"decimals\":\"{}\",\"encryption\":\"{}\",\"genesis_hash\":\"{}\",\"logo\":\"{}\",\"name\":\"{}\",\"path_id\":\"{}\",\"secondary_color\":\"{}\",\"title\":\"{}\",\"unit\":\"{}\"", &self.base58prefix, &self.color, &self.decimals, &self.encryption.show(), hex::encode(&self.genesis_hash), &self.logo, &self.name, &self.path_id, &self.secondary_color, &self.title, &self.unit)
     }
@@ -121,6 +126,7 @@ impl NetworkSpecsToSend {
             unit: self.unit.to_string(),
         }
     }
+    #[cfg(feature = "active")]
     pub fn from_entry_with_key_checked (network_specs_key: &NetworkSpecsKey, network_specs_to_send_encoded: IVec) -> Result<Self, ErrorActive> {
         let (genesis_hash_vec, encryption) = network_specs_key.genesis_hash_encryption::<Active>(SpecsKeySource::SpecsTree)?;
         let network_specs_to_send = match Self::decode(&mut &network_specs_to_send_encoded[..]) {
@@ -131,6 +137,7 @@ impl NetworkSpecsToSend {
         if encryption != network_specs_to_send.encryption {return Err(ErrorActive::Database(DatabaseActive::Mismatch(MismatchActive::SpecsToSendEncryption{key: network_specs_key.to_owned(), encryption: network_specs_to_send.encryption})))}
         Ok(network_specs_to_send)
     }
+    #[cfg(feature = "active")]
     pub fn from_entry_checked ((network_specs_key_vec, network_specs_to_send_encoded): (IVec, IVec)) -> Result<Self, ErrorActive> {
         let network_specs_key = NetworkSpecsKey::from_ivec(&network_specs_key_vec);
         Self::from_entry_with_key_checked(&network_specs_key, network_specs_to_send_encoded)
@@ -153,6 +160,7 @@ pub enum VerifierValue {
     Standard (MultiSigner),
 }
 
+#[cfg(feature = "signer")]
 impl Verifier {
     pub fn show_card(&self) -> String {
         match &self.0 {
@@ -168,6 +176,7 @@ impl Verifier {
     }
 }
 
+#[cfg(feature = "signer")]
 impl VerifierValue {
     pub fn show_card(&self) -> String {
         match &self {
@@ -204,6 +213,7 @@ pub enum ValidCurrentVerifier {
     Custom (Verifier),
 }
 
+#[cfg(feature = "signer")]
 impl ValidCurrentVerifier {
     pub fn show(&self, general_verifier: &Verifier) -> String {
         match &self {

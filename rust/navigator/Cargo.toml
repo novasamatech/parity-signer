@@ -6,12 +6,10 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-constants = {path = "../constants"}
 db_handling = {path = "../db_handling"}
 definitions = {path = "../definitions"}
 hex = "0.4.3"
 lazy_static = "1.4.0"
-sp-core = {version = "6.0.0", default-features = false, features = ["full_crypto"]}
 sp-runtime = {version = "6.0.0", default-features = false}
 transaction_parsing = {path = "../transaction_parsing"}
 transaction_signing = {path = "../transaction_signing"}
@@ -19,7 +17,9 @@ zeroize = "1.5.3"
 
 [dev-dependencies]
 blake2-rfc = "0.2.18"
+constants = {path = "../constants"}
 image = {version = "0.24.0", default-features = false, features = ["ico"]}
 parser = {path = "../parser"}
 quircs = "0.10.0"
 regex = "1.5.4"
+sp-core = {version = "6.0.0", default-features = false, features = ["full_crypto"]}

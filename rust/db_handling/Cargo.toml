@@ -6,23 +6,29 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-blake2-rfc = "0.2.18"
+blake2-rfc = {version = "0.2.18", optional = true}
 chrono = "0.4.19"
 constants = {path = "../constants"}
-defaults = {path = "../defaults"}
-definitions = {path = "../definitions"}
-hex = "0.4.3"
+defaults = {path = "../defaults", default-features = false, optional = true}
+definitions = {path = "../definitions", default-features = false}
+hex = {version = "0.4.3", optional = true}
 lazy_static = "1.4.0"
 parity-scale-codec = {version = "3.0.0", features = ["derive"]}
-plot_icon = {git = "https://github.com/varovainen/polkadot-identicon-rust", default-features = false, features = ["pix"]}
-png = "0.17.3"
-qrcode_static = {path = "../qrcode_static"}
+plot_icon = {git = "https://github.com/varovainen/polkadot-identicon-rust", default-features = false, features = ["pix"], optional = true}
+qrcode_static = {path = "../qrcode_static", optional = true}
 regex = "1.5.4"
 sled = "0.34.6"
-sp-core = {version = "6.0.0", default-features = false, features = ["full_crypto"]}
-sp-runtime = {version = "6.0.0", default-features = false}
-tiny-bip39 = { version = "0.8.0", default-features = false }
-zeroize = "1.5.3"
+sp-core = {version = "6.0.0", default-features = false, features = ["full_crypto"], optional = true}
+sp-runtime = {version = "6.0.0", default-features = false, optional = true}
+tiny-bip39 = {version = "0.8.0", default-features = false, optional = true}
+zeroize = {version = "1.5.3", optional = true}
+
+[features]
+default = ["test"]
+
+active = ["constants/active", "defaults/active", "definitions/active", "sp-core", "sp-runtime", "zeroize"]
+signer = ["blake2-rfc", "constants/signer", "defaults/signer", "definitions/signer", "hex", "plot_icon", "qrcode_static", "tiny-bip39", "sp-core", "sp-runtime", "zeroize"]
+test = ["active", "constants/test", "signer"]
 
 [lib]
 name = "db_handling"

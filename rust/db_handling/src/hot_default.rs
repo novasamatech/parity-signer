@@ -3,7 +3,7 @@ use sled::Batch;
 
 use constants::{ADDRESS_BOOK, METATREE, SETTREE, SPECSTREEPREP, TYPES};
 use defaults::{get_default_address_book, get_default_chainspecs_to_send, get_default_types_content};
-use definitions::{error::{Active, ErrorActive}, keyring::{AddressBookKey, NetworkSpecsKey}};
+use definitions::{error_active::{Active, ErrorActive}, keyring::{AddressBookKey, NetworkSpecsKey}};
 
 use crate::db_transactions::TrDbHot;
 use crate::helpers::{make_batch_clear_tree};

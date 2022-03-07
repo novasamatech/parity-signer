@@ -4,7 +4,8 @@ use sp_core::crypto::SecretStringError;
 use sp_runtime::MultiSigner;
 
 use crate::crypto::Encryption;
-use crate::error::{AddressGeneration, AddressGenerationCommon, DatabaseSigner, EntryDecodingSigner, ErrorSigner, ExtraAddressGenerationSigner, GeneralVerifierForContent, InputSigner, InterfaceSigner, KeyDecodingSignerDb, KeyDecodingSignerInterface, MetadataError, MismatchSigner, NotFoundSigner, NotHexSigner, ParserDecodingError, ParserError, ParserMetadataError, TransferContent};
+use crate::error::{AddressGeneration, AddressGenerationCommon, MetadataError, TransferContent};
+use crate::error_signer::{DatabaseSigner, EntryDecodingSigner, ErrorSigner, ExtraAddressGenerationSigner, GeneralVerifierForContent, InputSigner, InterfaceSigner, KeyDecodingSignerDb, KeyDecodingSignerInterface, MismatchSigner, NotFoundSigner, NotHexSigner, ParserDecodingError, ParserError, ParserMetadataError};
 use crate::keyring::{AddressKey, MetaKey, NetworkSpecsKey, Order, VerifierKey};
 use crate::network_specs::{ValidCurrentVerifier, Verifier, VerifierValue};
 
@@ -224,7 +225,8 @@ pub fn signer_errors() -> Vec<ErrorSigner> {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::error::{ErrorSource, Signer};
+    use crate::error::ErrorSource;
+    use crate::error_signer::Signer;
     
     #[test]
     fn print_signer_errors_nicely() {

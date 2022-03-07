@@ -1,3 +1,4 @@
+#[cfg(feature = "test")]
 pub mod test_values;
 
 /// COLD database on Signer device:  
@@ -9,7 +10,9 @@ pub mod test_values;
 /// TEMPORARILY user identities and addresses - TO BE REMOVED SOON
 /// transaction information
 
+#[cfg(feature = "active")]
 pub const COLD_DB_NAME: &str = "../database/database_cold";
+#[cfg(feature = "active")]
 pub const COLD_DB_NAME_RELEASE: &str = "../database/database_cold_release";
 
 /// Tree names:  
@@ -27,12 +30,17 @@ pub const GENERALVERIFIER: &[u8] = b"general_verifier";
 pub const DANGER: &[u8] = b"dangerous_encounter";
 
 /// Key names used for transaction tree:  
+#[cfg(feature = "signer")]
 pub const STUB: &[u8] = b"stub";
+#[cfg(feature = "signer")]
 pub const SIGN: &[u8] = b"sign";
+#[cfg(feature = "signer")]
 pub const DRV: &[u8] = b"derivations";
 
 /// Display constants
+#[cfg(feature = "signer")]
 pub const MAX_WORDS_DISPLAY: usize = 8;
+#[cfg(feature = "signer")]
 pub const HISTORY_PAGE_SIZE: usize = 20;
 
 /// HOT database on external device:  
@@ -43,10 +51,13 @@ pub const HISTORY_PAGE_SIZE: usize = 20;
 /// types information
 /// address book
 
+#[cfg(feature = "active")]
 pub const HOT_DB_NAME: &str = "../database/database_hot";
 
 /// Tree names:
+#[cfg(feature = "active")]
 pub const SPECSTREEPREP: &[u8] = b"chainspecs_prep";
+#[cfg(feature = "active")]
 pub const ADDRESS_BOOK: &[u8] = b"address_book";
 /// Also hot database uses:
 /// - tree METATREE with same (key, value) properties as in cold database
@@ -57,20 +68,32 @@ pub const ADDRESS_BOOK: &[u8] = b"address_book";
 
 /// Default colors to be used when forming ChainSpecsToSend
 /// for networks without known network specs
+#[cfg(feature = "active")]
 pub const COLOR: &str = "#660D35";
+#[cfg(feature = "active")]
 pub const SECONDARY_COLOR: &str = "#262626";
 
 /// File name parts used for exports in generate_message crate
+#[cfg(feature = "active")]
 pub const ADD: &str = "../files/for_signing/sign_me_add_network";
+#[cfg(feature = "active")]
 pub const LOAD: &str = "../files/for_signing/sign_me_load_metadata";
+#[cfg(feature = "active")]
 pub const TYLO: &str = "../files/for_signing/sign_me_load_types";
+#[cfg(feature = "active")]
 pub const SPECS: &str = "../files/for_signing/sign_me_add_specs";
 
 /// Folder name used for imports in generate_message crate
+#[cfg(feature = "active")]
 pub const FOLDER: &str = "../files/for_signing";
+#[cfg(feature = "active")]
 pub const EXPORT_FOLDER: &str = "../files/signed";
 
+/// Alice seed phrase
+pub const ALICE_SEED_PHRASE: &str = "bottom drive obey lake curtain smoke basket hold race lonely fit walk";
+
 /// QR making, raptorq:
+#[cfg(feature = "active")]
 pub const CHUNK_SIZE: u16 = 1072;
 
 /// QR making, both apng and png, grayscale:

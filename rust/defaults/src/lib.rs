@@ -1,10 +1,27 @@
-use sp_runtime::MultiSigner;
-use std::convert::TryInto;
-use std::fs;
-use regex::Regex;
-use lazy_static::lazy_static;
-use definitions::{crypto::Encryption, error::{Active, DefaultLoading, ErrorActive, ErrorSource, IncomingMetadataSourceActive, IncomingMetadataSourceActiveStr, MetadataError, MetadataSource}, keyring::VerifierKey, metadata::{AddressBookEntry, MetaValues}, network_specs::{NetworkSpecs, NetworkSpecsToSend, CurrentVerifier, ValidCurrentVerifier, Verifier, VerifierValue}, qr_transfers::ContentLoadTypes, types::{TypeEntry, Description, EnumVariant, EnumVariantType, StructField}};
+#![deny(unused_crate_dependencies)]
 
+#[cfg(feature = "signer")]
+use sp_runtime::MultiSigner;
+
+#[cfg(feature = "active")]
+use std::convert::TryInto;
+
+#[cfg(feature = "active")]
+use std::fs;
+
+#[cfg(feature = "active")]
+use regex::Regex;
+
+#[cfg(feature = "active")]
+use lazy_static::lazy_static;
+
+#[cfg(feature = "active")]
+use definitions::{crypto::Encryption, error::{ErrorSource, MetadataError, MetadataSource}, error_active::{Active, DefaultLoading, ErrorActive, IncomingMetadataSourceActive, IncomingMetadataSourceActiveStr}, keyring::VerifierKey, metadata::{AddressBookEntry, MetaValues}, network_specs::{NetworkSpecs, NetworkSpecsToSend, CurrentVerifier, ValidCurrentVerifier}, qr_transfers::ContentLoadTypes, types::{TypeEntry, Description, EnumVariant, EnumVariantType, StructField}};
+
+#[cfg(feature = "signer")]
+use definitions::network_specs::{Verifier, VerifierValue};
+
+#[cfg(feature = "signer")]
 pub const DEFAULT_VERIFIER_PUBLIC: [u8;32] = [
     0xc4,
     0x6a,
@@ -40,10 +57,12 @@ pub const DEFAULT_VERIFIER_PUBLIC: [u8;32] = [
     0x57
     ];//Real Parity key!
 
+#[cfg(feature = "signer")]
 pub fn default_general_verifier() -> Verifier {
     Verifier(Some(VerifierValue::Standard(MultiSigner::Sr25519(sp_core::sr25519::Public::from_raw(DEFAULT_VERIFIER_PUBLIC)))))
 }
 
+#[cfg(feature = "active")]
 struct DefaultNetworkInfo {
     address: String,
     base58prefix: u16,
@@ -60,6 +79,7 @@ struct DefaultNetworkInfo {
     unit: String,
 }
 
+#[cfg(feature = "active")]
 fn get_default_network_info() -> Vec<DefaultNetworkInfo> {
     vec![
         DefaultNetworkInfo {
@@ -110,6 +130,7 @@ fn get_default_network_info() -> Vec<DefaultNetworkInfo> {
     ]
 }
 
+#[cfg(feature = "active")]
 pub fn get_default_chainspecs() -> Vec<NetworkSpecs> {
     let mut out: Vec<NetworkSpecs> = Vec::new();
     for x in get_default_network_info().iter() {
@@ -132,6 +153,7 @@ pub fn get_default_chainspecs() -> Vec<NetworkSpecs> {
     out
 }
 
+#[cfg(feature = "active")]
 pub fn get_default_verifiers() -> Vec<(VerifierKey, CurrentVerifier)> {
     let mut out: Vec<(VerifierKey, CurrentVerifier)> = Vec::new();
     for x in get_default_network_info().iter() {
@@ -140,6 +162,7 @@ pub fn get_default_verifiers() -> Vec<(VerifierKey, CurrentVerifier)> {
     out
 }
 
+#[cfg(feature = "active")]
 pub fn get_default_chainspecs_to_send() -> Vec<NetworkSpecsToSend> {
     let mut out: Vec<NetworkSpecsToSend> = Vec::new();
     for x in get_default_network_info().iter() {
@@ -161,6 +184,7 @@ pub fn get_default_chainspecs_to_send() -> Vec<NetworkSpecsToSend> {
     out
 }
 
+#[cfg(feature = "active")]
 pub fn get_default_address_book() -> Vec<AddressBookEntry> {
     let mut out: Vec<AddressBookEntry> = Vec::new();
     for x in get_default_network_info().iter() {
@@ -176,6 +200,7 @@ pub fn get_default_address_book() -> Vec<AddressBookEntry> {
     out
 }
 
+#[cfg(feature = "active")]
 fn get_metadata(dir: &str) -> Result<Vec<MetaValues>, ErrorActive> {
     let default_network_info = get_default_network_info();
     let mut out: Vec<MetaValues> = Vec::new();
@@ -209,18 +234,22 @@ fn get_metadata(dir: &str) -> Result<Vec<MetaValues>, ErrorActive> {
     Ok(out)
 }
 
+#[cfg(feature = "active")]
 pub fn get_test_metadata() -> Result<Vec<MetaValues>, ErrorActive> {
     get_metadata("../defaults/test_metadata")
 }
 
+#[cfg(feature = "active")]
 pub fn get_nav_test_metadata() -> Result<Vec<MetaValues>, ErrorActive> {
     get_metadata("../defaults/nav_test_metadata")
 }
 
+#[cfg(feature = "active")]
 pub fn get_release_metadata() -> Result<Vec<MetaValues>, ErrorActive> {
     get_metadata("../defaults/release_metadata")
 }
 
+#[cfg(feature = "active")]
 lazy_static! {
     static ref REG_STRUCTS_WITH_NAMES: Regex = Regex::new(r#"(pub )?struct (?P<name>.*?)( )?\{(?P<description>(\n +(pub )?\w+: .*(,)?)*\n)\}"#).expect("checked construction");
     static ref REG_STRUCTS_NO_NAMES: Regex = Regex::new(r#"(pub )?struct (?P<name>.*?)( )?\((pub )?(?P<description>.*)\)"#).expect("checked construction");
@@ -233,6 +262,7 @@ lazy_static! {
     static ref REG_TYPES: Regex = Regex::new(r#"(?m)(pub )?type (?P<name>.*) = (?P<description>.*);$"#).expect("checked construction");
 }
 
+#[cfg(feature = "active")]
 pub fn get_default_types_vec() -> Result<Vec<TypeEntry>, ErrorActive> {
     
     let filename = "../defaults/default_types/full_types_information";
@@ -330,6 +360,7 @@ pub fn get_default_types_vec() -> Result<Vec<TypeEntry>, ErrorActive> {
     Ok(types_prep)
 }
 
+#[cfg(feature = "active")]
 pub fn get_default_types_content() -> Result<ContentLoadTypes, ErrorActive> {
     Ok(ContentLoadTypes::generate(&get_default_types_vec()?))
 }

@@ -1,4 +1,4 @@
-use crate::error::ErrorSigner;
+use crate::error_signer::ErrorSigner;
 
 pub fn export_plain_vector<T: std::fmt::Display> (vec: &[T]) -> String {
     let mut out = String::from("[");

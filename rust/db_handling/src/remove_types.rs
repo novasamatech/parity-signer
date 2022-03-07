@@ -1,7 +1,7 @@
 use sled::Batch;
 
 use constants::TYPES;
-use definitions::{error::{ErrorSigner, Signer}, history::{Event, TypesDisplay}, qr_transfers::ContentLoadTypes};
+use definitions::{error_signer::{ErrorSigner, Signer}, history::{Event, TypesDisplay}, qr_transfers::ContentLoadTypes};
 
 use crate::db_transactions::TrDbCold;
 use crate::helpers::{get_general_verifier, get_types};

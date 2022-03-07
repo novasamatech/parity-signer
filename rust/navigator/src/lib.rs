@@ -1,6 +1,8 @@
 //! This is experimental crossplatform navigation for Signer.
 //! Ideally it should replace almost everything and become the only interface
 
+#![deny(unused_crate_dependencies)]
+
 //do we support mutex?
 use std::sync::{Mutex, TryLockError};
 use lazy_static::lazy_static;

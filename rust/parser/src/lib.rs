@@ -1,3 +1,5 @@
+#![deny(unused_crate_dependencies)]
+
 use defaults::get_default_types_vec;
 use definitions::{error::{ParserError, ParserDecodingError, ParserMetadataError}, metadata::info_from_metadata, network_specs::ShortSpecs, types::TypeEntry};
 use frame_metadata::{RuntimeMetadata, v14::RuntimeMetadataV14};

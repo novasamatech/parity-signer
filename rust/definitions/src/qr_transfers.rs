@@ -1,8 +1,14 @@
+#[cfg(feature = "signer")]
 use blake2_rfc::blake2b::blake2b;
 use parity_scale_codec::{Decode, Encode};
 
 use crate::crypto::Encryption;
-use crate::error::{ErrorActive, ErrorSigner, ErrorSource, InputSigner, TransferContent};
+use crate::error::{ErrorSource, TransferContent};
+#[cfg(feature = "active")]
+use crate::error_active::ErrorActive;
+#[cfg(feature = "signer")]
+use crate::error_signer::{ErrorSigner, InputSigner};
+#[cfg(feature = "signer")]
 use crate::helpers::pic_types;
 use crate::network_specs::NetworkSpecsToSend;
 use crate::types::TypeEntry;
@@ -52,6 +58,7 @@ impl ContentLoadMeta {
         }
     }
     /// Function to export load_metadata content into file
+    #[cfg(feature = "active")]
     pub fn write (&self, filename: &str) -> Result<(), ErrorActive> {
         match std::fs::write(&filename, &self.to_sign()) {
             Ok(_) => Ok(()),
@@ -98,6 +105,7 @@ impl ContentAddSpecs {
         }
     }
     /// Function to export add_specs content into file
+    #[cfg(feature = "active")]
     pub fn write (&self, filename: &str) -> Result<(), ErrorActive> {
         match std::fs::write(&filename, &self.to_sign()) {
             Ok(_) => Ok(()),
@@ -145,6 +153,7 @@ impl ContentLoadTypes {
         }
     }
     /// Function to export load_types content into file
+    #[cfg(feature = "active")]
     pub fn write (&self, filename: &str) -> Result<(), ErrorActive> {
         match std::fs::write(&filename, &self.to_sign()) {
             Ok(_) => Ok(()),
@@ -164,6 +173,7 @@ impl ContentLoadTypes {
         self.encode()
     }
     /// Function to show encoded types hash and corresponding id pic
+    #[cfg(feature = "signer")]
     pub fn show(&self) -> String {
         let types_hash = blake2b(32, &[], &self.store()).as_bytes().to_vec();
         let types_id_pic = hex::encode(pic_types(&types_hash));
@@ -199,6 +209,7 @@ impl ContentDerivations {
         Self(slice.to_vec())
     }
     /// Function to get tuple of network genesis hash and vector of derivations Vec<String> from ContentDerivations
+    #[cfg(feature = "signer")]
     pub fn encryption_genhash_derivations (&self) -> Result<(Encryption, [u8;32], Vec<String>), ErrorSigner> {
         match <DecodedContentDerivations>::decode(&mut &self.0[..]) {
             Ok(a) => Ok((a.encryption, a.genesis_hash, a.derivations)),

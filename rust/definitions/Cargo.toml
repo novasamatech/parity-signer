@@ -1,25 +1,30 @@
 [package]
 name = "definitions"
 version = "0.1.0"
-authors = ["vera"]
-edition = "2018"
+edition = "2021"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-anyhow = "1.0.55"
+anyhow = {version = "1.0.55", optional = true}
 blake2-rfc = "0.2.18"
-constants = {path = "../constants"}
 frame-metadata = {version = "15.0.0", features = ["std", "legacy"]}
 hex = "0.4.3"
 parity-scale-codec = {version = "3.0.0", features = ["derive"]}
-plot_icon = {git = "https://github.com/varovainen/polkadot-identicon-rust", default-features = false, features = ["pix"]}
-png = "0.17.3"
+plot_icon = {git = "https://github.com/varovainen/polkadot-identicon-rust", default-features = false, features = ["pix"], optional = true}
+png = {version = "0.17.3", optional = true}
 sled = "0.34.6"
 sp-core = {version = "6.0.0", default-features = false, features = ["full_crypto"]}
 sp-runtime = {version = "6.0.0", default-features = false}
 sp-version = "5.0.0"
 #wasm-testbed = "0.13.1"
+
+[features]
+default = ["test"]
+
+active = []
+signer = ["anyhow", "plot_icon", "png"]
+test = ["active", "signer"]
 
 [lib]
 name = "definitions"
