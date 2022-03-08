@@ -1,5 +1,5 @@
 use db_handling::{db_transactions::TrDbColdDerivations, helpers::try_get_network_specs, identities::check_derivation_set};
-use definitions::{error::{ErrorSigner, NotFoundSigner, NotHexSigner, Signer}, helpers::unhex, keyring::NetworkSpecsKey, qr_transfers::ContentDerivations};
+use definitions::{error_signer::{ErrorSigner, NotFoundSigner, NotHexSigner, Signer}, helpers::unhex, keyring::NetworkSpecsKey, qr_transfers::ContentDerivations};
 
 use crate::Action;
 use crate::cards::Card;

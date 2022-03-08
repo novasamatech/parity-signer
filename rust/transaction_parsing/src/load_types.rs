@@ -1,5 +1,5 @@
 use db_handling::{db_transactions::TrDbColdStub, helpers::{try_get_types, get_general_verifier}};
-use definitions::{error::{ErrorSigner, GeneralVerifierForContent, InputSigner, Signer, TransferContent}, network_specs::Verifier, history::Event, qr_transfers::ContentLoadTypes, types::TypeEntry};
+use definitions::{error::TransferContent, error_signer::{ErrorSigner, GeneralVerifierForContent, InputSigner, Signer}, network_specs::Verifier, history::Event, qr_transfers::ContentLoadTypes, types::TypeEntry};
 
 use crate::{Action, StubNav};
 use crate::cards::{Card, Warning};

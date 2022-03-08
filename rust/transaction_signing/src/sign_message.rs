@@ -1,11 +1,11 @@
+use parity_scale_codec::Encode;
 use sp_core::{Pair, ed25519, sr25519, ecdsa};
 use sp_runtime::MultiSigner;
-use definitions::{crypto::SufficientCrypto, error::{ErrorSigner, Signer}, history::{Event, MetaValuesDisplay, MetaValuesExport, NetworkSpecsExport, TypesExport}, keyring::NetworkSpecsKey, qr_transfers::{ContentAddSpecs, ContentLoadMeta}, users::AddressDetails};
-use parity_scale_codec::Encode;
-use db_handling::{db_transactions::TrDbCold, helpers::{get_meta_values_by_name_version, get_network_specs}, manage_history::{events_to_batch}, prep_messages::{prep_types, get_genesis_hash}};
-use qrcode_static::png_qr;
 use zeroize::Zeroize;
 
+use db_handling::{db_transactions::TrDbCold, helpers::{get_meta_values_by_name_version, get_network_specs}, manage_history::{events_to_batch}, prep_messages::{prep_types, get_genesis_hash}};
+use definitions::{crypto::SufficientCrypto, error_signer::{ErrorSigner, Signer}, history::{Event, MetaValuesDisplay, MetaValuesExport, NetworkSpecsExport, TypesExport}, keyring::NetworkSpecsKey, qr_transfers::{ContentAddSpecs, ContentLoadMeta}, users::AddressDetails};
+use qrcode_static::png_qr;
 
 pub (crate) fn sign_as_address_key (to_sign: &[u8], multisigner: &MultiSigner, full_address: &str, pwd: Option<&str>) -> Result<SufficientCrypto, ErrorSigner> {
     match multisigner {

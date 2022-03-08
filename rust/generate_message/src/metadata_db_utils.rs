@@ -1,7 +1,7 @@
 use std::cmp::Ordering;
 
 use constants::{HOT_DB_NAME, METATREE};
-use definitions::{error::{Active, DatabaseActive, ErrorActive, Fetch}, keyring::MetaKey, metadata::MetaValues};
+use definitions::{error_active::{Active, DatabaseActive, ErrorActive, Fetch}, keyring::MetaKey, metadata::MetaValues};
 use db_handling::{db_transactions::TrDbHot, helpers::{open_db, open_tree, make_batch_clear_tree}};
 
 

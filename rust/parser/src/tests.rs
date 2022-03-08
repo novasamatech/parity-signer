@@ -3,7 +3,6 @@ mod tests {
     use crate::{parse_and_display_set};
     use definitions::network_specs::ShortSpecs;
     use frame_metadata::RuntimeMetadata;
-    use hex;
     use parity_scale_codec::Decode;
     
     fn metadata(filename: &str) -> RuntimeMetadata {

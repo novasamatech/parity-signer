@@ -12,8 +12,7 @@ mod tests {
     
     use constants::test_values::{ALICE_POLKADOT_QR, ALICE_SR_0, ALICE_SR_1, ALICE_SR_ALICE, ALICE_SR_ALICE_SECRET_SECRET, ALICE_SR_ALICE_WESTEND, ALICE_SR_KUSAMA, ALICE_SR_POLKADOT, ALICE_SR_SECRET_PATH_MULTIPASS, ALICE_SR_ROOT, ALICE_SR_WESTEND, ALICE_SR_WESTEND_0, ALICE_SR_WESTEND_1, ALICE_SR_WESTEND_2, ALICE_WESTEND_ALICE_QR, ALICE_WESTEND_ALICE_SECRET_SECRET_QR, ALICE_WESTEND_ROOT_QR, ALICE_WESTEND_WESTEND_QR, BOB, EMPTY_PNG, KUSAMA_9130, KUSAMA_9151, TYPES_KNOWN, WESTEND_9150};
     use db_handling::cold_default::{populate_cold_nav_test, signer_init};
-    use definitions::error::Signer;
-    use definitions::network_specs::{Verifier, VerifierValue};
+    use definitions::{error_signer::Signer, network_specs::{Verifier, VerifierValue}};
     use parser;
     
     use crate::{do_action, init_navigation, update_seed_names};

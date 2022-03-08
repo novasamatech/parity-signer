@@ -1,7 +1,7 @@
 use sled::Batch;
 use constants::{ADDRESS_BOOK, HOT_DB_NAME, SPECSTREEPREP};
 use db_handling::{db_transactions::TrDbHot, helpers::{open_db, open_tree}};
-use definitions::{crypto::Encryption, error::{Active, DatabaseActive, ErrorActive, ErrorSource, MismatchActive, NotFoundActive}, keyring::{AddressBookKey, NetworkSpecsKey}, metadata::AddressBookEntry, network_specs::NetworkSpecsToSend};
+use definitions::{crypto::Encryption, error::ErrorSource, error_active::{Active, DatabaseActive, ErrorActive, MismatchActive, NotFoundActive}, keyring::{AddressBookKey, NetworkSpecsKey}, metadata::AddressBookEntry, network_specs::NetworkSpecsToSend};
 use parity_scale_codec::{Encode};
 
 

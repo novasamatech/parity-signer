@@ -1,5 +1,5 @@
 use constants::{LOAD, SPECS};
-use definitions::{error::ErrorActive, network_specs::NetworkSpecsToSend, qr_transfers::{ContentLoadMeta, ContentAddSpecs}};
+use definitions::{error_active::ErrorActive, network_specs::NetworkSpecsToSend, qr_transfers::{ContentLoadMeta, ContentAddSpecs}};
 
 use crate::metadata_shortcut::{MetaShortCut};
 

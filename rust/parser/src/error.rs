@@ -1,4 +1,4 @@
-use definitions::error::{ParserError, MetadataError};
+use definitions::{error::MetadataError, error_signer::ParserError};
 
 pub enum Error {
     Parser(ParserError),

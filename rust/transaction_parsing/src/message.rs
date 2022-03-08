@@ -1,5 +1,5 @@
 use db_handling::{db_transactions::{TrDbColdSign, SignContent}, helpers::{try_get_network_specs, try_get_address_details}};
-use definitions::{error::{ErrorSigner, InputSigner}, keyring::{AddressKey, NetworkSpecsKey}};
+use definitions::{error_signer::{ErrorSigner, InputSigner}, keyring::{AddressKey, NetworkSpecsKey}};
 use parity_scale_codec::Decode;
 use parser::cards::ParserCard;
 

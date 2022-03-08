@@ -1,5 +1,6 @@
 use frame_metadata::{v12::RuntimeMetadataV12, v13::RuntimeMetadataV13, decode_different::DecodeDifferent};
-use definitions::error::{ParserError, ParserDecodingError};
+
+use definitions::error_signer::{ParserError, ParserDecodingError};
 
 /// Struct to store the method information
 pub (crate) struct MethodOld {

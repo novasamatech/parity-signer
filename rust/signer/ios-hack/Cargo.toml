@@ -7,16 +7,16 @@ edition = "2018"
 [dependencies]
 anyhow = "1.0"
 base64 = "0.10.1"
-db_handling = {path = "../db_handling"}
-definitions = {path = "../definitions"}
+db_handling = {path = "../db_handling", default-features = false, features = ["signer"]}
+definitions = {path = "../definitions", default-features = false, features = ["signer"]}
 ffi-support = "0.4"
 hex = "0.4.3"
 libc = "0.2"
-navigator = {path = "../navigator"}
+navigator = {path = "../navigator", default-features = false}
 qr_reader_phone = {path = "..//qr_reader_phone"}
 rustc-hex = "2.1.0"
-transaction_parsing = {path = "../transaction_parsing"}
-transaction_signing = {path = "../transaction_signing"}
+transaction_parsing = {path = "../transaction_parsing", default-features = false}
+transaction_signing = {path = "../transaction_signing", default-features = false}
 zeroize = {version = "1.3.0", features = ["zeroize_derive"]}
 
 [lib]

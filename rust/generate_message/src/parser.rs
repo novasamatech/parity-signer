@@ -1,6 +1,6 @@
 use std::env;
 use constants::FOLDER;
-use definitions::{crypto::{Encryption, SufficientCrypto}, error::{Active, CommandBadArgument, CommandDoubleKey, CommandNeedArgument, CommandNeedKey, CommandParser, CommandUnexpected, ErrorActive, InputActive, NotHexActive}, helpers::unhex};
+use definitions::{crypto::{Encryption, SufficientCrypto}, error_active::{Active, CommandBadArgument, CommandDoubleKey, CommandNeedArgument, CommandNeedKey, CommandParser, CommandUnexpected, ErrorActive, InputActive, NotHexActive}, helpers::unhex};
 use parity_scale_codec::Decode;
 use sp_core::{ed25519, sr25519, ecdsa};
 use std::convert::TryInto;

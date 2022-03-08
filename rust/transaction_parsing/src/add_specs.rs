@@ -1,5 +1,5 @@
 use db_handling::{db_transactions::TrDbColdStub, helpers::{genesis_hash_in_specs, get_general_verifier, open_db, try_get_valid_current_verifier}};
-use definitions::{error::{ErrorSigner, GeneralVerifierForContent, InputSigner, Signer, TransferContent}, history::Event, keyring::{NetworkSpecsKey, VerifierKey}, network_specs::{ValidCurrentVerifier, Verifier}, qr_transfers::ContentAddSpecs};
+use definitions::{error::TransferContent, error_signer::{ErrorSigner, GeneralVerifierForContent, InputSigner, Signer}, history::Event, keyring::{NetworkSpecsKey, VerifierKey}, network_specs::{ValidCurrentVerifier, Verifier}, qr_transfers::ContentAddSpecs};
 
 use crate::{Action, StubNav};
 use crate::cards::{Card, Warning};

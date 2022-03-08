@@ -1,13 +1,11 @@
 //! This is experimental crossplatform navigation for Signer.
 //! Ideally it should replace almost everything and become the only interface
 
-#![deny(unused_crate_dependencies)]
-
 //do we support mutex?
 use std::sync::{Mutex, TryLockError};
 use lazy_static::lazy_static;
 
-use definitions::{error::Signer, keyring::NetworkSpecsKey};
+use definitions::{error_signer::Signer, keyring::NetworkSpecsKey};
 
 mod actions;
     use actions::Action;
@@ -16,6 +14,7 @@ pub mod modals;
 mod navstate;
     use navstate::{Navstate, State};
 pub mod screens;
+#[cfg(feature = "test")]
 mod tests;
 
 

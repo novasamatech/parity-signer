@@ -8,7 +8,6 @@ mod tests {
     use constants::test_values::{ALICE_SR_ALICE, BOB, ED, TYPES_KNOWN, TYPES_UNKNOWN, EMPTY_VEC_HASH_PIC, WESTEND_9070, ID_01, ID_02, ID_03};
     use db_handling::{cold_default::{populate_cold, populate_cold_no_metadata, populate_cold_no_networks}, manage_history::print_history};
     use definitions::{crypto::Encryption, keyring::NetworkSpecsKey, network_specs::{Verifier, VerifierValue}};
-    use sp_core;
     use sp_runtime::MultiSigner;
     use std::fs;
     

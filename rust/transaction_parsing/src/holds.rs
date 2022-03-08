@@ -1,7 +1,7 @@
 use sled::{Tree};
 use constants::{METATREE, SETTREE, SPECSTREE, TYPES, VERIFIERS};
 use db_handling::{db_transactions::{TrDbColdStub}, helpers::{open_db, open_tree, get_general_verifier}, prep_messages::prep_types};
-use definitions::{error::{DatabaseSigner, EntryDecodingSigner, ErrorSigner, ErrorSource, Signer}, history::Event, keyring::{MetaKeyPrefix, VerifierKey}, metadata::{MetaValues}, network_specs::{CurrentVerifier, NetworkSpecs, ValidCurrentVerifier, Verifier}};
+use definitions::{error::ErrorSource, error_signer::{DatabaseSigner, EntryDecodingSigner, ErrorSigner, Signer}, history::Event, keyring::{MetaKeyPrefix, VerifierKey}, metadata::{MetaValues}, network_specs::{CurrentVerifier, NetworkSpecs, ValidCurrentVerifier, Verifier}};
 use parity_scale_codec::Decode;
 
 use crate::{cards::Warning};

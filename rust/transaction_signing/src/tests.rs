@@ -1,21 +1,18 @@
 #[cfg(test)]
 mod tests {
-    use hex;
     use parity_scale_codec::{Decode, Encode};
     use sled::{Db, open, Tree};
-    use sp_core;
     use sp_runtime::MultiSigner;
     use std::fs;
 
-    use constants::{ADDRTREE, GENERALVERIFIER, METATREE, SETTREE, SPECSTREE, VERIFIERS, test_values::{ALICE_SR_ALICE, ALICE_SR_ROOT, BOB, DOCK_31, ED, EMPTY_PNG, ID_01, ID_02, ID_04, ID_05, SHELL_200, TYPES_KNOWN, TYPES_UNKNOWN, WESTEND_9070, WESTEND_9111, WESTEND_9122}};
+    use constants::{ADDRTREE, ALICE_SEED_PHRASE, GENERALVERIFIER, METATREE, SETTREE, SPECSTREE, VERIFIERS, test_values::{ALICE_SR_ALICE, ALICE_SR_ROOT, BOB, DOCK_31, ED, EMPTY_PNG, ID_01, ID_02, ID_04, ID_05, SHELL_200, TYPES_KNOWN, TYPES_UNKNOWN, WESTEND_9070, WESTEND_9111, WESTEND_9122}};
     use db_handling::{cold_default::{populate_cold, populate_cold_no_networks}, identities::{remove_seed, try_create_address, try_create_seed}, manage_history::print_history, remove_network::remove_network};
-    use definitions::{crypto::Encryption, error::{AddressKeySource, DatabaseSigner, ErrorSigner, ErrorSource, Signer}, keyring::{AddressKey, MetaKey, NetworkSpecsKey, VerifierKey}, network_specs::{CurrentVerifier, NetworkSpecs, Verifier, VerifierValue}, users::AddressDetails};
+    use definitions::{crypto::Encryption, error::{AddressKeySource, ErrorSource}, error_signer::{DatabaseSigner, ErrorSigner, Signer}, keyring::{AddressKey, MetaKey, NetworkSpecsKey, VerifierKey}, network_specs::{CurrentVerifier, NetworkSpecs, Verifier, VerifierValue}, users::AddressDetails};
     use transaction_parsing::{Action, produce_output, print_history_entry_by_order_with_decoding, StubNav};
 
     use crate::{handle_stub, sign_transaction::create_signature};
 
-    const SEED_PHRASE: &str = "bottom drive obey lake curtain smoke basket hold race lonely fit walk";
-    const PWD: &str = "jaskier";
+    const PWD: &str = "";
     const USER_COMMENT: &str = "";
     const ALICE: [u8; 32] = [212, 53, 147, 199, 21, 253, 211, 28, 97, 20, 26, 189, 4, 169, 159, 214, 130, 44, 133, 88, 133, 76, 205, 227, 154, 86, 132, 231, 165, 109, 162, 125];
     fn verifier_alice_sr25519() -> Verifier {
@@ -120,7 +117,7 @@ mod tests {
             assert!(network_info == network_info_known, "Received: \n{}", network_info);
             assert!(!has_pwd, "Expected no password");
             
-            match sign_action_test(checksum, SEED_PHRASE, PWD, USER_COMMENT, dbname) {
+            match sign_action_test(checksum, ALICE_SEED_PHRASE, PWD, USER_COMMENT, dbname) {
                 Ok(signature) => assert!((signature.len() == 130) && (signature.starts_with("01")), "Wrong signature format,\nReceived: \n{}", signature),
                 Err(e) => panic!("Was unable to sign. {:?}", e),
             }
@@ -130,7 +127,7 @@ mod tests {
             let my_event = r#""events":[{"event":"transaction_signed","payload":{"transaction":"a40403008eaf04151687736326c9fea17e25fc5287613693c912909cb226aa4794f26a480700e8764817b501b8003223000005000000e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e538a7d7a0ac17eb6dd004578cb8e238c384a10f57c999a3fa1200409cd9b3f33","network_name":"westend","signed_by":{"public_key":"d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d","identicon":"<alice_sr25519_//Alice>","encryption":"sr25519"},"user_comment":""}}]"#;
             assert!(history_recorded_cut.contains(my_event), "Recorded history is different: \n{}", history_recorded);
             
-            let result = sign_action_test(checksum, SEED_PHRASE, PWD, USER_COMMENT, dbname);
+            let result = sign_action_test(checksum, ALICE_SEED_PHRASE, PWD, USER_COMMENT, dbname);
             if let Err(e) = result {
                 let expected_err = ErrorSigner::Database(DatabaseSigner::ChecksumMismatch);
                 if <Signer>::show(&e) != <Signer>::show(&expected_err) {panic!("Expected wrong checksum. Got error: {:?}.", e)}
@@ -164,7 +161,7 @@ mod tests {
             assert!(network_info == network_info_known, "Received: \n{}", network_info);
             assert!(!has_pwd, "Expected no password");
             
-            match sign_action_test(checksum, SEED_PHRASE, PWD, USER_COMMENT, dbname) {
+            match sign_action_test(checksum, ALICE_SEED_PHRASE, PWD, USER_COMMENT, dbname) {
                 Ok(signature) => assert!((signature.len() == 130) && (signature.starts_with("01")), "Wrong signature format,\nReceived: \n{}", signature),
                 Err(e) => panic!("Was unable to sign. {:?}", e),
             }
@@ -174,7 +171,7 @@ mod tests {
             let my_event = r#""events":[{"event":"message_signed","payload":{"message":"4c6f72656d20697073756d20646f6c6f722073697420616d65742c20636f6e73656374657475722061646970697363696e6720656c69742c2073656420646f20656975736d6f642074656d706f7220696e6369646964756e74207574206c61626f726520657420646f6c6f7265206d61676e6120616c697175612e20557420656e696d206164206d696e696d2076656e69616d2c2071756973206e6f737472756420657865726369746174696f6e20756c6c616d636f206c61626f726973206e69736920757420616c697175697020657820656120636f6d6d6f646f20636f6e7365717561742e2044756973206175746520697275726520646f6c6f7220696e20726570726568656e646572697420696e20766f6c7570746174652076656c697420657373652063696c6c756d20646f6c6f726520657520667567696174206e756c6c612070617269617475722e204578636570746575722073696e74206f6363616563617420637570696461746174206e6f6e2070726f6964656e742c2073756e7420696e2063756c706120717569206f666669636961206465736572756e74206d6f6c6c697420616e696d20696420657374206c61626f72756d2e","network_name":"westend","signed_by":{"public_key":"d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d","identicon":"<alice_sr25519_//Alice>","encryption":"sr25519"},"user_comment":""}}]"#;
             assert!(history_recorded_cut.contains(my_event), "Recorded history is different: \n{}", history_recorded);
             
-            let result = sign_action_test(checksum, SEED_PHRASE, PWD, USER_COMMENT, dbname);
+            let result = sign_action_test(checksum, ALICE_SEED_PHRASE, PWD, USER_COMMENT, dbname);
             if let Err(e) = result {
                 let expected_err = ErrorSigner::Database(DatabaseSigner::ChecksumMismatch);
                 if <Signer>::show(&e) != <Signer>::show(&expected_err) {panic!("Expected wrong checksum. Got error: {:?}.", e)}
@@ -300,8 +297,8 @@ Identities:
 		018091b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3"#;
             assert!(print_after == expected_print_after, "Received: \n{}", print_after);
         
-            try_create_address("Alice", SEED_PHRASE, "", &NetworkSpecsKey::from_parts(&hex::decode("e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e").unwrap(), &Encryption::Ed25519), dbname).unwrap();
-            try_create_address("Alice", SEED_PHRASE, "//westend", &NetworkSpecsKey::from_parts(&hex::decode("e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e").unwrap(), &Encryption::Ed25519), dbname).unwrap();
+            try_create_address("Alice", ALICE_SEED_PHRASE, "", &NetworkSpecsKey::from_parts(&hex::decode("e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e").unwrap(), &Encryption::Ed25519), dbname).unwrap();
+            try_create_address("Alice", ALICE_SEED_PHRASE, "//westend", &NetworkSpecsKey::from_parts(&hex::decode("e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e").unwrap(), &Encryption::Ed25519), dbname).unwrap();
             let print_after = print_db_content(&dbname)
                 .replace(EMPTY_PNG, r#"<empty>"#);
             let expected_print_after = r#"Database contents:
@@ -361,7 +358,7 @@ General Verifier: none
 Identities: "#;
             assert!(print_after == expected_print_after, "Received: \n{}", print_after);
             
-            try_create_seed("Alice", SEED_PHRASE, true, dbname).unwrap();
+            try_create_seed("Alice", ALICE_SEED_PHRASE, true, dbname).unwrap();
             let print_after = print_db_content(&dbname)
                 .replace(EMPTY_PNG, r#"<empty>"#);
             let expected_print_after = r#"Database contents:
@@ -1163,7 +1160,7 @@ Identities:
             assert!(author_info_cut == author_info_known, "Received: \n{}", author_info);
             assert!(network_info == network_info_known, "Received: \n{}", network_info);
             assert!(!has_pwd, "Expected no password");
-            sign_action_test(checksum, SEED_PHRASE, PWD, USER_COMMENT, dbname).unwrap();
+            sign_action_test(checksum, ALICE_SEED_PHRASE, PWD, USER_COMMENT, dbname).unwrap();
         }
         else {panic!("Wrong action: {:?}", output)}
         
@@ -1185,7 +1182,7 @@ Identities:
             assert!(author_info_cut == author_info_known, "Received: \n{}", author_info);
             assert!(network_info == network_info_known, "Received: \n{}", network_info);
             assert!(!has_pwd, "Expected no password");
-            sign_action_test(checksum, SEED_PHRASE, PWD, USER_COMMENT, dbname).unwrap();
+            sign_action_test(checksum, ALICE_SEED_PHRASE, PWD, USER_COMMENT, dbname).unwrap();
         }
         else {panic!("Wrong action: {:?}", output)}
         

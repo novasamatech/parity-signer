@@ -1,4 +1,3 @@
-use hex;
 use sp_core::crypto::{Ss58Codec, Ss58AddressFormat, AccountId32};
 use sp_runtime::generic::Era;
 

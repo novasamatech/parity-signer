@@ -1,7 +1,7 @@
 #![deny(unused_crate_dependencies)]
 
 use db_handling::manage_history::get_history_entry_by_order;
-use definitions::{error::{ErrorSigner, InputSigner}, keyring::NetworkSpecsKey};
+use definitions::{error_signer::{ErrorSigner, InputSigner}, keyring::NetworkSpecsKey};
 
 mod add_specs;
     use add_specs::add_specs;
@@ -22,6 +22,7 @@ mod parse_transaction;
     use parse_transaction::{parse_transaction, decode_signable_from_history};
 pub mod test_all_cards;
     use test_all_cards::make_all_cards;
+#[cfg(feature = "test")]
 mod tests;
 
 /// Enum containing card sets for three different outcomes:

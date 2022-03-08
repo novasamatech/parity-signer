@@ -1,4 +1,4 @@
-use definitions::error::{Active, ErrorSource};
+use definitions::{error::ErrorSource, error_active::Active};
 use generate_message::{full_run, parser::Command};
 use std::env;
 

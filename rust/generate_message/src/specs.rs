@@ -1,6 +1,6 @@
 use constants::{ADDRESS_BOOK, HOT_DB_NAME};
 use sled::{IVec};
-use definitions::{crypto::Encryption, error::{Active, DatabaseActive, ErrorActive, Fetch, NotFoundActive}, keyring::NetworkSpecsKey, metadata::AddressBookEntry};
+use definitions::{crypto::Encryption, error_active::{Active, DatabaseActive, ErrorActive, Fetch, NotFoundActive}, keyring::NetworkSpecsKey, metadata::AddressBookEntry};
 use db_handling::helpers::{open_db, open_tree};
 
 use crate::helpers::{error_occured, filter_address_book_by_url, get_address_book_entry, get_network_specs_to_send, network_specs_from_entry, network_specs_from_title, process_indices, try_get_network_specs_to_send, update_db};

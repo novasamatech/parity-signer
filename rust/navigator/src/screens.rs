@@ -3,7 +3,7 @@ use sp_runtime::MultiSigner;
 use zeroize::Zeroize;
 
 use db_handling::{helpers::get_address_details, interface_signer::{first_network, SeedDraft}};
-use definitions::{error::{AddressKeySource, ErrorSigner, ExtraAddressKeySourceSigner, Signer}, helpers::{multisigner_to_public, make_identicon_from_multisigner}, keyring::{AddressKey, NetworkSpecsKey}, users::AddressDetails};
+use definitions::{error::AddressKeySource, error_signer::{ErrorSigner, ExtraAddressKeySourceSigner, Signer}, helpers::{multisigner_to_public, make_identicon_from_multisigner}, keyring::{AddressKey, NetworkSpecsKey}, users::AddressDetails};
 use transaction_parsing;
 use transaction_signing;
 
@@ -539,6 +539,7 @@ impl Screen {
 }
 
 #[cfg(test)]
+#[cfg(feature = "test")]
 mod tests {
 
 use sp_core::sr25519::Public;

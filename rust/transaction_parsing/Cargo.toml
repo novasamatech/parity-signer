@@ -8,17 +8,22 @@ edition = "2018"
 
 [dependencies]
 bitvec = "1.0.0"
-constants = {path = "../constants"}
-db_handling = {path = "../db_handling"}
-definitions = {path = "../definitions"}
+constants = {path = "../constants", default-features = false}
+db_handling = {path = "../db_handling", default-features = false, features = ["signer"]}
+definitions = {path = "../definitions", default-features = false, features = ["signer"]}
 frame-metadata = {version = "15.0.0", default-features = false}
 hex = "0.4.3"
 parity-scale-codec = "3.0.0"
-parser = {path = "../parser"}
+parser = {path = "../parser", default-features = false}
 plot_icon = {git = "https://github.com/varovainen/polkadot-identicon-rust", default-features = false, features = ["pix"]}
 sled = "0.34.6"
 sp-core = {version = "6.0.0", default-features = false, features = ["full_crypto"]}
 sp-runtime = {version = "6.0.0", default-features = false}
+
+[features]
+default = ["test"]
+
+test = ["constants/test", "db_handling/test"]
 
 [lib]
 name = "transaction_parsing"

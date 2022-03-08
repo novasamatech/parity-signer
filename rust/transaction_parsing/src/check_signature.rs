@@ -1,7 +1,7 @@
 use sp_core::{Pair, ed25519, sr25519, ecdsa};
 use sp_runtime::MultiSigner;
 use std::convert::TryInto;
-use definitions::{error::{ErrorSigner, InputSigner, NotHexSigner, Signer, TransferContent}, helpers::unhex, network_specs::{Verifier, VerifierValue}};
+use definitions::{error::TransferContent, error_signer::{ErrorSigner, InputSigner, NotHexSigner, Signer}, helpers::unhex, network_specs::{Verifier, VerifierValue}};
 use parser::decoding_commons::get_compact;
 
 pub struct InfoPassedCrypto {

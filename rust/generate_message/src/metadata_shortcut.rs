@@ -1,5 +1,5 @@
 use constants::{COLOR, SECONDARY_COLOR};
-use definitions::{crypto::Encryption, error::{Active, Changed, DatabaseActive, ErrorActive, Fetch, IncomingMetadataSourceActiveStr, NotHexActive}, helpers::unhex, metadata::MetaValues, network_specs::NetworkSpecsToSend};
+use definitions::{crypto::Encryption, error_active::{Active, Changed, DatabaseActive, ErrorActive, Fetch, IncomingMetadataSourceActiveStr, NotHexActive}, helpers::unhex, metadata::MetaValues, network_specs::NetworkSpecsToSend};
 use std::convert::TryInto;
 
 use crate::fetch_metadata::{fetch_info, fetch_info_with_network_specs};

@@ -7,9 +7,9 @@ edition = "2018"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-constants = {path = "../constants"}
-db_handling = {path = "../db_handling"}
-definitions = {path = "../definitions"}
+constants = {path = "../constants", default-features = false, features = ["active"]}
+db_handling = {path = "../db_handling", default-features = false, features = ["active"]}
+definitions = {path = "../definitions", default-features = false, features = ["active"]}
 hex = "0.4.3"
 jsonrpsee = {version = "0.9.0", features = ["ws-client"]}
 parity-scale-codec = "3.0.0"

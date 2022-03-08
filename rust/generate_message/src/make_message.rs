@@ -1,5 +1,5 @@
 use constants::EXPORT_FOLDER;
-use definitions::{crypto::{Encryption, SufficientCrypto}, error::{Active, ErrorActive, InputActive}, metadata::MetaValues, qr_transfers::{ContentLoadTypes, ContentLoadMeta, ContentAddSpecs}};
+use definitions::{crypto::{Encryption, SufficientCrypto}, error_active::{Active, ErrorActive, InputActive}, metadata::MetaValues, qr_transfers::{ContentLoadTypes, ContentLoadMeta, ContentAddSpecs}};
 use hex;
 use sp_core::{Pair, ed25519, sr25519, ecdsa};
 use qrcode_rtx::make_pretty_qr;

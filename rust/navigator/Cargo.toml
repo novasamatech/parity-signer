@@ -6,20 +6,27 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-db_handling = {path = "../db_handling"}
-definitions = {path = "../definitions"}
+blake2-rfc = {version = "0.2.18", optional = true}
+constants = {path = "../constants", features = ["test"], optional = true}
+db_handling = {path = "../db_handling", default-features = false, features = ["signer"]}
+definitions = {path = "../definitions", default-features = false, features = ["signer"]}
 hex = "0.4.3"
+image = {version = "0.24.0", default-features = false, features = ["ico"], optional = true}
 lazy_static = "1.4.0"
+parser = {path = "../parser", default-features = false, optional = true}
+quircs = {version = "0.10.0", optional = true}
+regex = {version = "1.5.4", optional = true}
+sp-core = {version = "6.0.0", default-features = false, features = ["full_crypto"], optional = true}
 sp-runtime = {version = "6.0.0", default-features = false}
 transaction_parsing = {path = "../transaction_parsing"}
 transaction_signing = {path = "../transaction_signing"}
 zeroize = "1.5.3"
 
-[dev-dependencies]
-blake2-rfc = "0.2.18"
-constants = {path = "../constants"}
-image = {version = "0.24.0", default-features = false, features = ["ico"]}
-parser = {path = "../parser"}
-quircs = "0.10.0"
-regex = "1.5.4"
-sp-core = {version = "6.0.0", default-features = false, features = ["full_crypto"]}
+[features]
+default = ["test"]
+
+test = ["blake2-rfc", "constants", "db_handling/test", "image", "parser", "quircs", "regex", "sp-core"]
+
+[lib]
+name = "navigator"
+crate-type = ["lib"]

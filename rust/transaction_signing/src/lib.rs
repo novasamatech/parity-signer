@@ -1,14 +1,13 @@
-#![deny(unused_crate_dependencies)]
-
 use sp_runtime::MultiSigner;
 
 use db_handling::db_transactions::{TrDbColdStub};
-use definitions::{error::ErrorSigner, keyring::NetworkSpecsKey, users::AddressDetails};
+use definitions::{error_signer::ErrorSigner, keyring::NetworkSpecsKey, users::AddressDetails};
 
 mod sign_message;
     use sign_message::{sufficient_crypto_load_types, sufficient_crypto_load_metadata, sufficient_crypto_add_specs};
 mod sign_transaction;
     use sign_transaction::create_signature_png;
+#[cfg(feature = "test")]
 mod tests;
 
 

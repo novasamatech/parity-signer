@@ -1,26 +1,28 @@
 [package]
 name = "transaction_signing"
 version = "0.1.0"
-authors = ["vera"]
-edition = "2018"
+edition = "2021"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
 blake2-rfc = "0.2.18"
-definitions = {path = "../definitions"}
-db_handling = {path = "../db_handling"}
+constants = {path = "../constants", optional = true}
+definitions = {path = "../definitions", default-features = false, features = ["signer"]}
+db_handling = {path = "../db_handling", default-features = false, features = ["signer"]}
 hex = "0.4.3"
 parity-scale-codec = "3.0.0"
 qrcode_static = {path = "../qrcode_static"}
+sled = {version = "0.34.6", optional = true}
 sp-core = {version = "6.0.0", default-features = false, features = ["full_crypto"]}
 sp-runtime = {version = "6.0.0", default-features = false}
+transaction_parsing = {path = "../transaction_parsing", default-features = false, optional = true}
 zeroize = "1.5.3"
 
-[dev-dependencies]
-constants = {path = "../constants"}
-sled = "0.34.6"
-transaction_parsing = {path = "../transaction_parsing"}
+[features]
+default = ["test"]
+
+test = ["constants/test", "db_handling/test", "sled", "transaction_parsing"]
 
 [lib]
 name = "transaction_signing"

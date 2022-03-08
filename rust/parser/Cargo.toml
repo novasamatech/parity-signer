@@ -8,8 +8,8 @@ edition = "2018"
 
 [dependencies]
 bitvec = "1.0.0"
-defaults = {path = "../defaults"}
-definitions = {path = "../definitions"}
+defaults = {path = "../defaults", default-features = false, optional = true}
+definitions = {path = "../definitions", default-features = false, features = ["signer"]}
 frame-metadata = { version = "15.0.0", default-features = false, features = ["std", "legacy"]}
 hex = "0.4.3"
 lazy_static = "1.4.0"
@@ -22,6 +22,10 @@ sp-arithmetic = "5.0.0"
 sp-core = {version = "6.0.0", default-features = false, features = ["full_crypto"]}
 sp-runtime = {version = "6.0.0", default-features = false}
 
+[features]
+default = ["test"]
+
+test = ["defaults/active"]
 
 [lib]
 name = "parser"

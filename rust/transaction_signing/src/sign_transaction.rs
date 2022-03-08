@@ -1,10 +1,11 @@
 use blake2_rfc::blake2b::blake2b;
-use db_handling::db_transactions::{TrDbColdSign, SignContent};
-use definitions::error::ErrorSigner;
 use parity_scale_codec::Encode;
-use qrcode_static::png_qr_from_string;
 use sp_runtime::MultiSignature;
 use zeroize::Zeroize;
+
+use db_handling::db_transactions::{TrDbColdSign, SignContent};
+use definitions::error_signer::ErrorSigner;
+use qrcode_static::png_qr_from_string;
 
 use crate::sign_message::sign_as_address_key;
 

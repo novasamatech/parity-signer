@@ -1,14 +1,13 @@
-use regex::Regex;
-use lazy_static::lazy_static;
-use sp_arithmetic::{Percent, Perbill, PerU16};
 use bitvec::prelude::{BitVec, Lsb0};
-use definitions::{error::{ParserError, ParserDecodingError}, network_specs::ShortSpecs, types::{TypeEntry, Description, EnumVariant, EnumVariantType, StructField}};
+use lazy_static::lazy_static;
+use regex::Regex;
+use sp_arithmetic::{Percent, Perbill, PerU16};
+
+use definitions::{error_signer::{ParserError, ParserDecodingError}, network_specs::ShortSpecs, types::{TypeEntry, Description, EnumVariant, EnumVariantType, StructField}};
 
 use crate::cards::{ParserCard};
 use crate::decoding_commons::{OutputCard, DecodedOut, get_compact, decode_known_length, special_case_account_id, decode_perthing, decode_primitive_with_flags};
 use crate::method::{what_next_old, OlderMeta};
-
-
 
 /// Function to decode primitive types (fixed-width or compact form), and Percent,
 /// Permill, and PerU16 structs (also fixed-width or compact form).

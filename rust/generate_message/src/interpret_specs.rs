@@ -1,6 +1,6 @@
 use serde_json::{value::Value, map::Map};
 use std::convert::TryInto;
-use definitions::{error::SpecsError, network_specs::NetworkProperties};
+use definitions::{error_active::SpecsError, network_specs::NetworkProperties};
 
 use crate::parser::TokenOverride;
 

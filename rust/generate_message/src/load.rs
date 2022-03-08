@@ -4,7 +4,7 @@
 
 use constants::{ADDRESS_BOOK, HOT_DB_NAME, METATREE};
 use db_handling::helpers::{open_db, open_tree};
-use definitions::{error::{Active, Changed, DatabaseActive, ErrorActive, ErrorSource, Fetch, IncomingMetadataSourceActive, IncomingMetadataSourceActiveStr, MetadataError, MetadataSource, NotFoundActive/*, Wasm*/}, keyring::MetaKeyPrefix, metadata::{AddressBookEntry, MetaValues}};
+use definitions::{error::{ErrorSource, MetadataError, MetadataSource}, error_active::{Active, Changed, DatabaseActive, ErrorActive, Fetch, IncomingMetadataSourceActive, IncomingMetadataSourceActiveStr, NotFoundActive/*, Wasm*/}, keyring::MetaKeyPrefix, metadata::{AddressBookEntry, MetaValues}};
 
 use crate::parser::{Instruction, Content, Set};
 use crate::metadata_db_utils::{add_new, SortedMetaValues, prepare_metadata, write_metadata};

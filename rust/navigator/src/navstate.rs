@@ -9,7 +9,7 @@ use crate::actions::Action;
 use crate::alerts::Alert;
 
 use db_handling::interface_signer::{BIP_CAP, print_guess, SAFE_RESERVE, WORD_LENGTH};
-use definitions::{error::{AddressGeneration, AddressGenerationCommon, AddressKeySource, ErrorSigner, ErrorSource, ExtraAddressKeySourceSigner, InputSigner, InterfaceSigner, Signer}, keyring::{AddressKey, NetworkSpecsKey}, users::AddressDetails};
+use definitions::{error::{AddressGeneration, AddressGenerationCommon, AddressKeySource, ErrorSource}, error_signer::{ErrorSigner, ExtraAddressKeySourceSigner, InputSigner, InterfaceSigner, Signer}, keyring::{AddressKey, NetworkSpecsKey}, users::AddressDetails};
 
 ///State of the app as remembered by backend
 #[derive(Debug, Clone)]

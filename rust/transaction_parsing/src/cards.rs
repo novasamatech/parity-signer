@@ -1,7 +1,7 @@
 use sp_core::crypto::{Ss58Codec, Ss58AddressFormat};
 use sp_runtime::{generic::Era, MultiSigner};
 
-use definitions::{crypto::Encryption, error::{ErrorSigner, ErrorSource, Signer}, helpers::make_identicon_from_multisigner, history::MetaValuesDisplay, keyring::{print_multisigner_as_base58, VerifierKey}, network_specs::{NetworkSpecs, NetworkSpecsToSend, VerifierValue}, print::{export_complex_single, export_plain_vector}, qr_transfers::ContentLoadTypes, users::AddressDetails};
+use definitions::{crypto::Encryption, error::ErrorSource, error_signer::{ErrorSigner, Signer}, helpers::make_identicon_from_multisigner, history::MetaValuesDisplay, keyring::{print_multisigner_as_base58, VerifierKey}, network_specs::{NetworkSpecs, NetworkSpecsToSend, VerifierValue}, print::{export_complex_single, export_plain_vector}, qr_transfers::ContentLoadTypes, users::AddressDetails};
 use parser::cards::ParserCard;
 use plot_icon::generate_png_scaled_default;
 

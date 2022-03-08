@@ -27,7 +27,7 @@ pub mod print;
 
 pub mod qr_transfers;
 
-#[cfg(feature = "test")]
+#[cfg(feature = "signer")]
 pub mod test_all_errors_signer;
 
 pub mod types;

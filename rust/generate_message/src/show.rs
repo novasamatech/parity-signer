@@ -1,5 +1,5 @@
 use constants::{ADDRESS_BOOK, HOT_DB_NAME, METATREE};
-use definitions::{error::{Active, ErrorActive}, metadata::{AddressBookEntry, MetaValues}};
+use definitions::{error_active::{Active, ErrorActive}, metadata::{AddressBookEntry, MetaValues}};
 use db_handling::helpers::{open_db, open_tree};
 
 pub fn show_database() -> Result<(), ErrorActive> {

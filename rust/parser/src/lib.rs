@@ -1,11 +1,17 @@
 #![deny(unused_crate_dependencies)]
 
-use defaults::get_default_types_vec;
-use definitions::{error::{ParserError, ParserDecodingError, ParserMetadataError}, metadata::info_from_metadata, network_specs::ShortSpecs, types::TypeEntry};
-use frame_metadata::{RuntimeMetadata, v14::RuntimeMetadataV14};
+use frame_metadata::v14::RuntimeMetadataV14;
+#[cfg(feature = "test")]
+use frame_metadata::RuntimeMetadata;
 use parity_scale_codec::{Decode, Encode};
 use printing_balance::{convert_balance_pretty};
 use sp_runtime::generic::Era;
+
+#[cfg(feature = "test")]
+use defaults::get_default_types_vec;
+use definitions::{error_signer::{ParserError, ParserDecodingError, ParserMetadataError}, network_specs::ShortSpecs, types::TypeEntry};
+#[cfg(feature = "test")]
+use definitions::metadata::info_from_metadata;
 
 pub mod cards;
     use cards::ParserCard;
@@ -17,10 +23,13 @@ mod decoding_sci;
     use decoding_sci::decoding_sci_entry_point;
 mod decoding_sci_ext;
     use decoding_sci_ext::{decode_ext_attempt, Ext};
+#[cfg(feature = "test")]
 mod error;
+    #[cfg(feature = "test")]
     use error::{Error, ArgumentsError};
 pub mod method;
     use method::OlderMeta;
+#[cfg(feature = "test")]
 mod tests;
 
 
@@ -127,6 +136,7 @@ pub fn parse_set (data: &[u8], metadata_bundle: &MetadataBundle, short_specs: &S
     Ok((method_cards, extensions_cards, method_data, extensions_data))
 }
 
+#[cfg(feature = "test")]
 pub fn parse_and_display_set (data: &[u8], metadata: &RuntimeMetadata, short_specs: &ShortSpecs) -> Result<String, String> {
     let meta_info = match info_from_metadata(metadata) {
         Ok(x) => x,

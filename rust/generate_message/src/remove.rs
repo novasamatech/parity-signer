@@ -1,7 +1,7 @@
 use constants::{HOT_DB_NAME, METATREE};
 use sled::{Batch};
 use db_handling::{db_transactions::TrDbHot, helpers::{open_db, open_tree}};
-use definitions::{error::{Active, ErrorActive}, keyring::{AddressBookKey, MetaKey, MetaKeyPrefix, NetworkSpecsKey}};
+use definitions::{error_active::{Active, ErrorActive}, keyring::{AddressBookKey, MetaKey, MetaKeyPrefix, NetworkSpecsKey}};
 
 use crate::parser::Remove;
 use crate::helpers::{get_address_book_entry, specname_in_db};

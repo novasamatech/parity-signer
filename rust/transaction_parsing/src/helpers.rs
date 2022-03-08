@@ -1,6 +1,6 @@
 use constants::{METATREE, SPECSTREE};
 use db_handling::helpers::{open_db, open_tree, get_types};
-use definitions::{crypto::Encryption, error::{DatabaseSigner, ErrorSigner, ErrorSource, InputSigner, MetadataError, MetadataSource, NotFoundSigner, NotHexSigner, Signer}, helpers::unhex, keyring::{MetaKey, MetaKeyPrefix, NetworkSpecsKey}, metadata::{MetaValues, MetaSetElement}, network_specs::{NetworkSpecs, NetworkSpecsToSend, ShortSpecs}};
+use definitions::{crypto::Encryption, error::{ErrorSource, MetadataError, MetadataSource}, error_signer::{DatabaseSigner, ErrorSigner, InputSigner, NotFoundSigner, NotHexSigner, Signer}, helpers::unhex, keyring::{MetaKey, MetaKeyPrefix, NetworkSpecsKey}, metadata::{MetaValues, MetaSetElement}, network_specs::{NetworkSpecs, NetworkSpecsToSend, ShortSpecs}};
 use frame_metadata::RuntimeMetadata;
 use parser::{MetadataBundle, method::OlderMeta};
 use sp_core::{ed25519, sr25519, ecdsa};

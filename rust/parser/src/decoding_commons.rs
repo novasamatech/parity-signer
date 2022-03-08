@@ -1,9 +1,10 @@
 use parity_scale_codec::{Decode, HasCompact, Compact};
-use sp_arithmetic::{PerThing};
-use std::mem::size_of;
-use definitions::{error::{ParserError, ParserDecodingError, ParserMetadataError}, network_specs::ShortSpecs};
-use printing_balance::convert_balance_pretty;
+use sp_arithmetic::PerThing;
 use sp_core::crypto::AccountId32;
+use std::mem::size_of;
+
+use definitions::{error_signer::{ParserError, ParserDecodingError, ParserMetadataError}, network_specs::ShortSpecs};
+use printing_balance::convert_balance_pretty;
 
 use crate::cards::{ParserCard};
 use crate::decoding_sci_ext::{Ext, SpecialExt};
