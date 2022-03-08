@@ -11,6 +11,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.unit.dp
+import com.halilibo.richtext.ui.material.SetupMaterialRichText
 import io.parity.signer.alerts.AndroidCalledConfirm
 import io.parity.signer.components.BigButton
 import io.parity.signer.components.Documents
@@ -28,9 +29,7 @@ fun LandingView(signerDataModel: SignerDataModel) {
 	var ppAccept by remember { mutableStateOf(false) }
 
 	Box {
-		Column {
 			Documents()
-		}
 		Column(Modifier.padding(horizontal = 20.dp)) {
 			Spacer(Modifier.weight(1f))
 			Surface(color = MaterialTheme.colors.Bg100) {
