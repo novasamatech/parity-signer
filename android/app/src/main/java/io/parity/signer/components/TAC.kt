@@ -21,7 +21,7 @@ fun TAC() {
 		) {
 			Markdown(
 				"""
-						**PARITY SIGNER MOBILE APPLICATION - END USER LICENCE AGREEMENT**
+**PARITY SIGNER MOBILE APPLICATION - END USER LICENCE AGREEMENT**
 
 **Parity Technologies Limited** is a company registered in England and Wales under company number 09760015, with its registered office at c/o Ignition Law, 1 Sans Walk, London, England, EC1R 0LT ("**Parity**"). Parity operates this Parity Signer mobile application (the "**App**").
 
