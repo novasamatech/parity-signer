@@ -13,16 +13,19 @@ hex = "0.4.3"
 parity-scale-codec = {version = "3.0.0", features = ["derive"]}
 plot_icon = {git = "https://github.com/varovainen/polkadot-identicon-rust", default-features = false, features = ["pix"], optional = true}
 png = {version = "0.17.3", optional = true}
+sc-executor-common = {git = "https://github.com/paritytech/substrate", optional = true}
+sc-executor-wasmi = {git = "https://github.com/paritytech/substrate", optional = true}
 sled = "0.34.6"
 sp-core = {version = "6.0.0", default-features = false, features = ["full_crypto"]}
+sp-io = {git = "https://github.com/paritytech/substrate", optional = true}
 sp-runtime = {version = "6.0.0", default-features = false}
 sp-version = "5.0.0"
-#wasm-testbed = "0.13.1"
+sp-wasm-interface = {git = "https://github.com/paritytech/substrate", optional = true}
 
 [features]
 default = ["test"]
 
-active = []
+active = ["sc-executor-common", "sc-executor-wasmi", "sp-io", "sp-wasm-interface"]
 signer = ["anyhow", "plot_icon", "png"]
 test = ["active", "signer"]
 

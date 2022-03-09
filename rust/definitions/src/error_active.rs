@@ -1,5 +1,3 @@
-//use wasm_testbed;
-
 use crate::{crypto:: Encryption, error::{AddressGeneration, AddressGenerationCommon, AddressKeySource, ErrorSource, MetadataError, MetadataSource, SpecsKeySource, TransferContent}, keyring::{AddressKey, AddressBookKey, MetaKey, NetworkSpecsKey}};
 
 /// Enum-marker indicating that error originates on the Active side
@@ -37,7 +35,7 @@ impl ErrorSource for Active {
             MetadataSource::Database{name, version} => ErrorActive::Database(DatabaseActive::FaultyMetadata{name, version, error}),
             MetadataSource::Incoming(IncomingMetadataSourceActive::Str(IncomingMetadataSourceActiveStr::Fetch{url})) => ErrorActive::Fetch(Fetch::FaultyMetadata{url, error}),
             MetadataSource::Incoming(IncomingMetadataSourceActive::Str(IncomingMetadataSourceActiveStr::Default{filename})) => ErrorActive::DefaultLoading(DefaultLoading::FaultyMetadata{filename, error}),
-            MetadataSource::Incoming(IncomingMetadataSourceActive::Wasm{filename}) => ErrorActive::Wasm(Wasm::FaultyMetadata{filename, error}),
+            MetadataSource::Incoming(IncomingMetadataSourceActive::Wasm{filename}) => ErrorActive::Wasm{filename, wasm: Wasm::FaultyMetadata(error)},
         }
     }
     fn specs_decoding(key: NetworkSpecsKey) -> Self::Error {
@@ -148,7 +146,7 @@ impl ErrorSource for Active {
             ErrorActive::Fetch(a) => {
                 let insert = match a {
                     Fetch::FaultyMetadata{url, error} => format!("Metadata from {} is not suitable. {}", url, error.show()),
-                    Fetch::EarlierVersion{name, old_version, new_version} => format!("For {} the fetched version ({}) is lower than the latest version in the hot database ({}).", name, new_version, old_version),
+                    Fetch::EarlierVersion{name, old_version, new_version} => format!("For {} the newly received version ({}) is lower than the latest version in the hot database ({}).", name, new_version, old_version),
                     Fetch::SameVersionDifferentMetadata{name, version} => format!("Fetched metadata for {}{} differs from the one in the hot database.", name, version),
                     Fetch::FaultySpecs{url, error} => {
                         let insert = match error {
@@ -316,10 +314,15 @@ impl ErrorSource for Active {
             ErrorActive::Qr(e) => format!("Error generating qr code. {}", e),
             ErrorActive::NotSupported => String::from("Key combination is not supported. Please file a ticket if you need it."),
             ErrorActive::NoTokenOverrideKnownNetwork{url} => format!("Network with corresponding url {} has database records. Token override is not supported.", url),
-            ErrorActive::Wasm(a) => {
-                match a {
-//                    Wasm::WasmTestbed(e) => format!("WasmTestbed error. {}", e),
-                    Wasm::FaultyMetadata{filename, error} => format!("Metadata error in .wasm file {}. {}", filename, error.show()),
+            ErrorActive::Wasm{filename, wasm} => {
+                match wasm {
+                    Wasm::Call(e) => format!("Error processing .wasm file {}. Unable to process call on wasmi instance. {}", filename, e),
+                    Wasm::DecodingMetadata => format!("Error processing .wasm file {}. Unable to decode metadata.", filename),
+                    Wasm::FaultyMetadata(e) => format!("Metadata error in .wasm file {}. {}", filename, e.show()),
+                    Wasm::File(e) => format!("Error processing .wasm file {}. Unable to load file. {}", filename, e),
+                    Wasm::RuntimeBlob(e) => format!("Error processing .wasm file {}. Unable to generate RuntimeBlob. {}", filename, e),
+                    Wasm::WasmiInstance(e) => format!("Error processing .wasm file {}. Unable to generate WasmiInstance. {}", filename, e),
+                    Wasm::WasmiRuntime(e) => format!("Error processing .wasm file {}. Unable to generate WasmiRuntime. {}", filename, e),
                 }
             },
         }
@@ -342,7 +345,7 @@ pub enum ErrorActive {
     Qr(String),
     NotSupported,
     NoTokenOverrideKnownNetwork{url: String},
-    Wasm(Wasm),
+    Wasm{filename: String, wasm: Wasm},
 }
 
 /// Active side errors could be displayed standardly
@@ -618,7 +621,12 @@ pub enum InputActive {
 /// Enum listing possible errors with .wasm files processing
 #[derive(Debug)]
 pub enum Wasm {
-//    WasmTestbed(wasm_testbed::WasmTestbedError),
-    FaultyMetadata{filename: String, error: MetadataError},
+    Call(sc_executor_common::error::Error),
+    DecodingMetadata,
+    FaultyMetadata(MetadataError),
+    File(std::io::Error),
+    RuntimeBlob(sc_executor_common::error::WasmError),
+    WasmiInstance(sc_executor_common::error::Error),
+    WasmiRuntime(sc_executor_common::error::WasmError),
 }
 

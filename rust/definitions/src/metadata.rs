@@ -1,12 +1,20 @@
 use parity_scale_codec::{Decode, Encode};
 use frame_metadata::{RuntimeMetadata, decode_different::DecodeDifferent, v14::RuntimeMetadataV14};
+#[cfg(feature = "active")]
+use sc_executor_common::{runtime_blob::RuntimeBlob, wasm_runtime::{InvokeMethod, WasmModule}};
+#[cfg(feature = "active")]
+use sc_executor_wasmi::{create_runtime};
 use sled::IVec;
+#[cfg(feature = "active")]
+use sp_io::SubstrateHostFunctions;
 use sp_version::RuntimeVersion;
+#[cfg(feature = "active")]
+use sp_wasm_interface::HostFunctions;
 use std::collections::HashMap;
 
 use crate::{error::{ErrorSource, MetadataError, MetadataSource}, keyring::MetaKey};
 #[cfg(feature = "active")]
-use crate::{crypto::Encryption, error_active::{Active, DatabaseActive, EntryDecodingActive, ErrorActive, IncomingMetadataSourceActive, IncomingMetadataSourceActiveStr, NotHexActive}, helpers::unhex, keyring::AddressBookKey};
+use crate::{crypto::Encryption, error_active::{Active, DatabaseActive, EntryDecodingActive, ErrorActive, IncomingMetadataSourceActive, IncomingMetadataSourceActiveStr, NotHexActive, Wasm}, helpers::unhex, keyring::AddressBookKey};
 #[cfg(feature = "signer")]
 use crate::error_signer::{ErrorSigner, Signer};
 
@@ -55,18 +63,9 @@ impl MetaValues {
         })
     }
     #[cfg(feature = "active")]
-    pub fn from_runtime_metadata(runtime_metadata: &RuntimeMetadata, source: IncomingMetadataSourceActive) -> Result<Self, ErrorActive> {
-        let meta_info = match info_from_metadata(runtime_metadata) {
-            Ok(a) => a,
-            Err(e) => return Err(<Active>::faulty_metadata(e, MetadataSource::Incoming(source))),
-        };
-        Ok(Self{
-            name: meta_info.name.to_string(),
-            version: meta_info.version,
-            optional_base58prefix: meta_info.optional_base58prefix,
-            warn_incomplete_extensions: meta_info.warn_incomplete_extensions,
-            meta: [vec![109, 101, 116, 97], runtime_metadata.encode()].concat(),
-        })
+    pub fn from_wasm_file(filename: &str) -> Result<Self, ErrorActive> {
+        let metadata = convert_wasm_into_metadata(filename).map_err(|e| ErrorActive::Wasm{filename: filename.to_string(), wasm: e})?;
+        Self::from_slice_metadata(&metadata).map_err(|e| ErrorActive::Wasm{filename: filename.to_string(), wasm: Wasm::FaultyMetadata(e)})
     }
     /// Function to get MetaValues from metadata in format of hex string.
     /// Is used only on Active side, for:
@@ -84,6 +83,16 @@ impl MetaValues {
             Err(e) => Err(<Active>::faulty_metadata(e, MetadataSource::Incoming(IncomingMetadataSourceActive::Str(source))))
         }
     }
+}
+
+#[cfg(feature = "active")]
+pub fn convert_wasm_into_metadata(filename: &str) -> Result<Vec<u8>, Wasm> {
+    let buffer = std::fs::read(filename).map_err(Wasm::File)?;
+    let runtime_blob = RuntimeBlob::uncompress_if_needed(&buffer).map_err(Wasm::RuntimeBlob)?;
+    let wasmi_runtime = create_runtime(runtime_blob, 64, SubstrateHostFunctions::host_functions(), false).map_err(Wasm::WasmiRuntime)?;
+    let mut wasmi_instance = wasmi_runtime.new_instance().map_err(Wasm::WasmiInstance)?;
+    let data = wasmi_instance.call(InvokeMethod::Export("Metadata_metadata"), &[]).map_err(Wasm::Call)?;
+    <Vec<u8>>::decode(&mut &data[..]).map_err(|_| Wasm::DecodingMetadata)
 }
 
 /// Function to search metadata as RuntimeMetadata for system block,
@@ -406,6 +415,15 @@ mod tests {
         assert!(meta_values.name == String::from("shell"), "Unexpected network name: {}", meta_values.name);
         assert!(meta_values.version == 200, "Unexpected network name: {}", meta_values.version);
         assert!(meta_values.warn_incomplete_extensions, "Expected incomplete extensions warning in shell200.")
+    }
+    
+    #[test]
+    fn unwasm_westend9150() {
+        let filename = "for_tests/westend_runtime-v9150.compact.compressed.wasm";
+        let meta_values = MetaValues::from_wasm_file(filename).unwrap();
+        assert!(meta_values.name == String::from("westend"), "Unexpected network name: {}", meta_values.name);
+        assert!(meta_values.version == 9150, "Unexpected network name: {}", meta_values.version);
+        assert!(!meta_values.warn_incomplete_extensions, "Expected complete extensions in westend9150.")
     }
 }
 

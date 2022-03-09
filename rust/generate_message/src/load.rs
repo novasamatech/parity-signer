@@ -1,7 +1,3 @@
-//use std::path::PathBuf;
-//use wasm_loader::Source;
-//use wasm_testbed::WasmTestBed;
-
 use constants::{ADDRESS_BOOK, HOT_DB_NAME, METATREE};
 use db_handling::helpers::{open_db, open_tree};
 use definitions::{error::{ErrorSource, MetadataError, MetadataSource}, error_active::{Active, Changed, DatabaseActive, ErrorActive, Fetch, IncomingMetadataSourceActive, IncomingMetadataSourceActiveStr, NotFoundActive/*, Wasm*/}, keyring::MetaKeyPrefix, metadata::{AddressBookEntry, MetaValues}};
@@ -290,14 +286,10 @@ fn shortcut_set_element (set_element: &AddressSpecs) -> Result<MetaShortCut, Err
 fn warn(name: &str, version: u32) {
     println!("Warning. Metadata {}{} has incomplete set of signed extensions, and could cause Signer to fail in parsing signable transactions using this metadata.", name, version);
 }
-/*
+
 /// Function to process .wasm files into signable entities and add metadata into the database
 pub fn unwasm (filename: &str, update_db: bool) -> Result<(), ErrorActive> {
-    let testbed = match WasmTestBed::new(&Source::File(PathBuf::from(&filename))) {
-        Ok(a) => a,
-        Err(e) => return Err(ErrorActive::Wasm(Wasm::WasmTestbed(e))),
-    };
-    let meta_values = MetaValues::from_runtime_metadata(testbed.metadata(), IncomingMetadataSourceActive::Wasm{filename: filename.to_string()})?;
+    let meta_values = MetaValues::from_wasm_file(filename)?;
     let set_element = search_name(&meta_values.name)?;
     if let Some(prefix_from_meta) = meta_values.optional_base58prefix {
         if prefix_from_meta != set_element.base58prefix {
@@ -317,4 +309,4 @@ pub fn unwasm (filename: &str, update_db: bool) -> Result<(), ErrorActive> {
     };
     load_meta_print(&shortcut)
 }
-*/
+

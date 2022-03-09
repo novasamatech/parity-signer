@@ -28,7 +28,7 @@ pub enum Command {
     MakeColdRelease,
     TransferMetaRelease,
     Derivations(Derivations),
-//    Unwasm{filename: String, update_db: bool},
+    Unwasm{filename: String, update_db: bool},
 }
 
 pub enum Show {
@@ -680,10 +680,6 @@ impl Command {
                         Ok(Command::Derivations(Derivations{goal, title, derivations}))
                     },
                     "unwasm" => {
-                         // temporarily removed because subwasm needs to have version bump
-                         // maybe will go eventually in a separate crate
-                         Err(ErrorActive::NotSupported)
-                     /*
                         let mut found_payload = None;
                         let mut update_db = true;
                         while let Some(a) = args.next() {
@@ -703,7 +699,6 @@ impl Command {
                             Some(x) => Ok(Command::Unwasm{filename: x, update_db}),
                             None => Err(ErrorActive::CommandParser(CommandParser::NeedKey(CommandNeedKey::Payload))),
                         }                        
-                    */
                     },
                     _ => Err(ErrorActive::CommandParser(CommandParser::UnknownCommand)),
                 }
