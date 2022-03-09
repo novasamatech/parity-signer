@@ -20,7 +20,7 @@ struct Backup: View {
             RoundedRectangle(cornerRadius: 20.0).foregroundColor(Color("Bg200"))
             VStack{
                 ZStack {
-                    HeaderBar(line1: "Backup", line2: content.seed_name)
+                    HeaderBar(line1: "Backup", line2: content.seed_name.decode64())
                     HStack {
                         Spacer()
                         Button(action: {

@@ -53,14 +53,14 @@ struct HistoryCardExtended: View {
                 timestamp: timestamp,
                 danger: false,
                 line1: "Key created",
-                line2: value.seed_name + value.path + " in network with hash " +  value.network_genesis_hash
+                line2: value.seed_name.decode64() + value.path + " in network with hash " +  value.network_genesis_hash
             )
             case .identityRemoved(let value): HistoryCardTemplate(
                 image: "xmark.rectangle.portrait",
                 timestamp: timestamp,
                 danger: false,
                 line1: "Key removed",
-                line2: value.seed_name + value.path + " in network with hash " +  value.network_genesis_hash
+                line2: value.seed_name.decode64() + value.path + " in network with hash " +  value.network_genesis_hash
             )
             case .metadataAdded(let value): HistoryCardTemplate(
                 image: "plus.viewfinder",
@@ -110,14 +110,14 @@ struct HistoryCardExtended: View {
                     timestamp: timestamp,
                     danger: false,
                     line1: "Seed created",
-                    line2: text
+                    line2: text.decode64()
                 )
             case .seedNameWasShown(let text): HistoryCardTemplate(
                 image: "eye.trianglebadge.exclamationmark.fill",
                 timestamp: timestamp,
                 danger: false,
                 line1: "Seed was shown",
-                line2: text
+                line2: text.decode64()
             )
             case .signedAddNetwork(let value): HistoryCardTemplate(
                 image: "signature",

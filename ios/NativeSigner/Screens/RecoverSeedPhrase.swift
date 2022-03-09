@@ -23,7 +23,7 @@ struct RecoverSeedPhrase: View {
             ScrollView {
             VStack {
                 //SeedNameCardOfSomeKind
-                Text(content.seed_name)
+                Text(content.seed_name.decode64())
                 VStack(alignment: .leading) {
                     Text("SEED PHRASE").font(FBase(style: .overline))
                     VStack {
