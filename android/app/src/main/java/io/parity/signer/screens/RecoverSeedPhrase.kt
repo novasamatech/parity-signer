@@ -59,7 +59,7 @@ fun RecoverSeedPhrase(
 			modifier = Modifier.fillMaxWidth(1f)
 		) {
 			Text(
-				signerDataModel.screenData.value?.optString("seed_name")
+				signerDataModel.screenData.value?.optString("seed_name")?.decode64()
 					?: "Error: no seed name",
 				style = MaterialTheme.typography.subtitle1
 			)
