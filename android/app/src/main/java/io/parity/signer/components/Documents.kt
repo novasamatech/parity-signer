@@ -16,7 +16,6 @@ import androidx.compose.ui.unit.dp
 import io.parity.signer.ui.theme.Bg100
 import io.parity.signer.ui.theme.Typography
 
-//TODO: everything
 @Composable
 fun Documents() {
 	var document by remember { mutableStateOf(0) }
