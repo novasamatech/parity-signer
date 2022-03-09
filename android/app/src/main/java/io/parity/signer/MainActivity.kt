@@ -16,6 +16,7 @@ import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import com.halilibo.richtext.ui.material.SetupMaterialRichText
 import io.parity.signer.components.BigButton
 import io.parity.signer.components.BottomBar
 import io.parity.signer.components.TopBar
@@ -72,7 +73,7 @@ fun SignerApp(signerDataModel: SignerDataModel) {
 							TopBar(signerDataModel = signerDataModel)
 						},
 						bottomBar = {
-							if(footer.value == true) BottomBar(signerDataModel = signerDataModel)
+							if (footer.value == true) BottomBar(signerDataModel = signerDataModel)
 						}
 					) { innerPadding ->
 						Box(modifier = Modifier.padding(innerPadding)) {
@@ -103,7 +104,9 @@ fun SignerApp(signerDataModel: SignerDataModel) {
 			}
 			OnBoardingState.No -> {
 				if (shieldAlert.value == ShieldAlert.None) {
-					LandingView(signerDataModel = signerDataModel)
+					Scaffold {
+						LandingView(signerDataModel = signerDataModel)
+					}
 				} else {
 					Box(
 						contentAlignment = Alignment.Center,
@@ -131,7 +134,7 @@ fun SignerApp(signerDataModel: SignerDataModel) {
 					}
 				}
 			}
-			null -> TODO()
+			null -> WaitingScreen()
 		}
 	}
 }
