@@ -8,6 +8,7 @@
 use anyhow::anyhow;
 use qr_reader_phone::process_payload::{process_decoded_payload, InProgress, Ready};
 use image::{Luma, GrayImage, ImageBuffer};
+use indicatif::ProgressBar;
 
 use opencv::{
 	highgui,
@@ -27,7 +28,8 @@ const SKIPPED_FRAMES_QTY: u32 = 10;
 /// Structure for storing camera settings.
 #[derive(Debug)]
 pub struct CameraSettings {
-    index: Option<i32>,
+    /// Camera index
+    pub index: Option<i32>,
 }
 
 /// Main cycle of video capture.
@@ -51,10 +53,15 @@ pub fn run_with_camera(camera_settings: CameraSettings) -> anyhow::Result<String
 
     let mut out = Ready::NotYet(InProgress::None);
     let mut line = String::new();
-    
+
+    let pb = ProgressBar::new(1);
     loop {
         match out {
             Ready::NotYet(decoding) => {
+                if let InProgress::Fountain(f) = &decoding {
+                    pb.set_length(f.total as u64);
+                    pb.set_position(f.collected() as u64)
+                }
                 out = match camera_capture(&mut camera, window) {
                     Ok(img) => process_qr_image (&img, decoding)?,
                     Err(_) => Ready::NotYet(decoding),
@@ -62,10 +69,6 @@ pub fn run_with_camera(camera_settings: CameraSettings) -> anyhow::Result<String
             },
             Ready::Yes(a) => {
                 line.push_str(&hex::encode(&a));
-                match std::fs::write("decoded_output.txt", &line) {
-                    Ok(_) => (),
-                    Err(e) => println!("Unable to write decoded information in the file. {}", e)
-                };
                 break;
             },
         }
@@ -75,6 +78,7 @@ pub fn run_with_camera(camera_settings: CameraSettings) -> anyhow::Result<String
             break;
         };
     }
+    highgui::destroy_window(window)?;
     Ok(line)
 }
 

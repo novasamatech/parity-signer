@@ -44,6 +44,7 @@ mod tests {
         static ref TEXT: Regex = Regex::new(r#""type":"text","payload":"(?P<text>[0-9a-f]*?)""#).expect("checked construction");
         static ref SET: Regex = Regex::new(r#""set":\[\{"address_key":"01(?P<public>[0-9a-f]*?)","base58":"(?P<base>.*?)","identicon":"(?P<identicon>[0-9a-f]*?)".*?\}\]"#).expect("checked construction");
         static ref KEY0: Regex = Regex::new(r#"\{"address_key":"01(?P<public>[0-9a-f]*?)","base58":"(?P<base>.*?)","identicon":"(?P<identicon>[0-9a-f]*?)","has_pwd":true.*?,"path":"//0".*?\}"#).expect("checked construction");
+        static ref OS_MSG: Regex = Regex::new(r#"Os \{[^}]*\}"#).expect("checked_construction");
     }
     
     fn timeless(current_real_json: &str) -> String {
@@ -68,6 +69,9 @@ mod tests {
     }
     fn cut_public_key(current_real_json: &str) -> String {
         PUBLIC_KEY.replace_all(&current_real_json, r#""public_key":"**""#).to_string()
+    }
+    fn cut_os_msg(current_real_json: &str) -> String {
+        OS_MSG.replace_all(&current_real_json, r#"Os {**}"#).to_string()
     }
     
     fn qr_payload(qr_content_hex: &str) -> Vec<u8> {
@@ -882,7 +886,7 @@ mod tests {
         // let's scan something!!! oops wrong network version
         do_action("NavbarScan","","");
         let real_json = do_action("TransactionFetched","530100d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27da40403008eaf04151687736326c9fea17e25fc5287613693c912909cb226aa4794f26a480700e8764817b501b8003223000005000000e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e538a7d7a0ac17eb6dd004578cb8e238c384a10f57c999a3fa1200409cd9b3f33e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e","");
-        let expected_json = r#"{"screen":"Transaction","screenLabel":"","back":true,"footer":false,"footerButton":"Scan","rightButton":"None","screenNameType":"h1","modal":"Empty","alert":"Empty","screenData":{"content":{"error":[{"index":0,"indent":0,"type":"error","payload":"All parsing attempts failed with following errors. Parsing with westend9150 metadata: Network spec version decoded from extensions (9010) differs from the version in metadata (9150)."}]},"type":"read"},"modalData":{},"alertData":{}}"#;
+        let expected_json = r#"{"screen":"Transaction","screenLabel":"","back":true,"footer":false,"footerButton":"Scan","rightButton":"None","screenNameType":"h1","modal":"Empty","alert":"Empty","screenData":{"content":{"error":[{"index":0,"indent":0,"type":"error","payload":"Failed to decode extensions. Please try updating metadata for westend network. Parsing with westend9150 metadata: Network spec version decoded from extensions (9010) differs from the version in metadata (9150)."}]},"type":"read"},"modalData":{},"alertData":{}}"#;
         assert!(real_json == expected_json, "TransactionFetched on Scan screen containing transaction. Expected Transaction screen with no modals, got:\n{}", real_json);
         
         let real_json = do_action("GoForward","","");
@@ -1059,12 +1063,14 @@ mod tests {
             let _database = db_handling::helpers::open_db::<Signer>(dbname).unwrap(); // database got unavailable for some reason
             
             let real_json = do_action("NavbarKeys","","");
-            let expected_json = r#"{"screen":"SeedSelector","screenLabel":"Select seed","back":false,"footer":true,"footerButton":"Keys","rightButton":"NewSeed","screenNameType":"h1","modal":"Empty","alert":"ErrorDisplay","screenData":{"seedNameCards":[]},"modalData":{},"alertData":{"error":"Database error. Internal error. IO error: could not acquire lock on "for_tests/flow_test_1/db": Os { code: 11, kind: WouldBlock, message: "Resource temporarily unavailable" }"}}"#;
-            assert!(real_json == expected_json, "Tried to switch from Log to Keys with unavailable database. Expected empty SeedSelector with ErrorDisplay alert, got:\n{}", real_json);
+            let expected_json = r#"{"screen":"SeedSelector","screenLabel":"Select seed","back":false,"footer":true,"footerButton":"Keys","rightButton":"NewSeed","screenNameType":"h1","modal":"Empty","alert":"ErrorDisplay","screenData":{"seedNameCards":[]},"modalData":{},"alertData":{"error":"Database error. Internal error. IO error: could not acquire lock on "for_tests/flow_test_1/db": Os {**}"}}"#;
+            let cut_real_json = cut_os_msg(&real_json);
+            assert!(cut_real_json == expected_json, "Tried to switch from Log to Keys with unavailable database. Expected empty SeedSelector with ErrorDisplay alert, got:\n{}", real_json);
             
             let real_json = do_action("GoBack","","");
-            let expected_json = r#"{"screen":"Settings","screenLabel":"","back":false,"footer":true,"footerButton":"Settings","rightButton":"None","screenNameType":"h4","modal":"Empty","alert":"Empty","screenData":{"error":"Database error. Internal error. IO error: could not acquire lock on "for_tests/flow_test_1/db": Os { code: 11, kind: WouldBlock, message: "Resource temporarily unavailable" }"},"modalData":{},"alertData":{}}"#;
-            assert!(real_json == expected_json, "GoBack on SeedSelector with ErrorDisplay alert. Expected Settings screen with error displayed in screen details, got:\n{}", real_json);
+            let expected_json = r#"{"screen":"Settings","screenLabel":"","back":false,"footer":true,"footerButton":"Settings","rightButton":"None","screenNameType":"h4","modal":"Empty","alert":"Empty","screenData":{"error":"Database error. Internal error. IO error: could not acquire lock on "for_tests/flow_test_1/db": Os {**}"},"modalData":{},"alertData":{}}"#;
+            let cut_real_json = cut_os_msg(&real_json);
+            assert!(cut_real_json == expected_json, "GoBack on SeedSelector with ErrorDisplay alert. Expected Settings screen with error displayed in screen details, got:\n{}", real_json);
             
         }
         

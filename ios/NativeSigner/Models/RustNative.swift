@@ -159,6 +159,12 @@ extension SignerDataModel {
     func wipe() {
         refreshSeeds()
         if authenticated {
+            //remove secters first
+            let query = [
+                kSecClass as String: kSecClassGenericPassword
+            ] as CFDictionary
+            SecItemDelete(query)
+            //then everything else
             do {
                 var destination = try FileManager.default.url(for: .documentDirectory, in: .userDomainMask, appropriateFor: nil, create: false)
                 destination.appendPathComponent("Database")
@@ -167,12 +173,7 @@ extension SignerDataModel {
                 try FileManager.default.removeItem(at: destination)
             } catch {
                 print("FileManager failed to delete db")
-                return
             }
-            let query = [
-                kSecClass as String: kSecClassGenericPassword
-            ] as CFDictionary
-            SecItemDelete(query)
             self.onboardingDone = false
             self.seedNames = []
             init_navigation(nil, dbName, seedNames.joined(separator: ","))

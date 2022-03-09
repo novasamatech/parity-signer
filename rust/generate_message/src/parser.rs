@@ -1,5 +1,5 @@
 use std::env;
-use constants::FOLDER;
+use constants::{EXPORT_FOLDER, FOLDER};
 use definitions::{crypto::{Encryption, SufficientCrypto}, error::{Active, CommandBadArgument, CommandDoubleKey, CommandNeedArgument, CommandNeedKey, CommandParser, CommandUnexpected, ErrorActive, InputActive, NotHexActive}, helpers::unhex};
 use parity_scale_codec::Decode;
 use sp_core::{ed25519, sr25519, ecdsa};
@@ -398,7 +398,7 @@ impl Command {
                                         "-name" => {
                                             if let Some(_) = name {return Err(ErrorActive::CommandParser(CommandParser::DoubleKey(CommandDoubleKey::Name)))}
                                             name = match args.next() {
-                                                Some(x) => Some(x.to_string()),
+                                                Some(x) => Some(format!("{}/{}", EXPORT_FOLDER, x)),
                                                 None => return Err(ErrorActive::CommandParser(CommandParser::NeedArgument(CommandNeedArgument::Name))),
                                             };
                                         },
@@ -527,7 +527,7 @@ impl Command {
                                         "-name" => {
                                             if let Some(_) = name {return Err(ErrorActive::CommandParser(CommandParser::DoubleKey(CommandDoubleKey::Name)))}
                                             name = match args.next() {
-                                                Some(x) => Some(x.to_string()),
+                                                Some(x) => Some(format!("{}/{}", EXPORT_FOLDER, x)),
                                                 None => return Err(ErrorActive::CommandParser(CommandParser::NeedArgument(CommandNeedArgument::Name))),
                                             };
                                         },
