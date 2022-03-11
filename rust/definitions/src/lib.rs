@@ -1,3 +1,16 @@
+//! Definitions and common methods for types used in [Signer](https://github.com/paritytech/parity-signer)
+//! and Signer-supporting ecosystem.  
+//!
+//! ## Features
+//! Feature `"signer"` corresponds to everything related to Signer air-gapped
+//! device.
+//!
+//! Feature `"active"` corresponds to all Signer-related things happening
+//! **without** air-gap.
+//!
+//! Feature `"test"` includes both `"signer"` and `"active"` features, along
+//! with some testing, and is the default one.  
+
 #![deny(unused_crate_dependencies)]
 
 pub mod crypto;
@@ -33,4 +46,3 @@ pub mod test_all_errors_signer;
 pub mod types;
 
 pub mod users;
-

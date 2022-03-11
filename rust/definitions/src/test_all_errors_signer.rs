@@ -1,19 +1,37 @@
 use anyhow::anyhow;
-use sled::{IVec, transaction::TransactionError};
+use sled::{transaction::TransactionError, IVec};
 use sp_core::crypto::SecretStringError;
 use sp_runtime::MultiSigner;
 
 use crate::crypto::Encryption;
 use crate::error::{AddressGeneration, AddressGenerationCommon, MetadataError, TransferContent};
-use crate::error_signer::{DatabaseSigner, EntryDecodingSigner, ErrorSigner, ExtraAddressGenerationSigner, GeneralVerifierForContent, InputSigner, InterfaceSigner, KeyDecodingSignerDb, KeyDecodingSignerInterface, MismatchSigner, NotFoundSigner, NotHexSigner, ParserDecodingError, ParserError, ParserMetadataError};
+use crate::error_signer::{
+    DatabaseSigner, EntryDecodingSigner, ErrorSigner, ExtraAddressGenerationSigner,
+    GeneralVerifierForContent, InputSigner, InterfaceSigner, KeyDecodingSignerDb,
+    KeyDecodingSignerInterface, MismatchSigner, NotFoundSigner, NotHexSigner, ParserDecodingError,
+    ParserError, ParserMetadataError,
+};
 use crate::keyring::{AddressKey, MetaKey, NetworkSpecsKey, Order, VerifierKey};
 use crate::network_specs::{ValidCurrentVerifier, Verifier, VerifierValue};
 
-const PUBLIC: [u8; 32] = [142, 175, 4, 21, 22, 135, 115, 99, 38, 201, 254, 161, 126, 37, 252, 82, 135, 97, 54, 147, 201, 18, 144, 156, 178, 38, 170, 71, 148, 242, 106, 72];
+const PUBLIC: [u8; 32] = [
+    142, 175, 4, 21, 22, 135, 115, 99, 38, 201, 254, 161, 126, 37, 252, 82, 135, 97, 54, 147, 201,
+    18, 144, 156, 178, 38, 170, 71, 148, 242, 106, 72,
+];
 
-fn verifier_sr25519() -> Verifier {Verifier(Some(verifier_value_sr25519()))}
-fn verifier_value_sr25519() -> VerifierValue {VerifierValue::Standard(MultiSigner::Sr25519(sp_core::sr25519::Public::from_raw(PUBLIC)))}
-fn verifier_value_ed25519() -> VerifierValue {VerifierValue::Standard(MultiSigner::Ed25519(sp_core::ed25519::Public::from_raw(PUBLIC)))}
+fn verifier_sr25519() -> Verifier {
+    Verifier(Some(verifier_value_sr25519()))
+}
+fn verifier_value_sr25519() -> VerifierValue {
+    VerifierValue::Standard(MultiSigner::Sr25519(sp_core::sr25519::Public::from_raw(
+        PUBLIC,
+    )))
+}
+fn verifier_value_ed25519() -> VerifierValue {
+    VerifierValue::Standard(MultiSigner::Ed25519(sp_core::ed25519::Public::from_raw(
+        PUBLIC,
+    )))
+}
 
 fn db_internal_error_set() -> Vec<sled::Error> {
     vec![
@@ -21,7 +39,7 @@ fn db_internal_error_set() -> Vec<sled::Error> {
         sled::Error::Unsupported(String::from("Something Unsupported.")),
         sled::Error::ReportableBug(String::from("Please report me")),
         sled::Error::Io(std::io::Error::new(std::io::ErrorKind::Other, "oh no!")),
-        sled::Error::Corruption{at: None, bt: ()},
+        sled::Error::Corruption { at: None, bt: () },
     ]
 }
 
@@ -49,7 +67,9 @@ fn secret_string_error_set() -> Vec<SecretStringError> {
 
 fn content() -> Vec<GeneralVerifierForContent> {
     vec![
-        GeneralVerifierForContent::Network{name: String::from("westend")},
+        GeneralVerifierForContent::Network {
+            name: String::from("westend"),
+        },
         GeneralVerifierForContent::Types,
     ]
 }
@@ -68,157 +88,477 @@ fn parser_metadata_error_set() -> Vec<ParserMetadataError> {
 
 fn all_parsing_failed_set() -> Vec<(String, u32, ParserError)> {
     vec![
-        (String::from("westend"), 9010, ParserError::WrongNetworkVersion {as_decoded: String::from("9122"), in_metadata: 9010}),
-        (String::from("westend"), 9000, ParserError::WrongNetworkVersion {as_decoded: String::from("9122"), in_metadata: 9000}),
+        (
+            String::from("westend"),
+            9010,
+            ParserError::WrongNetworkVersion {
+                as_decoded: String::from("9122"),
+                in_metadata: 9010,
+            },
+        ),
+        (
+            String::from("westend"),
+            9000,
+            ParserError::WrongNetworkVersion {
+                as_decoded: String::from("9122"),
+                in_metadata: 9000,
+            },
+        ),
     ]
 }
 
 pub fn signer_errors() -> Vec<ErrorSigner> {
-    
-    let address_key_bad = AddressKey::from_hex("0350e7c3d5edde7db964317cd9b51a3a059d7cd99f81bdbce14990047354334c9779").unwrap();
-    let address_key_good = AddressKey::from_hex("0150e7c3d5edde7db964317cd9b51a3a059d7cd99f81bdbce14990047354334c9779").unwrap();
+    let address_key_bad = AddressKey::from_hex(
+        "0350e7c3d5edde7db964317cd9b51a3a059d7cd99f81bdbce14990047354334c9779",
+    )
+    .unwrap();
+    let address_key_good = AddressKey::from_hex(
+        "0150e7c3d5edde7db964317cd9b51a3a059d7cd99f81bdbce14990047354334c9779",
+    )
+    .unwrap();
     let entry_order_vec: Vec<u8> = vec![100, 4, 85];
-    let genesis_hash: Vec<u8> = hex::decode("e143f23803ca50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e").unwrap();
+    let genesis_hash: Vec<u8> =
+        hex::decode("e143f23803ca50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e").unwrap();
     let meta_key = MetaKey::from_parts("westend", 9122);
-    let network_specs_key_bad = NetworkSpecsKey::from_hex("0350e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e").unwrap();
-    let network_specs_key_good = NetworkSpecsKey::from_hex("0150e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e").unwrap();
+    let network_specs_key_bad = NetworkSpecsKey::from_hex(
+        "0350e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e",
+    )
+    .unwrap();
+    let network_specs_key_good = NetworkSpecsKey::from_hex(
+        "0150e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e",
+    )
+    .unwrap();
     let not_hex_string = String::from("0xabracadabra");
-    let verifier_key = VerifierKey::from_parts(&hex::decode("853faffbfc6713c1f899bf16547fcfbf733ae8361b8ca0129699d01d4f2181fd").unwrap());
+    let verifier_key = VerifierKey::from_parts(
+        &hex::decode("853faffbfc6713c1f899bf16547fcfbf733ae8361b8ca0129699d01d4f2181fd").unwrap(),
+    );
     let valid_current_verifier = ValidCurrentVerifier::General;
-    
+
     let mut error_set = vec![
-        ErrorSigner::Interface(InterfaceSigner::NotHex(NotHexSigner::NetworkSpecsKey{input: not_hex_string.to_string()})),
+        ErrorSigner::Interface(InterfaceSigner::NotHex(NotHexSigner::NetworkSpecsKey {
+            input: not_hex_string.to_string(),
+        })),
         ErrorSigner::Interface(InterfaceSigner::NotHex(NotHexSigner::InputContent)),
-        ErrorSigner::Interface(InterfaceSigner::NotHex(NotHexSigner::AddressKey{input: not_hex_string})),
-        ErrorSigner::Interface(InterfaceSigner::KeyDecoding(KeyDecodingSignerInterface::AddressKey(address_key_bad.to_owned()))),
-        ErrorSigner::Interface(InterfaceSigner::KeyDecoding(KeyDecodingSignerInterface::NetworkSpecsKey(network_specs_key_bad.to_owned()))),
+        ErrorSigner::Interface(InterfaceSigner::NotHex(NotHexSigner::AddressKey {
+            input: not_hex_string,
+        })),
+        ErrorSigner::Interface(InterfaceSigner::KeyDecoding(
+            KeyDecodingSignerInterface::AddressKey(address_key_bad.to_owned()),
+        )),
+        ErrorSigner::Interface(InterfaceSigner::KeyDecoding(
+            KeyDecodingSignerInterface::NetworkSpecsKey(network_specs_key_bad.to_owned()),
+        )),
         ErrorSigner::Interface(InterfaceSigner::PublicKeyLength),
-        ErrorSigner::Interface(InterfaceSigner::HistoryPageOutOfRange{page_number: 14, total_pages: 10}),
-    
-        ErrorSigner::Database(DatabaseSigner::KeyDecoding(KeyDecodingSignerDb::AddressKey(address_key_bad))),
-        ErrorSigner::Database(DatabaseSigner::KeyDecoding(KeyDecodingSignerDb::EntryOrder(entry_order_vec))),
-        ErrorSigner::Database(DatabaseSigner::KeyDecoding(KeyDecodingSignerDb::MetaKey(meta_key))),
-        ErrorSigner::Database(DatabaseSigner::KeyDecoding(KeyDecodingSignerDb::NetworkSpecsKey(network_specs_key_bad.to_owned()))),
-        ErrorSigner::Database(DatabaseSigner::KeyDecoding(KeyDecodingSignerDb::NetworkSpecsKeyAddressDetails{address_key: address_key_good.to_owned(), network_specs_key: network_specs_key_bad.to_owned()}))
+        ErrorSigner::Interface(InterfaceSigner::HistoryPageOutOfRange {
+            page_number: 14,
+            total_pages: 10,
+        }),
+        ErrorSigner::Database(DatabaseSigner::KeyDecoding(
+            KeyDecodingSignerDb::AddressKey(address_key_bad),
+        )),
+        ErrorSigner::Database(DatabaseSigner::KeyDecoding(
+            KeyDecodingSignerDb::EntryOrder(entry_order_vec),
+        )),
+        ErrorSigner::Database(DatabaseSigner::KeyDecoding(KeyDecodingSignerDb::MetaKey(
+            meta_key,
+        ))),
+        ErrorSigner::Database(DatabaseSigner::KeyDecoding(
+            KeyDecodingSignerDb::NetworkSpecsKey(network_specs_key_bad.to_owned()),
+        )),
+        ErrorSigner::Database(DatabaseSigner::KeyDecoding(
+            KeyDecodingSignerDb::NetworkSpecsKeyAddressDetails {
+                address_key: address_key_good.to_owned(),
+                network_specs_key: network_specs_key_bad.to_owned(),
+            },
+        )),
     ];
-    for e in db_internal_error_set().into_iter() {error_set.push(ErrorSigner::Database(DatabaseSigner::Internal(e)));}
-    for e in db_internal_error_set().into_iter(){error_set.push(ErrorSigner::Database(DatabaseSigner::Transaction(TransactionError::Storage(e))));}
+    for e in db_internal_error_set().into_iter() {
+        error_set.push(ErrorSigner::Database(DatabaseSigner::Internal(e)));
+    }
+    for e in db_internal_error_set().into_iter() {
+        error_set.push(ErrorSigner::Database(DatabaseSigner::Transaction(
+            TransactionError::Storage(e),
+        )));
+    }
     error_set.push(ErrorSigner::Database(DatabaseSigner::ChecksumMismatch));
-    error_set.push(ErrorSigner::Database(DatabaseSigner::EntryDecoding(EntryDecodingSigner::AddressDetails(address_key_good.to_owned()))));
-    error_set.push(ErrorSigner::Database(DatabaseSigner::EntryDecoding(EntryDecodingSigner::CurrentVerifier(verifier_key.to_owned()))));
-    error_set.push(ErrorSigner::Database(DatabaseSigner::EntryDecoding(EntryDecodingSigner::DangerStatus)));
-    error_set.push(ErrorSigner::Database(DatabaseSigner::EntryDecoding(EntryDecodingSigner::GeneralVerifier)));
-    error_set.push(ErrorSigner::Database(DatabaseSigner::EntryDecoding(EntryDecodingSigner::HistoryEntry(Order::from_number(135)))));
-    error_set.push(ErrorSigner::Database(DatabaseSigner::EntryDecoding(EntryDecodingSigner::NetworkSpecs(network_specs_key_good.to_owned()))));
-    error_set.push(ErrorSigner::Database(DatabaseSigner::EntryDecoding(EntryDecodingSigner::Sign)));
-    error_set.push(ErrorSigner::Database(DatabaseSigner::EntryDecoding(EntryDecodingSigner::Stub)));
-    error_set.push(ErrorSigner::Database(DatabaseSigner::EntryDecoding(EntryDecodingSigner::Types)));
-    error_set.push(ErrorSigner::Database(DatabaseSigner::Mismatch(MismatchSigner::Metadata{name_key: String::from("westend"), version_key: 1922, name_inside: String::from("westend"), version_inside: 9122})));
-    error_set.push(ErrorSigner::Database(DatabaseSigner::Mismatch(MismatchSigner::SpecsGenesisHash{key: network_specs_key_good.to_owned(), genesis_hash: genesis_hash.to_vec()})));
-    error_set.push(ErrorSigner::Database(DatabaseSigner::Mismatch(MismatchSigner::SpecsEncryption{key: network_specs_key_good.to_owned(), encryption: Encryption::Ecdsa})));
-    error_set.push(ErrorSigner::Database(DatabaseSigner::Mismatch(MismatchSigner::AddressDetailsEncryption{key: address_key_good.to_owned(), encryption: Encryption::Ecdsa})));
-    error_set.push(ErrorSigner::Database(DatabaseSigner::Mismatch(MismatchSigner::AddressDetailsSpecsEncryption{address_key: address_key_good.to_owned(), network_specs_key: network_specs_key_bad.to_owned()})));
-    for error in metadata_error_set().into_iter() {error_set.push(ErrorSigner::Database(DatabaseSigner::FaultyMetadata{name: String::from("westend"), version: 9000, error}));}
-    error_set.push(ErrorSigner::Database(DatabaseSigner::UnexpectedGenesisHash{verifier_key: VerifierKey::from_parts(&genesis_hash), network_specs_key: network_specs_key_good.to_owned()}));
-    error_set.push(ErrorSigner::Database(DatabaseSigner::SpecsCollision{name: String::from("westend"), encryption: Encryption::Sr25519}));
-    error_set.push(ErrorSigner::Database(DatabaseSigner::DifferentNamesSameGenesisHash{name1: String::from("westend"), name2: String::from("WeStEnD"), genesis_hash: genesis_hash.to_vec()}));
-    error_set.push(ErrorSigner::Database(DatabaseSigner::TwoTransactionsInEntry(135)));
-    error_set.push(ErrorSigner::Database(DatabaseSigner::CustomVerifierIsGeneral(verifier_key.to_owned())));
-    
-    error_set.push(ErrorSigner::Input(InputSigner::TransferContent(TransferContent::AddSpecs)));
-    error_set.push(ErrorSigner::Input(InputSigner::TransferContent(TransferContent::LoadMeta)));
-    error_set.push(ErrorSigner::Input(InputSigner::TransferContent(TransferContent::LoadTypes)));
-    for e in metadata_error_set().into_iter() {error_set.push(ErrorSigner::Input(InputSigner::FaultyMetadata(e)));}
+    error_set.push(ErrorSigner::Database(DatabaseSigner::EntryDecoding(
+        EntryDecodingSigner::AddressDetails(address_key_good.to_owned()),
+    )));
+    error_set.push(ErrorSigner::Database(DatabaseSigner::EntryDecoding(
+        EntryDecodingSigner::CurrentVerifier(verifier_key.to_owned()),
+    )));
+    error_set.push(ErrorSigner::Database(DatabaseSigner::EntryDecoding(
+        EntryDecodingSigner::DangerStatus,
+    )));
+    error_set.push(ErrorSigner::Database(DatabaseSigner::EntryDecoding(
+        EntryDecodingSigner::GeneralVerifier,
+    )));
+    error_set.push(ErrorSigner::Database(DatabaseSigner::EntryDecoding(
+        EntryDecodingSigner::HistoryEntry(Order::from_number(135)),
+    )));
+    error_set.push(ErrorSigner::Database(DatabaseSigner::EntryDecoding(
+        EntryDecodingSigner::NetworkSpecs(network_specs_key_good.to_owned()),
+    )));
+    error_set.push(ErrorSigner::Database(DatabaseSigner::EntryDecoding(
+        EntryDecodingSigner::Sign,
+    )));
+    error_set.push(ErrorSigner::Database(DatabaseSigner::EntryDecoding(
+        EntryDecodingSigner::Stub,
+    )));
+    error_set.push(ErrorSigner::Database(DatabaseSigner::EntryDecoding(
+        EntryDecodingSigner::Types,
+    )));
+    error_set.push(ErrorSigner::Database(DatabaseSigner::Mismatch(
+        MismatchSigner::Metadata {
+            name_key: String::from("westend"),
+            version_key: 1922,
+            name_inside: String::from("westend"),
+            version_inside: 9122,
+        },
+    )));
+    error_set.push(ErrorSigner::Database(DatabaseSigner::Mismatch(
+        MismatchSigner::SpecsGenesisHash {
+            key: network_specs_key_good.to_owned(),
+            genesis_hash: genesis_hash.to_vec(),
+        },
+    )));
+    error_set.push(ErrorSigner::Database(DatabaseSigner::Mismatch(
+        MismatchSigner::SpecsEncryption {
+            key: network_specs_key_good.to_owned(),
+            encryption: Encryption::Ecdsa,
+        },
+    )));
+    error_set.push(ErrorSigner::Database(DatabaseSigner::Mismatch(
+        MismatchSigner::AddressDetailsEncryption {
+            key: address_key_good.to_owned(),
+            encryption: Encryption::Ecdsa,
+        },
+    )));
+    error_set.push(ErrorSigner::Database(DatabaseSigner::Mismatch(
+        MismatchSigner::AddressDetailsSpecsEncryption {
+            address_key: address_key_good.to_owned(),
+            network_specs_key: network_specs_key_bad.to_owned(),
+        },
+    )));
+    for error in metadata_error_set().into_iter() {
+        error_set.push(ErrorSigner::Database(DatabaseSigner::FaultyMetadata {
+            name: String::from("westend"),
+            version: 9000,
+            error,
+        }));
+    }
+    error_set.push(ErrorSigner::Database(
+        DatabaseSigner::UnexpectedGenesisHash {
+            verifier_key: VerifierKey::from_parts(&genesis_hash),
+            network_specs_key: network_specs_key_good.to_owned(),
+        },
+    ));
+    error_set.push(ErrorSigner::Database(DatabaseSigner::SpecsCollision {
+        name: String::from("westend"),
+        encryption: Encryption::Sr25519,
+    }));
+    error_set.push(ErrorSigner::Database(
+        DatabaseSigner::DifferentNamesSameGenesisHash {
+            name1: String::from("westend"),
+            name2: String::from("WeStEnD"),
+            genesis_hash: genesis_hash.to_vec(),
+        },
+    ));
+    error_set.push(ErrorSigner::Database(
+        DatabaseSigner::TwoTransactionsInEntry(135),
+    ));
+    error_set.push(ErrorSigner::Database(
+        DatabaseSigner::CustomVerifierIsGeneral(verifier_key.to_owned()),
+    ));
+
+    error_set.push(ErrorSigner::Input(InputSigner::TransferContent(
+        TransferContent::AddSpecs,
+    )));
+    error_set.push(ErrorSigner::Input(InputSigner::TransferContent(
+        TransferContent::LoadMeta,
+    )));
+    error_set.push(ErrorSigner::Input(InputSigner::TransferContent(
+        TransferContent::LoadTypes,
+    )));
+    for e in metadata_error_set().into_iter() {
+        error_set.push(ErrorSigner::Input(InputSigner::FaultyMetadata(e)));
+    }
     error_set.push(ErrorSigner::Input(InputSigner::TooShort));
-    error_set.push(ErrorSigner::Input(InputSigner::NotSubstrate(String::from("35"))));
-    error_set.push(ErrorSigner::Input(InputSigner::PayloadNotSupported(String::from("0f"))));
-    error_set.push(ErrorSigner::Input(InputSigner::SameNameVersionDifferentMeta{name: String::from("kusama"), version: 9110}));
-    error_set.push(ErrorSigner::Input(InputSigner::MetadataKnown{name: String::from("westend"), version: 9122}));
-    error_set.push(ErrorSigner::Input(InputSigner::ImportantSpecsChanged(network_specs_key_good.to_owned())));
-    error_set.push(ErrorSigner::Input(InputSigner::EncryptionNotSupported(String::from("03"))));
+    error_set.push(ErrorSigner::Input(InputSigner::NotSubstrate(String::from(
+        "35",
+    ))));
+    error_set.push(ErrorSigner::Input(InputSigner::PayloadNotSupported(
+        String::from("0f"),
+    )));
+    error_set.push(ErrorSigner::Input(
+        InputSigner::SameNameVersionDifferentMeta {
+            name: String::from("kusama"),
+            version: 9110,
+        },
+    ));
+    error_set.push(ErrorSigner::Input(InputSigner::MetadataKnown {
+        name: String::from("westend"),
+        version: 9122,
+    }));
+    error_set.push(ErrorSigner::Input(InputSigner::ImportantSpecsChanged(
+        network_specs_key_good.to_owned(),
+    )));
+    error_set.push(ErrorSigner::Input(InputSigner::EncryptionNotSupported(
+        String::from("03"),
+    )));
     error_set.push(ErrorSigner::Input(InputSigner::BadSignature));
-    error_set.push(ErrorSigner::Input(InputSigner::LoadMetaUnknownNetwork{name: String::from("kulupu")}));
-    error_set.push(ErrorSigner::Input(InputSigner::LoadMetaNoSpecs{name: String::from("westend"), valid_current_verifier, general_verifier: verifier_sr25519()}));
-    error_set.push(ErrorSigner::Input(InputSigner::NeedVerifier{name: String::from("kulupu"), verifier_value: verifier_value_ed25519()}));
-    for content in content().into_iter() {error_set.push(ErrorSigner::Input(InputSigner::NeedGeneralVerifier{content, verifier_value: verifier_value_sr25519()}));}
-    error_set.push(ErrorSigner::Input(InputSigner::LoadMetaSetVerifier{name: String::from("kulupu"), new_verifier_value: verifier_value_ed25519()}));
-    error_set.push(ErrorSigner::Input(InputSigner::LoadMetaVerifierChanged{name: String::from("kulupu"), old_verifier_value: verifier_value_sr25519(), new_verifier_value: verifier_value_ed25519()}));
-    error_set.push(ErrorSigner::Input(InputSigner::LoadMetaSetGeneralVerifier{name: String::from("westend"), new_general_verifier_value: verifier_value_sr25519()}));
-    error_set.push(ErrorSigner::Input(InputSigner::LoadMetaGeneralVerifierChanged{name: String::from("westend"), old_general_verifier_value: verifier_value_sr25519(), new_general_verifier_value: verifier_value_ed25519()}));
-    for content in content().into_iter() {error_set.push(ErrorSigner::Input(InputSigner::GeneralVerifierChanged{content, old_general_verifier_value: verifier_value_sr25519(), new_general_verifier_value: verifier_value_ed25519()}));}
+    error_set.push(ErrorSigner::Input(InputSigner::LoadMetaUnknownNetwork {
+        name: String::from("kulupu"),
+    }));
+    error_set.push(ErrorSigner::Input(InputSigner::LoadMetaNoSpecs {
+        name: String::from("westend"),
+        valid_current_verifier,
+        general_verifier: verifier_sr25519(),
+    }));
+    error_set.push(ErrorSigner::Input(InputSigner::NeedVerifier {
+        name: String::from("kulupu"),
+        verifier_value: verifier_value_ed25519(),
+    }));
+    for content in content().into_iter() {
+        error_set.push(ErrorSigner::Input(InputSigner::NeedGeneralVerifier {
+            content,
+            verifier_value: verifier_value_sr25519(),
+        }));
+    }
+    error_set.push(ErrorSigner::Input(InputSigner::LoadMetaSetVerifier {
+        name: String::from("kulupu"),
+        new_verifier_value: verifier_value_ed25519(),
+    }));
+    error_set.push(ErrorSigner::Input(InputSigner::LoadMetaVerifierChanged {
+        name: String::from("kulupu"),
+        old_verifier_value: verifier_value_sr25519(),
+        new_verifier_value: verifier_value_ed25519(),
+    }));
+    error_set.push(ErrorSigner::Input(
+        InputSigner::LoadMetaSetGeneralVerifier {
+            name: String::from("westend"),
+            new_general_verifier_value: verifier_value_sr25519(),
+        },
+    ));
+    error_set.push(ErrorSigner::Input(
+        InputSigner::LoadMetaGeneralVerifierChanged {
+            name: String::from("westend"),
+            old_general_verifier_value: verifier_value_sr25519(),
+            new_general_verifier_value: verifier_value_ed25519(),
+        },
+    ));
+    for content in content().into_iter() {
+        error_set.push(ErrorSigner::Input(InputSigner::GeneralVerifierChanged {
+            content,
+            old_general_verifier_value: verifier_value_sr25519(),
+            new_general_verifier_value: verifier_value_ed25519(),
+        }));
+    }
     error_set.push(ErrorSigner::Input(InputSigner::TypesKnown));
     error_set.push(ErrorSigner::Input(InputSigner::MessageNotReadable));
-    error_set.push(ErrorSigner::Input(InputSigner::UnknownNetwork{genesis_hash: genesis_hash.to_vec(), encryption: Encryption::Sr25519}));
-    error_set.push(ErrorSigner::Input(InputSigner::NoMetadata{name: String::from("westend")}));
-    error_set.push(ErrorSigner::Input(InputSigner::SpecsKnown{name: String::from("westend"), encryption: Encryption::Sr25519}));
-    error_set.push(ErrorSigner::Input(InputSigner::AddSpecsVerifierChanged {name: String::from("kulupu"), old_verifier_value: verifier_value_sr25519(), new_verifier_value: verifier_value_ed25519()}));
-    
-    error_set.push(ErrorSigner::NotFound(NotFoundSigner::CurrentVerifier(verifier_key.to_owned())));
+    error_set.push(ErrorSigner::Input(InputSigner::UnknownNetwork {
+        genesis_hash: genesis_hash.to_vec(),
+        encryption: Encryption::Sr25519,
+    }));
+    error_set.push(ErrorSigner::Input(InputSigner::NoMetadata {
+        name: String::from("westend"),
+    }));
+    error_set.push(ErrorSigner::Input(InputSigner::SpecsKnown {
+        name: String::from("westend"),
+        encryption: Encryption::Sr25519,
+    }));
+    error_set.push(ErrorSigner::Input(InputSigner::AddSpecsVerifierChanged {
+        name: String::from("kulupu"),
+        old_verifier_value: verifier_value_sr25519(),
+        new_verifier_value: verifier_value_ed25519(),
+    }));
+
+    error_set.push(ErrorSigner::NotFound(NotFoundSigner::CurrentVerifier(
+        verifier_key.to_owned(),
+    )));
     error_set.push(ErrorSigner::NotFound(NotFoundSigner::GeneralVerifier));
     error_set.push(ErrorSigner::NotFound(NotFoundSigner::Types));
-    error_set.push(ErrorSigner::NotFound(NotFoundSigner::NetworkSpecs(network_specs_key_bad)));
-    error_set.push(ErrorSigner::NotFound(NotFoundSigner::NetworkSpecsForName(String::from("westend"))));
-    error_set.push(ErrorSigner::NotFound(NotFoundSigner::NetworkSpecsKeyForAddress{network_specs_key: network_specs_key_good, address_key: address_key_good.to_owned()}));
-    error_set.push(ErrorSigner::NotFound(NotFoundSigner::AddressDetails(address_key_good)));
-    error_set.push(ErrorSigner::NotFound(NotFoundSigner::Metadata{name: String::from("westend"), version: 9120}));
+    error_set.push(ErrorSigner::NotFound(NotFoundSigner::NetworkSpecs(
+        network_specs_key_bad,
+    )));
+    error_set.push(ErrorSigner::NotFound(NotFoundSigner::NetworkSpecsForName(
+        String::from("westend"),
+    )));
+    error_set.push(ErrorSigner::NotFound(
+        NotFoundSigner::NetworkSpecsKeyForAddress {
+            network_specs_key: network_specs_key_good,
+            address_key: address_key_good.to_owned(),
+        },
+    ));
+    error_set.push(ErrorSigner::NotFound(NotFoundSigner::AddressDetails(
+        address_key_good,
+    )));
+    error_set.push(ErrorSigner::NotFound(NotFoundSigner::Metadata {
+        name: String::from("westend"),
+        version: 9120,
+    }));
     error_set.push(ErrorSigner::NotFound(NotFoundSigner::DangerStatus));
     error_set.push(ErrorSigner::NotFound(NotFoundSigner::Stub));
     error_set.push(ErrorSigner::NotFound(NotFoundSigner::Sign));
-    error_set.push(ErrorSigner::NotFound(NotFoundSigner::HistoryEntry(Order::from_number(135))));
-    error_set.push(ErrorSigner::NotFound(NotFoundSigner::HistoryNetworkSpecs{name: String::from("westend"), encryption: Encryption::Ed25519}));
+    error_set.push(ErrorSigner::NotFound(NotFoundSigner::HistoryEntry(
+        Order::from_number(135),
+    )));
+    error_set.push(ErrorSigner::NotFound(NotFoundSigner::HistoryNetworkSpecs {
+        name: String::from("westend"),
+        encryption: Encryption::Ed25519,
+    }));
     error_set.push(ErrorSigner::NotFound(NotFoundSigner::TransactionEvent(280)));
-    error_set.push(ErrorSigner::NotFound(NotFoundSigner::HistoricalMetadata{name: String::from("kulupu")}));
-    
+    error_set.push(ErrorSigner::NotFound(NotFoundSigner::HistoricalMetadata {
+        name: String::from("kulupu"),
+    }));
+
     error_set.push(ErrorSigner::DeadVerifier(verifier_key));
-    
-    error_set.push(ErrorSigner::AddressGeneration(AddressGeneration::Common(AddressGenerationCommon::EncryptionMismatch{network_encryption: Encryption::Sr25519, seed_object_encryption: Encryption::Ed25519})));
-    error_set.push(ErrorSigner::AddressGeneration(AddressGeneration::Common(AddressGenerationCommon::KeyCollision{seed_name: String::from("Alice super secret seed")})));
-    for e in secret_string_error_set().into_iter() {error_set.push(ErrorSigner::AddressGeneration(AddressGeneration::Common(AddressGenerationCommon::SecretString(e))));}
-    error_set.push(ErrorSigner::AddressGeneration(AddressGeneration::Extra(ExtraAddressGenerationSigner::RandomPhraseGeneration(anyhow!("Mnemonic generator refuses to work with a valid excuse.")))));
-    error_set.push(ErrorSigner::AddressGeneration(AddressGeneration::Extra(ExtraAddressGenerationSigner::InvalidDerivation)));
-    
-    error_set.push(ErrorSigner::Qr(String::from("QR generator refuses to work with a valid excuse.")));
-    
-    error_set.push(ErrorSigner::Parser(ParserError::Decoding(ParserDecodingError::UnexpectedImmortality)));
-    error_set.push(ErrorSigner::Parser(ParserError::Decoding(ParserDecodingError::UnexpectedMortality)));
-    error_set.push(ErrorSigner::Parser(ParserError::Decoding(ParserDecodingError::GenesisHashMismatch)));
-    error_set.push(ErrorSigner::Parser(ParserError::Decoding(ParserDecodingError::ImmortalHashMismatch)));
-    error_set.push(ErrorSigner::Parser(ParserError::Decoding(ParserDecodingError::ExtensionsOlder)));
-    error_set.push(ErrorSigner::Parser(ParserError::Decoding(ParserDecodingError::MethodNotFound{method_index: 2, pallet_name: "test_Pallet".to_string()})));
-    error_set.push(ErrorSigner::Parser(ParserError::Decoding(ParserDecodingError::PalletNotFound(3))));
-    error_set.push(ErrorSigner::Parser(ParserError::Decoding(ParserDecodingError::MethodIndexTooHigh{method_index: 5, pallet_index: 3, total: 4})));
-    error_set.push(ErrorSigner::Parser(ParserError::Decoding(ParserDecodingError::NoCallsInPallet("test_pallet_v14".to_string()))));
-    error_set.push(ErrorSigner::Parser(ParserError::Decoding(ParserDecodingError::V14TypeNotResolved)));
-    error_set.push(ErrorSigner::Parser(ParserError::Decoding(ParserDecodingError::ArgumentTypeError)));
-    error_set.push(ErrorSigner::Parser(ParserError::Decoding(ParserDecodingError::ArgumentNameError)));
-    error_set.push(ErrorSigner::Parser(ParserError::Decoding(ParserDecodingError::NotPrimitive(String::from("Option<u8>")))));
-    error_set.push(ErrorSigner::Parser(ParserError::Decoding(ParserDecodingError::NoCompact)));
-    error_set.push(ErrorSigner::Parser(ParserError::Decoding(ParserDecodingError::DataTooShort)));
-    error_set.push(ErrorSigner::Parser(ParserError::Decoding(ParserDecodingError::PrimitiveFailure("u32".to_string()))));
-    error_set.push(ErrorSigner::Parser(ParserError::Decoding(ParserDecodingError::UnexpectedOptionVariant)));
-    error_set.push(ErrorSigner::Parser(ParserError::Decoding(ParserDecodingError::IdFields)));
-    error_set.push(ErrorSigner::Parser(ParserError::Decoding(ParserDecodingError::Array)));
-    error_set.push(ErrorSigner::Parser(ParserError::Decoding(ParserDecodingError::BalanceNotDescribed)));
-    error_set.push(ErrorSigner::Parser(ParserError::Decoding(ParserDecodingError::UnexpectedEnumVariant)));
-    error_set.push(ErrorSigner::Parser(ParserError::Decoding(ParserDecodingError::UnexpectedCompactInsides)));
-    error_set.push(ErrorSigner::Parser(ParserError::Decoding(ParserDecodingError::CompactNotPrimitive)));
-    error_set.push(ErrorSigner::Parser(ParserError::Decoding(ParserDecodingError::UnknownType("T::SomeUnknownType".to_string()))));
-    error_set.push(ErrorSigner::Parser(ParserError::Decoding(ParserDecodingError::NotBitStoreType)));
-    error_set.push(ErrorSigner::Parser(ParserError::Decoding(ParserDecodingError::NotBitOrderType)));
-    error_set.push(ErrorSigner::Parser(ParserError::Decoding(ParserDecodingError::BitVecFailure)));
-    error_set.push(ErrorSigner::Parser(ParserError::Decoding(ParserDecodingError::Era)));
-    error_set.push(ErrorSigner::Parser(ParserError::Decoding(ParserDecodingError::SomeDataNotUsedMethod)));
-    error_set.push(ErrorSigner::Parser(ParserError::Decoding(ParserDecodingError::SomeDataNotUsedExtensions)));
-    for e in parser_metadata_error_set().into_iter() {error_set.push(ErrorSigner::Parser(ParserError::FundamentallyBadV14Metadata(e)));}
+
+    error_set.push(ErrorSigner::AddressGeneration(AddressGeneration::Common(
+        AddressGenerationCommon::EncryptionMismatch {
+            network_encryption: Encryption::Sr25519,
+            seed_object_encryption: Encryption::Ed25519,
+        },
+    )));
+    error_set.push(ErrorSigner::AddressGeneration(AddressGeneration::Common(
+        AddressGenerationCommon::KeyCollision {
+            seed_name: String::from("Alice super secret seed"),
+        },
+    )));
+    for e in secret_string_error_set().into_iter() {
+        error_set.push(ErrorSigner::AddressGeneration(AddressGeneration::Common(
+            AddressGenerationCommon::SecretString(e),
+        )));
+    }
+    error_set.push(ErrorSigner::AddressGeneration(AddressGeneration::Extra(
+        ExtraAddressGenerationSigner::RandomPhraseGeneration(anyhow!(
+            "Mnemonic generator refuses to work with a valid excuse."
+        )),
+    )));
+    error_set.push(ErrorSigner::AddressGeneration(AddressGeneration::Extra(
+        ExtraAddressGenerationSigner::InvalidDerivation,
+    )));
+
+    error_set.push(ErrorSigner::Qr(String::from(
+        "QR generator refuses to work with a valid excuse.",
+    )));
+
+    error_set.push(ErrorSigner::Parser(ParserError::Decoding(
+        ParserDecodingError::UnexpectedImmortality,
+    )));
+    error_set.push(ErrorSigner::Parser(ParserError::Decoding(
+        ParserDecodingError::UnexpectedMortality,
+    )));
+    error_set.push(ErrorSigner::Parser(ParserError::Decoding(
+        ParserDecodingError::GenesisHashMismatch,
+    )));
+    error_set.push(ErrorSigner::Parser(ParserError::Decoding(
+        ParserDecodingError::ImmortalHashMismatch,
+    )));
+    error_set.push(ErrorSigner::Parser(ParserError::Decoding(
+        ParserDecodingError::ExtensionsOlder,
+    )));
+    error_set.push(ErrorSigner::Parser(ParserError::Decoding(
+        ParserDecodingError::MethodNotFound {
+            method_index: 2,
+            pallet_name: "test_Pallet".to_string(),
+        },
+    )));
+    error_set.push(ErrorSigner::Parser(ParserError::Decoding(
+        ParserDecodingError::PalletNotFound(3),
+    )));
+    error_set.push(ErrorSigner::Parser(ParserError::Decoding(
+        ParserDecodingError::MethodIndexTooHigh {
+            method_index: 5,
+            pallet_index: 3,
+            total: 4,
+        },
+    )));
+    error_set.push(ErrorSigner::Parser(ParserError::Decoding(
+        ParserDecodingError::NoCallsInPallet("test_pallet_v14".to_string()),
+    )));
+    error_set.push(ErrorSigner::Parser(ParserError::Decoding(
+        ParserDecodingError::V14TypeNotResolved,
+    )));
+    error_set.push(ErrorSigner::Parser(ParserError::Decoding(
+        ParserDecodingError::ArgumentTypeError,
+    )));
+    error_set.push(ErrorSigner::Parser(ParserError::Decoding(
+        ParserDecodingError::ArgumentNameError,
+    )));
+    error_set.push(ErrorSigner::Parser(ParserError::Decoding(
+        ParserDecodingError::NotPrimitive(String::from("Option<u8>")),
+    )));
+    error_set.push(ErrorSigner::Parser(ParserError::Decoding(
+        ParserDecodingError::NoCompact,
+    )));
+    error_set.push(ErrorSigner::Parser(ParserError::Decoding(
+        ParserDecodingError::DataTooShort,
+    )));
+    error_set.push(ErrorSigner::Parser(ParserError::Decoding(
+        ParserDecodingError::PrimitiveFailure("u32".to_string()),
+    )));
+    error_set.push(ErrorSigner::Parser(ParserError::Decoding(
+        ParserDecodingError::UnexpectedOptionVariant,
+    )));
+    error_set.push(ErrorSigner::Parser(ParserError::Decoding(
+        ParserDecodingError::IdFields,
+    )));
+    error_set.push(ErrorSigner::Parser(ParserError::Decoding(
+        ParserDecodingError::Array,
+    )));
+    error_set.push(ErrorSigner::Parser(ParserError::Decoding(
+        ParserDecodingError::BalanceNotDescribed,
+    )));
+    error_set.push(ErrorSigner::Parser(ParserError::Decoding(
+        ParserDecodingError::UnexpectedEnumVariant,
+    )));
+    error_set.push(ErrorSigner::Parser(ParserError::Decoding(
+        ParserDecodingError::UnexpectedCompactInsides,
+    )));
+    error_set.push(ErrorSigner::Parser(ParserError::Decoding(
+        ParserDecodingError::CompactNotPrimitive,
+    )));
+    error_set.push(ErrorSigner::Parser(ParserError::Decoding(
+        ParserDecodingError::UnknownType("T::SomeUnknownType".to_string()),
+    )));
+    error_set.push(ErrorSigner::Parser(ParserError::Decoding(
+        ParserDecodingError::NotBitStoreType,
+    )));
+    error_set.push(ErrorSigner::Parser(ParserError::Decoding(
+        ParserDecodingError::NotBitOrderType,
+    )));
+    error_set.push(ErrorSigner::Parser(ParserError::Decoding(
+        ParserDecodingError::BitVecFailure,
+    )));
+    error_set.push(ErrorSigner::Parser(ParserError::Decoding(
+        ParserDecodingError::Era,
+    )));
+    error_set.push(ErrorSigner::Parser(ParserError::Decoding(
+        ParserDecodingError::SomeDataNotUsedMethod,
+    )));
+    error_set.push(ErrorSigner::Parser(ParserError::Decoding(
+        ParserDecodingError::SomeDataNotUsedExtensions,
+    )));
+    for e in parser_metadata_error_set().into_iter() {
+        error_set.push(ErrorSigner::Parser(
+            ParserError::FundamentallyBadV14Metadata(e),
+        ));
+    }
     error_set.push(ErrorSigner::Parser(ParserError::RegexError));
-    error_set.push(ErrorSigner::Parser(ParserError::WrongNetworkVersion {as_decoded: String::from("9122"), in_metadata: 9010}));
-    
+    error_set.push(ErrorSigner::Parser(ParserError::WrongNetworkVersion {
+        as_decoded: String::from("9122"),
+        in_metadata: 9010,
+    }));
+
     error_set.push(ErrorSigner::AllParsingFailed(all_parsing_failed_set()));
-    
-    for e in secret_string_error_set().into_iter() {error_set.push(ErrorSigner::AddressUse(e));}
-    
+
+    for e in secret_string_error_set().into_iter() {
+        error_set.push(ErrorSigner::AddressUse(e));
+    }
+
     error_set.push(ErrorSigner::WrongPassword);
-    
+
     error_set
 }
 
@@ -227,12 +567,16 @@ mod tests {
     use super::*;
     use crate::error::ErrorSource;
     use crate::error_signer::Signer;
-    
+
     #[test]
     fn print_signer_errors_nicely() {
         let mut print = String::from("\n");
         let signer_errors = signer_errors();
-        assert!(signer_errors.len() == 156, "Different error set length: {}", signer_errors.len());
+        assert!(
+            signer_errors.len() == 156,
+            "Different error set length: {}",
+            signer_errors.len()
+        );
         for e in signer_errors.iter() {
             print.push_str(&format!("\"{}\"", <Signer>::show(e)));
             print.push_str("\n");
@@ -398,4 +742,3 @@ mod tests {
         assert!(print == print_expected, "\nReceived: {}", print);
     }
 }
-
