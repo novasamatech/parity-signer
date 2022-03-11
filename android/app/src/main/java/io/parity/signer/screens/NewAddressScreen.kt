@@ -10,17 +10,32 @@ import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.unit.dp
 import io.parity.signer.ButtonID
-import io.parity.signer.components.BigButton
-import io.parity.signer.components.HeadingOverline
-import io.parity.signer.components.SingleTextInput
+import io.parity.signer.components.*
 import io.parity.signer.models.*
 import io.parity.signer.ui.theme.Text600
+import org.json.JSONObject
 
 @Composable
 fun NewAddressScreen(signerDataModel: SignerDataModel, increment: Boolean) {
+	val screenData = signerDataModel.screenData.value?: JSONObject()
 	val derivationPath = remember { mutableStateOf("") }
-	var derivationState by remember { mutableStateOf(DerivationState()) }
+	val buttonGood = remember { mutableStateOf(false) }
+	val whereTo = remember { mutableStateOf<DeriveDestination?>(null) }
+	val collision = remember { mutableStateOf<JSONObject?>(null) }
 	val seedName = signerDataModel.screenData.value?.optString("seed_name") ?: ""
+	val networkSpecKey = signerDataModel.screenData.value?.optString("network_specs_key") ?: ""
+	var derivationState by remember(buttonGood, whereTo, collision) { mutableStateOf(DerivationCheck(
+		buttonGood,
+		whereTo,
+		collision
+	) {
+		signerDataModel.substratePathCheck(
+			seedName,
+			it,
+			networkSpecKey,
+			signerDataModel.dbName
+		)
+	}) }
 	val focusManager = LocalFocusManager.current
 	val focusRequester = remember { FocusRequester() }
 
@@ -32,15 +47,15 @@ fun NewAddressScreen(signerDataModel: SignerDataModel, increment: Boolean) {
 			.fillMaxSize()
 	) {
 		Row {
-			HeadingOverline("Create new key")
+			HeaderBar(line1 = "Create new key", line2 = "For seed $seedName")
 			Spacer(Modifier.weight(1f))
 		}
+		NetworkCard(network = screenData)
 		SingleTextInput(
 			content = derivationPath,
 			update = {
 				derivationPath.value = it
-				derivationState = signerDataModel.checkAsDerivation(it)
-				signerDataModel.clearError()
+				derivationState.check(it)
 			},
 			prefix = {
 				Text(
@@ -54,41 +69,57 @@ fun NewAddressScreen(signerDataModel: SignerDataModel, increment: Boolean) {
 			capitalize = false,
 			onDone = {
 				focusManager.clearFocus()
-				if (derivationState.isValid) {
-					if (derivationState.hasPassword) {
-						signerDataModel.pushButton(
-							ButtonID.CheckPassword,
-							details = derivationPath.value
-						)
-					} else {
-						signerDataModel.addKey(
+				if (derivationState.buttonGood.value) {
+					when (derivationState.whereTo.value) {
+						DeriveDestination.pin -> {
+							signerDataModel.addKey(
 							path = derivationPath.value,
 							seedName = seedName
 						)
+						}
+						DeriveDestination.pwd -> {
+							signerDataModel.pushButton(
+							ButtonID.CheckPassword,
+							details = derivationPath.value
+						)
+						}
+						null -> {}
 					}
 				}
 			},
 			focusManager = focusManager,
 			focusRequester = focusRequester
 		)
+		collision.value?.let {
+			Column(
+				Modifier.fillMaxWidth(1f)
+			) {
+				Text("This key already exists:")
+				KeyCard(identity = it)
+			}
+		}
 		Spacer(Modifier.height(20.dp))
 		Row {
 			BigButton(
 				text = "Next",
 				action = {
-					if (derivationState.hasPassword) {
-						signerDataModel.pushButton(
-							ButtonID.CheckPassword,
-							details = derivationPath.value
-						)
-					} else {
-						signerDataModel.addKey(
-							path = derivationPath.value,
-							seedName = seedName
-						)
+					when (derivationState.whereTo.value) {
+						DeriveDestination.pin -> {
+							signerDataModel.addKey(
+								path = derivationPath.value,
+								seedName = seedName
+							)
+						}
+						DeriveDestination.pwd -> {
+							signerDataModel.pushButton(
+								ButtonID.CheckPassword,
+								details = derivationPath.value
+							)
+						}
+						null -> {}
 					}
 				},
-				isDisabled = !derivationState.isValid
+				isDisabled = !derivationState.buttonGood.value
 			)
 		}
 	}
@@ -99,7 +130,7 @@ fun NewAddressScreen(signerDataModel: SignerDataModel, increment: Boolean) {
 		derivationPath.value =
 			signerDataModel.screenData.value?.optString("suggested_derivation")
 				?: ""
-		derivationState = signerDataModel.checkAsDerivation(derivationPath.value)
+		derivationState.fromJSON(signerDataModel.screenData.value?: JSONObject())
 		onDispose { focusManager.clearFocus() }
 	}
 }
