@@ -14,8 +14,8 @@ hex = "0.4.3"
 parity-scale-codec = "3.0.0"
 qrcode_static = {path = "../qrcode_static"}
 sled = {version = "0.34.6", optional = true}
-sp-core = {version = "6.0.0", default-features = false, features = ["full_crypto"]}
-sp-runtime = {version = "6.0.0", default-features = false}
+sp-core = {git = "https://github.com/paritytech/substrate", default-features = false, features = ["full_crypto"]}
+sp-runtime = {git = "https://github.com/paritytech/substrate", default-features = false}
 transaction_parsing = {path = "../transaction_parsing", default-features = false, optional = true}
 zeroize = "1.5.3"
 

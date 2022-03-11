@@ -18,8 +18,8 @@ plot_icon = {git = "https://github.com/varovainen/polkadot-identicon-rust", defa
 qrcode_static = {path = "../qrcode_static", optional = true}
 regex = "1.5.4"
 sled = "0.34.6"
-sp-core = {version = "6.0.0", default-features = false, features = ["full_crypto"], optional = true}
-sp-runtime = {version = "6.0.0", default-features = false, optional = true}
+sp-core = {git = "https://github.com/paritytech/substrate", default-features = false, features = ["full_crypto"], optional = true}
+sp-runtime = {git = "https://github.com/paritytech/substrate", default-features = false, optional = true}
 tiny-bip39 = {version = "0.8.0", default-features = false, optional = true}
 zeroize = {version = "1.5.3", optional = true}
 

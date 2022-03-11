@@ -16,8 +16,8 @@ lazy_static = "1.4.0"
 parser = {path = "../parser", default-features = false, optional = true}
 quircs = {version = "0.10.0", optional = true}
 regex = {version = "1.5.4", optional = true}
-sp-core = {version = "6.0.0", default-features = false, features = ["full_crypto"], optional = true}
-sp-runtime = {version = "6.0.0", default-features = false}
+sp-core = {git = "https://github.com/paritytech/substrate", default-features = false, features = ["full_crypto"], optional = true}
+sp-runtime = {git = "https://github.com/paritytech/substrate", default-features = false}
 transaction_parsing = {path = "../transaction_parsing"}
 transaction_signing = {path = "../transaction_signing"}
 zeroize = "1.5.3"

@@ -16,5 +16,5 @@ parity-scale-codec = "3.0.0"
 qrcode_rtx = {path = "../qrcode_rtx"}
 serde_json = "1.0.79"
 sled = "0.34.6"
-sp-core = {version = "6.0.0", default-features = false, features = ["full_crypto"]}
+sp-core = {git = "https://github.com/paritytech/substrate", default-features = false, features = ["full_crypto"]}
 tokio = { version = "1", features = ["full"] }

@@ -16,10 +16,10 @@ png = {version = "0.17.3", optional = true}
 sc-executor-common = {git = "https://github.com/paritytech/substrate", optional = true}
 sc-executor-wasmi = {git = "https://github.com/paritytech/substrate", optional = true}
 sled = "0.34.6"
-sp-core = {version = "6.0.0", default-features = false, features = ["full_crypto"]}
+sp-core = {git = "https://github.com/paritytech/substrate", default-features = false, features = ["full_crypto"]}
 sp-io = {git = "https://github.com/paritytech/substrate", optional = true}
-sp-runtime = {version = "6.0.0", default-features = false}
-sp-version = "5.0.0"
+sp-runtime = {git = "https://github.com/paritytech/substrate", default-features = false}
+sp-version = {git = "https://github.com/paritytech/substrate"}
 sp-wasm-interface = {git = "https://github.com/paritytech/substrate", optional = true}
 
 [features]

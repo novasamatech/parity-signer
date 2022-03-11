@@ -17,8 +17,8 @@ parity-scale-codec = "3.0.0"
 parser = {path = "../parser", default-features = false}
 plot_icon = {git = "https://github.com/varovainen/polkadot-identicon-rust", default-features = false, features = ["pix"]}
 sled = "0.34.6"
-sp-core = {version = "6.0.0", default-features = false, features = ["full_crypto"]}
-sp-runtime = {version = "6.0.0", default-features = false}
+sp-core = {git = "https://github.com/paritytech/substrate", default-features = false, features = ["full_crypto"]}
+sp-runtime = {git = "https://github.com/paritytech/substrate", default-features = false}
 
 [features]
 default = ["test"]
