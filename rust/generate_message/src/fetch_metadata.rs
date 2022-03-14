@@ -1,6 +1,8 @@
 use jsonrpsee::core::client::ClientT;
 use jsonrpsee::rpc_params;
 use jsonrpsee::ws_client::WsClientBuilder;
+use lazy_static::lazy_static;
+use regex::Regex;
 use serde_json::{value::{Number, Value}, map::Map};
 
 pub struct FetchedInfo {
@@ -14,14 +16,28 @@ pub struct FetchedInfoWithNetworkSpecs {
     pub properties: Map<String, Value>,
 }
 
+lazy_static! {
+// stolen from sp_core
+// removed seed phrase part
+// last '+' used to be '*', but empty password is an error
+    static ref PORT: Regex = Regex::new(r".*(?P<port>:[0-9]+)/?$").expect("known value");
+}
+
+fn address_with_port (str_address: &str) -> String {
+    // note: here the port is set to 443, since default port is unavailable for now;
+    // see for details `https://github.com/paritytech/jsonrpsee/issues/554`
+    // some addresses already have port specified, and should be left as is
+    if PORT.captures(str_address).is_some() {str_address.to_string()}
+    else {str_address.to_owned() + ":443"}
+}
+
 /// Function to fetch the metadata as String and genesis hash as String from given address,
 /// actually fetches stuff, is slow
 
 #[tokio::main]
 pub async fn fetch_info(str_address: &str) -> Result<FetchedInfo, Box<dyn std::error::Error>> {
-    // note: here the port is set to 443, since default port is unavailable for now;
-    // see for details `https://github.com/paritytech/jsonrpsee/issues/554`
-    let client = WsClientBuilder::default().build(str_address.to_owned() + ":443").await?;
+    
+    let client = WsClientBuilder::default().build(address_with_port(str_address)).await?;
     let response: Value = client.request("state_getMetadata", rpc_params![]).await?;
     let meta = match response {
         Value::String(x) => x,
@@ -43,9 +59,7 @@ pub async fn fetch_info(str_address: &str) -> Result<FetchedInfo, Box<dyn std::e
 
 #[tokio::main]
 pub async fn fetch_info_with_network_specs(str_address: &str) -> Result<FetchedInfoWithNetworkSpecs, Box<dyn std::error::Error>> {
-    // note: here the port is set to 443, since default port is unavailable for now;
-    // see for details `https://github.com/paritytech/jsonrpsee/issues/554`
-    let client = WsClientBuilder::default().build(str_address.to_owned() + ":443").await?;
+    let client = WsClientBuilder::default().build(address_with_port(str_address)).await?;
     let response: Value = client.request("state_getMetadata", rpc_params![]).await?;
     let meta = match response {
         Value::String(x) => x,
