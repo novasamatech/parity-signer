@@ -29,6 +29,7 @@ pub enum Command {
     TransferMetaRelease,
     Derivations(Derivations),
     Unwasm{filename: String, update_db: bool},
+    MetaDefaultFile{name: String, version: u32},
 }
 
 pub enum Show {
@@ -698,6 +699,43 @@ impl Command {
                         match found_payload {
                             Some(x) => Ok(Command::Unwasm{filename: x, update_db}),
                             None => Err(ErrorActive::CommandParser(CommandParser::NeedKey(CommandNeedKey::Payload))),
+                        }                        
+                    },
+                    "meta_default_file" => {
+                        let mut name_found = None;
+                        let mut version_found = None;
+                        while let Some(a) = args.next() {
+                            match a.as_str() {
+                                "-name" => {
+                                    if name_found.is_some() {return Err(ErrorActive::CommandParser(CommandParser::DoubleKey(CommandDoubleKey::MetaDefaultFileName)))}
+                                    name_found = match args.next() {
+                                        Some(b) => {
+                                            Some(b.to_string())
+                                        },
+                                        None => return Err(ErrorActive::CommandParser(CommandParser::NeedArgument(CommandNeedArgument::MetaDefaultFileName))),
+                                    };
+                                },
+                                "-version" => {
+                                    if version_found.is_some() {return Err(ErrorActive::CommandParser(CommandParser::DoubleKey(CommandDoubleKey::MetaDefaultFileVersion)))}
+                                    version_found = match args.next() {
+                                        Some(b) => {
+                                            match b.parse::<u32> () {
+                                                Ok(c) => Some(c),
+                                                Err(_) => return Err(ErrorActive::CommandParser(CommandParser::Unexpected(CommandUnexpected::VersionFormat))),
+                                            }
+                                        },
+                                        None => return Err(ErrorActive::CommandParser(CommandParser::NeedArgument(CommandNeedArgument::MetaDefaultFileVersion))),
+                                    };
+                                },
+                                _ => return Err(ErrorActive::CommandParser(CommandParser::UnexpectedKeyArgumentSequence)),
+                            }
+                        }
+                        match name_found {
+                            Some(name) => match version_found {
+                                Some(version) => Ok(Command::MetaDefaultFile{name, version}),
+                                None => Err(ErrorActive::CommandParser(CommandParser::NeedKey(CommandNeedKey::MetaDefaultFileVersion))),
+                            },
+                            None => Err(ErrorActive::CommandParser(CommandParser::NeedKey(CommandNeedKey::MetaDefaultFileName))),
                         }                        
                     },
                     _ => Err(ErrorActive::CommandParser(CommandParser::UnknownCommand)),

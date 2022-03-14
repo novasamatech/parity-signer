@@ -295,6 +295,8 @@ impl ErrorSource for Active {
                             CommandNeedKey::Remove => "`-title` or `-name`",
                             CommandNeedKey::RemoveVersion => "`-version`",
                             CommandNeedKey::DerivationsTitle => "'-title'",
+                            CommandNeedKey::MetaDefaultFileName => "`-name`",
+                            CommandNeedKey::MetaDefaultFileVersion => "`-version`",
                         };
                         format!("Expected {} key to be used.", insert)
                     },
@@ -313,6 +315,8 @@ impl ErrorSource for Active {
                             CommandDoubleKey::SufficientCrypto => "`-sufficient`",
                             CommandDoubleKey::Remove => "`-remove`",
                             CommandDoubleKey::DerivationsTitle => "'-title'",
+                            CommandDoubleKey::MetaDefaultFileName => "`-name`",
+                            CommandDoubleKey::MetaDefaultFileVersion => "`-version`",
                         };
                         format!("More than one entry for {} key is not allowed.", insert)
                     },
@@ -342,6 +346,8 @@ impl ErrorSource for Active {
                             CommandNeedArgument::RemoveVersion => "`remove -name *** -version`",
                             CommandNeedArgument::Derivations => "'derivations'",
                             CommandNeedArgument::DerivationsTitle => "'-title'",
+                            CommandNeedArgument::MetaDefaultFileName => "`-name`",
+                            CommandNeedArgument::MetaDefaultFileVersion => "`-version`",
                         };
                         format!("{} must be followed by an agrument.", insert)
                     },
@@ -689,6 +695,8 @@ pub enum CommandNeedKey {
     Remove,
     RemoveVersion,
     DerivationsTitle,
+    MetaDefaultFileName,
+    MetaDefaultFileVersion,
 }
 
 /// Enum listing command line parser errors conserning key encountered twice
@@ -707,6 +715,8 @@ pub enum CommandDoubleKey {
     SufficientCrypto,
     Remove,
     DerivationsTitle,
+    MetaDefaultFileName,
+    MetaDefaultFileVersion,
 }
 
 /// Enum listing command line parser errors conserning missing key argument
@@ -736,6 +746,8 @@ pub enum CommandNeedArgument {
     RemoveVersion,
     Derivations,
     DerivationsTitle,
+    MetaDefaultFileName,
+    MetaDefaultFileVersion,
 }
 
 /// Enum listing command line parser errors conserning an unsuitable key argument
