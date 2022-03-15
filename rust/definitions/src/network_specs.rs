@@ -9,6 +9,46 @@
 //! [`ShortSpecs`] is the minimal [`NetworkSpecs`] subset needed to properly 
 //! format decoded transactions.  
 //! 
+//! # Verifiers
+//! Signer is expected to be safe to use as long as the information uploaded into 
+//! it through air-gap is the correct one.
+//!
+//! Damaged network specs or network metadata could result in transactions 
+//! being parsed incorrectly.
+//!
+//! Verifier system is introduced to have important transferrable data signed by 
+//! a trusted party to exclude accidental or intentional errors.
+//! 
+//! ## Verifiers of data entering the Signer
+//! The data scanned into Signer has an associated [`Verifier`].
+//! If the information is verified, [`Verifier`] is `Some(VerifierValue)`.
+//! If the information is not verified, [`Verifier`] is `None`.
+//!
+//! Payloads with verified data contain trusted party public key and signature
+//! for the data transferred, that are checked when the data is processed in Signer.
+//! Unverified data gets processed as is, without any verification. Unverified 
+//! data should be used cautiously, and avoided unless absolutely necessary.
+//! 
+//! [`VerifierValue`] is public key of the trusted party using a certain ecnryption
+//! algorithm. At this moment, only `Standard` variant supporting
+//! [`MultiSigner`](https://docs.rs/sp-runtime/6.0.0/sp_runtime/enum.MultiSigner.html)
+//! is available.
+//!
+//! ## Verifiers of data already in the Signer
+//! `GeneralVerifier` is the default [`Verifier`] known to the Signer.
+//! It is the data source the Signer relies upon the most.
+//!
+//! `GeneralVerifier` is set up during Signer initialization, and is by default
+//! Parity-associated key. `GeneralVerifier` value is stored in `SETTREE` tree
+//! of the cold database under key `GENERALVERIFIER`.
+//!
+//! Users can remove existing `GeneralVerifier`, this will re-initialize
+//! Signer with `GeneralVerifier` set to `None` and wipe the Signer.
+//!
+//! `GeneralVerifier` is used for verification of default network specs,
+//! default networks metadata, and types information.
+//! Default networks are Polkadot, Kusama, and Westend.
+//!
 //! # `NetworkSpecs` in cold database
 //!
 //! [`NetworkSpecs`] are stored in `SPECSTREE` tree of the cold database,
