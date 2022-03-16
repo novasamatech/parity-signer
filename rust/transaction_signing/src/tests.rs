@@ -1479,4 +1479,217 @@ Identities: "#;
         fs::remove_dir_all(dbname).unwrap();
     }
 
+    #[test]
+    fn rococo_and_verifiers_1() {
+        let dbname = "for_tests/rococo_and_verifiers_1";
+        populate_cold_no_networks(dbname, verifier_alice_sr25519()).unwrap();
+        
+        // added rococo specs with ed25519, custom verifier
+        let line = fs::read_to_string("for_tests/add_specs_rococo-ed25519_Alice-ed25519.txt").unwrap();
+        let output = produce_output(&line.trim(), dbname);
+        if let Action::Stub(_, checksum, _) = output {handle_stub(checksum, dbname).unwrap();}
+        else {panic!("Wrong action: {:?}", output)}
+        
+        // added rococo specs with sr25519, custom verifier
+        let line = fs::read_to_string("for_tests/add_specs_rococo-sr25519_Alice-ed25519.txt").unwrap();
+        let output = produce_output(&line.trim(), dbname);
+        if let Action::Stub(_, checksum, _) = output {handle_stub(checksum, dbname).unwrap();}
+        else {panic!("Wrong action: {:?}", output)}
+        
+        let print = print_db_content(&dbname)
+            .replace(ED, r#"<ed>"#);
+        let expected_print = r#"Database contents:
+Metadata:
+Network Specs:
+	008027b0e1604364f6a7309d31ad60cdfb820666c3095b9f948c4a7d7894b6b3c184: rococo-ed25519 (rococo with ed25519)
+	018027b0e1604364f6a7309d31ad60cdfb820666c3095b9f948c4a7d7894b6b3c184: rococo-sr25519 (rococo with sr25519)
+Verifiers:
+	27b0e1604364f6a7309d31ad60cdfb820666c3095b9f948c4a7d7894b6b3c184: "type":"custom","details":{"public_key":"88dc3417d5058ec4b4503e0c12ea1a0a89be200fe98922423d4334014fa6b0ee","identicon":"<ed>","encryption":"ed25519"}
+General Verifier: public key: d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d, encryption: sr25519
+Identities: "#;
+        assert!(print == expected_print, "Received: \n{}", print);
+        
+        // remove only one of the rococo's
+        remove_network(&NetworkSpecsKey::from_parts(&hex::decode("27b0e1604364f6a7309d31ad60cdfb820666c3095b9f948c4a7d7894b6b3c184").unwrap(), &Encryption::Sr25519), dbname).unwrap();
+        
+        let print = print_db_content(&dbname);
+        let expected_print = r#"Database contents:
+Metadata:
+Network Specs:
+Verifiers:
+	27b0e1604364f6a7309d31ad60cdfb820666c3095b9f948c4a7d7894b6b3c184: network inactivated
+General Verifier: public key: d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d, encryption: sr25519
+Identities: "#;
+        assert!(print == expected_print, "Received: \n{}", print);
+
+        fs::remove_dir_all(dbname).unwrap();
+    }
+    
+    #[test]
+    fn rococo_and_verifiers_2() {
+        let dbname = "for_tests/rococo_and_verifiers_2";
+        populate_cold_no_networks(dbname, verifier_alice_sr25519()).unwrap();
+
+        // added rococo specs with sr25519, general verifier, specified one
+        let line = fs::read_to_string("for_tests/add_specs_rococo-sr25519_Alice-sr25519.txt").unwrap();
+        let output = produce_output(&line.trim(), dbname);
+        if let Action::Stub(_, checksum, _) = output {handle_stub(checksum, dbname).unwrap();}
+        else {panic!("Wrong action: {:?}", output)}
+        
+        let print = print_db_content(&dbname)
+            .replace(ALICE_SR_ALICE, r#"<alice_sr25519_//Alice>"#);
+        let expected_print = r#"Database contents:
+Metadata:
+Network Specs:
+	018027b0e1604364f6a7309d31ad60cdfb820666c3095b9f948c4a7d7894b6b3c184: rococo-sr25519 (rococo with sr25519)
+Verifiers:
+	27b0e1604364f6a7309d31ad60cdfb820666c3095b9f948c4a7d7894b6b3c184: "type":"general","details":{"public_key":"d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d","identicon":"<alice_sr25519_//Alice>","encryption":"sr25519"}
+General Verifier: public key: d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d, encryption: sr25519
+Identities: "#;
+        assert!(print == expected_print, "Received: \n{}", print);
+        
+        // remove it
+        remove_network(&NetworkSpecsKey::from_parts(&hex::decode("27b0e1604364f6a7309d31ad60cdfb820666c3095b9f948c4a7d7894b6b3c184").unwrap(), &Encryption::Sr25519), dbname).unwrap();
+        
+        let print = print_db_content(&dbname)
+            .replace(ALICE_SR_ALICE, r#"<alice_sr25519_//Alice>"#);
+        let expected_print = r#"Database contents:
+Metadata:
+Network Specs:
+Verifiers:
+	27b0e1604364f6a7309d31ad60cdfb820666c3095b9f948c4a7d7894b6b3c184: "type":"general","details":{"public_key":"d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d","identicon":"<alice_sr25519_//Alice>","encryption":"sr25519"}
+General Verifier: public key: d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d, encryption: sr25519
+Identities: "#;
+        assert!(print == expected_print, "Received: \n{}", print);
+
+        fs::remove_dir_all(dbname).unwrap();
+    }
+    
+    #[test]
+    fn rococo_and_verifiers_3() {
+        let dbname = "for_tests/rococo_and_verifiers_3";
+        populate_cold_no_networks(dbname, verifier_alice_sr25519()).unwrap();
+
+        // added rococo specs with sr25519, custom verifier None
+        let line = fs::read_to_string("for_tests/add_specs_rococo-sr25519_unverified.txt").unwrap();
+        let output = produce_output(&line.trim(), dbname);
+        if let Action::Stub(_, checksum, _) = output {handle_stub(checksum, dbname).unwrap();}
+        else {panic!("Wrong action: {:?}", output)}
+        
+        let print = print_db_content(&dbname)
+            .replace(EMPTY_PNG, r#"<empty>"#);
+        let expected_print = r#"Database contents:
+Metadata:
+Network Specs:
+	018027b0e1604364f6a7309d31ad60cdfb820666c3095b9f948c4a7d7894b6b3c184: rococo-sr25519 (rococo with sr25519)
+Verifiers:
+	27b0e1604364f6a7309d31ad60cdfb820666c3095b9f948c4a7d7894b6b3c184: "type":"custom","details":{"public_key":"","identicon":"<empty>","encryption":"none"}
+General Verifier: public key: d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d, encryption: sr25519
+Identities: "#;
+        assert!(print == expected_print, "Received: \n{}", print);
+        
+        // remove it
+        remove_network(&NetworkSpecsKey::from_parts(&hex::decode("27b0e1604364f6a7309d31ad60cdfb820666c3095b9f948c4a7d7894b6b3c184").unwrap(), &Encryption::Sr25519), dbname).unwrap();
+        
+        let print = print_db_content(&dbname)
+            .replace(EMPTY_PNG, r#"<empty>"#);
+        let expected_print = r#"Database contents:
+Metadata:
+Network Specs:
+Verifiers:
+	27b0e1604364f6a7309d31ad60cdfb820666c3095b9f948c4a7d7894b6b3c184: "type":"custom","details":{"public_key":"","identicon":"<empty>","encryption":"none"}
+General Verifier: public key: d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d, encryption: sr25519
+Identities: "#;
+        assert!(print == expected_print, "Received: \n{}", print);
+
+        fs::remove_dir_all(dbname).unwrap();
+    }
+
+    #[test]
+    fn rococo_and_verifiers_4() {
+        let dbname = "for_tests/rococo_and_verifiers_4";
+        populate_cold_no_networks(dbname, verifier_alice_sr25519()).unwrap();
+
+        // added rococo specs with sr25519, custom verifier None
+        let line = fs::read_to_string("for_tests/add_specs_rococo-sr25519_unverified.txt").unwrap();
+        let output = produce_output(&line.trim(), dbname);
+        if let Action::Stub(_, checksum, _) = output {handle_stub(checksum, dbname).unwrap();}
+        else {panic!("Wrong action: {:?}", output)}
+        
+        let print = print_db_content(&dbname)
+            .replace(EMPTY_PNG, r#"<empty>"#);
+        let expected_print = r#"Database contents:
+Metadata:
+Network Specs:
+	018027b0e1604364f6a7309d31ad60cdfb820666c3095b9f948c4a7d7894b6b3c184: rococo-sr25519 (rococo with sr25519)
+Verifiers:
+	27b0e1604364f6a7309d31ad60cdfb820666c3095b9f948c4a7d7894b6b3c184: "type":"custom","details":{"public_key":"","identicon":"<empty>","encryption":"none"}
+General Verifier: public key: d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d, encryption: sr25519
+Identities: "#;
+        assert!(print == expected_print, "Received: \n{}", print);
+        
+        // added rococo specs with sr25519, general verifier
+        let line = fs::read_to_string("for_tests/add_specs_rococo-sr25519_Alice-sr25519.txt").unwrap();
+        let output = produce_output(&line.trim(), dbname);
+        if let Action::Stub(_, checksum, _) = output {handle_stub(checksum, dbname).unwrap();}
+        else {panic!("Wrong action: {:?}", output)}
+        
+        let print = print_db_content(&dbname)
+            .replace(ALICE_SR_ALICE, r#"<alice_sr25519_//Alice>"#);
+        let expected_print = r#"Database contents:
+Metadata:
+Network Specs:
+	018027b0e1604364f6a7309d31ad60cdfb820666c3095b9f948c4a7d7894b6b3c184: rococo-sr25519 (rococo with sr25519)
+Verifiers:
+	27b0e1604364f6a7309d31ad60cdfb820666c3095b9f948c4a7d7894b6b3c184: "type":"general","details":{"public_key":"d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d","identicon":"<alice_sr25519_//Alice>","encryption":"sr25519"}
+General Verifier: public key: d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d, encryption: sr25519
+Identities: "#;
+        assert!(print == expected_print, "Received: \n{}", print);
+
+        fs::remove_dir_all(dbname).unwrap();
+    }
+
+    #[test]
+    fn rococo_and_verifiers_5() {
+        let dbname = "for_tests/rococo_and_verifiers_5";
+        populate_cold_no_networks(dbname, verifier_alice_sr25519()).unwrap();
+
+        // added rococo specs with sr25519, custom verifier
+        let line = fs::read_to_string("for_tests/add_specs_rococo-sr25519_Alice-ed25519.txt").unwrap();
+        let output = produce_output(&line.trim(), dbname);
+        if let Action::Stub(_, checksum, _) = output {handle_stub(checksum, dbname).unwrap();}
+        else {panic!("Wrong action: {:?}", output)}
+        
+        let print = print_db_content(&dbname)
+            .replace(ED, r#"<ed>"#);
+        let expected_print = r#"Database contents:
+Metadata:
+Network Specs:
+	018027b0e1604364f6a7309d31ad60cdfb820666c3095b9f948c4a7d7894b6b3c184: rococo-sr25519 (rococo with sr25519)
+Verifiers:
+	27b0e1604364f6a7309d31ad60cdfb820666c3095b9f948c4a7d7894b6b3c184: "type":"custom","details":{"public_key":"88dc3417d5058ec4b4503e0c12ea1a0a89be200fe98922423d4334014fa6b0ee","identicon":"<ed>","encryption":"ed25519"}
+General Verifier: public key: d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d, encryption: sr25519
+Identities: "#;
+        assert!(print == expected_print, "Received: \n{}", print);
+        
+        // added rococo specs with sr25519, general verifier
+        let line = fs::read_to_string("for_tests/add_specs_rococo-sr25519_Alice-sr25519.txt").unwrap();
+        let output = produce_output(&line.trim(), dbname);
+        if let Action::Stub(_, checksum, _) = output {handle_stub(checksum, dbname).unwrap();}
+        else {panic!("Wrong action: {:?}", output)}
+        
+        let print = print_db_content(&dbname)
+            .replace(ALICE_SR_ALICE, r#"<alice_sr25519_//Alice>"#);
+        let expected_print = r#"Database contents:
+Metadata:
+Network Specs:
+	018027b0e1604364f6a7309d31ad60cdfb820666c3095b9f948c4a7d7894b6b3c184: rococo-sr25519 (rococo with sr25519)
+Verifiers:
+	27b0e1604364f6a7309d31ad60cdfb820666c3095b9f948c4a7d7894b6b3c184: "type":"general","details":{"public_key":"d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d","identicon":"<alice_sr25519_//Alice>","encryption":"sr25519"}
+General Verifier: public key: d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d, encryption: sr25519
+Identities: "#;
+        assert!(print == expected_print, "Received: \n{}", print);
+
+        fs::remove_dir_all(dbname).unwrap();
+    }
 }
