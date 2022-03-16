@@ -101,7 +101,7 @@ fn create_camera(camera_index: i32, width: u32, height: u32) -> anyhow::Result<v
     let mut frame = Mat::default();
 
     match camera.read(&mut frame) {
-        Ok(_) if frame.size()?.width > 0 => Ok(camera),
+        Ok(_) if frame.size()?.width >= 0 => Ok(camera),
         Ok(_) => Err(anyhow!("Zero frame size.")),
         Err(e) => Err(anyhow!("Can`t read camera. {}", e)),
     }
