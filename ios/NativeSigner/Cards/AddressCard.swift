@@ -28,7 +28,7 @@ struct AddressCard: View {
                             Spacer()
                             HStack{
                                 Spacer()
-                                Image(systemName: address.multiselect ? "checkmark.circle.fill" : "circle").imageScale(.large)
+                                Image(systemName: address.multiselect == true ? "checkmark.circle.fill" : "circle").imageScale(.large)
                             }
                         }
                     }

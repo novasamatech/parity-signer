@@ -288,6 +288,7 @@ extension SignerDataModel {
                     }
                     signer_destroy_string(res!)
                 } else {
+                    signer_destroy_string(err_ptr.pointee.message)
                     print("pushing button failed")
                 }
             }
