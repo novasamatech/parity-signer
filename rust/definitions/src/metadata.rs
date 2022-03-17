@@ -1,3 +1,21 @@
+//! Network metadata and related types
+//!
+//! The main purpose of the Signer is to generate signatures for transactions.
+//! Signer reads the transactions as QR codes with SCALE-encoded 
+//! information.
+//! Any transaction before user is able to sign it must be decoded. 
+//!
+//! Transaction decoding uses network metadata, and Signer needs latest 
+//! available network metadata to parse freshly generated transactions.  
+//! 
+//! New network metadata could be added to Signer through scanning `load_metadata` 
+//! QR code for the network metadata. Signer allows loading new metadata only if 
+//! the network has network specs in the database and the incoming `load_metadata` 
+//! payload is signed by the verifier already associated with the network.  
+//!
+//! Metadata is stored both in cold and in hot databases tree `METATREE` as 
+//! SCALE-encoded [`MetaValues`] under key [`MetaKey`].  
+
 use frame_metadata::{decode_different::DecodeDifferent, v14::RuntimeMetadataV14, RuntimeMetadata};
 use parity_scale_codec::{Decode, Encode};
 #[cfg(feature = "active")]
@@ -32,28 +50,57 @@ use crate::{
     keyring::MetaKey,
 };
 
-/// Struct for the network information extracted from the metadata:
-/// name, version, optional base58 prefix
+/// Network information extracted from the metadata: name, version, optional 
+/// base58 prefix, warning about extensions incompatible with transaction 
+/// parsing for RuntimeMetadata with version 14 and above
 #[derive(Decode, Encode, PartialEq)]
 pub struct MetaInfo {
+    /// Network name, from metadata `Version` constant  
     pub name: String,
+    /// Network version, from in metadata `Version` constant  
     pub version: u32,
+    /// Network base58 prefix, could be encountered in metadata `SS58Prefix`
+    /// constant  
+    /// 
+    /// If `SS58Prefix` constant is present in metadata, the prefix derived 
+    /// from it is expected to match `base58prefix` from `NetworkSpecs`.  
     pub optional_base58prefix: Option<u16>,
+    /// Flag to indicate that extrinsic set from metadata with 
+    /// [`RuntimeMetadataV14`](https://docs.rs/frame-metadata/15.0.0/frame_metadata/v14/struct.RuntimeMetadataV14.html)
+    /// is insufficient for transaction decoding  
     pub warn_incomplete_extensions: bool,
 }
 
-/// Struct to store the metadata values (network name, network
-/// version, optional base58 prefix from metadata, full metadata as Vec<u8>)
+/// Metadata values: name, version, optional base58 prefix, warning about 
+/// extensions incompatible with transaction parsing for RuntimeMetadata with 
+/// version 14 and above, and metadata itself as raw `Vec<u8>`
 #[derive(PartialEq, Clone)]
 pub struct MetaValues {
+    /// Network name, from metadata `Version` constant  
     pub name: String,
+    /// Network version, from in metadata `Version` constant  
     pub version: u32,
+    /// Network base58 prefix, could be encountered in metadata `SS58Prefix`
+    /// constant  
+    /// 
+    /// If `SS58Prefix` constant is present in metadata, the prefix derived 
+    /// from it is expected to match `base58prefix` from `NetworkSpecs`.  
     pub optional_base58prefix: Option<u16>,
+    /// Flag to indicate that extrinsic set from metadata with 
+    /// [`RuntimeMetadataV14`](https://docs.rs/frame-metadata/15.0.0/frame_metadata/v14/struct.RuntimeMetadataV14.html)
+    /// is insufficient for transaction decoding  
     pub warn_incomplete_extensions: bool,
+    /// raw metadata
     pub meta: Vec<u8>,
 }
 
 impl MetaValues {
+    /// Generates [`MetaValues`] from value extracted from database tree 
+    /// `METATREE` either in cold or in hot database using known associated 
+    /// network name and network version  
+    ///
+    /// Checks that input name and version match the ones in metadata `Version`
+    /// constant.  
     pub fn from_entry_name_version_checked<T: ErrorSource>(
         name: &str,
         version: u32,
@@ -81,6 +128,12 @@ impl MetaValues {
         }
         Ok(meta_values)
     }
+    
+    /// Gets [`MetaValues`] from either cold or hot database tree `METATREE`
+    /// (key, value) entry  
+    ///
+    /// Checks that name and version from [`MetaKey`] match the ones in metadata 
+    /// `Version` constant.  
     pub fn from_entry_checked<T: ErrorSource>(
         (meta_key_vec, meta_encoded): (IVec, IVec),
     ) -> Result<Self, T::Error> {

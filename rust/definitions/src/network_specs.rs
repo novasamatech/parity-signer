@@ -1,4 +1,4 @@
-//! Network specs and verifier related types  
+//! Network specs, verifiers, and related types  
 //!
 //! Signer could be used only for networks introduced to the database.  
 //!
@@ -289,7 +289,7 @@ use crate::{
     print::export_complex_single,
 };
 
-/// Network parameters stored in the **cold** database 
+/// Network parameters stored SCALE-encoded in the **cold** database 
 /// `SPECSTREE` tree under [`NetworkSpecsKey`]
 ///
 /// These network parameters must be in Signer database for the Signer to be 
@@ -326,7 +326,7 @@ pub struct NetworkSpecs {
     pub unit: String,
 }
 
-/// Network parameters stored in the **hot** database 
+/// Network parameters stored SCALE-encoded in the **hot** database 
 /// `SPECSTREEPREP` tree under [`NetworkSpecsKey`] and sent as QR code 
 /// in `add_specs` messages
 ///
@@ -379,6 +379,7 @@ pub struct ShortSpecs {
 }
 
 impl NetworkSpecs {
+    /// Prints network specs in json format
     #[cfg(feature = "signer")]
     pub fn show(
         &self,
@@ -387,17 +388,9 @@ impl NetworkSpecs {
     ) -> String {
         format!("\"base58prefix\":\"{}\",\"color\":\"{}\",\"decimals\":\"{}\",\"encryption\":\"{}\",\"genesis_hash\":\"{}\",\"logo\":\"{}\",\"name\":\"{}\",\"order\":\"{}\",\"path_id\":\"{}\",\"secondary_color\":\"{}\",\"title\":\"{}\",\"unit\":\"{}\",\"current_verifier\":{}", &self.base58prefix, &self.color, &self.decimals, &self.encryption.show(), hex::encode(&self.genesis_hash), &self.logo, &self.name, &self.order, &self.path_id, &self.secondary_color, &self.title, &self.unit, export_complex_single(valid_current_verifier, |a| a.show(general_verifier)))
     }
+
+    /// Makes [`NetworkSpecsToSend`] from [`NetworkSpecs`]
     #[cfg(feature = "signer")]
-    pub fn print_single(&self) -> String {
-        format!(
-            "\"color\":\"{}\",\"logo\":\"{}\",\"secondary_color\":\"{}\",\"title\":\"{}\"",
-            &self.color, &self.logo, &self.secondary_color, &self.title
-        )
-    }
-    #[cfg(feature = "signer")]
-    pub fn print_as_set_part(&self) -> String {
-        format!("\"key\":\"{}\",\"color\":\"{}\",\"logo\":\"{}\",\"order\":\"{}\",\"secondary_color\":\"{}\",\"title\":\"{}\"", hex::encode(NetworkSpecsKey::from_parts(&self.genesis_hash, &self.encryption).key()), &self.color, &self.logo, &self.order, &self.secondary_color, &self.title)
-    }
     pub fn to_send(&self) -> NetworkSpecsToSend {
         NetworkSpecsToSend {
             base58prefix: self.base58prefix,
@@ -413,6 +406,9 @@ impl NetworkSpecs {
             unit: self.unit.to_string(),
         }
     }
+
+    /// Makes [`ShortSpecs`] from [`NetworkSpecs`]
+    #[cfg(feature = "signer")]
     pub fn short(&self) -> ShortSpecs {
         ShortSpecs {
             base58prefix: self.base58prefix,
@@ -422,6 +418,12 @@ impl NetworkSpecs {
             unit: self.unit.to_string(),
         }
     }
+
+    /// Gets [`NetworkSpecs`] from [`NetworkSpecsKey`] and associated value 
+    /// from cold database tree `SPECSTREE`  
+    ///
+    /// Checks that there is no genesis hash or encryption mismatch between 
+    /// key and specs content.  
     pub fn from_entry_with_key_checked<T: ErrorSource>(
         network_specs_key: &NetworkSpecsKey,
         network_specs_encoded: IVec,
@@ -446,6 +448,12 @@ impl NetworkSpecs {
         }
         Ok(network_specs)
     }
+
+    /// Gets [`NetworkSpecs`] from cold database tree `SPECSTREE` (key, value) 
+    /// entry  
+    ///
+    /// Checks that there is no genesis hash or encryption mismatch between 
+    /// key and specs content.  
     pub fn from_entry_checked<T: ErrorSource>(
         (network_specs_key_vec, network_specs_encoded): (IVec, IVec),
     ) -> Result<Self, T::Error> {
@@ -455,10 +463,19 @@ impl NetworkSpecs {
 }
 
 impl NetworkSpecsToSend {
+    /// Prints network specs in json format
     #[cfg(feature = "signer")]
     pub fn show(&self) -> String {
         format!("\"base58prefix\":\"{}\",\"color\":\"{}\",\"decimals\":\"{}\",\"encryption\":\"{}\",\"genesis_hash\":\"{}\",\"logo\":\"{}\",\"name\":\"{}\",\"path_id\":\"{}\",\"secondary_color\":\"{}\",\"title\":\"{}\",\"unit\":\"{}\"", &self.base58prefix, &self.color, &self.decimals, &self.encryption.show(), hex::encode(&self.genesis_hash), &self.logo, &self.name, &self.path_id, &self.secondary_color, &self.title, &self.unit)
     }
+
+    /// Makes [`NetworkSpecs`] from [`NetworkSpecsToSend`], 
+    /// needs `order` input
+    ///
+    /// `order` is network number on the list of networks in Signer.
+    ///
+    /// This happens when Signer receives new network specs through QR update.
+    #[cfg(feature = "signer")]
     pub fn to_store(&self, order: u8) -> NetworkSpecs {
         NetworkSpecs {
             base58prefix: self.base58prefix,
@@ -475,6 +492,12 @@ impl NetworkSpecsToSend {
             unit: self.unit.to_string(),
         }
     }
+
+    /// Gets [`NetworkSpecsToSend`] from [`NetworkSpecsKey`] and associated 
+    /// value from hot database tree `SPECSTREEPREP`  
+    ///
+    /// Checks that there is no genesis hash or encryption mismatch between 
+    /// key and specs content.  
     #[cfg(feature = "active")]
     pub fn from_entry_with_key_checked(
         network_specs_key: &NetworkSpecsKey,
@@ -508,6 +531,12 @@ impl NetworkSpecsToSend {
         }
         Ok(network_specs_to_send)
     }
+
+    /// Gets [`NetworkSpecsToSend`] from hot database tree `SPECSTREEPREP` 
+    /// (key, value) entry  
+    ///
+    /// Checks that there is no genesis hash or encryption mismatch between 
+    /// key and specs content.  
     #[cfg(feature = "active")]
     pub fn from_entry_checked(
         (network_specs_key_vec, network_specs_to_send_encoded): (IVec, IVec),
@@ -517,24 +546,34 @@ impl NetworkSpecsToSend {
     }
 }
 
+/// Network properties that must be fetched with rpc call for properties
+/// in each compatible network
 #[derive(Decode, Encode, PartialEq, Debug)]
+#[cfg(feature = "active")]
 pub struct NetworkProperties {
     pub base58prefix: u16,
     pub decimals: u8,
     pub unit: String,
 }
 
-/// Verifier for both network metadata and for types information
+/// Verifier information
+///
+/// Either real verifier or information that there is no verifier.
 #[derive(Decode, Encode, PartialEq, Debug, Clone)]
 pub struct Verifier(pub Option<VerifierValue>);
 
+/// Information on known and existing verifier  
+///
+/// Verifier public key with associated encryption algorithm.
 #[derive(Decode, Encode, PartialEq, Debug, Clone)]
 pub enum VerifierValue {
+    /// public key for standard substrate-compatible encryption algorithms  
     Standard(MultiSigner),
 }
 
 #[cfg(feature = "signer")]
 impl Verifier {
+    /// Display [`Verifier`] in json-like format, for json exports  
     pub fn show_card(&self) -> String {
         match &self.0 {
             Some(a) => a.show_card(),
@@ -544,6 +583,8 @@ impl Verifier {
             ),
         }
     }
+
+    /// Display [`Verifier`] in human-readable format, for errors  
     pub fn show_error(&self) -> String {
         match &self.0 {
             Some(a) => a.show_error(),
@@ -554,6 +595,7 @@ impl Verifier {
 
 #[cfg(feature = "signer")]
 impl VerifierValue {
+    /// Display [`VerifierValue`] in json-like format, for json exports  
     pub fn show_card(&self) -> String {
         match &self {
             VerifierValue::Standard(m) => {
@@ -569,6 +611,8 @@ impl VerifierValue {
             }
         }
     }
+
+    /// Display [`VerifierValue`] in human-readable format, for errors  
     pub fn show_error(&self) -> String {
         match &self {
             VerifierValue::Standard(MultiSigner::Ed25519(x)) => {
@@ -584,24 +628,31 @@ impl VerifierValue {
     }
 }
 
-/// Current network verifier.
-/// Could be general verifier (by default, for networks: kusama, polkadot, westend, rococo),
-/// or could be custom verifier.
+/// Current network verifier
 #[derive(Decode, Encode, PartialEq, Debug, Clone)]
 pub enum CurrentVerifier {
+    /// Verifier is valid, Signer can use the network
     Valid(ValidCurrentVerifier),
+    /// Verifier is invalid, Signer would not be able to use the network 
+    /// without wipe and reset
     Dead,
 }
 
-/// Possible variants of valid current network verifier.
+/// Possible variants of valid current network verifier
+///
+/// Could be general verifier (by default for networks Polkadot, Kusama, Westend),
+/// or custom verifier.
 #[derive(Decode, Encode, PartialEq, Debug, Clone)]
 pub enum ValidCurrentVerifier {
+    /// Network has general verifier
     General,
+    /// Network has some other verifier, different from the general one
     Custom(Verifier),
 }
 
 #[cfg(feature = "signer")]
 impl ValidCurrentVerifier {
+    /// Display [`ValidCurrentVerifier`] in json-like format, for json exports  
     pub fn show(&self, general_verifier: &Verifier) -> String {
         match &self {
             ValidCurrentVerifier::General => format!(

@@ -70,6 +70,7 @@ impl AddressDetails {
         }
         Ok((multisigner, address_details))
     }
+
     /// Gets ([`MultiSigner`](https://docs.rs/sp-runtime/6.0.0/sp_runtime/enum.MultiSigner.html),
     /// [`AddressDetails`]) tuple from database `ADDRTREE` (key, value) entry.  
     ///
@@ -80,6 +81,7 @@ impl AddressDetails {
         let address_key = AddressKey::from_ivec(&address_key_vec);
         AddressDetails::process_entry_with_key_checked::<T>(&address_key, address_details_encoded)
     }
+
     /// Gets [`AddressDetails`] from [`AddressKey`] and associated value from database `ADDRTREE`.  
     ///
     /// Checks that there is no encryption mismatch.
@@ -93,6 +95,7 @@ impl AddressDetails {
         )?;
         Ok(address_details)
     }
+
     /// Checks if the [`AddressDetails`] have empty derivation path (i.e. 
     /// derivation path is empty and there is no password).  
     /// 

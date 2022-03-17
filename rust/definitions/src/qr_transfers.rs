@@ -59,10 +59,12 @@ impl ContentLoadMeta {
             .encode(),
         )
     }
+
     /// Transform `&[u8]` slice into [`ContentLoadMeta`].
     pub fn from_slice(slice: &[u8]) -> Self {
         Self(slice.to_vec())
     }
+
     /// Get metadata `Vec<u8>` from [`ContentLoadMeta`].
     pub fn meta<T: ErrorSource>(&self) -> Result<Vec<u8>, T::Error> {
         match <DecodedContentLoadMeta>::decode(&mut &self.0[..]) {
@@ -70,6 +72,7 @@ impl ContentLoadMeta {
             Err(_) => Err(<T>::transfer_content_error(TransferContent::LoadMeta)),
         }
     }
+
     /// Get genesis hash `[u8; 32]` from [`ContentLoadMeta`].
     pub fn genesis_hash<T: ErrorSource>(&self) -> Result<[u8; 32], T::Error> {
         match <DecodedContentLoadMeta>::decode(&mut &self.0[..]) {
@@ -77,6 +80,7 @@ impl ContentLoadMeta {
             Err(_) => Err(<T>::transfer_content_error(TransferContent::LoadMeta)),
         }
     }
+
     /// Get metadata `Vec<u8>` and genesis hash `[u8; 32]` from [`ContentLoadMeta`] as a tuple.
     pub fn meta_genhash<T: ErrorSource>(&self) -> Result<(Vec<u8>, [u8; 32]), T::Error> {
         match <DecodedContentLoadMeta>::decode(&mut &self.0[..]) {
@@ -84,6 +88,7 @@ impl ContentLoadMeta {
             Err(_) => Err(<T>::transfer_content_error(TransferContent::LoadMeta)),
         }
     }
+
     /// Write [`ContentLoadMeta`] into file that could be signed by the verifier.
     #[cfg(feature = "active")]
     pub fn write(&self, filename: &str) -> Result<(), ErrorActive> {
@@ -92,10 +97,12 @@ impl ContentLoadMeta {
             Err(e) => Err(ErrorActive::Output(e)),
         }
     }
+
     /// Transform [`ContentLoadMeta`] into `Vec<u8>` that could be signed by the verifier.
     pub fn to_sign(&self) -> Vec<u8> {
         self.0.to_vec()
     }
+
     /// Transform [`ContentLoadMeta`] into `Vec<u8>` that is concatenated with
     /// other parts of the QR code.
     ///
@@ -126,10 +133,12 @@ impl ContentAddSpecs {
             .encode(),
         )
     }
+
     /// Transform `&[u8]` slice into [`ContentAddSpecs`].
     pub fn from_slice(slice: &[u8]) -> Self {
         Self(slice.to_vec())
     }
+
     /// Get network specs [`NetworkSpecsToSend`] from [`ContentAddSpecs`].
     pub fn specs<T: ErrorSource>(&self) -> Result<NetworkSpecsToSend, T::Error> {
         match <DecodedContentAddSpecs>::decode(&mut &self.0[..]) {
@@ -137,6 +146,7 @@ impl ContentAddSpecs {
             Err(_) => Err(<T>::transfer_content_error(TransferContent::AddSpecs)),
         }
     }
+
     /// Write [`ContentAddSpecs`] into file that could be signed by the verifier.
     #[cfg(feature = "active")]
     pub fn write(&self, filename: &str) -> Result<(), ErrorActive> {
@@ -145,10 +155,12 @@ impl ContentAddSpecs {
             Err(e) => Err(ErrorActive::Output(e)),
         }
     }
+
     /// Transform [`ContentAddSpecs`] into `Vec<u8>` that could be signed by the verifier.
     pub fn to_sign(&self) -> Vec<u8> {
         self.0.to_vec()
     }
+
     /// Transform [`ContentAddSpecs`] into `Vec<u8>` that is concatenated with
     /// other parts of the QR code.
     ///
@@ -188,10 +200,12 @@ impl ContentLoadTypes {
             .encode(),
         )
     }
+
     /// Transform `&[u8]` slice into [`ContentLoadTypes`].  
     pub fn from_slice(slice: &[u8]) -> Self {
         Self(slice.to_vec())
     }
+
     /// Get types information `Vec<TypeEntry>` from [`ContentLoadTypes`].  
     pub fn types<T: ErrorSource>(&self) -> Result<Vec<TypeEntry>, T::Error> {
         match <DecodedContentLoadTypes>::decode(&mut &self.0[..]) {
@@ -199,6 +213,7 @@ impl ContentLoadTypes {
             Err(_) => Err(<T>::transfer_content_error(TransferContent::LoadTypes)),
         }
     }
+
     /// Write [`ContentLoadTypes`] into file that could be signed by the verifier.  
     #[cfg(feature = "active")]
     pub fn write(&self, filename: &str) -> Result<(), ErrorActive> {
@@ -207,14 +222,17 @@ impl ContentLoadTypes {
             Err(e) => Err(ErrorActive::Output(e)),
         }
     }
+
     /// Transform [`ContentLoadTypes`] into `Vec<u8>` to be put in the database.  
     pub fn store(&self) -> Vec<u8> {
         self.0.to_vec()
     }
+
     /// Transform [`ContentLoadTypes`] into `Vec<u8>` that could be signed by the verifier.  
     pub fn to_sign(&self) -> Vec<u8> {
         self.0.to_vec()
     }
+
     /// Transform [`ContentLoadTypes`] into `Vec<u8>` that is concatenated with
     /// other parts of the QR code.  
     ///
@@ -225,6 +243,7 @@ impl ContentLoadTypes {
     pub fn to_transfer(&self) -> Vec<u8> {
         self.encode()
     }
+
     /// Generate json consisting of types information hash and corresponding id pic  
     ///
     /// Types information hash is calculated for `Vec<u8>` of encoded types information,
@@ -279,10 +298,12 @@ impl ContentDerivations {
             .encode(),
         )
     }
+
     /// Transform `&[u8]` slice into [`ContentDerivations`].  
     pub fn from_slice(slice: &[u8]) -> Self {
         Self(slice.to_vec())
     }
+
     /// Get encryption [`Encryption`], genesis hash `[u8; 32]` and derivations `Vec<String>`
     /// from [`ContentDerivations`] as a tuple.
     #[cfg(feature = "signer")]
@@ -294,6 +315,7 @@ impl ContentDerivations {
             Err(_) => Err(ErrorSigner::Input(InputSigner::TransferDerivations)),
         }
     }
+
     /// Transform [`ContentDerivations`] into `Vec<u8>` that is concatenated with
     /// prelude to get the QR code data.  
     pub fn to_transfer(&self) -> Vec<u8> {
