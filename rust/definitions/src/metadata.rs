@@ -140,6 +140,11 @@ impl MetaValues {
         let (name, version) = MetaKey::from_ivec(&meta_key_vec).name_version::<T>()?;
         Self::from_entry_name_version_checked::<T>(&name, version, meta_encoded)
     }
+    
+    /// Gets [`MetaValues`] from raw metadata in `Vec<u8>` format
+    ///
+    /// Produces [`MetadataError`] if the metadata is somehow not suitable for 
+    /// use in Signer.
     pub fn from_slice_metadata(meta_slice: &[u8]) -> Result<Self, MetadataError> {
         let meta_info = info_from_metadata(&runtime_metadata_from_slice(meta_slice)?)?;
         Ok(Self {
@@ -150,6 +155,10 @@ impl MetaValues {
             meta: meta_slice.to_vec(),
         })
     }
+    
+    /// Gets [`MetaValues`] from `wasm` file
+    ///
+    /// Could be used to generate metadata updates before metadata release.
     #[cfg(feature = "active")]
     pub fn from_wasm_file(filename: &str) -> Result<Self, ErrorActive> {
         let metadata = convert_wasm_into_metadata(filename).map_err(|e| ErrorActive::Wasm {
@@ -161,7 +170,9 @@ impl MetaValues {
             wasm: Wasm::FaultyMetadata(e),
         })
     }
-    /// Function to get MetaValues from metadata in format of hex string.
+    
+    /// Gets [`MetaValues`] from raw hexadecimal metadata
+    ///
     /// Is used only on Active side, for:
     /// (a) default and test metadata loading;
     /// (b) decoding and evaluating fetched metadata;
@@ -191,6 +202,10 @@ impl MetaValues {
     }
 }
 
+/// Extracts raw metadata in `Vec<u8>` format from `wasm` file.
+///
+/// Is used only on Active side, to generate metadata updates before metadata
+/// release.
 #[cfg(feature = "active")]
 pub fn convert_wasm_into_metadata(filename: &str) -> Result<Vec<u8>, Wasm> {
     let buffer = std::fs::read(filename).map_err(Wasm::File)?;
@@ -209,6 +224,25 @@ pub fn convert_wasm_into_metadata(filename: &str) -> Result<Vec<u8>, Wasm> {
     <Vec<u8>>::decode(&mut &data[..]).map_err(|_| Wasm::DecodingMetadata)
 }
 
+/// Get [`MetaInfo`] from 
+/// [`RuntimeMetadata`](https://docs.rs/frame-metadata/15.0.0/frame_metadata/enum.RuntimeMetadata.html)
+///
+/// Searches `System` pallet within the metadata, gets from it `Version` and 
+/// optionally `SS58Prefix` constants. 
+///
+/// Produces [`MetaInfo`] if the metadata is suitable for the Signer, and 
+/// [`MetadataError`] if not.
+///
+/// `RuntimeMetadata` suitable for use in Signer:  
+///
+/// - must be of runtime version V12 or later  
+/// - must have 'System' pallet  
+/// - must have `Version` constant in `System` pallet, SCALE-decodeable  
+/// - can have `SS58Prefix` constant in `System` pallet, and if it does, the 
+/// constant must be SCALE-decodeable  
+/// - for [`RuntimeMetadataV14`](https://docs.rs/frame-metadata/15.0.0/frame_metadata/v14/struct.RuntimeMetadataV14.html)
+/// the extensions set must be decoding-compatible
+///
 /// Function to search metadata as RuntimeMetadata for system block,
 /// decode RuntimeVersion constant,
 /// output MetaInfo
