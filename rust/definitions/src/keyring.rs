@@ -1,3 +1,29 @@
+//! Key types and key generation for hot and cold databases
+//!
+//! Cold database has following trees:  
+//!
+//! - `SPECSTREE`, for network specs `NetworkSpecs`, with keys [`NetworkSpecsKey`]  
+//! - `VERIFIERS`, for network verifiers information, with keys [`VerifierKey`]  
+//! - `METATREE`, for network metadata, with keys [`MetaKey`] and available 
+//! prefix search with [`MetaKeyPrefix`]
+//! - `ADDRTREE`, for user addresses and associated public information, with keys 
+//! [`AddressKey`]  
+//! - `SETTREE`, for types information, Signer danger status, and general verifier
+//! - `TRANSACTION`, to temporarily store transaction information while waiting 
+//! for user approval
+//! - `HISTORY`, to keep log of all events happening in Signer, with keys 
+//! [`Order`]
+//!
+//! Hot database has following trees:  
+//!
+//! - `SPECSTREEPREP`, for network specs `NetworkSpecsToSend`, with keys 
+//! [`NetworkSpecsKey`]  
+//! - `METATREE`, for network metadata, with keys [`MetaKey`] and available 
+//! prefix search with [`MetaKeyPrefix`]
+//! - `SETTREE`, for types information
+//! - `ADDRESS_BOOK` for information needed to maintain hot database and send
+//! rpc calls to fetch network information
+//!
 use parity_scale_codec::{Decode, Encode};
 use sled::IVec;
 use sp_core::crypto::{Ss58AddressFormat, Ss58Codec};

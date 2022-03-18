@@ -40,7 +40,8 @@ pub struct AddressDetails {
 
 impl AddressDetails {
     /// Gets ([`MultiSigner`](https://docs.rs/sp-runtime/6.0.0/sp_runtime/enum.MultiSigner.html),
-    /// [`AddressDetails`]) tuple from [`AddressKey`] and associated value from database `ADDRTREE`.  
+    /// [`AddressDetails`]) tuple from [`AddressKey`] and associated value from 
+    /// database tree `ADDRTREE`.  
     ///
     /// Checks that there is no encryption mismatch.
     pub fn process_entry_with_key_checked<T: ErrorSource>(
@@ -72,7 +73,7 @@ impl AddressDetails {
     }
 
     /// Gets ([`MultiSigner`](https://docs.rs/sp-runtime/6.0.0/sp_runtime/enum.MultiSigner.html),
-    /// [`AddressDetails`]) tuple from database `ADDRTREE` (key, value) entry.  
+    /// [`AddressDetails`]) tuple from database tree `ADDRTREE` (key, value) entry.  
     ///
     /// Checks that there is no encryption mismatch.
     pub fn process_entry_checked<T: ErrorSource>(
@@ -82,7 +83,8 @@ impl AddressDetails {
         AddressDetails::process_entry_with_key_checked::<T>(&address_key, address_details_encoded)
     }
 
-    /// Gets [`AddressDetails`] from [`AddressKey`] and associated value from database `ADDRTREE`.  
+    /// Gets [`AddressDetails`] from [`AddressKey`] and associated value from 
+    /// database tree `ADDRTREE`.  
     ///
     /// Checks that there is no encryption mismatch.
     pub fn from_entry_with_key_checked<T: ErrorSource>(

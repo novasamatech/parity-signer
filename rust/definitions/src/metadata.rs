@@ -352,7 +352,6 @@ pub fn info_from_metadata(runtime_metadata: &RuntimeMetadata) -> Result<MetaInfo
 ///
 /// - must begin with b"meta"  
 /// - after that must be SCALE-encoded `RuntimeMetadata` with runtime version V12 or above
-///
 pub fn runtime_metadata_from_slice(meta: &[u8]) -> Result<RuntimeMetadata, MetadataError> {
     if !meta.starts_with(&[109, 101, 116, 97]) {
         return Err(MetadataError::NotMeta);
@@ -389,18 +388,37 @@ fn need_v14_warning(metadata_v14: &RuntimeMetadataV14) -> bool {
         && signed_extensions.get("CheckMortality") == Some(&1)) // no warning needed if each one encountered, and only once
 }
 
-/// Metadata as processed and already checked `RuntimeMetadata` with info 
-/// extracted from it, for transaction decoding
+/// Metadata as checked [`RuntimeMetadata`](https://docs.rs/frame-metadata/15.0.0/frame_metadata/enum.RuntimeMetadata.html) 
+/// with network info extracted from it, for transaction decoding
 #[cfg(feature = "signer")]
 pub struct MetaSetElement {
+    /// Network name, from metadata `Version` constant
     name: String,
+    /// Network version, from in metadata `Version` constant  
     version: u32,
+    /// Network base58 prefix, could be encountered in metadata `SS58Prefix`
+    /// constant  
+    /// 
+    /// If `SS58Prefix` constant is present in metadata, the prefix derived 
+    /// from it is expected to match `base58prefix` from `NetworkSpecs`.  
     optional_base58prefix: Option<u16>,
+    /// [`RuntimeMetadata`](https://docs.rs/frame-metadata/15.0.0/frame_metadata/enum.RuntimeMetadata.html)
+    /// [`MetaSetElement`] is successfully generated only if metadata is a 
+    /// suitable one
     runtime_metadata: RuntimeMetadata,
 }
 
 #[cfg(feature = "signer")]
 impl MetaSetElement {
+    /// Generates `MetaSetElement` from Signer database tree `METATREE` (key, value) 
+    /// entry  
+    ///
+    /// Checks that name and version from [`MetaKey`] match the ones in metadata 
+    /// `Version` constant.  
+    ///
+    /// Also checks that the metadata is suitable for use in Signer. Since the 
+    /// metadata already was accepted in the database at some point, errors here 
+    /// are very unlikely to happen and would indicate the database corruption
     pub fn from_entry((meta_key_vec, meta_encoded): (IVec, IVec)) -> Result<Self, ErrorSigner> {
         let (network_name, network_version) =
             MetaKey::from_ivec(&meta_key_vec).name_version::<Signer>()?;
@@ -445,39 +463,77 @@ impl MetaSetElement {
             runtime_metadata,
         })
     }
+
+    /// Gets network name
     pub fn name(&self) -> String {
         self.name.to_string()
     }
+    
+    /// Gets network version
     pub fn version(&self) -> u32 {
         self.version
     }
+    
+    /// Gets optional base58 prefix, if there is one in the metadata
     pub fn optional_base58prefix(&self) -> Option<u16> {
         self.optional_base58prefix
     }
+    
+    /// Gets runtime metadata, to be used in transcation decoding
     pub fn runtime_metadata(&self) -> &RuntimeMetadata {
         &self.runtime_metadata
     }
 }
 
-/// Struct to store network information needed for metadata and network specs fetching
+/// Network information needed for rpc calls in the network and for managing the
+/// hot database  
+///
+/// Hot database contains tree `ADDRESS_BOOK` with information needed to perform 
+/// rpc calls in networks and generate `load_metadata` and `add_specs` payloads.
+/// 
+/// `ADDRESS_BOOK` tree stores SCALE-encoded [`AddressBookEntry`] entries under 
+/// keys [`AddressBookKey`]
 #[derive(Decode, Encode, PartialEq)]
 #[cfg(feature = "active")]
 pub struct AddressBookEntry {
+    /// Network name, as it appears in `Version` constant in metadata  
+    /// 
+    /// If network data is queired through rpc call, retrieved metadata must
+    /// have exactly same network name in `Version` constant  
     pub name: String,
+    /// Network genesis hash  
+    ///
+    /// If network data is queried through rpc call, retrieved version must
+    /// be same as the one in address book  
     pub genesis_hash: [u8; 32],
+    /// Url address for rpc calls, with or without preferred port  
     pub address: String,
+    /// [`Encryption`] that is supported by the network  
     pub encryption: Encryption,
+    /// Address book entry is the default one  
+    ///
+    /// Default networks currently are Polkadot, Kusama, Westend with Sr25519
+    /// encryption  
     pub def: bool,
 }
 
 #[cfg(feature = "active")]
 impl AddressBookEntry {
+    /// Gets [`AddressBookEntry`] from from hot database tree `ADDRESS_BOOK` 
+    /// (key, value) entry.  
     pub fn from_entry(
         (address_book_key_encoded, address_book_entry_encoded): (IVec, IVec),
     ) -> Result<AddressBookEntry, ErrorActive> {
         let title = AddressBookKey::from_ivec(&address_book_key_encoded).title()?;
         AddressBookEntry::from_entry_with_title(&title, &address_book_entry_encoded)
     }
+
+    /// Gets network address book title and [`AddressBookEntry`] as a tuple from 
+    /// from hot database tree `ADDRESS_BOOK` (key, value) entry.  
+    ///
+    /// Network address book title **differs** from `title` in network specs. 
+    /// This is just a key in hot database `ADDRESS_BOOK`, and is not displayed 
+    /// anywhere else.  
     pub fn process_entry(
         (address_book_key_encoded, address_book_entry_encoded): (IVec, IVec),
     ) -> Result<(String, AddressBookEntry), ErrorActive> {
@@ -486,6 +542,9 @@ impl AddressBookEntry {
             AddressBookEntry::from_entry_with_title(&title, &address_book_entry_encoded)?;
         Ok((title, address_book_entry))
     }
+
+    /// Gets [`AddressBookEntry`] from network address book title and associated 
+    /// value from hot database tree `ADDRESS_BOOK`.  
     pub fn from_entry_with_title(
         title: &str,
         address_book_entry_encoded: &IVec,
