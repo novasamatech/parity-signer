@@ -35,21 +35,21 @@ pub fn find_meta_set(short_specs: &ShortSpecs, database_name: &str) -> Result<Ve
     let meta_key_prefix = MetaKeyPrefix::from_name(&short_specs.name);
     for x in metadata.scan_prefix(meta_key_prefix.prefix()).flatten() {
         let new_element = MetaSetElement::from_entry(x)?;
-        if let Some(found_now) = new_element.optional_base58prefix {
-            if found_now != short_specs.base58prefix {return Err(<Signer>::faulty_metadata(MetadataError::Base58PrefixSpecsMismatch{specs: short_specs.base58prefix, meta: found_now}, MetadataSource::Database{name: short_specs.name.to_string(), version: new_element.version}))}
+        if let Some(found_now) = new_element.optional_base58prefix() {
+            if found_now != short_specs.base58prefix {return Err(<Signer>::faulty_metadata(MetadataError::Base58PrefixSpecsMismatch{specs: short_specs.base58prefix, meta: found_now}, MetadataSource::Database{name: short_specs.name.to_string(), version: new_element.version()}))}
         }
         out.push(new_element);
     }
-    out.sort_by(|a, b| b.version.cmp(&a.version));
+    out.sort_by(|a, b| b.version().cmp(&a.version()));
     Ok(out)
 }
 
 pub fn bundle_from_meta_set_element <'a> (meta_set_element: &'a MetaSetElement, database_name: &'a str) -> Result<MetadataBundle <'a>, ErrorSigner> {
-    match meta_set_element.runtime_metadata {
-        RuntimeMetadata::V12(ref meta_v12) => Ok(MetadataBundle::Older{older_meta: OlderMeta::V12(meta_v12), types: get_types::<Signer>(database_name)?, network_version: meta_set_element.version}),
-        RuntimeMetadata::V13(ref meta_v13) => Ok(MetadataBundle::Older{older_meta: OlderMeta::V13(meta_v13), types: get_types::<Signer>(database_name)?, network_version: meta_set_element.version}),
-        RuntimeMetadata::V14(ref meta_v14) => Ok(MetadataBundle::Sci{meta_v14, network_version: meta_set_element.version}),
-        _ => Err(<Signer>::faulty_metadata(MetadataError::VersionIncompatible, MetadataSource::Database{name: meta_set_element.name.to_string(), version: meta_set_element.version})),
+    match meta_set_element.runtime_metadata() {
+        RuntimeMetadata::V12(ref meta_v12) => Ok(MetadataBundle::Older{older_meta: OlderMeta::V12(meta_v12), types: get_types::<Signer>(database_name)?, network_version: meta_set_element.version()}),
+        RuntimeMetadata::V13(ref meta_v13) => Ok(MetadataBundle::Older{older_meta: OlderMeta::V13(meta_v13), types: get_types::<Signer>(database_name)?, network_version: meta_set_element.version()}),
+        RuntimeMetadata::V14(ref meta_v14) => Ok(MetadataBundle::Sci{meta_v14, network_version: meta_set_element.version()}),
+        _ => Err(<Signer>::faulty_metadata(MetadataError::VersionIncompatible, MetadataSource::Database{name: meta_set_element.name(), version: meta_set_element.version()})),
     }
 }
 

@@ -67,9 +67,9 @@ pub (crate) fn parse_transaction (data_hex: &str, database_name: &str) -> Result
             if meta_set.is_empty() {return Err(ErrorSigner::Input(InputSigner::NoMetadata{name: network_specs.name}))}
             let mut found_solution = None;
             let mut error_collection: Vec<(String, u32, ParserError)> = Vec::new();
-            let latest_version = meta_set[0].version;
+            let latest_version = meta_set[0].version();
             for (i,x) in meta_set.iter().enumerate() {
-                let used_version = x.version;
+                let used_version = x.version();
                 match parse_set(&parser_data, &bundle_from_meta_set_element(x, database_name)?, &short_specs, optional_mortal_flag) {
                     Ok((method_cards_result, extensions_cards, method_vec, extensions_vec)) => {
                         if i>0 {
@@ -149,7 +149,7 @@ pub (crate) fn decode_signable_from_history (found_signable: &SignDisplay, datab
     let indent = 0;
     
     for x in meta_set.iter() {
-        let used_version = x.version;
+        let used_version = x.version();
         match parse_set(&parser_data, &bundle_from_meta_set_element(x, database_name)?, &short_specs, None) {
             Ok((method_cards_result, extensions_cards, _, _)) => {
                 match method_cards_result {

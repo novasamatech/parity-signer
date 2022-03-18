@@ -235,17 +235,14 @@ pub fn convert_wasm_into_metadata(filename: &str) -> Result<Vec<u8>, Wasm> {
 ///
 /// `RuntimeMetadata` suitable for use in Signer:  
 ///
-/// - must be of runtime version V12 or later  
+/// - must be of runtime version V12 or above  
 /// - must have 'System' pallet  
 /// - must have `Version` constant in `System` pallet, SCALE-decodeable  
 /// - can have `SS58Prefix` constant in `System` pallet, and if it does, the 
 /// constant must be SCALE-decodeable  
-/// - for [`RuntimeMetadataV14`](https://docs.rs/frame-metadata/15.0.0/frame_metadata/v14/struct.RuntimeMetadataV14.html)
-/// the extensions set must be decoding-compatible
 ///
-/// Function to search metadata as RuntimeMetadata for system block,
-/// decode RuntimeVersion constant,
-/// output MetaInfo
+/// Additionally, for [`RuntimeMetadataV14`](https://docs.rs/frame-metadata/15.0.0/frame_metadata/v14/struct.RuntimeMetadataV14.html)
+/// the extensions set must be decoding-compatible for any signable transaction.  
 pub fn info_from_metadata(runtime_metadata: &RuntimeMetadata) -> Result<MetaInfo, MetadataError> {
     let mut runtime_version_encoded: Option<&[u8]> = None;
     let mut base58_prefix_encoded: Option<&[u8]> = None;
@@ -348,26 +345,36 @@ pub fn info_from_metadata(runtime_metadata: &RuntimeMetadata) -> Result<MetaInfo
     })
 }
 
-pub fn runtime_metadata_from_slice(meta_vec: &[u8]) -> Result<RuntimeMetadata, MetadataError> {
-    if !meta_vec.starts_with(&[109, 101, 116, 97]) {
+/// Get [`RuntimeMetadata`](https://docs.rs/frame-metadata/15.0.0/frame_metadata/enum.RuntimeMetadata.html)
+/// from slice of raw `Vec<u8>` metadata
+///
+/// Raw `Vec<u8>` metadata suitable for use in Signer:  
+///
+/// - must begin with b"meta"  
+/// - after that must be SCALE-encoded `RuntimeMetadata` with runtime version V12 or above
+///
+pub fn runtime_metadata_from_slice(meta: &[u8]) -> Result<RuntimeMetadata, MetadataError> {
+    if !meta.starts_with(&[109, 101, 116, 97]) {
         return Err(MetadataError::NotMeta);
     }
-    if meta_vec[4] < 12 {
+    if meta[4] < 12 {
         return Err(MetadataError::VersionIncompatible);
     }
-    match RuntimeMetadata::decode(&mut &meta_vec[4..]) {
+    match RuntimeMetadata::decode(&mut &meta[4..]) {
         Ok(x) => Ok(x),
         Err(_) => Err(MetadataError::UnableToDecode),
     }
 }
 
-/// Function to check if the v14 metadata has all signed extensions required for transaction decoding.
+/// Checks if the v14 metadata has all signed extensions required for transaction decoding.
 /// True if extensions are incomplete.
+///
 /// Currently, the decoding of the transaction demands that metadata version, network genesis hash,
 /// and era are among signed extensions. Otherwise, a ParserMetadataError would occur on decoding.
 /// However, we can not simply forbid the loading of the metadata without required set of
 /// signed extensions into Signer.
-/// This function should be used for warnings only on generate_message side and during metadata
+///
+/// This function should be used for warnings only on `generate_message` side and during metadata
 /// loading into Signer.
 fn need_v14_warning(metadata_v14: &RuntimeMetadataV14) -> bool {
     let mut signed_extensions = HashMap::new();
@@ -382,13 +389,14 @@ fn need_v14_warning(metadata_v14: &RuntimeMetadataV14) -> bool {
         && signed_extensions.get("CheckMortality") == Some(&1)) // no warning needed if each one encountered, and only once
 }
 
-/// Struct to keep metadata and its info for transaction decoding
+/// Metadata as processed and already checked `RuntimeMetadata` with info 
+/// extracted from it, for transaction decoding
 #[cfg(feature = "signer")]
 pub struct MetaSetElement {
-    pub name: String,
-    pub version: u32,
-    pub optional_base58prefix: Option<u16>,
-    pub runtime_metadata: RuntimeMetadata,
+    name: String,
+    version: u32,
+    optional_base58prefix: Option<u16>,
+    runtime_metadata: RuntimeMetadata,
 }
 
 #[cfg(feature = "signer")]
@@ -436,6 +444,18 @@ impl MetaSetElement {
             optional_base58prefix,
             runtime_metadata,
         })
+    }
+    pub fn name(&self) -> String {
+        self.name.to_string()
+    }
+    pub fn version(&self) -> u32 {
+        self.version
+    }
+    pub fn optional_base58prefix(&self) -> Option<u16> {
+        self.optional_base58prefix
+    }
+    pub fn runtime_metadata(&self) -> &RuntimeMetadata {
+        &self.runtime_metadata
     }
 }
 
