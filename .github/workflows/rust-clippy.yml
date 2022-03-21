@@ -34,7 +34,9 @@ jobs:
       - name:                 Rust Cache
         uses:                 Swatinem/rust-cache@v1.3.0
         with:
-          working-directory:  .
+          working-directory:  rust
 
       - name:                 cargo clippy
-        run:                  cargo clippy --all-targets --all-features -- -D warnings
+        run:                  |
+          cd rust
+          cargo clippy --all-targets --all-features -- -D warnings

@@ -32,4 +32,6 @@ jobs:
           override:           true
 
       - name:                 cargo fmt
-        run:                  cargo fmt --all -- --check
+        run:                  |
+          cd rust
+          cargo fmt --all -- --check
