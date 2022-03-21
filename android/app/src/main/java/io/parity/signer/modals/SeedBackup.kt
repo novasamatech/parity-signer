@@ -10,6 +10,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import io.parity.signer.components.*
 import io.parity.signer.models.SignerDataModel
+import io.parity.signer.models.decode64
 import io.parity.signer.models.getSeed
 import io.parity.signer.models.toListOfJSONObjects
 import io.parity.signer.ui.theme.Bg200
@@ -41,7 +42,7 @@ fun SeedBackup(signerDataModel: SignerDataModel) {
 			Column(
 				modifier = Modifier.padding(20.dp)
 			) {
-				HeaderBar("Backup", seedName)
+				HeaderBar("Backup", seedName.decode64())
 				HeadingOverline("SEED PHRASE")
 				SeedBox(seedPhrase = seedPhrase, status = seedBoxStatus)
 				HeadingOverline("DERIVED KEYS")

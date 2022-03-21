@@ -14,6 +14,8 @@ import io.parity.signer.components.BigButton
 import io.parity.signer.components.HeadingOverline
 import io.parity.signer.components.SingleTextInput
 import io.parity.signer.models.SignerDataModel
+import io.parity.signer.models.decode64
+import io.parity.signer.models.encode64
 import io.parity.signer.ui.theme.Text600
 
 @Composable
@@ -41,8 +43,8 @@ fun NewSeedScreen(
 				signerDataModel.clearError()
 			},
 			onDone = {
-				if (seedName.value.isNotBlank() && !seedName.value.contains(",")) {
-					button(ButtonID.GoForward, seedName.value)
+				if (seedName.value.isNotBlank() && (signerDataModel.seedNames.value?.contains(seedName.value.encode64()) == false)) {
+					button(ButtonID.GoForward, seedName.value.encode64())
 				}
 			},
 			isCrypto = true,
@@ -58,9 +60,9 @@ fun NewSeedScreen(
 			text = "Generate seed phrase",
 			action = {
 				focusManager.clearFocus()
-				button(ButtonID.GoForward, seedName.value)
+				button(ButtonID.GoForward, seedName.value.encode64())
 			},
-			isDisabled = seedName.value.isBlank() || seedName.value.contains(",") || (signerDataModel.seedNames.value?.contains(seedName.value) ?: false)
+			isDisabled = seedName.value.isBlank() || (signerDataModel.seedNames.value?.contains(seedName.value.encode64()) != false)
 		)
 	}
 	DisposableEffect(Unit) {
@@ -68,7 +70,7 @@ fun NewSeedScreen(
 			focusRequester.requestFocus()
 		}
 		seedName.value =
-			signerDataModel.screenData.value?.optString("seed_name") ?: ""
+			signerDataModel.screenData.value?.optString("seed_name")?.decode64() ?: ""
 		onDispose { focusManager.clearFocus() }
 	}
 }
