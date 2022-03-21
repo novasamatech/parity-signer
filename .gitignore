@@ -87,6 +87,7 @@ rust/*/target
 rust/Cargo.lock
 rust/signer/Cargo.toml
 rust/db_handling/signer_database
+rust/database/database_cold_release
 rust/qrcode_static/*.png
 rust/files/for_signing/*
 rust/files/signed/*
