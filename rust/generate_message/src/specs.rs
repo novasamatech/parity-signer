@@ -217,6 +217,14 @@ mod tests {
     use constants::FOLDER;
     use crate::parser::Override;
     use super::*;
+    
+    // The aim is to check that rpc calls are going through for "officially 
+    // approved" networks.  
+    // Also, mass fetcher is neat, and it is nice to have all addresses in one 
+    // place.  
+    // However, the fetching results are constantly changing (some networks at 
+    // times could not be called).  
+    // Argh?  
     #[test]
     fn mass_fetch() {
         let address_set = [
@@ -242,7 +250,7 @@ mod tests {
             "wss://rpc-01.basilisk.hydradx.io",
             "wss://bifrost-rpc.liebi.com/ws",
             "wss://pioneer-1-rpc.bit.country",
-            "wss://falafel.calamari.systems",
+//            "wss://falafel.calamari.systems", // error502
 //            "wss://rpc-shadow.crust.network", //error500
             "wss://crab-parachain-rpc.darwinia.network/",
             "wss://kusama.api.integritee.network",
@@ -261,7 +269,7 @@ mod tests {
             "wss://kusama.rpc.robonomics.network/",
             "wss://rpc.shiden.astar.network",
             "wss://ws.parachain-collator-1.c1.sora2.soramitsu.co.jp",
-            "wss://gamma.subgame.org/",
+//            "wss://gamma.subgame.org/", // error502
             "wss://para.subsocial.network",
             "wss://rpc.kusama.standard.tech",
             "wss://rpc-0.zeitgeist.pm",
@@ -275,6 +283,8 @@ mod tests {
             "wss://rococo-rpc.polkadot.io",
             "wss://rococo-statemint-rpc.polkadot.io",
             "wss://rococo-canvas-rpc.polkadot.io",
+            "wss://rococo.api.encointer.org",
+            "wss://rpc-01.basilisk-rococo.hydradx.io",
             "wss://rpc.rococo.efinity.io",
             "wss://moonsama-testnet-rpc.moonsama.com",
             "wss://rococo.kilt.io",
@@ -297,7 +307,6 @@ mod tests {
             "wss://rpc.kulupu.corepaper.org/ws",
             "wss://ws.kusari.network",
             "wss://mathchain-asia.maiziqianbao.net/ws",
-            "wss://minichain-mainnet.coming.chat/ws",
             "wss://rpc.neatcoin.org/ws",
             "wss://mainnet.nftmart.io/rpc/ws",
             "wss://main3.nodleprotocol.io",
@@ -326,7 +335,7 @@ mod tests {
             "wss://mogiway-01.dotmog.com",
             "wss://gesell.encointer.org",
             "wss://galois-hk.maiziqianbao.net/ws",
-            "wss://gamepower.io",
+//            "wss://gamepower.io", // Networking or low-level protocol error: Connection timeout exceeded: 10s
             "wss://testnet.geekcash.org",
 //            "wss://api.interlay.io/parachain", // Base58PrefixMismatch { specs: 2032, meta: 42 }
 //            "wss://ws.jupiter-poa.patract.cn", // Error when opening the TCP socket: Connection reset by peer (os error 104)
@@ -365,7 +374,7 @@ mod tests {
             "wss://testnet.web3games.org",
 //            "wss://test1.zcloak.network", // error502
             "wss://bsr.zeitgeist.pm",
-            "wss://alphaville.zero.io",
+//            "wss://alphaville.zero.io", // error502
         ];
         let mut all_clear = true;
         for address in address_set {
