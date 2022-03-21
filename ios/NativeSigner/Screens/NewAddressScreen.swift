@@ -31,7 +31,7 @@ struct NewAddressScreen: View {
                     ZStack {
                         RoundedRectangle(cornerRadius: 8).stroke(Color("Crypto400")).frame(height: 39)
                         HStack {
-                            Text(content.seed_name)
+                            Text(content.seed_name.decode64())
                             TextField("Path", text: $path, prompt: Text("//<network>//input"))
                                 .foregroundColor(Color("Crypto400"))
                                 .font(.system(size: 15, design: .monospaced))

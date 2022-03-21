@@ -14,6 +14,7 @@ import io.parity.signer.components.HeaderBar
 import io.parity.signer.components.SeedBox
 import io.parity.signer.models.SignerDataModel
 import io.parity.signer.models.addSeed
+import io.parity.signer.models.decode64
 import io.parity.signer.ui.theme.Bg200
 import io.parity.signer.ui.theme.modal
 
@@ -29,7 +30,7 @@ fun NewSeedBackup(signerDataModel: SignerDataModel) {
 			verticalArrangement = Arrangement.spacedBy(8.dp),
 			modifier = Modifier.padding(20.dp)
 		) {
-			HeaderBar("BACKUP SEED PHRASE", signerDataModel.modalData.value?.optString("seed")?: "")
+			HeaderBar("BACKUP SEED PHRASE", signerDataModel.modalData.value?.optString("seed")?.decode64() ?: "Seed name error")
 			SeedBox(
 				seedPhrase = signerDataModel.modalData.value?.optString("seed_phrase")
 					?: ""
