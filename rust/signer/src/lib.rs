@@ -16,11 +16,6 @@
 
 //used for identicon size; because JNI has no signed int
 
-use db_handling;
-use definitions;
-use navigator;
-use qr_reader_phone;
-
 mod export;
 
 export! {
