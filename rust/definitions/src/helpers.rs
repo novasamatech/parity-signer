@@ -1,6 +1,7 @@
 use hex;
 #[cfg(feature = "signer")]
 use sp_core::{ecdsa, ed25519, sr25519};
+use sp_core::crypto::{Ss58AddressFormat, Ss58Codec};
 use sp_runtime::MultiSigner;
 #[cfg(feature = "signer")]
 use std::convert::TryInto;
@@ -78,6 +79,31 @@ pub fn get_multisigner(public: &[u8], encryption: &Encryption) -> Result<MultiSi
             };
             Ok(MultiSigner::Ecdsa(ecdsa::Public::from_raw(into_pubkey)))
         }
+    }
+}
+
+pub fn print_multisigner_as_base58(
+    multi_signer: &MultiSigner,
+    optional_prefix: Option<u16>,
+) -> String {
+    match optional_prefix {
+        Some(base58prefix) => {
+            let version_for_base58 = Ss58AddressFormat::custom(base58prefix);
+            match multi_signer {
+                MultiSigner::Ed25519(pubkey) => {
+                    pubkey.to_ss58check_with_version(version_for_base58)
+                }
+                MultiSigner::Sr25519(pubkey) => {
+                    pubkey.to_ss58check_with_version(version_for_base58)
+                }
+                MultiSigner::Ecdsa(pubkey) => pubkey.to_ss58check_with_version(version_for_base58),
+            }
+        }
+        None => match multi_signer {
+            MultiSigner::Ed25519(pubkey) => pubkey.to_ss58check(),
+            MultiSigner::Sr25519(pubkey) => pubkey.to_ss58check(),
+            MultiSigner::Ecdsa(pubkey) => pubkey.to_ss58check(),
+        },
     }
 }
 
