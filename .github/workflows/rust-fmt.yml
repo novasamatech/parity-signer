@@ -1,0 +1,35 @@
+name:                         Rustfmt
+
+on:
+  pull_request:
+  push:
+    branches:
+      - master
+      - stable
+
+jobs:
+  rustfmt:
+    name:                     Cargo fmt
+    runs-on:                  ubuntu-latest
+    steps:
+
+      - name:                 Cancel Previous Runs
+        uses:                 styfle/cancel-workflow-action@0.9.1
+        with:
+          access_token:       ${{ github.token }}
+
+      - name:                 Checkout sources
+        uses:                 actions/checkout@v2.4.0
+        with:
+          fetch-depth:        50
+          submodules:         'recursive'
+ 
+      - name:                 Install Rust stable toolchain
+        uses:                 actions-rs/toolchain@v1.0.7
+        with:
+          profile:            minimal
+          toolchain:          stable
+          override:           true
+
+      - name:                 cargo fmt
+        run:                  cargo fmt --all -- --check
