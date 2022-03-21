@@ -33,11 +33,13 @@ struct NewSeedScreen: View {
                     })
                     .onSubmit {
                         nameFocused = false
-                        if (seedName != "") && (!seedName.contains(",")) {
-                            data.pushButton(buttonID: .GoForward, details: seedName)
+                        if (seedName != "") && !data.checkSeedCollision(seedName: seedName.encode64()) {
+                            data.pushButton(buttonID: .GoForward, details: seedName.encode64())
                         }
                     }
-                    .onAppear(perform: {nameFocused = content.keyboard})
+                    .onAppear(perform: {
+                        nameFocused = content.keyboard
+                    })
                     .onDisappear {
                         data.lastError = ""
                     }
@@ -49,14 +51,10 @@ struct NewSeedScreen: View {
             BigButton(
                 text: "Generate seed phrase",
                 action: {
-                    if !data.checkSeedCollision(seedName: seedName) {
-                        nameFocused = false
-                        data.pushButton(buttonID: .GoForward, details: seedName)
-                    } else {
-                        data.lastError = "This seed name already exists"
-                    }
+                    nameFocused = false
+                    data.pushButton(buttonID: .GoForward, details: seedName.encode64())
                 },
-                isDisabled: (seedName == "")  || (seedName.contains(","))
+                isDisabled: (seedName == "") || data.checkSeedCollision(seedName: seedName.encode64())
             )
             Spacer()
         }.padding()
