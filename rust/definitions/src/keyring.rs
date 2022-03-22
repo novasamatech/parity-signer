@@ -2,31 +2,31 @@
 //!
 //! Cold database has following trees:  
 //!
-//! - `SPECSTREE`, for network specs [`NetworkSpecs`](crate::network_specs::NetworkSpecs) 
+//! - `SPECSTREE`, for network specs [`NetworkSpecs`](crate::network_specs::NetworkSpecs)
 //! entries, with keys [`NetworkSpecsKey`]  
-//! - `VERIFIERS`, for network verifier [`CurrentVerifier`](crate::network_specs::CurrentVerifier) 
+//! - `VERIFIERS`, for network verifier [`CurrentVerifier`](crate::network_specs::CurrentVerifier)
 //! entries, with keys [`VerifierKey`]  
-//! - `METATREE`, for `Vec<u8>` metadata entries, with keys [`MetaKey`] and 
+//! - `METATREE`, for `Vec<u8>` metadata entries, with keys [`MetaKey`] and
 //! prefix search with [`MetaKeyPrefix`]  
-//! - `ADDRTREE`, for [`AddressDetails`](crate::users::AddressDetails) entries 
-//! with public information associated with user addresses, with keys 
+//! - `ADDRTREE`, for [`AddressDetails`](crate::users::AddressDetails) entries
+//! with public information associated with user addresses, with keys
 //! [`AddressKey`]  
-//! - `SETTREE`, for types information, Signer danger status, and general 
+//! - `SETTREE`, for types information, Signer danger status, and general
 //! verifier  
-//! - `TRANSACTION`, to temporarily store transaction information while waiting 
+//! - `TRANSACTION`, to temporarily store transaction information while waiting
 //! for user approval  
-//! - `HISTORY`, for [`Entry`](crate::history::Entry) log of all events 
+//! - `HISTORY`, for [`Entry`](crate::history::Entry) log of all events
 //! happening in Signer, with keys [`Order`]  
 //!
 //! Hot database has following trees:  
 //!
-//! - `SPECSTREEPREP`, for network specs [`NetworkSpecsToSend`](crate::network_specs::NetworkSpecsToSend) 
+//! - `SPECSTREEPREP`, for network specs [`NetworkSpecsToSend`](crate::network_specs::NetworkSpecsToSend)
 //! entries, with keys [`NetworkSpecsKey`]  
-//! - `METATREE`, for `Vec<u8>` metadata entries, with keys [`MetaKey`] and 
+//! - `METATREE`, for `Vec<u8>` metadata entries, with keys [`MetaKey`] and
 //! prefix search with [`MetaKeyPrefix`]  
 //! - `SETTREE`, for types information  
-//! - `ADDRESS_BOOK` for [`AddressBookEntry`](crate::metadata::AddressBookEntry) 
-//! data needed to maintain hot database and send rpc calls to fetch network 
+//! - `ADDRESS_BOOK` for [`AddressBookEntry`](crate::metadata::AddressBookEntry)
+//! data needed to maintain hot database and send rpc calls to fetch network
 //! information, with keys [`AddressBookKey`]  
 //!
 use parity_scale_codec::{Decode, Encode};
@@ -47,20 +47,20 @@ use crate::{
 
 /// Key in `SPECSTREE` tree (cold database) and in `SPECSPREPTREE` (hot database)  
 ///
-/// [`NetworkSpecsKey`] is used to retrieve the 
+/// [`NetworkSpecsKey`] is used to retrieve the
 /// [`NetworkSpecs`](crate::network_specs::NetworkSpecs) in cold database and
-/// [`NetworkSpecsToSend`](crate::network_specs::NetworkSpecsToSend) in hot 
+/// [`NetworkSpecsToSend`](crate::network_specs::NetworkSpecsToSend) in hot
 /// database.  
 ///
 /// Key is derived from network genesis hash and encryption algorithm.  
-/// 
+///
 /// Network could support more than one encryption algorithm. In this case
-/// there would be more than one database entry with different 
+/// there would be more than one database entry with different
 /// [`NetworkSpecsKey`] values. Such entries do not conflict.  
 #[derive(Decode, Encode, PartialEq, Debug, Clone)]
 pub struct NetworkSpecsKey(Vec<u8>);
 
-/// Decoded `NetworkSpecsKey` content, encryption-based variants with vector 
+/// Decoded `NetworkSpecsKey` content, encryption-based variants with vector
 /// genesis hash inside
 #[derive(Decode, Encode)]
 enum NetworkSpecsKeyContent {
@@ -70,7 +70,7 @@ enum NetworkSpecsKeyContent {
 }
 
 impl NetworkSpecsKey {
-    /// Generate [`NetworkSpecsKey`] from parts: network genesis hash and 
+    /// Generate [`NetworkSpecsKey`] from parts: network genesis hash and
     /// [`Encryption`]
     pub fn from_parts(genesis_hash: &[u8], encryption: &Encryption) -> Self {
         let network_key_content = match encryption {
@@ -92,7 +92,7 @@ impl NetworkSpecsKey {
     ///
     /// Signer receives hexadecimal strings from user interface.  
     ///
-    /// This function checks only that hexadecimal format is valid, no check 
+    /// This function checks only that hexadecimal format is valid, no check
     /// of encryption validity is done here.  
     #[cfg(feature = "signer")]
     pub fn from_hex(hex_line: &str) -> Result<Self, ErrorSigner> {
@@ -133,7 +133,7 @@ impl NetworkSpecsKey {
 ///
 /// Same [`VerifierKey`] and same [`CurrentVerifier`](crate::network_specs::CurrentVerifier)
 /// are corresponding to all network-associated information:
-/// 
+///
 /// - network specs, for any encryption algorithm  
 /// - network metadata
 #[derive(Decode, Encode, Debug, Clone, PartialEq)]
@@ -166,8 +166,8 @@ impl VerifierKey {
 /// [`AddressKey`] is used to retrieve the address associated public information.  
 ///
 /// Key is derived from public key and encryption algorithm.  
-/// 
-/// To create an address in Signer, sufficient information is: 
+///
+/// To create an address in Signer, sufficient information is:
 ///
 /// - seed phrase  
 /// - derivation: soft (`/`) and hard (`//`) junctions and password (`///`)  
@@ -180,14 +180,14 @@ impl VerifierKey {
 /// Passwords are never stored.  
 /// Cold database stores only **non-secret** address associated information.  
 ///
-/// Each address is defined by combination of public key, encryption algorithm, 
+/// Each address is defined by combination of public key, encryption algorithm,
 /// and network.  
 ///
 /// More than one address could be created for same seed phrase and derivation,
 /// with same encryption algorithm, but for different networks.
 ///
-/// For the user interface these addresses would appear as separate entities, 
-/// however, the database stores them under same [`AddressKey`], with a set of 
+/// For the user interface these addresses would appear as separate entities,
+/// however, the database stores them under same [`AddressKey`], with a set of
 /// allowed networks.  
 #[derive(Decode, Encode, Debug, PartialEq, Clone)]
 pub struct AddressKey(Vec<u8>);
@@ -197,7 +197,7 @@ pub struct AddressKey(Vec<u8>);
 struct AddressKeyContent(MultiSigner);
 
 impl AddressKey {
-    /// Generate [`AddressKey`] from corresponding 
+    /// Generate [`AddressKey`] from corresponding
     /// [`MultiSigner`](https://docs.rs/sp-runtime/6.0.0/sp_runtime/enum.MultiSigner.html) value  
     pub fn from_multisigner(multisigner: &MultiSigner) -> Self {
         Self(AddressKeyContent(multisigner.to_owned()).encode())
@@ -205,7 +205,7 @@ impl AddressKey {
 
     /// Generate [`AddressKey`] from parts: raw public key and [`Encryption`]  
     ///
-    /// Could result in error if public key length does not match the 
+    /// Could result in error if public key length does not match the
     /// expected length for chosen encryption algorithm.  
     #[cfg(feature = "signer")]
     pub fn from_parts(public: &[u8], encryption: &Encryption) -> Result<Self, ErrorSigner> {
@@ -224,7 +224,7 @@ impl AddressKey {
     ///
     /// Signer receives hexadecimal strings from user interface.  
     ///
-    /// This function checks only that hexadecimal format is valid, no length 
+    /// This function checks only that hexadecimal format is valid, no length
     /// check happens here.  
     #[cfg(feature = "signer")]
     pub fn from_hex(hex_address_key: &str) -> Result<Self, ErrorSigner> {
@@ -248,7 +248,7 @@ impl AddressKey {
         }
     }
 
-    /// Get [`MultiSigner`](https://docs.rs/sp-runtime/6.0.0/sp_runtime/enum.MultiSigner.html) 
+    /// Get [`MultiSigner`](https://docs.rs/sp-runtime/6.0.0/sp_runtime/enum.MultiSigner.html)
     /// from the [`AddressKey`]  
     pub fn multi_signer<T: ErrorSource>(
         &self,
@@ -270,17 +270,17 @@ impl AddressKey {
 ///
 /// [`MetaKey`] is used to retrieve raw `Vec<u8>` metadata.  
 ///
-/// Key is derived from network name as it appears in the metadata and network 
+/// Key is derived from network name as it appears in the metadata and network
 /// version.  
-/// 
-/// Each [`MetaKey`] corresponds to single metadata entry and each metadata 
+///
+/// Each [`MetaKey`] corresponds to single metadata entry and each metadata
 /// entry has unique [`MetaKey`]. This is so because:
 ///
-/// - Metadata that could be used in Signer must contain `Version` constant in 
+/// - Metadata that could be used in Signer must contain `Version` constant in
 /// pallet `System`, and only such metadata can be added in the databases.  
 ///
 /// - Two raw metadata entries corresponding to same network name and network
-/// version must be identical. If the metadata changes without bumping the 
+/// version must be identical. If the metadata changes without bumping the
 /// network version, both Signer and hot database client would produce an error.  
 /// It is not possible to switch the metadata in cold or hot database to the
 /// changed one without removing the old entry first.  
@@ -329,15 +329,15 @@ impl MetaKey {
 
 /// Prefix for searching in `METATREE` tree (cold and hot database)  
 ///
-/// [`MetaKeyPrefix`] is used to retrieve all available `Vec<u8>` metadata 
+/// [`MetaKeyPrefix`] is used to retrieve all available `Vec<u8>` metadata
 /// for a given network name.  
 ///
 /// Prefix is derived from network name as it appears in the metadata.  
-/// 
-/// [`MetaKey`] consists of concatenated encoded network name and encoded 
-/// network version. 
-/// [`MetaKeyPrefix`] consists only of encoded network name, and is therefore 
-/// a common prefix for all [`MetaKey`] corresponding to the given network 
+///
+/// [`MetaKey`] consists of concatenated encoded network name and encoded
+/// network version.
+/// [`MetaKeyPrefix`] consists only of encoded network name, and is therefore
+/// a common prefix for all [`MetaKey`] corresponding to the given network
 /// name and all available network versions.  
 #[derive(Debug)]
 pub struct MetaKeyPrefix(Vec<u8>);
@@ -363,10 +363,10 @@ impl MetaKeyPrefix {
 ///
 /// [`Order`] is used to retrieve history log entry.  
 ///
-/// History log [`Entry`](crate::history::Entry) contains timestamp and a set 
+/// History log [`Entry`](crate::history::Entry) contains timestamp and a set
 /// of simultaneously occured events.  
 ///
-/// Order is generated from the number of the history entry in the database 
+/// Order is generated from the number of the history entry in the database
 /// `HISTORY` tree.  
 #[derive(Clone, Debug, PartialEq)]
 pub struct Order(u32);
@@ -408,12 +408,12 @@ impl Order {
 ///
 /// Key is used to retrieve the `AddressBookEntry` for network.
 ///
-/// Key is a SCALE-encoded address book title, which is either a network name 
-/// as it is stated in the metadata for default networks, or the name with 
+/// Key is a SCALE-encoded address book title, which is either a network name
+/// as it is stated in the metadata for default networks, or the name with
 /// `-<encryption>` added for non-default networks.
 ///
 /// Database could have a few entries for related networks, for example,
-/// entry "westend" for default Westend, and entry "westend-ed25519" for 
+/// entry "westend" for default Westend, and entry "westend-ed25519" for
 /// Westend with Ed25519 encryption. Such entries would not conflict.  
 #[derive(Debug, Clone)]
 #[cfg(feature = "active")]
@@ -431,14 +431,14 @@ impl AddressBookKey {
         let address_book_key_content = AddressBookKeyContent(title.to_string());
         Self(address_book_key_content.encode())
     }
-    
+
     /// Transform database `IVec` key into [`AddressBookKey`] prior to processing  
     ///
     /// Unfallible, the validity of resulting `AddressBookKey` is not checked.
     pub fn from_ivec(ivec: &IVec) -> Self {
         Self(ivec.to_vec())
     }
-    
+
     /// Get the network address book title from the [`AddressBookKey`]
     ///
     /// Could result in error if key is corrupted.
@@ -450,7 +450,7 @@ impl AddressBookKey {
             ))),
         }
     }
-    
+
     /// Transform [`AddressBookKey`] into `Vec<u8>` database key  
     pub fn key(&self) -> Vec<u8> {
         self.0.to_vec()

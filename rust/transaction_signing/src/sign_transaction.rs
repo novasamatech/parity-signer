@@ -34,7 +34,7 @@ pub (crate) fn create_signature (seed_phrase: &str, pwd_entry: &str, user_commen
         Ok(s) => {
             full_address.zeroize();
             sign.apply(false, user_comment, database_name)?;
-            Ok(s.get_multi_signature())
+            Ok(s.multi_signature())
         },
         Err(e) => {
             full_address.zeroize();

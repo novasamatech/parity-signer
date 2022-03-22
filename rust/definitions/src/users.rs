@@ -40,7 +40,7 @@ pub struct AddressDetails {
 
 impl AddressDetails {
     /// Gets ([`MultiSigner`](https://docs.rs/sp-runtime/6.0.0/sp_runtime/enum.MultiSigner.html),
-    /// [`AddressDetails`]) tuple from [`AddressKey`] and associated value from 
+    /// [`AddressDetails`]) tuple from [`AddressKey`] and associated value from
     /// database tree `ADDRTREE`.  
     ///
     /// Checks that there is no encryption mismatch.
@@ -83,7 +83,7 @@ impl AddressDetails {
         AddressDetails::process_entry_with_key_checked::<T>(&address_key, address_details_encoded)
     }
 
-    /// Gets [`AddressDetails`] from [`AddressKey`] and associated value from 
+    /// Gets [`AddressDetails`] from [`AddressKey`] and associated value from
     /// database tree `ADDRTREE`.  
     ///
     /// Checks that there is no encryption mismatch.
@@ -98,9 +98,9 @@ impl AddressDetails {
         Ok(address_details)
     }
 
-    /// Checks if the [`AddressDetails`] have empty derivation path (i.e. 
+    /// Checks if the [`AddressDetails`] have empty derivation path (i.e.
     /// derivation path is empty and there is no password).  
-    /// 
+    ///
     /// Address key in this case is called root key or seed key.  
     pub fn is_root(&self) -> bool {
         (self.path.is_empty()) && (!self.has_pwd)

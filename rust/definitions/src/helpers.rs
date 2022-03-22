@@ -1,7 +1,9 @@
+//! Common helper functions
+
 use hex;
+use sp_core::crypto::{Ss58AddressFormat, Ss58Codec};
 #[cfg(feature = "signer")]
 use sp_core::{ecdsa, ed25519, sr25519};
-use sp_core::crypto::{Ss58AddressFormat, Ss58Codec};
 use sp_runtime::MultiSigner;
 #[cfg(feature = "signer")]
 use std::convert::TryInto;
@@ -14,8 +16,13 @@ use crate::error::ErrorSource;
 #[cfg(feature = "signer")]
 use crate::error_signer::{ErrorSigner, InterfaceSigner};
 
-/// Function to decode hex encoded &str into Vec<u8>,
-/// `what` is either of enums (NotHexHot or NotHexSigner) implementing NotHex trait
+/// Decode hexadecimal `&str` into `Vec<u8>`, with descriptive error  
+///
+/// Function could be used both on hot and cold side.  
+///
+/// In addition to encoded `&str` required is input of `T::NotHex`, to produce
+/// error with details on what exactly turned out to be invalid hexadecimal
+/// string.  
 pub fn unhex<T: ErrorSource>(hex_entry: &str, what: T::NotHex) -> Result<Vec<u8>, T::Error> {
     let hex_entry = {
         if let Some(a) = hex_entry.strip_prefix("0x") {
@@ -30,7 +37,8 @@ pub fn unhex<T: ErrorSource>(hex_entry: &str, what: T::NotHex) -> Result<Vec<u8>
     }
 }
 
-/// Function to get public key from MultiSigner
+/// Get `Vec<u8>` public key from
+/// [`MultiSigner`](https://docs.rs/sp-runtime/6.0.0/sp_runtime/enum.MultiSigner.html)  
 pub fn multisigner_to_public(m: &MultiSigner) -> Vec<u8> {
     match m {
         MultiSigner::Ed25519(a) => a.to_vec(),
@@ -39,7 +47,8 @@ pub fn multisigner_to_public(m: &MultiSigner) -> Vec<u8> {
     }
 }
 
-/// Function to get encryption from MultiSigner
+/// Get [`Encryption`](crate::crypto::Encryption) from
+/// [`MultiSigner`](https://docs.rs/sp-runtime/6.0.0/sp_runtime/enum.MultiSigner.html)  
 pub fn multisigner_to_encryption(m: &MultiSigner) -> Encryption {
     match m {
         MultiSigner::Ed25519(_) => Encryption::Ed25519,
@@ -48,13 +57,15 @@ pub fn multisigner_to_encryption(m: &MultiSigner) -> Encryption {
     }
 }
 
-/// Helper function to print identicon from the multisigner
+/// Print identicon from
+/// [`MultiSigner`](https://docs.rs/sp-runtime/6.0.0/sp_runtime/enum.MultiSigner.html)  
 #[cfg(feature = "signer")]
 pub fn make_identicon_from_multisigner(multisigner: &MultiSigner) -> Vec<u8> {
     generate_png_scaled_default(&multisigner_to_public(multisigner))
 }
 
-/// Function to get MultiSigner from public key and Encryption
+/// Get [`MultiSigner`](https://docs.rs/sp-runtime/6.0.0/sp_runtime/enum.MultiSigner.html)
+/// from public key and [`Encryption`](crate::crypto::Encryption)
 #[cfg(feature = "signer")]
 pub fn get_multisigner(public: &[u8], encryption: &Encryption) -> Result<MultiSigner, ErrorSigner> {
     match encryption {
@@ -82,6 +93,14 @@ pub fn get_multisigner(public: &[u8], encryption: &Encryption) -> Result<MultiSi
     }
 }
 
+/// Print [`MultiSigner`](https://docs.rs/sp-runtime/6.0.0/sp_runtime/enum.MultiSigner.html)
+/// in base58 format
+///
+/// Could be done for both
+/// [custom](https://docs.rs/sp-core/6.0.0/sp_core/crypto/trait.Ss58Codec.html#method.to_ss58check_with_version)
+/// network-specific base58 prefix by providing `Some(value)` as `optional_prefix` or with
+/// [default](https://docs.rs/sp-core/6.0.0/sp_core/crypto/trait.Ss58Codec.html#method.to_ss58check)
+/// one by leaving it `None`.
 pub fn print_multisigner_as_base58(
     multi_signer: &MultiSigner,
     optional_prefix: Option<u16>,
@@ -107,15 +126,17 @@ pub fn print_multisigner_as_base58(
     }
 }
 
-/// Helper function to print id pic for metadata hash.
-/// Currently uses identicon, could be changed later.
+/// Print id pic for metadata hash
+///
+/// Currently uses png identicon generator, could be changed later.
 #[cfg(feature = "signer")]
 pub fn pic_meta(meta_hash: &[u8]) -> Vec<u8> {
     generate_png_scaled_default(meta_hash)
 }
 
-/// Helper function to print id pic for types data hash.
-/// Currently uses identicon, could be changed later.
+/// Print id pic for hash of SCALE-encoded types data
+///
+/// Currently uses png identicon generator, could be changed later.
 #[cfg(feature = "signer")]
 pub fn pic_types(types_hash: &[u8]) -> Vec<u8> {
     generate_png_scaled_default(types_hash)

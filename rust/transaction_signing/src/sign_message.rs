@@ -66,7 +66,7 @@ pub (crate) fn sufficient_crypto_load_types (multisigner: &MultiSigner, address_
     let sufficient = match sufficient_crypto (multisigner, address_details, &types_content.to_sign(), seed_phrase, pwd_entry) {
         Ok(s) => {
             TrDbCold::new()
-                .set_history(events_to_batch::<Signer>(database_name, vec![Event::TypesSigned(TypesExport::get(&types_content, &s.get_verifier_value()))])?)
+                .set_history(events_to_batch::<Signer>(database_name, vec![Event::TypesSigned(TypesExport::get(&types_content, &s.verifier_value()))])?)
                 .apply::<Signer>(database_name)?;
             hex_qr_from_sufficient(s)?
         },
@@ -91,7 +91,7 @@ pub (crate) fn sufficient_crypto_load_metadata (network_specs_key: &NetworkSpecs
     let sufficient = match sufficient_crypto (multisigner, address_details, &load_meta_content.to_sign(), seed_phrase, pwd_entry) {
         Ok(s) => {
             TrDbCold::new()
-                .set_history(events_to_batch::<Signer>(database_name, vec![Event::MetadataSigned(MetaValuesExport::get(&meta_values, &s.get_verifier_value()))])?)
+                .set_history(events_to_batch::<Signer>(database_name, vec![Event::MetadataSigned(MetaValuesExport::get(&meta_values, &s.verifier_value()))])?)
                 .apply::<Signer>(database_name)?;
             hex_qr_from_sufficient(s)?
         },
@@ -114,7 +114,7 @@ pub (crate) fn sufficient_crypto_add_specs (network_specs_key: &NetworkSpecsKey,
     let sufficient = match sufficient_crypto (multisigner, address_details, &add_specs_content.to_sign(), seed_phrase, pwd_entry) {
         Ok(s) => {
             TrDbCold::new()
-                .set_history(events_to_batch::<Signer>(database_name, vec![Event::NetworkSpecsSigned(NetworkSpecsExport::get(&network_specs_to_send, &s.get_verifier_value()))])?)
+                .set_history(events_to_batch::<Signer>(database_name, vec![Event::NetworkSpecsSigned(NetworkSpecsExport::get(&network_specs_to_send, &s.verifier_value()))])?)
                 .apply::<Signer>(database_name)?;
             hex_qr_from_sufficient(s)?
         },

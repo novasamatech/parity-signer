@@ -1,19 +1,19 @@
 //! Network metadata and related types
 //!
 //! The main purpose of the Signer is to generate signatures for transactions.
-//! Signer reads the transactions as QR codes with SCALE-encoded 
+//! Signer reads the transactions as QR codes with SCALE-encoded
 //! information.
-//! Any transaction before user is able to sign it must be decoded. 
+//! Any transaction before user is able to sign it must be decoded.
 //!
-//! Transaction decoding uses network metadata, and Signer needs latest 
+//! Transaction decoding uses network metadata, and Signer needs latest
 //! available network metadata to parse freshly generated transactions.  
-//! 
-//! New network metadata could be added to Signer through scanning `load_metadata` 
-//! QR code for the network metadata. Signer allows loading new metadata only if 
-//! the network has network specs in the database and the incoming `load_metadata` 
+//!
+//! New network metadata could be added to Signer through scanning `load_metadata`
+//! QR code for the network metadata. Signer allows loading new metadata only if
+//! the network has network specs in the database and the incoming `load_metadata`
 //! payload is signed by the verifier already associated with the network.  
 //!
-//! Metadata is stored both in cold and in hot databases tree `METATREE` as 
+//! Metadata is stored both in cold and in hot databases tree `METATREE` as
 //! SCALE-encoded [`MetaValues`] under key [`MetaKey`].  
 
 use frame_metadata::{decode_different::DecodeDifferent, v14::RuntimeMetadataV14, RuntimeMetadata};
@@ -50,8 +50,8 @@ use crate::{
     keyring::MetaKey,
 };
 
-/// Network information extracted from the metadata: name, version, optional 
-/// base58 prefix, warning about extensions incompatible with transaction 
+/// Network information extracted from the metadata: name, version, optional
+/// base58 prefix, warning about extensions incompatible with transaction
 /// parsing for RuntimeMetadata with version 14 and above
 #[derive(Decode, Encode, PartialEq)]
 pub struct MetaInfo {
@@ -61,18 +61,18 @@ pub struct MetaInfo {
     pub version: u32,
     /// Network base58 prefix, could be encountered in metadata `SS58Prefix`
     /// constant  
-    /// 
-    /// If `SS58Prefix` constant is present in metadata, the prefix derived 
+    ///
+    /// If `SS58Prefix` constant is present in metadata, the prefix derived
     /// from it is expected to match `base58prefix` from `NetworkSpecs`.  
     pub optional_base58prefix: Option<u16>,
-    /// Flag to indicate that extrinsic set from metadata with 
+    /// Flag to indicate that extrinsic set from metadata with
     /// [`RuntimeMetadataV14`](https://docs.rs/frame-metadata/15.0.0/frame_metadata/v14/struct.RuntimeMetadataV14.html)
     /// is insufficient for transaction decoding  
     pub warn_incomplete_extensions: bool,
 }
 
-/// Metadata values: name, version, optional base58 prefix, warning about 
-/// extensions incompatible with transaction parsing for RuntimeMetadata with 
+/// Metadata values: name, version, optional base58 prefix, warning about
+/// extensions incompatible with transaction parsing for RuntimeMetadata with
 /// version 14 and above, and metadata itself as raw `Vec<u8>`
 #[derive(PartialEq, Clone)]
 pub struct MetaValues {
@@ -82,11 +82,11 @@ pub struct MetaValues {
     pub version: u32,
     /// Network base58 prefix, could be encountered in metadata `SS58Prefix`
     /// constant  
-    /// 
-    /// If `SS58Prefix` constant is present in metadata, the prefix derived 
+    ///
+    /// If `SS58Prefix` constant is present in metadata, the prefix derived
     /// from it is expected to match `base58prefix` from `NetworkSpecs`.  
     pub optional_base58prefix: Option<u16>,
-    /// Flag to indicate that extrinsic set from metadata with 
+    /// Flag to indicate that extrinsic set from metadata with
     /// [`RuntimeMetadataV14`](https://docs.rs/frame-metadata/15.0.0/frame_metadata/v14/struct.RuntimeMetadataV14.html)
     /// is insufficient for transaction decoding  
     pub warn_incomplete_extensions: bool,
@@ -95,8 +95,8 @@ pub struct MetaValues {
 }
 
 impl MetaValues {
-    /// Generates [`MetaValues`] from value extracted from database tree 
-    /// `METATREE` either in cold or in hot database using known associated 
+    /// Generates [`MetaValues`] from value extracted from database tree
+    /// `METATREE` either in cold or in hot database using known associated
     /// network name and network version  
     ///
     /// Checks that input name and version match the ones in metadata `Version`
@@ -128,11 +128,11 @@ impl MetaValues {
         }
         Ok(meta_values)
     }
-    
+
     /// Gets [`MetaValues`] from either cold or hot database tree `METATREE`
     /// (key, value) entry  
     ///
-    /// Checks that name and version from [`MetaKey`] match the ones in metadata 
+    /// Checks that name and version from [`MetaKey`] match the ones in metadata
     /// `Version` constant.  
     pub fn from_entry_checked<T: ErrorSource>(
         (meta_key_vec, meta_encoded): (IVec, IVec),
@@ -140,10 +140,10 @@ impl MetaValues {
         let (name, version) = MetaKey::from_ivec(&meta_key_vec).name_version::<T>()?;
         Self::from_entry_name_version_checked::<T>(&name, version, meta_encoded)
     }
-    
+
     /// Gets [`MetaValues`] from raw metadata in `Vec<u8>` format
     ///
-    /// Produces [`MetadataError`] if the metadata is somehow not suitable for 
+    /// Produces [`MetadataError`] if the metadata is somehow not suitable for
     /// use in Signer.
     pub fn from_slice_metadata(meta_slice: &[u8]) -> Result<Self, MetadataError> {
         let meta_info = info_from_metadata(&runtime_metadata_from_slice(meta_slice)?)?;
@@ -155,7 +155,7 @@ impl MetaValues {
             meta: meta_slice.to_vec(),
         })
     }
-    
+
     /// Gets [`MetaValues`] from `wasm` file
     ///
     /// Could be used to generate metadata updates before metadata release.
@@ -170,7 +170,7 @@ impl MetaValues {
             wasm: Wasm::FaultyMetadata(e),
         })
     }
-    
+
     /// Gets [`MetaValues`] from raw hexadecimal metadata
     ///
     /// Is used only on Active side, for:
@@ -224,13 +224,13 @@ pub fn convert_wasm_into_metadata(filename: &str) -> Result<Vec<u8>, Wasm> {
     <Vec<u8>>::decode(&mut &data[..]).map_err(|_| Wasm::DecodingMetadata)
 }
 
-/// Get [`MetaInfo`] from 
+/// Get [`MetaInfo`] from
 /// [`RuntimeMetadata`](https://docs.rs/frame-metadata/15.0.0/frame_metadata/enum.RuntimeMetadata.html)
 ///
-/// Searches `System` pallet within the metadata, gets from it `Version` and 
-/// optionally `SS58Prefix` constants. 
+/// Searches `System` pallet within the metadata, gets from it `Version` and
+/// optionally `SS58Prefix` constants.
 ///
-/// Produces [`MetaInfo`] if the metadata is suitable for the Signer, and 
+/// Produces [`MetaInfo`] if the metadata is suitable for the Signer, and
 /// [`MetadataError`] if not.
 ///
 /// `RuntimeMetadata` suitable for use in Signer:  
@@ -238,7 +238,7 @@ pub fn convert_wasm_into_metadata(filename: &str) -> Result<Vec<u8>, Wasm> {
 /// - must be of runtime version V12 or above  
 /// - must have 'System' pallet  
 /// - must have `Version` constant in `System` pallet, SCALE-decodeable  
-/// - can have `SS58Prefix` constant in `System` pallet, and if it does, the 
+/// - can have `SS58Prefix` constant in `System` pallet, and if it does, the
 /// constant must be SCALE-decodeable  
 ///
 /// Additionally, for [`RuntimeMetadataV14`](https://docs.rs/frame-metadata/15.0.0/frame_metadata/v14/struct.RuntimeMetadataV14.html)
@@ -388,7 +388,7 @@ fn need_v14_warning(metadata_v14: &RuntimeMetadataV14) -> bool {
         && signed_extensions.get("CheckMortality") == Some(&1)) // no warning needed if each one encountered, and only once
 }
 
-/// Metadata as checked [`RuntimeMetadata`](https://docs.rs/frame-metadata/15.0.0/frame_metadata/enum.RuntimeMetadata.html) 
+/// Metadata as checked [`RuntimeMetadata`](https://docs.rs/frame-metadata/15.0.0/frame_metadata/enum.RuntimeMetadata.html)
 /// with network info extracted from it, for transaction decoding
 #[cfg(feature = "signer")]
 pub struct MetaSetElement {
@@ -398,26 +398,26 @@ pub struct MetaSetElement {
     version: u32,
     /// Network base58 prefix, could be encountered in metadata `SS58Prefix`
     /// constant  
-    /// 
-    /// If `SS58Prefix` constant is present in metadata, the prefix derived 
+    ///
+    /// If `SS58Prefix` constant is present in metadata, the prefix derived
     /// from it is expected to match `base58prefix` from `NetworkSpecs`.  
     optional_base58prefix: Option<u16>,
     /// [`RuntimeMetadata`](https://docs.rs/frame-metadata/15.0.0/frame_metadata/enum.RuntimeMetadata.html)
-    /// [`MetaSetElement`] is successfully generated only if metadata is a 
+    /// [`MetaSetElement`] is successfully generated only if metadata is a
     /// suitable one
     runtime_metadata: RuntimeMetadata,
 }
 
 #[cfg(feature = "signer")]
 impl MetaSetElement {
-    /// Generates `MetaSetElement` from Signer database tree `METATREE` (key, value) 
+    /// Generates `MetaSetElement` from Signer database tree `METATREE` (key, value)
     /// entry  
     ///
-    /// Checks that name and version from [`MetaKey`] match the ones in metadata 
+    /// Checks that name and version from [`MetaKey`] match the ones in metadata
     /// `Version` constant.  
     ///
-    /// Also checks that the metadata is suitable for use in Signer. Since the 
-    /// metadata already was accepted in the database at some point, errors here 
+    /// Also checks that the metadata is suitable for use in Signer. Since the
+    /// metadata already was accepted in the database at some point, errors here
     /// are very unlikely to happen and would indicate the database corruption
     pub fn from_entry((meta_key_vec, meta_encoded): (IVec, IVec)) -> Result<Self, ErrorSigner> {
         let (network_name, network_version) =
@@ -468,17 +468,17 @@ impl MetaSetElement {
     pub fn name(&self) -> String {
         self.name.to_string()
     }
-    
+
     /// Gets network version
     pub fn version(&self) -> u32 {
         self.version
     }
-    
+
     /// Gets optional base58 prefix, if there is one in the metadata
     pub fn optional_base58prefix(&self) -> Option<u16> {
         self.optional_base58prefix
     }
-    
+
     /// Gets runtime metadata, to be used in transcation decoding
     pub fn runtime_metadata(&self) -> &RuntimeMetadata {
         &self.runtime_metadata
@@ -488,16 +488,16 @@ impl MetaSetElement {
 /// Network information needed for rpc calls in the network and for managing the
 /// hot database  
 ///
-/// Hot database contains tree `ADDRESS_BOOK` with information needed to perform 
+/// Hot database contains tree `ADDRESS_BOOK` with information needed to perform
 /// rpc calls in networks and generate `load_metadata` and `add_specs` payloads.
-/// 
-/// `ADDRESS_BOOK` tree stores SCALE-encoded [`AddressBookEntry`] entries under 
+///
+/// `ADDRESS_BOOK` tree stores SCALE-encoded [`AddressBookEntry`] entries under
 /// keys [`AddressBookKey`]
 #[derive(Decode, Encode, PartialEq)]
 #[cfg(feature = "active")]
 pub struct AddressBookEntry {
     /// Network name, as it appears in `Version` constant in metadata  
-    /// 
+    ///
     /// If network data is queired through rpc call, retrieved metadata must
     /// have exactly same network name in `Version` constant  
     pub name: String,
@@ -519,7 +519,7 @@ pub struct AddressBookEntry {
 
 #[cfg(feature = "active")]
 impl AddressBookEntry {
-    /// Gets [`AddressBookEntry`] from from hot database tree `ADDRESS_BOOK` 
+    /// Gets [`AddressBookEntry`] from from hot database tree `ADDRESS_BOOK`
     /// (key, value) entry.  
     pub fn from_entry(
         (address_book_key_encoded, address_book_entry_encoded): (IVec, IVec),
@@ -528,11 +528,11 @@ impl AddressBookEntry {
         AddressBookEntry::from_entry_with_title(&title, &address_book_entry_encoded)
     }
 
-    /// Gets network address book title and [`AddressBookEntry`] as a tuple from 
+    /// Gets network address book title and [`AddressBookEntry`] as a tuple from
     /// from hot database tree `ADDRESS_BOOK` (key, value) entry.  
     ///
-    /// Network address book title **differs** from `title` in network specs. 
-    /// This is just a key in hot database `ADDRESS_BOOK`, and is not displayed 
+    /// Network address book title **differs** from `title` in network specs.
+    /// This is just a key in hot database `ADDRESS_BOOK`, and is not displayed
     /// anywhere else.  
     pub fn process_entry(
         (address_book_key_encoded, address_book_entry_encoded): (IVec, IVec),
@@ -543,7 +543,7 @@ impl AddressBookEntry {
         Ok((title, address_book_entry))
     }
 
-    /// Gets [`AddressBookEntry`] from network address book title and associated 
+    /// Gets [`AddressBookEntry`] from network address book title and associated
     /// value from hot database tree `ADDRESS_BOOK`.  
     pub fn from_entry_with_title(
         title: &str,

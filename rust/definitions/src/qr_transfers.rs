@@ -38,7 +38,7 @@ use crate::types::TypeEntry;
 
 /// `load_metadata` QR code content  
 ///
-/// Messages `load_metadata` are used to update through air-gap the network 
+/// Messages `load_metadata` are used to update through air-gap the network
 /// matadata for networks already known to the Signer.  
 pub struct ContentLoadMeta(Vec<u8>);
 
@@ -177,10 +177,10 @@ impl ContentAddSpecs {
 ///
 /// Messages `load_types` are used to add or update Signer types information.  
 ///
-/// Externally acquired types information is needed only for 
+/// Externally acquired types information is needed only for
 /// [`RuntimeMetadata`](https://docs.rs/frame-metadata/15.0.0/frame_metadata/enum.RuntimeMetadata.html)
 /// V13 and below. After V14 all types information is contained within the metadata.  
-/// 
+///
 /// This kind of messages is expected to be used seldom, if ever.  
 #[derive(Decode, Encode)]
 pub struct ContentLoadTypes(Vec<u8>);
@@ -262,7 +262,7 @@ impl ContentLoadTypes {
 
 /// Derivations import QR code content  
 ///
-/// Derivations import could be used to generate or to restore a set of 
+/// Derivations import could be used to generate or to restore a set of
 /// **password-free** derivations in Signer avoiding manual adding of multiple
 /// derivations.  
 ///

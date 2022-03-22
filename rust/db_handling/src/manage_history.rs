@@ -174,7 +174,7 @@ pub fn history_entry_system(database_name: &str, string_from_system: String) -> 
 pub fn device_was_online(database_name: &str) -> Result<(), ErrorSigner> {
     let events = vec![Event::DeviceWasOnline];
     let mut settings_batch = Batch::default();
-    settings_batch.insert(DANGER, DangerRecord::not_safe().store());
+    settings_batch.insert(DANGER, DangerRecord::set_was_online().store());
     TrDbCold::new()
         .set_history(events_to_batch::<Signer>(database_name, events)?)
         .set_settings(settings_batch)

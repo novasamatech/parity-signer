@@ -1,3 +1,6 @@
+//! Trait [`ErrorSource`] and error-related types common for cold and hot sides
+//!
+//!
 use sp_core::crypto::SecretStringError;
 use sp_runtime::MultiSigner;
 

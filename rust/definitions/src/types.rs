@@ -2,12 +2,12 @@
 //! [`RuntimeMetadata`](https://docs.rs/frame-metadata/15.0.0/frame_metadata/enum.RuntimeMetadata.html)
 //! V12 and V13  
 //!
-//! Prior to V14, metadata did not contain information on *what* the type used 
-//! in the transaction actually is, it had only the type name. 
+//! Prior to V14, metadata did not contain information on *what* the type used
+//! in the transaction actually is, it had only the type name.
 //! For common types (i.e the ones encountered in network Westend, Polkadot,
 //! Kusama, and Rococo) the type information was found elsewhere, and is a part of
 //! existing Signer defaults.  
-//! 
+//!
 //! [`TypeEntry`] is used to store the type information. Default types set contains [`TypeEntry`]
 //! data for common types, and is stored in `SETTREE` tree of both hot and cold databases
 //! with key `TYPES`.  
