@@ -1,9 +1,5 @@
 package io.parity.signer.models
 
-import android.util.Log
-import org.json.JSONArray
-import org.json.JSONObject
-
 /**
  * This is how hard types should look like; just copy from ios I suppose?
  */

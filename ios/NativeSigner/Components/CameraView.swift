@@ -64,13 +64,16 @@ struct CameraView: View {
                 if model.total ?? 0 > 0 {
                     
                     MenuStack {
-                        HeadingOverline(text: "Multipart data").padding(.top, 12)
+                        HeadingOverline(text: "PARSING MULTIPART DATA").padding(.top, 12)
                         ProgressView(value: min(Float(captured ?? 0)/(Float(total ?? -1) + 2), 1))
                             .border(Color("Crypto400"))
                             .foregroundColor(Color("Crypto400"))
                             .padding(.vertical, 8)
-                        Text(String(model.captured ?? 0) + "/" + String(model.total ?? 0) + " complete")
+                        Text(constructFrameCountMessage(captured: model.captured, total: model.total))
                             .font(FBase(style: .subtitle1))
+                            .foregroundColor(Color("Text600"))
+                        Text("Please hold still")
+                            .font(FBase(style: .subtitle2))
                             .foregroundColor(Color("Text400"))
                         MenuButtonsStack {
                             BigButton(
@@ -81,11 +84,19 @@ struct CameraView: View {
                                 }
                             )
                         }
-                    }
+                    }.padding(.bottom, -20)
                 }
             }
         }.background(Color("Bg100"))
     }
+}
+
+func constructFrameCountMessage(captured: Int?, total: Int?) -> String {
+    return "From "
+         + String(captured ?? 0)
+         + " / "
+         + String(total ?? 0)
+         + " captured frames"
 }
 
 /*

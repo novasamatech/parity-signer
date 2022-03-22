@@ -19,7 +19,7 @@ struct RecoverSeedName: View {
             ZStack {
                 RoundedRectangle(cornerRadius: 8)
                     .stroke(Color("Border400"))
-                    //.foregroundColor(Color("Border400"))
+                //.foregroundColor(Color("Border400"))
                     .frame(height: 39)
                 TextField("Seed", text: $seedName, prompt: Text("Seed name"))
                     .focused($nameFocused)
@@ -32,12 +32,12 @@ struct RecoverSeedName: View {
                         data.lastError = ""
                     })
                     .onSubmit {
-                        if (seedName != "") && (!seedName.contains(",")) {
-                            data.pushButton(buttonID: .GoForward, details: seedName)
+                        if (seedName != "") && !data.checkSeedCollision(seedName: seedName.encode64()) {
+                            data.pushButton(buttonID: .GoForward, details: seedName.encode64())
                         }
                     }
                     .onAppear(perform: {
-                        seedName = content.seed_name
+                        seedName = content.seed_name.decode64()
                         nameFocused = content.keyboard
                     })
                     .padding(.horizontal, 8)
@@ -48,13 +48,9 @@ struct RecoverSeedName: View {
             BigButton(
                 text: "Next",
                 action: {
-                    if !data.checkSeedCollision(seedName: seedName) {
-                        data.pushButton(buttonID: .GoForward, details: seedName)
-                    } else {
-                        data.lastError = "This seed name already exists"
-                    }
+                    data.pushButton(buttonID: .GoForward, details: seedName.encode64())
                 },
-                isDisabled: (seedName == "") || (seedName.contains(","))
+                isDisabled: (seedName == "") || data.checkSeedCollision(seedName: seedName.encode64())
             )
             Spacer()
         }.padding()

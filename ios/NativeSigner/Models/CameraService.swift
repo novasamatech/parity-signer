@@ -244,7 +244,7 @@ public class CameraService: UIViewController, AVCaptureVideoDataOutputSampleBuff
                                 DispatchQueue.main.async {
                                     self.captured = self.bucket.count
                                 }
-                                if self.bucket.count >= self.total ?? 0 {
+                                if (self.bucket.count + 1) >= self.total ?? 0 {
                                     var err = ExternError()
                                     withUnsafeMutablePointer(to: &err) {err_ptr in
                                         let process = "[\"" +  self.bucket.joined(separator: "\",\"") + "\"]" //Decoder expects JSON array
