@@ -1,12 +1,12 @@
-//! Types used in history log in Signer
+//! Types used in Signer history log
 //!
 //! Signer keeps log of all events in `HISTORY` tree of the cold database.
 //!
 //! Every log [`Entry`] consists of timestamp and a set of simultaneously
-//! occured events stored as `Vec<Event>`. [`Entry`] is stored SCALE-encoded
-//! under key [`Order`](crate::keyring::Order). `Order` is produced from the
-//! order the event gets in history log when entered. `Order` is an addition
-//! to the timestamp, and normally arranging entries by the timestamp should
+//! occured events `Vec<Event>`. [`Entry`] is stored SCALE-encoded under key
+//! [`Order`](crate::keyring::Order). `Order` is produced from the order the
+//! event gets in history log when entered. `Order` is an addition to the
+//! timestamp, and normally arranging entries by the timestamp should
 //! coincide with arranging entries by `Order`.  
 //!
 //! Log by default starts with database init `Entry` containing:
@@ -83,8 +83,8 @@ impl MetaValuesDisplay {
 /// Event content for generating [`SufficientCrypto`](crate::crypto::SufficientCrypto)
 /// QR code for `load_metadata` message  
 ///
-/// Effectively records that network metadata were signed by user.
-/// Contains network name, network version, metadata hash, [`VerifierValue`]
+/// Effectively records that network metadata was signed by user.
+/// Contains network name, network version, metadata hash, and [`VerifierValue`]
 /// of address used for `SufficientCrypto` generation.  
 #[derive(Decode, Encode, PartialEq, Clone)]
 pub struct MetaValuesExport {
@@ -114,8 +114,7 @@ impl MetaValuesExport {
     }
 }
 
-/// Event content for importing or removing network specs and corresponding
-/// network verifier.  
+/// Event content for importing or removing network specs  
 #[derive(Decode, Encode, PartialEq, Clone)]
 pub struct NetworkSpecsDisplay {
     specs: NetworkSpecs,
@@ -285,11 +284,11 @@ impl TypesExport {
 
 /// Event content for address generation or removal
 ///
-/// Contains only public information associated with address:
+/// Contains public information associated with address:
 /// - seed name  
 /// - [`Encryption`]  
 /// - public key for address  
-/// - path with soft (`/`) and hard (`//`) derivatinos only, *without* password  
+/// - path with soft (`/`) and hard (`//`) derivatinos only, **without** password  
 /// - genesis hash of the network within which the address is  
 #[derive(Decode, Encode, PartialEq, Clone)]
 pub struct IdentityHistory {
@@ -378,7 +377,7 @@ impl SignDisplay {
         self.transaction.to_vec()
     }
 
-    /// Print json with [`SignDisplay`] information in case of *successful*
+    /// Print json with [`SignDisplay`] information in case of **successful**
     /// signing, for user interface
     ///
     /// Function to display transaction could vary,
@@ -398,7 +397,7 @@ impl SignDisplay {
         )
     }
 
-    /// Print json with [`SignDisplay`] information in case of *failed* signing,
+    /// Print json with [`SignDisplay`] information in case of **failed** signing,
     /// for user interface
     ///
     /// This is reserved for cases that have failed because user has entered
@@ -450,7 +449,7 @@ impl SignMessageDisplay {
         }
     }
 
-    /// Print json with [`SignMessageDisplay`] information in case of *successful*
+    /// Print json with [`SignMessageDisplay`] information in case of **successful**
     /// signing, for user interface
     #[cfg(feature = "signer")]
     pub fn success(&self) -> String {
@@ -463,7 +462,7 @@ impl SignMessageDisplay {
         )
     }
 
-    /// Print json with [`SignMessageDisplay`] information in case of *failed* signing,
+    /// Print json with [`SignMessageDisplay`] information in case of **failed** signing,
     /// for user interface
     #[cfg(feature = "signer")]
     pub fn pwd_failure(&self) -> String {
@@ -474,76 +473,103 @@ impl SignMessageDisplay {
 /// Events that could be recorded in the history log
 #[derive(Decode, Encode, Clone)]
 pub enum Event {
-    /// network metadata was added
+    /// Network metadata was added
     MetadataAdded(MetaValuesDisplay),
-    /// network metadata was removed
+
+    /// Network metadata was removed
     MetadataRemoved(MetaValuesDisplay),
-    /// user has generated [`SufficientCrypto`](crate::crypto::SufficientCrypto)
+
+    /// User has generated [`SufficientCrypto`](crate::crypto::SufficientCrypto)
     /// with one of Signer addresses for `load_metadata` update
     MetadataSigned(MetaValuesExport),
-    /// network specs were added
+
+    /// Network specs were added
     NetworkSpecsAdded(NetworkSpecsDisplay),
-    /// network specs were removed
+
+    /// Network specs were removed
     NetworkSpecsRemoved(NetworkSpecsDisplay),
-    /// user has generated [`SufficientCrypto`](crate::crypto::SufficientCrypto)
+
+    /// User has generated [`SufficientCrypto`](crate::crypto::SufficientCrypto)
     /// with one of Signer addresses for `add_specs` update
     NetworkSpecsSigned(NetworkSpecsExport),
-    /// network verifier with [`ValidCurrentVerifier`] was set for network
+
+    /// Network verifier with [`ValidCurrentVerifier`] was set for network
     NetworkVerifierSet(NetworkVerifierDisplay),
-    /// general verifier was set up
+
+    /// General verifier was set up
     GeneralVerifierSet(Verifier),
-    /// types information was added
+
+    /// Types information was added
     TypesAdded(TypesDisplay),
-    /// types information was removed
+
+    /// Types information was removed
     TypesRemoved(TypesDisplay),
-    /// user has generated [`SufficientCrypto`](crate::crypto::SufficientCrypto)
+
+    /// User has generated [`SufficientCrypto`](crate::crypto::SufficientCrypto)
     /// with one of Signer addresses for `load_types` update
     TypesSigned(TypesExport),
-    /// user has generated signature for a transaction
+
+    /// User has generated signature for a transaction
     TransactionSigned(SignDisplay),
-    /// user tried to generate signature for a transaction, but failed to enter
+
+    /// User tried to generate signature for a transaction, but failed to enter
     /// a valid password
     TransactionSignError(SignDisplay),
-    /// user has generated signature for a message
+
+    /// User has generated signature for a message
     MessageSigned(SignMessageDisplay),
-    /// user tried to generate signature for a message, but failed to enter
+
+    /// User tried to generate signature for a message, but failed to enter
     /// a valid password
     MessageSignError(SignMessageDisplay),
-    /// user generated a new address
+
+    /// User generated a new address
     IdentityAdded(IdentityHistory),
-    /// user removed an address
+
+    /// User removed an address
     IdentityRemoved(IdentityHistory),
-    /// all identities were wiped
+
+    /// All identities were wiped
     IdentitiesWiped,
+
     /// Signer was online, i.e. the air-gap was broken
     DeviceWasOnline,
-    /// user has acknowledged the dangers detected and has reset the Signer
+
+    /// User has acknowledged the dangers detected and has reset the Signer
     /// danger status
     ResetDangerRecord,
-    /// new seed was created (stored value here is the seed name)
+
+    /// New seed was created (stored value here is the seed name)
     SeedCreated(String),
-    /// user opened seed backup, and seed phrase for shortly shown as a plain
+
+    /// User opened seed backup, and seed phrase for shortly shown as a plain
     /// text on screen (stored value here is the seed name)
     SeedNameWasShown(String), // for individual seed_name
-    /// a warning was produces and displayed to user
+
+    /// A warning was produces and displayed to user
     Warning(String),
-    /// user has entered wrong password
+
+    /// User has entered wrong password
     WrongPassword,
-    /// user has manually added entry to history log
+
+    /// User has manually added entry to history log
     UserEntry(String),
-    /// system-generated entry into history log
+
+    /// System-generated entry into history log
     SystemEntry(String),
-    /// history was cleared
+
+    /// History was cleared
     HistoryCleared,
-    /// database was initiated
+
+    /// Database was initiated
     DatabaseInitiated,
 }
 
 /// History log individual entry
 ///
-/// Contains timestamp and set of [`Event`] that occured simultaneously.
+/// Contains timestamp and set of simultaneously occured events `Vec<Event>`.
 ///
-/// `Entry` is stored encoded in the `HISTORY` tree of the cold database,
+/// `Entry` is stored SCALE-encoded in the `HISTORY` tree of the cold database,
 /// under key `Order`.
 #[derive(Decode, Encode, Clone)]
 pub struct Entry {
@@ -555,8 +581,9 @@ pub struct Entry {
 impl Event {
     /// Print json with [`Event`] related information for user interface
     ///
-    /// Function to display transaction could vary,
-    /// currently general log view shows raw hexadecimal transaction,
+    /// Required input is the function to print `SignDisplay` contents.
+    ///
+    /// Currently general log view shows raw hexadecimal transaction,
     /// detailed log view shows parsed transaction if parsing is possible.
     pub fn show<O>(&self, op: O) -> String
     where
@@ -657,8 +684,9 @@ impl Event {
 impl Entry {
     /// Print json with [`Entry`] for user interface
     ///
-    /// Function to display transaction could vary,
-    /// currently general log view shows raw hexadecimal transaction,
+    /// Required input is the function to print `SignDisplay` contents.
+    ///
+    /// Currently general log view shows raw hexadecimal transaction,
     /// detailed log view shows parsed transaction if parsing is possible.
     pub fn show<O>(&self, op: O) -> String
     where

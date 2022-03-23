@@ -27,13 +27,17 @@ use crate::{
 pub struct AddressDetails {
     /// seed name (as it is known to the Signer device)  
     pub seed_name: String,
+
     /// derivation path, only with soft (`/`) and hard (`//`) junctions (i.e. no password)  
     pub path: String,
+
     /// whether the address key has an associated password  
     pub has_pwd: bool,
+
     /// set of networks, identified through [`NetworkSpecsKey`], that are available
     /// to work with this address key  
     pub network_id: Vec<NetworkSpecsKey>,
+
     /// encryption algorithm associated with the address key and all its associated networks  
     pub encryption: Encryption,
 }

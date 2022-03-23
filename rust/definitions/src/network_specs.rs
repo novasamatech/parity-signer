@@ -299,29 +299,40 @@ pub struct NetworkSpecs {
     /// Network-specific prefix for address representation in
     /// [base58 format](https://docs.rs/sp-core/6.0.0/sp_core/crypto/trait.Ss58Codec.html#method.to_ss58check_with_version)  
     pub base58prefix: u16,
+
     /// Network-associated color.  
     /// Historically is there, not doing much at the moment.  
     pub color: String,
+
     /// Order of magnitude, by which the token unit exceeds the balance integer unit.  
     /// Is used to display balance-related values properly.  
     pub decimals: u8,
+
     /// Encryption algorithm the network uses
     pub encryption: Encryption,
+
     /// Network genesis hash
     pub genesis_hash: [u8; 32],
+
     /// Network associated logo
     pub logo: String,
+
     /// Network name, as it appears in network metadata
     pub name: String,
+
     /// Order in which the network is displayed by Signer
     pub order: u8,
+
     /// Default derivation path for addresses in this network
     pub path_id: String,
+
     /// Network-associated secondary color.  
     /// Historically is there, not doing much at the moment.  
     pub secondary_color: String,
+
     /// Network title, as it appears in Signer menus.
     pub title: String,
+
     /// Token name, to display balance-related values properly.  
     pub unit: String,
 }
@@ -336,27 +347,37 @@ pub struct NetworkSpecsToSend {
     /// Network-specific prefix for address representation in
     /// [base58 format](https://docs.rs/sp-core/6.0.0/sp_core/crypto/trait.Ss58Codec.html#method.to_ss58check_with_version)  
     pub base58prefix: u16,
+
     /// Network-associated color.  
     /// Historically is there, not doing much at the moment.  
     pub color: String,
+
     /// Order of magnitude, by which the token unit exceeds the balance integer unit.  
     /// Is used to display balance-related values properly.  
     pub decimals: u8,
+
     /// Encryption algorithm the network uses  
     pub encryption: Encryption,
+
     /// Network genesis hash  
     pub genesis_hash: [u8; 32],
+
     /// Network associated logo  
     pub logo: String,
+
     /// Network name, as it appears in network metadata  
     pub name: String,
+
     /// Default derivation path for addresses in this network  
     pub path_id: String,
+
     /// Network-associated secondary color.  
     /// Historically is there, not doing much at the moment.  
     pub secondary_color: String,
+
     /// Network title, as it appears in Signer menus.  
     pub title: String,
+
     /// Token name, to display balance-related values properly.  
     pub unit: String,
 }
@@ -367,13 +388,17 @@ pub struct ShortSpecs {
     /// Network-specific prefix for address representation in
     /// [base58 format](https://docs.rs/sp-core/6.0.0/sp_core/crypto/trait.Ss58Codec.html#method.to_ss58check_with_version)  
     pub base58prefix: u16,
+
     /// Order of magnitude, by which the token unit exceeds the balance integer unit.  
     /// Is used to display balance-related values properly.  
     pub decimals: u8,
+
     /// Network genesis hash  
     pub genesis_hash: [u8; 32],
+
     /// Network name, as it appears in network metadata  
     pub name: String,
+
     /// Token name, to display balance-related values properly.  
     pub unit: String,
 }
@@ -633,6 +658,7 @@ impl VerifierValue {
 pub enum CurrentVerifier {
     /// Verifier is valid, Signer can use the network
     Valid(ValidCurrentVerifier),
+
     /// Verifier is invalid, Signer would not be able to use the network
     /// without wipe and reset
     Dead,
@@ -646,6 +672,7 @@ pub enum CurrentVerifier {
 pub enum ValidCurrentVerifier {
     /// Network has general verifier
     General,
+
     /// Network has some other verifier, different from the general one
     Custom(Verifier),
 }

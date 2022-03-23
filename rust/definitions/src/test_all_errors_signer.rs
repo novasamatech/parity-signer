@@ -415,12 +415,6 @@ pub fn signer_errors() -> Vec<ErrorSigner> {
     error_set.push(ErrorSigner::DeadVerifier(verifier_key));
 
     error_set.push(ErrorSigner::AddressGeneration(AddressGeneration::Common(
-        AddressGenerationCommon::EncryptionMismatch {
-            network_encryption: Encryption::Sr25519,
-            seed_object_encryption: Encryption::Ed25519,
-        },
-    )));
-    error_set.push(ErrorSigner::AddressGeneration(AddressGeneration::Common(
         AddressGenerationCommon::KeyCollision {
             seed_name: String::from("Alice super secret seed"),
         },
@@ -573,7 +567,7 @@ mod tests {
         let mut print = String::from("\n");
         let signer_errors = signer_errors();
         assert!(
-            signer_errors.len() == 156,
+            signer_errors.len() == 155,
             "Different error set length: {}",
             signer_errors.len()
         );
@@ -680,7 +674,6 @@ mod tests {
 "Entry with order 280 contains no transaction-related events."
 "Historical transaction was generated in network kulupu and processed. Currently there are no metadata entries for the network, and transaction could not be processed again. Add network metadata."
 "Network with genesis hash 853faffbfc6713c1f899bf16547fcfbf733ae8361b8ca0129699d01d4f2181fd is disabled. It could be enabled again only after complete wipe and re-installation of Signer."
-"Error generating address. Network encryption sr25519 is different from seed object encryption ed25519."
 "Error generating address. Address key collision for seed name Alice super secret seed"
 "Error generating address. Bad secret string: invalid overall format."
 "Error generating address. Bad secret string: invalid bip39 phrase."

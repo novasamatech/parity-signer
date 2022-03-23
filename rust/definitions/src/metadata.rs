@@ -57,14 +57,17 @@ use crate::{
 pub struct MetaInfo {
     /// Network name, from metadata `Version` constant  
     pub name: String,
+
     /// Network version, from in metadata `Version` constant  
     pub version: u32,
+
     /// Network base58 prefix, could be encountered in metadata `SS58Prefix`
     /// constant  
     ///
     /// If `SS58Prefix` constant is present in metadata, the prefix derived
     /// from it is expected to match `base58prefix` from `NetworkSpecs`.  
     pub optional_base58prefix: Option<u16>,
+
     /// Flag to indicate that extrinsic set from metadata with
     /// [`RuntimeMetadataV14`](https://docs.rs/frame-metadata/15.0.0/frame_metadata/v14/struct.RuntimeMetadataV14.html)
     /// is insufficient for transaction decoding  
@@ -78,18 +81,22 @@ pub struct MetaInfo {
 pub struct MetaValues {
     /// Network name, from metadata `Version` constant  
     pub name: String,
+
     /// Network version, from in metadata `Version` constant  
     pub version: u32,
+
     /// Network base58 prefix, could be encountered in metadata `SS58Prefix`
     /// constant  
     ///
     /// If `SS58Prefix` constant is present in metadata, the prefix derived
     /// from it is expected to match `base58prefix` from `NetworkSpecs`.  
     pub optional_base58prefix: Option<u16>,
+
     /// Flag to indicate that extrinsic set from metadata with
     /// [`RuntimeMetadataV14`](https://docs.rs/frame-metadata/15.0.0/frame_metadata/v14/struct.RuntimeMetadataV14.html)
     /// is insufficient for transaction decoding  
     pub warn_incomplete_extensions: bool,
+
     /// raw metadata
     pub meta: Vec<u8>,
 }
@@ -394,14 +401,17 @@ fn need_v14_warning(metadata_v14: &RuntimeMetadataV14) -> bool {
 pub struct MetaSetElement {
     /// Network name, from metadata `Version` constant
     name: String,
+
     /// Network version, from in metadata `Version` constant  
     version: u32,
+
     /// Network base58 prefix, could be encountered in metadata `SS58Prefix`
     /// constant  
     ///
     /// If `SS58Prefix` constant is present in metadata, the prefix derived
     /// from it is expected to match `base58prefix` from `NetworkSpecs`.  
     optional_base58prefix: Option<u16>,
+
     /// [`RuntimeMetadata`](https://docs.rs/frame-metadata/15.0.0/frame_metadata/enum.RuntimeMetadata.html)
     /// [`MetaSetElement`] is successfully generated only if metadata is a
     /// suitable one
@@ -501,15 +511,19 @@ pub struct AddressBookEntry {
     /// If network data is queired through rpc call, retrieved metadata must
     /// have exactly same network name in `Version` constant  
     pub name: String,
+
     /// Network genesis hash  
     ///
     /// If network data is queried through rpc call, retrieved version must
     /// be same as the one in address book  
     pub genesis_hash: [u8; 32],
+
     /// Url address for rpc calls, with or without preferred port  
     pub address: String,
+
     /// [`Encryption`] that is supported by the network  
     pub encryption: Encryption,
+
     /// Address book entry is the default one  
     ///
     /// Default networks currently are Polkadot, Kusama, Westend with Sr25519

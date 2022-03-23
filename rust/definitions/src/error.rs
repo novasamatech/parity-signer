@@ -1,6 +1,5 @@
-//! Trait [`ErrorSource`] and error-related types common for cold and hot sides
-//!
-//!
+//! Trait [`ErrorSource`] and error-related types shared by Signer and active
+//! sides
 use sp_core::crypto::SecretStringError;
 use sp_runtime::MultiSigner;
 
@@ -11,159 +10,257 @@ use crate::{
     users::AddressDetails,
 };
 
-/// Trait describing the origin of errors.
-/// ErrorSource is implemented for Active (errors on the active side -
+/// Error trait for Signer and Signer-ecosystem tools
+///
+/// [`ErrorSource`] is implemented for:
+/// - [`Active`](crate::error_active::Active) (errors on the active side -
 /// either hot database errors or errors while preparing cold database
 /// before its moving into Signer)
-/// and for Signer (errors on the Signer side)
+/// - [`Signer`](crate::error_signer::Signer) (errors on the Signer side)
 pub trait ErrorSource {
-    ///
-    /// Type specifies errors occuring on either Active or Signer side.
+    /// Enum listing all possible errors
     type Error;
+
+    /// Errors in transforming hexadecimal strings into `Vec<u8>`.
     ///
-    /// NotHex refers to errors in transforming hexadecimal strings into Vec<u8>.
-    /// NotHex errors may occur both on Active and on Signer side.
-    /// On Active side NotHex errors could be related to strings fetched form url,
-    /// input from command line, and processing of the default values.
-    /// On Signer side NotHex errors are caused by communication errors
+    /// `NotHex` errors may occur both on `Active` and on `Signer` side.
+    ///
+    /// On `Active` side `NotHex` errors could be related to strings fetched
+    /// form url, input from command line, and processing of the default values.
+    ///
+    /// On `Signer` side `NotHex` errors are caused by communication errors
     /// and, since user interface should be sending valid hex strings into rust,
-    /// generally should not be occuring.
+    /// generally are not expected to occur.
     type NotHex;
+
+    /// Sources of the faulty [`NetworkSpecsKey`] **excluding** the database
+    /// entries, that are:
     ///
-    /// Describes the source of the faulty NetworkSpecsKey
-    /// aside from the database itself (key in SpecsTree and value part in AddrTree).
-    /// On the Active side is empty.
+    /// - key in `SPECSTREE` (cold database) and `SPECSTREEPREP` (hot database)
+    /// - part of value in `ADDRTREE` (cold database), element of `network_id`
+    /// set in [`AddressDetails`]
+    ///
+    /// On the active side enum is empty.
+    ///
     /// On the Signer side the source could be only interface.
     type ExtraSpecsKeySource;
+
+    /// Sources of the faulty [`AddressKey`] **excluding** the database
+    /// entries, that are:
     ///
-    /// Describes the source of the faulty AddressSpecsKey
-    /// aside from the database itself.
-    /// On the active side is empty.
+    /// - key in `ADDRTREE` (cold database)
+    ///
+    /// On the active side enum is empty.
+    ///
     /// On the Signer side the source could be only interface.
     type ExtraAddressKeySource;
+
+    /// Sources of the faulty metadata **excluding** the database entries, that
+    /// are:
     ///
-    /// Incoming metadata source describes possible origins of the faulty metadata
-    /// excluding the database.
-    /// For Active side, it could be bad fetch or damaged default file.
-    /// For Signer side, it could be faulty received metadata.
+    /// - value stored in `METATREE` (both cold and hot databases)
+    ///
+    /// For active side, it could be bad fetch or damaged default file.
+    ///
+    /// For Signer side, it could be faulty received metadata update.
     type IncomingMetadataSource;
-    ///
-    /// Source-specific errors during address generation:
-    /// test address generation on Active side
-    /// and actual address generation on the Signer side
+
+    /// Address generation errors, unique for given [`ErrorSource`] implementor
     type ExtraAddressGeneration;
-    ///
-    /// Function to transform NotHex error into Error
+
+    /// Transform `NotHex` error into `Error`
     fn hex_to_error(what: Self::NotHex) -> Self::Error;
-    ///
-    /// Function to create Error for bad network specs key
+
+    /// `Error` for damaged [`NetworkSpecsKey`]
     fn specs_key_to_error(
         network_specs_key: &NetworkSpecsKey,
         source: SpecsKeySource<Self>,
     ) -> Self::Error;
-    ///
-    /// Function to create Error for bad address key
+
+    /// `Error` for damaged [`AddressKey`]
     fn address_key_to_error(
         address_key: &AddressKey,
         source: AddressKeySource<Self>,
     ) -> Self::Error;
+
+    /// `Error` for damaged [`MetaKey`]
     ///
-    /// Function to create Error for bad meta key (database only both on the Active side
-    /// and on the Signer side)
+    /// Damaged [`MetaKey`] both on active and on Signer side would mean the
+    /// database corruption
     fn meta_key_to_error(meta_key: &MetaKey) -> Self::Error;
-    ///
-    /// Function to create errors for metadata name and/or version mismatch within the database
+
+    /// `Error` for mismatch of network name and/or network version between the
+    /// values from [`MetaKey`] and the values from `Version` constant in
+    /// `System` pallet of the metadata itself
     fn metadata_mismatch(
         name_key: String,
         version_key: u32,
         name_inside: String,
         version_inside: u32,
     ) -> Self::Error;
-    ///
-    /// Function to create errors related to metadata being unsuitable
+
+    /// `Error` when metadata is unsuitable for use in Signer
     fn faulty_metadata(error: MetadataError, source: MetadataSource<Self>) -> Self::Error;
-    ///
-    /// Functions to create errors related to network specs NetworkSpecs
-    /// (is used on Signer side, but also on Active side, for example, during metadata transfer in test cold database)
-    /// Function to generate error in the event that NetworkSpecs entry could not be decoded...
+
+    /// `Error` when [`NetworkSpecs`](crate::network_specs::NetworkSpecs) entry
+    /// could not be decoded
     fn specs_decoding(key: NetworkSpecsKey) -> Self::Error;
-    /// ... or has mismatch in genesis hash between key and stored value,
+
+    /// `Error` when there is genesis hash mismatch between stored
+    /// [`NetworkSpecs`](crate::network_specs::NetworkSpecs) contents and the
+    /// [`NetworkSpecsKey`]
     fn specs_genesis_hash_mismatch(key: NetworkSpecsKey, genesis_hash: Vec<u8>) -> Self::Error;
-    /// ... or has mismatch in encryption between key and stored value,
+
+    /// `Error` when there is encryption mismatch between stored
+    /// [`NetworkSpecs`](crate::network_specs::NetworkSpecs) contents and the
+    /// [`NetworkSpecsKey`]
     fn specs_encryption_mismatch(key: NetworkSpecsKey, encryption: Encryption) -> Self::Error;
-    ///
-    /// Functions to create errors related to address details AddressDetails
-    /// (intended for Signer side, but could appear on the Active side during test identities generation)
-    /// Function to generate error in the event that AddressDetails entry could not be decoded...
+
+    /// `Error` when [`AddressDetails`] entry could not be decoded
     fn address_details_decoding(key: AddressKey) -> Self::Error;
-    /// ... or has mismatch in encryption between key and stored value,
+
+    /// `Error` when there is encryption mismatch between `encryption` field
+    /// of [`AddressDetails`] and the [`AddressKey`]
     fn address_details_encryption_mismatch(key: AddressKey, encryption: Encryption) -> Self::Error;
-    /// ... or has mismatch between encryption within address details and encryption
-    /// of an associated network
+
+    /// `Error` when there is encryption mismatch between one of
+    /// [`NetworkSpecsKey`] in `network_id` field of [`AddressDetails`] and the
+    /// `encryption` field of [`AddressDetails`] 
     fn address_details_specs_encryption_mismatch(
         address_key: AddressKey,
         network_specs_key: NetworkSpecsKey,
     ) -> Self::Error;
-    ///
-    /// Function to generate error in case of a common address generation error
+
+    /// `Error` corresponding to one of [`AddressGenerationCommon`]
+    /// variants
     fn address_generation_common(error: AddressGenerationCommon) -> Self::Error;
-    ///
-    /// Function to create error corresponding to faulty transfer content
+
+    /// `Error` corresponding to faulty [`TransferContent`]
     fn transfer_content_error(transfer_content: TransferContent) -> Self::Error;
-    ///
-    /// Functions to create error corresponding to database internal error...
+
+    /// `Error` corresponding to database internal error
     fn db_internal(error: sled::Error) -> Self::Error;
-    /// ... and database transaction error
+
+    /// `Error` corresponding to database transaction error
     fn db_transaction(error: sled::transaction::TransactionError) -> Self::Error;
-    ///
-    /// Functions to create error corresponding to the situation
-    /// when types information from the database that could not be decoded...
+
+    /// `Error` when types information from the database could not be decoded
     fn faulty_database_types() -> Self::Error;
-    /// ... or could not be found at all
+
+    /// `Error` when types information was expected to be in the database, but
+    /// was not found
     fn types_not_found() -> Self::Error;
-    ///
-    /// Function to create error when metadata for the network with given name and version was not found
+
+    /// `Error` when metadata for the network with given name and version was
+    /// expected to be in the database, but was not found
     fn metadata_not_found(name: String, version: u32) -> Self::Error;
+
+    /// Print `Error` as a `String`
     ///
-    /// Function to print the Error, is used in cards, for anyhow or std::fmt::Display output
+    /// Generated string is used in parsing cards, in Signer side anyhow
+    /// errors, or in active side errors std::fmt::Display implementation.
     fn show(error: &Self::Error) -> String;
 }
 
+/// Source of the error-causing network metadata
+#[derive(Debug)]
 pub enum MetadataSource<T: ErrorSource + ?Sized> {
+    /// Faulty metadata in the database
+    ///
+    /// Associated `name` and `version` are the ones found from the
+    /// corresponding [`MetaKey`]
     Database { name: String, version: u32 },
+
+    /// Faulty metadata was received from the outside
     Incoming(T::IncomingMetadataSource),
 }
 
+/// Source of the error-causing [`NetworkSpecsKey`]
+#[derive(Debug)]
 pub enum SpecsKeySource<T: ErrorSource + ?Sized> {
+    /// Faulty [`NetworkSpecsKey`] is a key in the tree `SPECSTREE` (cold
+    /// database) or `SPECSTREEPREP` (hot database)
     SpecsTree,
+
+    /// Faulty [`NetworkSpecsKey`] is encountered in `network_id` set in
+    /// [`AddressDetails`]
+    ///
+    /// Associated [`AddressKey`] is the one under which the [`AddressDetails`]
+    /// are stored in the tree `ADDRTREE` (cold database)
     AddrTree(AddressKey),
+
+    /// Faulty [`NetworkSpecsKey`] is not from the database
     Extra(T::ExtraSpecsKeySource),
 }
 
+/// Source of the error-causing [`AddressKey`]
+#[derive(Debug)]
 pub enum AddressKeySource<T: ErrorSource + ?Sized> {
+    /// Faulty [`AddressKey`] is a key in the tree `ADDRTREE` (cold
+    /// database)
     AddrTree,
+
+    /// Faulty [`AddressKey`] is not from the database
     Extra(T::ExtraAddressKeySource),
 }
 
+/// Errors in the address generation
 #[derive(Debug)]
 pub enum AddressGeneration<T: ErrorSource + ?Sized> {
+    /// Address generation errors common for active and Signer sides
     Common(AddressGenerationCommon),
+
+    /// Address generation errors, unique for given [`ErrorSource`] implementor
     Extra(T::ExtraAddressGeneration),
 }
 
+/// Address generation errors common for active and Signer sides
 #[derive(Debug)]
 pub enum AddressGenerationCommon {
-    EncryptionMismatch {
-        network_encryption: Encryption,
-        seed_object_encryption: Encryption,
-    },
-    KeyCollision {
-        seed_name: String,
-    },
+    /// Same public key was produced for a different seed phrase and/or 
+    /// derivation path
+    ///
+    /// Address is generated within a network using seed phrase and derivation
+    /// path.
+    ///
+    /// Address is defined by public key and [`NetworkSpecsKey`]. Public key
+    /// is created from seed phrase and derivation with encryption algorithm
+    /// supported by the network.
+    ///
+    /// If two networks are using the same encryption algorithm, generating
+    /// public key in both with same seed phrase and derivation path would
+    /// result in two identical public keys. This is normal and expected
+    /// behavior, and this is the reason why [`AddressDetails`] contain a set
+    /// of allowed networks in `network_id` field.  
+    ///
+    /// It is, however, possible, that when generating public key for
+    /// **different** seed names and/or **different** derivation
+    /// paths, resulting public keys accidentally coincide.
+    ///
+    /// This is called here `KeyCollision`, and results in error.
+    KeyCollision { seed_name: String },
+
+    /// Error in [`SecretString`](https://docs.rs/sp-core/6.0.0/sp_core/crypto/type.SecretString.html).
+    ///
+    /// SecretString consists of combined seed phrase and derivation.
+    ///
+    /// Associated error content is
+    /// [`SecretStringError`](https://docs.rs/sp-core/6.0.0/sp_core/crypto/enum.SecretStringError.html).
     SecretString(SecretStringError),
+
+    /// Derivaion that user tried to create already exists.
+    ///
+    /// Associated error content is:
+    /// - [`MultiSigner`](https://docs.rs/sp-runtime/6.0.0/sp_runtime/enum.MultiSigner.html)
+    /// of the already existing address
+    /// - [`AddressDetails`] for already existing address
+    /// - [`NetworkSpecsKey`] of the associated network
     DerivationExists(MultiSigner, AddressDetails, NetworkSpecsKey),
 }
 
+/// Display
+/// [`SecretStringError`](https://docs.rs/sp-core/6.0.0/sp_core/crypto/enum.SecretStringError.html)
+/// as `&str`.
 pub(crate) fn bad_secret_string(e: &SecretStringError) -> &'static str {
     match e {
         SecretStringError::InvalidFormat => "invalid overall format",
@@ -176,16 +273,9 @@ pub(crate) fn bad_secret_string(e: &SecretStringError) -> &'static str {
 }
 
 impl AddressGenerationCommon {
+    /// Display [`AddressGenerationCommon`] in readable form
     pub fn show(&self) -> String {
         match &self {
-            AddressGenerationCommon::EncryptionMismatch {
-                network_encryption,
-                seed_object_encryption,
-            } => format!(
-                "Network encryption {} is different from seed object encryption {}.",
-                network_encryption.show(),
-                seed_object_encryption.show()
-            ),
             AddressGenerationCommon::KeyCollision { seed_name } => {
                 format!("Address key collision for seed name {}", seed_name)
             }
@@ -208,18 +298,25 @@ impl AddressGenerationCommon {
     }
 }
 
-/// Enum to specify errors occuring with decoding transfer content,
-/// all of its variants could be encountered both on the Active side
+/// Error decoding transfer content
+///
+/// All variants could be encountered both on the active side
 /// (when checking the message content while signing it)
-/// and on the cold side (when processing the received messages)
+/// and on the Signer side (when processing the received messages)
 #[derive(Debug)]
 pub enum TransferContent {
+    /// `add_specs` message content
     AddSpecs,
+
+    /// `load_metadata` message content
     LoadMeta,
+
+    /// `load_types` message content
     LoadTypes,
 }
 
 impl TransferContent {
+    /// Display [`TransferContent`] in readable form
     pub fn show(&self) -> String {
         let insert = match &self {
             TransferContent::AddSpecs => "`add_specs`",
@@ -230,20 +327,48 @@ impl TransferContent {
     }
 }
 
-/// Enum to describe intrinsic problems of the metadata
+/// Intrinsic problems of the metadata making it unsuitable for Signer use
 #[derive(Debug)]
 pub enum MetadataError {
+    /// Supported are V12, V13, and V14 versions of
+    /// [`RuntimeMetadata`](https://docs.rs/frame-metadata/15.0.0/frame_metadata/enum.RuntimeMetadata.html).
+    ///
+    /// Any other version results in error.
     VersionIncompatible,
+
+    /// Metadata does not have `System` pallet, i.e. there is no place to look
+    /// for network
+    /// [`RuntimeVersion`](https://docs.rs/sp-version/latest/sp_version/struct.RuntimeVersion.html)
     NoSystemPallet,
+
+    /// Metadata does not have `Version` constant in `System` pallet, i.e.
+    /// there is no place to look for network
+    /// [`RuntimeVersion`](https://docs.rs/sp-version/latest/sp_version/struct.RuntimeVersion.html)
     NoVersionInConstants,
+
+    /// `Vec<u8>` retrieved from `Version` constant in `System` pallet could
+    /// not be decoded as
+    /// [`RuntimeVersion`](https://docs.rs/sp-version/latest/sp_version/struct.RuntimeVersion.html)
     RuntimeVersionNotDecodeable,
+
+    /// Metadata has `SS58Prefix` constant in `System` pallet, but its content
+    /// could not be decoded as valid base58 prefix, i.e. as `u16` or `u8`
+    /// number
     Base58PrefixNotDecodeable,
+
+    /// Base58 prefix from metadata (`meta`) does not match base58 prefix in specs (`specs`)
     Base58PrefixSpecsMismatch { specs: u16, meta: u16 },
+
+    /// Metadata first 4 bytes are not expected `b"meta"` prelude
     NotMeta,
+
+    /// Metadata body (after `b"meta"` prelude) could not be decoded as
+    /// [`RuntimeMetadata`](https://docs.rs/frame-metadata/15.0.0/frame_metadata/enum.RuntimeMetadata.html)
     UnableToDecode,
 }
 
 impl MetadataError {
+    /// Display [`MetadataError`] in readable form
     pub fn show(&self) -> String {
         match &self {
             MetadataError::VersionIncompatible => String::from("Runtime metadata version is incompatible. Currently supported are v12, v13, and v14."),

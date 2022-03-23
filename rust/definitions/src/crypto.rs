@@ -113,6 +113,7 @@ pub enum SufficientCrypto {
         /// signature for the data
         signature: sp_core::ed25519::Signature,
     },
+
     /// `Sr25519` encryption algorithm
     Sr25519 {
         /// public key of the signature author
@@ -120,6 +121,7 @@ pub enum SufficientCrypto {
         /// signature for the data
         signature: sp_core::sr25519::Signature,
     },
+
     /// `Ecdsa` encryption algorithm
     Ecdsa {
         /// public key of the signature author
@@ -147,6 +149,7 @@ impl SufficientCrypto {
             } => VerifierValue::Standard(MultiSigner::Ecdsa(public.to_owned())),
         }
     }
+
     /// Get [`MultiSignature`](https://docs.rs/sp-runtime/6.0.0/sp_runtime/enum.MultiSignature.html)
     /// from signature part of [`SufficientCrypto`]
     pub fn multi_signature(&self) -> MultiSignature {

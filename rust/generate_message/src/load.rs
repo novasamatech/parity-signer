@@ -1,6 +1,6 @@
 use constants::{ADDRESS_BOOK, EXPORT_FOLDER, HOT_DB_NAME, METATREE};
-use db_handling::helpers::{open_db, open_tree};
-use definitions::{error::{ErrorSource, MetadataError, MetadataSource}, error_active::{Active, Changed, DatabaseActive, ErrorActive, Fetch, IncomingMetadataSourceActive, IncomingMetadataSourceActiveStr, NotFoundActive}, keyring::{MetaKey, MetaKeyPrefix}, metadata::{AddressBookEntry, MetaValues}};
+use db_handling::helpers::{get_meta_values_by_name_version, open_db, open_tree};
+use definitions::{error::{ErrorSource, MetadataError, MetadataSource}, error_active::{Active, Changed, DatabaseActive, ErrorActive, Fetch, IncomingMetadataSourceActive, IncomingMetadataSourceActiveStr, NotFoundActive}, keyring::MetaKeyPrefix, metadata::{AddressBookEntry, MetaValues}};
 
 use crate::parser::{Instruction, Content, Set};
 use crate::metadata_db_utils::{add_new, SortedMetaValues, prepare_metadata, write_metadata};
@@ -313,20 +313,11 @@ pub fn unwasm (filename: &str, update_db: bool) -> Result<(), ErrorActive> {
 /// Function to generate text file with hex string metadata, for defaults generation
 /// Takes metadata only from the database
 pub fn meta_default_file(name: &str, version: u32) -> Result<(), ErrorActive> {
-    let meta_key = MetaKey::from_parts(name, version);
-    let database = open_db::<Active>(HOT_DB_NAME)?;
-    let metadata = open_tree::<Active>(&database, METATREE)?;
-    match metadata.get(meta_key.key()) {
-        Ok(Some(encoded_entry)) => {
-            let meta_values = MetaValues::from_entry_name_version_checked::<Active>(name, version, encoded_entry)?;
-            let filename = format!("{}/{}{}", EXPORT_FOLDER, name, version);
-            match std::fs::write(&filename, hex::encode(meta_values.meta)) {
-                Ok(_) => Ok(()),
-                Err(e) => Err(ErrorActive::Output(e)),
-            }
-        },
-        Ok(None) => Err(<Active>::metadata_not_found(name.to_string(), version)),
-        Err(e) => Err(<Active>::db_internal(e)),
+    let meta_values = get_meta_values_by_name_version::<Active>(HOT_DB_NAME, name, version)?;
+    let filename = format!("{}/{}{}", EXPORT_FOLDER, name, version);
+    match std::fs::write(&filename, hex::encode(meta_values.meta)) {
+        Ok(_) => Ok(()),
+        Err(e) => Err(ErrorActive::Output(e)),
     }
 }
 

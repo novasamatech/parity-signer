@@ -26,6 +26,7 @@ use parity_scale_codec::{Decode, Encode};
 pub struct TypeEntry {
     /// type name, as it appears in the metadata
     pub name: String,
+
     /// type description
     pub description: Description,
 }
@@ -37,8 +38,10 @@ pub struct TypeEntry {
 pub enum Description {
     /// type is a type alias
     Type(String),
+
     /// type is an enum
     Enum(Vec<EnumVariant>),
+
     /// type is a struct
     Struct(Vec<StructField>),
 }
@@ -50,6 +53,7 @@ pub enum Description {
 pub struct EnumVariant {
     /// enum variant name, will be displayed during the parsing if the variant is encountered
     pub variant_name: String,
+
     /// variant type
     pub variant_type: EnumVariantType,
 }
@@ -69,6 +73,7 @@ pub enum EnumVariantType {
 pub struct StructField {
     /// struct field name, if it exists, it will be displayed during the parsing if the struct is encountered
     pub field_name: Option<String>,
+
     /// field type
     pub field_type: String,
 }
