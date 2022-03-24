@@ -1,6 +1,20 @@
+//! Errors occuring in Signer
+//!
+//! Signer works with cold database only.
+//!
+//! All errors [`ErrorSigner`] could be displayed to user:
+//! - as part of card set, generated during transaction parsing  
+//! - as individual text errors through `Error` modal in `navigator`
+//! - as `anyhow` errors produced by the Signer device
+//!
+//! For all this, the text representation of the error is needed. Error text
+//! must clearly indicate what happened and what user can try to do to fix the
+//! issue. Error wording must be yet polished extensively.
+//!
+//! This module gathers all possible errors in one place, so that error
+//! management is easier.
 use anyhow::anyhow;
 use sp_core::crypto::SecretStringError;
-//use wasm_testbed;
 
 use crate::{
     crypto::Encryption,
@@ -318,139 +332,334 @@ impl ErrorSource for Signer {
                 format!("Error generating address. {}", insert)
             },
             ErrorSigner::Qr(e) => format!("Error generating qr code. {}", e),
-            ErrorSigner::Parser(a) => format!("Error parsing incoming transaction. {}", a.show()),
-            ErrorSigner::AllParsingFailed(errors) => {
+            ErrorSigner::Parser(a) => format!("Error parsing incoming transaction content. {}", a.show()),
+            ErrorSigner::AllExtensionsParsingFailed{network_name, errors} => {
                 let mut insert = String::new();
-                for (i,(name, version, parser_error)) in errors.iter().enumerate() {
+                for (i,(version, parser_error)) in errors.iter().enumerate() {
                     if i>0 {insert.push(' ')}
-                    insert.push_str(&format!("Parsing with {}{} metadata: {}", name, version, parser_error.show()));
+                    insert.push_str(&format!("Parsing with {}{} metadata: {}", network_name, version, parser_error.show()));
                 }
-                format!("All parsing attempts failed with following errors. {}", insert)
+                format!("Failed to decode extensions. Please try updating metadata for {} network. {}", network_name, insert)
             },
             ErrorSigner::AddressUse(e) => format!("Error with secret string of existing address: {}.", bad_secret_string(e)),
             ErrorSigner::WrongPassword => String::from("Wrong password."),
             ErrorSigner::WrongPasswordNewChecksum(_) => String::from("Wrong password."),
-            ErrorSigner::PngGeneration(e) => format!("Error generating png. {}", e),
             ErrorSigner::NoNetworksAvailable => String::from("No networks available. Please load networks information to proceed."),
         }
     }
 }
 
-/// Enum listing all variants of errors from the Signer side
+/// All possible errors that could occur on the Signer side
 #[derive(Debug)]
 pub enum ErrorSigner {
+    /// Communication errors on the interface between native frontend and rust
+    /// backend
     Interface(InterfaceSigner),
+
+    /// Errors within Signer rust-managed database
     Database(DatabaseSigner),
+
+    /// Errors in received input: either signable transaction or update
     Input(InputSigner),
+
+    /// Something was expected to be known to Signer, but was not found
     NotFound(NotFoundSigner),
+
+    /// User tried to interact with previously disabled network
     DeadVerifier(VerifierKey),
+
+    /// Errors with address generation
     AddressGeneration(AddressGeneration<Signer>),
+
+    /// Errors with static QR codes generation
+    ///
+    /// Signer can produce QR codes with signatures for transactions, with
+    /// [`SufficientCrypto`](crate::crypto::SufficientCrypto) exports for
+    /// user-verified updates, and with address public information exports
+    /// for Signer companion.
     Qr(String),
+
+    /// Errors parsing a signable transactions with a given version of the
+    /// metadata for given network
     Parser(ParserError),
-    AllParsingFailed(Vec<(String, u32, ParserError)>),
+
+    /// Error parsing extensions of a signable transaction with all available
+    /// versions of metadata for given network
+    AllExtensionsParsingFailed {
+        network_name: String,
+        errors: Vec<(u32, ParserError)>,
+    },
+
+    /// Error with using address already stored in the database
     AddressUse(SecretStringError),
+
+    /// User has entered a wrong password for a passworded address
+    ///
+    /// For cases when Signer database checksum is not verified.
+    /// Signer log records that password was entered incorrectly.
     WrongPassword,
+
+    /// User has entered a wrong password for a passworded address for cases
+    /// when the Signer database checksum is verified
+    ///
+    /// Signer log records that password was entered incorrectly.
+    /// This changes the database checksum, and for the next attempt it must be
+    /// updated.
     WrongPasswordNewChecksum(u32),
-    PngGeneration(png::EncodingError),
+
+    /// Signer has attempted an operation that requires at least one network to
+    /// be loaded into Signer
     NoNetworksAvailable,
 }
 
-/// Signer side errors could be exported into native interface,
-/// before that they are transformed into anyhow errors
 impl ErrorSigner {
+    /// Signer side errors could be exported into native interface, before that
+    /// they must be transformed into anyhow errors
     pub fn anyhow(&self) -> anyhow::Error {
         anyhow!(<Signer>::show(self))
     }
 }
 
-/// Enum listing all variants of errors on the interface between native and Rust parts,
-/// on Signer side
+/// Communication errors on the interface between native frontend and rust
+/// backend
+///
+/// [`InterfaceSigner`] error means that rust backend can not process the
+/// information sent by the frontend.
+///
+/// Signer rust backend sends data into frontend as `json` strings. Frontend
+/// parses these `json` strings, displays them, and can send back into rust
+/// some parts of the data that the user has, for example, selected.
+///
+/// Data that user can type from keyboard is processed as is, it does not
+/// cause errors on the interface.
 #[derive(Debug)]
 pub enum InterfaceSigner {
+    /// Received string is not hexadecimal, and could not be transformed into
+    /// `Vec<u8>`
     NotHex(NotHexSigner),
+
+    /// Received database key could not be decoded
     KeyDecoding(KeyDecodingSignerInterface),
+
+    /// Received public key length is different from the one expected for
+    /// given encryption algorithm
     PublicKeyLength,
-    HistoryPageOutOfRange {
-        page_number: u32,
-        total_pages: u32,
-    },
+
+    /// Requested history page number exceeds the total number of pages
+    // TODO: error possibly would become obsolete
+    HistoryPageOutOfRange { page_number: u32, total_pages: u32 },
+
+    /// To generate QR code with public address information export, Signer
+    /// receives both seed name and
+    /// [`MultiSigner`](https://docs.rs/sp-runtime/6.0.0/sp_runtime/enum.MultiSigner.html)
+    /// from the navigation state `Navstate`.
+    /// `MultiSigner` gets transformed into [`AddressKey`] and corresponds to
+    /// [`AddressDetails`](crate::users::AddressDetails) that are exported.
+    /// `AddressDetails` also contain `seed_name` field, that must coincide
+    /// with the one received directly from the navigator.
+    /// This error appears if the seed names are different.
     SeedNameNotMatching {
         address_key: AddressKey,
         expected_seed_name: String,
         real_seed_name: String,
     },
+
+    /// User was creating the derivation with password, and thus moved into
+    /// `PasswordConfirm` modal, however, the password was not found when
+    /// cutting password from the path
     LostPwd,
+
+    /// Received from interface network metadata version could not be parsed
+    /// as `u32`
+    ///
+    /// Associated content is the received data as a string
     VersionNotU32(String),
+
+    /// Received from interface increment for address generation could not
+    /// be parsed as `u32`
+    ///
+    /// Associated content is the received data as a string
     IncNotU32(String),
+
+    /// Received from interface history log order could not be parsed as `u32`
+    ///
+    /// Associated content is the received data as a string
     OrderNotU32(String),
+
+    /// Received from interface boolean flag could not be parsed as `bool`
+    ///
+    /// Associated content is the received data as a string
     FlagNotBool(String),
 }
 
-/// NotHex errors occuring on the Signer side
+/// `NotHex` errors occuring on the Signer side
+///
+/// Expected to receive hexadecimal string from the interface, got something
+/// different. [`NotHexSigner`] specifies, what was expected.
 #[derive(Debug)]
 pub enum NotHexSigner {
+    /// [`NetworkSpecsKey`] is not hexadecimal, associated data is input string
+    /// as it is received
     NetworkSpecsKey { input: String },
+
+    /// Received signable transaction or update are not hexadecimal
     InputContent,
+
+    /// [`AddressKey`] is not hexadecimal, associated data is input string as
+    /// it is received
     AddressKey { input: String },
 }
 
-/// Source of bad network specs keys on the Signer side
+/// Source of damaged [`NetworkSpecsKey`], exclusive for the Signer side
 #[derive(Debug)]
 pub enum ExtraSpecsKeySourceSigner {
+    /// Damaged [`NetworkSpecsKey`] is from the interface
     Interface,
 }
 
-/// Source of bad address keys
+/// Source of damaged [`AddressKey`], exclusive for the Signer side
+#[derive(Debug)]
 pub enum ExtraAddressKeySourceSigner {
+    /// Damaged [`AddressKey`] is from the interface
     Interface,
 }
 
-/// Source of unsuitable metadata on the Signer side
+/// Source of damaged metadata, exclusive for the Signer side
 #[derive(Debug)]
 pub enum IncomingMetadataSourceSigner {
+    /// Damaged metadata is received through QR code update
     ReceivedData,
 }
 
-/// Enum listing possible errors in decoding keys from the interface on the Signer side
+/// Errors decoding database keys received from the frontend on the Signer
+/// side
 #[derive(Debug)]
 pub enum KeyDecodingSignerInterface {
+    /// [`AddressKey`] received from the frontend was a valid hexadecimal, but
+    /// turned out to be a damaged database key with invalid content.
+    ///
+    /// This error indicates that [`AddressKey`] content could not be processed
+    /// to get an associated
+    /// [`MultiSigner`](https://docs.rs/sp-runtime/6.0.0/sp_runtime/enum.MultiSigner.html)
+    /// value.
     AddressKey(AddressKey),
+
+    /// [`NetworkSpecsKey`] received from the frontend was a valid hexadecimal, but
+    /// turned out to be a damaged database key with invalid content.
+    ///
+    /// This error indicates that [`NetworkSpecsKey`] content could not be processed
+    /// to get an associated [`Encryption`] and network genesis hash.
     NetworkSpecsKey(NetworkSpecsKey),
 }
 
-/// Enum listing all variants of errors in the database on Signer side
+/// Errors in the database content on the Signer side
+///
+/// Describes errors with already existing database content (e.g. damaged keys,
+/// damaged values, various mismatches, data that could not have been added to
+/// the database in the first place etc).
+///
+/// Note that [`NotFoundSigner`] is a separate set of errors. Things **not
+/// found** are kept separately here from things **damaged**.
 #[derive(Debug)]
 pub enum DatabaseSigner {
+    /// Key used in one of the database trees has invalid content, and could
+    /// not be decoded
     KeyDecoding(KeyDecodingSignerDb),
+
+    /// Database [`Error`](https://docs.rs/sled/0.34.6/sled/enum.Error.html)
+    ///
+    /// Could happen, for example, when opening the database, loading trees,
+    /// reading values etc.
     Internal(sled::Error),
+
+    /// Database
+    /// [`TransactionError`](https://docs.rs/sled/0.34.6/sled/transaction/enum.TransactionError.html)
+    ///
+    /// Could happen when making transactions in multiple trees simultaneously.
     Transaction(sled::transaction::TransactionError),
+
+    /// Database checksum does not match the expected value
     ChecksumMismatch,
+
+    /// Value found in one of the database trees has invalid content, and could
+    /// not be decoded
     EntryDecoding(EntryDecodingSigner),
+
+    /// Data retrieved from the database contains some internal contradictions,
+    /// could not have been written in the database this way, and is therefore
+    /// likely indicating the database corruption.
     Mismatch(MismatchSigner),
+
+    /// Network metadata that already is in the database, is damaged.
+    ///
+    /// Unsuitable metadata could not be put in the database in the first place,
+    /// finding one would mean the database got corrupted
     FaultyMetadata {
+        /// network name, from [`MetaKey`]
         name: String,
+
+        /// network version, from [`MetaKey`]
         version: u32,
+
+        /// what exactly is wrong with the metadata
         error: MetadataError,
     },
+
+    /// Network has no entry for
+    /// [`CurrentVerifier`](crate::network_specs::CurrentVerifier) under
+    /// `verifier_key` in `VERIFIERS` tree of the database, however, the
+    /// corresponding genesis hash is encountered in a
+    /// [`NetworkSpecs`](crate::network_specs::NetworkSpecs) entry under
+    /// `network_specs_key` in `SPECSTREE` tree of the database.
+    /// No network specs record can get into database without the verifier
+    /// entry, and the verifier could not be removed while network specs still
+    /// remain, so this indicates the database got corrupted
     UnexpectedGenesisHash {
         verifier_key: VerifierKey,
         network_specs_key: NetworkSpecsKey,
     },
+
+    /// More than one entry found for network specs with given `name` and
+    /// `encryption`, when trying to parse transaction from historical record.
+    // TODO: goes obsolete if we add `genesis_hash` field to `SignDisplay`
     SpecsCollision {
         name: String,
         encryption: Encryption,
     },
+
+    /// While searching for all networks with same genesis hash, found that
+    /// there are networks with same genesis hash, but different names.
+    // TODO: is this really an error? if it is, add error to data loading too.
     DifferentNamesSameGenesisHash {
         name1: String,
         name2: String,
         genesis_hash: Vec<u8>,
     },
+
+    /// History log [`Entry`](crate::history::Entry) contains two events with
+    /// a signable transactions
+    ///
+    /// This is error and indication of the database corruption, because only
+    /// one at a time signable transaction [`Event`](crate::history::Event)
+    /// could be added.
     TwoTransactionsInEntry(u32),
+
+    /// Network [`CurrentVerifier`](crate::network_specs::CurrentVerifier) is
+    /// `ValidCurrentVerifier::Custom(_)`, but the custom verifier value
+    /// coincides with the general verifier.
     CustomVerifierIsGeneral(VerifierKey),
+
+    /// Database has two root addresses (i.e. with empty derivation path and no
+    /// password) for same seed name and [`Encryption`]
+    ///
+    /// This indicates the database corruption, since the encrypion method,
+    /// seed name and derivation path strictly determine the public key.
     TwoRootKeys {
         seed_name: String,
         encryption: Encryption,
     },
+
+    /// Network specs entries have same genesis hash, but different base58 prefix
     DifferentBase58Specs {
         genesis_hash: [u8; 32],
         base58_1: u16,
@@ -654,9 +863,9 @@ pub enum ExtraAddressGenerationSigner {
 /// Enum listing errors that occur during the transaction parsing
 #[derive(Debug)]
 pub enum ParserError {
+    SeparateMethodExtensions, // can not separate method from extensions, bad transaction
     Decoding(ParserDecodingError), // errors occuring during the decoding procedure
     FundamentallyBadV14Metadata(ParserMetadataError), // errors occuring because the metadata is legit, but not acceptable in existing safety paradigm, for example, in V14 has no mention of network spec version in extrinsics
-    RegexError, // very much unexpected regex errors not related directly to parsing
     WrongNetworkVersion {
         as_decoded: String,
         in_metadata: u32,
@@ -724,8 +933,9 @@ pub enum ParserMetadataError {
 impl ParserError {
     pub fn show(&self) -> String {
         match &self {
+            ParserError::SeparateMethodExtensions => String::from("Unable to separate transaction method and extensions."),
             ParserError::Decoding(x) => {
-                let insert = match x {
+                match x {
                     ParserDecodingError::UnexpectedImmortality => String::from("Expected mortal transaction due to prelude format. Found immortal transaction."),
                     ParserDecodingError::UnexpectedMortality => String::from("Expected immortal transaction due to prelude format. Found mortal transaction."),
                     ParserDecodingError::GenesisHashMismatch => String::from("Genesis hash values from decoded extensions and from used network specs do not match."),
@@ -756,8 +966,7 @@ impl ParserError {
                     ParserDecodingError::Era => String::from("Could not decode Era."),
                     ParserDecodingError::SomeDataNotUsedMethod => String::from("After decoding the method some data remained unused."),
                     ParserDecodingError::SomeDataNotUsedExtensions => String::from("After decoding the extensions some data remained unused."),
-                };
-                format!("Metadata spec version matches. Error decoding transaction content. {}", insert)
+                }
             },
             ParserError::FundamentallyBadV14Metadata(x) => {
                 let insert = match x {
@@ -769,9 +978,8 @@ impl ParserError {
                     ParserMetadataError::BlockHashTwice => String::from("Block hash is encountered more than once."),
                     ParserMetadataError::SpecVersionTwice => String::from("Metadata spec version is encountered more than once."),
                 };
-                format!("Metadata spec version matches. Signed extensions are not compatible with Signer (v14 metadata). {}", insert)
+                format!("Metadata signed extensions are not compatible with Signer (v14 metadata). {}", insert)
             },
-            ParserError::RegexError => String::from("Metadata spec version matches. Unexpected regular expressions error."),
             ParserError::WrongNetworkVersion{as_decoded, in_metadata} => format!("Network spec version decoded from extensions ({}) differs from the version in metadata ({}).", as_decoded, in_metadata),
         }
     }

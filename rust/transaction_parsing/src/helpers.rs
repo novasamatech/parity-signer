@@ -40,7 +40,7 @@ pub fn find_meta_set(short_specs: &ShortSpecs, database_name: &str) -> Result<Ve
         }
         out.push(new_element);
     }
-    out.sort_by(|a, b| b.version().cmp(&a.version()));
+    out.sort_by_key(|b| std::cmp::Reverse(b.version()));
     Ok(out)
 }
 

@@ -86,10 +86,9 @@ fn parser_metadata_error_set() -> Vec<ParserMetadataError> {
     ]
 }
 
-fn all_parsing_failed_set() -> Vec<(String, u32, ParserError)> {
+fn all_ext_parsing_failed_set() -> Vec<(u32, ParserError)> {
     vec![
         (
-            String::from("westend"),
             9010,
             ParserError::WrongNetworkVersion {
                 as_decoded: String::from("9122"),
@@ -97,7 +96,6 @@ fn all_parsing_failed_set() -> Vec<(String, u32, ParserError)> {
             },
         ),
         (
-            String::from("westend"),
             9000,
             ParserError::WrongNetworkVersion {
                 as_decoded: String::from("9122"),
@@ -539,13 +537,15 @@ pub fn signer_errors() -> Vec<ErrorSigner> {
             ParserError::FundamentallyBadV14Metadata(e),
         ));
     }
-    error_set.push(ErrorSigner::Parser(ParserError::RegexError));
     error_set.push(ErrorSigner::Parser(ParserError::WrongNetworkVersion {
         as_decoded: String::from("9122"),
         in_metadata: 9010,
     }));
 
-    error_set.push(ErrorSigner::AllParsingFailed(all_parsing_failed_set()));
+    error_set.push(ErrorSigner::AllExtensionsParsingFailed {
+        network_name: String::from("westend"),
+        errors: all_ext_parsing_failed_set(),
+    });
 
     for e in secret_string_error_set().into_iter() {
         error_set.push(ErrorSigner::AddressUse(e));
@@ -567,7 +567,7 @@ mod tests {
         let mut print = String::from("\n");
         let signer_errors = signer_errors();
         assert!(
-            signer_errors.len() == 155,
+            signer_errors.len() == 154,
             "Different error set length: {}",
             signer_errors.len()
         );

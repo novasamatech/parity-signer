@@ -125,7 +125,7 @@ pub trait ErrorSource {
 
     /// `Error` when there is encryption mismatch between one of
     /// [`NetworkSpecsKey`] in `network_id` field of [`AddressDetails`] and the
-    /// `encryption` field of [`AddressDetails`] 
+    /// `encryption` field of [`AddressDetails`]
     fn address_details_specs_encryption_mismatch(
         address_key: AddressKey,
         network_specs_key: NetworkSpecsKey,
@@ -217,7 +217,7 @@ pub enum AddressGeneration<T: ErrorSource + ?Sized> {
 /// Address generation errors common for active and Signer sides
 #[derive(Debug)]
 pub enum AddressGenerationCommon {
-    /// Same public key was produced for a different seed phrase and/or 
+    /// Same public key was produced for a different seed phrase and/or
     /// derivation path
     ///
     /// Address is generated within a network using seed phrase and derivation
