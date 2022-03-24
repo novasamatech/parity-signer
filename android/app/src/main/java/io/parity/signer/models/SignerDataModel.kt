@@ -374,11 +374,7 @@ class SignerDataModel : ViewModel() {
 		cleaned: Boolean
 	): String
 
-	external fun substrateGuessWord(part: String): String
-
 	external fun substrateCheckPath(path: String): Boolean
-
-	external fun substrateValidateSeedphrase(seed_phrase: String)
 
 	private external fun historyInitHistoryWithCert(dbname: String)
 	private external fun historyInitHistoryNoCert(dbname: String)

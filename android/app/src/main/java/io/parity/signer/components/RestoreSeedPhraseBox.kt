@@ -20,13 +20,15 @@ import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
+import io.parity.signer.ButtonID
 import io.parity.signer.ui.theme.*
+import org.json.JSONObject
 
 @Composable
 fun RestoreSeedPhraseBox(
-	seedPhrase: MutableState<List<String>>,
-	seedWord: MutableState<TextFieldValue>,
-	update: (word: String) -> Unit,
+	seedPhrase: List<JSONObject>,
+	seedWord: TextFieldValue,
+	button: (button: ButtonID, details: String) -> Unit,
 	keyboard: Boolean
 ) {
 	val focusManager = LocalFocusManager.current
@@ -40,8 +42,10 @@ fun RestoreSeedPhraseBox(
 			horizontalAlignment = Alignment.CenterHorizontally,
 			modifier = Modifier.fillMaxWidth(1f)
 		) {
+			//TODO: make this thing interactive
 			Text(
-				seedPhrase.value.joinToString(" "),
+				seedPhrase.sortedBy { it.optInt("order") }
+					.joinToString(" ") { it.optString("content") },
 				style = CryptoTypography.body1,
 				color = MaterialTheme.colors.Crypto400,
 				modifier = Modifier.fillMaxWidth().padding(12.dp)
@@ -49,9 +53,9 @@ fun RestoreSeedPhraseBox(
 			Divider(color = MaterialTheme.colors.Border400)
 			Row(horizontalArrangement = Arrangement.Center) {
 				TextField(
-					value = seedWord.value,
+					value = seedWord,
 					onValueChange = {
-						update(it.text)
+						button(ButtonID.TextEntry, it.text)
 					},
 					singleLine = true,
 					leadingIcon = {
@@ -89,7 +93,6 @@ fun RestoreSeedPhraseBox(
 		if (keyboard) {
 			focusRequester.requestFocus()
 		}
-		update("")
 		onDispose { focusManager.clearFocus() }
 	}
 }
