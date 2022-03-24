@@ -8,19 +8,19 @@ pub use ffi_support;
 
 /// Trait for converting Rust types into FFI return values
 pub trait Return<'a>: Sized {
-	type Ext;
-	type Env;
-	fn convert(env: Self::Env, val: Self) -> Self::Ext;
-	fn convert_without_exception(env: Self::Env, val: Self) -> Self::Ext {
-		Return::convert(env, val)
-	}
+    type Ext;
+    type Env;
+    fn convert(env: Self::Env, val: Self) -> Self::Ext;
+    fn convert_without_exception(env: Self::Env, val: Self) -> Self::Ext {
+        Return::convert(env, val)
+    }
 }
 
 /// Trait for converting FFI arguments into Rust types
 pub trait Argument<'a> {
-	type Ext;
-	type Env;
-	fn convert(env: &Self::Env, val: Self::Ext) -> Self;
+    type Ext;
+    type Env;
+    fn convert(env: &Self::Env, val: Self::Ext) -> Self;
 }
 
 #[macro_export]
