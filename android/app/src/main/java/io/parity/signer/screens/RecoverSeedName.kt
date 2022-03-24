@@ -69,7 +69,7 @@ fun RecoverSeedName(
 			text = "Next",
 			action = {
 				focusManager.clearFocus()
-				button(ButtonID.GoForward, seedName.value)
+				button(ButtonID.GoForward, seedName.value.encode64())
 			},
 			isDisabled = seedName.value.isBlank() || (signerDataModel.seedNames.value?.contains(seedName.value.encode64()) != false)
 		)
