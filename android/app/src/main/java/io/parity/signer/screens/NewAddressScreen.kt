@@ -59,7 +59,7 @@ fun NewAddressScreen(signerDataModel: SignerDataModel, increment: Boolean) {
 			},
 			prefix = {
 				Text(
-					seedName,
+					seedName.decode64(),
 					style = MaterialTheme.typography.body2,
 					color = MaterialTheme.colors.Text600
 				)
