@@ -6,7 +6,7 @@
     
 - **How does an offline device communicate with the outside world?**
     
-    Communication happens through QR codes that are scanned as an input into Signer to interact with your keys and then, in turn, it generates a response QR code on behalf of those keys that are meant to be scanned by the app you interact with. There are tried and true cryptographic algorithms that power these QR codes, as well as some smart engineering that make your dedicated device safe to use.
+    Communication happens through scanning and generating QR codes. Scanned with Signer input-QRs interact with keys stored in Signer to, generate response-QRs on behalf of those keys. Usually input-QR is a blockchain transaction, and a response-QR is a signature for this transaction. There are tried and true cryptographic algorithms that power these QR codes, as well as some smart engineering that make your dedicated device safe to use.
     
 - **Should I use Signer?**
     
