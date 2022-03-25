@@ -55,12 +55,15 @@ struct NewAddressScreen: View {
                                 .padding(8)
                         }
                     }
-                }.padding()
+                }.padding(.vertical)
                 if let collision = derivationCheck?.collision {
                     VStack {
-                        Text("This key already exists:")
+                        HStack {
+                            Text("This key already exists:").foregroundColor(Color("Text300"))
+                            Spacer()
+                        }
                         AddressCard(address: collision)
-                    }
+                    }.padding(.bottom)
                 }
                 HStack {
                     BigButton(
