@@ -317,7 +317,6 @@ impl ErrorSource for Signer {
                     NotFoundSigner::Derivations => String::from("Could not find database temporary entry with information needed for importing derivations set."),
                     NotFoundSigner::HistoryEntry(x) => format!("Could not find history entry with order {}.", x.stamp()),
                     NotFoundSigner::HistoryNetworkSpecs{name, encryption} => format!("Could not find network specs for {} with encryption {} needed to decode historical transaction.", name, encryption.show()),
-                    NotFoundSigner::TransactionEvent(x) => format!("Entry with order {} contains no transaction-related events.", x),
                     NotFoundSigner::HistoricalMetadata{name} => format!("Historical transaction was generated in network {} and processed. Currently there are no metadata entries for the network, and transaction could not be processed again. Add network metadata.", name),
                     NotFoundSigner::NetworkForDerivationsImport{genesis_hash, encryption} => format!("Unable to import derivations for network with genesis hash {} and encryption {}. Network is unknown. Please add corresponding network specs.", hex::encode(genesis_hash), encryption.show()),
                 }
@@ -359,7 +358,8 @@ pub enum ErrorSigner {
     /// Errors within Signer rust-managed database
     Database(DatabaseSigner),
 
-    /// Errors in received input: either signable transaction or update
+    /// Errors in received input: signable transactions, updates,
+    /// user-entered content
     Input(InputSigner),
 
     /// Something was expected to be known to Signer, but was not found
@@ -667,216 +667,777 @@ pub enum DatabaseSigner {
     },
 }
 
-/// Enum listing possible errors in decoding keys from the database on the Signer side
+/// Errors decoding database keys on the Signer side
+///
+/// `IVec` value of the database key could be unfallably transformed into the
+/// contents of the corresponding key from the [`keyring`](crate::keyring)
+/// module. All these keys were, however, generated using certain information,
+/// and if this information could not be extracted from the key, it indicates
+/// that the database is damaged and results in [`KeyDecodingSignerDb`] error.
 #[derive(Debug)]
 pub enum KeyDecodingSignerDb {
+    /// [`AddressKey`] from the database could not be processed.
+    ///
+    /// Associated data is the damaged `AddressKey`.
     AddressKey(AddressKey),
+
+    /// [`Order`](crate::keyring::Order) could not be generated from the
+    /// database key.
+    ///
+    /// Associated data is the damaged database key in `Vec<u8>` format.
     EntryOrder(Vec<u8>),
+
+    /// [`MetaKey`] from the database could not be processed.
+    ///
+    /// Associated data is the damaged `MetaKey`.
     MetaKey(MetaKey),
+
+    /// [`NetworkSpecsKey`] encountered as a key in database tree `SPECSTREE`
+    /// could not be processed.
+    ///
+    /// Associated data is the damaged `NetworkSpecsKey`.
     NetworkSpecsKey(NetworkSpecsKey),
+
+    /// [`NetworkSpecsKey`] encountered as one of the entries in `network_id`
+    /// field of the [`AddressDetails`](crate::users::AddressDetails) could not
+    /// be processed.
     NetworkSpecsKeyAddressDetails {
+        /// [`AddressKey`] corresponding to `AddressDetails` that contain the
+        /// damaged `NetworkSpecsKey`
         address_key: AddressKey,
+
+        /// damaged `NetworkSpecsKey`
         network_specs_key: NetworkSpecsKey,
     },
 }
 
-/// Enum listing possible errors in decoding database entry content on the Signer side
+/// Errors decoding database entry content on the Signer side
+///
+/// Database stores most of the values SCALE-encoded, and to be used they must
+/// be decoded. If the decoding fails, it indicates that the database is
+/// damaged.
 #[derive(Debug)]
 pub enum EntryDecodingSigner {
+    /// Database entry could not be decoded as
+    /// [`AddressDetails`](crate::users::AddressDetails).
+    ///
+    /// Associated data is the corresponding [`AddressKey`].
     AddressDetails(AddressKey),
+
+    /// Database entry could not be decoded as
+    /// [`CurrentVerifier`](crate::network_specs::CurrentVerifier).
+    ///
+    /// Associated data is the corresponding [`VerifierKey`].
     CurrentVerifier(VerifierKey),
+
+    /// Database entry in `SETTREE` tree of the Signer database stored under
+    /// the key `DANGER` could not be processed as a valid
+    /// [`DangerRecord`](crate::danger::DangerRecord).
     DangerStatus,
+
+    /// Temporary database entry in `TRANSACTION` tree of the Signer database
+    /// under the key `DRV`, used to store the derivation import data,
+    /// could not be decoded.
     Derivations,
+
+    /// General verifier information, i.e. encoded
+    /// [`Verifier`](crate::network_specs::Verifier) stored in `SETTREE` tree
+    /// of the Signer database under the key `GENERALVERIFIER`,
+    /// could not be decoded.
     GeneralVerifier,
+
+    /// History log [`Entry`](crate::history::Entry) stored in `HISTORY` tree
+    /// of the Signer database under the key [`Order`](crate::keyring::Order)
+    /// could not be decoded.
+    ///
+    /// Associated data is the corresponding [`Order`].
     HistoryEntry(Order),
+
+    /// Database entry could not be decoded as
+    /// [`NetworkSpecs`](crate::network_specs::NetworkSpecs).
+    ///
+    /// Associated data is the corresponding [`NetworkSpecsKey`].
     NetworkSpecs(NetworkSpecsKey),
+
+    /// Temporary database entry in `TRANSACTION` tree of the Signer database
+    /// under the key `SIGN`, used to store the signable transaction data
+    /// awaiting for the user approval, could not be decoded.
     Sign,
+
+    /// Temporary database entry in `TRANSACTION` tree of the Signer database
+    /// under the key `STUB`, used to store the update data awaiting for the
+    /// user approval, could not be decoded.
     Stub,
+
+    /// Types information, i.e. encoded `Vec<TypeEntry>` stored in `SETTREE`
+    /// tree of the Signer database under the key `TYPES`, could not be decoded.
     Types,
 }
 
 #[derive(Debug)]
-/// Enum listing possible mismatch within database on the Signer side
+/// Mismatch errors within database on the Signer side
+///
+/// Data could be recorded in the Signer database only in ordered fasion, i.e.
+/// with keys corresponding to the data stored in the encoded values etc.
+/// If the data retrieved from the database contains some internal
+/// contradictions, it indicates the database corruption.
 pub enum MismatchSigner {
+    /// Network name and/or network version in [`MetaKey`] do not match the
+    /// network name and network version from `Version` constant, `System`
+    /// pallet of the metadata stored under this `MetaKey`.
     Metadata {
+        /// network name as it is in the key
         name_key: String,
+
+        /// network version as it is in the key
         version_key: u32,
+
+        /// network name as it is in the metadata
         name_inside: String,
+
+        /// network version as it is in the metadata
         version_inside: u32,
     },
+
+    /// [`NetworkSpecsKey`] is built using network genesis hash and [`Encryption`].
+    /// [`NetworkSpecs`](crate::network_specs::NetworkSpecs) entry stored under
+    /// this `NetworkSpecsKey` contains `genesis_hash` field with a different
+    /// genesis hash.
     SpecsGenesisHash {
+        /// [`NetworkSpecsKey`] corresponding to mismatching data
         key: NetworkSpecsKey,
+
+        /// genesis hash as it is in the `NetworkSpecs`
+        // TODO: could be [u8; 32] array here; we may want to decide and fix in
+        // several places if the genesis hash may at all be something different
+        // from [u8;32] array
         genesis_hash: Vec<u8>,
     },
+
+    /// [`NetworkSpecsKey`] is built using network genesis hash and [`Encryption`].
+    /// [`NetworkSpecs`](crate::network_specs::NetworkSpecs) entry stored under
+    /// this `NetworkSpecsKey` contains `encryption` field with a different
+    /// [`Encryption`].
     SpecsEncryption {
+        /// [`NetworkSpecsKey`] corresponding to mismatching data
         key: NetworkSpecsKey,
+
+        /// [`Encryption`] as it is in the `NetworkSpecs`
         encryption: Encryption,
     },
+
+    /// [`AddressKey`] has an associated [`Encryption`].
+    /// [`AddressDetails`](crate::users::AddressDetails) entry stored under
+    /// this `AddressKey` contains `encryption` field with a different
+    /// [`Encryption`].
     AddressDetailsEncryption {
+        /// [`AddressKey`] corresponding to mismatching data
         key: AddressKey,
+
+        /// [`Encryption`] as it is in the `AddressDetails`
         encryption: Encryption,
     },
+
+    /// [`AddressKey`] has an associated [`Encryption`].
+    /// [`AddressDetails`](crate::users::AddressDetails) entry stored under
+    /// this `AddressKey` contains `network_id` field with a set of
+    /// [`NetworkSpecsKey`] values corresponding to networks in which this
+    /// address exists. [`NetworkSpecsKey`] is built using network genesis hash
+    /// and `Encryption`.
+    ///
+    /// If the `Encryption` value from one of `NetworkSpecsKey` values is
+    /// different from `Encryption` assocaited with `AddressKey`, this error
+    /// appears.
     AddressDetailsSpecsEncryption {
+        /// [`AddressKey`] corresponding to mismatching data
         address_key: AddressKey,
+
+        /// [`NetworkSpecsKey`] having `Encryption` different from the one
+        /// associated with `AddressKey`
         network_specs_key: NetworkSpecsKey,
     },
 }
 
-/// Enum listing errors with input received by the Signer
+/// Errors in the input received by the Signer
 #[derive(Debug)]
 pub enum InputSigner {
+    /// Updating transaction with `add_specs`, `load_metadata` or `load_types`
+    /// content, as declared by the prelude, could not be decoded.
+    ///
+    /// Associated data is [`TransferContent`] specifying what content was
+    /// expected to be.
     TransferContent(TransferContent),
+
+    /// Updating transaction with `derivation` content, as declared by the
+    /// prelude, could not be decoded.
     TransferDerivations,
+
+    /// Network metadata received in `load_metadata` is not suitable for use
+    /// in Signer.
+    ///
+    /// Associated data is [`MetadataError`] specifying what exactly is
+    /// unacceplable with incoming metadata.
     FaultyMetadata(MetadataError),
+
+    /// Received transaction is unexpectedly short, more bytes were expected.
     TooShort,
+
+    /// All transactions are expected to be the Substrate ones, starting with
+    /// hexadecimal `53`.
+    ///
+    /// Associated data is the first two elements of the hexadecimal string in
+    /// received transaction.
     NotSubstrate(String),
+
+    /// There is a limited number of payloads supported by the Signer. Payload
+    /// type is declared in the transaction prelude `53xxyy` in `yy` part.
+    ///
+    /// Currently supported payloads are:
+    ///
+    /// - `00` mortal signable transaction
+    /// - `02` immortal signable transaction
+    /// - `03` text message
+    /// - `80` `load_metadata` update
+    /// - `81` `load_types` update
+    /// - `c1` `add_specs` update
+    /// - `de` `derivations` update
+    /// - `f0` print all available cards (testing tool)
+    ///
+    /// Other codes are not supported, the error associated data contains the
+    /// hexadecimal string with unsupported payload code.
     PayloadNotSupported(String),
+
+    /// Network name and version from metadata received in `load_metadata`
+    /// message already have a corresponding entry in `METATREE` tree of the
+    /// Signer database. However, the received metadata is different from
+    /// the one already stored in the database.
     SameNameVersionDifferentMeta {
+        /// network name (identical for received and for stored metadata)
         name: String,
+
+        /// network version (identical for received and for stored metadata)
         version: u32,
     },
+
+    /// Network name and version from metadata received in `load_metadata`
+    /// message already have a corresponding entry in `METATREE` tree of the
+    /// Signer database, with exactly same metadata.
+    ///
+    /// Not exactly an error, but Signer can't do anything and complains.
     MetadataKnown {
+        /// network name (identical for received and for stored metadata)
         name: String,
+
+        /// network version (identical for received and for stored metadata)
         version: u32,
     },
+
+    /// [`NetworkSpecsToSend`](crate::network_specs::NetworkSpecsToSend)
+    /// received in `add_specs` payload are for a network that already has
+    /// [`NetworkSpecs`](crate::network_specs::NetworkSpecs) entry in
+    /// the `SPECSTREE` tree of the Signer database with **same**
+    /// [`NetworkSpecsKey`], and the permanent components of the network
+    /// specs stores and received are different.
+    ///
+    /// The components that could not be changed by an update, without removing
+    /// the network completely, are:
+    ///
+    /// - `base58prefix`, network-associated base58 prefix  
+    /// - `decimals`  
+    /// - `name`, network name, as it appears in the network metadata  
+    /// - `unit`
     ImportantSpecsChanged(NetworkSpecsKey),
+
+    /// [`NetworkSpecsToSend`](crate::network_specs::NetworkSpecsToSend)
+    /// received in `add_specs` payload are for a network that already has
+    /// [`NetworkSpecs`](crate::network_specs::NetworkSpecs) entry in
+    /// the `SPECSTREE` tree of the Signer database with not necessarily
+    /// same encryption, i.e. **possibly different** [`NetworkSpecsKey`],
+    /// and base58 prefix in stored network specs is different from the base58
+    /// prefix in the received ones.
     DifferentBase58 {
         genesis_hash: [u8; 32],
         base58_database: u16,
         base58_input: u16,
     },
+
+    /// There is a limited number of encryption algorithms supported by the
+    /// Signer. Encryption algorithm is declared in the transaction prelude
+    /// `53xxyy` in `xx` part.
+    ///
+    /// For signable transactions (i.e. with prelude `53xx00`, `53xx02` and
+    /// `53xx03`) currently supported encryption algorithms are:
+    ///
+    /// - `00` for `Ed25519`
+    /// - `01` for `Sr25519`
+    /// - `02` for `Ecdsa`
+    ///
+    /// In signable transaction the encryption algorithm corresponds to the
+    /// encryption associated with the address that generated the transaction
+    /// and can sign it (and thus to the encryption supported by the network
+    /// in which the transaction is generated).
+    ///
+    /// Update transactions have currently supported encryption codes:
+    ///
+    /// - `00` for `Ed25519`
+    /// - `01` for `Sr25519`
+    /// - `02` for `Ecdsa`
+    /// - `ff` for unsigned update transactions
+    ///
+    /// In signed update transactions the encryption code indicates which
+    /// algorithm to use for update signature verification.
+    ///
+    /// Unsigned update transactions have no associated signature, are not
+    /// checked and are strongly discouraged.
+    ///
+    /// Other encryption codes are not supported, the error associated data
+    /// contains the hexadecimal string with unsupported encryption code.
     EncryptionNotSupported(String),
+
+    /// Update payload signature is invalid for given public key, encryption
+    /// algorithm and payload content
     BadSignature,
+
+    /// User attempted to load into Signer the metadata for the network that
+    /// has no [`CurrentVerifier`](crate::network_specs::CurrentVerifier) entry
+    /// in the `VERIFIERS` tree of the Signer database.
     LoadMetaUnknownNetwork {
+        /// network name as it is in the received metadata
         name: String,
     },
+
+    /// User attempted to load into Signer the metadata for the network that
+    /// has no associated [`NetworkSpecs`](crate::network_specs::NetworkSpecs)
+    /// entries in the `SPECSTREE` tree of the Signer database, although it has
+    /// an associated
+    /// [`ValidCurrentVerifier`](crate::network_specs::ValidCurrentVerifier),
+    /// i.e. it was known to user at some point and never disabled.
     LoadMetaNoSpecs {
+        /// network name as it is in the received metadata
         name: String,
+
+        /// network-associated
+        /// [`ValidCurrentVerifier`](crate::network_specs::ValidCurrentVerifier)
         valid_current_verifier: ValidCurrentVerifier,
+
+        /// Signer general verifier
         general_verifier: Verifier,
     },
+
+    /// Received `add_specs` or `load_metadata` update payload is not verified.
+    ///
+    /// Network, however, was verified previuosly by verifier with certain
+    /// [`VerifierValue`] and corresponding entry in `VERIFIERS` tree of the
+    /// database is
+    /// `CurrentVerifier::Valid(ValidCurrentVerifier::Custom(Some(verifier_value)))`.
+    ///
+    /// Signer does not allow downgrading the verifiers.
     NeedVerifier {
+        /// network name
         name: String,
+
+        /// expected verifier for this network
         verifier_value: VerifierValue,
     },
+
+    /// Received update payload is not verified, although the verification by
+    /// currently used general verifier with certain [`VerifierValue`] was
+    /// expected.
+    ///
+    /// Network has entry in `VERIFIERS` tree of the database with
+    /// `CurrentVerifier::Valid(ValidCurrentVerifier::General)`.
     NeedGeneralVerifier {
+        /// payload that requires general verifier
         content: GeneralVerifierForContent,
+
+        /// [`VerifierValue`] currently associated with the general verifier,
+        /// expected verifier for the data
         verifier_value: VerifierValue,
     },
+
+    /// Received `load_metadata` update payload is signed.
+    ///
+    /// Network has entry in `VERIFIERS` tree of the database with
+    /// `CurrentVerifier::Valid(ValidCurrentVerifier::Custom(None))`, i.e. it was
+    /// never verified previously and its network specs were loaded unverified.
+    ///
+    /// Verified `add_specs` must be loaded before any verified `load_metadata`.
     LoadMetaSetVerifier {
+        /// network name
         name: String,
+
+        /// [`VerifierValue`] that has signed the update payload
         new_verifier_value: VerifierValue,
     },
+
+    /// Received `load_metadata` update payload is signed by `new_verifier_value`.
+    ///
+    /// Network has entry in `VERIFIERS` tree of the database with
+    /// `CurrentVerifier::Valid(ValidCurrentVerifier::Custom(Some(old_verifier_value)))`,
+    /// but `new_verifier_value` and `old_verifier_value` are different, and
+    /// `new_verifier_value` is not the general verifier.
+    ///
+    /// Custom verifier could be upgraded only to general one, see
+    /// [here](crate::network_specs), and during that network specs must be
+    /// updated prior to loading the metadata.
     LoadMetaVerifierChanged {
+        /// network name
         name: String,
+
+        /// [`VerifierValue`] for the network in the database
         old_verifier_value: VerifierValue,
+
+        /// [`VerifierValue`] for the payload
         new_verifier_value: VerifierValue,
     },
+
+    /// Received `load_metadata` update payload is signed by
+    /// `new_general_verifier_value`.
+    ///
+    /// Network has entry in `VERIFIERS` tree of the database with
+    /// `CurrentVerifier::Valid(ValidCurrentVerifier::General)`,
+    /// and database value for general verifier is `None`, i.e. the network
+    /// specs for this network are not verified.
+    ///
+    /// Verified `add_specs` must be loaded before any verified `load_metadata`.
     LoadMetaSetGeneralVerifier {
+        /// network name
         name: String,
+
+        /// [`VerifierValue`] that has signed the payload instead of the
+        /// known general verifier
         new_general_verifier_value: VerifierValue,
     },
+
+    /// Received `load_metadata` update payload is signed by
+    /// `new_general_verifier_value`.
+    ///
+    /// Network has entry in `VERIFIERS` tree of the database with
+    /// `CurrentVerifier::Valid(ValidCurrentVerifier::General)`,
+    /// and database value for general verifier is
+    /// `Some(old_general_verifier_value)`.
+    ///
+    /// General verifier with assigned [`VerifierValue`] could not be changed
+    /// without Signer wipe. If the Signer is reset with no general verifier,
+    /// and the network in question is the default one (currently Pokadot,
+    /// Kusama, and Westend), the network will still be recorded as the one
+    /// verified by the general verifier and accepting verified `add_specs` for
+    /// it would result in setting the general verifier. If the network is not
+    /// the default one and if by the time its `add_specs` are loaded the
+    /// general verifier already has an associated `VerifierValue`, loading
+    /// verified `add_specs` would result in the network having custom verifier.
     LoadMetaGeneralVerifierChanged {
+        /// network name
         name: String,
+
+        /// general verifier associated `VerifierValue` in the database
         old_general_verifier_value: VerifierValue,
+
+        /// `VerifierValue` that was used to sign the update
         new_general_verifier_value: VerifierValue,
     },
+
+    /// Received `add_specs` or `load_types` is signed by
+    /// `new_general_verifier_value`.
+    // TODO: maybe combine with the LoadMetaGeneralVerifierChanged,
+    // modify GeneralVerifierForContent into 3 variants
     GeneralVerifierChanged {
+        /// payload that requires general verifier
         content: GeneralVerifierForContent,
+
+        /// general verifier associated `VerifierValue` in the database
         old_general_verifier_value: VerifierValue,
+
+        /// `VerifierValue` that was used to sign the update
         new_general_verifier_value: VerifierValue,
     },
+
+    /// Types information received in the `load_types` payload is exactly
+    /// same, as the one already stored in the `SETTREE` tree of the database
+    /// under the key `TYPES`.
+    ///
+    /// Not exactly an error, but Signer can't do anything and complains.
     TypesKnown,
+
+    /// Text message received as a part of signable transaction with `53xx03`
+    /// prelude could not be transformed into a valid `String`.
     MessageNotReadable,
+
+    /// Received signable transaction (with prelude `53xx00`, `53xx02` or
+    /// `53xx03`) is generated in the network that has no corresponding
+    /// [`NetworkSpecs`](crate::network_specs::NetworkSpecs) entry in the
+    /// `SPECSTREE` tree of the database.
     UnknownNetwork {
+        /// network genesis hash
         genesis_hash: Vec<u8>,
+
+        /// encryption algorithm supported by the network
         encryption: Encryption,
     },
-    NoMetadata {
-        name: String,
-    },
+
+    /// Received transaction that should be parsed prior to approval (with
+    /// prelude `53xx00` or `53xx02`) is generated in the network that has no
+    /// metadata entries in the `METATREE` tree of the database.
+    ///
+    /// Without metadata the transaction could not be decoded.
+    NoMetadata { name: String },
+
+    /// [`NetworkSpecsToSend`](crate::network_specs::NetworkSpecs) from the
+    /// received `add_specs` payload already have an entry in `SPECSTREE` tree
+    /// of the database.
+    ///
+    /// Not exactly an error, but Signer can't do anything and complains.
     SpecsKnown {
+        /// network name
         name: String,
+
+        /// network [`Encryption`]
         encryption: Encryption,
     },
+
+    /// Received `add_specs` update payload is signed by `new_verifier_value`.
+    ///
+    /// Network has entry in `VERIFIERS` tree of the database with
+    /// `CurrentVerifier::Valid(ValidCurrentVerifier::Custom(Some(old_verifier_value)))`,
+    /// but `new_verifier_value` and `old_verifier_value` are different, and
+    /// `new_verifier_value` is not the general verifier.
+    ///
+    /// Custom verifier could be upgraded only to general one, see
+    /// [here](crate::network_specs).
     AddSpecsVerifierChanged {
+        /// network name
         name: String,
+
+        /// [`VerifierValue`] for the network in the database
         old_verifier_value: VerifierValue,
+
+        /// [`VerifierValue`] for the payload
         new_verifier_value: VerifierValue,
     },
+
+    /// Received `derivations` update payload contains an invalid derivation.
+    ///
+    /// Associated data is the derivation that could not be used as a `String`.
     InvalidDerivation(String),
+
+    /// Received `derivations` update payload contains a derivation with a password.
     OnlyNoPwdDerivations,
+
+    /// User has tried to create new seed with already existing seed name.
+    ///
+    /// Note: this is only input error that is caused by the user-typed input.
+    ///
+    /// Associated data is the proposed seed name that is already known to Signer.
     SeedNameExists(String),
 }
 
+/// Content that should have been verified by the general verifier
 #[derive(Debug)]
 pub enum GeneralVerifierForContent {
+    /// Network data.
+    /// Associated data is the network name.
     Network { name: String },
+
+    /// Types information.
     Types,
 }
 
-/// Enum listing errors for cases when something was needed from the Signer database
-/// and was not found.
-/// Not necessarily the database failure, could be just not updated Signer as well
+/// Errors when something was needed from the Signer database and was not found
+///
+/// Not necessarily the database failure, could be just not updated Signer
+/// as well.
 #[derive(Debug)]
 pub enum NotFoundSigner {
+    /// [`CurrentVerifier`](crate::network_specs::CurrentVerifier) for a
+    /// network in `VERIFIERS` tree of the Signer database.
+    ///
+    /// Associated data is the [`VerifierKey`] used for the search.
     CurrentVerifier(VerifierKey),
+
+    /// General verifier [`Verifier`](crate::network_specs::Verifier) information
+    /// stored in `SETTREE` tree of the database under key `GENERALVERIFIER`.
+    ///
+    /// Missing general verifier always indicates the database corruption.
     GeneralVerifier,
+
+    /// Types information stored in `SETTREE` tree of the database under key
+    /// `TYPES`.
+    ///
+    /// Could be missing if user has deleted it.
     Types,
+
+    /// [`NetworkSpecs`](crate::network_specs::NetworkSpecs) for a network
+    /// in `SPECSTREE` tree of the Signer database, searched by
+    /// [`NetworkSpecsKey`].
+    ///
+    /// Associated data is the `NetworkSpecsKey` used for the search.
     NetworkSpecs(NetworkSpecsKey),
+
+    /// [`NetworkSpecs`](crate::network_specs::NetworkSpecs) for a network
+    /// in `SPECSTREE` tree of the Signer database, searched by
+    /// network name.
+    ///
+    /// Associated data is the network name.
     NetworkSpecsForName(String),
+
+    /// [`NetworkSpecsKey`] of a network in `network_id` field of the
+    /// [`AddressDetails`](crate::users::AddressDetails) corresponding to
+    /// [`AddressKey`].
+    ///
+    /// This happens when the derivation is created in some other network(s), but
+    /// not in the given network. This way the `AddressKey` is in the database,
+    /// but the address in the network is not.
     NetworkSpecsKeyForAddress {
+        /// [`NetworkSpecsKey`] of the network that is not available
         network_specs_key: NetworkSpecsKey,
+
+        /// [`AddressKey`] for which the address in the network was expected to
+        /// exist
         address_key: AddressKey,
     },
+
+    /// [`AddressDetails`](crate::users::AddressDetails) for [`AddressKey`] in
+    /// `ADDRTREE` tree of the Signer database.
+    ///
+    /// Associated data is the `AddressKey` used for search.
     AddressDetails(AddressKey),
+
+    /// Network metadata in `METATREE` tree of the Signer database, for network
+    /// name and version combination.
     Metadata {
+        /// network name
         name: String,
+
+        /// network version
         version: u32,
     },
+
+    /// [`DangerRecord`](crate::danger::DangerRecord) information
+    /// stored in `SETTREE` tree of the database under key `DANGER`.
+    ///
+    /// Missing `DangerRecord` always indicates the database corruption.
     DangerStatus,
+
+    /// Temporary database entry in `TRANSACTION` tree of the Signer database
+    /// under the key `STUB`, used to store the update data awaiting for the
+    /// user approval.
+    ///
+    /// Missing `Stub` when it is expected always indicates the database 
+    /// corruption.
     Stub,
+
+    /// Temporary database entry in `TRANSACTION` tree of the Signer database
+    /// under the key `SIGN`, used to store the signable transaction data
+    /// awaiting for the user approval.
+    ///
+    /// Missing `Sign` when it is expected always indicates the database 
+    /// corruption.
     Sign,
+
+    /// Temporary database entry in `TRANSACTION` tree of the Signer database
+    /// under the key `DRV`, used to store the derivation import data.
+    ///
+    /// Missing `Derivations` when it is expected always indicates the database
+    /// corruption.
     Derivations,
+
+    /// History log [`Entry`](crate::history::Entry) from `HISTORY` tree of the
+    /// Signer database.
+    ///
+    /// Associated data is the [`Order`] used for search.
     HistoryEntry(Order),
+
+    /// [`NetworkSpecs`](crate::network_specs::NetworkSpecs) needed to parse
+    /// historical transactions saved into history log, searched by network 
+    /// name and encryption.
     HistoryNetworkSpecs {
+        /// network name
         name: String,
+
+        /// network supported [`Encryption`]
         encryption: Encryption,
     },
-    TransactionEvent(u32),
+
+    /// Network metadata needed to parse historical transaction, no entries at 
+    /// all for a given network name.
     HistoricalMetadata {
+        /// network name used for the search
         name: String,
     },
+
+    /// [`NetworkSpecs`](crate::network_specs::NetworkSpecs) for network in
+    /// which the imported derivations are user to create addresses.
     NetworkForDerivationsImport {
+        /// network genesis hash
         genesis_hash: [u8; 32],
+
+        /// network supported encryption
         encryption: Encryption,
     },
 }
 
-/// Enum listing errors that can happen when generating address only on the Signer side
+/// Errors in generating address, exclusive for the Signer side
 #[derive(Debug)]
 pub enum ExtraAddressGenerationSigner {
+    /// Error generating random phrase.
+    ///
+    /// Associated data is an error produced by `bip39`.
     RandomPhraseGeneration(anyhow::Error),
+
+    /// Invalid derivation used for address generation.
     InvalidDerivation,
 }
 
-/// Enum listing errors that occur during the transaction parsing
+/// Errors in transaction parsing
 #[derive(Debug)]
 pub enum ParserError {
-    SeparateMethodExtensions, // can not separate method from extensions, bad transaction
-    Decoding(ParserDecodingError), // errors occuring during the decoding procedure
-    FundamentallyBadV14Metadata(ParserMetadataError), // errors occuring because the metadata is legit, but not acceptable in existing safety paradigm, for example, in V14 has no mention of network spec version in extrinsics
+    /// Can not separate method from extensions, bad transaction.
+    SeparateMethodExtensions,
+
+    /// Errors occuring during the decoding procedure.
+    Decoding(ParserDecodingError),
+
+    /// Errors occuring because the metadata
+    /// [`RuntimeMetadataV14`](https://docs.rs/frame-metadata/15.0.0/frame_metadata/v14/struct.RuntimeMetadataV14.html)
+    /// has extensions not acceptable in existing safety paradigm for
+    /// signable transactions.
+    FundamentallyBadV14Metadata(ParserMetadataError),
+
+    /// While parsing transaction with certain version of network metadata,
+    /// found that the version found in signable extensions does not match
+    /// the version of the metadata used for parsing.
+    ///
+    /// Transaction parsing in Signer is done by consecutively checking all
+    /// available metadata for a given network name, starting with the highest
+    /// available version, and looking for a matching network version in the
+    /// parsed extensions.
+    ///
+    /// For `RuntimeMetadataV12` and `RuntimeMetadataV13` the extensions set
+    /// is a fixed one, whereas for `RuntimeMetadataV14` is may vary and is
+    /// determined by the metadata itself.
     WrongNetworkVersion {
+        /// metadata version from transaction extensions, as found through
+        /// parsing process
         as_decoded: String,
+
+        /// metadata version actually used for parsing, from the `Version`
+        /// constant in `System` pallet of the metadata
         in_metadata: u32,
     },
 }
 
-/// Enum listing errors directly related to transaction parsing
+/// Errors directly related to transaction parsing
 #[derive(Debug)]
 pub enum ParserDecodingError {
+    /// Transaction was announced by the prelude to be mortal (`53xx00`),
+    /// but has `Era::Immortal` in extensions
     UnexpectedImmortality,
+
+    /// Transaction was announced by the prelude to be immortal (`53xx02`),
+    /// but has `Era::Mortal(_, _)` in extensions
     UnexpectedMortality,
+
+    /// 
     GenesisHashMismatch,
     ImmortalHashMismatch,
     ExtensionsOlder,
@@ -914,19 +1475,41 @@ pub enum ParserDecodingError {
     SomeDataNotUsedExtensions,
 }
 
-/// Not every V14 metadata are suitable for transaction parsing.
-/// At the very least the extensions must include Era (once), BlockHash (once),
-/// Version (once) and at most once the network genesis hash.
-/// If the metadata does not follow those criteria, transactons could not be read,
-/// and therefore, could not be signed.
+/// Errors occuring because the network metadata
+/// [`RuntimeMetadataV14`](https://docs.rs/frame-metadata/15.0.0/frame_metadata/v14/struct.RuntimeMetadataV14.html)
+/// has extensions not compatible with Signer.
+///
+/// To be compatible with signable transactions, metadata extensions must
+/// include:
+///
+/// - `Era` (once)
+/// - block hash (once)
+/// - metadata version (once)
+/// - network genesis hash (at most, once)
+///
+/// If the metadata does not follow those criteria, transactons could not be
+/// parsed, and therefore, could not be signed.
 #[derive(Debug)]
 pub enum ParserMetadataError {
+    /// Metadata extensions have no `Era`
     NoEra,
+
+    /// Metadata extensions have no block hash
     NoBlockHash,
+
+    /// Metadata extensions have no network metadata version
     NoVersionExt,
+
+    /// Metadata extensions have more than one `Era`
     EraTwice,
+
+    /// Metadata extensions have more than one genesis hash
     GenesisHashTwice,
+
+    /// Metadata extensions have more than one block hash
     BlockHashTwice,
+
+    /// Metadata extensions have more than one network metadata version
     SpecVersionTwice,
 }
 

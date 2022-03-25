@@ -405,7 +405,6 @@ pub fn signer_errors() -> Vec<ErrorSigner> {
         name: String::from("westend"),
         encryption: Encryption::Ed25519,
     }));
-    error_set.push(ErrorSigner::NotFound(NotFoundSigner::TransactionEvent(280)));
     error_set.push(ErrorSigner::NotFound(NotFoundSigner::HistoricalMetadata {
         name: String::from("kulupu"),
     }));
