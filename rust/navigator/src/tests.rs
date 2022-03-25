@@ -588,7 +588,7 @@ mod tests {
         assert!(real_json == alice_polkadot_keys_json, "GoBack on KeyDetails screen. Expected known Keys screen for Alice polkadot keys, got:\n{}", real_json);
         
         let real_json = do_action("NewKey","","");
-        let expected_json = r#"{"screen":"DeriveKey","screenLabel":"Derive Key","back":true,"footer":false,"footerButton":"Keys","rightButton":"None","screenNameType":"h1","modal":"Empty","alert":"Empty","screenData":{"seed_name":"Alice","network_title":"Polkadot","network_logo":"polkadot","suggested_derivation":"","keyboard":true},"modalData":{},"alertData":{}}"#;
+        let expected_json = r#"{"screen":"DeriveKey","screenLabel":"Derive Key","back":true,"footer":false,"footerButton":"Keys","rightButton":"None","screenNameType":"h1","modal":"Empty","alert":"Empty","screenData":{"seed_name":"Alice","network_title":"Polkadot","network_logo":"polkadot","network_specs_key":"018091b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3","suggested_derivation":"","keyboard":true},"modalData":{},"alertData":{}}"#;
         assert!(real_json == expected_json, "NewKey on Keys screen. Expected DeriveKey screen, got:\n{}", real_json);
         
         let real_json = do_action("GoBack","","");
@@ -596,7 +596,7 @@ mod tests {
         
         do_action("NewKey","","");
         let real_json = do_action("CheckPassword","//secret//path///multipass","");
-        let expected_json = r#"{"screen":"DeriveKey","screenLabel":"Derive Key","back":true,"footer":false,"footerButton":"Keys","rightButton":"None","screenNameType":"h1","modal":"PasswordConfirm","alert":"Empty","screenData":{"seed_name":"Alice","network_title":"Polkadot","network_logo":"polkadot","suggested_derivation":"//secret//path///multipass","keyboard":false},"modalData":{"seed_name":"Alice","cropped_path":"//secret//path","pwd":"multipass"},"alertData":{}}"#;
+        let expected_json = r#"{"screen":"DeriveKey","screenLabel":"Derive Key","back":true,"footer":false,"footerButton":"Keys","rightButton":"None","screenNameType":"h1","modal":"PasswordConfirm","alert":"Empty","screenData":{"seed_name":"Alice","network_title":"Polkadot","network_logo":"polkadot","network_specs_key":"018091b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3","suggested_derivation":"//secret//path///multipass","keyboard":false},"modalData":{"seed_name":"Alice","cropped_path":"//secret//path","pwd":"multipass"},"alertData":{}}"#;
         assert!(real_json == expected_json, "CheckPassword on DeriveKey screen with password (path validity and password existence is checked elsewhere). Expected updated DeriveKey screen with PasswordConfirm modal, got:\n{}", real_json);
         
         // Plaintext secrets in json?
@@ -806,7 +806,7 @@ mod tests {
         assert!(real_json == alice_westend_keys_json, "GoBack on KeyDetailsMulti screen. Expected Keys screen in plain mode, got:\n{}", real_json);
         
         let real_json = do_action("NewKey","","");
-        let expected_json = r#"{"screen":"DeriveKey","screenLabel":"Derive Key","back":true,"footer":false,"footerButton":"Keys","rightButton":"None","screenNameType":"h1","modal":"Empty","alert":"Empty","screenData":{"seed_name":"Alice","network_title":"Westend","network_logo":"westend","suggested_derivation":"","keyboard":true},"modalData":{},"alertData":{}}"#;
+        let expected_json = r#"{"screen":"DeriveKey","screenLabel":"Derive Key","back":true,"footer":false,"footerButton":"Keys","rightButton":"None","screenNameType":"h1","modal":"Empty","alert":"Empty","screenData":{"seed_name":"Alice","network_title":"Westend","network_logo":"westend","network_specs_key":"0180e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e","suggested_derivation":"","keyboard":true},"modalData":{},"alertData":{}}"#;
         assert!(real_json == expected_json, "NewKey on Keys screen. Expected DeriveKey screen, got:\n{}", real_json);
         
         let real_json = do_action("GoBack","","");
@@ -1063,11 +1063,11 @@ mod tests {
         do_action("RemoveKey","","");
         
         let real_json = do_action("NewKey","","");
-        let expected_json = r#"{"screen":"DeriveKey","screenLabel":"Derive Key","back":true,"footer":false,"footerButton":"Keys","rightButton":"None","screenNameType":"h1","modal":"Empty","alert":"Empty","screenData":{"seed_name":"Pepper","network_title":"Westend","network_logo":"westend","suggested_derivation":"","keyboard":true},"modalData":{},"alertData":{}}"#;
+        let expected_json = r#"{"screen":"DeriveKey","screenLabel":"Derive Key","back":true,"footer":false,"footerButton":"Keys","rightButton":"None","screenNameType":"h1","modal":"Empty","alert":"Empty","screenData":{"seed_name":"Pepper","network_title":"Westend","network_logo":"westend","network_specs_key":"0180e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e","suggested_derivation":"","keyboard":true},"modalData":{},"alertData":{}}"#;
         assert!(real_json == expected_json, "NewKey on Keys screen. Expected DeriveKey screen, got:\n{}", real_json);
         
         let real_json = do_action("CheckPassword","//0///secret","");
-        let expected_json = r#"{"screen":"DeriveKey","screenLabel":"Derive Key","back":true,"footer":false,"footerButton":"Keys","rightButton":"None","screenNameType":"h1","modal":"PasswordConfirm","alert":"Empty","screenData":{"seed_name":"Pepper","network_title":"Westend","network_logo":"westend","suggested_derivation":"//0///secret","keyboard":false},"modalData":{"seed_name":"Pepper","cropped_path":"//0","pwd":"secret"},"alertData":{}}"#;
+        let expected_json = r#"{"screen":"DeriveKey","screenLabel":"Derive Key","back":true,"footer":false,"footerButton":"Keys","rightButton":"None","screenNameType":"h1","modal":"PasswordConfirm","alert":"Empty","screenData":{"seed_name":"Pepper","network_title":"Westend","network_logo":"westend","network_specs_key":"0180e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e","suggested_derivation":"//0///secret","keyboard":false},"modalData":{"seed_name":"Pepper","cropped_path":"//0","pwd":"secret"},"alertData":{}}"#;
         assert!(real_json == expected_json, "CheckPassword on DeriveKey screen with password (path validity and password existence is checked elsewhere). Expected updated DeriveKey screen with PasswordConfirm modal, got:\n{}", real_json);
         
         let real_json = do_action("GoForward","//0///secret",&seed_phrase_pepper);

@@ -374,7 +374,12 @@ class SignerDataModel : ViewModel() {
 		cleaned: Boolean
 	): String
 
-	external fun substrateCheckPath(path: String): Boolean
+	external fun substratePathCheck(
+		seedName: String,
+		path: String,
+		network: String,
+		dbname: String
+	): String
 
 	private external fun historyInitHistoryWithCert(dbname: String)
 	private external fun historyInitHistoryNoCert(dbname: String)

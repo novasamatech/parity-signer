@@ -49,6 +49,7 @@ Please note that the Signer app is an advanced tool designed for maximum securit
 
 ### Wiki
 
+- [FAQ](./wiki/FAQ.md)
 - [Security and Privacy](./wiki/Security-And-Privacy.md)
 - [Development](./wiki/Development.md)
 - [Building and Publishing](./wiki/Building-And-Publishing.md)

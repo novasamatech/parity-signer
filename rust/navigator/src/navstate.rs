@@ -269,6 +269,7 @@ impl State {
                                 Err(e) => {
                                     if let ErrorSigner::AddressGeneration(AddressGeneration::Common(AddressGenerationCommon::DerivationExists(ref multisigner, ref address_details, _))) = e {
                                         new_navstate.screen = Screen::DeriveKey(derive_state.collided_with(&multisigner, &address_details));
+                                        new_navstate.modal = Modal::Empty;
                                         new_navstate.alert = Alert::Error;
                                         errorline.push_str(&<Signer>::show(&e));
                                     }
