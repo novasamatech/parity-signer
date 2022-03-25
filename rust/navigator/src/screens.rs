@@ -72,6 +72,7 @@ pub struct AddressStateMulti {
 pub struct DeriveState {
     entered_info: EnteredInfo,
     keys_state: KeysState,
+    collision: Option<(MultiSigner, AddressDetails)>,
 }
 
 ///State of transaction screen
@@ -299,6 +300,7 @@ impl DeriveState {
         Self {
             entered_info: EnteredInfo(entered_string.to_string()),
             keys_state: keys_state.to_owned(),
+            collision: None,
         }
     }
     pub fn blank_keys_state(&self) -> KeysState {
@@ -317,10 +319,21 @@ impl DeriveState {
     pub fn path(&self) -> String {
         self.entered_info.0.to_owned()
     }
+    pub fn collision(&self) -> Option<(MultiSigner, AddressDetails)> {
+        self.collision.to_owned()
+    }
     pub fn update(&self, new_secret_string: &str) -> Self {
         Self {
             entered_info: EnteredInfo(new_secret_string.to_string()),
             keys_state: self.blank_keys_state(),
+            collision: self.collision(),
+        }
+    }
+    pub fn collided_with(&self, multisigner: &MultiSigner, address_details: &AddressDetails) -> Self {
+        Self {
+            entered_info: self.entered_info.to_owned(),
+            keys_state: self.blank_keys_state(),
+            collision: Some((multisigner.to_owned(), address_details.to_owned())),
         }
     }
 }
