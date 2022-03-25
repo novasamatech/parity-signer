@@ -17,37 +17,26 @@ struct Address: Codable, Equatable {
     var has_pwd: Bool
     var identicon: String
     var seed_name: String
-    var multiselect: Bool
+    var multiselect: Bool?
 }
 
-/*
+/**
  * Checkers for derivation path
  */
-struct DerivationState {
-    var isValid: Bool
-    var hasPassword: Bool
+struct DerivationCheck: Decodable, Equatable {
+    var button_good: Bool?
+    var where_to: DerivationDestination?
+    var collision: Address?
+    var error: String?
 }
 
-extension String {
-    /*
-     * Check whether we need to confirm password
-     * and whether next button should be active
-     * in one move using tristate error hack
-     */
-    func checkAsDerivation() -> DerivationState {
-        var err = ExternError()
-        return withUnsafeMutablePointer(to: &err) {err_ptr in
-            let res = check_path(err_ptr, self)
-            if err_ptr.pointee.code == 0 {
-                return DerivationState(isValid: true, hasPassword: res != 0)
-            } else {
-                signer_destroy_string(err_ptr.pointee.message)
-                return DerivationState(isValid: false, hasPassword: false)
-            }
-        }
-    }
+/**
+ * Destination of "next" button in key derivation screen
+ */
+enum DerivationDestination: String, Decodable {
+    case pwd
+    case pin
 }
-
 
 /**
  * Address-related operations in data model

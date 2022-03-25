@@ -46,7 +46,7 @@ const char * try_decode_qr_sequence(struct ExternError*, const char* data, int8_
 const char * guess_word(struct ExternError*, const char* part);
 
 // Check validity of proposed path and find password
-int8_t check_path(struct ExternError*, const char* path);
+const char * path_check(struct ExternError*, const char* seed_name, const char* path, const char* network, const char* dbname);
 
 // Check seed phrase validity
 void validate_phrase(struct ExternError*, const char* seed_phrase);

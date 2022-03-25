@@ -376,7 +376,12 @@ class SignerDataModel : ViewModel() {
 
 	external fun substrateGuessWord(part: String): String
 
-	external fun substrateCheckPath(path: String): Boolean
+	external fun substratePathCheck(
+		seedName: String,
+		path: String,
+		network: String,
+		dbname: String
+	): String
 
 	external fun substrateValidateSeedphrase(seed_phrase: String)
 

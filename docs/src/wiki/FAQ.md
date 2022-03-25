@@ -10,7 +10,7 @@
     
 - **Should I use Signer?**
     
-    Signer is optimised for the highest security requirements. If you already manage many accounts on multiple networks, Signer is great for you. If you have little experience with blockchain networks but still want good security affordances, you might find the learning curve steep. We strive to make Signer as intuitive as possible; [get in touch](https://www.notion.so/Signer-EULA-ae7e43b0d83f4c56b2fe47cace395da6) if you can help us get there!
+    Signer is optimised for the highest security requirements. If you already manage many accounts on multiple networks, Signer is great for you. If you have little experience with blockchain networks but still want good security affordances, you might find the learning curve steep. We strive to make Signer as intuitive as possible; get in touch via [signer@parity.io](mailto:signer@parity.io) or [GitHub Issues](https://github.com/paritytech/parity-signer/issues) if you can help us get there!
     
 - **What networks does Signer support?**
     
