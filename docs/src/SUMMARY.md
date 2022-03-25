@@ -4,6 +4,7 @@
 
 ## wiki
 
+- [FAQ](./wiki/FAQ.md)
 - [Building-And-Publishing](./wiki/Building-And-Publishing.md)
 - [Changelog](./wiki/Changelog.md)
 - [Development](./wiki/Development.md)
