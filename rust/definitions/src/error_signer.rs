@@ -241,7 +241,6 @@ impl ErrorSource for Signer {
                     DatabaseSigner::UnexpectedGenesisHash{verifier_key, network_specs_key} => format!("No verifier information found for network with genesis hash {}, however genesis hash is encountered in network specs entry with key {}.", hex::encode(verifier_key.genesis_hash()), hex::encode(network_specs_key.key())),
                     DatabaseSigner::SpecsCollision{name, encryption} => format!("More than one entry for network specs with name {} and encryption {}.", name, encryption.show()),
                     DatabaseSigner::DifferentNamesSameGenesisHash{name1, name2, genesis_hash} => format!("Different network names ({}, {}) in database for same genesis hash {}.", name1, name2, hex::encode(genesis_hash)),
-                    DatabaseSigner::TwoTransactionsInEntry(x) => format!("Entry with order {} contains more than one transaction-related event. This should not be possible in current Signer and likely indicates database corruption.", x),
                     DatabaseSigner::CustomVerifierIsGeneral(key) => format!("Network with genesis hash {} verifier is set as a custom one. This custom verifier coinsides the database general verifier and not None. This should not have happened and likely indicates database corruption.", hex::encode(key.genesis_hash())),
                     DatabaseSigner::TwoRootKeys{seed_name, encryption} => format!("More than one root key (i.e. with empty path and without password) found for seed name {} and encryption {}.", seed_name, encryption.show()),
                     DatabaseSigner::DifferentBase58Specs{genesis_hash, base58_1, base58_2} => format!("More than one base58 prefix in network specs database entries for network with genesis hash {}: {} and {}.", hex::encode(genesis_hash), base58_1, base58_2),
@@ -348,73 +347,97 @@ impl ErrorSource for Signer {
     }
 }
 
-/// All possible errors that could occur on the Signer side
+/// All possible errors that could occur on the Signer side.
 #[derive(Debug)]
 pub enum ErrorSigner {
     /// Communication errors on the interface between native frontend and rust
-    /// backend
+    /// backend.
+    ///
+    /// Associated data is [`InterfaceSigner`] with more details.
     Interface(InterfaceSigner),
 
-    /// Errors within Signer rust-managed database
+    /// Errors within Signer rust-managed database.
+    ///
+    /// Associated data is [`DatabaseSigner`] with more details.
     Database(DatabaseSigner),
 
     /// Errors in received input: signable transactions, updates,
-    /// user-entered content
+    /// user-entered content.
+    ///
+    /// Associated data is [`InputSigner`] with more details.
     Input(InputSigner),
 
-    /// Something was expected to be known to Signer, but was not found
+    /// Something was expected to be known to Signer, but was not found.
+    ///
+    /// Associated data is [`NotFoundSigner`] with more details.
     NotFound(NotFoundSigner),
 
-    /// User tried to interact with previously disabled network
+    /// User tried to interact with previously disabled network.
+    ///
+    /// Associated data is the [`VerifierKey`] of the network.
     DeadVerifier(VerifierKey),
 
-    /// Errors with address generation
+    /// Errors with address generation.
+    ///
+    /// Associated data is [`AddressGeneration`] with more details.
     AddressGeneration(AddressGeneration<Signer>),
 
-    /// Errors with static QR codes generation
+    /// Errors with static QR codes generation.
     ///
     /// Signer can produce QR codes with signatures for transactions, with
     /// [`SufficientCrypto`](crate::crypto::SufficientCrypto) exports for
     /// user-verified updates, and with address public information exports
     /// for Signer companion.
+    ///
+    /// Associated data is text of the error produced by the QR generator.
     Qr(String),
 
     /// Errors parsing a signable transactions with a given version of the
-    /// metadata for given network
+    /// metadata for given network.
+    ///
+    /// Associated data is [`ParserError`] with more details.
     Parser(ParserError),
 
     /// Error parsing extensions of a signable transaction with all available
-    /// versions of metadata for given network
+    /// versions of metadata for given network.
     AllExtensionsParsingFailed {
+        /// network name
         network_name: String,
+
+        /// set of errors, with network version and [`ParserError`] for each
         errors: Vec<(u32, ParserError)>,
     },
 
-    /// Error with using address already stored in the database
+    /// Error with using address already stored in the database.
+    ///
+    /// Associated data is
+    /// [`SecretStringError`](https://docs.rs/sp-core/6.0.0/sp_core/crypto/enum.SecretStringError.html).
     AddressUse(SecretStringError),
 
-    /// User has entered a wrong password for a passworded address
+    /// User has entered a wrong password for a passworded address.
     ///
     /// For cases when Signer database checksum is not verified.
     /// Signer log records that password was entered incorrectly.
     WrongPassword,
 
     /// User has entered a wrong password for a passworded address for cases
-    /// when the Signer database checksum is verified
+    /// when the Signer database checksum is verified.
     ///
     /// Signer log records that password was entered incorrectly.
     /// This changes the database checksum, and for the next attempt it must be
     /// updated.
+    ///
+    /// Associated data is the new checksum.
     WrongPasswordNewChecksum(u32),
 
     /// Signer has attempted an operation that requires at least one network to
-    /// be loaded into Signer
+    /// be loaded into Signer.
     NoNetworksAvailable,
 }
 
 impl ErrorSigner {
     /// Signer side errors could be exported into native interface, before that
-    /// they must be transformed into anyhow errors
+    /// they must be transformed into anyhow errors.
     pub fn anyhow(&self) -> anyhow::Error {
         anyhow!(<Signer>::show(self))
     }
@@ -435,17 +458,21 @@ impl ErrorSigner {
 #[derive(Debug)]
 pub enum InterfaceSigner {
     /// Received string is not hexadecimal, and could not be transformed into
-    /// `Vec<u8>`
+    /// `Vec<u8>`.
+    ///
+    /// Associated data is [`NotHexSigner`] with more details.
     NotHex(NotHexSigner),
 
-    /// Received database key could not be decoded
+    /// Received database key could not be decoded.
+    ///
+    /// Associated data is [`KeyDecodingSignerInterface`] with more details.
     KeyDecoding(KeyDecodingSignerInterface),
 
     /// Received public key length is different from the one expected for
-    /// given encryption algorithm
+    /// given encryption algorithm.
     PublicKeyLength,
 
-    /// Requested history page number exceeds the total number of pages
+    /// Requested history page number exceeds the total number of pages.
     // TODO: error possibly would become obsolete
     HistoryPageOutOfRange { page_number: u32, total_pages: u32 },
 
@@ -459,36 +486,41 @@ pub enum InterfaceSigner {
     /// with the one received directly from the navigator.
     /// This error appears if the seed names are different.
     SeedNameNotMatching {
+        /// address key for which the export is done
         address_key: AddressKey,
+
+        /// seed name, from the navigator
         expected_seed_name: String,
+
+        /// seed name, from the `AddressDetails`
         real_seed_name: String,
     },
 
     /// User was creating the derivation with password, and thus moved into
     /// `PasswordConfirm` modal, however, the password was not found when
-    /// cutting password from the path
+    /// cutting password from the path.
     LostPwd,
 
     /// Received from interface network metadata version could not be parsed
-    /// as `u32`
+    /// as `u32`.
     ///
-    /// Associated content is the received data as a string
+    /// Associated content is the received data as a string.
     VersionNotU32(String),
 
     /// Received from interface increment for address generation could not
-    /// be parsed as `u32`
+    /// be parsed as `u32`.
     ///
-    /// Associated content is the received data as a string
+    /// Associated content is the received data as a string.
     IncNotU32(String),
 
-    /// Received from interface history log order could not be parsed as `u32`
+    /// Received from interface history log order could not be parsed as `u32`.
     ///
-    /// Associated content is the received data as a string
+    /// Associated content is the received data as a string.
     OrderNotU32(String),
 
-    /// Received from interface boolean flag could not be parsed as `bool`
+    /// Received from interface boolean flag could not be parsed as `bool`.
     ///
-    /// Associated content is the received data as a string
+    /// Associated content is the received data as a string.
     FlagNotBool(String),
 }
 
@@ -499,35 +531,35 @@ pub enum InterfaceSigner {
 #[derive(Debug)]
 pub enum NotHexSigner {
     /// [`NetworkSpecsKey`] is not hexadecimal, associated data is input string
-    /// as it is received
+    /// as it is received.
     NetworkSpecsKey { input: String },
 
-    /// Received signable transaction or update are not hexadecimal
+    /// Received signable transaction or update are not hexadecimal.
     InputContent,
 
     /// [`AddressKey`] is not hexadecimal, associated data is input string as
-    /// it is received
+    /// it is received.
     AddressKey { input: String },
 }
 
 /// Source of damaged [`NetworkSpecsKey`], exclusive for the Signer side
 #[derive(Debug)]
 pub enum ExtraSpecsKeySourceSigner {
-    /// Damaged [`NetworkSpecsKey`] is from the interface
+    /// Damaged [`NetworkSpecsKey`] is from the interface.
     Interface,
 }
 
 /// Source of damaged [`AddressKey`], exclusive for the Signer side
 #[derive(Debug)]
 pub enum ExtraAddressKeySourceSigner {
-    /// Damaged [`AddressKey`] is from the interface
+    /// Damaged [`AddressKey`] is from the interface.
     Interface,
 }
 
 /// Source of damaged metadata, exclusive for the Signer side
 #[derive(Debug)]
 pub enum IncomingMetadataSourceSigner {
-    /// Damaged metadata is received through QR code update
+    /// Damaged metadata is received through QR code update.
     ReceivedData,
 }
 
@@ -539,16 +571,20 @@ pub enum KeyDecodingSignerInterface {
     /// turned out to be a damaged database key with invalid content.
     ///
     /// This error indicates that [`AddressKey`] content could not be processed
-    /// to get an associated
+    /// to get
     /// [`MultiSigner`](https://docs.rs/sp-runtime/6.0.0/sp_runtime/enum.MultiSigner.html)
     /// value.
+    ///
+    /// Associated data is the damaged `AddressKey`.
     AddressKey(AddressKey),
 
     /// [`NetworkSpecsKey`] received from the frontend was a valid hexadecimal, but
     /// turned out to be a damaged database key with invalid content.
     ///
     /// This error indicates that [`NetworkSpecsKey`] content could not be processed
-    /// to get an associated [`Encryption`] and network genesis hash.
+    /// to get from it [`Encryption`] and network genesis hash.
+    ///
+    /// Associated data is the damaged `NetworkSpecsKey`.
     NetworkSpecsKey(NetworkSpecsKey),
 }
 
@@ -563,37 +599,43 @@ pub enum KeyDecodingSignerInterface {
 #[derive(Debug)]
 pub enum DatabaseSigner {
     /// Key used in one of the database trees has invalid content, and could
-    /// not be decoded
+    /// not be decoded.
+    ///
+    /// Associated data is [`KeyDecodingSignerDb`] with more details.
     KeyDecoding(KeyDecodingSignerDb),
 
-    /// Database [`Error`](https://docs.rs/sled/0.34.6/sled/enum.Error.html)
+    /// Database [`Error`](https://docs.rs/sled/0.34.6/sled/enum.Error.html).
     ///
     /// Could happen, for example, when opening the database, loading trees,
     /// reading values etc.
     Internal(sled::Error),
 
     /// Database
-    /// [`TransactionError`](https://docs.rs/sled/0.34.6/sled/transaction/enum.TransactionError.html)
+    /// [`TransactionError`](https://docs.rs/sled/0.34.6/sled/transaction/enum.TransactionError.html).
     ///
     /// Could happen when making transactions in multiple trees simultaneously.
     Transaction(sled::transaction::TransactionError),
 
-    /// Database checksum does not match the expected value
+    /// Database checksum does not match the expected value.
     ChecksumMismatch,
 
     /// Value found in one of the database trees has invalid content, and could
-    /// not be decoded
+    /// not be decoded.
+    ///
+    /// Associated data is [`EntryDecodingSigner`] with more details.
     EntryDecoding(EntryDecodingSigner),
 
     /// Data retrieved from the database contains some internal contradictions,
     /// could not have been written in the database this way, and is therefore
     /// likely indicating the database corruption.
+    ///
+    /// Associated data is [`MismatchSigner`] with more details.
     Mismatch(MismatchSigner),
 
     /// Network metadata that already is in the database, is damaged.
     ///
     /// Unsuitable metadata could not be put in the database in the first place,
-    /// finding one would mean the database got corrupted
+    /// finding one would mean the database got corrupted.
     FaultyMetadata {
         /// network name, from [`MetaKey`]
         name: String,
@@ -613,9 +655,13 @@ pub enum DatabaseSigner {
     /// `network_specs_key` in `SPECSTREE` tree of the database.
     /// No network specs record can get into database without the verifier
     /// entry, and the verifier could not be removed while network specs still
-    /// remain, so this indicates the database got corrupted
+    /// remain, so this indicates the database got corrupted.
     UnexpectedGenesisHash {
+        /// `VerifierKey` that was not found in the database
         verifier_key: VerifierKey,
+
+        /// `NetworkSpecsKey` for entry that has the genesis hash corresponding
+        /// to not found `verifier_key`
         network_specs_key: NetworkSpecsKey,
     },
 
@@ -623,7 +669,10 @@ pub enum DatabaseSigner {
     /// `encryption`, when trying to parse transaction from historical record.
     // TODO: goes obsolete if we add `genesis_hash` field to `SignDisplay`
     SpecsCollision {
+        /// network name
         name: String,
+
+        /// network supported encryption
         encryption: Encryption,
     },
 
@@ -636,17 +685,11 @@ pub enum DatabaseSigner {
         genesis_hash: Vec<u8>,
     },
 
-    /// History log [`Entry`](crate::history::Entry) contains two events with
-    /// a signable transactions
-    ///
-    /// This is error and indication of the database corruption, because only
-    /// one at a time signable transaction [`Event`](crate::history::Event)
-    /// could be added.
-    TwoTransactionsInEntry(u32),
-
     /// Network [`CurrentVerifier`](crate::network_specs::CurrentVerifier) is
     /// `ValidCurrentVerifier::Custom(_)`, but the custom verifier value
     /// coincides with the general verifier.
+    ///
+    /// Associated data is [`VerifierKey`] corresponding to faulty entry.
     CustomVerifierIsGeneral(VerifierKey),
 
     /// Database has two root addresses (i.e. with empty derivation path and no
@@ -655,7 +698,10 @@ pub enum DatabaseSigner {
     /// This indicates the database corruption, since the encrypion method,
     /// seed name and derivation path strictly determine the public key.
     TwoRootKeys {
+        /// seed name
         seed_name: String,
+
+        /// encryption algorithm for which two root keys were found
         encryption: Encryption,
     },
 
@@ -1322,7 +1368,7 @@ pub enum NotFoundSigner {
     /// under the key `STUB`, used to store the update data awaiting for the
     /// user approval.
     ///
-    /// Missing `Stub` when it is expected always indicates the database 
+    /// Missing `Stub` when it is expected always indicates the database
     /// corruption.
     Stub,
 
@@ -1330,7 +1376,7 @@ pub enum NotFoundSigner {
     /// under the key `SIGN`, used to store the signable transaction data
     /// awaiting for the user approval.
     ///
-    /// Missing `Sign` when it is expected always indicates the database 
+    /// Missing `Sign` when it is expected always indicates the database
     /// corruption.
     Sign,
 
@@ -1348,7 +1394,7 @@ pub enum NotFoundSigner {
     HistoryEntry(Order),
 
     /// [`NetworkSpecs`](crate::network_specs::NetworkSpecs) needed to parse
-    /// historical transactions saved into history log, searched by network 
+    /// historical transactions saved into history log, searched by network
     /// name and encryption.
     HistoryNetworkSpecs {
         /// network name
@@ -1358,7 +1404,7 @@ pub enum NotFoundSigner {
         encryption: Encryption,
     },
 
-    /// Network metadata needed to parse historical transaction, no entries at 
+    /// Network metadata needed to parse historical transaction, no entries at
     /// all for a given network name.
     HistoricalMetadata {
         /// network name used for the search
@@ -1427,6 +1473,90 @@ pub enum ParserError {
 }
 
 /// Errors directly related to transaction parsing
+///
+/// Signable transactions are differentiated based on prelude:
+///
+/// - `53xx00` mortal transactions
+/// - `53xx02` immortal transactions
+/// - `53xx03` text message transactions
+///
+/// `53xx00` and `53xx02` transactions contain encoded transaction data, and
+/// are parsed prior to signing using the network metadata. Transaction is
+/// generated in client, for certain address and within certain network.
+/// To parse the transaction and to generate the signature, Signer must
+/// have the network information (network specs and correct network metadata)
+/// and the public address-associated information in its database.
+///
+/// `53xx00` and `53xx02` transcations consist of:
+///
+/// - prelude, `53xx00` or `53xx02`, where `xx` stands for the encryption
+/// algorithm associated with address and network used
+/// - public key corresponding to the address that can sign the transaction
+/// - encoded call data, the body of the transaction
+/// - extensions, as set in the network metadata
+/// - genesis hash of the network in which the transaction was generated
+///
+/// Parsing process first separates the prelude, public key, genesis hash and
+/// the combined call + extensions data.
+///
+/// The call information is SCALE-encoded into `Vec<u8>` bytes and then those
+/// bytes are SCALE-encoded again, so that the call data contained in the
+/// transaction consists of `compact` with encoded call length in bytes
+/// followed by the `Vec<u8>` with the encoded data.
+///
+/// Call and extensions are cut based on the call length declared at the start
+/// of the combined call + extensions data.
+///
+/// Then the extensions are decoded, and it is checked that the metadata version
+/// in extensions coincides with the metadata version used for the decoding.
+///
+/// Decoding the extensions for metadata with `RuntimeMetadataV12` or
+/// `RuntimeMetadataV13` is using a static set of extensions, namely:
+///
+/// - [`Era`](https://docs.rs/sp-runtime/6.0.0/sp_runtime/generic/enum.Era.html)
+/// - nonce, compact `u64`
+/// - transaction tip, compact `u128`
+/// - metadata version, `u32`
+/// - tx version, `u32`
+/// - network genesis hash, `[u8; 32]`
+/// - block hash, `[u8; 32]`
+///
+/// Decoding the extensions for metadata with `RuntimeMetadataV14` uses
+/// dynamically acquired set of extensions from the metadata itself.
+///
+/// After the extensions, the call data itself is decoded using the network
+/// metadata. Each call first byte is the index of the pallet.
+///
+/// Metadata with `RuntimeMetadataV12` or `RuntimeMetadataV13` has only type
+/// names associated with call arguments. Signer finds what the types really
+/// are and how to decode them by using the types information that must be in
+/// Signer database.
+/// For `RuntimeMetadataV12` or `RuntimeMetadataV13` the second byte in call is
+/// the index of the method within the pallet, and thes Signer finds the types
+/// used by the method and proceeds to decode the call data piece by piece.
+///
+/// Metadata with `RuntimeMetadataV14` has types data in-built in the metadata
+/// itself, and the types needed to decode the call are resolved during the
+/// decoding. For `RuntimeMetadataV14` the second byte in call is also
+/// the index of the method within the pallet, but this already goes into the
+/// type resolver.
+///
+/// Calls may contain nested calls, for `RuntimeMetadataV12` or
+/// `RuntimeMetadataV13` metadata the call decoding always starts with pallet
+/// and method combination processing. For `RuntimeMetadataV14` metadata the
+/// nested calls are processed through the type resolver, i.e. the pallet index
+/// is processed independently only on the start of the decoding.
+///
+/// `53xx03` transaction consists of:
+///
+/// - prelude `53xx03`, where `xx` stands for the encryption algorithm
+/// associated with address and network used
+/// - public key corresponding to the address that can sign the transaction
+/// - SCALE-encoded `String` contents of the message
+/// - genesis hash of the network in which the transaction was generated
+///
+/// Signer assumes that every byte of the transaction will be processed, and
+/// shows an error if this is not the case.
 #[derive(Debug)]
 pub enum ParserDecodingError {
     /// Transaction was announced by the prelude to be mortal (`53xx00`),
@@ -1437,41 +1567,147 @@ pub enum ParserDecodingError {
     /// but has `Era::Mortal(_, _)` in extensions
     UnexpectedMortality,
 
-    /// 
+    /// Genesis hash cut from the end of the transaction doen not match the one
+    /// found in the extensions
     GenesisHashMismatch,
+
+    /// In immortal transaction the block hash from the extensions is the
+    /// network genesis hash.
+    ///
+    /// This error happens when block hash is different with the genesis hash
+    /// cut from the end of the transaction.
     ImmortalHashMismatch,
+
+    /// Error decoding the extensions using metadata with `RuntimeMetadataV12`
+    /// or `RuntimeMetadataV13`, with default extensions set.
     ExtensionsOlder,
+
+    /// Used only for `RuntimeMetadataV12` or `RuntimeMetadataV13`,
+    /// indicates that method index (second byte of the call data) is not valid
+    /// for the pallet with found name.
     MethodNotFound {
+        /// index of the method, second byte of the call data
         method_index: u8,
+
+        /// name of the pallet, found from the first byte of the call data
         pallet_name: String,
     },
+
+    /// Used only for all calls in `RuntimeMetadataV12` or `RuntimeMetadataV13`,
+    /// and for entry call in `RuntimeMetadataV14` metadata. First byte of the
+    /// call data is not a valid pallet index.
+    ///
+    /// Associated data is what was thought to be a pallet index.
     PalletNotFound(u8),
-    MethodIndexTooHigh {
-        method_index: u8,
-        pallet_index: u8,
-        total: usize,
-    },
+
+    /// Only for entry call in `RuntimeMetadataV14`. Pallet found via first byte
+    /// of the call has no associated calls.
+    ///
+    /// Associated data is the pallet name.
     NoCallsInPallet(String),
+
+    /// Only for `RuntimeMetadataV14`. Found type index could not be resolved
+    /// in types registry
     V14TypeNotResolved,
+
+    /// Only for `RuntimeMetadataV12` and `RuntimeMetadataV13`. Argument type
+    /// could not be taken out of `DecodeDifferent` construction.
     ArgumentTypeError,
+
+    /// Only for `RuntimeMetadataV12` and `RuntimeMetadataV13`. Argument name
+    /// could not be taken out of `DecodeDifferent` construction.
     ArgumentNameError,
-    NotPrimitive(String),
+
+    /// Parser was trying to find an encoded
+    /// [`compact`](https://docs.rs/parity-scale-codec/latest/parity_scale_codec/struct.Compact.html),
+    /// in the bytes sequence, but was unable to.
     NoCompact,
+
+    /// Parser was expecting more data.
     DataTooShort,
+
+    /// Parser was unable to decode the data piece into a primitive type.
+    ///
+    /// Associated data is primitive identifier.
     PrimitiveFailure(String),
+
+    /// SCALE-encoded `Option<_>` can have as a first byte:
+    ///
+    /// - `0` if the value is `None`
+    /// - `1` if the value is `Some`
+    /// - `2` if the value is `Some(false)` for `Option<bool>` encoding
+    ///
+    /// This error appears if the parser encounters something unexpected in the
+    /// first byte of encoded `Option<_>` instead.
     UnexpectedOptionVariant,
+
+    /// Only for `RuntimeMetadataV12` and `RuntimeMetadataV13`.
+    /// Decoding
+    /// [`IdentityFields`](https://docs.substrate.io/rustdocs/latest/pallet_identity/struct.IdentityFields.html)
+    /// requires having correct type information for
+    /// [`IdentityField`](https://docs.substrate.io/rustdocs/latest/pallet_identity/enum.IdentityField.html)
+    /// in types information. If types information has no entry for
+    /// `IdentityFields` or it is not an enum, this error appears.
     IdFields,
-    Array,
+
+    /// Parser processes certain types as balance (i.e. transforms the data
+    /// into appropriate float using decimals and units provided).
+    /// For some types the balance representation is not possible, this error
+    /// occurs if the parser tried to process as a balance some type not
+    /// suitable for it.
     BalanceNotDescribed,
+
+    /// SCALE-encoded enum can have as a first byte only correct index of the
+    /// variant used.
+    ///
+    /// This error appears if the first byte is an invalid variant index.
     UnexpectedEnumVariant,
+
+    /// Parser found that type declared as a
+    /// [`compact`](https://docs.rs/parity-scale-codec/latest/parity_scale_codec/struct.Compact.html)
+    /// has inner type that could not be encoded as a `compact`
     UnexpectedCompactInsides,
-    CompactNotPrimitive,
+
+    /// Only for `RuntimeMetadataV12` and `RuntimeMetadataV13`.
+    /// Parser has encountered a type that could not be interpreted using the
+    /// existing types information.
+    ///
+    /// Associated data is the type description as it was received by parser
+    /// from the metadata.
     UnknownType(String),
+
+    /// Only for `RuntimeMetadataV14`.
+    /// While decoding
+    /// [`BitVec<T,O>`](https://docs.rs/bitvec/1.0.0/bitvec/vec/struct.BitVec.html),
+    /// parser encountered `T` type not implementing
+    /// [`BitStore`](https://docs.rs/bitvec/1.0.0/bitvec/store/trait.BitStore.html).
     NotBitStoreType,
+
+    /// Only for `RuntimeMetadataV14`.
+    /// While decoding
+    /// [`BitVec<T,O>`](https://docs.rs/bitvec/1.0.0/bitvec/vec/struct.BitVec.html),
+    /// parser encountered `O` type not implementing
+    /// [`BitOrder`](https://docs.rs/bitvec/1.0.0/bitvec/order/trait.BitOrder.html).
     NotBitOrderType,
+
+    /// Only for `RuntimeMetadataV14`.
+    /// Parser failed to decode
+    /// [`BitVec<T,O>`](https://docs.rs/bitvec/1.0.0/bitvec/vec/struct.BitVec.html),
+    /// even though `T` and `O` types were suitable.
     BitVecFailure,
+
+    /// Only for `RuntimeMetadataV14`.
+    /// Parser failed to decode data slice as
+    /// [`Era`](https://docs.rs/sp-runtime/6.0.0/sp_runtime/generic/enum.Era.html).
     Era,
+
+    /// Parser expects to use all data in decoding. This error appears if some
+    /// data was not used in parsing of the method.
     SomeDataNotUsedMethod,
+
+    /// Only for `RuntimeMetadataV14`.
+    /// Parser expects to use all data in decoding. This error appears if some
+    /// data from extensions is not used in the decoding.
     SomeDataNotUsedExtensions,
 }
 
@@ -1514,6 +1750,7 @@ pub enum ParserMetadataError {
 }
 
 impl ParserError {
+    /// Printing [`ParserError`] in readable format.
     pub fn show(&self) -> String {
         match &self {
             ParserError::SeparateMethodExtensions => String::from("Unable to separate transaction method and extensions."),
@@ -1526,22 +1763,18 @@ impl ParserError {
                     ParserDecodingError::ExtensionsOlder => String::from("Unable to decode extensions for V12/V13 metadata using standard extensions set."),
                     ParserDecodingError::MethodNotFound{method_index, pallet_name} => format!("Method number {} not found in pallet {}.", method_index, pallet_name),
                     ParserDecodingError::PalletNotFound(i) => format!("Pallet with index {} not found.", i),
-                    ParserDecodingError::MethodIndexTooHigh{method_index, pallet_index, total} => format!("Method number {} too high for pallet number {}. Only {} indices available.", method_index, pallet_index, total),
                     ParserDecodingError::NoCallsInPallet(x) => format!("No calls found in pallet {}.", x),
                     ParserDecodingError::V14TypeNotResolved => String::from("Referenced type could not be resolved in v14 metadata."),
                     ParserDecodingError::ArgumentTypeError => String::from("Argument type error."),
                     ParserDecodingError::ArgumentNameError => String::from("Argument name error."),
-                    ParserDecodingError::NotPrimitive(x) => format!("Expected primitive type. Found {}.", x),
                     ParserDecodingError::NoCompact => String::from("Expected compact. Not found it."),
                     ParserDecodingError::DataTooShort => String::from("Data too short for expected content."),
                     ParserDecodingError::PrimitiveFailure(x) => format!("Unable to decode part of data as {}.", x),
                     ParserDecodingError::UnexpectedOptionVariant => String::from("Encountered unexpected Option<_> variant."),
                     ParserDecodingError::IdFields => String::from("IdentityField description error."),
-                    ParserDecodingError::Array => String::from("Unable to decode part of data as an array."),
                     ParserDecodingError::BalanceNotDescribed => String::from("Unexpected type encountered for Balance"),
                     ParserDecodingError::UnexpectedEnumVariant => String::from("Encountered unexpected enum variant."),
                     ParserDecodingError::UnexpectedCompactInsides => String::from("Unexpected type inside compact."),
-                    ParserDecodingError::CompactNotPrimitive => String::from("Type claimed inside compact is not compactable."),
                     ParserDecodingError::UnknownType(x) => format!("No description found for type {}.", x),
                     ParserDecodingError::NotBitStoreType => String::from("Declared type is not suitable BitStore type for BitVec."),
                     ParserDecodingError::NotBitOrderType => String::from("Declared type is not suitable BitOrder type for BitVec."),

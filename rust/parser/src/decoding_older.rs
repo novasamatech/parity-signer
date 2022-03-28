@@ -22,26 +22,26 @@ use crate::method::{what_next_old, OlderMeta};
 /// - indent used for creating properly formatted js cards.
 ///
 /// The function outputs the DecodedOut value in case of success.
-fn decode_primitive (found_ty: &str, data: &[u8], indent: u32, short_specs: &ShortSpecs) -> Result<DecodedOut, ParserError> {
+fn decode_primitive (found_ty: &str, data: &[u8], indent: u32, short_specs: &ShortSpecs) -> Option<DecodedOut> {
     match found_ty {
-        "bool" => decode_known_length::<bool>(data, found_ty, indent),
-        "u8" => decode_primitive_with_flags::<u8>(data, &mut None, false, false, found_ty, indent, short_specs),
-        "u16" => decode_primitive_with_flags::<u16>(data, &mut None, false, false, found_ty, indent, short_specs),
-        "u32" => decode_primitive_with_flags::<u32>(data, &mut None, false, false, found_ty, indent, short_specs),
-        "u64" => decode_primitive_with_flags::<u64>(data, &mut None, false, false, found_ty, indent, short_specs),
-        "u128" => decode_primitive_with_flags::<u128>(data, &mut None, false, false, found_ty, indent, short_specs),
-        "Percent" => decode_perthing::<Percent>(data, false, found_ty, indent),
-        "Perbill" => decode_perthing::<Perbill>(data, false, found_ty, indent),
-        "PerU16" => decode_perthing::<PerU16>(data, false, found_ty, indent),
-        "Compact<u8>" => decode_primitive_with_flags::<u8>(data, &mut None, true, false, found_ty, indent, short_specs),
-        "Compact<u16>" => decode_primitive_with_flags::<u16>(data, &mut None, true, false, found_ty, indent, short_specs),
-        "Compact<u32>" => decode_primitive_with_flags::<u32>(data, &mut None, true, false, found_ty, indent, short_specs),
-        "Compact<u64>" => decode_primitive_with_flags::<u64>(data, &mut None, true, false, found_ty, indent, short_specs),
-        "Compact<u128>" => decode_primitive_with_flags::<u128>(data, &mut None, true, false, found_ty, indent, short_specs),
-        "Compact<Percent>" => decode_perthing::<Percent>(data, true, found_ty, indent),
-        "Compact<Perbill>" => decode_perthing::<Perbill>(data, true, found_ty, indent),
-        "Compact<PerU16>" => decode_perthing::<PerU16>(data, true, found_ty, indent),
-        _ => Err(ParserError::Decoding(ParserDecodingError::NotPrimitive(found_ty.to_string()))),
+        "bool" => decode_known_length::<bool>(data, found_ty, indent).map_or_else(|_| None, Some),
+        "u8" => decode_primitive_with_flags::<u8>(data, &mut None, false, false, found_ty, indent, short_specs).map_or_else(|_| None, Some),
+        "u16" => decode_primitive_with_flags::<u16>(data, &mut None, false, false, found_ty, indent, short_specs).map_or_else(|_| None, Some),
+        "u32" => decode_primitive_with_flags::<u32>(data, &mut None, false, false, found_ty, indent, short_specs).map_or_else(|_| None, Some),
+        "u64" => decode_primitive_with_flags::<u64>(data, &mut None, false, false, found_ty, indent, short_specs).map_or_else(|_| None, Some),
+        "u128" => decode_primitive_with_flags::<u128>(data, &mut None, false, false, found_ty, indent, short_specs).map_or_else(|_| None, Some),
+        "Percent" => decode_perthing::<Percent>(data, false, found_ty, indent).map_or_else(|_| None, Some),
+        "Perbill" => decode_perthing::<Perbill>(data, false, found_ty, indent).map_or_else(|_| None, Some),
+        "PerU16" => decode_perthing::<PerU16>(data, false, found_ty, indent).map_or_else(|_| None, Some),
+        "Compact<u8>" => decode_primitive_with_flags::<u8>(data, &mut None, true, false, found_ty, indent, short_specs).map_or_else(|_| None, Some),
+        "Compact<u16>" => decode_primitive_with_flags::<u16>(data, &mut None, true, false, found_ty, indent, short_specs).map_or_else(|_| None, Some),
+        "Compact<u32>" => decode_primitive_with_flags::<u32>(data, &mut None, true, false, found_ty, indent, short_specs).map_or_else(|_| None, Some),
+        "Compact<u64>" => decode_primitive_with_flags::<u64>(data, &mut None, true, false, found_ty, indent, short_specs).map_or_else(|_| None, Some),
+        "Compact<u128>" => decode_primitive_with_flags::<u128>(data, &mut None, true, false, found_ty, indent, short_specs).map_or_else(|_| None, Some),
+        "Compact<Percent>" => decode_perthing::<Percent>(data, true, found_ty, indent).map_or_else(|_| None, Some),
+        "Compact<Perbill>" => decode_perthing::<Perbill>(data, true, found_ty, indent).map_or_else(|_| None, Some),
+        "Compact<PerU16>" => decode_perthing::<PerU16>(data, true, found_ty, indent).map_or_else(|_| None, Some),
+        _ => None,
     }
 }
 
@@ -583,8 +583,8 @@ fn decode_simple (found_ty: &str, mut data: Vec<u8>, type_database: &[TypeEntry]
 
     if data.is_empty() {return Err(ParserError::Decoding(ParserDecodingError::DataTooShort))}
     match decode_primitive(found_ty, &data, indent, short_specs) {
-        Ok(a) => Ok(a),
-        Err(_) => {
+        Some(a) => Ok(a),
+        None => {
             // check for option
             match REGOPTION.captures(found_ty) {
                 Some(caps) => deal_with_option(&caps["arg"], data, type_database, indent, short_specs),
@@ -650,7 +650,7 @@ fn decode_simple (found_ty: &str, mut data: Vec<u8>, type_database: &[TypeEntry]
                                                                 let new_ty = found_ty.replace(inner_ty, a);
                                                                 decode_simple(&new_ty, data, type_database, indent, short_specs)
                                                             },
-                                                            None => Err(ParserError::Decoding(ParserDecodingError::CompactNotPrimitive)),
+                                                            None => Err(ParserError::Decoding(ParserDecodingError::UnexpectedCompactInsides)),
                                                         }
                                                     },
                                                     None => {

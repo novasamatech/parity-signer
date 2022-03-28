@@ -33,6 +33,48 @@ fn verifier_value_ed25519() -> VerifierValue {
     )))
 }
 
+fn not_hex_string() -> String {
+    String::from("0xabracadabra")
+}
+
+fn address_key_bad() -> AddressKey {
+    AddressKey::from_hex("0350e7c3d5edde7db964317cd9b51a3a059d7cd99f81bdbce14990047354334c9779")
+        .unwrap()
+}
+
+fn address_key_good() -> AddressKey {
+    AddressKey::from_hex("0150e7c3d5edde7db964317cd9b51a3a059d7cd99f81bdbce14990047354334c9779")
+        .unwrap()
+}
+
+fn network_specs_key_bad() -> NetworkSpecsKey {
+    NetworkSpecsKey::from_hex(
+        "0350e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e",
+    )
+    .unwrap()
+}
+
+fn network_specs_key_good() -> NetworkSpecsKey {
+    NetworkSpecsKey::from_hex(
+        "0150e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e",
+    )
+    .unwrap()
+}
+
+fn meta_key() -> MetaKey {
+    MetaKey::from_parts("westend", 9122)
+}
+
+fn verifier_key() -> VerifierKey {
+    VerifierKey::from_parts(
+        &hex::decode("853faffbfc6713c1f899bf16547fcfbf733ae8361b8ca0129699d01d4f2181fd").unwrap()
+    )
+}
+
+fn genesis_hash_vec() -> Vec<u8> {
+    hex::decode("e143f23803ca50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e").unwrap()
+}
+
 fn db_internal_error_set() -> Vec<sled::Error> {
     vec![
         sled::Error::CollectionNotFound(IVec::from(vec![1])),
@@ -105,6 +147,117 @@ fn all_ext_parsing_failed_set() -> Vec<(u32, ParserError)> {
     ]
 }
 
+/// Collecting all [`NotHexSigner`] errors.
+fn not_hex_signer() -> Vec<NotHexSigner> {
+    vec![
+        NotHexSigner::NetworkSpecsKey {
+            input: not_hex_string(),
+        },
+        NotHexSigner::InputContent,
+        NotHexSigner::AddressKey {
+            input: not_hex_string(),
+        },
+    ]
+}
+
+/// Collecting all [`KeyDecodingSignerInterface`] errors.
+fn key_decoding_signer_interface() -> Vec<KeyDecodingSignerInterface> {
+    vec![
+        KeyDecodingSignerInterface::AddressKey(address_key_bad()),
+        KeyDecodingSignerInterface::NetworkSpecsKey(network_specs_key_bad()),
+    ]
+}
+
+/// Collecting all [`InterfaceSigner`] errors.
+fn interface_signer() -> Vec<InterfaceSigner> {
+    // [`NotHexSigner`] errors
+    let mut out = not_hex_signer()
+        .into_iter()
+        .map(InterfaceSigner::NotHex)
+        .collect::<Vec<InterfaceSigner>>();
+    // [`KeyDecodingSignerInterface`] errors.
+    out.append(
+        &mut key_decoding_signer_interface()
+            .into_iter()
+            .map(InterfaceSigner::KeyDecoding)
+            .collect::<Vec<InterfaceSigner>>(),
+    );
+    // All remaining [`InterfaceSigner`] errors.
+    out.append(&mut vec![
+        InterfaceSigner::PublicKeyLength,
+        InterfaceSigner::HistoryPageOutOfRange {
+            page_number: 14,
+            total_pages: 10,
+        },
+        InterfaceSigner::SeedNameNotMatching {
+            address_key: address_key_good(),
+            expected_seed_name: String::from("Alice"),
+            real_seed_name: String::from("ALICE"),
+        },
+        InterfaceSigner::LostPwd,
+        InterfaceSigner::VersionNotU32(String::from("a505")),
+        InterfaceSigner::IncNotU32(String::from("a505")),
+        InterfaceSigner::OrderNotU32(String::from("a505")),
+        InterfaceSigner::FlagNotBool(String::from("FALSE")),
+    ]);
+    out
+}
+
+fn key_decoding_signer_db() -> Vec<KeyDecodingSignerDb> {
+    vec![
+        KeyDecodingSignerDb::AddressKey(address_key_bad()),
+        KeyDecodingSignerDb::EntryOrder(vec![100, 4, 85]),
+        KeyDecodingSignerDb::MetaKey(meta_key()),
+        KeyDecodingSignerDb::NetworkSpecsKey(network_specs_key_bad()),
+        KeyDecodingSignerDb::NetworkSpecsKeyAddressDetails {
+            address_key: address_key_good(),
+            network_specs_key: network_specs_key_bad(),
+        },
+    ]
+}
+
+fn entry_decoding_signer() -> Vec<EntryDecodingSigner> {
+    vec![
+        EntryDecodingSigner::AddressDetails(address_key_good()),
+        EntryDecodingSigner::CurrentVerifier(verifier_key()),
+        EntryDecodingSigner::DangerStatus,
+        EntryDecodingSigner::Derivations,
+        EntryDecodingSigner::GeneralVerifier,
+        EntryDecodingSigner::HistoryEntry(Order::from_number(135)),
+        EntryDecodingSigner::NetworkSpecs(network_specs_key_good()),
+        EntryDecodingSigner::Sign,
+        EntryDecodingSigner::Stub,
+        EntryDecodingSigner::Types,
+    ]
+}
+
+fn mismatch_signer() -> Vec<MismatchSigner> {
+    vec! [
+        MismatchSigner::Metadata {
+            name_key: String::from("westend"),
+            version_key: 1922,
+            name_inside: String::from("westend"),
+            version_inside: 9122,
+        },
+        MismatchSigner::SpecsGenesisHash {
+            key: network_specs_key_good(),
+            genesis_hash: genesis_hash_vec(),
+        },
+        MismatchSigner::SpecsEncryption {
+            key: network_specs_key_good(),
+            encryption: Encryption::Ecdsa,
+        },
+        MismatchSigner::AddressDetailsEncryption {
+            key: address_key_good(),
+            encryption: Encryption::Ecdsa,
+        },
+        MismatchSigner::AddressDetailsSpecsEncryption {
+            address_key: address_key_good(),
+            network_specs_key: network_specs_key_bad(),
+        }
+    ]
+}
+
 pub fn signer_errors() -> Vec<ErrorSigner> {
     let address_key_bad = AddressKey::from_hex(
         "0350e7c3d5edde7db964317cd9b51a3a059d7cd99f81bdbce14990047354334c9779",
@@ -151,6 +304,16 @@ pub fn signer_errors() -> Vec<ErrorSigner> {
             page_number: 14,
             total_pages: 10,
         }),
+        ErrorSigner::Interface(InterfaceSigner::SeedNameNotMatching {
+            address_key: address_key_good.to_owned(),
+            expected_seed_name: String::from("Alice"),
+            real_seed_name: String::from("ALICE"),
+        }),
+        ErrorSigner::Interface(InterfaceSigner::LostPwd),
+        ErrorSigner::Interface(InterfaceSigner::VersionNotU32(String::from("a505"))),
+        ErrorSigner::Interface(InterfaceSigner::IncNotU32(String::from("a505"))),
+        ErrorSigner::Interface(InterfaceSigner::OrderNotU32(String::from("a505"))),
+        ErrorSigner::Interface(InterfaceSigner::FlagNotBool(String::from("FALSE"))),
         ErrorSigner::Database(DatabaseSigner::KeyDecoding(
             KeyDecodingSignerDb::AddressKey(address_key_bad),
         )),
@@ -261,9 +424,6 @@ pub fn signer_errors() -> Vec<ErrorSigner> {
             name2: String::from("WeStEnD"),
             genesis_hash: genesis_hash.to_vec(),
         },
-    ));
-    error_set.push(ErrorSigner::Database(
-        DatabaseSigner::TwoTransactionsInEntry(135),
     ));
     error_set.push(ErrorSigner::Database(
         DatabaseSigner::CustomVerifierIsGeneral(verifier_key.to_owned()),
@@ -459,13 +619,6 @@ pub fn signer_errors() -> Vec<ErrorSigner> {
         ParserDecodingError::PalletNotFound(3),
     )));
     error_set.push(ErrorSigner::Parser(ParserError::Decoding(
-        ParserDecodingError::MethodIndexTooHigh {
-            method_index: 5,
-            pallet_index: 3,
-            total: 4,
-        },
-    )));
-    error_set.push(ErrorSigner::Parser(ParserError::Decoding(
         ParserDecodingError::NoCallsInPallet("test_pallet_v14".to_string()),
     )));
     error_set.push(ErrorSigner::Parser(ParserError::Decoding(
@@ -476,9 +629,6 @@ pub fn signer_errors() -> Vec<ErrorSigner> {
     )));
     error_set.push(ErrorSigner::Parser(ParserError::Decoding(
         ParserDecodingError::ArgumentNameError,
-    )));
-    error_set.push(ErrorSigner::Parser(ParserError::Decoding(
-        ParserDecodingError::NotPrimitive(String::from("Option<u8>")),
     )));
     error_set.push(ErrorSigner::Parser(ParserError::Decoding(
         ParserDecodingError::NoCompact,
@@ -496,9 +646,6 @@ pub fn signer_errors() -> Vec<ErrorSigner> {
         ParserDecodingError::IdFields,
     )));
     error_set.push(ErrorSigner::Parser(ParserError::Decoding(
-        ParserDecodingError::Array,
-    )));
-    error_set.push(ErrorSigner::Parser(ParserError::Decoding(
         ParserDecodingError::BalanceNotDescribed,
     )));
     error_set.push(ErrorSigner::Parser(ParserError::Decoding(
@@ -506,9 +653,6 @@ pub fn signer_errors() -> Vec<ErrorSigner> {
     )));
     error_set.push(ErrorSigner::Parser(ParserError::Decoding(
         ParserDecodingError::UnexpectedCompactInsides,
-    )));
-    error_set.push(ErrorSigner::Parser(ParserError::Decoding(
-        ParserDecodingError::CompactNotPrimitive,
     )));
     error_set.push(ErrorSigner::Parser(ParserError::Decoding(
         ParserDecodingError::UnknownType("T::SomeUnknownType".to_string()),

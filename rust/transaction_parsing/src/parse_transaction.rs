@@ -149,10 +149,7 @@ pub (crate) fn decode_signable_from_history (found_signable: &SignDisplay, datab
     let meta_set = find_meta_set(&short_specs, database_name)?;
     if meta_set.is_empty() {return Err(ErrorSigner::NotFound(NotFoundSigner::HistoricalMetadata{name: network_name}))}
     
-    let (method_data, extensions_data) = match cut_method_extensions(&parser_data) {
-        Ok(a) => a,
-        Err(_) => return Err(ErrorSigner::Parser(ParserError::SeparateMethodExtensions)),
-    };
+    let (method_data, extensions_data) = cut_method_extensions(&parser_data).map_err(ErrorSigner::Parser)?;
     
     let mut found_solution = None;
     let mut error_collection: Vec<(u32, ParserError)> = Vec::new();

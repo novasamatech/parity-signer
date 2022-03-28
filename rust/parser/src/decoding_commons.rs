@@ -1,7 +1,7 @@
 use parity_scale_codec::{Decode, HasCompact, Compact};
 use sp_arithmetic::PerThing;
 use sp_core::crypto::AccountId32;
-use std::mem::size_of;
+use std::{convert::TryInto, mem::size_of};
 
 use definitions::{error_signer::{ParserError, ParserDecodingError, ParserMetadataError}, network_specs::ShortSpecs};
 use printing_balance::convert_balance_pretty;
@@ -248,19 +248,15 @@ fn process_number (number: String, possible_ext: &mut Option<&mut Ext>, indent: 
 /// Resulting AccountId in base58 form is added to fancy_out on js card "Id".
 pub (crate) fn special_case_account_id (data: Vec<u8>, indent: u32, short_specs: &ShortSpecs) -> Result<DecodedOut, ParserError> {
     match data.get(0..32) {
-        Some(mut a) => {
-            match <[u8; 32]>::decode(&mut a) {
-                Ok(x) => {
-                    let remaining_vector = data[32..].to_vec();
-                    let account_id = AccountId32::new(x);
-                    let fancy_out = vec![OutputCard{card: ParserCard::Id{id: account_id, base58prefix: short_specs.base58prefix}, indent}];
-                    Ok(DecodedOut {
-                        remaining_vector,
-                        fancy_out,
-                    })
-                },
-                Err(_) => Err(ParserError::Decoding(ParserDecodingError::Array)),
-            }
+        Some(a) => {
+            let array_decoded: [u8;32] = a.try_into().expect("constant length, always fits");
+            let remaining_vector = data[32..].to_vec();
+            let account_id = AccountId32::new(array_decoded);
+            let fancy_out = vec![OutputCard{card: ParserCard::Id{id: account_id, base58prefix: short_specs.base58prefix}, indent}];
+            Ok(DecodedOut {
+                remaining_vector,
+                fancy_out,
+            })
         },
         None => Err(ParserError::Decoding(ParserDecodingError::DataTooShort)),
     }
