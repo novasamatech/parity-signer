@@ -1,6 +1,6 @@
 use db_handling::{db_transactions::{TrDbColdSign, SignContent}, helpers::{try_get_network_specs, try_get_address_details}};
 use definitions::{error::{ErrorSigner, InputSigner}, keyring::{AddressKey, NetworkSpecsKey}};
-use parity_scale_codec::Decode;
+use parity_scale_codec::DecodeAll;
 use parser::cards::ParserCard;
 
 use crate::Action;
@@ -16,7 +16,7 @@ pub fn process_message (data_hex: &str, dbname: &str) -> Result<Action, ErrorSig
 // processing input vec![20, 104, 101, 3, 108, 111] will not throw error at element `3`,
 // it will result in output `helo` instead, length, however, is still correct, 5.
 // note that some invisible symbols may thus sneak into the message;
-    let message = match String::decode(&mut &message_vec[..]) {
+    let message = match String::decode_all(&mut &message_vec[..]) {
         Ok(a) => a,
         Err(_) => return Err(ErrorSigner::Input(InputSigner::MessageNotReadable)),
     };
