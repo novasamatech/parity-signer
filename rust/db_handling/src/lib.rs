@@ -1,3 +1,5 @@
+use std::path::PathBuf;
+
 use constants::{COLD_DB_NAME, COLD_DB_NAME_RELEASE, HOT_DB_NAME};
 use definitions::{error::ErrorActive, network_specs::Verifier};
 
@@ -21,9 +23,12 @@ pub mod remove_types;
 /// This database should be copied into Signer's resources.
 /// Note that this operation is performed NOT on Signer device,
 /// so ErrorActive is used
-pub fn default_cold_release () -> Result<(), ErrorActive> {
-    let database_name = COLD_DB_NAME_RELEASE;
-    populate_cold_release(&database_name)
+pub fn default_cold_release (path: Option<PathBuf>) -> Result<(), ErrorActive> {
+    let database_name = match path {
+        Some(ref path) => path.to_str().unwrap_or(COLD_DB_NAME_RELEASE),
+        None => COLD_DB_NAME_RELEASE,
+    };
+    populate_cold_release(database_name)
 }
 
 /// Function to re-populate default "cold" database with default values.
