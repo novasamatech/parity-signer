@@ -20,9 +20,7 @@ use generate_message::{full_run, parser::Command};
 fn main() -> Result<(), String> {
     let command = Command::MakeColdRelease;
 
-    if let Err(e) = full_run(command) {
-        return Err(<Active>::show(&e));
-    }
+    full_run(command).map_err(|e| <Active>::show(&e))?;
 
     Ok(())
 }
