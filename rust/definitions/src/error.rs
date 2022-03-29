@@ -2,6 +2,8 @@
 //! sides
 use sp_core::crypto::SecretStringError;
 use sp_runtime::MultiSigner;
+#[cfg(feature = "test")]
+use variant_count::VariantCount;
 
 use crate::{
     crypto::Encryption,
@@ -216,6 +218,7 @@ pub enum AddressGeneration<T: ErrorSource + ?Sized> {
 
 /// Address generation errors common for active and Signer sides
 #[derive(Debug)]
+#[cfg_attr(feature = "test", derive(VariantCount))]
 pub enum AddressGenerationCommon {
     /// Same public key was produced for a different seed phrase and/or
     /// derivation path
@@ -304,6 +307,7 @@ impl AddressGenerationCommon {
 /// (when checking the message content while signing it)
 /// and on the Signer side (when processing the received messages)
 #[derive(Debug)]
+#[cfg_attr(feature = "test", derive(VariantCount))]
 pub enum TransferContent {
     /// `add_specs` message content
     AddSpecs,
@@ -329,6 +333,7 @@ impl TransferContent {
 
 /// Intrinsic problems of the metadata making it unsuitable for Signer use
 #[derive(Debug)]
+#[cfg_attr(feature = "test", derive(VariantCount))]
 pub enum MetadataError {
     /// Supported are V12, V13, and V14 versions of
     /// [`RuntimeMetadata`](https://docs.rs/frame-metadata/15.0.0/frame_metadata/enum.RuntimeMetadata.html).

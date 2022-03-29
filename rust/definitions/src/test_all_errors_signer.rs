@@ -9,7 +9,7 @@ use crate::error_signer::{
     DatabaseSigner, EntryDecodingSigner, ErrorSigner, ExtraAddressGenerationSigner,
     GeneralVerifierForContent, InputSigner, InterfaceSigner, KeyDecodingSignerDb,
     KeyDecodingSignerInterface, MismatchSigner, NotFoundSigner, NotHexSigner, ParserDecodingError,
-    ParserError, ParserMetadataError,
+    ParserError, ParserMetadataError, Signer,
 };
 use crate::keyring::{AddressKey, MetaKey, NetworkSpecsKey, Order, VerifierKey};
 use crate::network_specs::{ValidCurrentVerifier, Verifier, VerifierValue};
@@ -67,12 +67,15 @@ fn meta_key() -> MetaKey {
 
 fn verifier_key() -> VerifierKey {
     VerifierKey::from_parts(
-        &hex::decode("853faffbfc6713c1f899bf16547fcfbf733ae8361b8ca0129699d01d4f2181fd").unwrap()
+        &hex::decode("853faffbfc6713c1f899bf16547fcfbf733ae8361b8ca0129699d01d4f2181fd").unwrap(),
     )
 }
 
-fn genesis_hash_vec() -> Vec<u8> {
-    hex::decode("e143f23803ca50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e").unwrap()
+fn genesis_hash() -> [u8; 32] {
+    hex::decode("e143f23803ca50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e")
+        .unwrap()
+        .try_into()
+        .unwrap()
 }
 
 fn db_internal_error_set() -> Vec<sled::Error> {
@@ -91,6 +94,8 @@ fn metadata_error_set() -> Vec<MetadataError> {
         MetadataError::NoSystemPallet,
         MetadataError::NoVersionInConstants,
         MetadataError::RuntimeVersionNotDecodeable,
+        MetadataError::Base58PrefixNotDecodeable,
+        MetadataError::Base58PrefixSpecsMismatch{specs: 42, meta: 104},
         MetadataError::NotMeta,
         MetadataError::UnableToDecode,
     ]
@@ -107,24 +112,12 @@ fn secret_string_error_set() -> Vec<SecretStringError> {
     ]
 }
 
-fn content() -> Vec<GeneralVerifierForContent> {
+fn content_set() -> Vec<GeneralVerifierForContent> {
     vec![
         GeneralVerifierForContent::Network {
             name: String::from("westend"),
         },
         GeneralVerifierForContent::Types,
-    ]
-}
-
-fn parser_metadata_error_set() -> Vec<ParserMetadataError> {
-    vec![
-        ParserMetadataError::NoEra,
-        ParserMetadataError::NoBlockHash,
-        ParserMetadataError::NoVersionExt,
-        ParserMetadataError::EraTwice,
-        ParserMetadataError::GenesisHashTwice,
-        ParserMetadataError::BlockHashTwice,
-        ParserMetadataError::SpecVersionTwice,
     ]
 }
 
@@ -175,6 +168,7 @@ fn interface_signer() -> Vec<InterfaceSigner> {
         .into_iter()
         .map(InterfaceSigner::NotHex)
         .collect::<Vec<InterfaceSigner>>();
+
     // [`KeyDecodingSignerInterface`] errors.
     out.append(
         &mut key_decoding_signer_interface()
@@ -182,6 +176,7 @@ fn interface_signer() -> Vec<InterfaceSigner> {
             .map(InterfaceSigner::KeyDecoding)
             .collect::<Vec<InterfaceSigner>>(),
     );
+
     // All remaining [`InterfaceSigner`] errors.
     out.append(&mut vec![
         InterfaceSigner::PublicKeyLength,
@@ -200,9 +195,11 @@ fn interface_signer() -> Vec<InterfaceSigner> {
         InterfaceSigner::OrderNotU32(String::from("a505")),
         InterfaceSigner::FlagNotBool(String::from("FALSE")),
     ]);
+
     out
 }
 
+/// Collecting all [`KeyDecodingSignerDb`] errors.
 fn key_decoding_signer_db() -> Vec<KeyDecodingSignerDb> {
     vec![
         KeyDecodingSignerDb::AddressKey(address_key_bad()),
@@ -216,6 +213,7 @@ fn key_decoding_signer_db() -> Vec<KeyDecodingSignerDb> {
     ]
 }
 
+/// Collecting all [`EntryDecodingSigner`] errors.
 fn entry_decoding_signer() -> Vec<EntryDecodingSigner> {
     vec![
         EntryDecodingSigner::AddressDetails(address_key_good()),
@@ -231,8 +229,9 @@ fn entry_decoding_signer() -> Vec<EntryDecodingSigner> {
     ]
 }
 
+/// Collecting all [`MismatchSigner`] errors.
 fn mismatch_signer() -> Vec<MismatchSigner> {
-    vec! [
+    vec![
         MismatchSigner::Metadata {
             name_key: String::from("westend"),
             version_key: 1922,
@@ -241,7 +240,7 @@ fn mismatch_signer() -> Vec<MismatchSigner> {
         },
         MismatchSigner::SpecsGenesisHash {
             key: network_specs_key_good(),
-            genesis_hash: genesis_hash_vec(),
+            genesis_hash: genesis_hash().to_vec(),
         },
         MismatchSigner::SpecsEncryption {
             key: network_specs_key_good(),
@@ -254,451 +253,472 @@ fn mismatch_signer() -> Vec<MismatchSigner> {
         MismatchSigner::AddressDetailsSpecsEncryption {
             address_key: address_key_good(),
             network_specs_key: network_specs_key_bad(),
-        }
+        },
     ]
 }
 
-pub fn signer_errors() -> Vec<ErrorSigner> {
-    let address_key_bad = AddressKey::from_hex(
-        "0350e7c3d5edde7db964317cd9b51a3a059d7cd99f81bdbce14990047354334c9779",
-    )
-    .unwrap();
-    let address_key_good = AddressKey::from_hex(
-        "0150e7c3d5edde7db964317cd9b51a3a059d7cd99f81bdbce14990047354334c9779",
-    )
-    .unwrap();
-    let entry_order_vec: Vec<u8> = vec![100, 4, 85];
-    let genesis_hash: Vec<u8> =
-        hex::decode("e143f23803ca50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e").unwrap();
-    let meta_key = MetaKey::from_parts("westend", 9122);
-    let network_specs_key_bad = NetworkSpecsKey::from_hex(
-        "0350e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e",
-    )
-    .unwrap();
-    let network_specs_key_good = NetworkSpecsKey::from_hex(
-        "0150e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e",
-    )
-    .unwrap();
-    let not_hex_string = String::from("0xabracadabra");
-    let verifier_key = VerifierKey::from_parts(
-        &hex::decode("853faffbfc6713c1f899bf16547fcfbf733ae8361b8ca0129699d01d4f2181fd").unwrap(),
-    );
-    let valid_current_verifier = ValidCurrentVerifier::General;
+/// Collecting all [`DatabaseSigner`] errors.
+fn database_signer() -> Vec<DatabaseSigner> {
+    // [`KeyDecodingSignerDb`] errors.
+    let mut out = key_decoding_signer_db()
+        .into_iter()
+        .map(DatabaseSigner::KeyDecoding)
+        .collect::<Vec<DatabaseSigner>>();
 
-    let mut error_set = vec![
-        ErrorSigner::Interface(InterfaceSigner::NotHex(NotHexSigner::NetworkSpecsKey {
-            input: not_hex_string.to_string(),
-        })),
-        ErrorSigner::Interface(InterfaceSigner::NotHex(NotHexSigner::InputContent)),
-        ErrorSigner::Interface(InterfaceSigner::NotHex(NotHexSigner::AddressKey {
-            input: not_hex_string,
-        })),
-        ErrorSigner::Interface(InterfaceSigner::KeyDecoding(
-            KeyDecodingSignerInterface::AddressKey(address_key_bad.to_owned()),
-        )),
-        ErrorSigner::Interface(InterfaceSigner::KeyDecoding(
-            KeyDecodingSignerInterface::NetworkSpecsKey(network_specs_key_bad.to_owned()),
-        )),
-        ErrorSigner::Interface(InterfaceSigner::PublicKeyLength),
-        ErrorSigner::Interface(InterfaceSigner::HistoryPageOutOfRange {
-            page_number: 14,
-            total_pages: 10,
-        }),
-        ErrorSigner::Interface(InterfaceSigner::SeedNameNotMatching {
-            address_key: address_key_good.to_owned(),
-            expected_seed_name: String::from("Alice"),
-            real_seed_name: String::from("ALICE"),
-        }),
-        ErrorSigner::Interface(InterfaceSigner::LostPwd),
-        ErrorSigner::Interface(InterfaceSigner::VersionNotU32(String::from("a505"))),
-        ErrorSigner::Interface(InterfaceSigner::IncNotU32(String::from("a505"))),
-        ErrorSigner::Interface(InterfaceSigner::OrderNotU32(String::from("a505"))),
-        ErrorSigner::Interface(InterfaceSigner::FlagNotBool(String::from("FALSE"))),
-        ErrorSigner::Database(DatabaseSigner::KeyDecoding(
-            KeyDecodingSignerDb::AddressKey(address_key_bad),
-        )),
-        ErrorSigner::Database(DatabaseSigner::KeyDecoding(
-            KeyDecodingSignerDb::EntryOrder(entry_order_vec),
-        )),
-        ErrorSigner::Database(DatabaseSigner::KeyDecoding(KeyDecodingSignerDb::MetaKey(
-            meta_key,
-        ))),
-        ErrorSigner::Database(DatabaseSigner::KeyDecoding(
-            KeyDecodingSignerDb::NetworkSpecsKey(network_specs_key_bad.to_owned()),
-        )),
-        ErrorSigner::Database(DatabaseSigner::KeyDecoding(
-            KeyDecodingSignerDb::NetworkSpecsKeyAddressDetails {
-                address_key: address_key_good.to_owned(),
-                network_specs_key: network_specs_key_bad.to_owned(),
-            },
-        )),
-    ];
-    for e in db_internal_error_set().into_iter() {
-        error_set.push(ErrorSigner::Database(DatabaseSigner::Internal(e)));
-    }
-    for e in db_internal_error_set().into_iter() {
-        error_set.push(ErrorSigner::Database(DatabaseSigner::Transaction(
-            TransactionError::Storage(e),
-        )));
-    }
-    error_set.push(ErrorSigner::Database(DatabaseSigner::ChecksumMismatch));
-    error_set.push(ErrorSigner::Database(DatabaseSigner::EntryDecoding(
-        EntryDecodingSigner::AddressDetails(address_key_good.to_owned()),
-    )));
-    error_set.push(ErrorSigner::Database(DatabaseSigner::EntryDecoding(
-        EntryDecodingSigner::CurrentVerifier(verifier_key.to_owned()),
-    )));
-    error_set.push(ErrorSigner::Database(DatabaseSigner::EntryDecoding(
-        EntryDecodingSigner::DangerStatus,
-    )));
-    error_set.push(ErrorSigner::Database(DatabaseSigner::EntryDecoding(
-        EntryDecodingSigner::GeneralVerifier,
-    )));
-    error_set.push(ErrorSigner::Database(DatabaseSigner::EntryDecoding(
-        EntryDecodingSigner::HistoryEntry(Order::from_number(135)),
-    )));
-    error_set.push(ErrorSigner::Database(DatabaseSigner::EntryDecoding(
-        EntryDecodingSigner::NetworkSpecs(network_specs_key_good.to_owned()),
-    )));
-    error_set.push(ErrorSigner::Database(DatabaseSigner::EntryDecoding(
-        EntryDecodingSigner::Sign,
-    )));
-    error_set.push(ErrorSigner::Database(DatabaseSigner::EntryDecoding(
-        EntryDecodingSigner::Stub,
-    )));
-    error_set.push(ErrorSigner::Database(DatabaseSigner::EntryDecoding(
-        EntryDecodingSigner::Types,
-    )));
-    error_set.push(ErrorSigner::Database(DatabaseSigner::Mismatch(
-        MismatchSigner::Metadata {
-            name_key: String::from("westend"),
-            version_key: 1922,
-            name_inside: String::from("westend"),
-            version_inside: 9122,
-        },
-    )));
-    error_set.push(ErrorSigner::Database(DatabaseSigner::Mismatch(
-        MismatchSigner::SpecsGenesisHash {
-            key: network_specs_key_good.to_owned(),
-            genesis_hash: genesis_hash.to_vec(),
-        },
-    )));
-    error_set.push(ErrorSigner::Database(DatabaseSigner::Mismatch(
-        MismatchSigner::SpecsEncryption {
-            key: network_specs_key_good.to_owned(),
-            encryption: Encryption::Ecdsa,
-        },
-    )));
-    error_set.push(ErrorSigner::Database(DatabaseSigner::Mismatch(
-        MismatchSigner::AddressDetailsEncryption {
-            key: address_key_good.to_owned(),
-            encryption: Encryption::Ecdsa,
-        },
-    )));
-    error_set.push(ErrorSigner::Database(DatabaseSigner::Mismatch(
-        MismatchSigner::AddressDetailsSpecsEncryption {
-            address_key: address_key_good.to_owned(),
-            network_specs_key: network_specs_key_bad.to_owned(),
-        },
-    )));
-    for error in metadata_error_set().into_iter() {
-        error_set.push(ErrorSigner::Database(DatabaseSigner::FaultyMetadata {
-            name: String::from("westend"),
-            version: 9000,
-            error,
-        }));
-    }
-    error_set.push(ErrorSigner::Database(
+    // `sled::Error` internal database errors.
+    out.append(
+        &mut db_internal_error_set()
+            .into_iter()
+            .map(DatabaseSigner::Internal)
+            .collect::<Vec<DatabaseSigner>>(),
+    );
+
+    // `sled::transaction::Transaction` database errors.
+    out.append(
+        &mut db_internal_error_set()
+            .into_iter()
+            .map(|a| DatabaseSigner::Transaction(TransactionError::Storage(a)))
+            .collect::<Vec<DatabaseSigner>>(),
+    );
+
+    // Checksum mismatch error
+    out.push(DatabaseSigner::ChecksumMismatch);
+
+    // [`EntryDecodingSigner`] errors.
+    out.append(
+        &mut entry_decoding_signer()
+            .into_iter()
+            .map(DatabaseSigner::EntryDecoding)
+            .collect::<Vec<DatabaseSigner>>(),
+    );
+
+    // [`MismatchSigner`] errors.
+    out.append(
+        &mut mismatch_signer()
+            .into_iter()
+            .map(DatabaseSigner::Mismatch)
+            .collect::<Vec<DatabaseSigner>>(),
+    );
+
+    // `FaultyMetadata` database errors.
+    out.append(
+        &mut metadata_error_set()
+            .into_iter()
+            .map(|error| DatabaseSigner::FaultyMetadata {
+                name: String::from("westend"),
+                version: 9000,
+                error,
+            })
+            .collect::<Vec<DatabaseSigner>>(),
+    );
+
+    // All remaining [`DatabaseSigner`] errors.
+    out.append(&mut vec![
         DatabaseSigner::UnexpectedGenesisHash {
-            verifier_key: VerifierKey::from_parts(&genesis_hash),
-            network_specs_key: network_specs_key_good.to_owned(),
+            verifier_key: VerifierKey::from_parts(&genesis_hash().to_vec()),
+            network_specs_key: network_specs_key_good(),
         },
-    ));
-    error_set.push(ErrorSigner::Database(DatabaseSigner::SpecsCollision {
-        name: String::from("westend"),
-        encryption: Encryption::Sr25519,
-    }));
-    error_set.push(ErrorSigner::Database(
+        DatabaseSigner::SpecsCollision {
+            name: String::from("westend"),
+            encryption: Encryption::Sr25519,
+        },
         DatabaseSigner::DifferentNamesSameGenesisHash {
             name1: String::from("westend"),
             name2: String::from("WeStEnD"),
-            genesis_hash: genesis_hash.to_vec(),
+            genesis_hash: genesis_hash().to_vec(),
         },
-    ));
-    error_set.push(ErrorSigner::Database(
-        DatabaseSigner::CustomVerifierIsGeneral(verifier_key.to_owned()),
-    ));
+        DatabaseSigner::CustomVerifierIsGeneral(verifier_key()),
+        DatabaseSigner::TwoRootKeys {
+            seed_name: String::from("Alice"),
+            encryption: Encryption::Sr25519,
+        },
+        DatabaseSigner::DifferentBase58Specs {
+            genesis_hash: genesis_hash(),
+            base58_1: 42,
+            base58_2: 104,
+        },
+    ]);
 
-    error_set.push(ErrorSigner::Input(InputSigner::TransferContent(
+    out
+}
+
+/// [`TransferContent`] errors.
+fn transfer_content() -> Vec<TransferContent> {
+    vec![
         TransferContent::AddSpecs,
-    )));
-    error_set.push(ErrorSigner::Input(InputSigner::TransferContent(
         TransferContent::LoadMeta,
-    )));
-    error_set.push(ErrorSigner::Input(InputSigner::TransferContent(
         TransferContent::LoadTypes,
-    )));
-    for e in metadata_error_set().into_iter() {
-        error_set.push(ErrorSigner::Input(InputSigner::FaultyMetadata(e)));
-    }
-    error_set.push(ErrorSigner::Input(InputSigner::TooShort));
-    error_set.push(ErrorSigner::Input(InputSigner::NotSubstrate(String::from(
-        "35",
-    ))));
-    error_set.push(ErrorSigner::Input(InputSigner::PayloadNotSupported(
-        String::from("0f"),
-    )));
-    error_set.push(ErrorSigner::Input(
+    ]
+}
+
+/// Collecting all [`InputSigner`] errors.
+fn input_signer() -> Vec<InputSigner> {
+    // [`TransferContent`] errors.
+    let mut out = transfer_content()
+        .into_iter()
+        .map(InputSigner::TransferContent)
+        .collect::<Vec<InputSigner>>();
+
+    // `TransferDerivations` error.
+    out.push(InputSigner::TransferDerivations);
+
+    // Faulty metadata input content errors.
+    out.append(
+        &mut metadata_error_set()
+            .into_iter()
+            .map(InputSigner::FaultyMetadata)
+            .collect::<Vec<InputSigner>>(),
+    );
+
+    // More [`InputSigner`] errors.
+    out.append(&mut vec![
+        InputSigner::TooShort,
+        InputSigner::NotSubstrate(String::from("35")),
+        InputSigner::PayloadNotSupported(String::from("0f")),
         InputSigner::SameNameVersionDifferentMeta {
             name: String::from("kusama"),
             version: 9110,
         },
-    ));
-    error_set.push(ErrorSigner::Input(InputSigner::MetadataKnown {
-        name: String::from("westend"),
-        version: 9122,
-    }));
-    error_set.push(ErrorSigner::Input(InputSigner::ImportantSpecsChanged(
-        network_specs_key_good.to_owned(),
-    )));
-    error_set.push(ErrorSigner::Input(InputSigner::EncryptionNotSupported(
-        String::from("03"),
-    )));
-    error_set.push(ErrorSigner::Input(InputSigner::BadSignature));
-    error_set.push(ErrorSigner::Input(InputSigner::LoadMetaUnknownNetwork {
-        name: String::from("kulupu"),
-    }));
-    error_set.push(ErrorSigner::Input(InputSigner::LoadMetaNoSpecs {
-        name: String::from("westend"),
-        valid_current_verifier,
-        general_verifier: verifier_sr25519(),
-    }));
-    error_set.push(ErrorSigner::Input(InputSigner::NeedVerifier {
-        name: String::from("kulupu"),
-        verifier_value: verifier_value_ed25519(),
-    }));
-    for content in content().into_iter() {
-        error_set.push(ErrorSigner::Input(InputSigner::NeedGeneralVerifier {
-            content,
-            verifier_value: verifier_value_sr25519(),
-        }));
-    }
-    error_set.push(ErrorSigner::Input(InputSigner::LoadMetaSetVerifier {
-        name: String::from("kulupu"),
-        new_verifier_value: verifier_value_ed25519(),
-    }));
-    error_set.push(ErrorSigner::Input(InputSigner::LoadMetaVerifierChanged {
-        name: String::from("kulupu"),
-        old_verifier_value: verifier_value_sr25519(),
-        new_verifier_value: verifier_value_ed25519(),
-    }));
-    error_set.push(ErrorSigner::Input(
+        InputSigner::MetadataKnown {
+            name: String::from("westend"),
+            version: 9122,
+        },
+        InputSigner::ImportantSpecsChanged(network_specs_key_good()),
+        InputSigner::DifferentBase58 {
+            genesis_hash: genesis_hash(),
+            base58_database: 42,
+            base58_input: 104,
+        },
+        InputSigner::EncryptionNotSupported(String::from("03")),
+        InputSigner::BadSignature,
+        InputSigner::LoadMetaUnknownNetwork {
+            name: String::from("kulupu"),
+        },
+        InputSigner::LoadMetaNoSpecs {
+            name: String::from("westend"),
+            valid_current_verifier: ValidCurrentVerifier::General,
+            general_verifier: verifier_sr25519(),
+        },
+        InputSigner::NeedVerifier {
+            name: String::from("kulupu"),
+            verifier_value: verifier_value_ed25519(),
+        },
+    ]);
+
+    // `NeedGeneralVerifier` errors.
+    out.append(
+        &mut content_set()
+            .into_iter()
+            .map(|content| InputSigner::NeedGeneralVerifier {
+                content,
+                verifier_value: verifier_value_sr25519(),
+            })
+            .collect::<Vec<InputSigner>>(),
+    );
+
+    // More [`InputSigner`] errors.
+    out.append(&mut vec![
+        InputSigner::LoadMetaSetVerifier {
+            name: String::from("kulupu"),
+            new_verifier_value: verifier_value_ed25519(),
+        },
+        InputSigner::LoadMetaVerifierChanged {
+            name: String::from("kulupu"),
+            old_verifier_value: verifier_value_sr25519(),
+            new_verifier_value: verifier_value_ed25519(),
+        },
         InputSigner::LoadMetaSetGeneralVerifier {
             name: String::from("westend"),
             new_general_verifier_value: verifier_value_sr25519(),
         },
-    ));
-    error_set.push(ErrorSigner::Input(
         InputSigner::LoadMetaGeneralVerifierChanged {
             name: String::from("westend"),
             old_general_verifier_value: verifier_value_sr25519(),
             new_general_verifier_value: verifier_value_ed25519(),
         },
-    ));
-    for content in content().into_iter() {
-        error_set.push(ErrorSigner::Input(InputSigner::GeneralVerifierChanged {
-            content,
-            old_general_verifier_value: verifier_value_sr25519(),
-            new_general_verifier_value: verifier_value_ed25519(),
-        }));
-    }
-    error_set.push(ErrorSigner::Input(InputSigner::TypesKnown));
-    error_set.push(ErrorSigner::Input(InputSigner::MessageNotReadable));
-    error_set.push(ErrorSigner::Input(InputSigner::UnknownNetwork {
-        genesis_hash: genesis_hash.to_vec(),
-        encryption: Encryption::Sr25519,
-    }));
-    error_set.push(ErrorSigner::Input(InputSigner::NoMetadata {
-        name: String::from("westend"),
-    }));
-    error_set.push(ErrorSigner::Input(InputSigner::SpecsKnown {
-        name: String::from("westend"),
-        encryption: Encryption::Sr25519,
-    }));
-    error_set.push(ErrorSigner::Input(InputSigner::AddSpecsVerifierChanged {
-        name: String::from("kulupu"),
-        old_verifier_value: verifier_value_sr25519(),
-        new_verifier_value: verifier_value_ed25519(),
-    }));
+    ]);
 
-    error_set.push(ErrorSigner::NotFound(NotFoundSigner::CurrentVerifier(
-        verifier_key.to_owned(),
-    )));
-    error_set.push(ErrorSigner::NotFound(NotFoundSigner::GeneralVerifier));
-    error_set.push(ErrorSigner::NotFound(NotFoundSigner::Types));
-    error_set.push(ErrorSigner::NotFound(NotFoundSigner::NetworkSpecs(
-        network_specs_key_bad,
-    )));
-    error_set.push(ErrorSigner::NotFound(NotFoundSigner::NetworkSpecsForName(
-        String::from("westend"),
-    )));
-    error_set.push(ErrorSigner::NotFound(
+    // `GeneralVerifierChanged` errors.
+    out.append(
+        &mut content_set()
+            .into_iter()
+            .map(|content| InputSigner::GeneralVerifierChanged {
+                content,
+                old_general_verifier_value: verifier_value_sr25519(),
+                new_general_verifier_value: verifier_value_ed25519(),
+            })
+            .collect::<Vec<InputSigner>>(),
+    );
+
+    // More [`InputSigner`] errors.
+    out.append(&mut vec![
+        InputSigner::TypesKnown,
+        InputSigner::MessageNotReadable,
+        InputSigner::UnknownNetwork {
+            genesis_hash: genesis_hash().to_vec(),
+            encryption: Encryption::Sr25519,
+        },
+        InputSigner::NoMetadata {
+            name: String::from("westend"),
+        },
+        InputSigner::SpecsKnown {
+            name: String::from("westend"),
+            encryption: Encryption::Sr25519,
+        },
+        InputSigner::AddSpecsVerifierChanged {
+            name: String::from("kulupu"),
+            old_verifier_value: verifier_value_sr25519(),
+            new_verifier_value: verifier_value_ed25519(),
+        },
+        InputSigner::InvalidDerivation(String::from("//")),
+        InputSigner::OnlyNoPwdDerivations,
+        InputSigner::SeedNameExists(String::from("Alice")),
+    ]);
+
+    out
+}
+
+/// Collecting all [`NotFoundSigner`] errors.
+fn not_found_signer() -> Vec<NotFoundSigner> {
+    vec![
+        NotFoundSigner::CurrentVerifier(verifier_key()),
+        NotFoundSigner::GeneralVerifier,
+        NotFoundSigner::Types,
+        NotFoundSigner::NetworkSpecs(network_specs_key_bad()),
+        NotFoundSigner::NetworkSpecsForName(String::from("westend")),
         NotFoundSigner::NetworkSpecsKeyForAddress {
-            network_specs_key: network_specs_key_good,
-            address_key: address_key_good.to_owned(),
+            network_specs_key: network_specs_key_good(),
+            address_key: address_key_good(),
         },
-    ));
-    error_set.push(ErrorSigner::NotFound(NotFoundSigner::AddressDetails(
-        address_key_good,
-    )));
-    error_set.push(ErrorSigner::NotFound(NotFoundSigner::Metadata {
-        name: String::from("westend"),
-        version: 9120,
-    }));
-    error_set.push(ErrorSigner::NotFound(NotFoundSigner::DangerStatus));
-    error_set.push(ErrorSigner::NotFound(NotFoundSigner::Stub));
-    error_set.push(ErrorSigner::NotFound(NotFoundSigner::Sign));
-    error_set.push(ErrorSigner::NotFound(NotFoundSigner::HistoryEntry(
-        Order::from_number(135),
-    )));
-    error_set.push(ErrorSigner::NotFound(NotFoundSigner::HistoryNetworkSpecs {
-        name: String::from("westend"),
-        encryption: Encryption::Ed25519,
-    }));
-    error_set.push(ErrorSigner::NotFound(NotFoundSigner::HistoricalMetadata {
-        name: String::from("kulupu"),
-    }));
-
-    error_set.push(ErrorSigner::DeadVerifier(verifier_key));
-
-    error_set.push(ErrorSigner::AddressGeneration(AddressGeneration::Common(
-        AddressGenerationCommon::KeyCollision {
-            seed_name: String::from("Alice super secret seed"),
+        NotFoundSigner::AddressDetails(address_key_good()),
+        NotFoundSigner::Metadata {
+            name: String::from("westend"),
+            version: 9120,
         },
-    )));
-    for e in secret_string_error_set().into_iter() {
-        error_set.push(ErrorSigner::AddressGeneration(AddressGeneration::Common(
-            AddressGenerationCommon::SecretString(e),
-        )));
-    }
-    error_set.push(ErrorSigner::AddressGeneration(AddressGeneration::Extra(
+        NotFoundSigner::DangerStatus,
+        NotFoundSigner::Stub,
+        NotFoundSigner::Sign,
+        NotFoundSigner::Derivations,
+        NotFoundSigner::HistoryEntry(Order::from_number(135)),
+        NotFoundSigner::HistoryNetworkSpecs {
+            name: String::from("westend"),
+            encryption: Encryption::Ed25519,
+        },
+        NotFoundSigner::HistoricalMetadata {
+            name: String::from("kulupu"),
+        },
+        NotFoundSigner::NetworkForDerivationsImport {
+            genesis_hash: genesis_hash(),
+            encryption: Encryption::Sr25519,
+        },
+    ]
+}
+
+/// Collecting all [`AddressGenerationCommon`] errors.
+fn address_generation_common() -> Vec<AddressGenerationCommon> {
+    // `KeyCollision` error.
+    let mut out = vec![AddressGenerationCommon::KeyCollision {
+        seed_name: String::from("Alice"),
+    }];
+
+    // `AddressGenerationCommon` errors.
+    out.append(
+        &mut secret_string_error_set()
+            .into_iter()
+            .map(AddressGenerationCommon::SecretString)
+            .collect::<Vec<AddressGenerationCommon>>(),
+    );
+
+    out
+}
+
+/// Collecting all [`ExtraAddressGenerationSigner`] errors.
+fn extra_address_generation_signer() -> Vec<ExtraAddressGenerationSigner> {
+    vec![
         ExtraAddressGenerationSigner::RandomPhraseGeneration(anyhow!(
-            "Mnemonic generator refuses to work with a valid excuse."
+            "Seed phrase has invalid length."
         )),
-    )));
-    error_set.push(ErrorSigner::AddressGeneration(AddressGeneration::Extra(
         ExtraAddressGenerationSigner::InvalidDerivation,
-    )));
+    ]
+}
 
-    error_set.push(ErrorSigner::Qr(String::from(
-        "QR generator refuses to work with a valid excuse.",
-    )));
+/// Collecting all [`AddressGeneration`] errors.
+fn address_generation() -> Vec<AddressGeneration<Signer>> {
+    // `AddressGenerationCommon` errors.
+    let mut out = address_generation_common()
+        .into_iter()
+        .map(AddressGeneration::Common)
+        .collect::<Vec<AddressGeneration<Signer>>>();
 
-    error_set.push(ErrorSigner::Parser(ParserError::Decoding(
+    // `GeneralVerifierChanged` errors.
+    out.append(
+        &mut extra_address_generation_signer()
+            .into_iter()
+            .map(AddressGeneration::Extra)
+            .collect::<Vec<AddressGeneration<Signer>>>(),
+    );
+
+    out
+}
+
+/// Collecting all [`ParserDecodingError`] errors.
+fn parser_decoding_error() -> Vec<ParserDecodingError> {
+    vec![
         ParserDecodingError::UnexpectedImmortality,
-    )));
-    error_set.push(ErrorSigner::Parser(ParserError::Decoding(
         ParserDecodingError::UnexpectedMortality,
-    )));
-    error_set.push(ErrorSigner::Parser(ParserError::Decoding(
         ParserDecodingError::GenesisHashMismatch,
-    )));
-    error_set.push(ErrorSigner::Parser(ParserError::Decoding(
         ParserDecodingError::ImmortalHashMismatch,
-    )));
-    error_set.push(ErrorSigner::Parser(ParserError::Decoding(
         ParserDecodingError::ExtensionsOlder,
-    )));
-    error_set.push(ErrorSigner::Parser(ParserError::Decoding(
         ParserDecodingError::MethodNotFound {
             method_index: 2,
-            pallet_name: "test_Pallet".to_string(),
+            pallet_name: String::from("test_Pallet"),
         },
-    )));
-    error_set.push(ErrorSigner::Parser(ParserError::Decoding(
         ParserDecodingError::PalletNotFound(3),
-    )));
-    error_set.push(ErrorSigner::Parser(ParserError::Decoding(
-        ParserDecodingError::NoCallsInPallet("test_pallet_v14".to_string()),
-    )));
-    error_set.push(ErrorSigner::Parser(ParserError::Decoding(
+        ParserDecodingError::NoCallsInPallet(String::from("test_pallet_v14")),
         ParserDecodingError::V14TypeNotResolved,
-    )));
-    error_set.push(ErrorSigner::Parser(ParserError::Decoding(
         ParserDecodingError::ArgumentTypeError,
-    )));
-    error_set.push(ErrorSigner::Parser(ParserError::Decoding(
         ParserDecodingError::ArgumentNameError,
-    )));
-    error_set.push(ErrorSigner::Parser(ParserError::Decoding(
         ParserDecodingError::NoCompact,
-    )));
-    error_set.push(ErrorSigner::Parser(ParserError::Decoding(
         ParserDecodingError::DataTooShort,
-    )));
-    error_set.push(ErrorSigner::Parser(ParserError::Decoding(
-        ParserDecodingError::PrimitiveFailure("u32".to_string()),
-    )));
-    error_set.push(ErrorSigner::Parser(ParserError::Decoding(
+        ParserDecodingError::PrimitiveFailure(String::from("u32")),
         ParserDecodingError::UnexpectedOptionVariant,
-    )));
-    error_set.push(ErrorSigner::Parser(ParserError::Decoding(
         ParserDecodingError::IdFields,
-    )));
-    error_set.push(ErrorSigner::Parser(ParserError::Decoding(
         ParserDecodingError::BalanceNotDescribed,
-    )));
-    error_set.push(ErrorSigner::Parser(ParserError::Decoding(
         ParserDecodingError::UnexpectedEnumVariant,
-    )));
-    error_set.push(ErrorSigner::Parser(ParserError::Decoding(
         ParserDecodingError::UnexpectedCompactInsides,
-    )));
-    error_set.push(ErrorSigner::Parser(ParserError::Decoding(
-        ParserDecodingError::UnknownType("T::SomeUnknownType".to_string()),
-    )));
-    error_set.push(ErrorSigner::Parser(ParserError::Decoding(
+        ParserDecodingError::UnknownType(String::from("SomeUnknownType")),
         ParserDecodingError::NotBitStoreType,
-    )));
-    error_set.push(ErrorSigner::Parser(ParserError::Decoding(
         ParserDecodingError::NotBitOrderType,
-    )));
-    error_set.push(ErrorSigner::Parser(ParserError::Decoding(
         ParserDecodingError::BitVecFailure,
-    )));
-    error_set.push(ErrorSigner::Parser(ParserError::Decoding(
         ParserDecodingError::Era,
-    )));
-    error_set.push(ErrorSigner::Parser(ParserError::Decoding(
         ParserDecodingError::SomeDataNotUsedMethod,
-    )));
-    error_set.push(ErrorSigner::Parser(ParserError::Decoding(
         ParserDecodingError::SomeDataNotUsedExtensions,
-    )));
-    for e in parser_metadata_error_set().into_iter() {
-        error_set.push(ErrorSigner::Parser(
-            ParserError::FundamentallyBadV14Metadata(e),
-        ));
-    }
-    error_set.push(ErrorSigner::Parser(ParserError::WrongNetworkVersion {
+    ]
+}
+
+/// Collecting all [`ParserMetadataError`] errors.
+fn parser_metadata_error() -> Vec<ParserMetadataError> {
+    vec![
+        ParserMetadataError::NoEra,
+        ParserMetadataError::NoBlockHash,
+        ParserMetadataError::NoVersionExt,
+        ParserMetadataError::EraTwice,
+        ParserMetadataError::GenesisHashTwice,
+        ParserMetadataError::BlockHashTwice,
+        ParserMetadataError::SpecVersionTwice,
+    ]
+}
+
+/// Collecting all [`ParserError`] errors.
+fn parser_error() -> Vec<ParserError> {
+    // `SeparateMethodExtensions` error.
+    let mut out = vec![ParserError::SeparateMethodExtensions];
+
+    // `ParserDecodingError` errors.
+    out.append(
+        &mut parser_decoding_error()
+            .into_iter()
+            .map(ParserError::Decoding)
+            .collect::<Vec<ParserError>>(),
+    );
+
+    // `ParserMetadataError` errors.
+    out.append(
+        &mut parser_metadata_error()
+            .into_iter()
+            .map(ParserError::FundamentallyBadV14Metadata)
+            .collect::<Vec<ParserError>>(),
+    );
+
+    out.push(ParserError::WrongNetworkVersion {
         as_decoded: String::from("9122"),
         in_metadata: 9010,
-    }));
+    });
 
-    error_set.push(ErrorSigner::AllExtensionsParsingFailed {
+    out
+}
+
+/// Collecting all [`ErrorSigner`] errors.
+pub fn error_signer() -> Vec<ErrorSigner> {
+    // [`InterfaceSigner`] errors.
+    let mut out = interface_signer()
+        .into_iter()
+        .map(ErrorSigner::Interface)
+        .collect::<Vec<ErrorSigner>>();
+
+    // [`DatabaseSigner`] errors.
+    out.append(
+        &mut database_signer()
+            .into_iter()
+            .map(ErrorSigner::Database)
+            .collect::<Vec<ErrorSigner>>(),
+    );
+
+    // [`InputSigner`] errors.
+    out.append(
+        &mut input_signer()
+            .into_iter()
+            .map(ErrorSigner::Input)
+            .collect::<Vec<ErrorSigner>>(),
+    );
+
+    // [`NotFoundSigner`] errors.
+    out.append(
+        &mut not_found_signer()
+            .into_iter()
+            .map(ErrorSigner::NotFound)
+            .collect::<Vec<ErrorSigner>>(),
+    );
+
+    // `DeadVerifier` error.
+    out.push(ErrorSigner::DeadVerifier(verifier_key()));
+
+    // `AddressGeneration` errors.
+    out.append(
+        &mut address_generation()
+            .into_iter()
+            .map(ErrorSigner::AddressGeneration)
+            .collect::<Vec<ErrorSigner>>(),
+    );
+
+    // `Qr` error.
+    out.push(ErrorSigner::Qr(String::from("Qr generation failed.")));
+
+    // `ParserError` errors.
+    out.append(
+        &mut parser_error()
+            .into_iter()
+            .map(ErrorSigner::Parser)
+            .collect::<Vec<ErrorSigner>>(),
+    );
+
+    // `AllExtensionsParsingFailed` error.
+    out.push(ErrorSigner::AllExtensionsParsingFailed {
         network_name: String::from("westend"),
         errors: all_ext_parsing_failed_set(),
     });
 
-    for e in secret_string_error_set().into_iter() {
-        error_set.push(ErrorSigner::AddressUse(e));
-    }
+    // `AddressUse` errors.
+    out.append(
+        &mut secret_string_error_set()
+            .into_iter()
+            .map(ErrorSigner::AddressUse)
+            .collect::<Vec<ErrorSigner>>(),
+    );
 
-    error_set.push(ErrorSigner::WrongPassword);
+    // `WrongPassword` error.
+    out.push(ErrorSigner::WrongPassword);
 
-    error_set
+    // `WrongPasswordNewChecksum(_)` error.
+    out.push(ErrorSigner::WrongPasswordNewChecksum(32167));
+
+    // `NoNetworksAvailable` error.
+    out.push(ErrorSigner::NoNetworksAvailable);
+
+    out
 }
 
+#[cfg(feature = "test")]
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -706,9 +726,119 @@ mod tests {
     use crate::error_signer::Signer;
 
     #[test]
+    fn metadata_error_check() {
+        assert_eq!(MetadataError::VARIANT_COUNT, metadata_error_set().len());
+    }
+    
+    #[test]
+    fn transfer_content_check() {
+        assert_eq!(TransferContent::VARIANT_COUNT, transfer_content().len());
+    }
+    
+    #[test]
+    fn not_hex_signer_check() {
+        assert_eq!(NotHexSigner::VARIANT_COUNT, not_hex_signer().len());
+    }
+    
+    #[test]
+    fn key_decoding_signer_interface_check() {
+        assert_eq!(KeyDecodingSignerInterface::VARIANT_COUNT, key_decoding_signer_interface().len());
+    }
+    
+    /// count all `InterfaceSigner` variants including the nested ones
+    fn interface_signer_count() -> usize {
+        InterfaceSigner::VARIANT_COUNT
+            - 1 + not_hex_signer().len() // for nested variants in `InterfaceSigner::NotHex(_)`
+            - 1 + key_decoding_signer_interface().len() // for nested variants `InterfaceSigner::KeyDecoding(_)`
+    }
+    
+    #[test]
+    fn interface_signer_check() {
+        assert_eq!(
+            interface_signer_count(), 
+            interface_signer().len(),
+        );
+    }
+    
+    #[test]
+    fn key_decoding_signer_db_check() {
+        assert_eq!(KeyDecodingSignerDb::VARIANT_COUNT, key_decoding_signer_db().len());
+    }
+    
+    #[test]
+    fn entry_decoding_signer_check() {
+        assert_eq!(EntryDecodingSigner::VARIANT_COUNT, entry_decoding_signer().len());
+    }
+    
+    #[test]
+    fn mismatch_signer_check() {
+        assert_eq!(MismatchSigner::VARIANT_COUNT, mismatch_signer().len());
+    }
+    
+    /// count all `DatabaseSigner` variants including the nested ones
+    fn database_signer_count() -> usize {
+        DatabaseSigner::VARIANT_COUNT
+            - 1 + key_decoding_signer_db().len() // for nested variants in `DatabaseSigner::KeyDecoding(_)`
+            - 1 + db_internal_error_set().len() // for nested variants `DatabaseSigner::Internal(_)`
+            - 1 + db_internal_error_set().len() // for nested variants `DatabaseSigner::Transaction(_)` except user-provided error, since there is none
+            - 1 + entry_decoding_signer().len() // for nested variants in `DatabaseSigner::EntryDecoding(_)`
+            - 1 + mismatch_signer().len() // for nested variants in `DatabaseSigner::Mismatch(_)`
+            - 1 + metadata_error_set().len() // for nested variants in `DatabaseSigner::FaultyMetadata(_)`
+    }
+    
+    /// check that no `DatabaseSigner` entries are missed
+    #[test]
+    fn database_signer_check() {
+        assert_eq!(
+            database_signer_count(), 
+            database_signer().len(),
+        );
+    }
+    
+    /// check that no `GeneralVerifierForContent` entries are missed
+    #[test]
+    fn content_set_check() {
+        assert_eq!(GeneralVerifierForContent::VARIANT_COUNT, content_set().len());
+    }
+    
+    /// count all `InputSigner` variants including the nested ones
+    fn input_signer_count() -> usize {
+        InputSigner::VARIANT_COUNT
+            - 1 + transfer_content().len() // for nested variants in `InputSigner::TransferContent(_)`
+            - 1 + metadata_error_set().len() // for nested variants in `InputSigner::FaultyMetadata(_)`
+            - 1 + content_set().len() // for nested variants in `InputSigner::NeedGeneralVerifier(_)`
+            - 1 + content_set().len() // for nested variants in `InputSigner::GeneralVerifierChanged(_)`
+    }
+    
+    /// check that no `InputSigner` entries are missed
+    #[test]
+    fn input_signer_check() {
+        assert_eq!(
+            input_signer_count(), 
+            input_signer().len(),
+        );
+    }
+    
+    /// count all `NotFoundSigner` variants
+    fn not_found_signer_count() -> usize {
+        NotFoundSigner::VARIANT_COUNT
+    }
+    
+    /// check that no `NotFoundSigner` entries are missed
+    #[test]
+    fn not_found_signer_check() {
+        assert_eq!(
+            not_found_signer_count(), 
+            not_found_signer().len(),
+        );
+    }
+    
+    
+    
+    #[test]
     fn print_signer_errors_nicely() {
         let mut print = String::from("\n");
-        let signer_errors = signer_errors();
+        let signer_errors = error_signer();
         assert!(
             signer_errors.len() == 154,
             "Different error set length: {}",
@@ -718,163 +848,7 @@ mod tests {
             print.push_str(&format!("\"{}\"", <Signer>::show(e)));
             print.push_str("\n");
         }
-        let print_expected = r#"
-"Error on the interface. Network specs key 0xabracadabra is not in hexadecimal format."
-"Error on the interface. Input content is not in hexadecimal format."
-"Error on the interface. Address key 0xabracadabra is not in hexadecimal format."
-"Error on the interface. Unable to parse address key 0350e7c3d5edde7db964317cd9b51a3a059d7cd99f81bdbce14990047354334c9779 passed through the interface."
-"Error on the interface. Unable to parse network specs key 0350e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e passed through the interface."
-"Error on the interface. Public key length does not match the encryption."
-"Error on the interface. Requested history page 14 does not exist. Total number of pages 10."
-"Database error. Unable to parse address key 0350e7c3d5edde7db964317cd9b51a3a059d7cd99f81bdbce14990047354334c9779 from the database."
-"Database error. Unable to parse history entry order 640455 from the database."
-"Database error. Unable to parse meta key 1c77657374656e64a2230000 from the database."
-"Database error. Unable to parse network specs key 0350e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e from the database."
-"Database error. Unable to parse network specs key 0350e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e from network id set of address book entry with key 0150e7c3d5edde7db964317cd9b51a3a059d7cd99f81bdbce14990047354334c9779 from the database."
-"Database error. Internal error. Collection [1] does not exist"
-"Database error. Internal error. Unsupported: Something Unsupported."
-"Database error. Internal error. Unexpected bug has happened: Please report me. PLEASE REPORT THIS BUG!"
-"Database error. Internal error. IO error: oh no!"
-"Database error. Internal error. Read corrupted data at file offset None backtrace ()"
-"Database error. Transaction error. Collection [1] does not exist"
-"Database error. Transaction error. Unsupported: Something Unsupported."
-"Database error. Transaction error. Unexpected bug has happened: Please report me. PLEASE REPORT THIS BUG!"
-"Database error. Transaction error. IO error: oh no!"
-"Database error. Transaction error. Read corrupted data at file offset None backtrace ()"
-"Database error. Checksum mismatch."
-"Database error. Unable to decode address details entry for key 0150e7c3d5edde7db964317cd9b51a3a059d7cd99f81bdbce14990047354334c9779."
-"Database error. Unable to decode current verifier entry for key 853faffbfc6713c1f899bf16547fcfbf733ae8361b8ca0129699d01d4f2181fd."
-"Database error. Unable to decode danger status entry."
-"Database error. Unable to decode general verifier entry."
-"Database error. Unable to decode history entry for order 135."
-"Database error. Unable to decode network specs (NetworkSpecs) entry for key 0150e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e."
-"Database error. Unable to decode temporary entry with information needed for signing approved transaction."
-"Database error. Unable to decode temporary entry with information needed for accepting approved information."
-"Database error. Unable to decode types information."
-"Database error. Mismatch found. Meta key corresponds to westend1922. Stored metadata is westend9122."
-"Database error. Mismatch found. Network specs (NetworkSpecs) entry with network specs key 0150e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e has not matching genesis hash e143f23803ca50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e."
-"Database error. Mismatch found. Network specs (NetworkSpecs) entry with network specs key 0150e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e has not matching encryption ecdsa."
-"Database error. Mismatch found. Address details entry with address key 0150e7c3d5edde7db964317cd9b51a3a059d7cd99f81bdbce14990047354334c9779 has not matching encryption ecdsa."
-"Database error. Mismatch found. Address details entry with address key 0150e7c3d5edde7db964317cd9b51a3a059d7cd99f81bdbce14990047354334c9779 has associated network specs key 0350e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e with wrong encryption."
-"Database error. Bad metadata for westend9000. Runtime metadata version is incompatible. Currently supported are v12, v13, and v14."
-"Database error. Bad metadata for westend9000. No system pallet in runtime metadata."
-"Database error. Bad metadata for westend9000. No runtime version in system pallet constants."
-"Database error. Bad metadata for westend9000. Runtime version from system pallet constants could not be decoded."
-"Database error. Bad metadata for westend9000. Metadata vector does not start with 0x6d657461."
-"Database error. Bad metadata for westend9000. Runtime metadata could not be decoded."
-"Database error. No verifier information found for network with genesis hash e143f23803ca50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e, however genesis hash is encountered in network specs entry with key 0150e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e."
-"Database error. More than one entry for network specs with name westend and encryption sr25519."
-"Database error. Different network names (westend, WeStEnD) in database for same genesis hash e143f23803ca50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e."
-"Database error. Entry with order 135 contains more than one transaction-related event. This should not be possible in current Signer and likely indicates database corruption."
-"Database error. Network with genesis hash 853faffbfc6713c1f899bf16547fcfbf733ae8361b8ca0129699d01d4f2181fd verifier is set as a custom one. This custom verifier coinsides the database general verifier and not None. This should not have happened and likely indicates database corruption."
-"Bad input data. Payload could not be decoded as `add_specs`."
-"Bad input data. Payload could not be decoded as `load_meta`."
-"Bad input data. Payload could not be decoded as `load_types`."
-"Bad input data. Received metadata is unsuitable. Runtime metadata version is incompatible. Currently supported are v12, v13, and v14."
-"Bad input data. Received metadata is unsuitable. No system pallet in runtime metadata."
-"Bad input data. Received metadata is unsuitable. No runtime version in system pallet constants."
-"Bad input data. Received metadata is unsuitable. Runtime version from system pallet constants could not be decoded."
-"Bad input data. Received metadata is unsuitable. Metadata vector does not start with 0x6d657461."
-"Bad input data. Received metadata is unsuitable. Runtime metadata could not be decoded."
-"Bad input data. Input is too short."
-"Bad input data. Only Substrate transactions are supported. Transaction is expected to start with 0x53, this one starts with 0x35."
-"Bad input data. Payload type with code 0x0f is not supported."
-"Bad input data. Metadata for kusama9110 is already in the database and is different from the one in received payload."
-"Bad input data. Metadata for westend9122 is already in the database."
-"Bad input data. Similar network specs are already stored in the database under key 0150e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e. Network specs in received payload have different unchangeable values (base58 prefix, decimals, encryption, network name, unit)."
-"Bad input data. Payload with encryption 0x03 is not supported."
-"Bad input data. Received payload has bad signature."
-"Bad input data. Network kulupu is not in the database. Add network specs before loading the metadata."
-"Bad input data. Network westend was previously known to the database with verifier public key: 8eaf04151687736326c9fea17e25fc5287613693c912909cb226aa4794f26a48, encryption: sr25519 (general verifier). However, no network specs are in the database at the moment. Add network specs before loading the metadata."
-"Bad input data. Saved network kulupu information was signed by verifier public key: 8eaf04151687736326c9fea17e25fc5287613693c912909cb226aa4794f26a48, encryption: ed25519. Received information is not signed."
-"Bad input data. General verifier in the database is public key: 8eaf04151687736326c9fea17e25fc5287613693c912909cb226aa4794f26a48, encryption: sr25519. Received unsigned westend network information could be accepted only if signed by the general verifier."
-"Bad input data. General verifier in the database is public key: 8eaf04151687736326c9fea17e25fc5287613693c912909cb226aa4794f26a48, encryption: sr25519. Received unsigned types information could be accepted only if signed by the general verifier."
-"Bad input data. Network kulupu currently has no verifier set up. Received load_metadata message is verified by public key: 8eaf04151687736326c9fea17e25fc5287613693c912909cb226aa4794f26a48, encryption: ed25519. In order to accept verified metadata, first download properly verified network specs."
-"Bad input data. Network kulupu current verifier is public key: 8eaf04151687736326c9fea17e25fc5287613693c912909cb226aa4794f26a48, encryption: sr25519. Received load_metadata message is verified by public key: 8eaf04151687736326c9fea17e25fc5287613693c912909cb226aa4794f26a48, encryption: ed25519. Changing verifier for the network would require wipe and reset of Signer."
-"Bad input data. Network westend is set to be verified by the general verifier, however, general verifier is not yet established. Received load_metadata message is verified by public key: 8eaf04151687736326c9fea17e25fc5287613693c912909cb226aa4794f26a48, encryption: sr25519. In order to accept verified metadata and set up the general verifier, first download properly verified network specs."
-"Bad input data. Network westend is verified by the general verifier which currently is public key: 8eaf04151687736326c9fea17e25fc5287613693c912909cb226aa4794f26a48, encryption: sr25519. Received load_metadata message is verified by public key: 8eaf04151687736326c9fea17e25fc5287613693c912909cb226aa4794f26a48, encryption: ed25519. Changing the general verifier or changing the network verifier to custom would require wipe and reset of Signer."
-"Bad input data. General verifier in the database is public key: 8eaf04151687736326c9fea17e25fc5287613693c912909cb226aa4794f26a48, encryption: sr25519. Received network westend specs could be accepted only if verified by the same general verifier. Current message is verified by public key: 8eaf04151687736326c9fea17e25fc5287613693c912909cb226aa4794f26a48, encryption: ed25519."
-"Bad input data. General verifier in the database is public key: 8eaf04151687736326c9fea17e25fc5287613693c912909cb226aa4794f26a48, encryption: sr25519. Received types information could be accepted only if verified by the same general verifier. Current message is verified by public key: 8eaf04151687736326c9fea17e25fc5287613693c912909cb226aa4794f26a48, encryption: ed25519."
-"Bad input data. Exactly same types information is already in the database."
-"Bad input data. Received message could not be read."
-"Bad input data. Input generated within unknown network and could not be processed. Add network with genesis hash e143f23803ca50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e and encryption sr25519."
-"Bad input data. Input transaction is generated in network westend. Currently there are no metadata entries for it, and transaction could not be processed. Add network metadata."
-"Bad input data. Exactly same network specs for network westend with encryption sr25519 are already in the database."
-"Bad input data. Network kulupu current verifier is public key: 8eaf04151687736326c9fea17e25fc5287613693c912909cb226aa4794f26a48, encryption: sr25519. Received add_specs message is verified by public key: 8eaf04151687736326c9fea17e25fc5287613693c912909cb226aa4794f26a48, encryption: ed25519, which is neither current network verifier not the general verifier. Changing the network verifier to another non-general one would require wipe and reset of Signer."
-"Could not find current verifier for network with genesis hash 853faffbfc6713c1f899bf16547fcfbf733ae8361b8ca0129699d01d4f2181fd."
-"Could not find general verifier."
-"Could not find types information."
-"Could not find network specs for network specs key 0350e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e."
-"Could not find network specs for westend."
-"Could not find network specs key 0150e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e in address details with key 0150e7c3d5edde7db964317cd9b51a3a059d7cd99f81bdbce14990047354334c9779."
-"Could not find address details for address key 0150e7c3d5edde7db964317cd9b51a3a059d7cd99f81bdbce14990047354334c9779."
-"Could not find metadata entry for westend9120."
-"Could not find danger status information."
-"Could not find database temporary entry with information needed for accepting approved information."
-"Could not find database temporary entry with information needed for signing approved transaction."
-"Could not find history entry with order 135."
-"Could not find network specs for westend with encryption ed25519 needed to decode historical transaction."
-"Entry with order 280 contains no transaction-related events."
-"Historical transaction was generated in network kulupu and processed. Currently there are no metadata entries for the network, and transaction could not be processed again. Add network metadata."
-"Network with genesis hash 853faffbfc6713c1f899bf16547fcfbf733ae8361b8ca0129699d01d4f2181fd is disabled. It could be enabled again only after complete wipe and re-installation of Signer."
-"Error generating address. Address key collision for seed name Alice super secret seed"
-"Error generating address. Bad secret string: invalid overall format."
-"Error generating address. Bad secret string: invalid bip39 phrase."
-"Error generating address. Bad secret string: invalid password."
-"Error generating address. Bad secret string: invalid seed."
-"Error generating address. Bad secret string: invalid seed length."
-"Error generating address. Bad secret string: invalid path."
-"Error generating address. Could not create random phrase. Mnemonic generator refuses to work with a valid excuse."
-"Error generating address. Invalid derivation format."
-"Error generating qr code. QR generator refuses to work with a valid excuse."
-"Error parsing incoming transaction. Metadata spec version matches. Error decoding transaction content. Expected mortal transaction due to prelude format. Found immortal transaction."
-"Error parsing incoming transaction. Metadata spec version matches. Error decoding transaction content. Expected immortal transaction due to prelude format. Found mortal transaction."
-"Error parsing incoming transaction. Metadata spec version matches. Error decoding transaction content. Genesis hash values from decoded extensions and from used network specs do not match."
-"Error parsing incoming transaction. Metadata spec version matches. Error decoding transaction content. Block hash for immortal transaction not matching genesis hash for the network."
-"Error parsing incoming transaction. Metadata spec version matches. Error decoding transaction content. Unable to decode extensions for V12/V13 metadata using standard extensions set."
-"Error parsing incoming transaction. Metadata spec version matches. Error decoding transaction content. Method number 2 not found in pallet test_Pallet."
-"Error parsing incoming transaction. Metadata spec version matches. Error decoding transaction content. Pallet with index 3 not found."
-"Error parsing incoming transaction. Metadata spec version matches. Error decoding transaction content. Method number 5 too high for pallet number 3. Only 4 indices available."
-"Error parsing incoming transaction. Metadata spec version matches. Error decoding transaction content. No calls found in pallet test_pallet_v14."
-"Error parsing incoming transaction. Metadata spec version matches. Error decoding transaction content. Referenced type could not be resolved in v14 metadata."
-"Error parsing incoming transaction. Metadata spec version matches. Error decoding transaction content. Argument type error."
-"Error parsing incoming transaction. Metadata spec version matches. Error decoding transaction content. Argument name error."
-"Error parsing incoming transaction. Metadata spec version matches. Error decoding transaction content. Expected primitive type. Found Option<u8>."
-"Error parsing incoming transaction. Metadata spec version matches. Error decoding transaction content. Expected compact. Not found it."
-"Error parsing incoming transaction. Metadata spec version matches. Error decoding transaction content. Data too short for expected content."
-"Error parsing incoming transaction. Metadata spec version matches. Error decoding transaction content. Unable to decode part of data as u32."
-"Error parsing incoming transaction. Metadata spec version matches. Error decoding transaction content. Encountered unexpected Option<_> variant."
-"Error parsing incoming transaction. Metadata spec version matches. Error decoding transaction content. IdentityField description error."
-"Error parsing incoming transaction. Metadata spec version matches. Error decoding transaction content. Unable to decode part of data as an array."
-"Error parsing incoming transaction. Metadata spec version matches. Error decoding transaction content. Unexpected type encountered for Balance"
-"Error parsing incoming transaction. Metadata spec version matches. Error decoding transaction content. Encountered unexpected enum variant."
-"Error parsing incoming transaction. Metadata spec version matches. Error decoding transaction content. Unexpected type inside compact."
-"Error parsing incoming transaction. Metadata spec version matches. Error decoding transaction content. Type claimed inside compact is not compactable."
-"Error parsing incoming transaction. Metadata spec version matches. Error decoding transaction content. No description found for type T::SomeUnknownType."
-"Error parsing incoming transaction. Metadata spec version matches. Error decoding transaction content. Declared type is not suitable BitStore type for BitVec."
-"Error parsing incoming transaction. Metadata spec version matches. Error decoding transaction content. Declared type is not suitable BitOrder type for BitVec."
-"Error parsing incoming transaction. Metadata spec version matches. Error decoding transaction content. Could not decode BitVec."
-"Error parsing incoming transaction. Metadata spec version matches. Error decoding transaction content. Could not decode Era."
-"Error parsing incoming transaction. Metadata spec version matches. Error decoding transaction content. After decoding the method some data remained unused."
-"Error parsing incoming transaction. Metadata spec version matches. Error decoding transaction content. After decoding the extensions some data remained unused."
-"Error parsing incoming transaction. Metadata spec version matches. Signed extensions are not compatible with Signer (v14 metadata). Era information is missing."
-"Error parsing incoming transaction. Metadata spec version matches. Signed extensions are not compatible with Signer (v14 metadata). Block hash information is missing."
-"Error parsing incoming transaction. Metadata spec version matches. Signed extensions are not compatible with Signer (v14 metadata). Metadata spec version information is missing."
-"Error parsing incoming transaction. Metadata spec version matches. Signed extensions are not compatible with Signer (v14 metadata). Era information is encountered mora than once."
-"Error parsing incoming transaction. Metadata spec version matches. Signed extensions are not compatible with Signer (v14 metadata). Genesis hash is encountered more than once."
-"Error parsing incoming transaction. Metadata spec version matches. Signed extensions are not compatible with Signer (v14 metadata). Block hash is encountered more than once."
-"Error parsing incoming transaction. Metadata spec version matches. Signed extensions are not compatible with Signer (v14 metadata). Metadata spec version is encountered more than once."
-"Error parsing incoming transaction. Metadata spec version matches. Unexpected regular expressions error."
-"Error parsing incoming transaction. Network spec version decoded from extensions (9122) differs from the version in metadata (9010)."
-"All parsing attempts failed with following errors. Parsing with westend9010 metadata: Network spec version decoded from extensions (9122) differs from the version in metadata (9010). Parsing with westend9000 metadata: Network spec version decoded from extensions (9122) differs from the version in metadata (9000)."
-"Error with secret string of existing address: invalid overall format."
-"Error with secret string of existing address: invalid bip39 phrase."
-"Error with secret string of existing address: invalid password."
-"Error with secret string of existing address: invalid seed."
-"Error with secret string of existing address: invalid seed length."
-"Error with secret string of existing address: invalid path."
-"Wrong password."
-"#;
+        let print_expected = r#""#;
         assert!(print == print_expected, "\nReceived: {}", print);
     }
 }

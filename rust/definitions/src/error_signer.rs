@@ -15,6 +15,8 @@
 //! management is easier.
 use anyhow::anyhow;
 use sp_core::crypto::SecretStringError;
+#[cfg(feature = "test")]
+use variant_count::VariantCount;
 
 use crate::{
     crypto::Encryption,
@@ -456,6 +458,7 @@ impl ErrorSigner {
 /// Data that user can type from keyboard is processed as is, it does not
 /// cause errors on the interface.
 #[derive(Debug)]
+#[cfg_attr(feature = "test", derive(VariantCount))]
 pub enum InterfaceSigner {
     /// Received string is not hexadecimal, and could not be transformed into
     /// `Vec<u8>`.
@@ -529,6 +532,7 @@ pub enum InterfaceSigner {
 /// Expected to receive hexadecimal string from the interface, got something
 /// different. [`NotHexSigner`] specifies, what was expected.
 #[derive(Debug)]
+#[cfg_attr(feature = "test", derive(VariantCount))]
 pub enum NotHexSigner {
     /// [`NetworkSpecsKey`] is not hexadecimal, associated data is input string
     /// as it is received.
@@ -566,6 +570,7 @@ pub enum IncomingMetadataSourceSigner {
 /// Errors decoding database keys received from the frontend on the Signer
 /// side
 #[derive(Debug)]
+#[cfg_attr(feature = "test", derive(VariantCount))]
 pub enum KeyDecodingSignerInterface {
     /// [`AddressKey`] received from the frontend was a valid hexadecimal, but
     /// turned out to be a damaged database key with invalid content.
@@ -597,6 +602,7 @@ pub enum KeyDecodingSignerInterface {
 /// Note that [`NotFoundSigner`] is a separate set of errors. Things **not
 /// found** are kept separately here from things **damaged**.
 #[derive(Debug)]
+#[cfg_attr(feature = "test", derive(VariantCount))]
 pub enum DatabaseSigner {
     /// Key used in one of the database trees has invalid content, and could
     /// not be decoded.
@@ -721,6 +727,7 @@ pub enum DatabaseSigner {
 /// and if this information could not be extracted from the key, it indicates
 /// that the database is damaged and results in [`KeyDecodingSignerDb`] error.
 #[derive(Debug)]
+#[cfg_attr(feature = "test", derive(VariantCount))]
 pub enum KeyDecodingSignerDb {
     /// [`AddressKey`] from the database could not be processed.
     ///
@@ -763,6 +770,7 @@ pub enum KeyDecodingSignerDb {
 /// be decoded. If the decoding fails, it indicates that the database is
 /// damaged.
 #[derive(Debug)]
+#[cfg_attr(feature = "test", derive(VariantCount))]
 pub enum EntryDecodingSigner {
     /// Database entry could not be decoded as
     /// [`AddressDetails`](crate::users::AddressDetails).
@@ -820,13 +828,14 @@ pub enum EntryDecodingSigner {
     Types,
 }
 
-#[derive(Debug)]
 /// Mismatch errors within database on the Signer side
 ///
 /// Data could be recorded in the Signer database only in ordered fasion, i.e.
 /// with keys corresponding to the data stored in the encoded values etc.
 /// If the data retrieved from the database contains some internal
 /// contradictions, it indicates the database corruption.
+#[derive(Debug)]
+#[cfg_attr(feature = "test", derive(VariantCount))]
 pub enum MismatchSigner {
     /// Network name and/or network version in [`MetaKey`] do not match the
     /// network name and network version from `Version` constant, `System`
@@ -906,6 +915,7 @@ pub enum MismatchSigner {
 
 /// Errors in the input received by the Signer
 #[derive(Debug)]
+#[cfg_attr(feature = "test", derive(VariantCount))]
 pub enum InputSigner {
     /// Updating transaction with `add_specs`, `load_metadata` or `load_types`
     /// content, as declared by the prelude, could not be decoded.
@@ -1279,6 +1289,7 @@ pub enum InputSigner {
 
 /// Content that should have been verified by the general verifier
 #[derive(Debug)]
+#[cfg_attr(feature = "test", derive(VariantCount))]
 pub enum GeneralVerifierForContent {
     /// Network data.
     /// Associated data is the network name.
@@ -1293,6 +1304,7 @@ pub enum GeneralVerifierForContent {
 /// Not necessarily the database failure, could be just not updated Signer
 /// as well.
 #[derive(Debug)]
+#[cfg_attr(feature = "test", derive(VariantCount))]
 pub enum NotFoundSigner {
     /// [`CurrentVerifier`](crate::network_specs::CurrentVerifier) for a
     /// network in `VERIFIERS` tree of the Signer database.

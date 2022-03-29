@@ -20,13 +20,14 @@ sp-io = {git = "https://github.com/paritytech/substrate", optional = true}
 sp-runtime = {git = "https://github.com/paritytech/substrate", default-features = false}
 sp-version = {git = "https://github.com/paritytech/substrate"}
 sp-wasm-interface = {git = "https://github.com/paritytech/substrate", optional = true}
+variant_count = {version = "1.1.0", optional = true}
 
 [features]
 default = ["test"]
 
 active = ["sc-executor-common", "sc-executor-wasmi", "sp-io", "sp-wasm-interface"]
 signer = ["anyhow", "plot_icon"]
-test = ["active", "signer"]
+test = ["active", "signer", "variant_count"]
 
 [lib]
 name = "definitions"
