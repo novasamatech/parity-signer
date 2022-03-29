@@ -1,10 +1,28 @@
+// Copyright 2015-2022 Parity Technologies (UK) Ltd.
+// This file is part of Parity.
+
+// Parity is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+
+// Parity is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+
+// You should have received a copy of the GNU General Public License
+// along with Parity.  If not, see <http://www.gnu.org/licenses/>.
+
 use definitions::error::{Active, ErrorSource};
 use generate_message::{full_run, parser::Command};
 
 fn main() -> Result<(), String> {
     let command = Command::MakeColdRelease;
-    match full_run(command) {
-        Ok(_) => Ok(()),
-        Err(e) => return Err(<Active>::show(&e)),
+
+    if let Err(e) = full_run(command) {
+        return Err(<Active>::show(&e));
     }
+
+    Ok(())
 }
