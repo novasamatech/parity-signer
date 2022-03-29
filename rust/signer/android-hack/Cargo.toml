@@ -20,10 +20,15 @@ transaction_parsing = {path = "../transaction_parsing"}
 transaction_signing = {path = "../transaction_signing"}
 zeroize = {version = "1.3.0", features = ["zeroize_derive"]}
 
+[build-dependencies]
+definitions = {path = "../definitions"}
+generate_message = {path = "../generate_message"}
+
 [lib]
 name = "signer"
 crate-type = ["staticlib", "cdylib"]
 
 [features]
 default = ["jni"]
+
 

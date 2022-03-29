@@ -3122,6 +3122,7 @@ dependencies = [
  "db_handling",
  "definitions",
  "ffi-support",
+ "generate_message",
  "hex",
  "jni",
  "libc",

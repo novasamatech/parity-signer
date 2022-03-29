@@ -1,4 +1,4 @@
-use std::env;
+use std::{env, path::PathBuf};
 use constants::{EXPORT_FOLDER, FOLDER};
 use definitions::{crypto::{Encryption, SufficientCrypto}, error::{Active, CommandBadArgument, CommandDoubleKey, CommandNeedArgument, CommandNeedKey, CommandParser, CommandUnexpected, ErrorActive, InputActive, NotHexActive}, helpers::unhex};
 use parity_scale_codec::Decode;
@@ -25,7 +25,7 @@ pub enum Command {
     RestoreDefaults,
     MakeColdWithIdentities,
     TransferMeta,
-    MakeColdRelease,
+    MakeColdRelease(Option<PathBuf>),
     TransferMetaRelease,
     Derivations(Derivations),
     Unwasm{filename: String, update_db: bool},
@@ -154,7 +154,7 @@ impl Command {
                         let mut name = None;
                         let mut encryption_override_key = None;
                         let mut token = None;
-                        
+
                         loop {
                             match args.next() {
                                 Some(x) => {
@@ -230,7 +230,7 @@ impl Command {
                             },
                             None => Set::T,
                         };
-                        
+
                         let encryption = match encryption_override_key {
                             Some(x) => {
                                 match x.as_str() {
@@ -243,7 +243,7 @@ impl Command {
                             None => None,
                         };
                         let over = Override{encryption, token};
-                        
+
                         let content = match content_key {
                             Some(x) => {
                                 match x.as_str() {
@@ -268,14 +268,14 @@ impl Command {
                             },
                             None => return Err(ErrorActive::CommandParser(CommandParser::NeedKey(CommandNeedKey::Content))),
                         };
-                        
+
                         let instruction = Instruction {
                             set,
                             content,
                             pass_errors,
                             over,
                         };
-                        
+
                         match arg.as_str() {
                             "load_metadata" => Ok(Command::Load(instruction)),
                             "add_specs" => Ok(Command::Specs(instruction)),
@@ -586,7 +586,7 @@ impl Command {
                             name,
                         };
                         Ok(Command::Make(make))
-                    },                
+                    },
                     "remove" => {
                         let mut info_found = None;
                         loop {
@@ -637,12 +637,12 @@ impl Command {
                         match info_found {
                             Some(x) => Ok(Command::Remove(x)),
                             None => return Err(ErrorActive::CommandParser(CommandParser::NeedKey(CommandNeedKey::Remove))),
-                        }                        
+                        }
                     },
                     "restore_defaults" => Ok(Command::RestoreDefaults),
                     "make_cold_with_identities" => Ok(Command::MakeColdWithIdentities),
                     "transfer_meta_to_cold" => Ok(Command::TransferMeta),
-                    "make_cold_release" => Ok(Command::MakeColdRelease),
+                    "make_cold_release" => Ok(Command::MakeColdRelease(None)),
                     "transfer_meta_to_cold_release" => Ok(Command::TransferMetaRelease),
                     "derivations" => {
                         let mut goal = Goal::Both; // default option for `derivations`
@@ -728,7 +728,7 @@ impl Command {
                         match found_payload {
                             Some(x) => Ok(Command::Unwasm{filename: x, update_db}),
                             None => return Err(ErrorActive::CommandParser(CommandParser::NeedKey(CommandNeedKey::Payload))),
-                        }                        
+                        }
                     },
                     _ => return Err(ErrorActive::CommandParser(CommandParser::UnknownCommand)),
                 }
