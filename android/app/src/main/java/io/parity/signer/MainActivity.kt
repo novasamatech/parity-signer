@@ -30,11 +30,7 @@ import io.parity.signer.ui.theme.Text600
 @ExperimentalMaterialApi
 @ExperimentalAnimationApi
 class MainActivity : AppCompatActivity() {
-	companion object {
-		init {
-			System.loadLibrary("signer")
-		}
-	}
+	//rust library is initialized inside data model
 	private val signerDataModel by viewModels<SignerDataModel>()
 
 	override fun onCreate(savedInstanceState: Bundle?) {
