@@ -42,8 +42,8 @@ struct RecoverSeedPhrase: View {
                                 //.background(Color("backgroundColor"))
                                     .font(FBase(style: .body2))
                                     .disableAutocorrection(true)
+                                    .textInputAutocapitalization(.never)
                                     .keyboardType(.asciiCapable)
-                                    .textCase(.lowercase)
                                     .submitLabel(.done)
                                     .onChange(of: userInput, perform: { word in
                                         data.pushButton(buttonID: .TextEntry, details: word)
@@ -71,7 +71,13 @@ struct RecoverSeedPhrase: View {
                                         Button(action: {
                                             data.pushButton(buttonID: .PushWord, details: guess)
                                         }) {
-                                            Text(guess).foregroundColor(Color("Crypto400")).font(FCrypto(style: .body2)).padding(.horizontal, 12).padding(.vertical, 4).background(RoundedRectangle(cornerRadius: 4).foregroundColor(Color("Crypto100")))
+                                            Text(guess)
+                                                .foregroundColor(Color("Crypto400"))
+                                                .font(FCrypto(style: .body2))
+                                                .padding(.horizontal, 12)
+                                                .padding(.vertical, 4)
+                                                .background(RoundedRectangle(cornerRadius: 4)
+                                                                .foregroundColor(Color("Crypto100")))
                                         }
                                     }
                                 }

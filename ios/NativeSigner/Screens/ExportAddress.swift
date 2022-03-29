@@ -31,7 +31,7 @@ struct ExportAddress: View {
                     }.padding().foregroundColor(Color("Crypto400")).font(FCrypto(style: .body2))
                     HStack {
                         Text("Seed name: ")
-                        Text(content.seed_name)
+                        Text(content.seed_name.decode64()g)
                     }.padding().foregroundColor(Color("Text400")).font(FBase(style: .body2))
                 }
                 
