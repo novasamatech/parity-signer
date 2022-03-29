@@ -5,7 +5,6 @@ set -e
 
 # Build Signer backend
 
-cd "$(dirname "${0}")/../rust/signer"
 
 if [ "$1" != "android" ] && [ "$1" != "ios" ]
 then
@@ -18,64 +17,7 @@ fi
 
 if [ "$1" == "android" ]
   then
-
-    # Build android
-
-    if [ -z ${NDK_HOME+x} ];
-      then
-        printf 'Please install android-ndk or export NDK_HOME (use absolute path)\n\n'
-        printf 'from https://developer.android.com/ndk/downloads or with sdkmanager\n'
-        exit 1
-      else
-        printf "Building Android targets...";
-    fi
-
-    printf "Building ARM64 Android targets...";
-    cp ../os-specific-lock/android/Cargo.lock ../
-    cp android-hack/Cargo.toml .
-    CC_aarch64_linux_android="${ANDROID_PREBUILD_BIN}/aarch64-linux-android${API_LEVEL}-clang" \
-    CXX_aarch64_linux_android="${ANDROID_PREBUILD_BIN}/aarch64-linux-android${API_LEVEL}-clang++" \
-    CARGO_TARGET_AARCH64_LINUX_ANDROID_LINKER="${ANDROID_PREBUILD_BIN}/aarch64-linux-android${API_LEVEL}-clang" \
-    AR_aarch64_linux_android="${ANDROID_PREBUILD_BIN}/aarch64-linux-android-ar" \
-      cargo build --locked --target=aarch64-linux-android --release
-
-    printf "Building ARMv7 Android targets...";
-    CC_armv7_linux_androideabi="${ANDROID_PREBUILD_BIN}/armv7a-linux-androideabi${API_LEVEL}-clang" \
-    CXX_armv7_linux_androideabi="${ANDROID_PREBUILD_BIN}/armv7a-linux-androideabi${API_LEVEL}-clang++" \
-    CARGO_TARGET_ARMV7_LINUX_ANDROIDEABI_LINKER="${ANDROID_PREBUILD_BIN}/armv7a-linux-androideabi${API_LEVEL}-clang" \
-    AR_armv7_linux_androideabi="${ANDROID_PREBUILD_BIN}/arm-linux-androideabi-ar" \
-      cargo build --locked --target=armv7-linux-androideabi --release
-
-    printf "Building 32-bit x86  Android targets...";
-    CC_i686_linux_android="${ANDROID_PREBUILD_BIN}/i686-linux-android${API_LEVEL}-clang" \
-    CXX_i686_linux_android="${ANDROID_PREBUILD_BIN}/i686-linux-android${API_LEVEL}-clang++" \
-    CARGO_TARGET_I686_LINUX_ANDROID_LINKER="${ANDROID_PREBUILD_BIN}/i686-linux-android${API_LEVEL}-clang" \
-    AR_i686_linux_android="${ANDROID_PREBUILD_BIN}/i686-linux-android-ar" \
-      cargo build --locked --target=i686-linux-android --release
-
-    printf "Building 64-bit x86  Android targets...";
-    CC_x86_64_linux_android="${ANDROID_PREBUILD_BIN}/x86_64-linux-android${API_LEVEL}-clang" \
-    CXX_x86_64_linux_android="${ANDROID_PREBUILD_BIN}/x86_64-linux-android${API_LEVEL}-clang++" \
-    CARGO_TARGET_X86_64_LINUX_ANDROID_LINKER="${ANDROID_PREBUILD_BIN}/x86_64-linux-android${API_LEVEL}-clang" \
-    AR_x86_64_linux_android="${ANDROID_PREBUILD_BIN}/x86_64-linux-android-ar" \
-      cargo build --locked --target=x86_64-linux-android --release
-
-    for i in "${!ANDROID_ARCHS[@]}";
-      do
-        mkdir -p -v "../../android/app/src/main/jniLibs/${ANDROID_FOLDER[$i]}"
-        cp "../target/${ANDROID_ARCHS[$i]}/release/lib${LIB_NAME}.so" "../../android/app/src/main/jniLibs/${ANDROID_FOLDER[$i]}/lib${LIB_NAME}.so"
-    done
-
-    # Generate cold release database with built-in metadata
-
-    cd "$(dirname "${0}")/../generate_message"
-    cargo run --locked make_cold_release
-
-    # Move database to assets
-
-    rm -rf ../../android/app/src/main/assets/Database/*
-    mkdir -p ../../android/app/src/main/assets/Database/
-    cp -R ../database/database_cold_release/* ../../android/app/src/main/assets/Database/
+    . "$(dirname "${0}")/switch_to_android.sh"
 fi
 
 if [ "$1" == "ios" ]
@@ -84,6 +26,8 @@ if [ "$1" == "ios" ]
     # Build iOS
 
     printf "Building iOS targets...";
+    
+    cd "$(dirname "${0}")/../rust/signer"
 
     cp ../os-specific-lock/ios/Cargo.lock ../
     cp ios-hack/Cargo.toml .
