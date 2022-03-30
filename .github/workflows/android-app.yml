@@ -1,0 +1,52 @@
+name: Build android app
+
+on:
+  pull_request:
+  push:
+    branches:
+      - master
+      - stable
+
+jobs:
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    steps:
+
+      - name:           Cancel Previous Runs
+        uses:           styfle/cancel-workflow-action@0.9.1
+        with:
+          access_token: ${{ github.token }}
+
+      - name:           Checkout Sources
+        uses:           actions/checkout@v2.4.0
+        with:
+          fetch-depth:  50
+          submodules:   'recursive'
+
+      - name:           Install System Dependencies
+        run:            |
+          sudo apt-get update
+          sudo apt-get install -y clang libclang-dev libopencv-dev
+
+      - name:           Install Rust stable toolchain
+        uses:           actions-rs/toolchain@v1.0.7
+        with:
+          profile:      minimal
+          toolchain:    stable
+          override:     true
+
+      - name:           Set up JDK environment
+        uses:           actions/setup-java@1.4.3
+        with:
+          java-version: 1.8
+
+      - name:           Install NDK
+        uses:           nttld/setup-ndk@v1
+        with:
+          ndk-version:  r24e
+
+      - name:           Build
+        run:            |
+          cd android
+          ./gradlew build
