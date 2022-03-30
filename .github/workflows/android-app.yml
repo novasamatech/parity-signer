@@ -37,7 +37,7 @@ jobs:
           override:     true
 
       - name:           Install additional rust targets
-        run:            rustup target add aarch64-linux-android armv7-linux-androideabi i686-linux-android
+        run:            rustup target add aarch64-linux-android armv7-linux-androideabi x86_64-linux-android
 
       - name:           Set up JDK environment
         uses:           actions/setup-java@v2
