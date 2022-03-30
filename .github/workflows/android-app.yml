@@ -39,7 +39,8 @@ jobs:
       - name:           Set up JDK environment
         uses:           actions/setup-java@v2
         with:
-          java-version: 1.8
+          distribution: 'adopt'
+          java-version: 11
 
       - name:           Install NDK
         uses:           nttld/setup-ndk@v1
