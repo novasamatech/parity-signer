@@ -30,12 +30,11 @@ jobs:
           sudo apt-get install -y clang libclang-dev libopencv-dev
 
       - name:           Install Rust stable toolchain
-        uses:           actions-rs/toolchain@v1.0.7
+        uses:           actions-rs/toolchain@v1
         with:
           profile:      minimal
           toolchain:    stable
           override:     true
-          target:       aarch64-linux-android
           target:       armv7-linux-androideabi
 
       - name:           Set up JDK environment
