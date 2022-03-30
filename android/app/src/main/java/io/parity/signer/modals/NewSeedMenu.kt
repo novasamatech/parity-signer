@@ -9,6 +9,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import io.parity.signer.ButtonID
+import io.parity.signer.ShieldAlert
 import io.parity.signer.components.BigButton
 import io.parity.signer.components.HeaderBar
 import io.parity.signer.models.SignerDataModel
@@ -30,10 +31,20 @@ fun NewSeedMenu(signerDataModel: SignerDataModel) {
 				HeaderBar(line1 = "ADD SEED", line2 = "Select seed addition method")
 				BigButton(
 					text = "New seed",
-					action = { signerDataModel.pushButton(ButtonID.NewSeed) })
+					action = {
+						if (signerDataModel.alertState.value == ShieldAlert.None)
+							signerDataModel.pushButton(ButtonID.NewSeed)
+						else
+							signerDataModel.pushButton(ButtonID.Shield)
+					})
 				BigButton(
 					text = "Recover seed",
-					action = { signerDataModel.pushButton(ButtonID.RecoverSeed) },
+					action = {
+						if (signerDataModel.alertState.value == ShieldAlert.None)
+							signerDataModel.pushButton(ButtonID.RecoverSeed)
+						else
+							signerDataModel.pushButton(ButtonID.Shield)
+					},
 					isShaded = true
 				)
 			}

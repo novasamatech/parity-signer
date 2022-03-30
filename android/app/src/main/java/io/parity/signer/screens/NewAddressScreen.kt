@@ -17,25 +17,28 @@ import org.json.JSONObject
 
 @Composable
 fun NewAddressScreen(signerDataModel: SignerDataModel, increment: Boolean) {
-	val screenData = signerDataModel.screenData.value?: JSONObject()
+	val screenData = signerDataModel.screenData.value ?: JSONObject()
 	val derivationPath = remember { mutableStateOf("") }
 	val buttonGood = remember { mutableStateOf(false) }
 	val whereTo = remember { mutableStateOf<DeriveDestination?>(null) }
 	val collision = remember { mutableStateOf<JSONObject?>(null) }
 	val seedName = signerDataModel.screenData.value?.optString("seed_name") ?: ""
-	val networkSpecKey = signerDataModel.screenData.value?.optString("network_specs_key") ?: ""
-	var derivationState by remember(buttonGood, whereTo, collision) { mutableStateOf(DerivationCheck(
-		buttonGood,
-		whereTo,
-		collision
-	) {
-		signerDataModel.substratePathCheck(
-			seedName,
-			it,
-			networkSpecKey,
-			signerDataModel.dbName
-		)
-	}) }
+	val networkSpecKey =
+		signerDataModel.screenData.value?.optString("network_specs_key") ?: ""
+	var derivationState by remember(buttonGood, whereTo, collision) {
+		mutableStateOf(DerivationCheck(
+			buttonGood,
+			whereTo,
+			collision
+		) {
+			signerDataModel.substratePathCheck(
+				seedName,
+				it,
+				networkSpecKey,
+				signerDataModel.dbName
+			)
+		})
+	}
 	val focusManager = LocalFocusManager.current
 	val focusRequester = remember { FocusRequester() }
 
@@ -73,15 +76,15 @@ fun NewAddressScreen(signerDataModel: SignerDataModel, increment: Boolean) {
 					when (derivationState.whereTo.value) {
 						DeriveDestination.pin -> {
 							signerDataModel.addKey(
-							path = derivationPath.value,
-							seedName = seedName
-						)
+								path = derivationPath.value,
+								seedName = seedName
+							)
 						}
 						DeriveDestination.pwd -> {
 							signerDataModel.pushButton(
-							ButtonID.CheckPassword,
-							details = derivationPath.value
-						)
+								ButtonID.CheckPassword,
+								details = derivationPath.value
+							)
 						}
 						null -> {}
 					}
@@ -130,7 +133,7 @@ fun NewAddressScreen(signerDataModel: SignerDataModel, increment: Boolean) {
 		derivationPath.value =
 			signerDataModel.screenData.value?.optString("suggested_derivation")
 				?: ""
-		derivationState.fromJSON(signerDataModel.screenData.value?: JSONObject())
+		derivationState.fromJSON(signerDataModel.screenData.value ?: JSONObject())
 		onDispose { focusManager.clearFocus() }
 	}
 }

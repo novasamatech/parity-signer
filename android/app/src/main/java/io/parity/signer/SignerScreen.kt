@@ -21,6 +21,7 @@ import org.json.JSONObject
 @Composable
 fun ScreenSelector(screen: SignerScreen?, signerDataModel: SignerDataModel) {
 	val screenData by signerDataModel.screenData.observeAsState()
+	val alertState by signerDataModel.alertState.observeAsState()
 	when (screen) {
 		SignerScreen.Scan -> {
 			ScanScreen(
@@ -28,9 +29,12 @@ fun ScreenSelector(screen: SignerScreen?, signerDataModel: SignerDataModel) {
 			)
 		}
 		SignerScreen.Keys -> {
-			KeyManager(signerDataModel::pushButton,
+			KeyManager(
+				signerDataModel::pushButton,
 				signerDataModel::increment,
-				screenData?: JSONObject())
+				screenData ?: JSONObject(),
+				alertState
+			)
 		}
 		SignerScreen.Settings -> {
 			SettingsScreen(signerDataModel = signerDataModel)
