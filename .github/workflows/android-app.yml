@@ -45,7 +45,7 @@ jobs:
       - name:           Install NDK
         uses:           nttld/setup-ndk@v1
         with:
-          ndk-version:  r21e
+          ndk-version:  r24
 
       - name:           Build
         run:            |
