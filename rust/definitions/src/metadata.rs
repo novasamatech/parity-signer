@@ -566,7 +566,7 @@ impl AddressBookEntry {
         match <AddressBookEntry>::decode(&mut &address_book_entry_encoded[..]) {
             Ok(a) => Ok(a),
             Err(_) => Err(ErrorActive::Database(DatabaseActive::EntryDecoding(
-                EntryDecodingActive::AddressBookEntryTitle {
+                EntryDecodingActive::AddressBookEntry {
                     title: title.to_string(),
                 },
             ))),
