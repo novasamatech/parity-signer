@@ -260,7 +260,7 @@ impl ErrorSource for Signer {
                     InputSigner::SameNameVersionDifferentMeta{name, version} => format!("Metadata for {}{} is already in the database and is different from the one in received payload.", name, version),
                     InputSigner::MetadataKnown{name, version} => format!("Metadata for {}{} is already in the database.", name, version),
                     InputSigner::ImportantSpecsChanged(key) => format!("Similar network specs are already stored in the database under key {}. Network specs in received payload have different unchangeable values (base58 prefix, decimals, encryption, network name, unit).", hex::encode(key.key())),
-                    InputSigner::DifferentBase58{genesis_hash, base58_database, base58_input} => format!("Network with genesis hash {} already has entries in the database with base58 prefix {}. Received network specs have different base 58 prefix {}.", hex::encode(genesis_hash), base58_database, base58_input),
+                    InputSigner::DifferentBase58{genesis_hash, base58_database, base58_input} => format!("Network with genesis hash {} already has entries in the database with base58 prefix {}. Received network specs have different base58 prefix {}.", hex::encode(genesis_hash), base58_database, base58_input),
                     InputSigner::EncryptionNotSupported(code) => format!("Payload with encryption 0x{} is not supported.", code),
                     InputSigner::BadSignature => String::from("Received payload has bad signature."),
                     InputSigner::LoadMetaUnknownNetwork{name} => format!("Network {} is not in the database. Add network specs before loading the metadata.", name),
@@ -351,6 +351,7 @@ impl ErrorSource for Signer {
 
 /// All possible errors that could occur on the Signer side.
 #[derive(Debug)]
+#[cfg_attr(feature = "test", derive(VariantCount))]
 pub enum ErrorSigner {
     /// Communication errors on the interface between native frontend and rust
     /// backend.
@@ -1436,6 +1437,7 @@ pub enum NotFoundSigner {
 
 /// Errors in generating address, exclusive for the Signer side
 #[derive(Debug)]
+#[cfg_attr(feature = "test", derive(VariantCount))]
 pub enum ExtraAddressGenerationSigner {
     /// Error generating random phrase.
     ///
@@ -1448,6 +1450,7 @@ pub enum ExtraAddressGenerationSigner {
 
 /// Errors in transaction parsing
 #[derive(Debug)]
+#[cfg_attr(feature = "test", derive(VariantCount))]
 pub enum ParserError {
     /// Can not separate method from extensions, bad transaction.
     SeparateMethodExtensions,
@@ -1570,6 +1573,7 @@ pub enum ParserError {
 /// Signer assumes that every byte of the transaction will be processed, and
 /// shows an error if this is not the case.
 #[derive(Debug)]
+#[cfg_attr(feature = "test", derive(VariantCount))]
 pub enum ParserDecodingError {
     /// Transaction was announced by the prelude to be mortal (`53xx00`),
     /// but has `Era::Immortal` in extensions
@@ -1738,6 +1742,7 @@ pub enum ParserDecodingError {
 /// If the metadata does not follow those criteria, transactons could not be
 /// parsed, and therefore, could not be signed.
 #[derive(Debug)]
+#[cfg_attr(feature = "test", derive(VariantCount))]
 pub enum ParserMetadataError {
     /// Metadata extensions have no `Era`
     NoEra,

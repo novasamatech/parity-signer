@@ -13,6 +13,7 @@ use crate::error_signer::{
 };
 use crate::keyring::{AddressKey, MetaKey, NetworkSpecsKey, Order, VerifierKey};
 use crate::network_specs::{ValidCurrentVerifier, Verifier, VerifierValue};
+use crate::users::AddressDetails;
 
 const PUBLIC: [u8; 32] = [
     142, 175, 4, 21, 22, 135, 115, 99, 38, 201, 254, 161, 126, 37, 252, 82, 135, 97, 54, 147, 201,
@@ -22,11 +23,13 @@ const PUBLIC: [u8; 32] = [
 fn verifier_sr25519() -> Verifier {
     Verifier(Some(verifier_value_sr25519()))
 }
+
 fn verifier_value_sr25519() -> VerifierValue {
     VerifierValue::Standard(MultiSigner::Sr25519(sp_core::sr25519::Public::from_raw(
         PUBLIC,
     )))
 }
+
 fn verifier_value_ed25519() -> VerifierValue {
     VerifierValue::Standard(MultiSigner::Ed25519(sp_core::ed25519::Public::from_raw(
         PUBLIC,
@@ -528,6 +531,21 @@ fn address_generation_common() -> Vec<AddressGenerationCommon> {
             .map(AddressGenerationCommon::SecretString)
             .collect::<Vec<AddressGenerationCommon>>(),
     );
+    
+    // `DerivationExists` error.
+    out.push(
+        AddressGenerationCommon::DerivationExists(
+            MultiSigner::Sr25519(sp_core::sr25519::Public::from_raw(PUBLIC)), 
+            AddressDetails {
+                seed_name: String::from("Alice"),
+                path: String::from("//Alice"),
+                has_pwd: false,
+                network_id: vec![network_specs_key_good()],
+                encryption: Encryption::Sr25519,
+            }, 
+            network_specs_key_good()
+        )
+    );
 
     out
 }
@@ -819,36 +837,291 @@ mod tests {
         );
     }
     
-    /// count all `NotFoundSigner` variants
-    fn not_found_signer_count() -> usize {
-        NotFoundSigner::VARIANT_COUNT
-    }
-    
     /// check that no `NotFoundSigner` entries are missed
     #[test]
     fn not_found_signer_check() {
         assert_eq!(
-            not_found_signer_count(), 
+            NotFoundSigner::VARIANT_COUNT, 
             not_found_signer().len(),
         );
     }
     
+    /// count all `AddressGenerationCommon` variants
+    fn address_generation_common_count() -> usize {
+        AddressGenerationCommon::VARIANT_COUNT
+            - 1 + secret_string_error_set().len() // for nested variants in `AddressGenerationCommon::SecretString(_)`
+    }
     
+    /// check that no `AddressGenerationCommon` entries are missed
+    #[test]
+    fn address_generation_common_check() {
+        assert_eq!(
+            address_generation_common_count(), 
+            address_generation_common().len(),
+        );
+    }
+    
+    /// check that no `ExtraAddressGenerationSigner` entries are missed
+    #[test]
+    fn extra_address_generation_signer_check() {
+        assert_eq!(
+            ExtraAddressGenerationSigner::VARIANT_COUNT, 
+            extra_address_generation_signer().len(),
+        );
+    }
+    
+    /// count all `AddressGeneration` variants
+    fn address_generation_count() -> usize {
+        AddressGeneration::<Signer>::VARIANT_COUNT
+            - 1 + address_generation_common_count() // for nested variants in `AddressGeneration::Common(_)`
+            - 1 + extra_address_generation_signer().len() // for nested variants in `AddressGeneration::Extra(_)`
+    }
+    
+    /// check that no `AddressGeneration` entries are missed
+    #[test]
+    fn address_generation_check() {
+        assert_eq!(
+            address_generation_count(), 
+            address_generation().len(),
+        );
+    }
+    
+    /// check that no `ParserDecodingError` entries are missed
+    #[test]
+    fn parser_decoding_error_check() {
+        assert_eq!(
+            ParserDecodingError::VARIANT_COUNT, 
+            parser_decoding_error().len(),
+        );
+    }
+    
+    /// check that no `ParserMetadataError` entries are missed
+    #[test]
+    fn parser_metadata_error_check() {
+        assert_eq!(
+            ParserMetadataError::VARIANT_COUNT, 
+            parser_metadata_error().len(),
+        );
+    }
+    
+    /// count all `ParserError` variants
+    fn parser_error_count() -> usize {
+        ParserError::VARIANT_COUNT
+            - 1 + parser_decoding_error().len() // for nested variants in `ParserError::Decoding(_)`
+            - 1 + parser_metadata_error().len() // for nested variants in `ParserError::FundamentallyBadV14Metadata(_)`
+    }
+    
+    /// check that no `ParserError` entries are missed
+    #[test]
+    fn parser_error_check() {
+        assert_eq!(
+            parser_error_count(), 
+            parser_error().len(),
+        );
+    }
+    
+    /// count all `ErrorSigner` variants
+    fn error_signer_count() -> usize {
+        ErrorSigner::VARIANT_COUNT
+            - 1 + interface_signer_count() // for nested variants in `ErrorSigner::Interface(_)`
+            - 1 + database_signer_count() // for nested variants in `ErrorSigner::Database(_)`
+            - 1 + input_signer_count() // for nested variants in `ErrorSigner::Input(_)`
+            - 1 + not_found_signer().len() // for nested variants in `ErrorSigner::NotFound(_)`
+            - 1 + address_generation_count() // for nested variants in `ErrorSigner::AddressGeneration(_)`
+            - 1 + parser_error_count() // for nested variants in `ErrorSigner::Parser(_)`
+            - 1 + secret_string_error_set().len() // for nested variants in `ErrorSigner::AddressUse(_)`
+    }
+    
+    /// check that no `ErrorSigner` entries are missed, this covers all signer errors
+    #[test]
+    fn error_signer_check() {
+        assert_eq!(
+            error_signer_count(), 
+            error_signer().len(),
+        );
+    }
     
     #[test]
     fn print_signer_errors_nicely() {
         let mut print = String::from("\n");
-        let signer_errors = error_signer();
-        assert!(
-            signer_errors.len() == 154,
-            "Different error set length: {}",
-            signer_errors.len()
-        );
-        for e in signer_errors.iter() {
+        for e in error_signer().iter() {
             print.push_str(&format!("\"{}\"", <Signer>::show(e)));
             print.push_str("\n");
         }
-        let print_expected = r#""#;
+        let print_expected = r#"
+"Error on the interface. Network specs key 0xabracadabra is not in hexadecimal format."
+"Error on the interface. Input content is not in hexadecimal format."
+"Error on the interface. Address key 0xabracadabra is not in hexadecimal format."
+"Error on the interface. Unable to parse address key 0350e7c3d5edde7db964317cd9b51a3a059d7cd99f81bdbce14990047354334c9779 passed through the interface."
+"Error on the interface. Unable to parse network specs key 0350e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e passed through the interface."
+"Error on the interface. Public key length does not match the encryption."
+"Error on the interface. Requested history page 14 does not exist. Total number of pages 10."
+"Error on the interface. Expected seed name Alice for address key 0150e7c3d5edde7db964317cd9b51a3a059d7cd99f81bdbce14990047354334c9779. Address details in database have ALICE name."
+"Error on the interface. Derivation had password, then lost it."
+"Error on the interface. Version a505 could not be converted into u32."
+"Error on the interface. Increment a505 could not be converted into u32."
+"Error on the interface. Order a505 could not be converted into u32"
+"Error on the interface. Flag FALSE could not be converted into bool."
+"Database error. Unable to parse address key 0350e7c3d5edde7db964317cd9b51a3a059d7cd99f81bdbce14990047354334c9779 from the database."
+"Database error. Unable to parse history entry order 640455 from the database."
+"Database error. Unable to parse meta key 1c77657374656e64a2230000 from the database."
+"Database error. Unable to parse network specs key 0350e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e from the database."
+"Database error. Unable to parse network specs key 0350e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e from network id set of address book entry with key 0150e7c3d5edde7db964317cd9b51a3a059d7cd99f81bdbce14990047354334c9779 from the database."
+"Database error. Internal error. Collection [1] does not exist"
+"Database error. Internal error. Unsupported: Something Unsupported."
+"Database error. Internal error. Unexpected bug has happened: Please report me. PLEASE REPORT THIS BUG!"
+"Database error. Internal error. IO error: oh no!"
+"Database error. Internal error. Read corrupted data at file offset None backtrace ()"
+"Database error. Transaction error. Collection [1] does not exist"
+"Database error. Transaction error. Unsupported: Something Unsupported."
+"Database error. Transaction error. Unexpected bug has happened: Please report me. PLEASE REPORT THIS BUG!"
+"Database error. Transaction error. IO error: oh no!"
+"Database error. Transaction error. Read corrupted data at file offset None backtrace ()"
+"Database error. Checksum mismatch."
+"Database error. Unable to decode address details entry for key 0150e7c3d5edde7db964317cd9b51a3a059d7cd99f81bdbce14990047354334c9779."
+"Database error. Unable to decode current verifier entry for key 853faffbfc6713c1f899bf16547fcfbf733ae8361b8ca0129699d01d4f2181fd."
+"Database error. Unable to decode danger status entry."
+"Database error. Unable to decode temporary entry with information needed to import derivations."
+"Database error. Unable to decode general verifier entry."
+"Database error. Unable to decode history entry for order 135."
+"Database error. Unable to decode network specs (NetworkSpecs) entry for key 0150e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e."
+"Database error. Unable to decode temporary entry with information needed for signing approved transaction."
+"Database error. Unable to decode temporary entry with information needed for accepting approved information."
+"Database error. Unable to decode types information."
+"Database error. Mismatch found. Meta key corresponds to westend1922. Stored metadata is westend9122."
+"Database error. Mismatch found. Network specs (NetworkSpecs) entry with network specs key 0150e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e has not matching genesis hash e143f23803ca50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e."
+"Database error. Mismatch found. Network specs (NetworkSpecs) entry with network specs key 0150e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e has not matching encryption ecdsa."
+"Database error. Mismatch found. Address details entry with address key 0150e7c3d5edde7db964317cd9b51a3a059d7cd99f81bdbce14990047354334c9779 has not matching encryption ecdsa."
+"Database error. Mismatch found. Address details entry with address key 0150e7c3d5edde7db964317cd9b51a3a059d7cd99f81bdbce14990047354334c9779 has associated network specs key 0350e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e with wrong encryption."
+"Database error. Bad metadata for westend9000. Runtime metadata version is incompatible. Currently supported are v12, v13, and v14."
+"Database error. Bad metadata for westend9000. No system pallet in runtime metadata."
+"Database error. Bad metadata for westend9000. No runtime version in system pallet constants."
+"Database error. Bad metadata for westend9000. Runtime version from system pallet constants could not be decoded."
+"Database error. Bad metadata for westend9000. Base58 prefix is found in system pallet constants, but could not be decoded."
+"Database error. Bad metadata for westend9000. Base58 prefix 104 from system pallet constants does not match the base58 prefix from network specs 42."
+"Database error. Bad metadata for westend9000. Metadata vector does not start with 0x6d657461."
+"Database error. Bad metadata for westend9000. Runtime metadata could not be decoded."
+"Database error. No verifier information found for network with genesis hash e143f23803ca50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e, however genesis hash is encountered in network specs entry with key 0150e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e."
+"Database error. More than one entry for network specs with name westend and encryption sr25519."
+"Database error. Different network names (westend, WeStEnD) in database for same genesis hash e143f23803ca50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e."
+"Database error. Network with genesis hash 853faffbfc6713c1f899bf16547fcfbf733ae8361b8ca0129699d01d4f2181fd verifier is set as a custom one. This custom verifier coinsides the database general verifier and not None. This should not have happened and likely indicates database corruption."
+"Database error. More than one root key (i.e. with empty path and without password) found for seed name Alice and encryption sr25519."
+"Database error. More than one base58 prefix in network specs database entries for network with genesis hash e143f23803ca50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e: 42 and 104."
+"Bad input data. Payload could not be decoded as `add_specs`."
+"Bad input data. Payload could not be decoded as `load_meta`."
+"Bad input data. Payload could not be decoded as `load_types`."
+"Bad input data. Payload could not be decoded as derivations transfer."
+"Bad input data. Received metadata is unsuitable. Runtime metadata version is incompatible. Currently supported are v12, v13, and v14."
+"Bad input data. Received metadata is unsuitable. No system pallet in runtime metadata."
+"Bad input data. Received metadata is unsuitable. No runtime version in system pallet constants."
+"Bad input data. Received metadata is unsuitable. Runtime version from system pallet constants could not be decoded."
+"Bad input data. Received metadata is unsuitable. Base58 prefix is found in system pallet constants, but could not be decoded."
+"Bad input data. Received metadata is unsuitable. Base58 prefix 104 from system pallet constants does not match the base58 prefix from network specs 42."
+"Bad input data. Received metadata is unsuitable. Metadata vector does not start with 0x6d657461."
+"Bad input data. Received metadata is unsuitable. Runtime metadata could not be decoded."
+"Bad input data. Input is too short."
+"Bad input data. Only Substrate transactions are supported. Transaction is expected to start with 0x53, this one starts with 0x35."
+"Bad input data. Payload type with code 0x0f is not supported."
+"Bad input data. Metadata for kusama9110 is already in the database and is different from the one in received payload."
+"Bad input data. Metadata for westend9122 is already in the database."
+"Bad input data. Similar network specs are already stored in the database under key 0150e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e. Network specs in received payload have different unchangeable values (base58 prefix, decimals, encryption, network name, unit)."
+"Bad input data. Network with genesis hash e143f23803ca50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e already has entries in the database with base58 prefix 42. Received network specs have different base58 prefix 104."
+"Bad input data. Payload with encryption 0x03 is not supported."
+"Bad input data. Received payload has bad signature."
+"Bad input data. Network kulupu is not in the database. Add network specs before loading the metadata."
+"Bad input data. Network westend was previously known to the database with verifier public key: 8eaf04151687736326c9fea17e25fc5287613693c912909cb226aa4794f26a48, encryption: sr25519 (general verifier). However, no network specs are in the database at the moment. Add network specs before loading the metadata."
+"Bad input data. Saved network kulupu information was signed by verifier public key: 8eaf04151687736326c9fea17e25fc5287613693c912909cb226aa4794f26a48, encryption: ed25519. Received information is not signed."
+"Bad input data. General verifier in the database is public key: 8eaf04151687736326c9fea17e25fc5287613693c912909cb226aa4794f26a48, encryption: sr25519. Received unsigned westend network information could be accepted only if signed by the general verifier."
+"Bad input data. General verifier in the database is public key: 8eaf04151687736326c9fea17e25fc5287613693c912909cb226aa4794f26a48, encryption: sr25519. Received unsigned types information could be accepted only if signed by the general verifier."
+"Bad input data. Network kulupu currently has no verifier set up. Received load_metadata message is verified by public key: 8eaf04151687736326c9fea17e25fc5287613693c912909cb226aa4794f26a48, encryption: ed25519. In order to accept verified metadata, first download properly verified network specs."
+"Bad input data. Network kulupu current verifier is public key: 8eaf04151687736326c9fea17e25fc5287613693c912909cb226aa4794f26a48, encryption: sr25519. Received load_metadata message is verified by public key: 8eaf04151687736326c9fea17e25fc5287613693c912909cb226aa4794f26a48, encryption: ed25519. Changing verifier for the network would require wipe and reset of Signer."
+"Bad input data. Network westend is set to be verified by the general verifier, however, general verifier is not yet established. Received load_metadata message is verified by public key: 8eaf04151687736326c9fea17e25fc5287613693c912909cb226aa4794f26a48, encryption: sr25519. In order to accept verified metadata and set up the general verifier, first download properly verified network specs."
+"Bad input data. Network westend is verified by the general verifier which currently is public key: 8eaf04151687736326c9fea17e25fc5287613693c912909cb226aa4794f26a48, encryption: sr25519. Received load_metadata message is verified by public key: 8eaf04151687736326c9fea17e25fc5287613693c912909cb226aa4794f26a48, encryption: ed25519. Changing the general verifier or changing the network verifier to custom would require wipe and reset of Signer."
+"Bad input data. General verifier in the database is public key: 8eaf04151687736326c9fea17e25fc5287613693c912909cb226aa4794f26a48, encryption: sr25519. Received network westend specs could be accepted only if verified by the same general verifier. Current message is verified by public key: 8eaf04151687736326c9fea17e25fc5287613693c912909cb226aa4794f26a48, encryption: ed25519."
+"Bad input data. General verifier in the database is public key: 8eaf04151687736326c9fea17e25fc5287613693c912909cb226aa4794f26a48, encryption: sr25519. Received types information could be accepted only if verified by the same general verifier. Current message is verified by public key: 8eaf04151687736326c9fea17e25fc5287613693c912909cb226aa4794f26a48, encryption: ed25519."
+"Bad input data. Exactly same types information is already in the database."
+"Bad input data. Received message could not be read."
+"Bad input data. Input generated within unknown network and could not be processed. Add network with genesis hash e143f23803ca50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e and encryption sr25519."
+"Bad input data. Input transaction is generated in network westend. Currently there are no metadata entries for it, and transaction could not be processed. Add network metadata."
+"Bad input data. Exactly same network specs for network westend with encryption sr25519 are already in the database."
+"Bad input data. Network kulupu current verifier is public key: 8eaf04151687736326c9fea17e25fc5287613693c912909cb226aa4794f26a48, encryption: sr25519. Received add_specs message is verified by public key: 8eaf04151687736326c9fea17e25fc5287613693c912909cb226aa4794f26a48, encryption: ed25519, which is neither current network verifier not the general verifier. Changing the network verifier to another non-general one would require wipe and reset of Signer."
+"Bad input data. Derivation // has invalid format."
+"Bad input data. Only derivations without passwords are allowed in bulk import."
+"Bad input data. Seed name Alice already exists."
+"Could not find current verifier for network with genesis hash 853faffbfc6713c1f899bf16547fcfbf733ae8361b8ca0129699d01d4f2181fd."
+"Could not find general verifier."
+"Could not find types information."
+"Could not find network specs for network specs key 0350e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e."
+"Could not find network specs for westend."
+"Could not find network specs key 0150e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e in address details with key 0150e7c3d5edde7db964317cd9b51a3a059d7cd99f81bdbce14990047354334c9779."
+"Could not find address details for address key 0150e7c3d5edde7db964317cd9b51a3a059d7cd99f81bdbce14990047354334c9779."
+"Could not find metadata entry for westend9120."
+"Could not find danger status information."
+"Could not find database temporary entry with information needed for accepting approved information."
+"Could not find database temporary entry with information needed for signing approved transaction."
+"Could not find database temporary entry with information needed for importing derivations set."
+"Could not find history entry with order 135."
+"Could not find network specs for westend with encryption ed25519 needed to decode historical transaction."
+"Historical transaction was generated in network kulupu and processed. Currently there are no metadata entries for the network, and transaction could not be processed again. Add network metadata."
+"Unable to import derivations for network with genesis hash e143f23803ca50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e and encryption sr25519. Network is unknown. Please add corresponding network specs."
+"Network with genesis hash 853faffbfc6713c1f899bf16547fcfbf733ae8361b8ca0129699d01d4f2181fd is disabled. It could be enabled again only after complete wipe and re-installation of Signer."
+"Error generating address. Address key collision for seed name Alice"
+"Error generating address. Bad secret string: invalid overall format."
+"Error generating address. Bad secret string: invalid bip39 phrase."
+"Error generating address. Bad secret string: invalid password."
+"Error generating address. Bad secret string: invalid seed."
+"Error generating address. Bad secret string: invalid seed length."
+"Error generating address. Bad secret string: invalid path."
+"Error generating address. Seed Alice already has derivation //Alice for network specs key 0150e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e, public key 8eaf04151687736326c9fea17e25fc5287613693c912909cb226aa4794f26a48."
+"Error generating address. Could not create random phrase. Seed phrase has invalid length."
+"Error generating address. Invalid derivation format."
+"Error generating qr code. Qr generation failed."
+"Error parsing incoming transaction content. Unable to separate transaction method and extensions."
+"Error parsing incoming transaction content. Expected mortal transaction due to prelude format. Found immortal transaction."
+"Error parsing incoming transaction content. Expected immortal transaction due to prelude format. Found mortal transaction."
+"Error parsing incoming transaction content. Genesis hash values from decoded extensions and from used network specs do not match."
+"Error parsing incoming transaction content. Block hash for immortal transaction not matching genesis hash for the network."
+"Error parsing incoming transaction content. Unable to decode extensions for V12/V13 metadata using standard extensions set."
+"Error parsing incoming transaction content. Method number 2 not found in pallet test_Pallet."
+"Error parsing incoming transaction content. Pallet with index 3 not found."
+"Error parsing incoming transaction content. No calls found in pallet test_pallet_v14."
+"Error parsing incoming transaction content. Referenced type could not be resolved in v14 metadata."
+"Error parsing incoming transaction content. Argument type error."
+"Error parsing incoming transaction content. Argument name error."
+"Error parsing incoming transaction content. Expected compact. Not found it."
+"Error parsing incoming transaction content. Data too short for expected content."
+"Error parsing incoming transaction content. Unable to decode part of data as u32."
+"Error parsing incoming transaction content. Encountered unexpected Option<_> variant."
+"Error parsing incoming transaction content. IdentityField description error."
+"Error parsing incoming transaction content. Unexpected type encountered for Balance"
+"Error parsing incoming transaction content. Encountered unexpected enum variant."
+"Error parsing incoming transaction content. Unexpected type inside compact."
+"Error parsing incoming transaction content. No description found for type SomeUnknownType."
+"Error parsing incoming transaction content. Declared type is not suitable BitStore type for BitVec."
+"Error parsing incoming transaction content. Declared type is not suitable BitOrder type for BitVec."
+"Error parsing incoming transaction content. Could not decode BitVec."
+"Error parsing incoming transaction content. Could not decode Era."
+"Error parsing incoming transaction content. After decoding the method some data remained unused."
+"Error parsing incoming transaction content. After decoding the extensions some data remained unused."
+"Error parsing incoming transaction content. Metadata signed extensions are not compatible with Signer (v14 metadata). Era information is missing."
+"Error parsing incoming transaction content. Metadata signed extensions are not compatible with Signer (v14 metadata). Block hash information is missing."
+"Error parsing incoming transaction content. Metadata signed extensions are not compatible with Signer (v14 metadata). Metadata spec version information is missing."
+"Error parsing incoming transaction content. Metadata signed extensions are not compatible with Signer (v14 metadata). Era information is encountered mora than once."
+"Error parsing incoming transaction content. Metadata signed extensions are not compatible with Signer (v14 metadata). Genesis hash is encountered more than once."
+"Error parsing incoming transaction content. Metadata signed extensions are not compatible with Signer (v14 metadata). Block hash is encountered more than once."
+"Error parsing incoming transaction content. Metadata signed extensions are not compatible with Signer (v14 metadata). Metadata spec version is encountered more than once."
+"Error parsing incoming transaction content. Network spec version decoded from extensions (9122) differs from the version in metadata (9010)."
+"Failed to decode extensions. Please try updating metadata for westend network. Parsing with westend9010 metadata: Network spec version decoded from extensions (9122) differs from the version in metadata (9010). Parsing with westend9000 metadata: Network spec version decoded from extensions (9122) differs from the version in metadata (9000)."
+"Error with secret string of existing address: invalid overall format."
+"Error with secret string of existing address: invalid bip39 phrase."
+"Error with secret string of existing address: invalid password."
+"Error with secret string of existing address: invalid seed."
+"Error with secret string of existing address: invalid seed length."
+"Error with secret string of existing address: invalid path."
+"Wrong password."
+"Wrong password."
+"No networks available. Please load networks information to proceed."
+"#;
         assert!(print == print_expected, "\nReceived: {}", print);
     }
 }

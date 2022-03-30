@@ -1,5 +1,5 @@
 use bitvec::prelude::{BitVec, Lsb0};
-use definitions::{crypto::Encryption, history::MetaValuesDisplay, keyring::VerifierKey, metadata::MetaValues, network_specs::{VerifierValue, NetworkSpecs}, qr_transfers::ContentLoadTypes, test_all_errors_signer::signer_errors, users::AddressDetails};
+use definitions::{crypto::Encryption, history::MetaValuesDisplay, keyring::VerifierKey, metadata::MetaValues, network_specs::{VerifierValue, NetworkSpecs}, qr_transfers::ContentLoadTypes, test_all_errors_signer::error_signer, users::AddressDetails};
 use hex;
 use std::convert::TryInto;
 use parser::cards::ParserCard;
@@ -95,7 +95,7 @@ Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deseru
     all_cards.push(Card::Warning(Warning::NetworkSpecsAlreadyThere(&network_specs_westend.title)).card(&mut index,0));
     all_cards.push(Card::Warning(Warning::MetadataExtensionsIncomplete).card(&mut index,0));
     
-    for e in signer_errors().into_iter() {all_cards.push(Card::Error(e).card(&mut index, 0));}
+    for e in error_signer().into_iter() {all_cards.push(Card::Error(e).card(&mut index, 0));}
 
     let mut output_cards = String::from("\"method\":[");
     

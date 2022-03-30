@@ -208,6 +208,7 @@ pub enum AddressKeySource<T: ErrorSource + ?Sized> {
 
 /// Errors in the address generation
 #[derive(Debug)]
+#[cfg_attr(feature = "test", derive(VariantCount))]
 pub enum AddressGeneration<T: ErrorSource + ?Sized> {
     /// Address generation errors common for active and Signer sides
     Common(AddressGenerationCommon),
