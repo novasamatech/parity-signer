@@ -35,6 +35,8 @@ jobs:
           profile:      minimal
           toolchain:    stable
           override:     true
+          target:       aarch64-linux-android
+          target:       armv7-linux-androideabi
 
       - name:           Set up JDK environment
         uses:           actions/setup-java@v2
