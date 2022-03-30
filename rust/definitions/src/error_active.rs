@@ -1,3 +1,17 @@
+//! Errors occuring on the active side, i.e. while operating `generate_message`
+//! client
+//!
+//! Active side deals with both preparation of cold database that would be
+//! loaded in Signer on build and with hot database operations.
+//!
+//! All errors [`ErrorActive`] could be displayed to user as error messages in
+//! `generate_message` client, and are implementing `Display` trait.
+//!
+//! Exact error wording will be refined eventually.
+//!
+//! This module gathers all possible [`ErrorActive`] errors in one place, so that
+//! error management is easier.
+
 use crate::{
     crypto::Encryption,
     error::{
@@ -404,26 +418,91 @@ impl ErrorSource for Active {
     }
 }
 
-/// Enum listing all variants of errors from the Active side
+/// All possible errors that could occur on the active side
 #[derive(Debug)]
 pub enum ErrorActive {
+    /// Errors within database.
+    ///
+    /// Associated data is [`DatabaseActive`] with more details.
     Database(DatabaseActive),
+
+    /// Expected to get a hexadecimal string, got something different.
+    ///
+    /// Associated data is [`NotHexActive`] with more details.
     NotHex(NotHexActive),
+
+    /// Damaged update payload.
+    ///
+    /// Associated data is [`TransferContent`] with more details.
     TransferContent(TransferContent),
+
+    /// Error fetching network information through rpc call.
+    ///
+    /// Associated data is [`Fetch`] with more details.
     Fetch(Fetch),
+
+    /// Error loading default information while generating the database.
+    ///
+    /// Associated data is [`DefaultLoading`] with more details.
     DefaultLoading(DefaultLoading),
+
+    /// Error generating output file, associated data is `std::io::Error`.
     Output(std::io::Error),
+
+    /// Something was expected to be found in the hot database, but was not.
+    ///
+    /// Associated data is [`NotFoundActive`] with more details.
     NotFound(NotFoundActive),
+
+    /// Test address generation in cold database has failed.
+    ///
+    /// Associated data is [`AddressGeneration`] with more details.
     TestAddressGeneration(AddressGeneration<Active>),
+
+    /// Error parsing commands from `generate_message` client command line.
+    ///
+    /// Associated data is [`CommandParser`] with more details.
     CommandParser(CommandParser),
+
+    /// Input is invalid.
+    ///
+    /// Associated data is [`InputActive`] with more details.
     Input(InputActive),
+
+    /// Error generating QR code, static or fountain.
+    ///
+    /// `generate_message` can produce QR codes with updates data for:
+    ///
+    /// - network specs: `add_specs` message, usually static `png`
+    /// - network metadata: `load_metadata` message, usually fountain `apng`
+    /// - types information: `load_types` message, usually fountain `apng`
+    ///
+    /// These QR codes could be scanned into Signer through air-gap to update
+    /// Signer database.
+    ///
+    /// Associated data is text of the error produced by the QR generator.
     Qr(String),
+
+    /// Requested command from `generate_message` client command line is not
+    /// supported.
     NotSupported,
+
+    /// It is not allowed to override token in known network, if the fetching
+    /// uses or updates the hot database.
+    ///
+    /// Associated data is url address used for the fetching.
     NoTokenOverrideKnownNetwork { url: String },
-    Wasm { filename: String, wasm: Wasm },
+
+    /// Error extracting network metadata from `wasm` file.
+    Wasm {
+        /// `wasm` file name
+        filename: String,
+
+        /// error details
+        wasm: Wasm
+    },
 }
 
-/// Active side errors could be displayed standardly
 impl std::fmt::Display for ErrorActive {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", <Active>::show(self))
@@ -431,88 +510,247 @@ impl std::fmt::Display for ErrorActive {
 }
 
 /// NotHex errors occuring on the Active side
+///
+/// Expected to receive data in hexadecimal format, got something different.
+/// [`NotHexActive`] specifies what was expected.
 #[derive(Debug)]
 pub enum NotHexActive {
+    /// Network metadata, fetched through rpc call.
+    ///
+    /// Associated data is the url address used for the fetching.
     FetchedMetadata { url: String },
+
+    /// Network genesis hash, fetched through rpc call.
+    ///
+    /// Associated data is the url address used for the fetching.
     FetchedGenesisHash { url: String },
+
+    /// [`SufficientCrypto`](crate::crypto::SufficientCrypto) received in 
+    /// command line in `generate_message` client.
+    ///
+    /// Could be encountered when generating signed update with `sign` command.
     InputSufficientCrypto,
+
+    /// Public key received in command line in `generate_message` client.
+    ///
+    /// Could be encountered when generating signed update with `make` command.
     InputPublicKey,
+
+    /// Signature received in command line in `generate_message` client.
+    ///
+    /// Could be encountered when generating signed update with `make` command.
     InputSignature,
+
+    /// Default network metadata, used to generate cold database, with filename
+    /// as an associated data.
     DefaultMetadata { filename: String },
 }
 
-/// Origin of unsuitable metadata on the Active side
+/// Source of unsuitable metadata on the Active side
 #[derive(Debug)]
 pub enum IncomingMetadataSourceActive {
+    /// Bad metadata was in a hexadecimal string
     Str(IncomingMetadataSourceActiveStr),
+
+    /// Bad metadata was contained in `wasm` file, associated data is the filename.
     Wasm { filename: String },
 }
 
-/// Origin of unsuitable metadata on the Active side, in str form
+/// Source of unsuitable hexadecimal string metadata on the Active side
 #[derive(Debug)]
 pub enum IncomingMetadataSourceActiveStr {
+    /// Metadata was fetched, associated data is url used for rpc call.
     Fetch { url: String },
+
+    /// Metadata is the default one, associated data is the filename.
     Default { filename: String },
 }
 
-/// Origin of unsuitable specs key on the Active side, except SpecsTree in the database.
+/// Source of damaged [`NetworkSpecsKey`], exclusive for the active side.
 /// Is empty.
 #[derive(Debug)]
 pub enum ExtraSpecsKeySourceActive {}
 
-/// Origin of unsuitable address key on the Active side, except AddrTree in the database.
+/// Source of damaged [`AddressKey`], exclusive for the active side.
 /// Is empty.
 #[derive(Debug)]
 pub enum ExtraAddressKeySourceActive {}
 
-/// Source-specific address generation errors on the Active side.
+/// Errors in generating address, exclusive for the active side.
 /// Is empty.
 #[derive(Debug)]
 pub enum ExtraAddressGenerationActive {}
 
-/// Enum listing all variants of errors related to database on Active side
+/// Errors in the database content on the active side
+///
+/// Describes errors with already existing database content (e.g. damaged keys,
+/// damaged values, various mismatches, data that could not have been added to
+/// the database in the first place etc).
+///
+/// Note that [`NotFoundActive`] is a separate set of errors. Things **not
+/// found** are kept separately here from things **damaged**.
 #[derive(Debug)]
 pub enum DatabaseActive {
+    /// Key used in one of the database trees has invalid content, and could
+    /// not be decoded.
+    ///
+    /// Associated data is [`KeyDecodingActive`] with more details.
     KeyDecoding(KeyDecodingActive),
+
+    /// Value found in one of the database trees has invalid content, and could
+    /// not be decoded.
+    ///
+    /// Associated data is [`EntryDecodingActive`] with more details.
     EntryDecoding(EntryDecodingActive),
+
+    /// Database [`Error`](https://docs.rs/sled/0.34.6/sled/enum.Error.html).
+    ///
+    /// Could happen, for example, when opening the database, loading trees,
+    /// reading values etc.
     Internal(sled::Error),
+
+    /// Database
+    /// [`TransactionError`](https://docs.rs/sled/0.34.6/sled/transaction/enum.TransactionError.html).
+    ///
+    /// Could happen when making transactions in multiple trees simultaneously.
     Transaction(sled::transaction::TransactionError),
+
+    /// Data retrieved from the database contains some internal contradictions,
+    /// could not have been written in the database this way, and is therefore
+    /// likely indicating the database corruption.
+    ///
+    /// Associated data is [`MismatchActive`] with more details.
     Mismatch(MismatchActive),
+
+    /// Network metadata that already is in the database, is damaged.
+    ///
+    /// Unsuitable metadata could not be put in the database in the first place,
+    /// finding one would mean the database got corrupted.
     FaultyMetadata {
+        /// network name, from [`MetaKey`]
         name: String,
+
+        /// network version, from [`MetaKey`]
         version: u32,
+
+        /// what exactly is wrong with the metadata
         error: MetadataError,
     },
+
+    /// `ADDRESS_BOOK` tree of the hot database contains more than one 
+    /// [`AddressBookEntry`](crate::metadata::AddressBookEntry) with same 
+    /// `address` and `encryption` fields values.
     TwoEntriesAddressEncryption {
+        /// url address of the entries
         url: String,
+
+        /// [`Encryption`] of the entries
         encryption: Encryption,
     },
+
+    /// `ADDRESS_BOOK` tree of the hot database contains more than one 
+    /// [`AddressBookEntry`](crate::metadata::AddressBookEntry) with same
+    /// `address` field value, for which `def` field is `true`, i.e. two 
+    /// entries for the same network are default ones.
     TwoDefaultsAddress {
+        /// url address of the entries
         url: String,
     },
+
+    /// `METATREE` of the hot database shoud contain at most two latest
+    /// metadata versions for each network, with the older entries being 
+    /// deleted as the new ones appear.
+    ///
+    /// This error appears if during the processing more than two metadata
+    /// entries for the network are found.
     HotDatabaseMetadataOverTwoEntries {
+        /// network name
         name: String,
     },
+
+    /// `METATREE` of the hot database has two entries for a network with the 
+    /// same metadata version.
+    ///
+    /// Note: at this moment should be unreachable, since the entries are 
+    /// getting checked for consistency with [`MetaKey`].
     HotDatabaseMetadataSameVersionTwice {
+        /// network name
         name: String,
+
+        /// network version
         version: u32,
     },
+
+    /// Fetched through rpc call network genesis hash is known to the hot
+    /// database, although the url address used for rpc call is not.
+    ///
+    /// Hot database does not allow to store more than one trusted url address
+    /// for rpc calls for same network.
+    ///
+    /// Alternative url address could be used if the database is not updated
+    /// (`-d` key is used).
+    ///
+    /// To update the address in the database in case the old one is no longer
+    /// acceptable, one should remove old entry, and only then add the new one.
     NewAddressKnownGenesisHash {
+        /// new for database url address used for rpc call, for which a known 
+        /// genesis hash was retrieved
         url: String,
+
+        /// network genesis hash that was fetched through rpc call and found in
+        /// the database
         genesis_hash: [u8; 32],
     },
+
+    /// `ADDRESS_BOOK` tree of the hot database contains
+    /// [`AddressBookEntry`](crate::metadata::AddressBookEntry) entries with same
+    /// `name` field and different `genesis_hash` values.
+    ///
+    /// This is not allowed, as it would cause uncertainty in `load_metadata`
+    /// message generation, which is build using metadata and genesis hash.
     TwoGenesisHashVariantsForName {
+        /// network name
         name: String,
     },
+
+    /// `ADDRESS_BOOK` tree of the hot database contains
+    /// [`AddressBookEntry`](crate::metadata::AddressBookEntry) entries with same
+    /// `name` field and different `address` values.
+    ///
+    /// Hot database does not allow to store more than one trusted url address
+    /// for rpc calls for same network.
+    ///
+    /// Alternative url address could be used if the database is not updated
+    /// (`-d` key is used).
+    ///
+    /// To update the address in the database in case the old one is no longer
+    /// acceptable, one should remove old entry, and only then add the new one.
     TwoUrlVariantsForName {
+        /// network name
         name: String,
     },
+
+    /// `ADDRESS_BOOK` tree of the hot database contains
+    /// [`AddressBookEntry`](crate::metadata::AddressBookEntry) entries with same
+    /// `address` field and different `name` fields.
+    ///
+    /// Name in address book is taken from the metadata, metadata is fetched
+    /// using rpc call, so one url address can correspond to only one network
+    /// name.
     TwoNamesForUrl {
+        /// url address, for which two condlicting names were found
         url: String,
     },
+
+    /// `SPECSTREEPREP` tree of the hot database contains
+    /// [`NetworkSpecsToSend`](crate::network_specs::NetworkSpecsToSend) entries
+    /// with same network name, but different base58 prefix.
     TwoBase58ForName {
+        /// network name
         name: String,
     },
+
+    /// `ADDRESS_BOOK` tree of the hot database has no entries to process.
     AddressBookEmpty,
 }
 

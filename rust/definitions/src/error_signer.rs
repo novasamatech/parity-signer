@@ -11,8 +11,8 @@
 //! must clearly indicate what happened and what user can try to do to fix the
 //! issue. Error wording must be yet polished extensively.
 //!
-//! This module gathers all possible errors in one place, so that error
-//! management is easier.
+//! This module gathers all possible [`ErrorSigner`] errors in one place, so that
+//! error management is easier.
 use anyhow::anyhow;
 use sp_core::crypto::SecretStringError;
 #[cfg(feature = "test")]

@@ -1,3 +1,13 @@
+//! Generating all [`ErrorSigner`] entries for tests
+//!
+//! This is used to proof-read the texts of the all possible errors, with some
+//! mock content, if necessary, and to generate a complete set of errors that
+//! is printed as cards in `transaction_parsing` and must be json-compatible.
+//!
+//! Crate `variant_count` is used to count the variants in each of the enums
+//! and to make sure no entries are left missing in case of [`ErrorSigner`]
+//! updating.
+
 use anyhow::anyhow;
 use sled::{transaction::TransactionError, IVec};
 use sp_core::crypto::SecretStringError;
@@ -20,36 +30,43 @@ const PUBLIC: [u8; 32] = [
     18, 144, 156, 178, 38, 170, 71, 148, 242, 106, 72,
 ];
 
+/// `Verifier` mock value.
 fn verifier_sr25519() -> Verifier {
     Verifier(Some(verifier_value_sr25519()))
 }
 
+/// `VerifierValue` mock value.
 fn verifier_value_sr25519() -> VerifierValue {
     VerifierValue::Standard(MultiSigner::Sr25519(sp_core::sr25519::Public::from_raw(
         PUBLIC,
     )))
 }
 
+/// Another `VerifierValue` mock value.
 fn verifier_value_ed25519() -> VerifierValue {
     VerifierValue::Standard(MultiSigner::Ed25519(sp_core::ed25519::Public::from_raw(
         PUBLIC,
     )))
 }
 
+/// Mock non-hexadecimal `String`.
 fn not_hex_string() -> String {
     String::from("0xabracadabra")
 }
 
+/// `AddressKey` mock value.
 fn address_key_bad() -> AddressKey {
     AddressKey::from_hex("0350e7c3d5edde7db964317cd9b51a3a059d7cd99f81bdbce14990047354334c9779")
         .unwrap()
 }
 
+/// Another `AddressKey` mock value.
 fn address_key_good() -> AddressKey {
     AddressKey::from_hex("0150e7c3d5edde7db964317cd9b51a3a059d7cd99f81bdbce14990047354334c9779")
         .unwrap()
 }
 
+/// `NetworkSpecsKey` mock value.
 fn network_specs_key_bad() -> NetworkSpecsKey {
     NetworkSpecsKey::from_hex(
         "0350e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e",
@@ -57,6 +74,7 @@ fn network_specs_key_bad() -> NetworkSpecsKey {
     .unwrap()
 }
 
+/// Another `NetworkSpecsKey` mock value.
 fn network_specs_key_good() -> NetworkSpecsKey {
     NetworkSpecsKey::from_hex(
         "0150e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e",
@@ -64,16 +82,19 @@ fn network_specs_key_good() -> NetworkSpecsKey {
     .unwrap()
 }
 
+/// `MetaKey` mock value.
 fn meta_key() -> MetaKey {
     MetaKey::from_parts("westend", 9122)
 }
 
+/// `VerifierKey` mock value.
 fn verifier_key() -> VerifierKey {
     VerifierKey::from_parts(
         &hex::decode("853faffbfc6713c1f899bf16547fcfbf733ae8361b8ca0129699d01d4f2181fd").unwrap(),
     )
 }
 
+/// `[u8; 32]` genesis hash mock value.
 fn genesis_hash() -> [u8; 32] {
     hex::decode("e143f23803ca50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e")
         .unwrap()
@@ -81,6 +102,7 @@ fn genesis_hash() -> [u8; 32] {
         .unwrap()
 }
 
+/// Possible `sled::Error` errors (https://docs.rs/sled/0.34.6/sled/enum.Error.html).
 fn db_internal_error_set() -> Vec<sled::Error> {
     vec![
         sled::Error::CollectionNotFound(IVec::from(vec![1])),
@@ -91,6 +113,7 @@ fn db_internal_error_set() -> Vec<sled::Error> {
     ]
 }
 
+/// All possible [`MetadataError`] values.
 fn metadata_error_set() -> Vec<MetadataError> {
     vec![
         MetadataError::VersionIncompatible,
@@ -98,12 +121,16 @@ fn metadata_error_set() -> Vec<MetadataError> {
         MetadataError::NoVersionInConstants,
         MetadataError::RuntimeVersionNotDecodeable,
         MetadataError::Base58PrefixNotDecodeable,
-        MetadataError::Base58PrefixSpecsMismatch{specs: 42, meta: 104},
+        MetadataError::Base58PrefixSpecsMismatch {
+            specs: 42,
+            meta: 104,
+        },
         MetadataError::NotMeta,
         MetadataError::UnableToDecode,
     ]
 }
 
+/// Possible `SecretStringError` errors (https://docs.rs/sp-core/6.0.0/sp_core/crypto/enum.SecretStringError.html).
 fn secret_string_error_set() -> Vec<SecretStringError> {
     vec![
         SecretStringError::InvalidFormat,
@@ -115,6 +142,7 @@ fn secret_string_error_set() -> Vec<SecretStringError> {
     ]
 }
 
+/// All possible [`GeneralVerifierForContent`] values.
 fn content_set() -> Vec<GeneralVerifierForContent> {
     vec![
         GeneralVerifierForContent::Network {
@@ -124,6 +152,7 @@ fn content_set() -> Vec<GeneralVerifierForContent> {
     ]
 }
 
+/// Associated data for `ErrorSigner::AllExtensionsParsingFailed(_)` error.
 fn all_ext_parsing_failed_set() -> Vec<(u32, ParserError)> {
     vec![
         (
@@ -531,21 +560,19 @@ fn address_generation_common() -> Vec<AddressGenerationCommon> {
             .map(AddressGenerationCommon::SecretString)
             .collect::<Vec<AddressGenerationCommon>>(),
     );
-    
+
     // `DerivationExists` error.
-    out.push(
-        AddressGenerationCommon::DerivationExists(
-            MultiSigner::Sr25519(sp_core::sr25519::Public::from_raw(PUBLIC)), 
-            AddressDetails {
-                seed_name: String::from("Alice"),
-                path: String::from("//Alice"),
-                has_pwd: false,
-                network_id: vec![network_specs_key_good()],
-                encryption: Encryption::Sr25519,
-            }, 
-            network_specs_key_good()
-        )
-    );
+    out.push(AddressGenerationCommon::DerivationExists(
+        MultiSigner::Sr25519(sp_core::sr25519::Public::from_raw(PUBLIC)),
+        AddressDetails {
+            seed_name: String::from("Alice"),
+            path: String::from("//Alice"),
+            has_pwd: false,
+            network_id: vec![network_specs_key_good()],
+            encryption: Encryption::Sr25519,
+        },
+        network_specs_key_good(),
+    ));
 
     out
 }
@@ -737,62 +764,77 @@ pub fn error_signer() -> Vec<ErrorSigner> {
 }
 
 #[cfg(feature = "test")]
+#[rustfmt::skip]
 #[cfg(test)]
 mod tests {
     use super::*;
     use crate::error::ErrorSource;
     use crate::error_signer::Signer;
 
+    /// check that no `MetadataError` entries are missed
     #[test]
     fn metadata_error_check() {
         assert_eq!(MetadataError::VARIANT_COUNT, metadata_error_set().len());
     }
-    
+
+    /// check that no `TransferContent` entries are missed
     #[test]
     fn transfer_content_check() {
         assert_eq!(TransferContent::VARIANT_COUNT, transfer_content().len());
     }
-    
+
+    /// check that no `NotHexSigner` entries are missed
     #[test]
     fn not_hex_signer_check() {
         assert_eq!(NotHexSigner::VARIANT_COUNT, not_hex_signer().len());
     }
-    
+
+    /// check that no `KeyDecodingSignerInterface` entries are missed
     #[test]
     fn key_decoding_signer_interface_check() {
-        assert_eq!(KeyDecodingSignerInterface::VARIANT_COUNT, key_decoding_signer_interface().len());
+        assert_eq!(
+            KeyDecodingSignerInterface::VARIANT_COUNT,
+            key_decoding_signer_interface().len()
+        );
     }
-    
+
     /// count all `InterfaceSigner` variants including the nested ones
     fn interface_signer_count() -> usize {
         InterfaceSigner::VARIANT_COUNT
             - 1 + not_hex_signer().len() // for nested variants in `InterfaceSigner::NotHex(_)`
             - 1 + key_decoding_signer_interface().len() // for nested variants `InterfaceSigner::KeyDecoding(_)`
     }
-    
+
+    /// check that no `InterfaceSigner` entries are missed
     #[test]
     fn interface_signer_check() {
-        assert_eq!(
-            interface_signer_count(), 
-            interface_signer().len(),
-        );
+        assert_eq!(interface_signer_count(), interface_signer().len(),);
     }
-    
+
+    /// check that no `KeyDecodingSignerDb` entries are missed
     #[test]
     fn key_decoding_signer_db_check() {
-        assert_eq!(KeyDecodingSignerDb::VARIANT_COUNT, key_decoding_signer_db().len());
+        assert_eq!(
+            KeyDecodingSignerDb::VARIANT_COUNT,
+            key_decoding_signer_db().len()
+        );
     }
-    
+
+    /// check that no `EntryDecodingSigner` entries are missed
     #[test]
     fn entry_decoding_signer_check() {
-        assert_eq!(EntryDecodingSigner::VARIANT_COUNT, entry_decoding_signer().len());
+        assert_eq!(
+            EntryDecodingSigner::VARIANT_COUNT,
+            entry_decoding_signer().len()
+        );
     }
-    
+
+    /// check that no `MismatchSigner` entries are missed
     #[test]
     fn mismatch_signer_check() {
         assert_eq!(MismatchSigner::VARIANT_COUNT, mismatch_signer().len());
     }
-    
+
     /// count all `DatabaseSigner` variants including the nested ones
     fn database_signer_count() -> usize {
         DatabaseSigner::VARIANT_COUNT
@@ -803,22 +845,22 @@ mod tests {
             - 1 + mismatch_signer().len() // for nested variants in `DatabaseSigner::Mismatch(_)`
             - 1 + metadata_error_set().len() // for nested variants in `DatabaseSigner::FaultyMetadata(_)`
     }
-    
+
     /// check that no `DatabaseSigner` entries are missed
     #[test]
     fn database_signer_check() {
-        assert_eq!(
-            database_signer_count(), 
-            database_signer().len(),
-        );
+        assert_eq!(database_signer_count(), database_signer().len(),);
     }
-    
+
     /// check that no `GeneralVerifierForContent` entries are missed
     #[test]
     fn content_set_check() {
-        assert_eq!(GeneralVerifierForContent::VARIANT_COUNT, content_set().len());
+        assert_eq!(
+            GeneralVerifierForContent::VARIANT_COUNT,
+            content_set().len()
+        );
     }
-    
+
     /// count all `InputSigner` variants including the nested ones
     fn input_signer_count() -> usize {
         InputSigner::VARIANT_COUNT
@@ -827,99 +869,86 @@ mod tests {
             - 1 + content_set().len() // for nested variants in `InputSigner::NeedGeneralVerifier(_)`
             - 1 + content_set().len() // for nested variants in `InputSigner::GeneralVerifierChanged(_)`
     }
-    
+
     /// check that no `InputSigner` entries are missed
     #[test]
     fn input_signer_check() {
-        assert_eq!(
-            input_signer_count(), 
-            input_signer().len(),
-        );
+        assert_eq!(input_signer_count(), input_signer().len(),);
     }
-    
+
     /// check that no `NotFoundSigner` entries are missed
     #[test]
     fn not_found_signer_check() {
-        assert_eq!(
-            NotFoundSigner::VARIANT_COUNT, 
-            not_found_signer().len(),
-        );
+        assert_eq!(NotFoundSigner::VARIANT_COUNT, not_found_signer().len(),);
     }
-    
+
     /// count all `AddressGenerationCommon` variants
     fn address_generation_common_count() -> usize {
-        AddressGenerationCommon::VARIANT_COUNT
-            - 1 + secret_string_error_set().len() // for nested variants in `AddressGenerationCommon::SecretString(_)`
+        AddressGenerationCommon::VARIANT_COUNT - 1 + secret_string_error_set().len() // for nested variants in `AddressGenerationCommon::SecretString(_)`
     }
-    
+
     /// check that no `AddressGenerationCommon` entries are missed
     #[test]
     fn address_generation_common_check() {
         assert_eq!(
-            address_generation_common_count(), 
+            address_generation_common_count(),
             address_generation_common().len(),
         );
     }
-    
+
     /// check that no `ExtraAddressGenerationSigner` entries are missed
     #[test]
     fn extra_address_generation_signer_check() {
         assert_eq!(
-            ExtraAddressGenerationSigner::VARIANT_COUNT, 
+            ExtraAddressGenerationSigner::VARIANT_COUNT,
             extra_address_generation_signer().len(),
         );
     }
-    
+
     /// count all `AddressGeneration` variants
     fn address_generation_count() -> usize {
         AddressGeneration::<Signer>::VARIANT_COUNT
             - 1 + address_generation_common_count() // for nested variants in `AddressGeneration::Common(_)`
             - 1 + extra_address_generation_signer().len() // for nested variants in `AddressGeneration::Extra(_)`
     }
-    
+
     /// check that no `AddressGeneration` entries are missed
     #[test]
     fn address_generation_check() {
-        assert_eq!(
-            address_generation_count(), 
-            address_generation().len(),
-        );
+        assert_eq!(address_generation_count(), address_generation().len(),);
     }
-    
+
     /// check that no `ParserDecodingError` entries are missed
     #[test]
     fn parser_decoding_error_check() {
         assert_eq!(
-            ParserDecodingError::VARIANT_COUNT, 
+            ParserDecodingError::VARIANT_COUNT,
             parser_decoding_error().len(),
         );
     }
-    
+
     /// check that no `ParserMetadataError` entries are missed
     #[test]
     fn parser_metadata_error_check() {
         assert_eq!(
-            ParserMetadataError::VARIANT_COUNT, 
+            ParserMetadataError::VARIANT_COUNT,
             parser_metadata_error().len(),
         );
     }
-    
+
     /// count all `ParserError` variants
     fn parser_error_count() -> usize {
         ParserError::VARIANT_COUNT
             - 1 + parser_decoding_error().len() // for nested variants in `ParserError::Decoding(_)`
             - 1 + parser_metadata_error().len() // for nested variants in `ParserError::FundamentallyBadV14Metadata(_)`
     }
-    
+
     /// check that no `ParserError` entries are missed
     #[test]
     fn parser_error_check() {
-        assert_eq!(
-            parser_error_count(), 
-            parser_error().len(),
-        );
+        assert_eq!(parser_error_count(), parser_error().len(),);
     }
-    
+
     /// count all `ErrorSigner` variants
     fn error_signer_count() -> usize {
         ErrorSigner::VARIANT_COUNT
@@ -931,16 +960,13 @@ mod tests {
             - 1 + parser_error_count() // for nested variants in `ErrorSigner::Parser(_)`
             - 1 + secret_string_error_set().len() // for nested variants in `ErrorSigner::AddressUse(_)`
     }
-    
+
     /// check that no `ErrorSigner` entries are missed, this covers all signer errors
     #[test]
     fn error_signer_check() {
-        assert_eq!(
-            error_signer_count(), 
-            error_signer().len(),
-        );
+        assert_eq!(error_signer_count(), error_signer().len(),);
     }
-    
+
     #[test]
     fn print_signer_errors_nicely() {
         let mut print = String::from("\n");
