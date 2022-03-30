@@ -48,6 +48,11 @@ jobs:
       - name:           Install NDK
         run:            echo "y" | sudo ${ANDROID_HOME}/tools/bin/sdkmanager --install "ndk;24.0.8215888" --sdk_root=${ANDROID_SDK_ROOT}
 
+      - name:           Rust Cache
+        uses:           Swatinem/rust-cache@v1
+        with:
+          working-directory: rust
+
       - name:           Build
         run:            |
           cd rust
