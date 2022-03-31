@@ -36,7 +36,9 @@ jobs:
       - name:           Install System Dependencies (MacOS)
         if: runner.os == 'macOS'
         run:            |
-          brew install clang opencv
+          brew update
+          brew install --with-toolchain llvm
+          brew install opencv
 
       - name:           Install Rust stable toolchain
         uses:           actions-rs/toolchain@v1
