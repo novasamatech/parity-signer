@@ -71,7 +71,7 @@ jobs:
           cd android
           ./gradlew build
      
-  release:
+  debug:
     name: Build unsigned APKs
     runs-on: ubuntu-latest
     # if: github.ref == ' refs/head/main'
@@ -139,6 +139,6 @@ jobs:
       - name:           Upload Gplay unsigned APKs
         uses:           actions/upload-artifact@v2
         with:
-          name:         signer-release-unsigned
+          name:         signer-debug-unsigned
           path:         |
-            android/app/build/outputs/apk/release/*.apk
+            android/app/build/outputs/apk/debug/*.apk
