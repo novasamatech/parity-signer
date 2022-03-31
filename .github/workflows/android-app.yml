@@ -53,6 +53,16 @@ jobs:
         with:
           working-directory: rust
 
+      - name:           Gradle Cache
+        uses:           actions/cache@v3
+        with:
+          path:         |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/.gradle*', '**/gradle-wrapper.properties') }}
+          restore-keys: |
+            ${{ runner.os }}-gradle-
+
       - name:           Build
         run:            |
           cd rust
