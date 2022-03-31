@@ -66,7 +66,18 @@ fun SignerApp(signerDataModel: SignerDataModel) {
 			OnBoardingState.Yes -> {
 				if (authenticated.value == true) {
 					BackHandler {
-						signerDataModel.pushButton(ButtonID.GoBack)
+						//TODO: implement this in backend
+						if (
+							signerDataModel.alert.value == SignerAlert.Empty
+							&&
+							signerDataModel.modal.value == SignerModal.Empty
+							&&
+							(
+								signerDataModel.screen.value == SignerScreen.Log || signerDataModel.screen.value == SignerScreen.Scan || signerDataModel.screen.value == SignerScreen.SeedSelector || signerDataModel.screen.value == SignerScreen.Settings)
+						) {
+							signerDataModel.activity.moveTaskToBack(true)
+						} else
+							signerDataModel.pushButton(ButtonID.GoBack)
 					}
 					//Structure to contain all app
 					Scaffold(
