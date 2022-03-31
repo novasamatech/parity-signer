@@ -134,7 +134,7 @@ jobs:
           cp signer/android-hack/Cargo.toml signer
           cd ..
           cd android
-          ./gradlew clean assembleRelease --stacktrace
+          ./gradlew clean assembleDebug --stacktrace
 
       - name:           Upload Gplay unsigned APKs
         uses:           actions/upload-artifact@v2
