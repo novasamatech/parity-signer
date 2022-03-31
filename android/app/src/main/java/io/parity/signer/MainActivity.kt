@@ -16,6 +16,7 @@ import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import com.halilibo.richtext.ui.material.SetupMaterialRichText
 import io.parity.signer.components.BigButton
 import io.parity.signer.components.BottomBar
 import io.parity.signer.components.TopBar
@@ -29,6 +30,7 @@ import io.parity.signer.ui.theme.Text600
 @ExperimentalMaterialApi
 @ExperimentalAnimationApi
 class MainActivity : AppCompatActivity() {
+	//rust library is initialized inside data model
 	private val signerDataModel by viewModels<SignerDataModel>()
 
 	override fun onCreate(savedInstanceState: Bundle?) {
@@ -64,7 +66,18 @@ fun SignerApp(signerDataModel: SignerDataModel) {
 			OnBoardingState.Yes -> {
 				if (authenticated.value == true) {
 					BackHandler {
-						signerDataModel.pushButton(ButtonID.GoBack)
+						//TODO: implement this in backend
+						if (
+							signerDataModel.alert.value == SignerAlert.Empty
+							&&
+							signerDataModel.modal.value == SignerModal.Empty
+							&&
+							(
+								signerDataModel.screen.value == SignerScreen.Log || signerDataModel.screen.value == SignerScreen.Scan || signerDataModel.screen.value == SignerScreen.SeedSelector || signerDataModel.screen.value == SignerScreen.Settings)
+						) {
+							signerDataModel.activity.moveTaskToBack(true)
+						} else
+							signerDataModel.pushButton(ButtonID.GoBack)
 					}
 					//Structure to contain all app
 					Scaffold(
@@ -72,7 +85,7 @@ fun SignerApp(signerDataModel: SignerDataModel) {
 							TopBar(signerDataModel = signerDataModel)
 						},
 						bottomBar = {
-							if(footer.value == true) BottomBar(signerDataModel = signerDataModel)
+							if (footer.value == true) BottomBar(signerDataModel = signerDataModel)
 						}
 					) { innerPadding ->
 						Box(modifier = Modifier.padding(innerPadding)) {
@@ -103,7 +116,9 @@ fun SignerApp(signerDataModel: SignerDataModel) {
 			}
 			OnBoardingState.No -> {
 				if (shieldAlert.value == ShieldAlert.None) {
-					LandingView(signerDataModel = signerDataModel)
+					Scaffold {
+						LandingView(signerDataModel = signerDataModel)
+					}
 				} else {
 					Box(
 						contentAlignment = Alignment.Center,
@@ -131,7 +146,7 @@ fun SignerApp(signerDataModel: SignerDataModel) {
 					}
 				}
 			}
-			null -> TODO()
+			null -> WaitingScreen()
 		}
 	}
 }

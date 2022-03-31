@@ -1,7 +1,11 @@
 package io.parity.signer.models
 
 import android.util.Log
+import android.widget.Toast
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.currentCompositionLocalContext
 import io.parity.signer.ButtonID
+import org.json.JSONObject
 
 /**
  * Add key to database; uses phone crypto to fetch seeds!
@@ -20,19 +24,43 @@ fun SignerDataModel.addKey(path: String, seedName: String) {
 	}
 }
 
+enum class DeriveDestination {
+	pin,
+	pwd;
+}
+
 /**
  * Checker for derivation path
  */
-class DerivationState(
-	var isValid: Boolean = true,
-	var hasPassword: Boolean = false
-)
+class DerivationCheck(
+	var buttonGood: MutableState<Boolean>,
+	var whereTo: MutableState<DeriveDestination?>,
+	var collision: MutableState<JSONObject?>,
+	var checkCallback: (path: String) -> String
+) {
+	/**
+	 * Call to perform on every path change
+	 */
+	fun check(path: String) {
+		val checkResult = checkCallback(path)
+		Log.d("checkResult", checkResult)
+		fromJSON(JSONObject(checkResult).optJSONObject("derivation_check")?: JSONObject())
+	}
 
-fun SignerDataModel.checkAsDerivation(path: String): DerivationState {
-	return try {
-		DerivationState(isValid = true, hasPassword = substrateCheckPath(path))
-	} catch (e: java.lang.Exception) {
-		DerivationState(isValid = false, hasPassword = false)
+	/**
+	 * Gerenate check state
+	 */
+	fun fromJSON(input: JSONObject) {
+		buttonGood.value = input.optBoolean("button_good", false)
+		whereTo.value = try {
+			DeriveDestination.valueOf(input.optString("where_to"))
+		} catch (_: java.lang.Exception) {
+			null
+		}
+		collision.value = input.optJSONObject("collision")
+		input.optString("error").let {
+			Log.d("collision checker error", it)
+		}
 	}
 }
 

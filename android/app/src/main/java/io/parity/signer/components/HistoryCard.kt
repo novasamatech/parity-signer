@@ -64,7 +64,7 @@ fun HistoryCard(card: JSONObject, timestamp: String) {
 				line1 = timestamp,
 				line2 = "Key created",
 				line3 = payload
-					?.optString("seed_name") + payload
+					?.optString("seed_name")?.decode64() + payload
 					?.optString("path")
 			)
 		}
@@ -74,7 +74,7 @@ fun HistoryCard(card: JSONObject, timestamp: String) {
 				line1 = timestamp,
 				line2 = "Key removed",
 				line3 = payload
-					?.optString("seed_name") + payload
+					?.optString("seed_name")?.decode64() + payload
 					?.optString("path")
 			)
 		}
@@ -153,7 +153,7 @@ fun HistoryCard(card: JSONObject, timestamp: String) {
 				image = Icons.Default.Pattern,
 				line1 = timestamp,
 				line2 = "Seed created",
-				line3 = card.optString("payload")
+				line3 = card.optString("payload").decode64()
 			)
 		}
 		"seed_name_shown" -> {
@@ -161,7 +161,7 @@ fun HistoryCard(card: JSONObject, timestamp: String) {
 				image = Icons.Default.Warning,
 				line1 = timestamp,
 				line2 = "Seed was shown",
-				line3 = card.optString("payload")
+				line3 = card.optString("payload").decode64()
 			)
 		}
 		"add_specs_message_signed" -> {

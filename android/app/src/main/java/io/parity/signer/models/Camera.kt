@@ -55,7 +55,7 @@ fun SignerDataModel.processFrame(
 						}
 					} else {
 						bucket += payloadString
-						if (bucket.size >= total.value ?: 0) {
+						if ((bucket.size + 1) >= total.value ?: 0) {
 							try {
 								payload = qrparserTryDecodeQrSequence(
 									"[\"" + bucket.joinToString(separator = "\",\"") + "\"]",

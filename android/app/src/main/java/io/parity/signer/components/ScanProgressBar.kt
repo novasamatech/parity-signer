@@ -4,6 +4,7 @@ import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
@@ -16,8 +17,10 @@ import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.unit.dp
 import io.parity.signer.models.SignerDataModel
 import io.parity.signer.models.resetScan
+import io.parity.signer.ui.theme.Bg000
 import io.parity.signer.ui.theme.Text400
 import io.parity.signer.ui.theme.Text600
+import io.parity.signer.ui.theme.modal
 
 @Composable
 fun ScanProgressBar(signerDataModel: SignerDataModel) {
@@ -28,8 +31,13 @@ fun ScanProgressBar(signerDataModel: SignerDataModel) {
 
 	progress.value?.let {
 		if (it != 0f) {
-			Surface {
-				Column {
+			Surface(
+			color = MaterialTheme.colors.Bg000,
+			shape = MaterialTheme.shapes.modal
+		) {
+				Column(
+					modifier = Modifier.padding(20.dp)
+				) {
 					HeadingOverline(text = "PARSING MULTIPART DATA")
 					Canvas(
 						modifier = Modifier
