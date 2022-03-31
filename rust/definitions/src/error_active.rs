@@ -977,8 +977,8 @@ pub enum Fetch {
         error: MetadataError,
     },
 
-    /// Fetched network metadata version is lower than the latest in the hot
-    /// database.
+    /// Fetched network metadata version is lower than the one already in the
+    /// hot database.
     EarlierVersion {
         /// network name
         name: String,
@@ -1043,58 +1043,226 @@ pub enum Fetch {
     },
 }
 
+/// Errors on the active side with network specs received through rpc call
 #[derive(Debug)]
 pub enum SpecsError {
+    /// Network base58 prefix information is not found neither in results of
+    /// the `system_properties` rpc call, nor in `System` pallet of the metadata
+    /// fetched with `state_getMetadata` rpc call.
     NoBase58Prefix,
+
+    /// Network base58 prefix information found through `system_properties` rpc
+    /// call differs from the one from `System` pallet of the metadata fetched
+    /// with "state_getMetadata" rpc call.
+    ///
+    /// Associated data is corresponding base58 prefixes.
     Base58PrefixMismatch { specs: u16, meta: u16 },
+
+    /// Network base58 prefix information received through `system_properties`
+    /// rpc call could not be transformed into expected `u16` prefix.
+    ///
+    /// Associated data is base58 prefix as received.
     Base58PrefixFormatNotSupported { value: String },
+
+    /// Network decimals information **is not found** in the results if the
+    /// `system_properties` rpc call, but the unit information **is found**.
+    ///
+    /// Associated data is the fetched unit value.
     UnitNoDecimals(String),
+
+    /// Network decimals information received through `system_properties`
+    /// rpc call could not be transformed into expected `u8` value.
+    ///
+    /// Associated data is decimals information as received.
     DecimalsFormatNotSupported { value: String },
+
+    /// Network unit information **is not found** in the results if the
+    /// `system_properties` rpc call, but the decimals information **is found**.
+    ///
+    /// Associated data is the fetched decimals value.
     DecimalsNoUnit(u8),
+
+    /// Network unit information received through `system_properties`
+    /// rpc call could not be transformed into expected `String` value.
+    ///
+    /// Associated data is unit information as received.
     UnitFormatNotSupported { value: String },
+
+    /// An array with more than one element is received for network decimals
+    /// through `system_properties` rpc call. Received units are not an array.
     DecimalsArrayUnitsNot,
+
+    /// Both the network decimals and network units are received as arrays,
+    /// but the array length is different, i.e. something not straightforward
+    /// is going on with the network.
+    ///
+    /// Associated data are the printed sets as they are received through the
+    /// `system_properties` rpc call.
     DecimalsUnitsArrayLength { decimals: String, unit: String },
+
+    /// An array with more than one element is received for network units
+    /// through `system_properties` rpc call. Received decimals are not an array.
     UnitsArrayDecimalsNot,
+
+    /// Unit and decimal override is not allowed.
+    ///
+    /// The only case when the decimals and unit override is permitted is when
+    /// the network has a matching set of decimals and units, and user has to
+    /// select the needed set element manually.
+    ///
+    /// If the network has a single decimals value and a single unit value, i.e.
+    /// the values that would be suitable on their own, and user attempts to
+    /// override it, this error appears.
     OverrideIgnored,
 }
 
+/// Data received through rpc call is different from the data in hot database
 #[derive(Debug)]
 pub enum Changed {
+    /// Network base58 prefix in hot database (consistent between the metadata
+    /// in `METATREE` and network specs in `SPECSPREPTREE`) is different from
+    /// the one received through new rpc calls (also consistent).
+    ///
+    /// Associated data is the base58 prefix values in question.
     Base58Prefix { old: u16, new: u16 },
+
+    /// Network genesis hash in hot database is different from the one fetched
+    /// through a new rpc call.
+    ///
+    /// Network genesis hash is encountered in `SPECSTREEPREP` and
+    /// `ADDRESS_BOOK`.
+    ///
+    /// It is possible for a network to change genesis hash, some, especially
+    /// experimental ones, are doing it quite regularly.
+    ///
+    /// If the network has changed the genesis hash, it would be best to remove
+    /// the old entry from the database, and then load the new one. If the
+    /// network is one of the default ones (currently Polkadot, Kusama,
+    /// Westend), the `defaults` crate must be updated as well.
+    ///
+    /// Associated data is the genesis hash values in question.
     GenesisHash { old: [u8; 32], new: [u8; 32] },
+
+    /// Network decimals value in
+    /// [`NetworkSpecsToSend`](crate::network_specs::NetworkSpecsToSend)
+    /// stored in `SPECSTREEPREP` tree of the hot database is different from
+    /// the one fetched through a new rpc call.
+    ///
+    /// Network decimals value is expected to be permanent.
     Decimals { old: u8, new: u8 },
+
+    /// Network name is stored in multiple places in the hot database:
+    ///
+    /// - in `name` field of network specs
+    /// [`NetworkSpecsToSend`](crate::network_specs::NetworkSpecsToSend) stored
+    /// in `SPECSTREEPREP` tree
+    /// - in `name` field of address book entry
+    /// [`AddressBookEntry`](crate::metadata::AddressBookEntry) stored in
+    /// `ADDRESS_BOOK` tree
+    /// - encoded as a part of [`MetaKey`] and inside the network metadata
+    /// stored in `METATREE` tree
+    ///
+    /// All those entries eventually are produced from network name that is
+    /// part of `Version` constant in `System` pallet of the network metadata.
+    ///
+    /// Network name is expected to be permanent. This error appears if the
+    /// name derived from metadata fetched through a new rpc call is different.
     Name { old: String, new: String },
+
+    /// Network unit value in
+    /// [`NetworkSpecsToSend`](crate::network_specs::NetworkSpecsToSend)
+    /// stored in `SPECSTREEPREP` tree of the hot database is different from
+    /// the one fetched through a new rpc call.
+    ///
+    /// Network unit value is expected to be permanent.
     Unit { old: String, new: String },
 }
 
-/// Enum listing possible errors on the Active side related to loading of the defaults
+/// Error loading of the defaults
+///
+/// Could happen during both hot and test cold detabase generation.
 #[derive(Debug)]
 pub enum DefaultLoading {
+    /// Default metadata is damaged.
+    ///
+    /// This is relevant only for test cold database.
+    ///
+    /// Hot database has no default metadata entries.
     FaultyMetadata {
+        /// filename, in which the faulty metadata was found
         filename: String,
+
+        /// what exactly is wrong with the metadata
         error: MetadataError,
     },
+
+    /// Unable to read directory with default metadata
     MetadataFolder(std::io::Error),
+
+    /// Unable to read file with default metadata
     MetadataFile(std::io::Error),
+
+    /// Unable to read file with defalt types information
     TypesFile(std::io::Error),
+
+    /// Default metadata set contains metadata files that have no corresponding
+    /// default network specs and address book entries.
     OrphanMetadata {
+        /// name of the network that has default metadata, but no default specs
         name: String,
+
+        /// filename of the file with orphan metadata
         filename: String,
     },
 }
 
-/// Enum listing errors for cases when something was needed from the Active database and was not found
+/// Errors when something was needed from the hot database and was not found
 #[derive(Debug)]
 pub enum NotFoundActive {
+    /// Types information stored in `SETTREE` tree of the hot database under key
+    /// `TYPES`.
+    ///
+    /// Types information is added to the database when generating it and could
+    /// not be deleted from the client.
     Types,
-    Metadata { name: String, version: u32 },
+
+    /// Network metadata for given network name and version, searched in hot
+    /// database `METATREE` tree.
+    Metadata {
+        /// network name
+        name: String,
+
+        /// network version
+        version: u32,
+    },
+
+    /// [`AddressBookEntry`](crate::metadata::AddressBookEntry) searched in
+    /// `ADDRESS_BOOK` tree of the hot database by network address book title
+    /// (i.e. with a specific [`AddressBookKey`]).
+    ///
+    /// Associated data is network address book title used for searching.
     AddressBookEntry { title: String },
+
+    /// [`NetworkSpecsToSend`](crate::network_specs::NetworkSpecsToSend) searched
+    /// by [`NetworkSpecsKey`] in `SPECSTREEPREP` tree of the hot database.
+    ///
+    /// Associated data is [`NetworkSpecsKey`] used for searching.
     NetworkSpecsToSend(NetworkSpecsKey),
+
+    /// [`AddressBookEntry`](crate::metadata::AddressBookEntry) searched in
+    /// `ADDRESS_BOOK` tree of the hot database by matching the `name` field.
+    ///
+    /// Associated data is the network name used for searching.
     AddressBookEntryWithName { name: String },
+
+    /// [`AddressBookEntry`](crate::metadata::AddressBookEntry) searched in
+    /// `ADDRESS_BOOK` tree of the hot database by matching the `address` field.
+    ///
+    /// Associated data is the url address used for searching.
     AddressBookEntryWithUrl { url: String },
 }
 
-/// Enum listing errors with command line parser from the `generate_message` crate
+/// Command line parser errors from the `generate_message` crate
 #[derive(Debug)]
 pub enum CommandParser {
     UnexpectedKeyArgumentSequence,
@@ -1108,7 +1276,7 @@ pub enum CommandParser {
     NoCommand,
 }
 
-/// Enum listing command line parser errors conserning missing key
+/// Missing key in `generate_message` command
 #[derive(Debug)]
 pub enum CommandNeedKey {
     Show,
@@ -1126,7 +1294,7 @@ pub enum CommandNeedKey {
     MetaDefaultFileVersion,
 }
 
-/// Enum listing command line parser errors conserning key encountered twice
+/// Key in `generate_message` command encountered twice
 #[derive(Debug)]
 pub enum CommandDoubleKey {
     Content,
@@ -1146,7 +1314,7 @@ pub enum CommandDoubleKey {
     MetaDefaultFileVersion,
 }
 
-/// Enum listing command line parser errors conserning missing key argument
+/// Missing argument for the key in `generate_message` command
 #[derive(Debug)]
 pub enum CommandNeedArgument {
     TokenUnit,
@@ -1177,7 +1345,7 @@ pub enum CommandNeedArgument {
     MetaDefaultFileVersion,
 }
 
-/// Enum listing command line parser errors conserning an unsuitable key argument
+/// Unsuitable argument for the key in `generate_message` command
 #[derive(Debug)]
 pub enum CommandBadArgument {
     CryptoKey,
@@ -1187,7 +1355,7 @@ pub enum CommandBadArgument {
     SufficientCrypto,
 }
 
-/// Enum listing command line parser errors conserning unexpected command content
+/// Unexpected content in `generate_message` command
 #[derive(Debug)]
 pub enum CommandUnexpected {
     DecimalsFormat,
@@ -1198,7 +1366,7 @@ pub enum CommandUnexpected {
     VersionFormat,
 }
 
-/// Enum listing possible input errors
+/// Errors in `generate_message` input
 #[derive(Debug)]
 pub enum InputActive {
     File(std::io::Error),
@@ -1210,7 +1378,7 @@ pub enum InputActive {
     NoValidDerivationsToExport,
 }
 
-/// Enum listing possible errors with .wasm files processing
+/// Errors with `wasm` files processing
 #[derive(Debug)]
 pub enum Wasm {
     Call(sc_executor_common::error::Error),
