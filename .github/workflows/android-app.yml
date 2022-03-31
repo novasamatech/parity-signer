@@ -37,7 +37,8 @@ jobs:
         if: runner.os == 'macOS'
         run:            |
           brew update
-          brew install --with-toolchain llvm
+          brew upgrade
+          brew install llvm
           brew install opencv
 
       - name:           Install Rust stable toolchain
