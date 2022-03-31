@@ -83,3 +83,75 @@ jobs:
           cd ..
           cd android
           ./gradlew build
+     
+  release:
+    name: Build unsigned APKs
+    runs-on: ubuntu-latest
+    if: github.ref == ' refs/head/main'
+    steps:
+      - name:           Cancel Previous Runs
+        uses:           styfle/cancel-workflow-action@0.9.1
+        with:
+          access_token: ${{ github.token }}
+
+      - name:           Checkout Sources
+        uses:           actions/checkout@v2.4.0
+        with:
+          fetch-depth:  50
+          submodules:   'recursive'
+
+      - name:           Install System Dependencies (Linux)
+        if: runner.os == 'Linux'
+        run:            |
+          sudo apt-get update
+          sudo apt-get install -y clang libclang-dev libopencv-dev
+
+      - name:           Install Rust stable toolchain
+        uses:           actions-rs/toolchain@v1
+        with:
+          profile:      minimal
+          toolchain:    stable
+          override:     true
+
+      - name:           Install additional rust targets
+        run:            rustup target add aarch64-linux-android armv7-linux-androideabi x86_64-linux-android
+
+      - name:           Set up JDK environment
+        uses:           actions/setup-java@v2
+        with:
+          distribution: 'adopt'
+          java-version: 11
+
+      - name:           Install NDK
+        run:            echo "y" | sudo ${ANDROID_HOME}/tools/bin/sdkmanager --install "ndk;24.0.8215888" --sdk_root=${ANDROID_SDK_ROOT}
+
+      - name:           Rust Cache
+        uses:           Swatinem/rust-cache@v1
+        with:
+          working-directory: rust
+
+      - name:           Gradle Cache
+        uses:           actions/cache@v3
+        with:
+          path:         |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/.gradle*', '**/gradle-wrapper.properties') }}
+          restore-keys: |
+            ${{ runner.os }}-gradle-
+
+      - name:           Assemble GPlay unsigned apk
+        run:            |
+          cd rust
+          cp os-specific-lock/android/Cargo.lock .
+          cp signer/android-hack/Cargo.toml signer
+          cd ..
+          cd android
+          ./gradlew clean assembleGplayRelease --stacktrace
+
+      - name:           Upload Gplay unsigned APKs
+        uses:           actions/upload-artifact@v2
+        with:
+          name:         vector-gplay-release-unsigned
+          path:         |
+            vector/build/outputs/apk/*/release/*.apk
