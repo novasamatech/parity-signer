@@ -154,4 +154,4 @@ jobs:
         with:
           name:         vector-gplay-release-unsigned
           path:         |
-            app/build/outputs/apk/release/*.apk
+            android/app/build/outputs/apk/release/*.apk
