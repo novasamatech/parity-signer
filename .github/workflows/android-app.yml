@@ -10,12 +10,8 @@ on:
 jobs:
   build:
     name: Build
-    runs-on: ${{ matrix.os }}
-    strategy:
-      matrix:
-        os: [macos-latest, ubuntu-latest]
+    runs-on:            ubuntu-latest
     steps:
-
       - name:           Cancel Previous Runs
         uses:           styfle/cancel-workflow-action@0.9.1
         with:
@@ -28,18 +24,9 @@ jobs:
           submodules:   'recursive'
 
       - name:           Install System Dependencies (Linux)
-        if: runner.os == 'Linux'
         run:            |
           sudo apt-get update
           sudo apt-get install -y clang libclang-dev libopencv-dev
-
-      - name:           Install System Dependencies (MacOS)
-        if: runner.os == 'macOS'
-        run:            |
-          brew update
-          brew upgrade
-          brew install llvm
-          brew install opencv
 
       - name:           Install Rust stable toolchain
         uses:           actions-rs/toolchain@v1
@@ -152,6 +139,6 @@ jobs:
       - name:           Upload Gplay unsigned APKs
         uses:           actions/upload-artifact@v2
         with:
-          name:         vector-gplay-release-unsigned
+          name:         signer-release-unsigned
           path:         |
             android/app/build/outputs/apk/release/*.apk
