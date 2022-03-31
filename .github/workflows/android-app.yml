@@ -87,7 +87,7 @@ jobs:
   release:
     name: Build unsigned APKs
     runs-on: ubuntu-latest
-    if: github.ref == ' refs/head/main'
+    # if: github.ref == ' refs/head/main'
     steps:
       - name:           Cancel Previous Runs
         uses:           styfle/cancel-workflow-action@0.9.1
