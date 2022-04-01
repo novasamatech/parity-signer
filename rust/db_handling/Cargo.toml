@@ -13,8 +13,8 @@ defaults = {path = "../defaults", default-features = false, optional = true}
 definitions = {path = "../definitions", default-features = false}
 hex = {version = "0.4.3", optional = true}
 lazy_static = "1.4.0"
-parity-scale-codec = {version = "3.0.0", features = ["derive"]}
-plot_icon = {git = "https://github.com/varovainen/polkadot-identicon-rust", default-features = false, features = ["pix"], optional = true}
+parity-scale-codec = {version = "3.1.2", features = ["derive"]}
+plot_icon = {version = "0.2.0", default-features = false, features = ["pix"], optional = true}
 qrcode_static = {path = "../qrcode_static", optional = true}
 regex = "1.5.4"
 sled = "0.34.6"

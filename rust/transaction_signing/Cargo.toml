@@ -11,7 +11,7 @@ constants = {path = "../constants", optional = true}
 definitions = {path = "../definitions", default-features = false, features = ["signer"]}
 db_handling = {path = "../db_handling", default-features = false, features = ["signer"]}
 hex = "0.4.3"
-parity-scale-codec = "3.0.0"
+parity-scale-codec = "3.1.2"
 qrcode_static = {path = "../qrcode_static"}
 sled = {version = "0.34.6", optional = true}
 sp-core = {git = "https://github.com/paritytech/substrate", default-features = false, features = ["full_crypto"]}
