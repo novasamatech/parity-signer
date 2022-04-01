@@ -2,7 +2,9 @@
 //! client
 //!
 //! Active side deals with both preparation of cold database that would be
-//! loaded in Signer on build and with hot database operations.
+//! loaded in Signer on build and with hot database operations. Cold database
+//! could be the *release* cold database (the actual one for Signer build) or
+//! the *test* cold database (with test Alice identities, used for tests).
 //!
 //! All errors [`ErrorActive`] could be displayed to user as error messages in
 //! `generate_message` client, and are implementing `Display` trait.
@@ -365,23 +367,22 @@ impl ErrorSource for Active {
                         format!("{} must be followed by an agrument.", insert)
                     },
                     CommandParser::BadArgument(b) => {
-                        let insert = match b {
-                            CommandBadArgument::CryptoKey => "`-crypto`",
-                            CommandBadArgument::MsgType => "`-msgtype`",
-                            CommandBadArgument::Verifier => "`-verifier`",
-                            CommandBadArgument::Signature => "`-signature`",
-                            CommandBadArgument::SufficientCrypto => "`-sufficient`",
-                        };
-                        format!("Invalid argument after {} key.", insert)
+                        match b {
+                            CommandBadArgument::CryptoKey => String::from("Invalid argument after `-crypto` key."),
+                            CommandBadArgument::DecimalsFormat => String::from("Key `-token` should be followed by u8 decimals value."),
+                            CommandBadArgument::MsgType => String::from("Invalid argument after `-msgtype` key."),
+                            CommandBadArgument::Signature => String::from("Invalid argument after `-signature` key."),
+                            CommandBadArgument::SufficientCrypto => String::from("Invalid argument after `-sufficient` key."),
+                            CommandBadArgument::Verifier => String::from("Invalid argument after `-verifier` key."),
+                            CommandBadArgument::VersionFormat => String::from("Unexpected version format."),
+                        }
                     },
                     CommandParser::Unexpected(b) => {
                         match b {
-                            CommandUnexpected::DecimalsFormat => String::from("Key `-token` should be followed by u8 decimals value."),
-                            CommandUnexpected::KeyAContent => String::from("Key `-a` is used to process all, name or url was not expected."),
-                            CommandUnexpected::VerifierNoCrypto => String::from("No verifier entry was expected for `-crypto none` sequence."),
-                            CommandUnexpected::SignatureNoCrypto => String::from("No singature entry was expected for `-crypto none` sequence."),
                             CommandUnexpected::AliceSignature => String::from("No signature was expected for verifier Alice."),
-                            CommandUnexpected::VersionFormat => String::from("Unexpected version format."),
+                            CommandUnexpected::KeyAContent => String::from("Key `-a` is used to process all, name or url was not expected."),
+                            CommandUnexpected::SignatureNoCrypto => String::from("No singature entry was expected for `-crypto none` sequence."),
+                            CommandUnexpected::VerifierNoCrypto => String::from("No verifier entry was expected for `-crypto none` sequence."),
                         }
                     },
                     CommandParser::UnknownCommand => String::from("Unknown command."),
@@ -777,7 +778,7 @@ pub enum KeyDecodingActive {
     /// Associated data is the damaged `MetaKey`.
     MetaKey(MetaKey),
 
-    /// [`NetworkSpecsKey`] from the database (hot or test cold one) could not
+    /// [`NetworkSpecsKey`] from the database (hot or cold one) could not
     /// be processed.
     ///
     /// Associated data is the damaged `NetworkSpecsKey`.
@@ -815,7 +816,7 @@ pub enum EntryDecodingActive {
     /// Associated data is the corresponding [`AddressKey`].
     AddressDetails(AddressKey),
 
-    /// Test cold database entry could not be decoded as
+    /// Cold database entry could not be decoded as
     /// [`NetworkSpecs`](crate::network_specs::NetworkSpecs).
     ///
     /// Associated data is the corresponding [`NetworkSpecsKey`].
@@ -834,7 +835,7 @@ pub enum EntryDecodingActive {
 
 /// Mismatch errors within database on active side
 ///
-/// Data could be recorded in both hot database and test cold database only
+/// Data could be recorded in both hot database and cold database only
 /// in ordered fasion, i.e. with keys corresponding to the data stored in the
 /// encoded values etc.
 ///
@@ -863,7 +864,7 @@ pub enum MismatchActive {
 
     /// [`NetworkSpecsKey`] is built using network genesis hash and [`Encryption`].
     /// [`NetworkSpecs`](crate::network_specs::NetworkSpecs) entry stored under
-    /// this `NetworkSpecsKey` in `SPECSTREE` tree of the test cold database
+    /// this `NetworkSpecsKey` in `SPECSTREE` tree of the cold database
     /// contains `genesis_hash` field with a different genesis hash.
     SpecsGenesisHash {
         /// [`NetworkSpecsKey`] corresponding to mismatching data
@@ -875,7 +876,7 @@ pub enum MismatchActive {
 
     /// [`NetworkSpecsKey`] is built using network genesis hash and [`Encryption`].
     /// [`NetworkSpecs`](crate::network_specs::NetworkSpecs) entry stored under
-    /// this `NetworkSpecsKey` in `SPECSTREE` tree of the test cold database
+    /// this `NetworkSpecsKey` in `SPECSTREE` tree of the cold database
     /// contains `encryption` field with a different [`Encryption`].
     SpecsEncryption {
         /// [`NetworkSpecsKey`] corresponding to mismatching data
@@ -1180,12 +1181,12 @@ pub enum Changed {
 
 /// Error loading of the defaults
 ///
-/// Could happen during both hot and test cold detabase generation.
+/// Could happen during both hot and cold detabase generation.
 #[derive(Debug)]
 pub enum DefaultLoading {
     /// Default metadata is damaged.
     ///
-    /// This is relevant only for test cold database.
+    /// This is relevant only for cold database.
     ///
     /// Hot database has no default metadata entries.
     FaultyMetadata {
@@ -1263,129 +1264,553 @@ pub enum NotFoundActive {
 }
 
 /// Command line parser errors from the `generate_message` crate
+///
+/// Client of `generate_message` crate supports following commands:
+///
+/// - `add_specs`, to add entries into hot database `SPECSTREEPREP` and
+/// `ADDRESS_BOOK` and to generate signable `add_specs` message content
+/// - `derivations`, to generate derivations import messages
+/// - `load_metadata`, to add entries into hot database `METATREE` tree and
+/// to generate signable `load_metadata` message content
+/// - `load_types`, to generate signable `load_types` message content
+/// - `make` to generate qr images or text files with update messages, unsigned,
+/// signed by test verifier (Alice) or signed with user-provided public key
+/// and signature
+/// - `make_cold_release` to generate *release* cold database as a part of
+/// Signer build process
+/// - `make_cold_with_identities` to generate *test* cold database with Alice
+/// identities pre-generated, for tests
+/// - `meta_default_file` to produce a file with hexadecimal network metadata
+/// from an entry in `METATREE` of the hot database; such files are used in
+/// `defaults` crate
+/// - `remove` to remove a metadata entry or a network from the hot database
+/// - `restore_defaults` to generate default hot database in place of the
+/// current one
+/// - `show`, to show current hot database entries in `METATREE` or
+/// `ADDRESS_BOOK` trees
+/// - `sign` to generate qr images or text files with update messages using
+/// Signer-generated [`SufficientCrypto`](crate::crypto::SufficientCrypto) data
+/// - `transfer_meta_to_cold` to transfer metadata from hot database into *test*
+/// cold database, only for networks with network specs entries in the cold
+/// database
+/// - `transfer_meta_to_cold_release` to transfer metadata from hot database
+/// into *release* cold database, only for networks with network specs entries
+/// in the cold database
+/// - `unwasm`, to generate signable `load_metadata` message content from `wasm`
+/// file, for networks before release
+///
+/// Commands may have keys (starting with `-`), keys may be followed by the
+/// arguments.
 #[derive(Debug)]
 pub enum CommandParser {
+    /// Agrument sequence could not be processed.
     UnexpectedKeyArgumentSequence,
+
+    /// Received more than one network identifier.
+    ///
+    /// Commands `add_specs` and `load_metadata` could be called for:
+    ///
+    /// - networks specified by network name (as it is recorded in entries in
+    /// `ADDRESS_BOOK`), using key `-n`
+    /// - url address to use for rpc call, using key `-u`.
+    ///
+    /// Both these keys must be used for an individual network, i.e. only one
+    /// network name or one network url address must be provided.
+    ///
+    /// This error appears if the parser has recognized more than one command
+    /// element as a network identifier.
     OnlyOneNetworkId,
+
+    /// A key needed to run the command was not provided.
+    ///
+    /// Associated data is [`CommandNeedKey`] with more details.
     NeedKey(CommandNeedKey),
+
+    /// Same key was encountered more than once.
+    ///
+    /// Associated data is [`CommandDoubleKey`] with more details.
     DoubleKey(CommandDoubleKey),
+
+    /// A key must have been followed by some argument, but was not.
+    ///
+    /// Associated data is [`CommandNeedArgument`] with more details.
     NeedArgument(CommandNeedArgument),
+
+    /// An argument following the key is unsuitable.
+    ///
+    /// Associated data is [`CommandBadArgument`] with more details.
     BadArgument(CommandBadArgument),
+
+    /// Unexpected excessive entry in the command.
+    ///
+    /// Associated data is [`CommandUnexpected`] with more details.
     Unexpected(CommandUnexpected),
+
+    /// Command is not known.
     UnknownCommand,
+
+    /// No command provided.
     NoCommand,
 }
 
 /// Missing key in `generate_message` command
 #[derive(Debug)]
 pub enum CommandNeedKey {
+    /// Command `show` needs key:
+    ///
+    /// - `-address_book` to show the contents of the hot database `ADDRESS_BOOK`
+    /// tree
+    /// - `-database` to show the contents of the hot database `METATREE` tree
     Show,
+
+    /// Commands `add_specs` and `load_metadata` need key specifying content:
+    ///
+    /// - `-a` to process all networks with entries in the `ADDRESS_BOOK` tree
+    /// - `-n` to process network by provided network name (in case of
+    /// `load_metadata`) or network address book title (in case of `add_specs`)
+    /// - `-u` to process network by provided url address
     Content,
+
+    /// Command `make` requires `-crypto` key, followed by the encryption to be
+    /// used in generating update transaction. Possible variants are:
+    ///
+    /// - `none` for unsigned updates
+    /// - `ed25519`
+    /// - `sr25519`
+    /// - `ecdsa`
+    ///
+    /// Entered encryption must match entered verifier and signature data.
     Crypto,
+
+    /// Commands `derivations`, `make`, `sign`, `unwasm` require `-payload` key
+    /// to be used, followed by the name of the file to process.
     Payload,
+
+    /// Commands `make` and `sign` require `-msgtype` key, followed by what is
+    /// contained in the payload: `add_specs`, `load_metadata` or `load_types`.
     MsgType,
+
+    /// Command `sign` requires `-sufficient` key, followed by
+    /// [`SufficientCrypto`](crate::crypto::SufficientCrypto) input, matching
+    /// the payload content.
     SufficientCrypto,
+
+    /// Command `make` requires signature if the message is to be signed by
+    /// real verifier.
     Signature,
+
+    /// Command `make` requires public key of the verifier if the message is to
+    /// be signed.
+    ///
+    /// Verifier could be:
+    /// - custom (real user, with own public key), in this case a real signature
+    /// would be required
+    /// - test verifier (Alice), no signature
     Verifier,
+
+    /// Command `remove` needs one of these keys:
+    ///
+    /// - `-title`, followed by network address book title, to remove
+    /// `ADDRESS_BOOK` entry for the network, and metadata in case there are no
+    /// more networks that use this metadata
+    /// - `-name`, followed by network name argument, key `-version`, and
+    /// network version argument, to remove specific metadata entry from
+    /// `METATREE` by name and version
     Remove,
+
+    /// If command `remove` is processed with the key `-name`, it requires also
+    /// a key `-version` followed by the metadata version, to specify the
+    /// version to be deleted.
     RemoveVersion,
+
+    /// Transaction with derivation import is generated for a specific network,
+    /// this network is addressed by `-title` key followed by network address
+    /// book title.
     DerivationsTitle,
+
+    /// Command `meta_default_file` must have `-name` key followed by the
+    /// network name to specify the metadata being exported.
     MetaDefaultFileName,
+
+    /// Command `meta_default_file` must have `-version` key followed by the
+    /// network metadata version to specify the metadata being exported.
     MetaDefaultFileVersion,
 }
 
 /// Key in `generate_message` command encountered twice
 #[derive(Debug)]
 pub enum CommandDoubleKey {
+    /// Commands `add_specs` and `load_metadata` allow only one content key:
+    ///
+    /// - `-a` to process all networks with entries in the `ADDRESS_BOOK` tree
+    /// - `-n` to process network by provided network name (in case of
+    /// `load_metadata`) or network address book title (in case of `add_specs`)
+    /// - `-u` to process network by provided url address
     Content,
+
+    /// Commands `add_specs` and `load_metadata` allow at most one set key,
+    ///
+    /// - `-f` to use the data from the database, without rpc calls, and save
+    /// files for signing
+    /// - `-d` to make rpc calls without updating the database, and save files
+    /// for signing
+    /// - `-k` to make rpc calls, update the database, and save for signing only
+    /// the files with the data **new** to the database
+    /// - `-p` to make rpc calls, update the database, and make no files
+    /// - `-t` (the default one, is done when the set key is not specified as
+    /// well), to make rpc calls, update the database, and save all files for
+    /// signing
     Set,
+
+    /// Command `add_specs` may use encryption override key to specify the
+    /// encryption supported by the network. Encryption override must be used
+    /// for networks without an entry in `ADDRESS_BOOK` tree. Encryption
+    /// override could be also used for networks already recorded in
+    /// `ADDRESS_BOOK` if the network supports more than one [`Encryption`].
+    ///
+    /// Encryption override key (`-ed25519`, `-sr25519`, `-ecdsa`) could not be
+    /// used more than once.
     CryptoOverride,
+
+    /// Command `add_specs`, when used for networks without network specs
+    /// entries in `SPECSTREEPREP` and with mora than one token supported,
+    /// could use token override. For this, key `-token` followed by `u8`
+    /// decimals and `String` unit arguments is used.
+    ///
+    /// Token override key may be used only once.
     TokenOverride,
+
+    /// Command `make` must have exactly one `-crypto` key, followed by the
+    /// encryption argument.
     CryptoKey,
+
+    /// Commands `make` and `sign` must have exactly one `-msgtype` key,
+    /// followed by the message type argument.
     MsgType,
+
+    /// Command `make` can have at most one `-verifier` key.
     Verifier,
+
+    /// Commands `derivations`, `make`, `sign`, `unwasm` must have exactly one
+    /// `-payload` key, followed by the name of the file to process.
     Payload,
+
+    /// Command `make` can have at most one `-signeture` key.
     Signature,
+
+    /// Commands `make` and `sign` can have at most one `-name` key,
+    /// followed by the custom name of the export file in `../files/signed/`
+    /// folder.
     Name,
+
+    /// Command `sign` must have exactly one `-sufficient` key, followed by the
+    /// [`SufficientCrypto`](crate::crypto::SufficientCrypto) input, matching
+    /// the payload content.
     SufficientCrypto,
+
+    /// Command `remove` must have exactly one content key:
+    ///
+    /// - `-title`, followed by network address book title, to remove
+    /// `ADDRESS_BOOK` entry for the network, and metadata in case there are no
+    /// more networks that use this metadata
+    /// - `-name`, followed by network name argument, key `-version`, and
+    /// network version argument, to remove specific metadata entry from
+    /// `METATREE` by name and version
     Remove,
+
+    /// Command `derivations` must have exactly one `-title` key followed by
+    /// network address book title for network in which the derivation export
+    /// is generated.
     DerivationsTitle,
+
+    /// Command `meta_default_file` must have exactly one `-name` key followed
+    /// by the network name.
     MetaDefaultFileName,
+
+    /// Command `meta_default_file` must have exactly one `-version` key followed
+    /// by the network version.
     MetaDefaultFileVersion,
 }
 
 /// Missing argument for the key in `generate_message` command
 #[derive(Debug)]
 pub enum CommandNeedArgument {
+    /// Key `-token` in `add_specs` command was supposed to be followed by `u8`
+    /// decimals and `String` unit agruments.
+    ///
+    /// Unit argument was not provided.
+    ///
+    /// Note: this error can occur only when `-token` is the last key in the
+    /// sequence.
+    ///
+    /// On the other hand, if sequence used is, for example,
+    /// `$ cargo run add_specs -d -u wss://my_super_network.io -token 10 -sr25519`
+    /// parser will interpret `-sr25519` part as an attempted unit entry (indeed,
+    /// units could be whatever, so no obvious criteria to recognize them),
+    /// and will complain that no encryption is provided for an unknown network.
     TokenUnit,
+
+    /// Key `-token` in `add_specs` command was supposed to be followed by `u8`
+    /// decimals and `String` unit agruments.
+    ///
+    /// Decimals argument was not provided.
+    ///
+    /// Note: this error can occur only when `-token` is the last key in the
+    /// sequence. Otherwise the parser will try to interpret as `u8` decimals
+    /// the next key and complain that it is not `u8`.
     TokenDecimals,
+
+    /// Commands `add_specs` and `load_metadata` with content key `-n` require
+    /// network identifier: network address book title for `add_specs` and
+    /// network name for `load_metadata`
     NetworkName,
+
+    /// Commands `add_specs` and `load_metadata` with content key `-u` require
+    /// url address input for rpc calls
     NetworkUrl,
+
+    /// Key `-crypto` in `make` command was supposed to be followed by an
+    /// agrument:
+    ///
+    /// - `ed25519`
+    /// - `sr25519`
+    /// - `ecdsa`
+    /// - `none`
     CryptoKey,
+
+    /// Key `-verifier` in `make` command was supposed to be followed by an
+    /// argument or additional key:
+    ///
+    /// - argument `Alice`
+    /// - key `-hex` followed by hexadecimal input argument
+    /// - key `-file` followed by filename argument
     Verifier,
+
+    /// Key sequence `-verifier -hex` in `make` command must be followed by a
+    /// hexadecimal verifier public key
     VerifierHex,
+
+    /// Key sequence `-verifier -file` in `make` command must be followed by a
+    /// filename of the file in `../files/for_signing/` with verifier public
+    /// key as `&[u8]`.
     VerifierFile,
+
+    /// Key `-payload` must be followed by a filename of the file:
+    /// - in `../files/for_signing/` for `make` and `sign` commands
+    /// - in `../generate_message/` for `derivations` and `unwasm` commands
     Payload,
+
+    /// Key `-msgtype` in `make` and `sign` must be followed by a valid message
+    /// type argument:
+    ///
+    /// - `add_specs`
+    /// - `load_metadata`
+    /// - `load_types`
     MsgType,
+
+    /// Key `-signature` in `make` command was supposed to be followed by an
+    /// additional key:
+    ///
+    /// - key `-hex` followed by hexadecimal input argument
+    /// - key `-file` followed by filename argument
     Signature,
+
+    /// Key sequence `-signature -hex` in `make` command must be followed by a
+    /// hexadecimal signature.
     SignatureHex,
+
+    /// Key sequence `-signature -file` in `make` command must be followed by a
+    /// filename of the file in `../files/for_signing/` with signature
+    /// as `&[u8]`.
     SignatureFile,
+
+    /// Key `-name` in `make` and `sign` commands, if used, must be followed by
+    /// a filename of target file in `../files/signed`.
     Name,
+
+    /// Key `-sufficient` in `sign` command was supposed to be followed by an
+    /// additional key:
+    ///
+    /// - key `-hex` followed by hexadecimal input argument
+    /// - key `-file` followed by filename argument
     SufficientCrypto,
+
+    /// Key sequence `-sufficient -hex` in `sign` command must be followed by a
+    /// hexadecimal SCALE-encoded `SufficientCrypto` string.
     SufficientCryptoHex,
+
+    /// Key sequence `-sufficient -file` in `sign` command must be followed by a
+    /// filename of the file in `../files/for_signing/` with SCALE-encoded
+    /// `SufficientCrypto` as `&[u8]`.
     SufficientCryptoFile,
+
+    /// Command `make` must be followed by additional keys.
     Make,
+
+    /// Command `sign` must be followed by additional keys.
     Sign,
+
+    /// Key `-title` in `remove` command must be followed by network address
+    /// book title.
     RemoveTitle,
+
+    /// Key `-name` in `remove` command must be followed by network name.
     RemoveName,
+
+    /// Key-argument sequence `remove -name <***> -version` in `remove` command
+    /// must be followed by network version.
     RemoveVersion,
+
+    /// Command `derivations` must be followed by additional keys.
     Derivations,
+
+    /// Key `-title` in `derivations` command must be followed by network
+    /// address book title.
     DerivationsTitle,
+
+    /// Key `-name` in `meta_default_file` command must be followed by network
+    /// name.
     MetaDefaultFileName,
+
+    /// Key `-version` in `meta_Default_file` command must be followed by
+    /// network version.
     MetaDefaultFileVersion,
 }
 
 /// Unsuitable argument for the key in `generate_message` command
 #[derive(Debug)]
 pub enum CommandBadArgument {
+    /// The valid arguments for key `-crypto` are:
+    ///
+    /// - `ed25519`
+    /// - `sr25519`
+    /// - `ecdsa`
+    /// - `none`
     CryptoKey,
+
+    /// Key `-token` must be followed by `u8` decimals and `String` unit values.
+    ///
+    /// This error appears if the value immediately after `-token` could not be
+    /// parsed as `u8`.
+    DecimalsFormat,
+
+    /// The valid arguments for key `-msgtype` are:
+    ///
+    /// - `add_specs`
+    /// - `load_metadata`
+    /// - `load_types`
     MsgType,
-    Verifier,
+
+    /// Signature may be entered from a file or as a hexadecimal string.
+    /// Key `-signature` may be followed by:
+    ///
+    /// `-file` followed by the name of the file in `../files/for_signing/` with
+    /// signature as `&[u8]`
+    /// `-hex` followed by hexadecimal signature
     Signature,
+
+    /// [`SufficientCrypto`](crate::crypto::SufficientCrypto) may be entered
+    /// from a file or as a hexadecimal string.
+    /// Key `-sufficient` may be followed by:
+    ///
+    /// `-file` followed by the name of the file in `../files/for_signing/` with
+    /// SCALE-encoded `SufficientCrypto` as `&[u8]`
+    /// `-hex` followed by hexadecimal SCALE-encoded `SufficientCrypto` string
     SufficientCrypto,
+
+    /// Verifier entered after key `-verifier` may be:
+    ///
+    /// `-file` followed by name of the file in `../files/for_signing/` with
+    /// verifier public key as `&[u8]`
+    /// `-hex` followed by hexadecimal verifier public key
+    /// `Alice`
+    Verifier,
+
+    /// Commands `remove` and `meta_default_file` require network version to be
+    /// specified after key `-version`.
+    ///
+    /// This error appears if the value immediately after `-version` could not be
+    /// parsed as `u32`.
+    VersionFormat,
 }
 
 /// Unexpected content in `generate_message` command
 #[derive(Debug)]
 pub enum CommandUnexpected {
-    DecimalsFormat,
-    KeyAContent,
-    VerifierNoCrypto,
-    SignatureNoCrypto,
+    /// Command `make` with `-verifier Alice` can not accept the signature.
     AliceSignature,
-    VersionFormat,
+
+    /// Commands `add_specs` and `load_metadata` can not accept name or url
+    /// address if `-a` (process all) content key is used.
+    KeyAContent,
+
+    /// Command `make` with `-crypto none` can not accept the signature.
+    SignatureNoCrypto,
+
+    /// Command `make` with `-crypto none` can not accept the verifier public key.
+    VerifierNoCrypto,
 }
 
 /// Errors in `generate_message` input
 #[derive(Debug)]
 pub enum InputActive {
+    /// Unable to read the file with input.
     File(std::io::Error),
+
+    /// [`SufficientCrypto`](crate::crypto::SufficientCrypto) could not be
+    /// decoded.
     DecodingSufficientCrypto,
+
+    /// The length of public key does not match the selected encryption
+    /// algorithm.
     PublicKeyLength,
+
+    /// The length of data signature does not match the selected encryption
+    /// algorithm.
     SignatureLength,
+
+    /// Tried to apply signature (i.e. used command `make` or `sign`) to
+    /// metadata that is not suitable for use in Signer
     FaultyMetadataInPayload(MetadataError),
+
+    /// Provided data signature (entered separately or as a part of
+    /// [`SufficientCrypto`](crate::crypto::SufficientCrypto) input) is invalid
+    /// for given public key and data.
     BadSignature,
+
+    /// Provided file contains no valid password-free derivations that could be
+    /// exported
     NoValidDerivationsToExport,
 }
 
 /// Errors with `wasm` files processing
+// TODO add links to external errors and definitions, when the `sc-...` crates
+// are published
 #[derive(Debug)]
 pub enum Wasm {
+    /// Failed to make "Metadata_metadata" call on data extracted from `wasm`
+    /// file.
     Call(sc_executor_common::error::Error),
+
+    /// Metadata extracted from `wasm` file could not be decoded.
     DecodingMetadata,
+
+    /// Metadata extracted from `wasm` file is not suitable to be used in
+    /// Signer.
+    ///
+    /// Associated data is [`MetadataError`] specifying what exactly is wrong
+    /// with the metadata.
     FaultyMetadata(MetadataError),
+
+    /// Error reading `wasm` file.
     File(std::io::Error),
+
+    /// Error generating `RuntimeBlob`.
     RuntimeBlob(sc_executor_common::error::WasmError),
+
+    /// Error generating `WasmiInstance`.
     WasmiInstance(sc_executor_common::error::Error),
+
+    /// Error generating `WasmiRuntime`.
     WasmiRuntime(sc_executor_common::error::WasmError),
 }

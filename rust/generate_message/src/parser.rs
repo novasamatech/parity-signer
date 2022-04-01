@@ -140,14 +140,23 @@ impl Command {
                     "show" => {
                         match args.next() {
                             Some(show) => match show.to_lowercase().as_str() {
-                                "-database" => Ok(Command::Show(Show::Database)),
-                                "-address_book" => Ok(Command::Show(Show::AddressBook)),
+                                "-database" => {
+                                    if args.next().is_some() {Err(ErrorActive::CommandParser(CommandParser::UnexpectedKeyArgumentSequence))}
+                                    else {Ok(Command::Show(Show::Database))}
+                                },
+                                "-address_book" => {
+                                    if args.next().is_some() {Err(ErrorActive::CommandParser(CommandParser::UnexpectedKeyArgumentSequence))}
+                                    else {Ok(Command::Show(Show::AddressBook))}
+                                },
                                 _ => Err(ErrorActive::CommandParser(CommandParser::UnexpectedKeyArgumentSequence)),
                             },
                             None => Err(ErrorActive::CommandParser(CommandParser::NeedKey(CommandNeedKey::Show)))
                         }
                     },
-                    "load_types" => Ok(Command::Types),
+                    "load_types" => {
+                        if args.next().is_some() {Err(ErrorActive::CommandParser(CommandParser::UnexpectedKeyArgumentSequence))}
+                        else {Ok(Command::Types)}
+                    },
                     "load_metadata"|"add_specs" => {
                         let mut set_key = None;
                         let mut content_key = None;
@@ -194,7 +203,7 @@ impl Command {
                                                                     None => return Err(ErrorActive::CommandParser(CommandParser::NeedArgument(CommandNeedArgument::TokenUnit)))
                                                                 }
                                                             },
-                                                            Err(_) => return Err(ErrorActive::CommandParser(CommandParser::Unexpected(CommandUnexpected::DecimalsFormat))),
+                                                            Err(_) => return Err(ErrorActive::CommandParser(CommandParser::BadArgument(CommandBadArgument::DecimalsFormat))),
                                                         }
                                                     },
                                                     None => return Err(ErrorActive::CommandParser(CommandParser::NeedArgument(CommandNeedArgument::TokenDecimals)))
@@ -597,7 +606,7 @@ impl Command {
                                                                 Some(d) => {
                                                                     match d.parse::<u32> () {
                                                                         Ok(version) => Some(Remove::SpecNameVersion{name, version}),
-                                                                        Err(_) => return Err(ErrorActive::CommandParser(CommandParser::Unexpected(CommandUnexpected::VersionFormat))),
+                                                                        Err(_) => return Err(ErrorActive::CommandParser(CommandParser::BadArgument(CommandBadArgument::VersionFormat))),
                                                                     }
                                                                 },
                                                                 None => return Err(ErrorActive::CommandParser(CommandParser::NeedArgument(CommandNeedArgument::RemoveVersion))),
@@ -620,11 +629,26 @@ impl Command {
                             None => Err(ErrorActive::CommandParser(CommandParser::NeedKey(CommandNeedKey::Remove))),
                         }                        
                     },
-                    "restore_defaults" => Ok(Command::RestoreDefaults),
-                    "make_cold_with_identities" => Ok(Command::MakeColdWithIdentities),
-                    "transfer_meta_to_cold" => Ok(Command::TransferMeta),
-                    "make_cold_release" => Ok(Command::MakeColdRelease),
-                    "transfer_meta_to_cold_release" => Ok(Command::TransferMetaRelease),
+                    "restore_defaults" => {
+                        if args.next().is_some() {Err(ErrorActive::CommandParser(CommandParser::UnexpectedKeyArgumentSequence))}
+                        else {Ok(Command::RestoreDefaults)}
+                    },
+                    "make_cold_with_identities" => {
+                        if args.next().is_some() {Err(ErrorActive::CommandParser(CommandParser::UnexpectedKeyArgumentSequence))}
+                        else {Ok(Command::MakeColdWithIdentities)}
+                    },
+                    "transfer_meta_to_cold" => {
+                        if args.next().is_some() {Err(ErrorActive::CommandParser(CommandParser::UnexpectedKeyArgumentSequence))}
+                        else {Ok(Command::TransferMeta)}
+                    },
+                    "make_cold_release" => {
+                        if args.next().is_some() {Err(ErrorActive::CommandParser(CommandParser::UnexpectedKeyArgumentSequence))}
+                        else {Ok(Command::MakeColdRelease)}
+                    },
+                    "transfer_meta_to_cold_release" => {
+                        if args.next().is_some() {Err(ErrorActive::CommandParser(CommandParser::UnexpectedKeyArgumentSequence))}
+                        else {Ok(Command::TransferMetaRelease)}
+                    },
                     "derivations" => {
                         let mut goal = Goal::Both; // default option for `derivations`
                         let mut args = args.peekable();
@@ -721,7 +745,7 @@ impl Command {
                                         Some(b) => {
                                             match b.parse::<u32> () {
                                                 Ok(c) => Some(c),
-                                                Err(_) => return Err(ErrorActive::CommandParser(CommandParser::Unexpected(CommandUnexpected::VersionFormat))),
+                                                Err(_) => return Err(ErrorActive::CommandParser(CommandParser::BadArgument(CommandBadArgument::VersionFormat))),
                                             }
                                         },
                                         None => return Err(ErrorActive::CommandParser(CommandParser::NeedArgument(CommandNeedArgument::MetaDefaultFileVersion))),
