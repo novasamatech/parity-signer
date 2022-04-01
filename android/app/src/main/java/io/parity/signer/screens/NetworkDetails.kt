@@ -15,34 +15,36 @@ import io.parity.signer.models.pushButton
 import org.json.JSONObject
 
 @Composable
-fun NetworkDetails(signerDataModel: SignerDataModel) {
-	val content = signerDataModel.screenData.value ?: JSONObject()
-
+fun NetworkDetails(
+	screenData: JSONObject,
+	button: (ButtonID, String) -> Unit
+) {
 	Column {
-		NetworkCard(network = content)
+		NetworkCard(network = screenData)
 		Row {
 			Text("Network name:")
-			Text(content.optString("name"))
+			Text(screenData.optString("name"))
 		}
 		Row {
 			Text("base58 prefix:")
-			Text(content.optString("base58prefix"))
+			Text(screenData.optString("base58prefix"))
 		}
 		Row {
 			Text("decimals:")
-			Text(content.optString("decimals"))
+			Text(screenData.optString("decimals"))
 		}
 		Row {
 			Text("unit:")
-			Text(content.optString("unit"))
+			Text(screenData.optString("unit"))
 		}
 		Row {
 			Text("genesis hash:")
-			Text(content.optString("genesis_hash"))
+			Text(screenData.optString("genesis_hash"))
 		}
 		Row {
 			Text("Verifier certificate:")
-			when (content.optJSONObject("current_verifier")?.optString("type") ?: "") {
+			when (screenData.optJSONObject("current_verifier")?.optString("type")
+				?: "") {
 				"general" -> {
 					Text("general")
 				}
@@ -50,7 +52,7 @@ fun NetworkDetails(signerDataModel: SignerDataModel) {
 					Column {
 						Text("custom")
 						Text(
-							content.optJSONObject("current_verifier")?.optString("details")
+							screenData.optJSONObject("current_verifier")?.optString("details")
 								?: ""
 						)
 					}
@@ -65,13 +67,13 @@ fun NetworkDetails(signerDataModel: SignerDataModel) {
 		}
 		Text("Metadata available:")
 		LazyColumn {
-			items(content.getJSONArray("meta").length()) { index ->
-				val meta = content.getJSONArray("meta").getJSONObject(index)
+			items(screenData.getJSONArray("meta").length()) { index ->
+				val meta = screenData.getJSONArray("meta").getJSONObject(index)
 				Row(
 					Modifier.clickable {
-						signerDataModel.pushButton(
+						button(
 							ButtonID.ManageMetadata,
-							details = meta.optString("spec_version")
+							meta.optString("spec_version")
 						)
 					}
 				) {

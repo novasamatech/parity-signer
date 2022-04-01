@@ -117,7 +117,7 @@ fun SignerApp(signerDataModel: SignerDataModel) {
 			OnBoardingState.No -> {
 				if (shieldAlert.value == ShieldAlert.None) {
 					Scaffold {
-						LandingView(signerDataModel = signerDataModel)
+						LandingView(signerDataModel::onBoard)
 					}
 				} else {
 					Box(

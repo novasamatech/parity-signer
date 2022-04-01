@@ -23,8 +23,10 @@ import io.parity.signer.ui.theme.Bg200
 import org.json.JSONObject
 
 @Composable
-fun KeyDetailsMulti(signerDataModel: SignerDataModel) {
-	val address = signerDataModel.screenData.observeAsState()
+fun KeyDetailsMulti(
+	screenData: JSONObject,
+	button: (button: ButtonID) -> Unit
+) {
 	var offset by remember { mutableStateOf(0f) }
 
 	Column(
@@ -38,14 +40,14 @@ fun KeyDetailsMulti(signerDataModel: SignerDataModel) {
 					MaterialTheme.colors.Bg200
 				)
 				.fillMaxWidth()
-		) { KeyCard(identity = address.value ?: JSONObject()) }
-		Row (
+		) { KeyCard(identity = screenData) }
+		Row(
 			Modifier.padding(top = 3.dp, start = 12.dp, end = 12.dp)
 		) {
-			NetworkCard(address.value ?: JSONObject())
+			NetworkCard(screenData)
 		}
 		Image(
-			(address.value?.optString("qr") ?: "").intoImageBitmap(),
+			(screenData.optString("qr")).intoImageBitmap(),
 			contentDescription = "QR with address to scan",
 			contentScale = ContentScale.FillWidth,
 			modifier = Modifier
@@ -59,10 +61,10 @@ fun KeyDetailsMulti(signerDataModel: SignerDataModel) {
 					},
 					onDragStopped = {
 						if (offset < -100) {
-							signerDataModel.pushButton(ButtonID.NextUnit)
+							button(ButtonID.NextUnit)
 						} else {
 							if (offset > 100) {
-								signerDataModel.pushButton(ButtonID.PreviousUnit)
+								button(ButtonID.PreviousUnit)
 							}
 						}
 						offset = 0f
@@ -70,9 +72,10 @@ fun KeyDetailsMulti(signerDataModel: SignerDataModel) {
 				)
 		)
 		Text(
-			"Key " + address.value?.optString("current_number") + " out of " + address.value?.optString(
-				"out_of"
-			)
+			"Key "
+				+ screenData.optString("current_number")
+				+ " out of "
+				+ screenData.optString("out_of")
 		)
 	}
 }

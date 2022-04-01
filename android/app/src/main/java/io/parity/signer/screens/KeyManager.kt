@@ -32,9 +32,7 @@ import org.json.JSONObject
 import kotlin.math.absoluteValue
 
 /**
- * Key manager screen; here all key/identity/seed creation and deletion
- * operations should happen. This is final point in navigation:
- * all subsequent interactions should be in modals or drop-down menus
+ * Key manager screen.
  */
 @Composable
 fun KeyManager(
@@ -42,7 +40,6 @@ fun KeyManager(
 	increment: (Int, String) -> Unit,
 	screenData: JSONObject
 ) {
-	//val screenData = signerDataModel.screenData.value
 	val rootKey = screenData.optJSONObject("root") ?: JSONObject()
 	val keySet = screenData.optJSONArray("set") ?: JSONArray()
 	//val network = signerDataModel.screenData.value?.optJSONObject("network")

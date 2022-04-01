@@ -12,11 +12,15 @@ import io.parity.signer.components.HistoryCard
 import io.parity.signer.models.SignerDataModel
 import io.parity.signer.models.pushButton
 import io.parity.signer.models.toListOfJSONObjects
+import org.json.JSONObject
 
 @Composable
-fun HistoryScreen(signerDataModel: SignerDataModel) {
+fun HistoryScreen(
+	screenData: JSONObject,
+	button: (button: ButtonID, details: String) -> Unit
+) {
 	val history =
-		signerDataModel.screenData.value?.optJSONArray("log")?.toListOfJSONObjects()?.sortedBy {
+		screenData.optJSONArray("log")?.toListOfJSONObjects()?.sortedBy {
 			it.optInt("order")
 		}?.reversed() ?: emptyList()
 
@@ -30,7 +34,7 @@ fun HistoryScreen(signerDataModel: SignerDataModel) {
 					items = record,
 					key = { recordJSON.optString("order") + it.toString() }
 				) { item ->
-					Row(Modifier.clickable { signerDataModel.pushButton(ButtonID.ShowLogDetails, details = order) }) {
+					Row(Modifier.clickable { button(ButtonID.ShowLogDetails, order) }) {
 						HistoryCard(
 							item,
 							timestamp

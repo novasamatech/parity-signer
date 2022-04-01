@@ -23,7 +23,9 @@ import io.parity.signer.ui.theme.Bg100
  * First screen with legal consent request
  */
 @Composable
-fun LandingView(signerDataModel: SignerDataModel) {
+fun LandingView(
+	onBoard: () -> Unit
+) {
 	var confirm by remember { mutableStateOf(false) }
 	var tacAccept by remember { mutableStateOf(false) }
 	var ppAccept by remember { mutableStateOf(false) }
@@ -81,7 +83,7 @@ fun LandingView(signerDataModel: SignerDataModel) {
 		show = confirm,
 		header = "Accept terms and conditions and privacy policy?",
 		back = { confirm = false },
-		forward = { signerDataModel.onBoard() },
+		forward = { onBoard() },
 		backText = "Decline",
 		forwardText = "Accept"
 	)

@@ -23,8 +23,7 @@ import io.parity.signer.ui.theme.Bg200
 import org.json.JSONObject
 
 @Composable
-fun ExportPublicKey(signerDataModel: SignerDataModel) {
-	val address = signerDataModel.screenData.value ?: JSONObject()
+fun ExportPublicKey(screenData: JSONObject) {
 
 	Column(
 		modifier = Modifier
@@ -39,15 +38,15 @@ fun ExportPublicKey(signerDataModel: SignerDataModel) {
 				)
 				.fillMaxWidth()
 		) {
-			KeyCard(identity = address)
+			KeyCard(identity = screenData)
 		}
 		Row (
 			Modifier.padding(top = 3.dp, start = 12.dp, end = 12.dp)
 			) {
-			NetworkCard(address)
+			NetworkCard(screenData)
 		}
 		Image(
-			address.optString("qr").intoImageBitmap(),
+			screenData.optString("qr").intoImageBitmap(),
 			contentDescription = "QR with address to scan",
 			contentScale = ContentScale.FillWidth,
 			modifier = Modifier.padding(12.dp).fillMaxWidth(1f)
@@ -55,15 +54,15 @@ fun ExportPublicKey(signerDataModel: SignerDataModel) {
 		HeaderBar(line1 = "KEY DETAILS", line2 = "")
 		Row {
 			Text("Base58 key:")
-			Text(address.optString("base58"))
+			Text(screenData.optString("base58"))
 		}
 		Row {
 			Text("Hex key:")
-			Text(address.optString("pubkey"))
+			Text(screenData.optString("pubkey"))
 		}
 		Row {
 			Text("Seed name:")
-			Text(address.optString("seed_name"))
+			Text(screenData.optString("seed_name"))
 		}
 	}
 }

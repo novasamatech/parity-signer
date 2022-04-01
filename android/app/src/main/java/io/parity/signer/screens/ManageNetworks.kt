@@ -13,11 +13,11 @@ import io.parity.signer.components.NetworkCard
 import io.parity.signer.models.SignerDataModel
 import io.parity.signer.models.pushButton
 import org.json.JSONArray
+import org.json.JSONObject
 
 @Composable
-fun ManageNetworks(signerDataModel: SignerDataModel) {
-	val networks =
-		signerDataModel.screenData.value?.optJSONArray("networks") ?: JSONArray()
+fun ManageNetworks(screenData: JSONObject, button: (ButtonID, String) -> Unit) {
+	val networks = screenData.optJSONArray("networks") ?: JSONArray()
 	LazyColumn(
 		contentPadding = PaddingValues(horizontal = 8.dp),
 		verticalArrangement = Arrangement.spacedBy(10.dp)
@@ -25,9 +25,9 @@ fun ManageNetworks(signerDataModel: SignerDataModel) {
 		items(networks.length()) { index ->
 			val thisNetwork = networks.getJSONObject(index)
 			Row(Modifier.clickable {
-				signerDataModel.pushButton(
+				button(
 					ButtonID.GoForward,
-					details = thisNetwork.optString("key")
+					thisNetwork.optString("key")
 				)
 			}) {
 				NetworkCard(network = thisNetwork)

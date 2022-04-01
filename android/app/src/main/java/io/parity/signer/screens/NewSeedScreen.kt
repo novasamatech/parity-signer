@@ -17,11 +17,13 @@ import io.parity.signer.models.SignerDataModel
 import io.parity.signer.models.decode64
 import io.parity.signer.models.encode64
 import io.parity.signer.ui.theme.Text600
+import org.json.JSONObject
 
 @Composable
 fun NewSeedScreen(
-	button: (button: ButtonID, details: String) -> Unit,
-	signerDataModel: SignerDataModel
+	screenData: JSONObject,
+	seedNames: Array<String>,
+	button: (button: ButtonID, details: String) -> Unit
 ) {
 	val seedName = remember { mutableStateOf("") }
 	val focusManager = LocalFocusManager.current
@@ -40,10 +42,9 @@ fun NewSeedScreen(
 			content = seedName,
 			update = {
 				seedName.value = it
-				signerDataModel.clearError()
 			},
 			onDone = {
-				if (seedName.value.isNotBlank() && (signerDataModel.seedNames.value?.contains(seedName.value.encode64()) == false)) {
+				if (seedName.value.isNotBlank() && !seedNames.contains(seedName.value.encode64())) {
 					button(ButtonID.GoForward, seedName.value.encode64())
 				}
 			},
@@ -62,15 +63,15 @@ fun NewSeedScreen(
 				focusManager.clearFocus()
 				button(ButtonID.GoForward, seedName.value.encode64())
 			},
-			isDisabled = seedName.value.isBlank() || (signerDataModel.seedNames.value?.contains(seedName.value.encode64()) != false)
+			isDisabled = seedName.value.isBlank() || seedNames.contains(seedName.value.encode64())
 		)
 	}
 	DisposableEffect(Unit) {
-		if (signerDataModel.screenData.value?.optBoolean("keyboard") == true) {
+		if (screenData.optBoolean("keyboard")) {
 			focusRequester.requestFocus()
 		}
 		seedName.value =
-			signerDataModel.screenData.value?.optString("seed_name")?.decode64() ?: ""
+			screenData.optString("seed_name")?.decode64() ?: ""
 		onDispose { focusManager.clearFocus() }
 	}
 }

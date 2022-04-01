@@ -9,13 +9,12 @@ import io.parity.signer.models.SignerDataModel
 import org.json.JSONObject
 
 @Composable
-fun LogDetails(signerDataModel: SignerDataModel) {
-	val content = signerDataModel.screenData.value?: JSONObject()
+fun LogDetails(screenData: JSONObject) {
 	Column {
-		Text(content.optString("timestamp"))
+		Text(screenData.optString("timestamp"))
 		LazyColumn {
-			items(content.optJSONArray("events")?.length() ?: 0) { index ->
-				HistoryCardExtended(card = content.getJSONArray("events").getJSONObject(index))
+			items(screenData.optJSONArray("events")?.length() ?: 0) { index ->
+				HistoryCardExtended(card = screenData.getJSONArray("events").getJSONObject(index))
 			}
 		}
 	}
