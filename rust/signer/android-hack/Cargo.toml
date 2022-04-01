@@ -17,8 +17,12 @@ navigator = {path = "../navigator", default-features = false}
 qr_reader_phone = {path = "..//qr_reader_phone"}
 rustc-hex = "2.1.0"
 transaction_parsing = {path = "../transaction_parsing", default-features = false}
-transaction_signing = {path = "../transaction_signing", default-features = false}
+transaction_signing = {path = "../transaction_signing", default-features = false
 zeroize = {version = "1.3.0", features = ["zeroize_derive"]}
+
+[build-dependencies]
+definitions = {path = "../definitions"}
+generate_message = {path = "../generate_message"}
 
 [lib]
 name = "signer"
@@ -26,4 +30,5 @@ crate-type = ["staticlib", "cdylib"]
 
 [features]
 default = ["jni"]
+
 

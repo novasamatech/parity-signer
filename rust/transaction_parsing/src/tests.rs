@@ -683,6 +683,21 @@ mod tests {
     }
 
     #[test]
+    fn parse_msg_2() {
+        let dbname = "for_tests/parse_msg_2";
+        populate_cold(dbname, Verifier(None)).unwrap();
+        // sneaking one extra byte in the text body
+        let line = "530103d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27df5064c6f72656d20697073756d20646f6c6f722073697420616d65742c20636f6e73656374657475722061646970697363696e6720656c69742c2073656420646f20656975736d6f642074656d706f7220696e6369646964756e74207574206c61626f726520657420646f6c6f7265206d61676e6120616c697175612e20557420656e696d206164206d696e696d2076656e69616d2c2071756973206e6f737472756420657865726369746174696f6e20756c6c616d636f206c61626f726973206e69736920757420616c697175697020657820656120636f6d6d6f646f20636f6e7365717561742e2044756973206175746520697275726520646f6c6f7220696e20726570726568656e646572697420696e20766f6c7570746174652076656c697420657373652063696c6c756d20646f6c6f726520657520667567696174206e756c6c612070617269617475722e204578636570746575722073696e74206f6363616563617420637570696461746174206e6f6e2070726f6964656e742c2073756e7420696e2063756c706120717569206f666669636961206465736572756e74206d6f6c6c697420616e696d20696420657374206c6c61626f72756d2ee143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e";
+        let reply_known = r#""error":[{"index":0,"indent":0,"type":"error","payload":"Bad input data. Received message could not be read."}]"#;
+        let output = produce_output(line, dbname);
+        if let Action::Read(reply) = output {
+            assert!(reply == reply_known, "Received: \n{}", reply);
+        }
+        else {panic!("Wrong action {:?}", output)}
+        fs::remove_dir_all(dbname).unwrap();
+    }
+
+    #[test]
     fn import_derivations() {
         let dbname = "for_tests/import_derivations";
         populate_cold(dbname, Verifier(None)).unwrap();
@@ -697,5 +712,5 @@ mod tests {
         else {panic!("Wrong action {:?}", output)}
         fs::remove_dir_all(dbname).unwrap();
     }
-    
+   
 }

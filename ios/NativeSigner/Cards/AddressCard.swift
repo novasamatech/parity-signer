@@ -28,14 +28,14 @@ struct AddressCard: View {
                             Spacer()
                             HStack{
                                 Spacer()
-                                Image(systemName: address.multiselect ? "checkmark.circle.fill" : "circle").imageScale(.large)
+                                Image(systemName: address.multiselect == true ? "checkmark.circle.fill" : "circle").imageScale(.large)
                             }
                         }
                     }
                 }.frame(width: 30, height: 30)
                 VStack (alignment: .leading) {
                     HStack {
-                        Text(address.seed_name).foregroundColor(Color("Text600")).font(FBase(style: .subtitle1))
+                        Text(address.seed_name.decode64()).foregroundColor(Color("Text600")).font(FBase(style: .subtitle1))
                         Text(address.path)
                         if address.has_pwd {
                             Text("///").foregroundColor(Color("Crypto400"))

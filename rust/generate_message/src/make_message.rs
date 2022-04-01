@@ -106,7 +106,7 @@ pub fn make_message (make: Make) -> Result<(), ErrorActive> {
     };
     
     let output_name = match make.name {
-        Some(a) => format!("{}/{}", EXPORT_FOLDER, a),
+        Some(a) => a,
         None => format!("{}/{}", EXPORT_FOLDER, complete_name),
     };
     

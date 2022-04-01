@@ -327,6 +327,32 @@ pub fn derivation_check (seed_name: &str, path: &str, network_specs_key: &Networ
     }
 }
 
+/// Enum to describe derivation proposed
+pub enum DerivationCheck {
+    BadFormat, // bad format, still gets json back into UI
+    Password, // passworded, no dynamic checking for collisions
+    NoPassword(Option<(MultiSigner, AddressDetails)>), // no password and optional collision
+}
+
+/// Function to check if proposed address collides,
+/// i.e. if the proposed path for given seed name and network specs key already exists
+pub fn derivation_check (seed_name: &str, path: &str, network_specs_key: &NetworkSpecsKey, database_name: &str) -> Result<DerivationCheck, ErrorSigner> {
+    match is_passworded(path) {
+        Ok(true) => Ok(DerivationCheck::Password),
+        Ok(false) => {
+            let mut found_collision = None;
+            for (multisigner, address_details) in get_all_addresses(database_name)?.into_iter() {
+                if (address_details.seed_name == seed_name)&&(address_details.path == path)&&(address_details.network_id.contains(network_specs_key))&&(!address_details.has_pwd) {
+                    found_collision = Some((multisigner, address_details));
+                    break;
+                }
+            }
+            Ok(DerivationCheck::NoPassword(found_collision))
+        },
+        Err(_) => Ok(DerivationCheck::BadFormat)
+    }
+}
+
 /// Function to cut the password to be verified later in UI.
 /// Expects password, if sees no password, returns error.
 #[cfg(feature = "signer")]
@@ -474,4 +500,3 @@ pub fn prepare_derivations_export (encryption: &Encryption, genesis_hash: &[u8;3
     }
     Ok(ContentDerivations::generate(encryption, genesis_hash, &derivations))
 }
-

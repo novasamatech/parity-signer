@@ -9,6 +9,13 @@ pub struct Fountain {
     decoder: raptorq::Decoder,
     collected_ser_packets: Vec<Vec<u8>>,
     length: u32,
+    pub total: usize,
+}
+
+impl Fountain {
+    pub fn collected(&self) -> usize {
+        self.collected_ser_packets.len()
+    }
 }
 
 #[derive(PartialEq)]
@@ -42,11 +49,10 @@ pub fn process_decoded_payload (payload: Vec<u8>, mut decoding: InProgress) -> a
         let length_piece: [u8; 4] = payload[..4].to_vec().try_into().expect("constant vector slice size, always fits");
         let length = u32::from_be_bytes(length_piece)-0x80000000;
         let new_packet = payload[4..].to_vec();
-        let number_of_messages = length/(new_packet.len() as u32) + 2;
         match decoding {
             InProgress::None => {
+                let total = (length as usize)/new_packet.len() + 2;
                 let collected_ser_packets = vec![new_packet];
-                println!("collected {} packets, out of approx. {} expected", collected_ser_packets.len(), number_of_messages);
                 let config = raptorq::ObjectTransmissionInformation::with_defaults(length as u64, CHUNK_SIZE);
                 let mut decoder = raptorq::Decoder::new(config);
                 match try_fountain (&collected_ser_packets, &mut decoder) {
@@ -56,6 +62,7 @@ pub fn process_decoded_payload (payload: Vec<u8>, mut decoding: InProgress) -> a
                             decoder,
                             collected_ser_packets,
                             length,
+                            total,
                         };
                         decoding = InProgress::Fountain(in_progress);
                         Ok(Ready::NotYet(decoding))
@@ -66,7 +73,6 @@ pub fn process_decoded_payload (payload: Vec<u8>, mut decoding: InProgress) -> a
                 if in_progress.length != length {return Err(anyhow!("Was decoding fountain qr code with message length {}, got interrupted by fountain qr code with message length {}", in_progress.length, length))}
                 if !in_progress.collected_ser_packets.contains(&new_packet) {
                     in_progress.collected_ser_packets.push(new_packet);
-                    println!("collected {} packets, out of approx. {} expected", in_progress.collected_ser_packets.len(), number_of_messages);
                     match try_fountain (&in_progress.collected_ser_packets, &mut in_progress.decoder) {
                         Some(v) => Ok(Ready::Yes(v)),
                         None => Ok(Ready::NotYet(InProgress::Fountain(in_progress))),

@@ -305,7 +305,6 @@ pub fn purge_transactions (database_name: &str) -> Result<(), ErrorSigner> {
         .apply::<Signer>(database_name)
 }
 
-
 /// Function to display possible options of English code words from allowed words list
 /// that start with already entered piece
 pub(crate) fn guess (word_part: &str) -> Vec<&'static str> {
@@ -380,6 +379,7 @@ impl SeedDraft {
         }
         else {self.user_input.clear()}
     }
+  
     pub fn added(&mut self, word: &str, position: Option<u32>) -> bool {
         if self.saved.len() < BIP_CAP {
             let guesses = guess(word);
@@ -405,17 +405,20 @@ impl SeedDraft {
         }
         else {false}
     }
+  
     pub fn remove(&mut self, position: u32) {
         let position = position as usize;
         if position < self.saved.len() {
             self.saved.remove(position);
         }
     }
+
     pub fn remove_last(&mut self) {
         if !self.saved.is_empty() {
             self.saved.remove(self.saved.len()-1);
         }
     }
+  
     pub fn print(&self) -> String {
         let mut out = String::with_capacity(SAFE_RESERVE);
         out.push('[');
@@ -428,6 +431,7 @@ impl SeedDraft {
         out.push(']');
         out
     }
+  
     /// Combines all draft elements into seed phrase proposal,
     /// and checks its validity.
     /// If valid, outputs secret seed phrase.
@@ -443,6 +447,7 @@ impl SeedDraft {
             None
         }
     }
+  
     /// Function to output the user input back into user interface
     pub fn user_input(&self) -> &str {
         &self.user_input

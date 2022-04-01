@@ -1,5 +1,5 @@
-use std::env;
-use constants::FOLDER;
+use std::{env, path::PathBuf};
+use constants::{EXPORT_FOLDER, FOLDER};
 use definitions::{crypto::{Encryption, SufficientCrypto}, error_active::{Active, CommandBadArgument, CommandDoubleKey, CommandNeedArgument, CommandNeedKey, CommandParser, CommandUnexpected, ErrorActive, InputActive, NotHexActive}, helpers::unhex};
 use parity_scale_codec::Decode;
 use sp_core::{ed25519, sr25519, ecdsa};
@@ -25,7 +25,7 @@ pub enum Command {
     RestoreDefaults,
     MakeColdWithIdentities,
     TransferMeta,
-    MakeColdRelease,
+    MakeColdRelease(Option<PathBuf>),
     TransferMetaRelease,
     Derivations(Derivations),
     Unwasm{filename: String, update_db: bool},
@@ -164,7 +164,6 @@ impl Command {
                         let mut name = None;
                         let mut encryption_override_key = None;
                         let mut token = None;
-                        
                         while let Some(x) = args.next() {
                             let x = x.to_lowercase();
                             if x.starts_with('-') {
@@ -235,7 +234,7 @@ impl Command {
                             },
                             None => Set::T,
                         };
-                        
+
                         let encryption = match encryption_override_key {
                             Some(x) => {
                                 match x.as_str() {
@@ -248,7 +247,7 @@ impl Command {
                             None => None,
                         };
                         let over = Override{encryption, token};
-                        
+
                         let content = match content_key {
                             Some(x) => {
                                 match x.as_str() {
@@ -273,14 +272,14 @@ impl Command {
                             },
                             None => return Err(ErrorActive::CommandParser(CommandParser::NeedKey(CommandNeedKey::Content))),
                         };
-                        
+
                         let instruction = Instruction {
                             set,
                             content,
                             pass_errors,
                             over,
                         };
-                        
+
                         match arg.as_str() {
                             "load_metadata" => Ok(Command::Load(instruction)),
                             "add_specs" => Ok(Command::Specs(instruction)),
@@ -581,7 +580,7 @@ impl Command {
                             name,
                         };
                         Ok(Command::Make(make))
-                    },                
+                    },
                     "remove" => {
                         let mut info_found = None;
                         while let Some(a) = args.next() {

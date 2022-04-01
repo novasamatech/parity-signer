@@ -47,8 +47,7 @@ struct LandingView: View {
                 .alert(isPresented: $accept, content: {
                     Alert(
                         title: Text("Accept privacy policy?"),
-                        message: Text("Do you accept privacy policy?"),
-                        primaryButton: .destructive(Text("Decline")),
+                        primaryButton: .default(Text("Decline")),
                         secondaryButton: .default(Text("Accept"), action: {data.onboard()})
                     )
                 })

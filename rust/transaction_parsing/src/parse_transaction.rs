@@ -1,5 +1,5 @@
 use db_handling::{db_transactions::{TrDbColdSign, SignContent}, helpers::{try_get_network_specs, try_get_address_details}};
-use definitions::{error_signer::{ErrorSigner, InputSigner, NotFoundSigner, ParserError}, history::{Event, SignDisplay}, keyring::{AddressKey, NetworkSpecsKey}, users::AddressDetails};
+use definitions::{error::{ErrorSigner, InputSigner, NotFoundSigner, ParserError}, history::{Event, SignDisplay}, keyring::{AddressKey, NetworkSpecsKey}, users::AddressDetails};
 use parser::{cut_method_extensions, parse_extensions, parse_method, decoding_commons::OutputCard};
 
 use crate::Action;
@@ -121,6 +121,8 @@ pub (crate) fn parse_transaction (data_hex: &str, database_name: &str) -> Result
             match found_solution {
                 Some(a) => Ok(a),
                 None => Err(ErrorSigner::AllExtensionsParsingFailed{network_name: network_specs.name, errors: error_collection})
+                // author: [], hint: [], error: []
+
             }
         },
         None => {
@@ -150,7 +152,7 @@ pub (crate) fn decode_signable_from_history (found_signable: &SignDisplay, datab
     if meta_set.is_empty() {return Err(ErrorSigner::NotFound(NotFoundSigner::HistoricalMetadata{name: network_name}))}
     
     let (method_data, extensions_data) = cut_method_extensions(&parser_data).map_err(ErrorSigner::Parser)?;
-    
+  
     let mut found_solution = None;
     let mut error_collection: Vec<(u32, ParserError)> = Vec::new();
     let mut index = 0;
@@ -159,6 +161,7 @@ pub (crate) fn decode_signable_from_history (found_signable: &SignDisplay, datab
     for x in meta_set.iter() {
         let used_version = x.version();
         let metadata_bundle = bundle_from_meta_set_element(x, database_name)?;
+
         match parse_extensions (extensions_data.to_vec(), &metadata_bundle, &short_specs, None) {
             Ok(extensions_cards) => {
                 match parse_method (method_data, &metadata_bundle, &short_specs) {
