@@ -1,5 +1,5 @@
 use db_handling::{db_transactions::{TrDbColdSign, SignContent}, helpers::{try_get_network_specs, try_get_address_details}};
-use definitions::{error::{ErrorSigner, InputSigner, NotFoundSigner, ParserError}, history::{Event, SignDisplay}, keyring::{AddressKey, NetworkSpecsKey}, users::AddressDetails};
+use definitions::{error_signer::{ErrorSigner, InputSigner, NotFoundSigner, ParserError}, history::{Event, SignDisplay}, keyring::{AddressKey, NetworkSpecsKey}, users::AddressDetails};
 use parser::{cut_method_extensions, parse_extensions, parse_method, decoding_commons::OutputCard};
 
 use crate::Action;

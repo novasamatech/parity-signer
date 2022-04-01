@@ -13,7 +13,7 @@ members = [
 	"qr_reader_pc",
 	"qrcode_rtx",
 	"qrcode_static",
-#	"signer",
+	"signer",
 	"transaction_parsing",
 	"transaction_signing"
 ]

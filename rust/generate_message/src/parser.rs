@@ -1,5 +1,5 @@
 use std::{env, path::PathBuf};
-use constants::{EXPORT_FOLDER, FOLDER};
+use constants::FOLDER;
 use definitions::{crypto::{Encryption, SufficientCrypto}, error_active::{Active, CommandBadArgument, CommandDoubleKey, CommandNeedArgument, CommandNeedKey, CommandParser, CommandUnexpected, ErrorActive, InputActive, NotHexActive}, helpers::unhex};
 use parity_scale_codec::Decode;
 use sp_core::{ed25519, sr25519, ecdsa};
@@ -642,7 +642,7 @@ impl Command {
                     },
                     "make_cold_release" => {
                         if args.next().is_some() {Err(ErrorActive::CommandParser(CommandParser::UnexpectedKeyArgumentSequence))}
-                        else {Ok(Command::MakeColdRelease)}
+                        else {Ok(Command::MakeColdRelease(None))}
                     },
                     "transfer_meta_to_cold_release" => {
                         if args.next().is_some() {Err(ErrorActive::CommandParser(CommandParser::UnexpectedKeyArgumentSequence))}
