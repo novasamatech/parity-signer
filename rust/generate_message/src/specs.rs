@@ -229,7 +229,7 @@ mod tests {
     fn mass_fetch() {
         let address_set = [
             "wss://rpc.polkadot.io",
-            "wss://statemint-rpc.polkadot.io",
+/*            "wss://statemint-rpc.polkadot.io",
             "wss://acala-polkadot.api.onfinality.io/public-ws",
 //            "wss://wss.odyssey.aresprotocol.io", // error502
             "wss://rpc.astar.network",
@@ -243,8 +243,8 @@ mod tests {
             "wss://rpc.parallel.fi",
             "wss://mainnet.polkadex.trade",
             "wss://ws.unique.network/",
-            "wss://kusama-rpc.polkadot.io",
-            "wss://statemine-rpc.polkadot.io",
+*/            "wss://kusama-rpc.polkadot.io",
+/*            "wss://statemine-rpc.polkadot.io",
 //            "wss://encointer.api.onfinality.io/public-ws", // Base58PrefixMismatch { specs: 2, meta: 42 }
             "wss://fullnode.altair.centrifuge.io",
             "wss://rpc-01.basilisk.hydradx.io",
@@ -273,8 +273,8 @@ mod tests {
             "wss://para.subsocial.network",
             "wss://rpc.kusama.standard.tech",
             "wss://rpc-0.zeitgeist.pm",
-            "wss://westend-rpc.polkadot.io",
-            "wss://westmint-rpc.polkadot.io",
+*/            "wss://westend-rpc.polkadot.io",
+/*            "wss://westmint-rpc.polkadot.io",
             "wss://fullnode-collator.charcoal.centrifuge.io",
             "wss://teerw1.integritee.network",
             "wss://westend.kylin-node.co.uk",
@@ -374,7 +374,7 @@ mod tests {
             "wss://testnet.web3games.org",
 //            "wss://test1.zcloak.network", // error502
             "wss://bsr.zeitgeist.pm",
-//            "wss://alphaville.zero.io", // error502
+//            "wss://alphaville.zero.io", // error502*/
         ];
         let mut all_clear = true;
         for address in address_set {
