@@ -1,11 +1,10 @@
 #![deny(unused_crate_dependencies)]
 
-#[cfg(feature = "active")]
-
-use std::path::PathBuf;
 use constants::{COLD_DB_NAME, COLD_DB_NAME_RELEASE, HOT_DB_NAME};
 #[cfg(feature = "active")]
 use definitions::{error_active::ErrorActive, network_specs::Verifier};
+#[cfg(feature = "active")]
+use std::path::PathBuf;
 
 pub mod cold_default;
 
@@ -49,7 +48,7 @@ use hot_default::reset_hot_database;
 /// Note that this operation is performed NOT on Signer device,
 /// so ErrorActive is used
 #[cfg(feature = "active")]
-pub fn default_cold_release (path: Option<PathBuf>) -> Result<(), ErrorActive> {
+pub fn default_cold_release(path: Option<PathBuf>) -> Result<(), ErrorActive> {
     let database_name = match path {
         Some(ref path) => path.to_str().unwrap_or(COLD_DB_NAME_RELEASE),
         None => COLD_DB_NAME_RELEASE,
@@ -63,7 +62,7 @@ pub fn default_cold_release (path: Option<PathBuf>) -> Result<(), ErrorActive> {
 /// Note that this operation is performed NOT on Signer device,
 /// so ErrorActive is used
 #[cfg(feature = "active")]
-pub fn default_cold () -> Result<(), ErrorActive> {
+pub fn default_cold() -> Result<(), ErrorActive> {
     let database_name = COLD_DB_NAME;
     populate_cold(database_name, Verifier(None))
 }
@@ -71,8 +70,7 @@ pub fn default_cold () -> Result<(), ErrorActive> {
 /// Function to reset default "hot" database.
 /// Active side operation, ErrorActive is used
 #[cfg(feature = "active")]
-pub fn default_hot () -> Result<(), ErrorActive> {
+pub fn default_hot() -> Result<(), ErrorActive> {
     let database_name = HOT_DB_NAME;
     reset_hot_database(database_name)
 }
-

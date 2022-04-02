@@ -1,16 +1,34 @@
-use sp_core::crypto::{Ss58Codec, Ss58AddressFormat};
+use sp_core::crypto::{Ss58AddressFormat, Ss58Codec};
 use sp_runtime::{generic::Era, MultiSigner};
 
-use definitions::{crypto::Encryption, error::ErrorSource, error_signer::{ErrorSigner, Signer}, helpers::{make_identicon_from_multisigner, print_multisigner_as_base58}, history::MetaValuesDisplay, keyring::VerifierKey, network_specs::{NetworkSpecs, NetworkSpecsToSend, VerifierValue}, print::{export_complex_single, export_plain_vector}, qr_transfers::ContentLoadTypes, users::AddressDetails};
+use definitions::{
+    crypto::Encryption,
+    error::ErrorSource,
+    error_signer::{ErrorSigner, Signer},
+    helpers::{make_identicon_from_multisigner, print_multisigner_as_base58},
+    history::MetaValuesDisplay,
+    keyring::VerifierKey,
+    network_specs::{NetworkSpecs, NetworkSpecsToSend, VerifierValue},
+    print::{export_complex_single, export_plain_vector},
+    qr_transfers::ContentLoadTypes,
+    users::AddressDetails,
+};
 use parser::cards::ParserCard;
 use plot_icon::generate_png_scaled_default;
 
 use crate::holds::{GeneralHold, Hold};
 
-pub (crate) enum Card <'a> {
+pub(crate) enum Card<'a> {
     ParserCard(&'a ParserCard),
-    Author {author: &'a MultiSigner, base58prefix: u16, address_details: &'a AddressDetails},
-    AuthorPlain {author: &'a MultiSigner, base58prefix: u16},
+    Author {
+        author: &'a MultiSigner,
+        base58prefix: u16,
+        address_details: &'a AddressDetails,
+    },
+    AuthorPlain {
+        author: &'a MultiSigner,
+        base58prefix: u16,
+    },
     AuthorPublicKey(&'a MultiSigner),
     Verifier(&'a VerifierValue),
     Meta(MetaValuesDisplay),
@@ -19,28 +37,40 @@ pub (crate) enum Card <'a> {
     NetworkInfo(&'a NetworkSpecs),
     NetworkGenesisHash(&'a [u8]),
     Derivations(&'a [String]),
-    Warning (Warning <'a>),
-    Error (ErrorSigner),
+    Warning(Warning<'a>),
+    Error(ErrorSigner),
 }
 
-pub (crate) enum Warning <'a> {
+pub(crate) enum Warning<'a> {
     AuthorNotFound,
-    NewerVersion {used_version: u32, latest_version: u32},
+    NewerVersion {
+        used_version: u32,
+        latest_version: u32,
+    },
     NoNetworkID,
     NotVerified,
     UpdatingTypes,
     TypesNotVerified,
     GeneralVerifierAppeared(&'a GeneralHold),
-    VerifierChangingToGeneral{verifier_key: &'a VerifierKey, hold: &'a Hold},
-    VerifierChangingToCustom{verifier_key: &'a VerifierKey, hold: &'a Hold},
-    VerifierGeneralSuper{verifier_key: &'a VerifierKey, hold: &'a Hold},
+    VerifierChangingToGeneral {
+        verifier_key: &'a VerifierKey,
+        hold: &'a Hold,
+    },
+    VerifierChangingToCustom {
+        verifier_key: &'a VerifierKey,
+        hold: &'a Hold,
+    },
+    VerifierGeneralSuper {
+        verifier_key: &'a VerifierKey,
+        hold: &'a Hold,
+    },
     TypesAlreadyThere,
     NetworkSpecsAlreadyThere(&'a str), // network title
     MetadataExtensionsIncomplete,
 }
 
-impl <'a> Warning <'a> {
-    pub (crate) fn show (&self) -> String {
+impl<'a> Warning<'a> {
+    pub(crate) fn show(&self) -> String {
         match &self {
             Warning::AuthorNotFound => String::from("Transaction author public key not found."),
             Warning::NewerVersion {used_version, latest_version} => format!("Transaction uses outdated runtime version {}. Latest known available version is {}.", used_version, latest_version),
@@ -59,14 +89,17 @@ impl <'a> Warning <'a> {
     }
 }
 
-fn fancy (index: &mut u32, indent: u32, card_type: &str, decoded_string: &str) -> String {
-    let out = format!("{{\"index\":{},\"indent\":{},\"type\":\"{}\",\"payload\":{}}}", index, indent, card_type, decoded_string);
+fn fancy(index: &mut u32, indent: u32, card_type: &str, decoded_string: &str) -> String {
+    let out = format!(
+        "{{\"index\":{},\"indent\":{},\"type\":\"{}\",\"payload\":{}}}",
+        index, indent, card_type, decoded_string
+    );
     *index += 1;
     out
 }
 
-impl <'a> Card <'a> {
-    pub (crate) fn card (&self, index: &mut u32, indent: u32) -> String {
+impl<'a> Card<'a> {
+    pub(crate) fn card(&self, index: &mut u32, indent: u32) -> String {
         match &self {
             Card::ParserCard (m) => match m {
                 ParserCard::Pallet (pallet_name) => fancy(index, indent, "pallet", &format!("\"{}\"", pallet_name)),
@@ -116,7 +149,10 @@ impl <'a> Card <'a> {
     }
 }
 
-
-pub (crate) fn make_author_info (author: &MultiSigner, base58prefix: u16, address_details: &AddressDetails) -> String {
+pub(crate) fn make_author_info(
+    author: &MultiSigner,
+    base58prefix: u16,
+    address_details: &AddressDetails,
+) -> String {
     format!("\"base58\":\"{}\",\"identicon\":\"{}\",\"seed\":\"{}\",\"derivation_path\":\"{}\",\"has_pwd\":{}", print_multisigner_as_base58(author, Some(base58prefix)), hex::encode(make_identicon_from_multisigner(author)), address_details.seed_name, address_details.path, address_details.has_pwd)
 }

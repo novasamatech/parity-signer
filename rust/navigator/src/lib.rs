@@ -2,24 +2,23 @@
 //! Ideally it should replace almost everything and become the only interface
 
 //do we support mutex?
-use std::sync::{Mutex, TryLockError};
 use lazy_static::lazy_static;
+use std::sync::{Mutex, TryLockError};
 
 use definitions::{error_signer::Signer, keyring::NetworkSpecsKey};
 
 mod actions;
-    use actions::Action;
+use actions::Action;
 pub mod alerts;
 pub mod modals;
 mod navstate;
-    use navstate::{Navstate, State};
+use navstate::{Navstate, State};
 pub mod screens;
 #[cfg(feature = "test")]
 mod tests;
 
-
 //TODO: multithread here some day!
-lazy_static!{
+lazy_static! {
 ///Navigation state of the app
 ///
 ///Navigation state is unsafe either way, since it has to persist
@@ -35,11 +34,7 @@ lazy_static!{
 }
 
 ///This should be called from UI; returns new UI information as JSON
-pub fn do_action(
-    action_str: &str,
-    details_str: &str,
-    secret_seed_phrase: &str,
-) -> String {
+pub fn do_action(action_str: &str, details_str: &str, secret_seed_phrase: &str) -> String {
     //If can't lock - debounce failed, ignore action
     //
     //guard is defined here to outline lifetime properly
@@ -49,21 +44,18 @@ pub fn do_action(
             let action = Action::parse(action_str);
             let details = (*state).perform(action, details_str, secret_seed_phrase);
             (*state).generate_json(&details)
-        },
+        }
         Err(TryLockError::Poisoned(_)) => {
             //TODO: maybe more grace here?
             //Maybe just silently restart navstate? But is it safe?
             panic!("Concurrency error! Restart the app.");
-         },
+        }
         Err(TryLockError::WouldBlock) => "".to_string(),
     }
 }
 
 ///Should be called in the beginning to recall things stored only by phone
-pub fn init_navigation(
-    dbname: &str,
-    seed_names: &str,
-) {
+pub fn init_navigation(dbname: &str, seed_names: &str) {
     //This operation has to happen; lock thread and do not ignore.
     let guard = STATE.lock();
     match guard {
@@ -77,16 +69,20 @@ pub fn init_navigation(
                 (*navstate).seed_names = Vec::new();
             }
             match db_handling::network_details::get_all_networks::<Signer>(dbname) {
-                Ok(a) => for x in a.iter() {
-                    (*navstate).networks.push(NetworkSpecsKey::from_parts(&x.genesis_hash, &x.encryption));
-                },
+                Ok(a) => {
+                    for x in a.iter() {
+                        (*navstate)
+                            .networks
+                            .push(NetworkSpecsKey::from_parts(&x.genesis_hash, &x.encryption));
+                    }
+                }
                 Err(e) => println!("No networks could be fetched: {:?}", e),
             };
-        },
+        }
         Err(_) => {
             //TODO: maybe more grace here?
             panic!("Concurrency error! Restart the app.");
-         },
+        }
     }
 }
 
@@ -102,10 +98,10 @@ pub fn update_seed_names(seed_names: &str) {
             } else {
                 (*navstate).seed_names = Vec::new();
             }
-        },
+        }
         Err(_) => {
             //TODO: maybe more grace here?
             panic!("Concurrency error! Restart the app.");
-         },
+        }
     }
 }

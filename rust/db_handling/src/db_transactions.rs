@@ -3,9 +3,9 @@ use sled::{Batch, Transactional};
 #[cfg(feature = "signer")]
 use sp_runtime::MultiSigner;
 
-use constants::{ADDRTREE, HISTORY, METATREE, SETTREE, SPECSTREE, TRANSACTION, VERIFIERS};
 #[cfg(feature = "active")]
 use constants::{ADDRESS_BOOK, SPECSTREEPREP};
+use constants::{ADDRTREE, HISTORY, METATREE, SETTREE, SPECSTREE, TRANSACTION, VERIFIERS};
 #[cfg(feature = "signer")]
 use constants::{DRV, GENERALVERIFIER, SIGN, STUB, TYPES};
 
@@ -13,12 +13,29 @@ use definitions::error::ErrorSource;
 #[cfg(feature = "active")]
 use definitions::error_active::{Active, ErrorActive};
 #[cfg(feature = "signer")]
-use definitions::{error_signer::{DatabaseSigner, EntryDecodingSigner, ErrorSigner, NotFoundSigner, Signer}, helpers::multisigner_to_public, history::{Event, IdentityHistory, MetaValuesDisplay, NetworkSpecsDisplay, NetworkVerifierDisplay, SignDisplay, SignMessageDisplay, TypesDisplay}, keyring::{AddressKey, MetaKey, NetworkSpecsKey, VerifierKey}, metadata::MetaValues, network_specs::{NetworkSpecs, NetworkSpecsToSend, CurrentVerifier, ValidCurrentVerifier, Verifier, VerifierValue}, qr_transfers::ContentLoadTypes, users::AddressDetails};
+use definitions::{
+    error_signer::{DatabaseSigner, EntryDecodingSigner, ErrorSigner, NotFoundSigner, Signer},
+    helpers::multisigner_to_public,
+    history::{
+        Event, IdentityHistory, MetaValuesDisplay, NetworkSpecsDisplay, NetworkVerifierDisplay,
+        SignDisplay, SignMessageDisplay, TypesDisplay,
+    },
+    keyring::{AddressKey, MetaKey, NetworkSpecsKey, VerifierKey},
+    metadata::MetaValues,
+    network_specs::{
+        CurrentVerifier, NetworkSpecs, NetworkSpecsToSend, ValidCurrentVerifier, Verifier,
+        VerifierValue,
+    },
+    qr_transfers::ContentLoadTypes,
+    users::AddressDetails,
+};
 
 use crate::helpers::{open_db, open_tree};
 #[cfg(feature = "signer")]
-use crate::{helpers::{make_batch_clear_tree, verify_checksum}, manage_history::events_to_batch};
-
+use crate::{
+    helpers::{make_batch_clear_tree, verify_checksum},
+    manage_history::events_to_batch,
+};
 
 pub struct TrDbCold {
     for_addresses: Batch,
@@ -80,8 +97,7 @@ impl BatchStub {
     }
 }
 
-
-/// Hot database contains following trees: 
+/// Hot database contains following trees:
 /// address_book tree, by default filled with values for standard networks;
 /// metadata tree, by default empty;
 /// network_specs_prep tree, by default filled with values for standard networks;
@@ -127,17 +143,19 @@ impl TrDbHot {
         let metadata = open_tree::<Active>(&database, METATREE)?;
         let network_specs_prep = open_tree::<Active>(&database, SPECSTREEPREP)?;
         let settings = open_tree::<Active>(&database, SETTREE)?;
-        match (&address_book, &metadata, &network_specs_prep, &settings).transaction(|(tx_address_book, tx_metadata, tx_network_specs_prep, tx_settings)| {
-            tx_address_book.apply_batch(&self.for_address_book)?;
-            tx_address_book.flush();
-            tx_metadata.apply_batch(&self.for_metadata)?;
-            tx_metadata.flush();
-            tx_network_specs_prep.apply_batch(&self.for_network_specs_prep)?;
-            tx_network_specs_prep.flush();
-            tx_settings.apply_batch(&self.for_settings)?;
-            tx_settings.flush();
-            Ok(())
-        }) {
+        match (&address_book, &metadata, &network_specs_prep, &settings).transaction(
+            |(tx_address_book, tx_metadata, tx_network_specs_prep, tx_settings)| {
+                tx_address_book.apply_batch(&self.for_address_book)?;
+                tx_address_book.flush();
+                tx_metadata.apply_batch(&self.for_metadata)?;
+                tx_metadata.flush();
+                tx_network_specs_prep.apply_batch(&self.for_network_specs_prep)?;
+                tx_network_specs_prep.flush();
+                tx_settings.apply_batch(&self.for_settings)?;
+                tx_settings.flush();
+                Ok(())
+            },
+        ) {
             Ok(()) => Ok(()),
             Err(e) => Err(<Active>::db_transaction(e)),
         }
@@ -151,7 +169,7 @@ impl Default for TrDbHot {
     }
 }
 
-/// Cold database contains following trees: 
+/// Cold database contains following trees:
 /// address tree, empty for release and populated with Alice-related addresses for test database;
 /// history tree, populated by history event entries; in "fresh start" contains only message that db was initiated;
 /// metadata tree, populated by default with metadata of kusama, polkadot, rococo, and westend;
@@ -222,24 +240,42 @@ impl TrDbCold {
         let settings = open_tree::<T>(&database, SETTREE)?;
         let transaction = open_tree::<T>(&database, TRANSACTION)?;
         let verifiers = open_tree::<T>(&database, VERIFIERS)?;
-        match (&addresses, &history, &metadata, &network_specs, &settings, &transaction, &verifiers)
-            .transaction(|(tx_addresses, tx_history, tx_metadata, tx_network_specs, tx_settings, tx_transaction, tx_verifiers)| {
-                tx_addresses.apply_batch(&self.for_addresses)?;
-                tx_addresses.flush();
-                tx_history.apply_batch(&self.for_history)?;
-                tx_history.flush();
-                tx_metadata.apply_batch(&self.for_metadata)?;
-                tx_metadata.flush();
-                tx_network_specs.apply_batch(&self.for_network_specs)?;
-                tx_network_specs.flush();
-                tx_settings.apply_batch(&self.for_settings)?;
-                tx_settings.flush();
-                tx_transaction.apply_batch(&self.for_transaction)?;
-                tx_transaction.flush();
-                tx_verifiers.apply_batch(&self.for_verifiers)?;
-                tx_verifiers.flush();
-                Ok(())
-        }) {
+        match (
+            &addresses,
+            &history,
+            &metadata,
+            &network_specs,
+            &settings,
+            &transaction,
+            &verifiers,
+        )
+            .transaction(
+                |(
+                    tx_addresses,
+                    tx_history,
+                    tx_metadata,
+                    tx_network_specs,
+                    tx_settings,
+                    tx_transaction,
+                    tx_verifiers,
+                )| {
+                    tx_addresses.apply_batch(&self.for_addresses)?;
+                    tx_addresses.flush();
+                    tx_history.apply_batch(&self.for_history)?;
+                    tx_history.flush();
+                    tx_metadata.apply_batch(&self.for_metadata)?;
+                    tx_metadata.flush();
+                    tx_network_specs.apply_batch(&self.for_network_specs)?;
+                    tx_network_specs.flush();
+                    tx_settings.apply_batch(&self.for_settings)?;
+                    tx_settings.flush();
+                    tx_transaction.apply_batch(&self.for_transaction)?;
+                    tx_transaction.flush();
+                    tx_verifiers.apply_batch(&self.for_verifiers)?;
+                    tx_verifiers.flush();
+                    Ok(())
+                },
+            ) {
             Ok(()) => Ok(()),
             Err(e) => Err(<T>::db_transaction(e)),
         }
@@ -297,7 +333,9 @@ impl TrDbColdStub {
             .apply::<Signer>(database_name)?;
         match Self::decode(&mut &stub_encoded[..]) {
             Ok(a) => Ok(a),
-            Err(_) => Err(ErrorSigner::Database(DatabaseSigner::EntryDecoding(EntryDecodingSigner::Stub))),
+            Err(_) => Err(ErrorSigner::Database(DatabaseSigner::EntryDecoding(
+                EntryDecodingSigner::Stub,
+            ))),
         }
     }
     /// function to put TrDbColdStub into storage in the database
@@ -321,8 +359,11 @@ impl TrDbColdStub {
     /// function to put metadata unit in addition queue in TrDbColdStub
     pub fn add_metadata(mut self, meta_values: &MetaValues) -> Self {
         let meta_key = MetaKey::from_parts(&meta_values.name, meta_values.version);
-        self.metadata_stub = self.metadata_stub.new_addition(meta_key.key(), meta_values.meta.to_vec());
-        self.history_stub.push(Event::MetadataAdded(MetaValuesDisplay::get(meta_values)));
+        self.metadata_stub = self
+            .metadata_stub
+            .new_addition(meta_key.key(), meta_values.meta.to_vec());
+        self.history_stub
+            .push(Event::MetadataAdded(MetaValuesDisplay::get(meta_values)));
         self
     }
     /// function to put meta_key in removal queue in TrDbColdStub
@@ -330,30 +371,66 @@ impl TrDbColdStub {
     pub fn remove_metadata(mut self, meta_values: &MetaValues) -> Self {
         let meta_key = MetaKey::from_parts(&meta_values.name, meta_values.version);
         self.metadata_stub = self.metadata_stub.new_removal(meta_key.key());
-        self.history_stub.push(Event::MetadataRemoved(MetaValuesDisplay::get(meta_values)));
+        self.history_stub
+            .push(Event::MetadataRemoved(MetaValuesDisplay::get(meta_values)));
         self
     }
     /// function to put network_specs unit in addition queue in TrDbColdStub
-    pub fn add_network_specs(mut self, network_specs_to_send: &NetworkSpecsToSend, valid_current_verifier: &ValidCurrentVerifier, general_verifier: &Verifier, database_name: &str) -> Result<Self, ErrorSigner> {
-        let network_specs_key = NetworkSpecsKey::from_parts(&network_specs_to_send.genesis_hash, &network_specs_to_send.encryption);
+    pub fn add_network_specs(
+        mut self,
+        network_specs_to_send: &NetworkSpecsToSend,
+        valid_current_verifier: &ValidCurrentVerifier,
+        general_verifier: &Verifier,
+        database_name: &str,
+    ) -> Result<Self, ErrorSigner> {
+        let network_specs_key = NetworkSpecsKey::from_parts(
+            &network_specs_to_send.genesis_hash,
+            &network_specs_to_send.encryption,
+        );
         let order = {
             let database = open_db::<Signer>(database_name)?;
             let chainspecs = open_tree::<Signer>(&database, SPECSTREE)?;
             chainspecs.len()
         } as u8;
         let network_specs = network_specs_to_send.to_store(order);
-        self.network_specs_stub = self.network_specs_stub.new_addition(network_specs_key.key(), network_specs.encode());
-        self.history_stub.push(Event::NetworkSpecsAdded(NetworkSpecsDisplay::get(&network_specs, valid_current_verifier, general_verifier)));
+        self.network_specs_stub = self
+            .network_specs_stub
+            .new_addition(network_specs_key.key(), network_specs.encode());
+        self.history_stub
+            .push(Event::NetworkSpecsAdded(NetworkSpecsDisplay::get(
+                &network_specs,
+                valid_current_verifier,
+                general_verifier,
+            )));
         {
             let database = open_db::<Signer>(database_name)?;
             let identities = open_tree::<Signer>(&database, ADDRTREE)?;
             for (address_key_vec, address_entry) in identities.iter().flatten() {
                 let address_key = AddressKey::from_ivec(&address_key_vec);
-                let (multisigner, mut address_details) = AddressDetails::process_entry_with_key_checked::<Signer>(&address_key, address_entry)?;
-                if address_details.path.is_empty() && !address_details.has_pwd && (address_details.encryption == network_specs.encryption) && !address_details.network_id.contains(&network_specs_key) {
-                    address_details.network_id.push(network_specs_key.to_owned());
-                    self.addresses_stub = self.addresses_stub.new_addition(address_key.key(), address_details.encode());
-                    self.history_stub.push(Event::IdentityAdded(IdentityHistory::get(&address_details.seed_name, &address_details.encryption, &multisigner_to_public(&multisigner), &address_details.path, &network_specs.genesis_hash)));
+                let (multisigner, mut address_details) =
+                    AddressDetails::process_entry_with_key_checked::<Signer>(
+                        &address_key,
+                        address_entry,
+                    )?;
+                if address_details.path.is_empty()
+                    && !address_details.has_pwd
+                    && (address_details.encryption == network_specs.encryption)
+                    && !address_details.network_id.contains(&network_specs_key)
+                {
+                    address_details
+                        .network_id
+                        .push(network_specs_key.to_owned());
+                    self.addresses_stub = self
+                        .addresses_stub
+                        .new_addition(address_key.key(), address_details.encode());
+                    self.history_stub
+                        .push(Event::IdentityAdded(IdentityHistory::get(
+                            &address_details.seed_name,
+                            &address_details.encryption,
+                            &multisigner_to_public(&multisigner),
+                            &address_details.path,
+                            &network_specs.genesis_hash,
+                        )));
                 }
             }
         }
@@ -361,35 +438,70 @@ impl TrDbColdStub {
     }
     /// function to put network_specs_key in removal queue in TrDbColdStub
     /// is used for clean up when the general verifier or network verifier is reset
-    pub fn remove_network_specs(mut self, network_specs: &NetworkSpecs, valid_current_verifier: &ValidCurrentVerifier, general_verifier: &Verifier) -> Self {
-        let network_specs_key = NetworkSpecsKey::from_parts(&network_specs.genesis_hash, &network_specs.encryption);
+    pub fn remove_network_specs(
+        mut self,
+        network_specs: &NetworkSpecs,
+        valid_current_verifier: &ValidCurrentVerifier,
+        general_verifier: &Verifier,
+    ) -> Self {
+        let network_specs_key =
+            NetworkSpecsKey::from_parts(&network_specs.genesis_hash, &network_specs.encryption);
         self.network_specs_stub = self.network_specs_stub.new_removal(network_specs_key.key());
-        self.history_stub.push(Event::NetworkSpecsRemoved(NetworkSpecsDisplay::get(network_specs, valid_current_verifier, general_verifier)));
+        self.history_stub
+            .push(Event::NetworkSpecsRemoved(NetworkSpecsDisplay::get(
+                network_specs,
+                valid_current_verifier,
+                general_verifier,
+            )));
         self
     }
     /// function to put new general verifier in addition queue in TrDbColdStub
     pub fn new_general_verifier(mut self, general_verifier: &Verifier) -> Self {
-        self.settings_stub = self.settings_stub.new_addition(GENERALVERIFIER.to_vec(), general_verifier.encode());
-        self.history_stub.push(Event::GeneralVerifierSet(general_verifier.to_owned()));
+        self.settings_stub = self
+            .settings_stub
+            .new_addition(GENERALVERIFIER.to_vec(), general_verifier.encode());
+        self.history_stub
+            .push(Event::GeneralVerifierSet(general_verifier.to_owned()));
         self
     }
     /// function to put new types entry in addition queue in TrDbColdStub
     pub fn add_types(mut self, types: &ContentLoadTypes, general_verifier: &Verifier) -> Self {
-        self.settings_stub = self.settings_stub.new_addition(TYPES.to_vec(), types.store());
-        self.history_stub.push(Event::TypesAdded(TypesDisplay::get(types, general_verifier)));
+        self.settings_stub = self
+            .settings_stub
+            .new_addition(TYPES.to_vec(), types.store());
+        self.history_stub.push(Event::TypesAdded(TypesDisplay::get(
+            types,
+            general_verifier,
+        )));
         self
     }
     /// function to put types in removal queue in TrDbColdStub
     /// is used for clean up when the general verifier is reset
     pub fn remove_types(mut self, types: &ContentLoadTypes, general_verifier: &Verifier) -> Self {
         self.settings_stub = self.settings_stub.new_removal(TYPES.to_vec());
-        self.history_stub.push(Event::TypesAdded(TypesDisplay::get(types, general_verifier)));
+        self.history_stub.push(Event::TypesAdded(TypesDisplay::get(
+            types,
+            general_verifier,
+        )));
         self
     }
     /// function to put new network verifier in addition queue in TrDbColdStub
-    pub fn new_network_verifier(mut self, verifier_key: &VerifierKey, valid_current_verifier: &ValidCurrentVerifier, general_verifier: &Verifier) -> Self {
-        self.verifiers_stub = self.verifiers_stub.new_addition(verifier_key.key(), CurrentVerifier::Valid(valid_current_verifier.to_owned()).encode());
-        self.history_stub.push(Event::NetworkVerifierSet(NetworkVerifierDisplay::get(verifier_key, valid_current_verifier, general_verifier)));
+    pub fn new_network_verifier(
+        mut self,
+        verifier_key: &VerifierKey,
+        valid_current_verifier: &ValidCurrentVerifier,
+        general_verifier: &Verifier,
+    ) -> Self {
+        self.verifiers_stub = self.verifiers_stub.new_addition(
+            verifier_key.key(),
+            CurrentVerifier::Valid(valid_current_verifier.to_owned()).encode(),
+        );
+        self.history_stub
+            .push(Event::NetworkVerifierSet(NetworkVerifierDisplay::get(
+                verifier_key,
+                valid_current_verifier,
+                general_verifier,
+            )));
         self
     }
     /// function to apply TrDbColdStub to database
@@ -402,7 +514,8 @@ impl TrDbColdStub {
             for_settings: self.settings_stub.make_batch(),
             for_transaction: Batch::default(),
             for_verifiers: self.verifiers_stub.make_batch(),
-        }.apply::<Signer>(database_name)
+        }
+        .apply::<Signer>(database_name)
     }
 }
 
@@ -433,14 +546,24 @@ pub struct TrDbColdSign {
 #[derive(Decode, Encode)]
 #[cfg(feature = "signer")]
 pub enum SignContent {
-    Transaction{method: Vec<u8>, extensions: Vec<u8>},
+    Transaction {
+        method: Vec<u8>,
+        extensions: Vec<u8>,
+    },
     Message(String),
 }
 
 #[cfg(feature = "signer")]
 impl TrDbColdSign {
     /// function to generate TrDbColdSign
-    pub fn generate(content: SignContent, network_name: &str, path: &str, has_pwd: bool, multisigner: &MultiSigner, history: Vec<Event>) -> Self {
+    pub fn generate(
+        content: SignContent,
+        network_name: &str,
+        path: &str,
+        has_pwd: bool,
+        multisigner: &MultiSigner,
+        history: Vec<Event>,
+    ) -> Self {
         Self {
             content,
             network_name: network_name.to_string(),
@@ -464,7 +587,9 @@ impl TrDbColdSign {
         };
         match Self::decode(&mut &sign_encoded[..]) {
             Ok(a) => Ok(a),
-            Err(_) => Err(ErrorSigner::Database(DatabaseSigner::EntryDecoding(EntryDecodingSigner::Sign))),
+            Err(_) => Err(ErrorSigner::Database(DatabaseSigner::EntryDecoding(
+                EntryDecodingSigner::Sign,
+            ))),
         }
     }
     /// function to get transaction content
@@ -498,28 +623,37 @@ impl TrDbColdSign {
     }
     /// function to apply TrDbColdSign to database
     /// returns database checksum, to be collected and re-used in case of wrong password entry
-    pub fn apply(self, wrong_password: bool, user_comment: &str, database_name: &str) -> Result<u32, ErrorSigner> {
+    pub fn apply(
+        self,
+        wrong_password: bool,
+        user_comment: &str,
+        database_name: &str,
+    ) -> Result<u32, ErrorSigner> {
         let signed_by = VerifierValue::Standard(self.multisigner());
         let mut history = self.history;
         let mut for_transaction = Batch::default();
         match self.content {
-            SignContent::Transaction{method, extensions} => {
+            SignContent::Transaction { method, extensions } => {
                 let transaction = [method.encode(), extensions].concat();
-                let sign_display = SignDisplay::get(&transaction, &self.network_name, &signed_by, user_comment);
-                if wrong_password {history.push(Event::TransactionSignError(sign_display))}
-                else {
+                let sign_display =
+                    SignDisplay::get(&transaction, &self.network_name, &signed_by, user_comment);
+                if wrong_password {
+                    history.push(Event::TransactionSignError(sign_display))
+                } else {
                     history.push(Event::TransactionSigned(sign_display));
                     for_transaction = make_batch_clear_tree::<Signer>(database_name, TRANSACTION)?;
                 }
-            },
+            }
             SignContent::Message(message) => {
-                let sign_message_display = SignMessageDisplay::get(&message, &self.network_name, &signed_by, user_comment);
-                if wrong_password {history.push(Event::MessageSignError(sign_message_display))}
-                else {
+                let sign_message_display =
+                    SignMessageDisplay::get(&message, &self.network_name, &signed_by, user_comment);
+                if wrong_password {
+                    history.push(Event::MessageSignError(sign_message_display))
+                } else {
                     history.push(Event::MessageSigned(sign_message_display));
                     for_transaction = make_batch_clear_tree::<Signer>(database_name, TRANSACTION)?;
                 }
-            },
+            }
         }
         TrDbCold::new()
             .set_history(events_to_batch::<Signer>(database_name, history)?)
@@ -565,7 +699,9 @@ impl TrDbColdDerivations {
         };
         match Self::decode(&mut &drv_encoded[..]) {
             Ok(a) => Ok(a),
-            Err(_) => Err(ErrorSigner::Database(DatabaseSigner::EntryDecoding(EntryDecodingSigner::Derivations))),
+            Err(_) => Err(ErrorSigner::Database(DatabaseSigner::EntryDecoding(
+                EntryDecodingSigner::Derivations,
+            ))),
         }
     }
     /// function to get checked derivations

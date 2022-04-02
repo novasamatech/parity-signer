@@ -63,7 +63,6 @@ pub const ADDRESS_BOOK: &[u8] = b"address_book";
 /// - tree METATREE with same (key, value) properties as in cold database
 /// - tree SETTREE with key TYPES as in cold database
 
-
 /// Other constants:
 
 /// Default colors to be used when forming ChainSpecsToSend
@@ -90,7 +89,8 @@ pub const FOLDER: &str = "../files/for_signing";
 pub const EXPORT_FOLDER: &str = "../files/signed";
 
 /// Alice seed phrase
-pub const ALICE_SEED_PHRASE: &str = "bottom drive obey lake curtain smoke basket hold race lonely fit walk";
+pub const ALICE_SEED_PHRASE: &str =
+    "bottom drive obey lake curtain smoke basket hold race lonely fit walk";
 
 /// QR making, raptorq:
 #[cfg(feature = "active")]

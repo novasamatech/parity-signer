@@ -12,4 +12,3 @@ fn main() -> Result<(), String> {
         Err(e) => Err(<Active>::show(&e)),
     }
 }
-

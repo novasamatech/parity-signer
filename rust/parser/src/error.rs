@@ -7,13 +7,16 @@ pub enum Error {
 
 pub enum ArgumentsError {
     Metadata(MetadataError),
-    NetworkNameMismatch {name_metadata: String, name_network_specs: String},
+    NetworkNameMismatch {
+        name_metadata: String,
+        name_network_specs: String,
+    },
     NoTypes,
     DefaultTypes,
 }
 
 impl Error {
-    pub fn show (&self) -> String {
+    pub fn show(&self) -> String {
         match &self {
             Error::Parser(x) => x.show(),
             Error::Arguments(x) => {
@@ -24,7 +27,7 @@ impl Error {
                     ArgumentsError::DefaultTypes => String::from("Decoding transactions with metadata V12 and V13 uses pre-existing types info. Error generating default types info."),
                 };
                 format!("Arguments error. {}", insert)
-            },
+            }
         }
     }
 }

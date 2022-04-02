@@ -102,7 +102,6 @@ impl Action {
             _ => Action::Nothing,
         }
     }
-
 }
 
 #[cfg(test)]

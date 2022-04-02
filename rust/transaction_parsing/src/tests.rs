@@ -4,41 +4,67 @@
 #[cfg(test)]
 mod tests {
 
-    use crate::{Action, produce_output, StubNav};
-    use constants::test_values::{ALICE_SR_ALICE, BOB, ED, TYPES_KNOWN, TYPES_UNKNOWN, EMPTY_VEC_HASH_PIC, WESTEND_9070, ID_01, ID_02, ID_03};
-    use db_handling::{cold_default::{populate_cold, populate_cold_no_metadata, populate_cold_no_networks}, manage_history::print_history};
-    use definitions::{crypto::Encryption, keyring::NetworkSpecsKey, network_specs::{Verifier, VerifierValue}};
+    use crate::{produce_output, Action, StubNav};
+    use constants::test_values::{
+        ALICE_SR_ALICE, BOB, ED, EMPTY_VEC_HASH_PIC, ID_01, ID_02, ID_03, TYPES_KNOWN,
+        TYPES_UNKNOWN, WESTEND_9070,
+    };
+    use db_handling::{
+        cold_default::{populate_cold, populate_cold_no_metadata, populate_cold_no_networks},
+        manage_history::print_history,
+    };
+    use definitions::{
+        crypto::Encryption,
+        keyring::NetworkSpecsKey,
+        network_specs::{Verifier, VerifierValue},
+    };
     use sp_runtime::MultiSigner;
     use std::fs;
-    
-    const ALICE: [u8; 32] = [212, 53, 147, 199, 21, 253, 211, 28, 97, 20, 26, 189, 4, 169, 159, 214, 130, 44, 133, 88, 133, 76, 205, 227, 154, 86, 132, 231, 165, 109, 162, 125];
+
+    const ALICE: [u8; 32] = [
+        212, 53, 147, 199, 21, 253, 211, 28, 97, 20, 26, 189, 4, 169, 159, 214, 130, 44, 133, 88,
+        133, 76, 205, 227, 154, 86, 132, 231, 165, 109, 162, 125,
+    ];
 
     fn verifier_alice_sr25519() -> Verifier {
-        Verifier(Some(VerifierValue::Standard(MultiSigner::Sr25519(sp_core::sr25519::Public::from_raw(ALICE)))))
+        Verifier(Some(VerifierValue::Standard(MultiSigner::Sr25519(
+            sp_core::sr25519::Public::from_raw(ALICE),
+        ))))
     }
-    
+
     fn verifier_alice_ed25519() -> Verifier {
-        Verifier(Some(VerifierValue::Standard(MultiSigner::Ed25519(sp_core::ed25519::Public::from_raw(ALICE)))))
+        Verifier(Some(VerifierValue::Standard(MultiSigner::Ed25519(
+            sp_core::ed25519::Public::from_raw(ALICE),
+        ))))
     }
-    
+
     #[test]
     fn add_specs_westend_no_network_info_not_signed() {
         let dbname = "for_tests/add_specs_westend_no_network_info_not_signed";
         populate_cold_no_networks(dbname, Verifier(None)).unwrap();
         let current_history = print_history(dbname).unwrap();
-        assert!(current_history.contains(r#""events":[{"event":"database_initiated"}]"#), "Current history: \n{}", current_history);
+        assert!(
+            current_history.contains(r#""events":[{"event":"database_initiated"}]"#),
+            "Current history: \n{}",
+            current_history
+        );
         let line = fs::read_to_string("for_tests/add_specs_westend_unverified.txt").unwrap();
         let reply_known = r##""warning":[{"index":0,"indent":0,"type":"warning","payload":"Received network information is not verified."}],"new_specs":[{"index":1,"indent":0,"type":"new_specs","payload":{"base58prefix":"42","color":"#660D35","decimals":"12","encryption":"sr25519","genesis_hash":"e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e","logo":"westend","name":"westend","path_id":"//westend","secondary_color":"#262626","title":"Westend","unit":"WND"}}]"##;
-        let stub_nav_known = StubNav::AddSpecs(NetworkSpecsKey::from_parts(&hex::decode("e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e").unwrap(), &Encryption::Sr25519));
+        let stub_nav_known = StubNav::AddSpecs(NetworkSpecsKey::from_parts(
+            &hex::decode("e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e")
+                .unwrap(),
+            &Encryption::Sr25519,
+        ));
         let output = produce_output(&line.trim(), dbname);
         if let Action::Stub(reply, _, stub_nav) = output {
             assert!(reply == reply_known, "Received: \n{}", reply);
             assert!(stub_nav == stub_nav_known, "Received: \n{:?}", stub_nav);
+        } else {
+            panic!("Wrong action {:?}", output)
         }
-        else {panic!("Wrong action {:?}", output)}
         fs::remove_dir_all(dbname).unwrap();
     }
-    
+
     #[test]
     fn add_specs_westend_not_signed() {
         let dbname = "for_tests/add_specs_westend_not_signed";
@@ -48,11 +74,12 @@ mod tests {
         let output = produce_output(&line.trim(), dbname);
         if let Action::Read(reply) = output {
             assert!(reply == reply_known, "Received: \n{}", reply);
+        } else {
+            panic!("Wrong action {:?}", output)
         }
-        else {panic!("Wrong action {:?}", output)}
         fs::remove_dir_all(dbname).unwrap();
     }
-    
+
     #[test]
     fn add_specs_westend_not_signed_general_verifier_disappear() {
         let dbname = "for_tests/add_specs_westend_not_signed_general_verifier_disappear";
@@ -62,11 +89,12 @@ mod tests {
         let output = produce_output(&line.trim(), dbname);
         if let Action::Read(reply) = output {
             assert!(reply == reply_known, "Received: \n{}", reply);
+        } else {
+            panic!("Wrong action {:?}", output)
         }
-        else {panic!("Wrong action {:?}", output)}
         fs::remove_dir_all(dbname).unwrap();
     }
-    
+
     #[test]
     fn load_types_known_not_signed() {
         let dbname = "for_tests/load_types_known_not_signed";
@@ -76,11 +104,12 @@ mod tests {
         let output = produce_output(&line.trim(), dbname);
         if let Action::Read(reply) = output {
             assert!(reply == reply_known, "Received: \n{}", reply);
+        } else {
+            panic!("Wrong action {:?}", output)
         }
-        else {panic!("Wrong action {:?}", output)}
         fs::remove_dir_all(dbname).unwrap();
     }
-    
+
     #[test]
     fn load_types_known_not_signed_general_verifier_disappear() {
         let dbname = "for_tests/load_types_known_not_signed_general_verifier_disappear";
@@ -90,8 +119,9 @@ mod tests {
         let output = produce_output(&line.trim(), dbname);
         if let Action::Read(reply) = output {
             assert!(reply == reply_known, "Received: \n{}", reply);
+        } else {
+            panic!("Wrong action {:?}", output)
         }
-        else {panic!("Wrong action {:?}", output)}
         fs::remove_dir_all(dbname).unwrap();
     }
 
@@ -109,11 +139,12 @@ mod tests {
                 .replace(TYPES_KNOWN, r#"<types_known>"#);
             assert!(reply_cut == reply_known, "Received: \n{}", reply);
             assert!(stub_nav == stub_nav_known, "Received: \n{:?}", stub_nav);
+        } else {
+            panic!("Wrong action {:?}", output)
         }
-        else {panic!("Wrong action {:?}", output)}
         fs::remove_dir_all(dbname).unwrap();
     }
-    
+
     #[test]
     fn load_types_known_alice_signed_known_general_verifier() {
         let dbname = "for_tests/load_types_known_alice_signed_known_general_verifier";
@@ -123,11 +154,12 @@ mod tests {
         let output = produce_output(&line.trim(), dbname);
         if let Action::Read(reply) = output {
             assert!(reply == reply_known, "Received: \n{}", reply);
+        } else {
+            panic!("Wrong action {:?}", output)
         }
-        else {panic!("Wrong action {:?}", output)}
         fs::remove_dir_all(dbname).unwrap();
     }
-    
+
     #[test]
     fn load_types_known_alice_signed_bad_general_verifier() {
         let dbname = "for_tests/load_types_known_alice_signed_bad_general_verifier";
@@ -137,11 +169,12 @@ mod tests {
         let output = produce_output(&line.trim(), dbname);
         if let Action::Read(reply) = output {
             assert!(reply == reply_known, "Received: \n{}", reply);
+        } else {
+            panic!("Wrong action {:?}", output)
         }
-        else {panic!("Wrong action {:?}", output)}
         fs::remove_dir_all(dbname).unwrap();
     }
-    
+
     #[test]
     fn load_types_known_alice_signed_metadata_hold() {
         let dbname = "for_tests/load_types_known_alice_signed_metadata_hold";
@@ -156,11 +189,12 @@ mod tests {
                 .replace(TYPES_KNOWN, r#"<types_known>"#);
             assert!(reply_cut == reply_known, "Received: \n{}", reply);
             assert!(stub_nav == stub_nav_known, "Received: \n{:?}", stub_nav);
+        } else {
+            panic!("Wrong action {:?}", output)
         }
-        else {panic!("Wrong action {:?}", output)}
         fs::remove_dir_all(dbname).unwrap();
     }
-    
+
     #[test]
     fn load_types_unknown_not_signed() {
         let dbname = "for_tests/load_types_unknown_not_signed";
@@ -173,8 +207,9 @@ mod tests {
             let reply_cut = reply.replace(TYPES_UNKNOWN, r#"<types_unknown>"#);
             assert!(reply_cut == reply_known, "Received: \n{}", reply);
             assert!(stub_nav == stub_nav_known, "Received: \n{:?}", stub_nav);
+        } else {
+            panic!("Wrong action {:?}", output)
         }
-        else {panic!("Wrong action {:?}", output)}
         fs::remove_dir_all(dbname).unwrap();
     }
 
@@ -187,12 +222,14 @@ mod tests {
         let stub_nav_known = StubNav::LoadTypes;
         let output = produce_output(&line.trim(), dbname);
         if let Action::Stub(reply, _, stub_nav) = output {
-            let reply_cut = reply.replace(ALICE_SR_ALICE, r#"<alice_sr25519_//Alice>"#)
+            let reply_cut = reply
+                .replace(ALICE_SR_ALICE, r#"<alice_sr25519_//Alice>"#)
                 .replace(TYPES_UNKNOWN, r#"<types_unknown>"#);
             assert!(reply_cut == reply_known, "Received: \n{}", reply);
             assert!(stub_nav == stub_nav_known, "Received: \n{:?}", stub_nav);
+        } else {
+            panic!("Wrong action {:?}", output)
         }
-        else {panic!("Wrong action {:?}", output)}
         fs::remove_dir_all(dbname).unwrap();
     }
 
@@ -205,8 +242,9 @@ mod tests {
         let output = produce_output(line, dbname);
         if let Action::Read(reply) = output {
             assert!(reply == reply_known, "Received: \n{}", reply);
+        } else {
+            panic!("Wrong action {:?}", output)
         }
-        else {panic!("Wrong action {:?}", output)}
         fs::remove_dir_all(dbname).unwrap();
     }
 
@@ -219,15 +257,31 @@ mod tests {
         let author_info_known = r#""base58":"5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY","identicon":"<alice_sr25519_//Alice>","seed":"Alice","derivation_path":"//Alice","has_pwd":false"#;
         let network_info_known = r#""network_title":"Westend","network_logo":"westend""#;
         let output = produce_output(line, dbname);
-        if let Action::Sign{content, checksum: _, has_pwd, author_info, network_info} = output {
+        if let Action::Sign {
+            content,
+            checksum: _,
+            has_pwd,
+            author_info,
+            network_info,
+        } = output
+        {
             let author_info_cut = author_info.replace(ALICE_SR_ALICE, r#"<alice_sr25519_//Alice>"#);
             let content_cut = content.replace(BOB, r#"<bob>"#);
             assert!(content_cut == content_known, "Received: \n{}", content);
-            assert!(author_info_cut == author_info_known, "Received: \n{}", author_info);
-            assert!(network_info == network_info_known, "Received: \n{}", network_info);
+            assert!(
+                author_info_cut == author_info_known,
+                "Received: \n{}",
+                author_info
+            );
+            assert!(
+                network_info == network_info_known,
+                "Received: \n{}",
+                network_info
+            );
             assert!(!has_pwd, "Expected no password");
+        } else {
+            panic!("Wrong action {:?}", output)
         }
-        else {panic!("Wrong action {:?}", output)}
         fs::remove_dir_all(dbname).unwrap();
     }
 
@@ -240,7 +294,14 @@ mod tests {
         let author_info_known = r#""base58":"5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY","identicon":"<alice_sr25519_//Alice>","seed":"Alice","derivation_path":"//Alice","has_pwd":false"#;
         let network_info_known = r#""network_title":"Westend","network_logo":"westend""#;
         let output = produce_output(line, dbname);
-        if let Action::Sign{content, checksum: _, has_pwd, author_info, network_info} = output {
+        if let Action::Sign {
+            content,
+            checksum: _,
+            has_pwd,
+            author_info,
+            network_info,
+        } = output
+        {
             let author_info_cut = author_info.replace(ALICE_SR_ALICE, r#"<alice_sr25519_//Alice>"#);
             let content_cut = content
                 .replace(ALICE_SR_ALICE, r#"<alice_sr25519_//Alice>"#)
@@ -248,11 +309,20 @@ mod tests {
                 .replace(ID_01, r#"<id_01>"#)
                 .replace(ID_02, r#"<id_02>"#);
             assert!(content_cut == content_known, "Received: \n{}", content);
-            assert!(author_info_cut == author_info_known, "Received: \n{}", author_info);
-            assert!(network_info == network_info_known, "Received: \n{}", network_info);
+            assert!(
+                author_info_cut == author_info_known,
+                "Received: \n{}",
+                author_info
+            );
+            assert!(
+                network_info == network_info_known,
+                "Received: \n{}",
+                network_info
+            );
             assert!(!has_pwd, "Expected no password");
+        } else {
+            panic!("Wrong action {:?}", output)
         }
-        else {panic!("Wrong action {:?}", output)}
         fs::remove_dir_all(dbname).unwrap();
     }
 
@@ -265,15 +335,31 @@ mod tests {
         let author_info_known = r#""base58":"5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY","identicon":"<alice_sr25519_//Alice>","seed":"Alice","derivation_path":"//Alice","has_pwd":false"#;
         let network_info_known = r#""network_title":"Westend","network_logo":"westend""#;
         let output = produce_output(line, dbname);
-        if let Action::Sign{content, checksum: _, has_pwd, author_info, network_info} = output {
+        if let Action::Sign {
+            content,
+            checksum: _,
+            has_pwd,
+            author_info,
+            network_info,
+        } = output
+        {
             let author_info_cut = author_info.replace(ALICE_SR_ALICE, r#"<alice_sr25519_//Alice>"#);
             let content_cut = content.replace(BOB, r#"<bob>"#);
             assert!(content_cut == content_known, "Received: \n{}", content);
-            assert!(author_info_cut == author_info_known, "Received: \n{}", author_info);
-            assert!(network_info == network_info_known, "Received: \n{}", network_info);
+            assert!(
+                author_info_cut == author_info_known,
+                "Received: \n{}",
+                author_info
+            );
+            assert!(
+                network_info == network_info_known,
+                "Received: \n{}",
+                network_info
+            );
             assert!(!has_pwd, "Expected no password");
+        } else {
+            panic!("Wrong action {:?}", output)
         }
-        else {panic!("Wrong action {:?}", output)}
         fs::remove_dir_all(dbname).unwrap();
     }
 
@@ -289,8 +375,9 @@ mod tests {
                 .replace(BOB, r#"<bob>"#)
                 .replace(EMPTY_VEC_HASH_PIC, r#"<empty_vec_hash_pic>"#);
             assert!(reply_cut == reply_known, "Received: \n{}", reply);
+        } else {
+            panic!("Wrong action {:?}", output)
         }
-        else {panic!("Wrong action {:?}", output)}
         fs::remove_dir_all(dbname).unwrap();
     }
 
@@ -300,14 +387,19 @@ mod tests {
         populate_cold_no_metadata(dbname, Verifier(None)).unwrap();
         let line = fs::read_to_string("for_tests/network_metadata_westendV9070_None.txt").unwrap();
         let reply_known = r#""warning":[{"index":0,"indent":0,"type":"warning","payload":"Received network information is not verified."}],"meta":[{"index":1,"indent":0,"type":"meta","payload":{"specname":"westend","spec_version":"9070","meta_hash":"e281fbc53168a6b87d1ea212923811f4c083e7be7d18df4b8527b9532e5f5fec","meta_id_pic":"<meta_pic_westend9070>"}}]"#;
-        let stub_nav_known = StubNav::LoadMeta(NetworkSpecsKey::from_parts(&hex::decode("e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e").unwrap(), &Encryption::Sr25519));
+        let stub_nav_known = StubNav::LoadMeta(NetworkSpecsKey::from_parts(
+            &hex::decode("e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e")
+                .unwrap(),
+            &Encryption::Sr25519,
+        ));
         let output = produce_output(&line.trim(), dbname);
         if let Action::Stub(reply, _, stub_nav) = output {
             let reply_cut = reply.replace(WESTEND_9070, r#"<meta_pic_westend9070>"#);
             assert!(reply_cut == reply_known, "Received: \n{}", reply);
             assert!(stub_nav == stub_nav_known, "Received: \n{:?}", stub_nav);
+        } else {
+            panic!("Wrong action {:?}", output)
         }
-        else {panic!("Wrong action {:?}", output)}
         fs::remove_dir_all(dbname).unwrap();
     }
 
@@ -320,8 +412,9 @@ mod tests {
         let output = produce_output(&line.trim(), dbname);
         if let Action::Read(reply) = output {
             assert!(reply == reply_known, "Received: \n{}", reply);
+        } else {
+            panic!("Wrong action {:?}", output)
         }
-        else {panic!("Wrong action {:?}", output)}
         fs::remove_dir_all(dbname).unwrap();
     }
 
@@ -334,8 +427,9 @@ mod tests {
         let output = produce_output(&line.trim(), dbname);
         if let Action::Read(reply) = output {
             assert!(reply == reply_known, "Received: \n{}", reply);
+        } else {
+            panic!("Wrong action {:?}", output)
         }
-        else {panic!("Wrong action {:?}", output)}
         fs::remove_dir_all(dbname).unwrap();
     }
 
@@ -348,11 +442,12 @@ mod tests {
         let output = produce_output(&line.trim(), dbname);
         if let Action::Read(reply) = output {
             assert!(reply == reply_known, "Received: \n{}", reply);
+        } else {
+            panic!("Wrong action {:?}", output)
         }
-        else {panic!("Wrong action {:?}", output)}
         fs::remove_dir_all(dbname).unwrap();
     }
-    
+
     #[test]
     fn load_westend9000_already_in_db_alice_signed_known_general_verifier() {
         let dbname = "for_tests/load_westend9000_already_in_db_alice_signed_known_general_verifier";
@@ -362,11 +457,12 @@ mod tests {
         let output = produce_output(&line.trim(), dbname);
         if let Action::Read(reply) = output {
             assert!(reply == reply_known, "Received: \n{}", reply);
+        } else {
+            panic!("Wrong action {:?}", output)
         }
-        else {panic!("Wrong action {:?}", output)}
         fs::remove_dir_all(dbname).unwrap();
     }
-    
+
     #[test]
     fn load_westend9000_already_in_db_alice_signed_bad_general_verifier() {
         let dbname = "for_tests/load_westend9000_already_in_db_alice_signed_bad_general_verifier";
@@ -376,200 +472,267 @@ mod tests {
         let output = produce_output(&line.trim(), dbname);
         if let Action::Read(reply) = output {
             assert!(reply == reply_known, "Received: \n{}", reply);
+        } else {
+            panic!("Wrong action {:?}", output)
         }
-        else {panic!("Wrong action {:?}", output)}
         fs::remove_dir_all(dbname).unwrap();
     }
-    
+
     #[test]
     fn load_dock31_unknown_network() {
         let dbname = "for_tests/load_dock31_unknown_network";
         populate_cold(dbname, Verifier(None)).unwrap();
-        let line = fs::read_to_string("for_tests/load_metadata_dock-pos-main-runtimeV31_unverified.txt").unwrap();
+        let line =
+            fs::read_to_string("for_tests/load_metadata_dock-pos-main-runtimeV31_unverified.txt")
+                .unwrap();
         let reply_known = r#""error":[{"index":0,"indent":0,"type":"error","payload":"Bad input data. Network dock-pos-main-runtime is not in the database. Add network specs before loading the metadata."}]"#;
         let output = produce_output(&line.trim(), dbname);
         if let Action::Read(reply) = output {
             assert!(reply == reply_known, "Received: \n{}", reply);
+        } else {
+            panic!("Wrong action {:?}", output)
         }
-        else {panic!("Wrong action {:?}", output)}
         fs::remove_dir_all(dbname).unwrap();
     }
-    
+
     #[test]
     fn add_specs_dock_not_verified_db_not_verified() {
         let dbname = "for_tests/add_specs_dock_not_verified_db_not_verified";
         populate_cold(dbname, Verifier(None)).unwrap();
-        let line = fs::read_to_string("for_tests/add_specs_dock-pos-main-runtime-sr25519_unverified.txt").unwrap();
+        let line =
+            fs::read_to_string("for_tests/add_specs_dock-pos-main-runtime-sr25519_unverified.txt")
+                .unwrap();
         let reply_known = r##""warning":[{"index":0,"indent":0,"type":"warning","payload":"Received network information is not verified."}],"new_specs":[{"index":1,"indent":0,"type":"new_specs","payload":{"base58prefix":"22","color":"#660D35","decimals":"6","encryption":"sr25519","genesis_hash":"6bfe24dca2a3be10f22212678ac13a6446ec764103c0f3471c71609eac384aae","logo":"dock-pos-main-runtime","name":"dock-pos-main-runtime","path_id":"//dock-pos-main-runtime","secondary_color":"#262626","title":"dock-pos-main-runtime-sr25519","unit":"DOCK"}}]"##;
-        let stub_nav_known = StubNav::AddSpecs(NetworkSpecsKey::from_parts(&hex::decode("6bfe24dca2a3be10f22212678ac13a6446ec764103c0f3471c71609eac384aae").unwrap(), &Encryption::Sr25519));
+        let stub_nav_known = StubNav::AddSpecs(NetworkSpecsKey::from_parts(
+            &hex::decode("6bfe24dca2a3be10f22212678ac13a6446ec764103c0f3471c71609eac384aae")
+                .unwrap(),
+            &Encryption::Sr25519,
+        ));
         let output = produce_output(&line.trim(), dbname);
         if let Action::Stub(reply, _, stub_nav) = output {
             assert!(reply == reply_known, "Received: \n{}", reply);
             assert!(stub_nav == stub_nav_known, "Received: \n{:?}", stub_nav);
+        } else {
+            panic!("Wrong action {:?}", output)
         }
-        else {panic!("Wrong action {:?}", output)}
         fs::remove_dir_all(dbname).unwrap();
     }
-    
+
     #[test]
     fn add_specs_dock_alice_verified_db_not_verified() {
         let dbname = "for_tests/add_specs_dock_alice_verified_db_not_verified";
         populate_cold(dbname, Verifier(None)).unwrap();
-        let line = fs::read_to_string("for_tests/add_specs_dock-pos-main-runtime-sr25519_Alice-sr25519.txt").unwrap();
+        let line = fs::read_to_string(
+            "for_tests/add_specs_dock-pos-main-runtime-sr25519_Alice-sr25519.txt",
+        )
+        .unwrap();
         let reply_known = r##""verifier":[{"index":0,"indent":0,"type":"verifier","payload":{"public_key":"d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d","identicon":"<alice_sr25519_//Alice>","encryption":"sr25519"}}],"warning":[{"index":1,"indent":0,"type":"warning","payload":"Received message is verified by a new general verifier. Currently no general verifier is set, and proceeding will update the general verifier to the received value. All previously acquired information associated with general verifier will be purged. Affected network specs entries: Kusama, Polkadot, Westend; affected metadata entries: kusama2030, polkadot30, westend9000, westend9010. Types information is purged."}],"new_specs":[{"index":2,"indent":0,"type":"new_specs","payload":{"base58prefix":"22","color":"#660D35","decimals":"6","encryption":"sr25519","genesis_hash":"6bfe24dca2a3be10f22212678ac13a6446ec764103c0f3471c71609eac384aae","logo":"dock-pos-main-runtime","name":"dock-pos-main-runtime","path_id":"//dock-pos-main-runtime","secondary_color":"#262626","title":"dock-pos-main-runtime-sr25519","unit":"DOCK"}}]"##;
-        let stub_nav_known = StubNav::AddSpecs(NetworkSpecsKey::from_parts(&hex::decode("6bfe24dca2a3be10f22212678ac13a6446ec764103c0f3471c71609eac384aae").unwrap(), &Encryption::Sr25519));
+        let stub_nav_known = StubNav::AddSpecs(NetworkSpecsKey::from_parts(
+            &hex::decode("6bfe24dca2a3be10f22212678ac13a6446ec764103c0f3471c71609eac384aae")
+                .unwrap(),
+            &Encryption::Sr25519,
+        ));
         let output = produce_output(&line.trim(), dbname);
         if let Action::Stub(reply, _, stub_nav) = output {
             let reply_cut = reply.replace(ALICE_SR_ALICE, r#"<alice_sr25519_//Alice>"#);
             assert!(reply_cut == reply_known, "Received: \n{}", reply);
             assert!(stub_nav == stub_nav_known, "Received: \n{:?}", stub_nav);
+        } else {
+            panic!("Wrong action {:?}", output)
         }
-        else {panic!("Wrong action {:?}", output)}
         fs::remove_dir_all(dbname).unwrap();
     }
-    
+
     #[test]
     fn add_specs_dock_not_verified_db_alice_verified() {
         let dbname = "for_tests/add_specs_dock_not_verified_db_alice_verified";
         populate_cold(dbname, verifier_alice_sr25519()).unwrap();
-        let line = fs::read_to_string("for_tests/add_specs_dock-pos-main-runtime-sr25519_unverified.txt").unwrap();
+        let line =
+            fs::read_to_string("for_tests/add_specs_dock-pos-main-runtime-sr25519_unverified.txt")
+                .unwrap();
         let reply_known = r##""warning":[{"index":0,"indent":0,"type":"warning","payload":"Received network information is not verified."}],"new_specs":[{"index":1,"indent":0,"type":"new_specs","payload":{"base58prefix":"22","color":"#660D35","decimals":"6","encryption":"sr25519","genesis_hash":"6bfe24dca2a3be10f22212678ac13a6446ec764103c0f3471c71609eac384aae","logo":"dock-pos-main-runtime","name":"dock-pos-main-runtime","path_id":"//dock-pos-main-runtime","secondary_color":"#262626","title":"dock-pos-main-runtime-sr25519","unit":"DOCK"}}]"##;
-        let stub_nav_known = StubNav::AddSpecs(NetworkSpecsKey::from_parts(&hex::decode("6bfe24dca2a3be10f22212678ac13a6446ec764103c0f3471c71609eac384aae").unwrap(), &Encryption::Sr25519));
+        let stub_nav_known = StubNav::AddSpecs(NetworkSpecsKey::from_parts(
+            &hex::decode("6bfe24dca2a3be10f22212678ac13a6446ec764103c0f3471c71609eac384aae")
+                .unwrap(),
+            &Encryption::Sr25519,
+        ));
         let output = produce_output(&line.trim(), dbname);
         if let Action::Stub(reply, _, stub_nav) = output {
             assert!(reply == reply_known, "Received: \n{}", reply);
             assert!(stub_nav == stub_nav_known, "Received: \n{:?}", stub_nav);
+        } else {
+            panic!("Wrong action {:?}", output)
         }
-        else {panic!("Wrong action {:?}", output)}
         fs::remove_dir_all(dbname).unwrap();
     }
-    
+
     #[test]
     fn add_specs_dock_both_verified_same() {
         let dbname = "for_tests/add_specs_dock_both_verified_same";
         populate_cold(dbname, verifier_alice_sr25519()).unwrap();
-        let line = fs::read_to_string("for_tests/add_specs_dock-pos-main-runtime-sr25519_Alice-sr25519.txt").unwrap();
+        let line = fs::read_to_string(
+            "for_tests/add_specs_dock-pos-main-runtime-sr25519_Alice-sr25519.txt",
+        )
+        .unwrap();
         let reply_known = r##""verifier":[{"index":0,"indent":0,"type":"verifier","payload":{"public_key":"d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d","identicon":"<alice_sr25519_//Alice>","encryption":"sr25519"}}],"new_specs":[{"index":1,"indent":0,"type":"new_specs","payload":{"base58prefix":"22","color":"#660D35","decimals":"6","encryption":"sr25519","genesis_hash":"6bfe24dca2a3be10f22212678ac13a6446ec764103c0f3471c71609eac384aae","logo":"dock-pos-main-runtime","name":"dock-pos-main-runtime","path_id":"//dock-pos-main-runtime","secondary_color":"#262626","title":"dock-pos-main-runtime-sr25519","unit":"DOCK"}}]"##;
-        let stub_nav_known = StubNav::AddSpecs(NetworkSpecsKey::from_parts(&hex::decode("6bfe24dca2a3be10f22212678ac13a6446ec764103c0f3471c71609eac384aae").unwrap(), &Encryption::Sr25519));
+        let stub_nav_known = StubNav::AddSpecs(NetworkSpecsKey::from_parts(
+            &hex::decode("6bfe24dca2a3be10f22212678ac13a6446ec764103c0f3471c71609eac384aae")
+                .unwrap(),
+            &Encryption::Sr25519,
+        ));
         let output = produce_output(&line.trim(), dbname);
         if let Action::Stub(reply, _, stub_nav) = output {
             let reply_cut = reply.replace(ALICE_SR_ALICE, r#"<alice_sr25519_//Alice>"#);
             assert!(reply_cut == reply_known, "Received: \n{}", reply);
             assert!(stub_nav == stub_nav_known, "Received: \n{:?}", stub_nav);
+        } else {
+            panic!("Wrong action {:?}", output)
         }
-        else {panic!("Wrong action {:?}", output)}
         fs::remove_dir_all(dbname).unwrap();
     }
-    
+
     #[test]
     fn add_specs_dock_both_verified_different() {
         let dbname = "for_tests/add_specs_dock_both_verified_different";
         populate_cold(dbname, verifier_alice_sr25519()).unwrap();
-        let line = fs::read_to_string("for_tests/add_specs_dock-pos-main-runtime-sr25519_Alice-ed25519.txt").unwrap();
+        let line = fs::read_to_string(
+            "for_tests/add_specs_dock-pos-main-runtime-sr25519_Alice-ed25519.txt",
+        )
+        .unwrap();
         let reply_known = r##""verifier":[{"index":0,"indent":0,"type":"verifier","payload":{"public_key":"88dc3417d5058ec4b4503e0c12ea1a0a89be200fe98922423d4334014fa6b0ee","identicon":"<ed25519>","encryption":"ed25519"}}],"new_specs":[{"index":1,"indent":0,"type":"new_specs","payload":{"base58prefix":"22","color":"#660D35","decimals":"6","encryption":"sr25519","genesis_hash":"6bfe24dca2a3be10f22212678ac13a6446ec764103c0f3471c71609eac384aae","logo":"dock-pos-main-runtime","name":"dock-pos-main-runtime","path_id":"//dock-pos-main-runtime","secondary_color":"#262626","title":"dock-pos-main-runtime-sr25519","unit":"DOCK"}}]"##;
-        let stub_nav_known = StubNav::AddSpecs(NetworkSpecsKey::from_parts(&hex::decode("6bfe24dca2a3be10f22212678ac13a6446ec764103c0f3471c71609eac384aae").unwrap(), &Encryption::Sr25519));
+        let stub_nav_known = StubNav::AddSpecs(NetworkSpecsKey::from_parts(
+            &hex::decode("6bfe24dca2a3be10f22212678ac13a6446ec764103c0f3471c71609eac384aae")
+                .unwrap(),
+            &Encryption::Sr25519,
+        ));
         let output = produce_output(&line.trim(), dbname);
         if let Action::Stub(reply, _, stub_nav) = output {
             let reply_cut = reply.replace(ED, r#"<ed25519>"#);
             assert!(reply_cut == reply_known, "Received: \n{}", reply);
             assert!(stub_nav == stub_nav_known, "Received: \n{:?}", stub_nav);
+        } else {
+            panic!("Wrong action {:?}", output)
         }
-        else {panic!("Wrong action {:?}", output)}
         fs::remove_dir_all(dbname).unwrap();
     }
-    
+
     #[test]
     fn add_specs_westend_ed25519_not_signed() {
         let dbname = "for_tests/add_specs_westend_ed25519_not_signed";
         populate_cold(dbname, Verifier(None)).unwrap();
-        let line = fs::read_to_string("for_tests/add_specs_westend-ed25519_unverified.txt").unwrap();
+        let line =
+            fs::read_to_string("for_tests/add_specs_westend-ed25519_unverified.txt").unwrap();
         let reply_known = r##""warning":[{"index":0,"indent":0,"type":"warning","payload":"Received network information is not verified."}],"new_specs":[{"index":1,"indent":0,"type":"new_specs","payload":{"base58prefix":"42","color":"#660D35","decimals":"12","encryption":"ed25519","genesis_hash":"e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e","logo":"westend","name":"westend","path_id":"//westend","secondary_color":"#262626","title":"westend-ed25519","unit":"WND"}}]"##;
-        let stub_nav_known = StubNav::AddSpecs(NetworkSpecsKey::from_parts(&hex::decode("e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e").unwrap(), &Encryption::Ed25519));
+        let stub_nav_known = StubNav::AddSpecs(NetworkSpecsKey::from_parts(
+            &hex::decode("e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e")
+                .unwrap(),
+            &Encryption::Ed25519,
+        ));
         let output = produce_output(&line.trim(), dbname);
         if let Action::Stub(reply, _, stub_nav) = output {
             assert!(reply == reply_known, "Received: \n{}", reply);
             assert!(stub_nav == stub_nav_known, "Received: \n{:?}", stub_nav);
+        } else {
+            panic!("Wrong action {:?}", output)
         }
-        else {panic!("Wrong action {:?}", output)}
         fs::remove_dir_all(dbname).unwrap();
     }
-    
+
     #[test]
     fn add_specs_bad_westend_ed25519_not_signed() {
         let dbname = "for_tests/add_specs_bad_westend_ed25519_not_signed";
         populate_cold(dbname, Verifier(None)).unwrap();
-        let line = fs::read_to_string("for_tests/add_specs_westend-ed25519_unverified_bad_ones.txt").unwrap();
+        let line =
+            fs::read_to_string("for_tests/add_specs_westend-ed25519_unverified_bad_ones.txt")
+                .unwrap();
         let reply_known = r#""error":[{"index":0,"indent":0,"type":"error","payload":"Bad input data. Network with genesis hash e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e already has entries in the database with base58 prefix 42. Received network specs have different base58 prefix 115."}]"#;
         let output = produce_output(&line.trim(), dbname);
         if let Action::Read(reply) = output {
             assert!(reply == reply_known, "Received: \n{}", reply);
+        } else {
+            panic!("Wrong action {:?}", output)
         }
-        else {panic!("Wrong action {:?}", output)}
         fs::remove_dir_all(dbname).unwrap();
     }
-    
+
     #[test]
     fn add_specs_westend_ed25519_alice_signed_db_not_verified() {
         let dbname = "for_tests/add_specs_westend_ed25519_alice_signed_db_not_verified";
         populate_cold(dbname, Verifier(None)).unwrap();
-        let line = fs::read_to_string("for_tests/add_specs_westend-ed25519_Alice-sr25519.txt").unwrap();
+        let line =
+            fs::read_to_string("for_tests/add_specs_westend-ed25519_Alice-sr25519.txt").unwrap();
         let reply_known = r##""verifier":[{"index":0,"indent":0,"type":"verifier","payload":{"public_key":"d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d","identicon":"<alice_sr25519_//Alice>","encryption":"sr25519"}}],"warning":[{"index":1,"indent":0,"type":"warning","payload":"Received message is verified by a new general verifier. Currently no general verifier is set, and proceeding will update the general verifier to the received value. All previously acquired information associated with general verifier will be purged. Affected network specs entries: Kusama, Polkadot, Westend; affected metadata entries: kusama2030, polkadot30, westend9000, westend9010. Types information is purged."}],"new_specs":[{"index":2,"indent":0,"type":"new_specs","payload":{"base58prefix":"42","color":"#660D35","decimals":"12","encryption":"ed25519","genesis_hash":"e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e","logo":"westend","name":"westend","path_id":"//westend","secondary_color":"#262626","title":"westend-ed25519","unit":"WND"}}]"##;
-        let stub_nav_known = StubNav::AddSpecs(NetworkSpecsKey::from_parts(&hex::decode("e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e").unwrap(), &Encryption::Ed25519));
+        let stub_nav_known = StubNav::AddSpecs(NetworkSpecsKey::from_parts(
+            &hex::decode("e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e")
+                .unwrap(),
+            &Encryption::Ed25519,
+        ));
         let output = produce_output(&line.trim(), dbname);
         if let Action::Stub(reply, _, stub_nav) = output {
             let reply_cut = reply.replace(ALICE_SR_ALICE, r#"<alice_sr25519_//Alice>"#);
             assert!(reply_cut == reply_known, "Received: \n{}", reply);
             assert!(stub_nav == stub_nav_known, "Received: \n{:?}", stub_nav);
+        } else {
+            panic!("Wrong action {:?}", output)
         }
-        else {panic!("Wrong action {:?}", output)}
         fs::remove_dir_all(dbname).unwrap();
     }
-    
+
     #[test]
     fn add_specs_westend_ed25519_not_verified_db_alice_verified() {
         let dbname = "for_tests/add_specs_westend_ed25519_not_verified_db_alice_verified";
         populate_cold(dbname, verifier_alice_sr25519()).unwrap();
-        let line = fs::read_to_string("for_tests/add_specs_westend-ed25519_unverified.txt").unwrap();
+        let line =
+            fs::read_to_string("for_tests/add_specs_westend-ed25519_unverified.txt").unwrap();
         let reply_known = r#""error":[{"index":0,"indent":0,"type":"error","payload":"Bad input data. General verifier in the database is public key: d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d, encryption: sr25519. Received unsigned westend network information could be accepted only if signed by the general verifier."}]"#;
         let output = produce_output(&line.trim(), dbname);
         if let Action::Read(reply) = output {
             assert!(reply == reply_known, "Received: \n{}", reply);
+        } else {
+            panic!("Wrong action {:?}", output)
         }
-        else {panic!("Wrong action {:?}", output)}
         fs::remove_dir_all(dbname).unwrap();
     }
-    
+
     #[test]
     fn add_specs_westend_ed25519_both_verified_same() {
         let dbname = "for_tests/add_specs_westend_ed25519_both_verified_same";
         populate_cold(dbname, verifier_alice_sr25519()).unwrap();
-        let line = fs::read_to_string("for_tests/add_specs_westend-ed25519_Alice-sr25519.txt").unwrap();
+        let line =
+            fs::read_to_string("for_tests/add_specs_westend-ed25519_Alice-sr25519.txt").unwrap();
         let reply_known = r##""verifier":[{"index":0,"indent":0,"type":"verifier","payload":{"public_key":"d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d","identicon":"<alice_sr25519_//Alice>","encryption":"sr25519"}}],"new_specs":[{"index":1,"indent":0,"type":"new_specs","payload":{"base58prefix":"42","color":"#660D35","decimals":"12","encryption":"ed25519","genesis_hash":"e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e","logo":"westend","name":"westend","path_id":"//westend","secondary_color":"#262626","title":"westend-ed25519","unit":"WND"}}]"##;
-        let stub_nav_known = StubNav::AddSpecs(NetworkSpecsKey::from_parts(&hex::decode("e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e").unwrap(), &Encryption::Ed25519));
+        let stub_nav_known = StubNav::AddSpecs(NetworkSpecsKey::from_parts(
+            &hex::decode("e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e")
+                .unwrap(),
+            &Encryption::Ed25519,
+        ));
         let output = produce_output(&line.trim(), dbname);
         if let Action::Stub(reply, _, stub_nav) = output {
             let reply_cut = reply.replace(ALICE_SR_ALICE, r#"<alice_sr25519_//Alice>"#);
             assert!(reply_cut == reply_known, "Received: \n{}", reply);
             assert!(stub_nav == stub_nav_known, "Received: \n{:?}", stub_nav);
+        } else {
+            panic!("Wrong action {:?}", output)
         }
-        else {panic!("Wrong action {:?}", output)}
         fs::remove_dir_all(dbname).unwrap();
     }
-    
+
     #[test]
     fn add_specs_westend_ed25519_both_verified_different() {
         let dbname = "for_tests/add_specs_westend_ed25519_both_verified_different";
         populate_cold(dbname, verifier_alice_sr25519()).unwrap();
-        let line = fs::read_to_string("for_tests/add_specs_westend-ed25519_Alice-ed25519.txt").unwrap();
+        let line =
+            fs::read_to_string("for_tests/add_specs_westend-ed25519_Alice-ed25519.txt").unwrap();
         let reply_known = r#""error":[{"index":0,"indent":0,"type":"error","payload":"Bad input data. General verifier in the database is public key: d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d, encryption: sr25519. Received network westend specs could be accepted only if verified by the same general verifier. Current message is verified by public key: 88dc3417d5058ec4b4503e0c12ea1a0a89be200fe98922423d4334014fa6b0ee, encryption: ed25519."}]"#;
         let output = produce_output(&line.trim(), dbname);
         if let Action::Read(reply) = output {
             assert!(reply == reply_known, "Received: \n{}", reply);
+        } else {
+            panic!("Wrong action {:?}", output)
         }
-        else {panic!("Wrong action {:?}", output)}
         fs::remove_dir_all(dbname).unwrap();
     }
-    
+
     #[test]
     fn parse_transaction_4_unknown_author() {
         let dbname = "for_tests/parse_transaction_4_unknown_author";
@@ -582,11 +745,12 @@ mod tests {
                 .replace(ALICE_SR_ALICE, r#"<alice_sr25519_//Alice>"#)
                 .replace(BOB, r#"<bob>"#);
             assert!(reply_cut == reply_known, "Received: \n{}", reply);
+        } else {
+            panic!("Wrong action {:?}", output)
         }
-        else {panic!("Wrong action {:?}", output)}
         fs::remove_dir_all(dbname).unwrap();
     }
-    
+
     #[test]
     fn parse_transaction_5_unknown_network() {
         let dbname = "for_tests/parse_transaction_5_unknown_network";
@@ -597,11 +761,12 @@ mod tests {
         if let Action::Read(reply) = output {
             let reply_cut = reply.replace(ID_03, r#"<id_03>"#);
             assert!(reply_cut == reply_known, "Received: \n{}", reply);
+        } else {
+            panic!("Wrong action {:?}", output)
         }
-        else {panic!("Wrong action {:?}", output)}
         fs::remove_dir_all(dbname).unwrap();
     }
-    
+
     #[test]
     fn parse_transaction_6_error_on_parsing() {
         let dbname = "for_tests/parse_transaction_6_error_on_parsing";
@@ -612,11 +777,12 @@ mod tests {
         if let Action::Read(reply) = output {
             let reply_cut = reply.replace(ALICE_SR_ALICE, r#"<alice_sr25519_//Alice>"#);
             assert!(reply_cut == reply_known, "Received: \n{}", reply);
+        } else {
+            panic!("Wrong action {:?}", output)
         }
-        else {panic!("Wrong action {:?}", output)}
         fs::remove_dir_all(dbname).unwrap();
     }
-    
+
     #[test]
     fn parse_transaction_7_error_on_parsing() {
         let dbname = "for_tests/parse_transaction_7_error_on_parsing";
@@ -627,11 +793,12 @@ mod tests {
         if let Action::Read(reply) = output {
             let reply_cut = reply.replace(ALICE_SR_ALICE, r#"<alice_sr25519_//Alice>"#);
             assert!(reply_cut == reply_known, "Received: \n{}", reply);
+        } else {
+            panic!("Wrong action {:?}", output)
         }
-        else {panic!("Wrong action {:?}", output)}
         fs::remove_dir_all(dbname).unwrap();
     }
-    
+
     #[test]
     fn parse_transaction_8_error_on_parsing() {
         let dbname = "for_tests/parse_transaction_8_error_on_parsing";
@@ -642,11 +809,12 @@ mod tests {
         if let Action::Read(reply) = output {
             let reply_cut = reply.replace(ALICE_SR_ALICE, r#"<alice_sr25519_//Alice>"#);
             assert!(reply_cut == reply_known, "Received: \n{}", reply);
+        } else {
+            panic!("Wrong action {:?}", output)
         }
-        else {panic!("Wrong action {:?}", output)}
         fs::remove_dir_all(dbname).unwrap();
     }
-    
+
     #[test]
     fn parse_msg_1() {
         let dbname = "for_tests/parse_msg_1";
@@ -656,17 +824,33 @@ mod tests {
         let author_info_known = r#""base58":"5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY","identicon":"<alice_sr25519_//Alice>","seed":"Alice","derivation_path":"//Alice","has_pwd":false"#;
         let network_info_known = r#""network_title":"Westend","network_logo":"westend""#;
         let output = produce_output(line, dbname);
-        if let Action::Sign{content, checksum: _, has_pwd, author_info, network_info} = output {
+        if let Action::Sign {
+            content,
+            checksum: _,
+            has_pwd,
+            author_info,
+            network_info,
+        } = output
+        {
             let author_info_cut = author_info.replace(ALICE_SR_ALICE, r#"<alice_sr25519_//Alice>"#);
             assert!(content == content_known, "Received: \n{}", content);
-            assert!(author_info_cut == author_info_known, "Received: \n{}", author_info);
-            assert!(network_info == network_info_known, "Received: \n{}", network_info);
+            assert!(
+                author_info_cut == author_info_known,
+                "Received: \n{}",
+                author_info
+            );
+            assert!(
+                network_info == network_info_known,
+                "Received: \n{}",
+                network_info
+            );
             assert!(!has_pwd, "Expected no password");
+        } else {
+            panic!("Wrong action {:?}", output)
         }
-        else {panic!("Wrong action {:?}", output)}
         fs::remove_dir_all(dbname).unwrap();
     }
-    
+
     #[test]
     fn parse_msg_2() {
         let dbname = "for_tests/parse_msg_2";
@@ -677,8 +861,9 @@ mod tests {
         let output = produce_output(line, dbname);
         if let Action::Read(reply) = output {
             assert!(reply == reply_known, "Received: \n{}", reply);
+        } else {
+            panic!("Wrong action {:?}", output)
         }
-        else {panic!("Wrong action {:?}", output)}
         fs::remove_dir_all(dbname).unwrap();
     }
 
@@ -690,12 +875,22 @@ mod tests {
         let content_known = r#""importing_derivations":[{"index":0,"indent":0,"type":"derivations","payload":["//Alice","//Alice/westend","//Alice/secret//secret","//0","//1"]}]"#;
         let network_info_known = r#""network_title":"Westend","network_logo":"westend""#;
         let output = produce_output(line, dbname);
-        if let Action::Derivations{content, network_info, checksum: _, network_specs_key: _} = output {
+        if let Action::Derivations {
+            content,
+            network_info,
+            checksum: _,
+            network_specs_key: _,
+        } = output
+        {
             assert!(content == content_known, "Received: \n{}", content);
-            assert!(network_info == network_info_known, "Received: \n{}", network_info);
+            assert!(
+                network_info == network_info_known,
+                "Received: \n{}",
+                network_info
+            );
+        } else {
+            panic!("Wrong action {:?}", output)
         }
-        else {panic!("Wrong action {:?}", output)}
         fs::remove_dir_all(dbname).unwrap();
     }
-   
 }
