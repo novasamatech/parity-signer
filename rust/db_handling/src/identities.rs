@@ -12,9 +12,9 @@ use sp_core::{Pair, ed25519, sr25519, ecdsa};
 use sp_runtime::MultiSigner;
 use zeroize::Zeroize;
 
-use constants::{ADDRTREE, MAX_WORDS_DISPLAY, TRANSACTION};
+use constants::{ADDRTREE, TRANSACTION};
 use defaults::get_default_chainspecs;
-use definitions::{crypto::Encryption, error::{Active, AddressGeneration, AddressGenerationCommon, ErrorActive, ErrorSigner, ErrorSource, ExtraAddressGenerationSigner, InputActive, InputSigner, InterfaceSigner, Signer, SpecsKeySource}, helpers::multisigner_to_public, history::{Event, IdentityHistory}, keyring::{NetworkSpecsKey, AddressKey}, network_specs::NetworkSpecs, print::export_plain_vector, qr_transfers::ContentDerivations, users::AddressDetails};
+use definitions::{crypto::Encryption, error::{Active, AddressGeneration, AddressGenerationCommon, ErrorActive, ErrorSigner, ErrorSource, ExtraAddressGenerationSigner, InputActive, InputSigner, InterfaceSigner, Signer, SpecsKeySource}, helpers::multisigner_to_public, history::{Event, IdentityHistory}, keyring::{NetworkSpecsKey, AddressKey}, network_specs::NetworkSpecs, qr_transfers::ContentDerivations, users::AddressDetails};
 
 use crate::db_transactions::{TrDbCold, TrDbColdDerivations};
 use crate::helpers::{open_db, open_tree, make_batch_clear_tree, upd_id_batch, get_network_specs, get_address_details};
@@ -63,16 +63,6 @@ pub fn generate_random_phrase (words_number: u32) -> Result<String, ErrorSigner>
     };
     let mnemonic = Mnemonic::new(mnemonic_type, Language::English);
     Ok(mnemonic.into_phrase())
-}
-
-/// Validate user-proposed random phrase.
-/// Function gets used only on the Signer side.
-/// Open to user interface.
-pub fn validate_phrase (seed_phrase_proposal: &str) -> Result<(), ErrorSigner> {
-    match Mnemonic::validate(seed_phrase_proposal, Language::English) {
-        Ok(_) => Ok(()),
-        Err(e) => return Err(ErrorSigner::AddressGeneration(AddressGeneration::Extra(ExtraAddressGenerationSigner::RandomPhraseValidation(e)))),
-    }
 }
 
 /// Create address from seed and path and insert it into the database.
@@ -454,18 +444,6 @@ pub fn prepare_derivations_export (encryption: &Encryption, genesis_hash: &[u8;3
     Ok(ContentDerivations::generate(encryption, genesis_hash, &derivations))
 }
 
-/// Function to display possible options of English code words from allowed words list
-/// that start with already entered piece; for user requested easier seed recovery
-/// Function interacts with user interface.
-pub fn guess (word_part: &str) -> String {
-    let dictionary = Language::English.wordlist();
-    let words = dictionary.get_words_by_prefix(word_part);
-    let words_set = {
-        if words.len() > MAX_WORDS_DISPLAY {words[..MAX_WORDS_DISPLAY].to_vec()}
-        else {words.to_vec()}
-    };
-    export_plain_vector(&words_set)
-}
 
 #[cfg(test)]
 mod tests {
@@ -631,71 +609,7 @@ mod tests {
         assert!(history_printed_after_create_seed.contains(element3), "\nReal history check5:\n{}", history_printed_after_create_seed);
         fs::remove_dir_all(dbname).unwrap();
     }
-    
-    #[test]
-    fn word_search_1() {
-        let word_part = "dri";
-        let out = guess(word_part);
-        let out_expected = r#"["drift","drill","drink","drip","drive"]"#;
-        assert!(out == out_expected, "Found different word set:\n{:?}", out);
-    }
-    
-    #[test]
-    fn word_search_2() {
-        let word_part = "umbra";
-        let out = guess(word_part);
-        let out_expected = r#"[]"#;
-        assert!(out == out_expected, "Found different word set:\n{:?}", out);
-    }
-    
-    #[test]
-    fn word_search_3() {
-        let word_part = "котик";
-        let out = guess(word_part);
-        let out_expected = r#"[]"#;
-        assert!(out == out_expected, "Found different word set:\n{:?}", out);
-    }
-    
-    #[test]
-    fn word_search_4() {
-        let word_part = "";
-        let out = guess(word_part);
-        let out_expected = r#"["abandon","ability","able","about","above","absent","absorb","abstract"]"#;
-        assert!(out == out_expected, "Found different word set:\n{:?}", out);
-    }
-    
-    #[test]
-    fn word_search_5() {
-        let word_part = " ";
-        let out = guess(word_part);
-        let out_expected = r#"[]"#;
-        assert!(out == out_expected, "Found different word set:\n{:?}", out);
-    }
-    
-    #[test]
-    fn word_search_6() {
-        let word_part = "s";
-        let out = guess(word_part);
-        let out_expected = r#"["sad","saddle","sadness","safe","sail","salad","salmon","salon"]"#;
-        assert!(out == out_expected, "Found different word set:\n{:?}", out);
-    }
-    
-    #[test]
-    fn word_search_7() {
-        let word_part = "se";
-        let out = guess(word_part);
-        let out_expected = r#"["sea","search","season","seat","second","secret","section","security"]"#;
-        assert!(out == out_expected, "Found different word set:\n{:?}", out);
-    }
-    
-    #[test]
-    fn word_search_8() {
-        let word_part = "sen";
-        let out = guess(word_part);
-        let out_expected = r#"["senior","sense","sentence"]"#;
-        assert!(out == out_expected, "Found different word set:\n{:?}", out);
-    }
-    
+
     fn get_multisigner_path_set(dbname: &str) -> Vec<(MultiSigner, String)> {
         let db = open_db::<Signer>(dbname).unwrap();
         let identities = open_tree::<Signer>(&db, ADDRTREE).unwrap();

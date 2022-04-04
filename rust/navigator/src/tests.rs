@@ -492,7 +492,7 @@ mod tests {
         
         do_action("GoBack","","");
         let real_json = do_action("GoForward","Alys","");
-        let expected_json = r#"{"screen":"RecoverSeedPhrase","screenLabel":"Recover Seed","back":true,"footer":false,"footerButton":"Keys","rightButton":"None","screenNameType":"h1","modal":"Empty","alert":"Empty","screenData":{"seed_name":"Alys","keyboard":true},"modalData":{},"alertData":{}}"#;
+        let expected_json = r#"{"screen":"RecoverSeedPhrase","screenLabel":"Recover Seed","back":true,"footer":false,"footerButton":"Keys","rightButton":"None","screenNameType":"h1","modal":"Empty","alert":"Empty","screenData":{"seed_name":"Alys","keyboard":true,"user_input":" ","guess_set":["abandon","ability","able","about","above","absent","absorb","abstract"],"draft":[]},"modalData":{},"alertData":{}}"#;
         assert!(real_json == expected_json, "GoForward on RecoverSeedName screen using new name. Expected RecoverSeedPhrase screen with no modals, got:\n{}", real_json);
         
         let real_json = do_action("GoBack","","");
@@ -500,8 +500,69 @@ mod tests {
         assert!(real_json == expected_json, "GoBack on RecoverSeedPhrase screen. Expected RecoverSeedName screen with no modals and with retained name, got:\n{}", real_json);
         
         let real_json = do_action("GoForward","Alice","");
-        let expected_json = r#"{"screen":"RecoverSeedPhrase","screenLabel":"Recover Seed","back":true,"footer":false,"footerButton":"Keys","rightButton":"None","screenNameType":"h1","modal":"Empty","alert":"Empty","screenData":{"seed_name":"Alice","keyboard":true},"modalData":{},"alertData":{}}"#;
+        let expected_json = r#"{"screen":"RecoverSeedPhrase","screenLabel":"Recover Seed","back":true,"footer":false,"footerButton":"Keys","rightButton":"None","screenNameType":"h1","modal":"Empty","alert":"Empty","screenData":{"seed_name":"Alice","keyboard":true,"user_input":" ","guess_set":["abandon","ability","able","about","above","absent","absorb","abstract"],"draft":[]},"modalData":{},"alertData":{}}"#;
         assert!(real_json == expected_json, "GoForward on RecoverSeedName screen using new name. Expected RecoverSeedPhrase screen with no modals, got:\n{}", real_json);
+        
+        // Alice painstakingly recalls her seed phrase
+        let real_json = do_action("TextEntry"," botto","");
+        let expected_json = r#"{"screen":"RecoverSeedPhrase","screenLabel":"Recover Seed","back":true,"footer":false,"footerButton":"Keys","rightButton":"None","screenNameType":"h1","modal":"Empty","alert":"Empty","screenData":{"seed_name":"Alice","keyboard":true,"user_input":" botto","guess_set":["bottom"],"draft":[]},"modalData":{},"alertData":{}}"#;
+        assert!(real_json == expected_json, "TextEntry on RecoverSeedPhrase screen with incomplete word. Expected RecoverSeedPhrase screen with no modals, got:\n{}", real_json);
+        
+        let real_json = do_action("TextEntry"," botto ","");
+        let expected_json = r#"{"screen":"RecoverSeedPhrase","screenLabel":"Recover Seed","back":true,"footer":false,"footerButton":"Keys","rightButton":"None","screenNameType":"h1","modal":"Empty","alert":"Empty","screenData":{"seed_name":"Alice","keyboard":true,"user_input":" ","guess_set":["abandon","ability","able","about","above","absent","absorb","abstract"],"draft":[{"order":0,"content":"bottom"}]},"modalData":{},"alertData":{}}"#;
+        assert!(real_json == expected_json, "TextEntry on RecoverSeedPhrase screen with incomplete word and space. Expected word to be added, got:\n{}", real_json);
+        
+        let real_json = do_action("TextEntry"," abstract ","");
+        let expected_json = r#"{"screen":"RecoverSeedPhrase","screenLabel":"Recover Seed","back":true,"footer":false,"footerButton":"Keys","rightButton":"None","screenNameType":"h1","modal":"Empty","alert":"Empty","screenData":{"seed_name":"Alice","keyboard":true,"user_input":" ","guess_set":["abandon","ability","able","about","above","absent","absorb","abstract"],"draft":[{"order":0,"content":"bottom"},{"order":1,"content":"abstract"}]},"modalData":{},"alertData":{}}"#;
+        assert!(real_json == expected_json, "TextEntry on RecoverSeedPhrase screen with complete long word. Wrong one. Expected word to be added, got:\n{}", real_json);
+        
+        let real_json = do_action("TextEntry","","");
+        let expected_json = r#"{"screen":"RecoverSeedPhrase","screenLabel":"Recover Seed","back":true,"footer":false,"footerButton":"Keys","rightButton":"None","screenNameType":"h1","modal":"Empty","alert":"Empty","screenData":{"seed_name":"Alice","keyboard":true,"user_input":" ","guess_set":["abandon","ability","able","about","above","absent","absorb","abstract"],"draft":[{"order":0,"content":"bottom"}]},"modalData":{},"alertData":{}}"#;
+        assert!(real_json == expected_json, "TextEntry on RecoverSeedPhrase screen with empty text. Expected last draft word to be deleted, got:\n{}", real_json);
+        
+        do_action("TextEntry"," d","");
+        
+        // a cat interfered
+        let real_json = do_action("TextEntry"," ddddddddddddddd","");
+        let expected_json = r#"{"screen":"RecoverSeedPhrase","screenLabel":"Recover Seed","back":true,"footer":false,"footerButton":"Keys","rightButton":"None","screenNameType":"h1","modal":"Empty","alert":"Empty","screenData":{"seed_name":"Alice","keyboard":true,"user_input":" d","guess_set":["dad","damage","damp","dance","danger","daring","dash","daughter"],"draft":[{"order":0,"content":"bottom"}]},"modalData":{},"alertData":{}}"#;
+        assert!(real_json == expected_json, "TextEntry on RecoverSeedPhrase screen with no guesses. Expected to keep previous good user entry, got:\n{}", real_json);
+        
+        let real_json = do_action("TextEntry"," dddddddd ","");
+        let expected_json = r#"{"screen":"RecoverSeedPhrase","screenLabel":"Recover Seed","back":true,"footer":false,"footerButton":"Keys","rightButton":"None","screenNameType":"h1","modal":"Empty","alert":"Empty","screenData":{"seed_name":"Alice","keyboard":true,"user_input":" d","guess_set":["dad","damage","damp","dance","danger","daring","dash","daughter"],"draft":[{"order":0,"content":"bottom"}]},"modalData":{},"alertData":{}}"#;
+        assert!(real_json == expected_json, "TextEntry on RecoverSeedPhrase screen with erroneous entry, attempted to add to the draft using whitespace. Expected nothing to happen, got:\n{}", real_json);
+        
+        do_action("TextEntry"," driv ","");
+        do_action("TextEntry"," obe ","");
+        do_action("TextEntry"," lake ","");
+        do_action("TextEntry"," curt ","");
+        let real_json = do_action("TextEntry"," som","");
+        let expected_json = r#"{"screen":"RecoverSeedPhrase","screenLabel":"Recover Seed","back":true,"footer":false,"footerButton":"Keys","rightButton":"None","screenNameType":"h1","modal":"Empty","alert":"Empty","screenData":{"seed_name":"Alice","keyboard":true,"user_input":" som","guess_set":["someone"],"draft":[{"order":0,"content":"bottom"},{"order":1,"content":"drive"},{"order":2,"content":"obey"},{"order":3,"content":"lake"},{"order":4,"content":"curtain"}]},"modalData":{},"alertData":{}}"#;
+        assert!(real_json == expected_json, "TextEntry on RecoverSeedPhrase screen with incomplete word with typo. Expected correct draft and guesses for wrong entry, got:\n{}", real_json);
+        
+        let real_json = do_action("TextEntry"," smo","");
+        let expected_json = r#"{"screen":"RecoverSeedPhrase","screenLabel":"Recover Seed","back":true,"footer":false,"footerButton":"Keys","rightButton":"None","screenNameType":"h1","modal":"Empty","alert":"Empty","screenData":{"seed_name":"Alice","keyboard":true,"user_input":" smo","guess_set":["smoke","smooth"],"draft":[{"order":0,"content":"bottom"},{"order":1,"content":"drive"},{"order":2,"content":"obey"},{"order":3,"content":"lake"},{"order":4,"content":"curtain"}]},"modalData":{},"alertData":{}}"#;
+        assert!(real_json == expected_json, "TextEntry on RecoverSeedPhrase screen with incomplete word. Expected correct draft and a few guesses, got:\n{}", real_json);
+        
+        let real_json = do_action("TextEntry"," smo ","");
+        let expected_json = r#"{"screen":"RecoverSeedPhrase","screenLabel":"Recover Seed","back":true,"footer":false,"footerButton":"Keys","rightButton":"None","screenNameType":"h1","modal":"Empty","alert":"Empty","screenData":{"seed_name":"Alice","keyboard":true,"user_input":" smo","guess_set":["smoke","smooth"],"draft":[{"order":0,"content":"bottom"},{"order":1,"content":"drive"},{"order":2,"content":"obey"},{"order":3,"content":"lake"},{"order":4,"content":"curtain"}]},"modalData":{},"alertData":{}}"#;
+        assert!(real_json == expected_json, "Try to enter with whitespace a word with multiple possible endings. Expected nothing to happen, got:\n{}", real_json);
+        
+        let real_json = do_action("PushWord","smoke","");
+        let expected_json = r#"{"screen":"RecoverSeedPhrase","screenLabel":"Recover Seed","back":true,"footer":false,"footerButton":"Keys","rightButton":"None","screenNameType":"h1","modal":"Empty","alert":"Empty","screenData":{"seed_name":"Alice","keyboard":true,"user_input":" ","guess_set":["abandon","ability","able","about","above","absent","absorb","abstract"],"draft":[{"order":0,"content":"bottom"},{"order":1,"content":"drive"},{"order":2,"content":"obey"},{"order":3,"content":"lake"},{"order":4,"content":"curtain"},{"order":5,"content":"smoke"}]},"modalData":{},"alertData":{}}"#;
+        assert!(real_json == expected_json, "PushWord on RecoverSeedPhrase screen. Expected correct draft and empty user_input, got:\n{}", real_json);
+        
+        do_action("TextEntry"," bask ","");
+        do_action("TextEntry"," hold ","");
+        do_action("TextEntry"," race ","");
+        do_action("TextEntry"," lone ","");
+        do_action("TextEntry"," fit ","");
+        let real_json = do_action("TextEntry"," walk ","");
+        let expected_json = r#"{"screen":"RecoverSeedPhrase","screenLabel":"Recover Seed","back":true,"footer":false,"footerButton":"Keys","rightButton":"None","screenNameType":"h1","modal":"Empty","alert":"Empty","screenData":{"seed_name":"Alice","keyboard":true,"user_input":" ","guess_set":["abandon","ability","able","about","above","absent","absorb","abstract"],"draft":[{"order":0,"content":"bottom"},{"order":1,"content":"drive"},{"order":2,"content":"obey"},{"order":3,"content":"lake"},{"order":4,"content":"curtain"},{"order":5,"content":"smoke"},{"order":6,"content":"basket"},{"order":7,"content":"hold"},{"order":8,"content":"race"},{"order":9,"content":"lonely"},{"order":10,"content":"fit"},{"order":11,"content":"walk"}],"ready_seed":"bottom drive obey lake curtain smoke basket hold race lonely fit walk"},"modalData":{},"alertData":{}}"#;
+        assert!(real_json == expected_json, "TextEntry on RecoverSeedPhrase screen finalizing draft. Expected correct full draft and allowed seed phrase to proceed, got:\n{}", real_json);
+        
+        // Woohoo!
+        // here the phone gets the finalized allowed seed, and needs to check it with strongbox, to see if the seed phrase already is known
+        // can't model it here
         
         let real_json = do_action("GoForward","false",ALICE_WORDS);
         let expected_json = r#"{"screen":"Keys","screenLabel":"","back":true,"footer":true,"footerButton":"Keys","rightButton":"Backup","screenNameType":"h4","modal":"Empty","alert":"Empty","screenData":{"root":{"seed_name":"Alice","identicon":"","address_key":"","base58":"","swiped":false,"multiselect":false},"set":[{"address_key":"01f606519cb8726753885cd4d0f518804a69a5e0badf36fee70feadd8044081730","base58":"16Zaf6BT6xc6WeYCX6YNAf67RumWaEiumwawt7cTdKMU7HqW","identicon":"89504e470d0a1a0a0000000d49484452000000410000004108060000008ef7c945000003a849444154789cedd82f6e1b5110c7f1865a0ab054c9a8dc472829300a2c28aa941ba46728e8199a1b442a2a280c3228e911cc8b2c55328864eace6835c9ec7a76febc376f6529fb052fecbddf7ea4105f9d4ea737afbd49100e8743f123cbe5f20afe34ad0942cd475bb540494568f9f1c3323152104a3e7eb1dec2d9efb8dbc0192b03a30aa1e4e33109802a81c06a308a115a0050534314219402602d11b012881042cdc753ad11a808861b2103009b0a01f342b8102200abed4738fbed37bfe0ec8a2258f75979204c845a008a0fd7202c008adf676541a4216883293e5c82f00250fc3ead2a042f0096391acbbe4f831845880060d9a3b3efc3c62044842800963d3afb3e4a8270232c1ed670f63bdeeee0ec8a8e7ebcbf86b3dfcddd139c5dd1fbac7d940bc10b40f187b4e17cb004407921f87dde7dd410c244d01ea0f843d2703e5803a02c087e5f741fa6220c01b09247b4a20856a5fb38c48c003d23480058e923635d0a024610e908ebf70b38fbedfe1ce1ec8a2258f745f7f1dc0898f6107f401a4cf1e11a840540f1fbbcfb86851030e921fe803698e2c325082f00c5efb3f649f5102c004fd1d156d9f78d851033c28c104478b75dc1d9efef660f675774f4f5fd4f38fb3ddd7d82b32b7a9fb56f2c3782f400c51fd286f3c11200e585e0f779f749b910b40728fe90349c0fd600280b82df17dd37ac09825514c1aa76df8c00cd085013842febf3ffe1efbb97ffe12882755f74df301702a63dc41f9006537cb806610150fc3eef3e293702263dc41fd006537cb804e105a0f87dd6beb1420856d1d156d9f78d3523403302f48c8059109f85513fd888e8e8d5b72d9cfdf65f37707645efb3f6492100fce97e4fc03404e9018a3fa40de7832500ca0bc1eff3ee1be646d01ea0f843d2703e5803a02c087e5f741faf19825514c1aa66df19022641d43c227529080480cd08500f011b42441fb9599cffeafb787cf9d5378a60dd17dd877100cc44c0b487f803d2608a0fd7202c008adfe7dd4799089817823fa00da6f87009c20b40f1fbac7dd4100073235845475b65df47b911b02844f6e8ecfb3009001b45c02210d9a3b3ef1b03c05404cc0b111d7dfbf6039cfd1efefd86b32b7a9f960680a52160da703e5802a0bc10fc3eab6a04ac16820fd600280b82df676501602e042c02a11545a8c90380b911b00c88a910bc00580881aac1688d10f978aa08012b8568895002801523602d20a606c0aa10a8120c09a204a0e6e3a91404aa04a3b48c8fa75211a89618991f4f3541185683d2e2a3874d8270e9fd07d4a1bface9299ffb0000000049454e44ae426082","has_pwd":false,"path":"//polkadot","swiped":false,"multiselect":false}],"network":{"title":"Polkadot","logo":"polkadot"},"multiselect_mode":false,"multiselect_count":""},"modalData":{},"alertData":{}}"#;

@@ -37,7 +37,7 @@ fun SeedBox(seedPhrase: String, status: SeedBoxStatus = SeedBoxStatus.Seed) {
 					"Time out. Come back again to see the seed phrase!",
 					style = MaterialTheme.typography.body1,
 					color = MaterialTheme.colors.Text300,
-					textAlign = TextAlign.Center,
+					textAlign = TextAlign.Left,
 					modifier = Modifier.padding(8.dp)
 				)
 			}
@@ -46,16 +46,16 @@ fun SeedBox(seedPhrase: String, status: SeedBoxStatus = SeedBoxStatus.Seed) {
 					"Seed phrase could not be shown due to error",
 					style = MaterialTheme.typography.body1,
 					color = MaterialTheme.colors.SignalDanger,
-					textAlign = TextAlign.Center,
+					textAlign = TextAlign.Left,
 					modifier = Modifier.padding(8.dp)
 				)
 			}
 			SeedBoxStatus.Locked -> {
 				Text(
-					"Seeds are not available now! Come back again to access them.",
+					"Network connected! Seeds are not available now. Please enable airplane mode and disconnect all cables to access the seed phrase",
 					style = MaterialTheme.typography.body1,
 					color = MaterialTheme.colors.SignalDanger,
-					textAlign = TextAlign.Center,
+					textAlign = TextAlign.Left,
 					modifier = Modifier.padding(8.dp)
 				)
 			}

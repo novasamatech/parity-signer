@@ -7,22 +7,25 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.ui.unit.dp
+import io.parity.signer.ButtonID
 
 @Composable
-fun RestoreSeedPhraseSuggest(guessWord: MutableState<List<String>>, push: (word: String) -> Unit) {
-
+fun RestoreSeedPhraseSuggest(
+	guessWord: List<String>,
+	button: (button: ButtonID, details: String) -> Unit,
+) {
 	LazyRow(
 		contentPadding = PaddingValues(horizontal = 8.dp),
 		horizontalArrangement = Arrangement.spacedBy(12.dp)
 	) {
 		this.items(
-			items = guessWord.value,
+			items = guessWord,
 			key = {
 				it
 			}
 		) { word ->
 			SeedPhraseButton(word = word, select = {
-				push(word)
+				button(ButtonID.PushWord, word)
 			})
 		}
 	}

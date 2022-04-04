@@ -1,12 +1,14 @@
+use bip39::{Language, Mnemonic};
 use blake2_rfc::blake2b::blake2b;
 use hex;
 use parity_scale_codec::Encode;
 use sp_core::{Pair, sr25519};
 use sp_runtime::MultiSigner;
 use std::collections::HashMap;
+use zeroize::{Zeroize, ZeroizeOnDrop};
 
-use constants::{HISTORY, TRANSACTION};
-use definitions::{error::{AddressGenerationCommon, DatabaseSigner, ErrorSigner, ErrorSource, InterfaceSigner, NotFoundSigner, Signer}, helpers::{make_identicon_from_multisigner, multisigner_to_encryption, multisigner_to_public, pic_meta}, keyring::{AddressKey, NetworkSpecsKey, print_multisigner_as_base58, VerifierKey}, network_specs::NetworkSpecs, print::export_complex_vector, qr_transfers::ContentLoadTypes, users::AddressDetails};
+use constants::{HISTORY, MAX_WORDS_DISPLAY, TRANSACTION};
+use definitions::{error::{AddressGenerationCommon, DatabaseSigner, ErrorSigner, ErrorSource, InterfaceSigner, NotFoundSigner, Signer}, helpers::{make_identicon_from_multisigner, multisigner_to_encryption, multisigner_to_public, pic_meta}, keyring::{AddressKey, NetworkSpecsKey, print_multisigner_as_base58, VerifierKey}, network_specs::NetworkSpecs, print::{export_complex_vector, export_plain_vector}, qr_transfers::ContentLoadTypes, users::AddressDetails};
 use qrcode_static::png_qr_from_string;
 
 use crate::db_transactions::TrDbCold;
@@ -345,6 +347,156 @@ pub fn purge_transactions (database_name: &str) -> Result<(), ErrorSigner> {
         .apply::<Signer>(&database_name)
 }
 
+
+/// Function to display possible options of English code words from allowed words list
+/// that start with already entered piece
+fn guess (word_part: &str) -> Vec<&'static str> {
+    let dictionary = Language::English.wordlist();
+    let words = dictionary.get_words_by_prefix(word_part);
+    if words.len() > MAX_WORDS_DISPLAY {words[..MAX_WORDS_DISPLAY].to_vec()}
+    else {words.to_vec()}
+}
+
+
+/// Function to dynamically update suggested seed phrase words,
+/// based on user entered word part.
+/// Produces json-like export with maximum 8 fitting words, sorted by alphabetical order.
+pub fn print_guess (user_entry: &str) -> String {
+    export_plain_vector(&guess(user_entry))
+}
+
+
+pub const BIP_CAP: usize = 24; // maximum word count in bip39 standard, see https://docs.rs/tiny-bip39/0.8.2/src/bip39/mnemonic_type.rs.html#60
+pub const WORD_LENGTH: usize = 8; // maximum word length in bip39 standard
+pub const SAFE_RESERVE: usize = 1000; // string length to reserve for json output of numbered draft; each element is {"order":**,"content":"********"}, at most 33+1(comma) symbols for each max BIP_CAP elements, two extras for [ and ], and some extra space just in case
+
+
+/// Struct to store seed draft, as entered by user
+#[derive(Debug, Clone, Zeroize, ZeroizeOnDrop)]
+pub struct SeedDraft {
+    user_input: String,
+    saved: Vec<SeedElement>,
+}
+
+/// Struct to store seed element, as entered by user
+#[derive(Debug, Clone, Zeroize, ZeroizeOnDrop)]
+struct SeedElement(String);
+
+impl SeedElement {
+    fn from_checked_str(word: &str) -> Self {
+        let mut new = String::with_capacity(WORD_LENGTH);
+        new.push_str(word);
+        SeedElement(new)
+    }
+    fn word(&self) -> &str {
+        &self.0
+    }
+}
+
+
+impl SeedDraft {
+    pub fn new() -> Self {
+        Self {
+            user_input: String::with_capacity(WORD_LENGTH), // capacity corresponds to maximum word length in bip39 standard;
+            saved: Vec::with_capacity(BIP_CAP), // capacity corresponds to maximum word count in bip39 standard; set here to avoid reallocation;
+        }
+    }
+    pub fn text_field_update(&mut self, user_text: &str) {
+        if self.saved.len() < BIP_CAP {
+            if user_text.is_empty() {
+                // user has removed all text, including the first default symbol
+                // if there are words in draft, remove the last one
+                self.remove_last();
+                // restore the user input to emtpy one
+                self.user_input.clear();
+            }
+            else {
+                let user_text = user_text.trim_start();
+                if user_text.ends_with(' ') {
+                    let word = user_text.trim();
+                    if self.added(word, None) {self.user_input.clear()}
+                    else {
+                        if !guess(word).is_empty() {self.user_input = String::from(word)}
+                    }
+                }
+                else {
+                    if !guess(user_text).is_empty() {self.user_input = String::from(user_text)}
+                }
+            }
+        }
+        else {self.user_input.clear()}
+    }
+    pub fn added(&mut self, word: &str, position: Option<u32>) -> bool {
+        if self.saved.len() < BIP_CAP {
+            let guesses = guess(word);
+            let definitive_guess = {
+                if guesses.len() == 1 {Some(guesses[0])}
+                else {
+                    if guesses.contains(&word) {Some(word)}
+                    else {None}
+                }
+            };
+            if let Some(guess) = definitive_guess {
+                let new = SeedElement::from_checked_str(guess);
+                match position {
+                    Some(p) => {
+                        let p = p as usize;
+                        if p <= self.saved.len() {self.saved.insert(p, new)}
+                        else {self.saved.push(new)}
+                    },
+                    None => self.saved.push(new),
+                }
+                self.user_input.clear();
+                true
+            }
+            else {false}
+        }
+        else {false}
+    }
+    pub fn remove(&mut self, position: u32) {
+        let position = position as usize;
+        if position < self.saved.len() {
+            self.saved.remove(position);
+        }
+    }
+    pub fn remove_last(&mut self) {
+        if self.saved.len() > 0 {
+            self.saved.remove(self.saved.len()-1);
+        }
+    }
+    pub fn print(&self) -> String {
+        let mut out = String::with_capacity(SAFE_RESERVE);
+        out.push_str("[");
+        for (i,x) in self.saved.iter().enumerate() {
+            if i>0 {out.push_str(",")}
+            out.push_str(&format!("{{\"order\":{},\"content\":\"", i));
+            out.push_str(x.word());
+            out.push_str("\"}");
+        }
+        out.push_str("]");
+        out
+    }
+    /// Combines all draft elements into seed phrase proposal,
+    /// and checks its validity.
+    /// If valid, outputs secret seed phrase.
+    pub fn try_finalize(&self) -> Option<String> {
+        let mut seed_phrase_proposal = String::with_capacity((WORD_LENGTH+1)*BIP_CAP);
+        for (i, x) in self.saved.iter().enumerate() {
+            if i>0 {seed_phrase_proposal.push_str(" ");}
+            seed_phrase_proposal.push_str(x.word());
+        }
+        if Mnemonic::validate(&seed_phrase_proposal, Language::English).is_ok() {Some(seed_phrase_proposal)}
+        else {
+            seed_phrase_proposal.zeroize();
+            None
+        }
+    }
+    /// Function to output the user input back into user interface
+    pub fn user_input(&self) -> &str {
+        &self.user_input
+    }
+}
+
 #[cfg(test)]
 mod tests {
     
@@ -578,7 +730,113 @@ mod tests {
         assert!(print == expected_print, "\nReceived: \n{}", print);
         fs::remove_dir_all(dbname).unwrap();
     }
+
+    #[test]
+    fn word_search_1() {
+        let word_part = "dri";
+        let out = guess(word_part);
+        let out_expected = vec!["drift".to_string(),"drill".to_string(),"drink".to_string(),"drip".to_string(),"drive".to_string()];
+        assert!(out == out_expected, "Found different word set:\n{:?}", out);
+    }
+
+    #[test]
+    fn word_search_2() {
+        let word_part = "umbra";
+        let out = guess(word_part);
+        assert!(out.is_empty(), "Found different word set:\n{:?}", out);
+    }
+
+    #[test]
+    fn word_search_3() {
+        let word_part = "котик";
+        let out = guess(word_part);
+        assert!(out.is_empty(), "Found different word set:\n{:?}", out);
+    }
+
+    #[test]
+    fn word_search_4() {
+        let word_part = "";
+        let out = guess(word_part);
+        let out_expected = vec!["abandon".to_string(),"ability".to_string(),"able".to_string(),"about".to_string(),"above".to_string(),"absent".to_string(),"absorb".to_string(),"abstract".to_string()];
+        assert!(out == out_expected, "Found different word set:\n{:?}", out);
+    }
+
+    #[test]
+    fn word_search_5() {
+        let word_part = " ";
+        let out = guess(word_part);
+        assert!(out.is_empty(), "Found different word set:\n{:?}", out);
+    }
+
+    #[test]
+    fn word_search_6() {
+        let word_part = "s";
+        let out = guess(word_part);
+        let out_expected = vec!["sad".to_string(),"saddle".to_string(),"sadness".to_string(),"safe".to_string(),"sail".to_string(),"salad".to_string(),"salmon".to_string(),"salon".to_string()];
+        assert!(out == out_expected, "Found different word set:\n{:?}", out);
+    }
+
+    #[test]
+    fn word_search_7() {
+        let word_part = "se";
+        let out = guess(word_part);
+        let out_expected = vec!["sea".to_string(),"search".to_string(),"season".to_string(),"seat".to_string(),"second".to_string(),"secret".to_string(),"section".to_string(),"security".to_string()];
+        assert!(out == out_expected, "Found different word set:\n{:?}", out);
+    }
+
+    #[test]
+    fn word_search_8() {
+        let word_part = "sen";
+        let out = guess(word_part);
+        let out_expected = vec!["senior".to_string(),"sense".to_string(),"sentence".to_string()];
+        assert!(out == out_expected, "Found different word set:\n{:?}", out);
+    }
+
+    #[test]
+    fn alice_recalls_seed_phrase_1() {
+        let mut seed_draft = SeedDraft::new();
+        seed_draft.added("bottom", None);
+        seed_draft.added("lake", None);
+        // oops, wrong place
+        seed_draft.added("drive", Some(1));
+        seed_draft.added("obey", Some(2));
+        let print = seed_draft.print();
+        let expected_print = r#"[{"order":0,"content":"bottom"},{"order":1,"content":"drive"},{"order":2,"content":"obey"},{"order":3,"content":"lake"}]"#;
+        assert!(print == expected_print, "\nReceived: \n{}", print);
+        // adding invalid word - should be blocked through UI, expect no changes
+        seed_draft.added("занавеска", None);
+        let print = seed_draft.print();
+        let expected_print = r#"[{"order":0,"content":"bottom"},{"order":1,"content":"drive"},{"order":2,"content":"obey"},{"order":3,"content":"lake"}]"#;
+        assert!(print == expected_print, "\nReceived: \n{}", print);
+        // removing invalid word - should be blocked through UI, expect no changes
+        seed_draft.remove(5);
+        let print = seed_draft.print();
+        let expected_print = r#"[{"order":0,"content":"bottom"},{"order":1,"content":"drive"},{"order":2,"content":"obey"},{"order":3,"content":"lake"}]"#;
+        assert!(print == expected_print, "\nReceived: \n{}", print);
+        // removing word
+        seed_draft.remove(1);
+        let print = seed_draft.print();
+        let expected_print = r#"[{"order":0,"content":"bottom"},{"order":1,"content":"obey"},{"order":2,"content":"lake"}]"#;
+        assert!(print == expected_print, "\nReceived: \n{}", print);
+    }
     
+    #[test]
+    fn alice_recalls_seed_phrase_2() {
+        let mut seed_draft = SeedDraft::new();
+        seed_draft.added("fit", None);
+        let print = seed_draft.print();
+        let expected_print = r#"[{"order":0,"content":"fit"}]"#;
+        assert!(print == expected_print, "\nReceived: \n{}", print);
+    }
+    
+    #[test]
+    fn alice_recalls_seed_phrase_3() {
+        let mut seed_draft = SeedDraft::new();
+        seed_draft.added("obe", None);
+        let print = seed_draft.print();
+        let expected_print = r#"[{"order":0,"content":"obey"}]"#;
+        assert!(print == expected_print, "\nReceived: \n{}", print);
+    }
 }
 
 

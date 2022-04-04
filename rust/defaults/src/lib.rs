@@ -5,7 +5,7 @@ use std::convert::TryInto;
 use std::fs;
 use regex::Regex;
 use lazy_static::lazy_static;
-use definitions::{crypto::Encryption, error::{DefaultLoading, ErrorActive, IncomingMetadataSourceActiveStr}, keyring::VerifierKey, metadata::{AddressBookEntry, MetaValues}, network_specs::{NetworkSpecs, NetworkSpecsToSend, CurrentVerifier, ValidCurrentVerifier, Verifier, VerifierValue}, qr_transfers::ContentLoadTypes, types::{TypeEntry, Description, EnumVariant, EnumVariantType, StructField}};
+use definitions::{crypto::Encryption, error::{Active, DefaultLoading, ErrorActive, ErrorSource, IncomingMetadataSourceActive, IncomingMetadataSourceActiveStr, MetadataError, MetadataSource}, keyring::VerifierKey, metadata::{AddressBookEntry, MetaValues}, network_specs::{NetworkSpecs, NetworkSpecsToSend, CurrentVerifier, ValidCurrentVerifier, Verifier, VerifierValue}, qr_transfers::ContentLoadTypes, types::{TypeEntry, Description, EnumVariant, EnumVariantType, StructField}};
 
 pub const DEFAULT_VERIFIER_PUBLIC: [u8;32] = [
     0xc4,
@@ -179,6 +179,7 @@ pub fn get_default_address_book() -> Vec<AddressBookEntry> {
 }
 
 fn get_metadata(dir: &str) -> Result<Vec<MetaValues>, ErrorActive> {
+    let default_network_info = get_default_network_info();
     let mut out: Vec<MetaValues> = Vec::new();
     let path_set = match std::fs::read_dir(dir) {
         Ok(a) => a,
@@ -186,12 +187,25 @@ fn get_metadata(dir: &str) -> Result<Vec<MetaValues>, ErrorActive> {
     };
     for x in path_set {
         if let Ok(path) = x {
-            if let Some(name) = path.path().to_str() {
+            if let Some(filename) = path.path().to_str() {
                 let meta_str = match std::fs::read_to_string(path.path()) {
                     Ok(a) => a,
                     Err(e) => return Err(ErrorActive::DefaultLoading(DefaultLoading::MetadataFile(e))),
                 };
-                let new = MetaValues::from_str_metadata(&meta_str.trim(), IncomingMetadataSourceActiveStr::Default{filename: name.to_string()})?;
+                let new = MetaValues::from_str_metadata(&meta_str.trim(), IncomingMetadataSourceActiveStr::Default{filename: filename.to_string()})?;
+                let mut found = false;
+                for a in default_network_info.iter() {
+                    if new.name == a.name {
+                        found = true;
+                        if let Some(prefix_from_meta) = new.optional_base58prefix {
+                            if prefix_from_meta != a.base58prefix {
+                                return Err(<Active>::faulty_metadata(MetadataError::Base58PrefixSpecsMismatch{specs: a.base58prefix, meta: prefix_from_meta}, MetadataSource::Incoming(IncomingMetadataSourceActive::Str(IncomingMetadataSourceActiveStr::Default{filename: filename.to_string()}))))
+                            }
+                        }
+                        break;
+                    }
+                }
+                if !found {return Err(ErrorActive::DefaultLoading(DefaultLoading::OrphanMetadata{name: new.name.to_string(), filename: filename.to_string()}))}
                 out.push(new)
             }
         }
