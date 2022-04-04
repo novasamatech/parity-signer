@@ -13,29 +13,21 @@ import io.parity.signer.models.SignerDataModel
 import io.parity.signer.models.getSeed
 import io.parity.signer.models.pushButton
 import org.json.JSONArray
+import org.json.JSONObject
 
 @Composable
-fun SignSufficientCrypto(signerDataModel: SignerDataModel) {
-	val identities =
-		signerDataModel.screenData.value?.optJSONArray("identities") ?: JSONArray()
+fun SignSufficientCrypto(
+	screenData: JSONObject,
+	sign: (JSONObject) -> Unit
+) {
+	val identities = screenData.optJSONArray("identities") ?: JSONArray()
 	Column {
 		Text("Select key for signing")
 		LazyColumn {
 			items(identities.length()) { index ->
 				val identity = identities.getJSONObject(index)
 				Row(Modifier.clickable {
-					signerDataModel.authentication.authenticate(signerDataModel.activity) {
-						val seedPhrase = signerDataModel.getSeed(
-							identity.optString("seed_name")
-						)
-						if (seedPhrase.isNotBlank()) {
-							signerDataModel.pushButton(
-								ButtonID.GoForward,
-								identity.optString("address_key"),
-								seedPhrase
-							)
-						}
-					}
+					sign(identity)
 				}) {
 					KeyCard(identity = identity)
 				}

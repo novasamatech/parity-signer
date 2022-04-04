@@ -18,6 +18,7 @@ import io.parity.signer.models.SignerDataModel
 import io.parity.signer.models.abbreviateString
 import io.parity.signer.models.pushButton
 import io.parity.signer.ui.theme.*
+import org.json.JSONObject
 
 /**
  * Settings screen; General purpose stuff like legal info, networks management
@@ -25,27 +26,34 @@ import io.parity.signer.ui.theme.*
  * all subsequent interactions should be in modals or drop-down menus
  */
 @Composable
-fun SettingsScreen(signerDataModel: SignerDataModel) {
+fun SettingsScreen(
+	screenData: JSONObject,
+	button: (ButtonID) -> Unit,
+	alertState: ShieldAlert?,
+	strongbox: String,
+	version: String,
+	wipeToFactory: () -> Unit
+) {
 	var confirm by remember { mutableStateOf(false) }
 
 	Column(
 		verticalArrangement = Arrangement.spacedBy(4.dp)
 	) {
-		Row(Modifier.clickable { signerDataModel.pushButton(ButtonID.ManageNetworks) }) {
+		Row(Modifier.clickable { button(ButtonID.ManageNetworks) }) {
 			SettingsCardTemplate(text = "Networks")
 		}
 		Row(Modifier.clickable {
-			if (signerDataModel.alertState.value == ShieldAlert.None)
-				signerDataModel.pushButton(ButtonID.BackupSeed)
+			if (alertState == ShieldAlert.None)
+				button(ButtonID.BackupSeed)
 			else
-				signerDataModel.pushButton(ButtonID.Shield)
+				button(ButtonID.Shield)
 		}) {
 			SettingsCardTemplate(text = "Backup keys")
 		}
 		Column(
 			Modifier
 				.padding(12.dp)
-				.clickable { signerDataModel.pushButton(ButtonID.ViewGeneralVerifier) }
+				.clickable { button(ButtonID.ViewGeneralVerifier) }
 		) {
 			Row {
 				Text(
@@ -55,52 +63,51 @@ fun SettingsScreen(signerDataModel: SignerDataModel) {
 				)
 				Spacer(Modifier.weight(1f))
 			}
-			signerDataModel.screenData.value?.let {
-				Surface(
-					shape = MaterialTheme.shapes.small,
-					color = MaterialTheme.colors.Bg200,
-					modifier = Modifier.padding(8.dp)
+
+			Surface(
+				shape = MaterialTheme.shapes.small,
+				color = MaterialTheme.colors.Bg200,
+				modifier = Modifier.padding(8.dp)
+			) {
+				Row(
+					verticalAlignment = Alignment.CenterVertically,
+					modifier = Modifier
+						.padding(8.dp)
+						.fillMaxWidth(1f)
 				) {
-					Row(
-						verticalAlignment = Alignment.CenterVertically,
-						modifier = Modifier
-							.padding(8.dp)
-							.fillMaxWidth(1f)
-					) {
-						Identicon(identicon = it.optString("identicon"))
-						Spacer(Modifier.width(4.dp))
-						Column {
-							Text(
-								it.optString("public_key").abbreviateString(8),
-								style = CryptoTypography.body2,
-								color = MaterialTheme.colors.Crypto400
-							)
-							Text(
-								"encryption: " + it.optString("encryption"),
-								style = CryptoTypography.body1,
-								color = MaterialTheme.colors.Text400
-							)
-						}
+					Identicon(identicon = screenData.optString("identicon"))
+					Spacer(Modifier.width(4.dp))
+					Column {
+						Text(
+							screenData.optString("public_key").abbreviateString(8),
+							style = CryptoTypography.body2,
+							color = MaterialTheme.colors.Crypto400
+						)
+						Text(
+							"encryption: " + screenData.optString("encryption"),
+							style = CryptoTypography.body1,
+							color = MaterialTheme.colors.Text400
+						)
 					}
 				}
 			}
+
 		}
 		Row(
 			Modifier.clickable {
 				confirm = true
 			}
 		) { SettingsCardTemplate(text = "Wipe signer", danger = true) }
-		Row(Modifier.clickable { signerDataModel.pushButton(ButtonID.ShowDocuments) }) {
+		Row(Modifier.clickable { button(ButtonID.ShowDocuments) }) {
 			SettingsCardTemplate(text = "About")
 		}
 		SettingsCardTemplate(
-			"Hardware seed protection: " + signerDataModel.isStrongBoxProtected()
-				.toString(),
+			"Hardware seed protection: $strongbox",
 			withIcon = false,
 			withBackground = false
 		)
 		SettingsCardTemplate(
-			"Version: " + signerDataModel.getAppVersion(),
+			"Version: $version",
 			withIcon = false,
 			withBackground = false
 		)
@@ -112,10 +119,7 @@ fun SettingsScreen(signerDataModel: SignerDataModel) {
 		text = "Factory reset the Signer app. This operation can not be reverted!",
 		back = { confirm = false },
 		forward = {
-			signerDataModel.authentication.authenticate(signerDataModel.activity) {
-				signerDataModel.wipe()
-				signerDataModel.totalRefresh()
-			}
+			wipeToFactory()
 		},
 		backText = "Cancel",
 		forwardText = "Wipe"

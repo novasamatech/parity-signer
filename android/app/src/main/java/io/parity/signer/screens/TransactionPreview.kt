@@ -15,17 +15,19 @@ import io.parity.signer.ButtonID
 import io.parity.signer.components.*
 import io.parity.signer.models.*
 import io.parity.signer.ui.theme.Text400
+import org.json.JSONObject
 
 @Composable
 fun TransactionPreview(
+	screenData: JSONObject,
 	button: (button: ButtonID, details: String, seedPhrase: String) -> Unit,
-	signerDataModel: SignerDataModel
+  sign: (String) -> Unit
 ) {
 	val transaction =
-		signerDataModel.screenData.value!!.getJSONObject("content")
+		screenData.getJSONObject("content")
 			.parseTransaction()
 	val action =
-		TransactionType.valueOf(signerDataModel.screenData.value!!.getString("type"))
+		TransactionType.valueOf(screenData.getString("type"))
   val comment = remember{ mutableStateOf("") }
 	val focusManager = LocalFocusManager.current
 	val focusRequester = remember { FocusRequester() }
@@ -34,10 +36,10 @@ fun TransactionPreview(
 		Modifier.verticalScroll(rememberScrollState())
 	) {
 		TransactionPreviewField(transaction = transaction)
-		signerDataModel.screenData.value!!.optJSONObject("author_info")?.let {
+		screenData.optJSONObject("author_info")?.let {
 			KeyCard(identity = it)
 		}
-		signerDataModel.screenData.value!!.optJSONObject("network_info")?.let {
+		screenData.optJSONObject("network_info")?.let {
 			NetworkCard(network = it)
 		}
 		when (action) {
@@ -57,15 +59,7 @@ fun TransactionPreview(
 				BigButton(
 					text = "Unlock key and sign",
 					action = {
-						signerDataModel.authentication.authenticate(signerDataModel.activity) {
-							val seedPhrase = signerDataModel.getSeed(
-								signerDataModel.screenData.value?.optJSONObject("author_info")
-									?.optString("seed") ?: ""
-							)
-							if (seedPhrase.isNotBlank()) {
-								button(ButtonID.GoForward, comment.value.encode64(), seedPhrase)
-							}
-						}
+						sign(comment.value)
 					}
 				)
 				BigButton(

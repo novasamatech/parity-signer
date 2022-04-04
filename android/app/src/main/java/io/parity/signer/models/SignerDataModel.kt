@@ -318,6 +318,25 @@ class SignerDataModel : ViewModel() {
 	}
 
 	/**
+	 * Auth user and wipe the Signer to initial state
+	 */
+	fun wipeToFactory() {
+		authentication.authenticate(activity) {
+			wipe()
+			totalRefresh()
+		}
+	}
+
+	/**
+	 * Auth user and wipe Signer to state without general verifier certificate
+	 */
+	fun wipeToJailbreak() {
+		authentication.authenticate(activity) {
+			jailbreak()
+		}
+	}
+
+	/**
 	 * Just clears last error;
 	 * Run every time user does something
 	 */

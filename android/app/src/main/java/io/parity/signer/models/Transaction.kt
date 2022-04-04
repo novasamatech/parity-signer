@@ -1,5 +1,6 @@
 package io.parity.signer.models
 
+import io.parity.signer.ButtonID
 import org.json.JSONArray
 import org.json.JSONObject
 
@@ -44,4 +45,31 @@ enum class TransactionType {
 	read,
 	import_derivations,
 	done;
+}
+
+fun SignerDataModel.signTransaction(comment: String) {
+	authentication.authenticate(activity) {
+		val seedPhrase = getSeed(
+			screenData.value?.optJSONObject("author_info")
+				?.optString("seed") ?: ""
+		)
+		if (seedPhrase.isNotBlank()) {
+			pushButton(ButtonID.GoForward, comment.encode64(), seedPhrase)
+		}
+	}
+}
+
+fun SignerDataModel.signSufficientCrypto(identity: JSONObject) {
+	authentication.authenticate(activity) {
+		val seedPhrase = getSeed(
+			identity.optString("seed_name")
+		)
+		if (seedPhrase.isNotBlank()) {
+			pushButton(
+				ButtonID.GoForward,
+				identity.optString("address_key"),
+				seedPhrase
+			)
+		}
+	}
 }

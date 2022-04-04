@@ -16,6 +16,7 @@ import io.parity.signer.models.SignerDataModel
 import io.parity.signer.models.pushButton
 import io.parity.signer.ui.theme.Bg200
 import org.json.JSONArray
+import org.json.JSONObject
 
 /**
  * Select seed for creating derivations
@@ -23,8 +24,9 @@ import org.json.JSONArray
  * TODO: really replace this with seedmanager element?
  */
 @Composable
-fun SelectSeedForBackup(signerDataModel: SignerDataModel) {
-	val cards = signerDataModel.screenData.value?.getJSONArray("seedNameCards")
+fun SelectSeedForBackup(screenData: JSONObject,
+												button: (ButtonID, String) -> Unit) {
+	val cards = screenData.getJSONArray("seedNameCards")
 		?: JSONArray()
 
 	LazyColumn(
@@ -40,9 +42,9 @@ fun SelectSeedForBackup(signerDataModel: SignerDataModel) {
 				Row(
 					Modifier
 						.clickable {
-							signerDataModel.pushButton(
+							button(
 								ButtonID.BackupSeed,
-								details = cards
+								cards
 									.getJSONObject(item)
 									.getString("seed_name")
 							)

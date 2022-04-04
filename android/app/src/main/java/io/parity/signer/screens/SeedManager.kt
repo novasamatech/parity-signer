@@ -14,10 +14,14 @@ import io.parity.signer.models.SignerDataModel
 import io.parity.signer.models.pushButton
 import io.parity.signer.ui.theme.Bg200
 import org.json.JSONArray
+import org.json.JSONObject
 
 @Composable
-fun SeedManager(signerDataModel: SignerDataModel) {
-	val cards = signerDataModel.screenData.value?.getJSONArray("seedNameCards")
+fun SeedManager(
+	screenData: JSONObject,
+	button: (ButtonID, String) -> Unit
+) {
+	val cards = screenData.getJSONArray("seedNameCards")
 		?: JSONArray()
 
 	LazyColumn(
@@ -33,9 +37,9 @@ fun SeedManager(signerDataModel: SignerDataModel) {
 				Row(
 					Modifier
 						.clickable {
-							signerDataModel.pushButton(
+							button(
 								ButtonID.SelectSeed,
-								details = cards
+								cards
 									.getJSONObject(item)
 									.getString("seed_name")
 							)

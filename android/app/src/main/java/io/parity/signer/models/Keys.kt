@@ -24,6 +24,15 @@ fun SignerDataModel.addKey(path: String, seedName: String) {
 	}
 }
 
+fun SignerDataModel.pathCheck(seedName: String, path: String, network: String): String {
+	return substratePathCheck(
+		seedName = seedName,
+		path = path,
+		network = network,
+		dbname = dbName
+	)
+}
+
 enum class DeriveDestination {
 	pin,
 	pwd;
@@ -43,7 +52,6 @@ class DerivationCheck(
 	 */
 	fun check(path: String) {
 		val checkResult = checkCallback(path)
-		Log.d("checkResult", checkResult)
 		fromJSON(JSONObject(checkResult).optJSONObject("derivation_check")?: JSONObject())
 	}
 
