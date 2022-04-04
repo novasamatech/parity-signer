@@ -1,3 +1,5 @@
+import static org.apache.tools.ant.taskdefs.condition.Os.*
+
 plugins {
 	id 'com.android.application'
 	id 'kotlin-android'
@@ -69,15 +71,14 @@ cargo {
 	apiLevel = 21
 	profile = 'release'
 	exec { spec, toolchain ->
-		println toolchain.target
 		if (toolchain.target == "x86_64-linux-android") {
-			spec.environment("AR_x86_64-linux-android", "$ndkDir/toolchains/llvm/prebuilt/linux-x86_64/bin/llvm-ar")
+			spec.environment("AR_x86_64-linux-android", "$ndkDir/toolchains/llvm/prebuilt/${OS_NAME}-${OS_ARCH}/bin/llvm-ar")
 		}
 		if (toolchain.target == "armv7-linux-androideabi") {
-			spec.environment("AR_armv7-linux-androideabi", "$ndkDir/toolchains/llvm/prebuilt/linux-x86_64/bin/llvm-ar")
+			spec.environment("AR_armv7-linux-androideabi", "$ndkDir/toolchains/llvm/prebuilt/${OS_NAME}-${OS_ARCH}/bin/llvm-ar")
 		}
 		if (toolchain.target == "aarch64-linux-android") {
-			spec.environment("AR_aarch64-linux-android", "$ndkDir/toolchains/llvm/prebuilt/linux-x86_64/bin/llvm-ar")
+			spec.environment("AR_aarch64-linux-android", "$ndkDir/toolchains/llvm/prebuilt/${OS_NAME}-${OS_ARCH}/bin/llvm-ar")
 		}
 	}
 }
