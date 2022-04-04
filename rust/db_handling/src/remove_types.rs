@@ -19,7 +19,7 @@ pub fn remove_types_info(database_name: &str) -> Result<(), ErrorSigner> {
         &get_general_verifier(database_name)?,
     ))];
     TrDbCold::new()
-        .set_history(events_to_batch::<Signer>(&database_name, events)?) // add history
+        .set_history(events_to_batch::<Signer>(database_name, events)?) // add history
         .set_settings(settings_batch) // upd settings
-        .apply::<Signer>(&database_name)
+        .apply::<Signer>(database_name)
 }

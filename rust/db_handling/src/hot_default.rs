@@ -35,8 +35,7 @@ fn default_hot_address_book(database_name: &str) -> Result<Batch, ErrorActive> {
 fn default_hot_network_specs_prep(database_name: &str) -> Result<Batch, ErrorActive> {
     let mut batch = make_batch_clear_tree::<Active>(database_name, SPECSTREEPREP)?;
     for x in get_default_chainspecs_to_send().iter() {
-        let network_specs_key =
-            NetworkSpecsKey::from_parts(&x.genesis_hash.to_vec(), &x.encryption);
+        let network_specs_key = NetworkSpecsKey::from_parts(&x.genesis_hash, &x.encryption);
         batch.insert(network_specs_key.key(), x.encode());
     }
     Ok(batch)
@@ -59,9 +58,9 @@ fn default_hot_settings(database_name: &str) -> Result<Batch, ErrorActive> {
 /// metadata empty
 pub fn reset_hot_database(database_name: &str) -> Result<(), ErrorActive> {
     TrDbHot::new()
-        .set_address_book(default_hot_address_book(&database_name)?) // set default address_book
-        .set_metadata(make_batch_clear_tree::<Active>(&database_name, METATREE)?) // clear metadata
-        .set_network_specs_prep(default_hot_network_specs_prep(&database_name)?) // set default network_specs_prep
-        .set_settings(default_hot_settings(&database_name)?) // load default types
-        .apply(&database_name)
+        .set_address_book(default_hot_address_book(database_name)?) // set default address_book
+        .set_metadata(make_batch_clear_tree::<Active>(database_name, METATREE)?) // clear metadata
+        .set_network_specs_prep(default_hot_network_specs_prep(database_name)?) // set default network_specs_prep
+        .set_settings(default_hot_settings(database_name)?) // load default types
+        .apply(database_name)
 }

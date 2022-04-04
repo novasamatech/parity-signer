@@ -30,7 +30,7 @@ use crate::method::{what_next_old, OlderMeta};
 /// The function outputs the DecodedOut value in case of success.
 fn decode_primitive(
     found_ty: &str,
-    data: &Vec<u8>,
+    data: &[u8],
     indent: u32,
     short_specs: &ShortSpecs,
 ) -> Result<DecodedOut, ParserError> {
@@ -132,11 +132,9 @@ fn decode_primitive(
         "Compact<Percent>" => decode_perthing::<Percent>(data, true, found_ty, indent),
         "Compact<Perbill>" => decode_perthing::<Perbill>(data, true, found_ty, indent),
         "Compact<PerU16>" => decode_perthing::<PerU16>(data, true, found_ty, indent),
-        _ => {
-            return Err(ParserError::Decoding(ParserDecodingError::NotPrimitive(
-                found_ty.to_string(),
-            )))
-        }
+        _ => Err(ParserError::Decoding(ParserDecodingError::NotPrimitive(
+            found_ty.to_string(),
+        ))),
     }
 }
 
@@ -166,7 +164,7 @@ fn decode_complex(
     found_ty: &str,
     mut data: Vec<u8>,
     meta: &OlderMeta,
-    type_database: &Vec<TypeEntry>,
+    type_database: &[TypeEntry],
     indent: u32,
     short_specs: &ShortSpecs,
 ) -> Result<DecodedOut, ParserError> {
@@ -237,7 +235,7 @@ fn decode_complex(
 pub(crate) fn process_as_call(
     mut data: Vec<u8>,
     meta: &OlderMeta,
-    type_database: &Vec<TypeEntry>,
+    type_database: &[TypeEntry],
     mut indent: u32,
     short_specs: &ShortSpecs,
 ) -> Result<DecodedOut, ParserError> {
@@ -257,7 +255,7 @@ pub(crate) fn process_as_call(
             indent: indent + 1,
         },
     ];
-    indent = indent + 2;
+    indent += 2;
 
     for x in call_in_processing.method.arguments.iter() {
         fancy_out.push(OutputCard {
@@ -320,7 +318,7 @@ lazy_static! {
 fn deal_with_option(
     inner_ty: &str,
     mut data: Vec<u8>,
-    type_database: &Vec<TypeEntry>,
+    type_database: &[TypeEntry],
     indent: u32,
     short_specs: &ShortSpecs,
 ) -> Result<DecodedOut, ParserError> {
@@ -381,11 +379,9 @@ fn deal_with_option(
                 data = data[1..].to_vec();
                 decode_simple(inner_ty, data, type_database, indent, short_specs)
             }
-            _ => {
-                return Err(ParserError::Decoding(
-                    ParserDecodingError::UnexpectedOptionVariant,
-                ))
-            }
+            _ => Err(ParserError::Decoding(
+                ParserDecodingError::UnexpectedOptionVariant,
+            )),
         }
     }
 }
@@ -415,7 +411,7 @@ fn deal_with_option(
 fn deal_with_vector(
     inner_ty: &str,
     mut data: Vec<u8>,
-    type_database: &Vec<TypeEntry>,
+    type_database: &[TypeEntry],
     indent: u32,
     short_specs: &ShortSpecs,
 ) -> Result<DecodedOut, ParserError> {
@@ -437,7 +433,7 @@ fn deal_with_vector(
         }
         None => {
             if elements_of_vector != 0 {
-                return Err(ParserError::Decoding(ParserDecodingError::DataTooShort));
+                Err(ParserError::Decoding(ParserDecodingError::DataTooShort))
             } else {
                 Ok(DecodedOut {
                     remaining_vector: Vec::new(),
@@ -474,7 +470,7 @@ fn deal_with_array(
     inner_ty: &str,
     number_of_elements: u32,
     mut data: Vec<u8>,
-    type_database: &Vec<TypeEntry>,
+    type_database: &[TypeEntry],
     indent: u32,
     short_specs: &ShortSpecs,
 ) -> Result<DecodedOut, ParserError> {
@@ -512,7 +508,7 @@ fn deal_with_array(
 /// For each identity field an individual js card "identity_field" is added to fancy_out.
 fn special_case_identity_fields(
     data: Vec<u8>,
-    type_database: &Vec<TypeEntry>,
+    type_database: &[TypeEntry],
     indent: u32,
 ) -> Result<DecodedOut, ParserError> {
     // at the moment, the length is known: 8 units in Vec<u8>
@@ -679,11 +675,9 @@ fn special_case_balance(
             indent,
             short_specs,
         ),
-        _ => {
-            return Err(ParserError::Decoding(
-                ParserDecodingError::BalanceNotDescribed,
-            ))
-        }
+        _ => Err(ParserError::Decoding(
+            ParserDecodingError::BalanceNotDescribed,
+        )),
     }
 }
 
@@ -707,9 +701,9 @@ fn special_case_balance(
 ///
 /// The function outputs the DecodedOut value in case of success.
 fn deal_with_struct(
-    v1: &Vec<StructField>,
+    v1: &[StructField],
     mut data: Vec<u8>,
-    type_database: &Vec<TypeEntry>,
+    type_database: &[TypeEntry],
     indent: u32,
     short_specs: &ShortSpecs,
 ) -> Result<DecodedOut, ParserError> {
@@ -765,9 +759,9 @@ fn deal_with_struct(
 ///
 /// The function outputs the DecodedOut value in case of success.
 fn deal_with_enum(
-    v1: &Vec<EnumVariant>,
+    v1: &[EnumVariant],
     mut data: Vec<u8>,
-    type_database: &Vec<TypeEntry>,
+    type_database: &[TypeEntry],
     indent: u32,
     short_specs: &ShortSpecs,
 ) -> Result<DecodedOut, ParserError> {
@@ -811,7 +805,7 @@ fn deal_with_enum(
                 },
                 indent,
             }];
-            let after_run = decode_simple(&inner_ty, data, type_database, indent + 1, short_specs)?;
+            let after_run = decode_simple(inner_ty, data, type_database, indent + 1, short_specs)?;
             fancy_output_prep.extend_from_slice(&after_run.fancy_out);
             data = after_run.remaining_vector;
             Ok(DecodedOut {
@@ -880,30 +874,30 @@ fn deal_with_enum(
 fn decode_simple(
     found_ty: &str,
     mut data: Vec<u8>,
-    type_database: &Vec<TypeEntry>,
+    type_database: &[TypeEntry],
     indent: u32,
     short_specs: &ShortSpecs,
 ) -> Result<DecodedOut, ParserError> {
-    if data.len() == 0 {
+    if data.is_empty() {
         return Err(ParserError::Decoding(ParserDecodingError::DataTooShort));
     }
-    match decode_primitive(&found_ty, &data, indent, short_specs) {
+    match decode_primitive(found_ty, &data, indent, short_specs) {
         Ok(a) => Ok(a),
         Err(_) => {
             // check for option
-            match REGOPTION.captures(&found_ty) {
+            match REGOPTION.captures(found_ty) {
                 Some(caps) => {
                     deal_with_option(&caps["arg"], data, type_database, indent, short_specs)
                 }
                 None => {
                     // check for vector
-                    match REGVECTOR.captures(&found_ty) {
+                    match REGVECTOR.captures(found_ty) {
                         Some(caps) => {
                             deal_with_vector(&caps["arg"], data, type_database, indent, short_specs)
                         }
                         None => {
                             // check for tuples
-                            match REGTUPLE.captures(&found_ty) {
+                            match REGTUPLE.captures(found_ty) {
                                 Some(caps) => {
                                     let mut fancy_out: Vec<OutputCard> = Vec::new();
                                     let mut i = 1;
@@ -933,7 +927,7 @@ fn decode_simple(
                                             }
                                             None => break,
                                         }
-                                        i = i + 1;
+                                        i += 1;
                                     }
                                     Ok(DecodedOut {
                                         remaining_vector: data,
@@ -942,7 +936,7 @@ fn decode_simple(
                                 }
                                 None => {
                                     // check for array
-                                    match REGARRAY.captures(&found_ty) {
+                                    match REGARRAY.captures(found_ty) {
                                         Some(caps) => {
                                             let inner_ty = &caps["arg"];
                                             let number_of_elements: u32 = caps["num"]
@@ -968,7 +962,7 @@ fn decode_simple(
                                                 )
                                             } else {
                                                 // check for compact and find the alias for compact
-                                                match REGCOMPACT.captures(&found_ty) {
+                                                match REGCOMPACT.captures(found_ty) {
                                                     Some(caps) => {
                                                         let inner_ty = &caps["arg"];
                                                         let mut new_inner_ty = None;
@@ -986,7 +980,7 @@ fn decode_simple(
                                                                 let new_ty = found_ty.replace(inner_ty, a);
                                                                 decode_simple(&new_ty, data, type_database, indent, short_specs)
                                                             },
-                                                            None => return Err(ParserError::Decoding(ParserDecodingError::CompactNotPrimitive)),
+                                                            None => Err(ParserError::Decoding(ParserDecodingError::CompactNotPrimitive)),
                                                         }
                                                     }
                                                     None => {
@@ -1017,7 +1011,7 @@ fn decode_simple(
                                                                     for x in type_database.iter() {
                                                                         if x.name == found_ty {
                                                                             let wrap_me = match &x.description {
-                                                                                Description::Type(inner_ty) => {decode_simple(&inner_ty, data, type_database, indent, short_specs)?},
+                                                                                Description::Type(inner_ty) => {decode_simple(inner_ty, data, type_database, indent, short_specs)?},
                                                                                 Description::Enum(v1) => {deal_with_enum(v1, data, type_database, indent, short_specs)?},
                                                                                 Description::Struct(v1) => {deal_with_struct(v1, data, type_database, indent, short_specs)?},
                                                                             };
@@ -1028,7 +1022,7 @@ fn decode_simple(
                                                                     }
                                                                     match found_solution {
                                                                         Some(x) => Ok(x),
-                                                                        None => return Err(ParserError::Decoding(ParserDecodingError::UnknownType(found_ty.to_string()))),
+                                                                        None => Err(ParserError::Decoding(ParserDecodingError::UnknownType(found_ty.to_string()))),
                                                                     }
                                                                 }
                                                             }

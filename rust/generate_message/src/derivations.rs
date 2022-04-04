@@ -1,4 +1,4 @@
-use hex;
+
 
 use db_handling::identities::prepare_derivations_export;
 use definitions::error::ErrorActive;

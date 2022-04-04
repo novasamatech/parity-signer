@@ -223,7 +223,7 @@ Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deseru
     );
     all_cards.push(
         Card::Warning(Warning::VerifierChangingToGeneral {
-            verifier_key: &VerifierKey::from_parts(&network_specs_westend.genesis_hash.to_vec()),
+            verifier_key: &VerifierKey::from_parts(network_specs_westend.genesis_hash.as_ref()),
             hold: &Hold {
                 metadata_set: Vec::new(),
                 network_specs_set: Vec::new(),
@@ -233,7 +233,7 @@ Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deseru
     );
     all_cards.push(
         Card::Warning(Warning::VerifierChangingToCustom {
-            verifier_key: &VerifierKey::from_parts(&network_specs_westend.genesis_hash.to_vec()),
+            verifier_key: &VerifierKey::from_parts(network_specs_westend.genesis_hash.as_ref()),
             hold: &Hold {
                 metadata_set: Vec::new(),
                 network_specs_set: Vec::new(),
@@ -243,7 +243,7 @@ Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deseru
     );
     all_cards.push(
         Card::Warning(Warning::VerifierGeneralSuper {
-            verifier_key: &VerifierKey::from_parts(&network_specs_westend.genesis_hash.to_vec()),
+            verifier_key: &VerifierKey::from_parts(network_specs_westend.genesis_hash.as_ref()),
             hold: &Hold {
                 metadata_set: Vec::new(),
                 network_specs_set: Vec::new(),
@@ -268,11 +268,11 @@ Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deseru
 
     for (i, x) in all_cards.iter().enumerate() {
         if i > 0 {
-            output_cards.push_str(",")
+            output_cards.push(',')
         }
-        output_cards.push_str(&x);
+        output_cards.push_str(x);
     }
 
-    output_cards.push_str("]");
+    output_cards.push(']');
     Action::Read(output_cards)
 }

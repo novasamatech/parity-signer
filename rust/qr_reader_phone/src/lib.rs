@@ -1,6 +1,6 @@
 use anyhow::anyhow;
-use hex;
-use serde_json;
+
+
 use std::convert::TryInto;
 
 pub mod process_payload;
@@ -14,7 +14,7 @@ pub fn get_payload(line: &str, cleaned: bool) -> anyhow::Result<Vec<u8>> {
             Err(_) => return Err(anyhow!("Not hex")),
         }
     } else {
-        if !line.starts_with("4") {
+        if !line.starts_with('4') {
             return Err(anyhow!("Encountered unexpected qr content start"));
         }
         let msg_length_info = match line.get(1..5) {
@@ -75,19 +75,17 @@ pub fn get_length(line: &str, cleaned: bool) -> anyhow::Result<u32> {
         let new_packet = payload[4..].to_vec();
         let number_of_messages = length / (new_packet.len() as u32) + 1;
         Ok(number_of_messages)
+    } else if payload.starts_with(&[0]) {
+        //            println!("dealing with element of legacy dynamic multi-element qr");
+        let number_of_messages_piece: [u8; 2] = payload[1..3]
+            .to_vec()
+            .try_into()
+            .expect("constant vector slice size, always fits");
+        let number_of_messages = u16::from_be_bytes(number_of_messages_piece);
+        Ok(number_of_messages as u32)
     } else {
-        if payload.starts_with(&[0]) {
-            //            println!("dealing with element of legacy dynamic multi-element qr");
-            let number_of_messages_piece: [u8; 2] = payload[1..3]
-                .to_vec()
-                .try_into()
-                .expect("constant vector slice size, always fits");
-            let number_of_messages = u16::from_be_bytes(number_of_messages_piece);
-            Ok(number_of_messages as u32)
-        } else {
-            //            println!("dealing with static qr");
-            Ok(1)
-        }
+        //            println!("dealing with static qr");
+        Ok(1)
     }
 }
 

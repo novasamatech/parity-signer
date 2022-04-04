@@ -12,7 +12,7 @@ use definitions::{
     qr_transfers::{ContentAddSpecs, ContentLoadMeta},
     users::AddressDetails,
 };
-use hex;
+
 use parity_scale_codec::Encode;
 use qrcode_static::png_qr;
 use sp_core::{ecdsa, ed25519, sr25519, Pair};
@@ -20,7 +20,7 @@ use sp_runtime::MultiSigner;
 use zeroize::Zeroize;
 
 pub(crate) fn sign_as_address_key(
-    to_sign: &Vec<u8>,
+    to_sign: &[u8],
     multisigner: &MultiSigner,
     full_address: &str,
     pwd: Option<&str>,
@@ -35,7 +35,7 @@ pub(crate) fn sign_as_address_key(
                 return Err(ErrorSigner::WrongPassword);
             }
             // secret zeroize on drop, https://docs.rs/ed25519-dalek/1.0.1/src/ed25519_dalek/secret.rs.html#43
-            let signature = ed25519_pair.sign(&to_sign[..]);
+            let signature = ed25519_pair.sign(to_sign);
             Ok(SufficientCrypto::Ed25519 {
                 public: public.to_owned(),
                 signature,
@@ -50,7 +50,7 @@ pub(crate) fn sign_as_address_key(
                 return Err(ErrorSigner::WrongPassword);
             }
             // pair zeroize on drop, https://docs.rs/schnorrkel/0.9.1/src/schnorrkel/keys.rs.html#680
-            let signature = sr25519_pair.sign(&to_sign[..]);
+            let signature = sr25519_pair.sign(to_sign);
             Ok(SufficientCrypto::Sr25519 {
                 public: public.to_owned(),
                 signature,
@@ -64,7 +64,7 @@ pub(crate) fn sign_as_address_key(
             if public != &ecdsa_pair.public() {
                 return Err(ErrorSigner::WrongPassword);
             }
-            let signature = ecdsa_pair.sign(&to_sign[..]);
+            let signature = ecdsa_pair.sign(to_sign);
             Ok(SufficientCrypto::Ecdsa {
                 public: public.to_owned(),
                 signature,
@@ -77,7 +77,7 @@ pub(crate) fn sign_as_address_key(
 fn sufficient_crypto(
     multisigner: &MultiSigner,
     address_details: &AddressDetails,
-    to_sign: &Vec<u8>,
+    to_sign: &[u8],
     seed_phrase: &str,
     pwd_entry: &str,
 ) -> Result<SufficientCrypto, ErrorSigner> {
@@ -96,7 +96,7 @@ fn sufficient_crypto(
         }
         Err(e) => {
             full_address.zeroize();
-            return Err(e);
+            Err(e)
         }
     }
 }
@@ -120,23 +120,23 @@ pub(crate) fn sufficient_crypto_load_types(
         Ok(s) => {
             TrDbCold::new()
                 .set_history(events_to_batch::<Signer>(
-                    &database_name,
+                    database_name,
                     vec![Event::TypesSigned(TypesExport::get(
                         &types_content,
                         &s.get_verifier_value(),
                     ))],
                 )?)
-                .apply::<Signer>(&database_name)?;
+                .apply::<Signer>(database_name)?;
             hex_qr_from_sufficient(s)?
         }
         Err(e) => {
             if let ErrorSigner::WrongPassword = e {
                 TrDbCold::new()
                     .set_history(events_to_batch::<Signer>(
-                        &database_name,
+                        database_name,
                         vec![Event::WrongPassword],
                     )?)
-                    .apply::<Signer>(&database_name)?;
+                    .apply::<Signer>(database_name)?;
             }
             return Err(e);
         }
@@ -176,23 +176,23 @@ pub(crate) fn sufficient_crypto_load_metadata(
         Ok(s) => {
             TrDbCold::new()
                 .set_history(events_to_batch::<Signer>(
-                    &database_name,
+                    database_name,
                     vec![Event::MetadataSigned(MetaValuesExport::get(
                         &meta_values,
                         &s.get_verifier_value(),
                     ))],
                 )?)
-                .apply::<Signer>(&database_name)?;
+                .apply::<Signer>(database_name)?;
             hex_qr_from_sufficient(s)?
         }
         Err(e) => {
             if let ErrorSigner::WrongPassword = e {
                 TrDbCold::new()
                     .set_history(events_to_batch::<Signer>(
-                        &database_name,
+                        database_name,
                         vec![Event::WrongPassword],
                     )?)
-                    .apply::<Signer>(&database_name)?;
+                    .apply::<Signer>(database_name)?;
             }
             return Err(e);
         }
@@ -225,23 +225,23 @@ pub(crate) fn sufficient_crypto_add_specs(
         Ok(s) => {
             TrDbCold::new()
                 .set_history(events_to_batch::<Signer>(
-                    &database_name,
+                    database_name,
                     vec![Event::NetworkSpecsSigned(NetworkSpecsExport::get(
                         &network_specs_to_send,
                         &s.get_verifier_value(),
                     ))],
                 )?)
-                .apply::<Signer>(&database_name)?;
+                .apply::<Signer>(database_name)?;
             hex_qr_from_sufficient(s)?
         }
         Err(e) => {
             if let ErrorSigner::WrongPassword = e {
                 TrDbCold::new()
                     .set_history(events_to_batch::<Signer>(
-                        &database_name,
+                        database_name,
                         vec![Event::WrongPassword],
                     )?)
-                    .apply::<Signer>(&database_name)?;
+                    .apply::<Signer>(database_name)?;
             }
             return Err(e);
         }

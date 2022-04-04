@@ -20,8 +20,6 @@ use definitions::{
     keyring::{AddressKey, NetworkSpecsKey},
     users::AddressDetails,
 };
-use transaction_parsing;
-use transaction_signing;
 
 ///State of the app as remembered by backend
 #[derive(Debug, Clone)]
@@ -50,6 +48,12 @@ impl Navstate {
     }
 }
 
+impl Default for Navstate {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl State {
     ///Decide what to do and do it!
     pub fn perform(
@@ -70,7 +74,7 @@ impl State {
                     println!("Seednames: {:?}, total: {}", seed_names, seed_names.len());
                     match db_handling::interface_signer::purge_transactions(dbname) {
                         Ok(()) => {
-                            if seed_names.len() == 0 {
+                            if seed_names.is_empty() {
                                 new_navstate = self.correct_seed_selector();
                             } else {
                                 new_navstate = Navstate::clean_screen(Screen::Log);
@@ -243,24 +247,21 @@ impl State {
                                     match details_str.parse::<bool>() {
                                         Ok(roots) => {
                                             match db_handling::identities::try_create_seed(
-                                                &seed_name,
+                                                seed_name,
                                                 secret_seed_phrase,
                                                 roots,
                                                 dbname,
                                             ) {
-                                                Ok(()) => {
-                                                    match KeysState::new(&seed_name, dbname) {
-                                                        Ok(a) => {
-                                                            new_navstate = Navstate::clean_screen(
-                                                                Screen::Keys(a),
-                                                            )
-                                                        }
-                                                        Err(e) => {
-                                                            new_navstate.alert = Alert::Error;
-                                                            errorline.push_str(&<Signer>::show(&e));
-                                                        }
+                                                Ok(()) => match KeysState::new(seed_name, dbname) {
+                                                    Ok(a) => {
+                                                        new_navstate =
+                                                            Navstate::clean_screen(Screen::Keys(a))
                                                     }
-                                                }
+                                                    Err(e) => {
+                                                        new_navstate.alert = Alert::Error;
+                                                        errorline.push_str(&<Signer>::show(&e));
+                                                    }
+                                                },
                                                 Err(e) => {
                                                     new_navstate.alert = Alert::Error;
                                                     errorline.push_str(&<Signer>::show(&e));
@@ -288,10 +289,10 @@ impl State {
                                 details_str,
                             ) {
                                 Ok(a) => {
-                                    if a.len() == 0 {
+                                    if a.is_empty() {
                                         new_navstate =
                                             Navstate::clean_screen(Screen::RecoverSeedPhrase(
-                                                RecoverSeedPhraseState::new(&details_str),
+                                                RecoverSeedPhraseState::new(details_str),
                                             ))
                                     } else {
                                         new_navstate.alert = Alert::Error;
@@ -368,7 +369,7 @@ impl State {
                                     {
                                         new_navstate.screen = Screen::DeriveKey(
                                             derive_state
-                                                .collided_with(&multisigner, &address_details),
+                                                .collided_with(multisigner, address_details),
                                         );
                                         new_navstate.modal = Modal::Empty;
                                         new_navstate.alert = Alert::Error;
@@ -617,7 +618,7 @@ impl State {
                 Action::SelectSeed => {
                     match self.navstate.screen {
                         Screen::SeedSelector => {
-                            if details_str != "" {
+                            if !details_str.is_empty() {
                                 // details_str is seed name
                                 match KeysState::new(details_str, dbname) {
                                     Ok(a) => {
@@ -708,7 +709,7 @@ impl State {
                     }
                 }
                 Action::BackupSeed => {
-                    if details_str == "" {
+                    if details_str.is_empty() {
                         match &self.navstate.screen {
                             Screen::Keys(ref keys_state) => {
                                 if let Modal::SeedMenu = self.navstate.modal {
@@ -720,24 +721,22 @@ impl State {
                             }
                             _ => println!("BackupSeed without seed_name does nothing here"),
                         }
-                    } else {
-                        if let Screen::SelectSeedForBackup = self.navstate.screen {
-                            new_navstate = match KeysState::new(details_str, dbname) {
-                                Ok(a) => Navstate {
-                                    screen: Screen::Keys(a),
-                                    modal: Modal::Backup(details_str.to_string()),
-                                    alert: Alert::Empty,
-                                },
-                                Err(e) => {
-                                    errorline.push_str(&<Signer>::show(&e));
-                                    Navstate {
-                                        screen: Screen::Log,
-                                        modal: Modal::Empty,
-                                        alert: Alert::Error,
-                                    }
+                    } else if let Screen::SelectSeedForBackup = self.navstate.screen {
+                        new_navstate = match KeysState::new(details_str, dbname) {
+                            Ok(a) => Navstate {
+                                screen: Screen::Keys(a),
+                                modal: Modal::Backup(details_str.to_string()),
+                                alert: Alert::Empty,
+                            },
+                            Err(e) => {
+                                errorline.push_str(&<Signer>::show(&e));
+                                Navstate {
+                                    screen: Screen::Log,
+                                    modal: Modal::Empty,
+                                    alert: Alert::Error,
                                 }
-                            };
-                        }
+                            }
+                        };
                     }
                 }
                 Action::NetworkSelector => {
@@ -804,7 +803,7 @@ impl State {
                     Screen::NetworkDetails(ref network_specs_key) => {
                         if let Modal::NetworkDetailsMenu = self.navstate.modal {
                             match db_handling::remove_network::remove_network(
-                                &network_specs_key,
+                                network_specs_key,
                                 dbname,
                             ) {
                                 Ok(()) => {
@@ -823,7 +822,7 @@ impl State {
                     Screen::NetworkDetails(ref network_specs_key) => match self.navstate.modal {
                         Modal::ManageMetadata(network_version) => {
                             match db_handling::remove_network::remove_metadata(
-                                &network_specs_key,
+                                network_specs_key,
                                 network_version,
                                 dbname,
                             ) {
@@ -932,7 +931,7 @@ impl State {
                         SpecialtyKeysState::Swiped(ref multisigner) => {
                             match db_handling::identities::remove_key(
                                 dbname,
-                                &multisigner,
+                                multisigner,
                                 &keys_state.network_specs_key(),
                             ) {
                                 Ok(()) => {
@@ -952,7 +951,7 @@ impl State {
                         SpecialtyKeysState::MultiSelect(ref multiselect) => {
                             match db_handling::identities::remove_keys_set(
                                 dbname,
-                                &multiselect,
+                                multiselect,
                                 &keys_state.network_specs_key(),
                             ) {
                                 Ok(()) => {
@@ -1164,7 +1163,7 @@ impl State {
                                         increment,
                                         &multisigner,
                                         &keys_state.network_specs_key(),
-                                        &secret_seed_phrase,
+                                        secret_seed_phrase,
                                         dbname,
                                     ) {
                                         Ok(()) => {
@@ -1200,7 +1199,7 @@ impl State {
                 },
                 Action::TextEntry => match self.navstate.screen {
                     Screen::RecoverSeedPhrase(ref mut recover_seed_phrase_state) => {
-                        recover_seed_phrase_state.text_entry(&details_str);
+                        recover_seed_phrase_state.text_entry(details_str);
                         new_navstate = Navstate::clean_screen(Screen::RecoverSeedPhrase(
                             recover_seed_phrase_state.to_owned(),
                         ));
@@ -1209,7 +1208,7 @@ impl State {
                 },
                 Action::PushWord => match self.navstate.screen {
                     Screen::RecoverSeedPhrase(ref mut recover_seed_phrase_state) => {
-                        recover_seed_phrase_state.push_word(&details_str);
+                        recover_seed_phrase_state.push_word(details_str);
                         new_navstate = Navstate::clean_screen(Screen::RecoverSeedPhrase(
                             recover_seed_phrase_state.to_owned(),
                         ));
@@ -1225,7 +1224,7 @@ impl State {
             let screen_details = match new_navstate.screen {
                 Screen::Log => {
                     match db_handling::manage_history::print_history(dbname) {
-                        Ok(a) => a.to_string(),
+                        Ok(a) => a,
                         Err(e) => {
                             new_navstate.alert = Alert::ErrorDisplay;
                             errorline.push_str(&<Signer>::show(&e));
@@ -1235,7 +1234,7 @@ impl State {
                 },
                 Screen::LogDetails(order) => {
                     match transaction_parsing::print_history_entry_by_order_with_decoding(order, dbname) {
-                        Ok(a) => a.to_string(),
+                        Ok(a) => a,
                         Err(e) => {
                             new_navstate.alert = Alert::ErrorDisplay;
                             errorline.push_str(&<Signer>::show(&e));
@@ -1321,15 +1320,15 @@ impl State {
                     let mut seed_finalized = draft.try_finalize();
                     if let Some(ref s) = seed_finalized {
                         out.push_str(",\"ready_seed\":\"");
-                        out.push_str(&s);
-                        out.push_str("\"");
+                        out.push_str(s);
+                        out.push('\"');
                     }
                     seed_finalized.zeroize();
 
                     out
                 },
                 Screen::DeriveKey(ref derive_state) => {
-                    match db_handling::interface_signer::derive_prep (dbname, &derive_state.seed_name(), &derive_state.network_specs_key(), derive_state.collision(), &details_str) {
+                    match db_handling::interface_signer::derive_prep (dbname, &derive_state.seed_name(), &derive_state.network_specs_key(), derive_state.collision(), details_str) {
                         Ok(a) => {
                             format!("{},\"keyboard\":{}", a, new_navstate.keyboard())
                         },
@@ -1367,7 +1366,7 @@ impl State {
                     }
                 },
                 Screen::NetworkDetails(ref network_specs_key) => {
-                    match db_handling::interface_signer::network_details_by_key(dbname, &network_specs_key) {
+                    match db_handling::interface_signer::network_details_by_key(dbname, network_specs_key) {
                         Ok(a) => a,
                         Err(e) => {
                             new_navstate.alert = Alert::ErrorDisplay;
@@ -1393,7 +1392,7 @@ impl State {
             //Prepare modal details
             let modal_details = match new_navstate.modal {
                 Modal::Backup(ref seed_name) => {
-                    match db_handling::interface_signer::backup_prep(dbname, &seed_name) {
+                    match db_handling::interface_signer::backup_prep(dbname, seed_name) {
                         Ok(a) => a,
                         Err(e) => {
                             new_navstate.alert = Alert::Error;
@@ -1423,7 +1422,7 @@ impl State {
                 Modal::NetworkSelector(ref network_specs_key) => {
                     match db_handling::interface_signer::show_all_networks_with_flag(
                         dbname,
-                        &network_specs_key,
+                        network_specs_key,
                     ) {
                         Ok(a) => a,
                         Err(e) => {
@@ -1589,7 +1588,7 @@ impl State {
         output.push_str(&format!("\"modal\":\"{}\",", modal.get_name()));
         output.push_str(&format!("\"alert\":\"{}\",", alert.get_name()));
         output.push_str(details);
-        output.push_str("}");
+        output.push('}');
         output
     }
 
@@ -1670,12 +1669,10 @@ impl State {
             Screen::Keys(ref keys_state) => {
                 if let Modal::Backup(_) = self.navstate.modal {
                     "None"
+                } else if keys_state.is_multiselect() {
+                    "MultiSelect"
                 } else {
-                    if keys_state.is_multiselect() {
-                        "MultiSelect"
-                    } else {
-                        "Backup"
-                    }
+                    "Backup"
                 }
             }
             Screen::KeyDetails(_) => "KeyMenu",
@@ -1724,7 +1721,7 @@ impl State {
     }
 
     fn correct_seed_selector(&self) -> Navstate {
-        if self.seed_names.len() == 0 {
+        if self.seed_names.is_empty() {
             Navstate {
                 screen: Screen::SeedSelector,
                 modal: Modal::NewSeedMenu,
@@ -1739,7 +1736,7 @@ impl State {
 impl Navstate {
     pub fn clean_screen(screen: Screen) -> Navstate {
         Navstate {
-            screen: screen,
+            screen,
             modal: Modal::Empty,
             alert: Alert::Empty,
         }
@@ -1748,11 +1745,7 @@ impl Navstate {
     ///Check if keyboard should be shown
     fn keyboard(&self) -> bool {
         if let Modal::Empty = self.modal {
-            if let Alert::Empty = self.alert {
-                true
-            } else {
-                false
-            }
+            matches!(self.alert, Alert::Empty)
         } else {
             false
         }

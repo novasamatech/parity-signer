@@ -29,7 +29,7 @@ enum NetworkSpecsKeyContent {
 
 impl NetworkSpecsKey {
     /// Function to generate NetworkSpecsKey from parts: network genesis hash and network encryption
-    pub fn from_parts(genesis_hash: &Vec<u8>, encryption: &Encryption) -> Self {
+    pub fn from_parts(genesis_hash: &[u8], encryption: &Encryption) -> Self {
         let network_key_content = match encryption {
             Encryption::Ed25519 => NetworkSpecsKeyContent::Ed25519(genesis_hash.to_vec()),
             Encryption::Sr25519 => NetworkSpecsKeyContent::Sr25519(genesis_hash.to_vec()),
@@ -61,7 +61,7 @@ impl NetworkSpecsKey {
                 NetworkSpecsKeyContent::Sr25519(b) => Ok((b, Encryption::Sr25519)),
                 NetworkSpecsKeyContent::Ecdsa(b) => Ok((b, Encryption::Ecdsa)),
             },
-            Err(_) => return Err(<T>::specs_key_to_error(self, source)),
+            Err(_) => Err(<T>::specs_key_to_error(self, source)),
         }
     }
     /// Function to get the key that can be used for the database search from the NetworkSpecsKey
@@ -79,7 +79,7 @@ pub struct VerifierKey(Vec<u8>);
 
 impl VerifierKey {
     /// Function to generate VerifierKey from network genesis hash (with possibility to add components later on)
-    pub fn from_parts(genesis_hash: &Vec<u8>) -> Self {
+    pub fn from_parts(genesis_hash: &[u8]) -> Self {
         Self(genesis_hash.to_vec())
     }
     /// Function to transform Vec<u8> into VerifierKey prior to processing
@@ -113,7 +113,7 @@ impl AddressKey {
         Self(AddressKeyContent(multisigner.to_owned()).encode())
     }
     /// Function to generate AddressKey from parts: public key vector and network encryption
-    pub fn from_parts(public: &Vec<u8>, encryption: &Encryption) -> Result<Self, ErrorSigner> {
+    pub fn from_parts(public: &[u8], encryption: &Encryption) -> Result<Self, ErrorSigner> {
         let multisigner = get_multisigner(public, encryption)?;
         Ok(Self::from_multisigner(&multisigner))
     }
@@ -148,7 +148,7 @@ impl AddressKey {
     ) -> Result<MultiSigner, T::Error> {
         match <AddressKeyContent>::decode(&mut &self.0[..]) {
             Ok(a) => Ok(a.0),
-            Err(_) => return Err(<T>::address_key_to_error(&self, source)),
+            Err(_) => Err(<T>::address_key_to_error(self, source)),
         }
     }
     /// Function to get the key that can be used for the database search from the NetworkSpecsKey
@@ -211,7 +211,7 @@ impl MetaKey {
     pub fn name_version<T: ErrorSource>(&self) -> Result<(String, u32), T::Error> {
         match <MetaKeyContent>::decode(&mut &self.0[..]) {
             Ok(a) => Ok((a.name, a.version)),
-            Err(_) => return Err(<T>::meta_key_to_error(self)),
+            Err(_) => Err(<T>::meta_key_to_error(self)),
         }
     }
     /// Function to get the key that can be used for the database search from the MetaKey
@@ -266,11 +266,9 @@ impl AddressBookKey {
     pub fn title(&self) -> Result<String, ErrorActive> {
         match <AddressBookKeyContent>::decode(&mut &self.0[..]) {
             Ok(a) => Ok(a.0),
-            Err(_) => {
-                return Err(ErrorActive::Database(DatabaseActive::KeyDecoding(
-                    KeyDecodingActive::AddressBookKey(self.to_owned()),
-                )))
-            }
+            Err(_) => Err(ErrorActive::Database(DatabaseActive::KeyDecoding(
+                KeyDecodingActive::AddressBookKey(self.to_owned()),
+            ))),
         }
     }
     /// Function to get the key that can be used for the database search from the AddressBookKey

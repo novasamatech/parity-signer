@@ -19,6 +19,7 @@ use plot_icon::png_data_from_vec;
 
 use crate::holds::{GeneralHold, Hold};
 
+#[allow(clippy::enum_variant_names)]
 pub(crate) enum Card<'a> {
     ParserCard(&'a ParserCard),
     Author {
@@ -95,7 +96,7 @@ fn fancy(index: &mut u32, indent: u32, card_type: &str, decoded_string: &str) ->
         "{{\"index\":{},\"indent\":{},\"type\":\"{}\",\"payload\":{}}}",
         index, indent, card_type, decoded_string
     );
-    *index = *index + 1;
+    *index += 1;
     out
 }
 
@@ -138,7 +139,7 @@ impl<'a> Card<'a> {
                     Ok(a) => hex::encode(a),
                     Err(_) => "".to_string(),
                 };
-                fancy(index, indent, "author_plain", &format!("{{\"base58\":\"{}\",\"identicon\":\"{}\"}}", print_multisigner_as_base58(&author, Some(*base58prefix)), hex_identicon))
+                fancy(index, indent, "author_plain", &format!("{{\"base58\":\"{}\",\"identicon\":\"{}\"}}", print_multisigner_as_base58(author, Some(*base58prefix)), hex_identicon))
             },
             Card::AuthorPublicKey(author) => {
                 let hex_identicon = match make_identicon_from_multisigner(author) {
@@ -146,9 +147,9 @@ impl<'a> Card<'a> {
                     Err(_) => "".to_string(),
                 };
                 let insert = match author {
-                    MultiSigner::Ed25519(p) => format!("{{\"public_key\":\"{}\",\"identicon\":\"{}\",\"encryption\":\"{}\"}}", hex::encode(p.to_vec()), hex_identicon, Encryption::Ed25519.show()),
-                    MultiSigner::Sr25519(p) => format!("{{\"public_key\":\"{}\",\"identicon\":\"{}\",\"encryption\":\"{}\"}}", hex::encode(p.to_vec()), hex_identicon, Encryption::Sr25519.show()),
-                    MultiSigner::Ecdsa(p) => format!("{{\"public_key\":\"{}\",\"identicon\":\"{}\",\"encryption\":\"{}\"}}", hex::encode(p.0.to_vec()), hex_identicon, Encryption::Ecdsa.show()),
+                    MultiSigner::Ed25519(p) => format!("{{\"public_key\":\"{}\",\"identicon\":\"{}\",\"encryption\":\"{}\"}}", hex::encode(p), hex_identicon, Encryption::Ed25519.show()),
+                    MultiSigner::Sr25519(p) => format!("{{\"public_key\":\"{}\",\"identicon\":\"{}\",\"encryption\":\"{}\"}}", hex::encode(p), hex_identicon, Encryption::Sr25519.show()),
+                    MultiSigner::Ecdsa(p) => format!("{{\"public_key\":\"{}\",\"identicon\":\"{}\",\"encryption\":\"{}\"}}", hex::encode(p.0), hex_identicon, Encryption::Ecdsa.show()),
                 };
                 fancy(index, indent, "author_public_key", &insert)
             },
@@ -160,7 +161,7 @@ impl<'a> Card<'a> {
             Card::NetworkGenesisHash(x) => fancy(index, indent, "network_genesis_hash", &format!("\"{}\"", hex::encode(x))),
             Card::Derivations(x) => fancy(index, indent, "derivations", &export_plain_vector(x)),
             Card::Warning (warn) => fancy(index, indent, "warning", &format!("\"{}\"", warn.show())),
-            Card::Error (err) => fancy(index, indent, "error", &format!("\"{}\"", <Signer>::show(&err))),
+            Card::Error (err) => fancy(index, indent, "error", &format!("\"{}\"", <Signer>::show(err))),
         }
     }
 }
@@ -174,5 +175,5 @@ pub(crate) fn make_author_info(
         Ok(a) => hex::encode(a),
         Err(_) => "".to_string(),
     };
-    format!("\"base58\":\"{}\",\"identicon\":\"{}\",\"seed\":\"{}\",\"derivation_path\":\"{}\",\"has_pwd\":{}", print_multisigner_as_base58(&author, Some(base58prefix)), hex_identicon, address_details.seed_name, address_details.path, address_details.has_pwd)
+    format!("\"base58\":\"{}\",\"identicon\":\"{}\",\"seed\":\"{}\",\"derivation_path\":\"{}\",\"has_pwd\":{}", print_multisigner_as_base58(author, Some(base58prefix)), hex_identicon, address_details.seed_name, address_details.path, address_details.has_pwd)
 }

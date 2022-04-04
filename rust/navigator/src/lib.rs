@@ -5,7 +5,6 @@
 use lazy_static::lazy_static;
 use std::sync::{Mutex, TryLockError};
 
-use db_handling;
 use definitions::{error::Signer, keyring::NetworkSpecsKey};
 
 mod actions;
@@ -15,6 +14,7 @@ pub mod modals;
 mod navstate;
 use navstate::{Navstate, State};
 pub mod screens;
+#[cfg(test)]
 mod tests;
 
 //TODO: multithread here some day!
@@ -50,19 +50,19 @@ pub fn do_action(action_str: &str, details_str: &str, secret_seed_phrase: &str) 
             //Maybe just silently restart navstate? But is it safe?
             panic!("Concurrency error! Restart the app.");
         }
-        Err(TryLockError::WouldBlock) => return "".to_string(),
+        Err(TryLockError::WouldBlock) => "".to_string(),
     }
 }
 
 ///Should be called in the beginning to recall things stored only by phone
-pub fn init_navigation(dbname: &str, seed_names: &str) -> () {
+pub fn init_navigation(dbname: &str, seed_names: &str) {
     //This operation has to happen; lock thread and do not ignore.
     let guard = STATE.lock();
     match guard {
         Ok(mut navstate) => {
             (*navstate).dbname = Some(dbname.to_string());
-            if seed_names != "" {
-                (*navstate).seed_names = seed_names.split(",").map(|a| a.to_string()).collect();
+            if !seed_names.is_empty() {
+                (*navstate).seed_names = seed_names.split(',').map(|a| a.to_string()).collect();
                 (*navstate).seed_names.sort();
                 (*navstate).seed_names.dedup();
             } else {
@@ -71,10 +71,9 @@ pub fn init_navigation(dbname: &str, seed_names: &str) -> () {
             match db_handling::network_details::get_all_networks::<Signer>(dbname) {
                 Ok(a) => {
                     for x in a.iter() {
-                        (*navstate).networks.push(NetworkSpecsKey::from_parts(
-                            &x.genesis_hash.to_vec(),
-                            &x.encryption,
-                        ));
+                        (*navstate)
+                            .networks
+                            .push(NetworkSpecsKey::from_parts(&x.genesis_hash, &x.encryption));
                     }
                 }
                 Err(e) => println!("No networks could be fetched: {:?}", e),
@@ -88,12 +87,12 @@ pub fn init_navigation(dbname: &str, seed_names: &str) -> () {
 }
 
 ///Should be called in the beginning to recall things stored only by phone
-pub fn update_seed_names(seed_names: &str) -> () {
+pub fn update_seed_names(seed_names: &str) {
     let guard = STATE.lock();
     match guard {
         Ok(mut navstate) => {
-            if seed_names != "" {
-                (*navstate).seed_names = seed_names.split(",").map(|a| a.to_string()).collect();
+            if !seed_names.is_empty() {
+                (*navstate).seed_names = seed_names.split(',').map(|a| a.to_string()).collect();
                 (*navstate).seed_names.sort();
                 (*navstate).seed_names.dedup();
             } else {

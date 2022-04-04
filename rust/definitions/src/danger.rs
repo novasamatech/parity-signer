@@ -40,7 +40,7 @@ impl DangerRecord {
         match <DecodedDangerRecord>::decode(&mut &self.0[..]) {
             Ok(a) => Ok(a.device_was_online),
             Err(_) => {
-                return Err(ErrorSigner::Database(DatabaseSigner::EntryDecoding(
+                Err(ErrorSigner::Database(DatabaseSigner::EntryDecoding(
                     EntryDecodingSigner::DangerStatus,
                 )))
             }

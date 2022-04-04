@@ -98,69 +98,68 @@ pub fn process_decoded_payload(
                 ))
             }
         }
-    } else {
-        if payload.starts_with(&[0]) {
-            //            println!("dealing with part of legacy dynamic multi-element qr code");
-            let length_piece: [u8; 2] = payload[1..3]
-                .to_vec()
-                .try_into()
-                .expect("constant vector slice size, always fits");
-            let length = u16::from_be_bytes(length_piece);
-            let element_number_piece: [u8; 2] = payload[3..5]
-                .to_vec()
-                .try_into()
-                .expect("constant vector slice size, always fits");
-            let number = u16::from_be_bytes(element_number_piece);
-            if number >= length {
-                return Err(anyhow!("Number of element in legacy multi-element qr sequence exceeds expected sequence length."));
+    } else if payload.starts_with(&[0]) {
+        //            println!("dealing with part of legacy dynamic multi-element qr code");
+        let length_piece: [u8; 2] = payload[1..3]
+            .to_vec()
+            .try_into()
+            .expect("constant vector slice size, always fits");
+        let length = u16::from_be_bytes(length_piece);
+        let element_number_piece: [u8; 2] = payload[3..5]
+            .to_vec()
+            .try_into()
+            .expect("constant vector slice size, always fits");
+        let number = u16::from_be_bytes(element_number_piece);
+        if number >= length {
+            return Err(anyhow!("Number of element in legacy multi-element qr sequence exceeds expected sequence length."));
+        }
+        let contents = payload[5..].to_vec();
+        let new_element = Element { number, contents };
+        match decoding {
+            InProgress::None => {
+                let mut collected = LegacyMulti {
+                    length,
+                    elements: vec![new_element],
+                };
+                match try_legacy(&mut collected) {
+                    Some(v) => Ok(Ready::Yes(v)),
+                    None => Ok(Ready::NotYet(InProgress::LegacyMulti(collected))),
+                }
             }
-            let contents = payload[5..].to_vec();
-            let new_element = Element { number, contents };
-            match decoding {
-                InProgress::None => {
-                    let mut collected = LegacyMulti {
-                        length,
-                        elements: vec![new_element],
-                    };
+            InProgress::Fountain(_) => return Err(anyhow!(
+                "Was decoding fountain qr code, and got interrupted by a legacy multi-element one."
+            )),
+            InProgress::LegacyMulti(mut collected) => {
+                if collected.length != length {
+                    return Err(anyhow!("Was decoding legacy multi-element qr code with {} elements, got interrupted by legacy multi-element qr code with {} elements", collected.length, length));
+                }
+                if !collected.elements.contains(&new_element) {
+                    for x in collected.elements.iter() {
+                        if x.number == number {
+                            return Err(anyhow!("Encountered two legacy multi-element qr code fragments with same number."));
+                        }
+                    }
+                    collected.elements.push(new_element);
                     match try_legacy(&mut collected) {
                         Some(v) => Ok(Ready::Yes(v)),
                         None => Ok(Ready::NotYet(InProgress::LegacyMulti(collected))),
                     }
-                },
-                InProgress::Fountain(_) => {
-                    return Err(anyhow!("Was decoding fountain qr code, and got interrupted by a legacy multi-element one."))
-                },
-                InProgress::LegacyMulti(mut collected) => {
-                    if collected.length != length {return Err(anyhow!("Was decoding legacy multi-element qr code with {} elements, got interrupted by legacy multi-element qr code with {} elements", collected.length, length))}
-                    if !collected.elements.contains(&new_element) {
-                        for x in collected.elements.iter() {
-                            if x.number == number {return Err(anyhow!("Encountered two legacy multi-element qr code fragments with same number."))}
-                        }
-                        collected.elements.push(new_element);
-                        match try_legacy(&mut collected) {
-                            Some(v) => Ok(Ready::Yes(v)),
-                            None => Ok(Ready::NotYet(InProgress::LegacyMulti(collected))),
-                        }
-                    }
-                    else {
-                        Ok(Ready::NotYet(InProgress::LegacyMulti(collected)))
-                    }
-                },
-            }
-        } else {
-            if let InProgress::None = decoding {
-                Ok(Ready::Yes(payload))
-            } else {
-                return Err(anyhow!(
-                    "Was reading dynamic qr, and got interrupted by a static one."
-                ));
+                } else {
+                    Ok(Ready::NotYet(InProgress::LegacyMulti(collected)))
+                }
             }
         }
+    } else if let InProgress::None = decoding {
+        Ok(Ready::Yes(payload))
+    } else {
+        return Err(anyhow!(
+            "Was reading dynamic qr, and got interrupted by a static one."
+        ));
     }
 }
 
 fn try_fountain(
-    collected_ser_packets: &Vec<Vec<u8>>,
+    collected_ser_packets: &[Vec<u8>],
     current_decoder: &mut raptorq::Decoder,
 ) -> Option<Vec<u8>> {
     let mut result = None;
