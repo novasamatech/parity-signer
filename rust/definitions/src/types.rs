@@ -12,7 +12,7 @@ pub struct TypeEntry {
 pub enum Description {
     Type(String),
     Enum(Vec<EnumVariant>),
-    Struct(Vec<StructField>)
+    Struct(Vec<StructField>),
 }
 
 /// Enum variants
@@ -36,4 +36,3 @@ pub struct StructField {
     pub field_name: Option<String>,
     pub field_type: String,
 }
-

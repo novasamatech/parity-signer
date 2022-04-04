@@ -36,19 +36,20 @@ struct Backup: View {
                             Text("SEED PHRASE").foregroundColor(Color("Text300")).font(FBase(style: .overline))
                             Spacer()
                         }
-                        ZStack {
+                        HStack {
                             //RoundedRectangle(cornerRadius: 8).foregroundColor(Color(countdown>0 ? "Crypto100" : "Bg300")).frame(height: 200)
                             Text(secret)
                                 .font(.system(size: 16, weight: .semibold, design: .monospaced))
                                 .foregroundColor(Color(failure ? "SignalDanger" : "Crypto400"))
                                 .padding(8)
+                            Spacer()
                         }
                         .onAppear{
                             secret = data.getSeed(seedName: content.seed_name, backup: true)
                             if secret == "" {
                                 failure = true
                                 countdown = -1
-                                secret = "Seeds are not available now! Come back again to access them."
+                                secret = data.alert ? "Network connected! Seeds are not available now. Please enable airplane mode and disconnect all cables to access the seed phrase." : "Seeds are not available now! Come back again to access them."
                             }
                         }
                         .onDisappear{

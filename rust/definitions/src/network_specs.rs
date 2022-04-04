@@ -4,13 +4,20 @@ use sled::IVec;
 use sp_runtime::MultiSigner;
 
 use crate::crypto::Encryption;
-use crate::error::{Active, DatabaseActive, EntryDecodingActive, ErrorActive, ErrorSource, MismatchActive, SpecsKeySource};
-use crate::helpers::{multisigner_to_public, multisigner_to_encryption, make_identicon_from_multisigner};
+use crate::error::{
+    Active, DatabaseActive, EntryDecodingActive, ErrorActive, ErrorSource, MismatchActive,
+    SpecsKeySource,
+};
+use crate::helpers::{
+    make_identicon_from_multisigner, multisigner_to_encryption, multisigner_to_public,
+};
 use crate::keyring::NetworkSpecsKey;
 use crate::print::export_complex_single;
 
 //TODO: rename fields to make them more clear
-#[derive(parity_scale_codec_derive::Decode, parity_scale_codec_derive::Encode, PartialEq, Debug, Clone)]
+#[derive(
+    parity_scale_codec_derive::Decode, parity_scale_codec_derive::Encode, PartialEq, Debug, Clone,
+)]
 pub struct NetworkSpecs {
     pub base58prefix: u16,
     pub color: String,
@@ -26,8 +33,9 @@ pub struct NetworkSpecs {
     pub unit: String,
 }
 
-
-#[derive(parity_scale_codec_derive::Decode, parity_scale_codec_derive::Encode, PartialEq, Debug, Clone)]
+#[derive(
+    parity_scale_codec_derive::Decode, parity_scale_codec_derive::Encode, PartialEq, Debug, Clone,
+)]
 pub struct NetworkSpecsToSend {
     pub base58prefix: u16,
     pub color: String,
@@ -42,7 +50,9 @@ pub struct NetworkSpecsToSend {
     pub unit: String,
 }
 
-#[derive(parity_scale_codec_derive::Decode, parity_scale_codec_derive::Encode, PartialEq, Debug, Clone)]
+#[derive(
+    parity_scale_codec_derive::Decode, parity_scale_codec_derive::Encode, PartialEq, Debug, Clone,
+)]
 pub struct ShortSpecs {
     pub base58prefix: u16,
     pub decimals: u8,
@@ -52,11 +62,18 @@ pub struct ShortSpecs {
 }
 
 impl NetworkSpecs {
-    pub fn show(&self, valid_current_verifier: &ValidCurrentVerifier, general_verifier: &Verifier) -> String {
+    pub fn show(
+        &self,
+        valid_current_verifier: &ValidCurrentVerifier,
+        general_verifier: &Verifier,
+    ) -> String {
         format!("\"base58prefix\":\"{}\",\"color\":\"{}\",\"decimals\":\"{}\",\"encryption\":\"{}\",\"genesis_hash\":\"{}\",\"logo\":\"{}\",\"name\":\"{}\",\"order\":\"{}\",\"path_id\":\"{}\",\"secondary_color\":\"{}\",\"title\":\"{}\",\"unit\":\"{}\",\"current_verifier\":{}", &self.base58prefix, &self.color, &self.decimals, &self.encryption.show(), hex::encode(&self.genesis_hash), &self.logo, &self.name, &self.order, &self.path_id, &self.secondary_color, &self.title, &self.unit, export_complex_single(valid_current_verifier, |a| a.show(general_verifier)))
     }
     pub fn print_single(&self) -> String {
-        format!("\"color\":\"{}\",\"logo\":\"{}\",\"secondary_color\":\"{}\",\"title\":\"{}\"", &self.color, &self.logo, &self.secondary_color, &self.title)
+        format!(
+            "\"color\":\"{}\",\"logo\":\"{}\",\"secondary_color\":\"{}\",\"title\":\"{}\"",
+            &self.color, &self.logo, &self.secondary_color, &self.title
+        )
     }
     pub fn print_as_set_part(&self) -> String {
         format!("\"key\":\"{}\",\"color\":\"{}\",\"logo\":\"{}\",\"order\":\"{}\",\"secondary_color\":\"{}\",\"title\":\"{}\"", hex::encode(NetworkSpecsKey::from_parts(&self.genesis_hash.to_vec(), &self.encryption).key()), &self.color, &self.logo, &self.order, &self.secondary_color, &self.title)
@@ -85,17 +102,33 @@ impl NetworkSpecs {
             unit: self.unit.to_string(),
         }
     }
-    pub fn from_entry_with_key_checked<T: ErrorSource> (network_specs_key: &NetworkSpecsKey, network_specs_encoded: IVec) -> Result<Self, T::Error> {
-        let (genesis_hash_vec, encryption) = network_specs_key.genesis_hash_encryption::<T>(SpecsKeySource::SpecsTree)?;
+    pub fn from_entry_with_key_checked<T: ErrorSource>(
+        network_specs_key: &NetworkSpecsKey,
+        network_specs_encoded: IVec,
+    ) -> Result<Self, T::Error> {
+        let (genesis_hash_vec, encryption) =
+            network_specs_key.genesis_hash_encryption::<T>(SpecsKeySource::SpecsTree)?;
         let network_specs = match Self::decode(&mut &network_specs_encoded[..]) {
             Ok(a) => a,
             Err(_) => return Err(<T>::specs_decoding(network_specs_key.to_owned())),
         };
-        if genesis_hash_vec != network_specs.genesis_hash.to_vec() {return Err(<T>::specs_genesis_hash_mismatch(network_specs_key.to_owned(), network_specs.genesis_hash.to_vec()))}
-        if encryption != network_specs.encryption {return Err(<T>::specs_encryption_mismatch(network_specs_key.to_owned(), network_specs.encryption))}
+        if genesis_hash_vec != network_specs.genesis_hash.to_vec() {
+            return Err(<T>::specs_genesis_hash_mismatch(
+                network_specs_key.to_owned(),
+                network_specs.genesis_hash.to_vec(),
+            ));
+        }
+        if encryption != network_specs.encryption {
+            return Err(<T>::specs_encryption_mismatch(
+                network_specs_key.to_owned(),
+                network_specs.encryption,
+            ));
+        }
         Ok(network_specs)
     }
-    pub fn from_entry_checked<T: ErrorSource> ((network_specs_key_vec, network_specs_encoded): (IVec, IVec)) -> Result<Self, T::Error> {
+    pub fn from_entry_checked<T: ErrorSource>(
+        (network_specs_key_vec, network_specs_encoded): (IVec, IVec),
+    ) -> Result<Self, T::Error> {
         let network_specs_key = NetworkSpecsKey::from_ivec(&network_specs_key_vec);
         Self::from_entry_with_key_checked::<T>(&network_specs_key, network_specs_encoded)
     }
@@ -121,23 +154,49 @@ impl NetworkSpecsToSend {
             unit: self.unit.to_string(),
         }
     }
-    pub fn from_entry_with_key_checked (network_specs_key: &NetworkSpecsKey, network_specs_to_send_encoded: IVec) -> Result<Self, ErrorActive> {
-        let (genesis_hash_vec, encryption) = network_specs_key.genesis_hash_encryption::<Active>(SpecsKeySource::SpecsTree)?;
+    pub fn from_entry_with_key_checked(
+        network_specs_key: &NetworkSpecsKey,
+        network_specs_to_send_encoded: IVec,
+    ) -> Result<Self, ErrorActive> {
+        let (genesis_hash_vec, encryption) =
+            network_specs_key.genesis_hash_encryption::<Active>(SpecsKeySource::SpecsTree)?;
         let network_specs_to_send = match Self::decode(&mut &network_specs_to_send_encoded[..]) {
             Ok(a) => a,
-            Err(_) => return Err(ErrorActive::Database(DatabaseActive::EntryDecoding(EntryDecodingActive::NetworkSpecsToSend(network_specs_key.to_owned())))),
+            Err(_) => {
+                return Err(ErrorActive::Database(DatabaseActive::EntryDecoding(
+                    EntryDecodingActive::NetworkSpecsToSend(network_specs_key.to_owned()),
+                )))
+            }
         };
-        if genesis_hash_vec != network_specs_to_send.genesis_hash.to_vec() {return Err(ErrorActive::Database(DatabaseActive::Mismatch(MismatchActive::SpecsToSendGenesisHash{key: network_specs_key.to_owned(), genesis_hash: network_specs_to_send.genesis_hash.to_vec()})))}
-        if encryption != network_specs_to_send.encryption {return Err(ErrorActive::Database(DatabaseActive::Mismatch(MismatchActive::SpecsToSendEncryption{key: network_specs_key.to_owned(), encryption: network_specs_to_send.encryption})))}
+        if genesis_hash_vec != network_specs_to_send.genesis_hash.to_vec() {
+            return Err(ErrorActive::Database(DatabaseActive::Mismatch(
+                MismatchActive::SpecsToSendGenesisHash {
+                    key: network_specs_key.to_owned(),
+                    genesis_hash: network_specs_to_send.genesis_hash.to_vec(),
+                },
+            )));
+        }
+        if encryption != network_specs_to_send.encryption {
+            return Err(ErrorActive::Database(DatabaseActive::Mismatch(
+                MismatchActive::SpecsToSendEncryption {
+                    key: network_specs_key.to_owned(),
+                    encryption: network_specs_to_send.encryption,
+                },
+            )));
+        }
         Ok(network_specs_to_send)
     }
-    pub fn from_entry_checked ((network_specs_key_vec, network_specs_to_send_encoded): (IVec, IVec)) -> Result<Self, ErrorActive> {
+    pub fn from_entry_checked(
+        (network_specs_key_vec, network_specs_to_send_encoded): (IVec, IVec),
+    ) -> Result<Self, ErrorActive> {
         let network_specs_key = NetworkSpecsKey::from_ivec(&network_specs_key_vec);
         Self::from_entry_with_key_checked(&network_specs_key, network_specs_to_send_encoded)
     }
 }
 
-#[derive(parity_scale_codec_derive::Decode, parity_scale_codec_derive::Encode, PartialEq, Debug)]
+#[derive(
+    parity_scale_codec_derive::Decode, parity_scale_codec_derive::Encode, PartialEq, Debug,
+)]
 pub struct NetworkProperties {
     pub base58prefix: u16,
     pub decimals: u8,
@@ -145,12 +204,16 @@ pub struct NetworkProperties {
 }
 
 /// Verifier for both network metadata and for types information
-#[derive(parity_scale_codec_derive::Decode, parity_scale_codec_derive::Encode, PartialEq, Debug, Clone)]
-pub struct Verifier (pub Option<VerifierValue>);
+#[derive(
+    parity_scale_codec_derive::Decode, parity_scale_codec_derive::Encode, PartialEq, Debug, Clone,
+)]
+pub struct Verifier(pub Option<VerifierValue>);
 
-#[derive(parity_scale_codec_derive::Decode, parity_scale_codec_derive::Encode, PartialEq, Debug, Clone)]
+#[derive(
+    parity_scale_codec_derive::Decode, parity_scale_codec_derive::Encode, PartialEq, Debug, Clone,
+)]
 pub enum VerifierValue {
-    Standard (MultiSigner),
+    Standard(MultiSigner),
 }
 
 impl Verifier {
@@ -178,15 +241,26 @@ impl VerifierValue {
                     Ok(a) => hex::encode(a),
                     Err(_) => String::new(),
                 };
-                format!("\"public_key\":\"{}\",\"identicon\":\"{}\",\"encryption\":\"{}\"", hex_public, hex_identicon, encryption.show())
-            },
+                format!(
+                    "\"public_key\":\"{}\",\"identicon\":\"{}\",\"encryption\":\"{}\"",
+                    hex_public,
+                    hex_identicon,
+                    encryption.show()
+                )
+            }
         }
     }
     pub fn show_error(&self) -> String {
         match &self {
-            VerifierValue::Standard(MultiSigner::Ed25519(x)) => format!("public key: {}, encryption: ed25519", hex::encode(x.0)),
-            VerifierValue::Standard(MultiSigner::Sr25519(x)) => format!("public key: {}, encryption: sr25519", hex::encode(x.0)),
-            VerifierValue::Standard(MultiSigner::Ecdsa(x)) => format!("public key: {}, encryption: ecdsa", hex::encode(x.0)),
+            VerifierValue::Standard(MultiSigner::Ed25519(x)) => {
+                format!("public key: {}, encryption: ed25519", hex::encode(x.0))
+            }
+            VerifierValue::Standard(MultiSigner::Sr25519(x)) => {
+                format!("public key: {}, encryption: sr25519", hex::encode(x.0))
+            }
+            VerifierValue::Standard(MultiSigner::Ecdsa(x)) => {
+                format!("public key: {}, encryption: ecdsa", hex::encode(x.0))
+            }
         }
     }
 }
@@ -194,24 +268,34 @@ impl VerifierValue {
 /// Current network verifier.
 /// Could be general verifier (by default, for networks: kusama, polkadot, westend, rococo),
 /// or could be custom verifier.
-#[derive(parity_scale_codec_derive::Decode, parity_scale_codec_derive::Encode, PartialEq, Debug, Clone)]
+#[derive(
+    parity_scale_codec_derive::Decode, parity_scale_codec_derive::Encode, PartialEq, Debug, Clone,
+)]
 pub enum CurrentVerifier {
     Valid(ValidCurrentVerifier),
     Dead,
 }
 
 /// Possible variants of valid current network verifier.
-#[derive(parity_scale_codec_derive::Decode, parity_scale_codec_derive::Encode, PartialEq, Debug, Clone)]
+#[derive(
+    parity_scale_codec_derive::Decode, parity_scale_codec_derive::Encode, PartialEq, Debug, Clone,
+)]
 pub enum ValidCurrentVerifier {
     General,
-    Custom (Verifier),
+    Custom(Verifier),
 }
 
 impl ValidCurrentVerifier {
     pub fn show(&self, general_verifier: &Verifier) -> String {
         match &self {
-            ValidCurrentVerifier::General => format!("\"type\":\"general\",\"details\":{}", export_complex_single(general_verifier, |a| a.show_card())),
-            ValidCurrentVerifier::Custom(a) => format!("\"type\":\"custom\",\"details\":{}", export_complex_single(a, |a| a.show_card())),
+            ValidCurrentVerifier::General => format!(
+                "\"type\":\"general\",\"details\":{}",
+                export_complex_single(general_verifier, |a| a.show_card())
+            ),
+            ValidCurrentVerifier::Custom(a) => format!(
+                "\"type\":\"custom\",\"details\":{}",
+                export_complex_single(a, |a| a.show_card())
+            ),
         }
     }
 }

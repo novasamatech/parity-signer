@@ -244,6 +244,8 @@ enum ButtonID {
     case SignNetworkSpecs
     case SignMetadata
     case SignTypes
+    case TextEntry
+    case PushWord
     case ManageNetworks
     case ViewGeneralVerifier
     case ManageMetadata
