@@ -82,8 +82,7 @@ pub fn load_types(data_hex: &str, database_name: &str) -> Result<Action, ErrorSi
                     Verifier(None) => {
                         let new_general_verifier = checked_info.verifier;
                         let general_hold = GeneralHold::get(database_name)?;
-                        stub =
-                            general_hold.upd_stub(stub, &new_general_verifier, database_name)?;
+                        stub = general_hold.upd_stub(stub, &new_general_verifier, database_name)?;
                         stub = stub.add_types(&content_new_types, &new_general_verifier);
                         let warning_card_1 =
                             Card::Warning(Warning::GeneralVerifierAppeared(&general_hold))

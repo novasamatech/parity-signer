@@ -119,18 +119,14 @@ fn find_method_v12(
                 };
                 Ok(out)
             }
-            None => {
-                Err(ParserError::Decoding(ParserDecodingError::MethodNotFound {
-                    method_index,
-                    pallet_name: x,
-                }))
-            }
+            None => Err(ParserError::Decoding(ParserDecodingError::MethodNotFound {
+                method_index,
+                pallet_name: x,
+            })),
         },
-        None => {
-            Err(ParserError::Decoding(ParserDecodingError::PalletNotFound(
-                pallet_index,
-            )))
-        }
+        None => Err(ParserError::Decoding(ParserDecodingError::PalletNotFound(
+            pallet_index,
+        ))),
     }
 }
 
@@ -224,18 +220,14 @@ fn find_method_v13(
                 };
                 Ok(out)
             }
-            None => {
-                Err(ParserError::Decoding(ParserDecodingError::MethodNotFound {
-                    method_index,
-                    pallet_name: x,
-                }))
-            }
+            None => Err(ParserError::Decoding(ParserDecodingError::MethodNotFound {
+                method_index,
+                pallet_name: x,
+            })),
         },
-        None => {
-            Err(ParserError::Decoding(ParserDecodingError::PalletNotFound(
-                pallet_index,
-            )))
-        }
+        None => Err(ParserError::Decoding(ParserDecodingError::PalletNotFound(
+            pallet_index,
+        ))),
     }
 }
 

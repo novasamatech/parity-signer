@@ -73,8 +73,8 @@ pub fn process_message(data_hex: &str, dbname: &str) -> Result<Action, ErrorSign
                         .card(&mut index, indent);
                         let warning_card =
                             Card::Warning(Warning::NoNetworkID).card(&mut index, indent);
-                        let message_card = Card::ParserCard(&ParserCard::Text(message))
-                            .card(&mut index, indent);
+                        let message_card =
+                            Card::ParserCard(&ParserCard::Text(message)).card(&mut index, indent);
                         let network_card =
                             Card::NetworkInfo(&network_specs).card(&mut index, indent);
                         Ok(Action::Read(format!(
@@ -91,8 +91,8 @@ pub fn process_message(data_hex: &str, dbname: &str) -> Result<Action, ErrorSign
                     .card(&mut index, indent);
                     let warning_card =
                         Card::Warning(Warning::AuthorNotFound).card(&mut index, indent);
-                    let message_card = Card::ParserCard(&ParserCard::Text(message))
-                        .card(&mut index, indent);
+                    let message_card =
+                        Card::ParserCard(&ParserCard::Text(message)).card(&mut index, indent);
                     let network_card = Card::NetworkInfo(&network_specs).card(&mut index, indent);
                     Ok(Action::Read(format!(
                         "\"author\":[{}],\"warning\":[{}],\"message\":[{},{}]",

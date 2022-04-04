@@ -14,7 +14,7 @@ mod tests {
         keyring::NetworkSpecsKey,
         network_specs::{Verifier, VerifierValue},
     };
-    
+
     use sp_runtime::MultiSigner;
     use std::fs;
 

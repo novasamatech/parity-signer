@@ -720,10 +720,7 @@ mod tests {
         let default_addresses = addresses_set_seed_name_network(
             dbname,
             "Alice",
-            &NetworkSpecsKey::from_parts(
-                chainspecs[0].genesis_hash.as_ref(),
-                &Encryption::Sr25519,
-            ),
+            &NetworkSpecsKey::from_parts(chainspecs[0].genesis_hash.as_ref(), &Encryption::Sr25519),
         )
         .unwrap();
         assert!(!default_addresses.is_empty());
@@ -1085,14 +1082,18 @@ mod tests {
 
     #[test]
     fn checking_derivation_set() {
-        assert!(check_derivation_set(&["/0".to_string(),
-            "//Alice/westend".to_string(),
-            "//secret//westend".to_string()])
-        .is_ok());
-        assert!(check_derivation_set(&["/0".to_string(),
+        assert!(check_derivation_set(&[
             "/0".to_string(),
             "//Alice/westend".to_string(),
-            "//secret//westend".to_string()])
+            "//secret//westend".to_string()
+        ])
+        .is_ok());
+        assert!(check_derivation_set(&[
+            "/0".to_string(),
+            "/0".to_string(),
+            "//Alice/westend".to_string(),
+            "//secret//westend".to_string()
+        ])
         .is_ok());
         assert!(check_derivation_set(&["//remarkably///ugly".to_string()]).is_err());
         assert!(check_derivation_set(&["no_path_at_all".to_string()]).is_err());

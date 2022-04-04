@@ -126,9 +126,11 @@ pub fn process_decoded_payload(
                     None => Ok(Ready::NotYet(InProgress::LegacyMulti(collected))),
                 }
             }
-            InProgress::Fountain(_) => return Err(anyhow!(
+            InProgress::Fountain(_) => {
+                return Err(anyhow!(
                 "Was decoding fountain qr code, and got interrupted by a legacy multi-element one."
-            )),
+            ))
+            }
             InProgress::LegacyMulti(mut collected) => {
                 if collected.length != length {
                     return Err(anyhow!("Was decoding legacy multi-element qr code with {} elements, got interrupted by legacy multi-element qr code with {} elements", collected.length, length));

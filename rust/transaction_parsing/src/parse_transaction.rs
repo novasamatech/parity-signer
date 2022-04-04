@@ -179,12 +179,10 @@ pub(crate) fn parse_transaction(data_hex: &str, dbname: &str) -> Result<Action, 
             }
             match found_solution {
                 Some(a) => Ok(a),
-                None => {
-                    Err(ErrorSigner::AllExtensionsParsingFailed {
-                        network_name: network_specs.name,
-                        errors: error_collection,
-                    })
-                } // author: [], hint: [], error: []
+                None => Err(ErrorSigner::AllExtensionsParsingFailed {
+                    network_name: network_specs.name,
+                    errors: error_collection,
+                }), // author: [], hint: [], error: []
             }
         }
         None => {

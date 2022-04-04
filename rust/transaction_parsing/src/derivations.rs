@@ -35,13 +35,11 @@ pub fn process_derivations(data_hex: &str, database_name: &str) -> Result<Action
                 network_specs_key,
             })
         }
-        None => {
-            Err(ErrorSigner::NotFound(
-                NotFoundSigner::NetworkForDerivationsImport {
-                    genesis_hash,
-                    encryption,
-                },
-            ))
-        }
+        None => Err(ErrorSigner::NotFound(
+            NotFoundSigner::NetworkForDerivationsImport {
+                genesis_hash,
+                encryption,
+            },
+        )),
     }
 }

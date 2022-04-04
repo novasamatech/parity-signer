@@ -41,15 +41,15 @@ pub fn load_metadata(data_hex: &str, database_name: &str) -> Result<Action, Erro
     };
     let general_verifier = get_general_verifier(database_name)?;
     let verifier_key = VerifierKey::from_parts(genesis_hash.as_ref());
-    let valid_current_verifier =
-        match try_get_valid_current_verifier(&verifier_key, database_name)? {
-            Some(a) => a,
-            None => {
-                return Err(ErrorSigner::Input(InputSigner::LoadMetaUnknownNetwork {
-                    name: meta_values.name,
-                }))
-            }
-        };
+    let valid_current_verifier = match try_get_valid_current_verifier(&verifier_key, database_name)?
+    {
+        Some(a) => a,
+        None => {
+            return Err(ErrorSigner::Input(InputSigner::LoadMetaUnknownNetwork {
+                name: meta_values.name,
+            }))
+        }
+    };
     let (network_specs_key, network_specs) =
         match genesis_hash_in_specs(&verifier_key, &open_db::<Signer>(database_name)?)? {
             Some(a) => a,

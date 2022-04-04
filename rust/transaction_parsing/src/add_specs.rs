@@ -75,8 +75,7 @@ pub fn add_specs(data_hex: &str, database_name: &str) -> Result<Action, ErrorSig
                     Verifier(None) => {
                         let new_general_verifier = checked_info.verifier;
                         let general_hold = GeneralHold::get(database_name)?;
-                        stub =
-                            general_hold.upd_stub(stub, &new_general_verifier, database_name)?;
+                        stub = general_hold.upd_stub(stub, &new_general_verifier, database_name)?;
                         stub = stub.add_network_specs(
                             &specs,
                             &ValidCurrentVerifier::General,
@@ -238,22 +237,20 @@ pub fn add_specs(data_hex: &str, database_name: &str) -> Result<Action, ErrorSig
                                     HoldRelease::GeneralSuper,
                                     database_name,
                                 )?;
-                                let warning_card_1 =
-                                    Card::Warning(Warning::VerifierGeneralSuper {
-                                        verifier_key: &verifier_key,
-                                        hold: &hold,
-                                    })
-                                    .card(&mut index, 0);
+                                let warning_card_1 = Card::Warning(Warning::VerifierGeneralSuper {
+                                    verifier_key: &verifier_key,
+                                    hold: &hold,
+                                })
+                                .card(&mut index, 0);
                                 let general_hold = GeneralHold::get(database_name)?;
                                 stub = general_hold.upd_stub(
                                     stub,
                                     &new_general_verifier,
                                     database_name,
                                 )?;
-                                let warning_card_2 = Card::Warning(
-                                    Warning::GeneralVerifierAppeared(&general_hold),
-                                )
-                                .card(&mut index, 0);
+                                let warning_card_2 =
+                                    Card::Warning(Warning::GeneralVerifierAppeared(&general_hold))
+                                        .card(&mut index, 0);
                                 let mut possible_warning = None;
                                 if !specs_are_new(&specs, database_name)? {
                                     possible_warning = Some(
@@ -283,9 +280,7 @@ pub fn add_specs(data_hex: &str, database_name: &str) -> Result<Action, ErrorSig
                                     stub,
                                     &verifier_key,
                                     &custom_verifier,
-                                    &ValidCurrentVerifier::Custom(
-                                        checked_info.verifier.to_owned(),
-                                    ),
+                                    &ValidCurrentVerifier::Custom(checked_info.verifier.to_owned()),
                                     HoldRelease::Custom,
                                     database_name,
                                 )?;
@@ -309,9 +304,7 @@ pub fn add_specs(data_hex: &str, database_name: &str) -> Result<Action, ErrorSig
                                 };
                                 stub = stub.add_network_specs(
                                     &specs,
-                                    &ValidCurrentVerifier::Custom(
-                                        checked_info.verifier.to_owned(),
-                                    ),
+                                    &ValidCurrentVerifier::Custom(checked_info.verifier.to_owned()),
                                     &general_verifier,
                                     database_name,
                                 )?;
@@ -327,12 +320,10 @@ pub fn add_specs(data_hex: &str, database_name: &str) -> Result<Action, ErrorSig
                 }
                 Verifier(Some(ref old_verifier_value)) => {
                     match checked_info.verifier {
-                        Verifier(None) => {
-                            Err(ErrorSigner::Input(InputSigner::NeedVerifier {
-                                name: specs.name,
-                                verifier_value: old_verifier_value.to_owned(),
-                            }))
-                        }
+                        Verifier(None) => Err(ErrorSigner::Input(InputSigner::NeedVerifier {
+                            name: specs.name,
+                            verifier_value: old_verifier_value.to_owned(),
+                        })),
                         Verifier(Some(ref new_verifier_value)) => {
                             let verifier_card =
                                 Card::Verifier(new_verifier_value).card(&mut index, 0);
@@ -385,8 +376,7 @@ pub fn add_specs(data_hex: &str, database_name: &str) -> Result<Action, ErrorSig
                                         database_name,
                                     )?;
                                     let specs_card = Card::NewSpecs(&specs).card(&mut index, 0);
-                                    let checksum =
-                                        stub.store_and_get_checksum(database_name)?;
+                                    let checksum = stub.store_and_get_checksum(database_name)?;
                                     Ok(Action::Stub(
                                         format!(
                                             "\"verifier\":[{}],\"new_specs\":[{}]",
@@ -402,13 +392,11 @@ pub fn add_specs(data_hex: &str, database_name: &str) -> Result<Action, ErrorSig
                                     }))
                                 }
                             } else {
-                                Err(ErrorSigner::Input(
-                                    InputSigner::AddSpecsVerifierChanged {
-                                        name: specs.name,
-                                        old_verifier_value: old_verifier_value.to_owned(),
-                                        new_verifier_value: new_verifier_value.to_owned(),
-                                    },
-                                ))
+                                Err(ErrorSigner::Input(InputSigner::AddSpecsVerifierChanged {
+                                    name: specs.name,
+                                    old_verifier_value: old_verifier_value.to_owned(),
+                                    new_verifier_value: new_verifier_value.to_owned(),
+                                }))
                             }
                         }
                     }
