@@ -47,6 +47,8 @@ pub enum Action {
     ExportMultiSelect,
     Increment,
     ShowDocuments,
+    TextEntry,
+    PushWord,
     Nothing,
 }
 
@@ -95,10 +97,11 @@ impl Action {
             "ExportMultiSelect" => Action::ExportMultiSelect,
             "Increment" => Action::Increment,
             "ShowDocuments" => Action::ShowDocuments,
+            "TextEntry" => Action::TextEntry,
+            "PushWord" => Action::PushWord,
             _ => Action::Nothing,
         }
     }
-
 }
 
 #[cfg(test)]

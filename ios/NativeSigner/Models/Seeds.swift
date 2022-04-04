@@ -221,36 +221,4 @@ extension SignerDataModel {
             }
         }
     }
-    
-    
-    /*
-     * Guess possible seed word(s) from user input
-     */
-    func guessWord(word: String) -> [String] {
-        let res = guess_word(nil, word)
-        if let wordsJSON = String(cString: res!).data(using: .utf8) {
-            guard let words = try? JSONDecoder().decode([String].self, from: wordsJSON)
-            else { return [] }
-            return words
-        } else {
-            return []
-        }
-    }
-    
-    /**
-     * Check if seedphrase is valid; returns error message or nothing
-     */
-    func validatePhrase(seedPhrase: String) -> String? {
-        var err = ExternError()
-        var errorMessage: String? = nil
-        withUnsafeMutablePointer(to: &err) {err_ptr in
-            validate_phrase(err_ptr, seedPhrase)
-            if (err_ptr.pointee.code != 0)
-            {
-                errorMessage = String(cString: err_ptr.pointee.message)
-                signer_destroy_string(err_ptr.pointee.message)
-            }
-        }
-        return errorMessage
-    }
 }

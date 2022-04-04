@@ -2,8 +2,16 @@
 use sp_runtime::MultiSigner;
 use zeroize::Zeroize;
 
-use db_handling::{helpers::get_address_details, interface_signer::{first_network}};
-use definitions::{error::{AddressKeySource, ErrorSigner, ExtraAddressKeySourceSigner, Signer}, helpers::{multisigner_to_public, make_identicon_from_multisigner}, keyring::{AddressKey, NetworkSpecsKey}, users::AddressDetails};
+use db_handling::{
+    helpers::get_address_details,
+    interface_signer::{first_network, SeedDraft},
+};
+use definitions::{
+    error::{AddressKeySource, ErrorSigner, ExtraAddressKeySourceSigner, Signer},
+    helpers::{make_identicon_from_multisigner, multisigner_to_public},
+    keyring::{AddressKey, NetworkSpecsKey},
+    users::AddressDetails,
+};
 use transaction_parsing;
 use transaction_signing;
 
@@ -22,7 +30,7 @@ pub enum Screen {
     KeyDetailsMulti(AddressStateMulti),
     NewSeed,
     RecoverSeedName(String),
-    RecoverSeedPhrase(String),
+    RecoverSeedPhrase(RecoverSeedPhraseState),
     DeriveKey(DeriveState),
     Settings,
     Verifier,
@@ -93,17 +101,27 @@ pub struct SufficientCryptoState {
     counter: u8,
 }
 
+///State of screen recover seed phrase
+#[derive(Debug, Clone)]
+pub struct RecoverSeedPhraseState {
+    seed_name: String,
+    seed_draft: SeedDraft,
+}
+
 ///EnteredInfo, path+pwd entered by the user, zeroizeable
 #[derive(Debug, Clone, Zeroize)]
 #[zeroize(drop)]
-pub struct EnteredInfo (pub String);
+pub struct EnteredInfo(pub String);
 
 impl KeysState {
     pub fn new(seed_name: &str, database_name: &str) -> Result<Self, ErrorSigner> {
         let network_specs = first_network(database_name)?;
         Ok(Self {
             seed_name: seed_name.to_string(),
-            network_specs_key: NetworkSpecsKey::from_parts(&network_specs.genesis_hash.to_vec(), &network_specs.encryption),
+            network_specs_key: NetworkSpecsKey::from_parts(
+                &network_specs.genesis_hash.to_vec(),
+                &network_specs.encryption,
+            ),
             specialty: SpecialtyKeysState::None,
         })
     }
@@ -134,9 +152,12 @@ impl KeysState {
         let specialty = match &self.specialty {
             SpecialtyKeysState::None => SpecialtyKeysState::Swiped(multisigner.to_owned()),
             SpecialtyKeysState::Swiped(swiped_multisigner) => {
-                if swiped_multisigner == multisigner {SpecialtyKeysState::None}
-                else {SpecialtyKeysState::Swiped(multisigner.to_owned())}
-            },
+                if swiped_multisigner == multisigner {
+                    SpecialtyKeysState::None
+                } else {
+                    SpecialtyKeysState::Swiped(multisigner.to_owned())
+                }
+            }
             SpecialtyKeysState::MultiSelect(_) => self.specialty.to_owned(),
         };
         Self {
@@ -147,16 +168,22 @@ impl KeysState {
     }
     pub fn select_single(&self, multisigner: &MultiSigner) -> Self {
         let specialty = match &self.specialty {
-            SpecialtyKeysState::None => SpecialtyKeysState::MultiSelect(vec![multisigner.to_owned()]),
+            SpecialtyKeysState::None => {
+                SpecialtyKeysState::MultiSelect(vec![multisigner.to_owned()])
+            }
             SpecialtyKeysState::Swiped(_) => self.specialty.to_owned(),
             SpecialtyKeysState::MultiSelect(multiselect) => {
                 let mut new_multiselect = multiselect.to_owned();
                 if multiselect.contains(multisigner) {
-                    new_multiselect = new_multiselect.into_iter().filter(|a| a != multisigner).collect();
+                    new_multiselect = new_multiselect
+                        .into_iter()
+                        .filter(|a| a != multisigner)
+                        .collect();
+                } else {
+                    new_multiselect.push(multisigner.to_owned());
                 }
-                else {new_multiselect.push(multisigner.to_owned());}
                 SpecialtyKeysState::MultiSelect(new_multiselect)
-            },
+            }
         };
         Self {
             seed_name: self.seed_name(),
@@ -172,16 +199,25 @@ impl KeysState {
         }
     }
     pub fn get_swiped_key(&self) -> Option<MultiSigner> {
-        if let SpecialtyKeysState::Swiped(ref multisigner) = self.specialty {Some(multisigner.to_owned())}
-        else {None}
+        if let SpecialtyKeysState::Swiped(ref multisigner) = self.specialty {
+            Some(multisigner.to_owned())
+        } else {
+            None
+        }
     }
     pub fn get_multiselect_keys(&self) -> Vec<MultiSigner> {
-        if let SpecialtyKeysState::MultiSelect(ref multiselect) = self.specialty {multiselect.to_vec()}
-        else {Vec::new()}
+        if let SpecialtyKeysState::MultiSelect(ref multiselect) = self.specialty {
+            multiselect.to_vec()
+        } else {
+            Vec::new()
+        }
     }
     pub fn is_multiselect(&self) -> bool {
-        if let SpecialtyKeysState::MultiSelect(_) = self.specialty {true}
-        else {false}
+        if let SpecialtyKeysState::MultiSelect(_) = self.specialty {
+            true
+        } else {
+            false
+        }
     }
     pub fn deselect_specialty(&self) -> Self {
         Self {
@@ -193,10 +229,18 @@ impl KeysState {
 }
 
 impl AddressState {
-    pub fn new(hex_address_key: &str, keys_state: &KeysState, database_name: &str) -> Result<Self, ErrorSigner> {
+    pub fn new(
+        hex_address_key: &str,
+        keys_state: &KeysState,
+        database_name: &str,
+    ) -> Result<Self, ErrorSigner> {
         let address_key = AddressKey::from_hex(hex_address_key)?;
-        let multisigner = address_key.multi_signer::<Signer>(AddressKeySource::Extra(ExtraAddressKeySourceSigner::Interface))?;
-        let is_root = get_address_details(database_name, &AddressKey::from_multisigner(&multisigner))?.is_root();
+        let multisigner = address_key.multi_signer::<Signer>(AddressKeySource::Extra(
+            ExtraAddressKeySourceSigner::Interface,
+        ))?;
+        let is_root =
+            get_address_details(database_name, &AddressKey::from_multisigner(&multisigner))?
+                .is_root();
         Ok(Self {
             seed_name: keys_state.seed_name(),
             network_specs_key: keys_state.network_specs_key(),
@@ -225,12 +269,17 @@ impl AddressState {
     }
 }
 
-
 impl AddressStateMulti {
-    pub fn new(seed_name: String, network_specs_key: NetworkSpecsKey, multiselect: &Vec<MultiSigner>, database_name: &str) -> Result<Self, ErrorSigner> {
+    pub fn new(
+        seed_name: String,
+        network_specs_key: NetworkSpecsKey,
+        multiselect: &Vec<MultiSigner>,
+        database_name: &str,
+    ) -> Result<Self, ErrorSigner> {
         let mut set: Vec<(MultiSigner, bool)> = Vec::new();
         for multisigner in multiselect.iter() {
-            let address_details = get_address_details(database_name, &AddressKey::from_multisigner(multisigner))?;
+            let address_details =
+                get_address_details(database_name, &AddressKey::from_multisigner(multisigner))?;
             set.push((multisigner.to_owned(), address_details.is_root()))
         }
         Ok(Self {
@@ -261,8 +310,11 @@ impl AddressStateMulti {
     }
     pub fn next(&self) -> Self {
         let selected = {
-            if self.selected+1 == self.set.len() {0}
-            else {self.selected+1}
+            if self.selected + 1 == self.set.len() {
+                0
+            } else {
+                self.selected + 1
+            }
         };
         Self {
             seed_name: self.seed_name(),
@@ -273,8 +325,11 @@ impl AddressStateMulti {
     }
     pub fn previous(&self) -> Self {
         let selected = {
-            if self.selected == 0 {self.set.len()-1}
-            else {self.selected-1}
+            if self.selected == 0 {
+                self.set.len() - 1
+            } else {
+                self.selected - 1
+            }
         };
         Self {
             seed_name: self.seed_name(),
@@ -284,7 +339,7 @@ impl AddressStateMulti {
         }
     }
     pub fn number(&self) -> usize {
-        self.selected+1
+        self.selected + 1
     }
     pub fn out_of(&self) -> usize {
         self.set.len()
@@ -294,9 +349,8 @@ impl AddressStateMulti {
     }
 }
 
-
 impl DeriveState {
-    pub fn new (entered_string: &str, keys_state: &KeysState) -> Self {
+    pub fn new(entered_string: &str, keys_state: &KeysState) -> Self {
         Self {
             entered_info: EnteredInfo(entered_string.to_string()),
             keys_state: keys_state.to_owned(),
@@ -329,7 +383,11 @@ impl DeriveState {
             collision: self.collision(),
         }
     }
-    pub fn collided_with(&self, multisigner: &MultiSigner, address_details: &AddressDetails) -> Self {
+    pub fn collided_with(
+        &self,
+        multisigner: &MultiSigner,
+        address_details: &AddressDetails,
+    ) -> Self {
         Self {
             entered_info: self.entered_info.to_owned(),
             keys_state: self.blank_keys_state(),
@@ -363,8 +421,21 @@ impl TransactionState {
             counter: self.counter,
         }
     }
-    pub fn update_checksum_sign(&self, new_checksum: u32, content: String, has_pwd: bool, author_info: String, network_info: String) -> Self {
-        let action = transaction_parsing::Action::Sign{content, checksum: new_checksum, has_pwd, author_info, network_info};
+    pub fn update_checksum_sign(
+        &self,
+        new_checksum: u32,
+        content: String,
+        has_pwd: bool,
+        author_info: String,
+        network_info: String,
+    ) -> Self {
+        let action = transaction_parsing::Action::Sign {
+            content,
+            checksum: new_checksum,
+            has_pwd,
+            author_info,
+            network_info,
+        };
         Self {
             entered_info: self.entered_info.to_owned(),
             action,
@@ -404,14 +475,29 @@ impl SufficientCryptoState {
     pub fn key_selected(&self) -> Option<(MultiSigner, AddressDetails, String)> {
         self.key_selected.to_owned()
     }
-    pub fn update(&self, multisigner: &MultiSigner, address_details: &AddressDetails, new_secret_string: &str) -> Self {
+    pub fn update(
+        &self,
+        multisigner: &MultiSigner,
+        address_details: &AddressDetails,
+        new_secret_string: &str,
+    ) -> Self {
         let hex_identicon = match make_identicon_from_multisigner(&multisigner) {
             Ok(a) => hex::encode(a),
             Err(_) => String::new(),
         };
-        let author_info = format!("\"base58\":\"{}\",\"identicon\":\"{}\",\"seed\":\"{}\",\"derivation_path\":\"{}\"", hex::encode(multisigner_to_public(&multisigner)), hex_identicon, address_details.seed_name, address_details.path);
-        Self{
-            key_selected: Some((multisigner.to_owned(), address_details.to_owned(), author_info)),
+        let author_info = format!(
+            "\"base58\":\"{}\",\"identicon\":\"{}\",\"seed\":\"{}\",\"derivation_path\":\"{}\"",
+            hex::encode(multisigner_to_public(&multisigner)),
+            hex_identicon,
+            address_details.seed_name,
+            address_details.path
+        );
+        Self {
+            key_selected: Some((
+                multisigner.to_owned(),
+                address_details.to_owned(),
+                author_info,
+            )),
             entered_info: EnteredInfo(new_secret_string.to_string()),
             content: self.content(),
             counter: self.counter,
@@ -433,6 +519,27 @@ impl SufficientCryptoState {
     }
     pub fn counter(&self) -> u8 {
         self.counter
+    }
+}
+
+impl RecoverSeedPhraseState {
+    pub fn new(seed_name: &str) -> Self {
+        Self {
+            seed_name: seed_name.to_string(),
+            seed_draft: SeedDraft::new(),
+        }
+    }
+    pub fn name(&self) -> String {
+        self.seed_name.to_string()
+    }
+    pub fn draft(&self) -> &SeedDraft {
+        &self.seed_draft
+    }
+    pub fn text_entry(&mut self, details_str: &str) {
+        self.seed_draft.text_field_update(details_str)
+    }
+    pub fn push_word(&mut self, details_str: &str) {
+        self.seed_draft.added(details_str, None);
     }
 }
 
@@ -485,7 +592,8 @@ impl Screen {
             Screen::SignSufficientCrypto(_) => "Sign SufficientCrypto",
             Screen::Documents => "ABOUT",
             Screen::Nowhere => "",
-        }.to_string()
+        }
+        .to_string()
     }
 
     pub fn has_back(&self) -> bool {
@@ -517,38 +625,56 @@ impl Screen {
 #[cfg(test)]
 mod tests {
 
-use sp_core::sr25519::Public;
+    use sp_core::sr25519::Public;
 
-use super::*;
+    use super::*;
 
-use definitions::{crypto::Encryption, users::AddressDetails};
+    use definitions::{crypto::Encryption, users::AddressDetails};
 
-const PUBLIC: [u8; 32] = [142, 175, 4, 21, 22, 135, 115, 99, 38, 201, 254, 161, 126, 37, 252, 82, 135, 97, 54, 147, 201, 18, 144, 156, 178, 38, 170, 71, 148, 242, 106, 72];
-fn test_address_details() -> AddressDetails {
-    AddressDetails {
-        seed_name: String::from("Alice"),
-        path: String::from("//alice"),
-        has_pwd: false,
-        network_id: Vec::new(),
-        encryption: Encryption::Sr25519,
+    const PUBLIC: [u8; 32] = [
+        142, 175, 4, 21, 22, 135, 115, 99, 38, 201, 254, 161, 126, 37, 252, 82, 135, 97, 54, 147,
+        201, 18, 144, 156, 178, 38, 170, 71, 148, 242, 106, 72,
+    ];
+    fn test_address_details() -> AddressDetails {
+        AddressDetails {
+            seed_name: String::from("Alice"),
+            path: String::from("//alice"),
+            has_pwd: false,
+            network_id: Vec::new(),
+            encryption: Encryption::Sr25519,
+        }
     }
-}
 
     /// EnteredInfo holds String with sensitive information arriving either from Signer phone memory or from the user.
     /// EnteredInto is used in several structs, and should always be zeroized properly.
     #[test]
     fn zeroize_entered_info_in_sufficient_crypto_state() {
         let secret_ptr: *const u8;
-            // using secret entered info in this scope, zeroize afterwards
-            {
-                let mock_seed = "super secret seed element";
-                let sufficient_crypto_test = SufficientCryptoState::init(transaction_signing::SufficientContent::LoadTypes);
-                let sufficient_crypto_test_updated = sufficient_crypto_test.update(&MultiSigner::Sr25519(Public::from_raw(PUBLIC)), &test_address_details(), mock_seed);
-                secret_ptr = unsafe {sufficient_crypto_test_updated.entered_info.0.as_ptr().offset(-100)};
-            }
+        // using secret entered info in this scope, zeroize afterwards
+        {
+            let mock_seed = "super secret seed element";
+            let sufficient_crypto_test =
+                SufficientCryptoState::init(transaction_signing::SufficientContent::LoadTypes);
+            let sufficient_crypto_test_updated = sufficient_crypto_test.update(
+                &MultiSigner::Sr25519(Public::from_raw(PUBLIC)),
+                &test_address_details(),
+                mock_seed,
+            );
+            secret_ptr = unsafe {
+                sufficient_crypto_test_updated
+                    .entered_info
+                    .0
+                    .as_ptr()
+                    .offset(-100)
+            };
+        }
         println!("zeroize should have happened");
-        let memory: &[u8] = unsafe {std::slice::from_raw_parts(secret_ptr, 300)};
+        let memory: &[u8] = unsafe { std::slice::from_raw_parts(secret_ptr, 300) };
         let memory_string = String::from_utf8_lossy(memory);
-        assert!(!memory_string.contains("super secret seed element"), "\n{:?}", memory_string);
+        assert!(
+            !memory_string.contains("super secret seed element"),
+            "\n{:?}",
+            memory_string
+        );
     }
 }
