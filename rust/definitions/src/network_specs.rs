@@ -147,19 +147,22 @@
 //! In some cases network verifiers and general verifier could be changed
 //! by accepting updating payloads:  
 //!
-//! - `ValidCurrentVerifier::General(None)` could be upgraded to
-//! `ValidCurrentVerifier::General(Some(VerifierValue))`. Happens when Signer
-//! with no general verifier receives and accepts a verified update with any
+//! - `ValidCurrentVerifier::General` with general verifier `None` could be
+//! upgraded to `ValidCurrentVerifier::General` with general verifier
+//! `(Some(VerifierValue))`. Happens when Signer with no value set up for
+//! the general verifier receives and accepts a verified update with any
 //! network specs or types.  
 //!
 //! - Network `ValidCurrentVerifier::Custom(Some(VerifierValue))` could be
-//! upgraded to `ValidCurrentVerifier::General(Some(VerifierValue))`.
+//! upgraded to `ValidCurrentVerifier::General` with general verifier set to
+//! `(Some(VerifierValue))`.
 //! Happens when Signer receives and accepts network specs update verified
 //! by general verifier for this network. Note: metadata update with
 //! verifier upgrade would be rejected.  
 //!
 //! - Network `ValidCurrentVerifier::Custom(None)` could be upgraded to
-//! `ValidCurrentVerifier::General(Some(VerifierValue))`.
+//! `ValidCurrentVerifier::General` with general verifier set to
+//! `(Some(VerifierValue))`.
 //! Happens when Signer receives and accepts network specs update verified
 //! by general verifier for this network. Note: metadata update with
 //! verifier upgrade would be rejected.  
