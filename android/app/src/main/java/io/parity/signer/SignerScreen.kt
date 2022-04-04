@@ -42,7 +42,7 @@ fun ScreenSelector(screen: SignerScreen?, signerDataModel: SignerDataModel) {
 		}
 		SignerScreen.Settings -> {
 			SettingsScreen(
-				screenData?: JSONObject(),
+				screenData ?: JSONObject(),
 				signerDataModel::pushButton,
 				alertState,
 				signerDataModel.isStrongBoxProtected().toString(),
@@ -59,7 +59,7 @@ fun ScreenSelector(screen: SignerScreen?, signerDataModel: SignerDataModel) {
 		SignerScreen.LogDetails -> LogDetails(screenData ?: JSONObject())
 		SignerScreen.Transaction -> {
 			TransactionPreview(
-				screenData?: JSONObject(),
+				screenData ?: JSONObject(),
 				signerDataModel::pushButton,
 				signerDataModel::signTransaction
 			)
@@ -105,7 +105,7 @@ fun ScreenSelector(screen: SignerScreen?, signerDataModel: SignerDataModel) {
 			)
 		}
 		SignerScreen.Verifier -> VerifierScreen(
-			screenData?: JSONObject(),
+			screenData ?: JSONObject(),
 			signerDataModel::wipeToJailbreak
 		)
 		null -> WaitingScreen()
@@ -135,6 +135,7 @@ fun ScreenSelector(screen: SignerScreen?, signerDataModel: SignerDataModel) {
 
 @Composable
 fun ModalSelector(modal: SignerModal, signerDataModel: SignerDataModel) {
+	val modalData = signerDataModel.modalData.observeAsState()
 	when (modal) {
 		SignerModal.Empty -> {}
 		SignerModal.NewSeedMenu -> NewSeedMenu(signerDataModel = signerDataModel)
@@ -163,10 +164,15 @@ fun AlertSelector(alert: SignerAlert, signerDataModel: SignerDataModel) {
 		SignerAlert.Error -> ErrorModal(
 			error = signerDataModel.alertData.value?.optString(
 				"error"
-			) ?: "unknown error", signerDataModel = signerDataModel
+			) ?: "unknown error",
+			signerDataModel::pushButton
 		)
-		SignerAlert.Shield -> ShieldAlert(signerDataModel)
-		SignerAlert.Confirm -> Confirm(signerDataModel = signerDataModel)
+		SignerAlert.Shield -> ShieldAlert(
+			signerDataModel.alertState.observeAsState(),
+			signerDataModel::pushButton,
+			signerDataModel::acknowledgeWarning
+		)
+		SignerAlert.Confirm -> Confirm(signerDataModel::pushButton)
 	}
 }
 

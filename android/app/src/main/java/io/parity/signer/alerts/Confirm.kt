@@ -10,12 +10,12 @@ import io.parity.signer.models.pushButton
  * Confirmation alert called from backend navigation
  */
 @Composable
-fun Confirm(signerDataModel: SignerDataModel) {
+fun Confirm(button: (ButtonID) -> Unit) {
 
 	AlertComponent(
 		show = true,
-		back = { signerDataModel.pushButton(ButtonID.GoBack) },
-		forward = { signerDataModel.pushButton(ButtonID.GoForward) }
+		back = { button(ButtonID.GoBack) },
+		forward = { button(ButtonID.GoForward) }
 	)
 
 }
