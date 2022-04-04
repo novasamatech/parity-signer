@@ -26,7 +26,7 @@ use constants::ALICE_SEED_PHRASE;
 use constants::TRANSACTION;
 
 #[cfg(feature = "active")]
-use defaults::get_default_chainspecs;
+use defaults::default_chainspecs;
 
 #[cfg(any(feature = "active", feature = "signer"))]
 use definitions::{
@@ -550,7 +550,7 @@ pub fn generate_test_identities(database_name: &str) -> Result<(), ErrorActive> 
             true,
         )?;
         events.extend_from_slice(&new_events);
-        for network_specs in get_default_chainspecs().iter() {
+        for network_specs in default_chainspecs().iter() {
             if (network_specs.name == "westend")
                 && (network_specs.encryption == Encryption::Sr25519)
             {

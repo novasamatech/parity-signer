@@ -1,5 +1,6 @@
 #![deny(unused_crate_dependencies)]
 
+#[cfg(feature = "active")]
 use constants::{COLD_DB_NAME, COLD_DB_NAME_RELEASE, HOT_DB_NAME};
 #[cfg(feature = "active")]
 use definitions::{error_active::ErrorActive, network_specs::Verifier};

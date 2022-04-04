@@ -23,8 +23,8 @@ use definitions::{error::ErrorSource, history::Event, network_specs::Verifier};
 use defaults::default_general_verifier;
 #[cfg(feature = "active")]
 use defaults::{
-    get_default_chainspecs, get_default_types_content, get_default_verifiers,
-    get_nav_test_metadata, get_release_metadata, get_test_metadata,
+    default_chainspecs, default_types_content, default_verifiers, nav_test_metadata,
+    release_metadata, test_metadata,
 };
 
 #[cfg(feature = "active")]
@@ -61,9 +61,9 @@ fn default_test_cold_history(database_name: &str) -> Result<Batch, ErrorActive> 
 fn default_cold_metadata(database_name: &str, purpose: Purpose) -> Result<Batch, ErrorActive> {
     let mut batch = make_batch_clear_tree::<Active>(database_name, METATREE)?;
     let metadata_set = match purpose {
-        Purpose::Release => get_release_metadata()?,
-        Purpose::Test => get_test_metadata()?,
-        Purpose::TestNavigator => get_nav_test_metadata()?,
+        Purpose::Release => release_metadata()?,
+        Purpose::Test => test_metadata()?,
+        Purpose::TestNavigator => nav_test_metadata()?,
     };
     for x in metadata_set.iter() {
         let meta_key = MetaKey::from_parts(&x.name, x.version);
@@ -79,7 +79,7 @@ fn default_cold_metadata(database_name: &str, purpose: Purpose) -> Result<Batch,
 #[cfg(feature = "active")]
 fn default_cold_network_specs(database_name: &str) -> Result<Batch, ErrorActive> {
     let mut batch = make_batch_clear_tree::<Active>(database_name, SPECSTREE)?;
-    for x in get_default_chainspecs().iter() {
+    for x in default_chainspecs().iter() {
         let network_specs_key = NetworkSpecsKey::from_parts(&x.genesis_hash, &x.encryption);
         batch.insert(network_specs_key.key(), x.encode());
     }
@@ -98,7 +98,7 @@ fn default_cold_settings(
     general_verifier: Verifier,
 ) -> Result<Batch, ErrorActive> {
     let mut batch = make_batch_clear_tree::<Active>(database_name, SETTREE)?;
-    let types_prep = get_default_types_content()?;
+    let types_prep = default_types_content()?;
     batch.insert(TYPES, types_prep.store());
     batch.insert(GENERALVERIFIER, general_verifier.encode());
     batch.insert(DANGER, DangerRecord::safe().store());
@@ -112,7 +112,7 @@ fn default_cold_settings(
 #[cfg(feature = "active")]
 fn default_cold_settings_init_later(database_name: &str) -> Result<Batch, ErrorActive> {
     let mut batch = make_batch_clear_tree::<Active>(database_name, SETTREE)?;
-    let types_prep = get_default_types_content()?;
+    let types_prep = default_types_content()?;
     batch.insert(TYPES, types_prep.store());
     batch.insert(DANGER, DangerRecord::safe().store());
     Ok(batch)
@@ -125,7 +125,7 @@ fn default_cold_settings_init_later(database_name: &str) -> Result<Batch, ErrorA
 #[cfg(feature = "active")]
 fn default_cold_verifiers(database_name: &str) -> Result<Batch, ErrorActive> {
     let mut batch = make_batch_clear_tree::<Active>(database_name, VERIFIERS)?;
-    for (verifier_key, current_verifier) in get_default_verifiers().iter() {
+    for (verifier_key, current_verifier) in default_verifiers().iter() {
         batch.insert(verifier_key.key(), current_verifier.encode());
     }
     Ok(batch)

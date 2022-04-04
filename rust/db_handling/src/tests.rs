@@ -17,7 +17,7 @@ mod tests {
         },
         ADDRTREE, ALICE_SEED_PHRASE, METATREE, SPECSTREE,
     };
-    use defaults::get_default_chainspecs;
+    use defaults::default_chainspecs;
     use definitions::{
         crypto::Encryption,
         error::ErrorSource,
@@ -682,7 +682,7 @@ mod tests {
                 addresses.len()
             );
         }
-        let chainspecs = get_default_chainspecs();
+        let chainspecs = default_chainspecs();
         let default_addresses = addresses_set_seed_name_network(
             dbname,
             "Alice",
@@ -724,7 +724,7 @@ mod tests {
     fn test_derive() {
         let dbname = "for_tests/test_derive";
         populate_cold_no_metadata(dbname, Verifier(None)).unwrap();
-        let chainspecs = get_default_chainspecs();
+        let chainspecs = default_chainspecs();
         println!(
             "[0]: {:?}, [1]: {:?}",
             chainspecs[0].name, chainspecs[1].name
@@ -804,7 +804,7 @@ mod tests {
         let dbname = "for_tests/test_identity_deletion";
         populate_cold_no_metadata(dbname, Verifier(None)).unwrap();
         try_create_seed("Alice", ALICE_SEED_PHRASE, true, dbname).unwrap();
-        let chainspecs = get_default_chainspecs();
+        let chainspecs = default_chainspecs();
         let network_specs_key_0 =
             NetworkSpecsKey::from_parts(&chainspecs[0].genesis_hash, &Encryption::Sr25519);
         let network_specs_key_1 =
@@ -904,7 +904,7 @@ mod tests {
             let identities = open_tree::<Signer>(&db, ADDRTREE).unwrap();
             assert!(identities.len() == 0);
         }
-        let chainspecs = get_default_chainspecs();
+        let chainspecs = default_chainspecs();
         let network_id_0 =
             NetworkSpecsKey::from_parts(&chainspecs[0].genesis_hash, &Encryption::Sr25519);
         try_create_address("Alice", ALICE_SEED_PHRASE, "//Alice", &network_id_0, dbname).unwrap();
@@ -949,7 +949,7 @@ mod tests {
             let identities = open_tree::<Signer>(&db, ADDRTREE).unwrap();
             assert!(identities.len() == 0);
         }
-        let chainspecs = get_default_chainspecs();
+        let chainspecs = default_chainspecs();
         let network_id_0 =
             NetworkSpecsKey::from_parts(&chainspecs[0].genesis_hash, &Encryption::Sr25519);
         try_create_address("Alice", ALICE_SEED_PHRASE, "//Alice", &network_id_0, dbname).unwrap();
@@ -1004,7 +1004,7 @@ mod tests {
             let identities = open_tree::<Signer>(&db, ADDRTREE).unwrap();
             assert!(identities.len() == 0);
         }
-        let chainspecs = get_default_chainspecs();
+        let chainspecs = default_chainspecs();
         let network_id_0 =
             NetworkSpecsKey::from_parts(&chainspecs[0].genesis_hash, &Encryption::Sr25519);
         try_create_address("Alice", ALICE_SEED_PHRASE, "//Alice", &network_id_0, dbname).unwrap();
@@ -1074,7 +1074,7 @@ mod tests {
     fn creating_derivation_1() {
         let dbname = "for_tests/creating_derivation_1";
         populate_cold_no_metadata(dbname, Verifier(None)).unwrap();
-        let chainspecs = get_default_chainspecs();
+        let chainspecs = default_chainspecs();
         let network_id_0 =
             NetworkSpecsKey::from_parts(&chainspecs[0].genesis_hash, &Encryption::Sr25519);
         assert!(
@@ -1100,7 +1100,7 @@ mod tests {
     fn creating_derivation_2() {
         let dbname = "for_tests/creating_derivation_2";
         populate_cold_no_metadata(dbname, Verifier(None)).unwrap();
-        let chainspecs = get_default_chainspecs();
+        let chainspecs = default_chainspecs();
         let network_id_0 =
             NetworkSpecsKey::from_parts(&chainspecs[0].genesis_hash, &Encryption::Sr25519);
         assert!(
@@ -1133,7 +1133,7 @@ mod tests {
     fn creating_derivation_3() {
         let dbname = "for_tests/creating_derivation_3";
         populate_cold_no_metadata(dbname, Verifier(None)).unwrap();
-        let chainspecs = get_default_chainspecs();
+        let chainspecs = default_chainspecs();
         let network_id_0 =
             NetworkSpecsKey::from_parts(&chainspecs[0].genesis_hash, &Encryption::Sr25519);
         assert!(
@@ -1166,7 +1166,7 @@ mod tests {
     fn creating_derivation_4() {
         let dbname = "for_tests/creating_derivation_4";
         populate_cold_no_metadata(dbname, Verifier(None)).unwrap();
-        let chainspecs = get_default_chainspecs();
+        let chainspecs = default_chainspecs();
         let network_id_0 =
             NetworkSpecsKey::from_parts(&chainspecs[0].genesis_hash, &Encryption::Sr25519);
         assert!(
@@ -1205,7 +1205,7 @@ mod tests {
     fn creating_derivation_5() {
         let dbname = "for_tests/creating_derivation_5";
         populate_cold_no_metadata(dbname, Verifier(None)).unwrap();
-        let chainspecs = get_default_chainspecs();
+        let chainspecs = default_chainspecs();
         let network_id_0 =
             NetworkSpecsKey::from_parts(&chainspecs[0].genesis_hash, &Encryption::Sr25519);
         assert!(
