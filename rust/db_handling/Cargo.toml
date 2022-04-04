@@ -17,7 +17,7 @@ sp-core = "3.0.0"
 sp-runtime = "3.0.0"
 tiny-bip39 = { version = "0.8.0", default-features = false }
 blake2-rfc = "0.2.18"
-zeroize = "1.4.2"
+zeroize = "1.5.2"
 constants = {path = "../constants"}
 defaults = {path = "../defaults"}
 definitions = {path = "../definitions"}

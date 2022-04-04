@@ -1031,7 +1031,6 @@ impl ErrorSource for Signer {
                 let insert = match a {
                     AddressGeneration::Common(a) => a.show(),
                     AddressGeneration::Extra(ExtraAddressGenerationSigner::RandomPhraseGeneration(e)) => format!("Could not create random phrase. {}", e),
-                    AddressGeneration::Extra(ExtraAddressGenerationSigner::RandomPhraseValidation(e)) => format!("Proposed random phrase is invalid. {}", e),
                     AddressGeneration::Extra(ExtraAddressGenerationSigner::InvalidDerivation) =>  String::from("Invalid derivation format."),
                 };
                 format!("Error generating address. {}", insert)
@@ -1253,7 +1252,6 @@ pub enum NotFoundSigner {
 #[derive(Debug)]
 pub enum ExtraAddressGenerationSigner {
     RandomPhraseGeneration(anyhow::Error),
-    RandomPhraseValidation(anyhow::Error),
     InvalidDerivation,
 }
 

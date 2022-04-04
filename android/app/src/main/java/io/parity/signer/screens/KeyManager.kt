@@ -20,6 +20,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.unit.dp
 import io.parity.signer.ButtonID
+import io.parity.signer.ShieldAlert
 import io.parity.signer.components.BottomMultiselectBar
 import io.parity.signer.components.KeySelector
 import io.parity.signer.components.NetworkLogoName
@@ -40,7 +41,8 @@ import kotlin.math.absoluteValue
 fun KeyManager(
 	button: (button: ButtonID, details: String) -> Unit,
 	increment: (Int, String) -> Unit,
-	screenData: JSONObject
+	screenData: JSONObject,
+	alertState: ShieldAlert?
 ) {
 	//val screenData = signerDataModel.screenData.value
 	val rootKey = screenData.optJSONObject("root") ?: JSONObject()
@@ -57,11 +59,17 @@ fun KeyManager(
 					.pointerInput(Unit) {
 						detectTapGestures(
 							onTap = {
-								if (rootKey.optString("address_key").isNotBlank())
+								if (rootKey
+										.optString("address_key")
+										.isNotBlank()
+								)
 									button(ButtonID.SelectKey, rootKey.optString("address_key"))
 							},
 							onLongPress = {
-								if (rootKey.optString("address_key").isNotBlank())
+								if (rootKey
+										.optString("address_key")
+										.isNotBlank()
+								)
 									button(ButtonID.LongTap, rootKey.optString("address_key"))
 							}
 						)
@@ -73,7 +81,10 @@ fun KeyManager(
 						orientation = Orientation.Horizontal,
 						onDragStopped = {
 							if (offsetX.absoluteValue > 20f) {
-								if (rootKey.optString("address_key").isNotBlank())
+								if (rootKey
+										.optString("address_key")
+										.isNotBlank()
+								)
 									button(ButtonID.Swipe, rootKey.optString("address_key"))
 							}
 							offsetX = 0f
@@ -116,7 +127,11 @@ fun KeyManager(
 					)
 				}
 				Spacer(Modifier.width(8.dp))
-				Icon(Icons.Outlined.ExpandCircleDown, "More networks", tint = MaterialTheme.colors.Action400)
+				Icon(
+					Icons.Outlined.ExpandCircleDown,
+					"More networks",
+					tint = MaterialTheme.colors.Action400
+				)
 				Spacer(modifier = Modifier.weight(1f))
 			}
 			Row(
@@ -128,8 +143,17 @@ fun KeyManager(
 			) {
 				Text("DERIVED KEYS")
 				Spacer(Modifier.weight(1f, true))
-				IconButton(onClick = { button(ButtonID.NewKey, "") }) {
-					Icon(Icons.Default.AddCircleOutline, contentDescription = "New derived key", tint = MaterialTheme.colors.Action400)
+				IconButton(onClick = {
+					if (alertState == ShieldAlert.None)
+						button(ButtonID.NewKey, "")
+					else
+						button(ButtonID.Shield, "")
+				}) {
+					Icon(
+						Icons.Default.AddCircleOutline,
+						contentDescription = "New derived key",
+						tint = MaterialTheme.colors.Action400
+					)
 				}
 			}
 			KeySelector(
