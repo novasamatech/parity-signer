@@ -26,18 +26,22 @@ import io.parity.signer.ui.theme.modal
 import org.json.JSONObject
 
 @Composable
-fun EnterPassword(signerDataModel: SignerDataModel) {
+fun EnterPassword(
+	modalData: JSONObject,
+	button: (ButtonID, String) -> Unit
+) {
 	val password = remember {
 		mutableStateOf("")
 	}
-	val content = signerDataModel.screenData.value ?: JSONObject()
 	val focusManager = LocalFocusManager.current
 	val focusRequester = remember { FocusRequester() }
 
 	Surface(
 		color = MaterialTheme.colors.Bg200,
 		shape = MaterialTheme.shapes.modal,
-		modifier = Modifier.fillMaxSize(1f).padding(8.dp)
+		modifier = Modifier
+			.fillMaxSize(1f)
+			.padding(8.dp)
 	) {
 		Column(
 			horizontalAlignment = Alignment.CenterHorizontally,
@@ -45,19 +49,19 @@ fun EnterPassword(signerDataModel: SignerDataModel) {
 		) {
 			HeaderBar(line1 = "SECRET PATH", line2 = "///password")
 			KeyCard(
-				identity = content.optJSONObject("author_info") ?: JSONObject()
+				identity = modalData.optJSONObject("author_info") ?: JSONObject()
 			)
-			if (content.optInt("counter") > 0) {
-				Text("Attempt " + content.optInt("counter").toString() + " of 3")
+			if (modalData.optInt("counter") > 0) {
+				Text("Attempt " + modalData.optInt("counter").toString() + " of 3")
 			}
 			SingleTextInput(
 				content = password,
 				update = { password.value = it },
 				onDone = {
 					if (password.value.isNotBlank()) {
-						signerDataModel.pushButton(
+						button(
 							ButtonID.GoForward,
-							details = password.value
+							password.value
 						)
 					}
 				},
@@ -69,9 +73,9 @@ fun EnterPassword(signerDataModel: SignerDataModel) {
 				text = "Next",
 				isCrypto = true,
 				action = {
-					signerDataModel.pushButton(
+					button(
 						ButtonID.GoForward,
-						details = password.value
+						password.value
 					)
 				},
 				isDisabled = password.value.isBlank()

@@ -135,7 +135,7 @@ fun ScreenSelector(screen: SignerScreen?, signerDataModel: SignerDataModel) {
 
 @Composable
 fun ModalSelector(modal: SignerModal, signerDataModel: SignerDataModel) {
-	val modalData = signerDataModel.modalData.observeAsState()
+	val modalData by signerDataModel.modalData.observeAsState()
 	when (modal) {
 		SignerModal.Empty -> {}
 		SignerModal.NewSeedMenu -> NewSeedMenu(signerDataModel = signerDataModel)
@@ -144,7 +144,10 @@ fun ModalSelector(modal: SignerModal, signerDataModel: SignerDataModel) {
 		SignerModal.Backup -> SeedBackup(signerDataModel = signerDataModel)
 		SignerModal.PasswordConfirm -> PasswordConfirm(signerDataModel = signerDataModel)
 		SignerModal.SignatureReady -> SignatureReady(signerDataModel = signerDataModel)
-		SignerModal.EnterPassword -> EnterPassword(signerDataModel = signerDataModel)
+		SignerModal.EnterPassword -> EnterPassword(
+			modalData?: JSONObject(),
+			signerDataModel::pushButton
+		)
 		SignerModal.LogRight -> LogMenu(signerDataModel = signerDataModel)
 		SignerModal.NetworkDetailsMenu -> NetworkDetailsMenu(signerDataModel = signerDataModel)
 		SignerModal.ManageMetadata -> ManageMetadata(signerDataModel = signerDataModel)
