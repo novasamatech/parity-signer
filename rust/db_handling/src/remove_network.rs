@@ -218,19 +218,17 @@ mod tests {
                 "Some westend metadata was not deleted"
             );
             let identities: Tree = database.open_tree(ADDRTREE).unwrap();
-            for x in identities.iter() {
-                if let Ok(a) = x {
-                    let (_, address_details) =
-                        AddressDetails::process_entry_checked::<Signer>(a).unwrap();
-                    assert!(
-                        !address_details.network_id.contains(&network_specs_key),
-                        "Some westend identities still remain."
-                    );
-                    assert!(
-                        !address_details.network_id.is_empty(),
-                        "Did not remove address key entried with no network keys associated"
-                    );
-                }
+            for x in identities.iter().flatten() {
+                let (_, address_details) =
+                    AddressDetails::process_entry_checked::<Signer>(x).unwrap();
+                assert!(
+                    !address_details.network_id.contains(&network_specs_key),
+                    "Some westend identities still remain."
+                );
+                assert!(
+                    !address_details.network_id.is_empty(),
+                    "Did not remove address key entried with no network keys associated"
+                );
             }
         }
         let history_printed = print_history(dbname).unwrap();

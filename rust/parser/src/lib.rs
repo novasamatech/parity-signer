@@ -24,6 +24,7 @@ mod error;
 use error::{ArgumentsError, Error};
 pub mod method;
 use method::OlderMeta;
+#[cfg(test)]
 mod tests;
 
 /// Function intakes SCALE encoded method part of transaction as Vec<u8>,

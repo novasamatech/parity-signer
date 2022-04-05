@@ -915,12 +915,10 @@ mod tests {
         let db = open_db::<Signer>(dbname).unwrap();
         let identities = open_tree::<Signer>(&db, ADDRTREE).unwrap();
         let mut multisigner_path_set: Vec<(MultiSigner, String)> = Vec::new();
-        for x in identities.iter() {
-            if let Ok(a) = x {
-                let (multisigner, address_details) =
-                    AddressDetails::process_entry_checked::<Signer>(a).unwrap();
-                multisigner_path_set.push((multisigner, address_details.path.to_string()))
-            }
+        for a in identities.iter().flatten() {
+            let (multisigner, address_details) =
+                AddressDetails::process_entry_checked::<Signer>(a).unwrap();
+            multisigner_path_set.push((multisigner, address_details.path.to_string()))
         }
         multisigner_path_set
     }

@@ -85,13 +85,11 @@ mod tests {
         let database = open_db::<Active>(database_name).unwrap();
         let metadata = open_tree::<Active>(&database, METATREE).unwrap();
         let mut out: Vec<(String, u32)> = Vec::new();
-        for x in metadata.iter() {
-            if let Ok((meta_key_vec, _)) = x {
-                let new = MetaKey::from_ivec(&meta_key_vec)
-                    .name_version::<Active>()
-                    .unwrap();
-                out.push(new);
-            }
+        for (meta_key_vec, _) in metadata.iter().flatten() {
+            let new = MetaKey::from_ivec(&meta_key_vec)
+                .name_version::<Active>()
+                .unwrap();
+            out.push(new);
         }
         out
     }
