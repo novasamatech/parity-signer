@@ -11,10 +11,8 @@ pub fn get_all_networks<T: ErrorSource>(
     let database = open_db::<T>(database_name)?;
     let chainspecs = open_tree::<T>(&database, SPECSTREE)?;
     let mut out: Vec<NetworkSpecs> = Vec::new();
-    for x in chainspecs.iter() {
-        if let Ok(a) = x {
-            out.push(NetworkSpecs::from_entry_checked::<T>(a)?)
-        }
+    for x in chainspecs.iter().flatten() {
+        out.push(NetworkSpecs::from_entry_checked::<T>(x)?)
     }
     Ok(out)
 }

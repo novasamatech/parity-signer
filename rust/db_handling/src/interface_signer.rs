@@ -40,7 +40,7 @@ use crate::network_details::get_all_networks;
 /// Gets used only on the Signer side, interacts with the user interface.
 pub fn print_all_seed_names_with_identicons(
     database_name: &str,
-    names_phone_knows: &Vec<String>,
+    names_phone_knows: &[String],
 ) -> Result<String, ErrorSigner> {
     let mut data_set: HashMap<String, Vec<MultiSigner>> = HashMap::new();
     for (multisigner, address_details) in get_all_addresses(database_name)?.into_iter() {
@@ -64,14 +64,12 @@ pub fn print_all_seed_names_with_identicons(
                     data_set.insert(address_details.seed_name.to_string(), vec![multisigner]);
                 }
             }
-        } else {
-            if let None = data_set.get(&address_details.seed_name) {
-                data_set.insert(address_details.seed_name.to_string(), Vec::new());
-            }
+        } else if data_set.get(&address_details.seed_name).is_none() {
+            data_set.insert(address_details.seed_name.to_string(), Vec::new());
         }
     }
     for x in names_phone_knows.iter() {
-        if let None = data_set.get(x) {
+        if data_set.get(x).is_none() {
             data_set.insert(x.to_string(), Vec::new());
         }
     }
@@ -92,8 +90,8 @@ pub fn print_all_seed_names_with_identicons(
     ))
 }
 
-fn preferred_multisigner_identicon(multisigner_set: &Vec<MultiSigner>) -> String {
-    if multisigner_set.len() == 0 {
+fn preferred_multisigner_identicon(multisigner_set: &[MultiSigner]) -> String {
+    if multisigner_set.is_empty() {
         String::new()
     } else {
         let mut got_sr25519 = None;
@@ -111,22 +109,18 @@ fn preferred_multisigner_identicon(multisigner_set: &Vec<MultiSigner>) -> String
                 Ok(b) => hex::encode(b),
                 Err(_) => String::new(),
             }
-        } else {
-            if let Some(a) = got_ed25519 {
-                match make_identicon_from_multisigner(&a) {
-                    Ok(b) => hex::encode(b),
-                    Err(_) => String::new(),
-                }
-            } else {
-                if let Some(a) = got_ecdsa {
-                    match make_identicon_from_multisigner(&a) {
-                        Ok(b) => hex::encode(b),
-                        Err(_) => String::new(),
-                    }
-                } else {
-                    String::new()
-                }
+        } else if let Some(a) = got_ed25519 {
+            match make_identicon_from_multisigner(&a) {
+                Ok(b) => hex::encode(b),
+                Err(_) => String::new(),
             }
+        } else if let Some(a) = got_ecdsa {
+            match make_identicon_from_multisigner(&a) {
+                Ok(b) => hex::encode(b),
+                Err(_) => String::new(),
+            }
+        } else {
+            String::new()
         }
     }
 }
@@ -137,9 +131,9 @@ pub fn print_all_identities(database_name: &str) -> Result<String, ErrorSigner> 
     Ok(export_complex_vector(
         &get_all_addresses(database_name)?,
         |(multisigner, address_details)| {
-            let address_key = AddressKey::from_multisigner(&multisigner); // to click
-            let public_key = multisigner_to_public(&multisigner); // to display
-            let hex_identicon = match make_identicon_from_multisigner(&multisigner) {
+            let address_key = AddressKey::from_multisigner(multisigner); // to click
+            let public_key = multisigner_to_public(multisigner); // to display
+            let hex_identicon = match make_identicon_from_multisigner(multisigner) {
                 Ok(a) => hex::encode(a),
                 Err(_) => String::new(),
             };
@@ -167,27 +161,17 @@ pub fn print_identities_for_seed_name_and_network(
         let address_key = AddressKey::from_multisigner(&multisigner);
         let swiped = {
             if let Some(ref swiped_multisigner) = swiped_key {
-                if swiped_multisigner == &multisigner {
-                    true
-                } else {
-                    false
-                }
+                swiped_multisigner == &multisigner
             } else {
                 false
             }
         };
-        let multiselect = {
-            if multiselect.contains(&multisigner) {
-                true
-            } else {
-                false
-            }
-        };
+        let multiselect = { multiselect.contains(&multisigner) };
         if address_details.is_root() {
-            if let Some(_) = root_id {
+            if root_id.is_some() {
                 return Err(ErrorSigner::Database(DatabaseSigner::TwoRootKeys {
                     seed_name: seed_name.to_string(),
-                    encryption: network_specs.encryption.to_owned(),
+                    encryption: network_specs.encryption,
                 }));
             }
             root_id = Some(format!("\"seed_name\":\"{}\",\"identicon\":\"{}\",\"address_key\":\"{}\",\"base58\":\"{}\",\"swiped\":{},\"multiselect\":{}", seed_name, hex::encode(identicon), hex::encode(address_key.key()), base58, swiped, multiselect));
@@ -202,7 +186,7 @@ pub fn print_identities_for_seed_name_and_network(
     let other_print = export_complex_vector(
         &other_id,
         |(multisigner, address_details, identicon, swiped, multiselect)| {
-            format!("\"address_key\":\"{}\",\"base58\":\"{}\",\"identicon\":\"{}\",\"has_pwd\":{},\"path\":\"{}\",\"swiped\":{},\"multiselect\":{}", hex::encode(AddressKey::from_multisigner(&multisigner).key()), print_multisigner_as_base58(&multisigner, Some(network_specs.base58prefix)), hex::encode(identicon), address_details.has_pwd, address_details.path, swiped, multiselect)
+            format!("\"address_key\":\"{}\",\"base58\":\"{}\",\"identicon\":\"{}\",\"has_pwd\":{},\"path\":\"{}\",\"swiped\":{},\"multiselect\":{}", hex::encode(AddressKey::from_multisigner(multisigner).key()), print_multisigner_as_base58(multisigner, Some(network_specs.base58prefix)), hex::encode(identicon), address_details.has_pwd, address_details.path, swiped, multiselect)
         },
     );
 
@@ -235,7 +219,7 @@ pub fn show_all_networks_with_flag(
         "\"networks\":{}",
         export_complex_vector(&networks, |a| {
             let network_specs_key_current =
-                NetworkSpecsKey::from_parts(&a.genesis_hash.to_vec(), &a.encryption);
+                NetworkSpecsKey::from_parts(&a.genesis_hash, &a.encryption);
             format!(
                 "\"key\":\"{}\",\"title\":\"{}\",\"logo\":\"{}\",\"order\":{},\"selected\":{}",
                 hex::encode(network_specs_key_current.key()),
@@ -256,7 +240,7 @@ pub fn show_all_networks(database_name: &str) -> Result<String, ErrorSigner> {
         "\"networks\":{}",
         export_complex_vector(&networks, |a| {
             let network_specs_key_current =
-                NetworkSpecsKey::from_parts(&a.genesis_hash.to_vec(), &a.encryption);
+                NetworkSpecsKey::from_parts(&a.genesis_hash, &a.encryption);
             format!(
                 "\"key\":\"{}\",\"title\":\"{}\",\"logo\":\"{}\",\"order\":{}",
                 hex::encode(network_specs_key_current.key()),
@@ -272,7 +256,7 @@ pub fn show_all_networks(database_name: &str) -> Result<String, ErrorSigner> {
 /// If no networks in the system, throws error
 pub fn first_network(database_name: &str) -> Result<NetworkSpecs, ErrorSigner> {
     let mut networks = get_all_networks::<Signer>(database_name)?;
-    if networks.len() == 0 {
+    if networks.is_empty() {
         return Err(ErrorSigner::NoNetworksAvailable);
     }
     networks.sort_by(|a, b| a.order.cmp(&b.order));
@@ -290,8 +274,8 @@ pub fn export_key(
     expected_seed_name: &str,
     network_specs_key: &NetworkSpecsKey,
 ) -> Result<String, ErrorSigner> {
-    let network_specs = get_network_specs(database_name, &network_specs_key)?;
-    let address_key = AddressKey::from_multisigner(&multisigner);
+    let network_specs = get_network_specs(database_name, network_specs_key)?;
+    let address_key = AddressKey::from_multisigner(multisigner);
     let address_details = get_address_details(database_name, &address_key)?;
     if address_details.seed_name != expected_seed_name {
         return Err(ErrorSigner::Interface(
@@ -302,12 +286,11 @@ pub fn export_key(
             },
         ));
     }
-    let address_base58 =
-        print_multisigner_as_base58(&multisigner, Some(network_specs.base58prefix));
-    let public_key = multisigner_to_public(&multisigner);
-    let identicon = make_identicon_from_multisigner(&multisigner)?;
+    let address_base58 = print_multisigner_as_base58(multisigner, Some(network_specs.base58prefix));
+    let public_key = multisigner_to_public(multisigner);
+    let identicon = make_identicon_from_multisigner(multisigner)?;
     let qr_prep = {
-        if address_details.network_id.contains(&network_specs_key) {
+        if address_details.network_id.contains(network_specs_key) {
             match png_qr_from_string(&format!(
                 "substrate:{}:0x{}",
                 address_base58,
@@ -332,7 +315,7 @@ pub fn export_key(
 /// Gets seed name, outputs all known derivations in all networks.
 pub fn backup_prep(database_name: &str, seed_name: &str) -> Result<String, ErrorSigner> {
     let networks = get_all_networks::<Signer>(database_name)?;
-    if networks.len() == 0 {
+    if networks.is_empty() {
         return Err(ErrorSigner::NoNetworksAvailable);
     }
     let mut export: Vec<(NetworkSpecs, Vec<AddressDetails>)> = Vec::new();
@@ -340,9 +323,9 @@ pub fn backup_prep(database_name: &str, seed_name: &str) -> Result<String, Error
         let id_set = addresses_set_seed_name_network(
             database_name,
             seed_name,
-            &NetworkSpecsKey::from_parts(&x.genesis_hash.to_vec(), &x.encryption),
+            &NetworkSpecsKey::from_parts(&x.genesis_hash, &x.encryption),
         )?;
-        if id_set.len() != 0 {
+        if !id_set.is_empty() {
             export.push((x, id_set.into_iter().map(|(_, a)| a).collect()))
         }
     }
@@ -355,7 +338,7 @@ pub fn backup_prep(database_name: &str, seed_name: &str) -> Result<String, Error
             specs.title,
             specs.logo,
             specs.order,
-            export_complex_vector(&id_set, |a| format!(
+            export_complex_vector(id_set, |a| format!(
                 "\"path\":\"{}\",\"has_pwd\":{}",
                 a.path, a.has_pwd
             ))
@@ -437,9 +420,9 @@ pub fn network_details_by_key(
     network_specs_key: &NetworkSpecsKey,
 ) -> Result<String, ErrorSigner> {
     let network_specs = get_network_specs(database_name, network_specs_key)?;
-    let verifier_key = VerifierKey::from_parts(&network_specs.genesis_hash.to_vec());
-    let general_verifier = get_general_verifier(&database_name)?;
-    let valid_current_verifier = get_valid_current_verifier(&verifier_key, &database_name)?;
+    let verifier_key = VerifierKey::from_parts(&network_specs.genesis_hash);
+    let general_verifier = get_general_verifier(database_name)?;
+    let valid_current_verifier = get_valid_current_verifier(&verifier_key, database_name)?;
     let relevant_meta = get_meta_values_by_name::<Signer>(database_name, &network_specs.name)?;
     let metadata_print = export_complex_vector(&relevant_meta, |a| {
         let meta_hash = blake2b(32, &[], &a.meta).as_bytes().to_vec();
@@ -473,7 +456,7 @@ pub fn metadata_details(
         &network_specs.name,
         network_version,
     )?;
-    let relevant_networks = get_all_networks::<Signer>(database_name)?
+    let relevant_networks: Vec<_> = get_all_networks::<Signer>(database_name)?
         .into_iter()
         .filter(|a| a.name == network_specs.name)
         .collect();
@@ -483,8 +466,7 @@ pub fn metadata_details(
             a.title,
             a.logo,
             a.order,
-            &NetworkSpecsKey::from_parts(&a.genesis_hash.to_vec(), &a.encryption)
-                == network_specs_key
+            &NetworkSpecsKey::from_parts(&a.genesis_hash, &a.encryption) == network_specs_key
         )
     });
     let meta_hash = blake2b(32, &[], &meta_values.meta).as_bytes().to_vec();
@@ -546,11 +528,8 @@ pub fn history_hex_checksum(database_name: &str) -> Result<String, ErrorSigner> 
 /// (e.g. user has scanned something, read it, clicked `back`)
 pub fn purge_transactions(database_name: &str) -> Result<(), ErrorSigner> {
     TrDbCold::new()
-        .set_transaction(make_batch_clear_tree::<Signer>(
-            &database_name,
-            TRANSACTION,
-        )?) // clear transaction
-        .apply::<Signer>(&database_name)
+        .set_transaction(make_batch_clear_tree::<Signer>(database_name, TRANSACTION)?) // clear transaction
+        .apply::<Signer>(database_name)
 }
 
 /// Function to display possible options of English code words from allowed words list
@@ -619,15 +598,11 @@ impl SeedDraft {
                     let word = user_text.trim();
                     if self.added(word, None) {
                         self.user_input.clear()
-                    } else {
-                        if !guess(word).is_empty() {
-                            self.user_input = String::from(word)
-                        }
+                    } else if !guess(word).is_empty() {
+                        self.user_input = String::from(word)
                     }
-                } else {
-                    if !guess(user_text).is_empty() {
-                        self.user_input = String::from(user_text)
-                    }
+                } else if !guess(user_text).is_empty() {
+                    self.user_input = String::from(user_text)
                 }
             }
         } else {
@@ -640,12 +615,10 @@ impl SeedDraft {
             let definitive_guess = {
                 if guesses.len() == 1 {
                     Some(guesses[0])
+                } else if guesses.contains(&word) {
+                    Some(word)
                 } else {
-                    if guesses.contains(&word) {
-                        Some(word)
-                    } else {
-                        None
-                    }
+                    None
                 }
             };
             if let Some(guess) = definitive_guess {
@@ -677,22 +650,22 @@ impl SeedDraft {
         }
     }
     pub fn remove_last(&mut self) {
-        if self.saved.len() > 0 {
+        if !self.saved.is_empty() {
             self.saved.remove(self.saved.len() - 1);
         }
     }
     pub fn print(&self) -> String {
         let mut out = String::with_capacity(SAFE_RESERVE);
-        out.push_str("[");
+        out.push('[');
         for (i, x) in self.saved.iter().enumerate() {
             if i > 0 {
-                out.push_str(",")
+                out.push(',')
             }
             out.push_str(&format!("{{\"order\":{},\"content\":\"", i));
             out.push_str(x.word());
             out.push_str("\"}");
         }
-        out.push_str("]");
+        out.push(']');
         out
     }
     /// Combines all draft elements into seed phrase proposal,
@@ -702,7 +675,7 @@ impl SeedDraft {
         let mut seed_phrase_proposal = String::with_capacity((WORD_LENGTH + 1) * BIP_CAP);
         for (i, x) in self.saved.iter().enumerate() {
             if i > 0 {
-                seed_phrase_proposal.push_str(" ");
+                seed_phrase_proposal.push(' ');
             }
             seed_phrase_proposal.push_str(x.word());
         }
@@ -716,6 +689,12 @@ impl SeedDraft {
     /// Function to output the user input back into user interface
     pub fn user_input(&self) -> &str {
         &self.user_input
+    }
+}
+
+impl Default for SeedDraft {
+    fn default() -> Self {
+        Self::new()
     }
 }
 
@@ -743,7 +722,7 @@ mod tests {
         let dbname = "for_tests/print_seed_names";
         populate_cold(dbname, Verifier(None)).unwrap();
         let horrible_print =
-            print_all_seed_names_with_identicons(dbname, &vec![String::from("Alice")]).unwrap();
+            print_all_seed_names_with_identicons(dbname, &[String::from("Alice")]).unwrap();
         let expected_print = r#"[{"identicon":"89504e470d0a1a0a0000000d49484452000000410000004108060000008ef7c9450000033a49444154789cedd8316e1441108561fb084e1d7100c71081135b64e6045cc289034484089cf8129c80cdd03a314410ef01889cee11967a1a9599197aba5e55778fd766fea036989656f505a3d61cee76bb83ffbd5910b6db6df84f8e8e8e0ee5a7694d104a96b66a815215a1e5f2e36a625441882c7ff9f94ee6b09b0fa7327dd5c02842882c8f52005a0402956084115a006873438410a200a825028a40b8104a96d75a23681e0c1aa106009a0b01b110148207e0e2fdb5cc61ab2f5732bbbc083f6fef650e7b75762c938b8130114a013416c202d06a425443c8016816040ba0b11045082c00f22258d54440398849040f00da770434059144f002a0a78080521034c2e5dd3799c36e4edfcaecf2229c9cbf91396cb3fe2eb3cb8b60bd63340a8105d058080b4063212c008d81301172009a05c1026816040ba08d21b2086300e445b0f222584510501f6241901e105200e8b9222085a88ef0fae45ce6b01f9bb5cc2e2f42ea7cfff92c0828076101682c447f41f65c0e620a00b910500a8205d02c88fe62a9e7e3fae7531039003440b00098bc08565e8468805810160427c2bb8b7f6f825f577f6f828f8d60dd54a7a21152001a0be101d072101680664150083900cd8288006829081640cb41344198bb05415a10a4bd44b8bffd7d30eef8ecc54134eb1d330b02ca4158005a042205a0b11039004423a014040ba0792072009a056101201782d56323445b10a405417a404016c4c5f54799c356579f6476791152e7fbcfbd08d6f78e5400909fee7b02ca21a4003416a2bf207b2e0761016839081a2107a05910fdc552cfc7f5cfa72058006d0aa219829517c1aa2a024a413c570405400b8234404063082fc2cbf31399c37ead3732bbbc08d64d3582d007402602ca4158001a0b6101682cc41800990888856001340b8205d02c080600d108565e042b2f021b8d80bc104f012105802611900762df11a600501601b1105e04eb1d5313210780aa21a01c8405a0b1102c002a4640a5102c806641d404401402f240e4f22294c400201a01d580980b8105402e04ad04a3358267792d8480a2102d112200288c805a40cc0d808a10b408460a220250b2bc5605418b6044abb1bc5615416b89517379ad09c2b81294164b8f9b0561dffb036973a4ac27dc44b20000000049454e44ae426082","seed_name":"Alice"}]"#;
         assert!(
             horrible_print == expected_print,
@@ -759,7 +738,7 @@ mod tests {
         populate_cold(dbname, Verifier(None)).unwrap();
         let horrible_print = print_all_seed_names_with_identicons(
             dbname,
-            &vec![String::from("Alice"), String::from("BobGhost")],
+            &[String::from("Alice"), String::from("BobGhost")],
         )
         .unwrap();
         let expected_print = r#"[{"identicon":"89504e470d0a1a0a0000000d49484452000000410000004108060000008ef7c9450000033a49444154789cedd8316e1441108561fb084e1d7100c71081135b64e6045cc289034484089cf8129c80cdd03a314410ef01889cee11967a1a9599197aba5e55778fd766fea036989656f505a3d61cee76bb83ffbd5910b6db6df84f8e8e8e0ee5a7694d104a96b66a815215a1e5f2e36a625441882c7ff9f94ee6b09b0fa7327dd5c02842882c8f52005a0402956084115a006873438410a200a825028a40b8104a96d75a23681e0c1aa106009a0b01b110148207e0e2fdb5cc61ab2f5732bbbc083f6fef650e7b75762c938b8130114a013416c202d06a425443c8016816040ba0b11045082c00f22258d54440398849040f00da770434059144f002a0a78080521034c2e5dd3799c36e4edfcaecf2229c9cbf91396cb3fe2eb3cb8b60bd63340a8105d058080b4063212c008d81301172009a05c1026816040ba08d21b2086300e445b0f222584510501f6241901e105200e8b9222085a88ef0fae45ce6b01f9bb5cc2e2f42ea7cfff92c0828076101682c447f41f65c0e620a00b910500a8205d02c88fe62a9e7e3fae7531039003440b00098bc08565e8468805810160427c2bb8b7f6f825f577f6f828f8d60dd54a7a21152001a0be101d072101680664150083900cd8288006829081640cb41344198bb05415a10a4bd44b8bffd7d30eef8ecc54134eb1d330b02ca4158005a042205a0b11039004423a014040ba0792072009a056101201782d56323445b10a405417a404016c4c5f54799c356579f6476791152e7fbcfbd08d6f78e5400909fee7b02ca21a4003416a2bf207b2e0761016839081a2107a05910fdc552cfc7f5cfa72058006d0aa219829517c1aa2a024a413c570405400b8234404063082fc2cbf31399c37ead3732bbbc08d64d3582d007402602ca4158001a0b6101682cc41800990888856001340b8205d02c080600d108565e042b2f021b8d80bc104f012105802611900762df11a600501601b1105e04eb1d5313210780aa21a01c8405a0b1102c002a4640a5102c806641d404401402f240e4f22294c400201a01d580980b8105402e04ad04a3358267792d8480a2102d112200288c805a40cc0d808a10b408460a220250b2bc5605418b6044abb1bc5615416b89517379ad09c2b81294164b8f9b0561dffb036973a4ac27dc44b20000000049454e44ae426082","seed_name":"Alice"},{"identicon":"","seed_name":"BobGhost"}]"#;

@@ -234,9 +234,9 @@ impl IdentityHistory {
     pub fn get(
         seed_name: &str,
         encryption: &Encryption,
-        public_key: &Vec<u8>,
+        public_key: &[u8],
         path: &str,
-        network_genesis_hash: &Vec<u8>,
+        network_genesis_hash: &[u8],
     ) -> Self {
         Self {
             seed_name: seed_name.to_string(),
@@ -263,7 +263,7 @@ pub struct SignDisplay {
 
 impl SignDisplay {
     pub fn get(
-        transaction: &Vec<u8>,
+        transaction: &[u8],
         network_name: &str,
         signed_by: &VerifierValue,
         user_comment: &str,
@@ -296,7 +296,7 @@ impl SignDisplay {
     {
         format!(
             "\"transaction\":{},\"network_name\":\"{}\",\"signed_by\":{},\"user_comment\":\"{}\"",
-            op(&self),
+            op(self),
             &self.network_name,
             export_complex_single(&self.signed_by, |a| a.show_card()),
             &self.user_comment
@@ -306,7 +306,7 @@ impl SignDisplay {
     where
         O: Fn(&Self) -> String + Copy,
     {
-        format!("\"transaction\":{},\"network_name\":\"{}\",\"signed_by\":{},\"user_comment\":\"{}\",\"error\":\"wrong_password_entered\"", op(&self), &self.network_name, export_complex_single(&self.signed_by, |a| a.show_card()), &self.user_comment)
+        format!("\"transaction\":{},\"network_name\":\"{}\",\"signed_by\":{},\"user_comment\":\"{}\",\"error\":\"wrong_password_entered\"", op(self), &self.network_name, export_complex_single(&self.signed_by, |a| a.show_card()), &self.user_comment)
     }
 }
 
@@ -555,7 +555,7 @@ pub fn all_events_preview() -> Vec<Event> {
         &verifier_value,
     )));
     events.push(Event::NetworkVerifierSet(NetworkVerifierDisplay::get(
-        &VerifierKey::from_parts(&network_specs.genesis_hash.to_vec()),
+        &VerifierKey::from_parts(&network_specs.genesis_hash),
         &valid_current_verifier,
         &verifier,
     )));
@@ -599,16 +599,16 @@ pub fn all_events_preview() -> Vec<Event> {
     events.push(Event::IdentityAdded(IdentityHistory::get(
         "Alice",
         &Encryption::Sr25519,
-        &public.to_vec(),
+        &public,
         "//",
-        &network_specs.genesis_hash.to_vec(),
+        &network_specs.genesis_hash,
     )));
     events.push(Event::IdentityRemoved(IdentityHistory::get(
         "Alice",
         &Encryption::Sr25519,
-        &public.to_vec(),
+        &public,
         "//",
-        &network_specs.genesis_hash.to_vec(),
+        &network_specs.genesis_hash,
     )));
     events.push(Event::IdentitiesWiped);
     events.push(Event::DeviceWasOnline);

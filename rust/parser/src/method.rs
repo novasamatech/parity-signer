@@ -68,7 +68,7 @@ fn find_method_v12(
                     {
                         for (i, a) in docs_found.iter().enumerate() {
                             if i > 0 {
-                                docs.push_str("\n");
+                                docs.push('\n');
                             }
                             docs.push_str(a);
                         }
@@ -119,18 +119,14 @@ fn find_method_v12(
                 };
                 Ok(out)
             }
-            None => {
-                return Err(ParserError::Decoding(ParserDecodingError::MethodNotFound {
-                    method_index,
-                    pallet_name: x,
-                }))
-            }
+            None => Err(ParserError::Decoding(ParserDecodingError::MethodNotFound {
+                method_index,
+                pallet_name: x,
+            })),
         },
-        None => {
-            return Err(ParserError::Decoding(ParserDecodingError::PalletNotFound(
-                pallet_index,
-            )))
-        }
+        None => Err(ParserError::Decoding(ParserDecodingError::PalletNotFound(
+            pallet_index,
+        ))),
     }
 }
 
@@ -173,7 +169,7 @@ fn find_method_v13(
                     {
                         for (i, a) in docs_found.iter().enumerate() {
                             if i > 0 {
-                                docs.push_str("\n");
+                                docs.push('\n');
                             }
                             docs.push_str(a);
                         }
@@ -219,23 +215,19 @@ fn find_method_v13(
                 let out = MethodOld {
                     pallet_name: x,
                     method_name: y,
-                    arguments: arguments,
+                    arguments,
                     docs,
                 };
                 Ok(out)
             }
-            None => {
-                return Err(ParserError::Decoding(ParserDecodingError::MethodNotFound {
-                    method_index,
-                    pallet_name: x,
-                }))
-            }
+            None => Err(ParserError::Decoding(ParserDecodingError::MethodNotFound {
+                method_index,
+                pallet_name: x,
+            })),
         },
-        None => {
-            return Err(ParserError::Decoding(ParserDecodingError::PalletNotFound(
-                pallet_index,
-            )))
-        }
+        None => Err(ParserError::Decoding(ParserDecodingError::PalletNotFound(
+            pallet_index,
+        ))),
     }
 }
 

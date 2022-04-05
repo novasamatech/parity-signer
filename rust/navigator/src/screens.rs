@@ -119,7 +119,7 @@ impl KeysState {
         Ok(Self {
             seed_name: seed_name.to_string(),
             network_specs_key: NetworkSpecsKey::from_parts(
-                &network_specs.genesis_hash.to_vec(),
+                &network_specs.genesis_hash,
                 &network_specs.encryption,
             ),
             specialty: SpecialtyKeysState::None,
@@ -213,11 +213,7 @@ impl KeysState {
         }
     }
     pub fn is_multiselect(&self) -> bool {
-        if let SpecialtyKeysState::MultiSelect(_) = self.specialty {
-            true
-        } else {
-            false
-        }
+        matches!(self.specialty, SpecialtyKeysState::MultiSelect(_))
     }
     pub fn deselect_specialty(&self) -> Self {
         Self {
@@ -273,7 +269,7 @@ impl AddressStateMulti {
     pub fn new(
         seed_name: String,
         network_specs_key: NetworkSpecsKey,
-        multiselect: &Vec<MultiSigner>,
+        multiselect: &[MultiSigner],
         database_name: &str,
     ) -> Result<Self, ErrorSigner> {
         let mut set: Vec<(MultiSigner, bool)> = Vec::new();
@@ -481,13 +477,13 @@ impl SufficientCryptoState {
         address_details: &AddressDetails,
         new_secret_string: &str,
     ) -> Self {
-        let hex_identicon = match make_identicon_from_multisigner(&multisigner) {
+        let hex_identicon = match make_identicon_from_multisigner(multisigner) {
             Ok(a) => hex::encode(a),
             Err(_) => String::new(),
         };
         let author_info = format!(
             "\"base58\":\"{}\",\"identicon\":\"{}\",\"seed\":\"{}\",\"derivation_path\":\"{}\"",
-            hex::encode(multisigner_to_public(&multisigner)),
+            hex::encode(multisigner_to_public(multisigner)),
             hex_identicon,
             address_details.seed_name,
             address_details.path

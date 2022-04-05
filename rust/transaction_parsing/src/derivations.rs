@@ -13,16 +13,16 @@ use crate::cards::Card;
 use crate::Action;
 
 pub fn process_derivations(data_hex: &str, database_name: &str) -> Result<Action, ErrorSigner> {
-    let data = unhex::<Signer>(&data_hex, NotHexSigner::InputContent)?;
+    let data = unhex::<Signer>(data_hex, NotHexSigner::InputContent)?;
     let content_derivations = ContentDerivations::from_slice(&data[3..]);
     let (encryption, genesis_hash, derivations) =
         content_derivations.encryption_genhash_derivations()?;
-    let network_specs_key = NetworkSpecsKey::from_parts(&genesis_hash.to_vec(), &encryption);
+    let network_specs_key = NetworkSpecsKey::from_parts(genesis_hash.as_ref(), &encryption);
     match try_get_network_specs(database_name, &network_specs_key)? {
         Some(network_specs) => {
             check_derivation_set(&derivations)?;
             let checksum = TrDbColdDerivations::generate(&derivations, &network_specs)
-                .store_and_get_checksum(&database_name)?;
+                .store_and_get_checksum(database_name)?;
             let derivations_card = Card::Derivations(&derivations).card(&mut 0, 0);
             let network_info = format!(
                 "\"network_title\":\"{}\",\"network_logo\":\"{}\"",
@@ -35,13 +35,11 @@ pub fn process_derivations(data_hex: &str, database_name: &str) -> Result<Action
                 network_specs_key,
             })
         }
-        None => {
-            return Err(ErrorSigner::NotFound(
-                NotFoundSigner::NetworkForDerivationsImport {
-                    genesis_hash,
-                    encryption,
-                },
-            ))
-        }
+        None => Err(ErrorSigner::NotFound(
+            NotFoundSigner::NetworkForDerivationsImport {
+                genesis_hash,
+                encryption,
+            },
+        )),
     }
 }

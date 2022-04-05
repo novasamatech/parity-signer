@@ -12,7 +12,7 @@ use crate::decoding_commons::{DecodedOut, OutputCard};
 use crate::decoding_sci::{decoding_sci_complete, CallExpectation};
 
 pub(crate) fn decode_ext_attempt(
-    data: &Vec<u8>,
+    data: &[u8],
     ext: &mut Ext,
     meta_v14: &RuntimeMetadataV14,
     indent: u32,
@@ -155,7 +155,7 @@ pub(crate) fn special_case_hash(
     hash: &Hash,
 ) -> Result<DecodedOut, ParserError> {
     match data.get(0..32) {
-        Some(a) => match <[u8; 32]>::decode(&mut &a[..]) {
+        Some(a) => match <[u8; 32]>::decode(&mut &*a) {
             Ok(x) => {
                 let remaining_vector = data[32..].to_vec();
                 let fancy_out = match hash {
@@ -181,9 +181,9 @@ pub(crate) fn special_case_hash(
                     fancy_out,
                 })
             }
-            Err(_) => return Err(ParserError::Decoding(ParserDecodingError::Array)),
+            Err(_) => Err(ParserError::Decoding(ParserDecodingError::Array)),
         },
-        None => return Err(ParserError::Decoding(ParserDecodingError::DataTooShort)),
+        None => Err(ParserError::Decoding(ParserDecodingError::DataTooShort)),
     }
 }
 
@@ -211,6 +211,6 @@ pub(crate) fn special_case_era(
                 }],
             })
         }
-        Err(_) => return Err(ParserError::Decoding(ParserDecodingError::Era)),
+        Err(_) => Err(ParserError::Decoding(ParserDecodingError::Era)),
     }
 }

@@ -19,7 +19,7 @@ struct DecodedContentLoadMeta {
 
 impl ContentLoadMeta {
     /// Function to generate load_metadata content from metadata and genesis hash parts
-    pub fn generate(meta: &Vec<u8>, genesis_hash: &[u8; 32]) -> Self {
+    pub fn generate(meta: &[u8], genesis_hash: &[u8; 32]) -> Self {
         Self(
             DecodedContentLoadMeta {
                 meta: meta.to_vec(),
@@ -29,35 +29,35 @@ impl ContentLoadMeta {
         )
     }
     /// Function to transform Vec<u8> into ContentLoadMeta prior to processing
-    pub fn from_vec(vec: &Vec<u8>) -> Self {
+    pub fn from_vec(vec: &[u8]) -> Self {
         Self(vec.to_vec())
     }
     /// Function to get metadata from load_metadata content
     pub fn meta<T: ErrorSource>(&self) -> Result<Vec<u8>, T::Error> {
         match <DecodedContentLoadMeta>::decode(&mut &self.0[..]) {
             Ok(a) => Ok(a.meta),
-            Err(_) => return Err(<T>::transfer_content_error(TransferContent::LoadMeta)),
+            Err(_) => Err(<T>::transfer_content_error(TransferContent::LoadMeta)),
         }
     }
     /// Function to get genesis hash from load_metadata content
     pub fn genesis_hash<T: ErrorSource>(&self) -> Result<[u8; 32], T::Error> {
         match <DecodedContentLoadMeta>::decode(&mut &self.0[..]) {
             Ok(a) => Ok(a.genesis_hash),
-            Err(_) => return Err(<T>::transfer_content_error(TransferContent::LoadMeta)),
+            Err(_) => Err(<T>::transfer_content_error(TransferContent::LoadMeta)),
         }
     }
     /// Function to decode load_metadata message and get both metadata and network genesis hash as a tuple
     pub fn meta_genhash<T: ErrorSource>(&self) -> Result<(Vec<u8>, [u8; 32]), T::Error> {
         match <DecodedContentLoadMeta>::decode(&mut &self.0[..]) {
             Ok(a) => Ok((a.meta, a.genesis_hash)),
-            Err(_) => return Err(<T>::transfer_content_error(TransferContent::LoadMeta)),
+            Err(_) => Err(<T>::transfer_content_error(TransferContent::LoadMeta)),
         }
     }
     /// Function to export load_metadata content into file
     pub fn write(&self, filename: &str) -> Result<(), ErrorActive> {
         match std::fs::write(&filename, &self.to_sign()) {
             Ok(_) => Ok(()),
-            Err(e) => return Err(ErrorActive::Output(e)),
+            Err(e) => Err(ErrorActive::Output(e)),
         }
     }
     /// Function to prepare Vec<u8> to be signed from load_metadata information
@@ -90,21 +90,21 @@ impl ContentAddSpecs {
         )
     }
     /// Function to transform Vec<u8> into ContentAddSpecs prior to processing
-    pub fn from_vec(vec: &Vec<u8>) -> Self {
+    pub fn from_vec(vec: &[u8]) -> Self {
         Self(vec.to_vec())
     }
     /// Function to get network specs NetworkSpecsToSend from add_specs content
     pub fn specs<T: ErrorSource>(&self) -> Result<NetworkSpecsToSend, T::Error> {
         match <DecodedContentAddSpecs>::decode(&mut &self.0[..]) {
             Ok(a) => Ok(a.specs),
-            Err(_) => return Err(<T>::transfer_content_error(TransferContent::AddSpecs)),
+            Err(_) => Err(<T>::transfer_content_error(TransferContent::AddSpecs)),
         }
     }
     /// Function to export add_specs content into file
     pub fn write(&self, filename: &str) -> Result<(), ErrorActive> {
         match std::fs::write(&filename, &self.to_sign()) {
             Ok(_) => Ok(()),
-            Err(e) => return Err(ErrorActive::Output(e)),
+            Err(e) => Err(ErrorActive::Output(e)),
         }
     }
     /// Function to prepare Vec<u8> to be signed from add_specs information
@@ -128,7 +128,7 @@ struct DecodedContentLoadTypes {
 
 impl ContentLoadTypes {
     /// Function to generate load_types content from vector Vec<TypeEntry>
-    pub fn generate(types: &Vec<TypeEntry>) -> Self {
+    pub fn generate(types: &[TypeEntry]) -> Self {
         Self(
             DecodedContentLoadTypes {
                 types: types.to_owned(),
@@ -137,21 +137,21 @@ impl ContentLoadTypes {
         )
     }
     /// Function to transform Vec<u8> into ContentLoadTypes prior to processing
-    pub fn from_vec(vec: &Vec<u8>) -> Self {
+    pub fn from_vec(vec: &[u8]) -> Self {
         Self(vec.to_vec())
     }
     /// Function to get vector Vec<TypeEntry> from load_types content
     pub fn types<T: ErrorSource>(&self) -> Result<Vec<TypeEntry>, T::Error> {
         match <DecodedContentLoadTypes>::decode(&mut &self.0[..]) {
             Ok(a) => Ok(a.types),
-            Err(_) => return Err(<T>::transfer_content_error(TransferContent::LoadTypes)),
+            Err(_) => Err(<T>::transfer_content_error(TransferContent::LoadTypes)),
         }
     }
     /// Function to export load_types content into file
     pub fn write(&self, filename: &str) -> Result<(), ErrorActive> {
         match std::fs::write(&filename, &self.to_sign()) {
             Ok(_) => Ok(()),
-            Err(e) => return Err(ErrorActive::Output(e)),
+            Err(e) => Err(ErrorActive::Output(e)),
         }
     }
     /// Function to put types information into database storage as Vec<u8>
@@ -197,7 +197,7 @@ impl ContentDerivations {
     pub fn generate(
         encryption: &Encryption,
         genesis_hash: &[u8; 32],
-        derivations: &Vec<String>,
+        derivations: &[String],
     ) -> Self {
         Self(
             DecodedContentDerivations {
@@ -218,7 +218,7 @@ impl ContentDerivations {
     ) -> Result<(Encryption, [u8; 32], Vec<String>), ErrorSigner> {
         match <DecodedContentDerivations>::decode(&mut &self.0[..]) {
             Ok(a) => Ok((a.encryption, a.genesis_hash, a.derivations)),
-            Err(_) => return Err(ErrorSigner::Input(InputSigner::TransferDerivations)),
+            Err(_) => Err(ErrorSigner::Input(InputSigner::TransferDerivations)),
         }
     }
     /// Function to prepare load_metadata information for transfer as Vec<u8>

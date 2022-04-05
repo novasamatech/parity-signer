@@ -200,7 +200,7 @@ impl AddressGenerationCommon {
                 address_details,
                 network_specs_key,
             ) => {
-                let public_key = multisigner_to_public(&multisigner);
+                let public_key = multisigner_to_public(multisigner);
                 if address_details.has_pwd {
                     format!("Seed {} already has derivation {}///<password> for network specs key {}, public key {}.", address_details.seed_name, address_details.path, hex::encode(network_specs_key.key()), hex::encode(public_key))
                 } else {
@@ -235,7 +235,7 @@ impl ErrorSource for Active {
             )),
             SpecsKeySource::AddrTree(address_key) => ErrorActive::Database(
                 DatabaseActive::KeyDecoding(KeyDecodingActive::NetworkSpecsKeyAddressDetails {
-                    address_key: address_key.to_owned(),
+                    address_key,
                     network_specs_key: network_specs_key.to_owned(),
                 }),
             ),
@@ -1001,7 +1001,7 @@ impl ErrorSource for Signer {
             )),
             SpecsKeySource::AddrTree(address_key) => ErrorSigner::Database(
                 DatabaseSigner::KeyDecoding(KeyDecodingSignerDb::NetworkSpecsKeyAddressDetails {
-                    address_key: address_key.to_owned(),
+                    address_key,
                     network_specs_key: network_specs_key.to_owned(),
                 }),
             ),
@@ -1287,7 +1287,7 @@ impl ErrorSource for Signer {
             ErrorSigner::AllExtensionsParsingFailed{network_name, errors} => {
                 let mut insert = String::new();
                 for (i,(version, parser_error)) in errors.iter().enumerate() {
-                    if i>0 {insert.push_str(" ")}
+                    if i>0 {insert.push(' ')}
                     insert.push_str(&format!("Parsing with {}{} metadata: {}", network_name, version, parser_error.show()));
                 }
                 format!("Failed to decode extensions. Please try updating metadata for {} network. {}", network_name, insert)

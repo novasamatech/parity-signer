@@ -24,16 +24,13 @@ pub fn transfer_metadata_to_cold(
         let metadata_hot = open_tree::<Active>(&database_hot, METATREE)?;
         let database_cold = open_db::<Active>(database_name_cold)?;
         let chainspecs_cold = open_tree::<Active>(&database_cold, SPECSTREE)?;
-        for x in chainspecs_cold.iter() {
-            if let Ok(a) = x {
-                let network_specs = NetworkSpecs::from_entry_checked::<Active>(a)?;
-                for y in
-                    metadata_hot.scan_prefix(MetaKeyPrefix::from_name(&network_specs.name).prefix())
-                {
-                    if let Ok((key, value)) = y {
-                        for_metadata.insert(key, value);
-                    }
-                }
+        for x in chainspecs_cold.iter().flatten() {
+            let network_specs = NetworkSpecs::from_entry_checked::<Active>(x)?;
+            for (k, v) in metadata_hot
+                .scan_prefix(MetaKeyPrefix::from_name(&network_specs.name).prefix())
+                .flatten()
+            {
+                for_metadata.insert(k, v);
             }
         }
     }
@@ -62,7 +59,7 @@ mod tests {
     fn insert_metadata_from_file(database_name: &str, filename: &str) {
         let meta_str = std::fs::read_to_string(filename).unwrap();
         let meta_values = MetaValues::from_str_metadata(
-            &meta_str.trim(),
+            meta_str.trim(),
             IncomingMetadataSourceActiveStr::Default {
                 filename: filename.to_string(),
             },
@@ -88,13 +85,11 @@ mod tests {
         let database = open_db::<Active>(database_name).unwrap();
         let metadata = open_tree::<Active>(&database, METATREE).unwrap();
         let mut out: Vec<(String, u32)> = Vec::new();
-        for x in metadata.iter() {
-            if let Ok((meta_key_vec, _)) = x {
-                let new = MetaKey::from_ivec(&meta_key_vec)
-                    .name_version::<Active>()
-                    .unwrap();
-                out.push(new);
-            }
+        for (meta_key_vec, _) in metadata.iter().flatten() {
+            let new = MetaKey::from_ivec(&meta_key_vec)
+                .name_version::<Active>()
+                .unwrap();
+            out.push(new);
         }
         out
     }

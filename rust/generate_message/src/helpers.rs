@@ -18,12 +18,10 @@ pub fn get_address_book_entry(title: &str) -> Result<AddressBookEntry, ErrorActi
     let address_book = open_tree::<Active>(&database, ADDRESS_BOOK)?;
     match address_book.get(AddressBookKey::from_title(title).key()) {
         Ok(Some(a)) => AddressBookEntry::from_entry_with_title(title, &a),
-        Ok(None) => {
-            return Err(ErrorActive::NotFound(NotFoundActive::AddressBookEntry {
-                title: title.to_string(),
-            }))
-        }
-        Err(e) => return Err(<Active>::db_internal(e)),
+        Ok(None) => Err(ErrorActive::NotFound(NotFoundActive::AddressBookEntry {
+            title: title.to_string(),
+        })),
+        Err(e) => Err(<Active>::db_internal(e)),
     }
 }
 
@@ -37,7 +35,7 @@ pub fn network_specs_from_entry(
     address_book_entry: &AddressBookEntry,
 ) -> Result<NetworkSpecsToSend, ErrorActive> {
     let network_specs_key = NetworkSpecsKey::from_parts(
-        &address_book_entry.genesis_hash.to_vec(),
+        &address_book_entry.genesis_hash,
         &address_book_entry.encryption,
     );
     let network_specs = get_network_specs_to_send(&network_specs_key)?;
@@ -65,20 +63,18 @@ pub fn try_get_network_specs_to_send(
             specs_encoded,
         )?)),
         Ok(None) => Ok(None),
-        Err(e) => return Err(<Active>::db_internal(e)),
+        Err(e) => Err(<Active>::db_internal(e)),
     }
 }
 
 pub fn get_network_specs_to_send(
     network_specs_key: &NetworkSpecsKey,
 ) -> Result<NetworkSpecsToSend, ErrorActive> {
-    match try_get_network_specs_to_send(&network_specs_key)? {
+    match try_get_network_specs_to_send(network_specs_key)? {
         Some(a) => Ok(a),
-        None => {
-            return Err(ErrorActive::NotFound(NotFoundActive::NetworkSpecsToSend(
-                network_specs_key.to_owned(),
-            )))
-        }
+        None => Err(ErrorActive::NotFound(NotFoundActive::NetworkSpecsToSend(
+            network_specs_key.to_owned(),
+        ))),
     }
 }
 
@@ -86,11 +82,7 @@ pub fn get_network_specs_to_send(
 pub fn update_db(address: &str, network_specs: &NetworkSpecsToSend) -> Result<(), ErrorActive> {
     let mut network_specs_prep_batch = Batch::default();
     network_specs_prep_batch.insert(
-        NetworkSpecsKey::from_parts(
-            &network_specs.genesis_hash.to_vec(),
-            &network_specs.encryption,
-        )
-        .key(),
+        NetworkSpecsKey::from_parts(&network_specs.genesis_hash, &network_specs.encryption).key(),
         network_specs.encode(),
     );
     let address_book_new_key = AddressBookKey::from_title(&network_specs.title);
@@ -113,9 +105,10 @@ pub fn update_db(address: &str, network_specs: &NetworkSpecsToSend) -> Result<()
 /// Function to process error depending on pass_errors flag
 pub fn error_occured(e: ErrorActive, pass_errors: bool) -> Result<(), ErrorActive> {
     if pass_errors {
-        Ok(println!("Error encountered. {} Skipping it.", e))
+        println!("Error encountered. {} Skipping it.", e);
+        Ok(())
     } else {
-        return Err(e);
+        Err(e)
     }
 }
 
@@ -132,24 +125,22 @@ pub fn filter_address_book_by_url(address: &str) -> Result<Vec<AddressBookEntry>
     let address_book = open_tree::<Active>(&database, ADDRESS_BOOK)?;
     let mut out: Vec<AddressBookEntry> = Vec::new();
     let mut found_name = None;
-    for x in address_book.iter() {
-        if let Ok(a) = x {
-            let new_address_book_entry = AddressBookEntry::from_entry(a)?;
-            if new_address_book_entry.address == address {
-                found_name = match found_name {
-                    Some(name) => {
-                        if name == new_address_book_entry.name {
-                            Some(name)
-                        } else {
-                            return Err(ErrorActive::Database(DatabaseActive::TwoNamesForUrl {
-                                url: address.to_string(),
-                            }));
-                        }
+    for x in address_book.iter().flatten() {
+        let new_address_book_entry = AddressBookEntry::from_entry(x)?;
+        if new_address_book_entry.address == address {
+            found_name = match found_name {
+                Some(name) => {
+                    if name == new_address_book_entry.name {
+                        Some(name)
+                    } else {
+                        return Err(ErrorActive::Database(DatabaseActive::TwoNamesForUrl {
+                            url: address.to_string(),
+                        }));
                     }
-                    None => Some(new_address_book_entry.name.to_string()),
-                };
-                out.push(new_address_book_entry)
-            }
+                }
+                None => Some(new_address_book_entry.name.to_string()),
+            };
+            out.push(new_address_book_entry)
         }
     }
     Ok(out)
@@ -165,7 +156,7 @@ struct Indices {
 /// for entry with given encryption and for default entry;
 /// Checks that there is only one default entry and only one entry with given encryption for this address
 fn get_indices(
-    entries: &Vec<AddressBookEntry>,
+    entries: &[AddressBookEntry],
     encryption: Encryption,
 ) -> Result<Indices, ErrorActive> {
     let mut index_correct_encryption = None;
@@ -204,29 +195,25 @@ fn get_indices(
 /// Function to use the indices to get the most appropriate chainspecs entry to modify,
 /// and modify its encryption and title
 pub fn process_indices(
-    entries: &Vec<AddressBookEntry>,
+    entries: &[AddressBookEntry],
     encryption: Encryption,
 ) -> Result<(NetworkSpecsToSend, bool), ErrorActive> {
-    let indices = get_indices(&entries, encryption.to_owned())?;
+    let indices = get_indices(entries, encryption.to_owned())?;
     match indices.index_correct_encryption {
         Some(i) => {
-            let network_specs_key = NetworkSpecsKey::from_parts(
-                &entries[i].genesis_hash.to_vec(),
-                &entries[i].encryption,
-            );
+            let network_specs_key =
+                NetworkSpecsKey::from_parts(&entries[i].genesis_hash, &entries[i].encryption);
             let network_specs = get_network_specs_to_send(&network_specs_key)?;
             Ok((network_specs, false))
         }
         None => {
             let network_specs_key = match indices.index_default {
-                Some(i) => NetworkSpecsKey::from_parts(
-                    &entries[i].genesis_hash.to_vec(),
-                    &entries[i].encryption,
-                ),
-                None => NetworkSpecsKey::from_parts(
-                    &entries[0].genesis_hash.to_vec(),
-                    &entries[0].encryption,
-                ),
+                Some(i) => {
+                    NetworkSpecsKey::from_parts(&entries[i].genesis_hash, &entries[i].encryption)
+                }
+                None => {
+                    NetworkSpecsKey::from_parts(&entries[0].genesis_hash, &entries[0].encryption)
+                }
             };
             let mut specs_found = get_network_specs_to_send(&network_specs_key)?;
             specs_found.encryption = encryption.clone();
@@ -241,13 +228,11 @@ pub fn genesis_hash_in_hot_db(genesis_hash: [u8; 32]) -> Result<bool, ErrorActiv
     let database = open_db::<Active>(HOT_DB_NAME)?;
     let chainspecs = open_tree::<Active>(&database, SPECSTREEPREP)?;
     let mut out = false;
-    for x in chainspecs.iter() {
-        if let Ok(a) = x {
-            let network_specs = NetworkSpecsToSend::from_entry_checked(a)?;
-            if network_specs.genesis_hash == genesis_hash {
-                out = true;
-                break;
-            }
+    for x in chainspecs.iter().flatten() {
+        let network_specs = NetworkSpecsToSend::from_entry_checked(x)?;
+        if network_specs.genesis_hash == genesis_hash {
+            out = true;
+            break;
         }
     }
     Ok(out)
@@ -258,13 +243,11 @@ pub fn specname_in_db(specname: &str, except_title: &str) -> Result<bool, ErrorA
     let database = open_db::<Active>(HOT_DB_NAME)?;
     let address_book = open_tree::<Active>(&database, ADDRESS_BOOK)?;
     let mut out = false;
-    for x in address_book.iter() {
-        if let Ok(a) = x {
-            let (title, address_book_entry) = <AddressBookEntry>::process_entry(a)?;
-            if (address_book_entry.name == specname) && (title != except_title) {
-                out = true;
-                break;
-            }
+    for x in address_book.iter().flatten() {
+        let (title, address_book_entry) = <AddressBookEntry>::process_entry(x)?;
+        if (address_book_entry.name == specname) && (title != except_title) {
+            out = true;
+            break;
         }
     }
     Ok(out)
