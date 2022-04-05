@@ -6,7 +6,13 @@ use sp_core::crypto::SecretStringError;
 use sp_runtime::MultiSigner;
 use wasm_testbed;
 
-use crate::{crypto:: Encryption, helpers::multisigner_to_public, keyring::{AddressKey, AddressBookKey, MetaKey, NetworkSpecsKey, VerifierKey}, network_specs::{ValidCurrentVerifier, Verifier, VerifierValue}, users::AddressDetails};
+use crate::{
+    crypto::Encryption,
+    helpers::multisigner_to_public,
+    keyring::{AddressBookKey, AddressKey, MetaKey, NetworkSpecsKey, VerifierKey},
+    network_specs::{ValidCurrentVerifier, Verifier, VerifierValue},
+    users::AddressDetails,
+};
 
 /// Trait describing the origin of errors.
 /// ErrorSource is implemented for Active (errors on the active side -
@@ -14,130 +20,149 @@ use crate::{crypto:: Encryption, helpers::multisigner_to_public, keyring::{Addre
 /// before its moving into Signer)
 /// and for Signer (errors on the Signer side)
 pub trait ErrorSource {
-///
-/// Type specifies errors occuring on either Active or Signer side.
+    ///
+    /// Type specifies errors occuring on either Active or Signer side.
     type Error;
-///
-/// NotHex refers to errors in transforming hexadecimal strings into Vec<u8>.
-/// NotHex errors may occur both on Active and on Signer side.
-/// On Active side NotHex errors could be related to strings fetched form url,
-/// input from command line, and processing of the default values.
-/// On Signer side NotHex errors are caused by communication errors 
-/// and, since user interface should be sending valid hex strings into rust,
-/// generally should not be occuring.
+    ///
+    /// NotHex refers to errors in transforming hexadecimal strings into Vec<u8>.
+    /// NotHex errors may occur both on Active and on Signer side.
+    /// On Active side NotHex errors could be related to strings fetched form url,
+    /// input from command line, and processing of the default values.
+    /// On Signer side NotHex errors are caused by communication errors
+    /// and, since user interface should be sending valid hex strings into rust,
+    /// generally should not be occuring.
     type NotHex;
-///
-/// Describes the source of the faulty NetworkSpecsKey
-/// aside from the database itself (key in SpecsTree and value part in AddrTree).
-/// On the Active side is empty.
-/// On the Signer side the source could be only interface.
+    ///
+    /// Describes the source of the faulty NetworkSpecsKey
+    /// aside from the database itself (key in SpecsTree and value part in AddrTree).
+    /// On the Active side is empty.
+    /// On the Signer side the source could be only interface.
     type ExtraSpecsKeySource;
-///
-/// Describes the source of the faulty AddressSpecsKey
-/// aside from the database itself.
-/// On the active side is empty.
-/// On the Signer side the source could be only interface.
+    ///
+    /// Describes the source of the faulty AddressSpecsKey
+    /// aside from the database itself.
+    /// On the active side is empty.
+    /// On the Signer side the source could be only interface.
     type ExtraAddressKeySource;
-///
-/// Incoming metadata source describes possible origins of the faulty metadata
-/// excluding the database.
-/// For Active side, it could be bad fetch or damaged default file.
-/// For Signer side, it could be faulty received metadata.
+    ///
+    /// Incoming metadata source describes possible origins of the faulty metadata
+    /// excluding the database.
+    /// For Active side, it could be bad fetch or damaged default file.
+    /// For Signer side, it could be faulty received metadata.
     type IncomingMetadataSource;
-///
-/// Source-specific errors during address generation:
-/// test address generation on Active side
-/// and actual address generation on the Signer side
+    ///
+    /// Source-specific errors during address generation:
+    /// test address generation on Active side
+    /// and actual address generation on the Signer side
     type ExtraAddressGeneration;
-///
-/// Function to transform NotHex error into Error
+    ///
+    /// Function to transform NotHex error into Error
     fn hex_to_error(what: Self::NotHex) -> Self::Error;
-///
-/// Function to create Error for bad network specs key
-    fn specs_key_to_error(network_specs_key: &NetworkSpecsKey, source: SpecsKeySource<Self>) -> Self::Error;
-///
-/// Function to create Error for bad address key
-    fn address_key_to_error(address_key: &AddressKey, source: AddressKeySource<Self>) -> Self::Error;
-///
-/// Function to create Error for bad meta key (database only both on the Active side
-/// and on the Signer side)
+    ///
+    /// Function to create Error for bad network specs key
+    fn specs_key_to_error(
+        network_specs_key: &NetworkSpecsKey,
+        source: SpecsKeySource<Self>,
+    ) -> Self::Error;
+    ///
+    /// Function to create Error for bad address key
+    fn address_key_to_error(
+        address_key: &AddressKey,
+        source: AddressKeySource<Self>,
+    ) -> Self::Error;
+    ///
+    /// Function to create Error for bad meta key (database only both on the Active side
+    /// and on the Signer side)
     fn meta_key_to_error(meta_key: &MetaKey) -> Self::Error;
-///
-/// Function to create errors for metadata name and/or version mismatch within the database
-    fn metadata_mismatch (name_key: String, version_key: u32, name_inside: String, version_inside: u32) -> Self::Error;
-///
-/// Function to create errors related to metadata being unsuitable
+    ///
+    /// Function to create errors for metadata name and/or version mismatch within the database
+    fn metadata_mismatch(
+        name_key: String,
+        version_key: u32,
+        name_inside: String,
+        version_inside: u32,
+    ) -> Self::Error;
+    ///
+    /// Function to create errors related to metadata being unsuitable
     fn faulty_metadata(error: MetadataError, source: MetadataSource<Self>) -> Self::Error;
-///
-/// Functions to create errors related to network specs NetworkSpecs 
-/// (is used on Signer side, but also on Active side, for example, during metadata transfer in test cold database)
-/// Function to generate error in the event that NetworkSpecs entry could not be decoded...
+    ///
+    /// Functions to create errors related to network specs NetworkSpecs
+    /// (is used on Signer side, but also on Active side, for example, during metadata transfer in test cold database)
+    /// Function to generate error in the event that NetworkSpecs entry could not be decoded...
     fn specs_decoding(key: NetworkSpecsKey) -> Self::Error;
-/// ... or has mismatch in genesis hash between key and stored value,
+    /// ... or has mismatch in genesis hash between key and stored value,
     fn specs_genesis_hash_mismatch(key: NetworkSpecsKey, genesis_hash: Vec<u8>) -> Self::Error;
-/// ... or has mismatch in encryption between key and stored value,
+    /// ... or has mismatch in encryption between key and stored value,
     fn specs_encryption_mismatch(key: NetworkSpecsKey, encryption: Encryption) -> Self::Error;
-///
-/// Functions to create errors related to address details AddressDetails
-/// (intended for Signer side, but could appear on the Active side during test identities generation)
-/// Function to generate error in the event that AddressDetails entry could not be decoded...
+    ///
+    /// Functions to create errors related to address details AddressDetails
+    /// (intended for Signer side, but could appear on the Active side during test identities generation)
+    /// Function to generate error in the event that AddressDetails entry could not be decoded...
     fn address_details_decoding(key: AddressKey) -> Self::Error;
-/// ... or has mismatch in encryption between key and stored value,
+    /// ... or has mismatch in encryption between key and stored value,
     fn address_details_encryption_mismatch(key: AddressKey, encryption: Encryption) -> Self::Error;
-/// ... or has mismatch between encryption within address details and encryption
-/// of an associated network
-    fn address_details_specs_encryption_mismatch(address_key: AddressKey, network_specs_key: NetworkSpecsKey) -> Self::Error;
-///
-/// Function to generate error in case of a common address generation error
+    /// ... or has mismatch between encryption within address details and encryption
+    /// of an associated network
+    fn address_details_specs_encryption_mismatch(
+        address_key: AddressKey,
+        network_specs_key: NetworkSpecsKey,
+    ) -> Self::Error;
+    ///
+    /// Function to generate error in case of a common address generation error
     fn address_generation_common(error: AddressGenerationCommon) -> Self::Error;
-///
-/// Function to create error corresponding to faulty transfer content
-    fn transfer_content_error (transfer_content: TransferContent) -> Self::Error;
-///
-/// Functions to create error corresponding to database internal error...
-    fn db_internal (error: sled::Error) -> Self::Error;
-/// ... and database transaction error
-    fn db_transaction (error: sled::transaction::TransactionError) -> Self::Error;
-///
-/// Functions to create error corresponding to the situation 
-/// when types information from the database that could not be decoded...
+    ///
+    /// Function to create error corresponding to faulty transfer content
+    fn transfer_content_error(transfer_content: TransferContent) -> Self::Error;
+    ///
+    /// Functions to create error corresponding to database internal error...
+    fn db_internal(error: sled::Error) -> Self::Error;
+    /// ... and database transaction error
+    fn db_transaction(error: sled::transaction::TransactionError) -> Self::Error;
+    ///
+    /// Functions to create error corresponding to the situation
+    /// when types information from the database that could not be decoded...
     fn faulty_database_types() -> Self::Error;
-/// ... or could not be found at all
+    /// ... or could not be found at all
     fn types_not_found() -> Self::Error;
-///
-/// Function to create error when metadata for the network with given name and version was not found
+    ///
+    /// Function to create error when metadata for the network with given name and version was not found
     fn metadata_not_found(name: String, version: u32) -> Self::Error;
-///
-/// Function to print the Error, is used in cards, for anyhow or std::fmt::Display output
+    ///
+    /// Function to print the Error, is used in cards, for anyhow or std::fmt::Display output
     fn show(error: &Self::Error) -> String;
 }
 
-pub enum MetadataSource <T: ErrorSource + ?Sized> {
-    Database {name: String, version: u32},
+pub enum MetadataSource<T: ErrorSource + ?Sized> {
+    Database { name: String, version: u32 },
     Incoming(T::IncomingMetadataSource),
 }
 
-pub enum SpecsKeySource <T: ErrorSource + ?Sized> {
+pub enum SpecsKeySource<T: ErrorSource + ?Sized> {
     SpecsTree,
     AddrTree(AddressKey),
     Extra(T::ExtraSpecsKeySource),
 }
 
-pub enum AddressKeySource <T: ErrorSource + ?Sized> {
+pub enum AddressKeySource<T: ErrorSource + ?Sized> {
     AddrTree,
     Extra(T::ExtraAddressKeySource),
 }
 
 #[derive(Debug)]
-pub enum AddressGeneration <T: ErrorSource + ?Sized> {
+pub enum AddressGeneration<T: ErrorSource + ?Sized> {
     Common(AddressGenerationCommon),
     Extra(T::ExtraAddressGeneration),
 }
 
 #[derive(Debug)]
 pub enum AddressGenerationCommon {
-    EncryptionMismatch{network_encryption: Encryption, seed_object_encryption: Encryption},
-    KeyCollision{seed_name: String},
+    EncryptionMismatch {
+        network_encryption: Encryption,
+        seed_object_encryption: Encryption,
+    },
+    KeyCollision {
+        seed_name: String,
+    },
     SecretString(SecretStringError),
     DerivationExists(MultiSigner, AddressDetails, NetworkSpecsKey),
 }
@@ -145,29 +170,43 @@ pub enum AddressGenerationCommon {
 fn bad_secret_string(e: &SecretStringError) -> &'static str {
     match e {
         SecretStringError::InvalidFormat => "invalid overall format",
-	SecretStringError::InvalidPhrase => "invalid bip39 phrase",
-	SecretStringError::InvalidPassword => "invalid password",
-	SecretStringError::InvalidSeed => "invalid seed",
+        SecretStringError::InvalidPhrase => "invalid bip39 phrase",
+        SecretStringError::InvalidPassword => "invalid password",
+        SecretStringError::InvalidSeed => "invalid seed",
         SecretStringError::InvalidSeedLength => "invalid seed length",
-	SecretStringError::InvalidPath => "invalid path",
+        SecretStringError::InvalidPath => "invalid path",
     }
 }
 
 impl AddressGenerationCommon {
     pub fn show(&self) -> String {
         match &self {
-            AddressGenerationCommon::EncryptionMismatch{network_encryption, seed_object_encryption} => format!("Network encryption {} is different from seed object encryption {}.", network_encryption.show(), seed_object_encryption.show()),
-            AddressGenerationCommon::KeyCollision{seed_name} => format!("Address key collision for seed name {}", seed_name),
-            AddressGenerationCommon::SecretString(e) => format!("Bad secret string: {}.", bad_secret_string(e)),
-            AddressGenerationCommon::DerivationExists(multisigner, address_details, network_specs_key) => {
-                let public_key = multisigner_to_public(&multisigner);
+            AddressGenerationCommon::EncryptionMismatch {
+                network_encryption,
+                seed_object_encryption,
+            } => format!(
+                "Network encryption {} is different from seed object encryption {}.",
+                network_encryption.show(),
+                seed_object_encryption.show()
+            ),
+            AddressGenerationCommon::KeyCollision { seed_name } => {
+                format!("Address key collision for seed name {}", seed_name)
+            }
+            AddressGenerationCommon::SecretString(e) => {
+                format!("Bad secret string: {}.", bad_secret_string(e))
+            }
+            AddressGenerationCommon::DerivationExists(
+                multisigner,
+                address_details,
+                network_specs_key,
+            ) => {
+                let public_key = multisigner_to_public(multisigner);
                 if address_details.has_pwd {
                     format!("Seed {} already has derivation {}///<password> for network specs key {}, public key {}.", address_details.seed_name, address_details.path, hex::encode(network_specs_key.key()), hex::encode(public_key))
-                }
-                else {
+                } else {
                     format!("Seed {} already has derivation {} for network specs key {}, public key {}.", address_details.seed_name, address_details.path, hex::encode(network_specs_key.key()), hex::encode(public_key))
                 }
-            },
+            }
         }
     }
 }
@@ -186,58 +225,117 @@ impl ErrorSource for Active {
     fn hex_to_error(what: Self::NotHex) -> Self::Error {
         ErrorActive::NotHex(what)
     }
-    fn specs_key_to_error(network_specs_key: &NetworkSpecsKey, source: SpecsKeySource<Self>) -> Self::Error {
+    fn specs_key_to_error(
+        network_specs_key: &NetworkSpecsKey,
+        source: SpecsKeySource<Self>,
+    ) -> Self::Error {
         match source {
-            SpecsKeySource::SpecsTree => ErrorActive::Database(DatabaseActive::KeyDecoding(KeyDecodingActive::NetworkSpecsKey(network_specs_key.to_owned()))),
-            SpecsKeySource::AddrTree(address_key) => ErrorActive::Database(DatabaseActive::KeyDecoding(KeyDecodingActive::NetworkSpecsKeyAddressDetails{address_key: address_key.to_owned(), network_specs_key: network_specs_key.to_owned()})),
+            SpecsKeySource::SpecsTree => ErrorActive::Database(DatabaseActive::KeyDecoding(
+                KeyDecodingActive::NetworkSpecsKey(network_specs_key.to_owned()),
+            )),
+            SpecsKeySource::AddrTree(address_key) => ErrorActive::Database(
+                DatabaseActive::KeyDecoding(KeyDecodingActive::NetworkSpecsKeyAddressDetails {
+                    address_key,
+                    network_specs_key: network_specs_key.to_owned(),
+                }),
+            ),
             SpecsKeySource::Extra(_) => unreachable!(),
         }
     }
-    fn address_key_to_error(address_key: &AddressKey, _source: AddressKeySource<Self>) -> Self::Error {
-        ErrorActive::Database(DatabaseActive::KeyDecoding(KeyDecodingActive::AddressKey(address_key.to_owned())))
+    fn address_key_to_error(
+        address_key: &AddressKey,
+        _source: AddressKeySource<Self>,
+    ) -> Self::Error {
+        ErrorActive::Database(DatabaseActive::KeyDecoding(KeyDecodingActive::AddressKey(
+            address_key.to_owned(),
+        )))
     }
     fn meta_key_to_error(meta_key: &MetaKey) -> Self::Error {
-        ErrorActive::Database(DatabaseActive::KeyDecoding(KeyDecodingActive::MetaKey(meta_key.to_owned())))
+        ErrorActive::Database(DatabaseActive::KeyDecoding(KeyDecodingActive::MetaKey(
+            meta_key.to_owned(),
+        )))
     }
-    fn metadata_mismatch (name_key: String, version_key: u32, name_inside: String, version_inside: u32) -> Self::Error {
-        ErrorActive::Database(DatabaseActive::Mismatch(MismatchActive::Metadata{name_key, version_key, name_inside, version_inside}))
+    fn metadata_mismatch(
+        name_key: String,
+        version_key: u32,
+        name_inside: String,
+        version_inside: u32,
+    ) -> Self::Error {
+        ErrorActive::Database(DatabaseActive::Mismatch(MismatchActive::Metadata {
+            name_key,
+            version_key,
+            name_inside,
+            version_inside,
+        }))
     }
     fn faulty_metadata(error: MetadataError, source: MetadataSource<Self>) -> Self::Error {
         match source {
-            MetadataSource::Database{name, version} => ErrorActive::Database(DatabaseActive::FaultyMetadata{name, version, error}),
-            MetadataSource::Incoming(IncomingMetadataSourceActive::Str(IncomingMetadataSourceActiveStr::Fetch{url})) => ErrorActive::Fetch(Fetch::FaultyMetadata{url, error}),
-            MetadataSource::Incoming(IncomingMetadataSourceActive::Str(IncomingMetadataSourceActiveStr::Default{filename})) => ErrorActive::DefaultLoading(DefaultLoading::FaultyMetadata{filename, error}),
-            MetadataSource::Incoming(IncomingMetadataSourceActive::Wasm{filename}) => ErrorActive::Wasm(Wasm::FaultyMetadata{filename, error}),
+            MetadataSource::Database { name, version } => {
+                ErrorActive::Database(DatabaseActive::FaultyMetadata {
+                    name,
+                    version,
+                    error,
+                })
+            }
+            MetadataSource::Incoming(IncomingMetadataSourceActive::Str(
+                IncomingMetadataSourceActiveStr::Fetch { url },
+            )) => ErrorActive::Fetch(Fetch::FaultyMetadata { url, error }),
+            MetadataSource::Incoming(IncomingMetadataSourceActive::Str(
+                IncomingMetadataSourceActiveStr::Default { filename },
+            )) => ErrorActive::DefaultLoading(DefaultLoading::FaultyMetadata { filename, error }),
+            MetadataSource::Incoming(IncomingMetadataSourceActive::Wasm { filename }) => {
+                ErrorActive::Wasm(Wasm::FaultyMetadata { filename, error })
+            }
         }
     }
     fn specs_decoding(key: NetworkSpecsKey) -> Self::Error {
-        ErrorActive::Database(DatabaseActive::EntryDecoding(EntryDecodingActive::NetworkSpecs(key)))
+        ErrorActive::Database(DatabaseActive::EntryDecoding(
+            EntryDecodingActive::NetworkSpecs(key),
+        ))
     }
     fn specs_genesis_hash_mismatch(key: NetworkSpecsKey, genesis_hash: Vec<u8>) -> Self::Error {
-        ErrorActive::Database(DatabaseActive::Mismatch(MismatchActive::SpecsGenesisHash{key, genesis_hash}))
+        ErrorActive::Database(DatabaseActive::Mismatch(MismatchActive::SpecsGenesisHash {
+            key,
+            genesis_hash,
+        }))
     }
     fn specs_encryption_mismatch(key: NetworkSpecsKey, encryption: Encryption) -> Self::Error {
-        ErrorActive::Database(DatabaseActive::Mismatch(MismatchActive::SpecsEncryption{key, encryption}))
+        ErrorActive::Database(DatabaseActive::Mismatch(MismatchActive::SpecsEncryption {
+            key,
+            encryption,
+        }))
     }
     fn address_details_decoding(key: AddressKey) -> Self::Error {
-        ErrorActive::Database(DatabaseActive::EntryDecoding(EntryDecodingActive::AddressDetails(key)))
+        ErrorActive::Database(DatabaseActive::EntryDecoding(
+            EntryDecodingActive::AddressDetails(key),
+        ))
     }
     fn address_details_encryption_mismatch(key: AddressKey, encryption: Encryption) -> Self::Error {
-        ErrorActive::Database(DatabaseActive::Mismatch(MismatchActive::AddressDetailsEncryption{key, encryption}))
+        ErrorActive::Database(DatabaseActive::Mismatch(
+            MismatchActive::AddressDetailsEncryption { key, encryption },
+        ))
     }
-    fn address_details_specs_encryption_mismatch(address_key: AddressKey, network_specs_key: NetworkSpecsKey) -> Self::Error {
-        ErrorActive::Database(DatabaseActive::Mismatch(MismatchActive::AddressDetailsSpecsEncryption{address_key, network_specs_key}))
+    fn address_details_specs_encryption_mismatch(
+        address_key: AddressKey,
+        network_specs_key: NetworkSpecsKey,
+    ) -> Self::Error {
+        ErrorActive::Database(DatabaseActive::Mismatch(
+            MismatchActive::AddressDetailsSpecsEncryption {
+                address_key,
+                network_specs_key,
+            },
+        ))
     }
     fn address_generation_common(error: AddressGenerationCommon) -> Self::Error {
         ErrorActive::TestAddressGeneration(AddressGeneration::Common(error))
     }
-    fn transfer_content_error (transfer_content: TransferContent) -> Self::Error {
+    fn transfer_content_error(transfer_content: TransferContent) -> Self::Error {
         ErrorActive::TransferContent(transfer_content)
     }
-    fn db_internal (error: sled::Error) -> Self::Error {
+    fn db_internal(error: sled::Error) -> Self::Error {
         ErrorActive::Database(DatabaseActive::Internal(error))
     }
-    fn db_transaction (error: sled::transaction::TransactionError) -> Self::Error {
+    fn db_transaction(error: sled::transaction::TransactionError) -> Self::Error {
         ErrorActive::Database(DatabaseActive::Transaction(error))
     }
     fn faulty_database_types() -> Self::Error {
@@ -247,7 +345,7 @@ impl ErrorSource for Active {
         ErrorActive::NotFound(NotFoundActive::Types)
     }
     fn metadata_not_found(name: String, version: u32) -> Self::Error {
-        ErrorActive::NotFound(NotFoundActive::Metadata{name, version})
+        ErrorActive::NotFound(NotFoundActive::Metadata { name, version })
     }
     fn show(error: &Self::Error) -> String {
         match error {
@@ -511,7 +609,7 @@ pub enum ErrorActive {
     Input(InputActive),
     Qr(String),
     NotSupported,
-    NoTokenOverrideKnownNetwork{url: String},
+    NoTokenOverrideKnownNetwork { url: String },
     Wasm(Wasm),
 }
 
@@ -525,26 +623,26 @@ impl std::fmt::Display for ErrorActive {
 /// NotHex errors occuring on the Active side
 #[derive(Debug)]
 pub enum NotHexActive {
-    FetchedMetadata {url: String},
-    FetchedGenesisHash {url: String},
+    FetchedMetadata { url: String },
+    FetchedGenesisHash { url: String },
     InputSufficientCrypto,
     InputPublicKey,
     InputSignature,
-    DefaultMetadata {filename: String},
+    DefaultMetadata { filename: String },
 }
 
 /// Origin of unsuitable metadata on the Active side
 #[derive(Debug)]
 pub enum IncomingMetadataSourceActive {
     Str(IncomingMetadataSourceActiveStr),
-    Wasm{filename: String},
+    Wasm { filename: String },
 }
 
 /// Origin of unsuitable metadata on the Active side, in str form
 #[derive(Debug)]
 pub enum IncomingMetadataSourceActiveStr {
-    Fetch{url: String},
-    Default{filename: String},
+    Fetch { url: String },
+    Default { filename: String },
 }
 
 /// Origin of unsuitable specs key on the Active side, except SpecsTree in the database.
@@ -570,16 +668,41 @@ pub enum DatabaseActive {
     Internal(sled::Error),
     Transaction(sled::transaction::TransactionError),
     Mismatch(MismatchActive),
-    FaultyMetadata{name: String, version: u32, error: MetadataError},
-    TwoEntriesAddressEncryption{url: String, encryption: Encryption},
-    TwoDefaultsAddress{url: String},
-    HotDatabaseMetadataOverTwoEntries{name: String},
-    HotDatabaseMetadataSameVersionTwice{name: String, version: u32},
-    NewAddressKnownGenesisHash{url: String, genesis_hash: [u8;32]},
-    TwoGenesisHashVariantsForName{name: String},
-    TwoUrlVariantsForName{name: String},
-    TwoNamesForUrl{url: String},
-    TwoBase58ForName{name: String},
+    FaultyMetadata {
+        name: String,
+        version: u32,
+        error: MetadataError,
+    },
+    TwoEntriesAddressEncryption {
+        url: String,
+        encryption: Encryption,
+    },
+    TwoDefaultsAddress {
+        url: String,
+    },
+    HotDatabaseMetadataOverTwoEntries {
+        name: String,
+    },
+    HotDatabaseMetadataSameVersionTwice {
+        name: String,
+        version: u32,
+    },
+    NewAddressKnownGenesisHash {
+        url: String,
+        genesis_hash: [u8; 32],
+    },
+    TwoGenesisHashVariantsForName {
+        name: String,
+    },
+    TwoUrlVariantsForName {
+        name: String,
+    },
+    TwoNamesForUrl {
+        url: String,
+    },
+    TwoBase58ForName {
+        name: String,
+    },
     AddressBookEmpty,
 }
 
@@ -590,14 +713,17 @@ pub enum KeyDecodingActive {
     AddressKey(AddressKey),
     MetaKey(MetaKey),
     NetworkSpecsKey(NetworkSpecsKey),
-    NetworkSpecsKeyAddressDetails{address_key: AddressKey, network_specs_key: NetworkSpecsKey},
+    NetworkSpecsKeyAddressDetails {
+        address_key: AddressKey,
+        network_specs_key: NetworkSpecsKey,
+    },
 }
 
 /// Enum listing possible errors in decoding database entry content on the Active side
 #[derive(Debug)]
 pub enum EntryDecodingActive {
     AddressBookEntryKey(AddressBookKey),
-    AddressBookEntryTitle{title: String},
+    AddressBookEntryTitle { title: String },
     AddressDetails(AddressKey),
     NetworkSpecs(NetworkSpecsKey),
     NetworkSpecsToSend(NetworkSpecsKey),
@@ -607,72 +733,128 @@ pub enum EntryDecodingActive {
 /// Enum listing possible mismatch within database on the Active side
 #[derive(Debug)]
 pub enum MismatchActive {
-    Metadata{name_key: String, version_key: u32, name_inside: String, version_inside: u32},
-    SpecsGenesisHash{key: NetworkSpecsKey, genesis_hash: Vec<u8>},
-    SpecsEncryption{key: NetworkSpecsKey, encryption: Encryption},
-    SpecsToSendGenesisHash{key: NetworkSpecsKey, genesis_hash: Vec<u8>},
-    SpecsToSendEncryption{key: NetworkSpecsKey, encryption: Encryption},
-    AddressDetailsEncryption{key: AddressKey, encryption: Encryption},
-    AddressDetailsSpecsEncryption{address_key: AddressKey, network_specs_key: NetworkSpecsKey},
-    AddressBookSpecsName{address_book_name: String, specs_name: String},
+    Metadata {
+        name_key: String,
+        version_key: u32,
+        name_inside: String,
+        version_inside: u32,
+    },
+    SpecsGenesisHash {
+        key: NetworkSpecsKey,
+        genesis_hash: Vec<u8>,
+    },
+    SpecsEncryption {
+        key: NetworkSpecsKey,
+        encryption: Encryption,
+    },
+    SpecsToSendGenesisHash {
+        key: NetworkSpecsKey,
+        genesis_hash: Vec<u8>,
+    },
+    SpecsToSendEncryption {
+        key: NetworkSpecsKey,
+        encryption: Encryption,
+    },
+    AddressDetailsEncryption {
+        key: AddressKey,
+        encryption: Encryption,
+    },
+    AddressDetailsSpecsEncryption {
+        address_key: AddressKey,
+        network_specs_key: NetworkSpecsKey,
+    },
+    AddressBookSpecsName {
+        address_book_name: String,
+        specs_name: String,
+    },
 }
 
 /// Enum listing possible errors on the Active side related to fetched (or not fetched) data
 #[derive(Debug)]
 pub enum Fetch {
-    FaultyMetadata{url: String, error: MetadataError},
-    EarlierVersion{name: String, old_version: u32, new_version: u32},
-    SameVersionDifferentMetadata{name: String, version: u32},
-    FaultySpecs{url: String, error: SpecsError},
-    Failed{url: String, error: String},
-    ValuesChanged{url: String, what: Changed},
-    UnexpectedFetchedGenesisHashFormat{value: String},
-    SpecsInDb{name: String, encryption: Encryption},
+    FaultyMetadata {
+        url: String,
+        error: MetadataError,
+    },
+    EarlierVersion {
+        name: String,
+        old_version: u32,
+        new_version: u32,
+    },
+    SameVersionDifferentMetadata {
+        name: String,
+        version: u32,
+    },
+    FaultySpecs {
+        url: String,
+        error: SpecsError,
+    },
+    Failed {
+        url: String,
+        error: String,
+    },
+    ValuesChanged {
+        url: String,
+        what: Changed,
+    },
+    UnexpectedFetchedGenesisHashFormat {
+        value: String,
+    },
+    SpecsInDb {
+        name: String,
+        encryption: Encryption,
+    },
 }
 
 #[derive(Debug)]
 pub enum SpecsError {
     NoBase58Prefix,
-    Base58PrefixMismatch{specs: u16, meta: u16},
-    Base58PrefixFormatNotSupported{value: String},
+    Base58PrefixMismatch { specs: u16, meta: u16 },
+    Base58PrefixFormatNotSupported { value: String },
     UnitNoDecimals(String),
-    DecimalsFormatNotSupported{value: String},
+    DecimalsFormatNotSupported { value: String },
     DecimalsNoUnit(u8),
-    UnitFormatNotSupported{value: String},
+    UnitFormatNotSupported { value: String },
     DecimalsArrayUnitsNot,
-    DecimalsUnitsArrayLength{decimals: String, unit: String},
+    DecimalsUnitsArrayLength { decimals: String, unit: String },
     UnitsArrayDecimalsNot,
     OverrideIgnored,
 }
 
 #[derive(Debug)]
 pub enum Changed {
-    Base58Prefix{old: u16, new: u16},
-    GenesisHash{old: [u8;32], new: [u8;32]},
-    Decimals{old: u8, new: u8},
-    Name{old: String, new: String},
-    Unit{old: String, new: String},
+    Base58Prefix { old: u16, new: u16 },
+    GenesisHash { old: [u8; 32], new: [u8; 32] },
+    Decimals { old: u8, new: u8 },
+    Name { old: String, new: String },
+    Unit { old: String, new: String },
 }
 
 /// Enum listing possible errors on the Active side related to loading of the defaults
 #[derive(Debug)]
 pub enum DefaultLoading {
-    FaultyMetadata{filename: String, error: MetadataError},
+    FaultyMetadata {
+        filename: String,
+        error: MetadataError,
+    },
     MetadataFolder(std::io::Error),
     MetadataFile(std::io::Error),
     TypesFile(std::io::Error),
-    OrphanMetadata{name: String, filename: String},
+    OrphanMetadata {
+        name: String,
+        filename: String,
+    },
 }
 
 /// Enum listing errors for cases when something was needed from the Active database and was not found
 #[derive(Debug)]
 pub enum NotFoundActive {
     Types,
-    Metadata{name: String, version: u32},
-    AddressBookEntry{title: String},
+    Metadata { name: String, version: u32 },
+    AddressBookEntry { title: String },
     NetworkSpecsToSend(NetworkSpecsKey),
-    AddressBookEntryWithName{name: String},
-    AddressBookEntryWithUrl{url: String},
+    AddressBookEntryWithName { name: String },
+    AddressBookEntryWithUrl { url: String },
 }
 
 /// Enum listing errors with command line parser from the `generate_message` crate
@@ -789,7 +971,10 @@ pub enum InputActive {
 #[derive(Debug)]
 pub enum Wasm {
     WasmTestbed(wasm_testbed::WasmTestbedError),
-    FaultyMetadata{filename: String, error: MetadataError},
+    FaultyMetadata {
+        filename: String,
+        error: MetadataError,
+    },
 }
 
 /// Enum-marker indicating that error originates on the Signer side
@@ -806,60 +991,122 @@ impl ErrorSource for Signer {
     fn hex_to_error(what: Self::NotHex) -> Self::Error {
         ErrorSigner::Interface(InterfaceSigner::NotHex(what))
     }
-    fn specs_key_to_error(network_specs_key: &NetworkSpecsKey, source: SpecsKeySource<Self>) -> Self::Error {
+    fn specs_key_to_error(
+        network_specs_key: &NetworkSpecsKey,
+        source: SpecsKeySource<Self>,
+    ) -> Self::Error {
         match source {
-            SpecsKeySource::SpecsTree => ErrorSigner::Database(DatabaseSigner::KeyDecoding(KeyDecodingSignerDb::NetworkSpecsKey(network_specs_key.to_owned()))),
-            SpecsKeySource::AddrTree(address_key) => ErrorSigner::Database(DatabaseSigner::KeyDecoding(KeyDecodingSignerDb::NetworkSpecsKeyAddressDetails{address_key: address_key.to_owned(), network_specs_key: network_specs_key.to_owned()})),
-            SpecsKeySource::Extra(ExtraSpecsKeySourceSigner::Interface) => ErrorSigner::Interface(InterfaceSigner::KeyDecoding(KeyDecodingSignerInterface::NetworkSpecsKey(network_specs_key.to_owned()))),
+            SpecsKeySource::SpecsTree => ErrorSigner::Database(DatabaseSigner::KeyDecoding(
+                KeyDecodingSignerDb::NetworkSpecsKey(network_specs_key.to_owned()),
+            )),
+            SpecsKeySource::AddrTree(address_key) => ErrorSigner::Database(
+                DatabaseSigner::KeyDecoding(KeyDecodingSignerDb::NetworkSpecsKeyAddressDetails {
+                    address_key,
+                    network_specs_key: network_specs_key.to_owned(),
+                }),
+            ),
+            SpecsKeySource::Extra(ExtraSpecsKeySourceSigner::Interface) => {
+                ErrorSigner::Interface(InterfaceSigner::KeyDecoding(
+                    KeyDecodingSignerInterface::NetworkSpecsKey(network_specs_key.to_owned()),
+                ))
+            }
         }
-        
     }
-    fn address_key_to_error(address_key: &AddressKey, source: AddressKeySource<Self>) -> Self::Error {
+    fn address_key_to_error(
+        address_key: &AddressKey,
+        source: AddressKeySource<Self>,
+    ) -> Self::Error {
         match source {
-            AddressKeySource::AddrTree => ErrorSigner::Database(DatabaseSigner::KeyDecoding(KeyDecodingSignerDb::AddressKey(address_key.to_owned()))),
-            AddressKeySource::Extra(ExtraAddressKeySourceSigner::Interface) => ErrorSigner::Interface(InterfaceSigner::KeyDecoding(KeyDecodingSignerInterface::AddressKey(address_key.to_owned()))),
+            AddressKeySource::AddrTree => ErrorSigner::Database(DatabaseSigner::KeyDecoding(
+                KeyDecodingSignerDb::AddressKey(address_key.to_owned()),
+            )),
+            AddressKeySource::Extra(ExtraAddressKeySourceSigner::Interface) => {
+                ErrorSigner::Interface(InterfaceSigner::KeyDecoding(
+                    KeyDecodingSignerInterface::AddressKey(address_key.to_owned()),
+                ))
+            }
         }
     }
     fn meta_key_to_error(meta_key: &MetaKey) -> Self::Error {
-        ErrorSigner::Database(DatabaseSigner::KeyDecoding(KeyDecodingSignerDb::MetaKey(meta_key.to_owned())))
+        ErrorSigner::Database(DatabaseSigner::KeyDecoding(KeyDecodingSignerDb::MetaKey(
+            meta_key.to_owned(),
+        )))
     }
-    fn metadata_mismatch (name_key: String, version_key: u32, name_inside: String, version_inside: u32) -> Self::Error {
-        ErrorSigner::Database(DatabaseSigner::Mismatch(MismatchSigner::Metadata{name_key, version_key, name_inside, version_inside}))
+    fn metadata_mismatch(
+        name_key: String,
+        version_key: u32,
+        name_inside: String,
+        version_inside: u32,
+    ) -> Self::Error {
+        ErrorSigner::Database(DatabaseSigner::Mismatch(MismatchSigner::Metadata {
+            name_key,
+            version_key,
+            name_inside,
+            version_inside,
+        }))
     }
     fn faulty_metadata(error: MetadataError, source: MetadataSource<Self>) -> Self::Error {
         match source {
-            MetadataSource::Database{name, version} => ErrorSigner::Database(DatabaseSigner::FaultyMetadata{name, version, error}),
-            MetadataSource::Incoming(IncomingMetadataSourceSigner::ReceivedData) => ErrorSigner::Input(InputSigner::FaultyMetadata(error)),
+            MetadataSource::Database { name, version } => {
+                ErrorSigner::Database(DatabaseSigner::FaultyMetadata {
+                    name,
+                    version,
+                    error,
+                })
+            }
+            MetadataSource::Incoming(IncomingMetadataSourceSigner::ReceivedData) => {
+                ErrorSigner::Input(InputSigner::FaultyMetadata(error))
+            }
         }
     }
     fn specs_decoding(key: NetworkSpecsKey) -> Self::Error {
-        ErrorSigner::Database(DatabaseSigner::EntryDecoding(EntryDecodingSigner::NetworkSpecs(key)))
+        ErrorSigner::Database(DatabaseSigner::EntryDecoding(
+            EntryDecodingSigner::NetworkSpecs(key),
+        ))
     }
     fn specs_genesis_hash_mismatch(key: NetworkSpecsKey, genesis_hash: Vec<u8>) -> Self::Error {
-        ErrorSigner::Database(DatabaseSigner::Mismatch(MismatchSigner::SpecsGenesisHash{key, genesis_hash}))
+        ErrorSigner::Database(DatabaseSigner::Mismatch(MismatchSigner::SpecsGenesisHash {
+            key,
+            genesis_hash,
+        }))
     }
     fn specs_encryption_mismatch(key: NetworkSpecsKey, encryption: Encryption) -> Self::Error {
-        ErrorSigner::Database(DatabaseSigner::Mismatch(MismatchSigner::SpecsEncryption{key, encryption}))
+        ErrorSigner::Database(DatabaseSigner::Mismatch(MismatchSigner::SpecsEncryption {
+            key,
+            encryption,
+        }))
     }
     fn address_details_decoding(key: AddressKey) -> Self::Error {
-        ErrorSigner::Database(DatabaseSigner::EntryDecoding(EntryDecodingSigner::AddressDetails(key)))
+        ErrorSigner::Database(DatabaseSigner::EntryDecoding(
+            EntryDecodingSigner::AddressDetails(key),
+        ))
     }
     fn address_details_encryption_mismatch(key: AddressKey, encryption: Encryption) -> Self::Error {
-        ErrorSigner::Database(DatabaseSigner::Mismatch(MismatchSigner::AddressDetailsEncryption{key, encryption}))
+        ErrorSigner::Database(DatabaseSigner::Mismatch(
+            MismatchSigner::AddressDetailsEncryption { key, encryption },
+        ))
     }
-    fn address_details_specs_encryption_mismatch(address_key: AddressKey, network_specs_key: NetworkSpecsKey) -> Self::Error {
-        ErrorSigner::Database(DatabaseSigner::Mismatch(MismatchSigner::AddressDetailsSpecsEncryption{address_key, network_specs_key}))
+    fn address_details_specs_encryption_mismatch(
+        address_key: AddressKey,
+        network_specs_key: NetworkSpecsKey,
+    ) -> Self::Error {
+        ErrorSigner::Database(DatabaseSigner::Mismatch(
+            MismatchSigner::AddressDetailsSpecsEncryption {
+                address_key,
+                network_specs_key,
+            },
+        ))
     }
     fn address_generation_common(error: AddressGenerationCommon) -> Self::Error {
         ErrorSigner::AddressGeneration(AddressGeneration::Common(error))
     }
-    fn transfer_content_error (transfer_content: TransferContent) -> Self::Error {
+    fn transfer_content_error(transfer_content: TransferContent) -> Self::Error {
         ErrorSigner::Input(InputSigner::TransferContent(transfer_content))
     }
-    fn db_internal (error: sled::Error) -> Self::Error {
+    fn db_internal(error: sled::Error) -> Self::Error {
         ErrorSigner::Database(DatabaseSigner::Internal(error))
     }
-    fn db_transaction (error: sled::transaction::TransactionError) -> Self::Error {
+    fn db_transaction(error: sled::transaction::TransactionError) -> Self::Error {
         ErrorSigner::Database(DatabaseSigner::Transaction(error))
     }
     fn faulty_database_types() -> Self::Error {
@@ -869,7 +1116,7 @@ impl ErrorSource for Signer {
         ErrorSigner::NotFound(NotFoundSigner::Types)
     }
     fn metadata_not_found(name: String, version: u32) -> Self::Error {
-        ErrorSigner::NotFound(NotFoundSigner::Metadata{name, version})
+        ErrorSigner::NotFound(NotFoundSigner::Metadata { name, version })
     }
     fn show(error: &Self::Error) -> String {
         match error {
@@ -1040,7 +1287,7 @@ impl ErrorSource for Signer {
             ErrorSigner::AllExtensionsParsingFailed{network_name, errors} => {
                 let mut insert = String::new();
                 for (i,(version, parser_error)) in errors.iter().enumerate() {
-                    if i>0 {insert.push_str(" ")}
+                    if i>0 {insert.push(' ')}
                     insert.push_str(&format!("Parsing with {}{} metadata: {}", network_name, version, parser_error.show()));
                 }
                 format!("Failed to decode extensions. Please try updating metadata for {} network. {}", network_name, insert)
@@ -1065,10 +1312,13 @@ pub enum ErrorSigner {
     AddressGeneration(AddressGeneration<Signer>),
     Qr(String),
     Parser(ParserError),
-    AllExtensionsParsingFailed{network_name: String, errors: Vec<(u32, ParserError)>},
+    AllExtensionsParsingFailed {
+        network_name: String,
+        errors: Vec<(u32, ParserError)>,
+    },
     AddressUse(SecretStringError),
     WrongPassword,
-    WrongPasswordNewChecksum (u32),
+    WrongPasswordNewChecksum(u32),
     PngGeneration(png::EncodingError),
     NoNetworksAvailable,
 }
@@ -1088,8 +1338,15 @@ pub enum InterfaceSigner {
     NotHex(NotHexSigner),
     KeyDecoding(KeyDecodingSignerInterface),
     PublicKeyLength,
-    HistoryPageOutOfRange{page_number: u32, total_pages: u32},
-    SeedNameNotMatching{address_key: AddressKey, expected_seed_name: String, real_seed_name: String},
+    HistoryPageOutOfRange {
+        page_number: u32,
+        total_pages: u32,
+    },
+    SeedNameNotMatching {
+        address_key: AddressKey,
+        expected_seed_name: String,
+        real_seed_name: String,
+    },
     LostPwd,
     VersionNotU32(String),
     IncNotU32(String),
@@ -1100,9 +1357,9 @@ pub enum InterfaceSigner {
 /// NotHex errors occuring on the Signer side
 #[derive(Debug)]
 pub enum NotHexSigner {
-    NetworkSpecsKey {input: String},
+    NetworkSpecsKey { input: String },
     InputContent,
-    AddressKey {input: String},
+    AddressKey { input: String },
 }
 
 /// Source of bad network specs keys on the Signer side
@@ -1138,14 +1395,35 @@ pub enum DatabaseSigner {
     ChecksumMismatch,
     EntryDecoding(EntryDecodingSigner),
     Mismatch(MismatchSigner),
-    FaultyMetadata{name: String, version: u32, error: MetadataError},
-    UnexpectedGenesisHash{verifier_key: VerifierKey, network_specs_key: NetworkSpecsKey},
-    SpecsCollision{name: String, encryption: Encryption},
-    DifferentNamesSameGenesisHash{name1: String, name2: String, genesis_hash: Vec<u8>},
+    FaultyMetadata {
+        name: String,
+        version: u32,
+        error: MetadataError,
+    },
+    UnexpectedGenesisHash {
+        verifier_key: VerifierKey,
+        network_specs_key: NetworkSpecsKey,
+    },
+    SpecsCollision {
+        name: String,
+        encryption: Encryption,
+    },
+    DifferentNamesSameGenesisHash {
+        name1: String,
+        name2: String,
+        genesis_hash: Vec<u8>,
+    },
     TwoTransactionsInEntry(u32),
     CustomVerifierIsGeneral(VerifierKey),
-    TwoRootKeys{seed_name: String, encryption: Encryption},
-    DifferentBase58Specs{genesis_hash: [u8;32], base58_1: u16, base58_2: u16},
+    TwoRootKeys {
+        seed_name: String,
+        encryption: Encryption,
+    },
+    DifferentBase58Specs {
+        genesis_hash: [u8; 32],
+        base58_1: u16,
+        base58_2: u16,
+    },
 }
 
 /// Enum listing possible errors in decoding keys from the database on the Signer side
@@ -1155,7 +1433,10 @@ pub enum KeyDecodingSignerDb {
     EntryOrder(Vec<u8>),
     MetaKey(MetaKey),
     NetworkSpecsKey(NetworkSpecsKey),
-    NetworkSpecsKeyAddressDetails{address_key: AddressKey, network_specs_key: NetworkSpecsKey},
+    NetworkSpecsKeyAddressDetails {
+        address_key: AddressKey,
+        network_specs_key: NetworkSpecsKey,
+    },
 }
 
 /// Enum listing possible errors in decoding database entry content on the Signer side
@@ -1176,11 +1457,28 @@ pub enum EntryDecodingSigner {
 #[derive(Debug)]
 /// Enum listing possible mismatch within database on the Signer side
 pub enum MismatchSigner {
-    Metadata{name_key: String, version_key: u32, name_inside: String, version_inside: u32},
-    SpecsGenesisHash{key: NetworkSpecsKey, genesis_hash: Vec<u8>},
-    SpecsEncryption{key: NetworkSpecsKey, encryption: Encryption},
-    AddressDetailsEncryption{key: AddressKey, encryption: Encryption},
-    AddressDetailsSpecsEncryption{address_key: AddressKey, network_specs_key: NetworkSpecsKey},
+    Metadata {
+        name_key: String,
+        version_key: u32,
+        name_inside: String,
+        version_inside: u32,
+    },
+    SpecsGenesisHash {
+        key: NetworkSpecsKey,
+        genesis_hash: Vec<u8>,
+    },
+    SpecsEncryption {
+        key: NetworkSpecsKey,
+        encryption: Encryption,
+    },
+    AddressDetailsEncryption {
+        key: AddressKey,
+        encryption: Encryption,
+    },
+    AddressDetailsSpecsEncryption {
+        address_key: AddressKey,
+        network_specs_key: NetworkSpecsKey,
+    },
 }
 
 /// Enum listing errors with input received by the Signer
@@ -1192,27 +1490,79 @@ pub enum InputSigner {
     TooShort,
     NotSubstrate(String),
     PayloadNotSupported(String),
-    SameNameVersionDifferentMeta{name: String, version: u32},
-    MetadataKnown{name: String, version: u32},
+    SameNameVersionDifferentMeta {
+        name: String,
+        version: u32,
+    },
+    MetadataKnown {
+        name: String,
+        version: u32,
+    },
     ImportantSpecsChanged(NetworkSpecsKey),
-    DifferentBase58{genesis_hash: [u8;32], base58_database: u16, base58_input: u16},
+    DifferentBase58 {
+        genesis_hash: [u8; 32],
+        base58_database: u16,
+        base58_input: u16,
+    },
     EncryptionNotSupported(String),
     BadSignature,
-    LoadMetaUnknownNetwork{name: String},
-    LoadMetaNoSpecs{name: String, valid_current_verifier: ValidCurrentVerifier, general_verifier: Verifier},
-    NeedVerifier{name: String, verifier_value: VerifierValue},
-    NeedGeneralVerifier{content: GeneralVerifierForContent, verifier_value: VerifierValue},
-    LoadMetaSetVerifier{name: String, new_verifier_value: VerifierValue},
-    LoadMetaVerifierChanged{name: String, old_verifier_value: VerifierValue, new_verifier_value: VerifierValue},
-    LoadMetaSetGeneralVerifier{name: String, new_general_verifier_value: VerifierValue},
-    LoadMetaGeneralVerifierChanged{name: String, old_general_verifier_value: VerifierValue, new_general_verifier_value: VerifierValue},
-    GeneralVerifierChanged{content: GeneralVerifierForContent, old_general_verifier_value: VerifierValue, new_general_verifier_value: VerifierValue},
+    LoadMetaUnknownNetwork {
+        name: String,
+    },
+    LoadMetaNoSpecs {
+        name: String,
+        valid_current_verifier: ValidCurrentVerifier,
+        general_verifier: Verifier,
+    },
+    NeedVerifier {
+        name: String,
+        verifier_value: VerifierValue,
+    },
+    NeedGeneralVerifier {
+        content: GeneralVerifierForContent,
+        verifier_value: VerifierValue,
+    },
+    LoadMetaSetVerifier {
+        name: String,
+        new_verifier_value: VerifierValue,
+    },
+    LoadMetaVerifierChanged {
+        name: String,
+        old_verifier_value: VerifierValue,
+        new_verifier_value: VerifierValue,
+    },
+    LoadMetaSetGeneralVerifier {
+        name: String,
+        new_general_verifier_value: VerifierValue,
+    },
+    LoadMetaGeneralVerifierChanged {
+        name: String,
+        old_general_verifier_value: VerifierValue,
+        new_general_verifier_value: VerifierValue,
+    },
+    GeneralVerifierChanged {
+        content: GeneralVerifierForContent,
+        old_general_verifier_value: VerifierValue,
+        new_general_verifier_value: VerifierValue,
+    },
     TypesKnown,
     MessageNotReadable,
-    UnknownNetwork{genesis_hash: Vec<u8>, encryption: Encryption},
-    NoMetadata{name: String},
-    SpecsKnown{name: String, encryption: Encryption},
-    AddSpecsVerifierChanged {name: String, old_verifier_value: VerifierValue, new_verifier_value: VerifierValue},
+    UnknownNetwork {
+        genesis_hash: Vec<u8>,
+        encryption: Encryption,
+    },
+    NoMetadata {
+        name: String,
+    },
+    SpecsKnown {
+        name: String,
+        encryption: Encryption,
+    },
+    AddSpecsVerifierChanged {
+        name: String,
+        old_verifier_value: VerifierValue,
+        new_verifier_value: VerifierValue,
+    },
     InvalidDerivation(String),
     OnlyNoPwdDerivations,
     SeedNameExists(String),
@@ -1220,7 +1570,7 @@ pub enum InputSigner {
 
 #[derive(Debug)]
 pub enum GeneralVerifierForContent {
-    Network{name: String},
+    Network { name: String },
     Types,
 }
 
@@ -1234,18 +1584,32 @@ pub enum NotFoundSigner {
     Types,
     NetworkSpecs(NetworkSpecsKey),
     NetworkSpecsForName(String),
-    NetworkSpecsKeyForAddress{network_specs_key: NetworkSpecsKey, address_key: AddressKey},
+    NetworkSpecsKeyForAddress {
+        network_specs_key: NetworkSpecsKey,
+        address_key: AddressKey,
+    },
     AddressDetails(AddressKey),
-    Metadata{name: String, version: u32},
+    Metadata {
+        name: String,
+        version: u32,
+    },
     DangerStatus,
     Stub,
     Sign,
     Derivations,
     HistoryEntry(u32),
-    HistoryNetworkSpecs{name: String, encryption: Encryption},
+    HistoryNetworkSpecs {
+        name: String,
+        encryption: Encryption,
+    },
     TransactionEvent(u32),
-    HistoricalMetadata{name: String},
-    NetworkForDerivationsImport{genesis_hash: [u8;32], encryption: Encryption},
+    HistoricalMetadata {
+        name: String,
+    },
+    NetworkForDerivationsImport {
+        genesis_hash: [u8; 32],
+        encryption: Encryption,
+    },
 }
 
 /// Enum listing errors that can happen when generating address only on the Signer side
@@ -1261,7 +1625,10 @@ pub enum ParserError {
     SeparateMethodExtensions, // can not separate method from extensions, bad transaction
     Decoding(ParserDecodingError), // errors occuring during the decoding procedure
     FundamentallyBadV14Metadata(ParserMetadataError), // errors occuring because the metadata is legit, but not acceptable in existing safety paradigm, for example, in V14 has no mention of network spec version in extrinsics
-    WrongNetworkVersion {as_decoded: String, in_metadata: u32},
+    WrongNetworkVersion {
+        as_decoded: String,
+        in_metadata: u32,
+    },
 }
 
 /// Enum listing errors directly related to transaction parsing
@@ -1272,9 +1639,16 @@ pub enum ParserDecodingError {
     GenesisHashMismatch,
     ImmortalHashMismatch,
     ExtensionsOlder,
-    MethodNotFound{method_index: u8, pallet_name: String},
+    MethodNotFound {
+        method_index: u8,
+        pallet_name: String,
+    },
     PalletNotFound(u8),
-    MethodIndexTooHigh{method_index: u8, pallet_index: u8, total: usize},
+    MethodIndexTooHigh {
+        method_index: u8,
+        pallet_index: u8,
+        total: usize,
+    },
     NoCallsInPallet(String),
     V14TypeNotResolved,
     ArgumentTypeError,
@@ -1316,7 +1690,7 @@ pub enum ParserMetadataError {
 }
 
 impl ParserError {
-    pub fn show (&self) -> String {
+    pub fn show(&self) -> String {
         match &self {
             ParserError::SeparateMethodExtensions => String::from("Unable to separate transaction method and extensions."),
             ParserError::Decoding(x) => {
@@ -1400,7 +1774,7 @@ pub enum MetadataError {
     NoVersionInConstants,
     RuntimeVersionNotDecodeable,
     Base58PrefixNotDecodeable,
-    Base58PrefixSpecsMismatch{specs: u16, meta: u16},
+    Base58PrefixSpecsMismatch { specs: u16, meta: u16 },
     NotMeta,
     UnableToDecode,
 }

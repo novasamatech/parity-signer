@@ -8,7 +8,7 @@ pub enum Modal {
     NewSeedMenu,
     NewSeedBackup(String),
     SeedMenu,
-    NetworkSelector(NetworkSpecsKey), 
+    NetworkSelector(NetworkSpecsKey),
     PasswordConfirm,
     SignatureReady(String),
     EnterPassword,

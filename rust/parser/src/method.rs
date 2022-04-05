@@ -1,28 +1,30 @@
-use frame_metadata::{v12::RuntimeMetadataV12, v13::RuntimeMetadataV13, decode_different::DecodeDifferent};
-use definitions::error::{ParserError, ParserDecodingError};
+use definitions::error::{ParserDecodingError, ParserError};
+use frame_metadata::{
+    decode_different::DecodeDifferent, v12::RuntimeMetadataV12, v13::RuntimeMetadataV13,
+};
 
 /// Struct to store the method information
-pub (crate) struct MethodOld {
-    pub (crate) pallet_name: String,
-    pub (crate) method_name: String,
-    pub (crate) arguments: Vec<Argument>,
-    pub (crate) docs: String,
+pub(crate) struct MethodOld {
+    pub(crate) pallet_name: String,
+    pub(crate) method_name: String,
+    pub(crate) arguments: Vec<Argument>,
+    pub(crate) docs: String,
 }
 
 /// Struct to store the argument name and type
-pub (crate) struct Argument {
-    pub (crate) name: String,
-    pub (crate) ty: String,
+pub(crate) struct Argument {
+    pub(crate) name: String,
+    pub(crate) ty: String,
 }
 
 /// Struct to store current method and remaining data
-pub (crate) struct NextDecodeOld {
-    pub (crate) method: MethodOld,
-    pub (crate) data: Vec<u8>,
+pub(crate) struct NextDecodeOld {
+    pub(crate) method: MethodOld,
+    pub(crate) data: Vec<u8>,
 }
 
 /// Enum to transfer around older metadata (V12 and V13)
-pub enum OlderMeta <'a> {
+pub enum OlderMeta<'a> {
     V12(&'a RuntimeMetadataV12),
     V13(&'a RuntimeMetadataV13),
 }
@@ -32,12 +34,16 @@ pub enum OlderMeta <'a> {
 /// Pallet index is explicitly recorded in network metadata as a number.
 /// Method index is ordinal number in vector of calls within pallet.
 
-fn find_method_v12 (pallet_index: u8, method_index: u8, meta: &RuntimeMetadataV12) -> Result<MethodOld, ParserError> {
+fn find_method_v12(
+    pallet_index: u8,
+    method_index: u8,
+    meta: &RuntimeMetadataV12,
+) -> Result<MethodOld, ParserError> {
     let mut found_pallet_name = None;
     let mut found_method_name = None;
     let mut docs = String::new();
     let mut arguments: Vec<Argument> = Vec::new();
-    
+
     if let DecodeDifferent::Decoded(meta_vector) = &meta.modules {
         for y in meta_vector.iter() {
             if y.index == pallet_index {
@@ -45,32 +51,55 @@ fn find_method_v12 (pallet_index: u8, method_index: u8, meta: &RuntimeMetadataV1
                     found_pallet_name = Some(name.to_string());
                 }
                 if let Some(DecodeDifferent::Decoded(calls)) = &y.calls {
-                    if calls.len() <= method_index.into() {return Err(ParserError::Decoding(ParserDecodingError::MethodIndexTooHigh{method_index, pallet_index, total: calls.len()}));}
+                    if calls.len() <= method_index.into() {
+                        return Err(ParserError::Decoding(
+                            ParserDecodingError::MethodIndexTooHigh {
+                                method_index,
+                                pallet_index,
+                                total: calls.len(),
+                            },
+                        ));
+                    }
                     if let DecodeDifferent::Decoded(nm) = &calls[method_index as usize].name {
                         found_method_name = Some(nm.to_string());
                     }
-                    if let DecodeDifferent::Decoded(docs_found) = &calls[method_index as usize].documentation {
+                    if let DecodeDifferent::Decoded(docs_found) =
+                        &calls[method_index as usize].documentation
+                    {
                         for (i, a) in docs_found.iter().enumerate() {
-                            if i>0 {docs.push_str("\n");}
+                            if i > 0 {
+                                docs.push('\n');
+                            }
                             docs.push_str(a);
                         }
                     }
-                    if let DecodeDifferent::Decoded(args) = &calls[method_index as usize].arguments {
+                    if let DecodeDifferent::Decoded(args) = &calls[method_index as usize].arguments
+                    {
                         for a in args.iter() {
                             let mut name_a = None;
                             let mut ty_a = None;
-                            if let DecodeDifferent::Decoded(b) = &a.name {name_a = Some(b.to_string())}
-                            if let DecodeDifferent::Decoded(c) = &a.ty {ty_a = Some(c.to_string())}
+                            if let DecodeDifferent::Decoded(b) = &a.name {
+                                name_a = Some(b.to_string())
+                            }
+                            if let DecodeDifferent::Decoded(c) = &a.ty {
+                                ty_a = Some(c.to_string())
+                            }
                             match name_a {
-                                Some(x) => {
-                                    match ty_a {
-                                        Some(y) => {
-                                            arguments.push(Argument{name: x, ty: y});
-                                        },
-                                        None => {return Err(ParserError::Decoding(ParserDecodingError::ArgumentTypeError))},
+                                Some(x) => match ty_a {
+                                    Some(y) => {
+                                        arguments.push(Argument { name: x, ty: y });
+                                    }
+                                    None => {
+                                        return Err(ParserError::Decoding(
+                                            ParserDecodingError::ArgumentTypeError,
+                                        ))
                                     }
                                 },
-                                None => {return Err(ParserError::Decoding(ParserDecodingError::ArgumentNameError))},
+                                None => {
+                                    return Err(ParserError::Decoding(
+                                        ParserDecodingError::ArgumentNameError,
+                                    ))
+                                }
                             }
                         }
                     }
@@ -80,21 +109,24 @@ fn find_method_v12 (pallet_index: u8, method_index: u8, meta: &RuntimeMetadataV1
         }
     }
     match found_pallet_name {
-        Some(x) => {
-            match found_method_name {
-                Some(y) => {
-                    let out = MethodOld {
-                        pallet_name: x,
-                        method_name: y,
-                        arguments,
-                        docs,
-                    };
-                    Ok(out)
-                },
-                None => return Err(ParserError::Decoding(ParserDecodingError::MethodNotFound{method_index, pallet_name: x})),
+        Some(x) => match found_method_name {
+            Some(y) => {
+                let out = MethodOld {
+                    pallet_name: x,
+                    method_name: y,
+                    arguments,
+                    docs,
+                };
+                Ok(out)
             }
+            None => Err(ParserError::Decoding(ParserDecodingError::MethodNotFound {
+                method_index,
+                pallet_name: x,
+            })),
         },
-        None => return Err(ParserError::Decoding(ParserDecodingError::PalletNotFound(pallet_index))),
+        None => Err(ParserError::Decoding(ParserDecodingError::PalletNotFound(
+            pallet_index,
+        ))),
     }
 }
 
@@ -103,12 +135,16 @@ fn find_method_v12 (pallet_index: u8, method_index: u8, meta: &RuntimeMetadataV1
 /// Pallet index is explicitly recorded in network metadata as a number.
 /// Method index is ordinal number in vector of calls within pallet.
 
-fn find_method_v13 (pallet_index: u8, method_index: u8, meta: &RuntimeMetadataV13) -> Result<MethodOld, ParserError> {
+fn find_method_v13(
+    pallet_index: u8,
+    method_index: u8,
+    meta: &RuntimeMetadataV13,
+) -> Result<MethodOld, ParserError> {
     let mut found_pallet_name = None;
     let mut found_method_name = None;
     let mut docs = String::new();
     let mut arguments: Vec<Argument> = Vec::new();
-    
+
     if let DecodeDifferent::Decoded(meta_vector) = &meta.modules {
         for y in meta_vector.iter() {
             if y.index == pallet_index {
@@ -116,32 +152,55 @@ fn find_method_v13 (pallet_index: u8, method_index: u8, meta: &RuntimeMetadataV1
                     found_pallet_name = Some(name.to_string());
                 }
                 if let Some(DecodeDifferent::Decoded(calls)) = &y.calls {
-                    if calls.len() <= method_index.into() {return Err(ParserError::Decoding(ParserDecodingError::MethodIndexTooHigh{method_index, pallet_index, total: calls.len()}));}
+                    if calls.len() <= method_index.into() {
+                        return Err(ParserError::Decoding(
+                            ParserDecodingError::MethodIndexTooHigh {
+                                method_index,
+                                pallet_index,
+                                total: calls.len(),
+                            },
+                        ));
+                    }
                     if let DecodeDifferent::Decoded(nm) = &calls[method_index as usize].name {
                         found_method_name = Some(nm.to_string());
                     }
-                    if let DecodeDifferent::Decoded(docs_found) = &calls[method_index as usize].documentation {
+                    if let DecodeDifferent::Decoded(docs_found) =
+                        &calls[method_index as usize].documentation
+                    {
                         for (i, a) in docs_found.iter().enumerate() {
-                            if i>0 {docs.push_str("\n");}
+                            if i > 0 {
+                                docs.push('\n');
+                            }
                             docs.push_str(a);
                         }
                     }
-                    if let DecodeDifferent::Decoded(args) = &calls[method_index as usize].arguments {
+                    if let DecodeDifferent::Decoded(args) = &calls[method_index as usize].arguments
+                    {
                         for a in args.iter() {
                             let mut name_a = None;
                             let mut ty_a = None;
-                            if let DecodeDifferent::Decoded(b) = &a.name {name_a = Some(b.to_string())}
-                            if let DecodeDifferent::Decoded(c) = &a.ty {ty_a = Some(c.to_string())}
+                            if let DecodeDifferent::Decoded(b) = &a.name {
+                                name_a = Some(b.to_string())
+                            }
+                            if let DecodeDifferent::Decoded(c) = &a.ty {
+                                ty_a = Some(c.to_string())
+                            }
                             match name_a {
-                                Some(x) => {
-                                    match ty_a {
-                                        Some(y) => {
-                                            arguments.push(Argument{name: x, ty: y});
-                                        },
-                                        None => {return Err(ParserError::Decoding(ParserDecodingError::ArgumentTypeError))},
+                                Some(x) => match ty_a {
+                                    Some(y) => {
+                                        arguments.push(Argument { name: x, ty: y });
+                                    }
+                                    None => {
+                                        return Err(ParserError::Decoding(
+                                            ParserDecodingError::ArgumentTypeError,
+                                        ))
                                     }
                                 },
-                                None => {return Err(ParserError::Decoding(ParserDecodingError::ArgumentNameError))},
+                                None => {
+                                    return Err(ParserError::Decoding(
+                                        ParserDecodingError::ArgumentNameError,
+                                    ))
+                                }
                             }
                         }
                     }
@@ -151,39 +210,42 @@ fn find_method_v13 (pallet_index: u8, method_index: u8, meta: &RuntimeMetadataV1
         }
     }
     match found_pallet_name {
-        Some(x) => {
-            match found_method_name {
-                Some(y) => {
-                    let out = MethodOld {
-                        pallet_name: x,
-                        method_name: y,
-                        arguments: arguments,
-                        docs,
-                    };
-                    Ok(out)
-                },
-                None => return Err(ParserError::Decoding(ParserDecodingError::MethodNotFound{method_index, pallet_name: x})),
+        Some(x) => match found_method_name {
+            Some(y) => {
+                let out = MethodOld {
+                    pallet_name: x,
+                    method_name: y,
+                    arguments,
+                    docs,
+                };
+                Ok(out)
             }
+            None => Err(ParserError::Decoding(ParserDecodingError::MethodNotFound {
+                method_index,
+                pallet_name: x,
+            })),
         },
-        None => return Err(ParserError::Decoding(ParserDecodingError::PalletNotFound(pallet_index))),
+        None => Err(ParserError::Decoding(ParserDecodingError::PalletNotFound(
+            pallet_index,
+        ))),
     }
 }
-
 
 /// Function to find method for current call for metadata in v12 or v13
 /// Outputs NextDecode value.
 
-pub (crate) fn what_next_old (data: Vec<u8>, meta: &OlderMeta) -> Result<NextDecodeOld, ParserError> {
-    if data.len() < 2 {return Err(ParserError::Decoding(ParserDecodingError::DataTooShort));}
+pub(crate) fn what_next_old(data: Vec<u8>, meta: &OlderMeta) -> Result<NextDecodeOld, ParserError> {
+    if data.len() < 2 {
+        return Err(ParserError::Decoding(ParserDecodingError::DataTooShort));
+    }
     let pallet_index = data[0];
     let method_index = data[1];
     let method = match meta {
         OlderMeta::V12(meta_v12) => find_method_v12(pallet_index, method_index, meta_v12)?,
         OlderMeta::V13(meta_v13) => find_method_v13(pallet_index, method_index, meta_v13)?,
     };
-    Ok(NextDecodeOld{
+    Ok(NextDecodeOld {
         method,
         data: data[2..].to_vec(),
     })
 }
-

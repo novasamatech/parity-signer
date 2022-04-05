@@ -9,7 +9,6 @@ fn main() -> Result<(), String> {
     };
     match full_run(command) {
         Ok(_) => Ok(()),
-        Err(e) => return Err(<Active>::show(&e)),
+        Err(e) => Err(<Active>::show(&e)),
     }
 }
-
