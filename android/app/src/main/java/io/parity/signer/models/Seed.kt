@@ -87,26 +87,6 @@ internal fun SignerDataModel.getSeed(seedName: String, backup: Boolean = false):
 
 }
 
-/**
- * Guess possible seed words from user input
- */
-internal fun SignerDataModel.guessWord(word: String): List<String> {
-	return JSONArray(substrateGuessWord(word)).toListOfStrings()
-}
-
-/**
- * Check if provided seed phrase is valid
- */
-internal fun SignerDataModel.validatePhrase(seedPhrase: String): String? {
-	var errorMessage: String? = null
-	try {
-		substrateValidateSeedphrase(seedPhrase)
-	} catch (e: java.lang.Exception) {
-		errorMessage = e.toString()
-	}
-	return errorMessage
-}
-
 fun SignerDataModel.removeSeed(seedName: String) {
 	authentication.authenticate(activity) {
 		try {
