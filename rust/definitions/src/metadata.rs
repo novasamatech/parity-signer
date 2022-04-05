@@ -586,12 +586,12 @@ mod tests {
         let filename = String::from("for_tests/westend9070");
         let meta = read_to_string(&filename).unwrap();
         let meta_values = MetaValues::from_str_metadata(
-            &meta.trim(),
+            meta.trim(),
             IncomingMetadataSourceActiveStr::Default { filename },
         )
         .unwrap();
         assert!(
-            meta_values.name == String::from("westend"),
+            meta_values.name == *"westend",
             "Unexpected network name: {}",
             meta_values.name
         );
@@ -607,12 +607,12 @@ mod tests {
         let filename = String::from("for_tests/westend9033");
         let meta = read_to_string(&filename).unwrap();
         let meta_values = MetaValues::from_str_metadata(
-            &meta.trim(),
+            meta.trim(),
             IncomingMetadataSourceActiveStr::Default { filename },
         )
         .unwrap();
         assert!(
-            meta_values.name == String::from("westend"),
+            meta_values.name == *"westend",
             "Unexpected network name: {}",
             meta_values.name
         );
@@ -628,12 +628,12 @@ mod tests {
         let filename = String::from("for_tests/westend9030");
         let meta = read_to_string(&filename).unwrap();
         let meta_values = MetaValues::from_str_metadata(
-            &meta.trim(),
+            meta.trim(),
             IncomingMetadataSourceActiveStr::Default { filename },
         )
         .unwrap();
         assert!(
-            meta_values.name == String::from("westend"),
+            meta_values.name == *"westend",
             "Unexpected network name: {}",
             meta_values.name
         );
@@ -649,12 +649,12 @@ mod tests {
         let filename = String::from("for_tests/rococo9004");
         let meta = read_to_string(&filename).unwrap();
         let meta_values = MetaValues::from_str_metadata(
-            &meta.trim(),
+            meta.trim(),
             IncomingMetadataSourceActiveStr::Default { filename },
         )
         .unwrap();
         assert!(
-            meta_values.name == String::from("rococo"),
+            meta_values.name == *"rococo",
             "Unexpected network name: {}",
             meta_values.name
         );
@@ -670,12 +670,12 @@ mod tests {
         let filename = String::from("for_tests/rococo9002");
         let meta = read_to_string(&filename).unwrap();
         let meta_values = MetaValues::from_str_metadata(
-            &meta.trim(),
+            meta.trim(),
             IncomingMetadataSourceActiveStr::Default { filename },
         )
         .unwrap();
         assert!(
-            meta_values.name == String::from("rococo"),
+            meta_values.name == *"rococo",
             "Unexpected network name: {}",
             meta_values.name
         );
@@ -691,12 +691,12 @@ mod tests {
         let filename = String::from("for_tests/polkadot9080");
         let meta = read_to_string(&filename).unwrap();
         let meta_values = MetaValues::from_str_metadata(
-            &meta.trim(),
+            meta.trim(),
             IncomingMetadataSourceActiveStr::Default { filename },
         )
         .unwrap();
         assert!(
-            meta_values.name == String::from("polkadot"),
+            meta_values.name == *"polkadot",
             "Unexpected network name: {}",
             meta_values.name
         );
@@ -712,12 +712,12 @@ mod tests {
         let filename = String::from("for_tests/polkadot30");
         let meta = read_to_string(&filename).unwrap();
         let meta_values = MetaValues::from_str_metadata(
-            &meta.trim(),
+            meta.trim(),
             IncomingMetadataSourceActiveStr::Default { filename },
         )
         .unwrap();
         assert!(
-            meta_values.name == String::from("polkadot"),
+            meta_values.name == *"polkadot",
             "Unexpected network name: {}",
             meta_values.name
         );
@@ -733,12 +733,12 @@ mod tests {
         let filename = String::from("for_tests/polkadot29");
         let meta = read_to_string(&filename).unwrap();
         let meta_values = MetaValues::from_str_metadata(
-            &meta.trim(),
+            meta.trim(),
             IncomingMetadataSourceActiveStr::Default { filename },
         )
         .unwrap();
         assert!(
-            meta_values.name == String::from("polkadot"),
+            meta_values.name == *"polkadot",
             "Unexpected network name: {}",
             meta_values.name
         );
@@ -754,12 +754,12 @@ mod tests {
         let filename = String::from("for_tests/kusama9040");
         let meta = read_to_string(&filename).unwrap();
         let meta_values = MetaValues::from_str_metadata(
-            &meta.trim(),
+            meta.trim(),
             IncomingMetadataSourceActiveStr::Default { filename },
         )
         .unwrap();
         assert!(
-            meta_values.name == String::from("kusama"),
+            meta_values.name == *"kusama",
             "Unexpected network name: {}",
             meta_values.name
         );
@@ -775,12 +775,12 @@ mod tests {
         let filename = String::from("for_tests/kusama9010");
         let meta = read_to_string(&filename).unwrap();
         let meta_values = MetaValues::from_str_metadata(
-            &meta.trim(),
+            meta.trim(),
             IncomingMetadataSourceActiveStr::Default { filename },
         )
         .unwrap();
         assert!(
-            meta_values.name == String::from("kusama"),
+            meta_values.name == *"kusama",
             "Unexpected network name: {}",
             meta_values.name
         );
@@ -802,7 +802,7 @@ mod tests {
             },
         ));
         match MetaValues::from_str_metadata(
-            &meta.trim(),
+            meta.trim(),
             IncomingMetadataSourceActiveStr::Default { filename },
         ) {
             Ok(x) => panic!("Unexpectedly decoded as {} version {}", x.name, x.version),
@@ -827,7 +827,7 @@ mod tests {
             },
         ));
         match MetaValues::from_str_metadata(
-            &meta.trim(),
+            meta.trim(),
             IncomingMetadataSourceActiveStr::Default { filename },
         ) {
             Ok(x) => panic!("Unexpectedly decoded as {} version {}", x.name, x.version),
@@ -846,12 +846,12 @@ mod tests {
         let filename = String::from("for_tests/westend9150");
         let meta = read_to_string(&filename).unwrap();
         let meta_values = MetaValues::from_str_metadata(
-            &meta.trim(),
+            meta.trim(),
             IncomingMetadataSourceActiveStr::Default { filename },
         )
         .unwrap();
         assert!(
-            meta_values.name == String::from("westend"),
+            meta_values.name == *"westend",
             "Unexpected network name: {}",
             meta_values.name
         );
@@ -871,12 +871,12 @@ mod tests {
         let filename = String::from("for_tests/shell200");
         let meta = read_to_string(&filename).unwrap();
         let meta_values = MetaValues::from_str_metadata(
-            &meta.trim(),
+            meta.trim(),
             IncomingMetadataSourceActiveStr::Default { filename },
         )
         .unwrap();
         assert!(
-            meta_values.name == String::from("shell"),
+            meta_values.name == *"shell",
             "Unexpected network name: {}",
             meta_values.name
         );

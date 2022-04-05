@@ -65,6 +65,7 @@ fn sort_metavalues(meta_values: Vec<MetaValues>) -> Result<SortedMetaValues, Err
                     }
                     Ordering::Greater => num_new = Some(i),
                 }
+
                 break;
             }
         }

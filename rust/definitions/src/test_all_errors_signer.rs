@@ -972,7 +972,7 @@ mod tests {
         let mut print = String::from("\n");
         for e in error_signer().iter() {
             print.push_str(&format!("\"{}\"", <Signer>::show(e)));
-            print.push_str("\n");
+            print.push('\n');
         }
         let print_expected = r#"
 "Error on the interface. Network specs key 0xabracadabra is not in hexadecimal format."
