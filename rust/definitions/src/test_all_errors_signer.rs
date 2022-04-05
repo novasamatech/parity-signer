@@ -34,40 +34,35 @@ fn verifier_value_ed25519() -> VerifierValue {
 }
 
 fn db_internal_error_set() -> Vec<sled::Error> {
-    let mut out: Vec<sled::Error> = Vec::new();
-    out.push(sled::Error::CollectionNotFound(IVec::from(vec![1])));
-    out.push(sled::Error::Unsupported(String::from(
-        "Something Unsupported.",
-    )));
-    out.push(sled::Error::ReportableBug(String::from("Please report me")));
-    out.push(sled::Error::Io(std::io::Error::new(
-        std::io::ErrorKind::Other,
-        "oh no!",
-    )));
-    out.push(sled::Error::Corruption { at: None, bt: () });
-    out
+    vec![
+        sled::Error::CollectionNotFound(IVec::from(vec![1])),
+        sled::Error::Unsupported(String::from("Something Unsupported.")),
+        sled::Error::ReportableBug(String::from("Please report me")),
+        sled::Error::Io(std::io::Error::new(std::io::ErrorKind::Other, "oh no!")),
+        sled::Error::Corruption { at: None, bt: () },
+    ]
 }
 
 fn metadata_error_set() -> Vec<MetadataError> {
-    let mut out: Vec<MetadataError> = Vec::new();
-    out.push(MetadataError::VersionIncompatible);
-    out.push(MetadataError::NoSystemPallet);
-    out.push(MetadataError::NoVersionInConstants);
-    out.push(MetadataError::RuntimeVersionNotDecodeable);
-    out.push(MetadataError::NotMeta);
-    out.push(MetadataError::UnableToDecode);
-    out
+    vec![
+        MetadataError::VersionIncompatible,
+        MetadataError::NoSystemPallet,
+        MetadataError::NoVersionInConstants,
+        MetadataError::RuntimeVersionNotDecodeable,
+        MetadataError::NotMeta,
+        MetadataError::UnableToDecode,
+    ]
 }
 
 fn secret_string_error_set() -> Vec<SecretStringError> {
-    let mut out: Vec<SecretStringError> = Vec::new();
-    out.push(SecretStringError::InvalidFormat);
-    out.push(SecretStringError::InvalidPhrase);
-    out.push(SecretStringError::InvalidPassword);
-    out.push(SecretStringError::InvalidSeed);
-    out.push(SecretStringError::InvalidSeedLength);
-    out.push(SecretStringError::InvalidPath);
-    out
+    vec![
+        SecretStringError::InvalidFormat,
+        SecretStringError::InvalidPhrase,
+        SecretStringError::InvalidPassword,
+        SecretStringError::InvalidSeed,
+        SecretStringError::InvalidSeedLength,
+        SecretStringError::InvalidPath,
+    ]
 }
 
 fn content() -> Vec<GeneralVerifierForContent> {
@@ -80,15 +75,15 @@ fn content() -> Vec<GeneralVerifierForContent> {
 }
 
 fn parser_metadata_error_set() -> Vec<ParserMetadataError> {
-    let mut out: Vec<ParserMetadataError> = Vec::new();
-    out.push(ParserMetadataError::NoEra);
-    out.push(ParserMetadataError::NoBlockHash);
-    out.push(ParserMetadataError::NoVersionExt);
-    out.push(ParserMetadataError::EraTwice);
-    out.push(ParserMetadataError::GenesisHashTwice);
-    out.push(ParserMetadataError::BlockHashTwice);
-    out.push(ParserMetadataError::SpecVersionTwice);
-    out
+    vec![
+        ParserMetadataError::NoEra,
+        ParserMetadataError::NoBlockHash,
+        ParserMetadataError::NoVersionExt,
+        ParserMetadataError::EraTwice,
+        ParserMetadataError::GenesisHashTwice,
+        ParserMetadataError::BlockHashTwice,
+        ParserMetadataError::SpecVersionTwice,
+    ]
 }
 
 fn all_ext_parsing_failed_set() -> Vec<(u32, ParserError)> {
@@ -137,19 +132,17 @@ pub fn signer_errors() -> Vec<ErrorSigner> {
     );
     let valid_current_verifier = ValidCurrentVerifier::General;
 
-    let mut error_set: Vec<ErrorSigner> = Vec::new();
-
-    error_set.push(ErrorSigner::Interface(InterfaceSigner::NotHex(
+    let mut error_set = vec![ErrorSigner::Interface(InterfaceSigner::NotHex(
         NotHexSigner::NetworkSpecsKey {
             input: not_hex_string.to_string(),
         },
-    )));
+    ))];
     error_set.push(ErrorSigner::Interface(InterfaceSigner::NotHex(
         NotHexSigner::InputContent,
     )));
     error_set.push(ErrorSigner::Interface(InterfaceSigner::NotHex(
         NotHexSigner::AddressKey {
-            input: not_hex_string.to_string(),
+            input: not_hex_string,
         },
     )));
     error_set.push(ErrorSigner::Interface(InterfaceSigner::KeyDecoding(
@@ -167,13 +160,13 @@ pub fn signer_errors() -> Vec<ErrorSigner> {
     ));
 
     error_set.push(ErrorSigner::Database(DatabaseSigner::KeyDecoding(
-        KeyDecodingSignerDb::AddressKey(address_key_bad.to_owned()),
+        KeyDecodingSignerDb::AddressKey(address_key_bad),
     )));
     error_set.push(ErrorSigner::Database(DatabaseSigner::KeyDecoding(
-        KeyDecodingSignerDb::EntryOrder(entry_order_vec.to_owned()),
+        KeyDecodingSignerDb::EntryOrder(entry_order_vec),
     )));
     error_set.push(ErrorSigner::Database(DatabaseSigner::KeyDecoding(
-        KeyDecodingSignerDb::MetaKey(meta_key.to_owned()),
+        KeyDecodingSignerDb::MetaKey(meta_key),
     )));
     error_set.push(ErrorSigner::Database(DatabaseSigner::KeyDecoding(
         KeyDecodingSignerDb::NetworkSpecsKey(network_specs_key_bad.to_owned()),
@@ -324,7 +317,7 @@ pub fn signer_errors() -> Vec<ErrorSigner> {
     }));
     error_set.push(ErrorSigner::Input(InputSigner::LoadMetaNoSpecs {
         name: String::from("westend"),
-        valid_current_verifier: valid_current_verifier.to_owned(),
+        valid_current_verifier,
         general_verifier: verifier_sr25519(),
     }));
     error_set.push(ErrorSigner::Input(InputSigner::NeedVerifier {
@@ -391,19 +384,19 @@ pub fn signer_errors() -> Vec<ErrorSigner> {
     error_set.push(ErrorSigner::NotFound(NotFoundSigner::GeneralVerifier));
     error_set.push(ErrorSigner::NotFound(NotFoundSigner::Types));
     error_set.push(ErrorSigner::NotFound(NotFoundSigner::NetworkSpecs(
-        network_specs_key_bad.to_owned(),
+        network_specs_key_bad,
     )));
     error_set.push(ErrorSigner::NotFound(NotFoundSigner::NetworkSpecsForName(
         String::from("westend"),
     )));
     error_set.push(ErrorSigner::NotFound(
         NotFoundSigner::NetworkSpecsKeyForAddress {
-            network_specs_key: network_specs_key_good.to_owned(),
+            network_specs_key: network_specs_key_good,
             address_key: address_key_good.to_owned(),
         },
     ));
     error_set.push(ErrorSigner::NotFound(NotFoundSigner::AddressDetails(
-        address_key_good.to_owned(),
+        address_key_good,
     )));
     error_set.push(ErrorSigner::NotFound(NotFoundSigner::Metadata {
         name: String::from("westend"),
@@ -422,7 +415,7 @@ pub fn signer_errors() -> Vec<ErrorSigner> {
         name: String::from("kulupu"),
     }));
 
-    error_set.push(ErrorSigner::DeadVerifier(verifier_key.to_owned()));
+    error_set.push(ErrorSigner::DeadVerifier(verifier_key));
 
     error_set.push(ErrorSigner::AddressGeneration(AddressGeneration::Common(
         AddressGenerationCommon::EncryptionMismatch {
@@ -590,7 +583,7 @@ mod tests {
         );
         for e in signer_errors.iter() {
             print.push_str(&format!("\"{}\"", <Signer>::show(e)));
-            print.push_str("\n");
+            print.push('\n');
         }
         let print_expected = r#"
 "Error on the interface. Network specs key 0xabracadabra is not in hexadecimal format."

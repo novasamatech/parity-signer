@@ -146,17 +146,13 @@ impl Command {
                         Some(show) => match show.to_lowercase().as_str() {
                             "-database" => Ok(Command::Show(Show::Database)),
                             "-address_book" => Ok(Command::Show(Show::AddressBook)),
-                            _ => {
-                                return Err(ErrorActive::CommandParser(
-                                    CommandParser::UnexpectedKeyArgumentSequence,
-                                ))
-                            }
+                            _ => Err(ErrorActive::CommandParser(
+                                CommandParser::UnexpectedKeyArgumentSequence,
+                            )),
                         },
-                        None => {
-                            return Err(ErrorActive::CommandParser(CommandParser::NeedKey(
-                                CommandNeedKey::Show,
-                            )))
-                        }
+                        None => Err(ErrorActive::CommandParser(CommandParser::NeedKey(
+                            CommandNeedKey::Show,
+                        ))),
                     },
                     "load_types" => Ok(Command::Types),
                     "load_metadata" | "add_specs" => {
@@ -167,90 +163,106 @@ impl Command {
                         let mut encryption_override_key = None;
                         let mut token = None;
 
-                        loop {
-                            match args.next() {
-                                Some(x) => {
-                                    let x = x.to_lowercase();
-                                    if x.starts_with("-") {
-                                        match x.as_str() {
-                                            "-a" | "-n" | "-u" => match content_key {
-                                                Some(_) => {
-                                                    return Err(ErrorActive::CommandParser(
-                                                        CommandParser::DoubleKey(
-                                                            CommandDoubleKey::Content,
-                                                        ),
-                                                    ))
-                                                }
-                                                None => content_key = Some(x),
-                                            },
-                                            "-d" | "-f" | "-k" | "-p" | "-t" => match set_key {
-                                                Some(_) => {
-                                                    return Err(ErrorActive::CommandParser(
-                                                        CommandParser::DoubleKey(
-                                                            CommandDoubleKey::Set,
-                                                        ),
-                                                    ))
-                                                }
-                                                None => set_key = Some(x),
-                                            },
-                                            "-s" => pass_errors = false,
-                                            "-ed25519" | "-sr25519" | "-ecdsa" => {
-                                                if arg == "load_metadata" {
-                                                    return Err(ErrorActive::CommandParser(CommandParser::UnexpectedKeyArgumentSequence));
-                                                }
-                                                match encryption_override_key {
-                                                    Some(_) => {
+                        while let Some(x) = args.next() {
+                            let x = x.to_lowercase();
+                            if x.starts_with('-') {
+                                match x.as_str() {
+                                    "-a" | "-n" | "-u" => match content_key {
+                                        Some(_) => {
+                                            return Err(ErrorActive::CommandParser(
+                                                CommandParser::DoubleKey(CommandDoubleKey::Content),
+                                            ))
+                                        }
+                                        None => content_key = Some(x),
+                                    },
+                                    "-d" | "-f" | "-k" | "-p" | "-t" => match set_key {
+                                        Some(_) => {
+                                            return Err(ErrorActive::CommandParser(
+                                                CommandParser::DoubleKey(CommandDoubleKey::Set),
+                                            ))
+                                        }
+                                        None => set_key = Some(x),
+                                    },
+                                    "-s" => pass_errors = false,
+                                    "-ed25519" | "-sr25519" | "-ecdsa" => {
+                                        if arg == "load_metadata" {
+                                            return Err(ErrorActive::CommandParser(
+                                                CommandParser::UnexpectedKeyArgumentSequence,
+                                            ));
+                                        }
+                                        match encryption_override_key {
+                                            Some(_) => {
+                                                return Err(ErrorActive::CommandParser(
+                                                    CommandParser::DoubleKey(
+                                                        CommandDoubleKey::CryptoOverride,
+                                                    ),
+                                                ))
+                                            }
+                                            None => encryption_override_key = Some(x),
+                                        }
+                                    }
+                                    "-token" => {
+                                        if arg == "load_metadata" {
+                                            return Err(ErrorActive::CommandParser(
+                                                CommandParser::UnexpectedKeyArgumentSequence,
+                                            ));
+                                        }
+                                        match token {
+                                            Some(_) => {
+                                                return Err(ErrorActive::CommandParser(
+                                                    CommandParser::DoubleKey(
+                                                        CommandDoubleKey::TokenOverride,
+                                                    ),
+                                                ))
+                                            }
+                                            None => token = match args.next() {
+                                                Some(b) => match b.parse::<u8>() {
+                                                    Ok(decimals) => match args.next() {
+                                                        Some(c) => Some(TokenOverride {
+                                                            decimals,
+                                                            unit: c.to_string(),
+                                                        }),
+                                                        None => {
+                                                            return Err(ErrorActive::CommandParser(
+                                                                CommandParser::NeedArgument(
+                                                                    CommandNeedArgument::TokenUnit,
+                                                                ),
+                                                            ))
+                                                        }
+                                                    },
+                                                    Err(_) => {
                                                         return Err(ErrorActive::CommandParser(
-                                                            CommandParser::DoubleKey(
-                                                                CommandDoubleKey::CryptoOverride,
+                                                            CommandParser::Unexpected(
+                                                                CommandUnexpected::DecimalsFormat,
                                                             ),
                                                         ))
                                                     }
-                                                    None => encryption_override_key = Some(x),
+                                                },
+                                                None => {
+                                                    return Err(ErrorActive::CommandParser(
+                                                        CommandParser::NeedArgument(
+                                                            CommandNeedArgument::TokenDecimals,
+                                                        ),
+                                                    ))
                                                 }
-                                            }
-                                            "-token" => {
-                                                if arg == "load_metadata" {
-                                                    return Err(ErrorActive::CommandParser(CommandParser::UnexpectedKeyArgumentSequence));
-                                                }
-                                                match token {
-                                                    Some(_) => return Err(ErrorActive::CommandParser(CommandParser::DoubleKey(CommandDoubleKey::TokenOverride))),
-                                                    None => {
-                                                        token = match args.next() {
-                                                            Some(b) => {
-                                                                match b.parse::<u8> () {
-                                                                    Ok(decimals) => {
-                                                                       match args.next() {
-                                                                           Some(c) => Some(TokenOverride{decimals, unit: c.to_string()}),
-                                                                           None => return Err(ErrorActive::CommandParser(CommandParser::NeedArgument(CommandNeedArgument::TokenUnit)))
-                                                                       }
-                                                                    },
-                                                                    Err(_) => return Err(ErrorActive::CommandParser(CommandParser::Unexpected(CommandUnexpected::DecimalsFormat))),
-                                                                }
-                                                            },
-                                                            None => return Err(ErrorActive::CommandParser(CommandParser::NeedArgument(CommandNeedArgument::TokenDecimals)))
-                                                        }
-                                                    },
-                                                }
-                                            }
-                                            _ => {
-                                                return Err(ErrorActive::CommandParser(
-                                                    CommandParser::UnexpectedKeyArgumentSequence,
-                                                ))
-                                            }
-                                        }
-                                    } else {
-                                        match name {
-                                            Some(_) => {
-                                                return Err(ErrorActive::CommandParser(
-                                                    CommandParser::OnlyOneNetworkId,
-                                                ))
-                                            }
-                                            None => name = Some(x),
+                                            },
                                         }
                                     }
+                                    _ => {
+                                        return Err(ErrorActive::CommandParser(
+                                            CommandParser::UnexpectedKeyArgumentSequence,
+                                        ))
+                                    }
                                 }
-                                None => break,
+                            } else {
+                                match name {
+                                    Some(_) => {
+                                        return Err(ErrorActive::CommandParser(
+                                            CommandParser::OnlyOneNetworkId,
+                                        ))
+                                    }
+                                    None => name = Some(x),
+                                }
                             }
                         }
 
@@ -280,7 +292,7 @@ impl Command {
                         let content = match content_key {
                             Some(x) => match x.as_str() {
                                 "-a" => {
-                                    if let Some(_) = name {
+                                    if name.is_some() {
                                         return Err(ErrorActive::CommandParser(
                                             CommandParser::Unexpected(
                                                 CommandUnexpected::KeyAContent,
@@ -358,177 +370,196 @@ impl Command {
                         let mut payload_found = None;
                         let mut signature_found = None;
                         let mut name = None; // default option for `make`
-                        loop {
-                            match args.next() {
-                                Some(x) => {
-                                    let x = x.to_lowercase();
-                                    match x.as_str() {
-                                        "-crypto" => {
-                                            if let Some(_) = crypto_type_found {
+                        while let Some(x) = args.next() {
+                            let x = x.to_lowercase();
+                            match x.as_str() {
+                                "-crypto" => {
+                                    if crypto_type_found.is_some() {
+                                        return Err(ErrorActive::CommandParser(
+                                            CommandParser::DoubleKey(CommandDoubleKey::CryptoKey),
+                                        ));
+                                    }
+                                    crypto_type_found = match args.next() {
+                                        Some(x) => match x.to_lowercase().as_str() {
+                                            "ed25519" => Some(CryptoType::Ed25519),
+                                            "sr25519" => Some(CryptoType::Sr25519),
+                                            "ecdsa" => Some(CryptoType::Ecdsa),
+                                            "none" => Some(CryptoType::None),
+                                            _ => {
                                                 return Err(ErrorActive::CommandParser(
-                                                    CommandParser::DoubleKey(
-                                                        CommandDoubleKey::CryptoKey,
+                                                    CommandParser::BadArgument(
+                                                        CommandBadArgument::CryptoKey,
                                                     ),
-                                                ));
+                                                ))
                                             }
-                                            crypto_type_found = match args.next() {
-                                                Some(x) => match x.to_lowercase().as_str() {
-                                                    "ed25519" => Some(CryptoType::Ed25519),
-                                                    "sr25519" => Some(CryptoType::Sr25519),
-                                                    "ecdsa" => Some(CryptoType::Ecdsa),
-                                                    "none" => Some(CryptoType::None),
-                                                    _ => {
-                                                        return Err(ErrorActive::CommandParser(
-                                                            CommandParser::BadArgument(
-                                                                CommandBadArgument::CryptoKey,
-                                                            ),
-                                                        ))
-                                                    }
-                                                },
-                                                None => {
-                                                    return Err(ErrorActive::CommandParser(
-                                                        CommandParser::NeedArgument(
-                                                            CommandNeedArgument::CryptoKey,
-                                                        ),
-                                                    ))
-                                                }
-                                            };
-                                        }
-                                        "-msgtype" => {
-                                            if let Some(_) = msg_type_found {
-                                                return Err(ErrorActive::CommandParser(
-                                                    CommandParser::DoubleKey(
-                                                        CommandDoubleKey::MsgType,
-                                                    ),
-                                                ));
-                                            }
-                                            msg_type_found = match args.next() {
-                                                Some(x) => match x.to_lowercase().as_str() {
-                                                    "load_types" => Some(MsgType::LoadTypes),
-                                                    "load_metadata" => Some(MsgType::LoadMetadata),
-                                                    "add_specs" => Some(MsgType::AddSpecs),
-                                                    _ => {
-                                                        return Err(ErrorActive::CommandParser(
-                                                            CommandParser::BadArgument(
-                                                                CommandBadArgument::MsgType,
-                                                            ),
-                                                        ))
-                                                    }
-                                                },
-                                                None => {
-                                                    return Err(ErrorActive::CommandParser(
-                                                        CommandParser::NeedArgument(
-                                                            CommandNeedArgument::MsgType,
-                                                        ),
-                                                    ))
-                                                }
-                                            };
-                                        }
-                                        "-verifier" => {
-                                            if let Some(_) = verifier_found {
-                                                return Err(ErrorActive::CommandParser(
-                                                    CommandParser::DoubleKey(
-                                                        CommandDoubleKey::Verifier,
-                                                    ),
-                                                ));
-                                            }
-                                            verifier_found = match args.next() {
-                                                Some(x) => {
-                                                    match x.to_lowercase().as_str() {
-                                                        "-hex" => {
-                                                            match args.next() {
-                                                                Some(h) => Some(VerKey::Hex(h.to_string())),
-                                                                None => return Err(ErrorActive::CommandParser(CommandParser::NeedArgument(CommandNeedArgument::VerifierHex))),
-                                                            }
-                                                        },
-                                                        "-file" => {
-                                                            match args.next() {
-                                                                Some(f) => Some(VerKey::File(f.to_string())),
-                                                                None => return Err(ErrorActive::CommandParser(CommandParser::NeedArgument(CommandNeedArgument::VerifierFile))),
-                                                            }
-                                                        },
-                                                        "alice" => Some(VerKey::Alice),
-                                                        _ => return Err(ErrorActive::CommandParser(CommandParser::BadArgument(CommandBadArgument::Verifier))),
-                                                    }
-                                                },
-                                                None => return Err(ErrorActive::CommandParser(CommandParser::NeedArgument(CommandNeedArgument::Verifier))),
-                                            };
-                                        }
-                                        "-payload" => {
-                                            if let Some(_) = payload_found {
-                                                return Err(ErrorActive::CommandParser(
-                                                    CommandParser::DoubleKey(
-                                                        CommandDoubleKey::Payload,
-                                                    ),
-                                                ));
-                                            }
-                                            payload_found = match args.next() {
-                                                Some(x) => Some(x.to_string()),
-                                                None => {
-                                                    return Err(ErrorActive::CommandParser(
-                                                        CommandParser::NeedArgument(
-                                                            CommandNeedArgument::Payload,
-                                                        ),
-                                                    ))
-                                                }
-                                            };
-                                        }
-                                        "-signature" => {
-                                            if let Some(_) = signature_found {
-                                                return Err(ErrorActive::CommandParser(
-                                                    CommandParser::DoubleKey(
-                                                        CommandDoubleKey::Signature,
-                                                    ),
-                                                ));
-                                            }
-                                            signature_found = match args.next() {
-                                                Some(x) => {
-                                                    match x.as_str() {
-                                                        "-hex" => {
-                                                            match args.next() {
-                                                                Some(h) => Some(Entry::Hex(h.to_string())),
-                                                                None => return Err(ErrorActive::CommandParser(CommandParser::NeedArgument(CommandNeedArgument::SignatureHex))),
-                                                            }
-                                                        },
-                                                        "-file" => {
-                                                            match args.next() {
-                                                                Some(f) => Some(Entry::File(f.to_string())),
-                                                                None => return Err(ErrorActive::CommandParser(CommandParser::NeedArgument(CommandNeedArgument::SignatureFile))),
-                                                            }
-                                                        },
-                                                        _ => return Err(ErrorActive::CommandParser(CommandParser::BadArgument(CommandBadArgument::Signature))),
-                                                    }
-                                                },
-                                                None => return Err(ErrorActive::CommandParser(CommandParser::NeedArgument(CommandNeedArgument::Signature))),
-                                            }
-                                        }
-                                        "-name" => {
-                                            if let Some(_) = name {
-                                                return Err(ErrorActive::CommandParser(
-                                                    CommandParser::DoubleKey(
-                                                        CommandDoubleKey::Name,
-                                                    ),
-                                                ));
-                                            }
-                                            name = match args.next() {
-                                                Some(x) => Some(format!("{}/{}", EXPORT_FOLDER, x)),
-                                                None => {
-                                                    return Err(ErrorActive::CommandParser(
-                                                        CommandParser::NeedArgument(
-                                                            CommandNeedArgument::Name,
-                                                        ),
-                                                    ))
-                                                }
-                                            };
-                                        }
-                                        _ => {
+                                        },
+                                        None => {
                                             return Err(ErrorActive::CommandParser(
-                                                CommandParser::UnexpectedKeyArgumentSequence,
+                                                CommandParser::NeedArgument(
+                                                    CommandNeedArgument::CryptoKey,
+                                                ),
+                                            ))
+                                        }
+                                    };
+                                }
+                                "-msgtype" => {
+                                    if msg_type_found.is_some() {
+                                        return Err(ErrorActive::CommandParser(
+                                            CommandParser::DoubleKey(CommandDoubleKey::MsgType),
+                                        ));
+                                    }
+                                    msg_type_found = match args.next() {
+                                        Some(x) => match x.to_lowercase().as_str() {
+                                            "load_types" => Some(MsgType::LoadTypes),
+                                            "load_metadata" => Some(MsgType::LoadMetadata),
+                                            "add_specs" => Some(MsgType::AddSpecs),
+                                            _ => {
+                                                return Err(ErrorActive::CommandParser(
+                                                    CommandParser::BadArgument(
+                                                        CommandBadArgument::MsgType,
+                                                    ),
+                                                ))
+                                            }
+                                        },
+                                        None => {
+                                            return Err(ErrorActive::CommandParser(
+                                                CommandParser::NeedArgument(
+                                                    CommandNeedArgument::MsgType,
+                                                ),
+                                            ))
+                                        }
+                                    };
+                                }
+                                "-verifier" => {
+                                    if verifier_found.is_some() {
+                                        return Err(ErrorActive::CommandParser(
+                                            CommandParser::DoubleKey(CommandDoubleKey::Verifier),
+                                        ));
+                                    }
+                                    verifier_found = match args.next() {
+                                        Some(x) => match x.to_lowercase().as_str() {
+                                            "-hex" => match args.next() {
+                                                Some(h) => Some(VerKey::Hex(h.to_string())),
+                                                None => {
+                                                    return Err(ErrorActive::CommandParser(
+                                                        CommandParser::NeedArgument(
+                                                            CommandNeedArgument::VerifierHex,
+                                                        ),
+                                                    ))
+                                                }
+                                            },
+                                            "-file" => match args.next() {
+                                                Some(f) => Some(VerKey::File(f.to_string())),
+                                                None => {
+                                                    return Err(ErrorActive::CommandParser(
+                                                        CommandParser::NeedArgument(
+                                                            CommandNeedArgument::VerifierFile,
+                                                        ),
+                                                    ))
+                                                }
+                                            },
+                                            "alice" => Some(VerKey::Alice),
+                                            _ => {
+                                                return Err(ErrorActive::CommandParser(
+                                                    CommandParser::BadArgument(
+                                                        CommandBadArgument::Verifier,
+                                                    ),
+                                                ))
+                                            }
+                                        },
+                                        None => {
+                                            return Err(ErrorActive::CommandParser(
+                                                CommandParser::NeedArgument(
+                                                    CommandNeedArgument::Verifier,
+                                                ),
+                                            ))
+                                        }
+                                    };
+                                }
+                                "-payload" => {
+                                    if payload_found.is_some() {
+                                        return Err(ErrorActive::CommandParser(
+                                            CommandParser::DoubleKey(CommandDoubleKey::Payload),
+                                        ));
+                                    }
+                                    payload_found = match args.next() {
+                                        Some(x) => Some(x.to_string()),
+                                        None => {
+                                            return Err(ErrorActive::CommandParser(
+                                                CommandParser::NeedArgument(
+                                                    CommandNeedArgument::Payload,
+                                                ),
+                                            ))
+                                        }
+                                    };
+                                }
+                                "-signature" => {
+                                    if signature_found.is_some() {
+                                        return Err(ErrorActive::CommandParser(
+                                            CommandParser::DoubleKey(CommandDoubleKey::Signature),
+                                        ));
+                                    }
+                                    signature_found = match args.next() {
+                                        Some(x) => match x.as_str() {
+                                            "-hex" => match args.next() {
+                                                Some(h) => Some(Entry::Hex(h.to_string())),
+                                                None => {
+                                                    return Err(ErrorActive::CommandParser(
+                                                        CommandParser::NeedArgument(
+                                                            CommandNeedArgument::SignatureHex,
+                                                        ),
+                                                    ))
+                                                }
+                                            },
+                                            "-file" => match args.next() {
+                                                Some(f) => Some(Entry::File(f.to_string())),
+                                                None => {
+                                                    return Err(ErrorActive::CommandParser(
+                                                        CommandParser::NeedArgument(
+                                                            CommandNeedArgument::SignatureFile,
+                                                        ),
+                                                    ))
+                                                }
+                                            },
+                                            _ => {
+                                                return Err(ErrorActive::CommandParser(
+                                                    CommandParser::BadArgument(
+                                                        CommandBadArgument::Signature,
+                                                    ),
+                                                ))
+                                            }
+                                        },
+                                        None => {
+                                            return Err(ErrorActive::CommandParser(
+                                                CommandParser::NeedArgument(
+                                                    CommandNeedArgument::Signature,
+                                                ),
                                             ))
                                         }
                                     }
                                 }
-                                None => break,
+                                "-name" => {
+                                    if name.is_some() {
+                                        return Err(ErrorActive::CommandParser(
+                                            CommandParser::DoubleKey(CommandDoubleKey::Name),
+                                        ));
+                                    }
+                                    name = match args.next() {
+                                        Some(x) => Some(format!("{}/{}", EXPORT_FOLDER, x)),
+                                        None => {
+                                            return Err(ErrorActive::CommandParser(
+                                                CommandParser::NeedArgument(
+                                                    CommandNeedArgument::Name,
+                                                ),
+                                            ))
+                                        }
+                                    };
+                                }
+                                _ => {
+                                    return Err(ErrorActive::CommandParser(
+                                        CommandParser::UnexpectedKeyArgumentSequence,
+                                    ))
+                                }
                             }
                         }
                         // finalize what was parsed for `make`
@@ -550,14 +581,14 @@ impl Command {
                                     Encryption::Ecdsa,
                                 )?,
                                 CryptoType::None => {
-                                    if let Some(_) = verifier_found {
+                                    if verifier_found.is_some() {
                                         return Err(ErrorActive::CommandParser(
                                             CommandParser::Unexpected(
                                                 CommandUnexpected::VerifierNoCrypto,
                                             ),
                                         ));
                                     }
-                                    if let Some(_) = signature_found {
+                                    if signature_found.is_some() {
                                         return Err(ErrorActive::CommandParser(
                                             CommandParser::Unexpected(
                                                 CommandUnexpected::SignatureNoCrypto,
@@ -632,116 +663,119 @@ impl Command {
                         let mut msg_type_found = None;
                         let mut payload_found = None;
                         let mut name = None; // default option for `sign`
-                        loop {
-                            match args.next() {
-                                Some(x) => {
-                                    let x = x.to_lowercase();
-                                    match x.as_str() {
-                                        "-sufficient" => {
-                                            if let Some(_) = sufficient_crypto_found {
-                                                return Err(ErrorActive::CommandParser(
-                                                    CommandParser::DoubleKey(
-                                                        CommandDoubleKey::SufficientCrypto,
+                        while let Some(x) = args.next() {
+                            let x = x.to_lowercase();
+                            match x.as_str() {
+                                "-sufficient" => {
+                                    if sufficient_crypto_found.is_some() {
+                                        return Err(ErrorActive::CommandParser(
+                                            CommandParser::DoubleKey(
+                                                CommandDoubleKey::SufficientCrypto,
+                                            ),
+                                        ));
+                                    }
+                                    sufficient_crypto_found = match args.next() {
+                                        Some(x) => match x.to_lowercase().as_str() {
+                                            "-hex" => match args.next() {
+                                                Some(h) => Some(Entry::Hex(h.to_string())),
+                                                None => return Err(ErrorActive::CommandParser(
+                                                    CommandParser::NeedArgument(
+                                                        CommandNeedArgument::SufficientCryptoHex,
                                                     ),
-                                                ));
-                                            }
-                                            sufficient_crypto_found = match args.next() {
-                                                Some(x) => {
-                                                    match x.to_lowercase().as_str() {
-                                                        "-hex" => {
-                                                            match args.next() {
-                                                                Some(h) => Some(Entry::Hex(h.to_string())),
-                                                                None => return Err(ErrorActive::CommandParser(CommandParser::NeedArgument(CommandNeedArgument::SufficientCryptoHex))),
-                                                            }
-                                                        },
-                                                        "-file" => {
-                                                            match args.next() {
-                                                                Some(f) => Some(Entry::File(f.to_string())),
-                                                                None => return Err(ErrorActive::CommandParser(CommandParser::NeedArgument(CommandNeedArgument::SufficientCryptoFile))),
-                                                            }
-                                                        },
-                                                        _ => return Err(ErrorActive::CommandParser(CommandParser::BadArgument(CommandBadArgument::SufficientCrypto))),
-                                                    }
-                                                },
-                                                None => return Err(ErrorActive::CommandParser(CommandParser::NeedArgument(CommandNeedArgument::SufficientCrypto))),
-                                            };
-                                        }
-                                        "-msgtype" => {
-                                            if let Some(_) = msg_type_found {
-                                                return Err(ErrorActive::CommandParser(
-                                                    CommandParser::DoubleKey(
-                                                        CommandDoubleKey::MsgType,
+                                                )),
+                                            },
+                                            "-file" => match args.next() {
+                                                Some(f) => Some(Entry::File(f.to_string())),
+                                                None => return Err(ErrorActive::CommandParser(
+                                                    CommandParser::NeedArgument(
+                                                        CommandNeedArgument::SufficientCryptoFile,
                                                     ),
-                                                ));
-                                            }
-                                            msg_type_found = match args.next() {
-                                                Some(x) => match x.to_lowercase().as_str() {
-                                                    "load_types" => Some(MsgType::LoadTypes),
-                                                    "load_metadata" => Some(MsgType::LoadMetadata),
-                                                    "add_specs" => Some(MsgType::AddSpecs),
-                                                    _ => {
-                                                        return Err(ErrorActive::CommandParser(
-                                                            CommandParser::BadArgument(
-                                                                CommandBadArgument::MsgType,
-                                                            ),
-                                                        ))
-                                                    }
-                                                },
-                                                None => {
-                                                    return Err(ErrorActive::CommandParser(
-                                                        CommandParser::NeedArgument(
-                                                            CommandNeedArgument::MsgType,
-                                                        ),
-                                                    ))
-                                                }
-                                            };
-                                        }
-                                        "-payload" => {
-                                            if let Some(_) = payload_found {
+                                                )),
+                                            },
+                                            _ => {
                                                 return Err(ErrorActive::CommandParser(
-                                                    CommandParser::DoubleKey(
-                                                        CommandDoubleKey::Payload,
+                                                    CommandParser::BadArgument(
+                                                        CommandBadArgument::SufficientCrypto,
                                                     ),
-                                                ));
+                                                ))
                                             }
-                                            payload_found = match args.next() {
-                                                Some(x) => Some(x.to_string()),
-                                                None => {
-                                                    return Err(ErrorActive::CommandParser(
-                                                        CommandParser::NeedArgument(
-                                                            CommandNeedArgument::Payload,
-                                                        ),
-                                                    ))
-                                                }
-                                            };
-                                        }
-                                        "-name" => {
-                                            if let Some(_) = name {
-                                                return Err(ErrorActive::CommandParser(
-                                                    CommandParser::DoubleKey(
-                                                        CommandDoubleKey::Name,
-                                                    ),
-                                                ));
-                                            }
-                                            name = match args.next() {
-                                                Some(x) => Some(format!("{}/{}", EXPORT_FOLDER, x)),
-                                                None => {
-                                                    return Err(ErrorActive::CommandParser(
-                                                        CommandParser::NeedArgument(
-                                                            CommandNeedArgument::Name,
-                                                        ),
-                                                    ))
-                                                }
-                                            };
-                                        }
-                                        _ => {
+                                        },
+                                        None => {
                                             return Err(ErrorActive::CommandParser(
-                                                CommandParser::UnexpectedKeyArgumentSequence,
+                                                CommandParser::NeedArgument(
+                                                    CommandNeedArgument::SufficientCrypto,
+                                                ),
                                             ))
                                         }
-                                    }
+                                    };
                                 }
-                                None => break,
+                                "-msgtype" => {
+                                    if msg_type_found.is_some() {
+                                        return Err(ErrorActive::CommandParser(
+                                            CommandParser::DoubleKey(CommandDoubleKey::MsgType),
+                                        ));
+                                    }
+                                    msg_type_found = match args.next() {
+                                        Some(x) => match x.to_lowercase().as_str() {
+                                            "load_types" => Some(MsgType::LoadTypes),
+                                            "load_metadata" => Some(MsgType::LoadMetadata),
+                                            "add_specs" => Some(MsgType::AddSpecs),
+                                            _ => {
+                                                return Err(ErrorActive::CommandParser(
+                                                    CommandParser::BadArgument(
+                                                        CommandBadArgument::MsgType,
+                                                    ),
+                                                ))
+                                            }
+                                        },
+                                        None => {
+                                            return Err(ErrorActive::CommandParser(
+                                                CommandParser::NeedArgument(
+                                                    CommandNeedArgument::MsgType,
+                                                ),
+                                            ))
+                                        }
+                                    };
+                                }
+                                "-payload" => {
+                                    if payload_found.is_some() {
+                                        return Err(ErrorActive::CommandParser(
+                                            CommandParser::DoubleKey(CommandDoubleKey::Payload),
+                                        ));
+                                    }
+                                    payload_found = match args.next() {
+                                        Some(x) => Some(x.to_string()),
+                                        None => {
+                                            return Err(ErrorActive::CommandParser(
+                                                CommandParser::NeedArgument(
+                                                    CommandNeedArgument::Payload,
+                                                ),
+                                            ))
+                                        }
+                                    };
+                                }
+                                "-name" => {
+                                    if name.is_some() {
+                                        return Err(ErrorActive::CommandParser(
+                                            CommandParser::DoubleKey(CommandDoubleKey::Name),
+                                        ));
+                                    }
+                                    name = match args.next() {
+                                        Some(x) => Some(format!("{}/{}", EXPORT_FOLDER, x)),
+                                        None => {
+                                            return Err(ErrorActive::CommandParser(
+                                                CommandParser::NeedArgument(
+                                                    CommandNeedArgument::Name,
+                                                ),
+                                            ))
+                                        }
+                                    };
+                                }
+                                _ => {
+                                    return Err(ErrorActive::CommandParser(
+                                        CommandParser::UnexpectedKeyArgumentSequence,
+                                    ))
+                                }
                             }
                         }
                         // finalize command parsed with "sign"
@@ -821,36 +855,35 @@ impl Command {
                     }
                     "remove" => {
                         let mut info_found = None;
-                        loop {
-                            match args.next() {
-                                Some(a) => match a.as_str() {
-                                    "-title" => {
-                                        if let Some(_) = info_found {
-                                            return Err(ErrorActive::CommandParser(
-                                                CommandParser::DoubleKey(CommandDoubleKey::Remove),
-                                            ));
-                                        }
-                                        info_found = match args.next() {
-                                            Some(b) => Some(Remove::Title(b.to_string())),
-                                            None => {
-                                                return Err(ErrorActive::CommandParser(
-                                                    CommandParser::NeedArgument(
-                                                        CommandNeedArgument::RemoveTitle,
-                                                    ),
-                                                ))
-                                            }
-                                        };
+                        while let Some(a) = args.next() {
+                            match a.as_str() {
+                                "-title" => {
+                                    if info_found.is_some() {
+                                        return Err(ErrorActive::CommandParser(
+                                            CommandParser::DoubleKey(CommandDoubleKey::Remove),
+                                        ));
                                     }
-                                    "-name" => {
-                                        if let Some(_) = info_found {
+                                    info_found = match args.next() {
+                                        Some(b) => Some(Remove::Title(b.to_string())),
+                                        None => {
                                             return Err(ErrorActive::CommandParser(
-                                                CommandParser::DoubleKey(CommandDoubleKey::Remove),
-                                            ));
+                                                CommandParser::NeedArgument(
+                                                    CommandNeedArgument::RemoveTitle,
+                                                ),
+                                            ))
                                         }
-                                        info_found = match args.next() {
-                                            Some(b) => {
-                                                let name = b.to_string();
-                                                match args.next() {
+                                    };
+                                }
+                                "-name" => {
+                                    if info_found.is_some() {
+                                        return Err(ErrorActive::CommandParser(
+                                            CommandParser::DoubleKey(CommandDoubleKey::Remove),
+                                        ));
+                                    }
+                                    info_found = match args.next() {
+                                        Some(b) => {
+                                            let name = b.to_string();
+                                            match args.next() {
                                                         Some(c) => {
                                                             match c.as_str() {
                                                                 "-version" => {
@@ -869,32 +902,28 @@ impl Command {
                                                         },
                                                         None => return Err(ErrorActive::CommandParser(CommandParser::NeedKey(CommandNeedKey::RemoveVersion))),
                                                     }
-                                            }
-                                            None => {
-                                                return Err(ErrorActive::CommandParser(
-                                                    CommandParser::NeedArgument(
-                                                        CommandNeedArgument::RemoveName,
-                                                    ),
-                                                ))
-                                            }
-                                        };
-                                    }
-                                    _ => {
-                                        return Err(ErrorActive::CommandParser(
-                                            CommandParser::UnexpectedKeyArgumentSequence,
-                                        ))
-                                    }
-                                },
-                                None => break,
-                            }
+                                        }
+                                        None => {
+                                            return Err(ErrorActive::CommandParser(
+                                                CommandParser::NeedArgument(
+                                                    CommandNeedArgument::RemoveName,
+                                                ),
+                                            ))
+                                        }
+                                    };
+                                }
+                                _ => {
+                                    return Err(ErrorActive::CommandParser(
+                                        CommandParser::UnexpectedKeyArgumentSequence,
+                                    ))
+                                }
+                            };
                         }
                         match info_found {
                             Some(x) => Ok(Command::Remove(x)),
-                            None => {
-                                return Err(ErrorActive::CommandParser(CommandParser::NeedKey(
-                                    CommandNeedKey::Remove,
-                                )))
-                            }
+                            None => Err(ErrorActive::CommandParser(CommandParser::NeedKey(
+                                CommandNeedKey::Remove,
+                            ))),
                         }
                     }
                     "restore_defaults" => Ok(Command::RestoreDefaults),
@@ -925,59 +954,56 @@ impl Command {
                         }
                         let mut found_title = None;
                         let mut found_payload = None;
-                        loop {
-                            match args.next() {
-                                Some(a) => match a.as_str() {
-                                    "-title" => {
-                                        if let Some(_) = found_title {
-                                            return Err(ErrorActive::CommandParser(
-                                                CommandParser::DoubleKey(
-                                                    CommandDoubleKey::DerivationsTitle,
-                                                ),
-                                            ));
-                                        }
-                                        found_title = match args.next() {
-                                            Some(b) => Some(b.to_string()),
-                                            None => {
-                                                return Err(ErrorActive::CommandParser(
-                                                    CommandParser::NeedArgument(
-                                                        CommandNeedArgument::DerivationsTitle,
-                                                    ),
-                                                ))
-                                            }
-                                        };
-                                    }
-                                    "-payload" => {
-                                        if let Some(_) = found_payload {
-                                            return Err(ErrorActive::CommandParser(
-                                                CommandParser::DoubleKey(CommandDoubleKey::Payload),
-                                            ));
-                                        }
-                                        found_payload = match args.next() {
-                                            Some(b) => match std::fs::read_to_string(&b) {
-                                                Ok(c) => Some(c),
-                                                Err(e) => {
-                                                    return Err(ErrorActive::Input(
-                                                        InputActive::File(e),
-                                                    ))
-                                                }
-                                            },
-                                            None => {
-                                                return Err(ErrorActive::CommandParser(
-                                                    CommandParser::NeedArgument(
-                                                        CommandNeedArgument::Payload,
-                                                    ),
-                                                ))
-                                            }
-                                        };
-                                    }
-                                    _ => {
+                        while let Some(a) = args.next() {
+                            match a.as_str() {
+                                "-title" => {
+                                    if found_title.is_some() {
                                         return Err(ErrorActive::CommandParser(
-                                            CommandParser::UnexpectedKeyArgumentSequence,
-                                        ))
+                                            CommandParser::DoubleKey(
+                                                CommandDoubleKey::DerivationsTitle,
+                                            ),
+                                        ));
                                     }
-                                },
-                                None => break,
+                                    found_title = match args.next() {
+                                        Some(b) => Some(b.to_string()),
+                                        None => {
+                                            return Err(ErrorActive::CommandParser(
+                                                CommandParser::NeedArgument(
+                                                    CommandNeedArgument::DerivationsTitle,
+                                                ),
+                                            ))
+                                        }
+                                    };
+                                }
+                                "-payload" => {
+                                    if found_payload.is_some() {
+                                        return Err(ErrorActive::CommandParser(
+                                            CommandParser::DoubleKey(CommandDoubleKey::Payload),
+                                        ));
+                                    }
+                                    found_payload = match args.next() {
+                                        Some(b) => match std::fs::read_to_string(&b) {
+                                            Ok(c) => Some(c),
+                                            Err(e) => {
+                                                return Err(ErrorActive::Input(InputActive::File(
+                                                    e,
+                                                )))
+                                            }
+                                        },
+                                        None => {
+                                            return Err(ErrorActive::CommandParser(
+                                                CommandParser::NeedArgument(
+                                                    CommandNeedArgument::Payload,
+                                                ),
+                                            ))
+                                        }
+                                    };
+                                }
+                                _ => {
+                                    return Err(ErrorActive::CommandParser(
+                                        CommandParser::UnexpectedKeyArgumentSequence,
+                                    ))
+                                }
                             }
                         }
                         let title = match found_title {
@@ -1005,34 +1031,31 @@ impl Command {
                     "unwasm" => {
                         let mut found_payload = None;
                         let mut update_db = true;
-                        loop {
-                            match args.next() {
-                                Some(a) => match a.as_str() {
-                                    "-payload" => {
-                                        if let Some(_) = found_payload {
-                                            return Err(ErrorActive::CommandParser(
-                                                CommandParser::DoubleKey(CommandDoubleKey::Payload),
-                                            ));
-                                        }
-                                        found_payload = match args.next() {
-                                            Some(b) => Some(b.to_string()),
-                                            None => {
-                                                return Err(ErrorActive::CommandParser(
-                                                    CommandParser::NeedArgument(
-                                                        CommandNeedArgument::Payload,
-                                                    ),
-                                                ))
-                                            }
-                                        };
-                                    }
-                                    "-d" => update_db = false,
-                                    _ => {
+                        while let Some(a) = args.next() {
+                            match a.as_str() {
+                                "-payload" => {
+                                    if found_payload.is_some() {
                                         return Err(ErrorActive::CommandParser(
-                                            CommandParser::UnexpectedKeyArgumentSequence,
-                                        ))
+                                            CommandParser::DoubleKey(CommandDoubleKey::Payload),
+                                        ));
                                     }
-                                },
-                                None => break,
+                                    found_payload = match args.next() {
+                                        Some(b) => Some(b.to_string()),
+                                        None => {
+                                            return Err(ErrorActive::CommandParser(
+                                                CommandParser::NeedArgument(
+                                                    CommandNeedArgument::Payload,
+                                                ),
+                                            ))
+                                        }
+                                    };
+                                }
+                                "-d" => update_db = false,
+                                _ => {
+                                    return Err(ErrorActive::CommandParser(
+                                        CommandParser::UnexpectedKeyArgumentSequence,
+                                    ))
+                                }
                             }
                         }
                         match found_payload {
@@ -1040,17 +1063,15 @@ impl Command {
                                 filename: x,
                                 update_db,
                             }),
-                            None => {
-                                return Err(ErrorActive::CommandParser(CommandParser::NeedKey(
-                                    CommandNeedKey::Payload,
-                                )))
-                            }
+                            None => Err(ErrorActive::CommandParser(CommandParser::NeedKey(
+                                CommandNeedKey::Payload,
+                            ))),
                         }
                     }
-                    _ => return Err(ErrorActive::CommandParser(CommandParser::UnknownCommand)),
+                    _ => Err(ErrorActive::CommandParser(CommandParser::UnknownCommand)),
                 }
             }
-            None => return Err(ErrorActive::CommandParser(CommandParser::NoCommand)),
+            None => Err(ErrorActive::CommandParser(CommandParser::NoCommand)),
         }
     }
 }
@@ -1084,18 +1105,16 @@ fn process_verifier_and_signature(
             )?))
         }
         Some(VerKey::Alice) => {
-            if let Some(_) = signature_found {
+            if signature_found.is_some() {
                 return Err(ErrorActive::CommandParser(CommandParser::Unexpected(
                     CommandUnexpected::AliceSignature,
                 )));
             }
             Ok(Crypto::Alice(encryption))
         }
-        None => {
-            return Err(ErrorActive::CommandParser(CommandParser::NeedKey(
-                CommandNeedKey::Verifier,
-            )))
-        }
+        None => Err(ErrorActive::CommandParser(CommandParser::NeedKey(
+            CommandNeedKey::Verifier,
+        ))),
     }
 }
 
@@ -1106,14 +1125,12 @@ fn get_needed_signature(signature_found: Option<Entry>) -> Result<Vec<u8>, Error
             let signature_filename = format!("{}/{}", FOLDER, t);
             match std::fs::read(&signature_filename) {
                 Ok(a) => Ok(a),
-                Err(e) => return Err(ErrorActive::Input(InputActive::File(e))),
+                Err(e) => Err(ErrorActive::Input(InputActive::File(e))),
             }
         }
-        None => {
-            return Err(ErrorActive::CommandParser(CommandParser::NeedKey(
-                CommandNeedKey::Signature,
-            )))
-        }
+        None => Err(ErrorActive::CommandParser(CommandParser::NeedKey(
+            CommandNeedKey::Signature,
+        ))),
     }
 }
 

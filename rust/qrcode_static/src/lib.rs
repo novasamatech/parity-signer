@@ -1,7 +1,6 @@
 use anyhow::anyhow;
 use constants::{BACK_COLOR, BORDER, MAIN_COLOR, SCALING};
-use hex;
-use png;
+
 use qrcodegen::{QrCode, QrCodeEcc};
 
 struct QrContent {
@@ -9,7 +8,7 @@ struct QrContent {
     size: u32,
 }
 
-fn prepare_qr_png_data(input: &Vec<u8>) -> anyhow::Result<QrContent> {
+fn prepare_qr_png_data(input: &[u8]) -> anyhow::Result<QrContent> {
     if input.len() > 2953 {
         return Err(anyhow!("Data too large to make static qr code."));
     } // 2953 is bytes limit for qr codes having 8-bit binary data
@@ -33,7 +32,7 @@ fn prepare_qr_png_data(input: &Vec<u8>) -> anyhow::Result<QrContent> {
 }
 
 /// Function to generate static qr code from Vec<u8>
-pub fn png_qr(input: &Vec<u8>) -> anyhow::Result<Vec<u8>> {
+pub fn png_qr(input: &[u8]) -> anyhow::Result<Vec<u8>> {
     let qr_content = prepare_qr_png_data(input)?;
 
     let mut out: Vec<u8> = Vec::new();
@@ -58,8 +57,8 @@ pub fn png_qr(input: &Vec<u8>) -> anyhow::Result<Vec<u8>> {
 /// Function to generate static qr code from hex string
 pub fn png_qr_from_hex(hex_input: &str) -> anyhow::Result<Vec<u8>> {
     let hex_input = {
-        if hex_input.starts_with("0x") {
-            &hex_input[2..]
+        if let Some(h) = hex_input.strip_prefix("0x") {
+            h
         } else {
             hex_input
         }

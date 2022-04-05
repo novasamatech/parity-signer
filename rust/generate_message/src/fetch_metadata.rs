@@ -29,7 +29,7 @@ pub async fn fetch_info(str_address: &str) -> Result<FetchedInfo, Box<dyn std::e
     let response: JsonValue = client
         .request(
             "chain_getBlockHash",
-            JsonRpcParams::ArrayRef(&[JsonValue::Number(Number::from(0 as u8))]),
+            JsonRpcParams::ArrayRef(&[JsonValue::Number(Number::from(0_u8))]),
         )
         .await?;
     let genesis_hash = match response {
@@ -57,7 +57,7 @@ pub async fn fetch_info_with_network_specs(
     let response: JsonValue = client
         .request(
             "chain_getBlockHash",
-            JsonRpcParams::ArrayRef(&[JsonValue::Number(Number::from(0 as u8))]),
+            JsonRpcParams::ArrayRef(&[JsonValue::Number(Number::from(0_u8))]),
         )
         .await?;
     let genesis_hash = match response {

@@ -27,7 +27,7 @@ enum FirstCard {
 }
 
 pub fn load_metadata(data_hex: &str, database_name: &str) -> Result<Action, ErrorSigner> {
-    let checked_info = pass_crypto(&data_hex, TransferContent::LoadMeta)?;
+    let checked_info = pass_crypto(data_hex, TransferContent::LoadMeta)?;
     let (meta, genesis_hash) =
         ContentLoadMeta::from_vec(&checked_info.message).meta_genhash::<Signer>()?;
     let meta_values = match MetaValues::from_vec_metadata(&meta) {
@@ -39,19 +39,19 @@ pub fn load_metadata(data_hex: &str, database_name: &str) -> Result<Action, Erro
             ))
         }
     };
-    let general_verifier = get_general_verifier(&database_name)?;
-    let verifier_key = VerifierKey::from_parts(&genesis_hash.to_vec());
-    let valid_current_verifier =
-        match try_get_valid_current_verifier(&verifier_key, &database_name)? {
-            Some(a) => a,
-            None => {
-                return Err(ErrorSigner::Input(InputSigner::LoadMetaUnknownNetwork {
-                    name: meta_values.name,
-                }))
-            }
-        };
+    let general_verifier = get_general_verifier(database_name)?;
+    let verifier_key = VerifierKey::from_parts(genesis_hash.as_ref());
+    let valid_current_verifier = match try_get_valid_current_verifier(&verifier_key, database_name)?
+    {
+        Some(a) => a,
+        None => {
+            return Err(ErrorSigner::Input(InputSigner::LoadMetaUnknownNetwork {
+                name: meta_values.name,
+            }))
+        }
+    };
     let (network_specs_key, network_specs) =
-        match genesis_hash_in_specs(&verifier_key, &open_db::<Signer>(&database_name)?)? {
+        match genesis_hash_in_specs(&verifier_key, &open_db::<Signer>(database_name)?)? {
             Some(a) => a,
             None => {
                 return Err(ErrorSigner::Input(InputSigner::LoadMetaNoSpecs {
@@ -159,9 +159,9 @@ pub fn load_metadata(data_hex: &str, database_name: &str) -> Result<Action, Erro
             FirstCard::VerifierCard(Card::Verifier(new_verifier_value).card(&mut index, 0))
         }
     };
-    if accept_meta_values(&meta_values, &database_name)? {
+    if accept_meta_values(&meta_values, database_name)? {
         stub = stub.add_metadata(&meta_values);
-        let checksum = stub.store_and_get_checksum(&database_name)?;
+        let checksum = stub.store_and_get_checksum(database_name)?;
         let meta_display = MetaValuesDisplay::get(&meta_values);
         let meta_card = Card::Meta(meta_display).card(&mut index, 0);
         match first_card {
@@ -197,9 +197,9 @@ pub fn load_metadata(data_hex: &str, database_name: &str) -> Result<Action, Erro
             },
         }
     } else {
-        return Err(ErrorSigner::Input(InputSigner::MetadataKnown {
+        Err(ErrorSigner::Input(InputSigner::MetadataKnown {
             name: meta_values.name,
             version: meta_values.version,
-        }));
+        }))
     }
 }

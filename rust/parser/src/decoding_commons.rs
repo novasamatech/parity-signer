@@ -33,20 +33,20 @@ pub struct CutCompact<T: HasCompact> {
     pub start_next_unit: Option<usize>,
 }
 
-/// Function to search Vec<u8> for shortest compact <T> by brute force.
+/// Function to search &[u8] for shortest compact <T> by brute force.
 /// Outputs CutCompact value in case of success.
-pub fn get_compact<T>(data: &Vec<u8>) -> Result<CutCompact<T>, ParserError>
+pub fn get_compact<T>(data: &[u8]) -> Result<CutCompact<T>, ParserError>
 where
     T: HasCompact,
     Compact<T>: Decode,
 {
-    if data.len() == 0 {
+    if data.is_empty() {
         return Err(ParserError::Decoding(ParserDecodingError::DataTooShort));
     }
     let mut out = None;
     for i in 1..data.len() + 1 {
         let hippo = &data[..i];
-        let unhippo = <Compact<T>>::decode(&mut &hippo[..]);
+        let unhippo = <Compact<T>>::decode(&mut &*hippo);
         if let Ok(hurray) = unhippo {
             let mut start_next_unit = None;
             if data.len() > i {
@@ -61,7 +61,7 @@ where
     }
     match out {
         Some(c) => Ok(c),
-        None => return Err(ParserError::Decoding(ParserDecodingError::NoCompact)),
+        None => Err(ParserError::Decoding(ParserDecodingError::NoCompact)),
     }
 }
 
@@ -80,7 +80,7 @@ where
 ///
 /// The function outputs the DecodedOut value in case of success.
 pub(crate) fn decode_perthing<T>(
-    data: &Vec<u8>,
+    data: &[u8],
     compact_flag: bool,
     found_ty: &str,
     indent: u32,
@@ -145,7 +145,7 @@ where
 ///
 /// The function outputs the DecodedOut value in case of success.
 pub(crate) fn decode_known_length<T: Decode + std::fmt::Display>(
-    data: &Vec<u8>,
+    data: &[u8],
     found_ty: &str,
     indent: u32,
 ) -> Result<DecodedOut, ParserError> {
@@ -166,11 +166,9 @@ pub(crate) fn decode_known_length<T: Decode + std::fmt::Display>(
                 fancy_out,
             })
         }
-        Err(_) => {
-            return Err(ParserError::Decoding(
-                ParserDecodingError::PrimitiveFailure(found_ty.to_string()),
-            ))
-        }
+        Err(_) => Err(ParserError::Decoding(
+            ParserDecodingError::PrimitiveFailure(found_ty.to_string()),
+        )),
     }
 }
 
@@ -190,7 +188,7 @@ pub(crate) fn decode_known_length<T: Decode + std::fmt::Display>(
 ///
 /// The function outputs the DecodedOut value in case of success.
 pub(crate) fn decode_primitive_with_flags<T>(
-    data: &Vec<u8>,
+    data: &[u8],
     possible_ext: &mut Option<&mut Ext>,
     compact_flag: bool,
     balance_flag: bool,
@@ -261,11 +259,9 @@ where
                     fancy_out,
                 })
             }
-            Err(_) => {
-                return Err(ParserError::Decoding(
-                    ParserDecodingError::PrimitiveFailure(found_ty.to_string()),
-                ))
-            }
+            Err(_) => Err(ParserError::Decoding(
+                ParserDecodingError::PrimitiveFailure(found_ty.to_string()),
+            )),
         }
     }
 }
@@ -287,7 +283,7 @@ fn process_balance(
     let out_tip = vec![OutputCard {
         card: ParserCard::Tip {
             number: balance_output.number.to_string(),
-            units: balance_output.units.to_string(),
+            units: balance_output.units,
         },
         indent,
     }];
@@ -369,7 +365,7 @@ pub(crate) fn special_case_account_id(
     short_specs: &ShortSpecs,
 ) -> Result<DecodedOut, ParserError> {
     match data.get(0..32) {
-        Some(a) => match <[u8; 32]>::decode(&mut &a[..]) {
+        Some(a) => match <[u8; 32]>::decode(&mut &*a) {
             Ok(x) => {
                 let remaining_vector = data[32..].to_vec();
                 let account_id = AccountId32::new(x);
@@ -385,8 +381,8 @@ pub(crate) fn special_case_account_id(
                     fancy_out,
                 })
             }
-            Err(_) => return Err(ParserError::Decoding(ParserDecodingError::Array)),
+            Err(_) => Err(ParserError::Decoding(ParserDecodingError::Array)),
         },
-        None => return Err(ParserError::Decoding(ParserDecodingError::DataTooShort)),
+        None => Err(ParserError::Decoding(ParserDecodingError::DataTooShort)),
     }
 }

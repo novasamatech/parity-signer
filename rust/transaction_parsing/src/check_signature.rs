@@ -18,7 +18,7 @@ pub fn pass_crypto(
     data_hex: &str,
     content: TransferContent,
 ) -> Result<InfoPassedCrypto, ErrorSigner> {
-    let data = unhex::<Signer>(&data_hex, NotHexSigner::InputContent)?;
+    let data = unhex::<Signer>(data_hex, NotHexSigner::InputContent)?;
 
     match &data_hex[2..4] {
         "00" => {
@@ -52,7 +52,7 @@ pub fn pass_crypto(
                     tail,
                 })
             } else {
-                return Err(ErrorSigner::Input(InputSigner::BadSignature));
+                Err(ErrorSigner::Input(InputSigner::BadSignature))
             }
         }
         "01" => {
@@ -86,7 +86,7 @@ pub fn pass_crypto(
                     tail,
                 })
             } else {
-                return Err(ErrorSigner::Input(InputSigner::BadSignature));
+                Err(ErrorSigner::Input(InputSigner::BadSignature))
             }
         }
         "02" => {
@@ -119,7 +119,7 @@ pub fn pass_crypto(
                     tail,
                 })
             } else {
-                return Err(ErrorSigner::Input(InputSigner::BadSignature));
+                Err(ErrorSigner::Input(InputSigner::BadSignature))
             }
         }
         "ff" => {
@@ -136,16 +136,14 @@ pub fn pass_crypto(
                 tail,
             })
         }
-        _ => {
-            return Err(ErrorSigner::Input(InputSigner::EncryptionNotSupported(
-                data_hex[2..4].to_string(),
-            )))
-        }
+        _ => Err(ErrorSigner::Input(InputSigner::EncryptionNotSupported(
+            data_hex[2..4].to_string(),
+        ))),
     }
 }
 
-fn cut_data(data: &Vec<u8>, content: TransferContent) -> Result<(Vec<u8>, Vec<u8>), ErrorSigner> {
-    let pre_data = match get_compact::<u32>(&data) {
+fn cut_data(data: &[u8], content: TransferContent) -> Result<(Vec<u8>, Vec<u8>), ErrorSigner> {
+    let pre_data = match get_compact::<u32>(data) {
         Ok(a) => a,
         Err(_) => return Err(ErrorSigner::Input(InputSigner::TransferContent(content))),
     };
@@ -156,9 +154,9 @@ fn cut_data(data: &Vec<u8>, content: TransferContent) -> Result<(Vec<u8>, Vec<u8
             match pre_data.start_next_unit {
                 Some(start) => match data.get(start..start + data_length) {
                     Some(a) => Ok((a.to_vec(), data[start + data_length..].to_vec())),
-                    None => return Err(ErrorSigner::Input(InputSigner::TooShort)),
+                    None => Err(ErrorSigner::Input(InputSigner::TooShort)),
                 },
-                None => return Err(ErrorSigner::Input(InputSigner::TooShort)),
+                None => Err(ErrorSigner::Input(InputSigner::TooShort)),
             }
         }
         TransferContent::LoadMeta => {
@@ -167,9 +165,9 @@ fn cut_data(data: &Vec<u8>, content: TransferContent) -> Result<(Vec<u8>, Vec<u8
             match pre_data.start_next_unit {
                 Some(start) => match data.get(..start + data_length) {
                     Some(a) => Ok((a.to_vec(), data[start + data_length..].to_vec())),
-                    None => return Err(ErrorSigner::Input(InputSigner::TooShort)),
+                    None => Err(ErrorSigner::Input(InputSigner::TooShort)),
                 },
-                None => return Err(ErrorSigner::Input(InputSigner::TooShort)),
+                None => Err(ErrorSigner::Input(InputSigner::TooShort)),
             }
         }
     }

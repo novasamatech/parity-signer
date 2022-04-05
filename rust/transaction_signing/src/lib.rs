@@ -9,10 +9,11 @@ use sign_message::{
 };
 mod sign_transaction;
 use sign_transaction::create_signature_png;
+#[cfg(test)]
 mod tests;
 
 pub fn handle_stub(checksum: u32, database_name: &str) -> Result<(), ErrorSigner> {
-    TrDbColdStub::from_storage(&database_name, checksum)?.apply(database_name)
+    TrDbColdStub::from_storage(database_name, checksum)?.apply(database_name)
 }
 
 pub fn handle_sign(

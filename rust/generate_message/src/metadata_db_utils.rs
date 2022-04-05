@@ -15,10 +15,8 @@ fn read_metadata_database() -> Result<Vec<MetaValues>, ErrorActive> {
     let database = open_db::<Active>(HOT_DB_NAME)?;
     let metadata = open_tree::<Active>(&database, METATREE)?;
     let mut out: Vec<MetaValues> = Vec::new();
-    for x in metadata.iter() {
-        if let Ok(a) = x {
-            out.push(MetaValues::from_entry_checked::<Active>(a)?)
-        }
+    for x in metadata.iter().flatten() {
+        out.push(MetaValues::from_entry_checked::<Active>(x)?)
     }
     Ok(out)
 }
@@ -53,20 +51,23 @@ fn sort_metavalues(meta_values: Vec<MetaValues>) -> Result<SortedMetaValues, Err
                     }
                 }
                 found_in_new = true;
-                if x.version < y.version {
-                    older.push(x.to_owned());
-                } else {
-                    if x.version == y.version {
+                match x.version.cmp(&y.version) {
+                    std::cmp::Ordering::Less => {
+                        older.push(x.to_owned());
+                    }
+                    std::cmp::Ordering::Equal => {
                         return Err(ErrorActive::Database(
                             DatabaseActive::HotDatabaseMetadataSameVersionTwice {
                                 name: x.name.to_string(),
                                 version: x.version,
                             },
                         ));
-                    } else {
+                    }
+                    std::cmp::Ordering::Greater => {
                         num_new = Some(i);
                     }
                 }
+
                 break;
             }
         }
@@ -101,16 +102,17 @@ pub fn add_new(
     let mut num_old = None;
     let mut found_in_newer = false;
     for (i, x) in sorted.newer.iter().enumerate() {
-        if &new.name == &x.name {
+        if new.name == x.name {
             found_in_newer = true;
-            if new.version < x.version {
-                return Err(ErrorActive::Fetch(Fetch::EarlierVersion {
-                    name: x.name.to_string(),
-                    old_version: x.version,
-                    new_version: new.version,
-                }));
-            } else {
-                if new.version == x.version {
+            match new.version.cmp(&x.version) {
+                std::cmp::Ordering::Less => {
+                    return Err(ErrorActive::Fetch(Fetch::EarlierVersion {
+                        name: x.name.to_string(),
+                        old_version: x.version,
+                        new_version: new.version,
+                    }));
+                }
+                std::cmp::Ordering::Equal => {
                     if new.meta != x.meta {
                         let mut sus1: Vec<u8> = Vec::new();
                         let mut sus2: Vec<u8> = Vec::new();
@@ -127,10 +129,11 @@ pub fn add_new(
                             version: new.version,
                         }));
                     }
-                } else {
+                }
+                std::cmp::Ordering::Greater => {
                     num_new = Some(i);
                     for (j, y) in sorted.older.iter().enumerate() {
-                        if &x.name == &y.name {
+                        if x.name == y.name {
                             num_old = Some(j);
                             break;
                         }

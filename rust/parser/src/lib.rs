@@ -24,6 +24,7 @@ mod error;
 use error::{ArgumentsError, Error};
 pub mod method;
 use method::OlderMeta;
+#[cfg(test)]
 mod tests;
 
 /// Function intakes SCALE encoded method part of transaction as Vec<u8>,
@@ -40,13 +41,13 @@ pub fn parse_method(
             older_meta,
             types,
             network_version: _,
-        } => process_as_call(method_data, &older_meta, &types, start_indent, &short_specs)?,
+        } => process_as_call(method_data, older_meta, types, start_indent, short_specs)?,
         MetadataBundle::Sci {
             meta_v14,
             network_version: _,
-        } => decoding_sci_entry_point(method_data, &meta_v14, start_indent, &short_specs)?,
+        } => decoding_sci_entry_point(method_data, meta_v14, start_indent, short_specs)?,
     };
-    if method_decoded.remaining_vector.len() != 0 {
+    if !method_decoded.remaining_vector.is_empty() {
         return Err(ParserError::Decoding(
             ParserDecodingError::SomeDataNotUsedMethod,
         ));
@@ -113,7 +114,7 @@ pub fn parse_extensions(
                 OutputCard {
                     card: ParserCard::Tip {
                         number: tip.number.to_string(),
-                        units: tip.units.to_string(),
+                        units: tip.units,
                     },
                     indent,
                 },
@@ -141,7 +142,7 @@ pub fn parse_extensions(
         } => {
             let mut ext = Ext::init();
             let extensions_decoded =
-                decode_ext_attempt(&extensions_data, &mut ext, &meta_v14, indent, short_specs)?;
+                decode_ext_attempt(&extensions_data, &mut ext, meta_v14, indent, short_specs)?;
             if let Some(genesis_hash) = ext.found_ext.genesis_hash {
                 if genesis_hash != short_specs.genesis_hash {
                     return Err(ParserError::Decoding(
@@ -180,7 +181,7 @@ pub fn parse_extensions(
                     ))
                 }
             }
-            if extensions_decoded.remaining_vector.len() != 0 {
+            if !extensions_decoded.remaining_vector.is_empty() {
                 return Err(ParserError::Decoding(
                     ParserDecodingError::SomeDataNotUsedExtensions,
                 ));
@@ -210,13 +211,13 @@ pub fn parse_extensions(
     Ok(cards)
 }
 
-pub fn cut_method_extensions(data: &Vec<u8>) -> Result<(Vec<u8>, Vec<u8>), ParserError> {
+pub fn cut_method_extensions(data: &[u8]) -> Result<(Vec<u8>, Vec<u8>), ParserError> {
     let pre_method = get_compact::<u32>(data)?;
     let method_length = pre_method.compact_found as usize;
     match pre_method.start_next_unit {
         Some(start) => match data.get(start..start + method_length) {
             Some(a) => Ok((a.to_vec(), data[start + method_length..].to_vec())),
-            None => return Err(ParserError::Decoding(ParserDecodingError::DataTooShort)),
+            None => Err(ParserError::Decoding(ParserDecodingError::DataTooShort)),
         },
         None => {
             if method_length != 0 {
@@ -227,8 +228,9 @@ pub fn cut_method_extensions(data: &Vec<u8>) -> Result<(Vec<u8>, Vec<u8>), Parse
     }
 }
 
+#[allow(clippy::type_complexity)]
 pub fn parse_set(
-    data: &Vec<u8>,
+    data: &[u8],
     metadata_bundle: &MetadataBundle,
     short_specs: &ShortSpecs,
     optional_mortal_flag: Option<bool>,
@@ -264,17 +266,17 @@ pub fn parse_set(
 }
 
 pub fn parse_and_display_set(
-    data: &Vec<u8>,
+    data: &[u8],
     metadata: &RuntimeMetadata,
     short_specs: &ShortSpecs,
 ) -> Result<String, String> {
-    let meta_info = match info_from_metadata(&metadata) {
+    let meta_info = match info_from_metadata(metadata) {
         Ok(x) => x,
         Err(e) => return Err(Error::Arguments(ArgumentsError::Metadata(e)).show()),
     };
     if meta_info.name != short_specs.name {
         return Err(Error::Arguments(ArgumentsError::NetworkNameMismatch {
-            name_metadata: meta_info.name.to_string(),
+            name_metadata: meta_info.name,
             name_network_specs: short_specs.name.to_string(),
         })
         .show());
@@ -288,7 +290,7 @@ pub fn parse_and_display_set(
             };
             let types = match get_default_types_vec() {
                 Ok(a) => {
-                    if a.len() == 0 {
+                    if a.is_empty() {
                         return Err(Error::Arguments(ArgumentsError::NoTypes).show());
                     }
                     a
@@ -333,7 +335,7 @@ pub fn parse_and_display_set(
                 method, extensions
             ))
         }
-        Err(e) => return Err(Error::Parser(e).show()),
+        Err(e) => Err(Error::Parser(e).show()),
     }
 }
 

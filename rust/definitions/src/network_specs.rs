@@ -76,7 +76,7 @@ impl NetworkSpecs {
         )
     }
     pub fn print_as_set_part(&self) -> String {
-        format!("\"key\":\"{}\",\"color\":\"{}\",\"logo\":\"{}\",\"order\":\"{}\",\"secondary_color\":\"{}\",\"title\":\"{}\"", hex::encode(NetworkSpecsKey::from_parts(&self.genesis_hash.to_vec(), &self.encryption).key()), &self.color, &self.logo, &self.order, &self.secondary_color, &self.title)
+        format!("\"key\":\"{}\",\"color\":\"{}\",\"logo\":\"{}\",\"order\":\"{}\",\"secondary_color\":\"{}\",\"title\":\"{}\"", hex::encode(NetworkSpecsKey::from_parts(&self.genesis_hash, &self.encryption).key()), &self.color, &self.logo, &self.order, &self.secondary_color, &self.title)
     }
     pub fn to_send(&self) -> NetworkSpecsToSend {
         NetworkSpecsToSend {

@@ -69,7 +69,7 @@ impl MetaValues {
         let (name, version) = MetaKey::from_ivec(&meta_key_vec).name_version::<T>()?;
         Self::from_entry_name_version_checked::<T>(&name, version, meta_encoded)
     }
-    pub fn from_vec_metadata(meta_vec: &Vec<u8>) -> Result<Self, MetadataError> {
+    pub fn from_vec_metadata(meta_vec: &[u8]) -> Result<Self, MetadataError> {
         let meta_info = info_from_metadata(&runtime_metadata_from_vec(meta_vec)?)?;
         Ok(Self {
             name: meta_info.name.to_string(),
@@ -121,12 +121,10 @@ impl MetaValues {
         let meta_vec = unhex::<Active>(meta, what)?;
         match Self::from_vec_metadata(&meta_vec) {
             Ok(a) => Ok(a),
-            Err(e) => {
-                return Err(<Active>::faulty_metadata(
-                    e,
-                    MetadataSource::Incoming(IncomingMetadataSourceActive::Str(source)),
-                ))
-            }
+            Err(e) => Err(<Active>::faulty_metadata(
+                e,
+                MetadataSource::Incoming(IncomingMetadataSourceActive::Str(source)),
+            )),
         }
     }
 }
@@ -237,8 +235,8 @@ pub fn info_from_metadata(runtime_metadata: &RuntimeMetadata) -> Result<MetaInfo
     })
 }
 
-pub fn runtime_metadata_from_vec(meta_vec: &Vec<u8>) -> Result<RuntimeMetadata, MetadataError> {
-    if !meta_vec.starts_with(&vec![109, 101, 116, 97]) {
+pub fn runtime_metadata_from_vec(meta_vec: &[u8]) -> Result<RuntimeMetadata, MetadataError> {
+    if !meta_vec.starts_with(&[109, 101, 116, 97]) {
         return Err(MetadataError::NotMeta);
     }
     if meta_vec[4] < 12 {
@@ -246,7 +244,7 @@ pub fn runtime_metadata_from_vec(meta_vec: &Vec<u8>) -> Result<RuntimeMetadata, 
     }
     match RuntimeMetadata::decode(&mut &meta_vec[4..]) {
         Ok(x) => Ok(x),
-        Err(_) => return Err(MetadataError::UnableToDecode),
+        Err(_) => Err(MetadataError::UnableToDecode),
     }
 }
 
@@ -299,7 +297,7 @@ impl MetaSetElement {
             Ok(a) => {
                 if (a.version != network_version) || (a.name != network_name) {
                     return Err(<Signer>::metadata_mismatch(
-                        network_name.to_string(),
+                        network_name,
                         network_version,
                         a.name.to_string(),
                         a.version,
@@ -357,13 +355,11 @@ impl AddressBookEntry {
     ) -> Result<AddressBookEntry, ErrorActive> {
         match <AddressBookEntry>::decode(&mut &address_book_entry_encoded[..]) {
             Ok(a) => Ok(a),
-            Err(_) => {
-                return Err(ErrorActive::Database(DatabaseActive::EntryDecoding(
-                    EntryDecodingActive::AddressBookEntryTitle {
-                        title: title.to_string(),
-                    },
-                )))
-            }
+            Err(_) => Err(ErrorActive::Database(DatabaseActive::EntryDecoding(
+                EntryDecodingActive::AddressBookEntryTitle {
+                    title: title.to_string(),
+                },
+            ))),
         }
     }
 }
@@ -379,12 +375,12 @@ mod tests {
         let filename = String::from("for_tests/westend9070");
         let meta = read_to_string(&filename).unwrap();
         let meta_values = MetaValues::from_str_metadata(
-            &meta.trim(),
+            meta.trim(),
             IncomingMetadataSourceActiveStr::Default { filename },
         )
         .unwrap();
         assert!(
-            meta_values.name == String::from("westend"),
+            meta_values.name == *"westend",
             "Unexpected network name: {}",
             meta_values.name
         );
@@ -400,12 +396,12 @@ mod tests {
         let filename = String::from("for_tests/westend9033");
         let meta = read_to_string(&filename).unwrap();
         let meta_values = MetaValues::from_str_metadata(
-            &meta.trim(),
+            meta.trim(),
             IncomingMetadataSourceActiveStr::Default { filename },
         )
         .unwrap();
         assert!(
-            meta_values.name == String::from("westend"),
+            meta_values.name == *"westend",
             "Unexpected network name: {}",
             meta_values.name
         );
@@ -421,12 +417,12 @@ mod tests {
         let filename = String::from("for_tests/westend9030");
         let meta = read_to_string(&filename).unwrap();
         let meta_values = MetaValues::from_str_metadata(
-            &meta.trim(),
+            meta.trim(),
             IncomingMetadataSourceActiveStr::Default { filename },
         )
         .unwrap();
         assert!(
-            meta_values.name == String::from("westend"),
+            meta_values.name == *"westend",
             "Unexpected network name: {}",
             meta_values.name
         );
@@ -442,12 +438,12 @@ mod tests {
         let filename = String::from("for_tests/rococo9004");
         let meta = read_to_string(&filename).unwrap();
         let meta_values = MetaValues::from_str_metadata(
-            &meta.trim(),
+            meta.trim(),
             IncomingMetadataSourceActiveStr::Default { filename },
         )
         .unwrap();
         assert!(
-            meta_values.name == String::from("rococo"),
+            meta_values.name == *"rococo",
             "Unexpected network name: {}",
             meta_values.name
         );
@@ -463,12 +459,12 @@ mod tests {
         let filename = String::from("for_tests/rococo9002");
         let meta = read_to_string(&filename).unwrap();
         let meta_values = MetaValues::from_str_metadata(
-            &meta.trim(),
+            meta.trim(),
             IncomingMetadataSourceActiveStr::Default { filename },
         )
         .unwrap();
         assert!(
-            meta_values.name == String::from("rococo"),
+            meta_values.name == *"rococo",
             "Unexpected network name: {}",
             meta_values.name
         );
@@ -484,12 +480,12 @@ mod tests {
         let filename = String::from("for_tests/polkadot9080");
         let meta = read_to_string(&filename).unwrap();
         let meta_values = MetaValues::from_str_metadata(
-            &meta.trim(),
+            meta.trim(),
             IncomingMetadataSourceActiveStr::Default { filename },
         )
         .unwrap();
         assert!(
-            meta_values.name == String::from("polkadot"),
+            meta_values.name == *"polkadot",
             "Unexpected network name: {}",
             meta_values.name
         );
@@ -505,12 +501,12 @@ mod tests {
         let filename = String::from("for_tests/polkadot30");
         let meta = read_to_string(&filename).unwrap();
         let meta_values = MetaValues::from_str_metadata(
-            &meta.trim(),
+            meta.trim(),
             IncomingMetadataSourceActiveStr::Default { filename },
         )
         .unwrap();
         assert!(
-            meta_values.name == String::from("polkadot"),
+            meta_values.name == *"polkadot",
             "Unexpected network name: {}",
             meta_values.name
         );
@@ -526,12 +522,12 @@ mod tests {
         let filename = String::from("for_tests/polkadot29");
         let meta = read_to_string(&filename).unwrap();
         let meta_values = MetaValues::from_str_metadata(
-            &meta.trim(),
+            meta.trim(),
             IncomingMetadataSourceActiveStr::Default { filename },
         )
         .unwrap();
         assert!(
-            meta_values.name == String::from("polkadot"),
+            meta_values.name == *"polkadot",
             "Unexpected network name: {}",
             meta_values.name
         );
@@ -547,12 +543,12 @@ mod tests {
         let filename = String::from("for_tests/kusama9040");
         let meta = read_to_string(&filename).unwrap();
         let meta_values = MetaValues::from_str_metadata(
-            &meta.trim(),
+            meta.trim(),
             IncomingMetadataSourceActiveStr::Default { filename },
         )
         .unwrap();
         assert!(
-            meta_values.name == String::from("kusama"),
+            meta_values.name == *"kusama",
             "Unexpected network name: {}",
             meta_values.name
         );
@@ -568,12 +564,12 @@ mod tests {
         let filename = String::from("for_tests/kusama9010");
         let meta = read_to_string(&filename).unwrap();
         let meta_values = MetaValues::from_str_metadata(
-            &meta.trim(),
+            meta.trim(),
             IncomingMetadataSourceActiveStr::Default { filename },
         )
         .unwrap();
         assert!(
-            meta_values.name == String::from("kusama"),
+            meta_values.name == *"kusama",
             "Unexpected network name: {}",
             meta_values.name
         );
@@ -595,7 +591,7 @@ mod tests {
             },
         ));
         match MetaValues::from_str_metadata(
-            &meta.trim(),
+            meta.trim(),
             IncomingMetadataSourceActiveStr::Default { filename },
         ) {
             Ok(x) => panic!("Unexpectedly decoded as {} version {}", x.name, x.version),
@@ -620,7 +616,7 @@ mod tests {
             },
         ));
         match MetaValues::from_str_metadata(
-            &meta.trim(),
+            meta.trim(),
             IncomingMetadataSourceActiveStr::Default { filename },
         ) {
             Ok(x) => panic!("Unexpectedly decoded as {} version {}", x.name, x.version),
@@ -639,12 +635,12 @@ mod tests {
         let filename = String::from("for_tests/westend9150");
         let meta = read_to_string(&filename).unwrap();
         let meta_values = MetaValues::from_str_metadata(
-            &meta.trim(),
+            meta.trim(),
             IncomingMetadataSourceActiveStr::Default { filename },
         )
         .unwrap();
         assert!(
-            meta_values.name == String::from("westend"),
+            meta_values.name == *"westend",
             "Unexpected network name: {}",
             meta_values.name
         );
@@ -664,12 +660,12 @@ mod tests {
         let filename = String::from("for_tests/shell200");
         let meta = read_to_string(&filename).unwrap();
         let meta_values = MetaValues::from_str_metadata(
-            &meta.trim(),
+            meta.trim(),
             IncomingMetadataSourceActiveStr::Default { filename },
         )
         .unwrap();
         assert!(
-            meta_values.name == String::from("shell"),
+            meta_values.name == *"shell",
             "Unexpected network name: {}",
             meta_values.name
         );

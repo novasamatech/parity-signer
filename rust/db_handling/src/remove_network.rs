@@ -35,11 +35,11 @@ pub fn remove_network(
     let mut verifiers_batch = Batch::default();
     let mut events: Vec<Event> = Vec::new();
 
-    let general_verifier = get_general_verifier(&database_name)?;
+    let general_verifier = get_general_verifier(database_name)?;
     let network_specs = get_network_specs(database_name, network_specs_key)?;
 
-    let verifier_key = VerifierKey::from_parts(&network_specs.genesis_hash.to_vec());
-    let valid_current_verifier = get_valid_current_verifier(&verifier_key, &database_name)?;
+    let verifier_key = VerifierKey::from_parts(&network_specs.genesis_hash);
+    let valid_current_verifier = get_valid_current_verifier(&verifier_key, database_name)?;
 
     // modify verifier as needed
     if let ValidCurrentVerifier::Custom(ref a) = valid_current_verifier {
@@ -60,81 +60,74 @@ pub fn remove_network(
 
         // scan through chainspecs tree to mark for removal all networks with target genesis hash
         let mut keys_to_wipe: Vec<NetworkSpecsKey> = Vec::new();
-        for x in chainspecs.iter() {
-            if let Ok((network_specs_key_vec, entry)) = x {
-                let x_network_specs_key = NetworkSpecsKey::from_ivec(&network_specs_key_vec);
-                let mut x_network_specs = NetworkSpecs::from_entry_with_key_checked::<Signer>(
-                    &x_network_specs_key,
-                    entry,
-                )?;
-                if x_network_specs.genesis_hash == network_specs.genesis_hash {
-                    network_specs_batch.remove(x_network_specs_key.key());
-                    events.push(Event::NetworkSpecsRemoved(NetworkSpecsDisplay::get(
-                        &x_network_specs,
-                        &valid_current_verifier,
-                        &general_verifier,
-                    )));
-                    keys_to_wipe.push(x_network_specs_key);
-                } else {
-                    if x_network_specs.order > network_specs.order {
-                        x_network_specs.order = x_network_specs.order - 1;
-                        network_specs_batch
-                            .insert(x_network_specs_key.key(), x_network_specs.encode());
-                    }
-                }
+        for x in chainspecs.iter().flatten() {
+            let (network_specs_key_vec, entry) = x;
+            let x_network_specs_key = NetworkSpecsKey::from_ivec(&network_specs_key_vec);
+            let mut x_network_specs =
+                NetworkSpecs::from_entry_with_key_checked::<Signer>(&x_network_specs_key, entry)?;
+            if x_network_specs.genesis_hash == network_specs.genesis_hash {
+                network_specs_batch.remove(x_network_specs_key.key());
+                events.push(Event::NetworkSpecsRemoved(NetworkSpecsDisplay::get(
+                    &x_network_specs,
+                    &valid_current_verifier,
+                    &general_verifier,
+                )));
+                keys_to_wipe.push(x_network_specs_key);
+            } else if x_network_specs.order > network_specs.order {
+                x_network_specs.order -= 1;
+                network_specs_batch.insert(x_network_specs_key.key(), x_network_specs.encode());
             }
         }
+
         // scan through metadata tree to mark for removal all networks with target name
         let meta_key_prefix = MetaKeyPrefix::from_name(&network_specs.name);
-        for x in metadata.scan_prefix(meta_key_prefix.prefix()) {
-            if let Ok((meta_key_vec, meta_stored)) = x {
-                let meta_key = MetaKey::from_ivec(&meta_key_vec);
-                meta_batch.remove(meta_key.key());
-                if let Ok((name, version)) = meta_key.name_version::<Signer>() {
-                    let meta_values_display =
-                        MetaValuesDisplay::from_storage(&name, version, meta_stored);
-                    events.push(Event::MetadataRemoved(meta_values_display));
-                }
+        for x in metadata.scan_prefix(meta_key_prefix.prefix()).flatten() {
+            let (meta_key_vec, meta_stored) = x;
+            let meta_key = MetaKey::from_ivec(&meta_key_vec);
+            meta_batch.remove(meta_key.key());
+            if let Ok((name, version)) = meta_key.name_version::<Signer>() {
+                let meta_values_display =
+                    MetaValuesDisplay::from_storage(&name, version, meta_stored);
+                events.push(Event::MetadataRemoved(meta_values_display));
             }
         }
         // scan through address tree to clean up the network_key(s) from identities
-        for x in identities.iter() {
-            if let Ok((address_key_vec, entry)) = x {
-                let address_key = AddressKey::from_ivec(&address_key_vec);
-                let (multisigner, mut address_details) =
-                    AddressDetails::process_entry_checked::<Signer>((address_key_vec, entry))?;
-                for key in keys_to_wipe.iter() {
-                    if address_details.network_id.contains(key) {
-                        let identity_history = IdentityHistory::get(
-                            &address_details.seed_name,
-                            &address_details.encryption,
-                            &multisigner_to_public(&multisigner),
-                            &address_details.path,
-                            &network_specs.genesis_hash.to_vec(),
-                        );
-                        events.push(Event::IdentityRemoved(identity_history));
-                        address_details.network_id = address_details
-                            .network_id
-                            .into_iter()
-                            .filter(|id| id != key)
-                            .collect();
-                    }
+        for x in identities.iter().flatten() {
+            let (address_key_vec, entry) = x;
+            let address_key = AddressKey::from_ivec(&address_key_vec);
+            let (multisigner, mut address_details) =
+                AddressDetails::process_entry_checked::<Signer>((address_key_vec, entry))?;
+            for key in keys_to_wipe.iter() {
+                if address_details.network_id.contains(key) {
+                    let identity_history = IdentityHistory::get(
+                        &address_details.seed_name,
+                        &address_details.encryption,
+                        &multisigner_to_public(&multisigner),
+                        &address_details.path,
+                        &network_specs.genesis_hash,
+                    );
+                    events.push(Event::IdentityRemoved(identity_history));
+                    address_details.network_id = address_details
+                        .network_id
+                        .into_iter()
+                        .filter(|id| id != key)
+                        .collect();
                 }
-                if address_details.network_id.is_empty() {
-                    address_batch.remove(address_key.key())
-                } else {
-                    address_batch.insert(address_key.key(), address_details.encode())
-                }
+            }
+            if address_details.network_id.is_empty() {
+                address_batch.remove(address_key.key())
+            } else {
+                address_batch.insert(address_key.key(), address_details.encode())
             }
         }
     }
     TrDbCold::new()
         .set_addresses(address_batch) // upd addresses
-        .set_history(events_to_batch::<Signer>(&database_name, events)?) // add corresponding history
+        .set_history(events_to_batch::<Signer>(database_name, events)?) // add corresponding history
         .set_metadata(meta_batch) // upd metadata
         .set_network_specs(network_specs_batch) // upd network_specs
         .set_verifiers(verifiers_batch) // upd network_verifiers
-        .apply::<Signer>(&database_name)
+        .apply::<Signer>(database_name)
 }
 
 pub fn remove_metadata(
@@ -151,7 +144,7 @@ pub fn remove_metadata(
     TrDbCold::new()
         .set_metadata(meta_batch) // remove metadata
         .set_history(history_batch) // add corresponding history
-        .apply::<Signer>(&database_name)
+        .apply::<Signer>(database_name)
 }
 
 fn get_batch_remove_unchecked_meta(
@@ -178,7 +171,7 @@ fn get_batch_remove_unchecked_meta(
             Err(e) => return Err(<Signer>::db_internal(e)),
         }
     };
-    events_to_batch::<Signer>(&database_name, events)
+    events_to_batch::<Signer>(database_name, events)
 }
 
 #[cfg(test)]
@@ -225,19 +218,17 @@ mod tests {
                 "Some westend metadata was not deleted"
             );
             let identities: Tree = database.open_tree(ADDRTREE).unwrap();
-            for x in identities.iter() {
-                if let Ok(a) = x {
-                    let (_, address_details) =
-                        AddressDetails::process_entry_checked::<Signer>(a).unwrap();
-                    assert!(
-                        !address_details.network_id.contains(&network_specs_key),
-                        "Some westend identities still remain."
-                    );
-                    assert!(
-                        address_details.network_id.len() != 0,
-                        "Did not remove address key entried with no network keys associated"
-                    );
-                }
+            for x in identities.iter().flatten() {
+                let (_, address_details) =
+                    AddressDetails::process_entry_checked::<Signer>(x).unwrap();
+                assert!(
+                    !address_details.network_id.contains(&network_specs_key),
+                    "Some westend identities still remain."
+                );
+                assert!(
+                    !address_details.network_id.is_empty(),
+                    "Did not remove address key entried with no network keys associated"
+                );
             }
         }
         let history_printed = print_history(dbname).unwrap();
