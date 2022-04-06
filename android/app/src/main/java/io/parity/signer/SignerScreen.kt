@@ -3,6 +3,7 @@ package io.parity.signer
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import io.parity.signer.alerts.Confirm
@@ -17,18 +18,24 @@ import org.json.JSONObject
 @ExperimentalAnimationApi
 @ExperimentalMaterialApi
 @Composable
-fun ScreenSelector(screen: SignerScreen?, signerDataModel: SignerDataModel) {
-	val screenData by signerDataModel.screenData.observeAsState()
-	val alertState by signerDataModel.alertState.observeAsState()
-
+fun ScreenSelector(
+	screen: SignerScreen?,
+	screenData: State<JSONObject?>,
+	shieldAlert: State<ShieldAlert?>,
+	progress: State<Float?>,
+	captured: State<Int?>,
+	total: State<Int?>,
+	button: (ButtonID, String, String) -> Unit,
+	signerDataModel: SignerDataModel
+) {
 	when (screen) {
 		SignerScreen.Scan -> {
 			ScanScreen(
 				signerDataModel::handleCameraPermissions,
 				signerDataModel::processFrame,
-				signerDataModel.progress.observeAsState(),
-				signerDataModel.captured.observeAsState(),
-				signerDataModel.total.observeAsState(),
+				progress,
+				captured,
+				total,
 				signerDataModel::resetScan
 			)
 		}
@@ -36,15 +43,15 @@ fun ScreenSelector(screen: SignerScreen?, signerDataModel: SignerDataModel) {
 			KeyManager(
 				signerDataModel::pushButton,
 				signerDataModel::increment,
-				screenData ?: JSONObject(),
-				alertState
+				screenData.value ?: JSONObject(),
+				shieldAlert.value
 			)
 		}
 		SignerScreen.Settings -> {
 			SettingsScreen(
-				screenData ?: JSONObject(),
+				screenData.value ?: JSONObject(),
 				signerDataModel::pushButton,
-				alertState,
+				shieldAlert.value,
 				signerDataModel.isStrongBoxProtected().toString(),
 				signerDataModel.getAppVersion(),
 				signerDataModel::wipeToFactory
@@ -52,82 +59,82 @@ fun ScreenSelector(screen: SignerScreen?, signerDataModel: SignerDataModel) {
 		}
 		SignerScreen.Log -> {
 			HistoryScreen(
-				screenData ?: JSONObject(),
+				screenData.value ?: JSONObject(),
 				signerDataModel::pushButton
 			)
 		}
-		SignerScreen.LogDetails -> LogDetails(screenData ?: JSONObject())
+		SignerScreen.LogDetails -> LogDetails(screenData.value ?: JSONObject())
 		SignerScreen.Transaction -> {
 			TransactionPreview(
-				screenData ?: JSONObject(),
+				screenData.value ?: JSONObject(),
 				signerDataModel::pushButton,
 				signerDataModel::signTransaction
 			)
 		}
 		SignerScreen.SeedSelector -> {
 			SeedManager(
-				screenData ?: JSONObject(),
+				screenData.value ?: JSONObject(),
 				signerDataModel::pushButton
 			)
 		}
 		SignerScreen.KeyDetails -> {
 			ExportPublicKey(
-				screenData ?: JSONObject()
+				screenData.value ?: JSONObject()
 			)
 		}
 		SignerScreen.NewSeed -> {
 			NewSeedScreen(
-				screenData ?: JSONObject(),
+				screenData.value ?: JSONObject(),
 				signerDataModel.seedNames.value ?: arrayOf(),
 				signerDataModel::pushButton
 			)
 		}
 		SignerScreen.RecoverSeedName -> {
 			RecoverSeedName(
-				screenData ?: JSONObject(),
+				screenData.value ?: JSONObject(),
 				signerDataModel.seedNames.value ?: arrayOf(),
 				signerDataModel::pushButton
 			)
 		}
 		SignerScreen.RecoverSeedPhrase -> {
 			RecoverSeedPhrase(
-				screenData ?: JSONObject(),
+				screenData.value ?: JSONObject(),
 				signerDataModel::pushButton,
 				signerDataModel::addSeed
 			)
 		}
 		SignerScreen.DeriveKey -> {
 			NewAddressScreen(
-				screenData ?: JSONObject(),
+				screenData.value ?: JSONObject(),
 				signerDataModel::pushButton,
 				signerDataModel::pathCheck,
 				signerDataModel::addKey
 			)
 		}
 		SignerScreen.Verifier -> VerifierScreen(
-			screenData ?: JSONObject(),
+			screenData.value ?: JSONObject(),
 			signerDataModel::wipeToJailbreak
 		)
 		null -> WaitingScreen()
 		SignerScreen.ManageNetworks -> ManageNetworks(
-			screenData ?: JSONObject(),
+			screenData.value ?: JSONObject(),
 			signerDataModel::pushButton
 		)
 		SignerScreen.NetworkDetails -> NetworkDetails(
-			screenData ?: JSONObject(),
+			screenData.value ?: JSONObject(),
 			signerDataModel::pushButton
 		)
 		SignerScreen.SignSufficientCrypto -> SignSufficientCrypto(
-			screenData ?: JSONObject(),
+			screenData.value ?: JSONObject(),
 			signerDataModel::signSufficientCrypto
 		)
 		SignerScreen.SelectSeedForBackup -> SelectSeedForBackup(
-			screenData ?: JSONObject(),
+			screenData.value ?: JSONObject(),
 			signerDataModel::pushButton
 		)
 		SignerScreen.Documents -> Documents()
 		SignerScreen.KeyDetailsMultiSelect -> KeyDetailsMulti(
-			screenData ?: JSONObject(),
+			screenData.value ?: JSONObject(),
 			signerDataModel::pushButton
 		)
 	}

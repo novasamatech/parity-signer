@@ -59,6 +59,10 @@ fun SignerApp(signerDataModel: SignerDataModel) {
 		val signerScreen = signerDataModel.screen.observeAsState()
 		val signerModal = signerDataModel.modal.observeAsState()
 		val signerAlert = signerDataModel.alert.observeAsState()
+		val screenData = signerDataModel.screenData.observeAsState()
+		val progress = signerDataModel.progress.observeAsState()
+		val captured = signerDataModel.captured.observeAsState()
+		val total = signerDataModel.total.observeAsState()
 		val shieldAlert = signerDataModel.alertState.observeAsState()
 		val footer = signerDataModel.footer.observeAsState()
 
@@ -89,7 +93,16 @@ fun SignerApp(signerDataModel: SignerDataModel) {
 						}
 					) { innerPadding ->
 						Box(modifier = Modifier.padding(innerPadding)) {
-							ScreenSelector(signerScreen.value, signerDataModel)
+							ScreenSelector(
+								signerScreen.value,
+								screenData,
+								shieldAlert,
+								progress,
+								captured,
+								total,
+								signerDataModel::pushButton,
+								signerDataModel
+							)
 							ModalSelector(
 								modal = signerModal.value ?: SignerModal.Empty,
 								signerDataModel = signerDataModel
