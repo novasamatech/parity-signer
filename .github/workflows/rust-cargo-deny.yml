@@ -11,6 +11,8 @@ jobs:
   cargo-deny:
     name:                 Cargo deny
     runs-on:              ubuntu-latest
+    defaults:
+      working-directory:  rust
     strategy:
       matrix:
         checks:
@@ -24,13 +26,11 @@ jobs:
 
       - name:               Move Cargo.toml
         run:                |
-          cd rust
           cp os-specific-lock/android/Cargo.lock .
           cp signer/android-hack/Cargo.toml signer
 
       - name:               Run cargo-deny
         uses:               EmbarkStudios/cargo-deny-action@v1
         with:
-          working-directory:  ./rust/
           command:        check {{ $matrix.checks }}
 
