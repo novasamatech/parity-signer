@@ -44,128 +44,56 @@ mod tests {
         ))))
     }
 
-    fn sign_action_test(
-        checksum: u32,
-        seed_phrase: &str,
-        pwd_entry: &str,
-        user_comment: &str,
-        dbname: &str,
-    ) -> Result<String, ErrorSigner> {
-        Ok(hex::encode(
-            create_signature(seed_phrase, pwd_entry, user_comment, dbname, checksum)?.encode(),
+    let mut network_specs_set: Vec<(NetworkSpecsKey, NetworkSpecs)> = Vec::new();
+    let chainspecs: Tree = database.open_tree(SPECSTREE).unwrap();
+    for x in chainspecs.iter().flatten() {
+        let (network_specs_key_vec, network_specs_encoded) = x;
+        let network_specs_key = NetworkSpecsKey::from_ivec(&network_specs_key_vec);
+        let network_specs = NetworkSpecs::from_entry_with_key_checked::<Signer>(
+            &network_specs_key,
+            network_specs_encoded,
+        )
+        .unwrap();
+        network_specs_set.push((network_specs_key, network_specs));
+    }
+    network_specs_set.sort_by(|(_, a), (_, b)| a.title.cmp(&b.title));
+    let mut network_specs_str = String::new();
+    for (network_specs_key, network_specs) in network_specs_set.iter() {
+        network_specs_str.push_str(&format!(
+            "\n\t{}: {} ({} with {})",
+            hex::encode(network_specs_key.key()),
+            network_specs.title,
+            network_specs.name,
+            network_specs.encryption.show()
         ))
     }
 
-    fn print_db_content(dbname: &str) -> String {
-        let database: Db = open(dbname).unwrap();
+    let settings: Tree = database.open_tree(SETTREE).unwrap();
+    let general_verifier_encoded = settings.get(&GENERALVERIFIER).unwrap().unwrap();
+    let general_verifier = Verifier::decode(&mut &general_verifier_encoded[..]).unwrap();
 
-        let mut metadata_set: Vec<String> = Vec::new();
-        let metadata: Tree = database.open_tree(METATREE).unwrap();
-        for x in metadata.iter() {
-            if let Ok((meta_key_vec, _)) = x {
-                let meta_key = MetaKey::from_ivec(&meta_key_vec);
-                let (name, version) = meta_key.name_version::<Signer>().unwrap();
-                metadata_set.push(format!("{}{}", name, version));
-            }
+    let mut verifiers_set: Vec<String> = Vec::new();
+    let verifiers: Tree = database.open_tree(VERIFIERS).unwrap();
+    for x in verifiers.iter().flatten() {
+        let (verifier_key_vec, current_verifier_encoded) = x;
+        let verifier_key = VerifierKey::from_ivec(&verifier_key_vec);
+        let current_verifier = CurrentVerifier::decode(&mut &current_verifier_encoded[..]).unwrap();
+        match current_verifier {
+            CurrentVerifier::Valid(a) => verifiers_set.push(format!(
+                "{}: {}",
+                hex::encode(verifier_key.key()),
+                a.show(&general_verifier)
+            )),
+            CurrentVerifier::Dead => verifiers_set.push(format!(
+                "{}: network inactivated",
+                hex::encode(verifier_key.key())
+            )),
         }
-        metadata_set.sort();
-        let mut metadata_str = String::new();
-        for x in metadata_set.iter() {
-            metadata_str.push_str(&format!("\n\t{}", x))
-        }
-
-        let mut network_specs_set: Vec<(NetworkSpecsKey, NetworkSpecs)> = Vec::new();
-        let chainspecs: Tree = database.open_tree(SPECSTREE).unwrap();
-        for x in chainspecs.iter() {
-            if let Ok((network_specs_key_vec, network_specs_encoded)) = x {
-                let network_specs_key = NetworkSpecsKey::from_ivec(&network_specs_key_vec);
-                let network_specs = NetworkSpecs::from_entry_with_key_checked::<Signer>(
-                    &network_specs_key,
-                    network_specs_encoded,
-                )
-                .unwrap();
-                network_specs_set.push((network_specs_key, network_specs));
-            }
-        }
-        network_specs_set.sort_by(|(_, a), (_, b)| a.title.cmp(&b.title));
-        let mut network_specs_str = String::new();
-        for (network_specs_key, network_specs) in network_specs_set.iter() {
-            network_specs_str.push_str(&format!(
-                "\n\t{}: {} ({} with {})",
-                hex::encode(network_specs_key.key()),
-                network_specs.title,
-                network_specs.name,
-                network_specs.encryption.show()
-            ))
-        }
-
-        let settings: Tree = database.open_tree(SETTREE).unwrap();
-        let general_verifier_encoded = settings.get(&GENERALVERIFIER).unwrap().unwrap();
-        let general_verifier = Verifier::decode(&mut &general_verifier_encoded[..]).unwrap();
-
-        let mut verifiers_set: Vec<String> = Vec::new();
-        let verifiers: Tree = database.open_tree(VERIFIERS).unwrap();
-        for x in verifiers.iter() {
-            if let Ok((verifier_key_vec, current_verifier_encoded)) = x {
-                let verifier_key = VerifierKey::from_ivec(&verifier_key_vec);
-                let current_verifier =
-                    CurrentVerifier::decode(&mut &current_verifier_encoded[..]).unwrap();
-                match current_verifier {
-                    CurrentVerifier::Valid(a) => verifiers_set.push(format!(
-                        "{}: {}",
-                        hex::encode(verifier_key.key()),
-                        a.show(&general_verifier)
-                    )),
-                    CurrentVerifier::Dead => verifiers_set.push(format!(
-                        "{}: network inactivated",
-                        hex::encode(verifier_key.key())
-                    )),
-                }
-            }
-        }
-        verifiers_set.sort();
-        let mut verifiers_str = String::new();
-        for x in verifiers_set.iter() {
-            verifiers_str.push_str(&format!("\n\t{}", x))
-        }
-
-        let mut identities_set: Vec<String> = Vec::new();
-        let identities: Tree = database.open_tree(ADDRTREE).unwrap();
-        for x in identities.iter() {
-            if let Ok((address_key_vec, address_details_encoded)) = x {
-                let address_key = AddressKey::from_ivec(&address_key_vec);
-                let address_details =
-                    AddressDetails::decode(&mut &address_details_encoded[..]).unwrap();
-                let (public_key, encryption) = address_key
-                    .public_key_encryption::<Signer>(AddressKeySource::AddrTree)
-                    .unwrap();
-
-                let mut networks_set: Vec<String> = Vec::new();
-                for y in address_details.network_id.iter() {
-                    networks_set.push(hex::encode(y.key()))
-                }
-                networks_set.sort();
-                let mut networks_str = String::new();
-                for y in networks_set.iter() {
-                    networks_str.push_str(&format!("\n\t\t{}", y))
-                }
-
-                identities_set.push(format!(
-                    "public_key: {}, encryption: {}, path: {}, available_networks: {}",
-                    hex::encode(public_key),
-                    encryption.show(),
-                    address_details.path,
-                    networks_str
-                ));
-            }
-        }
-        identities_set.sort();
-        let mut identities_str = String::new();
-        for x in identities_set.iter() {
-            identities_str.push_str(&format!("\n\t{}", x))
-        }
-
-        format!("Database contents:\nMetadata:{}\nNetwork Specs:{}\nVerifiers:{}\nGeneral Verifier: {}\nIdentities: {}", metadata_str, network_specs_str, verifiers_str, general_verifier.show_error(), identities_str)
+    }
+    verifiers_set.sort();
+    let mut verifiers_str = String::new();
+    for x in verifiers_set.iter() {
+        verifiers_str.push_str(&format!("\n\t{}", x))
     }
 
     // can sign a parsed transaction
@@ -309,21 +237,20 @@ mod tests {
         } else {
             panic!("Wrong action: {:?}", output)
         }
-        fs::remove_dir_all(dbname).unwrap();
-    }
 
-    #[test]
-    fn add_specs_westend_no_network_info_not_signed() {
-        let dbname = "for_tests/add_specs_westend_no_network_info_not_signed";
-        populate_cold_no_networks(dbname, Verifier(None)).unwrap();
-        let line = fs::read_to_string("for_tests/add_specs_westend_unverified.txt").unwrap();
-        let output = produce_output(&line.trim(), dbname);
-        let reply_known = r##""warning":[{"index":0,"indent":0,"type":"warning","payload":"Received network information is not verified."}],"new_specs":[{"index":1,"indent":0,"type":"new_specs","payload":{"base58prefix":"42","color":"#660D35","decimals":"12","encryption":"sr25519","genesis_hash":"e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e","logo":"westend","name":"westend","path_id":"//westend","secondary_color":"#262626","title":"Westend","unit":"WND"}}]"##;
-        let stub_nav_known = StubNav::AddSpecs(NetworkSpecsKey::from_parts(
-            &hex::decode("e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e")
-                .unwrap(),
-            &Encryption::Sr25519,
+        identities_set.push(format!(
+            "public_key: {}, encryption: {}, path: {}, available_networks: {}",
+            hex::encode(public_key),
+            encryption.show(),
+            address_details.path,
+            networks_str
         ));
+    }
+    identities_set.sort();
+    let mut identities_str = String::new();
+    for x in identities_set.iter() {
+        identities_str.push_str(&format!("\n\t{}", x))
+    }
 
         if let Action::Stub(reply, checksum, stub_nav) = output {
             assert!(reply == reply_known, "Received: \n{}", reply);
@@ -337,7 +264,34 @@ mod tests {
                 print_before
             );
 
-            handle_stub(checksum, dbname).unwrap();
+    let output = produce_output(line, dbname);
+    if let Action::Sign {
+        content,
+        checksum,
+        has_pwd,
+        author_info,
+        network_info,
+    } = output
+    {
+        assert!(
+            content == content_known,
+            "Expected: {}\nReceived: {}",
+            content_known,
+            content
+        );
+        assert!(
+            author_info == author_info_known,
+            "Expected: {}\nReceived: {}",
+            author_info_known,
+            author_info
+        );
+        assert!(
+            network_info == network_info_known,
+            "Expected: {}\nReceived: {}",
+            network_info_known,
+            network_info
+        );
+        assert!(!has_pwd, "Expected no password");
 
             let print_after = print_db_content(&dbname).replace(EMPTY_PNG, r#"<empty>"#);
             let expected_print_after = r#"Database contents:
@@ -360,19 +314,8 @@ Identities: "#;
         fs::remove_dir_all(dbname).unwrap();
     }
 
-    #[test]
-    fn add_specs_westend_ed25519_not_signed() {
-        let dbname = "for_tests/add_specs_westend_ed25519_not_signed";
-        populate_cold(dbname, Verifier(None)).unwrap();
-        let line =
-            fs::read_to_string("for_tests/add_specs_westend-ed25519_unverified.txt").unwrap();
-        let output = produce_output(&line.trim(), dbname);
-        let reply_known = r##""warning":[{"index":0,"indent":0,"type":"warning","payload":"Received network information is not verified."}],"new_specs":[{"index":1,"indent":0,"type":"new_specs","payload":{"base58prefix":"42","color":"#660D35","decimals":"12","encryption":"ed25519","genesis_hash":"e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e","logo":"westend","name":"westend","path_id":"//westend","secondary_color":"#262626","title":"westend-ed25519","unit":"WND"}}]"##;
-        let stub_nav_known = StubNav::AddSpecs(NetworkSpecsKey::from_parts(
-            &hex::decode("e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e")
-                .unwrap(),
-            &Encryption::Ed25519,
-        ));
+    fs::remove_dir_all(dbname).unwrap();
+}
 
         if let Action::Stub(reply, checksum, stub_nav) = output {
             assert!(
@@ -590,6 +533,8 @@ Identities:
         }
         fs::remove_dir_all(dbname).unwrap();
     }
+    fs::remove_dir_all(dbname).unwrap();
+}
 
     #[test]
     fn load_westend9070() {
@@ -648,7 +593,7 @@ Identities:
                 print_before
             );
 
-            handle_stub(checksum, dbname).unwrap();
+        handle_stub(checksum, dbname).unwrap();
 
             let print_after = print_db_content(&dbname).replace(EMPTY_PNG, r#"<empty>"#);
             let expected_print_after = r#"Database contents:
@@ -690,6 +635,8 @@ Identities:
         }
         fs::remove_dir_all(dbname).unwrap();
     }
+    fs::remove_dir_all(dbname).unwrap();
+}
 
     #[test]
     fn load_known_types_upd_general_verifier() {
@@ -742,7 +689,7 @@ Identities:
                 print_before
             );
 
-            handle_stub(checksum, dbname).unwrap();
+        handle_stub(checksum, dbname).unwrap();
 
             let print_after =
                 print_db_content(&dbname).replace(ALICE_SR_ALICE, r#"<alice_sr25519_//Alice>"#);
@@ -777,6 +724,8 @@ Identities:
         }
         fs::remove_dir_all(dbname).unwrap();
     }
+    fs::remove_dir_all(dbname).unwrap();
+}
 
     #[test]
     fn load_new_types_verified() {
@@ -830,7 +779,7 @@ Identities:
                 print_before
             );
 
-            handle_stub(checksum, dbname).unwrap();
+        handle_stub(checksum, dbname).unwrap();
 
             let print_after =
                 print_db_content(&dbname).replace(ALICE_SR_ALICE, r#"<alice_sr25519_//Alice>"#);
@@ -872,21 +821,22 @@ Identities:
         }
         fs::remove_dir_all(dbname).unwrap();
     }
+    fs::remove_dir_all(dbname).unwrap();
+}
 
-    #[test]
-    fn dock_adventures_1() {
-        let dbname = "for_tests/dock_adventures_1";
-        populate_cold(dbname, Verifier(None)).unwrap();
-        let line =
-            fs::read_to_string("for_tests/add_specs_dock-pos-main-runtime-sr25519_unverified.txt")
-                .unwrap();
-        let output = produce_output(&line.trim(), dbname);
-        let reply_known = r##""warning":[{"index":0,"indent":0,"type":"warning","payload":"Received network information is not verified."}],"new_specs":[{"index":1,"indent":0,"type":"new_specs","payload":{"base58prefix":"22","color":"#660D35","decimals":"6","encryption":"sr25519","genesis_hash":"6bfe24dca2a3be10f22212678ac13a6446ec764103c0f3471c71609eac384aae","logo":"dock-pos-main-runtime","name":"dock-pos-main-runtime","path_id":"//dock-pos-main-runtime","secondary_color":"#262626","title":"dock-pos-main-runtime-sr25519","unit":"DOCK"}}]"##;
-        let stub_nav_known = StubNav::AddSpecs(NetworkSpecsKey::from_parts(
-            &hex::decode("6bfe24dca2a3be10f22212678ac13a6446ec764103c0f3471c71609eac384aae")
-                .unwrap(),
-            &Encryption::Sr25519,
-        ));
+#[test]
+fn dock_adventures_1() {
+    let dbname = "for_tests/dock_adventures_1";
+    populate_cold(dbname, Verifier(None)).unwrap();
+    let line =
+        fs::read_to_string("for_tests/add_specs_dock-pos-main-runtime-sr25519_unverified.txt")
+            .unwrap();
+    let output = produce_output(line.trim(), dbname);
+    let reply_known = r##""warning":[{"index":0,"indent":0,"type":"warning","payload":"Received network information is not verified."}],"new_specs":[{"index":1,"indent":0,"type":"new_specs","payload":{"base58prefix":"22","color":"#660D35","decimals":"6","encryption":"sr25519","genesis_hash":"6bfe24dca2a3be10f22212678ac13a6446ec764103c0f3471c71609eac384aae","logo":"dock-pos-main-runtime","name":"dock-pos-main-runtime","path_id":"//dock-pos-main-runtime","secondary_color":"#262626","title":"dock-pos-main-runtime-sr25519","unit":"DOCK"}}]"##;
+    let stub_nav_known = StubNav::AddSpecs(NetworkSpecsKey::from_parts(
+        &hex::decode("6bfe24dca2a3be10f22212678ac13a6446ec764103c0f3471c71609eac384aae").unwrap(),
+        &Encryption::Sr25519,
+    ));
 
         if let Action::Stub(reply, checksum, stub_nav) = output {
             assert!(
@@ -931,7 +881,7 @@ Identities:
                 print_before
             );
 
-            handle_stub(checksum, dbname).unwrap();
+        handle_stub(checksum, dbname).unwrap();
 
             let print_after = print_db_content(&dbname).replace(EMPTY_PNG, r#"<empty>"#);
             let expected_print_after = r#"Database contents:
@@ -994,7 +944,7 @@ Identities:
             );
             assert!(stub_nav == stub_nav_known, "Received: {:?}", stub_nav);
 
-            handle_stub(checksum, dbname).unwrap();
+        handle_stub(checksum, dbname).unwrap();
 
             let print_after = print_db_content(&dbname).replace(EMPTY_PNG, r#"<empty>"#);
             let expected_print_after = r#"Database contents:
@@ -1059,7 +1009,7 @@ Identities:
             );
             assert!(stub_nav == stub_nav_known, "Received: \n{:?}", stub_nav);
 
-            handle_stub(checksum, dbname).unwrap();
+        handle_stub(checksum, dbname).unwrap();
 
             let print_after =
                 print_db_content(&dbname).replace(ALICE_SR_ALICE, r#"<alice_sr25519_//Alice>"#);
@@ -1099,20 +1049,8 @@ Identities:
         fs::remove_dir_all(dbname).unwrap();
     }
 
-    #[test]
-    fn dock_adventures_2() {
-        let dbname = "for_tests/dock_adventures_2";
-        populate_cold(dbname, verifier_alice_sr25519()).unwrap();
-        let line =
-            fs::read_to_string("for_tests/add_specs_dock-pos-main-runtime-sr25519_unverified.txt")
-                .unwrap();
-        let output = produce_output(&line.trim(), dbname);
-        let reply_known = r##""warning":[{"index":0,"indent":0,"type":"warning","payload":"Received network information is not verified."}],"new_specs":[{"index":1,"indent":0,"type":"new_specs","payload":{"base58prefix":"22","color":"#660D35","decimals":"6","encryption":"sr25519","genesis_hash":"6bfe24dca2a3be10f22212678ac13a6446ec764103c0f3471c71609eac384aae","logo":"dock-pos-main-runtime","name":"dock-pos-main-runtime","path_id":"//dock-pos-main-runtime","secondary_color":"#262626","title":"dock-pos-main-runtime-sr25519","unit":"DOCK"}}]"##;
-        let stub_nav_known = StubNav::AddSpecs(NetworkSpecsKey::from_parts(
-            &hex::decode("6bfe24dca2a3be10f22212678ac13a6446ec764103c0f3471c71609eac384aae")
-                .unwrap(),
-            &Encryption::Sr25519,
-        ));
+    fs::remove_dir_all(dbname).unwrap();
+}
 
         if let Action::Stub(reply, checksum, stub_nav) = output {
             assert!(
@@ -1158,7 +1096,7 @@ Identities:
                 print_before
             );
 
-            handle_stub(checksum, dbname).unwrap();
+        handle_stub(checksum, dbname).unwrap();
 
             let print_after = print_db_content(&dbname)
                 .replace(ALICE_SR_ALICE, r#"<alice_sr25519_//Alice>"#)
@@ -1223,7 +1161,7 @@ Identities:
             );
             assert!(stub_nav == stub_nav_known, "Received: \n{:?}", stub_nav);
 
-            handle_stub(checksum, dbname).unwrap();
+        handle_stub(checksum, dbname).unwrap();
 
             let print_after = print_db_content(&dbname)
                 .replace(ALICE_SR_ALICE, r#"<alice_sr25519_//Alice>"#)
@@ -1290,7 +1228,7 @@ Identities:
             );
             assert!(stub_nav == stub_nav_known, "Received: \n{:?}", stub_nav);
 
-            handle_stub(checksum, dbname).unwrap();
+        handle_stub(checksum, dbname).unwrap();
 
             let print_after = print_db_content(&dbname)
                 .replace(ALICE_SR_ALICE, r#"<alice_sr25519_//Alice>"#)
@@ -1356,7 +1294,7 @@ Identities:
             );
             assert!(stub_nav == stub_nav_known, "Received: \n{:?}", stub_nav);
 
-            handle_stub(checksum, dbname).unwrap();
+        handle_stub(checksum, dbname).unwrap();
 
             let print_after =
                 print_db_content(&dbname).replace(ALICE_SR_ALICE, r#"<alice_sr25519_//Alice>"#);
@@ -1461,7 +1399,7 @@ Identities:
                 print_before
             );
 
-            handle_stub(checksum, dbname).unwrap();
+        handle_stub(checksum, dbname).unwrap();
 
             let print_after = print_db_content(&dbname).replace(EMPTY_PNG, r#"<empty>"#);
             let expected_print_after = r#"Database contents:
@@ -1577,10 +1515,9 @@ Identities:
             .replace(BOB, r#"<bob>"#);
         let historic_reply_known = r#""method":[{"index":0,"indent":0,"type":"pallet","payload":"Balances"},{"index":1,"indent":1,"type":"method","payload":{"method_name":"transfer_keep_alive","docs":"53616d6520617320746865205b607472616e73666572605d2063616c6c2c206275742077697468206120636865636b207468617420746865207472616e736665722077696c6c206e6f74206b696c6c207468650a6f726967696e206163636f756e742e0a0a393925206f66207468652074696d6520796f752077616e74205b607472616e73666572605d20696e73746561642e0a0a5b607472616e73666572605d3a207374727563742e50616c6c65742e68746d6c236d6574686f642e7472616e736665720a23203c7765696768743e0a2d2043686561706572207468616e207472616e736665722062656361757365206163636f756e742063616e6e6f74206265206b696c6c65642e0a2d2042617365205765696768743a2035312e3420c2b5730a2d204442205765696768743a2031205265616420616e64203120577269746520746f2064657374202873656e64657220697320696e206f7665726c617920616c7265616479290a233c2f7765696768743e"}},{"index":2,"indent":2,"type":"field_name","payload":{"name":"dest","docs_field_name":"","path_type":"sp_runtime >> multiaddress >> MultiAddress","docs_type":""}},{"index":3,"indent":3,"type":"enum_variant_name","payload":{"name":"Id","docs_enum_variant":""}},{"index":4,"indent":4,"type":"Id","payload":{"base58":"5FHneW46xGXgs5mUiveU4sbTyGBzmstUspZC92UhjJM694ty","identicon":"<bob>"}},{"index":5,"indent":2,"type":"field_name","payload":{"name":"value","docs_field_name":"","path_type":"","docs_type":""}},{"index":6,"indent":3,"type":"balance","payload":{"amount":"100.000000","units":"uWND"}}],"extensions":[{"index":7,"indent":0,"type":"era","payload":{"era":"Mortal","phase":"61","period":"64"}},{"index":8,"indent":0,"type":"nonce","payload":"261"},{"index":9,"indent":0,"type":"tip","payload":{"amount":"10.000000","units":"uWND"}},{"index":10,"indent":0,"type":"name_version","payload":{"name":"westend","version":"9111"}},{"index":11,"indent":0,"type":"tx_version","payload":"7"},{"index":12,"indent":0,"type":"block_hash","payload":"98a8ee9e389043cd8a9954b254d822d34138b9ae97d3b7f50dc6781b13df8d84"}]"#;
         assert!(
-            historic_reply.contains(historic_reply_known),
-            "Received different historic reply for order 3: \n{}\n{}",
-            historic_reply,
-            print_history(dbname).unwrap()
+            print_after == expected_print_after,
+            "Received:\n{}",
+            print_after
         );
 
         let historic_reply = print_history_entry_by_order_with_decoding(4, dbname)
@@ -1733,48 +1670,40 @@ Identities:
             print_before
         );
 
-        let line =
-            fs::read_to_string("for_tests/load_metadata_westendV9122_Alice-sr25519.txt").unwrap();
-        let output = produce_output(&line.trim(), dbname);
-        let reply_known = r#""error":[{"index":0,"indent":0,"type":"error","payload":"Bad input data. Network westend was previously known to the database with verifier public key: d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d, encryption: sr25519 (general verifier). However, no network specs are in the database at the moment. Add network specs before loading the metadata."}]"#;
+    let line =
+        fs::read_to_string("for_tests/load_metadata_westendV9122_Alice-sr25519.txt").unwrap();
+    let output = produce_output(line.trim(), dbname);
+    let reply_known = r#""error":[{"index":0,"indent":0,"type":"error","payload":"Bad input data. Network westend was previously known to the database with verifier public key: d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d, encryption: sr25519 (general verifier). However, no network specs are in the database at the moment. Add network specs before loading the metadata."}]"#;
 
-        if let Action::Read(reply) = output {
-            assert!(reply == reply_known, "Received: \n{}", reply);
-        } else {
-            panic!("Wrong action: {:?}", output)
-        }
-
-        fs::remove_dir_all(dbname).unwrap();
+    if let Action::Read(reply) = output {
+        assert!(reply == reply_known, "Received: \n{}", reply);
+    } else {
+        panic!("Wrong action: {:?}", output)
     }
 
-    #[test]
-    fn dock_adventures_3() {
-        let dbname = "for_tests/dock_adventures_3";
-        populate_cold(dbname, verifier_alice_sr25519()).unwrap();
+    fs::remove_dir_all(dbname).unwrap();
+}
 
-        let line = fs::read_to_string(
-            "for_tests/add_specs_dock-pos-main-runtime-sr25519_Alice-ed25519.txt",
-        )
-        .unwrap();
-        let output = produce_output(&line.trim(), dbname);
+#[test]
+fn dock_adventures_3() {
+    let dbname = "for_tests/dock_adventures_3";
+    populate_cold(dbname, verifier_alice_sr25519()).unwrap();
 
-        if let Action::Stub(_, checksum, _) = output {
-            handle_stub(checksum, dbname).unwrap();
-        } else {
-            panic!("Wrong action: {:?}", output)
-        }
+    let line =
+        fs::read_to_string("for_tests/add_specs_dock-pos-main-runtime-sr25519_Alice-ed25519.txt")
+            .unwrap();
+    let output = produce_output(line.trim(), dbname);
 
-        let line = fs::read_to_string(
-            "for_tests/load_metadata_dock-pos-main-runtimeV34_Alice-ed25519.txt",
-        )
-        .unwrap();
-        let output = produce_output(&line.trim(), dbname);
+    if let Action::Stub(_, checksum, _) = output {
+        handle_stub(checksum, dbname).unwrap();
+    } else {
+        panic!("Wrong action: {:?}", output)
+    }
 
-        if let Action::Stub(_, checksum, _) = output {
-            handle_stub(checksum, dbname).unwrap();
-        } else {
-            panic!("Wrong action: {:?}", output)
-        }
+    let line =
+        fs::read_to_string("for_tests/load_metadata_dock-pos-main-runtimeV34_Alice-ed25519.txt")
+            .unwrap();
+    let output = produce_output(line.trim(), dbname);
 
         let print_before = print_db_content(&dbname)
             .replace(ALICE_SR_ALICE, r#"<alice_sr25519_//Alice>"#)
@@ -1817,15 +1746,15 @@ Identities:
             print_before
         );
 
-        remove_network(
-            &NetworkSpecsKey::from_parts(
-                &hex::decode("6bfe24dca2a3be10f22212678ac13a6446ec764103c0f3471c71609eac384aae")
-                    .unwrap(),
-                &Encryption::Sr25519,
-            ),
-            dbname,
-        )
-        .unwrap();
+    remove_network(
+        &NetworkSpecsKey::from_parts(
+            &hex::decode("6bfe24dca2a3be10f22212678ac13a6446ec764103c0f3471c71609eac384aae")
+                .unwrap(),
+            &Encryption::Sr25519,
+        ),
+        dbname,
+    )
+    .unwrap();
 
         let print_after =
             print_db_content(&dbname).replace(ALICE_SR_ALICE, r#"<alice_sr25519_//Alice>"#);
@@ -1864,12 +1793,11 @@ Identities:
             print_after
         );
 
-        let line = fs::read_to_string(
-            "for_tests/add_specs_dock-pos-main-runtime-sr25519_Alice-ed25519.txt",
-        )
-        .unwrap();
-        let output = produce_output(&line.trim(), dbname);
-        let reply_known = r#""error":[{"index":0,"indent":0,"type":"error","payload":"Network with genesis hash 6bfe24dca2a3be10f22212678ac13a6446ec764103c0f3471c71609eac384aae is disabled. It could be enabled again only after complete wipe and re-installation of Signer."}]"#;
+    let line =
+        fs::read_to_string("for_tests/add_specs_dock-pos-main-runtime-sr25519_Alice-ed25519.txt")
+            .unwrap();
+    let output = produce_output(line.trim(), dbname);
+    let reply_known = r#""error":[{"index":0,"indent":0,"type":"error","payload":"Network with genesis hash 6bfe24dca2a3be10f22212678ac13a6446ec764103c0f3471c71609eac384aae is disabled. It could be enabled again only after complete wipe and re-installation of Signer."}]"#;
 
         if let Action::Read(reply) = output {
             assert!(reply == reply_known, "Received: \n{}", reply);
@@ -1893,19 +1821,20 @@ Identities:
         fs::remove_dir_all(dbname).unwrap();
     }
 
-    #[test]
-    fn acala_adventures() {
-        let dbname = "for_tests/acala_adventures";
-        populate_cold_no_networks(dbname, Verifier(None)).unwrap();
+    let line =
+        fs::read_to_string("for_tests/load_metadata_dock-pos-main-runtimeV34_Alice-ed25519.txt")
+            .unwrap();
+    let output = produce_output(line.trim(), dbname);
+    let reply_known = r#""error":[{"index":0,"indent":0,"type":"error","payload":"Network with genesis hash 6bfe24dca2a3be10f22212678ac13a6446ec764103c0f3471c71609eac384aae is disabled. It could be enabled again only after complete wipe and re-installation of Signer."}]"#;
 
-        let line = fs::read_to_string("for_tests/add_specs_acala-sr25519_unverified.txt").unwrap();
-        let output = produce_output(&line.trim(), dbname);
+    if let Action::Read(reply) = output {
+        assert!(reply == reply_known, "\nReceived: {}", reply);
+    } else {
+        panic!("Wrong action: {:?}", output)
+    }
 
-        if let Action::Stub(_, checksum, _) = output {
-            handle_stub(checksum, dbname).unwrap();
-        } else {
-            panic!("Wrong action: {:?}", output)
-        }
+    fs::remove_dir_all(dbname).unwrap();
+}
 
         let print_after = print_db_content(&dbname).replace(EMPTY_PNG, r#"<empty>"#);
         let expected_print_after = r#"Database contents:
@@ -1916,6 +1845,26 @@ Verifiers:
 	fc41b9bd8ef8fe53d58c7ea67c794c7ec9a73daf05e6d54b14ff6342c99ba64c: "type":"custom","details":{"public_key":"","identicon":"<empty>","encryption":"none"}
 General Verifier: none
 Identities: "#;
+    assert!(
+        print_after == expected_print_after,
+        "Received:\n{}",
+        print_after
+    );
+
+    let line = fs::read_to_string("for_tests/load_metadata_acalaV2012_unverified.txt").unwrap();
+    let output = produce_output(line.trim(), dbname);
+
+    if let Action::Stub(_, checksum, _) = output {
+        handle_stub(checksum, dbname).unwrap();
+    } else {
+        panic!("Wrong action: {:?}", output)
+    }
+
+    let line = "530102dc621b10081b4b51335553ef8df227feb0327649d00beab6e09c10a1dce97359a80a0000dc621b10081b4b51335553ef8df227feb0327649d00beab6e09c10a1dce973590b00407a10f35a24010000dc07000001000000fc41b9bd8ef8fe53d58c7ea67c794c7ec9a73daf05e6d54b14ff6342c99ba64c5cfeb3e46c080274613bdb80809a3e84fe782ac31ea91e2c778de996f738e620fc41b9bd8ef8fe53d58c7ea67c794c7ec9a73daf05e6d54b14ff6342c99ba64c";
+    let output = produce_output(line, dbname);
+    let content_known = r#""author":[{"index":0,"indent":0,"type":"author_plain","payload":{"base58":"25rZGFcFEWz1d81xB98PJN8LQu5cCwjyazAerGkng5NDuk9C","identicon":"89504e470d0a1a0a0000000d49484452000000410000004108060000008ef7c9450000035149444154789cedd9ad6e146114c6719a54e1d6a0b806eea2018345a0707049e050082c06d2bbe01a509875a826cbfb64f3b46766cf9c8ff763324de72f66c54ede73e6279ac9f6ea743a3d7beaad82703c1eab871c0e87abf231b421082d0fed3502a52bc2c8879fd713a30b42cdc3dfbe7b59aed36ebeff29d75c3d309a106a1e1e6900ac0602b56054238c00606b435421d402a09108a8062285d0f2f06c3402cb6084117a00a0b51050142284900178f1e67db94efbfbf35bb99ecb22fc78fea55ca7bdfdf7b15c6345205c8456001685f000584f886e081600f320a2002c0ad1841005405904af9e08c8825844c800a0ad23a0250815210b801e0302d220c208d7bf5e95ebb4bbd7bfcbf55c16e1c3f5e5795fef1ececb2278fbb110421480c941168407c0a2101e0093fbb139848b600d607290061105601e441480c9fd90893007403543acb2085eb5fb49881da1748fa001a0da214b6d050111a23b8276bffc3e8be09da77d3f4fde2f0b23206b901c10bdcf82f000983c2f7adfbc1402d206c901daf7f3e4fd1a441480c9f3b4fbe5f75a13040f2092b6c43c6f2959eff39602c48eb02324117abfb97dbebdfc3de1d3cdc3ef09d9f3bc37d5a5c2081a008b42c8853500168590e76900cc8308215800cc83900b5b00cc8390e75900cc821882e09545f0da114a3b42699308de9b6016c13b6f1504644178004c2e6e4178004c9e67415800288c8034882800938b6b10510026cfd3203c009442f0ca2eedd5fbbca57684d28e50ba47401e84f7bfc3ecd2de9b60f63c6f3f2d00948ff3ef09c842d0063039c85a5c2eac01b028843c2fbadfbc30823580c941dae272610b807910f2bcec7eb261085e5904af96fd2e109006d132446b2b0804403b42698280e610d921de9b5b16c17b53cdee87240072119035480ed0005814c203605108b91f73115014420eb00098071105601e84dc8fcd015018c12b8be09545881646405988c780a001a045049481d83ac2120032115014228bd0fb6f82950580ba21200bc20360518828006a4640ad105100e641f4044021049481b0ca22b41401406104d403622d8428004a21b0168cd1089987675508a8166224420d00aa46402320d606404d08ac064383a801687978d60581d560d4d6e3e15957043612a3e7c3b32108f35a50463cf4bc5510b6de7fd01ebfac0eac30e50000000049454e44ae426082"}}],"warning":[{"index":1,"indent":0,"type":"warning","payload":"Transaction author public key not found."}],"method":[{"index":2,"indent":0,"type":"pallet","payload":"Balances"},{"index":3,"indent":1,"type":"method","payload":{"method_name":"transfer","docs":"5472616e7366657220736f6d65206c697175696420667265652062616c616e636520746f20616e6f74686572206163636f756e742e0a0a607472616e73666572602077696c6c207365742074686520604672656542616c616e636560206f66207468652073656e64657220616e642072656365697665722e0a49742077696c6c2064656372656173652074686520746f74616c2069737375616e6365206f66207468652073797374656d2062792074686520605472616e73666572466565602e0a4966207468652073656e6465722773206163636f756e742069732062656c6f7720746865206578697374656e7469616c206465706f736974206173206120726573756c740a6f6620746865207472616e736665722c20746865206163636f756e742077696c6c206265207265617065642e0a0a546865206469737061746368206f726967696e20666f7220746869732063616c6c206d75737420626520605369676e65646020627920746865207472616e736163746f722e0a0a23203c7765696768743e0a2d20446570656e64656e74206f6e20617267756d656e747320627574206e6f7420637269746963616c2c20676976656e2070726f70657220696d706c656d656e746174696f6e7320666f7220696e70757420636f6e6669670a202074797065732e205365652072656c617465642066756e6374696f6e732062656c6f772e0a2d20497420636f6e7461696e732061206c696d69746564206e756d626572206f6620726561647320616e642077726974657320696e7465726e616c6c7920616e64206e6f20636f6d706c65780a2020636f6d7075746174696f6e2e0a0a52656c617465642066756e6374696f6e733a0a0a20202d2060656e737572655f63616e5f77697468647261776020697320616c776179732063616c6c656420696e7465726e616c6c792062757420686173206120626f756e64656420636f6d706c65786974792e0a20202d205472616e7366657272696e672062616c616e63657320746f206163636f756e7473207468617420646964206e6f74206578697374206265666f72652077696c6c2063617573650a2020202060543a3a4f6e4e65774163636f756e743a3a6f6e5f6e65775f6163636f756e746020746f2062652063616c6c65642e0a20202d2052656d6f76696e6720656e6f7567682066756e64732066726f6d20616e206163636f756e742077696c6c20747269676765722060543a3a4475737452656d6f76616c3a3a6f6e5f756e62616c616e636564602e0a20202d20607472616e736665725f6b6565705f616c6976656020776f726b73207468652073616d652077617920617320607472616e73666572602c206275742068617320616e206164646974696f6e616c20636865636b0a202020207468617420746865207472616e736665722077696c6c206e6f74206b696c6c20746865206f726967696e206163636f756e742e0a2d2d2d2d2d2d2d2d2d2d2d2d2d2d2d2d2d2d2d2d2d2d2d2d2d2d2d2d2d2d2d2d2d0a2d204f726967696e206163636f756e7420697320616c726561647920696e206d656d6f72792c20736f206e6f204442206f7065726174696f6e7320666f72207468656d2e0a23203c2f7765696768743e"}},{"index":4,"indent":2,"type":"field_name","payload":{"name":"dest","docs_field_name":"","path_type":"sp_runtime >> multiaddress >> MultiAddress","docs_type":""}},{"index":5,"indent":3,"type":"enum_variant_name","payload":{"name":"Id","docs_enum_variant":""}},{"index":6,"indent":4,"type":"Id","payload":{"base58":"25rZGFcFEWz1d81xB98PJN8LQu5cCwjyazAerGkng5NDuk9C","identicon":"89504e470d0a1a0a0000000d49484452000000410000004108060000008ef7c9450000035149444154789cedd9ad6e146114c6719a54e1d6a0b806eea2018345a0707049e050082c06d2bbe01a509875a826cbfb64f3b46766cf9c8ff763324de72f66c54ede73e6279ac9f6ea743a3d7beaad82703c1eab871c0e87abf231b421082d0fed3502a52bc2c8879fd713a30b42cdc3dfbe7b59aed36ebeff29d75c3d309a106a1e1e6900ac0602b56054238c00606b435421d402a09108a8062285d0f2f06c3402cb6084117a00a0b51050142284900178f1e67db94efbfbf35bb99ecb22fc78fea55ca7bdfdf7b15c6345205c8456001685f000584f886e081600f320a2002c0ad1841005405904af9e08c8825844c800a0ad23a0250815210b801e0302d220c208d7bf5e95ebb4bbd7bfcbf55c16e1c3f5e5795fef1ececb2278fbb110421480c941168407c0a2101e0093fbb139848b600d607290061105601e441480c9fd90893007403543acb2085eb5fb49881da1748fa001a0da214b6d050111a23b8276bffc3e8be09da77d3f4fde2f0b23206b901c10bdcf82f000983c2f7adfbc1402d206c901daf7f3e4fd1a441480c9f3b4fbe5f75a13040f2092b6c43c6f2959eff39602c48eb02324117abfb97dbebdfc3de1d3cdc3ef09d9f3bc37d5a5c2081a008b42c8853500168590e76900cc8308215800cc83900b5b00cc8390e75900cc821882e09545f0da114a3b42699308de9b6016c13b6f1504644178004c2e6e4178004c9e67415800288c8034882800938b6b10510026cfd3203c009442f0ca2eedd5fbbca57684d28e50ba47401e84f7bfc3ecd2de9b60f63c6f3f2d00948ff3ef09c842d0063039c85a5c2eac01b028843c2fbadfbc30823580c941dae272610b807910f2bcec7eb261085e5904af96fd2e109006d132446b2b0804403b42698280e610d921de9b5b16c17b53cdee87240072119035480ed0005814c203605108b91f73115014420eb00098071105601e84dc8fcd015018c12b8be09545881646405988c780a001a045049481d83ac2120032115014228bd0fb6f82950580ba21200bc20360518828006a4640ad105100e641f4044021049481b0ca22b41401406104d403622d8428004a21b0168cd1089987675508a8166224420d00aa46402320d606404d08ac064383a801687978d60581d560d4d6e3e15957043612a3e7c3b32108f35a50463cf4bc5510b6de7fd01ebfac0eac30e50000000049454e44ae426082"}},{"index":7,"indent":2,"type":"field_name","payload":{"name":"value","docs_field_name":"","path_type":"","docs_type":""}},{"index":8,"indent":3,"type":"balance","payload":{"amount":"100.000000000000","units":"ACA"}}],"extensions":[{"index":9,"indent":0,"type":"era","payload":{"era":"Mortal","phase":"18","period":"32"}},{"index":10,"indent":0,"type":"nonce","payload":"0"},{"index":11,"indent":0,"type":"tip","payload":{"amount":"0","units":"pACA"}},{"index":12,"indent":0,"type":"name_version","payload":{"name":"acala","version":"2012"}},{"index":13,"indent":0,"type":"tx_version","payload":"1"},{"index":14,"indent":0,"type":"block_hash","payload":"5cfeb3e46c080274613bdb80809a3e84fe782ac31ea91e2c778de996f738e620"}]"#;
+
+    if let Action::Read(content) = output {
         assert!(
             print_after == expected_print_after,
             "Received: \n{}",

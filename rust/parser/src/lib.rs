@@ -237,6 +237,7 @@ pub fn cut_method_extensions(data: &[u8]) -> Result<(Vec<u8>, Vec<u8>), ParserEr
     }
 }
 
+#[allow(clippy::type_complexity)]
 pub fn parse_set(
     data: &[u8],
     metadata_bundle: &MetadataBundle,

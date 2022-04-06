@@ -18,6 +18,7 @@ use plot_icon::generate_png_scaled_default;
 
 use crate::holds::{GeneralHold, Hold};
 
+#[allow(clippy::enum_variant_names)]
 pub(crate) enum Card<'a> {
     ParserCard(&'a ParserCard),
     Author {

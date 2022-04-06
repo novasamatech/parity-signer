@@ -34,7 +34,7 @@ pub struct CutCompact<T: HasCompact> {
     pub start_next_unit: Option<usize>,
 }
 
-/// Function to search Vec<u8> for shortest compact <T> by brute force.
+/// Function to search &[u8] for shortest compact <T> by brute force.
 /// Outputs CutCompact value in case of success.
 pub fn get_compact<T>(data: &[u8]) -> Result<CutCompact<T>, ParserError>
 where

@@ -340,6 +340,7 @@ fn field_type_name_is_balance(type_name: &str) -> bool {
         || (type_name == "PalletBalanceOf<T>")
 }
 
+#[allow(clippy::too_many_arguments)]
 pub(crate) fn decoding_sci_complete(
     current_type: &Type<PortableForm>,
     possible_ext: &mut Option<&mut Ext>,
@@ -604,6 +605,7 @@ pub(crate) fn decoding_sci_entry_point(
     })
 }
 
+#[allow(clippy::too_many_arguments)]
 fn decode_type_def_sequence(
     inner_type: &Type<PortableForm>,
     possible_ext: &mut Option<&mut Ext>,
@@ -657,6 +659,7 @@ fn decode_type_def_sequence(
     }
 }
 
+#[allow(clippy::too_many_arguments)]
 fn decode_type_def_array(
     inner_type: &Type<PortableForm>,
     len: u32,
@@ -925,6 +928,7 @@ fn decode_type_def_variant(
     }
 }
 
+#[allow(clippy::too_many_arguments)]
 fn process_fields(
     fields: &[Field<PortableForm>],
     possible_ext: &mut Option<&mut Ext>,
@@ -1016,6 +1020,7 @@ fn process_fields(
     })
 }
 
+#[allow(clippy::too_many_arguments)]
 fn decode_type_def_composite(
     composite_ty: &TypeDefComposite<PortableForm>,
     possible_ext: &mut Option<&mut Ext>,

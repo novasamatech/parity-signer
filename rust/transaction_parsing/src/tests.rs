@@ -1,8 +1,18 @@
 /// Separated new cold test databases are created during the tests,
 /// and removed after test is performed, so the test can run in parallel
+use crate::{produce_output, Action, StubNav};
+use db_handling::{
+    cold_default::{populate_cold, populate_cold_no_metadata, populate_cold_no_networks},
+    manage_history::print_history,
+};
+use definitions::{
+    crypto::Encryption,
+    keyring::NetworkSpecsKey,
+    network_specs::{Verifier, VerifierValue},
+};
 
-#[cfg(test)]
-mod tests {
+use sp_runtime::MultiSigner;
+use std::fs;
 
     use crate::{produce_output, Action, StubNav};
     use constants::test_values::{

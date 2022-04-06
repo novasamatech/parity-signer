@@ -72,7 +72,7 @@ fn handle_scanner_input(payload: &str, dbname: &str) -> Result<Action, ErrorSign
         if let Some(a) = payload.strip_prefix("0x") {
             a
         } else {
-            &payload
+            payload
         }
     };
 

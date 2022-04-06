@@ -78,6 +78,7 @@ pub fn remove_network(
                 network_specs_batch.insert(x_network_specs_key.key(), x_network_specs.encode());
             }
         }
+
         // scan through metadata tree to mark for removal all networks with target name
         let meta_key_prefix = MetaKeyPrefix::from_name(&network_specs.name);
         for (meta_key_vec, meta_stored) in metadata.scan_prefix(meta_key_prefix.prefix()).flatten()
