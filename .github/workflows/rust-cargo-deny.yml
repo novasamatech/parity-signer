@@ -19,9 +19,17 @@ jobs:
     continue-on-error:    ${{ matrix.checks == 'advisories' }}
 
     steps:
-      - uses:             actions/checkout@v2
-      - uses:             EmbarkStudios/cargo-deny-action@v1
-        run:              |
+      - name:               Checkout Sources
+        uses:               actions/checkout@v2
+
+      - name:               Move Cargo.toml
+        run:                |
           cd rust
+          cp os-specific-lock/android/Cargo.lock .
+          cp signer/android-hack/Cargo.toml signer
+
+      - name:               Run cargo-deny
+        uses:               EmbarkStudios/cargo-deny-action@v1
+        working-directory:  ./rust/
         with:
           command:        check {{ $matrix.checks }}
