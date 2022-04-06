@@ -1,4 +1,3 @@
-
 use bip39::{Language, Mnemonic};
 use sled::{open, Batch, Db, Tree};
 use sp_core::sr25519::Public;

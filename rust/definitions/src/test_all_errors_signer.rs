@@ -347,7 +347,7 @@ fn database_signer() -> Vec<DatabaseSigner> {
     // All remaining [`DatabaseSigner`] errors.
     out.append(&mut vec![
         DatabaseSigner::UnexpectedGenesisHash {
-            verifier_key: VerifierKey::from_parts(&genesis_hash().to_vec()),
+            verifier_key: VerifierKey::from_parts(&genesis_hash()),
             network_specs_key: network_specs_key_good(),
         },
         DatabaseSigner::SpecsCollision {
