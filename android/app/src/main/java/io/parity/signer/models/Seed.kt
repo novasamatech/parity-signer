@@ -3,6 +3,7 @@ package io.parity.signer.models
 import android.util.Log
 import android.widget.Toast
 import io.parity.signer.ButtonID
+import io.parity.signer.components.SeedBoxStatus
 import org.json.JSONArray
 
 //MARK: Seed management begin
@@ -84,9 +85,15 @@ internal fun SignerDataModel.getSeed(seedName: String, backup: Boolean = false):
 		Toast.makeText(context, "get seed failure: $e", Toast.LENGTH_LONG).show()
 		""
 	}
-
 }
 
+/**
+ * All logic required to remove seed from memory
+ *
+ * 1. Remover encrypted storage item
+ * 2. Synchronizes list of seeds with rust
+ * 3. Calls rust remove seed logic
+ */
 fun SignerDataModel.removeSeed(seedName: String) {
 	authentication.authenticate(activity) {
 		try {
@@ -98,4 +105,26 @@ fun SignerDataModel.removeSeed(seedName: String) {
 			Toast.makeText(context, e.toString(), Toast.LENGTH_SHORT).show()
 		}
 	}
+}
+
+fun SignerDataModel.getSeedForBackup(
+	seedName: String,
+	setSeedPhrase: (String) -> Unit,
+	setSeedBoxStatus: (SeedBoxStatus) -> Unit
+) {
+	if (alertState.value == io.parity.signer.ShieldAlert.None) {
+			authentication.authenticate(activity) {
+				val seedPhrase = getSeed(seedName, backup = true)
+				if (seedPhrase.isBlank()) {
+					setSeedPhrase("")
+					setSeedBoxStatus(SeedBoxStatus.Error)
+				} else {
+					setSeedPhrase(seedPhrase)
+					setSeedBoxStatus(SeedBoxStatus.Seed)
+				}
+			}
+		} else {
+			setSeedPhrase("")
+			setSeedBoxStatus(SeedBoxStatus.Locked)
+		}
 }

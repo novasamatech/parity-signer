@@ -8,6 +8,7 @@ import androidx.compose.material.icons.filled.Lock
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import io.parity.signer.ShieldAlert
 import io.parity.signer.components.*
 import io.parity.signer.models.SignerDataModel
 import io.parity.signer.models.decode64
@@ -18,18 +19,22 @@ import io.parity.signer.ui.theme.Crypto400
 import io.parity.signer.ui.theme.CryptoTypography
 import io.parity.signer.ui.theme.modal
 import kotlinx.coroutines.delay
+import org.json.JSONObject
 
 /**
  * Modal to show seed phrase. Dangerous place.
  * TODO: make sure seed phrase is cleared at all times!!!
  */
 @Composable
-fun SeedBackup(signerDataModel: SignerDataModel) {
-	val seedName = signerDataModel.modalData.value?.optString("seed_name") ?: ""
+fun SeedBackup(
+	modalData: State<JSONObject?>,
+	getSeedForBackup: (String, (String) -> Unit, (SeedBoxStatus) -> Unit) -> Unit,
+) {
+	val seedName = modalData.value?.optString("seed_name") ?: ""
 	var seedPhrase by remember { mutableStateOf("") }
 	var seedBoxStatus by remember { mutableStateOf(SeedBoxStatus.Locked) }
 	val derivations =
-		signerDataModel.modalData.value?.optJSONArray("derivations")
+		modalData.value?.optJSONArray("derivations")
 			?.toListOfJSONObjects()?.sortedBy { it.optInt("network_order") }
 			?: listOf()
 	val time = remember { mutableStateOf(60000L) } //Countdown time
@@ -134,20 +139,7 @@ fun SeedBackup(signerDataModel: SignerDataModel) {
 	}
 
 	DisposableEffect(Unit) {
-		if (signerDataModel.alertState.value == io.parity.signer.ShieldAlert.None) {
-			signerDataModel.authentication.authenticate(signerDataModel.activity) {
-				seedPhrase = signerDataModel.getSeed(seedName, backup = true)
-				if (seedPhrase.isBlank()) {
-					seedPhrase = ""
-					seedBoxStatus = SeedBoxStatus.Error
-				} else {
-					seedBoxStatus = SeedBoxStatus.Seed
-				}
-			}
-		} else {
-			seedPhrase = ""
-			seedBoxStatus = SeedBoxStatus.Locked
-		}
+		getSeedForBackup(seedName, {seedPhrase = it}, {seedBoxStatus = it})
 		onDispose { seedPhrase = "" }
 	}
 }

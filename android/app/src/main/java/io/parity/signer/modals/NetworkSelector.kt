@@ -6,6 +6,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.State
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
@@ -17,20 +18,24 @@ import io.parity.signer.models.pushButton
 import io.parity.signer.ui.theme.Bg000
 import io.parity.signer.ui.theme.modal
 import org.json.JSONArray
+import org.json.JSONObject
 
 @Composable
-fun NetworkSelector(signerDataModel: SignerDataModel) {
+fun NetworkSelector(
+	modalData: State<JSONObject?>,
+	button: (ButtonID, String) -> Unit
+) {
 	val networks =
-		signerDataModel.modalData.value?.optJSONArray("networks") ?: JSONArray()
+		modalData.value?.optJSONArray("networks") ?: JSONArray()
 	Surface(
 		color = Color(0x00000000),
-		modifier = Modifier.clickable { signerDataModel.pushButton(ButtonID.GoBack) }
+		modifier = Modifier.clickable { button(ButtonID.GoBack, "") }
 	) {
 		Column {
 			Spacer(
 				Modifier
 					.weight(1f)
-					)
+			)
 			Surface(
 				shape = MaterialTheme.shapes.modal,
 				color = MaterialTheme.colors.Bg000,
@@ -51,7 +56,7 @@ fun NetworkSelector(signerDataModel: SignerDataModel) {
 					) {
 						items(networks.length()) { item ->
 							Row(Modifier.clickable {
-								signerDataModel.pushButton(
+								button(
 									ButtonID.ChangeNetwork,
 									networks.getJSONObject(item).optString("key")
 								)

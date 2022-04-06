@@ -60,6 +60,7 @@ fun SignerApp(signerDataModel: SignerDataModel) {
 		val signerModal = signerDataModel.modal.observeAsState()
 		val signerAlert = signerDataModel.alert.observeAsState()
 		val screenData = signerDataModel.screenData.observeAsState()
+		val modalData = signerDataModel.modalData.observeAsState()
 		val progress = signerDataModel.progress.observeAsState()
 		val captured = signerDataModel.captured.observeAsState()
 		val total = signerDataModel.total.observeAsState()
@@ -105,7 +106,9 @@ fun SignerApp(signerDataModel: SignerDataModel) {
 							)
 							ModalSelector(
 								modal = signerModal.value ?: SignerModal.Empty,
-								signerDataModel = signerDataModel
+								modalData,
+								shieldAlert,
+								signerDataModel
 							)
 							AlertSelector(
 								alert = signerAlert.value ?: SignerAlert.Empty,
