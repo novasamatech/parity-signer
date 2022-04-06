@@ -69,7 +69,6 @@ cargo {
 	apiLevel = 21
 	profile = 'release'
 	exec { spec, toolchain ->
-		println toolchain.target
 		if (toolchain.target == "x86_64-linux-android") {
 			spec.environment("AR_x86_64-linux-android", "$ndkDir/toolchains/llvm/prebuilt/linux-x86_64/bin/llvm-ar")
 		}
