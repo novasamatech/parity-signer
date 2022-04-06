@@ -896,7 +896,7 @@ mod tests {
         let filename = "for_tests/westend_runtime-v9150.compact.compressed.wasm";
         let meta_values = MetaValues::from_wasm_file(filename).unwrap();
         assert!(
-            meta_values.name == String::from("westend"),
+            meta_values.name == *"westend",
             "Unexpected network name: {}",
             meta_values.name
         );

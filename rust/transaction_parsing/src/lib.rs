@@ -26,6 +26,7 @@ use parse_transaction::{decode_signable_from_history, parse_transaction};
 pub mod test_all_cards;
 use test_all_cards::make_all_cards;
 #[cfg(feature = "test")]
+#[cfg(test)]
 mod tests;
 
 /// Enum containing card sets for three different outcomes:

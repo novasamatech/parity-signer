@@ -64,6 +64,7 @@ pub mod remove_network;
 pub mod remove_types;
 
 #[cfg(feature = "test")]
+#[cfg(test)]
 pub mod tests;
 
 #[cfg(feature = "active")]
@@ -79,7 +80,7 @@ use hot_default::reset_hot_database;
 /// The location of the generated database is either optional user-provided path,
 /// or default `../database/database_cold_release` folder.
 ///
-/// The cold release database contains: 
+/// The cold release database contains:
 ///
 /// - network specs for default networks (Polkadot, Kusama, Westend)
 /// - verifier information for default networks, with verifiers set to the
@@ -111,7 +112,7 @@ pub fn default_cold_release(path: Option<PathBuf>) -> Result<(), ErrorActive> {
 ///
 /// The location of the generated database is `../database/database_cold` folder.
 ///
-/// The test cold database contains: 
+/// The test cold database contains:
 ///
 /// - network specs for default networks (Polkadot, Kusama, Westend)
 /// - verifier information for default networks, with verifiers set to the

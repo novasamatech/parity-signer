@@ -8,7 +8,7 @@ use printing_balance::convert_balance_pretty;
 use sp_runtime::generic::Era;
 
 #[cfg(feature = "test")]
-use defaults::get_default_types_vec;
+use defaults::default_types_vec;
 #[cfg(feature = "test")]
 use definitions::metadata::info_from_metadata;
 use definitions::{
@@ -34,6 +34,7 @@ use error::{ArgumentsError, Error};
 pub mod method;
 use method::OlderMeta;
 #[cfg(feature = "test")]
+#[cfg(test)]
 mod tests;
 
 /// Function intakes SCALE encoded method part of transaction as Vec<u8>,
@@ -296,7 +297,7 @@ pub fn parse_and_display_set(
                 RuntimeMetadata::V13(meta_v13) => OlderMeta::V13(meta_v13),
                 _ => unreachable!(),
             };
-            let types = match get_default_types_vec() {
+            let types = match default_types_vec() {
                 Ok(a) => {
                     if a.is_empty() {
                         return Err(Error::Arguments(ArgumentsError::NoTypes).show());

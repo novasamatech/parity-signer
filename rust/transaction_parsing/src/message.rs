@@ -22,7 +22,7 @@ pub fn process_message(data_hex: &str, database_name: &str) -> Result<Action, Er
     // processing input vec![20, 104, 101, 3, 108, 111] will not throw error at element `3`,
     // it will result in output `helo` instead, length, however, is still correct, 5.
     // note that some invisible symbols may thus sneak into the message;
-    let message = match String::decode_all(&message_vec[..]) {
+    let message = match String::decode_all(&mut &message_vec[..]) {
         Ok(a) => a,
         Err(_) => return Err(ErrorSigner::Input(InputSigner::MessageNotReadable)),
     };

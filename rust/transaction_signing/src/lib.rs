@@ -10,6 +10,7 @@ use sign_message::{
 mod sign_transaction;
 use sign_transaction::create_signature_png;
 #[cfg(feature = "test")]
+#[cfg(test)]
 mod tests;
 
 pub fn handle_stub(checksum: u32, database_name: &str) -> Result<(), ErrorSigner> {

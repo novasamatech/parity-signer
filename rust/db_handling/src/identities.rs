@@ -124,6 +124,7 @@ pub fn generate_random_phrase(words_number: u32) -> Result<String, ErrorSigner> 
 /// Helper gets used both on Active side (when generating test cold database with well-known addresses)
 /// and on Signer side (when real addresses are actually created by the user).
 #[cfg(any(feature = "active", feature = "signer"))]
+#[allow(clippy::type_complexity)]
 pub(crate) fn create_address<T: ErrorSource>(
     database_name: &str,
     input_batch_prep: &[(AddressKey, AddressDetails)],
