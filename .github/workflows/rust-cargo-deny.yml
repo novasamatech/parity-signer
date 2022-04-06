@@ -1,16 +1,22 @@
-name:         cargo-deny
+name:                     Check cargo deny
 
-on: [push, pull_request]
+on:
+  pull_request:
+  push:
+    branches:
+      - master
+      - stable
 
 jobs:
   cargo-deny:
-    runs-on: ubuntu-latest
+    name:                 Cargo deny
+    runs-on:              ubuntu-latest
     strategy:
       matrix:
         checks:
           - advisories
 
-    continue-on-error: ${{ matrix.checks == 'advisories' }}
+    continue-on-error:    ${{ matrix.checks == 'advisories' }}
 
     steps:
       - uses:             actions/checkout@v2
