@@ -59,6 +59,16 @@ export! {
         qr_reader_phone::decode_sequence(data, cleaned)
     }
 
+    @Java_io_parity_signer_models_SignerDataModel_substratePathCheck
+    fn path_check(
+        seed_name: &str,
+        path: &str,
+        network: &str,
+        dbname: &str
+    ) -> String {
+        db_handling::interface_signer::dynamic_path_check(dbname, seed_name, path, network)
+    }
+	
     @Java_io_parity_signer_models_SignerDataModel_historyInitHistoryWithCert
     fn init_history_with_cert(
         dbname: &str
