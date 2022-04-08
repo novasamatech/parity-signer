@@ -1,7 +1,7 @@
 use crate::{produce_output, Action, StubNav};
 use constants::test_values::{
-    ALICE_SR_ALICE, BOB, ED, EMPTY_VEC_HASH_PIC, ID_01, ID_02, ID_03, TYPES_KNOWN, TYPES_UNKNOWN,
-    WESTEND_9070,
+    alice_sr_alice, bob, ed, empty_vec_hash_pic, id_01, id_02, id_03, types_known, types_unknown,
+    westend_9070,
 };
 use db_handling::{
     cold_default::{populate_cold, populate_cold_no_metadata, populate_cold_no_networks},
@@ -128,8 +128,8 @@ fn load_types_known_alice_signed() {
     let output = produce_output(line.trim(), dbname);
     if let Action::Stub(reply, _, stub_nav) = output {
         let reply_cut = reply
-            .replace(ALICE_SR_ALICE, r#"<alice_sr25519_//Alice>"#)
-            .replace(TYPES_KNOWN, r#"<types_known>"#);
+            .replace(&alice_sr_alice(), r#"<alice_sr25519_//Alice>"#)
+            .replace(&types_known(), r#"<types_known>"#);
         assert!(reply_cut == reply_known, "Received: \n{}", reply);
         assert!(stub_nav == stub_nav_known, "Received: \n{:?}", stub_nav);
     } else {
@@ -178,8 +178,8 @@ fn load_types_known_alice_signed_metadata_hold() {
     let output = produce_output(line.trim(), dbname);
     if let Action::Stub(reply, _, stub_nav) = output {
         let reply_cut = reply
-            .replace(ALICE_SR_ALICE, r#"<alice_sr25519_//Alice>"#)
-            .replace(TYPES_KNOWN, r#"<types_known>"#);
+            .replace(&alice_sr_alice(), r#"<alice_sr25519_//Alice>"#)
+            .replace(&types_known(), r#"<types_known>"#);
         assert!(reply_cut == reply_known, "Received: \n{}", reply);
         assert!(stub_nav == stub_nav_known, "Received: \n{:?}", stub_nav);
     } else {
@@ -197,7 +197,7 @@ fn load_types_unknown_not_signed() {
     let stub_nav_known = StubNav::LoadTypes;
     let output = produce_output(line.trim(), dbname);
     if let Action::Stub(reply, _, stub_nav) = output {
-        let reply_cut = reply.replace(TYPES_UNKNOWN, r#"<types_unknown>"#);
+        let reply_cut = reply.replace(&types_unknown(), r#"<types_unknown>"#);
         assert!(reply_cut == reply_known, "Received: \n{}", reply);
         assert!(stub_nav == stub_nav_known, "Received: \n{:?}", stub_nav);
     } else {
@@ -216,8 +216,8 @@ fn load_types_unknown_alice_signed() {
     let output = produce_output(line.trim(), dbname);
     if let Action::Stub(reply, _, stub_nav) = output {
         let reply_cut = reply
-            .replace(ALICE_SR_ALICE, r#"<alice_sr25519_//Alice>"#)
-            .replace(TYPES_UNKNOWN, r#"<types_unknown>"#);
+            .replace(&alice_sr_alice(), r#"<alice_sr25519_//Alice>"#)
+            .replace(&types_unknown(), r#"<types_unknown>"#);
         assert!(reply_cut == reply_known, "Received: \n{}", reply);
         assert!(stub_nav == stub_nav_known, "Received: \n{:?}", stub_nav);
     } else {
@@ -258,8 +258,8 @@ fn parse_transaction_1() {
         network_info,
     } = output
     {
-        let author_info_cut = author_info.replace(ALICE_SR_ALICE, r#"<alice_sr25519_//Alice>"#);
-        let content_cut = content.replace(BOB, r#"<bob>"#);
+        let author_info_cut = author_info.replace(&alice_sr_alice(), r#"<alice_sr25519_//Alice>"#);
+        let content_cut = content.replace(&bob(), r#"<bob>"#);
         assert!(content_cut == content_known, "Received: \n{}", content);
         assert!(
             author_info_cut == author_info_known,
@@ -295,12 +295,12 @@ fn parse_transaction_2() {
         network_info,
     } = output
     {
-        let author_info_cut = author_info.replace(ALICE_SR_ALICE, r#"<alice_sr25519_//Alice>"#);
+        let author_info_cut = author_info.replace(&alice_sr_alice(), r#"<alice_sr25519_//Alice>"#);
         let content_cut = content
-            .replace(ALICE_SR_ALICE, r#"<alice_sr25519_//Alice>"#)
-            .replace(BOB, r#"<bob>"#)
-            .replace(ID_01, r#"<id_01>"#)
-            .replace(ID_02, r#"<id_02>"#);
+            .replace(&alice_sr_alice(), r#"<alice_sr25519_//Alice>"#)
+            .replace(&bob(), r#"<bob>"#)
+            .replace(&id_01(), r#"<id_01>"#)
+            .replace(&id_02(), r#"<id_02>"#);
         assert!(content_cut == content_known, "Received: \n{}", content);
         assert!(
             author_info_cut == author_info_known,
@@ -336,8 +336,8 @@ fn parse_transaction_3() {
         network_info,
     } = output
     {
-        let author_info_cut = author_info.replace(ALICE_SR_ALICE, r#"<alice_sr25519_//Alice>"#);
-        let content_cut = content.replace(BOB, r#"<bob>"#);
+        let author_info_cut = author_info.replace(&alice_sr_alice(), r#"<alice_sr25519_//Alice>"#);
+        let content_cut = content.replace(&bob(), r#"<bob>"#);
         assert!(content_cut == content_known, "Received: \n{}", content);
         assert!(
             author_info_cut == author_info_known,
@@ -365,8 +365,8 @@ fn print_all_cards() {
     let output = produce_output(line.trim(), dbname);
     if let Action::Read(reply) = output {
         let reply_cut = reply
-            .replace(BOB, r#"<bob>"#)
-            .replace(EMPTY_VEC_HASH_PIC, r#"<empty_vec_hash_pic>"#);
+            .replace(&bob(), r#"<bob>"#)
+            .replace(&empty_vec_hash_pic(), r#"<empty_vec_hash_pic>"#);
         assert!(reply_cut == reply_known, "Received: \n{}", reply);
     } else {
         panic!("Wrong action {:?}", output)
@@ -386,7 +386,7 @@ fn load_westend9070_not_signed() {
     ));
     let output = produce_output(line.trim(), dbname);
     if let Action::Stub(reply, _, stub_nav) = output {
-        let reply_cut = reply.replace(WESTEND_9070, r#"<meta_pic_westend9070>"#);
+        let reply_cut = reply.replace(&westend_9070(), r#"<meta_pic_westend9070>"#);
         assert!(reply_cut == reply_known, "Received: \n{}", reply);
         assert!(stub_nav == stub_nav_known, "Received: \n{:?}", stub_nav);
     } else {
@@ -523,7 +523,7 @@ fn add_specs_dock_alice_verified_db_not_verified() {
     ));
     let output = produce_output(line.trim(), dbname);
     if let Action::Stub(reply, _, stub_nav) = output {
-        let reply_cut = reply.replace(ALICE_SR_ALICE, r#"<alice_sr25519_//Alice>"#);
+        let reply_cut = reply.replace(&alice_sr_alice(), r#"<alice_sr25519_//Alice>"#);
         assert!(reply_cut == reply_known, "Received: \n{}", reply);
         assert!(stub_nav == stub_nav_known, "Received: \n{:?}", stub_nav);
     } else {
@@ -568,7 +568,7 @@ fn add_specs_dock_both_verified_same() {
     ));
     let output = produce_output(line.trim(), dbname);
     if let Action::Stub(reply, _, stub_nav) = output {
-        let reply_cut = reply.replace(ALICE_SR_ALICE, r#"<alice_sr25519_//Alice>"#);
+        let reply_cut = reply.replace(&alice_sr_alice(), r#"<alice_sr25519_//Alice>"#);
         assert!(reply_cut == reply_known, "Received: \n{}", reply);
         assert!(stub_nav == stub_nav_known, "Received: \n{:?}", stub_nav);
     } else {
@@ -591,7 +591,7 @@ fn add_specs_dock_both_verified_different() {
     ));
     let output = produce_output(line.trim(), dbname);
     if let Action::Stub(reply, _, stub_nav) = output {
-        let reply_cut = reply.replace(ED, r#"<ed25519>"#);
+        let reply_cut = reply.replace(&ed(), r#"<ed25519>"#);
         assert!(reply_cut == reply_known, "Received: \n{}", reply);
         assert!(stub_nav == stub_nav_known, "Received: \n{:?}", stub_nav);
     } else {
@@ -648,7 +648,7 @@ fn add_specs_westend_ed25519_alice_signed_db_not_verified() {
     ));
     let output = produce_output(line.trim(), dbname);
     if let Action::Stub(reply, _, stub_nav) = output {
-        let reply_cut = reply.replace(ALICE_SR_ALICE, r#"<alice_sr25519_//Alice>"#);
+        let reply_cut = reply.replace(&alice_sr_alice(), r#"<alice_sr25519_//Alice>"#);
         assert!(reply_cut == reply_known, "Received: \n{}", reply);
         assert!(stub_nav == stub_nav_known, "Received: \n{:?}", stub_nav);
     } else {
@@ -684,7 +684,7 @@ fn add_specs_westend_ed25519_both_verified_same() {
     ));
     let output = produce_output(line.trim(), dbname);
     if let Action::Stub(reply, _, stub_nav) = output {
-        let reply_cut = reply.replace(ALICE_SR_ALICE, r#"<alice_sr25519_//Alice>"#);
+        let reply_cut = reply.replace(&alice_sr_alice(), r#"<alice_sr25519_//Alice>"#);
         assert!(reply_cut == reply_known, "Received: \n{}", reply);
         assert!(stub_nav == stub_nav_known, "Received: \n{:?}", stub_nav);
     } else {
@@ -717,8 +717,8 @@ fn parse_transaction_4_unknown_author() {
     let output = produce_output(line, dbname);
     if let Action::Read(reply) = output {
         let reply_cut = reply
-            .replace(ALICE_SR_ALICE, r#"<alice_sr25519_//Alice>"#)
-            .replace(BOB, r#"<bob>"#);
+            .replace(&alice_sr_alice(), r#"<alice_sr25519_//Alice>"#)
+            .replace(&bob(), r#"<bob>"#);
         assert!(reply_cut == reply_known, "Received: \n{}", reply);
     } else {
         panic!("Wrong action {:?}", output)
@@ -734,7 +734,7 @@ fn parse_transaction_5_unknown_network() {
     let reply_known = r#""author":[{"index":0,"indent":0,"type":"author_public_key","payload":{"public_key":"761291ee5faf5b5b67b028aa7e28fb1271bf40af17a486b368e8c7de86ad3c62","identicon":"<id_03>","encryption":"sr25519"}}],"error":[{"index":1,"indent":0,"type":"error","payload":"Bad input data. Input generated within unknown network and could not be processed. Add network with genesis hash f7a99d3cb92853d00d5275c971c132c074636256583fee53b3bbe60d7b8769ba and encryption sr25519."}]"#;
     let output = produce_output(line, dbname);
     if let Action::Read(reply) = output {
-        let reply_cut = reply.replace(ID_03, r#"<id_03>"#);
+        let reply_cut = reply.replace(&id_03(), r#"<id_03>"#);
         assert!(reply_cut == reply_known, "Received: \n{}", reply);
     } else {
         panic!("Wrong action {:?}", output)
@@ -750,7 +750,7 @@ fn parse_transaction_6_error_on_parsing() {
     let reply_known = r#""author":[{"index":0,"indent":0,"type":"author","payload":{"base58":"5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY","identicon":"<alice_sr25519_//Alice>","seed":"Alice","derivation_path":"//Alice","has_pwd":false}}],"error":[{"index":1,"indent":0,"type":"error","payload":"Error parsing incoming transaction content. After decoding the method some data remained unused."}],"extensions":[{"index":2,"indent":0,"type":"era","payload":{"era":"Mortal","phase":"27","period":"64"}},{"index":3,"indent":0,"type":"nonce","payload":"46"},{"index":4,"indent":0,"type":"tip","payload":{"amount":"0","units":"pWND"}},{"index":5,"indent":0,"type":"name_version","payload":{"name":"westend","version":"9010"}},{"index":6,"indent":0,"type":"tx_version","payload":"5"},{"index":7,"indent":0,"type":"block_hash","payload":"538a7d7a0ac17eb6dd004578cb8e238c384a10f57c999a3fa1200409cd9b3f33"}]"#;
     let output = produce_output(line, dbname);
     if let Action::Read(reply) = output {
-        let reply_cut = reply.replace(ALICE_SR_ALICE, r#"<alice_sr25519_//Alice>"#);
+        let reply_cut = reply.replace(&alice_sr_alice(), r#"<alice_sr25519_//Alice>"#);
         assert!(reply_cut == reply_known, "Received: \n{}", reply);
     } else {
         panic!("Wrong action {:?}", output)
@@ -766,7 +766,7 @@ fn parse_transaction_7_error_on_parsing() {
     let reply_known = r#""author":[{"index":0,"indent":0,"type":"author","payload":{"base58":"5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY","identicon":"<alice_sr25519_//Alice>","seed":"Alice","derivation_path":"//Alice","has_pwd":false}}],"error":[{"index":1,"indent":0,"type":"error","payload":"Error parsing incoming transaction content. Encountered unexpected enum variant."}],"extensions":[{"index":2,"indent":0,"type":"era","payload":{"era":"Mortal","phase":"27","period":"64"}},{"index":3,"indent":0,"type":"nonce","payload":"46"},{"index":4,"indent":0,"type":"tip","payload":{"amount":"0","units":"pWND"}},{"index":5,"indent":0,"type":"name_version","payload":{"name":"westend","version":"9010"}},{"index":6,"indent":0,"type":"tx_version","payload":"5"},{"index":7,"indent":0,"type":"block_hash","payload":"538a7d7a0ac17eb6dd004578cb8e238c384a10f57c999a3fa1200409cd9b3f33"}]"#;
     let output = produce_output(line, dbname);
     if let Action::Read(reply) = output {
-        let reply_cut = reply.replace(ALICE_SR_ALICE, r#"<alice_sr25519_//Alice>"#);
+        let reply_cut = reply.replace(&alice_sr_alice(), r#"<alice_sr25519_//Alice>"#);
         assert!(reply_cut == reply_known, "Received: \n{}", reply);
     } else {
         panic!("Wrong action {:?}", output)
@@ -782,7 +782,7 @@ fn parse_transaction_8_error_on_parsing() {
     let reply_known = r#""author":[{"index":0,"indent":0,"type":"author","payload":{"base58":"5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY","identicon":"<alice_sr25519_//Alice>","seed":"Alice","derivation_path":"//Alice","has_pwd":false}}],"error":[{"index":1,"indent":0,"type":"error","payload":"Error parsing incoming transaction content. Data too short for expected content."}],"extensions":[{"index":2,"indent":0,"type":"era","payload":{"era":"Mortal","phase":"27","period":"64"}},{"index":3,"indent":0,"type":"nonce","payload":"46"},{"index":4,"indent":0,"type":"tip","payload":{"amount":"0","units":"pWND"}},{"index":5,"indent":0,"type":"name_version","payload":{"name":"westend","version":"9010"}},{"index":6,"indent":0,"type":"tx_version","payload":"5"},{"index":7,"indent":0,"type":"block_hash","payload":"538a7d7a0ac17eb6dd004578cb8e238c384a10f57c999a3fa1200409cd9b3f33"}]"#;
     let output = produce_output(line, dbname);
     if let Action::Read(reply) = output {
-        let reply_cut = reply.replace(ALICE_SR_ALICE, r#"<alice_sr25519_//Alice>"#);
+        let reply_cut = reply.replace(&alice_sr_alice(), r#"<alice_sr25519_//Alice>"#);
         assert!(reply_cut == reply_known, "Received: \n{}", reply);
     } else {
         panic!("Wrong action {:?}", output)
@@ -807,7 +807,7 @@ fn parse_msg_1() {
         network_info,
     } = output
     {
-        let author_info_cut = author_info.replace(ALICE_SR_ALICE, r#"<alice_sr25519_//Alice>"#);
+        let author_info_cut = author_info.replace(&alice_sr_alice(), r#"<alice_sr25519_//Alice>"#);
         assert!(content == content_known, "Received: \n{}", content);
         assert!(
             author_info_cut == author_info_known,

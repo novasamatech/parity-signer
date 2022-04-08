@@ -7,9 +7,9 @@ use std::fs;
 
 use constants::{
     test_values::{
-        ALICE_SR_ALICE, ALICE_SR_KUSAMA, ALICE_SR_POLKADOT, ALICE_SR_ROOT,
-        ALICE_SR_SECRET_ABRACADABRA, ALICE_SR_WESTEND, ALICE_WESTEND_ROOT_QR, BOB, EMPTY_PNG,
-        EMPTY_VEC_HASH_PIC, REAL_PARITY_VERIFIER, TYPES_KNOWN, WESTEND_9000, WESTEND_9010,
+        alice_sr_alice, alice_sr_kusama, alice_sr_polkadot, alice_sr_root,
+        alice_sr_secret_abracadabra, alice_sr_westend, alice_westend_root_qr, bob, empty_png,
+        empty_vec_hash_pic, real_parity_verifier, types_known, westend_9000, westend_9010,
     },
     ADDRTREE, ALICE_SEED_PHRASE, METATREE, SPECSTREE,
 };
@@ -63,7 +63,7 @@ fn print_seed_names() {
     populate_cold(dbname, Verifier(None)).unwrap();
     let print = print_all_seed_names_with_identicons(dbname, &[String::from("Alice")])
         .unwrap()
-        .replace(ALICE_SR_ROOT, r#"<alice_sr25519_root>"#);
+        .replace(&alice_sr_root(), r#"<alice_sr25519_root>"#);
     let expected_print = r#"[{"identicon":"<alice_sr25519_root>","seed_name":"Alice"}]"#;
     assert!(print == expected_print, "\nReceived: \n{}", print);
     fs::remove_dir_all(dbname).unwrap();
@@ -78,8 +78,8 @@ fn print_seed_names_with_orphan() {
         &[String::from("Alice"), String::from("BobGhost")],
     )
     .unwrap()
-    .replace(ALICE_SR_ROOT, r#"<alice_sr25519_root>"#)
-    .replace(EMPTY_PNG, r#"<empty>"#);
+    .replace(&alice_sr_root(), r#"<alice_sr25519_root>"#)
+    .replace(&empty_png(), r#"<empty>"#);
     let expected_print = r#"[{"identicon":"<alice_sr25519_root>","seed_name":"Alice"},{"identicon":"<empty>","seed_name":"BobGhost"}]"#;
     assert!(print == expected_print, "\nReceived: \n{}", print);
     fs::remove_dir_all(dbname).unwrap();
@@ -91,11 +91,11 @@ fn print_all_ids() {
     populate_cold(dbname, Verifier(None)).unwrap();
     let print = print_all_identities(dbname)
         .unwrap()
-        .replace(ALICE_SR_ROOT, r#"<alice_sr25519_root>"#)
-        .replace(ALICE_SR_ALICE, r#"<alice_sr25519_//Alice>"#)
-        .replace(ALICE_SR_KUSAMA, r#"<alice_sr25519_//kusama>"#)
-        .replace(ALICE_SR_POLKADOT, r#"<alice_sr25519_//polkadot>"#)
-        .replace(ALICE_SR_WESTEND, r#"<alice_sr25519_//westend>"#);
+        .replace(&alice_sr_root(), r#"<alice_sr25519_root>"#)
+        .replace(&alice_sr_alice(), r#"<alice_sr25519_//Alice>"#)
+        .replace(&alice_sr_kusama(), r#"<alice_sr25519_//kusama>"#)
+        .replace(&alice_sr_polkadot(), r#"<alice_sr25519_//polkadot>"#)
+        .replace(&alice_sr_westend(), r#"<alice_sr25519_//westend>"#);
     let expected_print = r#"[{"seed_name":"Alice","address_key":"013efeca331d646d8a2986374bb3bb8d6e9e3cfcdd7c45c2b69104fab5d61d3f34","public_key":"3efeca331d646d8a2986374bb3bb8d6e9e3cfcdd7c45c2b69104fab5d61d3f34","identicon":"<alice_sr25519_//westend>","has_pwd":false,"path":"//westend"},{"seed_name":"Alice","address_key":"0146ebddef8cd9bb167dc30878d7113b7e168e6f0646beffd77d69d39bad76b47a","public_key":"46ebddef8cd9bb167dc30878d7113b7e168e6f0646beffd77d69d39bad76b47a","identicon":"<alice_sr25519_root>","has_pwd":false,"path":""},{"seed_name":"Alice","address_key":"0164a31235d4bf9b37cfed3afa8aa60754675f9c4915430454d365c05112784d05","public_key":"64a31235d4bf9b37cfed3afa8aa60754675f9c4915430454d365c05112784d05","identicon":"<alice_sr25519_//kusama>","has_pwd":false,"path":"//kusama"},{"seed_name":"Alice","address_key":"01d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d","public_key":"d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d","identicon":"<alice_sr25519_//Alice>","has_pwd":false,"path":"//Alice"},{"seed_name":"Alice","address_key":"01f606519cb8726753885cd4d0f518804a69a5e0badf36fee70feadd8044081730","public_key":"f606519cb8726753885cd4d0f518804a69a5e0badf36fee70feadd8044081730","identicon":"<alice_sr25519_//polkadot>","has_pwd":false,"path":"//polkadot"}]"#;
     assert!(print == expected_print, "\nReceived: \n{}", print);
     fs::remove_dir_all(dbname).unwrap();
@@ -117,9 +117,9 @@ fn print_ids_seed_name_network() {
         Vec::new(),
     )
     .unwrap()
-    .replace(ALICE_SR_ROOT, r#"<alice_sr25519_root>"#)
-    .replace(ALICE_SR_ALICE, r#"<alice_sr25519_//Alice>"#)
-    .replace(ALICE_SR_WESTEND, r#"<alice_sr25519_//westend>"#);
+    .replace(&alice_sr_root(), r#"<alice_sr25519_root>"#)
+    .replace(&alice_sr_alice(), r#"<alice_sr25519_//Alice>"#)
+    .replace(&alice_sr_westend(), r#"<alice_sr25519_//westend>"#);
     let expected_print = r#""root":{"seed_name":"Alice","identicon":"<alice_sr25519_root>","address_key":"0146ebddef8cd9bb167dc30878d7113b7e168e6f0646beffd77d69d39bad76b47a","base58":"5DfhGyQdFobKM8NsWvEeAKk5EQQgYe9AydgJ7rMB6E1EqRzV","swiped":false,"multiselect":false},"set":[{"address_key":"013efeca331d646d8a2986374bb3bb8d6e9e3cfcdd7c45c2b69104fab5d61d3f34","base58":"5DVJWniDyUja5xnG4t5i3Rrd2Gguf1fzxPYfgZBbKcvFqk4N","identicon":"<alice_sr25519_//westend>","has_pwd":false,"path":"//westend","swiped":false,"multiselect":false},{"address_key":"01d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d","base58":"5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY","identicon":"<alice_sr25519_//Alice>","has_pwd":false,"path":"//Alice","swiped":false,"multiselect":false}],"network":{"title":"Westend","logo":"westend"}"#;
     assert!(print == expected_print, "\nReceived: \n{}", print);
     fs::remove_dir_all(dbname).unwrap();
@@ -182,8 +182,8 @@ fn export_alice_westend() {
         ),
     )
     .unwrap()
-    .replace(ALICE_SR_ROOT, r#"<alice_sr25519_root>"#)
-    .replace(ALICE_WESTEND_ROOT_QR, r#"<alice_westend_root_qr>"#);
+    .replace(&alice_sr_root(), r#"<alice_sr25519_root>"#)
+    .replace(&alice_westend_root_qr(), r#"<alice_westend_root_qr>"#);
     let expected_print = r#""qr":"<alice_westend_root_qr>","pubkey":"46ebddef8cd9bb167dc30878d7113b7e168e6f0646beffd77d69d39bad76b47a","base58":"5DfhGyQdFobKM8NsWvEeAKk5EQQgYe9AydgJ7rMB6E1EqRzV","identicon":"<alice_sr25519_root>","seed_name":"Alice","path":"","network_title":"Westend","network_logo":"westend""#;
     assert!(print == expected_print, "\nReceived: \n{:?}", print);
     fs::remove_dir_all(dbname).unwrap();
@@ -251,7 +251,7 @@ fn derive_prep_alice_collided() {
         "//Alice",
     )
     .unwrap()
-    .replace(ALICE_SR_ALICE, r#"<alice_sr25519_//Alice>"#);
+    .replace(&alice_sr_alice(), r#"<alice_sr25519_//Alice>"#);
     let expected_print = r#""seed_name":"Alice","network_title":"Westend","network_logo":"westend","network_specs_key":"0180e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e","suggested_derivation":"//Alice","collision":{"base58":"5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY","path":"//Alice","has_pwd":false,"identicon":"<alice_sr25519_//Alice>","seed_name":"Alice"}"#;
     assert!(print == expected_print, "\nReceived: \n{}", print);
     fs::remove_dir_all(dbname).unwrap();
@@ -297,7 +297,7 @@ fn derive_prep_alice_collided_with_password() {
     )
     .unwrap()
     .replace(
-        ALICE_SR_SECRET_ABRACADABRA,
+        &alice_sr_secret_abracadabra(),
         r#"<alice_sr25519_//secret///abracadabra>"#,
     );
     let expected_print = r#""seed_name":"Alice","network_title":"Westend","network_logo":"westend","network_specs_key":"0180e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e","suggested_derivation":"//secret///abracadabra","collision":{"base58":"5EkMjdgyuHqnWA9oWXUoFRaMwMUgMJ1ik9KtMpPNuTuZTi2t","path":"//secret","has_pwd":true,"identicon":"<alice_sr25519_//secret///abracadabra>","seed_name":"Alice"}"#;
@@ -318,9 +318,9 @@ fn westend_network_details() {
         ),
     )
     .unwrap()
-    .replace(EMPTY_PNG, r#"<empty>"#)
-    .replace(WESTEND_9000, r#"<meta_pic_westend9000>"#)
-    .replace(WESTEND_9010, r#"<meta_pic_westend9010>"#);
+    .replace(&empty_png(), r#"<empty>"#)
+    .replace(&westend_9000(), r#"<meta_pic_westend9000>"#)
+    .replace(&westend_9010(), r#"<meta_pic_westend9010>"#);
     let expected_print = r##""base58prefix":"42","color":"#660D35","decimals":"12","encryption":"sr25519","genesis_hash":"e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e","logo":"westend","name":"westend","order":"2","path_id":"//westend","secondary_color":"#262626","title":"Westend","unit":"WND","current_verifier":{"type":"general","details":{"public_key":"","identicon":"<empty>","encryption":"none"}},"meta":[{"spec_version":"9000","meta_hash":"e80237ad8b2e92b72fcf6beb8f0e4ba4a21043a7115c844d91d6c4f981e469ce","meta_id_pic":"<meta_pic_westend9000>"},{"spec_version":"9010","meta_hash":"70c99738c27fb32c87883f1c9c94ee454bf0b3d88e4a431a2bbfe1222b46ebdf","meta_id_pic":"<meta_pic_westend9010>"}]"##;
     assert!(print == expected_print, "\nReceived: \n{}", print);
     fs::remove_dir_all(dbname).unwrap();
@@ -340,7 +340,7 @@ fn westend_9010_metadata_details() {
         9010,
     )
     .unwrap()
-    .replace(WESTEND_9010, r#"<meta_pic_westend9010>"#);
+    .replace(&westend_9010(), r#"<meta_pic_westend9010>"#);
     let expected_print = r#""name":"westend","version":"9010","meta_hash":"70c99738c27fb32c87883f1c9c94ee454bf0b3d88e4a431a2bbfe1222b46ebdf","meta_id_pic":"<meta_pic_westend9010>","networks":[{"title":"Westend","logo":"westend","order":2,"current_on_screen":true}]"#;
     assert!(print == expected_print, "\nReceived: \n{}", print);
     fs::remove_dir_all(dbname).unwrap();
@@ -353,7 +353,7 @@ fn types_status_and_history() {
 
     let print = show_types_status(dbname)
         .unwrap()
-        .replace(TYPES_KNOWN, r#"<types_known>"#);
+        .replace(&types_known(), r#"<types_known>"#);
     let expected_print = r#""types_on_file":true,"types_hash":"d091a5a24a97e18dfe298b167d8fd5a2add10098c8792cba21c39029a9ee0aeb","types_id_pic":"<types_known>""#;
     assert!(print == expected_print, "\nReceived: \n{}", print);
 
@@ -364,8 +364,8 @@ fn types_status_and_history() {
 
     let history_printed = print_history(dbname)
         .unwrap()
-        .replace(EMPTY_PNG, r#"<empty>"#)
-        .replace(TYPES_KNOWN, r#"<types_known>"#);
+        .replace(&empty_png(), r#"<empty>"#)
+        .replace(&types_known(), r#"<types_known>"#);
     let expected_element = r#"{"event":"types_removed","payload":{"types_hash":"d091a5a24a97e18dfe298b167d8fd5a2add10098c8792cba21c39029a9ee0aeb","types_id_pic":"<types_known>","verifier":{"public_key":"","identicon":"<empty>","encryption":"none"}}}"#;
     assert!(
         history_printed.contains(expected_element),
@@ -386,7 +386,7 @@ fn path_is_known() {
         "//Alice",
         "0180e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e",
     )
-    .replace(ALICE_SR_ALICE, r#"<alice_sr25519_//Alice>"#);
+    .replace(&alice_sr_alice(), r#"<alice_sr25519_//Alice>"#);
     let expected_print = r#"{"derivation_check":{"button_good":false,"collision":{"base58":"5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY","path":"//Alice","has_pwd":false,"identicon":"<alice_sr25519_//Alice>","seed_name":"Alice"}}}"#;
     assert!(print == expected_print, "\nReceived: \n{}", print);
     fs::remove_dir_all(dbname).unwrap();
@@ -595,7 +595,7 @@ fn display_general_verifier_properly() {
     signer_init_no_cert(dbname).unwrap();
     let print = display_general_verifier(dbname)
         .unwrap()
-        .replace(EMPTY_PNG, r#"<empty>"#);
+        .replace(&empty_png(), r#"<empty>"#);
     assert!(
         print == r#""public_key":"","identicon":"<empty>","encryption":"none""#,
         "Got: {}",
@@ -604,7 +604,7 @@ fn display_general_verifier_properly() {
     signer_init_with_cert(dbname).unwrap();
     let print = display_general_verifier(dbname)
         .unwrap()
-        .replace(REAL_PARITY_VERIFIER, r#"<real_verifier>"#);
+        .replace(&real_parity_verifier(), r#"<real_verifier>"#);
     assert!(
         print
             == r#""public_key":"c46a22b9da19540a77cbde23197e5fd90485c72b4ecf3c599ecca6998f39bd57","identicon":"<real_verifier>","encryption":"sr25519""#,
@@ -836,7 +836,7 @@ fn history_with_identities() {
     signer_init_with_cert(dbname).unwrap();
     let history_printed = print_history(dbname)
         .unwrap()
-        .replace(REAL_PARITY_VERIFIER, r#"<real_verifier>"#);
+        .replace(&real_parity_verifier(), r#"<real_verifier>"#);
     let element1 = r#"{"event":"database_initiated"}"#;
     let element2 = r#"{"event":"general_verifier_added","payload":{"public_key":"c46a22b9da19540a77cbde23197e5fd90485c72b4ecf3c599ecca6998f39bd57","identicon":"<real_verifier>","encryption":"sr25519"}}"#;
     assert!(
@@ -852,7 +852,7 @@ fn history_with_identities() {
     try_create_seed("Alice", ALICE_SEED_PHRASE, true, dbname).unwrap();
     let history_printed_after_create_seed = print_history(dbname)
         .unwrap()
-        .replace(REAL_PARITY_VERIFIER, r#"<real_verifier>"#);
+        .replace(&real_parity_verifier(), r#"<real_verifier>"#);
     let element3 = r#""events":[{"event":"seed_created","payload":"Alice"},{"event":"identity_added","payload":{"seed_name":"Alice","encryption":"sr25519","public_key":"46ebddef8cd9bb167dc30878d7113b7e168e6f0646beffd77d69d39bad76b47a","path":"","network_genesis_hash":"91b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3"}},{"event":"identity_added","payload":{"seed_name":"Alice","encryption":"sr25519","public_key":"f606519cb8726753885cd4d0f518804a69a5e0badf36fee70feadd8044081730","path":"//polkadot","network_genesis_hash":"91b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3"}},{"event":"identity_added","payload":{"seed_name":"Alice","encryption":"sr25519","public_key":"46ebddef8cd9bb167dc30878d7113b7e168e6f0646beffd77d69d39bad76b47a","path":"","network_genesis_hash":"b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe"}},{"event":"identity_added","payload":{"seed_name":"Alice","encryption":"sr25519","public_key":"64a31235d4bf9b37cfed3afa8aa60754675f9c4915430454d365c05112784d05","path":"//kusama","network_genesis_hash":"b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe"}},{"event":"identity_added","payload":{"seed_name":"Alice","encryption":"sr25519","public_key":"46ebddef8cd9bb167dc30878d7113b7e168e6f0646beffd77d69d39bad76b47a","path":"","network_genesis_hash":"e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e"}},{"event":"identity_added","payload":{"seed_name":"Alice","encryption":"sr25519","public_key":"3efeca331d646d8a2986374bb3bb8d6e9e3cfcdd7c45c2b69104fab5d61d3f34","path":"//westend","network_genesis_hash":"e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e"}}]"#;
     assert!(
         history_printed_after_create_seed.contains(element1),
@@ -1310,8 +1310,8 @@ fn test_all_events() {
     enter_events::<Signer>(dbname, events).unwrap();
     let history = print_history(dbname)
         .unwrap()
-        .replace(EMPTY_VEC_HASH_PIC, r#"<empty_vec_hash_pic>"#)
-        .replace(BOB, r#"<bob_identicon>"#);
+        .replace(&empty_vec_hash_pic(), r#"<empty_vec_hash_pic>"#)
+        .replace(&bob(), r#"<bob_identicon>"#);
     let expected_history_part = r##""events":[{"event":"metadata_added","payload":{"specname":"westend","spec_version":"9000","meta_hash":"0e5751c026e543b2e8ab2eb06099daa1d1e5df47778f7787faab45cdf12fe3a8","meta_id_pic":"<empty_vec_hash_pic>"}},{"event":"metadata_removed","payload":{"specname":"westend","spec_version":"9000","meta_hash":"0e5751c026e543b2e8ab2eb06099daa1d1e5df47778f7787faab45cdf12fe3a8","meta_id_pic":"<empty_vec_hash_pic>"}},{"event":"load_metadata_message_signed","payload":{"specname":"westend","spec_version":"9000","meta_hash":"0e5751c026e543b2e8ab2eb06099daa1d1e5df47778f7787faab45cdf12fe3a8","meta_id_pic":"<empty_vec_hash_pic>","signed_by":{"public_key":"8eaf04151687736326c9fea17e25fc5287613693c912909cb226aa4794f26a48","identicon":"<bob_identicon>","encryption":"sr25519"}}},{"event":"network_specs_added","payload":{"base58prefix":"42","color":"#660D35","decimals":"12","encryption":"sr25519","genesis_hash":"e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e","logo":"westend","name":"westend","order":"3","path_id":"//westend","secondary_color":"#262626","title":"Westend","unit":"WND","current_verifier":{"type":"general","details":{"public_key":"8eaf04151687736326c9fea17e25fc5287613693c912909cb226aa4794f26a48","identicon":"<bob_identicon>","encryption":"sr25519"}}}},{"event":"network_removed","payload":{"base58prefix":"42","color":"#660D35","decimals":"12","encryption":"sr25519","genesis_hash":"e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e","logo":"westend","name":"westend","order":"3","path_id":"//westend","secondary_color":"#262626","title":"Westend","unit":"WND","current_verifier":{"type":"general","details":{"public_key":"8eaf04151687736326c9fea17e25fc5287613693c912909cb226aa4794f26a48","identicon":"<bob_identicon>","encryption":"sr25519"}}}},{"event":"add_specs_message_signed","payload":{"base58prefix":"42","color":"#660D35","decimals":"12","encryption":"sr25519","genesis_hash":"e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e","logo":"westend","name":"westend","path_id":"//westend","secondary_color":"#262626","title":"Westend","unit":"WND","signed_by":{"public_key":"8eaf04151687736326c9fea17e25fc5287613693c912909cb226aa4794f26a48","identicon":"<bob_identicon>","encryption":"sr25519"}}},{"event":"network_verifier_set","payload":{"genesis_hash":"e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e","current_verifier":{"type":"general","details":{"public_key":"8eaf04151687736326c9fea17e25fc5287613693c912909cb226aa4794f26a48","identicon":"<bob_identicon>","encryption":"sr25519"}}}},{"event":"general_verifier_added","payload":{"public_key":"8eaf04151687736326c9fea17e25fc5287613693c912909cb226aa4794f26a48","identicon":"<bob_identicon>","encryption":"sr25519"}},{"event":"types_added","payload":{"types_hash":"0e5751c026e543b2e8ab2eb06099daa1d1e5df47778f7787faab45cdf12fe3a8","types_id_pic":"<empty_vec_hash_pic>","verifier":{"public_key":"8eaf04151687736326c9fea17e25fc5287613693c912909cb226aa4794f26a48","identicon":"<bob_identicon>","encryption":"sr25519"}}},{"event":"types_removed","payload":{"types_hash":"0e5751c026e543b2e8ab2eb06099daa1d1e5df47778f7787faab45cdf12fe3a8","types_id_pic":"<empty_vec_hash_pic>","verifier":{"public_key":"8eaf04151687736326c9fea17e25fc5287613693c912909cb226aa4794f26a48","identicon":"<bob_identicon>","encryption":"sr25519"}}},{"event":"load_types_message_signed","payload":{"types_hash":"0e5751c026e543b2e8ab2eb06099daa1d1e5df47778f7787faab45cdf12fe3a8","types_id_pic":"<empty_vec_hash_pic>","signed_by":{"public_key":"8eaf04151687736326c9fea17e25fc5287613693c912909cb226aa4794f26a48","identicon":"<bob_identicon>","encryption":"sr25519"}}},{"event":"transaction_signed","payload":{"transaction":"","network_name":"westend","signed_by":{"public_key":"8eaf04151687736326c9fea17e25fc5287613693c912909cb226aa4794f26a48","identicon":"<bob_identicon>","encryption":"sr25519"},"user_comment":"send to Alice"}},{"event":"transaction_sign_error","payload":{"transaction":"","network_name":"westend","signed_by":{"public_key":"8eaf04151687736326c9fea17e25fc5287613693c912909cb226aa4794f26a48","identicon":"<bob_identicon>","encryption":"sr25519"},"user_comment":"send to Alice","error":"wrong_password_entered"}},{"event":"message_signed","payload":{"message":"5468697320697320416c6963650a526f676572","network_name":"westend","signed_by":{"public_key":"8eaf04151687736326c9fea17e25fc5287613693c912909cb226aa4794f26a48","identicon":"<bob_identicon>","encryption":"sr25519"},"user_comment":"send to Alice"}},{"event":"message_sign_error","payload":{"message":"5468697320697320416c6963650a526f676572","network_name":"westend","signed_by":{"public_key":"8eaf04151687736326c9fea17e25fc5287613693c912909cb226aa4794f26a48","identicon":"<bob_identicon>","encryption":"sr25519"},"user_comment":"send to Alice","error":"wrong_password_entered"}},{"event":"identity_added","payload":{"seed_name":"Alice","encryption":"sr25519","public_key":"8eaf04151687736326c9fea17e25fc5287613693c912909cb226aa4794f26a48","path":"//","network_genesis_hash":"e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e"}},{"event":"identity_removed","payload":{"seed_name":"Alice","encryption":"sr25519","public_key":"8eaf04151687736326c9fea17e25fc5287613693c912909cb226aa4794f26a48","path":"//","network_genesis_hash":"e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e"}},{"event":"identities_wiped"},{"event":"device_online"},{"event":"reset_danger_record"},{"event":"seed_created","payload":"Alice"},{"event":"seed_name_shown","payload":"AliceSecretSeed"},{"event":"warning","payload":"Received network information is not verified."},{"event":"wrong_password_entered"},{"event":"user_entered_event","payload":"Lalala!!!"},{"event":"system_entered_event","payload":"Blip blop"},{"event":"history_cleared"},{"event":"database_initiated"}]"##;
     assert!(
         history.contains(expected_history_part),
@@ -1327,7 +1327,7 @@ fn print_single_event() {
     populate_cold(dbname, Verifier(None)).unwrap();
     let print = print_history_entry_by_order(0, dbname)
         .unwrap()
-        .replace(EMPTY_PNG, r#"<empty>"#);
+        .replace(&empty_png(), r#"<empty>"#);
     let expected_print = r#""events":[{"event":"database_initiated"},{"event":"general_verifier_added","payload":{"public_key":"","identicon":"<empty>","encryption":"none"}}]"#;
     assert!(
         print.contains(expected_print),
@@ -1382,9 +1382,9 @@ fn remove_all_westend() {
     }
     let history_printed = print_history(dbname)
         .unwrap()
-        .replace(EMPTY_PNG, r#"<empty>"#)
-        .replace(WESTEND_9000, r#"<meta_pic_westend9000>"#)
-        .replace(WESTEND_9010, r#"<meta_pic_westend9010>"#);
+        .replace(&empty_png(), r#"<empty>"#)
+        .replace(&westend_9000(), r#"<meta_pic_westend9000>"#)
+        .replace(&westend_9010(), r#"<meta_pic_westend9010>"#);
     assert!(history_printed.contains(r#"{"event":"database_initiated"}"#) && history_printed.contains(r##"{"event":"network_removed","payload":{"base58prefix":"42","color":"#660D35","decimals":"12","encryption":"sr25519","genesis_hash":"e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e","logo":"westend","name":"westend","order":"2","path_id":"//westend","secondary_color":"#262626","title":"Westend","unit":"WND","current_verifier":{"type":"general","details":{"public_key":"","identicon":"<empty>","encryption":"none"}}}}"##) && history_printed.contains(r#"{"event":"metadata_removed","payload":{"specname":"westend","spec_version":"9000","meta_hash":"e80237ad8b2e92b72fcf6beb8f0e4ba4a21043a7115c844d91d6c4f981e469ce","meta_id_pic":"<meta_pic_westend9000>"}}"#) && history_printed.contains(r#"{"event":"metadata_removed","payload":{"specname":"westend","spec_version":"9010","meta_hash":"70c99738c27fb32c87883f1c9c94ee454bf0b3d88e4a431a2bbfe1222b46ebdf","meta_id_pic":"<meta_pic_westend9010>"}}"#) && history_printed.contains(r#"{"event":"identity_removed","payload":{"seed_name":"Alice","encryption":"sr25519","public_key":"3efeca331d646d8a2986374bb3bb8d6e9e3cfcdd7c45c2b69104fab5d61d3f34","path":"//westend","network_genesis_hash":"e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e"}}"#) && history_printed.contains(r#"{"event":"identity_removed","payload":{"seed_name":"Alice","encryption":"sr25519","public_key":"46ebddef8cd9bb167dc30878d7113b7e168e6f0646beffd77d69d39bad76b47a","path":"","network_genesis_hash":"e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e"}}"#) && history_printed.contains(r#"{"event":"identity_removed","payload":{"seed_name":"Alice","encryption":"sr25519","public_key":"d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d","path":"//Alice","network_genesis_hash":"e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e"}}"#), "Expected different history:\n{}", history_printed);
     fs::remove_dir_all(dbname).unwrap();
 }
