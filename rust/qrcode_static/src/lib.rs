@@ -1,6 +1,5 @@
 use anyhow::anyhow;
 use constants::{BACK_COLOR, BORDER, MAIN_COLOR, SCALING};
-
 use qrcodegen::{QrCode, QrCodeEcc};
 
 struct QrContent {
@@ -57,8 +56,8 @@ pub fn png_qr(input: &[u8]) -> anyhow::Result<Vec<u8>> {
 /// Function to generate static qr code from hex string
 pub fn png_qr_from_hex(hex_input: &str) -> anyhow::Result<Vec<u8>> {
     let hex_input = {
-        if let Some(h) = hex_input.strip_prefix("0x") {
-            h
+        if let Some(a) = hex_input.strip_prefix("0x") {
+            a
         } else {
             hex_input
         }

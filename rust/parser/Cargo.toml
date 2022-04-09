@@ -7,22 +7,24 @@ edition = "2018"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-scale-info = "1.0.0"
+bitvec = "1.0.0"
+defaults = {path = "../defaults", default-features = false, optional = true}
+definitions = {path = "../definitions", default-features = false, features = ["signer"]}
+frame-metadata = { version = "15.0.0", default-features = false, features = ["std", "legacy"]}
 hex = "0.4.3"
-parity-scale-codec = { version = "2.2.0", default-features = false, features = ["std", "bit-vec"], optional = false}
-parity-scale-codec-derive = "2.2.0"
-regex = "1.4.5"
-frame-metadata = { version = "14.0.0", default-features = false, features = ["v12", "v13", "v14", "std"]}
-printing_balance = {path = "../printing_balance"}
-bitvec = "0.20.4"
-num-bigint = "0.4.0"
 lazy_static = "1.4.0"
-sp-arithmetic = "3.0.0"
-sp-runtime = "3.0.0"
-sp-core = "3.0.0"
-defaults = {path = "../defaults"}
-definitions = {path = "../definitions"}
+num-bigint = "0.4.3"
+parity-scale-codec = {version = "3.1.2", features = ["derive", "bit-vec"]}
+printing_balance = {path = "../printing_balance"}
+regex = "1.5.4"
+scale-info = "2.0.1"
+sp-arithmetic = {git = "https://github.com/paritytech/substrate"}
+sp-core = {git = "https://github.com/paritytech/substrate", default-features = false, features = ["full_crypto"]}
+sp-runtime = {git = "https://github.com/paritytech/substrate", default-features = false}
 
+[features]
+default = ["test"]
+test = ["defaults/active"]
 
 [lib]
 name = "parser"

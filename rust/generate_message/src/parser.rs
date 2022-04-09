@@ -1,7 +1,7 @@
-use constants::{EXPORT_FOLDER, FOLDER};
+use constants::FOLDER;
 use definitions::{
     crypto::{Encryption, SufficientCrypto},
-    error::{
+    error_active::{
         Active, CommandBadArgument, CommandDoubleKey, CommandNeedArgument, CommandNeedKey,
         CommandParser, CommandUnexpected, ErrorActive, InputActive, NotHexActive,
     },
@@ -35,6 +35,7 @@ pub enum Command {
     TransferMetaRelease,
     Derivations(Derivations),
     Unwasm { filename: String, update_db: bool },
+    MetaDefaultFile { name: String, version: u32 },
 }
 
 pub enum Show {
@@ -144,8 +145,24 @@ impl Command {
                 match arg.as_str() {
                     "show" => match args.next() {
                         Some(show) => match show.to_lowercase().as_str() {
-                            "-database" => Ok(Command::Show(Show::Database)),
-                            "-address_book" => Ok(Command::Show(Show::AddressBook)),
+                            "-database" => {
+                                if args.next().is_some() {
+                                    Err(ErrorActive::CommandParser(
+                                        CommandParser::UnexpectedKeyArgumentSequence,
+                                    ))
+                                } else {
+                                    Ok(Command::Show(Show::Database))
+                                }
+                            }
+                            "-address_book" => {
+                                if args.next().is_some() {
+                                    Err(ErrorActive::CommandParser(
+                                        CommandParser::UnexpectedKeyArgumentSequence,
+                                    ))
+                                } else {
+                                    Ok(Command::Show(Show::AddressBook))
+                                }
+                            }
                             _ => Err(ErrorActive::CommandParser(
                                 CommandParser::UnexpectedKeyArgumentSequence,
                             )),
@@ -154,7 +171,15 @@ impl Command {
                             CommandNeedKey::Show,
                         ))),
                     },
-                    "load_types" => Ok(Command::Types),
+                    "load_types" => {
+                        if args.next().is_some() {
+                            Err(ErrorActive::CommandParser(
+                                CommandParser::UnexpectedKeyArgumentSequence,
+                            ))
+                        } else {
+                            Ok(Command::Types)
+                        }
+                    }
                     "load_metadata" | "add_specs" => {
                         let mut set_key = None;
                         let mut content_key = None;
@@ -162,7 +187,6 @@ impl Command {
                         let mut name = None;
                         let mut encryption_override_key = None;
                         let mut token = None;
-
                         while let Some(x) = args.next() {
                             let x = x.to_lowercase();
                             if x.starts_with('-') {
@@ -232,8 +256,8 @@ impl Command {
                                                     },
                                                     Err(_) => {
                                                         return Err(ErrorActive::CommandParser(
-                                                            CommandParser::Unexpected(
-                                                                CommandUnexpected::DecimalsFormat,
+                                                            CommandParser::BadArgument(
+                                                                CommandBadArgument::DecimalsFormat,
                                                             ),
                                                         ))
                                                     }
@@ -545,7 +569,7 @@ impl Command {
                                         ));
                                     }
                                     name = match args.next() {
-                                        Some(x) => Some(format!("{}/{}", EXPORT_FOLDER, x)),
+                                        Some(x) => Some(x.to_string()),
                                         None => {
                                             return Err(ErrorActive::CommandParser(
                                                 CommandParser::NeedArgument(
@@ -761,7 +785,7 @@ impl Command {
                                         ));
                                     }
                                     name = match args.next() {
-                                        Some(x) => Some(format!("{}/{}", EXPORT_FOLDER, x)),
+                                        Some(x) => Some(x.to_string()),
                                         None => {
                                             return Err(ErrorActive::CommandParser(
                                                 CommandParser::NeedArgument(
@@ -884,24 +908,24 @@ impl Command {
                                         Some(b) => {
                                             let name = b.to_string();
                                             match args.next() {
-                                                        Some(c) => {
-                                                            match c.as_str() {
-                                                                "-version" => {
-                                                                    match args.next() {
-                                                                        Some(d) => {
-                                                                            match d.parse::<u32> () {
-                                                                                Ok(version) => Some(Remove::SpecNameVersion{name, version}),
-                                                                                Err(_) => return Err(ErrorActive::CommandParser(CommandParser::Unexpected(CommandUnexpected::VersionFormat))),
-                                                                            }
-                                                                        },
-                                                                        None => return Err(ErrorActive::CommandParser(CommandParser::NeedArgument(CommandNeedArgument::RemoveVersion))),
+                                                Some(c) => {
+                                                    match c.as_str() {
+                                                        "-version" => {
+                                                            match args.next() {
+                                                                Some(d) => {
+                                                                    match d.parse::<u32> () {
+                                                                        Ok(version) => Some(Remove::SpecNameVersion{name, version}),
+                                                                        Err(_) => return Err(ErrorActive::CommandParser(CommandParser::BadArgument(CommandBadArgument::VersionFormat))),
                                                                     }
-                                                                }
-                                                                _ => return Err(ErrorActive::CommandParser(CommandParser::UnexpectedKeyArgumentSequence)),
+                                                                },
+                                                                None => return Err(ErrorActive::CommandParser(CommandParser::NeedArgument(CommandNeedArgument::RemoveVersion))),
                                                             }
-                                                        },
-                                                        None => return Err(ErrorActive::CommandParser(CommandParser::NeedKey(CommandNeedKey::RemoveVersion))),
+                                                        }
+                                                        _ => return Err(ErrorActive::CommandParser(CommandParser::UnexpectedKeyArgumentSequence)),
                                                     }
+                                                },
+                                                None => return Err(ErrorActive::CommandParser(CommandParser::NeedKey(CommandNeedKey::RemoveVersion))),
+                                            }
                                         }
                                         None => {
                                             return Err(ErrorActive::CommandParser(
@@ -917,7 +941,7 @@ impl Command {
                                         CommandParser::UnexpectedKeyArgumentSequence,
                                     ))
                                 }
-                            };
+                            }
                         }
                         match info_found {
                             Some(x) => Ok(Command::Remove(x)),
@@ -926,11 +950,51 @@ impl Command {
                             ))),
                         }
                     }
-                    "restore_defaults" => Ok(Command::RestoreDefaults),
-                    "make_cold_with_identities" => Ok(Command::MakeColdWithIdentities),
-                    "transfer_meta_to_cold" => Ok(Command::TransferMeta),
-                    "make_cold_release" => Ok(Command::MakeColdRelease(None)),
-                    "transfer_meta_to_cold_release" => Ok(Command::TransferMetaRelease),
+                    "restore_defaults" => {
+                        if args.next().is_some() {
+                            Err(ErrorActive::CommandParser(
+                                CommandParser::UnexpectedKeyArgumentSequence,
+                            ))
+                        } else {
+                            Ok(Command::RestoreDefaults)
+                        }
+                    }
+                    "make_cold_with_identities" => {
+                        if args.next().is_some() {
+                            Err(ErrorActive::CommandParser(
+                                CommandParser::UnexpectedKeyArgumentSequence,
+                            ))
+                        } else {
+                            Ok(Command::MakeColdWithIdentities)
+                        }
+                    }
+                    "transfer_meta_to_cold" => {
+                        if args.next().is_some() {
+                            Err(ErrorActive::CommandParser(
+                                CommandParser::UnexpectedKeyArgumentSequence,
+                            ))
+                        } else {
+                            Ok(Command::TransferMeta)
+                        }
+                    }
+                    "make_cold_release" => {
+                        if args.next().is_some() {
+                            Err(ErrorActive::CommandParser(
+                                CommandParser::UnexpectedKeyArgumentSequence,
+                            ))
+                        } else {
+                            Ok(Command::MakeColdRelease(None))
+                        }
+                    }
+                    "transfer_meta_to_cold_release" => {
+                        if args.next().is_some() {
+                            Err(ErrorActive::CommandParser(
+                                CommandParser::UnexpectedKeyArgumentSequence,
+                            ))
+                        } else {
+                            Ok(Command::TransferMetaRelease)
+                        }
+                    }
                     "derivations" => {
                         let mut goal = Goal::Both; // default option for `derivations`
                         let mut args = args.peekable();
@@ -1065,6 +1129,77 @@ impl Command {
                             }),
                             None => Err(ErrorActive::CommandParser(CommandParser::NeedKey(
                                 CommandNeedKey::Payload,
+                            ))),
+                        }
+                    }
+                    "meta_default_file" => {
+                        let mut name_found = None;
+                        let mut version_found = None;
+                        while let Some(a) = args.next() {
+                            match a.as_str() {
+                                "-name" => {
+                                    if name_found.is_some() {
+                                        return Err(ErrorActive::CommandParser(
+                                            CommandParser::DoubleKey(
+                                                CommandDoubleKey::MetaDefaultFileName,
+                                            ),
+                                        ));
+                                    }
+                                    name_found = match args.next() {
+                                        Some(b) => Some(b.to_string()),
+                                        None => {
+                                            return Err(ErrorActive::CommandParser(
+                                                CommandParser::NeedArgument(
+                                                    CommandNeedArgument::MetaDefaultFileName,
+                                                ),
+                                            ))
+                                        }
+                                    };
+                                }
+                                "-version" => {
+                                    if version_found.is_some() {
+                                        return Err(ErrorActive::CommandParser(
+                                            CommandParser::DoubleKey(
+                                                CommandDoubleKey::MetaDefaultFileVersion,
+                                            ),
+                                        ));
+                                    }
+                                    version_found = match args.next() {
+                                        Some(b) => match b.parse::<u32>() {
+                                            Ok(c) => Some(c),
+                                            Err(_) => {
+                                                return Err(ErrorActive::CommandParser(
+                                                    CommandParser::BadArgument(
+                                                        CommandBadArgument::VersionFormat,
+                                                    ),
+                                                ))
+                                            }
+                                        },
+                                        None => {
+                                            return Err(ErrorActive::CommandParser(
+                                                CommandParser::NeedArgument(
+                                                    CommandNeedArgument::MetaDefaultFileVersion,
+                                                ),
+                                            ))
+                                        }
+                                    };
+                                }
+                                _ => {
+                                    return Err(ErrorActive::CommandParser(
+                                        CommandParser::UnexpectedKeyArgumentSequence,
+                                    ))
+                                }
+                            }
+                        }
+                        match name_found {
+                            Some(name) => match version_found {
+                                Some(version) => Ok(Command::MetaDefaultFile { name, version }),
+                                None => Err(ErrorActive::CommandParser(CommandParser::NeedKey(
+                                    CommandNeedKey::MetaDefaultFileVersion,
+                                ))),
+                            },
+                            None => Err(ErrorActive::CommandParser(CommandParser::NeedKey(
+                                CommandNeedKey::MetaDefaultFileName,
                             ))),
                         }
                     }

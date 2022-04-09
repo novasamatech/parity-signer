@@ -2,7 +2,7 @@
 fn cold_release() -> Result<(), String> {
     use std::{env, fs::create_dir_all, path::Path};
 
-    use definitions::error::{Active, ErrorSource};
+    use definitions::{error::ErrorSource, error_active::Active};
     use generate_message::{full_run, parser::Command};
 
     let manifest_dir = env::var_os("CARGO_MANIFEST_DIR").unwrap();

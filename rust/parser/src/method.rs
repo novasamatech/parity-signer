@@ -1,7 +1,8 @@
-use definitions::error::{ParserDecodingError, ParserError};
 use frame_metadata::{
     decode_different::DecodeDifferent, v12::RuntimeMetadataV12, v13::RuntimeMetadataV13,
 };
+
+use definitions::error_signer::{ParserDecodingError, ParserError};
 
 /// Struct to store the method information
 pub(crate) struct MethodOld {
@@ -49,56 +50,56 @@ fn find_method_v12(
             if y.index == pallet_index {
                 if let DecodeDifferent::Decoded(name) = &y.name {
                     found_pallet_name = Some(name.to_string());
-                }
-                if let Some(DecodeDifferent::Decoded(calls)) = &y.calls {
-                    if calls.len() <= method_index.into() {
-                        return Err(ParserError::Decoding(
-                            ParserDecodingError::MethodIndexTooHigh {
-                                method_index,
-                                pallet_index,
-                                total: calls.len(),
-                            },
-                        ));
-                    }
-                    if let DecodeDifferent::Decoded(nm) = &calls[method_index as usize].name {
-                        found_method_name = Some(nm.to_string());
-                    }
-                    if let DecodeDifferent::Decoded(docs_found) =
-                        &calls[method_index as usize].documentation
-                    {
-                        for (i, a) in docs_found.iter().enumerate() {
-                            if i > 0 {
-                                docs.push('\n');
-                            }
-                            docs.push_str(a);
+                    if let Some(DecodeDifferent::Decoded(calls)) = &y.calls {
+                        if calls.len() <= method_index.into() {
+                            return Err(ParserError::Decoding(
+                                ParserDecodingError::MethodNotFound {
+                                    method_index,
+                                    pallet_name: name.to_string(),
+                                },
+                            ));
                         }
-                    }
-                    if let DecodeDifferent::Decoded(args) = &calls[method_index as usize].arguments
-                    {
-                        for a in args.iter() {
-                            let mut name_a = None;
-                            let mut ty_a = None;
-                            if let DecodeDifferent::Decoded(b) = &a.name {
-                                name_a = Some(b.to_string())
+                        if let DecodeDifferent::Decoded(nm) = &calls[method_index as usize].name {
+                            found_method_name = Some(nm.to_string());
+                        }
+                        if let DecodeDifferent::Decoded(docs_found) =
+                            &calls[method_index as usize].documentation
+                        {
+                            for (i, a) in docs_found.iter().enumerate() {
+                                if i > 0 {
+                                    docs.push('\n');
+                                }
+                                docs.push_str(a);
                             }
-                            if let DecodeDifferent::Decoded(c) = &a.ty {
-                                ty_a = Some(c.to_string())
-                            }
-                            match name_a {
-                                Some(x) => match ty_a {
-                                    Some(y) => {
-                                        arguments.push(Argument { name: x, ty: y });
-                                    }
+                        }
+                        if let DecodeDifferent::Decoded(args) =
+                            &calls[method_index as usize].arguments
+                        {
+                            for a in args.iter() {
+                                let mut name_a = None;
+                                let mut ty_a = None;
+                                if let DecodeDifferent::Decoded(b) = &a.name {
+                                    name_a = Some(b.to_string())
+                                }
+                                if let DecodeDifferent::Decoded(c) = &a.ty {
+                                    ty_a = Some(c.to_string())
+                                }
+                                match name_a {
+                                    Some(x) => match ty_a {
+                                        Some(y) => {
+                                            arguments.push(Argument { name: x, ty: y });
+                                        }
+                                        None => {
+                                            return Err(ParserError::Decoding(
+                                                ParserDecodingError::ArgumentTypeError,
+                                            ))
+                                        }
+                                    },
                                     None => {
                                         return Err(ParserError::Decoding(
-                                            ParserDecodingError::ArgumentTypeError,
+                                            ParserDecodingError::ArgumentNameError,
                                         ))
                                     }
-                                },
-                                None => {
-                                    return Err(ParserError::Decoding(
-                                        ParserDecodingError::ArgumentNameError,
-                                    ))
                                 }
                             }
                         }
@@ -150,56 +151,56 @@ fn find_method_v13(
             if y.index == pallet_index {
                 if let DecodeDifferent::Decoded(name) = &y.name {
                     found_pallet_name = Some(name.to_string());
-                }
-                if let Some(DecodeDifferent::Decoded(calls)) = &y.calls {
-                    if calls.len() <= method_index.into() {
-                        return Err(ParserError::Decoding(
-                            ParserDecodingError::MethodIndexTooHigh {
-                                method_index,
-                                pallet_index,
-                                total: calls.len(),
-                            },
-                        ));
-                    }
-                    if let DecodeDifferent::Decoded(nm) = &calls[method_index as usize].name {
-                        found_method_name = Some(nm.to_string());
-                    }
-                    if let DecodeDifferent::Decoded(docs_found) =
-                        &calls[method_index as usize].documentation
-                    {
-                        for (i, a) in docs_found.iter().enumerate() {
-                            if i > 0 {
-                                docs.push('\n');
-                            }
-                            docs.push_str(a);
+                    if let Some(DecodeDifferent::Decoded(calls)) = &y.calls {
+                        if calls.len() <= method_index.into() {
+                            return Err(ParserError::Decoding(
+                                ParserDecodingError::MethodNotFound {
+                                    method_index,
+                                    pallet_name: name.to_string(),
+                                },
+                            ));
                         }
-                    }
-                    if let DecodeDifferent::Decoded(args) = &calls[method_index as usize].arguments
-                    {
-                        for a in args.iter() {
-                            let mut name_a = None;
-                            let mut ty_a = None;
-                            if let DecodeDifferent::Decoded(b) = &a.name {
-                                name_a = Some(b.to_string())
+                        if let DecodeDifferent::Decoded(nm) = &calls[method_index as usize].name {
+                            found_method_name = Some(nm.to_string());
+                        }
+                        if let DecodeDifferent::Decoded(docs_found) =
+                            &calls[method_index as usize].documentation
+                        {
+                            for (i, a) in docs_found.iter().enumerate() {
+                                if i > 0 {
+                                    docs.push('\n');
+                                }
+                                docs.push_str(a);
                             }
-                            if let DecodeDifferent::Decoded(c) = &a.ty {
-                                ty_a = Some(c.to_string())
-                            }
-                            match name_a {
-                                Some(x) => match ty_a {
-                                    Some(y) => {
-                                        arguments.push(Argument { name: x, ty: y });
-                                    }
+                        }
+                        if let DecodeDifferent::Decoded(args) =
+                            &calls[method_index as usize].arguments
+                        {
+                            for a in args.iter() {
+                                let mut name_a = None;
+                                let mut ty_a = None;
+                                if let DecodeDifferent::Decoded(b) = &a.name {
+                                    name_a = Some(b.to_string())
+                                }
+                                if let DecodeDifferent::Decoded(c) = &a.ty {
+                                    ty_a = Some(c.to_string())
+                                }
+                                match name_a {
+                                    Some(x) => match ty_a {
+                                        Some(y) => {
+                                            arguments.push(Argument { name: x, ty: y });
+                                        }
+                                        None => {
+                                            return Err(ParserError::Decoding(
+                                                ParserDecodingError::ArgumentTypeError,
+                                            ))
+                                        }
+                                    },
                                     None => {
                                         return Err(ParserError::Decoding(
-                                            ParserDecodingError::ArgumentTypeError,
+                                            ParserDecodingError::ArgumentNameError,
                                         ))
                                     }
-                                },
-                                None => {
-                                    return Err(ParserError::Decoding(
-                                        ParserDecodingError::ArgumentNameError,
-                                    ))
                                 }
                             }
                         }

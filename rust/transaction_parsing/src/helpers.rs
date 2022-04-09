@@ -2,9 +2,9 @@ use constants::{METATREE, SPECSTREE};
 use db_handling::helpers::{get_types, open_db, open_tree};
 use definitions::{
     crypto::Encryption,
-    error::{
-        DatabaseSigner, ErrorSigner, ErrorSource, InputSigner, MetadataError, MetadataSource,
-        NotFoundSigner, NotHexSigner, Signer,
+    error::{ErrorSource, MetadataError, MetadataSource},
+    error_signer::{
+        DatabaseSigner, ErrorSigner, InputSigner, NotFoundSigner, NotHexSigner, Signer,
     },
     helpers::unhex,
     keyring::{MetaKey, MetaKeyPrefix, NetworkSpecsKey},
@@ -62,7 +62,7 @@ pub fn find_meta_set(
     let meta_key_prefix = MetaKeyPrefix::from_name(&short_specs.name);
     for x in metadata.scan_prefix(meta_key_prefix.prefix()).flatten() {
         let new_element = MetaSetElement::from_entry(x)?;
-        if let Some(found_now) = new_element.optional_base58prefix {
+        if let Some(found_now) = new_element.optional_base58prefix() {
             if found_now != short_specs.base58prefix {
                 return Err(<Signer>::faulty_metadata(
                     MetadataError::Base58PrefixSpecsMismatch {
@@ -71,14 +71,14 @@ pub fn find_meta_set(
                     },
                     MetadataSource::Database {
                         name: short_specs.name.to_string(),
-                        version: new_element.version,
+                        version: new_element.version(),
                     },
                 ));
             }
         }
         out.push(new_element);
     }
-    out.sort_by(|a, b| b.version.cmp(&a.version));
+    out.sort_by_key(|b| std::cmp::Reverse(b.version()));
     Ok(out)
 }
 
@@ -86,26 +86,26 @@ pub fn bundle_from_meta_set_element<'a>(
     meta_set_element: &'a MetaSetElement,
     database_name: &'a str,
 ) -> Result<MetadataBundle<'a>, ErrorSigner> {
-    match meta_set_element.runtime_metadata {
+    match meta_set_element.runtime_metadata() {
         RuntimeMetadata::V12(ref meta_v12) => Ok(MetadataBundle::Older {
             older_meta: OlderMeta::V12(meta_v12),
             types: get_types::<Signer>(database_name)?,
-            network_version: meta_set_element.version,
+            network_version: meta_set_element.version(),
         }),
         RuntimeMetadata::V13(ref meta_v13) => Ok(MetadataBundle::Older {
             older_meta: OlderMeta::V13(meta_v13),
             types: get_types::<Signer>(database_name)?,
-            network_version: meta_set_element.version,
+            network_version: meta_set_element.version(),
         }),
         RuntimeMetadata::V14(ref meta_v14) => Ok(MetadataBundle::Sci {
             meta_v14,
-            network_version: meta_set_element.version,
+            network_version: meta_set_element.version(),
         }),
         _ => Err(<Signer>::faulty_metadata(
             MetadataError::VersionIncompatible,
             MetadataSource::Database {
-                name: meta_set_element.name.to_string(),
-                version: meta_set_element.version,
+                name: meta_set_element.name(),
+                version: meta_set_element.version(),
             },
         )),
     }
@@ -138,7 +138,7 @@ pub fn accept_meta_values(
 
 /// Function to check if the chaispecs are already in the database
 pub fn specs_are_new(new: &NetworkSpecsToSend, database_name: &str) -> Result<bool, ErrorSigner> {
-    let network_specs_key = NetworkSpecsKey::from_parts(new.genesis_hash.as_ref(), &new.encryption);
+    let network_specs_key = NetworkSpecsKey::from_parts(&new.genesis_hash, &new.encryption);
     let database = open_db::<Signer>(database_name)?;
     let chainspecs = open_tree::<Signer>(&database, SPECSTREE)?;
     match chainspecs.get(network_specs_key.key()) {
@@ -180,7 +180,7 @@ pub fn multisigner_msg_genesis_encryption(
         "00" => match data.get(3..35) {
             Some(a) => (
                 MultiSigner::Ed25519(ed25519::Public::from_raw(
-                    a.to_vec().try_into().expect("static length"),
+                    a.try_into().expect("static length"),
                 )),
                 &data[35..],
                 Encryption::Ed25519,
@@ -190,7 +190,7 @@ pub fn multisigner_msg_genesis_encryption(
         "01" => match data.get(3..35) {
             Some(a) => (
                 MultiSigner::Sr25519(sr25519::Public::from_raw(
-                    a.to_vec().try_into().expect("static length"),
+                    a.try_into().expect("static length"),
                 )),
                 &data[35..],
                 Encryption::Sr25519,
@@ -200,7 +200,7 @@ pub fn multisigner_msg_genesis_encryption(
         "02" => match data.get(3..36) {
             Some(a) => (
                 MultiSigner::Ecdsa(ecdsa::Public::from_raw(
-                    a.to_vec().try_into().expect("static length"),
+                    a.try_into().expect("static length"),
                 )),
                 &data[36..],
                 Encryption::Ecdsa,

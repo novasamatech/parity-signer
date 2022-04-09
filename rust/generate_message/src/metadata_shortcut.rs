@@ -1,7 +1,7 @@
 use constants::{COLOR, SECONDARY_COLOR};
 use definitions::{
     crypto::Encryption,
-    error::{
+    error_active::{
         Active, Changed, DatabaseActive, ErrorActive, Fetch, IncomingMetadataSourceActiveStr,
         NotHexActive,
     },

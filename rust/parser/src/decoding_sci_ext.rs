@@ -1,11 +1,13 @@
-use definitions::{
-    error::{ParserDecodingError, ParserError},
-    network_specs::ShortSpecs,
-};
 use frame_metadata::v14::RuntimeMetadataV14;
 use parity_scale_codec::Decode;
 use scale_info::{form::PortableForm, Type};
 use sp_runtime::generic::Era;
+use std::convert::TryInto;
+
+use definitions::{
+    error_signer::{ParserDecodingError, ParserError},
+    network_specs::ShortSpecs,
+};
 
 use crate::cards::ParserCard;
 use crate::decoding_commons::{DecodedOut, OutputCard};
@@ -155,34 +157,32 @@ pub(crate) fn special_case_hash(
     hash: &Hash,
 ) -> Result<DecodedOut, ParserError> {
     match data.get(0..32) {
-        Some(a) => match <[u8; 32]>::decode(&mut &*a) {
-            Ok(x) => {
-                let remaining_vector = data[32..].to_vec();
-                let fancy_out = match hash {
-                    Hash::GenesisHash => {
-                        found_ext.genesis_hash = Some(x);
-                        if x != short_specs.genesis_hash {
-                            return Err(ParserError::Decoding(
-                                ParserDecodingError::GenesisHashMismatch,
-                            ));
-                        }
-                        Vec::new()
+        Some(a) => {
+            let decoded_hash: [u8; 32] = a.try_into().expect("constant length, always fits");
+            let remaining_vector = data[32..].to_vec();
+            let fancy_out = match hash {
+                Hash::GenesisHash => {
+                    found_ext.genesis_hash = Some(decoded_hash);
+                    if decoded_hash != short_specs.genesis_hash {
+                        return Err(ParserError::Decoding(
+                            ParserDecodingError::GenesisHashMismatch,
+                        ));
                     }
-                    Hash::BlockHash => {
-                        found_ext.block_hash = Some(x);
-                        vec![OutputCard {
-                            card: ParserCard::BlockHash(x),
-                            indent,
-                        }]
-                    }
-                };
-                Ok(DecodedOut {
-                    remaining_vector,
-                    fancy_out,
-                })
-            }
-            Err(_) => Err(ParserError::Decoding(ParserDecodingError::Array)),
-        },
+                    Vec::new()
+                }
+                Hash::BlockHash => {
+                    found_ext.block_hash = Some(decoded_hash);
+                    vec![OutputCard {
+                        card: ParserCard::BlockHash(decoded_hash),
+                        indent,
+                    }]
+                }
+            };
+            Ok(DecodedOut {
+                remaining_vector,
+                fancy_out,
+            })
+        }
         None => Err(ParserError::Decoding(ParserDecodingError::DataTooShort)),
     }
 }
