@@ -1,6 +1,6 @@
-#[cfg(feature = "jni")]
+#[cfg(target_os = "android")]
 pub mod android;
-#[cfg(not(feature = "jni"))]
+#[cfg(target_os = "ios")]
 pub mod ios;
 
 pub use anyhow;
@@ -32,7 +32,7 @@ macro_rules! export {
             ) -> $ret $code
         )*
 
-        #[cfg(feature = "jni")]
+        #[cfg(target_os = "android")]
         pub mod android_export {
             use $crate::export::{Return, Argument};
 
@@ -52,7 +52,7 @@ macro_rules! export {
             )*
         }
 
-        #[cfg(not(feature = "jni"))]
+        #[cfg(target_os = "ios")]
         pub mod ios_export {
             use $crate::export::{Return, Argument};
 

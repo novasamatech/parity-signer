@@ -29,9 +29,6 @@ if [ "$1" == "ios" ]
     
     cd "$(dirname "${0}")/../rust/signer"
 
-    cp ../os-specific-lock/ios/Cargo.lock ../
-    cp ios-hack/Cargo.toml .
-
     for i in "${IOS_ARCHS[@]}";
       do
         rustup target add "$i";
