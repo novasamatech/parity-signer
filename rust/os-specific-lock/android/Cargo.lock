@@ -393,6 +393,9 @@ checksum = "245097e9a4535ee1e3e3931fcfcd55a796a44c643e8596ff6566d68f09b87bbc"
 [[package]]
 name = "constants"
 version = "0.1.0"
+dependencies = [
+ "hex",
+]
 
 [[package]]
 name = "core-foundation"
