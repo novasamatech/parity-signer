@@ -1,12 +1,13 @@
 use bitvec::prelude::{BitVec, Lsb0};
-use definitions::{
-    error::{ParserDecodingError, ParserError},
-    network_specs::ShortSpecs,
-    types::{Description, EnumVariant, EnumVariantType, StructField, TypeEntry},
-};
 use lazy_static::lazy_static;
 use regex::Regex;
 use sp_arithmetic::{PerU16, Perbill, Percent};
+
+use definitions::{
+    error_signer::{ParserDecodingError, ParserError},
+    network_specs::ShortSpecs,
+    types::{Description, EnumVariant, EnumVariantType, StructField, TypeEntry},
+};
 
 use crate::cards::ParserCard;
 use crate::decoding_commons::{
@@ -33,9 +34,9 @@ fn decode_primitive(
     data: &[u8],
     indent: u32,
     short_specs: &ShortSpecs,
-) -> Result<DecodedOut, ParserError> {
+) -> Option<DecodedOut> {
     match found_ty {
-        "bool" => decode_known_length::<bool>(data, found_ty, indent),
+        "bool" => decode_known_length::<bool>(data, found_ty, indent).map_or_else(|_| None, Some),
         "u8" => decode_primitive_with_flags::<u8>(
             data,
             &mut None,
@@ -44,7 +45,8 @@ fn decode_primitive(
             found_ty,
             indent,
             short_specs,
-        ),
+        )
+        .map_or_else(|_| None, Some),
         "u16" => decode_primitive_with_flags::<u16>(
             data,
             &mut None,
@@ -53,7 +55,8 @@ fn decode_primitive(
             found_ty,
             indent,
             short_specs,
-        ),
+        )
+        .map_or_else(|_| None, Some),
         "u32" => decode_primitive_with_flags::<u32>(
             data,
             &mut None,
@@ -62,7 +65,8 @@ fn decode_primitive(
             found_ty,
             indent,
             short_specs,
-        ),
+        )
+        .map_or_else(|_| None, Some),
         "u64" => decode_primitive_with_flags::<u64>(
             data,
             &mut None,
@@ -71,7 +75,8 @@ fn decode_primitive(
             found_ty,
             indent,
             short_specs,
-        ),
+        )
+        .map_or_else(|_| None, Some),
         "u128" => decode_primitive_with_flags::<u128>(
             data,
             &mut None,
@@ -80,10 +85,17 @@ fn decode_primitive(
             found_ty,
             indent,
             short_specs,
-        ),
-        "Percent" => decode_perthing::<Percent>(data, false, found_ty, indent),
-        "Perbill" => decode_perthing::<Perbill>(data, false, found_ty, indent),
-        "PerU16" => decode_perthing::<PerU16>(data, false, found_ty, indent),
+        )
+        .map_or_else(|_| None, Some),
+        "Percent" => {
+            decode_perthing::<Percent>(data, false, found_ty, indent).map_or_else(|_| None, Some)
+        }
+        "Perbill" => {
+            decode_perthing::<Perbill>(data, false, found_ty, indent).map_or_else(|_| None, Some)
+        }
+        "PerU16" => {
+            decode_perthing::<PerU16>(data, false, found_ty, indent).map_or_else(|_| None, Some)
+        }
         "Compact<u8>" => decode_primitive_with_flags::<u8>(
             data,
             &mut None,
@@ -92,7 +104,8 @@ fn decode_primitive(
             found_ty,
             indent,
             short_specs,
-        ),
+        )
+        .map_or_else(|_| None, Some),
         "Compact<u16>" => decode_primitive_with_flags::<u16>(
             data,
             &mut None,
@@ -101,7 +114,8 @@ fn decode_primitive(
             found_ty,
             indent,
             short_specs,
-        ),
+        )
+        .map_or_else(|_| None, Some),
         "Compact<u32>" => decode_primitive_with_flags::<u32>(
             data,
             &mut None,
@@ -110,7 +124,8 @@ fn decode_primitive(
             found_ty,
             indent,
             short_specs,
-        ),
+        )
+        .map_or_else(|_| None, Some),
         "Compact<u64>" => decode_primitive_with_flags::<u64>(
             data,
             &mut None,
@@ -119,7 +134,8 @@ fn decode_primitive(
             found_ty,
             indent,
             short_specs,
-        ),
+        )
+        .map_or_else(|_| None, Some),
         "Compact<u128>" => decode_primitive_with_flags::<u128>(
             data,
             &mut None,
@@ -128,13 +144,18 @@ fn decode_primitive(
             found_ty,
             indent,
             short_specs,
-        ),
-        "Compact<Percent>" => decode_perthing::<Percent>(data, true, found_ty, indent),
-        "Compact<Perbill>" => decode_perthing::<Perbill>(data, true, found_ty, indent),
-        "Compact<PerU16>" => decode_perthing::<PerU16>(data, true, found_ty, indent),
-        _ => Err(ParserError::Decoding(ParserDecodingError::NotPrimitive(
-            found_ty.to_string(),
-        ))),
+        )
+        .map_or_else(|_| None, Some),
+        "Compact<Percent>" => {
+            decode_perthing::<Percent>(data, true, found_ty, indent).map_or_else(|_| None, Some)
+        }
+        "Compact<Perbill>" => {
+            decode_perthing::<Perbill>(data, true, found_ty, indent).map_or_else(|_| None, Some)
+        }
+        "Compact<PerU16>" => {
+            decode_perthing::<PerU16>(data, true, found_ty, indent).map_or_else(|_| None, Some)
+        }
+        _ => None,
     }
 }
 
@@ -524,7 +545,7 @@ fn special_case_identity_fields(
     };
     let into_bv = data[..8].to_vec();
     // make correct Bitvec
-    let bv: BitVec<Lsb0, u8> = BitVec::from_vec(into_bv);
+    let bv: BitVec<u8, Lsb0> = BitVec::from_vec(into_bv);
     let mut found = false;
     let mut fancy_out: Vec<OutputCard> = Vec::new();
     for x in type_database.iter() {
@@ -586,7 +607,7 @@ fn special_case_bitvec(data: Vec<u8>, indent: u32) -> Result<DecodedOut, ParserE
                 return Err(ParserError::Decoding(ParserDecodingError::DataTooShort));
             }
             let into_bv = data[start..fin].to_vec();
-            let bv: BitVec<Lsb0, u8> = BitVec::from_vec(into_bv);
+            let bv: BitVec<u8, Lsb0> = BitVec::from_vec(into_bv);
             let fancy_out = vec![OutputCard {
                 card: ParserCard::BitVec(bv.to_string()),
                 indent,
@@ -882,8 +903,8 @@ fn decode_simple(
         return Err(ParserError::Decoding(ParserDecodingError::DataTooShort));
     }
     match decode_primitive(found_ty, &data, indent, short_specs) {
-        Ok(a) => Ok(a),
-        Err(_) => {
+        Some(a) => Ok(a),
+        None => {
             // check for option
             match REGOPTION.captures(found_ty) {
                 Some(caps) => {
@@ -980,7 +1001,7 @@ fn decode_simple(
                                                                 let new_ty = found_ty.replace(inner_ty, a);
                                                                 decode_simple(&new_ty, data, type_database, indent, short_specs)
                                                             },
-                                                            None => Err(ParserError::Decoding(ParserDecodingError::CompactNotPrimitive)),
+                                                            None => Err(ParserError::Decoding(ParserDecodingError::UnexpectedCompactInsides)),
                                                         }
                                                     }
                                                     None => {

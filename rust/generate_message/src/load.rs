@@ -1,14 +1,10 @@
-use std::path::PathBuf;
-use wasm_loader::Source;
-use wasm_testbed::WasmTestBed;
-
-use constants::{ADDRESS_BOOK, HOT_DB_NAME, METATREE};
-use db_handling::helpers::{open_db, open_tree};
+use constants::{ADDRESS_BOOK, EXPORT_FOLDER, HOT_DB_NAME, METATREE};
+use db_handling::helpers::{get_meta_values_by_name_version, open_db, open_tree};
 use definitions::{
-    error::{
-        Active, Changed, DatabaseActive, ErrorActive, ErrorSource, Fetch,
-        IncomingMetadataSourceActive, IncomingMetadataSourceActiveStr, MetadataError,
-        MetadataSource, NotFoundActive, Wasm,
+    error::{ErrorSource, MetadataError, MetadataSource},
+    error_active::{
+        Active, Changed, DatabaseActive, ErrorActive, Fetch, IncomingMetadataSourceActive,
+        IncomingMetadataSourceActiveStr, NotFoundActive,
     },
     keyring::MetaKeyPrefix,
     metadata::{AddressBookEntry, MetaValues},
@@ -385,16 +381,7 @@ fn warn(name: &str, version: u32) {
 
 /// Function to process .wasm files into signable entities and add metadata into the database
 pub fn unwasm(filename: &str, update_db: bool) -> Result<(), ErrorActive> {
-    let testbed = match WasmTestBed::new(&Source::File(PathBuf::from(&filename))) {
-        Ok(a) => a,
-        Err(e) => return Err(ErrorActive::Wasm(Wasm::WasmTestbed(e))),
-    };
-    let meta_values = MetaValues::from_runtime_metadata(
-        testbed.metadata(),
-        IncomingMetadataSourceActive::Wasm {
-            filename: filename.to_string(),
-        },
-    )?;
+    let meta_values = MetaValues::from_wasm_file(filename)?;
     let set_element = search_name(&meta_values.name)?;
     if let Some(prefix_from_meta) = meta_values.optional_base58prefix {
         if prefix_from_meta != set_element.base58prefix {
@@ -430,4 +417,15 @@ pub fn unwasm(filename: &str, update_db: bool) -> Result<(), ErrorActive> {
         genesis_hash,
     };
     load_meta_print(&shortcut)
+}
+
+/// Function to generate text file with hex string metadata, for defaults generation
+/// Takes metadata only from the database
+pub fn meta_default_file(name: &str, version: u32) -> Result<(), ErrorActive> {
+    let meta_values = get_meta_values_by_name_version::<Active>(HOT_DB_NAME, name, version)?;
+    let filename = format!("{}/{}{}", EXPORT_FOLDER, name, version);
+    match std::fs::write(&filename, hex::encode(meta_values.meta)) {
+        Ok(_) => Ok(()),
+        Err(e) => Err(ErrorActive::Output(e)),
+    }
 }

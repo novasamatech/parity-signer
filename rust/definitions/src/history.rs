@@ -1,25 +1,47 @@
+//! Types used in Signer history log
+//!
+//! Signer keeps log of all events in `HISTORY` tree of the cold database.
+//!
+//! Every log [`Entry`] consists of timestamp and a set of simultaneously
+//! occured events `Vec<Event>`. [`Entry`] is stored SCALE-encoded under key
+//! [`Order`](crate::keyring::Order). `Order` is produced from the order the
+//! event gets in history log when entered. `Order` is an addition to the
+//! timestamp, and normally arranging entries by the timestamp should
+//! coincide with arranging entries by `Order`.  
+//!
+//! Log by default starts with database init `Entry` containing:
+//!
+//! - `Event::DatabaseInitiated`
+//! - `Event::GeneralVerifierSet(_)`
+//!
+//! User can clear history log at any time. This indeed will remove all history
+//! entries, and the log will then start with `Entry` containing
+//! `Event::HistoryCleared`.
 use blake2_rfc::blake2b::blake2b;
-use hex;
-use parity_scale_codec_derive::{Decode, Encode};
+use parity_scale_codec::{Decode, Encode};
 use sled::IVec;
-use sp_core;
 use sp_runtime::MultiSigner;
+#[cfg(feature = "signer")]
 use std::convert::TryInto;
 
 use crate::{
     crypto::Encryption,
-    helpers::{pic_meta, pic_types},
     keyring::VerifierKey,
     metadata::MetaValues,
     network_specs::{
         NetworkSpecs, NetworkSpecsToSend, ValidCurrentVerifier, Verifier, VerifierValue,
     },
-    print::{export_complex_single, export_complex_vector},
     qr_transfers::ContentLoadTypes,
 };
+#[cfg(feature = "signer")]
+use crate::{
+    helpers::{pic_meta, pic_types},
+    print::{export_complex_single, export_complex_vector},
+};
 
-/// History log entry content for importing or removing metadata of a known network.
-/// Contains network name, network version, metadata hash, verifier.
+/// Event content for importing or removing metadata of a known network
+///
+/// Contains network name, network version, metadata hash.
 #[derive(Decode, Encode, PartialEq, Clone)]
 pub struct MetaValuesDisplay {
     name: String,
@@ -28,6 +50,7 @@ pub struct MetaValuesDisplay {
 }
 
 impl MetaValuesDisplay {
+    /// Generate [`MetaValuesDisplay`] from [`MetaValues`]
     pub fn get(meta_values: &MetaValues) -> Self {
         Self {
             name: meta_values.name.to_string(),
@@ -35,6 +58,12 @@ impl MetaValuesDisplay {
             meta_hash: blake2b(32, &[], &meta_values.meta).as_bytes().to_vec(),
         }
     }
+
+    /// Generate [`MetaValuesDisplay`] from database entry with network name,
+    /// network version, and stored metadata entry as is
+    ///
+    /// This is used for deletion, no checking of stored metadata integrity is
+    /// made.
     pub fn from_storage(name: &str, version: u32, meta_stored: IVec) -> Self {
         Self {
             name: name.to_string(),
@@ -42,19 +71,21 @@ impl MetaValuesDisplay {
             meta_hash: blake2b(32, &[], &meta_stored).as_bytes().to_vec(),
         }
     }
+
+    /// Print json with [`MetaValuesDisplay`] information for user interface  
+    #[cfg(feature = "signer")]
     pub fn show(&self) -> String {
-        let meta_id_pic = match pic_meta(&self.meta_hash) {
-            Ok(a) => hex::encode(a),
-            Err(_) => String::new(),
-        };
+        let meta_id_pic = hex::encode(pic_meta(&self.meta_hash));
         format!("\"specname\":\"{}\",\"spec_version\":\"{}\",\"meta_hash\":\"{}\",\"meta_id_pic\":\"{}\"", &self.name, &self.version, hex::encode(&self.meta_hash), meta_id_pic)
     }
 }
 
-/// History log entry content for creating and showing as a qr code `sufficient crypto`
-/// content for load_metadata message;
-/// effectively records that network metadata were signed by user.
-/// Contains network name, network version, metadata hash, verifier value.
+/// Event content for generating [`SufficientCrypto`](crate::crypto::SufficientCrypto)
+/// QR code for `load_metadata` message  
+///
+/// Effectively records that network metadata was signed by user.
+/// Contains network name, network version, metadata hash, and [`VerifierValue`]
+/// of address used for `SufficientCrypto` generation.  
 #[derive(Decode, Encode, PartialEq, Clone)]
 pub struct MetaValuesExport {
     name: String,
@@ -64,6 +95,8 @@ pub struct MetaValuesExport {
 }
 
 impl MetaValuesExport {
+    /// Generate [`MetaValuesExport`] from [`MetaValues`] and [`VerifierValue`]
+    /// of address used for `SufficientCrypto` generation.  
     pub fn get(meta_values: &MetaValues, signed_by: &VerifierValue) -> Self {
         Self {
             name: meta_values.name.to_string(),
@@ -72,16 +105,16 @@ impl MetaValuesExport {
             signed_by: signed_by.to_owned(),
         }
     }
+
+    /// Print json with [`MetaValuesExport`] information for user interface
+    #[cfg(feature = "signer")]
     pub fn show(&self) -> String {
-        let meta_id_pic = match pic_meta(&self.meta_hash) {
-            Ok(a) => hex::encode(a),
-            Err(_) => String::new(),
-        };
+        let meta_id_pic = hex::encode(pic_meta(&self.meta_hash));
         format!("\"specname\":\"{}\",\"spec_version\":\"{}\",\"meta_hash\":\"{}\",\"meta_id_pic\":\"{}\",\"signed_by\":{}", &self.name, &self.version, hex::encode(&self.meta_hash), meta_id_pic, export_complex_single(&self.signed_by, |a| a.show_card()))
     }
 }
 
-/// History log entry content for importing or removing network specs and corresponding network verifier.
+/// Event content for importing or removing network specs  
 #[derive(Decode, Encode, PartialEq, Clone)]
 pub struct NetworkSpecsDisplay {
     specs: NetworkSpecs,
@@ -90,6 +123,9 @@ pub struct NetworkSpecsDisplay {
 }
 
 impl NetworkSpecsDisplay {
+    /// Generate [`NetworkSpecsDisplay`] from [`NetworkSpecs`],
+    /// network-associated [`ValidCurrentVerifier`], and
+    /// general verifier [`Verifier`]
     pub fn get(
         specs: &NetworkSpecs,
         valid_current_verifier: &ValidCurrentVerifier,
@@ -101,15 +137,21 @@ impl NetworkSpecsDisplay {
             general_verifier: general_verifier.to_owned(),
         }
     }
+
+    /// Print json with [`NetworkSpecsDisplay`] information for user interface
+    #[cfg(feature = "signer")]
     pub fn show(&self) -> String {
         self.specs
             .show(&self.valid_current_verifier, &self.general_verifier)
     }
 }
 
-/// History log entry content for creating and showing as a qr code `sufficient crypto`
-/// content for add_specs message;
-/// effectively records that network specs were signed by user.
+/// Event content for generating [`SufficientCrypto`](crate::crypto::SufficientCrypto)
+/// QR code for `add_specs` message  
+///
+/// Effectively records that network specs were signed by user.
+/// Contains [`NetworkSpecsToSend`] and [`VerifierValue`] of address used for
+/// `SufficientCrypto` generation.  
 #[derive(Decode, Encode, PartialEq, Clone)]
 pub struct NetworkSpecsExport {
     specs_to_send: NetworkSpecsToSend,
@@ -117,12 +159,17 @@ pub struct NetworkSpecsExport {
 }
 
 impl NetworkSpecsExport {
+    /// Generate [`NetworkSpecsExport`] from [`NetworkSpecsToSend`] and
+    /// [`VerifierValue`] of address used for `SufficientCrypto` generation.  
     pub fn get(specs_to_send: &NetworkSpecsToSend, signed_by: &VerifierValue) -> Self {
         Self {
             specs_to_send: specs_to_send.to_owned(),
             signed_by: signed_by.to_owned(),
         }
     }
+
+    /// Print json with [`NetworkSpecsExport`] information for user interface
+    #[cfg(feature = "signer")]
     pub fn show(&self) -> String {
         format!(
             "{},\"signed_by\":{}",
@@ -132,7 +179,7 @@ impl NetworkSpecsExport {
     }
 }
 
-/// History log entry content for setting network verifier
+/// Event content for setting network verifier
 #[derive(Decode, Encode, PartialEq, Clone)]
 pub struct NetworkVerifierDisplay {
     genesis_hash: Vec<u8>,
@@ -141,6 +188,9 @@ pub struct NetworkVerifierDisplay {
 }
 
 impl NetworkVerifierDisplay {
+    /// Generate [`NetworkVerifierDisplay`] from [`VerifierKey`],
+    /// [`ValidCurrentVerifier`], the setting of which the event records,
+    /// and general verifier [`Verifier`]  
     pub fn get(
         verifier_key: &VerifierKey,
         valid_current_verifier: &ValidCurrentVerifier,
@@ -152,6 +202,9 @@ impl NetworkVerifierDisplay {
             general_verifier: general_verifier.to_owned(),
         }
     }
+
+    /// Print json with [`NetworkVerifierDisplay`] information for user interface
+    #[cfg(feature = "signer")]
     pub fn show(&self) -> String {
         format!(
             "\"genesis_hash\":\"{}\",\"current_verifier\":{}",
@@ -162,7 +215,9 @@ impl NetworkVerifierDisplay {
     }
 }
 
-/// History log entry content for importing types information.
+/// Event content for importing or removing types information
+///
+/// Contains hash of SCALE-encoded types data and types information [`Verifier`].
 #[derive(Decode, Encode, PartialEq, Clone)]
 pub struct TypesDisplay {
     types_hash: Vec<u8>,
@@ -170,17 +225,19 @@ pub struct TypesDisplay {
 }
 
 impl TypesDisplay {
+    /// Generate [`TypesDisplay`] from [`ContentLoadTypes`] and types information
+    /// [`Verifier`]  
     pub fn get(types_content: &ContentLoadTypes, verifier: &Verifier) -> Self {
         Self {
             types_hash: blake2b(32, &[], &types_content.store()).as_bytes().to_vec(),
             verifier: verifier.to_owned(),
         }
     }
+
+    /// Print json with [`TypesDisplay`] information for user interface
+    #[cfg(feature = "signer")]
     pub fn show(&self) -> String {
-        let types_id_pic = match pic_types(&self.types_hash) {
-            Ok(a) => hex::encode(a),
-            Err(_) => String::new(),
-        };
+        let types_id_pic = hex::encode(pic_types(&self.types_hash));
         format!(
             "\"types_hash\":\"{}\",\"types_id_pic\":\"{}\",\"verifier\":{}",
             hex::encode(&self.types_hash),
@@ -190,9 +247,12 @@ impl TypesDisplay {
     }
 }
 
-/// History log entry content for creating and showing as a qr code `sufficient crypto`
-/// content for load_types message;
-/// effectively records that types information was signed by user.
+/// Event content for generating [`SufficientCrypto`](crate::crypto::SufficientCrypto)
+/// QR code for `load_types` message  
+///
+/// Effectively records that types information was signed by user.
+/// Contains hash of SCALE-encoded types data and [`VerifierValue`] of address
+/// used for `SufficientCrypto` generation.  
 #[derive(Decode, Encode, PartialEq, Clone)]
 pub struct TypesExport {
     types_hash: Vec<u8>,
@@ -200,17 +260,19 @@ pub struct TypesExport {
 }
 
 impl TypesExport {
+    /// Generate [`TypesExport`] from [`ContentLoadTypes`] and [`VerifierValue`]
+    /// of address used for `SufficientCrypto` generation  
     pub fn get(types_content: &ContentLoadTypes, signed_by: &VerifierValue) -> Self {
         Self {
             types_hash: blake2b(32, &[], &types_content.store()).as_bytes().to_vec(),
             signed_by: signed_by.to_owned(),
         }
     }
+
+    /// Print json with [`TypesExport`] information for user interface
+    #[cfg(feature = "signer")]
     pub fn show(&self) -> String {
-        let types_id_pic = match pic_types(&self.types_hash) {
-            Ok(a) => hex::encode(a),
-            Err(_) => String::new(),
-        };
+        let types_id_pic = hex::encode(pic_types(&self.types_hash));
         format!(
             "\"types_hash\":\"{}\",\"types_id_pic\":\"{}\",\"signed_by\":{}",
             hex::encode(&self.types_hash),
@@ -220,7 +282,14 @@ impl TypesExport {
     }
 }
 
-/// History log entry content for identity action
+/// Event content for address generation or removal
+///
+/// Contains public information associated with address:
+/// - seed name  
+/// - [`Encryption`]  
+/// - public key for address  
+/// - path with soft (`/`) and hard (`//`) derivatinos only, **without** password  
+/// - genesis hash of the network within which the address is  
 #[derive(Decode, Encode, PartialEq, Clone)]
 pub struct IdentityHistory {
     seed_name: String,
@@ -231,6 +300,7 @@ pub struct IdentityHistory {
 }
 
 impl IdentityHistory {
+    /// Generate [`IdentityHistory`] from parts  
     pub fn get(
         seed_name: &str,
         encryption: &Encryption,
@@ -246,22 +316,34 @@ impl IdentityHistory {
             network_genesis_hash: network_genesis_hash.to_vec(),
         }
     }
+
+    /// Print json with [`IdentityHistory`] information for user interface
+    #[cfg(feature = "signer")]
     pub fn show(&self) -> String {
         format!("\"seed_name\":\"{}\",\"encryption\":\"{}\",\"public_key\":\"{}\",\"path\":\"{}\",\"network_genesis_hash\":\"{}\"", &self.seed_name, &self.encryption.show(), hex::encode(&self.public_key), &self.path, hex::encode(&self.network_genesis_hash))
     }
 }
 
-/// Struct to store information in history log about transactions,
-/// both successfully signed and the ones with wrong password entered by user
+/// History log information about transactions, both successfully signed and
+/// the ones with wrong password entered by user
 #[derive(Decode, Encode, PartialEq, Clone)]
 pub struct SignDisplay {
-    transaction: Vec<u8>,     // transaction
-    network_name: String,     // network name
-    signed_by: VerifierValue, // signature author
-    user_comment: String,     // user entered comment for transaction
+    /// raw `Vec<u8>` transaction that user either tried to sign or signed  
+    transaction: Vec<u8>,
+
+    /// name for the network in which transaction is generated,
+    /// as it is recorded in the network specs and network metadata  
+    network_name: String,
+
+    /// address that has generated and signed the transaction  
+    signed_by: VerifierValue,
+
+    /// user entered comment for transaction
+    user_comment: String,
 }
 
 impl SignDisplay {
+    /// Generate [`SignDisplay`] from parts  
     pub fn get(
         transaction: &[u8],
         network_name: &str,
@@ -275,6 +357,8 @@ impl SignDisplay {
             user_comment: user_comment.to_string(),
         }
     }
+
+    /// Get raw transaction, network name, and [`Encryption`] from [`SignDisplay`]  
     pub fn transaction_network_encryption(&self) -> (Vec<u8>, String, Encryption) {
         let encryption = match &self.signed_by {
             VerifierValue::Standard(MultiSigner::Ed25519(_)) => Encryption::Ed25519,
@@ -287,9 +371,19 @@ impl SignDisplay {
             encryption,
         )
     }
+
+    /// Get raw transaction from [`SignDisplay`]  
     pub fn transaction(&self) -> Vec<u8> {
         self.transaction.to_vec()
     }
+
+    /// Print json with [`SignDisplay`] information in case of **successful**
+    /// signing, for user interface
+    ///
+    /// Function to display transaction could vary,
+    /// currently general log view shows raw hexadecimal transaction,
+    /// detailed log view shows parsed transaction if parsing is possible.
+    #[cfg(feature = "signer")]
     pub fn success<O>(&self, op: O) -> String
     where
         O: Fn(&Self) -> String + Copy,
@@ -302,6 +396,17 @@ impl SignDisplay {
             &self.user_comment
         )
     }
+
+    /// Print json with [`SignDisplay`] information in case of **failed** signing,
+    /// for user interface
+    ///
+    /// This is reserved for cases that have failed because user has entered
+    /// a wrong password.
+    ///
+    /// Function to display transaction could vary,
+    /// currently general log view shows raw hexadecimal transaction,
+    /// detailed log view shows parsed transaction if parsing is possible.
+    #[cfg(feature = "signer")]
     pub fn pwd_failure<O>(&self, op: O) -> String
     where
         O: Fn(&Self) -> String + Copy,
@@ -310,17 +415,26 @@ impl SignDisplay {
     }
 }
 
-/// Struct to store information in history log about messages,
-/// both successfully signed and the ones with wrong password entered by user
+/// History log information about messages, both successfully signed and
+/// the ones with wrong password entered by user
 #[derive(Decode, Encode, PartialEq, Clone)]
 pub struct SignMessageDisplay {
-    message: String,          // message
-    network_name: String,     // network name
-    signed_by: VerifierValue, // signature author
-    user_comment: String,     // user entered comment for message
+    /// decoded message
+    message: String,
+
+    /// name for the network in which message transaction is generated,
+    /// as it is recorded in the network specs and network metadata  
+    network_name: String,
+
+    /// address that has generated and signed the message  
+    signed_by: VerifierValue,
+
+    /// user entered comment for message
+    user_comment: String,
 }
 
 impl SignMessageDisplay {
+    /// Generate [`SignMessageDisplay`] from parts  
     pub fn get(
         message: &str,
         network_name: &str,
@@ -334,6 +448,10 @@ impl SignMessageDisplay {
             user_comment: user_comment.to_string(),
         }
     }
+
+    /// Print json with [`SignMessageDisplay`] information in case of **successful**
+    /// signing, for user interface
+    #[cfg(feature = "signer")]
     pub fn success(&self) -> String {
         format!(
             "\"message\":\"{}\",\"network_name\":\"{}\",\"signed_by\":{},\"user_comment\":\"{}\"",
@@ -343,51 +461,130 @@ impl SignMessageDisplay {
             &self.user_comment
         )
     }
+
+    /// Print json with [`SignMessageDisplay`] information in case of **failed** signing,
+    /// for user interface
+    #[cfg(feature = "signer")]
     pub fn pwd_failure(&self) -> String {
         format!("\"message\":\"{}\",\"network_name\":\"{}\",\"signed_by\":{},\"user_comment\":\"{}\",\"error\":\"wrong_password_entered\"", hex::encode(&self.message.as_bytes()), &self.network_name, export_complex_single(&self.signed_by, |a| a.show_card()), &self.user_comment)
     }
 }
 
-/// Possible events to be recorded in the history log
+/// Events that could be recorded in the history log
 #[derive(Decode, Encode, Clone)]
 pub enum Event {
+    /// Network metadata was added
     MetadataAdded(MetaValuesDisplay),
+
+    /// Network metadata was removed
     MetadataRemoved(MetaValuesDisplay),
+
+    /// User has generated [`SufficientCrypto`](crate::crypto::SufficientCrypto)
+    /// with one of Signer addresses for `load_metadata` update
     MetadataSigned(MetaValuesExport),
+
+    /// Network specs were added
     NetworkSpecsAdded(NetworkSpecsDisplay),
+
+    /// Network specs were removed
     NetworkSpecsRemoved(NetworkSpecsDisplay),
+
+    /// User has generated [`SufficientCrypto`](crate::crypto::SufficientCrypto)
+    /// with one of Signer addresses for `add_specs` update
     NetworkSpecsSigned(NetworkSpecsExport),
+
+    /// Network verifier with [`ValidCurrentVerifier`] was set for network
     NetworkVerifierSet(NetworkVerifierDisplay),
+
+    /// General verifier was set up
     GeneralVerifierSet(Verifier),
+
+    /// Types information was added
     TypesAdded(TypesDisplay),
+
+    /// Types information was removed
     TypesRemoved(TypesDisplay),
+
+    /// User has generated [`SufficientCrypto`](crate::crypto::SufficientCrypto)
+    /// with one of Signer addresses for `load_types` update
     TypesSigned(TypesExport),
+
+    /// User has generated signature for a transaction
     TransactionSigned(SignDisplay),
+
+    /// User tried to generate signature for a transaction, but failed to enter
+    /// a valid password
     TransactionSignError(SignDisplay),
+
+    /// User has generated signature for a message
     MessageSigned(SignMessageDisplay),
+
+    /// User tried to generate signature for a message, but failed to enter
+    /// a valid password
     MessageSignError(SignMessageDisplay),
+
+    /// User generated a new address
     IdentityAdded(IdentityHistory),
+
+    /// User removed an address
     IdentityRemoved(IdentityHistory),
+
+    /// All identities were wiped
     IdentitiesWiped,
+
+    /// Signer was online, i.e. the air-gap was broken
     DeviceWasOnline,
+
+    /// User has acknowledged the dangers detected and has reset the Signer
+    /// danger status
     ResetDangerRecord,
+
+    /// New seed was created (stored value here is the seed name)
     SeedCreated(String),
+
+    /// User opened seed backup, and seed phrase for shortly shown as a plain
+    /// text on screen (stored value here is the seed name)
     SeedNameWasShown(String), // for individual seed_name
-    Warning(String),          // TODO change to actual crate warning
+
+    /// A warning was produces and displayed to user
+    Warning(String),
+
+    /// User has entered wrong password
     WrongPassword,
+
+    /// User has manually added entry to history log
     UserEntry(String),
+
+    /// System-generated entry into history log
     SystemEntry(String),
+
+    /// History was cleared
     HistoryCleared,
+
+    /// Database was initiated
     DatabaseInitiated,
 }
 
+/// History log individual entry
+///
+/// Contains timestamp and set of simultaneously occured events `Vec<Event>`.
+///
+/// `Entry` is stored SCALE-encoded in the `HISTORY` tree of the cold database,
+/// under key `Order`.
 #[derive(Decode, Encode, Clone)]
 pub struct Entry {
     pub timestamp: String,
     pub events: Vec<Event>, // events already in showable form
 }
 
+#[cfg(feature = "signer")]
 impl Event {
+    /// Print json with [`Event`] related information for user interface
+    ///
+    /// Required input is the function to print `SignDisplay` contents.
+    ///
+    /// Currently general log view shows raw hexadecimal transaction,
+    /// detailed log view shows parsed transaction if parsing is possible.
     pub fn show<O>(&self, op: O) -> String
     where
         O: Fn(&SignDisplay) -> String + Copy,
@@ -483,7 +680,14 @@ impl Event {
     }
 }
 
+#[cfg(feature = "signer")]
 impl Entry {
+    /// Print json with [`Entry`] for user interface
+    ///
+    /// Required input is the function to print `SignDisplay` contents.
+    ///
+    /// Currently general log view shows raw hexadecimal transaction,
+    /// detailed log view shows parsed transaction if parsing is possible.
     pub fn show<O>(&self, op: O) -> String
     where
         O: Fn(&SignDisplay) -> String + Copy,
@@ -496,8 +700,12 @@ impl Entry {
     }
 }
 
+/// Test function generating a set of all possible events
+///
+/// Uses mock values and is needed to test json format in displaying all events
+/// in user interface.  
+#[cfg(feature = "signer")]
 pub fn all_events_preview() -> Vec<Event> {
-    let mut events: Vec<Event> = Vec::new();
     let meta_values = MetaValues {
         name: String::from("westend"),
         version: 9000,
@@ -533,100 +741,102 @@ pub fn all_events_preview() -> Vec<Event> {
         title: String::from("Westend"),
         unit: String::from("WND"),
     };
-
-    events.push(Event::MetadataAdded(MetaValuesDisplay::get(&meta_values)));
-    events.push(Event::MetadataRemoved(MetaValuesDisplay::get(&meta_values)));
-    events.push(Event::MetadataSigned(MetaValuesExport::get(
-        &meta_values,
-        &verifier_value,
-    )));
-    events.push(Event::NetworkSpecsAdded(NetworkSpecsDisplay::get(
-        &network_specs,
-        &valid_current_verifier,
-        &verifier,
-    )));
-    events.push(Event::NetworkSpecsRemoved(NetworkSpecsDisplay::get(
-        &network_specs,
-        &valid_current_verifier,
-        &verifier,
-    )));
-    events.push(Event::NetworkSpecsSigned(NetworkSpecsExport::get(
-        &network_specs.to_send(),
-        &verifier_value,
-    )));
-    events.push(Event::NetworkVerifierSet(NetworkVerifierDisplay::get(
-        &VerifierKey::from_parts(&network_specs.genesis_hash),
-        &valid_current_verifier,
-        &verifier,
-    )));
-    events.push(Event::GeneralVerifierSet(verifier.to_owned()));
-    events.push(Event::TypesAdded(TypesDisplay::get(
-        &ContentLoadTypes::from_vec(&Vec::new()),
-        &verifier,
-    )));
-    events.push(Event::TypesRemoved(TypesDisplay::get(
-        &ContentLoadTypes::from_vec(&Vec::new()),
-        &verifier,
-    )));
-    events.push(Event::TypesSigned(TypesExport::get(
-        &ContentLoadTypes::from_vec(&Vec::new()),
-        &verifier_value,
-    )));
-    events.push(Event::TransactionSigned(SignDisplay::get(
-        &Vec::new(),
-        "westend",
-        &verifier_value,
-        "send to Alice",
-    )));
-    events.push(Event::TransactionSignError(SignDisplay::get(
-        &Vec::new(),
-        "westend",
-        &verifier_value,
-        "send to Alice",
-    )));
-    events.push(Event::MessageSigned(SignMessageDisplay::get(
-        "This is Alice\nRoger",
-        "westend",
-        &verifier_value,
-        "send to Alice",
-    )));
-    events.push(Event::MessageSignError(SignMessageDisplay::get(
-        "This is Alice\nRoger",
-        "westend",
-        &verifier_value,
-        "send to Alice",
-    )));
-    events.push(Event::IdentityAdded(IdentityHistory::get(
-        "Alice",
-        &Encryption::Sr25519,
-        &public,
-        "//",
-        &network_specs.genesis_hash,
-    )));
-    events.push(Event::IdentityRemoved(IdentityHistory::get(
-        "Alice",
-        &Encryption::Sr25519,
-        &public,
-        "//",
-        &network_specs.genesis_hash,
-    )));
-    events.push(Event::IdentitiesWiped);
-    events.push(Event::DeviceWasOnline);
-    events.push(Event::ResetDangerRecord);
-    events.push(Event::SeedCreated(String::from("Alice")));
-    events.push(Event::SeedNameWasShown(String::from("AliceSecretSeed")));
-    events.push(Event::Warning(String::from(
-        "Received network information is not verified.",
-    )));
-    events.push(Event::WrongPassword);
-    events.push(Event::UserEntry(String::from("Lalala!!!")));
-    events.push(Event::SystemEntry(String::from("Blip blop")));
-    events.push(Event::HistoryCleared);
-    events.push(Event::DatabaseInitiated);
-
-    events
+    vec![
+        Event::MetadataAdded(MetaValuesDisplay::get(&meta_values)),
+        Event::MetadataRemoved(MetaValuesDisplay::get(&meta_values)),
+        Event::MetadataSigned(MetaValuesExport::get(&meta_values, &verifier_value)),
+        Event::NetworkSpecsAdded(NetworkSpecsDisplay::get(
+            &network_specs,
+            &valid_current_verifier,
+            &verifier,
+        )),
+        Event::NetworkSpecsRemoved(NetworkSpecsDisplay::get(
+            &network_specs,
+            &valid_current_verifier,
+            &verifier,
+        )),
+        Event::NetworkSpecsSigned(NetworkSpecsExport::get(
+            &network_specs.to_send(),
+            &verifier_value,
+        )),
+        Event::NetworkVerifierSet(NetworkVerifierDisplay::get(
+            &VerifierKey::from_parts(&network_specs.genesis_hash),
+            &valid_current_verifier,
+            &verifier,
+        )),
+        Event::GeneralVerifierSet(verifier.to_owned()),
+        Event::TypesAdded(TypesDisplay::get(
+            &ContentLoadTypes::from_slice(&[]),
+            &verifier,
+        )),
+        Event::TypesRemoved(TypesDisplay::get(
+            &ContentLoadTypes::from_slice(&[]),
+            &verifier,
+        )),
+        Event::TypesSigned(TypesExport::get(
+            &ContentLoadTypes::from_slice(&[]),
+            &verifier_value,
+        )),
+        Event::TransactionSigned(SignDisplay::get(
+            &Vec::new(),
+            "westend",
+            &verifier_value,
+            "send to Alice",
+        )),
+        Event::TransactionSignError(SignDisplay::get(
+            &Vec::new(),
+            "westend",
+            &verifier_value,
+            "send to Alice",
+        )),
+        Event::MessageSigned(SignMessageDisplay::get(
+            "This is Alice\nRoger",
+            "westend",
+            &verifier_value,
+            "send to Alice",
+        )),
+        Event::MessageSignError(SignMessageDisplay::get(
+            "This is Alice\nRoger",
+            "westend",
+            &verifier_value,
+            "send to Alice",
+        )),
+        Event::IdentityAdded(IdentityHistory::get(
+            "Alice",
+            &Encryption::Sr25519,
+            &public,
+            "//",
+            &network_specs.genesis_hash,
+        )),
+        Event::IdentityRemoved(IdentityHistory::get(
+            "Alice",
+            &Encryption::Sr25519,
+            &public,
+            "//",
+            &network_specs.genesis_hash,
+        )),
+        Event::IdentitiesWiped,
+        Event::DeviceWasOnline,
+        Event::ResetDangerRecord,
+        Event::SeedCreated(String::from("Alice")),
+        Event::SeedNameWasShown(String::from("AliceSecretSeed")),
+        Event::Warning(String::from(
+            "Received network information is not verified.",
+        )),
+        Event::WrongPassword,
+        Event::UserEntry(String::from("Lalala!!!")),
+        Event::SystemEntry(String::from("Blip blop")),
+        Event::HistoryCleared,
+        Event::DatabaseInitiated,
+    ]
 }
 
+/// Test function generating a printed version of an entry with all possible
+/// events
+///
+/// Uses mock values and is needed to test json format in displaying all events
+/// in user interface.  
+#[cfg(feature = "signer")]
 pub fn print_all_events() -> String {
     let events = all_events_preview();
     let entry = Entry {

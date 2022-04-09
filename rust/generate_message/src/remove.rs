@@ -4,7 +4,7 @@ use db_handling::{
     helpers::{open_db, open_tree},
 };
 use definitions::{
-    error::{Active, ErrorActive},
+    error_active::{Active, ErrorActive},
     keyring::{AddressBookKey, MetaKey, MetaKeyPrefix, NetworkSpecsKey},
 };
 use sled::Batch;

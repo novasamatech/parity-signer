@@ -1,12 +1,13 @@
-use definitions::{
-    error::{ParserDecodingError, ParserError, ParserMetadataError},
-    network_specs::ShortSpecs,
-};
 use parity_scale_codec::{Compact, Decode, HasCompact};
-use printing_balance::convert_balance_pretty;
 use sp_arithmetic::PerThing;
 use sp_core::crypto::AccountId32;
-use std::mem::size_of;
+use std::{convert::TryInto, mem::size_of};
+
+use definitions::{
+    error_signer::{ParserDecodingError, ParserError, ParserMetadataError},
+    network_specs::ShortSpecs,
+};
+use printing_balance::convert_balance_pretty;
 
 use crate::cards::ParserCard;
 use crate::decoding_sci_ext::{Ext, SpecialExt};
@@ -45,8 +46,8 @@ where
     }
     let mut out = None;
     for i in 1..data.len() + 1 {
-        let hippo = &data[..i];
-        let unhippo = <Compact<T>>::decode(&mut &*hippo);
+        let mut hippo = &data[..i];
+        let unhippo = <Compact<T>>::decode(&mut hippo);
         if let Ok(hurray) = unhippo {
             let mut start_next_unit = None;
             if data.len() > i {
@@ -365,24 +366,22 @@ pub(crate) fn special_case_account_id(
     short_specs: &ShortSpecs,
 ) -> Result<DecodedOut, ParserError> {
     match data.get(0..32) {
-        Some(a) => match <[u8; 32]>::decode(&mut &*a) {
-            Ok(x) => {
-                let remaining_vector = data[32..].to_vec();
-                let account_id = AccountId32::new(x);
-                let fancy_out = vec![OutputCard {
-                    card: ParserCard::Id {
-                        id: account_id,
-                        base58prefix: short_specs.base58prefix,
-                    },
-                    indent,
-                }];
-                Ok(DecodedOut {
-                    remaining_vector,
-                    fancy_out,
-                })
-            }
-            Err(_) => Err(ParserError::Decoding(ParserDecodingError::Array)),
-        },
+        Some(a) => {
+            let array_decoded: [u8; 32] = a.try_into().expect("constant length, always fits");
+            let remaining_vector = data[32..].to_vec();
+            let account_id = AccountId32::new(array_decoded);
+            let fancy_out = vec![OutputCard {
+                card: ParserCard::Id {
+                    id: account_id,
+                    base58prefix: short_specs.base58prefix,
+                },
+                indent,
+            }];
+            Ok(DecodedOut {
+                remaining_vector,
+                fancy_out,
+            })
+        }
         None => Err(ParserError::Decoding(ParserDecodingError::DataTooShort)),
     }
 }

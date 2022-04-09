@@ -1,6 +1,8 @@
+#![deny(unused_crate_dependencies)]
+
 use db_handling::manage_history::get_history_entry_by_order;
 use definitions::{
-    error::{ErrorSigner, InputSigner},
+    error_signer::{ErrorSigner, InputSigner},
     keyring::NetworkSpecsKey,
 };
 
@@ -23,6 +25,7 @@ mod parse_transaction;
 use parse_transaction::{decode_signable_from_history, parse_transaction};
 pub mod test_all_cards;
 use test_all_cards::make_all_cards;
+#[cfg(feature = "test")]
 #[cfg(test)]
 mod tests;
 
@@ -67,8 +70,8 @@ pub enum StubNav {
 
 fn handle_scanner_input(payload: &str, dbname: &str) -> Result<Action, ErrorSigner> {
     let data_hex = {
-        if let Some(p) = payload.strip_prefix("0x") {
-            p
+        if let Some(a) = payload.strip_prefix("0x") {
+            a
         } else {
             payload
         }
