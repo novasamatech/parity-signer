@@ -15,11 +15,6 @@ then
 	exit 1
 fi
 
-if [ "$1" == "android" ]
-  then
-    . "$(dirname "${0}")/switch_to_android.sh"
-fi
-
 if [ "$1" == "ios" ]
   then
 
@@ -52,5 +47,3 @@ if [ "$1" == "ios" ]
     cp -R ../database/database_cold_release/ ../../ios/NativeSigner/Database/Database
 fi
 
-#echo "hello tom" > read.txt
-#cat read.txt
