@@ -1,10 +1,12 @@
+use std::cmp::Ordering;
+
 use constants::{HOT_DB_NAME, METATREE};
 use db_handling::{
     db_transactions::TrDbHot,
     helpers::{make_batch_clear_tree, open_db, open_tree},
 };
 use definitions::{
-    error::{Active, DatabaseActive, ErrorActive, Fetch},
+    error_active::{Active, DatabaseActive, ErrorActive, Fetch},
     keyring::MetaKey,
     metadata::MetaValues,
 };
@@ -52,20 +54,16 @@ fn sort_metavalues(meta_values: Vec<MetaValues>) -> Result<SortedMetaValues, Err
                 }
                 found_in_new = true;
                 match x.version.cmp(&y.version) {
-                    std::cmp::Ordering::Less => {
-                        older.push(x.to_owned());
-                    }
-                    std::cmp::Ordering::Equal => {
+                    Ordering::Less => older.push(x.to_owned()),
+                    Ordering::Equal => {
                         return Err(ErrorActive::Database(
                             DatabaseActive::HotDatabaseMetadataSameVersionTwice {
                                 name: x.name.to_string(),
                                 version: x.version,
                             },
-                        ));
+                        ))
                     }
-                    std::cmp::Ordering::Greater => {
-                        num_new = Some(i);
-                    }
+                    Ordering::Greater => num_new = Some(i),
                 }
 
                 break;
@@ -105,14 +103,14 @@ pub fn add_new(
         if new.name == x.name {
             found_in_newer = true;
             match new.version.cmp(&x.version) {
-                std::cmp::Ordering::Less => {
+                Ordering::Less => {
                     return Err(ErrorActive::Fetch(Fetch::EarlierVersion {
                         name: x.name.to_string(),
                         old_version: x.version,
                         new_version: new.version,
-                    }));
+                    }))
                 }
-                std::cmp::Ordering::Equal => {
+                Ordering::Equal => {
                     if new.meta != x.meta {
                         let mut sus1: Vec<u8> = Vec::new();
                         let mut sus2: Vec<u8> = Vec::new();
@@ -130,7 +128,7 @@ pub fn add_new(
                         }));
                     }
                 }
-                std::cmp::Ordering::Greater => {
+                Ordering::Greater => {
                     num_new = Some(i);
                     for (j, y) in sorted.older.iter().enumerate() {
                         if x.name == y.name {
@@ -180,7 +178,7 @@ pub fn write_metadata(sorted_meta_values: SortedMetaValues) -> Result<(), ErrorA
     all_meta.extend_from_slice(&sorted_meta_values.older);
     for x in all_meta.iter() {
         let meta_key = MetaKey::from_parts(&x.name, x.version);
-        metadata_batch.insert(meta_key.key(), x.meta.to_vec());
+        metadata_batch.insert(meta_key.key(), &x.meta[..]);
     }
     TrDbHot::new()
         .set_metadata(metadata_batch)

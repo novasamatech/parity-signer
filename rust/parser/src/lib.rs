@@ -1,14 +1,21 @@
-use defaults::get_default_types_vec;
+#![deny(unused_crate_dependencies)]
+
+use frame_metadata::v14::RuntimeMetadataV14;
+#[cfg(feature = "test")]
+use frame_metadata::RuntimeMetadata;
+use parity_scale_codec::{Decode, DecodeAll, Encode};
+use printing_balance::convert_balance_pretty;
+use sp_runtime::generic::Era;
+
+#[cfg(feature = "test")]
+use defaults::default_types_vec;
+#[cfg(feature = "test")]
+use definitions::metadata::info_from_metadata;
 use definitions::{
-    error::{ParserDecodingError, ParserError, ParserMetadataError},
-    metadata::info_from_metadata,
+    error_signer::{ParserDecodingError, ParserError, ParserMetadataError},
     network_specs::ShortSpecs,
     types::TypeEntry,
 };
-use frame_metadata::{v14::RuntimeMetadataV14, RuntimeMetadata};
-use parity_scale_codec::Decode;
-use printing_balance::convert_balance_pretty;
-use sp_runtime::generic::Era;
 
 pub mod cards;
 use cards::ParserCard;
@@ -20,10 +27,13 @@ mod decoding_sci;
 use decoding_sci::decoding_sci_entry_point;
 mod decoding_sci_ext;
 use decoding_sci_ext::{decode_ext_attempt, Ext};
+#[cfg(feature = "test")]
 mod error;
+#[cfg(feature = "test")]
 use error::{ArgumentsError, Error};
 pub mod method;
 use method::OlderMeta;
+#[cfg(feature = "test")]
 #[cfg(test)]
 mod tests;
 
@@ -56,7 +66,7 @@ pub fn parse_method(
 }
 
 /// Struct to decode pre-determined extensions for transactions with V12 and V13 metadata
-#[derive(Debug, parity_scale_codec_derive::Decode, parity_scale_codec_derive::Encode)]
+#[derive(Debug, Decode, Encode)]
 struct ExtValues {
     era: Era,
     #[codec(compact)]
@@ -82,7 +92,7 @@ pub fn parse_extensions(
             types: _,
             network_version,
         } => {
-            let ext = match <ExtValues>::decode(&mut &extensions_data[..]) {
+            let ext = match <ExtValues>::decode_all(&mut &extensions_data[..]) {
                 Ok(a) => a,
                 Err(_) => return Err(ParserError::Decoding(ParserDecodingError::ExtensionsOlder)),
             };
@@ -212,16 +222,16 @@ pub fn parse_extensions(
 }
 
 pub fn cut_method_extensions(data: &[u8]) -> Result<(Vec<u8>, Vec<u8>), ParserError> {
-    let pre_method = get_compact::<u32>(data)?;
+    let pre_method = get_compact::<u32>(data).map_err(|_| ParserError::SeparateMethodExtensions)?;
     let method_length = pre_method.compact_found as usize;
     match pre_method.start_next_unit {
         Some(start) => match data.get(start..start + method_length) {
             Some(a) => Ok((a.to_vec(), data[start + method_length..].to_vec())),
-            None => Err(ParserError::Decoding(ParserDecodingError::DataTooShort)),
+            None => Err(ParserError::SeparateMethodExtensions),
         },
         None => {
             if method_length != 0 {
-                return Err(ParserError::Decoding(ParserDecodingError::DataTooShort));
+                return Err(ParserError::SeparateMethodExtensions);
             }
             Ok((Vec::new(), data.to_vec()))
         }
@@ -244,10 +254,8 @@ pub fn parse_set(
     ParserError,
 > {
     // if unable to separate method date and extensions, then some fundamental flaw is in transaction itself
-    let (method_data, extensions_data) = match cut_method_extensions(data) {
-        Ok(a) => a,
-        Err(_) => return Err(ParserError::SeparateMethodExtensions),
-    };
+    let (method_data, extensions_data) = cut_method_extensions(data)?;
+
     // try parsing extensions, if is works, the version and extensions are correct
     let extensions_cards = parse_extensions(
         extensions_data.to_vec(),
@@ -265,6 +273,7 @@ pub fn parse_set(
     ))
 }
 
+#[cfg(feature = "test")]
 pub fn parse_and_display_set(
     data: &[u8],
     metadata: &RuntimeMetadata,
@@ -288,7 +297,7 @@ pub fn parse_and_display_set(
                 RuntimeMetadata::V13(meta_v13) => OlderMeta::V13(meta_v13),
                 _ => unreachable!(),
             };
-            let types = match get_default_types_vec() {
+            let types = match default_types_vec() {
                 Ok(a) => {
                     if a.is_empty() {
                         return Err(Error::Arguments(ArgumentsError::NoTypes).show());

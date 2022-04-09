@@ -2,7 +2,7 @@ use constants::{ADDRESS_BOOK, HOT_DB_NAME};
 use db_handling::helpers::{open_db, open_tree};
 use definitions::{
     crypto::Encryption,
-    error::{Active, DatabaseActive, ErrorActive, Fetch, NotFoundActive},
+    error_active::{Active, DatabaseActive, ErrorActive, Fetch, NotFoundActive},
     keyring::NetworkSpecsKey,
     metadata::AddressBookEntry,
 };
@@ -279,4 +279,201 @@ fn specs_pt_u(
         }));
     }
     Ok(())
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::parser::Override;
+    use constants::FOLDER;
+
+    // The aim is to check that rpc calls are going through for "officially
+    // approved" networks.
+    // Also, mass fetcher is neat, and it is nice to have all addresses in one
+    // place.
+    // However, the fetching results are constantly changing (some networks at
+    // times could not be called).
+    // Argh?
+    #[test]
+    fn mass_fetch() {
+        let address_set = [
+            "wss://rpc.polkadot.io",
+            /*            "wss://statemint-rpc.polkadot.io",
+                        "wss://acala-polkadot.api.onfinality.io/public-ws",
+            //            "wss://wss.odyssey.aresprotocol.io", // error502
+                        "wss://rpc.astar.network",
+                        "wss://fullnode.parachain.centrifuge.io",
+                        "wss://rpc-para.clover.finance",
+                        "wss://rpc.efinity.io",
+                        "wss://rpc-01.hydradx.io",
+            //            "wss://api.interlay.io/parachain", // Base58PrefixMismatch { specs: 2032, meta: 42 }
+                        "wss://wss.api.moonbeam.network",
+            //            "wss://node-6907995778982338560.sz.onfinality.io/ws?apikey=b5324589-1447-4699-92a6-025bc2cc2ac1", // error500
+                        "wss://rpc.parallel.fi",
+                        "wss://mainnet.polkadex.trade",
+                        "wss://ws.unique.network/",
+            */
+            "wss://kusama-rpc.polkadot.io",
+            /*            "wss://statemine-rpc.polkadot.io",
+            //            "wss://encointer.api.onfinality.io/public-ws", // Base58PrefixMismatch { specs: 2, meta: 42 }
+                        "wss://fullnode.altair.centrifuge.io",
+                        "wss://rpc-01.basilisk.hydradx.io",
+                        "wss://bifrost-rpc.liebi.com/ws",
+                        "wss://pioneer-1-rpc.bit.country",
+            //            "wss://falafel.calamari.systems", // error502
+            //            "wss://rpc-shadow.crust.network", //error500
+                        "wss://crab-parachain-rpc.darwinia.network/",
+                        "wss://kusama.api.integritee.network",
+                        "wss://karura.api.onfinality.io/public-ws",
+                        "wss://khala-api.phala.network/ws",
+            //            "wss://rpc.api.kico.dico.io", // Base58PrefixMismatch { specs: 51, meta: 42 }
+                        "wss://spiritnet.kilt.io",
+                        "wss://kintsugi.api.onfinality.io/public-ws",
+                        "wss://rpc.litmus-parachain.litentry.io",
+            //            "wss://wss.mars.aresprotocol.io", // error502
+                        "wss://wss.moonriver.moonbeam.network",
+                        "wss://heiko-rpc.parallel.fi",
+                        "wss://picasso-rpc.composable.finance",
+            //            "wss://kusama.kylin-node.co.uk", // Networking or low-level protocol error: Error in the WebSocket handshake: i/o error: unexpected end of file
+                        "wss://quartz.unique.network",
+                        "wss://kusama.rpc.robonomics.network/",
+                        "wss://rpc.shiden.astar.network",
+                        "wss://ws.parachain-collator-1.c1.sora2.soramitsu.co.jp",
+            //            "wss://gamma.subgame.org/", // error502
+                        "wss://para.subsocial.network",
+                        "wss://rpc.kusama.standard.tech",
+                        "wss://rpc-0.zeitgeist.pm",
+            */
+            "wss://westend-rpc.polkadot.io",
+            /*            "wss://westmint-rpc.polkadot.io",
+                        "wss://fullnode-collator.charcoal.centrifuge.io",
+                        "wss://teerw1.integritee.network",
+                        "wss://westend.kylin-node.co.uk",
+                        "wss://rpc.westend.standard.tech",
+                        "wss://westend.kilt.io:9977",
+                        "wss://rococo-rpc.polkadot.io",
+                        "wss://rococo-statemint-rpc.polkadot.io",
+                        "wss://rococo-canvas-rpc.polkadot.io",
+                        "wss://rococo.api.encointer.org",
+                        "wss://rpc-01.basilisk-rococo.hydradx.io",
+                        "wss://rpc.rococo.efinity.io",
+                        "wss://moonsama-testnet-rpc.moonsama.com",
+                        "wss://rococo.kilt.io",
+                        "wss://spreehafen.datahighway.com",
+                        "wss://ws.azero.dev",
+                        "wss://api.ata.network",
+            //            "wss://fullnode.centrifuge.io", // metadata below V12
+                        "wss://mainnet.chainx.org/ws",
+                        "wss://node0.competitors.club/wss",
+                        "wss://blockchain.crownsterling.io",
+                        "wss://crust.api.onfinality.io/public-ws",
+                        "wss://rpc.darwinia.network",
+                        "wss://crab-rpc.darwinia.network",
+                        "wss://mainnet-node.dock.io",
+            //            "wss://edgeware.api.onfinality.io/public-ws", // no version block in metadata
+            //            "wss://node.equilibrium.io", // decimals [9,9,9,9,9,9,9] vs units ["Unknown","USD","EQ","ETH","BTC","EOS","DOT","CRV"]
+                        "wss://node.genshiro.io",
+                        "wss://rpc-01.snakenet.hydradx.io",
+                        "wss://api.solo.integritee.io",
+                        "wss://rpc.kulupu.corepaper.org/ws",
+                        "wss://ws.kusari.network",
+                        "wss://mathchain-asia.maiziqianbao.net/ws",
+                        "wss://rpc.neatcoin.org/ws",
+                        "wss://mainnet.nftmart.io/rpc/ws",
+                        "wss://main3.nodleprotocol.io",
+            //            "wss://rpc.plasmnet.io", // metadata below V12
+                        "wss://mainnet.polkadex.trade",
+                        "wss://mainnet-rpc.polymesh.network",
+            //            "wss://node.v1.riochain.io", // no version block in metadata
+                        "wss://mainnet.sherpax.io",
+                        "wss://mof2.sora.org",
+                        "wss://mainnet.subgame.org/",
+                        "wss://rpc.subsocial.network",
+                        "wss://ws.swapdex.network",
+            //            "wss://mainnet.uniarts.vip:9443", // Base58PrefixMismatch { specs: 2, meta: 42 }
+            //            "wss://westlake.datahighway.com", // error502
+                        "wss://rpc-test.ajuna.network",
+            //            "wss://ws.test.azero.dev", // units TZERO, no decimals
+            //            "wss://fullnode.amber.centrifuge.io", // metadata below 12
+                        "wss://arcadia1.nodleprotocol.io",
+                        "wss://gladios.aresprotocol.io",
+                        "wss://cf-api.ata.network",
+            //            "wss://beresheet.edgewa.re", // Base58PrefixMismatch { specs: 42, meta: 7 }
+            //            "wss://asgard-rpc.liebi.com/ws", // error502
+            //            "wss://tewai-rpc.bit.country", // Base58PrefixMismatch { specs: 28, meta: 42 }
+                        "wss://api.crust.network/",
+                        "wss://trillian.dolphin.red",
+                        "wss://mogiway-01.dotmog.com",
+                        "wss://gesell.encointer.org",
+                        "wss://galois-hk.maiziqianbao.net/ws",
+            //            "wss://gamepower.io", // Networking or low-level protocol error: Connection timeout exceeded: 10s
+                        "wss://testnet.geekcash.org",
+            //            "wss://api.interlay.io/parachain", // Base58PrefixMismatch { specs: 2032, meta: 42 }
+            //            "wss://ws.jupiter-poa.patract.cn", // Error when opening the TCP socket: Connection reset by peer (os error 104)
+                        "wss://full-nodes.kilt.io:9944/",
+                        "wss://peregrine.kilt.io/parachain-public-ws/",
+                        "wss://klugdossier.net/",
+            //            "wss://testnet.litentry.io", // error502
+                        "wss://mandala.polkawallet.io",
+                        "wss://minichain.coming.chat/ws",
+                        "wss://wss.api.moonbase.moonbeam.network",
+                        "wss://neumann.api.onfinality.io/public-ws",
+            //            "wss://staging-ws.nftmart.io", // Error when opening the TCP socket: invalid peer certificate contents: invalid peer certificate: CertExpired
+                        "wss://opal.unique.network",
+                        "wss://rpc.opportunity.standard.tech",
+            //            "wss://parachain-rpc.origin-trail.network", // decimals 18, no units
+                        "wss://pangolin-rpc.darwinia.network",
+                        "wss://pangoro-rpc.darwinia.network",
+                        "wss://poc5.phala.network/ws",
+            //            "wss://blockchain.polkadex.trade", // Error when opening the TCP socket: invalid peer certificate contents: invalid peer certificate: CertExpired
+                        "wss://testnet-rpc.polymesh.live",
+                        "wss://testnet.pontem.network/ws",
+            //            "wss://testnet.psm.link", // error502
+                        "wss://rpc.realis.network/",
+                        "wss://sherpax-testnet.chainx.org",
+                        "wss://rpc.shibuya.astar.network",
+                        "wss://parachain-rpc.snowbridge.network",
+                        "wss://alpha.subdao.org",
+                        "wss://staging.subgame.org",
+                        "wss://farm-rpc.subspace.network",
+                        "wss://test-rpc.subspace.network",
+                        "wss://testnet.ternoa.com/",
+            //            "wss://testnet-node-1.laminar-chain.laminar.one/ws", // no version block in metadata
+            //            "wss://testnet.uniarts.network", // Base58PrefixMismatch { specs: 2, meta: 45 }
+                        "wss://testnet2.unique.network",
+                        "wss://vodka.rpc.neatcoin.org/ws",
+                        "wss://testnet.web3games.org",
+            //            "wss://test1.zcloak.network", // error502
+                        "wss://bsr.zeitgeist.pm",
+            //            "wss://alphaville.zero.io", // error502*/
+        ];
+        let mut all_clear = true;
+        for address in address_set {
+            let instruction = Instruction {
+                set: Set::D,
+                content: Content::Address(address.to_string()),
+                pass_errors: true,
+                over: Override {
+                    encryption: Some(Encryption::Sr25519),
+                    token: None,
+                },
+            };
+            match gen_add_specs(instruction) {
+                Ok(()) => (),
+                Err(e) => {
+                    println!("Error: \n{}", e);
+                    all_clear = false;
+                }
+            };
+        }
+        let path_set = std::fs::read_dir(FOLDER).unwrap();
+        for x in path_set.flatten() {
+            if let Some(filename) = x.path().to_str() {
+                if filename.contains("sign_me_add_specs") {
+                    std::fs::remove_file(x.path()).unwrap()
+                }
+            }
+        }
+        assert!(all_clear, "Errors were encountered");
+    }
 }

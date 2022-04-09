@@ -5,7 +5,7 @@
 use lazy_static::lazy_static;
 use std::sync::{Mutex, TryLockError};
 
-use definitions::{error::Signer, keyring::NetworkSpecsKey};
+use definitions::{error_signer::Signer, keyring::NetworkSpecsKey};
 
 mod actions;
 use actions::Action;
@@ -14,6 +14,7 @@ pub mod modals;
 mod navstate;
 use navstate::{Navstate, State};
 pub mod screens;
+#[cfg(feature = "test")]
 #[cfg(test)]
 mod tests;
 

@@ -10,12 +10,11 @@ use crate::screens::{
     AddressState, AddressStateMulti, DeriveState, KeysState, RecoverSeedPhraseState, Screen,
     SpecialtyKeysState, SufficientCryptoState, TransactionState,
 };
-
 use db_handling::interface_signer::{print_guess, BIP_CAP, SAFE_RESERVE, WORD_LENGTH};
 use definitions::{
-    error::{
-        AddressGeneration, AddressGenerationCommon, AddressKeySource, ErrorSigner, ErrorSource,
-        ExtraAddressKeySourceSigner, InputSigner, InterfaceSigner, Signer,
+    error::{AddressGeneration, AddressGenerationCommon, AddressKeySource, ErrorSource},
+    error_signer::{
+        ErrorSigner, ExtraAddressKeySourceSigner, InputSigner, InterfaceSigner, Signer,
     },
     keyring::{AddressKey, NetworkSpecsKey},
     users::AddressDetails,

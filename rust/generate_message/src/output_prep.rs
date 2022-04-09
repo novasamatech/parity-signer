@@ -1,6 +1,6 @@
 use constants::{LOAD, SPECS};
 use definitions::{
-    error::ErrorActive,
+    error_active::ErrorActive,
     network_specs::NetworkSpecsToSend,
     qr_transfers::{ContentAddSpecs, ContentLoadMeta},
 };

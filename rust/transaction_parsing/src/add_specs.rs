@@ -5,7 +5,8 @@ use db_handling::{
     },
 };
 use definitions::{
-    error::{ErrorSigner, GeneralVerifierForContent, InputSigner, Signer, TransferContent},
+    error::TransferContent,
+    error_signer::{ErrorSigner, GeneralVerifierForContent, InputSigner, Signer},
     history::Event,
     keyring::{NetworkSpecsKey, VerifierKey},
     network_specs::{ValidCurrentVerifier, Verifier},
@@ -21,10 +22,9 @@ use crate::holds::{GeneralHold, Hold, HoldRelease};
 
 pub fn add_specs(data_hex: &str, database_name: &str) -> Result<Action, ErrorSigner> {
     let checked_info = pass_crypto(data_hex, TransferContent::AddSpecs)?;
-    let specs = ContentAddSpecs::from_vec(&checked_info.message).specs::<Signer>()?;
-    let network_specs_key =
-        NetworkSpecsKey::from_parts(specs.genesis_hash.as_ref(), &specs.encryption);
-    let verifier_key = VerifierKey::from_parts(specs.genesis_hash.as_ref());
+    let specs = ContentAddSpecs::from_slice(&checked_info.message).specs::<Signer>()?;
+    let network_specs_key = NetworkSpecsKey::from_parts(&specs.genesis_hash, &specs.encryption);
+    let verifier_key = VerifierKey::from_parts(&specs.genesis_hash);
     let possible_valid_current_verifier =
         try_get_valid_current_verifier(&verifier_key, database_name)?;
     let general_verifier = get_general_verifier(database_name)?;

@@ -3,16 +3,17 @@ use bitvec::{
     prelude::{BitVec, Lsb0, Msb0},
     store::BitStore,
 };
-use definitions::{
-    error::{ParserDecodingError, ParserError, ParserMetadataError},
-    network_specs::ShortSpecs,
-};
 use frame_metadata::v14::RuntimeMetadataV14;
 use num_bigint::{BigInt, BigUint};
 use parity_scale_codec::Decode;
 use scale_info::{
     form::PortableForm, Field, Type, TypeDef, TypeDefBitSequence, TypeDefComposite,
     TypeDefPrimitive, TypeDefVariant,
+};
+
+use definitions::{
+    error_signer::{ParserDecodingError, ParserError, ParserMetadataError},
+    network_specs::ShortSpecs,
 };
 
 use crate::cards::ParserCard;
@@ -180,7 +181,7 @@ fn reject_flags(compact_flag: bool, balance_flag: bool) -> Result<(), ParserErro
 /// The function outputs the DecodedOut value in case of success.
 fn decode_char(data: &[u8], indent: u32) -> Result<DecodedOut, ParserError> {
     match data.get(0..4) {
-        Some(slice_to_char) => match <u32>::decode(&mut &*slice_to_char) {
+        Some(mut slice_to_char) => match <u32>::decode(&mut slice_to_char) {
             Ok(a) => match char::from_u32(a) {
                 Some(b) => {
                     let fancy_out = vec![OutputCard {
@@ -1151,11 +1152,11 @@ fn process_bitvec<T: BitStore + Decode>(
     into_bv_decode: Vec<u8>,
 ) -> Result<String, ParserError> {
     match bitorder {
-        FoundBitOrder::Lsb0 => match <BitVec<Lsb0, T>>::decode(&mut &into_bv_decode[..]) {
+        FoundBitOrder::Lsb0 => match <BitVec<T, Lsb0>>::decode(&mut &into_bv_decode[..]) {
             Ok(b) => Ok(b.to_string()),
             Err(_) => Err(ParserError::Decoding(ParserDecodingError::BitVecFailure)),
         },
-        FoundBitOrder::Msb0 => match <BitVec<Msb0, T>>::decode(&mut &into_bv_decode[..]) {
+        FoundBitOrder::Msb0 => match <BitVec<T, Msb0>>::decode(&mut &into_bv_decode[..]) {
             Ok(b) => Ok(b.to_string()),
             Err(_) => Err(ParserError::Decoding(ParserDecodingError::BitVecFailure)),
         },
@@ -1163,7 +1164,7 @@ fn process_bitvec<T: BitStore + Decode>(
 }
 
 fn ugly_patch_u64<O: BitOrder>(into_bv_decode: Vec<u8>) -> Result<String, ParserError> {
-    let bitvec_decoded = match <BitVec<O, u32>>::decode(&mut &into_bv_decode[..]) {
+    let bitvec_decoded = match <BitVec<u32, O>>::decode(&mut &into_bv_decode[..]) {
         Ok(b) => b,
         Err(_) => return Err(ParserError::Decoding(ParserDecodingError::BitVecFailure)),
     };
@@ -1173,8 +1174,8 @@ fn ugly_patch_u64<O: BitOrder>(into_bv_decode: Vec<u8>) -> Result<String, Parser
         if i > 0 {
             out.push_str(", ");
         }
-        let print1 = BitVec::<O, u32>::from_vec(vec![vec[2 * i]]).to_string();
-        let print2 = BitVec::<O, u32>::from_vec(vec![vec[2 * i + 1]]).to_string();
+        let print1 = BitVec::<u32, O>::from_vec(vec![vec[2 * i]]).to_string();
+        let print2 = BitVec::<u32, O>::from_vec(vec![vec[2 * i + 1]]).to_string();
         out.push_str(&format!(
             "{}{}",
             &print1[1..print1.len() - 1],

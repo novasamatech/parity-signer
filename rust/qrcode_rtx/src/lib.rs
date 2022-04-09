@@ -1,7 +1,6 @@
 use constants::{BACK_COLOR, BORDER, CHUNK_SIZE, FPS_DEN, FPS_NOM, MAIN_COLOR, SCALING};
 use qrcode_static::png_qr;
 use qrcodegen::{QrCode, QrCodeEcc};
-
 use std::fs;
 
 /// function to take data as Vec<u8>, apply raptorq to get Vec<EncodingPacket>

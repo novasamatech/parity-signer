@@ -1,3 +1,8 @@
+use parity_scale_codec::Encode;
+use sp_core::{ecdsa, ed25519, sr25519, Pair};
+use sp_runtime::MultiSigner;
+use zeroize::Zeroize;
+
 use db_handling::{
     db_transactions::TrDbCold,
     helpers::{get_meta_values_by_name_version, get_network_specs},
@@ -6,18 +11,13 @@ use db_handling::{
 };
 use definitions::{
     crypto::SufficientCrypto,
-    error::{ErrorSigner, Signer},
+    error_signer::{ErrorSigner, Signer},
     history::{Event, MetaValuesDisplay, MetaValuesExport, NetworkSpecsExport, TypesExport},
     keyring::NetworkSpecsKey,
     qr_transfers::{ContentAddSpecs, ContentLoadMeta},
     users::AddressDetails,
 };
-
-use parity_scale_codec::Encode;
 use qrcode_static::png_qr;
-use sp_core::{ecdsa, ed25519, sr25519, Pair};
-use sp_runtime::MultiSigner;
-use zeroize::Zeroize;
 
 pub(crate) fn sign_as_address_key(
     to_sign: &[u8],
@@ -123,7 +123,7 @@ pub(crate) fn sufficient_crypto_load_types(
                     database_name,
                     vec![Event::TypesSigned(TypesExport::get(
                         &types_content,
-                        &s.get_verifier_value(),
+                        &s.verifier_value(),
                     ))],
                 )?)
                 .apply::<Signer>(database_name)?;
@@ -179,7 +179,7 @@ pub(crate) fn sufficient_crypto_load_metadata(
                     database_name,
                     vec![Event::MetadataSigned(MetaValuesExport::get(
                         &meta_values,
-                        &s.get_verifier_value(),
+                        &s.verifier_value(),
                     ))],
                 )?)
                 .apply::<Signer>(database_name)?;
@@ -228,7 +228,7 @@ pub(crate) fn sufficient_crypto_add_specs(
                     database_name,
                     vec![Event::NetworkSpecsSigned(NetworkSpecsExport::get(
                         &network_specs_to_send,
-                        &s.get_verifier_value(),
+                        &s.verifier_value(),
                     ))],
                 )?)
                 .apply::<Signer>(database_name)?;

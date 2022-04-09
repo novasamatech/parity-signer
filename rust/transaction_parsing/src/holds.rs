@@ -5,7 +5,8 @@ use db_handling::{
     prep_messages::prep_types,
 };
 use definitions::{
-    error::{DatabaseSigner, EntryDecodingSigner, ErrorSigner, ErrorSource, Signer},
+    error::ErrorSource,
+    error_signer::{DatabaseSigner, EntryDecodingSigner, ErrorSigner, Signer},
     history::Event,
     keyring::{MetaKeyPrefix, VerifierKey},
     metadata::MetaValues,
@@ -54,7 +55,7 @@ fn collect_set(
     let mut name_found: Option<String> = None;
     for x in chainspecs.iter().flatten() {
         let network_specs = NetworkSpecs::from_entry_checked::<Signer>(x)?;
-        if network_specs.genesis_hash.to_vec() == genesis_hash {
+        if network_specs.genesis_hash == genesis_hash[..] {
             name_found = match name_found {
                 Some(n) => {
                     if n != network_specs.name {
@@ -111,8 +112,7 @@ impl GeneralHold {
         let chainspecs = open_tree::<Signer>(&database, SPECSTREE)?;
         let settings = open_tree::<Signer>(&database, SETTREE)?;
         let verifiers = open_tree::<Signer>(&database, VERIFIERS)?;
-        for x in verifiers.iter().flatten() {
-            let (verifier_key_vec, current_verifier_encoded) = x;
+        for (verifier_key_vec, current_verifier_encoded) in verifiers.iter().flatten() {
             let verifier_key = VerifierKey::from_ivec(&verifier_key_vec);
             let current_verifier =
                 match <CurrentVerifier>::decode(&mut &current_verifier_encoded[..]) {

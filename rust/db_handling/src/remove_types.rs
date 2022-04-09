@@ -2,7 +2,7 @@ use sled::Batch;
 
 use constants::TYPES;
 use definitions::{
-    error::{ErrorSigner, Signer},
+    error_signer::{ErrorSigner, Signer},
     history::{Event, TypesDisplay},
     qr_transfers::ContentLoadTypes,
 };
@@ -13,7 +13,7 @@ use crate::manage_history::events_to_batch;
 
 pub fn remove_types_info(database_name: &str) -> Result<(), ErrorSigner> {
     let mut settings_batch = Batch::default();
-    settings_batch.remove(TYPES.to_vec());
+    settings_batch.remove(TYPES);
     let events: Vec<Event> = vec![Event::TypesRemoved(TypesDisplay::get(
         &ContentLoadTypes::generate(&get_types::<Signer>(database_name)?),
         &get_general_verifier(database_name)?,
