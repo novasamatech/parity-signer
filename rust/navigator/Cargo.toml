@@ -24,8 +24,16 @@ zeroize = "1.5.3"
 
 [features]
 default = ["test"]
-
-test = ["blake2-rfc", "constants", "db_handling/test", "image", "parser", "quircs", "regex", "sp-core"]
+test = [
+	"blake2-rfc",
+	"constants",
+	"db_handling/test",
+	"image",
+	"parser",
+	"quircs",
+	"regex",
+	"sp-core",
+]
 
 [lib]
 name = "navigator"

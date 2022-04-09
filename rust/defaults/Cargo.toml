@@ -15,11 +15,21 @@ sp-runtime = {git = "https://github.com/paritytech/substrate", default-features 
 
 [features]
 default = ["test"]
-
-active = ["definitions/active", "hex", "lazy_static", "regex"]
-signer = ["definitions/signer", "sp-core", "sp-runtime"]
-test = ["active", "signer"]
-
+active = [
+	"definitions/active",
+	"hex",
+	"lazy_static",
+	"regex",
+]
+signer = [
+	"definitions/signer",
+	"sp-core",
+	"sp-runtime",
+]
+test = [
+	"active",
+	"signer",
+]
 
 [lib]
 name = "defaults"

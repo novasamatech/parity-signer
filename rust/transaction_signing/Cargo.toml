@@ -21,8 +21,12 @@ zeroize = "1.5.3"
 
 [features]
 default = ["test"]
-
-test = ["constants/test", "db_handling/test", "sled", "transaction_parsing"]
+test = [
+	"constants/test",
+	"db_handling/test",
+	"sled",
+	"transaction_parsing"
+]
 
 [lib]
 name = "transaction_signing"

@@ -24,7 +24,6 @@ sp-runtime = {git = "https://github.com/paritytech/substrate", default-features 
 
 [features]
 default = ["test"]
-
 test = ["defaults/active"]
 
 [lib]

@@ -22,8 +22,10 @@ sp-runtime = {git = "https://github.com/paritytech/substrate", default-features 
 
 [features]
 default = ["test"]
-
-test = ["constants/test", "db_handling/test"]
+test = [
+	"constants/test",
+	"db_handling/test",
+]
 
 [lib]
 name = "transaction_parsing"

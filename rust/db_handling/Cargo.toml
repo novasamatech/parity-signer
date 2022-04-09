@@ -25,10 +25,32 @@ zeroize = {version = "1.5.3", optional = true}
 
 [features]
 default = ["test"]
-
-active = ["constants/active", "defaults/active", "definitions/active", "sp-core", "sp-runtime", "zeroize"]
-signer = ["blake2-rfc", "constants/signer", "defaults/signer", "definitions/signer", "hex", "plot_icon", "qrcode_static", "tiny-bip39", "sp-core", "sp-runtime", "zeroize"]
-test = ["active", "constants/test", "signer"]
+active = [
+	"constants/active",
+	"defaults/active",
+	"definitions/active",
+	"sp-core",
+	"sp-runtime",
+	"zeroize",
+]
+signer = [
+	"blake2-rfc",
+	"constants/signer",
+	"defaults/signer",
+	"definitions/signer",
+	"hex",
+	"plot_icon",
+	"qrcode_static",
+	"tiny-bip39",
+	"sp-core",
+	"sp-runtime",
+	"zeroize",
+]
+test = [
+	"active",
+	"constants/test",
+	"signer",
+]
 
 [lib]
 name = "db_handling"
