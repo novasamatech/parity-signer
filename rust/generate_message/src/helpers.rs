@@ -5,7 +5,8 @@ use db_handling::{
 };
 use definitions::{
     crypto::Encryption,
-    error::{Active, DatabaseActive, ErrorActive, ErrorSource, MismatchActive, NotFoundActive},
+    error::ErrorSource,
+    error_active::{Active, DatabaseActive, ErrorActive, MismatchActive, NotFoundActive},
     keyring::{AddressBookKey, NetworkSpecsKey},
     metadata::AddressBookEntry,
     network_specs::NetworkSpecsToSend,

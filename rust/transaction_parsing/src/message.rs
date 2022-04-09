@@ -3,7 +3,7 @@ use db_handling::{
     helpers::{try_get_address_details, try_get_network_specs},
 };
 use definitions::{
-    error::{ErrorSigner, InputSigner},
+    error_signer::{ErrorSigner, InputSigner},
     keyring::{AddressKey, NetworkSpecsKey},
 };
 use parity_scale_codec::DecodeAll;
@@ -13,7 +13,7 @@ use crate::cards::{make_author_info, Card, Warning};
 use crate::helpers::multisigner_msg_genesis_encryption;
 use crate::Action;
 
-pub fn process_message(data_hex: &str, dbname: &str) -> Result<Action, ErrorSigner> {
+pub fn process_message(data_hex: &str, database_name: &str) -> Result<Action, ErrorSigner> {
     let (author_multi_signer, message_vec, genesis_hash_vec, encryption) =
         multisigner_msg_genesis_encryption(data_hex)?;
     let network_specs_key = NetworkSpecsKey::from_parts(&genesis_hash_vec, &encryption);
@@ -22,7 +22,7 @@ pub fn process_message(data_hex: &str, dbname: &str) -> Result<Action, ErrorSign
     // processing input vec![20, 104, 101, 3, 108, 111] will not throw error at element `3`,
     // it will result in output `helo` instead, length, however, is still correct, 5.
     // note that some invisible symbols may thus sneak into the message;
-    let message = match String::decode_all(&message_vec[..]) {
+    let message = match String::decode_all(&mut &message_vec[..]) {
         Ok(a) => a,
         Err(_) => return Err(ErrorSigner::Input(InputSigner::MessageNotReadable)),
     };
@@ -31,10 +31,10 @@ pub fn process_message(data_hex: &str, dbname: &str) -> Result<Action, ErrorSign
     let mut index: u32 = 0;
     let indent: u32 = 0;
 
-    match try_get_network_specs(dbname, &network_specs_key)? {
+    match try_get_network_specs(database_name, &network_specs_key)? {
         Some(network_specs) => {
             let address_key = AddressKey::from_multisigner(&author_multi_signer);
-            match try_get_address_details(dbname, &address_key)? {
+            match try_get_address_details(database_name, &address_key)? {
                 Some(address_details) => {
                     if address_details.network_id.contains(&network_specs_key) {
                         let message_card = Card::ParserCard(&ParserCard::Text(message.to_string()))
@@ -47,7 +47,7 @@ pub fn process_message(data_hex: &str, dbname: &str) -> Result<Action, ErrorSign
                             &author_multi_signer,
                             Vec::new(),
                         );
-                        let checksum = sign.store_and_get_checksum(dbname)?;
+                        let checksum = sign.store_and_get_checksum(database_name)?;
                         let author_info = make_author_info(
                             &author_multi_signer,
                             network_specs.base58prefix,

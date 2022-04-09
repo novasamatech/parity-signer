@@ -1,25 +1,32 @@
 [package]
 name = "transaction_signing"
 version = "0.1.0"
-authors = ["vera"]
-edition = "2018"
+edition = "2021"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-sp-core = "3.0.0"
-sp-runtime = "3.0.0"
-hex = "0.4.3"
-constants = {path = "../constants"}
-definitions = {path = "../definitions"}
-db_handling = {path = "../db_handling"}
-qrcode_static = {path = "../qrcode_static"}
-transaction_parsing = {path = "../transaction_parsing"}
-sled = "0.34.6"
-parity-scale-codec = "2.2.0"
-zeroize = "1.4.2"
 blake2-rfc = "0.2.18"
+constants = {path = "../constants", optional = true}
+definitions = {path = "../definitions", default-features = false, features = ["signer"]}
+db_handling = {path = "../db_handling", default-features = false, features = ["signer"]}
+hex = "0.4.3"
+parity-scale-codec = "3.1.2"
+qrcode_static = {path = "../qrcode_static"}
+sled = {version = "0.34.6", optional = true}
+sp-core = {git = "https://github.com/paritytech/substrate", default-features = false, features = ["full_crypto"]}
+sp-runtime = {git = "https://github.com/paritytech/substrate", default-features = false}
+transaction_parsing = {path = "../transaction_parsing", default-features = false, optional = true}
+zeroize = "1.5.3"
 
+[features]
+default = ["test"]
+test = [
+	"constants/test",
+	"db_handling/test",
+	"sled",
+	"transaction_parsing"
+]
 
 [lib]
 name = "transaction_signing"

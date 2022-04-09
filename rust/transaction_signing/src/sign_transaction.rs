@@ -1,10 +1,11 @@
 use blake2_rfc::blake2b::blake2b;
-use db_handling::db_transactions::{SignContent, TrDbColdSign};
-use definitions::error::ErrorSigner;
 use parity_scale_codec::Encode;
-use qrcode_static::png_qr_from_string;
 use sp_runtime::MultiSignature;
 use zeroize::Zeroize;
+
+use db_handling::db_transactions::{SignContent, TrDbColdSign};
+use definitions::error_signer::ErrorSigner;
+use qrcode_static::png_qr_from_string;
 
 use crate::sign_message::sign_as_address_key;
 
@@ -47,7 +48,7 @@ pub(crate) fn create_signature(
         Ok(s) => {
             full_address.zeroize();
             sign.apply(false, user_comment, database_name)?;
-            Ok(s.get_multi_signature())
+            Ok(s.multi_signature())
         }
         Err(e) => {
             full_address.zeroize();

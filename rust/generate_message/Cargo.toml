@@ -7,17 +7,16 @@ edition = "2018"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-sp-core = "3.0.0"
+constants = {path = "../constants", default-features = false, features = ["active"]}
+db_handling = {path = "../db_handling", default-features = false, features = ["active"]}
+definitions = {path = "../definitions", default-features = false, features = ["active"]}
 hex = "0.4.3"
+jsonrpsee = {version = "0.9.0", features = ["ws-client"]}
+lazy_static = "1.4.0"
+parity-scale-codec = "3.1.2"
 qrcode_rtx = {path = "../qrcode_rtx"}
-parity-scale-codec = "2.2.0"
+regex = "1.5.4"
+serde_json = "1.0.79"
 sled = "0.34.6"
-definitions = {path = "../definitions"}
-db_handling = {path = "../db_handling"}
-constants = {path = "../constants"}
-jsonrpsee-types = "0.2.0-alpha.6"
-jsonrpsee-ws-client = "0.2.0-alpha.6"
+sp-core = {git = "https://github.com/paritytech/substrate", default-features = false, features = ["full_crypto"]}
 tokio = { version = "1", features = ["full"] }
-serde_json = "1.0.64"
-wasm-loader = "0.13.0"
-wasm-testbed = "0.13.1"

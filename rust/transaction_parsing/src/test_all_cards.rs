@@ -1,5 +1,4 @@
 use bitvec::prelude::{BitVec, Lsb0};
-//use sled::IVec;
 use definitions::{
     crypto::Encryption,
     history::MetaValuesDisplay,
@@ -7,7 +6,7 @@ use definitions::{
     metadata::MetaValues,
     network_specs::{NetworkSpecs, VerifierValue},
     qr_transfers::ContentLoadTypes,
-    test_all_errors_signer::signer_errors,
+    test_all_errors_signer::error_signer,
     users::AddressDetails,
 };
 use hex;
@@ -58,12 +57,12 @@ pub fn make_all_cards() -> Action {
     };
     let address_details = AddressDetails {
         seed_name: String::from("Alice"),
-        path: String::from("//Alice"),
+        path: String::from("//Bob"),
         has_pwd: false,
         network_id: Vec::new(),
         encryption: Encryption::Sr25519,
     };
-    let bv: BitVec<Lsb0, u8> = BitVec::from_vec(vec![32, 4, 155]);
+    let bv: BitVec<u8, Lsb0> = BitVec::from_vec(vec![32, 4, 155]);
 
     all_cards
         .push(Card::ParserCard(&ParserCard::Pallet("test_pallet".to_string())).card(&mut index, 0));
@@ -186,14 +185,13 @@ Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deseru
         }))
         .card(&mut index, 0),
     );
-    all_cards.push(Card::TypesInfo(ContentLoadTypes::generate(&Vec::new())).card(&mut index, 0));
+    all_cards.push(Card::TypesInfo(ContentLoadTypes::from_slice(&[])).card(&mut index, 0));
     all_cards.push(Card::NewSpecs(&network_specs_westend.to_send()).card(&mut index, 0));
     all_cards.push(Card::NetworkInfo(&network_specs_westend).card(&mut index, 0));
+    all_cards
+        .push(Card::NetworkGenesisHash(&network_specs_westend.genesis_hash).card(&mut index, 0));
     all_cards.push(
-        Card::NetworkGenesisHash(&network_specs_westend.genesis_hash.to_vec()).card(&mut index, 0),
-    );
-    all_cards.push(
-        Card::Derivations(&vec![
+        Card::Derivations(&[
             "//Alice".to_string(),
             "//Alice/2/1".to_string(),
             "//secret//westend".to_string(),
@@ -223,7 +221,7 @@ Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deseru
     );
     all_cards.push(
         Card::Warning(Warning::VerifierChangingToGeneral {
-            verifier_key: &VerifierKey::from_parts(network_specs_westend.genesis_hash.as_ref()),
+            verifier_key: &VerifierKey::from_parts(&network_specs_westend.genesis_hash),
             hold: &Hold {
                 metadata_set: Vec::new(),
                 network_specs_set: Vec::new(),
@@ -233,7 +231,7 @@ Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deseru
     );
     all_cards.push(
         Card::Warning(Warning::VerifierChangingToCustom {
-            verifier_key: &VerifierKey::from_parts(network_specs_westend.genesis_hash.as_ref()),
+            verifier_key: &VerifierKey::from_parts(&network_specs_westend.genesis_hash),
             hold: &Hold {
                 metadata_set: Vec::new(),
                 network_specs_set: Vec::new(),
@@ -243,7 +241,7 @@ Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deseru
     );
     all_cards.push(
         Card::Warning(Warning::VerifierGeneralSuper {
-            verifier_key: &VerifierKey::from_parts(network_specs_westend.genesis_hash.as_ref()),
+            verifier_key: &VerifierKey::from_parts(&network_specs_westend.genesis_hash),
             hold: &Hold {
                 metadata_set: Vec::new(),
                 network_specs_set: Vec::new(),
@@ -260,7 +258,7 @@ Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deseru
     );
     all_cards.push(Card::Warning(Warning::MetadataExtensionsIncomplete).card(&mut index, 0));
 
-    for e in signer_errors().into_iter() {
+    for e in error_signer().into_iter() {
         all_cards.push(Card::Error(e).card(&mut index, 0));
     }
 

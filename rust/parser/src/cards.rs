@@ -1,4 +1,3 @@
-use hex;
 use sp_core::crypto::{AccountId32, Ss58AddressFormat, Ss58Codec};
 use sp_runtime::generic::Era;
 
@@ -67,7 +66,7 @@ impl ParserCard {
             ParserCard::Id { id, base58prefix } => readable(
                 indent,
                 "Id",
-                &id.to_ss58check_with_version(Ss58AddressFormat::Custom(*base58prefix)),
+                &id.to_ss58check_with_version(Ss58AddressFormat::custom(*base58prefix)),
             ),
             ParserCard::None => readable(indent, "none", ""),
             ParserCard::IdentityField(variant) => readable(indent, "identity_field", variant),
