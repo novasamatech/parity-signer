@@ -1,7 +1,7 @@
 use constants::{ADDRESS_BOOK, HOT_DB_NAME, METATREE};
 use db_handling::helpers::{open_db, open_tree};
 use definitions::{
-    error::{Active, ErrorActive},
+    error_active::{Active, ErrorActive},
     metadata::{AddressBookEntry, MetaValues},
 };
 

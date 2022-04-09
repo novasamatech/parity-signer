@@ -1,5 +1,6 @@
 use definitions::{
-    error::{ErrorSigner, InputSigner, NotHexSigner, Signer, TransferContent},
+    error::TransferContent,
+    error_signer::{ErrorSigner, InputSigner, NotHexSigner, Signer},
     helpers::unhex,
     network_specs::{Verifier, VerifierValue},
 };
@@ -27,11 +28,11 @@ pub fn pass_crypto(
                 Some(a) => {
                     let into_pubkey: [u8; 32] =
                         a.try_into().expect("fixed size should fit in array");
-                    (ed25519::Public::from_raw(into_pubkey), data[35..].to_vec())
+                    (ed25519::Public::from_raw(into_pubkey), &data[35..])
                 }
                 None => return Err(ErrorSigner::Input(InputSigner::TooShort)),
             };
-            let (message, tail) = cut_data(&data, content)?;
+            let (message, tail) = cut_data(data, content)?;
             let (signature, tail) = match tail.get(..64) {
                 Some(a) => {
                     let into_signature: [u8; 64] =
@@ -61,11 +62,11 @@ pub fn pass_crypto(
                 Some(a) => {
                     let into_pubkey: [u8; 32] =
                         a.try_into().expect("fixed size should fit in array");
-                    (sr25519::Public::from_raw(into_pubkey), data[35..].to_vec())
+                    (sr25519::Public::from_raw(into_pubkey), &data[35..])
                 }
                 None => return Err(ErrorSigner::Input(InputSigner::TooShort)),
             };
-            let (message, tail) = cut_data(&data, content)?;
+            let (message, tail) = cut_data(data, content)?;
             let (signature, tail) = match tail.get(..64) {
                 Some(a) => {
                     let into_signature: [u8; 64] =
@@ -95,11 +96,11 @@ pub fn pass_crypto(
                 Some(a) => {
                     let into_pubkey: [u8; 33] =
                         a.try_into().expect("fixed size should fit in array");
-                    (ecdsa::Public::from_raw(into_pubkey), data[36..].to_vec())
+                    (ecdsa::Public::from_raw(into_pubkey), &data[36..])
                 }
                 None => return Err(ErrorSigner::Input(InputSigner::TooShort)),
             };
-            let (message, tail) = cut_data(&data, content)?;
+            let (message, tail) = cut_data(data, content)?;
             let (signature, tail) = match tail.get(..65) {
                 Some(a) => {
                     let into_signature: [u8; 65] =
@@ -125,10 +126,10 @@ pub fn pass_crypto(
         "ff" => {
             // Received info was not signed
             let data = match data.get(3..) {
-                Some(a) => a.to_vec(),
+                Some(a) => a,
                 None => return Err(ErrorSigner::Input(InputSigner::TooShort)),
             };
-            let (message, tail) = cut_data(&data, content)?;
+            let (message, tail) = cut_data(data, content)?;
             let verifier = Verifier(None);
             Ok(InfoPassedCrypto {
                 verifier,

@@ -7,7 +7,8 @@ use db_handling::{
     interface_signer::{first_network, SeedDraft},
 };
 use definitions::{
-    error::{AddressKeySource, ErrorSigner, ExtraAddressKeySourceSigner, Signer},
+    error::AddressKeySource,
+    error_signer::{ErrorSigner, ExtraAddressKeySourceSigner, Signer},
     helpers::{make_identicon_from_multisigner, multisigner_to_public},
     keyring::{AddressKey, NetworkSpecsKey},
     users::AddressDetails,
@@ -477,10 +478,7 @@ impl SufficientCryptoState {
         address_details: &AddressDetails,
         new_secret_string: &str,
     ) -> Self {
-        let hex_identicon = match make_identicon_from_multisigner(multisigner) {
-            Ok(a) => hex::encode(a),
-            Err(_) => String::new(),
-        };
+        let hex_identicon = hex::encode(make_identicon_from_multisigner(multisigner));
         let author_info = format!(
             "\"base58\":\"{}\",\"identicon\":\"{}\",\"seed\":\"{}\",\"derivation_path\":\"{}\"",
             hex::encode(multisigner_to_public(multisigner)),
@@ -522,7 +520,7 @@ impl RecoverSeedPhraseState {
     pub fn new(seed_name: &str) -> Self {
         Self {
             seed_name: seed_name.to_string(),
-            seed_draft: SeedDraft::new(),
+            seed_draft: SeedDraft::initiate(),
         }
     }
     pub fn name(&self) -> String {
@@ -619,6 +617,7 @@ impl Screen {
 }
 
 #[cfg(test)]
+#[cfg(feature = "test")]
 mod tests {
 
     use sp_core::sr25519::Public;

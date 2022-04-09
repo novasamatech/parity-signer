@@ -3,7 +3,8 @@ use db_handling::{
     helpers::{get_general_verifier, try_get_types},
 };
 use definitions::{
-    error::{ErrorSigner, GeneralVerifierForContent, InputSigner, Signer, TransferContent},
+    error::TransferContent,
+    error_signer::{ErrorSigner, GeneralVerifierForContent, InputSigner, Signer},
     history::Event,
     network_specs::Verifier,
     qr_transfers::ContentLoadTypes,
@@ -17,7 +18,7 @@ use crate::{Action, StubNav};
 
 pub fn load_types(data_hex: &str, database_name: &str) -> Result<Action, ErrorSigner> {
     let checked_info = pass_crypto(data_hex, TransferContent::LoadTypes)?;
-    let content_new_types = ContentLoadTypes::from_vec(&checked_info.message);
+    let content_new_types = ContentLoadTypes::from_slice(&checked_info.message);
     let new_types = content_new_types.types::<Signer>()?;
     let old_types: Vec<TypeEntry> = match try_get_types::<Signer>(database_name)? {
         Some(a) => a,

@@ -1,5 +1,5 @@
 use db_handling::identities::prepare_derivations_export;
-use definitions::error::ErrorActive;
+use definitions::error_active::ErrorActive;
 use qrcode_rtx::make_pretty_qr;
 
 use crate::helpers::get_address_book_entry;

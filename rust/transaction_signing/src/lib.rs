@@ -1,7 +1,7 @@
 use sp_runtime::MultiSigner;
 
 use db_handling::db_transactions::TrDbColdStub;
-use definitions::{error::ErrorSigner, keyring::NetworkSpecsKey, users::AddressDetails};
+use definitions::{error_signer::ErrorSigner, keyring::NetworkSpecsKey, users::AddressDetails};
 
 mod sign_message;
 use sign_message::{
@@ -9,6 +9,7 @@ use sign_message::{
 };
 mod sign_transaction;
 use sign_transaction::create_signature_png;
+#[cfg(feature = "test")]
 #[cfg(test)]
 mod tests;
 
