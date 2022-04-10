@@ -15,11 +15,6 @@ then
 	exit 1
 fi
 
-if [ "$1" == "android" ]
-  then
-    . "$(dirname "${0}")/switch_to_android.sh"
-fi
-
 if [ "$1" == "ios" ]
   then
 
@@ -28,9 +23,6 @@ if [ "$1" == "ios" ]
     printf "Building iOS targets...";
     
     cd "$(dirname "${0}")/../rust/signer"
-
-    cp ../os-specific-lock/ios/Cargo.lock ../
-    cp ios-hack/Cargo.toml .
 
     for i in "${IOS_ARCHS[@]}";
       do
@@ -55,5 +47,3 @@ if [ "$1" == "ios" ]
     cp -R ../database/database_cold_release/ ../../ios/NativeSigner/Database/Database
 fi
 
-#echo "hello tom" > read.txt
-#cat read.txt
