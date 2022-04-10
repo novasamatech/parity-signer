@@ -56,28 +56,21 @@ fn make_apng(data: Vec<QrCode>, output_name: &str) -> Result<(), Box<dyn std::er
     let mut output_file = fs::File::create(output_name)?;
     let frames_count: u32 = data.len() as u32;
     let border_size = BORDER * SCALING;
-    let size: u32 = (data[0].size() as u32) * (SCALING as u32) + 2 * border_size as u32; // size is always positive and small
-    let apng_meta = apng_encoder::Meta {
-        width: size,
-        height: size,
-        color: apng_encoder::Color::Grayscale(8),
-        frames: frames_count,
-        plays: None,
-    };
-    let apng_frame = apng_encoder::Frame {
-        delay: Some(apng_encoder::Delay::new(FPS_NOM, FPS_DEN)),
-        ..Default::default()
-    };
-    let mut apng_encoder = match apng_encoder::Encoder::create(&mut output_file, apng_meta) {
-        Ok(a) => a,
-        Err(e) => return Err(Box::from(format!("Apng encoder error. {}", e))),
-    };
 
+    // size is always positive and small
+    let size: u32 = (data[0].size() as u32) * (SCALING as u32) + 2 * border_size as u32;
+    let mut encoder = png::Encoder::new(&mut output_file, size, size);
+
+    encoder.set_color(png::ColorType::Grayscale);
+    encoder.set_animated(frames_count, 0)?;
+    encoder.set_frame_delay(FPS_NOM, FPS_DEN)?;
+
+    let mut writer = encoder.write_header()?;
     // making actual apng
     // qr.get_module(x,y) = false corresponds to back color (white by default)
     // qr.get_module(x,y) = true corresponds to main color (black by default)
     for qr in data.iter() {
-        let mut buffer: Vec<u8> = Vec::new();
+        let mut buffer: Vec<u8> = Vec::with_capacity((size * size) as usize);
         for y in 0..size {
             for x in 0..size {
                 if qr.get_module(x as i32 / SCALING - BORDER, y as i32 / SCALING - BORDER) {
@@ -87,15 +80,10 @@ fn make_apng(data: Vec<QrCode>, output_name: &str) -> Result<(), Box<dyn std::er
                 }
             }
         }
-        match apng_encoder.write_frame(&buffer, Some(&apng_frame), None, None) {
-            Ok(a) => a,
-            Err(e) => return Err(Box::from(format!("Apng encoder error. {}", e))),
-        }
+        writer.write_image_data(&buffer)?;
     }
-    match apng_encoder.finish() {
-        Ok(a) => a,
-        Err(e) => return Err(Box::from(format!("Apng encoder error. {}", e))),
-    }
+    writer.finish()?;
+
     Ok(())
 }
 
