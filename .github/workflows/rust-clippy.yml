@@ -44,6 +44,4 @@ jobs:
       - name:                 cargo clippy
         run:                  |
           cd rust
-          cp os-specific-lock/android/Cargo.lock .
-          cp signer/android-hack/Cargo.toml signer
           cargo clippy --all-targets --all-features -- -D warnings
