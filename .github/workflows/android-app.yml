@@ -64,10 +64,6 @@ jobs:
 
       - name:           Build
         run:            |
-          cd rust
-          cp os-specific-lock/android/Cargo.lock .
-          cp signer/android-hack/Cargo.toml signer
-          cd ..
           cd android
           ./gradlew build
      
@@ -129,10 +125,6 @@ jobs:
 
       - name:           Assemble GPlay unsigned apk
         run:            |
-          cd rust
-          cp os-specific-lock/android/Cargo.lock .
-          cp signer/android-hack/Cargo.toml signer
-          cd ..
           cd android
           ./gradlew clean assembleDebug --stacktrace
 
