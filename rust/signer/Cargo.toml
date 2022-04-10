@@ -27,4 +27,4 @@ definitions = {path = "../definitions"}
 generate_message = {path = "../generate_message"}
 
 [lib]
-crate-type = ["staticlib", "rlib", "cdylib"]
+crate-type = ["staticlib", "cdylib"]
