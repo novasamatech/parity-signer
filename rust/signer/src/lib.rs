@@ -14,12 +14,8 @@
 // You should have received a copy of the GNU General Public License
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
-//used for identicon size; because JNI has no signed int
-
-#[cfg(any(target_os = "android", target_os = "ios"))]
 mod export;
 
-#[cfg(any(target_os = "android", target_os = "ios"))]
 export! {
     @Java_io_parity_signer_models_SignerDataModel_backendAction
     fn act(
