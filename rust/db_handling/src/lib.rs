@@ -28,9 +28,9 @@
 #![deny(unused_crate_dependencies)]
 
 #[cfg(feature = "active")]
-use constants::{COLD_DB_NAME, COLD_DB_NAME_RELEASE, HOT_DB_NAME};
+use constants::{COLD_DB_NAME_RELEASE, HOT_DB_NAME};
 #[cfg(feature = "active")]
-use definitions::{error_active::ErrorActive, network_specs::Verifier};
+use definitions::error_active::ErrorActive;
 #[cfg(feature = "active")]
 use std::path::PathBuf;
 
@@ -68,7 +68,7 @@ pub mod remove_types;
 pub mod tests;
 
 #[cfg(feature = "active")]
-use cold_default::{populate_cold, populate_cold_release};
+use cold_default::populate_cold_release;
 #[cfg(feature = "active")]
 use hot_default::reset_hot_database;
 
@@ -103,34 +103,6 @@ pub fn default_cold_release(path: Option<PathBuf>) -> Result<(), ErrorActive> {
         None => COLD_DB_NAME_RELEASE,
     };
     populate_cold_release(database_name)
-}
-
-/// Generate "cold" database with default values and Alice identities, **for
-/// tests**.
-///
-/// This was previously used for tests in Signer, may go obsolete.
-///
-/// The location of the generated database is `../database/database_cold` folder.
-///
-/// The test cold database contains:
-///
-/// - network specs for default networks (Polkadot, Kusama, Westend)
-/// - verifier information for default networks, with verifiers set to the
-/// general one
-/// - test metadata entries for default networks (old ones)
-/// - default types information
-/// - addressed for Alice in test networks
-/// - initiated history
-/// - general verifier value set to `None`
-///
-/// `TRANSACTION` tree is cleared.
-///
-/// This operation is performed **not** on Signer device, and is governed by
-/// the active side.
-#[cfg(feature = "active")]
-pub fn default_cold() -> Result<(), ErrorActive> {
-    let database_name = COLD_DB_NAME;
-    populate_cold(database_name, Verifier(None))
 }
 
 /// Function to reset default "hot" database.

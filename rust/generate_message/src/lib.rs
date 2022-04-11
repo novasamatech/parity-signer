@@ -30,9 +30,9 @@
 //! an identifier
 #![deny(unused_crate_dependencies)]
 
-use constants::{COLD_DB_NAME, COLD_DB_NAME_RELEASE, HOT_DB_NAME, TYLO};
+use constants::{COLD_DB_NAME_RELEASE, HOT_DB_NAME, TYLO};
 use db_handling::{
-    default_cold, default_cold_release, default_hot, metadata::transfer_metadata_to_cold,
+    default_cold_release, default_hot, metadata::transfer_metadata_to_cold,
     prep_messages::prep_types,
 };
 use definitions::error_active::{Active, ErrorActive};
@@ -72,8 +72,6 @@ pub fn full_run(command: Command) -> Result<(), ErrorActive> {
         Command::Make(make) => make_message(make),
         Command::Remove(info) => remove_info(info),
         Command::RestoreDefaults => default_hot(),
-        Command::MakeColdWithIdentities => default_cold(),
-        Command::TransferMeta => transfer_metadata_to_cold(HOT_DB_NAME, COLD_DB_NAME),
         Command::MakeColdRelease(opt_path) => default_cold_release(opt_path),
         Command::TransferMetaRelease => {
             transfer_metadata_to_cold(HOT_DB_NAME, COLD_DB_NAME_RELEASE)
