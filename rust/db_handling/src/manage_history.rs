@@ -1,4 +1,3 @@
-use chrono::Utc;
 #[cfg(feature = "signer")]
 use parity_scale_codec::Decode;
 use parity_scale_codec::Encode;
@@ -196,7 +195,9 @@ pub fn events_in_batch<T: ErrorSource>(
             Order::from_number(history.len() as u32)
         }
     };
-    let timestamp = Utc::now().to_string();
+    let timestamp = time::OffsetDateTime::now_utc()
+        .format(&time::format_description::well_known::Rfc3339)
+        .unwrap();
     let history_entry = Entry { timestamp, events };
     out_prep.insert(order.store(), history_entry.encode());
     Ok(out_prep)

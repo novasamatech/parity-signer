@@ -327,7 +327,6 @@ dependencies = [
  "libc",
  "num-integer",
  "num-traits",
- "time",
  "winapi",
 ]
 
@@ -543,7 +542,6 @@ name = "db_handling"
 version = "0.1.0"
 dependencies = [
  "blake2-rfc",
- "chrono",
  "constants",
  "defaults",
  "definitions",
@@ -556,6 +554,7 @@ dependencies = [
  "sled",
  "sp-core",
  "sp-runtime",
+ "time",
  "tiny-bip39",
  "zeroize",
 ]
@@ -590,6 +589,7 @@ dependencies = [
  "sp-runtime",
  "sp-version",
  "sp-wasm-interface",
+ "time",
  "variant_count",
 ]
 
@@ -1763,6 +1763,15 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "19e64526ebdee182341572e50e9ad03965aa510cd94427a4549448f285e957a1"
 dependencies = [
  "hermit-abi",
+ "libc",
+]
+
+[[package]]
+name = "num_threads"
+version = "0.1.5"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "aba1801fb138d8e85e11d0fc70baf4fe1cdfffda7c6cd34a854905df588e5ed0"
+dependencies = [
  "libc",
 ]
 
@@ -3314,13 +3323,13 @@ dependencies = [
 
 [[package]]
 name = "time"
-version = "0.1.44"
+version = "0.3.9"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "6db9e6914ab8b1ae1c260a4ae7a49b6c5611b40328a735b21862567685e73255"
+checksum = "c2702e08a7a860f005826c6815dcac101b19b5eb330c27fe4a5928fec1d20ddd"
 dependencies = [
+ "itoa 1.0.1",
  "libc",
- "wasi 0.10.0+wasi-snapshot-preview1",
- "winapi",
+ "num_threads",
 ]
 
 [[package]]
