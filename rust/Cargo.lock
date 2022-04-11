@@ -589,7 +589,6 @@ dependencies = [
  "sp-runtime",
  "sp-version",
  "sp-wasm-interface",
- "time",
  "variant_count",
 ]
 

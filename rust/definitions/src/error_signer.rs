@@ -345,7 +345,6 @@ impl ErrorSource for Signer {
             ErrorSigner::WrongPassword => String::from("Wrong password."),
             ErrorSigner::WrongPasswordNewChecksum(_) => String::from("Wrong password."),
             ErrorSigner::NoNetworksAvailable => String::from("No networks available. Please load networks information to proceed."),
-            ErrorSigner::TimeFormat(f) => format!("Datetime formatting error: {}.", f),
         }
     }
 }
@@ -437,9 +436,6 @@ pub enum ErrorSigner {
     /// Signer has attempted an operation that requires at least one network to
     /// be loaded into Signer.
     NoNetworksAvailable,
-
-    /// `time` formatting failed. Wraps `time::error::Format`.
-    TimeFormat(time::error::Format),
 }
 
 impl ErrorSigner {

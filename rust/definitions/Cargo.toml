@@ -20,7 +20,6 @@ sp-io = {git = "https://github.com/paritytech/substrate", optional = true}
 sp-runtime = {git = "https://github.com/paritytech/substrate", default-features = false}
 sp-version = {git = "https://github.com/paritytech/substrate"}
 sp-wasm-interface = {git = "https://github.com/paritytech/substrate", optional = true}
-time = {version="0.3.9", features=["formatting"]}
 variant_count = {version = "1.1.0", optional = true}
 
 [features]
