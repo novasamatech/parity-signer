@@ -64,6 +64,7 @@ fn make_apng(data: Vec<QrCode>, output_name: &str) -> Result<(), Box<dyn std::er
     encoder.set_color(png::ColorType::Grayscale);
     encoder.set_animated(frames_count, 0)?;
     encoder.set_frame_delay(FPS_NOM, FPS_DEN)?;
+    encoder.set_depth(png::BitDepth::Eight);
 
     let mut writer = encoder.write_header()?;
     // making actual apng
