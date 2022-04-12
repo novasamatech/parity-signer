@@ -1,3 +1,8 @@
+//! Database transaction 
+//!
+//! 
+
+#[cfg(feature = "signer")]
 use parity_scale_codec::{Decode, Encode};
 use sled::{Batch, Transactional};
 #[cfg(feature = "signer")]
@@ -37,151 +42,47 @@ use crate::{
     manage_history::events_to_batch,
 };
 
+/// Cold database transaction data containing
+/// [`Batch`](https://docs.rs/sled/latest/sled/struct.Batch.html) elements that 
+/// will be applied to each
+/// [`Tree`](https://docs.rs/sled/latest/sled/struct.Tree.html).
+///
+/// Cold database tree names and content information could be found in
+/// [`constants`] crate. All trees are routinely updated as Signer is used.
+///
+/// [`TrDbCold`] is applied to the cold database in an atomic transaction.
+///
+/// [`TrDbCold`] is used both by the Signer side (for all database-related
+/// actions) and the active side (to generate and populate the cold database).
+///
+/// Note that all the checking is done as the [`TrDbCold`] is generated,
+/// `apply` method does not do any checks on its own.
+#[derive(Debug)]
 pub struct TrDbCold {
+    /// `Batch` to be applied to [`ADDRTREE`] tree
     for_addresses: Batch,
+
+    /// `Batch` to be applied to [`HISTORY`] tree
     for_history: Batch,
+
+    /// `Batch` to be applied to [`METATREE`] tree
     for_metadata: Batch,
+
+    /// `Batch` to be applied to [`SPECSTREE`] tree
     for_network_specs: Batch,
+
+    /// `Batch` to be applied to [`SETTREE`] tree
     for_settings: Batch,
+
+    /// `Batch` to be applied to [`TRANSACTION`] tree
     for_transaction: Batch,
+
+    /// `Batch` to be applied to [`VERIFIERS`] tree
     for_verifiers: Batch,
 }
 
-#[cfg(feature = "active")]
-pub struct TrDbHot {
-    for_address_book: Batch,
-    for_metadata: Batch,
-    for_network_specs_prep: Batch,
-    for_settings: Batch,
-}
-
-#[derive(Decode, Encode)]
-pub struct BatchStub {
-    removals: Vec<Vec<u8>>, // vector of keys to be removed from the database
-    additions: Vec<(Vec<u8>, Vec<u8>)>, // vector of (key, value) to be added into the database
-}
-
-impl BatchStub {
-    // generate empty BatchStub
-    pub fn empty() -> Self {
-        Self {
-            removals: Vec::new(),
-            additions: Vec::new(),
-        }
-    }
-    // transform BatchStub into Batch, removals first
-    pub fn make_batch(&self) -> Batch {
-        self.extend_batch(Batch::default())
-    }
-    // add instructions from BatchStub, removals first,
-    // in queue after instructions from incoming Batch
-    pub fn extend_batch(&self, batch: Batch) -> Batch {
-        let mut out = batch;
-        for key in self.removals.iter() {
-            out.remove(&key[..])
-        }
-        for (key, value) in self.additions.iter() {
-            out.insert(&key[..], &value[..])
-        }
-        out
-    }
-    // new addition element into queue
-    pub fn new_addition(mut self, key: Vec<u8>, value: Vec<u8>) -> Self {
-        self.additions.push((key, value));
-        self
-    }
-    // new removal element into queue
-    pub fn new_removal(mut self, key: Vec<u8>) -> Self {
-        self.removals.push(key);
-        self
-    }
-}
-
-/// Hot database contains following trees:
-/// address_book tree, by default filled with values for standard networks;
-/// metadata tree, by default empty;
-/// network_specs_prep tree, by default filled with values for standard networks;
-/// settings tree, by default containing types information.
-/// Trees address_book, metadata, and network_specs_prep are routinely updated by database users.
-/// Struct TrDbHot contains set of batches that could be aplied to hot database.
-#[cfg(feature = "active")]
-impl TrDbHot {
-    /// function to construct new empty TrDbHot
-    pub fn new() -> Self {
-        Self {
-            for_address_book: Batch::default(),
-            for_metadata: Batch::default(),
-            for_network_specs_prep: Batch::default(),
-            for_settings: Batch::default(),
-        }
-    }
-    /// functions to set each of the four elements:
-    /// address_book batch
-    pub fn set_address_book(mut self, for_address_book: Batch) -> Self {
-        self.for_address_book = for_address_book;
-        self
-    }
-    /// metadata batch
-    pub fn set_metadata(mut self, for_metadata: Batch) -> Self {
-        self.for_metadata = for_metadata;
-        self
-    }
-    /// network_specs_prep batch
-    pub fn set_network_specs_prep(mut self, for_network_specs_prep: Batch) -> Self {
-        self.for_network_specs_prep = for_network_specs_prep;
-        self
-    }
-    /// settings batch
-    pub fn set_settings(mut self, for_settings: Batch) -> Self {
-        self.for_settings = for_settings;
-        self
-    }
-    /// function to apply constructed set of batches within TrDbHot to the database in a single transaction
-    pub fn apply(&self, database_name: &str) -> Result<(), ErrorActive> {
-        let database = open_db::<Active>(database_name)?;
-        let address_book = open_tree::<Active>(&database, ADDRESS_BOOK)?;
-        let metadata = open_tree::<Active>(&database, METATREE)?;
-        let network_specs_prep = open_tree::<Active>(&database, SPECSTREEPREP)?;
-        let settings = open_tree::<Active>(&database, SETTREE)?;
-        match (&address_book, &metadata, &network_specs_prep, &settings).transaction(
-            |(tx_address_book, tx_metadata, tx_network_specs_prep, tx_settings)| {
-                tx_address_book.apply_batch(&self.for_address_book)?;
-                tx_address_book.flush();
-                tx_metadata.apply_batch(&self.for_metadata)?;
-                tx_metadata.flush();
-                tx_network_specs_prep.apply_batch(&self.for_network_specs_prep)?;
-                tx_network_specs_prep.flush();
-                tx_settings.apply_batch(&self.for_settings)?;
-                tx_settings.flush();
-                Ok(())
-            },
-        ) {
-            Ok(()) => Ok(()),
-            Err(e) => Err(<Active>::db_transaction(e)),
-        }
-    }
-}
-
-#[cfg(feature = "active")]
-impl Default for TrDbHot {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-/// Cold database contains following trees:
-/// address tree, empty for release and populated with Alice-related addresses for test database;
-/// history tree, populated by history event entries; in "fresh start" contains only message that db was initiated;
-/// metadata tree, populated by default with metadata of kusama, polkadot, rococo, and westend;
-/// network_specs tree, by default populated with network specs of standard networks;
-/// settings tree, by default containing types and general verifier information;
-/// transaction tree, by default empty; is used to keep database update information or signer transaction information
-/// between transaction_parsing and transaction_signing;
-/// verifiers tree, by default populated with network verifier information for standard networks.
-/// All trees are routinely updated as Signer is used.
-/// Struct TrDbCold contains set of batches to be aplied to cold database.
 impl TrDbCold {
-    /// function to construct new empty TrDbCold
+    /// Construct new empty [`TrDbCold`].
     pub fn new() -> Self {
         Self {
             for_addresses: Batch::default(),
@@ -193,44 +94,60 @@ impl TrDbCold {
             for_verifiers: Batch::default(),
         }
     }
-    /// functions to set each of the seven elements:
-    /// addresses batch
+
+    /// Set `for_addresses` field in [`TrDbCold`] with `Batch` that will be
+    /// applied to [`ADDRTREE`] tree.
     pub fn set_addresses(mut self, for_addresses: Batch) -> Self {
         self.for_addresses = for_addresses;
         self
     }
-    /// set history batch
+
+    /// Set `for_history` field in [`TrDbCold`] with `Batch` that will be
+    /// applied to [`HISTORY`] tree.
     pub fn set_history(mut self, for_history: Batch) -> Self {
         self.for_history = for_history;
         self
     }
-    /// metadata batch
+
+    /// Set `for_metadata` field in [`TrDbCold`] with `Batch` that will be
+    /// applied to [`METATREE`] tree.
     pub fn set_metadata(mut self, for_metadata: Batch) -> Self {
         self.for_metadata = for_metadata;
         self
     }
-    /// network_specs batch
+
+    /// Set `for_network_specs` field in [`TrDbCold`] with `Batch` that will be
+    /// applied to [`SPECSTREE`] tree.
     pub fn set_network_specs(mut self, for_network_specs: Batch) -> Self {
         self.for_network_specs = for_network_specs;
         self
     }
-    /// settings batch
+
+    /// Set `for_settings` field in [`TrDbCold`] with `Batch` that will be
+    /// applied to [`SETTREE`] tree.
     pub fn set_settings(mut self, for_settings: Batch) -> Self {
         self.for_settings = for_settings;
         self
     }
-    /// transaction batch
+
+    /// Set `for_transaction` field in [`TrDbCold`] with `Batch` that will be
+    /// applied to [`TRANSACTION`] tree.
     pub fn set_transaction(mut self, for_transaction: Batch) -> Self {
         self.for_transaction = for_transaction;
         self
     }
-    /// verifiers batch
+
+    /// Set `for_verifiers` field in [`TrDbCold`] with `Batch` that will be
+    /// applied to [`VERIFIERS`] tree.
     pub fn set_verifiers(mut self, for_verifiers: Batch) -> Self {
         self.for_verifiers = for_verifiers;
         self
     }
-    /// function to apply constructed set of batches within TrDbCold to the database in a single transaction
-    /// Not that since creating cold database is done on the Active side, both ErrorSource veriants are applicable
+
+    /// Apply constructed set of batches within [`TrDbCold`] to the database
+    /// with a given name, in a single transaction.
+    ///
+    /// Note that both ErrorSource variants are available.
     pub fn apply<T: ErrorSource>(&self, database_name: &str) -> Result<(), T::Error> {
         let database = open_db::<T>(database_name)?;
         let addresses = open_tree::<T>(&database, ADDRTREE)?;
@@ -283,29 +200,246 @@ impl TrDbCold {
 }
 
 impl Default for TrDbCold {
+    /// Default value for [`TrDbCold`]. Empty.
     fn default() -> Self {
         Self::new()
     }
 }
 
-/// Database transaction stub for cold database is formed while running parse_transaction in Signer.
-/// It contains BatchStubs for address, metadata, network_specs, settings, and verifiers trees,
-/// and Vec<Event> from which the history tree is updated.
-/// It is stored SCALE encoded in transaction tree of the cold database with key STUB.
-#[derive(Decode, Encode)]
+/// Hot database transaction data containing
+/// [`Batch`](https://docs.rs/sled/latest/sled/struct.Batch.html) elements that 
+/// will be applied to each
+/// [`Tree`](https://docs.rs/sled/latest/sled/struct.Tree.html).
+///
+/// Hot database tree names and content information could be found in
+/// [`constants`] crate.
+///
+/// All trees are addressed when the database is generated or restored with
+/// default values. Trees [`ADDRESS_BOOK`], [`METATREE`], and
+/// [`SPECSTREEPREP`] are routinely updated by the database users.
+///
+/// [`TrDbHot`] is applied to the hot database in an atomic transaction and is
+/// used by the active side only.
+///
+/// Note that all the checking is done as the [`TrDbHot`] is generated,
+/// `apply` method does not do any checks on its own.
+#[cfg(feature = "active")]
+#[derive(Debug)]
+pub struct TrDbHot {
+    /// `Batch` to be applied to [`ADDRESS_BOOK`] tree
+    for_address_book: Batch,
+
+    /// `Batch` to be applied to [`METATREE`] tree
+    for_metadata: Batch,
+
+    /// `Batch` to be applied to [`SPECSTREEPREP`] tree
+    for_network_specs_prep: Batch,
+
+    /// `Batch` to be applied to [`SETTREE`] tree
+    for_settings: Batch,
+}
+
+#[cfg(feature = "active")]
+impl TrDbHot {
+    /// Construct new empty [`TrDbHot`].
+    pub fn new() -> Self {
+        Self {
+            for_address_book: Batch::default(),
+            for_metadata: Batch::default(),
+            for_network_specs_prep: Batch::default(),
+            for_settings: Batch::default(),
+        }
+    }
+
+    /// Set `for_address_book` field in [`TrDbHot`] with `Batch` that will be
+    /// applied to [`ADDRESS_BOOK`] tree.
+    pub fn set_address_book(mut self, for_address_book: Batch) -> Self {
+        self.for_address_book = for_address_book;
+        self
+    }
+
+    /// Set `for_metadata` field in [`TrDbHot`] with `Batch` that will be
+    /// applied to [`METATREE`] tree.
+    pub fn set_metadata(mut self, for_metadata: Batch) -> Self {
+        self.for_metadata = for_metadata;
+        self
+    }
+
+    /// Set `for_network_specs_prep` field in [`TrDbHot`] with `Batch` that
+    /// will be applied to [`SPECSTREEPREP`] tree.
+    pub fn set_network_specs_prep(mut self, for_network_specs_prep: Batch) -> Self {
+        self.for_network_specs_prep = for_network_specs_prep;
+        self
+    }
+
+    /// Set `for_settings` field in [`TrDbHot`] with `Batch` that will be
+    /// applied to [`SETTREE`] tree.
+    pub fn set_settings(mut self, for_settings: Batch) -> Self {
+        self.for_settings = for_settings;
+        self
+    }
+
+    /// Apply constructed set of batches within [`TrDbHot`] to the database
+    /// with a given name, in a single transaction.
+    pub fn apply(&self, database_name: &str) -> Result<(), ErrorActive> {
+        let database = open_db::<Active>(database_name)?;
+        let address_book = open_tree::<Active>(&database, ADDRESS_BOOK)?;
+        let metadata = open_tree::<Active>(&database, METATREE)?;
+        let network_specs_prep = open_tree::<Active>(&database, SPECSTREEPREP)?;
+        let settings = open_tree::<Active>(&database, SETTREE)?;
+        match (&address_book, &metadata, &network_specs_prep, &settings).transaction(
+            |(tx_address_book, tx_metadata, tx_network_specs_prep, tx_settings)| {
+                tx_address_book.apply_batch(&self.for_address_book)?;
+                tx_address_book.flush();
+                tx_metadata.apply_batch(&self.for_metadata)?;
+                tx_metadata.flush();
+                tx_network_specs_prep.apply_batch(&self.for_network_specs_prep)?;
+                tx_network_specs_prep.flush();
+                tx_settings.apply_batch(&self.for_settings)?;
+                tx_settings.flush();
+                Ok(())
+            },
+        ) {
+            Ok(()) => Ok(()),
+            Err(e) => Err(<Active>::db_transaction(e)),
+        }
+    }
+}
+
+#[cfg(feature = "active")]
+impl Default for TrDbHot {
+    /// Default value for [`TrDbHot`]. Empty.
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+/// SCALE-encodeable draft for
+/// [`Batch`](https://docs.rs/sled/latest/sled/struct.Batch.html), that will be
+/// a part of database atomic transaction.
+///
+/// [`Batch`](https://docs.rs/sled/latest/sled/struct.Batch.html) does not
+/// support SCALE-encoding, so [`BatchStub`] is constructed from a set of keys
+/// to be removed from the database and a set of (key, value) pairs to be added
+/// into the database. Keys and values are SCALE-compatible `Vec<u8>`.
+///
+/// When applying [`BatchStub`], i.e. transforming it into
+/// [`Batch`](https://docs.rs/sled/latest/sled/struct.Batch.html), the removals
+/// are always applied before additions, to avoid accidental replacing of just
+/// added value.
 #[cfg(feature = "signer")]
+#[derive(Debug, Decode, Encode)]
+struct BatchStub {
+    /// Vector of keys to be removed from the database.
+    removals: Vec<Vec<u8>>,
+
+    /// Vector of (key, value) pairs to be added into the database.
+    additions: Vec<(Vec<u8>, Vec<u8>)>,
+}
+
+#[cfg(feature = "signer")]
+impl BatchStub {
+    /// Generate empty [`BatchStub`].
+    fn empty() -> Self {
+        Self {
+            removals: Vec::new(),
+            additions: Vec::new(),
+        }
+    }
+
+    /// Transform [`BatchStub`] into
+    /// [`Batch`](https://docs.rs/sled/latest/sled/struct.Batch.html), removals
+    /// first.
+    fn make_batch(&self) -> Batch {
+        self.extend_batch(Batch::default())
+    }
+
+    /// Add elements from [`BatchStub`], removals first, in queue after
+    /// instructions already present in input
+    /// [`Batch`](https://docs.rs/sled/latest/sled/struct.Batch.html)
+    fn extend_batch(&self, batch: Batch) -> Batch {
+        let mut out = batch;
+        for key in self.removals.iter() {
+            out.remove(&key[..])
+        }
+        for (key, value) in self.additions.iter() {
+            out.insert(&key[..], &value[..])
+        }
+        out
+    }
+
+    /// Add a new addition element into [`BatchStub`] `additions` queue.
+    fn new_addition(mut self, key: Vec<u8>, value: Vec<u8>) -> Self {
+        self.additions.push((key, value));
+        self
+    }
+
+    /// Add a new removal element into [`BatchStub`] `removals` queue.
+    fn new_removal(mut self, key: Vec<u8>) -> Self {
+        self.removals.push(key);
+        self
+    }
+}
+
+/// Draft for cold database atomic transaction, constructed for Signer update
+/// transaction (`add_specs`, `load_metadata`, `load_types`).
+///
+/// [`TrDbColdStub`] is SCALE-encodeable draft for cold database atomic
+/// transaction that will be applied to the database if the update is accepted
+/// by user.
+/// 
+/// When user scans an update into Signer, the data is parsed and displayed to
+/// the user, to be eventually accepted or declined.
+///
+/// Accepting an update could result in adding or removing database data.
+///
+/// [`TrDbColdStub`] contains [`Event`](definitions::history::Event) set for
+/// [`HISTORY`] tree update and `BatchStub` update drafts with corresponding
+/// removals and additions for database trees:
+///
+/// - [`ADDRTREE`]
+/// - [`METATREE`]
+/// - [`SPECSTREE`]
+/// - [`SETTREE`]
+/// - [`VERIFIERS`]
+///
+/// [`TrDbColdStub`] thus could be used to update any cold database tree except
+/// [`TRANSACTION`].
+///
+/// [`TRANSACTION`] tree is used to store the SCALE-encoded [`TrDbColdStub`]
+/// under key [`STUB`], while user considers whether to accept or decline the
+/// update.
+///
+/// Note that all the checking is done before the [`TrDbColdStub`] is written
+/// into [`TRANSACTION`] tree, `apply` method will check only that the checksum
+/// known to the user is the same as the one database has currently.
+#[cfg(feature = "signer")]
+#[derive(Debug, Decode, Encode)]
 pub struct TrDbColdStub {
+    /// `BatchStub` to be transformed into `Batch` for [`ADDRTREE`] tree.
     addresses_stub: BatchStub,
+
+    /// `Vec<Event>` to be entered into [`HISTORY`] tree, the
+    /// [`Entry`](definitions::history::Entry) with `timestamp` is generated
+    /// only when  the payload is approved by the user.
     history_stub: Vec<Event>,
+
+    /// `BatchStub` to be transformed into `Batch` for [`METATREE`] tree.
     metadata_stub: BatchStub,
+
+    /// `BatchStub` to be transformed into `Batch` for [`SPECSTREE`] tree.
     network_specs_stub: BatchStub,
+
+    /// `BatchStub` to be transformed into `Batch` for [`SETTREE`] tree.
     settings_stub: BatchStub,
+
+    /// `BatchStub` to be transformed into `Batch` for [`VERIFIERS`] tree.
     verifiers_stub: BatchStub,
 }
 
 #[cfg(feature = "signer")]
 impl TrDbColdStub {
-    /// function to construct new empty TrDbColdStub
+    /// Construct new empty [`TrDbColdStub`].
     pub fn new() -> Self {
         Self {
             addresses_stub: BatchStub::empty(),
@@ -316,7 +450,13 @@ impl TrDbColdStub {
             verifiers_stub: BatchStub::empty(),
         }
     }
-    /// function to recover TrDbColdStub from storage in the Signer database
+
+    /// Recover [`TrDbColdStub`] from storage in the cold database.
+    ///
+    /// Function requires correct checksum to make sure the transaction is
+    /// still the one that was shown to the user previously, and no changes to
+    /// the database have occured after the atomic transaction draft was placed
+    /// into storage.
     pub fn from_storage(database_name: &str, checksum: u32) -> Result<Self, ErrorSigner> {
         let stub_encoded = {
             let database = open_db::<Signer>(database_name)?;
@@ -338,7 +478,12 @@ impl TrDbColdStub {
             ))),
         }
     }
-    /// function to put TrDbColdStub into storage in the database
+
+    /// Put SCALE-encoded [`TrDbColdStub`] into storage in the [`TRANSACTION`]
+    /// tree of the cold database under the key [`STUB`].
+    ///
+    /// Function returns `u32` checksum. This checksum is needed to recover
+    /// stored [`TrDbColdStub`] using `from_storage` method.
     pub fn store_and_get_checksum(&self, database_name: &str) -> Result<u32, ErrorSigner> {
         let mut transaction_batch = make_batch_clear_tree::<Signer>(database_name, TRANSACTION)?;
         transaction_batch.insert(STUB, self.encode());
@@ -351,12 +496,20 @@ impl TrDbColdStub {
             Err(e) => Err(<Signer>::db_internal(e)),
         }
     }
-    /// function to add new event in history preparation in TrDbColdStub
+
+    /// Add new [`Event`](definitions::history::Event) in `history_stub` field
+    /// of the [`TrDbColdStub`]
     pub fn new_history_entry(mut self, event: Event) -> Self {
         self.history_stub.push(event);
         self
     }
-    /// function to put metadata unit in addition queue in TrDbColdStub
+
+    /// Prepare adding the metadata into the cold database:
+    ///
+    /// - Add a (key, value) pair to the metadata additions queue in
+    /// `metadata_stub`. Key is [`MetaKey`](definitions::keyring::MetaKey) in
+    /// key form, value is metadata in `Vec<u8>` format.
+    /// - Add corresponding `Event::MetadataAdded(_)` into `history_stub`.
     pub fn add_metadata(mut self, meta_values: &MetaValues) -> Self {
         let meta_key = MetaKey::from_parts(&meta_values.name, meta_values.version);
         self.metadata_stub = self
@@ -366,8 +519,15 @@ impl TrDbColdStub {
             .push(Event::MetadataAdded(MetaValuesDisplay::get(meta_values)));
         self
     }
-    /// function to put meta_key in removal queue in TrDbColdStub
-    /// is used for clean up when the general verifier or network verifier is reset
+
+    /// Prepare removing the metadata from the cold database:
+    ///
+    /// - Add [`MetaKey`](definitions::keyring::MetaKey) in key form to the
+    /// metadata removals queue in `metadata_stub`.
+    /// - Add corresponding `Event::MetadataRemoved(_)` into `history_stub`.
+    /// 
+    /// Function is used for `Hold` and `GeneralHold` processing when,
+    /// respectively, the network verifier or the general verifier is reset.
     pub fn remove_metadata(mut self, meta_values: &MetaValues) -> Self {
         let meta_key = MetaKey::from_parts(&meta_values.name, meta_values.version);
         self.metadata_stub = self.metadata_stub.new_removal(meta_key.key());
@@ -375,7 +535,38 @@ impl TrDbColdStub {
             .push(Event::MetadataRemoved(MetaValuesDisplay::get(meta_values)));
         self
     }
-    /// function to put network_specs unit in addition queue in TrDbColdStub
+
+    /// Prepare adding
+    /// [`NetworkSpecs`](definitions::network_specs::NetworkSpecs) into the
+    /// cold database:
+    ///
+    /// - Transform received in `add_specs` payload
+    /// [`NetworkSpecsToSend`](definitions::network_specs::NetworkSpecsToSend)
+    /// into [`NetworkSpecs`](definitions::network_specs::NetworkSpecs) by
+    /// adding `order` field. Networks are always added in the end of the
+    /// network list, with order set to the total number of network specs
+    /// entries currently in Signer. When a network is removed, the order
+    /// of the remaining networks gets rearranged, see details in function
+    /// [`remove_network`](crate::remove_network::remove_network).
+    /// - Add a (key, value) pair to the network specs additions queue in
+    /// `network_specs_stub`. Key is
+    /// [`NetworkSpecsKey`](definitions::keyring::NetworkSpecsKey) in
+    /// key form, value is SCALE-encoded
+    /// [`NetworkSpecs`](definitions::network_specs::NetworkSpecs).
+    /// - Add corresponding `Event::NetworkSpecsAdded(_)` into `history_stub`.
+    /// - Add root address for the network if the
+    /// [`AddressDetails`](definitions::users::AddressDetails) entry with
+    /// matching [`Encryption`](definitions::crypto::Encryption) already exists,
+    /// i.e. add (key, value) pair to the address additions queue in
+    /// `addresses_stub`. Key is [`AddressKey`](definitions::keyring::AddressKey)
+    /// in key form, value is SCALE-encoded updated
+    /// [`AddressDetails`](definitions::users::AddressDetails).
+    /// - If address was added, add corresponding `Event::IdentityAdded(_)`
+    /// into `history_stub`.
+    /// 
+    /// Note that `add_network_specs` does not deal with network verifiers:
+    /// verifier data is not necessarily updated each time the network
+    /// specs are added.
     pub fn add_network_specs(
         mut self,
         network_specs_to_send: &NetworkSpecsToSend,
@@ -412,8 +603,7 @@ impl TrDbColdStub {
                         &address_key,
                         address_entry,
                     )?;
-                if address_details.path.is_empty()
-                    && !address_details.has_pwd
+                if address_details.is_root()
                     && (address_details.encryption == network_specs.encryption)
                     && !address_details.network_id.contains(&network_specs_key)
                 {
@@ -532,8 +722,8 @@ impl Default for TrDbColdStub {
 /// will signing the transaction (path, has_pwd, address_key),
 /// and relevant history entries.
 /// It is stored SCALE encoded in transaction tree of the cold database with key SIGN.
-#[derive(Decode, Encode)]
 #[cfg(feature = "signer")]
+#[derive(Debug, Decode, Encode)]
 pub struct TrDbColdSign {
     content: SignContent,
     network_name: String,
@@ -543,8 +733,8 @@ pub struct TrDbColdSign {
     history: Vec<Event>,
 }
 
-#[derive(Decode, Encode)]
 #[cfg(feature = "signer")]
+#[derive(Debug, Decode, Encode)]
 pub enum SignContent {
     Transaction {
         method: Vec<u8>,
@@ -669,8 +859,8 @@ impl TrDbColdSign {
 
 /// Temporary storage for information needed to import derivations
 /// Secret seed and seed name are required to approve
-#[derive(Decode, Encode)]
 #[cfg(feature = "signer")]
+#[derive(Debug, Decode, Encode)]
 pub struct TrDbColdDerivations {
     checked_derivations: Vec<String>,
     network_specs: NetworkSpecs,

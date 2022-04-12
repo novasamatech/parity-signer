@@ -72,15 +72,16 @@ use cold_default::populate_cold_release;
 #[cfg(feature = "active")]
 use hot_default::reset_hot_database;
 
-/// Generate "cold" database with default values, **for release build**.
+/// Generate or restore "cold" database with default values, **for release
+/// build**.
 ///
 /// Resulting database should be copied verbatim into Signer files during the
 /// build.
 ///
 /// The location of the generated database is either optional user-provided path,
-/// or default `../database/database_cold_release` folder.
+/// or default [`COLD_DB_NAME_RELEASE`] folder.
 ///
-/// The cold release database contains:
+/// The cold release database, as generated, contains:
 ///
 /// - network specs for default networks (Polkadot, Kusama, Westend)
 /// - verifier information for default networks, with verifiers set to the
@@ -88,8 +89,7 @@ use hot_default::reset_hot_database;
 /// - two latest metadata versions for default networks
 /// - default types information
 ///
-/// Also during the cold release database generation the trees `ADDRTREE`,
-/// `HISTORY`, and `TRANSACTION` are cleared.
+/// The trees `ADDRTREE`, `HISTORY`, and `TRANSACTION` are cleared.
 ///
 /// Note that resulting database history is not initialized and general
 /// verifier is not set.
@@ -105,8 +105,17 @@ pub fn default_cold_release(path: Option<PathBuf>) -> Result<(), ErrorActive> {
     populate_cold_release(database_name)
 }
 
-/// Function to reset default "hot" database.
-/// Active side operation, ErrorActive is used
+/// Generate or restore "hot" database with default values.
+///
+/// The location of the generated database is default [`HOT_DB_NAME`] folder.
+///
+/// The hot database, as generated, contains:
+///
+/// - address book entries for default networks (Polkadot, Kusama, Westend)
+/// - network specs for default networks
+/// - default types information
+/// - **no** metadata entries; the `METATREE` is cleared - all metadata in the
+/// hot database is received only through rpc calls.
 #[cfg(feature = "active")]
 pub fn default_hot() -> Result<(), ErrorActive> {
     let database_name = HOT_DB_NAME;
