@@ -384,12 +384,10 @@ impl BatchStub {
 /// Draft for cold database atomic transaction, constructed for Signer update
 /// transaction (`add_specs`, `load_metadata`, `load_types`).
 ///
-/// [`TrDbColdStub`] is SCALE-encodeable draft for cold database atomic
-/// transaction that will be applied to the database if the update is accepted
-/// by user.
-/// 
-/// When user scans an update into Signer, the data is parsed and displayed to
-/// the user, to be eventually accepted or declined.
+/// [`TrDbColdStub`] is stored SCALE-encoded in [`TRANSACTION`] tree
+/// of the cold database under key [`STUB`] while the update is considered by
+/// the user. Draft is applied atomically to the cold database if the update is
+/// accepted.
 ///
 /// Accepting an update could result in adding or removing database data.
 ///
@@ -402,13 +400,6 @@ impl BatchStub {
 /// - [`SPECSTREE`]
 /// - [`SETTREE`]
 /// - [`VERIFIERS`]
-///
-/// [`TrDbColdStub`] thus could be used to update any cold database tree except
-/// [`TRANSACTION`].
-///
-/// [`TRANSACTION`] tree is used to store the SCALE-encoded [`TrDbColdStub`]
-/// under key [`STUB`], while user considers whether to accept or decline the
-/// update.
 ///
 /// Note that all the checking is done before the [`TrDbColdStub`] is written
 /// into [`TRANSACTION`] tree, `apply` method will check only that the checksum
@@ -457,6 +448,8 @@ impl TrDbColdStub {
     /// still the one that was shown to the user previously, and no changes to
     /// the database have occured after the atomic transaction draft was placed
     /// into storage.
+    ///
+    /// [`TRANSACTION`] tree is cleared in the process.
     pub fn from_storage(database_name: &str, checksum: u32) -> Result<Self, ErrorSigner> {
         let stub_encoded = {
             let database = open_db::<Signer>(database_name)?;
@@ -484,6 +477,8 @@ impl TrDbColdStub {
     ///
     /// Function returns `u32` checksum. This checksum is needed to recover
     /// stored [`TrDbColdStub`] using `from_storage` method.
+    ///
+    /// The [`TRANSACTION`] tree is cleared prior to adding data to storage.
     pub fn store_and_get_checksum(&self, database_name: &str) -> Result<u32, ErrorSigner> {
         let mut transaction_batch = make_batch_clear_tree::<Signer>(database_name, TRANSACTION)?;
         transaction_batch.insert(STUB, self.encode());
@@ -504,7 +499,8 @@ impl TrDbColdStub {
         self
     }
 
-    /// Prepare adding the metadata into the cold database:
+    /// Prepare adding the metadata received as `load_metadata` update into the
+    /// cold database:
     ///
     /// - Add a (key, value) pair to the metadata additions queue in
     /// `metadata_stub`. Key is [`MetaKey`](definitions::keyring::MetaKey) in
@@ -527,7 +523,7 @@ impl TrDbColdStub {
     /// - Add corresponding `Event::MetadataRemoved(_)` into `history_stub`.
     /// 
     /// Function is used for `Hold` and `GeneralHold` processing when,
-    /// respectively, the network verifier or the general verifier is reset.
+    /// respectively, the network verifier or the general verifier is changed.
     pub fn remove_metadata(mut self, meta_values: &MetaValues) -> Self {
         let meta_key = MetaKey::from_parts(&meta_values.name, meta_values.version);
         self.metadata_stub = self.metadata_stub.new_removal(meta_key.key());
@@ -626,8 +622,25 @@ impl TrDbColdStub {
         }
         Ok(self)
     }
-    /// function to put network_specs_key in removal queue in TrDbColdStub
-    /// is used for clean up when the general verifier or network verifier is reset
+
+    /// Prepare removing
+    /// [`NetworkSpecs`](definitions::network_specs::NetworkSpecs) from the
+    /// cold database:
+    ///
+    /// - Add [`NetworkSpecsKey`](definitions::keyring::NetworkSpecsKey) in
+    /// key form to the network specs removal queue in `network_specs_stub`.
+    /// - Add corresponding `Event::NetworkSpecsRemoved(_)` into `history_stub`.
+    /// 
+    /// Function is used for `Hold` and `GeneralHold` processing when,
+    /// respectively, the network verifier or the general verifier is changed.
+    ///
+    /// Note that function does not deal with the verifiers nor with the
+    /// addresses.
+    ///
+    /// Verifiers remain unchanged during the hold processing.
+    ///
+    /// The addresses are not removed and will be again visible from the user
+    /// interface when the properly verified network specs are loaded in Signer.
     pub fn remove_network_specs(
         mut self,
         network_specs: &NetworkSpecs,
@@ -645,7 +658,16 @@ impl TrDbColdStub {
             )));
         self
     }
-    /// function to put new general verifier in addition queue in TrDbColdStub
+
+    /// Prepare adding new general verifier
+    /// [`Verifier`](definitions::network_specs::Verifier) into the cold
+    /// database:
+    ///
+    /// - Add a (key, value) pair to the settings additions queue in
+    /// `settings_stub`. Key is [`GENERALVERIFIER`] and the value is
+    /// SCALE-encoded [`Verifier`](definitions::network_specs::Verifier) that
+    /// is set to be the new general verifier.
+    /// - Add corresponding `Event::GeneralVerifierSet(_)` into `history_stub`.
     pub fn new_general_verifier(mut self, general_verifier: &Verifier) -> Self {
         self.settings_stub = self
             .settings_stub
@@ -654,7 +676,15 @@ impl TrDbColdStub {
             .push(Event::GeneralVerifierSet(general_verifier.to_owned()));
         self
     }
-    /// function to put new types entry in addition queue in TrDbColdStub
+
+    /// Prepare adding types information
+    /// [`ContentLoadTypes`](definitions::qr_transfers::ContentLoadTypes)
+    /// received as `load_types` update into the cold database:
+    ///
+    /// - Add a (key, value) pair to the settings additions queue in
+    /// `settings_stub`. Key is [`TYPES`] and the value is
+    /// types information in `store` format (SCALE-encoded).
+    /// - Add corresponding `Event::TypesAdded(_)` into `history_stub`.
     pub fn add_types(mut self, types: &ContentLoadTypes, general_verifier: &Verifier) -> Self {
         self.settings_stub = self
             .settings_stub
@@ -665,17 +695,33 @@ impl TrDbColdStub {
         )));
         self
     }
-    /// function to put types in removal queue in TrDbColdStub
-    /// is used for clean up when the general verifier is reset
+
+    /// Prepare removing types information from the cold database:
+    ///
+    /// - Add [`TYPES`] key to the settings removal queue in `settings_stub`.
+    /// - Add corresponding `Event::TypesRemoved(_)` into `history_stub`.
+    ///
+    /// Function is used to process `GeneralHold` when general verifier is changed.
     pub fn remove_types(mut self, types: &ContentLoadTypes, general_verifier: &Verifier) -> Self {
         self.settings_stub = self.settings_stub.new_removal(TYPES.to_vec());
-        self.history_stub.push(Event::TypesAdded(TypesDisplay::get(
+        self.history_stub.push(Event::TypesRemoved(TypesDisplay::get(
             types,
             general_verifier,
         )));
         self
     }
-    /// function to put new network verifier in addition queue in TrDbColdStub
+
+    /// Prepare adding new network verifier
+    /// [`ValidCurrentVerifier`](definitions::network_specs::ValidCurrentVerifier)
+    /// into the cold database:
+    ///
+    /// - Add a (key, value) pair to the verifiers additions queue in
+    /// `verifiers_stub`. Key is
+    /// [`VerifierKey`](definitions::keyring::VerifierKey) and the value is
+    /// SCALE-encoded
+    /// [`ValidCurrentVerifier`](definitions::network_specs::ValidCurrentVerifier)
+    /// that is set to be the new verifier for the network.
+    /// - Add corresponding `Event::NetworkVerifierSet(_)` into `history_stub`.
     pub fn new_network_verifier(
         mut self,
         verifier_key: &VerifierKey,
@@ -694,7 +740,9 @@ impl TrDbColdStub {
             )));
         self
     }
-    /// function to apply TrDbColdStub to database
+
+    /// Transform [`TrDbColdStub`] into [`TrDbCold`] and apply to the database
+    /// with a given name, in a single transaction.
     pub fn apply(self, database_name: &str) -> Result<(), ErrorSigner> {
         TrDbCold {
             for_addresses: self.addresses_stub.make_batch(),
@@ -711,41 +759,98 @@ impl TrDbColdStub {
 
 #[cfg(feature = "signer")]
 impl Default for TrDbColdStub {
+    /// Default value for [`TrDbColdStub`]. Empty.
     fn default() -> Self {
         Self::new()
     }
 }
 
-/// Temporary storage for transaction to be signed and its additional information,
-/// produced during parse_transaction in Signer.
-/// Contains transaction itself as Vec<u8>, information about the address that
-/// will signing the transaction (path, has_pwd, address_key),
-/// and relevant history entries.
-/// It is stored SCALE encoded in transaction tree of the cold database with key SIGN.
+/// Temporary storage for signable transaction and associated data.
+///
+/// Signable transaction received by the Signer must always be parsed prior to
+/// signing, and when it is, [`TrDbColdSign`] is generated and the transaction
+/// details are shown to user.
+///
+/// If the user signs the transaction or tries to sign and enters wrong
+/// password, the transaction data will be recorded in Signer history log.
+///
+/// While the user considers the transaction, [`TrDbColdSign`] is stored 
+/// SCALE-encoded in [`TRANSACTION`] tree of the cold database under the key
+/// [`SIGN`].
+///
+/// [`TrDbColdSign`] contains:
+///
+/// - [`SignContent`] with data to sign
+/// - name of the network in which the transaction is made
+/// - derivation path of the address used, whether the address has password,
+/// corresponding
+/// [`MultiSigner`](https://docs.rs/sp-runtime/6.0.0/sp_runtime/enum.MultiSigner.html)
+/// value
+/// - relevant history [`Event`](definitions::history::Event) set: warnings
+/// that were shown during the parsing
 #[cfg(feature = "signer")]
 #[derive(Debug, Decode, Encode)]
 pub struct TrDbColdSign {
+    /// data to sign
     content: SignContent,
+
+    /// name of the network in which the transaction is made
     network_name: String,
+
+    /// derivation path of the address by which the transaction was generated
     path: String,
+
+    /// is address by which the transaction was generated passworded?
     has_pwd: bool,
+
+    /// [`MultiSigner`](https://docs.rs/sp-runtime/6.0.0/sp_runtime/enum.MultiSigner.html)
+    /// corresponding to the address by which the transaction was generated
     multisigner: MultiSigner,
+
+    /// [`Event`](definitions::history::Event) set produced during parsing
     history: Vec<Event>,
 }
 
+/// Signable transaction content
+///
+/// Signer can sign:
+/// - transactions
+/// - messages
+///
+/// Mortal signable transactions have prelude `53xx00`, immortal have prelude 
+/// `53xx02`. Signable transactions consist of method with call details and
+/// extensions.
+///
+/// Messages contain SCALE-encoded text messages.
 #[cfg(feature = "signer")]
 #[derive(Debug, Decode, Encode)]
 pub enum SignContent {
+    /// `53xx00` or `53xx02` transaction
     Transaction {
+        /// method as raw data
         method: Vec<u8>,
+
+        /// extensions as raw data
         extensions: Vec<u8>,
     },
+
+    /// `53xx03` text message
     Message(String),
 }
 
 #[cfg(feature = "signer")]
 impl TrDbColdSign {
-    /// function to generate TrDbColdSign
+    /// Construct [`TrDbColdSign`] from components.
+    ///
+    /// Required input:
+    ///
+    /// - [`SignContent`] with data to sign
+    /// - name of the network in which the transaction is made
+    /// - derivation path of the address used, whether the address has password,
+    /// corresponding
+    /// [`MultiSigner`](https://docs.rs/sp-runtime/6.0.0/sp_runtime/enum.MultiSigner.html)
+    /// value
+    /// - relevant history [`Event`](definitions::history::Event) set
     pub fn generate(
         content: SignContent,
         network_name: &str,
@@ -763,7 +868,16 @@ impl TrDbColdSign {
             history,
         }
     }
-    /// function to recover TrDbColdSign from storage in the database
+
+    /// Recover [`TrDbColdSign`] from storage in the cold database.
+    ///
+    /// Function requires correct checksum to make sure the signable transaction
+    /// is still the one that were shown to the user previously, and no
+    /// changes to the database have occured.
+    ///
+    /// [`TRANSACTION`] tree is **not** cleared in the process. User is allowed
+    /// to try entering password several times, for all this time the
+    /// transaction remains in the database.
     pub fn from_storage(database_name: &str, checksum: u32) -> Result<Self, ErrorSigner> {
         let sign_encoded = {
             let database = open_db::<Signer>(database_name)?;
@@ -782,23 +896,35 @@ impl TrDbColdSign {
             ))),
         }
     }
-    /// function to get transaction content
+
+    /// Get transaction content.
     pub fn content(&self) -> &SignContent {
         &self.content
     }
-    /// function to get path
+
+    /// Get derivation path.
     pub fn path(&self) -> String {
         self.path.to_string()
     }
-    /// function to get has_pwd
+
+    /// Get `has_pwd` flag.
     pub fn has_pwd(&self) -> bool {
         self.has_pwd
     }
-    /// function to get address key
+
+    /// Get [`MultiSigner`](https://docs.rs/sp-runtime/6.0.0/sp_runtime/enum.MultiSigner.html)
+    /// value
     pub fn multisigner(&self) -> MultiSigner {
         self.multisigner.to_owned()
     }
-    /// function to put TrDbColdSign into storage in the database
+
+    /// Put SCALE-encoded [`TrDbColdSign`] into storage in the [`TRANSACTION`]
+    /// tree of the cold database under the key [`SIGN`].
+    ///
+    /// Function returns `u32` checksum. This checksum is needed to recover
+    /// stored [`TrDbColdSign`] using `from_storage` method.
+    ///
+    /// The [`TRANSACTION`] tree is cleared prior to adding data to storage.
     pub fn store_and_get_checksum(&self, database_name: &str) -> Result<u32, ErrorSigner> {
         let mut transaction_batch = make_batch_clear_tree::<Signer>(database_name, TRANSACTION)?;
         transaction_batch.insert(SIGN, self.encode());
@@ -811,8 +937,28 @@ impl TrDbColdSign {
             Err(e) => Err(<Signer>::db_internal(e)),
         }
     }
-    /// function to apply TrDbColdSign to database
-    /// returns database checksum, to be collected and re-used in case of wrong password entry
+
+    /// Use [`TrDbColdSign`] to add history log data into the cold database.
+    /// 
+    /// Possible history log entries are:
+    ///
+    /// - `Event::TransactionSigned(_)` and `Event::MessageSigned(_)` for the
+    /// cases when the signature was generated and diaplayed through the user
+    /// interface
+    /// - `Event::TransactionSignError(_)` and `Event::MessageSignError(_)` for
+    /// the cases when the user has entered the wrong password and no signature
+    /// was generated. Signer current policy is to log all wrong password entry
+    /// attempts.
+    ///
+    /// Required input:
+    ///
+    /// - `wrong_password` flag; for entries with `true` value the signature
+    /// was not generated, because user has entered the wrong password;
+    /// - user-added text comment for the transaction
+    /// - database name, into which the data is added
+    ///
+    /// Function returns database checksum, to be collected and re-used in case
+    /// of wrong password entry.
     pub fn apply(
         self,
         wrong_password: bool,
@@ -857,8 +1003,22 @@ impl TrDbColdSign {
     }
 }
 
-/// Temporary storage for information needed to import derivations
-/// Secret seed and seed name are required to approve
+/// Temporary storage for derivations import data.
+///
+/// Signer can import **password-free** derivations in bulk using
+/// [`ContentDerivations`](definitions::qr_transfers::ContentDerivations)
+/// payloads.
+///
+/// To approve the derivation payload, i.e. generate all those derivations,
+/// seed name and secret seed phrase are needed. This operation is done
+/// in [`import_derivations`](crate::identities::import_derivations).
+///
+/// [`TrDbColdDerivations`] contains:
+///
+/// - a set of derivations, that was checked when the derivation import was
+/// received by Signer
+/// - [`NetworkSpecs`](definitions::network_specs::NetworkSpecs) for the network
+/// in which the derivations will be used to generate addresses
 #[cfg(feature = "signer")]
 #[derive(Debug, Decode, Encode)]
 pub struct TrDbColdDerivations {
