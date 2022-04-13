@@ -8,7 +8,7 @@ use std::sync::{Mutex, TryLockError};
 use definitions::{error_signer::Signer, keyring::NetworkSpecsKey};
 
 mod actions;
-use actions::Action;
+pub use actions::Action;
 pub mod alerts;
 pub mod modals;
 mod navstate;
@@ -35,14 +35,13 @@ lazy_static! {
 }
 
 ///This should be called from UI; returns new UI information as JSON
-pub fn do_action(action_str: &str, details_str: &str, secret_seed_phrase: &str) -> String {
+pub fn do_action(action: Action, details_str: &str, secret_seed_phrase: &str) -> String {
     //If can't lock - debounce failed, ignore action
     //
     //guard is defined here to outline lifetime properly
     let guard = STATE.try_lock();
     match guard {
         Ok(mut state) => {
-            let action = Action::parse(action_str);
             let details = (*state).perform(action, details_str, secret_seed_phrase);
             (*state).generate_json(&details)
         }

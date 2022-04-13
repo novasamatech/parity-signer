@@ -31,12 +31,11 @@
 //!
 use parity_scale_codec::{Decode, Encode};
 use sled::IVec;
-use sp_runtime::MultiSigner;
 
 #[cfg(feature = "active")]
 use crate::error_active::{DatabaseActive, ErrorActive, KeyDecodingActive};
 use crate::{
-    crypto::Encryption,
+    crypto::{Encryption, MultiSigner},
     error::{AddressKeySource, ErrorSource, SpecsKeySource},
 };
 #[cfg(feature = "signer")]
@@ -242,9 +241,9 @@ impl AddressKey {
         source: AddressKeySource<T>,
     ) -> Result<(Vec<u8>, Encryption), T::Error> {
         match &self.multi_signer(source)? {
-            MultiSigner::Ed25519(b) => Ok((b.to_vec(), Encryption::Ed25519)),
-            MultiSigner::Sr25519(b) => Ok((b.to_vec(), Encryption::Sr25519)),
-            MultiSigner::Ecdsa(b) => Ok((b.0.to_vec(), Encryption::Ecdsa)),
+            MultiSigner::Ed25519 { public } => Ok((public.to_vec(), Encryption::Ed25519)),
+            MultiSigner::Sr25519 { public } => Ok((public.to_vec(), Encryption::Sr25519)),
+            MultiSigner::Ecdsa { public } => Ok((public.to_vec(), Encryption::Ecdsa)),
         }
     }
 

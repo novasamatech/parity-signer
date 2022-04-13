@@ -11,7 +11,6 @@ hex = {version = "0.4.3", optional = true}
 lazy_static = {version = "1.4.0", optional = true}
 regex = {version = "1.5.4", optional = true}
 sp-core = {git = "https://github.com/paritytech/substrate", default-features = false, features = ["full_crypto"], optional = true}
-sp-runtime = {git = "https://github.com/paritytech/substrate", default-features = false, optional = true}
 
 [features]
 default = ["test"]
@@ -24,7 +23,6 @@ active = [
 signer = [
 	"definitions/signer",
 	"sp-core",
-	"sp-runtime",
 ]
 test = [
 	"active",

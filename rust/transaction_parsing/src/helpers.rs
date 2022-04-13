@@ -1,7 +1,7 @@
 use constants::{METATREE, SPECSTREE};
 use db_handling::helpers::{get_types, open_db, open_tree};
 use definitions::{
-    crypto::Encryption,
+    crypto::{Encryption, MultiSigner},
     error::{ErrorSource, MetadataError, MetadataSource},
     error_signer::{
         DatabaseSigner, ErrorSigner, InputSigner, NotFoundSigner, NotHexSigner, Signer,
@@ -14,7 +14,6 @@ use definitions::{
 use frame_metadata::RuntimeMetadata;
 use parser::{method::OlderMeta, MetadataBundle};
 use sp_core::{ecdsa, ed25519, sr25519};
-use sp_runtime::MultiSigner;
 use std::convert::TryInto;
 
 /// Function to get the network specs from the database
@@ -179,9 +178,9 @@ pub fn multisigner_msg_genesis_encryption(
     let (multi_signer, data, encryption) = match &data_hex[2..4] {
         "00" => match data.get(3..35) {
             Some(a) => (
-                MultiSigner::Ed25519(ed25519::Public::from_raw(
-                    a.try_into().expect("static length"),
-                )),
+                MultiSigner::Ed25519 {
+                    public: ed25519::Public::from_raw(a.try_into().expect("static length")).into(),
+                },
                 &data[35..],
                 Encryption::Ed25519,
             ),
@@ -189,9 +188,9 @@ pub fn multisigner_msg_genesis_encryption(
         },
         "01" => match data.get(3..35) {
             Some(a) => (
-                MultiSigner::Sr25519(sr25519::Public::from_raw(
-                    a.try_into().expect("static length"),
-                )),
+                MultiSigner::Sr25519 {
+                    public: sr25519::Public::from_raw(a.try_into().expect("static length")).into(),
+                },
                 &data[35..],
                 Encryption::Sr25519,
             ),
@@ -199,9 +198,9 @@ pub fn multisigner_msg_genesis_encryption(
         },
         "02" => match data.get(3..36) {
             Some(a) => (
-                MultiSigner::Ecdsa(ecdsa::Public::from_raw(
-                    a.try_into().expect("static length"),
-                )),
+                MultiSigner::Ecdsa {
+                    public: ecdsa::Public::from_raw(a.try_into().expect("static length")).into(),
+                },
                 &data[36..],
                 Encryption::Ecdsa,
             ),

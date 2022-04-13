@@ -1,3 +1,5 @@
+use std::convert::TryInto;
+
 use constants::{ADDRESS_BOOK, EXPORT_FOLDER, HOT_DB_NAME, METATREE};
 use db_handling::helpers::{get_meta_values_by_name_version, open_db, open_tree};
 use definitions::{
@@ -273,7 +275,7 @@ fn get_address_book_set() -> Result<Vec<AddressSpecs>, ErrorActive> {
         let specs = network_specs_from_entry(x)?;
         for y in out.iter() {
             if y.name == specs.name {
-                if y.genesis_hash != specs.genesis_hash {
+                if y.genesis_hash.to_vec() != specs.genesis_hash {
                     return Err(ErrorActive::Database(
                         DatabaseActive::TwoGenesisHashVariantsForName {
                             name: x.name.to_string(),
@@ -297,7 +299,11 @@ fn get_address_book_set() -> Result<Vec<AddressSpecs>, ErrorActive> {
         let new = AddressSpecs {
             address: x.address.to_string(),
             base58prefix: specs.base58prefix,
-            genesis_hash: specs.genesis_hash,
+            genesis_hash: specs
+                .genesis_hash
+                .clone()
+                .try_into()
+                .expect("genesis hash always has fixed size; qed"),
             name: specs.name.to_string(),
         };
         if !out.contains(&new) {

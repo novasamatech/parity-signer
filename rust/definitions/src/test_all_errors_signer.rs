@@ -11,9 +11,8 @@
 use anyhow::anyhow;
 use sled::{transaction::TransactionError, IVec};
 use sp_core::crypto::SecretStringError;
-use sp_runtime::MultiSigner;
 
-use crate::crypto::Encryption;
+use crate::crypto::{Encryption, MultiSigner};
 use crate::error::{AddressGeneration, AddressGenerationCommon, MetadataError, TransferContent};
 use crate::error_signer::{
     DatabaseSigner, EntryDecodingSigner, ErrorSigner, ExtraAddressGenerationSigner,
@@ -32,21 +31,27 @@ const PUBLIC: [u8; 32] = [
 
 /// `Verifier` mock value.
 fn verifier_sr25519() -> Verifier {
-    Verifier(Some(verifier_value_sr25519()))
+    Verifier {
+        verifier_value: Some(verifier_value_sr25519()),
+    }
 }
 
 /// `VerifierValue` mock value.
 fn verifier_value_sr25519() -> VerifierValue {
-    VerifierValue::Standard(MultiSigner::Sr25519(sp_core::sr25519::Public::from_raw(
-        PUBLIC,
-    )))
+    VerifierValue::Standard {
+        multi_signer: MultiSigner::Sr25519 {
+            public: sp_core::sr25519::Public::from_raw(PUBLIC).into(),
+        },
+    }
 }
 
 /// Another `VerifierValue` mock value.
 fn verifier_value_ed25519() -> VerifierValue {
-    VerifierValue::Standard(MultiSigner::Ed25519(sp_core::ed25519::Public::from_raw(
-        PUBLIC,
-    )))
+    VerifierValue::Standard {
+        multi_signer: MultiSigner::Ed25519 {
+            public: sp_core::ed25519::Public::from_raw(PUBLIC).into(),
+        },
+    }
 }
 
 /// Mock non-hexadecimal `String`.
@@ -563,7 +568,9 @@ fn address_generation_common() -> Vec<AddressGenerationCommon> {
 
     // `DerivationExists` error.
     out.push(AddressGenerationCommon::DerivationExists(
-        MultiSigner::Sr25519(sp_core::sr25519::Public::from_raw(PUBLIC)),
+        MultiSigner::Sr25519 {
+            public: sp_core::sr25519::Public::from_raw(PUBLIC).into(),
+        },
         AddressDetails {
             seed_name: String::from("Alice"),
             path: String::from("//Alice"),

@@ -14,8 +14,6 @@ use sled::Batch;
 #[cfg(any(feature = "active", feature = "signer"))]
 use sp_core::{ecdsa, ed25519, sr25519, Pair};
 #[cfg(any(feature = "active", feature = "signer"))]
-use sp_runtime::MultiSigner;
-#[cfg(any(feature = "active", feature = "signer"))]
 use zeroize::Zeroize;
 
 #[cfg(any(feature = "active", feature = "signer"))]
@@ -30,7 +28,7 @@ use defaults::default_chainspecs;
 
 #[cfg(any(feature = "active", feature = "signer"))]
 use definitions::{
-    crypto::Encryption,
+    crypto::{Encryption, MultiSigner},
     error::{AddressGenerationCommon, ErrorSource},
     helpers::multisigner_to_public,
     history::{Event, IdentityHistory},
@@ -143,7 +141,9 @@ pub(crate) fn create_address<T: ErrorSource>(
         Encryption::Ed25519 => match ed25519::Pair::from_string(&full_address, None) {
             Ok(a) => {
                 full_address.zeroize();
-                MultiSigner::Ed25519(a.public())
+                MultiSigner::Ed25519 {
+                    public: a.public().into(),
+                }
             }
             Err(e) => {
                 full_address.zeroize();
@@ -155,7 +155,9 @@ pub(crate) fn create_address<T: ErrorSource>(
         Encryption::Sr25519 => match sr25519::Pair::from_string(&full_address, None) {
             Ok(a) => {
                 full_address.zeroize();
-                MultiSigner::Sr25519(a.public())
+                MultiSigner::Sr25519 {
+                    public: a.public().into(),
+                }
             }
             Err(e) => {
                 full_address.zeroize();
@@ -167,7 +169,9 @@ pub(crate) fn create_address<T: ErrorSource>(
         Encryption::Ecdsa => match ecdsa::Pair::from_string(&full_address, None) {
             Ok(a) => {
                 full_address.zeroize();
-                MultiSigner::Ecdsa(a.public())
+                MultiSigner::Ecdsa {
+                    public: a.public().into(),
+                }
             }
             Err(e) => {
                 full_address.zeroize();
@@ -196,7 +200,7 @@ pub(crate) fn create_address<T: ErrorSource>(
         cropped_path,
         &network_specs.genesis_hash,
     );
-    output_events.push(Event::IdentityAdded(identity_history));
+    output_events.push(Event::IdentityAdded { identity_history });
 
     let mut number_in_current = None;
 
@@ -313,7 +317,9 @@ pub fn try_create_seed(
     roots: bool,
     database_name: &str,
 ) -> Result<(), ErrorSigner> {
-    let mut events: Vec<Event> = vec![Event::SeedCreated(seed_name.to_string())];
+    let mut events: Vec<Event> = vec![Event::SeedCreated {
+        seed_created: seed_name.to_string(),
+    }];
     let (id_batch, add_events) = populate_addresses::<Signer>(
         database_name,
         Batch::default(),
@@ -361,7 +367,7 @@ pub fn remove_keys_set(
             &address_details.path,
             &network_specs.genesis_hash,
         );
-        events.push(Event::IdentityRemoved(identity_history));
+        events.push(Event::IdentityRemoved { identity_history });
         address_details.network_id = address_details
             .network_id
             .into_iter()
@@ -597,7 +603,7 @@ pub fn remove_seed(database_name: &str, seed_name: &str) -> Result<(), ErrorSign
                 &address_details.path,
                 &genesis_hash_vec,
             );
-            events.push(Event::IdentityRemoved(identity_history));
+            events.push(Event::IdentityRemoved { identity_history });
         }
     }
     TrDbCold::new()

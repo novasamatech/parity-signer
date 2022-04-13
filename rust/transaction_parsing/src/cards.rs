@@ -1,8 +1,8 @@
 use sp_core::crypto::{Ss58AddressFormat, Ss58Codec};
-use sp_runtime::{generic::Era, MultiSigner};
+use sp_runtime::generic::Era;
 
 use definitions::{
-    crypto::Encryption,
+    crypto::{Encryption, MultiSigner},
     error::ErrorSource,
     error_signer::{ErrorSigner, Signer},
     helpers::{make_identicon_from_multisigner, print_multisigner_as_base58},
@@ -131,9 +131,9 @@ impl<'a> Card<'a> {
             Card::AuthorPublicKey(author) => {
                 let hex_identicon = hex::encode(make_identicon_from_multisigner(author));
                 let insert = match author {
-                    MultiSigner::Ed25519(p) => format!("{{\"public_key\":\"{}\",\"identicon\":\"{}\",\"encryption\":\"{}\"}}", hex::encode(&p), hex_identicon, Encryption::Ed25519.show()),
-                    MultiSigner::Sr25519(p) => format!("{{\"public_key\":\"{}\",\"identicon\":\"{}\",\"encryption\":\"{}\"}}", hex::encode(&p), hex_identicon, Encryption::Sr25519.show()),
-                    MultiSigner::Ecdsa(p) => format!("{{\"public_key\":\"{}\",\"identicon\":\"{}\",\"encryption\":\"{}\"}}", hex::encode(&p), hex_identicon, Encryption::Ecdsa.show()),
+                    MultiSigner::Ed25519{ public } => format!("{{\"public_key\":\"{}\",\"identicon\":\"{}\",\"encryption\":\"{}\"}}", hex::encode(&public), hex_identicon, Encryption::Ed25519.show()),
+                    MultiSigner::Sr25519{ public } => format!("{{\"public_key\":\"{}\",\"identicon\":\"{}\",\"encryption\":\"{}\"}}", hex::encode(&public), hex_identicon, Encryption::Sr25519.show()),
+                    MultiSigner::Ecdsa{ public } => format!("{{\"public_key\":\"{}\",\"identicon\":\"{}\",\"encryption\":\"{}\"}}", hex::encode(&public), hex_identicon, Encryption::Ecdsa.show()),
                 };
                 fancy(index, indent, "author_public_key", &insert)
             },

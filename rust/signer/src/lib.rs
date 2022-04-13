@@ -16,10 +16,42 @@
 
 mod export;
 
+use std::fmt::Display;
+
+use definitions::crypto::*;
+use definitions::error_active::*;
+use definitions::history::*;
+use definitions::network_specs::*;
+use navigator::Action;
+use sp_runtime::app_crypto::ecdsa;
+use sp_runtime::app_crypto::ed25519;
+use sp_runtime::testing::sr25519;
+
+#[derive(Debug)]
+pub struct ErrorDisplayed {
+    text: String,
+}
+
+impl From<anyhow::Error> for ErrorDisplayed {
+    fn from(e: anyhow::Error) -> Self {
+        Self {
+            text: format!("error on signer side: {}", e),
+        }
+    }
+}
+
+impl Display for ErrorDisplayed {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.write_str(&self.text)
+    }
+}
+
+include!(concat!(env!("OUT_DIR"), "/signer.uniffi.rs"));
+
 export! {
     @Java_io_parity_signer_models_SignerDataModel_backendAction
     fn act(
-        action: &str,
+        action: Action,
         details: &str,
         seed_phrase: &str
     ) -> String {
@@ -45,8 +77,8 @@ export! {
     fn get_packets_total(
         data: &str,
         cleaned: bool
-    ) -> anyhow::Result<u32, anyhow::Error> {
-        qr_reader_phone::get_length(data, cleaned)
+    ) -> anyhow::Result<u32, ErrorDisplayed> {
+        qr_reader_phone::get_length(data, cleaned).map_err(Into::into)
     }
 
     @Java_io_parity_signer_models_SignerDataModel_qrparserTryDecodeQrSequence
@@ -104,10 +136,10 @@ export! {
 
     @Java_io_parity_signer_models_SignerDataModel_historyHistoryEntrySystem
     fn history_entry_system(
-        entry: &str,
+        event: Event,
         dbname: &str
     ) -> anyhow::Result<(), anyhow::Error> {
-        db_handling::manage_history::history_entry_system(dbname, entry.to_string()).map_err(|e| e.anyhow())
+        db_handling::manage_history::history_entry_system(dbname, event).map_err(|e| e.anyhow())
     }
 
     @Java_io_parity_signer_models_SignerDataModel_historySeedNameWasShown

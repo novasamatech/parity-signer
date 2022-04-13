@@ -22,5 +22,6 @@ fn cold_release() -> Result<(), String> {
 }
 
 fn main() -> Result<(), String> {
+    uniffi_build::generate_scaffolding("./src/signer.udl").unwrap();
     cold_release()
 }

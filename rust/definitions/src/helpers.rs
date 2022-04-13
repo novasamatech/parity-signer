@@ -4,14 +4,13 @@ use hex;
 use sp_core::crypto::{Ss58AddressFormat, Ss58Codec};
 #[cfg(feature = "signer")]
 use sp_core::{ecdsa, ed25519, sr25519};
-use sp_runtime::MultiSigner;
 #[cfg(feature = "signer")]
 use std::convert::TryInto;
 
 #[cfg(feature = "signer")]
 use plot_icon::generate_png_scaled_default;
 
-use crate::crypto::Encryption;
+use crate::crypto::{Encryption, MultiSigner};
 use crate::error::ErrorSource;
 #[cfg(feature = "signer")]
 use crate::error_signer::{ErrorSigner, InterfaceSigner};
@@ -41,9 +40,9 @@ pub fn unhex<T: ErrorSource>(hex_entry: &str, what: T::NotHex) -> Result<Vec<u8>
 /// [`MultiSigner`](https://docs.rs/sp-runtime/6.0.0/sp_runtime/enum.MultiSigner.html)  
 pub fn multisigner_to_public(m: &MultiSigner) -> Vec<u8> {
     match m {
-        MultiSigner::Ed25519(a) => a.to_vec(),
-        MultiSigner::Sr25519(a) => a.to_vec(),
-        MultiSigner::Ecdsa(a) => a.0.to_vec(),
+        MultiSigner::Ed25519 { public } => public.to_vec(),
+        MultiSigner::Sr25519 { public } => public.to_vec(),
+        MultiSigner::Ecdsa { public } => public.to_vec(),
     }
 }
 
@@ -51,9 +50,9 @@ pub fn multisigner_to_public(m: &MultiSigner) -> Vec<u8> {
 /// [`MultiSigner`](https://docs.rs/sp-runtime/6.0.0/sp_runtime/enum.MultiSigner.html)  
 pub fn multisigner_to_encryption(m: &MultiSigner) -> Encryption {
     match m {
-        MultiSigner::Ed25519(_) => Encryption::Ed25519,
-        MultiSigner::Sr25519(_) => Encryption::Sr25519,
-        MultiSigner::Ecdsa(_) => Encryption::Ecdsa,
+        MultiSigner::Ed25519 { .. } => Encryption::Ed25519,
+        MultiSigner::Sr25519 { .. } => Encryption::Sr25519,
+        MultiSigner::Ecdsa { .. } => Encryption::Ecdsa,
     }
 }
 
@@ -74,21 +73,27 @@ pub fn get_multisigner(public: &[u8], encryption: &Encryption) -> Result<MultiSi
                 Ok(a) => a,
                 Err(_) => return Err(ErrorSigner::Interface(InterfaceSigner::PublicKeyLength)),
             };
-            Ok(MultiSigner::Ed25519(ed25519::Public::from_raw(into_pubkey)))
+            Ok(MultiSigner::Ed25519 {
+                public: ed25519::Public::from_raw(into_pubkey).into(),
+            })
         }
         Encryption::Sr25519 => {
             let into_pubkey: [u8; 32] = match public.to_vec().try_into() {
                 Ok(a) => a,
                 Err(_) => return Err(ErrorSigner::Interface(InterfaceSigner::PublicKeyLength)),
             };
-            Ok(MultiSigner::Sr25519(sr25519::Public::from_raw(into_pubkey)))
+            Ok(MultiSigner::Sr25519 {
+                public: sr25519::Public::from_raw(into_pubkey).into(),
+            })
         }
         Encryption::Ecdsa => {
             let into_pubkey: [u8; 33] = match public.to_vec().try_into() {
                 Ok(a) => a,
                 Err(_) => return Err(ErrorSigner::Interface(InterfaceSigner::PublicKeyLength)),
             };
-            Ok(MultiSigner::Ecdsa(ecdsa::Public::from_raw(into_pubkey)))
+            Ok(MultiSigner::Ecdsa {
+                public: ecdsa::Public::from_raw(into_pubkey).into(),
+            })
         }
     }
 }
@@ -109,19 +114,33 @@ pub fn print_multisigner_as_base58(
         Some(base58prefix) => {
             let version_for_base58 = Ss58AddressFormat::custom(base58prefix);
             match multi_signer {
-                MultiSigner::Ed25519(pubkey) => {
-                    pubkey.to_ss58check_with_version(version_for_base58)
+                MultiSigner::Ed25519 { public } => {
+                    let p: ed25519::Public = public.clone().into();
+                    p.to_ss58check_with_version(version_for_base58)
                 }
-                MultiSigner::Sr25519(pubkey) => {
-                    pubkey.to_ss58check_with_version(version_for_base58)
+                MultiSigner::Sr25519 { public } => {
+                    let p: sr25519::Public = public.clone().into();
+                    p.to_ss58check_with_version(version_for_base58)
                 }
-                MultiSigner::Ecdsa(pubkey) => pubkey.to_ss58check_with_version(version_for_base58),
+                MultiSigner::Ecdsa { public } => {
+                    let p: ecdsa::Public = public.clone().into();
+                    p.to_ss58check_with_version(version_for_base58)
+                }
             }
         }
         None => match multi_signer {
-            MultiSigner::Ed25519(pubkey) => pubkey.to_ss58check(),
-            MultiSigner::Sr25519(pubkey) => pubkey.to_ss58check(),
-            MultiSigner::Ecdsa(pubkey) => pubkey.to_ss58check(),
+            MultiSigner::Ed25519 { public } => {
+                let p: ed25519::Public = public.clone().into();
+                p.to_ss58check()
+            }
+            MultiSigner::Sr25519 { public } => {
+                let p: sr25519::Public = public.clone().into();
+                p.to_ss58check()
+            }
+            MultiSigner::Ecdsa { public } => {
+                let p: ecdsa::Public = public.clone().into();
+                p.to_ss58check()
+            }
         },
     }
 }

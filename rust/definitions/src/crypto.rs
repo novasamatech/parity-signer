@@ -69,8 +69,8 @@
 //! Signer keeps track of the generated [`SufficientCrypto`] QR codes in
 //! history log.  
 use parity_scale_codec::{Decode, Encode};
-use sp_core;
-use sp_runtime::{MultiSignature, MultiSigner};
+use sp_core::{self, ecdsa, ed25519, hexdisplay::AsBytesRef, sr25519};
+use sp_runtime::MultiSignature;
 
 use crate::network_specs::VerifierValue;
 
@@ -138,15 +138,27 @@ impl SufficientCrypto {
             SufficientCrypto::Ed25519 {
                 public,
                 signature: _,
-            } => VerifierValue::Standard(MultiSigner::Ed25519(public.to_owned())),
+            } => VerifierValue::Standard {
+                multi_signer: MultiSigner::Ed25519 {
+                    public: public.clone().into(),
+                },
+            },
             SufficientCrypto::Sr25519 {
                 public,
                 signature: _,
-            } => VerifierValue::Standard(MultiSigner::Sr25519(public.to_owned())),
+            } => VerifierValue::Standard {
+                multi_signer: MultiSigner::Sr25519 {
+                    public: public.clone().into(),
+                },
+            },
             SufficientCrypto::Ecdsa {
                 public,
                 signature: _,
-            } => VerifierValue::Standard(MultiSigner::Ecdsa(public.to_owned())),
+            } => VerifierValue::Standard {
+                multi_signer: MultiSigner::Ecdsa {
+                    public: public.clone().into(),
+                },
+            },
         }
     }
 
@@ -167,5 +179,143 @@ impl SufficientCrypto {
                 signature,
             } => MultiSignature::Ecdsa(signature.to_owned()),
         }
+    }
+}
+
+#[derive(Encode, Decode, Clone, Debug, PartialEq)]
+pub struct Ed25519Public {
+    pub public: Vec<u8>,
+}
+
+impl From<ed25519::Public> for Ed25519Public {
+    fn from(p: ed25519::Public) -> Self {
+        Self { public: p.0.into() }
+    }
+}
+
+impl Into<ed25519::Public> for Ed25519Public {
+    fn into(self) -> ed25519::Public {
+        ed25519::Public(
+            self.public
+                .try_into()
+                .expect("ed25519 public keys have constant lengths; qed"),
+        )
+    }
+}
+
+impl AsRef<[u8]> for Ed25519Public {
+    fn as_ref(&self) -> &[u8] {
+        self.public.as_ref()
+    }
+}
+
+impl PartialEq<ed25519::Public> for Ed25519Public {
+    fn eq(&self, other: &ed25519::Public) -> bool {
+        self.public == other.0
+    }
+}
+
+#[derive(Encode, Decode, Clone, Debug, PartialEq)]
+pub struct Sr25519Public {
+    pub public: Vec<u8>,
+}
+
+impl From<sr25519::Public> for Sr25519Public {
+    fn from(p: sr25519::Public) -> Self {
+        Self { public: p.0.into() }
+    }
+}
+
+impl Into<sr25519::Public> for Sr25519Public {
+    fn into(self) -> sr25519::Public {
+        sr25519::Public(
+            self.public
+                .try_into()
+                .expect("sr25519 public keys have constant lengths; qed"),
+        )
+    }
+}
+
+impl AsRef<[u8]> for Sr25519Public {
+    fn as_ref(&self) -> &[u8] {
+        self.public.as_ref()
+    }
+}
+
+impl PartialEq<sr25519::Public> for Sr25519Public {
+    fn eq(&self, other: &sr25519::Public) -> bool {
+        self.public == other.0
+    }
+}
+
+#[derive(Encode, Decode, Clone, Debug, PartialEq)]
+pub struct EcdsaPublic {
+    pub public: Vec<u8>,
+}
+
+impl From<ecdsa::Public> for EcdsaPublic {
+    fn from(p: ecdsa::Public) -> Self {
+        Self { public: p.0.into() }
+    }
+}
+
+impl Into<ecdsa::Public> for EcdsaPublic {
+    fn into(self) -> ecdsa::Public {
+        ecdsa::Public(
+            self.public
+                .try_into()
+                .expect("ecdsa public keys constant lengths; qed"),
+        )
+    }
+}
+
+impl AsRef<[u8]> for EcdsaPublic {
+    fn as_ref(&self) -> &[u8] {
+        self.public.as_ref()
+    }
+}
+
+impl PartialEq<ecdsa::Public> for EcdsaPublic {
+    fn eq(&self, other: &ecdsa::Public) -> bool {
+        self.public == other.0
+    }
+}
+
+#[derive(Encode, Decode, Clone, Debug, PartialEq)]
+pub enum MultiSigner {
+    Ed25519 { public: Ed25519Public },
+    Sr25519 { public: Sr25519Public },
+    Ecdsa { public: EcdsaPublic },
+}
+
+impl From<sp_runtime::MultiSigner> for MultiSigner {
+    fn from(ms: sp_runtime::MultiSigner) -> Self {
+        match ms {
+            sp_runtime::MultiSigner::Ed25519(public) => Self::Ed25519 {
+                public: public.into(),
+            },
+            sp_runtime::MultiSigner::Sr25519(public) => Self::Sr25519 {
+                public: public.into(),
+            },
+            sp_runtime::MultiSigner::Ecdsa(public) => Self::Ecdsa {
+                public: public.into(),
+            },
+        }
+    }
+}
+impl Ed25519Public {
+    pub(crate) fn to_vec(&self) -> Vec<u8> {
+        self.public.clone()
+    }
+}
+
+impl Sr25519Public {
+    pub(crate) fn to_vec(&self) -> Vec<u8> {
+        self.public.clone()
+    }
+}
+impl EcdsaPublic {
+    pub(crate) fn to_vec(&self) -> Vec<u8> {
+        self.public.clone()
     }
 }

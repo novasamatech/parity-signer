@@ -1,6 +1,5 @@
 use parity_scale_codec::Encode;
 use sp_core::{ecdsa, ed25519, sr25519, Pair};
-use sp_runtime::MultiSigner;
 use zeroize::Zeroize;
 
 use db_handling::{
@@ -10,7 +9,7 @@ use db_handling::{
     prep_messages::{get_genesis_hash, prep_types},
 };
 use definitions::{
-    crypto::SufficientCrypto,
+    crypto::{MultiSigner, SufficientCrypto},
     error_signer::{ErrorSigner, Signer},
     history::{Event, MetaValuesDisplay, MetaValuesExport, NetworkSpecsExport, TypesExport},
     keyring::NetworkSpecsKey,
@@ -26,7 +25,7 @@ pub(crate) fn sign_as_address_key(
     pwd: Option<&str>,
 ) -> Result<SufficientCrypto, ErrorSigner> {
     match multisigner {
-        MultiSigner::Ed25519(public) => {
+        MultiSigner::Ed25519 { public } => {
             let ed25519_pair = match ed25519::Pair::from_string(full_address, pwd) {
                 Ok(x) => x,
                 Err(e) => return Err(ErrorSigner::AddressUse(e)),
@@ -37,11 +36,11 @@ pub(crate) fn sign_as_address_key(
             // secret zeroize on drop, https://docs.rs/ed25519-dalek/1.0.1/src/ed25519_dalek/secret.rs.html#43
             let signature = ed25519_pair.sign(to_sign);
             Ok(SufficientCrypto::Ed25519 {
-                public: public.to_owned(),
+                public: public.to_owned().into(),
                 signature,
             })
         }
-        MultiSigner::Sr25519(public) => {
+        MultiSigner::Sr25519 { public } => {
             let sr25519_pair = match sr25519::Pair::from_string(full_address, pwd) {
                 Ok(x) => x,
                 Err(e) => return Err(ErrorSigner::AddressUse(e)),
@@ -52,11 +51,11 @@ pub(crate) fn sign_as_address_key(
             // pair zeroize on drop, https://docs.rs/schnorrkel/0.9.1/src/schnorrkel/keys.rs.html#680
             let signature = sr25519_pair.sign(to_sign);
             Ok(SufficientCrypto::Sr25519 {
-                public: public.to_owned(),
+                public: public.to_owned().into(),
                 signature,
             })
         }
-        MultiSigner::Ecdsa(public) => {
+        MultiSigner::Ecdsa { public } => {
             let ecdsa_pair = match ecdsa::Pair::from_string(full_address, pwd) {
                 Ok(x) => x,
                 Err(e) => return Err(ErrorSigner::AddressUse(e)),
@@ -66,7 +65,7 @@ pub(crate) fn sign_as_address_key(
             }
             let signature = ecdsa_pair.sign(to_sign);
             Ok(SufficientCrypto::Ecdsa {
-                public: public.to_owned(),
+                public: public.to_owned().into(),
                 signature,
             })
         }
@@ -121,10 +120,9 @@ pub(crate) fn sufficient_crypto_load_types(
             TrDbCold::new()
                 .set_history(events_to_batch::<Signer>(
                     database_name,
-                    vec![Event::TypesSigned(TypesExport::get(
-                        &types_content,
-                        &s.verifier_value(),
-                    ))],
+                    vec![Event::TypesSigned {
+                        types_export: TypesExport::get(&types_content, &s.verifier_value()),
+                    }],
                 )?)
                 .apply::<Signer>(database_name)?;
             hex_qr_from_sufficient(s)?
@@ -177,10 +175,12 @@ pub(crate) fn sufficient_crypto_load_metadata(
             TrDbCold::new()
                 .set_history(events_to_batch::<Signer>(
                     database_name,
-                    vec![Event::MetadataSigned(MetaValuesExport::get(
-                        &meta_values,
-                        &s.verifier_value(),
-                    ))],
+                    vec![Event::MetadataSigned {
+                        meta_values_export: MetaValuesExport::get(
+                            &meta_values,
+                            &s.verifier_value(),
+                        ),
+                    }],
                 )?)
                 .apply::<Signer>(database_name)?;
             hex_qr_from_sufficient(s)?
@@ -226,10 +226,12 @@ pub(crate) fn sufficient_crypto_add_specs(
             TrDbCold::new()
                 .set_history(events_to_batch::<Signer>(
                     database_name,
-                    vec![Event::NetworkSpecsSigned(NetworkSpecsExport::get(
-                        &network_specs_to_send,
-                        &s.verifier_value(),
-                    ))],
+                    vec![Event::NetworkSpecsSigned {
+                        network_specs_export: NetworkSpecsExport::get(
+                            &network_specs_to_send,
+                            &s.verifier_value(),
+                        ),
+                    }],
                 )?)
                 .apply::<Signer>(database_name)?;
             hex_qr_from_sufficient(s)?

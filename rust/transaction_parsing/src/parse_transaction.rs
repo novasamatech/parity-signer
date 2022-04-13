@@ -114,13 +114,13 @@ pub(crate) fn parse_transaction(
                 ) {
                     Ok(extensions_cards) => {
                         if i > 0 {
-                            history.push(Event::Warning(
-                                Warning::NewerVersion {
+                            history.push(Event::Warning {
+                                warning: Warning::NewerVersion {
                                     used_version,
                                     latest_version,
                                 }
                                 .show(),
-                            ));
+                            });
                             cards_prep = match cards_prep {
                                 CardsPrep::SignProceed(address_details, _) => {
                                     CardsPrep::SignProceed(

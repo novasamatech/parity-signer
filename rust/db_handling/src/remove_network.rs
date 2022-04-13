@@ -43,9 +43,11 @@ pub fn remove_network(
     let valid_current_verifier = get_valid_current_verifier(&verifier_key, database_name)?;
 
     // modify verifier as needed
-    if let ValidCurrentVerifier::Custom(ref a) = valid_current_verifier {
-        match a {
-            Verifier(None) => (),
+    if let ValidCurrentVerifier::Custom { ref verifier } = valid_current_verifier {
+        match verifier {
+            Verifier {
+                verifier_value: None,
+            } => (),
             _ => {
                 verifiers_batch.remove(verifier_key.key());
                 verifiers_batch.insert(verifier_key.key(), (CurrentVerifier::Dead).encode());
@@ -67,11 +69,13 @@ pub fn remove_network(
                 NetworkSpecs::from_entry_with_key_checked::<Signer>(&x_network_specs_key, entry)?;
             if x_network_specs.genesis_hash == network_specs.genesis_hash {
                 network_specs_batch.remove(x_network_specs_key.key());
-                events.push(Event::NetworkSpecsRemoved(NetworkSpecsDisplay::get(
-                    &x_network_specs,
-                    &valid_current_verifier,
-                    &general_verifier,
-                )));
+                events.push(Event::NetworkSpecsRemoved {
+                    network_specs_display: NetworkSpecsDisplay::get(
+                        &x_network_specs,
+                        &valid_current_verifier,
+                        &general_verifier,
+                    ),
+                });
                 keys_to_wipe.push(x_network_specs_key);
             } else if x_network_specs.order > network_specs.order {
                 x_network_specs.order -= 1;
@@ -88,7 +92,9 @@ pub fn remove_network(
             if let Ok((name, version)) = meta_key.name_version::<Signer>() {
                 let meta_values_display =
                     MetaValuesDisplay::from_storage(&name, version, meta_stored);
-                events.push(Event::MetadataRemoved(meta_values_display));
+                events.push(Event::MetadataRemoved {
+                    meta_values_display,
+                });
             }
         }
         // scan through address tree to clean up the network_key(s) from identities
@@ -105,7 +111,7 @@ pub fn remove_network(
                         &address_details.path,
                         &network_specs.genesis_hash,
                     );
-                    events.push(Event::IdentityRemoved(identity_history));
+                    events.push(Event::IdentityRemoved { identity_history });
                     address_details.network_id = address_details
                         .network_id
                         .into_iter()
@@ -159,7 +165,9 @@ fn get_batch_remove_unchecked_meta(
             Ok(Some(meta_stored)) => {
                 let meta_values_display =
                     MetaValuesDisplay::from_storage(network_name, network_version, meta_stored);
-                vec![Event::MetadataRemoved(meta_values_display)]
+                vec![Event::MetadataRemoved {
+                    meta_values_display,
+                }]
             }
             Ok(None) => {
                 return Err(ErrorSigner::NotFound(NotFoundSigner::Metadata {

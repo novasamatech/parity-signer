@@ -1,6 +1,6 @@
 use bitvec::prelude::{BitVec, Lsb0};
 use definitions::{
-    crypto::Encryption,
+    crypto::{Encryption, MultiSigner},
     history::MetaValuesDisplay,
     keyring::VerifierKey,
     metadata::MetaValues,
@@ -12,7 +12,7 @@ use definitions::{
 use hex;
 use parser::cards::ParserCard;
 use sp_core::crypto::AccountId32;
-use sp_runtime::{generic::Era, MultiSigner};
+use sp_runtime::generic::Era;
 use std::convert::TryInto;
 
 use crate::cards::{Card, Warning};
@@ -25,9 +25,11 @@ const PUBLIC: [u8; 32] = [
 ];
 
 fn verifier_value_sr25519() -> VerifierValue {
-    VerifierValue::Standard(MultiSigner::Sr25519(sp_core::sr25519::Public::from_raw(
-        PUBLIC,
-    )))
+    VerifierValue::Standard {
+        multi_signer: MultiSigner::Sr25519 {
+            public: sp_core::sr25519::Public::from_raw(PUBLIC).into(),
+        },
+    }
 }
 
 /// Function to pring all types of cards.
@@ -155,7 +157,9 @@ Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deseru
 
     all_cards.push(
         Card::Author {
-            author: &MultiSigner::Sr25519(sp_core::sr25519::Public::from_raw(PUBLIC)),
+            author: &MultiSigner::Sr25519 {
+                public: sp_core::sr25519::Public::from_raw(PUBLIC).into(),
+            },
             base58prefix: 42,
             address_details: &address_details,
         }
@@ -163,15 +167,17 @@ Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deseru
     );
     all_cards.push(
         Card::AuthorPlain {
-            author: &MultiSigner::Sr25519(sp_core::sr25519::Public::from_raw(PUBLIC)),
+            author: &MultiSigner::Sr25519 {
+                public: sp_core::sr25519::Public::from_raw(PUBLIC).into(),
+            },
             base58prefix: 42,
         }
         .card(&mut index, 0),
     );
     all_cards.push(
-        Card::AuthorPublicKey(&MultiSigner::Sr25519(sp_core::sr25519::Public::from_raw(
-            PUBLIC,
-        )))
+        Card::AuthorPublicKey(&MultiSigner::Sr25519 {
+            public: sp_core::sr25519::Public::from_raw(PUBLIC).into(),
+        })
         .card(&mut index, 0),
     );
     all_cards.push(Card::Verifier(&verifier_value_sr25519()).card(&mut index, 0));

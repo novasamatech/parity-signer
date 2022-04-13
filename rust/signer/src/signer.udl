@@ -1,0 +1,255 @@
+dictionary ErrorDisplayed {
+    string text;
+};
+
+dictionary MetaValuesDisplay {
+    string name;
+    u32 version;
+    sequence<u8> meta_hash;
+};
+
+dictionary Ed25519Public {
+    sequence<u8> public;
+};
+
+dictionary Sr25519Public {
+    sequence<u8> public;
+};
+
+dictionary EcdsaPublic {
+    sequence<u8> public;
+};
+
+[Enum]
+interface MultiSigner {
+    Ed25519(Ed25519Public public);
+    Sr25519(Sr25519Public public);
+    Ecdsa(EcdsaPublic public);
+};
+
+[Enum]
+interface VerifierValue {
+    Standard(MultiSigner multi_signer);
+};
+
+dictionary Verifier {
+    VerifierValue? verifier_value;
+};
+
+enum Encryption {
+    "Ed25519",
+    "Sr25519",
+    "Ecdsa",
+};
+
+[Enum]
+interface ValidCurrentVerifier {
+    General();
+    Custom(Verifier verifier);
+};
+
+dictionary NetworkSpecs {
+    u16 base58prefix;
+    string color;
+    u8 decimals;
+    Encryption encryption;
+    sequence<u8> genesis_hash;
+    string logo;
+    string name;
+    u8 order;
+    string path_id;
+    string secondary_color;
+    string title;
+    string unit;
+};
+
+dictionary NetworkSpecsToSend {
+    u16 base58prefix;
+    string color;
+    u8 decimals;
+    Encryption encryption;
+    sequence<u8> genesis_hash;
+    string logo;
+    string name;
+    string path_id;
+    string secondary_color;
+    string title;
+    string unit;
+};
+
+dictionary NetworkSpecsDisplay {
+    NetworkSpecs specs;
+    ValidCurrentVerifier valid_current_verifier;
+    Verifier general_verifier;
+};
+
+
+dictionary NetworkSpecsExport {
+    NetworkSpecsToSend specs_to_send;
+    VerifierValue signed_by;
+};
+
+dictionary NetworkVerifierDisplay {
+    sequence<u8> genesis_hash;
+    ValidCurrentVerifier valid_current_verifier;
+    Verifier general_verifier;
+};
+
+dictionary TypesDisplay {
+    sequence<u8> types_hash;
+    Verifier verifier;
+};
+
+dictionary TypesExport {
+    sequence<u8> types_hash;
+    VerifierValue signed_by;
+};
+
+dictionary SignDisplay {
+    sequence<u8> transaction;
+    string network_name;
+    VerifierValue signed_by;
+    string user_comment;
+};
+
+dictionary SignMessageDisplay {
+    string message;
+    string network_name;
+    VerifierValue signed_by;
+    string user_comment;
+};
+
+dictionary IdentityHistory {
+    string seed_name;
+    Encryption encryption;
+    sequence<u8> public_key;
+    string path;
+    sequence<u8> network_genesis_hash;
+};
+
+dictionary MetaValuesExport {
+    string name;
+    u32 version;
+    sequence<u8> meta_hash;
+    VerifierValue signed_by;
+};
+
+[Enum]
+interface Event {
+    MetadataAdded(MetaValuesDisplay meta_values_display);
+    MetadataRemoved(MetaValuesDisplay meta_values_display);
+    MetadataSigned(MetaValuesExport meta_values_export);
+    NetworkSpecsAdded(NetworkSpecsDisplay network_specs_display);
+    NetworkSpecsRemoved(NetworkSpecsDisplay network_specs_display);
+    NetworkSpecsSigned(NetworkSpecsExport network_specs_export);
+    NetworkVerifierSet(NetworkVerifierDisplay network_verifier_display);
+    GeneralVerifierSet(Verifier verifier);
+    TypesAdded(TypesDisplay types_display);
+    TypesRemoved(TypesDisplay types_display);
+    TypesSigned(TypesExport types_export);
+    TransactionSigned(SignDisplay sign_display);
+    TransactionSignError(SignDisplay sign_display);
+    MessageSigned(SignMessageDisplay sign_message_display);
+    MessageSignError(SignMessageDisplay sign_message_display);
+    IdentityAdded(IdentityHistory identity_history);
+    IdentityRemoved(IdentityHistory identity_history);
+    IdentitiesWiped();
+    DeviceWasOnline();
+    ResetDangerRecord();
+    SeedCreated(string seed_created);
+    SeedNameWasShown(string seed_name_was_shown);
+    Warning(string warning);
+    WrongPassword();
+    UserEntry(string user_entry);
+    SystemEntry(string system_entry);
+    HistoryCleared();
+    DatabaseInitiated();
+};
+
+enum Action {
+    "Start",
+    "NavbarLog",
+    "NavbarScan",
+    "NavbarKeys",
+    "NavbarSettings",
+    "GoBack",
+    "GoForward",
+    "SelectSeed",
+    "SelectKey",
+    "NewKey",
+    "RightButton",
+    "Shield",
+    "NewSeed",
+    "RecoverSeed",
+    "BackupSeed",
+    "NetworkSelector",
+    "NextUnit",
+    "PreviousUnit",
+    "ChangeNetwork",
+    "CheckPassword",
+    "TransactionFetched",
+    "RemoveNetwork",
+    "RemoveMetadata",
+    "RemoveTypes",
+    "SignNetworkSpecs",
+    "SignMetadata",
+    "SignTypes",
+    "ManageNetworks",
+    "ViewGeneralVerifier",
+    "ManageMetadata",
+    "RemoveKey",
+    "RemoveSeed",
+    "ClearLog",
+    "CreateLogComment",
+    "ShowLogDetails",
+    "Swipe",
+    "LongTap",
+    "SelectAll",
+    "ExportMultiSelect",
+    "Increment",
+    "ShowDocuments",
+    "TextEntry",
+    "PushWord",
+    "Nothing",
+};
+
+namespace signer {
+    void init_navigation([ByRef] string dbname, [ByRef] string seed_names);
+
+    string act(Action action, [ByRef] string details, [ByRef] string seed_phrase);
+
+    void update_seed_names([ByRef] string seed_names);
+
+    [Throws=ErrorDisplayed]
+    u32 get_packets_total([ByRef] string data, boolean cleaned);
+
+    [Throws=ErrorDisplayed]
+    string try_decode_qr_sequence([ByRef] string data, boolean cleaned);
+
+    string path_check([ByRef] string seed_name, [ByRef] string path, [ByRef] string network, [ByRef] string dbname);
+
+    [Throws=ErrorDisplayed]
+    void init_history_with_cert([ByRef] string dbname);
+
+    [Throws=ErrorDisplayed]
+    void init_history_no_cert([ByRef] string dbname);
+
+    [Throws=ErrorDisplayed]
+    void device_was_online([ByRef] string dbname);
+
+    [Throws=ErrorDisplayed]
+    boolean get_warnings([ByRef] string dbname);
+
+    [Throws=ErrorDisplayed]
+    void acknowledge_warnings([ByRef] string dbname);
+
+    [Throws=ErrorDisplayed]
+    void history_entry_system(Event event, [ByRef] string dbname);
+
+    [Throws=ErrorDisplayed]
+    void seed_name_was_shown([ByRef] string seed_name, [ByRef] string dbname);
+
+    string get_all_tx_cards();
+
+    string get_all_log_cards();
+};

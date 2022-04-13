@@ -1,6 +1,3 @@
-//! Navigation state of the app
-
-use sp_runtime::MultiSigner;
 use zeroize::Zeroize;
 
 use crate::actions::Action;
@@ -12,6 +9,7 @@ use crate::screens::{
 };
 use db_handling::interface_signer::{print_guess, BIP_CAP, SAFE_RESERVE, WORD_LENGTH};
 use definitions::{
+    crypto::MultiSigner,
     error::{AddressGeneration, AddressGenerationCommon, AddressKeySource, ErrorSource},
     error_signer::{
         ErrorSigner, ExtraAddressKeySourceSigner, InputSigner, InterfaceSigner, Signer,

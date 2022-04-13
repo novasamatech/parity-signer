@@ -4,12 +4,12 @@ use hex;
 use parity_scale_codec::Encode;
 use plot_icon::EMPTY_PNG;
 use sp_core::{sr25519, Pair};
-use sp_runtime::MultiSigner;
 use std::collections::HashMap;
 use zeroize::{Zeroize, ZeroizeOnDrop};
 
 use constants::{HISTORY, MAX_WORDS_DISPLAY, TRANSACTION};
 use definitions::{
+    crypto::MultiSigner,
     error::{AddressGenerationCommon, ErrorSource},
     error_signer::{DatabaseSigner, ErrorSigner, InterfaceSigner, NotFoundSigner, Signer},
     helpers::{
@@ -99,9 +99,9 @@ fn preferred_multisigner_identicon(multisigner_set: &[MultiSigner]) -> String {
         let mut got_ecdsa = None;
         for x in multisigner_set.iter() {
             match x {
-                MultiSigner::Ed25519(_) => got_ed25519 = Some(x.to_owned()),
-                MultiSigner::Sr25519(_) => got_sr25519 = Some(x.to_owned()),
-                MultiSigner::Ecdsa(_) => got_ecdsa = Some(x.to_owned()),
+                MultiSigner::Ed25519 { .. } => got_ed25519 = Some(x.to_owned()),
+                MultiSigner::Sr25519 { .. } => got_sr25519 = Some(x.to_owned()),
+                MultiSigner::Ecdsa { .. } => got_ecdsa = Some(x.to_owned()),
             }
         }
         if let Some(a) = got_sr25519 {
@@ -483,9 +483,9 @@ pub fn print_new_seed(seed_name: &str) -> Result<String, ErrorSigner> {
             ))
         }
     };
-    let hex_identicon = hex::encode(make_identicon_from_multisigner(&MultiSigner::Sr25519(
-        sr25519_pair.public(),
-    )));
+    let hex_identicon = hex::encode(make_identicon_from_multisigner(&MultiSigner::Sr25519 {
+        public: sr25519_pair.public().into(),
+    }));
     Ok(format!(
         "\"seed\":\"{}\",\"seed_phrase\":\"{}\",\"identicon\":\"{}\"",
         seed_name, seed_phrase, hex_identicon

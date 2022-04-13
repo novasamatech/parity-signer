@@ -1,3 +1,5 @@
+use std::convert::TryInto;
+
 use constants::{ADDRESS_BOOK, HOT_DB_NAME, SPECSTREEPREP};
 use db_handling::{
     db_transactions::TrDbHot,
@@ -89,7 +91,11 @@ pub fn update_db(address: &str, network_specs: &NetworkSpecsToSend) -> Result<()
     let address_book_new_key = AddressBookKey::from_title(&network_specs.title);
     let address_book_new_entry_encoded = AddressBookEntry {
         name: network_specs.name.to_string(),
-        genesis_hash: network_specs.genesis_hash,
+        genesis_hash: network_specs
+            .genesis_hash
+            .clone()
+            .try_into()
+            .expect("genesis hash always has fixed size; qed"),
         address: address.to_string(),
         encryption: network_specs.encryption.clone(),
         def: false,

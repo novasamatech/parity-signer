@@ -10,10 +10,9 @@
 
 use parity_scale_codec::{Decode, Encode};
 use sled::IVec;
-use sp_runtime::MultiSigner;
 
 use crate::{
-    crypto::Encryption,
+    crypto::{Encryption, MultiSigner},
     error::{AddressKeySource, ErrorSource, SpecsKeySource},
     helpers::multisigner_to_encryption,
     keyring::{AddressKey, NetworkSpecsKey},

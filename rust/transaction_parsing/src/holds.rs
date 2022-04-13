@@ -123,7 +123,10 @@ impl GeneralHold {
                         )))
                     }
                 };
-            if let CurrentVerifier::Valid(ValidCurrentVerifier::General) = current_verifier {
+            if let CurrentVerifier::Valid {
+                valid: ValidCurrentVerifier::General,
+            } = current_verifier
+            {
                 verifier_set.push(verifier_key)
             }
         }
@@ -153,9 +156,9 @@ impl GeneralHold {
     ) -> Result<TrDbColdStub, ErrorSigner> {
         let former_general_verifier = get_general_verifier(database_name)?;
         let mut out = stub;
-        out = out.new_history_entry(Event::Warning(
-            Warning::GeneralVerifierAppeared(self).show(),
-        ));
+        out = out.new_history_entry(Event::Warning {
+            warning: Warning::GeneralVerifierAppeared(self).show(),
+        });
         for x in self.metadata_set.iter() {
             out = out.remove_metadata(x)
         }
@@ -229,14 +232,16 @@ impl Hold {
             }
             .show(),
         };
-        out = out.new_history_entry(Event::Warning(warning));
+        out = out.new_history_entry(Event::Warning { warning });
         for x in self.metadata_set.iter() {
             out = out.remove_metadata(x)
         }
         for x in self.network_specs_set.iter() {
             out = out.remove_network_specs(
                 x,
-                &ValidCurrentVerifier::Custom(former_verifier.to_owned()),
+                &ValidCurrentVerifier::Custom {
+                    verifier: former_verifier.to_owned(),
+                },
                 &general_verifier,
             )
         }

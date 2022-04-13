@@ -130,7 +130,12 @@ pub fn default_cold_release(path: Option<PathBuf>) -> Result<(), ErrorActive> {
 #[cfg(feature = "active")]
 pub fn default_cold() -> Result<(), ErrorActive> {
     let database_name = COLD_DB_NAME;
-    populate_cold(database_name, Verifier(None))
+    populate_cold(
+        database_name,
+        Verifier {
+            verifier_value: None,
+        },
+    )
 }
 
 /// Function to reset default "hot" database.
