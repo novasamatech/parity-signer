@@ -1,7 +1,14 @@
-//! Database transaction 
+//! Atomic transactions in cold and hot databases
 //!
-//! 
-
+//! Additions and removals of entries in cold and hot database occur through atomic
+//! [transactions](https://docs.rs/sled/0.34.7/sled/transaction/index.html).
+//! Each tree gets updated with its own
+//! [`Batch`](https://docs.rs/sled/0.34.7/sled/struct.Batch.html).
+//!
+//! For transactions scanned into Signer, currently a temporary database entry
+//! is made to store transaction details while they are displayed to user.
+// TODO this is a temporary solution, the data eventually could be stored in
+// `navigator` state.
 #[cfg(feature = "signer")]
 use parity_scale_codec::{Decode, Encode};
 use sled::{Batch, Transactional};
@@ -743,14 +750,21 @@ impl TrDbColdStub {
 
     /// Transform [`TrDbColdStub`] into [`TrDbCold`] and apply to the database
     /// with a given name, in a single transaction.
+    ///
+    /// The [`TRANSACTION`] tree gets cleared in the process.
+    ///
+    /// It is unlikely that this clearing is ever doing anything, as the
+    /// intended use of the [`TrDbColdStub`] is to recover it from the database
+    /// (with clearing the [`TRANSACTION`] tree) and then immediately apply.
     pub fn apply(self, database_name: &str) -> Result<(), ErrorSigner> {
+        let for_transaction = make_batch_clear_tree::<Signer>(database_name, TRANSACTION)?;
         TrDbCold {
             for_addresses: self.addresses_stub.make_batch(),
             for_history: events_to_batch::<Signer>(database_name, self.history_stub)?,
             for_metadata: self.metadata_stub.make_batch(),
             for_network_specs: self.network_specs_stub.make_batch(),
             for_settings: self.settings_stub.make_batch(),
-            for_transaction: Batch::default(),
+            for_transaction,
             for_verifiers: self.verifiers_stub.make_batch(),
         }
         .apply::<Signer>(database_name)
@@ -872,7 +886,7 @@ impl TrDbColdSign {
     /// Recover [`TrDbColdSign`] from storage in the cold database.
     ///
     /// Function requires correct checksum to make sure the signable transaction
-    /// is still the one that were shown to the user previously, and no
+    /// is still the one that was shown to the user previously, and no
     /// changes to the database have occured.
     ///
     /// [`TRANSACTION`] tree is **not** cleared in the process. User is allowed
@@ -959,6 +973,9 @@ impl TrDbColdSign {
     ///
     /// Function returns database checksum, to be collected and re-used in case
     /// of wrong password entry.
+    ///
+    /// If the password entered is correct, the [`TRANSACTION`] tree gets
+    /// cleared.
     pub fn apply(
         self,
         wrong_password: bool,
@@ -1009,9 +1026,13 @@ impl TrDbColdSign {
 /// [`ContentDerivations`](definitions::qr_transfers::ContentDerivations)
 /// payloads.
 ///
-/// To approve the derivation payload, i.e. generate all those derivations,
-/// seed name and secret seed phrase are needed. This operation is done
-/// in [`import_derivations`](crate::identities::import_derivations).
+/// To approve the derivation payload, i.e. generate addresses for each of the
+/// derivations, seed name and secret seed phrase are needed. This operation is
+/// done by [`import_derivations`](crate::identities::import_derivations).
+///
+/// While the user selects seed to be used in derivations import, SCALE-encoded
+/// [`TrDbColdDerivations`] is stored in [`TRANSACTION`] tree of the cold
+/// database under the key [`DRV`].
 ///
 /// [`TrDbColdDerivations`] contains:
 ///
@@ -1022,20 +1043,32 @@ impl TrDbColdSign {
 #[cfg(feature = "signer")]
 #[derive(Debug, Decode, Encode)]
 pub struct TrDbColdDerivations {
+    /// set of password-free derivation path strings, from received
+    /// `derivations` payload
     checked_derivations: Vec<String>,
+
+    /// network specs for the network in which to generate the derivations,
+    /// from received `derivations` payload
     network_specs: NetworkSpecs,
 }
 
 #[cfg(feature = "signer")]
 impl TrDbColdDerivations {
-    /// function to generate TrDbColdDerivations
+    /// Construct [`TrDbColdDerivations`] from payload components.
     pub fn generate(checked_derivations: &[String], network_specs: &NetworkSpecs) -> Self {
         Self {
             checked_derivations: checked_derivations.to_owned(),
             network_specs: network_specs.to_owned(),
         }
     }
-    /// function to recover TrDbColdDerivations from storage in the database
+
+    /// Recover [`TrDbColdDerivations`] from storage in the cold database.
+    ///
+    /// Function requires correct checksum to make sure the proposed derivations
+    /// are the ones approved by the user, and no changes to the database have
+    /// occured.
+    ///
+    /// [`TRANSACTION`] tree is cleared in the process.
     pub fn from_storage(database_name: &str, checksum: u32) -> Result<Self, ErrorSigner> {
         let drv_encoded = {
             let database = open_db::<Signer>(database_name)?;
@@ -1047,6 +1080,9 @@ impl TrDbColdDerivations {
                 Err(e) => return Err(<Signer>::db_internal(e)),
             }
         };
+        TrDbCold::new()
+            .set_transaction(make_batch_clear_tree::<Signer>(database_name, TRANSACTION)?) // clear transaction tree
+            .apply::<Signer>(database_name)?;
         match Self::decode(&mut &drv_encoded[..]) {
             Ok(a) => Ok(a),
             Err(_) => Err(ErrorSigner::Database(DatabaseSigner::EntryDecoding(
@@ -1054,15 +1090,24 @@ impl TrDbColdDerivations {
             ))),
         }
     }
-    /// function to get checked derivations
-    pub fn checked_derivations(&self) -> &Vec<String> {
+
+    /// Get checked derivations
+    pub fn checked_derivations(&self) -> &[String] {
         &self.checked_derivations
     }
-    /// function to get network specs
+
+    /// Get network specs
     pub fn network_specs(&self) -> &NetworkSpecs {
         &self.network_specs
     }
-    /// function to put TrDbColdDerivations into storage in the database
+
+    /// Put SCALE-encoded [`TrDbColdDerivations`] into storage in the
+    /// [`TRANSACTION`] tree of the cold database under the key [`STUB`].
+    ///
+    /// Function returns `u32` checksum. This checksum is needed to recover
+    /// stored [`TrDbColdDerivations`] using `from_storage` method.
+    ///
+    /// The [`TRANSACTION`] tree is cleared prior to adding data to storage.
     pub fn store_and_get_checksum(&self, database_name: &str) -> Result<u32, ErrorSigner> {
         let mut transaction_batch = make_batch_clear_tree::<Signer>(database_name, TRANSACTION)?;
         transaction_batch.insert(DRV, self.encode());
