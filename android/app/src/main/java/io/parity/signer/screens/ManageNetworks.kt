@@ -8,11 +8,11 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import io.parity.signer.ButtonID
 import io.parity.signer.components.NetworkCard
 import io.parity.signer.models.SignerDataModel
 import io.parity.signer.models.pushButton
 import org.json.JSONArray
+import uniffi.signer.Action
 
 @Composable
 fun ManageNetworks(signerDataModel: SignerDataModel) {
@@ -26,7 +26,7 @@ fun ManageNetworks(signerDataModel: SignerDataModel) {
 			val thisNetwork = networks.getJSONObject(index)
 			Row(Modifier.clickable {
 				signerDataModel.pushButton(
-					ButtonID.GoForward,
+					Action.GO_FORWARD,
 					details = thisNetwork.optString("key")
 				)
 			}) {

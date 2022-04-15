@@ -2,11 +2,11 @@ package io.parity.signer.alerts
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.livedata.observeAsState
-import io.parity.signer.ButtonID
 import io.parity.signer.ShieldAlert
 import io.parity.signer.components.AlertComponent
 import io.parity.signer.models.SignerDataModel
 import io.parity.signer.models.pushButton
+import uniffi.signer.Action
 
 @Composable
 fun ShieldAlert(signerDataModel: SignerDataModel) {
@@ -16,7 +16,7 @@ fun ShieldAlert(signerDataModel: SignerDataModel) {
 			AlertComponent(
 				show = true,
 				header = "Signer is secure",
-				back = { signerDataModel.pushButton(ButtonID.GoBack) },
+				back = { signerDataModel.pushButton(Action.GO_BACK) },
 				forward = { },
 				backText = "Ok",
 				showForward = false
@@ -27,7 +27,7 @@ fun ShieldAlert(signerDataModel: SignerDataModel) {
 				show = true,
 				header = "Network connected!",
 				text = "Signer detects currently connected network; please enable airplane mode, disconnect all cables and handle security breach according with your security protocol.",
-				back = { signerDataModel.pushButton(ButtonID.GoBack) },
+				back = { signerDataModel.pushButton(Action.GO_BACK) },
 				forward = { },
 				backText = "Dismiss",
 				showForward = false
@@ -38,10 +38,10 @@ fun ShieldAlert(signerDataModel: SignerDataModel) {
 				show = true,
 				header = "Network was connected!",
 				text = "Your Signer device has connected to a WiFi, tether or Bluetooth network since your last acknowledgement and should be considered unsafe to use. Please follow your security protocol",
-				back = { signerDataModel.pushButton(ButtonID.GoBack) },
+				back = { signerDataModel.pushButton(Action.GO_BACK) },
 				forward = {
 					signerDataModel.acknowledgeWarning()
-					signerDataModel.pushButton(ButtonID.GoBack)
+					signerDataModel.pushButton(Action.GO_BACK)
 				},
 				backText = "Back",
 				forwardText = "Acknowledge and reset"

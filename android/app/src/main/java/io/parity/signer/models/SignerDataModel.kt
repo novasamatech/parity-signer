@@ -18,6 +18,7 @@ import androidx.security.crypto.MasterKey
 import io.parity.signer.*
 import io.parity.signer.components.Authentication
 import org.json.JSONObject
+import uniffi.signer.*
 import java.io.File
 import java.io.FileOutputStream
 
@@ -313,7 +314,7 @@ class SignerDataModel : ViewModel() {
 		if (checkRefresh) {
 			getAlertState()
 			refreshSeedNames(init = true)
-			pushButton(ButtonID.Start)
+			pushButton(Action.START)
 		}
 	}
 
@@ -354,41 +355,6 @@ class SignerDataModel : ViewModel() {
 	//MARK: General utils end
 
 	//MARK: rust native section begin
-
-	external fun backendAction(
-		action: String,
-		details: String,
-		seedPhrase: String
-	): String
-
-	external fun initNavigation(
-		dbname: String,
-		seedNames: String
-	)
-
-	external fun updateSeedNames(seedNames: String)
-
-	external fun qrparserGetPacketsTotal(data: String, cleaned: Boolean): Int
-	external fun qrparserTryDecodeQrSequence(
-		data: String,
-		cleaned: Boolean
-	): String
-
-	external fun substratePathCheck(
-		seedName: String,
-		path: String,
-		network: String,
-		dbname: String
-	): String
-
-	private external fun historyInitHistoryWithCert(dbname: String)
-	private external fun historyInitHistoryNoCert(dbname: String)
-	private external fun historyDeviceWasOnline(dbname: String)
-	private external fun historyGetWarnings(dbname: String): Boolean
-	private external fun historyAcknowledgeWarnings(dbname: String)
-
-	//external fun historyEntrySystem(entry: String, dbname: String)
-	external fun historySeedNameWasShown(seedName: String, dbname: String)
 
 	//external fun testGetAllTXCards(dbname: String): String
 	//external fun testGetAllLogCards(dbname: String): String

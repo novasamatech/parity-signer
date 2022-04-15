@@ -26,6 +26,7 @@ import io.parity.signer.screens.LandingView
 import io.parity.signer.screens.WaitingScreen
 import io.parity.signer.ui.theme.ParitySignerTheme
 import io.parity.signer.ui.theme.Text600
+import uniffi.signer.Action
 
 @ExperimentalMaterialApi
 @ExperimentalAnimationApi
@@ -77,7 +78,7 @@ fun SignerApp(signerDataModel: SignerDataModel) {
 						) {
 							signerDataModel.activity.moveTaskToBack(true)
 						} else
-							signerDataModel.pushButton(ButtonID.GoBack)
+							signerDataModel.pushButton(Action.GO_BACK)
 					}
 					//Structure to contain all app
 					Scaffold(

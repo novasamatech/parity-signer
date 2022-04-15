@@ -12,12 +12,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
-import io.parity.signer.ButtonID
 import io.parity.signer.models.SignerDataModel
 import io.parity.signer.models.pushButton
 import io.parity.signer.ui.theme.Text300
 import io.parity.signer.ui.theme.Text400
 import io.parity.signer.ui.theme.Text600
+import uniffi.signer.Action
+import uniffi.signer.actionGetName
 
 /**
  * Unified bottom bar button view
@@ -26,10 +27,10 @@ import io.parity.signer.ui.theme.Text600
 fun BottomBarButton(
 	signerDataModel: SignerDataModel,
 	image: ImageVector,
-	buttonID: ButtonID
+	action: Action,
 ) {
 	val selected =
-		signerDataModel.footerButton.observeAsState().value == buttonID.getName()
+		signerDataModel.footerButton.observeAsState().value == actionGetName(action)
 	val tint = if (selected) {
 		MaterialTheme.colors.Text600
 	} else {
@@ -43,12 +44,12 @@ fun BottomBarButton(
 	Column(
 		horizontalAlignment = Alignment.CenterHorizontally,
 		modifier = Modifier.clickable(onClick = {
-			signerDataModel.pushButton(buttonID)
+			signerDataModel.pushButton(action)
 		}).width(66.dp)
 	) {
-		Icon(image, contentDescription = buttonID.getName(), tint = tint)
+		Icon(image, contentDescription = actionGetName(action), tint = tint)
 		Text(
-			buttonID.getName(),
+			actionGetName(action),
 			color = color,
 			style = MaterialTheme.typography.subtitle2
 		)

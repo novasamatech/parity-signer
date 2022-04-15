@@ -13,7 +13,6 @@ import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
-import io.parity.signer.ButtonID
 import io.parity.signer.components.KeyCard
 import io.parity.signer.components.NetworkCard
 import io.parity.signer.models.SignerDataModel
@@ -21,6 +20,7 @@ import io.parity.signer.models.intoImageBitmap
 import io.parity.signer.models.pushButton
 import io.parity.signer.ui.theme.Bg200
 import org.json.JSONObject
+import uniffi.signer.Action
 
 @Composable
 fun KeyDetailsMulti(signerDataModel: SignerDataModel) {
@@ -59,10 +59,10 @@ fun KeyDetailsMulti(signerDataModel: SignerDataModel) {
 					},
 					onDragStopped = {
 						if (offset < -100) {
-							signerDataModel.pushButton(ButtonID.NextUnit)
+							signerDataModel.pushButton(Action.NEXT_UNIT)
 						} else {
 							if (offset > 100) {
-								signerDataModel.pushButton(ButtonID.PreviousUnit)
+								signerDataModel.pushButton(Action.PREVIOUS_UNIT)
 							}
 						}
 						offset = 0f

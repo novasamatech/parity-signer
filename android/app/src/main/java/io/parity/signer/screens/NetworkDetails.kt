@@ -7,12 +7,12 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import io.parity.signer.ButtonID
 import io.parity.signer.components.MetadataCard
 import io.parity.signer.components.NetworkCard
 import io.parity.signer.models.SignerDataModel
 import io.parity.signer.models.pushButton
 import org.json.JSONObject
+import uniffi.signer.Action
 
 @Composable
 fun NetworkDetails(signerDataModel: SignerDataModel) {
@@ -70,7 +70,7 @@ fun NetworkDetails(signerDataModel: SignerDataModel) {
 				Row(
 					Modifier.clickable {
 						signerDataModel.pushButton(
-							ButtonID.ManageMetadata,
+							Action.MANAGE_METADATA,
 							details = meta.optString("spec_version")
 						)
 					}

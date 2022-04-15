@@ -1,5 +1,6 @@
 package io.parity.signer.screens
 
+import android.app.Notification
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.Orientation
@@ -19,7 +20,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.unit.dp
-import io.parity.signer.ButtonID
 import io.parity.signer.ShieldAlert
 import io.parity.signer.components.BottomMultiselectBar
 import io.parity.signer.components.KeySelector
@@ -30,6 +30,7 @@ import io.parity.signer.ui.theme.Bg100
 import io.parity.signer.ui.theme.Bg200
 import org.json.JSONArray
 import org.json.JSONObject
+import uniffi.signer.Action
 import kotlin.math.absoluteValue
 
 /**
@@ -39,7 +40,7 @@ import kotlin.math.absoluteValue
  */
 @Composable
 fun KeyManager(
-	button: (button: ButtonID, details: String) -> Unit,
+	button: (action: Action, details: String) -> Unit,
 	increment: (Int, String) -> Unit,
 	screenData: JSONObject,
 	alertState: ShieldAlert?
@@ -63,14 +64,14 @@ fun KeyManager(
 										.optString("address_key")
 										.isNotBlank()
 								)
-									button(ButtonID.SelectKey, rootKey.optString("address_key"))
+									button(Action.SELECT_KEY, rootKey.optString("address_key"))
 							},
 							onLongPress = {
 								if (rootKey
 										.optString("address_key")
 										.isNotBlank()
 								)
-									button(ButtonID.LongTap, rootKey.optString("address_key"))
+									button(Action.LONG_TAP, rootKey.optString("address_key"))
 							}
 						)
 					}
@@ -85,7 +86,7 @@ fun KeyManager(
 										.optString("address_key")
 										.isNotBlank()
 								)
-									button(ButtonID.Swipe, rootKey.optString("address_key"))
+									button(Action.SWIPE, rootKey.optString("address_key"))
 							}
 							offsetX = 0f
 						}
@@ -108,13 +109,13 @@ fun KeyManager(
 							rootKey.optString("seed_name")
 						)
 					},
-					delete = { button(ButtonID.RemoveKey, "") }
+					delete = { button(Action.REMOVE_KEY, "") }
 				)
 			}
 			Row(
 				verticalAlignment = Alignment.CenterVertically,
 				modifier = Modifier
-					.clickable { button(ButtonID.NetworkSelector, "") }
+					.clickable { button(Action.NETWORK_SELECTOR, "") }
 					.padding(top = 3.dp, start = 12.dp, end = 12.dp)
 					.background(MaterialTheme.colors.Bg100)
 					.fillMaxWidth()
@@ -145,9 +146,9 @@ fun KeyManager(
 				Spacer(Modifier.weight(1f, true))
 				IconButton(onClick = {
 					if (alertState == ShieldAlert.None)
-						button(ButtonID.NewKey, "")
+						button(Action.NEW_KEY, "")
 					else
-						button(ButtonID.Shield, "")
+						button(Action.SHIELD, "")
 				}) {
 					Icon(
 						Icons.Default.AddCircleOutline,
@@ -168,8 +169,8 @@ fun KeyManager(
 				Spacer(Modifier.weight(1f))
 				BottomMultiselectBar(
 					count = multiselectCount,
-					delete = { button(ButtonID.RemoveKey, "") },
-					export = { button(ButtonID.ExportMultiSelect, "") }
+					delete = { button(Action.REMOVE_KEY, "") },
+					export = { button(Action.EXPORT_MULTI_SELECT, "") }
 				)
 			}
 		}

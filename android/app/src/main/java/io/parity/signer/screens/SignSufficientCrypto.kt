@@ -7,12 +7,12 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import io.parity.signer.ButtonID
 import io.parity.signer.components.KeyCard
 import io.parity.signer.models.SignerDataModel
 import io.parity.signer.models.getSeed
 import io.parity.signer.models.pushButton
 import org.json.JSONArray
+import uniffi.signer.Action
 
 @Composable
 fun SignSufficientCrypto(signerDataModel: SignerDataModel) {
@@ -30,7 +30,7 @@ fun SignSufficientCrypto(signerDataModel: SignerDataModel) {
 						)
 						if (seedPhrase.isNotBlank()) {
 							signerDataModel.pushButton(
-								ButtonID.GoForward,
+								Action.GO_FORWARD,
 								identity.optString("address_key"),
 								seedPhrase
 							)

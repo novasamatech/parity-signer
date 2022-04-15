@@ -10,7 +10,6 @@ import androidx.compose.material.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import io.parity.signer.ButtonID
 import io.parity.signer.components.SeedCard
 import io.parity.signer.models.SignerDataModel
 import io.parity.signer.models.getSeed
@@ -19,6 +18,7 @@ import io.parity.signer.ui.theme.Bg100
 import io.parity.signer.ui.theme.Bg200
 import io.parity.signer.ui.theme.modal
 import org.json.JSONArray
+import uniffi.signer.Action
 
 @Composable
 fun SelectSeed(signerDataModel: SignerDataModel) {
@@ -49,7 +49,7 @@ fun SelectSeed(signerDataModel: SignerDataModel) {
 									val seedPhrase = signerDataModel.getSeed(seedName)
 									if (seedPhrase.isNotBlank()) {
 										signerDataModel.pushButton(
-											ButtonID.GoForward,
+											Action.GO_FORWARD,
 											seedName,
 											seedPhrase
 										)

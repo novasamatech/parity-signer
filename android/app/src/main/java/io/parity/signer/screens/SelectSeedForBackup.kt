@@ -10,12 +10,12 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import io.parity.signer.ButtonID
 import io.parity.signer.components.SeedCard
 import io.parity.signer.models.SignerDataModel
 import io.parity.signer.models.pushButton
 import io.parity.signer.ui.theme.Bg200
 import org.json.JSONArray
+import uniffi.signer.Action
 
 /**
  * Select seed for creating derivations
@@ -41,7 +41,7 @@ fun SelectSeedForBackup(signerDataModel: SignerDataModel) {
 					Modifier
 						.clickable {
 							signerDataModel.pushButton(
-								ButtonID.BackupSeed,
+								Action.BACKUP_SEED,
 								details = cards
 									.getJSONObject(item)
 									.getString("seed_name")

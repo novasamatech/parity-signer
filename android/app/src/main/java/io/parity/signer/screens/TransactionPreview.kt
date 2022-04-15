@@ -11,14 +11,14 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.platform.LocalFocusManager
-import io.parity.signer.ButtonID
 import io.parity.signer.components.*
 import io.parity.signer.models.*
 import io.parity.signer.ui.theme.Text400
+import uniffi.signer.Action
 
 @Composable
 fun TransactionPreview(
-	button: (button: ButtonID, details: String, seedPhrase: String) -> Unit,
+	button: (action: Action, details: String, seedPhrase: String) -> Unit,
 	signerDataModel: SignerDataModel
 ) {
 	val transaction =
@@ -63,7 +63,7 @@ fun TransactionPreview(
 									?.optString("seed") ?: ""
 							)
 							if (seedPhrase.isNotBlank()) {
-								button(ButtonID.GoForward, comment.value.encode64(), seedPhrase)
+								button(Action.GO_FORWARD, comment.value.encode64(), seedPhrase)
 							}
 						}
 					}
@@ -71,7 +71,7 @@ fun TransactionPreview(
 				BigButton(
 					text = "Decline",
 					action = {
-						button(ButtonID.GoBack, "", "")
+						button(Action.GO_BACK, "", "")
 					}
 				)
 			}
@@ -79,20 +79,20 @@ fun TransactionPreview(
 				BigButton(
 					text = "Done",
 					action = {
-						button(ButtonID.GoBack, "", "")
+						button(Action.GO_BACK, "", "")
 					}
 				)
 			TransactionType.stub -> {
 				BigButton(
 					text = "Approve",
 					action = {
-						button(ButtonID.GoForward, "", "")
+						button(Action.GO_FORWARD, "", "")
 					}
 				)
 				BigButton(
 					text = "Decline",
 					action = {
-						button(ButtonID.GoBack, "", "")
+						button(Action.GO_BACK, "", "")
 					}
 				)
 			}
@@ -100,20 +100,20 @@ fun TransactionPreview(
 				BigButton(
 					text = "Back",
 					action = {
-						button(ButtonID.GoBack, "", "")
+						button(Action.GO_BACK, "", "")
 					}
 				)
 			TransactionType.import_derivations -> {
 				BigButton(
 					text = "Select seed",
 					action = {
-						button(ButtonID.GoForward, "", "")
+						button(Action.GO_FORWARD, "", "")
 					}
 				)
 				BigButton(
 					text = "Decline",
 					action = {
-						button(ButtonID.GoBack, "", "")
+						button(Action.GO_BACK, "", "")
 					}
 				)
 			}

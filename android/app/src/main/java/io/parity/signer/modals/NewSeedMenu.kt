@@ -8,7 +8,6 @@ import androidx.compose.material.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import io.parity.signer.ButtonID
 import io.parity.signer.ShieldAlert
 import io.parity.signer.components.BigButton
 import io.parity.signer.components.HeaderBar
@@ -16,6 +15,7 @@ import io.parity.signer.models.SignerDataModel
 import io.parity.signer.models.pushButton
 import io.parity.signer.ui.theme.Bg000
 import io.parity.signer.ui.theme.modal
+import uniffi.signer.Action
 
 @Composable
 fun NewSeedMenu(signerDataModel: SignerDataModel) {
@@ -33,17 +33,17 @@ fun NewSeedMenu(signerDataModel: SignerDataModel) {
 					text = "New seed",
 					action = {
 						if (signerDataModel.alertState.value == ShieldAlert.None)
-							signerDataModel.pushButton(ButtonID.NewSeed)
+							signerDataModel.pushButton(Action.NEW_SEED)
 						else
-							signerDataModel.pushButton(ButtonID.Shield)
+							signerDataModel.pushButton(Action.SHIELD)
 					})
 				BigButton(
 					text = "Recover seed",
 					action = {
 						if (signerDataModel.alertState.value == ShieldAlert.None)
-							signerDataModel.pushButton(ButtonID.RecoverSeed)
+							signerDataModel.pushButton(Action.RECOVER_SEED)
 						else
-							signerDataModel.pushButton(ButtonID.Shield)
+							signerDataModel.pushButton(Action.SHIELD)
 					},
 					isShaded = true
 				)

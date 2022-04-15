@@ -7,11 +7,11 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import io.parity.signer.ButtonID
 import io.parity.signer.components.HistoryCard
 import io.parity.signer.models.SignerDataModel
 import io.parity.signer.models.pushButton
 import io.parity.signer.models.toListOfJSONObjects
+import uniffi.signer.Action
 
 @Composable
 fun HistoryScreen(signerDataModel: SignerDataModel) {
@@ -30,7 +30,7 @@ fun HistoryScreen(signerDataModel: SignerDataModel) {
 					items = record,
 					key = { recordJSON.optString("order") + it.toString() }
 				) { item ->
-					Row(Modifier.clickable { signerDataModel.pushButton(ButtonID.ShowLogDetails, details = order) }) {
+					Row(Modifier.clickable { signerDataModel.pushButton(Action.SHOW_LOG_DETAILS, details = order) }) {
 						HistoryCard(
 							item,
 							timestamp

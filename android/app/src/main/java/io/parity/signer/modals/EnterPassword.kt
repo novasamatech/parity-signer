@@ -14,7 +14,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.unit.dp
-import io.parity.signer.ButtonID
 import io.parity.signer.components.BigButton
 import io.parity.signer.components.HeaderBar
 import io.parity.signer.components.KeyCard
@@ -24,6 +23,7 @@ import io.parity.signer.models.pushButton
 import io.parity.signer.ui.theme.Bg200
 import io.parity.signer.ui.theme.modal
 import org.json.JSONObject
+import uniffi.signer.Action
 
 @Composable
 fun EnterPassword(signerDataModel: SignerDataModel) {
@@ -56,7 +56,7 @@ fun EnterPassword(signerDataModel: SignerDataModel) {
 				onDone = {
 					if (password.value.isNotBlank()) {
 						signerDataModel.pushButton(
-							ButtonID.GoForward,
+							Action.GO_FORWARD,
 							details = password.value
 						)
 					}
@@ -70,7 +70,7 @@ fun EnterPassword(signerDataModel: SignerDataModel) {
 				isCrypto = true,
 				action = {
 					signerDataModel.pushButton(
-						ButtonID.GoForward,
+						Action.GO_FORWARD,
 						details = password.value
 					)
 				},

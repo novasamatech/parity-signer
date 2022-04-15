@@ -14,13 +14,13 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
-import io.parity.signer.ButtonID
 import io.parity.signer.components.BigButton
 import io.parity.signer.models.SignerDataModel
 import io.parity.signer.models.intoImageBitmap
 import io.parity.signer.models.pushButton
 import io.parity.signer.ui.theme.Bg000
 import io.parity.signer.ui.theme.modal
+import uniffi.signer.Action
 
 @Composable
 fun SignatureReady(signerDataModel: SignerDataModel) {
@@ -61,7 +61,7 @@ fun SignatureReady(signerDataModel: SignerDataModel) {
 				BigButton(
 					text = "Done",
 					action = {
-						signerDataModel.pushButton(ButtonID.GoBack, "", "")
+						signerDataModel.pushButton(Action.GO_BACK, "", "")
 					}
 				)
 			}

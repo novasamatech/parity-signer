@@ -1,0 +1,2 @@
+[bindings.kotlin]
+cdylib_name = "signer"

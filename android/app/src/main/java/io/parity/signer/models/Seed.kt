@@ -2,8 +2,11 @@ package io.parity.signer.models
 
 import android.util.Log
 import android.widget.Toast
-import io.parity.signer.ButtonID
 import org.json.JSONArray
+import uniffi.signer.Action
+import uniffi.signer.historySeedNameWasShown
+import uniffi.signer.initNavigation
+import uniffi.signer.updateSeedNames
 
 //MARK: Seed management begin
 
@@ -54,7 +57,7 @@ fun SignerDataModel.addSeed(
 
 			refreshSeedNames()
 			pushButton(
-				button = ButtonID.GoForward,
+				button = Action.GO_FORWARD,
 				details = if (createRoots) "true" else "false",
 				seedPhrase = seedPhrase
 			)
@@ -84,7 +87,6 @@ internal fun SignerDataModel.getSeed(seedName: String, backup: Boolean = false):
 		Toast.makeText(context, "get seed failure: $e", Toast.LENGTH_LONG).show()
 		""
 	}
-
 }
 
 fun SignerDataModel.removeSeed(seedName: String) {
@@ -92,7 +94,7 @@ fun SignerDataModel.removeSeed(seedName: String) {
 		try {
 			sharedPreferences.edit().remove(seedName).apply()
 			refreshSeedNames()
-			pushButton(ButtonID.RemoveSeed)
+			pushButton(Action.REMOVE_SEED)
 		} catch (e: java.lang.Exception) {
 			Log.d("remove seed error", e.toString())
 			Toast.makeText(context, e.toString(), Toast.LENGTH_SHORT).show()

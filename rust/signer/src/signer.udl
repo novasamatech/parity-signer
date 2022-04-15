@@ -1,5 +1,6 @@
-dictionary ErrorDisplayed {
-    string text;
+[Error]
+interface ErrorDisplayed {
+    Str(string s);
 };
 
 dictionary MetaValuesDisplay {
@@ -214,40 +215,42 @@ enum Action {
 };
 
 namespace signer {
+    string action_get_name([ByRef] Action action);
+
     void init_navigation([ByRef] string dbname, [ByRef] string seed_names);
 
-    string act(Action action, [ByRef] string details, [ByRef] string seed_phrase);
+    string backend_action(Action action, [ByRef] string details, [ByRef] string seed_phrase);
 
     void update_seed_names([ByRef] string seed_names);
 
     [Throws=ErrorDisplayed]
-    u32 get_packets_total([ByRef] string data, boolean cleaned);
+    u32 qrparser_get_packets_total([ByRef] string data, boolean cleaned);
 
     [Throws=ErrorDisplayed]
-    string try_decode_qr_sequence([ByRef] string data, boolean cleaned);
+    string qrparser_try_decode_qr_sequence([ByRef] string data, boolean cleaned);
 
-    string path_check([ByRef] string seed_name, [ByRef] string path, [ByRef] string network, [ByRef] string dbname);
-
-    [Throws=ErrorDisplayed]
-    void init_history_with_cert([ByRef] string dbname);
+    string substrate_path_check([ByRef] string seed_name, [ByRef] string path, [ByRef] string network, [ByRef] string dbname);
 
     [Throws=ErrorDisplayed]
-    void init_history_no_cert([ByRef] string dbname);
+    void history_init_history_with_cert([ByRef] string dbname);
 
     [Throws=ErrorDisplayed]
-    void device_was_online([ByRef] string dbname);
+    void history_init_history_no_cert([ByRef] string dbname);
 
     [Throws=ErrorDisplayed]
-    boolean get_warnings([ByRef] string dbname);
+    void history_device_was_online([ByRef] string dbname);
 
     [Throws=ErrorDisplayed]
-    void acknowledge_warnings([ByRef] string dbname);
+    boolean history_get_warnings([ByRef] string dbname);
+
+    [Throws=ErrorDisplayed]
+    void history_acknowledge_warnings([ByRef] string dbname);
 
     [Throws=ErrorDisplayed]
     void history_entry_system(Event event, [ByRef] string dbname);
 
     [Throws=ErrorDisplayed]
-    void seed_name_was_shown([ByRef] string seed_name, [ByRef] string dbname);
+    void history_seed_name_was_shown([ByRef] string seed_name, [ByRef] string dbname);
 
     string get_all_tx_cards();
 

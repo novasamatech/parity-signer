@@ -4,8 +4,8 @@ import android.util.Log
 import android.widget.Toast
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.currentCompositionLocalContext
-import io.parity.signer.ButtonID
 import org.json.JSONObject
+import uniffi.signer.Action
 
 /**
  * Add key to database; uses phone crypto to fetch seeds!
@@ -15,7 +15,7 @@ fun SignerDataModel.addKey(path: String, seedName: String) {
 		try {
 			val seedPhrase = getSeed(seedName)
 			if (seedPhrase.isNotBlank()) {
-				pushButton(ButtonID.GoForward, path, seedPhrase)
+				pushButton(Action.GO_FORWARD, path, seedPhrase)
 			}
 		} catch (e: java.lang.Exception) {
 			Log.e("Add key error", e.toString())
@@ -69,7 +69,7 @@ fun SignerDataModel.increment(number: Int, seedName: String) {
 		try {
 			val seedPhrase = getSeed(seedName)
 			if (seedPhrase.isNotBlank()) {
-				pushButton(ButtonID.Increment, number.toString())
+				pushButton(Action.INCREMENT, number.toString())
 			}
 		} catch (e: java.lang.Exception) {
 			Log.e("Add key error", e.toString())

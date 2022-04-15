@@ -8,7 +8,6 @@ import androidx.compose.material.Surface
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import io.parity.signer.ButtonID
 import io.parity.signer.alerts.AndroidCalledConfirm
 import io.parity.signer.components.BigButton
 import io.parity.signer.components.HeaderBar
@@ -16,6 +15,7 @@ import io.parity.signer.models.SignerDataModel
 import io.parity.signer.models.pushButton
 import io.parity.signer.ui.theme.Bg000
 import io.parity.signer.ui.theme.modal
+import uniffi.signer.Action
 
 @Composable
 fun LogMenu(signerDataModel: SignerDataModel) {
@@ -34,7 +34,7 @@ fun LogMenu(signerDataModel: SignerDataModel) {
 				HeaderBar(line1 = "LOG", line2 = "Checksum: $checksum")
 				BigButton(text = "Add note",
 					action = {
-						signerDataModel.pushButton(ButtonID.CreateLogComment)
+						signerDataModel.pushButton(Action.CREATE_LOG_COMMENT)
 					})
 				BigButton(
 					text = "Clear log",
@@ -50,5 +50,5 @@ fun LogMenu(signerDataModel: SignerDataModel) {
 		show = confirm,
 		header = "Clear log?",
 		back = { confirm = false },
-		forward = { signerDataModel.pushButton(ButtonID.ClearLog) })
+		forward = { signerDataModel.pushButton(Action.CLEAR_LOG) })
 }

@@ -9,7 +9,6 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import io.parity.signer.ButtonID
 import io.parity.signer.ShieldAlert
 import io.parity.signer.alerts.AndroidCalledConfirm
 import io.parity.signer.components.Identicon
@@ -18,6 +17,7 @@ import io.parity.signer.models.SignerDataModel
 import io.parity.signer.models.abbreviateString
 import io.parity.signer.models.pushButton
 import io.parity.signer.ui.theme.*
+import uniffi.signer.Action
 
 /**
  * Settings screen; General purpose stuff like legal info, networks management
@@ -31,21 +31,21 @@ fun SettingsScreen(signerDataModel: SignerDataModel) {
 	Column(
 		verticalArrangement = Arrangement.spacedBy(4.dp)
 	) {
-		Row(Modifier.clickable { signerDataModel.pushButton(ButtonID.ManageNetworks) }) {
+		Row(Modifier.clickable { signerDataModel.pushButton(Action.MANAGE_NETWORKS) }) {
 			SettingsCardTemplate(text = "Networks")
 		}
 		Row(Modifier.clickable {
 			if (signerDataModel.alertState.value == ShieldAlert.None)
-				signerDataModel.pushButton(ButtonID.BackupSeed)
+				signerDataModel.pushButton(Action.BACKUP_SEED)
 			else
-				signerDataModel.pushButton(ButtonID.Shield)
+				signerDataModel.pushButton(Action.SHIELD)
 		}) {
 			SettingsCardTemplate(text = "Backup keys")
 		}
 		Column(
 			Modifier
 				.padding(12.dp)
-				.clickable { signerDataModel.pushButton(ButtonID.ViewGeneralVerifier) }
+				.clickable { signerDataModel.pushButton(Action.VIEW_GENERAL_VERIFIER) }
 		) {
 			Row {
 				Text(
@@ -90,7 +90,7 @@ fun SettingsScreen(signerDataModel: SignerDataModel) {
 				confirm = true
 			}
 		) { SettingsCardTemplate(text = "Wipe signer", danger = true) }
-		Row(Modifier.clickable { signerDataModel.pushButton(ButtonID.ShowDocuments) }) {
+		Row(Modifier.clickable { signerDataModel.pushButton(Action.SHOW_DOCUMENTS) }) {
 			SettingsCardTemplate(text = "About")
 		}
 		SettingsCardTemplate(

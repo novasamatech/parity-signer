@@ -9,7 +9,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import io.parity.signer.ButtonID
 import io.parity.signer.components.HeaderBar
 import io.parity.signer.components.NetworkCard
 import io.parity.signer.models.SignerDataModel
@@ -17,6 +16,7 @@ import io.parity.signer.models.pushButton
 import io.parity.signer.ui.theme.Bg000
 import io.parity.signer.ui.theme.modal
 import org.json.JSONArray
+import uniffi.signer.Action
 
 @Composable
 fun NetworkSelector(signerDataModel: SignerDataModel) {
@@ -24,7 +24,7 @@ fun NetworkSelector(signerDataModel: SignerDataModel) {
 		signerDataModel.modalData.value?.optJSONArray("networks") ?: JSONArray()
 	Surface(
 		color = Color(0x00000000),
-		modifier = Modifier.clickable { signerDataModel.pushButton(ButtonID.GoBack) }
+		modifier = Modifier.clickable { signerDataModel.pushButton(Action.GO_BACK) }
 	) {
 		Column {
 			Spacer(
@@ -52,7 +52,7 @@ fun NetworkSelector(signerDataModel: SignerDataModel) {
 						items(networks.length()) { item ->
 							Row(Modifier.clickable {
 								signerDataModel.pushButton(
-									ButtonID.ChangeNetwork,
+									Action.CHANGE_NETWORK,
 									networks.getJSONObject(item).optString("key")
 								)
 							}) {

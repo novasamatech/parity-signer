@@ -15,17 +15,17 @@ import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
-import io.parity.signer.ButtonID
 import io.parity.signer.components.BigButton
 import io.parity.signer.components.HeadingOverline
 import io.parity.signer.components.RestoreSeedPhraseBox
 import io.parity.signer.components.RestoreSeedPhraseSuggest
 import io.parity.signer.models.*
 import org.json.JSONArray
+import uniffi.signer.Action
 
 @Composable
 fun RecoverSeedPhrase(
-	button: (button: ButtonID, details: String) -> Unit,
+	button: (action: Action, details: String) -> Unit,
 	signerDataModel: SignerDataModel
 ) {
   val screenData = signerDataModel.screenData.observeAsState()

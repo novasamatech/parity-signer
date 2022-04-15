@@ -8,7 +8,6 @@ import androidx.compose.material.Surface
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import io.parity.signer.ButtonID
 import io.parity.signer.ShieldAlert
 import io.parity.signer.alerts.AndroidCalledConfirm
 import io.parity.signer.components.BigButton
@@ -18,6 +17,7 @@ import io.parity.signer.models.pushButton
 import io.parity.signer.models.removeSeed
 import io.parity.signer.ui.theme.Bg000
 import io.parity.signer.ui.theme.modal
+import uniffi.signer.Action
 
 @Composable
 fun SeedMenu(signerDataModel: SignerDataModel) {
@@ -37,17 +37,17 @@ fun SeedMenu(signerDataModel: SignerDataModel) {
 					text = "Backup",
 					action = {
 						if (signerDataModel.alertState.value == ShieldAlert.None)
-							signerDataModel.pushButton(ButtonID.BackupSeed)
+							signerDataModel.pushButton(Action.BACKUP_SEED)
 						else
-							signerDataModel.pushButton(ButtonID.Shield)
+							signerDataModel.pushButton(Action.SHIELD)
 					})
 				BigButton(
 					text = "Derive new key",
 					action = {
 						if (signerDataModel.alertState.value == ShieldAlert.None)
-							signerDataModel.pushButton(ButtonID.NewKey)
+							signerDataModel.pushButton(Action.NEW_KEY)
 						else
-							signerDataModel.pushButton(ButtonID.Shield)
+							signerDataModel.pushButton(Action.SHIELD)
 					},
 					isShaded = true,
 					isCrypto = true

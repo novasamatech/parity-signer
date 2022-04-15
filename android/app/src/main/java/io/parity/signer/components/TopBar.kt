@@ -12,12 +12,12 @@ import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.unit.dp
-import io.parity.signer.ButtonID
 import io.parity.signer.models.SignerDataModel
 import io.parity.signer.models.pushButton
 import io.parity.signer.ui.theme.Action400
 import io.parity.signer.ui.theme.Bg100
 import io.parity.signer.ui.theme.Text400
+import uniffi.signer.Action
 
 @Composable
 fun TopBar(signerDataModel: SignerDataModel) {
@@ -42,7 +42,7 @@ fun TopBar(signerDataModel: SignerDataModel) {
 						backgroundColor = MaterialTheme.colors.Bg100
 					),
 					onClick = {
-						signerDataModel.pushButton(ButtonID.GoBack)
+						signerDataModel.pushButton(Action.GO_BACK)
 					}) {
 					if (rightButton.value == "MultiSelect") {
 						Icon(
@@ -73,7 +73,7 @@ fun TopBar(signerDataModel: SignerDataModel) {
 			)
 			if (rightButton.value == "MultiSelect") {
 				SmallButton(text = "Select all") {
-					signerDataModel.pushButton(ButtonID.SelectAll)
+					signerDataModel.pushButton(Action.SELECT_ALL)
 				}
 			}
 		}
@@ -83,7 +83,7 @@ fun TopBar(signerDataModel: SignerDataModel) {
 				.weight(0.2f, fill = true)
 				.width(72.dp)
 		) {
-			IconButton(onClick = { signerDataModel.pushButton(ButtonID.RightButton) }) {
+			IconButton(onClick = { signerDataModel.pushButton(Action.RIGHT_BUTTON) }) {
 				when (rightButton.value) {
 					"NewSeed" -> {
 						Icon(
@@ -121,7 +121,7 @@ fun TopBar(signerDataModel: SignerDataModel) {
 					}
 				}
 			}
-			IconButton(onClick = { signerDataModel.pushButton(ButtonID.Shield) }) {
+			IconButton(onClick = { signerDataModel.pushButton(Action.SHIELD) }) {
 				NavbarShield(signerDataModel = signerDataModel)
 			}
 		}

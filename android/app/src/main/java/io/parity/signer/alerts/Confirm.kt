@@ -1,10 +1,10 @@
 package io.parity.signer.alerts
 
 import androidx.compose.runtime.Composable
-import io.parity.signer.ButtonID
 import io.parity.signer.components.AlertComponent
 import io.parity.signer.models.SignerDataModel
 import io.parity.signer.models.pushButton
+import uniffi.signer.Action
 
 /**
  * Confirmation alert called from backend navigation
@@ -14,8 +14,8 @@ fun Confirm(signerDataModel: SignerDataModel) {
 
 	AlertComponent(
 		show = true,
-		back = { signerDataModel.pushButton(ButtonID.GoBack) },
-		forward = { signerDataModel.pushButton(ButtonID.GoForward) }
+		back = { signerDataModel.pushButton(Action.GO_BACK) },
+		forward = { signerDataModel.pushButton(Action.GO_FORWARD) }
 	)
 
 }

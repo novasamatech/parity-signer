@@ -9,7 +9,6 @@ import androidx.compose.material.Surface
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import io.parity.signer.ButtonID
 import io.parity.signer.alerts.AndroidCalledConfirm
 import io.parity.signer.components.BigButton
 import io.parity.signer.components.HeaderBar
@@ -17,13 +16,14 @@ import io.parity.signer.models.SignerDataModel
 import io.parity.signer.models.pushButton
 import io.parity.signer.ui.theme.Bg000
 import io.parity.signer.ui.theme.modal
+import uniffi.signer.Action
 
 @Composable
 fun KeyDetailsAction(signerDataModel: SignerDataModel) {
 	var confirm by remember { mutableStateOf(false) }
 
 	Column (
-		Modifier.clickable { signerDataModel.pushButton(ButtonID.GoBack) }
+		Modifier.clickable { signerDataModel.pushButton(Action.GO_BACK) }
 		) {
 		Spacer(Modifier.weight(1f))
 		Surface(
@@ -50,7 +50,7 @@ fun KeyDetailsAction(signerDataModel: SignerDataModel) {
 		header = "Forget this key?",
 		text = "This key will be removed for this network. Are you sure?",
 		back = { confirm = false },
-		forward = { signerDataModel.pushButton(ButtonID.RemoveKey) },
+		forward = { signerDataModel.pushButton(Action.REMOVE_KEY) },
 		backText = "Cancel",
 		forwardText = "Remove key"
 	)

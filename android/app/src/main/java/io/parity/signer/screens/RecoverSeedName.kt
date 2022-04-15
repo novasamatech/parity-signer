@@ -1,5 +1,6 @@
 package io.parity.signer.screens
 
+import android.app.Notification
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
@@ -13,7 +14,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.unit.dp
-import io.parity.signer.ButtonID
 import io.parity.signer.components.BigButton
 import io.parity.signer.components.HeadingOverline
 import io.parity.signer.components.SingleTextInput
@@ -21,10 +21,11 @@ import io.parity.signer.models.SignerDataModel
 import io.parity.signer.models.decode64
 import io.parity.signer.models.encode64
 import io.parity.signer.ui.theme.Text600
+import uniffi.signer.Action
 
 @Composable
 fun RecoverSeedName(
-	button: (button: ButtonID, details: String) -> Unit,
+	button: (action: Action, details: String) -> Unit,
 	signerDataModel: SignerDataModel
 ) {
 	val seedName = remember { mutableStateOf("") }
@@ -50,7 +51,7 @@ fun RecoverSeedName(
 			},
 			onDone = {
 				if (seedName.value.isNotBlank() && signerDataModel.seedNames.value?.contains(seedName.value.encode64()) == false) {
-					button(ButtonID.GoForward, seedName.value.encode64())
+					button(Action.GO_FORWARD, seedName.value.encode64())
 				}
 			},
 			isCrypto = true,
@@ -69,7 +70,7 @@ fun RecoverSeedName(
 			text = "Next",
 			action = {
 				focusManager.clearFocus()
-				button(ButtonID.GoForward, seedName.value.encode64())
+				button(Action.GO_FORWARD, seedName.value.encode64())
 			},
 			isDisabled = seedName.value.isBlank() || (signerDataModel.seedNames.value?.contains(seedName.value.encode64()) != false)
 		)

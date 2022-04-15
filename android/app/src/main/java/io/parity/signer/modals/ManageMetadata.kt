@@ -11,7 +11,6 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import io.parity.signer.ButtonID
 import io.parity.signer.alerts.AndroidCalledConfirm
 import io.parity.signer.components.BigButton
 import io.parity.signer.components.HeaderBar
@@ -22,6 +21,7 @@ import io.parity.signer.models.pushButton
 import io.parity.signer.ui.theme.Bg000
 import io.parity.signer.ui.theme.modal
 import org.json.JSONObject
+import uniffi.signer.Action
 
 @Composable
 fun ManageMetadata(signerDataModel: SignerDataModel) {
@@ -30,7 +30,7 @@ fun ManageMetadata(signerDataModel: SignerDataModel) {
 
 	Surface(
 		color = Color.Transparent,
-		modifier = Modifier.clickable { signerDataModel.pushButton(ButtonID.GoBack) }
+		modifier = Modifier.clickable { signerDataModel.pushButton(Action.GO_BACK) }
 	) {
 		Column {
 			Spacer(Modifier.weight(1f))
@@ -58,7 +58,7 @@ fun ManageMetadata(signerDataModel: SignerDataModel) {
 						text = "Sign this metadata",
 						isShaded = true,
 						isCrypto = true,
-						action = { signerDataModel.pushButton(ButtonID.SignMetadata) })
+						action = { signerDataModel.pushButton(Action.SIGN_METADATA) })
 					BigButton(
 						text = "Delete this metadata",
 						isShaded = true,
@@ -77,7 +77,7 @@ fun ManageMetadata(signerDataModel: SignerDataModel) {
 		header = "Remove metadata?",
 		text = "This metadata will be removed for all networks",
 		back = { confirm = false },
-		forward = { signerDataModel.pushButton(ButtonID.RemoveMetadata) },
+		forward = { signerDataModel.pushButton(Action.REMOVE_METADATA) },
 		backText = "Cancel",
 		forwardText = "Remove metadata"
 	)

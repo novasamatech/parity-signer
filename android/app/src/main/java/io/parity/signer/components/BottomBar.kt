@@ -14,9 +14,9 @@ import androidx.compose.material.icons.filled.Settings
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import io.parity.signer.ButtonID
 import io.parity.signer.models.SignerDataModel
 import io.parity.signer.ui.theme.Bg000
+import uniffi.signer.Action
 
 /**
  * Bar to be shown on the bottom of screen;
@@ -37,22 +37,22 @@ fun BottomBar(
 			BottomBarButton(
 				signerDataModel = signerDataModel,
 				image = Icons.Default.CalendarViewDay,
-				buttonID = ButtonID.NavbarLog
+				action = Action.NAVBAR_LOG
 			)
 			BottomBarButton(
 				signerDataModel = signerDataModel,
 				image = Icons.Default.CropFree,
-				buttonID = ButtonID.NavbarScan
+				action = Action.NAVBAR_SCAN
 			)
 			BottomBarButton(
 				signerDataModel = signerDataModel,
 				image = Icons.Default.Pattern,
-				buttonID = ButtonID.NavbarKeys
+				action = Action.NAVBAR_KEYS
 			)
 			BottomBarButton(
 				signerDataModel = signerDataModel,
 				image = Icons.Default.Settings,
-				buttonID = ButtonID.NavbarSettings
+				action = Action.NAVBAR_SETTINGS
 			)
 		}
 	}

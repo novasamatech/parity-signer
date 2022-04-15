@@ -7,13 +7,13 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import io.parity.signer.ButtonID
 import io.parity.signer.models.toListOfJSONObjects
 import org.json.JSONArray
+import uniffi.signer.Action
 
 @Composable
 fun KeySelector(
-	button: (button: ButtonID, details: String) -> Unit,
+	button: (action: Action, details: String) -> Unit,
 	increment: (Int) -> Unit,
 	keySet: JSONArray,
 	multiSelectMode: Boolean
@@ -29,11 +29,11 @@ fun KeySelector(
 			val addressKey = address.optString("address_key")
 			KeyCardActive(
 				address,
-				selectButton = { button(ButtonID.SelectKey, addressKey) },
-				longTapButton = { button(ButtonID.LongTap, addressKey) },
-				swipe = { button(ButtonID.Swipe, addressKey) },
+				selectButton = { button(Action.SELECT_KEY, addressKey) },
+				longTapButton = { button(Action.LONG_TAP, addressKey) },
+				swipe = { button(Action.SWIPE, addressKey) },
 				increment,
-				delete = { button(ButtonID.RemoveKey, "") },
+				delete = { button(Action.REMOVE_KEY, "") },
 				multiSelectMode
 			)
 		}

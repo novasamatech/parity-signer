@@ -4,17 +4,18 @@ import android.util.Log
 import android.widget.Toast
 import io.parity.signer.*
 import org.json.JSONObject
+import uniffi.signer.Action
 
 /**
  * This pretty much offloads all navigation to backend!
  */
 fun SignerDataModel.pushButton(
-	button: ButtonID,
+	button: Action,
 	details: String = "",
 	seedPhrase: String = ""
 ) {
 	val actionResult =
-		backendAction(button.name, details, seedPhrase)
+		uniffi.signer.backendAction(button, details, seedPhrase)
 	//Here we just list all possible arguments coming from backend
 	try {
 		val actionResultObject = JSONObject(actionResult)

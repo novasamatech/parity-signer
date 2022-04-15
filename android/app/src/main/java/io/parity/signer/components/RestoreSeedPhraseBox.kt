@@ -20,15 +20,15 @@ import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
-import io.parity.signer.ButtonID
 import io.parity.signer.ui.theme.*
 import org.json.JSONObject
+import uniffi.signer.Action
 
 @Composable
 fun RestoreSeedPhraseBox(
 	seedPhrase: List<JSONObject>,
 	seedWord: TextFieldValue,
-	button: (button: ButtonID, details: String) -> Unit,
+	button: (action: Action, details: String) -> Unit,
 	keyboard: Boolean
 ) {
 	val focusManager = LocalFocusManager.current
@@ -55,7 +55,7 @@ fun RestoreSeedPhraseBox(
 				TextField(
 					value = seedWord,
 					onValueChange = {
-						button(ButtonID.TextEntry, it.text)
+						button(Action.TEXT_ENTRY, it.text)
 					},
 					singleLine = true,
 					leadingIcon = {

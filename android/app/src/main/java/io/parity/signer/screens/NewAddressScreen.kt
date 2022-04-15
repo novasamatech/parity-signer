@@ -9,11 +9,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.unit.dp
-import io.parity.signer.ButtonID
 import io.parity.signer.components.*
 import io.parity.signer.models.*
 import io.parity.signer.ui.theme.Text600
 import org.json.JSONObject
+import uniffi.signer.Action
+import uniffi.signer.substratePathCheck
 
 @Composable
 fun NewAddressScreen(signerDataModel: SignerDataModel, increment: Boolean) {
@@ -31,7 +32,7 @@ fun NewAddressScreen(signerDataModel: SignerDataModel, increment: Boolean) {
 			whereTo,
 			collision
 		) {
-			signerDataModel.substratePathCheck(
+			substratePathCheck(
 				seedName,
 				it,
 				networkSpecKey,
@@ -82,7 +83,7 @@ fun NewAddressScreen(signerDataModel: SignerDataModel, increment: Boolean) {
 						}
 						DeriveDestination.pwd -> {
 							signerDataModel.pushButton(
-								ButtonID.CheckPassword,
+								Action.CHECK_PASSWORD,
 								details = derivationPath.value
 							)
 						}
@@ -115,7 +116,7 @@ fun NewAddressScreen(signerDataModel: SignerDataModel, increment: Boolean) {
 						}
 						DeriveDestination.pwd -> {
 							signerDataModel.pushButton(
-								ButtonID.CheckPassword,
+								Action.CHECK_PASSWORD,
 								details = derivationPath.value
 							)
 						}
