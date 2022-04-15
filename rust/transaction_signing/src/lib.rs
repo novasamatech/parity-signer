@@ -1,7 +1,7 @@
+use sp_runtime::MultiSigner;
+
 use db_handling::db_transactions::TrDbColdStub;
-use definitions::{
-    crypto::MultiSigner, error_signer::ErrorSigner, keyring::NetworkSpecsKey, users::AddressDetails,
-};
+use definitions::{error_signer::ErrorSigner, keyring::NetworkSpecsKey, users::AddressDetails};
 
 mod sign_message;
 use sign_message::{

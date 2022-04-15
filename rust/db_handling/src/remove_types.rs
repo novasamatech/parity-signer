@@ -14,12 +14,10 @@ use crate::manage_history::events_to_batch;
 pub fn remove_types_info(database_name: &str) -> Result<(), ErrorSigner> {
     let mut settings_batch = Batch::default();
     settings_batch.remove(TYPES);
-    let events: Vec<Event> = vec![Event::TypesRemoved {
-        types_display: TypesDisplay::get(
-            &ContentLoadTypes::generate(&get_types::<Signer>(database_name)?),
-            &get_general_verifier(database_name)?,
-        ),
-    }];
+    let events: Vec<Event> = vec![Event::TypesRemoved(TypesDisplay::get(
+        &ContentLoadTypes::generate(&get_types::<Signer>(database_name)?),
+        &get_general_verifier(database_name)?,
+    ))];
     TrDbCold::new()
         .set_history(events_to_batch::<Signer>(database_name, events)?) // add history
         .set_settings(settings_batch) // upd settings

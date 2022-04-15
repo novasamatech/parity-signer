@@ -1,5 +1,4 @@
 use definitions::{
-    crypto::MultiSigner,
     error::TransferContent,
     error_signer::{ErrorSigner, InputSigner, NotHexSigner, Signer},
     helpers::unhex,
@@ -7,6 +6,7 @@ use definitions::{
 };
 use parser::decoding_commons::get_compact;
 use sp_core::{ecdsa, ed25519, sr25519, Pair};
+use sp_runtime::MultiSigner;
 use std::convert::TryInto;
 
 pub struct InfoPassedCrypto {
@@ -45,13 +45,8 @@ pub fn pass_crypto(
                 None => return Err(ErrorSigner::Input(InputSigner::TooShort)),
             };
             if ed25519::Pair::verify(&signature, &message, &pubkey) {
-                let verifier = Verifier {
-                    verifier_value: Some(VerifierValue::Standard {
-                        multi_signer: MultiSigner::Ed25519 {
-                            public: pubkey.into(),
-                        },
-                    }),
-                };
+                let verifier =
+                    Verifier(Some(VerifierValue::Standard(MultiSigner::Ed25519(pubkey))));
                 Ok(InfoPassedCrypto {
                     verifier,
                     message,
@@ -84,13 +79,8 @@ pub fn pass_crypto(
                 None => return Err(ErrorSigner::Input(InputSigner::TooShort)),
             };
             if sr25519::Pair::verify(&signature, &message, &pubkey) {
-                let verifier = Verifier {
-                    verifier_value: Some(VerifierValue::Standard {
-                        multi_signer: MultiSigner::Sr25519 {
-                            public: pubkey.into(),
-                        },
-                    }),
-                };
+                let verifier =
+                    Verifier(Some(VerifierValue::Standard(MultiSigner::Sr25519(pubkey))));
                 Ok(InfoPassedCrypto {
                     verifier,
                     message,
@@ -123,13 +113,7 @@ pub fn pass_crypto(
                 None => return Err(ErrorSigner::Input(InputSigner::TooShort)),
             };
             if ecdsa::Pair::verify(&signature, &message, &pubkey) {
-                let verifier = Verifier {
-                    verifier_value: Some(VerifierValue::Standard {
-                        multi_signer: MultiSigner::Ecdsa {
-                            public: pubkey.into(),
-                        },
-                    }),
-                };
+                let verifier = Verifier(Some(VerifierValue::Standard(MultiSigner::Ecdsa(pubkey))));
                 Ok(InfoPassedCrypto {
                     verifier,
                     message,
@@ -146,9 +130,7 @@ pub fn pass_crypto(
                 None => return Err(ErrorSigner::Input(InputSigner::TooShort)),
             };
             let (message, tail) = cut_data(data, content)?;
-            let verifier = Verifier {
-                verifier_value: None,
-            };
+            let verifier = Verifier(None);
             Ok(InfoPassedCrypto {
                 verifier,
                 message,

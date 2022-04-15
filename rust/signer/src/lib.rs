@@ -15,17 +15,10 @@
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
 mod export;
+mod ffi_types;
 
+use crate::ffi_types::*;
 use std::fmt::Display;
-
-use definitions::crypto::*;
-use definitions::error_active::*;
-use definitions::history::*;
-use definitions::network_specs::*;
-use navigator::Action;
-use sp_runtime::app_crypto::ecdsa;
-use sp_runtime::app_crypto::ed25519;
-use sp_runtime::testing::sr25519;
 
 #[derive(Debug)]
 pub struct ErrorDisplayed {
@@ -139,7 +132,7 @@ export! {
         event: Event,
         dbname: &str
     ) -> anyhow::Result<(), anyhow::Error> {
-        db_handling::manage_history::history_entry_system(dbname, event).map_err(|e| e.anyhow())
+        db_handling::manage_history::history_entry_system(dbname, event.into()).map_err(|e| e.anyhow())
     }
 
     @Java_io_parity_signer_models_SignerDataModel_historySeedNameWasShown

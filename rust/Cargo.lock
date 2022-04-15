@@ -587,6 +587,7 @@ dependencies = [
  "regex",
  "sled",
  "sp-core",
+ "sp-runtime",
  "tiny-bip39",
  "zeroize",
 ]
@@ -600,6 +601,7 @@ dependencies = [
  "lazy_static",
  "regex",
  "sp-core",
+ "sp-runtime",
 ]
 
 [[package]]
@@ -2839,6 +2841,7 @@ dependencies = [
  "navigator",
  "qr_reader_phone",
  "rustc-hex",
+ "sp-core",
  "sp-runtime",
  "transaction_parsing",
  "transaction_signing",

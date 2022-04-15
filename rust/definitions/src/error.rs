@@ -1,11 +1,12 @@
 //! Trait [`ErrorSource`] and error-related types shared by Signer and active
 //! sides
 use sp_core::crypto::SecretStringError;
+use sp_runtime::MultiSigner;
 #[cfg(feature = "test")]
 use variant_count::VariantCount;
 
 use crate::{
-    crypto::{Encryption, MultiSigner},
+    crypto::Encryption,
     helpers::multisigner_to_public,
     keyring::{AddressKey, MetaKey, NetworkSpecsKey},
     users::AddressDetails,

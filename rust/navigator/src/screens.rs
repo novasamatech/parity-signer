@@ -1,4 +1,5 @@
 //!List of all screens
+use sp_runtime::MultiSigner;
 use zeroize::Zeroize;
 
 use db_handling::{
@@ -6,7 +7,6 @@ use db_handling::{
     interface_signer::{first_network, SeedDraft},
 };
 use definitions::{
-    crypto::MultiSigner,
     error::AddressKeySource,
     error_signer::{ErrorSigner, ExtraAddressKeySourceSigner, Signer},
     helpers::{make_identicon_from_multisigner, multisigner_to_public},

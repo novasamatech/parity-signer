@@ -28,21 +28,13 @@ pub fn load_types(data_hex: &str, database_name: &str) -> Result<Action, ErrorSi
     let mut stub = TrDbColdStub::new();
     let mut index = 0;
     match checked_info.verifier {
-        Verifier {
-            verifier_value: None,
-        } => match general_verifier {
-            Verifier {
-                verifier_value: None,
-            } => {
+        Verifier(None) => match general_verifier {
+            Verifier(None) => {
                 if new_types == old_types {
                     Err(ErrorSigner::Input(InputSigner::TypesKnown))
                 } else {
-                    stub = stub.new_history_entry(Event::Warning {
-                        warning: Warning::TypesNotVerified.show(),
-                    });
-                    stub = stub.new_history_entry(Event::Warning {
-                        warning: Warning::UpdatingTypes.show(),
-                    });
+                    stub = stub.new_history_entry(Event::Warning(Warning::TypesNotVerified.show()));
+                    stub = stub.new_history_entry(Event::Warning(Warning::UpdatingTypes.show()));
                     stub = stub.add_types(&content_new_types, &checked_info.verifier);
                     let checksum = stub.store_and_get_checksum(database_name)?;
                     let warning_card_1 =
@@ -59,24 +51,20 @@ pub fn load_types(data_hex: &str, database_name: &str) -> Result<Action, ErrorSi
                     ))
                 }
             }
-            Verifier {
-                verifier_value: Some(old_general_verifier_value),
-            } => Err(ErrorSigner::Input(InputSigner::NeedGeneralVerifier {
-                content: GeneralVerifierForContent::Types,
-                verifier_value: old_general_verifier_value,
-            })),
+            Verifier(Some(old_general_verifier_value)) => {
+                Err(ErrorSigner::Input(InputSigner::NeedGeneralVerifier {
+                    content: GeneralVerifierForContent::Types,
+                    verifier_value: old_general_verifier_value,
+                }))
+            }
         },
-        Verifier {
-            verifier_value: Some(ref new_general_verifier_value),
-        } => {
+        Verifier(Some(ref new_general_verifier_value)) => {
             let verifier_card = Card::Verifier(new_general_verifier_value).card(&mut index, 0);
             if general_verifier == checked_info.verifier {
                 if new_types == old_types {
                     Err(ErrorSigner::Input(InputSigner::TypesKnown))
                 } else {
-                    stub = stub.new_history_entry(Event::Warning {
-                        warning: Warning::UpdatingTypes.show(),
-                    });
+                    stub = stub.new_history_entry(Event::Warning(Warning::UpdatingTypes.show()));
                     stub = stub.add_types(&content_new_types, &checked_info.verifier);
                     let checksum = stub.store_and_get_checksum(database_name)?;
                     let warning_card = Card::Warning(Warning::UpdatingTypes).card(&mut index, 0);
@@ -92,9 +80,7 @@ pub fn load_types(data_hex: &str, database_name: &str) -> Result<Action, ErrorSi
                 }
             } else {
                 match general_verifier {
-                    Verifier {
-                        verifier_value: None,
-                    } => {
+                    Verifier(None) => {
                         let new_general_verifier = checked_info.verifier;
                         let general_hold = GeneralHold::get(database_name)?;
                         stub = general_hold.upd_stub(stub, &new_general_verifier, database_name)?;
@@ -104,14 +90,14 @@ pub fn load_types(data_hex: &str, database_name: &str) -> Result<Action, ErrorSi
                                 .card(&mut index, 0);
                         let warning_card_2 = {
                             if new_types == old_types {
-                                stub = stub.new_history_entry(Event::Warning {
-                                    warning: Warning::TypesAlreadyThere.show(),
-                                });
+                                stub = stub.new_history_entry(Event::Warning(
+                                    Warning::TypesAlreadyThere.show(),
+                                ));
                                 Card::Warning(Warning::TypesAlreadyThere).card(&mut index, 0)
                             } else {
-                                stub = stub.new_history_entry(Event::Warning {
-                                    warning: Warning::UpdatingTypes.show(),
-                                });
+                                stub = stub.new_history_entry(Event::Warning(
+                                    Warning::UpdatingTypes.show(),
+                                ));
                                 Card::Warning(Warning::UpdatingTypes).card(&mut index, 0)
                             }
                         };
@@ -126,13 +112,13 @@ pub fn load_types(data_hex: &str, database_name: &str) -> Result<Action, ErrorSi
                             StubNav::LoadTypes,
                         ))
                     }
-                    Verifier {
-                        verifier_value: Some(old_general_verifier_value),
-                    } => Err(ErrorSigner::Input(InputSigner::GeneralVerifierChanged {
-                        content: GeneralVerifierForContent::Types,
-                        old_general_verifier_value,
-                        new_general_verifier_value: new_general_verifier_value.to_owned(),
-                    })),
+                    Verifier(Some(old_general_verifier_value)) => {
+                        Err(ErrorSigner::Input(InputSigner::GeneralVerifierChanged {
+                            content: GeneralVerifierForContent::Types,
+                            old_general_verifier_value,
+                            new_general_verifier_value: new_general_verifier_value.to_owned(),
+                        }))
+                    }
                 }
             }
         }

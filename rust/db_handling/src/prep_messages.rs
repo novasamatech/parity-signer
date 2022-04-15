@@ -33,10 +33,7 @@ pub fn get_genesis_hash(network_name: &str, database_name: &str) -> Result<[u8; 
         }
     }
     match found_genesis_hash {
-        Some(a) => Ok(a
-            .clone()
-            .try_into()
-            .expect("genesis hash always has a fixed length; qed")),
+        Some(a) => Ok(a),
         None => Err(ErrorSigner::NotFound(NotFoundSigner::NetworkSpecsForName(
             network_name.to_string(),
         ))),

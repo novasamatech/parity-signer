@@ -60,13 +60,10 @@ pub fn try_get_valid_current_verifier(
     match verifiers.get(verifier_key.key()) {
         Ok(Some(verifier_encoded)) => match <CurrentVerifier>::decode(&mut &verifier_encoded[..]) {
             Ok(a) => match a {
-                CurrentVerifier::Valid { valid: b } => {
-                    if let ValidCurrentVerifier::Custom { ref verifier } = b {
-                        if (verifier == &general_verifier)
-                            && (general_verifier
-                                != Verifier {
-                                    verifier_value: None,
-                                })
+                CurrentVerifier::Valid(b) => {
+                    if let ValidCurrentVerifier::Custom(ref custom_verifier) = b {
+                        if (custom_verifier == &general_verifier)
+                            && (general_verifier != Verifier(None))
                         {
                             return Err(ErrorSigner::Database(
                                 DatabaseSigner::CustomVerifierIsGeneral(verifier_key.to_owned()),
@@ -134,10 +131,7 @@ pub fn genesis_hash_in_specs(
                     } else {
                         return Err(ErrorSigner::Database(
                             DatabaseSigner::DifferentBase58Specs {
-                                genesis_hash: network_specs
-                                    .genesis_hash
-                                    .try_into()
-                                    .expect("genesis hash always has fixed length; qed"),
+                                genesis_hash: network_specs.genesis_hash,
                                 base58_1: base58prefix,
                                 base58_2: network_specs.base58prefix,
                             },

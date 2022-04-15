@@ -150,9 +150,7 @@ fn init_history<T: ErrorSource>(
     let batch = make_batch_clear_tree::<T>(database_name, HISTORY)?;
     let events = vec![
         Event::DatabaseInitiated,
-        Event::GeneralVerifierSet {
-            verifier: general_verifier.to_owned(),
-        },
+        Event::GeneralVerifierSet(general_verifier.to_owned()),
     ];
     let start_zero = true;
     events_in_batch::<T>(database_name, start_zero, batch, events)
@@ -200,12 +198,7 @@ pub fn signer_init_with_cert(database_name: &str) -> Result<(), ErrorSigner> {
 /// Function is applicable only to Signer side, interacts with user interface.
 #[cfg(feature = "signer")]
 pub fn signer_init_no_cert(database_name: &str) -> Result<(), ErrorSigner> {
-    signer_init(
-        database_name,
-        Verifier {
-            verifier_value: None,
-        },
-    )
+    signer_init(database_name, Verifier(None))
 }
 
 /// Function to populate cold database without adding any networks.

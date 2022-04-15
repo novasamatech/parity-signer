@@ -50,6 +50,9 @@
 
 #![deny(unused_crate_dependencies)]
 
+#[cfg(feature = "signer")]
+use sp_runtime::MultiSigner;
+
 #[cfg(feature = "active")]
 use std::convert::TryInto;
 
@@ -61,9 +64,6 @@ use regex::Regex;
 
 #[cfg(feature = "active")]
 use lazy_static::lazy_static;
-
-#[cfg(feature = "signer")]
-use definitions::crypto::MultiSigner;
 
 #[cfg(feature = "active")]
 use definitions::{
@@ -97,13 +97,9 @@ pub const DEFAULT_VERIFIER_PUBLIC: [u8; 32] = [
 /// inside.
 #[cfg(feature = "signer")]
 pub fn default_general_verifier() -> Verifier {
-    Verifier {
-        verifier_value: Some(VerifierValue::Standard {
-            multi_signer: MultiSigner::Sr25519 {
-                public: sp_core::sr25519::Public::from_raw(DEFAULT_VERIFIER_PUBLIC).into(),
-            },
-        }),
-    }
+    Verifier(Some(VerifierValue::Standard(MultiSigner::Sr25519(
+        sp_core::sr25519::Public::from_raw(DEFAULT_VERIFIER_PUBLIC),
+    ))))
 }
 
 /// Network information that is not expected to change, source for network specs
@@ -203,7 +199,7 @@ pub fn default_chainspecs() -> Vec<NetworkSpecs> {
             color: x.color.to_string(),
             decimals: x.decimals,
             encryption: x.encryption.clone(),
-            genesis_hash: x.genesis_hash.clone().into(),
+            genesis_hash: x.genesis_hash,
             logo: x.logo.to_string(),
             name: x.name.to_string(),
             order: x.order,
@@ -224,9 +220,7 @@ pub fn default_verifiers() -> Vec<(VerifierKey, CurrentVerifier)> {
     for x in default_network_info() {
         out.push((
             VerifierKey::from_parts(&x.genesis_hash),
-            CurrentVerifier::Valid {
-                valid: ValidCurrentVerifier::General,
-            },
+            CurrentVerifier::Valid(ValidCurrentVerifier::General),
         ));
     }
     out
@@ -243,7 +237,7 @@ pub fn default_chainspecs_to_send() -> Vec<NetworkSpecsToSend> {
             color: x.color.to_string(),
             decimals: x.decimals,
             encryption: x.encryption.clone(),
-            genesis_hash: x.genesis_hash.clone().into(),
+            genesis_hash: x.genesis_hash,
             logo: x.logo.to_string(),
             name: x.name.to_string(),
             path_id: x.path_id.to_string(),

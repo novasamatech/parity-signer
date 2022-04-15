@@ -267,7 +267,7 @@ impl ErrorSource for Signer {
                     InputSigner::LoadMetaNoSpecs{name, valid_current_verifier, general_verifier} => {
                         let insert = match valid_current_verifier {
                             ValidCurrentVerifier::General => format!("{} (general verifier)", general_verifier.show_error()),
-                            ValidCurrentVerifier::Custom{ verifier: a } => format!("{} (custom verifier)", a.show_error()),
+                            ValidCurrentVerifier::Custom(a) => format!("{} (custom verifier)", a.show_error()),
                         };
                         format!("Network {} was previously known to the database with verifier {}. However, no network specs are in the database at the moment. Add network specs before loading the metadata.", name, insert)
                     },

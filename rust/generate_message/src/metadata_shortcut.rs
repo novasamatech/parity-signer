@@ -9,7 +9,6 @@ use definitions::{
     metadata::MetaValues,
     network_specs::NetworkSpecsToSend,
 };
-use parity_scale_codec::KeyedVec;
 use std::convert::TryInto;
 
 use crate::fetch_metadata::{fetch_info, fetch_info_with_network_specs};
@@ -111,7 +110,7 @@ pub fn meta_specs_shortcut(
             color: COLOR.to_string(),
             decimals: new_properties.decimals,
             encryption: encryption.clone(),
-            genesis_hash: genesis_hash.to_vec(),
+            genesis_hash,
             logo: meta_values.name.to_string(),
             name: meta_values.name.to_string(),
             path_id: format!("//{}", meta_values.name),

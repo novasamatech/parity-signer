@@ -271,11 +271,11 @@
 //! Network `decimals` value is `12`, network `unit` is `WND`.
 //! The balance should be therefore represented as `10 uWND`.  
 
-use crate::crypto::MultiSigner;
 use parity_scale_codec::{Decode, Encode};
 #[cfg(feature = "signer")]
 use plot_icon::EMPTY_PNG;
 use sled::IVec;
+use sp_runtime::MultiSigner;
 
 #[cfg(feature = "active")]
 use crate::error_active::{
@@ -315,7 +315,7 @@ pub struct NetworkSpecs {
     pub encryption: Encryption,
 
     /// Network genesis hash
-    pub genesis_hash: Vec<u8>,
+    pub genesis_hash: [u8; 32],
 
     /// Network associated logo
     pub logo: String,
@@ -363,7 +363,7 @@ pub struct NetworkSpecsToSend {
     pub encryption: Encryption,
 
     /// Network genesis hash  
-    pub genesis_hash: Vec<u8>,
+    pub genesis_hash: [u8; 32],
 
     /// Network associated logo  
     pub logo: String,
@@ -425,7 +425,7 @@ impl NetworkSpecs {
             color: self.color.to_string(),
             decimals: self.decimals,
             encryption: self.encryption.to_owned(),
-            genesis_hash: self.genesis_hash.clone().into(),
+            genesis_hash: self.genesis_hash,
             logo: self.logo.to_string(),
             name: self.name.to_string(),
             path_id: self.path_id.to_string(),
@@ -441,11 +441,7 @@ impl NetworkSpecs {
         ShortSpecs {
             base58prefix: self.base58prefix,
             decimals: self.decimals,
-            genesis_hash: self
-                .genesis_hash
-                .clone()
-                .try_into()
-                .expect("genesis hash always has a fixed length; qed"),
+            genesis_hash: self.genesis_hash,
             name: self.name.to_string(),
             unit: self.unit.to_string(),
         }
@@ -514,7 +510,7 @@ impl NetworkSpecsToSend {
             color: self.color.to_string(),
             decimals: self.decimals,
             encryption: self.encryption.to_owned(),
-            genesis_hash: self.genesis_hash.clone().into(),
+            genesis_hash: self.genesis_hash,
             logo: self.logo.to_string(),
             name: self.name.to_string(),
             order,
@@ -592,9 +588,7 @@ pub struct NetworkProperties {
 ///
 /// Either real verifier or information that there is no verifier.
 #[derive(Decode, Encode, PartialEq, Debug, Clone)]
-pub struct Verifier {
-    pub verifier_value: Option<VerifierValue>,
-}
+pub struct Verifier(pub Option<VerifierValue>);
 
 /// Information on known and existing verifier  
 ///
@@ -602,14 +596,14 @@ pub struct Verifier {
 #[derive(Decode, Encode, PartialEq, Debug, Clone)]
 pub enum VerifierValue {
     /// public key for standard substrate-compatible encryption algorithms  
-    Standard { multi_signer: MultiSigner },
+    Standard(MultiSigner),
 }
 
 #[cfg(feature = "signer")]
 impl Verifier {
     /// Display [`Verifier`] in json-like format, for json exports  
     pub fn show_card(&self) -> String {
-        match &self.verifier_value {
+        match &self.0 {
             Some(a) => a.show_card(),
             None => format!(
                 "\"public_key\":\"\",\"identicon\":\"{}\",\"encryption\":\"none\"",
@@ -620,7 +614,7 @@ impl Verifier {
 
     /// Display [`Verifier`] in human-readable format, for errors  
     pub fn show_error(&self) -> String {
-        match &self.verifier_value {
+        match &self.0 {
             Some(a) => a.show_error(),
             None => String::from("none"),
         }
@@ -632,7 +626,7 @@ impl VerifierValue {
     /// Display [`VerifierValue`] in json-like format, for json exports  
     pub fn show_card(&self) -> String {
         match &self {
-            VerifierValue::Standard { multi_signer: m } => {
+            VerifierValue::Standard(m) => {
                 let hex_public = hex::encode(multisigner_to_public(m));
                 let encryption = multisigner_to_encryption(m);
                 let hex_identicon = hex::encode(make_identicon_from_multisigner(m));
@@ -649,29 +643,14 @@ impl VerifierValue {
     /// Display [`VerifierValue`] in human-readable format, for errors  
     pub fn show_error(&self) -> String {
         match &self {
-            VerifierValue::Standard {
-                multi_signer: MultiSigner::Ed25519 { public },
-            } => {
-                format!(
-                    "public key: {}, encryption: ed25519",
-                    hex::encode(&public.public)
-                )
+            VerifierValue::Standard(MultiSigner::Ed25519(x)) => {
+                format!("public key: {}, encryption: ed25519", hex::encode(x.0))
             }
-            VerifierValue::Standard {
-                multi_signer: MultiSigner::Sr25519 { public },
-            } => {
-                format!(
-                    "public key: {}, encryption: sr25519",
-                    hex::encode(&public.public)
-                )
+            VerifierValue::Standard(MultiSigner::Sr25519(x)) => {
+                format!("public key: {}, encryption: sr25519", hex::encode(x.0))
             }
-            VerifierValue::Standard {
-                multi_signer: MultiSigner::Ecdsa { public },
-            } => {
-                format!(
-                    "public key: {}, encryption: ecdsa",
-                    hex::encode(&public.public)
-                )
+            VerifierValue::Standard(MultiSigner::Ecdsa(x)) => {
+                format!("public key: {}, encryption: ecdsa", hex::encode(x.0))
             }
         }
     }
@@ -681,7 +660,7 @@ impl VerifierValue {
 #[derive(Decode, Encode, PartialEq, Debug, Clone)]
 pub enum CurrentVerifier {
     /// Verifier is valid, Signer can use the network
-    Valid { valid: ValidCurrentVerifier },
+    Valid(ValidCurrentVerifier),
 
     /// Verifier is invalid, Signer would not be able to use the network
     /// without wipe and reset
@@ -698,7 +677,7 @@ pub enum ValidCurrentVerifier {
     General,
 
     /// Network has some other verifier, different from the general one
-    Custom { verifier: Verifier },
+    Custom(Verifier),
 }
 
 #[cfg(feature = "signer")]
@@ -710,7 +689,7 @@ impl ValidCurrentVerifier {
                 "\"type\":\"general\",\"details\":{}",
                 export_complex_single(general_verifier, |a| a.show_card())
             ),
-            ValidCurrentVerifier::Custom { verifier: a } => format!(
+            ValidCurrentVerifier::Custom(a) => format!(
                 "\"type\":\"custom\",\"details\":{}",
                 export_complex_single(a, |a| a.show_card())
             ),

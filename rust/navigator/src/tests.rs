@@ -23,7 +23,7 @@ use definitions::{
     network_specs::{Verifier, VerifierValue},
 };
 
-use crate::{do_action, init_navigation, update_seed_names};
+use crate::{do_action, init_navigation, update_seed_names, Action};
 
 const ALICE: [u8; 32] = [
     212, 53, 147, 199, 21, 253, 211, 28, 97, 20, 26, 189, 4, 169, 159, 214, 130, 44, 133, 88, 133,
@@ -270,13 +270,13 @@ fn flow_test_1() {
     signer_init(dbname, verifier_alice_sr25519()).unwrap();
     init_navigation(dbname, "");
 
-    let real_json = do_action("Start", "", "");
+    let real_json = do_action(Action::Start, "", "");
     let expected_json = r#"{"screen":"SeedSelector","screenLabel":"Select seed","back":false,"footer":true,"footerButton":"Keys","rightButton":"NewSeed","screenNameType":"h1","modal":"NewSeedMenu","alert":"Empty","screenData":{"seedNameCards":[]},"modalData":{},"alertData":{}}"#;
     assert!(real_json == expected_json, "Initiated with no keys. Started. Expected SeedSelector screen with NewSeedMenu modal, got:\n{}", real_json);
 
     let mut seed_selector_json = real_json;
 
-    let real_json = do_action("NavbarLog", "", "");
+    let real_json = do_action(Action::NavbarLog, "", "");
     let cut_real_json =
         timeless(&real_json).replace(&alice_sr_alice(), r#"<alice_sr25519_//Alice>"#);
     let expected_json = r#"{"screen":"Log","screenLabel":"","back":false,"footer":true,"footerButton":"Log","rightButton":"LogRight","screenNameType":"h4","modal":"Empty","alert":"Empty","screenData":{"log":[{"order":0,"timestamp":"**","events":[{"event":"database_initiated"},{"event":"general_verifier_added","payload":{"public_key":"d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d","identicon":"<alice_sr25519_//Alice>","encryption":"sr25519"}}]}],"total_entries":1},"modalData":{},"alertData":{}}"#;
@@ -288,45 +288,45 @@ fn flow_test_1() {
 
     let mut current_log_json = real_json;
 
-    let real_json = do_action("GoBack", "", "");
+    let real_json = do_action(Action::GoBack, "", "");
     assert!(
         current_log_json == real_json,
         "GoBack on Log screen with no modals. Expected to remain where was, got:\n{}",
         real_json
     );
-    let real_json = do_action("GoForward", "", "");
+    let real_json = do_action(Action::GoForward, "", "");
     assert!(
         current_log_json == real_json,
         "GoForward on Log screen with no modals. Expected to remain where was, got:\n{}",
         real_json
     );
 
-    let real_json = do_action("RightButton", "", "");
+    let real_json = do_action(Action::RightButton, "", "");
     let cut_real_json = cut_checksum(&timeless(&real_json))
         .replace(&alice_sr_alice(), r#"<alice_sr25519_//Alice>"#);
     let expected_json = r#"{"screen":"Log","screenLabel":"","back":false,"footer":true,"footerButton":"Log","rightButton":"LogRight","screenNameType":"h4","modal":"LogRight","alert":"Empty","screenData":{"log":[{"order":0,"timestamp":"**","events":[{"event":"database_initiated"},{"event":"general_verifier_added","payload":{"public_key":"d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d","identicon":"<alice_sr25519_//Alice>","encryption":"sr25519"}}]}],"total_entries":1},"modalData":{"checksum":"**"},"alertData":{}}"#;
     assert!(cut_real_json == expected_json, "RightButton on Log screen with no modals. Expected same Log screen with LogRight modal, got:\n{}", real_json);
-    let real_json = do_action("GoBack", "", "");
+    let real_json = do_action(Action::GoBack, "", "");
     assert!(current_log_json == real_json, "GoBack on Log screen with LogRight modal. Expected to get Log screen with no modals, got:\n{}", real_json);
 
-    do_action("RightButton", "", "");
-    let real_json = do_action("CreateLogComment", "", "");
+    do_action(Action::RightButton, "", "");
+    let real_json = do_action(Action::CreateLogComment, "", "");
     let cut_real_json =
         timeless(&real_json).replace(&alice_sr_alice(), r#"<alice_sr25519_//Alice>"#);
     let expected_json = r#"{"screen":"Log","screenLabel":"","back":false,"footer":true,"footerButton":"Log","rightButton":"LogRight","screenNameType":"h4","modal":"LogComment","alert":"Empty","screenData":{"log":[{"order":0,"timestamp":"**","events":[{"event":"database_initiated"},{"event":"general_verifier_added","payload":{"public_key":"d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d","identicon":"<alice_sr25519_//Alice>","encryption":"sr25519"}}]}],"total_entries":1},"modalData":{},"alertData":{}}"#;
     assert!(cut_real_json == expected_json, "CreateLogComment on Log screen with LogRight modal. Expected same Log screen with LogComment modal, got:\n{}", real_json);
-    let real_json = do_action("GoBack", "", "");
+    let real_json = do_action(Action::GoBack, "", "");
     assert!(current_log_json == real_json, "GoBack on Log screen with LogComment modal. Expected same Log screen with no modals, got:\n{}", real_json);
 
-    do_action("RightButton", "", "");
-    do_action("CreateLogComment", "", "");
-    let real_json = do_action("GoForward", "Remember this moment", "");
+    do_action(Action::RightButton, "", "");
+    do_action(Action::CreateLogComment, "", "");
+    let real_json = do_action(Action::GoForward, "Remember this moment", "");
     let cut_real_json =
         timeless(&real_json).replace(&alice_sr_alice(), r#"<alice_sr25519_//Alice>"#);
     let expected_json = r#"{"screen":"Log","screenLabel":"","back":false,"footer":true,"footerButton":"Log","rightButton":"LogRight","screenNameType":"h4","modal":"Empty","alert":"Empty","screenData":{"log":[{"order":1,"timestamp":"**","events":[{"event":"user_entered_event","payload":"Remember this moment"}]},{"order":0,"timestamp":"**","events":[{"event":"database_initiated"},{"event":"general_verifier_added","payload":{"public_key":"d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d","identicon":"<alice_sr25519_//Alice>","encryption":"sr25519"}}]}],"total_entries":2},"modalData":{},"alertData":{}}"#;
     assert!(cut_real_json == expected_json, "GoForward on Log screen with LogComment modal. Expected updated Log screen with no modals, got:\n{}", real_json);
 
-    let real_json = do_action("Shield", "", "");
+    let real_json = do_action(Action::Shield, "", "");
     let cut_real_json =
         timeless(&real_json).replace(&alice_sr_alice(), r#"<alice_sr25519_//Alice>"#);
     let expected_json = r#"{"screen":"Log","screenLabel":"","back":false,"footer":true,"footerButton":"Log","rightButton":"LogRight","screenNameType":"h4","modal":"Empty","alert":"Shield","screenData":{"log":[{"order":1,"timestamp":"**","events":[{"event":"user_entered_event","payload":"Remember this moment"}]},{"order":0,"timestamp":"**","events":[{"event":"database_initiated"},{"event":"general_verifier_added","payload":{"public_key":"d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d","identicon":"<alice_sr25519_//Alice>","encryption":"sr25519"}}]}],"total_entries":2},"modalData":{},"alertData":{"shield_state":"unknown"}}"#;
@@ -336,13 +336,13 @@ fn flow_test_1() {
         real_json
     );
 
-    do_action("RightButton", "", "");
-    let real_json = do_action("ClearLog", "", "");
+    do_action(Action::RightButton, "", "");
+    let real_json = do_action(Action::ClearLog, "", "");
     let cut_real_json = timeless(&real_json);
     let expected_json = r#"{"screen":"Log","screenLabel":"","back":false,"footer":true,"footerButton":"Log","rightButton":"LogRight","screenNameType":"h4","modal":"Empty","alert":"Empty","screenData":{"log":[{"order":0,"timestamp":"**","events":[{"event":"history_cleared"}]}],"total_entries":1},"modalData":{},"alertData":{}}"#;
     assert!(cut_real_json == expected_json, "ClearLog on Log screen with LogRight modal. Expected updated Log screen with no modals, got:\n{}", real_json);
 
-    let real_json = do_action("NavbarSettings", "", "");
+    let real_json = do_action(Action::NavbarSettings, "", "");
     let cut_real_json = real_json.replace(&alice_sr_alice(), r#"<alice_sr25519_//Alice>"#);
     let expected_json = r#"{"screen":"Settings","screenLabel":"","back":false,"footer":true,"footerButton":"Settings","rightButton":"None","screenNameType":"h4","modal":"Empty","alert":"Empty","screenData":{"public_key":"d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d","identicon":"<alice_sr25519_//Alice>","encryption":"sr25519"},"modalData":{},"alertData":{}}"#;
     assert!(
@@ -353,14 +353,14 @@ fn flow_test_1() {
 
     let current_settings_json = real_json;
 
-    let real_json = do_action("BackupSeed", "", "");
+    let real_json = do_action(Action::BackupSeed, "", "");
     let expected_json = r#"{"screen":"SelectSeedForBackup","screenLabel":"Select seed","back":true,"footer":false,"footerButton":"Settings","rightButton":"Backup","screenNameType":"h4","modal":"Empty","alert":"Empty","screenData":{"seedNameCards":[]},"modalData":{},"alertData":{}}"#;
     assert!(real_json == expected_json, "BackupSeed on Settings screen. Expected SelectSeedForBackup screen with no modals, got:\n{}", real_json);
 
-    let real_json = do_action("GoBack", "", "");
+    let real_json = do_action(Action::GoBack, "", "");
     assert!(real_json == current_settings_json, "GoBack on SelectSeedForBackup screen with no seeds available. Expected Settings screen with no modals, got:\n{}", real_json);
 
-    let real_json = do_action("ViewGeneralVerifier", "", "");
+    let real_json = do_action(Action::ViewGeneralVerifier, "", "");
     let cut_real_json = real_json.replace(&alice_sr_alice(), r#"<alice_sr25519_//Alice>"#);
     let expected_json = r#"{"screen":"Verifier","screenLabel":"VERIFIER CERTIFICATE","back":true,"footer":false,"footerButton":"Settings","rightButton":"None","screenNameType":"h4","modal":"Empty","alert":"Empty","screenData":{"public_key":"d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d","identicon":"<alice_sr25519_//Alice>","encryption":"sr25519"},"modalData":{},"alertData":{}}"#;
     assert!(
@@ -369,14 +369,14 @@ fn flow_test_1() {
         real_json
     );
 
-    let real_json = do_action("GoBack", "", "");
+    let real_json = do_action(Action::GoBack, "", "");
     assert!(
         real_json == current_settings_json,
         "GoBack on Verifier screen. Expected Settings screen with no modals, got:\n{}",
         real_json
     );
 
-    let real_json = do_action("ShowDocuments", "", "");
+    let real_json = do_action(Action::ShowDocuments, "", "");
     let expected_json = r#"{"screen":"Documents","screenLabel":"ABOUT","back":true,"footer":false,"footerButton":"Settings","rightButton":"None","screenNameType":"h4","modal":"Empty","alert":"Empty","screenData":{},"modalData":{},"alertData":{}}"#;
     assert!(
         real_json == expected_json,
@@ -384,29 +384,29 @@ fn flow_test_1() {
         real_json
     );
 
-    let real_json = do_action("GoBack", "", "");
+    let real_json = do_action(Action::GoBack, "", "");
     assert!(
         real_json == current_settings_json,
         "GoBack on Documents screen. Expected Settings screen with no modals, got:\n{}",
         real_json
     );
 
-    let real_json = do_action("ManageNetworks", "", "");
+    let real_json = do_action(Action::ManageNetworks, "", "");
     let expected_json = r#"{"screen":"ManageNetworks","screenLabel":"MANAGE NETWORKS","back":true,"footer":false,"footerButton":"Settings","rightButton":"TypesInfo","screenNameType":"h4","modal":"Empty","alert":"Empty","screenData":{"networks":[{"key":"018091b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3","title":"Polkadot","logo":"polkadot","order":0},{"key":"0180b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe","title":"Kusama","logo":"kusama","order":1},{"key":"0180e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e","title":"Westend","logo":"westend","order":2}]},"modalData":{},"alertData":{}}"#;
     assert!(real_json == expected_json, "ManageNetworks on Settings screen. Expected ManageNetworks screen with no modals, got:\n{}", real_json);
 
     let mut manage_networks_json = real_json;
 
-    let real_json = do_action("GoBack", "", "");
+    let real_json = do_action(Action::GoBack, "", "");
     assert!(
         real_json == current_settings_json,
         "GoBack on ManageNetworks screen. Expected Settings screen with no modals, got:\n{}",
         real_json
     );
 
-    do_action("ManageNetworks", "", "");
+    do_action(Action::ManageNetworks, "", "");
     let real_json = do_action(
-        "GoForward",
+        Action::GoForward,
         "0180b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe",
         "",
     );
@@ -418,7 +418,7 @@ fn flow_test_1() {
 
     let mut kusama_json = real_json;
 
-    let real_json = do_action("GoBack", "", "");
+    let real_json = do_action(Action::GoBack, "", "");
     assert!(
         real_json == manage_networks_json,
         "GoBack on NetworkDetails screen. Expected ManageNetworks screen with no modals, got:\n{}",
@@ -426,68 +426,68 @@ fn flow_test_1() {
     );
 
     do_action(
-        "GoForward",
+        Action::GoForward,
         "0180b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe",
         "",
     );
-    let real_json = do_action("ManageMetadata", "9130", "");
+    let real_json = do_action(Action::ManageMetadata, "9130", "");
     let cut_real_json = real_json
         .replace(&alice_sr_alice(), r#"<alice_sr25519_//Alice>"#)
         .replace(&kusama_9130(), r#"<meta_pic_kusama9130>"#);
     let expected_json = r##"{"screen":"NetworkDetails","screenLabel":"Network details","back":true,"footer":false,"footerButton":"Settings","rightButton":"NDMenu","screenNameType":"h4","modal":"ManageMetadata","alert":"Empty","screenData":{"base58prefix":"2","color":"#000","decimals":"12","encryption":"sr25519","genesis_hash":"b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe","logo":"kusama","name":"kusama","order":"1","path_id":"//kusama","secondary_color":"#262626","title":"Kusama","unit":"KSM","current_verifier":{"type":"general","details":{"public_key":"d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d","identicon":"<alice_sr25519_//Alice>","encryption":"sr25519"}},"meta":[{"spec_version":"9130","meta_hash":"3e6bf025743e5cc550883170d91c8275fb238762b214922b41d64f9feba23987","meta_id_pic":"<meta_pic_kusama9130>"}]},"modalData":{"name":"kusama","version":"9130","meta_hash":"3e6bf025743e5cc550883170d91c8275fb238762b214922b41d64f9feba23987","meta_id_pic":"<meta_pic_kusama9130>","networks":[{"title":"Kusama","logo":"kusama","order":1,"current_on_screen":true}]},"alertData":{}}"##;
     assert!(cut_real_json == expected_json, "ManageMetadata on NetworkDetails screen for kusama sr25519 key. Expected NetworkDetails screen for kusama with ManageMetadata modal, got:\n{}", real_json);
 
-    let real_json = do_action("SignMetadata", "", "");
+    let real_json = do_action(Action::SignMetadata, "", "");
     let expected_json = r#"{"screen":"SignSufficientCrypto","screenLabel":"Sign SufficientCrypto","back":true,"footer":false,"footerButton":"Settings","rightButton":"None","screenNameType":"h1","modal":"Empty","alert":"Empty","screenData":{"identities":[]},"modalData":{},"alertData":{}}"#;
     assert!(real_json == expected_json, "SignMetadata on NetworkDetails screen for kusama sr25519 key with ManageMetadata modal for version 9130. Expected SignSufficientCrypto screen for kusama9130 metadata with no modals, got:\n{}", real_json);
 
-    let real_json = do_action("GoBack", "", "");
+    let real_json = do_action(Action::GoBack, "", "");
     assert!(real_json == kusama_json, "GoBack on SignSufficientCrypto screen. Expected NetworkDetails screen with no modals, got:\n{}", real_json);
 
-    do_action("ManageMetadata", "9130", "");
-    let real_json = do_action("RemoveMetadata", "", "");
+    do_action(Action::ManageMetadata, "9130", "");
+    let real_json = do_action(Action::RemoveMetadata, "", "");
     let cut_real_json = real_json.replace(&alice_sr_alice(), r#"<alice_sr25519_//Alice>"#);
     let expected_json = r##"{"screen":"NetworkDetails","screenLabel":"Network details","back":true,"footer":false,"footerButton":"Settings","rightButton":"NDMenu","screenNameType":"h4","modal":"Empty","alert":"Empty","screenData":{"base58prefix":"2","color":"#000","decimals":"12","encryption":"sr25519","genesis_hash":"b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe","logo":"kusama","name":"kusama","order":"1","path_id":"//kusama","secondary_color":"#262626","title":"Kusama","unit":"KSM","current_verifier":{"type":"general","details":{"public_key":"d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d","identicon":"<alice_sr25519_//Alice>","encryption":"sr25519"}},"meta":[]},"modalData":{},"alertData":{}}"##;
     assert!(cut_real_json == expected_json, "RemoveMetadata on ManageNetworks screen with kusama sr25519 key with ManageMetadata modal for version 9130. Expected updated NetworkDetails screen for kusama with no modals, got:\n{}", real_json);
 
     kusama_json = real_json;
 
-    let real_json = do_action("RightButton", "", "");
+    let real_json = do_action(Action::RightButton, "", "");
     let cut_real_json = real_json.replace(&alice_sr_alice(), r#"<alice_sr25519_//Alice>"#);
     let expected_json = r##"{"screen":"NetworkDetails","screenLabel":"Network details","back":true,"footer":false,"footerButton":"Settings","rightButton":"NDMenu","screenNameType":"h4","modal":"NetworkDetailsMenu","alert":"Empty","screenData":{"base58prefix":"2","color":"#000","decimals":"12","encryption":"sr25519","genesis_hash":"b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe","logo":"kusama","name":"kusama","order":"1","path_id":"//kusama","secondary_color":"#262626","title":"Kusama","unit":"KSM","current_verifier":{"type":"general","details":{"public_key":"d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d","identicon":"<alice_sr25519_//Alice>","encryption":"sr25519"}},"meta":[]},"modalData":{},"alertData":{}}"##;
     assert!(cut_real_json == expected_json, "RightButton on NetworkDetails screen for kusama sr25519 key. Expected NetworkDetails screen for kusama with NetworkDetailsMenu modal, got:\n{}", real_json);
 
-    let real_json = do_action("SignNetworkSpecs", "", "");
+    let real_json = do_action(Action::SignNetworkSpecs, "", "");
     let expected_json = r#"{"screen":"SignSufficientCrypto","screenLabel":"Sign SufficientCrypto","back":true,"footer":false,"footerButton":"Settings","rightButton":"None","screenNameType":"h1","modal":"Empty","alert":"Empty","screenData":{"identities":[]},"modalData":{},"alertData":{}}"#;
     assert!(real_json == expected_json, "SignNetworkSpecs on NetworkDetails screen for kusama sr25519 key with NetworkDetailsMenu modal. Expected SignSufficientCrypto screen for kusama specs with no modals, got:\n{}", real_json);
 
-    let real_json = do_action("GoBack", "", "");
+    let real_json = do_action(Action::GoBack, "", "");
     assert!(real_json == kusama_json, "GoBack on SignSufficientCrypto screen. Expected NetworkDetails screen with no modals, got:\n{}", real_json);
 
-    do_action("RightButton", "", "");
-    let real_json = do_action("RemoveNetwork", "", "");
+    do_action(Action::RightButton, "", "");
+    let real_json = do_action(Action::RemoveNetwork, "", "");
     let expected_json = r#"{"screen":"ManageNetworks","screenLabel":"MANAGE NETWORKS","back":true,"footer":false,"footerButton":"Settings","rightButton":"TypesInfo","screenNameType":"h4","modal":"Empty","alert":"Empty","screenData":{"networks":[{"key":"018091b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3","title":"Polkadot","logo":"polkadot","order":0},{"key":"0180e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e","title":"Westend","logo":"westend","order":1}]},"modalData":{},"alertData":{}}"#;
     assert!(real_json == expected_json, "RemoveNetwork on NetworkDetails screen for kusama sr25519. Expected updated ManageNetworks screen with no modals, got:\n{}", real_json);
 
-    let real_json = do_action("RightButton", "", "");
+    let real_json = do_action(Action::RightButton, "", "");
     let cut_real_json = real_json.replace(&types_known(), r#"<types_known>"#);
     let expected_json = r#"{"screen":"ManageNetworks","screenLabel":"MANAGE NETWORKS","back":true,"footer":false,"footerButton":"Settings","rightButton":"TypesInfo","screenNameType":"h4","modal":"TypesInfo","alert":"Empty","screenData":{"networks":[{"key":"018091b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3","title":"Polkadot","logo":"polkadot","order":0},{"key":"0180e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e","title":"Westend","logo":"westend","order":1}]},"modalData":{"types_on_file":true,"types_hash":"d091a5a24a97e18dfe298b167d8fd5a2add10098c8792cba21c39029a9ee0aeb","types_id_pic":"<types_known>"},"alertData":{}}"#;
     assert!(cut_real_json == expected_json, "RightButton on ManageNetworks screen. Expected ManageNetworks screen with TypesInfo modal, got:\n{}", real_json);
 
-    let real_json = do_action("SignTypes", "", "");
+    let real_json = do_action(Action::SignTypes, "", "");
     let expected_json = r#"{"screen":"SignSufficientCrypto","screenLabel":"Sign SufficientCrypto","back":true,"footer":false,"footerButton":"Settings","rightButton":"None","screenNameType":"h1","modal":"Empty","alert":"Empty","screenData":{"identities":[]},"modalData":{},"alertData":{}}"#;
     assert!(real_json == expected_json, "SignTypes on ManageNetworks screen with TypesInfo modal. Expected SignSufficientCrypto screen for types with no modals, got:\n{}", real_json);
 
-    let real_json = do_action("GoBack", "", "");
+    let real_json = do_action(Action::GoBack, "", "");
     assert!(
         real_json == current_settings_json,
         "GoBack on SignSufficientCrypto screen. Expected Settings screen with no modals, got:\n{}",
         real_json
     );
 
-    do_action("ManageNetworks", "", "");
-    do_action("RightButton", "", "");
-    let real_json = do_action("RemoveTypes", "", "");
+    do_action(Action::ManageNetworks, "", "");
+    do_action(Action::RightButton, "", "");
+    let real_json = do_action(Action::RemoveTypes, "", "");
     let cut_real_json = timeless(&real_json)
         .replace(&alice_sr_alice(), r#"<alice_sr25519_//Alice>"#)
         .replace(&kusama_9130(), r#"<meta_pic_kusama9130>"#)
@@ -497,26 +497,26 @@ fn flow_test_1() {
 
     current_log_json = real_json;
 
-    let real_json = do_action("ShowLogDetails", "2", "");
+    let real_json = do_action(Action::ShowLogDetails, "2", "");
     let cut_real_json =
         timeless(&real_json).replace(&alice_sr_alice(), r#"<alice_sr25519_//Alice>"#);
     let expected_json = r##"{"screen":"LogDetails","screenLabel":"Event details","back":true,"footer":true,"footerButton":"Log","rightButton":"None","screenNameType":"h4","modal":"Empty","alert":"Empty","screenData":{"timestamp":"**","events":[{"event":"network_removed","payload":{"base58prefix":"2","color":"#000","decimals":"12","encryption":"sr25519","genesis_hash":"b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe","logo":"kusama","name":"kusama","order":"1","path_id":"//kusama","secondary_color":"#262626","title":"Kusama","unit":"KSM","current_verifier":{"type":"general","details":{"public_key":"d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d","identicon":"<alice_sr25519_//Alice>","encryption":"sr25519"}}}}]},"modalData":{},"alertData":{}}"##;
     assert!(cut_real_json == expected_json, "ShowLogDetails on Log screen with order 2. Expected LogDetails screen with no modals, got:\n{}", real_json);
 
-    let real_json = do_action("GoBack", "", "");
+    let real_json = do_action(Action::GoBack, "", "");
     assert!(
         real_json == current_log_json,
         "GoBack on ShowLogDetails screen. Expected Log screen with no modals, got:\n{}",
         real_json
     );
 
-    do_action("RightButton", "", "");
-    let real_json = do_action("ClearLog", "", "");
+    do_action(Action::RightButton, "", "");
+    let real_json = do_action(Action::ClearLog, "", "");
     let cut_real_json = timeless(&real_json);
     let expected_json = r#"{"screen":"Log","screenLabel":"","back":false,"footer":true,"footerButton":"Log","rightButton":"LogRight","screenNameType":"h4","modal":"Empty","alert":"Empty","screenData":{"log":[{"order":0,"timestamp":"**","events":[{"event":"history_cleared"}]}],"total_entries":1},"modalData":{},"alertData":{}}"#;
     assert!(cut_real_json == expected_json, "ClearLog on Log screen with LogRight modal. Expected updated Log screen with no modals, got:\n{}", real_json);
 
-    let real_json = do_action("NavbarScan", "", "");
+    let real_json = do_action(Action::NavbarScan, "", "");
     let expected_json = r#"{"screen":"Scan","screenLabel":"","back":false,"footer":true,"footerButton":"Scan","rightButton":"None","screenNameType":"h1","modal":"Empty","alert":"Empty","screenData":{},"modalData":{},"alertData":{}}"#;
     assert!(
         real_json == expected_json,
@@ -527,7 +527,7 @@ fn flow_test_1() {
     let scan_json = real_json;
 
     let real_json = do_action(
-        "TransactionFetched",
+        Action::TransactionFetched,
         std::fs::read_to_string("for_tests/add_specs_kusama-sr25519_Alice-sr25519.txt")
             .unwrap()
             .trim(),
@@ -538,7 +538,7 @@ fn flow_test_1() {
     let expected_json = r##"{"screen":"Transaction","screenLabel":"","back":true,"footer":false,"footerButton":"Scan","rightButton":"None","screenNameType":"h1","modal":"Empty","alert":"Empty","screenData":{"content":{"verifier":[{"index":0,"indent":0,"type":"verifier","payload":{"public_key":"d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d","identicon":"<alice_sr25519_//Alice>","encryption":"sr25519"}}],"new_specs":[{"index":1,"indent":0,"type":"new_specs","payload":{"base58prefix":"2","color":"#000","decimals":"12","encryption":"sr25519","genesis_hash":"b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe","logo":"kusama","name":"kusama","path_id":"//kusama","secondary_color":"#262626","title":"Kusama","unit":"KSM"}}]},"type":"stub"},"modalData":{},"alertData":{}}"##;
     assert!(cut_real_json == expected_json, "TransactionFetched on Scan screen with add_specs info for kusama. Expected Transaction screen with no modals, got:\n{}", real_json);
 
-    let real_json = do_action("GoBack", "", "");
+    let real_json = do_action(Action::GoBack, "", "");
     assert!(
         real_json == scan_json,
         "GoBack on Transaction screen. Expected Scan screen with no modals, got:\n{}",
@@ -546,28 +546,28 @@ fn flow_test_1() {
     );
 
     do_action(
-        "TransactionFetched",
+        Action::TransactionFetched,
         std::fs::read_to_string("for_tests/add_specs_kusama-sr25519_Alice-sr25519.txt")
             .unwrap()
             .trim(),
         "",
     );
-    let real_json = do_action("GoForward", "", "");
+    let real_json = do_action(Action::GoForward, "", "");
     let cut_real_json =
         timeless(&real_json).replace(&alice_sr_alice(), r#"<alice_sr25519_//Alice>"#);
     let expected_json = r##"{"screen":"NetworkDetails","screenLabel":"Network details","back":true,"footer":false,"footerButton":"Settings","rightButton":"NDMenu","screenNameType":"h4","modal":"Empty","alert":"Empty","screenData":{"base58prefix":"2","color":"#000","decimals":"12","encryption":"sr25519","genesis_hash":"b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe","logo":"kusama","name":"kusama","order":"2","path_id":"//kusama","secondary_color":"#262626","title":"Kusama","unit":"KSM","current_verifier":{"type":"general","details":{"public_key":"d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d","identicon":"<alice_sr25519_//Alice>","encryption":"sr25519"}},"meta":[]},"modalData":{},"alertData":{}}"##;
     assert!(cut_real_json == expected_json, "GoForward on Transaction screen with add specs stub. Expected NetworkDetails screen for kusama sr25519, with no modals, got:\n{}", real_json);
 
-    let real_json = do_action("GoBack", "", "");
+    let real_json = do_action(Action::GoBack, "", "");
     let expected_json = r#"{"screen":"ManageNetworks","screenLabel":"MANAGE NETWORKS","back":true,"footer":false,"footerButton":"Settings","rightButton":"TypesInfo","screenNameType":"h4","modal":"Empty","alert":"Empty","screenData":{"networks":[{"key":"018091b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3","title":"Polkadot","logo":"polkadot","order":0},{"key":"0180e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e","title":"Westend","logo":"westend","order":1},{"key":"0180b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe","title":"Kusama","logo":"kusama","order":2}]},"modalData":{},"alertData":{}}"#;
     assert!(real_json == expected_json, "GoBack on NetworkDetails screen after adding kusama sr25519 specs. Expected ManageNetworks screen with no modals, got:\n{}", real_json);
 
     manage_networks_json = real_json;
 
-    let real_json = do_action("GoBack", "", "");
+    let real_json = do_action(Action::GoBack, "", "");
     assert!(real_json == current_settings_json, "GoBack on ManageNetworks screen, to see footer. Expected known Settings screen with no modals, got:\n{}", real_json);
 
-    let real_json = do_action("NavbarLog", "", "");
+    let real_json = do_action(Action::NavbarLog, "", "");
     let cut_real_json =
         timeless(&real_json).replace(&alice_sr_alice(), r#"<alice_sr25519_//Alice>"#);
     let expected_json = r##"{"screen":"Log","screenLabel":"","back":false,"footer":true,"footerButton":"Log","rightButton":"LogRight","screenNameType":"h4","modal":"Empty","alert":"Empty","screenData":{"log":[{"order":1,"timestamp":"**","events":[{"event":"network_specs_added","payload":{"base58prefix":"2","color":"#000","decimals":"12","encryption":"sr25519","genesis_hash":"b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe","logo":"kusama","name":"kusama","order":"2","path_id":"//kusama","secondary_color":"#262626","title":"Kusama","unit":"KSM","current_verifier":{"type":"general","details":{"public_key":"d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d","identicon":"<alice_sr25519_//Alice>","encryption":"sr25519"}}}}]},{"order":0,"timestamp":"**","events":[{"event":"history_cleared"}]}],"total_entries":2},"modalData":{},"alertData":{}}"##;
@@ -577,9 +577,9 @@ fn flow_test_1() {
         real_json
     );
 
-    do_action("NavbarScan", "", "");
+    do_action(Action::NavbarScan, "", "");
     let real_json = do_action(
-        "TransactionFetched",
+        Action::TransactionFetched,
         std::fs::read_to_string("for_tests/load_metadata_kusamaV9151_Alice-sr25519.txt")
             .unwrap()
             .trim(),
@@ -591,16 +591,16 @@ fn flow_test_1() {
     let expected_json = r#"{"screen":"Transaction","screenLabel":"","back":true,"footer":false,"footerButton":"Scan","rightButton":"None","screenNameType":"h1","modal":"Empty","alert":"Empty","screenData":{"content":{"verifier":[{"index":0,"indent":0,"type":"verifier","payload":{"public_key":"d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d","identicon":"<alice_sr25519_//Alice>","encryption":"sr25519"}}],"meta":[{"index":1,"indent":0,"type":"meta","payload":{"specname":"kusama","spec_version":"9151","meta_hash":"9a179da92949dd3ab3829177149ec83dc46fb009af10a45f955949b2a6693b46","meta_id_pic":"<meta_pic_kusama9151>"}}]},"type":"stub"},"modalData":{},"alertData":{}}"#;
     assert!(cut_real_json == expected_json, "TransactionFetched on Scan screen with load_metadata for kusama9151. Expected Transaction screen with no modals, got:\n{}", real_json);
 
-    let real_json = do_action("GoForward", "", "");
+    let real_json = do_action(Action::GoForward, "", "");
     let cut_real_json = real_json
         .replace(&alice_sr_alice(), r#"<alice_sr25519_//Alice>"#)
         .replace(&kusama_9151(), r#"<meta_pic_kusama9151>"#);
     let expected_json = r##"{"screen":"NetworkDetails","screenLabel":"Network details","back":true,"footer":false,"footerButton":"Settings","rightButton":"NDMenu","screenNameType":"h4","modal":"Empty","alert":"Empty","screenData":{"base58prefix":"2","color":"#000","decimals":"12","encryption":"sr25519","genesis_hash":"b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe","logo":"kusama","name":"kusama","order":"2","path_id":"//kusama","secondary_color":"#262626","title":"Kusama","unit":"KSM","current_verifier":{"type":"general","details":{"public_key":"d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d","identicon":"<alice_sr25519_//Alice>","encryption":"sr25519"}},"meta":[{"spec_version":"9151","meta_hash":"9a179da92949dd3ab3829177149ec83dc46fb009af10a45f955949b2a6693b46","meta_id_pic":"<meta_pic_kusama9151>"}]},"modalData":{},"alertData":{}}"##;
     assert!(cut_real_json == expected_json, "GoForward on Transaction screen with load metadata stub. Expected NetworkDetails screen for kusama sr25519, updated with new metadata, with no modals, got:\n{}", real_json);
 
-    do_action("GoBack", "", "");
-    do_action("GoBack", "", "");
-    let real_json = do_action("NavbarLog", "", "");
+    do_action(Action::GoBack, "", "");
+    do_action(Action::GoBack, "", "");
+    let real_json = do_action(Action::NavbarLog, "", "");
     let cut_real_json = timeless(&real_json)
         .replace(&alice_sr_alice(), r#"<alice_sr25519_//Alice>"#)
         .replace(&kusama_9151(), r#"<meta_pic_kusama9151>"#);
@@ -611,9 +611,9 @@ fn flow_test_1() {
         real_json
     );
 
-    do_action("NavbarScan", "", "");
+    do_action(Action::NavbarScan, "", "");
     let real_json = do_action(
-        "TransactionFetched",
+        Action::TransactionFetched,
         std::fs::read_to_string("for_tests/load_types_Alice-sr25519.txt")
             .unwrap()
             .trim(),
@@ -625,11 +625,11 @@ fn flow_test_1() {
     let expected_json = r#"{"screen":"Transaction","screenLabel":"","back":true,"footer":false,"footerButton":"Scan","rightButton":"None","screenNameType":"h1","modal":"Empty","alert":"Empty","screenData":{"content":{"verifier":[{"index":0,"indent":0,"type":"verifier","payload":{"public_key":"d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d","identicon":"<alice_sr25519_//Alice>","encryption":"sr25519"}}],"warning":[{"index":1,"indent":0,"type":"warning","payload":"Updating types (really rare operation)."}],"types_info":[{"index":2,"indent":0,"type":"types","payload":{"types_hash":"d091a5a24a97e18dfe298b167d8fd5a2add10098c8792cba21c39029a9ee0aeb","types_id_pic":"<types_known>"}}]},"type":"stub"},"modalData":{},"alertData":{}}"#;
     assert!(cut_real_json == expected_json, "TransactionFetched on Scan screen with load_types. Not that we really need them anymore. Expected Transaction screen with no modals, got:\n{}", real_json);
 
-    let real_json = do_action("GoForward", "", "");
+    let real_json = do_action(Action::GoForward, "", "");
     assert!(real_json == manage_networks_json, "GoForward on Transaction screen with load types stub. Expected known ManageNetworks screen with no modals, got:\n{}", real_json);
 
-    do_action("GoBack", "", "");
-    let real_json = do_action("NavbarLog", "", "");
+    do_action(Action::GoBack, "", "");
+    let real_json = do_action(Action::NavbarLog, "", "");
     let cut_real_json = timeless(&real_json)
         .replace(&alice_sr_alice(), r#"<alice_sr25519_//Alice>"#)
         .replace(&kusama_9151(), r#"<meta_pic_kusama9151>"#)
@@ -641,15 +641,15 @@ fn flow_test_1() {
         real_json
     );
 
-    do_action("RightButton", "", "");
-    let real_json = do_action("ClearLog", "", "");
+    do_action(Action::RightButton, "", "");
+    let real_json = do_action(Action::ClearLog, "", "");
     let cut_real_json = timeless(&real_json);
     let expected_json = r#"{"screen":"Log","screenLabel":"","back":false,"footer":true,"footerButton":"Log","rightButton":"LogRight","screenNameType":"h4","modal":"Empty","alert":"Empty","screenData":{"log":[{"order":0,"timestamp":"**","events":[{"event":"history_cleared"}]}],"total_entries":1},"modalData":{},"alertData":{}}"#;
     assert!(cut_real_json == expected_json, "ClearLog on Log screen with LogRight modal. Expected updated Log screen with no modals, got:\n{}", real_json);
 
     current_log_json = real_json;
 
-    let real_json = do_action("NavbarKeys", "", "");
+    let real_json = do_action(Action::NavbarKeys, "", "");
     let expected_json = r#"{"screen":"SeedSelector","screenLabel":"Select seed","back":false,"footer":true,"footerButton":"Keys","rightButton":"NewSeed","screenNameType":"h1","modal":"NewSeedMenu","alert":"Empty","screenData":{"seedNameCards":[]},"modalData":{},"alertData":{}}"#;
     assert!(
         real_json == expected_json,
@@ -657,7 +657,7 @@ fn flow_test_1() {
         real_json
     );
 
-    let real_json = do_action("NewSeed", "", "");
+    let real_json = do_action(Action::NewSeed, "", "");
     let expected_json = r#"{"screen":"NewSeed","screenLabel":"New Seed","back":true,"footer":false,"footerButton":"Keys","rightButton":"None","screenNameType":"h1","modal":"Empty","alert":"Empty","screenData":{"keyboard":true},"modalData":{},"alertData":{}}"#;
     assert!(
         real_json == expected_json,
@@ -667,43 +667,43 @@ fn flow_test_1() {
 
     let new_seed_json = real_json;
 
-    let real_json = do_action("GoBack", "", "");
+    let real_json = do_action(Action::GoBack, "", "");
     assert!(
         real_json == seed_selector_json,
         "GoBack on NewSeed screen. Expected SeedSelector screen with no modals, got:\n{}",
         real_json
     );
 
-    do_action("NewSeed", "", "");
-    let real_json = do_action("GoForward", "Portia", "");
+    do_action(Action::NewSeed, "", "");
+    let real_json = do_action(Action::GoForward, "Portia", "");
     let (cut_real_json, _) = cut_seed(&cut_identicon(&real_json));
     let expected_json = r#"{"screen":"NewSeed","screenLabel":"New Seed","back":true,"footer":false,"footerButton":"Keys","rightButton":"None","screenNameType":"h1","modal":"NewSeedBackup","alert":"Empty","screenData":{"keyboard":false},"modalData":{"seed":"Portia","seed_phrase":"**","identicon":"**"},"alertData":{}}"#;
     assert!(cut_real_json == expected_json, "GoForward on NewSeed screen with non-empty seed name. Expected NewSeed screen with NewSeedBackup modal, got:\n{}", real_json);
 
-    let real_json = do_action("GoBack", "", "");
+    let real_json = do_action(Action::GoBack, "", "");
     assert!(real_json == new_seed_json, "GoBack on NewSeed screen with generated seed. Expected NewSeed screen with no modals, got:\n{}", real_json);
 
-    let real_json = do_action("GoBack", "", "");
+    let real_json = do_action(Action::GoBack, "", "");
     assert!(real_json == seed_selector_json, "GoBack on NewSeed screen with no modals, to see footer. Expected known SeedSelector screen with no modals, got:\n{}", real_json);
 
-    let real_json = do_action("NavbarLog", "", "");
+    let real_json = do_action(Action::NavbarLog, "", "");
     assert!(real_json == current_log_json, "Switched to Log from SeedSelector after cancelling seed creation. Expected known Log screen with no modals, got:\n{}", real_json);
 
-    do_action("NavbarKeys", "", "");
-    do_action("NewSeed", "", "");
-    let real_json = do_action("GoForward", "Portia", "");
+    do_action(Action::NavbarKeys, "", "");
+    do_action(Action::NewSeed, "", "");
+    let real_json = do_action(Action::GoForward, "Portia", "");
     let (cut_real_json, seed_phrase_portia) = cut_seed(&cut_identicon(&real_json));
     let expected_json = r#"{"screen":"NewSeed","screenLabel":"New Seed","back":true,"footer":false,"footerButton":"Keys","rightButton":"None","screenNameType":"h1","modal":"NewSeedBackup","alert":"Empty","screenData":{"keyboard":false},"modalData":{"seed":"Portia","seed_phrase":"**","identicon":"**"},"alertData":{}}"#;
     assert!(cut_real_json == expected_json, "GoForward on NewSeed screen with non-empty seed name. Expected NewSeed screen with NewSeedBackup modal, got:\n{}", real_json);
 
-    let real_json = do_action("GoForward", "true", &seed_phrase_portia);
+    let real_json = do_action(Action::GoForward, "true", &seed_phrase_portia);
     let cut_real_json = cut_address_key(&cut_base58(&cut_identicon(&real_json)));
     let expected_json = r#"{"screen":"Keys","screenLabel":"","back":true,"footer":true,"footerButton":"Keys","rightButton":"Backup","screenNameType":"h4","modal":"Empty","alert":"Empty","screenData":{"root":{"seed_name":"Portia","identicon":"**","address_key":"**","base58":"**","swiped":false,"multiselect":false},"set":[{"address_key":"**","base58":"**","identicon":"**","has_pwd":false,"path":"//polkadot","swiped":false,"multiselect":false}],"network":{"title":"Polkadot","logo":"polkadot"},"multiselect_mode":false,"multiselect_count":""},"modalData":{},"alertData":{}}"#;
     assert!(cut_real_json == expected_json, "GoForward on NewSeed screen with NewSeedBackup modal active. Expected Keys screen with no modals, got:\n{}", real_json);
 
     update_seed_names(r#"Portia"#);
 
-    let real_json = do_action("GoBack", "", "");
+    let real_json = do_action(Action::GoBack, "", "");
     let cut_real_json = cut_identicon(&real_json);
     let expected_json = r#"{"screen":"SeedSelector","screenLabel":"Select seed","back":false,"footer":true,"footerButton":"Keys","rightButton":"NewSeed","screenNameType":"h1","modal":"Empty","alert":"Empty","screenData":{"seedNameCards":[{"identicon":"**","seed_name":"Portia"}]},"modalData":{},"alertData":{}}"#;
     assert!(
@@ -714,99 +714,99 @@ fn flow_test_1() {
 
     seed_selector_json = real_json;
 
-    let real_json = do_action("NavbarLog", "", "");
+    let real_json = do_action(Action::NavbarLog, "", "");
     let cut_real_json = cut_public_key(&timeless(&real_json));
     let expected_json = r##"{"screen":"Log","screenLabel":"","back":false,"footer":true,"footerButton":"Log","rightButton":"LogRight","screenNameType":"h4","modal":"Empty","alert":"Empty","screenData":{"log":[{"order":1,"timestamp":"**","events":[{"event":"seed_created","payload":"Portia"},{"event":"identity_added","payload":{"seed_name":"Portia","encryption":"sr25519","public_key":"**","path":"","network_genesis_hash":"91b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3"}},{"event":"identity_added","payload":{"seed_name":"Portia","encryption":"sr25519","public_key":"**","path":"//polkadot","network_genesis_hash":"91b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3"}},{"event":"identity_added","payload":{"seed_name":"Portia","encryption":"sr25519","public_key":"**","path":"","network_genesis_hash":"b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe"}},{"event":"identity_added","payload":{"seed_name":"Portia","encryption":"sr25519","public_key":"**","path":"//kusama","network_genesis_hash":"b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe"}},{"event":"identity_added","payload":{"seed_name":"Portia","encryption":"sr25519","public_key":"**","path":"","network_genesis_hash":"e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e"}},{"event":"identity_added","payload":{"seed_name":"Portia","encryption":"sr25519","public_key":"**","path":"//westend","network_genesis_hash":"e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e"}}]},{"order":0,"timestamp":"**","events":[{"event":"history_cleared"}]}],"total_entries":2},"modalData":{},"alertData":{}}"##;
     assert!(cut_real_json == expected_json, "Switched to Log from SeedSelector after adding new seed. Expected updated Log screen with no modals, got:\n{}", real_json);
 
-    do_action("RightButton", "", "");
-    let real_json = do_action("ClearLog", "", "");
+    do_action(Action::RightButton, "", "");
+    let real_json = do_action(Action::ClearLog, "", "");
     let cut_real_json = timeless(&real_json);
     let expected_json = r#"{"screen":"Log","screenLabel":"","back":false,"footer":true,"footerButton":"Log","rightButton":"LogRight","screenNameType":"h4","modal":"Empty","alert":"Empty","screenData":{"log":[{"order":0,"timestamp":"**","events":[{"event":"history_cleared"}]}],"total_entries":1},"modalData":{},"alertData":{}}"#;
     assert!(cut_real_json == expected_json, "ClearLog on Log screen with LogRight modal. Expected updated Log screen with no modals, got:\n{}", real_json);
 
-    do_action("NavbarKeys", "", "");
-    do_action("RightButton", "", "");
-    let real_json = do_action("RecoverSeed", "", "");
+    do_action(Action::NavbarKeys, "", "");
+    do_action(Action::RightButton, "", "");
+    let real_json = do_action(Action::RecoverSeed, "", "");
     let expected_json = r#"{"screen":"RecoverSeedName","screenLabel":"Recover Seed","back":true,"footer":false,"footerButton":"Keys","rightButton":"None","screenNameType":"h1","modal":"Empty","alert":"Empty","screenData":{"seed_name":"","keyboard":true},"modalData":{},"alertData":{}}"#;
     assert!(real_json == expected_json, "RecoverSeed on SeedSelector screen with NewSeedMenu modal. Expected RecoverSeedName screen with no modals, got:\n{}", real_json);
 
-    let real_json = do_action("GoBack", "", "");
+    let real_json = do_action(Action::GoBack, "", "");
     assert!(real_json == seed_selector_json, "GoBack on RecoverSeedName screen with no modals. Expected known SeedSelector screen, got:\n{}", real_json);
 
-    do_action("RightButton", "", "");
-    do_action("RecoverSeed", "", "");
-    let real_json = do_action("GoForward", "Portia", "");
+    do_action(Action::RightButton, "", "");
+    do_action(Action::RecoverSeed, "", "");
+    let real_json = do_action(Action::GoForward, "Portia", "");
     let expected_json = r#"{"screen":"RecoverSeedName","screenLabel":"Recover Seed","back":true,"footer":false,"footerButton":"Keys","rightButton":"None","screenNameType":"h1","modal":"Empty","alert":"Error","screenData":{"seed_name":"","keyboard":false},"modalData":{},"alertData":{"error":"Bad input data. Seed name Portia already exists."}}"#;
     assert!(real_json == expected_json, "GoForward on RecoverSeedName screen using existing name. Expected RecoverSeedName screen with error, got:\n{}", real_json);
 
-    do_action("GoBack", "", "");
-    let real_json = do_action("GoForward", "Alys", "");
+    do_action(Action::GoBack, "", "");
+    let real_json = do_action(Action::GoForward, "Alys", "");
     let expected_json = r#"{"screen":"RecoverSeedPhrase","screenLabel":"Recover Seed","back":true,"footer":false,"footerButton":"Keys","rightButton":"None","screenNameType":"h1","modal":"Empty","alert":"Empty","screenData":{"seed_name":"Alys","keyboard":true,"user_input":" ","guess_set":["abandon","ability","able","about","above","absent","absorb","abstract"],"draft":[]},"modalData":{},"alertData":{}}"#;
     assert!(real_json == expected_json, "GoForward on RecoverSeedName screen using new name. Expected RecoverSeedPhrase screen with no modals, got:\n{}", real_json);
 
-    let real_json = do_action("GoBack", "", "");
+    let real_json = do_action(Action::GoBack, "", "");
     let expected_json = r#"{"screen":"RecoverSeedName","screenLabel":"Recover Seed","back":true,"footer":false,"footerButton":"Keys","rightButton":"None","screenNameType":"h1","modal":"Empty","alert":"Empty","screenData":{"seed_name":"Alys","keyboard":true},"modalData":{},"alertData":{}}"#;
     assert!(real_json == expected_json, "GoBack on RecoverSeedPhrase screen. Expected RecoverSeedName screen with no modals and with retained name, got:\n{}", real_json);
 
-    let real_json = do_action("GoForward", "Alice", "");
+    let real_json = do_action(Action::GoForward, "Alice", "");
     let expected_json = r#"{"screen":"RecoverSeedPhrase","screenLabel":"Recover Seed","back":true,"footer":false,"footerButton":"Keys","rightButton":"None","screenNameType":"h1","modal":"Empty","alert":"Empty","screenData":{"seed_name":"Alice","keyboard":true,"user_input":" ","guess_set":["abandon","ability","able","about","above","absent","absorb","abstract"],"draft":[]},"modalData":{},"alertData":{}}"#;
     assert!(real_json == expected_json, "GoForward on RecoverSeedName screen using new name. Expected RecoverSeedPhrase screen with no modals, got:\n{}", real_json);
 
     // Alice painstakingly recalls her seed phrase
-    let real_json = do_action("TextEntry", " botto", "");
+    let real_json = do_action(Action::TextEntry, " botto", "");
     let expected_json = r#"{"screen":"RecoverSeedPhrase","screenLabel":"Recover Seed","back":true,"footer":false,"footerButton":"Keys","rightButton":"None","screenNameType":"h1","modal":"Empty","alert":"Empty","screenData":{"seed_name":"Alice","keyboard":true,"user_input":" botto","guess_set":["bottom"],"draft":[]},"modalData":{},"alertData":{}}"#;
     assert!(real_json == expected_json, "TextEntry on RecoverSeedPhrase screen with incomplete word. Expected RecoverSeedPhrase screen with no modals, got:\n{}", real_json);
 
-    let real_json = do_action("TextEntry", " botto ", "");
+    let real_json = do_action(Action::TextEntry, " botto ", "");
     let expected_json = r#"{"screen":"RecoverSeedPhrase","screenLabel":"Recover Seed","back":true,"footer":false,"footerButton":"Keys","rightButton":"None","screenNameType":"h1","modal":"Empty","alert":"Empty","screenData":{"seed_name":"Alice","keyboard":true,"user_input":" ","guess_set":["abandon","ability","able","about","above","absent","absorb","abstract"],"draft":[{"order":0,"content":"bottom"}]},"modalData":{},"alertData":{}}"#;
     assert!(real_json == expected_json, "TextEntry on RecoverSeedPhrase screen with incomplete word and space. Expected word to be added, got:\n{}", real_json);
 
-    let real_json = do_action("TextEntry", " abstract ", "");
+    let real_json = do_action(Action::TextEntry, " abstract ", "");
     let expected_json = r#"{"screen":"RecoverSeedPhrase","screenLabel":"Recover Seed","back":true,"footer":false,"footerButton":"Keys","rightButton":"None","screenNameType":"h1","modal":"Empty","alert":"Empty","screenData":{"seed_name":"Alice","keyboard":true,"user_input":" ","guess_set":["abandon","ability","able","about","above","absent","absorb","abstract"],"draft":[{"order":0,"content":"bottom"},{"order":1,"content":"abstract"}]},"modalData":{},"alertData":{}}"#;
     assert!(real_json == expected_json, "TextEntry on RecoverSeedPhrase screen with complete long word. Wrong one. Expected word to be added, got:\n{}", real_json);
 
-    let real_json = do_action("TextEntry", "", "");
+    let real_json = do_action(Action::TextEntry, "", "");
     let expected_json = r#"{"screen":"RecoverSeedPhrase","screenLabel":"Recover Seed","back":true,"footer":false,"footerButton":"Keys","rightButton":"None","screenNameType":"h1","modal":"Empty","alert":"Empty","screenData":{"seed_name":"Alice","keyboard":true,"user_input":" ","guess_set":["abandon","ability","able","about","above","absent","absorb","abstract"],"draft":[{"order":0,"content":"bottom"}]},"modalData":{},"alertData":{}}"#;
     assert!(real_json == expected_json, "TextEntry on RecoverSeedPhrase screen with empty text. Expected last draft word to be deleted, got:\n{}", real_json);
 
-    do_action("TextEntry", " d", "");
+    do_action(Action::TextEntry, " d", "");
 
     // a cat interfered
-    let real_json = do_action("TextEntry", " ddddddddddddddd", "");
+    let real_json = do_action(Action::TextEntry, " ddddddddddddddd", "");
     let expected_json = r#"{"screen":"RecoverSeedPhrase","screenLabel":"Recover Seed","back":true,"footer":false,"footerButton":"Keys","rightButton":"None","screenNameType":"h1","modal":"Empty","alert":"Empty","screenData":{"seed_name":"Alice","keyboard":true,"user_input":" d","guess_set":["dad","damage","damp","dance","danger","daring","dash","daughter"],"draft":[{"order":0,"content":"bottom"}]},"modalData":{},"alertData":{}}"#;
     assert!(real_json == expected_json, "TextEntry on RecoverSeedPhrase screen with no guesses. Expected to keep previous good user entry, got:\n{}", real_json);
 
-    let real_json = do_action("TextEntry", " dddddddd ", "");
+    let real_json = do_action(Action::TextEntry, " dddddddd ", "");
     let expected_json = r#"{"screen":"RecoverSeedPhrase","screenLabel":"Recover Seed","back":true,"footer":false,"footerButton":"Keys","rightButton":"None","screenNameType":"h1","modal":"Empty","alert":"Empty","screenData":{"seed_name":"Alice","keyboard":true,"user_input":" d","guess_set":["dad","damage","damp","dance","danger","daring","dash","daughter"],"draft":[{"order":0,"content":"bottom"}]},"modalData":{},"alertData":{}}"#;
     assert!(real_json == expected_json, "TextEntry on RecoverSeedPhrase screen with erroneous entry, attempted to add to the draft using whitespace. Expected nothing to happen, got:\n{}", real_json);
 
-    do_action("TextEntry", " driv ", "");
-    do_action("TextEntry", " obe ", "");
-    do_action("TextEntry", " lake ", "");
-    do_action("TextEntry", " curt ", "");
-    let real_json = do_action("TextEntry", " som", "");
+    do_action(Action::TextEntry, " driv ", "");
+    do_action(Action::TextEntry, " obe ", "");
+    do_action(Action::TextEntry, " lake ", "");
+    do_action(Action::TextEntry, " curt ", "");
+    let real_json = do_action(Action::TextEntry, " som", "");
     let expected_json = r#"{"screen":"RecoverSeedPhrase","screenLabel":"Recover Seed","back":true,"footer":false,"footerButton":"Keys","rightButton":"None","screenNameType":"h1","modal":"Empty","alert":"Empty","screenData":{"seed_name":"Alice","keyboard":true,"user_input":" som","guess_set":["someone"],"draft":[{"order":0,"content":"bottom"},{"order":1,"content":"drive"},{"order":2,"content":"obey"},{"order":3,"content":"lake"},{"order":4,"content":"curtain"}]},"modalData":{},"alertData":{}}"#;
     assert!(real_json == expected_json, "TextEntry on RecoverSeedPhrase screen with incomplete word with typo. Expected correct draft and guesses for wrong entry, got:\n{}", real_json);
 
-    let real_json = do_action("TextEntry", " smo", "");
+    let real_json = do_action(Action::TextEntry, " smo", "");
     let expected_json = r#"{"screen":"RecoverSeedPhrase","screenLabel":"Recover Seed","back":true,"footer":false,"footerButton":"Keys","rightButton":"None","screenNameType":"h1","modal":"Empty","alert":"Empty","screenData":{"seed_name":"Alice","keyboard":true,"user_input":" smo","guess_set":["smoke","smooth"],"draft":[{"order":0,"content":"bottom"},{"order":1,"content":"drive"},{"order":2,"content":"obey"},{"order":3,"content":"lake"},{"order":4,"content":"curtain"}]},"modalData":{},"alertData":{}}"#;
     assert!(real_json == expected_json, "TextEntry on RecoverSeedPhrase screen with incomplete word. Expected correct draft and a few guesses, got:\n{}", real_json);
 
-    let real_json = do_action("TextEntry", " smo ", "");
+    let real_json = do_action(Action::TextEntry, " smo ", "");
     let expected_json = r#"{"screen":"RecoverSeedPhrase","screenLabel":"Recover Seed","back":true,"footer":false,"footerButton":"Keys","rightButton":"None","screenNameType":"h1","modal":"Empty","alert":"Empty","screenData":{"seed_name":"Alice","keyboard":true,"user_input":" smo","guess_set":["smoke","smooth"],"draft":[{"order":0,"content":"bottom"},{"order":1,"content":"drive"},{"order":2,"content":"obey"},{"order":3,"content":"lake"},{"order":4,"content":"curtain"}]},"modalData":{},"alertData":{}}"#;
     assert!(real_json == expected_json, "Try to enter with whitespace a word with multiple possible endings. Expected nothing to happen, got:\n{}", real_json);
 
-    let real_json = do_action("PushWord", "smoke", "");
+    let real_json = do_action(Action::PushWord, "smoke", "");
     let expected_json = r#"{"screen":"RecoverSeedPhrase","screenLabel":"Recover Seed","back":true,"footer":false,"footerButton":"Keys","rightButton":"None","screenNameType":"h1","modal":"Empty","alert":"Empty","screenData":{"seed_name":"Alice","keyboard":true,"user_input":" ","guess_set":["abandon","ability","able","about","above","absent","absorb","abstract"],"draft":[{"order":0,"content":"bottom"},{"order":1,"content":"drive"},{"order":2,"content":"obey"},{"order":3,"content":"lake"},{"order":4,"content":"curtain"},{"order":5,"content":"smoke"}]},"modalData":{},"alertData":{}}"#;
     assert!(real_json == expected_json, "PushWord on RecoverSeedPhrase screen. Expected correct draft and empty user_input, got:\n{}", real_json);
 
-    do_action("TextEntry", " bask ", "");
-    do_action("TextEntry", " hold ", "");
-    do_action("TextEntry", " race ", "");
-    do_action("TextEntry", " lone ", "");
-    do_action("TextEntry", " fit ", "");
-    let real_json = do_action("TextEntry", " walk ", "");
+    do_action(Action::TextEntry, " bask ", "");
+    do_action(Action::TextEntry, " hold ", "");
+    do_action(Action::TextEntry, " race ", "");
+    do_action(Action::TextEntry, " lone ", "");
+    do_action(Action::TextEntry, " fit ", "");
+    let real_json = do_action(Action::TextEntry, " walk ", "");
     let expected_json = r#"{"screen":"RecoverSeedPhrase","screenLabel":"Recover Seed","back":true,"footer":false,"footerButton":"Keys","rightButton":"None","screenNameType":"h1","modal":"Empty","alert":"Empty","screenData":{"seed_name":"Alice","keyboard":true,"user_input":" ","guess_set":["abandon","ability","able","about","above","absent","absorb","abstract"],"draft":[{"order":0,"content":"bottom"},{"order":1,"content":"drive"},{"order":2,"content":"obey"},{"order":3,"content":"lake"},{"order":4,"content":"curtain"},{"order":5,"content":"smoke"},{"order":6,"content":"basket"},{"order":7,"content":"hold"},{"order":8,"content":"race"},{"order":9,"content":"lonely"},{"order":10,"content":"fit"},{"order":11,"content":"walk"}],"ready_seed":"bottom drive obey lake curtain smoke basket hold race lonely fit walk"},"modalData":{},"alertData":{}}"#;
     assert!(real_json == expected_json, "TextEntry on RecoverSeedPhrase screen finalizing draft. Expected correct full draft and allowed seed phrase to proceed, got:\n{}", real_json);
 
@@ -814,7 +814,7 @@ fn flow_test_1() {
     // here the phone gets the finalized allowed seed, and needs to check it with strongbox, to see if the seed phrase already is known
     // can't model it here
 
-    let real_json = do_action("GoForward", "false", ALICE_SEED_PHRASE);
+    let real_json = do_action(Action::GoForward, "false", ALICE_SEED_PHRASE);
     let cut_real_json = real_json
         .replace(&alice_sr_polkadot(), r#"<alice_sr25519_//polkadot>"#)
         .replace(&empty_png(), r#"<empty>"#);
@@ -825,7 +825,7 @@ fn flow_test_1() {
 
     let mut alice_polkadot_keys_json = real_json;
 
-    let real_json = do_action("GoBack", "", "");
+    let real_json = do_action(Action::GoBack, "", "");
     let cut_real_json = cut_identicon(&real_json.replace(&empty_png(), r#"<empty>"#));
     let expected_json = r#"{"screen":"SeedSelector","screenLabel":"Select seed","back":false,"footer":true,"footerButton":"Keys","rightButton":"NewSeed","screenNameType":"h1","modal":"Empty","alert":"Empty","screenData":{"seedNameCards":[{"identicon":"<empty>","seed_name":"Alice"},{"identicon":"**","seed_name":"Portia"}]},"modalData":{},"alertData":{}}"#;
     assert!(
@@ -834,11 +834,11 @@ fn flow_test_1() {
         real_json
     );
 
-    let real_json = do_action("SelectSeed", "Alice", "");
+    let real_json = do_action(Action::SelectSeed, "Alice", "");
     assert!(real_json == alice_polkadot_keys_json, "SelectSeed on SeedSelector screen. Expected known Keys screen for Alice polkadot keys, got:\n{}", real_json);
 
     let real_json = do_action(
-        "SelectKey",
+        Action::SelectKey,
         "01f606519cb8726753885cd4d0f518804a69a5e0badf36fee70feadd8044081730",
         "",
     );
@@ -852,14 +852,14 @@ fn flow_test_1() {
         real_json
     );
 
-    let real_json = do_action("GoBack", "", "");
+    let real_json = do_action(Action::GoBack, "", "");
     assert!(
         real_json == alice_polkadot_keys_json,
         "GoBack on KeyDetails screen. Expected known Keys screen for Alice polkadot keys, got:\n{}",
         real_json
     );
 
-    let real_json = do_action("NewKey", "", "");
+    let real_json = do_action(Action::NewKey, "", "");
     let expected_json = r#"{"screen":"DeriveKey","screenLabel":"Derive Key","back":true,"footer":false,"footerButton":"Keys","rightButton":"None","screenNameType":"h1","modal":"Empty","alert":"Empty","screenData":{"seed_name":"Alice","network_title":"Polkadot","network_logo":"polkadot","network_specs_key":"018091b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3","suggested_derivation":"","keyboard":true},"modalData":{},"alertData":{}}"#;
     assert!(
         real_json == expected_json,
@@ -867,21 +867,25 @@ fn flow_test_1() {
         real_json
     );
 
-    let real_json = do_action("GoBack", "", "");
+    let real_json = do_action(Action::GoBack, "", "");
     assert!(
         real_json == alice_polkadot_keys_json,
         "GoBack on DeriveKey screen. Expected known Keys screen for Alice polkadot keys, got:\n{}",
         real_json
     );
 
-    do_action("NewKey", "", "");
-    let real_json = do_action("CheckPassword", "//secret//path///multipass", "");
+    do_action(Action::NewKey, "", "");
+    let real_json = do_action(Action::CheckPassword, "//secret//path///multipass", "");
     let expected_json = r#"{"screen":"DeriveKey","screenLabel":"Derive Key","back":true,"footer":false,"footerButton":"Keys","rightButton":"None","screenNameType":"h1","modal":"PasswordConfirm","alert":"Empty","screenData":{"seed_name":"Alice","network_title":"Polkadot","network_logo":"polkadot","network_specs_key":"018091b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3","suggested_derivation":"//secret//path///multipass","keyboard":false},"modalData":{"seed_name":"Alice","cropped_path":"//secret//path","pwd":"multipass"},"alertData":{}}"#;
     assert!(real_json == expected_json, "CheckPassword on DeriveKey screen with password (path validity and password existence is checked elsewhere). Expected updated DeriveKey screen with PasswordConfirm modal, got:\n{}", real_json);
 
     // Plaintext secrets in json?
 
-    let real_json = do_action("GoForward", "//secret//path///multipass", ALICE_SEED_PHRASE);
+    let real_json = do_action(
+        Action::GoForward,
+        "//secret//path///multipass",
+        ALICE_SEED_PHRASE,
+    );
     let cut_real_json = real_json
         .replace(&empty_png(), r#"<empty>"#)
         .replace(
@@ -892,8 +896,8 @@ fn flow_test_1() {
     let expected_json = r#"{"screen":"Keys","screenLabel":"","back":true,"footer":true,"footerButton":"Keys","rightButton":"Backup","screenNameType":"h4","modal":"Empty","alert":"Empty","screenData":{"root":{"seed_name":"Alice","identicon":"<empty>","address_key":"","base58":"","swiped":false,"multiselect":false},"set":[{"address_key":"01e83f1549880f33524079201c5c7aed839f56c73adb2f61d9b271ae2d692dfe2c","base58":"16FWrEaDSDRwfDmNKacTBRNmYPH8Yg6s9o618vX2iHQLuWfb","identicon":"<alice_sr25519_//secret//path///multipass>","has_pwd":true,"path":"//secret//path","swiped":false,"multiselect":false},{"address_key":"01f606519cb8726753885cd4d0f518804a69a5e0badf36fee70feadd8044081730","base58":"16Zaf6BT6xc6WeYCX6YNAf67RumWaEiumwawt7cTdKMU7HqW","identicon":"<alice_sr25519_//polkadot>","has_pwd":false,"path":"//polkadot","swiped":false,"multiselect":false}],"network":{"title":"Polkadot","logo":"polkadot"},"multiselect_mode":false,"multiselect_count":""},"modalData":{},"alertData":{}}"#;
     assert!(cut_real_json == expected_json, "GoForward on DeriveKey screen with PasswordConfirm modal. Expected updated Keys screen, got:\n{}", real_json);
 
-    do_action("NewKey", "", "");
-    let real_json = do_action("GoForward", "", ""); // trying to create the missing root
+    do_action(Action::NewKey, "", "");
+    let real_json = do_action(Action::GoForward, "", ""); // trying to create the missing root
     let cut_real_json = real_json
         .replace(&alice_sr_root(), r#"<alice_sr25519_root>"#)
         .replace(
@@ -910,13 +914,13 @@ fn flow_test_1() {
 
     alice_polkadot_keys_json = real_json;
 
-    let real_json = do_action("GoBack", "", "");
+    let real_json = do_action(Action::GoBack, "", "");
     let cut_real_json = cut_identicon(&real_json);
     let expected_json = r#"{"screen":"SeedSelector","screenLabel":"Select seed","back":false,"footer":true,"footerButton":"Keys","rightButton":"NewSeed","screenNameType":"h1","modal":"Empty","alert":"Empty","screenData":{"seedNameCards":[{"identicon":"**","seed_name":"Alice"},{"identicon":"**","seed_name":"Portia"}]},"modalData":{},"alertData":{}}"#;
     assert!(cut_real_json == expected_json, "GoBack on Keys screen, root Alice have appeared in polkadot. Expected updated SeedSelector screen with no modals, got:\n{}", real_json);
 
-    do_action("SelectSeed", "Alice", "");
-    let real_json = do_action("RightButton", "", "");
+    do_action(Action::SelectSeed, "Alice", "");
+    let real_json = do_action(Action::RightButton, "", "");
     let cut_real_json = real_json
         .replace(&alice_sr_root(), r#"<alice_sr25519_root>"#)
         .replace(
@@ -931,7 +935,7 @@ fn flow_test_1() {
         real_json
     );
 
-    let real_json = do_action("BackupSeed", "", "");
+    let real_json = do_action(Action::BackupSeed, "", "");
     let cut_real_json = real_json
         .replace(&alice_sr_root(), r#"<alice_sr25519_root>"#)
         .replace(
@@ -944,21 +948,21 @@ fn flow_test_1() {
 
     db_handling::manage_history::seed_name_was_shown(dbname, String::from("Alice")).unwrap(); // mock signal from phone; elsewise untestable;
 
-    let real_json = do_action("NavbarLog", "", "");
+    let real_json = do_action(Action::NavbarLog, "", "");
     let cut_real_json = timeless(&real_json);
     let expected_json = r#"{"screen":"Log","screenLabel":"","back":false,"footer":true,"footerButton":"Log","rightButton":"LogRight","screenNameType":"h4","modal":"Empty","alert":"Empty","screenData":{"log":[{"order":4,"timestamp":"**","events":[{"event":"seed_name_shown","payload":"Alice"}]},{"order":3,"timestamp":"**","events":[{"event":"identity_added","payload":{"seed_name":"Alice","encryption":"sr25519","public_key":"46ebddef8cd9bb167dc30878d7113b7e168e6f0646beffd77d69d39bad76b47a","path":"","network_genesis_hash":"91b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3"}}]},{"order":2,"timestamp":"**","events":[{"event":"identity_added","payload":{"seed_name":"Alice","encryption":"sr25519","public_key":"e83f1549880f33524079201c5c7aed839f56c73adb2f61d9b271ae2d692dfe2c","path":"//secret//path","network_genesis_hash":"91b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3"}}]},{"order":1,"timestamp":"**","events":[{"event":"seed_created","payload":"Alice"},{"event":"identity_added","payload":{"seed_name":"Alice","encryption":"sr25519","public_key":"f606519cb8726753885cd4d0f518804a69a5e0badf36fee70feadd8044081730","path":"//polkadot","network_genesis_hash":"91b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3"}},{"event":"identity_added","payload":{"seed_name":"Alice","encryption":"sr25519","public_key":"64a31235d4bf9b37cfed3afa8aa60754675f9c4915430454d365c05112784d05","path":"//kusama","network_genesis_hash":"b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe"}},{"event":"identity_added","payload":{"seed_name":"Alice","encryption":"sr25519","public_key":"3efeca331d646d8a2986374bb3bb8d6e9e3cfcdd7c45c2b69104fab5d61d3f34","path":"//westend","network_genesis_hash":"e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e"}}]},{"order":0,"timestamp":"**","events":[{"event":"history_cleared"}]}],"total_entries":5},"modalData":{},"alertData":{}}"#;
     assert!(cut_real_json == expected_json, "Switched to Log from SeedSelector after backuping seed. Expected updated Log screen with no modals, got:\n{}", real_json);
 
-    do_action("RightButton", "", "");
-    let real_json = do_action("ClearLog", "", "");
+    do_action(Action::RightButton, "", "");
+    let real_json = do_action(Action::ClearLog, "", "");
     let cut_real_json = timeless(&real_json);
     let expected_json = r#"{"screen":"Log","screenLabel":"","back":false,"footer":true,"footerButton":"Log","rightButton":"LogRight","screenNameType":"h4","modal":"Empty","alert":"Empty","screenData":{"log":[{"order":0,"timestamp":"**","events":[{"event":"history_cleared"}]}],"total_entries":1},"modalData":{},"alertData":{}}"#;
     assert!(cut_real_json == expected_json, "ClearLog on Log screen with LogRight modal. Expected updated Log screen with no modals, got:\n{}", real_json);
 
-    do_action("NavbarKeys", "", "");
-    do_action("SelectSeed", "Portia", "");
-    do_action("RightButton", "", "");
-    let real_json = do_action("RemoveSeed", "", "");
+    do_action(Action::NavbarKeys, "", "");
+    do_action(Action::SelectSeed, "Portia", "");
+    do_action(Action::RightButton, "", "");
+    let real_json = do_action(Action::RemoveSeed, "", "");
     let cut_real_json = cut_public_key(&timeless(&real_json));
     let removal1 = r#"{"event":"identity_removed","payload":{"seed_name":"Portia","encryption":"sr25519","public_key":"**","path":"//kusama","network_genesis_hash":"b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe"}}"#;
     let removal2 = r#"{"event":"identity_removed","payload":{"seed_name":"Portia","encryption":"sr25519","public_key":"**","path":"//polkadot","network_genesis_hash":"91b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3"}}"#;
@@ -972,13 +976,13 @@ fn flow_test_1() {
 
     update_seed_names(r#"Alice"#);
 
-    do_action("RightButton", "", "");
-    let real_json = do_action("ClearLog", "", "");
+    do_action(Action::RightButton, "", "");
+    let real_json = do_action(Action::ClearLog, "", "");
     let cut_real_json = timeless(&real_json);
     let expected_json = r#"{"screen":"Log","screenLabel":"","back":false,"footer":true,"footerButton":"Log","rightButton":"LogRight","screenNameType":"h4","modal":"Empty","alert":"Empty","screenData":{"log":[{"order":0,"timestamp":"**","events":[{"event":"history_cleared"}]}],"total_entries":1},"modalData":{},"alertData":{}}"#;
     assert!(cut_real_json == expected_json, "ClearLog on Log screen with LogRight modal. Expected updated Log screen with no modals, got:\n{}", real_json);
 
-    let real_json = do_action("NavbarKeys", "", "");
+    let real_json = do_action(Action::NavbarKeys, "", "");
     let cut_real_json = real_json.replace(&alice_sr_root(), r#"<alice_sr25519_root>"#);
     let expected_json = r#"{"screen":"SeedSelector","screenLabel":"Select seed","back":false,"footer":true,"footerButton":"Keys","rightButton":"NewSeed","screenNameType":"h1","modal":"Empty","alert":"Empty","screenData":{"seedNameCards":[{"identicon":"<alice_sr25519_root>","seed_name":"Alice"}]},"modalData":{},"alertData":{}}"#;
     assert!(
@@ -987,8 +991,8 @@ fn flow_test_1() {
         real_json
     );
 
-    do_action("SelectSeed", "Alice", "");
-    let real_json = do_action("NetworkSelector", "", "");
+    do_action(Action::SelectSeed, "Alice", "");
+    let real_json = do_action(Action::NetworkSelector, "", "");
     let cut_real_json = real_json
         .replace(&alice_sr_root(), r#"<alice_sr25519_root>"#)
         .replace(
@@ -999,12 +1003,12 @@ fn flow_test_1() {
     let expected_json = r#"{"screen":"Keys","screenLabel":"","back":true,"footer":true,"footerButton":"Keys","rightButton":"Backup","screenNameType":"h4","modal":"NetworkSelector","alert":"Empty","screenData":{"root":{"seed_name":"Alice","identicon":"<alice_sr25519_root>","address_key":"0146ebddef8cd9bb167dc30878d7113b7e168e6f0646beffd77d69d39bad76b47a","base58":"12bzRJfh7arnnfPPUZHeJUaE62QLEwhK48QnH9LXeK2m1iZU","swiped":false,"multiselect":false},"set":[{"address_key":"01e83f1549880f33524079201c5c7aed839f56c73adb2f61d9b271ae2d692dfe2c","base58":"16FWrEaDSDRwfDmNKacTBRNmYPH8Yg6s9o618vX2iHQLuWfb","identicon":"<alice_sr25519_//secret//path///multipass>","has_pwd":true,"path":"//secret//path","swiped":false,"multiselect":false},{"address_key":"01f606519cb8726753885cd4d0f518804a69a5e0badf36fee70feadd8044081730","base58":"16Zaf6BT6xc6WeYCX6YNAf67RumWaEiumwawt7cTdKMU7HqW","identicon":"<alice_sr25519_//polkadot>","has_pwd":false,"path":"//polkadot","swiped":false,"multiselect":false}],"network":{"title":"Polkadot","logo":"polkadot"},"multiselect_mode":false,"multiselect_count":""},"modalData":{"networks":[{"key":"018091b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3","title":"Polkadot","logo":"polkadot","order":0,"selected":true},{"key":"0180e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e","title":"Westend","logo":"westend","order":1,"selected":false},{"key":"0180b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe","title":"Kusama","logo":"kusama","order":2,"selected":false}]},"alertData":{}}"#;
     assert!(cut_real_json == expected_json, "NetworkSelector on Keys screen for Alice polkadot keys. Expected modal NetworkSelector with polkadot selected, got:\n{}", real_json);
 
-    let real_json = do_action("NetworkSelector", "", "");
+    let real_json = do_action(Action::NetworkSelector, "", "");
     assert!(real_json == alice_polkadot_keys_json, "NetworkSelector on Keys screen with NetworkSelector modal. Expected known Keys screen for Alice, got:\n{}", real_json);
 
-    do_action("NetworkSelector", "", "");
+    do_action(Action::NetworkSelector, "", "");
     let real_json = do_action(
-        "ChangeNetwork",
+        Action::ChangeNetwork,
         "0180e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e",
         "",
     );
@@ -1018,17 +1022,17 @@ fn flow_test_1() {
         real_json
     );
 
-    do_action("NavbarScan", "", "");
-    let real_json = do_action("TransactionFetched","53ffde01e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e141c2f2f416c6963653c2f2f416c6963652f77657374656e64582f2f416c6963652f7365637265742f2f7365637265740c2f2f300c2f2f31","");
+    do_action(Action::NavbarScan, "", "");
+    let real_json = do_action(Action::TransactionFetched,"53ffde01e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e141c2f2f416c6963653c2f2f416c6963652f77657374656e64582f2f416c6963652f7365637265742f2f7365637265740c2f2f300c2f2f31","");
     let expected_json = r#"{"screen":"Transaction","screenLabel":"","back":true,"footer":false,"footerButton":"Scan","rightButton":"None","screenNameType":"h1","modal":"Empty","alert":"Empty","screenData":{"content":{"importing_derivations":[{"index":0,"indent":0,"type":"derivations","payload":["//Alice","//Alice/westend","//Alice/secret//secret","//0","//1"]}]},"network_info":{"network_title":"Westend","network_logo":"westend"},"type":"import_derivations"},"modalData":{},"alertData":{}}"#;
     assert!(real_json == expected_json, "TransactionFetched on Scan screen with import_derivations info for westend. Expected Transaction screen with no modals, got:\n{}", real_json);
 
-    let real_json = do_action("GoForward", "", "");
+    let real_json = do_action(Action::GoForward, "", "");
     let cut_real_json = real_json.replace(&alice_sr_root(), r#"<alice_sr25519_root>"#);
     let expected_json = r#"{"screen":"Transaction","screenLabel":"","back":true,"footer":false,"footerButton":"Scan","rightButton":"None","screenNameType":"h1","modal":"SelectSeed","alert":"Empty","screenData":{"content":{"importing_derivations":[{"index":0,"indent":0,"type":"derivations","payload":["//Alice","//Alice/westend","//Alice/secret//secret","//0","//1"]}]},"network_info":{"network_title":"Westend","network_logo":"westend"},"type":"import_derivations"},"modalData":{"seedNameCards":[{"identicon":"<alice_sr25519_root>","seed_name":"Alice"}]},"alertData":{}}"#;
     assert!(cut_real_json == expected_json, "GoForward on Transaction screen with derivations import. Expected Transaction screen with SelectSeed modal, got:\n{}", real_json);
 
-    let real_json = do_action("GoForward", "Alice", ALICE_SEED_PHRASE);
+    let real_json = do_action(Action::GoForward, "Alice", ALICE_SEED_PHRASE);
     let cut_real_json = real_json
         .replace(&empty_png(), r#"<empty>"#)
         .replace(&alice_sr_0(), r#"<alice_sr25519_//0>"#)
@@ -1048,22 +1052,22 @@ fn flow_test_1() {
 
     let mut alice_westend_keys_json = real_json;
 
-    do_action("NetworkSelector", "", "");
+    do_action(Action::NetworkSelector, "", "");
     let real_json = do_action(
-        "ChangeNetwork",
+        Action::ChangeNetwork,
         "018091b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3",
         "",
     ); // switching to polkadot, expect no changes
     assert!(real_json == alice_polkadot_keys_json, "Switched network to polkadot. Expected no changes on Keys screen for Alice polkadot keys, got:\n{}", real_json);
 
-    do_action("NetworkSelector", "", "");
+    do_action(Action::NetworkSelector, "", "");
     do_action(
-        "ChangeNetwork",
+        Action::ChangeNetwork,
         "0180e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e",
         "",
     );
     let real_json = do_action(
-        "Swipe",
+        Action::Swipe,
         "013efeca331d646d8a2986374bb3bb8d6e9e3cfcdd7c45c2b69104fab5d61d3f34",
         "",
     );
@@ -1089,19 +1093,19 @@ fn flow_test_1() {
     );
 
     let real_json = do_action(
-        "Swipe",
+        Action::Swipe,
         "013efeca331d646d8a2986374bb3bb8d6e9e3cfcdd7c45c2b69104fab5d61d3f34",
         "",
     ); // unswipe
     assert!(real_json == alice_westend_keys_json, "Unswipe on Keys screen for Alice westend keys. Expected known vanilla Keys screen for Alice westend keys, got:\n{}", real_json);
 
     do_action(
-        "Swipe",
+        Action::Swipe,
         "013efeca331d646d8a2986374bb3bb8d6e9e3cfcdd7c45c2b69104fab5d61d3f34",
         "",
     );
     let real_json = do_action(
-        "Swipe",
+        Action::Swipe,
         "019cd20feb68e0535a6c1cdeead4601b652cf6af6d76baf370df26ee25adde0805",
         "",
     ); // swipe another
@@ -1122,7 +1126,7 @@ fn flow_test_1() {
     let expected_json = r#"{"screen":"Keys","screenLabel":"","back":true,"footer":true,"footerButton":"Keys","rightButton":"Backup","screenNameType":"h4","modal":"Empty","alert":"Empty","screenData":{"root":{"seed_name":"Alice","identicon":"<empty>","address_key":"","base58":"","swiped":false,"multiselect":false},"set":[{"address_key":"012afba9278e30ccf6a6ceb3a8b6e336b70068f045c666f2e7f4f9cc5f47db8972","base58":"5D34dL5prEUaGNQtPPZ3yN5Y6BnkfXunKXXz6fo7ZJbLwRRH","identicon":"<alice_sr25519_//0>","has_pwd":false,"path":"//0","swiped":false,"multiselect":false},{"address_key":"013efeca331d646d8a2986374bb3bb8d6e9e3cfcdd7c45c2b69104fab5d61d3f34","base58":"5DVJWniDyUja5xnG4t5i3Rrd2Gguf1fzxPYfgZBbKcvFqk4N","identicon":"<alice_sr25519_//westend>","has_pwd":false,"path":"//westend","swiped":false,"multiselect":false},{"address_key":"018266a693d6872d2b6437215c198ee25cabf2e4256df9ad00e979e84b00b5235e","base58":"5F1gaMEdLTzoYFV6hYqX9AnZYg4bknuYE5HcVXmnKi1eSCXK","identicon":"<alice_sr25519_//Alice/secret//secret>","has_pwd":false,"path":"//Alice/secret//secret","swiped":false,"multiselect":false},{"address_key":"019cd20feb68e0535a6c1cdeead4601b652cf6af6d76baf370df26ee25adde0805","base58":"5FcKjDXS89U79cXvhksZ2pF5XBeafmSM8rqkDVoTHQcXd5Gq","identicon":"<alice_sr25519_//Alice/westend>","has_pwd":false,"path":"//Alice/westend","swiped":true,"multiselect":false},{"address_key":"01b606fc73f57f03cdb4c932d475ab426043e429cecc2ffff0d2672b0df8398c48","base58":"5GBNeWRhZc2jXu7D55rBimKYDk8PGk8itRYFTPfC8RJLKG5o","identicon":"<alice_sr25519_//1>","has_pwd":false,"path":"//1","swiped":false,"multiselect":false},{"address_key":"01d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d","base58":"5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY","identicon":"<alice_sr25519_//Alice>","has_pwd":false,"path":"//Alice","swiped":false,"multiselect":false}],"network":{"title":"Westend","logo":"westend"},"multiselect_mode":false,"multiselect_count":""},"modalData":{},"alertData":{}}"#;
     assert!(cut_real_json == expected_json, "Swipe on Keys screen on another key while first swiped key is still selected. Expected updated Keys screen, got:\n{}", real_json);
 
-    let real_json = do_action("RemoveKey", "", ""); // remove swiped
+    let real_json = do_action(Action::RemoveKey, "", ""); // remove swiped
     let cut_real_json = real_json
         .replace(&empty_png(), r#"<empty>"#)
         .replace(&alice_sr_0(), r#"<alice_sr25519_//0>"#)
@@ -1143,11 +1147,11 @@ fn flow_test_1() {
     // Note: after removal, stay on the Keys screen (previously went to log).
 
     do_action(
-        "Swipe",
+        Action::Swipe,
         "013efeca331d646d8a2986374bb3bb8d6e9e3cfcdd7c45c2b69104fab5d61d3f34",
         "",
     );
-    let real_json = do_action("Increment", "2", ""); // increment swiped `//westend`
+    let real_json = do_action(Action::Increment, "2", ""); // increment swiped `//westend`
     let cut_real_json = real_json
         .replace(&empty_png(), r#"<empty>"#)
         .replace(&alice_sr_0(), r#"<alice_sr25519_//0>"#)
@@ -1168,11 +1172,11 @@ fn flow_test_1() {
     );
 
     do_action(
-        "Swipe",
+        Action::Swipe,
         "013efeca331d646d8a2986374bb3bb8d6e9e3cfcdd7c45c2b69104fab5d61d3f34",
         "",
     );
-    let real_json = do_action("Increment", "1", ""); // increment swiped `//westend` again
+    let real_json = do_action(Action::Increment, "1", ""); // increment swiped `//westend` again
     let cut_real_json = real_json
         .replace(&empty_png(), r#"<empty>"#)
         .replace(&alice_sr_0(), r#"<alice_sr25519_//0>"#)
@@ -1194,7 +1198,7 @@ fn flow_test_1() {
     );
 
     let real_json = do_action(
-        "LongTap",
+        Action::LongTap,
         "018266a693d6872d2b6437215c198ee25cabf2e4256df9ad00e979e84b00b5235e",
         "",
     ); // enter multi regime with LongTap
@@ -1219,7 +1223,7 @@ fn flow_test_1() {
     );
 
     let real_json = do_action(
-        "SelectKey",
+        Action::SelectKey,
         "012afba9278e30ccf6a6ceb3a8b6e336b70068f045c666f2e7f4f9cc5f47db8972",
         "",
     ); // select by SelectKey in multi
@@ -1244,7 +1248,7 @@ fn flow_test_1() {
     );
 
     let real_json = do_action(
-        "SelectKey",
+        Action::SelectKey,
         "012afba9278e30ccf6a6ceb3a8b6e336b70068f045c666f2e7f4f9cc5f47db8972",
         "",
     ); // deselect by SelectKey in multi
@@ -1269,7 +1273,7 @@ fn flow_test_1() {
     );
 
     let real_json = do_action(
-        "LongTap",
+        Action::LongTap,
         "018266a693d6872d2b6437215c198ee25cabf2e4256df9ad00e979e84b00b5235e",
         "",
     ); // deselect by LongTap in multi
@@ -1296,31 +1300,31 @@ fn flow_test_1() {
     // Note: although multiselect count is 0, remain in multiselect mode
 
     do_action(
-        "LongTap",
+        Action::LongTap,
         "0120c394d410893cac63d993fa71eb8247e6af9a29cda467e836efec678b9f6b7f",
         "",
     );
     do_action(
-        "LongTap",
+        Action::LongTap,
         "012afba9278e30ccf6a6ceb3a8b6e336b70068f045c666f2e7f4f9cc5f47db8972",
         "",
     );
     do_action(
-        "LongTap",
+        Action::LongTap,
         "014e384fb30994d520094dce42086dbdd4977c11fb2f2cf9ca1c80056684934b08",
         "",
     );
     do_action(
-        "LongTap",
+        Action::LongTap,
         "01b606fc73f57f03cdb4c932d475ab426043e429cecc2ffff0d2672b0df8398c48",
         "",
     );
     do_action(
-        "LongTap",
+        Action::LongTap,
         "01e655361d12f3ccca5f128187cf3f5eea052be722746e392c8b498d0d18723470",
         "",
     );
-    let real_json = do_action("RemoveKey", "", ""); // remove keys in multiselect mode
+    let real_json = do_action(Action::RemoveKey, "", ""); // remove keys in multiselect mode
     let cut_real_json = real_json
         .replace(&empty_png(), r#"<empty>"#)
         .replace(&alice_sr_alice(), r#"<alice_sr25519_//Alice>"#)
@@ -1337,11 +1341,11 @@ fn flow_test_1() {
     );
 
     do_action(
-        "LongTap",
+        Action::LongTap,
         "013efeca331d646d8a2986374bb3bb8d6e9e3cfcdd7c45c2b69104fab5d61d3f34",
         "",
     ); // enter multiselect mode
-    let real_json = do_action("SelectAll", "", ""); // select all
+    let real_json = do_action(Action::SelectAll, "", ""); // select all
     let cut_real_json = real_json
         .replace(&empty_png(), r#"<empty>"#)
         .replace(&alice_sr_alice(), r#"<alice_sr25519_//Alice>"#)
@@ -1357,7 +1361,7 @@ fn flow_test_1() {
         real_json
     );
 
-    let real_json = do_action("SelectAll", "", ""); // deselect all
+    let real_json = do_action(Action::SelectAll, "", ""); // deselect all
     let cut_real_json = real_json
         .replace(&empty_png(), r#"<empty>"#)
         .replace(&alice_sr_alice(), r#"<alice_sr25519_//Alice>"#)
@@ -1373,7 +1377,7 @@ fn flow_test_1() {
         real_json
     );
 
-    let real_json = do_action("GoBack", "", ""); // exit multiselect mode
+    let real_json = do_action(Action::GoBack, "", ""); // exit multiselect mode
     let cut_real_json = real_json
         .replace(&empty_png(), r#"<empty>"#)
         .replace(&alice_sr_alice(), r#"<alice_sr25519_//Alice>"#)
@@ -1392,12 +1396,12 @@ fn flow_test_1() {
     alice_westend_keys_json = real_json;
 
     do_action(
-        "LongTap",
+        Action::LongTap,
         "013efeca331d646d8a2986374bb3bb8d6e9e3cfcdd7c45c2b69104fab5d61d3f34",
         "",
     ); // enter multiselect mode
-    do_action("SelectAll", "", ""); // select all
-    let real_json = do_action("ExportMultiSelect", "", "");
+    do_action(Action::SelectAll, "", ""); // select all
+    let real_json = do_action(Action::ExportMultiSelect, "", "");
     let cut_real_json = real_json
         .replace(
             &alice_westend_westend_qr(),
@@ -1409,7 +1413,7 @@ fn flow_test_1() {
 
     let unit1 = real_json;
 
-    let real_json = do_action("NextUnit", "", "");
+    let real_json = do_action(Action::NextUnit, "", "");
     let cut_real_json = real_json
         .replace(
             &alice_westend_alice_secret_secret_qr(),
@@ -1424,7 +1428,7 @@ fn flow_test_1() {
 
     let unit2 = real_json;
 
-    let real_json = do_action("NextUnit", "", "");
+    let real_json = do_action(Action::NextUnit, "", "");
     let cut_real_json = real_json
         .replace(&alice_westend_alice_qr(), r#"<alice_westend_//Alice_qr>"#)
         .replace(&alice_sr_alice(), r#"<alice_sr25519_//Alice>"#);
@@ -1433,26 +1437,26 @@ fn flow_test_1() {
 
     let unit3 = real_json;
 
-    let real_json = do_action("NextUnit", "", "");
+    let real_json = do_action(Action::NextUnit, "", "");
     assert!(real_json == unit1, "ExportMultiSelect on Keys screen with multiselect mode. Expected KeyDetailsMulti screen, got:\n{}", real_json);
 
-    let real_json = do_action("PreviousUnit", "", "");
+    let real_json = do_action(Action::PreviousUnit, "", "");
     assert!(real_json == unit3, "ExportMultiSelect on Keys screen with multiselect mode. Expected KeyDetailsMulti screen, got:\n{}", real_json);
 
-    let real_json = do_action("PreviousUnit", "", "");
+    let real_json = do_action(Action::PreviousUnit, "", "");
     assert!(real_json == unit2, "ExportMultiSelect on Keys screen with multiselect mode. Expected KeyDetailsMulti screen, got:\n{}", real_json);
 
-    let real_json = do_action("PreviousUnit", "", "");
+    let real_json = do_action(Action::PreviousUnit, "", "");
     assert!(real_json == unit1, "ExportMultiSelect on Keys screen with multiselect mode. Expected KeyDetailsMulti screen, got:\n{}", real_json);
 
-    let real_json = do_action("GoBack", "", "");
+    let real_json = do_action(Action::GoBack, "", "");
     assert!(
         real_json == alice_westend_keys_json,
         "GoBack on KeyDetailsMulti screen. Expected Keys screen in plain mode, got:\n{}",
         real_json
     );
 
-    let real_json = do_action("NewKey", "", "");
+    let real_json = do_action(Action::NewKey, "", "");
     let expected_json = r#"{"screen":"DeriveKey","screenLabel":"Derive Key","back":true,"footer":false,"footerButton":"Keys","rightButton":"None","screenNameType":"h1","modal":"Empty","alert":"Empty","screenData":{"seed_name":"Alice","network_title":"Westend","network_logo":"westend","network_specs_key":"0180e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e","suggested_derivation":"","keyboard":true},"modalData":{},"alertData":{}}"#;
     assert!(
         real_json == expected_json,
@@ -1460,15 +1464,15 @@ fn flow_test_1() {
         real_json
     );
 
-    let real_json = do_action("GoBack", "", "");
+    let real_json = do_action(Action::GoBack, "", "");
     assert!(
         real_json == alice_westend_keys_json,
         "GoBack on DeriveKey screen. Expected Keys screen in plain mode, got:\n{}",
         real_json
     );
 
-    do_action("NewKey", "", "");
-    let real_json = do_action("GoForward", "", ALICE_SEED_PHRASE); // create root derivation
+    do_action(Action::NewKey, "", "");
+    let real_json = do_action(Action::GoForward, "", ALICE_SEED_PHRASE); // create root derivation
     let cut_real_json = real_json
         .replace(&alice_sr_root(), r#"<alice_sr25519_root>"#)
         .replace(&alice_sr_westend(), r#"<alice_sr25519_//westend>"#)
@@ -1481,11 +1485,11 @@ fn flow_test_1() {
     assert!(cut_real_json == expected_json, "GoForward on DeriveKey screen with empty derivation string. Expected updated Keys screen, got:\n{}", real_json);
 
     do_action(
-        "LongTap",
+        Action::LongTap,
         "013efeca331d646d8a2986374bb3bb8d6e9e3cfcdd7c45c2b69104fab5d61d3f34",
         "",
     ); // enter multiselect mode
-    let real_json = do_action("SelectAll", "", ""); // select all
+    let real_json = do_action(Action::SelectAll, "", ""); // select all
     let cut_real_json = real_json
         .replace(&alice_sr_root(), r#"<alice_sr25519_root>"#)
         .replace(&alice_sr_westend(), r#"<alice_sr25519_//westend>"#)
@@ -1497,9 +1501,9 @@ fn flow_test_1() {
     let expected_json = r#"{"screen":"Keys","screenLabel":"","back":true,"footer":true,"footerButton":"Keys","rightButton":"MultiSelect","screenNameType":"h4","modal":"Empty","alert":"Empty","screenData":{"root":{"seed_name":"Alice","identicon":"<alice_sr25519_root>","address_key":"0146ebddef8cd9bb167dc30878d7113b7e168e6f0646beffd77d69d39bad76b47a","base58":"5DfhGyQdFobKM8NsWvEeAKk5EQQgYe9AydgJ7rMB6E1EqRzV","swiped":false,"multiselect":true},"set":[{"address_key":"013efeca331d646d8a2986374bb3bb8d6e9e3cfcdd7c45c2b69104fab5d61d3f34","base58":"5DVJWniDyUja5xnG4t5i3Rrd2Gguf1fzxPYfgZBbKcvFqk4N","identicon":"<alice_sr25519_//westend>","has_pwd":false,"path":"//westend","swiped":false,"multiselect":true},{"address_key":"018266a693d6872d2b6437215c198ee25cabf2e4256df9ad00e979e84b00b5235e","base58":"5F1gaMEdLTzoYFV6hYqX9AnZYg4bknuYE5HcVXmnKi1eSCXK","identicon":"<alice_sr25519_//Alice/secret//secret>","has_pwd":false,"path":"//Alice/secret//secret","swiped":false,"multiselect":true},{"address_key":"01d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d","base58":"5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY","identicon":"<alice_sr25519_//Alice>","has_pwd":false,"path":"//Alice","swiped":false,"multiselect":true}],"network":{"title":"Westend","logo":"westend"},"multiselect_mode":true,"multiselect_count":"4"},"modalData":{},"alertData":{}}"#;
     assert!(cut_real_json == expected_json, "SelectAll on Keys screen in multiselect mode, with existing root key. Expected updated Keys screen, got:\n{}", real_json);
 
-    do_action("GoBack", "", "");
+    do_action(Action::GoBack, "", "");
     let real_json = do_action(
-        "SelectKey",
+        Action::SelectKey,
         "0146ebddef8cd9bb167dc30878d7113b7e168e6f0646beffd77d69d39bad76b47a",
         "",
     );
@@ -1517,14 +1521,14 @@ fn flow_test_1() {
         real_qr_info
     );
 
-    do_action("GoBack", "", "");
-    do_action("NavbarSettings", "", "");
-    let real_json = do_action("BackupSeed", "", "");
+    do_action(Action::GoBack, "", "");
+    do_action(Action::NavbarSettings, "", "");
+    let real_json = do_action(Action::BackupSeed, "", "");
     let cut_real_json = real_json.replace(&alice_sr_root(), r#"<alice_sr25519_root>"#);
     let expected_json = r#"{"screen":"SelectSeedForBackup","screenLabel":"Select seed","back":true,"footer":false,"footerButton":"Settings","rightButton":"Backup","screenNameType":"h4","modal":"Empty","alert":"Empty","screenData":{"seedNameCards":[{"identicon":"<alice_sr25519_root>","seed_name":"Alice"}]},"modalData":{},"alertData":{}}"#;
     assert!(cut_real_json == expected_json, "BackupSeed on Settings screen. Expected SelectSeedForBackup screen with no modals, got:\n{}", real_json);
 
-    let real_json = do_action("BackupSeed", "Alice", "");
+    let real_json = do_action(Action::BackupSeed, "Alice", "");
     let cut_real_json = real_json
         .replace(&alice_sr_root(), r#"<alice_sr25519_root>"#)
         .replace(
@@ -1537,15 +1541,15 @@ fn flow_test_1() {
 
     db_handling::manage_history::seed_name_was_shown(dbname, String::from("Alice")).unwrap(); // mock signal from phone
 
-    do_action("NavbarSettings", "", "");
-    do_action("ManageNetworks", "", "");
+    do_action(Action::NavbarSettings, "", "");
+    do_action(Action::ManageNetworks, "", "");
     do_action(
-        "GoForward",
+        Action::GoForward,
         "0180e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e",
         "",
     );
-    do_action("RightButton", "", "");
-    let real_json = do_action("SignNetworkSpecs", "", "");
+    do_action(Action::RightButton, "", "");
+    let real_json = do_action(Action::SignNetworkSpecs, "", "");
     let cut_real_json = real_json
         .replace(&alice_sr_root(), r#"<alice_sr25519_root>"#)
         .replace(
@@ -1564,7 +1568,7 @@ fn flow_test_1() {
     assert!(cut_real_json == expected_json, "SignNetworkSpecs on NetworkDetails screen for westend sr25519. Expected SignSufficientCrypto screen, got:\n{}", real_json);
 
     let real_json = do_action(
-        "GoForward",
+        Action::GoForward,
         "0146ebddef8cd9bb167dc30878d7113b7e168e6f0646beffd77d69d39bad76b47a",
         "",
     );
@@ -1614,10 +1618,10 @@ fn flow_test_1() {
         std::env::set_current_dir("../../navigator").unwrap();
     }
 
-    let real_json = do_action("GoBack", "", "");
+    let real_json = do_action(Action::GoBack, "", "");
     assert!(real_json == current_settings_json, "GoBack on SignSufficientCrypto screen with SufficientCryptoReady modal. Expected Settings screen, got:\n{}", real_json);
 
-    let real_json = do_action("NavbarLog", "", "");
+    let real_json = do_action(Action::NavbarLog, "", "");
     let cut_real_json = real_json.replace(&alice_sr_root(), r#"<alice_sr25519_root>"#);
     let expected_json_piece = r##""events":[{"event":"add_specs_message_signed","payload":{"base58prefix":"42","color":"#660D35","decimals":"12","encryption":"sr25519","genesis_hash":"e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e","logo":"westend","name":"westend","path_id":"//westend","secondary_color":"#262626","title":"Westend","unit":"WND","signed_by":{"public_key":"46ebddef8cd9bb167dc30878d7113b7e168e6f0646beffd77d69d39bad76b47a","identicon":"<alice_sr25519_root>","encryption":"sr25519"}}}]"##;
     assert!(
@@ -1626,23 +1630,23 @@ fn flow_test_1() {
         real_json
     );
 
-    do_action("RightButton", "", "");
-    let real_json = do_action("ClearLog", "", "");
+    do_action(Action::RightButton, "", "");
+    let real_json = do_action(Action::ClearLog, "", "");
     let cut_real_json = timeless(&real_json);
     let expected_json = r#"{"screen":"Log","screenLabel":"","back":false,"footer":true,"footerButton":"Log","rightButton":"LogRight","screenNameType":"h4","modal":"Empty","alert":"Empty","screenData":{"log":[{"order":0,"timestamp":"**","events":[{"event":"history_cleared"}]}],"total_entries":1},"modalData":{},"alertData":{}}"#;
     assert!(cut_real_json == expected_json, "ClearLog on Log screen with LogRight modal. Expected updated Log screen with no modals, got:\n{}", real_json);
 
-    do_action("NavbarSettings", "", "");
-    do_action("ManageNetworks", "", "");
+    do_action(Action::NavbarSettings, "", "");
+    do_action(Action::ManageNetworks, "", "");
     do_action(
-        "GoForward",
+        Action::GoForward,
         "0180e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e",
         "",
     );
-    do_action("ManageMetadata", "9150", "");
-    do_action("SignMetadata", "", "");
+    do_action(Action::ManageMetadata, "9150", "");
+    do_action(Action::SignMetadata, "", "");
     let real_json = do_action(
-        "GoForward",
+        Action::GoForward,
         "0146ebddef8cd9bb167dc30878d7113b7e168e6f0646beffd77d69d39bad76b47a",
         "",
     );
@@ -1693,8 +1697,8 @@ fn flow_test_1() {
         std::env::set_current_dir("../../navigator").unwrap();
     }
 
-    do_action("GoBack", "", "");
-    let real_json = do_action("NavbarLog", "", "");
+    do_action(Action::GoBack, "", "");
+    let real_json = do_action(Action::NavbarLog, "", "");
     let cut_real_json = real_json
         .replace(&alice_sr_root(), r#"<alice_sr25519_root>"#)
         .replace(&westend_9150(), r#"<meta_pic_westend9150>"#);
@@ -1704,15 +1708,15 @@ fn flow_test_1() {
         "Expected the updated log to contain entry about generating sufficient crypto, got:\n{}",
         real_json
     );
-    do_action("RightButton", "", "");
-    do_action("ClearLog", "", "");
+    do_action(Action::RightButton, "", "");
+    do_action(Action::ClearLog, "", "");
 
-    do_action("NavbarSettings", "", "");
-    do_action("ManageNetworks", "", "");
-    do_action("RightButton", "", "");
-    do_action("SignTypes", "", "");
+    do_action(Action::NavbarSettings, "", "");
+    do_action(Action::ManageNetworks, "", "");
+    do_action(Action::RightButton, "", "");
+    do_action(Action::SignTypes, "", "");
     let real_json = do_action(
-        "GoForward",
+        Action::GoForward,
         "0146ebddef8cd9bb167dc30878d7113b7e168e6f0646beffd77d69d39bad76b47a",
         "",
     );
@@ -1763,8 +1767,8 @@ fn flow_test_1() {
         std::env::set_current_dir("../../navigator").unwrap();
     }
 
-    do_action("GoBack", "", "");
-    let real_json = do_action("NavbarLog", "", "");
+    do_action(Action::GoBack, "", "");
+    let real_json = do_action(Action::NavbarLog, "", "");
     let cut_real_json = real_json
         .replace(&alice_sr_root(), r#"<alice_sr25519_root>"#)
         .replace(&types_known(), r#"<types_known>"#);
@@ -1774,22 +1778,22 @@ fn flow_test_1() {
         "Expected the updated log to contain entry about generating sufficient crypto, got:\n{}",
         real_json
     );
-    do_action("RightButton", "", "");
-    do_action("ClearLog", "", "");
+    do_action(Action::RightButton, "", "");
+    do_action(Action::ClearLog, "", "");
 
     // let's scan something!!! oops wrong network version
-    do_action("NavbarScan", "", "");
-    let real_json = do_action("TransactionFetched","530100d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27da40403008eaf04151687736326c9fea17e25fc5287613693c912909cb226aa4794f26a480700e8764817b501b8003223000005000000e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e538a7d7a0ac17eb6dd004578cb8e238c384a10f57c999a3fa1200409cd9b3f33e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e","");
+    do_action(Action::NavbarScan, "", "");
+    let real_json = do_action(Action::TransactionFetched,"530100d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27da40403008eaf04151687736326c9fea17e25fc5287613693c912909cb226aa4794f26a480700e8764817b501b8003223000005000000e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e538a7d7a0ac17eb6dd004578cb8e238c384a10f57c999a3fa1200409cd9b3f33e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e","");
     let expected_json = r#"{"screen":"Transaction","screenLabel":"","back":true,"footer":false,"footerButton":"Scan","rightButton":"None","screenNameType":"h1","modal":"Empty","alert":"Empty","screenData":{"content":{"error":[{"index":0,"indent":0,"type":"error","payload":"Failed to decode extensions. Please try updating metadata for westend network. Parsing with westend9150 metadata: Network spec version decoded from extensions (9010) differs from the version in metadata (9150)."}]},"type":"read"},"modalData":{},"alertData":{}}"#;
     assert!(real_json == expected_json, "TransactionFetched on Scan screen containing transaction. Expected Transaction screen with no modals, got:\n{}", real_json);
 
-    let real_json = do_action("GoForward", "", "");
+    let real_json = do_action(Action::GoForward, "", "");
     assert!(real_json == expected_json, "GoForward on Transaction screen with transaction that could be only read. Expected to stay in same place, got:\n{}", real_json);
 
     // let's scan something real!!!
-    do_action("GoBack", "", "");
+    do_action(Action::GoBack, "", "");
     let transaction_hex = "5301008266a693d6872d2b6437215c198ee25cabf2e4256df9ad00e979e84b00b5235ea40403008eaf04151687736326c9fea17e25fc5287613693c912909cb226aa4794f26a480700e8764817b501b800be23000005000000e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e538a7d7a0ac17eb6dd004578cb8e238c384a10f57c999a3fa1200409cd9b3f33e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e";
-    let real_json = do_action("TransactionFetched", transaction_hex, "");
+    let real_json = do_action(Action::TransactionFetched, transaction_hex, "");
     let cut_real_json = real_json
         .replace(
             &alice_sr_alice_secret_secret(),
@@ -1799,7 +1803,11 @@ fn flow_test_1() {
     let expected_json_transaction_sign = r#"{"screen":"Transaction","screenLabel":"","back":true,"footer":false,"footerButton":"Scan","rightButton":"None","screenNameType":"h1","modal":"Empty","alert":"Empty","screenData":{"content":{"method":[{"index":0,"indent":0,"type":"pallet","payload":"Balances"},{"index":1,"indent":1,"type":"method","payload":{"method_name":"transfer_keep_alive","docs":"53616d6520617320746865205b607472616e73666572605d2063616c6c2c206275742077697468206120636865636b207468617420746865207472616e736665722077696c6c206e6f74206b696c6c207468650a6f726967696e206163636f756e742e0a0a393925206f66207468652074696d6520796f752077616e74205b607472616e73666572605d20696e73746561642e0a0a5b607472616e73666572605d3a207374727563742e50616c6c65742e68746d6c236d6574686f642e7472616e73666572"}},{"index":2,"indent":2,"type":"field_name","payload":{"name":"dest","docs_field_name":"","path_type":"sp_runtime >> multiaddress >> MultiAddress","docs_type":""}},{"index":3,"indent":3,"type":"enum_variant_name","payload":{"name":"Id","docs_enum_variant":""}},{"index":4,"indent":4,"type":"Id","payload":{"base58":"5FHneW46xGXgs5mUiveU4sbTyGBzmstUspZC92UhjJM694ty","identicon":"<bob>"}},{"index":5,"indent":2,"type":"field_name","payload":{"name":"value","docs_field_name":"","path_type":"","docs_type":""}},{"index":6,"indent":3,"type":"balance","payload":{"amount":"100.000000000","units":"mWND"}}],"extensions":[{"index":7,"indent":0,"type":"era","payload":{"era":"Mortal","phase":"27","period":"64"}},{"index":8,"indent":0,"type":"nonce","payload":"46"},{"index":9,"indent":0,"type":"tip","payload":{"amount":"0","units":"pWND"}},{"index":10,"indent":0,"type":"name_version","payload":{"name":"westend","version":"9150"}},{"index":11,"indent":0,"type":"tx_version","payload":"5"},{"index":12,"indent":0,"type":"block_hash","payload":"538a7d7a0ac17eb6dd004578cb8e238c384a10f57c999a3fa1200409cd9b3f33"}]},"author_info":{"base58":"5F1gaMEdLTzoYFV6hYqX9AnZYg4bknuYE5HcVXmnKi1eSCXK","identicon":"<alice_sr25519_//Alice/secret//secret>","seed":"Alice","derivation_path":"//Alice/secret//secret","has_pwd":false},"network_info":{"network_title":"Westend","network_logo":"westend"},"type":"sign"},"modalData":{},"alertData":{}}"#;
     assert!(cut_real_json == expected_json_transaction_sign, "TransactionFetched on Scan screen containing transaction. Expected Transaction screen with no modals, got:\n{}", real_json);
 
-    let real_json = do_action("GoForward", "Alice sends some cash", ALICE_SEED_PHRASE);
+    let real_json = do_action(
+        Action::GoForward,
+        "Alice sends some cash",
+        ALICE_SEED_PHRASE,
+    );
     let (cut_real_json, signature_hex) = process_signature(&real_json);
     let cut_real_json = cut_real_json
         .replace(
@@ -1820,7 +1828,7 @@ fn flow_test_1() {
         signature_hex
     );
 
-    let real_json = do_action("GoBack", "", "");
+    let real_json = do_action(Action::GoBack, "", "");
     let cut_real_json = timeless(&real_json).replace(
         &alice_sr_alice_secret_secret(),
         r#"<alice_sr25519_//Alice/secret//secret>"#,
@@ -1832,7 +1840,7 @@ fn flow_test_1() {
         real_json
     );
 
-    let real_json = do_action("ShowLogDetails", "1", "");
+    let real_json = do_action(Action::ShowLogDetails, "1", "");
     let cut_real_json = timeless(&real_json)
         .replace(
             &alice_sr_alice_secret_secret(),
@@ -1842,14 +1850,14 @@ fn flow_test_1() {
     let expected_json = r#"{"screen":"LogDetails","screenLabel":"Event details","back":true,"footer":true,"footerButton":"Log","rightButton":"None","screenNameType":"h4","modal":"Empty","alert":"Empty","screenData":{"timestamp":"**","events":[{"event":"transaction_signed","payload":{"transaction":{"method":[{"index":0,"indent":0,"type":"pallet","payload":"Balances"},{"index":1,"indent":1,"type":"method","payload":{"method_name":"transfer_keep_alive","docs":"53616d6520617320746865205b607472616e73666572605d2063616c6c2c206275742077697468206120636865636b207468617420746865207472616e736665722077696c6c206e6f74206b696c6c207468650a6f726967696e206163636f756e742e0a0a393925206f66207468652074696d6520796f752077616e74205b607472616e73666572605d20696e73746561642e0a0a5b607472616e73666572605d3a207374727563742e50616c6c65742e68746d6c236d6574686f642e7472616e73666572"}},{"index":2,"indent":2,"type":"field_name","payload":{"name":"dest","docs_field_name":"","path_type":"sp_runtime >> multiaddress >> MultiAddress","docs_type":""}},{"index":3,"indent":3,"type":"enum_variant_name","payload":{"name":"Id","docs_enum_variant":""}},{"index":4,"indent":4,"type":"Id","payload":{"base58":"5FHneW46xGXgs5mUiveU4sbTyGBzmstUspZC92UhjJM694ty","identicon":"<bob>"}},{"index":5,"indent":2,"type":"field_name","payload":{"name":"value","docs_field_name":"","path_type":"","docs_type":""}},{"index":6,"indent":3,"type":"balance","payload":{"amount":"100.000000000","units":"mWND"}}],"extensions":[{"index":7,"indent":0,"type":"era","payload":{"era":"Mortal","phase":"27","period":"64"}},{"index":8,"indent":0,"type":"nonce","payload":"46"},{"index":9,"indent":0,"type":"tip","payload":{"amount":"0","units":"pWND"}},{"index":10,"indent":0,"type":"name_version","payload":{"name":"westend","version":"9150"}},{"index":11,"indent":0,"type":"tx_version","payload":"5"},{"index":12,"indent":0,"type":"block_hash","payload":"538a7d7a0ac17eb6dd004578cb8e238c384a10f57c999a3fa1200409cd9b3f33"}]},"network_name":"westend","signed_by":{"public_key":"8266a693d6872d2b6437215c198ee25cabf2e4256df9ad00e979e84b00b5235e","identicon":"<alice_sr25519_//Alice/secret//secret>","encryption":"sr25519"},"user_comment":"Alice sends some cash"}}]},"modalData":{},"alertData":{}}"#;
     assert!(cut_real_json == expected_json, "ShowLogDetails on Log screen with order 1. Expected LogDetails screen with decoded transaction and no modals, got:\n{}", real_json);
 
-    do_action("GoBack", "", "");
-    do_action("RightButton", "", "");
-    do_action("ClearLog", "", "");
+    do_action(Action::GoBack, "", "");
+    do_action(Action::RightButton, "", "");
+    do_action(Action::ClearLog, "", "");
 
     // let's scan a text message
-    do_action("NavbarScan", "", "");
+    do_action(Action::NavbarScan, "", "");
     let message_hex = "5301033efeca331d646d8a2986374bb3bb8d6e9e3cfcdd7c45c2b69104fab5d61d3f34f5064c6f72656d20697073756d20646f6c6f722073697420616d65742c20636f6e73656374657475722061646970697363696e6720656c69742c2073656420646f20656975736d6f642074656d706f7220696e6369646964756e74207574206c61626f726520657420646f6c6f7265206d61676e6120616c697175612e20557420656e696d206164206d696e696d2076656e69616d2c2071756973206e6f737472756420657865726369746174696f6e20756c6c616d636f206c61626f726973206e69736920757420616c697175697020657820656120636f6d6d6f646f20636f6e7365717561742e2044756973206175746520697275726520646f6c6f7220696e20726570726568656e646572697420696e20766f6c7570746174652076656c697420657373652063696c6c756d20646f6c6f726520657520667567696174206e756c6c612070617269617475722e204578636570746575722073696e74206f6363616563617420637570696461746174206e6f6e2070726f6964656e742c2073756e7420696e2063756c706120717569206f666669636961206465736572756e74206d6f6c6c697420616e696d20696420657374206c61626f72756d2ee143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e";
-    let real_json = do_action("TransactionFetched", message_hex, "");
+    let real_json = do_action(Action::TransactionFetched, message_hex, "");
     let cut_real_json = real_json.replace(&alice_sr_westend(), r#"<alice_sr25519_//westend>"#);
     let expected_json_message_sign = r#"{"screen":"Transaction","screenLabel":"","back":true,"footer":false,"footerButton":"Scan","rightButton":"None","screenNameType":"h1","modal":"Empty","alert":"Empty","screenData":{"content":{"message":[{"index":0,"indent":0,"type":"text","payload":"4c6f72656d20697073756d20646f6c6f722073697420616d65742c20636f6e73656374657475722061646970697363696e6720656c69742c2073656420646f20656975736d6f642074656d706f7220696e6369646964756e74207574206c61626f726520657420646f6c6f7265206d61676e6120616c697175612e20557420656e696d206164206d696e696d2076656e69616d2c2071756973206e6f737472756420657865726369746174696f6e20756c6c616d636f206c61626f726973206e69736920757420616c697175697020657820656120636f6d6d6f646f20636f6e7365717561742e2044756973206175746520697275726520646f6c6f7220696e20726570726568656e646572697420696e20766f6c7570746174652076656c697420657373652063696c6c756d20646f6c6f726520657520667567696174206e756c6c612070617269617475722e204578636570746575722073696e74206f6363616563617420637570696461746174206e6f6e2070726f6964656e742c2073756e7420696e2063756c706120717569206f666669636961206465736572756e74206d6f6c6c697420616e696d20696420657374206c61626f72756d2e"}]},"author_info":{"base58":"5DVJWniDyUja5xnG4t5i3Rrd2Gguf1fzxPYfgZBbKcvFqk4N","identicon":"<alice_sr25519_//westend>","seed":"Alice","derivation_path":"//westend","has_pwd":false},"network_info":{"network_title":"Westend","network_logo":"westend"},"type":"sign"},"modalData":{},"alertData":{}}"#;
     assert!(cut_real_json == expected_json_message_sign, "TransactionFetched on Scan screen containing message transaction. Expected Transaction screen with no modals, got:\n{}", real_json);
@@ -1868,7 +1876,7 @@ fn flow_test_1() {
     let expected_text = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.";
     assert!(text == expected_text, "Different text: \n{}", text);
 
-    let real_json = do_action("GoForward", "text test", ALICE_SEED_PHRASE);
+    let real_json = do_action(Action::GoForward, "text test", ALICE_SEED_PHRASE);
     let (cut_real_json, signature_hex) = process_signature(&real_json);
     let cut_real_json = cut_real_json.replace(&alice_sr_westend(), r#"<alice_sr25519_//westend>"#);
     let expected_json_message_ready = r#"{"screen":"Transaction","screenLabel":"","back":true,"footer":false,"footerButton":"Scan","rightButton":"None","screenNameType":"h1","modal":"SignatureReady","alert":"Empty","screenData":{"content":{"message":[{"index":0,"indent":0,"type":"text","payload":"4c6f72656d20697073756d20646f6c6f722073697420616d65742c20636f6e73656374657475722061646970697363696e6720656c69742c2073656420646f20656975736d6f642074656d706f7220696e6369646964756e74207574206c61626f726520657420646f6c6f7265206d61676e6120616c697175612e20557420656e696d206164206d696e696d2076656e69616d2c2071756973206e6f737472756420657865726369746174696f6e20756c6c616d636f206c61626f726973206e69736920757420616c697175697020657820656120636f6d6d6f646f20636f6e7365717561742e2044756973206175746520697275726520646f6c6f7220696e20726570726568656e646572697420696e20766f6c7570746174652076656c697420657373652063696c6c756d20646f6c6f726520657520667567696174206e756c6c612070617269617475722e204578636570746575722073696e74206f6363616563617420637570696461746174206e6f6e2070726f6964656e742c2073756e7420696e2063756c706120717569206f666669636961206465736572756e74206d6f6c6c697420616e696d20696420657374206c61626f72756d2e"}]},"author_info":{"base58":"5DVJWniDyUja5xnG4t5i3Rrd2Gguf1fzxPYfgZBbKcvFqk4N","identicon":"<alice_sr25519_//westend>","seed":"Alice","derivation_path":"//westend","has_pwd":false},"network_info":{"network_title":"Westend","network_logo":"westend"},"type":"done"},"modalData":{"signature":"**"},"alertData":{}}"#;
@@ -1884,7 +1892,7 @@ fn flow_test_1() {
         signature_hex
     );
 
-    let real_json = do_action("GoBack", "", "");
+    let real_json = do_action(Action::GoBack, "", "");
     let cut_real_json =
         timeless(&real_json).replace(&alice_sr_westend(), r#"<alice_sr25519_//westend>"#);
     let expected_json = r#"{"screen":"Log","screenLabel":"","back":false,"footer":true,"footerButton":"Log","rightButton":"LogRight","screenNameType":"h4","modal":"Empty","alert":"Empty","screenData":{"log":[{"order":1,"timestamp":"**","events":[{"event":"message_signed","payload":{"message":"4c6f72656d20697073756d20646f6c6f722073697420616d65742c20636f6e73656374657475722061646970697363696e6720656c69742c2073656420646f20656975736d6f642074656d706f7220696e6369646964756e74207574206c61626f726520657420646f6c6f7265206d61676e6120616c697175612e20557420656e696d206164206d696e696d2076656e69616d2c2071756973206e6f737472756420657865726369746174696f6e20756c6c616d636f206c61626f726973206e69736920757420616c697175697020657820656120636f6d6d6f646f20636f6e7365717561742e2044756973206175746520697275726520646f6c6f7220696e20726570726568656e646572697420696e20766f6c7570746174652076656c697420657373652063696c6c756d20646f6c6f726520657520667567696174206e756c6c612070617269617475722e204578636570746575722073696e74206f6363616563617420637570696461746174206e6f6e2070726f6964656e742c2073756e7420696e2063756c706120717569206f666669636961206465736572756e74206d6f6c6c697420616e696d20696420657374206c61626f72756d2e","network_name":"westend","signed_by":{"public_key":"3efeca331d646d8a2986374bb3bb8d6e9e3cfcdd7c45c2b69104fab5d61d3f34","identicon":"<alice_sr25519_//westend>","encryption":"sr25519"},"user_comment":"text test"}}]},{"order":0,"timestamp":"**","events":[{"event":"history_cleared"}]}],"total_entries":2},"modalData":{},"alertData":{}}"#;
@@ -1894,25 +1902,25 @@ fn flow_test_1() {
         real_json
     );
 
-    let real_json = do_action("ShowLogDetails", "1", "");
+    let real_json = do_action(Action::ShowLogDetails, "1", "");
     let cut_real_json =
         timeless(&real_json).replace(&alice_sr_westend(), r#"<alice_sr25519_//westend>"#);
     let expected_json = r#"{"screen":"LogDetails","screenLabel":"Event details","back":true,"footer":true,"footerButton":"Log","rightButton":"None","screenNameType":"h4","modal":"Empty","alert":"Empty","screenData":{"timestamp":"**","events":[{"event":"message_signed","payload":{"message":"4c6f72656d20697073756d20646f6c6f722073697420616d65742c20636f6e73656374657475722061646970697363696e6720656c69742c2073656420646f20656975736d6f642074656d706f7220696e6369646964756e74207574206c61626f726520657420646f6c6f7265206d61676e6120616c697175612e20557420656e696d206164206d696e696d2076656e69616d2c2071756973206e6f737472756420657865726369746174696f6e20756c6c616d636f206c61626f726973206e69736920757420616c697175697020657820656120636f6d6d6f646f20636f6e7365717561742e2044756973206175746520697275726520646f6c6f7220696e20726570726568656e646572697420696e20766f6c7570746174652076656c697420657373652063696c6c756d20646f6c6f726520657520667567696174206e756c6c612070617269617475722e204578636570746575722073696e74206f6363616563617420637570696461746174206e6f6e2070726f6964656e742c2073756e7420696e2063756c706120717569206f666669636961206465736572756e74206d6f6c6c697420616e696d20696420657374206c61626f72756d2e","network_name":"westend","signed_by":{"public_key":"3efeca331d646d8a2986374bb3bb8d6e9e3cfcdd7c45c2b69104fab5d61d3f34","identicon":"<alice_sr25519_//westend>","encryption":"sr25519"},"user_comment":"text test"}}]},"modalData":{},"alertData":{}}"#;
     assert!(cut_real_json == expected_json, "ShowLogDetails on Log screen with order 1. Expected LogDetails screen with decoded message and no modals, got:\n{}", real_json);
 
-    do_action("GoBack", "", "");
-    do_action("RightButton", "", "");
-    do_action("ClearLog", "", "");
+    do_action(Action::GoBack, "", "");
+    do_action(Action::RightButton, "", "");
+    do_action(Action::ClearLog, "", "");
 
-    do_action("NavbarKeys", "", "");
-    do_action("RightButton", "", "");
-    do_action("NewSeed", "", "");
-    let real_json = do_action("GoForward", "Pepper", "");
+    do_action(Action::NavbarKeys, "", "");
+    do_action(Action::RightButton, "", "");
+    do_action(Action::NewSeed, "", "");
+    let real_json = do_action(Action::GoForward, "Pepper", "");
     let (cut_real_json, seed_phrase_pepper) = cut_seed(&cut_identicon(&real_json));
     let expected_json = r#"{"screen":"NewSeed","screenLabel":"New Seed","back":true,"footer":false,"footerButton":"Keys","rightButton":"None","screenNameType":"h1","modal":"NewSeedBackup","alert":"Empty","screenData":{"keyboard":false},"modalData":{"seed":"Pepper","seed_phrase":"**","identicon":"**"},"alertData":{}}"#;
     assert!(cut_real_json == expected_json, "GoForward on NewSeed screen with non-empty seed name. Expected NewSeed screen with NewSeedBackup modal, got:\n{}", real_json);
 
-    let real_json = do_action("GoForward", "false", &seed_phrase_pepper);
+    let real_json = do_action(Action::GoForward, "false", &seed_phrase_pepper);
     let cut_real_json = cut_address_key(&cut_base58(&cut_identicon(
         &real_json.replace(&empty_png(), r#"<empty>"#),
     )));
@@ -1921,9 +1929,9 @@ fn flow_test_1() {
 
     update_seed_names(r#"Alice,Pepper"#);
 
-    do_action("NetworkSelector", "", "");
+    do_action(Action::NetworkSelector, "", "");
     let real_json = do_action(
-        "ChangeNetwork",
+        Action::ChangeNetwork,
         "0180e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e",
         "",
     );
@@ -1942,12 +1950,12 @@ fn flow_test_1() {
     let pepper_westend_base58 = caps.name("base").unwrap().as_str().to_string();
     let pepper_westend_identicon = caps.name("identicon").unwrap().as_str().to_string();
 
-    do_action("NavbarScan", "", "");
+    do_action(Action::NavbarScan, "", "");
     let transaction_hex = transaction_hex.replace(
         "8266a693d6872d2b6437215c198ee25cabf2e4256df9ad00e979e84b00b5235e",
         &pepper_westend_public,
     );
-    let real_json = do_action("TransactionFetched", &transaction_hex, "");
+    let real_json = do_action(Action::TransactionFetched, &transaction_hex, "");
     let cut_real_json = real_json.replace(&bob(), r#"<bob>"#);
     let expected_json_transaction_sign = expected_json_transaction_sign
         .replace(
@@ -1963,7 +1971,7 @@ fn flow_test_1() {
     assert!(cut_real_json == expected_json_transaction_sign, "TransactionFetched on Scan screen containing transaction. Expected Transaction screen with no modals, got:\n{}", real_json);
 
     let real_json = do_action(
-        "GoForward",
+        Action::GoForward,
         "Pepper also sends some cash",
         &seed_phrase_pepper,
     );
@@ -1992,21 +2000,21 @@ fn flow_test_1() {
         signature_hex
     );
 
-    do_action("GoBack", "", "");
-    do_action("RightButton", "", "");
-    do_action("ClearLog", "", "");
-    do_action("NavbarKeys", "", "");
-    do_action("SelectSeed", "Pepper", "");
-    do_action("NetworkSelector", "", "");
+    do_action(Action::GoBack, "", "");
+    do_action(Action::RightButton, "", "");
+    do_action(Action::ClearLog, "", "");
+    do_action(Action::NavbarKeys, "", "");
+    do_action(Action::SelectSeed, "Pepper", "");
+    do_action(Action::NetworkSelector, "", "");
     do_action(
-        "ChangeNetwork",
+        Action::ChangeNetwork,
         "0180e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e",
         "",
     );
-    do_action("Swipe", &format!("01{}", pepper_westend_public), "");
-    do_action("RemoveKey", "", "");
+    do_action(Action::Swipe, &format!("01{}", pepper_westend_public), "");
+    do_action(Action::RemoveKey, "", "");
 
-    let real_json = do_action("NewKey", "", "");
+    let real_json = do_action(Action::NewKey, "", "");
     let expected_json = r#"{"screen":"DeriveKey","screenLabel":"Derive Key","back":true,"footer":false,"footerButton":"Keys","rightButton":"None","screenNameType":"h1","modal":"Empty","alert":"Empty","screenData":{"seed_name":"Pepper","network_title":"Westend","network_logo":"westend","network_specs_key":"0180e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e","suggested_derivation":"","keyboard":true},"modalData":{},"alertData":{}}"#;
     assert!(
         real_json == expected_json,
@@ -2014,11 +2022,11 @@ fn flow_test_1() {
         real_json
     );
 
-    let real_json = do_action("CheckPassword", "//0///secret", "");
+    let real_json = do_action(Action::CheckPassword, "//0///secret", "");
     let expected_json = r#"{"screen":"DeriveKey","screenLabel":"Derive Key","back":true,"footer":false,"footerButton":"Keys","rightButton":"None","screenNameType":"h1","modal":"PasswordConfirm","alert":"Empty","screenData":{"seed_name":"Pepper","network_title":"Westend","network_logo":"westend","network_specs_key":"0180e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e","suggested_derivation":"//0///secret","keyboard":false},"modalData":{"seed_name":"Pepper","cropped_path":"//0","pwd":"secret"},"alertData":{}}"#;
     assert!(real_json == expected_json, "CheckPassword on DeriveKey screen with password (path validity and password existence is checked elsewhere). Expected updated DeriveKey screen with PasswordConfirm modal, got:\n{}", real_json);
 
-    let real_json = do_action("GoForward", "//0///secret", &seed_phrase_pepper);
+    let real_json = do_action(Action::GoForward, "//0///secret", &seed_phrase_pepper);
     let cut_real_json = cut_address_key(&cut_base58(&cut_identicon(
         &real_json.replace(&empty_png(), r#"<empty>"#),
     )));
@@ -2030,45 +2038,49 @@ fn flow_test_1() {
     let pepper_key0_base58 = caps.name("base").unwrap().as_str().to_string();
     let pepper_key0_identicon = caps.name("identicon").unwrap().as_str().to_string();
 
-    do_action("NavbarScan", "", "");
+    do_action(Action::NavbarScan, "", "");
     let message_hex = message_hex.replace(
         "3efeca331d646d8a2986374bb3bb8d6e9e3cfcdd7c45c2b69104fab5d61d3f34",
         &pepper_key0_public,
     );
-    let real_json = do_action("TransactionFetched", &message_hex, "");
+    let real_json = do_action(Action::TransactionFetched, &message_hex, "");
     let expected_json = format!("{{\"screen\":\"Transaction\",\"screenLabel\":\"\",\"back\":true,\"footer\":false,\"footerButton\":\"Scan\",\"rightButton\":\"None\",\"screenNameType\":\"h1\",\"modal\":\"Empty\",\"alert\":\"Empty\",\"screenData\":{{\"content\":{{\"message\":[{{\"index\":0,\"indent\":0,\"type\":\"text\",\"payload\":\"4c6f72656d20697073756d20646f6c6f722073697420616d65742c20636f6e73656374657475722061646970697363696e6720656c69742c2073656420646f20656975736d6f642074656d706f7220696e6369646964756e74207574206c61626f726520657420646f6c6f7265206d61676e6120616c697175612e20557420656e696d206164206d696e696d2076656e69616d2c2071756973206e6f737472756420657865726369746174696f6e20756c6c616d636f206c61626f726973206e69736920757420616c697175697020657820656120636f6d6d6f646f20636f6e7365717561742e2044756973206175746520697275726520646f6c6f7220696e20726570726568656e646572697420696e20766f6c7570746174652076656c697420657373652063696c6c756d20646f6c6f726520657520667567696174206e756c6c612070617269617475722e204578636570746575722073696e74206f6363616563617420637570696461746174206e6f6e2070726f6964656e742c2073756e7420696e2063756c706120717569206f666669636961206465736572756e74206d6f6c6c697420616e696d20696420657374206c61626f72756d2e\"}}]}},\"author_info\":{{\"base58\":\"{}\",\"identicon\":\"{}\",\"seed\":\"Pepper\",\"derivation_path\":\"//0\",\"has_pwd\":true}},\"network_info\":{{\"network_title\":\"Westend\",\"network_logo\":\"westend\"}},\"type\":\"sign\"}},\"modalData\":{{}},\"alertData\":{{}}}}", pepper_key0_base58, pepper_key0_identicon);
     assert!(real_json == expected_json, "TransactionFetched on Scan screen containing message transaction. Expected Transaction screen with no modals, got:\n{}", real_json);
 
     let real_json = do_action(
-        "GoForward",
+        Action::GoForward,
         "Pepper tries sending text from passworded account",
         &seed_phrase_pepper,
     );
     let expected_json = format!("{{\"screen\":\"Transaction\",\"screenLabel\":\"\",\"back\":true,\"footer\":false,\"footerButton\":\"Scan\",\"rightButton\":\"None\",\"screenNameType\":\"h1\",\"modal\":\"EnterPassword\",\"alert\":\"Empty\",\"screenData\":{{\"content\":{{\"message\":[{{\"index\":0,\"indent\":0,\"type\":\"text\",\"payload\":\"4c6f72656d20697073756d20646f6c6f722073697420616d65742c20636f6e73656374657475722061646970697363696e6720656c69742c2073656420646f20656975736d6f642074656d706f7220696e6369646964756e74207574206c61626f726520657420646f6c6f7265206d61676e6120616c697175612e20557420656e696d206164206d696e696d2076656e69616d2c2071756973206e6f737472756420657865726369746174696f6e20756c6c616d636f206c61626f726973206e69736920757420616c697175697020657820656120636f6d6d6f646f20636f6e7365717561742e2044756973206175746520697275726520646f6c6f7220696e20726570726568656e646572697420696e20766f6c7570746174652076656c697420657373652063696c6c756d20646f6c6f726520657520667567696174206e756c6c612070617269617475722e204578636570746575722073696e74206f6363616563617420637570696461746174206e6f6e2070726f6964656e742c2073756e7420696e2063756c706120717569206f666669636961206465736572756e74206d6f6c6c697420616e696d20696420657374206c61626f72756d2e\"}}]}},\"author_info\":{{\"base58\":\"{}\",\"identicon\":\"{}\",\"seed\":\"Pepper\",\"derivation_path\":\"//0\",\"has_pwd\":true}},\"network_info\":{{\"network_title\":\"Westend\",\"network_logo\":\"westend\"}},\"type\":\"sign\"}},\"modalData\":{{\"author_info\":{{\"base58\":\"{}\",\"identicon\":\"{}\",\"seed\":\"Pepper\",\"derivation_path\":\"//0\",\"has_pwd\":true}},\"counter\":1}},\"alertData\":{{}}}}", pepper_key0_base58, pepper_key0_identicon, pepper_key0_base58, pepper_key0_identicon);
     assert!(real_json == expected_json, "GoForward on Transaction screen for passworded address. Expected Transaction screen with EnterPassword modal, got:\n{}", real_json);
 
-    let real_json = do_action("GoForward", "wrong_one", "");
+    let real_json = do_action(Action::GoForward, "wrong_one", "");
     let expected_json = format!("{{\"screen\":\"Transaction\",\"screenLabel\":\"\",\"back\":true,\"footer\":false,\"footerButton\":\"Scan\",\"rightButton\":\"None\",\"screenNameType\":\"h1\",\"modal\":\"EnterPassword\",\"alert\":\"Error\",\"screenData\":{{\"content\":{{\"message\":[{{\"index\":0,\"indent\":0,\"type\":\"text\",\"payload\":\"4c6f72656d20697073756d20646f6c6f722073697420616d65742c20636f6e73656374657475722061646970697363696e6720656c69742c2073656420646f20656975736d6f642074656d706f7220696e6369646964756e74207574206c61626f726520657420646f6c6f7265206d61676e6120616c697175612e20557420656e696d206164206d696e696d2076656e69616d2c2071756973206e6f737472756420657865726369746174696f6e20756c6c616d636f206c61626f726973206e69736920757420616c697175697020657820656120636f6d6d6f646f20636f6e7365717561742e2044756973206175746520697275726520646f6c6f7220696e20726570726568656e646572697420696e20766f6c7570746174652076656c697420657373652063696c6c756d20646f6c6f726520657520667567696174206e756c6c612070617269617475722e204578636570746575722073696e74206f6363616563617420637570696461746174206e6f6e2070726f6964656e742c2073756e7420696e2063756c706120717569206f666669636961206465736572756e74206d6f6c6c697420616e696d20696420657374206c61626f72756d2e\"}}]}},\"author_info\":{{\"base58\":\"{}\",\"identicon\":\"{}\",\"seed\":\"Pepper\",\"derivation_path\":\"//0\",\"has_pwd\":true}},\"network_info\":{{\"network_title\":\"Westend\",\"network_logo\":\"westend\"}},\"type\":\"sign\"}},\"modalData\":{{\"author_info\":{{\"base58\":\"{}\",\"identicon\":\"{}\",\"seed\":\"Pepper\",\"derivation_path\":\"//0\",\"has_pwd\":true}},\"counter\":2}},\"alertData\":{{\"error\":\"Wrong password.\"}}}}", pepper_key0_base58, pepper_key0_identicon, pepper_key0_base58, pepper_key0_identicon);
     assert!(real_json == expected_json, "GoForward on Transaction screen for passworded address with wrong password. Expected Transaction screen with EnterPassword modal with counter at 2, got:\n{}", real_json);
 
-    do_action("GoBack", "", "");
-    let real_json = do_action("GoForward", "wrong_two", "");
+    do_action(Action::GoBack, "", "");
+    let real_json = do_action(Action::GoForward, "wrong_two", "");
     let expected_json = format!("{{\"screen\":\"Transaction\",\"screenLabel\":\"\",\"back\":true,\"footer\":false,\"footerButton\":\"Scan\",\"rightButton\":\"None\",\"screenNameType\":\"h1\",\"modal\":\"EnterPassword\",\"alert\":\"Error\",\"screenData\":{{\"content\":{{\"message\":[{{\"index\":0,\"indent\":0,\"type\":\"text\",\"payload\":\"4c6f72656d20697073756d20646f6c6f722073697420616d65742c20636f6e73656374657475722061646970697363696e6720656c69742c2073656420646f20656975736d6f642074656d706f7220696e6369646964756e74207574206c61626f726520657420646f6c6f7265206d61676e6120616c697175612e20557420656e696d206164206d696e696d2076656e69616d2c2071756973206e6f737472756420657865726369746174696f6e20756c6c616d636f206c61626f726973206e69736920757420616c697175697020657820656120636f6d6d6f646f20636f6e7365717561742e2044756973206175746520697275726520646f6c6f7220696e20726570726568656e646572697420696e20766f6c7570746174652076656c697420657373652063696c6c756d20646f6c6f726520657520667567696174206e756c6c612070617269617475722e204578636570746575722073696e74206f6363616563617420637570696461746174206e6f6e2070726f6964656e742c2073756e7420696e2063756c706120717569206f666669636961206465736572756e74206d6f6c6c697420616e696d20696420657374206c61626f72756d2e\"}}]}},\"author_info\":{{\"base58\":\"{}\",\"identicon\":\"{}\",\"seed\":\"Pepper\",\"derivation_path\":\"//0\",\"has_pwd\":true}},\"network_info\":{{\"network_title\":\"Westend\",\"network_logo\":\"westend\"}},\"type\":\"sign\"}},\"modalData\":{{\"author_info\":{{\"base58\":\"{}\",\"identicon\":\"{}\",\"seed\":\"Pepper\",\"derivation_path\":\"//0\",\"has_pwd\":true}},\"counter\":3}},\"alertData\":{{\"error\":\"Wrong password.\"}}}}", pepper_key0_base58, pepper_key0_identicon, pepper_key0_base58, pepper_key0_identicon);
     assert!(real_json == expected_json, "GoForward on Transaction screen for passworded address with second wrong password. Expected Transaction screen with EnterPassword modal with counter at 3, got:\n{}", real_json);
 
-    do_action("GoBack", "", "");
-    let real_json = do_action("GoForward", "wrong_three", "");
+    do_action(Action::GoBack, "", "");
+    let real_json = do_action(Action::GoForward, "wrong_three", "");
     let cut_real_json = cut_public_key(&cut_base58(&cut_identicon(&timeless(&real_json))));
     let expected_json = r#"{"screen":"Log","screenLabel":"","back":false,"footer":true,"footerButton":"Log","rightButton":"LogRight","screenNameType":"h4","modal":"Empty","alert":"Error","screenData":{"log":[{"order":5,"timestamp":"**","events":[{"event":"message_sign_error","payload":{"message":"4c6f72656d20697073756d20646f6c6f722073697420616d65742c20636f6e73656374657475722061646970697363696e6720656c69742c2073656420646f20656975736d6f642074656d706f7220696e6369646964756e74207574206c61626f726520657420646f6c6f7265206d61676e6120616c697175612e20557420656e696d206164206d696e696d2076656e69616d2c2071756973206e6f737472756420657865726369746174696f6e20756c6c616d636f206c61626f726973206e69736920757420616c697175697020657820656120636f6d6d6f646f20636f6e7365717561742e2044756973206175746520697275726520646f6c6f7220696e20726570726568656e646572697420696e20766f6c7570746174652076656c697420657373652063696c6c756d20646f6c6f726520657520667567696174206e756c6c612070617269617475722e204578636570746575722073696e74206f6363616563617420637570696461746174206e6f6e2070726f6964656e742c2073756e7420696e2063756c706120717569206f666669636961206465736572756e74206d6f6c6c697420616e696d20696420657374206c61626f72756d2e","network_name":"westend","signed_by":{"public_key":"**","identicon":"**","encryption":"sr25519"},"user_comment":"Pepper tries sending text from passworded account","error":"wrong_password_entered"}}]},{"order":4,"timestamp":"**","events":[{"event":"message_sign_error","payload":{"message":"4c6f72656d20697073756d20646f6c6f722073697420616d65742c20636f6e73656374657475722061646970697363696e6720656c69742c2073656420646f20656975736d6f642074656d706f7220696e6369646964756e74207574206c61626f726520657420646f6c6f7265206d61676e6120616c697175612e20557420656e696d206164206d696e696d2076656e69616d2c2071756973206e6f737472756420657865726369746174696f6e20756c6c616d636f206c61626f726973206e69736920757420616c697175697020657820656120636f6d6d6f646f20636f6e7365717561742e2044756973206175746520697275726520646f6c6f7220696e20726570726568656e646572697420696e20766f6c7570746174652076656c697420657373652063696c6c756d20646f6c6f726520657520667567696174206e756c6c612070617269617475722e204578636570746575722073696e74206f6363616563617420637570696461746174206e6f6e2070726f6964656e742c2073756e7420696e2063756c706120717569206f666669636961206465736572756e74206d6f6c6c697420616e696d20696420657374206c61626f72756d2e","network_name":"westend","signed_by":{"public_key":"**","identicon":"**","encryption":"sr25519"},"user_comment":"Pepper tries sending text from passworded account","error":"wrong_password_entered"}}]},{"order":3,"timestamp":"**","events":[{"event":"message_sign_error","payload":{"message":"4c6f72656d20697073756d20646f6c6f722073697420616d65742c20636f6e73656374657475722061646970697363696e6720656c69742c2073656420646f20656975736d6f642074656d706f7220696e6369646964756e74207574206c61626f726520657420646f6c6f7265206d61676e6120616c697175612e20557420656e696d206164206d696e696d2076656e69616d2c2071756973206e6f737472756420657865726369746174696f6e20756c6c616d636f206c61626f726973206e69736920757420616c697175697020657820656120636f6d6d6f646f20636f6e7365717561742e2044756973206175746520697275726520646f6c6f7220696e20726570726568656e646572697420696e20766f6c7570746174652076656c697420657373652063696c6c756d20646f6c6f726520657520667567696174206e756c6c612070617269617475722e204578636570746575722073696e74206f6363616563617420637570696461746174206e6f6e2070726f6964656e742c2073756e7420696e2063756c706120717569206f666669636961206465736572756e74206d6f6c6c697420616e696d20696420657374206c61626f72756d2e","network_name":"westend","signed_by":{"public_key":"**","identicon":"**","encryption":"sr25519"},"user_comment":"Pepper tries sending text from passworded account","error":"wrong_password_entered"}}]},{"order":2,"timestamp":"**","events":[{"event":"identity_added","payload":{"seed_name":"Pepper","encryption":"sr25519","public_key":"**","path":"//0","network_genesis_hash":"e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e"}}]},{"order":1,"timestamp":"**","events":[{"event":"identity_removed","payload":{"seed_name":"Pepper","encryption":"sr25519","public_key":"**","path":"//westend","network_genesis_hash":"e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e"}}]},{"order":0,"timestamp":"**","events":[{"event":"history_cleared"}]}],"total_entries":6},"modalData":{},"alertData":{"error":"Wrong password."}}"#;
     assert!(cut_real_json == expected_json, "GoForward on Transaction screen for passworded address with third wrong password. Expected Log screen, got:\n{}", cut_real_json);
 
-    do_action("RightButton", "", "");
-    do_action("ClearLog", "", "");
+    do_action(Action::RightButton, "", "");
+    do_action(Action::ClearLog, "", "");
 
-    do_action("NavbarScan", "", "");
-    do_action("TransactionFetched", &message_hex, "");
-    do_action("GoForward", "Pepper tries better", &seed_phrase_pepper);
-    let real_json = do_action("GoForward", "secret", "");
+    do_action(Action::NavbarScan, "", "");
+    do_action(Action::TransactionFetched, &message_hex, "");
+    do_action(
+        Action::GoForward,
+        "Pepper tries better",
+        &seed_phrase_pepper,
+    );
+    let real_json = do_action(Action::GoForward, "secret", "");
     let (cut_real_json, signature_hex) = process_signature(&real_json);
     let expected_json = format!("{{\"screen\":\"Transaction\",\"screenLabel\":\"\",\"back\":true,\"footer\":false,\"footerButton\":\"Scan\",\"rightButton\":\"None\",\"screenNameType\":\"h1\",\"modal\":\"SignatureReady\",\"alert\":\"Empty\",\"screenData\":{{\"content\":{{\"message\":[{{\"index\":0,\"indent\":0,\"type\":\"text\",\"payload\":\"4c6f72656d20697073756d20646f6c6f722073697420616d65742c20636f6e73656374657475722061646970697363696e6720656c69742c2073656420646f20656975736d6f642074656d706f7220696e6369646964756e74207574206c61626f726520657420646f6c6f7265206d61676e6120616c697175612e20557420656e696d206164206d696e696d2076656e69616d2c2071756973206e6f737472756420657865726369746174696f6e20756c6c616d636f206c61626f726973206e69736920757420616c697175697020657820656120636f6d6d6f646f20636f6e7365717561742e2044756973206175746520697275726520646f6c6f7220696e20726570726568656e646572697420696e20766f6c7570746174652076656c697420657373652063696c6c756d20646f6c6f726520657520667567696174206e756c6c612070617269617475722e204578636570746575722073696e74206f6363616563617420637570696461746174206e6f6e2070726f6964656e742c2073756e7420696e2063756c706120717569206f666669636961206465736572756e74206d6f6c6c697420616e696d20696420657374206c61626f72756d2e\"}}]}},\"author_info\":{{\"base58\":\"{}\",\"identicon\":\"{}\",\"seed\":\"Pepper\",\"derivation_path\":\"//0\",\"has_pwd\":true}},\"network_info\":{{\"network_title\":\"Westend\",\"network_logo\":\"westend\"}},\"type\":\"done\"}},\"modalData\":{{\"signature\":\"**\"}},\"alertData\":{{}}}}", pepper_key0_base58, pepper_key0_identicon);
     assert!(cut_real_json == expected_json, "GoForward on Transaction screen for passworded address with correct password. Expected Transaction screen with SignatureReady modal, got:\n{}", real_json);
@@ -2079,31 +2091,31 @@ fn flow_test_1() {
         signature_hex
     );
 
-    do_action("GoBack", "", "");
+    do_action(Action::GoBack, "", "");
 
     {
         let _database = db_handling::helpers::open_db::<Signer>(dbname).unwrap(); // database got unavailable for some reason
 
-        let real_json = do_action("NavbarKeys", "", "");
+        let real_json = do_action(Action::NavbarKeys, "", "");
         let expected_json = r#"{"screen":"SeedSelector","screenLabel":"Select seed","back":false,"footer":true,"footerButton":"Keys","rightButton":"NewSeed","screenNameType":"h1","modal":"Empty","alert":"ErrorDisplay","screenData":{"seedNameCards":[]},"modalData":{},"alertData":{"error":"Database error. Internal error. IO error: could not acquire lock on "for_tests/flow_test_1/db": Os {**}"}}"#;
         let cut_real_json = cut_os_msg(&real_json);
         assert!(cut_real_json == expected_json, "Tried to switch from Log to Keys with unavailable database. Expected empty SeedSelector with ErrorDisplay alert, got:\n{}", real_json);
 
-        let real_json = do_action("GoBack", "", "");
+        let real_json = do_action(Action::GoBack, "", "");
         let expected_json = r#"{"screen":"Settings","screenLabel":"","back":false,"footer":true,"footerButton":"Settings","rightButton":"None","screenNameType":"h4","modal":"Empty","alert":"Empty","screenData":{"error":"Database error. Internal error. IO error: could not acquire lock on "for_tests/flow_test_1/db": Os {**}"},"modalData":{},"alertData":{}}"#;
         let cut_real_json = cut_os_msg(&real_json);
         assert!(cut_real_json == expected_json, "GoBack on SeedSelector with ErrorDisplay alert. Expected Settings screen with error displayed in screen details, got:\n{}", real_json);
     }
 
     // Aaand, we are back
-    let real_json = do_action("NavbarSettings", "", "");
+    let real_json = do_action(Action::NavbarSettings, "", "");
     assert!(
         real_json == current_settings_json,
         "Reload Settings. Expected known Settings screen with no errors, got:\n{}",
         real_json
     );
 
-    let real_json = do_action("NavbarLog", "", "");
+    let real_json = do_action(Action::NavbarLog, "", "");
     let cut_real_json = cut_public_key(&cut_base58(&cut_identicon(&timeless(&real_json))));
     let expected_json = r#"{"screen":"Log","screenLabel":"","back":false,"footer":true,"footerButton":"Log","rightButton":"LogRight","screenNameType":"h4","modal":"Empty","alert":"Empty","screenData":{"log":[{"order":1,"timestamp":"**","events":[{"event":"message_signed","payload":{"message":"4c6f72656d20697073756d20646f6c6f722073697420616d65742c20636f6e73656374657475722061646970697363696e6720656c69742c2073656420646f20656975736d6f642074656d706f7220696e6369646964756e74207574206c61626f726520657420646f6c6f7265206d61676e6120616c697175612e20557420656e696d206164206d696e696d2076656e69616d2c2071756973206e6f737472756420657865726369746174696f6e20756c6c616d636f206c61626f726973206e69736920757420616c697175697020657820656120636f6d6d6f646f20636f6e7365717561742e2044756973206175746520697275726520646f6c6f7220696e20726570726568656e646572697420696e20766f6c7570746174652076656c697420657373652063696c6c756d20646f6c6f726520657520667567696174206e756c6c612070617269617475722e204578636570746575722073696e74206f6363616563617420637570696461746174206e6f6e2070726f6964656e742c2073756e7420696e2063756c706120717569206f666669636961206465736572756e74206d6f6c6c697420616e696d20696420657374206c61626f72756d2e","network_name":"westend","signed_by":{"public_key":"**","identicon":"**","encryption":"sr25519"},"user_comment":"Pepper tries better"}}]},{"order":0,"timestamp":"**","events":[{"event":"history_cleared"}]}],"total_entries":2},"modalData":{},"alertData":{}}"#;
     assert!(
@@ -2114,7 +2126,7 @@ fn flow_test_1() {
 
     // What if the database is not initiated properly? This should have been a separate test, but mutex.
     populate_cold_nav_test(dbname).unwrap(); // no init after population
-    let real_json = do_action("NavbarSettings", "", "");
+    let real_json = do_action(Action::NavbarSettings, "", "");
     let expected_json = r#"{"screen":"Settings","screenLabel":"","back":false,"footer":true,"footerButton":"Settings","rightButton":"None","screenNameType":"h4","modal":"Empty","alert":"Empty","screenData":{"error":"Could not find general verifier."},"modalData":{},"alertData":{}}"#;
     assert!(real_json == expected_json, "Switched to Settings from Log with non-initiated database. Expected Settings screen with error on screen, and no alerts (we should still allow to reset Signer), got:\n{}", real_json);
 
