@@ -40,7 +40,7 @@ pub fn load_metadata(data_hex: &str, database_name: &str) -> Result<Action, Erro
         }
     };
     let general_verifier = get_general_verifier(database_name)?;
-    let verifier_key = VerifierKey::from_parts(&genesis_hash);
+    let verifier_key = VerifierKey::from_parts(genesis_hash.as_bytes());
     let valid_current_verifier = match try_get_valid_current_verifier(&verifier_key, database_name)?
     {
         Some(a) => a,
@@ -85,19 +85,28 @@ pub fn load_metadata(data_hex: &str, database_name: &str) -> Result<Action, Erro
     };
 
     let first_card = match checked_info.verifier {
-        Verifier(None) => {
+        Verifier { v: None } => {
             stub = stub.new_history_entry(Event::Warning(Warning::NotVerified.show()));
             match valid_current_verifier {
-                ValidCurrentVerifier::Custom(Verifier(None)) => (),
-                ValidCurrentVerifier::Custom(Verifier(Some(verifier_value))) => {
+                ValidCurrentVerifier::Custom {
+                    v: Verifier { v: None },
+                } => (),
+                ValidCurrentVerifier::Custom {
+                    v:
+                        Verifier {
+                            v: Some(verifier_value),
+                        },
+                } => {
                     return Err(ErrorSigner::Input(InputSigner::NeedVerifier {
                         name: meta_values.name,
                         verifier_value,
                     }))
                 }
                 ValidCurrentVerifier::General => match general_verifier {
-                    Verifier(None) => (),
-                    Verifier(Some(verifier_value)) => {
+                    Verifier { v: None } => (),
+                    Verifier {
+                        v: Some(verifier_value),
+                    } => {
                         return Err(ErrorSigner::Input(InputSigner::NeedGeneralVerifier {
                             content: GeneralVerifierForContent::Network {
                                 name: meta_values.name,
@@ -109,18 +118,22 @@ pub fn load_metadata(data_hex: &str, database_name: &str) -> Result<Action, Erro
             }
             FirstCard::WarningCard(Card::Warning(Warning::NotVerified).card(&mut index, 0))
         }
-        Verifier(Some(ref new_verifier_value)) => {
+        Verifier {
+            v: Some(ref new_verifier_value),
+        } => {
             match valid_current_verifier {
-                ValidCurrentVerifier::Custom(a) => {
+                ValidCurrentVerifier::Custom { v: a } => {
                     if checked_info.verifier != a {
                         match a {
-                            Verifier(None) => {
+                            Verifier { v: None } => {
                                 return Err(ErrorSigner::Input(InputSigner::LoadMetaSetVerifier {
                                     name: meta_values.name,
                                     new_verifier_value: new_verifier_value.to_owned(),
                                 }))
                             }
-                            Verifier(Some(old_verifier_value)) => {
+                            Verifier {
+                                v: Some(old_verifier_value),
+                            } => {
                                 return Err(ErrorSigner::Input(
                                     InputSigner::LoadMetaVerifierChanged {
                                         name: meta_values.name,
@@ -135,7 +148,7 @@ pub fn load_metadata(data_hex: &str, database_name: &str) -> Result<Action, Erro
                 ValidCurrentVerifier::General => {
                     if checked_info.verifier != general_verifier {
                         match general_verifier {
-                            Verifier(None) => {
+                            Verifier { v: None } => {
                                 return Err(ErrorSigner::Input(
                                     InputSigner::LoadMetaSetGeneralVerifier {
                                         name: meta_values.name,
@@ -143,7 +156,9 @@ pub fn load_metadata(data_hex: &str, database_name: &str) -> Result<Action, Erro
                                     },
                                 ))
                             }
-                            Verifier(Some(old_general_verifier_value)) => {
+                            Verifier {
+                                v: Some(old_general_verifier_value),
+                            } => {
                                 return Err(ErrorSigner::Input(
                                     InputSigner::LoadMetaGeneralVerifierChanged {
                                         name: meta_values.name,

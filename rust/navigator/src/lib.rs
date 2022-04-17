@@ -71,9 +71,10 @@ pub fn init_navigation(dbname: &str, seed_names: &str) {
             match db_handling::network_details::get_all_networks::<Signer>(dbname) {
                 Ok(a) => {
                     for x in a.iter() {
-                        (*navstate)
-                            .networks
-                            .push(NetworkSpecsKey::from_parts(&x.genesis_hash, &x.encryption));
+                        (*navstate).networks.push(NetworkSpecsKey::from_parts(
+                            x.genesis_hash.as_bytes(),
+                            &x.encryption,
+                        ));
                     }
                 }
                 Err(e) => println!("No networks could be fetched: {:?}", e),

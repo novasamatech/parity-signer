@@ -213,7 +213,7 @@ pub fn show_all_networks_with_flag(
         "\"networks\":{}",
         export_complex_vector(&networks, |a| {
             let network_specs_key_current =
-                NetworkSpecsKey::from_parts(&a.genesis_hash, &a.encryption);
+                NetworkSpecsKey::from_parts(a.genesis_hash.as_bytes(), &a.encryption);
             format!(
                 "\"key\":\"{}\",\"title\":\"{}\",\"logo\":\"{}\",\"order\":{},\"selected\":{}",
                 hex::encode(network_specs_key_current.key()),
@@ -234,7 +234,7 @@ pub fn show_all_networks(database_name: &str) -> Result<String, ErrorSigner> {
         "\"networks\":{}",
         export_complex_vector(&networks, |a| {
             let network_specs_key_current =
-                NetworkSpecsKey::from_parts(&a.genesis_hash, &a.encryption);
+                NetworkSpecsKey::from_parts(a.genesis_hash.as_bytes(), &a.encryption);
             format!(
                 "\"key\":\"{}\",\"title\":\"{}\",\"logo\":\"{}\",\"order\":{}",
                 hex::encode(network_specs_key_current.key()),
@@ -317,7 +317,7 @@ pub fn backup_prep(database_name: &str, seed_name: &str) -> Result<String, Error
         let id_set = addresses_set_seed_name_network(
             database_name,
             seed_name,
-            &NetworkSpecsKey::from_parts(&x.genesis_hash, &x.encryption),
+            &NetworkSpecsKey::from_parts(x.genesis_hash.as_bytes(), &x.encryption),
         )?;
         if !id_set.is_empty() {
             export.push((x, id_set.into_iter().map(|(_, a)| a).collect()))
@@ -409,7 +409,7 @@ pub fn network_details_by_key(
     network_specs_key: &NetworkSpecsKey,
 ) -> Result<String, ErrorSigner> {
     let network_specs = get_network_specs(database_name, network_specs_key)?;
-    let verifier_key = VerifierKey::from_parts(&network_specs.genesis_hash);
+    let verifier_key = VerifierKey::from_parts(network_specs.genesis_hash.as_bytes());
     let general_verifier = get_general_verifier(database_name)?;
     let valid_current_verifier = get_valid_current_verifier(&verifier_key, database_name)?;
     let relevant_meta = get_meta_values_by_name::<Signer>(database_name, &network_specs.name)?;
@@ -452,7 +452,8 @@ pub fn metadata_details(
             a.title,
             a.logo,
             a.order,
-            &NetworkSpecsKey::from_parts(&a.genesis_hash, &a.encryption) == network_specs_key
+            &NetworkSpecsKey::from_parts(a.genesis_hash.as_bytes(), &a.encryption)
+                == network_specs_key
         )
     });
     let meta_hash = blake2b(32, &[], &meta_values.meta).as_bytes().to_vec();

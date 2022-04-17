@@ -31,9 +31,11 @@ const ALICE: [u8; 32] = [
 ];
 
 fn verifier_alice_sr25519() -> Verifier {
-    Verifier(Some(VerifierValue::Standard(MultiSigner::Sr25519(
-        sp_core::sr25519::Public::from_raw(ALICE),
-    ))))
+    Verifier {
+        v: Some(VerifierValue::Standard {
+            m: MultiSigner::Sr25519(sp_core::sr25519::Public::from_raw(ALICE)),
+        }),
+    }
 }
 
 lazy_static! {

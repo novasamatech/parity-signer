@@ -36,7 +36,7 @@ pub fn network_specs_from_entry(
     address_book_entry: &AddressBookEntry,
 ) -> Result<NetworkSpecsToSend, ErrorActive> {
     let network_specs_key = NetworkSpecsKey::from_parts(
-        &address_book_entry.genesis_hash,
+        address_book_entry.genesis_hash.as_bytes(),
         &address_book_entry.encryption,
     );
     let network_specs = get_network_specs_to_send(&network_specs_key)?;
@@ -83,7 +83,11 @@ pub fn get_network_specs_to_send(
 pub fn update_db(address: &str, network_specs: &NetworkSpecsToSend) -> Result<(), ErrorActive> {
     let mut network_specs_prep_batch = Batch::default();
     network_specs_prep_batch.insert(
-        NetworkSpecsKey::from_parts(&network_specs.genesis_hash, &network_specs.encryption).key(),
+        NetworkSpecsKey::from_parts(
+            network_specs.genesis_hash.as_bytes(),
+            &network_specs.encryption,
+        )
+        .key(),
         network_specs.encode(),
     );
     let address_book_new_key = AddressBookKey::from_title(&network_specs.title);
@@ -202,19 +206,23 @@ pub fn process_indices(
     let indices = get_indices(entries, encryption.to_owned())?;
     match indices.index_correct_encryption {
         Some(i) => {
-            let network_specs_key =
-                NetworkSpecsKey::from_parts(&entries[i].genesis_hash, &entries[i].encryption);
+            let network_specs_key = NetworkSpecsKey::from_parts(
+                entries[i].genesis_hash.as_bytes(),
+                &entries[i].encryption,
+            );
             let network_specs = get_network_specs_to_send(&network_specs_key)?;
             Ok((network_specs, false))
         }
         None => {
             let network_specs_key = match indices.index_default {
-                Some(i) => {
-                    NetworkSpecsKey::from_parts(&entries[i].genesis_hash, &entries[i].encryption)
-                }
-                None => {
-                    NetworkSpecsKey::from_parts(&entries[0].genesis_hash, &entries[0].encryption)
-                }
+                Some(i) => NetworkSpecsKey::from_parts(
+                    entries[i].genesis_hash.as_bytes(),
+                    &entries[i].encryption,
+                ),
+                None => NetworkSpecsKey::from_parts(
+                    entries[0].genesis_hash.as_bytes(),
+                    &entries[0].encryption,
+                ),
             };
             let mut specs_found = get_network_specs_to_send(&network_specs_key)?;
             specs_found.encryption = encryption.clone();
@@ -225,7 +233,7 @@ pub fn process_indices(
 }
 
 /// Function to search through chainspecs tree of the database for the given genesis hash
-pub fn genesis_hash_in_hot_db(genesis_hash: [u8; 32]) -> Result<bool, ErrorActive> {
+pub fn genesis_hash_in_hot_db(genesis_hash: sp_core::H256) -> Result<bool, ErrorActive> {
     let database = open_db::<Active>(HOT_DB_NAME)?;
     let chainspecs = open_tree::<Active>(&database, SPECSTREEPREP)?;
     let mut out = false;

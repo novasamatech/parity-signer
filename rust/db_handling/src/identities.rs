@@ -12,7 +12,7 @@ use regex::Regex;
 #[cfg(any(feature = "active", feature = "signer"))]
 use sled::Batch;
 #[cfg(any(feature = "active", feature = "signer"))]
-use sp_core::{ecdsa, ed25519, sr25519, Pair};
+use sp_core::{ecdsa, ed25519, sr25519, Pair, H256};
 #[cfg(any(feature = "active", feature = "signer"))]
 use sp_runtime::MultiSigner;
 #[cfg(any(feature = "active", feature = "signer"))]
@@ -135,8 +135,10 @@ pub(crate) fn create_address<T: ErrorSource>(
 ) -> Result<(Vec<(AddressKey, AddressDetails)>, Vec<Event>), T::Error> {
     let mut output_batch_prep = input_batch_prep.to_vec();
     let mut output_events: Vec<Event> = Vec::new();
-    let network_specs_key =
-        NetworkSpecsKey::from_parts(&network_specs.genesis_hash, &network_specs.encryption);
+    let network_specs_key = NetworkSpecsKey::from_parts(
+        network_specs.genesis_hash.as_bytes(),
+        &network_specs.encryption,
+    );
 
     let mut full_address = seed_phrase.to_owned() + path;
     let multisigner = match network_specs.encryption {
@@ -194,7 +196,7 @@ pub(crate) fn create_address<T: ErrorSource>(
         &network_specs.encryption,
         &public_key,
         cropped_path,
-        &network_specs.genesis_hash,
+        network_specs.genesis_hash.as_bytes(),
     );
     output_events.push(Event::IdentityAdded(identity_history));
 
@@ -359,7 +361,7 @@ pub fn remove_keys_set(
             &network_specs.encryption,
             &public_key,
             &address_details.path,
-            &network_specs.genesis_hash,
+            network_specs.genesis_hash.as_bytes(),
         );
         events.push(Event::IdentityRemoved(identity_history));
         address_details.network_id = address_details
@@ -672,7 +674,7 @@ pub fn check_derivation_set(derivations: &[String]) -> Result<(), ErrorSigner> {
 #[cfg(feature = "active")]
 pub fn prepare_derivations_export(
     encryption: &Encryption,
-    genesis_hash: &[u8; 32],
+    genesis_hash: &H256,
     content: &str,
 ) -> Result<ContentDerivations, ErrorActive> {
     let mut derivations: Vec<String> = Vec::new();

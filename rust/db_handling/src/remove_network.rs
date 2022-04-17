@@ -39,13 +39,13 @@ pub fn remove_network(
     let general_verifier = get_general_verifier(database_name)?;
     let network_specs = get_network_specs(database_name, network_specs_key)?;
 
-    let verifier_key = VerifierKey::from_parts(&network_specs.genesis_hash);
+    let verifier_key = VerifierKey::from_parts(network_specs.genesis_hash.as_bytes());
     let valid_current_verifier = get_valid_current_verifier(&verifier_key, database_name)?;
 
     // modify verifier as needed
-    if let ValidCurrentVerifier::Custom(ref a) = valid_current_verifier {
+    if let ValidCurrentVerifier::Custom { v: ref a } = valid_current_verifier {
         match a {
-            Verifier(None) => (),
+            Verifier { v: None } => (),
             _ => {
                 verifiers_batch.remove(verifier_key.key());
                 verifiers_batch.insert(verifier_key.key(), (CurrentVerifier::Dead).encode());
@@ -103,7 +103,7 @@ pub fn remove_network(
                         &address_details.encryption,
                         &multisigner_to_public(&multisigner),
                         &address_details.path,
-                        &network_specs.genesis_hash,
+                        network_specs.genesis_hash.as_bytes(),
                     );
                     events.push(Event::IdentityRemoved(identity_history));
                     address_details.network_id = address_details

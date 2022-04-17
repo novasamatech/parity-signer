@@ -170,7 +170,8 @@ fn specs_f_u(address: &str, encryption_override: Option<Encryption>) -> Result<(
         }
         None => {
             for x in entries.iter() {
-                let network_specs_key = NetworkSpecsKey::from_parts(&x.genesis_hash, &x.encryption);
+                let network_specs_key =
+                    NetworkSpecsKey::from_parts(x.genesis_hash.as_bytes(), &x.encryption);
                 let network_specs = get_network_specs_to_send(&network_specs_key)?;
                 print_specs(&network_specs)?;
             }
@@ -210,7 +211,7 @@ fn specs_d_u(
 fn specs_pt_n(title: &str, encryption: Encryption, printing: bool) -> Result<(), ErrorActive> {
     let address_book_entry = get_address_book_entry(title)?;
     let network_specs_key_existing = NetworkSpecsKey::from_parts(
-        &address_book_entry.genesis_hash,
+        address_book_entry.genesis_hash.as_bytes(),
         &address_book_entry.encryption,
     );
     let network_specs_existing = get_network_specs_to_send(&network_specs_key_existing)?;
@@ -225,7 +226,7 @@ fn specs_pt_n(title: &str, encryption: Encryption, printing: bool) -> Result<(),
         }
     } else {
         let network_specs_key_possible =
-            NetworkSpecsKey::from_parts(&address_book_entry.genesis_hash, &encryption);
+            NetworkSpecsKey::from_parts(address_book_entry.genesis_hash.as_bytes(), &encryption);
         match try_get_network_specs_to_send(&network_specs_key_possible)? {
             Some(network_specs_found) => {
                 if printing {

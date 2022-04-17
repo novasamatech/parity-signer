@@ -9,6 +9,7 @@ use definitions::{
     users::AddressDetails,
 };
 use parser::{cut_method_extensions, decoding_commons::OutputCard, parse_extensions, parse_method};
+use sp_core::H256;
 
 use crate::cards::{make_author_info, Card, Warning};
 use crate::helpers::{
@@ -191,8 +192,9 @@ pub(crate) fn parse_transaction(
         None => {
             // did not find network with matching genesis hash in database
             let author_card = Card::AuthorPublicKey(&author_multi_signer).card(&mut index, indent);
+            let genesis_hash = H256::from_slice(&genesis_hash_vec);
             let error_card = Card::Error(ErrorSigner::Input(InputSigner::UnknownNetwork {
-                genesis_hash: genesis_hash_vec.to_vec(),
+                genesis_hash,
                 encryption,
             }))
             .card(&mut index, indent);

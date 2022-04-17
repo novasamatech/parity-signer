@@ -28,8 +28,8 @@ pub fn load_types(data_hex: &str, database_name: &str) -> Result<Action, ErrorSi
     let mut stub = TrDbColdStub::new();
     let mut index = 0;
     match checked_info.verifier {
-        Verifier(None) => match general_verifier {
-            Verifier(None) => {
+        Verifier { v: None } => match general_verifier {
+            Verifier { v: None } => {
                 if new_types == old_types {
                     Err(ErrorSigner::Input(InputSigner::TypesKnown))
                 } else {
@@ -51,14 +51,16 @@ pub fn load_types(data_hex: &str, database_name: &str) -> Result<Action, ErrorSi
                     ))
                 }
             }
-            Verifier(Some(old_general_verifier_value)) => {
-                Err(ErrorSigner::Input(InputSigner::NeedGeneralVerifier {
-                    content: GeneralVerifierForContent::Types,
-                    verifier_value: old_general_verifier_value,
-                }))
-            }
+            Verifier {
+                v: Some(old_general_verifier_value),
+            } => Err(ErrorSigner::Input(InputSigner::NeedGeneralVerifier {
+                content: GeneralVerifierForContent::Types,
+                verifier_value: old_general_verifier_value,
+            })),
         },
-        Verifier(Some(ref new_general_verifier_value)) => {
+        Verifier {
+            v: Some(ref new_general_verifier_value),
+        } => {
             let verifier_card = Card::Verifier(new_general_verifier_value).card(&mut index, 0);
             if general_verifier == checked_info.verifier {
                 if new_types == old_types {
@@ -80,7 +82,7 @@ pub fn load_types(data_hex: &str, database_name: &str) -> Result<Action, ErrorSi
                 }
             } else {
                 match general_verifier {
-                    Verifier(None) => {
+                    Verifier { v: None } => {
                         let new_general_verifier = checked_info.verifier;
                         let general_hold = GeneralHold::get(database_name)?;
                         stub = general_hold.upd_stub(stub, &new_general_verifier, database_name)?;
@@ -112,13 +114,13 @@ pub fn load_types(data_hex: &str, database_name: &str) -> Result<Action, ErrorSi
                             StubNav::LoadTypes,
                         ))
                     }
-                    Verifier(Some(old_general_verifier_value)) => {
-                        Err(ErrorSigner::Input(InputSigner::GeneralVerifierChanged {
-                            content: GeneralVerifierForContent::Types,
-                            old_general_verifier_value,
-                            new_general_verifier_value: new_general_verifier_value.to_owned(),
-                        }))
-                    }
+                    Verifier {
+                        v: Some(old_general_verifier_value),
+                    } => Err(ErrorSigner::Input(InputSigner::GeneralVerifierChanged {
+                        content: GeneralVerifierForContent::Types,
+                        old_general_verifier_value,
+                        new_general_verifier_value: new_general_verifier_value.to_owned(),
+                    })),
                 }
             }
         }

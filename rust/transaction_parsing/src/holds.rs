@@ -55,7 +55,7 @@ fn collect_set(
     let mut name_found: Option<String> = None;
     for x in chainspecs.iter().flatten() {
         let network_specs = NetworkSpecs::from_entry_checked::<Signer>(x)?;
-        if network_specs.genesis_hash == genesis_hash[..] {
+        if network_specs.genesis_hash.as_bytes() == &genesis_hash[..] {
             name_found = match name_found {
                 Some(n) => {
                     if n != network_specs.name {
@@ -236,7 +236,9 @@ impl Hold {
         for x in self.network_specs_set.iter() {
             out = out.remove_network_specs(
                 x,
-                &ValidCurrentVerifier::Custom(former_verifier.to_owned()),
+                &ValidCurrentVerifier::Custom {
+                    v: former_verifier.to_owned(),
+                },
                 &general_verifier,
             )
         }

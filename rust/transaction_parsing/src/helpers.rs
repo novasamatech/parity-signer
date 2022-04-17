@@ -138,7 +138,8 @@ pub fn accept_meta_values(
 
 /// Function to check if the chaispecs are already in the database
 pub fn specs_are_new(new: &NetworkSpecsToSend, database_name: &str) -> Result<bool, ErrorSigner> {
-    let network_specs_key = NetworkSpecsKey::from_parts(&new.genesis_hash, &new.encryption);
+    let network_specs_key =
+        NetworkSpecsKey::from_parts(new.genesis_hash.as_bytes(), &new.encryption);
     let database = open_db::<Signer>(database_name)?;
     let chainspecs = open_tree::<Signer>(&database, SPECSTREE)?;
     match chainspecs.get(network_specs_key.key()) {

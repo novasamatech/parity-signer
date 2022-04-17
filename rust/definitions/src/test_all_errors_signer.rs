@@ -8,9 +8,12 @@
 //! and to make sure no entries are left missing in case of [`ErrorSigner`]
 //! updating.
 
+use std::str::FromStr;
+
 use anyhow::anyhow;
 use sled::{transaction::TransactionError, IVec};
 use sp_core::crypto::SecretStringError;
+use sp_core::H256;
 use sp_runtime::MultiSigner;
 
 use crate::crypto::Encryption;
@@ -32,21 +35,23 @@ const PUBLIC: [u8; 32] = [
 
 /// `Verifier` mock value.
 fn verifier_sr25519() -> Verifier {
-    Verifier(Some(verifier_value_sr25519()))
+    Verifier {
+        v: Some(verifier_value_sr25519()),
+    }
 }
 
 /// `VerifierValue` mock value.
 fn verifier_value_sr25519() -> VerifierValue {
-    VerifierValue::Standard(MultiSigner::Sr25519(sp_core::sr25519::Public::from_raw(
-        PUBLIC,
-    )))
+    VerifierValue::Standard {
+        m: MultiSigner::Sr25519(sp_core::sr25519::Public::from_raw(PUBLIC)),
+    }
 }
 
 /// Another `VerifierValue` mock value.
 fn verifier_value_ed25519() -> VerifierValue {
-    VerifierValue::Standard(MultiSigner::Ed25519(sp_core::ed25519::Public::from_raw(
-        PUBLIC,
-    )))
+    VerifierValue::Standard {
+        m: MultiSigner::Ed25519(sp_core::ed25519::Public::from_raw(PUBLIC)),
+    }
 }
 
 /// Mock non-hexadecimal `String`.
@@ -95,11 +100,8 @@ fn verifier_key() -> VerifierKey {
 }
 
 /// `[u8; 32]` genesis hash mock value.
-fn genesis_hash() -> [u8; 32] {
-    hex::decode("e143f23803ca50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e")
-        .unwrap()
-        .try_into()
-        .unwrap()
+fn genesis_hash() -> H256 {
+    H256::from_str("e143f23803ca50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e").unwrap()
 }
 
 /// Possible `sled::Error` errors (https://docs.rs/sled/0.34.6/sled/enum.Error.html).
@@ -272,7 +274,7 @@ fn mismatch_signer() -> Vec<MismatchSigner> {
         },
         MismatchSigner::SpecsGenesisHash {
             key: network_specs_key_good(),
-            genesis_hash: genesis_hash().to_vec(),
+            genesis_hash: genesis_hash(),
         },
         MismatchSigner::SpecsEncryption {
             key: network_specs_key_good(),
@@ -347,7 +349,7 @@ fn database_signer() -> Vec<DatabaseSigner> {
     // All remaining [`DatabaseSigner`] errors.
     out.append(&mut vec![
         DatabaseSigner::UnexpectedGenesisHash {
-            verifier_key: VerifierKey::from_parts(&genesis_hash()),
+            verifier_key: VerifierKey::from_parts(genesis_hash().as_bytes()),
             network_specs_key: network_specs_key_good(),
         },
         DatabaseSigner::SpecsCollision {
@@ -357,7 +359,7 @@ fn database_signer() -> Vec<DatabaseSigner> {
         DatabaseSigner::DifferentNamesSameGenesisHash {
             name1: String::from("westend"),
             name2: String::from("WeStEnD"),
-            genesis_hash: genesis_hash().to_vec(),
+            genesis_hash: genesis_hash().as_bytes().to_vec(),
         },
         DatabaseSigner::CustomVerifierIsGeneral(verifier_key()),
         DatabaseSigner::TwoRootKeys {
@@ -487,7 +489,7 @@ fn input_signer() -> Vec<InputSigner> {
         InputSigner::TypesKnown,
         InputSigner::MessageNotReadable,
         InputSigner::UnknownNetwork {
-            genesis_hash: genesis_hash().to_vec(),
+            genesis_hash: genesis_hash(),
             encryption: Encryption::Sr25519,
         },
         InputSigner::NoMetadata {

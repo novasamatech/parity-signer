@@ -1,419 +1,92 @@
-pub use definitions::crypto::Encryption;
+use crate::UniffiCustomTypeConverter;
+pub use definitions::{
+    crypto::Encryption,
+    history::{
+        IdentityHistory, MetaValuesDisplay, MetaValuesExport, NetworkSpecsDisplay,
+        NetworkSpecsExport, NetworkVerifierDisplay, SignDisplay, SignMessageDisplay, TypesDisplay,
+        TypesExport,
+    },
+    network_specs::{
+        NetworkSpecs, NetworkSpecsToSend, ValidCurrentVerifier, Verifier, VerifierValue,
+    },
+};
 pub use navigator::Action;
 
-use std::convert::TryInto;
+use std::convert::TryFrom;
 
-#[derive(Clone)]
-pub struct IdentityHistory {
-    pub seed_name: String,
-    pub encryption: Encryption,
-    pub public_key: Vec<u8>,
-    pub path: String,
-    pub network_genesis_hash: Vec<u8>,
-}
+pub type Ed25519Public = sp_core::ed25519::Public;
+pub type Sr25519Public = sp_core::sr25519::Public;
+pub type EcdsaPublic = sp_core::ecdsa::Public;
+pub type MultiSigner = sp_runtime::MultiSigner;
+pub type H256 = sp_core::H256;
 
-impl From<IdentityHistory> for definitions::history::IdentityHistory {
-    fn from(i: IdentityHistory) -> Self {
-        let IdentityHistory {
-            seed_name,
-            encryption,
-            public_key,
-            path,
-            network_genesis_hash,
-        } = i;
-        definitions::history::IdentityHistory::new(
-            seed_name,
-            encryption,
-            public_key,
-            path,
-            network_genesis_hash,
-        )
+impl UniffiCustomTypeConverter for sp_runtime::MultiSigner {
+    type Builtin = String;
+
+    fn into_custom(val: Self::Builtin) -> uniffi::Result<Self> {
+        Ok(serde_json::from_str(&val)?)
+    }
+
+    fn from_custom(obj: Self) -> Self::Builtin {
+        obj.to_string()
     }
 }
 
-#[derive(Clone)]
-pub enum MultiSigner {
-    Ed25519 { public: Ed25519Public },
-    Sr25519 { public: Sr25519Public },
-    Ecdsa { public: EcdsaPublic },
-}
+impl UniffiCustomTypeConverter for Ed25519Public {
+    type Builtin = Vec<u8>;
 
-impl From<MultiSigner> for sp_runtime::MultiSigner {
-    fn from(m: MultiSigner) -> Self {
-        match m {
-            MultiSigner::Ed25519 { public } => sp_runtime::MultiSigner::Ed25519(public.into()),
-            MultiSigner::Sr25519 { public } => sp_runtime::MultiSigner::Sr25519(public.into()),
-            MultiSigner::Ecdsa { public } => sp_runtime::MultiSigner::Ecdsa(public.into()),
-        }
+    fn into_custom(val: Self::Builtin) -> uniffi::Result<Self> {
+        let public = Ed25519Public::try_from(val.as_ref())
+            .map_err(|_| anyhow::Error::msg("ed25519".to_string()))?;
+
+        Ok(public)
+    }
+
+    // Convert our custom type to Builtin
+    fn from_custom(obj: Self) -> Self::Builtin {
+        obj.0.to_vec()
     }
 }
 
-#[derive(Clone)]
-pub struct SignMessageDisplay {
-    pub message: String,
-    pub network_name: String,
-    pub signed_by: VerifierValue,
-    pub user_comment: String,
-}
+impl UniffiCustomTypeConverter for Sr25519Public {
+    type Builtin = Vec<u8>;
 
-impl From<SignMessageDisplay> for definitions::history::SignMessageDisplay {
-    fn from(s: SignMessageDisplay) -> Self {
-        let SignMessageDisplay {
-            message,
-            network_name,
-            signed_by,
-            user_comment,
-        } = s;
+    fn into_custom(val: Self::Builtin) -> uniffi::Result<Self> {
+        let public = Sr25519Public::try_from(val.as_ref())
+            .map_err(|_| anyhow::Error::msg("sr25519".to_string()))?;
 
-        definitions::history::SignMessageDisplay::get(
-            &message,
-            &network_name,
-            &signed_by.into(),
-            &user_comment,
-        )
+        Ok(public)
+    }
+
+    // Convert our custom type to Builtin
+    fn from_custom(obj: Self) -> Self::Builtin {
+        obj.0.to_vec()
     }
 }
 
-#[derive(Clone)]
-pub struct Verifier {
-    pub verifier_value: Option<VerifierValue>,
-}
+impl UniffiCustomTypeConverter for EcdsaPublic {
+    type Builtin = Vec<u8>;
 
-impl From<Verifier> for definitions::network_specs::Verifier {
-    fn from(v: Verifier) -> Self {
-        definitions::network_specs::Verifier(v.verifier_value.map(Into::into))
+    fn into_custom(val: Self::Builtin) -> uniffi::Result<Self> {
+        let public = EcdsaPublic::try_from(val.as_ref())
+            .map_err(|_| anyhow::Error::msg("ecdsa".to_string()))?;
+
+        Ok(public)
+    }
+    fn from_custom(obj: Self) -> Self::Builtin {
+        obj.0.to_vec()
     }
 }
 
-#[derive(Clone)]
-pub enum VerifierValue {
-    Standard { multi_signer: MultiSigner },
-}
+impl UniffiCustomTypeConverter for H256 {
+    type Builtin = Vec<u8>;
 
-impl From<VerifierValue> for definitions::network_specs::VerifierValue {
-    fn from(v: VerifierValue) -> Self {
-        match v {
-            VerifierValue::Standard { multi_signer } => {
-                definitions::network_specs::VerifierValue::Standard(multi_signer.into())
-            }
-        }
+    fn into_custom(_val: Self::Builtin) -> uniffi::Result<Self> {
+        unimplemented!()
     }
-}
 
-#[derive(Clone)]
-pub struct MetaValuesExport {
-    pub name: String,
-    pub version: u32,
-    pub meta_hash: Vec<u8>,
-    pub signed_by: VerifierValue,
-}
-
-impl From<MetaValuesExport> for definitions::history::MetaValuesExport {
-    fn from(mv: MetaValuesExport) -> Self {
-        let MetaValuesExport {
-            name,
-            version,
-            meta_hash,
-            signed_by,
-        } = mv;
-        definitions::history::MetaValuesExport::new(name, version, meta_hash, signed_by.into())
-    }
-}
-
-#[derive(Clone)]
-pub struct TypesExport {
-    pub types_hash: Vec<u8>,
-    pub signed_by: VerifierValue,
-}
-
-impl From<TypesExport> for definitions::history::TypesExport {
-    fn from(t: TypesExport) -> Self {
-        let TypesExport {
-            types_hash,
-            signed_by,
-        } = t;
-        definitions::history::TypesExport::new(types_hash, signed_by.into())
-    }
-}
-
-#[derive(Clone)]
-pub struct TypesDisplay {
-    pub types_hash: Vec<u8>,
-    pub verifier: Verifier,
-}
-
-impl From<TypesDisplay> for definitions::history::TypesDisplay {
-    fn from(t: TypesDisplay) -> Self {
-        let TypesDisplay {
-            types_hash,
-            verifier,
-        } = t;
-        definitions::history::TypesDisplay::new(types_hash, verifier.into())
-    }
-}
-
-#[derive(Clone)]
-pub enum ValidCurrentVerifier {
-    General,
-    Custom { verifier: Verifier },
-}
-
-impl From<ValidCurrentVerifier> for definitions::network_specs::ValidCurrentVerifier {
-    fn from(v: ValidCurrentVerifier) -> Self {
-        match v {
-            ValidCurrentVerifier::General => {
-                definitions::network_specs::ValidCurrentVerifier::General
-            }
-            ValidCurrentVerifier::Custom { verifier } => {
-                definitions::network_specs::ValidCurrentVerifier::Custom(verifier.into())
-            }
-        }
-    }
-}
-
-#[derive(Clone)]
-pub struct NetworkVerifierDisplay {
-    pub genesis_hash: Vec<u8>,
-    pub valid_current_verifier: ValidCurrentVerifier,
-    pub general_verifier: Verifier,
-}
-
-impl From<NetworkVerifierDisplay> for definitions::history::NetworkVerifierDisplay {
-    fn from(n: NetworkVerifierDisplay) -> Self {
-        let NetworkVerifierDisplay {
-            genesis_hash,
-            valid_current_verifier,
-            general_verifier,
-        } = n;
-        definitions::history::NetworkVerifierDisplay::get(
-            &definitions::keyring::VerifierKey::from_parts(&genesis_hash),
-            &valid_current_verifier.into(),
-            &general_verifier.into(),
-        )
-    }
-}
-
-#[derive(Clone)]
-pub struct NetworkSpecsToSend {
-    pub base58prefix: u16,
-    pub color: String,
-    pub decimals: u8,
-    pub encryption: Encryption,
-    pub genesis_hash: Vec<u8>,
-    pub logo: String,
-    pub name: String,
-    pub path_id: String,
-    pub secondary_color: String,
-    pub title: String,
-    pub unit: String,
-}
-
-impl From<NetworkSpecsToSend> for definitions::network_specs::NetworkSpecsToSend {
-    fn from(n: NetworkSpecsToSend) -> Self {
-        let NetworkSpecsToSend {
-            base58prefix,
-            color,
-            decimals,
-            encryption,
-            genesis_hash,
-            logo,
-            name,
-            path_id,
-            secondary_color,
-            title,
-            unit,
-        } = n;
-
-        definitions::network_specs::NetworkSpecsToSend {
-            base58prefix,
-            color,
-            decimals,
-            encryption,
-            genesis_hash: genesis_hash.try_into().unwrap(),
-            logo,
-            name,
-            path_id,
-            secondary_color,
-            title,
-            unit,
-        }
-    }
-}
-
-#[derive(Clone)]
-pub struct NetworkSpecsExport {
-    pub specs_to_send: NetworkSpecsToSend,
-    pub signed_by: VerifierValue,
-}
-
-impl From<NetworkSpecsExport> for definitions::history::NetworkSpecsExport {
-    fn from(a: NetworkSpecsExport) -> Self {
-        let NetworkSpecsExport {
-            specs_to_send,
-            signed_by,
-        } = a;
-        definitions::history::NetworkSpecsExport::get(&specs_to_send.into(), &signed_by.into())
-    }
-}
-
-#[derive(Clone)]
-pub struct SignDisplay {
-    pub transaction: Vec<u8>,
-    pub network_name: String,
-    pub signed_by: VerifierValue,
-    pub user_comment: String,
-}
-
-impl From<SignDisplay> for definitions::history::SignDisplay {
-    fn from(s: SignDisplay) -> Self {
-        let SignDisplay {
-            transaction,
-            network_name,
-            signed_by,
-            user_comment,
-        } = s;
-        definitions::history::SignDisplay::new(
-            transaction,
-            network_name,
-            signed_by.into(),
-            user_comment,
-        )
-    }
-}
-
-#[derive(Clone)]
-pub struct MetaValuesDisplay {
-    pub name: String,
-    pub version: u32,
-    pub meta_hash: Vec<u8>,
-}
-
-impl From<MetaValuesDisplay> for definitions::history::MetaValuesDisplay {
-    fn from(m: MetaValuesDisplay) -> Self {
-        let MetaValuesDisplay {
-            name,
-            version,
-            meta_hash,
-        } = m;
-        definitions::history::MetaValuesDisplay::new(name, version, meta_hash)
-    }
-}
-
-#[derive(Clone)]
-pub struct NetworkSpecs {
-    pub base58prefix: u16,
-    pub color: String,
-    pub decimals: u8,
-    pub encryption: Encryption,
-    pub genesis_hash: Vec<u8>,
-    pub logo: String,
-    pub name: String,
-    pub order: u8,
-    pub path_id: String,
-    pub secondary_color: String,
-    pub title: String,
-    pub unit: String,
-}
-
-impl From<NetworkSpecs> for definitions::network_specs::NetworkSpecs {
-    fn from(n: NetworkSpecs) -> Self {
-        let NetworkSpecs {
-            base58prefix,
-            color,
-            decimals,
-            encryption,
-            genesis_hash,
-            logo,
-            name,
-            order,
-            path_id,
-            secondary_color,
-            title,
-            unit,
-        } = n;
-
-        definitions::network_specs::NetworkSpecs {
-            base58prefix,
-            color,
-            decimals,
-            encryption,
-            genesis_hash: genesis_hash.try_into().unwrap(),
-            logo,
-            name,
-            order,
-            path_id,
-            secondary_color,
-            title,
-            unit,
-        }
-    }
-}
-
-#[derive(Clone)]
-pub struct NetworkSpecsDisplay {
-    pub specs: NetworkSpecs,
-    pub valid_current_verifier: ValidCurrentVerifier,
-    pub general_verifier: Verifier,
-}
-
-impl From<NetworkSpecsDisplay> for definitions::history::NetworkSpecsDisplay {
-    fn from(n: NetworkSpecsDisplay) -> Self {
-        let NetworkSpecsDisplay {
-            specs,
-            valid_current_verifier,
-            general_verifier,
-        } = n;
-
-        definitions::history::NetworkSpecsDisplay::get(
-            &specs.into(),
-            &valid_current_verifier.into(),
-            &general_verifier.into(),
-        )
-    }
-}
-
-#[derive(Clone)]
-pub struct Ed25519Public {
-    pub public: Vec<u8>,
-}
-
-impl From<Ed25519Public> for sp_core::ed25519::Public {
-    fn from(p: Ed25519Public) -> Self {
-        sp_core::ed25519::Public(
-            p.public
-                .try_into()
-                .expect("keys always have fixed length; qed"),
-        )
-    }
-}
-
-#[derive(Clone)]
-pub struct Sr25519Public {
-    pub public: Vec<u8>,
-}
-
-impl From<Sr25519Public> for sp_core::sr25519::Public {
-    fn from(p: Sr25519Public) -> Self {
-        sp_core::sr25519::Public(
-            p.public
-                .try_into()
-                .expect("keys always have fixed length; qed"),
-        )
-    }
-}
-
-#[derive(Clone)]
-pub struct EcdsaPublic {
-    pub public: Vec<u8>,
-}
-
-impl From<EcdsaPublic> for sp_core::ecdsa::Public {
-    fn from(p: EcdsaPublic) -> Self {
-        sp_core::ecdsa::Public(
-            p.public
-                .try_into()
-                .expect("keys always have fixed length; qed"),
-        )
+    fn from_custom(obj: Self) -> Self::Builtin {
+        obj.0.to_vec()
     }
 }
 
@@ -534,54 +207,54 @@ impl From<Event> for definitions::history::Event {
         match e {
             Event::MetadataAdded {
                 meta_values_display,
-            } => definitions::history::Event::MetadataAdded(meta_values_display.into()),
+            } => definitions::history::Event::MetadataAdded(meta_values_display),
             Event::MetadataRemoved {
                 meta_values_display,
-            } => definitions::history::Event::MetadataRemoved(meta_values_display.into()),
+            } => definitions::history::Event::MetadataRemoved(meta_values_display),
             Event::MetadataSigned { meta_values_export } => {
-                definitions::history::Event::MetadataSigned(meta_values_export.into())
+                definitions::history::Event::MetadataSigned(meta_values_export)
             }
             Event::NetworkSpecsAdded {
                 network_specs_display,
-            } => definitions::history::Event::NetworkSpecsAdded(network_specs_display.into()),
+            } => definitions::history::Event::NetworkSpecsAdded(network_specs_display),
             Event::NetworkSpecsRemoved {
                 network_specs_display,
-            } => definitions::history::Event::NetworkSpecsRemoved(network_specs_display.into()),
+            } => definitions::history::Event::NetworkSpecsRemoved(network_specs_display),
             Event::NetworkSpecsSigned {
                 network_specs_export,
-            } => definitions::history::Event::NetworkSpecsSigned(network_specs_export.into()),
+            } => definitions::history::Event::NetworkSpecsSigned(network_specs_export),
             Event::NetworkVerifierSet {
                 network_verifier_display,
-            } => definitions::history::Event::NetworkVerifierSet(network_verifier_display.into()),
+            } => definitions::history::Event::NetworkVerifierSet(network_verifier_display),
             Event::GeneralVerifierSet { verifier } => {
-                definitions::history::Event::GeneralVerifierSet(verifier.into())
+                definitions::history::Event::GeneralVerifierSet(verifier)
             }
             Event::TypesAdded { types_display } => {
-                definitions::history::Event::TypesAdded(types_display.into())
+                definitions::history::Event::TypesAdded(types_display)
             }
             Event::TypesRemoved { types_display } => {
-                definitions::history::Event::TypesRemoved(types_display.into())
+                definitions::history::Event::TypesRemoved(types_display)
             }
             Event::TypesSigned { types_export } => {
-                definitions::history::Event::TypesSigned(types_export.into())
+                definitions::history::Event::TypesSigned(types_export)
             }
             Event::TransactionSigned { sign_display } => {
-                definitions::history::Event::TransactionSigned(sign_display.into())
+                definitions::history::Event::TransactionSigned(sign_display)
             }
             Event::TransactionSignError { sign_display } => {
-                definitions::history::Event::TransactionSigned(sign_display.into())
+                definitions::history::Event::TransactionSigned(sign_display)
             }
             Event::MessageSigned {
                 sign_message_display,
-            } => definitions::history::Event::MessageSigned(sign_message_display.into()),
+            } => definitions::history::Event::MessageSigned(sign_message_display),
             Event::MessageSignError {
                 sign_message_display,
-            } => definitions::history::Event::MessageSignError(sign_message_display.into()),
+            } => definitions::history::Event::MessageSignError(sign_message_display),
             Event::IdentityAdded { identity_history } => {
-                definitions::history::Event::IdentityAdded(identity_history.into())
+                definitions::history::Event::IdentityAdded(identity_history)
             }
             Event::IdentityRemoved { identity_history } => {
-                definitions::history::Event::IdentityRemoved(identity_history.into())
+                definitions::history::Event::IdentityRemoved(identity_history)
             }
             Event::IdentitiesWiped => definitions::history::Event::IdentitiesWiped,
             Event::DeviceWasOnline => definitions::history::Event::DeviceWasOnline,

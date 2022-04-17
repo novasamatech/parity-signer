@@ -26,6 +26,7 @@ use sc_executor_common::{
 #[cfg(feature = "active")]
 use sc_executor_wasmi::create_runtime;
 use sled::IVec;
+use sp_core::H256;
 #[cfg(feature = "active")]
 use sp_io::SubstrateHostFunctions;
 use sp_version::RuntimeVersion;
@@ -516,7 +517,7 @@ pub struct AddressBookEntry {
     ///
     /// If network data is queried through rpc call, retrieved version must
     /// be same as the one in address book  
-    pub genesis_hash: [u8; 32],
+    pub genesis_hash: H256,
 
     /// Url address for rpc calls, with or without preferred port  
     pub address: String,

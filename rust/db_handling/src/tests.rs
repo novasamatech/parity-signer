@@ -60,7 +60,7 @@ use crate::{
 #[test]
 fn print_seed_names() {
     let dbname = "for_tests/print_seed_names";
-    populate_cold(dbname, Verifier(None)).unwrap();
+    populate_cold(dbname, Verifier { v: None }).unwrap();
     let print = print_all_seed_names_with_identicons(dbname, &[String::from("Alice")])
         .unwrap()
         .replace(&alice_sr_root(), r#"<alice_sr25519_root>"#);
@@ -72,7 +72,7 @@ fn print_seed_names() {
 #[test]
 fn print_seed_names_with_orphan() {
     let dbname = "for_tests/print_seed_names_with_orphan";
-    populate_cold(dbname, Verifier(None)).unwrap();
+    populate_cold(dbname, Verifier { v: None }).unwrap();
     let print = print_all_seed_names_with_identicons(
         dbname,
         &[String::from("Alice"), String::from("BobGhost")],
@@ -88,7 +88,7 @@ fn print_seed_names_with_orphan() {
 #[test]
 fn print_all_ids() {
     let dbname = "for_tests/print_all_ids";
-    populate_cold(dbname, Verifier(None)).unwrap();
+    populate_cold(dbname, Verifier { v: None }).unwrap();
     let print = print_all_identities(dbname)
         .unwrap()
         .replace(&alice_sr_root(), r#"<alice_sr25519_root>"#)
@@ -104,7 +104,7 @@ fn print_all_ids() {
 #[test]
 fn print_ids_seed_name_network() {
     let dbname = "for_tests/print_ids_seed_name_network";
-    populate_cold(dbname, Verifier(None)).unwrap();
+    populate_cold(dbname, Verifier { v: None }).unwrap();
     let print = print_identities_for_seed_name_and_network(
         dbname,
         "Alice",
@@ -128,7 +128,7 @@ fn print_ids_seed_name_network() {
 #[test]
 fn show_all_networks_flag_westend() {
     let dbname = "for_tests/show_all_networks_flag_westend";
-    populate_cold(dbname, Verifier(None)).unwrap();
+    populate_cold(dbname, Verifier { v: None }).unwrap();
     let print = show_all_networks_with_flag(
         dbname,
         &NetworkSpecsKey::from_parts(
@@ -146,7 +146,7 @@ fn show_all_networks_flag_westend() {
 #[test]
 fn show_all_networks_no_flag() {
     let dbname = "for_tests/show_all_networks_no_flag";
-    populate_cold(dbname, Verifier(None)).unwrap();
+    populate_cold(dbname, Verifier { v: None }).unwrap();
     let print = show_all_networks(dbname).unwrap();
     let expected_print = r#""networks":[{"key":"018091b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3","title":"Polkadot","logo":"polkadot","order":0},{"key":"0180b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe","title":"Kusama","logo":"kusama","order":1},{"key":"0180e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e","title":"Westend","logo":"westend","order":2}]"#;
     assert!(print == expected_print, "\nReceived: \n{}", print);
@@ -156,7 +156,7 @@ fn show_all_networks_no_flag() {
 #[test]
 fn first_standard_network() {
     let dbname = "for_tests/first_standard_network";
-    populate_cold(dbname, Verifier(None)).unwrap();
+    populate_cold(dbname, Verifier { v: None }).unwrap();
     let specs = first_network(dbname).unwrap();
     assert!(specs.name == "polkadot", "\nReceived: \n{:?}", specs);
     fs::remove_dir_all(dbname).unwrap();
@@ -165,7 +165,7 @@ fn first_standard_network() {
 #[test]
 fn export_alice_westend() {
     let dbname = "for_tests/export_alice_westend";
-    populate_cold(dbname, Verifier(None)).unwrap();
+    populate_cold(dbname, Verifier { v: None }).unwrap();
     let public: [u8; 32] =
         hex::decode("46ebddef8cd9bb167dc30878d7113b7e168e6f0646beffd77d69d39bad76b47a")
             .unwrap()
@@ -192,7 +192,7 @@ fn export_alice_westend() {
 #[test]
 fn backup_prep_alice() {
     let dbname = "for_tests/backup_prep_alice";
-    populate_cold(dbname, Verifier(None)).unwrap();
+    populate_cold(dbname, Verifier { v: None }).unwrap();
     let print = backup_prep(dbname, "Alice").unwrap();
     let expected_print = r#""seed_name":"Alice","derivations":[{"network_title":"Polkadot","network_logo":"polkadot","network_order":0,"id_set":[{"path":"","has_pwd":false},{"path":"//polkadot","has_pwd":false}]},{"network_title":"Kusama","network_logo":"kusama","network_order":1,"id_set":[{"path":"","has_pwd":false},{"path":"//kusama","has_pwd":false}]},{"network_title":"Westend","network_logo":"westend","network_order":2,"id_set":[{"path":"//westend","has_pwd":false},{"path":"","has_pwd":false},{"path":"//Alice","has_pwd":false}]}]"#;
     assert!(print == expected_print, "\nReceived: \n{}", print);
@@ -202,7 +202,7 @@ fn backup_prep_alice() {
 #[test]
 fn derive_prep_alice() {
     let dbname = "for_tests/derive_prep_alice";
-    populate_cold(dbname, Verifier(None)).unwrap();
+    populate_cold(dbname, Verifier { v: None }).unwrap();
     let print = derive_prep(
         dbname,
         "Alice",
@@ -223,7 +223,7 @@ fn derive_prep_alice() {
 #[test]
 fn derive_prep_alice_collided() {
     let dbname = "for_tests/derive_prep_alice_collided";
-    populate_cold(dbname, Verifier(None)).unwrap();
+    populate_cold(dbname, Verifier { v: None }).unwrap();
     let network_specs_key = NetworkSpecsKey::from_parts(
         &hex::decode("e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e").unwrap(),
         &Encryption::Sr25519,
@@ -260,7 +260,7 @@ fn derive_prep_alice_collided() {
 #[test]
 fn derive_prep_alice_collided_with_password() {
     let dbname = "for_tests/derive_prep_alice_collided_with_password";
-    populate_cold(dbname, Verifier(None)).unwrap();
+    populate_cold(dbname, Verifier { v: None }).unwrap();
     let network_specs_key = NetworkSpecsKey::from_parts(
         &hex::decode("e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e").unwrap(),
         &Encryption::Sr25519,
@@ -308,7 +308,7 @@ fn derive_prep_alice_collided_with_password() {
 #[test]
 fn westend_network_details() {
     let dbname = "for_tests/westend_network_details";
-    populate_cold(dbname, Verifier(None)).unwrap();
+    populate_cold(dbname, Verifier { v: None }).unwrap();
     let print = network_details_by_key(
         dbname,
         &NetworkSpecsKey::from_parts(
@@ -329,7 +329,7 @@ fn westend_network_details() {
 #[test]
 fn westend_9010_metadata_details() {
     let dbname = "for_tests/westend_9010_metadata_details";
-    populate_cold(dbname, Verifier(None)).unwrap();
+    populate_cold(dbname, Verifier { v: None }).unwrap();
     let print = metadata_details(
         dbname,
         &NetworkSpecsKey::from_parts(
@@ -349,7 +349,7 @@ fn westend_9010_metadata_details() {
 #[test]
 fn types_status_and_history() {
     let dbname = "for_tests/types_status_and_history";
-    populate_cold(dbname, Verifier(None)).unwrap();
+    populate_cold(dbname, Verifier { v: None }).unwrap();
 
     let print = show_types_status(dbname)
         .unwrap()
@@ -379,7 +379,7 @@ fn types_status_and_history() {
 #[test]
 fn path_is_known() {
     let dbname = "for_tests/path_is_known";
-    populate_cold(dbname, Verifier(None)).unwrap();
+    populate_cold(dbname, Verifier { v: None }).unwrap();
     let print = dynamic_path_check(
         dbname,
         "Alice",
@@ -395,7 +395,7 @@ fn path_is_known() {
 #[test]
 fn path_is_unknown() {
     let dbname = "for_tests/path_is_unknown";
-    populate_cold(dbname, Verifier(None)).unwrap();
+    populate_cold(dbname, Verifier { v: None }).unwrap();
     let print = dynamic_path_check(
         dbname,
         "Alice",
@@ -410,7 +410,7 @@ fn path_is_unknown() {
 #[test]
 fn path_is_unknown_passworded() {
     let dbname = "for_tests/path_is_unknown_passworded";
-    populate_cold(dbname, Verifier(None)).unwrap();
+    populate_cold(dbname, Verifier { v: None }).unwrap();
     let print = dynamic_path_check(
         dbname,
         "Alice",
@@ -617,7 +617,7 @@ fn display_general_verifier_properly() {
 #[test]
 fn find_westend_verifier() {
     let dbname = "for_tests/find_westend_verifier";
-    populate_cold_no_metadata(dbname, Verifier(None)).unwrap();
+    populate_cold_no_metadata(dbname, Verifier { v: None }).unwrap();
     let verifier_key = VerifierKey::from_parts(
         &hex::decode("e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e").unwrap(),
     );
@@ -629,7 +629,7 @@ fn find_westend_verifier() {
 #[test]
 fn not_find_mock_verifier() {
     let dbname = "for_tests/not_find_mock_verifier";
-    populate_cold_no_metadata(dbname, Verifier(None)).unwrap();
+    populate_cold_no_metadata(dbname, Verifier { v: None }).unwrap();
     let verifier_key = VerifierKey::from_parts(
         &hex::decode("62bacaaa3d9bb01313bb882c23615aae6509ab2ef1e7e807581ee0b74c77416b").unwrap(),
     );
@@ -662,7 +662,7 @@ fn test_check_for_seed_validity() {
 #[test]
 fn test_generate_default_addresses_for_alice() {
     let dbname = "for_tests/test_generate_default_addresses_for_Alice";
-    populate_cold_no_metadata(dbname, Verifier(None)).unwrap();
+    populate_cold_no_metadata(dbname, Verifier { v: None }).unwrap();
     try_create_seed("Alice", ALICE_SEED_PHRASE, true, dbname).unwrap();
     {
         let database = open_db::<Signer>(dbname).unwrap();
@@ -677,7 +677,7 @@ fn test_generate_default_addresses_for_alice() {
     let default_addresses = addresses_set_seed_name_network(
         dbname,
         "Alice",
-        &NetworkSpecsKey::from_parts(&chainspecs[0].genesis_hash, &Encryption::Sr25519),
+        &NetworkSpecsKey::from_parts(chainspecs[0].genesis_hash.as_bytes(), &Encryption::Sr25519),
     )
     .unwrap();
     assert!(!default_addresses.is_empty());
@@ -714,7 +714,7 @@ fn must_check_for_valid_derivation_phrase() {
 #[test]
 fn test_derive() {
     let dbname = "for_tests/test_derive";
-    populate_cold_no_metadata(dbname, Verifier(None)).unwrap();
+    populate_cold_no_metadata(dbname, Verifier { v: None }).unwrap();
     let chainspecs = default_chainspecs();
     println!(
         "[0]: {:?}, [1]: {:?}",
@@ -722,9 +722,9 @@ fn test_derive() {
     );
     let seed_name = "Alice";
     let network_id_0 =
-        NetworkSpecsKey::from_parts(&chainspecs[0].genesis_hash, &Encryption::Sr25519);
+        NetworkSpecsKey::from_parts(chainspecs[0].genesis_hash.as_bytes(), &Encryption::Sr25519);
     let network_id_1 =
-        NetworkSpecsKey::from_parts(&chainspecs[1].genesis_hash, &Encryption::Sr25519);
+        NetworkSpecsKey::from_parts(chainspecs[1].genesis_hash.as_bytes(), &Encryption::Sr25519);
     let both_networks = vec![network_id_0.to_owned(), network_id_1];
     let only_one_network = vec![network_id_0];
 
@@ -793,13 +793,13 @@ fn test_derive() {
 #[test]
 fn test_identity_deletion() {
     let dbname = "for_tests/test_identity_deletion";
-    populate_cold_no_metadata(dbname, Verifier(None)).unwrap();
+    populate_cold_no_metadata(dbname, Verifier { v: None }).unwrap();
     try_create_seed("Alice", ALICE_SEED_PHRASE, true, dbname).unwrap();
     let chainspecs = default_chainspecs();
     let network_specs_key_0 =
-        NetworkSpecsKey::from_parts(&chainspecs[0].genesis_hash, &Encryption::Sr25519);
+        NetworkSpecsKey::from_parts(chainspecs[0].genesis_hash.as_bytes(), &Encryption::Sr25519);
     let network_specs_key_1 =
-        NetworkSpecsKey::from_parts(&chainspecs[1].genesis_hash, &Encryption::Sr25519);
+        NetworkSpecsKey::from_parts(chainspecs[1].genesis_hash.as_bytes(), &Encryption::Sr25519);
     let mut identities = addresses_set_seed_name_network(dbname, "Alice", &network_specs_key_0)
         .expect("Alice should have some addresses by default");
     println!("{:?}", identities);
@@ -887,7 +887,7 @@ fn get_multisigner_path_set(dbname: &str) -> Vec<(MultiSigner, String)> {
 #[test]
 fn increment_identities_1() {
     let dbname = "for_tests/increment_identities_1";
-    populate_cold_no_metadata(dbname, Verifier(None)).unwrap();
+    populate_cold_no_metadata(dbname, Verifier { v: None }).unwrap();
     {
         let db = open_db::<Signer>(dbname).unwrap();
         let identities = open_tree::<Signer>(&db, ADDRTREE).unwrap();
@@ -895,7 +895,7 @@ fn increment_identities_1() {
     }
     let chainspecs = default_chainspecs();
     let network_id_0 =
-        NetworkSpecsKey::from_parts(&chainspecs[0].genesis_hash, &Encryption::Sr25519);
+        NetworkSpecsKey::from_parts(chainspecs[0].genesis_hash.as_bytes(), &Encryption::Sr25519);
     try_create_address("Alice", ALICE_SEED_PHRASE, "//Alice", &network_id_0, dbname).unwrap();
     let multisigner_path_set = get_multisigner_path_set(dbname);
     assert!(
@@ -932,7 +932,7 @@ fn increment_identities_1() {
 #[test]
 fn increment_identities_2() {
     let dbname = "for_tests/increment_identities_2";
-    populate_cold_no_metadata(dbname, Verifier(None)).unwrap();
+    populate_cold_no_metadata(dbname, Verifier { v: None }).unwrap();
     {
         let db = open_db::<Signer>(dbname).unwrap();
         let identities = open_tree::<Signer>(&db, ADDRTREE).unwrap();
@@ -940,7 +940,7 @@ fn increment_identities_2() {
     }
     let chainspecs = default_chainspecs();
     let network_id_0 =
-        NetworkSpecsKey::from_parts(&chainspecs[0].genesis_hash, &Encryption::Sr25519);
+        NetworkSpecsKey::from_parts(chainspecs[0].genesis_hash.as_bytes(), &Encryption::Sr25519);
     try_create_address("Alice", ALICE_SEED_PHRASE, "//Alice", &network_id_0, dbname).unwrap();
     try_create_address(
         "Alice",
@@ -987,7 +987,7 @@ fn increment_identities_2() {
 #[test]
 fn increment_identities_3() {
     let dbname = "for_tests/increment_identities_3";
-    populate_cold_no_metadata(dbname, Verifier(None)).unwrap();
+    populate_cold_no_metadata(dbname, Verifier { v: None }).unwrap();
     {
         let db = open_db::<Signer>(dbname).unwrap();
         let identities = open_tree::<Signer>(&db, ADDRTREE).unwrap();
@@ -995,7 +995,7 @@ fn increment_identities_3() {
     }
     let chainspecs = default_chainspecs();
     let network_id_0 =
-        NetworkSpecsKey::from_parts(&chainspecs[0].genesis_hash, &Encryption::Sr25519);
+        NetworkSpecsKey::from_parts(chainspecs[0].genesis_hash.as_bytes(), &Encryption::Sr25519);
     try_create_address("Alice", ALICE_SEED_PHRASE, "//Alice", &network_id_0, dbname).unwrap();
     try_create_address(
         "Alice",
@@ -1062,10 +1062,10 @@ fn checking_derivation_set() {
 #[test]
 fn creating_derivation_1() {
     let dbname = "for_tests/creating_derivation_1";
-    populate_cold_no_metadata(dbname, Verifier(None)).unwrap();
+    populate_cold_no_metadata(dbname, Verifier { v: None }).unwrap();
     let chainspecs = default_chainspecs();
     let network_id_0 =
-        NetworkSpecsKey::from_parts(&chainspecs[0].genesis_hash, &Encryption::Sr25519);
+        NetworkSpecsKey::from_parts(chainspecs[0].genesis_hash.as_bytes(), &Encryption::Sr25519);
     assert!(
         try_create_address("Alice", ALICE_SEED_PHRASE, "//Alice", &network_id_0, dbname).is_ok(),
         "Should be able to create //Alice derivation."
@@ -1087,10 +1087,10 @@ fn creating_derivation_1() {
 #[test]
 fn creating_derivation_2() {
     let dbname = "for_tests/creating_derivation_2";
-    populate_cold_no_metadata(dbname, Verifier(None)).unwrap();
+    populate_cold_no_metadata(dbname, Verifier { v: None }).unwrap();
     let chainspecs = default_chainspecs();
     let network_id_0 =
-        NetworkSpecsKey::from_parts(&chainspecs[0].genesis_hash, &Encryption::Sr25519);
+        NetworkSpecsKey::from_parts(chainspecs[0].genesis_hash.as_bytes(), &Encryption::Sr25519);
     assert!(
         try_create_address(
             "Alice",
@@ -1121,10 +1121,10 @@ fn creating_derivation_2() {
 #[test]
 fn creating_derivation_3() {
     let dbname = "for_tests/creating_derivation_3";
-    populate_cold_no_metadata(dbname, Verifier(None)).unwrap();
+    populate_cold_no_metadata(dbname, Verifier { v: None }).unwrap();
     let chainspecs = default_chainspecs();
     let network_id_0 =
-        NetworkSpecsKey::from_parts(&chainspecs[0].genesis_hash, &Encryption::Sr25519);
+        NetworkSpecsKey::from_parts(chainspecs[0].genesis_hash.as_bytes(), &Encryption::Sr25519);
     assert!(
         try_create_address("Alice", ALICE_SEED_PHRASE, "//Alice", &network_id_0, dbname).is_ok(),
         "Should be able to create //Alice derivation."
@@ -1155,10 +1155,10 @@ fn creating_derivation_3() {
 #[test]
 fn creating_derivation_4() {
     let dbname = "for_tests/creating_derivation_4";
-    populate_cold_no_metadata(dbname, Verifier(None)).unwrap();
+    populate_cold_no_metadata(dbname, Verifier { v: None }).unwrap();
     let chainspecs = default_chainspecs();
     let network_id_0 =
-        NetworkSpecsKey::from_parts(&chainspecs[0].genesis_hash, &Encryption::Sr25519);
+        NetworkSpecsKey::from_parts(chainspecs[0].genesis_hash.as_bytes(), &Encryption::Sr25519);
     assert!(
         try_create_address(
             "Alice",
@@ -1194,10 +1194,10 @@ fn creating_derivation_4() {
 #[test]
 fn creating_derivation_5() {
     let dbname = "for_tests/creating_derivation_5";
-    populate_cold_no_metadata(dbname, Verifier(None)).unwrap();
+    populate_cold_no_metadata(dbname, Verifier { v: None }).unwrap();
     let chainspecs = default_chainspecs();
     let network_id_0 =
-        NetworkSpecsKey::from_parts(&chainspecs[0].genesis_hash, &Encryption::Sr25519);
+        NetworkSpecsKey::from_parts(chainspecs[0].genesis_hash.as_bytes(), &Encryption::Sr25519);
     assert!(
         try_create_address(
             "Alice",
@@ -1266,7 +1266,7 @@ fn test_metadata_transfer() {
     let dbname_hot = "for_tests/test_metadata_transfer_mock_hot";
     reset_hot_database(dbname_hot).unwrap();
     let dbname_cold = "for_tests/test_metadata_transfer_mock_cold";
-    populate_cold(dbname_cold, Verifier(None)).unwrap();
+    populate_cold(dbname_cold, Verifier { v: None }).unwrap();
 
     insert_metadata_from_file(dbname_hot, "for_tests/westend9010");
     assert!(
@@ -1305,7 +1305,7 @@ fn test_metadata_transfer() {
 #[test]
 fn test_all_events() {
     let dbname = "for_tests/test_all_events";
-    populate_cold_no_metadata(dbname, Verifier(None)).unwrap();
+    populate_cold_no_metadata(dbname, Verifier { v: None }).unwrap();
     let events = all_events_preview();
     enter_events::<Signer>(dbname, events).unwrap();
     let history = print_history(dbname)
@@ -1324,7 +1324,7 @@ fn test_all_events() {
 #[test]
 fn print_single_event() {
     let dbname = "for_tests/print_single_event";
-    populate_cold(dbname, Verifier(None)).unwrap();
+    populate_cold(dbname, Verifier { v: None }).unwrap();
     let print = print_history_entry_by_order(0, dbname)
         .unwrap()
         .replace(&empty_png(), r#"<empty>"#);
@@ -1347,7 +1347,7 @@ fn check_for_network(name: &str, version: u32, dbname: &str) -> bool {
 #[test]
 fn remove_all_westend() {
     let dbname = "for_tests/remove_all_westend";
-    populate_cold(dbname, Verifier(None)).unwrap();
+    populate_cold(dbname, Verifier { v: None }).unwrap();
 
     let genesis_hash = "e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e";
     let network_specs_key =
@@ -1392,7 +1392,7 @@ fn remove_all_westend() {
 #[test]
 fn remove_westend_9010() {
     let dbname = "for_tests/remove_westend_9010";
-    populate_cold(dbname, Verifier(None)).unwrap();
+    populate_cold(dbname, Verifier { v: None }).unwrap();
     let genesis_hash = "e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e";
     let network_specs_key =
         NetworkSpecsKey::from_parts(&hex::decode(genesis_hash).unwrap(), &Encryption::Sr25519);

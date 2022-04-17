@@ -37,9 +37,11 @@ const ALICE: [u8; 32] = [
     76, 205, 227, 154, 86, 132, 231, 165, 109, 162, 125,
 ];
 fn verifier_alice_sr25519() -> Verifier {
-    Verifier(Some(VerifierValue::Standard(MultiSigner::Sr25519(
-        sp_core::sr25519::Public::from_raw(ALICE),
-    ))))
+    Verifier {
+        v: Some(VerifierValue::Standard {
+            m: MultiSigner::Sr25519(sp_core::sr25519::Public::from_raw(ALICE)),
+        }),
+    }
 }
 
 fn sign_action_test(
@@ -160,7 +162,7 @@ fn print_db_content(dbname: &str) -> String {
 #[test]
 fn can_sign_transaction_1() {
     let dbname = "for_tests/can_sign_transaction_1";
-    populate_cold(dbname, Verifier(None)).unwrap();
+    populate_cold(dbname, Verifier { v: None }).unwrap();
     let line = "530100d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27da40403008eaf04151687736326c9fea17e25fc5287613693c912909cb226aa4794f26a480700e8764817b501b8003223000005000000e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e538a7d7a0ac17eb6dd004578cb8e238c384a10f57c999a3fa1200409cd9b3f33e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e";
     let content_known = r#""method":[{"index":0,"indent":0,"type":"pallet","payload":"Balances"},{"index":1,"indent":1,"type":"method","payload":{"method_name":"transfer_keep_alive","docs":"2053616d6520617320746865205b607472616e73666572605d2063616c6c2c206275742077697468206120636865636b207468617420746865207472616e736665722077696c6c206e6f74206b696c6c207468650a206f726967696e206163636f756e742e0a0a20393925206f66207468652074696d6520796f752077616e74205b607472616e73666572605d20696e73746561642e0a0a205b607472616e73666572605d3a207374727563742e50616c6c65742e68746d6c236d6574686f642e7472616e736665720a2023203c7765696768743e0a202d2043686561706572207468616e207472616e736665722062656361757365206163636f756e742063616e6e6f74206265206b696c6c65642e0a202d2042617365205765696768743a2035312e3420c2b5730a202d204442205765696768743a2031205265616420616e64203120577269746520746f2064657374202873656e64657220697320696e206f7665726c617920616c7265616479290a20233c2f7765696768743e"}},{"index":2,"indent":2,"type":"varname","payload":"dest"},{"index":3,"indent":3,"type":"enum_variant_name","payload":{"name":"Id","docs_enum_variant":""}},{"index":4,"indent":4,"type":"Id","payload":{"base58":"5FHneW46xGXgs5mUiveU4sbTyGBzmstUspZC92UhjJM694ty","identicon":"<bob>"}},{"index":5,"indent":2,"type":"varname","payload":"value"},{"index":6,"indent":3,"type":"balance","payload":{"amount":"100.000000000","units":"mWND"}}],"extensions":[{"index":7,"indent":0,"type":"era","payload":{"era":"Mortal","phase":"27","period":"64"}},{"index":8,"indent":0,"type":"nonce","payload":"46"},{"index":9,"indent":0,"type":"tip","payload":{"amount":"0","units":"pWND"}},{"index":10,"indent":0,"type":"name_version","payload":{"name":"westend","version":"9010"}},{"index":11,"indent":0,"type":"tx_version","payload":"5"},{"index":12,"indent":0,"type":"block_hash","payload":"538a7d7a0ac17eb6dd004578cb8e238c384a10f57c999a3fa1200409cd9b3f33"}]"#;
     let author_info_known = r#""base58":"5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY","identicon":"<alice_sr25519_//Alice>","seed":"Alice","derivation_path":"//Alice","has_pwd":false"#;
@@ -237,7 +239,7 @@ fn can_sign_transaction_1() {
 #[test]
 fn can_sign_message_1() {
     let dbname = "for_tests/can_sign_message_1";
-    populate_cold(dbname, Verifier(None)).unwrap();
+    populate_cold(dbname, Verifier { v: None }).unwrap();
     let line = "530103d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27df5064c6f72656d20697073756d20646f6c6f722073697420616d65742c20636f6e73656374657475722061646970697363696e6720656c69742c2073656420646f20656975736d6f642074656d706f7220696e6369646964756e74207574206c61626f726520657420646f6c6f7265206d61676e6120616c697175612e20557420656e696d206164206d696e696d2076656e69616d2c2071756973206e6f737472756420657865726369746174696f6e20756c6c616d636f206c61626f726973206e69736920757420616c697175697020657820656120636f6d6d6f646f20636f6e7365717561742e2044756973206175746520697275726520646f6c6f7220696e20726570726568656e646572697420696e20766f6c7570746174652076656c697420657373652063696c6c756d20646f6c6f726520657520667567696174206e756c6c612070617269617475722e204578636570746575722073696e74206f6363616563617420637570696461746174206e6f6e2070726f6964656e742c2073756e7420696e2063756c706120717569206f666669636961206465736572756e74206d6f6c6c697420616e696d20696420657374206c61626f72756d2ee143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e";
     let output = produce_output(line, dbname);
     let content_known = r#""message":[{"index":0,"indent":0,"type":"text","payload":"4c6f72656d20697073756d20646f6c6f722073697420616d65742c20636f6e73656374657475722061646970697363696e6720656c69742c2073656420646f20656975736d6f642074656d706f7220696e6369646964756e74207574206c61626f726520657420646f6c6f7265206d61676e6120616c697175612e20557420656e696d206164206d696e696d2076656e69616d2c2071756973206e6f737472756420657865726369746174696f6e20756c6c616d636f206c61626f726973206e69736920757420616c697175697020657820656120636f6d6d6f646f20636f6e7365717561742e2044756973206175746520697275726520646f6c6f7220696e20726570726568656e646572697420696e20766f6c7570746174652076656c697420657373652063696c6c756d20646f6c6f726520657520667567696174206e756c6c612070617269617475722e204578636570746575722073696e74206f6363616563617420637570696461746174206e6f6e2070726f6964656e742c2073756e7420696e2063756c706120717569206f666669636961206465736572756e74206d6f6c6c697420616e696d20696420657374206c61626f72756d2e"}]"#;
@@ -303,7 +305,7 @@ fn can_sign_message_1() {
 #[test]
 fn add_specs_westend_no_network_info_not_signed() {
     let dbname = "for_tests/add_specs_westend_no_network_info_not_signed";
-    populate_cold_no_networks(dbname, Verifier(None)).unwrap();
+    populate_cold_no_networks(dbname, Verifier { v: None }).unwrap();
     let line = fs::read_to_string("for_tests/add_specs_westend_unverified.txt").unwrap();
     let output = produce_output(line.trim(), dbname);
     let reply_known = r##""warning":[{"index":0,"indent":0,"type":"warning","payload":"Received network information is not verified."}],"new_specs":[{"index":1,"indent":0,"type":"new_specs","payload":{"base58prefix":"42","color":"#660D35","decimals":"12","encryption":"sr25519","genesis_hash":"e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e","logo":"westend","name":"westend","path_id":"//westend","secondary_color":"#262626","title":"Westend","unit":"WND"}}]"##;
@@ -350,7 +352,7 @@ Identities: "#;
 #[test]
 fn add_specs_westend_ed25519_not_signed() {
     let dbname = "for_tests/add_specs_westend_ed25519_not_signed";
-    populate_cold(dbname, Verifier(None)).unwrap();
+    populate_cold(dbname, Verifier { v: None }).unwrap();
     let line = fs::read_to_string("for_tests/add_specs_westend-ed25519_unverified.txt").unwrap();
     let output = produce_output(line.trim(), dbname);
     let reply_known = r##""warning":[{"index":0,"indent":0,"type":"warning","payload":"Received network information is not verified."}],"new_specs":[{"index":1,"indent":0,"type":"new_specs","payload":{"base58prefix":"42","color":"#660D35","decimals":"12","encryption":"ed25519","genesis_hash":"e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e","logo":"westend","name":"westend","path_id":"//westend","secondary_color":"#262626","title":"westend-ed25519","unit":"WND"}}]"##;
@@ -575,7 +577,7 @@ Identities:
 #[test]
 fn load_westend9070() {
     let dbname = "for_tests/load_westend9070";
-    populate_cold(dbname, Verifier(None)).unwrap();
+    populate_cold(dbname, Verifier { v: None }).unwrap();
     let line = fs::read_to_string("for_tests/network_metadata_westendV9070_None.txt").unwrap();
     let output = produce_output(line.trim(), dbname);
     let reply_known = r##""warning":[{"index":0,"indent":0,"type":"warning","payload":"Received network information is not verified."}],"meta":[{"index":1,"indent":0,"type":"meta","payload":{"specname":"westend","spec_version":"9070","meta_hash":"e281fbc53168a6b87d1ea212923811f4c083e7be7d18df4b8527b9532e5f5fec","meta_id_pic":"<meta_pic_westend9070>"}}]"##;
@@ -674,7 +676,7 @@ Identities:
 #[test]
 fn load_known_types_upd_general_verifier() {
     let dbname = "for_tests/load_known_types_upd_general_verifier";
-    populate_cold(dbname, Verifier(None)).unwrap();
+    populate_cold(dbname, Verifier { v: None }).unwrap();
     let line = fs::read_to_string("for_tests/types_info_Alice.txt").unwrap();
     let output = produce_output(line.trim(), dbname);
     let reply_known = r#""verifier":[{"index":0,"indent":0,"type":"verifier","payload":{"public_key":"d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d","identicon":"<alice_sr25519_//Alice>","encryption":"sr25519"}}],"warning":[{"index":1,"indent":0,"type":"warning","payload":"Received message is verified by a new general verifier. Currently no general verifier is set, and proceeding will update the general verifier to the received value. All previously acquired information associated with general verifier will be purged. Affected network specs entries: Kusama, Polkadot, Westend; affected metadata entries: kusama2030, polkadot30, westend9000, westend9010. Types information is purged."},{"index":2,"indent":0,"type":"warning","payload":"Received types information is identical to the one that was in the database."}],"types_info":[{"index":3,"indent":0,"type":"types","payload":{"types_hash":"d091a5a24a97e18dfe298b167d8fd5a2add10098c8792cba21c39029a9ee0aeb","types_id_pic":"<types_known>"}}]"#;
@@ -856,7 +858,7 @@ Identities:
 #[test]
 fn dock_adventures_1() {
     let dbname = "for_tests/dock_adventures_1";
-    populate_cold(dbname, Verifier(None)).unwrap();
+    populate_cold(dbname, Verifier { v: None }).unwrap();
     let line =
         fs::read_to_string("for_tests/add_specs_dock-pos-main-runtime-sr25519_unverified.txt")
             .unwrap();
@@ -1376,7 +1378,7 @@ Identities:
 #[test]
 fn can_parse_westend_with_v14() {
     let dbname = "for_tests/can_parse_westend_with_v14";
-    populate_cold(dbname, Verifier(None)).unwrap();
+    populate_cold(dbname, Verifier { v: None }).unwrap();
     let line = fs::read_to_string("for_tests/load_metadata_westendV9111_unverified.txt").unwrap();
     let output = produce_output(line.trim(), dbname);
     let reply_known = r#""warning":[{"index":0,"indent":0,"type":"warning","payload":"Received network information is not verified."}],"meta":[{"index":1,"indent":0,"type":"meta","payload":{"specname":"westend","spec_version":"9111","meta_hash":"207956815bc7b3234fa8827ef40df5fd2879e93f18a680e22bc6801bca27312d","meta_id_pic":"<meta_pic_westend9111>"}}]"#;
@@ -1570,7 +1572,7 @@ Identities:
 #[test]
 fn parse_transaction_alice_remarks_westend9122() {
     let dbname = "for_tests/parse_transaction_alice_remarks_westend9122";
-    populate_cold(dbname, Verifier(None)).unwrap();
+    populate_cold(dbname, Verifier { v: None }).unwrap();
     let line = fs::read_to_string("for_tests/load_metadata_westendV9122_unverified.txt").unwrap();
     let output = produce_output(line.trim(), dbname);
     let reply_known = r#""warning":[{"index":0,"indent":0,"type":"warning","payload":"Received network information is not verified."}],"meta":[{"index":1,"indent":0,"type":"meta","payload":{"specname":"westend","spec_version":"9122","meta_hash":"d656951f4c58c9fdbe029be33b02a7095abc3007586656be7ff68fd0550d6ced","meta_id_pic":"<meta_pic_westend9122>"}}]"#;
@@ -1629,7 +1631,7 @@ fn parse_transaction_alice_remarks_westend9122() {
 #[test]
 fn proper_hold_display() {
     let dbname = "for_tests/proper_hold_display";
-    populate_cold(dbname, Verifier(None)).unwrap();
+    populate_cold(dbname, Verifier { v: None }).unwrap();
     let line = fs::read_to_string("for_tests/add_specs_westend-ed25519_unverified.txt").unwrap();
     let output = produce_output(line.trim(), dbname);
 
@@ -1857,7 +1859,7 @@ Identities:
 #[test]
 fn acala_adventures() {
     let dbname = "for_tests/acala_adventures";
-    populate_cold_no_networks(dbname, Verifier(None)).unwrap();
+    populate_cold_no_networks(dbname, Verifier { v: None }).unwrap();
 
     let line = fs::read_to_string("for_tests/add_specs_acala-sr25519_unverified.txt").unwrap();
     let output = produce_output(line.trim(), dbname);
@@ -1909,7 +1911,7 @@ Identities: "#;
 #[test]
 fn shell_no_token_warning_on_metadata() {
     let dbname = "for_tests/shell_no_token_warning_on_metadata";
-    populate_cold_no_networks(dbname, Verifier(None)).unwrap();
+    populate_cold_no_networks(dbname, Verifier { v: None }).unwrap();
 
     let line = fs::read_to_string("for_tests/add_specs_shell-sr25519_unverified.txt").unwrap();
     let output = produce_output(line.trim(), dbname);

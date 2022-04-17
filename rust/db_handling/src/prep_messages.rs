@@ -10,6 +10,8 @@ use definitions::{
 use crate::helpers::get_types;
 #[cfg(feature = "signer")]
 use crate::helpers::{open_db, open_tree};
+#[cfg(feature = "signer")]
+use sp_core::H256;
 
 /// Function to get types info from the database.
 /// Gets used both on the Active side (when preparing messages containing `load_types` payload)
@@ -21,7 +23,7 @@ pub fn prep_types<T: ErrorSource>(database_name: &str) -> Result<ContentLoadType
 /// Function to get genesis hash from the Signer database searching by network name.
 /// Gets used only on Signer side when preparing SufficientCrypto export qr code for `load_metadata` payload
 #[cfg(feature = "signer")]
-pub fn get_genesis_hash(network_name: &str, database_name: &str) -> Result<[u8; 32], ErrorSigner> {
+pub fn get_genesis_hash(network_name: &str, database_name: &str) -> Result<H256, ErrorSigner> {
     let database = open_db::<Signer>(database_name)?;
     let chainspecs = open_tree::<Signer>(&database, SPECSTREE)?;
     let mut found_genesis_hash = None;

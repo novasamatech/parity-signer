@@ -80,7 +80,8 @@ fn default_cold_metadata(database_name: &str, purpose: Purpose) -> Result<Batch,
 fn default_cold_network_specs(database_name: &str) -> Result<Batch, ErrorActive> {
     let mut batch = make_batch_clear_tree::<Active>(database_name, SPECSTREE)?;
     for x in default_chainspecs().iter() {
-        let network_specs_key = NetworkSpecsKey::from_parts(&x.genesis_hash, &x.encryption);
+        let network_specs_key =
+            NetworkSpecsKey::from_parts(x.genesis_hash.as_bytes(), &x.encryption);
         batch.insert(network_specs_key.key(), x.encode());
     }
     Ok(batch)
@@ -198,7 +199,7 @@ pub fn signer_init_with_cert(database_name: &str) -> Result<(), ErrorSigner> {
 /// Function is applicable only to Signer side, interacts with user interface.
 #[cfg(feature = "signer")]
 pub fn signer_init_no_cert(database_name: &str) -> Result<(), ErrorSigner> {
-    signer_init(database_name, Verifier(None))
+    signer_init(database_name, Verifier { v: None })
 }
 
 /// Function to populate cold database without adding any networks.

@@ -8,6 +8,7 @@ use definitions::{
 };
 use parity_scale_codec::DecodeAll;
 use parser::cards::ParserCard;
+use sp_core::H256;
 
 use crate::cards::{make_author_info, Card, Warning};
 use crate::helpers::multisigner_msg_genesis_encryption;
@@ -103,8 +104,9 @@ pub fn process_message(data_hex: &str, database_name: &str) -> Result<Action, Er
         }
         None => {
             let author_card = Card::AuthorPublicKey(&author_multi_signer).card(&mut index, indent);
+            let genesis_hash = H256::from_slice(&genesis_hash_vec);
             let error_card = Card::Error(ErrorSigner::Input(InputSigner::UnknownNetwork {
-                genesis_hash: genesis_hash_vec.to_vec(),
+                genesis_hash,
                 encryption,
             }))
             .card(&mut index, indent);

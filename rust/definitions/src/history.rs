@@ -44,9 +44,9 @@ use crate::{
 /// Contains network name, network version, metadata hash.
 #[derive(Decode, Encode, PartialEq, Clone)]
 pub struct MetaValuesDisplay {
-    name: String,
-    version: u32,
-    meta_hash: Vec<u8>,
+    pub name: String,
+    pub version: u32,
+    pub meta_hash: Vec<u8>,
 }
 
 impl MetaValuesDisplay {
@@ -96,10 +96,10 @@ impl MetaValuesDisplay {
 /// of address used for `SufficientCrypto` generation.  
 #[derive(Decode, Encode, PartialEq, Clone)]
 pub struct MetaValuesExport {
-    name: String,
-    version: u32,
-    meta_hash: Vec<u8>,
-    signed_by: VerifierValue,
+    pub name: String,
+    pub version: u32,
+    pub meta_hash: Vec<u8>,
+    pub signed_by: VerifierValue,
 }
 
 impl MetaValuesExport {
@@ -134,9 +134,9 @@ impl MetaValuesExport {
 /// Event content for importing or removing network specs  
 #[derive(Decode, Encode, PartialEq, Clone)]
 pub struct NetworkSpecsDisplay {
-    specs: NetworkSpecs,
-    valid_current_verifier: ValidCurrentVerifier,
-    general_verifier: Verifier,
+    pub specs: NetworkSpecs,
+    pub valid_current_verifier: ValidCurrentVerifier,
+    pub general_verifier: Verifier,
 }
 
 impl NetworkSpecsDisplay {
@@ -171,8 +171,8 @@ impl NetworkSpecsDisplay {
 /// `SufficientCrypto` generation.  
 #[derive(Decode, Encode, PartialEq, Clone)]
 pub struct NetworkSpecsExport {
-    specs_to_send: NetworkSpecsToSend,
-    signed_by: VerifierValue,
+    pub specs_to_send: NetworkSpecsToSend,
+    pub signed_by: VerifierValue,
 }
 
 impl NetworkSpecsExport {
@@ -199,9 +199,9 @@ impl NetworkSpecsExport {
 /// Event content for setting network verifier
 #[derive(Decode, Encode, PartialEq, Clone)]
 pub struct NetworkVerifierDisplay {
-    genesis_hash: Vec<u8>,
-    valid_current_verifier: ValidCurrentVerifier,
-    general_verifier: Verifier,
+    pub genesis_hash: Vec<u8>,
+    pub valid_current_verifier: ValidCurrentVerifier,
+    pub general_verifier: Verifier,
 }
 
 impl NetworkVerifierDisplay {
@@ -237,8 +237,8 @@ impl NetworkVerifierDisplay {
 /// Contains hash of SCALE-encoded types data and types information [`Verifier`].
 #[derive(Decode, Encode, PartialEq, Clone)]
 pub struct TypesDisplay {
-    types_hash: Vec<u8>,
-    verifier: Verifier,
+    pub types_hash: Vec<u8>,
+    pub verifier: Verifier,
 }
 
 impl TypesDisplay {
@@ -279,8 +279,8 @@ impl TypesDisplay {
 /// used for `SufficientCrypto` generation.  
 #[derive(Decode, Encode, PartialEq, Clone)]
 pub struct TypesExport {
-    types_hash: Vec<u8>,
-    signed_by: VerifierValue,
+    pub types_hash: Vec<u8>,
+    pub signed_by: VerifierValue,
 }
 
 impl TypesExport {
@@ -323,11 +323,11 @@ impl TypesExport {
 /// - genesis hash of the network within which the address is  
 #[derive(Decode, Encode, PartialEq, Clone)]
 pub struct IdentityHistory {
-    seed_name: String,
-    encryption: Encryption,
-    public_key: Vec<u8>,
-    path: String,
-    network_genesis_hash: Vec<u8>,
+    pub seed_name: String,
+    pub encryption: Encryption,
+    pub public_key: Vec<u8>,
+    pub path: String,
+    pub network_genesis_hash: Vec<u8>,
 }
 
 impl IdentityHistory {
@@ -376,17 +376,17 @@ impl IdentityHistory {
 #[derive(Decode, Encode, PartialEq, Clone)]
 pub struct SignDisplay {
     /// raw `Vec<u8>` transaction that user either tried to sign or signed  
-    transaction: Vec<u8>,
+    pub transaction: Vec<u8>,
 
     /// name for the network in which transaction is generated,
     /// as it is recorded in the network specs and network metadata  
-    network_name: String,
+    pub network_name: String,
 
     /// address that has generated and signed the transaction  
-    signed_by: VerifierValue,
+    pub signed_by: VerifierValue,
 
     /// user entered comment for transaction
-    user_comment: String,
+    pub user_comment: String,
 }
 
 impl SignDisplay {
@@ -422,9 +422,15 @@ impl SignDisplay {
     /// Get raw transaction, network name, and [`Encryption`] from [`SignDisplay`]  
     pub fn transaction_network_encryption(&self) -> (Vec<u8>, String, Encryption) {
         let encryption = match &self.signed_by {
-            VerifierValue::Standard(MultiSigner::Ed25519(_)) => Encryption::Ed25519,
-            VerifierValue::Standard(MultiSigner::Sr25519(_)) => Encryption::Sr25519,
-            VerifierValue::Standard(MultiSigner::Ecdsa(_)) => Encryption::Ecdsa,
+            VerifierValue::Standard {
+                m: MultiSigner::Ed25519(_),
+            } => Encryption::Ed25519,
+            VerifierValue::Standard {
+                m: MultiSigner::Sr25519(_),
+            } => Encryption::Sr25519,
+            VerifierValue::Standard {
+                m: MultiSigner::Ecdsa(_),
+            } => Encryption::Ecdsa,
         };
         (
             self.transaction.to_vec(),
@@ -481,17 +487,17 @@ impl SignDisplay {
 #[derive(Decode, Encode, PartialEq, Clone)]
 pub struct SignMessageDisplay {
     /// decoded message
-    message: String,
+    pub message: String,
 
     /// name for the network in which message transaction is generated,
     /// as it is recorded in the network specs and network metadata  
-    network_name: String,
+    pub network_name: String,
 
     /// address that has generated and signed the message  
-    signed_by: VerifierValue,
+    pub signed_by: VerifierValue,
 
     /// user entered comment for message
-    user_comment: String,
+    pub user_comment: String,
 }
 
 impl SignMessageDisplay {
@@ -778,22 +784,24 @@ pub fn all_events_preview() -> Vec<Event> {
         142, 175, 4, 21, 22, 135, 115, 99, 38, 201, 254, 161, 126, 37, 252, 82, 135, 97, 54, 147,
         201, 18, 144, 156, 178, 38, 170, 71, 148, 242, 106, 72,
     ];
-    let verifier_value = VerifierValue::Standard(MultiSigner::Sr25519(
-        sp_core::sr25519::Public::from_raw(public),
-    ));
-    let verifier = Verifier(Some(verifier_value.clone()));
+    let verifier_value = VerifierValue::Standard {
+        m: MultiSigner::Sr25519(sp_core::sr25519::Public::from_raw(public)),
+    };
+    let verifier = Verifier {
+        v: Some(verifier_value.clone()),
+    };
     let valid_current_verifier = ValidCurrentVerifier::General;
+    let known_value: [u8; 32] =
+        hex::decode("e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e")
+            .expect("known value")
+            .try_into()
+            .expect("known value");
     let network_specs = NetworkSpecs {
         base58prefix: 42,
         color: String::from("#660D35"),
         decimals: 12,
         encryption: Encryption::Sr25519,
-        genesis_hash: hex::decode(
-            "e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e",
-        )
-        .expect("known value")
-        .try_into()
-        .expect("known value"),
+        genesis_hash: sp_core::H256::from(known_value),
         logo: String::from("westend"),
         name: String::from("westend"),
         order: 3,
@@ -821,7 +829,7 @@ pub fn all_events_preview() -> Vec<Event> {
             &verifier_value,
         )),
         Event::NetworkVerifierSet(NetworkVerifierDisplay::get(
-            &VerifierKey::from_parts(&network_specs.genesis_hash),
+            &VerifierKey::from_parts(network_specs.genesis_hash.as_bytes()),
             &valid_current_verifier,
             &verifier,
         )),
@@ -867,14 +875,14 @@ pub fn all_events_preview() -> Vec<Event> {
             &Encryption::Sr25519,
             &public,
             "//",
-            &network_specs.genesis_hash,
+            network_specs.genesis_hash.as_bytes(),
         )),
         Event::IdentityRemoved(IdentityHistory::get(
             "Alice",
             &Encryption::Sr25519,
             &public,
             "//",
-            &network_specs.genesis_hash,
+            network_specs.genesis_hash.as_bytes(),
         )),
         Event::IdentitiesWiped,
         Event::DeviceWasOnline,

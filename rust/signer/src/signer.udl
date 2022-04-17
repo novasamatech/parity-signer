@@ -9,32 +9,28 @@ dictionary MetaValuesDisplay {
     sequence<u8> meta_hash;
 };
 
-dictionary Ed25519Public {
-    sequence<u8> public;
-};
+[Custom]
+typedef sequence<u8> H256;
 
-dictionary Sr25519Public {
-    sequence<u8> public;
-};
+[Custom]
+typedef sequence<u8> Ed25519Public;
 
-dictionary EcdsaPublic {
-    sequence<u8> public;
-};
+[Custom]
+typedef sequence<u8> Sr25519Public;
 
-[Enum]
-interface MultiSigner {
-    Ed25519(Ed25519Public public);
-    Sr25519(Sr25519Public public);
-    Ecdsa(EcdsaPublic public);
-};
+[Custom]
+typedef sequence<u8> EcdsaPublic;
+
+[Custom]
+typedef string MultiSigner;
 
 [Enum]
 interface VerifierValue {
-    Standard(MultiSigner multi_signer);
+    Standard(MultiSigner m);
 };
 
 dictionary Verifier {
-    VerifierValue? verifier_value;
+    VerifierValue? v;
 };
 
 enum Encryption {
@@ -46,7 +42,7 @@ enum Encryption {
 [Enum]
 interface ValidCurrentVerifier {
     General();
-    Custom(Verifier verifier);
+    Custom(Verifier v);
 };
 
 dictionary NetworkSpecs {
@@ -54,7 +50,7 @@ dictionary NetworkSpecs {
     string color;
     u8 decimals;
     Encryption encryption;
-    sequence<u8> genesis_hash;
+    H256 genesis_hash;
     string logo;
     string name;
     u8 order;
@@ -69,7 +65,7 @@ dictionary NetworkSpecsToSend {
     string color;
     u8 decimals;
     Encryption encryption;
-    sequence<u8> genesis_hash;
+    H256 genesis_hash;
     string logo;
     string name;
     string path_id;
