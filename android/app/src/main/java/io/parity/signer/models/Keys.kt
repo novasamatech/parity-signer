@@ -5,7 +5,7 @@ import android.widget.Toast
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.currentCompositionLocalContext
 import org.json.JSONObject
-import uniffi.signer.Action
+import io.parity.signer.uniffi.Action
 
 /**
  * Add key to database; uses phone crypto to fetch seeds!

@@ -21,7 +21,7 @@ import io.parity.signer.components.RestoreSeedPhraseBox
 import io.parity.signer.components.RestoreSeedPhraseSuggest
 import io.parity.signer.models.*
 import org.json.JSONArray
-import uniffi.signer.Action
+import io.parity.signer.uniffi.Action
 
 @Composable
 fun RecoverSeedPhrase(

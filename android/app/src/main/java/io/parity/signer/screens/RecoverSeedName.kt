@@ -21,7 +21,7 @@ import io.parity.signer.models.SignerDataModel
 import io.parity.signer.models.decode64
 import io.parity.signer.models.encode64
 import io.parity.signer.ui.theme.Text600
-import uniffi.signer.Action
+import io.parity.signer.uniffi.Action
 
 @Composable
 fun RecoverSeedName(

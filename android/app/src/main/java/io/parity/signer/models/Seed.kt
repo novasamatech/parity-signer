@@ -3,10 +3,10 @@ package io.parity.signer.models
 import android.util.Log
 import android.widget.Toast
 import org.json.JSONArray
-import uniffi.signer.Action
-import uniffi.signer.historySeedNameWasShown
-import uniffi.signer.initNavigation
-import uniffi.signer.updateSeedNames
+import io.parity.signer.uniffi.Action
+import io.parity.signer.uniffi.historySeedNameWasShown
+import io.parity.signer.uniffi.initNavigation
+import io.parity.signer.uniffi.updateSeedNames
 
 //MARK: Seed management begin
 

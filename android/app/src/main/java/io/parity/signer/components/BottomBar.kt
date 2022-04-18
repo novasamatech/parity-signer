@@ -16,7 +16,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import io.parity.signer.models.SignerDataModel
 import io.parity.signer.ui.theme.Bg000
-import uniffi.signer.Action
+import io.parity.signer.uniffi.Action
 
 /**
  * Bar to be shown on the bottom of screen;

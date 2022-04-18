@@ -26,7 +26,7 @@ import io.parity.signer.screens.LandingView
 import io.parity.signer.screens.WaitingScreen
 import io.parity.signer.ui.theme.ParitySignerTheme
 import io.parity.signer.ui.theme.Text600
-import uniffi.signer.Action
+import io.parity.signer.uniffi.Action
 
 @ExperimentalMaterialApi
 @ExperimentalAnimationApi

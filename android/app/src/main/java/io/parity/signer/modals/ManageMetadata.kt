@@ -21,7 +21,7 @@ import io.parity.signer.models.pushButton
 import io.parity.signer.ui.theme.Bg000
 import io.parity.signer.ui.theme.modal
 import org.json.JSONObject
-import uniffi.signer.Action
+import io.parity.signer.uniffi.Action
 
 @Composable
 fun ManageMetadata(signerDataModel: SignerDataModel) {

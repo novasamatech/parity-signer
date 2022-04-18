@@ -17,7 +17,7 @@ import io.parity.signer.models.SignerDataModel
 import io.parity.signer.models.abbreviateString
 import io.parity.signer.models.pushButton
 import io.parity.signer.ui.theme.*
-import uniffi.signer.Action
+import io.parity.signer.uniffi.Action
 
 /**
  * Settings screen; General purpose stuff like legal info, networks management

@@ -18,7 +18,7 @@ import io.parity.signer.ui.theme.Bg100
 import io.parity.signer.ui.theme.Bg200
 import io.parity.signer.ui.theme.modal
 import org.json.JSONArray
-import uniffi.signer.Action
+import io.parity.signer.uniffi.Action
 
 @Composable
 fun SelectSeed(signerDataModel: SignerDataModel) {

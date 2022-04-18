@@ -17,7 +17,7 @@ import io.parity.signer.models.pushButton
 import io.parity.signer.ui.theme.Action400
 import io.parity.signer.ui.theme.Bg100
 import io.parity.signer.ui.theme.Text400
-import uniffi.signer.Action
+import io.parity.signer.uniffi.Action
 
 @Composable
 fun TopBar(signerDataModel: SignerDataModel) {

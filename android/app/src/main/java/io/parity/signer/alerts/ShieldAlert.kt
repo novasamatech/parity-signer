@@ -6,7 +6,7 @@ import io.parity.signer.ShieldAlert
 import io.parity.signer.components.AlertComponent
 import io.parity.signer.models.SignerDataModel
 import io.parity.signer.models.pushButton
-import uniffi.signer.Action
+import io.parity.signer.uniffi.Action
 
 @Composable
 fun ShieldAlert(signerDataModel: SignerDataModel) {

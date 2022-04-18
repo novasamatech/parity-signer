@@ -14,7 +14,7 @@ import androidx.compose.ui.platform.LocalFocusManager
 import io.parity.signer.components.*
 import io.parity.signer.models.*
 import io.parity.signer.ui.theme.Text400
-import uniffi.signer.Action
+import io.parity.signer.uniffi.Action
 
 @Composable
 fun TransactionPreview(

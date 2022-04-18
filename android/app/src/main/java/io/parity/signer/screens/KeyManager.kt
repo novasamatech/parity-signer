@@ -30,7 +30,7 @@ import io.parity.signer.ui.theme.Bg100
 import io.parity.signer.ui.theme.Bg200
 import org.json.JSONArray
 import org.json.JSONObject
-import uniffi.signer.Action
+import io.parity.signer.uniffi.Action
 import kotlin.math.absoluteValue
 
 /**

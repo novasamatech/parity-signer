@@ -12,7 +12,7 @@ import io.parity.signer.components.NetworkCard
 import io.parity.signer.models.SignerDataModel
 import io.parity.signer.models.pushButton
 import org.json.JSONArray
-import uniffi.signer.Action
+import io.parity.signer.uniffi.Action
 
 @Composable
 fun ManageNetworks(signerDataModel: SignerDataModel) {

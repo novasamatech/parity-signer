@@ -18,7 +18,7 @@ import androidx.security.crypto.MasterKey
 import io.parity.signer.*
 import io.parity.signer.components.Authentication
 import org.json.JSONObject
-import uniffi.signer.*
+import io.parity.signer.uniffi.*
 import java.io.File
 import java.io.FileOutputStream
 

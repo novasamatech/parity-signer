@@ -22,7 +22,7 @@ import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import io.parity.signer.ui.theme.*
 import org.json.JSONObject
-import uniffi.signer.Action
+import io.parity.signer.uniffi.Action
 
 @Composable
 fun RestoreSeedPhraseBox(

@@ -13,8 +13,8 @@ import io.parity.signer.components.*
 import io.parity.signer.models.*
 import io.parity.signer.ui.theme.Text600
 import org.json.JSONObject
-import uniffi.signer.Action
-import uniffi.signer.substratePathCheck
+import io.parity.signer.uniffi.Action
+import io.parity.signer.uniffi.substratePathCheck
 
 @Composable
 fun NewAddressScreen(signerDataModel: SignerDataModel, increment: Boolean) {

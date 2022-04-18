@@ -7,7 +7,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.ui.unit.dp
-import uniffi.signer.Action
+import io.parity.signer.uniffi.Action
 
 @Composable
 fun RestoreSeedPhraseSuggest(

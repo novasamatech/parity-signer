@@ -20,7 +20,7 @@ import io.parity.signer.models.intoImageBitmap
 import io.parity.signer.models.pushButton
 import io.parity.signer.ui.theme.Bg200
 import org.json.JSONObject
-import uniffi.signer.Action
+import io.parity.signer.uniffi.Action
 
 @Composable
 fun KeyDetailsMulti(signerDataModel: SignerDataModel) {

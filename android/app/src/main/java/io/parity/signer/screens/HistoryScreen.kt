@@ -11,7 +11,7 @@ import io.parity.signer.components.HistoryCard
 import io.parity.signer.models.SignerDataModel
 import io.parity.signer.models.pushButton
 import io.parity.signer.models.toListOfJSONObjects
-import uniffi.signer.Action
+import io.parity.signer.uniffi.Action
 
 @Composable
 fun HistoryScreen(signerDataModel: SignerDataModel) {

@@ -4,7 +4,7 @@ import androidx.compose.runtime.Composable
 import io.parity.signer.components.AlertComponent
 import io.parity.signer.models.SignerDataModel
 import io.parity.signer.models.pushButton
-import uniffi.signer.Action
+import io.parity.signer.uniffi.Action
 
 /**
  * Confirmation alert called from backend navigation

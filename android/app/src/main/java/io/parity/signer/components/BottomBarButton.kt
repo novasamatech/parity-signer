@@ -17,8 +17,8 @@ import io.parity.signer.models.pushButton
 import io.parity.signer.ui.theme.Text300
 import io.parity.signer.ui.theme.Text400
 import io.parity.signer.ui.theme.Text600
-import uniffi.signer.Action
-import uniffi.signer.actionGetName
+import io.parity.signer.uniffi.Action
+import io.parity.signer.uniffi.actionGetName
 
 /**
  * Unified bottom bar button view

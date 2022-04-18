@@ -5,9 +5,9 @@ import android.util.Log
 import androidx.camera.core.ImageProxy
 import com.google.mlkit.vision.barcode.BarcodeScanner
 import com.google.mlkit.vision.common.InputImage
-import uniffi.signer.Action
-import uniffi.signer.qrparserGetPacketsTotal
-import uniffi.signer.qrparserTryDecodeQrSequence
+import io.parity.signer.uniffi.Action
+import io.parity.signer.uniffi.qrparserGetPacketsTotal
+import io.parity.signer.uniffi.qrparserTryDecodeQrSequence
 
 //MARK: Camera tools begin
 
