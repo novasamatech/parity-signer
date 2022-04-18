@@ -151,7 +151,9 @@ fn init_history<T: ErrorSource>(
     let batch = make_batch_clear_tree::<T>(database_name, HISTORY)?;
     let events = vec![
         Event::DatabaseInitiated,
-        Event::GeneralVerifierSet(general_verifier.to_owned()),
+        Event::GeneralVerifierSet {
+            verifier: general_verifier.to_owned(),
+        },
     ];
     let start_zero = true;
     events_in_batch::<T>(database_name, start_zero, batch, events)

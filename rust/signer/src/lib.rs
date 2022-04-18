@@ -100,7 +100,7 @@ fn history_acknowledge_warnings(dbname: &str) -> anyhow::Result<(), anyhow::Erro
 }
 
 fn history_entry_system(event: Event, dbname: &str) -> anyhow::Result<(), anyhow::Error> {
-    db_handling::manage_history::history_entry_system(dbname, event.into()).map_err(|e| e.anyhow())
+    db_handling::manage_history::history_entry_system(dbname, event).map_err(|e| e.anyhow())
 }
 
 fn history_seed_name_was_shown(seed_name: &str, dbname: &str) -> anyhow::Result<(), anyhow::Error> {

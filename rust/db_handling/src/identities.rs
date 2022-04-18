@@ -198,7 +198,7 @@ pub(crate) fn create_address<T: ErrorSource>(
         cropped_path,
         network_specs.genesis_hash.as_bytes(),
     );
-    output_events.push(Event::IdentityAdded(identity_history));
+    output_events.push(Event::IdentityAdded { identity_history });
 
     let mut number_in_current = None;
 
@@ -315,7 +315,9 @@ pub fn try_create_seed(
     roots: bool,
     database_name: &str,
 ) -> Result<(), ErrorSigner> {
-    let mut events: Vec<Event> = vec![Event::SeedCreated(seed_name.to_string())];
+    let mut events: Vec<Event> = vec![Event::SeedCreated {
+        seed_created: seed_name.to_string(),
+    }];
     let (id_batch, add_events) = populate_addresses::<Signer>(
         database_name,
         Batch::default(),
@@ -363,7 +365,7 @@ pub fn remove_keys_set(
             &address_details.path,
             network_specs.genesis_hash.as_bytes(),
         );
-        events.push(Event::IdentityRemoved(identity_history));
+        events.push(Event::IdentityRemoved { identity_history });
         address_details.network_id = address_details
             .network_id
             .into_iter()
@@ -599,7 +601,7 @@ pub fn remove_seed(database_name: &str, seed_name: &str) -> Result<(), ErrorSign
                 &address_details.path,
                 &genesis_hash_vec,
             );
-            events.push(Event::IdentityRemoved(identity_history));
+            events.push(Event::IdentityRemoved { identity_history });
         }
     }
     TrDbCold::new()

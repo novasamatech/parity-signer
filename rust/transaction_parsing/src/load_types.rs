@@ -33,8 +33,12 @@ pub fn load_types(data_hex: &str, database_name: &str) -> Result<Action, ErrorSi
                 if new_types == old_types {
                     Err(ErrorSigner::Input(InputSigner::TypesKnown))
                 } else {
-                    stub = stub.new_history_entry(Event::Warning(Warning::TypesNotVerified.show()));
-                    stub = stub.new_history_entry(Event::Warning(Warning::UpdatingTypes.show()));
+                    stub = stub.new_history_entry(Event::Warning {
+                        warning: Warning::TypesNotVerified.show(),
+                    });
+                    stub = stub.new_history_entry(Event::Warning {
+                        warning: Warning::UpdatingTypes.show(),
+                    });
                     stub = stub.add_types(&content_new_types, &checked_info.verifier);
                     let checksum = stub.store_and_get_checksum(database_name)?;
                     let warning_card_1 =
@@ -66,7 +70,9 @@ pub fn load_types(data_hex: &str, database_name: &str) -> Result<Action, ErrorSi
                 if new_types == old_types {
                     Err(ErrorSigner::Input(InputSigner::TypesKnown))
                 } else {
-                    stub = stub.new_history_entry(Event::Warning(Warning::UpdatingTypes.show()));
+                    stub = stub.new_history_entry(Event::Warning {
+                        warning: Warning::UpdatingTypes.show(),
+                    });
                     stub = stub.add_types(&content_new_types, &checked_info.verifier);
                     let checksum = stub.store_and_get_checksum(database_name)?;
                     let warning_card = Card::Warning(Warning::UpdatingTypes).card(&mut index, 0);
@@ -92,14 +98,14 @@ pub fn load_types(data_hex: &str, database_name: &str) -> Result<Action, ErrorSi
                                 .card(&mut index, 0);
                         let warning_card_2 = {
                             if new_types == old_types {
-                                stub = stub.new_history_entry(Event::Warning(
-                                    Warning::TypesAlreadyThere.show(),
-                                ));
+                                stub = stub.new_history_entry(Event::Warning {
+                                    warning: Warning::TypesAlreadyThere.show(),
+                                });
                                 Card::Warning(Warning::TypesAlreadyThere).card(&mut index, 0)
                             } else {
-                                stub = stub.new_history_entry(Event::Warning(
-                                    Warning::UpdatingTypes.show(),
-                                ));
+                                stub = stub.new_history_entry(Event::Warning {
+                                    warning: Warning::UpdatingTypes.show(),
+                                });
                                 Card::Warning(Warning::UpdatingTypes).card(&mut index, 0)
                             }
                         };

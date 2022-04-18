@@ -153,9 +153,9 @@ impl GeneralHold {
     ) -> Result<TrDbColdStub, ErrorSigner> {
         let former_general_verifier = get_general_verifier(database_name)?;
         let mut out = stub;
-        out = out.new_history_entry(Event::Warning(
-            Warning::GeneralVerifierAppeared(self).show(),
-        ));
+        out = out.new_history_entry(Event::Warning {
+            warning: Warning::GeneralVerifierAppeared(self).show(),
+        });
         for x in self.metadata_set.iter() {
             out = out.remove_metadata(x)
         }
@@ -229,7 +229,7 @@ impl Hold {
             }
             .show(),
         };
-        out = out.new_history_entry(Event::Warning(warning));
+        out = out.new_history_entry(Event::Warning { warning });
         for x in self.metadata_set.iter() {
             out = out.remove_metadata(x)
         }

@@ -219,7 +219,9 @@ pub fn enter_events<T: ErrorSource>(
 /// Interacts with the user interface.
 #[cfg(feature = "signer")]
 pub fn history_entry_user(database_name: &str, string_from_user: &str) -> Result<(), ErrorSigner> {
-    let events = vec![Event::UserEntry(string_from_user.to_string())];
+    let events = vec![Event::UserEntry {
+        user_entry: string_from_user.to_string(),
+    }];
     enter_events::<Signer>(database_name, events)
 }
 
@@ -265,7 +267,12 @@ pub fn reset_danger_status_to_safe(database_name: &str) -> Result<(), ErrorSigne
 /// Applicable only to Signer side.
 /// Interacts with the user interface.
 #[cfg(feature = "signer")]
-pub fn seed_name_was_shown(database_name: &str, seed_name: String) -> Result<(), ErrorSigner> {
-    let events = vec![Event::SeedNameWasShown(seed_name)];
+pub fn seed_name_was_shown(
+    database_name: &str,
+    seed_name_was_shown: String,
+) -> Result<(), ErrorSigner> {
+    let events = vec![Event::SeedNameWasShown {
+        seed_name_was_shown,
+    }];
     enter_events::<Signer>(database_name, events)
 }

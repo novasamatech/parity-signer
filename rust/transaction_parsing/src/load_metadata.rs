@@ -76,8 +76,9 @@ pub fn load_metadata(data_hex: &str, database_name: &str) -> Result<Action, Erro
     let mut index = 0;
     let optional_ext_warning = {
         if meta_values.warn_incomplete_extensions {
-            stub = stub
-                .new_history_entry(Event::Warning(Warning::MetadataExtensionsIncomplete.show()));
+            stub = stub.new_history_entry(Event::Warning {
+                warning: Warning::MetadataExtensionsIncomplete.show(),
+            });
             Some(Card::Warning(Warning::MetadataExtensionsIncomplete).card(&mut index, 0))
         } else {
             None
@@ -86,7 +87,9 @@ pub fn load_metadata(data_hex: &str, database_name: &str) -> Result<Action, Erro
 
     let first_card = match checked_info.verifier {
         Verifier { v: None } => {
-            stub = stub.new_history_entry(Event::Warning(Warning::NotVerified.show()));
+            stub = stub.new_history_entry(Event::Warning {
+                warning: Warning::NotVerified.show(),
+            });
             match valid_current_verifier {
                 ValidCurrentVerifier::Custom {
                     v: Verifier { v: None },

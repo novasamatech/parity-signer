@@ -46,7 +46,9 @@ pub fn add_specs(data_hex: &str, database_name: &str) -> Result<Action, ErrorSig
     match possible_valid_current_verifier {
         None => match checked_info.verifier {
             Verifier { v: None } => {
-                stub = stub.new_history_entry(Event::Warning(Warning::NotVerified.show()));
+                stub = stub.new_history_entry(Event::Warning {
+                    warning: Warning::NotVerified.show(),
+                });
                 stub = stub.add_network_specs(
                     &specs,
                     &ValidCurrentVerifier::Custom {
@@ -167,8 +169,9 @@ pub fn add_specs(data_hex: &str, database_name: &str) -> Result<Action, ErrorSig
                 Verifier { v: None } => {
                     match checked_info.verifier {
                         Verifier { v: None } => {
-                            stub =
-                                stub.new_history_entry(Event::Warning(Warning::NotVerified.show()));
+                            stub = stub.new_history_entry(Event::Warning {
+                                warning: Warning::NotVerified.show(),
+                            });
                             let warning_card =
                                 Card::Warning(Warning::NotVerified).card(&mut index, 0);
                             if specs_are_new(&specs, database_name)? {
@@ -226,9 +229,10 @@ pub fn add_specs(data_hex: &str, database_name: &str) -> Result<Action, ErrorSig
                                         ))
                                         .card(&mut index, 0),
                                     );
-                                    stub = stub.new_history_entry(Event::Warning(
-                                        Warning::NetworkSpecsAlreadyThere(&specs.title).show(),
-                                    ));
+                                    stub = stub.new_history_entry(Event::Warning {
+                                        warning: Warning::NetworkSpecsAlreadyThere(&specs.title)
+                                            .show(),
+                                    });
                                 };
                                 stub = stub.add_network_specs(
                                     &specs,
@@ -274,9 +278,10 @@ pub fn add_specs(data_hex: &str, database_name: &str) -> Result<Action, ErrorSig
                                         ))
                                         .card(&mut index, 0),
                                     );
-                                    stub = stub.new_history_entry(Event::Warning(
-                                        Warning::NetworkSpecsAlreadyThere(&specs.title).show(),
-                                    ));
+                                    stub = stub.new_history_entry(Event::Warning {
+                                        warning: Warning::NetworkSpecsAlreadyThere(&specs.title)
+                                            .show(),
+                                    });
                                 };
                                 stub = stub.add_network_specs(
                                     &specs,
@@ -315,9 +320,10 @@ pub fn add_specs(data_hex: &str, database_name: &str) -> Result<Action, ErrorSig
                                         ))
                                         .card(&mut index, 0),
                                     );
-                                    stub = stub.new_history_entry(Event::Warning(
-                                        Warning::NetworkSpecsAlreadyThere(&specs.title).show(),
-                                    ));
+                                    stub = stub.new_history_entry(Event::Warning {
+                                        warning: Warning::NetworkSpecsAlreadyThere(&specs.title)
+                                            .show(),
+                                    });
                                 };
                                 stub = stub.add_network_specs(
                                     &specs,
@@ -376,9 +382,10 @@ pub fn add_specs(data_hex: &str, database_name: &str) -> Result<Action, ErrorSig
                                         ))
                                         .card(&mut index, 0),
                                     );
-                                    stub = stub.new_history_entry(Event::Warning(
-                                        Warning::NetworkSpecsAlreadyThere(&specs.title).show(),
-                                    ));
+                                    stub = stub.new_history_entry(Event::Warning {
+                                        warning: Warning::NetworkSpecsAlreadyThere(&specs.title)
+                                            .show(),
+                                    });
                                 };
                                 stub = stub.add_network_specs(
                                     &specs,
@@ -432,7 +439,9 @@ pub fn add_specs(data_hex: &str, database_name: &str) -> Result<Action, ErrorSig
             Verifier { v: None } => match checked_info.verifier {
                 Verifier { v: None } => {
                     let warning_card = Card::Warning(Warning::NotVerified).card(&mut index, 0);
-                    stub = stub.new_history_entry(Event::Warning(Warning::NotVerified.show()));
+                    stub = stub.new_history_entry(Event::Warning {
+                        warning: Warning::NotVerified.show(),
+                    });
                     if specs_are_new(&specs, database_name)? {
                         stub = stub.add_network_specs(
                             &specs,
@@ -473,9 +482,9 @@ pub fn add_specs(data_hex: &str, database_name: &str) -> Result<Action, ErrorSig
                             Card::Warning(Warning::NetworkSpecsAlreadyThere(&specs.title))
                                 .card(&mut index, 0),
                         );
-                        stub = stub.new_history_entry(Event::Warning(
-                            Warning::NetworkSpecsAlreadyThere(&specs.title).show(),
-                        ));
+                        stub = stub.new_history_entry(Event::Warning {
+                            warning: Warning::NetworkSpecsAlreadyThere(&specs.title).show(),
+                        });
                     };
                     stub = stub.add_network_specs(
                         &specs,
