@@ -25,7 +25,7 @@ if [ "$1" == "ios" ]
     
     cd "$(dirname "${0}")/../rust/signer"
 
-    uniffi-bindgen src/signer.udl --language swift --out-dir ../../ios/NativeSigner/Generated
+    uniffi-bindgen generate src/signer.udl --language swift --out-dir ../../ios/NativeSigner/Generated
 
     for i in "${IOS_ARCHS[@]}";
       do
