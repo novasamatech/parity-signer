@@ -82,6 +82,7 @@
 		2D72B4F626EF3BC50081E879 /* Navigator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D72B4F526EF3BC50081E879 /* Navigator.swift */; };
 		2D72B4FA26EF7D1C0081E879 /* Seeds.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D72B4F926EF7D1C0081E879 /* Seeds.swift */; };
 		2D72D52A2732B8A7004BA7C9 /* Database in Resources */ = {isa = PBXBuildFile; fileRef = 2D72D5292732B8A7004BA7C9 /* Database */; };
+		2D75EFA1280F163700C48FAF /* signer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D75EFA0280F163700C48FAF /* signer.swift */; };
 		2D7A7BCE26BBC5690053C1E0 /* LaunchScreen.xib in Resources */ = {isa = PBXBuildFile; fileRef = 2D7A7BCD26BBC5690053C1E0 /* LaunchScreen.xib */; };
 		2D7A7BD426BBEAF00053C1E0 /* Canary.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D7A7BD326BBEAF00053C1E0 /* Canary.swift */; };
 		2D7A7BD626C1126C0053C1E0 /* Utils.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D7A7BD526C1126C0053C1E0 /* Utils.swift */; };
@@ -168,9 +169,25 @@
 		2DE72BD426A588C9002BB752 /* NativeSignerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2DE72BD326A588C9002BB752 /* NativeSignerTests.swift */; };
 		2DE72BDF26A588C9002BB752 /* NativeSignerUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2DE72BDE26A588C9002BB752 /* NativeSignerUITests.swift */; };
 		2DE72C0026A6ADC5002BB752 /* CameraService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2DE72BFF26A6ADC5002BB752 /* CameraService.swift */; };
-		2DE72C0926A98FE9002BB752 /* libsigner.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 2DE72C0826A98FE9002BB752 /* libsigner.a */; };
 		2DE72C0F26A99885002BB752 /* RustNative.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2DE72C0E26A99885002BB752 /* RustNative.swift */; };
 /* End PBXBuildFile section */
+
+/* Begin PBXBuildRule section */
+		2D75EF98280EA43300C48FAF /* PBXBuildRule */ = {
+			isa = PBXBuildRule;
+			compilerSpec = com.apple.compilers.proxy.script;
+			filePatterns = "*.udl";
+			fileType = pattern.proxy;
+			inputFiles = (
+			);
+			isEditable = 1;
+			outputFiles = (
+				"$(SRCROOT)/NativeSigner/Generated/$(INPUT_BASE_FILE).h",
+				"$(SRCROOT)/NativeSigner/Generated/$(INPUT_BASE_FILE)FFI.h",
+			);
+			script = "# Type a script or drag a script file from your workspace to insert its path.\n# This could generate bindings but does not work as expected. This \nuniffi-bindgen generate \"$INPUT_FILE_PATH\" --language swift --out-dir \"$SRCROOT/NativeSigner/Generated/\"\n";
+		};
+/* End PBXBuildRule section */
 
 /* Begin PBXContainerItemProxy section */
 		2DE72BD026A588C9002BB752 /* PBXContainerItemProxy */ = {
@@ -265,6 +282,9 @@
 		2D72B4F526EF3BC50081E879 /* Navigator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Navigator.swift; sourceTree = "<group>"; };
 		2D72B4F926EF7D1C0081E879 /* Seeds.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Seeds.swift; sourceTree = "<group>"; };
 		2D72D5292732B8A7004BA7C9 /* Database */ = {isa = PBXFileReference; lastKnownFileType = folder; path = Database; sourceTree = "<group>"; };
+		2D75EF9C280EC3B000C48FAF /* NativeSigner-Bridging-Header.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NativeSigner-Bridging-Header.h"; sourceTree = "<group>"; };
+		2D75EFA0280F163700C48FAF /* signer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = signer.swift; sourceTree = "<group>"; };
+		2D75EFA2280F164000C48FAF /* signerFFI.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = signerFFI.h; sourceTree = "<group>"; };
 		2D7A7BCD26BBC5690053C1E0 /* LaunchScreen.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; name = LaunchScreen.xib; path = NativeSigner/LaunchScreen.xib; sourceTree = "<group>"; };
 		2D7A7BD326BBEAF00053C1E0 /* Canary.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = Canary.swift; path = NativeSigner/Components/Canary.swift; sourceTree = SOURCE_ROOT; };
 		2D7A7BD526C1126C0053C1E0 /* Utils.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Utils.swift; sourceTree = "<group>"; };
@@ -357,10 +377,7 @@
 		2DE72BDE26A588C9002BB752 /* NativeSignerUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NativeSignerUITests.swift; sourceTree = "<group>"; };
 		2DE72BE026A588C9002BB752 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		2DE72BFF26A6ADC5002BB752 /* CameraService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraService.swift; sourceTree = "<group>"; };
-		2DE72C0826A98FE9002BB752 /* libsigner.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libsigner.a; sourceTree = "<group>"; };
-		2DE72C0A26A99029002BB752 /* signer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = signer.h; sourceTree = "<group>"; };
 		2DE72C0C26A992D9002BB752 /* libresolv.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libresolv.tbd; path = usr/lib/libresolv.tbd; sourceTree = SDKROOT; };
-		2DE72C0D26A99334002BB752 /* NativeSigner-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "NativeSigner-Bridging-Header.h"; sourceTree = "<group>"; };
 		2DE72C0E26A99885002BB752 /* RustNative.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RustNative.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -369,7 +386,6 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				2DE72C0926A98FE9002BB752 /* libsigner.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -397,6 +413,15 @@
 				2D48F3A1276CA49D004B27BE /* MConfirm.swift */,
 			);
 			path = AlertModels;
+			sourceTree = "<group>";
+		};
+		2D75EF9E280F02B900C48FAF /* Generated */ = {
+			isa = PBXGroup;
+			children = (
+				2D75EFA2280F164000C48FAF /* signerFFI.h */,
+				2D75EFA0280F163700C48FAF /* signer.swift */,
+			);
+			path = Generated;
 			sourceTree = "<group>";
 		};
 		2D7A7BC526BA96D00053C1E0 /* Cards */ = {
@@ -615,6 +640,7 @@
 		2DE72BB526A588C7002BB752 = {
 			isa = PBXGroup;
 			children = (
+				2D75EF9C280EC3B000C48FAF /* NativeSigner-Bridging-Header.h */,
 				2D7A7BCD26BBC5690053C1E0 /* LaunchScreen.xib */,
 				2DE72BC026A588C7002BB752 /* NativeSigner */,
 				2DE72BD226A588C9002BB752 /* NativeSignerTests */,
@@ -643,16 +669,14 @@
 				2D7A7BC726BA97A50053C1E0 /* Modals */,
 				2D7A7BC626BA974E0053C1E0 /* Screens */,
 				2D7A7BC526BA96D00053C1E0 /* Cards */,
-				2DE72C0826A98FE9002BB752 /* libsigner.a */,
-				2DE72C0A26A99029002BB752 /* signer.h */,
 				2DE72BEF26A5981C002BB752 /* Models */,
 				2DE72BC126A588C7002BB752 /* NativeSignerApp.swift */,
 				2DE72C1226AACB25002BB752 /* Database */,
 				2DE72BC526A588C9002BB752 /* Assets.xcassets */,
 				2DB037BD270F12BB00A318B2 /* Fonts */,
 				2DE72BCA26A588C9002BB752 /* Info.plist */,
+				2D75EF9E280F02B900C48FAF /* Generated */,
 				2DE72BC726A588C9002BB752 /* Preview Content */,
-				2DE72C0D26A99334002BB752 /* NativeSigner-Bridging-Header.h */,
 			);
 			path = NativeSigner;
 			sourceTree = "<group>";
@@ -727,11 +751,13 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 2DE72BE326A588C9002BB752 /* Build configuration list for PBXNativeTarget "NativeSigner" */;
 			buildPhases = (
+				2D75EF99280EACC800C48FAF /* Run Script */,
 				2DE72BBA26A588C7002BB752 /* Sources */,
 				2DE72BBB26A588C7002BB752 /* Frameworks */,
 				2DE72BBC26A588C7002BB752 /* Resources */,
 			);
 			buildRules = (
+				2D75EF98280EA43300C48FAF /* PBXBuildRule */,
 			);
 			dependencies = (
 			);
@@ -855,6 +881,27 @@
 		};
 /* End PBXResourcesBuildPhase section */
 
+/* Begin PBXShellScriptBuildPhase section */
+		2D75EF99280EACC800C48FAF /* Run Script */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			name = "Run Script";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "# Type a script or drag a script file from your workspace to insert its path.\n$SRCROOT/../scripts/build.sh ios\n";
+		};
+/* End PBXShellScriptBuildPhase section */
+
 /* Begin PBXSourcesBuildPhase section */
 		2DE72BBA26A588C7002BB752 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
@@ -883,6 +930,7 @@
 				2D48F3A0276C8D5E004B27BE /* LogMenu.swift in Sources */,
 				2D48F36D27636092004B27BE /* MBackup.swift in Sources */,
 				2DAA82A127885BAF002917C0 /* TCDefault.swift in Sources */,
+				2D75EFA1280F163700C48FAF /* signer.swift in Sources */,
 				2DAA82A327885C2E002917C0 /* TCIdentityField.swift in Sources */,
 				2D48F3C62774AEE7004B27BE /* SelectSeedForBackup.swift in Sources */,
 				2DA5F85F27566C3600D8DD29 /* TCTypesInfo.swift in Sources */,
@@ -1185,7 +1233,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = io.parity.NativeSigner;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
-				SWIFT_OBJC_BRIDGING_HEADER = "$(PROJECT_DIR)/NativeSigner/NativeSigner-Bridging-Header.h";
+				SWIFT_OBJC_BRIDGING_HEADER = "$(PROJECT_DIR)/NativeSigner-Bridging-Header.h";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				VALID_ARCHS = "arm64 arm64e x86_64";
@@ -1218,7 +1266,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = io.parity.NativeSigner;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
-				SWIFT_OBJC_BRIDGING_HEADER = "$(PROJECT_DIR)/NativeSigner/NativeSigner-Bridging-Header.h";
+				SWIFT_OBJC_BRIDGING_HEADER = "$(PROJECT_DIR)/NativeSigner-Bridging-Header.h";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				VALID_ARCHS = "arm64 arm64e x86_64";

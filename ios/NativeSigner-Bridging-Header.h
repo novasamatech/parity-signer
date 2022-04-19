@@ -8,6 +8,6 @@
 #ifndef NativeSigner_Bridging_Header_h
 #define NativeSigner_Bridging_Header_h
 
-#import "signer.h"
+#import "signerFFI.h"
 
 #endif /* NativeSigner_Bridging_Header_h */
