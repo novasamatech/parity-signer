@@ -88,7 +88,7 @@ pub struct DeriveState {
 #[derive(Debug, Clone)]
 pub struct TransactionState {
     entered_info: EnteredInfo,
-    action: transaction_parsing::Action,
+    action: transaction_parsing::TransactionAction,
     comment: String,
     counter: u8,
 }
@@ -426,7 +426,7 @@ impl TransactionState {
         author_info: String,
         network_info: String,
     ) -> Self {
-        let action = transaction_parsing::Action::Sign {
+        let action = transaction_parsing::TransactionAction::Sign {
             content,
             checksum: new_checksum,
             has_pwd,
@@ -440,7 +440,7 @@ impl TransactionState {
             counter: self.counter + 1,
         }
     }
-    pub fn action(&self) -> transaction_parsing::Action {
+    pub fn action(&self) -> transaction_parsing::TransactionAction {
         self.action.to_owned()
     }
     pub fn seed(&self) -> String {

@@ -52,8 +52,12 @@ fn action_get_name(action: &Action) -> String {
     .to_string()
 }
 
-fn backend_action(action: Action, details: &str, seed_phrase: &str) -> String {
-    navigator::do_action(action, details, seed_phrase)
+fn backend_action(
+    action: Action,
+    details: &str,
+    seed_phrase: &str,
+) -> Result<ActionResult, ErrorDisplayed> {
+    navigator::do_action(action, details, seed_phrase).map_err(|s| ErrorDisplayed::Str { s })
 }
 
 fn init_navigation(dbname: &str, seed_names: &str) {
@@ -109,10 +113,10 @@ fn history_seed_name_was_shown(seed_name: &str, dbname: &str) -> anyhow::Result<
 }
 
 fn get_all_tx_cards() -> String {
-    if let transaction_parsing::Action::Read(content) =
+    if let transaction_parsing::TransactionAction::Read { r } =
         transaction_parsing::test_all_cards::make_all_cards()
     {
-        format!("{{{}}}", content)
+        format!("{{{}}}", r)
     } else {
         "".to_string()
     }

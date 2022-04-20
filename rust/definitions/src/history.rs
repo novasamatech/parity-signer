@@ -538,7 +538,7 @@ impl SignMessageDisplay {
 }
 
 /// Events that could be recorded in the history log
-#[derive(Decode, Encode, Clone)]
+#[derive(PartialEq, Decode, Encode, Clone)]
 pub enum Event {
     /// Network metadata was added
     MetadataAdded {

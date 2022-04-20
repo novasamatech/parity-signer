@@ -16,7 +16,7 @@ use std::str::FromStr;
 
 use crate::cards::{Card, Warning};
 use crate::holds::{GeneralHold, Hold};
-use crate::Action;
+use crate::TransactionAction;
 
 const PUBLIC: [u8; 32] = [
     142, 175, 4, 21, 22, 135, 115, 99, 38, 201, 254, 161, 126, 37, 252, 82, 135, 97, 54, 147, 201,
@@ -32,7 +32,7 @@ fn verifier_value_sr25519() -> VerifierValue {
 /// Function to pring all types of cards.
 /// Should be used to check how the cards are printed in the app.
 
-pub fn make_all_cards() -> Action {
+pub fn make_all_cards() -> TransactionAction {
     let mut index = 0;
     let mut all_cards: Vec<String> = Vec::new();
     let network_specs_westend = NetworkSpecs {
@@ -268,5 +268,5 @@ Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deseru
     }
 
     output_cards.push(']');
-    Action::Read(output_cards)
+    TransactionAction::Read { r: output_cards }
 }

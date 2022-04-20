@@ -1,5 +1,6 @@
 //! Navigation state of the app
 
+use definitions::navigation::{ActionResult, LogScreenEntry, ScreenData};
 use sp_runtime::MultiSigner;
 use zeroize::Zeroize;
 
@@ -10,7 +11,7 @@ use crate::screens::{
     AddressState, AddressStateMulti, DeriveState, KeysState, RecoverSeedPhraseState, Screen,
     SpecialtyKeysState, SufficientCryptoState, TransactionState,
 };
-use db_handling::interface_signer::{print_guess, BIP_CAP, SAFE_RESERVE, WORD_LENGTH};
+use db_handling::interface_signer::guess;
 use definitions::{
     error::{AddressGeneration, AddressGenerationCommon, AddressKeySource, ErrorSource},
     error_signer::{
@@ -374,7 +375,7 @@ impl State {
             }
             Screen::Transaction(ref t) => {
                 match t.action() {
-                    transaction_parsing::Action::Sign {
+                    transaction_parsing::TransactionAction::Sign {
                         content,
                         checksum,
                         has_pwd,
@@ -444,33 +445,39 @@ impl State {
                             }
                         }
                     }
-                    transaction_parsing::Action::Stub(_, checksum, stub_nav) => {
-                        match transaction_signing::handle_stub(checksum, dbname) {
-                            Ok(()) => match stub_nav {
-                                transaction_parsing::StubNav::AddSpecs(network_specs_key) => {
-                                    new_navstate = Navstate::clean_screen(Screen::NetworkDetails(
-                                        network_specs_key,
-                                    ));
-                                }
-                                transaction_parsing::StubNav::LoadMeta(network_specs_key) => {
-                                    new_navstate = Navstate::clean_screen(Screen::NetworkDetails(
-                                        network_specs_key,
-                                    ));
-                                }
-                                transaction_parsing::StubNav::LoadTypes => {
-                                    new_navstate = Navstate::clean_screen(Screen::ManageNetworks);
-                                }
-                            },
-                            Err(e) => {
-                                new_navstate.alert = Alert::Error;
-                                errorline.push_str(&<Signer>::show(&e));
+                    transaction_parsing::TransactionAction::Stub {
+                        s: _,
+                        u: checksum,
+                        stub: stub_nav,
+                    } => match transaction_signing::handle_stub(checksum, dbname) {
+                        Ok(()) => match stub_nav {
+                            transaction_parsing::StubNav::AddSpecs {
+                                n: network_specs_key,
+                            } => {
+                                new_navstate = Navstate::clean_screen(Screen::NetworkDetails(
+                                    network_specs_key,
+                                ));
                             }
+                            transaction_parsing::StubNav::LoadMeta {
+                                l: network_specs_key,
+                            } => {
+                                new_navstate = Navstate::clean_screen(Screen::NetworkDetails(
+                                    network_specs_key,
+                                ));
+                            }
+                            transaction_parsing::StubNav::LoadTypes => {
+                                new_navstate = Navstate::clean_screen(Screen::ManageNetworks);
+                            }
+                        },
+                        Err(e) => {
+                            new_navstate.alert = Alert::Error;
+                            errorline.push_str(&<Signer>::show(&e));
                         }
-                    }
-                    transaction_parsing::Action::Read(_) => {
+                    },
+                    transaction_parsing::TransactionAction::Read { .. } => {
                         println!("GoForward does nothing here")
                     }
-                    transaction_parsing::Action::Derivations {
+                    transaction_parsing::TransactionAction::Derivations {
                         content: _,
                         network_info: _,
                         checksum,
@@ -1423,7 +1430,7 @@ impl State {
         action: Action,
         details_str: &str,
         secret_seed_phrase: &str,
-    ) -> String {
+    ) -> Result<ActionResult, String> {
         let mut new_navstate = self.navstate.to_owned();
 
         if let Some(ref dbname) = self.dbname.clone() {
@@ -1485,8 +1492,20 @@ impl State {
             };
 
             //Prepare screen details
-            let screen_details: String = match new_navstate.screen {
+            let screen_details: ScreenData = match new_navstate.screen {
                 Screen::Log => {
+                    let history = db_handling::manage_history::get_history(dbname).unwrap();
+                    let log = history
+                        .into_iter()
+                        .map(|(order, entry)| LogScreenEntry {
+                            order: order.stamp(),
+                            timestamp: entry.timestamp,
+                            events: entry.events,
+                        })
+                        .collect();
+
+                    ScreenData::LogData { log }
+                    /*
                     match db_handling::manage_history::print_history(dbname) {
                         Ok(a) => a,
                         Err(e) => {
@@ -1495,88 +1514,93 @@ impl State {
                             "".to_string()
                         },
                     }
-                },
+                    */
+                }
                 Screen::LogDetails(order) => {
-                    match transaction_parsing::print_history_entry_by_order_with_decoding(order, dbname) {
-                        Ok(a) => a,
-                        Err(e) => {
-                            new_navstate.alert = Alert::ErrorDisplay;
-                            errorline.push_str(&<Signer>::show(&e));
-                            "".to_string()
-                        },
-                    }
-                },
-                Screen::Scan => "".to_string(),
-                Screen::Transaction(ref t) => {
-                    match t.action() {
-                        transaction_parsing::Action::Derivations{content, network_info, checksum: _, network_specs_key: _} => format!("\"content\":{{{}}},\"network_info\":{{{}}},\"type\":\"import_derivations\"", content, network_info),
-                        transaction_parsing::Action::Sign{content, checksum: _, has_pwd: _, author_info, network_info} => {
-                            let action_type = match new_navstate.modal {
-                                Modal::SignatureReady(_) => "done",
-                                _ => "sign",
-                            };
-                            format!("\"content\":{{{}}},\"author_info\":{{{}}},\"network_info\":{{{}}},\"type\":\"{}\"", content, author_info, network_info, action_type)
-                        },
-                        transaction_parsing::Action::Stub(content, _, _) => format!("\"content\":{{{}}},\"type\":\"stub\"", content),
-                        transaction_parsing::Action::Read(content) => format!("\"content\":{{{}}},\"type\":\"read\"", content),
-                    }
-                },
+                    let details_data =
+                        transaction_parsing::print_history_entry_by_order_with_decoding(
+                            order, dbname,
+                        )
+                        .unwrap();
+                    ScreenData::LogDetailsData { details_data }
+                }
+                Screen::Scan => ScreenData::ScanData,
+                Screen::Transaction(ref t) => ScreenData::TransactionData { t: t.action() },
                 Screen::SeedSelector | Screen::SelectSeedForBackup => {
-                    match db_handling::interface_signer::print_all_seed_names_with_identicons(dbname, &self.seed_names) {
-                        Ok(a) => format!("\"seedNameCards\":{}", a),
-                        Err(e) => {
-                            new_navstate.alert = Alert::ErrorDisplay;
-                            errorline.push_str(&<Signer>::show(&e));
-                            "\"seedNameCards\":[]".to_string()
-                        },
-                    }
-                },
+                    let n = db_handling::interface_signer::get_all_seed_names_with_identicons(
+                        dbname,
+                        &self.seed_names,
+                    )
+                    .unwrap();
+                    ScreenData::SeedNamesWithIdenticons { n }
+                }
                 Screen::Keys(ref keys_state) => {
-                    match db_handling::interface_signer::print_identities_for_seed_name_and_network(dbname, &keys_state.seed_name(), &keys_state.network_specs_key(), keys_state.get_swiped_key(), keys_state.get_multiselect_keys()) {
-                        Ok(a) => {
-                            let count = {
-                                if let SpecialtyKeysState::MultiSelect(ref multiselect) = keys_state.get_specialty() {multiselect.len().to_string()}
-                                else {String::new()}
-                            };
-                            format!("{},\"multiselect_mode\":{},\"multiselect_count\":\"{}\"", a, keys_state.is_multiselect(), count)
-                        },
-                        Err(e) => {
-                            new_navstate.alert = Alert::ErrorDisplay;
-                            errorline.push_str(&<Signer>::show(&e));
-                            "".to_string()
-                        },
+                    let i =
+                        db_handling::interface_signer::print_identities_for_seed_name_and_network(
+                            dbname,
+                            &keys_state.seed_name(),
+                            &keys_state.network_specs_key(),
+                            keys_state.get_swiped_key(),
+                            keys_state.get_multiselect_keys(),
+                        )
+                        .unwrap();
+                    let multiselect_mode = keys_state.is_multiselect();
+                    let multiselect_count =
+                        if let SpecialtyKeysState::MultiSelect(ref multiselect) =
+                            keys_state.get_specialty()
+                        {
+                            multiselect.len().to_string()
+                        } else {
+                            String::new()
+                        };
+                    ScreenData::IdentitiesForSeedNameAndNetworkData {
+                        i,
+                        multiselect_mode,
+                        multiselect_count,
                     }
-                },
+                }
                 Screen::KeyDetails(ref address_state) => {
-                    match db_handling::interface_signer::export_key (dbname, &address_state.multisigner(), &address_state.seed_name(), &address_state.network_specs_key()) {
-                        Ok(a) => a,
-                        Err(e) => {
-                            new_navstate.alert = Alert::ErrorDisplay;
-                            errorline.push_str(&<Signer>::show(&e));
-                            "".to_string()
-                        },
-                    }
-                },
+                    let k = db_handling::interface_signer::export_key(
+                        dbname,
+                        &address_state.multisigner(),
+                        &address_state.seed_name(),
+                        &address_state.network_specs_key(),
+                    )
+                    .unwrap();
+                    ScreenData::ExportedKeyData { k }
+                }
                 Screen::KeyDetailsMulti(ref address_state_multi) => {
-                    match db_handling::interface_signer::export_key (dbname, &address_state_multi.multisigner(), &address_state_multi.seed_name(), &address_state_multi.network_specs_key()) {
-                        Ok(a) => format!("{},\"current_number\":\"{}\",\"out_of\":\"{}\"", a, address_state_multi.number(), address_state_multi.out_of()),
-                        Err(e) => {
-                            new_navstate.alert = Alert::ErrorDisplay;
-                            errorline.push_str(&<Signer>::show(&e));
-                            "".to_string()
-                        },
+                    let k = db_handling::interface_signer::export_key(
+                        dbname,
+                        &address_state_multi.multisigner(),
+                        &address_state_multi.seed_name(),
+                        &address_state_multi.network_specs_key(),
+                    )
+                    .unwrap();
+                    ScreenData::ExportedKeyDataMulti {
+                        k,
+                        current_number: address_state_multi.number() as u32,
+                        out_of: address_state_multi.out_of() as u32,
                     }
+                }
+                Screen::NewSeed => ScreenData::KeyboardData {
+                    keyboard: new_navstate.keyboard(),
                 },
-                Screen::NewSeed => format!("\"keyboard\":{}", new_navstate.keyboard()),
-                Screen::RecoverSeedName(ref seed_name) => format!("\"seed_name\":\"{}\",\"keyboard\":{}", seed_name, new_navstate.keyboard()),
+                Screen::RecoverSeedName(ref seed_name) => ScreenData::RecoverSeedNameData {
+                    seed_name: seed_name.to_string(),
+                    keyboard: new_navstate.keyboard(),
+                },
                 Screen::RecoverSeedPhrase(ref recover_seed_phrase_state) => {
                     let draft = recover_seed_phrase_state.draft();
                     let user_input = draft.user_input();
-                    let guess_set = print_guess(user_input);
+                    let guess_set = guess(user_input);
+                    /*
                     let open_part = format!("\"seed_name\":\"{}\",\"keyboard\":{},\"user_input\":\" {}\",\"guess_set\":{},\"draft\":", recover_seed_phrase_state.name(), new_navstate.keyboard(), user_input, guess_set); // first space in user input is intended
                     let mut out = String::with_capacity(open_part.len() + SAFE_RESERVE + (WORD_LENGTH+1)*BIP_CAP + 15); // fit open part, draft as json, ready seed as str
                     out.push_str(&open_part);
+                    */
 
+                    let mut out = String::new();
                     let mut seed_draft_print = draft.print();
                     out.push_str(&seed_draft_print);
                     seed_draft_print.zeroize();
@@ -1589,68 +1613,59 @@ impl State {
                     }
                     seed_finalized.zeroize();
 
-                    out
-                },
+                    ScreenData::RecoverSeedPhraseData {
+                        seed_name: recover_seed_phrase_state.name(),
+                        keyboard: new_navstate.keyboard(),
+                        user_input: user_input.to_string(),
+                        guess_set: guess_set.iter().map(|s| s.to_string()).collect(),
+                        draft: out,
+                    }
+                }
                 Screen::DeriveKey(ref derive_state) => {
-                    match db_handling::interface_signer::derive_prep (dbname, &derive_state.seed_name(), &derive_state.network_specs_key(), derive_state.collision(), details_str) {
-                        Ok(a) => {
-                            format!("{},\"keyboard\":{}", a, new_navstate.keyboard())
-                        },
-                        Err(e) => {
-                            new_navstate.alert = Alert::ErrorDisplay;
-                            errorline.push_str(&<Signer>::show(&e));
-                            String::from("\"keyboard\":false")
-                        },
+                    let d = db_handling::interface_signer::derive_prep(
+                        dbname,
+                        &derive_state.seed_name(),
+                        &derive_state.network_specs_key(),
+                        derive_state.collision(),
+                        details_str,
+                    )
+                    .unwrap();
+                    ScreenData::DerivePrepData {
+                        d,
+                        keyboard: new_navstate.keyboard(),
                     }
-                },
-                Screen::Settings => { // for now has same content as Screen::Verifier
-                    match db_handling::helpers::get_general_verifier(dbname) {
-                        Ok(a) => a.show_card(),
-                        Err(e) => format!("\"error\":\"{}\"", <Signer>::show(&e)),
-                    }
-                },
+                }
+                Screen::Settings => {
+                    // for now has same content as Screen::Verifier
+                    let verifier = db_handling::helpers::get_general_verifier(dbname).unwrap();
+                    ScreenData::SettingsData { verifier }
+                }
                 Screen::Verifier => {
-                    match db_handling::helpers::get_general_verifier(dbname) {
-                        Ok(a) => a.show_card(),
-                        Err(e) => {
-                            new_navstate.alert = Alert::ErrorDisplay;
-                            errorline.push_str(&<Signer>::show(&e));
-                            "".to_string()
-                        },
-                    }
-                },
+                    let verifier = db_handling::helpers::get_general_verifier(dbname).unwrap();
+                    ScreenData::VerifierData { verifier }
+                }
                 Screen::ManageNetworks => {
-                    match db_handling::interface_signer::show_all_networks(dbname) {
-                        Ok(a) => a,
-                        Err(e) => {
-                            new_navstate.alert = Alert::ErrorDisplay;
-                            errorline.push_str(&<Signer>::show(&e));
-                            "".to_string()
-                        },
-                    }
-                },
+                    let networks =
+                        db_handling::interface_signer::show_all_networks(dbname).unwrap();
+                    ScreenData::ManageNetworksData { networks }
+                }
                 Screen::NetworkDetails(ref network_specs_key) => {
-                    match db_handling::interface_signer::network_details_by_key(dbname, network_specs_key) {
-                        Ok(a) => a,
-                        Err(e) => {
-                            new_navstate.alert = Alert::ErrorDisplay;
-                            errorline.push_str(&<Signer>::show(&e));
-                            "".to_string()
-                        },
-                    }
-                },
+                    let details = db_handling::interface_signer::network_details_by_key(
+                        dbname,
+                        network_specs_key,
+                    )
+                    .unwrap();
+                    ScreenData::NetworkDetailsData { details }
+                }
                 Screen::SignSufficientCrypto(_) => {
-                    match db_handling::interface_signer::print_all_identities(dbname) {
-                        Ok(a) => format!("\"identities\":{}", a),
-                        Err(e) => {
-                            new_navstate.alert = Alert::ErrorDisplay;
-                            errorline.push_str(&<Signer>::show(&e));
-                            "".to_string()
-                        },
-                    }
-                },
-                Screen::Nowhere => "".to_string(),
-                _ => "".to_string(),
+                    let identities =
+                        db_handling::interface_signer::print_all_identities(dbname).unwrap();
+                    ScreenData::AllIdentitiesData { identities }
+                }
+                _ => {
+                    //"".to_string(),
+                    unimplemented!()
+                }
             };
 
             //Prepare modal details
@@ -1719,7 +1734,7 @@ impl State {
                 Modal::SignatureReady(ref a) => format!("\"signature\":\"{}\"", a),
                 Modal::EnterPassword => match new_navstate.screen {
                     Screen::Transaction(ref t) => {
-                        if let transaction_parsing::Action::Sign {
+                        if let transaction_parsing::TransactionAction::Sign {
                             content: _,
                             checksum: _,
                             has_pwd: _,
@@ -1797,6 +1812,7 @@ impl State {
                     }
                 }
                 Modal::SelectSeed => {
+                    /*
                     match db_handling::interface_signer::print_all_seed_names_with_identicons(
                         dbname,
                         &self.seed_names,
@@ -1808,6 +1824,8 @@ impl State {
                             "\"seedNameCards\":[]".to_string()
                         }
                     }
+                    */
+                    unimplemented!()
                 }
                 _ => "".to_string(),
             };
@@ -1822,12 +1840,23 @@ impl State {
             };
 
             self.navstate = new_navstate;
-            format!(
-                "\"screenData\":{{{}}},\"modalData\":{{{}}},\"alertData\":{{{}}}",
-                screen_details, modal_details, alert_details
-            )
+
+            Ok(ActionResult {
+                screen: self.navstate.screen.get_name(),
+                screen_label: self.get_screen_label(),
+                back: self.navstate.screen.has_back(),
+                footer: self.get_footer(),
+                footer_button: self.get_active_navbutton(),
+                right_button: self.get_right_button(),
+                screen_name_type: self.get_screen_name_type(),
+                modal: self.navstate.modal.get_name(),
+                alert: self.navstate.alert.get_name(),
+                screen_data: screen_details,
+                modal_data: format!("{{{}}}", modal_details),
+                alert_data: format!("{{{}}}", alert_details),
+            })
         } else {
-            "\"error\":\"db not initialized\"".to_string()
+            Err("db not initialized".to_string())
         }
     }
 

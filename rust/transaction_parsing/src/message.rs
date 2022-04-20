@@ -12,9 +12,12 @@ use sp_core::H256;
 
 use crate::cards::{make_author_info, Card, Warning};
 use crate::helpers::multisigner_msg_genesis_encryption;
-use crate::Action;
+use crate::TransactionAction;
 
-pub fn process_message(data_hex: &str, database_name: &str) -> Result<Action, ErrorSigner> {
+pub fn process_message(
+    data_hex: &str,
+    database_name: &str,
+) -> Result<TransactionAction, ErrorSigner> {
     let (author_multi_signer, message_vec, genesis_hash_vec, encryption) =
         multisigner_msg_genesis_encryption(data_hex)?;
     let network_specs_key = NetworkSpecsKey::from_parts(&genesis_hash_vec, &encryption);
@@ -58,7 +61,7 @@ pub fn process_message(data_hex: &str, database_name: &str) -> Result<Action, Er
                             "\"network_title\":\"{}\",\"network_logo\":\"{}\"",
                             network_specs.title, network_specs.logo
                         );
-                        Ok(Action::Sign {
+                        Ok(TransactionAction::Sign {
                             content: format!("\"message\":[{}]", message_card),
                             checksum,
                             has_pwd: address_details.has_pwd,
@@ -78,10 +81,12 @@ pub fn process_message(data_hex: &str, database_name: &str) -> Result<Action, Er
                             Card::ParserCard(&ParserCard::Text(message)).card(&mut index, indent);
                         let network_card =
                             Card::NetworkInfo(&network_specs).card(&mut index, indent);
-                        Ok(Action::Read(format!(
-                            "\"author\":[{}],\"warning\":[{}],\"message\":[{},{}]",
-                            author_card, warning_card, message_card, network_card
-                        )))
+                        Ok(TransactionAction::Read {
+                            r: format!(
+                                "\"author\":[{}],\"warning\":[{}],\"message\":[{},{}]",
+                                author_card, warning_card, message_card, network_card
+                            ),
+                        })
                     }
                 }
                 None => {
@@ -95,10 +100,12 @@ pub fn process_message(data_hex: &str, database_name: &str) -> Result<Action, Er
                     let message_card =
                         Card::ParserCard(&ParserCard::Text(message)).card(&mut index, indent);
                     let network_card = Card::NetworkInfo(&network_specs).card(&mut index, indent);
-                    Ok(Action::Read(format!(
-                        "\"author\":[{}],\"warning\":[{}],\"message\":[{},{}]",
-                        author_card, warning_card, message_card, network_card
-                    )))
+                    Ok(TransactionAction::Read {
+                        r: format!(
+                            "\"author\":[{}],\"warning\":[{}],\"message\":[{},{}]",
+                            author_card, warning_card, message_card, network_card
+                        ),
+                    })
                 }
             }
         }
@@ -113,10 +120,12 @@ pub fn process_message(data_hex: &str, database_name: &str) -> Result<Action, Er
             let message_card =
                 Card::ParserCard(&ParserCard::Text(message)).card(&mut index, indent);
             let network_card = Card::NetworkGenesisHash(&genesis_hash_vec).card(&mut index, indent);
-            Ok(Action::Read(format!(
-                "\"author\":[{}],\"error\":[{}],\"message\":[{},{}]",
-                author_card, error_card, message_card, network_card
-            )))
+            Ok(TransactionAction::Read {
+                r: format!(
+                    "\"author\":[{}],\"error\":[{}],\"message\":[{},{}]",
+                    author_card, error_card, message_card, network_card
+                ),
+            })
         }
     }
 }

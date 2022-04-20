@@ -95,7 +95,7 @@ pub fn print_history_page(page_number: u32, database_name: &str) -> Result<Strin
 /// Local helper function to retrieve history entries from the database.
 /// Applicable only to Signer side.
 #[cfg(feature = "signer")]
-fn get_history(database_name: &str) -> Result<Vec<(Order, Entry)>, ErrorSigner> {
+pub fn get_history(database_name: &str) -> Result<Vec<(Order, Entry)>, ErrorSigner> {
     let database = open_db::<Signer>(database_name)?;
     let history = open_tree::<Signer>(&database, HISTORY)?;
     let mut out: Vec<(Order, Entry)> = Vec::new();

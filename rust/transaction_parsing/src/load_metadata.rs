@@ -19,14 +19,17 @@ use definitions::{
 use crate::cards::{Card, Warning};
 use crate::check_signature::pass_crypto;
 use crate::helpers::accept_meta_values;
-use crate::{Action, StubNav};
+use crate::{StubNav, TransactionAction};
 
 enum FirstCard {
     WarningCard(String),
     VerifierCard(String),
 }
 
-pub fn load_metadata(data_hex: &str, database_name: &str) -> Result<Action, ErrorSigner> {
+pub fn load_metadata(
+    data_hex: &str,
+    database_name: &str,
+) -> Result<TransactionAction, ErrorSigner> {
     let checked_info = pass_crypto(data_hex, TransferContent::LoadMeta)?;
     let (meta, genesis_hash) =
         ContentLoadMeta::from_slice(&checked_info.message).meta_genhash::<Signer>()?;
@@ -184,34 +187,42 @@ pub fn load_metadata(data_hex: &str, database_name: &str) -> Result<Action, Erro
         let meta_card = Card::Meta(meta_display).card(&mut index, 0);
         match first_card {
             FirstCard::WarningCard(warning_card) => match optional_ext_warning {
-                Some(ext_warning) => Ok(Action::Stub(
-                    format!(
+                Some(ext_warning) => Ok(TransactionAction::Stub {
+                    s: format!(
                         "\"warning\":[{},{}],\"meta\":[{}]",
                         ext_warning, warning_card, meta_card
                     ),
-                    checksum,
-                    StubNav::LoadMeta(network_specs_key),
-                )),
-                None => Ok(Action::Stub(
-                    format!("\"warning\":[{}],\"meta\":[{}]", warning_card, meta_card),
-                    checksum,
-                    StubNav::LoadMeta(network_specs_key),
-                )),
+                    u: checksum,
+                    stub: StubNav::LoadMeta {
+                        l: network_specs_key,
+                    },
+                }),
+                None => Ok(TransactionAction::Stub {
+                    s: format!("\"warning\":[{}],\"meta\":[{}]", warning_card, meta_card),
+                    u: checksum,
+                    stub: StubNav::LoadMeta {
+                        l: network_specs_key,
+                    },
+                }),
             },
             FirstCard::VerifierCard(verifier_card) => match optional_ext_warning {
-                Some(ext_warning) => Ok(Action::Stub(
-                    format!(
+                Some(ext_warning) => Ok(TransactionAction::Stub {
+                    s: format!(
                         "\"warning\":[{}],\"verifier\":[{}],\"meta\":[{}]",
                         ext_warning, verifier_card, meta_card
                     ),
-                    checksum,
-                    StubNav::LoadMeta(network_specs_key),
-                )),
-                None => Ok(Action::Stub(
-                    format!("\"verifier\":[{}],\"meta\":[{}]", verifier_card, meta_card),
-                    checksum,
-                    StubNav::LoadMeta(network_specs_key),
-                )),
+                    u: checksum,
+                    stub: StubNav::LoadMeta {
+                        l: network_specs_key,
+                    },
+                }),
+                None => Ok(TransactionAction::Stub {
+                    s: format!("\"verifier\":[{}],\"meta\":[{}]", verifier_card, meta_card),
+                    u: checksum,
+                    stub: StubNav::LoadMeta {
+                        l: network_specs_key,
+                    },
+                }),
             },
         }
     } else {

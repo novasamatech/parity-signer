@@ -1,11 +1,9 @@
 #![deny(unused_crate_dependencies)]
 
 use db_handling::manage_history::get_history_entry_by_order;
-use definitions::{
-    error_signer::{ErrorSigner, InputSigner},
-    keyring::NetworkSpecsKey,
-};
+use definitions::error_signer::{ErrorSigner, InputSigner};
 
+pub use definitions::navigation::{StubNav, TransactionAction};
 mod add_specs;
 use add_specs::add_specs;
 pub mod cards;
@@ -29,46 +27,13 @@ use test_all_cards::make_all_cards;
 #[cfg(test)]
 mod tests;
 
-/// Enum containing card sets for three different outcomes:
-/// signing (Sign), accepting (Stub) and reading, for example, in case of an error (Read)
-#[derive(PartialEq, Debug, Clone)]
-pub enum Action {
-    Derivations {
-        content: String,
-        network_info: String,
-        checksum: u32,
-        network_specs_key: NetworkSpecsKey,
-    },
-    Sign {
-        content: String,
-        checksum: u32,
-        has_pwd: bool,
-        author_info: String,
-        network_info: String,
-    },
-    Stub(String, u32, StubNav),
-    Read(String),
-}
-
-/// Enum describing Stub content.
-/// Is used for proper navigation. Variants:
-/// AddSpecs (with associated NetworkSpecsKey), LoadMeta (with associated
-/// NetworkSpecsKey for the first by order network using those metadata),
-/// and LoadTypes
-#[derive(PartialEq, Debug, Clone)]
-pub enum StubNav {
-    AddSpecs(NetworkSpecsKey),
-    LoadMeta(NetworkSpecsKey),
-    LoadTypes,
-}
-
 /// Payload in hex format as it arrives into handling contains following elements:
 /// - prelude, length 6 symbols ("53" stands for substrate, ** - crypto type, ** - transaction type),
 /// see the standard for details,
 /// - actual content (differs between transaction types, could be even empty)
 /// actual content is handled individually depending on prelude
 
-fn handle_scanner_input(payload: &str, dbname: &str) -> Result<Action, ErrorSigner> {
+fn handle_scanner_input(payload: &str, dbname: &str) -> Result<TransactionAction, ErrorSigner> {
     let data_hex = {
         if let Some(a) = payload.strip_prefix("0x") {
             a
@@ -101,10 +66,12 @@ fn handle_scanner_input(payload: &str, dbname: &str) -> Result<Action, ErrorSign
     }
 }
 
-pub fn produce_output(payload: &str, dbname: &str) -> Action {
+pub fn produce_output(payload: &str, dbname: &str) -> TransactionAction {
     match handle_scanner_input(payload, dbname) {
         Ok(out) => out,
-        Err(e) => Action::Read(format!("\"error\":[{}]", Card::Error(e).card(&mut 0, 0))),
+        Err(e) => TransactionAction::Read {
+            r: format!("\"error\":[{}]", Card::Error(e).card(&mut 0, 0)),
+        },
     }
 }
 

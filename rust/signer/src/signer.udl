@@ -131,6 +131,29 @@ dictionary MetaValuesExport {
     VerifierValue signed_by;
 };
 
+dictionary ActionResult {
+    string? screen;
+    string screen_label;
+    boolean back;
+    boolean footer;
+    string footer_button;
+    string right_button;
+    string screen_name_type;
+    string modal;
+    string alert;
+    ScreenData screen_data;
+    string modal_data;
+    string alert_data;
+};
+
+dictionary MetaValues {
+    string name;
+    u32 version;
+    u16? optional_base58prefix;
+    boolean warn_incomplete_extensions;
+    sequence<u8> meta;
+};
+
 [Enum]
 interface Event {
     MetadataAdded(MetaValuesDisplay meta_values_display);
@@ -210,12 +233,152 @@ enum Action {
     "Nothing",
 };
 
+dictionary LogScreenEntry {
+    u32 order;
+    string timestamp;
+    sequence<Event> events;
+};
+
+[Custom]
+typedef string NetworkSpecsKey;
+
+[Enum]
+interface StubNav {
+    AddSpecs(NetworkSpecsKey n);
+    LoadMeta(NetworkSpecsKey l);
+    LoadTypes();
+};
+
+[Enum]
+interface TransactionAction {
+    Derivations(string content, string network_info, u32 checksum, NetworkSpecsKey network_specs_key);
+    Sign(string content, u32 checksum, boolean has_pwd, string author_info, string network_info);
+    Stub(string s, u32 u, StubNav stub);
+    Read(string r);
+};
+
+dictionary SeedNameWithIdenticon {
+    string seed_name;
+    string identicon;
+};
+
+dictionary RootNetworkId {
+    string seed_name;
+    string identicon;
+    string address_key;
+    string base58;
+    boolean swiped;
+    boolean is_multiselect;
+};
+
+dictionary OtherNetworkId {
+    string address_key;
+    string base58;
+    string identicon;
+    boolean has_pwd;
+    string path;
+    boolean swiped;
+    boolean is_multiselect;
+};
+
+dictionary IdentitiesForSeedNameAndNetwork {
+    RootNetworkId root;
+    sequence<OtherNetworkId> set;
+    string title;
+    string logo;
+};
+
+dictionary ExportedKey {
+    string qr;
+    string pubkey;
+    string address_base58;
+    string identicon;
+    string seed_name;
+    string path;
+    string network_title;
+    string network_logo;
+};
+
+dictionary CollisionDisplay {
+    string base58;
+    string path;
+    boolean has_pwd;
+    string identicon;
+    string seed_name;
+};
+
+dictionary DerivePrep {
+    string seed_name;
+    string network_title;
+    string network_logo;
+    string network_specs_key;
+    string suggested_derivation;
+    CollisionDisplay? collision;
+};
+
+dictionary NetworkDetails {
+    NetworkSpecs specs;
+    ValidCurrentVerifier current_verifier;
+    Verifier general_verifier;
+    sequence<MetaValues> meta_values;
+};
+
+dictionary Identity {
+    string seed_name;
+    string address_key;
+    string public_key;
+    string identicon;
+    boolean has_pwd;
+    string path;
+    boolean is_multiselect;
+    string base58;
+};
+
+[Enum]
+interface ScreenData {
+    Empty();
+    LogData(sequence<LogScreenEntry> log);
+    LogDetailsData(string details_data);
+    SettingsData(Verifier verifier);
+    SelectSeedForBackupData();
+    VerifierData(Verifier verifier);
+    DocumentsData();
+    ManageNetworksData(sequence<NetworkSpecs> networks);
+    NetworkDetailsData(NetworkDetails details);
+    SignSufficientCryptoData();
+    ScanData();
+    TransactionData(TransactionAction t);
+    SeedNamesWithIdenticons( sequence<SeedNameWithIdenticon> n);
+    IdentitiesForSeedNameAndNetworkData(
+        IdentitiesForSeedNameAndNetwork i,
+        boolean multiselect_mode,
+        string multiselect_count
+    );
+    ExportedKeyData(ExportedKey k);
+    ExportedKeyDataMulti(ExportedKey k, u32 current_number, u32 out_of);
+    KeyboardData(boolean keyboard);
+    RecoverSeedNameData(string seed_name, boolean keyboard);
+    RecoverSeedPhraseData(
+        string seed_name,
+        boolean keyboard,
+        string user_input,
+        sequence<string> guess_set,
+        string draft
+    );
+    DerivePrepData(
+        DerivePrep d,
+        boolean keyboard
+    );
+    AllIdentitiesData(sequence<Identity> identities);
+};
+
 namespace signer {
     string action_get_name([ByRef] Action action);
 
     void init_navigation([ByRef] string dbname, [ByRef] string seed_names);
 
-    string backend_action(Action action, [ByRef] string details, [ByRef] string seed_phrase);
+    [Throws=ErrorDisplayed]
+    ActionResult backend_action(Action action, [ByRef] string details, [ByRef] string seed_phrase);
 
     void update_seed_names([ByRef] string seed_names);
 

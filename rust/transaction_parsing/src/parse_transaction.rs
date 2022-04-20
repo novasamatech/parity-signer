@@ -15,7 +15,7 @@ use crate::cards::{make_author_info, Card, Warning};
 use crate::helpers::{
     bundle_from_meta_set_element, find_meta_set, multisigner_msg_genesis_encryption, specs_by_name,
 };
-use crate::Action;
+use crate::TransactionAction;
 
 /// Transaction payload in hex format as it arrives into parsing program contains following elements:
 /// - prelude, length 6 symbols ("53" stands for substrate, ** - crypto type, 00 or 02 - transaction type),
@@ -41,7 +41,7 @@ enum CardsPrep<'a> {
 pub(crate) fn parse_transaction(
     data_hex: &str,
     database_name: &str,
-) -> Result<Action, ErrorSigner> {
+) -> Result<TransactionAction, ErrorSigner> {
     let (author_multi_signer, parser_data, genesis_hash_vec, encryption) =
         multisigner_msg_genesis_encryption(data_hex)?;
     let network_specs_key = NetworkSpecsKey::from_parts(&genesis_hash_vec, &encryption);
@@ -157,22 +157,22 @@ pub(crate) fn parse_transaction(
                                         let author_info = make_author_info(&author_multi_signer, network_specs.base58prefix, &address_details);
                                         let network_info = format!("\"network_title\":\"{}\",\"network_logo\":\"{}\"", network_specs.title, network_specs.logo);
                                         match possible_warning {
-                                            Some(warning) => Some(Action::Sign{content: format!("\"warning\":[{}],\"method\":[{}],\"extensions\":[{}]", Card::Warning(warning).card(&mut index, indent), into_cards(&a, &mut index), into_cards(&extensions_cards, &mut index)), checksum, has_pwd: address_details.has_pwd, author_info, network_info}),
-                                            None => Some(Action::Sign{content: format!("\"method\":[{}],\"extensions\":[{}]", into_cards(&a, &mut index), into_cards(&extensions_cards, &mut index)), checksum, has_pwd: address_details.has_pwd, author_info, network_info}),
+                                            Some(warning) => Some(TransactionAction::Sign{content: format!("\"warning\":[{}],\"method\":[{}],\"extensions\":[{}]", Card::Warning(warning).card(&mut index, indent), into_cards(&a, &mut index), into_cards(&extensions_cards, &mut index)), checksum, has_pwd: address_details.has_pwd, author_info, network_info}),
+                                            None => Some(TransactionAction::Sign{content: format!("\"method\":[{}],\"extensions\":[{}]", into_cards(&a, &mut index), into_cards(&extensions_cards, &mut index)), checksum, has_pwd: address_details.has_pwd, author_info, network_info}),
                                         }
                                     },
-                                    CardsPrep::ShowOnly(author_card, warning_card) => Some(Action::Read(format!("\"author\":[{}],\"warning\":[{}],\"method\":[{}],\"extensions\":[{}]", author_card, warning_card, into_cards(&a, &mut index), into_cards(&extensions_cards, &mut index))))
+                                    CardsPrep::ShowOnly(author_card, warning_card) => Some(TransactionAction::Read{ r: format!("\"author\":[{}],\"warning\":[{}],\"method\":[{}],\"extensions\":[{}]", author_card, warning_card, into_cards(&a, &mut index), into_cards(&extensions_cards, &mut index))})
                                 };
                             }
                             Err(e) => {
                                 found_solution = match cards_prep {
                                     CardsPrep::SignProceed(address_details, possible_warning) => {
                                         match possible_warning {
-                                            Some(warning) => Some(Action::Read(format!("\"author\":[{}],\"warning\":[{}],\"error\":[{}],\"extensions\":[{}]", Card::Author{author: &author_multi_signer, base58prefix: network_specs.base58prefix, address_details: &address_details}.card(&mut index, indent), Card::Warning(warning).card(&mut index, indent), Card::Error(ErrorSigner::Parser(e)).card(&mut index, indent), into_cards(&extensions_cards, &mut index)))),
-                                            None => Some(Action::Read(format!("\"author\":[{}],\"error\":[{}],\"extensions\":[{}]", Card::Author{author: &author_multi_signer, base58prefix: network_specs.base58prefix, address_details: &address_details}.card(&mut index, indent), Card::Error(ErrorSigner::Parser(e)).card(&mut index, indent), into_cards(&extensions_cards, &mut index)))),
+                                            Some(warning) => Some(TransactionAction::Read{ r: format!("\"author\":[{}],\"warning\":[{}],\"error\":[{}],\"extensions\":[{}]", Card::Author{author: &author_multi_signer, base58prefix: network_specs.base58prefix, address_details: &address_details}.card(&mut index, indent), Card::Warning(warning).card(&mut index, indent), Card::Error(ErrorSigner::Parser(e)).card(&mut index, indent), into_cards(&extensions_cards, &mut index))}),
+                                            None => Some(TransactionAction::Read{ r: format!("\"author\":[{}],\"error\":[{}],\"extensions\":[{}]", Card::Author{author: &author_multi_signer, base58prefix: network_specs.base58prefix, address_details: &address_details}.card(&mut index, indent), Card::Error(ErrorSigner::Parser(e)).card(&mut index, indent), into_cards(&extensions_cards, &mut index))}),
                                         }
                                     },
-                                    CardsPrep::ShowOnly(author_card, warning_card) => Some(Action::Read(format!("\"author\":[{}],\"warning\":[{}],\"error\":[{}],\"extensions\":[{}]", author_card, warning_card, Card::Error(ErrorSigner::Parser(e)).card(&mut index, indent), into_cards(&extensions_cards, &mut index))))
+                                    CardsPrep::ShowOnly(author_card, warning_card) => Some(TransactionAction::Read{ r: format!("\"author\":[{}],\"warning\":[{}],\"error\":[{}],\"extensions\":[{}]", author_card, warning_card, Card::Error(ErrorSigner::Parser(e)).card(&mut index, indent), into_cards(&extensions_cards, &mut index))})
                                 };
                             }
                         }
@@ -198,10 +198,9 @@ pub(crate) fn parse_transaction(
                 encryption,
             }))
             .card(&mut index, indent);
-            Ok(Action::Read(format!(
-                "\"author\":[{}],\"error\":[{}]",
-                author_card, error_card
-            )))
+            Ok(TransactionAction::Read {
+                r: format!("\"author\":[{}],\"error\":[{}]", author_card, error_card),
+            })
         }
     }
 }

@@ -46,3 +46,5 @@ pub mod test_all_errors_signer;
 pub mod types;
 
 pub mod users;
+
+pub mod navigation;
