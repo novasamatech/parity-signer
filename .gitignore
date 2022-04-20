@@ -86,6 +86,7 @@ rust/target
 rust/*/target
 rust/db_handling/signer_database
 rust/database/database_cold_release
+rust/database/database_hot
 rust/qrcode_static/*.png
 rust/files/for_signing/*
 rust/files/signed/*
