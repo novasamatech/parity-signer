@@ -78,8 +78,8 @@ use hot_default::reset_hot_database;
 /// Resulting database should be copied verbatim into Signer files during the
 /// build.
 ///
-/// The location of the generated database is either optional user-provided path,
-/// or default [`COLD_DB_NAME_RELEASE`] folder.
+/// The location of the generated database is either optional user-provided
+/// path, or default [`COLD_DB_NAME_RELEASE`] folder.
 ///
 /// The cold release database, as generated, contains:
 ///

@@ -1,3 +1,5 @@
+//! Common helper functions for database operations
+
 use parity_scale_codec::Decode;
 #[cfg(any(feature = "active", feature = "signer"))]
 use parity_scale_codec::Encode;
@@ -23,18 +25,22 @@ use definitions::{
 #[cfg(any(feature = "active", feature = "signer"))]
 use definitions::{keyring::AddressKey, users::AddressDetails};
 
-/// Wrapper for `open`
+/// Open a database.
+///
+/// Wrapper for [`open`] from [`sled`]. Input is database location path.
 pub fn open_db<T: ErrorSource>(database_name: &str) -> Result<Db, T::Error> {
     open(database_name).map_err(<T>::db_internal)
 }
 
-/// Wrapper for `open_tree`
+/// Open a tree in the database.
+///
+/// Wrapper for `open_tree()` method for database [`Db`] from [`sled`].
+/// Input is `&[u8]` tree identifier.
 pub fn open_tree<T: ErrorSource>(database: &Db, tree_name: &[u8]) -> Result<Tree, T::Error> {
     database.open_tree(tree_name).map_err(<T>::db_internal)
 }
 
-/// Wrapper to assemble a Batch for removing all elements of a tree
-/// (to add into transaction where clear_tree should be)
+/// Assemble a [`Batch`] that removes all elements from a tree.
 pub fn make_batch_clear_tree<T: ErrorSource>(
     database_name: &str,
     tree_name: &[u8],
@@ -48,7 +54,15 @@ pub fn make_batch_clear_tree<T: ErrorSource>(
     Ok(out)
 }
 
-/// Function to try and get from the Signer database the _valid_ current verifier for network using VerifierKey
+/// Try to get [`ValidCurrentVerifier`] from the Signer database for a network,
+/// using [`VerifierKey`].
+///
+/// If the network is not known to the database, i.e. there is no verifier data
+/// and network genesis hash is not encountered elsewhere in the database,
+/// result is `Ok(None)`.
+///
+/// Note that `CurrentVerifier::Dead` or damaged verifier data result in
+/// errors.
 #[cfg(feature = "signer")]
 pub fn try_get_valid_current_verifier(
     verifier_key: &VerifierKey,
@@ -58,9 +72,17 @@ pub fn try_get_valid_current_verifier(
     let database = open_db::<Signer>(database_name)?;
     let verifiers = open_tree::<Signer>(&database, VERIFIERS)?;
     match verifiers.get(verifier_key.key()) {
+        // verifier entry is found
         Ok(Some(verifier_encoded)) => match <CurrentVerifier>::decode(&mut &verifier_encoded[..]) {
+            // verifier could be decoded
             Ok(a) => match a {
+                // verifier is a valid one
                 CurrentVerifier::Valid(b) => {
+                    // Custom verifier ([`Verifier`]) can never be entered in
+                    // the database with same value as database general verifier
+                    // ([`Verifier`]), unless both values are `None`.
+                    // If such entry is found, it indicates that the database is
+                    // corrupted.
                     if let ValidCurrentVerifier::Custom(ref custom_verifier) = b {
                         if (custom_verifier == &general_verifier)
                             && (general_verifier != Verifier(None))
@@ -72,13 +94,22 @@ pub fn try_get_valid_current_verifier(
                     }
                     Ok(Some(b))
                 }
+                // verifier is dead, network could not be used
                 CurrentVerifier::Dead => Err(ErrorSigner::DeadVerifier(verifier_key.to_owned())),
             },
+            // verifier entry is damaged
             Err(_) => Err(ErrorSigner::Database(DatabaseSigner::EntryDecoding(
                 EntryDecodingSigner::CurrentVerifier(verifier_key.to_owned()),
             ))),
         },
+        // no verifier for network in the database
         Ok(None) => {
+            // `VerifierKey` is formed from network genesis hash.
+            // When the entries are added in the database, network specs could
+            // be added only if the verifier is already in the database or is
+            // added at the same time.
+            // If the genesis hash is found in network specs, but no verifier
+            // entry exists, it indicated that the database is corrupted.
             if let Some((network_specs_key, _)) = genesis_hash_in_specs(verifier_key, &database)? {
                 return Err(ErrorSigner::Database(
                     DatabaseSigner::UnexpectedGenesisHash {
@@ -89,11 +120,16 @@ pub fn try_get_valid_current_verifier(
             }
             Ok(None)
         }
+        // database own errors
         Err(e) => Err(<Signer>::db_internal(e)),
     }
 }
 
-/// Function to get from the Signer database the current verifier for network using VerifierKey, returns error if not found
+/// Get [`ValidCurrentVerifier`] from the Signer database for a network, using
+/// [`VerifierKey`].
+///
+/// Entry here is expected to be in the database, failure to find it results in
+/// an error.
 #[cfg(feature = "signer")]
 pub fn get_valid_current_verifier(
     verifier_key: &VerifierKey,
@@ -104,10 +140,31 @@ pub fn get_valid_current_verifier(
     })
 }
 
-/// Function to search for genesis hash corresponding to a given verifier key
-/// in SPECSTREE of the Signer database
+/// Search for network genesis hash in [`NetworkSpecs`] entries in [`SPECSTREE`]
+/// of the Signer database.
+///
+/// Genesis hash is calculated from network [`VerifierKey`] input.
+// TODO too convoluted, historically so; replace VerifierKey with genesis hash;
+// fixes needed in `add_specs`, `load_metadata` and
+// `try_get_valid_current_verifier` function above
+///
 /// If there are more than one network corresponding to the same genesis hash,
-/// outputs network specs key for the network with the lowest order
+/// outputs network specs key for the network with the lowest order.
+///
+/// If there are several entries with same genesis hash, all of them must have
+/// identical base58 prefix. Base58 prefix from found network specs is used in
+/// `add_specs` module of `transaction_parsing` crate directly, and therefore is
+/// checked here.
+///
+/// When the entries are added in the database, only the entries with same
+/// base58 prefix are allowed for a given network, as identified by genesis
+/// hash. This is done to keep consistency between the network specs and
+/// network metadata, that potentially also can contain the base58 prefix, but
+/// has no specified associated [`Encryption`](definitions::crypto::Encryption),
+/// i.e. could be used with any [`NetworkSpecs`] containing given genesis hash.
+///
+/// If later on different values are found, it indicates the database
+/// corruption.
 #[cfg(feature = "signer")]
 pub fn genesis_hash_in_specs(
     verifier_key: &VerifierKey,
@@ -150,8 +207,10 @@ pub fn genesis_hash_in_specs(
     }
 }
 
-/// Function to get general Verifier from the Signer database
-/// Note that not finding general verifier is always an error.
+/// Get general verifier [`Verifier`] from the Signer database.
+///
+/// Signer works only with an initiated database, i.e. the one with general
+/// verifier set up. Failure to find general verifier is always an error.
 #[cfg(feature = "signer")]
 pub fn get_general_verifier(database_name: &str) -> Result<Verifier, ErrorSigner> {
     let database = open_db::<Signer>(database_name)?;
@@ -168,14 +227,15 @@ pub fn get_general_verifier(database_name: &str) -> Result<Verifier, ErrorSigner
     }
 }
 
-/// Function to display general Verifier from the Signer database
+/// Display general verifier [`Verifier`] from the Signer database
 #[cfg(feature = "signer")]
 pub fn display_general_verifier(database_name: &str) -> Result<String, ErrorSigner> {
     Ok(get_general_verifier(database_name)?.show_card())
 }
 
-/// Function to try and get types information from the database
-/// Applicable to both Active side and Signer side
+/// Try to get types information from the database.
+///
+/// If no types information is found, result is `Ok(None)`.
 pub fn try_get_types<T: ErrorSource>(
     database_name: &str,
 ) -> Result<Option<Vec<TypeEntry>>, T::Error> {
@@ -193,13 +253,24 @@ pub fn try_get_types<T: ErrorSource>(
     }
 }
 
-/// Function to get types information from the database, returns error if not found
-/// Applicable to both Active side and Signer side
+/// Get types information from the database.
+///
+/// Types data is expected to be found, for example, in:
+///
+/// - hot database, from which the types data could not be removed using
+/// standard operations
+/// - cold database, when transactions made using RuntimeMetadata V12 or V13 are
+/// being decoded
+///
+/// Not finding types data results in an error.
 pub fn get_types<T: ErrorSource>(database_name: &str) -> Result<Vec<TypeEntry>, T::Error> {
     try_get_types::<T>(database_name)?.ok_or_else(|| <T>::types_not_found())
 }
 
-/// Function to try and get network specs from the Signer database
+/// Try to get network specs [`NetworkSpecs`] from the Signer database.
+///
+/// If the [`NetworkSpecsKey`] and associated [`NetworkSpecs`] are not found in
+/// the [`SPECSTREE`], the result is `Ok(None)`.
 #[cfg(feature = "signer")]
 pub fn try_get_network_specs(
     database_name: &str,
@@ -218,7 +289,10 @@ pub fn try_get_network_specs(
     }
 }
 
-/// Function to get network specs from the Signer database, returns error if not found
+/// Get network specs [`NetworkSpecs`] from the Signer database.
+///
+/// Network specs here are expected to be found, not finding them results in an
+/// error.
 #[cfg(feature = "signer")]
 pub fn get_network_specs(
     database_name: &str,
@@ -229,7 +303,10 @@ pub fn get_network_specs(
     })
 }
 
-/// Function to try and get address details from the Signer database
+/// Try to get [`AddressDetails`] from the Signer database, using
+/// [`AddressKey`].
+///
+/// If no entry with provided [`AddressKey`] is found, the result is `Ok(None)`.
 #[cfg(feature = "signer")]
 pub fn try_get_address_details(
     database_name: &str,
@@ -249,7 +326,10 @@ pub fn try_get_address_details(
     }
 }
 
-/// Function to get address details from the Signer database, returns error if not found
+/// Get [`AddressDetails`] from the Signer database, using
+/// [`AddressKey`].
+///
+/// Address is expected to exist, not finding it results in an error.
 #[cfg(feature = "signer")]
 pub fn get_address_details(
     database_name: &str,
@@ -260,18 +340,21 @@ pub fn get_address_details(
     })
 }
 
-/// Function to collect MetaValues corresponding to given network name.
-/// Applicable to both Active side and Signer side
-pub fn get_meta_values_by_name<T: ErrorSource>(
+/// Get [`MetaValues`] set from Signer database, for networks with a given name.
+///
+/// The resulting set could be an empty one. It is used to display metadata
+/// available for the network.
+#[cfg(feature = "signer")]
+pub(crate) fn get_meta_values_by_name(
     database_name: &str,
     network_name: &str,
-) -> Result<Vec<MetaValues>, T::Error> {
-    let database = open_db::<T>(database_name)?;
-    let metadata = open_tree::<T>(&database, METATREE)?;
+) -> Result<Vec<MetaValues>, ErrorSigner> {
+    let database = open_db::<Signer>(database_name)?;
+    let metadata = open_tree::<Signer>(&database, METATREE)?;
     let mut out: Vec<MetaValues> = Vec::new();
     let meta_key_prefix = MetaKeyPrefix::from_name(network_name);
     for x in metadata.scan_prefix(meta_key_prefix.prefix()).flatten() {
-        let meta_values = MetaValues::from_entry_checked::<T>(x)?;
+        let meta_values = MetaValues::from_entry_checked::<Signer>(x)?;
         if meta_values.name == network_name {
             out.push(meta_values)
         }
@@ -279,9 +362,11 @@ pub fn get_meta_values_by_name<T: ErrorSource>(
     Ok(out)
 }
 
-/// Function to get MetaValues corresponding to given network name and version.
-/// Returns error if finds nothing.
-/// Applicable to both Active side and Signer side.
+/// Get [`MetaValues`], corresponding to given network name and version, from
+/// the database.
+///
+/// Entry is expected to be in the database, error is produced if it is not
+/// found.
 pub fn get_meta_values_by_name_version<T: ErrorSource>(
     database_name: &str,
     network_name: &str,
@@ -302,7 +387,8 @@ pub fn get_meta_values_by_name_version<T: ErrorSource>(
     }
 }
 
-/// Function to modify existing batch for ADDRTREE with incoming vector of additions
+/// Modify existing batch for [`ADDRTREE`](constants::ADDRTREE) with incoming
+/// vector of additions.
 #[cfg(any(feature = "active", feature = "signer"))]
 pub(crate) fn upd_id_batch(mut batch: Batch, adds: Vec<(AddressKey, AddressDetails)>) -> Batch {
     for (address_key, address_details) in adds.iter() {
@@ -311,9 +397,13 @@ pub(crate) fn upd_id_batch(mut batch: Batch, adds: Vec<(AddressKey, AddressDetai
     batch
 }
 
-/// Function to verify checksum in Signer database
+/// Verify checksum in Signer database.
+///
+/// Used in retrieving temporary stored data from
+/// [`TRANSACTION`](constants::TRANSACTION) tree of the database.
+// TODO Goes obsolete if the temporary storage goes.
 #[cfg(feature = "signer")]
-pub fn verify_checksum(database: &Db, checksum: u32) -> Result<(), ErrorSigner> {
+pub(crate) fn verify_checksum(database: &Db, checksum: u32) -> Result<(), ErrorSigner> {
     let real_checksum = match database.checksum() {
         Ok(x) => x,
         Err(e) => return Err(<Signer>::db_internal(e)),
@@ -324,8 +414,10 @@ pub fn verify_checksum(database: &Db, checksum: u32) -> Result<(), ErrorSigner> 
     Ok(())
 }
 
-/// Function to get the danger status from the Signer database.
-/// Function interacts with user interface.
+/// Get the danger status from the Signer database.
+///
+/// Currently, the only flag contributing to the danger status is whether the
+/// device was online. This may change eventually.
 #[cfg(feature = "signer")]
 pub fn get_danger_status(database_name: &str) -> Result<bool, ErrorSigner> {
     let database = open_db::<Signer>(database_name)?;

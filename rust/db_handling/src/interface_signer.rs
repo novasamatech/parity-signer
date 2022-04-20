@@ -412,7 +412,7 @@ pub fn network_details_by_key(
     let verifier_key = VerifierKey::from_parts(&network_specs.genesis_hash);
     let general_verifier = get_general_verifier(database_name)?;
     let valid_current_verifier = get_valid_current_verifier(&verifier_key, database_name)?;
-    let relevant_meta = get_meta_values_by_name::<Signer>(database_name, &network_specs.name)?;
+    let relevant_meta = get_meta_values_by_name(database_name, &network_specs.name)?;
     let metadata_print = export_complex_vector(&relevant_meta, |a| {
         let meta_hash = blake2b(32, &[], &a.meta).as_bytes().to_vec();
         let hex_id_pic = hex::encode(pic_meta(&meta_hash));

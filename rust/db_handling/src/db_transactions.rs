@@ -1,9 +1,9 @@
 //! Atomic transactions in cold and hot databases
 //!
-//! Additions and removals of entries in cold and hot database occur through atomic
-//! [transactions](https://docs.rs/sled/0.34.7/sled/transaction/index.html).
-//! Each tree gets updated with its own
-//! [`Batch`](https://docs.rs/sled/0.34.7/sled/struct.Batch.html).
+//! Additions and removals of entries in cold and hot database occur through
+//! atomic [transactions](sled::transaction).
+//! Each tree gets updated with its own [`Batch`], updates occur within a single
+//! transaction.
 //!
 //! For transactions scanned into Signer, currently a temporary database entry
 //! is made to store transaction details while they are displayed to user.
@@ -49,10 +49,8 @@ use crate::{
     manage_history::events_to_batch,
 };
 
-/// Cold database transaction data containing
-/// [`Batch`](https://docs.rs/sled/latest/sled/struct.Batch.html) elements that 
-/// will be applied to each
-/// [`Tree`](https://docs.rs/sled/latest/sled/struct.Tree.html).
+/// Cold database transaction data containing [`Batch`] elements that will be
+/// applied to each [`Tree`](sled::Tree).
 ///
 /// Cold database tree names and content information could be found in
 /// [`constants`] crate. All trees are routinely updated as Signer is used.
@@ -213,10 +211,8 @@ impl Default for TrDbCold {
     }
 }
 
-/// Hot database transaction data containing
-/// [`Batch`](https://docs.rs/sled/latest/sled/struct.Batch.html) elements that 
-/// will be applied to each
-/// [`Tree`](https://docs.rs/sled/latest/sled/struct.Tree.html).
+/// Hot database transaction data containing [`Batch`] elements that will be
+/// applied to each [`Tree`](sled::Tree).
 ///
 /// Hot database tree names and content information could be found in
 /// [`constants`] crate.
@@ -321,19 +317,17 @@ impl Default for TrDbHot {
     }
 }
 
-/// SCALE-encodeable draft for
-/// [`Batch`](https://docs.rs/sled/latest/sled/struct.Batch.html), that will be
-/// a part of database atomic transaction.
+/// SCALE-encodeable draft for [`Batch`], that will be a part of database atomic
+/// transaction.
 ///
-/// [`Batch`](https://docs.rs/sled/latest/sled/struct.Batch.html) does not
-/// support SCALE-encoding, so [`BatchStub`] is constructed from a set of keys
-/// to be removed from the database and a set of (key, value) pairs to be added
-/// into the database. Keys and values are SCALE-compatible `Vec<u8>`.
+/// [`Batch`] does not support SCALE-encoding, so [`BatchStub`] is constructed
+/// from a set of keys to be removed from the database and a set of (key, value)
+/// pairs to be added into the database. Keys and values are SCALE-compatible
+/// `Vec<u8>`.
 ///
-/// When applying [`BatchStub`], i.e. transforming it into
-/// [`Batch`](https://docs.rs/sled/latest/sled/struct.Batch.html), the removals
-/// are always applied before additions, to avoid accidental replacing of just
-/// added value.
+/// When applying [`BatchStub`], i.e. transforming it into [`Batch`], the
+/// removals are always applied before additions, to avoid accidental replacing
+/// of just added value.
 #[cfg(feature = "signer")]
 #[derive(Debug, Decode, Encode)]
 struct BatchStub {
@@ -354,16 +348,13 @@ impl BatchStub {
         }
     }
 
-    /// Transform [`BatchStub`] into
-    /// [`Batch`](https://docs.rs/sled/latest/sled/struct.Batch.html), removals
-    /// first.
+    /// Transform [`BatchStub`] into [`Batch`], removals first.
     fn make_batch(&self) -> Batch {
         self.extend_batch(Batch::default())
     }
 
     /// Add elements from [`BatchStub`], removals first, in queue after
-    /// instructions already present in input
-    /// [`Batch`](https://docs.rs/sled/latest/sled/struct.Batch.html)
+    /// instructions already present in input [`Batch`]
     fn extend_batch(&self, batch: Batch) -> Batch {
         let mut out = batch;
         for key in self.removals.iter() {
@@ -398,9 +389,9 @@ impl BatchStub {
 ///
 /// Accepting an update could result in adding or removing database data.
 ///
-/// [`TrDbColdStub`] contains [`Event`](definitions::history::Event) set for
-/// [`HISTORY`] tree update and `BatchStub` update drafts with corresponding
-/// removals and additions for database trees:
+/// [`TrDbColdStub`] contains [`Event`] set for [`HISTORY`] tree update and
+/// `BatchStub` update drafts with corresponding removals and additions for
+/// database trees:
 ///
 /// - [`ADDRTREE`]
 /// - [`METATREE`]
@@ -418,8 +409,8 @@ pub struct TrDbColdStub {
     addresses_stub: BatchStub,
 
     /// `Vec<Event>` to be entered into [`HISTORY`] tree, the
-    /// [`Entry`](definitions::history::Entry) with `timestamp` is generated
-    /// only when  the payload is approved by the user.
+    /// [`Entry`](definitions::history::Entry) with a timestamp is generated
+    /// only when the payload is approved by the user.
     history_stub: Vec<Event>,
 
     /// `BatchStub` to be transformed into `Batch` for [`METATREE`] tree.
@@ -490,7 +481,7 @@ impl TrDbColdStub {
         let mut transaction_batch = make_batch_clear_tree::<Signer>(database_name, TRANSACTION)?;
         transaction_batch.insert(STUB, self.encode());
         TrDbCold::new()
-            .set_transaction(transaction_batch) // clear transaction tree and insert the stub
+            .set_transaction(transaction_batch) // clear transaction tree
             .apply::<Signer>(database_name)?;
         let database = open_db::<Signer>(database_name)?;
         match database.checksum() {
@@ -499,8 +490,7 @@ impl TrDbColdStub {
         }
     }
 
-    /// Add new [`Event`](definitions::history::Event) in `history_stub` field
-    /// of the [`TrDbColdStub`]
+    /// Add new [`Event`] in `history_stub` field of the [`TrDbColdStub`]
     pub fn new_history_entry(mut self, event: Event) -> Self {
         self.history_stub.push(event);
         self
@@ -510,8 +500,8 @@ impl TrDbColdStub {
     /// cold database:
     ///
     /// - Add a (key, value) pair to the metadata additions queue in
-    /// `metadata_stub`. Key is [`MetaKey`](definitions::keyring::MetaKey) in
-    /// key form, value is metadata in `Vec<u8>` format.
+    /// `metadata_stub`. Key is [`MetaKey`] in key form, value is metadata in
+    /// `Vec<u8>` format.
     /// - Add corresponding `Event::MetadataAdded(_)` into `history_stub`.
     pub fn add_metadata(mut self, meta_values: &MetaValues) -> Self {
         let meta_key = MetaKey::from_parts(&meta_values.name, meta_values.version);
@@ -525,10 +515,10 @@ impl TrDbColdStub {
 
     /// Prepare removing the metadata from the cold database:
     ///
-    /// - Add [`MetaKey`](definitions::keyring::MetaKey) in key form to the
-    /// metadata removals queue in `metadata_stub`.
+    /// - Add [`MetaKey`] in key form to the metadata removals queue in
+    /// `metadata_stub`.
     /// - Add corresponding `Event::MetadataRemoved(_)` into `history_stub`.
-    /// 
+    ///
     /// Function is used for `Hold` and `GeneralHold` processing when,
     /// respectively, the network verifier or the general verifier is changed.
     pub fn remove_metadata(mut self, meta_values: &MetaValues) -> Self {
@@ -539,34 +529,26 @@ impl TrDbColdStub {
         self
     }
 
-    /// Prepare adding
-    /// [`NetworkSpecs`](definitions::network_specs::NetworkSpecs) into the
-    /// cold database:
+    /// Prepare adding [`NetworkSpecs`] into the cold database:
     ///
-    /// - Transform received in `add_specs` payload
-    /// [`NetworkSpecsToSend`](definitions::network_specs::NetworkSpecsToSend)
-    /// into [`NetworkSpecs`](definitions::network_specs::NetworkSpecs) by
-    /// adding `order` field. Networks are always added in the end of the
-    /// network list, with order set to the total number of network specs
-    /// entries currently in Signer. When a network is removed, the order
-    /// of the remaining networks gets rearranged, see details in function
-    /// [`remove_network`](crate::remove_network::remove_network).
+    /// - Transform received in `add_specs` payload [`NetworkSpecsToSend`]
+    /// into [`NetworkSpecs`] by adding `order` field. Networks are always added
+    /// in the end of the network list, with order set to the total number of
+    /// network specs entries currently in Signer. When a network is removed,
+    /// the order of the remaining networks gets rearranged, see details in
+    /// function [`remove_network`](crate::remove_network::remove_network).
     /// - Add a (key, value) pair to the network specs additions queue in
-    /// `network_specs_stub`. Key is
-    /// [`NetworkSpecsKey`](definitions::keyring::NetworkSpecsKey) in
-    /// key form, value is SCALE-encoded
-    /// [`NetworkSpecs`](definitions::network_specs::NetworkSpecs).
+    /// `network_specs_stub`. Key is [`NetworkSpecsKey`] in key form, value is
+    /// SCALE-encoded [`NetworkSpecs`].
     /// - Add corresponding `Event::NetworkSpecsAdded(_)` into `history_stub`.
-    /// - Add root address for the network if the
-    /// [`AddressDetails`](definitions::users::AddressDetails) entry with
+    /// - Add root address for the network if the [`AddressDetails`] entry with
     /// matching [`Encryption`](definitions::crypto::Encryption) already exists,
     /// i.e. add (key, value) pair to the address additions queue in
-    /// `addresses_stub`. Key is [`AddressKey`](definitions::keyring::AddressKey)
-    /// in key form, value is SCALE-encoded updated
-    /// [`AddressDetails`](definitions::users::AddressDetails).
+    /// `addresses_stub`. Key is [`AddressKey`] in key form, value is
+    /// SCALE-encoded updated [`AddressDetails`].
     /// - If address was added, add corresponding `Event::IdentityAdded(_)`
     /// into `history_stub`.
-    /// 
+    ///
     /// Note that `add_network_specs` does not deal with network verifiers:
     /// verifier data is not necessarily updated each time the network
     /// specs are added.
@@ -630,14 +612,12 @@ impl TrDbColdStub {
         Ok(self)
     }
 
-    /// Prepare removing
-    /// [`NetworkSpecs`](definitions::network_specs::NetworkSpecs) from the
-    /// cold database:
+    /// Prepare removing [`NetworkSpecs`] from the cold database:
     ///
-    /// - Add [`NetworkSpecsKey`](definitions::keyring::NetworkSpecsKey) in
-    /// key form to the network specs removal queue in `network_specs_stub`.
+    /// - Add [`NetworkSpecsKey`] in key form to the network specs removal queue
+    /// in `network_specs_stub`.
     /// - Add corresponding `Event::NetworkSpecsRemoved(_)` into `history_stub`.
-    /// 
+    ///
     /// Function is used for `Hold` and `GeneralHold` processing when,
     /// respectively, the network verifier or the general verifier is changed.
     ///
@@ -666,14 +646,12 @@ impl TrDbColdStub {
         self
     }
 
-    /// Prepare adding new general verifier
-    /// [`Verifier`](definitions::network_specs::Verifier) into the cold
+    /// Prepare adding new general verifier [`Verifier`] into the cold
     /// database:
     ///
     /// - Add a (key, value) pair to the settings additions queue in
     /// `settings_stub`. Key is [`GENERALVERIFIER`] and the value is
-    /// SCALE-encoded [`Verifier`](definitions::network_specs::Verifier) that
-    /// is set to be the new general verifier.
+    /// SCALE-encoded [`Verifier`] that is set to be the new general verifier.
     /// - Add corresponding `Event::GeneralVerifierSet(_)` into `history_stub`.
     pub fn new_general_verifier(mut self, general_verifier: &Verifier) -> Self {
         self.settings_stub = self
@@ -684,12 +662,11 @@ impl TrDbColdStub {
         self
     }
 
-    /// Prepare adding types information
-    /// [`ContentLoadTypes`](definitions::qr_transfers::ContentLoadTypes)
-    /// received as `load_types` update into the cold database:
+    /// Prepare adding types information [`ContentLoadTypes`] received as
+    /// `load_types` update into the cold database:
     ///
     /// - Add a (key, value) pair to the settings additions queue in
-    /// `settings_stub`. Key is [`TYPES`] and the value is
+    /// `settings_stub`. Key is [`TYPES`] and the value is [`ContentLoadTypes`]
     /// types information in `store` format (SCALE-encoded).
     /// - Add corresponding `Event::TypesAdded(_)` into `history_stub`.
     pub fn add_types(mut self, types: &ContentLoadTypes, general_verifier: &Verifier) -> Self {
@@ -708,26 +685,25 @@ impl TrDbColdStub {
     /// - Add [`TYPES`] key to the settings removal queue in `settings_stub`.
     /// - Add corresponding `Event::TypesRemoved(_)` into `history_stub`.
     ///
-    /// Function is used to process `GeneralHold` when general verifier is changed.
+    /// Function is used to process `GeneralHold` when general verifier is
+    /// changed.
     pub fn remove_types(mut self, types: &ContentLoadTypes, general_verifier: &Verifier) -> Self {
         self.settings_stub = self.settings_stub.new_removal(TYPES.to_vec());
-        self.history_stub.push(Event::TypesRemoved(TypesDisplay::get(
-            types,
-            general_verifier,
-        )));
+        self.history_stub
+            .push(Event::TypesRemoved(TypesDisplay::get(
+                types,
+                general_verifier,
+            )));
         self
     }
 
-    /// Prepare adding new network verifier
-    /// [`ValidCurrentVerifier`](definitions::network_specs::ValidCurrentVerifier)
-    /// into the cold database:
+    /// Prepare adding new network verifier [`ValidCurrentVerifier`] into the
+    /// cold database:
     ///
     /// - Add a (key, value) pair to the verifiers additions queue in
-    /// `verifiers_stub`. Key is
-    /// [`VerifierKey`](definitions::keyring::VerifierKey) and the value is
-    /// SCALE-encoded
-    /// [`ValidCurrentVerifier`](definitions::network_specs::ValidCurrentVerifier)
-    /// that is set to be the new verifier for the network.
+    /// `verifiers_stub`. Key is [`VerifierKey`] and the value is SCALE-encoded
+    /// [`ValidCurrentVerifier`] that is set to be the new verifier for the
+    /// network.
     /// - Add corresponding `Event::NetworkVerifierSet(_)` into `history_stub`.
     pub fn new_network_verifier(
         mut self,
@@ -788,7 +764,7 @@ impl Default for TrDbColdStub {
 /// If the user signs the transaction or tries to sign and enters wrong
 /// password, the transaction data will be recorded in Signer history log.
 ///
-/// While the user considers the transaction, [`TrDbColdSign`] is stored 
+/// While the user considers the transaction, [`TrDbColdSign`] is stored
 /// SCALE-encoded in [`TRANSACTION`] tree of the cold database under the key
 /// [`SIGN`].
 ///
@@ -797,11 +773,9 @@ impl Default for TrDbColdStub {
 /// - [`SignContent`] with data to sign
 /// - name of the network in which the transaction is made
 /// - derivation path of the address used, whether the address has password,
-/// corresponding
-/// [`MultiSigner`](https://docs.rs/sp-runtime/6.0.0/sp_runtime/enum.MultiSigner.html)
-/// value
-/// - relevant history [`Event`](definitions::history::Event) set: warnings
-/// that were shown during the parsing
+/// corresponding [`MultiSigner`] value
+/// - relevant history [`Event`] set: warnings that were shown during the
+/// parsing
 #[cfg(feature = "signer")]
 #[derive(Debug, Decode, Encode)]
 pub struct TrDbColdSign {
@@ -817,11 +791,11 @@ pub struct TrDbColdSign {
     /// is address by which the transaction was generated passworded?
     has_pwd: bool,
 
-    /// [`MultiSigner`](https://docs.rs/sp-runtime/6.0.0/sp_runtime/enum.MultiSigner.html)
-    /// corresponding to the address by which the transaction was generated
+    /// [`MultiSigner`] corresponding to the address by which the transaction
+    /// was generated
     multisigner: MultiSigner,
 
-    /// [`Event`](definitions::history::Event) set produced during parsing
+    /// [`Event`] set produced during parsing
     history: Vec<Event>,
 }
 
@@ -831,7 +805,7 @@ pub struct TrDbColdSign {
 /// - transactions
 /// - messages
 ///
-/// Mortal signable transactions have prelude `53xx00`, immortal have prelude 
+/// Mortal signable transactions have prelude `53xx00`, immortal have prelude
 /// `53xx02`. Signable transactions consist of method with call details and
 /// extensions.
 ///
@@ -861,10 +835,8 @@ impl TrDbColdSign {
     /// - [`SignContent`] with data to sign
     /// - name of the network in which the transaction is made
     /// - derivation path of the address used, whether the address has password,
-    /// corresponding
-    /// [`MultiSigner`](https://docs.rs/sp-runtime/6.0.0/sp_runtime/enum.MultiSigner.html)
-    /// value
-    /// - relevant history [`Event`](definitions::history::Event) set
+    /// corresponding [`MultiSigner`] value
+    /// - relevant history [`Event`] set
     pub fn generate(
         content: SignContent,
         network_name: &str,
@@ -926,8 +898,7 @@ impl TrDbColdSign {
         self.has_pwd
     }
 
-    /// Get [`MultiSigner`](https://docs.rs/sp-runtime/6.0.0/sp_runtime/enum.MultiSigner.html)
-    /// value
+    /// Get [`MultiSigner`] value
     pub fn multisigner(&self) -> MultiSigner {
         self.multisigner.to_owned()
     }
@@ -943,7 +914,7 @@ impl TrDbColdSign {
         let mut transaction_batch = make_batch_clear_tree::<Signer>(database_name, TRANSACTION)?;
         transaction_batch.insert(SIGN, self.encode());
         TrDbCold::new()
-            .set_transaction(transaction_batch) // clear transaction tree and insert the stub
+            .set_transaction(transaction_batch) // clear transaction tree
             .apply::<Signer>(database_name)?;
         let database = open_db::<Signer>(database_name)?;
         match database.checksum() {
@@ -953,7 +924,7 @@ impl TrDbColdSign {
     }
 
     /// Use [`TrDbColdSign`] to add history log data into the cold database.
-    /// 
+    ///
     /// Possible history log entries are:
     ///
     /// - `Event::TransactionSigned(_)` and `Event::MessageSigned(_)` for the
@@ -1038,8 +1009,8 @@ impl TrDbColdSign {
 ///
 /// - a set of derivations, that was checked when the derivation import was
 /// received by Signer
-/// - [`NetworkSpecs`](definitions::network_specs::NetworkSpecs) for the network
-/// in which the derivations will be used to generate addresses
+/// - [`NetworkSpecs`] for the network in which the derivations will be used to
+/// generate addresses
 #[cfg(feature = "signer")]
 #[derive(Debug, Decode, Encode)]
 pub struct TrDbColdDerivations {
@@ -1112,7 +1083,7 @@ impl TrDbColdDerivations {
         let mut transaction_batch = make_batch_clear_tree::<Signer>(database_name, TRANSACTION)?;
         transaction_batch.insert(DRV, self.encode());
         TrDbCold::new()
-            .set_transaction(transaction_batch) // clear transaction tree and insert the stub
+            .set_transaction(transaction_batch) // clear transaction tree
             .apply::<Signer>(database_name)?;
         let database = open_db::<Signer>(database_name)?;
         match database.checksum() {
