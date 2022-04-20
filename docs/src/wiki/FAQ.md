@@ -32,6 +32,19 @@
     
     Signer is does not interact with network. The app itself does not have a way to check if an app or an account you interacting with is malicious. 
     If you use Signer with PolkadotJS Browser Extension, PolkadotJS Apps or Signer Component Browser Extension they will rely on community driven curated list of potentially less-than-honest operators: [https://polkadot.js.org/phishing/#](https://polkadot.js.org/phishing/#) to prevent you from interacting with certain sites and addresses. However, there are no limitations on use of Signer with other tools.
+	
+- **Can import my account from polkadot{.js} apps or extension to Parity Signer?**
+
+	Yes. Keys are compatible between polkadot{.js} and Parity Signer, except for Ledger keys. To import seed keys into Parity Signer, you need to know:
+1. Seed phrase\
+_It should always be backed up in paper!_
+2. Network you are adding address to\
+_If (2) is not one of the default built-in networks, you will need to add network yourself or find a distribution center for adding networks._
+3. Derivation path\
+_Only if you are importing a derived key, usually keys generated with polkadot{.js} are seed keys._
+
+	In Parity Signer go to Keys, then press "Plus" icon in the top right of the screen, select "Recover seed", enter display name to identify your seed, press "Next", enter the seed phrase. Done, you've got your seed key imported!\
+	If you are importing a derived key, in the screen of the imported seed select the account's network, press "Plus" icon next to "Derived keys", enter your derivation path.
     
 - **What is a difference between seed key and derived key? Why should I use derived keys?**
     
