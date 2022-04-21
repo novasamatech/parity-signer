@@ -123,7 +123,8 @@ fn get_all_tx_cards() -> String {
 }
 
 fn get_all_log_cards() -> String {
-    definitions::history::print_all_events()
+    String::new()
+    // TODO: definitions::history::print_all_events()
 }
 
 ffi_support::define_string_destructor!(signer_destroy_string);

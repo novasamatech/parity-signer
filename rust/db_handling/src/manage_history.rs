@@ -29,22 +29,6 @@ use crate::{
     helpers::{open_db, open_tree},
 };
 
-/// Function to print history entries.
-/// Interacts with user interface.
-#[cfg(feature = "signer")]
-pub fn print_history(database_name: &str) -> Result<String, ErrorSigner> {
-    let history = get_history(database_name)?;
-    Ok(format!(
-        "\"log\":{},\"total_entries\":{}",
-        export_complex_vector(&history, |(order, entry)| format!(
-            "\"order\":{},{}",
-            order.stamp(),
-            entry.show(|b| format!("\"{}\"", hex::encode(b.transaction())))
-        )),
-        history.len()
-    ))
-}
-
 /// Function to print total number of pages for pre-set number of entries per page.
 /// Interacts with user interface.
 #[cfg(feature = "signer")]
@@ -58,38 +42,6 @@ pub fn history_total_pages(database_name: &str) -> Result<u32, ErrorSigner> {
         }
     };
     Ok(total_pages as u32)
-}
-
-/// Function to print given page number from the history set.
-/// Interacts with user interface.
-#[cfg(feature = "signer")]
-pub fn print_history_page(page_number: u32, database_name: &str) -> Result<String, ErrorSigner> {
-    let history = get_history(database_name)?;
-    let total_pages = history_total_pages(database_name)?;
-    let n = page_number as usize;
-    let history_subset = match history.get(n * HISTORY_PAGE_SIZE..(n + 1) * HISTORY_PAGE_SIZE) {
-        Some(a) => a.to_vec(),
-        None => match history.get(n * HISTORY_PAGE_SIZE..) {
-            Some(a) => a.to_vec(),
-            None => {
-                return Err(ErrorSigner::Interface(
-                    InterfaceSigner::HistoryPageOutOfRange {
-                        page_number,
-                        total_pages,
-                    },
-                ))
-            }
-        },
-    };
-    Ok(format!(
-        "\"log\":{},\"total_entries\":{}",
-        export_complex_vector(&history_subset, |(order, entry)| format!(
-            "\"order\":{},{}",
-            order.stamp(),
-            entry.show(|b| format!("\"{}\"", hex::encode(b.transaction())))
-        )),
-        history.len()
-    ))
 }
 
 /// Local helper function to retrieve history entries from the database.
@@ -143,20 +95,6 @@ pub fn get_history_entry_by_order(order: u32, database_name: &str) -> Result<Ent
         Some(a) => Ok(a),
         None => Err(ErrorSigner::NotFound(NotFoundSigner::HistoryEntry(order))),
     }
-}
-
-/// Function to print history entry by order for entries without parseable transaction
-#[cfg(feature = "signer")]
-pub fn print_history_entry_by_order(
-    order: u32,
-    database_name: &str,
-) -> Result<String, ErrorSigner> {
-    let entry = get_history_entry_by_order(order, database_name)?;
-    Ok(format!(
-        "\"order\":{},{}",
-        order,
-        entry.show(|b| format!("\"{}\"", hex::encode(b.transaction())))
-    ))
 }
 
 /// Function to clear Signer history.

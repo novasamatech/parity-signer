@@ -286,6 +286,7 @@ use crate::{
     crypto::Encryption,
     error::{ErrorSource, SpecsKeySource},
     keyring::NetworkSpecsKey,
+    navigation::MVerifierDetails,
 };
 #[cfg(feature = "signer")]
 use crate::{
@@ -408,16 +409,6 @@ pub struct ShortSpecs {
 }
 
 impl NetworkSpecs {
-    /// Prints network specs in json format
-    #[cfg(feature = "signer")]
-    pub fn show(
-        &self,
-        valid_current_verifier: &ValidCurrentVerifier,
-        general_verifier: &Verifier,
-    ) -> String {
-        format!("\"base58prefix\":\"{}\",\"color\":\"{}\",\"decimals\":\"{}\",\"encryption\":\"{}\",\"genesis_hash\":\"{}\",\"logo\":\"{}\",\"name\":\"{}\",\"order\":\"{}\",\"path_id\":\"{}\",\"secondary_color\":\"{}\",\"title\":\"{}\",\"unit\":\"{}\",\"current_verifier\":{}", &self.base58prefix, &self.color, &self.decimals, &self.encryption.show(), hex::encode(&self.genesis_hash), &self.logo, &self.name, &self.order, &self.path_id, &self.secondary_color, &self.title, &self.unit, export_complex_single(valid_current_verifier, |a| a.show(general_verifier)))
-    }
-
     /// Makes [`NetworkSpecsToSend`] from [`NetworkSpecs`]
     #[cfg(feature = "signer")]
     pub fn to_send(&self) -> NetworkSpecsToSend {
@@ -605,13 +596,14 @@ pub enum VerifierValue {
 #[cfg(feature = "signer")]
 impl Verifier {
     /// Display [`Verifier`] in json-like format, for json exports  
-    pub fn show_card(&self) -> String {
+    pub fn show_card(&self) -> MVerifierDetails {
         match &self.v {
             Some(a) => a.show_card(),
-            None => format!(
-                "\"public_key\":\"\",\"identicon\":\"{}\",\"encryption\":\"none\"",
-                hex::encode(EMPTY_PNG)
-            ),
+            None => MVerifierDetails {
+                public_key: String::new(),
+                identicon: hex::encode(EMPTY_PNG),
+                encryption: String::new(),
+            },
         }
     }
 
@@ -627,18 +619,18 @@ impl Verifier {
 #[cfg(feature = "signer")]
 impl VerifierValue {
     /// Display [`VerifierValue`] in json-like format, for json exports  
-    pub fn show_card(&self) -> String {
+    pub fn show_card(&self) -> MVerifierDetails {
         match &self {
             VerifierValue::Standard { m } => {
-                let hex_public = hex::encode(multisigner_to_public(m));
-                let encryption = multisigner_to_encryption(m);
-                let hex_identicon = hex::encode(make_identicon_from_multisigner(m));
-                format!(
-                    "\"public_key\":\"{}\",\"identicon\":\"{}\",\"encryption\":\"{}\"",
-                    hex_public,
-                    hex_identicon,
-                    encryption.show()
-                )
+                let public_key = hex::encode(multisigner_to_public(m));
+                let encryption = multisigner_to_encryption(m).show();
+                let identicon = hex::encode(make_identicon_from_multisigner(m));
+
+                MVerifierDetails {
+                    public_key,
+                    identicon,
+                    encryption,
+                }
             }
         }
     }
@@ -687,21 +679,4 @@ pub enum ValidCurrentVerifier {
 
     /// Network has some other verifier, different from the general one
     Custom { v: Verifier },
-}
-
-#[cfg(feature = "signer")]
-impl ValidCurrentVerifier {
-    /// Display [`ValidCurrentVerifier`] in json-like format, for json exports  
-    pub fn show(&self, general_verifier: &Verifier) -> String {
-        match &self {
-            ValidCurrentVerifier::General => format!(
-                "\"type\":\"general\",\"details\":{}",
-                export_complex_single(general_verifier, |a| a.show_card())
-            ),
-            ValidCurrentVerifier::Custom { v } => format!(
-                "\"type\":\"custom\",\"details\":{}",
-                export_complex_single(v, |v| v.show_card())
-            ),
-        }
-    }
 }

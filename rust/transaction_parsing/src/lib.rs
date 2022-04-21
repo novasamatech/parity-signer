@@ -77,9 +77,12 @@ pub fn produce_output(payload: &str, dbname: &str) -> TransactionAction {
 
 /// Function to print history entry by order for entries without parseable transaction
 pub fn print_history_entry_by_order_with_decoding(
-    order: u32,
-    database_name: &str,
+    _order: u32,
+    _database_name: &str,
 ) -> Result<String, ErrorSigner> {
+    // TODO
+    Ok(String::new())
+    /*
     let entry = get_history_entry_by_order(order, database_name)?;
     Ok(
         entry.show(|a| match decode_signable_from_history(a, database_name) {
@@ -91,4 +94,5 @@ pub fn print_history_entry_by_order_with_decoding(
             ),
         }),
     )
+    */
 }

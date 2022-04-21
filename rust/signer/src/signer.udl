@@ -233,96 +233,6 @@ enum Action {
     "Nothing",
 };
 
-dictionary LogScreenEntry {
-    u32 order;
-    string timestamp;
-    sequence<Event> events;
-};
-
-[Custom]
-typedef string NetworkSpecsKey;
-
-[Enum]
-interface StubNav {
-    AddSpecs(NetworkSpecsKey n);
-    LoadMeta(NetworkSpecsKey l);
-    LoadTypes();
-};
-
-[Enum]
-interface TransactionAction {
-    Derivations(string content, string network_info, u32 checksum, NetworkSpecsKey network_specs_key);
-    Sign(string content, u32 checksum, boolean has_pwd, string author_info, string network_info);
-    Stub(string s, u32 u, StubNav stub);
-    Read(string r);
-};
-
-dictionary SeedNameWithIdenticon {
-    string seed_name;
-    string identicon;
-};
-
-dictionary RootNetworkId {
-    string seed_name;
-    string identicon;
-    string address_key;
-    string base58;
-    boolean swiped;
-    boolean is_multiselect;
-};
-
-dictionary OtherNetworkId {
-    string address_key;
-    string base58;
-    string identicon;
-    boolean has_pwd;
-    string path;
-    boolean swiped;
-    boolean is_multiselect;
-};
-
-dictionary IdentitiesForSeedNameAndNetwork {
-    RootNetworkId root;
-    sequence<OtherNetworkId> set;
-    string title;
-    string logo;
-};
-
-dictionary ExportedKey {
-    string qr;
-    string pubkey;
-    string address_base58;
-    string identicon;
-    string seed_name;
-    string path;
-    string network_title;
-    string network_logo;
-};
-
-dictionary CollisionDisplay {
-    string base58;
-    string path;
-    boolean has_pwd;
-    string identicon;
-    string seed_name;
-};
-
-dictionary DerivePrep {
-    string seed_name;
-    string network_title;
-    string network_logo;
-    string network_specs_key;
-    string suggested_derivation;
-    CollisionDisplay? collision;
-};
-
-dictionary NetworkDetails {
-    NetworkSpecs specs;
-    ValidCurrentVerifier current_verifier;
-    Verifier general_verifier;
-    sequence<MetaValues> meta_values;
-};
-
 dictionary Identity {
     string seed_name;
     string address_key;
@@ -334,42 +244,265 @@ dictionary Identity {
     string base58;
 };
 
+dictionary MSeedKeyCard {
+    string seed_name;
+    string identicon;
+    string address_key;
+    string base58;
+    boolean swiped;
+    boolean multiselect;
+};
+
+dictionary MNetworkCard {
+    string title;
+    string logo;
+};
+
+dictionary MKeys {
+    sequence<MKeysCard> set;
+    MSeedKeyCard root;
+    MNetworkCard network;
+    boolean multiselect_mode;
+    string multiselect_count;
+};
+
+dictionary MKeysCard {
+    string address_key;
+    string base58;
+    string identicon;
+    boolean has_pwd;
+    string path;
+    boolean swiped;
+    boolean multiselect;
+};
+
+dictionary MSettings {
+    string? public_key;
+    string? identicon;
+    string? encryption;
+    string? error;
+};
+
+dictionary MLog {
+    sequence<History> log;
+    u32 total_entries;
+};
+
+dictionary History {
+    u32 order;
+    string timestamp;
+    sequence<Event> events;
+};
+
+dictionary MLogDetails {
+    string timestamp;
+    sequence<Event> events;
+};
+
+dictionary MTransaction {
+    TransactionCardSet content;
+    TransactionType ttype;
+    TransactionAuthor? author_info;
+    TransactionNetworkInfo? network_info;
+};
+
+dictionary TransactionAuthor {
+    string base58;
+    string identicon;
+    string seed;
+    string derivation_path;
+};
+
+dictionary TransactionNetworkInfo {
+    string network_title;
+    string network_logo;
+};
+
+enum TransactionType {
+    "Sign",
+    "Stub",
+    "Read",
+    "ImportDerivations",
+    "Done",
+};
+
+dictionary TransactionCard {
+    string content;
+};
+
+dictionary TransactionCardSet {
+    sequence<TransactionCard>? author;
+    sequence<TransactionCard>? error;
+    sequence<TransactionCard>? extensions;
+    sequence<TransactionCard>? importing_derivations;
+    sequence<TransactionCard>? message;
+    sequence<TransactionCard>? meta;
+    sequence<TransactionCard>? method;
+    sequence<TransactionCard>? new_specs;
+    sequence<TransactionCard>? verifier;
+    sequence<TransactionCard>? warning;
+    sequence<TransactionCard>? types_info;
+};
+
+dictionary SeedNameCard {
+    string seed_name;
+    string identicon;
+};
+
+dictionary MSeeds {
+    sequence<SeedNameCard> seed_name_cards;
+};
+
+dictionary MKeyDetails {
+    string qr;
+    string pubkey;
+    string base58;
+    string identicon;
+    string seed_name;
+    string path;
+    string network_title;
+    string network_logo;
+};
+
+dictionary MNewSeed {
+    boolean keyboard;
+};
+
+dictionary MRecoverSeedName {
+    boolean keyboard;
+    string seed_name;
+};
+
+dictionary MRecoverSeedPhrase {
+    boolean keyboard;
+    string seed_name;
+    string user_input;
+    sequence<string> guess_set;
+    sequence<SeedWord> draft;
+    string? ready_seed;
+};
+
+dictionary SeedWord {
+    u32 order;
+    string content;
+};
+
+dictionary MDeriveKey {
+    string seed_name;
+    string network_title;
+    string network_logo;
+    string network_specs_key;
+    string suggested_derivation;
+    boolean keyboard;
+    DerivationCheck? derivation_check;
+};
+
+dictionary DerivationCheck {
+    boolean? button_good;
+    DerivationDestination? where_to;
+    Address? collision;
+    string? error;
+};
+
+dictionary Address {
+    string base58;
+    string path;
+    boolean has_pwd;
+    string identicon;
+    string seed_name;
+    boolean? multiselect;
+};
+
+enum DerivationDestination {
+    "Pwd",
+    "Pin",
+};
+
+dictionary MVerifierDetails {
+    string public_key;
+    string identicon;
+    string encryption;
+};
+
+dictionary MNetworkDetails {
+    u16 base58prefix;
+    string color;
+    u8 decimals;
+    Encryption encryption;
+    string genesis_hash;
+    string logo;
+    string name;
+    string order;
+    string path_id;
+    string secondary_color;
+    string title;
+    string unit;
+    MVerifier current_verifier;
+    sequence<MMetadataRecord> meta;
+};
+
+dictionary MVerifier {
+    string ttype;
+    MVerifierDetails details;
+};
+
+dictionary MMetadataRecord {
+    string specs_version;
+    string meta_hash;
+    string meta_id_pic;
+};
+
+dictionary MRawKey {
+    string seed_name;
+    string address_key;
+    string public_key;
+    string identicon;
+    boolean has_pwd;
+    string path;
+};
+
+dictionary MSignSufficientCrypto {
+    sequence<MRawKey> identities;
+};
+
+dictionary MKeyDetailsMulti {
+    MKeyDetails key_details;
+    string current_number;
+    string out_of;
+};
+
+dictionary MMNetwork {
+    string key;
+    string title;
+    string logo;
+    u8 order;
+};
+
+dictionary MManageNetworks {
+    sequence<MMNetwork> networks;
+};
+
 [Enum]
 interface ScreenData {
-    Empty();
-    LogData(sequence<LogScreenEntry> log);
-    LogDetailsData(string details_data);
-    SettingsData(Verifier verifier);
-    SelectSeedForBackupData();
-    VerifierData(Verifier verifier);
-    DocumentsData();
-    ManageNetworksData(sequence<NetworkSpecs> networks);
-    NetworkDetailsData(NetworkDetails details);
-    SignSufficientCryptoData();
-    ScanData();
-    TransactionData(TransactionAction t);
-    SeedNamesWithIdenticons( sequence<SeedNameWithIdenticon> n);
-    IdentitiesForSeedNameAndNetworkData(
-        IdentitiesForSeedNameAndNetwork i,
-        boolean multiselect_mode,
-        string multiselect_count
-    );
-    ExportedKeyData(ExportedKey k);
-    ExportedKeyDataMulti(ExportedKey k, u32 current_number, u32 out_of);
-    KeyboardData(boolean keyboard);
-    RecoverSeedNameData(string seed_name, boolean keyboard);
-    RecoverSeedPhraseData(
-        string seed_name,
-        boolean keyboard,
-        string user_input,
-        sequence<string> guess_set,
-        string draft
-    );
-    DerivePrepData(
-        DerivePrep d,
-        boolean keyboard
-    );
-    AllIdentitiesData(sequence<Identity> identities);
+    Scan();
+    Keys(MKeys f);
+    Settings(MSettings f);
+    Log(MLog f);
+    LogDetails(MLogDetails f);
+    Transaction(MTransaction f);
+    SeedSelector(MSeeds f);
+    KeyDetails(MKeyDetails f);
+    NewSeed(MNewSeed f);
+    RecoverSeedName(MRecoverSeedName f);
+    RecoverSeedPhrase(MRecoverSeedPhrase f);
+    DeriveKey(MDeriveKey f);
+    VVerifier(MVerifierDetails f);
+    ManageNetworks(MManageNetworks f);
+    NNetworkDetails(MNetworkDetails f);
+    SignSufficientCrypto(MSignSufficientCrypto f);
+    SelectSeedForBackup(MSeeds f);
+    Documents();
+    KeyDetailsMulti(MKeyDetailsMulti f);
 };
 
 namespace signer {

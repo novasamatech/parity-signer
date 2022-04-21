@@ -1,6 +1,10 @@
 //! Navigation state of the app
 
-use definitions::navigation::{ActionResult, LogScreenEntry, ScreenData};
+use definitions::navigation::{
+    ActionResult, History, MKeyDetailsMulti, MKeys, MLog, MLogDetails, MManageNetworks, MNewSeed,
+    MRecoverSeedName, MRecoverSeedPhrase, MSeeds, MSettings, MSignSufficientCrypto,
+    MVerifierDetails, ScreenData,
+};
 use sp_runtime::MultiSigner;
 use zeroize::Zeroize;
 
@@ -1495,47 +1499,40 @@ impl State {
             let screen_details: ScreenData = match new_navstate.screen {
                 Screen::Log => {
                     let history = db_handling::manage_history::get_history(dbname).unwrap();
-                    let log = history
+                    let log: Vec<_> = history
                         .into_iter()
-                        .map(|(order, entry)| LogScreenEntry {
+                        .map(|(order, entry)| History {
                             order: order.stamp(),
                             timestamp: entry.timestamp,
                             events: entry.events,
                         })
                         .collect();
+                    let total_entries = log.len() as u32;
+                    let f = MLog { log, total_entries };
 
-                    ScreenData::LogData { log }
-                    /*
-                    match db_handling::manage_history::print_history(dbname) {
-                        Ok(a) => a,
-                        Err(e) => {
-                            new_navstate.alert = Alert::ErrorDisplay;
-                            errorline.push_str(&<Signer>::show(&e));
-                            "".to_string()
-                        },
-                    }
-                    */
+                    ScreenData::Log { f }
                 }
                 Screen::LogDetails(order) => {
-                    let details_data =
-                        transaction_parsing::print_history_entry_by_order_with_decoding(
-                            order, dbname,
+                    let f = MLogDetails {
+                        timestamp: String::new(),
+                        events: vec![],
+                    };
+                    ScreenData::LogDetails { f }
+                }
+                Screen::Scan => ScreenData::Scan,
+                Screen::Transaction(ref t) => ScreenData::Transaction { f: todo!() },
+                Screen::SeedSelector | Screen::SelectSeedForBackup => {
+                    let seed_name_cards =
+                        db_handling::interface_signer::get_all_seed_names_with_identicons(
+                            dbname,
+                            &self.seed_names,
                         )
                         .unwrap();
-                    ScreenData::LogDetailsData { details_data }
-                }
-                Screen::Scan => ScreenData::ScanData,
-                Screen::Transaction(ref t) => ScreenData::TransactionData { t: t.action() },
-                Screen::SeedSelector | Screen::SelectSeedForBackup => {
-                    let n = db_handling::interface_signer::get_all_seed_names_with_identicons(
-                        dbname,
-                        &self.seed_names,
-                    )
-                    .unwrap();
-                    ScreenData::SeedNamesWithIdenticons { n }
+                    let f = MSeeds { seed_name_cards };
+                    ScreenData::SeedSelector { f }
                 }
                 Screen::Keys(ref keys_state) => {
-                    let i =
+                    let (root, set) =
                         db_handling::interface_signer::print_identities_for_seed_name_and_network(
                             dbname,
                             &keys_state.seed_name(),
@@ -1553,43 +1550,54 @@ impl State {
                         } else {
                             String::new()
                         };
-                    ScreenData::IdentitiesForSeedNameAndNetworkData {
-                        i,
+                    let network = Default::default();
+                    let f = MKeys {
+                        set,
+                        root,
+                        network,
                         multiselect_mode,
                         multiselect_count,
-                    }
+                    };
+                    ScreenData::Keys { f }
                 }
                 Screen::KeyDetails(ref address_state) => {
-                    let k = db_handling::interface_signer::export_key(
+                    let f = db_handling::interface_signer::export_key(
                         dbname,
                         &address_state.multisigner(),
                         &address_state.seed_name(),
                         &address_state.network_specs_key(),
                     )
                     .unwrap();
-                    ScreenData::ExportedKeyData { k }
+                    ScreenData::KeyDetails { f }
                 }
                 Screen::KeyDetailsMulti(ref address_state_multi) => {
-                    let k = db_handling::interface_signer::export_key(
+                    let key_details = db_handling::interface_signer::export_key(
                         dbname,
                         &address_state_multi.multisigner(),
                         &address_state_multi.seed_name(),
                         &address_state_multi.network_specs_key(),
                     )
                     .unwrap();
-                    ScreenData::ExportedKeyDataMulti {
-                        k,
-                        current_number: address_state_multi.number() as u32,
-                        out_of: address_state_multi.out_of() as u32,
-                    }
+                    let f = MKeyDetailsMulti {
+                        key_details,
+                        current_number: address_state_multi.number().to_string(),
+                        out_of: address_state_multi.out_of().to_string(),
+                    };
+                    ScreenData::KeyDetailsMulti { f }
                 }
-                Screen::NewSeed => ScreenData::KeyboardData {
-                    keyboard: new_navstate.keyboard(),
-                },
-                Screen::RecoverSeedName(ref seed_name) => ScreenData::RecoverSeedNameData {
-                    seed_name: seed_name.to_string(),
-                    keyboard: new_navstate.keyboard(),
-                },
+                Screen::NewSeed => {
+                    let f = MNewSeed {
+                        keyboard: new_navstate.keyboard(),
+                    };
+                    ScreenData::NewSeed { f }
+                }
+                Screen::RecoverSeedName(ref seed_name) => {
+                    let f = MRecoverSeedName {
+                        keyboard: new_navstate.keyboard(),
+                        seed_name: seed_name.to_string(),
+                    };
+                    ScreenData::RecoverSeedName { f }
+                }
                 Screen::RecoverSeedPhrase(ref recover_seed_phrase_state) => {
                     let draft = recover_seed_phrase_state.draft();
                     let user_input = draft.user_input();
@@ -1605,62 +1613,65 @@ impl State {
                     out.push_str(&seed_draft_print);
                     seed_draft_print.zeroize();
 
-                    let mut seed_finalized = draft.try_finalize();
-                    if let Some(ref s) = seed_finalized {
-                        out.push_str(",\"ready_seed\":\"");
-                        out.push_str(s);
-                        out.push('\"');
-                    }
-                    seed_finalized.zeroize();
+                    let seed_finalized = draft.try_finalize();
 
-                    ScreenData::RecoverSeedPhraseData {
-                        seed_name: recover_seed_phrase_state.name(),
+                    let f = MRecoverSeedPhrase {
                         keyboard: new_navstate.keyboard(),
+                        seed_name: recover_seed_phrase_state.name(),
                         user_input: user_input.to_string(),
                         guess_set: guess_set.iter().map(|s| s.to_string()).collect(),
-                        draft: out,
-                    }
+                        draft: seed_finalized.unwrap_or_default(),
+                        ready_seed: None,
+                    };
+                    ScreenData::RecoverSeedPhrase { f }
                 }
                 Screen::DeriveKey(ref derive_state) => {
-                    let d = db_handling::interface_signer::derive_prep(
+                    let f = db_handling::interface_signer::derive_prep(
                         dbname,
                         &derive_state.seed_name(),
                         &derive_state.network_specs_key(),
                         derive_state.collision(),
                         details_str,
+                        new_navstate.keyboard(),
                     )
                     .unwrap();
-                    ScreenData::DerivePrepData {
-                        d,
-                        keyboard: new_navstate.keyboard(),
-                    }
+                    ScreenData::DeriveKey { f }
                 }
                 Screen::Settings => {
                     // for now has same content as Screen::Verifier
-                    let verifier = db_handling::helpers::get_general_verifier(dbname).unwrap();
-                    ScreenData::SettingsData { verifier }
+                    // TODO: let f = db_handling::helpers::get_general_verifier(dbname).unwrap();
+                    ScreenData::Settings {
+                        f: MSettings {
+                            public_key: None,
+                            identicon: None,
+                            encryption: None,
+                            error: None,
+                        },
+                    }
                 }
                 Screen::Verifier => {
-                    let verifier = db_handling::helpers::get_general_verifier(dbname).unwrap();
-                    ScreenData::VerifierData { verifier }
+                    let f = db_handling::helpers::get_general_verifier(dbname).unwrap();
+                    ScreenData::VVerifier { f: f.show_card() }
                 }
                 Screen::ManageNetworks => {
                     let networks =
                         db_handling::interface_signer::show_all_networks(dbname).unwrap();
-                    ScreenData::ManageNetworksData { networks }
+                    let f = MManageNetworks { networks };
+                    ScreenData::ManageNetworks { f }
                 }
                 Screen::NetworkDetails(ref network_specs_key) => {
-                    let details = db_handling::interface_signer::network_details_by_key(
+                    let f = db_handling::interface_signer::network_details_by_key(
                         dbname,
                         network_specs_key,
                     )
                     .unwrap();
-                    ScreenData::NetworkDetailsData { details }
+                    ScreenData::NNetworkDetails { f }
                 }
                 Screen::SignSufficientCrypto(_) => {
                     let identities =
                         db_handling::interface_signer::print_all_identities(dbname).unwrap();
-                    ScreenData::AllIdentitiesData { identities }
+                    let f = MSignSufficientCrypto { identities };
+                    ScreenData::SignSufficientCrypto { f }
                 }
                 _ => {
                     //"".to_string(),

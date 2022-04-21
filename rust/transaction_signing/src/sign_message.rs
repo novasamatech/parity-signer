@@ -199,9 +199,9 @@ pub(crate) fn sufficient_crypto_load_metadata(
         }
     };
     Ok(format!(
-        "\"sufficient\":\"{}\",\"content\":{{\"type\":\"load_metadata\",{}}}",
+        "\"sufficient\":\"{}\",\"content\":{{\"type\":\"load_metadata\": \"\"}}",
         sufficient,
-        MetaValuesDisplay::get(&meta_values).show()
+        // MetaValuesDisplay::get(&meta_values).show()
     ))
 }
 

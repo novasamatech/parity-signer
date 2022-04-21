@@ -1,10 +1,4 @@
-use crate::{
-    history::Event,
-    keyring::NetworkSpecsKey,
-    metadata::MetaValues,
-    network_specs::{NetworkSpecs, ValidCurrentVerifier, Verifier},
-};
-use plot_icon::EMPTY_PNG;
+use crate::{crypto::Encryption, history::Event, keyring::NetworkSpecsKey};
 
 #[derive(PartialEq, Clone)]
 pub struct SeedNameWithIdenticon {
@@ -76,69 +70,25 @@ pub struct LogScreenEntry {
 
 #[derive(Clone, PartialEq)]
 pub enum ScreenData {
-    Empty,
-    LogData {
-        log: Vec<LogScreenEntry>,
-    },
-    LogDetailsData {
-        details_data: String,
-    },
-    SettingsData {
-        verifier: Verifier,
-    },
-    SelectSeedForBackupData,
-    VerifierData {
-        verifier: Verifier,
-    },
-    DocumentsData,
-    ManageNetworksData {
-        networks: Vec<NetworkSpecs>,
-    },
-    NetworkDetailsData {
-        details: NetworkDetails,
-    },
-    SignSufficientCryptoData,
-    ScanData,
-    TransactionData {
-        t: TransactionAction,
-    },
-    SeedNamesWithIdenticons {
-        n: Vec<SeedNameWithIdenticon>,
-    },
-    IdentitiesForSeedNameAndNetworkData {
-        i: IdentitiesForSeedNameAndNetwork,
-        multiselect_mode: bool,
-        multiselect_count: String,
-    },
-    ExportedKeyData {
-        k: ExportedKey,
-    },
-    ExportedKeyDataMulti {
-        k: ExportedKey,
-        current_number: u32,
-        out_of: u32,
-    },
-    KeyboardData {
-        keyboard: bool,
-    },
-    RecoverSeedNameData {
-        seed_name: String,
-        keyboard: bool,
-    },
-    RecoverSeedPhraseData {
-        seed_name: String,
-        keyboard: bool,
-        user_input: String,
-        guess_set: Vec<String>,
-        draft: String,
-    },
-    DerivePrepData {
-        d: DerivePrep,
-        keyboard: bool,
-    },
-    AllIdentitiesData {
-        identities: Vec<Identity>,
-    },
+    Scan,
+    Keys { f: MKeys },
+    Settings { f: MSettings },
+    Log { f: MLog },
+    LogDetails { f: MLogDetails },
+    Transaction { f: MTransaction },
+    SeedSelector { f: MSeeds },
+    KeyDetails { f: MKeyDetails },
+    NewSeed { f: MNewSeed },
+    RecoverSeedName { f: MRecoverSeedName },
+    RecoverSeedPhrase { f: MRecoverSeedPhrase },
+    DeriveKey { f: MDeriveKey },
+    VVerifier { f: MVerifierDetails },
+    ManageNetworks { f: MManageNetworks },
+    NNetworkDetails { f: MNetworkDetails },
+    SignSufficientCrypto { f: MSignSufficientCrypto },
+    SelectSeedForBackup { f: MSeeds },
+    Documents,
+    KeyDetailsMulti { f: MKeyDetailsMulti },
 }
 
 #[derive(Clone, PartialEq)]
@@ -154,82 +104,274 @@ pub struct Identity {
 }
 
 #[derive(Clone, PartialEq)]
-pub struct NetworkDetails {
-    pub specs: NetworkSpecs,
-    pub current_verifier: ValidCurrentVerifier,
-    pub general_verifier: Verifier,
-    pub meta_values: Vec<MetaValues>,
+pub struct MKeysCard {
+    pub address_key: String,
+    pub base58: String,
+    pub identicon: String,
+    pub has_pwd: bool,
+    pub path: String,
+    pub swiped: bool,
+    pub multiselect: bool,
+}
+
+#[derive(Clone, Default, PartialEq)]
+pub struct MNetworkCard {
+    pub title: String,
+    pub logo: String,
+}
+
+// TODO: This has to have a custom default.
+#[derive(Clone, Default, PartialEq)]
+pub struct MSeedKeyCard {
+    pub seed_name: String,
+    pub identicon: String,
+    pub address_key: String,
+    pub base58: String,
+    pub swiped: bool,
+    pub multiselect: bool,
 }
 
 #[derive(Clone, PartialEq)]
-pub struct DerivePrep {
+pub struct MKeys {
+    pub set: Vec<MKeysCard>,
+    pub root: MSeedKeyCard,
+    pub network: MNetworkCard,
+    pub multiselect_mode: bool,
+    pub multiselect_count: String,
+}
+
+#[derive(Clone, PartialEq)]
+pub struct MSettings {
+    pub public_key: Option<String>,
+    pub identicon: Option<String>,
+    pub encryption: Option<String>,
+    pub error: Option<String>,
+}
+
+#[derive(Clone, PartialEq)]
+pub struct History {
+    pub order: u32,
+    pub timestamp: String,
+    pub events: Vec<Event>,
+}
+
+#[derive(Clone, PartialEq)]
+pub struct MLog {
+    pub log: Vec<History>,
+    pub total_entries: u32,
+}
+
+#[derive(Clone, PartialEq)]
+pub struct MLogDetails {
+    pub timestamp: String,
+    pub events: Vec<Event>,
+}
+
+#[derive(Clone, PartialEq)]
+pub enum TransactionType {
+    Sign,
+    Stub,
+    Read,
+    ImportDerivations,
+    Done,
+}
+
+#[derive(Clone, PartialEq)]
+pub struct TransactionNetworkInfo {
+    pub network_title: String,
+    pub network_logo: String,
+}
+
+#[derive(Clone, PartialEq)]
+pub struct TransactionAuthor {
+    pub base58: String,
+    pub identicon: String,
+    pub seed: String,
+    pub derivation_path: String,
+}
+
+#[derive(Clone, PartialEq)]
+pub struct TransactionCard {
+    pub content: String,
+}
+
+#[derive(Clone, PartialEq)]
+pub struct TransactionCardSet {
+    pub author: Option<Vec<TransactionCard>>,
+    pub error: Option<Vec<TransactionCard>>,
+    pub extensions: Option<Vec<TransactionCard>>,
+    pub importing_derivations: Option<Vec<TransactionCard>>,
+    pub message: Option<Vec<TransactionCard>>,
+    pub meta: Option<Vec<TransactionCard>>,
+    pub method: Option<Vec<TransactionCard>>,
+    pub new_specs: Option<Vec<TransactionCard>>,
+    pub verifier: Option<Vec<TransactionCard>>,
+    pub warning: Option<Vec<TransactionCard>>,
+    pub types_info: Option<Vec<TransactionCard>>,
+}
+
+#[derive(Clone, PartialEq)]
+pub struct MTransaction {
+    pub content: TransactionCardSet,
+    pub ttype: TransactionType,
+    pub author_info: Option<TransactionAuthor>,
+    pub network_info: Option<TransactionNetworkInfo>,
+}
+
+#[derive(Clone, PartialEq)]
+pub struct SeedNameCard {
+    pub seed_name: String,
+    pub identicon: String,
+}
+
+#[derive(Clone, PartialEq)]
+pub struct MSeeds {
+    pub seed_name_cards: Vec<SeedNameCard>,
+}
+
+#[derive(Clone, PartialEq)]
+pub struct MKeyDetails {
+    pub qr: String,
+    pub pubkey: String,
+    pub base58: String,
+    pub identicon: String,
+    pub seed_name: String,
+    pub path: String,
+    pub network_title: String,
+    pub network_logo: String,
+}
+
+#[derive(Clone, PartialEq)]
+pub struct MNewSeed {
+    pub keyboard: bool,
+}
+
+#[derive(Clone, PartialEq)]
+pub struct MRecoverSeedName {
+    pub keyboard: bool,
+    pub seed_name: String,
+}
+
+#[derive(Clone, PartialEq)]
+pub struct MRecoverSeedPhrase {
+    pub keyboard: bool,
+    pub seed_name: String,
+    pub user_input: String,
+    pub guess_set: Vec<String>,
+    pub draft: Vec<SeedWord>,
+    pub ready_seed: Option<String>,
+}
+
+#[derive(Clone, PartialEq)]
+pub struct SeedWord {
+    pub order: u32,
+    pub content: String,
+}
+
+#[derive(Clone, PartialEq)]
+pub struct DerivationCheck {
+    pub button_good: Option<bool>,
+    pub where_to: Option<DerivationDestination>,
+    pub collision: Option<Address>,
+    pub error: Option<String>,
+}
+
+#[derive(Clone, PartialEq)]
+pub struct Address {
+    pub base58: String,
+    pub path: String,
+    pub has_pwd: bool,
+    pub identicon: String,
+    pub seed_name: String,
+    pub multiselect: Option<bool>,
+}
+
+#[derive(Clone, PartialEq)]
+pub enum DerivationDestination {
+    Pwd,
+    Pin,
+}
+
+#[derive(Clone, PartialEq)]
+pub struct MDeriveKey {
     pub seed_name: String,
     pub network_title: String,
     pub network_logo: String,
     pub network_specs_key: String,
     pub suggested_derivation: String,
-    pub collision: Option<CollisionDisplay>,
+    pub keyboard: bool,
+    pub derivation_check: Option<DerivationCheck>,
+}
+
+#[derive(Clone, Default, PartialEq)]
+pub struct MVerifierDetails {
+    pub public_key: String,
+    pub identicon: String,
+    pub encryption: String,
+}
+
+#[derive(Clone, Default, PartialEq)]
+pub struct MVerifier {
+    pub ttype: String,
+    pub details: MVerifierDetails,
 }
 
 #[derive(Clone, PartialEq)]
-pub struct CollisionDisplay {
-    pub base58: String,
-    pub path: String,
-    pub has_pwd: bool,
-    pub identicon: String,
+pub struct MMetadataRecord {
+    pub specs_version: String,
+    pub meta_hash: String,
+    pub meta_id_pic: String,
+}
+
+#[derive(Clone, PartialEq)]
+pub struct MNetworkDetails {
+    pub base58prefix: u16,
+    pub color: String,
+    pub decimals: u8,
+    pub encryption: Encryption,
+    pub genesis_hash: String,
+    pub logo: String,
+    pub name: String,
+    pub order: String,
+    pub path_id: String,
+    pub secondary_color: String,
+    pub title: String,
+    pub unit: String,
+    pub current_verifier: MVerifier,
+    pub meta: Vec<MMetadataRecord>,
+}
+
+#[derive(Clone, PartialEq)]
+pub struct MRawKey {
     pub seed_name: String,
-}
-
-#[derive(Clone, PartialEq)]
-pub struct RootNetworkId {
-    pub seed_name: String,
-    pub identicon: String,
     pub address_key: String,
-    pub base58: String,
-    pub swiped: bool,
-    pub is_multiselect: bool,
-}
-
-impl Default for RootNetworkId {
-    fn default() -> Self {
-        RootNetworkId {
-            identicon: hex::encode(EMPTY_PNG),
-            seed_name: Default::default(),
-            address_key: Default::default(),
-            base58: Default::default(),
-            swiped: Default::default(),
-            is_multiselect: Default::default(),
-        }
-    }
-}
-
-#[derive(Clone, PartialEq)]
-pub struct OtherNetworkId {
-    pub address_key: String,
-    pub base58: String,
+    pub public_key: String,
     pub identicon: String,
     pub has_pwd: bool,
     pub path: String,
-    pub swiped: bool,
-    pub is_multiselect: bool,
 }
 
 #[derive(Clone, PartialEq)]
-pub struct IdentitiesForSeedNameAndNetwork {
-    pub root: RootNetworkId,
-    pub set: Vec<OtherNetworkId>,
+pub struct MSignSufficientCrypto {
+    pub identities: Vec<MRawKey>,
+}
+
+#[derive(Clone, PartialEq)]
+pub struct MKeyDetailsMulti {
+    pub key_details: MKeyDetails,
+    pub current_number: String,
+    pub out_of: String,
+}
+
+#[derive(Clone, PartialEq)]
+pub struct MMNetwork {
+    pub key: String,
     pub title: String,
     pub logo: String,
+    pub order: u8,
 }
 
 #[derive(Clone, PartialEq)]
-pub struct ExportedKey {
-    pub qr: String,
-    pub pubkey: String,
-    pub address_base58: String,
-    pub identicon: String,
-    pub seed_name: String,
-    pub path: String,
-    pub network_title: String,
-    pub network_logo: String,
+pub struct MManageNetworks {
+    pub networks: Vec<MMNetwork>,
 }
