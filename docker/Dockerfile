@@ -5,13 +5,12 @@ LABEL maintainer="Parity Technologies <admin@parity.io>"
 ENV ANDROID_SDK_ROOT /opt/android-sdk-linux
 ENV ANDROID_HOME /opt/android-sdk-linux
 ENV NDK_HOME /opt/android-ndk
-ENV ANDROID_NDK_VERSION r23b
 ENV JAVA_HOME /usr/lib/jvm/java-11-openjdk-amd64/
 
 RUN apt-get -y update && apt-get -y install default-jdk wget unzip curl clang
+RUN apt-get -y install python git
 
 # SDK setup is taken from https://github.com/bitrise-io/android/blob/master/Dockerfile
-# NDK setup is taken from https://github.com/bitrise-io/android-ndk/blob/master/Dockerfile
 
 RUN cd /opt \
     && wget -q https://dl.google.com/android/repository/commandlinetools-linux-8092744_latest.zip -O android-commandline-tools.zip \
@@ -26,20 +25,6 @@ RUN yes | sdkmanager --licenses
 # We need at least one set of build-tools installed for apksigner
 RUN yes | sdkmanager "build-tools;30.0.3"
 RUN echo "y" | sdkmanager --install "ndk;24.0.8215888" --sdk_root=${ANDROID_SDK_ROOT}
-
-RUN mkdir /opt/android-ndk-tmp && \
-    cd /opt/android-ndk-tmp && \
-    wget -q https://dl.google.com/android/repository/android-ndk-${ANDROID_NDK_VERSION}-linux.zip && \
-# uncompress
-    unzip -q android-ndk-${ANDROID_NDK_VERSION}-linux.zip && \
-# move to its final location
-    mv ./android-ndk-${ANDROID_NDK_VERSION} ${NDK_HOME} && \
-# remove temp dir
-    cd ${NDK_HOME} && \
-    rm -rf /opt/android-ndk-tmp
-
-# add to PATH
-ENV PATH ${PATH}:${NDK_HOME}
 
 # rust stuff
 
