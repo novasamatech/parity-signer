@@ -10,145 +10,6 @@
 
 import Foundation
 
-/**
- * This object stores really stores observable backend model
- * without boilerplate that handles iOS-contained logic
- */
-struct ActionResult: Decodable {
-    var screen: SignerScreen = .Log(MLog())
-    var screenLabel: String = ""
-    var back: Bool = false
-    var footer: Bool = true
-    var footerButton: String = ""
-    var rightButton: String = ""
-    var screenNameType: String = ""
-    var modal: SignerModal = .Empty
-    var alert: SignerAlert = .Empty
-    
-    enum CodingKeys: String, CodingKey {
-        case screen
-        case screenLabel
-        case back
-        case footer
-        case footerButton
-        case rightButton
-        case screenNameType
-        case modal
-        case alert
-        case screenData
-        case modalData
-        case alertData
-    }
-    
-    init() {}
-    
-    //TODO: maybe replace explicits with rust call
-    init(from decoder: Decoder) throws {
-        let values = try decoder.container(keyedBy: CodingKeys.self)
-        screenLabel = try values.decode(String.self, forKey: .screenLabel)
-        back = try values.decode(Bool.self, forKey: .back)
-        footer = try values.decode(Bool.self, forKey: .footer)
-        footerButton = try values.decode(String.self, forKey: .footerButton)
-        rightButton = try values.decode(String.self, forKey: .rightButton)
-        screenNameType = try values.decode(String.self, forKey: .screenNameType)
-        let alertType = try values.decode(String.self, forKey: .alert)
-        let modalType = try values.decode(String.self, forKey: .modal)
-        let screenType = try values.decode(String.self, forKey: .screen)
-        
-        switch screenType {
-        case "Scan":
-            screen = .Scan
-        case "Keys":
-            screen = .Keys(try values.decode(MKeys.self, forKey: .screenData))
-        case "Settings":
-            screen = .Settings(try values.decode(MSettings.self, forKey: .screenData))
-        case "Log":
-            screen = .Log(try values.decode(MLog.self, forKey: .screenData))
-        case "LogDetails":
-            screen = .LogDetails(try values.decode(MLogDetails.self, forKey: .screenData))
-        case "SeedSelector":
-            screen = .SeedSelector(try values.decode(MSeeds.self, forKey: .screenData))
-        case "KeyDetails":
-            screen = .KeyDetails(try values.decode(MKeyDetails.self, forKey: .screenData))
-        case "NewSeed":
-            screen = .NewSeed(try values.decode(MNewSeed.self, forKey: .screenData))
-        case "RecoverSeedName":
-            screen = .RecoverSeedName(try values.decode(MRecoverSeedName.self, forKey: .screenData))
-        case "RecoverSeedPhrase":
-            screen = .RecoverSeedPhrase(try values.decode(MRecoverSeedPhrase.self, forKey: .screenData))
-        case "Transaction":
-            screen = .Transaction(try values.decode(MTransaction.self, forKey: .screenData))
-        case "DeriveKey":
-            screen = .DeriveKey(try values.decode(MDeriveKey.self, forKey: .screenData))
-        case "Verifier":
-            screen = .Verifier(try values.decode(MVerifierDetails.self, forKey: .screenData))
-        case "ManageNetworks":
-            screen = .ManageNetworks(try values.decode(MManageNetworks.self, forKey: .screenData))
-        case "NetworkDetails":
-            screen = .NetworkDetails(try values.decode(MNetworkDetails.self, forKey: .screenData))
-        case "SignSufficientCrypto":
-            screen = .SignSufficientCrypto(try values.decode(MSignSufficientCrypto.self, forKey: .screenData))
-        case "SelectSeedForBackup":
-            screen = .SelectSeedForBackup(try values.decode(MSeeds.self, forKey: .screenData))
-        case "Documents":
-            screen = .Documents
-        case "KeyDetailsMultiSelect":
-            screen = .KeyDetailsMulti(try values.decode(MKeyDetailsMulti.self, forKey: .screenData))
-        default:
-            screen = .Log(MLog())
-        }
-        
-        switch modalType {
-        case "Empty":
-            modal = .Empty
-        case "NewSeedMenu":
-            modal = .NewSeedMenu
-        case "NetworkSelector":
-            modal = .NetworkMenu(try values.decode(MNetworkMenu.self, forKey: .modalData))
-        case "SeedMenu":
-            modal = .SeedMenu(try values.decode(MSeedMenu.self, forKey: .modalData))
-        case "Backup":
-            modal = .Backup(try values.decode(MBackup.self, forKey: .modalData))
-        case "PasswordConfirm":
-            modal = .PasswordConfirm(try values.decode(MPasswordConfirm.self, forKey: .modalData))
-        case "EnterPassword":
-            modal = .EnterPassword(try values.decode(MEnterPassword.self, forKey: .modalData))
-        case "SignatureReady":
-            modal = .SignatureReady(try values.decode(MSignatureReady.self, forKey: .modalData))
-        case "LogRight":
-            modal = .LogRight(try values.decode(MLogRight.self, forKey: .modalData))
-        case "NetworkDetailsMenu":
-            modal = .NetworkDetailsMenu
-        case "ManageMetadata":
-            modal = .ManageMetadata(try values.decode(MManageMetadata.self, forKey: .modalData))
-        case "SufficientCryptoReady":
-            modal = .SufficientCryptoReady(try values.decode(MSufficientCryptoReady.self, forKey: .modalData))
-        case "KeyDetailsAction":
-            modal = .KeyDetailsAction
-        case "TypesInfo":
-            modal = .TypesInfo(try values.decode(MTypesInfo.self, forKey: .modalData))
-        case "NewSeedBackup":
-            modal = .NewSeedBackup(try values.decode(MNewSeedBackup.self, forKey: .modalData))
-        case "LogComment":
-            modal = .LogComment
-        case "SelectSeed":
-            modal = .SelectSeed(try values.decode(MSeeds.self, forKey: .modalData))
-        default:
-            modal = .Empty
-        }
-        
-        switch alertType {
-        case "Empty":
-            alert = .Empty
-        case "Error":
-            alert = .Error(try values.decode(MError.self, forKey: .alertData))
-        case "Confirm":
-            alert = .Confirm(try values.decode(MConfirm.self, forKey: .alertData))
-        default:
-            alert = .Empty
-        }
-    }
-}
 
 /**
  * Struct to store main navstate of the screen
@@ -267,31 +128,22 @@ enum ButtonID {
  * We should keep this to minimum
  */
 extension SignerDataModel {
-    func pushButton(buttonID: ButtonID, details: String = "", seedPhrase: String = "") {
+    func pushButton(action: Action, details: String = "", seedPhrase: String = "") {
         //Poor man's mutex; just because it's really managed by UI abstraction
         if actionAvailable {
             /** No returns below or things will stall! **/
             actionAvailable = false
-            var err = ExternError()
-            withUnsafeMutablePointer(to: &err) {err_ptr in
-                let res = act(err_ptr, String(describing: buttonID), details, seedPhrase)
-                if (err_ptr.pointee.code == 0) {
-                    //print(String(cString: res!))
-                    if let actionResultJSON = String(cString: res!).data(using: .utf8) {
-                        //print(actionResultJSON)
-                        if let newActionResult = try? JSONDecoder().decode(ActionResult.self, from: actionResultJSON)
-                        {
-                            //print(newActionResult)
-                            actionResult = newActionResult
-                        } else {
-                            print("pushing button failed on decoding!")
-                            parsingAlert = true
-                        }
-                    }
-                    signer_destroy_string(res!)
+            let res = backendAction(action: action, details: details, seedPhrase: seedPhrase)
+            //print(String(cString: res!))
+            if let actionResultJSON = res.data(using: .utf8) {
+                //print(actionResultJSON)
+                if let newActionResult = try? JSONDecoder().decode(ActionResult.self, from: actionResultJSON)
+                {
+                    //print(newActionResult)
+                    actionResult = newActionResult
                 } else {
-                    signer_destroy_string(err_ptr.pointee.message)
-                    print("pushing button failed")
+                    print("pushing button failed on decoding!")
+                    parsingAlert = true
                 }
             }
             //Boink! debounce is here

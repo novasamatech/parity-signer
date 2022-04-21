@@ -18,7 +18,7 @@ struct NetworkDetailsMenu: View {
                     text: "Sign network specs",
                     isShaded: true,
                     isCrypto: true,
-                    action:{data.pushButton(buttonID: .SignNetworkSpecs)}
+                    action:{data.pushButton(action: <#T##Action#>: .signNetworkSpecs)}
                 )
                 BigButton(
                     text: "Delete network",

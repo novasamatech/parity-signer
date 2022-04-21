@@ -14,18 +14,19 @@ struct SignSufficientCrypto: View {
         VStack {
             Text("Select key for signing")
             ScrollView {
+                /*
                 LazyVStack {
                     ForEach(content.getSortedKeys(), id: \.address_key) {keyrecord in
                         Button(action: {
                             let seedPhrase = data.getSeed(seedName: keyrecord.seed_name)
                             if seedPhrase != "" {
-                                data.pushButton(buttonID: .GoForward, details: keyrecord.address_key, seedPhrase: seedPhrase)
+                                data.pushButton(action: .goForward, details: keyrecord.address_key, seedPhrase: seedPhrase)
                             }
                         }) {
                             AddressCard(address: keyrecord.intoAddress())
                         }
                     }
-                }
+                }*/
             }
         }
     }

@@ -39,7 +39,7 @@ if [ "$1" == "ios" ]
 
     # Generate cold release database with built-in metadata
 
-    cd "$(dirname "${0}")/../rust/generate_message"
+    cd "$(dirname "${0}")/../generate_message"
     cargo run --locked make_cold_release
 
     # Move database to assets

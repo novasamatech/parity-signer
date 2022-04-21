@@ -17,7 +17,7 @@ struct KeyManager: View {
             VStack {
                 ZStack{
                     Button(action: {
-                        data.pushButton(buttonID: .SelectKey, details: content.root.address_key)
+                        data.pushButton(action: .selectKey, details: content.root.address_key)
                     }){
                         SeedKeyCard(seedCard: content.root, multiselectMode: content.multiselect_mode).gesture(DragGesture()
                                                                                                                 .onEnded {drag in
@@ -41,7 +41,7 @@ struct KeyManager: View {
                         AddressCardControls(seed_name: content.root.seed_name)
                     }
                 }
-                Button(action: {data.pushButton(buttonID: .NetworkSelector)}) {
+                Button(action: {data.pushButton(action: .networkSelector)}) {
                     HStack {
                         NetworkCard(title: content.network.title, logo: content.network.logo)
                         Image(systemName: "chevron.down")
@@ -69,7 +69,7 @@ struct KeyManager: View {
                             address in
                             ZStack {
                                 Button(action: {
-                                    data.pushButton(buttonID: .SelectKey, details: address.address_key)
+                                    data.pushButton(action: .selectKey, details: address.address_key)
                                 }){
                                     AddressCard(address: address.intoAddress(), multiselectMode: content.multiselect_mode).gesture(DragGesture()
                                                                                                                                     .onEnded {drag in
@@ -79,7 +79,7 @@ struct KeyManager: View {
                                     })
                                         .gesture(LongPressGesture()
                                                     .onEnded {_ in
-                                            data.pushButton(buttonID: .LongTap, details: address.address_key)
+                                            data.pushButton(action: .longTap, details: address.address_key)
                                         }
                                         )
                                 }.padding(2)

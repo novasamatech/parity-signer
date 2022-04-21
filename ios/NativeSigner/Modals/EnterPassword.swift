@@ -45,7 +45,7 @@ struct EnterPassword: View {
                     text: "Next",
                     isCrypto: true,
                     action: {
-                    data.pushButton(buttonID: .GoForward, details: password)
+                    data.pushButton(action: .goForward, details: password)
                 },
                     isDisabled: password == ""
                 )
