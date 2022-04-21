@@ -41,7 +41,7 @@ struct NewSeedBackupModal: View {
                     }) {
                         HStack {
                             Image(systemName: createRoots ? "checkmark.square" : "square").imageScale(.large)
-                            Text("Create root keys")
+                            Text("Create seed keys")
                                 .multilineTextAlignment(.leading).foregroundColor(Color("Text500"))
                             Spacer()
                         }
