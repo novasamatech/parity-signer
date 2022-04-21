@@ -13,12 +13,12 @@ use constants::{METATREE, SETTREE, TYPES};
 use definitions::{
     danger::DangerRecord,
     error_signer::{DatabaseSigner, EntryDecodingSigner, ErrorSigner, NotFoundSigner, Signer},
-    keyring::{NetworkSpecsKey, VerifierKey},
+    keyring::{MetaKeyPrefix, NetworkSpecsKey, VerifierKey},
     network_specs::{CurrentVerifier, NetworkSpecs, ValidCurrentVerifier, Verifier},
 };
 use definitions::{
     error::ErrorSource,
-    keyring::{MetaKey, MetaKeyPrefix},
+    keyring::MetaKey,
     metadata::MetaValues,
     types::TypeEntry,
 };
