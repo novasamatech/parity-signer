@@ -6,6 +6,16 @@ pub use definitions::{
         NetworkSpecsExport, NetworkVerifierDisplay, SignDisplay, SignMessageDisplay, TypesDisplay,
         TypesExport,
     },
+    metadata::MetaValues,
+    navigation::{
+        ActionResult, Address, DerivationCheck, DerivationDestination, History, Identity,
+        LogScreenEntry, MDeriveKey, MKeyDetails, MKeyDetailsMulti, MKeys, MKeysCard, MLog,
+        MLogDetails, MMNetwork, MManageNetworks, MMetadataRecord, MNetworkCard, MNetworkDetails,
+        MNewSeed, MRawKey, MRecoverSeedName, MRecoverSeedPhrase, MSeedKeyCard, MSeeds, MSettings,
+        MSignSufficientCrypto, MTransaction, MVerifier, MVerifierDetails, ScreenData, SeedNameCard,
+        SeedNameWithIdenticon, SeedWord, StubNav, TransactionAction, TransactionAuthor,
+        TransactionCard, TransactionCardSet, TransactionNetworkInfo, TransactionType,
+    },
     network_specs::{
         NetworkSpecs, NetworkSpecsToSend, ValidCurrentVerifier, Verifier, VerifierValue,
     },
@@ -13,6 +23,20 @@ pub use definitions::{
 pub use navigator::Action;
 
 use std::convert::{TryFrom, TryInto};
+
+pub type NetworkSpecsKey = definitions::keyring::NetworkSpecsKey;
+
+impl UniffiCustomTypeConverter for NetworkSpecsKey {
+    type Builtin = String;
+
+    fn into_custom(hex_line: Self::Builtin) -> uniffi::Result<Self> {
+        Self::from_hex(&hex_line).map_err(|_| anyhow::Error::msg("network specks key"))
+    }
+
+    fn from_custom(obj: Self) -> Self::Builtin {
+        hex::encode(obj.key())
+    }
+}
 
 pub type Ed25519Public = sp_core::ed25519::Public;
 pub type Sr25519Public = sp_core::sr25519::Public;

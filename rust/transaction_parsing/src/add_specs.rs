@@ -16,11 +16,11 @@ use definitions::{
 use crate::cards::{Card, Warning};
 use crate::check_signature::pass_crypto;
 use crate::helpers::specs_are_new;
-use crate::{Action, StubNav};
+use crate::{StubNav, TransactionAction};
 
 use crate::holds::{GeneralHold, Hold, HoldRelease};
 
-pub fn add_specs(data_hex: &str, database_name: &str) -> Result<Action, ErrorSigner> {
+pub fn add_specs(data_hex: &str, database_name: &str) -> Result<TransactionAction, ErrorSigner> {
     let checked_info = pass_crypto(data_hex, TransferContent::AddSpecs)?;
     let specs = ContentAddSpecs::from_slice(&checked_info.message).specs::<Signer>()?;
     let network_specs_key =
@@ -67,14 +67,16 @@ pub fn add_specs(data_hex: &str, database_name: &str) -> Result<Action, ErrorSig
                 let checksum = stub.store_and_get_checksum(database_name)?;
                 let warning_card = Card::Warning(Warning::NotVerified).card(&mut index, 0);
                 let specs_card = Card::NewSpecs(&specs).card(&mut index, 0);
-                Ok(Action::Stub(
-                    format!(
+                Ok(TransactionAction::Stub {
+                    s: format!(
                         "\"warning\":[{}],\"new_specs\":[{}]",
                         warning_card, specs_card
                     ),
-                    checksum,
-                    StubNav::AddSpecs(network_specs_key),
-                ))
+                    u: checksum,
+                    stub: StubNav::AddSpecs {
+                        n: network_specs_key,
+                    },
+                })
             }
             Verifier {
                 v: Some(ref new_verifier_value),
@@ -101,14 +103,16 @@ pub fn add_specs(data_hex: &str, database_name: &str) -> Result<Action, ErrorSig
                                 .card(&mut index, 0);
                         let specs_card = Card::NewSpecs(&specs).card(&mut index, 0);
                         let checksum = stub.store_and_get_checksum(database_name)?;
-                        Ok(Action::Stub(
-                            format!(
+                        Ok(TransactionAction::Stub {
+                            s: format!(
                                 "\"verifier\":[{}],\"warning\":[{}],\"new_specs\":[{}]",
                                 verifier_card, warning_card, specs_card
                             ),
-                            checksum,
-                            StubNav::AddSpecs(network_specs_key),
-                        ))
+                            u: checksum,
+                            stub: StubNav::AddSpecs {
+                                n: network_specs_key,
+                            },
+                        })
                     }
                     _ => {
                         if checked_info.verifier == general_verifier {
@@ -125,14 +129,16 @@ pub fn add_specs(data_hex: &str, database_name: &str) -> Result<Action, ErrorSig
                             );
                             let specs_card = Card::NewSpecs(&specs).card(&mut index, 0);
                             let checksum = stub.store_and_get_checksum(database_name)?;
-                            Ok(Action::Stub(
-                                format!(
+                            Ok(TransactionAction::Stub {
+                                s: format!(
                                     "\"verifier\":[{}],\"new_specs\":[{}]",
                                     verifier_card, specs_card
                                 ),
-                                checksum,
-                                StubNav::AddSpecs(network_specs_key),
-                            ))
+                                u: checksum,
+                                stub: StubNav::AddSpecs {
+                                    n: network_specs_key,
+                                },
+                            })
                         } else {
                             stub = stub.add_network_specs(
                                 &specs,
@@ -151,14 +157,16 @@ pub fn add_specs(data_hex: &str, database_name: &str) -> Result<Action, ErrorSig
                             );
                             let specs_card = Card::NewSpecs(&specs).card(&mut index, 0);
                             let checksum = stub.store_and_get_checksum(database_name)?;
-                            Ok(Action::Stub(
-                                format!(
+                            Ok(TransactionAction::Stub {
+                                s: format!(
                                     "\"verifier\":[{}],\"new_specs\":[{}]",
                                     verifier_card, specs_card
                                 ),
-                                checksum,
-                                StubNav::AddSpecs(network_specs_key),
-                            ))
+                                u: checksum,
+                                stub: StubNav::AddSpecs {
+                                    n: network_specs_key,
+                                },
+                            })
                         }
                     }
                 }
@@ -185,14 +193,16 @@ pub fn add_specs(data_hex: &str, database_name: &str) -> Result<Action, ErrorSig
                                 )?;
                                 let checksum = stub.store_and_get_checksum(database_name)?;
                                 let specs_card = Card::NewSpecs(&specs).card(&mut index, 0);
-                                Ok(Action::Stub(
-                                    format!(
+                                Ok(TransactionAction::Stub {
+                                    s: format!(
                                         "\"warning\":[{}],\"new_specs\":[{}]",
                                         warning_card, specs_card
                                     ),
-                                    checksum,
-                                    StubNav::AddSpecs(network_specs_key),
-                                ))
+                                    u: checksum,
+                                    stub: StubNav::AddSpecs {
+                                        n: network_specs_key,
+                                    },
+                                })
                             } else {
                                 Err(ErrorSigner::Input(InputSigner::SpecsKnown {
                                     name: specs.name,
@@ -243,8 +253,8 @@ pub fn add_specs(data_hex: &str, database_name: &str) -> Result<Action, ErrorSig
                                 let specs_card = Card::NewSpecs(&specs).card(&mut index, 0);
                                 let checksum = stub.store_and_get_checksum(database_name)?;
                                 match possible_warning {
-                                    None => Ok(Action::Stub(format!("\"verifier\":[{}],\"warning\":[{}],\"new_specs\":[{}]", verifier_card, warning_card_1, specs_card), checksum, StubNav::AddSpecs(network_specs_key))),
-                                    Some(warning_card_2) => Ok(Action::Stub(format!("\"verifier\":[{}],\"warning\":[{},{}],\"new_specs\":[{}]", verifier_card, warning_card_1, warning_card_2, specs_card), checksum, StubNav::AddSpecs(network_specs_key))),
+                                    None => Ok(TransactionAction::Stub{ s: format!("\"verifier\":[{}],\"warning\":[{}],\"new_specs\":[{}]", verifier_card, warning_card_1, specs_card), u: checksum, stub: StubNav::AddSpecs{ n: network_specs_key }}),
+                                    Some(warning_card_2) => Ok(TransactionAction::Stub{ s: format!("\"verifier\":[{}],\"warning\":[{},{}],\"new_specs\":[{}]", verifier_card, warning_card_1, warning_card_2, specs_card), u: checksum, stub: StubNav::AddSpecs{ n: network_specs_key}}),
                                 }
                             } else if general_verifier.v.is_none() {
                                 let new_general_verifier = checked_info.verifier;
@@ -292,8 +302,8 @@ pub fn add_specs(data_hex: &str, database_name: &str) -> Result<Action, ErrorSig
                                 let specs_card = Card::NewSpecs(&specs).card(&mut index, 0);
                                 let checksum = stub.store_and_get_checksum(database_name)?;
                                 match possible_warning {
-                                    None => Ok(Action::Stub(format!("\"verifier\":[{}],\"warning\":[{},{}],\"new_specs\":[{}]", verifier_card, warning_card_1, warning_card_2, specs_card), checksum, StubNav::AddSpecs(network_specs_key))),
-                                    Some(warning_card_3) => Ok(Action::Stub(format!("\"verifier\":[{}],\"warning\":[{},{},{}],\"new_specs\":[{}]", verifier_card, warning_card_1, warning_card_2, warning_card_3, specs_card), checksum, StubNav::AddSpecs(network_specs_key))),
+                                    None => Ok(TransactionAction::Stub{ s: format!("\"verifier\":[{}],\"warning\":[{},{}],\"new_specs\":[{}]", verifier_card, warning_card_1, warning_card_2, specs_card), u: checksum, stub: StubNav::AddSpecs{n:network_specs_key}}),
+                                    Some(warning_card_3) => Ok(TransactionAction::Stub{ s: format!("\"verifier\":[{}],\"warning\":[{},{},{}],\"new_specs\":[{}]", verifier_card, warning_card_1, warning_card_2, warning_card_3, specs_card), u: checksum, stub: StubNav::AddSpecs{n: network_specs_key}}),
                                 }
                             } else {
                                 stub = hold.upd_stub(
@@ -336,8 +346,8 @@ pub fn add_specs(data_hex: &str, database_name: &str) -> Result<Action, ErrorSig
                                 let specs_card = Card::NewSpecs(&specs).card(&mut index, 0);
                                 let checksum = stub.store_and_get_checksum(database_name)?;
                                 match possible_warning {
-                                    None => Ok(Action::Stub(format!("\"verifier\":[{}],\"warning\":[{}],\"new_specs\":[{}]", verifier_card, warning_card_1, specs_card), checksum, StubNav::AddSpecs(network_specs_key))),
-                                    Some(warning_card_2) => Ok(Action::Stub(format!("\"verifier\":[{}],\"warning\":[{},{}],\"new_specs\":[{}]", verifier_card, warning_card_1, warning_card_2, specs_card), checksum, StubNav::AddSpecs(network_specs_key))),
+                                    None => Ok(TransactionAction::Stub { s: format!("\"verifier\":[{}],\"warning\":[{}],\"new_specs\":[{}]", verifier_card, warning_card_1, specs_card), u: checksum, stub: StubNav::AddSpecs{ n: network_specs_key}}),
+                                    Some(warning_card_2) => Ok(TransactionAction::Stub{ s: format!("\"verifier\":[{}],\"warning\":[{},{}],\"new_specs\":[{}]", verifier_card, warning_card_1, warning_card_2, specs_card), u: checksum, stub: StubNav::AddSpecs{ n: network_specs_key}}),
                                 }
                             }
                         }
@@ -396,8 +406,8 @@ pub fn add_specs(data_hex: &str, database_name: &str) -> Result<Action, ErrorSig
                                 let specs_card = Card::NewSpecs(&specs).card(&mut index, 0);
                                 let checksum = stub.store_and_get_checksum(database_name)?;
                                 match possible_warning {
-                                    None => Ok(Action::Stub(format!("\"verifier\":[{}],\"warning\":[{}],\"new_specs\":[{}]", verifier_card, warning_card_1, specs_card), checksum, StubNav::AddSpecs(network_specs_key))),
-                                    Some(warning_card_2) => Ok(Action::Stub(format!("\"verifier\":[{}],\"warning\":[{},{}],\"new_specs\":[{}]", verifier_card, warning_card_1, warning_card_2, specs_card), checksum, StubNav::AddSpecs(network_specs_key))),
+                                    None => Ok(TransactionAction::Stub{ s: format!("\"verifier\":[{}],\"warning\":[{}],\"new_specs\":[{}]", verifier_card, warning_card_1, specs_card), u: checksum, stub: StubNav::AddSpecs{ n: network_specs_key}}),
+                                    Some(warning_card_2) => Ok(TransactionAction::Stub{ s: format!("\"verifier\":[{}],\"warning\":[{},{}],\"new_specs\":[{}]", verifier_card, warning_card_1, warning_card_2, specs_card), u: checksum, stub: StubNav::AddSpecs{ n: network_specs_key }}),
                                 }
                             } else if new_verifier_value == old_verifier_value {
                                 if specs_are_new(&specs, database_name)? {
@@ -409,14 +419,16 @@ pub fn add_specs(data_hex: &str, database_name: &str) -> Result<Action, ErrorSig
                                     )?;
                                     let specs_card = Card::NewSpecs(&specs).card(&mut index, 0);
                                     let checksum = stub.store_and_get_checksum(database_name)?;
-                                    Ok(Action::Stub(
-                                        format!(
+                                    Ok(TransactionAction::Stub {
+                                        s: format!(
                                             "\"verifier\":[{}],\"new_specs\":[{}]",
                                             verifier_card, specs_card
                                         ),
-                                        checksum,
-                                        StubNav::AddSpecs(network_specs_key),
-                                    ))
+                                        u: checksum,
+                                        stub: StubNav::AddSpecs {
+                                            n: network_specs_key,
+                                        },
+                                    })
                                 } else {
                                     Err(ErrorSigner::Input(InputSigner::SpecsKnown {
                                         name: specs.name,
@@ -451,14 +463,16 @@ pub fn add_specs(data_hex: &str, database_name: &str) -> Result<Action, ErrorSig
                         )?;
                         let specs_card = Card::NewSpecs(&specs).card(&mut index, 0);
                         let checksum = stub.store_and_get_checksum(database_name)?;
-                        Ok(Action::Stub(
-                            format!(
+                        Ok(TransactionAction::Stub {
+                            s: format!(
                                 "\"warning\":[{}],\"new_specs\":[{}]",
                                 warning_card, specs_card
                             ),
-                            checksum,
-                            StubNav::AddSpecs(network_specs_key),
-                        ))
+                            u: checksum,
+                            stub: StubNav::AddSpecs {
+                                n: network_specs_key,
+                            },
+                        })
                     } else {
                         Err(ErrorSigner::Input(InputSigner::SpecsKnown {
                             name: specs.name,
@@ -495,22 +509,26 @@ pub fn add_specs(data_hex: &str, database_name: &str) -> Result<Action, ErrorSig
                     let specs_card = Card::NewSpecs(&specs).card(&mut index, 0);
                     let checksum = stub.store_and_get_checksum(database_name)?;
                     match possible_warning {
-                        None => Ok(Action::Stub(
-                            format!(
+                        None => Ok(TransactionAction::Stub {
+                            s: format!(
                                 "\"verifier\":[{}],\"warning\":[{}],\"new_specs\":[{}]",
                                 verifier_card, warning_card_1, specs_card
                             ),
-                            checksum,
-                            StubNav::AddSpecs(network_specs_key),
-                        )),
-                        Some(warning_card_2) => Ok(Action::Stub(
-                            format!(
+                            u: checksum,
+                            stub: StubNav::AddSpecs {
+                                n: network_specs_key,
+                            },
+                        }),
+                        Some(warning_card_2) => Ok(TransactionAction::Stub {
+                            s: format!(
                                 "\"verifier\":[{}],\"warning\":[{},{}],\"new_specs\":[{}]",
                                 verifier_card, warning_card_1, warning_card_2, specs_card
                             ),
-                            checksum,
-                            StubNav::AddSpecs(network_specs_key),
-                        )),
+                            u: checksum,
+                            stub: StubNav::AddSpecs {
+                                n: network_specs_key,
+                            },
+                        }),
                     }
                 }
             },
@@ -529,14 +547,16 @@ pub fn add_specs(data_hex: &str, database_name: &str) -> Result<Action, ErrorSig
                         )?;
                         let specs_card = Card::NewSpecs(&specs).card(&mut index, 0);
                         let checksum = stub.store_and_get_checksum(database_name)?;
-                        Ok(Action::Stub(
-                            format!(
+                        Ok(TransactionAction::Stub {
+                            s: format!(
                                 "\"verifier\":[{}],\"new_specs\":[{}]",
                                 verifier_card, specs_card
                             ),
-                            checksum,
-                            StubNav::AddSpecs(network_specs_key),
-                        ))
+                            u: checksum,
+                            stub: StubNav::AddSpecs {
+                                n: network_specs_key,
+                            },
+                        })
                     } else {
                         Err(ErrorSigner::Input(InputSigner::SpecsKnown {
                             name: specs.name,

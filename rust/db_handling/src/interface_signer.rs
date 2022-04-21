@@ -17,6 +17,10 @@ use definitions::{
         pic_meta, print_multisigner_as_base58,
     },
     keyring::{AddressKey, NetworkSpecsKey, VerifierKey},
+    navigation::{
+        Address, MDeriveKey, MKeyDetails, MKeysCard, MMNetwork, MNetworkDetails, MRawKey,
+        MSeedKeyCard, SeedNameCard, SeedWord,
+    },
     network_specs::NetworkSpecs,
     print::{export_complex_vector, export_plain_vector},
     qr_transfers::ContentLoadTypes,
@@ -27,8 +31,8 @@ use qrcode_static::png_qr_from_string;
 use crate::db_transactions::TrDbCold;
 use crate::helpers::{
     get_address_details, get_general_verifier, get_meta_values_by_name,
-    get_meta_values_by_name_version, get_network_specs, get_valid_current_verifier,
-    make_batch_clear_tree, open_db, open_tree, try_get_types,
+    get_meta_values_by_name_version, get_network_specs, make_batch_clear_tree, open_db, open_tree,
+    try_get_types,
 };
 use crate::identities::{
     derivation_check, generate_random_phrase, get_addresses_by_seed_name, get_all_addresses,
@@ -38,10 +42,10 @@ use crate::network_details::get_all_networks;
 
 /// Function to print all seed names with identicons
 /// Gets used only on the Signer side, interacts with the user interface.
-pub fn print_all_seed_names_with_identicons(
+pub fn get_all_seed_names_with_identicons(
     database_name: &str,
     names_phone_knows: &[String],
-) -> Result<String, ErrorSigner> {
+) -> Result<Vec<SeedNameCard>, ErrorSigner> {
     let mut data_set: HashMap<String, Vec<MultiSigner>> = HashMap::new();
     for (multisigner, address_details) in get_all_addresses(database_name)?.into_iter() {
         if address_details.is_root() {
@@ -73,21 +77,15 @@ pub fn print_all_seed_names_with_identicons(
             data_set.insert(x.to_string(), Vec::new());
         }
     }
-    let mut print_set: Vec<(String, String)> = Vec::new();
-    for (seed_name, multisigner_set) in data_set.into_iter() {
-        let identicon_string = preferred_multisigner_identicon(&multisigner_set);
-        print_set.push((identicon_string, seed_name))
-    }
-    print_set.sort_by(|a, b| a.1.cmp(&b.1));
-    Ok(export_complex_vector(
-        &print_set,
-        |(identicon_string, seed_name)| {
-            format!(
-                "\"identicon\":\"{}\",\"seed_name\":\"{}\"",
-                identicon_string, seed_name
-            )
-        },
-    ))
+    let mut res: Vec<_> = data_set
+        .into_iter()
+        .map(|(seed_name, multisigner_set)| SeedNameCard {
+            seed_name,
+            identicon: preferred_multisigner_identicon(&multisigner_set),
+        })
+        .collect();
+    res.sort_by(|a, b| a.seed_name.cmp(&b.seed_name));
+    Ok(res)
 }
 
 fn preferred_multisigner_identicon(multisigner_set: &[MultiSigner]) -> String {
@@ -118,16 +116,23 @@ fn preferred_multisigner_identicon(multisigner_set: &[MultiSigner]) -> String {
 
 /// Function to print all identities (seed names AND derication paths) with identicons
 /// Gets used only on the Signer side, interacts with the user interface.
-pub fn print_all_identities(database_name: &str) -> Result<String, ErrorSigner> {
-    Ok(export_complex_vector(
-        &get_all_addresses(database_name)?,
-        |(multisigner, address_details)| {
-            let address_key = AddressKey::from_multisigner(multisigner); // to click
-            let public_key = multisigner_to_public(multisigner); // to display
-            let hex_identicon = hex::encode(make_identicon_from_multisigner(multisigner));
-            format!("\"seed_name\":\"{}\",\"address_key\":\"{}\",\"public_key\":\"{}\",\"identicon\":\"{}\",\"has_pwd\":{},\"path\":\"{}\"", address_details.seed_name, hex::encode(address_key.key()), hex::encode(public_key), hex_identicon, address_details.has_pwd, address_details.path)
-        },
-    ))
+pub fn print_all_identities(database_name: &str) -> Result<Vec<MRawKey>, ErrorSigner> {
+    Ok(get_all_addresses(database_name)?
+        .into_iter()
+        .map(|(multisigner, address_details)| {
+            let address_key = AddressKey::from_multisigner(&multisigner); // to click
+            let public_key = multisigner_to_public(&multisigner); // to display
+            let identicon = hex::encode(make_identicon_from_multisigner(&multisigner));
+            MRawKey {
+                seed_name: address_details.seed_name,
+                address_key: hex::encode(address_key.key()),
+                public_key: hex::encode(public_key),
+                identicon,
+                has_pwd: address_details.has_pwd,
+                path: address_details.path,
+            }
+        })
+        .collect())
 }
 
 /// Function to print separately root identity and derived identities for given seed name and network specs key.
@@ -138,7 +143,7 @@ pub fn print_identities_for_seed_name_and_network(
     network_specs_key: &NetworkSpecsKey,
     swiped_key: Option<MultiSigner>,
     multiselect: Vec<MultiSigner>,
-) -> Result<String, ErrorSigner> {
+) -> Result<(MSeedKeyCard, Vec<MKeysCard>), ErrorSigner> {
     let network_specs = get_network_specs(database_name, network_specs_key)?;
     let identities = addresses_set_seed_name_network(database_name, seed_name, network_specs_key)?;
     let mut root_id = None;
@@ -154,7 +159,7 @@ pub fn print_identities_for_seed_name_and_network(
                 false
             }
         };
-        let is_multiselect = multiselect.contains(&multisigner);
+        let multiselect = multiselect.contains(&multisigner);
         if address_details.is_root() {
             if root_id.is_some() {
                 return Err(ErrorSigner::Database(DatabaseSigner::TwoRootKeys {
@@ -162,32 +167,35 @@ pub fn print_identities_for_seed_name_and_network(
                     encryption: network_specs.encryption,
                 }));
             }
-            root_id = Some(format!("\"seed_name\":\"{}\",\"identicon\":\"{}\",\"address_key\":\"{}\",\"base58\":\"{}\",\"swiped\":{},\"multiselect\":{}", seed_name, hex::encode(identicon), hex::encode(address_key.key()), base58, swiped, is_multiselect));
-        } else {
-            other_id.push((
-                multisigner,
-                address_details,
-                identicon,
+            root_id = Some(MSeedKeyCard {
+                seed_name: seed_name.to_string(),
+                identicon: hex::encode(identicon),
+                address_key: hex::encode(address_key.key()),
+                base58,
                 swiped,
-                is_multiselect,
-            ))
+                multiselect,
+            });
+        } else {
+            other_id.push((multisigner, address_details, identicon, swiped, multiselect))
         }
     }
-    let root_print = match root_id {
-        Some(a) => a,
-        None => format!("\"seed_name\":\"{}\",\"identicon\":\"{}\",\"address_key\":\"\",\"base58\":\"\",\"swiped\":false,\"multiselect\":false", seed_name, hex::encode(EMPTY_PNG)),
-    };
-    let other_print = export_complex_vector(
-        &other_id,
-        |(multisigner, address_details, identicon, swiped, is_multiselect)| {
-            format!("\"address_key\":\"{}\",\"base58\":\"{}\",\"identicon\":\"{}\",\"has_pwd\":{},\"path\":\"{}\",\"swiped\":{},\"multiselect\":{}", hex::encode(AddressKey::from_multisigner(multisigner).key()), print_multisigner_as_base58(multisigner, Some(network_specs.base58prefix)), hex::encode(identicon), address_details.has_pwd, address_details.path, swiped, is_multiselect)
-        },
-    );
+    let root = root_id.unwrap_or_default();
+    let set: Vec<_> = other_id
+        .into_iter()
+        .map(
+            |(multisigner, address_details, identicon, swiped, multiselect)| MKeysCard {
+                address_key: hex::encode(AddressKey::from_multisigner(&multisigner).key()),
+                base58: print_multisigner_as_base58(&multisigner, Some(network_specs.base58prefix)),
+                identicon: hex::encode(identicon),
+                has_pwd: address_details.has_pwd,
+                path: address_details.path,
+                swiped,
+                multiselect,
+            },
+        )
+        .collect();
 
-    Ok(format!(
-        "\"root\":{{{}}},\"set\":{},\"network\":{{\"title\":\"{}\",\"logo\":\"{}\"}}",
-        root_print, other_print, network_specs.title, network_specs.logo
-    ))
+    Ok((root, set))
 }
 
 /// Function to get addresses for given seed name and network specs key
@@ -227,23 +235,20 @@ pub fn show_all_networks_with_flag(
 }
 
 /// Function to print all networks without any selection
-pub fn show_all_networks(database_name: &str) -> Result<String, ErrorSigner> {
-    let mut networks = get_all_networks::<Signer>(database_name)?;
-    networks.sort_by(|a, b| a.order.cmp(&b.order));
-    Ok(format!(
-        "\"networks\":{}",
-        export_complex_vector(&networks, |a| {
-            let network_specs_key_current =
-                NetworkSpecsKey::from_parts(a.genesis_hash.as_bytes(), &a.encryption);
-            format!(
-                "\"key\":\"{}\",\"title\":\"{}\",\"logo\":\"{}\",\"order\":{}",
-                hex::encode(network_specs_key_current.key()),
-                a.title,
-                a.logo,
-                a.order
-            )
+pub fn show_all_networks(database_name: &str) -> Result<Vec<MMNetwork>, ErrorSigner> {
+    let networks = get_all_networks::<Signer>(database_name)?;
+    let mut networks = networks
+        .into_iter()
+        .map(|n| MMNetwork {
+            key: String::new(), // TODO: n.key,
+            title: n.title,
+            logo: n.logo,
+            order: n.order,
         })
-    ))
+        .collect::<Vec<_>>();
+    networks.sort_by(|a, b| a.order.cmp(&b.order));
+
+    Ok(networks)
 }
 
 /// Function to sort networks by the order and get the network specs for the first network on the list.
@@ -267,7 +272,7 @@ pub fn export_key(
     multisigner: &MultiSigner,
     expected_seed_name: &str,
     network_specs_key: &NetworkSpecsKey,
-) -> Result<String, ErrorSigner> {
+) -> Result<MKeyDetails, ErrorSigner> {
     let network_specs = get_network_specs(database_name, network_specs_key)?;
     let address_key = AddressKey::from_multisigner(multisigner);
     let address_details = get_address_details(database_name, &address_key)?;
@@ -280,14 +285,14 @@ pub fn export_key(
             },
         ));
     }
-    let address_base58 = print_multisigner_as_base58(multisigner, Some(network_specs.base58prefix));
+    let base58 = print_multisigner_as_base58(multisigner, Some(network_specs.base58prefix));
     let public_key = multisigner_to_public(multisigner);
     let identicon = make_identicon_from_multisigner(multisigner);
     let qr_prep = {
         if address_details.network_id.contains(network_specs_key) {
             match png_qr_from_string(&format!(
                 "substrate:{}:0x{}",
-                address_base58,
+                base58,
                 hex::encode(&network_specs.genesis_hash)
             )) {
                 Ok(a) => a,
@@ -302,7 +307,16 @@ pub fn export_key(
             ));
         }
     };
-    Ok(format!("\"qr\":\"{}\",\"pubkey\":\"{}\",\"base58\":\"{}\",\"identicon\":\"{}\",\"seed_name\":\"{}\",\"path\":\"{}\",\"network_title\":\"{}\",\"network_logo\":\"{}\"", hex::encode(qr_prep), hex::encode(public_key), address_base58, hex::encode(identicon), address_details.seed_name, address_details.path, network_specs.title, network_specs.logo))
+    Ok(MKeyDetails {
+        qr: hex::encode(qr_prep),
+        pubkey: hex::encode(public_key),
+        base58,
+        identicon: hex::encode(identicon),
+        seed_name: address_details.seed_name,
+        path: address_details.path,
+        network_title: network_specs.title,
+        network_logo: network_specs.logo,
+    })
 }
 
 /// Function to prepare seed backup screen.
@@ -348,17 +362,34 @@ pub fn derive_prep(
     network_specs_key: &NetworkSpecsKey,
     collision: Option<(MultiSigner, AddressDetails)>,
     suggest: &str,
-) -> Result<String, ErrorSigner> {
+    keyboard: bool,
+) -> Result<MDeriveKey, ErrorSigner> {
     let network_specs = get_network_specs(database_name, network_specs_key)?;
-    match collision {
-        Some((multisigner, address_details)) => {
-            let address_base58 = print_multisigner_as_base58(&multisigner, Some(network_specs.base58prefix));
-            let hex_identicon = hex::encode(make_identicon_from_multisigner(&multisigner));
-            let collision_display = format!("\"base58\":\"{}\",\"path\":\"{}\",\"has_pwd\":{},\"identicon\":\"{}\",\"seed_name\":\"{}\"", address_base58, address_details.path, address_details.has_pwd, hex_identicon, seed_name);
-            Ok(format!("\"seed_name\":\"{}\",\"network_title\":\"{}\",\"network_logo\":\"{}\",\"network_specs_key\":\"{}\",\"suggested_derivation\":\"{}\",\"collision\":{{{}}}", seed_name, network_specs.title, network_specs.logo, hex::encode(network_specs_key.key()), suggest, collision_display))
-        },
-        None => Ok(format!("\"seed_name\":\"{}\",\"network_title\":\"{}\",\"network_logo\":\"{}\",\"network_specs_key\":\"{}\",\"suggested_derivation\":\"{}\"", seed_name, network_specs.title, network_specs.logo, hex::encode(network_specs_key.key()), suggest)),
-    }
+    let _collision = collision.map(|(multisigner, address_details)| {
+        let base58 = print_multisigner_as_base58(&multisigner, Some(network_specs.base58prefix));
+        let path = address_details.path;
+        let has_pwd = address_details.has_pwd;
+        let identicon = hex::encode(make_identicon_from_multisigner(&multisigner));
+        let seed_name = seed_name.to_string();
+        Address {
+            base58,
+            path,
+            has_pwd,
+            identicon,
+            seed_name,
+            multiselect: None,
+        }
+    });
+
+    Ok(MDeriveKey {
+        seed_name: seed_name.to_string(),
+        network_title: network_specs.title,
+        network_logo: network_specs.logo,
+        network_specs_key: hex::encode(network_specs_key.key()),
+        suggested_derivation: suggest.to_string(),
+        keyboard,
+        derivation_check: None,
+    })
 }
 
 /// Function to show (dynamically) if the derivation with the provided path and no password already exists
@@ -407,27 +438,42 @@ pub fn dynamic_path_check(
 pub fn network_details_by_key(
     database_name: &str,
     network_specs_key: &NetworkSpecsKey,
-) -> Result<String, ErrorSigner> {
-    let network_specs = get_network_specs(database_name, network_specs_key)?;
-    let verifier_key = VerifierKey::from_parts(network_specs.genesis_hash.as_bytes());
-    let general_verifier = get_general_verifier(database_name)?;
-    let valid_current_verifier = get_valid_current_verifier(&verifier_key, database_name)?;
-    let relevant_meta = get_meta_values_by_name::<Signer>(database_name, &network_specs.name)?;
-    let metadata_print = export_complex_vector(&relevant_meta, |a| {
-        let meta_hash = blake2b(32, &[], &a.meta).as_bytes().to_vec();
-        let hex_id_pic = hex::encode(pic_meta(&meta_hash));
-        format!(
-            "\"spec_version\":\"{}\",\"meta_hash\":\"{}\",\"meta_id_pic\":\"{}\"",
-            a.version,
-            hex::encode(meta_hash),
-            hex_id_pic
-        )
-    });
-    Ok(format!(
-        "{},\"meta\":{}",
-        network_specs.show(&valid_current_verifier, &general_verifier),
-        metadata_print
-    ))
+) -> Result<MNetworkDetails, ErrorSigner> {
+    let NetworkSpecs {
+        base58prefix,
+        color,
+        decimals,
+        encryption,
+        genesis_hash,
+        logo,
+        name,
+        order,
+        path_id,
+        secondary_color,
+        title,
+        unit,
+    } = get_network_specs(database_name, network_specs_key)?;
+    let _verifier_key = VerifierKey::from_parts(genesis_hash.as_bytes());
+    let _general_verifier = get_general_verifier(database_name)?;
+    let current_verifier = Default::default(); // TODO: get_valid_current_verifier(&verifier_key, database_name)?;
+    let _meta = get_meta_values_by_name::<Signer>(database_name, &name)?;
+
+    Ok(MNetworkDetails {
+        base58prefix,
+        color,
+        decimals,
+        encryption,
+        genesis_hash: format!("{}", genesis_hash),
+        logo,
+        name,
+        order: order.to_string(),
+        path_id,
+        secondary_color,
+        title,
+        unit,
+        current_verifier,
+        meta: vec![],
+    })
 }
 
 /// Print metadata details for given network specs key and version.
@@ -516,7 +562,7 @@ pub fn purge_transactions(database_name: &str) -> Result<(), ErrorSigner> {
 
 /// Function to display possible options of English code words from allowed words list
 /// that start with already entered piece
-pub(crate) fn guess(word_part: &str) -> Vec<&'static str> {
+pub fn guess(word_part: &str) -> Vec<&'static str> {
     let dictionary = Language::English.wordlist();
     let words = dictionary.get_words_by_prefix(word_part);
     if words.len() > MAX_WORDS_DISPLAY {
@@ -658,7 +704,7 @@ impl SeedDraft {
     /// Combines all draft elements into seed phrase proposal,
     /// and checks its validity.
     /// If valid, outputs secret seed phrase.
-    pub fn try_finalize(&self) -> Option<String> {
+    pub fn try_finalize(&self) -> Option<Vec<SeedWord>> {
         let mut seed_phrase_proposal = String::with_capacity((WORD_LENGTH + 1) * BIP_CAP);
         for (i, x) in self.saved.iter().enumerate() {
             if i > 0 {
@@ -667,7 +713,16 @@ impl SeedDraft {
             seed_phrase_proposal.push_str(x.word());
         }
         if Mnemonic::validate(&seed_phrase_proposal, Language::English).is_ok() {
-            Some(seed_phrase_proposal)
+            Some(
+                seed_phrase_proposal
+                    .split_whitespace()
+                    .enumerate()
+                    .map(|(order, content)| SeedWord {
+                        order: order as u32,
+                        content: content.to_string(),
+                    })
+                    .collect(),
+            )
         } else {
             seed_phrase_proposal.zeroize();
             None

@@ -171,12 +171,6 @@ pub fn get_general_verifier(database_name: &str) -> Result<Verifier, ErrorSigner
     }
 }
 
-/// Function to display general Verifier from the Signer database
-#[cfg(feature = "signer")]
-pub fn display_general_verifier(database_name: &str) -> Result<String, ErrorSigner> {
-    Ok(get_general_verifier(database_name)?.show_card())
-}
-
 /// Function to try and get types information from the database
 /// Applicable to both Active side and Signer side
 pub fn try_get_types<T: ErrorSource>(

@@ -10,9 +10,12 @@ use definitions::{
 };
 
 use crate::cards::Card;
-use crate::Action;
+use crate::TransactionAction;
 
-pub fn process_derivations(data_hex: &str, database_name: &str) -> Result<Action, ErrorSigner> {
+pub fn process_derivations(
+    data_hex: &str,
+    database_name: &str,
+) -> Result<TransactionAction, ErrorSigner> {
     let data = unhex::<Signer>(data_hex, NotHexSigner::InputContent)?;
     let content_derivations = ContentDerivations::from_slice(&data[3..]);
     let (encryption, genesis_hash, derivations) =
@@ -28,7 +31,7 @@ pub fn process_derivations(data_hex: &str, database_name: &str) -> Result<Action
                 "\"network_title\":\"{}\",\"network_logo\":\"{}\"",
                 network_specs.title, network_specs.logo
             );
-            Ok(Action::Derivations {
+            Ok(TransactionAction::Derivations {
                 content: format!("\"importing_derivations\":[{}]", derivations_card),
                 network_info,
                 checksum,

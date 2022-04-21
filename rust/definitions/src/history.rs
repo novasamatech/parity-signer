@@ -34,10 +34,7 @@ use crate::{
     qr_transfers::ContentLoadTypes,
 };
 #[cfg(feature = "signer")]
-use crate::{
-    helpers::{pic_meta, pic_types},
-    print::{export_complex_single, export_complex_vector},
-};
+use crate::{helpers::pic_meta, print::export_complex_single};
 
 /// Event content for importing or removing metadata of a known network
 ///
@@ -79,13 +76,6 @@ impl MetaValuesDisplay {
             meta_hash: blake2b(32, &[], &meta_stored).as_bytes().to_vec(),
         }
     }
-
-    /// Print json with [`MetaValuesDisplay`] information for user interface  
-    #[cfg(feature = "signer")]
-    pub fn show(&self) -> String {
-        let meta_id_pic = hex::encode(pic_meta(&self.meta_hash));
-        format!("\"specname\":\"{}\",\"spec_version\":\"{}\",\"meta_hash\":\"{}\",\"meta_id_pic\":\"{}\"", &self.name, &self.version, hex::encode(&self.meta_hash), meta_id_pic)
-    }
 }
 
 /// Event content for generating [`SufficientCrypto`](crate::crypto::SufficientCrypto)
@@ -122,13 +112,6 @@ impl MetaValuesExport {
             signed_by: signed_by.to_owned(),
         }
     }
-
-    /// Print json with [`MetaValuesExport`] information for user interface
-    #[cfg(feature = "signer")]
-    pub fn show(&self) -> String {
-        let meta_id_pic = hex::encode(pic_meta(&self.meta_hash));
-        format!("\"specname\":\"{}\",\"spec_version\":\"{}\",\"meta_hash\":\"{}\",\"meta_id_pic\":\"{}\",\"signed_by\":{}", &self.name, &self.version, hex::encode(&self.meta_hash), meta_id_pic, export_complex_single(&self.signed_by, |a| a.show_card()))
-    }
 }
 
 /// Event content for importing or removing network specs  
@@ -154,13 +137,6 @@ impl NetworkSpecsDisplay {
             general_verifier: general_verifier.to_owned(),
         }
     }
-
-    /// Print json with [`NetworkSpecsDisplay`] information for user interface
-    #[cfg(feature = "signer")]
-    pub fn show(&self) -> String {
-        self.specs
-            .show(&self.valid_current_verifier, &self.general_verifier)
-    }
 }
 
 /// Event content for generating [`SufficientCrypto`](crate::crypto::SufficientCrypto)
@@ -183,16 +159,6 @@ impl NetworkSpecsExport {
             specs_to_send: specs_to_send.to_owned(),
             signed_by: signed_by.to_owned(),
         }
-    }
-
-    /// Print json with [`NetworkSpecsExport`] information for user interface
-    #[cfg(feature = "signer")]
-    pub fn show(&self) -> String {
-        format!(
-            "{},\"signed_by\":{}",
-            &self.specs_to_send.show(),
-            export_complex_single(&self.signed_by, |a| a.show_card())
-        )
     }
 }
 
@@ -218,17 +184,6 @@ impl NetworkVerifierDisplay {
             valid_current_verifier: valid_current_verifier.to_owned(),
             general_verifier: general_verifier.to_owned(),
         }
-    }
-
-    /// Print json with [`NetworkVerifierDisplay`] information for user interface
-    #[cfg(feature = "signer")]
-    pub fn show(&self) -> String {
-        format!(
-            "\"genesis_hash\":\"{}\",\"current_verifier\":{}",
-            hex::encode(&self.genesis_hash),
-            export_complex_single(&self.valid_current_verifier, |a| a
-                .show(&self.general_verifier))
-        )
     }
 }
 
@@ -256,18 +211,6 @@ impl TypesDisplay {
             types_hash: blake2b(32, &[], &types_content.store()).as_bytes().to_vec(),
             verifier: verifier.to_owned(),
         }
-    }
-
-    /// Print json with [`TypesDisplay`] information for user interface
-    #[cfg(feature = "signer")]
-    pub fn show(&self) -> String {
-        let types_id_pic = hex::encode(pic_types(&self.types_hash));
-        format!(
-            "\"types_hash\":\"{}\",\"types_id_pic\":\"{}\",\"verifier\":{}",
-            hex::encode(&self.types_hash),
-            types_id_pic,
-            export_complex_single(&self.verifier, |a| a.show_card())
-        )
     }
 }
 
@@ -298,18 +241,6 @@ impl TypesExport {
             types_hash: blake2b(32, &[], &types_content.store()).as_bytes().to_vec(),
             signed_by: signed_by.to_owned(),
         }
-    }
-
-    /// Print json with [`TypesExport`] information for user interface
-    #[cfg(feature = "signer")]
-    pub fn show(&self) -> String {
-        let types_id_pic = hex::encode(pic_types(&self.types_hash));
-        format!(
-            "\"types_hash\":\"{}\",\"types_id_pic\":\"{}\",\"signed_by\":{}",
-            hex::encode(&self.types_hash),
-            types_id_pic,
-            export_complex_single(&self.signed_by, |a| a.show_card())
-        )
     }
 }
 
@@ -362,12 +293,6 @@ impl IdentityHistory {
             path: path.to_string(),
             network_genesis_hash: network_genesis_hash.to_vec(),
         }
-    }
-
-    /// Print json with [`IdentityHistory`] information for user interface
-    #[cfg(feature = "signer")]
-    pub fn show(&self) -> String {
-        format!("\"seed_name\":\"{}\",\"encryption\":\"{}\",\"public_key\":\"{}\",\"path\":\"{}\",\"network_genesis_hash\":\"{}\"", &self.seed_name, &self.encryption.show(), hex::encode(&self.public_key), &self.path, hex::encode(&self.network_genesis_hash))
     }
 }
 
@@ -443,43 +368,6 @@ impl SignDisplay {
     pub fn transaction(&self) -> Vec<u8> {
         self.transaction.to_vec()
     }
-
-    /// Print json with [`SignDisplay`] information in case of **successful**
-    /// signing, for user interface
-    ///
-    /// Function to display transaction could vary,
-    /// currently general log view shows raw hexadecimal transaction,
-    /// detailed log view shows parsed transaction if parsing is possible.
-    #[cfg(feature = "signer")]
-    pub fn success<O>(&self, op: O) -> String
-    where
-        O: Fn(&Self) -> String + Copy,
-    {
-        format!(
-            "\"transaction\":{},\"network_name\":\"{}\",\"signed_by\":{},\"user_comment\":\"{}\"",
-            op(self),
-            &self.network_name,
-            export_complex_single(&self.signed_by, |a| a.show_card()),
-            &self.user_comment
-        )
-    }
-
-    /// Print json with [`SignDisplay`] information in case of **failed** signing,
-    /// for user interface
-    ///
-    /// This is reserved for cases that have failed because user has entered
-    /// a wrong password.
-    ///
-    /// Function to display transaction could vary,
-    /// currently general log view shows raw hexadecimal transaction,
-    /// detailed log view shows parsed transaction if parsing is possible.
-    #[cfg(feature = "signer")]
-    pub fn pwd_failure<O>(&self, op: O) -> String
-    where
-        O: Fn(&Self) -> String + Copy,
-    {
-        format!("\"transaction\":{},\"network_name\":\"{}\",\"signed_by\":{},\"user_comment\":\"{}\",\"error\":\"wrong_password_entered\"", op(self), &self.network_name, export_complex_single(&self.signed_by, |a| a.show_card()), &self.user_comment)
-    }
 }
 
 /// History log information about messages, both successfully signed and
@@ -515,30 +403,10 @@ impl SignMessageDisplay {
             user_comment: user_comment.to_string(),
         }
     }
-
-    /// Print json with [`SignMessageDisplay`] information in case of **successful**
-    /// signing, for user interface
-    #[cfg(feature = "signer")]
-    pub fn success(&self) -> String {
-        format!(
-            "\"message\":\"{}\",\"network_name\":\"{}\",\"signed_by\":{},\"user_comment\":\"{}\"",
-            hex::encode(&self.message.as_bytes()),
-            &self.network_name,
-            export_complex_single(&self.signed_by, |a| a.show_card()),
-            &self.user_comment
-        )
-    }
-
-    /// Print json with [`SignMessageDisplay`] information in case of **failed** signing,
-    /// for user interface
-    #[cfg(feature = "signer")]
-    pub fn pwd_failure(&self) -> String {
-        format!("\"message\":\"{}\",\"network_name\":\"{}\",\"signed_by\":{},\"user_comment\":\"{}\",\"error\":\"wrong_password_entered\"", hex::encode(&self.message.as_bytes()), &self.network_name, export_complex_single(&self.signed_by, |a| a.show_card()), &self.user_comment)
-    }
 }
 
 /// Events that could be recorded in the history log
-#[derive(Decode, Encode, Clone)]
+#[derive(PartialEq, Decode, Encode, Clone)]
 pub enum Event {
     /// Network metadata was added
     MetadataAdded {
@@ -660,155 +528,6 @@ pub enum Event {
 pub struct Entry {
     pub timestamp: String,
     pub events: Vec<Event>, // events already in showable form
-}
-
-#[cfg(feature = "signer")]
-impl Event {
-    /// Print json with [`Event`] related information for user interface
-    ///
-    /// Required input is the function to print `SignDisplay` contents.
-    ///
-    /// Currently general log view shows raw hexadecimal transaction,
-    /// detailed log view shows parsed transaction if parsing is possible.
-    pub fn show<O>(&self, op: O) -> String
-    where
-        O: Fn(&SignDisplay) -> String + Copy,
-    {
-        match &self {
-            Event::MetadataAdded {
-                meta_values_display: x,
-            } => format!(
-                "\"event\":\"metadata_added\",\"payload\":{}",
-                export_complex_single(x, |a| a.show())
-            ),
-            Event::MetadataRemoved {
-                meta_values_display: x,
-            } => format!(
-                "\"event\":\"metadata_removed\",\"payload\":{}",
-                export_complex_single(x, |a| a.show())
-            ),
-            Event::MetadataSigned {
-                meta_values_export: x,
-            } => format!(
-                "\"event\":\"load_metadata_message_signed\",\"payload\":{}",
-                export_complex_single(x, |a| a.show())
-            ),
-            Event::NetworkSpecsAdded {
-                network_specs_display: x,
-            } => format!(
-                "\"event\":\"network_specs_added\",\"payload\":{}",
-                export_complex_single(x, |a| a.show())
-            ),
-            Event::NetworkSpecsRemoved {
-                network_specs_display: x,
-            } => format!(
-                "\"event\":\"network_removed\",\"payload\":{}",
-                export_complex_single(x, |a| a.show())
-            ),
-            Event::NetworkSpecsSigned {
-                network_specs_export: x,
-            } => format!(
-                "\"event\":\"add_specs_message_signed\",\"payload\":{}",
-                export_complex_single(x, |a| a.show())
-            ),
-            Event::NetworkVerifierSet {
-                network_verifier_display: x,
-            } => format!(
-                "\"event\":\"network_verifier_set\",\"payload\":{}",
-                export_complex_single(x, |a| a.show())
-            ),
-            Event::GeneralVerifierSet { verifier: x } => format!(
-                "\"event\":\"general_verifier_added\",\"payload\":{}",
-                export_complex_single(x, |a| a.show_card())
-            ),
-            Event::TypesAdded { types_display: x } => format!(
-                "\"event\":\"types_added\",\"payload\":{}",
-                export_complex_single(x, |a| a.show())
-            ),
-            Event::TypesRemoved { types_display: x } => format!(
-                "\"event\":\"types_removed\",\"payload\":{}",
-                export_complex_single(x, |a| a.show())
-            ),
-            Event::TypesSigned { types_export: x } => format!(
-                "\"event\":\"load_types_message_signed\",\"payload\":{}",
-                export_complex_single(x, |a| a.show())
-            ),
-            Event::TransactionSigned { sign_display: x } => format!(
-                "\"event\":\"transaction_signed\",\"payload\":{}",
-                export_complex_single(x, |a| a.success(|b| op(b)))
-            ),
-            Event::TransactionSignError { sign_display: x } => format!(
-                "\"event\":\"transaction_sign_error\",\"payload\":{}",
-                export_complex_single(x, |a| a.pwd_failure(|b| op(b)))
-            ),
-            Event::MessageSigned {
-                sign_message_display: x,
-            } => format!(
-                "\"event\":\"message_signed\",\"payload\":{}",
-                export_complex_single(x, |a| a.success())
-            ),
-            Event::MessageSignError {
-                sign_message_display: x,
-            } => format!(
-                "\"event\":\"message_sign_error\",\"payload\":{}",
-                export_complex_single(x, |a| a.pwd_failure())
-            ),
-            Event::IdentityAdded {
-                identity_history: x,
-            } => format!(
-                "\"event\":\"identity_added\",\"payload\":{}",
-                export_complex_single(x, |a| a.show())
-            ),
-            Event::IdentityRemoved {
-                identity_history: x,
-            } => format!(
-                "\"event\":\"identity_removed\",\"payload\":{}",
-                export_complex_single(x, |a| a.show())
-            ),
-            Event::IdentitiesWiped => String::from("\"event\":\"identities_wiped\""),
-            Event::DeviceWasOnline => String::from("\"event\":\"device_online\""),
-            Event::ResetDangerRecord => String::from("\"event\":\"reset_danger_record\""),
-            Event::SeedCreated { seed_created: x } => {
-                format!("\"event\":\"seed_created\",\"payload\":\"{}\"", x)
-            }
-            Event::SeedNameWasShown {
-                seed_name_was_shown: seed_name,
-            } => format!(
-                "\"event\":\"seed_name_shown\",\"payload\":\"{}\"",
-                seed_name
-            ),
-            Event::Warning { warning: x } => format!("\"event\":\"warning\",\"payload\":\"{}\"", x),
-            Event::WrongPassword => String::from("\"event\":\"wrong_password_entered\""),
-            Event::UserEntry { user_entry: x } => {
-                format!("\"event\":\"user_entered_event\",\"payload\":\"{}\"", x)
-            }
-            Event::SystemEntry { system_entry: x } => {
-                format!("\"event\":\"system_entered_event\",\"payload\":\"{}\"", x)
-            }
-            Event::HistoryCleared => String::from("\"event\":\"history_cleared\""),
-            Event::DatabaseInitiated => String::from("\"event\":\"database_initiated\""),
-        }
-    }
-}
-
-#[cfg(feature = "signer")]
-impl Entry {
-    /// Print json with [`Entry`] for user interface
-    ///
-    /// Required input is the function to print `SignDisplay` contents.
-    ///
-    /// Currently general log view shows raw hexadecimal transaction,
-    /// detailed log view shows parsed transaction if parsing is possible.
-    pub fn show<O>(&self, op: O) -> String
-    where
-        O: Fn(&SignDisplay) -> String + Copy,
-    {
-        let events_chain = export_complex_vector(&self.events, |a| a.show(|b| op(b)));
-        format!(
-            "\"timestamp\":\"{}\",\"events\":{}",
-            self.timestamp, events_chain
-        )
-    }
 }
 
 /// Test function generating a set of all possible events
@@ -975,22 +694,4 @@ pub fn all_events_preview() -> Vec<Event> {
         Event::HistoryCleared,
         Event::DatabaseInitiated,
     ]
-}
-
-/// Test function generating a printed version of an entry with all possible
-/// events
-///
-/// Uses mock values and is needed to test json format in displaying all events
-/// in user interface.  
-#[cfg(feature = "signer")]
-pub fn print_all_events() -> String {
-    let events = all_events_preview();
-    let entry = Entry {
-        timestamp: String::from("2019-12-15 12:00:0.00000000 UTC"),
-        events,
-    };
-    format!(
-        "{{\"order\":0,{}}}",
-        entry.show(|a| format!("\"{}\"", hex::encode(a.transaction())))
-    )
 }

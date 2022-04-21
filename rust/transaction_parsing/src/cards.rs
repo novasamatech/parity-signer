@@ -137,8 +137,8 @@ impl<'a> Card<'a> {
                 };
                 fancy(index, indent, "author_public_key", &insert)
             },
-            Card::Verifier(x) => fancy(index, indent, "verifier", &export_complex_single(x, |a| a.show_card())),
-            Card::Meta(x) => fancy(index, indent, "meta", &format!("{{{}}}", x.show())),
+            Card::Verifier(x) => format!("{{}}"), // TODO
+            Card::Meta(x) => format!("{{}}"), // TODO
             Card::TypesInfo(x) => fancy(index, indent, "types", &format!("{{{}}}", x.show())),
             Card::NewSpecs(x) => fancy(index, indent, "new_specs", &format!("{{{}}}", x.show())),
             Card::NetworkInfo(x) => fancy(index, indent, "network_info", &format!("{{\"network_title\":\"{}\",\"network_logo\":\"{}\"}}", x.title, x.logo)),

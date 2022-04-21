@@ -5,7 +5,7 @@
 use lazy_static::lazy_static;
 use std::sync::{Mutex, TryLockError};
 
-use definitions::{error_signer::Signer, keyring::NetworkSpecsKey};
+use definitions::{error_signer::Signer, keyring::NetworkSpecsKey, navigation::ActionResult};
 
 mod actions;
 pub use actions::Action;
@@ -35,22 +35,23 @@ lazy_static! {
 }
 
 ///This should be called from UI; returns new UI information as JSON
-pub fn do_action(action: Action, details_str: &str, secret_seed_phrase: &str) -> String {
+pub fn do_action(
+    action: Action,
+    details_str: &str,
+    secret_seed_phrase: &str,
+) -> Result<ActionResult, String> {
     //If can't lock - debounce failed, ignore action
     //
     //guard is defined here to outline lifetime properly
     let guard = STATE.try_lock();
     match guard {
-        Ok(mut state) => {
-            let details = (*state).perform(action, details_str, secret_seed_phrase);
-            (*state).generate_json(&details)
-        }
+        Ok(mut state) => state.perform(action, details_str, secret_seed_phrase),
         Err(TryLockError::Poisoned(_)) => {
             //TODO: maybe more grace here?
             //Maybe just silently restart navstate? But is it safe?
             panic!("Concurrency error! Restart the app.");
         }
-        Err(TryLockError::WouldBlock) => "".to_string(),
+        Err(TryLockError::WouldBlock) => Err("WouldBlock".to_string()),
     }
 }
 

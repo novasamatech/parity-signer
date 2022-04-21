@@ -14,9 +14,9 @@ use definitions::{
 use crate::cards::{Card, Warning};
 use crate::check_signature::pass_crypto;
 use crate::holds::GeneralHold;
-use crate::{Action, StubNav};
+use crate::{StubNav, TransactionAction};
 
-pub fn load_types(data_hex: &str, database_name: &str) -> Result<Action, ErrorSigner> {
+pub fn load_types(data_hex: &str, database_name: &str) -> Result<TransactionAction, ErrorSigner> {
     let checked_info = pass_crypto(data_hex, TransferContent::LoadTypes)?;
     let content_new_types = ContentLoadTypes::from_slice(&checked_info.message);
     let new_types = content_new_types.types::<Signer>()?;
@@ -45,14 +45,14 @@ pub fn load_types(data_hex: &str, database_name: &str) -> Result<Action, ErrorSi
                         Card::Warning(Warning::TypesNotVerified).card(&mut index, 0);
                     let warning_card_2 = Card::Warning(Warning::UpdatingTypes).card(&mut index, 0);
                     let types_card = Card::TypesInfo(content_new_types).card(&mut index, 0);
-                    Ok(Action::Stub(
-                        format!(
+                    Ok(TransactionAction::Stub {
+                        s: format!(
                             "\"warning\":[{},{}],\"types_info\":[{}]",
                             warning_card_1, warning_card_2, types_card
                         ),
-                        checksum,
-                        StubNav::LoadTypes,
-                    ))
+                        u: checksum,
+                        stub: StubNav::LoadTypes,
+                    })
                 }
             }
             Verifier {
@@ -77,14 +77,14 @@ pub fn load_types(data_hex: &str, database_name: &str) -> Result<Action, ErrorSi
                     let checksum = stub.store_and_get_checksum(database_name)?;
                     let warning_card = Card::Warning(Warning::UpdatingTypes).card(&mut index, 0);
                     let types_card = Card::TypesInfo(content_new_types).card(&mut index, 0);
-                    Ok(Action::Stub(
-                        format!(
+                    Ok(TransactionAction::Stub {
+                        s: format!(
                             "\"verifier\":[{}],\"warning\":[{}],\"types_info\":[{}]",
                             verifier_card, warning_card, types_card
                         ),
-                        checksum,
-                        StubNav::LoadTypes,
-                    ))
+                        u: checksum,
+                        stub: StubNav::LoadTypes,
+                    })
                 }
             } else {
                 match general_verifier {
@@ -111,14 +111,14 @@ pub fn load_types(data_hex: &str, database_name: &str) -> Result<Action, ErrorSi
                         };
                         let types_card = Card::TypesInfo(content_new_types).card(&mut index, 0);
                         let checksum = stub.store_and_get_checksum(database_name)?;
-                        Ok(Action::Stub(
-                            format!(
+                        Ok(TransactionAction::Stub {
+                            s: format!(
                                 "\"verifier\":[{}],\"warning\":[{},{}],\"types_info\":[{}]",
                                 verifier_card, warning_card_1, warning_card_2, types_card
                             ),
-                            checksum,
-                            StubNav::LoadTypes,
-                        ))
+                            u: checksum,
+                            stub: StubNav::LoadTypes,
+                        })
                     }
                     Verifier {
                         v: Some(old_general_verifier_value),
