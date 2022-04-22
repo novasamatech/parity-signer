@@ -17,6 +17,7 @@ import io.parity.signer.ui.theme.Bg200
 import io.parity.signer.ui.theme.Crypto400
 import io.parity.signer.ui.theme.CryptoTypography
 import io.parity.signer.ui.theme.modal
+import io.parity.signer.uniffi.MBackup
 import kotlinx.coroutines.delay
 
 /**
@@ -24,14 +25,11 @@ import kotlinx.coroutines.delay
  * TODO: make sure seed phrase is cleared at all times!!!
  */
 @Composable
-fun SeedBackup(signerDataModel: SignerDataModel) {
-	val seedName = signerDataModel.modalData.value?.optString("seed_name") ?: ""
+fun SeedBackup(backup: MBackup, signerDataModel: SignerDataModel) {
+	val seedName = backup.seedName
 	var seedPhrase by remember { mutableStateOf("") }
 	var seedBoxStatus by remember { mutableStateOf(SeedBoxStatus.Locked) }
-	val derivations =
-		signerDataModel.modalData.value?.optJSONArray("derivations")
-			?.toListOfJSONObjects()?.sortedBy { it.optInt("network_order") }
-			?: listOf()
+	val derivations = backup.derivations.sortedBy { it.networkOrder }
 	val time = remember { mutableStateOf(60000L) } //Countdown time
 
 	Surface(
@@ -48,12 +46,12 @@ fun SeedBackup(signerDataModel: SignerDataModel) {
 				HeadingOverline("DERIVED KEYS")
 				LazyColumn {
 					for (pack in derivations) {
+						/* TODO: conversions, again
 						item {
 							NetworkCard(pack)
 						}
-						val networkDerivations =
-							pack.getJSONArray("id_set")
-								.toListOfJSONObjects().sortedBy { it.optString("path") }
+						*/
+						val networkDerivations = pack.idSet.sortedBy { it.path }
 						/*
 						//TODO: this could have been neat items block,
 						//but passworded keys might collide
@@ -70,7 +68,7 @@ fun SeedBackup(signerDataModel: SignerDataModel) {
 						)*/
 						for (record in networkDerivations) {
 							item {
-								if (record.optString("path").isBlank()) {
+								if (record.path.isBlank()) {
 									Text(
 										"seed key",
 										style = CryptoTypography.body2,
@@ -79,11 +77,11 @@ fun SeedBackup(signerDataModel: SignerDataModel) {
 								} else {
 									Row {
 										Text(
-											record.optString("path"),
+											record.path,
 											style = CryptoTypography.body2,
 											color = MaterialTheme.colors.Crypto400
 										)
-										if (record.optBoolean("has_pwd")) {
+										if (record.hasPwd) {
 											Text(
 												"///",
 												style = CryptoTypography.body2,

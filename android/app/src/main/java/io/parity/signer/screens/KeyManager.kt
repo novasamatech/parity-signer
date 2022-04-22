@@ -31,6 +31,7 @@ import io.parity.signer.ui.theme.Bg200
 import org.json.JSONArray
 import org.json.JSONObject
 import io.parity.signer.uniffi.Action
+import io.parity.signer.uniffi.MKeys
 import kotlin.math.absoluteValue
 
 /**
@@ -42,15 +43,15 @@ import kotlin.math.absoluteValue
 fun KeyManager(
 	button: (action: Action, details: String) -> Unit,
 	increment: (Int, String) -> Unit,
-	screenData: JSONObject,
+	mKeys: MKeys,
 	alertState: ShieldAlert?
 ) {
 	//val screenData = signerDataModel.screenData.value
-	val rootKey = screenData.optJSONObject("root") ?: JSONObject()
-	val keySet = screenData.optJSONArray("set") ?: JSONArray()
-	//val network = signerDataModel.screenData.value?.optJSONObject("network")
-	val multiselectMode = screenData.optBoolean("multiselect_mode")
-	val multiselectCount = screenData.optString("multiselect_count")
+	val rootKey = mKeys.root
+	val keySet = mKeys.set
+	val network = mKeys.network
+	val multiselectMode = mKeys.multiselectMode
+	val multiselectCount = mKeys.multiselectCount
 	var offsetX by remember { mutableStateOf(0f) }
 
 	Box {
@@ -60,18 +61,12 @@ fun KeyManager(
 					.pointerInput(Unit) {
 						detectTapGestures(
 							onTap = {
-								if (rootKey
-										.optString("address_key")
-										.isNotBlank()
-								)
-									button(Action.SELECT_KEY, rootKey.optString("address_key"))
+								if (rootKey.addressKey.isNotBlank())
+									button(Action.SELECT_KEY, rootKey.addressKey)
 							},
 							onLongPress = {
-								if (rootKey
-										.optString("address_key")
-										.isNotBlank()
-								)
-									button(Action.LONG_TAP, rootKey.optString("address_key"))
+								if (rootKey.addressKey.isNotBlank())
+									button(Action.LONG_TAP, rootKey.addressKey)
 							}
 						)
 					}
@@ -82,11 +77,8 @@ fun KeyManager(
 						orientation = Orientation.Horizontal,
 						onDragStopped = {
 							if (offsetX.absoluteValue > 20f) {
-								if (rootKey
-										.optString("address_key")
-										.isNotBlank()
-								)
-									button(Action.SWIPE, rootKey.optString("address_key"))
+								if (rootKey.addressKey.isNotBlank())
+									button(Action.SWIPE, rootKey.addressKey)
 							}
 							offsetX = 0f
 						}
@@ -96,17 +88,17 @@ fun KeyManager(
 					.fillMaxWidth()
 			) {
 				SeedCard(
-					seedName = rootKey.optString("seed_name", "error"),
-					identicon = rootKey.optString("identicon"),
-					base58 = rootKey.optString("base58"),
+					seedName = rootKey.seedName,
+					identicon = rootKey.identicon,
+					base58 = rootKey.base58,
 					showAddress = true,
 					multiselectMode = multiselectMode,
-					selected = rootKey.optBoolean("multiselect"),
-					swiped = rootKey.optBoolean("swiped"),
+					selected = rootKey.multiselect,
+					swiped = rootKey.swiped,
 					increment = { number ->
 						increment(
 							number,
-							rootKey.optString("seed_name")
+							rootKey.seedName
 						)
 					},
 					delete = { button(Action.REMOVE_KEY, "") }
@@ -121,10 +113,10 @@ fun KeyManager(
 					.fillMaxWidth()
 					.padding(top = 8.dp, start = 20.dp, end = 12.dp)
 			) {
-				screenData.optJSONObject("network")?.let { network ->
+				mKeys.network.let { network ->
 					NetworkLogoName(
-						logo = network.optString("logo"),
-						name = network.optString("title")
+						logo = network.logo,
+						name = network.title
 					)
 				}
 				Spacer(Modifier.width(8.dp))
@@ -159,7 +151,7 @@ fun KeyManager(
 			}
 			KeySelector(
 				button,
-				{ number -> increment(number, rootKey.optString("seed_name")) },
+				{ number -> increment(number, rootKey.seedName) },
 				keySet,
 				multiselectMode
 			)

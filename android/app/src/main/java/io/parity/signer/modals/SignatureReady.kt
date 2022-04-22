@@ -21,51 +21,54 @@ import io.parity.signer.models.pushButton
 import io.parity.signer.ui.theme.Bg000
 import io.parity.signer.ui.theme.modal
 import io.parity.signer.uniffi.Action
+import io.parity.signer.uniffi.MSignatureReady
 
 @Composable
-fun SignatureReady(signerDataModel: SignerDataModel) {
+fun SignatureReady(
+	signatureReady: MSignatureReady,
+	signerDataModel: SignerDataModel
+) {
 	val height = LocalConfiguration.current.screenHeightDp
 	val width = LocalConfiguration.current.screenWidthDp
 	var offset by remember { mutableStateOf(0f) }
 	Surface(
-			shape = MaterialTheme.shapes.modal,
-			color = MaterialTheme.colors.Bg000,
-			modifier = Modifier
-				.height(height.dp)
-				.offset{IntOffset(0, offset.toInt())}
-				.draggable(
-					orientation = Orientation.Vertical,
-					state = rememberDraggableState { delta ->
-						offset += delta
-						if (offset < 0) offset = 0f
-						//if (offset > ) offset = height.toFloat()
-					},
-				)
+		shape = MaterialTheme.shapes.modal,
+		color = MaterialTheme.colors.Bg000,
+		modifier = Modifier
+			.height(height.dp)
+			.offset { IntOffset(0, offset.toInt()) }
+			.draggable(
+				orientation = Orientation.Vertical,
+				state = rememberDraggableState { delta ->
+					offset += delta
+					if (offset < 0) offset = 0f
+					//if (offset > ) offset = height.toFloat()
+				},
+			)
 
+	) {
+		Column(
+			modifier = Modifier
+				.fillMaxSize()
+				.padding(20.dp)
 		) {
-			Column(
-				modifier = Modifier
-					.fillMaxSize()
-					.padding(20.dp)
-			) {
-				Text("Your signature")
-				Text("Scan this into your application")
-				Image(
-					bitmap = signerDataModel.modalData.value?.getString("signature")!!
-						.intoImageBitmap(),
-					contentDescription = "Signed transaction",
-					contentScale = ContentScale.FillWidth,
-					modifier = Modifier.fillMaxWidth()
-				)
-				Spacer(Modifier.weight(1f))
-				BigButton(
-					text = "Done",
-					action = {
-						signerDataModel.pushButton(Action.GO_BACK, "", "")
-					}
-				)
-			}
+			Text("Your signature")
+			Text("Scan this into your application")
+			Image(
+				bitmap = signatureReady.signature.intoImageBitmap(),
+				contentDescription = "Signed transaction",
+				contentScale = ContentScale.FillWidth,
+				modifier = Modifier.fillMaxWidth()
+			)
+			Spacer(Modifier.weight(1f))
+			BigButton(
+				text = "Done",
+				action = {
+					signerDataModel.pushButton(Action.GO_BACK, "", "")
+				}
+			)
 		}
+	}
 	DisposableEffect(Unit) {
 		offset = width.toFloat()
 		onDispose { offset = 0f }

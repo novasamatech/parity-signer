@@ -12,25 +12,30 @@ import io.parity.signer.models.SignerDataModel
 import io.parity.signer.models.pushButton
 import io.parity.signer.models.toListOfJSONObjects
 import io.parity.signer.uniffi.Action
+import io.parity.signer.uniffi.MLog
 
 @Composable
-fun HistoryScreen(signerDataModel: SignerDataModel) {
-	val history =
-		signerDataModel.screenData.value?.optJSONArray("log")?.toListOfJSONObjects()?.sortedBy {
-			it.optInt("order")
-		}?.reversed() ?: emptyList()
+fun HistoryScreen(mLog: MLog, signerDataModel: SignerDataModel) {
+	val history = mLog.log.sortedBy {
+		it.order
+	}?.reversed()
 
 	Column {
 		LazyColumn {
-			for (recordJSON in history) {
-				val order = recordJSON.optInt("order").toString()
-				val timestamp = recordJSON.optString("timestamp")
-				val record = recordJSON.optJSONArray("events")?.toListOfJSONObjects() ?: emptyList()
+			for (record in history) {
+				val order = record.order
+				val timestamp = record.timestamp
+
 				this.items(
-					items = record,
-					key = { recordJSON.optString("order") + it.toString() }
+					items = record.events,
+					key = { record.order.toString() + it.toString() }
 				) { item ->
-					Row(Modifier.clickable { signerDataModel.pushButton(Action.SHOW_LOG_DETAILS, details = order) }) {
+					Row(Modifier.clickable {
+						signerDataModel.pushButton(
+							Action.SHOW_LOG_DETAILS,
+							details = record.order.toString()
+						)
+					}) {
 						HistoryCard(
 							item,
 							timestamp

@@ -9,20 +9,21 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import io.parity.signer.models.abbreviateString
+import io.parity.signer.uniffi.MMetadataRecord
 import org.json.JSONObject
 
 @Composable
-fun MetadataCard(meta: JSONObject) {
-  Row {
-  	Identicon(identicon = meta.optString("meta_id_pic"))
+fun MetadataCard(metadataRecord: MMetadataRecord) {
+	Row {
+		Identicon(identicon = metadataRecord.metaIdPic)
 		Column {
 			Text("version")
-			Text(meta.optString("spec_version"))
+			Text(metadataRecord.specsVersion)
 		}
 		Spacer(Modifier.width(20.dp))
 		Column {
 			Text("hash")
-			Text(meta.optString("meta_hash").abbreviateString(8))
+			Text(metadataRecord.metaHash.abbreviateString(8))
 		}
 	}
 }

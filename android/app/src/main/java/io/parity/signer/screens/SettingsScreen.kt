@@ -18,6 +18,7 @@ import io.parity.signer.models.abbreviateString
 import io.parity.signer.models.pushButton
 import io.parity.signer.ui.theme.*
 import io.parity.signer.uniffi.Action
+import io.parity.signer.uniffi.MSettings
 
 /**
  * Settings screen; General purpose stuff like legal info, networks management
@@ -25,7 +26,7 @@ import io.parity.signer.uniffi.Action
  * all subsequent interactions should be in modals or drop-down menus
  */
 @Composable
-fun SettingsScreen(signerDataModel: SignerDataModel) {
+fun SettingsScreen(settings: MSettings, signerDataModel: SignerDataModel) {
 	var confirm by remember { mutableStateOf(false) }
 
 	Column(
@@ -55,32 +56,30 @@ fun SettingsScreen(signerDataModel: SignerDataModel) {
 				)
 				Spacer(Modifier.weight(1f))
 			}
-			signerDataModel.screenData.value?.let {
-				Surface(
-					shape = MaterialTheme.shapes.small,
-					color = MaterialTheme.colors.Bg200,
-					modifier = Modifier.padding(8.dp)
+			Surface(
+				shape = MaterialTheme.shapes.small,
+				color = MaterialTheme.colors.Bg200,
+				modifier = Modifier.padding(8.dp)
+			) {
+				Row(
+					verticalAlignment = Alignment.CenterVertically,
+					modifier = Modifier
+						.padding(8.dp)
+						.fillMaxWidth(1f)
 				) {
-					Row(
-						verticalAlignment = Alignment.CenterVertically,
-						modifier = Modifier
-							.padding(8.dp)
-							.fillMaxWidth(1f)
-					) {
-						Identicon(identicon = it.optString("identicon"))
-						Spacer(Modifier.width(4.dp))
-						Column {
-							Text(
-								it.optString("public_key").abbreviateString(8),
-								style = CryptoTypography.body2,
-								color = MaterialTheme.colors.Crypto400
-							)
-							Text(
-								"encryption: " + it.optString("encryption"),
-								style = CryptoTypography.body1,
-								color = MaterialTheme.colors.Text400
-							)
-						}
+					Identicon(identicon = settings.identicon ?: "")
+					Spacer(Modifier.width(4.dp))
+					Column {
+						Text(
+							settings.publicKey ?: "".abbreviateString(8),
+							style = CryptoTypography.body2,
+							color = MaterialTheme.colors.Crypto400
+						)
+						Text(
+							"encryption: " + settings.encryption ?: "",
+							style = CryptoTypography.body1,
+							color = MaterialTheme.colors.Text400
+						)
 					}
 				}
 			}

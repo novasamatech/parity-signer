@@ -24,31 +24,39 @@ import io.parity.signer.ui.theme.Bg200
 import io.parity.signer.ui.theme.modal
 import org.json.JSONObject
 import io.parity.signer.uniffi.Action
+import io.parity.signer.uniffi.MEnterPassword
 
 @Composable
-fun EnterPassword(signerDataModel: SignerDataModel) {
+fun EnterPassword(
+	enterPassword: MEnterPassword,
+	signerDataModel: SignerDataModel
+) {
 	val password = remember {
 		mutableStateOf("")
 	}
-	val content = signerDataModel.screenData.value ?: JSONObject()
+	val content = signerDataModel.screenData.value
 	val focusManager = LocalFocusManager.current
 	val focusRequester = remember { FocusRequester() }
 
 	Surface(
 		color = MaterialTheme.colors.Bg200,
 		shape = MaterialTheme.shapes.modal,
-		modifier = Modifier.fillMaxSize(1f).padding(8.dp)
+		modifier = Modifier
+			.fillMaxSize(1f)
+			.padding(8.dp)
 	) {
 		Column(
 			horizontalAlignment = Alignment.CenterHorizontally,
 			modifier = Modifier.padding(20.dp)
 		) {
 			HeaderBar(line1 = "SECRET PATH", line2 = "///password")
+			/* TODO: TransactionAuthor -> Address conversion
 			KeyCard(
-				identity = content.optJSONObject("author_info") ?: JSONObject()
+				identity = enterPassword.authorInfo
 			)
-			if (content.optInt("counter") > 0) {
-				Text("Attempt " + content.optInt("counter").toString() + " of 3")
+			 */
+			if (enterPassword.counter > 0u) {
+				Text("Attempt " + enterPassword.counter.toString() + " of 3")
 			}
 			SingleTextInput(
 				content = password,

@@ -17,9 +17,14 @@ import io.parity.signer.models.addSeed
 import io.parity.signer.models.decode64
 import io.parity.signer.ui.theme.Bg200
 import io.parity.signer.ui.theme.modal
+import io.parity.signer.uniffi.MNewSeed
+import io.parity.signer.uniffi.MNewSeedBackup
 
 @Composable
-fun NewSeedBackup(signerDataModel: SignerDataModel) {
+fun NewSeedBackup(
+	newSeedBackup: MNewSeedBackup,
+	signerDataModel: SignerDataModel
+) {
 	val confirmBackup = remember { mutableStateOf(false) }
 	val createRoots = remember { mutableStateOf(true) }
 	Surface(
@@ -30,10 +35,12 @@ fun NewSeedBackup(signerDataModel: SignerDataModel) {
 			verticalArrangement = Arrangement.spacedBy(8.dp),
 			modifier = Modifier.padding(20.dp)
 		) {
-			HeaderBar("BACKUP SEED PHRASE", signerDataModel.modalData.value?.optString("seed")?.decode64() ?: "Seed name error")
+			HeaderBar(
+				"BACKUP SEED PHRASE",
+				newSeedBackup.seed.decode64()
+			)
 			SeedBox(
-				seedPhrase = signerDataModel.modalData.value?.optString("seed_phrase")
-					?: ""
+				seedPhrase = newSeedBackup.seedPhrase
 			)
 			CheckboxTemplate(
 				checked = confirmBackup.value,
@@ -48,19 +55,13 @@ fun NewSeedBackup(signerDataModel: SignerDataModel) {
 
 			BigButton(
 				text = "Next",
-				action = {
-					signerDataModel.modalData.value?.let { modalData ->
-						modalData.optString("seed").let { seedName ->
-							modalData.optString("seed_phrase")
-								.let { seedPhrase ->
-									signerDataModel.addSeed(
-										seedName = seedName,
-										seedPhrase = seedPhrase,
-										createRoots = createRoots.value
-									)
-								}
-						}
-					}
+				action =
+				{
+					signerDataModel.addSeed(
+						seedName = newSeedBackup.seed,
+						seedPhrase = newSeedBackup.seedPhrase,
+						createRoots = createRoots.value
+					)
 				},
 				isDisabled = !confirmBackup.value
 			)

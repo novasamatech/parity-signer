@@ -16,10 +16,11 @@ import io.parity.signer.models.pushButton
 import io.parity.signer.ui.theme.Bg000
 import io.parity.signer.ui.theme.modal
 import io.parity.signer.uniffi.Action
+import io.parity.signer.uniffi.MLogRight
 
 @Composable
-fun LogMenu(signerDataModel: SignerDataModel) {
-	val checksum = signerDataModel.modalData.value?.optString("checksum")
+fun LogMenu(logRight: MLogRight, signerDataModel: SignerDataModel) {
+	val checksum = logRight.checksum
 	var confirm by remember { mutableStateOf(false) }
 
 	Column {

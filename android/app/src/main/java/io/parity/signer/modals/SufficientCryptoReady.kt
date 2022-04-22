@@ -15,32 +15,38 @@ import io.parity.signer.models.SignerDataModel
 import io.parity.signer.models.intoImageBitmap
 import io.parity.signer.ui.theme.Bg000
 import io.parity.signer.ui.theme.modal
+import io.parity.signer.uniffi.MSufficientCryptoReady
+import io.parity.signer.uniffi.ModalData
 import org.json.JSONObject
 
 @Composable
-fun SufficientCryptoReady(signerDataModel: SignerDataModel) {
+fun SufficientCryptoReady(
+	sufficientCrypto: MSufficientCryptoReady,
+	signerDataModel: SignerDataModel
+) {
 	Surface(
 		shape = MaterialTheme.shapes.modal,
 		color = MaterialTheme.colors.Bg000
 	) {
-		Column(modifier = Modifier
-			.fillMaxSize()
-			.padding(20.dp)) {
+		Column(
+			modifier = Modifier
+				.fillMaxSize()
+				.padding(20.dp)
+		) {
 			HeaderBar("Your signature", "Scan this into your application")
 			Image(
-				bitmap = signerDataModel.modalData.value?.getString("sufficient")!!
-					.intoImageBitmap(),
+				bitmap = sufficientCrypto.sufficient.intoImageBitmap(),
 				contentDescription = "Signed update",
 				contentScale = ContentScale.FillWidth,
 				modifier = Modifier.fillMaxWidth()
 			)
+			/* TODO: MSCAuthor -> Address conversion
 			KeyCard(
-				identity = signerDataModel.modalData.value?.optJSONObject("author_info")
-					?: JSONObject()
+				identity = sufficientCrypto.authorInfo,
 			)
+			 */
 			Text(
-				"Payload: " + signerDataModel.modalData.value?.optJSONObject("content")
-					?.optString("type")
+				"Payload: " + sufficientCrypto.content.ttype
 			)
 		}
 	}

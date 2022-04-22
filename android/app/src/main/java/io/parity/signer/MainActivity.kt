@@ -27,6 +27,8 @@ import io.parity.signer.screens.WaitingScreen
 import io.parity.signer.ui.theme.ParitySignerTheme
 import io.parity.signer.ui.theme.Text600
 import io.parity.signer.uniffi.Action
+import io.parity.signer.uniffi.ModalData
+import io.parity.signer.uniffi.ScreenData
 
 @ExperimentalMaterialApi
 @ExperimentalAnimationApi
@@ -57,8 +59,6 @@ fun SignerApp(signerDataModel: SignerDataModel) {
 	ParitySignerTheme {
 		val onBoardingDone = signerDataModel.onBoardingDone.observeAsState()
 		val authenticated = signerDataModel.authenticated.observeAsState()
-		val signerScreen = signerDataModel.screen.observeAsState()
-		val signerModal = signerDataModel.modal.observeAsState()
 		val signerAlert = signerDataModel.alert.observeAsState()
 		val shieldAlert = signerDataModel.alertState.observeAsState()
 		val footer = signerDataModel.footer.observeAsState()
@@ -71,10 +71,14 @@ fun SignerApp(signerDataModel: SignerDataModel) {
 						if (
 							signerDataModel.alert.value == SignerAlert.Empty
 							&&
-							signerDataModel.modal.value == SignerModal.Empty
+							signerDataModel.modalData.value is ModalData.Text
 							&&
 							(
-								signerDataModel.screen.value == SignerScreen.Log || signerDataModel.screen.value == SignerScreen.Scan || signerDataModel.screen.value == SignerScreen.SeedSelector || signerDataModel.screen.value == SignerScreen.Settings)
+								signerDataModel.screenData.value is ScreenData.Log ||
+									signerDataModel.screenData.value is ScreenData.Scan ||
+									signerDataModel.screenData.value is ScreenData.SeedSelector ||
+									signerDataModel.screenData.value is ScreenData.Settings
+								)
 						) {
 							signerDataModel.activity.moveTaskToBack(true)
 						} else
@@ -90,9 +94,10 @@ fun SignerApp(signerDataModel: SignerDataModel) {
 						}
 					) { innerPadding ->
 						Box(modifier = Modifier.padding(innerPadding)) {
-							ScreenSelector(signerScreen.value, signerDataModel)
+							ScreenSelector(signerDataModel)
 							ModalSelector(
-								modal = signerModal.value ?: SignerModal.Empty,
+								modal = signerDataModel.modalData.value
+									?: ModalData.Text(f = ""),
 								signerDataModel = signerDataModel
 							)
 							AlertSelector(

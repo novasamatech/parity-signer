@@ -10,23 +10,24 @@ import androidx.compose.ui.unit.dp
 import io.parity.signer.models.toListOfJSONObjects
 import org.json.JSONArray
 import io.parity.signer.uniffi.Action
+import io.parity.signer.uniffi.MKeysCard
 
 @Composable
 fun KeySelector(
 	button: (action: Action, details: String) -> Unit,
 	increment: (Int) -> Unit,
-	keySet: JSONArray,
+	keySet: List<MKeysCard>,
 	multiSelectMode: Boolean
 ) {
-	val addresses = keySet.toListOfJSONObjects().sortedBy { it.optString("path") }
+	val addresses = keySet.sortedBy { it.path }
 	LazyColumn {
 		this.items(
 			items = addresses,
 			key = {
-				it.optString("address_key")
+				it.addressKey
 			}
 		) { address ->
-			val addressKey = address.optString("address_key")
+			val addressKey = address.addressKey
 			KeyCardActive(
 				address,
 				selectButton = { button(Action.SELECT_KEY, addressKey) },

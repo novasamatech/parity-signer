@@ -23,10 +23,11 @@ import androidx.compose.ui.unit.dp
 import io.parity.signer.ui.theme.*
 import org.json.JSONObject
 import io.parity.signer.uniffi.Action
+import io.parity.signer.uniffi.SeedWord
 
 @Composable
 fun RestoreSeedPhraseBox(
-	seedPhrase: List<JSONObject>,
+	seedPhrase: List<SeedWord>,
 	seedWord: TextFieldValue,
 	button: (action: Action, details: String) -> Unit,
 	keyboard: Boolean
@@ -44,8 +45,8 @@ fun RestoreSeedPhraseBox(
 		) {
 			//TODO: make this thing interactive
 			Text(
-				seedPhrase.sortedBy { it.optInt("order") }
-					.joinToString(" ") { it.optString("content") },
+				seedPhrase.sortedBy { it.order }
+					.joinToString(" ") { it.content },
 				style = CryptoTypography.body1,
 				color = MaterialTheme.colors.Crypto400,
 				modifier = Modifier.fillMaxWidth().padding(12.dp)

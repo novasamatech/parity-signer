@@ -16,12 +16,11 @@ import io.parity.signer.models.SignerDataModel
 import io.parity.signer.models.pushButton
 import io.parity.signer.ui.theme.Bg000
 import io.parity.signer.ui.theme.modal
-import org.json.JSONObject
 import io.parity.signer.uniffi.Action
+import io.parity.signer.uniffi.MTypesInfo
 
 @Composable
-fun TypesInfo(signerDataModel: SignerDataModel) {
-	val content = signerDataModel.modalData.value ?: JSONObject()
+fun TypesInfo(typesInfo: MTypesInfo, signerDataModel: SignerDataModel) {
 	var confirm by remember { mutableStateOf(false) }
 
 	Column {
@@ -34,10 +33,10 @@ fun TypesInfo(signerDataModel: SignerDataModel) {
 				modifier = Modifier.padding(20.dp)
 			) {
 				HeaderBar(line1 = "MANAGE TYPES", line2 = "Select action")
-				if (content.optBoolean("types_on_file")) {
+				if (typesInfo.typesOnFile) {
 					Row {
-						Identicon(identicon = content.optString("types_id_pic"))
-						Text(content.optString("types_hash"))
+						Identicon(identicon = typesInfo.typesIdPic ?: "")
+						Text(typesInfo.typesHash ?: "")
 					}
 				} else {
 					Text("Pre-v14 types not installed")

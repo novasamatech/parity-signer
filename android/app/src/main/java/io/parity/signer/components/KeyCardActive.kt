@@ -15,12 +15,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.unit.dp
 import io.parity.signer.ui.theme.Bg200
+import io.parity.signer.uniffi.MKeysCard
 import org.json.JSONObject
 import kotlin.math.absoluteValue
 
 @Composable
 fun KeyCardActive(
-	address: JSONObject,
+	address: MKeysCard,
 	selectButton: () -> Unit,
 	longTapButton: () -> Unit,
 	swipe: () -> Unit,
@@ -62,11 +63,13 @@ fun KeyCardActive(
 					}
 				)
 		) {
+			/* TODO: MKeysCard -> Address conversion
 			KeyCard(
 				address, multiselectMode
 			)
+			 */
 			Spacer(modifier = Modifier.weight(1f, true))
-			if (address.optBoolean("swiped")) {
+			if (address.swiped) {
 				SwipedButtons(increment, delete)
 			}
 		}

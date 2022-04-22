@@ -22,10 +22,13 @@ import io.parity.signer.ui.theme.Bg000
 import io.parity.signer.ui.theme.modal
 import org.json.JSONObject
 import io.parity.signer.uniffi.Action
+import io.parity.signer.uniffi.MNetworkDetails
 
 @Composable
-fun ManageMetadata(signerDataModel: SignerDataModel) {
-	val content = signerDataModel.modalData.value ?: JSONObject()
+fun ManageMetadata(
+	networks: MNetworkDetails,
+	signerDataModel: SignerDataModel
+) {
 	var confirm by remember { mutableStateOf(false) }
 
 	Surface(
@@ -42,15 +45,17 @@ fun ManageMetadata(signerDataModel: SignerDataModel) {
 					modifier = Modifier.padding(20.dp)
 				) {
 					HeaderBar(line1 = "MANAGE METADATA", line2 = "Select action")
-					MetadataCard(content)
+
 					Row {
 						Text("Used for:")
 						LazyColumn {
-							items(content.optJSONArray("networks")?.length() ?: 0) { index ->
+							items(networks.meta.size) { index ->
+								MetadataCard(networks.meta[index]) // TODO: This has to go here?
+								/* Types don't match again
 								NetworkCard(
-									network = content.getJSONArray("networks")
-										.getJSONObject(index)
+									network = networks.meta[index]
 								)
+								 */
 							}
 						}
 					}

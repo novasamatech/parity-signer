@@ -27,13 +27,17 @@ import io.parity.signer.models.SignerDataModel
 import io.parity.signer.models.addKey
 import io.parity.signer.ui.theme.Bg200
 import io.parity.signer.ui.theme.modal
+import io.parity.signer.uniffi.MPasswordConfirm
 
 @Composable
-fun PasswordConfirm(signerDataModel: SignerDataModel) {
+fun PasswordConfirm(
+	passwordConfirm: MPasswordConfirm,
+	signerDataModel: SignerDataModel
+) {
 	val passwordCheck = remember { mutableStateOf("") }
-	val pwd = signerDataModel.modalData.value?.optString("pwd")
-	val croppedPath = signerDataModel.modalData.value?.optString("cropped_path")
-	val seedName = signerDataModel.modalData.value?.optString("seed_name") ?: ""
+	val pwd = passwordConfirm.pwd
+	val croppedPath = passwordConfirm.croppedPath
+	val seedName = passwordConfirm.seedName
 	val lastError = signerDataModel.lastError.observeAsState()
 	val focusManager = LocalFocusManager.current
 	val focusRequester = remember { FocusRequester() }

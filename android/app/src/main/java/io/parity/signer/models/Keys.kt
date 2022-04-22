@@ -6,6 +6,9 @@ import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.currentCompositionLocalContext
 import org.json.JSONObject
 import io.parity.signer.uniffi.Action
+import io.parity.signer.uniffi.Address
+import io.parity.signer.uniffi.DerivationDestination
+import io.parity.signer.uniffi.DerivationCheck as DerivationCheckFFI
 
 /**
  * Add key to database; uses phone crypto to fetch seeds!
@@ -34,8 +37,8 @@ enum class DeriveDestination {
  */
 class DerivationCheck(
 	var buttonGood: MutableState<Boolean>,
-	var whereTo: MutableState<DeriveDestination?>,
-	var collision: MutableState<JSONObject?>,
+	var whereTo: MutableState<DerivationDestination?>,
+	var collision: MutableState<Address?>,
 	var checkCallback: (path: String) -> String
 ) {
 	/**
@@ -44,12 +47,21 @@ class DerivationCheck(
 	fun check(path: String) {
 		val checkResult = checkCallback(path)
 		Log.d("checkResult", checkResult)
-		fromJSON(JSONObject(checkResult).optJSONObject("derivation_check")?: JSONObject())
+		JSONObject(checkResult).optJSONObject("derivation_check")
+	}
+
+	fun fromFFI(derivationCheck: DerivationCheckFFI) {
+		buttonGood.value = derivationCheck.buttonGood?:false
+		whereTo.value = derivationCheck.whereTo
+		collision.value = derivationCheck.collision
+		derivationCheck.error?.let {
+			Log.d("collision checker error", it)
+		}
+
 	}
 
 	/**
 	 * Gerenate check state
-	 */
 	fun fromJSON(input: JSONObject) {
 		buttonGood.value = input.optBoolean("button_good", false)
 		whereTo.value = try {
@@ -62,6 +74,7 @@ class DerivationCheck(
 			Log.d("collision checker error", it)
 		}
 	}
+	*/
 }
 
 fun SignerDataModel.increment(number: Int, seedName: String) {

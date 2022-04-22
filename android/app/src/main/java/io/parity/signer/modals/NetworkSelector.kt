@@ -17,11 +17,11 @@ import io.parity.signer.ui.theme.Bg000
 import io.parity.signer.ui.theme.modal
 import org.json.JSONArray
 import io.parity.signer.uniffi.Action
+import io.parity.signer.uniffi.MNetworkMenu
 
 @Composable
-fun NetworkSelector(signerDataModel: SignerDataModel) {
-	val networks =
-		signerDataModel.modalData.value?.optJSONArray("networks") ?: JSONArray()
+fun NetworkSelector(networks: MNetworkMenu, signerDataModel: SignerDataModel) {
+	val networks = networks.networks
 	Surface(
 		color = Color(0x00000000),
 		modifier = Modifier.clickable { signerDataModel.pushButton(Action.GO_BACK) }
@@ -30,7 +30,7 @@ fun NetworkSelector(signerDataModel: SignerDataModel) {
 			Spacer(
 				Modifier
 					.weight(1f)
-					)
+			)
 			Surface(
 				shape = MaterialTheme.shapes.modal,
 				color = MaterialTheme.colors.Bg000,
@@ -49,17 +49,16 @@ fun NetworkSelector(signerDataModel: SignerDataModel) {
 						contentPadding = PaddingValues(horizontal = 8.dp),
 						verticalArrangement = Arrangement.spacedBy(10.dp)
 					) {
-						items(networks.length()) { item ->
+						items(networks.size) { item ->
 							Row(Modifier.clickable {
 								signerDataModel.pushButton(
 									Action.CHANGE_NETWORK,
-									networks.getJSONObject(item).optString("key")
+									networks[item].key
 								)
 							}) {
 								NetworkCard(
-									network = networks.getJSONObject(item),
-									selected = networks.getJSONObject(item)
-										.optBoolean("selected", false)
+									network = networks[item],
+									selected = networks[item].selected
 								)
 							}
 						}
