@@ -142,7 +142,7 @@ dictionary ActionResult {
     string modal;
     string alert;
     ScreenData screen_data;
-    string modal_data;
+    ModalData modal_data;
     string alert_data;
 };
 
@@ -547,4 +547,117 @@ namespace signer {
     string get_all_tx_cards();
 
     string get_all_log_cards();
+};
+
+
+dictionary MSCContent {
+    string ttype;
+};
+
+dictionary MSCAuthor {
+    string base58;
+    string identicon;
+    string seed;
+    string derivation_path;
+};
+
+dictionary MSufficientCryptoReady {
+    MSCAuthor author_info;
+    string sufficient;
+    MSCContent content;
+};
+
+dictionary MBackup {
+    string seed_name;
+    sequence<DerivationPack> derivations;
+};
+
+dictionary DerivationPack {
+    string network_title;
+    string network_logo;
+    string network_order;
+    sequence<DerivationEntry> id_set;
+};
+
+dictionary DerivationEntry {
+    string path;
+    boolean has_pwd;
+};
+
+dictionary MSeedMenu {
+    string seed;
+};
+
+dictionary MNewSeedBackup {
+    string seed;
+    string seed_phrase;
+    string identicon;
+};
+
+dictionary Network {
+    string key;
+    string logo;
+    u32 order;
+    boolean selected;
+    string title;
+};
+
+dictionary MNetworkMenu {
+    sequence<Network> networks;
+};
+
+dictionary MPasswordConfirm {
+    string pwd;
+    string seed_name;
+    string cropped_path;
+};
+
+dictionary MSignatureReady {
+    string signature;
+};
+
+dictionary MEnterPassword {
+    TransactionAuthor author_info;
+    u32 counter;
+};
+
+dictionary MLogRight {
+    string checksum;
+};
+
+dictionary MMMNetwork {
+    string title;
+    string logo;
+    u32 order;
+    boolean current_on_screen;
+};
+
+dictionary MMManageNetworks {
+    string name;
+    string version;
+    string meta_hash;
+    string meta_id_pic;
+    sequence<MMMNetwork> networks;
+};
+
+dictionary MTypesInfo {
+    boolean types_on_file;
+    string? types_hash;
+    string? types_id_pic;
+};
+
+[Enum]
+interface ModalData {
+    SufficientCryptoReady(MSufficientCryptoReady f);
+    Backup(MBackup f);
+    SeedMenu(MSeedMenu f);
+    NewSeedBackup(MNewSeedBackup f);
+    NetworkSelector(MNetworkMenu f);
+    PasswordConfirm(MPasswordConfirm f);
+    SignatureReady(MSignatureReady f);
+    EnterPassword(MEnterPassword f);
+    LogRight(MLogRight f);
+    ManageNetworks(MMManageNetworks f);
+    TypesInfo(MTypesInfo f);
+    Text(string f);
 };

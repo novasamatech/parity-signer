@@ -11,6 +11,7 @@ use definitions::{
     error_signer::{ErrorSigner, ExtraAddressKeySourceSigner, Signer},
     helpers::{make_identicon_from_multisigner, multisigner_to_public},
     keyring::{AddressKey, NetworkSpecsKey},
+    navigation::TransactionAuthor,
     users::AddressDetails,
 };
 use transaction_parsing;
@@ -96,7 +97,7 @@ pub struct TransactionState {
 ///State of screen generating sufficient crypto
 #[derive(Debug, Clone)]
 pub struct SufficientCryptoState {
-    key_selected: Option<(MultiSigner, AddressDetails, String)>,
+    key_selected: Option<(MultiSigner, AddressDetails, TransactionAuthor)>,
     entered_info: EnteredInfo,
     content: transaction_signing::SufficientContent,
     counter: u8,
@@ -423,7 +424,7 @@ impl TransactionState {
         new_checksum: u32,
         content: String,
         has_pwd: bool,
-        author_info: String,
+        author_info: TransactionAuthor,
         network_info: String,
     ) -> Self {
         let action = transaction_parsing::TransactionAction::Sign {
@@ -469,7 +470,7 @@ impl SufficientCryptoState {
     pub fn content(&self) -> transaction_signing::SufficientContent {
         self.content.to_owned()
     }
-    pub fn key_selected(&self) -> Option<(MultiSigner, AddressDetails, String)> {
+    pub fn key_selected(&self) -> Option<(MultiSigner, AddressDetails, TransactionAuthor)> {
         self.key_selected.to_owned()
     }
     pub fn update(
@@ -478,14 +479,13 @@ impl SufficientCryptoState {
         address_details: &AddressDetails,
         new_secret_string: &str,
     ) -> Self {
-        let hex_identicon = hex::encode(make_identicon_from_multisigner(multisigner));
-        let author_info = format!(
-            "\"base58\":\"{}\",\"identicon\":\"{}\",\"seed\":\"{}\",\"derivation_path\":\"{}\"",
-            hex::encode(multisigner_to_public(multisigner)),
-            hex_identicon,
-            address_details.seed_name,
-            address_details.path
-        );
+        let identicon = hex::encode(make_identicon_from_multisigner(multisigner));
+        let author_info = TransactionAuthor {
+            base58: hex::encode(multisigner_to_public(multisigner)),
+            identicon,
+            seed: address_details.seed_name.clone(),
+            derivation_path: address_details.path.clone(),
+        };
         Self {
             key_selected: Some((
                 multisigner.to_owned(),

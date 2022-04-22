@@ -8,6 +8,7 @@ use definitions::{
     helpers::{make_identicon_from_multisigner, print_multisigner_as_base58},
     history::MetaValuesDisplay,
     keyring::VerifierKey,
+    navigation::TransactionAuthor,
     network_specs::{NetworkSpecs, NetworkSpecsToSend, VerifierValue},
     print::{export_complex_single, export_plain_vector},
     qr_transfers::ContentLoadTypes,
@@ -126,7 +127,7 @@ impl<'a> Card<'a> {
                 ParserCard::NetworkNameVersion {name, version} => fancy(index, indent, "name_version", &format!("{{\"name\":\"{}\",\"version\":\"{}\"}}", name, version)),
                 ParserCard::TxVersion (x) => fancy(index, indent, "tx_version", &format!("\"{}\"", x)),
             },
-            Card::Author {author, base58prefix, address_details} => fancy(index, indent, "author", &format!("{{{}}}", make_author_info(author, *base58prefix, address_details))),
+            Card::Author {..} => fancy(index, indent, "author", &format!("{{{}}}", "Author stub")),
             Card::AuthorPlain {author, base58prefix} => fancy(index, indent, "author_plain", &format!("{{\"base58\":\"{}\",\"identicon\":\"{}\"}}", print_multisigner_as_base58(author, Some(*base58prefix)), hex::encode(make_identicon_from_multisigner(author)))),
             Card::AuthorPublicKey(author) => {
                 let hex_identicon = hex::encode(make_identicon_from_multisigner(author));
@@ -139,7 +140,7 @@ impl<'a> Card<'a> {
             },
             Card::Verifier(x) => format!("{{}}"), // TODO
             Card::Meta(x) => format!("{{}}"), // TODO
-            Card::TypesInfo(x) => fancy(index, indent, "types", &format!("{{{}}}", x.show())),
+            Card::TypesInfo(x) => fancy(index, indent, "types", &format!("{{{}}}", x.show().0)),
             Card::NewSpecs(x) => fancy(index, indent, "new_specs", &format!("{{{}}}", x.show())),
             Card::NetworkInfo(x) => fancy(index, indent, "network_info", &format!("{{\"network_title\":\"{}\",\"network_logo\":\"{}\"}}", x.title, x.logo)),
             Card::NetworkGenesisHash(x) => fancy(index, indent, "network_genesis_hash", &format!("\"{}\"", hex::encode(x))),
@@ -154,6 +155,11 @@ pub(crate) fn make_author_info(
     author: &MultiSigner,
     base58prefix: u16,
     address_details: &AddressDetails,
-) -> String {
-    format!("\"base58\":\"{}\",\"identicon\":\"{}\",\"seed\":\"{}\",\"derivation_path\":\"{}\",\"has_pwd\":{}", print_multisigner_as_base58(author, Some(base58prefix)), hex::encode(make_identicon_from_multisigner(author)), address_details.seed_name, address_details.path, address_details.has_pwd)
+) -> TransactionAuthor {
+    TransactionAuthor {
+        base58: print_multisigner_as_base58(author, Some(base58prefix)),
+        identicon: hex::encode(make_identicon_from_multisigner(author)),
+        seed: address_details.seed_name.clone(),
+        derivation_path: address_details.path.clone(),
+    }
 }

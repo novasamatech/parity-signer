@@ -143,7 +143,7 @@ pub(crate) fn sufficient_crypto_load_types(
     Ok(format!(
         "\"sufficient\":\"{}\",\"content\":{{\"type\":\"load_types\",{}}}",
         sufficient,
-        types_content.show()
+        "TODO" // TODO types_content.show()
     ))
 }
 

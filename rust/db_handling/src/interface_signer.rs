@@ -18,8 +18,9 @@ use definitions::{
     },
     keyring::{AddressKey, NetworkSpecsKey, VerifierKey},
     navigation::{
-        Address, MDeriveKey, MKeyDetails, MKeysCard, MMNetwork, MNetworkDetails, MRawKey,
-        MSeedKeyCard, SeedNameCard, SeedWord,
+        Address, DerivationEntry, DerivationPack, MBackup, MDeriveKey, MKeyDetails, MKeysCard,
+        MMMNetwork, MMManageNetworks, MMNetwork, MNetworkDetails, MNetworkMenu, MNewSeedBackup,
+        MRawKey, MSeedKeyCard, MTypesInfo, Network, SeedNameCard, SeedWord,
     },
     network_specs::NetworkSpecs,
     print::{export_complex_vector, export_plain_vector},
@@ -214,24 +215,20 @@ pub fn addresses_set_seed_name_network(
 pub fn show_all_networks_with_flag(
     database_name: &str,
     network_specs_key: &NetworkSpecsKey,
-) -> Result<String, ErrorSigner> {
-    let mut networks = get_all_networks::<Signer>(database_name)?;
-    networks.sort_by(|a, b| a.order.cmp(&b.order));
-    Ok(format!(
-        "\"networks\":{}",
-        export_complex_vector(&networks, |a| {
+) -> Result<MNetworkMenu, ErrorSigner> {
+    let mut networks: Vec<_> = get_all_networks::<Signer>(database_name)?
+        .into_iter()
+        .map(|network| {
             let network_specs_key_current =
-                NetworkSpecsKey::from_parts(a.genesis_hash.as_bytes(), &a.encryption);
-            format!(
-                "\"key\":\"{}\",\"title\":\"{}\",\"logo\":\"{}\",\"order\":{},\"selected\":{}",
-                hex::encode(network_specs_key_current.key()),
-                a.title,
-                a.logo,
-                a.order,
-                &network_specs_key_current == network_specs_key
-            )
+                NetworkSpecsKey::from_parts(network.genesis_hash.as_bytes(), &network.encryption);
+            let mut n: Network = network.into();
+            n.selected = network_specs_key == &network_specs_key_current;
+            n
         })
-    ))
+        .collect();
+    networks.sort_by(|a, b| a.order.cmp(&b.order));
+
+    Ok(MNetworkMenu { networks })
 }
 
 /// Function to print all networks without any selection
@@ -321,37 +318,40 @@ pub fn export_key(
 
 /// Function to prepare seed backup screen.
 /// Gets seed name, outputs all known derivations in all networks.
-pub fn backup_prep(database_name: &str, seed_name: &str) -> Result<String, ErrorSigner> {
+pub fn backup_prep(database_name: &str, seed_name: &str) -> Result<MBackup, ErrorSigner> {
     let networks = get_all_networks::<Signer>(database_name)?;
     if networks.is_empty() {
         return Err(ErrorSigner::NoNetworksAvailable);
     }
-    let mut export: Vec<(NetworkSpecs, Vec<AddressDetails>)> = Vec::new();
-    for x in networks.into_iter() {
-        let id_set = addresses_set_seed_name_network(
+    let mut derivations = Vec::new();
+    for network in networks.into_iter() {
+        let id_set: Vec<_> = addresses_set_seed_name_network(
             database_name,
             seed_name,
-            &NetworkSpecsKey::from_parts(x.genesis_hash.as_bytes(), &x.encryption),
-        )?;
+            &NetworkSpecsKey::from_parts(network.genesis_hash.as_bytes(), &network.encryption),
+        )?
+        .into_iter()
+        .map(|a| DerivationEntry {
+            path: a.1.path,
+            has_pwd: a.1.has_pwd,
+        })
+        .collect();
         if !id_set.is_empty() {
-            export.push((x, id_set.into_iter().map(|(_, a)| a).collect()))
+            derivations.push(DerivationPack {
+                network_title: network.title,
+                network_logo: network.logo,
+                network_order: network.order.to_string(),
+                id_set,
+            });
         }
     }
-    export.sort_by(|(a, _), (b, _)| a.order.cmp(&b.order));
-    Ok(format!(
-        "\"seed_name\":\"{}\",\"derivations\":{}",
-        seed_name,
-        export_complex_vector(&export, |(specs, id_set)| format!(
-            "\"network_title\":\"{}\",\"network_logo\":\"{}\",\"network_order\":{},\"id_set\":{}",
-            specs.title,
-            specs.logo,
-            specs.order,
-            export_complex_vector(id_set, |a| format!(
-                "\"path\":\"{}\",\"has_pwd\":{}",
-                a.path, a.has_pwd
-            ))
-        ))
-    ))
+
+    derivations.sort_by(|a, b| a.network_order.cmp(&b.network_order));
+
+    Ok(MBackup {
+        seed_name: seed_name.to_string(),
+        derivations,
+    })
 }
 
 /// Function to prepare key derivation screen.
@@ -481,46 +481,60 @@ pub fn metadata_details(
     database_name: &str,
     network_specs_key: &NetworkSpecsKey,
     network_version: u32,
-) -> Result<String, ErrorSigner> {
+) -> Result<MMManageNetworks, ErrorSigner> {
     let network_specs = get_network_specs(database_name, network_specs_key)?;
     let meta_values = get_meta_values_by_name_version::<Signer>(
         database_name,
         &network_specs.name,
         network_version,
     )?;
-    let relevant_networks: Vec<NetworkSpecs> = get_all_networks::<Signer>(database_name)?
+    let networks: Vec<_> = get_all_networks::<Signer>(database_name)?
         .into_iter()
         .filter(|a| a.name == network_specs.name)
+        .map(|network| MMMNetwork {
+            title: network.title,
+            logo: network.logo,
+            order: network.order as u32,
+            current_on_screen: &NetworkSpecsKey::from_parts(
+                network.genesis_hash.as_bytes(),
+                &network.encryption,
+            ) == network_specs_key,
+        })
         .collect();
-    let relevant_networks_print = export_complex_vector(&relevant_networks, |a| {
-        format!(
-            "\"title\":\"{}\",\"logo\":\"{}\",\"order\":{},\"current_on_screen\":{}",
-            a.title,
-            a.logo,
-            a.order,
-            &NetworkSpecsKey::from_parts(a.genesis_hash.as_bytes(), &a.encryption)
-                == network_specs_key
-        )
-    });
+
     let meta_hash = blake2b(32, &[], &meta_values.meta).as_bytes().to_vec();
     let hex_id_pic = hex::encode(pic_meta(&meta_hash));
-    Ok(format!("\"name\":\"{}\",\"version\":\"{}\",\"meta_hash\":\"{}\",\"meta_id_pic\":\"{}\",\"networks\":{}", network_specs.name, network_version, hex::encode(meta_hash), hex_id_pic, relevant_networks_print))
+    Ok(MMManageNetworks {
+        name: network_specs.name,
+        version: network_version.to_string(),
+        meta_hash: hex::encode(meta_hash),
+        meta_id_pic: hex_id_pic,
+        networks,
+    })
 }
 
 /// Display types status
-pub fn show_types_status(database_name: &str) -> Result<String, ErrorSigner> {
+pub fn show_types_status(database_name: &str) -> Result<MTypesInfo, ErrorSigner> {
     match try_get_types::<Signer>(database_name)? {
-        Some(a) => Ok(format!(
-            "\"types_on_file\":true,{}",
-            ContentLoadTypes::generate(&a).show()
-        )),
-        None => Ok(String::from("\"types_on_file\":false")),
+        Some(a) => {
+            let (types_hash, types_id_pic) = ContentLoadTypes::generate(&a).show();
+            Ok(MTypesInfo {
+                types_on_file: true,
+                types_hash: Some(types_hash),
+                types_id_pic: Some(types_id_pic),
+            })
+        }
+        None => Ok(MTypesInfo {
+            types_on_file: false,
+            types_hash: None,
+            types_id_pic: None,
+        }),
     }
 }
 
 /// Function to generate new random seed phrase, make identicon for sr25519 public key,
 /// and send to Signer screen
-pub fn print_new_seed(seed_name: &str) -> Result<String, ErrorSigner> {
+pub fn print_new_seed(seed_name: &str) -> Result<MNewSeedBackup, ErrorSigner> {
     let seed_phrase = generate_random_phrase(24)?;
     let sr25519_pair = match sr25519::Pair::from_string(&seed_phrase, None) {
         Ok(x) => x,
@@ -530,13 +544,14 @@ pub fn print_new_seed(seed_name: &str) -> Result<String, ErrorSigner> {
             ))
         }
     };
-    let hex_identicon = hex::encode(make_identicon_from_multisigner(&MultiSigner::Sr25519(
+    let identicon = hex::encode(make_identicon_from_multisigner(&MultiSigner::Sr25519(
         sr25519_pair.public(),
     )));
-    Ok(format!(
-        "\"seed\":\"{}\",\"seed_phrase\":\"{}\",\"identicon\":\"{}\"",
-        seed_name, seed_phrase, hex_identicon
-    ))
+    Ok(MNewSeedBackup {
+        seed: seed_name.to_string(),
+        seed_phrase,
+        identicon,
+    })
 }
 
 /// Function to get database history tree checksum to be displayed in log screen
