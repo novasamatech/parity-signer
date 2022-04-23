@@ -33,8 +33,6 @@ use crate::{
     },
     qr_transfers::ContentLoadTypes,
 };
-#[cfg(feature = "signer")]
-use crate::{helpers::pic_meta, print::export_complex_single};
 
 /// Event content for importing or removing metadata of a known network
 ///

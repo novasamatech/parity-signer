@@ -4,6 +4,7 @@ use definitions::{
     history::MetaValuesDisplay,
     keyring::VerifierKey,
     metadata::MetaValues,
+    navigation::{TransactionCard, TransactionCardSet},
     network_specs::{NetworkSpecs, VerifierValue},
     qr_transfers::ContentLoadTypes,
     test_all_errors_signer::error_signer,
@@ -34,7 +35,8 @@ fn verifier_value_sr25519() -> VerifierValue {
 
 pub fn make_all_cards() -> TransactionAction {
     let mut index = 0;
-    let mut all_cards: Vec<String> = Vec::new();
+    let mut all_cards: Vec<TransactionCard> = Vec::new();
+    let mut warning: Vec<TransactionCard> = Vec::new();
     let network_specs_westend = NetworkSpecs {
         base58prefix: 42,
         color: String::from("#660D35"),
@@ -195,19 +197,19 @@ Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deseru
         .card(&mut index, 0),
     );
 
-    all_cards.push(Card::Warning(Warning::AuthorNotFound).card(&mut index, 0));
-    all_cards.push(
+    warning.push(Card::Warning(Warning::AuthorNotFound).card(&mut index, 0));
+    warning.push(
         Card::Warning(Warning::NewerVersion {
             used_version: 50,
             latest_version: 9010,
         })
         .card(&mut index, 0),
     );
-    all_cards.push(Card::Warning(Warning::NoNetworkID).card(&mut index, 0));
-    all_cards.push(Card::Warning(Warning::NotVerified).card(&mut index, 0));
-    all_cards.push(Card::Warning(Warning::UpdatingTypes).card(&mut index, 0));
-    all_cards.push(Card::Warning(Warning::TypesNotVerified).card(&mut index, 0));
-    all_cards.push(
+    warning.push(Card::Warning(Warning::NoNetworkID).card(&mut index, 0));
+    warning.push(Card::Warning(Warning::NotVerified).card(&mut index, 0));
+    warning.push(Card::Warning(Warning::UpdatingTypes).card(&mut index, 0));
+    warning.push(Card::Warning(Warning::TypesNotVerified).card(&mut index, 0));
+    warning.push(
         Card::Warning(Warning::GeneralVerifierAppeared(&GeneralHold {
             metadata_set: Vec::new(),
             network_specs_set: Vec::new(),
@@ -215,7 +217,7 @@ Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deseru
         }))
         .card(&mut index, 0),
     );
-    all_cards.push(
+    warning.push(
         Card::Warning(Warning::VerifierChangingToGeneral {
             verifier_key: &VerifierKey::from_parts(network_specs_westend.genesis_hash.as_bytes()),
             hold: &Hold {
@@ -225,7 +227,7 @@ Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deseru
         })
         .card(&mut index, 0),
     );
-    all_cards.push(
+    warning.push(
         Card::Warning(Warning::VerifierChangingToCustom {
             verifier_key: &VerifierKey::from_parts(network_specs_westend.genesis_hash.as_bytes()),
             hold: &Hold {
@@ -235,7 +237,7 @@ Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deseru
         })
         .card(&mut index, 0),
     );
-    all_cards.push(
+    warning.push(
         Card::Warning(Warning::VerifierGeneralSuper {
             verifier_key: &VerifierKey::from_parts(network_specs_westend.genesis_hash.as_bytes()),
             hold: &Hold {
@@ -245,28 +247,26 @@ Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deseru
         })
         .card(&mut index, 0),
     );
-    all_cards.push(Card::Warning(Warning::TypesAlreadyThere).card(&mut index, 0));
-    all_cards.push(
+    warning.push(Card::Warning(Warning::TypesAlreadyThere).card(&mut index, 0));
+    warning.push(
         Card::Warning(Warning::NetworkSpecsAlreadyThere(
             &network_specs_westend.title,
         ))
         .card(&mut index, 0),
     );
-    all_cards.push(Card::Warning(Warning::MetadataExtensionsIncomplete).card(&mut index, 0));
+    warning.push(Card::Warning(Warning::MetadataExtensionsIncomplete).card(&mut index, 0));
 
-    for e in error_signer().into_iter() {
-        all_cards.push(Card::Error(e).card(&mut index, 0));
+    let errors = error_signer()
+        .into_iter()
+        .map(|e| Card::Error(e).card(&mut index, 0))
+        .collect();
+
+    TransactionAction::Read {
+        r: TransactionCardSet {
+            meta: Some(all_cards),
+            error: Some(errors),
+            warning: Some(warning),
+            ..Default::default()
+        },
     }
-
-    let mut output_cards = String::from("\"method\":[");
-
-    for (i, x) in all_cards.iter().enumerate() {
-        if i > 0 {
-            output_cards.push(',')
-        }
-        output_cards.push_str(x);
-    }
-
-    output_cards.push(']');
-    TransactionAction::Read { r: output_cards }
 }

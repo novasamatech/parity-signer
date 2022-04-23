@@ -16,10 +16,7 @@ use definitions::{
 #[cfg(feature = "signer")]
 use definitions::{
     danger::DangerRecord,
-    error_signer::{
-        DatabaseSigner, EntryDecodingSigner, ErrorSigner, InterfaceSigner, NotFoundSigner, Signer,
-    },
-    print::export_complex_vector,
+    error_signer::{DatabaseSigner, EntryDecodingSigner, ErrorSigner, NotFoundSigner, Signer},
 };
 
 #[cfg(feature = "signer")]

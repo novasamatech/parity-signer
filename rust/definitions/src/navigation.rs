@@ -2,6 +2,8 @@ use crate::{
     crypto::Encryption, history::Event, keyring::NetworkSpecsKey, network_specs::NetworkSpecs,
 };
 
+pub use crate::network_specs::NetworkSpecsToSend;
+
 #[derive(PartialEq, Clone)]
 pub struct SeedNameWithIdenticon {
     pub seed_name: String,
@@ -10,28 +12,28 @@ pub struct SeedNameWithIdenticon {
 
 /// Enum containing card sets for three different outcomes:
 /// signing (Sign), accepting (Stub) and reading, for example, in case of an error (Read)
-#[derive(PartialEq, Debug, Clone)]
+#[derive(PartialEq, Clone)]
 pub enum TransactionAction {
     Derivations {
-        content: String,
+        content: TransactionCardSet,
         network_info: String,
         checksum: u32,
         network_specs_key: NetworkSpecsKey,
     },
     Sign {
-        content: String,
+        content: TransactionCardSet,
         checksum: u32,
         has_pwd: bool,
         author_info: TransactionAuthor,
         network_info: String,
     },
     Stub {
-        s: String,
+        s: TransactionCardSet,
         u: u32,
         stub: StubNav,
     },
     Read {
-        r: String,
+        r: TransactionCardSet,
     },
 }
 
@@ -194,10 +196,12 @@ pub struct TransactionAuthor {
 
 #[derive(Clone, PartialEq)]
 pub struct TransactionCard {
-    pub content: String,
+    pub index: u32,
+    pub indent: u32,
+    pub card: Card,
 }
 
-#[derive(Clone, PartialEq)]
+#[derive(Clone, Default, PartialEq)]
 pub struct TransactionCardSet {
     pub author: Option<Vec<TransactionCard>>,
     pub error: Option<Vec<TransactionCard>>,
@@ -389,6 +393,7 @@ pub struct MSCAuthor {
     pub identicon: String,
     pub seed: String,
     pub derivation_path: String,
+    pub has_password: Option<bool>,
 }
 
 #[derive(Clone, PartialEq)]
@@ -520,4 +525,135 @@ pub enum ModalData {
     ManageNetworks { f: MMManageNetworks },
     TypesInfo { f: MTypesInfo },
     Text { f: String },
+    NewSeedMenu,
+    NetworkDetailsMenu,
+    ManageMetadata,
+    KeyDetailsAction,
+    LogComment,
+    SelectSeed,
+}
+
+#[derive(Clone, PartialEq)]
+pub struct MSCAuthorPlain {
+    pub base58: String,
+    pub identicon: String,
+}
+
+#[derive(Clone, PartialEq)]
+pub struct MSCCall {
+    pub method_name: String,
+    pub docs: String,
+}
+
+#[derive(Clone, PartialEq)]
+pub struct MSCCurrency {
+    pub amount: String,
+    pub units: String,
+}
+
+#[derive(Clone, PartialEq)]
+pub struct MSCEnumVariantName {
+    pub name: String,
+    pub docs_enum_variant: String,
+}
+
+#[derive(Clone, PartialEq)]
+pub struct MSCEraMortal {
+    pub era: String,
+    pub phase: String,
+    pub period: String,
+}
+
+#[derive(Clone, PartialEq)]
+pub struct MSCFieldName {
+    pub name: String,
+    pub docs_field_name: String,
+    pub path_type: String,
+    pub docs_type: String,
+}
+
+#[derive(Clone, PartialEq)]
+pub struct MSCFieldNumber {
+    pub number: String,
+    pub docs_field_number: String,
+    pub path_type: String,
+    pub docs_type: String,
+}
+
+#[derive(Clone, PartialEq)]
+pub struct MSCId {
+    pub base58: String,
+    pub identicon: String,
+}
+
+#[derive(Clone, PartialEq)]
+pub struct MSCMetaSpecs {
+    pub specname: String,
+    pub spec_version: String,
+    pub meta_hash: String,
+    pub meta_id_pic: String,
+}
+
+#[derive(Clone, PartialEq)]
+pub struct MSCNameVersion {
+    pub name: String,
+    pub version: String,
+}
+
+#[derive(Clone, PartialEq)]
+pub struct MSCNetworkInfo {
+    pub network_title: String,
+    pub network_logo: String,
+}
+
+#[derive(Clone, PartialEq)]
+pub struct MSCTip {
+    pub amount: String,
+    pub units: String,
+}
+
+#[derive(Clone, PartialEq)]
+pub struct MSCTxSpecPlain {
+    pub network_genesis_hash: String,
+    pub version: String,
+    pub tx_version: String,
+}
+
+#[derive(Clone, PartialEq)]
+pub enum Card {
+    AuthorCard { f: TransactionAuthor },
+    AuthorPlainCard { f: MSCAuthorPlain },
+    AuthorPublicKeyCard { f: MVerifierDetails },
+    BalanceCard { f: MSCCurrency },
+    BitVecCard { f: String },
+    BlockHashCard { f: String },
+    CallCard { f: MSCCall },
+    DefaultCard { f: String },
+    DerivationsCard { f: Vec<String> },
+    EnumVariantNameCard { f: MSCEnumVariantName },
+    EraImmortalCard,
+    EraMortalCard { f: MSCEraMortal },
+    ErrorCard { f: String },
+    FieldNameCard { f: MSCFieldName },
+    FieldNumberCard { f: MSCFieldNumber },
+    IdCard { f: MSCId },
+    IdentityFieldCard { f: String },
+    MetaCard { f: MSCMetaSpecs },
+    NameVersionCard { f: MSCNameVersion },
+    NetworkGenesisHashCard { f: String },
+    NetworkNameCard { f: String },
+    NetworkInfoCard { f: MSCNetworkInfo },
+    NewSpecsCard { f: NetworkSpecsToSend },
+    NonceCard { f: String },
+    NoneCard,
+    PalletCard { f: String },
+    TextCard { f: String },
+    TipCard { f: MSCCurrency },
+    TipPlainCard { f: String },
+    TxSpecCard { f: String },
+    TxSpecPlainCard { f: MSCTxSpecPlain },
+    TypesInfoCard { f: MTypesInfo },
+    VarNameCard { f: String },
+    VerifierCard { f: MVerifierDetails },
+    WarningCard { f: String },
 }

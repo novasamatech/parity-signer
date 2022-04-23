@@ -282,16 +282,15 @@ use sp_runtime::MultiSigner;
 use crate::error_active::{
     Active, DatabaseActive, EntryDecodingActive, ErrorActive, MismatchActive,
 };
+#[cfg(feature = "signer")]
+use crate::helpers::{
+    make_identicon_from_multisigner, multisigner_to_encryption, multisigner_to_public,
+};
 use crate::{
     crypto::Encryption,
     error::{ErrorSource, SpecsKeySource},
     keyring::NetworkSpecsKey,
     navigation::MVerifierDetails,
-};
-#[cfg(feature = "signer")]
-use crate::{
-    helpers::{make_identicon_from_multisigner, multisigner_to_encryption, multisigner_to_public},
-    print::export_complex_single,
 };
 
 /// Network parameters stored SCALE-encoded in the **cold** database

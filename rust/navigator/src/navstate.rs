@@ -27,7 +27,7 @@ use definitions::{
 };
 
 ///State of the app as remembered by backend
-#[derive(Debug, Clone)]
+#[derive(Clone)]
 pub struct State {
     pub navstate: Navstate,
     pub dbname: Option<String>,
@@ -36,7 +36,7 @@ pub struct State {
 }
 
 ///Navigation state is completely defined here
-#[derive(Debug, Clone)]
+#[derive(Clone)]
 pub struct Navstate {
     pub screen: Screen,
     pub modal: Modal,
@@ -1521,7 +1521,7 @@ impl State {
                     ScreenData::LogDetails { f }
                 }
                 Screen::Scan => ScreenData::Scan,
-                Screen::Transaction(ref t) => ScreenData::Transaction { f: todo!() },
+                Screen::Transaction(ref _t) => ScreenData::Transaction { f: todo!() },
                 Screen::SeedSelector | Screen::SelectSeedForBackup => {
                     let seed_name_cards =
                         db_handling::interface_signer::get_all_seed_names_with_identicons(
@@ -1693,7 +1693,9 @@ impl State {
                             f: MSeedMenu { seed },
                         }
                     }
-                    _ => ModalData::Text { f: String::new() },
+                    _ => ModalData::Text {
+                        f: "Seed".to_string(),
+                    },
                 },
                 Modal::NewSeedBackup(ref new_seed_name) => ModalData::NewSeedBackup {
                     f: db_handling::interface_signer::print_new_seed(new_seed_name).unwrap(),
@@ -1783,7 +1785,9 @@ impl State {
                         )
                         .unwrap(),
                     },
-                    _ => ModalData::Text { f: String::new() },
+                    _ => ModalData::Text {
+                        f: "ManageMetadata".to_string(),
+                    },
                 },
                 Modal::SufficientCryptoReady(ref a) => match new_navstate.screen {
                     Screen::SignSufficientCrypto(ref s) => {
@@ -1797,6 +1801,7 @@ impl State {
                                 identicon: String::new(),
                                 seed: String::new(),
                                 derivation_path: String::new(),
+                                has_password: None,
                             };
                             let f = MSufficientCryptoReady {
                                 author_info,
@@ -1805,18 +1810,26 @@ impl State {
                             };
                             ModalData::SufficientCryptoReady { f }
                         } else {
-                            ModalData::Text { f: String::new() }
+                            ModalData::Text {
+                                f: "SignSufficientCrypto".to_string(),
+                            }
                         }
                     }
-                    _ => ModalData::Text { f: String::new() },
+                    _ => ModalData::Text {
+                        f: "SignSufficientCrypto".to_string(),
+                    },
                 },
                 Modal::TypesInfo => ModalData::TypesInfo {
                     f: db_handling::interface_signer::show_types_status(dbname).unwrap(),
                 },
-                Modal::SelectSeed => ModalData::Text {
-                    f: "TODO".to_string(), // TODO
+                Modal::SelectSeed => ModalData::SelectSeed,
+                Modal::NewSeedMenu => ModalData::NewSeedMenu,
+                Modal::LogComment => ModalData::LogComment,
+                Modal::NetworkDetailsMenu => ModalData::NetworkDetailsMenu,
+                Modal::KeyDetailsAction => ModalData::KeyDetailsAction,
+                Modal::Empty => ModalData::Text {
+                    f: "Empty".to_string(),
                 },
-                _ => ModalData::Text { f: String::new() },
             };
 
             //Prepare alert details

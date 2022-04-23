@@ -12,7 +12,7 @@ use db_handling::{
 use definitions::{
     crypto::SufficientCrypto,
     error_signer::{ErrorSigner, Signer},
-    history::{Event, MetaValuesDisplay, MetaValuesExport, NetworkSpecsExport, TypesExport},
+    history::{Event, MetaValuesExport, NetworkSpecsExport, TypesExport},
     keyring::NetworkSpecsKey,
     qr_transfers::{ContentAddSpecs, ContentLoadMeta},
     users::AddressDetails,

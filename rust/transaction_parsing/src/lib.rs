@@ -1,7 +1,9 @@
 #![deny(unused_crate_dependencies)]
 
-use db_handling::manage_history::get_history_entry_by_order;
-use definitions::error_signer::{ErrorSigner, InputSigner};
+use definitions::{
+    error_signer::{ErrorSigner, InputSigner},
+    navigation::TransactionCardSet,
+};
 
 pub use definitions::navigation::{StubNav, TransactionAction};
 mod add_specs;
@@ -20,7 +22,7 @@ use load_types::load_types;
 mod message;
 use message::process_message;
 mod parse_transaction;
-use parse_transaction::{decode_signable_from_history, parse_transaction};
+use parse_transaction::parse_transaction;
 pub mod test_all_cards;
 use test_all_cards::make_all_cards;
 #[cfg(feature = "test")]
@@ -70,29 +72,10 @@ pub fn produce_output(payload: &str, dbname: &str) -> TransactionAction {
     match handle_scanner_input(payload, dbname) {
         Ok(out) => out,
         Err(e) => TransactionAction::Read {
-            r: format!("\"error\":[{}]", Card::Error(e).card(&mut 0, 0)),
+            r: TransactionCardSet {
+                error: Some(vec![Card::Error(e).card(&mut 0, 0)]),
+                ..Default::default()
+            },
         },
     }
-}
-
-/// Function to print history entry by order for entries without parseable transaction
-pub fn print_history_entry_by_order_with_decoding(
-    _order: u32,
-    _database_name: &str,
-) -> Result<String, ErrorSigner> {
-    // TODO
-    Ok(String::new())
-    /*
-    let entry = get_history_entry_by_order(order, database_name)?;
-    Ok(
-        entry.show(|a| match decode_signable_from_history(a, database_name) {
-            Ok(b) => format!("{{{}}}", b),
-            Err(e) => format!(
-                "\"error\":[{}],\"raw_transaction\":\"{}\"",
-                Card::Error(e).card(&mut 0, 0),
-                hex::encode(a.transaction())
-            ),
-        }),
-    )
-    */
 }

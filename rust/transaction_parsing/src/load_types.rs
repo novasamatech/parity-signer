@@ -6,6 +6,7 @@ use definitions::{
     error::TransferContent,
     error_signer::{ErrorSigner, GeneralVerifierForContent, InputSigner, Signer},
     history::Event,
+    navigation::TransactionCardSet,
     network_specs::Verifier,
     qr_transfers::ContentLoadTypes,
     types::TypeEntry,
@@ -46,10 +47,11 @@ pub fn load_types(data_hex: &str, database_name: &str) -> Result<TransactionActi
                     let warning_card_2 = Card::Warning(Warning::UpdatingTypes).card(&mut index, 0);
                     let types_card = Card::TypesInfo(content_new_types).card(&mut index, 0);
                     Ok(TransactionAction::Stub {
-                        s: format!(
-                            "\"warning\":[{},{}],\"types_info\":[{}]",
-                            warning_card_1, warning_card_2, types_card
-                        ),
+                        s: TransactionCardSet {
+                            warning: Some(vec![warning_card_1, warning_card_2]),
+                            types_info: Some(vec![types_card]),
+                            ..Default::default()
+                        },
                         u: checksum,
                         stub: StubNav::LoadTypes,
                     })
@@ -78,10 +80,12 @@ pub fn load_types(data_hex: &str, database_name: &str) -> Result<TransactionActi
                     let warning_card = Card::Warning(Warning::UpdatingTypes).card(&mut index, 0);
                     let types_card = Card::TypesInfo(content_new_types).card(&mut index, 0);
                     Ok(TransactionAction::Stub {
-                        s: format!(
-                            "\"verifier\":[{}],\"warning\":[{}],\"types_info\":[{}]",
-                            verifier_card, warning_card, types_card
-                        ),
+                        s: TransactionCardSet {
+                            verifier: Some(vec![verifier_card]),
+                            warning: Some(vec![warning_card]),
+                            types_info: Some(vec![types_card]),
+                            ..Default::default()
+                        },
                         u: checksum,
                         stub: StubNav::LoadTypes,
                     })
@@ -112,10 +116,12 @@ pub fn load_types(data_hex: &str, database_name: &str) -> Result<TransactionActi
                         let types_card = Card::TypesInfo(content_new_types).card(&mut index, 0);
                         let checksum = stub.store_and_get_checksum(database_name)?;
                         Ok(TransactionAction::Stub {
-                            s: format!(
-                                "\"verifier\":[{}],\"warning\":[{},{}],\"types_info\":[{}]",
-                                verifier_card, warning_card_1, warning_card_2, types_card
-                            ),
+                            s: TransactionCardSet {
+                                verifier: Some(vec![verifier_card]),
+                                warning: Some(vec![warning_card_1, warning_card_2]),
+                                types_info: Some(vec![types_card]),
+                                ..Default::default()
+                            },
                             u: checksum,
                             stub: StubNav::LoadTypes,
                         })

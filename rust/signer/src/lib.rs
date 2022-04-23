@@ -112,13 +112,12 @@ fn history_seed_name_was_shown(seed_name: &str, dbname: &str) -> anyhow::Result<
         .map_err(|e| e.anyhow())
 }
 
-fn get_all_tx_cards() -> String {
-    if let transaction_parsing::TransactionAction::Read { r } =
-        transaction_parsing::test_all_cards::make_all_cards()
-    {
-        format!("{{{}}}", r)
-    } else {
-        "".to_string()
+fn get_all_tx_cards() -> TransactionCardSet {
+    match transaction_parsing::test_all_cards::make_all_cards() {
+        TransactionAction::Derivations { content, .. } => content,
+        TransactionAction::Sign { content, .. } => content,
+        TransactionAction::Stub { s, .. } => s,
+        TransactionAction::Read { r } => r,
     }
 }
 

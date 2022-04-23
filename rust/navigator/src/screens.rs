@@ -11,7 +11,7 @@ use definitions::{
     error_signer::{ErrorSigner, ExtraAddressKeySourceSigner, Signer},
     helpers::{make_identicon_from_multisigner, multisigner_to_public},
     keyring::{AddressKey, NetworkSpecsKey},
-    navigation::TransactionAuthor,
+    navigation::{TransactionAuthor, TransactionCardSet},
     users::AddressDetails,
 };
 use transaction_parsing;
@@ -20,7 +20,7 @@ use transaction_signing;
 const MAX_COUNT_SET: u8 = 3;
 
 ///All screens
-#[derive(Debug, Clone)]
+#[derive(Clone)]
 pub enum Screen {
     Log,
     LogDetails(u32),
@@ -86,7 +86,7 @@ pub struct DeriveState {
 }
 
 ///State of transaction screen
-#[derive(Debug, Clone)]
+#[derive(Clone)]
 pub struct TransactionState {
     entered_info: EnteredInfo,
     action: transaction_parsing::TransactionAction,
@@ -422,7 +422,7 @@ impl TransactionState {
     pub fn update_checksum_sign(
         &self,
         new_checksum: u32,
-        content: String,
+        content: TransactionCardSet,
         has_pwd: bool,
         author_info: TransactionAuthor,
         network_info: String,

@@ -6,6 +6,7 @@ use definitions::{
     error_signer::{ErrorSigner, NotFoundSigner, NotHexSigner, Signer},
     helpers::unhex,
     keyring::NetworkSpecsKey,
+    navigation::TransactionCardSet,
     qr_transfers::ContentDerivations,
 };
 
@@ -32,7 +33,10 @@ pub fn process_derivations(
                 network_specs.title, network_specs.logo
             );
             Ok(TransactionAction::Derivations {
-                content: format!("\"importing_derivations\":[{}]", derivations_card),
+                content: TransactionCardSet {
+                    importing_derivations: Some(vec![derivations_card]),
+                    ..Default::default()
+                },
                 network_info,
                 checksum,
                 network_specs_key,

@@ -23,7 +23,7 @@ use definitions::{
         MRawKey, MSeedKeyCard, MTypesInfo, Network, SeedNameCard, SeedWord,
     },
     network_specs::NetworkSpecs,
-    print::{export_complex_vector, export_plain_vector},
+    print::export_plain_vector,
     qr_transfers::ContentLoadTypes,
     users::AddressDetails,
 };
