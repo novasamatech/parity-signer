@@ -12,6 +12,7 @@ use definitions::{
     helpers::{make_identicon_from_multisigner, multisigner_to_public},
     keyring::{AddressKey, NetworkSpecsKey},
     navigation::{TransactionAuthor, TransactionCardSet},
+    network_specs::NetworkSpecs,
     users::AddressDetails,
 };
 use transaction_parsing;
@@ -425,7 +426,7 @@ impl TransactionState {
         content: TransactionCardSet,
         has_pwd: bool,
         author_info: TransactionAuthor,
-        network_info: String,
+        network_info: NetworkSpecs,
     ) -> Self {
         let action = transaction_parsing::TransactionAction::Sign {
             content,

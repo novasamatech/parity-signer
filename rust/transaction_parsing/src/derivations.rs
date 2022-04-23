@@ -28,10 +28,7 @@ pub fn process_derivations(
             let checksum = TrDbColdDerivations::generate(&derivations, &network_specs)
                 .store_and_get_checksum(database_name)?;
             let derivations_card = Card::Derivations(&derivations).card(&mut 0, 0);
-            let network_info = format!(
-                "\"network_title\":\"{}\",\"network_logo\":\"{}\"",
-                network_specs.title, network_specs.logo
-            );
+            let network_info = network_specs;
             Ok(TransactionAction::Derivations {
                 content: TransactionCardSet {
                     importing_derivations: Some(vec![derivations_card]),

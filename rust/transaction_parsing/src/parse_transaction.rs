@@ -168,10 +168,6 @@ pub(crate) fn parse_transaction(
                                             network_specs.base58prefix,
                                             &address_details,
                                         );
-                                        let network_info = format!(
-                                            "\"network_title\":\"{}\",\"network_logo\":\"{}\"",
-                                            network_specs.title, network_specs.logo
-                                        );
                                         let warning = possible_warning
                                             .map(|w| Card::Warning(w).card(&mut index, indent))
                                             .map(|w| vec![w]);
@@ -188,7 +184,7 @@ pub(crate) fn parse_transaction(
                                             checksum,
                                             has_pwd: address_details.has_pwd,
                                             author_info,
-                                            network_info,
+                                            network_info: network_specs.clone(),
                                         })
                                     }
                                     CardsPrep::ShowOnly(author_card, warning_card) => {

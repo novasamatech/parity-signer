@@ -16,7 +16,7 @@ pub struct SeedNameWithIdenticon {
 pub enum TransactionAction {
     Derivations {
         content: TransactionCardSet,
-        network_info: String,
+        network_info: NetworkSpecs,
         checksum: u32,
         network_specs_key: NetworkSpecsKey,
     },
@@ -25,7 +25,7 @@ pub enum TransactionAction {
         checksum: u32,
         has_pwd: bool,
         author_info: TransactionAuthor,
-        network_info: String,
+        network_info: NetworkSpecs,
     },
     Stub {
         s: TransactionCardSet,

@@ -1,12 +1,15 @@
 //! Navigation state of the app
 
+use db_handling::manage_history::get_history_entry_by_order;
 use definitions::navigation::{
     ActionResult, History, MEnterPassword, MKeyDetailsMulti, MKeys, MLog, MLogDetails,
     MManageNetworks, MNewSeed, MPasswordConfirm, MRecoverSeedName, MRecoverSeedPhrase, MSCAuthor,
     MSCContent, MSeedMenu, MSeeds, MSettings, MSignSufficientCrypto, MSignatureReady,
-    MSufficientCryptoReady, ModalData, ScreenData,
+    MSufficientCryptoReady, MTransaction, ModalData, ScreenData, TransactionNetworkInfo,
+    TransactionType,
 };
 use sp_runtime::MultiSigner;
+use transaction_parsing::TransactionAction;
 use zeroize::Zeroize;
 
 use crate::actions::Action;
@@ -1513,15 +1516,53 @@ impl State {
 
                     ScreenData::Log { f }
                 }
-                Screen::LogDetails(_order) => {
+                Screen::LogDetails(order) => {
+                    let e = get_history_entry_by_order(order, dbname).unwrap();
                     let f = MLogDetails {
-                        timestamp: String::new(),
-                        events: vec![],
+                        timestamp: e.timestamp,
+                        events: e.events,
                     };
                     ScreenData::LogDetails { f }
                 }
                 Screen::Scan => ScreenData::Scan,
-                Screen::Transaction(ref _t) => ScreenData::Transaction { f: todo!() },
+                Screen::Transaction(ref t) => {
+                    let (content, ttype, author_info, network_info) = match t.action() {
+                        TransactionAction::Derivations {
+                            content,
+                            network_info,
+                            ..
+                        } => (
+                            content,
+                            TransactionType::ImportDerivations,
+                            None,
+                            Some(network_info),
+                        ),
+                        TransactionAction::Sign {
+                            content,
+                            author_info,
+                            network_info,
+                            ..
+                        } => (
+                            content,
+                            TransactionType::Sign,
+                            Some(author_info),
+                            Some(network_info),
+                        ),
+                        TransactionAction::Stub { s, .. } => (s, TransactionType::Stub, None, None),
+                        TransactionAction::Read { r } => (r, TransactionType::Read, None, None),
+                    };
+                    ScreenData::Transaction {
+                        f: MTransaction {
+                            content,
+                            ttype,
+                            author_info,
+                            network_info: network_info.map(|i| TransactionNetworkInfo {
+                                network_title: i.title,
+                                network_logo: i.logo,
+                            }),
+                        },
+                    }
+                }
                 Screen::SeedSelector | Screen::SelectSeedForBackup => {
                     let seed_name_cards =
                         db_handling::interface_signer::get_all_seed_names_with_identicons(

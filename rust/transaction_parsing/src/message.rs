@@ -58,10 +58,7 @@ pub fn process_message(
                             network_specs.base58prefix,
                             &address_details,
                         );
-                        let network_info = format!(
-                            "\"network_title\":\"{}\",\"network_logo\":\"{}\"",
-                            network_specs.title, network_specs.logo
-                        );
+                        let network_info = network_specs;
                         Ok(TransactionAction::Sign {
                             content: TransactionCardSet {
                                 message: Some(vec![message_card]),
