@@ -549,6 +549,8 @@ namespace signer {
     TransactionCardSet get_all_tx_cards();
 
     string get_all_log_cards();
+
+    void init_logging(string tag);
 };
 
 

@@ -29,10 +29,14 @@ import io.parity.signer.ui.theme.Text600
 import io.parity.signer.uniffi.Action
 import io.parity.signer.uniffi.ModalData
 import io.parity.signer.uniffi.ScreenData
+import io.parity.signer.uniffi.initLogging
 
 @ExperimentalMaterialApi
 @ExperimentalAnimationApi
 class MainActivity : AppCompatActivity() {
+	init {
+		initLogging("SIGNER_RUST_LOG")
+	}
 	//rust library is initialized inside data model
 	private val signerDataModel by viewModels<SignerDataModel>()
 

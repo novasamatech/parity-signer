@@ -126,6 +126,23 @@ fn get_all_log_cards() -> String {
     // TODO: definitions::history::print_all_events()
 }
 
+fn init_logging(tag: String) {
+    #[cfg(target_os = "android")]
+    android_logger::init_once(
+        android_logger::Config::default()
+            .with_min_level(log::Level::Trace) // limit log level
+            .with_tag(tag) // logs will show under mytag tag
+            .with_filter(
+                // configure messages for specific crate
+                android_logger::FilterBuilder::new()
+                    .parse("debug,hello::crate=error")
+                    .build(),
+            ),
+    );
+    #[cfg(not(target_os = "android"))]
+    env_logger::init();
+}
+
 ffi_support::define_string_destructor!(signer_destroy_string);
 
 #[cfg(test)]

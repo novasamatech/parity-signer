@@ -1441,6 +1441,7 @@ impl State {
     ) -> Result<ActionResult, String> {
         let mut new_navstate = self.navstate.to_owned();
 
+        log::warn!("action {:?}", action);
         if let Some(ref dbname) = self.dbname.clone() {
             let mut errorline;
             //Try to perform action
