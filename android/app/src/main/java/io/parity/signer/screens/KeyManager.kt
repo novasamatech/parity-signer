@@ -48,16 +48,16 @@ fun KeyManager(
 	increment: (Int, String) -> Unit,
 	mKeys: MKeys,
 	alertState: ShieldAlert?
-) {
-	//val screenData = signerDataModel.screenData.value
+) {1
 	val rootKey = mKeys.root
 	val keySet = mKeys.set
 	val network = mKeys.network
 	val multiselectMode = mKeys.multiselectMode
 	val multiselectCount = mKeys.multiselectCount
 	var offsetX by remember { mutableStateOf(0f) }
-	Log.w("SSSS", ">>> $mKeys" )
-	Log.w("SSSS", "$alertState" )
+	Log.w("SIGNER_RUST_LOG", ">>> $keySet" )
+	Log.w("SIGNER_RUST_LOG", ">>>>> ${keySet.size}")
+	Log.w("SIGNER_RUST_LOG", "$alertState" )
 	Box {
 		Column {
 			Row(
@@ -157,7 +157,8 @@ fun KeyManager(
 				button,
 				{ number -> increment(number, rootKey.seedName) },
 				keySet,
-				multiselectMode
+				multiselectMode,
+				rootKey.seedName,
 			)
 		}
 		if (multiselectMode) {

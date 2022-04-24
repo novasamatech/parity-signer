@@ -47,7 +47,7 @@ fun KeyCard(identity: Address, multiselectMode: Boolean = false) {
 				verticalAlignment = Alignment.CenterVertically
 			) {
 				Text(
-					identity.seedName.decode64(),
+					identity.seedName,
 					color = MaterialTheme.colors.Text600,
 					style = MaterialTheme.typography.subtitle1
 				)

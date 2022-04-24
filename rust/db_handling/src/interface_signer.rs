@@ -146,6 +146,7 @@ pub fn print_identities_for_seed_name_and_network(
     swiped_key: Option<MultiSigner>,
     multiselect: Vec<MultiSigner>,
 ) -> Result<(MSeedKeyCard, Vec<MKeysCard>), ErrorSigner> {
+    log::warn!("SEED NAME {}", seed_name);
     let network_specs = get_network_specs(database_name, network_specs_key)?;
     let identities = addresses_set_seed_name_network(database_name, seed_name, network_specs_key)?;
     let mut root_id = None;

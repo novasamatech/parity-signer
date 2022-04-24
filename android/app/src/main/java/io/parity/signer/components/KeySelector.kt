@@ -1,5 +1,6 @@
 package io.parity.signer.components
 
+import android.util.Log
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.lazy.LazyColumn
@@ -17,9 +18,11 @@ fun KeySelector(
 	button: (action: Action, details: String) -> Unit,
 	increment: (Int) -> Unit,
 	keySet: List<MKeysCard>,
-	multiSelectMode: Boolean
+	multiSelectMode: Boolean,
+	rootSeed: String,
 ) {
 	val addresses = keySet.sortedBy { it.path }
+	Log.w("SIGNER_RUST_LOG", "*** ${keySet.size}" )
 	LazyColumn {
 		this.items(
 			items = addresses,
@@ -30,6 +33,7 @@ fun KeySelector(
 			val addressKey = address.addressKey
 			KeyCardActive(
 				address,
+				rootSeed = rootSeed,
 				selectButton = { button(Action.SELECT_KEY, addressKey) },
 				longTapButton = { button(Action.LONG_TAP, addressKey) },
 				swipe = { button(Action.SWIPE, addressKey) },
