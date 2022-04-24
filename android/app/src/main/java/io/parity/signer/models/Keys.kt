@@ -39,15 +39,15 @@ class DerivationCheck(
 	var buttonGood: MutableState<Boolean>,
 	var whereTo: MutableState<DerivationDestination?>,
 	var collision: MutableState<Address?>,
-	var checkCallback: (path: String) -> String
+	var checkCallback: (path: String) -> Unit
 ) {
 	/**
 	 * Call to perform on every path change
 	 */
 	fun check(path: String) {
 		val checkResult = checkCallback(path)
-		Log.d("checkResult", checkResult)
-		JSONObject(checkResult).optJSONObject("derivation_check")
+		Log.d("checkResult", "$checkResult")
+		checkResult
 	}
 
 	fun fromFFI(derivationCheck: DerivationCheckFFI) {
@@ -57,24 +57,7 @@ class DerivationCheck(
 		derivationCheck.error?.let {
 			Log.d("collision checker error", it)
 		}
-
 	}
-
-	/**
-	 * Gerenate check state
-	fun fromJSON(input: JSONObject) {
-		buttonGood.value = input.optBoolean("button_good", false)
-		whereTo.value = try {
-			DeriveDestination.valueOf(input.optString("where_to"))
-		} catch (_: java.lang.Exception) {
-			null
-		}
-		collision.value = input.optJSONObject("collision")
-		input.optString("error").let {
-			Log.d("collision checker error", it)
-		}
-	}
-	*/
 }
 
 fun SignerDataModel.increment(number: Int, seedName: String) {

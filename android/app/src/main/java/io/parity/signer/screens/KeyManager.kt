@@ -1,6 +1,7 @@
 package io.parity.signer.screens
 
 import android.app.Notification
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.Orientation
@@ -32,6 +33,8 @@ import org.json.JSONArray
 import org.json.JSONObject
 import io.parity.signer.uniffi.Action
 import io.parity.signer.uniffi.MKeys
+import java.util.Arrays.toString
+import java.util.Objects.toString
 import kotlin.math.absoluteValue
 
 /**
@@ -53,7 +56,8 @@ fun KeyManager(
 	val multiselectMode = mKeys.multiselectMode
 	val multiselectCount = mKeys.multiselectCount
 	var offsetX by remember { mutableStateOf(0f) }
-
+	Log.w("SSSS", ">>> $mKeys" )
+	Log.w("SSSS", "$alertState" )
 	Box {
 		Column {
 			Row(

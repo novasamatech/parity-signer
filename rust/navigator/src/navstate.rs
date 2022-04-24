@@ -39,7 +39,7 @@ pub struct State {
 }
 
 ///Navigation state is completely defined here
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 pub struct Navstate {
     pub screen: Screen,
     pub modal: Modal,
@@ -1495,11 +1495,12 @@ impl State {
                 Action::TextEntry => self.handle_text_entry(details_str),
                 Action::PushWord => self.handle_push_word(details_str),
                 Action::Nothing => {
-                    println!("no action was passed in action");
+                    log::warn!("no action was passed in action");
                     (new_navstate, String::new())
                 }
             };
 
+            log::warn!("new_navstate {:?}", new_navstate);
             //Prepare screen details
             let screen_data = match new_navstate.screen {
                 Screen::Log => {
@@ -1885,7 +1886,7 @@ impl State {
 
             self.navstate = new_navstate;
 
-            Ok(ActionResult {
+            let action_result = ActionResult {
                 screen: self.navstate.screen.get_name(),
                 screen_label: self.get_screen_label(),
                 back: self.navstate.screen.has_back(),
@@ -1898,7 +1899,10 @@ impl State {
                 screen_data,
                 modal_data,
                 alert_data: format!("{{{}}}", alert_details),
-            })
+            };
+
+            log::warn!("action result {:?}", action_result);
+            Ok(action_result)
         } else {
             Err("db not initialized".to_string())
         }

@@ -100,8 +100,7 @@ fun SignerApp(signerDataModel: SignerDataModel) {
 						Box(modifier = Modifier.padding(innerPadding)) {
 							ScreenSelector(signerDataModel)
 							ModalSelector(
-								modal = signerDataModel.modalData.value
-									?: ModalData.Text(f = ""),
+								liveModal = signerDataModel.modalData,
 								signerDataModel = signerDataModel
 							)
 							AlertSelector(

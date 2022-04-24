@@ -400,7 +400,7 @@ dictionary MDeriveKey {
 };
 
 dictionary DerivationCheck {
-    boolean? button_good;
+    boolean button_good;
     DerivationDestination? where_to;
     Address? collision;
     string? error;
@@ -523,7 +523,7 @@ namespace signer {
     [Throws=ErrorDisplayed]
     string qrparser_try_decode_qr_sequence([ByRef] string data, boolean cleaned);
 
-    string substrate_path_check([ByRef] string seed_name, [ByRef] string path, [ByRef] string network, [ByRef] string dbname);
+    DerivationCheck substrate_path_check([ByRef] string seed_name, [ByRef] string path, [ByRef] string network, [ByRef] string dbname);
 
     [Throws=ErrorDisplayed]
     void history_init_history_with_cert([ByRef] string dbname);

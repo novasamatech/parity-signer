@@ -17,6 +17,7 @@ fun SignerDataModel.pushButton(
 ) {
 	//Here we just list all possible arguments coming from backend
 	try {
+		Log.w("AACTION", "$details $button")
 		val actionResult = backendAction(button, details, seedPhrase)
 		_screenLabel.value = actionResult.screenLabel
 		_back.value = actionResult.back

@@ -1,5 +1,6 @@
 package io.parity.signer.screens
 
+import android.util.Log
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
@@ -34,12 +35,21 @@ fun NewAddressScreen(
 			whereTo,
 			collision
 		) {
-			substratePathCheck(
+			Log.w("SIGNER_RUST_LOG", "check $seedName $it $networkSpecKey")
+			val v = substratePathCheck(
 				seedName,
 				it,
 				networkSpecKey,
 				signerDataModel.dbName
 			)
+			Log.w("SIGNER_RUST_LOG", "v $v")
+
+			buttonGood.value = v.buttonGood
+			v.whereTo?.let {
+				whereTo.value = it
+			}
+
+			collision.value = v.collision
 		})
 	}
 	val focusManager = LocalFocusManager.current

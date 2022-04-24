@@ -21,7 +21,7 @@ use transaction_signing;
 const MAX_COUNT_SET: u8 = 3;
 
 ///All screens
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 pub enum Screen {
     Log,
     LogDetails(u32),
@@ -87,7 +87,7 @@ pub struct DeriveState {
 }
 
 ///State of transaction screen
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 pub struct TransactionState {
     entered_info: EnteredInfo,
     action: transaction_parsing::TransactionAction,

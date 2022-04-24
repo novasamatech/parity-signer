@@ -79,7 +79,12 @@ fn qrparser_try_decode_qr_sequence(
     qr_reader_phone::decode_sequence(data, cleaned)
 }
 
-fn substrate_path_check(seed_name: &str, path: &str, network: &str, dbname: &str) -> String {
+fn substrate_path_check(
+    seed_name: &str,
+    path: &str,
+    network: &str,
+    dbname: &str,
+) -> DerivationCheck {
     db_handling::interface_signer::dynamic_path_check(dbname, seed_name, path, network)
 }
 

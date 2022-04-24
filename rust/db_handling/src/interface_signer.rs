@@ -18,9 +18,10 @@ use definitions::{
     },
     keyring::{AddressKey, NetworkSpecsKey, VerifierKey},
     navigation::{
-        Address, DerivationEntry, DerivationPack, MBackup, MDeriveKey, MKeyDetails, MKeysCard,
-        MMMNetwork, MMManageNetworks, MMNetwork, MNetworkDetails, MNetworkMenu, MNewSeedBackup,
-        MRawKey, MSeedKeyCard, MTypesInfo, Network, SeedNameCard, SeedWord,
+        Address, DerivationCheck as NavDerivationCheck, DerivationDestination, DerivationEntry,
+        DerivationPack, MBackup, MDeriveKey, MKeyDetails, MKeysCard, MMMNetwork, MMManageNetworks,
+        MMNetwork, MNetworkDetails, MNetworkMenu, MNewSeedBackup, MRawKey, MSeedKeyCard,
+        MTypesInfo, Network, SeedNameCard, SeedWord,
     },
     network_specs::NetworkSpecs,
     print::export_plain_vector,
@@ -399,18 +400,25 @@ pub fn dynamic_path_check(
     seed_name: &str,
     path: &str,
     network_specs_key_hex: &str,
-) -> String {
+) -> NavDerivationCheck {
     let content = match NetworkSpecsKey::from_hex(network_specs_key_hex) {
         Ok(network_specs_key) => match get_network_specs(database_name, &network_specs_key) {
             Ok(network_specs) => {
                 match derivation_check(seed_name, path, &network_specs_key, database_name) {
-                    Ok(DerivationCheck::BadFormat) => String::from("\"button_good\":false"),
-                    Ok(DerivationCheck::Password) => {
-                        String::from("\"button_good\":true,\"where_to\":\"pwd\"")
-                    }
-                    Ok(DerivationCheck::NoPassword(None)) => {
-                        String::from("\"button_good\":true,\"where_to\":\"pin\"")
-                    }
+                    Ok(DerivationCheck::BadFormat) => NavDerivationCheck {
+                        button_good: false,
+                        ..Default::default()
+                    },
+                    Ok(DerivationCheck::Password) => NavDerivationCheck {
+                        button_good: true,
+                        where_to: Some(DerivationDestination::Pwd),
+                        ..Default::default()
+                    },
+                    Ok(DerivationCheck::NoPassword(None)) => NavDerivationCheck {
+                        button_good: true,
+                        where_to: Some(DerivationDestination::Pin),
+                        ..Default::default()
+                    },
                     Ok(DerivationCheck::NoPassword(Some((multisigner, address_details)))) => {
                         let address_base58 = print_multisigner_as_base58(
                             &multisigner,
@@ -418,20 +426,37 @@ pub fn dynamic_path_check(
                         );
                         let hex_identicon =
                             hex::encode(make_identicon_from_multisigner(&multisigner));
-                        let collision_display = format!("\"base58\":\"{}\",\"path\":\"{}\",\"has_pwd\":{},\"identicon\":\"{}\",\"seed_name\":\"{}\"", address_base58, address_details.path, address_details.has_pwd, hex_identicon, seed_name);
-                        format!(
-                            "\"button_good\":false,\"collision\":{{{}}}",
-                            collision_display
-                        )
+                        let collision_display = Address {
+                            base58: address_base58,
+                            path: address_details.path,
+                            has_pwd: address_details.has_pwd,
+                            identicon: hex_identicon,
+                            seed_name: seed_name.to_string(),
+                            multiselect: None,
+                        };
+                        NavDerivationCheck {
+                            button_good: false,
+                            collision: Some(collision_display),
+                            ..Default::default()
+                        }
                     }
-                    Err(e) => format!("\"error\":\"{}\"", <Signer>::show(&e)),
+                    Err(e) => NavDerivationCheck {
+                        error: Some(<Signer>::show(&e)),
+                        ..Default::default()
+                    },
                 }
             }
-            Err(e) => format!("\"error\":\"{}\"", <Signer>::show(&e)),
+            Err(e) => NavDerivationCheck {
+                error: Some(<Signer>::show(&e)),
+                ..Default::default()
+            },
         },
-        Err(e) => format!("\"error\":\"{}\"", <Signer>::show(&e)),
+        Err(e) => NavDerivationCheck {
+            error: Some(<Signer>::show(&e)),
+            ..Default::default()
+        },
     };
-    format!("{{\"derivation_check\":{{{}}}}}", content)
+    content
 }
 
 /// Print network specs and metadata set information for network with given network specs key.
