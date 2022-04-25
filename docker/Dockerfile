@@ -1,60 +1,50 @@
 # This dockerfile is based on Bitrise but with a lot of extra cruft we don't need removed
 FROM ubuntu:focal
-MAINTAINER Parity Technologies <admin@parity.io>
+LABEL maintainer="Parity Technologies <admin@parity.io>"
 
 ENV ANDROID_SDK_ROOT /opt/android-sdk-linux
 ENV ANDROID_HOME /opt/android-sdk-linux
 ENV NDK_HOME /opt/android-ndk
-ENV ANDROID_NDK_VERSION r23b
 ENV JAVA_HOME /usr/lib/jvm/java-11-openjdk-amd64/
-
-RUN apt-get -y update && apt-get -y install default-jdk wget unzip curl clang
-
-# SDK setup is taken from https://github.com/bitrise-io/android/blob/master/Dockerfile
-# NDK setup is taken from https://github.com/bitrise-io/android-ndk/blob/master/Dockerfile
-
-RUN cd /opt \
-    && wget -q https://dl.google.com/android/repository/commandlinetools-linux-6858069_latest.zip -O android-commandline-tools.zip \
-    && mkdir -p ${ANDROID_SDK_ROOT}/cmdline-tools \
-    && unzip -q android-commandline-tools.zip -d /tmp/ \
-    && mv /tmp/cmdline-tools/ ${ANDROID_SDK_ROOT}/cmdline-tools/latest \
-    && rm android-commandline-tools.zip && ls -la ${ANDROID_SDK_ROOT}/cmdline-tools/latest/
-
+# skip prompts
+ENV DEBIAN_FRONTEND=noninteractive
+# sdk env
 ENV PATH ${PATH}:${ANDROID_SDK_ROOT}/platform-tools:${ANDROID_SDK_ROOT}/cmdline-tools/latest/bin
-
-RUN yes | sdkmanager --licenses
-# We need at least one set of build-tools installed for apksigner
-RUN yes | sdkmanager "build-tools;30.0.3"
-
-RUN mkdir /opt/android-ndk-tmp && \
-    cd /opt/android-ndk-tmp && \
-    wget -q https://dl.google.com/android/repository/android-ndk-${ANDROID_NDK_VERSION}-linux.zip && \
-# uncompress
-    unzip -q android-ndk-${ANDROID_NDK_VERSION}-linux.zip && \
-# move to its final location
-    mv ./android-ndk-${ANDROID_NDK_VERSION} ${NDK_HOME} && \
-# remove temp dir
-    cd ${NDK_HOME} && \
-    rm -rf /opt/android-ndk-tmp
-
-# add to PATH
-ENV PATH ${PATH}:${NDK_HOME}
-
-# rust stuff
-
+# Rust env
 ENV RUSTUP_HOME=/usr/local/rustup
 ENV CARGO_HOME=/usr/local/cargo
 ENV PATH=/usr/local/cargo/bin:$PATH
 
-WORKDIR /build
-
-RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
-
 COPY scripts /tmp/scripts/
-RUN bash /tmp/scripts/init.sh
 
-# Cleanup
-RUN rm -rf /tmp/scripts ;\
-    apt-get autoremove -y ; \
-    apt-get clean ; \
-    rm -rf /var/lib/apt/lists/*
+RUN apt-get -y update && \
+    apt-get -y install python git default-jdk wget unzip curl clang && \
+# SDK setup is taken from https://github.com/bitrise-io/android/blob/master/Dockerfile
+    cd /opt && \
+    wget -q https://dl.google.com/android/repository/commandlinetools-linux-8092744_latest.zip -O android-commandline-tools.zip && \
+    mkdir -p ${ANDROID_SDK_ROOT}/cmdline-tools && \
+    unzip -q android-commandline-tools.zip -d /tmp/ && \
+    mv /tmp/cmdline-tools/ ${ANDROID_SDK_ROOT}/cmdline-tools/latest && \
+    rm android-commandline-tools.zip && ls -la ${ANDROID_SDK_ROOT}/cmdline-tools/latest/ && \
+# We need at least one set of build-tools installed for apksigner
+    yes | sdkmanager --licenses && \
+    yes | sdkmanager "build-tools;30.0.3" && \
+    echo "y" | sdkmanager --install "ndk;24.0.8215888" --sdk_root=${ANDROID_SDK_ROOT} && \
+# rust stuff
+    curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y && \
+# install additional rust targets
+    rustup target add aarch64-linux-android armv7-linux-androideabi x86_64-linux-android && \
+    bash /tmp/scripts/init.sh && \
+# versions
+    rustup show && \
+    cargo --version && \
+# cleanup
+    rm -rf /tmp/scripts ;\
+    apt-get autoremove -y && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/* && \
+    # cargo clean up
+    # removes compilation artifacts cargo install creates (>250M)
+    rm -rf "${CARGO_HOME}/registry" "${CARGO_HOME}/git"
+
+WORKDIR /build
