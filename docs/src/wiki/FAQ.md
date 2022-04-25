@@ -30,7 +30,7 @@
     
 - **How do I know I am not interacting with malicious apps or actors?**
     
-    Signer is does not interact with network. The app itself does not have a way to check if an app or an account you interacting with is malicious. 
+    Signer does not interact with network. The app itself does not have a way to check if an app or an account you interacting with is malicious. 
     If you use Signer with PolkadotJS Browser Extension, PolkadotJS Apps or Signer Component Browser Extension they will rely on community driven curated list of potentially less-than-honest operators: [https://polkadot.js.org/phishing/#](https://polkadot.js.org/phishing/#) to prevent you from interacting with certain sites and addresses. However, there are no limitations on use of Signer with other tools.
 	
 - **Can import my account from polkadot{.js} apps or extension to Parity Signer?**
