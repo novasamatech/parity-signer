@@ -489,7 +489,7 @@ pub fn network_details_by_key(
         color,
         decimals,
         encryption,
-        genesis_hash: format!("{}", genesis_hash),
+        genesis_hash: format!("{:x}", genesis_hash),
         logo,
         name,
         order: order.to_string(),
