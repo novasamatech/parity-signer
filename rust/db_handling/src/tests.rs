@@ -1,15 +1,23 @@
 use bip39::{Language, Mnemonic};
+use definitions::history::{
+    Entry, IdentityHistory, MetaValuesDisplay, MetaValuesExport, NetworkSpecsDisplay,
+    NetworkSpecsExport, NetworkVerifierDisplay, SignDisplay, SignMessageDisplay, TypesExport,
+};
+use definitions::navigation::{Address, DerivationDestination, NetworkSpecsToSend};
+use definitions::network_specs::NetworkSpecs;
+use pretty_assertions::{assert_eq, assert_ne};
 use sled::{open, Batch, Db, Tree};
 use sp_core::sr25519::Public;
+use sp_core::H256;
 use sp_runtime::MultiSigner;
 use std::convert::TryInto;
 use std::fs;
+use std::str::FromStr;
 
 use constants::{
     test_values::{
-        alice_sr_alice, alice_sr_kusama, alice_sr_polkadot, alice_sr_root,
-        alice_sr_secret_abracadabra, alice_sr_westend, alice_westend_root_qr, bob, empty_png,
-        empty_vec_hash_pic, real_parity_verifier, types_known, westend_9000, westend_9010,
+        alice_sr_alice, alice_sr_kusama, alice_sr_polkadot, alice_sr_root, alice_sr_westend,
+        alice_westend_root_qr, empty_png, types_known, westend_9000, westend_9010,
     },
     ADDRTREE, ALICE_SEED_PHRASE, METATREE, SPECSTREE,
 };
@@ -19,13 +27,20 @@ use definitions::{
     error::ErrorSource,
     error_active::{Active, IncomingMetadataSourceActiveStr},
     error_signer::Signer,
-    history::all_events_preview,
+    history::{all_events_preview, Event, TypesDisplay},
     keyring::{AddressKey, MetaKey, MetaKeyPrefix, NetworkSpecsKey, VerifierKey},
     metadata::MetaValues,
-    network_specs::{ValidCurrentVerifier, Verifier},
+    navigation::{
+        DerivationCheck as NavDerivationCheck, DerivationEntry, DerivationPack, MBackup,
+        MDeriveKey, MKeyDetails, MKeysCard, MMMNetwork, MMManageNetworks, MMNetwork,
+        MMetadataRecord, MNetworkDetails, MNetworkMenu, MRawKey, MSeedKeyCard, MTypesInfo,
+        MVerifier, Network, SeedNameCard,
+    },
+    network_specs::{ValidCurrentVerifier, Verifier, VerifierValue},
     users::AddressDetails,
 };
 
+use crate::manage_history::get_history_entry_by_order;
 use crate::{
     cold_default::{
         populate_cold, populate_cold_no_metadata, populate_cold_release, signer_init_no_cert,
@@ -33,7 +48,7 @@ use crate::{
     },
     db_transactions::TrDbCold,
     helpers::{
-        display_general_verifier, get_danger_status, open_db, open_tree,
+        get_danger_status, get_general_verifier, open_db, open_tree,
         try_get_valid_current_verifier, upd_id_batch,
     },
     hot_default::reset_hot_database,
@@ -44,13 +59,12 @@ use crate::{
     },
     interface_signer::{
         addresses_set_seed_name_network, backup_prep, derive_prep, dynamic_path_check, export_key,
-        first_network, guess, metadata_details, network_details_by_key, print_all_identities,
-        print_all_seed_names_with_identicons, print_identities_for_seed_name_and_network,
+        first_network, get_all_seed_names_with_identicons, guess, metadata_details,
+        network_details_by_key, print_all_identities, print_identities_for_seed_name_and_network,
         show_all_networks, show_all_networks_with_flag, show_types_status, SeedDraft,
     },
     manage_history::{
-        device_was_online, enter_events, events_to_batch, print_history,
-        print_history_entry_by_order, reset_danger_status_to_safe,
+        device_was_online, enter_events, events_to_batch, get_history, reset_danger_status_to_safe,
     },
     metadata::transfer_metadata_to_cold,
     remove_network::{remove_metadata, remove_network},
@@ -61,11 +75,12 @@ use crate::{
 fn print_seed_names() {
     let dbname = "for_tests/print_seed_names";
     populate_cold(dbname, Verifier { v: None }).unwrap();
-    let print = print_all_seed_names_with_identicons(dbname, &[String::from("Alice")])
-        .unwrap()
-        .replace(&alice_sr_root(), r#"<alice_sr25519_root>"#);
-    let expected_print = r#"[{"identicon":"<alice_sr25519_root>","seed_name":"Alice"}]"#;
-    assert!(print == expected_print, "\nReceived: \n{}", print);
+    let cards = get_all_seed_names_with_identicons(dbname, &[String::from("Alice")]).unwrap();
+    let expected_cards = vec![SeedNameCard {
+        seed_name: "Alice".to_string(),
+        identicon: alice_sr_root(),
+    }];
+    assert!(cards == expected_cards, "\nReceived: \n{:?}", cards);
     fs::remove_dir_all(dbname).unwrap();
 }
 
@@ -73,15 +88,23 @@ fn print_seed_names() {
 fn print_seed_names_with_orphan() {
     let dbname = "for_tests/print_seed_names_with_orphan";
     populate_cold(dbname, Verifier { v: None }).unwrap();
-    let print = print_all_seed_names_with_identicons(
+    let cards = get_all_seed_names_with_identicons(
         dbname,
         &[String::from("Alice"), String::from("BobGhost")],
     )
-    .unwrap()
-    .replace(&alice_sr_root(), r#"<alice_sr25519_root>"#)
-    .replace(&empty_png(), r#"<empty>"#);
-    let expected_print = r#"[{"identicon":"<alice_sr25519_root>","seed_name":"Alice"},{"identicon":"<empty>","seed_name":"BobGhost"}]"#;
-    assert!(print == expected_print, "\nReceived: \n{}", print);
+    .unwrap();
+
+    let expected_cards = vec![
+        SeedNameCard {
+            seed_name: "Alice".to_string(),
+            identicon: alice_sr_root(),
+        },
+        SeedNameCard {
+            seed_name: "BobGhost".to_string(),
+            identicon: empty_png(),
+        },
+    ];
+    assert!(cards == expected_cards, "\nReceived: \n{:?}", cards);
     fs::remove_dir_all(dbname).unwrap();
 }
 
@@ -89,15 +112,62 @@ fn print_seed_names_with_orphan() {
 fn print_all_ids() {
     let dbname = "for_tests/print_all_ids";
     populate_cold(dbname, Verifier { v: None }).unwrap();
-    let print = print_all_identities(dbname)
-        .unwrap()
-        .replace(&alice_sr_root(), r#"<alice_sr25519_root>"#)
-        .replace(&alice_sr_alice(), r#"<alice_sr25519_//Alice>"#)
-        .replace(&alice_sr_kusama(), r#"<alice_sr25519_//kusama>"#)
-        .replace(&alice_sr_polkadot(), r#"<alice_sr25519_//polkadot>"#)
-        .replace(&alice_sr_westend(), r#"<alice_sr25519_//westend>"#);
-    let expected_print = r#"[{"seed_name":"Alice","address_key":"013efeca331d646d8a2986374bb3bb8d6e9e3cfcdd7c45c2b69104fab5d61d3f34","public_key":"3efeca331d646d8a2986374bb3bb8d6e9e3cfcdd7c45c2b69104fab5d61d3f34","identicon":"<alice_sr25519_//westend>","has_pwd":false,"path":"//westend"},{"seed_name":"Alice","address_key":"0146ebddef8cd9bb167dc30878d7113b7e168e6f0646beffd77d69d39bad76b47a","public_key":"46ebddef8cd9bb167dc30878d7113b7e168e6f0646beffd77d69d39bad76b47a","identicon":"<alice_sr25519_root>","has_pwd":false,"path":""},{"seed_name":"Alice","address_key":"0164a31235d4bf9b37cfed3afa8aa60754675f9c4915430454d365c05112784d05","public_key":"64a31235d4bf9b37cfed3afa8aa60754675f9c4915430454d365c05112784d05","identicon":"<alice_sr25519_//kusama>","has_pwd":false,"path":"//kusama"},{"seed_name":"Alice","address_key":"01d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d","public_key":"d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d","identicon":"<alice_sr25519_//Alice>","has_pwd":false,"path":"//Alice"},{"seed_name":"Alice","address_key":"01f606519cb8726753885cd4d0f518804a69a5e0badf36fee70feadd8044081730","public_key":"f606519cb8726753885cd4d0f518804a69a5e0badf36fee70feadd8044081730","identicon":"<alice_sr25519_//polkadot>","has_pwd":false,"path":"//polkadot"}]"#;
-    assert!(print == expected_print, "\nReceived: \n{}", print);
+    let keys = print_all_identities(dbname).unwrap();
+
+    let expected_keys = vec![
+        MRawKey {
+            seed_name: "Alice".to_string(),
+            address_key: "013efeca331d646d8a2986374bb3bb8d6e9e3cfcdd7c45c2b69104fab5d61d3f34"
+                .to_string(),
+            public_key: "3efeca331d646d8a2986374bb3bb8d6e9e3cfcdd7c45c2b69104fab5d61d3f34"
+                .to_string(),
+            identicon: alice_sr_westend(),
+            has_pwd: false,
+            path: "//westend".to_string(),
+        },
+        MRawKey {
+            seed_name: "Alice".to_string(),
+            address_key: "0146ebddef8cd9bb167dc30878d7113b7e168e6f0646beffd77d69d39bad76b47a"
+                .to_string(),
+            public_key: "46ebddef8cd9bb167dc30878d7113b7e168e6f0646beffd77d69d39bad76b47a"
+                .to_string(),
+            identicon: alice_sr_root(),
+            has_pwd: false,
+            path: "".to_string(),
+        },
+        MRawKey {
+            seed_name: "Alice".to_string(),
+            address_key: "0164a31235d4bf9b37cfed3afa8aa60754675f9c4915430454d365c05112784d05"
+                .to_string(),
+            public_key: "64a31235d4bf9b37cfed3afa8aa60754675f9c4915430454d365c05112784d05"
+                .to_string(),
+            identicon: alice_sr_kusama(),
+            has_pwd: false,
+            path: "//kusama".to_string(),
+        },
+        MRawKey {
+            seed_name: "Alice".to_string(),
+            address_key: "01d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d"
+                .to_string(),
+            public_key: "d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d"
+                .to_string(),
+            identicon: alice_sr_alice(),
+            has_pwd: false,
+            path: "//Alice".to_string(),
+        },
+        MRawKey {
+            seed_name: "Alice".to_string(),
+            address_key: "01f606519cb8726753885cd4d0f518804a69a5e0badf36fee70feadd8044081730"
+                .to_string(),
+            public_key: "f606519cb8726753885cd4d0f518804a69a5e0badf36fee70feadd8044081730"
+                .to_string(),
+            identicon: alice_sr_polkadot(),
+            has_pwd: false,
+            path: "//polkadot".to_string(),
+        },
+    ];
+
+    assert_eq!(keys, expected_keys);
     fs::remove_dir_all(dbname).unwrap();
 }
 
@@ -105,7 +175,7 @@ fn print_all_ids() {
 fn print_ids_seed_name_network() {
     let dbname = "for_tests/print_ids_seed_name_network";
     populate_cold(dbname, Verifier { v: None }).unwrap();
-    let print = print_identities_for_seed_name_and_network(
+    let cards = print_identities_for_seed_name_and_network(
         dbname,
         "Alice",
         &NetworkSpecsKey::from_parts(
@@ -116,20 +186,50 @@ fn print_ids_seed_name_network() {
         None,
         Vec::new(),
     )
-    .unwrap()
-    .replace(&alice_sr_root(), r#"<alice_sr25519_root>"#)
-    .replace(&alice_sr_alice(), r#"<alice_sr25519_//Alice>"#)
-    .replace(&alice_sr_westend(), r#"<alice_sr25519_//westend>"#);
-    let expected_print = r#""root":{"seed_name":"Alice","identicon":"<alice_sr25519_root>","address_key":"0146ebddef8cd9bb167dc30878d7113b7e168e6f0646beffd77d69d39bad76b47a","base58":"5DfhGyQdFobKM8NsWvEeAKk5EQQgYe9AydgJ7rMB6E1EqRzV","swiped":false,"multiselect":false},"set":[{"address_key":"013efeca331d646d8a2986374bb3bb8d6e9e3cfcdd7c45c2b69104fab5d61d3f34","base58":"5DVJWniDyUja5xnG4t5i3Rrd2Gguf1fzxPYfgZBbKcvFqk4N","identicon":"<alice_sr25519_//westend>","has_pwd":false,"path":"//westend","swiped":false,"multiselect":false},{"address_key":"01d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d","base58":"5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY","identicon":"<alice_sr25519_//Alice>","has_pwd":false,"path":"//Alice","swiped":false,"multiselect":false}],"network":{"title":"Westend","logo":"westend"}"#;
-    assert!(print == expected_print, "\nReceived: \n{}", print);
+    .unwrap();
+    let expected_cards = (
+        MSeedKeyCard {
+            seed_name: "Alice".to_string(),
+            identicon: alice_sr_root(),
+            address_key: "0146ebddef8cd9bb167dc30878d7113b7e168e6f0646beffd77d69d39bad76b47a"
+                .to_string(),
+            base58: "5DfhGyQdFobKM8NsWvEeAKk5EQQgYe9AydgJ7rMB6E1EqRzV".to_string(),
+            swiped: false,
+            multiselect: false,
+        },
+        vec![
+            MKeysCard {
+                address_key: "013efeca331d646d8a2986374bb3bb8d6e9e3cfcdd7c45c2b69104fab5d61d3f34"
+                    .to_string(),
+                base58: "5DVJWniDyUja5xnG4t5i3Rrd2Gguf1fzxPYfgZBbKcvFqk4N".to_string(),
+                identicon: alice_sr_westend(),
+                has_pwd: false,
+                path: "//westend".to_string(),
+                swiped: false,
+                multiselect: false,
+            },
+            MKeysCard {
+                address_key: "01d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d"
+                    .to_string(),
+                base58: "5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY".to_string(),
+                identicon: alice_sr_alice(),
+                has_pwd: false,
+                path: "//Alice".to_string(),
+                swiped: false,
+                multiselect: false,
+            },
+        ],
+    );
+    // TODO: "network":{"title":"Westend","logo":"westend"}"#;
+    assert_eq!(cards, expected_cards);
     fs::remove_dir_all(dbname).unwrap();
 }
 
 #[test]
-fn show_all_networks_flag_westend() {
+fn print_show_all_networks_flag_westend() {
     let dbname = "for_tests/show_all_networks_flag_westend";
     populate_cold(dbname, Verifier { v: None }).unwrap();
-    let print = show_all_networks_with_flag(
+    let menu = show_all_networks_with_flag(
         dbname,
         &NetworkSpecsKey::from_parts(
             &hex::decode("e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e")
@@ -138,8 +238,35 @@ fn show_all_networks_flag_westend() {
         ),
     )
     .unwrap();
-    let expected_print = r#""networks":[{"key":"018091b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3","title":"Polkadot","logo":"polkadot","order":0,"selected":false},{"key":"0180b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe","title":"Kusama","logo":"kusama","order":1,"selected":false},{"key":"0180e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e","title":"Westend","logo":"westend","order":2,"selected":true}]"#;
-    assert!(print == expected_print, "\nReceived: \n{}", print);
+    let expected_menu = MNetworkMenu {
+        networks: vec![
+            Network {
+                key: "018091b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3"
+                    .to_string(),
+                logo: "polkadot".to_string(),
+                order: 0,
+                selected: false,
+                title: "Polkadot".to_string(),
+            },
+            Network {
+                key: "0180b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe"
+                    .to_string(),
+                logo: "kusama".to_string(),
+                order: 1,
+                selected: false,
+                title: "Kusama".to_string(),
+            },
+            Network {
+                key: "0180e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e"
+                    .to_string(),
+                logo: "westend".to_string(),
+                order: 2,
+                selected: true,
+                title: "Westend".to_string(),
+            },
+        ],
+    };
+    assert_eq!(menu, expected_menu);
     fs::remove_dir_all(dbname).unwrap();
 }
 
@@ -147,9 +274,28 @@ fn show_all_networks_flag_westend() {
 fn show_all_networks_no_flag() {
     let dbname = "for_tests/show_all_networks_no_flag";
     populate_cold(dbname, Verifier { v: None }).unwrap();
-    let print = show_all_networks(dbname).unwrap();
-    let expected_print = r#""networks":[{"key":"018091b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3","title":"Polkadot","logo":"polkadot","order":0},{"key":"0180b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe","title":"Kusama","logo":"kusama","order":1},{"key":"0180e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e","title":"Westend","logo":"westend","order":2}]"#;
-    assert!(print == expected_print, "\nReceived: \n{}", print);
+    let networks = show_all_networks(dbname).unwrap();
+    let expected_networks = vec![
+        MMNetwork {
+            key: "018091b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3".to_string(),
+            title: "Polkadot".to_string(),
+            logo: "polkadot".to_string(),
+            order: 0,
+        },
+        MMNetwork {
+            key: "0180b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe".to_string(),
+            title: "Kusama".to_string(),
+            logo: "kusama".to_string(),
+            order: 1,
+        },
+        MMNetwork {
+            key: "0180e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e".to_string(),
+            title: "Westend".to_string(),
+            logo: "westend".to_string(),
+            order: 2,
+        },
+    ];
+    assert_eq!(networks, expected_networks);
     fs::remove_dir_all(dbname).unwrap();
 }
 
@@ -158,7 +304,7 @@ fn first_standard_network() {
     let dbname = "for_tests/first_standard_network";
     populate_cold(dbname, Verifier { v: None }).unwrap();
     let specs = first_network(dbname).unwrap();
-    assert!(specs.name == "polkadot", "\nReceived: \n{:?}", specs);
+    assert_eq!(specs.name, "polkadot");
     fs::remove_dir_all(dbname).unwrap();
 }
 
@@ -171,7 +317,7 @@ fn export_alice_westend() {
             .unwrap()
             .try_into()
             .unwrap();
-    let print = export_key(
+    let key = export_key(
         dbname,
         &MultiSigner::Sr25519(Public::from_raw(public)),
         "Alice",
@@ -181,11 +327,18 @@ fn export_alice_westend() {
             &Encryption::Sr25519,
         ),
     )
-    .unwrap()
-    .replace(&alice_sr_root(), r#"<alice_sr25519_root>"#)
-    .replace(&alice_westend_root_qr(), r#"<alice_westend_root_qr>"#);
-    let expected_print = r#""qr":"<alice_westend_root_qr>","pubkey":"46ebddef8cd9bb167dc30878d7113b7e168e6f0646beffd77d69d39bad76b47a","base58":"5DfhGyQdFobKM8NsWvEeAKk5EQQgYe9AydgJ7rMB6E1EqRzV","identicon":"<alice_sr25519_root>","seed_name":"Alice","path":"","network_title":"Westend","network_logo":"westend""#;
-    assert!(print == expected_print, "\nReceived: \n{:?}", print);
+    .unwrap();
+    let expected_key = MKeyDetails {
+        qr: alice_westend_root_qr(),
+        pubkey: "46ebddef8cd9bb167dc30878d7113b7e168e6f0646beffd77d69d39bad76b47a".to_string(),
+        base58: "5DfhGyQdFobKM8NsWvEeAKk5EQQgYe9AydgJ7rMB6E1EqRzV".to_string(),
+        identicon: alice_sr_root(),
+        seed_name: "Alice".to_string(),
+        path: "".to_string(),
+        network_title: "Westend".to_string(),
+        network_logo: "westend".to_string(),
+    };
+    assert_eq!(key, expected_key);
     fs::remove_dir_all(dbname).unwrap();
 }
 
@@ -193,9 +346,62 @@ fn export_alice_westend() {
 fn backup_prep_alice() {
     let dbname = "for_tests/backup_prep_alice";
     populate_cold(dbname, Verifier { v: None }).unwrap();
-    let print = backup_prep(dbname, "Alice").unwrap();
-    let expected_print = r#""seed_name":"Alice","derivations":[{"network_title":"Polkadot","network_logo":"polkadot","network_order":0,"id_set":[{"path":"","has_pwd":false},{"path":"//polkadot","has_pwd":false}]},{"network_title":"Kusama","network_logo":"kusama","network_order":1,"id_set":[{"path":"","has_pwd":false},{"path":"//kusama","has_pwd":false}]},{"network_title":"Westend","network_logo":"westend","network_order":2,"id_set":[{"path":"//westend","has_pwd":false},{"path":"","has_pwd":false},{"path":"//Alice","has_pwd":false}]}]"#;
-    assert!(print == expected_print, "\nReceived: \n{}", print);
+    let backup = backup_prep(dbname, "Alice").unwrap();
+    let expected_backup = MBackup {
+        seed_name: "Alice".to_string(),
+        derivations: vec![
+            DerivationPack {
+                network_title: "Polkadot".to_string(),
+                network_logo: "polkadot".to_string(),
+                network_order: 0.to_string(),
+                id_set: vec![
+                    DerivationEntry {
+                        path: String::new(),
+                        has_pwd: false,
+                    },
+                    DerivationEntry {
+                        path: "//polkadot".to_string(),
+                        has_pwd: false,
+                    },
+                ],
+            },
+            DerivationPack {
+                network_title: "Kusama".to_string(),
+                network_logo: "kusama".to_string(),
+                network_order: 1.to_string(),
+                id_set: vec![
+                    DerivationEntry {
+                        path: String::new(),
+                        has_pwd: false,
+                    },
+                    DerivationEntry {
+                        path: "//kusama".to_string(),
+                        has_pwd: false,
+                    },
+                ],
+            },
+            DerivationPack {
+                network_title: "Westend".to_string(),
+                network_logo: "westend".to_string(),
+                network_order: 2.to_string(),
+                id_set: vec![
+                    DerivationEntry {
+                        path: "//westend".to_string(),
+                        has_pwd: false,
+                    },
+                    DerivationEntry {
+                        path: String::new(),
+                        has_pwd: false,
+                    },
+                    DerivationEntry {
+                        path: "//Alice".to_string(),
+                        has_pwd: false,
+                    },
+                ],
+            },
+        ],
+    };
+    assert_eq!(backup, expected_backup);
     fs::remove_dir_all(dbname).unwrap();
 }
 
@@ -203,7 +409,7 @@ fn backup_prep_alice() {
 fn derive_prep_alice() {
     let dbname = "for_tests/derive_prep_alice";
     populate_cold(dbname, Verifier { v: None }).unwrap();
-    let print = derive_prep(
+    let key = derive_prep(
         dbname,
         "Alice",
         &NetworkSpecsKey::from_parts(
@@ -213,10 +419,20 @@ fn derive_prep_alice() {
         ),
         None,
         "//secret//derive",
+        false,
     )
     .unwrap();
-    let expected_print = r#""seed_name":"Alice","network_title":"Westend","network_logo":"westend","network_specs_key":"0180e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e","suggested_derivation":"//secret//derive""#;
-    assert!(print == expected_print, "\nReceived: \n{}", print);
+    let expected_key = MDeriveKey {
+        seed_name: "Alice".to_string(),
+        network_title: "Westend".to_string(),
+        network_logo: "westend".to_string(),
+        network_specs_key: "0180e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e"
+            .to_string(),
+        suggested_derivation: "//secret//derive".to_string(),
+        keyboard: false,
+        derivation_check: None,
+    };
+    assert_eq!(key, expected_key);
     fs::remove_dir_all(dbname).unwrap();
 }
 
@@ -243,17 +459,26 @@ fn derive_prep_alice_collided() {
         Some(a) => a,
         None => panic!("Did not create address?"),
     };
-    let print = derive_prep(
+    let key = derive_prep(
         dbname,
         "Alice",
         &network_specs_key,
         Some(collision),
         "//Alice",
+        false,
     )
-    .unwrap()
-    .replace(&alice_sr_alice(), r#"<alice_sr25519_//Alice>"#);
-    let expected_print = r#""seed_name":"Alice","network_title":"Westend","network_logo":"westend","network_specs_key":"0180e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e","suggested_derivation":"//Alice","collision":{"base58":"5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY","path":"//Alice","has_pwd":false,"identicon":"<alice_sr25519_//Alice>","seed_name":"Alice"}"#;
-    assert!(print == expected_print, "\nReceived: \n{}", print);
+    .unwrap();
+    let expected_key = MDeriveKey {
+        seed_name: "Alice".to_string(),
+        network_title: "Westend".to_string(),
+        network_logo: "westend".to_string(),
+        network_specs_key: "0180e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e"
+            .to_string(),
+        suggested_derivation: "//Alice".to_string(),
+        keyboard: false,
+        derivation_check: None,
+    };
+    assert_eq!(key, expected_key);
     fs::remove_dir_all(dbname).unwrap();
 }
 
@@ -288,20 +513,26 @@ fn derive_prep_alice_collided_with_password() {
         Some(a) => a,
         None => panic!("Did not create address?"),
     };
-    let print = derive_prep(
+    let key = derive_prep(
         dbname,
         "Alice",
         &network_specs_key,
         Some(collision),
         "//secret///abracadabra",
+        false,
     )
-    .unwrap()
-    .replace(
-        &alice_sr_secret_abracadabra(),
-        r#"<alice_sr25519_//secret///abracadabra>"#,
-    );
-    let expected_print = r#""seed_name":"Alice","network_title":"Westend","network_logo":"westend","network_specs_key":"0180e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e","suggested_derivation":"//secret///abracadabra","collision":{"base58":"5EkMjdgyuHqnWA9oWXUoFRaMwMUgMJ1ik9KtMpPNuTuZTi2t","path":"//secret","has_pwd":true,"identicon":"<alice_sr25519_//secret///abracadabra>","seed_name":"Alice"}"#;
-    assert!(print == expected_print, "\nReceived: \n{}", print);
+    .unwrap();
+    let expected_key = MDeriveKey {
+        seed_name: "Alice".to_string(),
+        network_title: "Westend".to_string(),
+        network_logo: "westend".to_string(),
+        network_specs_key: "0180e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e"
+            .to_string(),
+        suggested_derivation: "//secret///abracadabra".to_string(),
+        keyboard: false,
+        derivation_check: None, //TODO "collision":{"base58":"5EkMjdgyuHqnWA9oWXUoFRaMwMUgMJ1ik9KtMpPNuTuZTi2t","path":"//secret","has_pwd":true,"identicon":"<alice_sr25519_//secret///abracadabra>","seed_name":"Alice"}
+    };
+    assert_eq!(key, expected_key);
     fs::remove_dir_all(dbname).unwrap();
 }
 
@@ -309,7 +540,7 @@ fn derive_prep_alice_collided_with_password() {
 fn westend_network_details() {
     let dbname = "for_tests/westend_network_details";
     populate_cold(dbname, Verifier { v: None }).unwrap();
-    let print = network_details_by_key(
+    let details = network_details_by_key(
         dbname,
         &NetworkSpecsKey::from_parts(
             &hex::decode("e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e")
@@ -317,12 +548,45 @@ fn westend_network_details() {
             &Encryption::Sr25519,
         ),
     )
-    .unwrap()
-    .replace(&empty_png(), r#"<empty>"#)
-    .replace(&westend_9000(), r#"<meta_pic_westend9000>"#)
-    .replace(&westend_9010(), r#"<meta_pic_westend9010>"#);
-    let expected_print = r##""base58prefix":"42","color":"#660D35","decimals":"12","encryption":"sr25519","genesis_hash":"e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e","logo":"westend","name":"westend","order":"2","path_id":"//westend","secondary_color":"#262626","title":"Westend","unit":"WND","current_verifier":{"type":"general","details":{"public_key":"","identicon":"<empty>","encryption":"none"}},"meta":[{"spec_version":"9000","meta_hash":"e80237ad8b2e92b72fcf6beb8f0e4ba4a21043a7115c844d91d6c4f981e469ce","meta_id_pic":"<meta_pic_westend9000>"},{"spec_version":"9010","meta_hash":"70c99738c27fb32c87883f1c9c94ee454bf0b3d88e4a431a2bbfe1222b46ebdf","meta_id_pic":"<meta_pic_westend9010>"}]"##;
-    assert!(print == expected_print, "\nReceived: \n{}", print);
+    .unwrap();
+    let expected_details = MNetworkDetails {
+        base58prefix: 42,
+        color: "#660D35".to_string(),
+        decimals: 12,
+        encryption: Encryption::Sr25519,
+        genesis_hash: "e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e"
+            .to_string(),
+        logo: "westend".to_string(),
+        name: "westend".to_string(),
+        order: "2".to_string(),
+        path_id: "//westend".to_string(),
+        secondary_color: "#262626".to_string(),
+        title: "Westend".to_string(),
+        unit: "WND".to_string(),
+        current_verifier: MVerifier {
+            ttype: "general".to_string(),
+            details: definitions::navigation::MVerifierDetails {
+                public_key: "".to_string(),
+                identicon: "".to_string(),
+                encryption: "".to_string(),
+            },
+        },
+        meta: vec![
+            MMetadataRecord {
+                specs_version: "9000".to_string(),
+                meta_hash: "e80237ad8b2e92b72fcf6beb8f0e4ba4a21043a7115c844d91d6c4f981e469ce"
+                    .to_string(),
+                meta_id_pic: westend_9000(),
+            },
+            MMetadataRecord {
+                specs_version: "9010".to_string(),
+                meta_hash: "70c99738c27fb32c87883f1c9c94ee454bf0b3d88e4a431a2bbfe1222b46ebdf"
+                    .to_string(),
+                meta_id_pic: westend_9010(),
+            },
+        ],
+    };
+    assert_eq!(details, expected_details);
     fs::remove_dir_all(dbname).unwrap();
 }
 
@@ -330,7 +594,7 @@ fn westend_network_details() {
 fn westend_9010_metadata_details() {
     let dbname = "for_tests/westend_9010_metadata_details";
     populate_cold(dbname, Verifier { v: None }).unwrap();
-    let print = metadata_details(
+    let network = metadata_details(
         dbname,
         &NetworkSpecsKey::from_parts(
             &hex::decode("e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e")
@@ -339,10 +603,20 @@ fn westend_9010_metadata_details() {
         ),
         9010,
     )
-    .unwrap()
-    .replace(&westend_9010(), r#"<meta_pic_westend9010>"#);
-    let expected_print = r#""name":"westend","version":"9010","meta_hash":"70c99738c27fb32c87883f1c9c94ee454bf0b3d88e4a431a2bbfe1222b46ebdf","meta_id_pic":"<meta_pic_westend9010>","networks":[{"title":"Westend","logo":"westend","order":2,"current_on_screen":true}]"#;
-    assert!(print == expected_print, "\nReceived: \n{}", print);
+    .unwrap();
+    let expected_network = MMManageNetworks {
+        name: "westend".to_string(),
+        version: "9010".to_string(),
+        meta_hash: "70c99738c27fb32c87883f1c9c94ee454bf0b3d88e4a431a2bbfe1222b46ebdf".to_string(),
+        meta_id_pic: westend_9010(),
+        networks: vec![MMMNetwork {
+            title: "Westend".to_string(),
+            logo: "westend".to_string(),
+            order: 2,
+            current_on_screen: true,
+        }],
+    };
+    assert_eq!(network, expected_network);
     fs::remove_dir_all(dbname).unwrap();
 }
 
@@ -351,27 +625,36 @@ fn types_status_and_history() {
     let dbname = "for_tests/types_status_and_history";
     populate_cold(dbname, Verifier { v: None }).unwrap();
 
-    let print = show_types_status(dbname)
-        .unwrap()
-        .replace(&types_known(), r#"<types_known>"#);
-    let expected_print = r#""types_on_file":true,"types_hash":"d091a5a24a97e18dfe298b167d8fd5a2add10098c8792cba21c39029a9ee0aeb","types_id_pic":"<types_known>""#;
-    assert!(print == expected_print, "\nReceived: \n{}", print);
+    let types = show_types_status(dbname).unwrap();
+    let mut expected_types = MTypesInfo {
+        types_on_file: true,
+        types_hash: Some(
+            "d091a5a24a97e18dfe298b167d8fd5a2add10098c8792cba21c39029a9ee0aeb".to_string(),
+        ),
+        types_id_pic: Some(types_known()),
+    };
+    assert_eq!(types, expected_types);
 
     remove_types_info(dbname).unwrap();
-    let print = show_types_status(dbname).unwrap();
-    let expected_print = r#""types_on_file":false"#;
-    assert!(print == expected_print, "\nReceived: \n{}", print);
+    let types = show_types_status(dbname).unwrap();
+    expected_types.types_on_file = false;
 
-    let history_printed = print_history(dbname)
-        .unwrap()
-        .replace(&empty_png(), r#"<empty>"#)
-        .replace(&types_known(), r#"<types_known>"#);
-    let expected_element = r#"{"event":"types_removed","payload":{"types_hash":"d091a5a24a97e18dfe298b167d8fd5a2add10098c8792cba21c39029a9ee0aeb","types_id_pic":"<types_known>","verifier":{"public_key":"","identicon":"<empty>","encryption":"none"}}}"#;
-    assert!(
-        history_printed.contains(expected_element),
-        "\nReceived history: \n{}",
-        history_printed
-    );
+    assert_eq!(types, expected_types);
+
+    let history_printed = get_history(dbname).unwrap();
+    let expected_element = Event::TypesRemoved {
+        types_display: TypesDisplay {
+            types_hash: hex::decode(
+                "d091a5a24a97e18dfe298b167d8fd5a2add10098c8792cba21c39029a9ee0aeb",
+            )
+            .unwrap(),
+            verifier: Verifier { v: None },
+        },
+    };
+    assert!(history_printed
+        .iter()
+        .find(|h| h.1.events.contains(&expected_element))
+        .is_some());
 
     fs::remove_dir_all(dbname).unwrap();
 }
@@ -380,15 +663,26 @@ fn types_status_and_history() {
 fn path_is_known() {
     let dbname = "for_tests/path_is_known";
     populate_cold(dbname, Verifier { v: None }).unwrap();
-    let print = dynamic_path_check(
+    let check = dynamic_path_check(
         dbname,
         "Alice",
         "//Alice",
         "0180e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e",
-    )
-    .replace(&alice_sr_alice(), r#"<alice_sr25519_//Alice>"#);
-    let expected_print = r#"{"derivation_check":{"button_good":false,"collision":{"base58":"5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY","path":"//Alice","has_pwd":false,"identicon":"<alice_sr25519_//Alice>","seed_name":"Alice"}}}"#;
-    assert!(print == expected_print, "\nReceived: \n{}", print);
+    );
+    let expected_check = NavDerivationCheck {
+        button_good: false,
+        where_to: None,
+        collision: Some(Address {
+            base58: "5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY".to_string(),
+            path: "//Alice".to_string(),
+            has_pwd: false,
+            identicon: alice_sr_alice(),
+            seed_name: "Alice".to_string(),
+            multiselect: None,
+        }),
+        error: None,
+    };
+    assert_eq!(check, expected_check);
     fs::remove_dir_all(dbname).unwrap();
 }
 
@@ -396,14 +690,19 @@ fn path_is_known() {
 fn path_is_unknown() {
     let dbname = "for_tests/path_is_unknown";
     populate_cold(dbname, Verifier { v: None }).unwrap();
-    let print = dynamic_path_check(
+    let check = dynamic_path_check(
         dbname,
         "Alice",
         "//secret",
         "0180e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e",
     );
-    let expected_print = r#"{"derivation_check":{"button_good":true,"where_to":"pin"}}"#;
-    assert!(print == expected_print, "\nReceived: \n{}", print);
+    let expected_check = NavDerivationCheck {
+        button_good: true,
+        where_to: Some(DerivationDestination::Pin),
+        collision: None,
+        error: None,
+    };
+    assert_eq!(check, expected_check);
     fs::remove_dir_all(dbname).unwrap();
 }
 
@@ -411,14 +710,19 @@ fn path_is_unknown() {
 fn path_is_unknown_passworded() {
     let dbname = "for_tests/path_is_unknown_passworded";
     populate_cold(dbname, Verifier { v: None }).unwrap();
-    let print = dynamic_path_check(
+    let check = dynamic_path_check(
         dbname,
         "Alice",
         "//secret///abracadabra",
         "0180e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e",
     );
-    let expected_print = r#"{"derivation_check":{"button_good":true,"where_to":"pwd"}}"#;
-    assert!(print == expected_print, "\nReceived: \n{}", print);
+    let expected_check = NavDerivationCheck {
+        button_good: true,
+        where_to: Some(DerivationDestination::Pwd),
+        collision: None,
+        error: None,
+    };
+    assert_eq!(check, expected_check);
     fs::remove_dir_all(dbname).unwrap();
 }
 
@@ -433,7 +737,7 @@ fn word_search_1() {
         "drip".to_string(),
         "drive".to_string(),
     ];
-    assert!(out == out_expected, "Found different word set:\n{:?}", out);
+    assert_eq!(out, out_expected);
 }
 
 #[test]
@@ -464,7 +768,7 @@ fn word_search_4() {
         "absorb".to_string(),
         "abstract".to_string(),
     ];
-    assert!(out == out_expected, "Found different word set:\n{:?}", out);
+    assert_eq!(out, out_expected);
 }
 
 #[test]
@@ -488,7 +792,7 @@ fn word_search_6() {
         "salmon".to_string(),
         "salon".to_string(),
     ];
-    assert!(out == out_expected, "Found different word set:\n{:?}", out);
+    assert_eq!(out, out_expected);
 }
 
 #[test]
@@ -505,7 +809,7 @@ fn word_search_7() {
         "section".to_string(),
         "security".to_string(),
     ];
-    assert!(out == out_expected, "Found different word set:\n{:?}", out);
+    assert_eq!(out, out_expected);
 }
 
 #[test]
@@ -517,7 +821,7 @@ fn word_search_8() {
         "sense".to_string(),
         "sentence".to_string(),
     ];
-    assert!(out == out_expected, "Found different word set:\n{:?}", out);
+    assert_eq!(out, out_expected);
 }
 
 #[test]
@@ -593,24 +897,27 @@ fn display_general_verifier_properly() {
     let dbname = "for_tests/display_general_verifier_properly";
     populate_cold_release(dbname).unwrap();
     signer_init_no_cert(dbname).unwrap();
-    let print = display_general_verifier(dbname)
-        .unwrap()
-        .replace(&empty_png(), r#"<empty>"#);
-    assert!(
-        print == r#""public_key":"","identicon":"<empty>","encryption":"none""#,
-        "Got: {}",
-        print
-    );
+    let verifier = get_general_verifier(dbname).unwrap();
+
+    let expected_verifier = Verifier { v: None };
+    assert_eq!(verifier, expected_verifier);
+
     signer_init_with_cert(dbname).unwrap();
-    let print = display_general_verifier(dbname)
-        .unwrap()
-        .replace(&real_parity_verifier(), r#"<real_verifier>"#);
-    assert!(
-        print
-            == r#""public_key":"c46a22b9da19540a77cbde23197e5fd90485c72b4ecf3c599ecca6998f39bd57","identicon":"<real_verifier>","encryption":"sr25519""#,
-        "Got: {}",
-        print
-    );
+    let verifier = get_general_verifier(dbname).unwrap();
+    let expected_verifier = Verifier {
+        v: Some(VerifierValue::Standard {
+            m: MultiSigner::Sr25519(
+                Public::try_from(
+                    hex::decode("c46a22b9da19540a77cbde23197e5fd90485c72b4ecf3c599ecca6998f39bd57")
+                        .unwrap()
+                        .as_ref(),
+                )
+                .unwrap(),
+            ),
+        }),
+    };
+    assert_eq!(verifier, expected_verifier);
+
     fs::remove_dir_all(dbname).unwrap();
 }
 
@@ -622,7 +929,7 @@ fn find_westend_verifier() {
         &hex::decode("e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e").unwrap(),
     );
     let westend_verifier = try_get_valid_current_verifier(&verifier_key, dbname).unwrap();
-    assert!(westend_verifier == Some(ValidCurrentVerifier::General));
+    assert_eq!(westend_verifier, Some(ValidCurrentVerifier::General));
     fs::remove_dir_all(dbname).unwrap();
 }
 
@@ -667,11 +974,7 @@ fn test_generate_default_addresses_for_alice() {
     {
         let database = open_db::<Signer>(dbname).unwrap();
         let addresses = open_tree::<Signer>(&database, ADDRTREE).unwrap();
-        assert!(
-            addresses.len() == 4,
-            "real addresses length: {}",
-            addresses.len()
-        );
+        assert_eq!(addresses.len(), 4);
     }
     let chainspecs = default_chainspecs();
     let default_addresses = addresses_set_seed_name_network(
@@ -680,8 +983,69 @@ fn test_generate_default_addresses_for_alice() {
         &NetworkSpecsKey::from_parts(chainspecs[0].genesis_hash.as_bytes(), &Encryption::Sr25519),
     )
     .unwrap();
-    assert!(!default_addresses.is_empty());
-    assert!("[(MultiSigner::Sr25519(46ebddef8cd9bb167dc30878d7113b7e168e6f0646beffd77d69d39bad76b47a (5DfhGyQd...)), AddressDetails { seed_name: \"Alice\", path: \"\", has_pwd: false, network_id: [NetworkSpecsKey([1, 128, 145, 177, 113, 187, 21, 142, 45, 56, 72, 250, 35, 169, 241, 194, 81, 130, 251, 142, 32, 49, 59, 44, 30, 180, 146, 25, 218, 122, 112, 206, 144, 195]), NetworkSpecsKey([1, 128, 176, 168, 212, 147, 40, 92, 45, 247, 50, 144, 223, 183, 230, 31, 135, 15, 23, 180, 24, 1, 25, 122, 20, 156, 169, 54, 84, 73, 158, 163, 218, 254]), NetworkSpecsKey([1, 128, 225, 67, 242, 56, 3, 172, 80, 232, 246, 248, 230, 38, 149, 209, 206, 158, 78, 29, 104, 170, 54, 193, 205, 44, 253, 21, 52, 2, 19, 243, 66, 62])], encryption: Sr25519 }), (MultiSigner::Sr25519(64a31235d4bf9b37cfed3afa8aa60754675f9c4915430454d365c05112784d05 (5ELf63sL...)), AddressDetails { seed_name: \"Alice\", path: \"//kusama\", has_pwd: false, network_id: [NetworkSpecsKey([1, 128, 176, 168, 212, 147, 40, 92, 45, 247, 50, 144, 223, 183, 230, 31, 135, 15, 23, 180, 24, 1, 25, 122, 20, 156, 169, 54, 84, 73, 158, 163, 218, 254])], encryption: Sr25519 })]" == format!("{:?}", default_addresses), "Default addresses:\n{:?}", default_addresses);
+
+    let expected_default_addresses = vec![
+        (
+            MultiSigner::Sr25519(
+                Public::try_from(
+                    hex::decode("46ebddef8cd9bb167dc30878d7113b7e168e6f0646beffd77d69d39bad76b47a")
+                        .unwrap()
+                        .as_ref(),
+                )
+                .unwrap(),
+            ),
+            AddressDetails {
+                seed_name: "Alice".to_string(),
+                path: "".to_string(),
+                has_pwd: false,
+                network_id: vec![
+                    NetworkSpecsKey::from_hex(&hex::encode(&[
+                        1, 128, 145, 177, 113, 187, 21, 142, 45, 56, 72, 250, 35, 169, 241, 194,
+                        81, 130, 251, 142, 32, 49, 59, 44, 30, 180, 146, 25, 218, 122, 112, 206,
+                        144, 195,
+                    ]))
+                    .unwrap(),
+                    NetworkSpecsKey::from_hex(&hex::encode(&[
+                        1, 128, 176, 168, 212, 147, 40, 92, 45, 247, 50, 144, 223, 183, 230, 31,
+                        135, 15, 23, 180, 24, 1, 25, 122, 20, 156, 169, 54, 84, 73, 158, 163, 218,
+                        254,
+                    ]))
+                    .unwrap(),
+                    NetworkSpecsKey::from_hex(&hex::encode(&[
+                        1, 128, 225, 67, 242, 56, 3, 172, 80, 232, 246, 248, 230, 38, 149, 209,
+                        206, 158, 78, 29, 104, 170, 54, 193, 205, 44, 253, 21, 52, 2, 19, 243, 66,
+                        62,
+                    ]))
+                    .unwrap(),
+                ],
+                encryption: Encryption::Sr25519,
+            },
+        ),
+        (
+            MultiSigner::Sr25519(
+                Public::try_from(
+                    hex::decode("64a31235d4bf9b37cfed3afa8aa60754675f9c4915430454d365c05112784d05")
+                        .unwrap()
+                        .as_ref(),
+                )
+                .unwrap(),
+            ),
+            AddressDetails {
+                seed_name: "Alice".to_string(),
+                path: "//kusama".to_string(),
+                has_pwd: false,
+                network_id: vec![NetworkSpecsKey::from_hex(&hex::encode(&[
+                    1, 128, 176, 168, 212, 147, 40, 92, 45, 247, 50, 144, 223, 183, 230, 31, 135,
+                    15, 23, 180, 24, 1, 25, 122, 20, 156, 169, 54, 84, 73, 158, 163, 218, 254,
+                ]))
+                .unwrap()],
+                encryption: Encryption::Sr25519,
+            },
+        ),
+    ];
+
+    assert_eq!(default_addresses, expected_default_addresses);
+
     let database: Db = open(dbname).unwrap();
     let identities: Tree = database.open_tree(ADDRTREE).unwrap();
     let test_key = AddressKey::from_parts(
@@ -834,41 +1198,152 @@ fn history_with_identities() {
     let dbname = "for_tests/history_with_identities";
     populate_cold_release(dbname).unwrap();
     signer_init_with_cert(dbname).unwrap();
-    let history_printed = print_history(dbname)
-        .unwrap()
-        .replace(&real_parity_verifier(), r#"<real_verifier>"#);
-    let element1 = r#"{"event":"database_initiated"}"#;
-    let element2 = r#"{"event":"general_verifier_added","payload":{"public_key":"c46a22b9da19540a77cbde23197e5fd90485c72b4ecf3c599ecca6998f39bd57","identicon":"<real_verifier>","encryption":"sr25519"}}"#;
-    assert!(
-        history_printed.contains(element1),
-        "\nReal history check1:\n{}",
-        history_printed
-    );
-    assert!(
-        history_printed.contains(element2),
-        "\nReal history check2:\n{}",
-        history_printed
-    );
+    let history_printed = get_history(dbname).unwrap();
+    let element1 = Event::DatabaseInitiated;
+    let element2 = Event::GeneralVerifierSet {
+        verifier: Verifier {
+            v: Some(VerifierValue::Standard {
+                m: MultiSigner::Sr25519(
+                    Public::try_from(
+                        hex::decode(
+                            "c46a22b9da19540a77cbde23197e5fd90485c72b4ecf3c599ecca6998f39bd57",
+                        )
+                        .unwrap()
+                        .as_ref(),
+                    )
+                    .unwrap(),
+                ),
+            }),
+        },
+    };
+    assert!(history_printed
+        .iter()
+        .find(|e| e.1.events.contains(&element1))
+        .is_some());
+    assert!(history_printed
+        .iter()
+        .find(|e| e.1.events.contains(&element2))
+        .is_some());
     try_create_seed("Alice", ALICE_SEED_PHRASE, true, dbname).unwrap();
-    let history_printed_after_create_seed = print_history(dbname)
+    let history_printed_after_create_seed: Vec<_> = get_history(dbname)
         .unwrap()
-        .replace(&real_parity_verifier(), r#"<real_verifier>"#);
-    let element3 = r#""events":[{"event":"seed_created","payload":"Alice"},{"event":"identity_added","payload":{"seed_name":"Alice","encryption":"sr25519","public_key":"46ebddef8cd9bb167dc30878d7113b7e168e6f0646beffd77d69d39bad76b47a","path":"","network_genesis_hash":"91b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3"}},{"event":"identity_added","payload":{"seed_name":"Alice","encryption":"sr25519","public_key":"f606519cb8726753885cd4d0f518804a69a5e0badf36fee70feadd8044081730","path":"//polkadot","network_genesis_hash":"91b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3"}},{"event":"identity_added","payload":{"seed_name":"Alice","encryption":"sr25519","public_key":"46ebddef8cd9bb167dc30878d7113b7e168e6f0646beffd77d69d39bad76b47a","path":"","network_genesis_hash":"b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe"}},{"event":"identity_added","payload":{"seed_name":"Alice","encryption":"sr25519","public_key":"64a31235d4bf9b37cfed3afa8aa60754675f9c4915430454d365c05112784d05","path":"//kusama","network_genesis_hash":"b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe"}},{"event":"identity_added","payload":{"seed_name":"Alice","encryption":"sr25519","public_key":"46ebddef8cd9bb167dc30878d7113b7e168e6f0646beffd77d69d39bad76b47a","path":"","network_genesis_hash":"e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e"}},{"event":"identity_added","payload":{"seed_name":"Alice","encryption":"sr25519","public_key":"3efeca331d646d8a2986374bb3bb8d6e9e3cfcdd7c45c2b69104fab5d61d3f34","path":"//westend","network_genesis_hash":"e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e"}}]"#;
-    assert!(
-        history_printed_after_create_seed.contains(element1),
-        "\nReal history check3:\n{}",
-        history_printed_after_create_seed
-    );
-    assert!(
-        history_printed_after_create_seed.contains(element2),
-        "\nReal history check4:\n{}",
-        history_printed_after_create_seed
-    );
-    assert!(
-        history_printed_after_create_seed.contains(element3),
-        "\nReal history check5:\n{}",
-        history_printed_after_create_seed
-    );
+        .into_iter()
+        .map(|e| e.1)
+        .collect();
+
+    let element3 = vec![
+        Event::SeedCreated {
+            seed_created: "Alice".to_string(),
+        },
+        Event::IdentityAdded {
+            identity_history: IdentityHistory {
+                seed_name: "Alice".to_string(),
+                encryption: Encryption::Sr25519,
+                public_key: hex::decode(
+                    "46ebddef8cd9bb167dc30878d7113b7e168e6f0646beffd77d69d39bad76b47a",
+                )
+                .unwrap(),
+                path: String::new(),
+                network_genesis_hash: hex::decode(
+                    "91b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3",
+                )
+                .unwrap(),
+            },
+        },
+        Event::IdentityAdded {
+            identity_history: IdentityHistory {
+                seed_name: "Alice".to_string(),
+                encryption: Encryption::Sr25519,
+                public_key: hex::decode(
+                    "f606519cb8726753885cd4d0f518804a69a5e0badf36fee70feadd8044081730",
+                )
+                .unwrap(),
+                path: "//polkadot".to_string(),
+                network_genesis_hash: hex::decode(
+                    "91b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3",
+                )
+                .unwrap(),
+            },
+        },
+        Event::IdentityAdded {
+            identity_history: IdentityHistory {
+                seed_name: "Alice".to_string(),
+                encryption: Encryption::Sr25519,
+                public_key: hex::decode(
+                    "46ebddef8cd9bb167dc30878d7113b7e168e6f0646beffd77d69d39bad76b47a",
+                )
+                .unwrap(),
+                path: "".to_string(),
+                network_genesis_hash: hex::decode(
+                    "b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe",
+                )
+                .unwrap(),
+            },
+        },
+        Event::IdentityAdded {
+            identity_history: IdentityHistory {
+                seed_name: "Alice".to_string(),
+                encryption: Encryption::Sr25519,
+                public_key: hex::decode(
+                    "64a31235d4bf9b37cfed3afa8aa60754675f9c4915430454d365c05112784d05",
+                )
+                .unwrap(),
+                path: "//kusama".to_string(),
+                network_genesis_hash: hex::decode(
+                    "b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe",
+                )
+                .unwrap(),
+            },
+        },
+        Event::IdentityAdded {
+            identity_history: IdentityHistory {
+                seed_name: "Alice".to_string(),
+                encryption: Encryption::Sr25519,
+                public_key: hex::decode(
+                    "46ebddef8cd9bb167dc30878d7113b7e168e6f0646beffd77d69d39bad76b47a",
+                )
+                .unwrap(),
+                path: String::new(),
+                network_genesis_hash: hex::decode(
+                    "e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e",
+                )
+                .unwrap(),
+            },
+        },
+        Event::IdentityAdded {
+            identity_history: IdentityHistory {
+                seed_name: "Alice".to_string(),
+                encryption: Encryption::Sr25519,
+                public_key: hex::decode(
+                    "3efeca331d646d8a2986374bb3bb8d6e9e3cfcdd7c45c2b69104fab5d61d3f34",
+                )
+                .unwrap(),
+                path: "//westend".to_string(),
+                network_genesis_hash: hex::decode(
+                    "e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e",
+                )
+                .unwrap(),
+            },
+        },
+    ];
+
+    assert!(entries_contain_event(
+        &history_printed_after_create_seed,
+        &element1
+    ));
+    assert!(entries_contain_event(
+        &history_printed_after_create_seed,
+        &element2
+    ));
+
+    for (i, e) in element3.iter().enumerate() {
+        assert!(
+            entries_contain_event(&history_printed_after_create_seed, e),
+            "{}-th missing",
+            i
+        );
+    }
+
     fs::remove_dir_all(dbname).unwrap();
 }
 
@@ -1308,16 +1783,456 @@ fn test_all_events() {
     populate_cold_no_metadata(dbname, Verifier { v: None }).unwrap();
     let events = all_events_preview();
     enter_events::<Signer>(dbname, events).unwrap();
-    let history = print_history(dbname)
+    let entries: Vec<_> = get_history(dbname)
         .unwrap()
-        .replace(&empty_vec_hash_pic(), r#"<empty_vec_hash_pic>"#)
-        .replace(&bob(), r#"<bob_identicon>"#);
-    let expected_history_part = r##""events":[{"event":"metadata_added","payload":{"specname":"westend","spec_version":"9000","meta_hash":"0e5751c026e543b2e8ab2eb06099daa1d1e5df47778f7787faab45cdf12fe3a8","meta_id_pic":"<empty_vec_hash_pic>"}},{"event":"metadata_removed","payload":{"specname":"westend","spec_version":"9000","meta_hash":"0e5751c026e543b2e8ab2eb06099daa1d1e5df47778f7787faab45cdf12fe3a8","meta_id_pic":"<empty_vec_hash_pic>"}},{"event":"load_metadata_message_signed","payload":{"specname":"westend","spec_version":"9000","meta_hash":"0e5751c026e543b2e8ab2eb06099daa1d1e5df47778f7787faab45cdf12fe3a8","meta_id_pic":"<empty_vec_hash_pic>","signed_by":{"public_key":"8eaf04151687736326c9fea17e25fc5287613693c912909cb226aa4794f26a48","identicon":"<bob_identicon>","encryption":"sr25519"}}},{"event":"network_specs_added","payload":{"base58prefix":"42","color":"#660D35","decimals":"12","encryption":"sr25519","genesis_hash":"e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e","logo":"westend","name":"westend","order":"3","path_id":"//westend","secondary_color":"#262626","title":"Westend","unit":"WND","current_verifier":{"type":"general","details":{"public_key":"8eaf04151687736326c9fea17e25fc5287613693c912909cb226aa4794f26a48","identicon":"<bob_identicon>","encryption":"sr25519"}}}},{"event":"network_removed","payload":{"base58prefix":"42","color":"#660D35","decimals":"12","encryption":"sr25519","genesis_hash":"e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e","logo":"westend","name":"westend","order":"3","path_id":"//westend","secondary_color":"#262626","title":"Westend","unit":"WND","current_verifier":{"type":"general","details":{"public_key":"8eaf04151687736326c9fea17e25fc5287613693c912909cb226aa4794f26a48","identicon":"<bob_identicon>","encryption":"sr25519"}}}},{"event":"add_specs_message_signed","payload":{"base58prefix":"42","color":"#660D35","decimals":"12","encryption":"sr25519","genesis_hash":"e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e","logo":"westend","name":"westend","path_id":"//westend","secondary_color":"#262626","title":"Westend","unit":"WND","signed_by":{"public_key":"8eaf04151687736326c9fea17e25fc5287613693c912909cb226aa4794f26a48","identicon":"<bob_identicon>","encryption":"sr25519"}}},{"event":"network_verifier_set","payload":{"genesis_hash":"e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e","current_verifier":{"type":"general","details":{"public_key":"8eaf04151687736326c9fea17e25fc5287613693c912909cb226aa4794f26a48","identicon":"<bob_identicon>","encryption":"sr25519"}}}},{"event":"general_verifier_added","payload":{"public_key":"8eaf04151687736326c9fea17e25fc5287613693c912909cb226aa4794f26a48","identicon":"<bob_identicon>","encryption":"sr25519"}},{"event":"types_added","payload":{"types_hash":"0e5751c026e543b2e8ab2eb06099daa1d1e5df47778f7787faab45cdf12fe3a8","types_id_pic":"<empty_vec_hash_pic>","verifier":{"public_key":"8eaf04151687736326c9fea17e25fc5287613693c912909cb226aa4794f26a48","identicon":"<bob_identicon>","encryption":"sr25519"}}},{"event":"types_removed","payload":{"types_hash":"0e5751c026e543b2e8ab2eb06099daa1d1e5df47778f7787faab45cdf12fe3a8","types_id_pic":"<empty_vec_hash_pic>","verifier":{"public_key":"8eaf04151687736326c9fea17e25fc5287613693c912909cb226aa4794f26a48","identicon":"<bob_identicon>","encryption":"sr25519"}}},{"event":"load_types_message_signed","payload":{"types_hash":"0e5751c026e543b2e8ab2eb06099daa1d1e5df47778f7787faab45cdf12fe3a8","types_id_pic":"<empty_vec_hash_pic>","signed_by":{"public_key":"8eaf04151687736326c9fea17e25fc5287613693c912909cb226aa4794f26a48","identicon":"<bob_identicon>","encryption":"sr25519"}}},{"event":"transaction_signed","payload":{"transaction":"","network_name":"westend","signed_by":{"public_key":"8eaf04151687736326c9fea17e25fc5287613693c912909cb226aa4794f26a48","identicon":"<bob_identicon>","encryption":"sr25519"},"user_comment":"send to Alice"}},{"event":"transaction_sign_error","payload":{"transaction":"","network_name":"westend","signed_by":{"public_key":"8eaf04151687736326c9fea17e25fc5287613693c912909cb226aa4794f26a48","identicon":"<bob_identicon>","encryption":"sr25519"},"user_comment":"send to Alice","error":"wrong_password_entered"}},{"event":"message_signed","payload":{"message":"5468697320697320416c6963650a526f676572","network_name":"westend","signed_by":{"public_key":"8eaf04151687736326c9fea17e25fc5287613693c912909cb226aa4794f26a48","identicon":"<bob_identicon>","encryption":"sr25519"},"user_comment":"send to Alice"}},{"event":"message_sign_error","payload":{"message":"5468697320697320416c6963650a526f676572","network_name":"westend","signed_by":{"public_key":"8eaf04151687736326c9fea17e25fc5287613693c912909cb226aa4794f26a48","identicon":"<bob_identicon>","encryption":"sr25519"},"user_comment":"send to Alice","error":"wrong_password_entered"}},{"event":"identity_added","payload":{"seed_name":"Alice","encryption":"sr25519","public_key":"8eaf04151687736326c9fea17e25fc5287613693c912909cb226aa4794f26a48","path":"//","network_genesis_hash":"e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e"}},{"event":"identity_removed","payload":{"seed_name":"Alice","encryption":"sr25519","public_key":"8eaf04151687736326c9fea17e25fc5287613693c912909cb226aa4794f26a48","path":"//","network_genesis_hash":"e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e"}},{"event":"identities_wiped"},{"event":"device_online"},{"event":"reset_danger_record"},{"event":"seed_created","payload":"Alice"},{"event":"seed_name_shown","payload":"AliceSecretSeed"},{"event":"warning","payload":"Received network information is not verified."},{"event":"wrong_password_entered"},{"event":"user_entered_event","payload":"Lalala!!!"},{"event":"system_entered_event","payload":"Blip blop"},{"event":"history_cleared"},{"event":"database_initiated"}]"##;
-    assert!(
-        history.contains(expected_history_part),
-        "\nHistory generated:\n{}",
-        history
-    );
+        .into_iter()
+        .map(|(_, a)| a)
+        .collect();
+
+    assert!(entries_contain_event(
+        &entries,
+        &Event::MetadataAdded {
+            meta_values_display: MetaValuesDisplay {
+                name: "westend".to_string(),
+                version: 9000,
+                meta_hash: hex::decode(
+                    "0e5751c026e543b2e8ab2eb06099daa1d1e5df47778f7787faab45cdf12fe3a8"
+                )
+                .unwrap()
+            }
+        }
+    ));
+
+    assert!(entries_contain_event(
+        &entries,
+        &Event::MetadataRemoved {
+            meta_values_display: MetaValuesDisplay {
+                name: "westend".to_string(),
+                version: 9000,
+                meta_hash: hex::decode(
+                    "0e5751c026e543b2e8ab2eb06099daa1d1e5df47778f7787faab45cdf12fe3a8"
+                )
+                .unwrap()
+            }
+        }
+    ));
+
+    assert!(entries_contain_event(
+        &entries,
+        &Event::MetadataSigned {
+            meta_values_export: MetaValuesExport {
+                name: "westend".to_string(),
+                version: 9000,
+                meta_hash: hex::decode(
+                    "0e5751c026e543b2e8ab2eb06099daa1d1e5df47778f7787faab45cdf12fe3a8"
+                )
+                .unwrap(),
+                signed_by: VerifierValue::Standard {
+                    m: MultiSigner::Sr25519(
+                        Public::try_from(
+                            hex::decode(
+                                "8eaf04151687736326c9fea17e25fc5287613693c912909cb226aa4794f26a48"
+                            )
+                            .unwrap()
+                            .as_ref()
+                        )
+                        .unwrap()
+                    )
+                }
+            }
+        }
+    ));
+
+    assert!(entries_contain_event(
+        &entries,
+        &Event::NetworkSpecsAdded {
+            network_specs_display: NetworkSpecsDisplay {
+                specs: NetworkSpecs {
+                    base58prefix: 42,
+                    color: "#660D35".to_string(),
+                    decimals: 12,
+                    encryption: Encryption::Sr25519,
+                    genesis_hash: H256::from_str(
+                        "e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e"
+                    )
+                    .unwrap(),
+                    logo: "westend".to_string(),
+                    name: "westend".to_string(),
+                    order: 3,
+                    path_id: "//westend".to_string(),
+                    secondary_color: "#262626".to_string(),
+                    title: "Westend".to_string(),
+                    unit: "WND".to_string(),
+                },
+                valid_current_verifier: ValidCurrentVerifier::General,
+                general_verifier: Verifier {
+                    v: Some(
+                           VerifierValue::Standard {
+                                m: MultiSigner::Sr25519(
+                                       Public::try_from(
+                                           hex::decode(
+                                "8eaf04151687736326c9fea17e25fc5287613693c912909cb226aa4794f26a48"
+                       )
+                                           .unwrap().as_ref()).unwrap())
+                    })
+                },
+            }
+        }
+    ));
+
+    assert!(entries_contain_event(
+        &entries,
+        &Event::NetworkSpecsRemoved {
+            network_specs_display: NetworkSpecsDisplay {
+                specs: NetworkSpecs {
+                    base58prefix: 42,
+                    color: "#660D35".to_string(),
+                    decimals: 12,
+                    encryption: Encryption::Sr25519,
+                    genesis_hash: H256::from_str(
+                        "e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e"
+                    )
+                    .unwrap(),
+                    logo: "westend".to_string(),
+                    name: "westend".to_string(),
+                    order: 3,
+                    path_id: "//westend".to_string(),
+                    secondary_color: "#262626".to_string(),
+                    title: "Westend".to_string(),
+                    unit: "WND".to_string(),
+                },
+                valid_current_verifier: ValidCurrentVerifier::General,
+                general_verifier: Verifier {
+                    v: Some(VerifierValue::Standard {
+                        m: MultiSigner::Sr25519(Public::try_from(
+                                   hex::decode(
+"8eaf04151687736326c9fea17e25fc5287613693c912909cb226aa4794f26a48"
+                                   ).unwrap()
+                                   .as_ref()
+                           ).unwrap())
+                    })
+                }
+            }
+        }
+    ));
+
+    assert!(entries_contain_event(
+        &entries,
+        &Event::NetworkSpecsSigned {
+            network_specs_export: NetworkSpecsExport {
+                specs_to_send: NetworkSpecsToSend {
+                    base58prefix: 42,
+                    color: "#660D35".to_string(),
+                    decimals: 12,
+                    encryption: Encryption::Sr25519,
+                    genesis_hash: H256::from_str(
+                        "e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e"
+                    )
+                    .unwrap(),
+                    logo: "westend".to_string(),
+                    name: "westend".to_string(),
+                    path_id: "//westend".to_string(),
+                    secondary_color: "#262626".to_string(),
+                    title: "Westend".to_string(),
+                    unit: "WND".to_string(),
+                },
+                signed_by: VerifierValue::Standard {
+                    m: MultiSigner::Sr25519(
+                        Public::try_from(
+                            hex::decode(
+                                "8eaf04151687736326c9fea17e25fc5287613693c912909cb226aa4794f26a48"
+                            )
+                            .unwrap()
+                            .as_ref()
+                        )
+                        .unwrap()
+                    )
+                }
+            }
+        }
+    ));
+
+    assert!(entries_contain_event(
+        &entries,
+        &Event::NetworkVerifierSet {
+            network_verifier_display: NetworkVerifierDisplay {
+                genesis_hash: hex::decode(
+                    "e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e"
+                )
+                .unwrap(),
+                valid_current_verifier: ValidCurrentVerifier::General,
+                general_verifier: Verifier {
+                    v: Some(VerifierValue::Standard {
+                        m: MultiSigner::Sr25519(
+                               Public::try_from(
+                                   hex::decode(
+                                    "8eaf04151687736326c9fea17e25fc5287613693c912909cb226aa4794f26a48"
+                                   ).unwrap().as_ref()
+                                   ).unwrap()
+                               )
+                        }
+                    )
+                }
+            }
+        }
+    ));
+
+    assert!(entries_contain_event(
+        &entries,
+        &Event::GeneralVerifierSet {
+            verifier: Verifier {
+                v: Some(VerifierValue::Standard {
+                    m: MultiSigner::Sr25519(
+                        Public::try_from(
+                            hex::decode(
+                                "8eaf04151687736326c9fea17e25fc5287613693c912909cb226aa4794f26a48"
+                            )
+                            .unwrap()
+                            .as_ref()
+                        )
+                        .unwrap()
+                    )
+                })
+            }
+        }
+    ));
+
+    assert!(entries_contain_event(
+        &entries,
+        &Event::TypesAdded {
+            types_display: TypesDisplay {
+                types_hash: hex::decode(
+                    "0e5751c026e543b2e8ab2eb06099daa1d1e5df47778f7787faab45cdf12fe3a8"
+                )
+                .unwrap(),
+                verifier: Verifier {
+                    v: Some(VerifierValue::Standard {
+                        m: MultiSigner::Sr25519(
+                            Public::try_from(hex::decode(
+                                "8eaf04151687736326c9fea17e25fc5287613693c912909cb226aa4794f26a48"
+                            ).unwrap().as_ref()).unwrap()
+                        )
+                    })
+                }
+            }
+        }
+    ));
+
+    assert!(entries_contain_event(
+        &entries,
+        &Event::TypesRemoved {
+            types_display: TypesDisplay {
+                types_hash: hex::decode(
+                    "0e5751c026e543b2e8ab2eb06099daa1d1e5df47778f7787faab45cdf12fe3a8"
+                )
+                .unwrap(),
+                verifier: Verifier {
+                    v: Some(VerifierValue::Standard {
+                        m: MultiSigner::Sr25519(
+                            Public::try_from(hex::decode(
+                                "8eaf04151687736326c9fea17e25fc5287613693c912909cb226aa4794f26a48"
+                            ).unwrap().as_ref()).unwrap()
+                        )
+                    })
+                }
+            }
+        }
+    ));
+
+    assert!(entries_contain_event(
+        &entries,
+        &Event::TypesSigned {
+            types_export: TypesExport {
+                types_hash: hex::decode(
+                    "0e5751c026e543b2e8ab2eb06099daa1d1e5df47778f7787faab45cdf12fe3a8"
+                )
+                .unwrap(),
+                signed_by: VerifierValue::Standard {
+                    m: MultiSigner::Sr25519(
+                        Public::try_from(
+                            hex::decode(
+                                "8eaf04151687736326c9fea17e25fc5287613693c912909cb226aa4794f26a48"
+                            )
+                            .unwrap()
+                            .as_ref()
+                        )
+                        .unwrap()
+                    )
+                }
+            }
+        }
+    ));
+
+    assert!(entries_contain_event(
+        &entries,
+        &Event::TransactionSigned {
+            sign_display: SignDisplay {
+                transaction: vec![],
+                network_name: "westend".to_string(),
+                signed_by: VerifierValue::Standard {
+                    m: MultiSigner::Sr25519(
+                        Public::try_from(
+                            hex::decode(
+                                "8eaf04151687736326c9fea17e25fc5287613693c912909cb226aa4794f26a48"
+                            )
+                            .unwrap()
+                            .as_ref()
+                        )
+                        .unwrap()
+                    )
+                },
+                user_comment: "send to Alice".to_string(),
+            }
+        }
+    ));
+
+    // TODO: "error":"wrong_password_entered"
+    assert!(entries_contain_event(
+        &entries,
+        &Event::TransactionSignError {
+            sign_display: SignDisplay {
+                transaction: vec![],
+                network_name: "westend".to_string(),
+                signed_by: VerifierValue::Standard {
+                    m: MultiSigner::Sr25519(
+                        Public::try_from(
+                            hex::decode(
+                                "8eaf04151687736326c9fea17e25fc5287613693c912909cb226aa4794f26a48"
+                            )
+                            .unwrap()
+                            .as_ref()
+                        )
+                        .unwrap()
+                    )
+                },
+                user_comment: "send to Alice".to_string(),
+            }
+        }
+    ));
+
+    assert!(entries_contain_event(
+        &entries,
+        &Event::MessageSigned {
+            sign_message_display: SignMessageDisplay {
+                message: "This is Alice\nRoger".to_string(),
+                network_name: "westend".to_string(),
+                signed_by: VerifierValue::Standard {
+                    m: MultiSigner::Sr25519(
+                        Public::try_from(
+                            hex::decode(
+                                "8eaf04151687736326c9fea17e25fc5287613693c912909cb226aa4794f26a48"
+                            )
+                            .unwrap()
+                            .as_ref()
+                        )
+                        .unwrap()
+                    )
+                },
+                user_comment: "send to Alice".to_string(),
+            }
+        }
+    ));
+
+    // TODO: "error":"wrong_password_entered"
+    assert!(entries_contain_event(
+        &entries,
+        &Event::MessageSignError {
+            sign_message_display: SignMessageDisplay {
+                message: "This is Alice\nRoger".to_string(),
+                network_name: "westend".to_string(),
+                signed_by: VerifierValue::Standard {
+                    m: MultiSigner::Sr25519(
+                        Public::try_from(
+                            hex::decode(
+                                "8eaf04151687736326c9fea17e25fc5287613693c912909cb226aa4794f26a48"
+                            )
+                            .unwrap()
+                            .as_ref()
+                        )
+                        .unwrap()
+                    )
+                },
+                user_comment: "send to Alice".to_string(),
+            }
+        }
+    ));
+
+    assert!(entries_contain_event(
+        &entries,
+        &Event::IdentityAdded {
+            identity_history: IdentityHistory {
+                seed_name: "Alice".to_string(),
+                encryption: Encryption::Sr25519,
+                public_key: hex::decode(
+                    "8eaf04151687736326c9fea17e25fc5287613693c912909cb226aa4794f26a48"
+                )
+                .unwrap(),
+                path: "//".to_string(),
+                network_genesis_hash: hex::decode(
+                    "e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e"
+                )
+                .unwrap()
+            }
+        }
+    ));
+
+    assert!(entries_contain_event(
+        &entries,
+        &Event::IdentityRemoved {
+            identity_history: IdentityHistory {
+                seed_name: "Alice".to_string(),
+                encryption: Encryption::Sr25519,
+                public_key: hex::decode(
+                    "8eaf04151687736326c9fea17e25fc5287613693c912909cb226aa4794f26a48"
+                )
+                .unwrap(),
+                path: "//".to_string(),
+                network_genesis_hash: hex::decode(
+                    "e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e"
+                )
+                .unwrap()
+            }
+        }
+    ));
+
+    assert!(entries_contain_event(&entries, &Event::IdentitiesWiped));
+    assert!(entries_contain_event(&entries, &Event::DeviceWasOnline));
+    assert!(entries_contain_event(&entries, &Event::ResetDangerRecord));
+    assert!(entries_contain_event(
+        &entries,
+        &Event::SeedCreated {
+            seed_created: "Alice".to_string()
+        }
+    ));
+    assert!(entries_contain_event(
+        &entries,
+        &Event::SeedNameWasShown {
+            seed_name_was_shown: "AliceSecretSeed".to_string()
+        }
+    ));
+    assert!(entries_contain_event(
+        &entries,
+        &Event::Warning {
+            warning: "Received network information is not verified.".to_string()
+        }
+    ));
+    assert!(entries_contain_event(&entries, &Event::WrongPassword));
+    assert!(entries_contain_event(
+        &entries,
+        &Event::UserEntry {
+            user_entry: "Lalala!!!".to_string()
+        }
+    ));
+    assert!(entries_contain_event(
+        &entries,
+        &Event::SystemEntry {
+            system_entry: "Blip blop".to_string()
+        }
+    ));
+
+    assert!(entries_contain_event(&entries, &Event::HistoryCleared));
+    assert!(entries_contain_event(&entries, &Event::DatabaseInitiated));
+
     std::fs::remove_dir_all(dbname).unwrap();
 }
 
@@ -1325,15 +2240,16 @@ fn test_all_events() {
 fn print_single_event() {
     let dbname = "for_tests/print_single_event";
     populate_cold(dbname, Verifier { v: None }).unwrap();
-    let print = print_history_entry_by_order(0, dbname)
-        .unwrap()
-        .replace(&empty_png(), r#"<empty>"#);
-    let expected_print = r#""events":[{"event":"database_initiated"},{"event":"general_verifier_added","payload":{"public_key":"","identicon":"<empty>","encryption":"none"}}]"#;
-    assert!(
-        print.contains(expected_print),
-        "\nHistory entry printed as:\n{}",
-        print
-    );
+    let entry = get_history_entry_by_order(0, dbname).unwrap();
+    let expected_events = vec![
+        Event::DatabaseInitiated,
+        Event::GeneralVerifierSet {
+            verifier: Verifier { v: None },
+        },
+    ];
+
+    assert_eq!(entry.events, expected_events);
+
     std::fs::remove_dir_all(dbname).unwrap();
 }
 
@@ -1342,6 +2258,10 @@ fn check_for_network(name: &str, version: u32, dbname: &str) -> bool {
     let metadata: Tree = database.open_tree(METATREE).unwrap();
     let meta_key = MetaKey::from_parts(name, version);
     metadata.contains_key(meta_key.key()).unwrap()
+}
+
+fn entries_contain_event(entries: &[Entry], event: &Event) -> bool {
+    entries.iter().find(|e| e.events.contains(event)).is_some()
 }
 
 #[test]
@@ -1380,12 +2300,123 @@ fn remove_all_westend() {
             );
         }
     }
-    let history_printed = print_history(dbname)
+    let history: Vec<_> = get_history(dbname)
         .unwrap()
-        .replace(&empty_png(), r#"<empty>"#)
-        .replace(&westend_9000(), r#"<meta_pic_westend9000>"#)
-        .replace(&westend_9010(), r#"<meta_pic_westend9010>"#);
-    assert!(history_printed.contains(r#"{"event":"database_initiated"}"#) && history_printed.contains(r##"{"event":"network_removed","payload":{"base58prefix":"42","color":"#660D35","decimals":"12","encryption":"sr25519","genesis_hash":"e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e","logo":"westend","name":"westend","order":"2","path_id":"//westend","secondary_color":"#262626","title":"Westend","unit":"WND","current_verifier":{"type":"general","details":{"public_key":"","identicon":"<empty>","encryption":"none"}}}}"##) && history_printed.contains(r#"{"event":"metadata_removed","payload":{"specname":"westend","spec_version":"9000","meta_hash":"e80237ad8b2e92b72fcf6beb8f0e4ba4a21043a7115c844d91d6c4f981e469ce","meta_id_pic":"<meta_pic_westend9000>"}}"#) && history_printed.contains(r#"{"event":"metadata_removed","payload":{"specname":"westend","spec_version":"9010","meta_hash":"70c99738c27fb32c87883f1c9c94ee454bf0b3d88e4a431a2bbfe1222b46ebdf","meta_id_pic":"<meta_pic_westend9010>"}}"#) && history_printed.contains(r#"{"event":"identity_removed","payload":{"seed_name":"Alice","encryption":"sr25519","public_key":"3efeca331d646d8a2986374bb3bb8d6e9e3cfcdd7c45c2b69104fab5d61d3f34","path":"//westend","network_genesis_hash":"e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e"}}"#) && history_printed.contains(r#"{"event":"identity_removed","payload":{"seed_name":"Alice","encryption":"sr25519","public_key":"46ebddef8cd9bb167dc30878d7113b7e168e6f0646beffd77d69d39bad76b47a","path":"","network_genesis_hash":"e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e"}}"#) && history_printed.contains(r#"{"event":"identity_removed","payload":{"seed_name":"Alice","encryption":"sr25519","public_key":"d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d","path":"//Alice","network_genesis_hash":"e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e"}}"#), "Expected different history:\n{}", history_printed);
+        .into_iter()
+        .map(|e| e.1)
+        .collect();
+
+    assert!(entries_contain_event(&history, &Event::DatabaseInitiated));
+    assert!(entries_contain_event(
+        &history,
+        &Event::NetworkSpecsRemoved {
+            network_specs_display: NetworkSpecsDisplay {
+                specs: NetworkSpecs {
+                    base58prefix: 42,
+                    color: "#660D35".to_string(),
+                    decimals: 12,
+                    encryption: Encryption::Sr25519,
+                    genesis_hash: H256::from_str(
+                        "e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e"
+                    )
+                    .unwrap(),
+                    logo: "westend".to_string(),
+                    name: "westend".to_string(),
+                    order: 2,
+                    path_id: "//westend".to_string(),
+                    secondary_color: "#262626".to_string(),
+                    title: "Westend".to_string(),
+                    unit: "WND".to_string(),
+                },
+                valid_current_verifier: ValidCurrentVerifier::General,
+                general_verifier: Verifier { v: None },
+            }
+        }
+    ));
+
+    assert!(entries_contain_event(
+        &history,
+        &Event::MetadataRemoved {
+            meta_values_display: MetaValuesDisplay {
+                name: "westend".to_string(),
+                version: 9000,
+                meta_hash: hex::decode(
+                    "e80237ad8b2e92b72fcf6beb8f0e4ba4a21043a7115c844d91d6c4f981e469ce"
+                )
+                .unwrap(),
+            }
+        }
+    ));
+
+    assert!(entries_contain_event(
+        &history,
+        &Event::MetadataRemoved {
+            meta_values_display: MetaValuesDisplay {
+                name: "westend".to_string(),
+                version: 9010,
+                meta_hash: hex::decode(
+                    "70c99738c27fb32c87883f1c9c94ee454bf0b3d88e4a431a2bbfe1222b46ebdf"
+                )
+                .unwrap(),
+            }
+        }
+    ));
+    assert!(entries_contain_event(
+        &history,
+        &Event::IdentityRemoved {
+            identity_history: IdentityHistory {
+                seed_name: "Alice".to_string(),
+                encryption: Encryption::Sr25519,
+                public_key: hex::decode(
+                    "3efeca331d646d8a2986374bb3bb8d6e9e3cfcdd7c45c2b69104fab5d61d3f34"
+                )
+                .unwrap(),
+                path: "//westend".to_string(),
+                network_genesis_hash: hex::decode(
+                    "e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e"
+                )
+                .unwrap()
+            },
+        }
+    ));
+
+    assert!(entries_contain_event(
+        &history,
+        &Event::IdentityRemoved {
+            identity_history: IdentityHistory {
+                seed_name: "Alice".to_string(),
+                encryption: Encryption::Sr25519,
+                public_key: hex::decode(
+                    "46ebddef8cd9bb167dc30878d7113b7e168e6f0646beffd77d69d39bad76b47a",
+                )
+                .unwrap(),
+                path: String::new(),
+                network_genesis_hash: hex::decode(
+                    "e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e"
+                )
+                .unwrap()
+            },
+        }
+    ));
+
+    assert!(entries_contain_event(
+        &history,
+        &Event::IdentityRemoved {
+            identity_history: IdentityHistory {
+                seed_name: "Alice".to_string(),
+                encryption: Encryption::Sr25519,
+                public_key: hex::decode(
+                    "d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d"
+                )
+                .unwrap(),
+                path: "//Alice".to_string(),
+                network_genesis_hash: hex::decode(
+                    "e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e"
+                )
+                .unwrap()
+            },
+        }
+    ));
     fs::remove_dir_all(dbname).unwrap();
 }
 

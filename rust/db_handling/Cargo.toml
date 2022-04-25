@@ -24,6 +24,9 @@ tiny-bip39 = {version = "0.8.0", default-features = false, optional = true}
 zeroize = {version = "1.5.3", optional = true}
 log = { version = "0.4" }
 
+[dev-dependencies]
+pretty_assertions = { version = "1.2" }
+
 [features]
 default = ["test"]
 active = [
