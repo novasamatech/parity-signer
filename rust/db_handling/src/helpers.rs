@@ -16,12 +16,7 @@ use definitions::{
     keyring::{MetaKeyPrefix, NetworkSpecsKey, VerifierKey},
     network_specs::{CurrentVerifier, NetworkSpecs, ValidCurrentVerifier, Verifier},
 };
-use definitions::{
-    error::ErrorSource,
-    keyring::MetaKey,
-    metadata::MetaValues,
-    types::TypeEntry,
-};
+use definitions::{error::ErrorSource, keyring::MetaKey, metadata::MetaValues, types::TypeEntry};
 #[cfg(any(feature = "active", feature = "signer"))]
 use definitions::{keyring::AddressKey, users::AddressDetails};
 

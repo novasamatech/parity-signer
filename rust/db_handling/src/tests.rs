@@ -729,7 +729,7 @@ fn test_derive() {
     let only_one_network = vec![network_id_0];
 
     try_create_seed(seed_name, ALICE_SEED_PHRASE, true, dbname).unwrap();
-    let (adds1, events1) = {
+    let prep_data_1 = {
         create_address::<Signer>(
             dbname,
             &Vec::new(),
@@ -741,11 +741,11 @@ fn test_derive() {
         .unwrap()
     };
     TrDbCold::new()
-        .set_addresses(upd_id_batch(Batch::default(), adds1)) // modify addresses
-        .set_history(events_to_batch::<Signer>(dbname, events1).unwrap()) // add corresponding history
+        .set_addresses(upd_id_batch(Batch::default(), prep_data_1.address_prep)) // modify addresses
+        .set_history(events_to_batch::<Signer>(dbname, prep_data_1.history_prep).unwrap()) // add corresponding history
         .apply::<Signer>(dbname)
         .unwrap();
-    let (adds2, events2) = {
+    let prep_data_2 = {
         create_address::<Signer>(
             dbname,
             &Vec::new(),
@@ -757,11 +757,11 @@ fn test_derive() {
         .unwrap()
     };
     TrDbCold::new()
-        .set_addresses(upd_id_batch(Batch::default(), adds2)) // modify addresses
-        .set_history(events_to_batch::<Signer>(dbname, events2).unwrap()) // add corresponding history
+        .set_addresses(upd_id_batch(Batch::default(), prep_data_2.address_prep)) // modify addresses
+        .set_history(events_to_batch::<Signer>(dbname, prep_data_2.history_prep).unwrap()) // add corresponding history
         .apply::<Signer>(dbname)
         .unwrap();
-    let (adds3, events3) = {
+    let prep_data_3 = {
         create_address::<Signer>(
             dbname,
             &Vec::new(),
@@ -773,8 +773,8 @@ fn test_derive() {
         .unwrap()
     };
     TrDbCold::new()
-        .set_addresses(upd_id_batch(Batch::default(), adds3)) // modify addresses
-        .set_history(events_to_batch::<Signer>(dbname, events3).unwrap()) // add corresponding history
+        .set_addresses(upd_id_batch(Batch::default(), prep_data_3.address_prep)) // modify addresses
+        .set_history(events_to_batch::<Signer>(dbname, prep_data_3.history_prep).unwrap()) // add corresponding history
         .apply::<Signer>(dbname)
         .unwrap();
     let identities = get_addresses_by_seed_name(dbname, seed_name).unwrap();
