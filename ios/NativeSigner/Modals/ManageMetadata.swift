@@ -59,7 +59,7 @@ struct ManageMetadata: View {
             }
         })
         .alert(isPresented: $removeMetadataAlert, content: {
-            Alert(title: Text("Remove metadata?"), message: Text("This metadata will be removed for all networks"), primaryButton: .cancel(Text("Cancel")), secondaryButton: .destructive(Text("Remove metadata"), action: {data.pushButton(buttonID: .RemoveMetadata)}))
+            Alert(title: Text("Remove metadata?"), message: Text("This metadata will be removed for all networks"), primaryButton: .cancel(Text("Cancel")), secondaryButton: .destructive(Text("Remove metadata"), action: {data.pushButton(action: .removeMetadata)}))
         })
     }
 }

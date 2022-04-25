@@ -27,7 +27,7 @@ struct MainScreenContainer: View {
                 .gesture(
                     DragGesture().updating($dragOffset, body: { (value, state, transaction) in
                         if value.startLocation.x < 20 && value.translation.width > 100 {
-                            data.pushButton(buttonID: .GoBack)
+                            data.pushButton(action: .goBack)
                         }
                     })
                 )
@@ -42,7 +42,7 @@ struct MainScreenContainer: View {
             .gesture(
                 DragGesture().onEnded{drag in
                     if drag.translation.width < -20 {
-                        data.pushButton(buttonID: .GoBack)
+                        data.pushButton(action: .goBack)
                     }
                 }
             )

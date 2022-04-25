@@ -76,3 +76,30 @@ extension String {
         return String(decoding: Data(base64Encoded: self) ?? Data(), as: UTF8.self)
     }
 }
+
+extension TransactionAuthor {
+    func toAddress() -> Address {
+        return Address(base58: self.base58, path: self.derivationPath, hasPwd: false, identicon: self.identicon, seedName: self.seed, multiselect: nil
+        )
+    }
+}
+
+extension TransactionCardSet {
+    func assemble() -> [TransactionCard] {
+        var assembled: [TransactionCard] = []
+        assembled.append(contentsOf: self.author ?? [])
+        assembled.append(contentsOf: self.error ?? [])
+        assembled.append(contentsOf: self.extensions ?? [])
+        assembled.append(contentsOf: self.importingDerivations ?? [])
+        assembled.append(contentsOf: self.message ?? [])
+        assembled.append(contentsOf: self.meta ?? [])
+        assembled.append(contentsOf: self.method ?? [])
+        assembled.append(contentsOf: self.newSpecs ?? [])
+        assembled.append(contentsOf: self.verifier ?? [])
+        assembled.append(contentsOf: self.warning ?? [])
+        assembled.append(contentsOf: self.typesInfo ?? [])
+        return assembled.sorted(by: {
+            $0.index < $1.index
+        })
+    }
+}

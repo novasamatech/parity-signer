@@ -35,9 +35,9 @@ struct AddressCard: View {
                 }.frame(width: 30, height: 30)
                 VStack (alignment: .leading) {
                     HStack {
-                        Text(address.seed_name.decode64()).foregroundColor(Color("Text600")).font(FBase(style: .subtitle1))
+                        Text(address.seedName.decode64()).foregroundColor(Color("Text600")).font(FBase(style: .subtitle1))
                         Text(address.path)
-                        if address.has_pwd {
+                        if address.hasPwd {
                             Text("///").foregroundColor(Color("Crypto400"))
                                 .font(FCrypto(style: .body2))
                             Image(systemName: "lock").foregroundColor(Color("Crypto400"))

@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct HistoryCardExtended: View {
-    var event: EventDetailed
+    var event: Event
     let timestamp = ""
     var body: some View {
         HStack {
@@ -32,7 +32,7 @@ struct HistoryCardExtended: View {
                 timestamp: timestamp,
                 danger: false,
                 line1: "General verifier set",
-                line2: value.public_key.truncateMiddle(length: 8) + "\n" + value.encryption
+                line2: value.publicKey.truncateMiddle(length: 8) + "\n" + value.encryption
             )
             case .historyCleared: HistoryCardTemplate(
                 image: "xmark.rectangle.portrait",
@@ -53,28 +53,28 @@ struct HistoryCardExtended: View {
                 timestamp: timestamp,
                 danger: false,
                 line1: "Key created",
-                line2: value.seed_name.decode64() + value.path + " in network with hash " +  value.network_genesis_hash
+                line2: value.seedName.decode64() + value.path + " in network with hash " +  value.networkGenesisHash
             )
             case .identityRemoved(let value): HistoryCardTemplate(
                 image: "xmark.rectangle.portrait",
                 timestamp: timestamp,
                 danger: false,
                 line1: "Key removed",
-                line2: value.seed_name.decode64() + value.path + " in network with hash " +  value.network_genesis_hash
+                line2: value.seedName.decode64() + value.path + " in network with hash " +  value.networkGenesisHash
             )
             case .metadataAdded(let value): HistoryCardTemplate(
                 image: "plus.viewfinder",
                 timestamp: timestamp,
                 danger: false,
                 line1: "Metadata added",
-                line2: value.specname + " version " +  value.spec_version
+                line2: value.name + " version " +  value.version
             )
             case .metadataRemoved(let value): HistoryCardTemplate(
                 image: "xmark.rectangle.portrait",
                 timestamp: timestamp,
                 danger: false,
                 line1: "Metadata removed",
-                line2: value.specname + " version " +  value.spec_version
+                line2: value.name + " version " +  value.version
             )
             case .networkAdded(let value): HistoryCardTemplate(
                 image: "plus.viewfinder",
@@ -95,7 +95,7 @@ struct HistoryCardExtended: View {
                 timestamp: timestamp,
                 danger: false,
                 line1: "Network verifier set",
-                line2: value.genesis_hash
+                line2: value.genesisHash
             )
             case .resetDangerRecord: HistoryCardTemplate(
                 image: "checkmark.shield",
@@ -153,16 +153,16 @@ struct HistoryCardExtended: View {
                 TransactionBlock(cards: value.transaction.assemble())
                 Text("Signed by: ")
                 HStack {
-                    Identicon(identicon: value.signed_by.identicon)
+                    Identicon(identicon: value.signedBy.identicon)
                     VStack {
-                        Text(value.signed_by.hex)
-                        Text(value.signed_by.encryption)
+                        Text(value.signedBy.hex)
+                        Text(value.signedBy.encryption)
                     }
                 }
                 Text("in network")
                 Text(value.network_name)
                 Text("Comment :")
-                Text(String(decoding: Data(base64Encoded: value.user_comment) ?? Data(), as: UTF8.self))
+                Text(String(decoding: Data(base64Encoded: value.userComment) ?? Data(), as: UTF8.self))
             }
             case .transactionSigned(let value):
                 VStack {
@@ -170,16 +170,16 @@ struct HistoryCardExtended: View {
                     TransactionBlock(cards: value.transaction.assemble())
                     Text("Signed by: ")
                     HStack {
-                        Identicon(identicon: value.signed_by.identicon)
+                        Identicon(identicon: value.signedBy.identicon)
                         VStack {
-                            Text(value.signed_by.hex)
-                            Text(value.signed_by.encryption)
+                            Text(value.signedBy.hex)
+                            Text(value.signedBy.encryption)
                         }
                     }
                     Text("in network")
                     Text(value.network_name)
                     Text("Comment :")
-                    Text(String(decoding: Data(base64Encoded: value.user_comment) ?? Data(), as: UTF8.self))
+                    Text(String(decoding: Data(base64Encoded: value.userComment) ?? Data(), as: UTF8.self))
                 }
             case .typesAdded(_): HistoryCardTemplate(
                 image: "plus.viewfinder",
@@ -228,7 +228,7 @@ struct HistoryCardExtended: View {
                 timestamp: timestamp,
                 danger: false,
                 line1: "Generated signature for message",
-                line2: String(decoding: Data(base64Encoded: value.user_comment) ?? Data(), as: UTF8.self)
+                line2: String(decoding: Data(base64Encoded: value.userComment) ?? Data(), as: UTF8.self)
             )
             }
         }

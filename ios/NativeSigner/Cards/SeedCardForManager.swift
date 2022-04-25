@@ -18,7 +18,7 @@ struct SeedCardForManager: View {
                     .resizable(resizingMode: .stretch)
                     .frame(width: 30, height: 30)
                 VStack (alignment: .leading) {
-                    Text(seedNameCard.seed_name.decode64())
+                    Text(seedNameCard.seedName.decode64())
                         .foregroundColor(Color("Text600"))
                         .font(FBase(style: .subtitle1))
                 }

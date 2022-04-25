@@ -13,7 +13,7 @@ struct NetworkManager: View {
     var body: some View {
         VStack {
             Rectangle().frame(height: UIScreen.main.bounds.height/3).opacity(0.0001).gesture(TapGesture().onEnded{_ in
-                data.pushButton(buttonID: .GoBack)
+                data.pushButton(action: .goBack)
             })
             ZStack {
                 RoundedRectangle(cornerRadius: 20.0).foregroundColor(Color("Bg000"))
@@ -28,7 +28,7 @@ struct NetworkManager: View {
                             ForEach(content.networks.sorted(by: {$0.order < $1.order}), id: \.order) {network in
                                 ZStack {
                                     Button(action: {
-                                        data.pushButton(buttonID: .ChangeNetwork, details: network.key)
+                                        data.pushButton(action: .changeNetwork, details: network.key)
                                     }) {
                                         NetworkCard(title: network.title, logo: network.logo, fancy: true)
                                     }

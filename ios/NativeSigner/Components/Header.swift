@@ -16,7 +16,7 @@ struct Header: View {
                 HStack(spacing: 8.0) {
                     if data.actionResult.back {
                         Button(action: {
-                            data.pushButton(buttonID: .GoBack)
+                            data.pushButton(action: .goBack)
                         }) {
                             Image(systemName: data.actionResult.rightButton == "MultiSelect" ? "xmark" : "chevron.left")
                                 .imageScale(.large)
@@ -42,7 +42,7 @@ struct Header: View {
                 
                 if data.actionResult.rightButton == "MultiSelect" {
                     Button(action: {
-                        data.pushButton(buttonID: .SelectAll)
+                        data.pushButton(action: .selectAll)
                     }) {
                         SmallButton(text: "Select all")
                     }
@@ -55,7 +55,7 @@ struct Header: View {
                         if data.alert && data.actionResult.rightButton == "NewSeed" {
                             data.alertShow = true
                         } else {
-                            data.pushButton(buttonID: .RightButton)
+                            data.pushButton(action: .rightButton)
                         }
                     }) {
                         switch(

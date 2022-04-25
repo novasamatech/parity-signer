@@ -16,7 +16,7 @@ struct HistoryScreen: View {
                 ForEach(content.log.sorted(by: {$0.order > $1.order}), id: \.order) { history in
                     ForEach(history.events, id: \.self) { event in
                         Button(action: {
-                            data.pushButton(buttonID: .ShowLogDetails, details: String(history.order))
+                            data.pushButton(action: .showLogDetails, details: String(history.order))
                         }) {
                             HistoryCard(
                                 event: event,

@@ -14,7 +14,7 @@ import Foundation
 /**
  * Struct to store main navstate of the screen
  */
-enum SignerScreen: Decodable {
+enum SignerScreen {
     case Scan
     case Keys(MKeys)
     case Settings(MSettings)
