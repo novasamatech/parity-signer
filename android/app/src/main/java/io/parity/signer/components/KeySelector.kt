@@ -1,5 +1,6 @@
 package io.parity.signer.components
 
+import android.util.Log
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.lazy.LazyColumn
@@ -10,25 +11,29 @@ import androidx.compose.ui.unit.dp
 import io.parity.signer.models.toListOfJSONObjects
 import org.json.JSONArray
 import io.parity.signer.uniffi.Action
+import io.parity.signer.uniffi.MKeysCard
 
 @Composable
 fun KeySelector(
 	button: (action: Action, details: String) -> Unit,
 	increment: (Int) -> Unit,
-	keySet: JSONArray,
-	multiSelectMode: Boolean
+	keySet: List<MKeysCard>,
+	multiSelectMode: Boolean,
+	rootSeed: String,
 ) {
-	val addresses = keySet.toListOfJSONObjects().sortedBy { it.optString("path") }
+	val addresses = keySet.sortedBy { it.path }
+	Log.w("SIGNER_RUST_LOG", "*** ${keySet.size}" )
 	LazyColumn {
 		this.items(
 			items = addresses,
 			key = {
-				it.optString("address_key")
+				it.addressKey
 			}
 		) { address ->
-			val addressKey = address.optString("address_key")
+			val addressKey = address.addressKey
 			KeyCardActive(
 				address,
+				rootSeed = rootSeed,
 				selectButton = { button(Action.SELECT_KEY, addressKey) },
 				longTapButton = { button(Action.LONG_TAP, addressKey) },
 				swipe = { button(Action.SWIPE, addressKey) },

@@ -33,13 +33,11 @@ use crate::{
     },
     qr_transfers::ContentLoadTypes,
 };
-#[cfg(feature = "signer")]
-use crate::{helpers::pic_meta, print::export_complex_single};
 
 /// Event content for importing or removing metadata of a known network
 ///
 /// Contains network name, network version, metadata hash.
-#[derive(Decode, Encode, PartialEq, Clone)]
+#[derive(Decode, Encode, Debug, PartialEq, Clone)]
 pub struct MetaValuesDisplay {
     pub name: String,
     pub version: u32,
@@ -84,7 +82,7 @@ impl MetaValuesDisplay {
 /// Effectively records that network metadata was signed by user.
 /// Contains network name, network version, metadata hash, and [`VerifierValue`]
 /// of address used for `SufficientCrypto` generation.  
-#[derive(Decode, Encode, PartialEq, Clone)]
+#[derive(Decode, Debug, Encode, PartialEq, Clone)]
 pub struct MetaValuesExport {
     pub name: String,
     pub version: u32,
@@ -115,7 +113,7 @@ impl MetaValuesExport {
 }
 
 /// Event content for importing or removing network specs  
-#[derive(Decode, Encode, PartialEq, Clone)]
+#[derive(Decode, Debug, Encode, PartialEq, Clone)]
 pub struct NetworkSpecsDisplay {
     pub specs: NetworkSpecs,
     pub valid_current_verifier: ValidCurrentVerifier,
@@ -145,7 +143,7 @@ impl NetworkSpecsDisplay {
 /// Effectively records that network specs were signed by user.
 /// Contains [`NetworkSpecsToSend`] and [`VerifierValue`] of address used for
 /// `SufficientCrypto` generation.  
-#[derive(Decode, Encode, PartialEq, Clone)]
+#[derive(Decode, Debug, Encode, PartialEq, Clone)]
 pub struct NetworkSpecsExport {
     pub specs_to_send: NetworkSpecsToSend,
     pub signed_by: VerifierValue,
@@ -163,7 +161,7 @@ impl NetworkSpecsExport {
 }
 
 /// Event content for setting network verifier
-#[derive(Decode, Encode, PartialEq, Clone)]
+#[derive(Decode, Debug, Encode, PartialEq, Clone)]
 pub struct NetworkVerifierDisplay {
     pub genesis_hash: Vec<u8>,
     pub valid_current_verifier: ValidCurrentVerifier,
@@ -190,7 +188,7 @@ impl NetworkVerifierDisplay {
 /// Event content for importing or removing types information
 ///
 /// Contains hash of SCALE-encoded types data and types information [`Verifier`].
-#[derive(Decode, Encode, PartialEq, Clone)]
+#[derive(Decode, Debug, Encode, PartialEq, Clone)]
 pub struct TypesDisplay {
     pub types_hash: Vec<u8>,
     pub verifier: Verifier,
@@ -220,7 +218,7 @@ impl TypesDisplay {
 /// Effectively records that types information was signed by user.
 /// Contains hash of SCALE-encoded types data and [`VerifierValue`] of address
 /// used for `SufficientCrypto` generation.  
-#[derive(Decode, Encode, PartialEq, Clone)]
+#[derive(Decode, Debug, Encode, PartialEq, Clone)]
 pub struct TypesExport {
     pub types_hash: Vec<u8>,
     pub signed_by: VerifierValue,
@@ -252,7 +250,7 @@ impl TypesExport {
 /// - public key for address  
 /// - path with soft (`/`) and hard (`//`) derivatinos only, **without** password  
 /// - genesis hash of the network within which the address is  
-#[derive(Decode, Encode, PartialEq, Clone)]
+#[derive(Decode, Debug, Encode, PartialEq, Clone)]
 pub struct IdentityHistory {
     pub seed_name: String,
     pub encryption: Encryption,
@@ -298,7 +296,7 @@ impl IdentityHistory {
 
 /// History log information about transactions, both successfully signed and
 /// the ones with wrong password entered by user
-#[derive(Decode, Encode, PartialEq, Clone)]
+#[derive(Decode, Debug, Encode, PartialEq, Clone)]
 pub struct SignDisplay {
     /// raw `Vec<u8>` transaction that user either tried to sign or signed  
     pub transaction: Vec<u8>,
@@ -372,7 +370,7 @@ impl SignDisplay {
 
 /// History log information about messages, both successfully signed and
 /// the ones with wrong password entered by user
-#[derive(Decode, Encode, PartialEq, Clone)]
+#[derive(Decode, Debug, Encode, PartialEq, Clone)]
 pub struct SignMessageDisplay {
     /// decoded message
     pub message: String,
@@ -406,7 +404,7 @@ impl SignMessageDisplay {
 }
 
 /// Events that could be recorded in the history log
-#[derive(PartialEq, Decode, Encode, Clone)]
+#[derive(PartialEq, Debug, Decode, Encode, Clone)]
 pub enum Event {
     /// Network metadata was added
     MetadataAdded {

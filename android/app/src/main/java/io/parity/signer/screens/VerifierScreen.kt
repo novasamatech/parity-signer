@@ -8,20 +8,23 @@ import io.parity.signer.alerts.AndroidCalledConfirm
 import io.parity.signer.components.BigButton
 import io.parity.signer.components.Identicon
 import io.parity.signer.models.SignerDataModel
+import io.parity.signer.uniffi.MVerifierDetails
 import org.json.JSONObject
 
 @Composable
-fun VerifierScreen(signerDataModel: SignerDataModel) {
-	val verifierDetails = signerDataModel.screenData.value ?: JSONObject()
+fun VerifierScreen(
+	verifierDetails: MVerifierDetails,
+	signerDataModel: SignerDataModel
+) {
 	var jailbreakAlert by remember { mutableStateOf(false) }
 
 	Column {
 		Row {
-			Identicon(identicon = verifierDetails.optString("identicon"))
+			Identicon(identicon = verifierDetails.identicon)
 			Column {
 				Text("General verifier certificate")
-				Text(verifierDetails.optString("public_key"))
-				Text("encryption: " + verifierDetails.optString("encryption"))
+				Text(verifierDetails.publicKey)
+				Text("encryption: " + verifierDetails.encryption)
 			}
 		}
 		BigButton(

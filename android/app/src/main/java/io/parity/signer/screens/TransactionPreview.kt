@@ -12,20 +12,22 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.platform.LocalFocusManager
 import io.parity.signer.components.*
-import io.parity.signer.models.*
+import io.parity.signer.models.SignerDataModel
+import io.parity.signer.models.encode64
+import io.parity.signer.models.getSeed
 import io.parity.signer.ui.theme.Text400
 import io.parity.signer.uniffi.Action
+import io.parity.signer.uniffi.MTransaction
+import io.parity.signer.uniffi.TransactionType
 
 @Composable
 fun TransactionPreview(
+	transaction: MTransaction,
 	button: (action: Action, details: String, seedPhrase: String) -> Unit,
 	signerDataModel: SignerDataModel
 ) {
-	val transaction =
-		signerDataModel.screenData.value!!.getJSONObject("content")
-			.parseTransaction()
-	val action =
-		TransactionType.valueOf(signerDataModel.screenData.value!!.getString("type"))
+	//val transaction = transaction.content //.parseTransaction()
+	val action = transaction.ttype
   val comment = remember{ mutableStateOf("") }
 	val focusManager = LocalFocusManager.current
 	val focusRequester = remember { FocusRequester() }
@@ -34,14 +36,18 @@ fun TransactionPreview(
 		Modifier.verticalScroll(rememberScrollState())
 	) {
 		TransactionPreviewField(transaction = transaction)
-		signerDataModel.screenData.value!!.optJSONObject("author_info")?.let {
+		transaction.authorInfo?.let {
+			/* TODO: Address -> TransactionAuthor
 			KeyCard(identity = it)
+			 */
 		}
-		signerDataModel.screenData.value!!.optJSONObject("network_info")?.let {
-			NetworkCard(network = it)
+		transaction.networkInfo?.let {
+			/* TODO
+			NetworkCard(deriveKey = it)
+			*/
 		}
 		when (action) {
-			TransactionType.sign -> {
+			TransactionType.SIGN -> {
 				Text("LOG NOTE", style = MaterialTheme.typography.overline, color = MaterialTheme.colors.Text400)
 
 				SingleTextInput(
@@ -59,8 +65,7 @@ fun TransactionPreview(
 					action = {
 						signerDataModel.authentication.authenticate(signerDataModel.activity) {
 							val seedPhrase = signerDataModel.getSeed(
-								signerDataModel.screenData.value?.optJSONObject("author_info")
-									?.optString("seed") ?: ""
+								transaction.authorInfo?.seed ?: ""
 							)
 							if (seedPhrase.isNotBlank()) {
 								button(Action.GO_FORWARD, comment.value.encode64(), seedPhrase)
@@ -75,14 +80,14 @@ fun TransactionPreview(
 					}
 				)
 			}
-			TransactionType.done ->
+			TransactionType.DONE ->
 				BigButton(
 					text = "Done",
 					action = {
 						button(Action.GO_BACK, "", "")
 					}
 				)
-			TransactionType.stub -> {
+			TransactionType.STUB -> {
 				BigButton(
 					text = "Approve",
 					action = {
@@ -96,14 +101,14 @@ fun TransactionPreview(
 					}
 				)
 			}
-			TransactionType.read ->
+			TransactionType.READ ->
 				BigButton(
 					text = "Back",
 					action = {
 						button(Action.GO_BACK, "", "")
 					}
 				)
-			TransactionType.import_derivations -> {
+			TransactionType.IMPORT_DERIVATIONS -> {
 				BigButton(
 					text = "Select seed",
 					action = {

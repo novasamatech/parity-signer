@@ -18,9 +18,10 @@ import io.parity.signer.models.removeSeed
 import io.parity.signer.ui.theme.Bg000
 import io.parity.signer.ui.theme.modal
 import io.parity.signer.uniffi.Action
+import io.parity.signer.uniffi.MSeedMenu
 
 @Composable
-fun SeedMenu(signerDataModel: SignerDataModel) {
+fun SeedMenu(seedMenu: MSeedMenu, signerDataModel: SignerDataModel) {
 	var confirm by remember { mutableStateOf(false) }
 
 	Column {
@@ -57,8 +58,7 @@ fun SeedMenu(signerDataModel: SignerDataModel) {
 					isShaded = true,
 					isDangerous = true,
 					action = {
-						val seedName =
-							signerDataModel.modalData.value?.optString("seed") ?: ""
+						val seedName = seedMenu.seed
 						signerDataModel.removeSeed(seedName)
 					}
 				)
@@ -72,7 +72,7 @@ fun SeedMenu(signerDataModel: SignerDataModel) {
 		text = "This seed will be removed for all networks. This is not reversible. Are you sure?",
 		back = { confirm = false },
 		forward = {
-			signerDataModel.modalData.value?.optString("seed")?.let {
+			seedMenu.seed.let {
 				if (it.isNotBlank()) signerDataModel.removeSeed(it)
 			}
 		},

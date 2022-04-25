@@ -22,9 +22,11 @@ import io.parity.signer.models.decode64
 import io.parity.signer.models.encode64
 import io.parity.signer.ui.theme.Text600
 import io.parity.signer.uniffi.Action
+import io.parity.signer.uniffi.MRecoverSeedName
 
 @Composable
 fun RecoverSeedName(
+	recoverSeedName: MRecoverSeedName,
 	button: (action: Action, details: String) -> Unit,
 	signerDataModel: SignerDataModel
 ) {
@@ -50,7 +52,10 @@ fun RecoverSeedName(
 				signerDataModel.clearError()
 			},
 			onDone = {
-				if (seedName.value.isNotBlank() && signerDataModel.seedNames.value?.contains(seedName.value.encode64()) == false) {
+				if (seedName.value.isNotBlank() && signerDataModel.seedNames.value?.contains(
+						seedName.value.encode64()
+					) == false
+				) {
 					button(Action.GO_FORWARD, seedName.value.encode64())
 				}
 			},
@@ -72,16 +77,18 @@ fun RecoverSeedName(
 				focusManager.clearFocus()
 				button(Action.GO_FORWARD, seedName.value.encode64())
 			},
-			isDisabled = seedName.value.isBlank() || (signerDataModel.seedNames.value?.contains(seedName.value.encode64()) != false)
+			isDisabled = seedName.value.isBlank() || (signerDataModel.seedNames.value?.contains(
+				seedName.value.encode64()
+			) != false)
 		)
 	}
 
 	DisposableEffect(Unit) {
-		if (signerDataModel.screenData.value?.optBoolean("keyboard") == true) {
+		if (recoverSeedName.keyboard) {
 			focusRequester.requestFocus()
 		}
 		seedName.value =
-			signerDataModel.screenData.value?.optString("seed_name")?.decode64() ?: ""
+			recoverSeedName.seedName.decode64()
 		onDispose { focusManager.clearFocus() }
 	}
 }

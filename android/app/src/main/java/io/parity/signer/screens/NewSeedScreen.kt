@@ -17,9 +17,11 @@ import io.parity.signer.models.decode64
 import io.parity.signer.models.encode64
 import io.parity.signer.ui.theme.Text600
 import io.parity.signer.uniffi.Action
+import io.parity.signer.uniffi.MNewSeed
 
 @Composable
 fun NewSeedScreen(
+	newSeed: MNewSeed,
 	button: (action: Action, details: String) -> Unit,
 	signerDataModel: SignerDataModel
 ) {
@@ -30,7 +32,9 @@ fun NewSeedScreen(
 	Column(
 		horizontalAlignment = Alignment.CenterHorizontally,
 		verticalArrangement = Arrangement.Top,
-		modifier = Modifier.padding(20.dp).fillMaxSize()
+		modifier = Modifier
+			.padding(20.dp)
+			.fillMaxSize()
 	) {
 		Row {
 			HeadingOverline("DISPLAY NAME")
@@ -43,7 +47,10 @@ fun NewSeedScreen(
 				signerDataModel.clearError()
 			},
 			onDone = {
-				if (seedName.value.isNotBlank() && (signerDataModel.seedNames.value?.contains(seedName.value.encode64()) == false)) {
+				if (seedName.value.isNotBlank() && (signerDataModel.seedNames.value?.contains(
+						seedName.value.encode64()
+					) == false)
+				) {
 					button(Action.GO_FORWARD, seedName.value.encode64())
 				}
 			},
@@ -52,9 +59,11 @@ fun NewSeedScreen(
 			focusRequester = focusRequester
 		)
 
-		Text("Display name visible only on this device",
+		Text(
+			"Display name visible only on this device",
 			style = MaterialTheme.typography.caption,
-			color = MaterialTheme.colors.Text600)
+			color = MaterialTheme.colors.Text600
+		)
 		Spacer(Modifier.height(20.dp))
 		BigButton(
 			text = "Generate seed phrase",
@@ -62,15 +71,19 @@ fun NewSeedScreen(
 				focusManager.clearFocus()
 				button(Action.GO_FORWARD, seedName.value.encode64())
 			},
-			isDisabled = seedName.value.isBlank() || (signerDataModel.seedNames.value?.contains(seedName.value.encode64()) != false)
+			isDisabled = seedName.value.isBlank() || (signerDataModel.seedNames.value?.contains(
+				seedName.value.encode64()
+			) != false)
 		)
 	}
 	DisposableEffect(Unit) {
-		if (signerDataModel.screenData.value?.optBoolean("keyboard") == true) {
+		if (newSeed.keyboard) {
 			focusRequester.requestFocus()
 		}
+		/* TODO: seed_name
 		seedName.value =
 			signerDataModel.screenData.value?.optString("seed_name")?.decode64() ?: ""
+		*/
 		onDispose { focusManager.clearFocus() }
 	}
 }

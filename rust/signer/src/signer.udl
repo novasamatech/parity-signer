@@ -142,7 +142,7 @@ dictionary ActionResult {
     string modal;
     string alert;
     ScreenData screen_data;
-    string modal_data;
+    ModalData modal_data;
     string alert_data;
 };
 
@@ -327,7 +327,9 @@ enum TransactionType {
 };
 
 dictionary TransactionCard {
-    string content;
+    u32 index;
+    u32 indent;
+    Card card;
 };
 
 dictionary TransactionCardSet {
@@ -398,7 +400,7 @@ dictionary MDeriveKey {
 };
 
 dictionary DerivationCheck {
-    boolean? button_good;
+    boolean button_good;
     DerivationDestination? where_to;
     Address? collision;
     string? error;
@@ -521,7 +523,7 @@ namespace signer {
     [Throws=ErrorDisplayed]
     string qrparser_try_decode_qr_sequence([ByRef] string data, boolean cleaned);
 
-    string substrate_path_check([ByRef] string seed_name, [ByRef] string path, [ByRef] string network, [ByRef] string dbname);
+    DerivationCheck substrate_path_check([ByRef] string seed_name, [ByRef] string path, [ByRef] string network, [ByRef] string dbname);
 
     [Throws=ErrorDisplayed]
     void history_init_history_with_cert([ByRef] string dbname);
@@ -544,7 +546,241 @@ namespace signer {
     [Throws=ErrorDisplayed]
     void history_seed_name_was_shown([ByRef] string seed_name, [ByRef] string dbname);
 
-    string get_all_tx_cards();
+    TransactionCardSet get_all_tx_cards();
 
     string get_all_log_cards();
+
+    void init_logging(string tag);
+};
+
+
+dictionary MSCContent {
+    string ttype;
+};
+
+dictionary MSCAuthor {
+    string base58;
+    string identicon;
+    string seed;
+    boolean? has_password;
+    string derivation_path;
+};
+
+dictionary MSufficientCryptoReady {
+    MSCAuthor author_info;
+    string sufficient;
+    MSCContent content;
+};
+
+dictionary MBackup {
+    string seed_name;
+    sequence<DerivationPack> derivations;
+};
+
+dictionary DerivationPack {
+    string network_title;
+    string network_logo;
+    string network_order;
+    sequence<DerivationEntry> id_set;
+};
+
+dictionary DerivationEntry {
+    string path;
+    boolean has_pwd;
+};
+
+dictionary MSeedMenu {
+    string seed;
+};
+
+dictionary MNewSeedBackup {
+    string seed;
+    string seed_phrase;
+    string identicon;
+};
+
+dictionary Network {
+    string key;
+    string logo;
+    u32 order;
+    boolean selected;
+    string title;
+};
+
+dictionary MNetworkMenu {
+    sequence<Network> networks;
+};
+
+dictionary MPasswordConfirm {
+    string pwd;
+    string seed_name;
+    string cropped_path;
+};
+
+dictionary MSignatureReady {
+    string signature;
+};
+
+dictionary MEnterPassword {
+    TransactionAuthor author_info;
+    u32 counter;
+};
+
+dictionary MLogRight {
+    string checksum;
+};
+
+dictionary MMMNetwork {
+    string title;
+    string logo;
+    u32 order;
+    boolean current_on_screen;
+};
+
+dictionary MMManageNetworks {
+    string name;
+    string version;
+    string meta_hash;
+    string meta_id_pic;
+    sequence<MMMNetwork> networks;
+};
+
+dictionary MTypesInfo {
+    boolean types_on_file;
+    string? types_hash;
+    string? types_id_pic;
+};
+
+[Enum]
+interface ModalData {
+    SufficientCryptoReady(MSufficientCryptoReady f);
+    Backup(MBackup f);
+    SeedMenu(MSeedMenu f);
+    NewSeedBackup(MNewSeedBackup f);
+    NetworkSelector(MNetworkMenu f);
+    PasswordConfirm(MPasswordConfirm f);
+    SignatureReady(MSignatureReady f);
+    EnterPassword(MEnterPassword f);
+    LogRight(MLogRight f);
+    ManageNetworks(MMManageNetworks f);
+    TypesInfo(MTypesInfo f);
+    Text(string f);
+    NewSeedMenu();
+    NetworkDetailsMenu();
+    ManageMetadata();
+    KeyDetailsAction();
+    LogComment();
+    SelectSeed();
+};
+
+dictionary MSCAuthorPlain {
+    string base58;
+    string identicon;
+};
+
+dictionary MSCCall {
+    string method_name;
+    string docs;
+};
+
+dictionary MSCCurrency {
+    string amount;
+    string units;
+};
+
+dictionary MSCEnumVariantName {
+    string name;
+    string docs_enum_variant;
+};
+
+dictionary MSCEraMortal {
+    string era;
+    string phase;
+    string period;
+};
+
+dictionary MSCFieldName {
+    string name;
+    string docs_field_name;
+    string path_type;
+    string docs_type;
+};
+
+dictionary MSCFieldNumber {
+    string number;
+    string docs_field_number;
+    string path_type;
+    string docs_type;
+};
+
+dictionary MSCId {
+    string base58;
+    string identicon;
+};
+
+dictionary MSCMetaSpecs {
+    string specname;
+    string spec_version;
+    string meta_hash;
+    string meta_id_pic;
+};
+
+dictionary MSCNameVersion {
+    string name;
+    string version;
+};
+
+dictionary MSCNetworkInfo {
+    string network_title;
+    string network_logo;
+};
+
+dictionary MSCTip {
+    string amount;
+    string units;
+};
+
+dictionary MSCTxSpecPlain {
+    string network_genesis_hash;
+    string version;
+    string tx_version;
+};
+
+[Enum]
+interface Card {
+    AuthorCard(TransactionAuthor f);
+    AuthorPlainCard(MSCAuthorPlain f);
+    AuthorPublicKeyCard(MVerifierDetails f);
+    BalanceCard(MSCCurrency f);
+    BitVecCard(string f);
+    BlockHashCard(string f);
+    CallCard(MSCCall f);
+    DefaultCard(string f);
+    DerivationsCard(sequence<string> f);
+    EnumVariantNameCard(MSCEnumVariantName f);
+    EraImmortalCard();
+    EraMortalCard(MSCEraMortal f);
+    ErrorCard(string f);
+    FieldNameCard(MSCFieldName f);
+    FieldNumberCard(MSCFieldNumber f);
+    IdCard(MSCId f);
+    IdentityFieldCard(string f);
+    MetaCard(MSCMetaSpecs f);
+    NameVersionCard(MSCNameVersion f);
+    NetworkGenesisHashCard(string f);
+    NetworkNameCard(string f);
+    NetworkInfoCard(MSCNetworkInfo f);
+    NewSpecsCard(NetworkSpecsToSend f);
+    NonceCard(string f);
+    NoneCard();
+    PalletCard(string f);
+    TextCard(string f);
+    TipCard(MSCCurrency f);
+    TipPlainCard(string f);
+    TxSpecCard(string f);
+    TxSpecPlainCard(MSCTxSpecPlain f);
+    TypesInfoCard(MTypesInfo f);
+    VarNameCard(string f);
+    VerifierCard(MVerifierDetails f);
+    WarningCard(string f);
 };

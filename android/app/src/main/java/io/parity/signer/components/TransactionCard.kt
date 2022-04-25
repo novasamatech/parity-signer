@@ -88,7 +88,7 @@ fun TransactionCard(card: JSONObject) {
 				TCGenesisHash(payload = card.optString("payload"))
 			}
 			"network_info" -> {
-				NetworkCard(network = payload)
+				// TODO: NetworkCard(deriveKey = payload)
 			}
 			"network_name" -> {
 				TCNetworkName(text = card.optString("payload"))

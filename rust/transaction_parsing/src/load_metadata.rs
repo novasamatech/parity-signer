@@ -12,6 +12,7 @@ use definitions::{
     history::{Event, MetaValuesDisplay},
     keyring::VerifierKey,
     metadata::MetaValues,
+    navigation::{TransactionCard, TransactionCardSet},
     network_specs::{ValidCurrentVerifier, Verifier},
     qr_transfers::ContentLoadMeta,
 };
@@ -22,8 +23,8 @@ use crate::helpers::accept_meta_values;
 use crate::{StubNav, TransactionAction};
 
 enum FirstCard {
-    WarningCard(String),
-    VerifierCard(String),
+    WarningCard(TransactionCard),
+    VerifierCard(TransactionCard),
 }
 
 pub fn load_metadata(
@@ -188,17 +189,22 @@ pub fn load_metadata(
         match first_card {
             FirstCard::WarningCard(warning_card) => match optional_ext_warning {
                 Some(ext_warning) => Ok(TransactionAction::Stub {
-                    s: format!(
-                        "\"warning\":[{},{}],\"meta\":[{}]",
-                        ext_warning, warning_card, meta_card
-                    ),
+                    s: TransactionCardSet {
+                        warning: Some(vec![ext_warning, warning_card]),
+                        meta: Some(vec![meta_card]),
+                        ..Default::default()
+                    },
                     u: checksum,
                     stub: StubNav::LoadMeta {
                         l: network_specs_key,
                     },
                 }),
                 None => Ok(TransactionAction::Stub {
-                    s: format!("\"warning\":[{}],\"meta\":[{}]", warning_card, meta_card),
+                    s: TransactionCardSet {
+                        warning: Some(vec![warning_card]),
+                        meta: Some(vec![meta_card]),
+                        ..Default::default()
+                    },
                     u: checksum,
                     stub: StubNav::LoadMeta {
                         l: network_specs_key,
@@ -207,17 +213,23 @@ pub fn load_metadata(
             },
             FirstCard::VerifierCard(verifier_card) => match optional_ext_warning {
                 Some(ext_warning) => Ok(TransactionAction::Stub {
-                    s: format!(
-                        "\"warning\":[{}],\"verifier\":[{}],\"meta\":[{}]",
-                        ext_warning, verifier_card, meta_card
-                    ),
+                    s: TransactionCardSet {
+                        warning: Some(vec![ext_warning]),
+                        verifier: Some(vec![verifier_card]),
+                        meta: Some(vec![meta_card]),
+                        ..Default::default()
+                    },
                     u: checksum,
                     stub: StubNav::LoadMeta {
                         l: network_specs_key,
                     },
                 }),
                 None => Ok(TransactionAction::Stub {
-                    s: format!("\"verifier\":[{}],\"meta\":[{}]", verifier_card, meta_card),
+                    s: TransactionCardSet {
+                        verifier: Some(vec![verifier_card]),
+                        meta: Some(vec![meta_card]),
+                        ..Default::default()
+                    },
                     u: checksum,
                     stub: StubNav::LoadMeta {
                         l: network_specs_key,

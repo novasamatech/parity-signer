@@ -70,17 +70,15 @@ class SignerDataModel : ViewModel() {
 	internal val _lastError = MutableLiveData("")
 
 	//Navigator
-	internal val _screen = MutableLiveData(SignerScreen.Log)
 	internal val _screenLabel = MutableLiveData("")
 	internal val _back = MutableLiveData(false)
 	internal val _footerButton = MutableLiveData("")
 	internal val _footer = MutableLiveData(false)
 	internal val _rightButton = MutableLiveData("None")
 	internal val _screenNameType = MutableLiveData("h4")
-	internal val _modal = MutableLiveData(SignerModal.Empty)
 	internal val _alert = MutableLiveData(SignerAlert.Empty)
-	internal var _screenData = MutableLiveData(JSONObject())
-	internal var _modalData = MutableLiveData(JSONObject())
+	internal var _screenData: MutableLiveData<ScreenData> = MutableLiveData(null)
+	internal var _modalData: MutableLiveData<ModalData> = MutableLiveData(null)
 	internal var _alertData = MutableLiveData(JSONObject())
 
 	//Data storage locations
@@ -104,8 +102,6 @@ class SignerDataModel : ViewModel() {
 
 	val alertState: LiveData<ShieldAlert> = _alertState
 
-	val screen: LiveData<SignerScreen> = _screen
-	val modal: LiveData<SignerModal> = _modal
 	val alert: LiveData<SignerAlert> = _alert
 	val screenLabel: LiveData<String> = _screenLabel
 	val back: LiveData<Boolean> = _back
@@ -113,8 +109,8 @@ class SignerDataModel : ViewModel() {
 	val footerButton: LiveData<String> = _footerButton
 	val rightButton: LiveData<String> = _rightButton
 	val screenNameType: LiveData<String> = _screenNameType
-	val screenData: LiveData<JSONObject> = _screenData
-	val modalData: LiveData<JSONObject> = _modalData
+	val screenData: LiveData<ScreenData> = _screenData
+	val modalData: LiveData<ModalData> = _modalData
 	val alertData: LiveData<JSONObject> = _alertData
 
 	//MARK: init boilerplate begin
@@ -351,14 +347,4 @@ class SignerDataModel : ViewModel() {
 			_alertState.value = ShieldAlert.None
 		}
 	}
-
-	//MARK: General utils end
-
-	//MARK: rust native section begin
-
-	//external fun testGetAllTXCards(dbname: String): String
-	//external fun testGetAllLogCards(dbname: String): String
-
-	//MARK: rust native section end
-
 }

@@ -8,8 +8,12 @@ use definitions::{
     helpers::{make_identicon_from_multisigner, print_multisigner_as_base58},
     history::MetaValuesDisplay,
     keyring::VerifierKey,
+    navigation::{
+        Card as NavCard, MSCAuthorPlain, MSCCall, MSCCurrency, MSCEnumVariantName, MSCEraMortal,
+        MSCFieldName, MSCFieldNumber, MSCId, MSCMetaSpecs, MSCNameVersion, MSCNetworkInfo,
+        MTypesInfo, MVerifierDetails, TransactionAuthor, TransactionCard,
+    },
     network_specs::{NetworkSpecs, NetworkSpecsToSend, VerifierValue},
-    print::{export_complex_single, export_plain_vector},
     qr_transfers::ContentLoadTypes,
     users::AddressDetails,
 };
@@ -90,62 +94,193 @@ impl<'a> Warning<'a> {
     }
 }
 
-fn fancy(index: &mut u32, indent: u32, card_type: &str, decoded_string: &str) -> String {
-    let out = format!(
-        "{{\"index\":{},\"indent\":{},\"type\":\"{}\",\"payload\":{}}}",
-        index, indent, card_type, decoded_string
-    );
-    *index += 1;
-    out
-}
-
 impl<'a> Card<'a> {
-    pub(crate) fn card(&self, index: &mut u32, indent: u32) -> String {
-        match &self {
-            Card::ParserCard (m) => match m {
-                ParserCard::Pallet (pallet_name) => fancy(index, indent, "pallet", &format!("\"{}\"", pallet_name)),
-                ParserCard::Method {method_name, docs} => fancy(index, indent, "method", &format!("{{\"method_name\":\"{}\",\"docs\":\"{}\"}}", method_name, hex::encode(docs.as_bytes()))),
-                ParserCard::Varname (varname) => fancy(index, indent, "varname", &format!("\"{}\"", varname)),
-                ParserCard::Default (decoded_string) => fancy(index, indent, "default", &format!("\"{}\"", decoded_string)),
-                ParserCard::Text (decoded_text) => fancy(index, indent, "text", &format!("\"{}\"", hex::encode(decoded_text.as_bytes()))),
-                ParserCard::Id {id, base58prefix} => fancy(index, indent, "Id", &format!("{{\"base58\":\"{}\",\"identicon\":\"{}\"}}", id.to_ss58check_with_version(Ss58AddressFormat::custom(*base58prefix)), hex::encode(generate_png_scaled_default(&<[u8;32]>::from(id.to_owned()))))),
-                ParserCard::None => fancy(index, indent, "none", "\"\""),
-                ParserCard::IdentityField (variant) => fancy(index, indent, "identity_field", &format!("\"{}\"", variant)),
-                ParserCard::BitVec (bv) => fancy(index, indent, "bitvec", &format!("\"{}\"", bv)),
-                ParserCard::Balance {number, units} => fancy(index, indent, "balance", &format!("{{\"amount\":\"{}\",\"units\":\"{}\"}}", number, units)),
-                ParserCard::FieldName {name, docs_field_name, path_type, docs_type} => fancy(index, indent, "field_name", &format!("{{\"name\":\"{}\",\"docs_field_name\":\"{}\",\"path_type\":\"{}\",\"docs_type\":\"{}\"}}", name, hex::encode(docs_field_name.as_bytes()), path_type, hex::encode(docs_type.as_bytes()))),
-                ParserCard::FieldNumber {number, docs_field_number, path_type, docs_type} => fancy(index, indent, "field_number", &format!("{{\"number\":\"{}\",\"docs_field_number\":\"{}\",\"path_type\":\"{}\",\"docs_type\":\"{}\"}}", number, hex::encode(docs_field_number.as_bytes()), path_type, hex::encode(docs_type.as_bytes()))),
-                ParserCard::EnumVariantName {name, docs_enum_variant} => fancy(index, indent, "enum_variant_name", &format!("{{\"name\":\"{}\",\"docs_enum_variant\":\"{}\"}}", name, hex::encode(docs_enum_variant.as_bytes()))),
-                ParserCard::Era(era) => match era {
-                    Era::Immortal => fancy(index, indent, "era", "{\"era\":\"Immortal\",\"phase\":\"\",\"period\":\"\"}"),
-                    Era::Mortal(period, phase)  => fancy(index, indent, "era", &format!("{{\"era\":\"Mortal\",\"phase\":\"{}\",\"period\":\"{}\"}}", phase, period)),
+    pub(crate) fn card(&self, index: &mut u32, indent: u32) -> TransactionCard {
+        let card = match &self {
+            Card::ParserCard(m) => match m {
+                ParserCard::Pallet(f) => NavCard::PalletCard { f: f.clone() },
+                ParserCard::Method { method_name, docs } => NavCard::CallCard {
+                    f: MSCCall {
+                        method_name: method_name.clone(),
+                        docs: hex::encode(docs.as_bytes()),
+                    },
                 },
-                ParserCard::Nonce (nonce) => fancy(index, indent, "nonce", &format!("\"{}\"", nonce)),
-                ParserCard::BlockHash (block_hash) => fancy(index, indent, "block_hash", &format!("\"{}\"", hex::encode(block_hash))),
-                ParserCard::Tip {number, units} => fancy(index, indent, "tip", &format!("{{\"amount\":\"{}\",\"units\":\"{}\"}}", number, units)),
-                ParserCard::NetworkNameVersion {name, version} => fancy(index, indent, "name_version", &format!("{{\"name\":\"{}\",\"version\":\"{}\"}}", name, version)),
-                ParserCard::TxVersion (x) => fancy(index, indent, "tx_version", &format!("\"{}\"", x)),
+                ParserCard::Varname(varname) => NavCard::VarNameCard { f: varname.clone() },
+                ParserCard::Default(decoded_string) => NavCard::DefaultCard {
+                    f: decoded_string.clone(),
+                },
+                ParserCard::Text(decoded_text) => NavCard::TextCard {
+                    f: hex::encode(decoded_text.as_bytes()),
+                },
+                ParserCard::Id { id, base58prefix } => NavCard::IdCard {
+                    f: MSCId {
+                        base58: id
+                            .to_ss58check_with_version(Ss58AddressFormat::custom(*base58prefix)),
+                        identicon: hex::encode(generate_png_scaled_default(&<[u8; 32]>::from(
+                            id.to_owned(),
+                        ))),
+                    },
+                },
+                ParserCard::None => NavCard::NoneCard,
+                ParserCard::IdentityField(variant) => {
+                    NavCard::IdentityFieldCard { f: variant.clone() }
+                }
+                ParserCard::BitVec(bv) => NavCard::BitVecCard { f: bv.clone() },
+                ParserCard::Balance { number, units } => NavCard::BalanceCard {
+                    f: MSCCurrency {
+                        amount: number.clone(),
+                        units: units.clone(),
+                    },
+                },
+                ParserCard::FieldName {
+                    name,
+                    docs_field_name,
+                    path_type,
+                    docs_type,
+                } => NavCard::FieldNameCard {
+                    f: MSCFieldName {
+                        name: name.clone(),
+                        docs_field_name: hex::encode(docs_field_name.as_bytes()),
+                        path_type: path_type.clone(),
+                        docs_type: hex::encode(docs_type.as_bytes()),
+                    },
+                },
+                ParserCard::FieldNumber {
+                    number,
+                    docs_field_number,
+                    path_type,
+                    docs_type,
+                } => NavCard::FieldNumberCard {
+                    f: MSCFieldNumber {
+                        number: number.to_string(),
+                        docs_field_number: hex::encode(docs_field_number.as_bytes()),
+                        path_type: path_type.clone(),
+                        docs_type: hex::encode(docs_type.as_bytes()),
+                    },
+                },
+                ParserCard::EnumVariantName {
+                    name,
+                    docs_enum_variant,
+                } => NavCard::EnumVariantNameCard {
+                    f: MSCEnumVariantName {
+                        name: name.clone(),
+                        docs_enum_variant: hex::encode(docs_enum_variant.as_bytes()),
+                    },
+                },
+                ParserCard::Era(era) => match era {
+                    Era::Immortal => NavCard::EraImmortalCard,
+                    Era::Mortal(period, phase) => NavCard::EraMortalCard {
+                        f: MSCEraMortal {
+                            era: "TODO".to_string(),
+                            phase: phase.to_string(),
+                            period: period.to_string(),
+                        },
+                    },
+                },
+                ParserCard::Nonce(nonce) => NavCard::NonceCard { f: nonce.clone() },
+                ParserCard::BlockHash(block_hash) => NavCard::BlockHashCard {
+                    f: hex::encode(block_hash),
+                },
+                ParserCard::Tip { number, units } => NavCard::TipCard {
+                    f: MSCCurrency {
+                        amount: number.clone(),
+                        units: units.clone(),
+                    },
+                },
+                ParserCard::NetworkNameVersion { name, version } => NavCard::NameVersionCard {
+                    f: MSCNameVersion {
+                        name: name.clone(),
+                        version: version.clone(),
+                    },
+                },
+                ParserCard::TxVersion(x) => NavCard::TxSpecCard { f: x.clone() },
             },
-            Card::Author {author, base58prefix, address_details} => fancy(index, indent, "author", &format!("{{{}}}", make_author_info(author, *base58prefix, address_details))),
-            Card::AuthorPlain {author, base58prefix} => fancy(index, indent, "author_plain", &format!("{{\"base58\":\"{}\",\"identicon\":\"{}\"}}", print_multisigner_as_base58(author, Some(*base58prefix)), hex::encode(make_identicon_from_multisigner(author)))),
+            Card::Author {
+                author,
+                base58prefix,
+                address_details,
+            } => NavCard::AuthorCard {
+                f: make_author_info(author, *base58prefix, address_details),
+            },
+            Card::AuthorPlain {
+                author,
+                base58prefix,
+            } => NavCard::AuthorPlainCard {
+                f: MSCAuthorPlain {
+                    base58: print_multisigner_as_base58(author, Some(*base58prefix)),
+                    identicon: hex::encode(make_identicon_from_multisigner(author)),
+                },
+            },
             Card::AuthorPublicKey(author) => {
-                let hex_identicon = hex::encode(make_identicon_from_multisigner(author));
-                let insert = match author {
-                    MultiSigner::Ed25519(p) => format!("{{\"public_key\":\"{}\",\"identicon\":\"{}\",\"encryption\":\"{}\"}}", hex::encode(&p), hex_identicon, Encryption::Ed25519.show()),
-                    MultiSigner::Sr25519(p) => format!("{{\"public_key\":\"{}\",\"identicon\":\"{}\",\"encryption\":\"{}\"}}", hex::encode(&p), hex_identicon, Encryption::Sr25519.show()),
-                    MultiSigner::Ecdsa(p) => format!("{{\"public_key\":\"{}\",\"identicon\":\"{}\",\"encryption\":\"{}\"}}", hex::encode(&p), hex_identicon, Encryption::Ecdsa.show()),
+                let identicon = hex::encode(make_identicon_from_multisigner(author));
+                let (public_key, encryption) = match author {
+                    MultiSigner::Ed25519(p) => (hex::encode(&p), Encryption::Ed25519.show()),
+                    MultiSigner::Sr25519(p) => (hex::encode(&p), Encryption::Sr25519.show()),
+                    MultiSigner::Ecdsa(p) => (hex::encode(&p), Encryption::Ecdsa.show()),
                 };
-                fancy(index, indent, "author_public_key", &insert)
+                NavCard::AuthorPublicKeyCard {
+                    f: MVerifierDetails {
+                        public_key,
+                        identicon,
+                        encryption,
+                    },
+                }
+            }
+            Card::Verifier(x) => match x {
+                VerifierValue::Standard { m } => {
+                    let (public_key, encryption) = match m {
+                        MultiSigner::Ed25519(p) => (hex::encode(&p), Encryption::Ed25519.show()),
+                        MultiSigner::Sr25519(p) => (hex::encode(&p), Encryption::Sr25519.show()),
+                        MultiSigner::Ecdsa(p) => (hex::encode(&p), Encryption::Ecdsa.show()),
+                    };
+                    NavCard::VerifierCard {
+                        f: MVerifierDetails {
+                            public_key,
+                            identicon: hex::encode(make_identicon_from_multisigner(m)),
+                            encryption,
+                        },
+                    }
+                }
             },
-            Card::Verifier(x) => format!("{{}}"), // TODO
-            Card::Meta(x) => format!("{{}}"), // TODO
-            Card::TypesInfo(x) => fancy(index, indent, "types", &format!("{{{}}}", x.show())),
-            Card::NewSpecs(x) => fancy(index, indent, "new_specs", &format!("{{{}}}", x.show())),
-            Card::NetworkInfo(x) => fancy(index, indent, "network_info", &format!("{{\"network_title\":\"{}\",\"network_logo\":\"{}\"}}", x.title, x.logo)),
-            Card::NetworkGenesisHash(x) => fancy(index, indent, "network_genesis_hash", &format!("\"{}\"", hex::encode(x))),
-            Card::Derivations(x) => fancy(index, indent, "derivations", &export_plain_vector(x)),
-            Card::Warning (warn) => fancy(index, indent, "warning", &format!("\"{}\"", warn.show())),
-            Card::Error (err) => fancy(index, indent, "error", &format!("\"{}\"", <Signer>::show(err))),
+            Card::Meta(x) => NavCard::MetaCard {
+                f: MSCMetaSpecs {
+                    specname: x.name.clone(),
+                    spec_version: x.version.to_string(),
+                    meta_hash: hex::encode(&x.meta_hash),
+                    meta_id_pic: "".to_string(),
+                },
+            },
+            Card::TypesInfo(_x) => NavCard::TypesInfoCard {
+                // TODO
+                f: MTypesInfo {
+                    types_on_file: false,
+                    types_hash: None,
+                    types_id_pic: None,
+                },
+            },
+            Card::NewSpecs(x) => NavCard::NewSpecsCard { f: (*x).clone() },
+            Card::NetworkInfo(x) => NavCard::NetworkInfoCard {
+                f: MSCNetworkInfo {
+                    network_title: x.title.clone(),
+                    network_logo: x.logo.clone(),
+                },
+            },
+            Card::NetworkGenesisHash(x) => NavCard::NetworkGenesisHashCard { f: hex::encode(x) },
+            Card::Derivations(x) => NavCard::DerivationsCard {
+                f: x.iter().cloned().collect(),
+            },
+            Card::Warning(warn) => NavCard::WarningCard { f: warn.show() },
+            Card::Error(err) => NavCard::ErrorCard {
+                f: <Signer>::show(err),
+            },
+        };
+
+        let i = *index;
+        *index += 1;
+        TransactionCard {
+            index: i,
+            indent,
+            card,
         }
     }
 }
@@ -154,6 +289,11 @@ pub(crate) fn make_author_info(
     author: &MultiSigner,
     base58prefix: u16,
     address_details: &AddressDetails,
-) -> String {
-    format!("\"base58\":\"{}\",\"identicon\":\"{}\",\"seed\":\"{}\",\"derivation_path\":\"{}\",\"has_pwd\":{}", print_multisigner_as_base58(author, Some(base58prefix)), hex::encode(make_identicon_from_multisigner(author)), address_details.seed_name, address_details.path, address_details.has_pwd)
+) -> TransactionAuthor {
+    TransactionAuthor {
+        base58: print_multisigner_as_base58(author, Some(base58prefix)),
+        identicon: hex::encode(make_identicon_from_multisigner(author)),
+        seed: address_details.seed_name.clone(),
+        derivation_path: address_details.path.clone(),
+    }
 }

@@ -21,10 +21,13 @@ import io.parity.signer.models.pushButton
 import io.parity.signer.ui.theme.Bg200
 import org.json.JSONObject
 import io.parity.signer.uniffi.Action
+import io.parity.signer.uniffi.MKeyDetailsMulti
 
 @Composable
-fun KeyDetailsMulti(signerDataModel: SignerDataModel) {
-	val address = signerDataModel.screenData.observeAsState()
+fun KeyDetailsMulti(
+	keyDetailsMulti: MKeyDetailsMulti,
+	signerDataModel: SignerDataModel
+) {
 	var offset by remember { mutableStateOf(0f) }
 
 	Column(
@@ -38,14 +41,20 @@ fun KeyDetailsMulti(signerDataModel: SignerDataModel) {
 					MaterialTheme.colors.Bg200
 				)
 				.fillMaxWidth()
-		) { KeyCard(identity = address.value ?: JSONObject()) }
-		Row (
+		) {
+			/* TODO: MKeyDetailsMulti -> Address conversion
+			KeyCard(identity = address.value ?: JSONObject())
+			 */
+		}
+		Row(
 			Modifier.padding(top = 3.dp, start = 12.dp, end = 12.dp)
 		) {
+			/* TODO: MKeyDetailsMulti -> MDeriveKey conversion
 			NetworkCard(address.value ?: JSONObject())
+			*/
 		}
 		Image(
-			(address.value?.optString("qr") ?: "").intoImageBitmap(),
+			(keyDetailsMulti.keyDetails.qr).intoImageBitmap(),
 			contentDescription = "QR with address to scan",
 			contentScale = ContentScale.FillWidth,
 			modifier = Modifier
@@ -70,9 +79,7 @@ fun KeyDetailsMulti(signerDataModel: SignerDataModel) {
 				)
 		)
 		Text(
-			"Key " + address.value?.optString("current_number") + " out of " + address.value?.optString(
-				"out_of"
-			)
+			"Key " + keyDetailsMulti.currentNumber + " out of " + keyDetailsMulti.outOf
 		)
 	}
 }

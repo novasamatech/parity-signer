@@ -13,6 +13,7 @@ definitions = {path = "../definitions", default-features = false, features = ["s
 hex = "0.4.3"
 image = {version = "0.24.0", default-features = false, features = ["ico"], optional = true}
 lazy_static = "1.4.0"
+log = "0.4"
 parser = {path = "../parser", default-features = false, optional = true}
 quircs = {version = "0.10.0", optional = true}
 regex = {version = "1.5.4", optional = true}

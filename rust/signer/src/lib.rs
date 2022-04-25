@@ -79,7 +79,12 @@ fn qrparser_try_decode_qr_sequence(
     qr_reader_phone::decode_sequence(data, cleaned)
 }
 
-fn substrate_path_check(seed_name: &str, path: &str, network: &str, dbname: &str) -> String {
+fn substrate_path_check(
+    seed_name: &str,
+    path: &str,
+    network: &str,
+    dbname: &str,
+) -> DerivationCheck {
     db_handling::interface_signer::dynamic_path_check(dbname, seed_name, path, network)
 }
 
@@ -112,19 +117,35 @@ fn history_seed_name_was_shown(seed_name: &str, dbname: &str) -> anyhow::Result<
         .map_err(|e| e.anyhow())
 }
 
-fn get_all_tx_cards() -> String {
-    if let transaction_parsing::TransactionAction::Read { r } =
-        transaction_parsing::test_all_cards::make_all_cards()
-    {
-        format!("{{{}}}", r)
-    } else {
-        "".to_string()
+fn get_all_tx_cards() -> TransactionCardSet {
+    match transaction_parsing::test_all_cards::make_all_cards() {
+        TransactionAction::Derivations { content, .. } => content,
+        TransactionAction::Sign { content, .. } => content,
+        TransactionAction::Stub { s, .. } => s,
+        TransactionAction::Read { r } => r,
     }
 }
 
 fn get_all_log_cards() -> String {
     String::new()
     // TODO: definitions::history::print_all_events()
+}
+
+fn init_logging(tag: String) {
+    #[cfg(target_os = "android")]
+    android_logger::init_once(
+        android_logger::Config::default()
+            .with_min_level(log::Level::Trace) // limit log level
+            .with_tag(tag) // logs will show under mytag tag
+            .with_filter(
+                // configure messages for specific crate
+                android_logger::FilterBuilder::new()
+                    .parse("debug,hello::crate=error")
+                    .build(),
+            ),
+    );
+    #[cfg(not(target_os = "android"))]
+    env_logger::init();
 }
 
 ffi_support::define_string_destructor!(signer_destroy_string);

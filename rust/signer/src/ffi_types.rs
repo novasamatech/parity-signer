@@ -7,15 +7,7 @@ pub use definitions::{
         TypesExport,
     },
     metadata::MetaValues,
-    navigation::{
-        ActionResult, Address, DerivationCheck, DerivationDestination, History, Identity,
-        LogScreenEntry, MDeriveKey, MKeyDetails, MKeyDetailsMulti, MKeys, MKeysCard, MLog,
-        MLogDetails, MMNetwork, MManageNetworks, MMetadataRecord, MNetworkCard, MNetworkDetails,
-        MNewSeed, MRawKey, MRecoverSeedName, MRecoverSeedPhrase, MSeedKeyCard, MSeeds, MSettings,
-        MSignSufficientCrypto, MTransaction, MVerifier, MVerifierDetails, ScreenData, SeedNameCard,
-        SeedNameWithIdenticon, SeedWord, StubNav, TransactionAction, TransactionAuthor,
-        TransactionCard, TransactionCardSet, TransactionNetworkInfo, TransactionType,
-    },
+    navigation::*,
     network_specs::{
         NetworkSpecs, NetworkSpecsToSend, ValidCurrentVerifier, Verifier, VerifierValue,
     },

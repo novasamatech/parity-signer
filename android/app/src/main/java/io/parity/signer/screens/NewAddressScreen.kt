@@ -1,5 +1,6 @@
 package io.parity.signer.screens
 
+import android.util.Log
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
@@ -11,33 +12,44 @@ import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.unit.dp
 import io.parity.signer.components.*
 import io.parity.signer.models.*
+import io.parity.signer.models.DerivationCheck
 import io.parity.signer.ui.theme.Text600
+import io.parity.signer.uniffi.*
 import org.json.JSONObject
-import io.parity.signer.uniffi.Action
-import io.parity.signer.uniffi.substratePathCheck
 
 @Composable
-fun NewAddressScreen(signerDataModel: SignerDataModel, increment: Boolean) {
-	val screenData = signerDataModel.screenData.value ?: JSONObject()
+fun NewAddressScreen(
+	deriveKey: MDeriveKey,
+	signerDataModel: SignerDataModel,
+	increment: Boolean
+) {
 	val derivationPath = remember { mutableStateOf("") }
 	val buttonGood = remember { mutableStateOf(false) }
-	val whereTo = remember { mutableStateOf<DeriveDestination?>(null) }
-	val collision = remember { mutableStateOf<JSONObject?>(null) }
-	val seedName = signerDataModel.screenData.value?.optString("seed_name") ?: ""
-	val networkSpecKey =
-		signerDataModel.screenData.value?.optString("network_specs_key") ?: ""
+	val whereTo = remember { mutableStateOf<DerivationDestination?>(null) }
+	val collision = remember { mutableStateOf<Address?>(null) }
+	val seedName = deriveKey.seedName
+	val networkSpecKey = deriveKey.networkSpecsKey
 	var derivationState by remember(buttonGood, whereTo, collision) {
 		mutableStateOf(DerivationCheck(
 			buttonGood,
 			whereTo,
 			collision
 		) {
-			substratePathCheck(
+			Log.w("SIGNER_RUST_LOG", "check $seedName $it $networkSpecKey")
+			val v = substratePathCheck(
 				seedName,
 				it,
 				networkSpecKey,
 				signerDataModel.dbName
 			)
+			Log.w("SIGNER_RUST_LOG", "v $v")
+
+			buttonGood.value = v.buttonGood
+			v.whereTo?.let {
+				whereTo.value = it
+			}
+
+			collision.value = v.collision
 		})
 	}
 	val focusManager = LocalFocusManager.current
@@ -54,7 +66,8 @@ fun NewAddressScreen(signerDataModel: SignerDataModel, increment: Boolean) {
 			HeaderBar(line1 = "Create new key", line2 = "For seed $seedName")
 			Spacer(Modifier.weight(1f))
 		}
-		NetworkCard(network = screenData)
+		// TODO: Another type conversion MDeriveKey -> network
+		//  NetworkCard(deriveKey)
 		SingleTextInput(
 			content = derivationPath,
 			update = {
@@ -75,13 +88,13 @@ fun NewAddressScreen(signerDataModel: SignerDataModel, increment: Boolean) {
 				focusManager.clearFocus()
 				if (derivationState.buttonGood.value) {
 					when (derivationState.whereTo.value) {
-						DeriveDestination.pin -> {
+						DerivationDestination.PIN -> {
 							signerDataModel.addKey(
 								path = derivationPath.value,
 								seedName = seedName
 							)
 						}
-						DeriveDestination.pwd -> {
+						DerivationDestination.PWD -> {
 							signerDataModel.pushButton(
 								Action.CHECK_PASSWORD,
 								details = derivationPath.value
@@ -108,13 +121,13 @@ fun NewAddressScreen(signerDataModel: SignerDataModel, increment: Boolean) {
 				text = "Next",
 				action = {
 					when (derivationState.whereTo.value) {
-						DeriveDestination.pin -> {
+						DerivationDestination.PIN -> {
 							signerDataModel.addKey(
 								path = derivationPath.value,
 								seedName = seedName
 							)
 						}
-						DeriveDestination.pwd -> {
+						DerivationDestination.PWD -> {
 							signerDataModel.pushButton(
 								Action.CHECK_PASSWORD,
 								details = derivationPath.value
@@ -128,13 +141,13 @@ fun NewAddressScreen(signerDataModel: SignerDataModel, increment: Boolean) {
 		}
 	}
 	DisposableEffect(Unit) {
-		if (signerDataModel.screenData.value?.optBoolean("keyboard") == true) {
+		if (deriveKey.keyboard) {
 			focusRequester.requestFocus()
 		}
-		derivationPath.value =
-			signerDataModel.screenData.value?.optString("suggested_derivation")
-				?: ""
-		derivationState.fromJSON(signerDataModel.screenData.value ?: JSONObject())
+		derivationPath.value = deriveKey.suggestedDerivation
+		deriveKey.derivationCheck?.let {
+			derivationState.fromFFI(it)
+		}
 		onDispose { focusManager.clearFocus() }
 	}
 }

@@ -6,6 +6,7 @@ use definitions::{
     error_signer::{ErrorSigner, InputSigner, NotFoundSigner, ParserError},
     history::{Event, SignDisplay},
     keyring::{AddressKey, NetworkSpecsKey},
+    navigation::{TransactionCard, TransactionCardSet},
     users::AddressDetails,
 };
 use parser::{cut_method_extensions, decoding_commons::OutputCard, parse_extensions, parse_method};
@@ -26,7 +27,7 @@ use crate::TransactionAction;
 /// Enum to move around cards in preparatory stage (author details or author card, and warning card)
 enum CardsPrep<'a> {
     SignProceed(AddressDetails, Option<Warning<'a>>),
-    ShowOnly(String, String),
+    ShowOnly(TransactionCard, TransactionCard),
 }
 
 /// Function to parse transaction.
@@ -135,15 +136,12 @@ pub(crate) fn parse_transaction(
                                 CardsPrep::ShowOnly(author_card, warning_card) => {
                                     CardsPrep::ShowOnly(
                                         author_card,
-                                        format!(
-                                            "{},{}",
-                                            warning_card,
-                                            Card::Warning(Warning::NewerVersion {
-                                                used_version,
-                                                latest_version
-                                            })
-                                            .card(&mut index, indent)
-                                        ),
+                                        //warning_card,
+                                        Card::Warning(Warning::NewerVersion {
+                                            used_version,
+                                            latest_version,
+                                        })
+                                        .card(&mut index, indent),
                                     )
                                 }
                             };
@@ -152,27 +150,100 @@ pub(crate) fn parse_transaction(
                             Ok(a) => {
                                 found_solution = match cards_prep {
                                     CardsPrep::SignProceed(address_details, possible_warning) => {
-                                        let sign = TrDbColdSign::generate(SignContent::Transaction{method: method_data, extensions: extensions_data}, &network_specs.name, &address_details.path, address_details.has_pwd, &author_multi_signer, history);
-                                        let checksum = sign.store_and_get_checksum (database_name)?;
-                                        let author_info = make_author_info(&author_multi_signer, network_specs.base58prefix, &address_details);
-                                        let network_info = format!("\"network_title\":\"{}\",\"network_logo\":\"{}\"", network_specs.title, network_specs.logo);
-                                        match possible_warning {
-                                            Some(warning) => Some(TransactionAction::Sign{content: format!("\"warning\":[{}],\"method\":[{}],\"extensions\":[{}]", Card::Warning(warning).card(&mut index, indent), into_cards(&a, &mut index), into_cards(&extensions_cards, &mut index)), checksum, has_pwd: address_details.has_pwd, author_info, network_info}),
-                                            None => Some(TransactionAction::Sign{content: format!("\"method\":[{}],\"extensions\":[{}]", into_cards(&a, &mut index), into_cards(&extensions_cards, &mut index)), checksum, has_pwd: address_details.has_pwd, author_info, network_info}),
-                                        }
-                                    },
-                                    CardsPrep::ShowOnly(author_card, warning_card) => Some(TransactionAction::Read{ r: format!("\"author\":[{}],\"warning\":[{}],\"method\":[{}],\"extensions\":[{}]", author_card, warning_card, into_cards(&a, &mut index), into_cards(&extensions_cards, &mut index))})
+                                        let sign = TrDbColdSign::generate(
+                                            SignContent::Transaction {
+                                                method: method_data,
+                                                extensions: extensions_data,
+                                            },
+                                            &network_specs.name,
+                                            &address_details.path,
+                                            address_details.has_pwd,
+                                            &author_multi_signer,
+                                            history,
+                                        );
+                                        let checksum =
+                                            sign.store_and_get_checksum(database_name)?;
+                                        let author_info = make_author_info(
+                                            &author_multi_signer,
+                                            network_specs.base58prefix,
+                                            &address_details,
+                                        );
+                                        let warning = possible_warning
+                                            .map(|w| Card::Warning(w).card(&mut index, indent))
+                                            .map(|w| vec![w]);
+                                        let method = into_cards(&a, &mut index);
+                                        let extensions = into_cards(&extensions_cards, &mut index);
+                                        let content = TransactionCardSet {
+                                            warning,
+                                            method: Some(method),
+                                            extensions: Some(extensions),
+                                            ..Default::default()
+                                        };
+                                        Some(TransactionAction::Sign {
+                                            content,
+                                            checksum,
+                                            has_pwd: address_details.has_pwd,
+                                            author_info,
+                                            network_info: network_specs.clone(),
+                                        })
+                                    }
+                                    CardsPrep::ShowOnly(author_card, warning_card) => {
+                                        let author = Some(vec![author_card]);
+                                        let warning = Some(vec![warning_card]);
+                                        let method = Some(into_cards(&a, &mut index));
+                                        let extensions =
+                                            Some(into_cards(&extensions_cards, &mut index));
+                                        let r = TransactionCardSet {
+                                            author,
+                                            warning,
+                                            method,
+                                            extensions,
+                                            ..Default::default()
+                                        };
+                                        Some(TransactionAction::Read { r })
+                                    }
                                 };
                             }
                             Err(e) => {
                                 found_solution = match cards_prep {
                                     CardsPrep::SignProceed(address_details, possible_warning) => {
-                                        match possible_warning {
-                                            Some(warning) => Some(TransactionAction::Read{ r: format!("\"author\":[{}],\"warning\":[{}],\"error\":[{}],\"extensions\":[{}]", Card::Author{author: &author_multi_signer, base58prefix: network_specs.base58prefix, address_details: &address_details}.card(&mut index, indent), Card::Warning(warning).card(&mut index, indent), Card::Error(ErrorSigner::Parser(e)).card(&mut index, indent), into_cards(&extensions_cards, &mut index))}),
-                                            None => Some(TransactionAction::Read{ r: format!("\"author\":[{}],\"error\":[{}],\"extensions\":[{}]", Card::Author{author: &author_multi_signer, base58prefix: network_specs.base58prefix, address_details: &address_details}.card(&mut index, indent), Card::Error(ErrorSigner::Parser(e)).card(&mut index, indent), into_cards(&extensions_cards, &mut index))}),
+                                        let warning = possible_warning
+                                            .map(|w| Card::Warning(w).card(&mut index, indent))
+                                            .map(|w| vec![w]);
+                                        let author = Card::Author {
+                                            author: &author_multi_signer,
+                                            base58prefix: network_specs.base58prefix,
+                                            address_details: &address_details,
                                         }
-                                    },
-                                    CardsPrep::ShowOnly(author_card, warning_card) => Some(TransactionAction::Read{ r: format!("\"author\":[{}],\"warning\":[{}],\"error\":[{}],\"extensions\":[{}]", author_card, warning_card, Card::Error(ErrorSigner::Parser(e)).card(&mut index, indent), into_cards(&extensions_cards, &mut index))})
+                                        .card(&mut index, indent);
+                                        let error = Card::Error(ErrorSigner::Parser(e))
+                                            .card(&mut index, indent);
+                                        let extensions = into_cards(&extensions_cards, &mut index);
+                                        let r = TransactionCardSet {
+                                            author: Some(vec![author]),
+                                            error: Some(vec![error]),
+                                            warning,
+                                            extensions: Some(extensions),
+                                            ..Default::default()
+                                        };
+                                        Some(TransactionAction::Read { r })
+                                    }
+                                    CardsPrep::ShowOnly(author_card, warning_card) => {
+                                        let author = Some(vec![author_card]);
+                                        let warning = Some(vec![warning_card]);
+                                        let error = Some(vec![Card::Error(ErrorSigner::Parser(e))
+                                            .card(&mut index, indent)]);
+                                        let extensions =
+                                            Some(into_cards(&extensions_cards, &mut index));
+                                        let r = TransactionCardSet {
+                                            author,
+                                            warning,
+                                            error,
+                                            extensions,
+                                            ..Default::default()
+                                        };
+                                        Some(TransactionAction::Read { r })
+                                    }
                                 };
                             }
                         }
@@ -198,28 +269,30 @@ pub(crate) fn parse_transaction(
                 encryption,
             }))
             .card(&mut index, indent);
-            Ok(TransactionAction::Read {
-                r: format!("\"author\":[{}],\"error\":[{}]", author_card, error_card),
-            })
+            let author = Some(vec![author_card]);
+            let error = Some(vec![error_card]);
+
+            let r = TransactionCardSet {
+                author,
+                error,
+                ..Default::default()
+            };
+
+            Ok(TransactionAction::Read { r })
         }
     }
 }
 
-fn into_cards(set: &[OutputCard], index: &mut u32) -> String {
-    let mut out = String::new();
-    for (i, x) in set.iter().enumerate() {
-        if i > 0 {
-            out.push(',');
-        }
-        out.push_str(&Card::ParserCard(&x.card).card(index, x.indent));
-    }
-    out
+fn into_cards(set: &[OutputCard], index: &mut u32) -> Vec<TransactionCard> {
+    set.iter()
+        .map(|card| Card::ParserCard(&card.card).card(index, card.indent))
+        .collect()
 }
 
 pub(crate) fn decode_signable_from_history(
     found_signable: &SignDisplay,
     database_name: &str,
-) -> Result<String, ErrorSigner> {
+) -> Result<TransactionCardSet, ErrorSigner> {
     let (parser_data, network_name, encryption) = found_signable.transaction_network_encryption();
 
     let short_specs = specs_by_name(&network_name, &encryption, database_name)?.short();
@@ -253,19 +326,20 @@ pub(crate) fn decode_signable_from_history(
                     Ok(a) => {
                         let method = into_cards(&a, &mut index);
                         let extensions = into_cards(&extensions_cards, &mut index);
-                        found_solution = Some(format!(
-                            "\"method\":[{}],\"extensions\":[{}]",
-                            method, extensions
-                        ));
+                        found_solution = Some(TransactionCardSet {
+                            method: Some(method),
+                            extensions: Some(extensions),
+                            ..Default::default()
+                        });
                     }
                     Err(e) => {
-                        let method_error =
-                            Card::Error(ErrorSigner::Parser(e)).card(&mut index, indent);
-                        let extensions = into_cards(&extensions_cards, &mut index);
-                        found_solution = Some(format!(
-                            "\"error\":[{}],\"extensions\":[{}]",
-                            method_error, extensions
-                        ));
+                        let error = Card::Error(ErrorSigner::Parser(e)).card(&mut index, indent);
+                        let extensions = Some(into_cards(&extensions_cards, &mut index));
+                        found_solution = Some(TransactionCardSet {
+                            error: Some(vec![error]),
+                            extensions,
+                            ..Default::default()
+                        });
                     }
                 }
                 break;

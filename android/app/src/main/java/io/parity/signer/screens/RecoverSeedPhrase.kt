@@ -22,20 +22,23 @@ import io.parity.signer.components.RestoreSeedPhraseSuggest
 import io.parity.signer.models.*
 import org.json.JSONArray
 import io.parity.signer.uniffi.Action
+import io.parity.signer.uniffi.MRecoverSeedPhrase
 
 @Composable
 fun RecoverSeedPhrase(
+	recoverSeedPhrase: MRecoverSeedPhrase,
 	button: (action: Action, details: String) -> Unit,
 	signerDataModel: SignerDataModel
 ) {
-  val screenData = signerDataModel.screenData.observeAsState()
-	val seedPhrase = screenData.value?.optJSONArray("draft")?.toListOfJSONObjects()?: listOf() //remember { mutableStateOf(listOf<String>()) }
-	val guessWord = screenData.value?.optJSONArray("guess_set")?.toListOfStrings() ?: listOf() //remember { mutableStateOf(listOf<String>()) }
-	val seedPhraseReady = screenData.value?.optString("ready_seed")
-	val seedWordText = screenData.value?.optString("user_input")?: ""
+	val seedPhrase =
+		recoverSeedPhrase.draft //remember { mutableStateOf(listOf<String>()) }
+	val guessWord =
+		recoverSeedPhrase.guessSet //remember { mutableStateOf(listOf<String>()) }
+	val seedPhraseReady = recoverSeedPhrase.readySeed
+	val seedWordText = recoverSeedPhrase.readySeed ?: ""
 	val seedWord = TextFieldValue(
-				seedWordText,
-				selection = TextRange(seedWordText.length)
+		seedWordText,
+		selection = TextRange(seedWordText.length)
 	)
 	val createRoots = remember { mutableStateOf(true) }
 
@@ -48,8 +51,7 @@ fun RecoverSeedPhrase(
 			modifier = Modifier.fillMaxWidth(1f)
 		) {
 			Text(
-				signerDataModel.screenData.value?.optString("seed_name")?.decode64()
-					?: "Error: no seed name",
+				recoverSeedPhrase.seedName.decode64(),
 				style = MaterialTheme.typography.subtitle1
 			)
 		}
@@ -60,8 +62,7 @@ fun RecoverSeedPhrase(
 			seedPhrase = seedPhrase,
 			seedWord = seedWord,
 			button = button,
-			keyboard = signerDataModel.screenData.value?.optBoolean("keyboard")
-				?: false
+			keyboard = recoverSeedPhrase.keyboard
 		)
 
 		Spacer(Modifier.height(12.dp))
@@ -83,12 +84,12 @@ fun RecoverSeedPhrase(
 			Text("Create root keys")
 		}
 		Spacer(Modifier.weight(0.1f))
-		//if (true) { //TODO: hide when keyboard is shown
+		if (recoverSeedPhrase.keyboard) {
 			BigButton(
 				text = "Next",
 				action = {
 					signerDataModel.screenData.value?.let { screenData ->
-						screenData.optString("seed_name").let { seedName ->
+						recoverSeedPhrase.seedName.let { seedName ->
 							seedPhraseReady?.let {
 								signerDataModel.addSeed(
 									seedName = seedName,
@@ -101,7 +102,7 @@ fun RecoverSeedPhrase(
 				},
 				isDisabled = seedPhraseReady == null
 			)
-		//}
+		}
 		Spacer(Modifier.weight(0.1f))
 	}
 

@@ -5,6 +5,7 @@ use db_handling::{
 use definitions::{
     error_signer::{ErrorSigner, InputSigner},
     keyring::{AddressKey, NetworkSpecsKey},
+    navigation::TransactionCardSet,
 };
 use parity_scale_codec::DecodeAll;
 use parser::cards::ParserCard;
@@ -57,12 +58,12 @@ pub fn process_message(
                             network_specs.base58prefix,
                             &address_details,
                         );
-                        let network_info = format!(
-                            "\"network_title\":\"{}\",\"network_logo\":\"{}\"",
-                            network_specs.title, network_specs.logo
-                        );
+                        let network_info = network_specs;
                         Ok(TransactionAction::Sign {
-                            content: format!("\"message\":[{}]", message_card),
+                            content: TransactionCardSet {
+                                message: Some(vec![message_card]),
+                                ..Default::default()
+                            },
                             checksum,
                             has_pwd: address_details.has_pwd,
                             author_info,
@@ -82,10 +83,13 @@ pub fn process_message(
                         let network_card =
                             Card::NetworkInfo(&network_specs).card(&mut index, indent);
                         Ok(TransactionAction::Read {
-                            r: format!(
-                                "\"author\":[{}],\"warning\":[{}],\"message\":[{},{}]",
-                                author_card, warning_card, message_card, network_card
-                            ),
+                            r: TransactionCardSet {
+                                author: Some(vec![author_card]),
+                                warning: Some(vec![warning_card]),
+                                message: Some(vec![message_card]),
+                                new_specs: Some(vec![network_card]),
+                                ..Default::default()
+                            },
                         })
                     }
                 }
@@ -101,10 +105,13 @@ pub fn process_message(
                         Card::ParserCard(&ParserCard::Text(message)).card(&mut index, indent);
                     let network_card = Card::NetworkInfo(&network_specs).card(&mut index, indent);
                     Ok(TransactionAction::Read {
-                        r: format!(
-                            "\"author\":[{}],\"warning\":[{}],\"message\":[{},{}]",
-                            author_card, warning_card, message_card, network_card
-                        ),
+                        r: TransactionCardSet {
+                            author: Some(vec![author_card]),
+                            warning: Some(vec![warning_card]),
+                            message: Some(vec![message_card]),
+                            new_specs: Some(vec![network_card]),
+                            ..Default::default()
+                        },
                     })
                 }
             }
@@ -121,10 +128,13 @@ pub fn process_message(
                 Card::ParserCard(&ParserCard::Text(message)).card(&mut index, indent);
             let network_card = Card::NetworkGenesisHash(&genesis_hash_vec).card(&mut index, indent);
             Ok(TransactionAction::Read {
-                r: format!(
-                    "\"author\":[{}],\"error\":[{}],\"message\":[{},{}]",
-                    author_card, error_card, message_card, network_card
-                ),
+                r: TransactionCardSet {
+                    author: Some(vec![author_card]),
+                    error: Some(vec![error_card]),
+                    message: Some(vec![message_card]),
+                    new_specs: Some(vec![network_card]),
+                    ..Default::default()
+                },
             })
         }
     }

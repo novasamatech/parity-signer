@@ -12,7 +12,7 @@ use db_handling::{
 use definitions::{
     crypto::SufficientCrypto,
     error_signer::{ErrorSigner, Signer},
-    history::{Event, MetaValuesDisplay, MetaValuesExport, NetworkSpecsExport, TypesExport},
+    history::{Event, MetaValuesExport, NetworkSpecsExport, TypesExport},
     keyring::NetworkSpecsKey,
     qr_transfers::{ContentAddSpecs, ContentLoadMeta},
     users::AddressDetails,
@@ -143,7 +143,7 @@ pub(crate) fn sufficient_crypto_load_types(
     Ok(format!(
         "\"sufficient\":\"{}\",\"content\":{{\"type\":\"load_types\",{}}}",
         sufficient,
-        types_content.show()
+        "TODO" // TODO types_content.show()
     ))
 }
 
