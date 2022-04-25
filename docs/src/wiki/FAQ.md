@@ -35,7 +35,7 @@
 	
 - **Can import my account from polkadot{.js} apps or extension to Parity Signer?**
 
-	Yes. Keys are compatible between polkadot{.js} and Parity Signer, except for Ledger keys. To import seed keys into Parity Signer, you need to know:
+	Yes. Keys are compatible between polkadot{.js} and Parity Signer, except for the keys generated with Ledger (BIP39). To import seed keys into Parity Signer, you need to know:
 1. Seed phrase\
 _It should always be backed up in paper!_
 2. Network you are adding address to and whether Parity Signer installed on your device has metadata for the respective network.\
