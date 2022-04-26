@@ -171,7 +171,7 @@ impl<'a> Card<'a> {
                     Era::Immortal => NavCard::EraImmortalCard,
                     Era::Mortal(period, phase) => NavCard::EraMortalCard {
                         f: MSCEraMortal {
-                            era: "TODO".to_string(),
+                            era: "Mortal".to_string(),
                             phase: phase.to_string(),
                             period: period.to_string(),
                         },
