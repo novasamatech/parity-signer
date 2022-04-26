@@ -12,7 +12,7 @@ Wipe the phone to factory state. This is good time to install newer version of o
 
 ### Set up phone
 
-Before installing the Signer, you need to set up the phone. It is essential that you enable sufficient authentication method; your secret seeds in Signer are as safe as the phone is. Seed secrets are protected with hardware encryption based on vendor authentification protocol. Other than that, you might want to select dark mode (Signer remains dark for historic reasons)
+Before installing the Signer, you need to set up the phone. It is essential that you enable sufficient authentication method; your secret seeds in Signer are as safe as the phone is. Seed secrets are protected with hardware encryption based on vendor authentification protocol. Other than that, you might want to select dark mode (Signer remains dark for historic reasons).
 
 ### Install Signer
 
