@@ -37,7 +37,7 @@ struct ManageMetadata: View {
                     text: "Sign this metadata",
                     isShaded: true,
                     isCrypto: true,
-                    action:{data.pushButton(buttonID: .SignMetadata)}
+                    action:{data.pushButton(action: .signMetadata)}
                 )
                 BigButton(
                     text: "Delete this metadata",
@@ -55,7 +55,7 @@ struct ManageMetadata: View {
                     .onEnded{drag in
             if drag.translation.height > 40 {
                 self.offset = UIScreen.main.bounds.size.height
-                data.pushButton(buttonID: .GoBack)
+                data.pushButton(action: .goBack)
             }
         })
         .alert(isPresented: $removeMetadataAlert, content: {

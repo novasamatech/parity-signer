@@ -17,9 +17,9 @@ struct KeyManager: View {
             VStack {
                 ZStack{
                     Button(action: {
-                        data.pushButton(action: .selectKey, details: content.root.address_key)
+                        data.pushButton(action: .selectKey, details: content.root.addressKey)
                     }){
-                        SeedKeyCard(seedCard: content.root, multiselectMode: content.multiselect_mode).gesture(DragGesture()
+                        SeedKeyCard(seedCard: content.root, multiselectMode: content.multiselectMode).gesture(DragGesture()
                                                                                                                 .onEnded {drag in
                             if abs(drag.translation.height) < 20 && abs(drag.translation.width) > 20 {
                                 if content.root.address_key != "" {
@@ -35,10 +35,10 @@ struct KeyManager: View {
                             }
                             )
                     }
-                    .disabled(content.root.address_key == "")
+                    .disabled(content.root.addressKey == "")
                     .padding(2)
                     if content.root.swiped {
-                        AddressCardControls(seed_name: content.root.seed_name)
+                        AddressCardControls(seed_name: content.root.seedName)
                     }
                 }
                 Button(action: {data.pushButton(action: .networkSelector)}) {
@@ -65,13 +65,13 @@ struct KeyManager: View {
                     LazyVStack {
                         ForEach(content.set.sorted(by: {$0.path < $1.path}).filter{card in
                             return card.path.contains(searchString) || searchString == ""
-                        }, id: \.address_key) {
+                        }, id: \.addressKey) {
                             address in
                             ZStack {
                                 Button(action: {
-                                    data.pushButton(action: .selectKey, details: address.address_key)
+                                    data.pushButton(action: .selectKey, details: address.addressKey)
                                 }){
-                                    AddressCard(address: address.intoAddress(), multiselectMode: content.multiselect_mode).gesture(DragGesture()
+                                    AddressCard(address: address, multiselectMode: content.multiselectMode).gesture(DragGesture()
                                                                                                                                     .onEnded {drag in
                                         if abs(drag.translation.height) < 20 && abs(drag.translation.width) > 20 {
                                             data.pushButton(buttonID: .Swipe, details: address.address_key)
@@ -79,20 +79,20 @@ struct KeyManager: View {
                                     })
                                         .gesture(LongPressGesture()
                                                     .onEnded {_ in
-                                            data.pushButton(action: .longTap, details: address.address_key)
+                                            data.pushButton(action: .longTap, details: address.addressKey)
                                         }
                                         )
                                 }.padding(2)
                                 if address.swiped {
-                                    AddressCardControls(seed_name: content.root.seed_name)
+                                    AddressCardControls(seed_name: content.root.seedName)
                                 }
                             }
                         }
                     }
                 }.padding(.bottom, -20)
                 Spacer()
-                if (content.multiselect_mode) {
-                    MultiselectBottomControl(selectedCount: content.multiselect_count)
+                if (content.multiselectMode) {
+                    MultiselectBottomControl(selectedCount: content.multiselectCount)
                 } else {
                     //SearchKeys(searchString: $searchString)
                     EmptyView()

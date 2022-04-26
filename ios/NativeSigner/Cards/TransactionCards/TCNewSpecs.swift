@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct TCNewSpecs: View {
-    var value: NewSpecs
+    var value: NetworkSpecsToSend
     var body: some View {
         VStack {
             Text("NEW NETWORK").foregroundColor(Color("Text600"))
@@ -40,7 +40,7 @@ struct TCNewSpecs: View {
                 HStack {
                     Text("genesis hash:")
                         .foregroundColor(Color("Text400"))
-                    Text(value.genesis_hash)
+                    Text(value.genesisHash)
                         .foregroundColor(Color("Text600"))
                 }
                 HStack {
@@ -63,7 +63,7 @@ struct TCNewSpecs: View {
                 HStack {
                     Text("default path:")
                         .foregroundColor(Color("Text400"))
-                    Text(value.path_id)
+                    Text(value.pathId)
                         .foregroundColor(Color("Text600"))
                 }
             }

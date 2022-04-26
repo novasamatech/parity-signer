@@ -28,7 +28,7 @@ struct Footer: View {
     var body: some View {
         HStack {
             Button(action: {
-                data.pushButton(buttonID: ButtonID.NavbarLog)
+                data.pushButton(action: .navbarLog)
             }) {
                 VStack(alignment: .center) {
                     Image(systemName: "rectangle.grid.1x2.fill").imageScale(.medium)
@@ -41,7 +41,7 @@ struct Footer: View {
             }
             Spacer()
             Button(action: {
-                data.pushButton(buttonID: ButtonID.NavbarScan)
+                data.pushButton(action: .navbarScan)
             }) {
                 VStack {
                     Image(systemName: "viewfinder").imageScale(.medium)
@@ -53,7 +53,7 @@ struct Footer: View {
             }
             Spacer()
             Button(action: {
-                data.pushButton(buttonID: ButtonID.NavbarKeys)
+                data.pushButton(action: .navbarKeys)
             }) {
                 VStack{
                     KeySymbol()
@@ -63,7 +63,7 @@ struct Footer: View {
             }
             Spacer()
             Button(action: {
-                data.pushButton(buttonID: ButtonID.NavbarSettings)
+                data.pushButton(action: .navbarSettings)
             }) {
                 VStack {
                     WrenchSymbol()

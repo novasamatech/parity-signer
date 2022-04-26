@@ -14,13 +14,13 @@ struct TypesMenu: View {
     var body: some View {
         MenuStack {
             HeaderBar(line1: "MANAGE TYPES", line2: "Select action").padding(.top, 10)
-            if content.types_on_file {
+            if content.typesOnFile {
                 HStack {
-                    Image(uiImage: UIImage(data: Data(fromHexEncodedString: content.types_id_pic ?? "") ?? Data()) ?? UIImage())
+                    Image(uiImage: UIImage(data: Data(fromHexEncodedString: content.typesIdPic ?? "") ?? Data()) ?? UIImage())
                         .resizable(resizingMode: .stretch)
                         .frame(width: 28, height: 28)
                 }
-                Text(content.types_hash ?? "none")
+                Text(content.typesHash ?? "none")
             } else {
                 Text("Pre-v14 types not installed")
             }

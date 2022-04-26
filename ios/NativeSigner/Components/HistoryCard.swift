@@ -53,37 +53,37 @@ struct HistoryCard: View {
                 timestamp: timestamp,
                 danger: false,
                 line1: "Key created",
-                line2: value.seed_name.decode64() + value.path
+                line2: value.seedName.decode64() + value.path
             )
             case .identityRemoved(let value): HistoryCardTemplate(
                 image: "xmark.rectangle.portrait",
                 timestamp: timestamp,
                 danger: false,
                 line1: "Key removed",
-                line2: value.seed_name.decode64() + value.path
+                line2: value.seedName.decode64() + value.path
             )
             case .metadataAdded(let value): HistoryCardTemplate(
                 image: "plus.viewfinder",
                 timestamp: timestamp,
                 danger: false,
                 line1: "Metadata added",
-                line2: value.specname + " version " +  value.spec_version
+                line2: value.name + " version " +  value.version
             )
             case .metadataRemoved(let value): HistoryCardTemplate(
                 image: "xmark.rectangle.portrait",
                 timestamp: timestamp,
                 danger: false,
                 line1: "Metadata removed",
-                line2: value.specname + " version " +  value.spec_version
+                line2: value.name + " version " +  value.version
             )
-            case .networkAdded(let value): HistoryCardTemplate(
+            case .networkSpecsAdded(let value): HistoryCardTemplate(
                 image: "plus.viewfinder",
                 timestamp: timestamp,
                 danger: false,
                 line1: "Network added",
-                line2: value.title
+                line2: value
             )
-            case .networkRemoved(let value): HistoryCardTemplate(
+            case .networkSpecsRemoved(let value): HistoryCardTemplate(
                 image: "xmark.rectangle.portrait",
                 timestamp: timestamp,
                 danger: false,
@@ -95,7 +95,7 @@ struct HistoryCard: View {
                 timestamp: timestamp,
                 danger: false,
                 line1: "Network verifier set",
-                line2: value.genesis_hash
+                line2: value.genesisHash
             )
             case .resetDangerRecord: HistoryCardTemplate(
                 image: "checkmark.shield",
@@ -119,21 +119,21 @@ struct HistoryCard: View {
                 line1: "Seed was shown",
                 line2: text.decode64()
             )
-            case .signedAddNetwork(let value): HistoryCardTemplate(
+            case .networkSpecsSigned(let value): HistoryCardTemplate(
                 image: "signature",
                 timestamp: timestamp,
                 danger: false,
                 line1: "Network specs signed",
-                line2: value.title
+                line2: value.specsToSend.title
             )
-            case .signedLoadMetadata(let value): HistoryCardTemplate(
+            case .metadataSigned(let value): HistoryCardTemplate(
                 image: "signature",
                 timestamp: timestamp,
                 danger: false,
                 line1: "Metadata signed",
-                line2: value.specname + value.spec_version
+                line2: value.name + value.version
             )
-            case .signedTypes(_): HistoryCardTemplate(
+            case .typesSigned(_): HistoryCardTemplate(
                 image: "signature",
                 timestamp: timestamp,
                 danger: false,
@@ -152,14 +152,14 @@ struct HistoryCard: View {
                 timestamp: timestamp,
                 danger: true,
                 line1: "Signing failure",
-                line2: String(decoding: Data(base64Encoded: value.user_comment) ?? Data(), as: UTF8.self)
+                line2: String(decoding: Data(base64Encoded: value.userComment) ?? Data(), as: UTF8.self)
             )
             case .transactionSigned(let value): HistoryCardTemplate(
                 image: "signature",
                 timestamp: timestamp,
                 danger: false,
                 line1: "Generated signature",
-                line2: String(decoding: Data(base64Encoded: value.user_comment) ?? Data(), as: UTF8.self)
+                line2: String(decoding: Data(base64Encoded: value.userComment) ?? Data(), as: UTF8.self)
             )
             case .typesAdded(_): HistoryCardTemplate(
                 image: "plus.viewfinder",
@@ -201,14 +201,14 @@ struct HistoryCard: View {
                 timestamp: timestamp,
                 danger: true,
                 line1: "Message signing error!",
-                line2: value.error
+                line2: ""
             )
             case .messageSigned(let value): HistoryCardTemplate(
                 image: "signature",
                 timestamp: timestamp,
                 danger: false,
                 line1: "Generated signature for message",
-                line2: String(decoding: Data(base64Encoded: value.user_comment) ?? Data(), as: UTF8.self)
+                line2: String(decoding: Data(base64Encoded: value.userComment) ?? Data(), as: UTF8.self)
             )
             }
         }

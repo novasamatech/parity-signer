@@ -13,75 +13,75 @@ struct TransactionCardSelector: View {
     var body: some View {
         HStack {
         switch card.card {
-        case .author(let author):
+        case .authorCard(let author):
             TCAuthor(author: author)
-        case .authorPlain(let value):
+        case .authorPlainCard(let value):
             TCAuthorPlain(value: value)
-        case .authorPublicKey(let value):
+        case .authorPublicKeyCard(let value):
             TCAuthorPublicKey(value: value)
-        case .balance(let value):
+        case .balanceCard(let value):
             TCBalance(value: value)
-        case .bitVec(let text):
+        case .bitVecCard(let text):
             TCBitVec(content: text)
-        case .blockHash(let text):
+        case .blockHashCard(let text):
             TCBlockHash(text: text)
-        case .call(let value):
+        case .callCard(let value):
             TCCall(value: value)
         case .defaultCard(let text):
             TCDefault(content: text)
-        case .derivations(let value):
+        case .derivationsCard(let value):
             TCDerivations(value: value)
-        case .enumVariantName(let value):
+        case .enumVariantNameCard(let value):
             TCEnumVariantName(value: value)
-        case .eraImmortal:
+        case .eraImmortalCard:
             TCEraImmortal()
-        case .eraMortal(let eraMortal):
+        case .eraMortalCard(let eraMortal):
             TCEraMortal(eraMortal: eraMortal)
-        case .error(let text):
+        case .errorCard(let text):
             TCError(text: text)
-        case .fieldName(let value):
+        case .fieldNameCard(let value):
             TCFieldName(value: value)
-        case .fieldNumber(let value):
+        case .fieldNumberCard(let value):
             TCFieldNumber(value: value)
-        case .id(let value):
+        case .idCard(let value):
             TCID(value: value)
-        case .identityField(let text):
+        case .identityFieldCard(let text):
             TCIdentityField(content: text)
-        case .meta(let value):
+        case .metaCard(let value):
             TCMeta(content: value)
-        case .nameVersion(let value):
+        case .nameVersionCard(let value):
             TCNameVersion(value: value)
-        case .networkInfo(let value):
+        case .networkInfoCard(let value):
             TCNetworkInfo(content: value)
-        case .newSpecs(let value):
+        case .newSpecsCard(let value):
             TCNewSpecs(value: value)
-        case .nonce(let text):
+        case .nonceCard(let text):
             TCNonce(content: text)
         case .none:
             EmptyView()
-        case .pallet(let text):
+        case .palletCard(let text):
             TCPallet(text: text)
-        case .text(let text):
+        case .textCard(let text):
             TCText(text: text)
-        case .tip(let value):
+        case .tipCard(let value):
             TCTip(value: value)
-        case .tipPlain(let text):
+        case .tipPlainCard(let text):
             TCTipPlain(content: text)
-        case .txSpec(let value):
+        case .txSpecCard(let value):
             TCTXSpec(value: value)
-        case .txSpecPlain(let value):
+        case .txSpecPlainCard(let value):
             TCTXSpecPlain(content: value)
-        case .typesInfo(let value):
+        case .typesInfoCard(let value):
             TCTypesInfo(content: value)
-        case .varName(let text):
+        case .varNameCard(let text):
             TCVarName(text: text)
-        case .verifier(let value):
+        case .verifierCard(let value):
             TCVerifier(value: value)
-        case .warning(let text):
+        case .warningCard(let text):
             TCWarning(text: text)
-        case .networkGenesisHash(let text):
+        case .networkGenesisHashCard(let text):
             TCGenesisHash(content: text)
-        case .networkName(let text):
+        case .networkNameCard(let text):
             TCNetworkName(content: text)
         }
         }

@@ -23,7 +23,7 @@ struct SignatureReady: View {
                     .aspectRatio(contentMode: .fit).padding(12)
                 Spacer()
                 BigButton(text: "Done", action: {
-                    data.pushButton(buttonID: .GoBack)
+                    data.pushButton(action: .goBack)
                 })
             }.padding(16)
         }//.background(RoundedRectangle(cornerRadius: 8).foregroundColor(Color("Bg000")))

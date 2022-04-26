@@ -16,9 +16,9 @@ struct KeyDetailsMulti: View {
     var body: some View {
         ScrollView {
             VStack {
-                AddressCard(address: content.intoAddress())
-                NetworkCard(title: content.network_title, logo: content.network_logo)
-                Image(uiImage: UIImage(data: Data(fromHexEncodedString: content.qr) ?? Data()) ?? UIImage())
+                AddressCard(address: Address(base58: content.keyDetails.base58, path: content.keyDetails.path, hasPwd: false /*TODO*/, identicon: content.keyDetails.identicon, seedName: content.keyDetails.seedName, multiselect: false))
+                NetworkCard(title: content.keyDetails.networkTitle, logo: content.keyDetails.networkLogo)
+                Image(uiImage: UIImage(data: Data(fromHexEncodedString: content.keyDetails.qr) ?? Data()) ?? UIImage())
                     .resizable()
                     .aspectRatio(contentMode: .fit).padding(12)
                     .offset(x: offset, y:0)

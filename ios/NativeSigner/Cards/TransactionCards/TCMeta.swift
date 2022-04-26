@@ -8,18 +8,18 @@
 import SwiftUI
 
 struct TCMeta: View {
-    let content: MetaSpecs
+    let content: MscMetaSpecs
     var body: some View {
         HStack {
-            Identicon(identicon: content.meta_id_pic)
+            Identicon(identicon: content.metaIdPic)
             VStack{
                 Text("Add metadata").foregroundColor(Color("Text600"))
                 HStack {
                     Text(content.specname)
-                    Text(content.spec_version)
+                    Text(content.specVersion)
                 }
                 .foregroundColor(Color("Crypto400")).font(FCrypto(style: .body2))
-                Text(content.meta_hash).foregroundColor(Color("Text400")).font(FCrypto(style: .body2))
+                Text(content.metaHash).foregroundColor(Color("Text400")).font(FCrypto(style: .body2))
             }
             Spacer()
         }

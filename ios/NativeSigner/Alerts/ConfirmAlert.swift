@@ -18,13 +18,13 @@ struct ConfirmAlert: View {
                 BigButton(
                     text: content.yes,
                     action: {
-                        data.pushButton(buttonID: .GoForward)
+                        data.pushButton(action: .goForward)
                     }
                 )
                 BigButton(
                     text: content.no,
                     action: {
-                        data.pushButton(buttonID: .GoBack)
+                        data.pushButton(action: .goBack)
                     }
                 )
             }

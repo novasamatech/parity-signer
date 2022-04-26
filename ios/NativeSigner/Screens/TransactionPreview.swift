@@ -19,7 +19,7 @@ struct TransactionPreview: View {
             TransactionBlock(cards: content.content.assemble())
             VStack {
                 if let address = content.authorInfo {
-                    AddressCard(address: address)
+                    AddressCard(address: address.toAddress())
                 }
                 if let network = content.networkInfo {
                     NetworkCard(title: network.networkTitle, logo: network.networkLogo)
@@ -50,7 +50,7 @@ struct TransactionPreview: View {
                 }
                 Spacer()
                 VStack {
-                    switch content.type {
+                    switch content.ttype {
                     case .sign:
                         BigButton(
                             text: "Unlock key and sign",
@@ -62,7 +62,7 @@ struct TransactionPreview: View {
                                     data.alertShow = true
                                 } else {
                                     data.pushButton(
-                                        buttonID: .GoForward,
+                                        action: .goForward,
                                         details: Data(comment.utf8).base64EncodedString(),
                                         seedPhrase: data.getSeed(seedName: content.authorInfo?.seed ?? "")
                                     )
@@ -77,7 +77,7 @@ struct TransactionPreview: View {
                             })
                     case .read:
                         EmptyView()
-                    case .import_derivations:
+                    case .importDerivations:
                         BigButton(
                             text: "Select seed",
                             isCrypto: true,
@@ -87,7 +87,7 @@ struct TransactionPreview: View {
                     case .done:
                         EmptyView()
                     }
-                    if content.type != .done {
+                    if content.ttype != .done {
                         BigButton(
                             text: "Decline",
                             isShaded: true,
