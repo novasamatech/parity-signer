@@ -37,7 +37,7 @@ use lazy_static::lazy_static;
 #[cfg(feature = "signer")]
 use parity_scale_codec::Encode;
 use regex::Regex;
-#[cfg(any(feature = "active", feature = "signer"))]
+#[cfg(feature = "signer")]
 use sled::Batch;
 #[cfg(any(feature = "active", feature = "signer"))]
 use sp_core::{ecdsa, ed25519, sr25519, Pair};
@@ -149,6 +149,7 @@ pub fn generate_random_phrase(words_number: u32) -> Result<String, ErrorSigner> 
 }
 
 /// Data associated with address generation
+#[cfg(any(feature = "active", feature = "signer"))]
 pub(crate) struct PrepData {
     /// information to be added into [`Batch`] for [`ADDRTREE`] update
     pub(crate) address_prep: Vec<(AddressKey, AddressDetails)>,
@@ -161,7 +162,7 @@ pub(crate) struct PrepData {
 /// network specs.
 ///
 /// Function generates addresses individually, and checks the database to
-/// avoid collisions and duplicates. However, often within a single database
+/// avoid collisions and duplicates. However, sometimes within a single database
 /// transaction multiple addresses are generated, and each new address must be
 /// checked with already semi-prepared new addresses set, to avoid collisions,
 /// duplicates and overwriting.
@@ -171,13 +172,30 @@ pub(crate) struct PrepData {
 /// corresponding `AddressKey` is already there, adds new `NetworkSpecsKey` into
 /// `AddressDetails` field `network_id` instead of creating a new entry.
 ///
-/// The output set of `(AddressKey, AddressDetails)` values eventually will be
-/// transformed into [`Batch`](sled::Batch) to update the `ADDRTREE` of the cold
-/// database, output `Event` set will be eventually added into `HISTORY`.
+/// The output [`PrepData`] contains:
+///
+/// - `address_prep` set of `(AddressKey, AddressDetails)` values that
+/// eventually will be transformed into [`Batch`](sled::Batch) to update the
+/// `ADDRTREE` of the cold database
+/// - output `Event` set that will be eventually added into `HISTORY` as a part
+/// of single `Entry`(definitions::history::Entry)
+///
+/// Function creates only **one** address, and output `PrepData` **updates**
+/// address preparation set received as input.
 ///
 /// Function gets used both on Active side (when generating test cold database
 /// with well-known addresses) and on Signer side (when real addresses are
 /// actually created by the user).
+///
+/// Secrets passed into this function are the:
+///
+/// - seed phrase
+/// - path, possibly with secret password part (`///<...>`).
+///
+/// Both are input as `&str`. Seed phrase is combined with derivation path into
+/// a string, a reference to which is sent into inner logic of
+/// [`sp_core::crypto`]. Combined secret string is then zeroized here regardless
+/// of the address generation success.
 #[cfg(any(feature = "active", feature = "signer"))]
 pub(crate) fn create_address<T: ErrorSource>(
     database_name: &str,
@@ -191,7 +209,11 @@ pub(crate) fn create_address<T: ErrorSource>(
     let network_specs_key =
         NetworkSpecsKey::from_parts(&network_specs.genesis_hash, &network_specs.encryption);
 
-    let mut full_address = seed_phrase.to_owned() + path; //TODO fix this with buffer, as done in `navigator`
+    // create fixed-length string to avoid reallocations
+    let mut full_address = String::with_capacity(seed_phrase.len() + path.len());
+    full_address.push_str(seed_phrase);
+    full_address.push_str(path);
+
     let multisigner = match network_specs.encryption {
         Encryption::Ed25519 => match ed25519::Pair::from_string(&full_address, None) {
             Ok(a) => {
@@ -247,7 +269,7 @@ pub(crate) fn create_address<T: ErrorSource>(
         None => ("", false),
     };
 
-    // prepare history log entry here
+    // prepare history log here
     let identity_history = IdentityHistory::get(
         seed_name,
         &network_specs.encryption,
@@ -396,38 +418,60 @@ pub(crate) fn create_address<T: ErrorSource>(
 ///
 /// This function prepares the generation of addresses with default derivation
 /// paths for each of the available networks. Additionally, if the
-/// `make_seed_key` flag is set to `true` the function also prepares seed key
+/// `make_seed_keys` flag is set to `true` the function also prepares seed key
 /// generation.
 ///
-/// Seed phrase here is used as a borrowed string slice. Its use occurs in
-/// `create_address` function and outside Rust.
+/// The output [`PrepData`] contains:
+///
+/// - `address_prep` set of `(AddressKey, AddressDetails)` values that
+/// eventually will be transformed into [`Batch`](sled::Batch) to update the
+/// `ADDRTREE` of the cold database
+/// - output `Event` set that will be eventually added into `HISTORY` as a part
+/// of single `Entry`(definitions::history::Entry)
+///
+/// All output `PrepData` elements are generated within this function.
+/// It does not input addresses previously processed for the same transaction
+/// and therefore does not check for collisions, so this function always goes
+/// first, when there are no address additions planned yet.
+///
+/// This function inputs secret seed phrase as `&str`. It is passed as `&str`
+/// into `create_address` and used there.
 #[cfg(any(feature = "active", feature = "signer"))]
 fn populate_addresses<T: ErrorSource>(
     database_name: &str,
-    entry_batch: Batch,
     seed_name: &str,
     seed_phrase: &str,
-    make_seed_key: bool,
-) -> Result<(Batch, Vec<Event>), T::Error> {
-    // TODO: check zeroize - fix string handling in `create_address`
-    let mut identity_adds: Vec<(AddressKey, AddressDetails)> = Vec::new();
-    let mut current_events: Vec<Event> = Vec::new();
+    make_seed_keys: bool,
+) -> Result<PrepData, T::Error> {
+    // Set of `(AddressKey, AddressDetails)` to be added into the database.
+    // Set is updated and is used on each iteration of `create_address` to check
+    // for collisions.
+    let mut address_prep: Vec<(AddressKey, AddressDetails)> = Vec::new();
+
+    // Set of associated `Event::IdentityAdded(_)` entries.
+    // Gets updated after each successful `create_address` run.
+    let mut history_prep: Vec<Event> = Vec::new();
+
+    // Collect all networks known to Signer.
+    // Note: networks with all `Encryption` variants are used here if they are
+    // in the Signer database.
     let specs_set = get_all_networks::<T>(database_name)?;
+
     for network_specs in specs_set.iter() {
-        // make seed keys if needed
-        // seed key **must** be possible to generate,
+        // Make seed keys if requested.
+        // Seed keys **must** be possible to generate,
         // if a seed key has a collision with some other key, it is an error
-        if make_seed_key {
+        if make_seed_keys {
             let prep_data = create_address::<T>(
                 database_name,
-                &identity_adds,
+                &address_prep,
                 "",
                 network_specs,
                 seed_name,
                 seed_phrase,
             )?;
-            identity_adds = prep_data.address_prep;
-            current_events.extend_from_slice(&prep_data.history_prep);
+            address_prep = prep_data.address_prep;
+            history_prep.extend_from_slice(&prep_data.history_prep);
         }
 
         // make keys with default derivation if possible;
@@ -435,17 +479,20 @@ fn populate_addresses<T: ErrorSource>(
         // this should not prevent generating a seed;
         if let Ok(prep_data) = create_address::<T>(
             database_name,
-            &identity_adds,
+            &address_prep,
             &network_specs.path_id,
             network_specs,
             seed_name,
             seed_phrase,
         ) {
-            identity_adds = prep_data.address_prep;
-            current_events.extend_from_slice(&prep_data.history_prep);
+            address_prep = prep_data.address_prep;
+            history_prep.extend_from_slice(&prep_data.history_prep);
         }
     }
-    Ok((upd_id_batch(entry_batch, identity_adds), current_events))
+    Ok(PrepData {
+        address_prep,
+        history_prep,
+    })
 }
 
 /// Generate default addresses for a seed.
@@ -454,26 +501,24 @@ fn populate_addresses<T: ErrorSource>(
 /// field `path_id`, normally `path_id` is `//<network_name>`.
 ///
 /// This function adds addresses with default derivation paths into the Signer
-/// database. If the `make_seed_key` flag is set to `true`, seed key is also
+/// database. If the `make_seed_keys` flag is set to `true`, seed keys are also
 /// added. History log is accordingly updated.
+///
+/// This function inputs secret seed phrase as `&str`. It is passed as `&str`
+/// into `populate_addresses` and used there.
 #[cfg(feature = "signer")]
 pub fn try_create_seed(
     seed_name: &str,
     seed_phrase: &str,
-    make_seed_key: bool,
+    make_seed_keys: bool,
     database_name: &str,
 ) -> Result<(), ErrorSigner> {
     let mut events: Vec<Event> = vec![Event::SeedCreated(seed_name.to_string())];
-    let (id_batch, add_events) = populate_addresses::<Signer>(
-        database_name,
-        Batch::default(),
-        seed_name,
-        seed_phrase,
-        make_seed_key,
-    )?;
-    events.extend_from_slice(&add_events);
+    let prep_data =
+        populate_addresses::<Signer>(database_name, seed_name, seed_phrase, make_seed_keys)?;
+    events.extend_from_slice(&prep_data.history_prep);
     TrDbCold::new()
-        .set_addresses(id_batch) // add addresses just made in populate_addresses
+        .set_addresses(upd_id_batch(Batch::default(), prep_data.address_prep)) // add addresses just made in populate_addresses
         .set_history(events_to_batch::<Signer>(database_name, events)?) // add corresponding history
         .apply::<Signer>(database_name)
 }
@@ -484,7 +529,9 @@ pub fn try_create_seed(
 /// network.
 ///
 /// Function removes network [`NetworkSpecsKey`] from `network_id` set in
-/// [`AddressDetails`] associated with provided [`MultiSigner`].
+/// [`AddressDetails`] associated with provided [`MultiSigner`]. If no networks
+/// associated with [`AddressKey`] remain, i.e. `network_id` set becomes empty,
+/// whole entry is removed.
 #[cfg(feature = "signer")]
 pub fn remove_key(
     database_name: &str,
@@ -494,8 +541,16 @@ pub fn remove_key(
     remove_keys_set(database_name, &[multisigner.to_owned()], network_specs_key)
 }
 
-/// Function removes a set of addresses within one network by set of multisigner identifier and and network id
-/// Function removes network_key from network_id vector for a defined set of database records
+/// Removes a set of addresses within a single network from the database.
+///
+/// Address is determined by [`MultiSigner`] and [`NetworkSpecsKey`] of the
+/// network. Function inputs network `NetworkSpecsKey` and a set of
+/// `MultiSigner` values for which the address within a network must be deleted.
+///
+/// `NetworkSpecsKey` of the network is removed from `network_id` set in
+/// [`AddressDetails`] associated with each of the provided `MultiSigner`
+/// values. If no networks associated with [`AddressKey`] remain, i.e.
+/// `network_id` set becomes empty, whole associated entry is removed.
 #[cfg(feature = "signer")]
 pub fn remove_keys_set(
     database_name: &str,
@@ -534,7 +589,58 @@ pub fn remove_keys_set(
         .apply::<Signer>(database_name)
 }
 
-/// Add a bunch of new derived addresses, N+1, N+2, etc.
+/// Add a set of new derived addresses: N+1, N+2, etc.
+///
+/// The number of the added addresses is set by `increment` input.
+///
+/// Input [`MultiSigner`] and [`NetworkSpecsKey`] determine the address, and the
+/// associated [`AddressDetails`] are found in the database. The derivations are
+/// based on the `path` from the `AddressDetails`.
+///
+/// If the database has addressed in given network with path that could be
+/// interpreted as `<path>//<number>`, the first derivation of the increment set
+/// is `<path>//<number>+1`. If no such addresses are existing in the database,
+/// the first derivation of the increment set is `<path>//0`.
+///
+/// Further derivations of the increment set have number part increased by 1
+/// until all requested derivations are generated.
+///
+/// Note: this is intended only for addresses not protected by the password
+/// (i.e. having derivation path **without** `///<password>` part). If the
+/// increment set is created on a passworded address, only public derivation
+/// path part will be used for increment set generation.
+///
+/// ## Example
+///
+/// User creates increment set of 3 on derivation `//user`. Resulting
+/// derivations are:
+///
+/// - `//user`
+/// - `//user//0`
+/// - `//user//1`
+/// - `//user//2`
+///
+/// User creates increment set of 2 on `//user` again, resulting derivations
+/// are:
+///
+/// - `//user`
+/// - `//user//0`
+/// - `//user//1`
+/// - `//user//2`
+/// - `//user//3`
+/// - `//user//4`
+///
+/// If the increment set of 2 is created on `//user//0`, resulting derivations
+/// would be:
+///
+/// - `//user`
+/// - `//user//0`
+/// - `//user//0//0`
+/// - `//user//0//1`
+/// - `//user//1`
+/// - `//user//2`
+/// - `//user//3`
+/// - `//user//4`
 #[cfg(feature = "signer")]
 pub fn create_increment_set(
     increment: u32,
@@ -583,9 +689,14 @@ pub fn create_increment_set(
         .apply::<Signer>(database_name)
 }
 
-/// Check derivation format and determine whether there is a password
+/// Check derivation format and determine if it has a password.
+///
+/// Invalid derivation produces an error. Valid derivation is checked for
+/// password with regex.
+///
+// TODO regex and secrets, see `create_address` comments.
 #[cfg(feature = "signer")]
-pub fn is_passworded(path: &str) -> Result<bool, ErrorSigner> {
+pub(crate) fn is_passworded(path: &str) -> Result<bool, ErrorSigner> {
     match REG_PATH.captures(path) {
         Some(caps) => Ok(caps.name("password").is_some()),
         None => Err(ErrorSigner::AddressGeneration(AddressGeneration::Extra(
@@ -594,39 +705,80 @@ pub fn is_passworded(path: &str) -> Result<bool, ErrorSigner> {
     }
 }
 
-/// Enum to describe derivation proposed
+/// Proposed derivation status.
 #[cfg(feature = "signer")]
 pub enum DerivationCheck {
-    BadFormat, // bad format, still gets json back into UI
-    Password,  // passworded, no dynamic checking for collisions
-    NoPassword(Option<(MultiSigner, AddressDetails)>), // no password and optional collision
+    /// Derivation has bad format, UI disables proceeding with address
+    /// generation.
+    BadFormat,
+
+    /// Derivation has password (`///<password>` part).
+    ///
+    /// Dynamic check in the database for already existing address is disabled.
+    Password,
+
+    /// Derivation has no password.
+    ///
+    /// Dynamic check in the database for already existing address is enabled.
+    ///
+    /// Inner content reflects if the already existing address is found and its
+    /// details.
+    NoPassword(Option<(MultiSigner, AddressDetails)>),
 }
 
-/// Function to check if proposed address collides,
-/// i.e. if the proposed path for given seed name and network specs key already exists
+/// Preliminarily checks if the user-proposed derivation could be used to create
+/// the address.
+///
+/// This function **does not** use secret phrase, and only searches the
+/// [`AddressDetails`] from the database for already existing addresses with
+/// same derivation path, in case there is no password in the proposed
+/// derivation.
+///
+/// If the proposed derivation is passworded, no checking could be done without
+/// using the seed phrase, and UI allows to proceed to try creating new address.
+/// If address already exists, an error would appear on the next stage.
+///
+/// No checking for collisions is done here (i.e. no checking if the same
+/// [`AddressKey`] will be produced for <secret phrase 1> + <derivation path 1>
+/// as for already known <secret phrase 2> + <derivation path 2>), because seed
+/// phrase is not known. If collision occurs, an error would appear on the next
+/// stage.
+///
+/// Note that the only errors in this function could appear from database
+/// malfunction when the database is being searched for the exact match, in case
+/// of password-free valid derivation. Bad format of the derivation is **not**
+/// an error, UI just does not allow to proceed.
 #[cfg(feature = "signer")]
-pub fn derivation_check(
+pub(crate) fn derivation_check(
     seed_name: &str,
     path: &str,
     network_specs_key: &NetworkSpecsKey,
     database_name: &str,
 ) -> Result<DerivationCheck, ErrorSigner> {
     match is_passworded(path) {
+        // Proposed derivation has password, no checks could be made, proceed.
         Ok(true) => Ok(DerivationCheck::Password),
+
+        // Proposed derivation has no password, checking the database for exact
+        // coincidence.
         Ok(false) => {
-            let mut found_collision = None;
+            let mut found_exact = None;
             for (multisigner, address_details) in get_all_addresses(database_name)?.into_iter() {
-                if (address_details.seed_name == seed_name)
-                    && (address_details.path == path)
-                    && (address_details.network_id.contains(network_specs_key))
+                if (address_details.seed_name == seed_name) // seed name
+                    && (address_details.path == path) // derivation path, cropped part without password
+                    && (address_details.network_id.contains(network_specs_key)) // in this network
                     && (!address_details.has_pwd)
+                // has no password to begin with
                 {
-                    found_collision = Some((multisigner, address_details));
+                    found_exact = Some((multisigner, address_details));
                     break;
                 }
             }
-            Ok(DerivationCheck::NoPassword(found_collision))
+            Ok(DerivationCheck::NoPassword(found_exact))
         }
+
+        // Proposed derivation is not suitable, UI would not allow to proceed.
+        // Note that this is **not** an error.
         Err(_) => Ok(DerivationCheck::BadFormat),
     }
 }
@@ -698,37 +850,31 @@ pub fn try_create_address(
 /// Function to generate identities batch with Alice information
 #[cfg(feature = "active")]
 pub fn generate_test_identities(database_name: &str) -> Result<(), ErrorActive> {
-    let (id_batch, events) = {
-        let entry_batch = make_batch_clear_tree::<Active>(database_name, ADDRTREE)?;
-        let mut events = vec![Event::IdentitiesWiped];
-        let (mut id_batch, new_events) = populate_addresses::<Active>(
-            database_name,
-            entry_batch,
-            "Alice",
-            ALICE_SEED_PHRASE,
-            true,
-        )?;
-        events.extend_from_slice(&new_events);
-        for network_specs in default_chainspecs().iter() {
-            if (network_specs.name == "westend")
-                && (network_specs.encryption == Encryption::Sr25519)
-            {
-                let prep_data = create_address::<Active>(
-                    database_name,
-                    &Vec::new(),
-                    "//Alice",
-                    network_specs,
-                    "Alice",
-                    ALICE_SEED_PHRASE,
-                )?;
-                id_batch = upd_id_batch(id_batch, prep_data.address_prep);
-                events.extend_from_slice(&prep_data.history_prep);
-            }
+    let entry_batch = make_batch_clear_tree::<Active>(database_name, ADDRTREE)?;
+    let mut events = vec![Event::IdentitiesWiped];
+
+    let prep_data = populate_addresses::<Active>(database_name, "Alice", ALICE_SEED_PHRASE, true)?;
+
+    let mut address_prep = prep_data.address_prep.to_vec();
+    events.extend_from_slice(&prep_data.history_prep);
+
+    for network_specs in default_chainspecs().iter() {
+        if (network_specs.name == "westend") && (network_specs.encryption == Encryption::Sr25519) {
+            let prep_data = create_address::<Active>(
+                database_name,
+                &address_prep,
+                "//Alice",
+                network_specs,
+                "Alice",
+                ALICE_SEED_PHRASE,
+            )?;
+            address_prep = prep_data.address_prep;
+            events.extend_from_slice(&prep_data.history_prep);
         }
-        (id_batch, events)
-    };
+    }
+
     TrDbCold::new()
-        .set_addresses(id_batch) // add created address
+        .set_addresses(upd_id_batch(entry_batch, address_prep)) // add created address
         .set_history(events_to_batch::<Active>(database_name, events)?) // add corresponding history
         .apply::<Active>(database_name)
 }
