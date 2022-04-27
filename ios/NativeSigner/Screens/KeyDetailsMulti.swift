@@ -25,7 +25,7 @@ struct KeyDetailsMulti: View {
                     .onAppear{
                         offset = 0
                     }
-                Text("Key " + content.current_number + " out of " + content.out_of)
+                Text("Key " + content.currentNumber + " out of " + content.outOf)
             }
         }
         .gesture(
@@ -39,10 +39,10 @@ struct KeyDetailsMulti: View {
                         showDetails.toggle()
                     } else {
                         if drag.translation.width > 20 {
-                            data.pushButton(buttonID: .NextUnit)
+                            data.pushButton(action: .nextUnit)
                         }
                         if drag.translation.width < -20 {
-                            data.pushButton(buttonID: .PreviousUnit)
+                            data.pushButton(action: .previousUnit)
                         }
                     }
                 }

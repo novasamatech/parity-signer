@@ -33,7 +33,7 @@ struct SettingsScreen: View {
                 VStack {
                     if content.publicKey != nil {
                     AddressCard(address: Address(
-                        base58: "encryption: " + content.encryption ?? "unknown", path: content.publicKey!.truncateMiddle(length: 8), hasPwd: false, identicon: content.identicon ?? "", seedName: "", multiselect: false
+                        base58: "encryption: " + (content.encryption ?? "unknown"), path: content.publicKey!.truncateMiddle(length: 8), hasPwd: false, identicon: content.identicon ?? "", seedName: "", multiselect: false
                     ))
                     } else {
                         Text("Error!").foregroundColor(Color("SignalDanger")).font(FBase(style: .h4))

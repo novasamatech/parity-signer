@@ -32,7 +32,7 @@ struct HistoryCard: View {
                 timestamp: timestamp,
                 danger: false,
                 line1: "General verifier set",
-                line2: value.public_key.truncateMiddle(length: 8) + "\n" + value.encryption
+                line2: ""//value.v?.publicKey?.truncateMiddle(length: 8) ?? "error" + "\n" + value.v?.encryption? ?? "error"
             )
             case .historyCleared: HistoryCardTemplate(
                 image: "xmark.rectangle.portrait",
@@ -67,35 +67,35 @@ struct HistoryCard: View {
                 timestamp: timestamp,
                 danger: false,
                 line1: "Metadata added",
-                line2: value.name + " version " +  value.version
+                line2: ""//value.name + " version " +  value.version
             )
             case .metadataRemoved(let value): HistoryCardTemplate(
                 image: "xmark.rectangle.portrait",
                 timestamp: timestamp,
                 danger: false,
                 line1: "Metadata removed",
-                line2: value.name + " version " +  value.version
+                line2: ""//value.name + " version " +  value.version
             )
             case .networkSpecsAdded(let value): HistoryCardTemplate(
                 image: "plus.viewfinder",
                 timestamp: timestamp,
                 danger: false,
                 line1: "Network added",
-                line2: value
+                line2: ""//value
             )
             case .networkSpecsRemoved(let value): HistoryCardTemplate(
                 image: "xmark.rectangle.portrait",
                 timestamp: timestamp,
                 danger: false,
                 line1: "Network removed",
-                line2: value.title
+                line2: ""//value.title
             )
             case .networkVerifierSet(let value): HistoryCardTemplate(
                 image: "checkmark.shield",
                 timestamp: timestamp,
                 danger: false,
                 line1: "Network verifier set",
-                line2: value.genesisHash
+                line2: ""//value.genesisHash
             )
             case .resetDangerRecord: HistoryCardTemplate(
                 image: "checkmark.shield",
@@ -131,7 +131,7 @@ struct HistoryCard: View {
                 timestamp: timestamp,
                 danger: false,
                 line1: "Metadata signed",
-                line2: value.name + value.version
+                line2: ""//value.name + value.version
             )
             case .typesSigned(_): HistoryCardTemplate(
                 image: "signature",
@@ -196,7 +196,7 @@ struct HistoryCard: View {
                 line1: "Wrong password entered",
                 line2: "operation was declined"
             )
-            case .messageSignError(let value): HistoryCardTemplate(
+            case .messageSignError(let _value): HistoryCardTemplate(
                 image: "exclamationmark.triangle.fill",
                 timestamp: timestamp,
                 danger: true,

@@ -9,16 +9,17 @@ import SwiftUI
 
 struct ManageMetadata: View {
     @EnvironmentObject var data: SignerDataModel
-    var content: MManageMetadata
+    //var content: MManageMetadata
     @State var removeMetadataAlert = false
     @State var offset: CGFloat = 0
     var body: some View {
         MenuStack {
             HeaderBar(line1: "MANAGE METADATA", line2: "Select action").padding(.top, 10)
-            MetadataCard(meta: content.forCard())
+            //MetadataCard(meta: content.forCard())
             HStack{
             Text("Used for:")
                 VStack{
+                    /*
                     ForEach(content.networks.sorted(by: {
                         $0.order<$1.order
                     }), id: \.order) {
@@ -29,7 +30,8 @@ struct ManageMetadata: View {
                             }
                         NetworkCard(title: network.title, logo: network.logo)
                         }
-                    }
+                    }*/
+                    EmptyView()
                 }
             }
             MenuButtonsStack {

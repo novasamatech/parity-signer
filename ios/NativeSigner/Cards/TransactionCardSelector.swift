@@ -57,7 +57,7 @@ struct TransactionCardSelector: View {
             TCNewSpecs(value: value)
         case .nonceCard(let text):
             TCNonce(content: text)
-        case .none:
+        case .noneCard:
             EmptyView()
         case .palletCard(let text):
             TCPallet(text: text)

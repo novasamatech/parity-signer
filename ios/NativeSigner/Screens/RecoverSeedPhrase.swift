@@ -54,7 +54,7 @@ struct RecoverSeedPhrase: View {
                                         userInput = input.userInput
                                     })
                                     .onAppear(perform: {
-                                        userInput = content.user_input
+                                        userInput = content.userInput
                                         focus = content.keyboard
                                     })
                                     .padding(.horizontal, 12)

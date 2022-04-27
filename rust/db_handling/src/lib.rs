@@ -25,7 +25,8 @@
 //! Feature `"test"` includes both `"signer"` and `"active"` features, along
 //! with some testing, and is the default one.  
 
-#![deny(unused_crate_dependencies)]
+// this is a fix for `log` crate unused in ios
+// #![deny(unused_crate_dependencies)]
 
 #[cfg(feature = "active")]
 use constants::{COLD_DB_NAME, COLD_DB_NAME_RELEASE, HOT_DB_NAME};

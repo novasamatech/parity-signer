@@ -178,14 +178,19 @@ extension SignerDataModel {
                     print("Seed access logging error! This system is broken and should not be used anymore.")
                     //Attempt to log this anyway one last time;
                     //if this fails too - complain to joulu pukki
-                    historyEntrySystem(event: "Seed access logging failed!", dbname: dbName)
+                    do {
+                        try historyEntrySystem(event: .systemEntry(systemEntry: "Seed access logging failed!"), dbname: dbName)
+                    } catch {
+                        logSuccess = false
+                        authenticated = false
+                        return ""
+                    }
                     logSuccess = false
                 }
                 return logSuccess ? String(data: (item as! CFData) as Data, encoding: .utf8) ?? "" : ""
             }
             return String(data: (item as! CFData) as Data, encoding: .utf8) ?? ""
         } else {
-            self.lastError = SecCopyErrorMessageString(status, nil)! as String
             authenticated = false
             return ""
         }

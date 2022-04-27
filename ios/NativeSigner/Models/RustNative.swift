@@ -20,7 +20,7 @@ class SignerDataModel: ObservableObject {
     
     //Action handler
     var actionAvailable = true //debouncer
-    @Published var actionResult: ActionResult// = ActionResult() //Screen state is stored here
+    @Published var actionResult: ActionResult = ActionResult(screen: "", screenLabel: "", back: false, footer: false, footerButton: "", rightButton: "", screenNameType: "", modal: "", alert: "", screenData: ScreenData.documents, modalData: ModalData.text(f: ""), alertData: "") //Screen state is stored here
     @Published var parsingAlert: Bool = false
     let debounceTime: Double = 0.2 //Debounce time
     

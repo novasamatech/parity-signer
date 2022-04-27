@@ -11,6 +11,7 @@ struct AlertSelector: View {
     @EnvironmentObject var data: SignerDataModel
     
     var body: some View {
+        /*
         switch (data.actionResult.alert) {
         case .Empty:
             EmptyView()
@@ -21,6 +22,8 @@ struct AlertSelector: View {
         case .Confirm(let value):
             ConfirmAlert(content: value)
         }
+         */
+        EmptyView()
     }
 }
 

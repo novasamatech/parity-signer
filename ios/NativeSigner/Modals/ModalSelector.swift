@@ -11,41 +11,43 @@ struct ModalSelector: View {
     @EnvironmentObject var data: SignerDataModel
     
     var body: some View {
-        switch (data.actionResult.modal) {
-        case .Empty:
-            EmptyView()
-        case .NewSeedMenu:
+        switch (data.actionResult.modalData) {
+        case .newSeedMenu:
             NewSeedMenu()
-        case .NetworkMenu(let value):
+        case .networkSelector(let value):
             NetworkManager(content: value)
-        case .SeedMenu(let value):
+        case .seedMenu(let value):
             SeedMenu(content: value)
-        case .Backup(let value):
+        case .backup(let value):
             Backup(content: value)
-        case .PasswordConfirm(let value):
+        case .passwordConfirm(let value):
             PasswordConfirm(content: value)
-        case .SignatureReady(let value):
+        case .signatureReady(let value):
             SignatureReady(content: value)
-        case .EnterPassword(let value):
+        case .enterPassword(let value):
             EnterPassword(content: value)
-        case .LogRight(let value):
+        case .logRight(let value):
             LogMenu(content: value)
-        case .NetworkDetailsMenu:
+        case .networkDetailsMenu:
             NetworkDetailsMenu()
-        case .ManageMetadata(let value):
-            ManageMetadata(content: value)
-        case .SufficientCryptoReady(let value):
+        case .manageMetadata://(let value):
+            ManageMetadata()//content: value)
+        case .sufficientCryptoReady(let value):
             SufficientCryptoReady(content: value)
-        case .KeyDetailsAction:
+        case .keyDetailsAction:
             KeyMenu()
-        case .TypesInfo(let value):
+        case .typesInfo(let value):
             TypesMenu(content: value)
-        case .NewSeedBackup(let value):
+        case .newSeedBackup(let value):
             NewSeedBackupModal(content: value)
-        case .LogComment:
+        case .logComment:
             LogComment()
-        case .SelectSeed(let value):
-            SelectSeed(content: value)
+        case .selectSeed://(let value):
+            EmptyView()//SelectSeed(content: value)
+        case .manageNetworks(_):
+            EmptyView()
+        case .text(_):
+            EmptyView()
         }
     }
 }

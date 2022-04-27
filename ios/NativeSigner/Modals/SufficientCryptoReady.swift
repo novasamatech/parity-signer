@@ -21,8 +21,8 @@ struct SufficientCryptoReady: View {
                  Image(uiImage: UIImage(data: Data(fromHexEncodedString: content.sufficient) ?? Data()) ?? UIImage())
                  .resizable()
                  .aspectRatio(contentMode: .fit).padding(12)
-                AddressCard(address: content.author_info.intoAddress())
-                Text("Payload: " + content.content.type)
+                //AddressCard(address: content.authorInfo.intoAddress())
+                Text("Payload: " + content.content.ttype)
             }
         }
     }

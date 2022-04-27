@@ -22,15 +22,15 @@ struct KeyManager: View {
                         SeedKeyCard(seedCard: content.root, multiselectMode: content.multiselectMode).gesture(DragGesture()
                                                                                                                 .onEnded {drag in
                             if abs(drag.translation.height) < 20 && abs(drag.translation.width) > 20 {
-                                if content.root.address_key != "" {
-                                    data.pushButton(buttonID: .Swipe, details: content.root.address_key)
+                                if content.root.addressKey != "" {
+                                    data.pushButton(action: .swipe, details: content.root.addressKey)
                                 }
                             }
                         })
                             .gesture(LongPressGesture()
                                         .onEnded {_ in
-                                if content.root.address_key != "" {
-                                    data.pushButton(buttonID: .LongTap, details: content.root.address_key)
+                                if content.root.addressKey != "" {
+                                    data.pushButton(action: .longTap, details: content.root.addressKey)
                                 }
                             }
                             )
@@ -55,7 +55,7 @@ struct KeyManager: View {
                         if data.alert {
                             data.alertShow = true
                         } else {
-                            data.pushButton(buttonID: .NewKey)
+                            data.pushButton(action: .newKey)
                         }
                     }) {
                         Image(systemName: "plus.circle").imageScale(.large).foregroundColor(Color("Action400"))
@@ -71,10 +71,10 @@ struct KeyManager: View {
                                 Button(action: {
                                     data.pushButton(action: .selectKey, details: address.addressKey)
                                 }){
-                                    AddressCard(address: address, multiselectMode: content.multiselectMode).gesture(DragGesture()
+                                    AddressCard(address: Address(base58: address.base58 , path: address.path, hasPwd: address.hasPwd, identicon: address.identicon, seedName: "", multiselect: address.multiselect), multiselectMode: content.multiselectMode).gesture(DragGesture()
                                                                                                                                     .onEnded {drag in
                                         if abs(drag.translation.height) < 20 && abs(drag.translation.width) > 20 {
-                                            data.pushButton(buttonID: .Swipe, details: address.address_key)
+                                            data.pushButton(action: .swipe, details: address.addressKey)
                                         }
                                     })
                                         .gesture(LongPressGesture()

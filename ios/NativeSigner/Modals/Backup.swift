@@ -18,13 +18,14 @@ struct Backup: View {
     var body: some View {
         ZStack {
             RoundedRectangle(cornerRadius: 20.0).foregroundColor(Color("Bg200"))
+            /*
             VStack{
                 ZStack {
-                    HeaderBar(line1: "Backup", line2: content.seed_name.decode64())
+                    HeaderBar(line1: "Backup", line2: content.seedName.decode64())
                     HStack {
                         Spacer()
                         Button(action: {
-                            data.pushButton(buttonID: .GoBack)
+                            data.pushButton(action: .goBack)
                         }) {
                             Image(systemName: "xmark").imageScale(.large).foregroundColor(Color("Text300"))
                         }
@@ -45,7 +46,7 @@ struct Backup: View {
                             Spacer()
                         }
                         .onAppear{
-                            secret = data.getSeed(seedName: content.seed_name, backup: true)
+                            secret = data.getSeed(seedName: content.seedName, backup: true)
                             if secret == "" {
                                 failure = true
                                 countdown = -1
@@ -61,17 +62,17 @@ struct Backup: View {
                             Spacer()
                         }
                         LazyVStack {
-                            ForEach(content.derivations.sorted(by: {$0.network_order < $1.network_order}), id: \.network_order) {
+                            ForEach(content.derivations.sorted(by: {$0.networkOrder < $1.networkOrder}), id: \.networkOrder) {
                                 pack in
                                 VStack {
                                     HStack {
-                                        NetworkCard(title: pack.network_title, logo: pack.network_logo, fancy: true).padding(.top, 10)
+                                        NetworkCard(title: pack.networkTitle, logo: pack.networkLogo, fancy: true).padding(.top, 10)
                                         Spacer()
                                     }
                                     ForEach(pack.id_set.sorted(by: {$0.path < $1.path}), id: \.self) {
                                         record in
                                         HStack{
-                                            Text((record.path == "" && !record.has_pwd) ? "seed key" : record.path)
+                                            Text((record.path == "" && !record.hasPwd) ? "seed key" : record.path)
                                                 .foregroundColor(Color("Crypto400"))
                                                 .font(FCrypto(style: .body2))
                                             if record.has_pwd {
@@ -121,6 +122,7 @@ struct Backup: View {
                     }.padding(.bottom, 75)
                 }
             }
+             */
         }
     }
 }

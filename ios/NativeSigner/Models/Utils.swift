@@ -103,3 +103,13 @@ extension TransactionCardSet {
         })
     }
 }
+
+extension MRecoverSeedPhrase {
+    func draftPhrase() -> String {
+        return self.draft.sorted {word1, word2 in
+            return word1.order < word2.order
+        }.map{guessWord in
+            return guessWord.content
+        }.joined(separator: "")
+    }
+}
