@@ -1,12 +1,13 @@
 # Add New Network
 
-Parity Signer supports adding a Substrate-based network or update the existing network via QR code.
+Parity Signer supports adding any substrate-based networks or updating and existing network via QR code.
 
-After you've installed [required software](#Prerequisites), you need to add *Network's Spec* to Signer and add *Network Metadata* for this network, so that Signer is able to decode, and you could read and verify transactions you are signing on this network.
+After you've installed [required software](#Prerequisites), you need to add *Network's Specs* to Signer and add *Network Metadata* for this network, so that Signer is able to decode, and you could read and verify transactions you are signing on this network.
 
-If you are updating metadata for already existing network you only need to update *Network Metadata*.
+If you need to update metadata for already existing network you only need to update *Network Metadata*.
+Off-the-shelf Signer comes with networks that you can update by scanning a multipart QR codes that containt recent metadata for these networks at [Metadata Update Portal](https://metadata.parity.io/).
 
-s*Network Specs*
+*Network Specs*
 
 1. [Get](#get-network-spec)
 2. [Sign](#sign-network-spec)
