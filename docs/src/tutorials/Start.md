@@ -24,7 +24,7 @@ Before starting the Signer, you should make sure that network is disabled. Many 
 
 ## First start
 
-When you first launch Signer, it prompts you to read and accept terms and conditions and privacy policy. Once that is done, the database is pre-populated with built-in networks and Signer is ready for use. It could [import network data](./New-Network.md) or [read transactions](./Kusama-tutorial.md), but to sign anything you need to create keys.
+When you first launch Signer, it prompts you to read and accept terms and conditions and privacy policy. Once that is done, the database is pre-populated with built-in networks and Signer is ready for use. It could [import network data](./Add-New-Network.md) or [read transactions](./Kusama-tutorial.md), but to sign anything you need to create keys.
 
 ### Create keys
 

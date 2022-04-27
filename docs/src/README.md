@@ -44,7 +44,7 @@ Please note that the Signer app is an advanced tool designed for maximum securit
 
 - [Start](./tutorials/Start.md)
 - [Upgrading](./tutorials/Upgrading.md)
-- [Add Network](./tutorials/New-Network.md)
+- [Add New Network](./tutorials/Add-New-Network.md)
 - [Kusama-tutorial](./tutorials/Kusama-tutorial.md)
 - [Recover-Account-Polkadotjs](./tutorials/Recover-Account-Polkadotjs.md)
 

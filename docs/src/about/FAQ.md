@@ -1,4 +1,10 @@
-## FAQ
+# FAQ
+
+- [About](#about)
+- [Networks](#networks)
+- [Seeds and keys](#seeds-and-keys)
+
+## About
 
 ### What is Signer?
 
@@ -12,6 +18,25 @@ Signer is optimised for the highest security requirements. If you already manage
 
 Communication happens through scanning and generating QR codes. Scanned with Signer input-QRs interact with keys stored in Signer to, generate response-QRs on behalf of those keys. Usually input-QR is a blockchain transaction, and a response-QR is a signature for this transaction. There are tried and true cryptographic algorithms that power these QR codes, as well as some smart engineering that make your dedicated device safe to use.
 
+### How do I keep my keys secure?
+
+Signer is a safe way to use your keys. However, that alone won't be enough to keep your keys secure. Devices break and get lost. This is why we always recommend to backup your seed phrases and derivation paths on paper. We are such big fans of paper backups that we even support a special tool to power your paper backup game by splitting your backups into shards called [Banana Split](https://bs.parity.io/).
+
+### How do I know I am not interacting with malicious apps or actors?
+
+Signer does not interact with network. The app itself does not have a way to check if an app or an account you interacting with is malicious. 
+If you use Signer with PolkadotJS Browser Extension, PolkadotJS Apps or Signer Component Browser Extension they will rely on community driven curated list of potentially less-than-honest operators: [https://polkadot.js.org/phishing/#](https://polkadot.js.org/phishing/#) to prevent you from interacting with certain sites and addresses. However, there are no limitations on use of Signer with other tools.
+
+### I want to play with Signer to get a better feeling of how it works. Is there a way to do it without spending valuable tokens?
+
+Yes. In Signer, you should add a key for an address on Westend network and request test tokens for that address, see step-by-step guide on [Polkadot Network Wiki](https://wiki.polkadot.network/docs/learn-DOT#getting-westies). 
+
+You can use test tokens in the same way you would use value-bearing tokens.
+
+For example with [PolkadotJS Apps](https://polkadot.js.org/apps/) you can create a transaction on behalf of your account, generate a signature with Signer and submit it to the network. All of this without keys ever leaving your offline device.
+
+## Networks
+
 ### How can I update metadata version for a network?
 
 Please go to [Metadata Update Portal](https://metadata.parity.io/) and select network you need to update. Scan multipart QR code the same way you scan a transaction QR code. 
@@ -22,26 +47,17 @@ It's a safety feature. Substrate-based blockchain networks have capacity to be u
 
 ### What networks does Signer support?
 
-From-the-shelf Party Signer supports Polkadot, Kusama and Westend networks. But it's not limited to these networks. More experienced users can generate metadata to expand network capability of Parity Signer.
+From-the-shelf Party Signer supports Polkadot, Kusama and Westend networks. But it's not limited to these networks. More experienced users can generate metadata for any network to expand capability of Parity Signer.
 
-### I want to play with Signer to get a better feeling of how it works. Is there a way to do it without spending valuable tokens?
+### How can I add a new network to Signer?
 
-Yes. In Signer, you should add a key for an address on Westend network and request test tokens for that address, see step-by-step guide on [Polkadot Network Wiki](https://wiki.polkadot.network/docs/learn-DOT#getting-westies). 
+Follow the [Add New Network](../tutorials/Add-New-Network.md) step-by-step guide.
 
-You can use test tokens in the same way you would use value-bearing tokens.
+Currently the process requires you to have [rust](https://www.rust-lang.org/tools/install), [subkey](https://docs.substrate.io/v3/tools/subkey/#installation) and [parity-signer repository](https://github.com/paritytech/parity-signer) on your machine.
 
-For example with [PolkadotJS Apps](https://polkadot.js.org/apps/) you can create a transaction on behalf of your account, generate a signature with Signer and submit it to the network. All of this without keys ever leaving your offline device.
-
-### How do I keep my keys secure?
-
-Signer is a safe way to use your keys. However, that alone won't be enough to keep your keys secure. Devices break and get lost. This is why we always recommend to backup your seed phrases and derivation paths on paper. We are such big fans of paper backups that we even support a special tool to power your paper backup game by splitting your backups into shards called [Banana Split](https://bs.parity.io/).
-
-### How do I know I am not interacting with malicious apps or actors?
-
-Signer does not interact with network. The app itself does not have a way to check if an app or an account you interacting with is malicious. 
-If you use Signer with PolkadotJS Browser Extension, PolkadotJS Apps or Signer Component Browser Extension they will rely on community driven curated list of potentially less-than-honest operators: [https://polkadot.js.org/phishing/#](https://polkadot.js.org/phishing/#) to prevent you from interacting with certain sites and addresses. However, there are no limitations on use of Signer with other tools.
+## Seeds and keys
 	
-### Can import my account from polkadot{.js} apps or extension to Parity Signer?
+### Can import my keys from polkadot{.js} apps or extension to Parity Signer?
 
 Yes. Keys are compatible between polkadot{.js} and Parity Signer, except for the keys generated with Ledger (BIP39). To import seed keys into Parity Signer, you need to know:
 1. Seed phrase\

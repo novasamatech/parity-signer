@@ -32,4 +32,4 @@ Before starting the Signer, you should make sure that network is disabled. Many 
 
 ### Start the Signer
 
-Start the app. Read and accept information provided on launch. Congratulations! The app is ready to use now, however it does not have any keys and only few basic built-in networks. Proceed with [setting up keys](../tutorials/Start.md) and [adding new networks](../tutorials/New-Network.md).
+Start the app. Read and accept information provided on launch. Congratulations! The app is ready to use now, however it does not have any keys and only few basic built-in networks. Proceed with [setting up keys](../tutorials/Start.md) and [adding new networks](../tutorials/Add-New-Network.md).
