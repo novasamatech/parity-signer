@@ -23,6 +23,8 @@ use sled::IVec;
 use sp_runtime::MultiSigner;
 #[cfg(feature = "signer")]
 use std::convert::TryInto;
+#[cfg(feature = "test")]
+use variant_count::VariantCount;
 
 use crate::{
     crypto::Encryption,
@@ -472,6 +474,7 @@ impl SignMessageDisplay {
 
 /// Events that could be recorded in the history log
 #[derive(Debug, Decode, Encode, Clone)]
+#[cfg_attr(feature = "test", derive(VariantCount))]
 pub enum Event {
     /// Network metadata was added
     MetadataAdded(MetaValuesDisplay),
@@ -848,3 +851,16 @@ pub fn print_all_events() -> String {
         entry.show(|a| format!("\"{}\"", hex::encode(a.transaction())))
     )
 }
+
+#[cfg(feature = "test")]
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    /// check that no `Event` variants are missed
+    #[test]
+    fn event_set_check() {
+        assert_eq!(Event::VARIANT_COUNT, all_events_preview().len());
+    }
+}
+

@@ -1,4 +1,4 @@
-//! Creating, collecting, and removing addresses in cold database.
+//! Creating, collecting, and removing addresses in cold database
 //!
 //! In Signer and Signer-related ecosystem the address is a key pair within a
 //! certain network. Signer Rust database stores only **non-secret** data
@@ -27,10 +27,9 @@
 //!
 //! Signer interface shows those addresses as separate entities.
 //!
-//! Non-secret data associated with address is stored in
+//! Non-secret data associated with `AddressKey` is stored in
 //! [`ADDRTREE`](constants::ADDRTREE) tree of the cold database as SCALE-encoded
-//! [`AddressDetails`](definitions::users::AddressDetails) under corresponding
-//! [`AddressKey`](definitions::keyring::AddressKey).
+//! [`AddressDetails`](definitions::users::AddressDetails).
 #[cfg(feature = "signer")]
 use bip39::{Language, Mnemonic, MnemonicType};
 use lazy_static::lazy_static;
@@ -52,9 +51,6 @@ use constants::ADDRTREE;
 use constants::ALICE_SEED_PHRASE;
 #[cfg(feature = "signer")]
 use constants::TRANSACTION;
-
-#[cfg(feature = "active")]
-use defaults::default_chainspecs;
 
 #[cfg(any(feature = "active", feature = "signer"))]
 use definitions::{
@@ -187,7 +183,7 @@ pub(crate) struct PrepData {
 /// with well-known addresses) and on Signer side (when real addresses are
 /// actually created by the user).
 ///
-/// Secrets passed into this function are the:
+/// Secrets passed into this function are:
 ///
 /// - seed phrase
 /// - path, possibly with secret password part (`///<...>`).
@@ -495,7 +491,8 @@ fn populate_addresses<T: ErrorSource>(
     })
 }
 
-/// Generate default addresses for a seed.
+/// Accept seed into Signer: add default addresses for a seed in the Signer
+/// database.
 ///
 /// Each network has a default derivation path, recorded in [`NetworkSpecs`]
 /// field `path_id`, normally `path_id` is `//<network_name>`.
@@ -523,7 +520,7 @@ pub fn try_create_seed(
         .apply::<Signer>(database_name)
 }
 
-/// Removes address from the database.
+/// Remove address from the Signer database.
 ///
 /// Address is determined by [`MultiSigner`] and [`NetworkSpecsKey`] of the
 /// network.
@@ -541,7 +538,7 @@ pub fn remove_key(
     remove_keys_set(database_name, &[multisigner.to_owned()], network_specs_key)
 }
 
-/// Removes a set of addresses within a single network from the database.
+/// Remove a set of addresses within a single network from the Signer database.
 ///
 /// Address is determined by [`MultiSigner`] and [`NetworkSpecsKey`] of the
 /// network. Function inputs network `NetworkSpecsKey` and a set of
@@ -589,7 +586,7 @@ pub fn remove_keys_set(
         .apply::<Signer>(database_name)
 }
 
-/// Add a set of new derived addresses: N+1, N+2, etc.
+/// Add a set of new derived addresses: N+1, N+2, etc into Signer database.
 ///
 /// The number of the added addresses is set by `increment` input.
 ///
@@ -609,6 +606,9 @@ pub fn remove_keys_set(
 /// (i.e. having derivation path **without** `///<password>` part). If the
 /// increment set is created on a passworded address, only public derivation
 /// path part will be used for increment set generation.
+///
+/// This function inputs secret seed phrase as `&str`. It is passed as `&str`
+/// into `create_address` and used there.
 ///
 /// ## Example
 ///
@@ -684,7 +684,7 @@ pub fn create_increment_set(
     }
     let id_batch = upd_id_batch(Batch::default(), identity_adds);
     TrDbCold::new()
-        .set_addresses(id_batch) // add created address
+        .set_addresses(id_batch) // add created addresses
         .set_history(events_to_batch::<Signer>(database_name, current_events)?) // add corresponding history
         .apply::<Signer>(database_name)
 }
@@ -783,8 +783,18 @@ pub(crate) fn derivation_check(
     }
 }
 
-/// Function to cut the password to be verified later in UI.
-/// Expects password, if sees no password, returns error.
+/// Separate derivation path with password into non-secret part and password.
+///
+/// Function is expected to deal **only** with derivations having a password
+/// (i.e. with `///<password>` part of the derivation path). Password-free
+/// derivations do not get to the point in `navigator` where this function is
+/// called. Calling this function on password-free derivation is an error.
+///
+/// Function receives derivation path with secret password part, and outputs
+/// hard and soft derivations part and secret password part of the derivation
+/// path separately.
+///
+// TODO regex and secrets, see `create_address` comments.
 #[cfg(feature = "signer")]
 pub fn cut_path(path: &str) -> Result<(String, String), ErrorSigner> {
     match REG_PATH.captures(path) {
@@ -804,8 +814,20 @@ pub fn cut_path(path: &str) -> Result<(String, String), ErrorSigner> {
     }
 }
 
-/// Generate new identity (api for create_address())
-/// Function is open to user interface
+/// Create a new address in the Signer database.
+///
+/// If the associated [`AddressKey`] already exists in the [`ADDRTREE`] tree of
+/// the Signer database, a new network [`NetworkSpecsKey`] is added into
+/// `network_id` set of the `AddressDetails`. If the `AddressKey` is new,
+/// a new `ADDRTREE` entry is made.
+/// 
+/// Secrets passed into this function are:
+///
+/// - seed phrase
+/// - path, possibly with secret password part (`///<...>`).
+///
+/// Both are input as `&str` and go directly in `create_address` (both) and
+/// `derivation_check` (path only).
 #[cfg(feature = "signer")]
 pub fn try_create_address(
     seed_name: &str,
@@ -815,9 +837,14 @@ pub fn try_create_address(
     database_name: &str,
 ) -> Result<(), ErrorSigner> {
     match derivation_check(seed_name, path, network_specs_key, database_name)? {
+        // UI should prevent user from getting into `try_create_address` if 
+        // derivation has a bad format
         DerivationCheck::BadFormat => Err(ErrorSigner::AddressGeneration(
             AddressGeneration::Extra(ExtraAddressGenerationSigner::InvalidDerivation),
         )),
+
+        // UI should prevent user from getting into `try_create_address` if
+        // derivation already exists
         DerivationCheck::NoPassword(Some((multisigner, address_details))) => Err(
             <Signer>::address_generation_common(AddressGenerationCommon::DerivationExists(
                 multisigner,
@@ -825,11 +852,18 @@ pub fn try_create_address(
                 network_specs_key.to_owned(),
             )),
         ),
+
+        // Valid derivation:
+        // - without a password and not in the database
+        // - with password
+        // Signer can try adding either. Collisions (for both cases) and exact
+        // coincidence (for passworded derivation) could not have been checked
+        // preliminarily and would result in `create_address` errors here.
         _ => {
             let network_specs = get_network_specs(database_name, network_specs_key)?;
             let prep_data = create_address::<Signer>(
                 database_name,
-                &Vec::new(),
+                &Vec::new(), // a single address is created, no data to check against here
                 path,
                 &network_specs,
                 seed_name,
@@ -847,22 +881,40 @@ pub fn try_create_address(
     }
 }
 
-/// Function to generate identities batch with Alice information
+/// Generate test Alice addresses in test cold database.
+///
+/// Function wipes [`ADDRTREE`] and adds:
+///
+/// - seed key, i.e. seed addresses for all 3 default networks (Polkadot,
+/// Kusama, Westend)
+/// - addresses with default derivation path in each default network
+/// - address with `//Alice` derivation path in Westend network
 #[cfg(feature = "active")]
 pub fn generate_test_identities(database_name: &str) -> Result<(), ErrorActive> {
+    // clear the tree
     let entry_batch = make_batch_clear_tree::<Active>(database_name, ADDRTREE)?;
+
+    // make a record that the tree was wiped
     let mut events = vec![Event::IdentitiesWiped];
 
+    // data for adding seed addresses and addresses with default derivation path
     let prep_data = populate_addresses::<Active>(database_name, "Alice", ALICE_SEED_PHRASE, true)?;
 
+    // Address preparation set, to be used as following `create_address` input.
+    // Alice addresses are known and good, so checking them for collisions is
+    // not really necessary. This is here just for the sake of completedness.
     let mut address_prep = prep_data.address_prep.to_vec();
+
+    // update events
     events.extend_from_slice(&prep_data.history_prep);
 
-    for network_specs in default_chainspecs().iter() {
+    for network_specs in get_all_networks::<Active>(database_name)?.iter() {
         if (network_specs.name == "westend") && (network_specs.encryption == Encryption::Sr25519) {
+            // data for adding address with `//Alice` derivation path in Westend
+            // network
             let prep_data = create_address::<Active>(
                 database_name,
-                &address_prep,
+                &address_prep, // address
                 "//Alice",
                 network_specs,
                 "Alice",
@@ -874,21 +926,36 @@ pub fn generate_test_identities(database_name: &str) -> Result<(), ErrorActive> 
     }
 
     TrDbCold::new()
-        .set_addresses(upd_id_batch(entry_batch, address_prep)) // add created address
+        .set_addresses(upd_id_batch(entry_batch, address_prep)) // add created addresses
         .set_history(events_to_batch::<Active>(database_name, events)?) // add corresponding history
         .apply::<Active>(database_name)
 }
 
-/// Function to remove all identities associated with given seen_name
-/// Function is open to the user interface
+/// Remove all addresses associated with given seed name from the Signer
+/// database.
+///
+/// Complementary action in frontend is removal of the seed data from the device
+/// key management system.
+///
+// TODO remove seed must have an associated log entry; decide who emits it -
+// front or back - and add.
 #[cfg(feature = "signer")]
 pub fn remove_seed(database_name: &str, seed_name: &str) -> Result<(), ErrorSigner> {
+    // `Batch` to use
     let mut identity_batch = Batch::default();
+
+    // Associated `Event` set
     let mut events: Vec<Event> = Vec::new();
+
+    // All addresses with given seed name from the database
     let id_set = get_addresses_by_seed_name(database_name, seed_name)?;
+
     for (multisigner, address_details) in id_set.iter() {
         let address_key = AddressKey::from_multisigner(multisigner);
+
+        // removal of all addresses corresponging to `AddressKey`
         identity_batch.remove(address_key.key());
+
         let public_key = multisigner_to_public(multisigner);
         for network_specs_key in address_details.network_id.iter() {
             let (genesis_hash_vec, _) = network_specs_key.genesis_hash_encryption::<Signer>(
@@ -901,6 +968,8 @@ pub fn remove_seed(database_name: &str, seed_name: &str) -> Result<(), ErrorSign
                 &address_details.path,
                 &genesis_hash_vec,
             );
+
+            // separate `Event` for each `NetworkSpecsKey` from `network_id` set
             events.push(Event::IdentityRemoved(identity_history));
         }
     }
@@ -910,9 +979,27 @@ pub fn remove_seed(database_name: &str, seed_name: &str) -> Result<(), ErrorSign
         .apply::<Signer>(database_name)
 }
 
-/// Function to import derivations without password into Signer from qr code
-/// i.e. create new (address key + address details) entry,
-/// or add network specs key to the existing one
+/// Create a set of addresses with password-free derivations for user-selected
+/// seed.
+///
+/// Function creates addresses in the Signer database for the derivations
+/// received as a part of `derivations` payload. Derivations are already checked
+/// and temporarily stored in `TRANSACTIONS` tree of the Signer database.
+/// Function retrieves the checked data from the database using input checksum.
+///
+/// If an address already exists in the database, i.e. the [`AddressDetails`]
+/// data associated with the [`AddressKey`] contains exactly same derivation
+/// path and `network_id` set contains the network [`NetworkSpecsKey`], it is
+/// ignored.
+///
+/// Collision with address already in the database or with another address from
+/// derivations set produces an error.
+///
+/// Function inputs secret seed phrase as `&str`. It is passed as `&str` into
+/// into `create_address` and used there.
+/// 
+// TODO this is likely to be considerably changed as soon as UI/UX design
+// appears
 #[cfg(feature = "signer")]
 pub fn import_derivations(
     checksum: u32,
@@ -920,11 +1007,22 @@ pub fn import_derivations(
     seed_phrase: &str,
     database_name: &str,
 ) -> Result<(), ErrorSigner> {
+
+    // derivations data retrieved from the database
     let content_derivations = TrDbColdDerivations::from_storage(database_name, checksum)?;
+
+    // [`NetworkSpecs`] for the network in which the addresses are generated
     let network_specs = content_derivations.network_specs();
+
+    // Address preparation set, to be modified and used as `create_address`
+    // input.
     let mut adds: Vec<(AddressKey, AddressDetails)> = Vec::new();
+
+    // Associated `Event` set
     let mut events: Vec<Event> = Vec::new();
+
     for path in content_derivations.checked_derivations().iter() {
+        // try creating address for each of the derivations
         match create_address::<Signer>(
             database_name,
             &adds,
@@ -933,26 +1031,42 @@ pub fn import_derivations(
             seed_name,
             seed_phrase,
         ) {
+            // success, updating address preparation set and `Event` set
             Ok(prep_data) => {
                 adds = prep_data.address_prep;
                 events.extend_from_slice(&prep_data.history_prep);
             }
+
+            // exactly same address already exists, ignoring it
             Err(ErrorSigner::AddressGeneration(AddressGeneration::Common(
                 AddressGenerationCommon::DerivationExists(_, _, _),
             ))) => (),
+
+            // some other error, processed as a real error
             Err(e) => return Err(e),
         }
     }
-    let identity_batch = upd_id_batch(Batch::default(), adds);
-    let transaction_batch = make_batch_clear_tree::<Signer>(database_name, TRANSACTION)?;
     TrDbCold::new()
-        .set_addresses(identity_batch) // modify addresses
+        .set_addresses(upd_id_batch(Batch::default(), adds)) // modify addresses data
         .set_history(events_to_batch::<Signer>(database_name, events)?) // add corresponding history
-        .set_transaction(transaction_batch) // clear transaction tree
+        .set_transaction(make_batch_clear_tree::<Signer>(database_name, TRANSACTION)?) // clear transaction tree
         .apply::<Signer>(database_name)
 }
 
-/// Function to check derivations before offering user to import them
+/// Check derivations before offering user to import them.
+///
+/// Signer allows bulk import only for valid derivations without password (i.e.
+/// without `///<password>` part).
+///
+/// This function is used in `transaction_parsing::derivations` to check the
+/// incoming derivations once they are received in `derivations` qr code
+/// payload.
+///
+/// Note that once the derivations are checked, they are moved around as
+/// "checked derivations" and not checked anymore until they are used in
+/// `import_derivations`. Only checked derivations are written into the
+/// database temporary storage in `TRANSACTION` tree, same data is recovered as
+/// ensured by the checksum matching.
 #[cfg(feature = "signer")]
 pub fn check_derivation_set(derivations: &[String]) -> Result<(), ErrorSigner> {
     for path in derivations.iter() {
@@ -972,7 +1086,19 @@ pub fn check_derivation_set(derivations: &[String]) -> Result<(), ErrorSigner> {
     Ok(())
 }
 
-/// Function to prepare derivations export using regex and a text provided by the user
+/// Prepare derivations bulk export content [`ContentDerivations`].
+///
+/// Function is used on the active side. It inputs information about network in
+/// which the derivations would be created if the export is successful
+/// (genesis hash and `Encryption`), and the plaintext user derivations set.
+///
+/// Derivations allowed in the export set must be valid and must have no
+/// password (i.e. no `///<password>`) part. The derivations source file must
+/// have derivations as a list with each new derivation on the new line.
+///
+/// The source plaintext is cut in lines and each line is processes using regex,
+/// all invalid derivations are ignored. Function prints found valid 
+/// password-free derivations as well.
 #[cfg(feature = "active")]
 pub fn prepare_derivations_export(
     encryption: &Encryption,
