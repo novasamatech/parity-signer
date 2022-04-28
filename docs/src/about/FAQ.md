@@ -66,7 +66,7 @@ Currently the process requires you to have [rust](https://www.rust-lang.org/tool
 
 ## Seeds and keys
 	
-### Can import my keys from polkadot{.js} apps or extension to Parity Signer?
+### Can I import my keys from polkadot{.js} apps or extension to Parity Signer?
 
 Yes. Keys are compatible between polkadot{.js} and Parity Signer, except for the keys generated with Ledger (BIP39). To import seed keys into Parity Signer, you need to know:
 1. Seed phrase\
