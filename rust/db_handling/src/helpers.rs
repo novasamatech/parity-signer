@@ -338,7 +338,8 @@ pub fn get_address_details(
 /// Get [`MetaValues`] set from Signer database, for networks with a given name.
 ///
 /// The resulting set could be an empty one. It is used to display metadata
-/// available for the network.
+/// available for the network and to find the metadata to be deleted, when the
+/// network gets deleted.
 #[cfg(feature = "signer")]
 pub(crate) fn get_meta_values_by_name(
     database_name: &str,

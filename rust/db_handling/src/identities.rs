@@ -820,7 +820,7 @@ pub fn cut_path(path: &str) -> Result<(String, String), ErrorSigner> {
 /// the Signer database, a new network [`NetworkSpecsKey`] is added into
 /// `network_id` set of the `AddressDetails`. If the `AddressKey` is new,
 /// a new `ADDRTREE` entry is made.
-/// 
+///
 /// Secrets passed into this function are:
 ///
 /// - seed phrase
@@ -837,7 +837,7 @@ pub fn try_create_address(
     database_name: &str,
 ) -> Result<(), ErrorSigner> {
     match derivation_check(seed_name, path, network_specs_key, database_name)? {
-        // UI should prevent user from getting into `try_create_address` if 
+        // UI should prevent user from getting into `try_create_address` if
         // derivation has a bad format
         DerivationCheck::BadFormat => Err(ErrorSigner::AddressGeneration(
             AddressGeneration::Extra(ExtraAddressGenerationSigner::InvalidDerivation),
@@ -997,7 +997,7 @@ pub fn remove_seed(database_name: &str, seed_name: &str) -> Result<(), ErrorSign
 ///
 /// Function inputs secret seed phrase as `&str`. It is passed as `&str` into
 /// into `create_address` and used there.
-/// 
+///
 // TODO this is likely to be considerably changed as soon as UI/UX design
 // appears
 #[cfg(feature = "signer")]
@@ -1007,7 +1007,6 @@ pub fn import_derivations(
     seed_phrase: &str,
     database_name: &str,
 ) -> Result<(), ErrorSigner> {
-
     // derivations data retrieved from the database
     let content_derivations = TrDbColdDerivations::from_storage(database_name, checksum)?;
 
@@ -1097,7 +1096,7 @@ pub fn check_derivation_set(derivations: &[String]) -> Result<(), ErrorSigner> {
 /// have derivations as a list with each new derivation on the new line.
 ///
 /// The source plaintext is cut in lines and each line is processes using regex,
-/// all invalid derivations are ignored. Function prints found valid 
+/// all invalid derivations are ignored. Function prints found valid
 /// password-free derivations as well.
 #[cfg(feature = "active")]
 pub fn prepare_derivations_export(

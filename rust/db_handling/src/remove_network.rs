@@ -1,31 +1,59 @@
 use parity_scale_codec::Encode;
 use sled::Batch;
 
-use constants::{ADDRTREE, METATREE, SPECSTREE};
+use constants::{ADDRTREE, SPECSTREE};
 use definitions::{
-    error::ErrorSource,
-    error_signer::{ErrorSigner, NotFoundSigner, Signer},
+    error_signer::{ErrorSigner, Signer},
     helpers::multisigner_to_public,
     history::{Event, IdentityHistory, MetaValuesDisplay, NetworkSpecsDisplay},
-    keyring::{AddressKey, MetaKey, MetaKeyPrefix, NetworkSpecsKey, VerifierKey},
+    keyring::{AddressKey, MetaKey, NetworkSpecsKey, VerifierKey},
     network_specs::{CurrentVerifier, NetworkSpecs, ValidCurrentVerifier, Verifier},
     users::AddressDetails,
 };
 
 use crate::db_transactions::TrDbCold;
 use crate::helpers::{
-    get_general_verifier, get_network_specs, get_valid_current_verifier, open_db, open_tree,
+    get_general_verifier, get_meta_values_by_name, get_meta_values_by_name_version,
+    get_network_specs, get_valid_current_verifier, open_db, open_tree,
 };
 use crate::manage_history::events_to_batch;
 
-/// Function to remove the network with given NetworkSpecsKey from the database.
-/// Removes network specs for all entries with same genesis hash.
-/// Removes all metadata entries for corresponding network specname.
-/// Removes all addresses corresponding to the networks removed (all encryptions).
-/// If ValidCurrentVerifier is Custom(Verifier(None)), leaves it as that. If ValidCurrentVerifier is General, leaves it as General.
-/// If ValidCurrentVerifier is Custom with some Verifier set, transforms CurrentVerifier from Valid into Dead to disable the network
-/// permanently until Signer is wiped altogether.
-/// Function is used only on the Signer side.
+/// Remove the network from the database.
+///
+/// Function inputs [`NetworkSpecsKey`] of the network, gets network genesis
+/// hash and proceeds to act on **all** networks with same genesis hash.
+///
+/// Removing network is mostly an emergency tool and is not expected to be used
+/// really often.
+///
+/// Removing a network means:
+///
+/// - Remove from [`SPECSTREE`] all [`NetworkSpecs`] that have genesis hash
+/// associated with given `NetworkSpecsKey`
+/// - Remove from [`METATREE`] all metadata entries corresponding to the network
+/// name, as found in `NetworkSpecs`
+/// - Remove from [`ADDRTREE`] all addresses in the networks being removed
+/// - Modify `Verifier` data if necessary.
+///
+/// Removing the network **may result** in blocking the network altogether until
+/// the Signer is reset. This happens only if the removed network
+/// [`ValidCurrentVerifier`] was set to
+/// `ValidCurrentVerifier::Custom(Verifier(Some(_)))` and is a security measure.
+/// This should be used to deal with compromised `Custom` verifiers.
+///
+/// Compromised general verifier is a major disaster and will require Signer
+/// reset in any case.
+///
+/// Removing the network verified by the general verifier **does not** block the
+/// network.
+///
+/// Removing the network verified by
+/// `ValidCurrentVerifier::Custom(Verifier(None))` **does not** block the
+/// network.
+///
+/// Note that if the network supports multiple encryption algorithms, the
+/// removal of network with one of the encryptions will cause the networks
+/// with other encryptions be removed as well.
 pub fn remove_network(
     network_specs_key: &NetworkSpecsKey,
     database_name: &str,
@@ -53,9 +81,15 @@ pub fn remove_network(
         }
     }
 
+    // scan through metadata tree to mark for removal all networks with target name
+    for meta_values in get_meta_values_by_name(database_name, &network_specs.name)?.iter() {
+        let meta_key = MetaKey::from_parts(&meta_values.name, meta_values.version);
+        meta_batch.remove(meta_key.key());
+        events.push(Event::MetadataRemoved(MetaValuesDisplay::get(meta_values)));
+    }
+
     {
         let database = open_db::<Signer>(database_name)?;
-        let metadata = open_tree::<Signer>(&database, METATREE)?;
         let chainspecs = open_tree::<Signer>(&database, SPECSTREE)?;
         let identities = open_tree::<Signer>(&database, ADDRTREE)?;
 
@@ -79,18 +113,6 @@ pub fn remove_network(
             }
         }
 
-        // scan through metadata tree to mark for removal all networks with target name
-        let meta_key_prefix = MetaKeyPrefix::from_name(&network_specs.name);
-        for (meta_key_vec, meta_stored) in metadata.scan_prefix(meta_key_prefix.prefix()).flatten()
-        {
-            let meta_key = MetaKey::from_ivec(&meta_key_vec);
-            meta_batch.remove(meta_key.key());
-            if let Ok((name, version)) = meta_key.name_version::<Signer>() {
-                let meta_values_display =
-                    MetaValuesDisplay::from_storage(&name, version, meta_stored);
-                events.push(Event::MetadataRemoved(meta_values_display));
-            }
-        }
         // scan through address tree to clean up the network_key(s) from identities
         for (address_key_vec, entry) in identities.iter().flatten() {
             let address_key = AddressKey::from_ivec(&address_key_vec);
@@ -129,6 +151,16 @@ pub fn remove_network(
         .apply::<Signer>(database_name)
 }
 
+/// Remove the network metadata entry from the database.
+///
+/// Function inputs [`NetworkSpecsKey`] of the network and `u32` version of the
+/// network metadata, and proceeds to remove a single metadata entry
+/// corresponding to this version.
+///
+/// Metadata in the Signer database is determined by the network name and
+/// network version, and has no information about the [`Encryption`] algorithm
+/// supported by the network. Therefore if the network supports more than one
+/// encryption algorithm, removing metadata for one will affect all encryptions.
 pub fn remove_metadata(
     network_specs_key: &NetworkSpecsKey,
     network_version: u32,
@@ -138,37 +170,19 @@ pub fn remove_metadata(
     let meta_key = MetaKey::from_parts(&network_specs.name, network_version);
     let mut meta_batch = Batch::default();
     meta_batch.remove(meta_key.key());
-    let history_batch =
-        get_batch_remove_unchecked_meta(database_name, &network_specs.name, network_version)?;
+
+    let meta_values = get_meta_values_by_name_version::<Signer>(
+        database_name,
+        &network_specs.name,
+        network_version,
+    )?;
+    let meta_values_display = MetaValuesDisplay::get(&meta_values);
+    let history_batch = events_to_batch::<Signer>(
+        database_name,
+        vec![Event::MetadataRemoved(meta_values_display)],
+    )?;
     TrDbCold::new()
         .set_metadata(meta_batch) // remove metadata
         .set_history(history_batch) // add corresponding history
         .apply::<Signer>(database_name)
-}
-
-fn get_batch_remove_unchecked_meta(
-    database_name: &str,
-    network_name: &str,
-    network_version: u32,
-) -> Result<Batch, ErrorSigner> {
-    let events = {
-        let meta_key = MetaKey::from_parts(network_name, network_version);
-        let database = open_db::<Signer>(database_name)?;
-        let metadata = open_tree::<Signer>(&database, METATREE)?;
-        match metadata.get(meta_key.key()) {
-            Ok(Some(meta_stored)) => {
-                let meta_values_display =
-                    MetaValuesDisplay::from_storage(network_name, network_version, meta_stored);
-                vec![Event::MetadataRemoved(meta_values_display)]
-            }
-            Ok(None) => {
-                return Err(ErrorSigner::NotFound(NotFoundSigner::Metadata {
-                    name: network_name.to_string(),
-                    version: network_version,
-                }))
-            }
-            Err(e) => return Err(<Signer>::db_internal(e)),
-        }
-    };
-    events_to_batch::<Signer>(database_name, events)
 }

@@ -19,7 +19,6 @@
 //! `Event::HistoryCleared`.
 use blake2_rfc::blake2b::blake2b;
 use parity_scale_codec::{Decode, Encode};
-use sled::IVec;
 use sp_runtime::MultiSigner;
 #[cfg(feature = "signer")]
 use std::convert::TryInto;
@@ -58,19 +57,6 @@ impl MetaValuesDisplay {
             name: meta_values.name.to_string(),
             version: meta_values.version,
             meta_hash: blake2b(32, &[], &meta_values.meta).as_bytes().to_vec(),
-        }
-    }
-
-    /// Generate [`MetaValuesDisplay`] from database entry with network name,
-    /// network version, and stored metadata entry as is
-    ///
-    /// This is used for deletion, no checking of stored metadata integrity is
-    /// made.
-    pub fn from_storage(name: &str, version: u32, meta_stored: IVec) -> Self {
-        Self {
-            name: name.to_string(),
-            version,
-            meta_hash: blake2b(32, &[], &meta_stored).as_bytes().to_vec(),
         }
     }
 
@@ -863,4 +849,3 @@ mod tests {
         assert_eq!(Event::VARIANT_COUNT, all_events_preview().len());
     }
 }
-
