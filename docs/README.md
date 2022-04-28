@@ -4,6 +4,6 @@
 ### Run docs locally
 
 ```
-# in repositary
+# in repository
 mdbook serve docs
 ```
