@@ -37,17 +37,22 @@ For example with [PolkadotJS Apps](https://polkadot.js.org/apps/) you can create
 
 ## Networks
 
-### How can I update metadata version for a network?
-
-Please go to [Metadata Update Portal](https://metadata.parity.io/) and select network you need to update. Scan multipart QR code the same way you scan a transaction QR code. 
-
-Why do I need to update network versions at all?
-
-It's a safety feature. Substrate-based blockchain networks have capacity to be updated and otherwise changed; without recent metadata version of a network Signer won't be able to parse a transaction correctly, and you won't be able to read it and verify what you sign. Given that Signer is an app for an air-gapped device, you have to update the network version by using camera.
-
 ### What networks does Signer support?
 
 From-the-shelf Party Signer supports Polkadot, Kusama and Westend networks. But it's not limited to these networks. More experienced users can generate metadata for any network to expand capability of Parity Signer.
+
+### How can I update metadata version for a network?
+
+Parity verifies and publishes recent metadata versions on [Metadata Update Portal](https://metadata.parity.io/). With off-the-shelf Signer you can scan one of the multipart QR–"movies" same way you scan transaction QR:\
+in Signer open scanner, scan the QR for the respective network and accept new metadata.
+
+Currently [Metadata Update Portal](https://metadata.parity.io/) follows Polkadot, Kusama and Westend networks. But we are open for collaboration with participants of other networks and we are eager to explore more decentralised way of publishing verified metadata.
+
+If you want to update networks that you've added manually, please follow the [Add Metadata](../tutorials/Add-New-Network.md#add-network-metadata) steps in [Add New Network](../tutorials/Add-New-Network.md) guide.
+
+### Why do I need to update network metadata versions at all?
+
+It's a safety feature. Substrate-based blockchain networks have capacity to be updated and otherwise changed; without recent metadata version of a network Signer won't be able to parse a transaction correctly, and you won't be able to read it and verify what you sign. Given that Signer is an app for an air-gapped device, you have to update the network version by using camera.
 
 ### How can I add a new network to Signer?
 

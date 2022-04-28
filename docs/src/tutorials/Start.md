@@ -26,6 +26,8 @@ Before starting the Signer, you should make sure that network is disabled. Many 
 
 When you first launch Signer, it prompts you to read and accept terms and conditions and privacy policy. Once that is done, the database is pre-populated with built-in networks and Signer is ready for use. It could [import network data](./Add-New-Network.md) or [read transactions](./Kusama-tutorial.md), but to sign anything you need to create keys.
 
+<!-- TODO for advanced users: If you would like to replace general verifier certificate (link to explanation?), this is time to do it, as that operation will wipe all data from Signer - something like this might be useful here" -->
+
 ### Create keys
 
 Open key manager by tapping bottom left symbol. On fresh start you will be prompted to create seed (otherwise you could always create more seeds by tapping `New seed` button in Key Manager). Enter any convenient seed name (it does not matter anything and is not used anywhere except for this particulat Signer device) and - if you would like to use custom seed phrase - switch to recovery mode and type the seed phrase. Custom seed phrase should be used only to recover or import existing key(s), do not input custom seed phrase unless it is properly random! **Security of your accounts relies on randomness of seed phrase**. If you are generating new seed phrase, use built-in random generator and do not input a custom seed phrase.
