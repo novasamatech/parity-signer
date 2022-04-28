@@ -46,7 +46,7 @@ From-the-shelf Party Signer supports Polkadot, Kusama and Westend networks. But 
 Parity verifies and publishes recent metadata versions on [Metadata Update Portal](https://metadata.parity.io/). With off-the-shelf Signer you can scan one of the multipart QR–"movies" same way you scan transaction QR:\
 in Signer open scanner, scan the QR for the respective network and accept new metadata.
 
-Currently [Metadata Update Portal](https://metadata.parity.io/) follows Polkadot, Kusama and Westend networks. But we are open for collaboration with participants of other networks and we are eager to explore more decentralised way of publishing verified metadata.
+Currently [Metadata Update Portal](https://metadata.parity.io/) follows Polkadot, Kusama and Westend network metadata updates. Parity is open for collaboration with participants of other networks and is currently exploring safe and more decentralised ways of publishing verified metadata.
 
 If you want to update networks that you've added manually, please follow the [Add Metadata](../tutorials/Add-New-Network.md#add-network-metadata) steps in [Add New Network](../tutorials/Add-New-Network.md) guide.
 
@@ -56,7 +56,11 @@ It's a safety feature. Substrate-based blockchain networks have capacity to be u
 
 ### How can I add a new network to Signer?
 
-Follow the [Add New Network](../tutorials/Add-New-Network.md) step-by-step guide.
+Parity verifies and publishes network specs on [Metadata Update Portal](https://metadata.parity.io/). To add one of the listed networks, in [Metadata Update Portal](https://metadata.parity.io/) click "Add to signer", scan the network specs QR same way you scan transaction QR: in Signer open scanner, scan the QR and accept new network spec. Than scan the multipart QR–"movie" containing recent metadata for this network.
+
+### Can I add a network that does not have network specs and metadata QR published anywhere?
+
+Yes. Follow the [Add New Network](../tutorials/Add-New-Network.md) step-by-step guide.
 
 Currently the process requires you to have [rust](https://www.rust-lang.org/tools/install), [subkey](https://docs.substrate.io/v3/tools/subkey/#installation) and [parity-signer repository](https://github.com/paritytech/parity-signer) on your machine.
 
