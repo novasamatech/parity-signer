@@ -22,6 +22,7 @@ use load_types::load_types;
 mod message;
 use message::process_message;
 mod parse_transaction;
+pub use parse_transaction::entry_to_transactions_with_decoding;
 use parse_transaction::parse_transaction;
 pub mod test_all_cards;
 use test_all_cards::make_all_cards;

@@ -4,7 +4,7 @@ use db_handling::{
 };
 use definitions::{
     error_signer::{ErrorSigner, InputSigner, NotFoundSigner, ParserError},
-    history::{Event, SignDisplay},
+    history::{Entry, Event, SignDisplay},
     keyring::{AddressKey, NetworkSpecsKey},
     navigation::{TransactionCard, TransactionCardSet},
     users::AddressDetails,
@@ -287,6 +287,25 @@ fn into_cards(set: &[OutputCard], index: &mut u32) -> Vec<TransactionCard> {
     set.iter()
         .map(|card| Card::ParserCard(&card.card).card(index, card.indent))
         .collect()
+}
+
+pub fn entry_to_transactions_with_decoding(
+    entry: &Entry,
+    database_name: &str,
+) -> Result<Vec<TransactionCardSet>, ErrorSigner> {
+    let mut res = Vec::new();
+
+    for event in &entry.events {
+        match event {
+            Event::TransactionSigned { sign_display }
+            | Event::TransactionSignError { sign_display } => {
+                res.push(decode_signable_from_history(&sign_display, database_name)?);
+            }
+            _ => (),
+        }
+    }
+
+    Ok(res)
 }
 
 pub(crate) fn decode_signable_from_history(

@@ -19,6 +19,9 @@ sp-runtime = {git = "https://github.com/paritytech/substrate", default-features 
 transaction_parsing = {path = "../transaction_parsing", default-features = false, optional = true}
 zeroize = "1.5.3"
 
+[dev-dependencies]
+pretty_assertions = "1"
+
 [features]
 default = ["test"]
 test = [
