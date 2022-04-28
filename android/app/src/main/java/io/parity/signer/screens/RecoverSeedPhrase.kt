@@ -92,7 +92,7 @@ fun RecoverSeedPhrase(
 					addSeed(
 						seedName,
 						seedPhraseReady,
-						createRoots.value
+						createSeedKeys.value
 					)
 				}
 			},
