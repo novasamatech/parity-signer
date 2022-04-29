@@ -20,17 +20,16 @@ use definitions::{
     navigation::{
         Address, DerivationCheck as NavDerivationCheck, DerivationDestination, DerivationEntry,
         DerivationPack, MBackup, MDeriveKey, MKeyDetails, MKeysCard, MMMNetwork, MMManageNetworks,
-        MMNetwork, MNetworkDetails, MNetworkMenu, MNewSeedBackup, MRawKey, MSeedKeyCard,
-        MTypesInfo, Network, SeedNameCard, SeedWord,
+        MMNetwork, MMetadataRecord, MNetworkDetails, MNetworkMenu, MNewSeedBackup, MRawKey,
+        MSeedKeyCard, MTypesInfo, MVerifier, Network, SeedNameCard, SeedWord,
     },
-    network_specs::NetworkSpecs,
+    network_specs::{NetworkSpecs, ValidCurrentVerifier},
     print::export_plain_vector,
     qr_transfers::ContentLoadTypes,
     users::AddressDetails,
 };
 use qrcode_static::png_qr_from_string;
 
-use crate::db_transactions::TrDbCold;
 use crate::helpers::{
     get_address_details, get_general_verifier, get_meta_values_by_name,
     get_meta_values_by_name_version, get_network_specs, make_batch_clear_tree, open_db, open_tree,
@@ -41,6 +40,7 @@ use crate::identities::{
     DerivationCheck,
 };
 use crate::network_details::get_all_networks;
+use crate::{db_transactions::TrDbCold, helpers::get_valid_current_verifier};
 
 /// Function to print all seed names with identicons
 /// Gets used only on the Signer side, interacts with the user interface.
@@ -145,13 +145,14 @@ pub fn print_identities_for_seed_name_and_network(
     network_specs_key: &NetworkSpecsKey,
     swiped_key: Option<MultiSigner>,
     multiselect: Vec<MultiSigner>,
-) -> Result<(MSeedKeyCard, Vec<MKeysCard>), ErrorSigner> {
+) -> Result<(MSeedKeyCard, Vec<MKeysCard>, String, String), ErrorSigner> {
     log::warn!("SEED NAME {}", seed_name);
     let network_specs = get_network_specs(database_name, network_specs_key)?;
     let identities = addresses_set_seed_name_network(database_name, seed_name, network_specs_key)?;
     let mut root_id = None;
     let mut other_id: Vec<(MultiSigner, AddressDetails, Vec<u8>, bool, bool)> = Vec::new();
     for (multisigner, address_details) in identities.into_iter() {
+        println!("Details {:#?}", address_details);
         let identicon = make_identicon_from_multisigner(&multisigner);
         let base58 = print_multisigner_as_base58(&multisigner, Some(network_specs.base58prefix));
         let address_key = AddressKey::from_multisigner(&multisigner);
@@ -198,7 +199,7 @@ pub fn print_identities_for_seed_name_and_network(
         )
         .collect();
 
-    Ok((root, set))
+    Ok((root, set, network_specs.title, network_specs.logo))
 }
 
 /// Function to get addresses for given seed name and network specs key
@@ -239,7 +240,9 @@ pub fn show_all_networks(database_name: &str) -> Result<Vec<MMNetwork>, ErrorSig
     let mut networks = networks
         .into_iter()
         .map(|n| MMNetwork {
-            key: String::new(), // TODO: n.key,
+            key: hex::encode(
+                NetworkSpecsKey::from_parts(&n.genesis_hash.as_bytes(), &n.encryption).key(),
+            ),
             title: n.title,
             logo: n.logo,
             order: n.order,
@@ -479,10 +482,28 @@ pub fn network_details_by_key(
         title,
         unit,
     } = get_network_specs(database_name, network_specs_key)?;
-    let _verifier_key = VerifierKey::from_parts(genesis_hash.as_bytes());
-    let _general_verifier = get_general_verifier(database_name)?;
-    let current_verifier = Default::default(); // TODO: get_valid_current_verifier(&verifier_key, database_name)?;
-    let _meta = get_meta_values_by_name::<Signer>(database_name, &name)?;
+    let verifier_key = VerifierKey::from_parts(genesis_hash.as_bytes());
+    let general_verifier = get_general_verifier(database_name)?;
+    let current_verifier = get_valid_current_verifier(&verifier_key, database_name)?;
+    let meta: Vec<_> = get_meta_values_by_name::<Signer>(database_name, &name)?
+        .into_iter()
+        .map(|m| {
+            let meta_hash = blake2b(32, &[], &m.meta).as_bytes().to_vec();
+            let meta_id_pic = hex::encode(pic_meta(&meta_hash));
+
+            MMetadataRecord {
+                specs_version: m.version.to_string(),
+                meta_hash: hex::encode(meta_hash),
+                meta_id_pic,
+            }
+        })
+        .collect();
+
+    let (ttype, details) = match current_verifier {
+        ValidCurrentVerifier::General => ("general".to_string(), general_verifier.show_card()),
+        ValidCurrentVerifier::Custom { v } => ("custom".to_string(), v.show_card()),
+    };
+    let current_verifier = MVerifier { ttype, details };
 
     Ok(MNetworkDetails {
         base58prefix,
@@ -498,7 +519,7 @@ pub fn network_details_by_key(
         title,
         unit,
         current_verifier,
-        meta: vec![],
+        meta,
     })
 }
 
@@ -740,6 +761,17 @@ impl SeedDraft {
         }
         out.push(']');
         out
+    }
+
+    pub fn draft(&self) -> Vec<SeedWord> {
+        self.saved
+            .iter()
+            .enumerate()
+            .map(|(order, w)| SeedWord {
+                order: order as u32,
+                content: w.word().to_string(),
+            })
+            .collect()
     }
 
     /// Combines all draft elements into seed phrase proposal,

@@ -670,7 +670,7 @@ interface ModalData {
     ManageMetadata();
     KeyDetailsAction();
     LogComment();
-    SelectSeed();
+    SelectSeed(MSeeds f);
 };
 
 dictionary MSCAuthorPlain {

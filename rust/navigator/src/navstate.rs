@@ -3,10 +3,10 @@
 use db_handling::manage_history::get_history_entry_by_order;
 use definitions::navigation::{
     ActionResult, History, MEnterPassword, MKeyDetailsMulti, MKeys, MLog, MLogDetails,
-    MManageNetworks, MNewSeed, MPasswordConfirm, MRecoverSeedName, MRecoverSeedPhrase, MSCAuthor,
-    MSCContent, MSeedMenu, MSeeds, MSettings, MSignSufficientCrypto, MSignatureReady,
-    MSufficientCryptoReady, MTransaction, ModalData, ScreenData, TransactionNetworkInfo,
-    TransactionType,
+    MManageNetworks, MNetworkCard, MNewSeed, MPasswordConfirm, MRecoverSeedName,
+    MRecoverSeedPhrase, MSCAuthor, MSCContent, MSeedMenu, MSeeds, MSettings, MSignSufficientCrypto,
+    MSignatureReady, MSufficientCryptoReady, MTransaction, ModalData, ScreenData,
+    TransactionNetworkInfo, TransactionType,
 };
 use sp_runtime::MultiSigner;
 use transaction_parsing::TransactionAction;
@@ -19,7 +19,7 @@ use crate::screens::{
     AddressState, AddressStateMulti, DeriveState, KeysState, RecoverSeedPhraseState, Screen,
     SpecialtyKeysState, SufficientCryptoState, TransactionState,
 };
-use db_handling::interface_signer::guess;
+use db_handling::interface_signer::{get_all_seed_names_with_identicons, guess};
 use definitions::{
     error::{AddressGeneration, AddressGenerationCommon, AddressKeySource, ErrorSource},
     error_signer::{
@@ -1576,7 +1576,7 @@ impl State {
                     ScreenData::SeedSelector { f }
                 }
                 Screen::Keys(ref keys_state) => {
-                    let (root, set) =
+                    let (root, set, title, logo) =
                         db_handling::interface_signer::print_identities_for_seed_name_and_network(
                             dbname,
                             &keys_state.seed_name(),
@@ -1594,7 +1594,7 @@ impl State {
                         } else {
                             String::new()
                         };
-                    let network = Default::default();
+                    let network = MNetworkCard { title, logo };
                     let f = MKeys {
                         set,
                         root,
@@ -1657,15 +1657,21 @@ impl State {
                     out.push_str(&seed_draft_print);
                     seed_draft_print.zeroize();
 
-                    let seed_finalized = draft.try_finalize();
+                    let ready_seed = draft.try_finalize().map(|a| {
+                        a.into_iter()
+                            .map(|word| word.content)
+                            .collect::<Vec<_>>()
+                            .join(" ")
+                    });
+                    let draft = draft.draft();
 
                     let f = MRecoverSeedPhrase {
                         keyboard: new_navstate.keyboard(),
                         seed_name: recover_seed_phrase_state.name(),
                         user_input: user_input.to_string(),
                         guess_set: guess_set.iter().map(|s| s.to_string()).collect(),
-                        draft: seed_finalized.unwrap_or_default(),
-                        ready_seed: None,
+                        draft,
+                        ready_seed,
                     };
                     ScreenData::RecoverSeedPhrase { f }
                 }
@@ -1683,15 +1689,20 @@ impl State {
                 }
                 Screen::Settings => {
                     // for now has same content as Screen::Verifier
-                    // TODO: let f = db_handling::helpers::get_general_verifier(dbname).unwrap();
-                    ScreenData::Settings {
-                        f: MSettings {
-                            public_key: None,
-                            identicon: None,
-                            encryption: None,
+                    let f = db_handling::helpers::get_general_verifier(dbname).unwrap();
+                    // TODO: this code is ugly.
+                    let f = if let Some(vv) = f.v {
+                        let card = vv.show_card();
+                        MSettings {
+                            public_key: Some(card.public_key),
+                            identicon: Some(card.identicon),
+                            encryption: Some(card.encryption),
                             error: None,
-                        },
-                    }
+                        }
+                    } else {
+                        Default::default()
+                    };
+                    ScreenData::Settings { f }
                 }
                 Screen::Verifier => {
                     let f = db_handling::helpers::get_general_verifier(dbname).unwrap();
@@ -1717,10 +1728,7 @@ impl State {
                     let f = MSignSufficientCrypto { identities };
                     ScreenData::SignSufficientCrypto { f }
                 }
-                _ => {
-                    //"".to_string(),
-                    unimplemented!()
-                }
+                _ => ScreenData::Documents,
             };
 
             //Prepare modal details
@@ -1865,7 +1873,21 @@ impl State {
                 Modal::TypesInfo => ModalData::TypesInfo {
                     f: db_handling::interface_signer::show_types_status(dbname).unwrap(),
                 },
-                Modal::SelectSeed => ModalData::SelectSeed,
+                Modal::SelectSeed => {
+                    match get_all_seed_names_with_identicons(dbname, &self.seed_names) {
+                        Ok(a) => ModalData::SelectSeed {
+                            f: MSeeds { seed_name_cards: a },
+                        },
+                        Err(_e) => {
+                            new_navstate.alert = Alert::Error;
+                            ModalData::SelectSeed {
+                                f: MSeeds {
+                                    seed_name_cards: vec![],
+                                },
+                            }
+                        }
+                    }
+                }
                 Modal::NewSeedMenu => ModalData::NewSeedMenu,
                 Modal::LogComment => ModalData::LogComment,
                 Modal::NetworkDetailsMenu => ModalData::NetworkDetailsMenu,

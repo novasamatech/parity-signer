@@ -145,7 +145,7 @@ pub struct MKeys {
     pub multiselect_count: String,
 }
 
-#[derive(Clone, Debug, PartialEq)]
+#[derive(Clone, Default, Debug, PartialEq)]
 pub struct MSettings {
     pub public_key: Option<String>,
     pub identicon: Option<String>,
@@ -236,7 +236,7 @@ pub struct MSeeds {
     pub seed_name_cards: Vec<SeedNameCard>,
 }
 
-#[derive(Clone, Debug, PartialEq)]
+#[derive(Clone, Default, Debug, PartialEq)]
 pub struct MKeyDetails {
     pub qr: String,
     pub pubkey: String,
@@ -531,7 +531,7 @@ pub enum ModalData {
     ManageMetadata,
     KeyDetailsAction,
     LogComment,
-    SelectSeed,
+    SelectSeed { f: MSeeds },
 }
 
 #[derive(Clone, Debug, PartialEq)]

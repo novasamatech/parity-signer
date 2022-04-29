@@ -221,7 +221,7 @@ fn print_ids_seed_name_network() {
         ],
     );
     // TODO: "network":{"title":"Westend","logo":"westend"}"#;
-    assert_eq!(cards, expected_cards);
+    assert_eq!((cards.0, cards.1), expected_cards);
     fs::remove_dir_all(dbname).unwrap();
 }
 

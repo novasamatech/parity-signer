@@ -23,6 +23,9 @@ transaction_parsing = {path = "../transaction_parsing"}
 transaction_signing = {path = "../transaction_signing"}
 zeroize = "1.5.3"
 
+[dev-dependencies]
+pretty_assertions = "1"
+
 [features]
 default = ["test"]
 test = [
