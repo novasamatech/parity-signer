@@ -1,3 +1,31 @@
+//! Making and restoring **cold** database with default content
+//!
+//! Cold database is the database that is operated from inside the Signer.
+//!
+//! For release, the cold database is generated on the hot side and then copied
+//! verbatim into Signer files during the build.
+//!
+//! Before the database could be used, it must be initiated:
+//!
+//! - History log old entries (if any are present) are removed and a new entry
+//! `Event::DatabaseInitiated` is added
+//! - General verifier is set. By default, Signer sets up Parity-associated key
+//! as a general verifier. This could be later on changed by the user.
+//!
+//! Signer then reads and updates the database as it operates.
+//!
+//! There are two ways to reset the database from the Signer user interface.
+//! Either would remove all the keys and restore the database to the release
+//! state. The difference would be only in the general verifier setting:
+//!
+//! - `Wipe all data` would set the general verifier to default `Some(_)`,
+//! with Parity-associated key inside
+//! - `Remove general certificate` would set the general verifier to `None`.
+//! User would then be able to set up own general verifier, preferably
+//! immediately afterwards, by loading to Signer any verified data.
+//! Setting up a new general verifier would remove all data associated with the
+//! general verifier from the Signer database to avoid confusion as to who
+//! verified what information.
 #[cfg(any(feature = "active", feature = "signer"))]
 use parity_scale_codec::Encode;
 #[cfg(any(feature = "active", feature = "signer"))]
@@ -34,17 +62,34 @@ use crate::{
     db_transactions::TrDbCold, helpers::make_batch_clear_tree, manage_history::events_in_batch,
 };
 
+/// Cold database generation purpose, determining the metadata to be loaded.
+///
+/// Default metadata is loaded into the cold database for default networks:
+/// Polkadot, Kusama, Westend. `Purpose` determines the metadata source folder
+/// and the versions to be loaded.
 #[cfg(feature = "active")]
 enum Purpose {
+
+    /// Two (or fewer) latest released versions of the metadata for each of the
+    /// default networks
     Release,
+
+    /// Old metadata set, used mostly in `transaction_parsing` tests
     Test,
+
+    /// Not so old metadata set, used for `navigator` tests
+    // TODO combine all testing together
     TestNavigator,
 }
 
-/// Function to set default *start* history in test cold database:
-/// (1) purges all existing entries
-/// (2) adds DatabaseInitiated entry
-/// Function is used on the active side.
+/// Mock history log initialization for **test** cold database.
+/// 
+/// - purges all existing entries
+/// - adds `Event::DatabaseInitiated` entry
+///
+/// Produces a [`Batch`] to apply to [`HISTORY`] tree of the test cold database,
+/// resulting database looks as if initiated.
+//TODO replace with real init maybe, why so complex
 #[cfg(feature = "active")]
 fn default_test_cold_history(database_name: &str) -> Result<Batch, ErrorActive> {
     let batch = make_batch_clear_tree::<Active>(database_name, HISTORY)?;

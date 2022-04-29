@@ -50,19 +50,6 @@ pub mod interface_signer;
 
 pub mod manage_history;
 
-#[cfg(feature = "active")]
-pub mod metadata;
-
-pub mod network_details;
-
-pub mod prep_messages;
-
-#[cfg(feature = "signer")]
-pub mod remove_network;
-
-#[cfg(feature = "signer")]
-pub mod remove_types;
-
 #[cfg(feature = "test")]
 #[cfg(test)]
 pub mod tests;

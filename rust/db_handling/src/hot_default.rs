@@ -1,3 +1,7 @@
+//! Making **hot** database with default content
+//!
+//!
+
 use parity_scale_codec::Encode;
 use sled::Batch;
 

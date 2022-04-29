@@ -1,3 +1,7 @@
+//! Displaying and updating history log
+//!
+//!
+
 use chrono::Utc;
 #[cfg(feature = "signer")]
 use parity_scale_codec::Decode;

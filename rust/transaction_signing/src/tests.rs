@@ -12,9 +12,9 @@ use constants::{
 };
 use db_handling::{
     cold_default::{populate_cold, populate_cold_no_networks},
+    helpers::remove_network,
     identities::{remove_seed, try_create_address, try_create_seed},
     manage_history::print_history,
-    remove_network::remove_network,
 };
 use definitions::{
     crypto::Encryption,

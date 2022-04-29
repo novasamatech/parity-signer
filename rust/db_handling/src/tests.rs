@@ -33,8 +33,16 @@ use crate::{
     },
     db_transactions::TrDbCold,
     helpers::{
-        display_general_verifier, get_danger_status, open_db, open_tree,
-        try_get_valid_current_verifier, upd_id_batch,
+        display_general_verifier,
+        get_danger_status,
+        open_db,
+        open_tree,
+        remove_metadata,
+        remove_network,
+        remove_types_info,
+        transfer_metadata_to_cold,
+        try_get_valid_current_verifier,
+        upd_id_batch,
     },
     hot_default::reset_hot_database,
     identities::{
@@ -52,9 +60,6 @@ use crate::{
         device_was_online, enter_events, events_to_batch, print_history,
         print_history_entry_by_order, reset_danger_status_to_safe,
     },
-    metadata::transfer_metadata_to_cold,
-    remove_network::{remove_metadata, remove_network},
-    remove_types::remove_types_info,
 };
 
 #[test]

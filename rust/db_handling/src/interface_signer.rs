@@ -1,3 +1,8 @@
+//! Utils to communicate with the Signer frontend
+//!
+//! This will be obsolete or majorly reworked at least when jsons "manual"
+//! export is gone.
+
 use bip39::{Language, Mnemonic};
 use blake2_rfc::blake2b::blake2b;
 use hex;
@@ -26,7 +31,7 @@ use qrcode_static::png_qr_from_string;
 
 use crate::db_transactions::TrDbCold;
 use crate::helpers::{
-    get_address_details, get_general_verifier, get_meta_values_by_name,
+    get_address_details, get_all_networks, get_general_verifier, get_meta_values_by_name,
     get_meta_values_by_name_version, get_network_specs, get_valid_current_verifier,
     make_batch_clear_tree, open_db, open_tree, try_get_types,
 };
@@ -34,7 +39,6 @@ use crate::identities::{
     derivation_check, generate_random_phrase, get_addresses_by_seed_name, get_all_addresses,
     DerivationCheck,
 };
-use crate::network_details::get_all_networks;
 
 /// Function to print all seed names with identicons
 /// Gets used only on the Signer side, interacts with the user interface.

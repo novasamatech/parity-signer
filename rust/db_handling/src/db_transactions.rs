@@ -536,7 +536,7 @@ impl TrDbColdStub {
     /// in the end of the network list, with order set to the total number of
     /// network specs entries currently in Signer. When a network is removed,
     /// the order of the remaining networks gets rearranged, see details in
-    /// function [`remove_network`](crate::remove_network::remove_network).
+    /// function [`remove_network`](crate::helpers::remove_network).
     /// - Add a (key, value) pair to the network specs additions queue in
     /// `network_specs_stub`. Key is [`NetworkSpecsKey`] in key form, value is
     /// SCALE-encoded [`NetworkSpecs`].

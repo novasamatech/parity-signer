@@ -78,9 +78,14 @@ use definitions::{
 #[cfg(any(feature = "active", feature = "signer"))]
 use crate::{
     db_transactions::TrDbCold,
-    helpers::{make_batch_clear_tree, open_db, open_tree, upd_id_batch},
+    helpers::{
+        get_all_networks,
+        make_batch_clear_tree,
+        open_db,
+        open_tree,
+        upd_id_batch,
+    },
     manage_history::events_to_batch,
-    network_details::get_all_networks,
 };
 #[cfg(feature = "signer")]
 use crate::{
@@ -147,7 +152,8 @@ pub fn generate_random_phrase(words_number: u32) -> Result<String, ErrorSigner> 
 /// Data associated with address generation
 #[cfg(any(feature = "active", feature = "signer"))]
 pub(crate) struct PrepData {
-    /// information to be added into [`Batch`] for [`ADDRTREE`] update
+    /// information to be added into [`Batch`](sled::Batch) for [`ADDRTREE`]
+    /// update
     pub(crate) address_prep: Vec<(AddressKey, AddressDetails)>,
 
     /// [`Event`] set, to be added into history log

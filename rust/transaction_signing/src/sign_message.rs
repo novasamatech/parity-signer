@@ -5,9 +5,8 @@ use zeroize::Zeroize;
 
 use db_handling::{
     db_transactions::TrDbCold,
-    helpers::{get_meta_values_by_name_version, get_network_specs},
+    helpers::{get_meta_values_by_name_version, get_network_specs, prep_types},
     manage_history::events_to_batch,
-    prep_messages::{get_genesis_hash, prep_types},
 };
 use definitions::{
     crypto::SufficientCrypto,
@@ -164,8 +163,7 @@ pub(crate) fn sufficient_crypto_load_metadata(
         &network_specs.name,
         network_version,
     )?;
-    let genesis_hash = get_genesis_hash(&network_specs.name, database_name)?;
-    let load_meta_content = ContentLoadMeta::generate(&meta_values.meta, &genesis_hash);
+    let load_meta_content = ContentLoadMeta::generate(&meta_values.meta, &network_specs.genesis_hash);
     let sufficient = match sufficient_crypto(
         multisigner,
         address_details,

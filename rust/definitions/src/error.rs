@@ -15,10 +15,10 @@ use crate::{
 /// Error trait for Signer and Signer-ecosystem tools
 ///
 /// [`ErrorSource`] is implemented for:
-/// - [`Active`](crate::error_active::Active) (errors on the active side -
-/// either hot database errors or errors while preparing cold database
-/// before its moving into Signer)
-/// - [`Signer`](crate::error_signer::Signer) (errors on the Signer side)
+///
+/// - `Active`, errors on the active side: either hot database errors or errors
+/// while preparing cold database before its moving into Signer
+/// - `Signer`, errors on the Signer side
 pub trait ErrorSource {
     /// Enum listing all possible errors
     type Error;

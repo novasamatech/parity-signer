@@ -32,8 +32,8 @@
 
 use constants::{COLD_DB_NAME_RELEASE, HOT_DB_NAME, TYLO};
 use db_handling::{
-    default_cold_release, default_hot, metadata::transfer_metadata_to_cold,
-    prep_messages::prep_types,
+    default_cold_release, default_hot,
+    helpers::{prep_types, transfer_metadata_to_cold},
 };
 use definitions::error_active::{Active, ErrorActive};
 
