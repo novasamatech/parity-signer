@@ -29,12 +29,11 @@ import io.parity.signer.uniffi.MEnterPassword
 @Composable
 fun EnterPassword(
 	enterPassword: MEnterPassword,
-	signerDataModel: SignerDataModel
+	button: (Action, String) -> Unit
 ) {
 	val password = remember {
 		mutableStateOf("")
 	}
-	val content = signerDataModel.screenData.value
 	val focusManager = LocalFocusManager.current
 	val focusRequester = remember { FocusRequester() }
 
@@ -63,9 +62,9 @@ fun EnterPassword(
 				update = { password.value = it },
 				onDone = {
 					if (password.value.isNotBlank()) {
-						signerDataModel.pushButton(
+						button(
 							Action.GO_FORWARD,
-							details = password.value
+							password.value
 						)
 					}
 				},
@@ -77,9 +76,9 @@ fun EnterPassword(
 				text = "Next",
 				isCrypto = true,
 				action = {
-					signerDataModel.pushButton(
+					button(
 						Action.GO_FORWARD,
-						details = password.value
+						password.value
 					)
 				},
 				isDisabled = password.value.isBlank()

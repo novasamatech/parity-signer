@@ -20,11 +20,14 @@ import io.parity.signer.uniffi.Action
 import io.parity.signer.uniffi.MNetworkMenu
 
 @Composable
-fun NetworkSelector(networks: MNetworkMenu, signerDataModel: SignerDataModel) {
+fun NetworkSelector(
+	networks: MNetworkMenu,
+	button: (Action, String) -> Unit
+) {
 	val networks = networks.networks
 	Surface(
 		color = Color(0x00000000),
-		modifier = Modifier.clickable { signerDataModel.pushButton(Action.GO_BACK) }
+		modifier = Modifier.clickable { button(Action.GO_BACK) }
 	) {
 		Column {
 			Spacer(
@@ -51,7 +54,7 @@ fun NetworkSelector(networks: MNetworkMenu, signerDataModel: SignerDataModel) {
 					) {
 						items(networks.size) { item ->
 							Row(Modifier.clickable {
-								signerDataModel.pushButton(
+								button(
 									Action.CHANGE_NETWORK,
 									networks[item].key
 								)

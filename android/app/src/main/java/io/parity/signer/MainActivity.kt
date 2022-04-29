@@ -64,6 +64,9 @@ fun SignerApp(signerDataModel: SignerDataModel) {
 		val authenticated = signerDataModel.authenticated.observeAsState()
 		val actionResult = signerDataModel.actionResult.observeAsState()
 		val shieldAlert = signerDataModel.alertState.observeAsState()
+		val progress = signerDataModel.progress.observeAsState()
+		val captured = signerDataModel.captured.observeAsState()
+		val total = signerDataModel.total.observeAsState()
 
 		when (onBoardingDone.value) {
 			OnBoardingState.Yes -> {
@@ -95,11 +98,16 @@ fun SignerApp(signerDataModel: SignerDataModel) {
 					) { innerPadding ->
 						Box(modifier = Modifier.padding(innerPadding)) {
 							ScreenSelector(
-								screenData = actionResult.value?.screenData ?: ,//default fallback
+								screenData = actionResult.value?.screenData ?: ScreenData.Documents,//default fallback
+								shieldAlert = shieldAlert,
+								progress = progress,
+								captured = captured,
+								total = total,
+								button = signerDataModel::pushButton,
 								signerDataModel = signerDataModel
 							)
 							ModalSelector(
-								modalData = actionResult.value?.modalData ?: ,//default fallback
+								modalData = actionResult.value?.modalData ?: ModalData.Text(""),//default fallback
 								signerDataModel = signerDataModel
 							)
 							AlertSelector(
@@ -126,7 +134,7 @@ fun SignerApp(signerDataModel: SignerDataModel) {
 			OnBoardingState.No -> {
 				if (shieldAlert.value == ShieldAlert.None) {
 					Scaffold {
-						LandingView(signerDataModel = signerDataModel)
+						LandingView(signerDataModel::onBoard)
 					}
 				} else {
 					Box(

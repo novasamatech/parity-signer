@@ -15,13 +15,11 @@ import io.parity.signer.models.*
 import io.parity.signer.models.DerivationCheck
 import io.parity.signer.ui.theme.Text600
 import io.parity.signer.uniffi.*
-import org.json.JSONObject
 
 @Composable
 fun NewAddressScreen(
 	deriveKey: MDeriveKey,
-	signerDataModel: SignerDataModel,
-	increment: Boolean
+	signerDataModel: SignerDataModel
 ) {
 	val derivationPath = remember { mutableStateOf("") }
 	val buttonGood = remember { mutableStateOf(false) }
@@ -30,27 +28,29 @@ fun NewAddressScreen(
 	val seedName = deriveKey.seedName
 	val networkSpecKey = deriveKey.networkSpecsKey
 	var derivationState by remember(buttonGood, whereTo, collision) {
-		mutableStateOf(DerivationCheck(
-			buttonGood,
-			whereTo,
-			collision
-		) {
-			Log.w("SIGNER_RUST_LOG", "check $seedName $it $networkSpecKey")
-			val v = substratePathCheck(
-				seedName,
-				it,
-				networkSpecKey,
-				signerDataModel.dbName
-			)
-			Log.w("SIGNER_RUST_LOG", "v $v")
+		mutableStateOf(
+			DerivationCheck(
+				buttonGood,
+				whereTo,
+				collision
+			) {
+				Log.w("SIGNER_RUST_LOG", "check $seedName $it $networkSpecKey")
+				val v = substratePathCheck(
+					seedName,
+					it,
+					networkSpecKey,
+					signerDataModel.dbName
+				)
+				Log.w("SIGNER_RUST_LOG", "v $v")
 
-			buttonGood.value = v.buttonGood
-			v.whereTo?.let {
-				whereTo.value = it
+				buttonGood.value = v.buttonGood
+				v.whereTo?.let {
+					whereTo.value = it
+				}
+
+				collision.value = v.collision
 			}
-
-			collision.value = v.collision
-		})
+		)
 	}
 	val focusManager = LocalFocusManager.current
 	val focusRequester = remember { FocusRequester() }

@@ -4,6 +4,7 @@ import android.util.Log
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.lifecycle.LiveData
@@ -16,17 +17,24 @@ import io.parity.signer.models.SignerDataModel
 import io.parity.signer.models.increment
 import io.parity.signer.models.pushButton
 import io.parity.signer.screens.*
+import io.parity.signer.uniffi.Action
 import io.parity.signer.uniffi.ModalData
 import io.parity.signer.uniffi.ScreenData
 
 @Composable
-fun ScreenSelector(screenData: ScreenData, signerDataModel: SignerDataModel) {
-	val alertState by signerDataModel.alertState.observeAsState()
+fun ScreenSelector(
+	screenData: ScreenData,
+	alertState: State<ShieldAlert>,
+  progress: State<Float?>,
+	captured: State<Int?>,
+	total: State<Int?>,
+	button: (Action, String, String) -> Unit,
+	signerDataModel: SignerDataModel
+) {
 	when (screenData) {
 		is ScreenData.DeriveKey -> NewAddressScreen(
 			screenData.f,
-			signerDataModel = signerDataModel,
-			increment = false
+			signerDataModel = signerDataModel
 		)
 		ScreenData.Documents -> Documents()
 		is ScreenData.KeyDetails -> ExportPublicKey(screenData.f)
@@ -38,7 +46,7 @@ fun ScreenSelector(screenData: ScreenData, signerDataModel: SignerDataModel) {
 			signerDataModel::pushButton,
 			signerDataModel::increment,
 			screenData.f,
-			alertState
+			alertState.value
 		)
 		is ScreenData.Log -> HistoryScreen(screenData.f, signerDataModel = signerDataModel)
 		is ScreenData.LogDetails -> LogDetails(screenData.f)
@@ -89,7 +97,10 @@ fun ScreenSelector(screenData: ScreenData, signerDataModel: SignerDataModel) {
 			signerDataModel::pushButton,
 			signerDataModel = signerDataModel
 		)
-		is ScreenData.VVerifier -> VerifierScreen(screenData.f, signerDataModel)
+		is ScreenData.VVerifier -> VerifierScreen(
+			screenData.f,
+			signerDataModel
+		)
 	}
 }
 

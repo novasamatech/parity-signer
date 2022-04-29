@@ -7,12 +7,12 @@ import io.parity.signer.models.pushButton
 import io.parity.signer.uniffi.Action
 
 @Composable
-fun ErrorModal(error: String, signerDataModel: SignerDataModel) {
+fun ErrorModal(error: String, button: (Action) -> Unit) {
 	AlertComponent(
 		show = true,
 		header = "Error!",
 		text = error,
-		back = { signerDataModel.pushButton(Action.GO_BACK) },
+		back = { button(Action.GO_BACK) },
 		forward = {  },
 		backText = "Dismiss",
 		showForward = false
