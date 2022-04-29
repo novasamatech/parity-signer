@@ -593,26 +593,26 @@ impl Screen {
 
     pub fn has_back(&self) -> bool {
         match self {
-            Screen::Log => false,
-            Screen::LogDetails(_) => true,
-            Screen::Scan => false,
-            Screen::Transaction(_) => true,
-            Screen::SeedSelector => false,
-            Screen::Keys(_) => true,
-            Screen::KeyDetails(_) => true,
-            Screen::KeyDetailsMulti(_) => true,
-            Screen::NewSeed => true,
-            Screen::RecoverSeedName(_) => true,
-            Screen::RecoverSeedPhrase(_) => true,
-            Screen::DeriveKey(_) => true,
-            Screen::Settings => false,
-            Screen::Verifier => true,
-            Screen::ManageNetworks => true,
-            Screen::NetworkDetails(_) => true,
-            Screen::SelectSeedForBackup => true,
-            Screen::SignSufficientCrypto(_) => true,
-            Screen::Documents => true,
-            Screen::Nowhere => false,
+            Screen::Log
+            | Screen::Scan
+            | Screen::Settings
+            | Screen::SeedSelector
+            | Screen::Nowhere => false,
+            Screen::Transaction(_)
+            | Screen::LogDetails(_)
+            | Screen::Keys(_)
+            | Screen::KeyDetails(_)
+            | Screen::KeyDetailsMulti(_)
+            | Screen::NewSeed
+            | Screen::RecoverSeedName(_)
+            | Screen::RecoverSeedPhrase(_)
+            | Screen::DeriveKey(_)
+            | Screen::Verifier
+            | Screen::ManageNetworks
+            | Screen::NetworkDetails(_)
+            | Screen::SelectSeedForBackup
+            | Screen::SignSufficientCrypto(_)
+            | Screen::Documents => true,
         }
     }
 }

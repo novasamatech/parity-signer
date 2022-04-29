@@ -23,14 +23,14 @@ use definitions::{
     error_signer::Signer,
     history::{Event, IdentityHistory, MetaValuesDisplay, NetworkSpecsDisplay, TypesDisplay},
     navigation::{
-        ActionResult, Card, DerivationEntry, DerivationPack, History, MBackup, MDeriveKey,
-        MKeyDetails, MKeys, MKeysCard, MLog, MLogDetails, MLogRight, MMMNetwork, MMManageNetworks,
-        MMNetwork, MManageNetworks, MMetadataRecord, MNetworkCard, MNetworkDetails, MNetworkMenu,
-        MNewSeed, MNewSeedBackup, MPasswordConfirm, MRecoverSeedName, MRecoverSeedPhrase,
-        MSCMetaSpecs, MSeedKeyCard, MSeedMenu, MSeeds, MSettings, MSignSufficientCrypto,
-        MTransaction, MTypesInfo, MVerifier, MVerifierDetails, ModalData, Network,
-        NetworkSpecsToSend, ScreenData, SeedNameCard, SeedWord, TransactionCard,
-        TransactionCardSet, TransactionNetworkInfo, TransactionType,
+        ActionResult, Card, DerivationEntry, DerivationPack, FooterButton, History, MBackup,
+        MDeriveKey, MKeyDetails, MKeys, MKeysCard, MLog, MLogDetails, MLogRight, MMMNetwork,
+        MMManageNetworks, MMNetwork, MManageNetworks, MMetadataRecord, MNetworkCard,
+        MNetworkDetails, MNetworkMenu, MNewSeed, MNewSeedBackup, MPasswordConfirm,
+        MRecoverSeedName, MRecoverSeedPhrase, MSCMetaSpecs, MSeedKeyCard, MSeedMenu, MSeeds,
+        MSettings, MSignSufficientCrypto, MTransaction, MTypesInfo, MVerifier, MVerifierDetails,
+        ModalData, Network, NetworkSpecsToSend, RightButton, ScreenData, ScreenNameType,
+        SeedNameCard, TransactionCard, TransactionCardSet, TransactionNetworkInfo, TransactionType,
     },
     network_specs::{NetworkSpecs, ValidCurrentVerifier, Verifier, VerifierValue},
 };
@@ -369,15 +369,12 @@ fn flow_test_1() {
 
     let action = do_action(Action::Start, "", "").unwrap();
     let expected_action = ActionResult {
-        screen: Some("SeedSelector".to_string()),
         screen_label: "Select seed".to_string(),
         back: false,
         footer: true,
-        footer_button: "Keys".to_string(),
-        right_button: "NewSeed".to_string(),
-        screen_name_type: "h1".to_string(),
-        modal: "NewSeedMenu".to_string(),
-        alert: "Empty".to_string(),
+        footer_button: Some(FooterButton::Keys),
+        right_button: Some(RightButton::NewSeed),
+        screen_name_type: ScreenNameType::H1,
         screen_data: ScreenData::SeedSelector {
             f: MSeeds {
                 seed_name_cards: vec![],
@@ -397,19 +394,15 @@ fn flow_test_1() {
     let hex = "d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d";
 
     let expected_action = ActionResult {
-        screen: Some("Log".to_string()),
         screen_label: String::new(),
         back: false,
         footer: true,
-        footer_button: "Log".to_string(),
-        right_button: "LogRight".to_string(),
-        screen_name_type: "h4".to_string(),
-        modal: "Empty".to_string(),
-        alert: "Empty".to_string(),
+        footer_button: Some(FooterButton::Log),
+        right_button: Some(RightButton::LogRight),
+        screen_name_type: ScreenNameType::H4,
         screen_data: ScreenData::Log {
             f: MLog {
                 log: vec![History {
-                    order: 0,
                     timestamp: String::new(),
                     events: vec![
                         Event::DatabaseInitiated,
@@ -422,7 +415,6 @@ fn flow_test_1() {
                         },
                     ],
                 }],
-                total_entries: 1,
             },
         },
         modal_data: ModalData::Text {
@@ -452,24 +444,20 @@ fn flow_test_1() {
         "GoForward on Log screen with no modals. Expected to remain where was.",
     );
 
-    let mut action = do_action(Action::RightButton, "", "").unwrap();
+    let mut action = do_action(Action::RightButtonAction, "", "").unwrap();
     erase_log_timestamps(&mut action.screen_data);
     erase_modal_data_checksum(&mut action.modal_data);
 
     let expected_action = ActionResult {
-        screen: Some("Log".to_string()),
         screen_label: String::new(),
         back: false,
         footer: true,
-        footer_button: "Log".to_string(),
-        right_button: "LogRight".to_string(),
-        screen_name_type: "h4".to_string(),
-        modal: "LogRight".to_string(),
-        alert: "Empty".to_string(),
+        footer_button: Some(FooterButton::Log),
+        right_button: Some(RightButton::LogRight),
+        screen_name_type: ScreenNameType::H4,
         screen_data: ScreenData::Log {
             f: MLog {
                 log: vec![History {
-                    order: 0,
                     timestamp: String::new(),
                     events: vec![
                         Event::DatabaseInitiated,
@@ -482,7 +470,6 @@ fn flow_test_1() {
                         },
                     ],
                 }],
-                total_entries: 1,
             },
         },
         modal_data: ModalData::LogRight {
@@ -506,24 +493,20 @@ fn flow_test_1() {
         "GoBack on Log screen with LogRight modal. Expected to get Log screen with no modals"
     );
 
-    do_action(Action::RightButton, "", "").unwrap();
+    do_action(Action::RightButtonAction, "", "").unwrap();
 
     let mut action = do_action(Action::CreateLogComment, "", "").unwrap();
     erase_log_timestamps(&mut action.screen_data);
     let expected_action = ActionResult {
-        screen: Some("Log".to_string()),
         screen_label: String::new(),
         back: false,
         footer: true,
-        footer_button: "Log".to_string(),
-        right_button: "LogRight".to_string(),
-        screen_name_type: "h4".to_string(),
-        modal: "LogComment".to_string(),
-        alert: "Empty".to_string(),
+        footer_button: Some(FooterButton::Log),
+        right_button: Some(RightButton::LogRight),
+        screen_name_type: ScreenNameType::H4,
         screen_data: ScreenData::Log {
             f: MLog {
                 log: vec![History {
-                    order: 0,
                     timestamp: String::new(),
                     events: vec![
                         Event::DatabaseInitiated,
@@ -536,7 +519,6 @@ fn flow_test_1() {
                         },
                     ],
                 }],
-                total_entries: 1,
             },
         },
         modal_data: ModalData::LogComment,
@@ -553,33 +535,28 @@ fn flow_test_1() {
         "GoBack on Log screen with LogComment modal. Expected same Log screen with no modals"
     );
 
-    do_action(Action::RightButton, "", "").unwrap();
+    do_action(Action::RightButtonAction, "", "").unwrap();
     do_action(Action::CreateLogComment, "", "").unwrap();
     let mut action = do_action(Action::GoForward, "Remember this moment", "").unwrap();
     erase_log_timestamps(&mut action.screen_data);
 
     let mut expected_action = ActionResult {
-        screen: Some("Log".to_string()),
         screen_label: String::new(),
         back: false,
         footer: true,
-        footer_button: "Log".to_string(),
-        right_button: "LogRight".to_string(),
-        screen_name_type: "h4".to_string(),
-        modal: "Empty".to_string(),
-        alert: "Empty".to_string(),
+        footer_button: Some(FooterButton::Log),
+        right_button: Some(RightButton::LogRight),
+        screen_name_type: ScreenNameType::H4,
         screen_data: ScreenData::Log {
             f: MLog {
                 log: vec![
                     History {
-                        order: 1,
                         timestamp: String::new(),
                         events: vec![Event::UserEntry {
                             user_entry: "Remember this moment".to_string(),
                         }],
                     },
                     History {
-                        order: 0,
                         timestamp: String::new(),
                         events: vec![
                             Event::DatabaseInitiated,
@@ -593,7 +570,6 @@ fn flow_test_1() {
                         ],
                     },
                 ],
-                total_entries: 2,
             },
         },
         modal_data: ModalData::Text {
@@ -607,7 +583,6 @@ fn flow_test_1() {
     let mut action = do_action(Action::Shield, "", "").unwrap();
     erase_log_timestamps(&mut action.screen_data);
 
-    expected_action.alert = "Shield".to_string();
     expected_action.alert_data = "{\"shield_state\":\"unknown\"}".to_string();
 
     assert_eq!(
@@ -615,21 +590,18 @@ fn flow_test_1() {
         "Shield on Log screen with no modal. Expected same Log screen with Shield alert.",
     );
 
-    do_action(Action::RightButton, "", "").unwrap();
+    do_action(Action::RightButtonAction, "", "").unwrap();
     let mut action = do_action(Action::ClearLog, "", "").unwrap();
     erase_log_timestamps(&mut action.screen_data);
 
     expected_action.screen_data = ScreenData::Log {
         f: MLog {
             log: vec![History {
-                order: 0,
                 timestamp: String::new(),
                 events: vec![Event::HistoryCleared],
             }],
-            total_entries: 1,
         },
     };
-    expected_action.alert = "Empty".to_string();
     expected_action.alert_data = "{}".to_string();
     let log_action = expected_action.clone();
     let empty_log = expected_action.clone();
@@ -642,15 +614,12 @@ fn flow_test_1() {
     let action = do_action(Action::NavbarSettings, "", "").unwrap();
 
     let expected_action = ActionResult {
-        screen: Some("Settings".to_string()),
         screen_label: String::new(),
         back: false,
         footer: true,
-        footer_button: "Settings".to_string(),
-        right_button: "None".to_string(),
-        screen_name_type: "h4".to_string(),
-        modal: "Empty".to_string(),
-        alert: "Empty".to_string(),
+        footer_button: Some(FooterButton::Settings),
+        right_button: None,
+        screen_name_type: ScreenNameType::H4,
         screen_data: ScreenData::Settings {
             f: MSettings {
                 public_key: Some(
@@ -675,15 +644,12 @@ fn flow_test_1() {
 
     let action = do_action(Action::BackupSeed, "", "").unwrap();
     let expected_action = ActionResult {
-        screen: Some("SelectSeedForBackup".to_string()),
         screen_label: "Select seed".to_string(),
         back: true,
         footer: false,
-        footer_button: "Settings".to_string(),
-        right_button: "Backup".to_string(),
-        screen_name_type: "h4".to_string(),
-        modal: "Empty".to_string(),
-        alert: "Empty".to_string(),
+        footer_button: Some(FooterButton::Settings),
+        right_button: Some(RightButton::Backup),
+        screen_name_type: ScreenNameType::H4,
         screen_data: ScreenData::SeedSelector {
             f: MSeeds {
                 seed_name_cards: vec![],
@@ -709,15 +675,12 @@ fn flow_test_1() {
     let action = do_action(Action::ViewGeneralVerifier, "", "").unwrap();
 
     let expected_action = ActionResult {
-        screen: Some("Verifier".to_string()),
         screen_label: "VERIFIER CERTIFICATE".to_string(),
         back: true,
         footer: false,
-        footer_button: "Settings".to_string(),
-        right_button: "None".to_string(),
-        screen_name_type: "h4".to_string(),
-        modal: "Empty".to_string(),
-        alert: "Empty".to_string(),
+        footer_button: Some(FooterButton::Settings),
+        right_button: None,
+        screen_name_type: ScreenNameType::H4,
         screen_data: ScreenData::VVerifier {
             f: MVerifierDetails {
                 public_key: "d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d"
@@ -744,15 +707,12 @@ fn flow_test_1() {
 
     let action = do_action(Action::ShowDocuments, "", "").unwrap();
     let expected_action = ActionResult {
-        screen: Some("Documents".to_string()),
         screen_label: "ABOUT".to_string(),
         back: true,
         footer: false,
-        footer_button: "Settings".to_string(),
-        right_button: "None".to_string(),
-        screen_name_type: "h4".to_string(),
-        modal: "Empty".to_string(),
-        alert: "Empty".to_string(),
+        footer_button: Some(FooterButton::Settings),
+        right_button: None,
+        screen_name_type: ScreenNameType::H4,
         screen_data: ScreenData::Documents,
         modal_data: ModalData::Text {
             f: "Empty".to_string(),
@@ -773,15 +733,12 @@ fn flow_test_1() {
     let action = do_action(Action::ManageNetworks, "", "").unwrap();
 
     let expected_action = ActionResult {
-        screen: Some("ManageNetworks".to_string()),
         screen_label: "MANAGE NETWORKS".to_string(),
         back: true,
         footer: false,
-        footer_button: "Settings".to_string(),
-        right_button: "TypesInfo".to_string(),
-        screen_name_type: "h4".to_string(),
-        modal: "Empty".to_string(),
-        alert: "Empty".to_string(),
+        footer_button: Some(FooterButton::Settings),
+        right_button: Some(RightButton::TypesInfo),
+        screen_name_type: ScreenNameType::H4,
         screen_data: ScreenData::ManageNetworks {
             f: MManageNetworks {
                 networks: vec![
@@ -836,15 +793,12 @@ fn flow_test_1() {
     )
     .unwrap();
     let expected_action = ActionResult {
-        screen: Some("NetworkDetails".to_string()),
         screen_label: "Network details".to_string(),
         back: true,
         footer: false,
-        footer_button: "Settings".to_string(),
-        right_button: "NDMenu".to_string(),
-        screen_name_type: "h4".to_string(),
-        modal: "Empty".to_string(),
-        alert: "Empty".to_string(),
+        footer_button: Some(FooterButton::Settings),
+        right_button: Some(RightButton::NDMenu),
+        screen_name_type: ScreenNameType::H4,
         screen_data: ScreenData::NNetworkDetails {
             f: MNetworkDetails {
                 base58prefix: 2,
@@ -905,7 +859,6 @@ fn flow_test_1() {
     let action = do_action(Action::ManageMetadata, "9130", "").unwrap();
 
     let mut kusama_action_modal = kusama_action.clone();
-    kusama_action_modal.modal = "ManageMetadata".to_string();
     kusama_action_modal.modal_data = ModalData::ManageNetworks {
         f: MMManageNetworks {
             name: "kusama".to_string(),
@@ -925,15 +878,12 @@ fn flow_test_1() {
 
     let action = do_action(Action::SignMetadata, "", "").unwrap();
     let expected_action = ActionResult {
-        screen: Some("SignSufficientCrypto".to_string()),
         screen_label: "Sign SufficientCrypto".to_string(),
         back: true,
         footer: false,
-        footer_button: "Settings".to_string(),
-        right_button: "None".to_string(),
-        screen_name_type: "h1".to_string(),
-        modal: "Empty".to_string(),
-        alert: "Empty".to_string(),
+        footer_button: Some(FooterButton::Settings),
+        right_button: None,
+        screen_name_type: ScreenNameType::H1,
         screen_data: ScreenData::SignSufficientCrypto {
             f: MSignSufficientCrypto { identities: vec![] },
         },
@@ -954,15 +904,12 @@ fn flow_test_1() {
     do_action(Action::ManageMetadata, "9130", "").unwrap();
     let action = do_action(Action::RemoveMetadata, "", "").unwrap();
     let expected_action = ActionResult {
-        screen: Some("NetworkDetails".to_string()),
         screen_label: "Network details".to_string(),
         back: true,
         footer: false,
-        footer_button: "Settings".to_string(),
-        right_button: "NDMenu".to_string(),
-        screen_name_type: "h4".to_string(),
-        modal: "Empty".to_string(),
-        alert: "Empty".to_string(),
+        footer_button: Some(FooterButton::Settings),
+        right_button: Some(RightButton::NDMenu),
+        screen_name_type: ScreenNameType::H4,
         screen_data: ScreenData::NNetworkDetails {
             f: MNetworkDetails {
                 base58prefix: 2,
@@ -1000,23 +947,19 @@ fn flow_test_1() {
 
     let kusama_action = action;
 
-    let action = do_action(Action::RightButton, "", "").unwrap();
+    let action = do_action(Action::RightButtonAction, "", "").unwrap();
     let mut expected_action = kusama_action.clone();
-    expected_action.modal = "NetworkDetailsMenu".to_string();
     expected_action.modal_data = ModalData::NetworkDetailsMenu;
     assert_eq!(action, expected_action, "RightButton on NetworkDetails screen for kusama sr25519 key. Expected NetworkDetails screen for kusama with NetworkDetailsMenu modal");
 
     let action = do_action(Action::SignNetworkSpecs, "", "").unwrap();
     let expected_action = ActionResult {
-        screen: Some("SignSufficientCrypto".to_string()),
         screen_label: "Sign SufficientCrypto".to_string(),
         back: true,
         footer: false,
-        footer_button: "Settings".to_string(),
-        right_button: "None".to_string(),
-        screen_name_type: "h1".to_string(),
-        modal: "Empty".to_string(),
-        alert: "Empty".to_string(),
+        footer_button: Some(FooterButton::Settings),
+        right_button: None,
+        screen_name_type: ScreenNameType::H1,
         screen_data: ScreenData::SignSufficientCrypto {
             f: MSignSufficientCrypto { identities: vec![] },
         },
@@ -1034,18 +977,15 @@ fn flow_test_1() {
         "GoBack on SignSufficientCrypto screen. Expected NetworkDetails screen with no modals."
     );
 
-    do_action(Action::RightButton, "", "").unwrap();
+    do_action(Action::RightButtonAction, "", "").unwrap();
     let action = do_action(Action::RemoveNetwork, "", "").unwrap();
     let expected_action = ActionResult {
-        screen: Some("ManageNetworks".to_string()),
         screen_label: "MANAGE NETWORKS".to_string(),
         back: true,
         footer: false,
-        footer_button: "Settings".to_string(),
-        right_button: "TypesInfo".to_string(),
-        screen_name_type: "h4".to_string(),
-        modal: "Empty".to_string(),
-        alert: "Empty".to_string(),
+        footer_button: Some(FooterButton::Settings),
+        right_button: Some(RightButton::TypesInfo),
+        screen_name_type: ScreenNameType::H4,
         screen_data: ScreenData::ManageNetworks {
             f: MManageNetworks {
                 networks: vec![
@@ -1076,10 +1016,9 @@ fn flow_test_1() {
         "RemoveNetwork on NetworkDetails screen for kusama sr25519. Expected updated ManageNetworks screen with no modals"
     );
 
-    let action = do_action(Action::RightButton, "", "").unwrap();
+    let action = do_action(Action::RightButtonAction, "", "").unwrap();
     let mut expected_action = expected_action;
-    expected_action.right_button = "TypesInfo".to_string();
-    expected_action.modal = "TypesInfo".to_string();
+    expected_action.right_button = Some(RightButton::TypesInfo);
     expected_action.modal_data = ModalData::TypesInfo {
         f: MTypesInfo {
             types_on_file: true,
@@ -1110,7 +1049,7 @@ fn flow_test_1() {
     );
 
     do_action(Action::ManageNetworks, "", "").unwrap();
-    do_action(Action::RightButton, "", "").unwrap();
+    do_action(Action::RightButtonAction, "", "").unwrap();
     let mut action = do_action(Action::RemoveTypes, "", "").unwrap();
     erase_log_timestamps(&mut action.screen_data);
 
@@ -1120,7 +1059,6 @@ fn flow_test_1() {
         f: MLog {
             log: vec![
                 History {
-                    order: 3,
                     timestamp: String::new(),
                     events: vec![Event::TypesRemoved {
                         types_display: TypesDisplay {
@@ -1137,7 +1075,6 @@ fn flow_test_1() {
                     }],
                 },
                 History {
-                    order: 2,
                     timestamp: String::new(),
                     events: vec![Event::NetworkSpecsRemoved {
                         network_specs_display: NetworkSpecsDisplay {
@@ -1164,7 +1101,6 @@ fn flow_test_1() {
                     }],
                 },
                 History {
-                    order: 1,
                     timestamp: String::new(),
                     events: vec![Event::MetadataRemoved { meta_values_display: MetaValuesDisplay {
                         name: "kusama".to_string(),
@@ -1172,12 +1108,10 @@ fn flow_test_1() {
                         meta_hash: hex::decode("3e6bf025743e5cc550883170d91c8275fb238762b214922b41d64f9feba23987").unwrap() } }],
                 },
               History {
-                    order: 0,
                     timestamp: String::new(),
                     events: vec![Event::HistoryCleared],
                 },
             ],
-            total_entries: 4,
         },
     };
 
@@ -1189,15 +1123,12 @@ fn flow_test_1() {
     erase_log_timestamps(&mut action.screen_data);
 
     let mut expected_action = ActionResult {
-        screen: Some("LogDetails".to_string()),
         screen_label: "Event details".to_string(),
         back: true,
         footer: true,
-        footer_button: "Log".to_string(),
-        right_button: "None".to_string(),
-        screen_name_type: "h4".to_string(),
-        modal: "Empty".to_string(),
-        alert: "Empty".to_string(),
+        footer_button: Some(FooterButton::Log),
+        right_button: None,
+        screen_name_type: ScreenNameType::H4,
         screen_data: ScreenData::LogDetails {
             f: MLogDetails {
                 timestamp: String::new(),
@@ -1247,22 +1178,19 @@ fn flow_test_1() {
         "GoBack on ShowLogDetails screen. Expected Log screen with no modals.",
     );
 
-    do_action(Action::RightButton, "", "").unwrap();
+    do_action(Action::RightButtonAction, "", "").unwrap();
     let mut action = do_action(Action::ClearLog, "", "").unwrap();
     erase_log_timestamps(&mut action.screen_data);
 
-    expected_action.screen = Some("Log".to_string());
     expected_action.screen_label = "".to_string();
     expected_action.back = false;
-    expected_action.right_button = "LogRight".to_string();
+    expected_action.right_button = Some(RightButton::LogRight);
     expected_action.screen_data = ScreenData::Log {
         f: MLog {
             log: vec![History {
-                order: 0,
                 timestamp: String::new(),
                 events: vec![Event::HistoryCleared],
             }],
-            total_entries: 1,
         },
     };
     assert_eq!(
@@ -1272,15 +1200,12 @@ fn flow_test_1() {
 
     let action = do_action(Action::NavbarScan, "", "").unwrap();
     let expected_action = ActionResult {
-        screen: Some("Scan".to_string()),
         screen_label: String::new(),
         back: false,
         footer: true,
-        footer_button: "Scan".to_string(),
-        right_button: "None".to_string(),
-        screen_name_type: "h1".to_string(),
-        modal: "Empty".to_string(),
-        alert: "Empty".to_string(),
+        footer_button: Some(FooterButton::Scan),
+        right_button: None,
+        screen_name_type: ScreenNameType::H1,
         screen_data: ScreenData::Scan,
         modal_data: ModalData::Text {
             f: "Empty".to_string(),
@@ -1305,15 +1230,12 @@ fn flow_test_1() {
     let aaa = "d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d".to_string();
     let genesis_hash = "b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe";
     let expected_action = ActionResult {
-        screen: Some("Transaction".to_string()),
         screen_label: String::new(),
         back: true,
         footer: false,
-        footer_button: "Scan".to_string(),
-        right_button: "None".to_string(),
-        screen_name_type: "h1".to_string(),
-        modal: "Empty".to_string(),
-        alert: "Empty".to_string(),
+        footer_button: Some(FooterButton::Scan),
+        right_button: None,
+        screen_name_type: ScreenNameType::H1,
         screen_data: ScreenData::Transaction {
             f: MTransaction {
                 content: TransactionCardSet {
@@ -1377,15 +1299,12 @@ fn flow_test_1() {
     .unwrap();
     let action = do_action(Action::GoForward, "", "").unwrap();
     let expected_action = ActionResult {
-        screen: Some("NetworkDetails".to_string()),
         screen_label: "Network details".to_string(),
         back: true,
         footer: false,
-        footer_button: "Settings".to_string(),
-        right_button: "NDMenu".to_string(),
-        screen_name_type: "h4".to_string(),
-        modal: "Empty".to_string(),
-        alert: "Empty".to_string(),
+        footer_button: Some(FooterButton::Settings),
+        right_button: Some(RightButton::NDMenu),
+        screen_name_type: ScreenNameType::H4,
         screen_data: ScreenData::NNetworkDetails {
             f: MNetworkDetails {
                 base58prefix: 2,
@@ -1427,15 +1346,12 @@ fn flow_test_1() {
 
     let action = do_action(Action::GoBack, "", "").unwrap();
     let expected_action = ActionResult {
-        screen: Some("ManageNetworks".to_string()),
         screen_label: "MANAGE NETWORKS".to_string(),
         back: true,
         footer: false,
-        footer_button: "Settings".to_string(),
-        right_button: "TypesInfo".to_string(),
-        screen_name_type: "h4".to_string(),
-        modal: "Empty".to_string(),
-        alert: "Empty".to_string(),
+        footer_button: Some(FooterButton::Settings),
+        right_button: Some(RightButton::TypesInfo),
+        screen_name_type: ScreenNameType::H4,
         screen_data: ScreenData::ManageNetworks {
             f: MManageNetworks {
                 networks: vec![
@@ -1484,7 +1400,6 @@ fn flow_test_1() {
         f: MLog {
             log: vec![
                 History {
-                    order: 1,
                     timestamp: String::new(),
                     events: vec![Event::NetworkSpecsAdded {
                         network_specs_display: NetworkSpecsDisplay {
@@ -1512,12 +1427,10 @@ fn flow_test_1() {
                     }],
                 },
                 History {
-                    order: 0,
                     timestamp: String::new(),
                     events: vec![Event::HistoryCleared],
                 },
             ],
-            total_entries: 2,
         },
     };
 
@@ -1539,15 +1452,12 @@ fn flow_test_1() {
     let aaa_2 = "d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d".to_string();
     let meta_hash = "9a179da92949dd3ab3829177149ec83dc46fb009af10a45f955949b2a6693b46".to_string();
     let expected_action = ActionResult {
-        screen: Some("Transaction".to_string()),
         screen_label: String::new(),
         back: true,
         footer: false,
-        footer_button: "Scan".to_string(),
-        right_button: "None".to_string(),
-        screen_name_type: "h1".to_string(),
-        modal: "Empty".to_string(),
-        alert: "Empty".to_string(),
+        footer_button: Some(FooterButton::Scan),
+        right_button: None,
+        screen_name_type: ScreenNameType::H1,
         screen_data: ScreenData::Transaction {
             f: MTransaction {
                 content: TransactionCardSet {
@@ -1593,15 +1503,12 @@ fn flow_test_1() {
 
     let action = do_action(Action::GoForward, "", "").unwrap();
     let expected_action = ActionResult {
-        screen: Some("NetworkDetails".to_string()),
         screen_label: "Network details".to_string(),
         back: true,
         footer: false,
-        footer_button: "Settings".to_string(),
-        right_button: "NDMenu".to_string(),
-        screen_name_type: "h4".to_string(),
-        modal: "Empty".to_string(),
-        alert: "Empty".to_string(),
+        footer_button: Some(FooterButton::Settings),
+        right_button: Some(RightButton::NDMenu),
+        screen_name_type: ScreenNameType::H4,
         screen_data: ScreenData::NNetworkDetails {
             f: MNetworkDetails {
                 base58prefix: 2,
@@ -1653,7 +1560,6 @@ fn flow_test_1() {
         f: MLog {
             log: vec![
                 History {
-                    order: 2,
                     timestamp: String::new(),
                     events: vec![Event::MetadataAdded {
                         meta_values_display: MetaValuesDisplay {
@@ -1667,7 +1573,6 @@ fn flow_test_1() {
                     }],
                 },
                 History {
-                    order: 1,
                     timestamp: String::new(),
                     events: vec![Event::NetworkSpecsAdded {
                         network_specs_display: NetworkSpecsDisplay {
@@ -1695,12 +1600,10 @@ fn flow_test_1() {
                     }],
                 },
                 History {
-                    order: 0,
                     timestamp: String::new(),
                     events: vec![Event::HistoryCleared],
                 },
             ],
-            total_entries: 3,
         },
     };
 
@@ -1722,15 +1625,12 @@ fn flow_test_1() {
     let types_hash =
         Some("d091a5a24a97e18dfe298b167d8fd5a2add10098c8792cba21c39029a9ee0aeb".to_string());
     let expected_action = ActionResult {
-        screen: Some("Transaction".to_string()),
         screen_label: String::new(),
         back: true,
         footer: false,
-        footer_button: "Scan".to_string(),
-        right_button: "None".to_string(),
-        screen_name_type: "h1".to_string(),
-        modal: "Empty".to_string(),
-        alert: "Empty".to_string(),
+        footer_button: Some(FooterButton::Scan),
+        right_button: None,
+        screen_name_type: ScreenNameType::H1,
         screen_data: ScreenData::Transaction {
             f: MTransaction {
                 content: TransactionCardSet {
@@ -1796,7 +1696,6 @@ fn flow_test_1() {
         f: MLog {
             log: vec![
                 History {
-                    order: 3,
                     timestamp: String::new(),
                     events: vec![
                         Event::Warning {
@@ -1815,7 +1714,6 @@ fn flow_test_1() {
                     ],
                 },
                 History {
-                    order: 2,
                     timestamp: String::new(),
                     events: vec![Event::MetadataAdded {
                         meta_values_display: MetaValuesDisplay {
@@ -1829,7 +1727,6 @@ fn flow_test_1() {
                     }],
                 },
                 History {
-                    order: 1,
                     timestamp: String::new(),
                     events: vec![Event::NetworkSpecsAdded {
                         network_specs_display: NetworkSpecsDisplay {
@@ -1857,12 +1754,10 @@ fn flow_test_1() {
                     }],
                 },
                 History {
-                    order: 0,
                     timestamp: String::new(),
                     events: vec![Event::HistoryCleared],
                 },
             ],
-            total_entries: 4,
         },
     };
 
@@ -1871,7 +1766,7 @@ fn flow_test_1() {
         "Switched to Log from Settings. Expected updated Log screen with no modals.",
     );
 
-    do_action(Action::RightButton, "", "").unwrap();
+    do_action(Action::RightButtonAction, "", "").unwrap();
     let mut action = do_action(Action::ClearLog, "", "").unwrap();
     erase_log_timestamps(&mut action.screen_data);
     assert_eq!(
@@ -1884,15 +1779,12 @@ fn flow_test_1() {
     let action = do_action(Action::NavbarKeys, "", "").unwrap();
 
     let expected_action = ActionResult {
-        screen: Some("SeedSelector".to_string()),
         screen_label: "Select seed".to_string(),
         back: false,
         footer: true,
-        footer_button: "Keys".to_string(),
-        right_button: "NewSeed".to_string(),
-        screen_name_type: "h1".to_string(),
-        modal: "NewSeedMenu".to_string(),
-        alert: "Empty".to_string(),
+        footer_button: Some(FooterButton::Keys),
+        right_button: Some(RightButton::NewSeed),
+        screen_name_type: ScreenNameType::H1,
         screen_data: ScreenData::SeedSelector {
             f: MSeeds {
                 seed_name_cards: vec![],
@@ -1908,15 +1800,12 @@ fn flow_test_1() {
 
     let action = do_action(Action::NewSeed, "", "").unwrap();
     let expected_action = ActionResult {
-        screen: Some("NewSeed".to_string()),
         screen_label: "New Seed".to_string(),
         back: true,
         footer: false,
-        footer_button: "Keys".to_string(),
-        right_button: "None".to_string(),
-        screen_name_type: "h1".to_string(),
-        modal: "Empty".to_string(),
-        alert: "Empty".to_string(),
+        footer_button: Some(FooterButton::Keys),
+        right_button: None,
+        screen_name_type: ScreenNameType::H1,
         screen_data: ScreenData::NewSeed {
             f: MNewSeed { keyboard: true },
         },
@@ -1941,15 +1830,12 @@ fn flow_test_1() {
     do_action(Action::NewSeed, "", "").unwrap();
     let mut action = do_action(Action::GoForward, "Portia", "").unwrap();
     let expected_action = ActionResult {
-        screen: Some("NewSeed".to_string()),
         screen_label: "New Seed".to_string(),
         back: true,
         footer: false,
-        footer_button: "Keys".to_string(),
-        right_button: "None".to_string(),
-        screen_name_type: "h1".to_string(),
-        modal: "NewSeedBackup".to_string(),
-        alert: "Empty".to_string(),
+        footer_button: Some(FooterButton::Keys),
+        right_button: None,
+        screen_name_type: ScreenNameType::H1,
         screen_data: ScreenData::NewSeed {
             f: MNewSeed { keyboard: false },
         },
@@ -1990,15 +1876,12 @@ fn flow_test_1() {
     let seed_phrase_portia = erase_modal_seed_phrase_and_identicon(&mut action.modal_data);
     let expected_json = r#"{"screen":"NewSeed","screenLabel":"New Seed","back":true,"footer":false,"footerButton":"Keys","rightButton":"None","screenNameType":"h1","modal":"NewSeedBackup","alert":"Empty","screenData":{"keyboard":false},"modalData":{"seed":"Portia","seed_phrase":"**","identicon":"**"},"alertData":{}}"#;
     let expected_action = ActionResult {
-        screen: Some("NewSeed".to_string()),
         screen_label: "New Seed".to_string(),
         back: true,
         footer: false,
-        footer_button: "Keys".to_string(),
-        right_button: "None".to_string(),
-        screen_name_type: "h1".to_string(),
-        modal: "NewSeedBackup".to_string(),
-        alert: "Empty".to_string(),
+        footer_button: Some(FooterButton::Keys),
+        right_button: None,
+        screen_name_type: ScreenNameType::H1,
         screen_data: ScreenData::NewSeed {
             f: MNewSeed { keyboard: false },
         },
@@ -2020,15 +1903,12 @@ fn flow_test_1() {
     let mut action = do_action(Action::GoForward, "true", &seed_phrase_portia).unwrap();
     erase_base58_address_identicon(&mut action.screen_data);
     let expected_action = ActionResult {
-        screen: Some("Keys".to_string()),
         screen_label: String::new(),
         back: true,
         footer: true,
-        footer_button: "Keys".to_string(),
-        right_button: "Backup".to_string(),
-        screen_name_type: "h4".to_string(),
-        modal: "Empty".to_string(),
-        alert: "Empty".to_string(),
+        footer_button: Some(FooterButton::Keys),
+        right_button: Some(RightButton::Backup),
+        screen_name_type: ScreenNameType::H4,
         screen_data: ScreenData::Keys {
             f: MKeys {
                 set: vec![MKeysCard {
@@ -2073,15 +1953,12 @@ fn flow_test_1() {
     erase_identicon(&mut action.screen_data);
 
     let expected_action = ActionResult {
-        screen: Some("SeedSelector".to_string()),
         screen_label: "Select seed".to_string(),
         back: false,
         footer: true,
-        footer_button: "Keys".to_string(),
-        right_button: "NewSeed".to_string(),
-        screen_name_type: "h1".to_string(),
-        modal: "Empty".to_string(),
-        alert: "Empty".to_string(),
+        footer_button: Some(FooterButton::Keys),
+        right_button: Some(RightButton::NewSeed),
+        screen_name_type: ScreenNameType::H1,
         screen_data: ScreenData::SeedSelector {
             f: MSeeds {
                 seed_name_cards: vec![SeedNameCard {
@@ -2116,20 +1993,16 @@ fn flow_test_1() {
         "e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e";
 
     let expected_action = ActionResult {
-        screen: Some("Log".to_string()),
         screen_label: String::new(),
         back: false,
         footer: true,
-        footer_button: "Log".to_string(),
-        right_button: "LogRight".to_string(),
-        screen_name_type: "h4".to_string(),
-        modal: "Empty".to_string(),
-        alert: "Empty".to_string(),
+        footer_button: Some(FooterButton::Log),
+        right_button: Some(RightButton::LogRight),
+        screen_name_type: ScreenNameType::H4,
         screen_data: ScreenData::Log {
             f: MLog {
                 log: vec![
                     History {
-                        order: 1,
                         timestamp: String::new(),
                         events: vec![
                             Event::SeedCreated {
@@ -2202,12 +2075,10 @@ fn flow_test_1() {
                         ],
                     },
                     History {
-                        order: 0,
                         timestamp: String::new(),
                         events: vec![Event::HistoryCleared],
                     },
                 ],
-                total_entries: 2,
             },
         },
         modal_data: ModalData::Text {
@@ -2217,28 +2088,23 @@ fn flow_test_1() {
     };
     assert_eq!(action, expected_action);
 
-    do_action(Action::RightButton, "", "").unwrap();
+    do_action(Action::RightButtonAction, "", "").unwrap();
     let mut action = do_action(Action::ClearLog, "", "").unwrap();
     erase_log_timestamps(&mut action.screen_data);
 
     let expected_action = ActionResult {
-        screen: Some("Log".to_string()),
         screen_label: String::new(),
         back: false,
         footer: true,
-        footer_button: "Log".to_string(),
-        right_button: "LogRight".to_string(),
-        screen_name_type: "h4".to_string(),
-        modal: "Empty".to_string(),
-        alert: "Empty".to_string(),
+        footer_button: Some(FooterButton::Log),
+        right_button: Some(RightButton::LogRight),
+        screen_name_type: ScreenNameType::H4,
         screen_data: ScreenData::Log {
             f: MLog {
                 log: vec![History {
-                    order: 0,
                     timestamp: String::new(),
                     events: vec![Event::HistoryCleared],
                 }],
-                total_entries: 1,
             },
         },
         modal_data: ModalData::Text {
@@ -2252,18 +2118,15 @@ fn flow_test_1() {
     );
 
     do_action(Action::NavbarKeys, "", "").unwrap();
-    do_action(Action::RightButton, "", "").unwrap();
+    do_action(Action::RightButtonAction, "", "").unwrap();
     let action = do_action(Action::RecoverSeed, "", "").unwrap();
     let expected_action = ActionResult {
-        screen: Some("RecoverSeedName".to_string()),
         screen_label: "Recover Seed".to_string(),
         back: true,
         footer: false,
-        footer_button: "Keys".to_string(),
-        right_button: "None".to_string(),
-        screen_name_type: "h1".to_string(),
-        modal: "Empty".to_string(),
-        alert: "Empty".to_string(),
+        footer_button: Some(FooterButton::Keys),
+        right_button: None,
+        screen_name_type: ScreenNameType::H1,
         screen_data: ScreenData::RecoverSeedName {
             f: MRecoverSeedName {
                 keyboard: true,
@@ -2287,19 +2150,16 @@ fn flow_test_1() {
         "GoBack on RecoverSeedName screen with no modals. Expected known SeedSelector screen"
     );
 
-    do_action(Action::RightButton, "", "").unwrap();
+    do_action(Action::RightButtonAction, "", "").unwrap();
     do_action(Action::RecoverSeed, "", "").unwrap();
     let action = do_action(Action::GoForward, "Portia", "").unwrap();
     let expected_action = ActionResult {
-        screen: Some("RecoverSeedName".to_string()),
         screen_label: "Recover Seed".to_string(),
         back: true,
         footer: false,
-        footer_button: "Keys".to_string(),
-        right_button: "None".to_string(),
-        screen_name_type: "h1".to_string(),
-        modal: "Empty".to_string(),
-        alert: "Error".to_string(),
+        footer_button: Some(FooterButton::Keys),
+        right_button: None,
+        screen_name_type: ScreenNameType::H1,
         screen_data: ScreenData::RecoverSeedName {
             f: MRecoverSeedName {
                 keyboard: false,
@@ -2319,15 +2179,12 @@ fn flow_test_1() {
     do_action(Action::GoBack, "", "").unwrap();
     let action = do_action(Action::GoForward, "Alys", "").unwrap();
     let expected_action = ActionResult {
-        screen: Some("RecoverSeedPhrase".to_string()),
         screen_label: "Recover Seed".to_string(),
         back: true,
         footer: false,
-        footer_button: "Keys".to_string(),
-        right_button: "None".to_string(),
-        screen_name_type: "h1".to_string(),
-        modal: "Empty".to_string(),
-        alert: "Empty".to_string(),
+        footer_button: Some(FooterButton::Keys),
+        right_button: None,
+        screen_name_type: ScreenNameType::H1,
         screen_data: ScreenData::RecoverSeedPhrase {
             f: MRecoverSeedPhrase {
                 keyboard: true,
@@ -2359,15 +2216,12 @@ fn flow_test_1() {
 
     let action = do_action(Action::GoBack, "", "").unwrap();
     let expected_action = ActionResult {
-        screen: Some("RecoverSeedName".to_string()),
         screen_label: "Recover Seed".to_string(),
         back: true,
         footer: false,
-        footer_button: "Keys".to_string(),
-        right_button: "None".to_string(),
-        screen_name_type: "h1".to_string(),
-        modal: "Empty".to_string(),
-        alert: "Empty".to_string(),
+        footer_button: Some(FooterButton::Keys),
+        right_button: None,
+        screen_name_type: ScreenNameType::H1,
         screen_data: ScreenData::RecoverSeedName {
             f: MRecoverSeedName {
                 keyboard: true,
@@ -2386,15 +2240,12 @@ fn flow_test_1() {
 
     let action = do_action(Action::GoForward, "Alice", "").unwrap();
     let expected_action = ActionResult {
-        screen: Some("RecoverSeedPhrase".to_string()),
         screen_label: "Recover Seed".to_string(),
         back: true,
         footer: false,
-        footer_button: "Keys".to_string(),
-        right_button: "None".to_string(),
-        screen_name_type: "h1".to_string(),
-        modal: "Empty".to_string(),
-        alert: "Empty".to_string(),
+        footer_button: Some(FooterButton::Keys),
+        right_button: None,
+        screen_name_type: ScreenNameType::H1,
         screen_data: ScreenData::RecoverSeedPhrase {
             f: MRecoverSeedPhrase {
                 keyboard: true,
@@ -2430,15 +2281,12 @@ fn flow_test_1() {
     // Alice painstakingly recalls her seed phrase
     let action = do_action(Action::TextEntry, " botto", "").unwrap();
     let expected_action = ActionResult {
-        screen: Some("RecoverSeedPhrase".to_string()),
         screen_label: "Recover Seed".to_string(),
         back: true,
         footer: false,
-        footer_button: "Keys".to_string(),
-        right_button: "None".to_string(),
-        screen_name_type: "h1".to_string(),
-        modal: "Empty".to_string(),
-        alert: "Empty".to_string(),
+        footer_button: Some(FooterButton::Keys),
+        right_button: None,
+        screen_name_type: ScreenNameType::H1,
         screen_data: ScreenData::RecoverSeedPhrase {
             f: MRecoverSeedPhrase {
                 keyboard: true,
@@ -2465,15 +2313,12 @@ fn flow_test_1() {
 
     let action = do_action(Action::TextEntry, " botto ", "").unwrap();
     let expected_action = ActionResult {
-        screen: Some("RecoverSeedPhrase".to_string()),
         screen_label: "Recover Seed".to_string(),
         back: true,
         footer: false,
-        footer_button: "Keys".to_string(),
-        right_button: "None".to_string(),
-        screen_name_type: "h1".to_string(),
-        modal: "Empty".to_string(),
-        alert: "Empty".to_string(),
+        footer_button: Some(FooterButton::Keys),
+        right_button: None,
+        screen_name_type: ScreenNameType::H1,
         screen_data: ScreenData::RecoverSeedPhrase {
             f: MRecoverSeedPhrase {
                 keyboard: true,
@@ -2489,10 +2334,7 @@ fn flow_test_1() {
                     "absorb".to_string(),
                     "abstract".to_string(),
                 ],
-                draft: vec![SeedWord {
-                    order: 0,
-                    content: "bottom".to_string(),
-                }],
+                draft: vec!["bottom".to_string()],
                 ready_seed: None,
             },
         },
@@ -2512,15 +2354,12 @@ fn flow_test_1() {
 
     let action = do_action(Action::TextEntry, " abstract ", "").unwrap();
     let expected_action = ActionResult {
-        screen: Some("RecoverSeedPhrase".to_string()),
         screen_label: "Recover Seed".to_string(),
         back: true,
         footer: false,
-        footer_button: "Keys".to_string(),
-        right_button: "None".to_string(),
-        screen_name_type: "h1".to_string(),
-        modal: "Empty".to_string(),
-        alert: "Empty".to_string(),
+        footer_button: Some(FooterButton::Keys),
+        right_button: None,
+        screen_name_type: ScreenNameType::H1,
         screen_data: ScreenData::RecoverSeedPhrase {
             f: MRecoverSeedPhrase {
                 keyboard: true,
@@ -2536,16 +2375,7 @@ fn flow_test_1() {
                     "absorb".to_string(),
                     "abstract".to_string(),
                 ],
-                draft: vec![
-                    SeedWord {
-                        order: 0,
-                        content: "bottom".to_string(),
-                    },
-                    SeedWord {
-                        order: 1,
-                        content: "abstract".to_string(),
-                    },
-                ],
+                draft: vec!["bottom".to_string(), "abstract".to_string()],
                 ready_seed: None,
             },
         },
@@ -2565,15 +2395,12 @@ fn flow_test_1() {
 
     let action = do_action(Action::TextEntry, "", "").unwrap();
     let expected_action = ActionResult {
-        screen: Some("RecoverSeedPhrase".to_string()),
         screen_label: "Recover Seed".to_string(),
         back: true,
         footer: false,
-        footer_button: "Keys".to_string(),
-        right_button: "None".to_string(),
-        screen_name_type: "h1".to_string(),
-        modal: "Empty".to_string(),
-        alert: "Empty".to_string(),
+        footer_button: Some(FooterButton::Keys),
+        right_button: None,
+        screen_name_type: ScreenNameType::H1,
         screen_data: ScreenData::RecoverSeedPhrase {
             f: MRecoverSeedPhrase {
                 keyboard: true,
@@ -2589,10 +2416,7 @@ fn flow_test_1() {
                     "absorb".to_string(),
                     "abstract".to_string(),
                 ],
-                draft: vec![SeedWord {
-                    order: 0,
-                    content: "bottom".to_string(),
-                }],
+                draft: vec!["bottom".to_string()],
                 ready_seed: None,
             },
         },
@@ -2615,15 +2439,12 @@ fn flow_test_1() {
     // a cat interfered
     let action = do_action(Action::TextEntry, " ddddddddddddddd", "").unwrap();
     let expected_action = ActionResult {
-        screen: Some("RecoverSeedPhrase".to_string()),
         screen_label: "Recover Seed".to_string(),
         back: true,
         footer: false,
-        footer_button: "Keys".to_string(),
-        right_button: "None".to_string(),
-        screen_name_type: "h1".to_string(),
-        modal: "Empty".to_string(),
-        alert: "Empty".to_string(),
+        footer_button: Some(FooterButton::Keys),
+        right_button: None,
+        screen_name_type: ScreenNameType::H1,
         screen_data: ScreenData::RecoverSeedPhrase {
             f: MRecoverSeedPhrase {
                 keyboard: true,
@@ -2639,10 +2460,7 @@ fn flow_test_1() {
                     "dash".to_string(),
                     "daughter".to_string(),
                 ],
-                draft: vec![SeedWord {
-                    order: 0,
-                    content: "bottom".to_string(),
-                }],
+                draft: vec!["bottom".to_string()],
                 ready_seed: None,
             },
         },
@@ -2675,15 +2493,12 @@ fn flow_test_1() {
     do_action(Action::TextEntry, " curt ", "").unwrap();
     let action = do_action(Action::TextEntry, " som", "").unwrap();
     let expected_action = ActionResult {
-        screen: Some("RecoverSeedPhrase".to_string()),
         screen_label: "Recover Seed".to_string(),
         back: true,
         footer: false,
-        footer_button: "Keys".to_string(),
-        right_button: "None".to_string(),
-        screen_name_type: "h1".to_string(),
-        modal: "Empty".to_string(),
-        alert: "Empty".to_string(),
+        footer_button: Some(FooterButton::Keys),
+        right_button: None,
+        screen_name_type: ScreenNameType::H1,
         screen_data: ScreenData::RecoverSeedPhrase {
             f: MRecoverSeedPhrase {
                 keyboard: true,
@@ -2691,26 +2506,11 @@ fn flow_test_1() {
                 user_input: "som".to_string(),
                 guess_set: vec!["someone".to_string()],
                 draft: vec![
-                    SeedWord {
-                        order: 0,
-                        content: "bottom".to_string(),
-                    },
-                    SeedWord {
-                        order: 1,
-                        content: "drive".to_string(),
-                    },
-                    SeedWord {
-                        order: 2,
-                        content: "obey".to_string(),
-                    },
-                    SeedWord {
-                        order: 3,
-                        content: "lake".to_string(),
-                    },
-                    SeedWord {
-                        order: 4,
-                        content: "curtain".to_string(),
-                    },
+                    "bottom".to_string(),
+                    "drive".to_string(),
+                    "obey".to_string(),
+                    "lake".to_string(),
+                    "curtain".to_string(),
                 ],
                 ready_seed: None,
             },
@@ -2731,15 +2531,12 @@ fn flow_test_1() {
 
     let action = do_action(Action::TextEntry, " smo", "").unwrap();
     let expected_action = ActionResult {
-        screen: Some("RecoverSeedPhrase".to_string()),
         screen_label: "Recover Seed".to_string(),
         back: true,
         footer: false,
-        footer_button: "Keys".to_string(),
-        right_button: "None".to_string(),
-        screen_name_type: "h1".to_string(),
-        modal: "Empty".to_string(),
-        alert: "Empty".to_string(),
+        footer_button: Some(FooterButton::Keys),
+        right_button: None,
+        screen_name_type: ScreenNameType::H1,
         screen_data: ScreenData::RecoverSeedPhrase {
             f: MRecoverSeedPhrase {
                 keyboard: true,
@@ -2747,26 +2544,11 @@ fn flow_test_1() {
                 user_input: "smo".to_string(),
                 guess_set: vec!["smoke".to_string(), "smooth".to_string()],
                 draft: vec![
-                    SeedWord {
-                        order: 0,
-                        content: "bottom".to_string(),
-                    },
-                    SeedWord {
-                        order: 1,
-                        content: "drive".to_string(),
-                    },
-                    SeedWord {
-                        order: 2,
-                        content: "obey".to_string(),
-                    },
-                    SeedWord {
-                        order: 3,
-                        content: "lake".to_string(),
-                    },
-                    SeedWord {
-                        order: 4,
-                        content: "curtain".to_string(),
-                    },
+                    "bottom".to_string(),
+                    "drive".to_string(),
+                    "obey".to_string(),
+                    "lake".to_string(),
+                    "curtain".to_string(),
                 ],
                 ready_seed: None,
             },
@@ -2796,15 +2578,12 @@ fn flow_test_1() {
 
     let action = do_action(Action::PushWord, "smoke", "").unwrap();
     let expected_action = ActionResult {
-        screen: Some("RecoverSeedPhrase".to_string()),
         screen_label: "Recover Seed".to_string(),
         back: true,
         footer: false,
-        footer_button: "Keys".to_string(),
-        right_button: "None".to_string(),
-        screen_name_type: "h1".to_string(),
-        modal: "Empty".to_string(),
-        alert: "Empty".to_string(),
+        footer_button: Some(FooterButton::Keys),
+        right_button: None,
+        screen_name_type: ScreenNameType::H1,
         screen_data: ScreenData::RecoverSeedPhrase {
             f: MRecoverSeedPhrase {
                 keyboard: true,
@@ -2821,30 +2600,12 @@ fn flow_test_1() {
                     "abstract".to_string(),
                 ],
                 draft: vec![
-                    SeedWord {
-                        order: 0,
-                        content: "bottom".to_string(),
-                    },
-                    SeedWord {
-                        order: 1,
-                        content: "drive".to_string(),
-                    },
-                    SeedWord {
-                        order: 2,
-                        content: "obey".to_string(),
-                    },
-                    SeedWord {
-                        order: 3,
-                        content: "lake".to_string(),
-                    },
-                    SeedWord {
-                        order: 4,
-                        content: "curtain".to_string(),
-                    },
-                    SeedWord {
-                        order: 5,
-                        content: "smoke".to_string(),
-                    },
+                    "bottom".to_string(),
+                    "drive".to_string(),
+                    "obey".to_string(),
+                    "lake".to_string(),
+                    "curtain".to_string(),
+                    "smoke".to_string(),
                 ],
                 ready_seed: None,
             },
@@ -2870,15 +2631,12 @@ fn flow_test_1() {
     do_action(Action::TextEntry, " fit ", "").unwrap();
     let action = do_action(Action::TextEntry, " walk ", "").unwrap();
     let expected_action = ActionResult {
-        screen: Some("RecoverSeedPhrase".to_string()),
         screen_label: "Recover Seed".to_string(),
         back: true,
         footer: false,
-        footer_button: "Keys".to_string(),
-        right_button: "None".to_string(),
-        screen_name_type: "h1".to_string(),
-        modal: "Empty".to_string(),
-        alert: "Empty".to_string(),
+        footer_button: Some(FooterButton::Keys),
+        right_button: None,
+        screen_name_type: ScreenNameType::H1,
         screen_data: ScreenData::RecoverSeedPhrase {
             f: MRecoverSeedPhrase {
                 keyboard: true,
@@ -2895,54 +2653,18 @@ fn flow_test_1() {
                     "abstract".to_string(),
                 ],
                 draft: vec![
-                    SeedWord {
-                        order: 0,
-                        content: "bottom".to_string(),
-                    },
-                    SeedWord {
-                        order: 1,
-                        content: "drive".to_string(),
-                    },
-                    SeedWord {
-                        order: 2,
-                        content: "obey".to_string(),
-                    },
-                    SeedWord {
-                        order: 3,
-                        content: "lake".to_string(),
-                    },
-                    SeedWord {
-                        order: 4,
-                        content: "curtain".to_string(),
-                    },
-                    SeedWord {
-                        order: 5,
-                        content: "smoke".to_string(),
-                    },
-                    SeedWord {
-                        order: 6,
-                        content: "basket".to_string(),
-                    },
-                    SeedWord {
-                        order: 7,
-                        content: "hold".to_string(),
-                    },
-                    SeedWord {
-                        order: 8,
-                        content: "race".to_string(),
-                    },
-                    SeedWord {
-                        order: 9,
-                        content: "lonely".to_string(),
-                    },
-                    SeedWord {
-                        order: 10,
-                        content: "fit".to_string(),
-                    },
-                    SeedWord {
-                        order: 11,
-                        content: "walk".to_string(),
-                    },
+                    "bottom".to_string(),
+                    "drive".to_string(),
+                    "obey".to_string(),
+                    "lake".to_string(),
+                    "curtain".to_string(),
+                    "smoke".to_string(),
+                    "basket".to_string(),
+                    "hold".to_string(),
+                    "race".to_string(),
+                    "lonely".to_string(),
+                    "fit".to_string(),
+                    "walk".to_string(),
                 ],
                 ready_seed: Some(
                     "bottom drive obey lake curtain smoke basket hold race lonely fit walk"
@@ -2969,18 +2691,14 @@ fn flow_test_1() {
     // can't model it here
 
     let action = do_action(Action::GoForward, "false", ALICE_SEED_PHRASE).unwrap();
-    let expected_json = r#"{"screen":"Keys","screenLabel":"","back":true,"footer":true,"footerButton":"Keys","rightButton":"Backup","screenNameType":"h4","modal":"Empty","alert":"Empty","screenData":{"root":{"seed_name":"Alice","identicon":"<empty>","address_key":"","base58":"","swiped":false,"multiselect":false},"set":[{"address_key":"01f606519cb8726753885cd4d0f518804a69a5e0badf36fee70feadd8044081730","base58":"16Zaf6BT6xc6WeYCX6YNAf67RumWaEiumwawt7cTdKMU7HqW","identicon":"<alice_sr25519_//polkadot>","has_pwd":false,"path":"//polkadot","swiped":false,"multiselect":false}],"network":{"title":"Polkadot","logo":"polkadot"},"multiselect_mode":false,"multiselect_count":""},"modalData":{},"alertData":{}}"#;
 
     let expected_action = ActionResult {
-        screen: Some("Keys".to_string()),
         screen_label: String::new(),
         back: true,
         footer: true,
-        footer_button: "Keys".to_string(),
-        right_button: "Backup".to_string(),
-        screen_name_type: "h4".to_string(),
-        modal: "Empty".to_string(),
-        alert: "Empty".to_string(),
+        footer_button: Some(FooterButton::Keys),
+        right_button: Some(RightButton::Backup),
+        screen_name_type: ScreenNameType::H4,
         screen_data: ScreenData::Keys {
             f: MKeys {
                 set: vec![MKeysCard {
@@ -3029,15 +2747,12 @@ fn flow_test_1() {
     let mut action = do_action(Action::GoBack, "", "").unwrap();
     erase_identicon(&mut action.screen_data);
     let expected_action = ActionResult {
-        screen: Some("SeedSelector".to_string()),
         screen_label: "Select seed".to_string(),
         back: false,
         footer: true,
-        footer_button: "Keys".to_string(),
-        right_button: "NewSeed".to_string(),
-        screen_name_type: "h1".to_string(),
-        modal: "Empty".to_string(),
-        alert: "Empty".to_string(),
+        footer_button: Some(FooterButton::Keys),
+        right_button: Some(RightButton::NewSeed),
+        screen_name_type: ScreenNameType::H1,
         screen_data: ScreenData::SeedSelector {
             f: MSeeds {
                 seed_name_cards: vec![
@@ -3080,15 +2795,12 @@ fn flow_test_1() {
     .unwrap();
 
     let expected_action = ActionResult {
-        screen: Some("KeyDetails".to_string()),
         screen_label: "Derived Key".to_string(),
         back: true,
         footer: false,
-        footer_button: "Keys".to_string(),
-        right_button: "KeyMenu".to_string(),
-        screen_name_type: "h4".to_string(),
-        modal: "Empty".to_string(),
-        alert: "Empty".to_string(),
+        footer_button: Some(FooterButton::Keys),
+        right_button: Some(RightButton::KeyMenu),
+        screen_name_type: ScreenNameType::H4,
         screen_data: ScreenData::KeyDetails {
             f: MKeyDetails {
                 qr: alice_polkadot_qr(),
@@ -3120,15 +2832,12 @@ fn flow_test_1() {
 
     let action = do_action(Action::NewKey, "", "").unwrap();
     let expected_action = ActionResult {
-        screen: Some("DeriveKey".to_string()),
         screen_label: "Derive Key".to_string(),
         back: true,
         footer: false,
-        footer_button: "Keys".to_string(),
-        right_button: "None".to_string(),
-        screen_name_type: "h1".to_string(),
-        modal: "Empty".to_string(),
-        alert: "Empty".to_string(),
+        footer_button: Some(FooterButton::Keys),
+        right_button: None,
+        screen_name_type: ScreenNameType::H1,
         screen_data: ScreenData::DeriveKey {
             f: MDeriveKey {
                 seed_name: "Alice".to_string(),
@@ -3161,15 +2870,12 @@ fn flow_test_1() {
     do_action(Action::NewKey, "", "").unwrap();
     let action = do_action(Action::CheckPassword, "//secret//path///multipass", "").unwrap();
     let expected_action = ActionResult {
-        screen: Some("DeriveKey".to_string()),
         screen_label: "Derive Key".to_string(),
         back: true,
         footer: false,
-        footer_button: "Keys".to_string(),
-        right_button: "None".to_string(),
-        screen_name_type: "h1".to_string(),
-        modal: "PasswordConfirm".to_string(),
-        alert: "Empty".to_string(),
+        footer_button: Some(FooterButton::Keys),
+        right_button: None,
+        screen_name_type: ScreenNameType::H1,
         screen_data: ScreenData::DeriveKey {
             f: MDeriveKey {
                 seed_name: "Alice".to_string(),
@@ -3211,15 +2917,12 @@ fn flow_test_1() {
     .unwrap();
 
     let expected_action = ActionResult {
-        screen: Some("Keys".to_string()),
         screen_label: String::new(),
         back: true,
         footer: true,
-        footer_button: "Keys".to_string(),
-        right_button: "Backup".to_string(),
-        screen_name_type: "h4".to_string(),
-        modal: "Empty".to_string(),
-        alert: "Empty".to_string(),
+        footer_button: Some(FooterButton::Keys),
+        right_button: Some(RightButton::Backup),
+        screen_name_type: ScreenNameType::H4,
         screen_data: ScreenData::Keys {
             f: MKeys {
                 set: vec![
@@ -3276,15 +2979,12 @@ fn flow_test_1() {
     let action = do_action(Action::GoForward, "", "").unwrap();
 
     let expected_action = ActionResult {
-        screen: Some("Keys".to_string()),
         screen_label: String::new(),
         back: true,
         footer: true,
-        footer_button: "Keys".to_string(),
-        right_button: "Backup".to_string(),
-        screen_name_type: "h4".to_string(),
-        modal: "Empty".to_string(),
-        alert: "Empty".to_string(),
+        footer_button: Some(FooterButton::Keys),
+        right_button: Some(RightButton::Backup),
+        screen_name_type: ScreenNameType::H4,
         screen_data: ScreenData::Keys {
             f: MKeys {
                 set: vec![
@@ -3345,15 +3045,12 @@ fn flow_test_1() {
     let mut action = do_action(Action::GoBack, "", "").unwrap();
     erase_identicon(&mut action.screen_data);
     let expected_action = ActionResult {
-        screen: Some("SeedSelector".to_string()),
         screen_label: "Select seed".to_string(),
         back: false,
         footer: true,
-        footer_button: "Keys".to_string(),
-        right_button: "NewSeed".to_string(),
-        screen_name_type: "h1".to_string(),
-        modal: "Empty".to_string(),
-        alert: "Empty".to_string(),
+        footer_button: Some(FooterButton::Keys),
+        right_button: Some(RightButton::NewSeed),
+        screen_name_type: ScreenNameType::H1,
         screen_data: ScreenData::SeedSelector {
             f: MSeeds {
                 seed_name_cards: vec![
@@ -3383,17 +3080,14 @@ fn flow_test_1() {
     );
 
     do_action(Action::SelectSeed, "Alice", "").unwrap();
-    let action = do_action(Action::RightButton, "", "").unwrap();
+    let action = do_action(Action::RightButtonAction, "", "").unwrap();
     let mut expected_action = ActionResult {
-        screen: Some("Keys".to_string()),
         screen_label: String::new(),
         back: true,
         footer: true,
-        footer_button: "Keys".to_string(),
-        right_button: "Backup".to_string(),
-        screen_name_type: "h4".to_string(),
-        modal: "SeedMenu".to_string(),
-        alert: "Empty".to_string(),
+        footer_button: Some(FooterButton::Keys),
+        right_button: Some(RightButton::Backup),
+        screen_name_type: ScreenNameType::H4,
         screen_data: ScreenData::Keys {
             f: MKeys {
                 set: vec![
@@ -3452,7 +3146,6 @@ fn flow_test_1() {
     );
 
     let action = do_action(Action::BackupSeed, "", "").unwrap();
-    expected_action.modal = "Backup".to_string();
     expected_action.modal_data = ModalData::Backup {
         f: MBackup {
             seed_name: "Alice".to_string(),
@@ -3497,7 +3190,7 @@ fn flow_test_1() {
             ],
         },
     };
-    expected_action.right_button = "None".to_string();
+    expected_action.right_button = None;
     assert_eq!(
         action, expected_action,
         "BackupSeed on Keys screen with SeedMenu button. Expected Keys screen with Backup modal"
@@ -3508,25 +3201,20 @@ fn flow_test_1() {
     let mut action = do_action(Action::NavbarLog, "", "").unwrap();
     erase_log_timestamps(&mut action.screen_data);
     let expected_action = ActionResult {
-        screen: Some("Log".to_string()),
         screen_label: String::new(),
         back: false,
         footer: true,
-        footer_button: "Log".to_string(),
-        right_button: "LogRight".to_string(),
-        screen_name_type: "h4".to_string(),
-        modal: "Empty".to_string(),
-        alert: "Empty".to_string(),
+        footer_button: Some(FooterButton::Log),
+        right_button: Some(RightButton::LogRight),
+        screen_name_type: ScreenNameType::H4,
         screen_data: ScreenData::Log {
             f: MLog {
                 log: vec![
                     History {
-                        order: 4,
                         timestamp: String::new(),
                         events: vec![Event::SeedNameWasShown { seed_name_was_shown: "Alice".to_string() }]
                     },
                     History {
-                        order: 3,
                         timestamp: String::new(),
                         events: vec![Event::IdentityAdded {
                             identity_history: IdentityHistory {
@@ -3542,7 +3230,6 @@ fn flow_test_1() {
                         }],
                     },
                     History {
-                        order: 2,
                         timestamp: String::new(),
                         events: vec![Event::IdentityAdded {
                             identity_history: IdentityHistory {
@@ -3558,7 +3245,6 @@ fn flow_test_1() {
                         }],
                     },
                     History {
-                        order: 1,
                         timestamp: String::new(),
                         events: vec![
                             Event::SeedCreated {
@@ -3605,12 +3291,10 @@ fn flow_test_1() {
                         ],
                     },
                     History {
-                        order: 0,
                         timestamp: String::new(),
                         events: vec![Event::HistoryCleared],
                     },
                 ],
-                total_entries: 5,
             },
         },
         modal_data: ModalData::Text {
@@ -3627,7 +3311,7 @@ fn flow_test_1() {
         )
     );
 
-    do_action(Action::RightButton, "", "").unwrap();
+    do_action(Action::RightButtonAction, "", "").unwrap();
     let mut action = do_action(Action::ClearLog, "", "").unwrap();
     erase_log_timestamps(&mut action.screen_data);
     assert_eq!(
@@ -3640,7 +3324,7 @@ fn flow_test_1() {
 
     do_action(Action::NavbarKeys, "", "").unwrap();
     do_action(Action::SelectSeed, "Portia", "").unwrap();
-    do_action(Action::RightButton, "", "").unwrap();
+    do_action(Action::RightButtonAction, "", "").unwrap();
     let action = do_action(Action::RemoveSeed, "", "").unwrap();
     /* TODO: this.
     let cut_real_json = cut_public_key(&timeless(&real_json));
@@ -3658,7 +3342,7 @@ fn flow_test_1() {
 
     update_seed_names(r#"Alice"#);
 
-    do_action(Action::RightButton, "", "").unwrap();
+    do_action(Action::RightButtonAction, "", "").unwrap();
     let mut action = do_action(Action::ClearLog, "", "").unwrap();
     erase_log_timestamps(&mut action.screen_data);
     assert_eq!(
@@ -3672,15 +3356,12 @@ fn flow_test_1() {
     let action = do_action(Action::NavbarKeys, "", "").unwrap();
 
     let expected_action = ActionResult {
-        screen: Some("SeedSelector".to_string()),
         screen_label: "Select seed".to_string(),
         back: false,
         footer: true,
-        footer_button: "Keys".to_string(),
-        right_button: "NewSeed".to_string(),
-        screen_name_type: "h1".to_string(),
-        modal: "Empty".to_string(),
-        alert: "Empty".to_string(),
+        footer_button: Some(FooterButton::Keys),
+        right_button: Some(RightButton::NewSeed),
+        screen_name_type: ScreenNameType::H1,
         screen_data: ScreenData::SeedSelector {
             f: MSeeds {
                 seed_name_cards: vec![SeedNameCard {
@@ -3702,7 +3383,6 @@ fn flow_test_1() {
     do_action(Action::SelectSeed, "Alice", "").unwrap();
     let action = do_action(Action::NetworkSelector, "", "").unwrap();
     let mut expected_action = alice_polkadot_keys_action.clone();
-    expected_action.modal = "NetworkSelector".to_string();
     expected_action.modal_data = ModalData::NetworkSelector {
         f: MNetworkMenu {
             networks: vec![
@@ -3759,15 +3439,12 @@ fn flow_test_1() {
     )
     .unwrap();
     let expected_action = ActionResult {
-        screen: Some("Keys".to_string()),
         screen_label: String::new(),
         back: true,
         footer: true,
-        footer_button: "Keys".to_string(),
-        right_button: "Backup".to_string(),
-        screen_name_type: "h4".to_string(),
-        modal: "Empty".to_string(),
-        alert: "Empty".to_string(),
+        footer_button: Some(FooterButton::Keys),
+        right_button: Some(RightButton::Backup),
+        screen_name_type: ScreenNameType::H4,
         screen_data: ScreenData::Keys {
             f: MKeys {
                 set: vec![MKeysCard {
@@ -3804,15 +3481,12 @@ fn flow_test_1() {
     do_action(Action::NavbarScan, "", "").unwrap();
     let action = do_action(Action::TransactionFetched,"53ffde01e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e141c2f2f416c6963653c2f2f416c6963652f77657374656e64582f2f416c6963652f7365637265742f2f7365637265740c2f2f300c2f2f31","").unwrap();
     let mut expected_action = ActionResult {
-        screen: Some("Transaction".to_string()),
         screen_label: String::new(),
         back: true,
         footer: false,
-        footer_button: "Scan".to_string(),
-        right_button: "None".to_string(),
-        screen_name_type: "h1".to_string(),
-        modal: "Empty".to_string(),
-        alert: "Empty".to_string(),
+        footer_button: Some(FooterButton::Scan),
+        right_button: None,
+        screen_name_type: ScreenNameType::H1,
         screen_data: ScreenData::Transaction {
             f: MTransaction {
                 content: TransactionCardSet {
@@ -3853,7 +3527,6 @@ fn flow_test_1() {
     );
 
     let action = do_action(Action::GoForward, "", "").unwrap();
-    expected_action.modal = "SelectSeed".to_string();
     expected_action.modal_data = ModalData::SelectSeed {
         f: MSeeds {
             seed_name_cards: vec![SeedNameCard {
@@ -4404,7 +4077,7 @@ fn flow_test_1() {
             "0180e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e",
             "",
         );
-        do_action(Action::RightButton, "", "");
+        do_action(Action::RightButtonAction, "", "");
         let real_json = do_action(Action::SignNetworkSpecs, "", "");
         let cut_real_json = real_json
             .replace(&alice_sr_root(), r#"<alice_sr25519_root>"#)
@@ -4486,7 +4159,7 @@ fn flow_test_1() {
             real_json
         );
 
-        do_action(Action::RightButton, "", "");
+        do_action(Action::RightButtonAction, "", "");
         let real_json = do_action(Action::ClearLog, "", "");
         let cut_real_json = timeless(&real_json);
         let expected_json = r#"{"screen":"Log","screenLabel":"","back":false,"footer":true,"footerButton":"Log","rightButton":"LogRight","screenNameType":"h4","modal":"Empty","alert":"Empty","screenData":{"log":[{"order":0,"timestamp":"**","events":[{"event":"history_cleared"}]}],"total_entries":1},"modalData":{},"alertData":{}}"#;
@@ -4564,12 +4237,12 @@ fn flow_test_1() {
             "Expected the updated log to contain entry about generating sufficient crypto, got:\n{}",
             real_json
         );
-        do_action(Action::RightButton, "", "");
+        do_action(Action::RightButtonAction, "", "");
         do_action(Action::ClearLog, "", "");
 
         do_action(Action::NavbarSettings, "", "");
         do_action(Action::ManageNetworks, "", "");
-        do_action(Action::RightButton, "", "");
+        do_action(Action::RightButtonAction, "", "");
         do_action(Action::SignTypes, "", "");
         let real_json = do_action(
             Action::GoForward,
@@ -4634,7 +4307,7 @@ fn flow_test_1() {
             "Expected the updated log to contain entry about generating sufficient crypto, got:\n{}",
             real_json
         );
-        do_action(Action::RightButton, "", "");
+        do_action(Action::RightButtonAction, "", "");
         do_action(Action::ClearLog, "", "");
 
         // let's scan something!!! oops wrong network version
@@ -4707,7 +4380,7 @@ fn flow_test_1() {
         assert!(cut_real_json == expected_json, "ShowLogDetails on Log screen with order 1. Expected LogDetails screen with decoded transaction and no modals, got:\n{}", real_json);
 
         do_action(Action::GoBack, "", "");
-        do_action(Action::RightButton, "", "");
+        do_action(Action::RightButtonAction, "", "");
         do_action(Action::ClearLog, "", "");
 
         // let's scan a text message
@@ -4765,11 +4438,11 @@ fn flow_test_1() {
         assert!(cut_real_json == expected_json, "ShowLogDetails on Log screen with order 1. Expected LogDetails screen with decoded message and no modals, got:\n{}", real_json);
 
         do_action(Action::GoBack, "", "");
-        do_action(Action::RightButton, "", "");
+        do_action(Action::RightButtonAction, "", "");
         do_action(Action::ClearLog, "", "");
 
         do_action(Action::NavbarKeys, "", "");
-        do_action(Action::RightButton, "", "");
+        do_action(Action::RightButtonAction, "", "");
         do_action(Action::NewSeed, "", "");
         let real_json = do_action(Action::GoForward, "Pepper", "");
         let (cut_real_json, seed_phrase_pepper) = cut_seed(&cut_identicon(&real_json));
@@ -4857,7 +4530,7 @@ fn flow_test_1() {
         );
 
         do_action(Action::GoBack, "", "");
-        do_action(Action::RightButton, "", "");
+        do_action(Action::RightButtonAction, "", "");
         do_action(Action::ClearLog, "", "");
         do_action(Action::NavbarKeys, "", "");
         do_action(Action::SelectSeed, "Pepper", "");
@@ -4926,7 +4599,7 @@ fn flow_test_1() {
         let expected_json = r#"{"screen":"Log","screenLabel":"","back":false,"footer":true,"footerButton":"Log","rightButton":"LogRight","screenNameType":"h4","modal":"Empty","alert":"Error","screenData":{"log":[{"order":5,"timestamp":"**","events":[{"event":"message_sign_error","payload":{"message":"4c6f72656d20697073756d20646f6c6f722073697420616d65742c20636f6e73656374657475722061646970697363696e6720656c69742c2073656420646f20656975736d6f642074656d706f7220696e6369646964756e74207574206c61626f726520657420646f6c6f7265206d61676e6120616c697175612e20557420656e696d206164206d696e696d2076656e69616d2c2071756973206e6f737472756420657865726369746174696f6e20756c6c616d636f206c61626f726973206e69736920757420616c697175697020657820656120636f6d6d6f646f20636f6e7365717561742e2044756973206175746520697275726520646f6c6f7220696e20726570726568656e646572697420696e20766f6c7570746174652076656c697420657373652063696c6c756d20646f6c6f726520657520667567696174206e756c6c612070617269617475722e204578636570746575722073696e74206f6363616563617420637570696461746174206e6f6e2070726f6964656e742c2073756e7420696e2063756c706120717569206f666669636961206465736572756e74206d6f6c6c697420616e696d20696420657374206c61626f72756d2e","network_name":"westend","signed_by":{"public_key":"**","identicon":"**","encryption":"sr25519"},"user_comment":"Pepper tries sending text from passworded account","error":"wrong_password_entered"}}]},{"order":4,"timestamp":"**","events":[{"event":"message_sign_error","payload":{"message":"4c6f72656d20697073756d20646f6c6f722073697420616d65742c20636f6e73656374657475722061646970697363696e6720656c69742c2073656420646f20656975736d6f642074656d706f7220696e6369646964756e74207574206c61626f726520657420646f6c6f7265206d61676e6120616c697175612e20557420656e696d206164206d696e696d2076656e69616d2c2071756973206e6f737472756420657865726369746174696f6e20756c6c616d636f206c61626f726973206e69736920757420616c697175697020657820656120636f6d6d6f646f20636f6e7365717561742e2044756973206175746520697275726520646f6c6f7220696e20726570726568656e646572697420696e20766f6c7570746174652076656c697420657373652063696c6c756d20646f6c6f726520657520667567696174206e756c6c612070617269617475722e204578636570746575722073696e74206f6363616563617420637570696461746174206e6f6e2070726f6964656e742c2073756e7420696e2063756c706120717569206f666669636961206465736572756e74206d6f6c6c697420616e696d20696420657374206c61626f72756d2e","network_name":"westend","signed_by":{"public_key":"**","identicon":"**","encryption":"sr25519"},"user_comment":"Pepper tries sending text from passworded account","error":"wrong_password_entered"}}]},{"order":3,"timestamp":"**","events":[{"event":"message_sign_error","payload":{"message":"4c6f72656d20697073756d20646f6c6f722073697420616d65742c20636f6e73656374657475722061646970697363696e6720656c69742c2073656420646f20656975736d6f642074656d706f7220696e6369646964756e74207574206c61626f726520657420646f6c6f7265206d61676e6120616c697175612e20557420656e696d206164206d696e696d2076656e69616d2c2071756973206e6f737472756420657865726369746174696f6e20756c6c616d636f206c61626f726973206e69736920757420616c697175697020657820656120636f6d6d6f646f20636f6e7365717561742e2044756973206175746520697275726520646f6c6f7220696e20726570726568656e646572697420696e20766f6c7570746174652076656c697420657373652063696c6c756d20646f6c6f726520657520667567696174206e756c6c612070617269617475722e204578636570746575722073696e74206f6363616563617420637570696461746174206e6f6e2070726f6964656e742c2073756e7420696e2063756c706120717569206f666669636961206465736572756e74206d6f6c6c697420616e696d20696420657374206c61626f72756d2e","network_name":"westend","signed_by":{"public_key":"**","identicon":"**","encryption":"sr25519"},"user_comment":"Pepper tries sending text from passworded account","error":"wrong_password_entered"}}]},{"order":2,"timestamp":"**","events":[{"event":"identity_added","payload":{"seed_name":"Pepper","encryption":"sr25519","public_key":"**","path":"//0","network_genesis_hash":"e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e"}}]},{"order":1,"timestamp":"**","events":[{"event":"identity_removed","payload":{"seed_name":"Pepper","encryption":"sr25519","public_key":"**","path":"//westend","network_genesis_hash":"e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e"}}]},{"order":0,"timestamp":"**","events":[{"event":"history_cleared"}]}],"total_entries":6},"modalData":{},"alertData":{"error":"Wrong password."}}"#;
         assert!(cut_real_json == expected_json, "GoForward on Transaction screen for passworded address with third wrong password. Expected Log screen, got:\n{}", cut_real_json);
 
-        do_action(Action::RightButton, "", "");
+        do_action(Action::RightButtonAction, "", "");
         do_action(Action::ClearLog, "", "");
 
         do_action(Action::NavbarScan, "", "");

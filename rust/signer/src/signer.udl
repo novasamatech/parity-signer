@@ -131,16 +131,35 @@ dictionary MetaValuesExport {
     VerifierValue signed_by;
 };
 
+enum FooterButton {
+    "Log",
+    "Scan",
+    "Keys",
+    "Settings",
+};
+
+enum RightButton {
+    "LogRight",
+    "NewSeed",
+    "Backup",
+    "MultiSelect",
+    "NDMenu",
+    "TypesInfo",
+    "KeyMenu",
+};
+
+enum ScreenNameType {
+    "H1",
+    "H4",
+};
+
 dictionary ActionResult {
-    string? screen;
     string screen_label;
     boolean back;
     boolean footer;
-    string footer_button;
-    string right_button;
-    string screen_name_type;
-    string modal;
-    string alert;
+    FooterButton? footer_button;
+    RightButton? right_button;
+    ScreenNameType screen_name_type;
     ScreenData screen_data;
     ModalData modal_data;
     string alert_data;
@@ -197,7 +216,7 @@ enum Action {
     "SelectSeed",
     "SelectKey",
     "NewKey",
-    "RightButton",
+    "RightButtonAction",
     "Shield",
     "NewSeed",
     "RecoverSeed",
@@ -285,11 +304,9 @@ dictionary MSettings {
 
 dictionary MLog {
     sequence<History> log;
-    u32 total_entries;
 };
 
 dictionary History {
-    u32 order;
     string timestamp;
     sequence<Event> events;
 };
@@ -380,13 +397,8 @@ dictionary MRecoverSeedPhrase {
     string seed_name;
     string user_input;
     sequence<string> guess_set;
-    sequence<SeedWord> draft;
+    sequence<string> draft;
     string? ready_seed;
-};
-
-dictionary SeedWord {
-    u32 order;
-    string content;
 };
 
 dictionary MDeriveKey {

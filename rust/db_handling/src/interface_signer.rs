@@ -21,7 +21,7 @@ use definitions::{
         Address, DerivationCheck as NavDerivationCheck, DerivationDestination, DerivationEntry,
         DerivationPack, MBackup, MDeriveKey, MKeyDetails, MKeysCard, MMMNetwork, MMManageNetworks,
         MMNetwork, MMetadataRecord, MNetworkDetails, MNetworkMenu, MNewSeedBackup, MRawKey,
-        MSeedKeyCard, MTypesInfo, MVerifier, Network, SeedNameCard, SeedWord,
+        MSeedKeyCard, MTypesInfo, MVerifier, Network, SeedNameCard,
     },
     network_specs::{NetworkSpecs, ValidCurrentVerifier},
     print::export_plain_vector,
@@ -763,21 +763,14 @@ impl SeedDraft {
         out
     }
 
-    pub fn draft(&self) -> Vec<SeedWord> {
-        self.saved
-            .iter()
-            .enumerate()
-            .map(|(order, w)| SeedWord {
-                order: order as u32,
-                content: w.word().to_string(),
-            })
-            .collect()
+    pub fn draft(&self) -> Vec<String> {
+        self.saved.iter().map(|w| w.word().to_string()).collect()
     }
 
     /// Combines all draft elements into seed phrase proposal,
     /// and checks its validity.
     /// If valid, outputs secret seed phrase.
-    pub fn try_finalize(&self) -> Option<Vec<SeedWord>> {
+    pub fn try_finalize(&self) -> Option<Vec<String>> {
         let mut seed_phrase_proposal = String::with_capacity((WORD_LENGTH + 1) * BIP_CAP);
         for (i, x) in self.saved.iter().enumerate() {
             if i > 0 {
@@ -789,11 +782,7 @@ impl SeedDraft {
             Some(
                 seed_phrase_proposal
                     .split_whitespace()
-                    .enumerate()
-                    .map(|(order, content)| SeedWord {
-                        order: order as u32,
-                        content: content.to_string(),
-                    })
+                    .map(|content| content.to_string())
                     .collect(),
             )
         } else {

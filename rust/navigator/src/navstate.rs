@@ -2,11 +2,11 @@
 
 use db_handling::manage_history::get_history_entry_by_order;
 use definitions::navigation::{
-    ActionResult, History, MEnterPassword, MKeyDetailsMulti, MKeys, MLog, MLogDetails,
-    MManageNetworks, MNetworkCard, MNewSeed, MPasswordConfirm, MRecoverSeedName,
+    ActionResult, FooterButton, History, MEnterPassword, MKeyDetailsMulti, MKeys, MLog,
+    MLogDetails, MManageNetworks, MNetworkCard, MNewSeed, MPasswordConfirm, MRecoverSeedName,
     MRecoverSeedPhrase, MSCAuthor, MSCContent, MSeedMenu, MSeeds, MSettings, MSignSufficientCrypto,
-    MSignatureReady, MSufficientCryptoReady, MTransaction, ModalData, ScreenData,
-    TransactionNetworkInfo, TransactionType,
+    MSignatureReady, MSufficientCryptoReady, MTransaction, ModalData, RightButton, ScreenData,
+    ScreenNameType, TransactionNetworkInfo, TransactionType,
 };
 use sp_runtime::MultiSigner;
 use transaction_parsing::TransactionAction;
@@ -1461,7 +1461,7 @@ impl State {
                 Action::SelectSeed => self.handle_select_seed(dbname, details_str),
                 Action::SelectKey => self.handle_select_key(dbname, details_str),
                 Action::NewKey => self.handle_new_key(details_str),
-                Action::RightButton => self.handle_right_button(),
+                Action::RightButtonAction => self.handle_right_button(),
                 Action::Shield => self.handle_shield(),
                 Action::NewSeed => self.handle_new_seed(),
                 Action::RecoverSeed => self.handle_recover_seed(),
@@ -1507,14 +1507,12 @@ impl State {
                     let history = db_handling::manage_history::get_history(dbname).unwrap();
                     let log: Vec<_> = history
                         .into_iter()
-                        .map(|(order, entry)| History {
-                            order: order.stamp(),
+                        .map(|(_, entry)| History {
                             timestamp: entry.timestamp,
                             events: entry.events,
                         })
                         .collect();
-                    let total_entries = log.len() as u32;
-                    let f = MLog { log, total_entries };
+                    let f = MLog { log };
 
                     ScreenData::Log { f }
                 }
@@ -1657,12 +1655,9 @@ impl State {
                     out.push_str(&seed_draft_print);
                     seed_draft_print.zeroize();
 
-                    let ready_seed = draft.try_finalize().map(|a| {
-                        a.into_iter()
-                            .map(|word| word.content)
-                            .collect::<Vec<_>>()
-                            .join(" ")
-                    });
+                    let ready_seed = draft
+                        .try_finalize()
+                        .map(|a| a.into_iter().collect::<Vec<_>>().join(" "));
                     let draft = draft.draft();
 
                     let f = MRecoverSeedPhrase {
@@ -1909,15 +1904,12 @@ impl State {
             self.navstate = new_navstate;
 
             let action_result = ActionResult {
-                screen: self.navstate.screen.get_name(),
                 screen_label: self.get_screen_label(),
                 back: self.navstate.screen.has_back(),
                 footer: self.get_footer(),
                 footer_button: self.get_active_navbutton(),
                 right_button: self.get_right_button(),
                 screen_name_type: self.get_screen_name_type(),
-                modal: self.navstate.modal.get_name(),
-                alert: self.navstate.alert.get_name(),
                 screen_data,
                 modal_data,
                 alert_data: format!("{{{}}}", alert_details),
@@ -1936,23 +1928,6 @@ impl State {
         } else {
             modal
         }
-    }
-
-    ///This converts state into renderable block
-    //TODO: clean this up
-    pub fn generate_json(&self, details: &str) -> String {
-        let mut output = String::from("{");
-        let screen = self.navstate.screen.to_owned();
-        let modal = self.navstate.modal.to_owned();
-        let alert = self.navstate.alert;
-        if let Some(screen_name) = screen.get_name() {
-            output.push_str(&format!("\"screen\":\"{}\",\"screenLabel\":\"{}\",\"back\":{},\"footer\":{},\"footerButton\":\"{}\",\"rightButton\":\"{}\",\"screenNameType\":\"{}\",", screen_name, self.get_screen_label(), screen.has_back(), self.get_footer(), self.get_active_navbutton(), self.get_right_button(), self.get_screen_name_type()));
-        }
-        output.push_str(&format!("\"modal\":\"{}\",", modal.get_name()));
-        output.push_str(&format!("\"alert\":\"{}\",", alert.get_name()));
-        output.push_str(details);
-        output.push('}');
-        output
     }
 
     ///Generate screen label taking into account state
@@ -1995,92 +1970,86 @@ impl State {
     }
 
     ///Decide which footer button should shine
-    fn get_active_navbutton(&self) -> String {
+    fn get_active_navbutton(&self) -> Option<FooterButton> {
         match self.navstate.screen {
-            Screen::Log => "Log",
-            Screen::LogDetails(_) => "Log",
-            Screen::Scan => "Scan",
-            Screen::Transaction(_) => "Scan",
-            Screen::SeedSelector => "Keys",
-            Screen::Keys(_) => "Keys",
-            Screen::KeyDetails(_) => "Keys",
-            Screen::KeyDetailsMulti(_) => "Keys",
-            Screen::NewSeed => "Keys",
-            Screen::RecoverSeedName(_) => "Keys",
-            Screen::RecoverSeedPhrase(_) => "Keys",
-            Screen::DeriveKey(_) => "Keys",
-            Screen::Settings => "Settings",
-            Screen::Verifier => "Settings",
-            Screen::ManageNetworks => "Settings",
-            Screen::NetworkDetails(_) => "Settings",
-            Screen::SelectSeedForBackup => "Settings",
-            Screen::SignSufficientCrypto(_) => "Settings",
-            Screen::Documents => "Settings",
-            Screen::Nowhere => "None",
+            Screen::Log | Screen::LogDetails(_) => Some(FooterButton::Log),
+            Screen::Scan | Screen::Transaction(_) => Some(FooterButton::Scan),
+            Screen::SeedSelector
+            | Screen::Keys(_)
+            | Screen::KeyDetails(_)
+            | Screen::KeyDetailsMulti(_)
+            | Screen::NewSeed
+            | Screen::RecoverSeedName(_)
+            | Screen::RecoverSeedPhrase(_)
+            | Screen::DeriveKey(_) => Some(FooterButton::Keys),
+            Screen::Settings
+            | Screen::Verifier
+            | Screen::ManageNetworks
+            | Screen::NetworkDetails(_)
+            | Screen::SelectSeedForBackup
+            | Screen::SignSufficientCrypto(_)
+            | Screen::Documents => Some(FooterButton::Settings),
+            Screen::Nowhere => None,
         }
-        .to_string()
     }
 
     ///Should header have some button on the right?
-    fn get_right_button(&self) -> String {
+    fn get_right_button(&self) -> Option<RightButton> {
         match self.navstate.screen {
-            Screen::Log => "LogRight",
-            Screen::LogDetails(_) => "None",
-            Screen::Scan => "None",
-            Screen::Transaction(_) => "None",
-            Screen::SeedSelector => "NewSeed",
+            Screen::Log => Some(RightButton::LogRight),
+            Screen::SeedSelector => Some(RightButton::NewSeed),
             Screen::Keys(ref keys_state) => {
                 if let Modal::Backup(_) = self.navstate.modal {
-                    "None"
+                    None
                 } else if keys_state.is_multiselect() {
-                    "MultiSelect"
+                    Some(RightButton::MultiSelect)
                 } else {
-                    "Backup"
+                    Some(RightButton::Backup)
                 }
             }
-            Screen::KeyDetails(_) => "KeyMenu",
-            Screen::KeyDetailsMulti(_) => "KeyMenu",
-            Screen::NewSeed => "None",
-            Screen::RecoverSeedName(_) => "None",
-            Screen::RecoverSeedPhrase(_) => "None",
-            Screen::DeriveKey(_) => "None",
-            Screen::Settings => "None",
-            Screen::Verifier => "None",
-            Screen::ManageNetworks => "TypesInfo",
-            Screen::NetworkDetails(_) => "NDMenu",
-            Screen::SelectSeedForBackup => "Backup",
-            Screen::SignSufficientCrypto(_) => "None",
-            Screen::Documents => "None",
-            Screen::Nowhere => "None",
+            Screen::KeyDetails(_) | Screen::KeyDetailsMulti(_) => Some(RightButton::KeyMenu),
+            Screen::NewSeed
+            | Screen::RecoverSeedName(_)
+            | Screen::RecoverSeedPhrase(_)
+            | Screen::DeriveKey(_)
+            | Screen::Settings
+            | Screen::LogDetails(_)
+            | Screen::Scan
+            | Screen::Transaction(_)
+            | Screen::Documents
+            | Screen::Nowhere
+            | Screen::Verifier
+            | Screen::SignSufficientCrypto(_) => None,
+            Screen::ManageNetworks => Some(RightButton::TypesInfo),
+            Screen::NetworkDetails(_) => Some(RightButton::NDMenu),
+            Screen::SelectSeedForBackup => Some(RightButton::Backup),
         }
-        .to_string()
     }
 
     ///Determine whether screen name should be h1 or h4
-    fn get_screen_name_type(&self) -> String {
+    fn get_screen_name_type(&self) -> ScreenNameType {
         match self.navstate.screen {
-            Screen::Log => "h4",
-            Screen::LogDetails(_) => "h4",
-            Screen::Scan => "h1",
-            Screen::Transaction(_) => "h1",
-            Screen::SeedSelector => "h1",
-            Screen::Keys(_) => "h4",
-            Screen::KeyDetails(_) => "h4",
-            Screen::KeyDetailsMulti(_) => "h4",
-            Screen::NewSeed => "h1",
-            Screen::RecoverSeedName(_) => "h1",
-            Screen::RecoverSeedPhrase(_) => "h1",
-            Screen::DeriveKey(_) => "h1",
-            Screen::Settings => "h4",
-            Screen::Verifier => "h4",
-            Screen::ManageNetworks => "h4",
-            Screen::NetworkDetails(_) => "h4",
-            Screen::SelectSeedForBackup => "h4",
-            Screen::SignSufficientCrypto(_) => "h1",
-            Screen::Documents => "h4",
-            Screen::Nowhere => "h4",
+            Screen::Log
+            | Screen::LogDetails(_)
+            | Screen::Keys(_)
+            | Screen::KeyDetails(_)
+            | Screen::KeyDetailsMulti(_)
+            | Screen::Settings
+            | Screen::Verifier
+            | Screen::ManageNetworks
+            | Screen::NetworkDetails(_)
+            | Screen::SelectSeedForBackup
+            | Screen::Documents
+            | Screen::Nowhere => ScreenNameType::H4,
+            Screen::NewSeed
+            | Screen::RecoverSeedName(_)
+            | Screen::RecoverSeedPhrase(_)
+            | Screen::DeriveKey(_)
+            | Screen::Scan
+            | Screen::Transaction(_)
+            | Screen::SeedSelector
+            | Screen::SignSufficientCrypto(_) => ScreenNameType::H1,
         }
-        .to_string()
     }
 
     fn correct_seed_selector(&self) -> Navstate {
