@@ -11,23 +11,20 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import io.parity.signer.components.HeaderBar
 import io.parity.signer.components.NetworkCard
-import io.parity.signer.models.SignerDataModel
-import io.parity.signer.models.pushButton
 import io.parity.signer.ui.theme.Bg000
 import io.parity.signer.ui.theme.modal
-import org.json.JSONArray
 import io.parity.signer.uniffi.Action
 import io.parity.signer.uniffi.MNetworkMenu
 
 @Composable
 fun NetworkSelector(
-	networks: MNetworkMenu,
+	modalData: MNetworkMenu,
 	button: (Action, String) -> Unit
 ) {
-	val networks = networks.networks
+	val networks = modalData.networks
 	Surface(
 		color = Color(0x00000000),
-		modifier = Modifier.clickable { button(Action.GO_BACK) }
+		modifier = Modifier.clickable { button(Action.GO_BACK, "") }
 	) {
 		Column {
 			Spacer(

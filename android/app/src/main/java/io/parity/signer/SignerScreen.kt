@@ -24,7 +24,7 @@ import io.parity.signer.uniffi.ScreenData
 @Composable
 fun ScreenSelector(
 	screenData: ScreenData,
-	alertState: State<ShieldAlert>,
+	alertState: State<ShieldAlert?>,
   progress: State<Float?>,
 	captured: State<Int?>,
 	total: State<Int?>,

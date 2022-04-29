@@ -99,7 +99,7 @@ fun SignerApp(signerDataModel: SignerDataModel) {
 						Box(modifier = Modifier.padding(innerPadding)) {
 							ScreenSelector(
 								screenData = actionResult.value?.screenData ?: ScreenData.Documents,//default fallback
-								shieldAlert = shieldAlert,
+								alertState = shieldAlert,
 								progress = progress,
 								captured = captured,
 								total = total,

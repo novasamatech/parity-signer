@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.State
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import io.parity.signer.ShieldAlert
@@ -18,7 +19,10 @@ import io.parity.signer.ui.theme.modal
 import io.parity.signer.uniffi.Action
 
 @Composable
-fun NewSeedMenu(signerDataModel: SignerDataModel) {
+fun NewSeedMenu(
+	shieldAlert: State<ShieldAlert?>,
+	button: (Action) -> Unit
+) {
 	Column {
 		Spacer(Modifier.weight(1f))
 		Surface(
@@ -32,18 +36,18 @@ fun NewSeedMenu(signerDataModel: SignerDataModel) {
 				BigButton(
 					text = "New seed",
 					action = {
-						if (signerDataModel.alertState.value == ShieldAlert.None)
-							signerDataModel.pushButton(Action.NEW_SEED)
+						if (shieldAlert.value == ShieldAlert.None)
+							button(Action.NEW_SEED)
 						else
-							signerDataModel.pushButton(Action.SHIELD)
+							button(Action.SHIELD)
 					})
 				BigButton(
 					text = "Recover seed",
 					action = {
-						if (signerDataModel.alertState.value == ShieldAlert.None)
-							signerDataModel.pushButton(Action.RECOVER_SEED)
+						if (shieldAlert.value == ShieldAlert.None)
+							button(Action.RECOVER_SEED)
 						else
-							signerDataModel.pushButton(Action.SHIELD)
+							button(Action.SHIELD)
 					},
 					isShaded = true
 				)

@@ -2,13 +2,13 @@ package io.parity.signer.models
 
 import android.util.Log
 import android.widget.Toast
-import org.json.JSONArray
+import io.parity.signer.components.SeedBoxStatus
 import io.parity.signer.uniffi.Action
 import io.parity.signer.uniffi.historySeedNameWasShown
 import io.parity.signer.uniffi.initNavigation
 import io.parity.signer.uniffi.updateSeedNames
 
-//MARK: Seed management begin
+// MARK: Seed management begin
 
 /**
  * Refresh seed names list
@@ -36,20 +36,20 @@ fun SignerDataModel.addSeed(
 	createRoots: Boolean
 ) {
 
-	//Check if seed name already exists
+	// Check if seed name already exists
 	if (seedNames.value?.contains(seedName) as Boolean) {
 		_lastError.value = "Seed with this name already exists!"
 	}
 
-	//Run standard login prompt!
+	// Run standard login prompt!
 	authentication.authenticate(activity) {
 		try {
-			//First check for seed collision
+			// First check for seed collision
 			if (sharedPreferences.all.values.contains(seedPhrase)) {
 				error("This seed phrase already exists")
 			}
 
-			//Encrypt and save seed
+			// Encrypt and save seed
 			with(sharedPreferences.edit()) {
 				putString(seedName, seedPhrase)
 				apply()
@@ -71,7 +71,10 @@ fun SignerDataModel.addSeed(
 /**
  * Fetch seed from strongbox; must be in unlocked scope
  */
-internal fun SignerDataModel.getSeed(seedName: String, backup: Boolean = false): String {
+internal fun SignerDataModel.getSeed(
+	seedName: String,
+	backup: Boolean = false
+): String {
 	return try {
 		val seedPhrase = sharedPreferences.getString(seedName, "") ?: ""
 		if (seedPhrase.isBlank()) {
@@ -89,6 +92,13 @@ internal fun SignerDataModel.getSeed(seedName: String, backup: Boolean = false):
 	}
 }
 
+/**
+ * All logic required to remove seed from memory
+ *
+ * 1. Remover encrypted storage item
+ * 2. Synchronizes list of seeds with rust
+ * 3. Calls rust remove seed logic
+ */
 fun SignerDataModel.removeSeed(seedName: String) {
 	authentication.authenticate(activity) {
 		try {
@@ -99,5 +109,30 @@ fun SignerDataModel.removeSeed(seedName: String) {
 			Log.d("remove seed error", e.toString())
 			Toast.makeText(context, e.toString(), Toast.LENGTH_SHORT).show()
 		}
+	}
+}
+
+/**
+ * All logic required to prepare seed box in seed backup screen
+ */
+fun SignerDataModel.getSeedForBackup(
+	seedName: String,
+	setSeedPhrase: (String) -> Unit,
+	setSeedBoxStatus: (SeedBoxStatus) -> Unit
+) {
+	if (alertState.value == io.parity.signer.ShieldAlert.None) {
+		authentication.authenticate(activity) {
+			val seedPhrase = getSeed(seedName, backup = true)
+			if (seedPhrase.isBlank()) {
+				setSeedPhrase("")
+				setSeedBoxStatus(SeedBoxStatus.Error)
+			} else {
+				setSeedPhrase(seedPhrase)
+				setSeedBoxStatus(SeedBoxStatus.Seed)
+			}
+		}
+	} else {
+		setSeedPhrase("")
+		setSeedBoxStatus(SeedBoxStatus.Locked)
 	}
 }

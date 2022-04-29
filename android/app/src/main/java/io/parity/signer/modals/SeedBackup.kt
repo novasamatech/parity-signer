@@ -25,12 +25,15 @@ import kotlinx.coroutines.delay
  * TODO: make sure seed phrase is cleared at all times!!!
  */
 @Composable
-fun SeedBackup(backup: MBackup, signerDataModel: SignerDataModel) {
+fun SeedBackup(
+	backup: MBackup,
+	getSeedForBackup: (String, (String) -> Unit, (SeedBoxStatus) -> Unit) -> Unit
+) {
 	val seedName = backup.seedName
 	var seedPhrase by remember { mutableStateOf("") }
 	var seedBoxStatus by remember { mutableStateOf(SeedBoxStatus.Locked) }
 	val derivations = backup.derivations.sortedBy { it.networkOrder }
-	val time = remember { mutableStateOf(60000L) } //Countdown time
+	val time = remember { mutableStateOf(60000L) } // Countdown time in ms
 
 	Surface(
 		color = MaterialTheme.colors.Bg200,
@@ -132,20 +135,7 @@ fun SeedBackup(backup: MBackup, signerDataModel: SignerDataModel) {
 	}
 
 	DisposableEffect(Unit) {
-		if (signerDataModel.alertState.value == io.parity.signer.ShieldAlert.None) {
-			signerDataModel.authentication.authenticate(signerDataModel.activity) {
-				seedPhrase = signerDataModel.getSeed(seedName, backup = true)
-				if (seedPhrase.isBlank()) {
-					seedPhrase = ""
-					seedBoxStatus = SeedBoxStatus.Error
-				} else {
-					seedBoxStatus = SeedBoxStatus.Seed
-				}
-			}
-		} else {
-			seedPhrase = ""
-			seedBoxStatus = SeedBoxStatus.Locked
-		}
+		getSeedForBackup(seedName, {seedPhrase = it}, { seedBoxStatus = it })
 		onDispose { seedPhrase = "" }
 	}
 }

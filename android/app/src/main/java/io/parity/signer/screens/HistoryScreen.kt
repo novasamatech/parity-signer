@@ -15,25 +15,26 @@ import io.parity.signer.uniffi.Action
 import io.parity.signer.uniffi.MLog
 
 @Composable
-fun HistoryScreen(mLog: MLog, signerDataModel: SignerDataModel) {
-	val history = mLog.log.sortedBy {
-		it.order
-	}?.reversed()
+fun HistoryScreen(
+	mLog: MLog,
+	button: (action: Action, details: String) -> Unit
+) {
+	val history = mLog.log // TODO: check maybe .reversed()
 
 	Column {
 		LazyColumn {
-			for (record in history) {
-				val order = record.order
+			for (order in 0 .. history.count()) {
+				val record = history[order]
 				val timestamp = record.timestamp
 
 				this.items(
 					items = record.events,
-					key = { record.order.toString() + it.toString() }
+					key = { order.toString() + it.toString() }
 				) { item ->
 					Row(Modifier.clickable {
-						signerDataModel.pushButton(
+						button(
 							Action.SHOW_LOG_DETAILS,
-							details = record.order.toString()
+							order.toString()
 						)
 					}) {
 						HistoryCard(
