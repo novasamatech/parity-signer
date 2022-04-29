@@ -5,7 +5,7 @@ use definitions::{
     crypto::Encryption,
     error::ErrorSource,
     error_signer::{ErrorSigner, Signer},
-    helpers::{make_identicon_from_multisigner, print_multisigner_as_base58},
+    helpers::{make_identicon_from_multisigner, pic_meta, print_multisigner_as_base58},
     history::MetaValuesDisplay,
     keyring::VerifierKey,
     navigation::{
@@ -247,17 +247,19 @@ impl<'a> Card<'a> {
                     specname: x.name.clone(),
                     spec_version: x.version.to_string(),
                     meta_hash: hex::encode(&x.meta_hash),
-                    meta_id_pic: "".to_string(),
+                    meta_id_pic: hex::encode(pic_meta(&x.meta_hash)),
                 },
             },
-            Card::TypesInfo(_x) => NavCard::TypesInfoCard {
-                // TODO
-                f: MTypesInfo {
-                    types_on_file: false,
-                    types_hash: None,
-                    types_id_pic: None,
-                },
-            },
+            Card::TypesInfo(x) => {
+                let (types_hash, types_id_pic) = x.show();
+                NavCard::TypesInfoCard {
+                    f: MTypesInfo {
+                        types_on_file: false,
+                        types_hash: Some(types_hash),
+                        types_id_pic: Some(types_id_pic),
+                    },
+                }
+            }
             Card::NewSpecs(x) => NavCard::NewSpecsCard { f: (*x).clone() },
             Card::NetworkInfo(x) => NavCard::NetworkInfoCard {
                 f: MSCNetworkInfo {

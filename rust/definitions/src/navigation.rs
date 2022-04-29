@@ -50,17 +50,39 @@ pub enum StubNav {
     LoadTypes,
 }
 
+#[derive(PartialEq, Debug, Clone)]
+pub enum FooterButton {
+    Log,
+    Scan,
+    Keys,
+    Settings,
+}
+
+#[derive(PartialEq, Debug, Clone)]
+pub enum RightButton {
+    LogRight,
+    NewSeed,
+    Backup,
+    MultiSelect,
+    NDMenu,
+    TypesInfo,
+    KeyMenu,
+}
+
+#[derive(PartialEq, Debug, Clone)]
+pub enum ScreenNameType {
+    H1,
+    H4,
+}
+
 #[derive(Clone, Debug, PartialEq)]
 pub struct ActionResult {
-    pub screen: Option<String>,
     pub screen_label: String,
     pub back: bool,
     pub footer: bool,
-    pub footer_button: String,
-    pub right_button: String,
-    pub screen_name_type: String,
-    pub modal: String,
-    pub alert: String,
+    pub footer_button: Option<FooterButton>,
+    pub right_button: Option<RightButton>,
+    pub screen_name_type: ScreenNameType,
     pub screen_data: ScreenData,
     pub modal_data: ModalData,
     pub alert_data: String,
@@ -68,7 +90,6 @@ pub struct ActionResult {
 
 #[derive(Clone, PartialEq)]
 pub struct LogScreenEntry {
-    pub order: u32,
     pub timestamp: String,
     pub events: Vec<Event>,
 }
@@ -145,7 +166,7 @@ pub struct MKeys {
     pub multiselect_count: String,
 }
 
-#[derive(Clone, Debug, PartialEq)]
+#[derive(Clone, Default, Debug, PartialEq)]
 pub struct MSettings {
     pub public_key: Option<String>,
     pub identicon: Option<String>,
@@ -155,7 +176,6 @@ pub struct MSettings {
 
 #[derive(Clone, Debug, PartialEq)]
 pub struct History {
-    pub order: u32,
     pub timestamp: String,
     pub events: Vec<Event>,
 }
@@ -163,7 +183,6 @@ pub struct History {
 #[derive(Clone, Debug, PartialEq)]
 pub struct MLog {
     pub log: Vec<History>,
-    pub total_entries: u32,
 }
 
 #[derive(Clone, Debug, PartialEq)]
@@ -236,7 +255,7 @@ pub struct MSeeds {
     pub seed_name_cards: Vec<SeedNameCard>,
 }
 
-#[derive(Clone, Debug, PartialEq)]
+#[derive(Clone, Default, Debug, PartialEq)]
 pub struct MKeyDetails {
     pub qr: String,
     pub pubkey: String,
@@ -265,14 +284,8 @@ pub struct MRecoverSeedPhrase {
     pub seed_name: String,
     pub user_input: String,
     pub guess_set: Vec<String>,
-    pub draft: Vec<SeedWord>,
+    pub draft: Vec<String>,
     pub ready_seed: Option<String>,
-}
-
-#[derive(Clone, Debug, PartialEq)]
-pub struct SeedWord {
-    pub order: u32,
-    pub content: String,
 }
 
 #[derive(Clone, Default, Debug, PartialEq)]
@@ -531,7 +544,7 @@ pub enum ModalData {
     ManageMetadata,
     KeyDetailsAction,
     LogComment,
-    SelectSeed,
+    SelectSeed { f: MSeeds },
 }
 
 #[derive(Clone, Debug, PartialEq)]

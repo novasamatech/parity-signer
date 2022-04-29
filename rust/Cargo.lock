@@ -1817,6 +1817,7 @@ dependencies = [
  "lazy_static",
  "log",
  "parser",
+ "pretty_assertions",
  "quircs",
  "regex",
  "sp-core",
