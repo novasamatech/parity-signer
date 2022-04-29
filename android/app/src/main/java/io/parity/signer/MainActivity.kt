@@ -16,7 +16,6 @@ import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.halilibo.richtext.ui.material.SetupMaterialRichText
 import io.parity.signer.components.BigButton
 import io.parity.signer.components.BottomBar
 import io.parity.signer.components.TopBar
@@ -37,7 +36,7 @@ class MainActivity : AppCompatActivity() {
 	init {
 		initLogging("SIGNER_RUST_LOG")
 	}
-	//rust library is initialized inside data model
+	// rust library is initialized inside data model
 	private val signerDataModel by viewModels<SignerDataModel>()
 
 	override fun onCreate(savedInstanceState: Bundle?) {
@@ -63,48 +62,48 @@ fun SignerApp(signerDataModel: SignerDataModel) {
 	ParitySignerTheme {
 		val onBoardingDone = signerDataModel.onBoardingDone.observeAsState()
 		val authenticated = signerDataModel.authenticated.observeAsState()
-		val signerAlert = signerDataModel.alert.observeAsState()
+		val actionResult = signerDataModel.actionResult.observeAsState()
 		val shieldAlert = signerDataModel.alertState.observeAsState()
-		val footer = signerDataModel.footer.observeAsState()
 
 		when (onBoardingDone.value) {
 			OnBoardingState.Yes -> {
 				if (authenticated.value == true) {
 					BackHandler {
-						//TODO: implement this in backend
+						// TODO: implement this in backend
 						if (
-							signerDataModel.alert.value == SignerAlert.Empty
-							&&
-							signerDataModel.modalData.value is ModalData.Text
-							&&
+							actionResult.value?.alertData is AlertData.Empty && //no alert state
+							actionResult.value?.modalData is ModalData.Text &&
 							(
-								signerDataModel.screenData.value is ScreenData.Log ||
-									signerDataModel.screenData.value is ScreenData.Scan ||
-									signerDataModel.screenData.value is ScreenData.SeedSelector ||
-									signerDataModel.screenData.value is ScreenData.Settings
+								actionResult.value?.screenData is ScreenData.Log ||
+									actionResult.value?.screenData is ScreenData.Scan ||
+									actionResult.value?.screenData is ScreenData.SeedSelector ||
+									actionResult.value?.screenData is ScreenData.Settings
 								)
 						) {
 							signerDataModel.activity.moveTaskToBack(true)
 						} else
 							signerDataModel.pushButton(Action.GO_BACK)
 					}
-					//Structure to contain all app
+					// Structure to contain all app
 					Scaffold(
 						topBar = {
 							TopBar(signerDataModel = signerDataModel)
 						},
 						bottomBar = {
-							if (footer.value == true) BottomBar(signerDataModel = signerDataModel)
+							if (actionResult.value?.footer == true) BottomBar(signerDataModel = signerDataModel)
 						}
 					) { innerPadding ->
 						Box(modifier = Modifier.padding(innerPadding)) {
-							ScreenSelector(signerDataModel)
+							ScreenSelector(
+								screenData = actionResult.value?.screenData ?: ,//default fallback
+								signerDataModel = signerDataModel
+							)
 							ModalSelector(
-								liveModal = signerDataModel.modalData,
+								modalData = actionResult.value?.modalData ?: ,//default fallback
 								signerDataModel = signerDataModel
 							)
 							AlertSelector(
-								alert = signerAlert.value ?: SignerAlert.Empty,
+								alert = actionResult.value?.alertData,
 								signerDataModel = signerDataModel
 							)
 						}
@@ -118,7 +117,8 @@ fun SignerApp(signerDataModel: SignerDataModel) {
 								signerDataModel.authentication.authenticate(signerDataModel.activity) {
 									signerDataModel.totalRefresh()
 								}
-							})
+							}
+						)
 						Spacer(Modifier.weight(0.5f))
 					}
 				}
@@ -150,7 +150,8 @@ fun SignerApp(signerDataModel: SignerDataModel) {
 							text = "Unlock app",
 							action = {
 								signerDataModel.lateInit()
-							})
+							}
+						)
 						Spacer(Modifier.weight(0.5f))
 					}
 				}

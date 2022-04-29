@@ -19,54 +19,49 @@ import io.parity.signer.screens.*
 import io.parity.signer.uniffi.ModalData
 import io.parity.signer.uniffi.ScreenData
 
-@ExperimentalAnimationApi
-@ExperimentalMaterialApi
 @Composable
-fun ScreenSelector(signerDataModel: SignerDataModel) {
-	val screenData by signerDataModel.screenData.observeAsState()
+fun ScreenSelector(screenData: ScreenData, signerDataModel: SignerDataModel) {
 	val alertState by signerDataModel.alertState.observeAsState()
-	val sd = screenData
-	Log.w("SSSS", "$sd")
-	when (sd) {
+	when (screenData) {
 		is ScreenData.DeriveKey -> NewAddressScreen(
-			sd.f,
+			screenData.f,
 			signerDataModel = signerDataModel,
 			increment = false
 		)
 		ScreenData.Documents -> Documents()
-		is ScreenData.KeyDetails -> ExportPublicKey(sd.f)
+		is ScreenData.KeyDetails -> ExportPublicKey(screenData.f)
 		is ScreenData.KeyDetailsMulti -> KeyDetailsMulti(
-			sd.f,
+			screenData.f,
 			signerDataModel = signerDataModel
 		)
 		is ScreenData.Keys -> KeyManager(
 			signerDataModel::pushButton,
 			signerDataModel::increment,
-			sd.f,
+			screenData.f,
 			alertState
 		)
-		is ScreenData.Log -> HistoryScreen(sd.f, signerDataModel = signerDataModel)
-		is ScreenData.LogDetails -> LogDetails(sd.f)
+		is ScreenData.Log -> HistoryScreen(screenData.f, signerDataModel = signerDataModel)
+		is ScreenData.LogDetails -> LogDetails(screenData.f)
 		is ScreenData.ManageNetworks -> ManageNetworks(
-			sd.f,
+			screenData.f,
 			signerDataModel = signerDataModel
 		)
 		is ScreenData.NNetworkDetails -> NetworkDetails(
-			sd.f,
+			screenData.f,
 			signerDataModel = signerDataModel
 		)
 		is ScreenData.NewSeed -> NewSeedScreen(
-			sd.f,
+			screenData.f,
 			signerDataModel::pushButton,
 			signerDataModel = signerDataModel
 		)
 		is ScreenData.RecoverSeedName -> RecoverSeedName(
-			sd.f,
+			screenData.f,
 			signerDataModel::pushButton,
 			signerDataModel = signerDataModel
 		)
 		is ScreenData.RecoverSeedPhrase -> RecoverSeedPhrase(
-			sd.f,
+			screenData.f,
 			signerDataModel::pushButton,
 			signerDataModel = signerDataModel
 		)
@@ -74,93 +69,80 @@ fun ScreenSelector(signerDataModel: SignerDataModel) {
 			signerDataModel = signerDataModel
 		)
 		is ScreenData.SeedSelector -> SeedManager(
-			sd.f,
+			screenData.f,
 			signerDataModel = signerDataModel
 		)
 		is ScreenData.SelectSeedForBackup -> SelectSeedForBackup(
-			sd.f,
+			screenData.f,
 			signerDataModel = signerDataModel
 		)
 		is ScreenData.Settings -> SettingsScreen(
-			sd.f,
+			screenData.f,
 			signerDataModel = signerDataModel
 		)
 		is ScreenData.SignSufficientCrypto -> SignSufficientCrypto(
-			sd.f,
+			screenData.f,
 			signerDataModel = signerDataModel
 		)
 		is ScreenData.Transaction -> TransactionPreview(
-			sd.f,
+			screenData.f,
 			signerDataModel::pushButton,
 			signerDataModel = signerDataModel
 		)
-		is ScreenData.VVerifier -> VerifierScreen(sd.f, signerDataModel)
-		null -> WaitingScreen()
+		is ScreenData.VVerifier -> VerifierScreen(screenData.f, signerDataModel)
 	}
 }
 
 @Composable
-fun ModalSelector(liveModal: LiveData<ModalData>, signerDataModel: SignerDataModel) {
-	val modalState by liveModal.observeAsState()
-
-	val modal = modalState
-	Log.w("SIGNER_RUST_LOG", ">>> $modal")
-
-	when (modal) {
+fun ModalSelector(modalData: ModalData, signerDataModel: SignerDataModel) {
+	when (modalData) {
 		is ModalData.Text -> {}
 		is ModalData.NewSeedMenu -> NewSeedMenu(signerDataModel = signerDataModel)
 		is ModalData.SeedMenu -> SeedMenu(
-			modal.f,
+			modalData.f,
 			signerDataModel = signerDataModel
 		)
 		is ModalData.NetworkSelector -> NetworkSelector(
-			modal.f,
+			modalData.f,
 			signerDataModel = signerDataModel
 		)
 		is ModalData.Backup -> SeedBackup(
-			modal.f,
+			modalData.f,
 			signerDataModel = signerDataModel
 		)
 		is ModalData.PasswordConfirm -> PasswordConfirm(
-			modal.f,
+			modalData.f,
 			signerDataModel = signerDataModel
 		)
 		is ModalData.SignatureReady -> SignatureReady(
-			modal.f,
+			modalData.f,
 			signerDataModel = signerDataModel
 		)
 		is ModalData.EnterPassword -> EnterPassword(
-			modal.f,
+			modalData.f,
 			signerDataModel = signerDataModel
 		)
-		is ModalData.LogRight -> LogMenu(modal.f, signerDataModel = signerDataModel)
+		is ModalData.LogRight -> LogMenu(modalData.f, signerDataModel = signerDataModel)
 		is ModalData.NetworkDetailsMenu -> NetworkDetailsMenu(signerDataModel = signerDataModel)
 		is ModalData.ManageMetadata -> {
-			val screenData = signerDataModel.screenData.value
-			if (screenData is ScreenData.NNetworkDetails) {
-				ManageMetadata(screenData.f, signerDataModel = signerDataModel)
-			}
+				ManageMetadata(modalData.f, signerDataModel = signerDataModel)
 		}
 		is ModalData.SufficientCryptoReady -> SufficientCryptoReady(
-			modal.f,
+			modalData.f,
 			signerDataModel = signerDataModel
 		)
 		is ModalData.KeyDetailsAction -> KeyDetailsAction(signerDataModel = signerDataModel)
 		is ModalData.TypesInfo -> TypesInfo(
-			modal.f,
+			modalData.f,
 			signerDataModel = signerDataModel
 		)
 		is ModalData.NewSeedBackup -> NewSeedBackup(
-			modal.f,
+			modalData.f,
 			signerDataModel = signerDataModel
 		)
 		is ModalData.LogComment -> LogComment(signerDataModel = signerDataModel)
 		is ModalData.SelectSeed -> {
-			val screenData = signerDataModel.screenData.value
-
-			if (screenData is ScreenData.SeedSelector) {
-				SelectSeed(screenData.f, signerDataModel = signerDataModel)
-			}
+			SelectSeed(modalData.f, signerDataModel = signerDataModel)
 		}
 		is ModalData.ManageNetworks -> {}
 	}
@@ -178,13 +160,6 @@ fun AlertSelector(alert: SignerAlert, signerDataModel: SignerDataModel) {
 		SignerAlert.Shield -> ShieldAlert(signerDataModel)
 		SignerAlert.Confirm -> Confirm(signerDataModel = signerDataModel)
 	}
-}
-
-enum class SignerAlert {
-	Empty,
-	Error,
-	Shield,
-	Confirm;
 }
 
 enum class OnBoardingState {
