@@ -380,8 +380,8 @@ fn flow_test_1() {
                 seed_name_cards: vec![],
             },
         },
-        modal_data: ModalData::NewSeedMenu,
-        alert_data: "{}".to_string(),
+        modal_data: Some(ModalData::NewSeedMenu),
+        alert_data: None,
     };
     assert_eq!(action, expected_action);
 
@@ -417,10 +417,8 @@ fn flow_test_1() {
                 }],
             },
         },
-        modal_data: ModalData::Text {
-            f: "Empty".to_string(),
-        },
-        alert_data: "{}".to_string(),
+        modal_data: None,
+        alert_data: None,
     };
 
     assert_eq!(action, expected_action);
@@ -446,7 +444,9 @@ fn flow_test_1() {
 
     let mut action = do_action(Action::RightButtonAction, "", "").unwrap();
     erase_log_timestamps(&mut action.screen_data);
-    erase_modal_data_checksum(&mut action.modal_data);
+    if let Some(ref mut m) = action.modal_data {
+        erase_modal_data_checksum(m);
+    }
 
     let expected_action = ActionResult {
         screen_label: String::new(),
@@ -472,12 +472,12 @@ fn flow_test_1() {
                 }],
             },
         },
-        modal_data: ModalData::LogRight {
+        modal_data: Some(ModalData::LogRight {
             f: MLogRight {
                 checksum: String::new(),
             },
-        },
-        alert_data: "{}".to_string(),
+        }),
+        alert_data: None,
     };
 
     assert_eq!(
@@ -521,8 +521,8 @@ fn flow_test_1() {
                 }],
             },
         },
-        modal_data: ModalData::LogComment,
-        alert_data: "{}".to_string(),
+        modal_data: Some(ModalData::LogComment),
+        alert_data: None,
     };
 
     assert_eq!(action, expected_action,
@@ -572,10 +572,8 @@ fn flow_test_1() {
                 ],
             },
         },
-        modal_data: ModalData::Text {
-            f: "Empty".to_string(),
-        },
-        alert_data: "{}".to_string(),
+        modal_data: None,
+        alert_data: None,
     };
 
     assert_eq!(action, expected_action, "GoForward on Log screen with LogComment modal. Expected updated Log screen with no modals.");
@@ -583,7 +581,7 @@ fn flow_test_1() {
     let mut action = do_action(Action::Shield, "", "").unwrap();
     erase_log_timestamps(&mut action.screen_data);
 
-    expected_action.alert_data = "{\"shield_state\":\"unknown\"}".to_string();
+    expected_action.alert_data = Some("{\"shield_state\":\"unknown\"}".to_string());
 
     assert_eq!(
         action, expected_action,
@@ -602,7 +600,7 @@ fn flow_test_1() {
             }],
         },
     };
-    expected_action.alert_data = "{}".to_string();
+    expected_action.alert_data = None;
     let log_action = expected_action.clone();
     let empty_log = expected_action.clone();
 
@@ -630,10 +628,8 @@ fn flow_test_1() {
                 error: None,
             },
         },
-        modal_data: ModalData::Text {
-            f: "Empty".to_string(),
-        },
-        alert_data: "{}".to_string(),
+        modal_data: None,
+        alert_data: None,
     };
     assert_eq!(
         action, expected_action,
@@ -655,10 +651,8 @@ fn flow_test_1() {
                 seed_name_cards: vec![],
             },
         },
-        modal_data: ModalData::Text {
-            f: "Empty".to_string(),
-        },
-        alert_data: "{}".to_string(),
+        modal_data: None,
+        alert_data: None,
     };
 
     assert_eq!(
@@ -689,10 +683,8 @@ fn flow_test_1() {
                 encryption: "sr25519".to_string(),
             },
         },
-        modal_data: ModalData::Text {
-            f: "Empty".to_string(),
-        },
-        alert_data: "{}".to_string(),
+        modal_data: None,
+        alert_data: None,
     };
     assert_eq!(
         action, expected_action,
@@ -714,10 +706,8 @@ fn flow_test_1() {
         right_button: None,
         screen_name_type: ScreenNameType::H4,
         screen_data: ScreenData::Documents,
-        modal_data: ModalData::Text {
-            f: "Empty".to_string(),
-        },
-        alert_data: "{}".to_string(),
+        modal_data: None,
+        alert_data: None,
     };
     assert_eq!(
         action, expected_action,
@@ -766,10 +756,8 @@ fn flow_test_1() {
                 ],
             },
         },
-        modal_data: ModalData::Text {
-            f: "Empty".to_string(),
-        },
-        alert_data: "{}".to_string(),
+        modal_data: None,
+        alert_data: None,
     };
 
     assert_eq!(
@@ -832,10 +820,8 @@ fn flow_test_1() {
                 }],
             },
         },
-        modal_data: ModalData::Text {
-            f: "Empty".to_string(),
-        },
-        alert_data: "{}".to_string(),
+        modal_data: None,
+        alert_data: None,
     };
     assert_eq!(
         action, expected_action,
@@ -859,7 +845,7 @@ fn flow_test_1() {
     let action = do_action(Action::ManageMetadata, "9130", "").unwrap();
 
     let mut kusama_action_modal = kusama_action.clone();
-    kusama_action_modal.modal_data = ModalData::ManageNetworks {
+    kusama_action_modal.modal_data = Some(ModalData::ManageNetworks {
         f: MMManageNetworks {
             name: "kusama".to_string(),
             version: "9130".to_string(),
@@ -873,7 +859,7 @@ fn flow_test_1() {
                 current_on_screen: true,
             }],
         },
-    };
+    });
     assert_eq!(action, kusama_action_modal, "ManageMetadata on NetworkDetails screen for kusama sr25519 key. Expected NetworkDetails screen for kusama with ManageMetadata modal");
 
     let action = do_action(Action::SignMetadata, "", "").unwrap();
@@ -887,10 +873,8 @@ fn flow_test_1() {
         screen_data: ScreenData::SignSufficientCrypto {
             f: MSignSufficientCrypto { identities: vec![] },
         },
-        modal_data: ModalData::Text {
-            f: "Empty".to_string(),
-        },
-        alert_data: "{}".to_string(),
+        modal_data: None,
+        alert_data: None,
     };
     assert_eq!(action, expected_action, "SignMetadata on NetworkDetails screen for kusama sr25519 key with ManageMetadata modal for version 9130. Expected SignSufficientCrypto screen for kusama9130 metadata with no modals");
     let sign_sufficient_crypto_action = expected_action;
@@ -938,10 +922,8 @@ fn flow_test_1() {
                 meta: vec![],
             },
         },
-        modal_data: ModalData::Text {
-            f: "Empty".to_string(),
-        },
-        alert_data: "{}".to_string(),
+        modal_data: None,
+        alert_data: None,
     };
     assert_eq!(action, expected_action, "RemoveMetadata on ManageNetworks screen with kusama sr25519 key with ManageMetadata modal for version 9130. Expected updated NetworkDetails screen for kusama with no modals");
 
@@ -949,7 +931,7 @@ fn flow_test_1() {
 
     let action = do_action(Action::RightButtonAction, "", "").unwrap();
     let mut expected_action = kusama_action.clone();
-    expected_action.modal_data = ModalData::NetworkDetailsMenu;
+    expected_action.modal_data = Some(ModalData::NetworkDetailsMenu);
     assert_eq!(action, expected_action, "RightButton on NetworkDetails screen for kusama sr25519 key. Expected NetworkDetails screen for kusama with NetworkDetailsMenu modal");
 
     let action = do_action(Action::SignNetworkSpecs, "", "").unwrap();
@@ -963,10 +945,8 @@ fn flow_test_1() {
         screen_data: ScreenData::SignSufficientCrypto {
             f: MSignSufficientCrypto { identities: vec![] },
         },
-        modal_data: ModalData::Text {
-            f: "Empty".to_string(),
-        },
-        alert_data: "{}".to_string(),
+        modal_data: None,
+        alert_data: None,
     };
 
     assert_eq!(action, expected_action, "SignNetworkSpecs on NetworkDetails screen for kusama sr25519 key with NetworkDetailsMenu modal. Expected SignSufficientCrypto screen for kusama specs with no modals.");
@@ -1006,10 +986,8 @@ fn flow_test_1() {
                 ],
             },
         },
-        modal_data: ModalData::Text {
-            f: "Empty".to_string(),
-        },
-        alert_data: "{}".to_string(),
+        modal_data: None,
+        alert_data: None,
     };
     assert_eq!(
         action, expected_action,
@@ -1019,7 +997,7 @@ fn flow_test_1() {
     let action = do_action(Action::RightButtonAction, "", "").unwrap();
     let mut expected_action = expected_action;
     expected_action.right_button = Some(RightButton::TypesInfo);
-    expected_action.modal_data = ModalData::TypesInfo {
+    expected_action.modal_data = Some(ModalData::TypesInfo {
         f: MTypesInfo {
             types_on_file: true,
             types_hash: Some(
@@ -1027,7 +1005,7 @@ fn flow_test_1() {
             ),
             types_id_pic: Some(types_known()),
         },
-    };
+    });
 
     assert_eq!(
         action, expected_action,
@@ -1161,10 +1139,8 @@ fn flow_test_1() {
                 }],
             },
         },
-        modal_data: ModalData::Text {
-            f: "Empty".to_string(),
-        },
-        alert_data: "{}".to_string(),
+        modal_data: None,
+        alert_data: None,
     };
     assert_eq!(
         action, expected_action,
@@ -1207,10 +1183,8 @@ fn flow_test_1() {
         right_button: None,
         screen_name_type: ScreenNameType::H1,
         screen_data: ScreenData::Scan,
-        modal_data: ModalData::Text {
-            f: "Empty".to_string(),
-        },
-        alert_data: "{}".to_string(),
+        modal_data: None,
+        alert_data: None,
     };
     assert_eq!(
         action, expected_action,
@@ -1276,10 +1250,8 @@ fn flow_test_1() {
                 network_info: None,
             },
         },
-        modal_data: ModalData::Text {
-            f: "Empty".to_string(),
-        },
-        alert_data: "{}".to_string(),
+        modal_data: None,
+        alert_data: None,
     };
     assert_eq!(action, expected_action, "TransactionFetched on Scan screen with add_specs info for kusama. Expected Transaction screen with no modals");
 
@@ -1333,10 +1305,8 @@ fn flow_test_1() {
                 meta: vec![],
             },
         },
-        modal_data: ModalData::Text {
-            f: "Empty".to_string(),
-        },
-        alert_data: "{}".to_string(),
+        modal_data: None,
+        alert_data: None,
     };
 
     assert_eq!(
@@ -1379,10 +1349,8 @@ fn flow_test_1() {
                 ],
             },
         },
-        modal_data: ModalData::Text {
-            f: "Empty".to_string(),
-        },
-        alert_data: "{}".to_string(),
+        modal_data: None,
+        alert_data: None,
     };
     assert_eq!(action, expected_action, "GoBack on NetworkDetails screen after adding kusama sr25519 specs. Expected ManageNetworks screen with no modals.");
 
@@ -1491,10 +1459,8 @@ fn flow_test_1() {
                 network_info: None,
             },
         },
-        modal_data: ModalData::Text {
-            f: "Empty".to_string(),
-        },
-        alert_data: "{}".to_string(),
+        modal_data: None,
+        alert_data: None,
     };
     assert_eq!(
         action, expected_action,
@@ -1542,10 +1508,8 @@ fn flow_test_1() {
                 }],
             },
         },
-        modal_data: ModalData::Text {
-            f: "Empty".to_string(),
-        },
-        alert_data: "{}".to_string(),
+        modal_data: None,
+        alert_data: None,
     };
     assert_eq!(action, expected_action,
         "GoForward on Transaction screen with load metadata stub. Expected NetworkDetails screen for kusama sr25519, updated with new metadata, with no modals"
@@ -1670,10 +1634,8 @@ fn flow_test_1() {
                 network_info: None,
             },
         },
-        modal_data: ModalData::Text {
-            f: "Empty".to_string(),
-        },
-        alert_data: "{}".to_string(),
+        modal_data: None,
+        alert_data: None,
     };
     assert_eq!(
         action, expected_action,
@@ -1790,8 +1752,8 @@ fn flow_test_1() {
                 seed_name_cards: vec![],
             },
         },
-        modal_data: ModalData::NewSeedMenu,
-        alert_data: "{}".to_string(),
+        modal_data: Some(ModalData::NewSeedMenu),
+        alert_data: None,
     };
     assert_eq!(
         action, expected_action,
@@ -1809,10 +1771,8 @@ fn flow_test_1() {
         screen_data: ScreenData::NewSeed {
             f: MNewSeed { keyboard: true },
         },
-        modal_data: ModalData::Text {
-            f: "Empty".to_string(),
-        },
-        alert_data: "{}".to_string(),
+        modal_data: None,
+        alert_data: None,
     };
     assert_eq!(
         action, expected_action,
@@ -1839,16 +1799,18 @@ fn flow_test_1() {
         screen_data: ScreenData::NewSeed {
             f: MNewSeed { keyboard: false },
         },
-        modal_data: ModalData::NewSeedBackup {
+        modal_data: Some(ModalData::NewSeedBackup {
             f: MNewSeedBackup {
                 seed: "Portia".to_string(),
                 seed_phrase: String::new(),
                 identicon: String::new(),
             },
-        },
-        alert_data: "{}".to_string(),
+        }),
+        alert_data: None,
     };
-    erase_modal_seed_phrase_and_identicon(&mut action.modal_data);
+    if let Some(ref mut m) = action.modal_data {
+        erase_modal_seed_phrase_and_identicon(m);
+    }
     assert_eq!(
         action, expected_action,
         "GoForward on NewSeed screen with non-empty seed name. Expected NewSeed screen with NewSeedBackup modal."
@@ -1873,8 +1835,11 @@ fn flow_test_1() {
     do_action(Action::NavbarKeys, "", "").unwrap();
     do_action(Action::NewSeed, "", "").unwrap();
     let mut action = do_action(Action::GoForward, "Portia", "").unwrap();
-    let seed_phrase_portia = erase_modal_seed_phrase_and_identicon(&mut action.modal_data);
-    let expected_json = r#"{"screen":"NewSeed","screenLabel":"New Seed","back":true,"footer":false,"footerButton":"Keys","rightButton":"None","screenNameType":"h1","modal":"NewSeedBackup","alert":"Empty","screenData":{"keyboard":false},"modalData":{"seed":"Portia","seed_phrase":"**","identicon":"**"},"alertData":{}}"#;
+    let seed_phrase_portia = if let Some(ref mut m) = action.modal_data {
+        erase_modal_seed_phrase_and_identicon(m)
+    } else {
+        String::new()
+    };
     let expected_action = ActionResult {
         screen_label: "New Seed".to_string(),
         back: true,
@@ -1885,14 +1850,14 @@ fn flow_test_1() {
         screen_data: ScreenData::NewSeed {
             f: MNewSeed { keyboard: false },
         },
-        modal_data: ModalData::NewSeedBackup {
+        modal_data: Some(ModalData::NewSeedBackup {
             f: MNewSeedBackup {
                 seed: "Portia".to_string(),
                 seed_phrase: String::new(),
                 identicon: String::new(),
             },
-        },
-        alert_data: "{}".to_string(),
+        }),
+        alert_data: None,
     };
 
     assert_eq!(
@@ -1936,10 +1901,8 @@ fn flow_test_1() {
                 multiselect_count: String::new(),
             },
         },
-        modal_data: ModalData::Text {
-            f: "Empty".to_string(),
-        },
-        alert_data: "{}".to_string(),
+        modal_data: None,
+        alert_data: None,
     };
 
     assert_eq!(
@@ -1967,10 +1930,8 @@ fn flow_test_1() {
                 }],
             },
         },
-        modal_data: ModalData::Text {
-            f: "Empty".to_string(),
-        },
-        alert_data: "{}".to_string(),
+        modal_data: None,
+        alert_data: None,
     };
     assert_eq!(
         action, expected_action,
@@ -2081,10 +2042,8 @@ fn flow_test_1() {
                 ],
             },
         },
-        modal_data: ModalData::Text {
-            f: "Empty".to_string(),
-        },
-        alert_data: "{}".to_string(),
+        modal_data: None,
+        alert_data: None,
     };
     assert_eq!(action, expected_action);
 
@@ -2107,10 +2066,8 @@ fn flow_test_1() {
                 }],
             },
         },
-        modal_data: ModalData::Text {
-            f: "Empty".to_string(),
-        },
-        alert_data: "{}".to_string(),
+        modal_data: None,
+        alert_data: None,
     };
     assert_eq!(
         action, expected_action,
@@ -2133,10 +2090,8 @@ fn flow_test_1() {
                 seed_name: String::new(),
             },
         },
-        modal_data: ModalData::Text {
-            f: "Empty".to_string(),
-        },
-        alert_data: "{}".to_string(),
+        modal_data: None,
+        alert_data: None,
     };
     assert_eq!(
         action, expected_action,
@@ -2166,10 +2121,10 @@ fn flow_test_1() {
                 seed_name: String::new(),
             },
         },
-        modal_data: ModalData::Text {
-            f: "Empty".to_string(),
-        },
-        alert_data: "{\"error\":\"Bad input data. Seed name Portia already exists.\"}".to_string(),
+        modal_data: None,
+        alert_data: Some(
+            "{\"error\":\"Bad input data. Seed name Portia already exists.\"}".to_string(),
+        ),
     };
     assert_eq!(
         action, expected_action,
@@ -2204,10 +2159,8 @@ fn flow_test_1() {
                 ready_seed: None,
             },
         },
-        modal_data: ModalData::Text {
-            f: "Empty".to_string(),
-        },
-        alert_data: "{}".to_string(),
+        modal_data: None,
+        alert_data: None,
     };
     assert_eq!(
         action, expected_action,
@@ -2228,10 +2181,8 @@ fn flow_test_1() {
                 seed_name: "Alys".to_string(),
             },
         },
-        modal_data: ModalData::Text {
-            f: "Empty".to_string(),
-        },
-        alert_data: "{}".to_string(),
+        modal_data: None,
+        alert_data: None,
     };
     assert_eq!(
         action, expected_action,
@@ -2265,10 +2216,8 @@ fn flow_test_1() {
                 ready_seed: None,
             },
         },
-        modal_data: ModalData::Text {
-            f: "Empty".to_string(),
-        },
-        alert_data: "{}".to_string(),
+        modal_data: None,
+        alert_data: None,
     };
     assert_eq!(
         action, expected_action,
@@ -2297,10 +2246,8 @@ fn flow_test_1() {
                 ready_seed: None,
             },
         },
-        modal_data: ModalData::Text {
-            f: "Empty".to_string(),
-        },
-        alert_data: "{}".to_string(),
+        modal_data: None,
+        alert_data: None,
     };
 
     assert_eq!(
@@ -2338,10 +2285,8 @@ fn flow_test_1() {
                 ready_seed: None,
             },
         },
-        modal_data: ModalData::Text {
-            f: "Empty".to_string(),
-        },
-        alert_data: "{}".to_string(),
+        modal_data: None,
+        alert_data: None,
     };
 
     assert_eq!(
@@ -2379,10 +2324,8 @@ fn flow_test_1() {
                 ready_seed: None,
             },
         },
-        modal_data: ModalData::Text {
-            f: "Empty".to_string(),
-        },
-        alert_data: "{}".to_string(),
+        modal_data: None,
+        alert_data: None,
     };
 
     assert_eq!(
@@ -2420,10 +2363,8 @@ fn flow_test_1() {
                 ready_seed: None,
             },
         },
-        modal_data: ModalData::Text {
-            f: "Empty".to_string(),
-        },
-        alert_data: "{}".to_string(),
+        modal_data: None,
+        alert_data: None,
     };
 
     assert_eq!(
@@ -2464,10 +2405,8 @@ fn flow_test_1() {
                 ready_seed: None,
             },
         },
-        modal_data: ModalData::Text {
-            f: "Empty".to_string(),
-        },
-        alert_data: "{}".to_string(),
+        modal_data: None,
+        alert_data: None,
     };
 
     assert_eq!(
@@ -2515,10 +2454,8 @@ fn flow_test_1() {
                 ready_seed: None,
             },
         },
-        modal_data: ModalData::Text {
-            f: "Empty".to_string(),
-        },
-        alert_data: "{}".to_string(),
+        modal_data: None,
+        alert_data: None,
     };
 
     assert_eq!(
@@ -2553,10 +2490,8 @@ fn flow_test_1() {
                 ready_seed: None,
             },
         },
-        modal_data: ModalData::Text {
-            f: "Empty".to_string(),
-        },
-        alert_data: "{}".to_string(),
+        modal_data: None,
+        alert_data: None,
     };
 
     assert_eq!(
@@ -2610,10 +2545,8 @@ fn flow_test_1() {
                 ready_seed: None,
             },
         },
-        modal_data: ModalData::Text {
-            f: "Empty".to_string(),
-        },
-        alert_data: "{}".to_string(),
+        modal_data: None,
+        alert_data: None,
     };
 
     assert_eq!(
@@ -2672,10 +2605,8 @@ fn flow_test_1() {
                 ),
             },
         },
-        modal_data: ModalData::Text {
-            f: "Empty".to_string(),
-        },
-        alert_data: "{}".to_string(),
+        modal_data: None,
+        alert_data: None,
     };
 
     assert_eq!(
@@ -2723,10 +2654,8 @@ fn flow_test_1() {
                 multiselect_count: String::new(),
             },
         },
-        modal_data: ModalData::Text {
-            f: "Empty".to_string(),
-        },
-        alert_data: "{}".to_string(),
+        modal_data: None,
+        alert_data: None,
     };
 
     assert_eq!(
@@ -2767,10 +2696,8 @@ fn flow_test_1() {
                 ],
             },
         },
-        modal_data: ModalData::Text {
-            f: "Empty".to_string(),
-        },
-        alert_data: "{}".to_string(),
+        modal_data: None,
+        alert_data: None,
     };
 
     assert_eq!(
@@ -2814,10 +2741,8 @@ fn flow_test_1() {
                 network_logo: "polkadot".to_string(),
             },
         },
-        modal_data: ModalData::Text {
-            f: "Empty".to_string(),
-        },
-        alert_data: "{}".to_string(),
+        modal_data: None,
+        alert_data: None,
     };
     assert_eq!(
         action, expected_action,
@@ -2851,10 +2776,8 @@ fn flow_test_1() {
                 derivation_check: None,
             },
         },
-        modal_data: ModalData::Text {
-            f: "Empty".to_string(),
-        },
-        alert_data: "{}".to_string(),
+        modal_data: None,
+        alert_data: None,
     };
     assert_eq!(
         action, expected_action,
@@ -2889,14 +2812,14 @@ fn flow_test_1() {
                 derivation_check: None,
             },
         },
-        modal_data: ModalData::PasswordConfirm {
+        modal_data: Some(ModalData::PasswordConfirm {
             f: MPasswordConfirm {
                 pwd: "multipass".to_string(),
                 seed_name: "Alice".to_string(),
                 cropped_path: "//secret//path".to_string(),
             },
-        },
-        alert_data: "{}".to_string(),
+        }),
+        alert_data: None,
     };
     assert_eq!(
         action, expected_action,
@@ -2960,10 +2883,8 @@ fn flow_test_1() {
                 multiselect_count: String::new(),
             },
         },
-        modal_data: ModalData::Text {
-            f: "Empty".to_string(),
-        },
-        alert_data: "{}".to_string(),
+        modal_data: None,
+        alert_data: None,
     };
 
     assert_eq!(
@@ -3029,10 +2950,8 @@ fn flow_test_1() {
                 multiselect_count: String::new(),
             },
         },
-        modal_data: ModalData::Text {
-            f: "Empty".to_string(),
-        },
-        alert_data: "{}".to_string(),
+        modal_data: None,
+        alert_data: None,
     };
 
     assert_eq!(
@@ -3065,10 +2984,8 @@ fn flow_test_1() {
                 ],
             },
         },
-        modal_data: ModalData::Text {
-            f: "Empty".to_string(),
-        },
-        alert_data: "{}".to_string(),
+        modal_data: None,
+        alert_data: None,
     };
 
     assert_eq!(
@@ -3132,12 +3049,12 @@ fn flow_test_1() {
                 multiselect_count: String::new(),
             },
         },
-        modal_data: ModalData::SeedMenu {
+        modal_data: Some(ModalData::SeedMenu {
             f: MSeedMenu {
                 seed: "Alice".to_string(),
             },
-        },
-        alert_data: "{}".to_string(),
+        }),
+        alert_data: None,
     };
 
     assert_eq!(
@@ -3146,7 +3063,7 @@ fn flow_test_1() {
     );
 
     let action = do_action(Action::BackupSeed, "", "").unwrap();
-    expected_action.modal_data = ModalData::Backup {
+    expected_action.modal_data = Some(ModalData::Backup {
         f: MBackup {
             seed_name: "Alice".to_string(),
             derivations: vec![
@@ -3189,7 +3106,7 @@ fn flow_test_1() {
                 },
             ],
         },
-    };
+    });
     expected_action.right_button = None;
     assert_eq!(
         action, expected_action,
@@ -3297,10 +3214,8 @@ fn flow_test_1() {
                 ],
             },
         },
-        modal_data: ModalData::Text {
-            f: "Empty".to_string(),
-        },
-        alert_data: "{}".to_string(),
+        modal_data: None,
+        alert_data: None,
     };
 
     assert_eq!(
@@ -3370,10 +3285,8 @@ fn flow_test_1() {
                 }],
             },
         },
-        modal_data: ModalData::Text {
-            f: "Empty".to_string(),
-        },
-        alert_data: "{}".to_string(),
+        modal_data: None,
+        alert_data: None,
     };
     assert_eq!(
         action, expected_action,
@@ -3383,7 +3296,7 @@ fn flow_test_1() {
     do_action(Action::SelectSeed, "Alice", "").unwrap();
     let action = do_action(Action::NetworkSelector, "", "").unwrap();
     let mut expected_action = alice_polkadot_keys_action.clone();
-    expected_action.modal_data = ModalData::NetworkSelector {
+    expected_action.modal_data = Some(ModalData::NetworkSelector {
         f: MNetworkMenu {
             networks: vec![
                 Network {
@@ -3412,7 +3325,7 @@ fn flow_test_1() {
                 },
             ],
         },
-    };
+    });
 
     assert_eq!(
         action, expected_action,
@@ -3467,10 +3380,8 @@ fn flow_test_1() {
                 multiselect_count: String::new(),
             },
         },
-        modal_data: ModalData::Text {
-            f: "Empty".to_string(),
-        },
-        alert_data: "{}".to_string(),
+        modal_data: None,
+        alert_data: None,
     };
 
     assert_eq!(
@@ -3513,10 +3424,8 @@ fn flow_test_1() {
                 }),
             },
         },
-        modal_data: ModalData::Text {
-            f: "Empty".to_string(),
-        },
-        alert_data: "{}".to_string(),
+        modal_data: None,
+        alert_data: None,
     };
     assert_eq!(
         action, expected_action,
@@ -3527,14 +3436,14 @@ fn flow_test_1() {
     );
 
     let action = do_action(Action::GoForward, "", "").unwrap();
-    expected_action.modal_data = ModalData::SelectSeed {
+    expected_action.modal_data = Some(ModalData::SelectSeed {
         f: MSeeds {
             seed_name_cards: vec![SeedNameCard {
                 seed_name: "Alice".to_string(),
                 identicon: alice_sr_root(),
             }],
         },
-    };
+    });
 
     assert_eq!(
         action, expected_action,

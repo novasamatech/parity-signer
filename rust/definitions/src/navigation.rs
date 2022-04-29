@@ -84,8 +84,8 @@ pub struct ActionResult {
     pub right_button: Option<RightButton>,
     pub screen_name_type: ScreenNameType,
     pub screen_data: ScreenData,
-    pub modal_data: ModalData,
-    pub alert_data: String,
+    pub modal_data: Option<ModalData>,
+    pub alert_data: Option<String>,
 }
 
 #[derive(Clone, PartialEq)]
@@ -538,7 +538,6 @@ pub enum ModalData {
     LogRight { f: MLogRight },
     ManageNetworks { f: MMManageNetworks },
     TypesInfo { f: MTypesInfo },
-    Text { f: String },
     NewSeedMenu,
     NetworkDetailsMenu,
     ManageMetadata,

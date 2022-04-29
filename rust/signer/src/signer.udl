@@ -161,8 +161,8 @@ dictionary ActionResult {
     RightButton? right_button;
     ScreenNameType screen_name_type;
     ScreenData screen_data;
-    ModalData modal_data;
-    string alert_data;
+    ModalData? modal_data;
+    string? alert_data;
 };
 
 dictionary MetaValues {
@@ -676,7 +676,6 @@ interface ModalData {
     LogRight(MLogRight f);
     ManageNetworks(MMManageNetworks f);
     TypesInfo(MTypesInfo f);
-    Text(string f);
     NewSeedMenu();
     NetworkDetailsMenu();
     ManageMetadata();
