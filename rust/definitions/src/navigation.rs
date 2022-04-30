@@ -1,6 +1,5 @@
 use crate::{
-    crypto::Encryption, error_signer::ErrorSigner, history::Event, keyring::NetworkSpecsKey,
-    network_specs::NetworkSpecs,
+    crypto::Encryption, history::Event, keyring::NetworkSpecsKey, network_specs::NetworkSpecs,
 };
 
 pub use crate::network_specs::NetworkSpecsToSend;

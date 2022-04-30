@@ -146,13 +146,11 @@ pub fn print_identities_for_seed_name_and_network(
     swiped_key: Option<MultiSigner>,
     multiselect: Vec<MultiSigner>,
 ) -> Result<(MSeedKeyCard, Vec<MKeysCard>, String, String), ErrorSigner> {
-    log::warn!("SEED NAME {}", seed_name);
     let network_specs = get_network_specs(database_name, network_specs_key)?;
     let identities = addresses_set_seed_name_network(database_name, seed_name, network_specs_key)?;
     let mut root_id = None;
     let mut other_id: Vec<(MultiSigner, AddressDetails, Vec<u8>, bool, bool)> = Vec::new();
     for (multisigner, address_details) in identities.into_iter() {
-        println!("Details {:#?}", address_details);
         let identicon = make_identicon_from_multisigner(&multisigner);
         let base58 = print_multisigner_as_base58(&multisigner, Some(network_specs.base58prefix));
         let address_key = AddressKey::from_multisigner(&multisigner);
@@ -165,6 +163,7 @@ pub fn print_identities_for_seed_name_and_network(
         };
         let multiselect = multiselect.contains(&multisigner);
         if address_details.is_root() {
+            println!("ISROOT {}", seed_name);
             if root_id.is_some() {
                 return Err(ErrorSigner::Database(DatabaseSigner::TwoRootKeys {
                     seed_name: seed_name.to_string(),

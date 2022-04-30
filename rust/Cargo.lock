@@ -686,7 +686,6 @@ dependencies = [
  "definitions",
  "hex",
  "lazy_static",
- "log",
  "parity-scale-codec",
  "plot_icon",
  "pretty_assertions",

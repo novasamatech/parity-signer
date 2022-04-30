@@ -1835,16 +1835,15 @@ impl State {
                 },
                 Modal::SufficientCryptoReady(ref a) => match new_navstate.screen {
                     Screen::SignSufficientCrypto(ref s) => {
-                        if let Some((_, _, _author_info)) = s.key_selected() {
+                        if let Some((_, _, author_info)) = s.key_selected() {
                             let content = MSCContent {
-                                ttype: String::new(),
+                                ttype: a.to_string(),
                             };
-                            // TODO conversions here and there, again
                             let author_info = MSCAuthor {
-                                base58: String::new(),
-                                identicon: String::new(),
-                                seed: String::new(),
-                                derivation_path: String::new(),
+                                base58: author_info.base58,
+                                identicon: author_info.identicon,
+                                seed: author_info.seed,
+                                derivation_path: author_info.derivation_path,
                                 has_password: None,
                             };
                             let f = MSufficientCryptoReady {

@@ -290,8 +290,10 @@ use crate::{
     crypto::Encryption,
     error::{ErrorSource, SpecsKeySource},
     keyring::NetworkSpecsKey,
-    navigation::MVerifierDetails,
 };
+
+#[cfg(feature = "signer")]
+use crate::navigation::MVerifierDetails;
 
 /// Network parameters stored SCALE-encoded in the **cold** database
 /// `SPECSTREE` tree under [`NetworkSpecsKey`]
