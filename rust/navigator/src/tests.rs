@@ -12,31 +12,30 @@ use constants::{
         alice_sr_alice_westend, alice_sr_kusama, alice_sr_polkadot, alice_sr_root,
         alice_sr_secret_path_multipass, alice_sr_westend, alice_sr_westend_0, alice_sr_westend_1,
         alice_sr_westend_2, alice_westend_alice_qr, alice_westend_alice_secret_secret_qr,
-        alice_westend_root_qr, alice_westend_westend_qr, bob, empty_png, kusama_9130, kusama_9151,
-        types_known, westend_9150,
+        alice_westend_root_qr, alice_westend_westend_qr, bob, kusama_9130, kusama_9151,
+        types_known,
     },
     ALICE_SEED_PHRASE,
 };
 use db_handling::cold_default::{populate_cold_nav_test, signer_init};
 use definitions::{
     crypto::Encryption,
-    error_signer::Signer,
     history::{
         Event, IdentityHistory, MetaValuesDisplay, MetaValuesExport, NetworkSpecsDisplay,
         NetworkSpecsExport, SignDisplay, SignMessageDisplay, TypesDisplay, TypesExport,
     },
     navigation::{
         ActionResult, Card, DerivationEntry, DerivationPack, FooterButton, History, MBackup,
-        MDeriveKey, MKeyDetails, MKeyDetailsMulti, MKeys, MKeysCard, MLog, MLogDetails, MLogRight,
-        MMMNetwork, MMManageNetworks, MMNetwork, MManageNetworks, MMetadataRecord, MNetworkCard,
-        MNetworkDetails, MNetworkMenu, MNewSeed, MNewSeedBackup, MPasswordConfirm, MRawKey,
-        MRecoverSeedName, MRecoverSeedPhrase, MSCAuthor, MSCCall, MSCContent, MSCCurrency,
-        MSCEnumVariantName, MSCEraMortal, MSCFieldName, MSCId, MSCMetaSpecs, MSCNameVersion,
-        MSeedKeyCard, MSeedMenu, MSeeds, MSettings, MSignSufficientCrypto, MSignatureReady,
-        MSufficientCryptoReady, MTransaction, MTypesInfo, MVerifier, MVerifierDetails, ModalData,
-        Network, NetworkSpecsToSend, RightButton, ScreenData, ScreenNameType, SeedNameCard,
-        TransactionAuthor, TransactionCard, TransactionCardSet, TransactionNetworkInfo,
-        TransactionType,
+        MDeriveKey, MEnterPassword, MKeyDetails, MKeyDetailsMulti, MKeys, MKeysCard, MLog,
+        MLogDetails, MLogRight, MMMNetwork, MMManageNetworks, MMNetwork, MManageNetworks,
+        MMetadataRecord, MNetworkCard, MNetworkDetails, MNetworkMenu, MNewSeed, MNewSeedBackup,
+        MPasswordConfirm, MRawKey, MRecoverSeedName, MRecoverSeedPhrase, MSCAuthor, MSCCall,
+        MSCContent, MSCCurrency, MSCEnumVariantName, MSCEraMortal, MSCFieldName, MSCId,
+        MSCMetaSpecs, MSCNameVersion, MSeedKeyCard, MSeedMenu, MSeeds, MSettings,
+        MSignSufficientCrypto, MSignatureReady, MSufficientCryptoReady, MTransaction, MTypesInfo,
+        MVerifier, MVerifierDetails, ModalData, Network, NetworkSpecsToSend, RightButton,
+        ScreenData, ScreenNameType, SeedNameCard, TransactionAuthor, TransactionCard,
+        TransactionCardSet, TransactionNetworkInfo, TransactionType,
     },
     network_specs::{NetworkSpecs, ValidCurrentVerifier, Verifier, VerifierValue},
 };
@@ -75,54 +74,16 @@ lazy_static! {
     static ref OS_MSG: Regex = Regex::new(r#"Os \{[^}]*\}"#).expect("checked_construction");
 }
 
-fn timeless(current_real_json: &str) -> String {
-    NO_TIME
-        .replace_all(current_real_json, r#""timestamp":"**""#)
-        .to_string()
+fn cut_seed_remove_identicon(data: &mut Option<ModalData>) -> String {
+    if let Some(ModalData::NewSeedBackup { f }) = data {
+        let res = f.seed_phrase.clone();
+        f.seed_phrase = String::new();
+        f.identicon = String::new();
+        res
+    } else {
+        panic!("Expected ModalData::NewSeedBackup, got {:?}", data);
+    }
 }
-fn cut_checksum(current_real_json: &str) -> String {
-    NO_CHECKSUM
-        .replace_all(current_real_json, r#""checksum":"**""#)
-        .to_string()
-}
-fn cut_seed(current_real_json: &str) -> (String, String) {
-    let seed_phrase = SEED
-        .captures(current_real_json)
-        .unwrap()
-        .name("seed_phrase")
-        .unwrap()
-        .as_str()
-        .to_string();
-    let seedless_json = SEED
-        .replace_all(current_real_json, r#""seed_phrase":"**""#)
-        .to_string();
-    (seedless_json, seed_phrase)
-}
-fn cut_identicon(current_real_json: &str) -> String {
-    IDENTICON
-        .replace_all(current_real_json, r#""identicon":"**""#)
-        .to_string()
-}
-fn cut_base58(current_real_json: &str) -> String {
-    BASE.replace_all(current_real_json, r#""base58":"**""#)
-        .to_string()
-}
-fn cut_address_key(current_real_json: &str) -> String {
-    ADDRESS_KEY
-        .replace_all(current_real_json, r#""address_key":"**""#)
-        .to_string()
-}
-fn cut_public_key(current_real_json: &str) -> String {
-    PUBLIC_KEY
-        .replace_all(current_real_json, r#""public_key":"**""#)
-        .to_string()
-}
-fn cut_os_msg(current_real_json: &str) -> String {
-    OS_MSG
-        .replace_all(current_real_json, r#"Os {**}"#)
-        .to_string()
-}
-
 fn qr_payload(qr_content_hex: &str) -> Vec<u8> {
     let qr_content = hex::decode(qr_content_hex).unwrap();
     let image = image::load_from_memory(&qr_content).unwrap();
@@ -150,34 +111,6 @@ fn process_sufficient(current_real_json: &str) -> (String, String) {
         .replace_all(current_real_json, r#""sufficient":"**""#)
         .to_string();
     (sufficient_free_json, hex::encode(qr_payload(&sufficient)))
-}
-
-fn process_signature(current_real_json: &str) -> (String, String) {
-    let signature = SIGNATURE
-        .captures(current_real_json)
-        .unwrap()
-        .name("signature")
-        .unwrap()
-        .as_str()
-        .to_string();
-    let signature_free_json = SIGNATURE
-        .replace_all(current_real_json, r#""signature":"**""#)
-        .to_string();
-    (
-        signature_free_json,
-        String::from_utf8(qr_payload(&signature)).unwrap(),
-    )
-}
-
-fn get_qr_info_read(current_real_json: &str) -> String {
-    let qr_content_hex = QR
-        .captures(current_real_json)
-        .unwrap()
-        .name("qr")
-        .unwrap()
-        .as_str()
-        .to_string();
-    String::from_utf8(qr_payload(&qr_content_hex)).unwrap()
 }
 
 fn signature_is_good(transaction_hex: &str, signature_hex: &str) -> bool {
@@ -834,7 +767,7 @@ fn flow_test_1() {
         "GoForward on ManageNetworks screen with kusama sr25519 key. Expected NetworkDetails screen for kusama with no modals."
     );
 
-    let mut kusama_action = action;
+    let kusama_action = action;
 
     let action = do_action(Action::GoBack, "", "").unwrap();
     assert_eq!(
@@ -1199,7 +1132,7 @@ fn flow_test_1() {
 
     let scan_action = action;
 
-    let mut action = do_action(
+    let action = do_action(
         Action::TransactionFetched,
         std::fs::read_to_string("for_tests/add_specs_kusama-sr25519_Alice-sr25519.txt")
             .unwrap()
@@ -3246,7 +3179,7 @@ fn flow_test_1() {
     do_action(Action::NavbarKeys, "", "").unwrap();
     do_action(Action::SelectSeed, "Portia", "").unwrap();
     do_action(Action::RightButtonAction, "", "").unwrap();
-    let action = do_action(Action::RemoveSeed, "", "").unwrap();
+    let _action = do_action(Action::RemoveSeed, "", "").unwrap();
     /* TODO: this.
     let cut_real_json = cut_public_key(&timeless(&real_json));
 
@@ -4314,16 +4247,6 @@ fn flow_test_1() {
         )
     );
 
-    /*
-        let real_qr_info = get_qr_info_read(&real_json);
-        let expected_qr_info = r#"substrate:5DfhGyQdFobKM8NsWvEeAKk5EQQgYe9AydgJ7rMB6E1EqRzV:0xe143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e"#;
-        assert!(
-            real_qr_info == expected_qr_info,
-            "Received unexpected qr payload:\n{}",
-            real_qr_info
-        );
-    */
-
     do_action(Action::GoBack, "", "").unwrap();
     do_action(Action::NavbarSettings, "", "").unwrap();
     let action = do_action(Action::BackupSeed, "", "").unwrap();
@@ -4354,7 +4277,7 @@ fn flow_test_1() {
     );
 
     let action = do_action(Action::BackupSeed, "Alice", "").unwrap();
-    let mut expected_action = ActionResult {
+    let expected_action = ActionResult {
         screen_label: String::new(),
         back: true,
         footer: true,
@@ -4755,7 +4678,7 @@ fn flow_test_1() {
         "",
     )
     .unwrap();
-    let mut expected_action = ActionResult {
+    let expected_action = ActionResult {
         screen_label: "Sign SufficientCrypto".to_string(),
         back: true,
         footer: false,
@@ -5123,7 +5046,7 @@ fn flow_test_1() {
                             card: Card::CallCard {
                                 f: MSCCall {
                                     method_name: "transfer_keep_alive".to_string(),
-                                    docs,
+                                    docs: docs.clone(),
                                 },
                             },
                         },
@@ -5339,22 +5262,6 @@ fn flow_test_1() {
 
     let mut action = do_action(Action::ShowLogDetails, "1", "").unwrap();
     erase_log_timestamps(&mut action.screen_data);
-    let expected_action = ActionResult {
-        screen_label: "Event details".to_string(),
-        back: true,
-        footer: true,
-        footer_button: Some(FooterButton::Log),
-        right_button: None,
-        screen_name_type: ScreenNameType::H4,
-        screen_data: ScreenData::LogDetails {
-            f: MLogDetails {
-                timestamp: String::new(),
-                events: vec![],
-            },
-        },
-        modal_data: None,
-        alert_data: None,
-    };
 
     //r#"{"screen":"LogDetails","screenLabel":"Event details","back":true,"footer":true,"footerButton":"Log","rightButton":"None","screenNameType":"h4","modal":"Empty","alert":"Empty","screenData":{"timestamp":"**","events":[{"event":"transaction_signed","payload":{"transaction":{"method":[{"index":0,"indent":0,"type":"pallet","payload":"Balances"},{"index":1,"indent":1,"type":"method","payload":{"method_name":"transfer_keep_alive","docs":"53616d6520617320746865205b607472616e73666572605d2063616c6c2c206275742077697468206120636865636b207468617420746865207472616e736665722077696c6c206e6f74206b696c6c207468650a6f726967696e206163636f756e742e0a0a393925206f66207468652074696d6520796f752077616e74205b607472616e73666572605d20696e73746561642e0a0a5b607472616e73666572605d3a207374727563742e50616c6c65742e68746d6c236d6574686f642e7472616e73666572"}},{"index":2,"indent":2,"type":"field_name","payload":{"name":"dest","docs_field_name":"","path_type":"sp_runtime >> multiaddress >> MultiAddress","docs_type":""}},{"index":3,"indent":3,"type":"enum_variant_name","payload":{"name":"Id","docs_enum_variant":""}},{"index":4,"indent":4,"type":"Id","payload":{"base58":"5FHneW46xGXgs5mUiveU4sbTyGBzmstUspZC92UhjJM694ty","identicon":"<bob>"}},{"index":5,"indent":2,"type":"field_name","payload":{"name":"value","docs_field_name":"","path_type":"","docs_type":""}},{"index":6,"indent":3,"type":"balance","payload":{"amount":"100.000000000","units":"mWND"}}],"extensions":[{"index":7,"indent":0,"type":"era","payload":{"era":"Mortal","phase":"27","period":"64"}},{"index":8,"indent":0,"type":"nonce","payload":"46"},{"index":9,"indent":0,"type":"tip","payload":{"amount":"0","units":"pWND"}},{"index":10,"indent":0,"type":"name_version","payload":{"name":"westend","version":"9150"}},{"index":11,"indent":0,"type":"tx_version","payload":"5"},{"index":12,"indent":0,"type":"block_hash","payload":"538a7d7a0ac17eb6dd004578cb8e238c384a10f57c999a3fa1200409cd9b3f33"}]},"network_name":"westend","signed_by":{"public_key":"8266a693d6872d2b6437215c198ee25cabf2e4256df9ad00e979e84b00b5235e","identicon":"<alice_sr25519_//Alice/secret//secret>","encryption":"sr25519"},"user_comment":"Alice sends some cash"}}]},"modalData":{},"alertData":{}}"#;
     /* TODO: here is transaction decoded but returned in encoded version.
@@ -5526,7 +5433,6 @@ fn flow_test_1() {
         alert_data: None,
     };
 
-    let expected_json = r#"{"screen":"LogDetails","screenLabel":"Event details","back":true,"footer":true,"footerButton":"Log","rightButton":"None","screenNameType":"h4","modal":"Empty","alert":"Empty","screenData":{"timestamp":"**","events":[{"event":"message_signed","payload":{"message":"4c6f72656d20697073756d20646f6c6f722073697420616d65742c20636f6e73656374657475722061646970697363696e6720656c69742c2073656420646f20656975736d6f642074656d706f7220696e6369646964756e74207574206c61626f726520657420646f6c6f7265206d61676e6120616c697175612e20557420656e696d206164206d696e696d2076656e69616d2c2071756973206e6f737472756420657865726369746174696f6e20756c6c616d636f206c61626f726973206e69736920757420616c697175697020657820656120636f6d6d6f646f20636f6e7365717561742e2044756973206175746520697275726520646f6c6f7220696e20726570726568656e646572697420696e20766f6c7570746174652076656c697420657373652063696c6c756d20646f6c6f726520657520667567696174206e756c6c612070617269617475722e204578636570746575722073696e74206f6363616563617420637570696461746174206e6f6e2070726f6964656e742c2073756e7420696e2063756c706120717569206f666669636961206465736572756e74206d6f6c6c697420616e696d20696420657374206c61626f72756d2e","network_name":"westend","signed_by":{"public_key":"3efeca331d646d8a2986374bb3bb8d6e9e3cfcdd7c45c2b69104fab5d61d3f34","identicon":"<alice_sr25519_//westend>","encryption":"sr25519"},"user_comment":"text test"}}]},"modalData":{},"alertData":{}}"#;
     assert_eq!(
         action, expected_action,
         concat!(
@@ -5542,184 +5448,748 @@ fn flow_test_1() {
     do_action(Action::NavbarKeys, "", "").unwrap();
     do_action(Action::RightButtonAction, "", "").unwrap();
     do_action(Action::NewSeed, "", "").unwrap();
-    /*
-        let real_json = do_action(Action::GoForward, "Pepper", "");
-        let (cut_real_json, seed_phrase_pepper) = cut_seed(&cut_identicon(&real_json));
-        let expected_json = r#"{"screen":"NewSeed","screenLabel":"New Seed","back":true,"footer":false,"footerButton":"Keys","rightButton":"None","screenNameType":"h1","modal":"NewSeedBackup","alert":"Empty","screenData":{"keyboard":false},"modalData":{"seed":"Pepper","seed_phrase":"**","identicon":"**"},"alertData":{}}"#;
-        assert!(cut_real_json == expected_json, "GoForward on NewSeed screen with non-empty seed name. Expected NewSeed screen with NewSeedBackup modal, got:\n{}", real_json);
+    let mut action = do_action(Action::GoForward, "Pepper", "").unwrap();
+    let seed_phrase_pepper = cut_seed_remove_identicon(&mut action.modal_data);
+    let expected_action = ActionResult {
+        screen_label: "New Seed".to_string(),
+        back: true,
+        footer: false,
+        footer_button: Some(FooterButton::Keys),
+        right_button: None,
+        screen_name_type: ScreenNameType::H1,
+        screen_data: ScreenData::NewSeed {
+            f: MNewSeed { keyboard: false },
+        },
+        modal_data: Some(ModalData::NewSeedBackup {
+            f: MNewSeedBackup {
+                seed: "Pepper".to_string(),
+                seed_phrase: String::new(),
+                identicon: String::new(),
+            },
+        }),
+        alert_data: None,
+    };
 
-        let real_json = do_action(Action::GoForward, "false", &seed_phrase_pepper);
-        let cut_real_json = cut_address_key(&cut_base58(&cut_identicon(
-            &real_json.replace(&empty_png(), r#"<empty>"#),
-        )));
-        let expected_json = r#"{"screen":"Keys","screenLabel":"","back":true,"footer":true,"footerButton":"Keys","rightButton":"Backup","screenNameType":"h4","modal":"Empty","alert":"Empty","screenData":{"root":{"seed_name":"Pepper","identicon":"<empty>","address_key":"","base58":"","swiped":false,"multiselect":false},"set":[{"address_key":"**","base58":"**","identicon":"**","has_pwd":false,"path":"//polkadot","swiped":false,"multiselect":false}],"network":{"title":"Polkadot","logo":"polkadot"},"multiselect_mode":false,"multiselect_count":""},"modalData":{},"alertData":{}}"#;
-        assert!(cut_real_json == expected_json, "GoForward on NewSeed screen with NewSeedBackup modal active. Expected Keys screen with no modals, got:\n{}", real_json);
+    assert_eq!(
+        action, expected_action,
+        concat!(
+            "GoForward on NewSeed screen with non-empty seed name. ",
+            "Expected NewSeed screen with NewSeedBackup modal."
+        )
+    );
 
-        update_seed_names(r#"Alice,Pepper"#);
+    let mut action = do_action(Action::GoForward, "false", &seed_phrase_pepper).unwrap();
+    erase_base58_address_identicon(&mut action.screen_data);
+    let expected_action = ActionResult {
+        screen_label: String::new(),
+        back: true,
+        footer: true,
+        footer_button: Some(FooterButton::Keys),
+        right_button: Some(RightButton::Backup),
+        screen_name_type: ScreenNameType::H4,
+        screen_data: ScreenData::Keys {
+            f: MKeys {
+                set: vec![MKeysCard {
+                    address_key: String::new(),
+                    base58: String::new(),
+                    identicon: String::new(),
+                    has_pwd: false,
+                    path: "//polkadot".to_string(),
+                    swiped: false,
+                    multiselect: false,
+                }],
+                root: MSeedKeyCard {
+                    seed_name: String::new(), // TODO "Pepper".to_string(),
+                    identicon: String::new(),
+                    address_key: String::new(),
+                    base58: String::new(),
+                    swiped: false,
+                    multiselect: false,
+                },
+                network: MNetworkCard {
+                    title: "Polkadot".to_string(),
+                    logo: "polkadot".to_string(),
+                },
+                multiselect_mode: false,
+                multiselect_count: String::new(),
+            },
+        },
+        modal_data: None,
+        alert_data: None,
+    };
 
-        do_action(Action::NetworkSelector, "", "");
-        let real_json = do_action(
-            Action::ChangeNetwork,
-            "0180e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e",
-            "",
-        );
-        let cut_real_json = cut_address_key(&cut_base58(&cut_identicon(
-            &real_json.replace(&empty_png(), r#"<empty>"#),
-        )));
-        let expected_json = r#"{"screen":"Keys","screenLabel":"","back":true,"footer":true,"footerButton":"Keys","rightButton":"Backup","screenNameType":"h4","modal":"Empty","alert":"Empty","screenData":{"root":{"seed_name":"Pepper","identicon":"<empty>","address_key":"","base58":"","swiped":false,"multiselect":false},"set":[{"address_key":"**","base58":"**","identicon":"**","has_pwd":false,"path":"//westend","swiped":false,"multiselect":false}],"network":{"title":"Westend","logo":"westend"},"multiselect_mode":false,"multiselect_count":""},"modalData":{},"alertData":{}}"#;
-        assert!(
-            cut_real_json == expected_json,
-            "Changed network to westend. Expected Keys screen with no modals, got:\n{}",
-            real_json
-        );
+    assert_eq!(
+        action, expected_action,
+        concat!(
+            "GoForward on NewSeed screen with NewSeedBackup modal active. ",
+            "Expected Keys screen with no modals."
+        )
+    );
 
-        let caps = SET.captures(&real_json).unwrap();
-        let pepper_westend_public = caps.name("public").unwrap().as_str().to_string();
-        let pepper_westend_base58 = caps.name("base").unwrap().as_str().to_string();
-        let pepper_westend_identicon = caps.name("identicon").unwrap().as_str().to_string();
+    update_seed_names(r#"Alice,Pepper"#);
 
-        do_action(Action::NavbarScan, "", "");
-        let transaction_hex = transaction_hex.replace(
-            "8266a693d6872d2b6437215c198ee25cabf2e4256df9ad00e979e84b00b5235e",
-            &pepper_westend_public,
-        );
-        let real_json = do_action(Action::TransactionFetched, &transaction_hex, "");
-        let cut_real_json = real_json.replace(&bob(), r#"<bob>"#);
-        let expected_json_transaction_sign = expected_json_transaction_sign
-            .replace(
-                "5F1gaMEdLTzoYFV6hYqX9AnZYg4bknuYE5HcVXmnKi1eSCXK",
-                &pepper_westend_base58,
+    do_action(Action::NetworkSelector, "", "").unwrap();
+    let mut action = do_action(
+        Action::ChangeNetwork,
+        "0180e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e",
+        "",
+    )
+    .unwrap();
+
+    let expected_action = ActionResult {
+        screen_label: String::new(),
+        back: true,
+        footer: true,
+        footer_button: Some(FooterButton::Keys),
+        right_button: Some(RightButton::Backup),
+        screen_name_type: ScreenNameType::H4,
+        screen_data: ScreenData::Keys {
+            f: MKeys {
+                set: vec![MKeysCard {
+                    address_key: String::new(),
+                    base58: String::new(),
+                    identicon: String::new(),
+                    has_pwd: false,
+                    path: "//westend".to_string(),
+                    swiped: false,
+                    multiselect: false,
+                }],
+                root: MSeedKeyCard {
+                    seed_name: String::new(), // TODO "Pepper".to_string(),
+                    identicon: String::new(),
+                    address_key: String::new(),
+                    base58: String::new(),
+                    swiped: false,
+                    multiselect: false,
+                },
+                network: MNetworkCard {
+                    title: "Westend".to_string(),
+                    logo: "westend".to_string(),
+                },
+                multiselect_mode: false,
+                multiselect_count: String::new(),
+            },
+        },
+        modal_data: None,
+        alert_data: None,
+    };
+
+    let (pepper_westend_public, pepper_westend_base58, pepper_westend_identicon) =
+        if let ScreenData::Keys { ref f } = action.screen_data {
+            (
+                f.set[0].address_key.strip_prefix("01").unwrap().to_string(),
+                f.set[0].base58.clone(),
+                f.set[0].identicon.clone(),
             )
-            .replace(
-                "<alice_sr25519_//Alice/secret//secret>",
-                &pepper_westend_identicon,
+        } else {
+            panic!();
+        };
+
+    erase_base58_address_identicon(&mut action.screen_data);
+    assert_eq!(
+        action, expected_action,
+        "Changed network to westend. Expected Keys screen with no modals",
+    );
+    do_action(Action::NavbarScan, "", "").unwrap();
+
+    let transaction_hex_pepper = transaction_hex.replace(
+        "8266a693d6872d2b6437215c198ee25cabf2e4256df9ad00e979e84b00b5235e",
+        &pepper_westend_public,
+    );
+    let action = do_action(Action::TransactionFetched, &transaction_hex_pepper, "").unwrap();
+
+    let block_hash = "538a7d7a0ac17eb6dd004578cb8e238c384a10f57c999a3fa1200409cd9b3f33".to_string();
+    let mut expected_action = ActionResult {
+        screen_label: String::new(),
+        back: true,
+        footer: false,
+        footer_button: Some(FooterButton::Scan),
+        right_button: None,
+        screen_name_type: ScreenNameType::H1,
+        screen_data: ScreenData::Transaction {
+            f: MTransaction {
+                content: TransactionCardSet {
+                    method: Some(vec![
+                        TransactionCard {
+                            index: 0,
+                            indent: 0,
+                            card: Card::PalletCard {
+                                f: "Balances".to_string(),
+                            },
+                        },
+                        TransactionCard {
+                            index: 1,
+                            indent: 1,
+                            card: Card::CallCard {
+                                f: MSCCall {
+                                    method_name: "transfer_keep_alive".to_string(),
+                                    docs,
+                                },
+                            },
+                        },
+                        TransactionCard {
+                            index: 2,
+                            indent: 2,
+                            card: Card::FieldNameCard {
+                                f: MSCFieldName {
+                                    name: "dest".to_string(),
+                                    docs_field_name: String::new(),
+                                    path_type: "sp_runtime >> multiaddress >> MultiAddress"
+                                        .to_string(),
+                                    docs_type: String::new(),
+                                },
+                            },
+                        },
+                        TransactionCard {
+                            index: 3,
+                            indent: 3,
+                            card: Card::EnumVariantNameCard {
+                                f: MSCEnumVariantName {
+                                    name: "Id".to_string(),
+                                    docs_enum_variant: String::new(),
+                                },
+                            },
+                        },
+                        TransactionCard {
+                            index: 4,
+                            indent: 4,
+                            card: Card::IdCard {
+                                f: MSCId {
+                                    base58: "5FHneW46xGXgs5mUiveU4sbTyGBzmstUspZC92UhjJM694ty"
+                                        .to_string(),
+                                    identicon: bob(),
+                                },
+                            },
+                        },
+                        TransactionCard {
+                            index: 5,
+                            indent: 2,
+                            card: Card::FieldNameCard {
+                                f: MSCFieldName {
+                                    name: "value".to_string(),
+                                    docs_field_name: String::new(),
+                                    path_type: String::new(),
+                                    docs_type: String::new(),
+                                },
+                            },
+                        },
+                        TransactionCard {
+                            index: 6,
+                            indent: 3,
+                            card: Card::BalanceCard {
+                                f: MSCCurrency {
+                                    amount: "100.000000000".to_string(),
+                                    units: "mWND".to_string(),
+                                },
+                            },
+                        },
+                    ]),
+                    extensions: Some(vec![
+                        TransactionCard {
+                            index: 7,
+                            indent: 0,
+                            card: Card::EraMortalCard {
+                                f: MSCEraMortal {
+                                    era: "Mortal".to_string(),
+                                    phase: "27".to_string(),
+                                    period: "64".to_string(),
+                                },
+                            },
+                        },
+                        TransactionCard {
+                            index: 8,
+                            indent: 0,
+                            card: Card::NonceCard {
+                                f: "46".to_string(),
+                            },
+                        },
+                        TransactionCard {
+                            index: 9,
+                            indent: 0,
+                            card: Card::TipCard {
+                                f: MSCCurrency {
+                                    amount: "0".to_string(),
+                                    units: "pWND".to_string(),
+                                },
+                            },
+                        },
+                        TransactionCard {
+                            index: 10,
+                            indent: 0,
+                            card: Card::NameVersionCard {
+                                f: MSCNameVersion {
+                                    name: "westend".to_string(),
+                                    version: "9150".to_string(),
+                                },
+                            },
+                        },
+                        TransactionCard {
+                            index: 11,
+                            indent: 0,
+                            card: Card::TxSpecCard { f: "5".to_string() },
+                        },
+                        TransactionCard {
+                            index: 12,
+                            indent: 0,
+                            card: Card::BlockHashCard {
+                                f: block_hash.to_string(),
+                            },
+                        },
+                    ]),
+                    ..Default::default()
+                },
+                ttype: TransactionType::Sign,
+                author_info: Some(TransactionAuthor {
+                    base58: pepper_westend_base58.clone(),
+                    identicon: pepper_westend_identicon.clone(),
+                    seed: "Pepper".to_string(),
+                    derivation_path: "//westend".to_string(),
+                }),
+                network_info: Some(TransactionNetworkInfo {
+                    network_title: "Westend".to_string(),
+                    network_logo: "westend".to_string(),
+                }),
+            },
+        },
+        modal_data: None,
+        alert_data: None,
+    };
+
+    assert_eq!(
+        action, expected_action,
+        concat!(
+            "TransactionFetched on Scan screen containing transaction. ",
+            "Expected Transaction screen with no modals"
+        )
+    );
+
+    let action = do_action(
+        Action::GoForward,
+        "Pepper also sends some cash",
+        &seed_phrase_pepper,
+    )
+    .unwrap();
+    let signature_hex = if let Some(ModalData::SignatureReady {
+        f: MSignatureReady { ref signature },
+    }) = action.modal_data
+    {
+        expected_action.modal_data = Some(ModalData::SignatureReady {
+            f: MSignatureReady {
+                signature: signature.clone(),
+            },
+        });
+
+        String::from_utf8(qr_payload(&signature)).unwrap()
+    } else {
+        panic!(
+            "Expected ModalData::SigantureReady, got {:?}",
+            action.modal_data
+        );
+    };
+
+    assert_eq!(
+        action, expected_action,
+        "GoForward on parsed transaction. Expected modal SignatureReady",
+    );
+
+    assert!(
+        signature_is_good(&transaction_hex_pepper, &signature_hex),
+        "Produced bad signature: \n{}",
+        signature_hex
+    );
+
+    do_action(Action::GoBack, "", "").unwrap();
+    do_action(Action::RightButtonAction, "", "").unwrap();
+    do_action(Action::ClearLog, "", "").unwrap();
+    do_action(Action::NavbarKeys, "", "").unwrap();
+    do_action(Action::SelectSeed, "Pepper", "").unwrap();
+    do_action(Action::NetworkSelector, "", "").unwrap();
+    do_action(
+        Action::ChangeNetwork,
+        "0180e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e",
+        "",
+    )
+    .unwrap();
+    do_action(Action::Swipe, &format!("01{}", pepper_westend_public), "").unwrap();
+    do_action(Action::RemoveKey, "", "").unwrap();
+
+    let action = do_action(Action::NewKey, "", "").unwrap();
+    let mut expected_action = ActionResult {
+        screen_label: "Derive Key".to_string(),
+        back: true,
+        footer: false,
+        footer_button: Some(FooterButton::Keys),
+        right_button: None,
+        screen_name_type: ScreenNameType::H1,
+        screen_data: ScreenData::DeriveKey {
+            f: MDeriveKey {
+                seed_name: "Pepper".to_string(),
+                network_title: "Westend".to_string(),
+                network_logo: "westend".to_string(),
+                network_specs_key:
+                    "0180e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e"
+                        .to_string(),
+                suggested_derivation: String::new(),
+                keyboard: true,
+                derivation_check: None,
+            },
+        },
+        modal_data: None,
+        alert_data: None,
+    };
+
+    assert_eq!(
+        action, expected_action,
+        "NewKey on Keys screen. Expected DeriveKey scree.",
+    );
+    expected_action.modal_data = Some(ModalData::PasswordConfirm {
+        f: MPasswordConfirm {
+            pwd: "secret".to_string(),
+            seed_name: "Pepper".to_string(),
+            cropped_path: "//0".to_string(),
+        },
+    });
+    if let ScreenData::DeriveKey { ref mut f } = expected_action.screen_data {
+        f.suggested_derivation = "//0///secret".to_string();
+        f.keyboard = false;
+    } else {
+        panic!("");
+    }
+
+    let action = do_action(Action::CheckPassword, "//0///secret", "").unwrap();
+    assert_eq!(
+        action, expected_action,
+        concat!(
+            "CheckPassword on DeriveKey screen with password ",
+            "(path validity and password existence is checked elsewhere). ",
+            "Expected updated DeriveKey screen with PasswordConfirm modal"
+        )
+    );
+
+    let mut action = do_action(Action::GoForward, "//0///secret", &seed_phrase_pepper).unwrap();
+    let (pepper_key0_public, pepper_key0_base58, pepper_key0_identicon) =
+        if let ScreenData::Keys { ref f } = action.screen_data {
+            (
+                f.set[0].address_key.strip_prefix("01").unwrap().to_string(),
+                f.set[0].base58.clone(),
+                f.set[0].identicon.clone(),
             )
-            .replace("//Alice/secret//secret", "//westend")
-            .replace("Alice", "Pepper");
-        assert!(cut_real_json == expected_json_transaction_sign, "TransactionFetched on Scan screen containing transaction. Expected Transaction screen with no modals, got:\n{}", real_json);
+        } else {
+            panic!();
+        };
 
-        let real_json = do_action(
-            Action::GoForward,
-            "Pepper also sends some cash",
-            &seed_phrase_pepper,
+    erase_base58_address_identicon(&mut action.screen_data);
+    let expected_action = ActionResult {
+        screen_label: String::new(),
+        back: true,
+        footer: true,
+        footer_button: Some(FooterButton::Keys),
+        right_button: Some(RightButton::Backup),
+        screen_name_type: ScreenNameType::H4,
+        screen_data: ScreenData::Keys {
+            f: MKeys {
+                set: vec![MKeysCard {
+                    address_key: String::new(),
+                    base58: String::new(),
+                    identicon: String::new(),
+                    has_pwd: true,
+                    path: "//0".to_string(),
+                    swiped: false,
+                    multiselect: false,
+                }],
+                root: MSeedKeyCard {
+                    seed_name: String::new(), // TODO "Pepper".to_string(),
+                    identicon: String::new(),
+                    address_key: String::new(),
+                    base58: String::new(),
+                    swiped: false,
+                    multiselect: false,
+                },
+                network: MNetworkCard {
+                    title: "Westend".to_string(),
+                    logo: "westend".to_string(),
+                },
+                multiselect_mode: false,
+                multiselect_count: String::new(),
+            },
+        },
+        modal_data: None,
+        alert_data: None,
+    };
+    assert_eq!(
+        action, expected_action,
+        concat!(
+            "GoForward on DeriveKey screen with PasswordConfirm modal. ",
+            "Expected updated Keys screen."
+        )
+    );
+
+    do_action(Action::NavbarScan, "", "").unwrap();
+    let message_hex = message_hex.replace(
+        "3efeca331d646d8a2986374bb3bb8d6e9e3cfcdd7c45c2b69104fab5d61d3f34",
+        &pepper_key0_public,
+    );
+    let action = do_action(Action::TransactionFetched, &message_hex, "").unwrap();
+    let mut expected_action = ActionResult {
+        screen_label: String::new(),
+        back: true,
+        footer: false,
+        footer_button: Some(FooterButton::Scan),
+        right_button: None,
+        screen_name_type: ScreenNameType::H1,
+        screen_data: ScreenData::Transaction {
+            f: MTransaction {
+                content: TransactionCardSet {
+                    message: Some(vec![TransactionCard {
+                        index: 0,
+                        indent: 0,
+                        card: Card::TextCard {
+                            f: card_text.clone(),
+                        },
+                    }]),
+                    ..Default::default()
+                },
+                ttype: TransactionType::Sign,
+                author_info: Some(TransactionAuthor {
+                    base58: pepper_key0_base58.clone(),
+                    identicon: pepper_key0_identicon.clone(),
+                    seed: "Pepper".to_string(),
+                    derivation_path: "//0".to_string(),
+                }),
+                network_info: Some(TransactionNetworkInfo {
+                    network_title: "Westend".to_string(),
+                    network_logo: "westend".to_string(),
+                }),
+            },
+        },
+        modal_data: None,
+        alert_data: None,
+    };
+    let mut text_sign_action = expected_action.clone();
+    assert_eq!(
+        action, expected_action,
+        concat!(
+            "TransactionFetched on Scan screen containing message transaction. ",
+            "Expected Transaction screen with no modals"
+        )
+    );
+
+    let action = do_action(
+        Action::GoForward,
+        "Pepper tries sending text from passworded account",
+        &seed_phrase_pepper,
+    )
+    .unwrap();
+    expected_action.modal_data = Some(ModalData::EnterPassword {
+        f: MEnterPassword {
+            author_info: TransactionAuthor {
+                base58: pepper_key0_base58.clone(),
+                identicon: pepper_key0_identicon.clone(),
+                seed: "Pepper".to_string(),
+                derivation_path: "//0".to_string(),
+            },
+            counter: 1,
+        },
+    });
+    assert_eq!(
+        action, expected_action,
+        concat!(
+            "GoForward on Transaction screen for passworded address. ",
+            "Expected Transaction screen with EnterPassword modal"
+        )
+    );
+
+    let action = do_action(Action::GoForward, "wrong_one", "").unwrap();
+    expected_action.modal_data = Some(ModalData::EnterPassword {
+        f: MEnterPassword {
+            author_info: TransactionAuthor {
+                base58: pepper_key0_base58.clone(),
+                identicon: pepper_key0_identicon.clone(),
+                seed: "Pepper".to_string(),
+                derivation_path: "//0".to_string(),
+            },
+            counter: 2,
+        },
+    });
+    expected_action.alert_data = Some("{\"error\":\"Wrong password.\"}".to_string());
+
+    assert_eq!(
+        action, expected_action,
+        concat!(
+            "GoForward on Transaction screen for passworded address with wrong password. ",
+            "Expected Transaction screen with EnterPassword modal with counter at 2."
+        )
+    );
+
+    do_action(Action::GoBack, "", "").unwrap();
+    let action = do_action(Action::GoForward, "wrong_two", "").unwrap();
+    expected_action.modal_data = Some(ModalData::EnterPassword {
+        f: MEnterPassword {
+            author_info: TransactionAuthor {
+                base58: pepper_key0_base58.clone(),
+                identicon: pepper_key0_identicon.clone(),
+                seed: "Pepper".to_string(),
+                derivation_path: "//0".to_string(),
+            },
+            counter: 3,
+        },
+    });
+    assert_eq!(
+        action, expected_action,
+        concat!(
+            "GoForward on Transaction screen for passworded address with second wrong password. ",
+            "Expected Transaction screen with EnterPassword modal with counter at 3"
+        )
+    );
+
+    do_action(Action::GoBack, "", "").unwrap();
+    let mut action = do_action(Action::GoForward, "wrong_three", "").unwrap();
+    erase_log_timestamps(&mut action.screen_data);
+
+    let verifier_value = VerifierValue::Standard {
+        m: MultiSigner::Sr25519(
+            sp_core::sr25519::Public::try_from(hex::decode(&pepper_key0_public).unwrap().as_ref())
+                .unwrap(),
+        ),
+    };
+    let network_genesis_hash =
+        hex::decode("e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e").unwrap();
+    let message = String::from_utf8(hex::decode(&card_text).unwrap()).unwrap();
+    let expected_action = ActionResult {
+        screen_label: String::new(),
+        back: false,
+        footer: true,
+        footer_button: Some(FooterButton::Log),
+        right_button: Some(RightButton::LogRight),
+        screen_name_type: ScreenNameType::H4,
+        screen_data: ScreenData::Log {
+            f: MLog {
+                log: vec![
+                    History {
+                        timestamp: String::new(),
+                        events: vec![Event::MessageSignError {
+                            sign_message_display: SignMessageDisplay {
+                                message: message.clone(),
+                                network_name: "westend".to_string(),
+                                signed_by: verifier_value.clone(),
+                                user_comment: "Pepper tries sending text from passworded account"
+                                    .to_string(),
+                            },
+                        }],
+                    },
+                    History {
+                        timestamp: String::new(),
+                        events: vec![Event::MessageSignError {
+                            sign_message_display: SignMessageDisplay {
+                                message: message.clone(),
+                                network_name: "westend".to_string(),
+                                signed_by: verifier_value.clone(),
+                                user_comment: "Pepper tries sending text from passworded account"
+                                    .to_string(),
+                            },
+                        }],
+                    },
+                    History {
+                        timestamp: String::new(),
+                        events: vec![Event::MessageSignError {
+                            sign_message_display: SignMessageDisplay {
+                                message: message.clone(),
+                                network_name: "westend".to_string(),
+                                signed_by: verifier_value.clone(),
+                                user_comment: "Pepper tries sending text from passworded account"
+                                    .to_string(),
+                            },
+                        }],
+                    },
+                    History {
+                        timestamp: String::new(),
+                        events: vec![Event::IdentityAdded {
+                            identity_history: IdentityHistory {
+                                seed_name: "Pepper".to_string(),
+                                encryption: Encryption::Sr25519,
+                                public_key: hex::decode(&pepper_key0_public).unwrap(),
+                                path: "//0".to_string(),
+                                network_genesis_hash: network_genesis_hash.clone(),
+                            },
+                        }],
+                    },
+                    History {
+                        timestamp: String::new(),
+                        events: vec![Event::IdentityRemoved {
+                            identity_history: IdentityHistory {
+                                seed_name: "Pepper".to_string(),
+                                encryption: Encryption::Sr25519,
+                                public_key: hex::decode(pepper_westend_public).unwrap(),
+                                path: "//westend".to_string(),
+                                network_genesis_hash,
+                            },
+                        }],
+                    },
+                    History {
+                        timestamp: String::new(),
+                        events: vec![Event::HistoryCleared],
+                    },
+                ],
+            },
+        },
+        modal_data: None,
+        alert_data: Some("{\"error\":\"Wrong password.\"}".to_string()),
+    };
+
+    assert_eq!(
+        action, expected_action,
+        concat!(
+            "GoForward on Transaction screen for passworded ",
+            "address with third wrong password. Expected Log screen"
+        )
+    );
+
+    do_action(Action::RightButtonAction, "", "").unwrap();
+    do_action(Action::ClearLog, "", "").unwrap();
+
+    do_action(Action::NavbarScan, "", "").unwrap();
+    do_action(Action::TransactionFetched, &message_hex, "").unwrap();
+    do_action(
+        Action::GoForward,
+        "Pepper tries better",
+        &seed_phrase_pepper,
+    )
+    .unwrap();
+    let action = do_action(Action::GoForward, "secret", "").unwrap();
+    let signature_hex = if let Some(ModalData::SignatureReady {
+        f: MSignatureReady { ref signature },
+    }) = action.modal_data
+    {
+        text_sign_action.modal_data = Some(ModalData::SignatureReady {
+            f: MSignatureReady {
+                signature: signature.clone(),
+            },
+        });
+
+        String::from_utf8(qr_payload(&signature)).unwrap()
+    } else {
+        panic!(
+            "Expected ModalData::SigantureReady, got {:?}",
+            action.modal_data
         );
-        let (cut_real_json, signature_hex) = process_signature(&real_json);
-        let cut_real_json = cut_real_json.replace(&bob(), r#"<bob>"#);
-        let expected_json_transaction_ready = expected_json_transaction_ready
-            .replace(
-                "5F1gaMEdLTzoYFV6hYqX9AnZYg4bknuYE5HcVXmnKi1eSCXK",
-                &pepper_westend_base58,
-            )
-            .replace(
-                "<alice_sr25519_//Alice/secret//secret>",
-                &pepper_westend_identicon,
-            )
-            .replace("//Alice/secret//secret", "//westend")
-            .replace("Alice", "Pepper");
-        assert!(
-            cut_real_json == expected_json_transaction_ready,
-            "GoForward on parsed transaction. Expected modal SignatureReady, got:\n{}",
-            real_json
-        );
+    };
 
-        assert!(
-            signature_is_good(&transaction_hex, &signature_hex),
-            "Produced bad signature: \n{}",
-            signature_hex
-        );
+    assert_eq!(
+        action, text_sign_action,
+        concat!(
+            "GoForward on Transaction screen for passworded address with correct password. ",
+            "Expected Transaction screen with SignatureReady modal."
+        )
+    );
 
-        do_action(Action::GoBack, "", "");
-        do_action(Action::RightButtonAction, "", "");
-        do_action(Action::ClearLog, "", "");
-        do_action(Action::NavbarKeys, "", "");
-        do_action(Action::SelectSeed, "Pepper", "");
-        do_action(Action::NetworkSelector, "", "");
-        do_action(
-            Action::ChangeNetwork,
-            "0180e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e",
-            "",
-        );
-        do_action(Action::Swipe, &format!("01{}", pepper_westend_public), "");
-        do_action(Action::RemoveKey, "", "");
+    assert!(
+        signature_is_good(&message_hex, &signature_hex),
+        "Produced bad signature: \n{}",
+        signature_hex
+    );
 
-        let real_json = do_action(Action::NewKey, "", "");
-        let expected_json = r#"{"screen":"DeriveKey","screenLabel":"Derive Key","back":true,"footer":false,"footerButton":"Keys","rightButton":"None","screenNameType":"h1","modal":"Empty","alert":"Empty","screenData":{"seed_name":"Pepper","network_title":"Westend","network_logo":"westend","network_specs_key":"0180e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e","suggested_derivation":"","keyboard":true},"modalData":{},"alertData":{}}"#;
-        assert!(
-            real_json == expected_json,
-            "NewKey on Keys screen. Expected DeriveKey screen, got:\n{}",
-            real_json
-        );
-
-        let real_json = do_action(Action::CheckPassword, "//0///secret", "");
-        let expected_json = r#"{"screen":"DeriveKey","screenLabel":"Derive Key","back":true,"footer":false,"footerButton":"Keys","rightButton":"None","screenNameType":"h1","modal":"PasswordConfirm","alert":"Empty","screenData":{"seed_name":"Pepper","network_title":"Westend","network_logo":"westend","network_specs_key":"0180e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e","suggested_derivation":"//0///secret","keyboard":false},"modalData":{"seed_name":"Pepper","cropped_path":"//0","pwd":"secret"},"alertData":{}}"#;
-        assert!(real_json == expected_json, "CheckPassword on DeriveKey screen with password (path validity and password existence is checked elsewhere). Expected updated DeriveKey screen with PasswordConfirm modal, got:\n{}", real_json);
-
-        let real_json = do_action(Action::GoForward, "//0///secret", &seed_phrase_pepper);
-        let cut_real_json = cut_address_key(&cut_base58(&cut_identicon(
-            &real_json.replace(&empty_png(), r#"<empty>"#),
-        )));
-        let expected_json = r#"{"screen":"Keys","screenLabel":"","back":true,"footer":true,"footerButton":"Keys","rightButton":"Backup","screenNameType":"h4","modal":"Empty","alert":"Empty","screenData":{"root":{"seed_name":"Pepper","identicon":"<empty>","address_key":"","base58":"","swiped":false,"multiselect":false},"set":[{"address_key":"**","base58":"**","identicon":"**","has_pwd":true,"path":"//0","swiped":false,"multiselect":false}],"network":{"title":"Westend","logo":"westend"},"multiselect_mode":false,"multiselect_count":""},"modalData":{},"alertData":{}}"#;
-        assert!(cut_real_json == expected_json, "GoForward on DeriveKey screen with PasswordConfirm modal. Expected updated Keys screen, got:\n{}", real_json);
-
-        let caps = KEY0.captures(&real_json).unwrap();
-        let pepper_key0_public = caps.name("public").unwrap().as_str().to_string();
-        let pepper_key0_base58 = caps.name("base").unwrap().as_str().to_string();
-        let pepper_key0_identicon = caps.name("identicon").unwrap().as_str().to_string();
-
-        do_action(Action::NavbarScan, "", "");
-        let message_hex = message_hex.replace(
-            "3efeca331d646d8a2986374bb3bb8d6e9e3cfcdd7c45c2b69104fab5d61d3f34",
-            &pepper_key0_public,
-        );
-        let real_json = do_action(Action::TransactionFetched, &message_hex, "");
-        let expected_json = format!("{{\"screen\":\"Transaction\",\"screenLabel\":\"\",\"back\":true,\"footer\":false,\"footerButton\":\"Scan\",\"rightButton\":\"None\",\"screenNameType\":\"h1\",\"modal\":\"Empty\",\"alert\":\"Empty\",\"screenData\":{{\"content\":{{\"message\":[{{\"index\":0,\"indent\":0,\"type\":\"text\",\"payload\":\"4c6f72656d20697073756d20646f6c6f722073697420616d65742c20636f6e73656374657475722061646970697363696e6720656c69742c2073656420646f20656975736d6f642074656d706f7220696e6369646964756e74207574206c61626f726520657420646f6c6f7265206d61676e6120616c697175612e20557420656e696d206164206d696e696d2076656e69616d2c2071756973206e6f737472756420657865726369746174696f6e20756c6c616d636f206c61626f726973206e69736920757420616c697175697020657820656120636f6d6d6f646f20636f6e7365717561742e2044756973206175746520697275726520646f6c6f7220696e20726570726568656e646572697420696e20766f6c7570746174652076656c697420657373652063696c6c756d20646f6c6f726520657520667567696174206e756c6c612070617269617475722e204578636570746575722073696e74206f6363616563617420637570696461746174206e6f6e2070726f6964656e742c2073756e7420696e2063756c706120717569206f666669636961206465736572756e74206d6f6c6c697420616e696d20696420657374206c61626f72756d2e\"}}]}},\"author_info\":{{\"base58\":\"{}\",\"identicon\":\"{}\",\"seed\":\"Pepper\",\"derivation_path\":\"//0\",\"has_pwd\":true}},\"network_info\":{{\"network_title\":\"Westend\",\"network_logo\":\"westend\"}},\"type\":\"sign\"}},\"modalData\":{{}},\"alertData\":{{}}}}", pepper_key0_base58, pepper_key0_identicon);
-        assert!(real_json == expected_json, "TransactionFetched on Scan screen containing message transaction. Expected Transaction screen with no modals, got:\n{}", real_json);
-
-        let real_json = do_action(
-            Action::GoForward,
-            "Pepper tries sending text from passworded account",
-            &seed_phrase_pepper,
-        );
-        let expected_json = format!("{{\"screen\":\"Transaction\",\"screenLabel\":\"\",\"back\":true,\"footer\":false,\"footerButton\":\"Scan\",\"rightButton\":\"None\",\"screenNameType\":\"h1\",\"modal\":\"EnterPassword\",\"alert\":\"Empty\",\"screenData\":{{\"content\":{{\"message\":[{{\"index\":0,\"indent\":0,\"type\":\"text\",\"payload\":\"4c6f72656d20697073756d20646f6c6f722073697420616d65742c20636f6e73656374657475722061646970697363696e6720656c69742c2073656420646f20656975736d6f642074656d706f7220696e6369646964756e74207574206c61626f726520657420646f6c6f7265206d61676e6120616c697175612e20557420656e696d206164206d696e696d2076656e69616d2c2071756973206e6f737472756420657865726369746174696f6e20756c6c616d636f206c61626f726973206e69736920757420616c697175697020657820656120636f6d6d6f646f20636f6e7365717561742e2044756973206175746520697275726520646f6c6f7220696e20726570726568656e646572697420696e20766f6c7570746174652076656c697420657373652063696c6c756d20646f6c6f726520657520667567696174206e756c6c612070617269617475722e204578636570746575722073696e74206f6363616563617420637570696461746174206e6f6e2070726f6964656e742c2073756e7420696e2063756c706120717569206f666669636961206465736572756e74206d6f6c6c697420616e696d20696420657374206c61626f72756d2e\"}}]}},\"author_info\":{{\"base58\":\"{}\",\"identicon\":\"{}\",\"seed\":\"Pepper\",\"derivation_path\":\"//0\",\"has_pwd\":true}},\"network_info\":{{\"network_title\":\"Westend\",\"network_logo\":\"westend\"}},\"type\":\"sign\"}},\"modalData\":{{\"author_info\":{{\"base58\":\"{}\",\"identicon\":\"{}\",\"seed\":\"Pepper\",\"derivation_path\":\"//0\",\"has_pwd\":true}},\"counter\":1}},\"alertData\":{{}}}}", pepper_key0_base58, pepper_key0_identicon, pepper_key0_base58, pepper_key0_identicon);
-        assert!(real_json == expected_json, "GoForward on Transaction screen for passworded address. Expected Transaction screen with EnterPassword modal, got:\n{}", real_json);
-
-        let real_json = do_action(Action::GoForward, "wrong_one", "");
-        let expected_json = format!("{{\"screen\":\"Transaction\",\"screenLabel\":\"\",\"back\":true,\"footer\":false,\"footerButton\":\"Scan\",\"rightButton\":\"None\",\"screenNameType\":\"h1\",\"modal\":\"EnterPassword\",\"alert\":\"Error\",\"screenData\":{{\"content\":{{\"message\":[{{\"index\":0,\"indent\":0,\"type\":\"text\",\"payload\":\"4c6f72656d20697073756d20646f6c6f722073697420616d65742c20636f6e73656374657475722061646970697363696e6720656c69742c2073656420646f20656975736d6f642074656d706f7220696e6369646964756e74207574206c61626f726520657420646f6c6f7265206d61676e6120616c697175612e20557420656e696d206164206d696e696d2076656e69616d2c2071756973206e6f737472756420657865726369746174696f6e20756c6c616d636f206c61626f726973206e69736920757420616c697175697020657820656120636f6d6d6f646f20636f6e7365717561742e2044756973206175746520697275726520646f6c6f7220696e20726570726568656e646572697420696e20766f6c7570746174652076656c697420657373652063696c6c756d20646f6c6f726520657520667567696174206e756c6c612070617269617475722e204578636570746575722073696e74206f6363616563617420637570696461746174206e6f6e2070726f6964656e742c2073756e7420696e2063756c706120717569206f666669636961206465736572756e74206d6f6c6c697420616e696d20696420657374206c61626f72756d2e\"}}]}},\"author_info\":{{\"base58\":\"{}\",\"identicon\":\"{}\",\"seed\":\"Pepper\",\"derivation_path\":\"//0\",\"has_pwd\":true}},\"network_info\":{{\"network_title\":\"Westend\",\"network_logo\":\"westend\"}},\"type\":\"sign\"}},\"modalData\":{{\"author_info\":{{\"base58\":\"{}\",\"identicon\":\"{}\",\"seed\":\"Pepper\",\"derivation_path\":\"//0\",\"has_pwd\":true}},\"counter\":2}},\"alertData\":{{\"error\":\"Wrong password.\"}}}}", pepper_key0_base58, pepper_key0_identicon, pepper_key0_base58, pepper_key0_identicon);
-        assert!(real_json == expected_json, "GoForward on Transaction screen for passworded address with wrong password. Expected Transaction screen with EnterPassword modal with counter at 2, got:\n{}", real_json);
-
-        do_action(Action::GoBack, "", "");
-        let real_json = do_action(Action::GoForward, "wrong_two", "");
-        let expected_json = format!("{{\"screen\":\"Transaction\",\"screenLabel\":\"\",\"back\":true,\"footer\":false,\"footerButton\":\"Scan\",\"rightButton\":\"None\",\"screenNameType\":\"h1\",\"modal\":\"EnterPassword\",\"alert\":\"Error\",\"screenData\":{{\"content\":{{\"message\":[{{\"index\":0,\"indent\":0,\"type\":\"text\",\"payload\":\"4c6f72656d20697073756d20646f6c6f722073697420616d65742c20636f6e73656374657475722061646970697363696e6720656c69742c2073656420646f20656975736d6f642074656d706f7220696e6369646964756e74207574206c61626f726520657420646f6c6f7265206d61676e6120616c697175612e20557420656e696d206164206d696e696d2076656e69616d2c2071756973206e6f737472756420657865726369746174696f6e20756c6c616d636f206c61626f726973206e69736920757420616c697175697020657820656120636f6d6d6f646f20636f6e7365717561742e2044756973206175746520697275726520646f6c6f7220696e20726570726568656e646572697420696e20766f6c7570746174652076656c697420657373652063696c6c756d20646f6c6f726520657520667567696174206e756c6c612070617269617475722e204578636570746575722073696e74206f6363616563617420637570696461746174206e6f6e2070726f6964656e742c2073756e7420696e2063756c706120717569206f666669636961206465736572756e74206d6f6c6c697420616e696d20696420657374206c61626f72756d2e\"}}]}},\"author_info\":{{\"base58\":\"{}\",\"identicon\":\"{}\",\"seed\":\"Pepper\",\"derivation_path\":\"//0\",\"has_pwd\":true}},\"network_info\":{{\"network_title\":\"Westend\",\"network_logo\":\"westend\"}},\"type\":\"sign\"}},\"modalData\":{{\"author_info\":{{\"base58\":\"{}\",\"identicon\":\"{}\",\"seed\":\"Pepper\",\"derivation_path\":\"//0\",\"has_pwd\":true}},\"counter\":3}},\"alertData\":{{\"error\":\"Wrong password.\"}}}}", pepper_key0_base58, pepper_key0_identicon, pepper_key0_base58, pepper_key0_identicon);
-        assert!(real_json == expected_json, "GoForward on Transaction screen for passworded address with second wrong password. Expected Transaction screen with EnterPassword modal with counter at 3, got:\n{}", real_json);
-
-        do_action(Action::GoBack, "", "");
-        let real_json = do_action(Action::GoForward, "wrong_three", "");
-        let cut_real_json = cut_public_key(&cut_base58(&cut_identicon(&timeless(&real_json))));
-        let expected_json = r#"{"screen":"Log","screenLabel":"","back":false,"footer":true,"footerButton":"Log","rightButton":"LogRight","screenNameType":"h4","modal":"Empty","alert":"Error","screenData":{"log":[{"order":5,"timestamp":"**","events":[{"event":"message_sign_error","payload":{"message":"4c6f72656d20697073756d20646f6c6f722073697420616d65742c20636f6e73656374657475722061646970697363696e6720656c69742c2073656420646f20656975736d6f642074656d706f7220696e6369646964756e74207574206c61626f726520657420646f6c6f7265206d61676e6120616c697175612e20557420656e696d206164206d696e696d2076656e69616d2c2071756973206e6f737472756420657865726369746174696f6e20756c6c616d636f206c61626f726973206e69736920757420616c697175697020657820656120636f6d6d6f646f20636f6e7365717561742e2044756973206175746520697275726520646f6c6f7220696e20726570726568656e646572697420696e20766f6c7570746174652076656c697420657373652063696c6c756d20646f6c6f726520657520667567696174206e756c6c612070617269617475722e204578636570746575722073696e74206f6363616563617420637570696461746174206e6f6e2070726f6964656e742c2073756e7420696e2063756c706120717569206f666669636961206465736572756e74206d6f6c6c697420616e696d20696420657374206c61626f72756d2e","network_name":"westend","signed_by":{"public_key":"**","identicon":"**","encryption":"sr25519"},"user_comment":"Pepper tries sending text from passworded account","error":"wrong_password_entered"}}]},{"order":4,"timestamp":"**","events":[{"event":"message_sign_error","payload":{"message":"4c6f72656d20697073756d20646f6c6f722073697420616d65742c20636f6e73656374657475722061646970697363696e6720656c69742c2073656420646f20656975736d6f642074656d706f7220696e6369646964756e74207574206c61626f726520657420646f6c6f7265206d61676e6120616c697175612e20557420656e696d206164206d696e696d2076656e69616d2c2071756973206e6f737472756420657865726369746174696f6e20756c6c616d636f206c61626f726973206e69736920757420616c697175697020657820656120636f6d6d6f646f20636f6e7365717561742e2044756973206175746520697275726520646f6c6f7220696e20726570726568656e646572697420696e20766f6c7570746174652076656c697420657373652063696c6c756d20646f6c6f726520657520667567696174206e756c6c612070617269617475722e204578636570746575722073696e74206f6363616563617420637570696461746174206e6f6e2070726f6964656e742c2073756e7420696e2063756c706120717569206f666669636961206465736572756e74206d6f6c6c697420616e696d20696420657374206c61626f72756d2e","network_name":"westend","signed_by":{"public_key":"**","identicon":"**","encryption":"sr25519"},"user_comment":"Pepper tries sending text from passworded account","error":"wrong_password_entered"}}]},{"order":3,"timestamp":"**","events":[{"event":"message_sign_error","payload":{"message":"4c6f72656d20697073756d20646f6c6f722073697420616d65742c20636f6e73656374657475722061646970697363696e6720656c69742c2073656420646f20656975736d6f642074656d706f7220696e6369646964756e74207574206c61626f726520657420646f6c6f7265206d61676e6120616c697175612e20557420656e696d206164206d696e696d2076656e69616d2c2071756973206e6f737472756420657865726369746174696f6e20756c6c616d636f206c61626f726973206e69736920757420616c697175697020657820656120636f6d6d6f646f20636f6e7365717561742e2044756973206175746520697275726520646f6c6f7220696e20726570726568656e646572697420696e20766f6c7570746174652076656c697420657373652063696c6c756d20646f6c6f726520657520667567696174206e756c6c612070617269617475722e204578636570746575722073696e74206f6363616563617420637570696461746174206e6f6e2070726f6964656e742c2073756e7420696e2063756c706120717569206f666669636961206465736572756e74206d6f6c6c697420616e696d20696420657374206c61626f72756d2e","network_name":"westend","signed_by":{"public_key":"**","identicon":"**","encryption":"sr25519"},"user_comment":"Pepper tries sending text from passworded account","error":"wrong_password_entered"}}]},{"order":2,"timestamp":"**","events":[{"event":"identity_added","payload":{"seed_name":"Pepper","encryption":"sr25519","public_key":"**","path":"//0","network_genesis_hash":"e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e"}}]},{"order":1,"timestamp":"**","events":[{"event":"identity_removed","payload":{"seed_name":"Pepper","encryption":"sr25519","public_key":"**","path":"//westend","network_genesis_hash":"e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e"}}]},{"order":0,"timestamp":"**","events":[{"event":"history_cleared"}]}],"total_entries":6},"modalData":{},"alertData":{"error":"Wrong password."}}"#;
-        assert!(cut_real_json == expected_json, "GoForward on Transaction screen for passworded address with third wrong password. Expected Log screen, got:\n{}", cut_real_json);
-
-        do_action(Action::RightButtonAction, "", "");
-        do_action(Action::ClearLog, "", "");
-
-        do_action(Action::NavbarScan, "", "");
-        do_action(Action::TransactionFetched, &message_hex, "");
-        do_action(
-            Action::GoForward,
-            "Pepper tries better",
-            &seed_phrase_pepper,
-        );
-        let real_json = do_action(Action::GoForward, "secret", "");
-        let (cut_real_json, signature_hex) = process_signature(&real_json);
-        let expected_json = format!("{{\"screen\":\"Transaction\",\"screenLabel\":\"\",\"back\":true,\"footer\":false,\"footerButton\":\"Scan\",\"rightButton\":\"None\",\"screenNameType\":\"h1\",\"modal\":\"SignatureReady\",\"alert\":\"Empty\",\"screenData\":{{\"content\":{{\"message\":[{{\"index\":0,\"indent\":0,\"type\":\"text\",\"payload\":\"4c6f72656d20697073756d20646f6c6f722073697420616d65742c20636f6e73656374657475722061646970697363696e6720656c69742c2073656420646f20656975736d6f642074656d706f7220696e6369646964756e74207574206c61626f726520657420646f6c6f7265206d61676e6120616c697175612e20557420656e696d206164206d696e696d2076656e69616d2c2071756973206e6f737472756420657865726369746174696f6e20756c6c616d636f206c61626f726973206e69736920757420616c697175697020657820656120636f6d6d6f646f20636f6e7365717561742e2044756973206175746520697275726520646f6c6f7220696e20726570726568656e646572697420696e20766f6c7570746174652076656c697420657373652063696c6c756d20646f6c6f726520657520667567696174206e756c6c612070617269617475722e204578636570746575722073696e74206f6363616563617420637570696461746174206e6f6e2070726f6964656e742c2073756e7420696e2063756c706120717569206f666669636961206465736572756e74206d6f6c6c697420616e696d20696420657374206c61626f72756d2e\"}}]}},\"author_info\":{{\"base58\":\"{}\",\"identicon\":\"{}\",\"seed\":\"Pepper\",\"derivation_path\":\"//0\",\"has_pwd\":true}},\"network_info\":{{\"network_title\":\"Westend\",\"network_logo\":\"westend\"}},\"type\":\"done\"}},\"modalData\":{{\"signature\":\"**\"}},\"alertData\":{{}}}}", pepper_key0_base58, pepper_key0_identicon);
-        assert!(cut_real_json == expected_json, "GoForward on Transaction screen for passworded address with correct password. Expected Transaction screen with SignatureReady modal, got:\n{}", real_json);
-
-        assert!(
-            signature_is_good(&message_hex, &signature_hex),
-            "Produced bad signature: \n{}",
-            signature_hex
-        );
-
-        do_action(Action::GoBack, "", "");
+    do_action(Action::GoBack, "", "").unwrap();
+    /* TODO: This piece has to be re-worked with error handling.
 
         {
             let _database = db_handling::helpers::open_db::<Signer>(dbname).unwrap(); // database got unavailable for some reason
