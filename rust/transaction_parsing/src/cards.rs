@@ -268,9 +268,7 @@ impl<'a> Card<'a> {
                 },
             },
             Card::NetworkGenesisHash(x) => NavCard::NetworkGenesisHashCard { f: hex::encode(x) },
-            Card::Derivations(x) => NavCard::DerivationsCard {
-                f: x.iter().cloned().collect(),
-            },
+            Card::Derivations(x) => NavCard::DerivationsCard { f: x.to_vec() },
             Card::Warning(warn) => NavCard::WarningCard { f: warn.show() },
             Card::Error(err) => NavCard::ErrorCard {
                 f: <Signer>::show(err),

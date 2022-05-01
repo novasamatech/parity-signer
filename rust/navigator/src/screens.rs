@@ -26,7 +26,7 @@ pub enum Screen {
     Log,
     LogDetails(u32),
     Scan,
-    Transaction(TransactionState),
+    Transaction(Box<TransactionState>),
     SeedSelector,
     Keys(KeysState),
     KeyDetails(AddressState),

@@ -27,7 +27,7 @@ use crate::TransactionAction;
 /// Enum to move around cards in preparatory stage (author details or author card, and warning card)
 enum CardsPrep<'a> {
     SignProceed(AddressDetails, Option<Warning<'a>>),
-    ShowOnly(TransactionCard, TransactionCard),
+    ShowOnly(TransactionCard, Box<TransactionCard>),
 }
 
 /// Function to parse transaction.
@@ -76,7 +76,7 @@ pub(crate) fn parse_transaction(
                         .card(&mut index, indent);
                         CardsPrep::ShowOnly(
                             author_card,
-                            Card::Warning(Warning::NoNetworkID).card(&mut index, indent),
+                            Box::new(Card::Warning(Warning::NoNetworkID).card(&mut index, indent)),
                         )
                     }
                 }
@@ -86,7 +86,7 @@ pub(crate) fn parse_transaction(
                         base58prefix: network_specs.base58prefix,
                     })
                     .card(&mut index, indent),
-                    (Card::Warning(Warning::AuthorNotFound)).card(&mut index, indent),
+                    Box::new((Card::Warning(Warning::AuthorNotFound)).card(&mut index, indent)),
                 ),
             };
 
@@ -133,15 +133,17 @@ pub(crate) fn parse_transaction(
                                         }),
                                     )
                                 }
-                                CardsPrep::ShowOnly(author_card, warning_card) => {
+                                CardsPrep::ShowOnly(author_card, _warning_card) => {
                                     CardsPrep::ShowOnly(
                                         author_card,
                                         //warning_card,
-                                        Card::Warning(Warning::NewerVersion {
-                                            used_version,
-                                            latest_version,
-                                        })
-                                        .card(&mut index, indent),
+                                        Box::new(
+                                            Card::Warning(Warning::NewerVersion {
+                                                used_version,
+                                                latest_version,
+                                            })
+                                            .card(&mut index, indent),
+                                        ),
                                     )
                                 }
                             };
@@ -189,7 +191,7 @@ pub(crate) fn parse_transaction(
                                     }
                                     CardsPrep::ShowOnly(author_card, warning_card) => {
                                         let author = Some(vec![author_card]);
-                                        let warning = Some(vec![warning_card]);
+                                        let warning = Some(vec![*warning_card]);
                                         let method = Some(into_cards(&a, &mut index));
                                         let extensions =
                                             Some(into_cards(&extensions_cards, &mut index));
@@ -230,7 +232,7 @@ pub(crate) fn parse_transaction(
                                     }
                                     CardsPrep::ShowOnly(author_card, warning_card) => {
                                         let author = Some(vec![author_card]);
-                                        let warning = Some(vec![warning_card]);
+                                        let warning = Some(vec![*warning_card]);
                                         let error = Some(vec![Card::Error(ErrorSigner::Parser(e))
                                             .card(&mut index, indent)]);
                                         let extensions =
@@ -299,7 +301,7 @@ pub fn entry_to_transactions_with_decoding(
         match event {
             Event::TransactionSigned { sign_display }
             | Event::TransactionSignError { sign_display } => {
-                res.push(decode_signable_from_history(&sign_display, database_name)?);
+                res.push(decode_signable_from_history(sign_display, database_name)?);
             }
             _ => (),
         }

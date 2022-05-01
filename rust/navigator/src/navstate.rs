@@ -410,13 +410,13 @@ impl State {
                                             if let ErrorSigner::WrongPasswordNewChecksum(c) = e {
                                                 if t.ok() {
                                                     new_navstate.screen = Screen::Transaction(
-                                                        t.update_checksum_sign(
+                                                        Box::new(t.update_checksum_sign(
                                                             c,
                                                             content,
                                                             has_pwd,
                                                             author_info,
                                                             network_info,
-                                                        ),
+                                                        )),
                                                     );
                                                 } else {
                                                     new_navstate =
@@ -429,9 +429,9 @@ impl State {
                                     }
                                 }
                                 _ => {
-                                    new_navstate.screen = Screen::Transaction(
+                                    new_navstate.screen = Screen::Transaction(Box::new(
                                         t.add_comment(details_str).update_seed(secret_seed_phrase),
-                                    );
+                                    ));
                                     new_navstate.modal = Modal::EnterPassword;
                                 }
                             }
@@ -864,9 +864,8 @@ impl State {
         let errorline = String::new();
 
         if let Screen::Scan = self.navstate.screen {
-            new_navstate = Navstate::clean_screen(Screen::Transaction(TransactionState::new(
-                details_str,
-                dbname,
+            new_navstate = Navstate::clean_screen(Screen::Transaction(Box::new(
+                TransactionState::new(details_str, dbname),
             )));
         }
 

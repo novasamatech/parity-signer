@@ -653,8 +653,7 @@ fn types_status_and_history() {
     };
     assert!(history_printed
         .iter()
-        .find(|h| h.1.events.contains(&expected_element))
-        .is_some());
+        .any(|h| h.1.events.contains(&expected_element)));
 
     fs::remove_dir_all(dbname).unwrap();
 }
@@ -1218,12 +1217,10 @@ fn history_with_identities() {
     };
     assert!(history_printed
         .iter()
-        .find(|e| e.1.events.contains(&element1))
-        .is_some());
+        .any(|e| e.1.events.contains(&element1)));
     assert!(history_printed
         .iter()
-        .find(|e| e.1.events.contains(&element2))
-        .is_some());
+        .any(|e| e.1.events.contains(&element2)));
     try_create_seed("Alice", ALICE_SEED_PHRASE, true, dbname).unwrap();
     let history_printed_after_create_seed: Vec<_> = get_history(dbname)
         .unwrap()
@@ -2261,7 +2258,7 @@ fn check_for_network(name: &str, version: u32, dbname: &str) -> bool {
 }
 
 fn entries_contain_event(entries: &[Entry], event: &Event) -> bool {
-    entries.iter().find(|e| e.events.contains(event)).is_some()
+    entries.iter().any(|e| e.events.contains(event))
 }
 
 #[test]

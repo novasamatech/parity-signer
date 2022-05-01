@@ -131,8 +131,8 @@ fn get_all_log_cards() -> String {
     // TODO: definitions::history::print_all_events()
 }
 
+#[cfg(target_os = "android")]
 fn init_logging(tag: String) {
-    #[cfg(target_os = "android")]
     android_logger::init_once(
         android_logger::Config::default()
             .with_min_level(log::Level::Trace) // limit log level
@@ -144,7 +144,10 @@ fn init_logging(tag: String) {
                     .build(),
             ),
     );
-    #[cfg(not(target_os = "android"))]
+}
+
+#[cfg(not(target_os = "android"))]
+fn init_logging(_tag: String) {
     env_logger::init();
 }
 

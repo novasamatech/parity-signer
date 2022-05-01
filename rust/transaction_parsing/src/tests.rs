@@ -44,12 +44,7 @@ fn verifier_alice_ed25519() -> Verifier {
 }
 
 fn entries_contain_event(entries: &[Entry], event: &Event) -> bool {
-    entries
-        .iter()
-        .map(|e| &e.events)
-        .flatten()
-        .find(|e| e == &event)
-        .is_some()
+    entries.iter().flat_map(|e| &e.events).any(|e| e == event)
 }
 
 fn westend_spec() -> NetworkSpecs {
@@ -984,7 +979,6 @@ fn parse_transaction_2() {
     };
     let network_info_known = westend_spec();
 
-    r#""network_title":"Westend","network_logo":"westend""#;
     let action = produce_output(line, dbname);
     if let TransactionAction::Sign {
         content,

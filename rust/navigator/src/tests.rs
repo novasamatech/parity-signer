@@ -5154,9 +5154,7 @@ fn flow_test_1() {
                         TransactionCard {
                             index: 12,
                             indent: 0,
-                            card: Card::BlockHashCard {
-                                f: block_hash.to_string(),
-                            },
+                            card: Card::BlockHashCard { f: block_hash },
                         },
                     ]),
                     ..Default::default()
@@ -5332,7 +5330,7 @@ fn flow_test_1() {
         f: MSignatureReady { ref signature },
     }) = action.modal_data
     {
-        String::from_utf8(qr_payload(&signature)).unwrap()
+        String::from_utf8(qr_payload(signature)).unwrap()
     } else {
         panic!(
             "Expected ModalData::SigantureReady, got {:?}",
@@ -5731,17 +5729,15 @@ fn flow_test_1() {
                         TransactionCard {
                             index: 12,
                             indent: 0,
-                            card: Card::BlockHashCard {
-                                f: block_hash.to_string(),
-                            },
+                            card: Card::BlockHashCard { f: block_hash },
                         },
                     ]),
                     ..Default::default()
                 },
                 ttype: TransactionType::Sign,
                 author_info: Some(TransactionAuthor {
-                    base58: pepper_westend_base58.clone(),
-                    identicon: pepper_westend_identicon.clone(),
+                    base58: pepper_westend_base58,
+                    identicon: pepper_westend_identicon,
                     seed: "Pepper".to_string(),
                     derivation_path: "//westend".to_string(),
                 }),
@@ -5779,7 +5775,7 @@ fn flow_test_1() {
             },
         });
 
-        String::from_utf8(qr_payload(&signature)).unwrap()
+        String::from_utf8(qr_payload(signature)).unwrap()
     } else {
         panic!(
             "Expected ModalData::SigantureReady, got {:?}",
@@ -6026,8 +6022,8 @@ fn flow_test_1() {
     expected_action.modal_data = Some(ModalData::EnterPassword {
         f: MEnterPassword {
             author_info: TransactionAuthor {
-                base58: pepper_key0_base58.clone(),
-                identicon: pepper_key0_identicon.clone(),
+                base58: pepper_key0_base58,
+                identicon: pepper_key0_identicon,
                 seed: "Pepper".to_string(),
                 derivation_path: "//0".to_string(),
             },
@@ -6093,9 +6089,9 @@ fn flow_test_1() {
                         timestamp: String::new(),
                         events: vec![Event::MessageSignError {
                             sign_message_display: SignMessageDisplay {
-                                message: message.clone(),
+                                message,
                                 network_name: "westend".to_string(),
-                                signed_by: verifier_value.clone(),
+                                signed_by: verifier_value,
                                 user_comment: "Pepper tries sending text from passworded account"
                                     .to_string(),
                             },
@@ -6166,7 +6162,7 @@ fn flow_test_1() {
             },
         });
 
-        String::from_utf8(qr_payload(&signature)).unwrap()
+        String::from_utf8(qr_payload(signature)).unwrap()
     } else {
         panic!(
             "Expected ModalData::SigantureReady, got {:?}",

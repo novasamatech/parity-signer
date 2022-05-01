@@ -163,7 +163,6 @@ pub fn print_identities_for_seed_name_and_network(
         };
         let multiselect = multiselect.contains(&multisigner);
         if address_details.is_root() {
-            println!("ISROOT {}", seed_name);
             if root_id.is_some() {
                 return Err(ErrorSigner::Database(DatabaseSigner::TwoRootKeys {
                     seed_name: seed_name.to_string(),
@@ -240,7 +239,7 @@ pub fn show_all_networks(database_name: &str) -> Result<Vec<MMNetwork>, ErrorSig
         .into_iter()
         .map(|n| MMNetwork {
             key: hex::encode(
-                NetworkSpecsKey::from_parts(&n.genesis_hash.as_bytes(), &n.encryption).key(),
+                NetworkSpecsKey::from_parts(n.genesis_hash.as_bytes(), &n.encryption).key(),
             ),
             title: n.title,
             logo: n.logo,
@@ -404,7 +403,7 @@ pub fn dynamic_path_check(
     path: &str,
     network_specs_key_hex: &str,
 ) -> NavDerivationCheck {
-    let content = match NetworkSpecsKey::from_hex(network_specs_key_hex) {
+    match NetworkSpecsKey::from_hex(network_specs_key_hex) {
         Ok(network_specs_key) => match get_network_specs(database_name, &network_specs_key) {
             Ok(network_specs) => {
                 match derivation_check(seed_name, path, &network_specs_key, database_name) {
@@ -458,8 +457,7 @@ pub fn dynamic_path_check(
             error: Some(<Signer>::show(&e)),
             ..Default::default()
         },
-    };
-    content
+    }
 }
 
 /// Print network specs and metadata set information for network with given network specs key.
