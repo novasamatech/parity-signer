@@ -14,12 +14,13 @@ import io.parity.signer.ui.theme.Crypto400
 import io.parity.signer.ui.theme.Text400
 import io.parity.signer.ui.theme.Text600
 import io.parity.signer.ui.theme.Typography
+import io.parity.signer.uniffi.TransactionAuthor
 import org.json.JSONObject
 
 @Composable
-fun TCAuthor(payload: JSONObject) {
+fun TCAuthor(author: TransactionAuthor) {
 	Row {
-		Identicon(payload.optString("identicon"))
+		Identicon(author.identicon)
 		Column {
 			Text(
 				"From: ",
@@ -28,16 +29,16 @@ fun TCAuthor(payload: JSONObject) {
 			)
 			Row {
 				Text(
-					payload.getString("seed").decode64(),
+					author.seed.decode64(),
 					style = MaterialTheme.typography.body1,
 					color = MaterialTheme.colors.Crypto400
 				)
 				Text(
-					payload.getString("derivation_path").toString(),
+					author.derivationPath,
 					style = Typography.body1,
 					color = MaterialTheme.colors.Crypto400
 				)
-				if (payload.getBoolean("has_password")) {
+				if (author.hasPwd) {
 					Text(
 						"///",
 						style = MaterialTheme.typography.body1,
@@ -51,7 +52,7 @@ fun TCAuthor(payload: JSONObject) {
 				}
 			}
 			Text(
-				payload.getString("base58"),
+				author.base58,
 				style = MaterialTheme.typography.caption,
 				color = MaterialTheme.colors.Text600
 			)

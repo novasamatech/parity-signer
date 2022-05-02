@@ -602,7 +602,7 @@ impl Verifier {
             Some(a) => a.show_card(),
             None => MVerifierDetails {
                 public_key: String::new(),
-                identicon: hex::encode(EMPTY_PNG),
+                identicon: EMPTY_PNG.to_vec(),
                 encryption: String::new(),
             },
         }
@@ -625,7 +625,7 @@ impl VerifierValue {
             VerifierValue::Standard { m } => {
                 let public_key = hex::encode(multisigner_to_public(m));
                 let encryption = multisigner_to_encryption(m).show();
-                let identicon = hex::encode(make_identicon_from_multisigner(m));
+                let identicon = make_identicon_from_multisigner(m);
 
                 MVerifierDetails {
                     public_key,

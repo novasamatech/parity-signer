@@ -90,9 +90,9 @@ pub fn get_all_seed_names_with_identicons(
     Ok(res)
 }
 
-fn preferred_multisigner_identicon(multisigner_set: &[MultiSigner]) -> String {
+fn preferred_multisigner_identicon(multisigner_set: &[MultiSigner]) -> Vec<u8> {
     if multisigner_set.is_empty() {
-        hex::encode(EMPTY_PNG)
+        EMPTY_PNG.to_vec()
     } else {
         let mut got_sr25519 = None;
         let mut got_ed25519 = None;
@@ -105,13 +105,13 @@ fn preferred_multisigner_identicon(multisigner_set: &[MultiSigner]) -> String {
             }
         }
         if let Some(a) = got_sr25519 {
-            hex::encode(make_identicon_from_multisigner(&a))
+            make_identicon_from_multisigner(&a)
         } else if let Some(a) = got_ed25519 {
-            hex::encode(make_identicon_from_multisigner(&a))
+            make_identicon_from_multisigner(&a)
         } else if let Some(a) = got_ecdsa {
-            hex::encode(make_identicon_from_multisigner(&a))
+            make_identicon_from_multisigner(&a)
         } else {
-            hex::encode(EMPTY_PNG)
+            EMPTY_PNG.to_vec()
         }
     }
 }
@@ -124,7 +124,7 @@ pub fn print_all_identities(database_name: &str) -> Result<Vec<MRawKey>, ErrorSi
         .map(|(multisigner, address_details)| {
             let address_key = AddressKey::from_multisigner(&multisigner); // to click
             let public_key = multisigner_to_public(&multisigner); // to display
-            let identicon = hex::encode(make_identicon_from_multisigner(&multisigner));
+            let identicon = make_identicon_from_multisigner(&multisigner);
             MRawKey {
                 seed_name: address_details.seed_name,
                 address_key: hex::encode(address_key.key()),
@@ -171,7 +171,7 @@ pub fn print_identities_for_seed_name_and_network(
             }
             root_id = Some(MSeedKeyCard {
                 seed_name: seed_name.to_string(),
-                identicon: hex::encode(identicon),
+                identicon,
                 address_key: hex::encode(address_key.key()),
                 base58,
                 swiped,
@@ -188,7 +188,7 @@ pub fn print_identities_for_seed_name_and_network(
             |(multisigner, address_details, identicon, swiped, multiselect)| MKeysCard {
                 address_key: hex::encode(AddressKey::from_multisigner(&multisigner).key()),
                 base58: print_multisigner_as_base58(&multisigner, Some(network_specs.base58prefix)),
-                identicon: hex::encode(identicon),
+                identicon,
                 has_pwd: address_details.has_pwd,
                 path: address_details.path,
                 swiped,
@@ -288,7 +288,7 @@ pub fn export_key(
     let base58 = print_multisigner_as_base58(multisigner, Some(network_specs.base58prefix));
     let public_key = multisigner_to_public(multisigner);
     let identicon = make_identicon_from_multisigner(multisigner);
-    let qr_prep = {
+    let qr = {
         if address_details.network_id.contains(network_specs_key) {
             match png_qr_from_string(&format!(
                 "substrate:{}:0x{}",
@@ -308,10 +308,10 @@ pub fn export_key(
         }
     };
     Ok(MKeyDetails {
-        qr: hex::encode(qr_prep),
+        qr,
         pubkey: hex::encode(public_key),
         base58,
-        identicon: hex::encode(identicon),
+        identicon,
         seed_name: address_details.seed_name,
         path: address_details.path,
         network_title: network_specs.title,
@@ -372,7 +372,7 @@ pub fn derive_prep(
         let base58 = print_multisigner_as_base58(&multisigner, Some(network_specs.base58prefix));
         let path = address_details.path;
         let has_pwd = address_details.has_pwd;
-        let identicon = hex::encode(make_identicon_from_multisigner(&multisigner));
+        let identicon = make_identicon_from_multisigner(&multisigner);
         let seed_name = seed_name.to_string();
         Address {
             base58,
@@ -426,13 +426,12 @@ pub fn dynamic_path_check(
                             &multisigner,
                             Some(network_specs.base58prefix),
                         );
-                        let hex_identicon =
-                            hex::encode(make_identicon_from_multisigner(&multisigner));
+                        let identicon = make_identicon_from_multisigner(&multisigner);
                         let collision_display = Address {
                             base58: address_base58,
                             path: address_details.path,
                             has_pwd: address_details.has_pwd,
-                            identicon: hex_identicon,
+                            identicon,
                             seed_name: seed_name.to_string(),
                             multiselect: None,
                         };
@@ -486,7 +485,7 @@ pub fn network_details_by_key(
         .into_iter()
         .map(|m| {
             let meta_hash = blake2b(32, &[], &m.meta).as_bytes().to_vec();
-            let meta_id_pic = hex::encode(pic_meta(&meta_hash));
+            let meta_id_pic = pic_meta(&meta_hash);
 
             MMetadataRecord {
                 specs_version: m.version.to_string(),
@@ -547,12 +546,12 @@ pub fn metadata_details(
         .collect();
 
     let meta_hash = blake2b(32, &[], &meta_values.meta).as_bytes().to_vec();
-    let hex_id_pic = hex::encode(pic_meta(&meta_hash));
+    let meta_id_pic = pic_meta(&meta_hash);
     Ok(MMManageNetworks {
         name: network_specs.name,
         version: network_version.to_string(),
         meta_hash: hex::encode(meta_hash),
-        meta_id_pic: hex_id_pic,
+        meta_id_pic,
         networks,
     })
 }
@@ -588,9 +587,7 @@ pub fn print_new_seed(seed_name: &str) -> Result<MNewSeedBackup, ErrorSigner> {
             ))
         }
     };
-    let identicon = hex::encode(make_identicon_from_multisigner(&MultiSigner::Sr25519(
-        sr25519_pair.public(),
-    )));
+    let identicon = make_identicon_from_multisigner(&MultiSigner::Sr25519(sr25519_pair.public()));
     Ok(MNewSeedBackup {
         seed: seed_name.to_string(),
         seed_phrase,

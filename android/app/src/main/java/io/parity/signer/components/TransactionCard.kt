@@ -13,19 +13,25 @@ import io.parity.signer.components.transactionCards.*
 import io.parity.signer.models.decodeHex
 import io.parity.signer.models.toListOfStrings
 import io.parity.signer.ui.theme.Text600
+import io.parity.signer.uniffi.MTransaction
 import org.json.JSONObject
 
 /**
  * Selector for transaction card appearance
  */
 @Composable
-fun TransactionCard(card: JSONObject) {
-	val payload = card.optJSONObject("payload")?: JSONObject()
+fun TransactionCard(card: MTransaction) {
+	/*
 	Box(
 		modifier = Modifier
 			.padding(start = (card.getInt("indent") * 10).dp)
 			.fillMaxWidth()
 	) {
+		card.authorInfo?.let {
+			TCAuthor(it)
+		}
+*/
+		/*
 		when (card.getString("type")) {
 			"author" -> {
 				TCAuthor(payload = payload)}
@@ -137,5 +143,6 @@ fun TransactionCard(card: JSONObject) {
 				}
 			}
 		}
-	}
+		*/
+	//}
 }

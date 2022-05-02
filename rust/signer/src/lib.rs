@@ -40,16 +40,15 @@ impl Display for ErrorDisplayed {
 
 include!(concat!(env!("OUT_DIR"), "/signer.uniffi.rs"));
 
-fn action_get_name(action: &Action) -> String {
+fn action_get_name(action: &Action) -> Option<FooterButton> {
     match action {
-        Action::NavbarLog => "Log",
-        Action::NavbarScan => "Scan",
-        Action::NavbarKeys => "Keys",
-        Action::NavbarSettings => "Settings",
-        Action::GoBack => "<",
-        _ => "",
+        Action::NavbarLog => Some(FooterButton::Log),
+        Action::NavbarScan => Some(FooterButton::Scan),
+        Action::NavbarKeys => Some(FooterButton::Keys),
+        Action::NavbarSettings => Some(FooterButton::Settings),
+        Action::GoBack => Some(FooterButton::Back),
+        _ => None,
     }
-    .to_string()
 }
 
 fn backend_action(

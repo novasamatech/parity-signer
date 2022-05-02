@@ -261,7 +261,7 @@ fn load_types_known_alice_signed() {
                         "d091a5a24a97e18dfe298b167d8fd5a2add10098c8792cba21c39029a9ee0aeb"
                             .to_string(),
                     ),
-                    types_id_pic: Some(types_known()),
+                    types_id_pic: Some(types_known().to_vec()),
                 },
             },
         },
@@ -275,7 +275,7 @@ fn load_types_known_alice_signed() {
                 f: MVerifierDetails {
                     public_key: "d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d"
                         .to_string(),
-                    identicon: alice_sr_alice(),
+                    identicon: alice_sr_alice().to_vec(),
                     encryption: "sr25519".to_string(),
                 },
             },
@@ -361,7 +361,7 @@ fn load_types_known_alice_signed_metadata_hold() {
                 f: MVerifierDetails {
                     public_key: "d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d"
                         .to_string(),
-                    identicon: alice_sr_alice(),
+                    identicon: alice_sr_alice().to_vec(),
                     encryption: "sr25519".to_string(),
                 },
             },
@@ -383,7 +383,7 @@ fn load_types_known_alice_signed_metadata_hold() {
             card: Card::TypesInfoCard { f: MTypesInfo {
                 types_on_file: false,
                 types_hash: Some("d091a5a24a97e18dfe298b167d8fd5a2add10098c8792cba21c39029a9ee0aeb".to_string()),
-                types_id_pic: Some(types_known()),
+                types_id_pic: Some(types_known().to_vec()),
             }
             }
         }]),
@@ -432,7 +432,7 @@ fn load_types_unknown_not_signed() {
                         "d2c5b096be10229ce9ea9d219325c4399875b52ceb4264add89b0d7c5e9ad574"
                             .to_string(),
                     ),
-                    types_id_pic: Some(types_unknown()),
+                    types_id_pic: Some(types_unknown().to_vec()),
                 },
             },
         }]),
@@ -462,7 +462,7 @@ fn load_types_unknown_alice_signed() {
                 f: MVerifierDetails {
                     public_key: "d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d"
                         .to_string(),
-                    identicon: alice_sr_alice(),
+                    identicon: alice_sr_alice().to_vec(),
                     encryption: "sr25519".to_string(),
                 },
             },
@@ -483,7 +483,7 @@ fn load_types_unknown_alice_signed() {
                 f: MTypesInfo {
                     types_on_file: false,
                     types_hash: Some("d2c5b096be10229ce9ea9d219325c4399875b52ceb4264add89b0d7c5e9ad574".to_string()),
-                    types_id_pic: Some(types_unknown()),
+                    types_id_pic: Some(types_unknown().to_vec()),
                 }
             }
         }]),
@@ -571,7 +571,7 @@ fn parse_transaction_1() {
                 card: Card::IdCard {
                     f: MSCId {
                         base58: "5FHneW46xGXgs5mUiveU4sbTyGBzmstUspZC92UhjJM694ty".to_string(),
-                        identicon: bob(),
+                        identicon: bob().to_vec(),
                     },
                 },
             },
@@ -651,9 +651,10 @@ fn parse_transaction_1() {
 
     let author_info_known = TransactionAuthor {
         base58: "5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY".to_string(),
-        identicon: alice_sr_alice(),
+        identicon: alice_sr_alice().to_vec(),
         seed: "Alice".to_string(),
         derivation_path: "//Alice".to_string(),
+        has_pwd: false,
     };
     let network_info_known = NetworkSpecs {
         base58prefix: 0,
@@ -767,7 +768,7 @@ fn parse_transaction_2() {
                 card: Card::IdCard {
                     f: MSCId {
                         base58: "5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY".to_string(),
-                        identicon: alice_sr_alice(),
+                        identicon: alice_sr_alice().to_vec(),
                     },
                 },
             },
@@ -845,7 +846,7 @@ fn parse_transaction_2() {
                 card: Card::IdCard {
                     f: MSCId {
                         base58: "5G1ojzh47Yt8KoYhuAjXpHcazvsoCXe3G8LZchKDvumozJJJ".to_string(),
-                        identicon: id_01(),
+                        identicon: id_01().to_vec(),
                     },
                 },
             },
@@ -865,7 +866,7 @@ fn parse_transaction_2() {
                 card: Card::IdCard {
                     f: MSCId {
                         base58: "5FZoQhgUCmqBxnkHX7jCqThScS2xQWiwiF61msg63CFL3Y8f".to_string(),
-                        identicon: id_02(),
+                        identicon: id_02().to_vec(),
                     },
                 },
             },
@@ -909,7 +910,7 @@ fn parse_transaction_2() {
                 card: Card::IdCard {
                     f: MSCId {
                         base58: "5FHneW46xGXgs5mUiveU4sbTyGBzmstUspZC92UhjJM694ty".to_string(),
-                        identicon: bob(),
+                        identicon: bob().to_vec(),
                     },
                 },
             },
@@ -972,10 +973,10 @@ fn parse_transaction_2() {
 
     let author_info_known = TransactionAuthor {
         base58: "5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY".to_string(),
-        identicon: alice_sr_alice(),
+        identicon: alice_sr_alice().to_vec(),
         seed: "Alice".to_string(),
         derivation_path: "//Alice".to_string(),
-        // TODO "has_pwd":false"#;
+        has_pwd: false,
     };
     let network_info_known = westend_spec();
 
@@ -1048,7 +1049,7 @@ fn parse_transaction_3() {
                 card: Card::IdCard {
                     f: MSCId {
                         base58: "5FHneW46xGXgs5mUiveU4sbTyGBzmstUspZC92UhjJM694ty".to_string(),
-                        identicon: bob(),
+                        identicon: bob().to_vec(),
                     },
                 },
             },
@@ -1128,9 +1129,10 @@ fn parse_transaction_3() {
 
     let author_info_known = TransactionAuthor {
         base58: "5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY".to_string(),
-        identicon: alice_sr_alice(),
+        identicon: alice_sr_alice().to_vec(),
         seed: "Alice".to_string(),
         derivation_path: "//Alice".to_string(),
+        has_pwd: false,
     };
     let network_info_known = westend_spec();
     let output = produce_output(line, dbname);
@@ -1194,7 +1196,7 @@ fn load_westend9070_not_signed() {
                     spec_version: "9070".to_string(),
                     meta_hash: "e281fbc53168a6b87d1ea212923811f4c083e7be7d18df4b8527b9532e5f5fec"
                         .to_string(),
-                    meta_id_pic: westend_9070(),
+                    meta_id_pic: westend_9070().to_vec(),
                 },
             },
         }]),
@@ -1436,7 +1438,7 @@ fn add_specs_dock_alice_verified_db_not_verified() {
                 f: MVerifierDetails {
                     public_key: "d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d"
                         .to_string(),
-                    identicon: alice_sr_alice(),
+                    identicon: alice_sr_alice().to_vec(),
                     encryption: "sr25519".to_string(),
                 },
             },
@@ -1557,7 +1559,7 @@ fn add_specs_dock_both_verified_same() {
                 f: MVerifierDetails {
                     public_key: "d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d"
                         .to_string(),
-                    identicon: alice_sr_alice(),
+                    identicon: alice_sr_alice().to_vec(),
                     encryption: "sr25519".to_string(),
                 },
             },
@@ -1619,7 +1621,7 @@ fn add_specs_dock_both_verified_different() {
                 f: MVerifierDetails {
                     public_key: "88dc3417d5058ec4b4503e0c12ea1a0a89be200fe98922423d4334014fa6b0ee"
                         .to_string(),
-                    identicon: ed(),
+                    identicon: ed().to_vec(),
                     encryption: "ed25519".to_string(),
                 },
             },
@@ -1759,7 +1761,7 @@ fn add_specs_westend_ed25519_alice_signed_db_not_verified() {
                 f: MVerifierDetails {
                     public_key: "d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d"
                         .to_string(),
-                    identicon: alice_sr_alice(),
+                    identicon: alice_sr_alice().to_vec(),
                     encryption: "sr25519".to_string(),
                 },
             },
@@ -1846,7 +1848,7 @@ fn add_specs_westend_ed25519_both_verified_same() {
                 f: MVerifierDetails {
                     public_key: "d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d"
                         .to_string(),
-                    identicon: alice_sr_alice(),
+                    identicon: alice_sr_alice().to_vec(),
                     encryption: "sr25519".to_string(),
                 },
             },
@@ -1931,7 +1933,7 @@ fn parse_transaction_4_unknown_author() {
             card: Card::AuthorPlainCard {
                 f: MSCAuthorPlain {
                     base58: "5FHneW46xGXgs5mUiveU4sbTyGBzmstUspZC92UhjJM694ty".to_string(),
-                    identicon: bob(),
+                    identicon: bob().to_vec(),
                 },
             },
         }]),
@@ -1983,7 +1985,7 @@ fn parse_transaction_4_unknown_author() {
                 card: Card::IdCard {
                     f: MSCId {
                         base58: "5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY".to_string(),
-                        identicon: alice_sr_alice(),
+                        identicon: alice_sr_alice().to_vec(),
                     },
                 },
             },
@@ -2083,7 +2085,7 @@ fn parse_transaction_5_unknown_network() {
                 f: MVerifierDetails {
                     public_key: "761291ee5faf5b5b67b028aa7e28fb1271bf40af17a486b368e8c7de86ad3c62"
                         .to_string(),
-                    identicon: id_03(),
+                    identicon: id_03().to_vec(),
                     encryption: "sr25519".to_string(),
                 },
             },
@@ -2118,9 +2120,10 @@ fn parse_transaction_6_error_on_parsing() {
             card: Card::AuthorCard {
                 f: TransactionAuthor {
                     base58: "5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY".to_string(),
-                    identicon: alice_sr_alice(),
+                    identicon: alice_sr_alice().to_vec(),
                     seed: "Alice".to_string(),
                     derivation_path: "//Alice".to_string(),
+                    has_pwd: false,
                 },
             },
         }]),
@@ -2209,9 +2212,10 @@ fn parse_transaction_7_error_on_parsing() {
             card: Card::AuthorCard {
                 f: TransactionAuthor {
                     base58: "5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY".to_string(),
-                    identicon: alice_sr_alice(),
+                    identicon: alice_sr_alice().to_vec(),
                     seed: "Alice".to_string(),
                     derivation_path: "//Alice".to_string(),
+                    has_pwd: false,
                 },
             },
         }]),
@@ -2301,9 +2305,10 @@ fn parse_transaction_8_error_on_parsing() {
             card: Card::AuthorCard {
                 f: TransactionAuthor {
                     base58: "5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY".to_string(),
-                    identicon: alice_sr_alice(),
+                    identicon: alice_sr_alice().to_vec(),
                     seed: "Alice".to_string(),
                     derivation_path: "//Alice".to_string(),
+                    has_pwd: false,
                 },
             },
         }]),
@@ -2396,9 +2401,10 @@ fn parse_msg_1() {
 
     let author_info_known = TransactionAuthor {
         base58: "5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY".to_string(),
-        identicon: alice_sr_alice(),
+        identicon: alice_sr_alice().to_vec(),
         seed: "Alice".to_string(),
         derivation_path: "//Alice".to_string(),
+        has_pwd: false,
     };
 
     let network_info_known = westend_spec();

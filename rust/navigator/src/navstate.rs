@@ -1506,7 +1506,8 @@ impl State {
                     let history = db_handling::manage_history::get_history(dbname).unwrap();
                     let log: Vec<_> = history
                         .into_iter()
-                        .map(|(_, entry)| History {
+                        .map(|(order, entry)| History {
+                            order: order.stamp(),
                             timestamp: entry.timestamp,
                             events: entry.events,
                         })
@@ -1776,7 +1777,7 @@ impl State {
                 },
                 Modal::SignatureReady(ref a) => Some(ModalData::SignatureReady {
                     f: MSignatureReady {
-                        signature: a.to_string(),
+                        signature: a.to_vec(),
                     },
                 }),
                 Modal::EnterPassword => match new_navstate.screen {
@@ -1847,7 +1848,7 @@ impl State {
                             };
                             let f = MSufficientCryptoReady {
                                 author_info,
-                                sufficient: String::new(),
+                                sufficient: vec![],
                                 content,
                             };
                             Some(ModalData::SufficientCryptoReady { f })

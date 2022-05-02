@@ -480,12 +480,13 @@ impl SufficientCryptoState {
         address_details: &AddressDetails,
         new_secret_string: &str,
     ) -> Self {
-        let identicon = hex::encode(make_identicon_from_multisigner(multisigner));
+        let identicon = make_identicon_from_multisigner(multisigner);
         let author_info = TransactionAuthor {
             base58: hex::encode(multisigner_to_public(multisigner)),
             identicon,
             seed: address_details.seed_name.clone(),
             derivation_path: address_details.path.clone(),
+            has_pwd: address_details.has_pwd,
         };
         Self {
             key_selected: Some((

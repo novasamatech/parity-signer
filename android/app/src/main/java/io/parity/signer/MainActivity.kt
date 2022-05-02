@@ -37,6 +37,7 @@ class MainActivity : AppCompatActivity() {
 	init {
 		initLogging("SIGNER_RUST_LOG")
 	}
+
 	//rust library is initialized inside data model
 	private val signerDataModel by viewModels<SignerDataModel>()
 
@@ -63,7 +64,6 @@ fun SignerApp(signerDataModel: SignerDataModel) {
 	ParitySignerTheme {
 		val onBoardingDone = signerDataModel.onBoardingDone.observeAsState()
 		val authenticated = signerDataModel.authenticated.observeAsState()
-		val signerAlert = signerDataModel.alert.observeAsState()
 		val shieldAlert = signerDataModel.alertState.observeAsState()
 		val footer = signerDataModel.footer.observeAsState()
 
@@ -73,9 +73,7 @@ fun SignerApp(signerDataModel: SignerDataModel) {
 					BackHandler {
 						//TODO: implement this in backend
 						if (
-							signerDataModel.alert.value == SignerAlert.Empty
-							&&
-							signerDataModel.modalData.value is ModalData.Text
+							signerDataModel.modalData.value == null
 							&&
 							(
 								signerDataModel.screenData.value is ScreenData.Log ||
@@ -104,7 +102,7 @@ fun SignerApp(signerDataModel: SignerDataModel) {
 								signerDataModel = signerDataModel
 							)
 							AlertSelector(
-								alert = signerAlert.value ?: SignerAlert.Empty,
+								alert = SignerAlert.Empty,
 								signerDataModel = signerDataModel
 							)
 						}

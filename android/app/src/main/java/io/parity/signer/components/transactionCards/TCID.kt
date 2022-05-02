@@ -9,10 +9,12 @@ import org.json.JSONObject
 
 @Composable
 fun TCID(payload: JSONObject) {
+	/*
 	Row {
 		Identicon(identicon = payload.optString("identicon"))
 		Column {
 			Text(payload.optString("base58"))
 		}
 	}
+	 */
 }

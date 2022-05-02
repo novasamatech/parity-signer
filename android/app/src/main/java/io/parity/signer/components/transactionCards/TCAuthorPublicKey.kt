@@ -13,6 +13,7 @@ import org.json.JSONObject
 
 @Composable
 fun TCAuthorPublicKey(payload: JSONObject) {
+	/*
 	Row {
 		Identicon(identicon = payload.optString("identicon"))
 		Column {
@@ -20,4 +21,5 @@ fun TCAuthorPublicKey(payload: JSONObject) {
 			Text(payload.optString("hex"), style = CryptoTypography.body2, color = MaterialTheme.colors.Crypto400)
 		}
 	}
+	 */
 }

@@ -25,12 +25,12 @@ fun SignerDataModel.pushButton(
 		_footerButton.value = actionResult.footerButton
 		_rightButton.value = actionResult.rightButton
 		_screenNameType.value = actionResult.screenNameType
-		_alert.value = SignerAlert.valueOf(actionResult.alert)
 		_screenData.value = actionResult.screenData
 		_modalData.value = actionResult.modalData
-		_alertData.value = JSONObject(actionResult.alertData)
+		_alertData.value = actionResult.alertData
 		Log.d("screen", _screenData.value.toString())
 		Log.d("modal", _modalData.value.toString())
+
 	} catch (e: java.lang.Exception) {
 		Log.e("Navigation error", e.toString())
 		Toast.makeText(context, e.toString(), Toast.LENGTH_SHORT).show()

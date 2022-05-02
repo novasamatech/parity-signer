@@ -23,11 +23,10 @@ import androidx.compose.ui.unit.dp
 import io.parity.signer.ui.theme.*
 import org.json.JSONObject
 import io.parity.signer.uniffi.Action
-import io.parity.signer.uniffi.SeedWord
 
 @Composable
 fun RestoreSeedPhraseBox(
-	seedPhrase: List<SeedWord>,
+	seedPhrase: List<String>,
 	seedWord: TextFieldValue,
 	button: (action: Action, details: String) -> Unit,
 	keyboard: Boolean
@@ -45,11 +44,13 @@ fun RestoreSeedPhraseBox(
 		) {
 			//TODO: make this thing interactive
 			Text(
-				seedPhrase.sortedBy { it.order }
-					.joinToString(" ") { it.content },
+				seedPhrase
+					.joinToString(" "),
 				style = CryptoTypography.body1,
 				color = MaterialTheme.colors.Crypto400,
-				modifier = Modifier.fillMaxWidth().padding(12.dp)
+				modifier = Modifier
+					.fillMaxWidth()
+					.padding(12.dp)
 			)
 			Divider(color = MaterialTheme.colors.Border400)
 			Row(horizontalArrangement = Arrangement.Center) {
@@ -63,7 +64,8 @@ fun RestoreSeedPhraseBox(
 						Text(
 							">",
 							style = MaterialTheme.typography.body2,
-							color = MaterialTheme.colors.Text400						)
+							color = MaterialTheme.colors.Text400
+						)
 					},
 					textStyle = CryptoTypography.body2,
 					keyboardOptions = KeyboardOptions(
@@ -84,7 +86,9 @@ fun RestoreSeedPhraseBox(
 						leadingIconColor = MaterialTheme.colors.Text400,
 						focusedIndicatorColor = Color.Transparent
 					),
-					modifier = Modifier.focusRequester(focusRequester = focusRequester).fillMaxWidth(1f)
+					modifier = Modifier
+						.focusRequester(focusRequester = focusRequester)
+						.fillMaxWidth(1f)
 				)
 			}
 		}
