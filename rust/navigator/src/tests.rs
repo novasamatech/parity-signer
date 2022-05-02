@@ -17,7 +17,7 @@ use constants::{
     },
     ALICE_SEED_PHRASE,
 };
-use db_handling::cold_default::{populate_cold_nav_test, signer_init};
+use db_handling::cold_default::{populate_cold_nav_test, init_db};
 use definitions::{
     error_signer::Signer,
     network_specs::{Verifier, VerifierValue},
@@ -267,7 +267,7 @@ fn signature_is_good(transaction_hex: &str, signature_hex: &str) -> bool {
 fn flow_test_1() {
     let dbname = "for_tests/flow_test_1";
     populate_cold_nav_test(dbname).unwrap();
-    signer_init(dbname, verifier_alice_sr25519()).unwrap();
+    init_db::<Signer>(dbname, verifier_alice_sr25519()).unwrap();
     init_navigation(dbname, "");
 
     let real_json = do_action("Start", "", "");

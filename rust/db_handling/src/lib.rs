@@ -24,7 +24,8 @@
 //!
 //! Feature `"test"` includes both `"signer"` and `"active"` features, along
 //! with some testing, and is the default one.  
-
+// possibly TODO: rename all database_name into database_path or whatever,
+// currently it is quite confusing
 #![deny(unused_crate_dependencies)]
 
 #[cfg(feature = "active")]

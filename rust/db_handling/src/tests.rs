@@ -33,16 +33,9 @@ use crate::{
     },
     db_transactions::TrDbCold,
     helpers::{
-        display_general_verifier,
-        get_danger_status,
-        open_db,
-        open_tree,
-        remove_metadata,
-        remove_network,
-        remove_types_info,
-        transfer_metadata_to_cold,
-        try_get_valid_current_verifier,
-        upd_id_batch,
+        display_general_verifier, get_danger_status, open_db, open_tree, remove_metadata,
+        remove_network, remove_types_info, transfer_metadata_to_cold,
+        try_get_valid_current_verifier, upd_id_batch,
     },
     hot_default::reset_hot_database,
     identities::{
@@ -58,7 +51,7 @@ use crate::{
     },
     manage_history::{
         device_was_online, enter_events, events_to_batch, print_history,
-        print_history_entry_by_order, reset_danger_status_to_safe,
+        /*print_history_entry_by_order, */ reset_danger_status_to_safe,
     },
 };
 
@@ -1326,6 +1319,7 @@ fn test_all_events() {
     std::fs::remove_dir_all(dbname).unwrap();
 }
 
+/*
 #[test]
 fn print_single_event() {
     let dbname = "for_tests/print_single_event";
@@ -1341,6 +1335,7 @@ fn print_single_event() {
     );
     std::fs::remove_dir_all(dbname).unwrap();
 }
+*/
 
 fn check_for_network(name: &str, version: u32, dbname: &str) -> bool {
     let database: Db = open(dbname).unwrap();

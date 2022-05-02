@@ -78,13 +78,7 @@ use definitions::{
 #[cfg(any(feature = "active", feature = "signer"))]
 use crate::{
     db_transactions::TrDbCold,
-    helpers::{
-        get_all_networks,
-        make_batch_clear_tree,
-        open_db,
-        open_tree,
-        upd_id_batch,
-    },
+    helpers::{get_all_networks, make_batch_clear_tree, open_db, open_tree, upd_id_batch},
     manage_history::events_to_batch,
 };
 #[cfg(feature = "signer")]

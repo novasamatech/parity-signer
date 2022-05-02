@@ -9,6 +9,8 @@ use sled::{open, Batch, Db, Tree};
 use constants::{ADDRTREE, DANGER, GENERALVERIFIER, VERIFIERS};
 use constants::{METATREE, SETTREE, SPECSTREE, TYPES};
 
+#[cfg(feature = "active")]
+use definitions::error_active::{Active, ErrorActive};
 #[cfg(feature = "signer")]
 use definitions::{
     danger::DangerRecord,
@@ -18,17 +20,9 @@ use definitions::{
     keyring::{NetworkSpecsKey, VerifierKey},
     network_specs::{CurrentVerifier, ValidCurrentVerifier, Verifier},
 };
-#[cfg(feature = "active")]
 use definitions::{
-    error_active::{Active, ErrorActive},
-};
-use definitions::{
-    error::ErrorSource,
-    keyring::MetaKey,
-    metadata::MetaValues,
-    network_specs::NetworkSpecs,
-    qr_transfers::ContentLoadTypes,
-    types::TypeEntry,
+    error::ErrorSource, keyring::MetaKey, metadata::MetaValues, network_specs::NetworkSpecs,
+    qr_transfers::ContentLoadTypes, types::TypeEntry,
 };
 #[cfg(any(feature = "active", feature = "signer"))]
 use definitions::{
@@ -36,10 +30,10 @@ use definitions::{
     users::AddressDetails,
 };
 
-#[cfg(feature = "signer")]
-use crate::manage_history::events_to_batch;
 #[cfg(any(feature = "active", feature = "signer"))]
 use crate::db_transactions::TrDbCold;
+#[cfg(feature = "signer")]
+use crate::manage_history::events_to_batch;
 
 /// Open a database.
 ///
