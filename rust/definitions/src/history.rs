@@ -28,6 +28,7 @@ use crate::{
     crypto::Encryption,
     keyring::VerifierKey,
     metadata::MetaValues,
+    navigation::MTransaction,
     network_specs::{
         NetworkSpecs, NetworkSpecsToSend, ValidCurrentVerifier, Verifier, VerifierValue,
     },

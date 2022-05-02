@@ -76,7 +76,7 @@ fun SettingsScreen(settings: MSettings, signerDataModel: SignerDataModel) {
 							color = MaterialTheme.colors.Crypto400
 						)
 						Text(
-							"encryption: " + settings.encryption ?: "",
+							"encryption: " + settings.encryption,
 							style = CryptoTypography.body1,
 							color = MaterialTheme.colors.Text400
 						)

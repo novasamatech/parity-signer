@@ -187,9 +187,17 @@ pub struct MLog {
 }
 
 #[derive(Clone, Debug, PartialEq)]
+pub struct MEventMaybeDecoded {
+    pub event: Event,
+    pub decoded: Option<TransactionCardSet>,
+    pub signed_by: Option<TransactionAuthor>,
+    pub verifier_details: Option<MVerifierDetails>,
+}
+
+#[derive(Clone, Debug, PartialEq)]
 pub struct MLogDetails {
     pub timestamp: String,
-    pub events: Vec<Event>,
+    pub events: Vec<MEventMaybeDecoded>,
 }
 
 #[derive(Clone, Debug, PartialEq)]

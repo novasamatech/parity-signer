@@ -26,11 +26,11 @@ use definitions::{
     },
     navigation::{
         ActionResult, Card, DerivationEntry, DerivationPack, FooterButton, History, MBackup,
-        MDeriveKey, MEnterPassword, MKeyDetails, MKeyDetailsMulti, MKeys, MKeysCard, MLog,
-        MLogDetails, MLogRight, MMMNetwork, MMManageNetworks, MMNetwork, MManageNetworks,
-        MMetadataRecord, MNetworkCard, MNetworkDetails, MNetworkMenu, MNewSeed, MNewSeedBackup,
-        MPasswordConfirm, MRawKey, MRecoverSeedName, MRecoverSeedPhrase, MSCAuthor, MSCCall,
-        MSCContent, MSCCurrency, MSCEnumVariantName, MSCEraMortal, MSCFieldName, MSCId,
+        MDeriveKey, MEnterPassword, MEventMaybeDecoded, MKeyDetails, MKeyDetailsMulti, MKeys,
+        MKeysCard, MLog, MLogDetails, MLogRight, MMMNetwork, MMManageNetworks, MMNetwork,
+        MManageNetworks, MMetadataRecord, MNetworkCard, MNetworkDetails, MNetworkMenu, MNewSeed,
+        MNewSeedBackup, MPasswordConfirm, MRawKey, MRecoverSeedName, MRecoverSeedPhrase, MSCAuthor,
+        MSCCall, MSCContent, MSCCurrency, MSCEnumVariantName, MSCEraMortal, MSCFieldName, MSCId,
         MSCMetaSpecs, MSCNameVersion, MSeedKeyCard, MSeedMenu, MSeeds, MSettings,
         MSignSufficientCrypto, MSignatureReady, MSufficientCryptoReady, MTransaction, MTypesInfo,
         MVerifier, MVerifierDetails, ModalData, Network, NetworkSpecsToSend, RightButton,
@@ -1049,6 +1049,7 @@ fn flow_test_1() {
     let mut action = do_action(Action::ShowLogDetails, "2", "").unwrap();
     erase_log_timestamps(&mut action.screen_data);
 
+    let genesis_hash = "b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe";
     let mut expected_action = ActionResult {
         screen_label: "Event details".to_string(),
         back: true,
@@ -1059,32 +1060,34 @@ fn flow_test_1() {
         screen_data: ScreenData::LogDetails {
             f: MLogDetails {
                 timestamp: String::new(),
-                events: vec![Event::NetworkSpecsRemoved {
-                    network_specs_display: NetworkSpecsDisplay {
-                        specs: NetworkSpecs {
-                            base58prefix: 2,
-                            color: "#000".to_string(),
-                            decimals: 12,
-                            encryption: Encryption::Sr25519,
-                            genesis_hash: H256::from_str(
-                                "b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe",
-                            )
-                            .unwrap(),
-                            logo: "kusama".to_string(),
-                            name: "kusama".to_string(),
-                            order: 1,
-                            path_id: "//kusama".to_string(),
-                            secondary_color: "#262626".to_string(),
-                            title: "Kusama".to_string(),
-                            unit: "KSM".to_string(),
-                        },
-                        valid_current_verifier: ValidCurrentVerifier::General,
-                        general_verifier: Verifier {
-                            v: Some(VerifierValue::Standard {
-                                m: sr_multisigner_from_hex(hex_2),
-                            }),
+                events: vec![MEventMaybeDecoded {
+                    event: Event::NetworkSpecsRemoved {
+                        network_specs_display: NetworkSpecsDisplay {
+                            specs: NetworkSpecs {
+                                base58prefix: 2,
+                                color: "#000".to_string(),
+                                decimals: 12,
+                                encryption: Encryption::Sr25519,
+                                genesis_hash: H256::from_str(genesis_hash).unwrap(),
+                                logo: "kusama".to_string(),
+                                name: "kusama".to_string(),
+                                order: 1,
+                                path_id: "//kusama".to_string(),
+                                secondary_color: "#262626".to_string(),
+                                title: "Kusama".to_string(),
+                                unit: "KSM".to_string(),
+                            },
+                            valid_current_verifier: ValidCurrentVerifier::General,
+                            general_verifier: Verifier {
+                                v: Some(VerifierValue::Standard {
+                                    m: sr_multisigner_from_hex(hex_2),
+                                }),
+                            },
                         },
                     },
+                    decoded: None,
+                    signed_by: None,
+                    verifier_details: None,
                 }],
             },
         },
@@ -5445,20 +5448,25 @@ fn flow_test_1() {
         screen_data: ScreenData::LogDetails {
             f: MLogDetails {
                 timestamp: String::new(),
-                events: vec![Event::MessageSigned {
-                    sign_message_display: SignMessageDisplay {
-                        message: String::from_utf8(hex::decode(&card_text).unwrap()).unwrap(),
-                        network_name: "westend".to_string(),
-                        signed_by: VerifierValue::Standard {
-                            m: MultiSigner::Sr25519(
-                                sp_core::sr25519::Public::try_from(
-                                    hex::decode(signed_by).unwrap().as_ref(),
-                                )
-                                .unwrap(),
-                            ),
+                events: vec![MEventMaybeDecoded {
+                    event: Event::MessageSigned {
+                        sign_message_display: SignMessageDisplay {
+                            message: String::from_utf8(hex::decode(&card_text).unwrap()).unwrap(),
+                            network_name: "westend".to_string(),
+                            signed_by: VerifierValue::Standard {
+                                m: MultiSigner::Sr25519(
+                                    sp_core::sr25519::Public::try_from(
+                                        hex::decode(signed_by).unwrap().as_ref(),
+                                    )
+                                    .unwrap(),
+                                ),
+                            },
+                            user_comment: "text test".to_string(),
                         },
-                        user_comment: "text test".to_string(),
                     },
+                    decoded: None,
+                    signed_by: None,
+                    verifier_details: None,
                 }],
             },
         },

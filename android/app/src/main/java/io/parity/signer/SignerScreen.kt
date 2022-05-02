@@ -144,8 +144,7 @@ fun ModalSelector(
 			}
 		}
 		is ModalData.SufficientCryptoReady -> SufficientCryptoReady(
-			modal.f,
-			signerDataModel = signerDataModel
+			modal.f
 		)
 		is ModalData.KeyDetailsAction -> KeyDetailsAction(signerDataModel = signerDataModel)
 		is ModalData.TypesInfo -> TypesInfo(

@@ -313,9 +313,16 @@ dictionary History {
     sequence<Event> events;
 };
 
+dictionary MEventMaybeDecoded {
+    Event event;
+    TransactionAuthor? signed_by;
+    TransactionCardSet? decoded;
+    MVerifierDetails? verifier_details;
+};
+
 dictionary MLogDetails {
     string timestamp;
-    sequence<Event> events;
+    sequence<MEventMaybeDecoded> events;
 };
 
 dictionary MTransaction {

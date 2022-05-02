@@ -9,7 +9,7 @@ use definitions::navigation::{
     ScreenNameType, TransactionNetworkInfo, TransactionType,
 };
 use sp_runtime::MultiSigner;
-use transaction_parsing::TransactionAction;
+use transaction_parsing::{entry_to_transactions_with_decoding, TransactionAction};
 use zeroize::Zeroize;
 
 use crate::actions::Action;
@@ -1518,10 +1518,9 @@ impl State {
                 }
                 Screen::LogDetails(order) => {
                     let e = get_history_entry_by_order(order, dbname).unwrap();
-                    let f = MLogDetails {
-                        timestamp: e.timestamp,
-                        events: e.events,
-                    };
+                    let timestamp = e.timestamp.clone();
+                    let events = entry_to_transactions_with_decoding(e, dbname).unwrap();
+                    let f = MLogDetails { timestamp, events };
                     ScreenData::LogDetails { f }
                 }
                 Screen::Scan => ScreenData::Scan,

@@ -9,17 +9,24 @@ import io.parity.signer.components.Identicon
 import io.parity.signer.ui.theme.Crypto400
 import io.parity.signer.ui.theme.CryptoTypography
 import io.parity.signer.ui.theme.Text400
+import io.parity.signer.uniffi.MVerifierDetails
 import org.json.JSONObject
 
 @Composable
-fun TCAuthorPublicKey(payload: JSONObject) {
-	/*
+fun TCAuthorPublicKey(key: MVerifierDetails) {
 	Row {
-		Identicon(identicon = payload.optString("identicon"))
+		Identicon(identicon = key.identicon)
 		Column {
-			Text("Signed with " + payload.optString("encryption"), style = MaterialTheme.typography.body2, color = MaterialTheme.colors.Text400)
-			Text(payload.optString("hex"), style = CryptoTypography.body2, color = MaterialTheme.colors.Crypto400)
+			Text(
+				"Signed with " + key.encryption,
+				style = MaterialTheme.typography.body2,
+				color = MaterialTheme.colors.Text400
+			)
+			Text(
+				key.publicKey,
+				style = CryptoTypography.body2,
+				color = MaterialTheme.colors.Crypto400
+			)
 		}
 	}
-	 */
 }
