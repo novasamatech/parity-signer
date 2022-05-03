@@ -11,7 +11,6 @@ import io.parity.signer.ui.theme.CryptoTypography
 import io.parity.signer.ui.theme.Text400
 import io.parity.signer.ui.theme.Text600
 import io.parity.signer.uniffi.MMetadataRecord
-import org.json.JSONObject
 
 @Composable
 fun TCMeta(meta: MMetadataRecord) {
@@ -23,7 +22,7 @@ fun TCMeta(meta: MMetadataRecord) {
 				style = MaterialTheme.typography.body2,
 				color = MaterialTheme.colors.Text600
 			)
-			Text(/*payload.optString("specname")*/ meta.specsVersion,
+			Text(meta.specsVersion,
 				style = CryptoTypography.body2,
 				color = MaterialTheme.colors.Crypto400
 			)

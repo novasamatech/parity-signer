@@ -12,22 +12,18 @@ import io.parity.signer.components.transactionCards.*
 import io.parity.signer.models.decodeHex
 import io.parity.signer.ui.theme.Text600
 import io.parity.signer.uniffi.Card
-import io.parity.signer.uniffi.TransactionAuthor
 import io.parity.signer.uniffi.TransactionCard
 
 /**
  * Selector for transaction card appearance
  */
 @Composable
-fun TransactionCard(card: TransactionCard, authorInfo: TransactionAuthor?) {
+fun TransactionCard(card: TransactionCard) {
 	Box(
 		modifier = Modifier
 			.padding(start = (card.indent.toInt() * 10).dp)
 			.fillMaxWidth()
 	) {
-		authorInfo?.let {
-			TCAuthor(it)
-		}
 		val card = card.card
 		when (card) {
 			is Card.AuthorCard -> TCAuthor(author = card.f)
@@ -51,7 +47,7 @@ fun TransactionCard(card: TransactionCard, authorInfo: TransactionAuthor?) {
 			is Card.FieldNumberCard -> TCFieldNumber(fieldNumber = card.f)
 			is Card.IdCard -> TCID(card.f)
 			is Card.IdentityFieldCard -> TCIdentityField(text = card.f)
-			is Card.MetaCard -> TODO() //TCMeta(meta = )
+			is Card.MetaCard -> TCMeta(meta = card.f)
 			is Card.NameVersionCard -> TCNameVersion(nameVersion = card.f)
 			is Card.NetworkGenesisHashCard -> TCGenesisHash(payload = card.f)
 			is Card.NetworkInfoCard -> TODO() //NetworkCard

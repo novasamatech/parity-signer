@@ -488,6 +488,7 @@ pub fn network_details_by_key(
             let meta_id_pic = pic_meta(&meta_hash);
 
             MMetadataRecord {
+                specname: m.name,
                 specs_version: m.version.to_string(),
                 meta_hash: hex::encode(meta_hash),
                 meta_id_pic,

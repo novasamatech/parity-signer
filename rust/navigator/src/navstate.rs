@@ -1440,7 +1440,6 @@ impl State {
     ) -> Result<ActionResult, String> {
         let mut new_navstate = self.navstate.to_owned();
 
-        log::warn!("action {:?}", action);
         if let Some(ref dbname) = self.dbname.clone() {
             let mut errorline;
             //Try to perform action
@@ -1493,13 +1492,9 @@ impl State {
                 Action::ShowDocuments => self.handle_show_documents(),
                 Action::TextEntry => self.handle_text_entry(details_str),
                 Action::PushWord => self.handle_push_word(details_str),
-                Action::Nothing => {
-                    log::warn!("no action was passed in action");
-                    (new_navstate, String::new())
-                }
+                Action::Nothing => (new_navstate, String::new()),
             };
 
-            log::warn!("new_navstate {:?}", new_navstate);
             //Prepare screen details
             let screen_data = match new_navstate.screen {
                 Screen::Log => {
@@ -1905,7 +1900,6 @@ impl State {
                 alert_data,
             };
 
-            log::warn!("action result {:?}", action_result);
             Ok(action_result)
         } else {
             Err("db not initialized".to_string())

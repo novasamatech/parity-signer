@@ -348,6 +348,7 @@ pub struct MVerifier {
 
 #[derive(Clone, Debug, PartialEq)]
 pub struct MMetadataRecord {
+    pub specname: String,
     pub specs_version: String,
     pub meta_hash: String,
     pub meta_id_pic: Vec<u8>,
@@ -610,14 +611,6 @@ pub struct MSCId {
 }
 
 #[derive(Clone, Debug, PartialEq)]
-pub struct MSCMetaSpecs {
-    pub specname: String,
-    pub spec_version: String,
-    pub meta_hash: String,
-    pub meta_id_pic: Vec<u8>,
-}
-
-#[derive(Clone, Debug, PartialEq)]
 pub struct MSCNameVersion {
     pub name: String,
     pub version: String,
@@ -661,7 +654,7 @@ pub enum Card {
     FieldNumberCard { f: MSCFieldNumber },
     IdCard { f: MSCId },
     IdentityFieldCard { f: String },
-    MetaCard { f: MSCMetaSpecs },
+    MetaCard { f: MMetadataRecord },
     NameVersionCard { f: MSCNameVersion },
     NetworkGenesisHashCard { f: String },
     NetworkNameCard { f: String },

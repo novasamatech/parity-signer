@@ -25,7 +25,7 @@ fun TransactionCards(
 	transactions?.let {
 		scope.items(it.size) { item ->
 			TransactionCard(
-				card = it[item], authorInfo = authorInfo
+				card = it[item]
 			)
 		}
 	}
