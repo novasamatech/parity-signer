@@ -67,7 +67,7 @@ fun SettingsScreen(settings: MSettings, signerDataModel: SignerDataModel) {
 						.padding(8.dp)
 						.fillMaxWidth(1f)
 				) {
-					Identicon(identicon = settings.identicon ?: "")
+					Identicon(identicon = settings.identicon ?: listOf())
 					Spacer(Modifier.width(4.dp))
 					Column {
 						Text(
@@ -76,7 +76,7 @@ fun SettingsScreen(settings: MSettings, signerDataModel: SignerDataModel) {
 							color = MaterialTheme.colors.Crypto400
 						)
 						Text(
-							"encryption: " + settings.encryption ?: "",
+							"encryption: " + settings.encryption,
 							style = CryptoTypography.body1,
 							color = MaterialTheme.colors.Text400
 						)

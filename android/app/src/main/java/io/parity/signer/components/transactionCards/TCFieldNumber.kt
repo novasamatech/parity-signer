@@ -4,10 +4,15 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import io.parity.signer.ui.theme.Text600
+import io.parity.signer.uniffi.MscFieldNumber
 import org.json.JSONObject
 
 @Composable
-fun TCFieldNumber(payload: JSONObject) {
+fun TCFieldNumber(fieldNumber: MscFieldNumber) {
 	//TODO: documentation button
-	Text(payload.optString("number"), style = MaterialTheme.typography.body2, color = MaterialTheme.colors.Text600)
+	Text(
+		fieldNumber.number,
+		style = MaterialTheme.typography.body2,
+		color = MaterialTheme.colors.Text600
+	)
 }

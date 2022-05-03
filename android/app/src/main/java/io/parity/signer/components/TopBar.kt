@@ -18,6 +18,8 @@ import io.parity.signer.ui.theme.Action400
 import io.parity.signer.ui.theme.Bg100
 import io.parity.signer.ui.theme.Text400
 import io.parity.signer.uniffi.Action
+import io.parity.signer.uniffi.RightButton
+import io.parity.signer.uniffi.ScreenNameType
 
 @Composable
 fun TopBar(signerDataModel: SignerDataModel) {
@@ -44,18 +46,19 @@ fun TopBar(signerDataModel: SignerDataModel) {
 					onClick = {
 						signerDataModel.pushButton(Action.GO_BACK)
 					}) {
-					if (rightButton.value == "MultiSelect") {
+					if (rightButton.value == RightButton.MULTI_SELECT) {
 						Icon(
 							Icons.Default.Close,
 							"go back",
 							tint = MaterialTheme.colors.Text400
 						)
 					} else {
-					Icon(
-						Icons.Default.ArrowBack,
-						"go back",
-						tint = MaterialTheme.colors.Text400
-					)}
+						Icon(
+							Icons.Default.ArrowBack,
+							"go back",
+							tint = MaterialTheme.colors.Text400
+						)
+					}
 				}
 			}
 		}
@@ -65,13 +68,13 @@ fun TopBar(signerDataModel: SignerDataModel) {
 		) {
 			Text(
 				screenName.value ?: "",
-				style = if (screenNameType.value == "h1") {
+				style = if (screenNameType.value == ScreenNameType.H1) {
 					MaterialTheme.typography.h2
 				} else {
 					MaterialTheme.typography.h4
 				}
 			)
-			if (rightButton.value == "MultiSelect") {
+			if (rightButton.value == RightButton.MULTI_SELECT) {
 				SmallButton(text = "Select all") {
 					signerDataModel.pushButton(Action.SELECT_ALL)
 				}
@@ -83,33 +86,33 @@ fun TopBar(signerDataModel: SignerDataModel) {
 				.weight(0.2f, fill = true)
 				.width(72.dp)
 		) {
-			IconButton(onClick = { signerDataModel.pushButton(Action.RIGHT_BUTTON) }) {
+			IconButton(onClick = { signerDataModel.pushButton(Action.RIGHT_BUTTON_ACTION) }) {
 				when (rightButton.value) {
-					"NewSeed" -> {
+					RightButton.NEW_SEED -> {
 						Icon(
 							Icons.Default.AddCircleOutline,
 							"New Seed",
 							tint = MaterialTheme.colors.Action400
 						)
 					}
-					"Backup" -> {
+					RightButton.BACKUP -> {
 						Icon(
 							Icons.Default.MoreVert,
 							"Seed backup",
 							tint = MaterialTheme.colors.Action400
 						)
 					}
-					"LogRight" -> {
+					RightButton.LOG_RIGHT -> {
 						Icon(
 							Icons.Default.MoreVert,
 							"Log menu",
 							tint = MaterialTheme.colors.Action400
 						)
 					}
-					"MultiSelect" -> {
+					RightButton.MULTI_SELECT -> {
 
 					}
-					"None" -> {
+					null -> {
 
 					}
 					else -> {

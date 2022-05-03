@@ -47,9 +47,9 @@ fun BottomBarButton(
 			signerDataModel.pushButton(action)
 		}).width(66.dp)
 	) {
-		Icon(image, contentDescription = actionGetName(action), tint = tint)
+		Icon(image, contentDescription = actionGetName(action).toString(), tint = tint)
 		Text(
-			actionGetName(action),
+			actionGetName(action).toString(),
 			color = color,
 			style = MaterialTheme.typography.subtitle2
 		)

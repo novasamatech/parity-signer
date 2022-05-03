@@ -26,7 +26,7 @@ pub enum Screen {
     Log,
     LogDetails(u32),
     Scan,
-    Transaction(TransactionState),
+    Transaction(Box<TransactionState>),
     SeedSelector,
     Keys(KeysState),
     KeyDetails(AddressState),
@@ -480,12 +480,13 @@ impl SufficientCryptoState {
         address_details: &AddressDetails,
         new_secret_string: &str,
     ) -> Self {
-        let identicon = hex::encode(make_identicon_from_multisigner(multisigner));
+        let identicon = make_identicon_from_multisigner(multisigner);
         let author_info = TransactionAuthor {
             base58: hex::encode(multisigner_to_public(multisigner)),
             identicon,
             seed: address_details.seed_name.clone(),
             derivation_path: address_details.path.clone(),
+            has_pwd: address_details.has_pwd,
         };
         Self {
             key_selected: Some((
@@ -593,26 +594,26 @@ impl Screen {
 
     pub fn has_back(&self) -> bool {
         match self {
-            Screen::Log => false,
-            Screen::LogDetails(_) => true,
-            Screen::Scan => false,
-            Screen::Transaction(_) => true,
-            Screen::SeedSelector => false,
-            Screen::Keys(_) => true,
-            Screen::KeyDetails(_) => true,
-            Screen::KeyDetailsMulti(_) => true,
-            Screen::NewSeed => true,
-            Screen::RecoverSeedName(_) => true,
-            Screen::RecoverSeedPhrase(_) => true,
-            Screen::DeriveKey(_) => true,
-            Screen::Settings => false,
-            Screen::Verifier => true,
-            Screen::ManageNetworks => true,
-            Screen::NetworkDetails(_) => true,
-            Screen::SelectSeedForBackup => true,
-            Screen::SignSufficientCrypto(_) => true,
-            Screen::Documents => true,
-            Screen::Nowhere => false,
+            Screen::Log
+            | Screen::Scan
+            | Screen::Settings
+            | Screen::SeedSelector
+            | Screen::Nowhere => false,
+            Screen::Transaction(_)
+            | Screen::LogDetails(_)
+            | Screen::Keys(_)
+            | Screen::KeyDetails(_)
+            | Screen::KeyDetailsMulti(_)
+            | Screen::NewSeed
+            | Screen::RecoverSeedName(_)
+            | Screen::RecoverSeedPhrase(_)
+            | Screen::DeriveKey(_)
+            | Screen::Verifier
+            | Screen::ManageNetworks
+            | Screen::NetworkDetails(_)
+            | Screen::SelectSeedForBackup
+            | Screen::SignSufficientCrypto(_)
+            | Screen::Documents => true,
         }
     }
 }

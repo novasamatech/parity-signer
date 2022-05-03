@@ -8,15 +8,20 @@ import androidx.compose.material.icons.filled.*
 import androidx.compose.runtime.Composable
 import io.parity.signer.models.abbreviateString
 import io.parity.signer.models.decode64
-import io.parity.signer.models.parseTransaction
-import io.parity.signer.uniffi.Event
-import io.parity.signer.uniffi.VerifierValue
+import io.parity.signer.uniffi.*
 
 /**
  * Detailed history event description representation selector
  */
 @Composable
-fun HistoryCardExtended(event: Event, timestamp: String) {
+fun HistoryCardExtended(
+	event: MEventMaybeDecoded,
+	timestamp: String
+) {
+	val decodedTransaction = event.decoded
+	val signedBy = event.signedBy
+	val verifierDetails = event.verifierDetails
+	val event = event.event
 	when (event) {
 		is Event.DatabaseInitiated -> {
 			HistoryCardTemplate(
@@ -217,38 +222,34 @@ fun HistoryCardExtended(event: Event, timestamp: String) {
 			)
 		}
 		is Event.TransactionSigned -> {
-			/* TODO
-			val content = card.optJSONObject("payload") ?: JSONObject()
 			Column {
 				Text("Transaction signed")
 
-				TransactionPreviewField(
-					transaction = signDisplay.transaction.toString() TODO: .parseTransaction()
-				)
-
+				if (decodedTransaction != null) {
+					TransactionPreviewField(
+						cardSet = decodedTransaction,
+						authorInfo = signedBy
+					)
+				}
 				Text("Signed by:")
 				Row {
 					Identicon(
-						identicon = content.optJSONObject("signed_by")
-							?.optString("identicon")
-							?: ""
+						identicon = signedBy?.identicon ?: listOf()
 					)
 					Column {
-						Text(content.optJSONObject("signed_by")?.optString("hex") ?: "")
+						Text(verifierDetails?.publicKey ?: "")
 						Text(
-							content.optJSONObject("signed_by")?.optString("encryption") ?: ""
+							verifierDetails?.encryption ?: ""
 						)
 					}
 				}
 				Text("In network")
-				Text(content.optString("network_name"))
+				Text(event.signDisplay.networkName)
 				Text("Comment:")
 				Text(
-					card.optJSONObject("payload")?.optString("user_comment")?.decode64()
-						?: ""
+					event.signDisplay.userComment.decode64()
 				)
 			}
-			 */
 		}
 		is Event.TypesAdded -> {
 			HistoryCardTemplate(

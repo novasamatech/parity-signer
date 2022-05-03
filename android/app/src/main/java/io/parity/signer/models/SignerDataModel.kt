@@ -72,14 +72,15 @@ class SignerDataModel : ViewModel() {
 	//Navigator
 	internal val _screenLabel = MutableLiveData("")
 	internal val _back = MutableLiveData(false)
-	internal val _footerButton = MutableLiveData("")
+	internal val _footerButton: MutableLiveData<FooterButton?> =
+		MutableLiveData(null)
 	internal val _footer = MutableLiveData(false)
-	internal val _rightButton = MutableLiveData("None")
-	internal val _screenNameType = MutableLiveData("h4")
-	internal val _alert = MutableLiveData(SignerAlert.Empty)
+	internal val _rightButton: MutableLiveData<RightButton?> =
+		MutableLiveData(null)
+	internal val _screenNameType = MutableLiveData(ScreenNameType.H4)
 	internal var _screenData: MutableLiveData<ScreenData> = MutableLiveData(null)
 	internal var _modalData: MutableLiveData<ModalData> = MutableLiveData(null)
-	internal var _alertData = MutableLiveData(JSONObject())
+	internal var _alertData: MutableLiveData<String?> = MutableLiveData(null)
 
 	//Data storage locations
 	internal var dbName: String = ""
@@ -102,16 +103,15 @@ class SignerDataModel : ViewModel() {
 
 	val alertState: LiveData<ShieldAlert> = _alertState
 
-	val alert: LiveData<SignerAlert> = _alert
 	val screenLabel: LiveData<String> = _screenLabel
 	val back: LiveData<Boolean> = _back
 	val footer: LiveData<Boolean> = _footer
-	val footerButton: LiveData<String> = _footerButton
-	val rightButton: LiveData<String> = _rightButton
-	val screenNameType: LiveData<String> = _screenNameType
+	val footerButton: LiveData<FooterButton?> = _footerButton
+	val rightButton: LiveData<RightButton?> = _rightButton
+	val screenNameType: LiveData<ScreenNameType> = _screenNameType
 	val screenData: LiveData<ScreenData> = _screenData
 	val modalData: LiveData<ModalData> = _modalData
-	val alertData: LiveData<JSONObject> = _alertData
+	val alertData: LiveData<String?> = _alertData
 
 	//MARK: init boilerplate begin
 
@@ -167,6 +167,7 @@ class SignerDataModel : ViewModel() {
 				.build()
 		}
 
+		Log.e("ENCRY", "$context $keyStore $masterKey")
 		//Imitate ios behavior
 		authentication.authenticate(activity) {
 			sharedPreferences = EncryptedSharedPreferences(

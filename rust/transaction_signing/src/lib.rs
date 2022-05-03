@@ -23,7 +23,7 @@ pub fn handle_sign(
     pwd_entry: &str,
     user_comment: &str,
     database_name: &str,
-) -> Result<String, ErrorSigner> {
+) -> Result<Vec<u8>, ErrorSigner> {
     create_signature_png(
         seed_phrase,
         pwd_entry,

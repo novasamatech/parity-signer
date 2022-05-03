@@ -28,14 +28,17 @@ fun TransactionPreview(
 ) {
 	//val transaction = transaction.content //.parseTransaction()
 	val action = transaction.ttype
-  val comment = remember{ mutableStateOf("") }
+	val comment = remember { mutableStateOf("") }
 	val focusManager = LocalFocusManager.current
 	val focusRequester = remember { FocusRequester() }
 
 	Column(
 		Modifier.verticalScroll(rememberScrollState())
 	) {
-		TransactionPreviewField(transaction = transaction)
+		TransactionPreviewField(
+			cardSet = transaction.content,
+			authorInfo = transaction.authorInfo
+		)
 		transaction.authorInfo?.let {
 			/* TODO: Address -> TransactionAuthor
 			KeyCard(identity = it)
@@ -48,17 +51,25 @@ fun TransactionPreview(
 		}
 		when (action) {
 			TransactionType.SIGN -> {
-				Text("LOG NOTE", style = MaterialTheme.typography.overline, color = MaterialTheme.colors.Text400)
+				Text(
+					"LOG NOTE",
+					style = MaterialTheme.typography.overline,
+					color = MaterialTheme.colors.Text400
+				)
 
 				SingleTextInput(
 					content = comment,
-					update = {comment.value = it},
+					update = { comment.value = it },
 					onDone = { },
 					focusManager = focusManager,
 					focusRequester = focusRequester
 				)
 
-				Text("visible only on this device", style = MaterialTheme.typography.subtitle1, color = MaterialTheme.colors.Text400)
+				Text(
+					"visible only on this device",
+					style = MaterialTheme.typography.subtitle1,
+					color = MaterialTheme.colors.Text400
+				)
 
 				BigButton(
 					text = "Unlock key and sign",

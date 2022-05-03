@@ -100,14 +100,16 @@ fun ScreenSelector(signerDataModel: SignerDataModel) {
 }
 
 @Composable
-fun ModalSelector(liveModal: LiveData<ModalData>, signerDataModel: SignerDataModel) {
+fun ModalSelector(
+	liveModal: LiveData<ModalData>,
+	signerDataModel: SignerDataModel
+) {
 	val modalState by liveModal.observeAsState()
 
 	val modal = modalState
 	Log.w("SIGNER_RUST_LOG", ">>> $modal")
 
 	when (modal) {
-		is ModalData.Text -> {}
 		is ModalData.NewSeedMenu -> NewSeedMenu(signerDataModel = signerDataModel)
 		is ModalData.SeedMenu -> SeedMenu(
 			modal.f,
@@ -142,8 +144,7 @@ fun ModalSelector(liveModal: LiveData<ModalData>, signerDataModel: SignerDataMod
 			}
 		}
 		is ModalData.SufficientCryptoReady -> SufficientCryptoReady(
-			modal.f,
-			signerDataModel = signerDataModel
+			modal.f
 		)
 		is ModalData.KeyDetailsAction -> KeyDetailsAction(signerDataModel = signerDataModel)
 		is ModalData.TypesInfo -> TypesInfo(
@@ -163,6 +164,7 @@ fun ModalSelector(liveModal: LiveData<ModalData>, signerDataModel: SignerDataMod
 			}
 		}
 		is ModalData.ManageNetworks -> {}
+		null -> {}
 	}
 }
 
@@ -171,9 +173,8 @@ fun AlertSelector(alert: SignerAlert, signerDataModel: SignerDataModel) {
 	when (alert) {
 		SignerAlert.Empty -> {}
 		SignerAlert.Error -> ErrorModal(
-			error = signerDataModel.alertData.value?.optString(
-				"error"
-			) ?: "unknown error", signerDataModel = signerDataModel
+			error = signerDataModel.alertData.value ?: "unknown error",
+			signerDataModel = signerDataModel
 		)
 		SignerAlert.Shield -> ShieldAlert(signerDataModel)
 		SignerAlert.Confirm -> Confirm(signerDataModel = signerDataModel)

@@ -250,9 +250,9 @@ impl ContentLoadTypes {
     /// Types information hash is calculated for `Vec<u8>` of encoded types information,
     /// as it would be stored in the database  
     #[cfg(feature = "signer")]
-    pub fn show(&self) -> (String, String) {
+    pub fn show(&self) -> (String, Vec<u8>) {
         let types_hash = blake2b(32, &[], &self.store()).as_bytes().to_vec();
-        let types_id_pic = hex::encode(pic_types(&types_hash));
+        let types_id_pic = pic_types(&types_hash);
         (hex::encode(types_hash), types_id_pic)
     }
 }

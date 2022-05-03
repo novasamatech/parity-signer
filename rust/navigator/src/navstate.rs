@@ -2,14 +2,14 @@
 
 use db_handling::manage_history::get_history_entry_by_order;
 use definitions::navigation::{
-    ActionResult, History, MEnterPassword, MKeyDetailsMulti, MKeys, MLog, MLogDetails,
-    MManageNetworks, MNewSeed, MPasswordConfirm, MRecoverSeedName, MRecoverSeedPhrase, MSCAuthor,
-    MSCContent, MSeedMenu, MSeeds, MSettings, MSignSufficientCrypto, MSignatureReady,
-    MSufficientCryptoReady, MTransaction, ModalData, ScreenData, TransactionNetworkInfo,
-    TransactionType,
+    ActionResult, FooterButton, History, MEnterPassword, MKeyDetailsMulti, MKeys, MLog,
+    MLogDetails, MManageNetworks, MNetworkCard, MNewSeed, MPasswordConfirm, MRecoverSeedName,
+    MRecoverSeedPhrase, MSCAuthor, MSCContent, MSeedMenu, MSeeds, MSettings, MSignSufficientCrypto,
+    MSignatureReady, MSufficientCryptoReady, MTransaction, ModalData, RightButton, ScreenData,
+    ScreenNameType, TransactionNetworkInfo, TransactionType,
 };
 use sp_runtime::MultiSigner;
-use transaction_parsing::TransactionAction;
+use transaction_parsing::{entry_to_transactions_with_decoding, TransactionAction};
 use zeroize::Zeroize;
 
 use crate::actions::Action;
@@ -19,7 +19,7 @@ use crate::screens::{
     AddressState, AddressStateMulti, DeriveState, KeysState, RecoverSeedPhraseState, Screen,
     SpecialtyKeysState, SufficientCryptoState, TransactionState,
 };
-use db_handling::interface_signer::guess;
+use db_handling::interface_signer::{get_all_seed_names_with_identicons, guess};
 use definitions::{
     error::{AddressGeneration, AddressGenerationCommon, AddressKeySource, ErrorSource},
     error_signer::{
@@ -410,13 +410,13 @@ impl State {
                                             if let ErrorSigner::WrongPasswordNewChecksum(c) = e {
                                                 if t.ok() {
                                                     new_navstate.screen = Screen::Transaction(
-                                                        t.update_checksum_sign(
+                                                        Box::new(t.update_checksum_sign(
                                                             c,
                                                             content,
                                                             has_pwd,
                                                             author_info,
                                                             network_info,
-                                                        ),
+                                                        )),
                                                     );
                                                 } else {
                                                     new_navstate =
@@ -429,9 +429,9 @@ impl State {
                                     }
                                 }
                                 _ => {
-                                    new_navstate.screen = Screen::Transaction(
+                                    new_navstate.screen = Screen::Transaction(Box::new(
                                         t.add_comment(details_str).update_seed(secret_seed_phrase),
-                                    );
+                                    ));
                                     new_navstate.modal = Modal::EnterPassword;
                                 }
                             }
@@ -864,9 +864,8 @@ impl State {
         let errorline = String::new();
 
         if let Screen::Scan = self.navstate.screen {
-            new_navstate = Navstate::clean_screen(Screen::Transaction(TransactionState::new(
-                details_str,
-                dbname,
+            new_navstate = Navstate::clean_screen(Screen::Transaction(Box::new(
+                TransactionState::new(details_str, dbname),
             )));
         }
 
@@ -1461,7 +1460,7 @@ impl State {
                 Action::SelectSeed => self.handle_select_seed(dbname, details_str),
                 Action::SelectKey => self.handle_select_key(dbname, details_str),
                 Action::NewKey => self.handle_new_key(details_str),
-                Action::RightButton => self.handle_right_button(),
+                Action::RightButtonAction => self.handle_right_button(),
                 Action::Shield => self.handle_shield(),
                 Action::NewSeed => self.handle_new_seed(),
                 Action::RecoverSeed => self.handle_recover_seed(),
@@ -1513,17 +1512,15 @@ impl State {
                             events: entry.events,
                         })
                         .collect();
-                    let total_entries = log.len() as u32;
-                    let f = MLog { log, total_entries };
+                    let f = MLog { log };
 
                     ScreenData::Log { f }
                 }
                 Screen::LogDetails(order) => {
                     let e = get_history_entry_by_order(order, dbname).unwrap();
-                    let f = MLogDetails {
-                        timestamp: e.timestamp,
-                        events: e.events,
-                    };
+                    let timestamp = e.timestamp.clone();
+                    let events = entry_to_transactions_with_decoding(e, dbname).unwrap();
+                    let f = MLogDetails { timestamp, events };
                     ScreenData::LogDetails { f }
                 }
                 Screen::Scan => ScreenData::Scan,
@@ -1576,7 +1573,7 @@ impl State {
                     ScreenData::SeedSelector { f }
                 }
                 Screen::Keys(ref keys_state) => {
-                    let (root, set) =
+                    let (root, set, title, logo) =
                         db_handling::interface_signer::print_identities_for_seed_name_and_network(
                             dbname,
                             &keys_state.seed_name(),
@@ -1594,7 +1591,7 @@ impl State {
                         } else {
                             String::new()
                         };
-                    let network = Default::default();
+                    let network = MNetworkCard { title, logo };
                     let f = MKeys {
                         set,
                         root,
@@ -1657,15 +1654,18 @@ impl State {
                     out.push_str(&seed_draft_print);
                     seed_draft_print.zeroize();
 
-                    let seed_finalized = draft.try_finalize();
+                    let ready_seed = draft
+                        .try_finalize()
+                        .map(|a| a.into_iter().collect::<Vec<_>>().join(" "));
+                    let draft = draft.draft();
 
                     let f = MRecoverSeedPhrase {
                         keyboard: new_navstate.keyboard(),
                         seed_name: recover_seed_phrase_state.name(),
                         user_input: user_input.to_string(),
                         guess_set: guess_set.iter().map(|s| s.to_string()).collect(),
-                        draft: seed_finalized.unwrap_or_default(),
-                        ready_seed: None,
+                        draft,
+                        ready_seed,
                     };
                     ScreenData::RecoverSeedPhrase { f }
                 }
@@ -1683,15 +1683,20 @@ impl State {
                 }
                 Screen::Settings => {
                     // for now has same content as Screen::Verifier
-                    // TODO: let f = db_handling::helpers::get_general_verifier(dbname).unwrap();
-                    ScreenData::Settings {
-                        f: MSettings {
-                            public_key: None,
-                            identicon: None,
-                            encryption: None,
+                    let f = db_handling::helpers::get_general_verifier(dbname).unwrap();
+                    // TODO: this code is ugly.
+                    let f = if let Some(vv) = f.v {
+                        let card = vv.show_card();
+                        MSettings {
+                            public_key: Some(card.public_key),
+                            identicon: Some(card.identicon),
+                            encryption: Some(card.encryption),
                             error: None,
-                        },
-                    }
+                        }
+                    } else {
+                        Default::default()
+                    };
+                    ScreenData::Settings { f }
                 }
                 Screen::Verifier => {
                     let f = db_handling::helpers::get_general_verifier(dbname).unwrap();
@@ -1717,68 +1722,63 @@ impl State {
                     let f = MSignSufficientCrypto { identities };
                     ScreenData::SignSufficientCrypto { f }
                 }
-                _ => {
-                    //"".to_string(),
-                    unimplemented!()
-                }
+                _ => ScreenData::Documents,
             };
 
             //Prepare modal details
             let modal_data = match new_navstate.modal {
-                Modal::Backup(ref seed_name) => ModalData::Backup {
+                Modal::Backup(ref seed_name) => Some(ModalData::Backup {
                     f: db_handling::interface_signer::backup_prep(dbname, seed_name).unwrap(),
-                },
+                }),
                 Modal::SeedMenu => match new_navstate.screen {
                     Screen::Keys(ref keys_state) => {
                         let seed = keys_state.seed_name();
                         new_navstate.screen = Screen::Keys(keys_state.deselect_specialty());
-                        ModalData::SeedMenu {
+                        Some(ModalData::SeedMenu {
                             f: MSeedMenu { seed },
-                        }
+                        })
                     }
-                    _ => ModalData::Text {
-                        f: "Seed".to_string(),
-                    },
+                    _ => None,
                 },
-                Modal::NewSeedBackup(ref new_seed_name) => ModalData::NewSeedBackup {
+                Modal::NewSeedBackup(ref new_seed_name) => Some(ModalData::NewSeedBackup {
                     f: db_handling::interface_signer::print_new_seed(new_seed_name).unwrap(),
-                },
-                Modal::NetworkSelector(ref network_specs_key) => ModalData::NetworkSelector {
+                }),
+                Modal::NetworkSelector(ref network_specs_key) => Some(ModalData::NetworkSelector {
                     f: db_handling::interface_signer::show_all_networks_with_flag(
                         dbname,
                         network_specs_key,
                     )
                     .unwrap(),
-                },
+                }),
                 Modal::PasswordConfirm => match new_navstate.screen {
                     Screen::DeriveKey(ref derive_state) => {
                         let mut path = derive_state.path();
                         match db_handling::identities::cut_path(&path) {
                             Ok((cropped_path, pwd)) => {
                                 path.zeroize();
-                                ModalData::PasswordConfirm {
+                                Some(ModalData::PasswordConfirm {
                                     f: MPasswordConfirm {
                                         pwd,
                                         cropped_path,
                                         seed_name: derive_state.seed_name(),
                                     },
-                                }
+                                })
                             }
                             Err(e) => {
                                 path.zeroize();
                                 new_navstate.alert = Alert::Error;
                                 errorline.push_str(&<Signer>::show(&e));
-                                ModalData::Text { f: String::new() }
+                                None
                             }
                         }
                     }
-                    _ => ModalData::Text { f: String::new() },
+                    _ => None,
                 },
-                Modal::SignatureReady(ref a) => ModalData::SignatureReady {
+                Modal::SignatureReady(ref a) => Some(ModalData::SignatureReady {
                     f: MSignatureReady {
-                        signature: a.to_string(),
+                        signature: a.to_vec(),
                     },
-                },
+                }),
                 Modal::EnterPassword => match new_navstate.screen {
                     Screen::Transaction(ref t) => {
                         if let transaction_parsing::TransactionAction::Sign {
@@ -1789,116 +1789,120 @@ impl State {
                             network_info: _,
                         } = t.action()
                         {
-                            ModalData::EnterPassword {
+                            Some(ModalData::EnterPassword {
                                 f: MEnterPassword {
                                     author_info,
                                     counter: t.counter() as u32,
                                 },
-                            }
+                            })
                         } else {
-                            ModalData::Text { f: String::new() }
+                            None
                         }
                     }
                     Screen::SignSufficientCrypto(ref s) => {
                         if let Some((_, _, author_info)) = s.key_selected() {
-                            ModalData::EnterPassword {
+                            Some(ModalData::EnterPassword {
                                 f: MEnterPassword {
                                     author_info,
                                     counter: s.counter() as u32,
                                 },
-                            }
+                            })
                         } else {
-                            ModalData::Text { f: String::new() }
+                            None
                         }
                     }
-                    _ => ModalData::Text { f: String::new() },
+                    _ => None,
                 },
-                Modal::LogRight => ModalData::LogRight {
+                Modal::LogRight => Some(ModalData::LogRight {
                     f: definitions::navigation::MLogRight {
                         checksum: db_handling::interface_signer::history_hex_checksum(dbname)
                             .unwrap(),
                     },
-                },
+                }),
                 Modal::ManageMetadata(network_version) => match new_navstate.screen {
-                    Screen::NetworkDetails(ref network_specs_key) => ModalData::ManageNetworks {
-                        f: db_handling::interface_signer::metadata_details(
-                            dbname,
-                            network_specs_key,
-                            network_version,
-                        )
-                        .unwrap(),
-                    },
-                    _ => ModalData::Text {
-                        f: "ManageMetadata".to_string(),
-                    },
+                    Screen::NetworkDetails(ref network_specs_key) => {
+                        Some(ModalData::ManageNetworks {
+                            f: db_handling::interface_signer::metadata_details(
+                                dbname,
+                                network_specs_key,
+                                network_version,
+                            )
+                            .unwrap(),
+                        })
+                    }
+                    _ => None,
                 },
                 Modal::SufficientCryptoReady(ref a) => match new_navstate.screen {
                     Screen::SignSufficientCrypto(ref s) => {
-                        if let Some((_, _, _author_info)) = s.key_selected() {
+                        if let Some((_, _, author_info)) = s.key_selected() {
                             let content = MSCContent {
-                                ttype: String::new(),
+                                ttype: a.to_string(),
                             };
-                            // TODO conversions here and there, again
                             let author_info = MSCAuthor {
-                                base58: String::new(),
-                                identicon: String::new(),
-                                seed: String::new(),
-                                derivation_path: String::new(),
+                                base58: author_info.base58,
+                                identicon: author_info.identicon,
+                                seed: author_info.seed,
+                                derivation_path: author_info.derivation_path,
                                 has_password: None,
                             };
                             let f = MSufficientCryptoReady {
                                 author_info,
-                                sufficient: String::new(),
+                                sufficient: vec![],
                                 content,
                             };
-                            ModalData::SufficientCryptoReady { f }
+                            Some(ModalData::SufficientCryptoReady { f })
                         } else {
-                            ModalData::Text {
-                                f: "SignSufficientCrypto".to_string(),
-                            }
+                            None
                         }
                     }
-                    _ => ModalData::Text {
-                        f: "SignSufficientCrypto".to_string(),
-                    },
+                    _ => None,
                 },
-                Modal::TypesInfo => ModalData::TypesInfo {
+                Modal::TypesInfo => Some(ModalData::TypesInfo {
                     f: db_handling::interface_signer::show_types_status(dbname).unwrap(),
-                },
-                Modal::SelectSeed => ModalData::SelectSeed,
-                Modal::NewSeedMenu => ModalData::NewSeedMenu,
-                Modal::LogComment => ModalData::LogComment,
-                Modal::NetworkDetailsMenu => ModalData::NetworkDetailsMenu,
-                Modal::KeyDetailsAction => ModalData::KeyDetailsAction,
-                Modal::Empty => ModalData::Text {
-                    f: "Empty".to_string(),
-                },
+                }),
+                Modal::SelectSeed => {
+                    match get_all_seed_names_with_identicons(dbname, &self.seed_names) {
+                        Ok(a) => Some(ModalData::SelectSeed {
+                            f: MSeeds { seed_name_cards: a },
+                        }),
+                        Err(_e) => {
+                            new_navstate.alert = Alert::Error;
+                            Some(ModalData::SelectSeed {
+                                f: MSeeds {
+                                    seed_name_cards: vec![],
+                                },
+                            })
+                        }
+                    }
+                }
+                Modal::NewSeedMenu => Some(ModalData::NewSeedMenu),
+                Modal::LogComment => Some(ModalData::LogComment),
+                Modal::NetworkDetailsMenu => Some(ModalData::NetworkDetailsMenu),
+                Modal::KeyDetailsAction => Some(ModalData::KeyDetailsAction),
+                Modal::Empty => None,
             };
 
             //Prepare alert details
             //Important! No errors could be handled in this block!
-            let alert_details = match new_navstate.alert {
-                Alert::Error => format!("\"error\":\"{}\"", errorline),
-                Alert::ErrorDisplay => format!("\"error\":\"{}\"", errorline),
-                Alert::Empty => "".to_string(),
-                Alert::Shield => "\"shield_state\":\"unknown\"".to_string(),
+            let alert_data = match new_navstate.alert {
+                Alert::Error => Some(format!("{{\"error\":\"{}\"}}", errorline)),
+                Alert::ErrorDisplay => Some(format!("{{\"error\":\"{}\"}}", errorline)),
+                Alert::Empty => None,
+                Alert::Shield => Some("{\"shield_state\":\"unknown\"}".to_string()),
             };
 
             self.navstate = new_navstate;
 
             let action_result = ActionResult {
-                screen: self.navstate.screen.get_name(),
                 screen_label: self.get_screen_label(),
                 back: self.navstate.screen.has_back(),
                 footer: self.get_footer(),
                 footer_button: self.get_active_navbutton(),
                 right_button: self.get_right_button(),
                 screen_name_type: self.get_screen_name_type(),
-                modal: self.navstate.modal.get_name(),
-                alert: self.navstate.alert.get_name(),
                 screen_data,
                 modal_data,
-                alert_data: format!("{{{}}}", alert_details),
+                alert_data,
             };
 
             log::warn!("action result {:?}", action_result);
@@ -1914,23 +1918,6 @@ impl State {
         } else {
             modal
         }
-    }
-
-    ///This converts state into renderable block
-    //TODO: clean this up
-    pub fn generate_json(&self, details: &str) -> String {
-        let mut output = String::from("{");
-        let screen = self.navstate.screen.to_owned();
-        let modal = self.navstate.modal.to_owned();
-        let alert = self.navstate.alert;
-        if let Some(screen_name) = screen.get_name() {
-            output.push_str(&format!("\"screen\":\"{}\",\"screenLabel\":\"{}\",\"back\":{},\"footer\":{},\"footerButton\":\"{}\",\"rightButton\":\"{}\",\"screenNameType\":\"{}\",", screen_name, self.get_screen_label(), screen.has_back(), self.get_footer(), self.get_active_navbutton(), self.get_right_button(), self.get_screen_name_type()));
-        }
-        output.push_str(&format!("\"modal\":\"{}\",", modal.get_name()));
-        output.push_str(&format!("\"alert\":\"{}\",", alert.get_name()));
-        output.push_str(details);
-        output.push('}');
-        output
     }
 
     ///Generate screen label taking into account state
@@ -1973,92 +1960,86 @@ impl State {
     }
 
     ///Decide which footer button should shine
-    fn get_active_navbutton(&self) -> String {
+    fn get_active_navbutton(&self) -> Option<FooterButton> {
         match self.navstate.screen {
-            Screen::Log => "Log",
-            Screen::LogDetails(_) => "Log",
-            Screen::Scan => "Scan",
-            Screen::Transaction(_) => "Scan",
-            Screen::SeedSelector => "Keys",
-            Screen::Keys(_) => "Keys",
-            Screen::KeyDetails(_) => "Keys",
-            Screen::KeyDetailsMulti(_) => "Keys",
-            Screen::NewSeed => "Keys",
-            Screen::RecoverSeedName(_) => "Keys",
-            Screen::RecoverSeedPhrase(_) => "Keys",
-            Screen::DeriveKey(_) => "Keys",
-            Screen::Settings => "Settings",
-            Screen::Verifier => "Settings",
-            Screen::ManageNetworks => "Settings",
-            Screen::NetworkDetails(_) => "Settings",
-            Screen::SelectSeedForBackup => "Settings",
-            Screen::SignSufficientCrypto(_) => "Settings",
-            Screen::Documents => "Settings",
-            Screen::Nowhere => "None",
+            Screen::Log | Screen::LogDetails(_) => Some(FooterButton::Log),
+            Screen::Scan | Screen::Transaction(_) => Some(FooterButton::Scan),
+            Screen::SeedSelector
+            | Screen::Keys(_)
+            | Screen::KeyDetails(_)
+            | Screen::KeyDetailsMulti(_)
+            | Screen::NewSeed
+            | Screen::RecoverSeedName(_)
+            | Screen::RecoverSeedPhrase(_)
+            | Screen::DeriveKey(_) => Some(FooterButton::Keys),
+            Screen::Settings
+            | Screen::Verifier
+            | Screen::ManageNetworks
+            | Screen::NetworkDetails(_)
+            | Screen::SelectSeedForBackup
+            | Screen::SignSufficientCrypto(_)
+            | Screen::Documents => Some(FooterButton::Settings),
+            Screen::Nowhere => None,
         }
-        .to_string()
     }
 
     ///Should header have some button on the right?
-    fn get_right_button(&self) -> String {
+    fn get_right_button(&self) -> Option<RightButton> {
         match self.navstate.screen {
-            Screen::Log => "LogRight",
-            Screen::LogDetails(_) => "None",
-            Screen::Scan => "None",
-            Screen::Transaction(_) => "None",
-            Screen::SeedSelector => "NewSeed",
+            Screen::Log => Some(RightButton::LogRight),
+            Screen::SeedSelector => Some(RightButton::NewSeed),
             Screen::Keys(ref keys_state) => {
                 if let Modal::Backup(_) = self.navstate.modal {
-                    "None"
+                    None
                 } else if keys_state.is_multiselect() {
-                    "MultiSelect"
+                    Some(RightButton::MultiSelect)
                 } else {
-                    "Backup"
+                    Some(RightButton::Backup)
                 }
             }
-            Screen::KeyDetails(_) => "KeyMenu",
-            Screen::KeyDetailsMulti(_) => "KeyMenu",
-            Screen::NewSeed => "None",
-            Screen::RecoverSeedName(_) => "None",
-            Screen::RecoverSeedPhrase(_) => "None",
-            Screen::DeriveKey(_) => "None",
-            Screen::Settings => "None",
-            Screen::Verifier => "None",
-            Screen::ManageNetworks => "TypesInfo",
-            Screen::NetworkDetails(_) => "NDMenu",
-            Screen::SelectSeedForBackup => "Backup",
-            Screen::SignSufficientCrypto(_) => "None",
-            Screen::Documents => "None",
-            Screen::Nowhere => "None",
+            Screen::KeyDetails(_) | Screen::KeyDetailsMulti(_) => Some(RightButton::KeyMenu),
+            Screen::NewSeed
+            | Screen::RecoverSeedName(_)
+            | Screen::RecoverSeedPhrase(_)
+            | Screen::DeriveKey(_)
+            | Screen::Settings
+            | Screen::LogDetails(_)
+            | Screen::Scan
+            | Screen::Transaction(_)
+            | Screen::Documents
+            | Screen::Nowhere
+            | Screen::Verifier
+            | Screen::SignSufficientCrypto(_) => None,
+            Screen::ManageNetworks => Some(RightButton::TypesInfo),
+            Screen::NetworkDetails(_) => Some(RightButton::NDMenu),
+            Screen::SelectSeedForBackup => Some(RightButton::Backup),
         }
-        .to_string()
     }
 
     ///Determine whether screen name should be h1 or h4
-    fn get_screen_name_type(&self) -> String {
+    fn get_screen_name_type(&self) -> ScreenNameType {
         match self.navstate.screen {
-            Screen::Log => "h4",
-            Screen::LogDetails(_) => "h4",
-            Screen::Scan => "h1",
-            Screen::Transaction(_) => "h1",
-            Screen::SeedSelector => "h1",
-            Screen::Keys(_) => "h4",
-            Screen::KeyDetails(_) => "h4",
-            Screen::KeyDetailsMulti(_) => "h4",
-            Screen::NewSeed => "h1",
-            Screen::RecoverSeedName(_) => "h1",
-            Screen::RecoverSeedPhrase(_) => "h1",
-            Screen::DeriveKey(_) => "h1",
-            Screen::Settings => "h4",
-            Screen::Verifier => "h4",
-            Screen::ManageNetworks => "h4",
-            Screen::NetworkDetails(_) => "h4",
-            Screen::SelectSeedForBackup => "h4",
-            Screen::SignSufficientCrypto(_) => "h1",
-            Screen::Documents => "h4",
-            Screen::Nowhere => "h4",
+            Screen::Log
+            | Screen::LogDetails(_)
+            | Screen::Keys(_)
+            | Screen::KeyDetails(_)
+            | Screen::KeyDetailsMulti(_)
+            | Screen::Settings
+            | Screen::Verifier
+            | Screen::ManageNetworks
+            | Screen::NetworkDetails(_)
+            | Screen::SelectSeedForBackup
+            | Screen::Documents
+            | Screen::Nowhere => ScreenNameType::H4,
+            Screen::NewSeed
+            | Screen::RecoverSeedName(_)
+            | Screen::RecoverSeedPhrase(_)
+            | Screen::DeriveKey(_)
+            | Screen::Scan
+            | Screen::Transaction(_)
+            | Screen::SeedSelector
+            | Screen::SignSufficientCrypto(_) => ScreenNameType::H1,
         }
-        .to_string()
     }
 
     fn correct_seed_selector(&self) -> Navstate {

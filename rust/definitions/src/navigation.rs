@@ -7,7 +7,7 @@ pub use crate::network_specs::NetworkSpecsToSend;
 #[derive(PartialEq, Clone)]
 pub struct SeedNameWithIdenticon {
     pub seed_name: String,
-    pub identicon: String,
+    pub identicon: Vec<u8>,
 }
 
 /// Enum containing card sets for three different outcomes:
@@ -49,25 +49,47 @@ pub enum StubNav {
     LoadTypes,
 }
 
+#[derive(PartialEq, Debug, Clone)]
+pub enum FooterButton {
+    Log,
+    Scan,
+    Keys,
+    Settings,
+    Back,
+}
+
+#[derive(PartialEq, Debug, Clone)]
+pub enum RightButton {
+    LogRight,
+    NewSeed,
+    Backup,
+    MultiSelect,
+    NDMenu,
+    TypesInfo,
+    KeyMenu,
+}
+
+#[derive(PartialEq, Debug, Clone)]
+pub enum ScreenNameType {
+    H1,
+    H4,
+}
+
 #[derive(Clone, Debug, PartialEq)]
 pub struct ActionResult {
-    pub screen: Option<String>,
     pub screen_label: String,
     pub back: bool,
     pub footer: bool,
-    pub footer_button: String,
-    pub right_button: String,
-    pub screen_name_type: String,
-    pub modal: String,
-    pub alert: String,
+    pub footer_button: Option<FooterButton>,
+    pub right_button: Option<RightButton>,
+    pub screen_name_type: ScreenNameType,
     pub screen_data: ScreenData,
-    pub modal_data: ModalData,
-    pub alert_data: String,
+    pub modal_data: Option<ModalData>,
+    pub alert_data: Option<String>,
 }
 
 #[derive(Clone, PartialEq)]
 pub struct LogScreenEntry {
-    pub order: u32,
     pub timestamp: String,
     pub events: Vec<Event>,
 }
@@ -100,7 +122,7 @@ pub struct Identity {
     pub seed_name: String,
     pub address_key: String,
     pub public_key: String,
-    pub identicon: String,
+    pub identicon: Vec<u8>,
     pub has_pwd: bool,
     pub path: String,
     pub is_multiselect: bool,
@@ -111,7 +133,7 @@ pub struct Identity {
 pub struct MKeysCard {
     pub address_key: String,
     pub base58: String,
-    pub identicon: String,
+    pub identicon: Vec<u8>,
     pub has_pwd: bool,
     pub path: String,
     pub swiped: bool,
@@ -128,7 +150,7 @@ pub struct MNetworkCard {
 #[derive(Clone, Debug, Default, PartialEq)]
 pub struct MSeedKeyCard {
     pub seed_name: String,
-    pub identicon: String,
+    pub identicon: Vec<u8>,
     pub address_key: String,
     pub base58: String,
     pub swiped: bool,
@@ -144,10 +166,10 @@ pub struct MKeys {
     pub multiselect_count: String,
 }
 
-#[derive(Clone, Debug, PartialEq)]
+#[derive(Clone, Default, Debug, PartialEq)]
 pub struct MSettings {
     pub public_key: Option<String>,
-    pub identicon: Option<String>,
+    pub identicon: Option<Vec<u8>>,
     pub encryption: Option<String>,
     pub error: Option<String>,
 }
@@ -162,13 +184,20 @@ pub struct History {
 #[derive(Clone, Debug, PartialEq)]
 pub struct MLog {
     pub log: Vec<History>,
-    pub total_entries: u32,
+}
+
+#[derive(Clone, Debug, PartialEq)]
+pub struct MEventMaybeDecoded {
+    pub event: Event,
+    pub decoded: Option<TransactionCardSet>,
+    pub signed_by: Option<TransactionAuthor>,
+    pub verifier_details: Option<MVerifierDetails>,
 }
 
 #[derive(Clone, Debug, PartialEq)]
 pub struct MLogDetails {
     pub timestamp: String,
-    pub events: Vec<Event>,
+    pub events: Vec<MEventMaybeDecoded>,
 }
 
 #[derive(Clone, Debug, PartialEq)]
@@ -189,9 +218,10 @@ pub struct TransactionNetworkInfo {
 #[derive(Clone, Debug, PartialEq)]
 pub struct TransactionAuthor {
     pub base58: String,
-    pub identicon: String,
+    pub identicon: Vec<u8>,
     pub seed: String,
     pub derivation_path: String,
+    pub has_pwd: bool,
 }
 
 #[derive(Clone, Debug, PartialEq)]
@@ -227,7 +257,7 @@ pub struct MTransaction {
 #[derive(Clone, Debug, PartialEq)]
 pub struct SeedNameCard {
     pub seed_name: String,
-    pub identicon: String,
+    pub identicon: Vec<u8>,
 }
 
 #[derive(Clone, Debug, PartialEq)]
@@ -235,12 +265,12 @@ pub struct MSeeds {
     pub seed_name_cards: Vec<SeedNameCard>,
 }
 
-#[derive(Clone, Debug, PartialEq)]
+#[derive(Clone, Default, Debug, PartialEq)]
 pub struct MKeyDetails {
-    pub qr: String,
+    pub qr: Vec<u8>,
     pub pubkey: String,
     pub base58: String,
-    pub identicon: String,
+    pub identicon: Vec<u8>,
     pub seed_name: String,
     pub path: String,
     pub network_title: String,
@@ -264,14 +294,8 @@ pub struct MRecoverSeedPhrase {
     pub seed_name: String,
     pub user_input: String,
     pub guess_set: Vec<String>,
-    pub draft: Vec<SeedWord>,
+    pub draft: Vec<String>,
     pub ready_seed: Option<String>,
-}
-
-#[derive(Clone, Debug, PartialEq)]
-pub struct SeedWord {
-    pub order: u32,
-    pub content: String,
 }
 
 #[derive(Clone, Default, Debug, PartialEq)]
@@ -287,7 +311,7 @@ pub struct Address {
     pub base58: String,
     pub path: String,
     pub has_pwd: bool,
-    pub identicon: String,
+    pub identicon: Vec<u8>,
     pub seed_name: String,
     pub multiselect: Option<bool>,
 }
@@ -312,7 +336,7 @@ pub struct MDeriveKey {
 #[derive(Clone, Debug, Default, PartialEq)]
 pub struct MVerifierDetails {
     pub public_key: String,
-    pub identicon: String,
+    pub identicon: Vec<u8>,
     pub encryption: String,
 }
 
@@ -326,7 +350,7 @@ pub struct MVerifier {
 pub struct MMetadataRecord {
     pub specs_version: String,
     pub meta_hash: String,
-    pub meta_id_pic: String,
+    pub meta_id_pic: Vec<u8>,
 }
 
 #[derive(Clone, Debug, PartialEq)]
@@ -352,7 +376,7 @@ pub struct MRawKey {
     pub seed_name: String,
     pub address_key: String,
     pub public_key: String,
-    pub identicon: String,
+    pub identicon: Vec<u8>,
     pub has_pwd: bool,
     pub path: String,
 }
@@ -390,7 +414,7 @@ pub struct MSCContent {
 #[derive(Clone, Debug, PartialEq)]
 pub struct MSCAuthor {
     pub base58: String,
-    pub identicon: String,
+    pub identicon: Vec<u8>,
     pub seed: String,
     pub derivation_path: String,
     pub has_password: Option<bool>,
@@ -399,7 +423,7 @@ pub struct MSCAuthor {
 #[derive(Clone, Debug, PartialEq)]
 pub struct MSufficientCryptoReady {
     pub author_info: MSCAuthor,
-    pub sufficient: String,
+    pub sufficient: Vec<u8>,
     pub content: MSCContent,
 }
 
@@ -432,7 +456,7 @@ pub struct MSeedMenu {
 pub struct MNewSeedBackup {
     pub seed: String,
     pub seed_phrase: String,
-    pub identicon: String,
+    pub identicon: Vec<u8>,
 }
 
 #[derive(Clone, Debug, PartialEq)]
@@ -473,7 +497,7 @@ pub struct MPasswordConfirm {
 
 #[derive(Clone, Debug, PartialEq)]
 pub struct MSignatureReady {
-    pub signature: String,
+    pub signature: Vec<u8>,
 }
 
 #[derive(Clone, Debug, PartialEq)]
@@ -500,7 +524,7 @@ pub struct MMManageNetworks {
     pub name: String,
     pub version: String,
     pub meta_hash: String,
-    pub meta_id_pic: String,
+    pub meta_id_pic: Vec<u8>,
     pub networks: Vec<MMMNetwork>,
 }
 
@@ -508,7 +532,7 @@ pub struct MMManageNetworks {
 pub struct MTypesInfo {
     pub types_on_file: bool,
     pub types_hash: Option<String>,
-    pub types_id_pic: Option<String>,
+    pub types_id_pic: Option<Vec<u8>>,
 }
 
 #[derive(Clone, Debug, PartialEq)]
@@ -524,19 +548,18 @@ pub enum ModalData {
     LogRight { f: MLogRight },
     ManageNetworks { f: MMManageNetworks },
     TypesInfo { f: MTypesInfo },
-    Text { f: String },
     NewSeedMenu,
     NetworkDetailsMenu,
     ManageMetadata,
     KeyDetailsAction,
     LogComment,
-    SelectSeed,
+    SelectSeed { f: MSeeds },
 }
 
 #[derive(Clone, Debug, PartialEq)]
 pub struct MSCAuthorPlain {
     pub base58: String,
-    pub identicon: String,
+    pub identicon: Vec<u8>,
 }
 
 #[derive(Clone, Debug, PartialEq)]
@@ -583,7 +606,7 @@ pub struct MSCFieldNumber {
 #[derive(Clone, Debug, PartialEq)]
 pub struct MSCId {
     pub base58: String,
-    pub identicon: String,
+    pub identicon: Vec<u8>,
 }
 
 #[derive(Clone, Debug, PartialEq)]
@@ -591,7 +614,7 @@ pub struct MSCMetaSpecs {
     pub specname: String,
     pub spec_version: String,
     pub meta_hash: String,
-    pub meta_id_pic: String,
+    pub meta_id_pic: Vec<u8>,
 }
 
 #[derive(Clone, Debug, PartialEq)]
