@@ -40,7 +40,7 @@ fun RecoverSeedPhrase(
 		seedWordText,
 		selection = TextRange(seedWordText.length)
 	)
-	val createRoots = remember { mutableStateOf(true) }
+	val createSeedKeys = remember { mutableStateOf(true) }
 
 	Column(
 		verticalArrangement = Arrangement.Top,
@@ -74,14 +74,14 @@ fun RecoverSeedPhrase(
 		Row(
 			verticalAlignment = Alignment.CenterVertically,
 			modifier = Modifier.toggleable(
-				value = createRoots.value,
+				value = createSeedKeys.value,
 				role = Role.Checkbox,
-				onValueChange = { createRoots.value = it }
+				onValueChange = { createSeedKeys.value = it }
 			)) {
 			Checkbox(
-				checked = createRoots.value,
-				onCheckedChange = { createRoots.value = it })
-			Text("Create root keys")
+				checked = createSeedKeys.value,
+				onCheckedChange = { createSeedKeys.value = it })
+			Text("Create seed keys")
 		}
 		Spacer(Modifier.weight(0.1f))
 		if (recoverSeedPhrase.keyboard) {
@@ -94,7 +94,7 @@ fun RecoverSeedPhrase(
 								signerDataModel.addSeed(
 									seedName = seedName,
 									seedPhrase = it,
-									createRoots = createRoots.value
+									createSeedKeys = createSeedKeys.value
 								)
 							}
 						}

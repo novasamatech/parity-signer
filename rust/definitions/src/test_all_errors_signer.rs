@@ -1033,7 +1033,7 @@ mod tests {
 "Database error. More than one entry for network specs with name westend and encryption sr25519."
 "Database error. Different network names (westend, WeStEnD) in database for same genesis hash e143f23803ca50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e."
 "Database error. Network with genesis hash 853faffbfc6713c1f899bf16547fcfbf733ae8361b8ca0129699d01d4f2181fd verifier is set as a custom one. This custom verifier coinsides the database general verifier and not None. This should not have happened and likely indicates database corruption."
-"Database error. More than one root key (i.e. with empty path and without password) found for seed name Alice and encryption sr25519."
+"Database error. More than one seed key (i.e. with empty path and without password) found for seed name Alice and encryption sr25519."
 "Database error. More than one base58 prefix in network specs database entries for network with genesis hash e143f23803ca50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e: 42 and 104."
 "Bad input data. Payload could not be decoded as `add_specs`."
 "Bad input data. Payload could not be decoded as `load_meta`."

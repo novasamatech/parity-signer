@@ -33,7 +33,7 @@ internal fun SignerDataModel.refreshSeedNames(init: Boolean = false) {
 fun SignerDataModel.addSeed(
 	seedName: String,
 	seedPhrase: String,
-	createRoots: Boolean
+	createSeedKeys: Boolean
 ) {
 
 	//Check if seed name already exists
