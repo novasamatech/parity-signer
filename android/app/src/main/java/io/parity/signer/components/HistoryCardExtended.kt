@@ -21,8 +21,8 @@ fun HistoryCardExtended(
 	val decodedTransaction = event.decoded
 	val signedBy = event.signedBy
 	val verifierDetails = event.verifierDetails
-	val event = event.event
-	when (event) {
+	val eventVal = event.event
+	when (eventVal) {
 		is Event.DatabaseInitiated -> {
 			HistoryCardTemplate(
 				image = Icons.Default.Smartphone,
@@ -41,7 +41,7 @@ fun HistoryCardExtended(
 			)
 		}
 		is Event.GeneralVerifierSet -> {
-			val hex = event.verifier.v.let {
+			val hex = eventVal.verifier.v.let {
 				when (it) {
 					is VerifierValue.Standard -> {
 						it.m
@@ -73,7 +73,7 @@ fun HistoryCardExtended(
 			)
 		}
 		is Event.IdentityAdded -> {
-			event.identityHistory.let {
+			eventVal.identityHistory.let {
 				HistoryCardTemplate(
 					image = Icons.Default.Pattern,
 					line1 = timestamp,
@@ -83,7 +83,7 @@ fun HistoryCardExtended(
 			}
 		}
 		is Event.IdentityRemoved -> {
-			event.identityHistory.let {
+			eventVal.identityHistory.let {
 				HistoryCardTemplate(
 					image = Icons.Default.Delete,
 					line1 = timestamp,
@@ -106,11 +106,11 @@ fun HistoryCardExtended(
 				image = Icons.Default.Done,
 				line1 = timestamp,
 				line2 = "Generated signature for message",
-				line3 = event.signMessageDisplay.userComment.decode64()
+				line3 = eventVal.signMessageDisplay.userComment.decode64()
 			)
 		}
 		is Event.MetadataAdded -> {
-			event.metaValuesDisplay.let {
+			eventVal.metaValuesDisplay.let {
 				HistoryCardTemplate(
 					image = Icons.Default.QrCodeScanner,
 					line1 = timestamp,
@@ -120,7 +120,7 @@ fun HistoryCardExtended(
 			}
 		}
 		is Event.MetadataRemoved -> {
-			event.metaValuesDisplay.let {
+			eventVal.metaValuesDisplay.let {
 				HistoryCardTemplate(
 					image = Icons.Default.Delete,
 					line1 = timestamp,
@@ -134,7 +134,7 @@ fun HistoryCardExtended(
 				image = Icons.Default.QrCodeScanner,
 				line1 = timestamp,
 				line2 = "Network added",
-				line3 = event.networkSpecsDisplay.specs.title,
+				line3 = eventVal.networkSpecsDisplay.specs.title,
 			)
 		}
 		is Event.NetworkSpecsRemoved -> {
@@ -142,7 +142,7 @@ fun HistoryCardExtended(
 				image = Icons.Default.Delete,
 				line1 = timestamp,
 				line2 = "Network removed",
-				line3 = event.networkSpecsDisplay.specs.title
+				line3 = eventVal.networkSpecsDisplay.specs.title
 			)
 		}
 		is Event.NetworkVerifierSet -> {
@@ -150,7 +150,7 @@ fun HistoryCardExtended(
 				image = Icons.Default.Shield,
 				line1 = timestamp,
 				line2 = "Network verifier set",
-				line3 = event.networkVerifierDisplay.genesisHash.toString()
+				line3 = eventVal.networkVerifierDisplay.genesisHash.toString()
 			)
 		}
 		is Event.ResetDangerRecord -> {
@@ -167,7 +167,7 @@ fun HistoryCardExtended(
 				image = Icons.Default.Pattern,
 				line1 = timestamp,
 				line2 = "Seed created",
-				line3 = event.seedCreated.decode64()
+				line3 = eventVal.seedCreated.decode64()
 			)
 		}
 		is Event.SeedNameWasShown -> {
@@ -175,7 +175,7 @@ fun HistoryCardExtended(
 				image = Icons.Default.Warning,
 				line1 = timestamp,
 				line2 = "Seed was shown",
-				line3 = event.seedNameWasShown.decode64()
+				line3 = eventVal.seedNameWasShown.decode64()
 			)
 		}
 		is Event.NetworkSpecsSigned -> {
@@ -183,11 +183,11 @@ fun HistoryCardExtended(
 				image = Icons.Default.Verified,
 				line1 = timestamp,
 				line2 = "Network specs signed",
-				line3 = event.networkSpecsExport.specsToSend.title
+				line3 = eventVal.networkSpecsExport.specsToSend.title
 			)
 		}
 		is Event.MetadataSigned -> {
-			event.metaValuesExport.let {
+			eventVal.metaValuesExport.let {
 				HistoryCardTemplate(
 					image = Icons.Default.Verified,
 					line1 = timestamp,
@@ -209,7 +209,7 @@ fun HistoryCardExtended(
 				image = Icons.Default.Warning,
 				line1 = timestamp,
 				line2 = "System entry",
-				line3 = event.systemEntry
+				line3 = eventVal.systemEntry
 			)
 		}
 		is Event.TransactionSignError -> {
@@ -217,7 +217,7 @@ fun HistoryCardExtended(
 				image = Icons.Default.Dangerous,
 				line1 = timestamp,
 				line2 = "Signing failure",
-				line3 = event.signDisplay.userComment.decode64(),
+				line3 = eventVal.signDisplay.userComment.decode64(),
 				danger = true
 			)
 		}
@@ -227,8 +227,7 @@ fun HistoryCardExtended(
 
 				if (decodedTransaction != null) {
 					TransactionPreviewField(
-						cardSet = decodedTransaction,
-						authorInfo = signedBy
+						cardSet = decodedTransaction
 					)
 				}
 				Text("Signed by:")
@@ -244,10 +243,10 @@ fun HistoryCardExtended(
 					}
 				}
 				Text("In network")
-				Text(event.signDisplay.networkName)
+				Text(eventVal.signDisplay.networkName)
 				Text("Comment:")
 				Text(
-					event.signDisplay.userComment.decode64()
+					eventVal.signDisplay.userComment.decode64()
 				)
 			}
 		}
@@ -273,7 +272,7 @@ fun HistoryCardExtended(
 				image = Icons.Default.Note,
 				line1 = timestamp,
 				line2 = "User entry",
-				line3 = event.userEntry
+				line3 = eventVal.userEntry
 			)
 		}
 		is Event.Warning -> {
@@ -281,7 +280,7 @@ fun HistoryCardExtended(
 				image = Icons.Default.Warning,
 				line1 = timestamp,
 				line2 = "Warning!",
-				line3 = event.warning,
+				line3 = eventVal.warning,
 				danger = true
 			)
 		}

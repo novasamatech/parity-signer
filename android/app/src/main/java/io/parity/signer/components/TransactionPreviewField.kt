@@ -13,14 +13,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
 import io.parity.signer.ui.theme.Crypto400
-import io.parity.signer.uniffi.TransactionAuthor
 import io.parity.signer.uniffi.TransactionCard
 import io.parity.signer.uniffi.TransactionCardSet
 
-fun TransactionCards(
+fun transactionCards(
 	scope: LazyListScope,
 	transactions: List<TransactionCard>?,
-	authorInfo: TransactionAuthor?
 ) {
 	transactions?.let {
 		scope.items(it.size) { item ->
@@ -34,7 +32,6 @@ fun TransactionCards(
 @Composable
 fun TransactionPreviewField(
 	cardSet: TransactionCardSet,
-	authorInfo: TransactionAuthor?
 ) {
 
 	LazyColumn(
@@ -48,28 +45,25 @@ fun TransactionPreviewField(
 			.clip(RoundedCornerShape(8.dp))
 			.padding(8.dp)
 	) {
-		TransactionCards(this, cardSet.author, authorInfo)
-		TransactionCards(this, cardSet.error, authorInfo)
-		TransactionCards(
+		transactionCards(this, cardSet.author)
+		transactionCards(this, cardSet.error)
+		transactionCards(
 			this,
-			cardSet.extensions,
-			authorInfo
+			cardSet.extensions
 		)
-		TransactionCards(
+		transactionCards(
 			this,
-			cardSet.importingDerivations,
-			authorInfo
+			cardSet.importingDerivations
 		)
-		TransactionCards(this, cardSet.message, authorInfo)
-		TransactionCards(this, cardSet.meta, authorInfo)
-		TransactionCards(this, cardSet.method, authorInfo)
-		TransactionCards(this, cardSet.newSpecs, authorInfo)
-		TransactionCards(this, cardSet.verifier, authorInfo)
-		TransactionCards(this, cardSet.warning, authorInfo)
-		TransactionCards(
+		transactionCards(this, cardSet.message)
+		transactionCards(this, cardSet.meta)
+		transactionCards(this, cardSet.method)
+		transactionCards(this, cardSet.newSpecs)
+		transactionCards(this, cardSet.verifier)
+		transactionCards(this, cardSet.warning)
+		transactionCards(
 			this,
-			cardSet.typesInfo,
-			authorInfo
+			cardSet.typesInfo
 		)
 	}
 }

@@ -50,7 +50,7 @@ fun TransactionCard(card: TransactionCard) {
 			is Card.MetaCard -> TCMeta(meta = card.f)
 			is Card.NameVersionCard -> TCNameVersion(nameVersion = card.f)
 			is Card.NetworkGenesisHashCard -> TCGenesisHash(payload = card.f)
-			is Card.NetworkInfoCard -> TODO() //NetworkCard
+			is Card.NetworkInfoCard -> NetworkCard(network = card.f)
 			is Card.NetworkNameCard -> TCNetworkName(text = card.f)
 			is Card.NewSpecsCard -> TCNewSpecs(specs = card.f)
 			is Card.NonceCard -> TCNonce(text = card.f)

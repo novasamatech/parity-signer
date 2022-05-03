@@ -15,13 +15,13 @@ import io.parity.signer.models.SignerDataModel
 import io.parity.signer.models.pushButton
 import io.parity.signer.ui.theme.Bg000
 import io.parity.signer.ui.theme.modal
-import org.json.JSONArray
 import io.parity.signer.uniffi.Action
 import io.parity.signer.uniffi.MNetworkMenu
+import io.parity.signer.uniffi.MscNetworkInfo
 
 @Composable
 fun NetworkSelector(networks: MNetworkMenu, signerDataModel: SignerDataModel) {
-	val networks = networks.networks
+	val nets = networks.networks
 	Surface(
 		color = Color(0x00000000),
 		modifier = Modifier.clickable { signerDataModel.pushButton(Action.GO_BACK) }
@@ -49,16 +49,19 @@ fun NetworkSelector(networks: MNetworkMenu, signerDataModel: SignerDataModel) {
 						contentPadding = PaddingValues(horizontal = 8.dp),
 						verticalArrangement = Arrangement.spacedBy(10.dp)
 					) {
-						items(networks.size) { item ->
+						items(nets.size) { item ->
 							Row(Modifier.clickable {
 								signerDataModel.pushButton(
 									Action.CHANGE_NETWORK,
-									networks[item].key
+									nets[item].key
 								)
 							}) {
 								NetworkCard(
-									network = networks[item],
-									selected = networks[item].selected
+									network = MscNetworkInfo(
+										networkTitle = nets[item].title,
+										networkLogo = nets[item].logo
+									),
+									selected = nets[item].selected
 								)
 							}
 						}

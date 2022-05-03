@@ -37,7 +37,6 @@ fun TransactionPreview(
 	) {
 		TransactionPreviewField(
 			cardSet = transaction.content,
-			authorInfo = transaction.authorInfo
 		)
 		transaction.authorInfo?.let {
 			/* TODO: Address -> TransactionAuthor
