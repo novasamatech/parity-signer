@@ -19,7 +19,7 @@ import io.parity.signer.ui.theme.*
 @Composable
 fun SeedCard(
 	seedName: String,
-	identicon: String,
+	identicon: List<UByte>,
 	base58: String = "",
 	showAddress: Boolean = false,
 	multiselectMode: Boolean = false,

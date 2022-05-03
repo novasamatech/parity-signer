@@ -168,6 +168,7 @@ class SignerDataModel : ViewModel() {
 		}
 
 		// Imitate ios behavior
+		Log.e("ENCRY", "$context $keyStore $masterKey")
 		authentication.authenticate(activity) {
 			sharedPreferences = EncryptedSharedPreferences(
 				context,

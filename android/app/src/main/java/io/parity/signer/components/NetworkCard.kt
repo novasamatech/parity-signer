@@ -13,11 +13,12 @@ import androidx.compose.ui.unit.dp
 import io.parity.signer.ui.theme.Action400
 import io.parity.signer.ui.theme.Bg200
 import io.parity.signer.uniffi.MDeriveKey
+import io.parity.signer.uniffi.MscNetworkInfo
 import io.parity.signer.uniffi.Network
 import org.json.JSONObject
 
 @Composable
-fun NetworkCard(network: Network, selected: Boolean = false) {
+fun NetworkCard(network: MscNetworkInfo, selected: Boolean = false) {
 	Surface(
 		shape = MaterialTheme.shapes.large,
 		color = MaterialTheme.colors.Bg200,
@@ -30,8 +31,8 @@ fun NetworkCard(network: Network, selected: Boolean = false) {
 				.padding(horizontal = 20.dp)
 		) {
 			NetworkLogoName(
-				logo = network.logo,
-				name = network.title,
+				logo = network.networkTitle,
+				name = network.networkLogo,
 			)
 			Spacer(Modifier.weight(1f))
 			if (selected) {

@@ -6,7 +6,6 @@ import androidx.compose.material.Checkbox
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -20,7 +19,6 @@ import io.parity.signer.components.HeadingOverline
 import io.parity.signer.components.RestoreSeedPhraseBox
 import io.parity.signer.components.RestoreSeedPhraseSuggest
 import io.parity.signer.models.*
-import org.json.JSONArray
 import io.parity.signer.uniffi.Action
 import io.parity.signer.uniffi.MRecoverSeedPhrase
 
@@ -81,7 +79,7 @@ fun RecoverSeedPhrase(
 			Checkbox(
 				checked = createRoots.value,
 				onCheckedChange = { createRoots.value = it })
-			Text("Create root keys")
+			Text("Create seed keys")
 		}
 		Spacer(Modifier.weight(0.1f))
 		if (recoverSeedPhrase.keyboard) {

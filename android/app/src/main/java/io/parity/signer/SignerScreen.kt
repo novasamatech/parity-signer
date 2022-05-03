@@ -1,6 +1,5 @@
 package io.parity.signer
 
-import android.util.Log
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.runtime.Composable
@@ -107,7 +106,6 @@ fun ScreenSelector(
 @Composable
 fun ModalSelector(modalData: ModalData, signerDataModel: SignerDataModel) {
 	when (modalData) {
-		is ModalData.Text -> {}
 		is ModalData.NewSeedMenu -> NewSeedMenu(signerDataModel = signerDataModel)
 		is ModalData.SeedMenu -> SeedMenu(
 			modalData.f,
@@ -156,6 +154,7 @@ fun ModalSelector(modalData: ModalData, signerDataModel: SignerDataModel) {
 			SelectSeed(modalData.f, signerDataModel = signerDataModel)
 		}
 		is ModalData.ManageNetworks -> {}
+		null -> {}
 	}
 }
 
@@ -164,9 +163,8 @@ fun AlertSelector(alert: SignerAlert, signerDataModel: SignerDataModel) {
 	when (alert) {
 		SignerAlert.Empty -> {}
 		SignerAlert.Error -> ErrorModal(
-			error = signerDataModel.alertData.value?.optString(
-				"error"
-			) ?: "unknown error", signerDataModel = signerDataModel
+			error = signerDataModel.alertData.value ?: "unknown error",
+			signerDataModel = signerDataModel
 		)
 		SignerAlert.Shield -> ShieldAlert(signerDataModel)
 		SignerAlert.Confirm -> Confirm(signerDataModel = signerDataModel)

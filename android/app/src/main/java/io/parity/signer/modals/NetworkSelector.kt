@@ -15,6 +15,7 @@ import io.parity.signer.ui.theme.Bg000
 import io.parity.signer.ui.theme.modal
 import io.parity.signer.uniffi.Action
 import io.parity.signer.uniffi.MNetworkMenu
+import io.parity.signer.uniffi.MscNetworkInfo
 
 @Composable
 fun NetworkSelector(
@@ -57,7 +58,10 @@ fun NetworkSelector(
 								)
 							}) {
 								NetworkCard(
-									network = networks[item],
+									network = MscNetworkInfo(
+										networkTitle = networks[item].title,
+										networkLogo = networks[item].logo
+									),
 									selected = networks[item].selected
 								)
 							}

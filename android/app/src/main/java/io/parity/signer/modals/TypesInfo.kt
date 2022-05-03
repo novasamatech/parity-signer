@@ -35,7 +35,7 @@ fun TypesInfo(typesInfo: MTypesInfo, signerDataModel: SignerDataModel) {
 				HeaderBar(line1 = "MANAGE TYPES", line2 = "Select action")
 				if (typesInfo.typesOnFile) {
 					Row {
-						Identicon(identicon = typesInfo.typesIdPic ?: "")
+						Identicon(identicon = typesInfo.typesIdPic?:listOf())
 						Text(typesInfo.typesHash ?: "")
 					}
 				} else {

@@ -3,7 +3,7 @@ use pretty_assertions::assert_eq;
 use sled::{open, Db, Tree};
 use sp_core::H256;
 use sp_runtime::MultiSigner;
-use std::{collections::HashSet, fs, io::Write, str::FromStr};
+use std::{fs, io::Write, str::FromStr};
 
 use constants::{
     test_values::{
@@ -29,7 +29,7 @@ use definitions::{
         MSCId, MSCMetaSpecs, MSCNameVersion, MTypesInfo, MVerifierDetails, NetworkSpecsToSend,
         TransactionAuthor, TransactionCard, TransactionCardSet,
     },
-    network_specs::{CurrentVerifier, NetworkSpecs, Verifier, VerifierValue},
+    network_specs::{CurrentVerifier, NetworkSpecs, ValidCurrentVerifier, Verifier, VerifierValue},
     users::AddressDetails,
 };
 use transaction_parsing::{
@@ -64,6 +64,19 @@ fn sign_action_test(
         create_signature(seed_phrase, pwd_entry, user_comment, dbname, checksum)?.encode(),
     ))
 }
+
+fn identicon_to_str(identicon: &[u8]) -> &str {
+    if identicon == ed() {
+        "<ed>"
+    } else if identicon == alice_sr_alice() {
+        "<alice_sr25519_//Alice>"
+    } else if identicon == empty_png() {
+        "<empty>"
+    } else {
+        "<unknown>"
+    }
+}
+
 fn print_db_content(dbname: &str) -> String {
     let database: Db = open(dbname).unwrap();
 
@@ -114,7 +127,41 @@ fn print_db_content(dbname: &str) -> String {
         let current_verifier = CurrentVerifier::decode(&mut &current_verifier_encoded[..]).unwrap();
         match current_verifier {
             CurrentVerifier::Valid(a) => {
-                verifiers_set.push(format!("{}: {:?}", hex::encode(verifier_key.key()), a))
+                let verifier = match a {
+                    ValidCurrentVerifier::General => {
+                        let card = general_verifier.show_card();
+                        let encryption = if card.encryption.is_empty() {
+                            "none".to_string()
+                        } else {
+                            card.encryption
+                        };
+
+                        format!(
+                            "{}: \"type\":\"general\",\"details\":{{\"public_key\":\"{}\",\"identicon\":\"{}\",\"encryption\":\"{}\"}}",
+                            hex::encode(verifier_key.key()),
+                            card.public_key,
+                            identicon_to_str(&card.identicon),
+                            encryption,
+                        )
+                    }
+                    ValidCurrentVerifier::Custom { v } => {
+                        let card = v.show_card();
+                        let encryption = if card.encryption.is_empty() {
+                            "none".to_string()
+                        } else {
+                            card.encryption
+                        };
+
+                        format!(
+                            "{}: \"type\":\"custom\",\"details\":{{\"public_key\":\"{}\",\"identicon\":\"{}\",\"encryption\":\"{}\"}}",
+                            hex::encode(verifier_key.key()),
+                            card.public_key,
+                            identicon_to_str(&card.identicon),
+                            encryption,
+                        )
+                    }
+                };
+                verifiers_set.push(verifier)
             }
             CurrentVerifier::Dead => verifiers_set.push(format!(
                 "{}: network inactivated",
@@ -165,7 +212,7 @@ fn print_db_content(dbname: &str) -> String {
 }
 
 fn entries_contain_event(entries: &[Entry], event: &Event) -> bool {
-    entries.iter().find(|e| e.events.contains(event)).is_some()
+    entries.iter().any(|e| e.events.contains(event))
 }
 
 // can sign a parsed transaction
@@ -219,7 +266,7 @@ fn can_sign_transaction_1() {
                 card: Card::IdCard {
                     f: MSCId {
                         base58: "5FHneW46xGXgs5mUiveU4sbTyGBzmstUspZC92UhjJM694ty".to_string(),
-                        identicon: bob(),
+                        identicon: bob().to_vec(),
                     },
                 },
             },
@@ -298,11 +345,11 @@ fn can_sign_transaction_1() {
     };
     let author_info_known = TransactionAuthor {
         base58: "5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY".to_string(),
-        identicon: alice_sr_alice(),
+        identicon: alice_sr_alice().to_vec(),
         seed: "Alice".to_string(),
         derivation_path: "//Alice".to_string(),
+        has_pwd: false,
     };
-    // TODO: "has_pwd":false"
 
     let network_info_known = NetworkSpecs {
         base58prefix: 42,
@@ -385,7 +432,7 @@ fn can_sign_transaction_1() {
         }
 
         let entry = get_history_entry_by_order(2, dbname).unwrap();
-        let historic_reply = entry_to_transactions_with_decoding(&entry, dbname).unwrap();
+        let historic_reply = entry_to_transactions_with_decoding(entry, dbname).unwrap();
         let docs = "2053616d6520617320746865205b607472616e73666572605d2063616c6c2c206275742077697468206120636865636b207468617420746865207472616e736665722077696c6c206e6f74206b696c6c207468650a206f726967696e206163636f756e742e0a0a20393925206f66207468652074696d6520796f752077616e74205b607472616e73666572605d20696e73746561642e0a0a205b607472616e73666572605d3a207374727563742e50616c6c65742e68746d6c236d6574686f642e7472616e736665720a2023203c7765696768743e0a202d2043686561706572207468616e207472616e736665722062656361757365206163636f756e742063616e6e6f74206265206b696c6c65642e0a202d2042617365205765696768743a2035312e3420c2b5730a202d204442205765696768743a2031205265616420616e64203120577269746520746f2064657374202873656e64657220697320696e206f7665726c617920616c7265616479290a20233c2f7765696768743e".to_string();
 
         let historic_reply_known = TransactionCardSet {
@@ -430,7 +477,7 @@ fn can_sign_transaction_1() {
                     card: Card::IdCard {
                         f: MSCId {
                             base58: "5FHneW46xGXgs5mUiveU4sbTyGBzmstUspZC92UhjJM694ty".to_string(),
-                            identicon: bob(),
+                            identicon: bob().to_vec(),
                         },
                     },
                 },
@@ -508,7 +555,9 @@ fn can_sign_transaction_1() {
             ..Default::default()
         };
 
-        assert!(historic_reply.contains(&historic_reply_known));
+        assert!(historic_reply
+            .iter()
+            .any(|m| m.decoded.as_ref() == Some(&historic_reply_known)));
     } else {
         panic!("Wrong action: {:?}", output)
     }
@@ -535,10 +584,10 @@ fn can_sign_message_1() {
 
     let author_info_known = TransactionAuthor {
         base58: "5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY".to_string(),
-        identicon: alice_sr_alice(),
+        identicon: alice_sr_alice().to_vec(),
         seed: "Alice".to_string(),
         derivation_path: "//Alice".to_string(),
-        // TODO "has_pwd":false"#;
+        has_pwd: false,
     };
 
     let network_info_known = NetworkSpecs {
@@ -584,10 +633,10 @@ fn can_sign_message_1() {
         let history_recorded: Vec<_> = get_history(dbname)
             .unwrap()
             .into_iter()
-            .map(|e| e.1.events)
-            .flatten()
+            .flat_map(|e| e.1.events)
             .collect();
 
+        let message = String::from_utf8(hex::decode(message).unwrap()).unwrap();
         let my_event = Event::MessageSigned {
             sign_message_display: SignMessageDisplay {
                 message,
@@ -609,7 +658,11 @@ fn can_sign_message_1() {
         };
 
         // TODO: fails since .message has to be encoded (or decoded) everywhere.
-        assert!(history_recorded.contains(&my_event));
+        assert!(
+            history_recorded.contains(&my_event),
+            "Recorded {:?}",
+            history_recorded
+        );
 
         let result = sign_action_test(checksum, ALICE_SEED_PHRASE, PWD, USER_COMMENT, dbname);
         if let Err(e) = result {
@@ -682,7 +735,7 @@ fn add_specs_westend_no_network_info_not_signed() {
         assert_eq!(stub_nav, stub_nav_known);
 
         let print_before = print_db_content(dbname);
-        let expected_print_before = "Database contents:\nMetadata:\nNetwork Specs:\nVerifiers:\nGeneral Verifier: none\nIdentities: ";
+        let expected_print_before = "Database contents:\nMetadata:\nNetwork Specs:\nVerifiers:\nGeneral Verifier: none\nIdentities:";
         assert!(
             print_before == expected_print_before,
             "Received: \n{}",
@@ -691,15 +744,15 @@ fn add_specs_westend_no_network_info_not_signed() {
 
         handle_stub(checksum, dbname).unwrap();
 
-        let print_after = print_db_content(dbname).replace(&empty_png(), r#"<empty>"#);
+        let print_after = print_db_content(dbname).replace(&hex::encode(empty_png()), r#"<empty>"#);
         let expected_print_after = r#"Database contents:
 Metadata:
 Network Specs:
     0180e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e: Westend (westend with sr25519)
 Verifiers:
-    e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e: Custom { v: Verifier { v: None } }
+    e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e: "type":"custom","details":{"public_key":"","identicon":"<empty>","encryption":"none"}
 General Verifier: none
-Identities: "#;
+Identities:"#;
         assert_eq!(print_after, expected_print_after);
     } else {
         panic!("Wrong action: {:?}", output)
@@ -763,7 +816,8 @@ fn add_specs_westend_ed25519_not_signed() {
         assert_eq!(reply, reply_known);
         assert_eq!(stub_nav, stub_nav_known);
 
-        let print_before = print_db_content(dbname).replace(&empty_png(), r#"<empty>"#);
+        let print_before =
+            print_db_content(dbname).replace(&hex::encode(empty_png()), r#"<empty>"#);
         let expected_print_before = r#"Database contents:
 Metadata:
     kusama2030
@@ -775,9 +829,9 @@ Network Specs:
     018091b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3: Polkadot (polkadot with sr25519)
     0180e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e: Westend (westend with sr25519)
 Verifiers:
-    91b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3: General
-    b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe: General
-    e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e: General
+    91b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3: "type":"general","details":{"public_key":"","identicon":"<empty>","encryption":"none"}
+    b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe: "type":"general","details":{"public_key":"","identicon":"<empty>","encryption":"none"}
+    e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e: "type":"general","details":{"public_key":"","identicon":"<empty>","encryption":"none"}
 General Verifier: none
 Identities:
     public_key: 3efeca331d646d8a2986374bb3bb8d6e9e3cfcdd7c45c2b69104fab5d61d3f34, encryption: sr25519, path: //westend, available_networks:
@@ -799,7 +853,7 @@ Identities:
         assert_eq!(print_before, expected_print_before);
 
         handle_stub(checksum, dbname).unwrap();
-        let print_after = print_db_content(dbname).replace(&empty_png(), r#"<empty>"#);
+        let print_after = print_db_content(dbname).replace(&hex::encode(empty_png()), r#"<empty>"#);
         let expected_print_after = r#"Database contents:
 Metadata:
     kusama2030
@@ -812,9 +866,9 @@ Network Specs:
     0180e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e: Westend (westend with sr25519)
     0080e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e: westend-ed25519 (westend with ed25519)
 Verifiers:
-    91b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3: General
-    b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe: General
-    e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e: General
+    91b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3: "type":"general","details":{"public_key":"","identicon":"<empty>","encryption":"none"}
+    b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe: "type":"general","details":{"public_key":"","identicon":"<empty>","encryption":"none"}
+    e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e: "type":"general","details":{"public_key":"","identicon":"<empty>","encryption":"none"}
 General Verifier: none
 Identities:
     public_key: 3efeca331d646d8a2986374bb3bb8d6e9e3cfcdd7c45c2b69104fab5d61d3f34, encryption: sr25519, path: //westend, available_networks:
@@ -855,7 +909,7 @@ Identities:
             dbname,
         )
         .unwrap();
-        let print_after = print_db_content(dbname).replace(&empty_png(), r#"<empty>"#);
+        let print_after = print_db_content(dbname).replace(&hex::encode(empty_png()), r#"<empty>"#);
         let expected_print_after = r#"Database contents:
 Metadata:
     kusama2030
@@ -868,9 +922,9 @@ Network Specs:
     0180e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e: Westend (westend with sr25519)
     0080e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e: westend-ed25519 (westend with ed25519)
 Verifiers:
-    91b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3: General
-    b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe: General
-    e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e: General
+    91b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3: "type":"general","details":{"public_key":"","identicon":"<empty>","encryption":"none"}
+    b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe: "type":"general","details":{"public_key":"","identicon":"<empty>","encryption":"none"}
+    e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e: "type":"general","details":{"public_key":"","identicon":"<empty>","encryption":"none"}
 General Verifier: none
 Identities:
     public_key: 345071da55e5dccefaaa440339415ef9f2663338a38f7da0df21be5ab4e055ef, encryption: ed25519, path: , available_networks:
@@ -892,7 +946,7 @@ Identities:
         assert_eq!(print_after, expected_print_after);
 
         remove_seed(dbname, "Alice").unwrap();
-        let print_after = print_db_content(dbname).replace(&empty_png(), r#"<empty>"#);
+        let print_after = print_db_content(dbname).replace(&hex::encode(empty_png()), r#"<empty>"#);
         let expected_print_after = r#"Database contents:
 Metadata:
     kusama2030
@@ -905,15 +959,15 @@ Network Specs:
     0180e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e: Westend (westend with sr25519)
     0080e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e: westend-ed25519 (westend with ed25519)
 Verifiers:
-    91b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3: General
-    b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe: General
-    e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e: General
+    91b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3: "type":"general","details":{"public_key":"","identicon":"<empty>","encryption":"none"}
+    b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe: "type":"general","details":{"public_key":"","identicon":"<empty>","encryption":"none"}
+    e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e: "type":"general","details":{"public_key":"","identicon":"<empty>","encryption":"none"}
 General Verifier: none
 Identities:"#;
         assert_eq!(print_after, expected_print_after);
 
         try_create_seed("Alice", ALICE_SEED_PHRASE, true, dbname).unwrap();
-        let print_after = print_db_content(dbname).replace(&empty_png(), r#"<empty>"#);
+        let print_after = print_db_content(dbname).replace(&hex::encode(empty_png()), r#"<empty>"#);
         let expected_print_after = r#"Database contents:
 Metadata:
     kusama2030
@@ -926,9 +980,9 @@ Network Specs:
     0180e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e: Westend (westend with sr25519)
     0080e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e: westend-ed25519 (westend with ed25519)
 Verifiers:
-    91b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3: General
-    b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe: General
-    e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e: General
+    91b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3: "type":"general","details":{"public_key":"","identicon":"<empty>","encryption":"none"}
+    b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe: "type":"general","details":{"public_key":"","identicon":"<empty>","encryption":"none"}
+    e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e: "type":"general","details":{"public_key":"","identicon":"<empty>","encryption":"none"}
 General Verifier: none
 Identities:
     public_key: 345071da55e5dccefaaa440339415ef9f2663338a38f7da0df21be5ab4e055ef, encryption: ed25519, path: , available_networks:
@@ -975,7 +1029,7 @@ fn load_westend9070() {
                     spec_version: "9070".to_string(),
                     meta_hash: "e281fbc53168a6b87d1ea212923811f4c083e7be7d18df4b8527b9532e5f5fec"
                         .to_string(),
-                    meta_id_pic: String::new(),
+                    meta_id_pic: westend_9070().to_vec(),
                 },
             },
         }]),
@@ -998,7 +1052,8 @@ fn load_westend9070() {
         assert_eq!(reply, reply_known);
         assert_eq!(stub_nav, stub_nav_known);
 
-        let print_before = print_db_content(dbname).replace(&empty_png(), r#"<empty>"#);
+        let print_before =
+            print_db_content(dbname).replace(&hex::encode(empty_png()), r#"<empty>"#);
         let expected_print_before = r#"Database contents:
 Metadata:
     kusama2030
@@ -1010,9 +1065,9 @@ Network Specs:
     018091b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3: Polkadot (polkadot with sr25519)
     0180e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e: Westend (westend with sr25519)
 Verifiers:
-    91b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3: General
-    b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe: General
-    e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e: General
+    91b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3: "type":"general","details":{"public_key":"","identicon":"<empty>","encryption":"none"}
+    b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe: "type":"general","details":{"public_key":"","identicon":"<empty>","encryption":"none"}
+    e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e: "type":"general","details":{"public_key":"","identicon":"<empty>","encryption":"none"}
 General Verifier: none
 Identities:
     public_key: 3efeca331d646d8a2986374bb3bb8d6e9e3cfcdd7c45c2b69104fab5d61d3f34, encryption: sr25519, path: //westend, available_networks:
@@ -1031,7 +1086,7 @@ Identities:
 
         handle_stub(checksum, dbname).unwrap();
 
-        let print_after = print_db_content(dbname).replace(&empty_png(), r#"<empty>"#);
+        let print_after = print_db_content(dbname).replace(&hex::encode(empty_png()), r#"<empty>"#);
         let expected_print_after = r#"Database contents:
 Metadata:
     kusama2030
@@ -1044,9 +1099,9 @@ Network Specs:
     018091b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3: Polkadot (polkadot with sr25519)
     0180e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e: Westend (westend with sr25519)
 Verifiers:
-    91b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3: General
-    b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe: General
-    e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e: General
+    91b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3: "type":"general","details":{"public_key":"","identicon":"<empty>","encryption":"none"}
+    b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe: "type":"general","details":{"public_key":"","identicon":"<empty>","encryption":"none"}
+    e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e: "type":"general","details":{"public_key":"","identicon":"<empty>","encryption":"none"}
 General Verifier: none
 Identities:
     public_key: 3efeca331d646d8a2986374bb3bb8d6e9e3cfcdd7c45c2b69104fab5d61d3f34, encryption: sr25519, path: //westend, available_networks:
@@ -1061,11 +1116,7 @@ Identities:
         0180e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e
     public_key: f606519cb8726753885cd4d0f518804a69a5e0badf36fee70feadd8044081730, encryption: sr25519, path: //polkadot, available_networks:
         018091b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3"#;
-        assert!(
-            print_after == expected_print_after,
-            "Received: \n{}",
-            print_after
-        );
+        assert_eq!(print_after, expected_print_after);
     } else {
         panic!("Wrong action: {:?}", output)
     }
@@ -1091,7 +1142,7 @@ fn load_known_types_upd_general_verifier() {
                 f: MVerifierDetails {
                     public_key: "d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d"
                         .to_string(),
-                    identicon: alice_sr_alice(),
+                    identicon: alice_sr_alice().to_vec(),
                     encryption: "sr25519".to_string(),
                 },
             },
@@ -1118,7 +1169,7 @@ fn load_known_types_upd_general_verifier() {
                         "d091a5a24a97e18dfe298b167d8fd5a2add10098c8792cba21c39029a9ee0aeb"
                             .to_string(),
                     ),
-                    types_id_pic: Some(types_known()),
+                    types_id_pic: Some(types_known().to_vec()),
                 },
             },
         }]),
@@ -1136,7 +1187,8 @@ fn load_known_types_upd_general_verifier() {
         assert_eq!(reply, reply_known);
         assert_eq!(stub_nav, stub_nav_known);
 
-        let print_before = print_db_content(dbname).replace(&empty_png(), r#"<empty>"#);
+        let print_before =
+            print_db_content(dbname).replace(&hex::encode(empty_png()), r#"<empty>"#);
         let expected_print_before = r#"Database contents:
 Metadata:
     kusama2030
@@ -1148,9 +1200,9 @@ Network Specs:
     018091b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3: Polkadot (polkadot with sr25519)
     0180e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e: Westend (westend with sr25519)
 Verifiers:
-    91b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3: General 
-    b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe: General 
-    e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e: General 
+    91b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3: "type":"general","details":{"public_key":"","identicon":"<empty>","encryption":"none"}
+    b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe: "type":"general","details":{"public_key":"","identicon":"<empty>","encryption":"none"}
+    e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e: "type":"general","details":{"public_key":"","identicon":"<empty>","encryption":"none"}
 General Verifier: none
 Identities:
     public_key: 3efeca331d646d8a2986374bb3bb8d6e9e3cfcdd7c45c2b69104fab5d61d3f34, encryption: sr25519, path: //westend, available_networks:
@@ -1169,8 +1221,8 @@ Identities:
 
         handle_stub(checksum, dbname).unwrap();
 
-        let print_after =
-            print_db_content(dbname).replace(&alice_sr_alice(), r#"<alice_sr25519_//Alice>"#);
+        let print_after = print_db_content(dbname)
+            .replace(&hex::encode(alice_sr_alice()), r#"<alice_sr25519_//Alice>"#);
         let expected_print_after = r#"Database contents:
 Metadata:
 Network Specs:
@@ -1213,7 +1265,7 @@ fn load_new_types_verified() {
                 f: MVerifierDetails {
                     public_key: "d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d"
                         .to_string(),
-                    identicon: alice_sr_alice(),
+                    identicon: alice_sr_alice().to_vec(),
                     encryption: "sr25519".to_string(),
                 },
             },
@@ -1235,7 +1287,7 @@ fn load_new_types_verified() {
                         "d2c5b096be10229ce9ea9d219325c4399875b52ceb4264add89b0d7c5e9ad574"
                             .to_string(),
                     ),
-                    types_id_pic: Some(types_unknown()),
+                    types_id_pic: Some(types_unknown().to_vec()),
                 },
             },
         }]),
@@ -1253,8 +1305,8 @@ fn load_new_types_verified() {
         assert_eq!(reply, reply_known);
         assert_eq!(stub_nav, stub_nav_known);
 
-        let print_before =
-            print_db_content(dbname).replace(&alice_sr_alice(), r#"<alice_sr25519_//Alice>"#);
+        let print_before = print_db_content(dbname)
+            .replace(&hex::encode(alice_sr_alice()), r#"<alice_sr25519_//Alice>"#);
         let expected_print_before = r#"Database contents:
 Metadata:
     kusama2030
@@ -1291,8 +1343,8 @@ Identities:
 
         handle_stub(checksum, dbname).unwrap();
 
-        let print_after =
-            print_db_content(dbname).replace(&alice_sr_alice(), r#"<alice_sr25519_//Alice>"#);
+        let print_after = print_db_content(dbname)
+            .replace(&hex::encode(alice_sr_alice()), r#"<alice_sr25519_//Alice>"#);
         let expected_print_after = r#"Database contents:
 Metadata:
     kusama2030
@@ -1390,7 +1442,8 @@ fn dock_adventures_1() {
         assert_eq!(reply, reply_known);
         assert_eq!(stub_nav, stub_nav_known);
 
-        let print_before = print_db_content(dbname).replace(&empty_png(), r#"<empty>"#);
+        let print_before =
+            print_db_content(dbname).replace(&hex::encode(empty_png()), r#"<empty>"#);
         let expected_print_before = r#"Database contents:
 Metadata:
     kusama2030
@@ -1427,7 +1480,7 @@ Identities:
 
         handle_stub(checksum, dbname).unwrap();
 
-        let print_after = print_db_content(dbname).replace(&empty_png(), r#"<empty>"#);
+        let print_after = print_db_content(dbname).replace(&hex::encode(empty_png()), r#"<empty>"#);
         let expected_print_after = r#"Database contents:
 Metadata:
     kusama2030
@@ -1489,7 +1542,7 @@ Identities:
                     spec_version: "31".to_string(),
                     meta_hash: "28c25067d5c0c739f64f7779c5f3095ecf57d9075b0c5258f3be2df6d7f323d0"
                         .to_string(),
-                    meta_id_pic: dock_31(),
+                    meta_id_pic: dock_31().to_vec(),
                 },
             },
         }]),
@@ -1514,7 +1567,7 @@ Identities:
 
         handle_stub(checksum, dbname).unwrap();
 
-        let print_after = print_db_content(dbname).replace(&empty_png(), r#"<empty>"#);
+        let print_after = print_db_content(dbname).replace(&hex::encode(empty_png()), r#"<empty>"#);
         let expected_print_after = r#"Database contents:
 Metadata:
     dock-pos-main-runtime31
@@ -1572,7 +1625,7 @@ Identities:
                 f: MVerifierDetails {
                     public_key: "d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d"
                         .to_string(),
-                    identicon: alice_sr_alice(),
+                    identicon: alice_sr_alice().to_vec(),
                     encryption: "sr25519".to_string(),
                 },
             },
@@ -1638,8 +1691,8 @@ Identities:
 
         handle_stub(checksum, dbname).unwrap();
 
-        let print_after =
-            print_db_content(dbname).replace(&alice_sr_alice(), r#"<alice_sr25519_//Alice>"#);
+        let print_after = print_db_content(dbname)
+            .replace(&hex::encode(alice_sr_alice()), r#"<alice_sr25519_//Alice>"#);
         let expected_print_after = r#"Database contents:
 Metadata:
 Network Specs:
@@ -1734,8 +1787,8 @@ fn dock_adventures_2() {
         assert_eq!(reply, reply_known);
         assert_eq!(stub_nav, stub_nav_known);
 
-        let print_before =
-            print_db_content(dbname).replace(&alice_sr_alice(), r#"<alice_sr25519_//Alice>"#);
+        let print_before = print_db_content(dbname)
+            .replace(&hex::encode(alice_sr_alice()), r#"<alice_sr25519_//Alice>"#);
         let expected_print_before = r#"Database contents:
 Metadata:
     kusama2030
@@ -1773,8 +1826,8 @@ Identities:
         handle_stub(checksum, dbname).unwrap();
 
         let print_after = print_db_content(dbname)
-            .replace(&alice_sr_alice(), r#"<alice_sr25519_//Alice>"#)
-            .replace(&empty_png(), r#"<empty>"#);
+            .replace(&hex::encode(alice_sr_alice()), r#"<alice_sr25519_//Alice>"#)
+            .replace(&hex::encode(empty_png()), r#"<empty>"#);
         let expected_print_after = r#"Database contents:
 Metadata:
     kusama2030
@@ -1836,7 +1889,7 @@ Identities:
                     spec_version: "31".to_string(),
                     meta_hash: "28c25067d5c0c739f64f7779c5f3095ecf57d9075b0c5258f3be2df6d7f323d0"
                         .to_string(),
-                    meta_id_pic: dock_31(),
+                    meta_id_pic: dock_31().to_vec(),
                 },
             },
         }]),
@@ -1862,8 +1915,8 @@ Identities:
         handle_stub(checksum, dbname).unwrap();
 
         let print_after = print_db_content(dbname)
-            .replace(&alice_sr_alice(), r#"<alice_sr25519_//Alice>"#)
-            .replace(&empty_png(), r#"<empty>"#);
+            .replace(&hex::encode(alice_sr_alice()), r#"<alice_sr25519_//Alice>"#)
+            .replace(&hex::encode(empty_png()), r#"<empty>"#);
         let expected_print_after = r#"Database contents:
 Metadata:
     dock-pos-main-runtime31
@@ -1921,7 +1974,7 @@ Identities:
                 f: MVerifierDetails {
                     public_key: "88dc3417d5058ec4b4503e0c12ea1a0a89be200fe98922423d4334014fa6b0ee"
                         .to_string(),
-                    identicon: ed(),
+                    identicon: ed().to_vec(),
                     encryption: "ed25519".to_string(),
                 },
             },
@@ -1984,8 +2037,8 @@ Identities:
         handle_stub(checksum, dbname).unwrap();
 
         let print_after = print_db_content(dbname)
-            .replace(&alice_sr_alice(), r#"<alice_sr25519_//Alice>"#)
-            .replace(&ed(), r#"<ed>"#);
+            .replace(&hex::encode(alice_sr_alice()), r#"<alice_sr25519_//Alice>"#)
+            .replace(&hex::encode(ed()), r#"<ed>"#);
         let expected_print_after = r#"Database contents:
 Metadata:
     kusama2030
@@ -2040,7 +2093,7 @@ Identities:
                 f: MVerifierDetails {
                     public_key: "d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d"
                         .to_string(),
-                    identicon: alice_sr_alice(),
+                    identicon: alice_sr_alice().to_vec(),
                     encryption: "sr25519".to_string(),
                 },
             },
@@ -2101,8 +2154,8 @@ Identities:
 
         handle_stub(checksum, dbname).unwrap();
 
-        let print_after =
-            print_db_content(dbname).replace(&alice_sr_alice(), r#"<alice_sr25519_//Alice>"#);
+        let print_after = print_db_content(dbname)
+            .replace(&hex::encode(alice_sr_alice()), r#"<alice_sr25519_//Alice>"#);
         let expected_print_after = r#"Database contents:
 Metadata:
     kusama2030
@@ -2169,7 +2222,7 @@ fn can_parse_westend_with_v14() {
                     spec_version: "9111".to_string(),
                     meta_hash: "207956815bc7b3234fa8827ef40df5fd2879e93f18a680e22bc6801bca27312d"
                         .to_string(),
-                    meta_id_pic: westend_9111(),
+                    meta_id_pic: westend_9111().to_vec(),
                 },
             },
         }]),
@@ -2193,7 +2246,8 @@ fn can_parse_westend_with_v14() {
         assert_eq!(reply, reply_known);
         assert_eq!(stub_nav, stub_nav_known);
 
-        let print_before = print_db_content(dbname).replace(&empty_png(), r#"<empty>"#);
+        let print_before =
+            print_db_content(dbname).replace(&hex::encode(empty_png()), r#"<empty>"#);
         let expected_print_before = r#"Database contents:
 Metadata:
     kusama2030
@@ -2230,7 +2284,7 @@ Identities:
 
         handle_stub(checksum, dbname).unwrap();
 
-        let print_after = print_db_content(dbname).replace(&empty_png(), r#"<empty>"#);
+        let print_after = print_db_content(dbname).replace(&hex::encode(empty_png()), r#"<empty>"#);
         let expected_print_after = r#"Database contents:
 Metadata:
     kusama2030
@@ -2320,7 +2374,7 @@ Identities:
                 card: Card::IdCard {
                     f: MSCId {
                         base58: "5FHneW46xGXgs5mUiveU4sbTyGBzmstUspZC92UhjJM694ty".to_string(),
-                        identicon: bob(),
+                        identicon: bob().to_vec(),
                     },
                 },
             },
@@ -2405,10 +2459,10 @@ Identities:
 
     let author_info_known = TransactionAuthor {
         base58: "5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY".to_string(),
-        identicon: alice_sr_alice(),
+        identicon: alice_sr_alice().to_vec(),
         seed: "Alice".to_string(),
         derivation_path: "//Alice".to_string(),
-        // TODO: has_pwd":false"#;
+        has_pwd: false,
     };
     // TODO: let network_info_known = r#""network_title":"Westend","network_logo":"westend""#;
 
@@ -2417,7 +2471,7 @@ Identities:
         checksum,
         has_pwd,
         author_info,
-        network_info,
+        network_info: _,
     } = output
     {
         assert_eq!(content, content_known);
@@ -2512,7 +2566,7 @@ Identities:
                 card: Card::IdCard {
                     f: MSCId {
                         base58: "5DfhGyQdFobKM8NsWvEeAKk5EQQgYe9AydgJ7rMB6E1EqRzV".to_string(),
-                        identicon: alice_sr_root(),
+                        identicon: alice_sr_root().to_vec(),
                     },
                 },
             },
@@ -2605,7 +2659,7 @@ Identities:
                 card: Card::IdCard {
                     f: MSCId {
                         base58: "5CFPcUJgYgWryPaV1aYjSbTpbTLu42V32Ytw1L9rfoMAsfGh".to_string(),
-                        identicon: id_04(),
+                        identicon: id_04().to_vec(),
                     },
                 },
             },
@@ -2625,7 +2679,7 @@ Identities:
                 card: Card::IdCard {
                     f: MSCId {
                         base58: "5G1ojzh47Yt8KoYhuAjXpHcazvsoCXe3G8LZchKDvumozJJJ".to_string(),
-                        identicon: id_01(),
+                        identicon: id_01().to_vec(),
                     },
                 },
             },
@@ -2645,7 +2699,7 @@ Identities:
                 card: Card::IdCard {
                     f: MSCId {
                         base58: "5FZoQhgUCmqBxnkHX7jCqThScS2xQWiwiF61msg63CFL3Y8f".to_string(),
-                        identicon: id_02(),
+                        identicon: id_02().to_vec(),
                     },
                 },
             },
@@ -2706,10 +2760,10 @@ Identities:
 
     let author_info_known = TransactionAuthor {
         base58: "5DfhGyQdFobKM8NsWvEeAKk5EQQgYe9AydgJ7rMB6E1EqRzV".to_string(),
-        identicon: alice_sr_root(),
+        identicon: alice_sr_root().to_vec(),
         seed: "Alice".to_string(),
         derivation_path: String::new(),
-        //TODO: ,"has_pwd":false"#;
+        has_pwd: false,
     };
     // TODO let network_info_known = r#""network_title":"Westend","network_logo":"westend""#;
 
@@ -2718,7 +2772,7 @@ Identities:
         checksum,
         has_pwd,
         author_info,
-        network_info,
+        network_info: _,
     } = output
     {
         assert_eq!(content, content_known);
@@ -2731,15 +2785,7 @@ Identities:
     }
 
     let entry = get_history_entry_by_order(3, dbname).unwrap();
-    let historic_reply = entry_to_transactions_with_decoding(&entry, dbname).unwrap();
-    let historic_reply_known = TransactionCardSet {
-        method: Some(vec![TransactionCard {
-            index: todo!(),
-            indent: todo!(),
-            card: todo!(),
-        }]),
-        ..Default::default()
-    };
+    let _historic_reply = entry_to_transactions_with_decoding(entry, dbname).unwrap();
 
     /*
         r#""method":[{"index":0,"indent":0,"type":"pallet","payload":"Balances"},{"index":1,"indent":1,"type":"method","payload":{"method_name":"transfer_keep_alive","docs":"53616d6520617320746865205b607472616e73666572605d2063616c6c2c206275742077697468206120636865636b207468617420746865207472616e736665722077696c6c206e6f74206b696c6c207468650a6f726967696e206163636f756e742e0a0a393925206f66207468652074696d6520796f752077616e74205b607472616e73666572605d20696e73746561642e0a0a5b607472616e73666572605d3a207374727563742e50616c6c65742e68746d6c236d6574686f642e7472616e736665720a23203c7765696768743e0a2d2043686561706572207468616e207472616e736665722062656361757365206163636f756e742063616e6e6f74206265206b696c6c65642e0a2d2042617365205765696768743a2035312e3420c2b5730a2d204442205765696768743a2031205265616420616e64203120577269746520746f2064657374202873656e64657220697320696e206f7665726c617920616c7265616479290a233c2f7765696768743e"}},{"index":2,"indent":2,"type":"field_name","payload":{"name":"dest","docs_field_name":"","path_type":"sp_runtime >> multiaddress >> MultiAddress","docs_type":""}},{"index":3,"indent":3,"type":"enum_variant_name","payload":{"name":"Id","docs_enum_variant":""}},{"index":4,"indent":4,"type":"Id","payload":{"base58":"5FHneW46xGXgs5mUiveU4sbTyGBzmstUspZC92UhjJM694ty","identicon":"<bob>"}},{"index":5,"indent":2,"type":"field_name","payload":{"name":"value","docs_field_name":"","path_type":"","docs_type":""}},{"index":6,"indent":3,"type":"balance","payload":{"amount":"100.000000","units":"uWND"}}],"extensions":[{"index":7,"indent":0,"type":"era","payload":{"era":"Mortal","phase":"61","period":"64"}},{"index":8,"indent":0,"type":"nonce","payload":"261"},{"index":9,"indent":0,"type":"tip","payload":{"amount":"10.000000","units":"uWND"}},{"index":10,"indent":0,"type":"name_version","payload":{"name":"westend","version":"9111"}},{"index":11,"indent":0,"type":"tx_version","payload":"7"},{"index":12,"indent":0,"type":"block_hash","payload":"98a8ee9e389043cd8a9954b254d822d34138b9ae97d3b7f50dc6781b13df8d84"}]"#;
@@ -2790,7 +2836,7 @@ fn parse_transaction_alice_remarks_westend9122() {
                     spec_version: "9122".to_string(),
                     meta_hash: "d656951f4c58c9fdbe029be33b02a7095abc3007586656be7ff68fd0550d6ced"
                         .to_string(),
-                    meta_id_pic: westend_9122(),
+                    meta_id_pic: westend_9122().to_vec(),
                 },
             },
         }]),
@@ -2918,10 +2964,10 @@ fn parse_transaction_alice_remarks_westend9122() {
     };
     let author_info_known = TransactionAuthor {
         base58: "5DfhGyQdFobKM8NsWvEeAKk5EQQgYe9AydgJ7rMB6E1EqRzV".to_string(),
-        identicon: alice_sr_root(),
+        identicon: alice_sr_root().to_vec(),
         seed: "Alice".to_string(),
         derivation_path: String::new(),
-        //TODO "has_pwd":false"#;
+        has_pwd: false,
     };
     // TODO let network_info_known = r#""network_title":"Westend","network_logo":"westend""#;
 
@@ -2930,7 +2976,7 @@ fn parse_transaction_alice_remarks_westend9122() {
         checksum: _,
         has_pwd,
         author_info,
-        network_info,
+        network_info: _,
     } = output
     {
         assert_eq!(content, content_known);
@@ -2976,7 +3022,7 @@ fn proper_hold_display() {
                 f: MVerifierDetails {
                     public_key: "d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d"
                         .to_string(),
-                    identicon: alice_sr_alice(),
+                    identicon: alice_sr_alice().to_vec(),
                     encryption: "sr25519".to_string(),
                 },
             },
@@ -3003,7 +3049,7 @@ fn proper_hold_display() {
                         "d091a5a24a97e18dfe298b167d8fd5a2add10098c8792cba21c39029a9ee0aeb"
                             .to_string(),
                     ),
-                    types_id_pic: Some(types_known()),
+                    types_id_pic: Some(types_known().to_vec()),
                 },
             },
         }]),
@@ -3040,8 +3086,8 @@ fn delete_westend_try_load_metadata() {
         dbname,
     )
     .unwrap();
-    let print_before =
-        print_db_content(dbname).replace(&alice_sr_alice(), r#"<alice_sr25519_//Alice>"#);
+    let print_before = print_db_content(dbname)
+        .replace(&hex::encode(alice_sr_alice()), r#"<alice_sr25519_//Alice>"#);
     let expected_print_before = r#"Database contents:
 Metadata:
     kusama2030
@@ -3125,8 +3171,8 @@ fn dock_adventures_3() {
     }
 
     let print_before = print_db_content(dbname)
-        .replace(&alice_sr_alice(), r#"<alice_sr25519_//Alice>"#)
-        .replace(&ed(), r#"<ed>"#);
+        .replace(&hex::encode(alice_sr_alice()), r#"<alice_sr25519_//Alice>"#)
+        .replace(&hex::encode(ed()), r#"<ed>"#);
     let expected_print_before = r#"Database contents:
 Metadata:
     dock-pos-main-runtime34
@@ -3171,8 +3217,8 @@ Identities:
     )
     .unwrap();
 
-    let print_after =
-        print_db_content(dbname).replace(&alice_sr_alice(), r#"<alice_sr25519_//Alice>"#);
+    let print_after = print_db_content(dbname)
+        .replace(&hex::encode(alice_sr_alice()), r#"<alice_sr25519_//Alice>"#);
     let expected_print_after = r#"Database contents:
 Metadata:
     kusama2030
@@ -3268,7 +3314,7 @@ fn acala_adventures() {
         panic!("Wrong action: {:?}", output)
     }
 
-    let print_after = print_db_content(dbname).replace(&empty_png(), r#"<empty>"#);
+    let print_after = print_db_content(dbname).replace(&hex::encode(empty_png()), r#"<empty>"#);
     let expected_print_after = r#"Database contents:
 Metadata:
 Network Specs:
@@ -3276,7 +3322,7 @@ Network Specs:
 Verifiers:
     fc41b9bd8ef8fe53d58c7ea67c794c7ec9a73daf05e6d54b14ff6342c99ba64c: "type":"custom","details":{"public_key":"","identicon":"<empty>","encryption":"none"}
 General Verifier: none
-Identities: "#;
+Identities:"#;
     assert!(
         print_after == expected_print_after,
         "Received: \n{}",
@@ -3309,7 +3355,7 @@ Identities: "#;
             card: Card::AuthorPlainCard {
                 f: MSCAuthorPlain {
                     base58: "25rZGFcFEWz1d81xB98PJN8LQu5cCwjyazAerGkng5NDuk9C".to_string(),
-                    identicon: id_05(),
+                    identicon: id_05().to_vec(),
                 },
             },
         }]),
@@ -3366,7 +3412,7 @@ Identities: "#;
                 card: Card::IdCard {
                     f: MSCId {
                         base58: "25rZGFcFEWz1d81xB98PJN8LQu5cCwjyazAerGkng5NDuk9C".to_string(),
-                        identicon: id_05(),
+                        identicon: id_05().to_vec(),
                     },
                 },
             },
@@ -3502,7 +3548,7 @@ fn shell_no_token_warning_on_metadata() {
                     spec_version: "200".to_string(),
                     meta_hash: "65f0d394de10396c6c1800092f9a95c48ec1365d9302dbf5df736c5e0c54fde3"
                         .to_string(),
-                    meta_id_pic: shell_200(),
+                    meta_id_pic: shell_200().to_vec(),
                 },
             },
         }]),
@@ -3565,7 +3611,7 @@ fn rococo_and_verifiers_1() {
         panic!("Wrong action: {:?}", output)
     }
 
-    let print = print_db_content(dbname).replace(&ed(), r#"<ed>"#);
+    let print = print_db_content(dbname).replace(&hex::encode(ed()), r#"<ed>"#);
     let expected_print = r#"Database contents:
 Metadata:
 Network Specs:
@@ -3574,7 +3620,7 @@ Network Specs:
 Verifiers:
     27b0e1604364f6a7309d31ad60cdfb820666c3095b9f948c4a7d7894b6b3c184: "type":"custom","details":{"public_key":"88dc3417d5058ec4b4503e0c12ea1a0a89be200fe98922423d4334014fa6b0ee","identicon":"<ed>","encryption":"ed25519"}
 General Verifier: public key: d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d, encryption: sr25519
-Identities: "#;
+Identities:"#;
     assert_eq!(print, expected_print);
 
     // remove only one of the rococo's
@@ -3595,7 +3641,7 @@ Network Specs:
 Verifiers:
     27b0e1604364f6a7309d31ad60cdfb820666c3095b9f948c4a7d7894b6b3c184: network inactivated
 General Verifier: public key: d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d, encryption: sr25519
-Identities: "#;
+Identities:"#;
     assert_eq!(print, expected_print);
 
     fs::remove_dir_all(dbname).unwrap();
@@ -3620,7 +3666,8 @@ fn rococo_and_verifiers_2() {
         panic!("Wrong action: {:?}", output)
     }
 
-    let print = print_db_content(dbname).replace(&alice_sr_alice(), r#"<alice_sr25519_//Alice>"#);
+    let print = print_db_content(dbname)
+        .replace(&hex::encode(alice_sr_alice()), r#"<alice_sr25519_//Alice>"#);
     let expected_print = r#"Database contents:
 Metadata:
 Network Specs:
@@ -3628,7 +3675,7 @@ Network Specs:
 Verifiers:
     27b0e1604364f6a7309d31ad60cdfb820666c3095b9f948c4a7d7894b6b3c184: "type":"general","details":{"public_key":"d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d","identicon":"<alice_sr25519_//Alice>","encryption":"sr25519"}
 General Verifier: public key: d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d, encryption: sr25519
-Identities: "#;
+Identities:"#;
     assert_eq!(print, expected_print);
 
     // remove it
@@ -3642,14 +3689,15 @@ Identities: "#;
     )
     .unwrap();
 
-    let print = print_db_content(dbname).replace(&alice_sr_alice(), r#"<alice_sr25519_//Alice>"#);
+    let print = print_db_content(dbname)
+        .replace(&hex::encode(alice_sr_alice()), r#"<alice_sr25519_//Alice>"#);
     let expected_print = r#"Database contents:
 Metadata:
 Network Specs:
 Verifiers:
     27b0e1604364f6a7309d31ad60cdfb820666c3095b9f948c4a7d7894b6b3c184: "type":"general","details":{"public_key":"d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d","identicon":"<alice_sr25519_//Alice>","encryption":"sr25519"}
 General Verifier: public key: d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d, encryption: sr25519
-Identities: "#;
+Identities:"#;
     assert_eq!(print, expected_print);
 
     fs::remove_dir_all(dbname).unwrap();
@@ -3674,7 +3722,7 @@ fn rococo_and_verifiers_3() {
         panic!("Wrong action: {:?}", output)
     }
 
-    let print = print_db_content(dbname).replace(&empty_png(), r#"<empty>"#);
+    let print = print_db_content(dbname).replace(&hex::encode(empty_png()), r#"<empty>"#);
     let expected_print = r#"Database contents:
 Metadata:
 Network Specs:
@@ -3682,7 +3730,7 @@ Network Specs:
 Verifiers:
     27b0e1604364f6a7309d31ad60cdfb820666c3095b9f948c4a7d7894b6b3c184: "type":"custom","details":{"public_key":"","identicon":"<empty>","encryption":"none"}
 General Verifier: public key: d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d, encryption: sr25519
-Identities: "#;
+Identities:"#;
     assert_eq!(print, expected_print);
 
     // remove it
@@ -3696,14 +3744,14 @@ Identities: "#;
     )
     .unwrap();
 
-    let print = print_db_content(dbname).replace(&empty_png(), r#"<empty>"#);
+    let print = print_db_content(dbname).replace(&hex::encode(empty_png()), r#"<empty>"#);
     let expected_print = r#"Database contents:
 Metadata:
 Network Specs:
 Verifiers:
     27b0e1604364f6a7309d31ad60cdfb820666c3095b9f948c4a7d7894b6b3c184: "type":"custom","details":{"public_key":"","identicon":"<empty>","encryption":"none"}
 General Verifier: public key: d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d, encryption: sr25519
-Identities: "#;
+Identities:"#;
     assert_eq!(print, expected_print);
 
     fs::remove_dir_all(dbname).unwrap();
@@ -3728,7 +3776,7 @@ fn rococo_and_verifiers_4() {
         panic!("Wrong action: {:?}", output)
     }
 
-    let print = print_db_content(dbname).replace(&empty_png(), r#"<empty>"#);
+    let print = print_db_content(dbname).replace(&hex::encode(empty_png()), r#"<empty>"#);
     let expected_print = r#"Database contents:
 Metadata:
 Network Specs:
@@ -3736,7 +3784,7 @@ Network Specs:
 Verifiers:
     27b0e1604364f6a7309d31ad60cdfb820666c3095b9f948c4a7d7894b6b3c184: "type":"custom","details":{"public_key":"","identicon":"<empty>","encryption":"none"}
 General Verifier: public key: d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d, encryption: sr25519
-Identities: "#;
+Identities:"#;
     assert_eq!(print, expected_print);
 
     // added rococo specs with sr25519, general verifier
@@ -3753,7 +3801,8 @@ Identities: "#;
         panic!("Wrong action: {:?}", output)
     }
 
-    let print = print_db_content(dbname).replace(&alice_sr_alice(), r#"<alice_sr25519_//Alice>"#);
+    let print = print_db_content(dbname)
+        .replace(&hex::encode(alice_sr_alice()), r#"<alice_sr25519_//Alice>"#);
     let expected_print = r#"Database contents:
 Metadata:
 Network Specs:
@@ -3761,7 +3810,7 @@ Network Specs:
 Verifiers:
     27b0e1604364f6a7309d31ad60cdfb820666c3095b9f948c4a7d7894b6b3c184: "type":"general","details":{"public_key":"d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d","identicon":"<alice_sr25519_//Alice>","encryption":"sr25519"}
 General Verifier: public key: d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d, encryption: sr25519
-Identities: "#;
+Identities:"#;
     assert_eq!(print, expected_print);
 
     fs::remove_dir_all(dbname).unwrap();
@@ -3786,7 +3835,7 @@ fn rococo_and_verifiers_5() {
         panic!("Wrong action: {:?}", output)
     }
 
-    let print = print_db_content(dbname).replace(&ed(), r#"<ed>"#);
+    let print = print_db_content(dbname).replace(&hex::encode(ed()), r#"<ed>"#);
     let expected_print = r#"Database contents:
 Metadata:
 Network Specs:
@@ -3794,7 +3843,7 @@ Network Specs:
 Verifiers:
     27b0e1604364f6a7309d31ad60cdfb820666c3095b9f948c4a7d7894b6b3c184: "type":"custom","details":{"public_key":"88dc3417d5058ec4b4503e0c12ea1a0a89be200fe98922423d4334014fa6b0ee","identicon":"<ed>","encryption":"ed25519"}
 General Verifier: public key: d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d, encryption: sr25519
-Identities: "#;
+Identities:"#;
     assert_eq!(print, expected_print);
 
     // added rococo specs with sr25519, general verifier
@@ -3811,7 +3860,8 @@ Identities: "#;
         panic!("Wrong action: {:?}", output)
     }
 
-    let print = print_db_content(dbname).replace(&alice_sr_alice(), r#"<alice_sr25519_//Alice>"#);
+    let print = print_db_content(dbname)
+        .replace(&hex::encode(alice_sr_alice()), r#"<alice_sr25519_//Alice>"#);
     let expected_print = r#"Database contents:
 Metadata:
 Network Specs:
@@ -3819,7 +3869,7 @@ Network Specs:
 Verifiers:
     27b0e1604364f6a7309d31ad60cdfb820666c3095b9f948c4a7d7894b6b3c184: "type":"general","details":{"public_key":"d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d","identicon":"<alice_sr25519_//Alice>","encryption":"sr25519"}
 General Verifier: public key: d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d, encryption: sr25519
-Identities: "#;
+Identities:"#;
     assert_eq!(print, expected_print);
 
     fs::remove_dir_all(dbname).unwrap();

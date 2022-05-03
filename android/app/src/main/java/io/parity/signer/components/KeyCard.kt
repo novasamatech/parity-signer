@@ -13,10 +13,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import io.parity.signer.models.abbreviateString
-import io.parity.signer.models.decode64
 import io.parity.signer.ui.theme.*
 import io.parity.signer.uniffi.Address
-import org.json.JSONObject
 
 /**
  * A card to show key info; only visual things.
@@ -33,10 +31,18 @@ fun KeyCard(identity: Address, multiselectMode: Boolean = false) {
 			Identicon(identity.identicon)
 			if (multiselectMode) {
 				identity.multiselect?.let {
-					if(it) {
-						Icon(Icons.Default.CheckCircle, "Not multiselected", tint = MaterialTheme.colors.Action400)
+					if (it) {
+						Icon(
+							Icons.Default.CheckCircle,
+							"Not multiselected",
+							tint = MaterialTheme.colors.Action400
+						)
 					} else {
-						Icon(Icons.Outlined.Circle, "Multiselected", tint = MaterialTheme.colors.Action400)
+						Icon(
+							Icons.Outlined.Circle,
+							"Multiselected",
+							tint = MaterialTheme.colors.Action400
+						)
 					}
 				}
 			}

@@ -9,7 +9,7 @@ use definitions::navigation::{
     ScreenNameType, TransactionNetworkInfo, TransactionType,
 };
 use sp_runtime::MultiSigner;
-use transaction_parsing::TransactionAction;
+use transaction_parsing::{entry_to_transactions_with_decoding, TransactionAction};
 use zeroize::Zeroize;
 
 use crate::actions::Action;
@@ -410,13 +410,13 @@ impl State {
                                             if let ErrorSigner::WrongPasswordNewChecksum(c) = e {
                                                 if t.ok() {
                                                     new_navstate.screen = Screen::Transaction(
-                                                        t.update_checksum_sign(
+                                                        Box::new(t.update_checksum_sign(
                                                             c,
                                                             content,
                                                             has_pwd,
                                                             author_info,
                                                             network_info,
-                                                        ),
+                                                        )),
                                                     );
                                                 } else {
                                                     new_navstate =
@@ -429,9 +429,9 @@ impl State {
                                     }
                                 }
                                 _ => {
-                                    new_navstate.screen = Screen::Transaction(
+                                    new_navstate.screen = Screen::Transaction(Box::new(
                                         t.add_comment(details_str).update_seed(secret_seed_phrase),
-                                    );
+                                    ));
                                     new_navstate.modal = Modal::EnterPassword;
                                 }
                             }
@@ -864,9 +864,8 @@ impl State {
         let errorline = String::new();
 
         if let Screen::Scan = self.navstate.screen {
-            new_navstate = Navstate::clean_screen(Screen::Transaction(TransactionState::new(
-                details_str,
-                dbname,
+            new_navstate = Navstate::clean_screen(Screen::Transaction(Box::new(
+                TransactionState::new(details_str, dbname),
             )));
         }
 
@@ -1441,7 +1440,6 @@ impl State {
     ) -> Result<ActionResult, String> {
         let mut new_navstate = self.navstate.to_owned();
 
-        log::warn!("action {:?}", action);
         if let Some(ref dbname) = self.dbname.clone() {
             let mut errorline;
             //Try to perform action
@@ -1494,20 +1492,17 @@ impl State {
                 Action::ShowDocuments => self.handle_show_documents(),
                 Action::TextEntry => self.handle_text_entry(details_str),
                 Action::PushWord => self.handle_push_word(details_str),
-                Action::Nothing => {
-                    log::warn!("no action was passed in action");
-                    (new_navstate, String::new())
-                }
+                Action::Nothing => (new_navstate, String::new()),
             };
 
-            log::warn!("new_navstate {:?}", new_navstate);
             //Prepare screen details
             let screen_data = match new_navstate.screen {
                 Screen::Log => {
                     let history = db_handling::manage_history::get_history(dbname).unwrap();
                     let log: Vec<_> = history
                         .into_iter()
-                        .map(|(_, entry)| History {
+                        .map(|(order, entry)| History {
+                            order: order.stamp(),
                             timestamp: entry.timestamp,
                             events: entry.events,
                         })
@@ -1518,10 +1513,9 @@ impl State {
                 }
                 Screen::LogDetails(order) => {
                     let e = get_history_entry_by_order(order, dbname).unwrap();
-                    let f = MLogDetails {
-                        timestamp: e.timestamp,
-                        events: e.events,
-                    };
+                    let timestamp = e.timestamp.clone();
+                    let events = entry_to_transactions_with_decoding(e, dbname).unwrap();
+                    let f = MLogDetails { timestamp, events };
                     ScreenData::LogDetails { f }
                 }
                 Screen::Scan => ScreenData::Scan,
@@ -1728,60 +1722,58 @@ impl State {
 
             //Prepare modal details
             let modal_data = match new_navstate.modal {
-                Modal::Backup(ref seed_name) => ModalData::Backup {
+                Modal::Backup(ref seed_name) => Some(ModalData::Backup {
                     f: db_handling::interface_signer::backup_prep(dbname, seed_name).unwrap(),
-                },
+                }),
                 Modal::SeedMenu => match new_navstate.screen {
                     Screen::Keys(ref keys_state) => {
                         let seed = keys_state.seed_name();
                         new_navstate.screen = Screen::Keys(keys_state.deselect_specialty());
-                        ModalData::SeedMenu {
+                        Some(ModalData::SeedMenu {
                             f: MSeedMenu { seed },
-                        }
+                        })
                     }
-                    _ => ModalData::Text {
-                        f: "Seed".to_string(),
-                    },
+                    _ => None,
                 },
-                Modal::NewSeedBackup(ref new_seed_name) => ModalData::NewSeedBackup {
+                Modal::NewSeedBackup(ref new_seed_name) => Some(ModalData::NewSeedBackup {
                     f: db_handling::interface_signer::print_new_seed(new_seed_name).unwrap(),
-                },
-                Modal::NetworkSelector(ref network_specs_key) => ModalData::NetworkSelector {
+                }),
+                Modal::NetworkSelector(ref network_specs_key) => Some(ModalData::NetworkSelector {
                     f: db_handling::interface_signer::show_all_networks_with_flag(
                         dbname,
                         network_specs_key,
                     )
                     .unwrap(),
-                },
+                }),
                 Modal::PasswordConfirm => match new_navstate.screen {
                     Screen::DeriveKey(ref derive_state) => {
                         let mut path = derive_state.path();
                         match db_handling::identities::cut_path(&path) {
                             Ok((cropped_path, pwd)) => {
                                 path.zeroize();
-                                ModalData::PasswordConfirm {
+                                Some(ModalData::PasswordConfirm {
                                     f: MPasswordConfirm {
                                         pwd,
                                         cropped_path,
                                         seed_name: derive_state.seed_name(),
                                     },
-                                }
+                                })
                             }
                             Err(e) => {
                                 path.zeroize();
                                 new_navstate.alert = Alert::Error;
                                 errorline.push_str(&<Signer>::show(&e));
-                                ModalData::Text { f: String::new() }
+                                None
                             }
                         }
                     }
-                    _ => ModalData::Text { f: String::new() },
+                    _ => None,
                 },
-                Modal::SignatureReady(ref a) => ModalData::SignatureReady {
+                Modal::SignatureReady(ref a) => Some(ModalData::SignatureReady {
                     f: MSignatureReady {
-                        signature: a.to_string(),
+                        signature: a.to_vec(),
                     },
-                },
+                }),
                 Modal::EnterPassword => match new_navstate.screen {
                     Screen::Transaction(ref t) => {
                         if let transaction_parsing::TransactionAction::Sign {
@@ -1792,113 +1784,106 @@ impl State {
                             network_info: _,
                         } = t.action()
                         {
-                            ModalData::EnterPassword {
+                            Some(ModalData::EnterPassword {
                                 f: MEnterPassword {
                                     author_info,
                                     counter: t.counter() as u32,
                                 },
-                            }
+                            })
                         } else {
-                            ModalData::Text { f: String::new() }
+                            None
                         }
                     }
                     Screen::SignSufficientCrypto(ref s) => {
                         if let Some((_, _, author_info)) = s.key_selected() {
-                            ModalData::EnterPassword {
+                            Some(ModalData::EnterPassword {
                                 f: MEnterPassword {
                                     author_info,
                                     counter: s.counter() as u32,
                                 },
-                            }
+                            })
                         } else {
-                            ModalData::Text { f: String::new() }
+                            None
                         }
                     }
-                    _ => ModalData::Text { f: String::new() },
+                    _ => None,
                 },
-                Modal::LogRight => ModalData::LogRight {
+                Modal::LogRight => Some(ModalData::LogRight {
                     f: definitions::navigation::MLogRight {
                         checksum: db_handling::interface_signer::history_hex_checksum(dbname)
                             .unwrap(),
                     },
-                },
+                }),
                 Modal::ManageMetadata(network_version) => match new_navstate.screen {
-                    Screen::NetworkDetails(ref network_specs_key) => ModalData::ManageNetworks {
-                        f: db_handling::interface_signer::metadata_details(
-                            dbname,
-                            network_specs_key,
-                            network_version,
-                        )
-                        .unwrap(),
-                    },
-                    _ => ModalData::Text {
-                        f: "ManageMetadata".to_string(),
-                    },
+                    Screen::NetworkDetails(ref network_specs_key) => {
+                        Some(ModalData::ManageNetworks {
+                            f: db_handling::interface_signer::metadata_details(
+                                dbname,
+                                network_specs_key,
+                                network_version,
+                            )
+                            .unwrap(),
+                        })
+                    }
+                    _ => None,
                 },
                 Modal::SufficientCryptoReady(ref a) => match new_navstate.screen {
                     Screen::SignSufficientCrypto(ref s) => {
-                        if let Some((_, _, _author_info)) = s.key_selected() {
+                        if let Some((_, _, author_info)) = s.key_selected() {
                             let content = MSCContent {
-                                ttype: String::new(),
+                                ttype: a.to_string(),
                             };
-                            // TODO conversions here and there, again
                             let author_info = MSCAuthor {
-                                base58: String::new(),
-                                identicon: String::new(),
-                                seed: String::new(),
-                                derivation_path: String::new(),
+                                base58: author_info.base58,
+                                identicon: author_info.identicon,
+                                seed: author_info.seed,
+                                derivation_path: author_info.derivation_path,
                                 has_password: None,
                             };
                             let f = MSufficientCryptoReady {
                                 author_info,
-                                sufficient: String::new(),
+                                sufficient: vec![],
                                 content,
                             };
-                            ModalData::SufficientCryptoReady { f }
+                            Some(ModalData::SufficientCryptoReady { f })
                         } else {
-                            ModalData::Text {
-                                f: "SignSufficientCrypto".to_string(),
-                            }
+                            None
                         }
                     }
-                    _ => ModalData::Text {
-                        f: "SignSufficientCrypto".to_string(),
-                    },
+                    _ => None,
                 },
-                Modal::TypesInfo => ModalData::TypesInfo {
+                Modal::TypesInfo => Some(ModalData::TypesInfo {
                     f: db_handling::interface_signer::show_types_status(dbname).unwrap(),
-                },
+                }),
                 Modal::SelectSeed => {
                     match get_all_seed_names_with_identicons(dbname, &self.seed_names) {
-                        Ok(a) => ModalData::SelectSeed {
+                        Ok(a) => Some(ModalData::SelectSeed {
                             f: MSeeds { seed_name_cards: a },
-                        },
+                        }),
                         Err(_e) => {
                             new_navstate.alert = Alert::Error;
-                            ModalData::SelectSeed {
+                            Some(ModalData::SelectSeed {
                                 f: MSeeds {
                                     seed_name_cards: vec![],
                                 },
-                            }
+                            })
                         }
                     }
                 }
-                Modal::NewSeedMenu => ModalData::NewSeedMenu,
-                Modal::LogComment => ModalData::LogComment,
-                Modal::NetworkDetailsMenu => ModalData::NetworkDetailsMenu,
-                Modal::KeyDetailsAction => ModalData::KeyDetailsAction,
-                Modal::Empty => ModalData::Text {
-                    f: "Empty".to_string(),
-                },
+                Modal::NewSeedMenu => Some(ModalData::NewSeedMenu),
+                Modal::LogComment => Some(ModalData::LogComment),
+                Modal::NetworkDetailsMenu => Some(ModalData::NetworkDetailsMenu),
+                Modal::KeyDetailsAction => Some(ModalData::KeyDetailsAction),
+                Modal::Empty => None,
             };
 
             //Prepare alert details
             //Important! No errors could be handled in this block!
-            let alert_details = match new_navstate.alert {
-                Alert::Error => format!("\"error\":\"{}\"", errorline),
-                Alert::ErrorDisplay => format!("\"error\":\"{}\"", errorline),
-                Alert::Empty => "".to_string(),
-                Alert::Shield => "\"shield_state\":\"unknown\"".to_string(),
+            let alert_data = match new_navstate.alert {
+                Alert::Error => Some(format!("{{\"error\":\"{}\"}}", errorline)),
+                Alert::ErrorDisplay => Some(format!("{{\"error\":\"{}\"}}", errorline)),
+                Alert::Empty => None,
+                Alert::Shield => Some("{\"shield_state\":\"unknown\"}".to_string()),
             };
 
             self.navstate = new_navstate;
@@ -1912,10 +1897,9 @@ impl State {
                 screen_name_type: self.get_screen_name_type(),
                 screen_data,
                 modal_data,
-                alert_data: format!("{{{}}}", alert_details),
+                alert_data,
             };
 
-            log::warn!("action result {:?}", action_result);
             Ok(action_result)
         } else {
             Err("db not initialized".to_string())

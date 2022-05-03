@@ -9,8 +9,8 @@ use definitions::{
     history::MetaValuesDisplay,
     keyring::VerifierKey,
     navigation::{
-        Card as NavCard, MSCAuthorPlain, MSCCall, MSCCurrency, MSCEnumVariantName, MSCEraMortal,
-        MSCFieldName, MSCFieldNumber, MSCId, MSCMetaSpecs, MSCNameVersion, MSCNetworkInfo,
+        Card as NavCard, MMetadataRecord, MSCAuthorPlain, MSCCall, MSCCurrency, MSCEnumVariantName,
+        MSCEraMortal, MSCFieldName, MSCFieldNumber, MSCId, MSCNameVersion, MSCNetworkInfo,
         MTypesInfo, MVerifierDetails, TransactionAuthor, TransactionCard,
     },
     network_specs::{NetworkSpecs, NetworkSpecsToSend, VerifierValue},
@@ -116,9 +116,7 @@ impl<'a> Card<'a> {
                     f: MSCId {
                         base58: id
                             .to_ss58check_with_version(Ss58AddressFormat::custom(*base58prefix)),
-                        identicon: hex::encode(generate_png_scaled_default(&<[u8; 32]>::from(
-                            id.to_owned(),
-                        ))),
+                        identicon: generate_png_scaled_default(&<[u8; 32]>::from(id.to_owned())),
                     },
                 },
                 ParserCard::None => NavCard::NoneCard,
@@ -208,11 +206,11 @@ impl<'a> Card<'a> {
             } => NavCard::AuthorPlainCard {
                 f: MSCAuthorPlain {
                     base58: print_multisigner_as_base58(author, Some(*base58prefix)),
-                    identicon: hex::encode(make_identicon_from_multisigner(author)),
+                    identicon: make_identicon_from_multisigner(author),
                 },
             },
             Card::AuthorPublicKey(author) => {
-                let identicon = hex::encode(make_identicon_from_multisigner(author));
+                let identicon = make_identicon_from_multisigner(author);
                 let (public_key, encryption) = match author {
                     MultiSigner::Ed25519(p) => (hex::encode(&p), Encryption::Ed25519.show()),
                     MultiSigner::Sr25519(p) => (hex::encode(&p), Encryption::Sr25519.show()),
@@ -236,18 +234,18 @@ impl<'a> Card<'a> {
                     NavCard::VerifierCard {
                         f: MVerifierDetails {
                             public_key,
-                            identicon: hex::encode(make_identicon_from_multisigner(m)),
+                            identicon: make_identicon_from_multisigner(m),
                             encryption,
                         },
                     }
                 }
             },
             Card::Meta(x) => NavCard::MetaCard {
-                f: MSCMetaSpecs {
+                f: MMetadataRecord {
                     specname: x.name.clone(),
-                    spec_version: x.version.to_string(),
+                    specs_version: x.version.to_string(),
                     meta_hash: hex::encode(&x.meta_hash),
-                    meta_id_pic: hex::encode(pic_meta(&x.meta_hash)),
+                    meta_id_pic: pic_meta(&x.meta_hash),
                 },
             },
             Card::TypesInfo(x) => {
@@ -268,9 +266,7 @@ impl<'a> Card<'a> {
                 },
             },
             Card::NetworkGenesisHash(x) => NavCard::NetworkGenesisHashCard { f: hex::encode(x) },
-            Card::Derivations(x) => NavCard::DerivationsCard {
-                f: x.iter().cloned().collect(),
-            },
+            Card::Derivations(x) => NavCard::DerivationsCard { f: x.to_vec() },
             Card::Warning(warn) => NavCard::WarningCard { f: warn.show() },
             Card::Error(err) => NavCard::ErrorCard {
                 f: <Signer>::show(err),
@@ -294,8 +290,9 @@ pub(crate) fn make_author_info(
 ) -> TransactionAuthor {
     TransactionAuthor {
         base58: print_multisigner_as_base58(author, Some(base58prefix)),
-        identicon: hex::encode(make_identicon_from_multisigner(author)),
+        identicon: make_identicon_from_multisigner(author),
         seed: address_details.seed_name.clone(),
         derivation_path: address_details.path.clone(),
+        has_pwd: address_details.has_pwd,
     }
 }

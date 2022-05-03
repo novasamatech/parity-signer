@@ -50,7 +50,7 @@ fun NewSeedBackup(
 			CheckboxTemplate(
 				checked = createRoots.value,
 				onValueChange = { createRoots.value = it },
-				text = "Create root keys"
+				text = "Create seed keys"
 			)
 
 			BigButton(

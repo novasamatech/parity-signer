@@ -136,6 +136,7 @@ enum FooterButton {
     "Scan",
     "Keys",
     "Settings",
+    "Back",
 };
 
 enum RightButton {
@@ -161,8 +162,8 @@ dictionary ActionResult {
     RightButton? right_button;
     ScreenNameType screen_name_type;
     ScreenData screen_data;
-    ModalData modal_data;
-    string alert_data;
+    ModalData? modal_data;
+    string? alert_data;
 };
 
 dictionary MetaValues {
@@ -256,7 +257,7 @@ dictionary Identity {
     string seed_name;
     string address_key;
     string public_key;
-    string identicon;
+    sequence<u8> identicon;
     boolean has_pwd;
     string path;
     boolean is_multiselect;
@@ -265,7 +266,7 @@ dictionary Identity {
 
 dictionary MSeedKeyCard {
     string seed_name;
-    string identicon;
+    sequence<u8> identicon;
     string address_key;
     string base58;
     boolean swiped;
@@ -288,7 +289,7 @@ dictionary MKeys {
 dictionary MKeysCard {
     string address_key;
     string base58;
-    string identicon;
+    sequence<u8> identicon;
     boolean has_pwd;
     string path;
     boolean swiped;
@@ -297,7 +298,7 @@ dictionary MKeysCard {
 
 dictionary MSettings {
     string? public_key;
-    string? identicon;
+    sequence<u8>? identicon;
     string? encryption;
     string? error;
 };
@@ -307,13 +308,21 @@ dictionary MLog {
 };
 
 dictionary History {
+    u32 order;
     string timestamp;
     sequence<Event> events;
 };
 
+dictionary MEventMaybeDecoded {
+    Event event;
+    TransactionAuthor? signed_by;
+    TransactionCardSet? decoded;
+    MVerifierDetails? verifier_details;
+};
+
 dictionary MLogDetails {
     string timestamp;
-    sequence<Event> events;
+    sequence<MEventMaybeDecoded> events;
 };
 
 dictionary MTransaction {
@@ -325,9 +334,10 @@ dictionary MTransaction {
 
 dictionary TransactionAuthor {
     string base58;
-    string identicon;
+    sequence<u8> identicon;
     string seed;
     string derivation_path;
+    boolean has_pwd;
 };
 
 dictionary TransactionNetworkInfo {
@@ -365,7 +375,7 @@ dictionary TransactionCardSet {
 
 dictionary SeedNameCard {
     string seed_name;
-    string identicon;
+    sequence<u8> identicon;
 };
 
 dictionary MSeeds {
@@ -373,10 +383,10 @@ dictionary MSeeds {
 };
 
 dictionary MKeyDetails {
-    string qr;
+    sequence<u8> qr;
     string pubkey;
     string base58;
-    string identicon;
+    sequence<u8> identicon;
     string seed_name;
     string path;
     string network_title;
@@ -422,7 +432,7 @@ dictionary Address {
     string base58;
     string path;
     boolean has_pwd;
-    string identicon;
+    sequence<u8> identicon;
     string seed_name;
     boolean? multiselect;
 };
@@ -434,7 +444,7 @@ enum DerivationDestination {
 
 dictionary MVerifierDetails {
     string public_key;
-    string identicon;
+    sequence<u8> identicon;
     string encryption;
 };
 
@@ -461,16 +471,17 @@ dictionary MVerifier {
 };
 
 dictionary MMetadataRecord {
+    string specname;
     string specs_version;
     string meta_hash;
-    string meta_id_pic;
+    sequence<u8> meta_id_pic;
 };
 
 dictionary MRawKey {
     string seed_name;
     string address_key;
     string public_key;
-    string identicon;
+    sequence<u8> identicon;
     boolean has_pwd;
     string path;
 };
@@ -520,7 +531,7 @@ interface ScreenData {
 };
 
 namespace signer {
-    string action_get_name([ByRef] Action action);
+    FooterButton? action_get_name([ByRef] Action action);
 
     void init_navigation([ByRef] string dbname, [ByRef] string seed_names);
 
@@ -572,7 +583,7 @@ dictionary MSCContent {
 
 dictionary MSCAuthor {
     string base58;
-    string identicon;
+    sequence<u8> identicon;
     string seed;
     boolean? has_password;
     string derivation_path;
@@ -580,7 +591,7 @@ dictionary MSCAuthor {
 
 dictionary MSufficientCryptoReady {
     MSCAuthor author_info;
-    string sufficient;
+    sequence<u8> sufficient;
     MSCContent content;
 };
 
@@ -608,7 +619,7 @@ dictionary MSeedMenu {
 dictionary MNewSeedBackup {
     string seed;
     string seed_phrase;
-    string identicon;
+    sequence<u8> identicon;
 };
 
 dictionary Network {
@@ -630,7 +641,7 @@ dictionary MPasswordConfirm {
 };
 
 dictionary MSignatureReady {
-    string signature;
+    sequence<u8> signature;
 };
 
 dictionary MEnterPassword {
@@ -653,14 +664,14 @@ dictionary MMManageNetworks {
     string name;
     string version;
     string meta_hash;
-    string meta_id_pic;
+    sequence<u8> meta_id_pic;
     sequence<MMMNetwork> networks;
 };
 
 dictionary MTypesInfo {
     boolean types_on_file;
     string? types_hash;
-    string? types_id_pic;
+    sequence<u8>? types_id_pic;
 };
 
 [Enum]
@@ -676,7 +687,6 @@ interface ModalData {
     LogRight(MLogRight f);
     ManageNetworks(MMManageNetworks f);
     TypesInfo(MTypesInfo f);
-    Text(string f);
     NewSeedMenu();
     NetworkDetailsMenu();
     ManageMetadata();
@@ -687,7 +697,7 @@ interface ModalData {
 
 dictionary MSCAuthorPlain {
     string base58;
-    string identicon;
+    sequence<u8> identicon;
 };
 
 dictionary MSCCall {
@@ -727,14 +737,7 @@ dictionary MSCFieldNumber {
 
 dictionary MSCId {
     string base58;
-    string identicon;
-};
-
-dictionary MSCMetaSpecs {
-    string specname;
-    string spec_version;
-    string meta_hash;
-    string meta_id_pic;
+    sequence<u8> identicon;
 };
 
 dictionary MSCNameVersion {
@@ -777,7 +780,7 @@ interface Card {
     FieldNumberCard(MSCFieldNumber f);
     IdCard(MSCId f);
     IdentityFieldCard(string f);
-    MetaCard(MSCMetaSpecs f);
+    MetaCard(MMetadataRecord f);
     NameVersionCard(MSCNameVersion f);
     NetworkGenesisHashCard(string f);
     NetworkNameCard(string f);

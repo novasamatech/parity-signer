@@ -20,7 +20,7 @@ Switching to airplane mode suffices in many cases.
 
 ==========================================================
 
-# !!! Parity Signer is being refactored from the ground up !!!
+# !!! Parity Signer was refactored from the ground up !!!
 
 The legacy app is still **fully functional** and is published 
 on the app stores. The source and documentation in the `./docs` directory for these are 

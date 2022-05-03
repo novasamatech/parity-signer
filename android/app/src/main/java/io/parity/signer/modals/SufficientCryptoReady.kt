@@ -10,19 +10,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import io.parity.signer.components.HeaderBar
-import io.parity.signer.components.KeyCard
-import io.parity.signer.models.SignerDataModel
 import io.parity.signer.models.intoImageBitmap
 import io.parity.signer.ui.theme.Bg000
 import io.parity.signer.ui.theme.modal
 import io.parity.signer.uniffi.MSufficientCryptoReady
-import io.parity.signer.uniffi.ModalData
-import org.json.JSONObject
 
 @Composable
 fun SufficientCryptoReady(
 	sufficientCrypto: MSufficientCryptoReady,
-	signerDataModel: SignerDataModel
 ) {
 	Surface(
 		shape = MaterialTheme.shapes.modal,

@@ -78,7 +78,7 @@ fn print_seed_names() {
     let cards = get_all_seed_names_with_identicons(dbname, &[String::from("Alice")]).unwrap();
     let expected_cards = vec![SeedNameCard {
         seed_name: "Alice".to_string(),
-        identicon: alice_sr_root(),
+        identicon: alice_sr_root().to_vec(),
     }];
     assert!(cards == expected_cards, "\nReceived: \n{:?}", cards);
     fs::remove_dir_all(dbname).unwrap();
@@ -97,11 +97,11 @@ fn print_seed_names_with_orphan() {
     let expected_cards = vec![
         SeedNameCard {
             seed_name: "Alice".to_string(),
-            identicon: alice_sr_root(),
+            identicon: alice_sr_root().to_vec(),
         },
         SeedNameCard {
             seed_name: "BobGhost".to_string(),
-            identicon: empty_png(),
+            identicon: empty_png().to_vec(),
         },
     ];
     assert!(cards == expected_cards, "\nReceived: \n{:?}", cards);
@@ -121,7 +121,7 @@ fn print_all_ids() {
                 .to_string(),
             public_key: "3efeca331d646d8a2986374bb3bb8d6e9e3cfcdd7c45c2b69104fab5d61d3f34"
                 .to_string(),
-            identicon: alice_sr_westend(),
+            identicon: alice_sr_westend().to_vec(),
             has_pwd: false,
             path: "//westend".to_string(),
         },
@@ -131,7 +131,7 @@ fn print_all_ids() {
                 .to_string(),
             public_key: "46ebddef8cd9bb167dc30878d7113b7e168e6f0646beffd77d69d39bad76b47a"
                 .to_string(),
-            identicon: alice_sr_root(),
+            identicon: alice_sr_root().to_vec(),
             has_pwd: false,
             path: "".to_string(),
         },
@@ -141,7 +141,7 @@ fn print_all_ids() {
                 .to_string(),
             public_key: "64a31235d4bf9b37cfed3afa8aa60754675f9c4915430454d365c05112784d05"
                 .to_string(),
-            identicon: alice_sr_kusama(),
+            identicon: alice_sr_kusama().to_vec(),
             has_pwd: false,
             path: "//kusama".to_string(),
         },
@@ -151,7 +151,7 @@ fn print_all_ids() {
                 .to_string(),
             public_key: "d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d"
                 .to_string(),
-            identicon: alice_sr_alice(),
+            identicon: alice_sr_alice().to_vec(),
             has_pwd: false,
             path: "//Alice".to_string(),
         },
@@ -161,7 +161,7 @@ fn print_all_ids() {
                 .to_string(),
             public_key: "f606519cb8726753885cd4d0f518804a69a5e0badf36fee70feadd8044081730"
                 .to_string(),
-            identicon: alice_sr_polkadot(),
+            identicon: alice_sr_polkadot().to_vec(),
             has_pwd: false,
             path: "//polkadot".to_string(),
         },
@@ -190,7 +190,7 @@ fn print_ids_seed_name_network() {
     let expected_cards = (
         MSeedKeyCard {
             seed_name: "Alice".to_string(),
-            identicon: alice_sr_root(),
+            identicon: alice_sr_root().to_vec(),
             address_key: "0146ebddef8cd9bb167dc30878d7113b7e168e6f0646beffd77d69d39bad76b47a"
                 .to_string(),
             base58: "5DfhGyQdFobKM8NsWvEeAKk5EQQgYe9AydgJ7rMB6E1EqRzV".to_string(),
@@ -202,7 +202,7 @@ fn print_ids_seed_name_network() {
                 address_key: "013efeca331d646d8a2986374bb3bb8d6e9e3cfcdd7c45c2b69104fab5d61d3f34"
                     .to_string(),
                 base58: "5DVJWniDyUja5xnG4t5i3Rrd2Gguf1fzxPYfgZBbKcvFqk4N".to_string(),
-                identicon: alice_sr_westend(),
+                identicon: alice_sr_westend().to_vec(),
                 has_pwd: false,
                 path: "//westend".to_string(),
                 swiped: false,
@@ -212,7 +212,7 @@ fn print_ids_seed_name_network() {
                 address_key: "01d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d"
                     .to_string(),
                 base58: "5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY".to_string(),
-                identicon: alice_sr_alice(),
+                identicon: alice_sr_alice().to_vec(),
                 has_pwd: false,
                 path: "//Alice".to_string(),
                 swiped: false,
@@ -329,10 +329,10 @@ fn export_alice_westend() {
     )
     .unwrap();
     let expected_key = MKeyDetails {
-        qr: alice_westend_root_qr(),
+        qr: alice_westend_root_qr().to_vec(),
         pubkey: "46ebddef8cd9bb167dc30878d7113b7e168e6f0646beffd77d69d39bad76b47a".to_string(),
         base58: "5DfhGyQdFobKM8NsWvEeAKk5EQQgYe9AydgJ7rMB6E1EqRzV".to_string(),
-        identicon: alice_sr_root(),
+        identicon: alice_sr_root().to_vec(),
         seed_name: "Alice".to_string(),
         path: "".to_string(),
         network_title: "Westend".to_string(),
@@ -567,7 +567,7 @@ fn westend_network_details() {
             ttype: "general".to_string(),
             details: definitions::navigation::MVerifierDetails {
                 public_key: "".to_string(),
-                identicon: "".to_string(),
+                identicon: empty_png().to_vec(),
                 encryption: "".to_string(),
             },
         },
@@ -576,13 +576,13 @@ fn westend_network_details() {
                 specs_version: "9000".to_string(),
                 meta_hash: "e80237ad8b2e92b72fcf6beb8f0e4ba4a21043a7115c844d91d6c4f981e469ce"
                     .to_string(),
-                meta_id_pic: westend_9000(),
+                meta_id_pic: westend_9000().to_vec(),
             },
             MMetadataRecord {
                 specs_version: "9010".to_string(),
                 meta_hash: "70c99738c27fb32c87883f1c9c94ee454bf0b3d88e4a431a2bbfe1222b46ebdf"
                     .to_string(),
-                meta_id_pic: westend_9010(),
+                meta_id_pic: westend_9010().to_vec(),
             },
         ],
     };
@@ -608,7 +608,7 @@ fn westend_9010_metadata_details() {
         name: "westend".to_string(),
         version: "9010".to_string(),
         meta_hash: "70c99738c27fb32c87883f1c9c94ee454bf0b3d88e4a431a2bbfe1222b46ebdf".to_string(),
-        meta_id_pic: westend_9010(),
+        meta_id_pic: westend_9010().to_vec(),
         networks: vec![MMMNetwork {
             title: "Westend".to_string(),
             logo: "westend".to_string(),
@@ -631,13 +631,15 @@ fn types_status_and_history() {
         types_hash: Some(
             "d091a5a24a97e18dfe298b167d8fd5a2add10098c8792cba21c39029a9ee0aeb".to_string(),
         ),
-        types_id_pic: Some(types_known()),
+        types_id_pic: Some(types_known().to_vec()),
     };
     assert_eq!(types, expected_types);
 
     remove_types_info(dbname).unwrap();
     let types = show_types_status(dbname).unwrap();
     expected_types.types_on_file = false;
+    expected_types.types_hash = None;
+    expected_types.types_id_pic = None;
 
     assert_eq!(types, expected_types);
 
@@ -653,8 +655,7 @@ fn types_status_and_history() {
     };
     assert!(history_printed
         .iter()
-        .find(|h| h.1.events.contains(&expected_element))
-        .is_some());
+        .any(|h| h.1.events.contains(&expected_element)));
 
     fs::remove_dir_all(dbname).unwrap();
 }
@@ -676,7 +677,7 @@ fn path_is_known() {
             base58: "5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY".to_string(),
             path: "//Alice".to_string(),
             has_pwd: false,
-            identicon: alice_sr_alice(),
+            identicon: alice_sr_alice().to_vec(),
             seed_name: "Alice".to_string(),
             multiselect: None,
         }),
@@ -1218,12 +1219,10 @@ fn history_with_identities() {
     };
     assert!(history_printed
         .iter()
-        .find(|e| e.1.events.contains(&element1))
-        .is_some());
+        .any(|e| e.1.events.contains(&element1)));
     assert!(history_printed
         .iter()
-        .find(|e| e.1.events.contains(&element2))
-        .is_some());
+        .any(|e| e.1.events.contains(&element2)));
     try_create_seed("Alice", ALICE_SEED_PHRASE, true, dbname).unwrap();
     let history_printed_after_create_seed: Vec<_> = get_history(dbname)
         .unwrap()
@@ -2261,7 +2260,7 @@ fn check_for_network(name: &str, version: u32, dbname: &str) -> bool {
 }
 
 fn entries_contain_event(entries: &[Entry], event: &Event) -> bool {
-    entries.iter().find(|e| e.events.contains(event)).is_some()
+    entries.iter().any(|e| e.events.contains(event))
 }
 
 #[test]
