@@ -30,6 +30,8 @@ fun ScreenSelector(
 	button: (Action, String, String) -> Unit,
 	signerDataModel: SignerDataModel
 ) {
+	val button1: (Action) -> Unit = {action -> button(action, "", "")}
+	val button2: (Action, String) -> Unit = {action, details -> button(action, details, "")}
 	when (screenData) {
 		is ScreenData.DeriveKey -> NewAddressScreen(
 			screenData.f,
@@ -47,7 +49,7 @@ fun ScreenSelector(
 			screenData.f,
 			alertState.value
 		)
-		is ScreenData.Log -> HistoryScreen(screenData.f, signerDataModel = signerDataModel)
+		is ScreenData.Log -> HistoryScreen(screenData.f, button2)
 		is ScreenData.LogDetails -> LogDetails(screenData.f)
 		is ScreenData.ManageNetworks -> ManageNetworks(
 			screenData.f,
@@ -104,7 +106,7 @@ fun ScreenSelector(
 }
 
 @Composable
-fun ModalSelector(modalData: ModalData, signerDataModel: SignerDataModel) {
+fun ModalSelector(modalData: ModalData?, signerDataModel: SignerDataModel) {
 	when (modalData) {
 		is ModalData.NewSeedMenu -> NewSeedMenu(signerDataModel = signerDataModel)
 		is ModalData.SeedMenu -> SeedMenu(

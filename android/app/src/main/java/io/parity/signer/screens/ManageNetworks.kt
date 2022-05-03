@@ -18,7 +18,7 @@ import io.parity.signer.uniffi.MManageNetworks
 @Composable
 fun ManageNetworks(
 	manageNetworks: MManageNetworks,
-	signerDataModel: SignerDataModel
+	button: (Action, String) -> Unit
 ) {
 	val networks = manageNetworks.networks
 	LazyColumn(
@@ -28,9 +28,9 @@ fun ManageNetworks(
 		items(networks.size) { index ->
 			val thisNetwork = networks[index]
 			Row(Modifier.clickable {
-				signerDataModel.pushButton(
+				button(
 					Action.GO_FORWARD,
-					details = thisNetwork.key
+					thisNetwork.key
 				)
 			}) {
 				/* TODO: MNetwork -> MDeriveKey

@@ -12,14 +12,15 @@ import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.unit.dp
 import io.parity.signer.components.*
 import io.parity.signer.models.*
-import io.parity.signer.models.DerivationCheck
 import io.parity.signer.ui.theme.Text600
 import io.parity.signer.uniffi.*
 
 @Composable
 fun NewAddressScreen(
 	deriveKey: MDeriveKey,
-	signerDataModel: SignerDataModel
+	button: (Action, String) -> Unit,
+	pathCheck: (String, String, String) -> String,
+	addKey: (String, String) -> Unit
 ) {
 	val derivationPath = remember { mutableStateOf("") }
 	val buttonGood = remember { mutableStateOf(false) }
@@ -86,18 +87,18 @@ fun NewAddressScreen(
 			capitalize = false,
 			onDone = {
 				focusManager.clearFocus()
-				if (derivationState.buttonGood.value) {
-					when (derivationState.whereTo.value) {
+				if (derivationState.buttonGood) {
+					when (derivationState.whereTo) {
 						DerivationDestination.PIN -> {
-							signerDataModel.addKey(
-								path = derivationPath.value,
-								seedName = seedName
+							addKey(
+								derivationPath.value,
+								seedName
 							)
 						}
 						DerivationDestination.PWD -> {
-							signerDataModel.pushButton(
+							button(
 								Action.CHECK_PASSWORD,
-								details = derivationPath.value
+								derivationPath.value
 							)
 						}
 						null -> {}
@@ -120,23 +121,23 @@ fun NewAddressScreen(
 			BigButton(
 				text = "Next",
 				action = {
-					when (derivationState.whereTo.value) {
+					when (derivationState.whereTo) {
 						DerivationDestination.PIN -> {
-							signerDataModel.addKey(
-								path = derivationPath.value,
-								seedName = seedName
+							addKey(
+								derivationPath.value,
+								seedName
 							)
 						}
 						DerivationDestination.PWD -> {
-							signerDataModel.pushButton(
+							button(
 								Action.CHECK_PASSWORD,
-								details = derivationPath.value
+								derivationPath.value
 							)
 						}
 						null -> {}
 					}
 				},
-				isDisabled = !derivationState.buttonGood.value
+				isDisabled = !derivationState.buttonGood
 			)
 		}
 	}
@@ -146,7 +147,7 @@ fun NewAddressScreen(
 		}
 		derivationPath.value = deriveKey.suggestedDerivation
 		deriveKey.derivationCheck?.let {
-			derivationState.fromFFI(it)
+			derivationState.value.fromFFI(it)
 		}
 		onDispose { focusManager.clearFocus() }
 	}

@@ -18,7 +18,7 @@ import io.parity.signer.uniffi.MNetworkDetails
 @Composable
 fun NetworkDetails(
 	networkDetails: MNetworkDetails,
-	signerDataModel: SignerDataModel
+	button: (Action, String) -> Unit
 ) {
 	Column {
 		/* TODO: MNetworkDetails -> MDeriveKey
@@ -72,9 +72,9 @@ fun NetworkDetails(
 				val metadataRecord = networkDetails.meta[index]
 				Row(
 					Modifier.clickable {
-						signerDataModel.pushButton(
+						button(
 							Action.MANAGE_METADATA,
-							details = metadataRecord.specsVersion
+							metadataRecord.specsVersion
 						)
 					}
 				) {

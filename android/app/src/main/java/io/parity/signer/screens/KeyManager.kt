@@ -38,9 +38,7 @@ import java.util.Objects.toString
 import kotlin.math.absoluteValue
 
 /**
- * Key manager screen; here all key/identity/seed creation and deletion
- * operations should happen. This is final point in navigation:
- * all subsequent interactions should be in modals or drop-down menus
+ * Key manager screen
  */
 @Composable
 fun KeyManager(

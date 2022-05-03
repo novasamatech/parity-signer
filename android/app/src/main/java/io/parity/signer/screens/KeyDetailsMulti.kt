@@ -26,7 +26,7 @@ import io.parity.signer.uniffi.MKeyDetailsMulti
 @Composable
 fun KeyDetailsMulti(
 	keyDetailsMulti: MKeyDetailsMulti,
-	signerDataModel: SignerDataModel
+	button: (Action) -> Unit
 ) {
 	var offset by remember { mutableStateOf(0f) }
 
@@ -68,10 +68,10 @@ fun KeyDetailsMulti(
 					},
 					onDragStopped = {
 						if (offset < -100) {
-							signerDataModel.pushButton(Action.NEXT_UNIT)
+							button(Action.NEXT_UNIT)
 						} else {
 							if (offset > 100) {
-								signerDataModel.pushButton(Action.PREVIOUS_UNIT)
+								button(Action.PREVIOUS_UNIT)
 							}
 						}
 						offset = 0f

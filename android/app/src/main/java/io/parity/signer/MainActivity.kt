@@ -36,7 +36,7 @@ class MainActivity : AppCompatActivity() {
 	init {
 		initLogging("SIGNER_RUST_LOG")
 	}
-  
+
 	// rust library is initialized inside data model
 	private val signerDataModel by viewModels<SignerDataModel>()
 
@@ -75,9 +75,8 @@ fun SignerApp(signerDataModel: SignerDataModel) {
 					BackHandler {
 						// TODO: implement this in backend
 						if (
-							actionResult.value?.alertData is AlertData.Empty && //no alert state
-							actionResult.value?.modalData == null
-
+							actionResult.value?.alertData == null && //no alert state
+							actionResult.value?.modalData == null &&
 							(
 								actionResult.value?.screenData is ScreenData.Log ||
 									actionResult.value?.screenData is ScreenData.Scan ||
@@ -109,7 +108,7 @@ fun SignerApp(signerDataModel: SignerDataModel) {
 								signerDataModel = signerDataModel
 							)
 							ModalSelector(
-								modalData = actionResult.value?.modalData ?: ModalData.Text(""),//default fallback
+								modalData = actionResult.value?.modalData,//default fallback
 								signerDataModel = signerDataModel
 							)
 							AlertSelector(
