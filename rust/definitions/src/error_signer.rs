@@ -699,7 +699,7 @@ pub enum DatabaseSigner {
     /// Associated data is [`VerifierKey`] corresponding to faulty entry.
     CustomVerifierIsGeneral(VerifierKey),
 
-    /// Database has two root addresses (i.e. with empty derivation path and no
+    /// Database has two seed addresses (i.e. with empty derivation path and no
     /// password) for same seed name and [`Encryption`]
     ///
     /// This indicates the database corruption, since the encrypion method,
@@ -708,7 +708,7 @@ pub enum DatabaseSigner {
         /// seed name
         seed_name: String,
 
-        /// encryption algorithm for which two root keys were found
+        /// encryption algorithm for which two seed keys were found
         encryption: Encryption,
     },
 
