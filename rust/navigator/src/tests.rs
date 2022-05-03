@@ -17,7 +17,7 @@ use constants::{
     },
     ALICE_SEED_PHRASE,
 };
-use db_handling::cold_default::{populate_cold_nav_test, init_db};
+use db_handling::cold_default::{init_db, populate_cold_nav_test};
 use definitions::{
     error_signer::Signer,
     network_specs::{Verifier, VerifierValue},

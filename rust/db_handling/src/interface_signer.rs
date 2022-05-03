@@ -635,7 +635,6 @@ pub const SAFE_RESERVE: usize = 1000;
 /// Zeroizeable seed phrase draft.
 #[derive(Debug, Clone, Zeroize, ZeroizeOnDrop)]
 pub struct SeedDraft {
-
     /// User-entered word part.
     user_input: String,
 
@@ -648,7 +647,6 @@ pub struct SeedDraft {
 struct SeedElement(String);
 
 impl SeedElement {
-
     /// Make `SeedElement` from checked bip39 word.
     fn from_checked_str(word: &str) -> Self {
         let mut new = String::with_capacity(WORD_LENGTH);
@@ -663,7 +661,6 @@ impl SeedElement {
 }
 
 impl SeedDraft {
-
     /// Start new `SeedDraft`
     pub fn initiate() -> Self {
         Self {

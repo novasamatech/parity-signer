@@ -1,7 +1,7 @@
 use crate::{produce_output, Action, StubNav};
 use constants::test_values::{
-    alice_sr_alice, bob, ed, empty_png, empty_vec_hash_pic, id_01, id_02, id_03, types_known, types_unknown,
-    westend_9070,
+    alice_sr_alice, bob, ed, empty_png, empty_vec_hash_pic, id_01, id_02, id_03, types_known,
+    types_unknown, westend_9070,
 };
 use db_handling::{
     cold_default::{populate_cold, populate_cold_no_metadata, populate_cold_no_networks},
@@ -37,8 +37,7 @@ fn add_specs_westend_no_network_info_not_signed() {
     let dbname = "for_tests/add_specs_westend_no_network_info_not_signed";
     populate_cold_no_networks(dbname, Verifier(None)).unwrap();
     let current_history = print_history(dbname).unwrap();
-    let cut_current_history = current_history
-        .replace(&empty_png(), r#"<empty>"#);
+    let cut_current_history = current_history.replace(&empty_png(), r#"<empty>"#);
     assert!(
         cut_current_history.contains(r#""events":[{"event":"database_initiated"},{"event":"general_verifier_added","payload":{"public_key":"","identicon":"<empty>","encryption":"none"}}]"#),
         "Current history: \n{}",

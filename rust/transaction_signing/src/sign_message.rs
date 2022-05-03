@@ -163,7 +163,8 @@ pub(crate) fn sufficient_crypto_load_metadata(
         &network_specs.name,
         network_version,
     )?;
-    let load_meta_content = ContentLoadMeta::generate(&meta_values.meta, &network_specs.genesis_hash);
+    let load_meta_content =
+        ContentLoadMeta::generate(&meta_values.meta, &network_specs.genesis_hash);
     let sufficient = match sufficient_crypto(
         multisigner,
         address_details,

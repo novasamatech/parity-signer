@@ -801,10 +801,7 @@ impl State {
                 Action::RemoveNetwork => match self.navstate.screen {
                     Screen::NetworkDetails(ref network_specs_key) => {
                         if let Modal::NetworkDetailsMenu = self.navstate.modal {
-                            match db_handling::helpers::remove_network(
-                                network_specs_key,
-                                dbname,
-                            ) {
+                            match db_handling::helpers::remove_network(network_specs_key, dbname) {
                                 Ok(()) => {
                                     new_navstate = Navstate::clean_screen(Screen::ManageNetworks);
                                 }
@@ -842,17 +839,15 @@ impl State {
                 },
                 Action::RemoveTypes => match self.navstate.screen {
                     Screen::ManageNetworks => match self.navstate.modal {
-                        Modal::TypesInfo => {
-                            match db_handling::helpers::remove_types_info(dbname) {
-                                Ok(()) => {
-                                    new_navstate = Navstate::clean_screen(Screen::Log);
-                                }
-                                Err(e) => {
-                                    new_navstate.alert = Alert::Error;
-                                    errorline.push_str(&<Signer>::show(&e));
-                                }
+                        Modal::TypesInfo => match db_handling::helpers::remove_types_info(dbname) {
+                            Ok(()) => {
+                                new_navstate = Navstate::clean_screen(Screen::Log);
                             }
-                        }
+                            Err(e) => {
+                                new_navstate.alert = Alert::Error;
+                                errorline.push_str(&<Signer>::show(&e));
+                            }
+                        },
                         _ => println!("RemoveTypes does nothing here"),
                     },
                     _ => println!("RemoveTypes does nothing here"),
