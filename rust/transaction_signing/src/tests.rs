@@ -8,7 +8,7 @@ use std::{fs, io::Write, str::FromStr};
 use constants::{
     test_values::{
         alice_sr_alice, alice_sr_root, bob, dock_31, ed, empty_png, id_01, id_02, id_04, id_05,
-        shell_200, types_known, types_unknown, westend_9111, westend_9122,
+        shell_200, types_known, types_unknown, westend_9070, westend_9111, westend_9122,
     },
     ADDRTREE, ALICE_SEED_PHRASE, GENERALVERIFIER, METATREE, SETTREE, SPECSTREE, VERIFIERS,
 };
@@ -29,7 +29,7 @@ use definitions::{
         MSCId, MSCMetaSpecs, MSCNameVersion, MTypesInfo, MVerifierDetails, NetworkSpecsToSend,
         TransactionAuthor, TransactionCard, TransactionCardSet,
     },
-    network_specs::{CurrentVerifier, NetworkSpecs, Verifier, VerifierValue},
+    network_specs::{CurrentVerifier, NetworkSpecs, ValidCurrentVerifier, Verifier, VerifierValue},
     users::AddressDetails,
 };
 use transaction_parsing::{
@@ -64,6 +64,19 @@ fn sign_action_test(
         create_signature(seed_phrase, pwd_entry, user_comment, dbname, checksum)?.encode(),
     ))
 }
+
+fn identicon_to_str(identicon: &[u8]) -> &str {
+    if identicon == ed() {
+        "<ed>"
+    } else if identicon == alice_sr_alice() {
+        "<alice_sr25519_//Alice>"
+    } else if identicon == empty_png() {
+        "<empty>"
+    } else {
+        "<unknown>"
+    }
+}
+
 fn print_db_content(dbname: &str) -> String {
     let database: Db = open(dbname).unwrap();
 
@@ -114,7 +127,41 @@ fn print_db_content(dbname: &str) -> String {
         let current_verifier = CurrentVerifier::decode(&mut &current_verifier_encoded[..]).unwrap();
         match current_verifier {
             CurrentVerifier::Valid(a) => {
-                verifiers_set.push(format!("{}: {:?}", hex::encode(verifier_key.key()), a))
+                let verifier = match a {
+                    ValidCurrentVerifier::General => {
+                        let card = general_verifier.show_card();
+                        let encryption = if card.encryption.is_empty() {
+                            "none".to_string()
+                        } else {
+                            card.encryption
+                        };
+
+                        format!(
+                            "{}: \"type\":\"general\",\"details\":{{\"public_key\":\"{}\",\"identicon\":\"{}\",\"encryption\":\"{}\"}}",
+                            hex::encode(verifier_key.key()),
+                            card.public_key,
+                            identicon_to_str(&card.identicon),
+                            encryption,
+                        )
+                    }
+                    ValidCurrentVerifier::Custom { v } => {
+                        let card = v.show_card();
+                        let encryption = if card.encryption.is_empty() {
+                            "none".to_string()
+                        } else {
+                            card.encryption
+                        };
+
+                        format!(
+                            "{}: \"type\":\"custom\",\"details\":{{\"public_key\":\"{}\",\"identicon\":\"{}\",\"encryption\":\"{}\"}}",
+                            hex::encode(verifier_key.key()),
+                            card.public_key,
+                            identicon_to_str(&card.identicon),
+                            encryption,
+                        )
+                    }
+                };
+                verifiers_set.push(verifier)
             }
             CurrentVerifier::Dead => verifiers_set.push(format!(
                 "{}: network inactivated",
@@ -583,11 +630,13 @@ fn can_sign_message_1() {
             Err(e) => panic!("Was unable to sign. {:?}", e),
         }
 
-        let mut history_recorded = get_history(dbname)
+        let history_recorded: Vec<_> = get_history(dbname)
             .unwrap()
             .into_iter()
-            .flat_map(|e| e.1.events);
+            .flat_map(|e| e.1.events)
+            .collect();
 
+        let message = String::from_utf8(hex::decode(message).unwrap()).unwrap();
         let my_event = Event::MessageSigned {
             sign_message_display: SignMessageDisplay {
                 message,
@@ -609,7 +658,11 @@ fn can_sign_message_1() {
         };
 
         // TODO: fails since .message has to be encoded (or decoded) everywhere.
-        assert!(history_recorded.any(|e| e == my_event));
+        assert!(
+            history_recorded.contains(&my_event),
+            "Recorded {:?}",
+            history_recorded
+        );
 
         let result = sign_action_test(checksum, ALICE_SEED_PHRASE, PWD, USER_COMMENT, dbname);
         if let Err(e) = result {
@@ -682,7 +735,7 @@ fn add_specs_westend_no_network_info_not_signed() {
         assert_eq!(stub_nav, stub_nav_known);
 
         let print_before = print_db_content(dbname);
-        let expected_print_before = "Database contents:\nMetadata:\nNetwork Specs:\nVerifiers:\nGeneral Verifier: none\nIdentities: ";
+        let expected_print_before = "Database contents:\nMetadata:\nNetwork Specs:\nVerifiers:\nGeneral Verifier: none\nIdentities:";
         assert!(
             print_before == expected_print_before,
             "Received: \n{}",
@@ -697,9 +750,9 @@ Metadata:
 Network Specs:
     0180e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e: Westend (westend with sr25519)
 Verifiers:
-    e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e: Custom { v: Verifier { v: None } }
+    e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e: "type":"custom","details":{"public_key":"","identicon":"<empty>","encryption":"none"}
 General Verifier: none
-Identities: "#;
+Identities:"#;
         assert_eq!(print_after, expected_print_after);
     } else {
         panic!("Wrong action: {:?}", output)
@@ -776,9 +829,9 @@ Network Specs:
     018091b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3: Polkadot (polkadot with sr25519)
     0180e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e: Westend (westend with sr25519)
 Verifiers:
-    91b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3: General
-    b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe: General
-    e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e: General
+    91b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3: "type":"general","details":{"public_key":"","identicon":"<empty>","encryption":"none"}
+    b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe: "type":"general","details":{"public_key":"","identicon":"<empty>","encryption":"none"}
+    e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e: "type":"general","details":{"public_key":"","identicon":"<empty>","encryption":"none"}
 General Verifier: none
 Identities:
     public_key: 3efeca331d646d8a2986374bb3bb8d6e9e3cfcdd7c45c2b69104fab5d61d3f34, encryption: sr25519, path: //westend, available_networks:
@@ -813,9 +866,9 @@ Network Specs:
     0180e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e: Westend (westend with sr25519)
     0080e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e: westend-ed25519 (westend with ed25519)
 Verifiers:
-    91b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3: General
-    b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe: General
-    e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e: General
+    91b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3: "type":"general","details":{"public_key":"","identicon":"<empty>","encryption":"none"}
+    b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe: "type":"general","details":{"public_key":"","identicon":"<empty>","encryption":"none"}
+    e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e: "type":"general","details":{"public_key":"","identicon":"<empty>","encryption":"none"}
 General Verifier: none
 Identities:
     public_key: 3efeca331d646d8a2986374bb3bb8d6e9e3cfcdd7c45c2b69104fab5d61d3f34, encryption: sr25519, path: //westend, available_networks:
@@ -869,9 +922,9 @@ Network Specs:
     0180e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e: Westend (westend with sr25519)
     0080e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e: westend-ed25519 (westend with ed25519)
 Verifiers:
-    91b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3: General
-    b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe: General
-    e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e: General
+    91b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3: "type":"general","details":{"public_key":"","identicon":"<empty>","encryption":"none"}
+    b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe: "type":"general","details":{"public_key":"","identicon":"<empty>","encryption":"none"}
+    e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e: "type":"general","details":{"public_key":"","identicon":"<empty>","encryption":"none"}
 General Verifier: none
 Identities:
     public_key: 345071da55e5dccefaaa440339415ef9f2663338a38f7da0df21be5ab4e055ef, encryption: ed25519, path: , available_networks:
@@ -906,9 +959,9 @@ Network Specs:
     0180e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e: Westend (westend with sr25519)
     0080e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e: westend-ed25519 (westend with ed25519)
 Verifiers:
-    91b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3: General
-    b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe: General
-    e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e: General
+    91b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3: "type":"general","details":{"public_key":"","identicon":"<empty>","encryption":"none"}
+    b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe: "type":"general","details":{"public_key":"","identicon":"<empty>","encryption":"none"}
+    e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e: "type":"general","details":{"public_key":"","identicon":"<empty>","encryption":"none"}
 General Verifier: none
 Identities:"#;
         assert_eq!(print_after, expected_print_after);
@@ -927,9 +980,9 @@ Network Specs:
     0180e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e: Westend (westend with sr25519)
     0080e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e: westend-ed25519 (westend with ed25519)
 Verifiers:
-    91b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3: General
-    b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe: General
-    e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e: General
+    91b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3: "type":"general","details":{"public_key":"","identicon":"<empty>","encryption":"none"}
+    b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe: "type":"general","details":{"public_key":"","identicon":"<empty>","encryption":"none"}
+    e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e: "type":"general","details":{"public_key":"","identicon":"<empty>","encryption":"none"}
 General Verifier: none
 Identities:
     public_key: 345071da55e5dccefaaa440339415ef9f2663338a38f7da0df21be5ab4e055ef, encryption: ed25519, path: , available_networks:
@@ -976,7 +1029,7 @@ fn load_westend9070() {
                     spec_version: "9070".to_string(),
                     meta_hash: "e281fbc53168a6b87d1ea212923811f4c083e7be7d18df4b8527b9532e5f5fec"
                         .to_string(),
-                    meta_id_pic: vec![],
+                    meta_id_pic: westend_9070().to_vec(),
                 },
             },
         }]),
@@ -1012,9 +1065,9 @@ Network Specs:
     018091b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3: Polkadot (polkadot with sr25519)
     0180e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e: Westend (westend with sr25519)
 Verifiers:
-    91b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3: General
-    b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe: General
-    e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e: General
+    91b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3: "type":"general","details":{"public_key":"","identicon":"<empty>","encryption":"none"}
+    b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe: "type":"general","details":{"public_key":"","identicon":"<empty>","encryption":"none"}
+    e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e: "type":"general","details":{"public_key":"","identicon":"<empty>","encryption":"none"}
 General Verifier: none
 Identities:
     public_key: 3efeca331d646d8a2986374bb3bb8d6e9e3cfcdd7c45c2b69104fab5d61d3f34, encryption: sr25519, path: //westend, available_networks:
@@ -1046,9 +1099,9 @@ Network Specs:
     018091b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3: Polkadot (polkadot with sr25519)
     0180e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e: Westend (westend with sr25519)
 Verifiers:
-    91b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3: General
-    b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe: General
-    e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e: General
+    91b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3: "type":"general","details":{"public_key":"","identicon":"<empty>","encryption":"none"}
+    b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe: "type":"general","details":{"public_key":"","identicon":"<empty>","encryption":"none"}
+    e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e: "type":"general","details":{"public_key":"","identicon":"<empty>","encryption":"none"}
 General Verifier: none
 Identities:
     public_key: 3efeca331d646d8a2986374bb3bb8d6e9e3cfcdd7c45c2b69104fab5d61d3f34, encryption: sr25519, path: //westend, available_networks:
@@ -1063,11 +1116,7 @@ Identities:
         0180e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e
     public_key: f606519cb8726753885cd4d0f518804a69a5e0badf36fee70feadd8044081730, encryption: sr25519, path: //polkadot, available_networks:
         018091b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3"#;
-        assert!(
-            print_after == expected_print_after,
-            "Received: \n{}",
-            print_after
-        );
+        assert_eq!(print_after, expected_print_after);
     } else {
         panic!("Wrong action: {:?}", output)
     }
@@ -1151,9 +1200,9 @@ Network Specs:
     018091b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3: Polkadot (polkadot with sr25519)
     0180e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e: Westend (westend with sr25519)
 Verifiers:
-    91b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3: General 
-    b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe: General 
-    e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e: General 
+    91b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3: "type":"general","details":{"public_key":"","identicon":"<empty>","encryption":"none"}
+    b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe: "type":"general","details":{"public_key":"","identicon":"<empty>","encryption":"none"}
+    e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e: "type":"general","details":{"public_key":"","identicon":"<empty>","encryption":"none"}
 General Verifier: none
 Identities:
     public_key: 3efeca331d646d8a2986374bb3bb8d6e9e3cfcdd7c45c2b69104fab5d61d3f34, encryption: sr25519, path: //westend, available_networks:
@@ -3273,7 +3322,7 @@ Network Specs:
 Verifiers:
     fc41b9bd8ef8fe53d58c7ea67c794c7ec9a73daf05e6d54b14ff6342c99ba64c: "type":"custom","details":{"public_key":"","identicon":"<empty>","encryption":"none"}
 General Verifier: none
-Identities: "#;
+Identities:"#;
     assert!(
         print_after == expected_print_after,
         "Received: \n{}",
@@ -3571,7 +3620,7 @@ Network Specs:
 Verifiers:
     27b0e1604364f6a7309d31ad60cdfb820666c3095b9f948c4a7d7894b6b3c184: "type":"custom","details":{"public_key":"88dc3417d5058ec4b4503e0c12ea1a0a89be200fe98922423d4334014fa6b0ee","identicon":"<ed>","encryption":"ed25519"}
 General Verifier: public key: d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d, encryption: sr25519
-Identities: "#;
+Identities:"#;
     assert_eq!(print, expected_print);
 
     // remove only one of the rococo's
@@ -3592,7 +3641,7 @@ Network Specs:
 Verifiers:
     27b0e1604364f6a7309d31ad60cdfb820666c3095b9f948c4a7d7894b6b3c184: network inactivated
 General Verifier: public key: d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d, encryption: sr25519
-Identities: "#;
+Identities:"#;
     assert_eq!(print, expected_print);
 
     fs::remove_dir_all(dbname).unwrap();
@@ -3626,7 +3675,7 @@ Network Specs:
 Verifiers:
     27b0e1604364f6a7309d31ad60cdfb820666c3095b9f948c4a7d7894b6b3c184: "type":"general","details":{"public_key":"d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d","identicon":"<alice_sr25519_//Alice>","encryption":"sr25519"}
 General Verifier: public key: d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d, encryption: sr25519
-Identities: "#;
+Identities:"#;
     assert_eq!(print, expected_print);
 
     // remove it
@@ -3648,7 +3697,7 @@ Network Specs:
 Verifiers:
     27b0e1604364f6a7309d31ad60cdfb820666c3095b9f948c4a7d7894b6b3c184: "type":"general","details":{"public_key":"d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d","identicon":"<alice_sr25519_//Alice>","encryption":"sr25519"}
 General Verifier: public key: d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d, encryption: sr25519
-Identities: "#;
+Identities:"#;
     assert_eq!(print, expected_print);
 
     fs::remove_dir_all(dbname).unwrap();
@@ -3681,7 +3730,7 @@ Network Specs:
 Verifiers:
     27b0e1604364f6a7309d31ad60cdfb820666c3095b9f948c4a7d7894b6b3c184: "type":"custom","details":{"public_key":"","identicon":"<empty>","encryption":"none"}
 General Verifier: public key: d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d, encryption: sr25519
-Identities: "#;
+Identities:"#;
     assert_eq!(print, expected_print);
 
     // remove it
@@ -3702,7 +3751,7 @@ Network Specs:
 Verifiers:
     27b0e1604364f6a7309d31ad60cdfb820666c3095b9f948c4a7d7894b6b3c184: "type":"custom","details":{"public_key":"","identicon":"<empty>","encryption":"none"}
 General Verifier: public key: d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d, encryption: sr25519
-Identities: "#;
+Identities:"#;
     assert_eq!(print, expected_print);
 
     fs::remove_dir_all(dbname).unwrap();
@@ -3735,7 +3784,7 @@ Network Specs:
 Verifiers:
     27b0e1604364f6a7309d31ad60cdfb820666c3095b9f948c4a7d7894b6b3c184: "type":"custom","details":{"public_key":"","identicon":"<empty>","encryption":"none"}
 General Verifier: public key: d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d, encryption: sr25519
-Identities: "#;
+Identities:"#;
     assert_eq!(print, expected_print);
 
     // added rococo specs with sr25519, general verifier
@@ -3761,7 +3810,7 @@ Network Specs:
 Verifiers:
     27b0e1604364f6a7309d31ad60cdfb820666c3095b9f948c4a7d7894b6b3c184: "type":"general","details":{"public_key":"d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d","identicon":"<alice_sr25519_//Alice>","encryption":"sr25519"}
 General Verifier: public key: d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d, encryption: sr25519
-Identities: "#;
+Identities:"#;
     assert_eq!(print, expected_print);
 
     fs::remove_dir_all(dbname).unwrap();
@@ -3794,7 +3843,7 @@ Network Specs:
 Verifiers:
     27b0e1604364f6a7309d31ad60cdfb820666c3095b9f948c4a7d7894b6b3c184: "type":"custom","details":{"public_key":"88dc3417d5058ec4b4503e0c12ea1a0a89be200fe98922423d4334014fa6b0ee","identicon":"<ed>","encryption":"ed25519"}
 General Verifier: public key: d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d, encryption: sr25519
-Identities: "#;
+Identities:"#;
     assert_eq!(print, expected_print);
 
     // added rococo specs with sr25519, general verifier
@@ -3820,7 +3869,7 @@ Network Specs:
 Verifiers:
     27b0e1604364f6a7309d31ad60cdfb820666c3095b9f948c4a7d7894b6b3c184: "type":"general","details":{"public_key":"d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d","identicon":"<alice_sr25519_//Alice>","encryption":"sr25519"}
 General Verifier: public key: d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d, encryption: sr25519
-Identities: "#;
+Identities:"#;
     assert_eq!(print, expected_print);
 
     fs::remove_dir_all(dbname).unwrap();

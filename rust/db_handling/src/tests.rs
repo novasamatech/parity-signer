@@ -567,7 +567,7 @@ fn westend_network_details() {
             ttype: "general".to_string(),
             details: definitions::navigation::MVerifierDetails {
                 public_key: "".to_string(),
-                identicon: vec![],
+                identicon: empty_png().to_vec(),
                 encryption: "".to_string(),
             },
         },
@@ -638,6 +638,8 @@ fn types_status_and_history() {
     remove_types_info(dbname).unwrap();
     let types = show_types_status(dbname).unwrap();
     expected_types.types_on_file = false;
+    expected_types.types_hash = None;
+    expected_types.types_id_pic = None;
 
     assert_eq!(types, expected_types);
 

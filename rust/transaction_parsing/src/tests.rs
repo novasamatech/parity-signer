@@ -52,7 +52,7 @@ fn westend_spec() -> NetworkSpecs {
         base58prefix: 42,
         color: "#660D35".to_string(),
         decimals: 12,
-        encryption: Encryption::Ed25519,
+        encryption: Encryption::Sr25519,
         genesis_hash: H256::from_str(
             "e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e",
         )
@@ -62,7 +62,7 @@ fn westend_spec() -> NetworkSpecs {
         order: 2,
         path_id: "//westend".to_string(),
         secondary_color: "#262626".to_string(),
-        title: "westend-ed25519".to_string(),
+        title: "Westend".to_string(),
         unit: "WND".to_string(),
     }
 }
@@ -251,21 +251,20 @@ fn load_types_known_alice_signed() {
                     .to_string(),
             },
         },
-        TransactionCard {
-            index: 3,
-            indent: 0,
-            card: Card::TypesInfoCard {
-                f: MTypesInfo {
-                    types_on_file: false,
-                    types_hash: Some(
-                        "d091a5a24a97e18dfe298b167d8fd5a2add10098c8792cba21c39029a9ee0aeb"
-                            .to_string(),
-                    ),
-                    types_id_pic: Some(types_known().to_vec()),
-                },
+    ]);
+    let types_info = Some(vec![TransactionCard {
+        index: 3,
+        indent: 0,
+        card: Card::TypesInfoCard {
+            f: MTypesInfo {
+                types_on_file: false,
+                types_hash: Some(
+                    "d091a5a24a97e18dfe298b167d8fd5a2add10098c8792cba21c39029a9ee0aeb".to_string(),
+                ),
+                types_id_pic: Some(types_known().to_vec()),
             },
         },
-    ]);
+    }]);
 
     let reply_known = TransactionCardSet {
         verifier: Some(vec![TransactionCard {
@@ -281,6 +280,7 @@ fn load_types_known_alice_signed() {
             },
         }]),
         warning,
+        types_info,
         ..Default::default()
     };
 
@@ -657,16 +657,19 @@ fn parse_transaction_1() {
         has_pwd: false,
     };
     let network_info_known = NetworkSpecs {
-        base58prefix: 0,
-        color: String::new(),
-        decimals: 0,
+        base58prefix: 42,
+        color: "#660D35".to_string(),
+        decimals: 12,
         encryption: Encryption::Sr25519,
-        genesis_hash: H256::random(),
+        genesis_hash: H256::from_str(
+            "e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e",
+        )
+        .unwrap(),
         logo: "westend".to_string(),
         name: "westend".to_string(),
-        order: 8,
-        path_id: "".to_string(),
-        secondary_color: "".to_string(),
+        order: 2,
+        path_id: "//westend".to_string(),
+        secondary_color: "#262626".to_string(),
         title: "Westend".to_string(),
         unit: "WND".to_string(),
     };
