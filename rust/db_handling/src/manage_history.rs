@@ -5,6 +5,9 @@
 //!
 //! Each history log [`Entry`] contains [`Event`] set and a timestamp. Database
 //! key for [`Entry`] value is [`Order`], SCALE-encoded number of the entry.
+//!
+//! In addition to keeping the log, Signer also displays [`HISTORY`] tree
+//! checksum for user to possibly keep the track of.
 // TODO: substantial part of this will go obsolete with interface updates;
 // some functions are not called at the moment from the user interface - kept
 // for now in case they make a return, commented.

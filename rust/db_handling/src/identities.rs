@@ -306,6 +306,9 @@ pub(crate) fn create_address<T: ErrorSource>(
                     },
                 ));
             }
+
+            // Note that no error would be caused if two identical addresses
+            // were proposed in same address generation set.
             if !in_this_network {
                 number_in_current = Some(i);
                 break;
