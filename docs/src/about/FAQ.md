@@ -1,4 +1,10 @@
-## FAQ
+# FAQ
+
+- [About](#about)
+- [Networks](#networks)
+- [Seeds and keys](#seeds-and-keys)
+
+## About
 
 ### What is Signer?
 
@@ -12,17 +18,14 @@ Signer is optimised for the highest security requirements. If you already manage
 
 Communication happens through scanning and generating QR codes. Scanned with Signer input-QRs interact with keys stored in Signer to, generate response-QRs on behalf of those keys. Usually input-QR is a blockchain transaction, and a response-QR is a signature for this transaction. There are tried and true cryptographic algorithms that power these QR codes, as well as some smart engineering that make your dedicated device safe to use.
 
-### How can I update metadata version for a network?
+### How do I keep my keys secure?
 
-Please go to [Metadata Update Portal](https://metadata.parity.io/) and select network you need to update. Scan multipart QR code the same way you scan a transaction QR code. 
+Signer is a safe way to use your keys. However, that alone won't be enough to keep your keys secure. Devices break and get lost. This is why we always recommend to backup your seed phrases and derivation paths on paper. We are such big fans of paper backups that we even support a special tool to power your paper backup game by splitting your backups into shards called [Banana Split](https://bs.parity.io/).
 
-Why do I need to update network versions at all?
+### How do I know I am not interacting with malicious apps or actors?
 
-It's a safety feature. Substrate-based blockchain networks have capacity to be updated and otherwise changed; without recent metadata version of a network Signer won't be able to parse a transaction correctly, and you won't be able to read it and verify what you sign. Given that Signer is an app for an air-gapped device, you have to update the network version by using camera.
-
-### What networks does Signer support?
-
-From-the-shelf Party Signer supports Polkadot, Kusama and Westend networks. But it's not limited to these networks. More experienced users can generate metadata to expand network capability of Parity Signer.
+Signer does not interact with network. The app itself does not have a way to check if an app or an account you interacting with is malicious. 
+If you use Signer with PolkadotJS Browser Extension, PolkadotJS Apps or Signer Component Browser Extension they will rely on community driven curated list of potentially less-than-honest operators: [https://polkadot.js.org/phishing/#](https://polkadot.js.org/phishing/#) to prevent you from interacting with certain sites and addresses. However, there are no limitations on use of Signer with other tools.
 
 ### I want to play with Signer to get a better feeling of how it works. Is there a way to do it without spending valuable tokens?
 
@@ -32,16 +35,38 @@ You can use test tokens in the same way you would use value-bearing tokens.
 
 For example with [PolkadotJS Apps](https://polkadot.js.org/apps/) you can create a transaction on behalf of your account, generate a signature with Signer and submit it to the network. All of this without keys ever leaving your offline device.
 
-### How do I keep my keys secure?
+## Networks
 
-Signer is a safe way to use your keys. However, that alone won't be enough to keep your keys secure. Devices break and get lost. This is why we always recommend to backup your seed phrases and derivation paths on paper. We are such big fans of paper backups that we even support a special tool to power your paper backup game by splitting your backups into shards called [Banana Split](https://bs.parity.io/).
+### What networks does Signer support?
 
-### How do I know I am not interacting with malicious apps or actors?
+From-the-shelf Party Signer supports Polkadot, Kusama and Westend networks. But it's not limited to these networks. More experienced users can generate metadata for any network to expand capability of Parity Signer.
 
-Signer does not interact with network. The app itself does not have a way to check if an app or an account you interacting with is malicious. 
-If you use Signer with PolkadotJS Browser Extension, PolkadotJS Apps or Signer Component Browser Extension they will rely on community driven curated list of potentially less-than-honest operators: [https://polkadot.js.org/phishing/#](https://polkadot.js.org/phishing/#) to prevent you from interacting with certain sites and addresses. However, there are no limitations on use of Signer with other tools.
+### How can I update metadata version for a network?
+
+Parity verifies and publishes recent metadata versions on [Metadata Update Portal](https://metadata.parity.io/). With off-the-shelf Signer you can scan one of the multipart QR–"movies" same way you scan transaction QR:\
+in Signer open scanner, scan the QR for the respective network and accept new metadata.
+
+Currently [Metadata Update Portal](https://metadata.parity.io/) follows Polkadot, Kusama and Westend network metadata updates. Parity is open for collaboration with participants of other networks and is currently exploring safe and more decentralised ways of publishing verified metadata.
+
+If you want to update networks that you've added manually, please follow the [Add Metadata](../tutorials/Add-New-Network.md#add-network-metadata) steps in [Add New Network](../tutorials/Add-New-Network.md) guide.
+
+### Why do I need to update network metadata versions at all?
+
+It's a safety feature. Substrate-based blockchain networks have capacity to be updated and otherwise changed; without recent metadata version of a network Signer won't be able to parse a transaction correctly, and you won't be able to read it and verify what you sign. Given that Signer is an app for an air-gapped device, you have to update the network version by using camera.
+
+### How can I add a new network to Signer?
+
+Parity verifies and publishes network specs on [Metadata Update Portal](https://metadata.parity.io/). To add one of the listed networks, in [Metadata Update Portal](https://metadata.parity.io/) click "Add to signer", scan the network specs QR same way you scan transaction QR: in Signer open scanner, scan the QR and accept new network spec. Than scan the multipart QR–"movie" containing recent metadata for this network.
+
+### Can I add a network that does not have network specs and metadata QR published anywhere?
+
+Yes. Follow the [Add New Network](../tutorials/Add-New-Network.md) step-by-step guide.
+
+Currently the process requires you to have [rust](https://www.rust-lang.org/tools/install), [subkey](https://docs.substrate.io/v3/tools/subkey/#installation) and [parity-signer repository](https://github.com/paritytech/parity-signer) on your machine.
+
+## Seeds and keys
 	
-### Can import my account from polkadot{.js} apps or extension to Parity Signer?
+### Can I import my keys from polkadot{.js} apps or extension to Parity Signer?
 
 Yes. Keys are compatible between polkadot{.js} and Parity Signer, except for the keys generated with Ledger (BIP39). To import seed keys into Parity Signer, you need to know:
 1. Seed phrase\
