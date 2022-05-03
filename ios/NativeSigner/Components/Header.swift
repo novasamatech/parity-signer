@@ -18,7 +18,7 @@ struct Header: View {
                         Button(action: {
                             data.pushButton(action: .goBack)
                         }) {
-                            Image(systemName: data.actionResult.rightButton == "MultiSelect" ? "xmark" : "chevron.left")
+                            Image(systemName: data.actionResult.rightButton == .multiSelect ? "xmark" : "chevron.left")
                                 .imageScale(.large)
                                 .foregroundColor(Color("Text500"))
                         }
@@ -37,10 +37,10 @@ struct Header: View {
                 Spacer()
                 Text(data.actionResult.screenLabel)
                     .foregroundColor(Color("Text600"))
-                    .font(data.actionResult.screenNameType == "h1" ? FBase(style: .h2) : FBase(style: .h4))
+                    .font(data.actionResult.screenNameType == .h1 ? FBase(style: .h2) : FBase(style: .h4))
                     .tracking(0.1)
                 
-                if data.actionResult.rightButton == "MultiSelect" {
+                if data.actionResult.rightButton == .multiSelect {
                     Button(action: {
                         data.pushButton(action: .selectAll)
                     }) {
@@ -52,30 +52,30 @@ struct Header: View {
                 HStack(spacing: 8.0) {
                     Spacer()
                     Button(action: {
-                        if data.alert && data.actionResult.rightButton == "NewSeed" {
+                        if data.alert && data.actionResult.rightButton == .newSeed {
                             data.alertShow = true
                         } else {
-                            data.pushButton(action: .rightButton)
+                            data.pushButton(action: .rightButtonAction)
                         }
                     }) {
                         switch(
                             data.actionResult.rightButton
                         ) {
-                        case "NewSeed":
+                        case .newSeed:
                             Image(systemName: "plus.circle")
                                 .imageScale(.large)
                                 .foregroundColor(Color("Action400"))
-                        case "Backup":
+                        case .backup:
                             Image(systemName: "ellipsis")
                                 .imageScale(.large)
                                 .foregroundColor(Color("Action400"))
-                        case "LogRight":
+                        case .logRight:
                             Image(systemName: "ellipsis")
                                 .imageScale(.large)
                                 .foregroundColor(Color("Action400"))
-                        case "MultiSelect":
+                        case .multiSelect:
                             EmptyView()
-                        case "None":
+                        case .none:
                             EmptyView()
                         default:
                             Image(systemName: "ellipsis")

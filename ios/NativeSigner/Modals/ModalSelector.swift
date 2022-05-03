@@ -46,7 +46,7 @@ struct ModalSelector: View {
             EmptyView()//SelectSeed(content: value)
         case .manageNetworks(_):
             EmptyView()
-        case .text(_):
+        case nil:
             EmptyView()
         }
     }

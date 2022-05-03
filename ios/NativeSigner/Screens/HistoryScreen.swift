@@ -13,10 +13,10 @@ struct HistoryScreen: View {
     var body: some View {
         ScrollView {
             LazyVStack (spacing: 8) {
-                ForEach(content.log.sorted(by: {$0.order > $1.order}), id: \.order) { history in
+                ForEach(content.log, id: \.timestamp) { history in
                     ForEach(history.events, id: \.self) { event in
                         Button(action: {
-                            data.pushButton(action: .showLogDetails, details: String(history.order))
+                            data.pushButton(action: .showLogDetails, details: String(content.log.firstIndex(of: history) ?? 0))
                         }) {
                             HistoryCard(
                                 event: event,

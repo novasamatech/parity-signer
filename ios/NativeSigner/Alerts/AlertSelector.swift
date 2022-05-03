@@ -12,7 +12,7 @@ struct AlertSelector: View {
     
     var body: some View {
         /*
-        switch (data.actionResult.alert) {
+        switch (data.actionResult.alertData) {
         case .Empty:
             EmptyView()
         case .Error(let value):

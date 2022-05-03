@@ -37,7 +37,7 @@ struct Footer: View {
                     Text("Log")
                         
                 }
-                .foregroundColor(buttonColor(active: data.actionResult.footerButton == "Log"))
+                .foregroundColor(buttonColor(active: data.actionResult.footerButton == .log))
             }
             Spacer()
             Button(action: {
@@ -49,7 +49,7 @@ struct Footer: View {
                         .padding(.bottom, 1.0)
                     Text("Scanner")
                 }
-                .foregroundColor(buttonColor(active: data.actionResult.footerButton == "Scan"))
+                .foregroundColor(buttonColor(active: data.actionResult.footerButton == .scan))
             }
             Spacer()
             Button(action: {
@@ -59,7 +59,7 @@ struct Footer: View {
                     KeySymbol()
                     Text("Keys")
                 }
-                .foregroundColor(buttonColor(active: data.actionResult.footerButton == "Keys"))
+                .foregroundColor(buttonColor(active: data.actionResult.footerButton == .keys))
             }
             Spacer()
             Button(action: {
@@ -71,7 +71,7 @@ struct Footer: View {
                         .padding(.bottom, 1.0)
                     Text("Settings")
                 }
-                .foregroundColor(buttonColor(active: data.actionResult.footerButton == "Settings"))
+                .foregroundColor(buttonColor(active: data.actionResult.footerButton == .settings))
             }
         }.font(.footnote)
     }

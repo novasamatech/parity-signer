@@ -91,7 +91,7 @@ struct RecoverSeedPhrase: View {
                         }) {
                             HStack {
                                 Image(systemName: createRoots ? "checkmark.square" : "square").imageScale(.large)
-                                Text("Create seed keys")
+                                Text("Create root keys")
                                     .multilineTextAlignment(.leading)
                                 Spacer()
                             }
