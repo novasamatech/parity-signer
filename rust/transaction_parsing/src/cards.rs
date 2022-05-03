@@ -9,8 +9,8 @@ use definitions::{
     history::MetaValuesDisplay,
     keyring::VerifierKey,
     navigation::{
-        Card as NavCard, MSCAuthorPlain, MSCCall, MSCCurrency, MSCEnumVariantName, MSCEraMortal,
-        MSCFieldName, MSCFieldNumber, MSCId, MSCMetaSpecs, MSCNameVersion, MSCNetworkInfo,
+        Card as NavCard, MMetadataRecord, MSCAuthorPlain, MSCCall, MSCCurrency, MSCEnumVariantName,
+        MSCEraMortal, MSCFieldName, MSCFieldNumber, MSCId, MSCNameVersion, MSCNetworkInfo,
         MTypesInfo, MVerifierDetails, TransactionAuthor, TransactionCard,
     },
     network_specs::{NetworkSpecs, NetworkSpecsToSend, VerifierValue},
@@ -241,9 +241,9 @@ impl<'a> Card<'a> {
                 }
             },
             Card::Meta(x) => NavCard::MetaCard {
-                f: MSCMetaSpecs {
+                f: MMetadataRecord {
                     specname: x.name.clone(),
-                    spec_version: x.version.to_string(),
+                    specs_version: x.version.to_string(),
                     meta_hash: hex::encode(&x.meta_hash),
                     meta_id_pic: pic_meta(&x.meta_hash),
                 },

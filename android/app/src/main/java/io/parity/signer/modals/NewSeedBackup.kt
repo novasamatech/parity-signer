@@ -26,7 +26,7 @@ fun NewSeedBackup(
 	signerDataModel: SignerDataModel
 ) {
 	val confirmBackup = remember { mutableStateOf(false) }
-	val createSeedKeys = remember { mutableStateOf(true) }
+	val createRoots = remember { mutableStateOf(true) }
 	Surface(
 		color = MaterialTheme.colors.Bg200,
 		shape = MaterialTheme.shapes.modal
@@ -48,8 +48,8 @@ fun NewSeedBackup(
 				text = "I have written down my seed phrase"
 			)
 			CheckboxTemplate(
-				checked = createSeedKeys.value,
-				onValueChange = { createSeedKeys.value = it },
+				checked = createRoots.value,
+				onValueChange = { createRoots.value = it },
 				text = "Create seed keys"
 			)
 

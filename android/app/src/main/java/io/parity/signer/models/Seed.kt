@@ -2,7 +2,6 @@ package io.parity.signer.models
 
 import android.util.Log
 import android.widget.Toast
-import org.json.JSONArray
 import io.parity.signer.uniffi.Action
 import io.parity.signer.uniffi.historySeedNameWasShown
 import io.parity.signer.uniffi.initNavigation
@@ -33,7 +32,7 @@ internal fun SignerDataModel.refreshSeedNames(init: Boolean = false) {
 fun SignerDataModel.addSeed(
 	seedName: String,
 	seedPhrase: String,
-	createSeedKeys: Boolean
+	createRoots: Boolean
 ) {
 
 	//Check if seed name already exists

@@ -16,7 +16,7 @@ import io.parity.signer.uniffi.MLog
 
 @Composable
 fun HistoryScreen(mLog: MLog, signerDataModel: SignerDataModel) {
-	val history = mLog.log.reversed()
+	val history = mLog.log
 
 	Column {
 		LazyColumn {

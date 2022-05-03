@@ -6,7 +6,6 @@ import androidx.compose.material.Checkbox
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -20,7 +19,6 @@ import io.parity.signer.components.HeadingOverline
 import io.parity.signer.components.RestoreSeedPhraseBox
 import io.parity.signer.components.RestoreSeedPhraseSuggest
 import io.parity.signer.models.*
-import org.json.JSONArray
 import io.parity.signer.uniffi.Action
 import io.parity.signer.uniffi.MRecoverSeedPhrase
 
@@ -40,7 +38,7 @@ fun RecoverSeedPhrase(
 		seedWordText,
 		selection = TextRange(seedWordText.length)
 	)
-	val createSeedKeys = remember { mutableStateOf(true) }
+	val createRoots = remember { mutableStateOf(true) }
 
 	Column(
 		verticalArrangement = Arrangement.Top,
@@ -74,13 +72,13 @@ fun RecoverSeedPhrase(
 		Row(
 			verticalAlignment = Alignment.CenterVertically,
 			modifier = Modifier.toggleable(
-				value = createSeedKeys.value,
+				value = createRoots.value,
 				role = Role.Checkbox,
-				onValueChange = { createSeedKeys.value = it }
+				onValueChange = { createRoots.value = it }
 			)) {
 			Checkbox(
-				checked = createSeedKeys.value,
-				onCheckedChange = { createSeedKeys.value = it })
+				checked = createRoots.value,
+				onCheckedChange = { createRoots.value = it })
 			Text("Create seed keys")
 		}
 		Spacer(Modifier.weight(0.1f))
@@ -94,7 +92,7 @@ fun RecoverSeedPhrase(
 								signerDataModel.addSeed(
 									seedName = seedName,
 									seedPhrase = it,
-									createSeedKeys = createSeedKeys.value
+									createRoots = createRoots.value
 								)
 							}
 						}

@@ -1,6 +1,5 @@
 package io.parity.signer
 
-import android.util.Log
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.runtime.Composable
@@ -26,7 +25,7 @@ fun ScreenSelector(signerDataModel: SignerDataModel) {
 	val screenData by signerDataModel.screenData.observeAsState()
 	val alertState by signerDataModel.alertState.observeAsState()
 	val sd = screenData
-	Log.w("SSSS", "$sd")
+
 	when (sd) {
 		is ScreenData.DeriveKey -> NewAddressScreen(
 			sd.f,
@@ -107,8 +106,6 @@ fun ModalSelector(
 	val modalState by liveModal.observeAsState()
 
 	val modal = modalState
-	Log.w("SIGNER_RUST_LOG", ">>> $modal")
-
 	when (modal) {
 		is ModalData.NewSeedMenu -> NewSeedMenu(signerDataModel = signerDataModel)
 		is ModalData.SeedMenu -> SeedMenu(

@@ -471,6 +471,7 @@ dictionary MVerifier {
 };
 
 dictionary MMetadataRecord {
+    string specname;
     string specs_version;
     string meta_hash;
     sequence<u8> meta_id_pic;
@@ -739,13 +740,6 @@ dictionary MSCId {
     sequence<u8> identicon;
 };
 
-dictionary MSCMetaSpecs {
-    string specname;
-    string spec_version;
-    string meta_hash;
-    sequence<u8> meta_id_pic;
-};
-
 dictionary MSCNameVersion {
     string name;
     string version;
@@ -786,7 +780,7 @@ interface Card {
     FieldNumberCard(MSCFieldNumber f);
     IdCard(MSCId f);
     IdentityFieldCard(string f);
-    MetaCard(MSCMetaSpecs f);
+    MetaCard(MMetadataRecord f);
     NameVersionCard(MSCNameVersion f);
     NetworkGenesisHashCard(string f);
     NetworkNameCard(string f);
