@@ -23,34 +23,16 @@ fun NewAddressScreen(
 	addKey: (String, String) -> Unit
 ) {
 	val derivationPath = remember { mutableStateOf("") }
-	val buttonGood = remember { mutableStateOf(false) }
-	val whereTo = remember { mutableStateOf<DerivationDestination?>(null) }
-	val collision = remember { mutableStateOf<Address?>(null) }
 	val seedName = deriveKey.seedName
 	val networkSpecKey = deriveKey.networkSpecsKey
-	var derivationState by remember(buttonGood, whereTo, collision) {
+	var derivationState by remember {
 		mutableStateOf(
 			DerivationCheck(
-				buttonGood,
-				whereTo,
-				collision
-			) {
-				Log.w("SIGNER_RUST_LOG", "check $seedName $it $networkSpecKey")
-				val v = substratePathCheck(
-					seedName,
-					it,
-					networkSpecKey,
-					signerDataModel.dbName
-				)
-				Log.w("SIGNER_RUST_LOG", "v $v")
-
-				buttonGood.value = v.buttonGood
-				v.whereTo?.let {
-					whereTo.value = it
-				}
-
-				collision.value = v.collision
-			}
+				false,
+				null,
+				null,
+				null
+			)
 		)
 	}
 	val focusManager = LocalFocusManager.current
@@ -73,7 +55,7 @@ fun NewAddressScreen(
 			content = derivationPath,
 			update = {
 				derivationPath.value = it
-				derivationState.check(it)
+				derivationPath.value = pathCheck(it)
 			},
 			prefix = {
 				Text(
@@ -108,7 +90,7 @@ fun NewAddressScreen(
 			focusManager = focusManager,
 			focusRequester = focusRequester
 		)
-		collision.value?.let {
+		derivationState.collision.let {
 			Column(
 				Modifier.fillMaxWidth(1f)
 			) {
@@ -147,7 +129,7 @@ fun NewAddressScreen(
 		}
 		derivationPath.value = deriveKey.suggestedDerivation
 		deriveKey.derivationCheck?.let {
-			derivationState.value.fromFFI(it)
+			derivationState = it
 		}
 		onDispose { focusManager.clearFocus() }
 	}
