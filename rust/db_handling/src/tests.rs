@@ -33,7 +33,8 @@ use crate::{
     },
     db_transactions::TrDbCold,
     helpers::{
-        display_general_verifier, get_danger_status, open_db, open_tree,
+        display_general_verifier, get_danger_status, open_db, open_tree, remove_metadata,
+        remove_network, remove_types_info, transfer_metadata_to_cold,
         try_get_valid_current_verifier, upd_id_batch,
     },
     hot_default::reset_hot_database,
@@ -50,11 +51,8 @@ use crate::{
     },
     manage_history::{
         device_was_online, enter_events, events_to_batch, print_history,
-        print_history_entry_by_order, reset_danger_status_to_safe,
+        /*print_history_entry_by_order, */ reset_danger_status_to_safe,
     },
-    metadata::transfer_metadata_to_cold,
-    remove_network::{remove_metadata, remove_network},
-    remove_types::remove_types_info,
 };
 
 #[test]
@@ -729,7 +727,7 @@ fn test_derive() {
     let only_one_network = vec![network_id_0];
 
     try_create_seed(seed_name, ALICE_SEED_PHRASE, true, dbname).unwrap();
-    let (adds1, events1) = {
+    let prep_data_1 = {
         create_address::<Signer>(
             dbname,
             &Vec::new(),
@@ -741,11 +739,11 @@ fn test_derive() {
         .unwrap()
     };
     TrDbCold::new()
-        .set_addresses(upd_id_batch(Batch::default(), adds1)) // modify addresses
-        .set_history(events_to_batch::<Signer>(dbname, events1).unwrap()) // add corresponding history
+        .set_addresses(upd_id_batch(Batch::default(), prep_data_1.address_prep)) // modify addresses
+        .set_history(events_to_batch::<Signer>(dbname, prep_data_1.history_prep).unwrap()) // add corresponding history
         .apply::<Signer>(dbname)
         .unwrap();
-    let (adds2, events2) = {
+    let prep_data_2 = {
         create_address::<Signer>(
             dbname,
             &Vec::new(),
@@ -757,11 +755,11 @@ fn test_derive() {
         .unwrap()
     };
     TrDbCold::new()
-        .set_addresses(upd_id_batch(Batch::default(), adds2)) // modify addresses
-        .set_history(events_to_batch::<Signer>(dbname, events2).unwrap()) // add corresponding history
+        .set_addresses(upd_id_batch(Batch::default(), prep_data_2.address_prep)) // modify addresses
+        .set_history(events_to_batch::<Signer>(dbname, prep_data_2.history_prep).unwrap()) // add corresponding history
         .apply::<Signer>(dbname)
         .unwrap();
-    let (adds3, events3) = {
+    let prep_data_3 = {
         create_address::<Signer>(
             dbname,
             &Vec::new(),
@@ -773,8 +771,8 @@ fn test_derive() {
         .unwrap()
     };
     TrDbCold::new()
-        .set_addresses(upd_id_batch(Batch::default(), adds3)) // modify addresses
-        .set_history(events_to_batch::<Signer>(dbname, events3).unwrap()) // add corresponding history
+        .set_addresses(upd_id_batch(Batch::default(), prep_data_3.address_prep)) // modify addresses
+        .set_history(events_to_batch::<Signer>(dbname, prep_data_3.history_prep).unwrap()) // add corresponding history
         .apply::<Signer>(dbname)
         .unwrap();
     let identities = get_addresses_by_seed_name(dbname, seed_name).unwrap();
@@ -1321,6 +1319,7 @@ fn test_all_events() {
     std::fs::remove_dir_all(dbname).unwrap();
 }
 
+/*
 #[test]
 fn print_single_event() {
     let dbname = "for_tests/print_single_event";
@@ -1336,6 +1335,7 @@ fn print_single_event() {
     );
     std::fs::remove_dir_all(dbname).unwrap();
 }
+*/
 
 fn check_for_network(name: &str, version: u32, dbname: &str) -> bool {
     let database: Db = open(dbname).unwrap();
