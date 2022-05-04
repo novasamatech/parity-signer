@@ -40,7 +40,8 @@ use definitions::{
     users::AddressDetails,
 };
 
-use crate::manage_history::get_history_entry_by_order;
+use crate::helpers::get_general_verifier;
+use crate::manage_history::get_history;
 use crate::{
     cold_default::{
         populate_cold, populate_cold_no_metadata, populate_cold_release, signer_init_no_cert,
@@ -48,8 +49,8 @@ use crate::{
     },
     db_transactions::TrDbCold,
     helpers::{
-        get_danger_status, get_general_verifier, open_db, open_tree,
-        try_get_valid_current_verifier, upd_id_batch,
+        get_danger_status, open_db, open_tree, remove_metadata, remove_network, remove_types_info,
+        transfer_metadata_to_cold, try_get_valid_current_verifier, upd_id_batch,
     },
     hot_default::reset_hot_database,
     identities::{
@@ -64,11 +65,8 @@ use crate::{
         show_all_networks, show_all_networks_with_flag, show_types_status, SeedDraft,
     },
     manage_history::{
-        device_was_online, enter_events, events_to_batch, get_history, reset_danger_status_to_safe,
+        device_was_online, enter_events, events_to_batch, reset_danger_status_to_safe,
     },
-    metadata::transfer_metadata_to_cold,
-    remove_network::{remove_metadata, remove_network},
-    remove_types::remove_types_info,
 };
 
 #[test]
@@ -573,12 +571,14 @@ fn westend_network_details() {
         },
         meta: vec![
             MMetadataRecord {
+                specname: "westend".to_string(),
                 specs_version: "9000".to_string(),
                 meta_hash: "e80237ad8b2e92b72fcf6beb8f0e4ba4a21043a7115c844d91d6c4f981e469ce"
                     .to_string(),
                 meta_id_pic: westend_9000().to_vec(),
             },
             MMetadataRecord {
+                specname: "westend".to_string(),
                 specs_version: "9010".to_string(),
                 meta_hash: "70c99738c27fb32c87883f1c9c94ee454bf0b3d88e4a431a2bbfe1222b46ebdf"
                     .to_string(),
@@ -1094,7 +1094,7 @@ fn test_derive() {
     let only_one_network = vec![network_id_0];
 
     try_create_seed(seed_name, ALICE_SEED_PHRASE, true, dbname).unwrap();
-    let (adds1, events1) = {
+    let prep_data_1 = {
         create_address::<Signer>(
             dbname,
             &Vec::new(),
@@ -1106,11 +1106,11 @@ fn test_derive() {
         .unwrap()
     };
     TrDbCold::new()
-        .set_addresses(upd_id_batch(Batch::default(), adds1)) // modify addresses
-        .set_history(events_to_batch::<Signer>(dbname, events1).unwrap()) // add corresponding history
+        .set_addresses(upd_id_batch(Batch::default(), prep_data_1.address_prep)) // modify addresses
+        .set_history(events_to_batch::<Signer>(dbname, prep_data_1.history_prep).unwrap()) // add corresponding history
         .apply::<Signer>(dbname)
         .unwrap();
-    let (adds2, events2) = {
+    let prep_data_2 = {
         create_address::<Signer>(
             dbname,
             &Vec::new(),
@@ -1122,11 +1122,11 @@ fn test_derive() {
         .unwrap()
     };
     TrDbCold::new()
-        .set_addresses(upd_id_batch(Batch::default(), adds2)) // modify addresses
-        .set_history(events_to_batch::<Signer>(dbname, events2).unwrap()) // add corresponding history
+        .set_addresses(upd_id_batch(Batch::default(), prep_data_2.address_prep)) // modify addresses
+        .set_history(events_to_batch::<Signer>(dbname, prep_data_2.history_prep).unwrap()) // add corresponding history
         .apply::<Signer>(dbname)
         .unwrap();
-    let (adds3, events3) = {
+    let prep_data_3 = {
         create_address::<Signer>(
             dbname,
             &Vec::new(),
@@ -1138,8 +1138,8 @@ fn test_derive() {
         .unwrap()
     };
     TrDbCold::new()
-        .set_addresses(upd_id_batch(Batch::default(), adds3)) // modify addresses
-        .set_history(events_to_batch::<Signer>(dbname, events3).unwrap()) // add corresponding history
+        .set_addresses(upd_id_batch(Batch::default(), prep_data_3.address_prep)) // modify addresses
+        .set_history(events_to_batch::<Signer>(dbname, prep_data_3.history_prep).unwrap()) // add corresponding history
         .apply::<Signer>(dbname)
         .unwrap();
     let identities = get_addresses_by_seed_name(dbname, seed_name).unwrap();
@@ -2235,6 +2235,7 @@ fn test_all_events() {
     std::fs::remove_dir_all(dbname).unwrap();
 }
 
+/*
 #[test]
 fn print_single_event() {
     let dbname = "for_tests/print_single_event";
@@ -2251,6 +2252,7 @@ fn print_single_event() {
 
     std::fs::remove_dir_all(dbname).unwrap();
 }
+*/
 
 fn check_for_network(name: &str, version: u32, dbname: &str) -> bool {
     let database: Db = open(dbname).unwrap();

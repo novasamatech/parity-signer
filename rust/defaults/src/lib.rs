@@ -11,9 +11,9 @@
 //!
 //! Default build of the cold database for Signer includes:
 //!
-//! - general verifier [`Verifier`] set to `Some(VerifierValue)` with Parity
+//! - general verifier `Verifier` set to `Some(VerifierValue)` with Parity
 //! public key as a verifier value
-//! - network specs [`NetworkSpecs`] for default networks
+//! - network specs `NetworkSpecs` for default networks
 //! - verifiers for default networks, set to
 //! `CurrentVerifier::Valid(ValidCurrentVerifier::General)`
 //! - two latest metadata versions for each of the default networks
@@ -27,7 +27,7 @@
 //!
 //! Default hot database contains:
 //!
-//! - network specs [`NetworkSpecsToSend`] for default networks
+//! - network specs `NetworkSpecsToSend` for default networks
 //! - address book containing the data for default networks
 //! - default types information
 //!

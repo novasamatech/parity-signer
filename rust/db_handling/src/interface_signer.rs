@@ -1,3 +1,13 @@
+//! Utils to communicate with the Signer frontend
+//!
+//! This will be obsolete or majorly reworked at least when jsons "manual"
+//! export is gone.
+//!
+//! Currently Signer receives from the frontend String inputs with
+//! **individual** object identifiers (e.g. single hexadecimal
+//! [`NetworkSpecsKey`] or single hexadecimal [`AddressKey`]). Signer sends
+//! json-like Strings with multiple fields, to be processed in the frontend to
+//! generate screens.
 use bip39::{Language, Mnemonic};
 use blake2_rfc::blake2b::blake2b;
 use hex;
@@ -31,7 +41,7 @@ use definitions::{
 use qrcode_static::png_qr_from_string;
 
 use crate::helpers::{
-    get_address_details, get_general_verifier, get_meta_values_by_name,
+    get_address_details, get_all_networks, get_general_verifier, get_meta_values_by_name,
     get_meta_values_by_name_version, get_network_specs, make_batch_clear_tree, open_db, open_tree,
     try_get_types,
 };
@@ -39,11 +49,20 @@ use crate::identities::{
     derivation_check, generate_random_phrase, get_addresses_by_seed_name, get_all_addresses,
     DerivationCheck,
 };
-use crate::network_details::get_all_networks;
 use crate::{db_transactions::TrDbCold, helpers::get_valid_current_verifier};
 
-/// Function to print all seed names with identicons
-/// Gets used only on the Signer side, interacts with the user interface.
+/// Make json with all seed names with seed key identicons if seed key is
+/// available.
+///
+/// Function processes all seeds known to Signer KMS (which are input as
+/// `&[String]`), including seeds without any corresponding addresses currently
+/// known to Signer (orphans).
+///
+/// If the same seed has more than one seed key in the database, i.e. it has
+/// been used to create seed keys with more than one
+/// [`Encryption`](definitions::crypto::Encryption) algorithm, only one
+/// identicon is selected, in order of preference: `Sr25519`, `Ed25519`,
+/// `Ecdsa`.
 pub fn get_all_seed_names_with_identicons(
     database_name: &str,
     names_phone_knows: &[String],
@@ -51,7 +70,7 @@ pub fn get_all_seed_names_with_identicons(
     let mut data_set: HashMap<String, Vec<MultiSigner>> = HashMap::new();
     for (multisigner, address_details) in get_all_addresses(database_name)?.into_iter() {
         if address_details.is_root() {
-            // found a root; could be any of the supported encryptions;
+            // found a seed key; could be any of the supported encryptions;
             match data_set.get(&address_details.seed_name) {
                 Some(root_set) => {
                     for id in root_set.iter() {
@@ -90,6 +109,15 @@ pub fn get_all_seed_names_with_identicons(
     Ok(res)
 }
 
+/// Print hex encoded `png` identicon data, for preferred encryption if
+/// multiple encryption algorithms are supported.
+///
+/// Output is:
+///
+/// - empty `png` if no seed key is available
+/// - the available seed key if there is only one
+/// - preferred seed key, if there are more than one; order of preference:
+/// `Sr25519`, `Ed25519`, `Ecdsa`
 fn preferred_multisigner_identicon(multisigner_set: &[MultiSigner]) -> Vec<u8> {
     if multisigner_set.is_empty() {
         EMPTY_PNG.to_vec()
@@ -116,8 +144,13 @@ fn preferred_multisigner_identicon(multisigner_set: &[MultiSigner]) -> Vec<u8> {
     }
 }
 
-/// Function to print all identities (seed names AND derication paths) with identicons
-/// Gets used only on the Signer side, interacts with the user interface.
+/// Make json with address-associated public data for all addresses from the
+/// Signer database.
+///
+/// Function is used to show users all possible addresses, when selecting the
+/// address to generate
+/// [`SufficientCrypto`](definitions::crypto::SufficientCrypto) for signing
+/// updates with the Signer.
 pub fn print_all_identities(database_name: &str) -> Result<Vec<MRawKey>, ErrorSigner> {
     Ok(get_all_addresses(database_name)?
         .into_iter()
@@ -137,8 +170,14 @@ pub fn print_all_identities(database_name: &str) -> Result<Vec<MRawKey>, ErrorSi
         .collect())
 }
 
-/// Function to print separately root identity and derived identities for given seed name and network specs key.
-/// Is used only on the Signer side, interacts only with navigation.
+/// Make json with address-associated public data for all addresses from the
+/// Signer database with given seed name and network [`NetworkSpecsKey`].
+///
+/// In addition, marks with flags swiped key or group of keys in multiselect
+/// selection.
+///
+/// Separately processes the seed key. If there is no seed key, empty export for
+/// seed key is still generated.
 pub fn print_identities_for_seed_name_and_network(
     database_name: &str,
     seed_name: &str,
@@ -200,7 +239,8 @@ pub fn print_identities_for_seed_name_and_network(
     Ok((root, set, network_specs.title, network_specs.logo))
 }
 
-/// Function to get addresses for given seed name and network specs key
+/// Get address-associated public data for all addresses from the Signer
+/// database with given seed name and network [`NetworkSpecsKey`].
 pub fn addresses_set_seed_name_network(
     database_name: &str,
     seed_name: &str,
@@ -212,7 +252,8 @@ pub fn addresses_set_seed_name_network(
         .collect())
 }
 
-/// Function to print all networks, with bool indicator which one is currently selected
+/// Make json with network information for all networks in the Signer database,
+/// with bool indicator which one is currently selected.
 pub fn show_all_networks_with_flag(
     database_name: &str,
     network_specs_key: &NetworkSpecsKey,
@@ -232,7 +273,8 @@ pub fn show_all_networks_with_flag(
     Ok(MNetworkMenu { networks })
 }
 
-/// Function to print all networks without any selection
+/// Make vec with network information for all networks in the Signer database,
+/// without any selection.
 pub fn show_all_networks(database_name: &str) -> Result<Vec<MMNetwork>, ErrorSigner> {
     let networks = get_all_networks::<Signer>(database_name)?;
     let mut networks = networks
@@ -251,8 +293,12 @@ pub fn show_all_networks(database_name: &str) -> Result<Vec<MMNetwork>, ErrorSig
     Ok(networks)
 }
 
-/// Function to sort networks by the order and get the network specs for the first network on the list.
-/// If no networks in the system, throws error
+/// Sort database networks by the order and get the network specs for the first
+/// network on the list.
+///
+/// If there are no networks in the system, throws error.
+// TODO: should be an option, not an error. Forbid getting to this point from ui
+// for the seed making process, allow backups.
 pub fn first_network(database_name: &str) -> Result<NetworkSpecs, ErrorSigner> {
     let mut networks = get_all_networks::<Signer>(database_name)?;
     if networks.is_empty() {
@@ -262,11 +308,16 @@ pub fn first_network(database_name: &str) -> Result<NetworkSpecs, ErrorSigner> {
     Ok(networks.remove(0))
 }
 
-/// Function to prepare the export key screen.
-/// Contains among else the QR code with identity information, in format
-/// `substrate:{public_key as as_base58}:0x{network_key}`,
-/// this string is transformed into bytes, then into png qr code, then qr code
-/// content is hexed so that it could be transferred into app.
+/// Prepare export key screen json.
+///
+/// For QR code the address information is put in format
+/// `substrate:{public key as base58}:0x{network genesis hash}`
+/// transformed into bytes, to be compatible with `polkadot-js` interface.
+///
+/// Note that no [`Encryption`](definitions::crypto::Encryption) algorithm
+/// information is contained in the QR code. If there are multiple `Encryption`
+/// algorithms supported by the network, the only visible difference in exports
+/// would be the identicon.
 pub fn export_key(
     database_name: &str,
     multisigner: &MultiSigner,
@@ -319,8 +370,10 @@ pub fn export_key(
     })
 }
 
-/// Function to prepare seed backup screen.
-/// Gets seed name, outputs all known derivations in all networks.
+/// Prepare seed backup screen json for given seed name.
+///
+/// Function inputs seed name, outputs vec with all known derivations in all
+/// networks.
 pub fn backup_prep(database_name: &str, seed_name: &str) -> Result<MBackup, ErrorSigner> {
     let networks = get_all_networks::<Signer>(database_name)?;
     if networks.is_empty() {
@@ -357,8 +410,18 @@ pub fn backup_prep(database_name: &str, seed_name: &str) -> Result<MBackup, Erro
     })
 }
 
-/// Function to prepare key derivation screen.
-/// Gets seed name, network specs key and suggested derivation
+/// Prepare key derivation screen json.
+///
+/// Function inputs seed name, network [`NetworkSpecsKey`] and user-suggested
+/// derivation, outputs json with derived address data and, if the derived
+/// address already exists in the database, shows the its data.
+///
+// TODO: the `collision` part is actually a mislabel, it is really
+// `derivation_exists`, and is referring to the derivation with same
+// [`AddressKey`] in same network (that would be cause by same seed used, same
+// derivation path and same password if any password exists) - this mislabel
+// should be corrected, after json fix; `seed_name` in existing derivation
+// display also seems to be excessive
 pub fn derive_prep(
     database_name: &str,
     seed_name: &str,
@@ -395,8 +458,21 @@ pub fn derive_prep(
     })
 }
 
-/// Function to show (dynamically) if the derivation with the provided path and no password already exists
-/// and if it exists, prints its details
+/// Make json with allowed action details for new key derivation.
+///
+/// Function is used to dynamically check from the frontend if user is allowed
+/// to proceed with the proposed derived key generation.
+///
+/// Note that the function is unfallible and always produces a json string.
+///
+/// User is allowed to try to proceed only if the derivation is valid and, in
+/// case of derivations without password, if the derivation does not already
+/// exist in the database. Passworded valid derivations are allowed to proceed,
+/// but result in an error later on, if the derivation exists.
+///
+/// Function makes only preliminary check on password-free derivations, it
+/// **does not** use seed phrase and does not calculate the [`AddressKey`], i.e.
+/// it can't check passworded derivations, and allows them to proceed anyway.
 pub fn dynamic_path_check(
     database_name: &str,
     seed_name: &str,
@@ -459,7 +535,8 @@ pub fn dynamic_path_check(
     }
 }
 
-/// Print network specs and metadata set information for network with given network specs key.
+/// Make json with network specs and metadata set information for network with
+/// given [`NetworkSpecsKey`].
 pub fn network_details_by_key(
     database_name: &str,
     network_specs_key: &NetworkSpecsKey,
@@ -481,7 +558,7 @@ pub fn network_details_by_key(
     let verifier_key = VerifierKey::from_parts(genesis_hash.as_bytes());
     let general_verifier = get_general_verifier(database_name)?;
     let current_verifier = get_valid_current_verifier(&verifier_key, database_name)?;
-    let meta: Vec<_> = get_meta_values_by_name::<Signer>(database_name, &name)?
+    let meta: Vec<_> = get_meta_values_by_name(database_name, &name)?
         .into_iter()
         .map(|m| {
             let meta_hash = blake2b(32, &[], &m.meta).as_bytes().to_vec();
@@ -520,7 +597,8 @@ pub fn network_details_by_key(
     })
 }
 
-/// Print metadata details for given network specs key and version.
+/// Make json with metadata details for network with given [`NetworkSpecsKey`]
+/// and given version.
 pub fn metadata_details(
     database_name: &str,
     network_specs_key: &NetworkSpecsKey,
@@ -557,7 +635,7 @@ pub fn metadata_details(
     })
 }
 
-/// Display types status
+/// Make types status display.
 pub fn show_types_status(database_name: &str) -> Result<MTypesInfo, ErrorSigner> {
     match try_get_types::<Signer>(database_name)? {
         Some(a) => {
@@ -576,8 +654,8 @@ pub fn show_types_status(database_name: &str) -> Result<MTypesInfo, ErrorSigner>
     }
 }
 
-/// Function to generate new random seed phrase, make identicon for sr25519 public key,
-/// and send to Signer screen
+/// Generate new random seed phrase, make identicon for sr25519 public key,
+/// and send to Signer screen.
 pub fn print_new_seed(seed_name: &str) -> Result<MNewSeedBackup, ErrorSigner> {
     let seed_phrase = generate_random_phrase(24)?;
     let sr25519_pair = match sr25519::Pair::from_string(&seed_phrase, None) {
@@ -596,7 +674,7 @@ pub fn print_new_seed(seed_name: &str) -> Result<MNewSeedBackup, ErrorSigner> {
     })
 }
 
-/// Function to get database history tree checksum to be displayed in log screen
+/// Get database history tree checksum to be displayed in log screen.
 pub fn history_hex_checksum(database_name: &str) -> Result<String, ErrorSigner> {
     let database = open_db::<Signer>(database_name)?;
     let history = open_tree::<Signer>(&database, HISTORY)?;
@@ -609,16 +687,20 @@ pub fn history_hex_checksum(database_name: &str) -> Result<String, ErrorSigner> 
     ))
 }
 
-/// Function to clear transaction tree of the database, for cases when transaction is declined by the user
-/// (e.g. user has scanned something, read it, clicked `back`)
+/// Clear transaction tree of the database.
+///
+/// Function is intended for cases when transaction is declined by the user
+/// (e.g. user has scanned something, read it, clicked `back` or `decline`)
 pub fn purge_transactions(database_name: &str) -> Result<(), ErrorSigner> {
     TrDbCold::new()
         .set_transaction(make_batch_clear_tree::<Signer>(database_name, TRANSACTION)?) // clear transaction
         .apply::<Signer>(database_name)
 }
 
-/// Function to display possible options of English code words from allowed words list
-/// that start with already entered piece
+/// Get possible options of English bip39 words that start with user-entered
+/// word part.
+///
+/// List lentgh limit is [`MAX_WORDS_DISPLAY`].
 pub fn guess(word_part: &str) -> Vec<&'static str> {
     let dictionary = Language::English.wordlist();
     let words = dictionary.get_words_by_prefix(word_part);
@@ -629,62 +711,89 @@ pub fn guess(word_part: &str) -> Vec<&'static str> {
     }
 }
 
-/// Function to dynamically update suggested seed phrase words,
-/// based on user entered word part.
-/// Produces json-like export with maximum 8 fitting words, sorted by alphabetical order.
+/// Make json with possible options of English bip39 words that start with
+/// user-entered word part.
+///
+//// List lentgh limit is [`MAX_WORDS_DISPLAY`], sorted alphabetically.
 pub fn print_guess(user_entry: &str) -> String {
     export_plain_vector(&guess(user_entry))
 }
 
-pub const BIP_CAP: usize = 24; // maximum word count in bip39 standard, see https://docs.rs/tiny-bip39/0.8.2/src/bip39/mnemonic_type.rs.html#60
-pub const WORD_LENGTH: usize = 8; // maximum word length in bip39 standard
-pub const SAFE_RESERVE: usize = 1000; // string length to reserve for json output of numbered draft; each element is {"order":**,"content":"********"}, at most 33+1(comma) symbols for each max BIP_CAP elements, two extras for [ and ], and some extra space just in case
+/// Maximum word count in bip39 standard.
+///
+/// See <https://docs.rs/tiny-bip39/0.8.2/src/bip39/mnemonic_type.rs.html#60>
+pub const BIP_CAP: usize = 24;
 
-/// Struct to store seed draft, as entered by user
+/// Maximum word length in bip39 standard.
+pub const WORD_LENGTH: usize = 8;
+
+/// String length to reserve for json output of numbered draft.
+///
+/// Each element is {"order":**,"content":"********"}, at most 33 + 1 (comma)
+/// symbols for each max BIP_CAP elements, two extras for `[` and `]`, and some
+/// extra space just in case.
+pub const SAFE_RESERVE: usize = 1000;
+
+/// Zeroizeable seed phrase draft.
 #[derive(Debug, Clone, Zeroize, ZeroizeOnDrop)]
 pub struct SeedDraft {
+    /// User-entered word part.
     user_input: String,
+
+    /// Already completed bip39 words.
     saved: Vec<SeedElement>,
 }
 
-/// Struct to store seed element, as entered by user
+/// Zeroizeable wrapper around complete bip39 word entered by user.
 #[derive(Debug, Clone, Zeroize, ZeroizeOnDrop)]
 struct SeedElement(String);
 
 impl SeedElement {
+    /// Make `SeedElement` from checked bip39 word.
     fn from_checked_str(word: &str) -> Self {
         let mut new = String::with_capacity(WORD_LENGTH);
         new.push_str(word);
         SeedElement(new)
     }
+
+    /// Get bip39 word from the `SeedElement`.
     fn word(&self) -> &str {
         &self.0
     }
 }
 
 impl SeedDraft {
+    /// Start new `SeedDraft`
     pub fn initiate() -> Self {
         Self {
             user_input: String::with_capacity(WORD_LENGTH), // capacity corresponds to maximum word length in bip39 standard;
             saved: Vec::with_capacity(BIP_CAP), // capacity corresponds to maximum word count in bip39 standard; set here to avoid reallocation;
         }
     }
+
+    /// Modify `SeedDraft` with updated `user_text` from the frontend.
+    ///
+    /// Note that `user_text` input by default starts with ' ' (space). If user
+    /// removes this space, it results in removing whole previous word.
     pub fn text_field_update(&mut self, user_text: &str) {
         if self.saved.len() < BIP_CAP {
             if user_text.is_empty() {
                 // user has removed all text, including the first default symbol
                 // if there are words in draft, remove the last one
                 self.remove_last();
-                // restore the user input to emtpy one
+                // restore the user input to empty one
                 self.user_input.clear();
             } else {
                 let user_text = user_text.trim_start();
+
+                // ' ' (space) in the end of the word indicates user attempt to
+                // submit the word into seed phrase
                 if user_text.ends_with(' ') {
                     let word = user_text.trim();
                     if self.added(word, None) {
-                        self.user_input.clear()
+                        self.user_input.clear() // added the word successfully, clear `user_input`
                     } else if !guess(word).is_empty() {
-                        self.user_input = String::from(word)
+                        self.user_input = String::from(word) // did not add the word, there are still possible variants, keep trimmed `user_input`
                     }
                 } else if !guess(user_text).is_empty() {
                     self.user_input = String::from(user_text)
@@ -695,16 +804,23 @@ impl SeedDraft {
         }
     }
 
+    /// User tries to add the word to the `saved` field of the `SeedDraft`.
+    /// Output is `true` if addition happens. `SeedDraft` gets modified in the
+    /// process.
+    ///
+    /// Optional `position` input could be used to mark the position in seed
+    /// phrase to add the word to.
     pub fn added(&mut self, word: &str, position: Option<u32>) -> bool {
+        // maximum number of the words is not reached
         if self.saved.len() < BIP_CAP {
             let guesses = guess(word);
             let definitive_guess = {
                 if guesses.len() == 1 {
-                    Some(guesses[0])
+                    Some(guesses[0]) // only one possible variant
                 } else if guesses.contains(&word) {
-                    Some(word)
+                    Some(word) // exactly matching variant
                 } else {
-                    None
+                    None // no definitive match, no addition
                 }
             };
             if let Some(guess) = definitive_guess {
@@ -713,12 +829,12 @@ impl SeedDraft {
                     Some(p) => {
                         let p = p as usize;
                         if p <= self.saved.len() {
-                            self.saved.insert(p, new)
+                            self.saved.insert(p, new) // position is reasonable, use it
                         } else {
-                            self.saved.push(new)
+                            self.saved.push(new) // position is **not** reasonable, add word at the end of the list
                         }
                     }
-                    None => self.saved.push(new),
+                    None => self.saved.push(new), // no position, add word at the end of the list
                 }
                 self.user_input.clear();
                 true
@@ -730,6 +846,7 @@ impl SeedDraft {
         }
     }
 
+    /// Remove word at given position from the saved seed phrase draft.
     pub fn remove(&mut self, position: u32) {
         let position = position as usize;
         if position < self.saved.len() {
@@ -737,14 +854,18 @@ impl SeedDraft {
         }
     }
 
+    /// Remove last word from the saved seed phrase draft.
     pub fn remove_last(&mut self) {
         if !self.saved.is_empty() {
             self.saved.remove(self.saved.len() - 1);
         }
     }
 
+    /// Make json with seed phrase draft.
+    ///
+    /// Resulting json contains a secret and should be handled as such.
     pub fn print(&self) -> String {
-        let mut out = String::with_capacity(SAFE_RESERVE);
+        let mut out = String::with_capacity(SAFE_RESERVE); // length set here to avoid reallocation
         out.push('[');
         for (i, x) in self.saved.iter().enumerate() {
             if i > 0 {
@@ -786,7 +907,7 @@ impl SeedDraft {
         }
     }
 
-    /// Function to output the user input back into user interface
+    /// Output the user input back into user interface.
     pub fn user_input(&self) -> &str {
         &self.user_input
     }

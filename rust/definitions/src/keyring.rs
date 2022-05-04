@@ -2,8 +2,8 @@
 //!
 //! Cold database has following trees:  
 //!
-//! - `SPECSTREE`, for network specs [`NetworkSpecs`](crate::network_specs::NetworkSpecs)
-//! entries, with keys [`NetworkSpecsKey`]  
+//! - `SPECSTREE`, for network specs `NetworkSpecs` entries, with keys
+//! [`NetworkSpecsKey`]  
 //! - `VERIFIERS`, for network verifier [`CurrentVerifier`](crate::network_specs::CurrentVerifier)
 //! entries, with keys [`VerifierKey`]  
 //! - `METATREE`, for `Vec<u8>` metadata entries, with keys [`MetaKey`] and
@@ -25,9 +25,8 @@
 //! - `METATREE`, for `Vec<u8>` metadata entries, with keys [`MetaKey`] and
 //! prefix search with [`MetaKeyPrefix`]  
 //! - `SETTREE`, for types information  
-//! - `ADDRESS_BOOK` for [`AddressBookEntry`](crate::metadata::AddressBookEntry)
-//! data needed to maintain hot database and send rpc calls to fetch network
-//! information, with keys [`AddressBookKey`]  
+//! - `ADDRESS_BOOK` for `AddressBookEntry` data needed to maintain hot database
+//! and send rpc calls to fetch network information, with keys `AddressBookKey`
 //!
 use parity_scale_codec::{Decode, Encode};
 use sled::IVec;

@@ -252,7 +252,7 @@ pub(crate) fn parse_transaction(
                         }
                         break;
                     }
-                    Err(e) => error_collection.push((used_version, e)),
+                    Err(e) => error_collection.push((used_version, e)), // TODO output transaction author info
                 }
             }
             match found_solution {

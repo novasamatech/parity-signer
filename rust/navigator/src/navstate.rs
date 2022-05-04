@@ -878,7 +878,7 @@ impl State {
         match self.navstate.screen {
             Screen::NetworkDetails(ref network_specs_key) => {
                 if let Modal::NetworkDetailsMenu = self.navstate.modal {
-                    match db_handling::remove_network::remove_network(network_specs_key, dbname) {
+                    match db_handling::helpers::remove_network(network_specs_key, dbname) {
                         Ok(()) => {
                             new_navstate = Navstate::clean_screen(Screen::ManageNetworks);
                         }
@@ -901,7 +901,7 @@ impl State {
         match self.navstate.screen {
             Screen::NetworkDetails(ref network_specs_key) => match self.navstate.modal {
                 Modal::ManageMetadata(network_version) => {
-                    match db_handling::remove_network::remove_metadata(
+                    match db_handling::helpers::remove_metadata(
                         network_specs_key,
                         network_version,
                         dbname,
@@ -930,7 +930,7 @@ impl State {
         let mut errorline = String::new();
         match self.navstate.screen {
             Screen::ManageNetworks => match self.navstate.modal {
-                Modal::TypesInfo => match db_handling::remove_types::remove_types_info(dbname) {
+                Modal::TypesInfo => match db_handling::helpers::remove_types_info(dbname) {
                     Ok(()) => {
                         new_navstate = Navstate::clean_screen(Screen::Log);
                     }

@@ -1,8 +1,7 @@
 use constants::{METATREE, SETTREE, SPECSTREE, TYPES, VERIFIERS};
 use db_handling::{
     db_transactions::TrDbColdStub,
-    helpers::{get_general_verifier, open_db, open_tree},
-    prep_messages::prep_types,
+    helpers::{get_general_verifier, open_db, open_tree, prep_types},
 };
 use definitions::{
     error::ErrorSource,

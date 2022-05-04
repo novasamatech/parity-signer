@@ -551,9 +551,18 @@ fn not_found_signer() -> Vec<NotFoundSigner> {
 /// Collecting all [`AddressGenerationCommon`] errors.
 fn address_generation_common() -> Vec<AddressGenerationCommon> {
     // `KeyCollision` error.
-    let mut out = vec![AddressGenerationCommon::KeyCollision {
-        seed_name: String::from("Alice"),
-    }];
+    let mut out = vec![
+        AddressGenerationCommon::KeyCollision {
+            seed_name: String::from("Alice"),
+        },
+        AddressGenerationCommon::KeyCollisionBatch {
+            seed_name_existing: String::from("Alice"),
+            seed_name_new: String::from("Alice"),
+            cropped_path_existing: String::from("//1"),
+            cropped_path_new: String::from("//01"),
+            in_this_network: true,
+        },
+    ];
 
     // `AddressGenerationCommon` errors.
     out.append(
@@ -1094,6 +1103,7 @@ mod tests {
 "Unable to import derivations for network with genesis hash e143f23803ca50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e and encryption sr25519. Network is unknown. Please add corresponding network specs."
 "Network with genesis hash 853faffbfc6713c1f899bf16547fcfbf733ae8361b8ca0129699d01d4f2181fd is disabled. It could be enabled again only after complete wipe and re-installation of Signer."
 "Error generating address. Address key collision for seed name Alice"
+"Error generating address. Tried to create colliding addresses within same network. Address for seed name Alice and path //01 has same public key as address for seed name Alice and path //1."
 "Error generating address. Bad secret string: invalid overall format."
 "Error generating address. Bad secret string: invalid bip39 phrase."
 "Error generating address. Bad secret string: invalid password."
