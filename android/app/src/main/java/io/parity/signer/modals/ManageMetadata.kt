@@ -23,10 +23,12 @@ import io.parity.signer.ui.theme.modal
 import org.json.JSONObject
 import io.parity.signer.uniffi.Action
 import io.parity.signer.uniffi.MNetworkDetails
+import io.parity.signer.uniffi.MmManageNetworks
+import io.parity.signer.uniffi.MscNetworkInfo
 
 @Composable
 fun ManageMetadata(
-	networks: MNetworkDetails,
+	networks: MmManageNetworks,
 	signerDataModel: SignerDataModel
 ) {
 	var confirm by remember { mutableStateOf(false) }
@@ -49,13 +51,13 @@ fun ManageMetadata(
 					Row {
 						Text("Used for:")
 						LazyColumn {
-							items(networks.meta.size) { index ->
-								MetadataCard(networks.meta[index]) // TODO: This has to go here?
-								/* Types don't match again
+							items(networks.networks.size) { index ->
 								NetworkCard(
-									network = networks.meta[index]
+									network = MscNetworkInfo(
+										networkTitle = networks.networks[index].title,
+										networkLogo = networks.networks[index].logo
+									)
 								)
-								 */
 							}
 						}
 					}

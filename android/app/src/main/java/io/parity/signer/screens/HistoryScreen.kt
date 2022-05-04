@@ -20,19 +20,18 @@ fun HistoryScreen(
 
 	Column {
 		LazyColumn {
-			for (order in 0..history.count()) {
-				val record = history[order]
+			for (record in history) {
 				val timestamp = record.timestamp
 
 				this.items(
 					items = record.events,
-					key = { order.toString() + it.toString() }
+					key = { record.order.toString() + it.toString() }
 				) { item ->
 					Row(
 						Modifier.clickable {
 							button(
 								Action.SHOW_LOG_DETAILS,
-								order.toString()
+								record.order.toString()
 							)
 						}
 					) {

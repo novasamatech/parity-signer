@@ -135,7 +135,7 @@ fun SeedBackup(
 	}
 
 	DisposableEffect(Unit) {
-		getSeedForBackup(seedName, {seedPhrase = it}, { seedBoxStatus = it })
+		getSeedForBackup(seedName, { seedPhrase = it }, { seedBoxStatus = it })
 		onDispose { seedPhrase = "" }
 	}
 }

@@ -1,5 +1,6 @@
 package io.parity.signer
 
+import android.util.Log
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.runtime.Composable
@@ -16,35 +17,39 @@ import io.parity.signer.models.SignerDataModel
 import io.parity.signer.models.increment
 import io.parity.signer.models.pushButton
 import io.parity.signer.screens.*
-import io.parity.signer.uniffi.Action
-import io.parity.signer.uniffi.ModalData
-import io.parity.signer.uniffi.ScreenData
+import io.parity.signer.uniffi.*
 
 @Composable
 fun ScreenSelector(
 	screenData: ScreenData,
-	alertState: State<ShieldAlert?>,
-  progress: State<Float?>,
+	alertState: State<AlertData?>,
+	progress: State<Float?>,
 	captured: State<Int?>,
 	total: State<Int?>,
 	button: (Action, String, String) -> Unit,
 	signerDataModel: SignerDataModel
 ) {
-	val button1: (Action) -> Unit = {action -> button(action, "", "")}
-	val button2: (Action, String) -> Unit = {action, details -> button(action, details, "")}
+	Log.w("SIGNER_RUST_LOG", "$screenData")
+	val button1: (Action) -> Unit = { action -> button(action, "", "") }
+	val button2: (Action, String) -> Unit =
+		{ action, details -> button(action, details, "") }
+	val button_add_key: (String, String) -> Unit =
+		{ details, a -> button(Action.NEW_KEY, details, a) }
 	when (screenData) {
 		is ScreenData.DeriveKey -> NewAddressScreen(
 			screenData.f,
-			signerDataModel = signerDataModel
+			button = button2,
+			addKey = button_add_key,
+			dbName = signerDataModel.dbName,
 		)
 		ScreenData.Documents -> Documents()
 		is ScreenData.KeyDetails -> ExportPublicKey(screenData.f)
 		is ScreenData.KeyDetailsMulti -> KeyDetailsMulti(
 			screenData.f,
-			signerDataModel = signerDataModel
+			button1,
 		)
 		is ScreenData.Keys -> KeyManager(
-			signerDataModel::pushButton,
+			button = button2,
 			signerDataModel::increment,
 			screenData.f,
 			alertState.value
@@ -53,11 +58,11 @@ fun ScreenSelector(
 		is ScreenData.LogDetails -> LogDetails(screenData.f)
 		is ScreenData.ManageNetworks -> ManageNetworks(
 			screenData.f,
-			signerDataModel = signerDataModel
+			button2,
 		)
 		is ScreenData.NNetworkDetails -> NetworkDetails(
-			screenData.f,
-			signerDataModel = signerDataModel
+			screenData.f,//default fallback
+			button2
 		)
 		is ScreenData.NewSeed -> NewSeedScreen(
 			screenData.f,
@@ -75,7 +80,11 @@ fun ScreenSelector(
 			signerDataModel = signerDataModel
 		)
 		ScreenData.Scan -> ScanScreen(
-			signerDataModel = signerDataModel
+			progress = progress,
+			captured = captured,
+			total = total,
+			button = signerDataModel::pushButton,
+			signerDataModel = signerDataModel,
 		)
 		is ScreenData.SeedSelector -> SeedManager(
 			screenData.f,
@@ -106,21 +115,39 @@ fun ScreenSelector(
 }
 
 @Composable
-fun ModalSelector(modalData: ModalData?, signerDataModel: SignerDataModel) {
+fun ModalSelector(
+	modalData: ModalData?,
+	alertState: AlertData?,
+	button: (Action, String, String) -> Unit,
+	signerDataModel: SignerDataModel
+) {
+	Log.w("SIGNER_RUST_LOG", "modal $modalData")
+	Log.w("SIGNER_RUST_LOG", "alert $alertState")
+	val button1: (Action) -> Unit = { action -> button(action, "", "") }
+	val button2: (Action, String) -> Unit =
+		{ action, details -> button(action, details, "") }
+	val seedButton: (String) -> Unit =
+		{ seed -> button(Action.GO_FORWARD, seed, "") }
 	when (modalData) {
-		is ModalData.NewSeedMenu -> NewSeedMenu(signerDataModel = signerDataModel)
+		is ModalData.NewSeedMenu -> when (alertState) {
+			AlertData.Confirm -> TODO()
+			is AlertData.ErrorData -> TODO()
+			is AlertData.Shield -> NewSeedMenu(alertState.f, button1)
+			null -> NewSeedMenu(null, button1)
+		}
 		is ModalData.SeedMenu -> SeedMenu(
 			modalData.f,
-			signerDataModel = signerDataModel
+			alertState,
+			button1,
+			removeSeed = seedButton
 		)
 		is ModalData.NetworkSelector -> NetworkSelector(
 			modalData.f,
-			signerDataModel = signerDataModel
+			button2
 		)
-		is ModalData.Backup -> SeedBackup(
+		is ModalData.Backup -> TODO() /*SeedBackup(
 			modalData.f,
-			signerDataModel = signerDataModel
-		)
+		)*/
 		is ModalData.PasswordConfirm -> PasswordConfirm(
 			modalData.f,
 			signerDataModel = signerDataModel
@@ -131,16 +158,18 @@ fun ModalSelector(modalData: ModalData?, signerDataModel: SignerDataModel) {
 		)
 		is ModalData.EnterPassword -> EnterPassword(
 			modalData.f,
+			button2,
+		)
+		is ModalData.LogRight -> LogMenu(
+			modalData.f,
 			signerDataModel = signerDataModel
 		)
-		is ModalData.LogRight -> LogMenu(modalData.f, signerDataModel = signerDataModel)
 		is ModalData.NetworkDetailsMenu -> NetworkDetailsMenu(signerDataModel = signerDataModel)
 		is ModalData.ManageMetadata -> {
-				ManageMetadata(modalData.f, signerDataModel = signerDataModel)
+			ManageMetadata(modalData.f, signerDataModel = signerDataModel)
 		}
 		is ModalData.SufficientCryptoReady -> SufficientCryptoReady(
 			modalData.f,
-			signerDataModel = signerDataModel
 		)
 		is ModalData.KeyDetailsAction -> KeyDetailsAction(signerDataModel = signerDataModel)
 		is ModalData.TypesInfo -> TypesInfo(
@@ -160,16 +189,28 @@ fun ModalSelector(modalData: ModalData?, signerDataModel: SignerDataModel) {
 	}
 }
 
+
 @Composable
-fun AlertSelector(alert: SignerAlert, signerDataModel: SignerDataModel) {
+fun AlertSelector(
+	alert: AlertData?,
+	button: (Action, String, String) -> Unit,
+	signerDataModel: SignerDataModel
+) {
+	val button1: (Action) -> Unit = { action -> button(action, "", "") }
+
+	val ackWarning: () -> Unit = { button1(Action.GO_BACK) }
 	when (alert) {
-		SignerAlert.Empty -> {}
-		SignerAlert.Error -> ErrorModal(
-			error = signerDataModel.alertData.value ?: "unknown error",
-			signerDataModel = signerDataModel
+		AlertData.Confirm -> Confirm(button = button1)
+		is AlertData.ErrorData -> ErrorModal(
+			error = alert.f,
+			button = button1
 		)
-		SignerAlert.Shield -> ShieldAlert(signerDataModel)
-		SignerAlert.Confirm -> Confirm(signerDataModel = signerDataModel)
+		is AlertData.Shield -> ShieldAlert(
+			alert.f,
+			button = button1,
+			acknowledgeWarning = ackWarning
+		)
+		null -> {}
 	}
 }
 
@@ -177,10 +218,4 @@ enum class OnBoardingState {
 	InProgress,
 	No,
 	Yes;
-}
-
-enum class ShieldAlert {
-	None,
-	Active,
-	Past
 }

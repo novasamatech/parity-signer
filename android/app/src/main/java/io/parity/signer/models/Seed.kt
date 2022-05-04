@@ -120,7 +120,7 @@ fun SignerDataModel.getSeedForBackup(
 	setSeedPhrase: (String) -> Unit,
 	setSeedBoxStatus: (SeedBoxStatus) -> Unit
 ) {
-	if (alertState.value == io.parity.signer.ShieldAlert.None) {
+	if (alertState.value == null) {
 		authentication.authenticate(activity) {
 			val seedPhrase = getSeed(seedName, backup = true)
 			if (seedPhrase.isBlank()) {

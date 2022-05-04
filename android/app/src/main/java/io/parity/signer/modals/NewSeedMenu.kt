@@ -6,21 +6,18 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.State
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import io.parity.signer.ShieldAlert
 import io.parity.signer.components.BigButton
 import io.parity.signer.components.HeaderBar
-import io.parity.signer.models.SignerDataModel
-import io.parity.signer.models.pushButton
 import io.parity.signer.ui.theme.Bg000
 import io.parity.signer.ui.theme.modal
 import io.parity.signer.uniffi.Action
+import io.parity.signer.uniffi.ShieldAlert
 
 @Composable
 fun NewSeedMenu(
-	shieldAlert: State<ShieldAlert?>,
+	shieldAlert: ShieldAlert?,
 	button: (Action) -> Unit
 ) {
 	Column {
@@ -36,7 +33,7 @@ fun NewSeedMenu(
 				BigButton(
 					text = "New seed",
 					action = {
-						if (shieldAlert.value == ShieldAlert.None)
+						if (shieldAlert == null)
 							button(Action.NEW_SEED)
 						else
 							button(Action.SHIELD)
@@ -44,7 +41,7 @@ fun NewSeedMenu(
 				BigButton(
 					text = "Recover seed",
 					action = {
-						if (shieldAlert.value == ShieldAlert.None)
+						if (shieldAlert == null)
 							button(Action.RECOVER_SEED)
 						else
 							button(Action.SHIELD)

@@ -41,7 +41,7 @@ class SignerDataModel : ViewModel() {
 	private var hasStrongbox: Boolean = false
 
 	// Alert
-	private val _alertState = MutableLiveData(ShieldAlert.None)
+	private val _alertState: MutableLiveData<AlertData?> = MutableLiveData(null)
 
 	// State of the app being unlocked
 	private val _authenticated = MutableLiveData(false)
@@ -74,17 +74,14 @@ class SignerDataModel : ViewModel() {
 	internal val _actionResult = MutableLiveData(
 		ActionResult(
 			"",
-			"",
 			false,
 			false,
-			"",
-			"",
-			"",
-			"",
-			"",
+			null,
+			null,
+			ScreenNameType.H4,
 			ScreenData.Documents,
-			ModalData.Text(""),
-			""
+			null,
+			null,
 		)
 	)
 
@@ -107,7 +104,7 @@ class SignerDataModel : ViewModel() {
 	val onBoardingDone: LiveData<OnBoardingState> = _onBoardingDone
 	val authenticated: LiveData<Boolean> = _authenticated
 
-	val alertState: LiveData<ShieldAlert> = _alertState
+	val alertState: LiveData<AlertData?> = _alertState
 
 	val actionResult: LiveData<ActionResult> = _actionResult
 
@@ -259,22 +256,25 @@ class SignerDataModel : ViewModel() {
 	 * Checks if airplane mode was off
 	 */
 	private fun isAirplaneOn() {
+		val alertData = actionResult?.value?.alertData
+
 		if (Settings.Global.getInt(
 				context.contentResolver,
 				Settings.Global.AIRPLANE_MODE_ON,
 				0
 			) == 0
 		) {
-			if (alertState.value != ShieldAlert.Active) {
-				_alertState.value = ShieldAlert.Active
+			if (alertData is AlertData.Shield && alertData.f != ShieldAlert.ACTIVE) {
+				actionResult?.value?.alertData = null
 				if (onBoardingDone.value == OnBoardingState.Yes) historyDeviceWasOnline(
 					dbName
 				)
 			}
 		} else {
-			if (alertState.value == ShieldAlert.Active) {
-				_alertState.value = if (onBoardingDone.value == OnBoardingState.Yes)
-					ShieldAlert.Past else ShieldAlert.None
+			if (alertData is AlertData.Shield && alertData.f != ShieldAlert.ACTIVE) {
+				actionResult?.value?.alertData =
+					if (onBoardingDone.value == OnBoardingState.Yes)
+						AlertData.Shield(f = ShieldAlert.PAST) else null
 			}
 		}
 	}
@@ -353,18 +353,20 @@ class SignerDataModel : ViewModel() {
 	}
 
 	private fun getAlertState() {
+		val state = alertState.value
 		_alertState.value = if (historyGetWarnings(dbName)) {
-			if (alertState.value == ShieldAlert.Active)
-				ShieldAlert.Active else ShieldAlert.Past
+			if (state is AlertData.Shield && state.f == ShieldAlert.ACTIVE)
+				AlertData.Shield(f = ShieldAlert.ACTIVE) else AlertData.Shield(f = ShieldAlert.PAST)
 		} else {
-			ShieldAlert.None
+			null
 		}
 	}
 
 	fun acknowledgeWarning() {
-		if (alertState.value == ShieldAlert.Past) {
+		val state = alertState.value
+		if (state is AlertData.Shield && state.f == ShieldAlert.PAST) {
 			historyAcknowledgeWarnings(dbName)
-			_alertState.value = ShieldAlert.None
+			_alertState.value = AlertData.Shield(f = ShieldAlert.PAST)
 		}
 	}
 }

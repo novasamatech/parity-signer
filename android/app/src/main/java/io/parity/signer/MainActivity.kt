@@ -25,10 +25,7 @@ import io.parity.signer.screens.LandingView
 import io.parity.signer.screens.WaitingScreen
 import io.parity.signer.ui.theme.ParitySignerTheme
 import io.parity.signer.ui.theme.Text600
-import io.parity.signer.uniffi.Action
-import io.parity.signer.uniffi.ModalData
-import io.parity.signer.uniffi.ScreenData
-import io.parity.signer.uniffi.initLogging
+import io.parity.signer.uniffi.*
 
 @ExperimentalMaterialApi
 @ExperimentalAnimationApi
@@ -91,7 +88,7 @@ fun SignerApp(signerDataModel: SignerDataModel) {
 					// Structure to contain all app
 					Scaffold(
 						topBar = {
-							TopBar(signerDataModel = signerDataModel)
+							TopBar(signerDataModel = signerDataModel, alert = shieldAlert)
 						},
 						bottomBar = {
 							if (actionResult.value?.footer == true) BottomBar(signerDataModel = signerDataModel)
@@ -99,7 +96,8 @@ fun SignerApp(signerDataModel: SignerDataModel) {
 					) { innerPadding ->
 						Box(modifier = Modifier.padding(innerPadding)) {
 							ScreenSelector(
-								screenData = actionResult.value?.screenData ?: ScreenData.Documents,//default fallback
+								screenData = actionResult.value?.screenData
+									?: ScreenData.Documents,//default fallback
 								alertState = shieldAlert,
 								progress = progress,
 								captured = captured,
@@ -109,10 +107,13 @@ fun SignerApp(signerDataModel: SignerDataModel) {
 							)
 							ModalSelector(
 								modalData = actionResult.value?.modalData,//default fallback
-								signerDataModel = signerDataModel
+								alertState = actionResult.value?.alertData,
+								button = signerDataModel::pushButton,
+								signerDataModel = signerDataModel,
 							)
 							AlertSelector(
 								alert = actionResult.value?.alertData,
+								button = signerDataModel::pushButton,
 								signerDataModel = signerDataModel
 							)
 						}
@@ -133,7 +134,7 @@ fun SignerApp(signerDataModel: SignerDataModel) {
 				}
 			}
 			OnBoardingState.No -> {
-				if (shieldAlert.value == ShieldAlert.None) {
+				if (shieldAlert.value == null) {
 					Scaffold {
 						LandingView(signerDataModel::onBoard)
 					}

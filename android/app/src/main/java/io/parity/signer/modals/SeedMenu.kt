@@ -8,20 +8,19 @@ import androidx.compose.material.Surface
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import io.parity.signer.ShieldAlert
 import io.parity.signer.alerts.AndroidCalledConfirm
 import io.parity.signer.components.BigButton
 import io.parity.signer.components.HeaderBar
-import io.parity.signer.models.removeSeed
 import io.parity.signer.ui.theme.Bg000
 import io.parity.signer.ui.theme.modal
 import io.parity.signer.uniffi.Action
+import io.parity.signer.uniffi.AlertData
 import io.parity.signer.uniffi.MSeedMenu
 
 @Composable
 fun SeedMenu(
 	seedMenu: MSeedMenu,
-	shieldAlert: State<ShieldAlert?>,
+	shieldAlert: AlertData?,
 	button: (Action) -> Unit,
 	removeSeed: (String) -> Unit
 ) {
@@ -40,7 +39,7 @@ fun SeedMenu(
 				BigButton(
 					text = "Backup",
 					action = {
-						if (shieldAlert.value == ShieldAlert.None)
+						if (shieldAlert is AlertData.Shield && shieldAlert.f == null)
 							button(Action.BACKUP_SEED)
 						else
 							button(Action.SHIELD)
@@ -49,7 +48,7 @@ fun SeedMenu(
 				BigButton(
 					text = "Derive new key",
 					action = {
-						if (shieldAlert.value == ShieldAlert.None)
+						if (shieldAlert is AlertData.Shield && shieldAlert.f == null)
 							button(Action.NEW_KEY)
 						else
 							button(Action.SHIELD)

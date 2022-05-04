@@ -1,22 +1,18 @@
 package io.parity.signer.alerts
 
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.State
-import androidx.compose.runtime.livedata.observeAsState
-import io.parity.signer.ShieldAlert
 import io.parity.signer.components.AlertComponent
-import io.parity.signer.models.SignerDataModel
-import io.parity.signer.models.pushButton
 import io.parity.signer.uniffi.Action
+import io.parity.signer.uniffi.ShieldAlert
 
 @Composable
 fun ShieldAlert(
-	shieldAlert: State<ShieldAlert>,
+	shieldAlert: ShieldAlert?,
 	button: (Action) -> Unit,
 	acknowledgeWarning: () -> Unit
 ) {
-	when (shieldAlert.value) {
-		ShieldAlert.None -> {
+	when (shieldAlert) {
+		null -> {
 			AlertComponent(
 				show = true,
 				header = "Signer is secure",
@@ -26,7 +22,7 @@ fun ShieldAlert(
 				showForward = false
 			)
 		}
-		ShieldAlert.Active -> {
+		ShieldAlert.ACTIVE -> {
 			AlertComponent(
 				show = true,
 				header = "Network connected!",
@@ -37,7 +33,7 @@ fun ShieldAlert(
 				showForward = false
 			)
 		}
-		ShieldAlert.Past -> {
+		ShieldAlert.PAST -> {
 			AlertComponent(
 				show = true,
 				header = "Network was connected!",

@@ -13,6 +13,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.State
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -26,18 +27,30 @@ import io.parity.signer.components.ScanProgressBar
 import io.parity.signer.models.SignerDataModel
 import io.parity.signer.models.processFrame
 import io.parity.signer.ui.theme.Crypto400
+import io.parity.signer.uniffi.Action
 
 /**
  * Main scanner screen. One of navigation roots.
  */
 @Composable
-fun ScanScreen(signerDataModel: SignerDataModel) {
+fun ScanScreen(
+	progress: State<Float?>,
+	captured: State<Int?>,
+	total: State<Int?>,
+	button: (Action, String, String) -> Unit,
+	signerDataModel: SignerDataModel,
+) {
 	val lifecycleOwner = LocalLifecycleOwner.current
 	val context = LocalContext.current
 	val cameraProviderFuture =
 		remember { ProcessCameraProvider.getInstance(context) }
 
-	Column (Modifier.fillMaxSize().verticalScroll(rememberScrollState())) {
+	val resetScan: () -> Unit = { button(Action.GO_BACK, "", "") }
+	Column(
+		Modifier
+			.fillMaxSize()
+			.verticalScroll(rememberScrollState())
+	) {
 		Box(
 			Modifier.padding(8.dp)
 		) {
@@ -97,7 +110,12 @@ fun ScanScreen(signerDataModel: SignerDataModel) {
 			verticalArrangement = Arrangement.Bottom,
 			modifier = Modifier.fillMaxSize()
 		) {
-			ScanProgressBar(signerDataModel = signerDataModel)
+			ScanProgressBar(
+				progress = progress,
+				captured = captured,
+				total = total,
+				resetScan = resetScan
+			)
 		}
 	}
 }

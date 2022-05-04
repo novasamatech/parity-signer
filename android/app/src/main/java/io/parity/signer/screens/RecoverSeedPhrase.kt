@@ -86,15 +86,14 @@ fun RecoverSeedPhrase(
 			BigButton(
 				text = "Next",
 				action = {
-					signerDataModel.screenData.value?.let { screenData ->
-						recoverSeedPhrase.seedName.let { seedName ->
-							seedPhraseReady?.let {
-								signerDataModel.addSeed(
-									seedName = seedName,
-									seedPhrase = it,
-									createRoots = createRoots.value
-								)
-							}
+					recoverSeedPhrase.seedName.let { seedName ->
+						seedPhraseReady?.let {
+							signerDataModel.addSeed(
+								seedName = seedName,
+								seedPhrase = it,
+								createRoots = createRoots.value
+							)
+
 						}
 					}
 				},

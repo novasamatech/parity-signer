@@ -2,7 +2,7 @@
 
 use db_handling::manage_history::get_history_entry_by_order;
 use definitions::navigation::{
-    ActionResult, FooterButton, History, MEnterPassword, MKeyDetailsMulti, MKeys, MLog,
+    ActionResult, AlertData, FooterButton, History, MEnterPassword, MKeyDetailsMulti, MKeys, MLog,
     MLogDetails, MManageNetworks, MNetworkCard, MNewSeed, MPasswordConfirm, MRecoverSeedName,
     MRecoverSeedPhrase, MSCAuthor, MSCContent, MSeedMenu, MSeeds, MSettings, MSignSufficientCrypto,
     MSignatureReady, MSufficientCryptoReady, MTransaction, ModalData, RightButton, ScreenData,
@@ -1880,10 +1880,11 @@ impl State {
             //Prepare alert details
             //Important! No errors could be handled in this block!
             let alert_data = match new_navstate.alert {
-                Alert::Error => Some(format!("{{\"error\":\"{}\"}}", errorline)),
-                Alert::ErrorDisplay => Some(format!("{{\"error\":\"{}\"}}", errorline)),
+                Alert::Error | Alert::ErrorDisplay => Some(AlertData::ErrorData {
+                    f: format!("{{\"error\":\"{}\"}}", errorline),
+                }),
                 Alert::Empty => None,
-                Alert::Shield => Some("{\"shield_state\":\"unknown\"}".to_string()),
+                Alert::Shield => Some(AlertData::Shield { f: None }),
             };
 
             self.navstate = new_navstate;

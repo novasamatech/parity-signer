@@ -1,6 +1,5 @@
 package io.parity.signer.screens
 
-import android.util.Log
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
@@ -19,8 +18,8 @@ import io.parity.signer.uniffi.*
 fun NewAddressScreen(
 	deriveKey: MDeriveKey,
 	button: (Action, String) -> Unit,
-	pathCheck: (String, String, String) -> String,
-	addKey: (String, String) -> Unit
+	addKey: (String, String) -> Unit,
+	dbName: String,
 ) {
 	val derivationPath = remember { mutableStateOf("") }
 	val buttonGood = remember { mutableStateOf(false) }
@@ -28,29 +27,14 @@ fun NewAddressScreen(
 	val collision = remember { mutableStateOf<Address?>(null) }
 	val seedName = deriveKey.seedName
 	val networkSpecKey = deriveKey.networkSpecsKey
-	var derivationState by remember(buttonGood, whereTo, collision) {
+	var derivationState by remember {
 		mutableStateOf(
 			DerivationCheck(
-				buttonGood,
-				whereTo,
-				collision
-			) {
-				Log.w("SIGNER_RUST_LOG", "check $seedName $it $networkSpecKey")
-				val v = substratePathCheck(
-					seedName,
-					it,
-					networkSpecKey,
-					signerDataModel.dbName
-				)
-				Log.w("SIGNER_RUST_LOG", "v $v")
-
-				buttonGood.value = v.buttonGood
-				v.whereTo?.let {
-					whereTo.value = it
-				}
-
-				collision.value = v.collision
-			}
+				false,
+				null,
+				null,
+				null
+			)
 		)
 	}
 	val focusManager = LocalFocusManager.current
@@ -73,7 +57,7 @@ fun NewAddressScreen(
 			content = derivationPath,
 			update = {
 				derivationPath.value = it
-				derivationState.check(it)
+				derivationState = substratePathCheck(seedName, networkSpecKey, it, dbName)
 			},
 			prefix = {
 				Text(
@@ -147,7 +131,7 @@ fun NewAddressScreen(
 		}
 		derivationPath.value = deriveKey.suggestedDerivation
 		deriveKey.derivationCheck?.let {
-			derivationState.value.fromFFI(it)
+			derivationState = it
 		}
 		onDispose { focusManager.clearFocus() }
 	}

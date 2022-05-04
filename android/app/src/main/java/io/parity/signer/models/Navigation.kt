@@ -15,9 +15,11 @@ fun SignerDataModel.pushButton(
 	details: String = "",
 	seedPhrase: String = ""
 ) {
+	Log.w("SIGNER_RUST_LOG", "action $button")
 	//Here we just list all possible arguments coming from backend
 	try {
 		_actionResult.value = backendAction(button, details, seedPhrase)
+		Log.w("SIGNER_RUST_LOG", "VALUE ${_actionResult.value}")
 	} catch (e: java.lang.Exception) {
 		Log.e("Navigation error", e.toString())
 		Toast.makeText(context, e.toString(), Toast.LENGTH_SHORT).show()

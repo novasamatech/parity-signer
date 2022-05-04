@@ -12,6 +12,7 @@ import io.parity.signer.components.transactionCards.*
 import io.parity.signer.models.decodeHex
 import io.parity.signer.ui.theme.Text600
 import io.parity.signer.uniffi.Card
+import io.parity.signer.uniffi.MscNetworkInfo
 import io.parity.signer.uniffi.TransactionCard
 
 /**
@@ -50,7 +51,12 @@ fun TransactionCard(card: TransactionCard) {
 			is Card.MetaCard -> TCMeta(meta = card.f)
 			is Card.NameVersionCard -> TCNameVersion(nameVersion = card.f)
 			is Card.NetworkGenesisHashCard -> TCGenesisHash(payload = card.f)
-			is Card.NetworkInfoCard -> NetworkCard(network = card.f)
+			is Card.NetworkInfoCard -> NetworkCard(
+				network = MscNetworkInfo(
+					networkTitle = card.f.networkTitle,
+					networkLogo = card.f.networkLogo
+				)
+			)
 			is Card.NetworkNameCard -> TCNetworkName(text = card.f)
 			is Card.NewSpecsCard -> TCNewSpecs(specs = card.f)
 			is Card.NonceCard -> TCNonce(text = card.f)
