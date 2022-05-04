@@ -69,7 +69,7 @@ pub fn init_navigation(dbname: &str, seed_names: &str) {
             } else {
                 (*navstate).seed_names = Vec::new();
             }
-            match db_handling::network_details::get_all_networks::<Signer>(dbname) {
+            match db_handling::helpers::get_all_networks::<Signer>(dbname) {
                 Ok(a) => {
                     for x in a.iter() {
                         (*navstate)

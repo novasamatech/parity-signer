@@ -1,5 +1,6 @@
-/// Identicons and related pictures, hex encoded vector of png data
-///
+//! Hexadecimal strings with identicons and qr codes data, as encountered in
+//! test jsons throughout the workspace
+
 /// Empty 30x30 transparent png image,
 /// used in cases when identicon generation failed or public key does not exist
 pub fn empty_png() -> String {
@@ -11,72 +12,76 @@ pub fn real_parity_verifier() -> String {
     hex::encode(include_bytes!("real_parity_verifier"))
 }
 
-/// Alice root key identicon, Sr25519 encryption
+/// Identicon for Alice root key, Sr25519 encryption
 pub fn alice_sr_root() -> String {
     hex::encode(include_bytes!("alice_sr_root"))
 }
 
-/// Alice key with derivation "//0", Sr25519 encryption
+/// Identicon for Alice key with derivation "//0", Sr25519 encryption
 pub fn alice_sr_0() -> String {
     hex::encode(include_bytes!("alice_sr_0"))
 }
 
-/// Alice key with derivation "//1", Sr25519 encryption
+/// Identicon for Alice key with derivation "//1", Sr25519 encryption
 pub fn alice_sr_1() -> String {
     hex::encode(include_bytes!("alice_sr_1"))
 }
 
-/// Alice key with derivation "//Alice", Sr25519 encryption
+/// Identicon for Alice key with derivation "//Alice", Sr25519 encryption
 pub fn alice_sr_alice() -> String {
     hex::encode(include_bytes!("alice_sr_alice"))
 }
 
-/// Alice key with derivation "//kusama", Sr25519 encryption
+/// Identicon for Alice key with derivation "//kusama", Sr25519 encryption
 pub fn alice_sr_kusama() -> String {
     hex::encode(include_bytes!("alice_sr_kusama"))
 }
 
-/// Alice key with derivation "//polkadot", Sr25519 encryption
+/// Identicon for Alice key with derivation "//polkadot", Sr25519 encryption
 pub fn alice_sr_polkadot() -> String {
     hex::encode(include_bytes!("alice_sr_polkadot"))
 }
 
-/// Alice key with derivation "//westend", Sr25519 encryption
+/// Identicon for Alice key with derivation "//westend", Sr25519 encryption
 pub fn alice_sr_westend() -> String {
     hex::encode(include_bytes!("alice_sr_westend"))
 }
 
-/// Alice key with derivation "//westend//0", Sr25519 encryption
+/// Identicon for Alice key with derivation "//westend//0", Sr25519 encryption
 pub fn alice_sr_westend_0() -> String {
     hex::encode(include_bytes!("alice_sr_westend_0"))
 }
 
-/// Alice key with derivation "//westend//1", Sr25519 encryption
+/// Identicon for Alice key with derivation "//westend//1", Sr25519 encryption
 pub fn alice_sr_westend_1() -> String {
     hex::encode(include_bytes!("alice_sr_westend_1"))
 }
 
-/// Alice key with derivation "//westend//2", Sr25519 encryption
+/// Identicon for Alice key with derivation "//westend//2", Sr25519 encryption
 pub fn alice_sr_westend_2() -> String {
     hex::encode(include_bytes!("alice_sr_westend_2"))
 }
 
-/// Alice key with derivation "//secret///abracadabra", Sr25519 encryption
+/// Identicon for Alice key with derivation "//secret///abracadabra", Sr25519
+/// encryption
 pub fn alice_sr_secret_abracadabra() -> String {
     hex::encode(include_bytes!("alice_sr_secret_abracadabra"))
 }
 
-/// Alice key with derivation "//secret//path///multipass", Sr25519 encryption
+/// Identicon for Alice key with derivation "//secret//path///multipass", Sr25519
+/// encryption
 pub fn alice_sr_secret_path_multipass() -> String {
     hex::encode(include_bytes!("alice_sr_secret_path_multipass"))
 }
 
-/// Alice key with derivation "//Alice/secret//secret", Sr25519 encryption
+/// Identicon for Alice key with derivation "//Alice/secret//secret", Sr25519
+/// encryption
 pub fn alice_sr_alice_secret_secret() -> String {
     hex::encode(include_bytes!("alice_sr_alice_secret_secret"))
 }
 
-/// Alice key with derivation "//Alice/westend", Sr25519 encryption
+/// Identicon for Alice key with derivation "//Alice/westend", Sr25519
+/// encryption
 pub fn alice_sr_alice_westend() -> String {
     hex::encode(include_bytes!("alice_sr_alice_westend"))
 }
@@ -131,19 +136,27 @@ pub fn shell_200() -> String {
     hex::encode(include_bytes!("shell_200"))
 }
 
-/// Identicons for test addresses
+/// Identicon for test address id_01
 pub fn id_01() -> String {
     hex::encode(include_bytes!("id_01"))
 }
+
+/// Identicon for test address id_02
 pub fn id_02() -> String {
     hex::encode(include_bytes!("id_02"))
 }
+
+/// Identicon for test address id_03
 pub fn id_03() -> String {
     hex::encode(include_bytes!("id_03"))
 }
+
+/// Identicon for test address id_04
 pub fn id_04() -> String {
     hex::encode(include_bytes!("id_04"))
 }
+
+/// Identicon for test address id_05
 pub fn id_05() -> String {
     hex::encode(include_bytes!("id_05"))
 }
@@ -168,7 +181,7 @@ pub fn empty_vec_hash_pic() -> String {
     hex::encode(include_bytes!("empty_vec_hash_pic"))
 }
 
-/// Alice key with derivation "//Alice", Ed25519 encryption
+/// Identicon for Alice key with derivation "//Alice", Ed25519 encryption
 pub fn ed() -> String {
     hex::encode(include_bytes!("ed"))
 }
@@ -188,12 +201,14 @@ pub fn alice_westend_alice_qr() -> String {
     hex::encode(include_bytes!("alice_westend_alice_qr"))
 }
 
-/// Export qr code for Alice key with "//Alice/secret//secret" derivation in westend network
+/// Export qr code for Alice key with "//Alice/secret//secret" derivation in
+/// westend network
 pub fn alice_westend_alice_secret_secret_qr() -> String {
     hex::encode(include_bytes!("alice_westend_alice_secret_secret_qr"))
 }
 
-/// Export qr code for Alice //polkadot key in polkadot network
+/// Export qr code for Alice key with "//polkadot" derivation in polkadot
+/// network
 pub fn alice_polkadot_qr() -> String {
     hex::encode(include_bytes!("alice_polkadot_qr"))
 }
