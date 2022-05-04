@@ -16,7 +16,7 @@ struct ExportAddress: View {
             VStack {
                 AddressCard(address: Address(base58: content.base58, path: content.path, hasPwd: false /*TODO*/, identicon: content.identicon, seedName: content.seedName, multiselect: nil))
                 NetworkCard(title: content.networkTitle, logo: content.networkLogo)
-                Image(uiImage: UIImage(data: Data(fromHexEncodedString: content.qr) ?? Data()) ?? UIImage())
+                Image(uiImage: UIImage(data: Data(content.qr)) ?? UIImage())
                     .resizable()
                     .aspectRatio(contentMode: .fit).padding(12)
                 HeaderBar(line1: "KEY DETAILS", line2: "").padding(.horizontal, 8)

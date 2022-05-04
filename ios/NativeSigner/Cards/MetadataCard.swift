@@ -11,9 +11,7 @@ struct MetadataCard: View {
     var meta: MMetadataRecord
     var body: some View {
         HStack {
-            Image(uiImage: UIImage(data: Data(fromHexEncodedString: meta.metaIdPic) ?? Data()) ?? UIImage())
-                .resizable(resizingMode: .stretch)
-                .frame(width: 28, height: 28)
+            Identicon(identicon: meta.metaIdPic) //TODO: this is potentially different from identicon
             VStack {
                 Text("version")
                 Text(meta.specsVersion)

@@ -16,9 +16,7 @@ struct TypesMenu: View {
             HeaderBar(line1: "MANAGE TYPES", line2: "Select action").padding(.top, 10)
             if content.typesOnFile {
                 HStack {
-                    Image(uiImage: UIImage(data: Data(fromHexEncodedString: content.typesIdPic ?? "") ?? Data()) ?? UIImage())
-                        .resizable(resizingMode: .stretch)
-                        .frame(width: 28, height: 28)
+                    Identicon(identicon: content.typesIdPic ?? []) //TODO: this is potentially different image
                 }
                 Text(content.typesHash ?? "none")
             } else {

@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct HistoryCardExtended: View {
-    var event: Event
+    var event: MEventMaybeDecoded
     let timestamp = ""
     var body: some View {
         HStack {

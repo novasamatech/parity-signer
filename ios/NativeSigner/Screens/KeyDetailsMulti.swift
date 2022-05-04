@@ -18,7 +18,7 @@ struct KeyDetailsMulti: View {
             VStack {
                 AddressCard(address: Address(base58: content.keyDetails.base58, path: content.keyDetails.path, hasPwd: false /*TODO*/, identicon: content.keyDetails.identicon, seedName: content.keyDetails.seedName, multiselect: false))
                 NetworkCard(title: content.keyDetails.networkTitle, logo: content.keyDetails.networkLogo)
-                Image(uiImage: UIImage(data: Data(fromHexEncodedString: content.keyDetails.qr) ?? Data()) ?? UIImage())
+                Image(uiImage: UIImage(data: Data(content.keyDetails.qr)) ?? UIImage())
                     .resizable()
                     .aspectRatio(contentMode: .fit).padding(12)
                     .offset(x: offset, y:0)

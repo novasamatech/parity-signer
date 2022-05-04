@@ -11,7 +11,7 @@ struct TCTypesInfo: View {
     var content: MTypesInfo
     var body: some View {
         HStack {
-            Identicon(identicon: content.typesIdPic ?? "")
+            Identicon(identicon: content.typesIdPic ?? [])
             TCNameValueTemplate(name: "Types hash:", value: content.typesHash ?? "")
         }
     }

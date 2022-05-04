@@ -18,7 +18,7 @@ struct SufficientCryptoReady: View {
             RoundedRectangle(cornerRadius: 8).foregroundColor(Color("Bg000"))
             VStack {
                 HeaderBar(line1: "Your Signature", line2: "Scan it into your application")
-                 Image(uiImage: UIImage(data: Data(fromHexEncodedString: content.sufficient) ?? Data()) ?? UIImage())
+                 Image(uiImage: UIImage(data: Data(content.sufficient)) ?? UIImage())
                  .resizable()
                  .aspectRatio(contentMode: .fit).padding(12)
                 //AddressCard(address: content.authorInfo.intoAddress())
