@@ -46,87 +46,87 @@ typedef struct RustCallStatus {
 // ⚠️ increment the version suffix in all instances of UNIFFI_SHARED_HEADER_V4 in this file.           ⚠️
 #endif // def UNIFFI_SHARED_H
 
-RustBuffer signer_efbd_action_get_name(
+RustBuffer signer_3bc_action_get_name(
       RustBuffer action,
     RustCallStatus *_Nonnull out_status
     );
-void signer_efbd_init_navigation(
+void signer_3bc_init_navigation(
       RustBuffer dbname,RustBuffer seed_names,
     RustCallStatus *_Nonnull out_status
     );
-RustBuffer signer_efbd_backend_action(
+RustBuffer signer_3bc_backend_action(
       RustBuffer action,RustBuffer details,RustBuffer seed_phrase,
     RustCallStatus *_Nonnull out_status
     );
-void signer_efbd_update_seed_names(
+void signer_3bc_update_seed_names(
       RustBuffer seed_names,
     RustCallStatus *_Nonnull out_status
     );
-uint32_t signer_efbd_qrparser_get_packets_total(
+uint32_t signer_3bc_qrparser_get_packets_total(
       RustBuffer data,int8_t cleaned,
     RustCallStatus *_Nonnull out_status
     );
-RustBuffer signer_efbd_qrparser_try_decode_qr_sequence(
+RustBuffer signer_3bc_qrparser_try_decode_qr_sequence(
       RustBuffer data,int8_t cleaned,
     RustCallStatus *_Nonnull out_status
     );
-RustBuffer signer_efbd_substrate_path_check(
+RustBuffer signer_3bc_substrate_path_check(
       RustBuffer seed_name,RustBuffer path,RustBuffer network,RustBuffer dbname,
     RustCallStatus *_Nonnull out_status
     );
-void signer_efbd_history_init_history_with_cert(
+void signer_3bc_history_init_history_with_cert(
       RustBuffer dbname,
     RustCallStatus *_Nonnull out_status
     );
-void signer_efbd_history_init_history_no_cert(
+void signer_3bc_history_init_history_no_cert(
       RustBuffer dbname,
     RustCallStatus *_Nonnull out_status
     );
-void signer_efbd_history_device_was_online(
+void signer_3bc_history_device_was_online(
       RustBuffer dbname,
     RustCallStatus *_Nonnull out_status
     );
-int8_t signer_efbd_history_get_warnings(
+int8_t signer_3bc_history_get_warnings(
       RustBuffer dbname,
     RustCallStatus *_Nonnull out_status
     );
-void signer_efbd_history_acknowledge_warnings(
+void signer_3bc_history_acknowledge_warnings(
       RustBuffer dbname,
     RustCallStatus *_Nonnull out_status
     );
-void signer_efbd_history_entry_system(
+void signer_3bc_history_entry_system(
       RustBuffer event,RustBuffer dbname,
     RustCallStatus *_Nonnull out_status
     );
-void signer_efbd_history_seed_name_was_shown(
+void signer_3bc_history_seed_name_was_shown(
       RustBuffer seed_name,RustBuffer dbname,
     RustCallStatus *_Nonnull out_status
     );
-RustBuffer signer_efbd_get_all_tx_cards(
+RustBuffer signer_3bc_get_all_tx_cards(
       
     RustCallStatus *_Nonnull out_status
     );
-RustBuffer signer_efbd_get_all_log_cards(
+RustBuffer signer_3bc_get_all_log_cards(
       
     RustCallStatus *_Nonnull out_status
     );
-void signer_efbd_init_logging(
+void signer_3bc_init_logging(
       RustBuffer tag,
     RustCallStatus *_Nonnull out_status
     );
-RustBuffer ffi_signer_efbd_rustbuffer_alloc(
+RustBuffer ffi_signer_3bc_rustbuffer_alloc(
       int32_t size,
     RustCallStatus *_Nonnull out_status
     );
-RustBuffer ffi_signer_efbd_rustbuffer_from_bytes(
+RustBuffer ffi_signer_3bc_rustbuffer_from_bytes(
       ForeignBytes bytes,
     RustCallStatus *_Nonnull out_status
     );
-void ffi_signer_efbd_rustbuffer_free(
+void ffi_signer_3bc_rustbuffer_free(
       RustBuffer buf,
     RustCallStatus *_Nonnull out_status
     );
-RustBuffer ffi_signer_efbd_rustbuffer_reserve(
+RustBuffer ffi_signer_3bc_rustbuffer_reserve(
       RustBuffer buf,int32_t additional,
     RustCallStatus *_Nonnull out_status
     );

@@ -28,7 +28,6 @@
 		2D48F38127691C05004B27BE /* AlertSelector.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D48F38027691C05004B27BE /* AlertSelector.swift */; };
 		2D48F38327691C0A004B27BE /* ConfirmAlert.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D48F38227691C0A004B27BE /* ConfirmAlert.swift */; };
 		2D48F38527691C0F004B27BE /* ErrorAlert.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D48F38427691C0F004B27BE /* ErrorAlert.swift */; };
-		2D48F38727691C12004B27BE /* ShieldAlert.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D48F38627691C12004B27BE /* ShieldAlert.swift */; };
 		2D48F38A27691C3B004B27BE /* MError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D48F38927691C3B004B27BE /* MError.swift */; };
 		2D48F396276A2003004B27BE /* SignatureReady.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D48F395276A2003004B27BE /* SignatureReady.swift */; };
 		2D48F398276A200F004B27BE /* EnterPassword.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D48F397276A200F004B27BE /* EnterPassword.swift */; };
@@ -184,7 +183,6 @@
 		2D48F38027691C05004B27BE /* AlertSelector.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AlertSelector.swift; sourceTree = "<group>"; };
 		2D48F38227691C0A004B27BE /* ConfirmAlert.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ConfirmAlert.swift; sourceTree = "<group>"; };
 		2D48F38427691C0F004B27BE /* ErrorAlert.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ErrorAlert.swift; sourceTree = "<group>"; };
-		2D48F38627691C12004B27BE /* ShieldAlert.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ShieldAlert.swift; sourceTree = "<group>"; };
 		2D48F38927691C3B004B27BE /* MError.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MError.swift; sourceTree = "<group>"; };
 		2D48F395276A2003004B27BE /* SignatureReady.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignatureReady.swift; sourceTree = "<group>"; };
 		2D48F397276A200F004B27BE /* EnterPassword.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EnterPassword.swift; sourceTree = "<group>"; };
@@ -504,7 +502,6 @@
 		2DA5F899275F86B600D8DD29 /* Alerts */ = {
 			isa = PBXGroup;
 			children = (
-				2D48F38627691C12004B27BE /* ShieldAlert.swift */,
 				2D48F38427691C0F004B27BE /* ErrorAlert.swift */,
 				2D48F38227691C0A004B27BE /* ConfirmAlert.swift */,
 				2D48F38027691C05004B27BE /* AlertSelector.swift */,
@@ -795,7 +792,6 @@
 			files = (
 				2DA5F89D275F874D00D8DD29 /* NetworkManager.swift in Sources */,
 				2D48F3DE277E4BEC004B27BE /* SmallButton.swift in Sources */,
-				2D48F38727691C12004B27BE /* ShieldAlert.swift in Sources */,
 				2DA5F87627566D7C00D8DD29 /* TransactionPreview.swift in Sources */,
 				2DAA82AF278874F3002917C0 /* NetworkLogo.swift in Sources */,
 				2DA5F85E27566C3600D8DD29 /* TCFieldName.swift in Sources */,

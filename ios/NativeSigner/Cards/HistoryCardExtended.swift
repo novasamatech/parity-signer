@@ -12,7 +12,7 @@ struct HistoryCardExtended: View {
     let timestamp = ""
     var body: some View {
         HStack {
-            switch event {
+            switch event.event {
             case .databaseInitiated: HistoryCardTemplate(
                 image: "iphone.and.arrow.forward",
                 timestamp: timestamp,

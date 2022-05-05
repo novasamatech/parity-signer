@@ -19,13 +19,13 @@ private extension RustBuffer {
     }
 
     static func from(_ ptr: UnsafeBufferPointer<UInt8>) -> RustBuffer {
-        try! rustCall { ffi_signer_efbd_rustbuffer_from_bytes(ForeignBytes(bufferPointer: ptr), $0) }
+        try! rustCall { ffi_signer_3bc_rustbuffer_from_bytes(ForeignBytes(bufferPointer: ptr), $0) }
     }
 
     // Frees the buffer in place.
     // The buffer must not be used after this is called.
     func deallocate() {
-        try! rustCall { ffi_signer_efbd_rustbuffer_free(self, $0) }
+        try! rustCall { ffi_signer_3bc_rustbuffer_free(self, $0) }
     }
 }
 
@@ -488,6 +488,7 @@ public enum FooterButton {
     case scan
     case keys
     case settings
+    case back
 }
 
 extension FooterButton: ViaFfiUsingByteBuffer, ViaFfi {
@@ -498,6 +499,7 @@ extension FooterButton: ViaFfiUsingByteBuffer, ViaFfi {
         case 2: return .scan
         case 3: return .keys
         case 4: return .settings
+        case 5: return .back
         default: throw UniffiInternalError.unexpectedEnumCase
         }
     }
@@ -515,6 +517,9 @@ extension FooterButton: ViaFfiUsingByteBuffer, ViaFfi {
 
         case .settings:
             buf.writeInt(Int32(4))
+
+        case .back:
+            buf.writeInt(Int32(5))
         }
     }
 }
@@ -607,6 +612,79 @@ extension ScreenNameType: ViaFfiUsingByteBuffer, ViaFfi {
 }
 
 extension ScreenNameType: Equatable, Hashable {}
+
+// Note that we don't yet support `indirect` for enums.
+// See https://github.com/mozilla/uniffi-rs/issues/396 for further discussion.
+
+public enum ShieldAlert {
+    case active
+    case past
+}
+
+extension ShieldAlert: ViaFfiUsingByteBuffer, ViaFfi {
+    fileprivate static func read(from buf: Reader) throws -> ShieldAlert {
+        let variant: Int32 = try buf.readInt()
+        switch variant {
+        case 1: return .active
+        case 2: return .past
+        default: throw UniffiInternalError.unexpectedEnumCase
+        }
+    }
+
+    fileprivate func write(into buf: Writer) {
+        switch self {
+        case .active:
+            buf.writeInt(Int32(1))
+
+        case .past:
+            buf.writeInt(Int32(2))
+        }
+    }
+}
+
+extension ShieldAlert: Equatable, Hashable {}
+
+// Note that we don't yet support `indirect` for enums.
+// See https://github.com/mozilla/uniffi-rs/issues/396 for further discussion.
+
+public enum AlertData {
+    case shield(f: ShieldAlert?)
+    case errorData(f: String)
+    case confirm
+}
+
+extension AlertData: ViaFfiUsingByteBuffer, ViaFfi {
+    fileprivate static func read(from buf: Reader) throws -> AlertData {
+        let variant: Int32 = try buf.readInt()
+        switch variant {
+        case 1: return .shield(
+                f: try FfiConverterOptionEnumShieldAlert.read(from: buf)
+            )
+        case 2: return .errorData(
+                f: try String.read(from: buf)
+            )
+        case 3: return .confirm
+        default: throw UniffiInternalError.unexpectedEnumCase
+        }
+    }
+
+    fileprivate func write(into buf: Writer) {
+        switch self {
+        case let .shield(f):
+            buf.writeInt(Int32(1))
+            FfiConverterOptionEnumShieldAlert.write(f, into: buf)
+
+        case let .errorData(f):
+            buf.writeInt(Int32(2))
+            f.write(into: buf)
+
+        case .confirm:
+            buf.writeInt(Int32(3))
+        }
+    }
+}
+
+extension AlertData: Equatable, Hashable {}
 
 // Note that we don't yet support `indirect` for enums.
 // See https://github.com/mozilla/uniffi-rs/issues/396 for further discussion.
@@ -1337,7 +1415,7 @@ public enum ModalData {
     case typesInfo(f: MTypesInfo)
     case newSeedMenu
     case networkDetailsMenu
-    case manageMetadata
+    case manageMetadata(f: MmManageNetworks)
     case keyDetailsAction
     case logComment
     case selectSeed(f: MSeeds)
@@ -1382,7 +1460,9 @@ extension ModalData: ViaFfiUsingByteBuffer, ViaFfi {
             )
         case 12: return .newSeedMenu
         case 13: return .networkDetailsMenu
-        case 14: return .manageMetadata
+        case 14: return .manageMetadata(
+                f: try MmManageNetworks.read(from: buf)
+            )
         case 15: return .keyDetailsAction
         case 16: return .logComment
         case 17: return .selectSeed(
@@ -1444,8 +1524,9 @@ extension ModalData: ViaFfiUsingByteBuffer, ViaFfi {
         case .networkDetailsMenu:
             buf.writeInt(Int32(13))
 
-        case .manageMetadata:
+        case let .manageMetadata(f):
             buf.writeInt(Int32(14))
+            f.write(into: buf)
 
         case .keyDetailsAction:
             buf.writeInt(Int32(15))
@@ -1483,7 +1564,7 @@ public enum Card {
     case fieldNumberCard(f: MscFieldNumber)
     case idCard(f: MscId)
     case identityFieldCard(f: String)
-    case metaCard(f: MscMetaSpecs)
+    case metaCard(f: MMetadataRecord)
     case nameVersionCard(f: MscNameVersion)
     case networkGenesisHashCard(f: String)
     case networkNameCard(f: String)
@@ -1557,7 +1638,7 @@ extension Card: ViaFfiUsingByteBuffer, ViaFfi {
                 f: try String.read(from: buf)
             )
         case 18: return .metaCard(
-                f: try MscMetaSpecs.read(from: buf)
+                f: try MMetadataRecord.read(from: buf)
             )
         case 19: return .nameVersionCard(
                 f: try MscNameVersion.read(from: buf)
@@ -1757,20 +1838,20 @@ extension Card: ViaFfiUsingByteBuffer, ViaFfi {
 
 extension Card: Equatable, Hashable {}
 
-public func actionGetName(action: Action) -> String {
+public func actionGetName(action: Action) -> FooterButton? {
     let _retval = try!
 
         rustCall {
-            signer_efbd_action_get_name(action.lower(), $0)
+            signer_3bc_action_get_name(action.lower(), $0)
         }
-    return try! String.lift(_retval)
+    return try! FfiConverterOptionEnumFooterButton.lift(_retval)
 }
 
 public func initNavigation(dbname: String, seedNames: String) {
     try!
 
         rustCall {
-            signer_efbd_init_navigation(dbname.lower(), seedNames.lower(), $0)
+            signer_3bc_init_navigation(dbname.lower(), seedNames.lower(), $0)
         }
 }
 
@@ -1778,7 +1859,7 @@ public func backendAction(action: Action, details: String, seedPhrase: String) t
     let _retval = try
 
         rustCallWithError(ErrorDisplayed.self) {
-            signer_efbd_backend_action(action.lower(), details.lower(), seedPhrase.lower(), $0)
+            signer_3bc_backend_action(action.lower(), details.lower(), seedPhrase.lower(), $0)
         }
     return try ActionResult.lift(_retval)
 }
@@ -1787,7 +1868,7 @@ public func updateSeedNames(seedNames: String) {
     try!
 
         rustCall {
-            signer_efbd_update_seed_names(seedNames.lower(), $0)
+            signer_3bc_update_seed_names(seedNames.lower(), $0)
         }
 }
 
@@ -1795,7 +1876,7 @@ public func qrparserGetPacketsTotal(data: String, cleaned: Bool) throws -> UInt3
     let _retval = try
 
         rustCallWithError(ErrorDisplayed.self) {
-            signer_efbd_qrparser_get_packets_total(data.lower(), cleaned.lower(), $0)
+            signer_3bc_qrparser_get_packets_total(data.lower(), cleaned.lower(), $0)
         }
     return try UInt32.lift(_retval)
 }
@@ -1804,7 +1885,7 @@ public func qrparserTryDecodeQrSequence(data: String, cleaned: Bool) throws -> S
     let _retval = try
 
         rustCallWithError(ErrorDisplayed.self) {
-            signer_efbd_qrparser_try_decode_qr_sequence(data.lower(), cleaned.lower(), $0)
+            signer_3bc_qrparser_try_decode_qr_sequence(data.lower(), cleaned.lower(), $0)
         }
     return try String.lift(_retval)
 }
@@ -1813,7 +1894,7 @@ public func substratePathCheck(seedName: String, path: String, network: String, 
     let _retval = try!
 
         rustCall {
-            signer_efbd_substrate_path_check(seedName.lower(), path.lower(), network.lower(), dbname.lower(), $0)
+            signer_3bc_substrate_path_check(seedName.lower(), path.lower(), network.lower(), dbname.lower(), $0)
         }
     return try! DerivationCheck.lift(_retval)
 }
@@ -1822,7 +1903,7 @@ public func historyInitHistoryWithCert(dbname: String) throws {
     try
 
         rustCallWithError(ErrorDisplayed.self) {
-            signer_efbd_history_init_history_with_cert(dbname.lower(), $0)
+            signer_3bc_history_init_history_with_cert(dbname.lower(), $0)
         }
 }
 
@@ -1830,7 +1911,7 @@ public func historyInitHistoryNoCert(dbname: String) throws {
     try
 
         rustCallWithError(ErrorDisplayed.self) {
-            signer_efbd_history_init_history_no_cert(dbname.lower(), $0)
+            signer_3bc_history_init_history_no_cert(dbname.lower(), $0)
         }
 }
 
@@ -1838,7 +1919,7 @@ public func historyDeviceWasOnline(dbname: String) throws {
     try
 
         rustCallWithError(ErrorDisplayed.self) {
-            signer_efbd_history_device_was_online(dbname.lower(), $0)
+            signer_3bc_history_device_was_online(dbname.lower(), $0)
         }
 }
 
@@ -1846,7 +1927,7 @@ public func historyGetWarnings(dbname: String) throws -> Bool {
     let _retval = try
 
         rustCallWithError(ErrorDisplayed.self) {
-            signer_efbd_history_get_warnings(dbname.lower(), $0)
+            signer_3bc_history_get_warnings(dbname.lower(), $0)
         }
     return try Bool.lift(_retval)
 }
@@ -1855,7 +1936,7 @@ public func historyAcknowledgeWarnings(dbname: String) throws {
     try
 
         rustCallWithError(ErrorDisplayed.self) {
-            signer_efbd_history_acknowledge_warnings(dbname.lower(), $0)
+            signer_3bc_history_acknowledge_warnings(dbname.lower(), $0)
         }
 }
 
@@ -1863,7 +1944,7 @@ public func historyEntrySystem(event: Event, dbname: String) throws {
     try
 
         rustCallWithError(ErrorDisplayed.self) {
-            signer_efbd_history_entry_system(event.lower(), dbname.lower(), $0)
+            signer_3bc_history_entry_system(event.lower(), dbname.lower(), $0)
         }
 }
 
@@ -1871,7 +1952,7 @@ public func historySeedNameWasShown(seedName: String, dbname: String) throws {
     try
 
         rustCallWithError(ErrorDisplayed.self) {
-            signer_efbd_history_seed_name_was_shown(seedName.lower(), dbname.lower(), $0)
+            signer_3bc_history_seed_name_was_shown(seedName.lower(), dbname.lower(), $0)
         }
 }
 
@@ -1879,7 +1960,7 @@ public func getAllTxCards() -> TransactionCardSet {
     let _retval = try!
 
         rustCall {
-            signer_efbd_get_all_tx_cards($0)
+            signer_3bc_get_all_tx_cards($0)
         }
     return try! TransactionCardSet.lift(_retval)
 }
@@ -1888,7 +1969,7 @@ public func getAllLogCards() -> String {
     let _retval = try!
 
         rustCall {
-            signer_efbd_get_all_log_cards($0)
+            signer_3bc_get_all_log_cards($0)
         }
     return try! String.lift(_retval)
 }
@@ -1897,7 +1978,7 @@ public func initLogging(tag: String) {
     try!
 
         rustCall {
-            signer_efbd_init_logging(tag.lower(), $0)
+            signer_3bc_init_logging(tag.lower(), $0)
         }
 }
 
@@ -2735,11 +2816,11 @@ public struct ActionResult {
     public var screenNameType: ScreenNameType
     public var screenData: ScreenData
     public var modalData: ModalData?
-    public var alertData: String?
+    public var alertData: AlertData?
 
     // Default memberwise initializers are never public by default, so we
     // declare one manually.
-    public init(screenLabel: String, back: Bool, footer: Bool, footerButton: FooterButton?, rightButton: RightButton?, screenNameType: ScreenNameType, screenData: ScreenData, modalData: ModalData?, alertData: String?) {
+    public init(screenLabel: String, back: Bool, footer: Bool, footerButton: FooterButton?, rightButton: RightButton?, screenNameType: ScreenNameType, screenData: ScreenData, modalData: ModalData?, alertData: AlertData?) {
         self.screenLabel = screenLabel
         self.back = back
         self.footer = footer
@@ -2808,7 +2889,7 @@ private extension ActionResult {
             screenNameType: ScreenNameType.read(from: buf),
             screenData: ScreenData.read(from: buf),
             modalData: FfiConverterOptionEnumModalData.read(from: buf),
-            alertData: FfiConverterOptionString.read(from: buf)
+            alertData: FfiConverterOptionEnumAlertData.read(from: buf)
         )
     }
 
@@ -2821,7 +2902,7 @@ private extension ActionResult {
         screenNameType.write(into: buf)
         screenData.write(into: buf)
         FfiConverterOptionEnumModalData.write(modalData, into: buf)
-        FfiConverterOptionString.write(alertData, into: buf)
+        FfiConverterOptionEnumAlertData.write(alertData, into: buf)
     }
 }
 
@@ -2900,7 +2981,7 @@ public struct Identity {
     public var seedName: String
     public var addressKey: String
     public var publicKey: String
-    public var identicon: String
+    public var identicon: [UInt8]
     public var hasPwd: Bool
     public var path: String
     public var isMultiselect: Bool
@@ -2908,7 +2989,7 @@ public struct Identity {
 
     // Default memberwise initializers are never public by default, so we
     // declare one manually.
-    public init(seedName: String, addressKey: String, publicKey: String, identicon: String, hasPwd: Bool, path: String, isMultiselect: Bool, base58: String) {
+    public init(seedName: String, addressKey: String, publicKey: String, identicon: [UInt8], hasPwd: Bool, path: String, isMultiselect: Bool, base58: String) {
         self.seedName = seedName
         self.addressKey = addressKey
         self.publicKey = publicKey
@@ -2967,7 +3048,7 @@ private extension Identity {
             seedName: String.read(from: buf),
             addressKey: String.read(from: buf),
             publicKey: String.read(from: buf),
-            identicon: String.read(from: buf),
+            identicon: FfiConverterSequenceUInt8.read(from: buf),
             hasPwd: Bool.read(from: buf),
             path: String.read(from: buf),
             isMultiselect: Bool.read(from: buf),
@@ -2979,7 +3060,7 @@ private extension Identity {
         seedName.write(into: buf)
         addressKey.write(into: buf)
         publicKey.write(into: buf)
-        identicon.write(into: buf)
+        FfiConverterSequenceUInt8.write(identicon, into: buf)
         hasPwd.write(into: buf)
         path.write(into: buf)
         isMultiselect.write(into: buf)
@@ -2991,7 +3072,7 @@ extension Identity: ViaFfiUsingByteBuffer, ViaFfi {}
 
 public struct MSeedKeyCard {
     public var seedName: String
-    public var identicon: String
+    public var identicon: [UInt8]
     public var addressKey: String
     public var base58: String
     public var swiped: Bool
@@ -2999,7 +3080,7 @@ public struct MSeedKeyCard {
 
     // Default memberwise initializers are never public by default, so we
     // declare one manually.
-    public init(seedName: String, identicon: String, addressKey: String, base58: String, swiped: Bool, multiselect: Bool) {
+    public init(seedName: String, identicon: [UInt8], addressKey: String, base58: String, swiped: Bool, multiselect: Bool) {
         self.seedName = seedName
         self.identicon = identicon
         self.addressKey = addressKey
@@ -3046,7 +3127,7 @@ private extension MSeedKeyCard {
     static func read(from buf: Reader) throws -> MSeedKeyCard {
         return try MSeedKeyCard(
             seedName: String.read(from: buf),
-            identicon: String.read(from: buf),
+            identicon: FfiConverterSequenceUInt8.read(from: buf),
             addressKey: String.read(from: buf),
             base58: String.read(from: buf),
             swiped: Bool.read(from: buf),
@@ -3056,7 +3137,7 @@ private extension MSeedKeyCard {
 
     func write(into buf: Writer) {
         seedName.write(into: buf)
-        identicon.write(into: buf)
+        FfiConverterSequenceUInt8.write(identicon, into: buf)
         addressKey.write(into: buf)
         base58.write(into: buf)
         swiped.write(into: buf)
@@ -3183,7 +3264,7 @@ extension MKeys: ViaFfiUsingByteBuffer, ViaFfi {}
 public struct MKeysCard {
     public var addressKey: String
     public var base58: String
-    public var identicon: String
+    public var identicon: [UInt8]
     public var hasPwd: Bool
     public var path: String
     public var swiped: Bool
@@ -3191,7 +3272,7 @@ public struct MKeysCard {
 
     // Default memberwise initializers are never public by default, so we
     // declare one manually.
-    public init(addressKey: String, base58: String, identicon: String, hasPwd: Bool, path: String, swiped: Bool, multiselect: Bool) {
+    public init(addressKey: String, base58: String, identicon: [UInt8], hasPwd: Bool, path: String, swiped: Bool, multiselect: Bool) {
         self.addressKey = addressKey
         self.base58 = base58
         self.identicon = identicon
@@ -3244,7 +3325,7 @@ private extension MKeysCard {
         return try MKeysCard(
             addressKey: String.read(from: buf),
             base58: String.read(from: buf),
-            identicon: String.read(from: buf),
+            identicon: FfiConverterSequenceUInt8.read(from: buf),
             hasPwd: Bool.read(from: buf),
             path: String.read(from: buf),
             swiped: Bool.read(from: buf),
@@ -3255,7 +3336,7 @@ private extension MKeysCard {
     func write(into buf: Writer) {
         addressKey.write(into: buf)
         base58.write(into: buf)
-        identicon.write(into: buf)
+        FfiConverterSequenceUInt8.write(identicon, into: buf)
         hasPwd.write(into: buf)
         path.write(into: buf)
         swiped.write(into: buf)
@@ -3267,13 +3348,13 @@ extension MKeysCard: ViaFfiUsingByteBuffer, ViaFfi {}
 
 public struct MSettings {
     public var publicKey: String?
-    public var identicon: String?
+    public var identicon: [UInt8]?
     public var encryption: String?
     public var error: String?
 
     // Default memberwise initializers are never public by default, so we
     // declare one manually.
-    public init(publicKey: String?, identicon: String?, encryption: String?, error: String?) {
+    public init(publicKey: String?, identicon: [UInt8]?, encryption: String?, error: String?) {
         self.publicKey = publicKey
         self.identicon = identicon
         self.encryption = encryption
@@ -3310,7 +3391,7 @@ private extension MSettings {
     static func read(from buf: Reader) throws -> MSettings {
         return try MSettings(
             publicKey: FfiConverterOptionString.read(from: buf),
-            identicon: FfiConverterOptionString.read(from: buf),
+            identicon: FfiConverterOptionSequenceUInt8.read(from: buf),
             encryption: FfiConverterOptionString.read(from: buf),
             error: FfiConverterOptionString.read(from: buf)
         )
@@ -3318,7 +3399,7 @@ private extension MSettings {
 
     func write(into buf: Writer) {
         FfiConverterOptionString.write(publicKey, into: buf)
-        FfiConverterOptionString.write(identicon, into: buf)
+        FfiConverterOptionSequenceUInt8.write(identicon, into: buf)
         FfiConverterOptionString.write(encryption, into: buf)
         FfiConverterOptionString.write(error, into: buf)
     }
@@ -3364,12 +3445,14 @@ private extension MLog {
 extension MLog: ViaFfiUsingByteBuffer, ViaFfi {}
 
 public struct History {
+    public var order: UInt32
     public var timestamp: String
     public var events: [Event]
 
     // Default memberwise initializers are never public by default, so we
     // declare one manually.
-    public init(timestamp: String, events: [Event]) {
+    public init(order: UInt32, timestamp: String, events: [Event]) {
+        self.order = order
         self.timestamp = timestamp
         self.events = events
     }
@@ -3377,6 +3460,9 @@ public struct History {
 
 extension History: Equatable, Hashable {
     public static func == (lhs: History, rhs: History) -> Bool {
+        if lhs.order != rhs.order {
+            return false
+        }
         if lhs.timestamp != rhs.timestamp {
             return false
         }
@@ -3387,6 +3473,7 @@ extension History: Equatable, Hashable {
     }
 
     public func hash(into hasher: inout Hasher) {
+        hasher.combine(order)
         hasher.combine(timestamp)
         hasher.combine(events)
     }
@@ -3395,12 +3482,14 @@ extension History: Equatable, Hashable {
 private extension History {
     static func read(from buf: Reader) throws -> History {
         return try History(
+            order: UInt32.read(from: buf),
             timestamp: String.read(from: buf),
             events: FfiConverterSequenceEnumEvent.read(from: buf)
         )
     }
 
     func write(into buf: Writer) {
+        order.write(into: buf)
         timestamp.write(into: buf)
         FfiConverterSequenceEnumEvent.write(events, into: buf)
     }
@@ -3408,13 +3497,74 @@ private extension History {
 
 extension History: ViaFfiUsingByteBuffer, ViaFfi {}
 
-public struct MLogDetails {
-    public var timestamp: String
-    public var events: [Event]
+public struct MEventMaybeDecoded {
+    public var event: Event
+    public var signedBy: TransactionAuthor?
+    public var decoded: TransactionCardSet?
+    public var verifierDetails: MVerifierDetails?
 
     // Default memberwise initializers are never public by default, so we
     // declare one manually.
-    public init(timestamp: String, events: [Event]) {
+    public init(event: Event, signedBy: TransactionAuthor?, decoded: TransactionCardSet?, verifierDetails: MVerifierDetails?) {
+        self.event = event
+        self.signedBy = signedBy
+        self.decoded = decoded
+        self.verifierDetails = verifierDetails
+    }
+}
+
+extension MEventMaybeDecoded: Equatable, Hashable {
+    public static func == (lhs: MEventMaybeDecoded, rhs: MEventMaybeDecoded) -> Bool {
+        if lhs.event != rhs.event {
+            return false
+        }
+        if lhs.signedBy != rhs.signedBy {
+            return false
+        }
+        if lhs.decoded != rhs.decoded {
+            return false
+        }
+        if lhs.verifierDetails != rhs.verifierDetails {
+            return false
+        }
+        return true
+    }
+
+    public func hash(into hasher: inout Hasher) {
+        hasher.combine(event)
+        hasher.combine(signedBy)
+        hasher.combine(decoded)
+        hasher.combine(verifierDetails)
+    }
+}
+
+private extension MEventMaybeDecoded {
+    static func read(from buf: Reader) throws -> MEventMaybeDecoded {
+        return try MEventMaybeDecoded(
+            event: Event.read(from: buf),
+            signedBy: FfiConverterOptionRecordTransactionAuthor.read(from: buf),
+            decoded: FfiConverterOptionRecordTransactionCardSet.read(from: buf),
+            verifierDetails: FfiConverterOptionRecordMVerifierDetails.read(from: buf)
+        )
+    }
+
+    func write(into buf: Writer) {
+        event.write(into: buf)
+        FfiConverterOptionRecordTransactionAuthor.write(signedBy, into: buf)
+        FfiConverterOptionRecordTransactionCardSet.write(decoded, into: buf)
+        FfiConverterOptionRecordMVerifierDetails.write(verifierDetails, into: buf)
+    }
+}
+
+extension MEventMaybeDecoded: ViaFfiUsingByteBuffer, ViaFfi {}
+
+public struct MLogDetails {
+    public var timestamp: String
+    public var events: [MEventMaybeDecoded]
+
+    // Default memberwise initializers are never public by default, so we
+    // declare one manually.
+    public init(timestamp: String, events: [MEventMaybeDecoded]) {
         self.timestamp = timestamp
         self.events = events
     }
@@ -3441,13 +3591,13 @@ private extension MLogDetails {
     static func read(from buf: Reader) throws -> MLogDetails {
         return try MLogDetails(
             timestamp: String.read(from: buf),
-            events: FfiConverterSequenceEnumEvent.read(from: buf)
+            events: FfiConverterSequenceRecordMEventMaybeDecoded.read(from: buf)
         )
     }
 
     func write(into buf: Writer) {
         timestamp.write(into: buf)
-        FfiConverterSequenceEnumEvent.write(events, into: buf)
+        FfiConverterSequenceRecordMEventMaybeDecoded.write(events, into: buf)
     }
 }
 
@@ -3516,17 +3666,19 @@ extension MTransaction: ViaFfiUsingByteBuffer, ViaFfi {}
 
 public struct TransactionAuthor {
     public var base58: String
-    public var identicon: String
+    public var identicon: [UInt8]
     public var seed: String
     public var derivationPath: String
+    public var hasPwd: Bool
 
     // Default memberwise initializers are never public by default, so we
     // declare one manually.
-    public init(base58: String, identicon: String, seed: String, derivationPath: String) {
+    public init(base58: String, identicon: [UInt8], seed: String, derivationPath: String, hasPwd: Bool) {
         self.base58 = base58
         self.identicon = identicon
         self.seed = seed
         self.derivationPath = derivationPath
+        self.hasPwd = hasPwd
     }
 }
 
@@ -3544,6 +3696,9 @@ extension TransactionAuthor: Equatable, Hashable {
         if lhs.derivationPath != rhs.derivationPath {
             return false
         }
+        if lhs.hasPwd != rhs.hasPwd {
+            return false
+        }
         return true
     }
 
@@ -3552,6 +3707,7 @@ extension TransactionAuthor: Equatable, Hashable {
         hasher.combine(identicon)
         hasher.combine(seed)
         hasher.combine(derivationPath)
+        hasher.combine(hasPwd)
     }
 }
 
@@ -3559,17 +3715,19 @@ private extension TransactionAuthor {
     static func read(from buf: Reader) throws -> TransactionAuthor {
         return try TransactionAuthor(
             base58: String.read(from: buf),
-            identicon: String.read(from: buf),
+            identicon: FfiConverterSequenceUInt8.read(from: buf),
             seed: String.read(from: buf),
-            derivationPath: String.read(from: buf)
+            derivationPath: String.read(from: buf),
+            hasPwd: Bool.read(from: buf)
         )
     }
 
     func write(into buf: Writer) {
         base58.write(into: buf)
-        identicon.write(into: buf)
+        FfiConverterSequenceUInt8.write(identicon, into: buf)
         seed.write(into: buf)
         derivationPath.write(into: buf)
+        hasPwd.write(into: buf)
     }
 }
 
@@ -3792,11 +3950,11 @@ extension TransactionCardSet: ViaFfiUsingByteBuffer, ViaFfi {}
 
 public struct SeedNameCard {
     public var seedName: String
-    public var identicon: String
+    public var identicon: [UInt8]
 
     // Default memberwise initializers are never public by default, so we
     // declare one manually.
-    public init(seedName: String, identicon: String) {
+    public init(seedName: String, identicon: [UInt8]) {
         self.seedName = seedName
         self.identicon = identicon
     }
@@ -3823,13 +3981,13 @@ private extension SeedNameCard {
     static func read(from buf: Reader) throws -> SeedNameCard {
         return try SeedNameCard(
             seedName: String.read(from: buf),
-            identicon: String.read(from: buf)
+            identicon: FfiConverterSequenceUInt8.read(from: buf)
         )
     }
 
     func write(into buf: Writer) {
         seedName.write(into: buf)
-        identicon.write(into: buf)
+        FfiConverterSequenceUInt8.write(identicon, into: buf)
     }
 }
 
@@ -3873,10 +4031,10 @@ private extension MSeeds {
 extension MSeeds: ViaFfiUsingByteBuffer, ViaFfi {}
 
 public struct MKeyDetails {
-    public var qr: String
+    public var qr: [UInt8]
     public var pubkey: String
     public var base58: String
-    public var identicon: String
+    public var identicon: [UInt8]
     public var seedName: String
     public var path: String
     public var networkTitle: String
@@ -3884,7 +4042,7 @@ public struct MKeyDetails {
 
     // Default memberwise initializers are never public by default, so we
     // declare one manually.
-    public init(qr: String, pubkey: String, base58: String, identicon: String, seedName: String, path: String, networkTitle: String, networkLogo: String) {
+    public init(qr: [UInt8], pubkey: String, base58: String, identicon: [UInt8], seedName: String, path: String, networkTitle: String, networkLogo: String) {
         self.qr = qr
         self.pubkey = pubkey
         self.base58 = base58
@@ -3940,10 +4098,10 @@ extension MKeyDetails: Equatable, Hashable {
 private extension MKeyDetails {
     static func read(from buf: Reader) throws -> MKeyDetails {
         return try MKeyDetails(
-            qr: String.read(from: buf),
+            qr: FfiConverterSequenceUInt8.read(from: buf),
             pubkey: String.read(from: buf),
             base58: String.read(from: buf),
-            identicon: String.read(from: buf),
+            identicon: FfiConverterSequenceUInt8.read(from: buf),
             seedName: String.read(from: buf),
             path: String.read(from: buf),
             networkTitle: String.read(from: buf),
@@ -3952,10 +4110,10 @@ private extension MKeyDetails {
     }
 
     func write(into buf: Writer) {
-        qr.write(into: buf)
+        FfiConverterSequenceUInt8.write(qr, into: buf)
         pubkey.write(into: buf)
         base58.write(into: buf)
-        identicon.write(into: buf)
+        FfiConverterSequenceUInt8.write(identicon, into: buf)
         seedName.write(into: buf)
         path.write(into: buf)
         networkTitle.write(into: buf)
@@ -4274,13 +4432,13 @@ public struct Address {
     public var base58: String
     public var path: String
     public var hasPwd: Bool
-    public var identicon: String
+    public var identicon: [UInt8]
     public var seedName: String
     public var multiselect: Bool?
 
     // Default memberwise initializers are never public by default, so we
     // declare one manually.
-    public init(base58: String, path: String, hasPwd: Bool, identicon: String, seedName: String, multiselect: Bool?) {
+    public init(base58: String, path: String, hasPwd: Bool, identicon: [UInt8], seedName: String, multiselect: Bool?) {
         self.base58 = base58
         self.path = path
         self.hasPwd = hasPwd
@@ -4329,7 +4487,7 @@ private extension Address {
             base58: String.read(from: buf),
             path: String.read(from: buf),
             hasPwd: Bool.read(from: buf),
-            identicon: String.read(from: buf),
+            identicon: FfiConverterSequenceUInt8.read(from: buf),
             seedName: String.read(from: buf),
             multiselect: FfiConverterOptionBool.read(from: buf)
         )
@@ -4339,7 +4497,7 @@ private extension Address {
         base58.write(into: buf)
         path.write(into: buf)
         hasPwd.write(into: buf)
-        identicon.write(into: buf)
+        FfiConverterSequenceUInt8.write(identicon, into: buf)
         seedName.write(into: buf)
         FfiConverterOptionBool.write(multiselect, into: buf)
     }
@@ -4349,12 +4507,12 @@ extension Address: ViaFfiUsingByteBuffer, ViaFfi {}
 
 public struct MVerifierDetails {
     public var publicKey: String
-    public var identicon: String
+    public var identicon: [UInt8]
     public var encryption: String
 
     // Default memberwise initializers are never public by default, so we
     // declare one manually.
-    public init(publicKey: String, identicon: String, encryption: String) {
+    public init(publicKey: String, identicon: [UInt8], encryption: String) {
         self.publicKey = publicKey
         self.identicon = identicon
         self.encryption = encryption
@@ -4386,14 +4544,14 @@ private extension MVerifierDetails {
     static func read(from buf: Reader) throws -> MVerifierDetails {
         return try MVerifierDetails(
             publicKey: String.read(from: buf),
-            identicon: String.read(from: buf),
+            identicon: FfiConverterSequenceUInt8.read(from: buf),
             encryption: String.read(from: buf)
         )
     }
 
     func write(into buf: Writer) {
         publicKey.write(into: buf)
-        identicon.write(into: buf)
+        FfiConverterSequenceUInt8.write(identicon, into: buf)
         encryption.write(into: buf)
     }
 }
@@ -4587,13 +4745,15 @@ private extension MVerifier {
 extension MVerifier: ViaFfiUsingByteBuffer, ViaFfi {}
 
 public struct MMetadataRecord {
+    public var specname: String
     public var specsVersion: String
     public var metaHash: String
-    public var metaIdPic: String
+    public var metaIdPic: [UInt8]
 
     // Default memberwise initializers are never public by default, so we
     // declare one manually.
-    public init(specsVersion: String, metaHash: String, metaIdPic: String) {
+    public init(specname: String, specsVersion: String, metaHash: String, metaIdPic: [UInt8]) {
+        self.specname = specname
         self.specsVersion = specsVersion
         self.metaHash = metaHash
         self.metaIdPic = metaIdPic
@@ -4602,6 +4762,9 @@ public struct MMetadataRecord {
 
 extension MMetadataRecord: Equatable, Hashable {
     public static func == (lhs: MMetadataRecord, rhs: MMetadataRecord) -> Bool {
+        if lhs.specname != rhs.specname {
+            return false
+        }
         if lhs.specsVersion != rhs.specsVersion {
             return false
         }
@@ -4615,6 +4778,7 @@ extension MMetadataRecord: Equatable, Hashable {
     }
 
     public func hash(into hasher: inout Hasher) {
+        hasher.combine(specname)
         hasher.combine(specsVersion)
         hasher.combine(metaHash)
         hasher.combine(metaIdPic)
@@ -4624,16 +4788,18 @@ extension MMetadataRecord: Equatable, Hashable {
 private extension MMetadataRecord {
     static func read(from buf: Reader) throws -> MMetadataRecord {
         return try MMetadataRecord(
+            specname: String.read(from: buf),
             specsVersion: String.read(from: buf),
             metaHash: String.read(from: buf),
-            metaIdPic: String.read(from: buf)
+            metaIdPic: FfiConverterSequenceUInt8.read(from: buf)
         )
     }
 
     func write(into buf: Writer) {
+        specname.write(into: buf)
         specsVersion.write(into: buf)
         metaHash.write(into: buf)
-        metaIdPic.write(into: buf)
+        FfiConverterSequenceUInt8.write(metaIdPic, into: buf)
     }
 }
 
@@ -4643,13 +4809,13 @@ public struct MRawKey {
     public var seedName: String
     public var addressKey: String
     public var publicKey: String
-    public var identicon: String
+    public var identicon: [UInt8]
     public var hasPwd: Bool
     public var path: String
 
     // Default memberwise initializers are never public by default, so we
     // declare one manually.
-    public init(seedName: String, addressKey: String, publicKey: String, identicon: String, hasPwd: Bool, path: String) {
+    public init(seedName: String, addressKey: String, publicKey: String, identicon: [UInt8], hasPwd: Bool, path: String) {
         self.seedName = seedName
         self.addressKey = addressKey
         self.publicKey = publicKey
@@ -4698,7 +4864,7 @@ private extension MRawKey {
             seedName: String.read(from: buf),
             addressKey: String.read(from: buf),
             publicKey: String.read(from: buf),
-            identicon: String.read(from: buf),
+            identicon: FfiConverterSequenceUInt8.read(from: buf),
             hasPwd: Bool.read(from: buf),
             path: String.read(from: buf)
         )
@@ -4708,7 +4874,7 @@ private extension MRawKey {
         seedName.write(into: buf)
         addressKey.write(into: buf)
         publicKey.write(into: buf)
-        identicon.write(into: buf)
+        FfiConverterSequenceUInt8.write(identicon, into: buf)
         hasPwd.write(into: buf)
         path.write(into: buf)
     }
@@ -4943,14 +5109,14 @@ extension MscContent: ViaFfiUsingByteBuffer, ViaFfi {}
 
 public struct MscAuthor {
     public var base58: String
-    public var identicon: String
+    public var identicon: [UInt8]
     public var seed: String
     public var hasPassword: Bool?
     public var derivationPath: String
 
     // Default memberwise initializers are never public by default, so we
     // declare one manually.
-    public init(base58: String, identicon: String, seed: String, hasPassword: Bool?, derivationPath: String) {
+    public init(base58: String, identicon: [UInt8], seed: String, hasPassword: Bool?, derivationPath: String) {
         self.base58 = base58
         self.identicon = identicon
         self.seed = seed
@@ -4992,7 +5158,7 @@ private extension MscAuthor {
     static func read(from buf: Reader) throws -> MscAuthor {
         return try MscAuthor(
             base58: String.read(from: buf),
-            identicon: String.read(from: buf),
+            identicon: FfiConverterSequenceUInt8.read(from: buf),
             seed: String.read(from: buf),
             hasPassword: FfiConverterOptionBool.read(from: buf),
             derivationPath: String.read(from: buf)
@@ -5001,7 +5167,7 @@ private extension MscAuthor {
 
     func write(into buf: Writer) {
         base58.write(into: buf)
-        identicon.write(into: buf)
+        FfiConverterSequenceUInt8.write(identicon, into: buf)
         seed.write(into: buf)
         FfiConverterOptionBool.write(hasPassword, into: buf)
         derivationPath.write(into: buf)
@@ -5012,12 +5178,12 @@ extension MscAuthor: ViaFfiUsingByteBuffer, ViaFfi {}
 
 public struct MSufficientCryptoReady {
     public var authorInfo: MscAuthor
-    public var sufficient: String
+    public var sufficient: [UInt8]
     public var content: MscContent
 
     // Default memberwise initializers are never public by default, so we
     // declare one manually.
-    public init(authorInfo: MscAuthor, sufficient: String, content: MscContent) {
+    public init(authorInfo: MscAuthor, sufficient: [UInt8], content: MscContent) {
         self.authorInfo = authorInfo
         self.sufficient = sufficient
         self.content = content
@@ -5049,14 +5215,14 @@ private extension MSufficientCryptoReady {
     static func read(from buf: Reader) throws -> MSufficientCryptoReady {
         return try MSufficientCryptoReady(
             authorInfo: MscAuthor.read(from: buf),
-            sufficient: String.read(from: buf),
+            sufficient: FfiConverterSequenceUInt8.read(from: buf),
             content: MscContent.read(from: buf)
         )
     }
 
     func write(into buf: Writer) {
         authorInfo.write(into: buf)
-        sufficient.write(into: buf)
+        FfiConverterSequenceUInt8.write(sufficient, into: buf)
         content.write(into: buf)
     }
 }
@@ -5254,11 +5420,11 @@ extension MSeedMenu: ViaFfiUsingByteBuffer, ViaFfi {}
 public struct MNewSeedBackup {
     public var seed: String
     public var seedPhrase: String
-    public var identicon: String
+    public var identicon: [UInt8]
 
     // Default memberwise initializers are never public by default, so we
     // declare one manually.
-    public init(seed: String, seedPhrase: String, identicon: String) {
+    public init(seed: String, seedPhrase: String, identicon: [UInt8]) {
         self.seed = seed
         self.seedPhrase = seedPhrase
         self.identicon = identicon
@@ -5291,14 +5457,14 @@ private extension MNewSeedBackup {
         return try MNewSeedBackup(
             seed: String.read(from: buf),
             seedPhrase: String.read(from: buf),
-            identicon: String.read(from: buf)
+            identicon: FfiConverterSequenceUInt8.read(from: buf)
         )
     }
 
     func write(into buf: Writer) {
         seed.write(into: buf)
         seedPhrase.write(into: buf)
-        identicon.write(into: buf)
+        FfiConverterSequenceUInt8.write(identicon, into: buf)
     }
 }
 
@@ -5464,11 +5630,11 @@ private extension MPasswordConfirm {
 extension MPasswordConfirm: ViaFfiUsingByteBuffer, ViaFfi {}
 
 public struct MSignatureReady {
-    public var signature: String
+    public var signature: [UInt8]
 
     // Default memberwise initializers are never public by default, so we
     // declare one manually.
-    public init(signature: String) {
+    public init(signature: [UInt8]) {
         self.signature = signature
     }
 }
@@ -5489,12 +5655,12 @@ extension MSignatureReady: Equatable, Hashable {
 private extension MSignatureReady {
     static func read(from buf: Reader) throws -> MSignatureReady {
         return try MSignatureReady(
-            signature: String.read(from: buf)
+            signature: FfiConverterSequenceUInt8.read(from: buf)
         )
     }
 
     func write(into buf: Writer) {
-        signature.write(into: buf)
+        FfiConverterSequenceUInt8.write(signature, into: buf)
     }
 }
 
@@ -5647,12 +5813,12 @@ public struct MmManageNetworks {
     public var name: String
     public var version: String
     public var metaHash: String
-    public var metaIdPic: String
+    public var metaIdPic: [UInt8]
     public var networks: [MmmNetwork]
 
     // Default memberwise initializers are never public by default, so we
     // declare one manually.
-    public init(name: String, version: String, metaHash: String, metaIdPic: String, networks: [MmmNetwork]) {
+    public init(name: String, version: String, metaHash: String, metaIdPic: [UInt8], networks: [MmmNetwork]) {
         self.name = name
         self.version = version
         self.metaHash = metaHash
@@ -5696,7 +5862,7 @@ private extension MmManageNetworks {
             name: String.read(from: buf),
             version: String.read(from: buf),
             metaHash: String.read(from: buf),
-            metaIdPic: String.read(from: buf),
+            metaIdPic: FfiConverterSequenceUInt8.read(from: buf),
             networks: FfiConverterSequenceRecordMmmNetwork.read(from: buf)
         )
     }
@@ -5705,7 +5871,7 @@ private extension MmManageNetworks {
         name.write(into: buf)
         version.write(into: buf)
         metaHash.write(into: buf)
-        metaIdPic.write(into: buf)
+        FfiConverterSequenceUInt8.write(metaIdPic, into: buf)
         FfiConverterSequenceRecordMmmNetwork.write(networks, into: buf)
     }
 }
@@ -5715,11 +5881,11 @@ extension MmManageNetworks: ViaFfiUsingByteBuffer, ViaFfi {}
 public struct MTypesInfo {
     public var typesOnFile: Bool
     public var typesHash: String?
-    public var typesIdPic: String?
+    public var typesIdPic: [UInt8]?
 
     // Default memberwise initializers are never public by default, so we
     // declare one manually.
-    public init(typesOnFile: Bool, typesHash: String?, typesIdPic: String?) {
+    public init(typesOnFile: Bool, typesHash: String?, typesIdPic: [UInt8]?) {
         self.typesOnFile = typesOnFile
         self.typesHash = typesHash
         self.typesIdPic = typesIdPic
@@ -5752,14 +5918,14 @@ private extension MTypesInfo {
         return try MTypesInfo(
             typesOnFile: Bool.read(from: buf),
             typesHash: FfiConverterOptionString.read(from: buf),
-            typesIdPic: FfiConverterOptionString.read(from: buf)
+            typesIdPic: FfiConverterOptionSequenceUInt8.read(from: buf)
         )
     }
 
     func write(into buf: Writer) {
         typesOnFile.write(into: buf)
         FfiConverterOptionString.write(typesHash, into: buf)
-        FfiConverterOptionString.write(typesIdPic, into: buf)
+        FfiConverterOptionSequenceUInt8.write(typesIdPic, into: buf)
     }
 }
 
@@ -5767,11 +5933,11 @@ extension MTypesInfo: ViaFfiUsingByteBuffer, ViaFfi {}
 
 public struct MscAuthorPlain {
     public var base58: String
-    public var identicon: String
+    public var identicon: [UInt8]
 
     // Default memberwise initializers are never public by default, so we
     // declare one manually.
-    public init(base58: String, identicon: String) {
+    public init(base58: String, identicon: [UInt8]) {
         self.base58 = base58
         self.identicon = identicon
     }
@@ -5798,13 +5964,13 @@ private extension MscAuthorPlain {
     static func read(from buf: Reader) throws -> MscAuthorPlain {
         return try MscAuthorPlain(
             base58: String.read(from: buf),
-            identicon: String.read(from: buf)
+            identicon: FfiConverterSequenceUInt8.read(from: buf)
         )
     }
 
     func write(into buf: Writer) {
         base58.write(into: buf)
-        identicon.write(into: buf)
+        FfiConverterSequenceUInt8.write(identicon, into: buf)
     }
 }
 
@@ -6122,11 +6288,11 @@ extension MscFieldNumber: ViaFfiUsingByteBuffer, ViaFfi {}
 
 public struct MscId {
     public var base58: String
-    public var identicon: String
+    public var identicon: [UInt8]
 
     // Default memberwise initializers are never public by default, so we
     // declare one manually.
-    public init(base58: String, identicon: String) {
+    public init(base58: String, identicon: [UInt8]) {
         self.base58 = base58
         self.identicon = identicon
     }
@@ -6153,78 +6319,17 @@ private extension MscId {
     static func read(from buf: Reader) throws -> MscId {
         return try MscId(
             base58: String.read(from: buf),
-            identicon: String.read(from: buf)
+            identicon: FfiConverterSequenceUInt8.read(from: buf)
         )
     }
 
     func write(into buf: Writer) {
         base58.write(into: buf)
-        identicon.write(into: buf)
+        FfiConverterSequenceUInt8.write(identicon, into: buf)
     }
 }
 
 extension MscId: ViaFfiUsingByteBuffer, ViaFfi {}
-
-public struct MscMetaSpecs {
-    public var specname: String
-    public var specVersion: String
-    public var metaHash: String
-    public var metaIdPic: String
-
-    // Default memberwise initializers are never public by default, so we
-    // declare one manually.
-    public init(specname: String, specVersion: String, metaHash: String, metaIdPic: String) {
-        self.specname = specname
-        self.specVersion = specVersion
-        self.metaHash = metaHash
-        self.metaIdPic = metaIdPic
-    }
-}
-
-extension MscMetaSpecs: Equatable, Hashable {
-    public static func == (lhs: MscMetaSpecs, rhs: MscMetaSpecs) -> Bool {
-        if lhs.specname != rhs.specname {
-            return false
-        }
-        if lhs.specVersion != rhs.specVersion {
-            return false
-        }
-        if lhs.metaHash != rhs.metaHash {
-            return false
-        }
-        if lhs.metaIdPic != rhs.metaIdPic {
-            return false
-        }
-        return true
-    }
-
-    public func hash(into hasher: inout Hasher) {
-        hasher.combine(specname)
-        hasher.combine(specVersion)
-        hasher.combine(metaHash)
-        hasher.combine(metaIdPic)
-    }
-}
-
-private extension MscMetaSpecs {
-    static func read(from buf: Reader) throws -> MscMetaSpecs {
-        return try MscMetaSpecs(
-            specname: String.read(from: buf),
-            specVersion: String.read(from: buf),
-            metaHash: String.read(from: buf),
-            metaIdPic: String.read(from: buf)
-        )
-    }
-
-    func write(into buf: Writer) {
-        specname.write(into: buf)
-        specVersion.write(into: buf)
-        metaHash.write(into: buf)
-        metaIdPic.write(into: buf)
-    }
-}
-
-extension MscMetaSpecs: ViaFfiUsingByteBuffer, ViaFfi {}
 
 public struct MscNameVersion {
     public var name: String
@@ -6630,6 +6735,7 @@ extension String: ViaFfi {
 // Helper code for MBackup record is found in RecordTemplate.swift
 // Helper code for MDeriveKey record is found in RecordTemplate.swift
 // Helper code for MEnterPassword record is found in RecordTemplate.swift
+// Helper code for MEventMaybeDecoded record is found in RecordTemplate.swift
 // Helper code for MKeyDetails record is found in RecordTemplate.swift
 // Helper code for MKeyDetailsMulti record is found in RecordTemplate.swift
 // Helper code for MKeys record is found in RecordTemplate.swift
@@ -6661,7 +6767,6 @@ extension String: ViaFfi {
 // Helper code for MscFieldName record is found in RecordTemplate.swift
 // Helper code for MscFieldNumber record is found in RecordTemplate.swift
 // Helper code for MscId record is found in RecordTemplate.swift
-// Helper code for MscMetaSpecs record is found in RecordTemplate.swift
 // Helper code for MscNameVersion record is found in RecordTemplate.swift
 // Helper code for MscNetworkInfo record is found in RecordTemplate.swift
 // Helper code for MscTip record is found in RecordTemplate.swift
@@ -6697,6 +6802,7 @@ extension String: ViaFfi {
 // Helper code for TypesExport record is found in RecordTemplate.swift
 // Helper code for Verifier record is found in RecordTemplate.swift
 // Helper code for Action enum is found in EnumTemplate.swift
+// Helper code for AlertData enum is found in EnumTemplate.swift
 // Helper code for Card enum is found in EnumTemplate.swift
 // Helper code for DerivationDestination enum is found in EnumTemplate.swift
 // Helper code for Encryption enum is found in EnumTemplate.swift
@@ -6706,6 +6812,7 @@ extension String: ViaFfi {
 // Helper code for RightButton enum is found in EnumTemplate.swift
 // Helper code for ScreenData enum is found in EnumTemplate.swift
 // Helper code for ScreenNameType enum is found in EnumTemplate.swift
+// Helper code for ShieldAlert enum is found in EnumTemplate.swift
 // Helper code for TransactionType enum is found in EnumTemplate.swift
 // Helper code for ValidCurrentVerifier enum is found in EnumTemplate.swift
 // Helper code for VerifierValue enum is found in EnumTemplate.swift
@@ -6791,6 +6898,22 @@ private enum FfiConverterOptionRecordDerivationCheck: FfiConverterUsingByteBuffe
     }
 }
 
+private enum FfiConverterOptionRecordMVerifierDetails: FfiConverterUsingByteBuffer {
+    typealias SwiftType = MVerifierDetails?
+
+    static func write(_ value: SwiftType, into buf: Writer) {
+        FfiConverterOptional.write(value, into: buf) { item, buf in
+            item.write(into: buf)
+        }
+    }
+
+    static func read(from buf: Reader) throws -> SwiftType {
+        try FfiConverterOptional.read(from: buf) { buf in
+            try MVerifierDetails.read(from: buf)
+        }
+    }
+}
+
 private enum FfiConverterOptionRecordTransactionAuthor: FfiConverterUsingByteBuffer {
     typealias SwiftType = TransactionAuthor?
 
@@ -6807,6 +6930,22 @@ private enum FfiConverterOptionRecordTransactionAuthor: FfiConverterUsingByteBuf
     }
 }
 
+private enum FfiConverterOptionRecordTransactionCardSet: FfiConverterUsingByteBuffer {
+    typealias SwiftType = TransactionCardSet?
+
+    static func write(_ value: SwiftType, into buf: Writer) {
+        FfiConverterOptional.write(value, into: buf) { item, buf in
+            item.write(into: buf)
+        }
+    }
+
+    static func read(from buf: Reader) throws -> SwiftType {
+        try FfiConverterOptional.read(from: buf) { buf in
+            try TransactionCardSet.read(from: buf)
+        }
+    }
+}
+
 private enum FfiConverterOptionRecordTransactionNetworkInfo: FfiConverterUsingByteBuffer {
     typealias SwiftType = TransactionNetworkInfo?
 
@@ -6819,6 +6958,22 @@ private enum FfiConverterOptionRecordTransactionNetworkInfo: FfiConverterUsingBy
     static func read(from buf: Reader) throws -> SwiftType {
         try FfiConverterOptional.read(from: buf) { buf in
             try TransactionNetworkInfo.read(from: buf)
+        }
+    }
+}
+
+private enum FfiConverterOptionEnumAlertData: FfiConverterUsingByteBuffer {
+    typealias SwiftType = AlertData?
+
+    static func write(_ value: SwiftType, into buf: Writer) {
+        FfiConverterOptional.write(value, into: buf) { item, buf in
+            item.write(into: buf)
+        }
+    }
+
+    static func read(from buf: Reader) throws -> SwiftType {
+        try FfiConverterOptional.read(from: buf) { buf in
+            try AlertData.read(from: buf)
         }
     }
 }
@@ -6887,6 +7042,22 @@ private enum FfiConverterOptionEnumRightButton: FfiConverterUsingByteBuffer {
     }
 }
 
+private enum FfiConverterOptionEnumShieldAlert: FfiConverterUsingByteBuffer {
+    typealias SwiftType = ShieldAlert?
+
+    static func write(_ value: SwiftType, into buf: Writer) {
+        FfiConverterOptional.write(value, into: buf) { item, buf in
+            item.write(into: buf)
+        }
+    }
+
+    static func read(from buf: Reader) throws -> SwiftType {
+        try FfiConverterOptional.read(from: buf) { buf in
+            try ShieldAlert.read(from: buf)
+        }
+    }
+}
+
 private enum FfiConverterOptionEnumVerifierValue: FfiConverterUsingByteBuffer {
     typealias SwiftType = VerifierValue?
 
@@ -6899,6 +7070,22 @@ private enum FfiConverterOptionEnumVerifierValue: FfiConverterUsingByteBuffer {
     static func read(from buf: Reader) throws -> SwiftType {
         try FfiConverterOptional.read(from: buf) { buf in
             try VerifierValue.read(from: buf)
+        }
+    }
+}
+
+private enum FfiConverterOptionSequenceUInt8: FfiConverterUsingByteBuffer {
+    typealias SwiftType = [UInt8]?
+
+    static func write(_ value: SwiftType, into buf: Writer) {
+        FfiConverterOptional.write(value, into: buf) { item, buf in
+            FfiConverterSequenceUInt8.write(item, into: buf)
+        }
+    }
+
+    static func read(from buf: Reader) throws -> SwiftType {
+        try FfiConverterOptional.read(from: buf) { buf in
+            try FfiConverterSequenceUInt8.read(from: buf)
         }
     }
 }
@@ -6995,6 +7182,22 @@ private enum FfiConverterSequenceRecordHistory: FfiConverterUsingByteBuffer {
     static func read(from buf: Reader) throws -> SwiftType {
         try FfiConverterSequence.read(from: buf) { buf in
             try History.read(from: buf)
+        }
+    }
+}
+
+private enum FfiConverterSequenceRecordMEventMaybeDecoded: FfiConverterUsingByteBuffer {
+    typealias SwiftType = [MEventMaybeDecoded]
+
+    static func write(_ value: SwiftType, into buf: Writer) {
+        FfiConverterSequence.write(value, into: buf) { item, buf in
+            item.write(into: buf)
+        }
+    }
+
+    static func read(from buf: Reader) throws -> SwiftType {
+        try FfiConverterSequence.read(from: buf) { buf in
+            try MEventMaybeDecoded.read(from: buf)
         }
     }
 }
