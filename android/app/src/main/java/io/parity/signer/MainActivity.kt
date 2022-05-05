@@ -16,7 +16,6 @@ import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.halilibo.richtext.ui.material.SetupMaterialRichText
 import io.parity.signer.components.BigButton
 import io.parity.signer.components.BottomBar
 import io.parity.signer.components.TopBar
@@ -26,10 +25,7 @@ import io.parity.signer.screens.LandingView
 import io.parity.signer.screens.WaitingScreen
 import io.parity.signer.ui.theme.ParitySignerTheme
 import io.parity.signer.ui.theme.Text600
-import io.parity.signer.uniffi.Action
-import io.parity.signer.uniffi.ModalData
-import io.parity.signer.uniffi.ScreenData
-import io.parity.signer.uniffi.initLogging
+import io.parity.signer.uniffi.*
 
 @ExperimentalMaterialApi
 @ExperimentalAnimationApi
@@ -38,7 +34,7 @@ class MainActivity : AppCompatActivity() {
 		initLogging("SIGNER_RUST_LOG")
 	}
 
-	//rust library is initialized inside data model
+	// rust library is initialized inside data model
 	private val signerDataModel by viewModels<SignerDataModel>()
 
 	override fun onCreate(savedInstanceState: Bundle?) {
@@ -64,45 +60,60 @@ fun SignerApp(signerDataModel: SignerDataModel) {
 	ParitySignerTheme {
 		val onBoardingDone = signerDataModel.onBoardingDone.observeAsState()
 		val authenticated = signerDataModel.authenticated.observeAsState()
+		val actionResult = signerDataModel.actionResult.observeAsState()
 		val shieldAlert = signerDataModel.alertState.observeAsState()
-		val footer = signerDataModel.footer.observeAsState()
+		val progress = signerDataModel.progress.observeAsState()
+		val captured = signerDataModel.captured.observeAsState()
+		val total = signerDataModel.total.observeAsState()
 
 		when (onBoardingDone.value) {
 			OnBoardingState.Yes -> {
 				if (authenticated.value == true) {
 					BackHandler {
-						//TODO: implement this in backend
+						// TODO: implement this in backend
 						if (
-							signerDataModel.modalData.value == null
-							&&
+							actionResult.value?.alertData == null && //no alert state
+							actionResult.value?.modalData == null &&
 							(
-								signerDataModel.screenData.value is ScreenData.Log ||
-									signerDataModel.screenData.value is ScreenData.Scan ||
-									signerDataModel.screenData.value is ScreenData.SeedSelector ||
-									signerDataModel.screenData.value is ScreenData.Settings
+								actionResult.value?.screenData is ScreenData.Log ||
+									actionResult.value?.screenData is ScreenData.Scan ||
+									actionResult.value?.screenData is ScreenData.SeedSelector ||
+									actionResult.value?.screenData is ScreenData.Settings
 								)
 						) {
 							signerDataModel.activity.moveTaskToBack(true)
 						} else
 							signerDataModel.pushButton(Action.GO_BACK)
 					}
-					//Structure to contain all app
+					// Structure to contain all app
 					Scaffold(
 						topBar = {
-							TopBar(signerDataModel = signerDataModel)
+							TopBar(signerDataModel = signerDataModel, alert = shieldAlert)
 						},
 						bottomBar = {
-							if (footer.value == true) BottomBar(signerDataModel = signerDataModel)
+							if (actionResult.value?.footer == true) BottomBar(signerDataModel = signerDataModel)
 						}
 					) { innerPadding ->
 						Box(modifier = Modifier.padding(innerPadding)) {
-							ScreenSelector(signerDataModel)
-							ModalSelector(
-								liveModal = signerDataModel.modalData,
+							ScreenSelector(
+								screenData = actionResult.value?.screenData
+									?: ScreenData.Documents,//default fallback
+								alertState = shieldAlert,
+								progress = progress,
+								captured = captured,
+								total = total,
+								button = signerDataModel::pushButton,
 								signerDataModel = signerDataModel
 							)
+							ModalSelector(
+								modalData = actionResult.value?.modalData,//default fallback
+								alertState = actionResult.value?.alertData,
+								button = signerDataModel::pushButton,
+								signerDataModel = signerDataModel,
+							)
 							AlertSelector(
-								alert = SignerAlert.Empty,
+								alert = actionResult.value?.alertData,
+								button = signerDataModel::pushButton,
 								signerDataModel = signerDataModel
 							)
 						}
@@ -116,15 +127,16 @@ fun SignerApp(signerDataModel: SignerDataModel) {
 								signerDataModel.authentication.authenticate(signerDataModel.activity) {
 									signerDataModel.totalRefresh()
 								}
-							})
+							}
+						)
 						Spacer(Modifier.weight(0.5f))
 					}
 				}
 			}
 			OnBoardingState.No -> {
-				if (shieldAlert.value == ShieldAlert.None) {
+				if (shieldAlert.value == null) {
 					Scaffold {
-						LandingView(signerDataModel = signerDataModel)
+						LandingView(signerDataModel::onBoard)
 					}
 				} else {
 					Box(
@@ -148,7 +160,8 @@ fun SignerApp(signerDataModel: SignerDataModel) {
 							text = "Unlock app",
 							action = {
 								signerDataModel.lateInit()
-							})
+							}
+						)
 						Spacer(Modifier.weight(0.5f))
 					}
 				}

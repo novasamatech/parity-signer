@@ -75,6 +75,19 @@ pub enum ScreenNameType {
     H4,
 }
 
+#[derive(PartialEq, Debug, Clone)]
+pub enum ShieldAlert {
+    Active,
+    Past,
+}
+
+#[derive(PartialEq, Debug, Clone)]
+pub enum AlertData {
+    Shield { f: Option<ShieldAlert> },
+    ErrorData { f: String },
+    Confirm,
+}
+
 #[derive(Clone, Debug, PartialEq)]
 pub struct ActionResult {
     pub screen_label: String,
@@ -85,7 +98,7 @@ pub struct ActionResult {
     pub screen_name_type: ScreenNameType,
     pub screen_data: ScreenData,
     pub modal_data: Option<ModalData>,
-    pub alert_data: Option<String>,
+    pub alert_data: Option<AlertData>,
 }
 
 #[derive(Clone, PartialEq)]
@@ -551,7 +564,7 @@ pub enum ModalData {
     TypesInfo { f: MTypesInfo },
     NewSeedMenu,
     NetworkDetailsMenu,
-    ManageMetadata,
+    ManageMetadata { f: MMManageNetworks },
     KeyDetailsAction,
     LogComment,
     SelectSeed { f: MSeeds },

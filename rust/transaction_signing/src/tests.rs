@@ -14,9 +14,9 @@ use constants::{
 };
 use db_handling::{
     cold_default::{populate_cold, populate_cold_no_networks},
+    helpers::remove_network,
     identities::{remove_seed, try_create_address, try_create_seed},
     manage_history::{get_history, get_history_entry_by_order},
-    remove_network::remove_network,
 };
 use definitions::{
     crypto::Encryption,
@@ -25,9 +25,9 @@ use definitions::{
     history::{Entry, Event, SignDisplay, SignMessageDisplay},
     keyring::{AddressKey, MetaKey, NetworkSpecsKey, VerifierKey},
     navigation::{
-        Card, MSCAuthorPlain, MSCCall, MSCCurrency, MSCEnumVariantName, MSCEraMortal, MSCFieldName,
-        MSCId, MSCMetaSpecs, MSCNameVersion, MTypesInfo, MVerifierDetails, NetworkSpecsToSend,
-        TransactionAuthor, TransactionCard, TransactionCardSet,
+        Card, MMetadataRecord, MSCAuthorPlain, MSCCall, MSCCurrency, MSCEnumVariantName,
+        MSCEraMortal, MSCFieldName, MSCId, MSCNameVersion, MTypesInfo, MVerifierDetails,
+        NetworkSpecsToSend, TransactionAuthor, TransactionCard, TransactionCardSet,
     },
     network_specs::{CurrentVerifier, NetworkSpecs, ValidCurrentVerifier, Verifier, VerifierValue},
     users::AddressDetails,
@@ -1024,9 +1024,9 @@ fn load_westend9070() {
             index: 1,
             indent: 0,
             card: Card::MetaCard {
-                f: MSCMetaSpecs {
+                f: MMetadataRecord {
                     specname: "westend".to_string(),
-                    spec_version: "9070".to_string(),
+                    specs_version: "9070".to_string(),
                     meta_hash: "e281fbc53168a6b87d1ea212923811f4c083e7be7d18df4b8527b9532e5f5fec"
                         .to_string(),
                     meta_id_pic: westend_9070().to_vec(),
@@ -1537,9 +1537,9 @@ Identities:
             index: 1,
             indent: 0,
             card: Card::MetaCard {
-                f: MSCMetaSpecs {
+                f: MMetadataRecord {
                     specname: "dock-pos-main-runtime".to_string(),
-                    spec_version: "31".to_string(),
+                    specs_version: "31".to_string(),
                     meta_hash: "28c25067d5c0c739f64f7779c5f3095ecf57d9075b0c5258f3be2df6d7f323d0"
                         .to_string(),
                     meta_id_pic: dock_31().to_vec(),
@@ -1884,9 +1884,9 @@ Identities:
             index: 1,
             indent: 0,
             card: Card::MetaCard {
-                f: MSCMetaSpecs {
+                f: MMetadataRecord {
                     specname: "dock-pos-main-runtime".to_string(),
-                    spec_version: "31".to_string(),
+                    specs_version: "31".to_string(),
                     meta_hash: "28c25067d5c0c739f64f7779c5f3095ecf57d9075b0c5258f3be2df6d7f323d0"
                         .to_string(),
                     meta_id_pic: dock_31().to_vec(),
@@ -2217,9 +2217,9 @@ fn can_parse_westend_with_v14() {
             index: 1,
             indent: 0,
             card: Card::MetaCard {
-                f: MSCMetaSpecs {
+                f: MMetadataRecord {
                     specname: "westend".to_string(),
-                    spec_version: "9111".to_string(),
+                    specs_version: "9111".to_string(),
                     meta_hash: "207956815bc7b3234fa8827ef40df5fd2879e93f18a680e22bc6801bca27312d"
                         .to_string(),
                     meta_id_pic: westend_9111().to_vec(),
@@ -2831,9 +2831,9 @@ fn parse_transaction_alice_remarks_westend9122() {
             index: 1,
             indent: 0,
             card: Card::MetaCard {
-                f: MSCMetaSpecs {
+                f: MMetadataRecord {
                     specname: "westend".to_string(),
-                    spec_version: "9122".to_string(),
+                    specs_version: "9122".to_string(),
                     meta_hash: "d656951f4c58c9fdbe029be33b02a7095abc3007586656be7ff68fd0550d6ced"
                         .to_string(),
                     meta_id_pic: westend_9122().to_vec(),
@@ -3543,9 +3543,9 @@ fn shell_no_token_warning_on_metadata() {
             index: 2,
             indent: 0,
             card: Card::MetaCard {
-                f: MSCMetaSpecs {
+                f: MMetadataRecord {
                     specname: "shell".to_string(),
-                    spec_version: "200".to_string(),
+                    specs_version: "200".to_string(),
                     meta_hash: "65f0d394de10396c6c1800092f9a95c48ec1365d9302dbf5df736c5e0c54fde3"
                         .to_string(),
                     meta_id_pic: shell_200().to_vec(),

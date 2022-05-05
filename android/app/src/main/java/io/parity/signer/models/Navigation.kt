@@ -15,22 +15,11 @@ fun SignerDataModel.pushButton(
 	details: String = "",
 	seedPhrase: String = ""
 ) {
+	Log.w("SIGNER_RUST_LOG", "action $button")
 	//Here we just list all possible arguments coming from backend
 	try {
-		Log.w("AACTION", "$details $button")
-		val actionResult = backendAction(button, details, seedPhrase)
-		_screenLabel.value = actionResult.screenLabel
-		_back.value = actionResult.back
-		_footer.value = actionResult.footer
-		_footerButton.value = actionResult.footerButton
-		_rightButton.value = actionResult.rightButton
-		_screenNameType.value = actionResult.screenNameType
-		_screenData.value = actionResult.screenData
-		_modalData.value = actionResult.modalData
-		_alertData.value = actionResult.alertData
-		Log.d("screen", _screenData.value.toString())
-		Log.d("modal", _modalData.value.toString())
-
+		_actionResult.value = backendAction(button, details, seedPhrase)
+		Log.w("SIGNER_RUST_LOG", "VALUE ${_actionResult.value}")
 	} catch (e: java.lang.Exception) {
 		Log.e("Navigation error", e.toString())
 		Toast.makeText(context, e.toString(), Toast.LENGTH_SHORT).show()

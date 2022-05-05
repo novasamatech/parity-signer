@@ -139,10 +139,6 @@ Possible commands are:
 
 - `restore_defaults` without any keys, to restore the hot database `HOT_DB_NAME` to its initial default form  
 
-- `make_cold_with_identities` without any keys, to reset in default form the cold database `COLD_DB_NAME` with default Alice identities  
-
-- `transfer_meta_to_cold` without any keys, to transfer metadata from hot database in its current state into cold database `COLD_DB_NAME` with default Alice identities  
-
 - `make_cold_release` without any keys, to reset in default form the cold database `COLD_DB_NAME_RELEASE` without any identities added  
 
 - `transfer_meta_to_cold_release` without any keys, to transfer metadata from hot database in its current state into cold database `COLD_DB_NAME_RELEASE` without any identities added  
@@ -269,10 +265,6 @@ Release cold database is the one loaded into Signer.
 `$ cargo run remove -name kusama -version 9090`  
 
 `$ cargo run restore_defaults`  
-
-`$ cargo run make_cold_with_identities`  
-
-`$ cargo run transfer_meta_to_cold`  
 
 `$ cargo run make_cold_release`  
 

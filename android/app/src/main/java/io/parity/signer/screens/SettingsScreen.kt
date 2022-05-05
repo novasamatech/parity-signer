@@ -9,7 +9,6 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import io.parity.signer.ShieldAlert
 import io.parity.signer.alerts.AndroidCalledConfirm
 import io.parity.signer.components.Identicon
 import io.parity.signer.components.SettingsCardTemplate
@@ -36,7 +35,7 @@ fun SettingsScreen(settings: MSettings, signerDataModel: SignerDataModel) {
 			SettingsCardTemplate(text = "Networks")
 		}
 		Row(Modifier.clickable {
-			if (signerDataModel.alertState.value == ShieldAlert.None)
+			if (signerDataModel.alertState.value == null)
 				signerDataModel.pushButton(Action.BACKUP_SEED)
 			else
 				signerDataModel.pushButton(Action.SHIELD)

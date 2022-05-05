@@ -11,8 +11,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import io.parity.signer.components.HeaderBar
 import io.parity.signer.components.NetworkCard
-import io.parity.signer.models.SignerDataModel
-import io.parity.signer.models.pushButton
 import io.parity.signer.ui.theme.Bg000
 import io.parity.signer.ui.theme.modal
 import io.parity.signer.uniffi.Action
@@ -20,11 +18,14 @@ import io.parity.signer.uniffi.MNetworkMenu
 import io.parity.signer.uniffi.MscNetworkInfo
 
 @Composable
-fun NetworkSelector(networks: MNetworkMenu, signerDataModel: SignerDataModel) {
-	val nets = networks.networks
+fun NetworkSelector(
+	modalData: MNetworkMenu,
+	button: (Action, String) -> Unit
+) {
+	val networks = modalData.networks
 	Surface(
 		color = Color(0x00000000),
-		modifier = Modifier.clickable { signerDataModel.pushButton(Action.GO_BACK) }
+		modifier = Modifier.clickable { button(Action.GO_BACK, "") }
 	) {
 		Column {
 			Spacer(
@@ -49,19 +50,19 @@ fun NetworkSelector(networks: MNetworkMenu, signerDataModel: SignerDataModel) {
 						contentPadding = PaddingValues(horizontal = 8.dp),
 						verticalArrangement = Arrangement.spacedBy(10.dp)
 					) {
-						items(nets.size) { item ->
+						items(networks.size) { item ->
 							Row(Modifier.clickable {
-								signerDataModel.pushButton(
+								button(
 									Action.CHANGE_NETWORK,
-									nets[item].key
+									networks[item].key
 								)
 							}) {
 								NetworkCard(
 									network = MscNetworkInfo(
-										networkTitle = nets[item].title,
-										networkLogo = nets[item].logo
+										networkTitle = networks[item].title,
+										networkLogo = networks[item].logo
 									),
-									selected = nets[item].selected
+									selected = networks[item].selected
 								)
 							}
 						}

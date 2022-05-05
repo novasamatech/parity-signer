@@ -10,12 +10,12 @@ import io.parity.signer.uniffi.Action
  * Confirmation alert called from backend navigation
  */
 @Composable
-fun Confirm(signerDataModel: SignerDataModel) {
+fun Confirm(button: (Action) -> Unit) {
 
 	AlertComponent(
 		show = true,
-		back = { signerDataModel.pushButton(Action.GO_BACK) },
-		forward = { signerDataModel.pushButton(Action.GO_FORWARD) }
+		back = { button(Action.GO_BACK) },
+		forward = { button(Action.GO_FORWARD) }
 	)
 
 }

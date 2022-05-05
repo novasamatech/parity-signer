@@ -17,9 +17,10 @@ use constants::{
     },
     ALICE_SEED_PHRASE,
 };
-use db_handling::cold_default::{populate_cold_nav_test, signer_init};
+use db_handling::cold_default::{init_db, populate_cold_nav_test};
 use definitions::{
     crypto::Encryption,
+    error_signer::Signer,
     history::{
         Event, IdentityHistory, MetaValuesDisplay, MetaValuesExport, NetworkSpecsDisplay,
         NetworkSpecsExport, SignDisplay, SignMessageDisplay, TypesDisplay, TypesExport,
@@ -31,11 +32,11 @@ use definitions::{
         MManageNetworks, MMetadataRecord, MNetworkCard, MNetworkDetails, MNetworkMenu, MNewSeed,
         MNewSeedBackup, MPasswordConfirm, MRawKey, MRecoverSeedName, MRecoverSeedPhrase, MSCAuthor,
         MSCCall, MSCContent, MSCCurrency, MSCEnumVariantName, MSCEraMortal, MSCFieldName, MSCId,
-        MSCMetaSpecs, MSCNameVersion, MSeedKeyCard, MSeedMenu, MSeeds, MSettings,
-        MSignSufficientCrypto, MSignatureReady, MSufficientCryptoReady, MTransaction, MTypesInfo,
-        MVerifier, MVerifierDetails, ModalData, Network, NetworkSpecsToSend, RightButton,
-        ScreenData, ScreenNameType, SeedNameCard, TransactionAuthor, TransactionCard,
-        TransactionCardSet, TransactionNetworkInfo, TransactionType,
+        MSCNameVersion, MSeedKeyCard, MSeedMenu, MSeeds, MSettings, MSignSufficientCrypto,
+        MSignatureReady, MSufficientCryptoReady, MTransaction, MTypesInfo, MVerifier,
+        MVerifierDetails, ModalData, Network, NetworkSpecsToSend, RightButton, ScreenData,
+        ScreenNameType, SeedNameCard, TransactionAuthor, TransactionCard, TransactionCardSet,
+        TransactionNetworkInfo, TransactionType,
     },
     network_specs::{NetworkSpecs, ValidCurrentVerifier, Verifier, VerifierValue},
 };
@@ -303,7 +304,7 @@ fn erase_public_keys(m: &mut ScreenData) {
 fn flow_test_1() {
     let dbname = "for_tests/flow_test_1";
     populate_cold_nav_test(dbname).unwrap();
-    signer_init(dbname, verifier_alice_sr25519()).unwrap();
+    init_db::<Signer>(dbname, verifier_alice_sr25519()).unwrap();
     init_navigation(dbname, "");
 
     let action = do_action(Action::Start, "", "").unwrap();
@@ -758,6 +759,7 @@ fn flow_test_1() {
                     },
                 },
                 meta: vec![MMetadataRecord {
+                    specname: "kusama".to_string(),
                     specs_version: "9130".to_string(),
                     meta_hash: "3e6bf025743e5cc550883170d91c8275fb238762b214922b41d64f9feba23987"
                         .to_string(),
@@ -1399,9 +1401,9 @@ fn flow_test_1() {
                         index: 1,
                         indent: 0,
                         card: Card::MetaCard {
-                            f: MSCMetaSpecs {
+                            f: MMetadataRecord {
                                 specname: "kusama".to_string(),
-                                spec_version: "9151".to_string(),
+                                specs_version: "9151".to_string(),
                                 meta_hash,
                                 meta_id_pic: kusama_9151().to_vec(),
                             },
@@ -1456,6 +1458,7 @@ fn flow_test_1() {
                     },
                 },
                 meta: vec![MMetadataRecord {
+                    specname: "kusama".to_string(),
                     specs_version: "9151".to_string(),
                     meta_hash: "9a179da92949dd3ab3829177149ec83dc46fb009af10a45f955949b2a6693b46"
                         .to_string(),

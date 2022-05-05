@@ -8,17 +8,13 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import io.parity.signer.components.NetworkCard
-import io.parity.signer.models.SignerDataModel
-import io.parity.signer.models.pushButton
-import org.json.JSONArray
 import io.parity.signer.uniffi.Action
 import io.parity.signer.uniffi.MManageNetworks
 
 @Composable
 fun ManageNetworks(
 	manageNetworks: MManageNetworks,
-	signerDataModel: SignerDataModel
+	button: (Action, String) -> Unit
 ) {
 	val networks = manageNetworks.networks
 	LazyColumn(
@@ -28,9 +24,9 @@ fun ManageNetworks(
 		items(networks.size) { index ->
 			val thisNetwork = networks[index]
 			Row(Modifier.clickable {
-				signerDataModel.pushButton(
+				button(
 					Action.GO_FORWARD,
-					details = thisNetwork.key
+					thisNetwork.key
 				)
 			}) {
 				/* TODO: MNetwork -> MDeriveKey

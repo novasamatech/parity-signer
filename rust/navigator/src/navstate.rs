@@ -2,7 +2,7 @@
 
 use db_handling::manage_history::get_history_entry_by_order;
 use definitions::navigation::{
-    ActionResult, FooterButton, History, MEnterPassword, MKeyDetailsMulti, MKeys, MLog,
+    ActionResult, AlertData, FooterButton, History, MEnterPassword, MKeyDetailsMulti, MKeys, MLog,
     MLogDetails, MManageNetworks, MNetworkCard, MNewSeed, MPasswordConfirm, MRecoverSeedName,
     MRecoverSeedPhrase, MSCAuthor, MSCContent, MSeedMenu, MSeeds, MSettings, MSignSufficientCrypto,
     MSignatureReady, MSufficientCryptoReady, MTransaction, ModalData, RightButton, ScreenData,
@@ -878,7 +878,7 @@ impl State {
         match self.navstate.screen {
             Screen::NetworkDetails(ref network_specs_key) => {
                 if let Modal::NetworkDetailsMenu = self.navstate.modal {
-                    match db_handling::remove_network::remove_network(network_specs_key, dbname) {
+                    match db_handling::helpers::remove_network(network_specs_key, dbname) {
                         Ok(()) => {
                             new_navstate = Navstate::clean_screen(Screen::ManageNetworks);
                         }
@@ -901,7 +901,7 @@ impl State {
         match self.navstate.screen {
             Screen::NetworkDetails(ref network_specs_key) => match self.navstate.modal {
                 Modal::ManageMetadata(network_version) => {
-                    match db_handling::remove_network::remove_metadata(
+                    match db_handling::helpers::remove_metadata(
                         network_specs_key,
                         network_version,
                         dbname,
@@ -930,7 +930,7 @@ impl State {
         let mut errorline = String::new();
         match self.navstate.screen {
             Screen::ManageNetworks => match self.navstate.modal {
-                Modal::TypesInfo => match db_handling::remove_types::remove_types_info(dbname) {
+                Modal::TypesInfo => match db_handling::helpers::remove_types_info(dbname) {
                     Ok(()) => {
                         new_navstate = Navstate::clean_screen(Screen::Log);
                     }
@@ -1880,10 +1880,11 @@ impl State {
             //Prepare alert details
             //Important! No errors could be handled in this block!
             let alert_data = match new_navstate.alert {
-                Alert::Error => Some(format!("{{\"error\":\"{}\"}}", errorline)),
-                Alert::ErrorDisplay => Some(format!("{{\"error\":\"{}\"}}", errorline)),
+                Alert::Error | Alert::ErrorDisplay => Some(AlertData::ErrorData {
+                    f: format!("{{\"error\":\"{}\"}}", errorline),
+                }),
                 Alert::Empty => None,
-                Alert::Shield => Some("{\"shield_state\":\"unknown\"}".to_string()),
+                Alert::Shield => Some(AlertData::Shield { f: None }),
             };
 
             self.navstate = new_navstate;

@@ -30,7 +30,7 @@ fun BottomBarButton(
 	action: Action,
 ) {
 	val selected =
-		signerDataModel.footerButton.observeAsState().value == actionGetName(action)
+		signerDataModel.actionResult.observeAsState().value?.footerButton == actionGetName(action)
 	val tint = if (selected) {
 		MaterialTheme.colors.Text600
 	} else {
@@ -43,9 +43,11 @@ fun BottomBarButton(
 	}
 	Column(
 		horizontalAlignment = Alignment.CenterHorizontally,
-		modifier = Modifier.clickable(onClick = {
-			signerDataModel.pushButton(action)
-		}).width(66.dp)
+		modifier = Modifier
+			.clickable(onClick = {
+				signerDataModel.pushButton(action)
+			})
+			.width(66.dp)
 	) {
 		Icon(image, contentDescription = actionGetName(action).toString(), tint = tint)
 		Text(

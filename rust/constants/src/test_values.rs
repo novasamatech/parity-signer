@@ -1,4 +1,5 @@
-/// Identicons and related pictures, vector of png data
+//! Hexadecimal strings with identicons and qr codes data, as encountered in
+//! test jsons throughout the workspace
 
 /// Empty 30x30 transparent png image,
 /// used in cases when identicon generation failed or public key does not exist
@@ -11,72 +12,76 @@ pub const fn real_parity_verifier() -> &'static [u8] {
     include_bytes!("real_parity_verifier")
 }
 
-/// Alice root key identicon, Sr25519 encryption
+/// Identicon for Alice root key, Sr25519 encryption
 pub const fn alice_sr_root() -> &'static [u8] {
     include_bytes!("alice_sr_root")
 }
 
-/// Alice key with derivation "//0", Sr25519 encryption
+/// Identicon for Alice key with derivation "//0", Sr25519 encryption
 pub const fn alice_sr_0() -> &'static [u8] {
     include_bytes!("alice_sr_0")
 }
 
-/// Alice key with derivation "//1", Sr25519 encryption
+/// Identicon for Alice key with derivation "//1", Sr25519 encryption
 pub const fn alice_sr_1() -> &'static [u8] {
     include_bytes!("alice_sr_1")
 }
 
-/// Alice key with derivation "//Alice", Sr25519 encryption
+/// Identicon for Alice key with derivation "//Alice", Sr25519 encryption
 pub const fn alice_sr_alice() -> &'static [u8] {
     include_bytes!("alice_sr_alice")
 }
 
-/// Alice key with derivation "//kusama", Sr25519 encryption
+/// Identicon for Alice key with derivation "//kusama", Sr25519 encryption
 pub const fn alice_sr_kusama() -> &'static [u8] {
     include_bytes!("alice_sr_kusama")
 }
 
-/// Alice key with derivation "//polkadot", Sr25519 encryption
+/// Identicon for Alice key with derivation "//polkadot", Sr25519 encryption
 pub const fn alice_sr_polkadot() -> &'static [u8] {
     include_bytes!("alice_sr_polkadot")
 }
 
-/// Alice key with derivation "//westend", Sr25519 encryption
+/// Identicon for Alice key with derivation "//westend", Sr25519 encryption
 pub const fn alice_sr_westend() -> &'static [u8] {
     include_bytes!("alice_sr_westend")
 }
 
-/// Alice key with derivation "//westend//0", Sr25519 encryption
+/// Identicon for Alice key with derivation "//westend//0", Sr25519 encryption
 pub const fn alice_sr_westend_0() -> &'static [u8] {
     include_bytes!("alice_sr_westend_0")
 }
 
-/// Alice key with derivation "//westend//1", Sr25519 encryption
+/// Identicon for Alice key with derivation "//westend//1", Sr25519 encryption
 pub const fn alice_sr_westend_1() -> &'static [u8] {
     include_bytes!("alice_sr_westend_1")
 }
 
-/// Alice key with derivation "//westend//2", Sr25519 encryption
+/// Identicon for Alice key with derivation "//westend//2", Sr25519 encryption
 pub const fn alice_sr_westend_2() -> &'static [u8] {
     include_bytes!("alice_sr_westend_2")
 }
 
-/// Alice key with derivation "//secret///abracadabra", Sr25519 encryption
+/// Identicon for Alice key with derivation "//secret///abracadabra", Sr25519
+/// encryption
 pub const fn alice_sr_secret_abracadabra() -> &'static [u8] {
     include_bytes!("alice_sr_secret_abracadabra")
 }
 
-/// Alice key with derivation "//secret//path///multipass", Sr25519 encryption
+/// Identicon for Alice key with derivation "//secret//path///multipass", Sr25519
+/// encryption
 pub const fn alice_sr_secret_path_multipass() -> &'static [u8] {
     include_bytes!("alice_sr_secret_path_multipass")
 }
 
-/// Alice key with derivation "//Alice/secret//secret", Sr25519 encryption
+/// Identicon for Alice key with derivation "//Alice/secret//secret", Sr25519
+/// encryption
 pub const fn alice_sr_alice_secret_secret() -> &'static [u8] {
     include_bytes!("alice_sr_alice_secret_secret")
 }
 
-/// Alice key with derivation "//Alice/westend", Sr25519 encryption
+/// Identicon for Alice key with derivation "//Alice/westend", Sr25519
+/// encryption
 pub const fn alice_sr_alice_westend() -> &'static [u8] {
     include_bytes!("alice_sr_alice_westend")
 }
@@ -135,15 +140,19 @@ pub const fn shell_200() -> &'static [u8] {
 pub const fn id_01() -> &'static [u8] {
     include_bytes!("id_01")
 }
+/// Identicon for test address id_02
 pub const fn id_02() -> &'static [u8] {
     include_bytes!("id_02")
 }
+/// Identicon for test address id_03
 pub const fn id_03() -> &'static [u8] {
     include_bytes!("id_03")
 }
+/// Identicon for test address id_04
 pub const fn id_04() -> &'static [u8] {
     include_bytes!("id_04")
 }
+/// Identicon for test address id_05
 pub const fn id_05() -> &'static [u8] {
     include_bytes!("id_05")
 }
@@ -168,7 +177,7 @@ pub const fn empty_vec_hash_pic() -> &'static [u8] {
     include_bytes!("empty_vec_hash_pic")
 }
 
-/// Alice key with derivation "//Alice", Ed25519 encryption
+/// Identicon for Alice key with derivation "//Alice", Ed25519 encryption
 pub const fn ed() -> &'static [u8] {
     include_bytes!("ed")
 }
@@ -188,12 +197,14 @@ pub const fn alice_westend_alice_qr() -> &'static [u8] {
     include_bytes!("alice_westend_alice_qr")
 }
 
-/// Export qr code for Alice key with "//Alice/secret//secret" derivation in westend network
+/// Export qr code for Alice key with "//Alice/secret//secret" derivation in
+/// westend network
 pub const fn alice_westend_alice_secret_secret_qr() -> &'static [u8] {
     include_bytes!("alice_westend_alice_secret_secret_qr")
 }
 
-/// Export qr code for Alice //polkadot key in polkadot network
+/// Export qr code for Alice key with "//polkadot" derivation in polkadot
+/// network
 pub const fn alice_polkadot_qr() -> &'static [u8] {
     include_bytes!("alice_polkadot_qr")
 }

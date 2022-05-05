@@ -15,14 +15,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import io.parity.signer.components.HeaderBar
-import io.parity.signer.components.KeyCard
-import io.parity.signer.components.NetworkCard
-import io.parity.signer.models.SignerDataModel
 import io.parity.signer.models.intoImageBitmap
 import io.parity.signer.ui.theme.Bg200
 import io.parity.signer.uniffi.MKeyDetails
-import io.parity.signer.uniffi.ScreenData
-import org.json.JSONObject
 
 @Composable
 fun ExportPublicKey(keyDetails: MKeyDetails) {
@@ -41,9 +36,9 @@ fun ExportPublicKey(keyDetails: MKeyDetails) {
 		) {
 			// TODO: KeyCard(identity = address)
 		}
-		Row (
+		Row(
 			Modifier.padding(top = 3.dp, start = 12.dp, end = 12.dp)
-			) {
+		) {
 			// TODO: NetworkCard(address)
 		}
 		Image(

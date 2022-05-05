@@ -19,10 +19,11 @@
 //! `Event::HistoryCleared`.
 use blake2_rfc::blake2b::blake2b;
 use parity_scale_codec::{Decode, Encode};
-use sled::IVec;
 use sp_runtime::MultiSigner;
 #[cfg(feature = "signer")]
 use std::convert::TryInto;
+#[cfg(feature = "test")]
+use variant_count::VariantCount;
 
 use crate::{
     crypto::Encryption,
@@ -37,7 +38,7 @@ use crate::{
 /// Event content for importing or removing metadata of a known network
 ///
 /// Contains network name, network version, metadata hash.
-#[derive(Decode, Encode, Debug, PartialEq, Clone)]
+#[derive(Debug, Decode, Encode, PartialEq, Clone)]
 pub struct MetaValuesDisplay {
     pub name: String,
     pub version: u32,
@@ -61,19 +62,6 @@ impl MetaValuesDisplay {
             meta_hash: blake2b(32, &[], &meta_values.meta).as_bytes().to_vec(),
         }
     }
-
-    /// Generate [`MetaValuesDisplay`] from database entry with network name,
-    /// network version, and stored metadata entry as is
-    ///
-    /// This is used for deletion, no checking of stored metadata integrity is
-    /// made.
-    pub fn from_storage(name: &str, version: u32, meta_stored: IVec) -> Self {
-        Self {
-            name: name.to_string(),
-            version,
-            meta_hash: blake2b(32, &[], &meta_stored).as_bytes().to_vec(),
-        }
-    }
 }
 
 /// Event content for generating [`SufficientCrypto`](crate::crypto::SufficientCrypto)
@@ -82,7 +70,7 @@ impl MetaValuesDisplay {
 /// Effectively records that network metadata was signed by user.
 /// Contains network name, network version, metadata hash, and [`VerifierValue`]
 /// of address used for `SufficientCrypto` generation.  
-#[derive(Decode, Debug, Encode, PartialEq, Clone)]
+#[derive(Debug, Decode, Encode, PartialEq, Clone)]
 pub struct MetaValuesExport {
     pub name: String,
     pub version: u32,
@@ -113,7 +101,7 @@ impl MetaValuesExport {
 }
 
 /// Event content for importing or removing network specs  
-#[derive(Decode, Debug, Encode, PartialEq, Clone)]
+#[derive(Debug, Decode, Encode, PartialEq, Clone)]
 pub struct NetworkSpecsDisplay {
     pub specs: NetworkSpecs,
     pub valid_current_verifier: ValidCurrentVerifier,
@@ -143,7 +131,7 @@ impl NetworkSpecsDisplay {
 /// Effectively records that network specs were signed by user.
 /// Contains [`NetworkSpecsToSend`] and [`VerifierValue`] of address used for
 /// `SufficientCrypto` generation.  
-#[derive(Decode, Debug, Encode, PartialEq, Clone)]
+#[derive(Debug, Decode, Encode, PartialEq, Clone)]
 pub struct NetworkSpecsExport {
     pub specs_to_send: NetworkSpecsToSend,
     pub signed_by: VerifierValue,
@@ -161,7 +149,7 @@ impl NetworkSpecsExport {
 }
 
 /// Event content for setting network verifier
-#[derive(Decode, Debug, Encode, PartialEq, Clone)]
+#[derive(Debug, Decode, Encode, PartialEq, Clone)]
 pub struct NetworkVerifierDisplay {
     pub genesis_hash: Vec<u8>,
     pub valid_current_verifier: ValidCurrentVerifier,
@@ -188,7 +176,7 @@ impl NetworkVerifierDisplay {
 /// Event content for importing or removing types information
 ///
 /// Contains hash of SCALE-encoded types data and types information [`Verifier`].
-#[derive(Decode, Debug, Encode, PartialEq, Clone)]
+#[derive(Debug, Decode, Encode, PartialEq, Clone)]
 pub struct TypesDisplay {
     pub types_hash: Vec<u8>,
     pub verifier: Verifier,
@@ -218,7 +206,7 @@ impl TypesDisplay {
 /// Effectively records that types information was signed by user.
 /// Contains hash of SCALE-encoded types data and [`VerifierValue`] of address
 /// used for `SufficientCrypto` generation.  
-#[derive(Decode, Debug, Encode, PartialEq, Clone)]
+#[derive(Debug, Decode, Encode, PartialEq, Clone)]
 pub struct TypesExport {
     pub types_hash: Vec<u8>,
     pub signed_by: VerifierValue,
@@ -250,7 +238,7 @@ impl TypesExport {
 /// - public key for address  
 /// - path with soft (`/`) and hard (`//`) derivatinos only, **without** password  
 /// - genesis hash of the network within which the address is  
-#[derive(Decode, Debug, Encode, PartialEq, Clone)]
+#[derive(Debug, Decode, Encode, PartialEq, Clone)]
 pub struct IdentityHistory {
     pub seed_name: String,
     pub encryption: Encryption,
@@ -296,7 +284,7 @@ impl IdentityHistory {
 
 /// History log information about transactions, both successfully signed and
 /// the ones with wrong password entered by user
-#[derive(Decode, Debug, Encode, PartialEq, Clone)]
+#[derive(Debug, Decode, Encode, PartialEq, Clone)]
 pub struct SignDisplay {
     /// raw `Vec<u8>` transaction that user either tried to sign or signed  
     pub transaction: Vec<u8>,
@@ -370,7 +358,7 @@ impl SignDisplay {
 
 /// History log information about messages, both successfully signed and
 /// the ones with wrong password entered by user
-#[derive(Decode, Debug, Encode, PartialEq, Clone)]
+#[derive(Debug, Decode, Encode, PartialEq, Clone)]
 pub struct SignMessageDisplay {
     /// decoded message
     pub message: String,
@@ -405,6 +393,7 @@ impl SignMessageDisplay {
 
 /// Events that could be recorded in the history log
 #[derive(PartialEq, Debug, Decode, Encode, Clone)]
+#[cfg_attr(feature = "test", derive(VariantCount))]
 pub enum Event {
     /// Network metadata was added
     MetadataAdded {
@@ -522,7 +511,7 @@ pub enum Event {
 ///
 /// `Entry` is stored SCALE-encoded in the `HISTORY` tree of the cold database,
 /// under key `Order`.
-#[derive(Decode, Encode, Debug, Clone)]
+#[derive(Debug, Decode, Encode, Clone)]
 pub struct Entry {
     pub timestamp: String,
     pub events: Vec<Event>, // events already in showable form

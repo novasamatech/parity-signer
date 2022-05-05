@@ -8,9 +8,9 @@ import androidx.compose.material.ButtonDefaults.buttonColors
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.State
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.scale
 import androidx.compose.ui.unit.dp
 import io.parity.signer.models.SignerDataModel
 import io.parity.signer.models.pushButton
@@ -18,15 +18,19 @@ import io.parity.signer.ui.theme.Action400
 import io.parity.signer.ui.theme.Bg100
 import io.parity.signer.ui.theme.Text400
 import io.parity.signer.uniffi.Action
+import io.parity.signer.uniffi.AlertData
 import io.parity.signer.uniffi.RightButton
 import io.parity.signer.uniffi.ScreenNameType
 
 @Composable
-fun TopBar(signerDataModel: SignerDataModel) {
-	val backButton = signerDataModel.back.observeAsState()
-	val screenName = signerDataModel.screenLabel.observeAsState()
-	val screenNameType = signerDataModel.screenNameType.observeAsState()
-	val rightButton = signerDataModel.rightButton.observeAsState()
+fun TopBar(
+	signerDataModel: SignerDataModel,
+	alert: State<AlertData?>
+) {
+	val actionResult = signerDataModel.actionResult.observeAsState()
+	//val screenName = signerDataModel.screenLabel.observeAsState()
+	//val screenNameType = signerDataModel.screenNameType.observeAsState()
+	//val rightButton = signerDataModel.rightButton.observeAsState()
 
 	TopAppBar(
 		backgroundColor = MaterialTheme.colors.Bg100
@@ -37,7 +41,7 @@ fun TopBar(signerDataModel: SignerDataModel) {
 				.weight(0.2f, fill = true)
 				.width(72.dp)
 		) {
-			if (backButton.value == true) {
+			if (actionResult.value?.back == true) {
 				Button(
 					colors = buttonColors(
 						contentColor = MaterialTheme.colors.Action400,
@@ -46,7 +50,7 @@ fun TopBar(signerDataModel: SignerDataModel) {
 					onClick = {
 						signerDataModel.pushButton(Action.GO_BACK)
 					}) {
-					if (rightButton.value == RightButton.MULTI_SELECT) {
+					if (actionResult.value?.rightButton == RightButton.MULTI_SELECT) {
 						Icon(
 							Icons.Default.Close,
 							"go back",
@@ -67,14 +71,14 @@ fun TopBar(signerDataModel: SignerDataModel) {
 			modifier = Modifier.weight(0.6f, fill = true)
 		) {
 			Text(
-				screenName.value ?: "",
-				style = if (screenNameType.value == ScreenNameType.H1) {
+				actionResult.value?.screenLabel ?: "",
+				style = if (actionResult.value?.screenNameType == ScreenNameType.H1) {
 					MaterialTheme.typography.h2
 				} else {
 					MaterialTheme.typography.h4
 				}
 			)
-			if (rightButton.value == RightButton.MULTI_SELECT) {
+			if (actionResult.value?.rightButton == RightButton.MULTI_SELECT) {
 				SmallButton(text = "Select all") {
 					signerDataModel.pushButton(Action.SELECT_ALL)
 				}
@@ -87,7 +91,7 @@ fun TopBar(signerDataModel: SignerDataModel) {
 				.width(72.dp)
 		) {
 			IconButton(onClick = { signerDataModel.pushButton(Action.RIGHT_BUTTON_ACTION) }) {
-				when (rightButton.value) {
+				when (actionResult.value?.rightButton) {
 					RightButton.NEW_SEED -> {
 						Icon(
 							Icons.Default.AddCircleOutline,
@@ -112,9 +116,7 @@ fun TopBar(signerDataModel: SignerDataModel) {
 					RightButton.MULTI_SELECT -> {
 
 					}
-					null -> {
-
-					}
+					null -> {}
 					else -> {
 						Icon(
 							Icons.Default.MoreVert,
@@ -125,7 +127,13 @@ fun TopBar(signerDataModel: SignerDataModel) {
 				}
 			}
 			IconButton(onClick = { signerDataModel.pushButton(Action.SHIELD) }) {
-				NavbarShield(signerDataModel = signerDataModel)
+				alert.value.let {
+					if (it is AlertData.Shield) {
+						NavbarShield(it.f)
+					} else {
+						NavbarShield(alert = null)
+					}
+				}
 			}
 		}
 	}

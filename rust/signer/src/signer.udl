@@ -154,6 +154,19 @@ enum ScreenNameType {
     "H4",
 };
 
+enum ShieldAlert {
+    "Active",
+    "Past",
+};
+
+[Enum]
+interface AlertData {
+    Shield(ShieldAlert? f);
+    ErrorData(string f);
+    Confirm();
+};
+
+
 dictionary ActionResult {
     string screen_label;
     boolean back;
@@ -163,8 +176,10 @@ dictionary ActionResult {
     ScreenNameType screen_name_type;
     ScreenData screen_data;
     ModalData? modal_data;
-    string? alert_data;
+    AlertData? alert_data;
 };
+
+
 
 dictionary MetaValues {
     string name;
@@ -689,7 +704,7 @@ interface ModalData {
     TypesInfo(MTypesInfo f);
     NewSeedMenu();
     NetworkDetailsMenu();
-    ManageMetadata();
+    ManageMetadata(MMManageNetworks f);
     KeyDetailsAction();
     LogComment();
     SelectSeed(MSeeds f);

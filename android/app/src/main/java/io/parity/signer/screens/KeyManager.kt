@@ -21,7 +21,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.unit.dp
-import io.parity.signer.ShieldAlert
 import io.parity.signer.components.BottomMultiselectBar
 import io.parity.signer.components.KeySelector
 import io.parity.signer.components.NetworkLogoName
@@ -32,32 +31,32 @@ import io.parity.signer.ui.theme.Bg200
 import org.json.JSONArray
 import org.json.JSONObject
 import io.parity.signer.uniffi.Action
+import io.parity.signer.uniffi.AlertData
 import io.parity.signer.uniffi.MKeys
 import java.util.Arrays.toString
 import java.util.Objects.toString
 import kotlin.math.absoluteValue
 
 /**
- * Key manager screen; here all key/identity/seed creation and deletion
- * operations should happen. This is final point in navigation:
- * all subsequent interactions should be in modals or drop-down menus
+ * Key manager screen
  */
 @Composable
 fun KeyManager(
 	button: (action: Action, details: String) -> Unit,
 	increment: (Int, String) -> Unit,
 	mKeys: MKeys,
-	alertState: ShieldAlert?
-) {1
+	alertState: AlertData?
+) {
+	1
 	val rootKey = mKeys.root
 	val keySet = mKeys.set
 	val network = mKeys.network
 	val multiselectMode = mKeys.multiselectMode
 	val multiselectCount = mKeys.multiselectCount
 	var offsetX by remember { mutableStateOf(0f) }
-	Log.w("SIGNER_RUST_LOG", ">>> $keySet" )
+	Log.w("SIGNER_RUST_LOG", ">>> $keySet")
 	Log.w("SIGNER_RUST_LOG", ">>>>> ${keySet.size}")
-	Log.w("SIGNER_RUST_LOG", "$alertState" )
+	Log.w("SIGNER_RUST_LOG", "$alertState")
 	Box {
 		Column {
 			Row(
@@ -141,7 +140,7 @@ fun KeyManager(
 				Text("DERIVED KEYS")
 				Spacer(Modifier.weight(1f, true))
 				IconButton(onClick = {
-					if (alertState == ShieldAlert.None)
+					if (alertState == null)
 						button(Action.NEW_KEY, "")
 					else
 						button(Action.SHIELD, "")

@@ -1,6 +1,5 @@
 package io.parity.signer.screens
 
-import android.util.Log
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
@@ -12,16 +11,15 @@ import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.unit.dp
 import io.parity.signer.components.*
 import io.parity.signer.models.*
-import io.parity.signer.models.DerivationCheck
 import io.parity.signer.ui.theme.Text600
 import io.parity.signer.uniffi.*
-import org.json.JSONObject
 
 @Composable
 fun NewAddressScreen(
 	deriveKey: MDeriveKey,
-	signerDataModel: SignerDataModel,
-	increment: Boolean
+	button: (Action, String) -> Unit,
+	addKey: (String, String) -> Unit,
+	dbName: String,
 ) {
 	val derivationPath = remember { mutableStateOf("") }
 	val buttonGood = remember { mutableStateOf(false) }
@@ -29,28 +27,15 @@ fun NewAddressScreen(
 	val collision = remember { mutableStateOf<Address?>(null) }
 	val seedName = deriveKey.seedName
 	val networkSpecKey = deriveKey.networkSpecsKey
-	var derivationState by remember(buttonGood, whereTo, collision) {
-		mutableStateOf(DerivationCheck(
-			buttonGood,
-			whereTo,
-			collision
-		) {
-			Log.w("SIGNER_RUST_LOG", "check $seedName $it $networkSpecKey")
-			val v = substratePathCheck(
-				seedName,
-				it,
-				networkSpecKey,
-				signerDataModel.dbName
+	var derivationState by remember {
+		mutableStateOf(
+			DerivationCheck(
+				false,
+				null,
+				null,
+				null
 			)
-			Log.w("SIGNER_RUST_LOG", "v $v")
-
-			buttonGood.value = v.buttonGood
-			v.whereTo?.let {
-				whereTo.value = it
-			}
-
-			collision.value = v.collision
-		})
+		)
 	}
 	val focusManager = LocalFocusManager.current
 	val focusRequester = remember { FocusRequester() }
@@ -72,7 +57,7 @@ fun NewAddressScreen(
 			content = derivationPath,
 			update = {
 				derivationPath.value = it
-				derivationState.check(it)
+				derivationState = substratePathCheck(seedName, networkSpecKey, it, dbName)
 			},
 			prefix = {
 				Text(
@@ -86,18 +71,18 @@ fun NewAddressScreen(
 			capitalize = false,
 			onDone = {
 				focusManager.clearFocus()
-				if (derivationState.buttonGood.value) {
-					when (derivationState.whereTo.value) {
+				if (derivationState.buttonGood) {
+					when (derivationState.whereTo) {
 						DerivationDestination.PIN -> {
-							signerDataModel.addKey(
-								path = derivationPath.value,
-								seedName = seedName
+							addKey(
+								derivationPath.value,
+								seedName
 							)
 						}
 						DerivationDestination.PWD -> {
-							signerDataModel.pushButton(
+							button(
 								Action.CHECK_PASSWORD,
-								details = derivationPath.value
+								derivationPath.value
 							)
 						}
 						null -> {}
@@ -120,23 +105,23 @@ fun NewAddressScreen(
 			BigButton(
 				text = "Next",
 				action = {
-					when (derivationState.whereTo.value) {
+					when (derivationState.whereTo) {
 						DerivationDestination.PIN -> {
-							signerDataModel.addKey(
-								path = derivationPath.value,
-								seedName = seedName
+							addKey(
+								derivationPath.value,
+								seedName
 							)
 						}
 						DerivationDestination.PWD -> {
-							signerDataModel.pushButton(
+							button(
 								Action.CHECK_PASSWORD,
-								details = derivationPath.value
+								derivationPath.value
 							)
 						}
 						null -> {}
 					}
 				},
-				isDisabled = !derivationState.buttonGood.value
+				isDisabled = !derivationState.buttonGood
 			)
 		}
 	}
@@ -146,7 +131,7 @@ fun NewAddressScreen(
 		}
 		derivationPath.value = deriveKey.suggestedDerivation
 		deriveKey.derivationCheck?.let {
-			derivationState.fromFFI(it)
+			derivationState = it
 		}
 		onDispose { focusManager.clearFocus() }
 	}
