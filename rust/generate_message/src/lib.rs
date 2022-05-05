@@ -1,3 +1,78 @@
+//! This crate is intended to support the
+//! [Signer](https://github.com/paritytech/parity-signer) from the active
+//! (non air-gapped) side.
+//!
+//! This crate is mainly used to:
+//!
+//! - fetch network data through rpc calls
+//! - prepare Signer update payloads
+//! - generate Signer update QR codes, either signed or unsigned, to be scanned
+//! into Signer
+//! - maintain the `hot` database on the network-connected device, to store and
+//! manage the data that went into QR codes
+//! - maintain Signer default network metadata set in `default` crate and
+//! prepare the `cold` database for the Signer release
+//!
+//! Signer air-gap holds true as long as the data loaded into Signer from the
+//! start is valid and the updates generated and received through the air-gap
+//! are valid and uncompomised.
+//!
+//! Parity maintains [Metadata Portal](https://metadata.parity.io) with network
+//! specs and fresh network metadata QR codes, signed by Parity-associated key.
+//!
+//! To load into Signer network specs and network metadata for the networks not
+//! published on the metadata portal yet or to keep a different trusted
+//! [`CurrentVerifier`](definitions::network_specs::CurrentVerifier) for a
+//! network, crate `generate_message` should be used.
+//!
+//! # Supported Signer updates
+//!
+//! Crate `generate_message` can generate and the Signer can accept following
+//! updates:
+//!
+//! - `add_specs`, to add a new network (i.e. the network specs) into the Signer
+//! - `load_metadata`, to load into the Signer the network metadata, for
+//! networks that already have corresponding network specs entry in the Signer
+//! database
+//! - `load_types`, to load types information (it  is used to support the
+//! transactions parsing in networks with legacy metadata, `RuntimeMetadata`
+//! version below V14)
+//! - `derivations`, for bulk-import of password-free derivations
+//!
+//! Updates are assembled as `Vec<u8>` and could be transformed into:
+//!
+//! - `png` QR codes, static or dynamic multiframe depending on the data size
+//! - hex-encoded string (used mostly for tests)
+//!
+//! Information in `add_specs`, `load_metadata` and `load_types` could be either
+//! signed or unsigned. Information in `derivations` could only be unsigned.
+//!
+//! Signed updates contain public key of the payload verifier and its
+//! signature for the payload data.
+//!
+//! Unsigned updates have no public key or signature, and in place of code for
+//! encryption algorithm have a special indicator that payload is unsigned (`ff`
+//! in hex-encoded string).
+//!
+//! Updates `add_specs`, `load_metadata`, `load_types` all are build from the
+//! following elements:
+//! - prelude `53xxyy` (in hex format) where `xx` is the encryption type, and
+//! `yy` is the message type  
+//! - verifier public key (if the QR code is signed by verifier)  
+//! - content  
+//! - verifier signature (if the QR code is signed by verifier) 
+//!
+//! Content of the updates is described in [definitions::qr_transfers].
+//!
+//! Note that the signable payloads are build in such a way that the length of
+//! the payload is always easily found in the update content. This is done to
+//! future-proof the updates if the multi-signing is ever implemented for them.
+//!
+//! # Adding a network to the Signer and `add_specs` payload
+//!
+//! (purpose, verifiers)
+//! (commands, keys, signing or send to manual?)
+//!
 //! # Encryption override
 //!
 //! [`NetworkSpecsToSend`](definitions::network_specs::NetworkSpecsToSend)
@@ -28,6 +103,10 @@
 //! - `-f -u`, with data only from the database, i.e. without rpc calls,
 //! update database with new specs entry, use network url address as
 //! an identifier
+//!
+//! # Loading network metadata into the Signer and `load_metadata` payload
+//!
+//! 
 #![deny(unused_crate_dependencies)]
 
 use constants::{COLD_DB_NAME_RELEASE, HOT_DB_NAME, TYLO};
@@ -52,7 +131,7 @@ mod show;
 use show::{show_address_book, show_database};
 mod specs;
 use specs::gen_add_specs;
-pub mod make_message;
+mod make_message;
 mod metadata_db_utils;
 mod metadata_shortcut;
 mod output_prep;
