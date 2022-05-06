@@ -184,7 +184,6 @@ fun ModalSelector(
 		is ModalData.SelectSeed -> {
 			SelectSeed(modalData.f, signerDataModel = signerDataModel)
 		}
-		is ModalData.ManageNetworks -> {}
 		null -> {}
 	}
 }

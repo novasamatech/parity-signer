@@ -1,5 +1,6 @@
 package io.parity.signer.components
 
+import android.util.Log
 import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.icons.Icons
@@ -13,12 +14,13 @@ import io.parity.signer.models.SignerDataModel
 import io.parity.signer.ui.theme.Crypto400
 import io.parity.signer.ui.theme.SignalDanger
 import io.parity.signer.ui.theme.SignalWarning
-import io.parity.signer.uniffi.AlertData
 import io.parity.signer.uniffi.ShieldAlert
 
 @Composable
 fun NavbarShield(alert: ShieldAlert?) {
-
+	alert?.let {
+		Log.w("SIGNER_RUST_LOG", "alert $alert")
+	}
 	when (alert) {
 		null -> Icon(
 			Icons.Default.GppGood,

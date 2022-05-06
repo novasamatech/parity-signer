@@ -811,7 +811,7 @@ fn flow_test_1() {
         .unwrap();
 
     let mut kusama_action_modal = kusama_action.clone();
-    kusama_action_modal.modal_data = Some(ModalData::ManageNetworks {
+    kusama_action_modal.modal_data = Some(ModalData::ManageMetadata {
         f: MMManageNetworks {
             name: "kusama".to_string(),
             version: "9130".to_string(),

@@ -9,11 +9,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import io.parity.signer.components.MetadataCard
 import io.parity.signer.components.NetworkCard
-import io.parity.signer.models.SignerDataModel
-import io.parity.signer.models.pushButton
-import org.json.JSONObject
 import io.parity.signer.uniffi.Action
 import io.parity.signer.uniffi.MNetworkDetails
+import io.parity.signer.uniffi.MscNetworkInfo
 
 @Composable
 fun NetworkDetails(
@@ -21,9 +19,13 @@ fun NetworkDetails(
 	button: (Action, String) -> Unit
 ) {
 	Column {
-		/* TODO: MNetworkDetails -> MDeriveKey
-		NetworkCard(network = content)
-		 */
+		NetworkCard(
+			network = MscNetworkInfo(
+				networkTitle = networkDetails.title,
+				networkLogo = networkDetails.logo
+			)
+		)
+
 		Row {
 			Text("Network name:")
 			Text(networkDetails.name)

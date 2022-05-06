@@ -1816,7 +1816,7 @@ impl State {
                 }),
                 Modal::ManageMetadata(network_version) => match new_navstate.screen {
                     Screen::NetworkDetails(ref network_specs_key) => {
-                        Some(ModalData::ManageNetworks {
+                        Some(ModalData::ManageMetadata {
                             f: db_handling::interface_signer::metadata_details(
                                 dbname,
                                 network_specs_key,

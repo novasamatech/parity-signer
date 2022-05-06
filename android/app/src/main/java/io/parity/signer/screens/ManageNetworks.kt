@@ -8,8 +8,10 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import io.parity.signer.components.NetworkCard
 import io.parity.signer.uniffi.Action
 import io.parity.signer.uniffi.MManageNetworks
+import io.parity.signer.uniffi.MscNetworkInfo
 
 @Composable
 fun ManageNetworks(
@@ -29,9 +31,12 @@ fun ManageNetworks(
 					thisNetwork.key
 				)
 			}) {
-				/* TODO: MNetwork -> MDeriveKey
-				NetworkCard(deriveKey = thisNetwork)
-				*/
+				NetworkCard(
+					network = MscNetworkInfo(
+						networkTitle = thisNetwork.title,
+						networkLogo = thisNetwork.logo
+					)
+				)
 			}
 		}
 	}

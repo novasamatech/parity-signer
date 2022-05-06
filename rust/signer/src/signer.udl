@@ -700,7 +700,6 @@ interface ModalData {
     SignatureReady(MSignatureReady f);
     EnterPassword(MEnterPassword f);
     LogRight(MLogRight f);
-    ManageNetworks(MMManageNetworks f);
     TypesInfo(MTypesInfo f);
     NewSeedMenu();
     NetworkDetailsMenu();
