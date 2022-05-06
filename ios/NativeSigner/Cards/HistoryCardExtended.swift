@@ -32,7 +32,7 @@ struct HistoryCardExtended: View {
                 timestamp: timestamp,
                 danger: false,
                 line1: "General verifier set",
-                line2: ""//value.v.publicKey.truncateMiddle(length: 8) + "\n" + value.v.encryption
+                line2: value.show()
             )
             case .historyCleared: HistoryCardTemplate(
                 image: "xmark.rectangle.portrait",
@@ -53,49 +53,49 @@ struct HistoryCardExtended: View {
                 timestamp: timestamp,
                 danger: false,
                 line1: "Key created",
-                line2: ""//value.seedName.decode64() + value.path + " in network with hash " +  value.networkGenesisHash
+                line2: value.seedName.decode64() + value.path + " in network with hash " +  value.networkGenesisHash.map{String($0)}.joined()
             )
             case .identityRemoved(let value): HistoryCardTemplate(
                 image: "xmark.rectangle.portrait",
                 timestamp: timestamp,
                 danger: false,
                 line1: "Key removed",
-                line2: ""//value.seedName.decode64() + value.path + " in network with hash " +  value.networkGenesisHash
+                line2: value.seedName.decode64() + value.path + " in network with hash " +  value.networkGenesisHash.map{String($0)}.joined()
             )
             case .metadataAdded(let value): HistoryCardTemplate(
                 image: "plus.viewfinder",
                 timestamp: timestamp,
                 danger: false,
                 line1: "Metadata added",
-                line2: ""//value.name + " version " +  value.version
+                line2: value.name + " version " +  String(value.version)
             )
             case .metadataRemoved(let value): HistoryCardTemplate(
                 image: "xmark.rectangle.portrait",
                 timestamp: timestamp,
                 danger: false,
                 line1: "Metadata removed",
-                line2: ""//value.name + " version " +  value.version
+                line2: value.name + " version " +  String(value.version)
             )
             case .networkSpecsAdded(let value): HistoryCardTemplate(
                 image: "plus.viewfinder",
                 timestamp: timestamp,
                 danger: false,
                 line1: "Network added",
-                line2: ""//value.title
+                line2: value.specs.title
             )
             case .networkSpecsRemoved(let value): HistoryCardTemplate(
                 image: "xmark.rectangle.portrait",
                 timestamp: timestamp,
                 danger: false,
                 line1: "Network removed",
-                line2: ""//value.title
+                line2: value.specs.title
             )
             case .networkVerifierSet(let value): HistoryCardTemplate(
                 image: "checkmark.shield",
                 timestamp: timestamp,
                 danger: false,
                 line1: "Network verifier set",
-                line2: ""//value.genesisHash
+                line2: value.genesisHash.map{String($0)}.joined()
             )
             case .resetDangerRecord: HistoryCardTemplate(
                 image: "checkmark.shield",
@@ -110,35 +110,35 @@ struct HistoryCardExtended: View {
                     timestamp: timestamp,
                     danger: false,
                     line1: "Seed created",
-                    line2: ""//text.decode64()
+                    line2: text.decode64()
                 )
             case .seedNameWasShown(let text): HistoryCardTemplate(
                 image: "eye.trianglebadge.exclamationmark.fill",
                 timestamp: timestamp,
                 danger: false,
                 line1: "Seed was shown",
-                line2: ""//text.decode64()
+                line2: text.decode64()
             )
             case .networkSpecsSigned(let value): HistoryCardTemplate(
                 image: "signature",
                 timestamp: timestamp,
                 danger: false,
                 line1: "Network specs signed",
-                line2: ""//value.title
+                line2: value.specsToSend.title
             )
             case .metadataSigned(let value): HistoryCardTemplate(
                 image: "signature",
                 timestamp: timestamp,
                 danger: false,
                 line1: "Metadata signed",
-                line2: ""//value.specname + value.spec_version
+                line2: value.name + String(value.version)
             )
-            case .typesSigned(_): HistoryCardTemplate(
+            case .typesSigned(let value): HistoryCardTemplate(
                 image: "signature",
                 timestamp: timestamp,
                 danger: false,
                 line1: "Types signed",
-                line2: ""
+                line2: value.typesHash.map{String($0)}.joined()
             )
             case .systemEntry(let text): HistoryCardTemplate(
                 image: "eye.trianglebadge.exclamationmark.fill",
@@ -149,41 +149,35 @@ struct HistoryCardExtended: View {
             )
             case .transactionSignError(let value): VStack {
                 Text("Transaction failed")
-                /*
-                Text(value.error)
-                TransactionBlock(cards: value.transaction.assemble())
+                TransactionBlock(cards: event.decoded?.assemble() ?? [])
                 Text("Signed by: ")
                 HStack {
-                    Identicon(identicon: value.signedBy.identicon)
+                    Identicon(identicon: event.signedBy?.identicon ?? [])
                     VStack {
-                        Text(value.signedBy.hex)
-                        Text(value.signedBy.encryption)
+                        Text(value.signedBy.show())
+                        Text((event.signedBy?.seed ?? "") + (event.signedBy?.derivationPath ?? ""))
                     }
                 }
                 Text("in network")
                 Text(value.networkName)
                 Text("Comment :")
                 Text(String(decoding: Data(base64Encoded: value.userComment) ?? Data(), as: UTF8.self))
-                 */
             }
             case .transactionSigned(let value):
                 VStack {
-                    /*
-                    Text("Transaction signed")
-                    TransactionBlock(cards: value.transaction.assemble())
+                    TransactionBlock(cards: event.decoded?.assemble() ?? [])
                     Text("Signed by: ")
                     HStack {
-                        Identicon(identicon: value.signedBy.identicon)
+                        Identicon(identicon: event.signedBy?.identicon ?? [])
                         VStack {
-                            Text(value.signedBy.hex)
-                            Text(value.signedBy.encryption)
+                            Text(value.signedBy.show())
+                            Text((event.signedBy?.seed ?? "") + (event.signedBy?.derivationPath ?? ""))
                         }
                     }
                     Text("in network")
                     Text(value.networkName)
                     Text("Comment :")
                     Text(String(decoding: Data(base64Encoded: value.userComment) ?? Data(), as: UTF8.self))
-                     */
                 }
             case .typesAdded(_): HistoryCardTemplate(
                 image: "plus.viewfinder",
@@ -225,14 +219,14 @@ struct HistoryCardExtended: View {
                 timestamp: timestamp,
                 danger: true,
                 line1: "Message signing error!",
-                line2: ""//value.error
+                line2: value.userComment
             )
             case .messageSigned(let value): HistoryCardTemplate(
                 image: "signature",
                 timestamp: timestamp,
                 danger: false,
                 line1: "Generated signature for message",
-                line2: ""//String(decoding: Data(base64Encoded: value.userComment) ?? Data(), as: UTF8.self)
+                line2: String(decoding: Data(base64Encoded: value.userComment) ?? Data(), as: UTF8.self)
             )
             }
         }

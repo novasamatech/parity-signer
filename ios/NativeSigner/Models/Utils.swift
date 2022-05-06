@@ -109,3 +109,23 @@ extension MRecoverSeedPhrase {
         return self.draft.joined(separator: "")
     }
 }
+
+extension Verifier {
+    func show() -> String {
+        switch(self.v) {
+        case .standard(let value):
+            return value
+        case .none:
+            return "None"
+        }
+    }
+}
+
+extension VerifierValue {
+    func show() -> String {
+        switch(self) {
+        case .standard(let value):
+            return value
+        }
+    }
+}
