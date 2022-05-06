@@ -55,7 +55,7 @@ fn backend_action(
     action: Action,
     details: &str,
     seed_phrase: &str,
-) -> Result<ActionResult, ErrorDisplayed> {
+) -> Result<Option<ActionResult>, ErrorDisplayed> {
     navigator::do_action(action, details, seed_phrase).map_err(|s| ErrorDisplayed::Str { s })
 }
 
