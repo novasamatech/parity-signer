@@ -66,7 +66,7 @@ fun HistoryCard(card: Event, timestamp: String) {
 				image = Icons.Default.Pattern,
 				line1 = timestamp,
 				line2 = "Key created",
-				line3 = payload
+				line3 = card.identityHistory.seedName.decode64() + card.identityHistory.path
 			)
 		}
 		is Event.IdentityRemoved -> {
@@ -74,7 +74,7 @@ fun HistoryCard(card: Event, timestamp: String) {
 				image = Icons.Default.Delete,
 				line1 = timestamp,
 				line2 = "Key removed",
-				line3 = payload
+				line3 = card.identityHistory.seedName.decode64() + card.identityHistory.path
 			)
 		}
 		is Event.MessageSignError -> {
@@ -82,7 +82,7 @@ fun HistoryCard(card: Event, timestamp: String) {
 				image = Icons.Default.Warning,
 				line1 = timestamp,
 				line2 = "Message signing error!",
-				line3 = "payload",
+				line3 = card.signMessageDisplay.message,
 				danger = true
 			)
 		}
@@ -91,7 +91,7 @@ fun HistoryCard(card: Event, timestamp: String) {
 				image = Icons.Default.Done,
 				line1 = timestamp,
 				line2 = "Generated signature for message",
-				line3 = card.signMessageDisplay.userComment
+				line3 = card.signMessageDisplay.message
 			)
 		}
 		is Event.MetadataAdded -> {

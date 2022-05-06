@@ -39,19 +39,21 @@ pub fn do_action(
     action: Action,
     details_str: &str,
     secret_seed_phrase: &str,
-) -> Result<ActionResult, String> {
+) -> Result<Option<ActionResult>, String> {
     //If can't lock - debounce failed, ignore action
     //
     //guard is defined here to outline lifetime properly
     let guard = STATE.try_lock();
     match guard {
-        Ok(mut state) => state.perform(action, details_str, secret_seed_phrase),
+        Ok(mut state) => state
+            .perform(action, details_str, secret_seed_phrase)
+            .map(Some),
         Err(TryLockError::Poisoned(_)) => {
             //TODO: maybe more grace here?
             //Maybe just silently restart navstate? But is it safe?
             panic!("Concurrency error! Restart the app.");
         }
-        Err(TryLockError::WouldBlock) => Err("WouldBlock".to_string()),
+        Err(TryLockError::WouldBlock) => Ok(None),
     }
 }
 

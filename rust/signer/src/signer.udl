@@ -551,7 +551,7 @@ namespace signer {
     void init_navigation([ByRef] string dbname, [ByRef] string seed_names);
 
     [Throws=ErrorDisplayed]
-    ActionResult backend_action(Action action, [ByRef] string details, [ByRef] string seed_phrase);
+    ActionResult? backend_action(Action action, [ByRef] string details, [ByRef] string seed_phrase);
 
     void update_seed_names([ByRef] string seed_names);
 
@@ -700,7 +700,6 @@ interface ModalData {
     SignatureReady(MSignatureReady f);
     EnterPassword(MEnterPassword f);
     LogRight(MLogRight f);
-    ManageNetworks(MMManageNetworks f);
     TypesInfo(MTypesInfo f);
     NewSeedMenu();
     NetworkDetailsMenu();

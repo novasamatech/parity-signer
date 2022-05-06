@@ -560,7 +560,6 @@ pub enum ModalData {
     SignatureReady { f: MSignatureReady },
     EnterPassword { f: MEnterPassword },
     LogRight { f: MLogRight },
-    ManageNetworks { f: MMManageNetworks },
     TypesInfo { f: MTypesInfo },
     NewSeedMenu,
     NetworkDetailsMenu,
