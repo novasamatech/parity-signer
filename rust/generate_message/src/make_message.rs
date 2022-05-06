@@ -5,7 +5,6 @@ use definitions::{
     metadata::MetaValues,
     qr_transfers::{ContentAddSpecs, ContentLoadMeta, ContentLoadTypes},
 };
-use hex;
 use qrcode_rtx::make_pretty_qr;
 use sp_core::{ecdsa, ed25519, sr25519, Pair};
 

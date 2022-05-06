@@ -197,6 +197,9 @@ impl MetaValues {
                     filename: filename.to_string(),
                 }
             }
+            IncomingMetadataSourceActiveStr::Check { filename } => NotHexActive::CheckedMetadata {
+                filename: filename.to_string(),
+            },
         };
         let meta_vec = unhex::<Active>(meta, what)?;
         match Self::from_slice_metadata(&meta_vec) {

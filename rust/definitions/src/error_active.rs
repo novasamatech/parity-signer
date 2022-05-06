@@ -95,6 +95,12 @@ impl ErrorSource for Active {
             MetadataSource::Incoming(IncomingMetadataSourceActive::Str(
                 IncomingMetadataSourceActiveStr::Default { filename },
             )) => ErrorActive::DefaultLoading(DefaultLoading::FaultyMetadata { filename, error }),
+            MetadataSource::Incoming(IncomingMetadataSourceActive::Str(
+                IncomingMetadataSourceActiveStr::Check { filename },
+            )) => ErrorActive::Check {
+                filename,
+                check: Check::FaultyMetadata(error),
+            },
             MetadataSource::Incoming(IncomingMetadataSourceActive::Wasm { filename }) => {
                 ErrorActive::Wasm {
                     filename,
@@ -172,6 +178,7 @@ impl ErrorSource for Active {
                     NotHexActive::InputPublicKey => String::from("Input public key"),
                     NotHexActive::InputSignature => String::from("Input signature"),
                     NotHexActive::DefaultMetadata {filename} => format!("Default network metadata from file {}", filename),
+                    NotHexActive::CheckedMetadata {filename} => format!("Checked metadata from file {}", filename),
                 };
                 format!("{} is not in hexadecimal format.", insert)
             },
@@ -363,6 +370,7 @@ impl ErrorSource for Active {
                             CommandNeedArgument::DerivationsTitle => "'-title'",
                             CommandNeedArgument::MetaDefaultFileName => "`-name`",
                             CommandNeedArgument::MetaDefaultFileVersion => "`-version`",
+                            CommandNeedArgument::CheckFile => "check_file",
                         };
                         format!("{} must be followed by an agrument.", insert)
                     },
@@ -412,6 +420,12 @@ impl ErrorSource for Active {
                     Wasm::RuntimeBlob(e) => format!("Error processing .wasm file {}. Unable to generate RuntimeBlob. {}", filename, e),
                     Wasm::WasmiInstance(e) => format!("Error processing .wasm file {}. Unable to generate WasmiInstance. {}", filename, e),
                     Wasm::WasmiRuntime(e) => format!("Error processing .wasm file {}. Unable to generate WasmiRuntime. {}", filename, e),
+                }
+            },
+            ErrorActive::Check{filename, check} => {
+                match check {
+                    Check::FaultyMetadata(e) => format!("Metadata error in file {}. {}", filename, e.show()),
+                    Check::MetadataFile(e) => format!("Error processing .wasm file {}. Unable to load file. {}", filename, e),
                 }
             },
         }
@@ -501,6 +515,15 @@ pub enum ErrorActive {
         /// error details
         wasm: Wasm,
     },
+
+    /// Error processing the metadata file that user tried to check
+    Check {
+        /// path of the file being checked
+        filename: String,
+
+        /// error details
+        check: Check,
+    },
 }
 
 impl std::fmt::Display for ErrorActive {
@@ -542,8 +565,11 @@ pub enum NotHexActive {
     InputSignature,
 
     /// Default network metadata, used to generate cold database, with filename
-    /// as an associated data.
+    /// as associated data.
     DefaultMetadata { filename: String },
+
+    /// Network metadata user tries to check, with filename as associated data
+    CheckedMetadata { filename: String },
 }
 
 /// Source of unsuitable metadata on the Active side
@@ -564,6 +590,9 @@ pub enum IncomingMetadataSourceActiveStr {
 
     /// Metadata is the default one, associated data is the filename.
     Default { filename: String },
+
+    /// Metadata is from the metadata file that must be checked
+    Check { filename: String },
 }
 
 /// Source of damaged [`NetworkSpecsKey`], exclusive for the active side.
@@ -1672,9 +1701,12 @@ pub enum CommandNeedArgument {
     /// name.
     MetaDefaultFileName,
 
-    /// Key `-version` in `meta_Default_file` command must be followed by
+    /// Key `-version` in `meta_default_file` command must be followed by
     /// network version.
     MetaDefaultFileVersion,
+
+    /// Command `check_file` must be followed by the file path
+    CheckFile,
 }
 
 /// Unsuitable argument for the key in `generate_message` command
@@ -1813,4 +1845,18 @@ pub enum Wasm {
 
     /// Error generating `WasmiRuntime`.
     WasmiRuntime(sc_executor_common::error::WasmError),
+}
+
+/// Error checking metadata file
+#[derive(Debug)]
+pub enum Check {
+    /// Metadata extracted from the metadata file is not suitable to be used in
+    /// Signer.
+    ///
+    /// Associated data is [`MetadataError`] specifying what exactly is wrong
+    /// with the metadata.
+    FaultyMetadata(MetadataError),
+
+    /// Unable to read directory with default metadata
+    MetadataFile(std::io::Error),
 }

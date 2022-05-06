@@ -7,6 +7,7 @@ edition = "2018"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
+blake2-rfc = "0.2.18"
 constants = {path = "../constants", default-features = false, features = ["active"]}
 db_handling = {path = "../db_handling", default-features = false, features = ["active"]}
 definitions = {path = "../definitions", default-features = false, features = ["active"]}

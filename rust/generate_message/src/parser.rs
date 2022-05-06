@@ -39,6 +39,7 @@ pub enum Command {
 pub enum Show {
     Database,
     AddressBook,
+    CheckFile(String),
 }
 
 pub struct Instruction {
@@ -167,6 +168,20 @@ impl Command {
                         },
                         None => Err(ErrorActive::CommandParser(CommandParser::NeedKey(
                             CommandNeedKey::Show,
+                        ))),
+                    },
+                    "check_file" => match args.next() {
+                        Some(path) => {
+                            if args.next().is_some() {
+                                Err(ErrorActive::CommandParser(
+                                    CommandParser::UnexpectedKeyArgumentSequence,
+                                ))
+                            } else {
+                                Ok(Command::Show(Show::CheckFile(path)))
+                            }
+                        }
+                        None => Err(ErrorActive::CommandParser(CommandParser::NeedArgument(
+                            CommandNeedArgument::CheckFile,
                         ))),
                     },
                     "load_types" => {

@@ -60,7 +60,7 @@
 //! `yy` is the message type  
 //! - verifier public key (if the QR code is signed by verifier)  
 //! - content  
-//! - verifier signature (if the QR code is signed by verifier) 
+//! - verifier signature (if the QR code is signed by verifier)
 //!
 //! Content of the updates is described in [definitions::qr_transfers].
 //!
@@ -106,7 +106,7 @@
 //!
 //! # Loading network metadata into the Signer and `load_metadata` payload
 //!
-//! 
+//!
 #![deny(unused_crate_dependencies)]
 
 use constants::{COLD_DB_NAME_RELEASE, HOT_DB_NAME, TYLO};
@@ -128,7 +128,7 @@ use parser::{Command, Show};
 mod remove;
 use remove::remove_info;
 mod show;
-use show::{show_address_book, show_database};
+use show::{check_file, show_address_book, show_database};
 mod specs;
 use specs::gen_add_specs;
 mod make_message;
@@ -144,6 +144,7 @@ pub fn full_run(command: Command) -> Result<(), ErrorActive> {
         Command::Show(x) => match x {
             Show::Database => show_database(),
             Show::AddressBook => show_address_book(),
+            Show::CheckFile(path) => check_file(path),
         },
         Command::Types => prep_types::<Active>(HOT_DB_NAME)?.write(TYLO),
         Command::Load(instruction) => gen_load_meta(instruction),
