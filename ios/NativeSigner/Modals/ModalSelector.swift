@@ -30,8 +30,8 @@ struct ModalSelector: View {
             LogMenu(content: value)
         case .networkDetailsMenu:
             NetworkDetailsMenu()
-        case .manageMetadata://(let value):
-            ManageMetadata()//content: value)
+        case .manageMetadata(let value)://(let value):
+            ManageMetadata(content: value)//content: value)
         case .sufficientCryptoReady(let value):
             SufficientCryptoReady(content: value)
         case .keyDetailsAction:
@@ -44,8 +44,6 @@ struct ModalSelector: View {
             LogComment()
         case .selectSeed://(let value):
             EmptyView()//SelectSeed(content: value)
-        case .manageNetworks(_):
-            EmptyView()
         case nil:
             EmptyView()
         }
