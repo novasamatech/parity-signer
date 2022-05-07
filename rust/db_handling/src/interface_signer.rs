@@ -29,8 +29,8 @@ use definitions::{
     keyring::{AddressKey, NetworkSpecsKey, VerifierKey},
     navigation::{
         Address, DerivationCheck as NavDerivationCheck, DerivationDestination, DerivationEntry,
-        DerivationPack, MBackup, MDeriveKey, MKeyDetails, MKeysCard, MMMNetwork, MMManageNetworks,
-        MMNetwork, MMetadataRecord, MNetworkDetails, MNetworkMenu, MNewSeedBackup, MRawKey,
+        DerivationPack, MBackup, MDeriveKey, MKeyDetails, MKeysCard, MMMNetwork, MMNetwork,
+        MManageMetadata, MMetadataRecord, MNetworkDetails, MNetworkMenu, MNewSeedBackup, MRawKey,
         MSeedKeyCard, MTypesInfo, MVerifier, Network, SeedNameCard,
     },
     network_specs::{NetworkSpecs, ValidCurrentVerifier},
@@ -603,7 +603,7 @@ pub fn metadata_details(
     database_name: &str,
     network_specs_key: &NetworkSpecsKey,
     network_version: u32,
-) -> Result<MMManageNetworks, ErrorSigner> {
+) -> Result<MManageMetadata, ErrorSigner> {
     let network_specs = get_network_specs(database_name, network_specs_key)?;
     let meta_values = get_meta_values_by_name_version::<Signer>(
         database_name,
@@ -626,7 +626,7 @@ pub fn metadata_details(
 
     let meta_hash = blake2b(32, &[], &meta_values.meta).as_bytes().to_vec();
     let meta_id_pic = pic_meta(&meta_hash);
-    Ok(MMManageNetworks {
+    Ok(MManageMetadata {
         name: network_specs.name,
         version: network_version.to_string(),
         meta_hash: hex::encode(meta_hash),

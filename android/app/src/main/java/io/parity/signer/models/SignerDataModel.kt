@@ -41,7 +41,7 @@ class SignerDataModel : ViewModel() {
 	private var hasStrongbox: Boolean = false
 
 	// Alert
-	private val _alertState: MutableLiveData<AlertData?> = MutableLiveData(null)
+	internal val _alertState: MutableLiveData<AlertData?> = MutableLiveData(null)
 
 	// State of the app being unlocked
 	private val _authenticated = MutableLiveData(false)

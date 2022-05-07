@@ -23,12 +23,12 @@ import io.parity.signer.ui.theme.modal
 import org.json.JSONObject
 import io.parity.signer.uniffi.Action
 import io.parity.signer.uniffi.MNetworkDetails
-import io.parity.signer.uniffi.MmManageNetworks
+import io.parity.signer.uniffi.MManageMetadata
 import io.parity.signer.uniffi.MscNetworkInfo
 
 @Composable
 fun ManageMetadata(
-	networks: MmManageNetworks,
+	networks: MManageMetadata,
 	signerDataModel: SignerDataModel
 ) {
 	var confirm by remember { mutableStateOf(false) }
