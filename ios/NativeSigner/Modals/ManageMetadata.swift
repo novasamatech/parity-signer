@@ -9,7 +9,7 @@ import SwiftUI
 
 struct ManageMetadata: View {
     @EnvironmentObject var data: SignerDataModel
-    var content: MmManageNetworks
+    var content: MManageMetadata
     @State var removeMetadataAlert = false
     @State var offset: CGFloat = 0
     var body: some View {
