@@ -32,7 +32,7 @@ use definitions::{
     metadata::MetaValues,
     navigation::{
         DerivationCheck as NavDerivationCheck, DerivationEntry, DerivationPack, MBackup,
-        MDeriveKey, MKeyDetails, MKeysCard, MMMNetwork, MMManageNetworks, MMNetwork,
+        MDeriveKey, MKeyDetails, MKeysCard, MMMNetwork, MMNetwork, MManageMetadata,
         MMetadataRecord, MNetworkDetails, MNetworkMenu, MRawKey, MSeedKeyCard, MTypesInfo,
         MVerifier, Network, SeedNameCard,
     },
@@ -604,7 +604,7 @@ fn westend_9010_metadata_details() {
         9010,
     )
     .unwrap();
-    let expected_network = MMManageNetworks {
+    let expected_network = MManageMetadata {
         name: "westend".to_string(),
         version: "9010".to_string(),
         meta_hash: "70c99738c27fb32c87883f1c9c94ee454bf0b3d88e4a431a2bbfe1222b46ebdf".to_string(),
@@ -833,42 +833,42 @@ fn alice_recalls_seed_phrase_1() {
     // oops, wrong place
     seed_draft.added("drive", Some(1));
     seed_draft.added("obey", Some(2));
-    let print = seed_draft.print();
-    let expected_print = r#"[{"order":0,"content":"bottom"},{"order":1,"content":"drive"},{"order":2,"content":"obey"},{"order":3,"content":"lake"}]"#;
-    assert!(print == expected_print, "\nReceived: \n{}", print);
+    let print = seed_draft.draft();
+    let expected_print = vec!["bottom", "drive", "obey", "lake"];
+    assert_eq!(print, expected_print);
     // adding invalid word - should be blocked through UI, expect no changes
     seed_draft.added("занавеска", None);
-    let print = seed_draft.print();
-    let expected_print = r#"[{"order":0,"content":"bottom"},{"order":1,"content":"drive"},{"order":2,"content":"obey"},{"order":3,"content":"lake"}]"#;
-    assert!(print == expected_print, "\nReceived: \n{}", print);
+    let print = seed_draft.draft();
+    let expected_print = vec!["bottom", "drive", "obey", "lake"];
+    assert_eq!(print, expected_print);
     // removing invalid word - should be blocked through UI, expect no changes
     seed_draft.remove(5);
-    let print = seed_draft.print();
-    let expected_print = r#"[{"order":0,"content":"bottom"},{"order":1,"content":"drive"},{"order":2,"content":"obey"},{"order":3,"content":"lake"}]"#;
-    assert!(print == expected_print, "\nReceived: \n{}", print);
+    let print = seed_draft.draft();
+    let expected_print = vec!["bottom", "drive", "obey", "lake"];
+    assert_eq!(print, expected_print);
     // removing word
     seed_draft.remove(1);
-    let print = seed_draft.print();
-    let expected_print = r#"[{"order":0,"content":"bottom"},{"order":1,"content":"obey"},{"order":2,"content":"lake"}]"#;
-    assert!(print == expected_print, "\nReceived: \n{}", print);
+    let print = seed_draft.draft();
+    let expected_print = vec!["bottom", "obey", "lake"];
+    assert_eq!(print, expected_print);
 }
 
 #[test]
 fn alice_recalls_seed_phrase_2() {
     let mut seed_draft = SeedDraft::initiate();
     seed_draft.added("fit", None);
-    let print = seed_draft.print();
-    let expected_print = r#"[{"order":0,"content":"fit"}]"#;
-    assert!(print == expected_print, "\nReceived: \n{}", print);
+    let print = seed_draft.draft();
+    let expected_print = vec!["fit"];
+    assert_eq!(print, expected_print);
 }
 
 #[test]
 fn alice_recalls_seed_phrase_3() {
     let mut seed_draft = SeedDraft::initiate();
     seed_draft.added("obe", None);
-    let print = seed_draft.print();
-    let expected_print = r#"[{"order":0,"content":"obey"}]"#;
-    assert!(print == expected_print, "\nReceived: \n{}", print);
+    let print = seed_draft.draft();
+    let expected_print = vec!["obey"];
+    assert_eq!(print, expected_print);
 }
 
 #[test]

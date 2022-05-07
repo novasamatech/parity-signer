@@ -35,9 +35,6 @@ pub mod metadata;
 
 pub mod network_specs;
 
-#[cfg(feature = "signer")]
-pub mod print;
-
 pub mod qr_transfers;
 
 #[cfg(feature = "signer")]

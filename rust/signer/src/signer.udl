@@ -675,7 +675,7 @@ dictionary MMMNetwork {
     boolean current_on_screen;
 };
 
-dictionary MMManageNetworks {
+dictionary MManageMetadata {
     string name;
     string version;
     string meta_hash;
@@ -703,7 +703,7 @@ interface ModalData {
     TypesInfo(MTypesInfo f);
     NewSeedMenu();
     NetworkDetailsMenu();
-    ManageMetadata(MMManageNetworks f);
+    ManageMetadata(MManageMetadata f);
     KeyDetailsAction();
     LogComment();
     SelectSeed(MSeeds f);

@@ -28,7 +28,7 @@ use definitions::{
     navigation::{
         ActionResult, AlertData, Card, DerivationEntry, DerivationPack, FooterButton, History,
         MBackup, MDeriveKey, MEnterPassword, MEventMaybeDecoded, MKeyDetails, MKeyDetailsMulti,
-        MKeys, MKeysCard, MLog, MLogDetails, MLogRight, MMMNetwork, MMManageNetworks, MMNetwork,
+        MKeys, MKeysCard, MLog, MLogDetails, MLogRight, MMMNetwork, MMNetwork, MManageMetadata,
         MManageNetworks, MMetadataRecord, MNetworkCard, MNetworkDetails, MNetworkMenu, MNewSeed,
         MNewSeedBackup, MPasswordConfirm, MRawKey, MRecoverSeedName, MRecoverSeedPhrase, MSCAuthor,
         MSCCall, MSCContent, MSCCurrency, MSCEnumVariantName, MSCEraMortal, MSCFieldName, MSCId,
@@ -812,7 +812,7 @@ fn flow_test_1() {
 
     let mut kusama_action_modal = kusama_action.clone();
     kusama_action_modal.modal_data = Some(ModalData::ManageMetadata {
-        f: MMManageNetworks {
+        f: MManageMetadata {
             name: "kusama".to_string(),
             version: "9130".to_string(),
             meta_hash: "3e6bf025743e5cc550883170d91c8275fb238762b214922b41d64f9feba23987"

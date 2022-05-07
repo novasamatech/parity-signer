@@ -534,7 +534,7 @@ pub struct MMMNetwork {
 }
 
 #[derive(Clone, Debug, PartialEq)]
-pub struct MMManageNetworks {
+pub struct MManageMetadata {
     pub name: String,
     pub version: String,
     pub meta_hash: String,
@@ -563,7 +563,7 @@ pub enum ModalData {
     TypesInfo { f: MTypesInfo },
     NewSeedMenu,
     NetworkDetailsMenu,
-    ManageMetadata { f: MMManageNetworks },
+    ManageMetadata { f: MManageMetadata },
     KeyDetailsAction,
     LogComment,
     SelectSeed { f: MSeeds },
