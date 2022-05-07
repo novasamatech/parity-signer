@@ -1,13 +1,4 @@
 //! Utils to communicate with the Signer frontend
-//!
-//! This will be obsolete or majorly reworked at least when jsons "manual"
-//! export is gone.
-//!
-//! Currently Signer receives from the frontend String inputs with
-//! **individual** object identifiers (e.g. single hexadecimal
-//! [`NetworkSpecsKey`] or single hexadecimal [`AddressKey`]). Signer sends
-//! json-like Strings with multiple fields, to be processed in the frontend to
-//! generate screens.
 use bip39::{Language, Mnemonic};
 use blake2_rfc::blake2b::blake2b;
 use hex;
@@ -34,7 +25,6 @@ use definitions::{
         MSeedKeyCard, MTypesInfo, MVerifier, Network, SeedNameCard,
     },
     network_specs::{NetworkSpecs, ValidCurrentVerifier},
-    print::export_plain_vector,
     qr_transfers::ContentLoadTypes,
     users::AddressDetails,
 };
@@ -51,7 +41,7 @@ use crate::identities::{
 };
 use crate::{db_transactions::TrDbCold, helpers::get_valid_current_verifier};
 
-/// Make json with all seed names with seed key identicons if seed key is
+/// Return a `Vec` with all seed names with seed key identicons if seed key is
 /// available.
 ///
 /// Function processes all seeds known to Signer KMS (which are input as
@@ -144,7 +134,7 @@ fn preferred_multisigner_identicon(multisigner_set: &[MultiSigner]) -> Vec<u8> {
     }
 }
 
-/// Make json with address-associated public data for all addresses from the
+/// Return a `Vec` with address-associated public data for all addresses from the
 /// Signer database.
 ///
 /// Function is used to show users all possible addresses, when selecting the
@@ -170,7 +160,7 @@ pub fn print_all_identities(database_name: &str) -> Result<Vec<MRawKey>, ErrorSi
         .collect())
 }
 
-/// Make json with address-associated public data for all addresses from the
+/// Return `Vec` with address-associated public data for all addresses from the
 /// Signer database with given seed name and network [`NetworkSpecsKey`].
 ///
 /// In addition, marks with flags swiped key or group of keys in multiselect
@@ -252,7 +242,7 @@ pub fn addresses_set_seed_name_network(
         .collect())
 }
 
-/// Make json with network information for all networks in the Signer database,
+/// Return `Vec` with network information for all networks in the Signer database,
 /// with bool indicator which one is currently selected.
 pub fn show_all_networks_with_flag(
     database_name: &str,
@@ -273,7 +263,7 @@ pub fn show_all_networks_with_flag(
     Ok(MNetworkMenu { networks })
 }
 
-/// Make vec with network information for all networks in the Signer database,
+/// Make `Vec` with network information for all networks in the Signer database,
 /// without any selection.
 pub fn show_all_networks(database_name: &str) -> Result<Vec<MMNetwork>, ErrorSigner> {
     let networks = get_all_networks::<Signer>(database_name)?;
@@ -308,7 +298,7 @@ pub fn first_network(database_name: &str) -> Result<NetworkSpecs, ErrorSigner> {
     Ok(networks.remove(0))
 }
 
-/// Prepare export key screen json.
+/// Prepare export key screen struct [`MKeyDetails`].
 ///
 /// For QR code the address information is put in format
 /// `substrate:{public key as base58}:0x{network genesis hash}`
@@ -370,7 +360,7 @@ pub fn export_key(
     })
 }
 
-/// Prepare seed backup screen json for given seed name.
+/// Prepare seed backup screen struct [`MBackup`] for given seed name.
 ///
 /// Function inputs seed name, outputs vec with all known derivations in all
 /// networks.
@@ -410,10 +400,10 @@ pub fn backup_prep(database_name: &str, seed_name: &str) -> Result<MBackup, Erro
     })
 }
 
-/// Prepare key derivation screen json.
+/// Prepare key derivation screen struct [`MDeriveKey`].
 ///
 /// Function inputs seed name, network [`NetworkSpecsKey`] and user-suggested
-/// derivation, outputs json with derived address data and, if the derived
+/// derivation, outputs struct with derived address data and, if the derived
 /// address already exists in the database, shows the its data.
 ///
 // TODO: the `collision` part is actually a mislabel, it is really
@@ -458,12 +448,10 @@ pub fn derive_prep(
     })
 }
 
-/// Make json with allowed action details for new key derivation.
+/// Return [`NavDerivationCheck`] with allowed action details for new key derivation.
 ///
 /// Function is used to dynamically check from the frontend if user is allowed
 /// to proceed with the proposed derived key generation.
-///
-/// Note that the function is unfallible and always produces a json string.
 ///
 /// User is allowed to try to proceed only if the derivation is valid and, in
 /// case of derivations without password, if the derivation does not already
@@ -535,8 +523,8 @@ pub fn dynamic_path_check(
     }
 }
 
-/// Make json with network specs and metadata set information for network with
-/// given [`NetworkSpecsKey`].
+/// Return [`MNetworkDetails`] with network specs and metadata set information
+/// for network with given [`NetworkSpecsKey`].
 pub fn network_details_by_key(
     database_name: &str,
     network_specs_key: &NetworkSpecsKey,
@@ -597,8 +585,8 @@ pub fn network_details_by_key(
     })
 }
 
-/// Make json with metadata details for network with given [`NetworkSpecsKey`]
-/// and given version.
+/// Return [`MManageMetadata`] with metadata details for network with given
+/// [`NetworkSpecsKey`] and given version.
 pub fn metadata_details(
     database_name: &str,
     network_specs_key: &NetworkSpecsKey,
@@ -711,14 +699,6 @@ pub fn guess(word_part: &str) -> Vec<&'static str> {
     }
 }
 
-/// Make json with possible options of English bip39 words that start with
-/// user-entered word part.
-///
-//// List lentgh limit is [`MAX_WORDS_DISPLAY`], sorted alphabetically.
-pub fn print_guess(user_entry: &str) -> String {
-    export_plain_vector(&guess(user_entry))
-}
-
 /// Maximum word count in bip39 standard.
 ///
 /// See <https://docs.rs/tiny-bip39/0.8.2/src/bip39/mnemonic_type.rs.html#60>
@@ -726,13 +706,6 @@ pub const BIP_CAP: usize = 24;
 
 /// Maximum word length in bip39 standard.
 pub const WORD_LENGTH: usize = 8;
-
-/// String length to reserve for json output of numbered draft.
-///
-/// Each element is {"order":**,"content":"********"}, at most 33 + 1 (comma)
-/// symbols for each max BIP_CAP elements, two extras for `[` and `]`, and some
-/// extra space just in case.
-pub const SAFE_RESERVE: usize = 1000;
 
 /// Zeroizeable seed phrase draft.
 #[derive(Debug, Clone, Zeroize, ZeroizeOnDrop)]
@@ -859,24 +832,6 @@ impl SeedDraft {
         if !self.saved.is_empty() {
             self.saved.remove(self.saved.len() - 1);
         }
-    }
-
-    /// Make json with seed phrase draft.
-    ///
-    /// Resulting json contains a secret and should be handled as such.
-    pub fn print(&self) -> String {
-        let mut out = String::with_capacity(SAFE_RESERVE); // length set here to avoid reallocation
-        out.push('[');
-        for (i, x) in self.saved.iter().enumerate() {
-            if i > 0 {
-                out.push(',')
-            }
-            out.push_str(&format!("{{\"order\":{},\"content\":\"", i));
-            out.push_str(x.word());
-            out.push_str("\"}");
-        }
-        out.push(']');
-        out
     }
 
     pub fn draft(&self) -> Vec<String> {

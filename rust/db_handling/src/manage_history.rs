@@ -105,25 +105,6 @@ pub fn get_history_entry_by_order(order: u32, database_name: &str) -> Result<Ent
     }
 }
 
-/*
-/// Print history [`Entry`] as a json by `u32` order identifier received from
-/// the frontend without transaction decodings.
-///
-/// Transactions are represented here as hex encoded raw data, without parsing.
-#[cfg(feature = "signer")]
-pub fn print_history_entry_by_order(
-    order: u32,
-    database_name: &str,
-) -> Result<String, ErrorSigner> {
-    let entry = get_history_entry_by_order(order, database_name)?;
-    Ok(format!(
-        "\"order\":{},{}",
-        order,
-        entry.show(|b| format!("\"{}\"", hex::encode(b.transaction())))
-    ))
-}
-*/
-
 /// Clear Signer history and make a log [`Entry`] that history was cleared.
 #[cfg(feature = "signer")]
 pub fn clear_history(database_name: &str) -> Result<(), ErrorSigner> {

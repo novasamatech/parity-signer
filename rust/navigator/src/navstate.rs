@@ -1638,17 +1638,6 @@ impl State {
                     let draft = recover_seed_phrase_state.draft();
                     let user_input = draft.user_input();
                     let guess_set = guess(user_input);
-                    /*
-                    let open_part = format!("\"seed_name\":\"{}\",\"keyboard\":{},\"user_input\":\" {}\",\"guess_set\":{},\"draft\":", recover_seed_phrase_state.name(), new_navstate.keyboard(), user_input, guess_set); // first space in user input is intended
-                    let mut out = String::with_capacity(open_part.len() + SAFE_RESERVE + (WORD_LENGTH+1)*BIP_CAP + 15); // fit open part, draft as json, ready seed as str
-                    out.push_str(&open_part);
-                    */
-
-                    let mut out = String::new();
-                    let mut seed_draft_print = draft.print();
-                    out.push_str(&seed_draft_print);
-                    seed_draft_print.zeroize();
-
                     let ready_seed = draft
                         .try_finalize()
                         .map(|a| a.into_iter().collect::<Vec<_>>().join(" "));
