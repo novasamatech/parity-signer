@@ -68,6 +68,81 @@
 //! the payload is always easily found in the update content. This is done to
 //! future-proof the updates if the multi-signing is ever implemented for them.
 //!
+//! # Networks and verifiers in Signer
+//!
+//! Signer operates only with the networks for which it has
+//! [`NetworkSpecs`](definitions::network_specs::NetworkSpecs) in the database:
+//! only for these networks it is possible to upload the metadata and parse
+//! transactions.
+//!
+//! By default, Signer supports networks Polkadot, Kusama, and Westend. Any
+//! other Substrate-based network could be added to Signer by scanning and
+//! accepting QR code with `add_specs` payload.
+//!
+//! Each network has an associated verifier, i.e. some entity that user
+//! trusts to produce valid payloads. Verifier could be anything from more or
+//! less centralized source to individual users themselves.
+//!
+//! Verifier gets set as soon as the `add_specs` payload is accepted by Signer.
+//! Signer keeps track of what verifier has been used for the network, and does
+//! not support verifier downgrades, i.e. using a verifier weaker than the one
+//! used before.
+//!
+//! Network metadata (`load_metadata`) updates could be accepted only if they
+//! have exactly same verifier as the one already in the database for that
+//! network.
+//!
+//! It is possible to accept `add_specs` with stronger verifier, in which case
+//! all previously known network matadata will be removed, `NetworkSpecs` entry
+//! will get updated, and the verifier will be changed.
+//!
+//! Users should practice caution when removing the networks.
+//!
+//! Removing the network verified previously by the general verifier will not
+//! change the fact that the expected verifier is the general one, should the
+//! network be added back to Signer.
+//!
+//! Removing the network verified previously by custom verifier with `Some(_)`
+//! value will cause the network to be **blocked** in Signer until the Signer is
+//! reset. This is a security measure.
+//!
+//! # Verifiers and payload signing
+//!
+//! In Signer, network verifiers, i.e. the verifiers for `add_specs` and
+//! `load_metadata` updates could be general or custom. Update `load_types` can
+//! be verified only by the general verifier.
+//!
+//! General verifier is the strongest and the most reliable verifier known to
+//! the Signer. By default it is set to Parity-associated key, but users can
+//! remove it and set their own. There could be only one general verifier at any
+//! time. Resetting general verifier to a different value (with trust on first
+//! use basis), would remove all the data verified by the previous general
+//! verifier.
+//!
+//! Custom verifier is a verifier used specifically for a given network,
+//! different from the general verifier. There could be as many custom verifiers
+//! for different networks as needed.
+//!
+//! Internal verifier-related Signer logic is described in more detail in
+//! [definitions::network_specs].
+//!
+//! Any of the verifiers could be `None` or `Some(_)` with public key of the
+//! trusted entity inside. Although keeping verifiers `None` is dangerous, it
+//! is certainly possible.
+//!
+//! Verifier `None` originates from unsigned updates, verifier `Some(_)` - from
+//! signed updates. If Signer has `None` for the general verifier, it sets up
+//! `Some(_)` value from first of the accepted signed updates as the general
+//! verifier. After the general verifier is set, without its removal, only
+//! custom verifiers could be set for the networks.
+//!
+//! # Signing the payloads
+//!
+//! ## With signatures produced by `subkey`
+//! 
+//!
+//! ## With special dedicated Signer
+//!
 //! # Adding a network to the Signer and `add_specs` payload
 //!
 //! (purpose, verifiers)
