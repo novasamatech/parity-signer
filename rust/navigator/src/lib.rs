@@ -20,10 +20,10 @@ mod tests;
 
 //TODO: multithread here some day!
 lazy_static! {
-///Navigation state of the app
+/// Navigation state of the app
 ///
-///Navigation state is unsafe either way, since it has to persist
-///No matter if here or beyond FFI
+/// Navigation state is unsafe either way, since it has to persist
+/// No matter if here or beyond FFI
     pub static ref STATE: Mutex<State> = Mutex::new(
         State{
             navstate: Navstate::new(),
@@ -34,7 +34,10 @@ lazy_static! {
     );
 }
 
-///This should be called from UI; returns new UI information as JSON
+/// User actions handler.
+///
+/// This method is called on every user [`Action`] in the UI, performs changes in backend
+/// and returns new UI information as [`ActionResult`].
 pub fn do_action(
     action: Action,
     details_str: &str,
@@ -57,7 +60,7 @@ pub fn do_action(
     }
 }
 
-///Should be called in the beginning to recall things stored only by phone
+/// Should be called in the beginning to recall things stored only by phone
 pub fn init_navigation(dbname: &str, seed_names: &str) {
     //This operation has to happen; lock thread and do not ignore.
     let guard = STATE.lock();
@@ -90,7 +93,7 @@ pub fn init_navigation(dbname: &str, seed_names: &str) {
     }
 }
 
-///Should be called in the beginning to recall things stored only by phone
+/// Should be called in the beginning to recall things stored only by phone
 pub fn update_seed_names(seed_names: &str) {
     let guard = STATE.lock();
     match guard {

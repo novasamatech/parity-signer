@@ -222,15 +222,6 @@ checksum = "6107fe1be6682a68940da878d9e9f5e90ca5745b3dec9fd1bb393c8777d4f581"
 
 [[package]]
 name = "base64"
-version = "0.10.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "0b25d992356d2eb0ed82172f5248873db5560c4721f564b13cb5193bda5e668e"
-dependencies = [
- "byteorder",
-]
-
-[[package]]
-name = "base64"
 version = "0.13.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "904dfeac50f3cdaba28fc6f57fdcddb75f49ed61346676a78c4ffe55877802fd"
@@ -1566,7 +1557,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "b0452aac8bab02242429380e9b2f94ea20cea2b37e2c1777a1358799bbe97f37"
 dependencies = [
  "arrayref",
- "base64 0.13.0",
+ "base64",
  "digest 0.9.0",
  "hmac-drbg",
  "libsecp256k1-core",
@@ -2629,7 +2620,7 @@ version = "0.2.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "5eebeaeb360c87bfb72e84abdb3447159c0eaececf1bef2aecd65a8be949d1c9"
 dependencies = [
- "base64 0.13.0",
+ "base64",
 ]
 
 [[package]]
@@ -2974,7 +2965,6 @@ version = "0.1.0"
 dependencies = [
  "android_logger",
  "anyhow",
- "base64 0.10.1",
  "db_handling",
  "definitions",
  "env_logger",
@@ -3041,7 +3031,7 @@ version = "0.7.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "41d1c5305e39e09653383c2c7244f2f78b3bcae37cf50c64cb4789c9f5096ec2"
 dependencies = [
- "base64 0.13.0",
+ "base64",
  "bytes",
  "futures",
  "httparse",

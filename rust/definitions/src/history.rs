@@ -200,15 +200,16 @@ impl TypesDisplay {
     }
 }
 
-/// Event content for generating [`SufficientCrypto`](crate::crypto::SufficientCrypto)
+/// Event content for generating [`SufficientCrypto`]
 /// QR code for `load_types` message  
 ///
 /// Effectively records that types information was signed by user.
-/// Contains hash of SCALE-encoded types data and [`VerifierValue`] of address
 /// used for `SufficientCrypto` generation.  
 #[derive(Debug, Decode, Encode, PartialEq, Clone)]
 pub struct TypesExport {
+    /// Hash of SCALE-encoded types data
     pub types_hash: Vec<u8>,
+    /// [`VerifierValue`] of address
     pub signed_by: VerifierValue,
 }
 
@@ -230,20 +231,18 @@ impl TypesExport {
     }
 }
 
-/// Event content for address generation or removal
-///
-/// Contains public information associated with address:
-/// - seed name  
-/// - [`Encryption`]  
-/// - public key for address  
-/// - path with soft (`/`) and hard (`//`) derivatinos only, **without** password  
-/// - genesis hash of the network within which the address is  
+/// Event content for address generation or removal.
 #[derive(Debug, Decode, Encode, PartialEq, Clone)]
 pub struct IdentityHistory {
+    /// The name of the seed.
     pub seed_name: String,
+    /// [`Encryption`] scheme of the seed.
     pub encryption: Encryption,
+    /// Public key.
     pub public_key: Vec<u8>,
+    /// - path with soft (`/`) and hard (`//`) derivatinos only, **without** password  
     pub path: String,
+    /// - genesis hash of the network within which the address is  
     pub network_genesis_hash: Vec<u8>,
 }
 
@@ -519,7 +518,7 @@ pub struct Entry {
 
 /// Test function generating a set of all possible events
 ///
-/// Uses mock values and is needed to test json format in displaying all events
+/// Uses mock values and is needed to test [`Event`] format in displaying all events
 /// in user interface.  
 #[cfg(feature = "signer")]
 pub fn all_events_preview() -> Vec<Event> {

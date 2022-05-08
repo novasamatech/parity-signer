@@ -54,9 +54,7 @@ fun KeyManager(
 	val multiselectMode = mKeys.multiselectMode
 	val multiselectCount = mKeys.multiselectCount
 	var offsetX by remember { mutableStateOf(0f) }
-	Log.w("SIGNER_RUST_LOG", ">>> $keySet")
-	Log.w("SIGNER_RUST_LOG", ">>>>> ${keySet.size}")
-	Log.w("SIGNER_RUST_LOG", "$alertState")
+
 	Box {
 		Column {
 			Row(

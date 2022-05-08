@@ -13,9 +13,7 @@ import io.parity.signer.alerts.ErrorModal
 import io.parity.signer.alerts.ShieldAlert
 import io.parity.signer.components.Documents
 import io.parity.signer.modals.*
-import io.parity.signer.models.SignerDataModel
-import io.parity.signer.models.increment
-import io.parity.signer.models.pushButton
+import io.parity.signer.models.*
 import io.parity.signer.screens.*
 import io.parity.signer.uniffi.*
 
@@ -33,13 +31,11 @@ fun ScreenSelector(
 	val button1: (Action) -> Unit = { action -> button(action, "", "") }
 	val button2: (Action, String) -> Unit =
 		{ action, details -> button(action, details, "") }
-	val button_add_key: (String, String) -> Unit =
-		{ details, a -> button(Action.NEW_KEY, details, a) }
 	when (screenData) {
 		is ScreenData.DeriveKey -> NewAddressScreen(
 			screenData.f,
 			button = button2,
-			addKey = button_add_key,
+			addKey = signerDataModel::addKey,
 			dbName = signerDataModel.dbName,
 		)
 		ScreenData.Documents -> Documents()
@@ -145,9 +141,10 @@ fun ModalSelector(
 			modalData.f,
 			button2
 		)
-		is ModalData.Backup -> TODO() /*SeedBackup(
+		is ModalData.Backup -> SeedBackup(
 			modalData.f,
-		)*/
+			getSeedForBackup = signerDataModel::getSeedForBackup
+		)
 		is ModalData.PasswordConfirm -> PasswordConfirm(
 			modalData.f,
 			signerDataModel = signerDataModel

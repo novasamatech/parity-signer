@@ -18,6 +18,7 @@ import io.parity.signer.ui.theme.Crypto400
 import io.parity.signer.ui.theme.CryptoTypography
 import io.parity.signer.ui.theme.modal
 import io.parity.signer.uniffi.MBackup
+import io.parity.signer.uniffi.MscNetworkInfo
 import kotlinx.coroutines.delay
 
 /**
@@ -49,11 +50,14 @@ fun SeedBackup(
 				HeadingOverline("DERIVED KEYS")
 				LazyColumn {
 					for (pack in derivations) {
-						/* TODO: conversions, again
 						item {
-							NetworkCard(pack)
+							NetworkCard(
+								MscNetworkInfo(
+									networkTitle = pack.networkTitle,
+									networkLogo = pack.networkLogo
+								)
+							)
 						}
-						*/
 						val networkDerivations = pack.idSet.sortedBy { it.path }
 						/*
 						//TODO: this could have been neat items block,
