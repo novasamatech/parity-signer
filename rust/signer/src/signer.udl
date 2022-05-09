@@ -344,12 +344,7 @@ dictionary MTransaction {
     TransactionCardSet content;
     TransactionType ttype;
     Address? author_info;
-    TransactionNetworkInfo? network_info;
-};
-
-dictionary TransactionNetworkInfo {
-    string network_title;
-    string network_logo;
+    MSCNetworkInfo? network_info;
 };
 
 enum TransactionType {

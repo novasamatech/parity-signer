@@ -36,7 +36,7 @@ use definitions::{
         MSettings, MSignSufficientCrypto, MSignatureReady, MSufficientCryptoReady, MTransaction,
         MTypesInfo, MVerifier, MVerifierDetails, ModalData, Network, NetworkSpecsToSend,
         RightButton, ScreenData, ScreenNameType, SeedNameCard, TransactionCard, TransactionCardSet,
-        TransactionNetworkInfo, TransactionType,
+        TransactionType,
     },
     network_specs::{NetworkSpecs, ValidCurrentVerifier, Verifier, VerifierValue},
 };
@@ -3468,7 +3468,7 @@ fn flow_test_1() {
                 },
                 ttype: TransactionType::ImportDerivations,
                 author_info: None,
-                network_info: Some(TransactionNetworkInfo {
+                network_info: Some(MSCNetworkInfo {
                     network_title: "Westend".to_string(),
                     network_logo: "westend".to_string(),
                 }),
@@ -5340,7 +5340,7 @@ fn flow_test_1() {
                     has_pwd: false,
                     multiselect: None,
                 }),
-                network_info: Some(TransactionNetworkInfo {
+                network_info: Some(MSCNetworkInfo {
                     network_title: "Westend".to_string(),
                     network_logo: "westend".to_string(),
                 }),
@@ -5490,7 +5490,7 @@ fn flow_test_1() {
                     has_pwd: false,
                     multiselect: None,
                 }),
-                network_info: Some(TransactionNetworkInfo {
+                network_info: Some(MSCNetworkInfo {
                     network_title: "Westend".to_string(),
                     network_logo: "westend".to_string(),
                 }),
@@ -5944,7 +5944,7 @@ fn flow_test_1() {
                     has_pwd: false,
                     multiselect: None,
                 }),
-                network_info: Some(TransactionNetworkInfo {
+                network_info: Some(MSCNetworkInfo {
                     network_title: "Westend".to_string(),
                     network_logo: "westend".to_string(),
                 }),
@@ -6170,7 +6170,7 @@ fn flow_test_1() {
                     has_pwd: true,
                     multiselect: None,
                 }),
-                network_info: Some(TransactionNetworkInfo {
+                network_info: Some(MSCNetworkInfo {
                     network_title: "Westend".to_string(),
                     network_logo: "westend".to_string(),
                 }),

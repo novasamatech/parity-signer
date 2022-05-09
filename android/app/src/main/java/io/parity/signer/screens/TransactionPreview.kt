@@ -26,7 +26,6 @@ fun TransactionPreview(
 	button: (action: Action, details: String, seedPhrase: String) -> Unit,
 	signerDataModel: SignerDataModel
 ) {
-	//val transaction = transaction.content //.parseTransaction()
 	val action = transaction.ttype
 	val comment = remember { mutableStateOf("") }
 	val focusManager = LocalFocusManager.current
@@ -39,14 +38,10 @@ fun TransactionPreview(
 			cardSet = transaction.content,
 		)
 		transaction.authorInfo?.let {
-			/* TODO: Address -> TransactionAuthor
 			KeyCard(identity = it)
-			 */
 		}
 		transaction.networkInfo?.let {
-			/* TODO
-			NetworkCard(deriveKey = it)
-			*/
+			NetworkCard(network = it)
 		}
 		when (action) {
 			TransactionType.SIGN -> {

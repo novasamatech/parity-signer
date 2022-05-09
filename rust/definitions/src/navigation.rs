@@ -223,12 +223,6 @@ pub enum TransactionType {
 }
 
 #[derive(Clone, Debug, PartialEq)]
-pub struct TransactionNetworkInfo {
-    pub network_title: String,
-    pub network_logo: String,
-}
-
-#[derive(Clone, Debug, PartialEq)]
 pub struct TransactionCard {
     pub index: u32,
     pub indent: u32,
@@ -255,7 +249,7 @@ pub struct MTransaction {
     pub content: TransactionCardSet,
     pub ttype: TransactionType,
     pub author_info: Option<Address>,
-    pub network_info: Option<TransactionNetworkInfo>,
+    pub network_info: Option<MSCNetworkInfo>,
 }
 
 #[derive(Clone, Debug, PartialEq)]

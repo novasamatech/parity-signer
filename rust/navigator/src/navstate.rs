@@ -4,9 +4,9 @@ use db_handling::manage_history::get_history_entry_by_order;
 use definitions::navigation::{
     ActionResult, Address, AlertData, FooterButton, History, MEnterPassword, MKeyDetailsMulti,
     MKeys, MLog, MLogDetails, MManageNetworks, MNetworkCard, MNewSeed, MPasswordConfirm,
-    MRecoverSeedName, MRecoverSeedPhrase, MSCContent, MSeedMenu, MSeeds, MSettings,
+    MRecoverSeedName, MRecoverSeedPhrase, MSCContent, MSCNetworkInfo, MSeedMenu, MSeeds, MSettings,
     MSignSufficientCrypto, MSignatureReady, MSufficientCryptoReady, MTransaction, ModalData,
-    RightButton, ScreenData, ScreenNameType, TransactionNetworkInfo, TransactionType,
+    RightButton, ScreenData, ScreenNameType, TransactionType,
 };
 use sp_runtime::MultiSigner;
 use transaction_parsing::{entry_to_transactions_with_decoding, TransactionAction};
@@ -1550,7 +1550,7 @@ impl State {
                             content,
                             ttype,
                             author_info,
-                            network_info: network_info.map(|i| TransactionNetworkInfo {
+                            network_info: network_info.map(|i| MSCNetworkInfo {
                                 network_title: i.title,
                                 network_logo: i.logo,
                             }),
