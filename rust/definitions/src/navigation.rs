@@ -278,16 +278,12 @@ pub struct MSeeds {
     pub seed_name_cards: Vec<SeedNameCard>,
 }
 
-#[derive(Clone, Default, Debug, PartialEq)]
+#[derive(Clone, Debug, PartialEq)]
 pub struct MKeyDetails {
     pub qr: Vec<u8>,
     pub pubkey: String,
-    pub base58: String,
-    pub identicon: Vec<u8>,
-    pub seed_name: String,
-    pub path: String,
-    pub network_title: String,
-    pub network_logo: String,
+    pub network_info: MSCNetworkInfo,
+    pub address: Address,
 }
 
 #[derive(Clone, Debug, PartialEq)]

@@ -400,12 +400,8 @@ dictionary MSeeds {
 dictionary MKeyDetails {
     sequence<u8> qr;
     string pubkey;
-    string base58;
-    sequence<u8> identicon;
-    string seed_name;
-    string path;
-    string network_title;
-    string network_logo;
+    MSCNetworkInfo network_info;
+    Address address;
 };
 
 dictionary MNewSeed {
