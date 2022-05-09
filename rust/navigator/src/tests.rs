@@ -4686,8 +4686,7 @@ fn flow_test_1() {
     });
     let sufficient = if let Some(ModalData::SufficientCryptoReady { ref mut f }) = action.modal_data
     {
-        let res = std::mem::take(&mut f.sufficient);
-        res
+        std::mem::take(&mut f.sufficient)
     } else {
         panic!(
             "Expected Some(ModalData::SufficientCrypto), got {:?}",
@@ -4947,8 +4946,7 @@ fn flow_test_1() {
     };
     let sufficient = if let Some(ModalData::SufficientCryptoReady { ref mut f }) = action.modal_data
     {
-        let res = std::mem::take(&mut f.sufficient);
-        res
+        std::mem::take(&mut f.sufficient)
     } else {
         panic!(
             "Expected Some(ModalData::SufficientCrypto), got {:?}",
@@ -5041,8 +5039,7 @@ fn flow_test_1() {
     .unwrap();
     let sufficient = if let Some(ModalData::SufficientCryptoReady { ref mut f }) = action.modal_data
     {
-        let res = std::mem::take(&mut f.sufficient);
-        res
+        std::mem::take(&mut f.sufficient)
     } else {
         panic!(
             "Expected Some(ModalData::SufficientCrypto), got {:?}",
