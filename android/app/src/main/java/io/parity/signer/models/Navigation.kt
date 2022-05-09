@@ -20,7 +20,6 @@ fun SignerDataModel.pushButton(
 	try {
 		_actionResult.value = backendAction(button, details, seedPhrase)
 		_alertState.value = _actionResult.value?.alertData
-		Log.w("SIGNER_RUST_LOG", "VALUE ${_actionResult.value}")
 	} catch (e: java.lang.Exception) {
 		Log.e("Navigation error", e.toString())
 		Toast.makeText(context, e.toString(), Toast.LENGTH_SHORT).show()

@@ -24,7 +24,7 @@ pub enum TransactionAction {
         content: TransactionCardSet,
         checksum: u32,
         has_pwd: bool,
-        author_info: TransactionAuthor,
+        author_info: Address,
         network_info: NetworkSpecs,
     },
     Stub {
@@ -203,7 +203,7 @@ pub struct MLog {
 pub struct MEventMaybeDecoded {
     pub event: Event,
     pub decoded: Option<TransactionCardSet>,
-    pub signed_by: Option<TransactionAuthor>,
+    pub signed_by: Option<Address>,
     pub verifier_details: Option<MVerifierDetails>,
 }
 
@@ -226,15 +226,6 @@ pub enum TransactionType {
 pub struct TransactionNetworkInfo {
     pub network_title: String,
     pub network_logo: String,
-}
-
-#[derive(Clone, Debug, PartialEq)]
-pub struct TransactionAuthor {
-    pub base58: String,
-    pub identicon: Vec<u8>,
-    pub seed: String,
-    pub derivation_path: String,
-    pub has_pwd: bool,
 }
 
 #[derive(Clone, Debug, PartialEq)]
@@ -263,7 +254,7 @@ pub struct TransactionCardSet {
 pub struct MTransaction {
     pub content: TransactionCardSet,
     pub ttype: TransactionType,
-    pub author_info: Option<TransactionAuthor>,
+    pub author_info: Option<Address>,
     pub network_info: Option<TransactionNetworkInfo>,
 }
 
@@ -278,16 +269,12 @@ pub struct MSeeds {
     pub seed_name_cards: Vec<SeedNameCard>,
 }
 
-#[derive(Clone, Default, Debug, PartialEq)]
+#[derive(Clone, Debug, PartialEq)]
 pub struct MKeyDetails {
     pub qr: Vec<u8>,
     pub pubkey: String,
-    pub base58: String,
-    pub identicon: Vec<u8>,
-    pub seed_name: String,
-    pub path: String,
-    pub network_title: String,
-    pub network_logo: String,
+    pub network_info: MSCNetworkInfo,
+    pub address: Address,
 }
 
 #[derive(Clone, Debug, PartialEq)]
@@ -426,17 +413,8 @@ pub struct MSCContent {
 }
 
 #[derive(Clone, Debug, PartialEq)]
-pub struct MSCAuthor {
-    pub base58: String,
-    pub identicon: Vec<u8>,
-    pub seed: String,
-    pub derivation_path: String,
-    pub has_password: Option<bool>,
-}
-
-#[derive(Clone, Debug, PartialEq)]
 pub struct MSufficientCryptoReady {
-    pub author_info: MSCAuthor,
+    pub author_info: Address,
     pub sufficient: Vec<u8>,
     pub content: MSCContent,
 }
@@ -516,7 +494,7 @@ pub struct MSignatureReady {
 
 #[derive(Clone, Debug, PartialEq)]
 pub struct MEnterPassword {
-    pub author_info: TransactionAuthor,
+    pub author_info: Address,
     pub counter: u32,
 }
 
@@ -649,7 +627,7 @@ pub struct MSCTxSpecPlain {
 
 #[derive(Clone, Debug, PartialEq)]
 pub enum Card {
-    AuthorCard { f: TransactionAuthor },
+    AuthorCard { f: Address },
     AuthorPlainCard { f: MSCAuthorPlain },
     AuthorPublicKeyCard { f: MVerifierDetails },
     BalanceCard { f: MSCCurrency },

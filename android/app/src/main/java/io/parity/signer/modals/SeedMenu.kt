@@ -39,7 +39,7 @@ fun SeedMenu(
 				BigButton(
 					text = "Backup",
 					action = {
-						if (shieldAlert is AlertData.Shield && shieldAlert.f == null)
+						if (shieldAlert == null || (shieldAlert is AlertData.Shield && shieldAlert.f == null))
 							button(Action.BACKUP_SEED)
 						else
 							button(Action.SHIELD)
@@ -48,7 +48,7 @@ fun SeedMenu(
 				BigButton(
 					text = "Derive new key",
 					action = {
-						if (shieldAlert is AlertData.Shield && shieldAlert.f == null)
+						if (shieldAlert == null || (shieldAlert is AlertData.Shield && shieldAlert.f == null))
 							button(Action.NEW_KEY)
 						else
 							button(Action.SHIELD)

@@ -27,13 +27,13 @@ fun NewAddressScreen(
 	val collision = remember { mutableStateOf<Address?>(null) }
 	val seedName = deriveKey.seedName
 	val networkSpecKey = deriveKey.networkSpecsKey
-	var derivationState by remember {
+	var derivationState by remember(buttonGood, whereTo, collision) {
 		mutableStateOf(
 			DerivationCheck(
 				false,
 				null,
 				null,
-				null
+				null,
 			)
 		)
 	}
@@ -48,16 +48,29 @@ fun NewAddressScreen(
 			.fillMaxSize()
 	) {
 		Row {
-			HeaderBar(line1 = "Create new key", line2 = "For seed $seedName")
+			HeaderBar(
+				line1 = "Create new key",
+				line2 = "For seed ${seedName.decode64()}"
+			)
 			Spacer(Modifier.weight(1f))
 		}
-		// TODO: Another type conversion MDeriveKey -> network
-		//  NetworkCard(deriveKey)
+		NetworkCard(
+			network = MscNetworkInfo(
+				networkTitle = deriveKey.networkTitle,
+				networkLogo = deriveKey.networkLogo
+			)
+		)
 		SingleTextInput(
 			content = derivationPath,
 			update = {
 				derivationPath.value = it
-				derivationState = substratePathCheck(seedName, networkSpecKey, it, dbName)
+				derivationState =
+					substratePathCheck(
+						seedName = seedName,
+						path = it,
+						network = networkSpecKey,
+						dbname = dbName
+					)
 			},
 			prefix = {
 				Text(

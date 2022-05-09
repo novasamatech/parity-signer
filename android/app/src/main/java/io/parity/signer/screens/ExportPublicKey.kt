@@ -15,6 +15,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import io.parity.signer.components.HeaderBar
+import io.parity.signer.components.KeyCard
+import io.parity.signer.components.NetworkCard
 import io.parity.signer.models.intoImageBitmap
 import io.parity.signer.ui.theme.Bg200
 import io.parity.signer.uniffi.MKeyDetails
@@ -34,23 +36,27 @@ fun ExportPublicKey(keyDetails: MKeyDetails) {
 				)
 				.fillMaxWidth()
 		) {
-			// TODO: KeyCard(identity = address)
+			KeyCard(identity = keyDetails.address)
 		}
 		Row(
 			Modifier.padding(top = 3.dp, start = 12.dp, end = 12.dp)
 		) {
-			// TODO: NetworkCard(address)
+			NetworkCard(
+				network = keyDetails.networkInfo
+			)
 		}
 		Image(
 			keyDetails.qr.intoImageBitmap(),
 			contentDescription = "QR with address to scan",
 			contentScale = ContentScale.FillWidth,
-			modifier = Modifier.padding(12.dp).fillMaxWidth(1f)
+			modifier = Modifier
+				.padding(12.dp)
+				.fillMaxWidth(1f)
 		)
 		HeaderBar(line1 = "KEY DETAILS", line2 = "")
 		Row {
 			Text("Base58 key:")
-			Text(keyDetails.base58)
+			Text(keyDetails.address.base58)
 		}
 		Row {
 			Text("Hex key:")
@@ -58,7 +64,7 @@ fun ExportPublicKey(keyDetails: MKeyDetails) {
 		}
 		Row {
 			Text("Seed name:")
-			Text(keyDetails.seedName)
+			Text(keyDetails.address.seedName)
 		}
 	}
 }

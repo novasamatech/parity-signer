@@ -4,6 +4,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.runtime.Composable
 import io.parity.signer.models.decode64
+import io.parity.signer.models.encodeHex
 import io.parity.signer.uniffi.Event
 import io.parity.signer.uniffi.VerifierValue
 
@@ -13,8 +14,6 @@ import io.parity.signer.uniffi.VerifierValue
  */
 @Composable
 fun HistoryCard(card: Event, timestamp: String) {
-	// TODO: val payload = card.optJSONObject("payload")
-	val payload = ""
 	when (card) {
 		is Event.DatabaseInitiated -> {
 			HistoryCardTemplate(
@@ -140,7 +139,7 @@ fun HistoryCard(card: Event, timestamp: String) {
 					image = Icons.Default.Shield,
 					line1 = timestamp,
 					line2 = "Network verifier set",
-					line3 = it.toString() // TODO: hex string
+					line3 = it.toUByteArray().toByteArray().encodeHex()
 				)
 			}
 		}

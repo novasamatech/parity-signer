@@ -22,7 +22,7 @@ use definitions::{
         Address, DerivationCheck as NavDerivationCheck, DerivationDestination, DerivationEntry,
         DerivationPack, MBackup, MDeriveKey, MKeyDetails, MKeysCard, MMMNetwork, MMNetwork,
         MManageMetadata, MMetadataRecord, MNetworkDetails, MNetworkMenu, MNewSeedBackup, MRawKey,
-        MSeedKeyCard, MTypesInfo, MVerifier, Network, SeedNameCard,
+        MSCNetworkInfo, MSeedKeyCard, MTypesInfo, MVerifier, Network, SeedNameCard,
     },
     network_specs::{NetworkSpecs, ValidCurrentVerifier},
     qr_transfers::ContentLoadTypes,
@@ -348,15 +348,25 @@ pub fn export_key(
             ));
         }
     };
+    let address = Address {
+        base58,
+        path: address_details.path,
+        has_pwd: address_details.has_pwd,
+        identicon,
+        seed_name: address_details.seed_name,
+        multiselect: None,
+    };
+
+    let network_info = MSCNetworkInfo {
+        network_title: network_specs.title,
+        network_logo: network_specs.logo,
+    };
+
     Ok(MKeyDetails {
         qr,
         pubkey: hex::encode(public_key),
-        base58,
-        identicon,
-        seed_name: address_details.seed_name,
-        path: address_details.path,
-        network_title: network_specs.title,
-        network_logo: network_specs.logo,
+        network_info,
+        address,
     })
 }
 

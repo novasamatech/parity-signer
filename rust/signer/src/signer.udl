@@ -330,7 +330,7 @@ dictionary History {
 
 dictionary MEventMaybeDecoded {
     Event event;
-    TransactionAuthor? signed_by;
+    Address? signed_by;
     TransactionCardSet? decoded;
     MVerifierDetails? verifier_details;
 };
@@ -343,16 +343,8 @@ dictionary MLogDetails {
 dictionary MTransaction {
     TransactionCardSet content;
     TransactionType ttype;
-    TransactionAuthor? author_info;
+    Address? author_info;
     TransactionNetworkInfo? network_info;
-};
-
-dictionary TransactionAuthor {
-    string base58;
-    sequence<u8> identicon;
-    string seed;
-    string derivation_path;
-    boolean has_pwd;
 };
 
 dictionary TransactionNetworkInfo {
@@ -400,12 +392,8 @@ dictionary MSeeds {
 dictionary MKeyDetails {
     sequence<u8> qr;
     string pubkey;
-    string base58;
-    sequence<u8> identicon;
-    string seed_name;
-    string path;
-    string network_title;
-    string network_logo;
+    MSCNetworkInfo network_info;
+    Address address;
 };
 
 dictionary MNewSeed {
@@ -596,16 +584,8 @@ dictionary MSCContent {
     string ttype;
 };
 
-dictionary MSCAuthor {
-    string base58;
-    sequence<u8> identicon;
-    string seed;
-    boolean? has_password;
-    string derivation_path;
-};
-
 dictionary MSufficientCryptoReady {
-    MSCAuthor author_info;
+    Address author_info;
     sequence<u8> sufficient;
     MSCContent content;
 };
@@ -660,7 +640,7 @@ dictionary MSignatureReady {
 };
 
 dictionary MEnterPassword {
-    TransactionAuthor author_info;
+    Address author_info;
     u32 counter;
 };
 
@@ -777,7 +757,7 @@ dictionary MSCTxSpecPlain {
 
 [Enum]
 interface Card {
-    AuthorCard(TransactionAuthor f);
+    AuthorCard(Address f);
     AuthorPlainCard(MSCAuthorPlain f);
     AuthorPublicKeyCard(MVerifierDetails f);
     BalanceCard(MSCCurrency f);

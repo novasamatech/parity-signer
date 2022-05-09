@@ -16,7 +16,7 @@ fun HistoryScreen(
 	mLog: MLog,
 	button: (action: Action, details: String) -> Unit
 ) {
-	val history = mLog.log // TODO: check maybe .reversed()
+	val history = mLog.log
 
 	Column {
 		LazyColumn {

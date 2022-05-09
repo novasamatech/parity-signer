@@ -3,7 +3,7 @@ use definitions::history::{
     Entry, IdentityHistory, MetaValuesDisplay, MetaValuesExport, NetworkSpecsDisplay,
     NetworkSpecsExport, NetworkVerifierDisplay, SignDisplay, SignMessageDisplay, TypesExport,
 };
-use definitions::navigation::{Address, DerivationDestination, NetworkSpecsToSend};
+use definitions::navigation::{Address, DerivationDestination, MSCNetworkInfo, NetworkSpecsToSend};
 use definitions::network_specs::NetworkSpecs;
 use pretty_assertions::{assert_eq, assert_ne};
 use sled::{open, Batch, Db, Tree};
@@ -329,12 +329,18 @@ fn export_alice_westend() {
     let expected_key = MKeyDetails {
         qr: alice_westend_root_qr().to_vec(),
         pubkey: "46ebddef8cd9bb167dc30878d7113b7e168e6f0646beffd77d69d39bad76b47a".to_string(),
-        base58: "5DfhGyQdFobKM8NsWvEeAKk5EQQgYe9AydgJ7rMB6E1EqRzV".to_string(),
-        identicon: alice_sr_root().to_vec(),
-        seed_name: "Alice".to_string(),
-        path: "".to_string(),
-        network_title: "Westend".to_string(),
-        network_logo: "westend".to_string(),
+        address: Address {
+            base58: "5DfhGyQdFobKM8NsWvEeAKk5EQQgYe9AydgJ7rMB6E1EqRzV".to_string(),
+            identicon: alice_sr_root().to_vec(),
+            seed_name: "Alice".to_string(),
+            path: "".to_string(),
+            has_pwd: false,
+            multiselect: None,
+        },
+        network_info: MSCNetworkInfo {
+            network_title: "Westend".to_string(),
+            network_logo: "westend".to_string(),
+        },
     };
     assert_eq!(key, expected_key);
     fs::remove_dir_all(dbname).unwrap();

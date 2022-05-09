@@ -75,7 +75,7 @@ fun TransactionPreview(
 					action = {
 						signerDataModel.authentication.authenticate(signerDataModel.activity) {
 							val seedPhrase = signerDataModel.getSeed(
-								transaction.authorInfo?.seed ?: ""
+								transaction.authorInfo?.seedName ?: ""
 							)
 							if (seedPhrase.isNotBlank()) {
 								button(Action.GO_FORWARD, comment.value.encode64(), seedPhrase)

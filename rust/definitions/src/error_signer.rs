@@ -452,9 +452,9 @@ impl ErrorSigner {
 /// [`InterfaceSigner`] error means that rust backend can not process the
 /// information sent by the frontend.
 ///
-/// Signer rust backend sends data into frontend as `json` strings. Frontend
-/// parses these `json` strings, displays them, and can send back into rust
-/// some parts of the data that the user has, for example, selected.
+/// Signer rust backend sends data into frontend as [`ActionResult`]s. Frontend
+/// displays them, and can send back into rust some parts of the data of
+/// the user input.
 ///
 /// Data that user can type from keyboard is processed as is, it does not
 /// cause errors on the interface.

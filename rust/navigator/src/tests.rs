@@ -26,16 +26,16 @@ use definitions::{
         NetworkSpecsExport, SignDisplay, SignMessageDisplay, TypesDisplay, TypesExport,
     },
     navigation::{
-        ActionResult, AlertData, Card, DerivationEntry, DerivationPack, FooterButton, History,
-        MBackup, MDeriveKey, MEnterPassword, MEventMaybeDecoded, MKeyDetails, MKeyDetailsMulti,
-        MKeys, MKeysCard, MLog, MLogDetails, MLogRight, MMMNetwork, MMNetwork, MManageMetadata,
-        MManageNetworks, MMetadataRecord, MNetworkCard, MNetworkDetails, MNetworkMenu, MNewSeed,
-        MNewSeedBackup, MPasswordConfirm, MRawKey, MRecoverSeedName, MRecoverSeedPhrase, MSCAuthor,
-        MSCCall, MSCContent, MSCCurrency, MSCEnumVariantName, MSCEraMortal, MSCFieldName, MSCId,
-        MSCNameVersion, MSeedKeyCard, MSeedMenu, MSeeds, MSettings, MSignSufficientCrypto,
-        MSignatureReady, MSufficientCryptoReady, MTransaction, MTypesInfo, MVerifier,
-        MVerifierDetails, ModalData, Network, NetworkSpecsToSend, RightButton, ScreenData,
-        ScreenNameType, SeedNameCard, TransactionAuthor, TransactionCard, TransactionCardSet,
+        ActionResult, Address, AlertData, Card, DerivationEntry, DerivationPack, FooterButton,
+        History, MBackup, MDeriveKey, MEnterPassword, MEventMaybeDecoded, MKeyDetails,
+        MKeyDetailsMulti, MKeys, MKeysCard, MLog, MLogDetails, MLogRight, MMMNetwork, MMNetwork,
+        MManageMetadata, MManageNetworks, MMetadataRecord, MNetworkCard, MNetworkDetails,
+        MNetworkMenu, MNewSeed, MNewSeedBackup, MPasswordConfirm, MRawKey, MRecoverSeedName,
+        MRecoverSeedPhrase, MSCCall, MSCContent, MSCCurrency, MSCEnumVariantName, MSCEraMortal,
+        MSCFieldName, MSCId, MSCNameVersion, MSCNetworkInfo, MSeedKeyCard, MSeedMenu, MSeeds,
+        MSettings, MSignSufficientCrypto, MSignatureReady, MSufficientCryptoReady, MTransaction,
+        MTypesInfo, MVerifier, MVerifierDetails, ModalData, Network, NetworkSpecsToSend,
+        RightButton, ScreenData, ScreenNameType, SeedNameCard, TransactionCard, TransactionCardSet,
         TransactionNetworkInfo, TransactionType,
     },
     network_specs::{NetworkSpecs, ValidCurrentVerifier, Verifier, VerifierValue},
@@ -2758,12 +2758,18 @@ fn flow_test_1() {
                 qr: alice_polkadot_qr().to_vec(),
                 pubkey: "f606519cb8726753885cd4d0f518804a69a5e0badf36fee70feadd8044081730"
                     .to_string(),
-                base58: "16Zaf6BT6xc6WeYCX6YNAf67RumWaEiumwawt7cTdKMU7HqW".to_string(),
-                identicon: alice_sr_polkadot().to_vec(),
-                seed_name: "Alice".to_string(),
-                path: "//polkadot".to_string(),
-                network_title: "Polkadot".to_string(),
-                network_logo: "polkadot".to_string(),
+                address: Address {
+                    base58: "16Zaf6BT6xc6WeYCX6YNAf67RumWaEiumwawt7cTdKMU7HqW".to_string(),
+                    identicon: alice_sr_polkadot().to_vec(),
+                    seed_name: "Alice".to_string(),
+                    path: "//polkadot".to_string(),
+                    has_pwd: false,
+                    multiselect: None,
+                },
+                network_info: MSCNetworkInfo {
+                    network_title: "Polkadot".to_string(),
+                    network_logo: "polkadot".to_string(),
+                },
             },
         },
         modal_data: None,
@@ -4057,12 +4063,18 @@ fn flow_test_1() {
                     qr: alice_westend_westend_qr().to_vec(),
                     pubkey: "3efeca331d646d8a2986374bb3bb8d6e9e3cfcdd7c45c2b69104fab5d61d3f34"
                         .to_string(),
-                    base58: "5DVJWniDyUja5xnG4t5i3Rrd2Gguf1fzxPYfgZBbKcvFqk4N".to_string(),
-                    identicon: alice_sr_westend().to_vec(),
-                    seed_name: "Alice".to_string(),
-                    path: "//westend".to_string(),
-                    network_title: "Westend".to_string(),
-                    network_logo: "westend".to_string(),
+                    address: Address {
+                        base58: "5DVJWniDyUja5xnG4t5i3Rrd2Gguf1fzxPYfgZBbKcvFqk4N".to_string(),
+                        identicon: alice_sr_westend().to_vec(),
+                        seed_name: "Alice".to_string(),
+                        path: "//westend".to_string(),
+                        has_pwd: false,
+                        multiselect: None,
+                    },
+                    network_info: MSCNetworkInfo {
+                        network_title: "Westend".to_string(),
+                        network_logo: "westend".to_string(),
+                    },
                 },
                 current_number: "1".to_string(),
                 out_of: "3".to_string(),
@@ -4095,12 +4107,18 @@ fn flow_test_1() {
                     qr: alice_westend_alice_secret_secret_qr().to_vec(),
                     pubkey: "8266a693d6872d2b6437215c198ee25cabf2e4256df9ad00e979e84b00b5235e"
                         .to_string(),
-                    base58: "5F1gaMEdLTzoYFV6hYqX9AnZYg4bknuYE5HcVXmnKi1eSCXK".to_string(),
-                    identicon: alice_sr_alice_secret_secret().to_vec(),
-                    seed_name: "Alice".to_string(),
-                    path: "//Alice/secret//secret".to_string(),
-                    network_title: "Westend".to_string(),
-                    network_logo: "westend".to_string(),
+                    address: Address {
+                        base58: "5F1gaMEdLTzoYFV6hYqX9AnZYg4bknuYE5HcVXmnKi1eSCXK".to_string(),
+                        identicon: alice_sr_alice_secret_secret().to_vec(),
+                        seed_name: "Alice".to_string(),
+                        path: "//Alice/secret//secret".to_string(),
+                        has_pwd: false,
+                        multiselect: None,
+                    },
+                    network_info: MSCNetworkInfo {
+                        network_title: "Westend".to_string(),
+                        network_logo: "westend".to_string(),
+                    },
                 },
                 current_number: "2".to_string(),
                 out_of: "3".to_string(),
@@ -4134,12 +4152,18 @@ fn flow_test_1() {
                     qr: alice_westend_alice_qr().to_vec(),
                     pubkey: "d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d"
                         .to_string(),
-                    base58: "5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY".to_string(),
-                    identicon: alice_sr_alice().to_vec(),
-                    seed_name: "Alice".to_string(),
-                    path: "//Alice".to_string(),
-                    network_title: "Westend".to_string(),
-                    network_logo: "westend".to_string(),
+                    address: Address {
+                        base58: "5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY".to_string(),
+                        identicon: alice_sr_alice().to_vec(),
+                        seed_name: "Alice".to_string(),
+                        path: "//Alice".to_string(),
+                        has_pwd: false,
+                        multiselect: None,
+                    },
+                    network_info: MSCNetworkInfo {
+                        network_title: "Westend".to_string(),
+                        network_logo: "westend".to_string(),
+                    },
                 },
                 current_number: "3".to_string(),
                 out_of: "3".to_string(),
@@ -4347,12 +4371,18 @@ fn flow_test_1() {
                 qr: alice_westend_root_qr().to_vec(),
                 pubkey: "46ebddef8cd9bb167dc30878d7113b7e168e6f0646beffd77d69d39bad76b47a"
                     .to_string(),
-                base58: "5DfhGyQdFobKM8NsWvEeAKk5EQQgYe9AydgJ7rMB6E1EqRzV".to_string(),
-                identicon: alice_sr_root().to_vec(),
-                seed_name: "Alice".to_string(),
-                path: String::new(),
-                network_title: "Westend".to_string(),
-                network_logo: "westend".to_string(),
+                address: Address {
+                    base58: "5DfhGyQdFobKM8NsWvEeAKk5EQQgYe9AydgJ7rMB6E1EqRzV".to_string(),
+                    identicon: alice_sr_root().to_vec(),
+                    seed_name: "Alice".to_string(),
+                    path: String::new(),
+                    has_pwd: false,
+                    multiselect: None,
+                },
+                network_info: MSCNetworkInfo {
+                    network_title: "Westend".to_string(),
+                    network_logo: "westend".to_string(),
+                },
             },
         },
         modal_data: None,
@@ -4651,13 +4681,14 @@ fn flow_test_1() {
     .unwrap();
     expected_action.modal_data = Some(ModalData::SufficientCryptoReady {
         f: MSufficientCryptoReady {
-            author_info: MSCAuthor {
+            author_info: Address {
                 base58: "46ebddef8cd9bb167dc30878d7113b7e168e6f0646beffd77d69d39bad76b47a"
                     .to_string(),
                 identicon: alice_sr_root().to_vec(),
-                seed: "Alice".to_string(),
-                derivation_path: String::new(),
-                has_password: None,
+                seed_name: "Alice".to_string(),
+                path: String::new(),
+                has_pwd: false,
+                multiselect: None,
             },
             sufficient: vec![],
             content: MSCContent {
@@ -4908,13 +4939,14 @@ fn flow_test_1() {
         },
         modal_data: Some(ModalData::SufficientCryptoReady {
             f: MSufficientCryptoReady {
-                author_info: MSCAuthor {
+                author_info: Address {
                     base58: "46ebddef8cd9bb167dc30878d7113b7e168e6f0646beffd77d69d39bad76b47a"
                         .to_string(),
                     identicon: alice_sr_root().to_vec(),
-                    seed: "Alice".to_string(),
-                    derivation_path: String::new(),
-                    has_password: None,
+                    seed_name: "Alice".to_string(),
+                    path: String::new(),
+                    has_pwd: false,
+                    multiselect: None,
                 },
                 sufficient: vec![],
                 content: MSCContent {
@@ -5300,12 +5332,13 @@ fn flow_test_1() {
                     ..Default::default()
                 },
                 ttype: TransactionType::Sign,
-                author_info: Some(TransactionAuthor {
+                author_info: Some(Address {
                     base58: "5F1gaMEdLTzoYFV6hYqX9AnZYg4bknuYE5HcVXmnKi1eSCXK".to_string(),
                     identicon: alice_sr_alice_secret_secret().to_vec(),
-                    seed: "Alice".to_string(),
-                    derivation_path: "//Alice/secret//secret".to_string(),
+                    seed_name: "Alice".to_string(),
+                    path: "//Alice/secret//secret".to_string(),
                     has_pwd: false,
+                    multiselect: None,
                 }),
                 network_info: Some(TransactionNetworkInfo {
                     network_title: "Westend".to_string(),
@@ -5449,12 +5482,13 @@ fn flow_test_1() {
                     ..Default::default()
                 },
                 ttype: TransactionType::Sign,
-                author_info: Some(TransactionAuthor {
+                author_info: Some(Address {
                     base58: "5DVJWniDyUja5xnG4t5i3Rrd2Gguf1fzxPYfgZBbKcvFqk4N".to_string(),
                     identicon: alice_sr_westend().to_vec(),
-                    seed: "Alice".to_string(),
-                    derivation_path: "//westend".to_string(),
+                    seed_name: "Alice".to_string(),
+                    path: "//westend".to_string(),
                     has_pwd: false,
+                    multiselect: None,
                 }),
                 network_info: Some(TransactionNetworkInfo {
                     network_title: "Westend".to_string(),
@@ -5902,12 +5936,13 @@ fn flow_test_1() {
                     ..Default::default()
                 },
                 ttype: TransactionType::Sign,
-                author_info: Some(TransactionAuthor {
+                author_info: Some(Address {
                     base58: pepper_westend_base58,
                     identicon: pepper_westend_identicon,
-                    seed: "Pepper".to_string(),
-                    derivation_path: "//westend".to_string(),
+                    seed_name: "Pepper".to_string(),
+                    path: "//westend".to_string(),
                     has_pwd: false,
+                    multiselect: None,
                 }),
                 network_info: Some(TransactionNetworkInfo {
                     network_title: "Westend".to_string(),
@@ -6127,12 +6162,13 @@ fn flow_test_1() {
                     ..Default::default()
                 },
                 ttype: TransactionType::Sign,
-                author_info: Some(TransactionAuthor {
+                author_info: Some(Address {
                     base58: pepper_key0_base58.clone(),
                     identicon: pepper_key0_identicon.clone(),
-                    seed: "Pepper".to_string(),
-                    derivation_path: "//0".to_string(),
+                    seed_name: "Pepper".to_string(),
+                    path: "//0".to_string(),
                     has_pwd: true,
+                    multiselect: None,
                 }),
                 network_info: Some(TransactionNetworkInfo {
                     network_title: "Westend".to_string(),
@@ -6161,12 +6197,13 @@ fn flow_test_1() {
     .unwrap();
     expected_action.modal_data = Some(ModalData::EnterPassword {
         f: MEnterPassword {
-            author_info: TransactionAuthor {
+            author_info: Address {
                 base58: pepper_key0_base58.clone(),
                 identicon: pepper_key0_identicon.clone(),
-                seed: "Pepper".to_string(),
-                derivation_path: "//0".to_string(),
+                seed_name: "Pepper".to_string(),
+                path: "//0".to_string(),
                 has_pwd: true,
+                multiselect: None,
             },
             counter: 1,
         },
@@ -6184,12 +6221,13 @@ fn flow_test_1() {
         .unwrap();
     expected_action.modal_data = Some(ModalData::EnterPassword {
         f: MEnterPassword {
-            author_info: TransactionAuthor {
+            author_info: Address {
                 base58: pepper_key0_base58.clone(),
                 identicon: pepper_key0_identicon.clone(),
-                seed: "Pepper".to_string(),
-                derivation_path: "//0".to_string(),
+                seed_name: "Pepper".to_string(),
+                path: "//0".to_string(),
                 has_pwd: true,
+                multiselect: None,
             },
             counter: 2,
         },
@@ -6212,12 +6250,13 @@ fn flow_test_1() {
         .unwrap();
     expected_action.modal_data = Some(ModalData::EnterPassword {
         f: MEnterPassword {
-            author_info: TransactionAuthor {
+            author_info: Address {
                 base58: pepper_key0_base58,
                 identicon: pepper_key0_identicon,
-                seed: "Pepper".to_string(),
-                derivation_path: "//0".to_string(),
+                seed_name: "Pepper".to_string(),
+                path: "//0".to_string(),
                 has_pwd: true,
+                multiselect: None,
             },
             counter: 3,
         },

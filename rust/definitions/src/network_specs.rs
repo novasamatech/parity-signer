@@ -484,12 +484,6 @@ impl NetworkSpecs {
 }
 
 impl NetworkSpecsToSend {
-    /// Prints network specs in json format
-    #[cfg(feature = "signer")]
-    pub fn show(&self) -> String {
-        format!("\"base58prefix\":\"{}\",\"color\":\"{}\",\"decimals\":\"{}\",\"encryption\":\"{}\",\"genesis_hash\":\"{}\",\"logo\":\"{}\",\"name\":\"{}\",\"path_id\":\"{}\",\"secondary_color\":\"{}\",\"title\":\"{}\",\"unit\":\"{}\"", &self.base58prefix, &self.color, &self.decimals, &self.encryption.show(), hex::encode(&self.genesis_hash), &self.logo, &self.name, &self.path_id, &self.secondary_color, &self.title, &self.unit)
-    }
-
     /// Makes [`NetworkSpecs`] from [`NetworkSpecsToSend`],
     /// needs `order` input
     ///
@@ -596,7 +590,7 @@ pub enum VerifierValue {
 
 #[cfg(feature = "signer")]
 impl Verifier {
-    /// Display [`Verifier`] in json-like format, for json exports  
+    /// Get the [`MVerifierDetails`] for UI to show.
     pub fn show_card(&self) -> MVerifierDetails {
         match &self.v {
             Some(a) => a.show_card(),
@@ -619,7 +613,7 @@ impl Verifier {
 
 #[cfg(feature = "signer")]
 impl VerifierValue {
-    /// Display [`VerifierValue`] in json-like format, for json exports  
+    /// Get the [`MVerifierDetails`] for UI to show.
     pub fn show_card(&self) -> MVerifierDetails {
         match &self {
             VerifierValue::Standard { m } => {

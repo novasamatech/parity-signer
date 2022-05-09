@@ -9,9 +9,9 @@ use definitions::{
     history::MetaValuesDisplay,
     keyring::VerifierKey,
     navigation::{
-        Card as NavCard, MMetadataRecord, MSCAuthorPlain, MSCCall, MSCCurrency, MSCEnumVariantName,
-        MSCEraMortal, MSCFieldName, MSCFieldNumber, MSCId, MSCNameVersion, MSCNetworkInfo,
-        MTypesInfo, MVerifierDetails, TransactionAuthor, TransactionCard,
+        Address, Card as NavCard, MMetadataRecord, MSCAuthorPlain, MSCCall, MSCCurrency,
+        MSCEnumVariantName, MSCEraMortal, MSCFieldName, MSCFieldNumber, MSCId, MSCNameVersion,
+        MSCNetworkInfo, MTypesInfo, MVerifierDetails, TransactionCard,
     },
     network_specs::{NetworkSpecs, NetworkSpecsToSend, VerifierValue},
     qr_transfers::ContentLoadTypes,
@@ -287,12 +287,13 @@ pub(crate) fn make_author_info(
     author: &MultiSigner,
     base58prefix: u16,
     address_details: &AddressDetails,
-) -> TransactionAuthor {
-    TransactionAuthor {
+) -> Address {
+    Address {
         base58: print_multisigner_as_base58(author, Some(base58prefix)),
         identicon: make_identicon_from_multisigner(author),
-        seed: address_details.seed_name.clone(),
-        derivation_path: address_details.path.clone(),
+        seed_name: address_details.seed_name.clone(),
+        path: address_details.path.clone(),
         has_pwd: address_details.has_pwd,
+        multiselect: None,
     }
 }

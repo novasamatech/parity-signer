@@ -8,8 +8,6 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import io.parity.signer.models.toListOfJSONObjects
-import org.json.JSONArray
 import io.parity.signer.uniffi.Action
 import io.parity.signer.uniffi.MKeysCard
 

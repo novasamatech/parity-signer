@@ -6,7 +6,6 @@ edition = "2018"
 
 [dependencies]
 anyhow = "1.0"
-base64 = "0.10.1"
 db_handling = {path = "../db_handling", default-features = false, features = ["signer"]}
 definitions = {path = "../definitions", default-features = false, features = ["signer"]}
 ffi-support = "0.4"

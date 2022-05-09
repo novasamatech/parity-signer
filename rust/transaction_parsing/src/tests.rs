@@ -11,9 +11,9 @@ use definitions::{
     history::{Entry, Event},
     keyring::NetworkSpecsKey,
     navigation::{
-        Card, MMetadataRecord, MSCAuthorPlain, MSCCall, MSCCurrency, MSCEnumVariantName,
+        Address, Card, MMetadataRecord, MSCAuthorPlain, MSCCall, MSCCurrency, MSCEnumVariantName,
         MSCEraMortal, MSCId, MSCNameVersion, MTypesInfo, MVerifierDetails, NetworkSpecsToSend,
-        TransactionAction, TransactionAuthor, TransactionCard, TransactionCardSet,
+        TransactionAction, TransactionCard, TransactionCardSet,
     },
     network_specs::{NetworkSpecs, Verifier, VerifierValue},
 };
@@ -649,12 +649,13 @@ fn parse_transaction_1() {
         ..Default::default()
     };
 
-    let author_info_known = TransactionAuthor {
+    let author_info_known = Address {
         base58: "5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY".to_string(),
         identicon: alice_sr_alice().to_vec(),
-        seed: "Alice".to_string(),
-        derivation_path: "//Alice".to_string(),
+        seed_name: "Alice".to_string(),
+        path: "//Alice".to_string(),
         has_pwd: false,
+        multiselect: None,
     };
     let network_info_known = NetworkSpecs {
         base58prefix: 42,
@@ -974,12 +975,13 @@ fn parse_transaction_2() {
         ..Default::default()
     };
 
-    let author_info_known = TransactionAuthor {
+    let author_info_known = Address {
         base58: "5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY".to_string(),
         identicon: alice_sr_alice().to_vec(),
-        seed: "Alice".to_string(),
-        derivation_path: "//Alice".to_string(),
+        seed_name: "Alice".to_string(),
+        path: "//Alice".to_string(),
         has_pwd: false,
+        multiselect: None,
     };
     let network_info_known = westend_spec();
 
@@ -1130,12 +1132,13 @@ fn parse_transaction_3() {
         ..Default::default()
     };
 
-    let author_info_known = TransactionAuthor {
+    let author_info_known = Address {
         base58: "5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY".to_string(),
         identicon: alice_sr_alice().to_vec(),
-        seed: "Alice".to_string(),
-        derivation_path: "//Alice".to_string(),
+        seed_name: "Alice".to_string(),
+        path: "//Alice".to_string(),
         has_pwd: false,
+        multiselect: None,
     };
     let network_info_known = westend_spec();
     let output = produce_output(line, dbname);
@@ -2121,12 +2124,13 @@ fn parse_transaction_6_error_on_parsing() {
             index: 0,
             indent: 0,
             card: Card::AuthorCard {
-                f: TransactionAuthor {
+                f: Address {
                     base58: "5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY".to_string(),
                     identicon: alice_sr_alice().to_vec(),
-                    seed: "Alice".to_string(),
-                    derivation_path: "//Alice".to_string(),
+                    seed_name: "Alice".to_string(),
+                    path: "//Alice".to_string(),
                     has_pwd: false,
+                    multiselect: None,
                 },
             },
         }]),
@@ -2213,12 +2217,13 @@ fn parse_transaction_7_error_on_parsing() {
             index: 0,
             indent: 0,
             card: Card::AuthorCard {
-                f: TransactionAuthor {
+                f: Address {
                     base58: "5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY".to_string(),
                     identicon: alice_sr_alice().to_vec(),
-                    seed: "Alice".to_string(),
-                    derivation_path: "//Alice".to_string(),
+                    seed_name: "Alice".to_string(),
+                    path: "//Alice".to_string(),
                     has_pwd: false,
+                    multiselect: None,
                 },
             },
         }]),
@@ -2306,12 +2311,13 @@ fn parse_transaction_8_error_on_parsing() {
             index: 0,
             indent: 0,
             card: Card::AuthorCard {
-                f: TransactionAuthor {
+                f: Address {
                     base58: "5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY".to_string(),
                     identicon: alice_sr_alice().to_vec(),
-                    seed: "Alice".to_string(),
-                    derivation_path: "//Alice".to_string(),
+                    seed_name: "Alice".to_string(),
+                    path: "//Alice".to_string(),
                     has_pwd: false,
+                    multiselect: None,
                 },
             },
         }]),
@@ -2402,12 +2408,13 @@ fn parse_msg_1() {
         ..Default::default()
     };
 
-    let author_info_known = TransactionAuthor {
+    let author_info_known = Address {
         base58: "5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY".to_string(),
         identicon: alice_sr_alice().to_vec(),
-        seed: "Alice".to_string(),
-        derivation_path: "//Alice".to_string(),
+        seed_name: "Alice".to_string(),
+        path: "//Alice".to_string(),
         has_pwd: false,
+        multiselect: None,
     };
 
     let network_info_known = westend_spec();

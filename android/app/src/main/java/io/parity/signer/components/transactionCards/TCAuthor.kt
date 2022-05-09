@@ -14,11 +14,10 @@ import io.parity.signer.ui.theme.Crypto400
 import io.parity.signer.ui.theme.Text400
 import io.parity.signer.ui.theme.Text600
 import io.parity.signer.ui.theme.Typography
-import io.parity.signer.uniffi.TransactionAuthor
-import org.json.JSONObject
+import io.parity.signer.uniffi.Address
 
 @Composable
-fun TCAuthor(author: TransactionAuthor) {
+fun TCAuthor(author: Address) {
 	Row {
 		Identicon(author.identicon)
 		Column {
@@ -29,12 +28,12 @@ fun TCAuthor(author: TransactionAuthor) {
 			)
 			Row {
 				Text(
-					author.seed.decode64(),
+					author.seedName.decode64(),
 					style = MaterialTheme.typography.body1,
 					color = MaterialTheme.colors.Crypto400
 				)
 				Text(
-					author.derivationPath,
+					author.path,
 					style = Typography.body1,
 					color = MaterialTheme.colors.Crypto400
 				)

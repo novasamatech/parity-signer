@@ -114,7 +114,6 @@ fun SignerApp(signerDataModel: SignerDataModel) {
 							AlertSelector(
 								alert = actionResult.value?.alertData,
 								button = signerDataModel::pushButton,
-								signerDataModel = signerDataModel
 							)
 						}
 					}
