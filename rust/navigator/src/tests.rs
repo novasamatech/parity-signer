@@ -35,9 +35,8 @@ use definitions::{
         MSCEraMortal, MSCFieldName, MSCId, MSCNameVersion, MSCNetworkInfo, MSeedKeyCard, MSeedMenu,
         MSeeds, MSettings, MSignSufficientCrypto, MSignatureReady, MSufficientCryptoReady,
         MTransaction, MTypesInfo, MVerifier, MVerifierDetails, ModalData, Network,
-        NetworkSpecsToSend, RightButton, ScreenData, ScreenNameType, SeedNameCard,
-        TransactionAuthor, TransactionCard, TransactionCardSet, TransactionNetworkInfo,
-        TransactionType,
+        NetworkSpecsToSend, RightButton, ScreenData, ScreenNameType, SeedNameCard, TransactionCard,
+        TransactionCardSet, TransactionNetworkInfo, TransactionType,
     },
     network_specs::{NetworkSpecs, ValidCurrentVerifier, Verifier, VerifierValue},
 };
@@ -4688,7 +4687,7 @@ fn flow_test_1() {
                 identicon: alice_sr_root().to_vec(),
                 seed: "Alice".to_string(),
                 derivation_path: String::new(),
-                has_password: None,
+                has_password: Some(false),
             },
             sufficient: vec![],
             content: MSCContent {
@@ -4945,7 +4944,7 @@ fn flow_test_1() {
                     identicon: alice_sr_root().to_vec(),
                     seed: "Alice".to_string(),
                     derivation_path: String::new(),
-                    has_password: None,
+                    has_password: Some(false),
                 },
                 sufficient: vec![],
                 content: MSCContent {
@@ -5331,12 +5330,13 @@ fn flow_test_1() {
                     ..Default::default()
                 },
                 ttype: TransactionType::Sign,
-                author_info: Some(TransactionAuthor {
+                author_info: Some(Address {
                     base58: "5F1gaMEdLTzoYFV6hYqX9AnZYg4bknuYE5HcVXmnKi1eSCXK".to_string(),
                     identicon: alice_sr_alice_secret_secret().to_vec(),
-                    seed: "Alice".to_string(),
-                    derivation_path: "//Alice/secret//secret".to_string(),
+                    seed_name: "Alice".to_string(),
+                    path: "//Alice/secret//secret".to_string(),
                     has_pwd: false,
+                    multiselect: None,
                 }),
                 network_info: Some(TransactionNetworkInfo {
                     network_title: "Westend".to_string(),
@@ -5480,12 +5480,13 @@ fn flow_test_1() {
                     ..Default::default()
                 },
                 ttype: TransactionType::Sign,
-                author_info: Some(TransactionAuthor {
+                author_info: Some(Address {
                     base58: "5DVJWniDyUja5xnG4t5i3Rrd2Gguf1fzxPYfgZBbKcvFqk4N".to_string(),
                     identicon: alice_sr_westend().to_vec(),
-                    seed: "Alice".to_string(),
-                    derivation_path: "//westend".to_string(),
+                    seed_name: "Alice".to_string(),
+                    path: "//westend".to_string(),
                     has_pwd: false,
+                    multiselect: None,
                 }),
                 network_info: Some(TransactionNetworkInfo {
                     network_title: "Westend".to_string(),
@@ -5933,12 +5934,13 @@ fn flow_test_1() {
                     ..Default::default()
                 },
                 ttype: TransactionType::Sign,
-                author_info: Some(TransactionAuthor {
+                author_info: Some(Address {
                     base58: pepper_westend_base58,
                     identicon: pepper_westend_identicon,
-                    seed: "Pepper".to_string(),
-                    derivation_path: "//westend".to_string(),
+                    seed_name: "Pepper".to_string(),
+                    path: "//westend".to_string(),
                     has_pwd: false,
+                    multiselect: None,
                 }),
                 network_info: Some(TransactionNetworkInfo {
                     network_title: "Westend".to_string(),
@@ -6158,12 +6160,13 @@ fn flow_test_1() {
                     ..Default::default()
                 },
                 ttype: TransactionType::Sign,
-                author_info: Some(TransactionAuthor {
+                author_info: Some(Address {
                     base58: pepper_key0_base58.clone(),
                     identicon: pepper_key0_identicon.clone(),
-                    seed: "Pepper".to_string(),
-                    derivation_path: "//0".to_string(),
+                    seed_name: "Pepper".to_string(),
+                    path: "//0".to_string(),
                     has_pwd: true,
+                    multiselect: None,
                 }),
                 network_info: Some(TransactionNetworkInfo {
                     network_title: "Westend".to_string(),
@@ -6192,12 +6195,13 @@ fn flow_test_1() {
     .unwrap();
     expected_action.modal_data = Some(ModalData::EnterPassword {
         f: MEnterPassword {
-            author_info: TransactionAuthor {
+            author_info: Address {
                 base58: pepper_key0_base58.clone(),
                 identicon: pepper_key0_identicon.clone(),
-                seed: "Pepper".to_string(),
-                derivation_path: "//0".to_string(),
+                seed_name: "Pepper".to_string(),
+                path: "//0".to_string(),
                 has_pwd: true,
+                multiselect: None,
             },
             counter: 1,
         },
@@ -6215,12 +6219,13 @@ fn flow_test_1() {
         .unwrap();
     expected_action.modal_data = Some(ModalData::EnterPassword {
         f: MEnterPassword {
-            author_info: TransactionAuthor {
+            author_info: Address {
                 base58: pepper_key0_base58.clone(),
                 identicon: pepper_key0_identicon.clone(),
-                seed: "Pepper".to_string(),
-                derivation_path: "//0".to_string(),
+                seed_name: "Pepper".to_string(),
+                path: "//0".to_string(),
                 has_pwd: true,
+                multiselect: None,
             },
             counter: 2,
         },
@@ -6243,12 +6248,13 @@ fn flow_test_1() {
         .unwrap();
     expected_action.modal_data = Some(ModalData::EnterPassword {
         f: MEnterPassword {
-            author_info: TransactionAuthor {
+            author_info: Address {
                 base58: pepper_key0_base58,
                 identicon: pepper_key0_identicon,
-                seed: "Pepper".to_string(),
-                derivation_path: "//0".to_string(),
+                seed_name: "Pepper".to_string(),
+                path: "//0".to_string(),
                 has_pwd: true,
+                multiselect: None,
             },
             counter: 3,
         },

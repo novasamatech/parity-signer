@@ -11,7 +11,7 @@ use definitions::{
     error_signer::{ErrorSigner, ExtraAddressKeySourceSigner, Signer},
     helpers::{make_identicon_from_multisigner, multisigner_to_public},
     keyring::{AddressKey, NetworkSpecsKey},
-    navigation::{TransactionAuthor, TransactionCardSet},
+    navigation::{Address, TransactionCardSet},
     network_specs::NetworkSpecs,
     users::AddressDetails,
 };
@@ -98,7 +98,7 @@ pub struct TransactionState {
 ///State of screen generating sufficient crypto
 #[derive(Debug, Clone)]
 pub struct SufficientCryptoState {
-    key_selected: Option<(MultiSigner, AddressDetails, TransactionAuthor)>,
+    key_selected: Option<(MultiSigner, AddressDetails, Address)>,
     entered_info: EnteredInfo,
     content: transaction_signing::SufficientContent,
     counter: u8,
@@ -425,7 +425,7 @@ impl TransactionState {
         new_checksum: u32,
         content: TransactionCardSet,
         has_pwd: bool,
-        author_info: TransactionAuthor,
+        author_info: Address,
         network_info: NetworkSpecs,
     ) -> Self {
         let action = transaction_parsing::TransactionAction::Sign {
@@ -471,7 +471,7 @@ impl SufficientCryptoState {
     pub fn content(&self) -> transaction_signing::SufficientContent {
         self.content.to_owned()
     }
-    pub fn key_selected(&self) -> Option<(MultiSigner, AddressDetails, TransactionAuthor)> {
+    pub fn key_selected(&self) -> Option<(MultiSigner, AddressDetails, Address)> {
         self.key_selected.to_owned()
     }
     pub fn update(
@@ -481,12 +481,13 @@ impl SufficientCryptoState {
         new_secret_string: &str,
     ) -> Self {
         let identicon = make_identicon_from_multisigner(multisigner);
-        let author_info = TransactionAuthor {
+        let author_info = Address {
             base58: hex::encode(multisigner_to_public(multisigner)),
             identicon,
-            seed: address_details.seed_name.clone(),
-            derivation_path: address_details.path.clone(),
+            seed_name: address_details.seed_name.clone(),
+            path: address_details.path.clone(),
             has_pwd: address_details.has_pwd,
+            multiselect: None,
         };
         Self {
             key_selected: Some((

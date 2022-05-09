@@ -330,7 +330,7 @@ dictionary History {
 
 dictionary MEventMaybeDecoded {
     Event event;
-    TransactionAuthor? signed_by;
+    Address? signed_by;
     TransactionCardSet? decoded;
     MVerifierDetails? verifier_details;
 };
@@ -343,16 +343,8 @@ dictionary MLogDetails {
 dictionary MTransaction {
     TransactionCardSet content;
     TransactionType ttype;
-    TransactionAuthor? author_info;
+    Address? author_info;
     TransactionNetworkInfo? network_info;
-};
-
-dictionary TransactionAuthor {
-    string base58;
-    sequence<u8> identicon;
-    string seed;
-    string derivation_path;
-    boolean has_pwd;
 };
 
 dictionary TransactionNetworkInfo {
@@ -656,7 +648,7 @@ dictionary MSignatureReady {
 };
 
 dictionary MEnterPassword {
-    TransactionAuthor author_info;
+    Address author_info;
     u32 counter;
 };
 
@@ -773,7 +765,7 @@ dictionary MSCTxSpecPlain {
 
 [Enum]
 interface Card {
-    AuthorCard(TransactionAuthor f);
+    AuthorCard(Address f);
     AuthorPlainCard(MSCAuthorPlain f);
     AuthorPublicKeyCard(MVerifierDetails f);
     BalanceCard(MSCCurrency f);

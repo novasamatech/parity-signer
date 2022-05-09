@@ -1825,9 +1825,9 @@ impl State {
                             let author_info = MSCAuthor {
                                 base58: author_info.base58,
                                 identicon: author_info.identicon,
-                                seed: author_info.seed,
-                                derivation_path: author_info.derivation_path,
-                                has_password: None,
+                                seed: author_info.seed_name,
+                                derivation_path: author_info.path,
+                                has_password: Some(author_info.has_pwd),
                             };
                             let f = MSufficientCryptoReady {
                                 author_info,
