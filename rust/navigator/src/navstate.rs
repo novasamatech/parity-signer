@@ -4,7 +4,7 @@ use db_handling::manage_history::get_history_entry_by_order;
 use definitions::navigation::{
     ActionResult, Address, AlertData, FooterButton, History, MEnterPassword, MKeyDetailsMulti,
     MKeys, MLog, MLogDetails, MManageNetworks, MNetworkCard, MNewSeed, MPasswordConfirm,
-    MRecoverSeedName, MRecoverSeedPhrase, MSCContent, MSCNetworkInfo, MSeedMenu, MSeeds, MSettings,
+    MRecoverSeedName, MRecoverSeedPhrase, MSCNetworkInfo, MSeedMenu, MSeeds, MSettings,
     MSignSufficientCrypto, MSignatureReady, MSufficientCryptoReady, MTransaction, ModalData,
     RightButton, ScreenData, ScreenNameType, TransactionType,
 };
@@ -1816,32 +1816,32 @@ impl State {
                     }
                     _ => None,
                 },
-                Modal::SufficientCryptoReady(ref a) => match new_navstate.screen {
-                    Screen::SignSufficientCrypto(ref s) => {
-                        if let Some((_, _, author_info)) = s.key_selected() {
-                            let content = MSCContent {
-                                ttype: a.to_string(),
-                            };
-                            let author_info = Address {
-                                base58: author_info.base58,
-                                identicon: author_info.identicon,
-                                seed_name: author_info.seed_name,
-                                path: author_info.path,
-                                has_pwd: author_info.has_pwd,
-                                multiselect: None,
-                            };
-                            let f = MSufficientCryptoReady {
-                                author_info,
-                                sufficient: vec![],
-                                content,
-                            };
-                            Some(ModalData::SufficientCryptoReady { f })
-                        } else {
-                            None
+                Modal::SufficientCryptoReady((ref sufficient, ref content)) => {
+                    match new_navstate.screen {
+                        Screen::SignSufficientCrypto(ref s) => {
+                            if let Some((_, _, author_info)) = s.key_selected() {
+                                let content = content.clone();
+                                let author_info = Address {
+                                    base58: author_info.base58,
+                                    identicon: author_info.identicon,
+                                    seed_name: author_info.seed_name,
+                                    path: author_info.path,
+                                    has_pwd: author_info.has_pwd,
+                                    multiselect: None,
+                                };
+                                let f = MSufficientCryptoReady {
+                                    author_info,
+                                    sufficient: sufficient.clone(),
+                                    content,
+                                };
+                                Some(ModalData::SufficientCryptoReady { f })
+                            } else {
+                                None
+                            }
                         }
+                        _ => None,
                     }
-                    _ => None,
-                },
+                }
                 Modal::TypesInfo => Some(ModalData::TypesInfo {
                     f: db_handling::interface_signer::show_types_status(dbname).unwrap(),
                 }),

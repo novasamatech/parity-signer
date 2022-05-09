@@ -10,11 +10,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import io.parity.signer.components.HeaderBar
+import io.parity.signer.components.Identicon
 import io.parity.signer.components.KeyCard
+import io.parity.signer.components.NetworkCard
 import io.parity.signer.models.intoImageBitmap
 import io.parity.signer.ui.theme.Bg000
 import io.parity.signer.ui.theme.modal
 import io.parity.signer.uniffi.MSufficientCryptoReady
+import io.parity.signer.uniffi.MscContent
 
 @Composable
 fun SufficientCryptoReady(
@@ -39,9 +42,17 @@ fun SufficientCryptoReady(
 			KeyCard(
 				identity = sufficientCrypto.authorInfo,
 			)
-			Text(
-				"Payload: " + sufficientCrypto.content.ttype
-			)
+			when (val c = sufficientCrypto.content) {
+				is MscContent.AddSpecs -> Column {
+					Text("Specs")
+					NetworkCard(c.f)
+				}
+				is MscContent.LoadMetadata -> Text("Metadata for " + c.name + " with version " + c.version)
+				is MscContent.LoadTypes -> Column {
+					Text("types " + c.types)
+					Identicon(identicon = c.pic)
+				}
+			}
 		}
 	}
 }

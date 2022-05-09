@@ -575,8 +575,11 @@ namespace signer {
 };
 
 
-dictionary MSCContent {
-    string ttype;
+[Enum]
+interface MSCContent {
+    LoadTypes(string types, sequence<u8> pic);
+    LoadMetadata(string name, u32 version);
+    AddSpecs(MSCNetworkInfo f);
 };
 
 dictionary MSufficientCryptoReady {

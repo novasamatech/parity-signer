@@ -13,6 +13,7 @@ use definitions::{
     error_signer::{ErrorSigner, Signer},
     history::{Event, MetaValuesExport, NetworkSpecsExport, TypesExport},
     keyring::NetworkSpecsKey,
+    navigation::{MSCContent, MSCNetworkInfo},
     qr_transfers::{ContentAddSpecs, ContentLoadMeta},
     users::AddressDetails,
 };
@@ -107,7 +108,7 @@ pub(crate) fn sufficient_crypto_load_types(
     database_name: &str,
     seed_phrase: &str,
     pwd_entry: &str,
-) -> Result<String, ErrorSigner> {
+) -> Result<(Vec<u8>, MSCContent), ErrorSigner> {
     let types_content = prep_types::<Signer>(database_name)?;
     let sufficient = match sufficient_crypto(
         multisigner,
@@ -125,7 +126,7 @@ pub(crate) fn sufficient_crypto_load_types(
                     }],
                 )?)
                 .apply::<Signer>(database_name)?;
-            hex_qr_from_sufficient(s)?
+            qr_from_sufficient(s)?
         }
         Err(e) => {
             if let ErrorSigner::WrongPassword = e {
@@ -139,11 +140,8 @@ pub(crate) fn sufficient_crypto_load_types(
             return Err(e);
         }
     };
-    Ok(format!(
-        "\"sufficient\":\"{}\",\"content\":{{\"type\":\"load_types\",{}}}",
-        sufficient,
-        "TODO" // TODO types_content.show()
-    ))
+    let (types, pic) = types_content.show();
+    Ok((sufficient, MSCContent::LoadTypes { types, pic }))
 }
 
 /// Function to generate hex line of qr data corresponding to `sufficient_crypto` for load_metadata message
@@ -155,7 +153,7 @@ pub(crate) fn sufficient_crypto_load_metadata(
     database_name: &str,
     seed_phrase: &str,
     pwd_entry: &str,
-) -> Result<String, ErrorSigner> {
+) -> Result<(Vec<u8>, MSCContent), ErrorSigner> {
     let network_specs = get_network_specs(database_name, network_specs_key)?;
     let meta_values = get_meta_values_by_name_version::<Signer>(
         database_name,
@@ -183,7 +181,7 @@ pub(crate) fn sufficient_crypto_load_metadata(
                     }],
                 )?)
                 .apply::<Signer>(database_name)?;
-            hex_qr_from_sufficient(s)?
+            qr_from_sufficient(s)?
         }
         Err(e) => {
             if let ErrorSigner::WrongPassword = e {
@@ -197,10 +195,12 @@ pub(crate) fn sufficient_crypto_load_metadata(
             return Err(e);
         }
     };
-    Ok(format!(
-        "\"sufficient\":\"{}\",\"content\":{{\"type\":\"load_metadata\": \"\"}}",
+    Ok((
         sufficient,
-        // MetaValuesDisplay::get(&meta_values).show()
+        MSCContent::LoadMetadata {
+            name: meta_values.name,
+            version: meta_values.version,
+        },
     ))
 }
 
@@ -212,7 +212,7 @@ pub(crate) fn sufficient_crypto_add_specs(
     database_name: &str,
     seed_phrase: &str,
     pwd_entry: &str,
-) -> Result<String, ErrorSigner> {
+) -> Result<(Vec<u8>, MSCContent), ErrorSigner> {
     let network_specs_to_send = get_network_specs(database_name, network_specs_key)?.to_send();
     let add_specs_content = ContentAddSpecs::generate(&network_specs_to_send);
     let sufficient = match sufficient_crypto(
@@ -234,7 +234,7 @@ pub(crate) fn sufficient_crypto_add_specs(
                     }],
                 )?)
                 .apply::<Signer>(database_name)?;
-            hex_qr_from_sufficient(s)?
+            qr_from_sufficient(s)?
         }
         Err(e) => {
             if let ErrorSigner::WrongPassword = e {
@@ -248,13 +248,20 @@ pub(crate) fn sufficient_crypto_add_specs(
             return Err(e);
         }
     };
-    Ok(format!("\"sufficient\":\"{}\",\"content\":{{\"type\":\"add_specs\",\"network_title\":\"{}\",\"network_logo\":\"{}\"}}", sufficient, network_specs_to_send.title, network_specs_to_send.logo))
+    Ok((
+        sufficient,
+        MSCContent::AddSpecs {
+            f: MSCNetworkInfo {
+                network_title: network_specs_to_send.title,
+                network_logo: network_specs_to_send.logo,
+            },
+        },
+    ))
 }
 
-fn hex_qr_from_sufficient(sufficient: SufficientCrypto) -> Result<String, ErrorSigner> {
-    let qr_data = match png_qr(&sufficient.encode()) {
-        Ok(a) => a,
-        Err(e) => return Err(ErrorSigner::Qr(e.to_string())),
-    };
-    Ok(hex::encode(qr_data))
+fn qr_from_sufficient(sufficient: SufficientCrypto) -> Result<Vec<u8>, ErrorSigner> {
+    match png_qr(&sufficient.encode()) {
+        Ok(a) => Ok(a),
+        Err(e) => Err(ErrorSigner::Qr(e.to_string())),
+    }
 }

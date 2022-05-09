@@ -78,7 +78,7 @@ pub struct MetaInfo {
 /// Metadata values: name, version, optional base58 prefix, warning about
 /// extensions incompatible with transaction parsing for RuntimeMetadata with
 /// version 14 and above, and metadata itself as raw `Vec<u8>`
-#[derive(PartialEq, Clone)]
+#[derive(PartialEq, Debug, Clone)]
 pub struct MetaValues {
     /// Network name, from metadata `Version` constant  
     pub name: String,

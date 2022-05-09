@@ -402,8 +402,10 @@ pub struct MManageNetworks {
 }
 
 #[derive(Clone, Debug, PartialEq)]
-pub struct MSCContent {
-    pub ttype: String,
+pub enum MSCContent {
+    LoadTypes { types: String, pic: Vec<u8> },
+    LoadMetadata { name: String, version: u32 },
+    AddSpecs { f: MSCNetworkInfo },
 }
 
 #[derive(Clone, Debug, PartialEq)]
