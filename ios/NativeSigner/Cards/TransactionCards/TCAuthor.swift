@@ -8,14 +8,14 @@
 import SwiftUI
 
 struct TCAuthor: View {
-    var author: TransactionAuthor
+    var author: Address
     var body: some View {
         HStack {
             Identicon(identicon: author.identicon)
             VStack (alignment: .leading) {
                 Text("From:")
                     .foregroundColor(Color("Text400"))
-                Text(author.seed.decode64() + author.derivationPath + (author.toAddress().hasPwd == true ? "///" : "")) //TODO: hasPwd should be real field
+                Text(author.seedName.decode64() + author.path + (author.hasPwd == true ? "///" : "")) //TODO: hasPwd should be real field
                     .foregroundColor(Color("Crypto400"))
                 Text(author.base58)
                     .font(.caption2)

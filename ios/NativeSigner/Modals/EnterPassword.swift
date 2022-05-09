@@ -17,7 +17,7 @@ struct EnterPassword: View {
             RoundedRectangle(cornerRadius: 20.0).foregroundColor(Color("Bg000"))
             VStack {
                 HeaderBar(line1: "SECRET PATH", line2: "///password")
-                AddressCard(address: content.authorInfo.toAddress())
+                AddressCard(address: content.authorInfo)
                 if (content.counter>0) {
                     Text("Attempt " + String(content.counter) + " of 3")
                 }

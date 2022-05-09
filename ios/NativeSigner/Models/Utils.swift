@@ -77,13 +77,6 @@ extension String {
     }
 }
 
-extension TransactionAuthor {
-    func toAddress() -> Address {
-        return Address(base58: self.base58, path: self.derivationPath, hasPwd: false, identicon: self.identicon, seedName: self.seed, multiselect: nil
-        )
-    }
-}
-
 extension TransactionCardSet {
     func assemble() -> [TransactionCard] {
         var assembled: [TransactionCard] = []

@@ -19,7 +19,7 @@ struct NewAddressScreen: View {
     var body: some View {
         ZStack {
             ScrollView {
-                HeaderBar(line1: "Create new key", line2: "For seed " + content.seedName)
+                HeaderBar(line1: "Create new key", line2: "For seed " + content.seedName.decode64())
                 //SeedCardForManager(seedName: data.selectedSeed)
                 NetworkCard(title: content.networkTitle, logo: content.networkLogo)
                 VStack (alignment: .leading) {
@@ -36,7 +36,7 @@ struct NewAddressScreen: View {
                                 .keyboardType(.asciiCapable)
                                 .submitLabel(.done)
                                 .onChange(of: path) {pathNew in
-                                    derivationCheck = substratePathCheck(seedName: content.seedName, path: pathNew, network: content.networkSpecsKey, dbname: data.dbName)//updateDerivationCheck(path: pathNew, dbName: data.dbName)
+                                    derivationCheck = substratePathCheck(seedName: content.seedName, path: pathNew, network: content.networkSpecsKey, dbname: data.dbName)
                                     path = pathNew
                                 }
                                 .onSubmit {

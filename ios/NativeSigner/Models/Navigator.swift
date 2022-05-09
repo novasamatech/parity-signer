@@ -34,6 +34,11 @@ extension SignerDataModel {
             actionAvailable = false
             if let tempActionResult = try? backendAction(action: action, details: details, seedPhrase: seedPhrase)
             {
+                switch(tempActionResult.modalData) {
+                case .sufficientCryptoReady(let value):
+                    print(value)
+                default: break
+                }
                 actionResult = tempActionResult
             }
             //Boink! debounce is here

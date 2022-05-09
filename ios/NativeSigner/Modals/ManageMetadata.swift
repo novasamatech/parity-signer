@@ -15,7 +15,7 @@ struct ManageMetadata: View {
     var body: some View {
         MenuStack {
             HeaderBar(line1: "MANAGE METADATA", line2: "Select action").padding(.top, 10)
-            //MetadataCard(meta: content.forCard())
+            MetadataCard(meta: MMetadataRecord(specname: content.name, specsVersion: content.version, metaHash: content.metaHash, metaIdPic: content.metaIdPic))
             HStack{
             Text("Used for:")
                 VStack{

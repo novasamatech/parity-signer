@@ -155,7 +155,7 @@ struct HistoryCardExtended: View {
                     Identicon(identicon: event.signedBy?.identicon ?? [])
                     VStack {
                         Text(value.signedBy.show())
-                        Text((event.signedBy?.seed ?? "") + (event.signedBy?.derivationPath ?? ""))
+                        Text((event.signedBy?.seedName ?? "") + (event.signedBy?.path ?? ""))
                     }
                 }
                 Text("in network")
@@ -171,7 +171,7 @@ struct HistoryCardExtended: View {
                         Identicon(identicon: event.signedBy?.identicon ?? [])
                         VStack {
                             Text(value.signedBy.show())
-                            Text((event.signedBy?.seed ?? "") + (event.signedBy?.derivationPath ?? ""))
+                            Text((event.signedBy?.seedName ?? "") + (event.signedBy?.path ?? ""))
                         }
                     }
                     Text("in network")

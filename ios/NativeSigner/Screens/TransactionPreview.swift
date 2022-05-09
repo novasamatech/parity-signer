@@ -19,7 +19,7 @@ struct TransactionPreview: View {
             TransactionBlock(cards: content.content.assemble())
             VStack {
                 if let address = content.authorInfo {
-                    AddressCard(address: address.toAddress())
+                    AddressCard(address: address)
                 }
                 if let network = content.networkInfo {
                     NetworkCard(title: network.networkTitle, logo: network.networkLogo)
@@ -64,7 +64,7 @@ struct TransactionPreview: View {
                                     data.pushButton(
                                         action: .goForward,
                                         details: Data(comment.utf8).base64EncodedString(),
-                                        seedPhrase: data.getSeed(seedName: content.authorInfo?.seed ?? "")
+                                        seedPhrase: data.getSeed(seedName: content.authorInfo?.seedName ?? "")
                                     )
                                 }
                             }

@@ -14,8 +14,7 @@ struct ExportAddress: View {
     var body: some View {
         ScrollView {
             VStack {
-                AddressCard(address: Address(base58: content.base58, path: content.path, hasPwd: false /*TODO*/, identicon: content.identicon, seedName: content.seedName, multiselect: nil))
-                NetworkCard(title: content.networkTitle, logo: content.networkLogo)
+                AddressCard(address: content.address)
                 Image(uiImage: UIImage(data: Data(content.qr)) ?? UIImage())
                     .resizable()
                     .aspectRatio(contentMode: .fit).padding(12)
@@ -23,7 +22,7 @@ struct ExportAddress: View {
                 VStack {
                     HStack {
                         Text("Base58 key: ")
-                        Text(content.base58)
+                        Text(content.address.base58)
                     }.padding().foregroundColor(Color("Crypto400")).font(FCrypto(style: .body2))
                     HStack {
                         Text("Hex key: ")
@@ -31,7 +30,7 @@ struct ExportAddress: View {
                     }.padding().foregroundColor(Color("Crypto400")).font(FCrypto(style: .body2))
                     HStack {
                         Text("Seed name: ")
-                        Text(content.seedName.decode64())
+                        Text(content.address.seedName.decode64())
                     }.padding().foregroundColor(Color("Text400")).font(FBase(style: .body2))
                 }
                 
