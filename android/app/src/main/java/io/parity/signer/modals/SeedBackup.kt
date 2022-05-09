@@ -12,7 +12,6 @@ import io.parity.signer.components.*
 import io.parity.signer.models.SignerDataModel
 import io.parity.signer.models.decode64
 import io.parity.signer.models.getSeed
-import io.parity.signer.models.toListOfJSONObjects
 import io.parity.signer.ui.theme.Bg200
 import io.parity.signer.ui.theme.Crypto400
 import io.parity.signer.ui.theme.CryptoTypography

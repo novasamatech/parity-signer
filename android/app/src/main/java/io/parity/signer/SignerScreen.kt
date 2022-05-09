@@ -1,13 +1,8 @@
 package io.parity.signer
 
 import android.util.Log
-import androidx.compose.animation.ExperimentalAnimationApi
-import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.State
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.livedata.observeAsState
-import androidx.lifecycle.LiveData
 import io.parity.signer.alerts.Confirm
 import io.parity.signer.alerts.ErrorModal
 import io.parity.signer.alerts.ShieldAlert
@@ -27,7 +22,6 @@ fun ScreenSelector(
 	button: (Action, String, String) -> Unit,
 	signerDataModel: SignerDataModel
 ) {
-	Log.w("SIGNER_RUST_LOG", "$screenData")
 	val button1: (Action) -> Unit = { action -> button(action, "", "") }
 	val button2: (Action, String) -> Unit =
 		{ action, details -> button(action, details, "") }
@@ -126,10 +120,8 @@ fun ModalSelector(
 		{ seed -> button(Action.GO_FORWARD, seed, "") }
 	when (modalData) {
 		is ModalData.NewSeedMenu -> when (alertState) {
-			AlertData.Confirm -> TODO()
-			is AlertData.ErrorData -> TODO()
 			is AlertData.Shield -> NewSeedMenu(alertState.f, button1)
-			null -> NewSeedMenu(null, button1)
+			else -> NewSeedMenu(null, button1)
 		}
 		is ModalData.SeedMenu -> SeedMenu(
 			modalData.f,
@@ -190,7 +182,6 @@ fun ModalSelector(
 fun AlertSelector(
 	alert: AlertData?,
 	button: (Action, String, String) -> Unit,
-	signerDataModel: SignerDataModel
 ) {
 	val button1: (Action) -> Unit = { action -> button(action, "", "") }
 

@@ -1,7 +1,5 @@
 package io.parity.signer.screens
 
-import android.app.Notification
-import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.Orientation
@@ -28,13 +26,9 @@ import io.parity.signer.components.SeedCard
 import io.parity.signer.ui.theme.Action400
 import io.parity.signer.ui.theme.Bg100
 import io.parity.signer.ui.theme.Bg200
-import org.json.JSONArray
-import org.json.JSONObject
 import io.parity.signer.uniffi.Action
 import io.parity.signer.uniffi.AlertData
 import io.parity.signer.uniffi.MKeys
-import java.util.Arrays.toString
-import java.util.Objects.toString
 import kotlin.math.absoluteValue
 
 /**
@@ -47,10 +41,8 @@ fun KeyManager(
 	mKeys: MKeys,
 	alertState: AlertData?
 ) {
-	1
 	val rootKey = mKeys.root
 	val keySet = mKeys.set
-	val network = mKeys.network
 	val multiselectMode = mKeys.multiselectMode
 	val multiselectCount = mKeys.multiselectCount
 	var offsetX by remember { mutableStateOf(0f) }

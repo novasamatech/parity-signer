@@ -54,8 +54,12 @@ fun NewAddressScreen(
 			)
 			Spacer(Modifier.weight(1f))
 		}
-		// TODO: Another type conversion MDeriveKey -> network
-		//  NetworkCard(deriveKey)
+		NetworkCard(
+			network = MscNetworkInfo(
+				networkTitle = deriveKey.networkTitle,
+				networkLogo = deriveKey.networkLogo
+			)
+		)
 		SingleTextInput(
 			content = derivationPath,
 			update = {
