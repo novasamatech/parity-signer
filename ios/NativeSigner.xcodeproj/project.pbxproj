@@ -28,11 +28,9 @@
 		2D48F38127691C05004B27BE /* AlertSelector.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D48F38027691C05004B27BE /* AlertSelector.swift */; };
 		2D48F38327691C0A004B27BE /* ConfirmAlert.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D48F38227691C0A004B27BE /* ConfirmAlert.swift */; };
 		2D48F38527691C0F004B27BE /* ErrorAlert.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D48F38427691C0F004B27BE /* ErrorAlert.swift */; };
-		2D48F38A27691C3B004B27BE /* MError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D48F38927691C3B004B27BE /* MError.swift */; };
 		2D48F396276A2003004B27BE /* SignatureReady.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D48F395276A2003004B27BE /* SignatureReady.swift */; };
 		2D48F398276A200F004B27BE /* EnterPassword.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D48F397276A200F004B27BE /* EnterPassword.swift */; };
 		2D48F3A0276C8D5E004B27BE /* LogMenu.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D48F39F276C8D5E004B27BE /* LogMenu.swift */; };
-		2D48F3A2276CA49D004B27BE /* MConfirm.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D48F3A1276CA49D004B27BE /* MConfirm.swift */; };
 		2D48F3A62770828B004B27BE /* ManageNetworks.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D48F3A52770828B004B27BE /* ManageNetworks.swift */; };
 		2D48F3A827708670004B27BE /* NetworkDetails.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D48F3A727708670004B27BE /* NetworkDetails.swift */; };
 		2D48F3AC277092FD004B27BE /* MetadataCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D48F3AB277092FD004B27BE /* MetadataCard.swift */; };
@@ -59,6 +57,7 @@
 		2D72D52A2732B8A7004BA7C9 /* Database in Resources */ = {isa = PBXBuildFile; fileRef = 2D72D5292732B8A7004BA7C9 /* Database */; };
 		2D75EFA1280F163700C48FAF /* signer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D75EFA0280F163700C48FAF /* signer.swift */; };
 		2D7803232819BE7700E4D01E /* libsigner.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 2D7803222819BE7600E4D01E /* libsigner.a */; };
+		2D78032528294D4C00E4D01E /* ShieldAlertComponent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D78032428294D4C00E4D01E /* ShieldAlertComponent.swift */; };
 		2D7A7BCE26BBC5690053C1E0 /* LaunchScreen.xib in Resources */ = {isa = PBXBuildFile; fileRef = 2D7A7BCD26BBC5690053C1E0 /* LaunchScreen.xib */; };
 		2D7A7BD426BBEAF00053C1E0 /* Canary.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D7A7BD326BBEAF00053C1E0 /* Canary.swift */; };
 		2D7A7BD626C1126C0053C1E0 /* Utils.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D7A7BD526C1126C0053C1E0 /* Utils.swift */; };
@@ -183,11 +182,9 @@
 		2D48F38027691C05004B27BE /* AlertSelector.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AlertSelector.swift; sourceTree = "<group>"; };
 		2D48F38227691C0A004B27BE /* ConfirmAlert.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ConfirmAlert.swift; sourceTree = "<group>"; };
 		2D48F38427691C0F004B27BE /* ErrorAlert.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ErrorAlert.swift; sourceTree = "<group>"; };
-		2D48F38927691C3B004B27BE /* MError.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MError.swift; sourceTree = "<group>"; };
 		2D48F395276A2003004B27BE /* SignatureReady.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignatureReady.swift; sourceTree = "<group>"; };
 		2D48F397276A200F004B27BE /* EnterPassword.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EnterPassword.swift; sourceTree = "<group>"; };
 		2D48F39F276C8D5E004B27BE /* LogMenu.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LogMenu.swift; sourceTree = "<group>"; };
-		2D48F3A1276CA49D004B27BE /* MConfirm.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MConfirm.swift; sourceTree = "<group>"; };
 		2D48F3A52770828B004B27BE /* ManageNetworks.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ManageNetworks.swift; sourceTree = "<group>"; };
 		2D48F3A727708670004B27BE /* NetworkDetails.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NetworkDetails.swift; sourceTree = "<group>"; };
 		2D48F3AB277092FD004B27BE /* MetadataCard.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MetadataCard.swift; sourceTree = "<group>"; };
@@ -216,6 +213,7 @@
 		2D75EFA0280F163700C48FAF /* signer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = signer.swift; sourceTree = "<group>"; };
 		2D75EFA2280F164000C48FAF /* signerFFI.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = signerFFI.h; sourceTree = "<group>"; };
 		2D7803222819BE7600E4D01E /* libsigner.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libsigner.a; sourceTree = "<group>"; };
+		2D78032428294D4C00E4D01E /* ShieldAlertComponent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShieldAlertComponent.swift; sourceTree = "<group>"; };
 		2D7A7BCD26BBC5690053C1E0 /* LaunchScreen.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; name = LaunchScreen.xib; path = NativeSigner/LaunchScreen.xib; sourceTree = "<group>"; };
 		2D7A7BD326BBEAF00053C1E0 /* Canary.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = Canary.swift; path = NativeSigner/Components/Canary.swift; sourceTree = SOURCE_ROOT; };
 		2D7A7BD526C1126C0053C1E0 /* Utils.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Utils.swift; sourceTree = "<group>"; };
@@ -334,15 +332,6 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		2D48F38827691C3B004B27BE /* AlertModels */ = {
-			isa = PBXGroup;
-			children = (
-				2D48F38927691C3B004B27BE /* MError.swift */,
-				2D48F3A1276CA49D004B27BE /* MConfirm.swift */,
-			);
-			path = AlertModels;
-			sourceTree = "<group>";
-		};
 		2D75EF9E280F02B900C48FAF /* Generated */ = {
 			isa = PBXGroup;
 			children = (
@@ -505,6 +494,7 @@
 				2D48F38427691C0F004B27BE /* ErrorAlert.swift */,
 				2D48F38227691C0A004B27BE /* ConfirmAlert.swift */,
 				2D48F38027691C05004B27BE /* AlertSelector.swift */,
+				2D78032428294D4C00E4D01E /* ShieldAlertComponent.swift */,
 			);
 			path = Alerts;
 			sourceTree = "<group>";
@@ -599,7 +589,6 @@
 			isa = PBXGroup;
 			children = (
 				2DA5F80C2756304B00D8DD29 /* Camera.swift */,
-				2D48F38827691C3B004B27BE /* AlertModels */,
 				2DE72BFF26A6ADC5002BB752 /* CameraService.swift */,
 				2D7A7BD326BBEAF00053C1E0 /* Canary.swift */,
 				2DE72C0E26A99885002BB752 /* RustNative.swift */,
@@ -795,6 +784,7 @@
 				2DA5F87627566D7C00D8DD29 /* TransactionPreview.swift in Sources */,
 				2DAA82AF278874F3002917C0 /* NetworkLogo.swift in Sources */,
 				2DA5F85E27566C3600D8DD29 /* TCFieldName.swift in Sources */,
+				2D78032528294D4C00E4D01E /* ShieldAlertComponent.swift in Sources */,
 				2D48F3D8277B95A3004B27BE /* TransactionBlock.swift in Sources */,
 				2DA5F86827566C3600D8DD29 /* TCAuthor.swift in Sources */,
 				2DA5F87427566C3600D8DD29 /* TCEraMortal.swift in Sources */,
@@ -844,7 +834,6 @@
 				2DA5F8272756629600D8DD29 /* ScreenSelector.swift in Sources */,
 				2DA5F87E2756A28B00D8DD29 /* NetworkCard.swift in Sources */,
 				2DA5F8332756653B00D8DD29 /* CameraPreview.swift in Sources */,
-				2D48F38A27691C3B004B27BE /* MError.swift in Sources */,
 				2DA5F8862756A44600D8DD29 /* AddressCardControls.swift in Sources */,
 				2DAA82AB27886734002917C0 /* TCGenesisHash.swift in Sources */,
 				2DA5F82F2756635A00D8DD29 /* HistoryScreen.swift in Sources */,
@@ -898,7 +887,6 @@
 				2D48F35B2760E5DF004B27BE /* RecoverSeedPhrase.swift in Sources */,
 				2DA5F87C2756A21200D8DD29 /* ExportAddress.swift in Sources */,
 				2D48F36127620F49004B27BE /* SeedKeyCard.swift in Sources */,
-				2D48F3A2276CA49D004B27BE /* MConfirm.swift in Sources */,
 				2DA5F821275652EE00D8DD29 /* Footer.swift in Sources */,
 				2D48F38327691C0A004B27BE /* ConfirmAlert.swift in Sources */,
 				2DAA82912786FA4B002917C0 /* KeyDetailsMulti.swift in Sources */,

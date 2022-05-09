@@ -11,18 +11,6 @@
 import Foundation
 
 /**
- * Alerts for showing
- *
- * This might be organized differently i iOS and android
- */
-enum SignerAlert: Decodable {
-    case Empty
-    case Error(MError)
-    case Shield
-    case Confirm(MConfirm)
-}
-
-/**
  * Slightly non-trivial navigation
  * We should keep this to minimum
  */

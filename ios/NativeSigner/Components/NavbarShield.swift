@@ -13,6 +13,7 @@ struct NavbarShield: View {
     var body: some View {
         if data.canaryDead /*|| data.bsDetector.canaryDead*/ {
             Button(action: {
+                data.pushButton(action: .shield)
                 data.alertShow = true
             }) {
                 Image(systemName: "shield.slash")

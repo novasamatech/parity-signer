@@ -9,20 +9,20 @@ import SwiftUI
 
 struct ConfirmAlert: View {
     @EnvironmentObject var data: SignerDataModel
-    let content: MConfirm
+    let content: String
     var body: some View {
         ZStack {
             RoundedRectangle(cornerRadius: 8)
-            HeaderBar(line1: content.header, line2: content.subheader)
+            HeaderBar(line1: content, line2: "content.subheader")
             MenuButtonsStack {
                 BigButton(
-                    text: content.yes,
+                    text: "content.yes",
                     action: {
                         data.pushButton(action: .goForward)
                     }
                 )
                 BigButton(
-                    text: content.no,
+                    text: "content.no",
                     action: {
                         data.pushButton(action: .goBack)
                     }

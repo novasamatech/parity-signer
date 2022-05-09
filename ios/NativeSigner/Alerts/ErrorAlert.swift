@@ -9,7 +9,7 @@ import SwiftUI
 
 struct ErrorAlert: View {
     @EnvironmentObject var data: SignerDataModel
-    let content: MError
+    let content: String
     var body: some View {
         ZStack {
             Rectangle().foregroundColor(Color("BgDanger")).opacity(0.3).gesture(TapGesture().onEnded{_ in
@@ -17,7 +17,7 @@ struct ErrorAlert: View {
                 })
             VStack{
                 Text("Error!").font(FBase(style: .h1)).foregroundColor(Color("SignalDanger"))
-                Text(content.error).foregroundColor(Color("SignalDanger"))
+                Text(content).foregroundColor(Color("SignalDanger"))
                 Button(action: {
                     data.pushButton(action: .goBack)
                 }) {Text("Ok")}
