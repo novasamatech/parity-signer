@@ -413,17 +413,8 @@ pub struct MSCContent {
 }
 
 #[derive(Clone, Debug, PartialEq)]
-pub struct MSCAuthor {
-    pub base58: String,
-    pub identicon: Vec<u8>,
-    pub seed: String,
-    pub derivation_path: String,
-    pub has_password: Option<bool>,
-}
-
-#[derive(Clone, Debug, PartialEq)]
 pub struct MSufficientCryptoReady {
-    pub author_info: MSCAuthor,
+    pub author_info: Address,
     pub sufficient: Vec<u8>,
     pub content: MSCContent,
 }

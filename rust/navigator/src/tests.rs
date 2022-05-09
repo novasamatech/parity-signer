@@ -31,12 +31,12 @@ use definitions::{
         MKeyDetailsMulti, MKeys, MKeysCard, MLog, MLogDetails, MLogRight, MMMNetwork, MMNetwork,
         MManageMetadata, MManageNetworks, MMetadataRecord, MNetworkCard, MNetworkDetails,
         MNetworkMenu, MNewSeed, MNewSeedBackup, MPasswordConfirm, MRawKey, MRecoverSeedName,
-        MRecoverSeedPhrase, MSCAuthor, MSCCall, MSCContent, MSCCurrency, MSCEnumVariantName,
-        MSCEraMortal, MSCFieldName, MSCId, MSCNameVersion, MSCNetworkInfo, MSeedKeyCard, MSeedMenu,
-        MSeeds, MSettings, MSignSufficientCrypto, MSignatureReady, MSufficientCryptoReady,
-        MTransaction, MTypesInfo, MVerifier, MVerifierDetails, ModalData, Network,
-        NetworkSpecsToSend, RightButton, ScreenData, ScreenNameType, SeedNameCard, TransactionCard,
-        TransactionCardSet, TransactionNetworkInfo, TransactionType,
+        MRecoverSeedPhrase, MSCCall, MSCContent, MSCCurrency, MSCEnumVariantName, MSCEraMortal,
+        MSCFieldName, MSCId, MSCNameVersion, MSCNetworkInfo, MSeedKeyCard, MSeedMenu, MSeeds,
+        MSettings, MSignSufficientCrypto, MSignatureReady, MSufficientCryptoReady, MTransaction,
+        MTypesInfo, MVerifier, MVerifierDetails, ModalData, Network, NetworkSpecsToSend,
+        RightButton, ScreenData, ScreenNameType, SeedNameCard, TransactionCard, TransactionCardSet,
+        TransactionNetworkInfo, TransactionType,
     },
     network_specs::{NetworkSpecs, ValidCurrentVerifier, Verifier, VerifierValue},
 };
@@ -4681,13 +4681,14 @@ fn flow_test_1() {
     .unwrap();
     expected_action.modal_data = Some(ModalData::SufficientCryptoReady {
         f: MSufficientCryptoReady {
-            author_info: MSCAuthor {
+            author_info: Address {
                 base58: "46ebddef8cd9bb167dc30878d7113b7e168e6f0646beffd77d69d39bad76b47a"
                     .to_string(),
                 identicon: alice_sr_root().to_vec(),
-                seed: "Alice".to_string(),
-                derivation_path: String::new(),
-                has_password: Some(false),
+                seed_name: "Alice".to_string(),
+                path: String::new(),
+                has_pwd: false,
+                multiselect: None,
             },
             sufficient: vec![],
             content: MSCContent {
@@ -4938,13 +4939,14 @@ fn flow_test_1() {
         },
         modal_data: Some(ModalData::SufficientCryptoReady {
             f: MSufficientCryptoReady {
-                author_info: MSCAuthor {
+                author_info: Address {
                     base58: "46ebddef8cd9bb167dc30878d7113b7e168e6f0646beffd77d69d39bad76b47a"
                         .to_string(),
                     identicon: alice_sr_root().to_vec(),
-                    seed: "Alice".to_string(),
-                    derivation_path: String::new(),
-                    has_password: Some(false),
+                    seed_name: "Alice".to_string(),
+                    path: String::new(),
+                    has_pwd: false,
+                    multiselect: None,
                 },
                 sufficient: vec![],
                 content: MSCContent {

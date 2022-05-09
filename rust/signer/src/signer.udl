@@ -584,16 +584,8 @@ dictionary MSCContent {
     string ttype;
 };
 
-dictionary MSCAuthor {
-    string base58;
-    sequence<u8> identicon;
-    string seed;
-    boolean? has_password;
-    string derivation_path;
-};
-
 dictionary MSufficientCryptoReady {
-    MSCAuthor author_info;
+    Address author_info;
     sequence<u8> sufficient;
     MSCContent content;
 };

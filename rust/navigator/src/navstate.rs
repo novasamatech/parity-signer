@@ -2,11 +2,11 @@
 
 use db_handling::manage_history::get_history_entry_by_order;
 use definitions::navigation::{
-    ActionResult, AlertData, FooterButton, History, MEnterPassword, MKeyDetailsMulti, MKeys, MLog,
-    MLogDetails, MManageNetworks, MNetworkCard, MNewSeed, MPasswordConfirm, MRecoverSeedName,
-    MRecoverSeedPhrase, MSCAuthor, MSCContent, MSeedMenu, MSeeds, MSettings, MSignSufficientCrypto,
-    MSignatureReady, MSufficientCryptoReady, MTransaction, ModalData, RightButton, ScreenData,
-    ScreenNameType, TransactionNetworkInfo, TransactionType,
+    ActionResult, Address, AlertData, FooterButton, History, MEnterPassword, MKeyDetailsMulti,
+    MKeys, MLog, MLogDetails, MManageNetworks, MNetworkCard, MNewSeed, MPasswordConfirm,
+    MRecoverSeedName, MRecoverSeedPhrase, MSCContent, MSeedMenu, MSeeds, MSettings,
+    MSignSufficientCrypto, MSignatureReady, MSufficientCryptoReady, MTransaction, ModalData,
+    RightButton, ScreenData, ScreenNameType, TransactionNetworkInfo, TransactionType,
 };
 use sp_runtime::MultiSigner;
 use transaction_parsing::{entry_to_transactions_with_decoding, TransactionAction};
@@ -1822,12 +1822,13 @@ impl State {
                             let content = MSCContent {
                                 ttype: a.to_string(),
                             };
-                            let author_info = MSCAuthor {
+                            let author_info = Address {
                                 base58: author_info.base58,
                                 identicon: author_info.identicon,
-                                seed: author_info.seed_name,
-                                derivation_path: author_info.path,
-                                has_password: Some(author_info.has_pwd),
+                                seed_name: author_info.seed_name,
+                                path: author_info.path,
+                                has_pwd: author_info.has_pwd,
+                                multiselect: None,
                             };
                             let f = MSufficientCryptoReady {
                                 author_info,
