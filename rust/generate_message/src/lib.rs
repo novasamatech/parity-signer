@@ -139,7 +139,7 @@
 //! # Signing the payloads
 //!
 //! ## With signatures produced by `subkey`
-//! 
+//!
 //!
 //! ## With special dedicated Signer
 //!

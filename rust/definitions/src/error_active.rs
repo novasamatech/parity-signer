@@ -1074,7 +1074,7 @@ pub enum Fetch {
 }
 
 /// Errors on the active side with network specs received through rpc call
-#[derive(Debug)]
+#[derive(Debug, PartialEq)]
 pub enum SpecsError {
     /// Network base58 prefix information is not found neither in results of
     /// the `system_properties` rpc call, nor in `System` pallet of the metadata
