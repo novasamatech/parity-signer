@@ -12,6 +12,8 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
+import io.parity.signer.components.KeyCard
+import io.parity.signer.components.NetworkCard
 import io.parity.signer.models.intoImageBitmap
 import io.parity.signer.ui.theme.Bg200
 import io.parity.signer.uniffi.Action
@@ -36,16 +38,12 @@ fun KeyDetailsMulti(
 				)
 				.fillMaxWidth()
 		) {
-			/* TODO: MKeyDetailsMulti -> Address conversion
-			KeyCard(identity = address.value ?: JSONObject())
-			 */
+			KeyCard(identity = keyDetailsMulti.keyDetails.address)
 		}
 		Row(
 			Modifier.padding(top = 3.dp, start = 12.dp, end = 12.dp)
 		) {
-			/* TODO: MKeyDetailsMulti -> MDeriveKey conversion
-			NetworkCard(address.value ?: JSONObject())
-			*/
+			NetworkCard(network = keyDetailsMulti.keyDetails.networkInfo)
 		}
 		Image(
 			(keyDetailsMulti.keyDetails.qr).intoImageBitmap(),

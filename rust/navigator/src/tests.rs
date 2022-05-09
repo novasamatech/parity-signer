@@ -36,7 +36,7 @@ use definitions::{
         MSettings, MSignSufficientCrypto, MSignatureReady, MSufficientCryptoReady, MTransaction,
         MTypesInfo, MVerifier, MVerifierDetails, ModalData, Network, NetworkSpecsToSend,
         RightButton, ScreenData, ScreenNameType, SeedNameCard, TransactionCard, TransactionCardSet,
-        TransactionNetworkInfo, TransactionType,
+        TransactionType,
     },
     network_specs::{NetworkSpecs, ValidCurrentVerifier, Verifier, VerifierValue},
 };
@@ -85,9 +85,8 @@ fn cut_seed_remove_identicon(data: &mut Option<ModalData>) -> String {
         panic!("Expected ModalData::NewSeedBackup, got {:?}", data);
     }
 }
-fn qr_payload(qr_content_hex: &str) -> Vec<u8> {
-    let qr_content = hex::decode(qr_content_hex).unwrap();
-    let image = image::load_from_memory(&qr_content).unwrap();
+fn qr_payload(qr_content: &[u8]) -> Vec<u8> {
+    let image = image::load_from_memory(qr_content).unwrap();
     let mut gray_img: GrayImage = ImageBuffer::new(image.width(), image.height());
     for y in 0..image.height() {
         for x in 0..image.width() {
@@ -98,20 +97,6 @@ fn qr_payload(qr_content_hex: &str) -> Vec<u8> {
     let mut qr_decoder = quircs::Quirc::new();
     let codes = qr_decoder.identify(image.width() as usize, image.height() as usize, &gray_img);
     codes.last().unwrap().unwrap().decode().unwrap().payload
-}
-
-fn process_sufficient(current_real_json: &str) -> (String, String) {
-    let sufficient = SUFFICIENT
-        .captures(current_real_json)
-        .unwrap()
-        .name("sufficient")
-        .unwrap()
-        .as_str()
-        .to_string();
-    let sufficient_free_json = SUFFICIENT
-        .replace_all(current_real_json, r#""sufficient":"**""#)
-        .to_string();
-    (sufficient_free_json, hex::encode(qr_payload(&sufficient)))
 }
 
 fn signature_is_good(transaction_hex: &str, signature_hex: &str) -> bool {
@@ -3468,7 +3453,7 @@ fn flow_test_1() {
                 },
                 ttype: TransactionType::ImportDerivations,
                 author_info: None,
-                network_info: Some(TransactionNetworkInfo {
+                network_info: Some(MSCNetworkInfo {
                     network_title: "Westend".to_string(),
                     network_logo: "westend".to_string(),
                 }),
@@ -4691,24 +4676,26 @@ fn flow_test_1() {
                 multiselect: None,
             },
             sufficient: vec![],
-            content: MSCContent {
-                ttype: String::new(),
+            content: MSCContent::AddSpecs {
+                f: MSCNetworkInfo {
+                    network_title: "Westend".to_string(),
+                    network_logo: "westend".to_string(),
+                },
             },
         },
     });
-    let (_, sufficient_hex) =
-        if let Some(ModalData::SufficientCryptoReady { ref mut f }) = action.modal_data {
-            let res = process_sufficient(&f.content.ttype);
-            f.content.ttype = String::new();
-            res
-        } else {
-            panic!(
-                "Expected Some(ModalData::SufficientCrypto), got {:?}",
-                action.modal_data
-            );
-        };
+    let sufficient = if let Some(ModalData::SufficientCryptoReady { ref mut f }) = action.modal_data
+    {
+        std::mem::take(&mut f.sufficient)
+    } else {
+        panic!(
+            "Expected Some(ModalData::SufficientCrypto), got {:?}",
+            action.modal_data
+        );
+    };
+    let sufficient_hex = hex::encode(qr_payload(&sufficient));
 
-    let new_log_with_modal = expected_action.clone();
+    let mut new_log_with_modal = expected_action.clone();
     assert_eq!(
         action, expected_action,
         concat!(
@@ -4949,24 +4936,24 @@ fn flow_test_1() {
                     multiselect: None,
                 },
                 sufficient: vec![],
-                content: MSCContent {
-                    ttype: "".to_string(),
+                content: MSCContent::LoadMetadata {
+                    name: "westend".to_string(),
+                    version: 9150,
                 },
             },
         }),
         alert_data: None,
     };
-    let (_, sufficient_hex) =
-        if let Some(ModalData::SufficientCryptoReady { ref mut f }) = action.modal_data {
-            let res = process_sufficient(&f.content.ttype);
-            f.content.ttype = String::new();
-            res
-        } else {
-            panic!(
-                "Expected Some(ModalData::SufficientCrypto), got {:?}",
-                action.modal_data
-            );
-        };
+    let sufficient = if let Some(ModalData::SufficientCryptoReady { ref mut f }) = action.modal_data
+    {
+        std::mem::take(&mut f.sufficient)
+    } else {
+        panic!(
+            "Expected Some(ModalData::SufficientCrypto), got {:?}",
+            action.modal_data
+        );
+    };
+    let sufficient_hex = hex::encode(qr_payload(&sufficient));
 
     assert_eq!(
         action, expected_action,
@@ -5050,18 +5037,37 @@ fn flow_test_1() {
     )
     .unwrap()
     .unwrap();
-    let (_, sufficient_hex) =
-        if let Some(ModalData::SufficientCryptoReady { ref mut f }) = action.modal_data {
-            let res = process_sufficient(&f.content.ttype);
-            f.content.ttype = String::new();
-            res
-        } else {
-            panic!(
-                "Expected Some(ModalData::SufficientCrypto), got {:?}",
-                action.modal_data
-            );
-        };
+    let sufficient = if let Some(ModalData::SufficientCryptoReady { ref mut f }) = action.modal_data
+    {
+        std::mem::take(&mut f.sufficient)
+    } else {
+        panic!(
+            "Expected Some(ModalData::SufficientCrypto), got {:?}",
+            action.modal_data
+        );
+    };
 
+    let sufficient_hex = hex::encode(qr_payload(&sufficient));
+
+    new_log_with_modal.modal_data = Some(ModalData::SufficientCryptoReady {
+        f: MSufficientCryptoReady {
+            author_info: Address {
+                base58: "46ebddef8cd9bb167dc30878d7113b7e168e6f0646beffd77d69d39bad76b47a"
+                    .to_string(),
+                identicon: alice_sr_root().to_vec(),
+                seed_name: "Alice".to_string(),
+                path: String::new(),
+                has_pwd: false,
+                multiselect: None,
+            },
+            sufficient: vec![],
+            content: MSCContent::LoadTypes {
+                types: "d091a5a24a97e18dfe298b167d8fd5a2add10098c8792cba21c39029a9ee0aeb"
+                    .to_string(),
+                pic: types_known().to_vec(),
+            },
+        },
+    });
     assert_eq!(
         action, new_log_with_modal,
         concat!(
@@ -5340,7 +5346,7 @@ fn flow_test_1() {
                     has_pwd: false,
                     multiselect: None,
                 }),
-                network_info: Some(TransactionNetworkInfo {
+                network_info: Some(MSCNetworkInfo {
                     network_title: "Westend".to_string(),
                     network_logo: "westend".to_string(),
                 }),
@@ -5369,7 +5375,7 @@ fn flow_test_1() {
         f: MSignatureReady { signature },
     }) = action.modal_data
     {
-        String::from_utf8(qr_payload(&hex::encode(signature))).unwrap()
+        String::from_utf8(qr_payload(&signature)).unwrap()
     } else {
         panic!(
             "Expected ModalData::SigantureReady, got {:?}",
@@ -5490,7 +5496,7 @@ fn flow_test_1() {
                     has_pwd: false,
                     multiselect: None,
                 }),
-                network_info: Some(TransactionNetworkInfo {
+                network_info: Some(MSCNetworkInfo {
                     network_title: "Westend".to_string(),
                     network_logo: "westend".to_string(),
                 }),
@@ -5515,7 +5521,7 @@ fn flow_test_1() {
         f: MSignatureReady { ref signature },
     }) = action.modal_data
     {
-        String::from_utf8(qr_payload(&hex::encode(signature))).unwrap()
+        String::from_utf8(qr_payload(signature)).unwrap()
     } else {
         panic!(
             "Expected ModalData::SigantureReady, got {:?}",
@@ -5944,7 +5950,7 @@ fn flow_test_1() {
                     has_pwd: false,
                     multiselect: None,
                 }),
-                network_info: Some(TransactionNetworkInfo {
+                network_info: Some(MSCNetworkInfo {
                     network_title: "Westend".to_string(),
                     network_logo: "westend".to_string(),
                 }),
@@ -5979,7 +5985,7 @@ fn flow_test_1() {
             },
         });
 
-        String::from_utf8(qr_payload(&hex::encode(signature))).unwrap()
+        String::from_utf8(qr_payload(signature)).unwrap()
     } else {
         panic!(
             "Expected ModalData::SigantureReady, got {:?}",
@@ -6170,7 +6176,7 @@ fn flow_test_1() {
                     has_pwd: true,
                     multiselect: None,
                 }),
-                network_info: Some(TransactionNetworkInfo {
+                network_info: Some(MSCNetworkInfo {
                     network_title: "Westend".to_string(),
                     network_logo: "westend".to_string(),
                 }),
@@ -6407,7 +6413,7 @@ fn flow_test_1() {
             },
         });
 
-        String::from_utf8(qr_payload(&hex::encode(signature))).unwrap()
+        String::from_utf8(qr_payload(signature)).unwrap()
     } else {
         panic!(
             "Expected ModalData::SigantureReady, got {:?}",

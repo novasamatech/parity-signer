@@ -256,7 +256,7 @@ class SignerDataModel : ViewModel() {
 	 * Checks if airplane mode was off
 	 */
 	private fun isAirplaneOn() {
-		val alertData = actionResult?.value?.alertData
+		val alertData = actionResult.value?.alertData
 
 		if (Settings.Global.getInt(
 				context.contentResolver,
@@ -265,14 +265,14 @@ class SignerDataModel : ViewModel() {
 			) == 0
 		) {
 			if (alertData is AlertData.Shield && alertData.f != ShieldAlert.ACTIVE) {
-				actionResult?.value?.alertData = null
+				actionResult.value?.alertData = null
 				if (onBoardingDone.value == OnBoardingState.Yes) historyDeviceWasOnline(
 					dbName
 				)
 			}
 		} else {
 			if (alertData is AlertData.Shield && alertData.f != ShieldAlert.ACTIVE) {
-				actionResult?.value?.alertData =
+				actionResult.value?.alertData =
 					if (onBoardingDone.value == OnBoardingState.Yes)
 						AlertData.Shield(f = ShieldAlert.PAST) else null
 			}
