@@ -1,5 +1,4 @@
-//! Make QR code with `derivations` update, i.e. with bulk password-free
-//! derivations import
+//! `derivations` update, for bulk password-free derivations import
 //!
 //! Signer can import sets of password-free derivations by accepting updates
 //! with `0x53ffde` prelude and

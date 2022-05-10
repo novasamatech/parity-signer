@@ -1,3 +1,4 @@
+//! Export `add_specs` and `load_metadata` payloads into files for signing
 use constants::{LOAD, SPECS};
 use definitions::{
     error_active::ErrorActive,

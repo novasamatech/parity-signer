@@ -1,3 +1,4 @@
+//! Managing network metadata in hot database
 use std::cmp::Ordering;
 
 use constants::{HOT_DB_NAME, METATREE};

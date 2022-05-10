@@ -251,7 +251,8 @@ impl ErrorSource for Active {
                             SpecsError::DecimalsArrayUnitsNot => String::from("Unexpected result for multi-token network. Decimals are fetched as an array with more than one element, whereas units are not."),
                             SpecsError::DecimalsUnitsArrayLength{decimals, unit} => format!("Unexpected result for multi-token network. Length of decimals array {} does not match the length of units array {}.", decimals, unit),
                             SpecsError::UnitsArrayDecimalsNot => String::from("Unexpected result for multi-token network. Units are fetched as an array with more than one element, whereas decimals are not."),
-                            SpecsError::OverrideIgnored => String::from("Fetched single value for token decimals and unit. Token override is not possible."),
+                            SpecsError::OverrideIgnoredSingle => String::from("Fetched single value for token decimals and unit. Token override is not possible."),
+                            SpecsError::OverrideIgnoredNone => String::from("Network has no value for token decimals and unit. Token override is not possible."),
                         };
                         format!("Problem with network specs from {}. {}", url, insert)
                     },
@@ -1134,7 +1135,8 @@ pub enum SpecsError {
     /// through `system_properties` rpc call. Received decimals are not an array.
     UnitsArrayDecimalsNot,
 
-    /// Unit and decimal override is not allowed.
+    /// Unit and decimal override is not allowed, when network has a single
+    /// token.
     ///
     /// The only case when the decimals and unit override is permitted is when
     /// the network has a matching set of decimals and units, and user has to
@@ -1143,7 +1145,10 @@ pub enum SpecsError {
     /// If the network has a single decimals value and a single unit value, i.e.
     /// the values that would be suitable on their own, and user attempts to
     /// override it, this error appears.
-    OverrideIgnored,
+    OverrideIgnoredSingle,
+
+    /// Unit and decimal override is not allowed, when network has no token.
+    OverrideIgnoredNone,
 }
 
 /// Data received through rpc call is different from the data in hot database

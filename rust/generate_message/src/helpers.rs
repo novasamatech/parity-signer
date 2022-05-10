@@ -1,3 +1,5 @@
+//! Hot database helpers
+//!
 use constants::{ADDRESS_BOOK, HOT_DB_NAME, SPECSTREEPREP};
 use db_handling::{
     db_transactions::TrDbHot,

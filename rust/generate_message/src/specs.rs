@@ -1,3 +1,5 @@
+//! `add_specs` payloads
+//!
 use constants::{ADDRESS_BOOK, HOT_DB_NAME};
 use db_handling::helpers::{open_db, open_tree};
 use definitions::{

@@ -1,3 +1,4 @@
+//! Command line parser for the client
 use constants::FOLDER;
 use definitions::{
     crypto::{Encryption, SufficientCrypto},

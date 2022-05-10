@@ -1,3 +1,4 @@
+//! Complete generating update QR code or test string, signed or unsigned
 use constants::EXPORT_FOLDER;
 use definitions::{
     crypto::{Encryption, SufficientCrypto},

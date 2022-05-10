@@ -1,3 +1,4 @@
+//! Transform rpc call output into data sufficient for update payload generation
 use constants::{COLOR, SECONDARY_COLOR};
 use definitions::{
     crypto::Encryption,

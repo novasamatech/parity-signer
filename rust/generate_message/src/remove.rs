@@ -1,3 +1,4 @@
+//! Removing data from the hot database
 use constants::{HOT_DB_NAME, METATREE};
 use db_handling::{
     db_transactions::TrDbHot,
