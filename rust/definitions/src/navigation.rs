@@ -77,7 +77,6 @@ pub enum ScreenNameType {
 
 #[derive(PartialEq, Debug, Clone)]
 pub enum ShieldAlert {
-    Active,
     Past,
 }
 

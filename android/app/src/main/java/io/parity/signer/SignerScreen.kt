@@ -194,6 +194,7 @@ fun AlertSelector(
 		)
 		is AlertData.Shield -> ShieldAlert(
 			alert.f,
+			active = false, // TODO: pass an alert
 			button = button1,
 			acknowledgeWarning = ackWarning
 		)

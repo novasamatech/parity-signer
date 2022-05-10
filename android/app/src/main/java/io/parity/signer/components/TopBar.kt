@@ -129,9 +129,9 @@ fun TopBar(
 			IconButton(onClick = { signerDataModel.pushButton(Action.SHIELD) }) {
 				alert.value.let {
 					if (it is AlertData.Shield) {
-						NavbarShield(it.f)
+						NavbarShield(it.f, active = false) // TODO: real active value
 					} else {
-						NavbarShield(alert = null)
+						NavbarShield(alert = null, active = false) // TODO: real active value
 					}
 				}
 			}

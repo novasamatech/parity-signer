@@ -155,7 +155,6 @@ enum ScreenNameType {
 };
 
 enum ShieldAlert {
-    "Active",
     "Past",
 };
 
