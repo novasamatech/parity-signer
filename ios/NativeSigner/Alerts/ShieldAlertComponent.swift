@@ -11,6 +11,8 @@ struct ShieldAlertComponent: View {
     @EnvironmentObject var data: SignerDataModel
     var content: ShieldAlert
     var body: some View {
+        EmptyView()
+        /*
         ZStack {
             RoundedRectangle(cornerRadius: 8)
             switch(content) {
@@ -42,7 +44,7 @@ struct ShieldAlertComponent: View {
                 }
             }
             
-        }
+        }*/
     }
 }
 

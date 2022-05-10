@@ -22,7 +22,16 @@ struct SufficientCryptoReady: View {
                  .resizable()
                  .aspectRatio(contentMode: .fit).padding(12)
                 AddressCard(address: content.authorInfo)
-                Text("Payload: " + content.content.ttype)
+                switch(content.content) {
+                case .addSpecs(let network):
+                    Text("Signature for network specs")
+                    NetworkCard(title: network.networkTitle, logo: network.networkLogo)
+                case .loadTypes(types: _, pic: _):
+                    Text("Signature for types")
+                case .loadMetadata(name: let name, version: let version):
+                    Text("Signature for metadata update" )
+                    Text(name + " version " + String(version))
+                }
             }
         }
     }

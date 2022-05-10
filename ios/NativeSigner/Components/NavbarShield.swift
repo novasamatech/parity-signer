@@ -11,9 +11,9 @@ import Network
 struct NavbarShield: View {
     @EnvironmentObject var data: SignerDataModel
     var body: some View {
-        if data.canaryDead /*|| data.bsDetector.canaryDead*/ {
+        if data.canaryDead /*bluetooth detector: `|| data.bsDetector.canaryDead`*/ {
             Button(action: {
-                data.pushButton(action: .shield)
+                //data.pushButton(action: .shield)
                 data.alertShow = true
             }) {
                 Image(systemName: "shield.slash")

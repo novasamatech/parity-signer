@@ -53,14 +53,14 @@ struct HistoryCardExtended: View {
                 timestamp: timestamp,
                 danger: false,
                 line1: "Key created",
-                line2: value.seedName.decode64() + value.path + " in network with hash " +  value.networkGenesisHash.map{String($0)}.joined()
+                line2: value.seedName.decode64() + value.path + " in network with hash " +  value.networkGenesisHash.map{String(format: "%02X", $0)}.joined()
             )
             case .identityRemoved(let value): HistoryCardTemplate(
                 image: "xmark.rectangle.portrait",
                 timestamp: timestamp,
                 danger: false,
                 line1: "Key removed",
-                line2: value.seedName.decode64() + value.path + " in network with hash " +  value.networkGenesisHash.map{String($0)}.joined()
+                line2: value.seedName.decode64() + value.path + " in network with hash " +  value.networkGenesisHash.map{String(format: "%02X", $0)}.joined()
             )
             case .metadataAdded(let value): HistoryCardTemplate(
                 image: "plus.viewfinder",
@@ -95,7 +95,7 @@ struct HistoryCardExtended: View {
                 timestamp: timestamp,
                 danger: false,
                 line1: "Network verifier set",
-                line2: value.genesisHash.map{String($0)}.joined()
+                line2: value.genesisHash.map{String(format: "%02X", $0)}.joined()
             )
             case .resetDangerRecord: HistoryCardTemplate(
                 image: "checkmark.shield",
@@ -138,7 +138,7 @@ struct HistoryCardExtended: View {
                 timestamp: timestamp,
                 danger: false,
                 line1: "Types signed",
-                line2: value.typesHash.map{String($0)}.joined()
+                line2: value.typesHash.map{String(format: "%02X", $0)}.joined()
             )
             case .systemEntry(let text): HistoryCardTemplate(
                 image: "eye.trianglebadge.exclamationmark.fill",
