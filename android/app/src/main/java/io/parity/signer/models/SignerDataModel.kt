@@ -264,14 +264,14 @@ class SignerDataModel : ViewModel() {
 				0
 			) == 0
 		) {
-			if (alertData is AlertData.Shield && alertData.f != ShieldAlert.ACTIVE) {
+			if (alertData is AlertData.Shield) {
 				actionResult.value?.alertData = null
 				if (onBoardingDone.value == OnBoardingState.Yes) historyDeviceWasOnline(
 					dbName
 				)
 			}
 		} else {
-			if (alertData is AlertData.Shield && alertData.f != ShieldAlert.ACTIVE) {
+			if (alertData is AlertData.Shield) {
 				actionResult.value?.alertData =
 					if (onBoardingDone.value == OnBoardingState.Yes)
 						AlertData.Shield(f = ShieldAlert.PAST) else null
@@ -355,8 +355,8 @@ class SignerDataModel : ViewModel() {
 	private fun getAlertState() {
 		val state = alertState.value
 		_alertState.value = if (historyGetWarnings(dbName)) {
-			if (state is AlertData.Shield && state.f == ShieldAlert.ACTIVE)
-				AlertData.Shield(f = ShieldAlert.ACTIVE) else AlertData.Shield(f = ShieldAlert.PAST)
+			if (state is AlertData.Shield)
+				AlertData.Shield(f = null) else AlertData.Shield(f = ShieldAlert.PAST)
 		} else {
 			null
 		}
