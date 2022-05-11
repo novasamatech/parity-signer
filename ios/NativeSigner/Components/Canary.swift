@@ -39,6 +39,7 @@ extension SignerDataModel {
         do {
             try historyAcknowledgeWarnings(dbname: dbName)
             self.checkAlert()
+            self.pushButton(action: .goBack)
         } catch {
             print("History init failed! This will not do.")
             self.alert = true

@@ -6,12 +6,11 @@
 //
 
 import SwiftUI
+import CoreML
 
 struct AlertSelector: View {
     @EnvironmentObject var data: SignerDataModel
-    
     var body: some View {
-        
         switch (data.actionResult.alertData) {
         case .none:
             EmptyView()
@@ -23,8 +22,6 @@ struct AlertSelector: View {
             let value = "TODO"
             ConfirmAlert(content: value)
         }
-         
-        EmptyView()
     }
 }
 

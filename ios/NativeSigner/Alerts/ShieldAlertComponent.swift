@@ -9,49 +9,61 @@ import SwiftUI
 
 struct ShieldAlertComponent: View {
     @EnvironmentObject var data: SignerDataModel
-    var content: ShieldAlert
+    @State var show = true
+    let content: ShieldAlert?
     var body: some View {
-        EmptyView()
-        /*
         ZStack {
-            RoundedRectangle(cornerRadius: 8)
-            switch(content) {
-            case .active:
-                HeaderBar(line1: "Warning", line2: "content.subheader")
-                MenuButtonsStack {
-                    BigButton(
-                        text: "content.yes",
-                        action: {
-                            data.pushButton(action: .goForward)
+            if (data.canaryDead) {
+                Text("")
+                    .alert(
+                        "Network connected!",
+                        isPresented: $show,
+                        actions: {
+                            Button("Ok") {data.pushButton(action: .goBack)}
+                        },
+                        message: {
+                            Text("Signer detects currently connected network; please enable airplane mode, disconnect all cables and handle security breach according with your security protocol.")
                         }
                     )
-                    BigButton(
-                        text: "content.no",
-                        action: {
-                            data.pushButton(action: .goBack)
-                        }
-                    )
-                }
-            case .past:
-                HeaderBar(line1: "Ok", line2: "content.subheader")
-                MenuButtonsStack {
-                    BigButton(
-                        text: "content.no",
-                        action: {
-                            data.pushButton(action: .goBack)
-                        }
-                    )
+            } else {
+                //TODO: actually use content
+                if (data.alert) {
+                    Text("")
+                        .alert(
+                            "Network was connected!",
+                            isPresented: $show,
+                            actions: {
+                                Button("Back") {data.pushButton(action: .goBack)}
+                                Button("Acknowledge and reset") {
+                                    data.resetAlert()
+                                }
+                            },
+                            message: {
+                                Text("Your Signer device has connected to a WiFi, tether or Bluetooth network since your last acknowledgement and should be considered unsafe to use. Please follow your security protocol")
+                            }
+                        )
+                } else {
+                    Text("")
+                        .alert(
+                            "Signer is secure",
+                            isPresented: $show,
+                            actions: {
+                                Button("Ok") {data.pushButton(action: .goBack)}
+                            },
+                            message: {
+                                Text("Please proceed")
+                            }
+                        )
                 }
             }
-            
-        }*/
+        }
     }
 }
 
 /*
-struct ShieldAlert_Previews: PreviewProvider {
-    static var previews: some View {
-        ShieldAlert()
-    }
-}
-*/
+ struct ShieldAlert_Previews: PreviewProvider {
+ static var previews: some View {
+ ShieldAlert()
+ }
+ }
+ */
