@@ -2122,7 +2122,7 @@ fn flow_test_1() {
         },
         modal_data: None,
         alert_data: Some(AlertData::ErrorData {
-            f: "{\"error\":\"Bad input data. Seed name Portia already exists.\"}".to_string(),
+            f: "Bad input data. Seed name Portia already exists.".to_string(),
         }),
     };
     assert_eq!(
@@ -6239,7 +6239,7 @@ fn flow_test_1() {
         },
     });
     expected_action.alert_data = Some(AlertData::ErrorData {
-        f: "{\"error\":\"Wrong password.\"}".to_string(),
+        f: "Wrong password.".to_string(),
     });
 
     assert_eq!(
@@ -6375,7 +6375,7 @@ fn flow_test_1() {
         },
         modal_data: None,
         alert_data: Some(AlertData::ErrorData {
-            f: "{\"error\":\"Wrong password.\"}".to_string(),
+            f: "Wrong password.".to_string(),
         }),
     };
 

@@ -1871,9 +1871,7 @@ impl State {
             //Prepare alert details
             //Important! No errors could be handled in this block!
             let alert_data = match new_navstate.alert {
-                Alert::Error | Alert::ErrorDisplay => Some(AlertData::ErrorData {
-                    f: format!("{{\"error\":\"{}\"}}", errorline),
-                }),
+                Alert::Error | Alert::ErrorDisplay => Some(AlertData::ErrorData { f: errorline }),
                 Alert::Empty => None,
                 Alert::Shield => match get_danger_status(dbname) {
                     Ok(true) => Some(AlertData::Shield {
@@ -1881,7 +1879,7 @@ impl State {
                     }),
                     Ok(false) => Some(AlertData::Shield { f: None }),
                     Err(e) => Some(AlertData::ErrorData {
-                        f: format!("{{\"error\":\"{}\"}}", e.anyhow()),
+                        f: e.anyhow().to_string(),
                     }),
                 },
             };
