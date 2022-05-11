@@ -1,12 +1,13 @@
 //! Navigation state of the app
 
+use db_handling::helpers::get_danger_status;
 use db_handling::manage_history::get_history_entry_by_order;
 use definitions::navigation::{
     ActionResult, Address, AlertData, FooterButton, History, MEnterPassword, MKeyDetailsMulti,
     MKeys, MLog, MLogDetails, MManageNetworks, MNetworkCard, MNewSeed, MPasswordConfirm,
     MRecoverSeedName, MRecoverSeedPhrase, MSCNetworkInfo, MSeedMenu, MSeeds, MSettings,
     MSignSufficientCrypto, MSignatureReady, MSufficientCryptoReady, MTransaction, ModalData,
-    RightButton, ScreenData, ScreenNameType, TransactionType,
+    RightButton, ScreenData, ScreenNameType, ShieldAlert, TransactionType,
 };
 use sp_runtime::MultiSigner;
 use transaction_parsing::{entry_to_transactions_with_decoding, TransactionAction};
@@ -1874,7 +1875,15 @@ impl State {
                     f: format!("{{\"error\":\"{}\"}}", errorline),
                 }),
                 Alert::Empty => None,
-                Alert::Shield => Some(AlertData::Shield { f: None }),
+                Alert::Shield => match get_danger_status(dbname) {
+                    Ok(true) => Some(AlertData::Shield {
+                        f: Some(ShieldAlert::Past),
+                    }),
+                    Ok(false) => Some(AlertData::Shield { f: None }),
+                    Err(e) => Some(AlertData::ErrorData {
+                        f: format!("{{\"error\":\"{}\"}}", e.anyhow()),
+                    }),
+                },
             };
 
             self.navstate = new_navstate;
