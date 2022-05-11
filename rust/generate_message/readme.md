@@ -85,7 +85,7 @@ Possible commands are:
 - `load_metadata` and `add_specs` with following possible keys (only the key combinations most likely to be needed are implemented at the moment, tickets filing is suggested for others if they are needed):  
     - setting keys (maximum one can be used):  
         - `-d`: do NOT update the database, make rpc calls, and produce ALL requested output files  
-        - `-f`: do NOT run rps calls, produce ALL requested output files from existing database  
+        - `-f`: do NOT run rpc calls, produce ALL requested output files from existing database  
         - `-k`: update database through rpc calls, produce requested output files only for UPDATED database entries  
         - `-p`: update database through rpc calls, do NOT produce any output files  
         - `-t` default setting: update database through rpc calls, produce ALL requested output files  
@@ -152,6 +152,11 @@ Possible commands are:
     - key `-payload` followed by file name for .wasm file, in `../generate_message` folder.  
     - optional key `-d` to **not** write into the database the result, i.e. only create the intermediate file. By default, the results are written in the database.  
 
+- `meta_default_file` to produce a network metadata file that will be part of the release metadata set in `defaults` crate. Use with following keys:  
+    - key `-name` followed by the network name  
+    - key `-version` followed by the network version  
+
+- `check_file` followed by path to the file, to check that the file is a valid hex-encoded metadata and, if it has a matching record in the hot database, assert that the metadata in file and database is identical.  
 
 ## Example commands  
 
@@ -246,20 +251,17 @@ Release cold database is the one loaded into Signer.
 
 `$ cargo run add_specs -f -a`  
 `$ cargo run add_specs -f -n network_title`  
-`$ cargo run add_specs -f -n network_title -ed25519` (*)  
+`$ cargo run add_specs -f -n network_title -ed25519`[^1]  
 `$ cargo run add_specs -f -u network_url`  
-`$ cargo run add_specs -f -u network_url -ed25519` (*)  
-`$ cargo run add_specs -d -u network_url -ed25519` (*)  
-`$ cargo run add_specs -d -u network_url -ed25519 -token 12 MEOW` (*) (**)  
-`$ cargo run add_specs -p -n network_title -ed25519` (*)  
-`$ cargo run add_specs -p -u network_url -ed25519` (*)  
-`$ cargo run add_specs -p -u network_url -ed25519 -token 12 MEOW` (*) (**)  
-`$ cargo run add_specs -t -n network_title -ed25519` (*)  
-`$ cargo run add_specs -t -u network_url -ed25519` (*)  
-`$ cargo run add_specs -t -u network_url -ed25519 -token 12 MEOW` (*) (**)  
-`$ cargo run add_specs -n network_title -ed25519` (*)  
-`$ cargo run add_specs -u network_url -ed25519` (*)  
-`$ cargo run add_specs -u network_url -ed25519 -token 12 MEOW` (*) (**)  
+`$ cargo run add_specs -f -u network_url -ed25519`  
+`$ cargo run add_specs -d -u network_url -ed25519`  
+`$ cargo run add_specs -d -u network_url -ed25519 -token 12 MEOW`[^2]  
+`$ cargo run add_specs -p -n network_title -ed25519`  
+`$ cargo run add_specs -p -u network_url -ed25519`  
+`$ cargo run add_specs -p -u network_url -ed25519 -token 12 MEOW`  
+`$ cargo run add_specs -t -n network_title -ed25519` or identical `$ cargo run add_specs -n network_title -ed25519`  
+`$ cargo run add_specs -t -u network_url -ed25519` or identical `$ cargo run add_specs -u network_url -ed25519`  
+`$ cargo run add_specs -t -u network_url -ed25519 -token 12 MEOW` or identical `$ cargo run add_specs -u network_url -ed25519 -token 12 MEOW`  
 
 `$ cargo run remove -title westend-ed25519`  
 `$ cargo run remove -name kusama -version 9090`  
@@ -274,5 +276,10 @@ Release cold database is the one loaded into Signer.
 
 `$ cargo run unwasm -payload westend_runtime-v9150.compact.compressed.wasm`  
 
-(*) encryption override key should correspond to appropriate encryption for the network in question
-(**) token override is possible only for networks that (1) are not in the database and (2) have multiple allowed tokens; use caution;
+`$ cargo run meta_default_file -name westend -version 9200`
+
+`$ cargo run check_file "../defaults/release_metadata/westend9200"`
+
+[^1]: encryption override key should correspond to appropriate encryption for the network in question  
+
+[^2]: token override is possible only for networks that (1) are not in the database and (2) have multiple allowed tokens; use caution;  

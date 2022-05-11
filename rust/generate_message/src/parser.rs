@@ -1,4 +1,20 @@
 //! Command line parser for the client
+//!
+//!
+//! Expected typical run commands:
+//!
+//! `$ cargo run show database`
+//!
+//! `$ cargo run show address_book`
+//!
+//! `$ cargo run load_metadata -n westend`
+//!
+//! `$ cargo run add_specs -d -n -ed25519 westend`
+//!
+//! `$ cargo run add_network -u wss://unknown-network.eu -ecdsa`
+//!
+//! `$ cargo run derivations -title westend -payload my_derivations_file`
+
 use constants::FOLDER;
 use definitions::{
     crypto::{Encryption, SufficientCrypto},
@@ -13,28 +29,205 @@ use sp_core::{ecdsa, ed25519, sr25519};
 use std::convert::TryInto;
 use std::{env, path::PathBuf};
 
-/// Expected typical run commands:
-/// `$ cargo run show database`
-/// `$ cargo run show address_book`
-/// `$ cargo run load_metadata -n westend`
-/// `$ cargo run add_specs -d -n -ed25519 westend`
-/// `$ cargo run add_network -u wss://unknown-network.eu -ecdsa`
-/// `$ cargo run derivations -title westend -payload my_derivations_file`
-
-/// Enum to describe the incoming command contents
+/// Commands to execute
 pub enum Command {
+    /// Execute [`Show`] command.
+    ///
+    /// # Display content of the metadata [`METATREE`](constants::METATREE) tree of the hot database
+    ///
+    /// `$ cargo run show -database`
+    ///
+    /// Function prints for each entry in hot database
+    /// [`METATREE`](constants::METATREE) tree:
+    ///
+    /// - network name
+    /// - network version
+    /// - hexadecimal metadata hash
+    ///
+    /// # Display content of the address book [`ADDRESS_BOOK`](constants::ADDRESS_BOOK) tree of the hot database
+    ///
+    /// `$ cargo run show -address_book`
+    ///
+    /// Function prints for each entry in hot database
+    /// [`ADDRESS_BOOK`](constants::ADDRESS_BOOK) tree:
+    ///
+    /// - address book title for the network, used only to distinguish between
+    /// address book entries
+    /// - url address at which rpc calls are made for the network
+    /// - network encryption
+    /// - additional marker that the network is a default one
+    ///
+    /// # Check external file with hex-encoded metadata
+    ///
+    /// `$ cargo run check_file <path>`
+    ///
+    /// Function asserts that:
+    ///
+    /// - the file contains valid metadata, with retrievable network name and
+    /// version
+    /// - if the metadata for same network name and version is in the hot
+    /// database, it completely matches the one from the file
     Show(Show),
+
+    /// # Prepare payload for `load_types` update
+    ///
+    /// `$ cargo run load_types`
+    ///
+    /// A file is generated in dedicated [`FOLDER`](constants::FOLDER) to
+    /// (optionally) be signed and later be transformed into `load_types` update
+    /// QR.
     Types,
+
+    /// # Prepare payload for `load_metadata` update according to `Instruction`
+    ///
+    /// `$ cargo run load_metadata <key(s)> <(value)>`
+    ///
+    /// A file is generated in dedicated [`FOLDER`](constants::FOLDER) to
+    /// (optionally) be signed and later be transformed into `load_metadata`
+    /// update QR.
+    ///
+    /// Setting keys that could be used in command line (maximum one):
+    ///
+    /// - `-d`: do **not** update the database, make rpc calls, and produce
+    /// output files
+    /// - `-f`: do **not** run rpc calls, produce output files from database as
+    /// it is
+    /// - `-k`: update database through rpc calls, produce output files only for
+    /// **updated** database entries
+    /// - `-p`: update database through rpc calls, do **not** produce any output
+    /// files
+    /// - `-t` (no setting key defaults here): update database through rpc
+    /// calls, produce output files
+    ///
+    /// Reference keys (exactly only one has to be used):  
+    ///
+    /// - `-a`: all networks with entries in the
+    /// [`ADDRESS_BOOK`](constants::ADDRESS_BOOK) tree of the hot database
+    /// - `-n` followed by single network name: for a network with existing
+    /// record in the [`ADDRESS_BOOK`](constants::ADDRESS_BOOK)
+    /// - `-u` followed by single url address: reserved for networks with no
+    /// record yet in the [`ADDRESS_BOOK`](constants::ADDRESS_BOOK)
+    ///
+    /// `-s` key could be used to stop processing after first error.
     Load(Instruction),
+
+    /// # Prepare payload for `add_specs` update according to `Instruction`
+    ///
+    /// `$ cargo run add_specs <keys> <value(s)>`
+    ///
+    /// A file is generated in dedicated [`FOLDER`](constants::FOLDER) to
+    /// (optionally) be signed and later be transformed into `add_specs` update
+    /// QR.
+    ///
+    /// Setting keys that could be used in command line (maximum one):
+    ///
+    /// - `-d`: do **not** update the database, make rpc calls, and produce
+    /// output files
+    /// - `-f`: do **not** run rpc calls, produce output files
+    /// - `-p`: update database through rpc calls, do **not** produce any output
+    /// files
+    /// - `-t` (no setting key defaults here): update database through rpc
+    /// calls, produce output files
+    ///
+    /// Reference keys (exactly only one has to be used):  
+    ///
+    /// - `-a`: all networks with entries in the
+    /// [`ADDRESS_BOOK`](constants::ADDRESS_BOOK) tree of the hot database
+    /// - `-n` followed by single network address book title: for a network with
+    /// existing record in the [`ADDRESS_BOOK`](constants::ADDRESS_BOOK)
+    /// - `-u` followed by single url address: reserved for networks with no
+    /// record yet in the [`ADDRESS_BOOK`](constants::ADDRESS_BOOK)
+    ///
+    /// `-s` key could be used to stop processing after first error.
+    ///
+    /// Key specifying encryption algorithm supported by the network is optional
+    /// for `-n` reference key (since there is already an entry in the database
+    /// with specified encryption) and mandatory for `-u` reference key.
+    /// Supported variants are:
+    ///
+    /// - `-ed25519`
+    /// - `-sr25519`
+    /// - `-ecdsa`
+    ///
+    /// Sequence invoking token override could be used when processing
+    /// individual network that (1) has no database record yet and (2) has
+    /// multiple allowed decimals and unit values retrieved as arrays of equal
+    /// size. To override token, key `-token` followed by `u8` decimals value
+    /// `String` unit value is used.
     Specs(Instruction),
+
+    /// Complete update QR generation, either signed or unsigned
+    ///
+    /// If update is signed and accepted in Signer, the signature author will
+    /// become a verifier in Signer, and some data afterwards could be accepted
+    /// by Signer only if signed by the same verifier.
+    ///
+    /// Verifier keys must be kept safe.
+    ///
+    /// # Assemble QR update with external signature
+    ///
+    /// `$ cargo run make <key(s)> <value(s)>`
+    ///
+    /// (here: what key-values are needed, how to get signature etc)
+    ///
+    /// ### Example: generate `load_metadata` QR code for westend metadata version 9200.
+    ///
+    /// At this point the payload is already prepared with `load_metadata`
+    /// command. File `sign_me_load_metadata_westendV9200` is in dedicated
+    /// [`FOLDER`](constants::FOLDER).
+    ///
+    /// After `make` command is executed, QR code will appear in dedicated
+    /// [`EXPORT_FOLDER`](constants::EXPORT_FOLDER).
+    ///
+    /// ### `make` for external signature
+    ///
+    /// Content of the payload file `sign_me_load_metadata_westendV9200` is
+    /// signed using some external tool, for example, `subkey`. Hexadecimal
+    /// `public key`, hexadecimal `signature`, and `encryption` will be needed
+    /// to run command:
+    ///
+    /// `$ cargo run make -qr -crypto <encryption> -msgtype load_metadata
+    /// -verifier -hex <public key> -payload sign_me_load_metadata_westendV9200
+    /// -signature -hex <signature>`
+    ///
+    /// Output file name would be `load_metadata_westendV9200`.
+    ///
+    /// ### `make` for test verifier Alice
+    ///
+    /// Alice has a well-known [seed phrase](constants::ALICE_SEED_PHRASE).
+    /// Payloads signed by Alice are used for testing in Signer. The signature
+    /// in this case is generated automatically and is not supplied in command
+    /// line.
+    ///
+    /// `$ cargo run make -qr -crypto <encryption> -msgtype load_metadata
+    /// -verifier Alice -payload sign_me_load_metadata_westendV9200`.
+    ///
+    /// Output file name would be `load_metadata_westendV9200_Alice-<encryption>`.
+    ///
+    /// ### `make` with no signature
+    ///
+    /// `$ cargo run make -qr -crypto none -msgtype load_metadata -payload
+    /// sign_me_load_metadata_westendV9200`
+    ///
+    /// Output file name would be `load_metadata_westendV9200_unverified`.
+    ///
+    /// # Assemble QR update using `SufficientCrypto` produced by Signer
+    ///
+    ///
     Make(Make),
     Remove(Remove),
     RestoreDefaults,
     MakeColdRelease(Option<PathBuf>),
     TransferMetaRelease,
     Derivations(Derivations),
-    Unwasm { filename: String, update_db: bool },
-    MetaDefaultFile { name: String, version: u32 },
+    Unwasm {
+        filename: String,
+        update_db: bool,
+    },
+    MetaDefaultFile {
+        name: String,
+        version: u32,
+    },
 }
 
 pub enum Show {
