@@ -136,7 +136,7 @@ pub const fn shell_200() -> &'static [u8] {
     include_bytes!("shell_200")
 }
 
-/// Identicons for test addresses
+/// Identicon for test address id_01
 pub const fn id_01() -> &'static [u8] {
     include_bytes!("id_01")
 }
