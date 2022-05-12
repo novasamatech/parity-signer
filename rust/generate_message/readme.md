@@ -101,7 +101,7 @@ Possible commands are:
     - token override key `-token` immediately followed by decimals value (should be `u8`) and unit name; could be used when generating network specs for networks with several supported tokens, when normal fetch returns an array instead of a single value; could be used only with `-u` reference key in `add_specs` generation **only** for networks not known to the database;  
     
 - `make` to `make_message` with following possible keys:  
-    - optional content key: `-qr` will generate only apng qr code, `-text` will generate only text file with hex encoded message; by default, both qr code and text message are generated; content keys are expected immediately after `make` command, if at all; keys to follow could go in any order, but with content immediately following the key.  
+    - optional content key: `-qr` will generate only apng qr code, `-text` will generate only text file with hex encoded message; by default, both qr code and text message are generated; content key is expected immediately after `make` command, if at all; keys to follow could go in any order, but with argument immediately following the key.  
     - key `-crypto` followed by encryption variant used in message verification:  
         - `ed25519`  
         - `sr25519`  
@@ -111,7 +111,7 @@ Possible commands are:
         - `load_types`  
         - `load_metadata`  
         - `add_specs`
-    - key `-verifier` (has to be entered if only the `-crypto` was `ed25519`, `sr25519`, or `ecdsa`), followed by:  
+    - key `-verifier` (can be entered if only the `-crypto` argument was `ed25519`, `sr25519`, or `ecdsa`), followed by:  
         - `Alice` to generate messages "verified" by Alice (used for tests)  
         - `-hex` followed by actual hex line of public key  
         - `-file` followed by file name ****, to read verifier public key as Vec<u8> from file named `****` from folder `../files/for_signing/`  
@@ -122,7 +122,7 @@ Possible commands are:
     - optional key `-name` followed by `****` - name override to save file named `****` for apng export and file named `****.txt` into folder `../files/signed/`  
     
 - `sign` to `make_message` using sufficient crypto information received from elsewhere, for example, from signer device, with following keys:  
-    - optional content key: `-qr` will generate only apng qr code, `-text` will generate only text file with hex encoded message; by default, both qr code and text message are generated; content keys are expected immediately after `make` command, if at all; keys to follow could go in any order, but with content immediately following the key.  
+    - optional content key: `-qr` will generate only apng qr code, `-text` will generate only text file with hex encoded message; by default, both qr code and text message are generated; content key is expected immediately after `sign` command, if at all; keys to follow could go in any order, but with argument immediately following the key.  
     - key `-sufficient` followed by:  
         - `-hex` followed by actual hex line of hex represented SCALE encoded sufficient crypto  
         - `-file` followed by file name ****, to read SCALE encoded sufficient crypto as Vec<u8> from file named `****` from folder `../files/for_signing/`  
@@ -144,7 +144,7 @@ Possible commands are:
 - `transfer_meta_to_cold_release` without any keys, to transfer metadata from hot database in its current state into cold database `COLD_DB_NAME_RELEASE` without any identities added  
 
 - `derivations` to generate Signer-readable qr code to import derivations, with following keys:  
-    - optional content key: `-qr` will generate only apng qr code, `-text` will generate only text file with hex encoded message; by default, both qr code and text message are generated; content keys are expected immediately after `derivations` command, if at all; keys to follow could go in any order, but with content immediately following the key.  
+    - optional content key: `-qr` will generate only apng qr code, `-text` will generate only text file with hex encoded message; by default, both qr code and text message are generated; content keys are expected immediately after `derivations` command, if at all; keys to follow could go in any order, but with argument immediately following the key.  
     - key `-title` followed by network title, the storage key in address book  
     - key `-payload` followed by file name to read derivation from, in `../generate_message` folder. Derivations should be on individual line each, empty line count as empty derivations (root ones). See file `../generate_message/standard_derivations_list` for formatting example. All succesfully read derivations will be also printed to user during the run. For now duplicates are allowed when creating transfer, only one entry is made in Signer when accepting the payload.  
 

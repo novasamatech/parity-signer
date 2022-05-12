@@ -80,7 +80,7 @@ pub enum Command {
 
     /// # Prepare payload for `load_metadata` update according to `Instruction`
     ///
-    /// `$ cargo run load_metadata <key(s)> <(value)>`
+    /// `$ cargo run load_metadata <key(s)> <(argument)>`
     ///
     /// A file is generated in dedicated [`FOLDER`](constants::FOLDER) to
     /// (optionally) be signed and later be transformed into `load_metadata`
@@ -113,7 +113,7 @@ pub enum Command {
 
     /// # Prepare payload for `add_specs` update according to `Instruction`
     ///
-    /// `$ cargo run add_specs <keys> <value(s)>`
+    /// `$ cargo run add_specs <keys> <argument(s)>`
     ///
     /// A file is generated in dedicated [`FOLDER`](constants::FOLDER) to
     /// (optionally) be signed and later be transformed into `add_specs` update
@@ -153,7 +153,7 @@ pub enum Command {
     /// individual network that (1) has no database record yet and (2) has
     /// multiple allowed decimals and unit values retrieved as arrays of equal
     /// size. To override token, key `-token` followed by `u8` decimals value
-    /// `String` unit value is used.
+    /// and `String` unit value is used.
     Specs(Instruction),
 
     /// Complete update QR generation, either signed or unsigned
@@ -166,9 +166,48 @@ pub enum Command {
     ///
     /// # Assemble QR update with external signature
     ///
-    /// `$ cargo run make <key(s)> <value(s)>`
+    /// `$ cargo run make <key(s)> <argument(s)>`
     ///
-    /// (here: what key-values are needed, how to get signature etc)
+    /// Keys to be used in command line:
+    ///
+    /// - Optional content key: `-qr` will generate only apng qr code, `-text`
+    /// will generate only text file with hex-encoded update. By default, i.e.
+    /// if content key is not provided, both qr code and text message are
+    /// generated. Optional content key is expected immediately after `make`
+    /// command, if at all; keys to follow could go in any order, but with
+    /// argument immediately following the key.  
+    ///
+    /// - Key `-crypto` followed by encryption used to make update signature:
+    ///    - `ed25519`  
+    ///    - `sr25519`  
+    ///    - `ecdsa`  
+    ///    - `none` if the message is not verified  
+    ///
+    /// - Key `-msgtype` followed by message type:  
+    ///    - `load_types`  
+    ///    - `load_metadata`  
+    ///    - `add_specs`
+    ///
+    /// - Key `-verifier` (can be entered if only the `-crypto` argument was
+    /// `ed25519`, `sr25519`, or `ecdsa`), followed by:  
+    ///    - `Alice` to generate messages "verified" by Alice (used for tests)  
+    ///    - `-hex` followed by hex public key  
+    ///    - `-file` followed by file path in dedicated
+    /// [`FOLDER`](constants::FOLDER) with public key as raw bytes
+    ///
+    /// - Key `-payload` followed by file path in dedicated
+    /// [`FOLDER`](constants::FOLDER) containing already generated payload as
+    /// raw bytes
+    ///
+    /// - Key `-signature` (can be entered if only the `-crypto` argument was
+    /// `ed25519`, `sr25519`, or `ecdsa` **and** `-verifier` is not `Alice`),
+    /// followed by:  
+    ///    - `-hex` followed by hex signature  
+    ///    - `-file` followed by file path in dedicated
+    /// [`FOLDER`](constants::FOLDER) with signature as raw bytes
+    ///
+    /// - Optional key `-name` followed by path override for export file in
+    /// dedicated [`EXPORT_FOLDER`](constants::EXPORT_FOLDER)
     ///
     /// ### Example: generate `load_metadata` QR code for westend metadata version 9200.
     ///
@@ -211,12 +250,120 @@ pub enum Command {
     ///
     /// Output file name would be `load_metadata_westendV9200_unverified`.
     ///
+    /// Note that the validity of the signature, if applicable, and the payload
+    /// content are checked before assembling QR update.
+    ///
     /// # Assemble QR update using `SufficientCrypto` produced by Signer
     ///
+    /// Updates could be signed in Signer itself, by generating
+    /// [`SufficientCrypto`] for data that is already in the Signer, with one of
+    /// the Signer keys. Signer exports `SufficientCrypto` as a static QR code,
+    /// its content is fed into command line.
     ///
+    /// `$ cargo run sign <key(s)> <argument(s)>`
+    ///
+    /// Keys to be used in command line:
+    ///
+    /// - Optional content key: `-qr` will generate only apng qr code, `-text`
+    /// will generate only text file with hex-encoded update. By default, i.e.
+    /// if content key is not provided, both qr code and text message are
+    /// generated. Optional content key is expected immediately after `make`
+    /// command, if at all; keys to follow could go in any order, but with
+    /// argument immediately following the key.
+    ///
+    /// - Key `-sufficient` followed by:  
+    ///    - `-hex` followed by hexadecimal string with SCALE-encoded
+    /// [`SufficientCrypto`], i.e. Signer QR code output content
+    ///    - `-file` followed by file path in dedicated
+    /// [`FOLDER`](constants::FOLDER) with SCALE-encoded [`SufficientCrypto`] as
+    /// raw bytes
+    ///
+    /// - Key `-msgtype` followed by message type:  
+    ///    - `load_types`  
+    ///    - `load_metadata`  
+    ///    - `add_specs`
+    ///
+    /// - Key `-payload` followed by file path in dedicated
+    /// [`FOLDER`](constants::FOLDER) containing already generated payload as
+    /// raw bytes
+    ///
+    /// - Optional key `-name` followed by path override for export file in
+    /// dedicated [`EXPORT_FOLDER`](constants::EXPORT_FOLDER)
+    ///
+    /// Note that the validity of the signature, if applicable, and the payload
+    /// content are checked before assembling QR update.
+    ///
+    /// Generating `SufficientCrypto` in Signer is suggested mainly for update
+    /// distribution purposes. A dedicated (i.e. used only for updates signing),
+    /// kept physically safe Signer is strongly suggested, with a dedicated key
+    /// for updates signing. As the Signer can accept only payloads with
+    /// verifier not weaker than the one used before, and the whole purpose of
+    /// the process is to generate a signature for payload, it is expected that
+    /// this isolated Signer will receive unsigned or weakly signed updates,
+    /// thoroughly check them and export `SufficientCrypto`, so that a signed
+    /// update could be made for other, routinely used Signer devices.
+    ///
+    /// ### Example: generate `load_metadata` QR code for westend metadata version 9200.
+    ///
+    /// At this point the payload is already prepared with `load_metadata`
+    /// command. File `sign_me_load_metadata_westendV9200` is in dedicated
+    /// [`FOLDER`](constants::FOLDER). Hexadecimal `hex_sufficient` string is
+    /// from [`SufficientCrypto`] QR code produced the Signer.
+    ///
+    /// After `make` command is executed, QR code will appear in dedicated
+    /// [`EXPORT_FOLDER`](constants::EXPORT_FOLDER).
+    ///
+    /// `$ cargo run sign -qr -sufficient -hex <hex_sufficient> -msgtype
+    /// load_metadata -payload sign_me_load_metadata_westendV9200`
+    ///
+    /// Output file name would be `load_metadata_westendV9200`.
     Make(Make),
+
+    /// Remove data from the hot database
+    ///
+    /// # Remove a single metadata entry
+    ///
+    /// `$ cargo run remove -name <network name> -version <network version>`
+    ///
+    /// # Remove all data associated with a network
+    ///
+    /// `$ cargo run remove -title <network address book title>`
+    ///
+    /// This will remove:
+    /// - address book entry
+    /// [`AddressBookEntry`](definitions::metadata::AddressBookEntry) from
+    /// [`ADDRESS_BOOK`](constants::ADDRESS_BOOK) tree
+    /// - network specs
+    /// [`NetworkSpecsToSend`](definitions::network_specs::NetworkSpecsToSend)
+    /// from [`SPECSTREEPREP`](constants::SPECSTREEPREP) tree
+    /// - all associated metadata entries from [`METATREE`](constants::METATREE)
+    /// if there are no other address book entries this metadata is associated
+    /// with
     Remove(Remove),
+
+    /// # Restore hot database to default state
+    ///
+    /// `$ cargo run restore_defaults`
+    ///
+    /// By default, hot database contains
+    ///
+    /// - [`ADDRESS_BOOK`](constants::ADDRESS_BOOK) and
+    /// [`SPECSTREEPREP`](constants::SPECSTREEPREP) entries for default networks
+    /// Polkadot, Kusama, and Westend
+    /// - types information in [`SETTREE`](constants::SETTREE)
+    /// - **no** metadata entries in [`METATREE`](constants::METATREE)
     RestoreDefaults,
+
+    /// # Generate release cold database
+    ///
+    /// `$ cargo run make_cold_release`
+    ///
+    // TODO remove option from inside or add additional argument for the path,
+    // now this became plain silly
+    ///
+    /// By default, cold release database contains:
+    ///
+    ///
     MakeColdRelease(Option<PathBuf>),
     TransferMetaRelease,
     Derivations(Derivations),

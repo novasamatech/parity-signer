@@ -182,6 +182,9 @@
 //! # Loading network metadata into the Signer and `load_metadata` payload
 //!
 //!
+// TODO add some notes here on the language. "update" is whole qr thing that
+// could be read by the Signer. "payload" is the un-husked content part, without
+// prelude, public key, signature. If I mess them up now, reader surely will.
 #![deny(unused_crate_dependencies)]
 
 use constants::{COLD_DB_NAME_RELEASE, HOT_DB_NAME, TYLO};
