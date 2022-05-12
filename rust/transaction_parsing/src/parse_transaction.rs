@@ -11,7 +11,6 @@ use definitions::{
     users::AddressDetails,
 };
 use parser::{cut_method_extensions, decoding_commons::OutputCard, parse_extensions, parse_method};
-use sp_core::H256;
 
 use crate::cards::{make_author_info, Card, Warning};
 use crate::helpers::{
@@ -44,9 +43,9 @@ pub(crate) fn parse_transaction(
     data_hex: &str,
     database_name: &str,
 ) -> Result<TransactionAction, ErrorSigner> {
-    let (author_multi_signer, parser_data, genesis_hash_vec, encryption) =
+    let (author_multi_signer, parser_data, genesis_hash, encryption) =
         multisigner_msg_genesis_encryption(data_hex)?;
-    let network_specs_key = NetworkSpecsKey::from_parts(&genesis_hash_vec, &encryption);
+    let network_specs_key = NetworkSpecsKey::from_parts(&genesis_hash, &encryption);
 
     // Some(true/false) should be here by the standard; should stay None for now, as currently existing transactions apparently do not comply to standard.
     let optional_mortal_flag = None; /*match &data_hex[4..6] {
@@ -266,7 +265,6 @@ pub(crate) fn parse_transaction(
         None => {
             // did not find network with matching genesis hash in database
             let author_card = Card::AuthorPublicKey(&author_multi_signer).card(&mut index, indent);
-            let genesis_hash = H256::from_slice(&genesis_hash_vec);
             let error_card = Card::Error(ErrorSigner::Input(InputSigner::UnknownNetwork {
                 genesis_hash,
                 encryption,

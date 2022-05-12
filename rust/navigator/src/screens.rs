@@ -122,7 +122,7 @@ impl KeysState {
         Ok(Self {
             seed_name: seed_name.to_string(),
             network_specs_key: NetworkSpecsKey::from_parts(
-                network_specs.genesis_hash.as_bytes(),
+                &network_specs.genesis_hash,
                 &network_specs.encryption,
             ),
             specialty: SpecialtyKeysState::None,

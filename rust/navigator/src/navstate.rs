@@ -104,11 +104,6 @@ impl State {
     fn handle_action_start(&self, dbname: &str) -> (Navstate, String) {
         let mut new_navstate = self.navstate.to_owned();
         let mut errorline = String::new();
-        println!(
-            "Seednames: {:?}, total: {}",
-            self.seed_names,
-            self.seed_names.len()
-        );
         match db_handling::interface_signer::purge_transactions(dbname) {
             Ok(()) => {
                 if self.seed_names.is_empty() {
@@ -1558,7 +1553,7 @@ impl State {
                         },
                     }
                 }
-                Screen::SeedSelector | Screen::SelectSeedForBackup => {
+                Screen::SeedSelector => {
                     let seed_name_cards =
                         db_handling::interface_signer::get_all_seed_names_with_identicons(
                             dbname,
@@ -1567,6 +1562,16 @@ impl State {
                         .unwrap();
                     let f = MSeeds { seed_name_cards };
                     ScreenData::SeedSelector { f }
+                }
+                Screen::SelectSeedForBackup => {
+                    let seed_name_cards =
+                        db_handling::interface_signer::get_all_seed_names_with_identicons(
+                            dbname,
+                            &self.seed_names,
+                        )
+                        .unwrap();
+                    let f = MSeeds { seed_name_cards };
+                    ScreenData::SelectSeedForBackup { f }
                 }
                 Screen::Keys(ref keys_state) => {
                     let (root, set, title, logo) =

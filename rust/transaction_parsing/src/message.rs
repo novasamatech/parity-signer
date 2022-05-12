@@ -9,7 +9,6 @@ use definitions::{
 };
 use parity_scale_codec::DecodeAll;
 use parser::cards::ParserCard;
-use sp_core::H256;
 
 use crate::cards::{make_author_info, Card, Warning};
 use crate::helpers::multisigner_msg_genesis_encryption;
@@ -19,9 +18,9 @@ pub fn process_message(
     data_hex: &str,
     database_name: &str,
 ) -> Result<TransactionAction, ErrorSigner> {
-    let (author_multi_signer, message_vec, genesis_hash_vec, encryption) =
+    let (author_multi_signer, message_vec, genesis_hash, encryption) =
         multisigner_msg_genesis_encryption(data_hex)?;
-    let network_specs_key = NetworkSpecsKey::from_parts(&genesis_hash_vec, &encryption);
+    let network_specs_key = NetworkSpecsKey::from_parts(&genesis_hash, &encryption);
 
     // this is a standard decoding of String, with utf8 conversion;
     // processing input vec![20, 104, 101, 3, 108, 111] will not throw error at element `3`,
@@ -118,7 +117,6 @@ pub fn process_message(
         }
         None => {
             let author_card = Card::AuthorPublicKey(&author_multi_signer).card(&mut index, indent);
-            let genesis_hash = H256::from_slice(&genesis_hash_vec);
             let error_card = Card::Error(ErrorSigner::Input(InputSigner::UnknownNetwork {
                 genesis_hash,
                 encryption,
@@ -126,7 +124,8 @@ pub fn process_message(
             .card(&mut index, indent);
             let message_card =
                 Card::ParserCard(&ParserCard::Text(message)).card(&mut index, indent);
-            let network_card = Card::NetworkGenesisHash(&genesis_hash_vec).card(&mut index, indent);
+            let network_card =
+                Card::NetworkGenesisHash(genesis_hash.as_ref()).card(&mut index, indent);
             Ok(TransactionAction::Read {
                 r: TransactionCardSet {
                     author: Some(vec![author_card]),

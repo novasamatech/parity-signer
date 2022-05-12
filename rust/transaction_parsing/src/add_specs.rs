@@ -24,8 +24,7 @@ use crate::holds::{GeneralHold, Hold, HoldRelease};
 pub fn add_specs(data_hex: &str, database_name: &str) -> Result<TransactionAction, ErrorSigner> {
     let checked_info = pass_crypto(data_hex, TransferContent::AddSpecs)?;
     let specs = ContentAddSpecs::from_slice(&checked_info.message).specs::<Signer>()?;
-    let network_specs_key =
-        NetworkSpecsKey::from_parts(specs.genesis_hash.as_bytes(), &specs.encryption);
+    let network_specs_key = NetworkSpecsKey::from_parts(&specs.genesis_hash, &specs.encryption);
     let verifier_key = VerifierKey::from_parts(specs.genesis_hash.as_bytes());
     let possible_valid_current_verifier =
         try_get_valid_current_verifier(&verifier_key, database_name)?;
