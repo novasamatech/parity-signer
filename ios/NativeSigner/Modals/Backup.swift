@@ -18,7 +18,6 @@ struct Backup: View {
     var body: some View {
         ZStack {
             RoundedRectangle(cornerRadius: 20.0).foregroundColor(Color("Bg200"))
-            /*
             VStack{
                 ZStack {
                     HeaderBar(line1: "Backup", line2: content.seedName.decode64())
@@ -69,13 +68,13 @@ struct Backup: View {
                                         NetworkCard(title: pack.networkTitle, logo: pack.networkLogo, fancy: true).padding(.top, 10)
                                         Spacer()
                                     }
-                                    ForEach(pack.id_set.sorted(by: {$0.path < $1.path}), id: \.self) {
+                                    ForEach(pack.idSet.sorted(by: {$0.path < $1.path}), id: \.self) {
                                         record in
                                         HStack{
                                             Text((record.path == "" && !record.hasPwd) ? "seed key" : record.path)
                                                 .foregroundColor(Color("Crypto400"))
                                                 .font(FCrypto(style: .body2))
-                                            if record.has_pwd {
+                                            if record.hasPwd {
                                                 Text("///").foregroundColor(Color("Crypto400"))
                                                     .font(FCrypto(style: .body2))
                                                 Image(systemName: "lock").foregroundColor(Color("Crypto400"))
@@ -107,22 +106,9 @@ struct Backup: View {
                                 secret = "Time out\n\nCome back again\nto see the seed phrase!"
                             }
                         }.padding(.horizontal, 16)
-                        /*
-                         RoundedRectangle(cornerRadius: 8).foregroundColor(Color("Bg300")).frame(height: 40)
-                         Text("Hide seed phrase in " + String(countdown) + "s")
-                         .onReceive(timer) { input in
-                         countdown -= 1
-                         if countdown == 0 {
-                         secret = "Time out\n\nCome back again\nto see the seed phrase!"
-                         }
-                         }
-                         .foregroundColor(Color("Action400"))
-                         .font(FBase(style: .button))
-                         */
                     }.padding(.bottom, 75)
                 }
             }
-             */
         }
     }
 }
