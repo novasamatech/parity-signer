@@ -21,11 +21,11 @@ struct NetworkDetails: View {
                     }
                     HStack {
                         Text("base58 prefix:")
-                        Text(String(format: "%c", content.base58prefix))
+                        Text(String(content.base58prefix))
                     }
                     HStack {
                         Text("decimals:")
-                        Text(String(format: "%c", content.decimals))
+                        Text(String(content.decimals))
                     }
                     HStack {
                         Text("unit:")

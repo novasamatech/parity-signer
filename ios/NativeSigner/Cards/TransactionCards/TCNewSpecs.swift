@@ -22,13 +22,13 @@ struct TCNewSpecs: View {
                 HStack {
                     Text("base58 prefix:")
                         .foregroundColor(Color("Text400"))
-                    Text(String(format: "%c", value.base58prefix))
+                    Text(String(value.base58prefix))
                         .foregroundColor(Color("Text600"))
                 }
                 HStack {
                     Text("decimals:")
                         .foregroundColor(Color("Text400"))
-                    Text(String(format: "%c", value.decimals))
+                    Text(String(value.decimals))
                         .foregroundColor(Color("Text600"))
                 }
                 HStack {
@@ -40,7 +40,7 @@ struct TCNewSpecs: View {
                 HStack {
                     Text("genesis hash:")
                         .foregroundColor(Color("Text400"))
-                    Text(String(format: "%c", value.genesisHash))
+                    Text(value.genesisHash.map{String(format: "%02X", $0)}.joined())
                         .foregroundColor(Color("Text600"))
                 }
                 HStack {
