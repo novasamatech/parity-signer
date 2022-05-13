@@ -99,7 +99,7 @@ extension TransactionCardSet {
 
 extension MRecoverSeedPhrase {
     func draftPhrase() -> String {
-        return self.draft.joined(separator: "")
+        return self.draft.joined(separator: " ")
     }
 }
 
