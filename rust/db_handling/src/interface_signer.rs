@@ -99,7 +99,7 @@ pub fn get_all_seed_names_with_identicons(
     Ok(res)
 }
 
-/// Print hex encoded `png` identicon data, for preferred encryption if
+/// Craete a `png` identicon data, for preferred encryption if
 /// multiple encryption algorithms are supported.
 ///
 /// Output is:
@@ -842,6 +842,9 @@ impl SeedDraft {
         }
     }
 
+    /// Make a `String` with a seed phrase draft.
+    ///
+    /// Returned string contains a secret and should be handled as such.
     pub fn draft(&self) -> Vec<String> {
         self.saved.iter().map(|w| w.word().to_string()).collect()
     }
@@ -849,7 +852,7 @@ impl SeedDraft {
     /// Combines all draft elements into seed phrase proposal,
     /// and checks its validity.
     /// If valid, outputs secret seed phrase.
-    pub fn try_finalize(&self) -> Option<Vec<String>> {
+    pub fn try_finalize(&self) -> Option<String> {
         let mut seed_phrase_proposal = String::with_capacity((WORD_LENGTH + 1) * BIP_CAP);
         for (i, x) in self.saved.iter().enumerate() {
             if i > 0 {
@@ -858,12 +861,7 @@ impl SeedDraft {
             seed_phrase_proposal.push_str(x.word());
         }
         if Mnemonic::validate(&seed_phrase_proposal, Language::English).is_ok() {
-            Some(
-                seed_phrase_proposal
-                    .split_whitespace()
-                    .map(|content| content.to_string())
-                    .collect(),
-            )
+            Some(seed_phrase_proposal)
         } else {
             seed_phrase_proposal.zeroize();
             None

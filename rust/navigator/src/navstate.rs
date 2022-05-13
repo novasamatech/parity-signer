@@ -1644,19 +1644,19 @@ impl State {
                     let draft = recover_seed_phrase_state.draft();
                     let user_input = draft.user_input();
                     let guess_set = guess(user_input);
-                    let ready_seed = draft
-                        .try_finalize()
-                        .map(|a| a.into_iter().collect::<Vec<_>>().join(" "));
-                    let draft = draft.draft();
+                    let ready_seed = draft.try_finalize();
+                    let mut draft = draft.draft();
 
                     let f = MRecoverSeedPhrase {
                         keyboard: new_navstate.keyboard(),
                         seed_name: recover_seed_phrase_state.name(),
                         user_input: user_input.to_string(),
                         guess_set: guess_set.iter().map(|s| s.to_string()).collect(),
-                        draft,
+                        draft: draft.clone(),
                         ready_seed,
                     };
+
+                    draft.zeroize();
                     ScreenData::RecoverSeedPhrase { f }
                 }
                 Screen::DeriveKey(ref derive_state) => {
