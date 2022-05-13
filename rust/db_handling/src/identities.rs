@@ -202,10 +202,8 @@ pub(crate) fn create_address<T: ErrorSource>(
     seed_phrase: &str,
 ) -> Result<PrepData, T::Error> {
     let mut address_prep = input_batch_prep.to_vec();
-    let network_specs_key = NetworkSpecsKey::from_parts(
-        network_specs.genesis_hash.as_bytes(),
-        &network_specs.encryption,
-    );
+    let network_specs_key =
+        NetworkSpecsKey::from_parts(&network_specs.genesis_hash, &network_specs.encryption);
 
     // create fixed-length string to avoid reallocations
     let mut full_address = String::with_capacity(seed_phrase.len() + path.len());
@@ -974,7 +972,7 @@ pub fn remove_seed(database_name: &str, seed_name: &str) -> Result<(), ErrorSign
                 &address_details.encryption,
                 &public_key,
                 &address_details.path,
-                &genesis_hash_vec,
+                genesis_hash_vec.as_ref(),
             );
             // separate `Event` for each `NetworkSpecsKey` from `network_id` set
             events.push(Event::IdentityRemoved { identity_history });

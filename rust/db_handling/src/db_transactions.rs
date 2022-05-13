@@ -562,7 +562,7 @@ impl TrDbColdStub {
         database_name: &str,
     ) -> Result<Self, ErrorSigner> {
         let network_specs_key = NetworkSpecsKey::from_parts(
-            network_specs_to_send.genesis_hash.as_bytes(),
+            &network_specs_to_send.genesis_hash,
             &network_specs_to_send.encryption,
         );
         let order = {
@@ -638,10 +638,8 @@ impl TrDbColdStub {
         valid_current_verifier: &ValidCurrentVerifier,
         general_verifier: &Verifier,
     ) -> Self {
-        let network_specs_key = NetworkSpecsKey::from_parts(
-            network_specs.genesis_hash.as_bytes(),
-            &network_specs.encryption,
-        );
+        let network_specs_key =
+            NetworkSpecsKey::from_parts(&network_specs.genesis_hash, &network_specs.encryption);
         self.network_specs_stub = self.network_specs_stub.new_removal(network_specs_key.key());
         self.history_stub.push(Event::NetworkSpecsRemoved {
             network_specs_display: NetworkSpecsDisplay::get(

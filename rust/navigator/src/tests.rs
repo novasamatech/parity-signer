@@ -591,7 +591,7 @@ fn flow_test_1() {
         footer_button: Some(FooterButton::Settings),
         right_button: Some(RightButton::Backup),
         screen_name_type: ScreenNameType::H4,
-        screen_data: ScreenData::SeedSelector {
+        screen_data: ScreenData::SelectSeedForBackup {
             f: MSeeds {
                 seed_name_cards: vec![],
             },
@@ -680,21 +680,21 @@ fn flow_test_1() {
             f: MManageNetworks {
                 networks: vec![
                     MMNetwork {
-                        key: "018091b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3"
+                        key: "0191b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3"
                             .to_string(),
                         title: "Polkadot".to_string(),
                         logo: "polkadot".to_string(),
                         order: 0,
                     },
                     MMNetwork {
-                        key: "0180b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe"
+                        key: "01b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe"
                             .to_string(),
                         title: "Kusama".to_string(),
                         logo: "kusama".to_string(),
                         order: 1,
                     },
                     MMNetwork {
-                        key: "0180e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e"
+                        key: "01e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e"
                             .to_string(),
                         title: "Westend".to_string(),
                         logo: "westend".to_string(),
@@ -723,7 +723,7 @@ fn flow_test_1() {
     do_action(Action::ManageNetworks, "", "").unwrap().unwrap();
     let action = do_action(
         Action::GoForward,
-        "0180b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe",
+        "01b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe",
         "",
     )
     .unwrap()
@@ -787,7 +787,7 @@ fn flow_test_1() {
 
     do_action(
         Action::GoForward,
-        "0180b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe",
+        "01b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe",
         "",
     )
     .unwrap();
@@ -929,14 +929,14 @@ fn flow_test_1() {
             f: MManageNetworks {
                 networks: vec![
                     MMNetwork {
-                        key: "018091b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3"
+                        key: "0191b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3"
                             .to_string(),
                         title: "Polkadot".to_string(),
                         logo: "polkadot".to_string(),
                         order: 0,
                     },
                     MMNetwork {
-                        key: "0180e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e"
+                        key: "01e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e"
                             .to_string(),
                         title: "Westend".to_string(),
                         logo: "westend".to_string(),
@@ -1300,21 +1300,21 @@ fn flow_test_1() {
             f: MManageNetworks {
                 networks: vec![
                     MMNetwork {
-                        key: "018091b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3"
+                        key: "0191b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3"
                             .to_string(),
                         title: "Polkadot".to_string(),
                         logo: "polkadot".to_string(),
                         order: 0,
                     },
                     MMNetwork {
-                        key: "0180e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e"
+                        key: "01e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e"
                             .to_string(),
                         title: "Westend".to_string(),
                         logo: "westend".to_string(),
                         order: 1,
                     },
                     MMNetwork {
-                        key: "0180b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe"
+                        key: "01b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe"
                             .to_string(),
                         title: "Kusama".to_string(),
                         logo: "kusama".to_string(),
@@ -2785,8 +2785,7 @@ fn flow_test_1() {
                 network_title: "Polkadot".to_string(),
                 network_logo: "polkadot".to_string(),
                 network_specs_key:
-                    "018091b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3"
-                        .to_string(),
+                    "0191b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3".to_string(),
                 suggested_derivation: String::new(),
                 keyboard: true,
                 derivation_check: None,
@@ -2823,8 +2822,7 @@ fn flow_test_1() {
                 network_title: "Polkadot".to_string(),
                 network_logo: "polkadot".to_string(),
                 network_specs_key:
-                    "018091b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3"
-                        .to_string(),
+                    "0191b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3".to_string(),
                 suggested_derivation: "//secret//path///multipass".to_string(),
                 keyboard: false,
                 derivation_check: None,
@@ -3334,7 +3332,7 @@ fn flow_test_1() {
         f: MNetworkMenu {
             networks: vec![
                 Network {
-                    key: "018091b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3"
+                    key: "0191b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3"
                         .to_string(),
                     logo: "polkadot".to_string(),
                     order: 0,
@@ -3342,7 +3340,7 @@ fn flow_test_1() {
                     title: "Polkadot".to_string(),
                 },
                 Network {
-                    key: "0180e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e"
+                    key: "01e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e"
                         .to_string(),
                     logo: "westend".to_string(),
                     order: 1,
@@ -3350,7 +3348,7 @@ fn flow_test_1() {
                     title: "Westend".to_string(),
                 },
                 Network {
-                    key: "0180b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe"
+                    key: "01b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe"
                         .to_string(),
                     logo: "kusama".to_string(),
                     order: 2,
@@ -3381,7 +3379,7 @@ fn flow_test_1() {
     do_action(Action::NetworkSelector, "", "").unwrap().unwrap();
     let action = do_action(
         Action::ChangeNetwork,
-        "0180e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e",
+        "01e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e",
         "",
     )
     .unwrap()
@@ -3604,7 +3602,7 @@ fn flow_test_1() {
     do_action(Action::NetworkSelector, "", "").unwrap().unwrap();
     let action = do_action(
         Action::ChangeNetwork,
-        "018091b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3",
+        "0191b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3",
         "",
     )
     .unwrap()
@@ -3620,7 +3618,7 @@ fn flow_test_1() {
     do_action(Action::NetworkSelector, "", "").unwrap().unwrap();
     do_action(
         Action::ChangeNetwork,
-        "0180e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e",
+        "01e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e",
         "",
     )
     .unwrap();
@@ -4211,8 +4209,7 @@ fn flow_test_1() {
                 network_title: "Westend".to_string(),
                 network_logo: "westend".to_string(),
                 network_specs_key:
-                    "0180e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e"
-                        .to_string(),
+                    "01e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e".to_string(),
                 suggested_derivation: String::new(),
                 keyboard: true,
                 derivation_check: None,
@@ -4392,7 +4389,7 @@ fn flow_test_1() {
         footer_button: Some(FooterButton::Settings),
         right_button: Some(RightButton::Backup),
         screen_name_type: ScreenNameType::H4,
-        screen_data: ScreenData::SeedSelector {
+        screen_data: ScreenData::SelectSeedForBackup {
             f: MSeeds {
                 seed_name_cards: vec![SeedNameCard {
                     seed_name: "Alice".to_string(),
@@ -4538,7 +4535,7 @@ fn flow_test_1() {
     do_action(Action::ManageNetworks, "", "").unwrap().unwrap();
     do_action(
         Action::GoForward,
-        "0180e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e",
+        "01e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e",
         "",
     )
     .unwrap();
@@ -4812,7 +4809,7 @@ fn flow_test_1() {
     do_action(Action::ManageNetworks, "", "").unwrap().unwrap();
     do_action(
         Action::GoForward,
-        "0180e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e",
+        "01e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e",
         "",
     )
     .unwrap();
@@ -5733,7 +5730,7 @@ fn flow_test_1() {
     do_action(Action::NetworkSelector, "", "").unwrap().unwrap();
     let mut action = do_action(
         Action::ChangeNetwork,
-        "0180e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e",
+        "01e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e",
         "",
     )
     .unwrap()
@@ -6016,7 +6013,7 @@ fn flow_test_1() {
     do_action(Action::NetworkSelector, "", "").unwrap().unwrap();
     do_action(
         Action::ChangeNetwork,
-        "0180e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e",
+        "01e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e",
         "",
     )
     .unwrap();
@@ -6039,8 +6036,7 @@ fn flow_test_1() {
                 network_title: "Westend".to_string(),
                 network_logo: "westend".to_string(),
                 network_specs_key:
-                    "0180e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e"
-                        .to_string(),
+                    "01e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e".to_string(),
                 suggested_derivation: String::new(),
                 keyboard: true,
                 derivation_check: None,

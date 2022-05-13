@@ -88,7 +88,7 @@ fn add_specs_westend_no_network_info_not_signed() {
     //"new_specs":[{"index":1,"indent":0,"type":"new_specs","payload":{"base58prefix":"42","color":"#660D35","decimals":"12","encryption":"sr25519","genesis_hash":"e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e","logo":"westend","name":"westend","path_id":"//westend","secondary_color":"#262626","title":"Westend","unit":"WND"}}]"##;
     let stub_nav_known = StubNav::AddSpecs {
         n: NetworkSpecsKey::from_parts(
-            &hex::decode("e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e")
+            &H256::from_str("e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e")
                 .unwrap(),
             &Encryption::Sr25519,
         ),
@@ -1211,7 +1211,7 @@ fn load_westend9070_not_signed() {
 
     let stub_nav_known = StubNav::LoadMeta {
         l: NetworkSpecsKey::from_parts(
-            &hex::decode("e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e")
+            &H256::from_str("e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e")
                 .unwrap(),
             &Encryption::Sr25519,
         ),
@@ -1413,7 +1413,7 @@ fn add_specs_dock_not_verified_db_not_verified() {
 
     let stub_nav_known = StubNav::AddSpecs {
         n: NetworkSpecsKey::from_parts(
-            &hex::decode("6bfe24dca2a3be10f22212678ac13a6446ec764103c0f3471c71609eac384aae")
+            &H256::from_str("6bfe24dca2a3be10f22212678ac13a6446ec764103c0f3471c71609eac384aae")
                 .unwrap(),
             &Encryption::Sr25519,
         ),
@@ -1478,7 +1478,7 @@ fn add_specs_dock_alice_verified_db_not_verified() {
 
     let stub_nav_known = StubNav::AddSpecs {
         n: NetworkSpecsKey::from_parts(
-            &hex::decode("6bfe24dca2a3be10f22212678ac13a6446ec764103c0f3471c71609eac384aae")
+            &H256::from_str("6bfe24dca2a3be10f22212678ac13a6446ec764103c0f3471c71609eac384aae")
                 .unwrap(),
             &Encryption::Sr25519,
         ),
@@ -1535,7 +1535,7 @@ fn add_specs_dock_not_verified_db_alice_verified() {
 
     let stub_nav_known = StubNav::AddSpecs {
         n: NetworkSpecsKey::from_parts(
-            &hex::decode("6bfe24dca2a3be10f22212678ac13a6446ec764103c0f3471c71609eac384aae")
+            &H256::from_str("6bfe24dca2a3be10f22212678ac13a6446ec764103c0f3471c71609eac384aae")
                 .unwrap(),
             &Encryption::Sr25519,
         ),
@@ -1597,7 +1597,7 @@ fn add_specs_dock_both_verified_same() {
 
     let stub_nav_known = StubNav::AddSpecs {
         n: NetworkSpecsKey::from_parts(
-            &hex::decode("6bfe24dca2a3be10f22212678ac13a6446ec764103c0f3471c71609eac384aae")
+            &H256::from_str("6bfe24dca2a3be10f22212678ac13a6446ec764103c0f3471c71609eac384aae")
                 .unwrap(),
             &Encryption::Sr25519,
         ),
@@ -1659,7 +1659,7 @@ fn add_specs_dock_both_verified_different() {
 
     let stub_nav_known = StubNav::AddSpecs {
         n: NetworkSpecsKey::from_parts(
-            &hex::decode("6bfe24dca2a3be10f22212678ac13a6446ec764103c0f3471c71609eac384aae")
+            &H256::from_str("6bfe24dca2a3be10f22212678ac13a6446ec764103c0f3471c71609eac384aae")
                 .unwrap(),
             &Encryption::Sr25519,
         ),
@@ -1713,7 +1713,7 @@ fn add_specs_westend_ed25519_not_signed() {
     };
     let stub_nav_known = StubNav::AddSpecs {
         n: NetworkSpecsKey::from_parts(
-            &hex::decode("e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e")
+            &H256::from_str("e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e")
                 .unwrap(),
             &Encryption::Ed25519,
         ),
@@ -1803,7 +1803,7 @@ fn add_specs_westend_ed25519_alice_signed_db_not_verified() {
     };
     let stub_nav_known = StubNav::AddSpecs {
         n: NetworkSpecsKey::from_parts(
-            &hex::decode("e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e")
+            &H256::from_str("e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e")
                 .unwrap(),
             &Encryption::Ed25519,
         ),
@@ -1886,7 +1886,7 @@ fn add_specs_westend_ed25519_both_verified_same() {
 
     let stub_nav_known = StubNav::AddSpecs {
         n: NetworkSpecsKey::from_parts(
-            &hex::decode("e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e")
+            &H256::from_str("e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e")
                 .unwrap(),
             &Encryption::Ed25519,
         ),

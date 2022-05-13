@@ -457,9 +457,7 @@ pub struct Network {
 
 impl From<NetworkSpecs> for Network {
     fn from(n: NetworkSpecs) -> Self {
-        let key = hex::encode(
-            NetworkSpecsKey::from_parts(n.genesis_hash.as_bytes(), &n.encryption).key(),
-        );
+        let key = hex::encode(NetworkSpecsKey::from_parts(&n.genesis_hash, &n.encryption).key());
         Network {
             key,
             logo: n.logo,

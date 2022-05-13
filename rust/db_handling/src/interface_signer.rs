@@ -252,7 +252,7 @@ pub fn show_all_networks_with_flag(
         .into_iter()
         .map(|network| {
             let network_specs_key_current =
-                NetworkSpecsKey::from_parts(network.genesis_hash.as_bytes(), &network.encryption);
+                NetworkSpecsKey::from_parts(&network.genesis_hash, &network.encryption);
             let mut n: Network = network.into();
             n.selected = network_specs_key == &network_specs_key_current;
             n
@@ -270,9 +270,7 @@ pub fn show_all_networks(database_name: &str) -> Result<Vec<MMNetwork>, ErrorSig
     let mut networks = networks
         .into_iter()
         .map(|n| MMNetwork {
-            key: hex::encode(
-                NetworkSpecsKey::from_parts(n.genesis_hash.as_bytes(), &n.encryption).key(),
-            ),
+            key: hex::encode(NetworkSpecsKey::from_parts(&n.genesis_hash, &n.encryption).key()),
             title: n.title,
             logo: n.logo,
             order: n.order,
@@ -384,7 +382,7 @@ pub fn backup_prep(database_name: &str, seed_name: &str) -> Result<MBackup, Erro
         let id_set: Vec<_> = addresses_set_seed_name_network(
             database_name,
             seed_name,
-            &NetworkSpecsKey::from_parts(network.genesis_hash.as_bytes(), &network.encryption),
+            &NetworkSpecsKey::from_parts(&network.genesis_hash, &network.encryption),
         )?
         .into_iter()
         .map(|a| DerivationEntry {
@@ -616,7 +614,7 @@ pub fn metadata_details(
             logo: network.logo,
             order: network.order as u32,
             current_on_screen: &NetworkSpecsKey::from_parts(
-                network.genesis_hash.as_bytes(),
+                &network.genesis_hash,
                 &network.encryption,
             ) == network_specs_key,
         })

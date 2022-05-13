@@ -13,7 +13,7 @@ use definitions::{
 };
 use frame_metadata::RuntimeMetadata;
 use parser::{method::OlderMeta, MetadataBundle};
-use sp_core::{ecdsa, ed25519, sr25519};
+use sp_core::{ecdsa, ed25519, sr25519, H256};
 use sp_runtime::MultiSigner;
 use std::convert::TryInto;
 
@@ -138,8 +138,7 @@ pub fn accept_meta_values(
 
 /// Function to check if the chaispecs are already in the database
 pub fn specs_are_new(new: &NetworkSpecsToSend, database_name: &str) -> Result<bool, ErrorSigner> {
-    let network_specs_key =
-        NetworkSpecsKey::from_parts(new.genesis_hash.as_bytes(), &new.encryption);
+    let network_specs_key = NetworkSpecsKey::from_parts(&new.genesis_hash, &new.encryption);
     let database = open_db::<Signer>(database_name)?;
     let chainspecs = open_tree::<Signer>(&database, SPECSTREE)?;
     match chainspecs.get(network_specs_key.key()) {
@@ -175,7 +174,7 @@ pub fn specs_are_new(new: &NetworkSpecsToSend, database_name: &str) -> Result<bo
 /// and network specs key
 pub fn multisigner_msg_genesis_encryption(
     data_hex: &str,
-) -> Result<(MultiSigner, Vec<u8>, Vec<u8>, Encryption), ErrorSigner> {
+) -> Result<(MultiSigner, Vec<u8>, H256, Encryption), ErrorSigner> {
     let data = unhex::<Signer>(data_hex, NotHexSigner::InputContent)?;
     let (multi_signer, data, encryption) = match &data_hex[2..4] {
         "00" => match data.get(3..35) {
@@ -217,7 +216,11 @@ pub fn multisigner_msg_genesis_encryption(
     if data.len() < 32 {
         return Err(ErrorSigner::Input(InputSigner::TooShort));
     }
-    let genesis_hash_vec = data[data.len() - 32..].to_vec(); // network genesis hash
+    // network genesis hash
+    let raw_hash: [u8; 32] = data[data.len() - 32..]
+        .try_into()
+        .map_err(|_| ErrorSigner::Input(InputSigner::TooShort))?;
+    let genesis_hash_vec = H256::from(raw_hash);
     let msg = data[..data.len() - 32].to_vec();
     Ok((multi_signer, msg, genesis_hash_vec, encryption))
 }

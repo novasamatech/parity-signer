@@ -177,7 +177,7 @@ fn print_ids_seed_name_network() {
         dbname,
         "Alice",
         &NetworkSpecsKey::from_parts(
-            &hex::decode("e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e")
+            &H256::from_str("e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e")
                 .unwrap(),
             &Encryption::Sr25519,
         ),
@@ -230,7 +230,7 @@ fn print_show_all_networks_flag_westend() {
     let menu = show_all_networks_with_flag(
         dbname,
         &NetworkSpecsKey::from_parts(
-            &hex::decode("e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e")
+            &H256::from_str("e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e")
                 .unwrap(),
             &Encryption::Sr25519,
         ),
@@ -239,7 +239,7 @@ fn print_show_all_networks_flag_westend() {
     let expected_menu = MNetworkMenu {
         networks: vec![
             Network {
-                key: "018091b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3"
+                key: "0191b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3"
                     .to_string(),
                 logo: "polkadot".to_string(),
                 order: 0,
@@ -247,7 +247,7 @@ fn print_show_all_networks_flag_westend() {
                 title: "Polkadot".to_string(),
             },
             Network {
-                key: "0180b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe"
+                key: "01b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe"
                     .to_string(),
                 logo: "kusama".to_string(),
                 order: 1,
@@ -255,7 +255,7 @@ fn print_show_all_networks_flag_westend() {
                 title: "Kusama".to_string(),
             },
             Network {
-                key: "0180e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e"
+                key: "01e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e"
                     .to_string(),
                 logo: "westend".to_string(),
                 order: 2,
@@ -275,19 +275,19 @@ fn show_all_networks_no_flag() {
     let networks = show_all_networks(dbname).unwrap();
     let expected_networks = vec![
         MMNetwork {
-            key: "018091b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3".to_string(),
+            key: "0191b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3".to_string(),
             title: "Polkadot".to_string(),
             logo: "polkadot".to_string(),
             order: 0,
         },
         MMNetwork {
-            key: "0180b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe".to_string(),
+            key: "01b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe".to_string(),
             title: "Kusama".to_string(),
             logo: "kusama".to_string(),
             order: 1,
         },
         MMNetwork {
-            key: "0180e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e".to_string(),
+            key: "01e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e".to_string(),
             title: "Westend".to_string(),
             logo: "westend".to_string(),
             order: 2,
@@ -320,7 +320,7 @@ fn export_alice_westend() {
         &MultiSigner::Sr25519(Public::from_raw(public)),
         "Alice",
         &NetworkSpecsKey::from_parts(
-            &hex::decode("e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e")
+            &H256::from_str("e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e")
                 .unwrap(),
             &Encryption::Sr25519,
         ),
@@ -417,7 +417,7 @@ fn derive_prep_alice() {
         dbname,
         "Alice",
         &NetworkSpecsKey::from_parts(
-            &hex::decode("e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e")
+            &H256::from_str("e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e")
                 .unwrap(),
             &Encryption::Sr25519,
         ),
@@ -430,7 +430,7 @@ fn derive_prep_alice() {
         seed_name: "Alice".to_string(),
         network_title: "Westend".to_string(),
         network_logo: "westend".to_string(),
-        network_specs_key: "0180e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e"
+        network_specs_key: "01e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e"
             .to_string(),
         suggested_derivation: "//secret//derive".to_string(),
         keyboard: false,
@@ -445,7 +445,8 @@ fn derive_prep_alice_collided() {
     let dbname = "for_tests/derive_prep_alice_collided";
     populate_cold(dbname, Verifier { v: None }).unwrap();
     let network_specs_key = NetworkSpecsKey::from_parts(
-        &hex::decode("e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e").unwrap(),
+        &H256::from_str("e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e")
+            .unwrap(),
         &Encryption::Sr25519,
     );
     let mut collision = None;
@@ -476,7 +477,7 @@ fn derive_prep_alice_collided() {
         seed_name: "Alice".to_string(),
         network_title: "Westend".to_string(),
         network_logo: "westend".to_string(),
-        network_specs_key: "0180e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e"
+        network_specs_key: "01e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e"
             .to_string(),
         suggested_derivation: "//Alice".to_string(),
         keyboard: false,
@@ -491,7 +492,8 @@ fn derive_prep_alice_collided_with_password() {
     let dbname = "for_tests/derive_prep_alice_collided_with_password";
     populate_cold(dbname, Verifier { v: None }).unwrap();
     let network_specs_key = NetworkSpecsKey::from_parts(
-        &hex::decode("e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e").unwrap(),
+        &H256::from_str("e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e")
+            .unwrap(),
         &Encryption::Sr25519,
     );
     try_create_address(
@@ -530,7 +532,7 @@ fn derive_prep_alice_collided_with_password() {
         seed_name: "Alice".to_string(),
         network_title: "Westend".to_string(),
         network_logo: "westend".to_string(),
-        network_specs_key: "0180e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e"
+        network_specs_key: "01e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e"
             .to_string(),
         suggested_derivation: "//secret///abracadabra".to_string(),
         keyboard: false,
@@ -547,7 +549,7 @@ fn westend_network_details() {
     let details = network_details_by_key(
         dbname,
         &NetworkSpecsKey::from_parts(
-            &hex::decode("e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e")
+            &H256::from_str("e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e")
                 .unwrap(),
             &Encryption::Sr25519,
         ),
@@ -603,7 +605,7 @@ fn westend_9010_metadata_details() {
     let network = metadata_details(
         dbname,
         &NetworkSpecsKey::from_parts(
-            &hex::decode("e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e")
+            &H256::from_str("e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e")
                 .unwrap(),
             &Encryption::Sr25519,
         ),
@@ -674,7 +676,7 @@ fn path_is_known() {
         dbname,
         "Alice",
         "//Alice",
-        "0180e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e",
+        "01e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e",
     );
     let expected_check = NavDerivationCheck {
         button_good: false,
@@ -701,7 +703,7 @@ fn path_is_unknown() {
         dbname,
         "Alice",
         "//secret",
-        "0180e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e",
+        "01e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e",
     );
     let expected_check = NavDerivationCheck {
         button_good: true,
@@ -721,7 +723,7 @@ fn path_is_unknown_passworded() {
         dbname,
         "Alice",
         "//secret///abracadabra",
-        "0180e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e",
+        "01e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e",
     );
     let expected_check = NavDerivationCheck {
         button_good: true,
@@ -987,7 +989,7 @@ fn test_generate_default_addresses_for_alice() {
     let default_addresses = addresses_set_seed_name_network(
         dbname,
         "Alice",
-        &NetworkSpecsKey::from_parts(chainspecs[0].genesis_hash.as_bytes(), &Encryption::Sr25519),
+        &NetworkSpecsKey::from_parts(&chainspecs[0].genesis_hash, &Encryption::Sr25519),
     )
     .unwrap();
 
@@ -1007,21 +1009,19 @@ fn test_generate_default_addresses_for_alice() {
                 has_pwd: false,
                 network_id: vec![
                     NetworkSpecsKey::from_hex(&hex::encode(&[
-                        1, 128, 145, 177, 113, 187, 21, 142, 45, 56, 72, 250, 35, 169, 241, 194,
-                        81, 130, 251, 142, 32, 49, 59, 44, 30, 180, 146, 25, 218, 122, 112, 206,
-                        144, 195,
+                        1, 145, 177, 113, 187, 21, 142, 45, 56, 72, 250, 35, 169, 241, 194, 81,
+                        130, 251, 142, 32, 49, 59, 44, 30, 180, 146, 25, 218, 122, 112, 206, 144,
+                        195,
                     ]))
                     .unwrap(),
                     NetworkSpecsKey::from_hex(&hex::encode(&[
-                        1, 128, 176, 168, 212, 147, 40, 92, 45, 247, 50, 144, 223, 183, 230, 31,
-                        135, 15, 23, 180, 24, 1, 25, 122, 20, 156, 169, 54, 84, 73, 158, 163, 218,
-                        254,
+                        1, 176, 168, 212, 147, 40, 92, 45, 247, 50, 144, 223, 183, 230, 31, 135,
+                        15, 23, 180, 24, 1, 25, 122, 20, 156, 169, 54, 84, 73, 158, 163, 218, 254,
                     ]))
                     .unwrap(),
                     NetworkSpecsKey::from_hex(&hex::encode(&[
-                        1, 128, 225, 67, 242, 56, 3, 172, 80, 232, 246, 248, 230, 38, 149, 209,
-                        206, 158, 78, 29, 104, 170, 54, 193, 205, 44, 253, 21, 52, 2, 19, 243, 66,
-                        62,
+                        1, 225, 67, 242, 56, 3, 172, 80, 232, 246, 248, 230, 38, 149, 209, 206,
+                        158, 78, 29, 104, 170, 54, 193, 205, 44, 253, 21, 52, 2, 19, 243, 66, 62,
                     ]))
                     .unwrap(),
                 ],
@@ -1042,8 +1042,8 @@ fn test_generate_default_addresses_for_alice() {
                 path: "//kusama".to_string(),
                 has_pwd: false,
                 network_id: vec![NetworkSpecsKey::from_hex(&hex::encode(&[
-                    1, 128, 176, 168, 212, 147, 40, 92, 45, 247, 50, 144, 223, 183, 230, 31, 135,
-                    15, 23, 180, 24, 1, 25, 122, 20, 156, 169, 54, 84, 73, 158, 163, 218, 254,
+                    1, 176, 168, 212, 147, 40, 92, 45, 247, 50, 144, 223, 183, 230, 31, 135, 15,
+                    23, 180, 24, 1, 25, 122, 20, 156, 169, 54, 84, 73, 158, 163, 218, 254,
                 ]))
                 .unwrap()],
                 encryption: Encryption::Sr25519,
@@ -1093,9 +1093,9 @@ fn test_derive() {
     );
     let seed_name = "Alice";
     let network_id_0 =
-        NetworkSpecsKey::from_parts(chainspecs[0].genesis_hash.as_bytes(), &Encryption::Sr25519);
+        NetworkSpecsKey::from_parts(&chainspecs[0].genesis_hash, &Encryption::Sr25519);
     let network_id_1 =
-        NetworkSpecsKey::from_parts(chainspecs[1].genesis_hash.as_bytes(), &Encryption::Sr25519);
+        NetworkSpecsKey::from_parts(&chainspecs[1].genesis_hash, &Encryption::Sr25519);
     let both_networks = vec![network_id_0.to_owned(), network_id_1];
     let only_one_network = vec![network_id_0];
 
@@ -1168,9 +1168,9 @@ fn test_identity_deletion() {
     try_create_seed("Alice", ALICE_SEED_PHRASE, true, dbname).unwrap();
     let chainspecs = default_chainspecs();
     let network_specs_key_0 =
-        NetworkSpecsKey::from_parts(chainspecs[0].genesis_hash.as_bytes(), &Encryption::Sr25519);
+        NetworkSpecsKey::from_parts(&chainspecs[0].genesis_hash, &Encryption::Sr25519);
     let network_specs_key_1 =
-        NetworkSpecsKey::from_parts(chainspecs[1].genesis_hash.as_bytes(), &Encryption::Sr25519);
+        NetworkSpecsKey::from_parts(&chainspecs[1].genesis_hash, &Encryption::Sr25519);
     let mut identities = addresses_set_seed_name_network(dbname, "Alice", &network_specs_key_0)
         .expect("Alice should have some addresses by default");
     println!("{:?}", identities);
@@ -1375,7 +1375,7 @@ fn increment_identities_1() {
     }
     let chainspecs = default_chainspecs();
     let network_id_0 =
-        NetworkSpecsKey::from_parts(chainspecs[0].genesis_hash.as_bytes(), &Encryption::Sr25519);
+        NetworkSpecsKey::from_parts(&chainspecs[0].genesis_hash, &Encryption::Sr25519);
     try_create_address("Alice", ALICE_SEED_PHRASE, "//Alice", &network_id_0, dbname).unwrap();
     let multisigner_path_set = get_multisigner_path_set(dbname);
     assert!(
@@ -1420,7 +1420,7 @@ fn increment_identities_2() {
     }
     let chainspecs = default_chainspecs();
     let network_id_0 =
-        NetworkSpecsKey::from_parts(chainspecs[0].genesis_hash.as_bytes(), &Encryption::Sr25519);
+        NetworkSpecsKey::from_parts(&chainspecs[0].genesis_hash, &Encryption::Sr25519);
     try_create_address("Alice", ALICE_SEED_PHRASE, "//Alice", &network_id_0, dbname).unwrap();
     try_create_address(
         "Alice",
@@ -1475,7 +1475,7 @@ fn increment_identities_3() {
     }
     let chainspecs = default_chainspecs();
     let network_id_0 =
-        NetworkSpecsKey::from_parts(chainspecs[0].genesis_hash.as_bytes(), &Encryption::Sr25519);
+        NetworkSpecsKey::from_parts(&chainspecs[0].genesis_hash, &Encryption::Sr25519);
     try_create_address("Alice", ALICE_SEED_PHRASE, "//Alice", &network_id_0, dbname).unwrap();
     try_create_address(
         "Alice",
@@ -1545,7 +1545,7 @@ fn creating_derivation_1() {
     populate_cold_no_metadata(dbname, Verifier { v: None }).unwrap();
     let chainspecs = default_chainspecs();
     let network_id_0 =
-        NetworkSpecsKey::from_parts(chainspecs[0].genesis_hash.as_bytes(), &Encryption::Sr25519);
+        NetworkSpecsKey::from_parts(&chainspecs[0].genesis_hash, &Encryption::Sr25519);
     assert!(
         try_create_address("Alice", ALICE_SEED_PHRASE, "//Alice", &network_id_0, dbname).is_ok(),
         "Should be able to create //Alice derivation."
@@ -1559,7 +1559,7 @@ fn creating_derivation_1() {
     }
     match try_create_address("Alice", ALICE_SEED_PHRASE, "//Alice", &network_id_0, dbname) {
             Ok(()) => panic!("Should NOT be able to create //Alice derivation again."),
-            Err(e) => assert!(<Signer>::show(&e) == "Error generating address. Seed Alice already has derivation //Alice for network specs key 0180b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe, public key d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d.", "Wrong error: {}", <Signer>::show(&e)),
+            Err(e) => assert_eq!(<Signer>::show(&e), "Error generating address. Seed Alice already has derivation //Alice for network specs key 01b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe, public key d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d.".to_string()),
         }
     fs::remove_dir_all(dbname).unwrap();
 }
@@ -1570,7 +1570,7 @@ fn creating_derivation_2() {
     populate_cold_no_metadata(dbname, Verifier { v: None }).unwrap();
     let chainspecs = default_chainspecs();
     let network_id_0 =
-        NetworkSpecsKey::from_parts(chainspecs[0].genesis_hash.as_bytes(), &Encryption::Sr25519);
+        NetworkSpecsKey::from_parts(&chainspecs[0].genesis_hash, &Encryption::Sr25519);
     assert!(
         try_create_address(
             "Alice",
@@ -1604,7 +1604,7 @@ fn creating_derivation_3() {
     populate_cold_no_metadata(dbname, Verifier { v: None }).unwrap();
     let chainspecs = default_chainspecs();
     let network_id_0 =
-        NetworkSpecsKey::from_parts(chainspecs[0].genesis_hash.as_bytes(), &Encryption::Sr25519);
+        NetworkSpecsKey::from_parts(&chainspecs[0].genesis_hash, &Encryption::Sr25519);
     assert!(
         try_create_address("Alice", ALICE_SEED_PHRASE, "//Alice", &network_id_0, dbname).is_ok(),
         "Should be able to create //Alice derivation."
@@ -1638,7 +1638,7 @@ fn creating_derivation_4() {
     populate_cold_no_metadata(dbname, Verifier { v: None }).unwrap();
     let chainspecs = default_chainspecs();
     let network_id_0 =
-        NetworkSpecsKey::from_parts(chainspecs[0].genesis_hash.as_bytes(), &Encryption::Sr25519);
+        NetworkSpecsKey::from_parts(&chainspecs[0].genesis_hash, &Encryption::Sr25519);
     assert!(
         try_create_address(
             "Alice",
@@ -1677,7 +1677,7 @@ fn creating_derivation_5() {
     populate_cold_no_metadata(dbname, Verifier { v: None }).unwrap();
     let chainspecs = default_chainspecs();
     let network_id_0 =
-        NetworkSpecsKey::from_parts(chainspecs[0].genesis_hash.as_bytes(), &Encryption::Sr25519);
+        NetworkSpecsKey::from_parts(&chainspecs[0].genesis_hash, &Encryption::Sr25519);
     assert!(
         try_create_address(
             "Alice",
@@ -1698,7 +1698,7 @@ fn creating_derivation_5() {
     }
     match try_create_address("Alice", ALICE_SEED_PHRASE, "//Alice///secret", &network_id_0, dbname) {
             Ok(()) => panic!("Should NOT be able to create //Alice///secret derivation again."),
-            Err(e) => assert!(<Signer>::show(&e) == "Error generating address. Seed Alice already has derivation //Alice///<password> for network specs key 0180b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe, public key 08a5e583f74f54f3811cb5f7d74e686d473e3a466fd0e95738707a80c3183b15.", "Wrong error: {}", <Signer>::show(&e)),
+            Err(e) => assert_eq!(<Signer>::show(&e), "Error generating address. Seed Alice already has derivation //Alice///<password> for network specs key 01b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe, public key 08a5e583f74f54f3811cb5f7d74e686d473e3a466fd0e95738707a80c3183b15.".to_string()),
         }
     fs::remove_dir_all(dbname).unwrap();
 }
@@ -2278,7 +2278,7 @@ fn remove_all_westend() {
 
     let genesis_hash = "e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e";
     let network_specs_key =
-        NetworkSpecsKey::from_parts(&hex::decode(genesis_hash).unwrap(), &Encryption::Sr25519);
+        NetworkSpecsKey::from_parts(&H256::from_str(genesis_hash).unwrap(), &Encryption::Sr25519);
     remove_network(&network_specs_key, dbname).unwrap();
 
     {
@@ -2433,7 +2433,7 @@ fn remove_westend_9010() {
     populate_cold(dbname, Verifier { v: None }).unwrap();
     let genesis_hash = "e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e";
     let network_specs_key =
-        NetworkSpecsKey::from_parts(&hex::decode(genesis_hash).unwrap(), &Encryption::Sr25519);
+        NetworkSpecsKey::from_parts(&H256::from_str(genesis_hash).unwrap(), &Encryption::Sr25519);
     let network_version = 9010;
     assert!(
         check_for_network("westend", network_version, dbname),
