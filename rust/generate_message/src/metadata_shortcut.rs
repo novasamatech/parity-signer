@@ -1,4 +1,4 @@
-//! Transform rpc call output into data sufficient for update payload generation
+//! Data for `load_metadata` and `add_specs` payloads and hot database updating
 use constants::{COLOR, SECONDARY_COLOR};
 use definitions::{
     crypto::Encryption,
@@ -17,14 +17,14 @@ use crate::helpers::{filter_address_book_by_url, genesis_hash_in_hot_db, process
 use crate::interpret_specs::interpret_properties;
 use crate::parser::TokenOverride;
 
-/// Struct to store MetaValues and genesis hash for network
+/// Data for `load_metadata` payload
 pub struct MetaShortCut {
     pub meta_values: MetaValues,
     pub genesis_hash: [u8; 32],
 }
 
-/// Function to process address as &str, fetch metadata and genesis hash for it,
-/// and output MetaShortCut value in case of success
+/// Get data needed for `load_metadata` payload [`MetaShortCut`] from given url
+/// address
 pub fn meta_shortcut(address: &str) -> Result<MetaShortCut, ErrorActive> {
     let new_info = match fetch_info(address) {
         Ok(a) => a,
@@ -48,26 +48,37 @@ pub fn meta_shortcut(address: &str) -> Result<MetaShortCut, ErrorActive> {
     })
 }
 
-/// Struct to store MetaValues, genesis hash, and NetworkSpecsToSend for network
-pub struct MetaSpecsShortCut {
-    pub meta_values: MetaValues,
+/// Data for `add_specs` payload
+pub struct SpecsShortCut {
+    /// network [`NetworkSpecsToSend`]
     pub specs: NetworkSpecsToSend,
-    pub update: bool, // flag to indicate that the database has no exact entry created
+
+    /// flag to indicate that exactly same entry is **not** yet in the database,
+    /// and the database could be updated
+    pub update: bool,
 }
 
-/// Function to process address as &str, fetch metadata, genesis hash, and network specs
-/// for it, and output MetaSpecsShortCut value in case of success
-pub fn meta_specs_shortcut(
+/// Get data needed for `add_specs` payload [`SpecsShortCut`] from given url
+/// address and command line input
+///
+/// Note that this function uses the database, even if `-d` setting key is used.
+pub fn specs_shortcut(
     address: &str,
     encryption: Encryption,
     optional_token_override: Option<TokenOverride>,
-) -> Result<MetaSpecsShortCut, ErrorActive> {
+) -> Result<SpecsShortCut, ErrorActive> {
+    // check entries in address book, to see if the url address is already known
     let entries = filter_address_book_by_url(address)?;
+
+    // token override is allowed only if the network is entirely new and token
+    // is not yet set
     if !entries.is_empty() && optional_token_override.is_some() {
         return Err(ErrorActive::NoTokenOverrideKnownNetwork {
             url: address.to_string(),
         });
     }
+
+    // actual fetch
     let new_info = match fetch_info_with_network_specs(address) {
         Ok(a) => a,
         Err(e) => {
@@ -77,13 +88,20 @@ pub fn meta_specs_shortcut(
             }))
         }
     };
+
+    // genesis hash in proper format
     let genesis_hash = get_genesis_hash(address, &new_info.genesis_hash)?;
+
+    // `MetaValues` are needed to get network name and (optionally) base58
+    // prefix
     let meta_values = MetaValues::from_str_metadata(
         &new_info.meta,
         IncomingMetadataSourceActiveStr::Fetch {
             url: address.to_string(),
         },
     )?;
+
+    // `NetworkProperties` checked and processed
     let new_properties = match interpret_properties(
         &new_info.properties,
         meta_values.optional_base58prefix,
@@ -97,7 +115,16 @@ pub fn meta_specs_shortcut(
             }))
         }
     };
+
+    // no entries in the address book for this url address
     if entries.is_empty() {
+        // Nonetheless, there are some entries in `SPECSTREE` with the same
+        // genesis hash.
+        //
+        // Most likely, this has happened because network already is known to
+        // the hot database, but with a different url address. At least for the
+        // time being, having more than one url address for the same network is
+        // not allowed.
         if genesis_hash_in_hot_db(genesis_hash)? {
             return Err(ErrorActive::Database(
                 DatabaseActive::NewAddressKnownGenesisHash {
@@ -106,6 +133,9 @@ pub fn meta_specs_shortcut(
                 },
             ));
         }
+
+        // Otherwise `NetworkSpecsToSend` entry is constructed with fetched and
+        // user-entered values and with default colors.
         let specs = NetworkSpecsToSend {
             base58prefix: new_properties.base58prefix,
             color: COLOR.to_string(),
@@ -119,14 +149,24 @@ pub fn meta_specs_shortcut(
             title: format!("{}-{}", meta_values.name, encryption.show()),
             unit: new_properties.unit,
         };
-        Ok(MetaSpecsShortCut {
-            meta_values,
+        Ok(SpecsShortCut {
             specs,
-            update: true,
+            update: true, // no entry in the database, can add it if requested
         })
     } else {
+        // there are address book entries for the network;
+        //
+        // find a most suitable entry: same encryption as requested is the most
+        // preferable, then the default entry, then any other entry
+        //
+        // tuple below is `specs` with appropriate title and encryption and
+        // `update` flag to indicate if the entry is not yet in the database,
+        // and could be added if requested
         let (specs, update) = process_indices(&entries, encryption)?;
+
         let url = address.to_string();
+
+        // check that base58 prefix did not change
         if specs.base58prefix != new_properties.base58prefix {
             return Err(ErrorActive::Fetch(Fetch::ValuesChanged {
                 url,
@@ -136,6 +176,8 @@ pub fn meta_specs_shortcut(
                 },
             }));
         }
+
+        // check that decimals did not change
         if specs.decimals != new_properties.decimals {
             return Err(ErrorActive::Fetch(Fetch::ValuesChanged {
                 url,
@@ -145,6 +187,8 @@ pub fn meta_specs_shortcut(
                 },
             }));
         }
+
+        // check that unit did not change
         if specs.unit != new_properties.unit {
             return Err(ErrorActive::Fetch(Fetch::ValuesChanged {
                 url,
@@ -154,6 +198,8 @@ pub fn meta_specs_shortcut(
                 },
             }));
         }
+
+        // check that name did not change
         if specs.name != meta_values.name {
             return Err(ErrorActive::Fetch(Fetch::ValuesChanged {
                 url,
@@ -163,16 +209,17 @@ pub fn meta_specs_shortcut(
                 },
             }));
         }
-        // NetworkSpecsToSend are good, can use them
-        Ok(MetaSpecsShortCut {
-            meta_values,
-            specs,
-            update,
-        })
+
+        // `NetworkSpecsToSend` are good, can use them
+        Ok(SpecsShortCut { specs, update })
     }
 }
 
-/// Helper function to interpret freshly fetched genesis hash
+/// Transform genesis hash from fetched hexadecimal string into proper format
+///
+/// Inputs url `address` from which the data was fetched and hex
+/// `fetched_genesis_hash`.
+// TODO fix genesis hash type if we fix genesis hash type after all
 fn get_genesis_hash(address: &str, fetched_genesis_hash: &str) -> Result<[u8; 32], ErrorActive> {
     let genesis_hash_vec = unhex::<Active>(
         fetched_genesis_hash,

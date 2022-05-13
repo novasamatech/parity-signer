@@ -8,9 +8,10 @@ use definitions::{
 
 use crate::metadata_shortcut::MetaShortCut;
 
-/// Function to print in standardly named file a plaintext output ready for signing
-/// for `load_meta` type of message.
-/// Input is MetaShortCut.
+/// Write to file raw bytes payload of `load_metadata` update
+///
+/// Resulting file, located in dedicated [`FOLDER`](constants::FOLDER), could be
+/// used to generate data signature and to produce updates.
 pub fn load_meta_print(shortcut: &MetaShortCut) -> Result<(), ErrorActive> {
     let filename = format!(
         "{}_{}V{}",
@@ -20,7 +21,10 @@ pub fn load_meta_print(shortcut: &MetaShortCut) -> Result<(), ErrorActive> {
     content.write(&filename)
 }
 
-/// Function to print `add_specs`
+/// Write to file raw bytes payload of `add_specs` update
+///
+/// Resulting file, located in dedicated [`FOLDER`](constants::FOLDER), could be
+/// used to generate data signature and to produce updates.
 pub fn print_specs(network_specs: &NetworkSpecsToSend) -> Result<(), ErrorActive> {
     let filename = format!(
         "{}_{}_{}",

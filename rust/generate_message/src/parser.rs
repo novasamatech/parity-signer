@@ -1,20 +1,4 @@
 //! Command line parser for the client
-//!
-//!
-//! Expected typical run commands:
-//!
-//! `$ cargo run show database`
-//!
-//! `$ cargo run show address_book`
-//!
-//! `$ cargo run load_metadata -n westend`
-//!
-//! `$ cargo run add_specs -d -n -ed25519 westend`
-//!
-//! `$ cargo run add_network -u wss://unknown-network.eu -ecdsa`
-//!
-//! `$ cargo run derivations -title westend -payload my_derivations_file`
-
 use constants::FOLDER;
 use definitions::{
     crypto::{Encryption, SufficientCrypto},
@@ -75,7 +59,7 @@ pub enum Command {
     ///
     /// A file is generated in dedicated [`FOLDER`](constants::FOLDER) to
     /// (optionally) be signed and later be transformed into `load_types` update
-    /// QR.
+    /// QR. Output file name is `sign_me_load_types`.
     Types,
 
     /// # Prepare payload for `load_metadata` update according to `Instruction`
@@ -84,7 +68,7 @@ pub enum Command {
     ///
     /// A file is generated in dedicated [`FOLDER`](constants::FOLDER) to
     /// (optionally) be signed and later be transformed into `load_metadata`
-    /// update QR.
+    /// update QR. Output file name is `sign_me_load_metadata_<name>V<version>`.
     ///
     /// Setting keys that could be used in command line (maximum one):
     ///
@@ -99,7 +83,7 @@ pub enum Command {
     /// - `-t` (no setting key defaults here): update database through rpc
     /// calls, produce output files
     ///
-    /// Reference keys (exactly only one has to be used):  
+    /// Reference keys (exactly only one has to be used):
     ///
     /// - `-a`: all networks with entries in the
     /// [`ADDRESS_BOOK`](constants::ADDRESS_BOOK) tree of the hot database
@@ -117,7 +101,7 @@ pub enum Command {
     ///
     /// A file is generated in dedicated [`FOLDER`](constants::FOLDER) to
     /// (optionally) be signed and later be transformed into `add_specs` update
-    /// QR.
+    /// QR. Output file name is `sign_me_add_specs_<name>_<encryption>`.
     ///
     /// Setting keys that could be used in command line (maximum one):
     ///
@@ -129,7 +113,7 @@ pub enum Command {
     /// - `-t` (no setting key defaults here): update database through rpc
     /// calls, produce output files
     ///
-    /// Reference keys (exactly only one has to be used):  
+    /// Reference keys (exactly only one has to be used):
     ///
     /// - `-a`: all networks with entries in the
     /// [`ADDRESS_BOOK`](constants::ADDRESS_BOOK) tree of the hot database
@@ -170,28 +154,28 @@ pub enum Command {
     ///
     /// Keys to be used in command line:
     ///
-    /// - Optional content key: `-qr` will generate only apng qr code, `-text`
-    /// will generate only text file with hex-encoded update. By default, i.e.
-    /// if content key is not provided, both qr code and text message are
-    /// generated. Optional content key is expected immediately after `make`
-    /// command, if at all; keys to follow could go in any order, but with
-    /// argument immediately following the key.  
+    /// - Optional output format key: `-qr` will generate only apng qr code,
+    /// `-text` will generate only text file with hex-encoded update. By
+    /// default, i.e. if content key is not provided, both qr code and text
+    /// message are generated. Optional output format key is expected
+    /// immediately after `make` command, if at all; keys to follow could go in
+    /// any order, but with argument immediately following the key.
     ///
     /// - Key `-crypto` followed by encryption used to make update signature:
-    ///    - `ed25519`  
-    ///    - `sr25519`  
-    ///    - `ecdsa`  
-    ///    - `none` if the message is not verified  
+    ///    - `ed25519`
+    ///    - `sr25519`
+    ///    - `ecdsa`
+    ///    - `none` if the message is not verified
     ///
-    /// - Key `-msgtype` followed by message type:  
-    ///    - `load_types`  
-    ///    - `load_metadata`  
+    /// - Key `-msgtype` followed by message type:
+    ///    - `load_types`
+    ///    - `load_metadata`
     ///    - `add_specs`
     ///
     /// - Key `-verifier` (can be entered if only the `-crypto` argument was
-    /// `ed25519`, `sr25519`, or `ecdsa`), followed by:  
-    ///    - `Alice` to generate messages "verified" by Alice (used for tests)  
-    ///    - `-hex` followed by hex public key  
+    /// `ed25519`, `sr25519`, or `ecdsa`), followed by:
+    ///    - `Alice` to generate messages "verified" by Alice (used for tests)
+    ///    - `-hex` followed by hex public key
     ///    - `-file` followed by file path in dedicated
     /// [`FOLDER`](constants::FOLDER) with public key as raw bytes
     ///
@@ -201,8 +185,8 @@ pub enum Command {
     ///
     /// - Key `-signature` (can be entered if only the `-crypto` argument was
     /// `ed25519`, `sr25519`, or `ecdsa` **and** `-verifier` is not `Alice`),
-    /// followed by:  
-    ///    - `-hex` followed by hex signature  
+    /// followed by:
+    ///    - `-hex` followed by hex signature
     ///    - `-file` followed by file path in dedicated
     /// [`FOLDER`](constants::FOLDER) with signature as raw bytes
     ///
@@ -234,6 +218,7 @@ pub enum Command {
     /// ### `make` for test verifier Alice
     ///
     /// Alice has a well-known [seed phrase](constants::ALICE_SEED_PHRASE).
+    /// Here derivation `//Alice` is used.
     /// Payloads signed by Alice are used for testing in Signer. The signature
     /// in this case is generated automatically and is not supplied in command
     /// line.
@@ -264,23 +249,23 @@ pub enum Command {
     ///
     /// Keys to be used in command line:
     ///
-    /// - Optional content key: `-qr` will generate only apng qr code, `-text`
-    /// will generate only text file with hex-encoded update. By default, i.e.
-    /// if content key is not provided, both qr code and text message are
-    /// generated. Optional content key is expected immediately after `make`
-    /// command, if at all; keys to follow could go in any order, but with
-    /// argument immediately following the key.
+    /// - Optional output format key: `-qr` will generate only apng qr code,
+    /// `-text` will generate only text file with hex-encoded update. By
+    /// default, i.e. if content key is not provided, both qr code and text
+    /// message are generated. Optional output format key is expected
+    /// immediately after `make` command, if at all; keys to follow could go in
+    /// any order, but with argument immediately following the key.
     ///
-    /// - Key `-sufficient` followed by:  
+    /// - Key `-sufficient` followed by:
     ///    - `-hex` followed by hexadecimal string with SCALE-encoded
     /// [`SufficientCrypto`], i.e. Signer QR code output content
     ///    - `-file` followed by file path in dedicated
     /// [`FOLDER`](constants::FOLDER) with SCALE-encoded [`SufficientCrypto`] as
     /// raw bytes
     ///
-    /// - Key `-msgtype` followed by message type:  
-    ///    - `load_types`  
-    ///    - `load_metadata`  
+    /// - Key `-msgtype` followed by message type:
+    ///    - `load_types`
+    ///    - `load_metadata`
     ///    - `add_specs`
     ///
     /// - Key `-payload` followed by file path in dedicated
@@ -356,126 +341,328 @@ pub enum Command {
 
     /// # Generate release cold database
     ///
-    /// `$ cargo run make_cold_release`
+    /// `$ cargo run make_cold_release <optional path>`
     ///
-    // TODO remove option from inside or add additional argument for the path,
-    // now this became plain silly
+    /// This generates release cold database (unitiniated) at user-provided path
+    /// or, if no valid path is given, at default path
+    /// [`COLD_DB_NAME_RELEASE`](constants::COLD_DB_NAME_RELEASE).
     ///
-    /// By default, cold release database contains:
+    /// The cold release database, as generated, contains:
     ///
+    /// - network specs for default networks (Polkadot, Kusama, Westend)
+    /// - verifier information for default networks, with verifiers set to the
+    /// general one
+    /// - two latest metadata versions for default networks
+    /// - default types information
     ///
+    /// Note that the general verifier is not specified and history is not
+    /// started. This will be done only in Signer itself.
     MakeColdRelease(Option<PathBuf>),
-    TransferMetaRelease,
+
+    /// # Transfer metadata from hot database to release cold database
+    ///
+    /// `$ cargo run transfer_meta_to_cold_release <optional path>`
+    ///
+    /// This transfers metadata from hot database to release cold database at
+    /// user-provided path or, if no valid path is given, at default path
+    /// [`COLD_DB_NAME_RELEASE`](constants::COLD_DB_NAME_RELEASE).
+    ///
+    /// Metadata is transfered only for the networks that are known to the cold
+    /// database, i.e. the ones having
+    /// [`NetworkSpecs`](definitions::network_specs::NetworkSpecs) on record.
+    TransferMetaRelease(Option<PathBuf>),
+
+    /// # Make QR update with `derivations` payload
+    ///
+    /// `$ cargo run derivations <keys> <arguments>`
+    ///
+    /// Keys to be used in command line:
+    ///
+    /// - Optional output format key: `-qr` will generate only apng qr code,
+    /// `-text` will generate only text file with hex-encoded update. By
+    /// default, i.e. if content key is not provided, both qr code and text
+    /// message are generated. Optional output format key is expected
+    /// immediately after `make` command, if at all; keys to follow could go in
+    /// any order, but with argument immediately following the key.
+    ///
+    /// - Key `-payload` followed by file path in `/generate_message/` folder.
+    /// File contains password-free derivations, each on its own line. Only
+    /// suitable derivations will be processed. Processed derivations are also
+    /// printed for user to check.
+    ///
+    /// - Key `-title` followed by network address book title, to indicate to
+    /// which network the derivatinos belong.
+    ///
+    /// Output file name would be `derivations-<network address book title>`.
     Derivations(Derivations),
-    Unwasm {
-        filename: String,
-        update_db: bool,
-    },
-    MetaDefaultFile {
-        name: String,
-        version: u32,
-    },
+
+    /// # Prepare payload for `load_metadata` update from `.wasm` file
+    ///
+    /// `$ cargo run unwasm <key(s)> <argument>`
+    ///
+    /// A file is generated in dedicated [`FOLDER`](constants::FOLDER) to
+    /// (optionally) be signed and later be transformed into `load_metadata`
+    /// update QR. Output file name is `sign_me_load_metadata_<name>V<version>`.
+    ///
+    /// This could be used to generate update QR codes before the metadata
+    /// becomes accessible from the node. As `load_metadata` payload contains
+    /// genesis hash, it must be retrieved from the hot database. Thus, `unwasm`
+    /// command could be used only for the networks introduced already to the
+    /// hot database.
+    ///
+    /// Keys to be used in command line:
+    ///
+    /// - Key `-payload` followed by `.wasm` file path in `/generate_message/`
+    /// folder.
+    ///
+    /// - Optional `-d` key to skip updating the database.
+    Unwasm { filename: String, update_db: bool },
+
+    /// # Make metadata file for `defaults` set
+    ///
+    /// `$ cargo run meta_default_file -name <network name> -version
+    /// <network_version>`
+    ///
+    /// Produces file with hex-encoded network metadata from the hot database
+    /// [`METATREE`](constants::METATREE) entry.
+    ///
+    /// Output file named `<network_name><network_version>` is generated in
+    /// dedicated [`EXPORT_FOLDER`](constants::EXPORT_FOLDER).
+    MetaDefaultFile { name: String, version: u32 },
 }
 
+/// Display data commands
 pub enum Show {
+    /// Show all hot database [`METATREE`](constants::METATREE) entries
     Database,
+
+    /// Show all hot database [`ADDRESS_BOOK`](constants::ADDRESS_BOOK) entries
     AddressBook,
+
+    /// Check that external file is valid network metadata and search for
+    /// similar entry in hot database [`METATREE`](constants::METATREE)
     CheckFile(String),
 }
 
+/// Command details for `load_metadata` and `add_specs`
 pub struct Instruction {
+    /// Setting key, as read from command line
     pub set: Set,
+
+    /// Reference key, as read from command line
     pub content: Content,
+
+    /// Flag to indicate skipping error, optional `-s` key sets this to false
     pub pass_errors: bool,
+
+    /// Overrides, relevant only for `add_specs` command
     pub over: Override,
 }
 
+/// Reference key for `load_metadata` and `add_specs` commands
 pub enum Content {
+    /// Key `-a`: deal with all relevant database entries
     All,
+
+    /// Key `-n`: process only the network referred to by:
+    ///
+    /// - network name (in `load_metadata` command)
+    /// - network address book title (in `add_specs` command)
     Name(String),
+
+    /// Key `-u`: process only the network referred to by url address
     Address(String),
 }
 
+/// Setting key for `load_metadata` and `add_specs` commands
 pub enum Set {
-    D, // key `-d`: do NOT update the database, make rpc calls, and produce ALL possible output files
-    F, // key `-f`: do NOT run rps calls, produce ALL possible output files from existing database
-    K, // key `-k`: update database through rpc calls, produce output files only for UPDATED database entries
-    P, // key `-p`: update database through rpc calls, do NOT produce any output files
-    T, // key `-t`: default setting, update database through rpc calls, produce ALL possible output files
+    /// Key `-d`: do **not** update the database, make rpc calls, and produce
+    /// output files
+    D,
+
+    /// Key `-f`: do **not** run rpc calls, produce output files from database
+    /// as it is
+    F,
+
+    /// Key `-k`: update database through rpc calls, produce output files only
+    /// for **updated** database entries
+    K,
+
+    /// Key `-p`: update database through rpc calls, do **not** produce any
+    /// output files
+    P,
+
+    /// Key `-t` (no setting key defaults here): update database through rpc
+    /// calls, produce output files
+    T,
 }
 
+/// Data to process `make` and `sign` commands
 pub struct Make {
+    /// Target output format
     pub goal: Goal,
+
+    /// Who is signing the payload
     pub crypto: Crypto,
+
+    /// Payload
     pub msg: Msg,
+
+    /// Output name override
     pub name: Option<String>,
 }
 
+/// Target output format for `derivations`, `make` and `sign` commands
 pub enum Goal {
+    /// Only QR code
     Qr,
+
+    /// Only text file with hexadecimal string (used for tests)
     Text,
+
+    /// Both QR code and text file, default
     Both,
 }
 
+/// Verifier-to-be, for `make` and `sign` commands
 pub enum Crypto {
+    /// Alice key, with well-known [seed phrase](constants::ALICE_SEED_PHRASE)
+    /// and derivation `//Alice`, to generate test updating payloads.
+    ///
+    /// Associated data is [`Encryption`] algorithm used.
     Alice(Encryption),
+
+    /// No verifier, to make unsigned updates.
     None,
+
+    /// Real verifier, [`SufficientCrypto`] is either assembled from `make`
+    /// command input parts or from `sign` command input directly.
     Sufficient(SufficientCrypto),
 }
 
+/// Payload for `make` and `sign` commands
+///
+/// Associated data is `Vec<u8>` blob that becomes part of the update.
+///
+/// Payload content details are described in [definitions::qr_transfers].
 pub enum Msg {
+    /// `load_types` payload
     LoadTypes(Vec<u8>),
+
+    /// `load_metadata` payload
     LoadMetadata(Vec<u8>),
+
+    /// `add_specs` payload
     AddSpecs(Vec<u8>),
 }
 
+/// Argument for `-crypto` key in `make` command
 enum CryptoType {
+    /// `ed25519` argument
     Ed25519,
+
+    /// `sr25519` argument
     Sr25519,
+
+    /// `ecdsa` argument
     Ecdsa,
+
+    /// `none` argument
     None,
 }
 
+/// Argument for `-msgtype` key in `make` and `sign` commands
 enum MsgType {
+    /// `load_types` argument
     LoadTypes,
+
+    /// `load_metadata` argument
     LoadMetadata,
+
+    /// `add_specs` argument
     AddSpecs,
 }
 
+/// Argument for `-verifier` key in `make` command
 enum VerKey {
+    /// Hexadecimal string input, entered with `-hex` key.
+    ///
+    /// Associated data is the string itself.
     Hex(String),
+
+    /// Input from file, entered with `-file` key.
+    ///
+    /// Associated data is the file path.
     File(String),
+
+    /// Verifier is Alice
     Alice,
 }
 
+/// Argument for `-signature` key in `make` command
 enum Entry {
+    /// Hexadecimal string input, entered with `-hex` key.
+    ///
+    /// Associated data is the string itself.
     Hex(String),
+
+    /// Input from file, entered with `-file` key.
+    ///
+    /// Associated data is the file path.
     File(String),
 }
 
+/// Data to process `remove` command
 pub enum Remove {
+    /// Removing all network data by network address book title.
+    ///
+    /// Associated data is user-entered network address book title.
     Title(String),
+
+    /// Remove specified network metadata entry.
+    ///
+    /// Associated data is network name and version.
     SpecNameVersion { name: String, version: u32 },
 }
 
+/// Data to process `derivations` command
 pub struct Derivations {
+    /// Target output format
     pub goal: Goal,
+
+    /// Address book title for network in which addresses with imported
+    /// derivations will be made in Signer
     pub title: String,
+
+    /// Contents of the payload file
     pub derivations: String,
 }
 
+/// Overrides for `add_specs` command
 pub struct Override {
+    /// [`Encryption`] override to specify encryption algorithm used by a new
+    /// network or to add another encryption algorithm in known network.
     pub encryption: Option<Encryption>,
+
+    /// Token override to specify decimals and units used to display balance in
+    /// network transactions.
+    ///
+    /// Token override could be invoked only if:
+    ///
+    /// - network has no database record yet
+    /// - network has multiple decimals and unit values, those were retrieved as
+    /// arrays of equal size.
     pub token: Option<TokenOverride>,
 }
 
+/// Data from command line for token override
 pub struct TokenOverride {
     pub decimals: u8,
     pub unit: String,
 }
 
 impl Command {
-    /// FUnction to interpret command line input
+    /// Interpret command line input into `Command`
     pub fn new(mut args: env::Args) -> Result<Command, ErrorActive> {
         args.next();
 
@@ -1313,24 +1500,30 @@ impl Command {
                             Ok(Command::RestoreDefaults)
                         }
                     }
-                    "make_cold_release" => {
-                        if args.next().is_some() {
-                            Err(ErrorActive::CommandParser(
-                                CommandParser::UnexpectedKeyArgumentSequence,
-                            ))
-                        } else {
-                            Ok(Command::MakeColdRelease(None))
+                    "make_cold_release" => match args.next() {
+                        Some(path) => {
+                            if args.next().is_some() {
+                                Err(ErrorActive::CommandParser(
+                                    CommandParser::UnexpectedKeyArgumentSequence,
+                                ))
+                            } else {
+                                Ok(Command::MakeColdRelease(Some(PathBuf::from(path))))
+                            }
                         }
-                    }
-                    "transfer_meta_to_cold_release" => {
-                        if args.next().is_some() {
-                            Err(ErrorActive::CommandParser(
-                                CommandParser::UnexpectedKeyArgumentSequence,
-                            ))
-                        } else {
-                            Ok(Command::TransferMetaRelease)
+                        None => Ok(Command::MakeColdRelease(None)),
+                    },
+                    "transfer_meta_to_cold_release" => match args.next() {
+                        Some(path) => {
+                            if args.next().is_some() {
+                                Err(ErrorActive::CommandParser(
+                                    CommandParser::UnexpectedKeyArgumentSequence,
+                                ))
+                            } else {
+                                Ok(Command::TransferMetaRelease(Some(PathBuf::from(path))))
+                            }
                         }
-                    }
+                        None => Ok(Command::TransferMetaRelease(None)),
+                    },
                     "derivations" => {
                         let mut goal = Goal::Both; // default option for `derivations`
                         let mut args = args.peekable();
@@ -1547,6 +1740,7 @@ impl Command {
     }
 }
 
+/// Get verifier infortmation from command line arguments
 fn process_verifier_and_signature(
     verifier_found: Option<VerKey>,
     signature_found: Option<Entry>,
@@ -1589,6 +1783,7 @@ fn process_verifier_and_signature(
     }
 }
 
+/// Get `Vec<u8>` signature draft from command line entry into
 fn get_needed_signature(signature_found: Option<Entry>) -> Result<Vec<u8>, ErrorActive> {
     match signature_found {
         Some(Entry::Hex(t)) => Ok(unhex::<Active>(&t, NotHexActive::InputSignature)?),
@@ -1605,6 +1800,7 @@ fn get_needed_signature(signature_found: Option<Entry>) -> Result<Vec<u8>, Error
     }
 }
 
+/// Fit public key and signature drafts into [`SufficientCrypto`]
 fn into_sufficient(
     verifier_public_key: Vec<u8>,
     signature: Vec<u8>,

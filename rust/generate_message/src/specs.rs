@@ -15,7 +15,7 @@ use crate::helpers::{
     network_specs_from_entry, network_specs_from_title, process_indices,
     try_get_network_specs_to_send, update_db,
 };
-use crate::metadata_shortcut::meta_specs_shortcut;
+use crate::metadata_shortcut::specs_shortcut;
 use crate::output_prep::print_specs;
 use crate::parser::{Content, Instruction, Set, TokenOverride};
 
@@ -191,7 +191,7 @@ fn specs_d_u(
     encryption: Encryption,
     optional_token_override: Option<TokenOverride>,
 ) -> Result<(), ErrorActive> {
-    let shortcut = meta_specs_shortcut(address, encryption, optional_token_override)?;
+    let shortcut = specs_shortcut(address, encryption, optional_token_override)?;
     print_specs(&shortcut.specs)
 }
 
@@ -266,7 +266,7 @@ fn specs_pt_u(
     optional_token_override: Option<TokenOverride>,
     printing: bool,
 ) -> Result<(), ErrorActive> {
-    let shortcut = meta_specs_shortcut(address, encryption.to_owned(), optional_token_override)?;
+    let shortcut = specs_shortcut(address, encryption.to_owned(), optional_token_override)?;
     if shortcut.update {
         update_db(address, &shortcut.specs)?;
         if printing {
@@ -276,7 +276,7 @@ fn specs_pt_u(
         print_specs(&shortcut.specs)?
     } else {
         return Err(ErrorActive::Fetch(Fetch::SpecsInDb {
-            name: shortcut.meta_values.name,
+            name: shortcut.specs.name,
             encryption,
         }));
     }

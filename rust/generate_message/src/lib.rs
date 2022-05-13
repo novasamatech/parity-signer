@@ -185,6 +185,7 @@
 // TODO add some notes here on the language. "update" is whole qr thing that
 // could be read by the Signer. "payload" is the un-husked content part, without
 // prelude, public key, signature. If I mess them up now, reader surely will.
+// QR or text = output format
 #![deny(unused_crate_dependencies)]
 
 use constants::{COLD_DB_NAME_RELEASE, HOT_DB_NAME, TYLO};
@@ -231,8 +232,12 @@ pub fn full_run(command: Command) -> Result<(), ErrorActive> {
         Command::Remove(info) => remove_info(info),
         Command::RestoreDefaults => default_hot(),
         Command::MakeColdRelease(opt_path) => default_cold_release(opt_path),
-        Command::TransferMetaRelease => {
-            transfer_metadata_to_cold(HOT_DB_NAME, COLD_DB_NAME_RELEASE)
+        Command::TransferMetaRelease(opt_path) => {
+            let cold_database_path = match opt_path {
+                Some(ref path) => path.to_str().unwrap_or(COLD_DB_NAME_RELEASE),
+                None => COLD_DB_NAME_RELEASE,
+            };
+            transfer_metadata_to_cold(HOT_DB_NAME, cold_database_path)
         }
         Command::Derivations(x) => process_derivations(x),
         Command::Unwasm {
