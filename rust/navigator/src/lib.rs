@@ -92,7 +92,7 @@ pub fn init_navigation(dbname: &str, seed_names: &str) {
     }
 }
 
-/// Should be called in the beginning to recall things stored only by phone
+/// Should be called when seed names are modified in native to synchronize data
 pub fn update_seed_names(seed_names: &str) {
     let guard = STATE.lock();
     match guard {
