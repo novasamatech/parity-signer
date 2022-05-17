@@ -17,7 +17,6 @@ import io.parity.signer.models.addSeed
 import io.parity.signer.models.decode64
 import io.parity.signer.ui.theme.Bg200
 import io.parity.signer.ui.theme.modal
-import io.parity.signer.uniffi.MNewSeed
 import io.parity.signer.uniffi.MNewSeedBackup
 
 @Composable

@@ -4,7 +4,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import io.parity.signer.uniffi.MscTxSpecPlain
-import org.json.JSONObject
 
 @Composable
 fun TCTXSpecPlain(specsPlain: MscTxSpecPlain) {

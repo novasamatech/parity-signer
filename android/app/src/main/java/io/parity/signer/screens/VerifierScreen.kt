@@ -7,14 +7,12 @@ import androidx.compose.runtime.*
 import io.parity.signer.alerts.AndroidCalledConfirm
 import io.parity.signer.components.BigButton
 import io.parity.signer.components.Identicon
-import io.parity.signer.models.SignerDataModel
 import io.parity.signer.uniffi.MVerifierDetails
-import org.json.JSONObject
 
 @Composable
 fun VerifierScreen(
 	verifierDetails: MVerifierDetails,
-	signerDataModel: SignerDataModel
+	wipeToJailbreak: () -> Unit
 ) {
 	var jailbreakAlert by remember { mutableStateOf(false) }
 
@@ -40,11 +38,7 @@ fun VerifierScreen(
 		header = "Wipe ALL data?",
 		text = "Remove all data and set general verifier blank so that it could be set later. This operation can not be reverted. Do not proceed unless you absolutely know what you are doing, there is no need to use this procedure in most cases. Misusing this feature may lead to loss of funds!",
 		back = { jailbreakAlert = false },
-		forward = {
-			signerDataModel.authentication.authenticate(signerDataModel.activity) {
-				signerDataModel.jailbreak()
-			}
-		},
+		forward = { wipeToJailbreak() },
 		backText = "Cancel",
 		forwardText = "I understand"
 	)

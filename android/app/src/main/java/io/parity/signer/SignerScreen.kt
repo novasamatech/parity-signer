@@ -10,7 +10,10 @@ import io.parity.signer.components.Documents
 import io.parity.signer.modals.*
 import io.parity.signer.models.*
 import io.parity.signer.screens.*
-import io.parity.signer.uniffi.*
+import io.parity.signer.uniffi.Action
+import io.parity.signer.uniffi.AlertData
+import io.parity.signer.uniffi.ModalData
+import io.parity.signer.uniffi.ScreenData
 
 @Composable
 fun ScreenSelector(
@@ -86,20 +89,34 @@ fun ScreenSelector(
 		)
 		is ScreenData.Settings -> SettingsScreen(
 			screenData.f,
-			signerDataModel = signerDataModel
+			button1 = button1,
+			isStrongBoxProtected = { signerDataModel.isStrongBoxProtected() },
+			getAppVersion = { signerDataModel.getAppVersion() },
+			wipeToFactory = { signerDataModel.wipeToFactory() },
+			alertState = alertState,
 		)
 		is ScreenData.SignSufficientCrypto -> SignSufficientCrypto(
 			screenData.f,
-			signerDataModel = signerDataModel
+			signSufficientCrypto = { seedName, addressKey ->
+				signerDataModel.signSufficientCrypto(
+					seedName,
+					addressKey
+				)
+			}
 		)
 		is ScreenData.Transaction -> TransactionPreview(
 			screenData.f,
 			signerDataModel::pushButton,
-			signerDataModel = signerDataModel
+			signTransaction = { comment, seedName ->
+				signerDataModel.signTransaction(
+					comment,
+					seedName
+				)
+			}
 		)
 		is ScreenData.VVerifier -> VerifierScreen(
 			screenData.f,
-			signerDataModel
+			wipeToJailbreak = { signerDataModel.wipeToJailbreak() }
 		)
 	}
 }
@@ -116,8 +133,6 @@ fun ModalSelector(
 	val button1: (Action) -> Unit = { action -> button(action, "", "") }
 	val button2: (Action, String) -> Unit =
 		{ action, details -> button(action, details, "") }
-	val seedButton: (String) -> Unit =
-		{ seed -> button(Action.GO_FORWARD, seed, "") }
 	when (modalData) {
 		is ModalData.NewSeedMenu -> when (alertState) {
 			is AlertData.Shield -> NewSeedMenu(alertState.f, button1)
@@ -127,7 +142,7 @@ fun ModalSelector(
 			modalData.f,
 			alertState,
 			button1,
-			removeSeed = seedButton
+			removeSeed = { signerDataModel.removeSeed(it) }
 		)
 		is ModalData.NetworkSelector -> NetworkSelector(
 			modalData.f,

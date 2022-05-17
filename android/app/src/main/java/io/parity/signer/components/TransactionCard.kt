@@ -25,52 +25,51 @@ fun TransactionCard(card: TransactionCard) {
 			.padding(start = (card.indent.toInt() * 10).dp)
 			.fillMaxWidth()
 	) {
-		val card = card.card
-		when (card) {
-			is Card.AuthorCard -> TCAuthor(author = card.f)
-			is Card.AuthorPlainCard -> TCAuthorPlain(author = card.f)
-			is Card.AuthorPublicKeyCard -> TCAuthorPublicKey(key = card.f)
-			is Card.BalanceCard -> TCBalance(currency = card.f)
-			is Card.BitVecCard -> TCBitVec(bitVec = card.f)
-			is Card.BlockHashCard -> TCBlockHash(text = card.f)
-			is Card.CallCard -> TCMethod(payload = card.f)
+		when (val txCard = card.card) {
+			is Card.AuthorCard -> TCAuthor(author = txCard.f)
+			is Card.AuthorPlainCard -> TCAuthorPlain(author = txCard.f)
+			is Card.AuthorPublicKeyCard -> TCAuthorPublicKey(key = txCard.f)
+			is Card.BalanceCard -> TCBalance(currency = txCard.f)
+			is Card.BitVecCard -> TCBitVec(bitVec = txCard.f)
+			is Card.BlockHashCard -> TCBlockHash(text = txCard.f)
+			is Card.CallCard -> TCMethod(payload = txCard.f)
 			is Card.DefaultCard -> Text(
-				card.f,
+				txCard.f,
 				style = MaterialTheme.typography.body2,
 				color = MaterialTheme.colors.Text600
 			)
-			is Card.DerivationsCard -> TCDerivations(payload = card.f)
-			is Card.EnumVariantNameCard -> TCEnumVariantName(name = card.f)
+			is Card.DerivationsCard -> TCDerivations(payload = txCard.f)
+			is Card.EnumVariantNameCard -> TCEnumVariantName(name = txCard.f)
 			Card.EraImmortalCard -> TCEraImmortal()
-			is Card.EraMortalCard -> TCEra(era = card.f)
-			is Card.ErrorCard -> TCError(error = card.f)
-			is Card.FieldNameCard -> TCFieldName(fieldName = card.f)
-			is Card.FieldNumberCard -> TCFieldNumber(fieldNumber = card.f)
-			is Card.IdCard -> TCID(card.f)
-			is Card.IdentityFieldCard -> TCIdentityField(text = card.f)
-			is Card.MetaCard -> TCMeta(meta = card.f)
-			is Card.NameVersionCard -> TCNameVersion(nameVersion = card.f)
-			is Card.NetworkGenesisHashCard -> TCGenesisHash(payload = card.f)
+			is Card.EraMortalCard -> TCEra(era = txCard.f)
+			is Card.ErrorCard -> TCError(error = txCard.f)
+			is Card.FieldNameCard -> TCFieldName(fieldName = txCard.f)
+			is Card.FieldNumberCard -> TCFieldNumber(fieldNumber = txCard.f)
+			is Card.IdCard -> TCID(txCard.f)
+			is Card.IdentityFieldCard -> TCIdentityField(text = txCard.f)
+			is Card.MetaCard -> TCMeta(meta = txCard.f)
+			is Card.NameVersionCard -> TCNameVersion(nameVersion = txCard.f)
+			is Card.NetworkGenesisHashCard -> TCGenesisHash(payload = txCard.f)
 			is Card.NetworkInfoCard -> NetworkCard(
 				network = MscNetworkInfo(
-					networkTitle = card.f.networkTitle,
-					networkLogo = card.f.networkLogo
+					networkTitle = txCard.f.networkTitle,
+					networkLogo = txCard.f.networkLogo
 				)
 			)
-			is Card.NetworkNameCard -> TCNetworkName(text = card.f)
-			is Card.NewSpecsCard -> TCNewSpecs(specs = card.f)
-			is Card.NonceCard -> TCNonce(text = card.f)
+			is Card.NetworkNameCard -> TCNetworkName(text = txCard.f)
+			is Card.NewSpecsCard -> TCNewSpecs(specs = txCard.f)
+			is Card.NonceCard -> TCNonce(text = txCard.f)
 			Card.NoneCard -> {}
-			is Card.PalletCard -> TCPallet(text = card.f)
-			is Card.TextCard -> Text(String(card.f.decodeHex()))
-			is Card.TipCard -> TCTip(card.f)
-			is Card.TipPlainCard -> TCTipPlain(card.f)
-			is Card.TxSpecCard -> TCTXSpec(card.f)
-			is Card.TxSpecPlainCard -> TCTXSpecPlain(card.f)
-			is Card.TypesInfoCard -> TCTypesInfo(card.f)
-			is Card.VarNameCard -> TCVarName(card.f)
-			is Card.VerifierCard -> TCVerifier(card.f)
-			is Card.WarningCard -> TCWarning(card.f)
+			is Card.PalletCard -> TCPallet(text = txCard.f)
+			is Card.TextCard -> Text(String(txCard.f.decodeHex()))
+			is Card.TipCard -> TCTip(txCard.f)
+			is Card.TipPlainCard -> TCTipPlain(txCard.f)
+			is Card.TxSpecCard -> TCTXSpec(txCard.f)
+			is Card.TxSpecPlainCard -> TCTXSpecPlain(txCard.f)
+			is Card.TypesInfoCard -> TCTypesInfo(txCard.f)
+			is Card.VarNameCard -> TCVarName(txCard.f)
+			is Card.VerifierCard -> TCVerifier(txCard.f)
+			is Card.WarningCard -> TCWarning(txCard.f)
 		}
 	}
 }
