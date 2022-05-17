@@ -20,7 +20,7 @@ class SignerDataModel: ObservableObject {
     
     //Action handler
     var actionAvailable = true //debouncer
-    @Published var actionResult: ActionResult = ActionResult() //Screen state is stored here
+    @Published var actionResult: ActionResult = ActionResult(screenLabel: "", back: false, footer: false, footerButton: .settings, rightButton: .none, screenNameType: .h4, screenData: ScreenData.documents, modalData: nil, alertData: .none) //Screen state is stored here
     @Published var parsingAlert: Bool = false
     let debounceTime: Double = 0.2 //Debounce time
     
@@ -64,7 +64,11 @@ class SignerDataModel: ObservableObject {
             } else {
                 DispatchQueue.main.async {
                     if self.onboardingDone {
-                        device_was_online(nil, self.dbName)
+                        do {
+                            try historyDeviceWasOnline(dbname: self.dbName)
+                        } catch {
+                            return
+                        }
                         self.alert = true
                     }
                     self.canaryDead = true
@@ -74,7 +78,7 @@ class SignerDataModel: ObservableObject {
         monitor.start(queue: self.queue)
         if self.onboardingDone {
             self.refreshSeeds()
-            init_navigation(nil, dbName, seedNames.joined(separator: ","))
+            initNavigation(dbname: dbName, seedNames: seedNames.joined(separator: ","))
             self.totalRefresh()
         }
     }
@@ -92,7 +96,7 @@ class SignerDataModel: ObservableObject {
      */
     func totalRefresh() {
         print("heavy reset")
-        pushButton(buttonID: .Start)
+        pushButton(action: .start)
         self.checkAlert()
         //self.refreshUI()
     }
@@ -106,7 +110,6 @@ extension SignerDataModel {
      * Populates database with starting values
      */
     func onboard(jailbreak: Bool = false) {
-        var err = ExternError()
         if !self.canaryDead {
             do {
                 print("onboarding...")
@@ -124,26 +127,22 @@ extension SignerDataModel {
                         }
                     }
                     try FileManager.default.copyItem(at: source, to: destination)
-                    withUnsafeMutablePointer(to: &err) {err_ptr in
+                    do {
                         if jailbreak {
-                            init_history_no_cert(err_ptr, self.dbName)
+                            try historyInitHistoryNoCert(dbname: dbName)
                         } else {
-                            init_history_with_cert(err_ptr, self.dbName)
+                            try historyInitHistoryWithCert(dbname: dbName)
                         }
-                        if (err_ptr.pointee.code == 0) {
                             self.onboardingDone = true
                             /* Mean app mode:
                              if self.canaryDead {
                              device_was_online(nil, self.dbName)
                              }*/
-                            init_navigation(nil, dbName, seedNames.joined(separator: ","))
+                        initNavigation(dbname: dbName, seedNames: seedNames.joined(separator: ","))
                             self.totalRefresh()
                             self.refreshSeeds()
-                        } else {
-                            print("History init failed! This will not do.")
-                            print(String(cString: err_ptr.pointee.message))
-                            signer_destroy_string(err_ptr.pointee.message)
-                        }
+                    } catch {
+                        print("History init failed! This will not do.")
                     }
                 }
             } catch {
@@ -176,7 +175,7 @@ extension SignerDataModel {
             }
             self.onboardingDone = false
             self.seedNames = []
-            init_navigation(nil, dbName, seedNames.joined(separator: ","))
+            initNavigation(dbname: dbName, seedNames: seedNames.joined(separator: ","))
         }
     }
     
@@ -187,6 +186,17 @@ extension SignerDataModel {
         self.wipe()
         if !onboardingDone {
             self.onboard(jailbreak: true)
+        }
+    }
+}
+
+/**
+ * Maybe this could show errors?
+ */
+extension ErrorDisplayed {
+    func show() {
+        if case .Str(let payload) = self {
+            print(payload)
         }
     }
 }

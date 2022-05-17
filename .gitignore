@@ -83,6 +83,7 @@ android/app/debug
 
 # iOS
 ios/NativeSigner/Database/Database/*
+ios/NativeSigner/Generated
 
 # rust
 rust/target

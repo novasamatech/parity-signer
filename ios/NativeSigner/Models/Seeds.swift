@@ -47,7 +47,7 @@ extension SignerDataModel {
             else {
                 print("no seeds available")
                 self.seedNames = []
-                update_seed_names(nil, seedNames.joined(separator: ","))
+                updateSeedNames(seedNames: seedNames.joined(separator: ","))
                 return
             }
             let seedNames = itemFound.map{item -> String in
@@ -59,13 +59,13 @@ extension SignerDataModel {
                 return seedName
             }
             self.seedNames = seedNames.sorted()
-            update_seed_names(nil, self.seedNames.joined(separator: ","))
+            updateSeedNames(seedNames: seedNames.joined(separator: ","))
             self.authenticated = true
         }
         case errSecItemNotFound: do {
             print("no seeds available")
             self.seedNames = []
-            update_seed_names(nil, seedNames.joined(separator: ","))
+            updateSeedNames(seedNames: seedNames.joined(separator: ","))
             self.authenticated = true
             return
         }
@@ -115,8 +115,8 @@ extension SignerDataModel {
         }
         self.seedNames.append(seedName)
         self.seedNames = self.seedNames.sorted()
-        update_seed_names(nil, self.seedNames.joined(separator: ","))
-        self.pushButton(buttonID: .GoForward, details: createRoots ? "true" : "false", seedPhrase: seedPhrase)
+        updateSeedNames(seedNames: self.seedNames.joined(separator: ","))
+        self.pushButton(action: .goForward, details: createRoots ? "true" : "false", seedPhrase: seedPhrase)
     }
     
     /**
@@ -161,7 +161,6 @@ extension SignerDataModel {
             self.alertShow = true
             return ""
         }
-        var err = ExternError()
         var item: CFTypeRef?
         var logSuccess = true
         let query: [String: Any] = [
@@ -173,24 +172,25 @@ extension SignerDataModel {
         let status = SecItemCopyMatching(query as CFDictionary, &item)
         if status == errSecSuccess {
             if backup {
-                withUnsafeMutablePointer(to: &err) {err_ptr in
-                    seed_name_was_shown(err_ptr, seedName, self.dbName)
-                    if err_ptr.pointee.code != 0 {
-                        print("Seed access logging error! This system is broken and should not be used anymore.")
-                        self.lastError = String(cString: err_ptr.pointee.message)
-                        print(self.lastError)
-                        signer_destroy_string(err_ptr.pointee.message)
-                        //Attempt to log this anyway one last time;
-                        //if this fails too - complain to joulu pukki
-                        history_entry_system(nil, "Seed access logging failed!", self.dbName)
+                do {
+                    try historySeedNameWasShown(seedName: seedName, dbname: self.dbName)
+                } catch {
+                    print("Seed access logging error! This system is broken and should not be used anymore.")
+                    //Attempt to log this anyway one last time;
+                    //if this fails too - complain to joulu pukki
+                    do {
+                        try historyEntrySystem(event: .systemEntry(systemEntry: "Seed access logging failed!"), dbname: dbName)
+                    } catch {
                         logSuccess = false
+                        authenticated = false
+                        return ""
                     }
+                    logSuccess = false
                 }
                 return logSuccess ? String(data: (item as! CFData) as Data, encoding: .utf8) ?? "" : ""
             }
             return String(data: (item as! CFData) as Data, encoding: .utf8) ?? ""
         } else {
-            self.lastError = SecCopyErrorMessageString(status, nil)! as String
             authenticated = false
             return ""
         }
@@ -213,8 +213,8 @@ extension SignerDataModel {
                     return element != seedName
                 }
                 self.seedNames = seedNames.sorted()
-                update_seed_names(nil, self.seedNames.joined(separator: ","))
-                pushButton(buttonID: .RemoveSeed)
+                updateSeedNames(seedNames: self.seedNames.joined(separator: ","))
+                pushButton(action: .removeSeed)
             } else {
                 self.lastError = SecCopyErrorMessageString(status, nil)! as String
                 print("remove seed from secure storage error: " + self.lastError)

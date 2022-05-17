@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct TCCall: View {
-    let value: Call
+    let value: MscCall
     @State private var showDoc = false
     var body: some View {
         Button (action: {
@@ -16,7 +16,7 @@ struct TCCall: View {
         }) {
             VStack {
                 HStack {
-                    TCNameValueTemplate(name: "Method", value: value.method_name)
+                    TCNameValueTemplate(name: "Method", value: value.methodName)
                     if value.docs != "" {
                         Text("?")
                         .foregroundColor(Color("Action400"))

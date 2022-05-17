@@ -33,11 +33,11 @@ struct RecoverSeedName: View {
                     })
                     .onSubmit {
                         if (seedName != "") && !data.checkSeedCollision(seedName: seedName.encode64()) {
-                            data.pushButton(buttonID: .GoForward, details: seedName.encode64())
+                            data.pushButton(action: .goForward, details: seedName.encode64())
                         }
                     }
                     .onAppear(perform: {
-                        seedName = content.seed_name.decode64()
+                        seedName = content.seedName.decode64()
                         nameFocused = content.keyboard
                     })
                     .padding(.horizontal, 8)
@@ -48,7 +48,7 @@ struct RecoverSeedName: View {
             BigButton(
                 text: "Next",
                 action: {
-                    data.pushButton(buttonID: .GoForward, details: seedName.encode64())
+                    data.pushButton(action: .goForward, details: seedName.encode64())
                 },
                 isDisabled: (seedName == "") || data.checkSeedCollision(seedName: seedName.encode64())
             )

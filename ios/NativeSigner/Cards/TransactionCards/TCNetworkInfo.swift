@@ -8,10 +8,10 @@
 import SwiftUI
 
 struct TCNetworkInfo: View {
-    let content: NetworkInfo
+    let content: MscNetworkInfo
     var body: some View {
         HStack {
-            NetworkCard(title: content.network_title, logo: content.network_logo)
+            NetworkCard(title: content.networkTitle, logo: content.networkLogo)
         }
     }
 }

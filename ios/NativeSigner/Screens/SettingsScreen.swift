@@ -15,25 +15,25 @@ struct SettingsScreen: View {
     var body: some View {
         VStack (spacing: 2) {
             Button(action: {
-                data.pushButton(buttonID: .ManageNetworks)
+                data.pushButton(action: .manageNetworks)
             }) {
                 SettingsCardTemplate(text: "Networks")
             }
             Button(action: {
-                data.pushButton(buttonID: .BackupSeed)
+                data.pushButton(action: .backupSeed)
             }) {
                 SettingsCardTemplate(text: "Backup keys")
             }
-            Button(action: {data.pushButton(buttonID: .ViewGeneralVerifier)}) {
+            Button(action: {data.pushButton(action: .viewGeneralVerifier)}) {
             VStack {
                 HStack {
                     Text("Verifier certificate").font(FBase(style: .h1)).foregroundColor(Color("Text600"))
                     Spacer()
                 }
                 VStack {
-                    if let verifier = content.intoVerifier() {
+                    if content.publicKey != nil {
                     AddressCard(address: Address(
-                        base58: "encryption: " + verifier.encryption, path: verifier.public_key.truncateMiddle(length: 8), has_pwd: false, identicon: verifier.identicon, seed_name: "", multiselect: false
+                        base58: "encryption: " + (content.encryption ?? "unknown"), path: content.publicKey!.truncateMiddle(length: 8), hasPwd: false, identicon: content.identicon ?? [], seedName: "", multiselect: false
                     ))
                     } else {
                         Text("Error!").foregroundColor(Color("SignalDanger")).font(FBase(style: .h4))
@@ -71,7 +71,7 @@ struct SettingsScreen: View {
             })
             
             Button(action: {
-                data.pushButton(buttonID: .ShowDocuments)
+                data.pushButton(action: .showDocuments)
             }) {
                 SettingsCardTemplate(text: "About")
             }

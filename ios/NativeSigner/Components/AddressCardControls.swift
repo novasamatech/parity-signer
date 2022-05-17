@@ -19,7 +19,7 @@ struct AddressCardControls: View {
             Button(action: {
                 let seed_phrase = data.getSeed(seedName: seed_name)
                 if seed_phrase != "" {
-                    data.pushButton(buttonID: .Increment, details: "1", seedPhrase: seed_phrase)
+                    data.pushButton(action: .increment, details: "1", seedPhrase: seed_phrase)
                 }
             }) {
                 ZStack {
@@ -34,7 +34,7 @@ struct AddressCardControls: View {
                             .onEnded{_ in
                     let seed_phrase = data.getSeed(seedName: seed_name)
                     if seed_phrase != "" {
-                        data.pushButton(buttonID: .Increment, details: String(Int(count)), seedPhrase: seed_phrase)
+                        data.pushButton(action: .increment, details: String(Int(count)), seedPhrase: seed_phrase)
                     }
                 })
                 .onAppear {
@@ -56,7 +56,7 @@ struct AddressCardControls: View {
                         primaryButton: .cancel(),
                         secondaryButton: .destructive(
                             Text("Delete"),
-                            action: { data.pushButton(buttonID: .RemoveKey)
+                            action: { data.pushButton(action: .removeKey)
                             }
                         )
                     )

@@ -28,7 +28,7 @@ struct CameraView: View {
                     .onReceive(model.$payload, perform: { payload in
                         if payload != nil {
                             DispatchQueue.main.async {
-                                data.pushButton(buttonID: .TransactionFetched, details: payload ?? "")
+                                data.pushButton(action: .transactionFetched, details: payload ?? "")
                             }
                         }
                     })
