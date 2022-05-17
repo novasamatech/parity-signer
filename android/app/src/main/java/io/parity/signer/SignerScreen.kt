@@ -1,6 +1,5 @@
 package io.parity.signer
 
-import android.util.Log
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.State
 import io.parity.signer.alerts.Confirm
@@ -128,8 +127,6 @@ fun ModalSelector(
 	button: (Action, String, String) -> Unit,
 	signerDataModel: SignerDataModel
 ) {
-	Log.w("SIGNER_RUST_LOG", "modal $modalData")
-	Log.w("SIGNER_RUST_LOG", "alert $alertState")
 	val button1: (Action) -> Unit = { action -> button(action, "", "") }
 	val button2: (Action, String) -> Unit =
 		{ action, details -> button(action, details, "") }

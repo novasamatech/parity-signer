@@ -13,7 +13,6 @@ fun SignerDataModel.pushButton(
 	details: String = "",
 	seedPhrase: String = ""
 ) {
-	Log.w("SIGNER_RUST_LOG", "action $button")
 	//Here we just list all possible arguments coming from backend
 	try {
 		_actionResult.value = backendAction(button, details, seedPhrase)
