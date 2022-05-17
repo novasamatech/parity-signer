@@ -26,8 +26,7 @@ struct ShieldAlertComponent: View {
                         }
                     )
             } else {
-                //TODO: actually use content
-                if (data.alert) {
+                if (content == .past) {
                     Text("")
                         .alert(
                             "Network was connected!",

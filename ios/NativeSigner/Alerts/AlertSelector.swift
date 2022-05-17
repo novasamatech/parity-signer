@@ -17,7 +17,7 @@ struct AlertSelector: View {
         case .errorData(let value):
             ErrorAlert(content: value)
         case .shield(let value):
-            ShieldAlertComponent(content: value ?? .past)
+            ShieldAlertComponent(content: value)
         case .confirm://(let value):
             let value = "TODO"
             ConfirmAlert(content: value)
