@@ -3,11 +3,13 @@ wss://statemint-rpc.polkadot.io				ok
 wss://acala.polkawallet.io				ok, token set
 wss://wss.odyssey.aresprotocol.io			ok
 wss://rpc.astar.network					ok
+wss://fullnode.parachain.centrifuge.io			ok
 wss://rpc-para.clover.finance				ok
-wss://rpc.efinity.io					rejects call (504), seems to be down on polkadot.js as well
+wss://rpc.efinity.io					ok
+wss://rpc-01.hydradx.io					ok
 wss://api.interlay.io/parachain				ok, token set
-wss://kuhlii.manta.systems				ok
 wss://wss.api.moonbeam.network				ok
+wss://node-6907995778982338560.sz.onfinality.io/ws?apikey=b5324589-1447-4699-92a6-025bc2cc2ac1
 wss://rpc.parallel.fi					ok
 wss://mainnet.polkadex.trade				ok
 

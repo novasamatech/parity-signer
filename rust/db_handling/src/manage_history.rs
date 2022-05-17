@@ -1,230 +1,302 @@
+//! Displaying and updating history log
+//!
+//! The Signer keeps a history log of all events that change the database and
+//! affect security. It is stored in [`HISTORY`] tree of the cold database.
+//!
+//! Each history log [`Entry`] contains [`Event`] set and a timestamp. Database
+//! key for [`Entry`] value is [`Order`], SCALE-encoded number of the entry.
+//!
+//! In addition to keeping the log, Signer also displays [`HISTORY`] tree
+//! checksum for user to possibly keep the track of.
+// TODO: substantial part of this will go obsolete with interface updates;
+// some functions are not called at the moment from the user interface - kept
+// for now in case they make a return, commented.
 use chrono::Utc;
-use hex;
-use parity_scale_codec::{Decode, Encode};
+#[cfg(feature = "signer")]
+use parity_scale_codec::Decode;
+use parity_scale_codec::Encode;
 use sled::Batch;
 
-use constants::{DANGER, HISTORY, HISTORY_PAGE_SIZE};
-use definitions::{danger::DangerRecord, error::{DatabaseSigner, EntryDecodingSigner, ErrorSigner, ErrorSource, InterfaceSigner, KeyDecodingSignerDb, NotFoundSigner, Signer}, history::{Event, Entry}, print::export_complex_vector};
+#[cfg(feature = "signer")]
+use constants::DANGER;
+use constants::HISTORY;
+use definitions::{
+    error::ErrorSource,
+    history::{Entry, Event},
+    keyring::Order,
+};
 
-use crate::db_transactions::TrDbCold;
-use crate::helpers::{open_db, open_tree, make_batch_clear_tree};
+#[cfg(feature = "signer")]
+use definitions::{
+    danger::DangerRecord,
+    error_signer::{
+        DatabaseSigner, EntryDecodingSigner, ErrorSigner,
+        /* InterfaceSigner,*/ NotFoundSigner, Signer,
+    },
+    print::export_complex_vector,
+};
 
-/// Key for history entries.
-/// Order in which entries have appeared in the database.
-type Order = u32;
+use crate::helpers::{open_db, open_tree};
+#[cfg(feature = "signer")]
+use crate::{db_transactions::TrDbCold, helpers::make_batch_clear_tree};
 
-/// Function to print history entries.
-/// Interacts with user interface.
+/// Print history log contents into json.
+#[cfg(feature = "signer")]
 pub fn print_history(database_name: &str) -> Result<String, ErrorSigner> {
     let history = get_history(database_name)?;
-    Ok(format!("\"log\":{},\"total_entries\":{}", export_complex_vector(&history, |(order, entry)| format!("\"order\":{},{}", order, entry.show(|b| format!("\"{}\"", hex::encode(b.transaction()))))), history.len()))
+    Ok(format!(
+        "\"log\":{},\"total_entries\":{}",
+        export_complex_vector(&history, |(order, entry)| format!(
+            "\"order\":{},{}",
+            order.stamp(),
+            entry.show(|b| format!("\"{}\"", hex::encode(b.transaction())))
+        )),
+        history.len()
+    ))
 }
 
-/// Function to print total number of pages for pre-set number of entries per page.
-/// Interacts with user interface.
+/*
+/// Print total number of pages, for maximum [`HISTORY_PAGE_SIZE`] number of
+/// entries per page.
+#[cfg(feature = "signer")]
 pub fn history_total_pages(database_name: &str) -> Result<u32, ErrorSigner> {
     let history = get_history(database_name)?;
     let total_pages = {
-        if history.len()%HISTORY_PAGE_SIZE == 0 {history.len()/HISTORY_PAGE_SIZE}
-        else {history.len()/HISTORY_PAGE_SIZE + 1}
+        if history.len() % HISTORY_PAGE_SIZE == 0 {
+            history.len() / HISTORY_PAGE_SIZE
+        } else {
+            history.len() / HISTORY_PAGE_SIZE + 1
+        }
     };
     Ok(total_pages as u32)
 }
 
-/// Function to print given page number from the history set.
-/// Interacts with user interface.
+/// Print page with given number from the history log.
+///
+/// Maximum number of entries per page is [`HISTORY_PAGE_SIZE`].
+#[cfg(feature = "signer")]
 pub fn print_history_page(page_number: u32, database_name: &str) -> Result<String, ErrorSigner> {
     let history = get_history(database_name)?;
     let total_pages = history_total_pages(database_name)?;
     let n = page_number as usize;
-    let history_subset = match history.get(n*HISTORY_PAGE_SIZE..(n+1)*HISTORY_PAGE_SIZE) {
+    let history_subset = match history.get(n * HISTORY_PAGE_SIZE..(n + 1) * HISTORY_PAGE_SIZE) {
         Some(a) => a.to_vec(),
-        None => match history.get(n*HISTORY_PAGE_SIZE..) {
+        None => match history.get(n * HISTORY_PAGE_SIZE..) {
             Some(a) => a.to_vec(),
-            None => return Err(ErrorSigner::Interface(InterfaceSigner::HistoryPageOutOfRange{page_number, total_pages})),
+            None => {
+                return Err(ErrorSigner::Interface(
+                    InterfaceSigner::HistoryPageOutOfRange {
+                        page_number,
+                        total_pages,
+                    },
+                ))
+            }
         },
     };
-    Ok(format!("\"log\":{},\"total_entries\":{}", export_complex_vector(&history_subset, |(order, entry)| format!("\"order\":{},{}", order, entry.show(|b| format!("\"{}\"", hex::encode(b.transaction()))))), history.len()))
+    Ok(format!(
+        "\"log\":{},\"total_entries\":{}",
+        export_complex_vector(&history_subset, |(order, entry)| format!(
+            "\"order\":{},{}",
+            order.stamp(),
+            entry.show(|b| format!("\"{}\"", hex::encode(b.transaction())))
+        )),
+        history.len()
+    ))
 }
+*/
 
-/// Local helper function to retrieve history entries from the database.
-/// Applicable only to Signer side.
+/// Get history log contents from the database.
+#[cfg(feature = "signer")]
 fn get_history(database_name: &str) -> Result<Vec<(Order, Entry)>, ErrorSigner> {
     let database = open_db::<Signer>(database_name)?;
     let history = open_tree::<Signer>(&database, HISTORY)?;
     let mut out: Vec<(Order, Entry)> = Vec::new();
-    for x in history.iter() {
-        if let Ok((order_encoded, history_entry_encoded)) = x {
-            let order = match <Order>::decode(&mut &order_encoded[..]) {
-                Ok(a) => a,
-                Err(_) => return Err(ErrorSigner::Database(DatabaseSigner::KeyDecoding(KeyDecodingSignerDb::EntryOrder(order_encoded.to_vec())))),
-            };
-            let history_entry = match <Entry>::decode(&mut &history_entry_encoded[..]) {
-                Ok(a) => a,
-                Err(_) => return Err(ErrorSigner::Database(DatabaseSigner::EntryDecoding(EntryDecodingSigner::HistoryEntry(order)))),
-            };
-            out.push((order, history_entry));
-        }
+    for (order_encoded, history_entry_encoded) in history.iter().flatten() {
+        let order = Order::from_ivec(&order_encoded)?;
+        let history_entry = match <Entry>::decode(&mut &history_entry_encoded[..]) {
+            Ok(a) => a,
+            Err(_) => {
+                return Err(ErrorSigner::Database(DatabaseSigner::EntryDecoding(
+                    EntryDecodingSigner::HistoryEntry(order),
+                )))
+            }
+        };
+        out.push((order, history_entry));
     }
-    out.sort_by(|a, b| b.0.cmp(&a.0));
+    out.sort_by(|a, b| b.0.stamp().cmp(&a.0.stamp()));
     Ok(out)
 }
 
-/// Function to retrieve history entry by its order.
-/// Applicable only to Signer side.
+/// Get from the database a history log [`Entry`] by `u32` order identifier
+/// received from the frontend.
+#[cfg(feature = "signer")]
 pub fn get_history_entry_by_order(order: u32, database_name: &str) -> Result<Entry, ErrorSigner> {
     let database = open_db::<Signer>(database_name)?;
     let history = open_tree::<Signer>(&database, HISTORY)?;
     let mut found = None;
-    for x in history.iter() {
-        if let Ok((order_encoded, history_entry_encoded)) = x {
-            match <Order>::decode(&mut &order_encoded[..]) {
-                Ok(a) => {
-                    if a == order {
-                        match <Entry>::decode(&mut &history_entry_encoded[..]) {
-                            Ok(b) => {
-                                found = Some(b);
-                                break;
-                            },
-                            Err(_) => return Err(ErrorSigner::Database(DatabaseSigner::EntryDecoding(EntryDecodingSigner::HistoryEntry(order)))),
-                        }
-                    }
-                },
-                Err(_) => return Err(ErrorSigner::Database(DatabaseSigner::KeyDecoding(KeyDecodingSignerDb::EntryOrder(order_encoded.to_vec())))),
+    let order = Order::from_number(order);
+    for (order_encoded, history_entry_encoded) in history.iter().flatten() {
+        let order_found = Order::from_ivec(&order_encoded)?;
+        if order_found == order {
+            match <Entry>::decode(&mut &history_entry_encoded[..]) {
+                Ok(b) => {
+                    found = Some(b);
+                    break;
+                }
+                Err(_) => {
+                    return Err(ErrorSigner::Database(DatabaseSigner::EntryDecoding(
+                        EntryDecodingSigner::HistoryEntry(order),
+                    )))
+                }
             }
         }
     }
     match found {
         Some(a) => Ok(a),
-        None => return Err(ErrorSigner::NotFound(NotFoundSigner::HistoryEntry(order))),
+        None => Err(ErrorSigner::NotFound(NotFoundSigner::HistoryEntry(order))),
     }
 }
 
-/// Function to print history entry by order for entries without parseable transaction
-pub fn print_history_entry_by_order(order: u32, database_name: &str) -> Result<String, ErrorSigner> {
+/*
+/// Print history [`Entry`] as a json by `u32` order identifier received from
+/// the frontend without transaction decodings.
+///
+/// Transactions are represented here as hex encoded raw data, without parsing.
+#[cfg(feature = "signer")]
+pub fn print_history_entry_by_order(
+    order: u32,
+    database_name: &str,
+) -> Result<String, ErrorSigner> {
     let entry = get_history_entry_by_order(order, database_name)?;
-    Ok(format!("\"order\":{},{}", order, entry.show(|b| format!("\"{}\"", hex::encode(b.transaction())))))
+    Ok(format!(
+        "\"order\":{},{}",
+        order,
+        entry.show(|b| format!("\"{}\"", hex::encode(b.transaction())))
+    ))
 }
+*/
 
-/// Function to clear Signer history.
-/// Naturally, applicable only to the Signer side.
-/// Interacts with user interface.
+/// Clear Signer history and make a log [`Entry`] that history was cleared.
+#[cfg(feature = "signer")]
 pub fn clear_history(database_name: &str) -> Result<(), ErrorSigner> {
     let batch = make_batch_clear_tree::<Signer>(database_name, HISTORY)?;
     let events = vec![Event::HistoryCleared];
-    let for_history = events_in_batch::<Signer>(&database_name, true, batch, events)?;
+    let for_history = events_in_batch::<Signer>(database_name, true, batch, events)?;
     TrDbCold::new()
         .set_history(for_history)
-        .apply::<Signer>(&database_name)
+        .apply::<Signer>(database_name)
 }
 
-/// Function to collect history events set into batch
-pub fn events_to_batch <T: ErrorSource> (database_name: &str, events: Vec<Event>) -> Result<Batch, T::Error> {
+/// Timestamp [`Event`] set and make with it a new [`Batch`], that could be
+/// applied to the [`HISTORY`] tree.
+pub fn events_to_batch<T: ErrorSource>(
+    database_name: &str,
+    events: Vec<Event>,
+) -> Result<Batch, T::Error> {
     events_in_batch::<T>(database_name, false, Batch::default(), events)
 }
 
-/// Function to add history events set to existing batch
-pub fn events_in_batch <T: ErrorSource> (database_name: &str, start_zero: bool, mut out_prep: Batch, events: Vec<Event>) -> Result<Batch, T::Error> {
+/// Timestamp [`Event`] set and add it to existing [`Batch`], that could be
+/// applied to the [`HISTORY`] tree.
+///
+/// Note that existing [`Batch`] must contain no [`Entry`] additions, only
+/// removals are possible. Only one [`Event`] set, transformed into [`Entry`]
+/// with a single timestamp could be added in a single database transaction.
+pub(crate) fn events_in_batch<T: ErrorSource>(
+    database_name: &str,
+    start_zero: bool,
+    mut out_prep: Batch,
+    events: Vec<Event>,
+) -> Result<Batch, T::Error> {
     let database = open_db::<T>(database_name)?;
     let history = open_tree::<T>(&database, HISTORY)?;
     let order = {
-        if start_zero {0 as Order}
-        else {history.len() as Order}
+        if start_zero {
+            Order::from_number(0u32)
+        } else {
+            Order::from_number(history.len() as u32)
+        }
     };
     let timestamp = Utc::now().to_string();
-    let history_entry = Entry {
-        timestamp,
-        events,
-    };
-    out_prep.insert(order.encode(), history_entry.encode());
+    let history_entry = Entry { timestamp, events };
+    out_prep.insert(order.store(), history_entry.encode());
     Ok(out_prep)
 }
 
-/// Function to load events into the database in single transaction.
-/// Applicable both to Active side (for creating the test databases)
-/// and for Signer side (loading actual events as part of Signer operation)
-pub fn enter_events <T: ErrorSource> (database_name: &str, events: Vec<Event>) -> Result<(), T::Error> {
+/// Enter [`Event`] set into the database as a single database transaction.
+#[cfg(any(feature = "signer", feature = "test"))]
+pub(crate) fn enter_events<T: ErrorSource>(
+    database_name: &str,
+    events: Vec<Event>,
+) -> Result<(), T::Error> {
     TrDbCold::new()
-        .set_history(events_to_batch::<T>(&database_name, events)?)
-        .apply::<T>(&database_name)
+        .set_history(events_to_batch::<T>(database_name, events)?)
+        .apply::<T>(database_name)
 }
 
-/// Function for Signer user to add events.
-/// Applicable only to Signer side.
-/// Interacts with the user interface.
+/// Enter user-generated [`Event`] into the database.
+#[cfg(feature = "signer")]
 pub fn history_entry_user(database_name: &str, string_from_user: &str) -> Result<(), ErrorSigner> {
     let events = vec![Event::UserEntry(string_from_user.to_string())];
     enter_events::<Signer>(database_name, events)
 }
 
-/// Function to add system-generated events during Signer operation.
-/// Applicable only to Signer side.
-/// Interacts with the user interface.
-pub fn history_entry_system(database_name: &str, string_from_system: String) -> Result<(), ErrorSigner> {
+/// Enter system-generated [`Event`] into the database.
+// TODO possibly obsolete
+#[cfg(feature = "signer")]
+pub fn history_entry_system(
+    database_name: &str,
+    string_from_system: String,
+) -> Result<(), ErrorSigner> {
     let events = vec![Event::SystemEntry(string_from_system)];
     enter_events::<Signer>(database_name, events)
 }
 
-/// Function shows if the `device was online` indicator is on
-/// Applicable only to Signer side.
-/// Interacts with the user interface.
+/// Process the fact that the Signer device was online.
+///
+/// - Add history log entry with `Event::DeviceWasOnline`.
+/// - Update [`DangerRecord`] stored in [`SETTREE`](constants::SETTREE) with
+/// `device_was_online = true` flag.
+///
+/// Unacknowledged non-safe [`DangerRecord`] block the use of Signer in the
+/// frontend.
+#[cfg(feature = "signer")]
 pub fn device_was_online(database_name: &str) -> Result<(), ErrorSigner> {
     let events = vec![Event::DeviceWasOnline];
     let mut settings_batch = Batch::default();
-    settings_batch.insert(DANGER.to_vec(), DangerRecord::not_safe().store());
+    settings_batch.insert(DANGER, DangerRecord::set_was_online().store());
     TrDbCold::new()
-        .set_history(events_to_batch::<Signer>(&database_name, events)?)
+        .set_history(events_to_batch::<Signer>(database_name, events)?)
         .set_settings(settings_batch)
-        .apply::<Signer>(&database_name)
+        .apply::<Signer>(database_name)
 }
 
-/// Function to reset the danger status to `safe` - use it wisely.
-/// Applicable only to Signer side.
-/// Interacts with the user interface.
+/// Acknowledge that the Signer device was online and reset the
+/// [`DangerRecord`] back to safe.
+///
+/// - Add history log entry with `Event::ResetDangerRecord`.
+/// - Reset [`DangerRecord`] stored in [`SETTREE`](constants::SETTREE) to
+/// `safe`, i.e. with `device_was_online = false` flag.
+///
+/// Acknowledged and reset [`DangerRecord`] allow to resume the use of Signer in
+/// the frontend. Use it wisely.
+#[cfg(feature = "signer")]
 pub fn reset_danger_status_to_safe(database_name: &str) -> Result<(), ErrorSigner> {
     let events = vec![Event::ResetDangerRecord];
     let mut settings_batch = Batch::default();
-    settings_batch.insert(DANGER.to_vec(), DangerRecord::safe().store());
+    settings_batch.insert(DANGER, DangerRecord::safe().store());
     TrDbCold::new()
-        .set_history(events_to_batch::<Signer>(&database_name, events)?)
+        .set_history(events_to_batch::<Signer>(database_name, events)?)
         .set_settings(settings_batch)
-        .apply::<Signer>(&database_name)
+        .apply::<Signer>(database_name)
 }
 
-/// Function to record in history log the fact that certain seed was shown on Signer screen.
-/// Applicable only to Signer side.
-/// Interacts with the user interface.
+/// Record in history log that certain seed was shown on Signer screen,
+/// presumably for backup.
+///
+/// Seeds are distinguished by the seed name.
+#[cfg(feature = "signer")]
 pub fn seed_name_was_shown(database_name: &str, seed_name: String) -> Result<(), ErrorSigner> {
     let events = vec![Event::SeedNameWasShown(seed_name)];
     enter_events::<Signer>(database_name, events)
 }
-
-#[cfg(test)]
-mod tests {
-    use definitions::{history::all_events_preview, network_specs::Verifier};
-    use super::*;
-    use crate::cold_default::{populate_cold, populate_cold_no_metadata};
-    
-    #[test]
-    fn test_all_events () {
-        let dbname = "for_tests/test_all_events";
-        populate_cold_no_metadata(dbname, Verifier(None)).unwrap();
-        let events = all_events_preview();
-        enter_events::<Signer>(dbname, events).unwrap();
-        let history = print_history(dbname).unwrap();
-        let expected_history_part = r##""events":[{"event":"metadata_added","payload":{"specname":"westend","spec_version":"9000","meta_hash":"0e5751c026e543b2e8ab2eb06099daa1d1e5df47778f7787faab45cdf12fe3a8","meta_id_pic":"89504e470d0a1a0a0000000d49484452000000410000004108060000008ef7c9450000039f49444154789cedd83d6e14411086619c12312b4bbe049903c8380101e2063ec31e63cfe01b20024e400681332e61c9da2122355d1a7d76cd6c4dfd7457af2c79dea01dd8eafee6097df1f8f8f8e6b5771684711cab1f1986e1a2fce85a1784968fb6ea81928ad0f3e3976562a420d47cfc707728e7bcf17a5fce5819184d08351f4f4900a806826ac1a846e80180ce0d5185500b40f544a06a2042082d1f8f7a23a008861b2103803a1702e5857021440086b757e59c37febb2fe75414c1bacfca036122b402203e5c83b00010bfcfca824843d006233e5c82f002207e9f5613821780ca1c4da5dfa740ac224400a8f4d1c9f7516b1022421480ca1e9d7d1f9220dc08bbaf37e59c77fc765bcea9e8e81fc3e9df7f1e9f7f1fbdcfda875c085e00c41fd286f3c11200f242f0fbbcfbd012c244d01e40fc2169381fac01200b82df17dd47a9084b00aae611ad288255ed3e0eb121949e102400aaf691b55e0a0205887484c3f0ab9cf3f6e3c7724e4511acfba2fb786e044a7b883f200d467cb8066101207e9f77dfb21002253dc41fd006233e5c82f002207e9fb54f6a866001788a8eb6cabe6f2d82d810368420c2cdee4339e7dd1e7f97732a3afa30fc29e7bcfdf8be9c53d1fbac7d6bb911a407107f481bce074b00c80bc1eff3ee937221680f20fe90349c0fd6009005c1ef8bee5bd605c12a8a60d5ba6f43286d08a52e08c3e15d39e78dfbbfe59c8a2258f745f72d732150da43fc016930e2c335080b00f1fbbcfba4dc0894f4107f401b8cf87009c20b80f87dd6beb5420856d1d156d9f7adb521943684d213026541dcedbe9773def5f14b39a7a2a3af1e8672cebbbf1ccb3915bdcfda274500e5c7f4ff044a43901e40fc216d381f2c01202f04bfcfbb6f991b417b00f187a4e17cb006802c087e5f741faf1b825514c1aa65df09022541b43c22f5521000406d08a51902b584883ef26977fa5fdf9fc7e7fffa4611acfba2fb280e40990894f6107f401a8cf8700dc20240fc3eef3e6422505e08fe803618f1e112841700f1fbac7d680940b911aca2a3adb2ef436e042a0a913d3afb3e4a02a05611a80844f6e8ecfbd600281581f2424447ef2e4ffffef8f0fcfbe87d5a1a0095864069c3f96009007921f87d56cd08542b041fac01200b82df676501502e042a02a1154568c90340b911a80c8873217801a810026ac1e88d10f978548540d542f444a801a0aa11a81e10e706a09a10500d86045103d0f2f1280501d560d496f1f1281501f5c4c8fc78d40561590b4a8f8f5e76168497de7fa22fbfac7f3444800000000049454e44ae426082"}},{"event":"metadata_removed","payload":{"specname":"westend","spec_version":"9000","meta_hash":"0e5751c026e543b2e8ab2eb06099daa1d1e5df47778f7787faab45cdf12fe3a8","meta_id_pic":"89504e470d0a1a0a0000000d49484452000000410000004108060000008ef7c9450000039f49444154789cedd83d6e14411086619c12312b4bbe049903c8380101e2063ec31e63cfe01b20024e400681332e61c9da2122355d1a7d76cd6c4dfd7457af2c79dea01dd8eafee6097df1f8f8f8e6b5771684711cab1f1986e1a2fce85a1784968fb6ea81928ad0f3e3976562a420d47cfc707728e7bcf17a5fce5819184d08351f4f4900a806826ac1a846e80180ce0d5185500b40f544a06a2042082d1f8f7a23a008861b2103803a1702e5857021440086b757e59c37febb2fe75414c1bacfca036122b402203e5c83b00010bfcfca824843d006233e5c82f002207e9f5613821780ca1c4da5dfa740ac224400a8f4d1c9f7516b1022421480ca1e9d7d1f9220dc08bbaf37e59c77fc765bcea9e8e81fc3e9df7f1e9f7f1fbdcfda875c085e00c41fd286f3c11200f242f0fbbcfbd012c244d01e40fc2169381fac01200b82df17dd47a9084b00aae611ad288255ed3e0eb121949e102400aaf691b55e0a0205887484c3f0ab9cf3f6e3c7724e4511acfba2fb786e044a7b883f200d467cb8066101207e9f77dfb21002253dc41fd006233e5c82f002207e9fb54f6a866001788a8eb6cabe6f2d82d810368420c2cdee4339e7dd1e7f97732a3afa30fc29e7bcfdf8be9c53d1fbac7d6bb911a407107f481bce074b00c80bc1eff3ee937221680f20fe90349c0fd6009005c1ef8bee5bd605c12a8a60d5ba6f43286d08a52e08c3e15d39e78dfbbfe59c8a2258f745f72d732150da43fc016930e2c335080b00f1fbbcfba4dc0894f4107f401b8cf87009c20b80f87dd6beb5420856d1d156d9f7adb521943684d213026541dcedbe9773def5f14b39a7a2a3af1e8672cebbbf1ccb3915bdcfda274500e5c7f4ff044a43901e40fc216d381f2c01202f04bfcfbb6f991b417b00f187a4e17cb006802c087e5f741faf1b825514c1aa65df09022541b43c22f5521000406d08a51902b584883ef26977fa5fdf9fc7e7fffa4611acfba2fb280e40990894f6107f401a8cf8700dc20240fc3eef3e6422505e08fe803618f1e112841700f1fbac7d680940b911aca2a3adb2ef436e042a0a913d3afb3e4a02a05611a80844f6e8ecfbd600281581f2424447ef2e4ffffef8f0fcfbe87d5a1a0095864069c3f96009007921f87d56cd08542b041fac01200b82df676501502e042a02a1154568c90340b911a80c8873217801a810026ac1e88d10f978548540d542f444a801a0aa11a81e10e706a09a10500d86045103d0f2f1280501d560d496f1f1281501f5c4c8fc78d40561590b4a8f8f5e76168497de7fa22fbfac7f3444800000000049454e44ae426082"}},{"event":"load_metadata_message_signed","payload":{"specname":"westend","spec_version":"9000","meta_hash":"0e5751c026e543b2e8ab2eb06099daa1d1e5df47778f7787faab45cdf12fe3a8","meta_id_pic":"89504e470d0a1a0a0000000d49484452000000410000004108060000008ef7c9450000039f49444154789cedd83d6e14411086619c12312b4bbe049903c8380101e2063ec31e63cfe01b20024e400681332e61c9da2122355d1a7d76cd6c4dfd7457af2c79dea01dd8eafee6097df1f8f8f8e6b5771684711cab1f1986e1a2fce85a1784968fb6ea81928ad0f3e3976562a420d47cfc707728e7bcf17a5fce5819184d08351f4f4900a806826ac1a846e80180ce0d5185500b40f544a06a2042082d1f8f7a23a008861b2103803a1702e5857021440086b757e59c37febb2fe75414c1bacfca036122b402203e5c83b00010bfcfca824843d006233e5c82f002207e9f5613821780ca1c4da5dfa740ac224400a8f4d1c9f7516b1022421480ca1e9d7d1f9220dc08bbaf37e59c77fc765bcea9e8e81fc3e9df7f1e9f7f1fbdcfda875c085e00c41fd286f3c11200f242f0fbbcfbd012c244d01e40fc2169381fac01200b82df17dd47a9084b00aae611ad288255ed3e0eb121949e102400aaf691b55e0a0205887484c3f0ab9cf3f6e3c7724e4511acfba2fb786e044a7b883f200d467cb8066101207e9f77dfb21002253dc41fd006233e5c82f002207e9fb54f6a866001788a8eb6cabe6f2d82d810368420c2cdee4339e7dd1e7f97732a3afa30fc29e7bcfdf8be9c53d1fbac7d6bb911a407107f481bce074b00c80bc1eff3ee937221680f20fe90349c0fd6009005c1ef8bee5bd605c12a8a60d5ba6f43286d08a52e08c3e15d39e78dfbbfe59c8a2258f745f72d732150da43fc016930e2c335080b00f1fbbcfba4dc0894f4107f401b8cf87009c20b80f87dd6beb5420856d1d156d9f7adb521943684d213026541dcedbe9773def5f14b39a7a2a3af1e8672cebbbf1ccb3915bdcfda274500e5c7f4ff044a43901e40fc216d381f2c01202f04bfcfbb6f991b417b00f187a4e17cb006802c087e5f741faf1b825514c1aa65df09022541b43c22f5521000406d08a51902b584883ef26977fa5fdf9fc7e7fffa4611acfba2fb280e40990894f6107f401a8cf8700dc20240fc3eef3e6422505e08fe803618f1e112841700f1fbac7d680940b911aca2a3adb2ef436e042a0a913d3afb3e4a02a05611a80844f6e8ecfbd600281581f2424447ef2e4ffffef8f0fcfbe87d5a1a0095864069c3f96009007921f87d56cd08542b041fac01200b82df676501502e042a02a1154568c90340b911a80c8873217801a810026ac1e88d10f978548540d542f444a801a0aa11a81e10e706a09a10500d86045103d0f2f1280501d560d496f1f1281501f5c4c8fc78d40561590b4a8f8f5e76168497de7fa22fbfac7f3444800000000049454e44ae426082","signed_by":{"public_key":"8eaf04151687736326c9fea17e25fc5287613693c912909cb226aa4794f26a48","identicon":"89504e470d0a1a0a0000000d49484452000000410000004108060000008ef7c9450000034d49444154789cedd93d6e144110c5717c04673e01c9264848080287dea8258ee2cc2200022040ce7c142447ebd00108098964134ee0ac8f60aa342a6b7b34dbef557f8cd6f6fc83b7a155bfa8e539babfbf7ff1dc9b0521c658fc478e8f8f8fe4a76b5d106a8e46f540698ad0f3f8712d319a20941c1f2edfcba65d5ffc90f5d502a30a21161caf850900ab0442abc12846881d00acb9218a10622180163a226825102e845871bc153a23581e0c1a213600d0c24c081a0b41214407c0ddcd2fd9b493b3b7b243c189b05ebd924ddb6cffca72311010215602582c0402b05a423443c80158088205b058882a844802685e04544b042d07b117c103a01d3a82b60f6212c10ba03d06046d0a824678b35ec9a6fdde6c6587bc08ffee6e64d35e9e9cc90e7911bede9ecba67d3abd924da31058008b854000160b81002c060222e4002c04c10258088205b0c61059843180e645407911502508da2ec482203d204c01684f15413388e60857e7b7b269e757a7b2435e8470f94d36edfae2a3ecd02c085a0e0201582c0402b058887d009a0b419b8260012c04c10258082207a025080880c98b80f22294a6100bc282e044402f412fc2ebd55a36edcf76233be44508979f65d3ae2fbec8e6a311a6002c160201582c0402b01004859003b010040b60210816c0ca417441407911500b82b420480789805e825e84d5fa9d6cda76f353766816042d0781002c160201582c440e40a311b4290816c042102c8085201080e642407911505e84d216046941901e10340411c0b7432f027a097a11be4fbc543fecbc54a75200f919fe9fa0c50c429800b058080460b11008c0ca41d008210360210816c042102c80b50fa21b02ca8b806a8aa0c50988f044110c405b10a404418b2388e04440df0ebd08e8255882b00ba041042d64201080c54220008b8518036810418b24040b60210816c042100c804623a0bc08282f021b8da079211e03c21480b61741f3401c3ac23e002d8ba0b1105e04f4edb025420e406b86a0e5201080c542b0005a3582560bc1025808a225804621681e885c5e849a18008d46d05a40cc85c002682e04ab06a33782e778ab08412b85e8895002a01523683d20e606d0aa10ac128c298812809ae3ad2608560946692d8eb79a22583d315a1e6f7541185783d2e3e871b3201c7aff01c564bfac995018020000000049454e44ae426082","encryption":"sr25519"}}},{"event":"network_specs_added","payload":{"base58prefix":"42","color":"#660D35","decimals":"12","encryption":"sr25519","genesis_hash":"e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e","logo":"westend","name":"westend","order":"3","path_id":"//westend","secondary_color":"#262626","title":"Westend","unit":"WND","current_verifier":{"type":"general","details":{"public_key":"8eaf04151687736326c9fea17e25fc5287613693c912909cb226aa4794f26a48","identicon":"89504e470d0a1a0a0000000d49484452000000410000004108060000008ef7c9450000034d49444154789cedd93d6e144110c5717c04673e01c9264848080287dea8258ee2cc2200022040ce7c142447ebd00108098964134ee0ac8f60aa342a6b7b34dbef557f8cd6f6fc83b7a155bfa8e539babfbf7ff1dc9b0521c658fc478e8f8f8fe4a76b5d106a8e46f540698ad0f3f8712d319a20941c1f2edfcba65d5ffc90f5d502a30a21161caf850900ab0442abc12846881d00acb9218a10622180163a226825102e845871bc153a23581e0c1a213600d0c24c081a0b41214407c0ddcd2fd9b493b3b7b243c189b05ebd924ddb6cffca72311010215602582c0402b05a423443c80158088205b058882a844802685e04544b042d07b117c103a01d3a82b60f6212c10ba03d06046d0a824678b35ec9a6fdde6c6587bc08ffee6e64d35e9e9cc90e7911bede9ecba67d3abd924da31058008b854000160b81002c060222e4002c04c10258088205b0c61059843180e645407911502508da2ec482203d204c01684f15413388e60857e7b7b269e757a7b2435e8470f94d36edfae2a3ecd02c085a0e0201582c0402b058887d009a0b419b8260012c04c10258082207a025080880c98b80f22294a6100bc282e044402f412fc2ebd55a36edcf76233be44508979f65d3ae2fbec8e6a311a6002c160201582c0402b01004859003b010040b60210816c0ca417441407911500b82b420480789805e825e84d5fa9d6cda76f353766816042d0781002c160201582c440e40a311b4290816c042102c8085201080e642407911505e84d216046941901e10340411c0b7432f027a097a11be4fbc543fecbc54a75200f919fe9fa0c50c429800b058080460b11008c0ca41d008210360210816c042102c80b50fa21b02ca8b806a8aa0c50988f044110c405b10a404418b2388e04440df0ebd08e8255882b00ba041042d64201080c54220008b8518036810418b24040b60210816c042100c804623a0bc08282f021b8da079211e03c21480b61741f3401c3ac23e002d8ba0b1105e04f4edb025420e406b86a0e5201080c542b0005a3582560bc1025808a225804621681e885c5e849a18008d46d05a40cc85c002682e04ab06a33782e778ab08412b85e8895002a01523683d20e606d0aa10ac128c298812809ae3ad2608560946692d8eb79a22583d315a1e6f7541185783d2e3e871b3201c7aff01c564bfac995018020000000049454e44ae426082","encryption":"sr25519"}}}},{"event":"network_removed","payload":{"base58prefix":"42","color":"#660D35","decimals":"12","encryption":"sr25519","genesis_hash":"e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e","logo":"westend","name":"westend","order":"3","path_id":"//westend","secondary_color":"#262626","title":"Westend","unit":"WND","current_verifier":{"type":"general","details":{"public_key":"8eaf04151687736326c9fea17e25fc5287613693c912909cb226aa4794f26a48","identicon":"89504e470d0a1a0a0000000d49484452000000410000004108060000008ef7c9450000034d49444154789cedd93d6e144110c5717c04673e01c9264848080287dea8258ee2cc2200022040ce7c142447ebd00108098964134ee0ac8f60aa342a6b7b34dbef557f8cd6f6fc83b7a155bfa8e539babfbf7ff1dc9b0521c658fc478e8f8f8fe4a76b5d106a8e46f540698ad0f3f8712d319a20941c1f2edfcba65d5ffc90f5d502a30a21161caf850900ab0442abc12846881d00acb9218a10622180163a226825102e845871bc153a23581e0c1a213600d0c24c081a0b41214407c0ddcd2fd9b493b3b7b243c189b05ebd924ddb6cffca72311010215602582c0402b05a423443c80158088205b058882a844802685e04544b042d07b117c103a01d3a82b60f6212c10ba03d06046d0a824678b35ec9a6fdde6c6587bc08ffee6e64d35e9e9cc90e7911bede9ecba67d3abd924da31058008b854000160b81002c060222e4002c04c10258088205b0c61059843180e645407911502508da2ec482203d204c01684f15413388e60857e7b7b269e757a7b2435e8470f94d36edfae2a3ecd02c085a0e0201582c0402b058887d009a0b419b8260012c04c10258082207a025080880c98b80f22294a6100bc282e044402f412fc2ebd55a36edcf76233be44508979f65d3ae2fbec8e6a311a6002c160201582c0402b01004859003b010040b60210816c0ca417441407911500b82b420480789805e825e84d5fa9d6cda76f353766816042d0781002c160201582c440e40a311b4290816c042102c8085201080e642407911505e84d216046941901e10340411c0b7432f027a097a11be4fbc543fecbc54a75200f919fe9fa0c50c429800b058080460b11008c0ca41d008210360210816c042102c80b50fa21b02ca8b806a8aa0c50988f044110c405b10a404418b2388e04440df0ebd08e8255882b00ba041042d64201080c54220008b8518036810418b24040b60210816c042100c804623a0bc08282f021b8da079211e03c21480b61741f3401c3ac23e002d8ba0b1105e04f4edb025420e406b86a0e5201080c542b0005a3582560bc1025808a225804621681e885c5e849a18008d46d05a40cc85c002682e04ab06a33782e778ab08412b85e8895002a01523683d20e606d0aa10ac128c298812809ae3ad2608560946692d8eb79a22583d315a1e6f7541185783d2e3e871b3201c7aff01c564bfac995018020000000049454e44ae426082","encryption":"sr25519"}}}},{"event":"add_specs_message_signed","payload":{"base58prefix":"42","color":"#660D35","decimals":"12","encryption":"sr25519","genesis_hash":"e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e","logo":"westend","name":"westend","path_id":"//westend","secondary_color":"#262626","title":"Westend","unit":"WND","signed_by":{"public_key":"8eaf04151687736326c9fea17e25fc5287613693c912909cb226aa4794f26a48","identicon":"89504e470d0a1a0a0000000d49484452000000410000004108060000008ef7c9450000034d49444154789cedd93d6e144110c5717c04673e01c9264848080287dea8258ee2cc2200022040ce7c142447ebd00108098964134ee0ac8f60aa342a6b7b34dbef557f8cd6f6fc83b7a155bfa8e539babfbf7ff1dc9b0521c658fc478e8f8f8fe4a76b5d106a8e46f540698ad0f3f8712d319a20941c1f2edfcba65d5ffc90f5d502a30a21161caf850900ab0442abc12846881d00acb9218a10622180163a226825102e845871bc153a23581e0c1a213600d0c24c081a0b41214407c0ddcd2fd9b493b3b7b243c189b05ebd924ddb6cffca72311010215602582c0402b05a423443c80158088205b058882a844802685e04544b042d07b117c103a01d3a82b60f6212c10ba03d06046d0a824678b35ec9a6fdde6c6587bc08ffee6e64d35e9e9cc90e7911bede9ecba67d3abd924da31058008b854000160b81002c060222e4002c04c10258088205b0c61059843180e645407911502508da2ec482203d204c01684f15413388e60857e7b7b269e757a7b2435e8470f94d36edfae2a3ecd02c085a0e0201582c0402b058887d009a0b419b8260012c04c10258082207a025080880c98b80f22294a6100bc282e044402f412fc2ebd55a36edcf76233be44508979f65d3ae2fbec8e6a311a6002c160201582c0402b01004859003b010040b60210816c0ca417441407911500b82b420480789805e825e84d5fa9d6cda76f353766816042d0781002c160201582c440e40a311b4290816c042102c8085201080e642407911505e84d216046941901e10340411c0b7432f027a097a11be4fbc543fecbc54a75200f919fe9fa0c50c429800b058080460b11008c0ca41d008210360210816c042102c80b50fa21b02ca8b806a8aa0c50988f044110c405b10a404418b2388e04440df0ebd08e8255882b00ba041042d64201080c54220008b8518036810418b24040b60210816c042100c804623a0bc08282f021b8da079211e03c21480b61741f3401c3ac23e002d8ba0b1105e04f4edb025420e406b86a0e5201080c542b0005a3582560bc1025808a225804621681e885c5e849a18008d46d05a40cc85c002682e04ab06a33782e778ab08412b85e8895002a01523683d20e606d0aa10ac128c298812809ae3ad2608560946692d8eb79a22583d315a1e6f7541185783d2e3e871b3201c7aff01c564bfac995018020000000049454e44ae426082","encryption":"sr25519"}}},{"event":"network_verifier_set","payload":{"genesis_hash":"e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e","current_verifier":{"type":"general","details":{"public_key":"8eaf04151687736326c9fea17e25fc5287613693c912909cb226aa4794f26a48","identicon":"89504e470d0a1a0a0000000d49484452000000410000004108060000008ef7c9450000034d49444154789cedd93d6e144110c5717c04673e01c9264848080287dea8258ee2cc2200022040ce7c142447ebd00108098964134ee0ac8f60aa342a6b7b34dbef557f8cd6f6fc83b7a155bfa8e539babfbf7ff1dc9b0521c658fc478e8f8f8fe4a76b5d106a8e46f540698ad0f3f8712d319a20941c1f2edfcba65d5ffc90f5d502a30a21161caf850900ab0442abc12846881d00acb9218a10622180163a226825102e845871bc153a23581e0c1a213600d0c24c081a0b41214407c0ddcd2fd9b493b3b7b243c189b05ebd924ddb6cffca72311010215602582c0402b05a423443c80158088205b058882a844802685e04544b042d07b117c103a01d3a82b60f6212c10ba03d06046d0a824678b35ec9a6fdde6c6587bc08ffee6e64d35e9e9cc90e7911bede9ecba67d3abd924da31058008b854000160b81002c060222e4002c04c10258088205b0c61059843180e645407911502508da2ec482203d204c01684f15413388e60857e7b7b269e757a7b2435e8470f94d36edfae2a3ecd02c085a0e0201582c0402b058887d009a0b419b8260012c04c10258082207a025080880c98b80f22294a6100bc282e044402f412fc2ebd55a36edcf76233be44508979f65d3ae2fbec8e6a311a6002c160201582c0402b01004859003b010040b60210816c0ca417441407911500b82b420480789805e825e84d5fa9d6cda76f353766816042d0781002c160201582c440e40a311b4290816c042102c8085201080e642407911505e84d216046941901e10340411c0b7432f027a097a11be4fbc543fecbc54a75200f919fe9fa0c50c429800b058080460b11008c0ca41d008210360210816c042102c80b50fa21b02ca8b806a8aa0c50988f044110c405b10a404418b2388e04440df0ebd08e8255882b00ba041042d64201080c54220008b8518036810418b24040b60210816c042100c804623a0bc08282f021b8da079211e03c21480b61741f3401c3ac23e002d8ba0b1105e04f4edb025420e406b86a0e5201080c542b0005a3582560bc1025808a225804621681e885c5e849a18008d46d05a40cc85c002682e04ab06a33782e778ab08412b85e8895002a01523683d20e606d0aa10ac128c298812809ae3ad2608560946692d8eb79a22583d315a1e6f7541185783d2e3e871b3201c7aff01c564bfac995018020000000049454e44ae426082","encryption":"sr25519"}}}},{"event":"general_verifier_added","payload":{"public_key":"8eaf04151687736326c9fea17e25fc5287613693c912909cb226aa4794f26a48","identicon":"89504e470d0a1a0a0000000d49484452000000410000004108060000008ef7c9450000034d49444154789cedd93d6e144110c5717c04673e01c9264848080287dea8258ee2cc2200022040ce7c142447ebd00108098964134ee0ac8f60aa342a6b7b34dbef557f8cd6f6fc83b7a155bfa8e539babfbf7ff1dc9b0521c658fc478e8f8f8fe4a76b5d106a8e46f540698ad0f3f8712d319a20941c1f2edfcba65d5ffc90f5d502a30a21161caf850900ab0442abc12846881d00acb9218a10622180163a226825102e845871bc153a23581e0c1a213600d0c24c081a0b41214407c0ddcd2fd9b493b3b7b243c189b05ebd924ddb6cffca72311010215602582c0402b05a423443c80158088205b058882a844802685e04544b042d07b117c103a01d3a82b60f6212c10ba03d06046d0a824678b35ec9a6fdde6c6587bc08ffee6e64d35e9e9cc90e7911bede9ecba67d3abd924da31058008b854000160b81002c060222e4002c04c10258088205b0c61059843180e645407911502508da2ec482203d204c01684f15413388e60857e7b7b269e757a7b2435e8470f94d36edfae2a3ecd02c085a0e0201582c0402b058887d009a0b419b8260012c04c10258082207a025080880c98b80f22294a6100bc282e044402f412fc2ebd55a36edcf76233be44508979f65d3ae2fbec8e6a311a6002c160201582c0402b01004859003b010040b60210816c0ca417441407911500b82b420480789805e825e84d5fa9d6cda76f353766816042d0781002c160201582c440e40a311b4290816c042102c8085201080e642407911505e84d216046941901e10340411c0b7432f027a097a11be4fbc543fecbc54a75200f919fe9fa0c50c429800b058080460b11008c0ca41d008210360210816c042102c80b50fa21b02ca8b806a8aa0c50988f044110c405b10a404418b2388e04440df0ebd08e8255882b00ba041042d64201080c54220008b8518036810418b24040b60210816c042100c804623a0bc08282f021b8da079211e03c21480b61741f3401c3ac23e002d8ba0b1105e04f4edb025420e406b86a0e5201080c542b0005a3582560bc1025808a225804621681e885c5e849a18008d46d05a40cc85c002682e04ab06a33782e778ab08412b85e8895002a01523683d20e606d0aa10ac128c298812809ae3ad2608560946692d8eb79a22583d315a1e6f7541185783d2e3e871b3201c7aff01c564bfac995018020000000049454e44ae426082","encryption":"sr25519"}},{"event":"types_added","payload":{"types_hash":"0e5751c026e543b2e8ab2eb06099daa1d1e5df47778f7787faab45cdf12fe3a8","types_id_pic":"89504e470d0a1a0a0000000d49484452000000410000004108060000008ef7c9450000039f49444154789cedd83d6e14411086619c12312b4bbe049903c8380101e2063ec31e63cfe01b20024e400681332e61c9da2122355d1a7d76cd6c4dfd7457af2c79dea01dd8eafee6097df1f8f8f8e6b5771684711cab1f1986e1a2fce85a1784968fb6ea81928ad0f3e3976562a420d47cfc707728e7bcf17a5fce5819184d08351f4f4900a806826ac1a846e80180ce0d5185500b40f544a06a2042082d1f8f7a23a008861b2103803a1702e5857021440086b757e59c37febb2fe75414c1bacfca036122b402203e5c83b00010bfcfca824843d006233e5c82f002207e9f5613821780ca1c4da5dfa740ac224400a8f4d1c9f7516b1022421480ca1e9d7d1f9220dc08bbaf37e59c77fc765bcea9e8e81fc3e9df7f1e9f7f1fbdcfda875c085e00c41fd286f3c11200f242f0fbbcfbd012c244d01e40fc2169381fac01200b82df17dd47a9084b00aae611ad288255ed3e0eb121949e102400aaf691b55e0a0205887484c3f0ab9cf3f6e3c7724e4511acfba2fb786e044a7b883f200d467cb8066101207e9f77dfb21002253dc41fd006233e5c82f002207e9fb54f6a866001788a8eb6cabe6f2d82d810368420c2cdee4339e7dd1e7f97732a3afa30fc29e7bcfdf8be9c53d1fbac7d6bb911a407107f481bce074b00c80bc1eff3ee937221680f20fe90349c0fd6009005c1ef8bee5bd605c12a8a60d5ba6f43286d08a52e08c3e15d39e78dfbbfe59c8a2258f745f72d732150da43fc016930e2c335080b00f1fbbcfba4dc0894f4107f401b8cf87009c20b80f87dd6beb5420856d1d156d9f7adb521943684d213026541dcedbe9773def5f14b39a7a2a3af1e8672cebbbf1ccb3915bdcfda274500e5c7f4ff044a43901e40fc216d381f2c01202f04bfcfbb6f991b417b00f187a4e17cb006802c087e5f741faf1b825514c1aa65df09022541b43c22f5521000406d08a51902b584883ef26977fa5fdf9fc7e7fffa4611acfba2fb280e40990894f6107f401a8cf8700dc20240fc3eef3e6422505e08fe803618f1e112841700f1fbac7d680940b911aca2a3adb2ef436e042a0a913d3afb3e4a02a05611a80844f6e8ecfbd600281581f2424447ef2e4ffffef8f0fcfbe87d5a1a0095864069c3f96009007921f87d56cd08542b041fac01200b82df676501502e042a02a1154568c90340b911a80c8873217801a810026ac1e88d10f978548540d542f444a801a0aa11a81e10e706a09a10500d86045103d0f2f1280501d560d496f1f1281501f5c4c8fc78d40561590b4a8f8f5e76168497de7fa22fbfac7f3444800000000049454e44ae426082","verifier":{"public_key":"8eaf04151687736326c9fea17e25fc5287613693c912909cb226aa4794f26a48","identicon":"89504e470d0a1a0a0000000d49484452000000410000004108060000008ef7c9450000034d49444154789cedd93d6e144110c5717c04673e01c9264848080287dea8258ee2cc2200022040ce7c142447ebd00108098964134ee0ac8f60aa342a6b7b34dbef557f8cd6f6fc83b7a155bfa8e539babfbf7ff1dc9b0521c658fc478e8f8f8fe4a76b5d106a8e46f540698ad0f3f8712d319a20941c1f2edfcba65d5ffc90f5d502a30a21161caf850900ab0442abc12846881d00acb9218a10622180163a226825102e845871bc153a23581e0c1a213600d0c24c081a0b41214407c0ddcd2fd9b493b3b7b243c189b05ebd924ddb6cffca72311010215602582c0402b05a423443c80158088205b058882a844802685e04544b042d07b117c103a01d3a82b60f6212c10ba03d06046d0a824678b35ec9a6fdde6c6587bc08ffee6e64d35e9e9cc90e7911bede9ecba67d3abd924da31058008b854000160b81002c060222e4002c04c10258088205b0c61059843180e645407911502508da2ec482203d204c01684f15413388e60857e7b7b269e757a7b2435e8470f94d36edfae2a3ecd02c085a0e0201582c0402b058887d009a0b419b8260012c04c10258082207a025080880c98b80f22294a6100bc282e044402f412fc2ebd55a36edcf76233be44508979f65d3ae2fbec8e6a311a6002c160201582c0402b01004859003b010040b60210816c0ca417441407911500b82b420480789805e825e84d5fa9d6cda76f353766816042d0781002c160201582c440e40a311b4290816c042102c8085201080e642407911505e84d216046941901e10340411c0b7432f027a097a11be4fbc543fecbc54a75200f919fe9fa0c50c429800b058080460b11008c0ca41d008210360210816c042102c80b50fa21b02ca8b806a8aa0c50988f044110c405b10a404418b2388e04440df0ebd08e8255882b00ba041042d64201080c54220008b8518036810418b24040b60210816c042100c804623a0bc08282f021b8da079211e03c21480b61741f3401c3ac23e002d8ba0b1105e04f4edb025420e406b86a0e5201080c542b0005a3582560bc1025808a225804621681e885c5e849a18008d46d05a40cc85c002682e04ab06a33782e778ab08412b85e8895002a01523683d20e606d0aa10ac128c298812809ae3ad2608560946692d8eb79a22583d315a1e6f7541185783d2e3e871b3201c7aff01c564bfac995018020000000049454e44ae426082","encryption":"sr25519"}}},{"event":"types_removed","payload":{"types_hash":"0e5751c026e543b2e8ab2eb06099daa1d1e5df47778f7787faab45cdf12fe3a8","types_id_pic":"89504e470d0a1a0a0000000d49484452000000410000004108060000008ef7c9450000039f49444154789cedd83d6e14411086619c12312b4bbe049903c8380101e2063ec31e63cfe01b20024e400681332e61c9da2122355d1a7d76cd6c4dfd7457af2c79dea01dd8eafee6097df1f8f8f8e6b5771684711cab1f1986e1a2fce85a1784968fb6ea81928ad0f3e3976562a420d47cfc707728e7bcf17a5fce5819184d08351f4f4900a806826ac1a846e80180ce0d5185500b40f544a06a2042082d1f8f7a23a008861b2103803a1702e5857021440086b757e59c37febb2fe75414c1bacfca036122b402203e5c83b00010bfcfca824843d006233e5c82f002207e9f5613821780ca1c4da5dfa740ac224400a8f4d1c9f7516b1022421480ca1e9d7d1f9220dc08bbaf37e59c77fc765bcea9e8e81fc3e9df7f1e9f7f1fbdcfda875c085e00c41fd286f3c11200f242f0fbbcfbd012c244d01e40fc2169381fac01200b82df17dd47a9084b00aae611ad288255ed3e0eb121949e102400aaf691b55e0a0205887484c3f0ab9cf3f6e3c7724e4511acfba2fb786e044a7b883f200d467cb8066101207e9f77dfb21002253dc41fd006233e5c82f002207e9fb54f6a866001788a8eb6cabe6f2d82d810368420c2cdee4339e7dd1e7f97732a3afa30fc29e7bcfdf8be9c53d1fbac7d6bb911a407107f481bce074b00c80bc1eff3ee937221680f20fe90349c0fd6009005c1ef8bee5bd605c12a8a60d5ba6f43286d08a52e08c3e15d39e78dfbbfe59c8a2258f745f72d732150da43fc016930e2c335080b00f1fbbcfba4dc0894f4107f401b8cf87009c20b80f87dd6beb5420856d1d156d9f7adb521943684d213026541dcedbe9773def5f14b39a7a2a3af1e8672cebbbf1ccb3915bdcfda274500e5c7f4ff044a43901e40fc216d381f2c01202f04bfcfbb6f991b417b00f187a4e17cb006802c087e5f741faf1b825514c1aa65df09022541b43c22f5521000406d08a51902b584883ef26977fa5fdf9fc7e7fffa4611acfba2fb280e40990894f6107f401a8cf8700dc20240fc3eef3e6422505e08fe803618f1e112841700f1fbac7d680940b911aca2a3adb2ef436e042a0a913d3afb3e4a02a05611a80844f6e8ecfbd600281581f2424447ef2e4ffffef8f0fcfbe87d5a1a0095864069c3f96009007921f87d56cd08542b041fac01200b82df676501502e042a02a1154568c90340b911a80c8873217801a810026ac1e88d10f978548540d542f444a801a0aa11a81e10e706a09a10500d86045103d0f2f1280501d560d496f1f1281501f5c4c8fc78d40561590b4a8f8f5e76168497de7fa22fbfac7f3444800000000049454e44ae426082","verifier":{"public_key":"8eaf04151687736326c9fea17e25fc5287613693c912909cb226aa4794f26a48","identicon":"89504e470d0a1a0a0000000d49484452000000410000004108060000008ef7c9450000034d49444154789cedd93d6e144110c5717c04673e01c9264848080287dea8258ee2cc2200022040ce7c142447ebd00108098964134ee0ac8f60aa342a6b7b34dbef557f8cd6f6fc83b7a155bfa8e539babfbf7ff1dc9b0521c658fc478e8f8f8fe4a76b5d106a8e46f540698ad0f3f8712d319a20941c1f2edfcba65d5ffc90f5d502a30a21161caf850900ab0442abc12846881d00acb9218a10622180163a226825102e845871bc153a23581e0c1a213600d0c24c081a0b41214407c0ddcd2fd9b493b3b7b243c189b05ebd924ddb6cffca72311010215602582c0402b05a423443c80158088205b058882a844802685e04544b042d07b117c103a01d3a82b60f6212c10ba03d06046d0a824678b35ec9a6fdde6c6587bc08ffee6e64d35e9e9cc90e7911bede9ecba67d3abd924da31058008b854000160b81002c060222e4002c04c10258088205b0c61059843180e645407911502508da2ec482203d204c01684f15413388e60857e7b7b269e757a7b2435e8470f94d36edfae2a3ecd02c085a0e0201582c0402b058887d009a0b419b8260012c04c10258082207a025080880c98b80f22294a6100bc282e044402f412fc2ebd55a36edcf76233be44508979f65d3ae2fbec8e6a311a6002c160201582c0402b01004859003b010040b60210816c0ca417441407911500b82b420480789805e825e84d5fa9d6cda76f353766816042d0781002c160201582c440e40a311b4290816c042102c8085201080e642407911505e84d216046941901e10340411c0b7432f027a097a11be4fbc543fecbc54a75200f919fe9fa0c50c429800b058080460b11008c0ca41d008210360210816c042102c80b50fa21b02ca8b806a8aa0c50988f044110c405b10a404418b2388e04440df0ebd08e8255882b00ba041042d64201080c54220008b8518036810418b24040b60210816c042100c804623a0bc08282f021b8da079211e03c21480b61741f3401c3ac23e002d8ba0b1105e04f4edb025420e406b86a0e5201080c542b0005a3582560bc1025808a225804621681e885c5e849a18008d46d05a40cc85c002682e04ab06a33782e778ab08412b85e8895002a01523683d20e606d0aa10ac128c298812809ae3ad2608560946692d8eb79a22583d315a1e6f7541185783d2e3e871b3201c7aff01c564bfac995018020000000049454e44ae426082","encryption":"sr25519"}}},{"event":"load_types_message_signed","payload":{"types_hash":"0e5751c026e543b2e8ab2eb06099daa1d1e5df47778f7787faab45cdf12fe3a8","types_id_pic":"89504e470d0a1a0a0000000d49484452000000410000004108060000008ef7c9450000039f49444154789cedd83d6e14411086619c12312b4bbe049903c8380101e2063ec31e63cfe01b20024e400681332e61c9da2122355d1a7d76cd6c4dfd7457af2c79dea01dd8eafee6097df1f8f8f8e6b5771684711cab1f1986e1a2fce85a1784968fb6ea81928ad0f3e3976562a420d47cfc707728e7bcf17a5fce5819184d08351f4f4900a806826ac1a846e80180ce0d5185500b40f544a06a2042082d1f8f7a23a008861b2103803a1702e5857021440086b757e59c37febb2fe75414c1bacfca036122b402203e5c83b00010bfcfca824843d006233e5c82f002207e9f5613821780ca1c4da5dfa740ac224400a8f4d1c9f7516b1022421480ca1e9d7d1f9220dc08bbaf37e59c77fc765bcea9e8e81fc3e9df7f1e9f7f1fbdcfda875c085e00c41fd286f3c11200f242f0fbbcfbd012c244d01e40fc2169381fac01200b82df17dd47a9084b00aae611ad288255ed3e0eb121949e102400aaf691b55e0a0205887484c3f0ab9cf3f6e3c7724e4511acfba2fb786e044a7b883f200d467cb8066101207e9f77dfb21002253dc41fd006233e5c82f002207e9fb54f6a866001788a8eb6cabe6f2d82d810368420c2cdee4339e7dd1e7f97732a3afa30fc29e7bcfdf8be9c53d1fbac7d6bb911a407107f481bce074b00c80bc1eff3ee937221680f20fe90349c0fd6009005c1ef8bee5bd605c12a8a60d5ba6f43286d08a52e08c3e15d39e78dfbbfe59c8a2258f745f72d732150da43fc016930e2c335080b00f1fbbcfba4dc0894f4107f401b8cf87009c20b80f87dd6beb5420856d1d156d9f7adb521943684d213026541dcedbe9773def5f14b39a7a2a3af1e8672cebbbf1ccb3915bdcfda274500e5c7f4ff044a43901e40fc216d381f2c01202f04bfcfbb6f991b417b00f187a4e17cb006802c087e5f741faf1b825514c1aa65df09022541b43c22f5521000406d08a51902b584883ef26977fa5fdf9fc7e7fffa4611acfba2fb280e40990894f6107f401a8cf8700dc20240fc3eef3e6422505e08fe803618f1e112841700f1fbac7d680940b911aca2a3adb2ef436e042a0a913d3afb3e4a02a05611a80844f6e8ecfbd600281581f2424447ef2e4ffffef8f0fcfbe87d5a1a0095864069c3f96009007921f87d56cd08542b041fac01200b82df676501502e042a02a1154568c90340b911a80c8873217801a810026ac1e88d10f978548540d542f444a801a0aa11a81e10e706a09a10500d86045103d0f2f1280501d560d496f1f1281501f5c4c8fc78d40561590b4a8f8f5e76168497de7fa22fbfac7f3444800000000049454e44ae426082","signed_by":{"public_key":"8eaf04151687736326c9fea17e25fc5287613693c912909cb226aa4794f26a48","identicon":"89504e470d0a1a0a0000000d49484452000000410000004108060000008ef7c9450000034d49444154789cedd93d6e144110c5717c04673e01c9264848080287dea8258ee2cc2200022040ce7c142447ebd00108098964134ee0ac8f60aa342a6b7b34dbef557f8cd6f6fc83b7a155bfa8e539babfbf7ff1dc9b0521c658fc478e8f8f8fe4a76b5d106a8e46f540698ad0f3f8712d319a20941c1f2edfcba65d5ffc90f5d502a30a21161caf850900ab0442abc12846881d00acb9218a10622180163a226825102e845871bc153a23581e0c1a213600d0c24c081a0b41214407c0ddcd2fd9b493b3b7b243c189b05ebd924ddb6cffca72311010215602582c0402b05a423443c80158088205b058882a844802685e04544b042d07b117c103a01d3a82b60f6212c10ba03d06046d0a824678b35ec9a6fdde6c6587bc08ffee6e64d35e9e9cc90e7911bede9ecba67d3abd924da31058008b854000160b81002c060222e4002c04c10258088205b0c61059843180e645407911502508da2ec482203d204c01684f15413388e60857e7b7b269e757a7b2435e8470f94d36edfae2a3ecd02c085a0e0201582c0402b058887d009a0b419b8260012c04c10258082207a025080880c98b80f22294a6100bc282e044402f412fc2ebd55a36edcf76233be44508979f65d3ae2fbec8e6a311a6002c160201582c0402b01004859003b010040b60210816c0ca417441407911500b82b420480789805e825e84d5fa9d6cda76f353766816042d0781002c160201582c440e40a311b4290816c042102c8085201080e642407911505e84d216046941901e10340411c0b7432f027a097a11be4fbc543fecbc54a75200f919fe9fa0c50c429800b058080460b11008c0ca41d008210360210816c042102c80b50fa21b02ca8b806a8aa0c50988f044110c405b10a404418b2388e04440df0ebd08e8255882b00ba041042d64201080c54220008b8518036810418b24040b60210816c042100c804623a0bc08282f021b8da079211e03c21480b61741f3401c3ac23e002d8ba0b1105e04f4edb025420e406b86a0e5201080c542b0005a3582560bc1025808a225804621681e885c5e849a18008d46d05a40cc85c002682e04ab06a33782e778ab08412b85e8895002a01523683d20e606d0aa10ac128c298812809ae3ad2608560946692d8eb79a22583d315a1e6f7541185783d2e3e871b3201c7aff01c564bfac995018020000000049454e44ae426082","encryption":"sr25519"}}},{"event":"transaction_signed","payload":{"transaction":"","network_name":"westend","signed_by":{"public_key":"8eaf04151687736326c9fea17e25fc5287613693c912909cb226aa4794f26a48","identicon":"89504e470d0a1a0a0000000d49484452000000410000004108060000008ef7c9450000034d49444154789cedd93d6e144110c5717c04673e01c9264848080287dea8258ee2cc2200022040ce7c142447ebd00108098964134ee0ac8f60aa342a6b7b34dbef557f8cd6f6fc83b7a155bfa8e539babfbf7ff1dc9b0521c658fc478e8f8f8fe4a76b5d106a8e46f540698ad0f3f8712d319a20941c1f2edfcba65d5ffc90f5d502a30a21161caf850900ab0442abc12846881d00acb9218a10622180163a226825102e845871bc153a23581e0c1a213600d0c24c081a0b41214407c0ddcd2fd9b493b3b7b243c189b05ebd924ddb6cffca72311010215602582c0402b05a423443c80158088205b058882a844802685e04544b042d07b117c103a01d3a82b60f6212c10ba03d06046d0a824678b35ec9a6fdde6c6587bc08ffee6e64d35e9e9cc90e7911bede9ecba67d3abd924da31058008b854000160b81002c060222e4002c04c10258088205b0c61059843180e645407911502508da2ec482203d204c01684f15413388e60857e7b7b269e757a7b2435e8470f94d36edfae2a3ecd02c085a0e0201582c0402b058887d009a0b419b8260012c04c10258082207a025080880c98b80f22294a6100bc282e044402f412fc2ebd55a36edcf76233be44508979f65d3ae2fbec8e6a311a6002c160201582c0402b01004859003b010040b60210816c0ca417441407911500b82b420480789805e825e84d5fa9d6cda76f353766816042d0781002c160201582c440e40a311b4290816c042102c8085201080e642407911505e84d216046941901e10340411c0b7432f027a097a11be4fbc543fecbc54a75200f919fe9fa0c50c429800b058080460b11008c0ca41d008210360210816c042102c80b50fa21b02ca8b806a8aa0c50988f044110c405b10a404418b2388e04440df0ebd08e8255882b00ba041042d64201080c54220008b8518036810418b24040b60210816c042100c804623a0bc08282f021b8da079211e03c21480b61741f3401c3ac23e002d8ba0b1105e04f4edb025420e406b86a0e5201080c542b0005a3582560bc1025808a225804621681e885c5e849a18008d46d05a40cc85c002682e04ab06a33782e778ab08412b85e8895002a01523683d20e606d0aa10ac128c298812809ae3ad2608560946692d8eb79a22583d315a1e6f7541185783d2e3e871b3201c7aff01c564bfac995018020000000049454e44ae426082","encryption":"sr25519"},"user_comment":"send to Alice"}},{"event":"transaction_sign_error","payload":{"transaction":"","network_name":"westend","signed_by":{"public_key":"8eaf04151687736326c9fea17e25fc5287613693c912909cb226aa4794f26a48","identicon":"89504e470d0a1a0a0000000d49484452000000410000004108060000008ef7c9450000034d49444154789cedd93d6e144110c5717c04673e01c9264848080287dea8258ee2cc2200022040ce7c142447ebd00108098964134ee0ac8f60aa342a6b7b34dbef557f8cd6f6fc83b7a155bfa8e539babfbf7ff1dc9b0521c658fc478e8f8f8fe4a76b5d106a8e46f540698ad0f3f8712d319a20941c1f2edfcba65d5ffc90f5d502a30a21161caf850900ab0442abc12846881d00acb9218a10622180163a226825102e845871bc153a23581e0c1a213600d0c24c081a0b41214407c0ddcd2fd9b493b3b7b243c189b05ebd924ddb6cffca72311010215602582c0402b05a423443c80158088205b058882a844802685e04544b042d07b117c103a01d3a82b60f6212c10ba03d06046d0a824678b35ec9a6fdde6c6587bc08ffee6e64d35e9e9cc90e7911bede9ecba67d3abd924da31058008b854000160b81002c060222e4002c04c10258088205b0c61059843180e645407911502508da2ec482203d204c01684f15413388e60857e7b7b269e757a7b2435e8470f94d36edfae2a3ecd02c085a0e0201582c0402b058887d009a0b419b8260012c04c10258082207a025080880c98b80f22294a6100bc282e044402f412fc2ebd55a36edcf76233be44508979f65d3ae2fbec8e6a311a6002c160201582c0402b01004859003b010040b60210816c0ca417441407911500b82b420480789805e825e84d5fa9d6cda76f353766816042d0781002c160201582c440e40a311b4290816c042102c8085201080e642407911505e84d216046941901e10340411c0b7432f027a097a11be4fbc543fecbc54a75200f919fe9fa0c50c429800b058080460b11008c0ca41d008210360210816c042102c80b50fa21b02ca8b806a8aa0c50988f044110c405b10a404418b2388e04440df0ebd08e8255882b00ba041042d64201080c54220008b8518036810418b24040b60210816c042100c804623a0bc08282f021b8da079211e03c21480b61741f3401c3ac23e002d8ba0b1105e04f4edb025420e406b86a0e5201080c542b0005a3582560bc1025808a225804621681e885c5e849a18008d46d05a40cc85c002682e04ab06a33782e778ab08412b85e8895002a01523683d20e606d0aa10ac128c298812809ae3ad2608560946692d8eb79a22583d315a1e6f7541185783d2e3e871b3201c7aff01c564bfac995018020000000049454e44ae426082","encryption":"sr25519"},"user_comment":"send to Alice","error":"wrong_password_entered"}},{"event":"message_signed","payload":{"message":"5468697320697320416c6963650a526f676572","network_name":"westend","signed_by":{"public_key":"8eaf04151687736326c9fea17e25fc5287613693c912909cb226aa4794f26a48","identicon":"89504e470d0a1a0a0000000d49484452000000410000004108060000008ef7c9450000034d49444154789cedd93d6e144110c5717c04673e01c9264848080287dea8258ee2cc2200022040ce7c142447ebd00108098964134ee0ac8f60aa342a6b7b34dbef557f8cd6f6fc83b7a155bfa8e539babfbf7ff1dc9b0521c658fc478e8f8f8fe4a76b5d106a8e46f540698ad0f3f8712d319a20941c1f2edfcba65d5ffc90f5d502a30a21161caf850900ab0442abc12846881d00acb9218a10622180163a226825102e845871bc153a23581e0c1a213600d0c24c081a0b41214407c0ddcd2fd9b493b3b7b243c189b05ebd924ddb6cffca72311010215602582c0402b05a423443c80158088205b058882a844802685e04544b042d07b117c103a01d3a82b60f6212c10ba03d06046d0a824678b35ec9a6fdde6c6587bc08ffee6e64d35e9e9cc90e7911bede9ecba67d3abd924da31058008b854000160b81002c060222e4002c04c10258088205b0c61059843180e645407911502508da2ec482203d204c01684f15413388e60857e7b7b269e757a7b2435e8470f94d36edfae2a3ecd02c085a0e0201582c0402b058887d009a0b419b8260012c04c10258082207a025080880c98b80f22294a6100bc282e044402f412fc2ebd55a36edcf76233be44508979f65d3ae2fbec8e6a311a6002c160201582c0402b01004859003b010040b60210816c0ca417441407911500b82b420480789805e825e84d5fa9d6cda76f353766816042d0781002c160201582c440e40a311b4290816c042102c8085201080e642407911505e84d216046941901e10340411c0b7432f027a097a11be4fbc543fecbc54a75200f919fe9fa0c50c429800b058080460b11008c0ca41d008210360210816c042102c80b50fa21b02ca8b806a8aa0c50988f044110c405b10a404418b2388e04440df0ebd08e8255882b00ba041042d64201080c54220008b8518036810418b24040b60210816c042100c804623a0bc08282f021b8da079211e03c21480b61741f3401c3ac23e002d8ba0b1105e04f4edb025420e406b86a0e5201080c542b0005a3582560bc1025808a225804621681e885c5e849a18008d46d05a40cc85c002682e04ab06a33782e778ab08412b85e8895002a01523683d20e606d0aa10ac128c298812809ae3ad2608560946692d8eb79a22583d315a1e6f7541185783d2e3e871b3201c7aff01c564bfac995018020000000049454e44ae426082","encryption":"sr25519"},"user_comment":"send to Alice"}},{"event":"message_sign_error","payload":{"message":"5468697320697320416c6963650a526f676572","network_name":"westend","signed_by":{"public_key":"8eaf04151687736326c9fea17e25fc5287613693c912909cb226aa4794f26a48","identicon":"89504e470d0a1a0a0000000d49484452000000410000004108060000008ef7c9450000034d49444154789cedd93d6e144110c5717c04673e01c9264848080287dea8258ee2cc2200022040ce7c142447ebd00108098964134ee0ac8f60aa342a6b7b34dbef557f8cd6f6fc83b7a155bfa8e539babfbf7ff1dc9b0521c658fc478e8f8f8fe4a76b5d106a8e46f540698ad0f3f8712d319a20941c1f2edfcba65d5ffc90f5d502a30a21161caf850900ab0442abc12846881d00acb9218a10622180163a226825102e845871bc153a23581e0c1a213600d0c24c081a0b41214407c0ddcd2fd9b493b3b7b243c189b05ebd924ddb6cffca72311010215602582c0402b05a423443c80158088205b058882a844802685e04544b042d07b117c103a01d3a82b60f6212c10ba03d06046d0a824678b35ec9a6fdde6c6587bc08ffee6e64d35e9e9cc90e7911bede9ecba67d3abd924da31058008b854000160b81002c060222e4002c04c10258088205b0c61059843180e645407911502508da2ec482203d204c01684f15413388e60857e7b7b269e757a7b2435e8470f94d36edfae2a3ecd02c085a0e0201582c0402b058887d009a0b419b8260012c04c10258082207a025080880c98b80f22294a6100bc282e044402f412fc2ebd55a36edcf76233be44508979f65d3ae2fbec8e6a311a6002c160201582c0402b01004859003b010040b60210816c0ca417441407911500b82b420480789805e825e84d5fa9d6cda76f353766816042d0781002c160201582c440e40a311b4290816c042102c8085201080e642407911505e84d216046941901e10340411c0b7432f027a097a11be4fbc543fecbc54a75200f919fe9fa0c50c429800b058080460b11008c0ca41d008210360210816c042102c80b50fa21b02ca8b806a8aa0c50988f044110c405b10a404418b2388e04440df0ebd08e8255882b00ba041042d64201080c54220008b8518036810418b24040b60210816c042100c804623a0bc08282f021b8da079211e03c21480b61741f3401c3ac23e002d8ba0b1105e04f4edb025420e406b86a0e5201080c542b0005a3582560bc1025808a225804621681e885c5e849a18008d46d05a40cc85c002682e04ab06a33782e778ab08412b85e8895002a01523683d20e606d0aa10ac128c298812809ae3ad2608560946692d8eb79a22583d315a1e6f7541185783d2e3e871b3201c7aff01c564bfac995018020000000049454e44ae426082","encryption":"sr25519"},"user_comment":"send to Alice","error":"wrong_password_entered"}},{"event":"identity_added","payload":{"seed_name":"Alice","encryption":"sr25519","public_key":"8eaf04151687736326c9fea17e25fc5287613693c912909cb226aa4794f26a48","path":"//","network_genesis_hash":"e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e"}},{"event":"identity_removed","payload":{"seed_name":"Alice","encryption":"sr25519","public_key":"8eaf04151687736326c9fea17e25fc5287613693c912909cb226aa4794f26a48","path":"//","network_genesis_hash":"e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e"}},{"event":"identities_wiped"},{"event":"device_online"},{"event":"reset_danger_record"},{"event":"seed_created","payload":"Alice"},{"event":"seed_name_shown","payload":"AliceSecretSeed"},{"event":"warning","payload":"Received network information is not verified."},{"event":"wrong_password_entered"},{"event":"user_entered_event","payload":"Lalala!!!"},{"event":"system_entered_event","payload":"Blip blop"},{"event":"history_cleared"},{"event":"database_initiated"}]"##;
-        assert!(history.contains(expected_history_part), "\nHistory generated:\n{}", history);
-        std::fs::remove_dir_all(dbname).unwrap();
-    }
-    
-    #[test]
-    fn print_single_event () {
-        let dbname = "for_tests/print_single_event";
-        populate_cold(dbname, Verifier(None)).unwrap();
-        let print = print_history_entry_by_order(0, dbname).unwrap();
-        let expected_print = r#""events":[{"event":"database_initiated"},{"event":"general_verifier_added","payload":{"public_key":"","identicon":"","encryption":"none"}}]"#;
-        assert!(print.contains(expected_print), "\nHistory entry printed as:\n{}", print);
-        std::fs::remove_dir_all(dbname).unwrap();
-    }
-}
-

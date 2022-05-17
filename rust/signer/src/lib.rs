@@ -14,13 +14,6 @@
 // You should have received a copy of the GNU General Public License
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
-//used for identicon size; because JNI has no signed int
-
-use db_handling;
-use qr_reader_phone;
-use navigator;
-use definitions;
-
 mod export;
 
 export! {
@@ -64,25 +57,14 @@ export! {
         qr_reader_phone::decode_sequence(data, cleaned)
     }
 
-     @Java_io_parity_signer_models_SignerDataModel_substrateGuessWord
-    fn guess_word (
-        part: &str
+    @Java_io_parity_signer_models_SignerDataModel_substratePathCheck
+    fn path_check(
+        seed_name: &str,
+        path: &str,
+        network: &str,
+        dbname: &str
     ) -> String {
-        db_handling::identities::guess(part)
-    }
-
-    @Java_io_parity_signer_models_SignerDataModel_substrateCheckPath
-    fn check_path(
-        path: &str
-    ) -> anyhow::Result<bool, anyhow::Error> {
-        db_handling::identities::check_derivation_format(path).map_err(|e| e.anyhow())
-    }
-
-    @Java_io_parity_signer_models_SignerDataModel_substrateValidateSeedphrase
-    fn validate_phrase(
-        seed_phrase: &str
-    ) -> anyhow::Result<(), anyhow::Error> {
-        db_handling::identities::validate_phrase(seed_phrase).map_err(|e| e.anyhow())
+        db_handling::interface_signer::dynamic_path_check(dbname, seed_name, path, network)
     }
 
     @Java_io_parity_signer_models_SignerDataModel_historyInitHistoryWithCert

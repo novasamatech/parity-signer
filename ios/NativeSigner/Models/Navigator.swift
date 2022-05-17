@@ -244,6 +244,8 @@ enum ButtonID {
     case SignNetworkSpecs
     case SignMetadata
     case SignTypes
+    case TextEntry
+    case PushWord
     case ManageNetworks
     case ViewGeneralVerifier
     case ManageMetadata
@@ -288,6 +290,7 @@ extension SignerDataModel {
                     }
                     signer_destroy_string(res!)
                 } else {
+                    signer_destroy_string(err_ptr.pointee.message)
                     print("pushing button failed")
                 }
             }

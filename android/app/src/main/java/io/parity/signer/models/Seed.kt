@@ -3,7 +3,6 @@ package io.parity.signer.models
 import android.util.Log
 import android.widget.Toast
 import io.parity.signer.ButtonID
-import org.json.JSONArray
 
 //MARK: Seed management begin
 
@@ -30,7 +29,7 @@ internal fun SignerDataModel.refreshSeedNames(init: Boolean = false) {
 fun SignerDataModel.addSeed(
 	seedName: String,
 	seedPhrase: String,
-	createRoots: Boolean
+	createSeedKeys: Boolean
 ) {
 
 	//Check if seed name already exists
@@ -55,7 +54,7 @@ fun SignerDataModel.addSeed(
 			refreshSeedNames()
 			pushButton(
 				button = ButtonID.GoForward,
-				details = if (createRoots) "true" else "false",
+				details = if (createSeedKeys) "true" else "false",
 				seedPhrase = seedPhrase
 			)
 		} catch (e: java.lang.Exception) {
@@ -85,26 +84,6 @@ internal fun SignerDataModel.getSeed(seedName: String, backup: Boolean = false):
 		""
 	}
 
-}
-
-/**
- * Guess possible seed words from user input
- */
-internal fun SignerDataModel.guessWord(word: String): List<String> {
-	return JSONArray(substrateGuessWord(word)).toListOfStrings()
-}
-
-/**
- * Check if provided seed phrase is valid
- */
-internal fun SignerDataModel.validatePhrase(seedPhrase: String): String? {
-	var errorMessage: String? = null
-	try {
-		substrateValidateSeedphrase(seedPhrase)
-	} catch (e: java.lang.Exception) {
-		errorMessage = e.toString()
-	}
-	return errorMessage
 }
 
 fun SignerDataModel.removeSeed(seedName: String) {

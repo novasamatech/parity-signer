@@ -3,6 +3,11 @@ package io.parity.signer.components
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import com.halilibo.richtext.markdown.Markdown
+import com.halilibo.richtext.ui.RichText
+import com.halilibo.richtext.ui.RichTextStyle
+import com.halilibo.richtext.ui.material.MaterialRichText
+import com.halilibo.richtext.ui.string.RichTextStringStyle
 import io.parity.signer.ui.theme.Text600
 import io.parity.signer.ui.theme.Typography
 
@@ -11,8 +16,10 @@ import io.parity.signer.ui.theme.Typography
  */
 @Composable
 fun PP() {
-	Text(
-		"""
+	MaterialRichText() {
+		RichText() {
+			Markdown(
+				"""
 # Privacy Policy
 
 Parity Technologies Limited (“**We**”; “**us**”; or “**our**”) are committed to protecting and respecting your privacy.
@@ -238,7 +245,8 @@ Statutory information
 - Registered in England and Wales
 - Registered Number: 09760015
 - Registered Office: Ignition Law, Moray House Floor 1, 23-31 Great Titchfield Street, London, United Kingdom, WC1W 7PA.
-						""",
-		style = Typography.body1, color = MaterialTheme.colors.Text600
-	)
+						"""
+			)
+		}
+	}
 }

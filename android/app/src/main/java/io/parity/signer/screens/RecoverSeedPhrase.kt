@@ -6,6 +6,7 @@ import androidx.compose.material.Checkbox
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -26,29 +27,16 @@ fun RecoverSeedPhrase(
 	button: (button: ButtonID, details: String) -> Unit,
 	signerDataModel: SignerDataModel
 ) {
-
-	val seedPhrase = remember { mutableStateOf(listOf<String>()) }
-	val guessWord = remember { mutableStateOf(listOf<String>()) }
-	val seedValid = remember { mutableStateOf(false) }
-	val seedWord = remember {
-		mutableStateOf(
-			TextFieldValue(
-				" ",
-				selection = TextRange(1)
-			)
-		)
-	}
-	val restoreSeedModel = remember(seedPhrase, seedWord, guessWord, seedValid) {
-		RestoreSeedModel(
-			seedPhrase,
-			seedWord,
-			guessWord,
-			seedValid,
-			signerDataModel::guessWord,
-			signerDataModel::validatePhrase
-		)
-	}
-	val createRoots = remember { mutableStateOf(true) }
+  val screenData = signerDataModel.screenData.observeAsState()
+	val seedPhrase = screenData.value?.optJSONArray("draft")?.toListOfJSONObjects()?: listOf() //remember { mutableStateOf(listOf<String>()) }
+	val guessWord = screenData.value?.optJSONArray("guess_set")?.toListOfStrings() ?: listOf() //remember { mutableStateOf(listOf<String>()) }
+	val seedPhraseReady = screenData.value?.optString("ready_seed")
+	val seedWordText = screenData.value?.optString("user_input")?: ""
+	val seedWord = TextFieldValue(
+				seedWordText,
+				selection = TextRange(seedWordText.length)
+	)
+	val createSeedKeys = remember { mutableStateOf(true) }
 
 	Column(
 		verticalArrangement = Arrangement.Top,
@@ -59,7 +47,7 @@ fun RecoverSeedPhrase(
 			modifier = Modifier.fillMaxWidth(1f)
 		) {
 			Text(
-				signerDataModel.screenData.value?.optString("seed_name")
+				signerDataModel.screenData.value?.optString("seed_name")?.decode64()
 					?: "Error: no seed name",
 				style = MaterialTheme.typography.subtitle1
 			)
@@ -68,30 +56,30 @@ fun RecoverSeedPhrase(
 
 		Spacer(Modifier.height(12.dp))
 		RestoreSeedPhraseBox(
-			seedPhrase = restoreSeedModel.seedPhrase,
-			seedWord = restoreSeedModel.seedWord,
-			update = restoreSeedModel::update,
+			seedPhrase = seedPhrase,
+			seedWord = seedWord,
+			button = button,
 			keyboard = signerDataModel.screenData.value?.optBoolean("keyboard")
 				?: false
 		)
 
 		Spacer(Modifier.height(12.dp))
 		RestoreSeedPhraseSuggest(
-			restoreSeedModel.guessWord,
-			push = restoreSeedModel::select
+			guessWord,
+			button
 		)
 		Spacer(Modifier.weight(0.8f))
 		Row(
 			verticalAlignment = Alignment.CenterVertically,
 			modifier = Modifier.toggleable(
-				value = createRoots.value,
+				value = createSeedKeys.value,
 				role = Role.Checkbox,
-				onValueChange = { createRoots.value = it }
+				onValueChange = { createSeedKeys.value = it }
 			)) {
 			Checkbox(
-				checked = createRoots.value,
-				onCheckedChange = { createRoots.value = it })
-			Text("Create root keys")
+				checked = createSeedKeys.value,
+				onCheckedChange = { createSeedKeys.value = it })
+			Text("Create seed keys")
 		}
 		Spacer(Modifier.weight(0.1f))
 		//if (true) { //TODO: hide when keyboard is shown
@@ -100,15 +88,17 @@ fun RecoverSeedPhrase(
 				action = {
 					signerDataModel.screenData.value?.let { screenData ->
 						screenData.optString("seed_name").let { seedName ->
-							signerDataModel.addSeed(
-								seedName = seedName,
-								seedPhrase = restoreSeedModel.seedPhrase.value.joinToString(" "),
-								createRoots = createRoots.value
-							)
+							seedPhraseReady?.let {
+								signerDataModel.addSeed(
+									seedName = seedName,
+									seedPhrase = it,
+									createSeedKeys = createSeedKeys.value
+								)
+							}
 						}
 					}
 				},
-				isDisabled = !restoreSeedModel.seedValid.value
+				isDisabled = seedPhraseReady == null
 			)
 		//}
 		Spacer(Modifier.weight(0.1f))

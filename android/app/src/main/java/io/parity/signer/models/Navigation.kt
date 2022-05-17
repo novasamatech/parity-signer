@@ -44,6 +44,8 @@ fun SignerDataModel.pushButton(
 		_screenData.value = actionResultObject.getJSONObject("screenData")
 		_modalData.value = actionResultObject.getJSONObject("modalData")
 		_alertData.value = actionResultObject.getJSONObject("alertData")
+		Log.d("screen", _screenData.value.toString())
+		Log.d("modal", _modalData.value.toString())
 	} catch (e: java.lang.Exception) {
 		Log.e("Navigation error", e.toString())
 		Toast.makeText(context, actionResult, Toast.LENGTH_SHORT).show()

@@ -1,6 +1,6 @@
-#[cfg(feature = "jni")]
+#[cfg(target_os = "android")]
 pub mod android;
-#[cfg(not(feature = "jni"))]
+#[cfg(target_os = "ios")]
 pub mod ios;
 
 pub use anyhow;
@@ -8,19 +8,19 @@ pub use ffi_support;
 
 /// Trait for converting Rust types into FFI return values
 pub trait Return<'a>: Sized {
-	type Ext;
-	type Env;
-	fn convert(env: Self::Env, val: Self) -> Self::Ext;
-	fn convert_without_exception(env: Self::Env, val: Self) -> Self::Ext {
-		Return::convert(env, val)
-	}
+    type Ext;
+    type Env;
+    fn convert(env: Self::Env, val: Self) -> Self::Ext;
+    fn convert_without_exception(env: Self::Env, val: Self) -> Self::Ext {
+        Return::convert(env, val)
+    }
 }
 
 /// Trait for converting FFI arguments into Rust types
 pub trait Argument<'a> {
-	type Ext;
-	type Env;
-	fn convert(env: &Self::Env, val: Self::Ext) -> Self;
+    type Ext;
+    type Env;
+    fn convert(env: &Self::Env, val: Self::Ext) -> Self;
 }
 
 #[macro_export]
@@ -32,7 +32,7 @@ macro_rules! export {
             ) -> $ret $code
         )*
 
-        #[cfg(feature = "jni")]
+        #[cfg(target_os = "android")]
         pub mod android_export {
             use $crate::export::{Return, Argument};
 
@@ -52,7 +52,7 @@ macro_rules! export {
             )*
         }
 
-        #[cfg(not(feature = "jni"))]
+        #[cfg(target_os = "ios")]
         pub mod ios_export {
             use $crate::export::{Return, Argument};
 

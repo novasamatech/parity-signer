@@ -32,6 +32,8 @@ enum class ButtonID {
 	SignNetworkSpecs,
 	SignMetadata,
 	SignTypes,
+	TextEntry,
+	PushWord,
 	ManageNetworks,
 	ViewGeneralVerifier,
 	ManageMetadata,

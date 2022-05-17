@@ -1,4 +1,4 @@
-use definitions::error::{Active, ErrorSource};
+use definitions::{error::ErrorSource, error_active::Active};
 use generate_message::{full_run, parser::Command};
 use std::env;
 
@@ -9,7 +9,6 @@ fn main() -> Result<(), String> {
     };
     match full_run(command) {
         Ok(_) => Ok(()),
-        Err(e) => return Err(<Active>::show(&e)),
+        Err(e) => Err(<Active>::show(&e)),
     }
 }
-
