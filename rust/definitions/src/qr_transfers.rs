@@ -245,7 +245,7 @@ impl ContentLoadTypes {
         self.encode()
     }
 
-    /// Generate json consisting of types information hash and corresponding id pic  
+    /// Generate types information hash and corresponding id pic  
     ///
     /// Types information hash is calculated for `Vec<u8>` of encoded types information,
     /// as it would be stored in the database  
