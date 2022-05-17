@@ -118,7 +118,7 @@ pub fn specs_shortcut(
 
     // no entries in the address book for this url address
     if entries.is_empty() {
-        // Nonetheless, there are some entries in `SPECSTREE` with the same
+        // Nonetheless, there are some entries in `SPECSTREEPREP` with the same
         // genesis hash.
         //
         // Most likely, this has happened because network already is known to
@@ -188,13 +188,13 @@ pub fn specs_shortcut(
             }));
         }
 
-        // check that unit did not change
-        if specs.unit != new_properties.unit {
+        // check that genesis hash did not change
+        if specs.genesis_hash != genesis_hash {
             return Err(ErrorActive::Fetch(Fetch::ValuesChanged {
                 url,
-                what: Changed::Unit {
-                    old: specs.unit,
-                    new: new_properties.unit,
+                what: Changed::GenesisHash {
+                    old: specs.genesis_hash,
+                    new: genesis_hash,
                 },
             }));
         }
@@ -206,6 +206,17 @@ pub fn specs_shortcut(
                 what: Changed::Name {
                     old: specs.name,
                     new: meta_values.name,
+                },
+            }));
+        }
+
+        // check that unit did not change
+        if specs.unit != new_properties.unit {
+            return Err(ErrorActive::Fetch(Fetch::ValuesChanged {
+                url,
+                what: Changed::Unit {
+                    old: specs.unit,
+                    new: new_properties.unit,
                 },
             }));
         }

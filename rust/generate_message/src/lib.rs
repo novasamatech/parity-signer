@@ -186,6 +186,28 @@
 // could be read by the Signer. "payload" is the un-husked content part, without
 // prelude, public key, signature. If I mess them up now, reader surely will.
 // QR or text = output format
+//!
+//! # Add this somewhere visible probably
+//!
+//!
+//! Signer updates with payload `add_specs` are used to add networks into the
+//! Signer.
+//!
+//! `add_specs` updates could be signed or unsigned. For the networks not yet
+//! known to the Signer, `add_specs` signature author becomes the network
+//! verifier in the Signer database. If `add_specs` payload is unsigned,
+//! verifier is set to `None`.
+//!
+//! If the network is already known to the Signer, the network information could
+//! be accepted if signed by same or stronger verifier, details are described in
+//! [definitions::network_specs].
+//!
+//! Updates `add_specs` for a known network (as determined by genesis hash),
+//! including network with known genesis hash and different
+//! [`Encryption`](definitions::crypto::Encryption), could be accepted if signed
+//! by already established verifier or the stronger one. Updates `load_metadata`
+//! for a known network could be accepted only if signed by already established
+//! verifier.
 #![deny(unused_crate_dependencies)]
 
 use constants::{COLD_DB_NAME_RELEASE, HOT_DB_NAME, TYLO};

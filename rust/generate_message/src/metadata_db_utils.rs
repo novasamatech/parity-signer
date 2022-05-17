@@ -8,7 +8,7 @@
 //! Hot database gets the metadata entries only through rpc calls. The metadata
 //! could be in the database only if there are also the network specs entry
 //! [`NetworkSpecsToSend`](definitions::network_specs::NetworkSpecsToSend) in
-//! [`SPECSTREE`](constants::SPECSTREE) and
+//! [`SPECSTREEPREP`](constants::SPECSTREEPREP) and
 //! [`AddressBookEntry`](definitions::metadata::AddressBookEntry) in
 //! [`ADDRESS_BOOK`](constants::ADDRESS_BOOK).
 use std::cmp::Ordering;

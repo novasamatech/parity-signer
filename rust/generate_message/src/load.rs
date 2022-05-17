@@ -1,4 +1,4 @@
-//! `load_metadata` payloads
+//! `load_metadata` payloads and updating [`METATREE`] tree of the hot database
 //!
 use constants::{ADDRESS_BOOK, EXPORT_FOLDER, HOT_DB_NAME, METATREE};
 use db_handling::helpers::{get_meta_values_by_name_version, open_db, open_tree};
