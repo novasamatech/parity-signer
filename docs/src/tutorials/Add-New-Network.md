@@ -49,7 +49,7 @@ Let's get started!
 In `parity-signer/rust/generate_message`
 
 ```
-cargo run add_spec -u <network-ws-url> -<crypto>
+cargo run add_specs -u <network-ws-url> -<crypto>
 
 ```
 ```
@@ -61,12 +61,12 @@ cargo run add_specs -u wss://statemint-rpc.polkadot.io -sr25519
 For networks supporting several tokens:
 
 ```
-cargo run add_spec -d -u <network-ws-url> -<crypto> -token <decimals> <SYMBOL>
+cargo run add_specs -d -u <network-ws-url> -<crypto> -token <decimals> <SYMBOL>
 
 ```
 ```
 // e.g.
-cargo run add_spec -d -u wss://karura-rpc-0.aca-api.network -sr25519 -token 12 KAR
+cargo run add_specs -d -u wss://karura-rpc-0.aca-api.network -sr25519 -token 12 KAR
 
 ```
 
