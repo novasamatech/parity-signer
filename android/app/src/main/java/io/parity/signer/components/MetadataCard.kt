@@ -10,7 +10,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import io.parity.signer.models.abbreviateString
 import io.parity.signer.uniffi.MMetadataRecord
-import org.json.JSONObject
 
 @Composable
 fun MetadataCard(metadataRecord: MMetadataRecord) {

@@ -5,7 +5,6 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import io.parity.signer.ui.theme.Text600
 import io.parity.signer.uniffi.MscFieldName
-import org.json.JSONObject
 
 @Composable
 fun TCFieldName(fieldName: MscFieldName) {

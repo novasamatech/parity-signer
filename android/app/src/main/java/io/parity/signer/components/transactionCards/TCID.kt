@@ -6,7 +6,6 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import io.parity.signer.components.Identicon
 import io.parity.signer.uniffi.MscId
-import org.json.JSONObject
 
 @Composable
 fun TCID(id: MscId) {

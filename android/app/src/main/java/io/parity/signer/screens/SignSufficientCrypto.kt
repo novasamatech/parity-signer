@@ -7,17 +7,12 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import io.parity.signer.components.KeyCard
-import io.parity.signer.models.SignerDataModel
-import io.parity.signer.models.getSeed
-import io.parity.signer.models.pushButton
-import io.parity.signer.uniffi.Action
 import io.parity.signer.uniffi.MSignSufficientCrypto
 
 @Composable
 fun SignSufficientCrypto(
 	sc: MSignSufficientCrypto,
-	signerDataModel: SignerDataModel
+	signSufficientCrypto: (seedName: String, addressKey: String) -> Unit
 ) {
 	val identities = sc.identities
 	Column {
@@ -26,18 +21,7 @@ fun SignSufficientCrypto(
 			items(identities.size) { index ->
 				val identity = identities[index]
 				Row(Modifier.clickable {
-					signerDataModel.authentication.authenticate(signerDataModel.activity) {
-						val seedPhrase = signerDataModel.getSeed(
-							identity.seedName
-						)
-						if (seedPhrase.isNotBlank()) {
-							signerDataModel.pushButton(
-								Action.GO_FORWARD,
-								identity.addressKey,
-								seedPhrase
-							)
-						}
-					}
+					signSufficientCrypto(identity.seedName, identity.addressKey)
 				}) {
 					/* TODO MRawKey -> Address conversion
 					KeyCard(identity = identity)

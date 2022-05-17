@@ -10,7 +10,6 @@ import io.parity.signer.ui.theme.Crypto400
 import io.parity.signer.ui.theme.CryptoTypography
 import io.parity.signer.ui.theme.Text400
 import io.parity.signer.uniffi.MVerifierDetails
-import org.json.JSONObject
 
 @Composable
 fun TCAuthorPublicKey(key: MVerifierDetails) {

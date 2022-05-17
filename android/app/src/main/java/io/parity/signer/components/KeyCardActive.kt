@@ -18,7 +18,6 @@ import io.parity.signer.models.decode64
 import io.parity.signer.ui.theme.Bg200
 import io.parity.signer.uniffi.Address
 import io.parity.signer.uniffi.MKeysCard
-import org.json.JSONObject
 import kotlin.math.absoluteValue
 
 @Composable

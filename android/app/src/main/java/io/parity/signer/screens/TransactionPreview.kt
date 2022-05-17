@@ -12,9 +12,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.platform.LocalFocusManager
 import io.parity.signer.components.*
-import io.parity.signer.models.SignerDataModel
-import io.parity.signer.models.encode64
-import io.parity.signer.models.getSeed
 import io.parity.signer.ui.theme.Text400
 import io.parity.signer.uniffi.Action
 import io.parity.signer.uniffi.MTransaction
@@ -24,7 +21,7 @@ import io.parity.signer.uniffi.TransactionType
 fun TransactionPreview(
 	transaction: MTransaction,
 	button: (action: Action, details: String, seedPhrase: String) -> Unit,
-	signerDataModel: SignerDataModel
+	signTransaction: (comment: String, seedName: String) -> Unit
 ) {
 	val action = transaction.ttype
 	val comment = remember { mutableStateOf("") }
@@ -68,14 +65,9 @@ fun TransactionPreview(
 				BigButton(
 					text = "Unlock key and sign",
 					action = {
-						signerDataModel.authentication.authenticate(signerDataModel.activity) {
-							val seedPhrase = signerDataModel.getSeed(
-								transaction.authorInfo?.seedName ?: ""
-							)
-							if (seedPhrase.isNotBlank()) {
-								button(Action.GO_FORWARD, comment.value.encode64(), seedPhrase)
-							}
-						}
+						signTransaction(
+							comment.value, transaction.authorInfo?.seedName ?: ""
+						)
 					}
 				)
 				BigButton(

@@ -11,7 +11,6 @@ import androidx.compose.ui.unit.dp
 import io.parity.signer.ui.theme.Text400
 import io.parity.signer.ui.theme.Text600
 import io.parity.signer.uniffi.MscCurrency
-import org.json.JSONObject
 
 @Composable
 fun TCTip(currency: MscCurrency) {

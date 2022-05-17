@@ -10,8 +10,9 @@ pub struct SeedNameWithIdenticon {
     pub identicon: Vec<u8>,
 }
 
-/// Enum containing card sets for three different outcomes:
-/// signing (Sign), accepting (Stub) and reading, for example, in case of an error (Read)
+/// Enum containing card sets for four different outcomes:
+/// importing derivations (Derivations), signing (Sign),
+/// accepting (Stub) and reading, for example, in case of an error (Read)
 #[derive(PartialEq, Debug, Clone)]
 pub enum TransactionAction {
     Derivations {

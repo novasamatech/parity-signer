@@ -2,8 +2,6 @@ package io.parity.signer.models
 
 import android.util.Log
 import android.widget.Toast
-import io.parity.signer.*
-import org.json.JSONObject
 import io.parity.signer.uniffi.Action
 import io.parity.signer.uniffi.backendAction
 

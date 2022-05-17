@@ -9,7 +9,6 @@ import io.parity.signer.components.Identicon
 import io.parity.signer.ui.theme.Text400
 import io.parity.signer.ui.theme.Text600
 import io.parity.signer.uniffi.MscAuthorPlain
-import org.json.JSONObject
 
 @Composable
 fun TCAuthorPlain(author: MscAuthorPlain) {

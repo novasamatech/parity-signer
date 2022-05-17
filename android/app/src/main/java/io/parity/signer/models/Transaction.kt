@@ -1,7 +1,6 @@
 package io.parity.signer.models
 
 import io.parity.signer.uniffi.Action
-import org.json.JSONObject
 
 
 fun SignerDataModel.signTransaction(
@@ -18,15 +17,15 @@ fun SignerDataModel.signTransaction(
 	}
 }
 
-fun SignerDataModel.signSufficientCrypto(identity: JSONObject) {
+fun SignerDataModel.signSufficientCrypto(seedName: String, addressKey: String) {
 	authentication.authenticate(activity) {
 		val seedPhrase = getSeed(
-			identity.optString("seed_name")
+			seedName
 		)
 		if (seedPhrase.isNotBlank()) {
 			pushButton(
 				Action.GO_FORWARD,
-				identity.optString("address_key"),
+				addressKey,
 				seedPhrase
 			)
 		}

@@ -5,8 +5,6 @@ import android.util.Base64
 import android.util.Log
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asImageBitmap
-import org.json.JSONArray
-import org.json.JSONObject
 
 /**
  * Decodes from hex string into number array

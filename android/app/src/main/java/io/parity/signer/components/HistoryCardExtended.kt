@@ -21,8 +21,7 @@ fun HistoryCardExtended(
 	val decodedTransaction = event.decoded
 	val signedBy = event.signedBy
 	val verifierDetails = event.verifierDetails
-	val eventVal = event.event
-	when (eventVal) {
+	when (val eventVal = event.event) {
 		is Event.DatabaseInitiated -> {
 			HistoryCardTemplate(
 				image = Icons.Default.Smartphone,
