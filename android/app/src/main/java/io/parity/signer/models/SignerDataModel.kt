@@ -41,7 +41,7 @@ class SignerDataModel : ViewModel() {
 	private var hasStrongbox: Boolean = false
 
 	// Alert
-	internal val _alertState: MutableLiveData<AlertData?> = MutableLiveData(null)
+	internal val _alertState: MutableLiveData<AlertState> = MutableLiveData(AlertState.None)
 
 	// State of the app being unlocked
 	private val _authenticated = MutableLiveData(false)
@@ -104,7 +104,7 @@ class SignerDataModel : ViewModel() {
 	val onBoardingDone: LiveData<OnBoardingState> = _onBoardingDone
 	val authenticated: LiveData<Boolean> = _authenticated
 
-	val alertState: LiveData<AlertData?> = _alertState
+	val alertState: LiveData<AlertState> = _alertState
 
 	val actionResult: LiveData<ActionResult> = _actionResult
 
@@ -256,28 +256,26 @@ class SignerDataModel : ViewModel() {
 	 * Checks if airplane mode was off
 	 */
 	private fun isAirplaneOn() {
-		val alertData = actionResult.value?.alertData
-
 		if (Settings.Global.getInt(
 				context.contentResolver,
 				Settings.Global.AIRPLANE_MODE_ON,
 				0
 			) == 0
 		) {
-			if (alertData is AlertData.Shield) {
-				actionResult.value?.alertData = null
+			if (alertState.value != AlertState.Active) {
+				_alertState.value = AlertState.Active
 				if (onBoardingDone.value == OnBoardingState.Yes) historyDeviceWasOnline(
 					dbName
 				)
 			}
 		} else {
-			if (alertData is AlertData.Shield) {
-				actionResult.value?.alertData =
-					if (onBoardingDone.value == OnBoardingState.Yes)
-						AlertData.Shield(f = ShieldAlert.PAST) else null
+			if (alertState.value == AlertState.Active) {
+				_alertState.value = if (onBoardingDone.value == OnBoardingState.Yes)
+					AlertState.Past else AlertState.None
 			}
 		}
 	}
+
 
 	private fun allPermissionsGranted() = REQUIRED_PERMISSIONS.all {
 		ContextCompat.checkSelfPermission(
@@ -353,20 +351,26 @@ class SignerDataModel : ViewModel() {
 	}
 
 	private fun getAlertState() {
-		val state = alertState.value
 		_alertState.value = if (historyGetWarnings(dbName)) {
-			if (state is AlertData.Shield)
-				AlertData.Shield(f = null) else AlertData.Shield(f = ShieldAlert.PAST)
+			if (alertState.value == AlertState.Active) AlertState.Active else AlertState.Past
 		} else {
-			null
+			AlertState.None
 		}
 	}
 
 	fun acknowledgeWarning() {
-		val state = alertState.value
-		if (state is AlertData.Shield && state.f == ShieldAlert.PAST) {
+		if (alertState.value == AlertState.Past) {
 			historyAcknowledgeWarnings(dbName)
-			_alertState.value = AlertData.Shield(f = ShieldAlert.PAST)
+			_alertState.value = AlertState.None
 		}
 	}
+}
+
+/**
+ * Describes current state of network detection alertness
+ */
+enum class AlertState {
+	None,
+	Active,
+	Past
 }

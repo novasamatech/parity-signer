@@ -9,7 +9,7 @@ import io.parity.signer.uniffi.Action
 import io.parity.signer.uniffi.qrparserGetPacketsTotal
 import io.parity.signer.uniffi.qrparserTryDecodeQrSequence
 
-//MARK: Camera tools begin
+// MARK: Camera tools begin
 
 /**
  * Barcode detecting function.
@@ -30,12 +30,11 @@ fun SignerDataModel.processFrame(
 		.addOnSuccessListener { barcodes ->
 			barcodes.forEach {
 				val payloadString = it?.rawBytes?.encodeHex()
-				Log.d("QR", payloadString ?: "empty")
 				if (!(bucket.contains(payloadString) || payloadString.isNullOrEmpty())) {
 					if (total.value == null) {
 						try {
-							val proposeTotal = qrparserGetPacketsTotal(payloadString, true).toInt()
-							Log.d("estimate total", proposeTotal.toString())
+							val proposeTotal =
+								qrparserGetPacketsTotal(payloadString, true).toInt()
 							if (proposeTotal == 1) {
 								try {
 									payload = qrparserTryDecodeQrSequence(
@@ -44,7 +43,6 @@ fun SignerDataModel.processFrame(
 									)
 									resetScan()
 									pushButton(Action.TRANSACTION_FETCHED, payload)
-									Log.d("payload", payload)
 								} catch (e: java.lang.Exception) {
 									Log.e("Single frame decode failed", e.toString())
 								}
@@ -63,7 +61,6 @@ fun SignerDataModel.processFrame(
 									"[\"" + bucket.joinToString(separator = "\",\"") + "\"]",
 									true
 								)
-								Log.d("multiframe payload", payload)
 								if (payload.isNotEmpty()) {
 									resetScan()
 									pushButton(Action.TRANSACTION_FETCHED, payload)
@@ -73,8 +70,16 @@ fun SignerDataModel.processFrame(
 							}
 						}
 						_captured.value = bucket.size
-						_progress.value = ((captured.value ?: 0).toFloat() / ((total.value
-							?: 1).toFloat()))
+						_progress.value = (
+							(
+								captured.value ?: 0
+								).toFloat() / (
+								(
+									total.value
+										?: 1
+									).toFloat()
+								)
+							)
 						Log.d("captured", captured.value.toString())
 					}
 				}
@@ -98,4 +103,4 @@ internal fun SignerDataModel.resetScan() {
 	_progress.value = 0.0f
 }
 
-//MARK: Camera tools end
+// MARK: Camera tools end

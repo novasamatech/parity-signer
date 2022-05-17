@@ -147,7 +147,7 @@ fun HistoryCard(card: Event, timestamp: String) {
 			HistoryCardTemplate(
 				image = Icons.Default.DeleteForever,
 				line1 = timestamp,
-				line2 = "History cleared",
+				line2 = "Warnings acknowledged",
 				line3 = "",
 				danger = true
 			)

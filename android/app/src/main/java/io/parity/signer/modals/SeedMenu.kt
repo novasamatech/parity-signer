@@ -11,6 +11,7 @@ import androidx.compose.ui.unit.dp
 import io.parity.signer.alerts.AndroidCalledConfirm
 import io.parity.signer.components.BigButton
 import io.parity.signer.components.HeaderBar
+import io.parity.signer.models.AlertState
 import io.parity.signer.ui.theme.Bg000
 import io.parity.signer.ui.theme.modal
 import io.parity.signer.uniffi.Action
@@ -20,7 +21,7 @@ import io.parity.signer.uniffi.MSeedMenu
 @Composable
 fun SeedMenu(
 	seedMenu: MSeedMenu,
-	shieldAlert: AlertData?,
+	alertState: State<AlertState?>,
 	button: (Action) -> Unit,
 	removeSeed: (String) -> Unit
 ) {
@@ -39,7 +40,7 @@ fun SeedMenu(
 				BigButton(
 					text = "Backup",
 					action = {
-						if (shieldAlert == null || (shieldAlert is AlertData.Shield && shieldAlert.f == null))
+						if (alertState.value == AlertState.None)
 							button(Action.BACKUP_SEED)
 						else
 							button(Action.SHIELD)
@@ -48,7 +49,7 @@ fun SeedMenu(
 				BigButton(
 					text = "Derive new key",
 					action = {
-						if (shieldAlert == null || (shieldAlert is AlertData.Shield && shieldAlert.f == null))
+						if (alertState.value == AlertState.None)
 							button(Action.NEW_KEY)
 						else
 							button(Action.SHIELD)

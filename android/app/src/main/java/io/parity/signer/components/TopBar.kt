@@ -12,25 +12,25 @@ import androidx.compose.runtime.State
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import io.parity.signer.models.AlertState
 import io.parity.signer.models.SignerDataModel
 import io.parity.signer.models.pushButton
 import io.parity.signer.ui.theme.Action400
 import io.parity.signer.ui.theme.Bg100
 import io.parity.signer.ui.theme.Text400
 import io.parity.signer.uniffi.Action
-import io.parity.signer.uniffi.AlertData
 import io.parity.signer.uniffi.RightButton
 import io.parity.signer.uniffi.ScreenNameType
 
 @Composable
 fun TopBar(
 	signerDataModel: SignerDataModel,
-	alert: State<AlertData?>
+	alertState: State<AlertState?>
 ) {
 	val actionResult = signerDataModel.actionResult.observeAsState()
-	//val screenName = signerDataModel.screenLabel.observeAsState()
-	//val screenNameType = signerDataModel.screenNameType.observeAsState()
-	//val rightButton = signerDataModel.rightButton.observeAsState()
+	// val screenName = signerDataModel.screenLabel.observeAsState()
+	// val screenNameType = signerDataModel.screenNameType.observeAsState()
+	// val rightButton = signerDataModel.rightButton.observeAsState()
 
 	TopAppBar(
 		backgroundColor = MaterialTheme.colors.Bg100
@@ -49,7 +49,8 @@ fun TopBar(
 					),
 					onClick = {
 						signerDataModel.pushButton(Action.GO_BACK)
-					}) {
+					}
+				) {
 					if (actionResult.value?.rightButton == RightButton.MULTI_SELECT) {
 						Icon(
 							Icons.Default.Close,
@@ -114,7 +115,6 @@ fun TopBar(
 						)
 					}
 					RightButton.MULTI_SELECT -> {
-
 					}
 					null -> {}
 					else -> {
@@ -127,13 +127,7 @@ fun TopBar(
 				}
 			}
 			IconButton(onClick = { signerDataModel.pushButton(Action.SHIELD) }) {
-				alert.value.let {
-					if (it is AlertData.Shield) {
-						NavbarShield(it.f, active = false) // TODO: real active value
-					} else {
-						NavbarShield(alert = null, active = false) // TODO: real active value
-					}
-				}
+				NavbarShield(alertState = alertState)
 			}
 		}
 	}

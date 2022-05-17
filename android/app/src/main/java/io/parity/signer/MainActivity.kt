@@ -19,6 +19,7 @@ import androidx.compose.ui.unit.dp
 import io.parity.signer.components.BigButton
 import io.parity.signer.components.BottomBar
 import io.parity.signer.components.TopBar
+import io.parity.signer.models.AlertState
 import io.parity.signer.models.SignerDataModel
 import io.parity.signer.models.pushButton
 import io.parity.signer.screens.LandingView
@@ -88,7 +89,7 @@ fun SignerApp(signerDataModel: SignerDataModel) {
 					// Structure to contain all app
 					Scaffold(
 						topBar = {
-							TopBar(signerDataModel = signerDataModel, alert = shieldAlert)
+							TopBar(signerDataModel = signerDataModel, alertState = shieldAlert)
 						},
 						bottomBar = {
 							if (actionResult.value?.footer == true) BottomBar(signerDataModel = signerDataModel)
@@ -106,14 +107,16 @@ fun SignerApp(signerDataModel: SignerDataModel) {
 								signerDataModel = signerDataModel
 							)
 							ModalSelector(
-								modalData = actionResult.value?.modalData,//default fallback
-								alertState = actionResult.value?.alertData,
+								modalData = actionResult.value?.modalData,
+								alertState = shieldAlert,
 								button = signerDataModel::pushButton,
 								signerDataModel = signerDataModel,
 							)
 							AlertSelector(
 								alert = actionResult.value?.alertData,
+								alertState = shieldAlert,
 								button = signerDataModel::pushButton,
+								acknowledgeWarning = signerDataModel::acknowledgeWarning
 							)
 						}
 					}
@@ -133,7 +136,7 @@ fun SignerApp(signerDataModel: SignerDataModel) {
 				}
 			}
 			OnBoardingState.No -> {
-				if (shieldAlert.value == null) {
+				if (shieldAlert.value == AlertState.None) {
 					Scaffold {
 						LandingView(signerDataModel::onBoard)
 					}

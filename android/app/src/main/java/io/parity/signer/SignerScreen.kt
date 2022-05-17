@@ -18,7 +18,7 @@ import io.parity.signer.uniffi.ScreenData
 @Composable
 fun ScreenSelector(
 	screenData: ScreenData,
-	alertState: State<AlertData?>,
+	alertState: State<AlertState?>,
 	progress: State<Float?>,
 	captured: State<Int?>,
 	total: State<Int?>,
@@ -45,7 +45,7 @@ fun ScreenSelector(
 			button = button2,
 			signerDataModel::increment,
 			screenData.f,
-			alertState.value
+			alertState
 		)
 		is ScreenData.Log -> HistoryScreen(screenData.f, button2)
 		is ScreenData.LogDetails -> LogDetails(screenData.f)
@@ -54,7 +54,7 @@ fun ScreenSelector(
 			button2,
 		)
 		is ScreenData.NNetworkDetails -> NetworkDetails(
-			screenData.f,//default fallback
+			screenData.f, // default fallback
 			button2
 		)
 		is ScreenData.NewSeed -> NewSeedScreen(
@@ -124,7 +124,7 @@ fun ScreenSelector(
 @Composable
 fun ModalSelector(
 	modalData: ModalData?,
-	alertState: AlertData?,
+	alertState: State<AlertState?>,
 	button: (Action, String, String) -> Unit,
 	signerDataModel: SignerDataModel
 ) {
@@ -134,10 +134,11 @@ fun ModalSelector(
 	val button2: (Action, String) -> Unit =
 		{ action, details -> button(action, details, "") }
 	when (modalData) {
-		is ModalData.NewSeedMenu -> when (alertState) {
-			is AlertData.Shield -> NewSeedMenu(alertState.f, button1)
-			else -> NewSeedMenu(null, button1)
-		}
+		is ModalData.NewSeedMenu ->
+			NewSeedMenu(
+				alertState = alertState,
+				button = button1
+			)
 		is ModalData.SeedMenu -> SeedMenu(
 			modalData.f,
 			alertState,
@@ -168,14 +169,18 @@ fun ModalSelector(
 			modalData.f,
 			signerDataModel = signerDataModel
 		)
-		is ModalData.NetworkDetailsMenu -> NetworkDetailsMenu(signerDataModel = signerDataModel)
+		is ModalData.NetworkDetailsMenu -> NetworkDetailsMenu(
+			signerDataModel = signerDataModel
+		)
 		is ModalData.ManageMetadata -> {
 			ManageMetadata(modalData.f, signerDataModel = signerDataModel)
 		}
 		is ModalData.SufficientCryptoReady -> SufficientCryptoReady(
 			modalData.f,
 		)
-		is ModalData.KeyDetailsAction -> KeyDetailsAction(signerDataModel = signerDataModel)
+		is ModalData.KeyDetailsAction -> KeyDetailsAction(
+			signerDataModel = signerDataModel
+		)
 		is ModalData.TypesInfo -> TypesInfo(
 			modalData.f,
 			signerDataModel = signerDataModel
@@ -192,15 +197,15 @@ fun ModalSelector(
 	}
 }
 
-
 @Composable
 fun AlertSelector(
 	alert: AlertData?,
+	alertState: State<AlertState?>,
 	button: (Action, String, String) -> Unit,
+	acknowledgeWarning: () -> Unit
 ) {
 	val button1: (Action) -> Unit = { action -> button(action, "", "") }
 
-	val ackWarning: () -> Unit = { button1(Action.GO_BACK) }
 	when (alert) {
 		AlertData.Confirm -> Confirm(button = button1)
 		is AlertData.ErrorData -> ErrorModal(
@@ -208,10 +213,10 @@ fun AlertSelector(
 			button = button1
 		)
 		is AlertData.Shield -> ShieldAlert(
-			alert.f,
-			active = false, // TODO: pass an alert
+			// alert.f, // TODO: use this instead
+			alertState = alertState,
 			button = button1,
-			acknowledgeWarning = ackWarning
+			acknowledgeWarning = acknowledgeWarning
 		)
 		null -> {}
 	}

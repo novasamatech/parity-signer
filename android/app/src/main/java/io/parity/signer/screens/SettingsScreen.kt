@@ -12,6 +12,7 @@ import androidx.compose.ui.unit.dp
 import io.parity.signer.alerts.AndroidCalledConfirm
 import io.parity.signer.components.Identicon
 import io.parity.signer.components.SettingsCardTemplate
+import io.parity.signer.models.AlertState
 import io.parity.signer.models.abbreviateString
 import io.parity.signer.ui.theme.*
 import io.parity.signer.uniffi.Action
@@ -30,7 +31,7 @@ fun SettingsScreen(
 	isStrongBoxProtected: () -> Boolean,
 	getAppVersion: () -> String,
 	wipeToFactory: () -> Unit,
-	alertState: State<AlertData?>
+	alertState: State<AlertState?>
 ) {
 	var confirm by remember { mutableStateOf(false) }
 
@@ -40,12 +41,14 @@ fun SettingsScreen(
 		Row(Modifier.clickable { button1(Action.MANAGE_NETWORKS) }) {
 			SettingsCardTemplate(text = "Networks")
 		}
-		Row(Modifier.clickable {
-			if (alertState.value == null)
-				button1(Action.BACKUP_SEED)
-			else
-				button1(Action.SHIELD)
-		}) {
+		Row(
+			Modifier.clickable {
+				if (alertState.value == AlertState.None)
+					button1(Action.BACKUP_SEED)
+				else
+					button1(Action.SHIELD)
+			}
+		) {
 			SettingsCardTemplate(text = "Backup keys")
 		}
 		Column(

@@ -23,6 +23,7 @@ import io.parity.signer.components.BottomMultiselectBar
 import io.parity.signer.components.KeySelector
 import io.parity.signer.components.NetworkLogoName
 import io.parity.signer.components.SeedCard
+import io.parity.signer.models.AlertState
 import io.parity.signer.ui.theme.Action400
 import io.parity.signer.ui.theme.Bg100
 import io.parity.signer.ui.theme.Bg200
@@ -39,7 +40,7 @@ fun KeyManager(
 	button: (action: Action, details: String) -> Unit,
 	increment: (Int, String) -> Unit,
 	mKeys: MKeys,
-	alertState: AlertData?
+	alertState: State<AlertState?>
 ) {
 	val rootKey = mKeys.root
 	val keySet = mKeys.set
@@ -130,7 +131,7 @@ fun KeyManager(
 				Text("DERIVED KEYS")
 				Spacer(Modifier.weight(1f, true))
 				IconButton(onClick = {
-					if (alertState == null)
+					if (alertState.value == AlertState.None)
 						button(Action.NEW_KEY, "")
 					else
 						button(Action.SHIELD, "")
