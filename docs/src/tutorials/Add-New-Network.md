@@ -178,3 +178,4 @@ In Signer open scanner, scan your `<metadata-qr>` and accept new metadata.
 <br/>
 
 Congratulations! You've fetched network specs, signed them, fed them into Signer, fetched recent metadata for the network, signed and fed it into Signer as well. Now you are ready to safely sign transactions on this network.
+ 
