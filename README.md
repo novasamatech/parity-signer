@@ -6,7 +6,7 @@
 </p>
 
 <p align="center">
-    <br<br>
+    <br><br><br>
     Air-gapped cold storage for crypto keys.
 </p>
 
@@ -30,6 +30,13 @@ Any data transfer from or to the app happens using QR code. By doing so, the mos
 
 ![](docs/src/res/screens-for-readme.png)
 
+# Links
+
+- [Landing Page](https://parity.io/signer) — official Signer page
+- [Documentation](https://paritytech.github.io/parity-signer/index.html) — auto-generated documentation for end users
+- [Metadata Portal](https://metadata.parity.io) — QR codes with the latest metadata
+- [BananaSplit](https://bs.parity.io) — split your seed phrase for maximum security
+- [Legacy: last public release with React Native](https://github.com/paritytech/parity-signer/tree/legacy-4.5.3)
 
 # Features
 
@@ -104,14 +111,6 @@ Official team email for direct inquiries: signer@parity.io
 # Contributing
 
 Our contribution guidelines are still in development. Until then, you're welcome to participate in discussions and send PRs with small bugfixes, we'd love it. Each PR must be reviewed by at least two project maintainers.
-
-# Links
-
-- [Landing Page](https://parity.io/signer) — official Signer page
-- [Documentation](https://paritytech.github.io/parity-signer/index.html) — auto-generated documentation for end users
-- [Metadata Portal](https://metadata.parity.io) — QR codes with the latest metadata
-- [BananaSplit](https://bs.parity.io) — split your seed phrase for maximum security
-- [Legacy: last public release with React Native](https://github.com/paritytech/parity-signer/tree/legacy-4.5.3)
 
 # License
 
