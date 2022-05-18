@@ -7,7 +7,8 @@
 
 <div align="center">
     <br><br>
-    Air-gapped cold storage for crypto keys.
+    Air-gapped cold storage for your crypto keys
+    <br><br>
 </div>
 
 <div align="center">
@@ -104,7 +105,7 @@ If you get errors like `cargo: feature X is required`, it most likely means you 
 
 **1.** You probably already have [Xcode](https://developer.apple.com/xcode/) installed if you are reading this. If not, go get it. 
 
-**2.** Compile the core library:
+**2.** Compile the core Rust library first:
 
 ```
 cd scripts && ./build.sh ios
@@ -112,7 +113,7 @@ cd scripts && ./build.sh ios
 
 **3.** Open the `NativeSigner.xcodeproj` project from the `ios` folder in your Xcode and click Run (Cmd+R).
 
-**4.** The first time you start the app, you will need to put your device into Airplane Mode. In the iOS simulator, you can do this by turning off WiFi on your MacBook.
+**4.** The first time you start the app, you will need to put your device into Airplane Mode. In the iOS simulator, you can do this by turning off WiFi on your Mac (yes, this is an official apple-recommended way).
 
 However, we strongly recommend that you use a real device for development, as some important parts (e.g. camera) may not work in the simulator.
 
@@ -134,7 +135,7 @@ We hightly recommend you to update all existing plugins and SDK's for Kotlin, Gr
 
 # Tests
 
-Core Rust code is fully covered by tests. To run them:
+Core Rust code is fully covered by tests and they are run in CI on each commit. To run tests on your machine:
 
 ```
 cd rust && cargo test
