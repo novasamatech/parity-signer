@@ -1,7 +1,7 @@
-<h1 align="center"> Parity Signer </h1><br>
 <p align="center">
   <a href="https://parity.io/signer/">
-    <img src="docs/src/tutorials/images/logo-parity-signer.jpg" alt="Logo" width="450">
+    <img src="docs/src/res/logo-black.jpg#gh-light-mode-only" alt="Logo Black" width="500">
+    <img src="docs/src/res/logo-white.jpg#gh-dark-mode-only" alt="Logo White" width="500">
   </a>
 </p>
 
@@ -11,7 +11,7 @@
 </p>
 
 <p align="center">
-    <a href="https://github.com/paritytech/parity-signer/releases"><img src="docs/src/res/github-badge.png" width="120"></a> <a href="https://play.google.com/store/apps/details?id=io.parity.signer"><img src="docs/src/res/google-play-badge.png" width="120"></a> <a href="https://itunes.apple.com/us/app/parity-signer/id1218174838"><img src="docs/src/res/app-store-badge.png" width="120"></a><br<br>
+    <a href="https://github.com/paritytech/parity-signer/releases"><img src="docs/src/res/github-badge.png" width="150"></a> <a href="https://play.google.com/store/apps/details?id=io.parity.signer"><img src="docs/src/res/google-play-badge.png" width="150"></a> <a href="https://itunes.apple.com/us/app/parity-signer/id1218174838"><img src="docs/src/res/app-store-badge.png" width="150"></a><br<br>
 </p>
 
 # Introduction
@@ -33,7 +33,8 @@ Any data transfer from or to the app happens using QR code. By doing so, the mos
 # Links
 
 - [Landing Page](https://parity.io/signer) — official Signer page
-- [Documentation](https://paritytech.github.io/parity-signer/index.html) — auto-generated documentation for end users
+- [Documentation](https://paritytech.github.io/parity-signer/index.html) — auto-generated docs for end users
+- [App Store](https://itunes.apple.com/us/app/parity-signer/id1218174838), [Google Play](https://play.google.com/store/apps/details?id=io.parity.signer), [Github Releases](https://github.com/paritytech/parity-signer/releases) — public builds
 - [Metadata Portal](https://metadata.parity.io) — QR codes with the latest metadata
 - [BananaSplit](https://bs.parity.io) — split your seed phrase for maximum security
 - [Legacy: last public release with React Native](https://github.com/paritytech/parity-signer/tree/legacy-4.5.3)
@@ -46,6 +47,7 @@ Any data transfer from or to the app happens using QR code. By doing so, the mos
 - Backup and restore your accounts
 - View activity log to detect unauthorized access
 - Update [metadata](https://metadata.parity.io) without going online
+- Add new networks
 
 # How to use
 
@@ -57,13 +59,13 @@ To contribute into the documentation use [docs](docs) folder
 
 # Project Structure
 
-Signer is a native app for iOS and Android. Native UI's are written on Swift and Kotlin and built on top of a universal Rust backend, which implements all the logic. Here's a rough folder structure of the project.
+Signer is a native app for iOS and Android. Native UI's are written on Swift and Kotlin and built on top of a universal Rust core library, which implements all the logic. Here's a rough folder structure of the project.
 
-- `android` - android project. Builds by Android Studio automatically
+- `android` - Android project. Builds by Android Studio automatically
 - `docker` - files for CI on gitlab
-- `docs` - user manuals
-- `ios` - iOS project folder. Run `/scripts/build.sh ios` before build in XCode
-- `rust` - backend Rust code (see internals below)
+- `docs` - official documentation. Built and published on each commit
+- `ios` - iOS project folder. Read how to build it in the "Build Process" section
+- `rust` - backend Rust code. Internals are listed below
 - `scripts` - mostly releasing scripts and `./build.sh` required for building iOS library
 
 Since most of the application logic is concentrated in the `rust` folder, it makes sense to review it separately.
@@ -93,11 +95,54 @@ Sub-folders of the `rust` folder:
 
 # Build Process
 
-TBD
+First and foremost, make sure you have the latest [Rust](https://www.rust-lang.org/tools/install) installed in your system. Nothing will work without Rust.
+
+If you get errors like `cargo: feature X is required`, it most likely means you have an old version of Rust. Update it by running `rustup update stable`.
+
+## iOS
+
+**1.** You probably already have [Xcode](https://developer.apple.com/xcode/) installed if you are reading this. If not, go get it. 
+
+**2.** Compile the core library:
+
+```
+cd scripts && ./build.sh ios
+```
+
+**3.** Open the `NativeSigner.xcodeproj` project from the `ios` folder in your Xcode and click Run (Cmd+R).
+
+**4.** The first time you start the app, you will need to put your device into Airplane Mode. In the iOS simulator, you can do this by turning off WiFi on your MacBook.
+
+However, we strongly recommend that you use a real device for development, as some important parts (e.g. camera) may not work in the simulator.
+
+## Android
+
+1. Download [Android Studio](https://developer.android.com/studio).
+
+2. Open the project from the `android` directory.
+
+3. Install NDK. Go to `File -> Project Structure -> SDK Location`. Next to the "Android NDK location" section, click "Download Android NDK" button.
+
+We hightly recommend you to update all existing plugins and SDK's for Kotlin, Gradle, etc even if you just downloaded a fresh Android Studio. It's always a good idea to restart Android Studio after that. This can save you many hours on Stackoverflow trying to fix random errors like "NDK not found".
+
+4. Connect your device or create a virtual one. Open `Tools -> Device Manager` and create a new phone simulator with the latest Android.
+
+5. Run the project (Ctrl+R). It should build the Rust core library automatically.
+
+# Tests
+
+Core Rust code is fully covered by tests. To run them:
+
+```
+cd rust && cargo test
+```
+
+We don't have test for UIs for now, which means Swift and Kotlin are not covered. We plan to do it in the future.
+
 
 # Bugs and Feedback
 
-If you found a bug or want to propose an improvement, please create [an issue](https://github.com/paritytech/parity-signer/issues).
+If you found a bug or want to propose an improvement, please open [an issue](https://github.com/paritytech/parity-signer/issues).
 
 Try to create bug reports that are:
 
