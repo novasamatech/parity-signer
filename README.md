@@ -1,9 +1,6 @@
 <p align="center">
   <a href="https://parity.io/signer/">
-    <img src="https://raw.githubusercontent.com/paritytech/parity-signer/add-build-tests-to-readme/docs/src/res/logo-black.svg#gh-light-mode-only" alt="Logo Black" width="600">
-  </a>
-  <a href="https://parity.io/signer/">
-    <img src="https://raw.githubusercontent.com/paritytech/parity-signer/add-build-tests-to-readme/docs/src/res/logo-white.svg#gh-dark-mode-only" alt="Logo White" width="600">
+    <img src="docs/src/res/logo-black.svg" alt="Logo Black" width="600">
   </a>
 </p>
 
