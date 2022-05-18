@@ -1,9 +1,9 @@
-<p align="center">
+<center align="center">
   <a href="https://parity.io/signer/">
-    <img src="docs/src/res/logo-black.svg#gh-light-mode-only" alt="Logo Black" width="500">
-    <img src="docs/src/res/logo-white.svg#gh-dark-mode-only" alt="Logo White" width="500">
+    <img src="docs/src/res/logo-black.svg#gh-light-mode-only" alt="Logo Black" width="600">
+    <img src="docs/src/res/logo-white.svg#gh-dark-mode-only" alt="Logo White" width="600">
   </a>
-</p>
+</center>
 
 <p align="center">
     <br><br><br>
@@ -32,9 +32,10 @@ Any data transfer from or to the app happens using QR code. By doing so, the mos
 
 # Links
 
-- [Landing Page](https://parity.io/signer) — official Signer page
-- [Documentation](https://paritytech.github.io/parity-signer/index.html) — auto-generated docs for end users
+- [Official Website](https://parity.io/signer)
+- [Docs](https://paritytech.github.io/parity-signer/index.html) — auto-generated documentation for end users
 - [App Store](https://itunes.apple.com/us/app/parity-signer/id1218174838), [Google Play](https://play.google.com/store/apps/details?id=io.parity.signer), [Github Releases](https://github.com/paritytech/parity-signer/releases) — public builds
+- [Signer Companion](https://parity.link/signer-companion) — web extension to inject keys from Signer and sign transactions through the browser
 - [Metadata Portal](https://metadata.parity.io) — QR codes with the latest metadata
 - [BananaSplit](https://bs.parity.io) — split your seed phrase for maximum security
 - [Legacy: last public release with React Native](https://github.com/paritytech/parity-signer/tree/legacy-4.5.3)
@@ -117,17 +118,17 @@ However, we strongly recommend that you use a real device for development, as so
 
 ## Android
 
-1. Download [Android Studio](https://developer.android.com/studio).
+**1.** Download [Android Studio](https://developer.android.com/studio).
 
-2. Open the project from the `android` directory.
+**2.** Open the project from the `android` directory.
 
-3. Install NDK. Go to `File -> Project Structure -> SDK Location`. Next to the "Android NDK location" section, click "Download Android NDK" button.
+**3.** Install NDK. Go to `File -> Project Structure -> SDK Location`. Next to the "Android NDK location" section, click "Download Android NDK" button.
 
 We hightly recommend you to update all existing plugins and SDK's for Kotlin, Gradle, etc even if you just downloaded a fresh Android Studio. It's always a good idea to restart Android Studio after that. This can save you many hours on Stackoverflow trying to fix random errors like "NDK not found".
 
-4. Connect your device or create a virtual one. Open `Tools -> Device Manager` and create a new phone simulator with the latest Android.
+**4.** Connect your device or create a virtual one. Open `Tools -> Device Manager` and create a new phone simulator with the latest Android.
 
-5. Run the project (Ctrl+R). It should build the Rust core library automatically.
+**5.** Run the project (Ctrl+R). It should build the Rust core library automatically.
 
 # Tests
 
