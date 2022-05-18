@@ -36,15 +36,15 @@ use crate::parser::{Content, Instruction, Set, TokenOverride};
 /// the command line
 pub fn gen_add_specs(instruction: Instruction) -> Result<(), ErrorActive> {
     match instruction.set {
-        // `-f` setting key: produce payload files from existing database
-        // entries.
+        // `-f` setting key: produce `add_specs` payload files from existing
+        // database entries.
         //
         // Note that `-f` key processed with an encryption override **will not**
         // add entry with a new encryption in the database.
         Set::F => match instruction.content {
             // `$ cargo run add_specs -f -a`
             //
-            // Make payloads for all specs entries in the database.
+            // Make `add_specs` payloads for all specs entries in the database.
             Content::All => {
                 // makes no sense to override encryption for all entries at once
                 if instruction.over.encryption.is_some() {
@@ -82,8 +82,8 @@ pub fn gen_add_specs(instruction: Instruction) -> Result<(), ErrorActive> {
             // `$ cargo run add_specs -f -n network_address_book_title
             // <optional encryption override>`
             //
-            // Make payload for single specs entry **already in the database**,
-            // referred to by network address book title.
+            // Make `add_specs` payload for single specs entry **already in the
+            // database**, referred to by network address book title.
             Content::Name(name) => {
                 // entry is expected to be in the database, meaning the token is
                 // already set up
@@ -98,8 +98,8 @@ pub fn gen_add_specs(instruction: Instruction) -> Result<(), ErrorActive> {
             // `$ cargo run add_specs -f -u network_url_address
             // <optional encryption override>`
             //
-            // Make payload(s) for specs entries **already in the database**,
-            // referred to by network url address.
+            // Make `add_specs` payload(s) for specs entries **already in the
+            // database**, referred to by network url address.
             //
             // Multiple payloads will be produced if multiple encryptions are
             // in the database for the same network and no encryption override
@@ -116,8 +116,8 @@ pub fn gen_add_specs(instruction: Instruction) -> Result<(), ErrorActive> {
             }
         },
 
-        // `-d` setting key: produce payloads through rpc calls, **do not**
-        // update the database, export payload files.
+        // `-d` setting key: produce `add_specs` payloads through rpc calls,
+        // **do not** update the database, export payload files.
         Set::D => match instruction.content {
             // `-d` key implies that the database does not get updated (only
             // the payload files are produced from rpc calls), `-a` key implies
@@ -136,8 +136,9 @@ pub fn gen_add_specs(instruction: Instruction) -> Result<(), ErrorActive> {
             // `$ cargo run add_specs -d -u network_url_address
             // <encryption override> <optional token override>`
             //
-            // Produce payload by making rpc calls at `network_url_address`,
-            // print payload file, do not update the database.
+            // Produce `add_specs` payload by making rpc calls at
+            // `network_url_address`, print payload file, do not update the
+            // database.
             //
             // Note that if the network genesis hash has a record in the
             // database, and url used for the rpc call is different, an error is
@@ -177,8 +178,8 @@ pub fn gen_add_specs(instruction: Instruction) -> Result<(), ErrorActive> {
             //
             // Network already has an entry in the database and could be
             // referred to by network address book title. This key combination
-            // is intended to be used to add to the database same network with
-            // different encryption, without creating payload file.
+            // is intended to be used to add to the hot database same network
+            // with different encryption, without creating payload file.
             Content::Name(name) => {
                 // network has entry in the database, token is set up and could
                 // not be changed
@@ -219,9 +220,9 @@ pub fn gen_add_specs(instruction: Instruction) -> Result<(), ErrorActive> {
             }
         },
 
-        // `-t` setting key or no setting key: produce payloads through rpc
-        // calls, even if the specs in the payload are already in the database,
-        // update the database.
+        // `-t` setting key or no setting key: produce `add_specs` payloads
+        // through rpc calls, even if the specs in the payload are already in
+        // the database, update the database.
         Set::T => match instruction.content {
             // Network specs are expected to remain constant over time,
             // this command seems to be of no use.
@@ -233,7 +234,8 @@ pub fn gen_add_specs(instruction: Instruction) -> Result<(), ErrorActive> {
             // Network already has an entry in the database and could be
             // referred to by network address book title. This key combination
             // is intended to be used to add to the database same network with
-            // different encryption and create payload file at the same time.
+            // different encryption and create `add_specs` payload file at the
+            // same time.
             Content::Name(name) => {
                 // network has entry in the database, token is set up and could
                 // not be changed
@@ -254,7 +256,7 @@ pub fn gen_add_specs(instruction: Instruction) -> Result<(), ErrorActive> {
             // <encryption override> <optional token override>`
             //
             // Update the database by making rpc calls at `network_url_address`
-            // and create a payload file.
+            // and create `add_specs` payload file.
             //
             // Note that if the network genesis hash has a record in the
             // database, and url used for the rpc call is different, an error is
@@ -402,7 +404,7 @@ fn specs_d_u(
 ///
 /// Note that no fetch is done while processing this command.
 ///
-/// Network address book title is the key in [`ADDRESS_BOOK`] tree, it is 
+/// Network address book title is the key in [`ADDRESS_BOOK`] tree, it is
 /// built as `<network name>-<encryption>` for non-default networks. Default
 /// networks have `<network name>` as an address book title. Field `title` in
 /// network specs

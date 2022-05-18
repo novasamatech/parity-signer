@@ -1,5 +1,46 @@
 //! `load_metadata` payloads and updating [`METATREE`] tree of the hot database
 //!
+//! This module deals with processing commands:
+//!
+//! - `$ cargo run load_metadata <key(s)> <argument>`
+//!
+//! Produces `load_metadata` payload from the database entries and through rpc
+//! calls.
+//!
+// TODO add direct link to keys and agruments so that they are not repeated
+// here, again
+//!
+//! Database updating is made only with data from rpc calls.
+//!
+//! Payload `load_metadata` is exported in dedicated
+//! [`FOLDER`](constants::FOLDER) to (optionally) be signed and later be
+//! transformed into `load_metadata` update QR. Output file name is
+//! `sign_me_load_metadata_<name>V<version>`.
+//!
+//! - `$ cargo run unwasm -payload <filename>`
+//!
+//! Produces `load_metadata` payload from `.wasm` files.
+//!
+//! `.wasm` file is supposedly pre-release metadata of a network already
+//! introduced to the hot database. Command could be used to prepare updates
+//! before the metadata gets published on a node.
+//!
+//! Optional key `-d` could be used to **not** write the metadata in the
+//! database.
+//!
+//! Payload `load_metadata` is exported in dedicated
+//! [`FOLDER`](constants::FOLDER) to (optionally) be signed and later be
+//! transformed into `load_metadata` update QR. Output file name is
+//! `sign_me_load_metadata_<name>V<version>`.
+//!
+//! - `$ cargo run meta_default_file -name <network_name> -version
+//! <metadata_version>`
+//!
+//! Generates metadata files for `defaults` crate from hot database entries.
+//! Command line specifies network name and metadata version.
+//!
+//! Output file is exported in dedicated [`FOLDER`](constants::FOLDER). File
+//! name is `<name><version>`.
 use constants::{ADDRESS_BOOK, EXPORT_FOLDER, HOT_DB_NAME, METATREE};
 use db_handling::helpers::{get_meta_values_by_name_version, open_db, open_tree};
 use definitions::{
@@ -18,20 +59,32 @@ use crate::metadata_shortcut::{meta_shortcut, MetaShortCut};
 use crate::output_prep::load_meta_print;
 use crate::parser::{Content, Instruction, Set};
 
-/// Function to generate `load_metadata` message ready for signing.
-/// Exact behavior is determined by the keys used.
-
+/// Process `load_metadata` command according to the [`Instruction`] received
+/// from the command line
 pub fn gen_load_meta(instruction: Instruction) -> Result<(), ErrorActive> {
+    // At the moment, `load_metadata` contains identical payloads for all
+    // encryptions.
     if instruction.over.encryption.is_some() {
         return Err(ErrorActive::NotSupported);
     }
+
+    // Token override is unavailable for metadata loading.
     if instruction.over.token.is_some() {
         return Err(ErrorActive::NotSupported);
     }
+
     match instruction.set {
+        // `-f` setting key: produce payload files from existing database
+        // entries.
         Set::F => match instruction.content {
+            // `$ cargo run load_metadata -f -a`
+            //
+            // Make payloads for all metadata entries in the database.
             Content::All => {
-                let set = get_address_book_set()?;
+                // Get `AddressSpecs` for each network in `ADDRESS_BOOK`
+                let set = address_specs_set()?;
+
+                // Process each entry
                 for x in set.iter() {
                     match meta_f_a_element(x) {
                         Ok(()) => (),
@@ -40,12 +93,31 @@ pub fn gen_load_meta(instruction: Instruction) -> Result<(), ErrorActive> {
                 }
                 Ok(())
             }
+
+            // `$ cargo run load_metadata -f -n network_name`
+            //
+            // Make payload(s) for all metadata entries **already in the
+            // database** for network with user-entered name.
             Content::Name(name) => meta_f_n(&name),
+
+            // `-u` content key is to provide the url address for rpc calls;
+            // since `-f` indicates the data is taken from the database, the
+            // the combination seems of no use.
             Content::Address(_) => Err(ErrorActive::NotSupported),
         },
+
+        // `-d` setting key: get network data using rpc calls, **do not**
+        // update the database, export payload files.
         Set::D => match instruction.content {
+            // `$ cargo run load_metadata -d -a`
+            //
+            // Make rpc calls for all networks in `ADDRESS_BOOK`, produce
+            // `load_metadata` payload files.
             Content::All => {
-                let set = get_address_book_set()?;
+                // Collect `AddressSpecs` for each network in `ADDRESS_BOOK`
+                let set = address_specs_set()?;
+
+                // Process each entry
                 for x in set.iter() {
                     match meta_d_a_element(x) {
                         Ok(()) => (),
@@ -54,42 +126,146 @@ pub fn gen_load_meta(instruction: Instruction) -> Result<(), ErrorActive> {
                 }
                 Ok(())
             }
+
+            // `$ cargo run load_metadata -d -n network_name`
+            //
+            // Make rpc calls for network with user-entered name and produce
+            // `load_metadata` payload file.
+            //
+            // Network here must already have an entry in `ADDRESS_BOOK`, so
+            // so that the url address at which to make rpc call is made could
+            // be found.
             Content::Name(name) => meta_d_n(&name),
+
+            // `$ cargo run load_metadata -d -u network_url_address`
+            //
+            // Make rpc calls for network at user-entered url address and
+            // produce `load_metadata` payload file.
+            //
+            // This is intended for the networks that do not have yet entries in
+            // `ADDRESS_BOOK`.
+            //
+            // If the rpc call is done at address already known to the
+            // `ADDRESS_BOOK`, a warning will be issued that the metadata is
+            // not checked for consistency with existing data in the database.
             Content::Address(address) => meta_d_u(&address),
         },
+
+        // `-k` setting key: get network data using rpc calls, update the
+        // database, produce `load_metadata` payload files only if new metadata
+        // was fetched.
         Set::K => {
             let write = Write::OnlyNew;
             match instruction.content {
+                // `$ cargo run load_metadata -k -a`
+                //
+                // Make rpc calls, update the database as needed and produce
+                // payload files for all networks in address book.
+                //
+                // If there are two entries for the same network and different
+                // encryption, fetch and (possibly) payload export is done only
+                // once: `load_metadata` payloads do not specify encryption.
                 Content::All => meta_kpt_a(&write, instruction.pass_errors),
+
+                // `$ cargo run load_metadata -k -n network_name`
+                //
+                // Make rpc calls, update the database as needed and produce
+                // payload files for network with specified name.
+                //
+                // This command is for networks already having at least one
+                // entry in the `ADDRESS_BOOK` and `SPECSTREEPREP` of the hot
+                // database.
+                //
+                // Regardless of how many entries with different encryptions are
+                // there, fetch and (possibly) payload export is done only once.
                 Content::Name(name) => meta_kpt_n(&name, &write),
+
+                // Key `-u` is for url addresses. If network has no entry in the
+                // database, its metadata can not be added before its specs. If
+                // network has an entry in the database, it is simpler to
+                // address it with `-n network_name` combination.
                 Content::Address(_) => Err(ErrorActive::NotSupported),
             }
         }
+
+        // `-p` setting key: get network data using rpc calls and update the
+        // database.
         Set::P => {
             let write = Write::None;
             match instruction.content {
+                // `$ cargo run load_metadata -p -a`
+                //
+                // Make rpc calls and update the database `METATREE` for all
+                // networks in `ADDRESS_BOOK`.
+                //
+                // Only one entry is processed for each network (network
+                // encryption is not a part of `load_metadata` payload).
                 Content::All => meta_kpt_a(&write, instruction.pass_errors),
+
+                // `$ cargo run load_metadata -p -n network_name`
+                //
+                // Make rpc calls and update the database `METATREE` for network
+                // with user-entered name.
+                //
+                // This command is for networks already having at least one
+                // entry in the `ADDRESS_BOOK` and `SPECSTREEPREP` of the hot
+                // database.
+                //
+                // Regardless of how many entries with different encryptions are
+                // there, fetch is done only once.
                 Content::Name(name) => meta_kpt_n(&name, &write),
+
+                // Key `-u` is for url addresses. If network has no entry in the
+                // database, its metadata can not be added before its specs. If
+                // network has an entry in the database, it is simpler to
+                // address it with `-n network_name` combination.
                 Content::Address(_) => Err(ErrorActive::NotSupported),
             }
         }
+
+        // `-t` setting key or no setting key: get network data using rpc calls
+        // and update the database.
         Set::T => {
             let write = Write::All;
             match instruction.content {
+                // `$ cargo run load_metadata -a`
+                //
+                // Make rpc calls, update the database `METATREE` and produce
+                // `load_metadata` payloads for all networks in `ADDRESS_BOOK`.
+                //
+                // Only one entry is processed for each network (network
+                // encryption is not a part of `load_metadata` payload).
                 Content::All => meta_kpt_a(&write, instruction.pass_errors),
+
+                // `$ cargo run load_metadata -n network_name`
+                //
+                // Make rpc calls, update the database `METATREE` and produce
+                // `load_metadata` payload for network with user-entered name.
+                //
+                // This command is for networks already having at least one
+                // entry in the `ADDRESS_BOOK` and `SPECSTREEPREP` of the hot
+                // database.
+                //
+                // Regardless of how many entries with different encryptions are
+                // there, fetch is done only once.
                 Content::Name(name) => meta_kpt_n(&name, &write),
+
+                // Key `-u` is for url addresses. If network has no entry in the
+                // database, its metadata can not be added before its specs. If
+                // network has an entry in the database, it is simpler to
+                // address it with `-n network_name` combination.
                 Content::Address(_) => Err(ErrorActive::NotSupported),
             }
         }
     }
 }
 
-/// Function to process an individual address book entry in `load_metadata -f -a` run.
-/// Expected behavior:  
-/// scan prefix in `metadata` database tree in search of network specname
-/// to get all versions available in the database (max 2),
-/// check meta_values integrity (network specname and spec_version),
-/// and print into `sign_me` output file.  
+/// `load_metadata -f -a` for individual [`AddressSpecs`] value.
+///
+/// - Get metadata entries from database [`METATREE`] by [`MetaKeyPrefix`]
+/// generated with network name. At most two entries are expected.
+/// - Check the metadata integrity
+/// - Output raw bytes payload file
 fn meta_f_a_element(set_element: &AddressSpecs) -> Result<(), ErrorActive> {
     let meta_key_prefix = MetaKeyPrefix::from_name(&set_element.name);
     let database = open_db::<Active>(HOT_DB_NAME)?;
@@ -122,48 +298,58 @@ fn meta_f_a_element(set_element: &AddressSpecs) -> Result<(), ErrorActive> {
     Ok(())
 }
 
-/// Function to process `load_metadata -f -n name` run.
-/// Here `name` is network specname, i.e. `polkadot` for any polkadot version and encryption variety
-/// (since load_metadata message does not contain info about network encryption).
-/// At this moment simple export of only specific version of the metadata is not implemented.
-/// Expected behavior:  
-/// go through `address_book` and `specs_tree` to collect all unique AddressSpecs entries,
-/// search through this set for the entry corresponding to the requested name,
-/// scan prefix in `metadata` database tree in search of network specname
-/// to get all versions available in the database (max 2),
-/// check `meta_values` integrity (network specname and `spec_version`),
-/// and print into `sign_me` output file.  
+/// `load_metadata -f -n network_name`
+///
+/// - Get all available [`AddressSpecs`] from the database and search for the
+/// one with user-entered `network_name`
+/// - Get metadata entries from database [`METATREE`] by [`MetaKeyPrefix`]
+/// generated with `network_name`. At most two entries are expected.
+/// - Check the metadata integrity
+/// - Output raw bytes payload file
 fn meta_f_n(name: &str) -> Result<(), ErrorActive> {
     meta_f_a_element(&search_name(name)?)
 }
 
-/// Function to process individual address book entry in `load_metadata -d -a` run.
-/// Expected behavior:  
-/// fetch information from address, check it,
-/// and print into `sign_me` output file.  
+/// `load_metadata -d -a` for individual [`AddressSpecs`] value.
+///
+/// - Fetch network information using rpc calls at `address` in [`AddressSpecs`]
+/// and interpret it
+/// - Check the metadata integrity with the data on record in the database
+/// - Output raw bytes payload file
 fn meta_d_a_element(set_element: &AddressSpecs) -> Result<(), ErrorActive> {
     let shortcut = shortcut_set_element(set_element)?;
     load_meta_print(&shortcut)
 }
 
-/// Function to process `load_metadata -d -n name` run.
-/// Expected behavior:  
-/// go through `address_book` and `specs_tree` to collect all unique AddressSpecs entries,
-/// search through this set for the entry corresponding to the requested name,
-/// fetch information from address, check it,
-/// and print into `sign_me` output file.
+/// `load_metadata -d -n network_name`
+///
+/// - Get all available [`AddressSpecs`] from the database and search for the
+/// one with user-entered `network_name`
+/// - Fetch network information using rpc calls at `address` in [`AddressSpecs`]
+/// and interpret it
+/// - Check the metadata integrity with the data on record in the database
+/// - Output raw bytes payload file
 fn meta_d_n(name: &str) -> Result<(), ErrorActive> {
     meta_d_a_element(&search_name(name)?)
 }
 
-/// Function to process `load_metadata -d -u url` run.
-/// Expected behavior:  
-/// fetch information from address, check it,
-/// and print into `sign_me` output file.
+/// `load_metadata -d -u network_url_address`
+///
+/// - Fetch network information using rpc calls at user-entered
+/// `network_url_address` and interpret it
+/// - Output raw bytes payload file
+///
+/// The command is intended to be used with unknown networks that do not have
+/// yet an entry in the database. Known networks are better addressed by the
+/// network name.
+///
+/// No metadata integrity checking is done here. For example, if base58 prefix
+/// in the metadata is no longer same as in network specs on record, there will
+/// no error produced here.
 fn meta_d_u(address: &str) -> Result<(), ErrorActive> {
     if let Ok(a) = filter_address_book_by_url(address) {
         if !a.is_empty() {
-            println!("Database contains entries for {} at {}. With `-d` setting key the fetched metadata integrity with existing database entries is not checked.", a[0].name, address)
+            println!("Warning. Address book contains an entry for {} with same url address {}. With `-d` setting key the consistency between the fetched metadata and existing database entries was not checked.", a[0].name, address)
         }
     }
     let shortcut = meta_shortcut(address)?;
@@ -173,16 +359,15 @@ fn meta_d_u(address: &str) -> Result<(), ErrorActive> {
     load_meta_print(&shortcut)
 }
 
-/// Function to process `load_metadata -k -a`, `load_metadata -p -a`, `load_metadata -t -a`, `load_metadata -a` runs.
-/// Expected behavior:  
-/// go through `address_book` and `specs_tree` to collect all unique AddressSpecs entries,
-/// collect known metadata from database and sort it, clear metadata from database,
-/// process each element and update sorted metadata set (so that there are
-/// max 2 most recent metadata entries for each network),
-/// record resulting metadata into database.
-/// `write` determines which `sign_me` files are produced.
+/// `load_metadata <-k/-p/-t> -a` whole
+///
+/// - Get all available [`AddressSpecs`] from the database
+/// - Get and sort existing metadata entries from [`METATREE`]
+/// - Process each [`AddressSpecs`] and update sorted metadata entries in the
+/// process. Input [`Write`] indicates if the payload file should be created.
+/// - Rewrite the database [`METATREE`] with updated metadata set
 fn meta_kpt_a(write: &Write, pass_errors: bool) -> Result<(), ErrorActive> {
-    let set = get_address_book_set()?;
+    let set = address_specs_set()?;
     let mut sorted_meta_values = prepare_metadata()?;
     for x in set.iter() {
         sorted_meta_values = match meta_kpt_a_element(x, write, &sorted_meta_values) {
@@ -196,12 +381,18 @@ fn meta_kpt_a(write: &Write, pass_errors: bool) -> Result<(), ErrorActive> {
     write_metadata(sorted_meta_values)
 }
 
-/// Function to process an individual element of
-/// `load_metadata -k -a`, `load_metadata -p -a`, `load_metadata -t -a`, `load_metadata -a` runs.
-/// Expected behavior:  
-/// fetch information from address, check it,
-/// insert in the sorted `meta_values`,
-/// and print into `sign_me` output file depending on value of `write`.
+/// `load_metadata <-k/-p/-t> -a` for individual [`AddressSpecs`] value
+///
+/// - Fetch network information using rpc calls at `address` in [`AddressSpecs`]
+/// and interpret it
+/// - Check the metadata integrity with the data on record in the database,
+/// insert it into received [`SortedMetaValues`]
+/// - Output raw bytes payload file, if requested by input [`Write`]
+///
+/// Inputs entry [`AddressSpecs`] that is currently processed, [`Write`]
+/// indicating if the `load_metadata` payload should be created, and
+/// [`SortedMetaValues`] that are initially taken from the database and then
+/// during `meta_kpt_a` run.
 fn meta_kpt_a_element(
     set_element: &AddressSpecs,
     write: &Write,
@@ -232,22 +423,31 @@ fn meta_kpt_a_element(
     Ok(upd_sorted.sorted)
 }
 
-/// Function to process `load_metadata -k -n name`, `load_metadata -p -n name`,
-/// `load_metadata -t -n name`, `load_metadata -n name` runs.
-/// Expected behavior:  
-/// collect known metadata from database and sort it, clear metadata from database,
-/// go through `address_book` and `specs_tree` to collect all unique AddressSpecs entries,
-/// search through this set for the entry corresponding to the requested name,
-/// fetch information from address, check it, insert into sorted metadata
-/// and print into `sign_me` output file depending on `write` value,
-/// record resulting metadata into database.
+/// `load_metadata <-k/-p/-t> -n network_name`
+///
+/// - Get and sort existing metadata entries from [`METATREE`]
+/// - Get all available [`AddressSpecs`] from the database and search for the
+/// one with user-entered `network_name`
+/// - Fetch network information using rpc calls at `address` in [`AddressSpecs`]
+/// and interpret it
+/// - Check the metadata integrity with the data on record in the database,
+/// insert it into [`SortedMetaValues`]
+/// - Output raw bytes payload file, if requested by input [`Write`]
+/// - Rewrite the database [`METATREE`] with updated metadata set
+///
+/// Inputs user-entered network name and [`Write`] indicating if the
+/// `load_metadata` payload should be created.
 fn meta_kpt_n(name: &str, write: &Write) -> Result<(), ErrorActive> {
     let mut sorted_meta_values = prepare_metadata()?;
     sorted_meta_values = meta_kpt_a_element(&search_name(name)?, write, &sorted_meta_values)?;
     write_metadata(sorted_meta_values)
 }
 
-/// Struct to collect network specname, genesis hash and fetching address from address book
+/// Network information from [`ADDRESS_BOOK`] and
+/// [`SPECSTREEPREP`](constants::SPECSTREEPREP)
+///
+/// This data is sufficient to make rpc calls and check that the metadata is
+/// consistent with existing database content.
 #[derive(PartialEq)]
 struct AddressSpecs {
     address: String,
@@ -256,8 +456,8 @@ struct AddressSpecs {
     name: String,
 }
 
-/// Function to collect a vector of unique AddressSpecs entries from address book
-fn get_address_book_set() -> Result<Vec<AddressSpecs>, ErrorActive> {
+/// Collect all unique [`AddressSpecs`] from the hot database
+fn address_specs_set() -> Result<Vec<AddressSpecs>, ErrorActive> {
     let mut set: Vec<AddressBookEntry> = Vec::new();
     {
         let database = open_db::<Active>(HOT_DB_NAME)?;
@@ -309,11 +509,10 @@ fn get_address_book_set() -> Result<Vec<AddressSpecs>, ErrorActive> {
     Ok(out)
 }
 
-/// Function to collect a vector of unique AddressSpecs entries from address book
-/// and search for particular name in it,
-/// outputs AddressSpecs
+/// Find in [`AddressSpecs`] set from the hot database the element with same
+/// `name` as the input
 fn search_name(name: &str) -> Result<AddressSpecs, ErrorActive> {
-    let set = get_address_book_set()?;
+    let set = address_specs_set()?;
     let mut found = None;
     for x in set.into_iter() {
         if x.name == name {
@@ -331,10 +530,14 @@ fn search_name(name: &str) -> Result<AddressSpecs, ErrorActive> {
     }
 }
 
-/// Function to process individual AddressSpecs entry:
-/// do fetch, check fetched metadata for version,
-/// check that genesis hash and network name are same in address book and in fetch
-/// output MetaShortCut value
+/// Make rpc calls and check the received information for given [`AddressSpecs`]
+///
+/// Checks that the network name, genesis hash, and base58 prefix did not
+/// change compared to what is on record in the database. Warns if the metadata
+/// (v14) has incomplete set of signed extensions.
+///
+/// Outputs [`MetaShortCut`], the data sufficient to produce `load_metadata`
+/// payload.
 fn shortcut_set_element(set_element: &AddressSpecs) -> Result<MetaShortCut, ErrorActive> {
     let shortcut = meta_shortcut(&set_element.address)?;
     if shortcut.meta_values.name != set_element.name {
@@ -376,12 +579,25 @@ fn shortcut_set_element(set_element: &AddressSpecs) -> Result<MetaShortCut, Erro
     Ok(shortcut)
 }
 
-/// Print warning if the metadata (v14) has incomplete set of signed extensions
+/// Show warning if the metadata (v14) has incomplete set of signed extensions
 fn warn(name: &str, version: u32) {
     println!("Warning. Metadata {}{} has incomplete set of signed extensions, and could cause Signer to fail in parsing signable transactions using this metadata.", name, version);
 }
 
-/// Function to process .wasm files into signable entities and add metadata into the database
+/// `unwasm -payload <filename>` and `unwasm -payload <filename> -d`
+///
+/// Generate `load_metadata` payload from `.wasm` files.
+///
+/// Function is intended to be used for metadata not yet published on a node and
+/// only for the networks that have network specs on record in the hot database.
+///
+/// Metadata is retrieved from `.wasm` file itself. To get genesis hash needed
+/// to complete `load_metadata` payload and to check the metadata for
+/// consistency, network name found in the metadata is used to retrieve
+/// [`NetworkSpecsToSend`](definitions::network_specs::NetworkSpecsToSend).
+///
+/// Optional key `-d`, if used, indicates that the metadata entry should **not**
+/// be added to the [`METATREE`] of the hot database.
 pub fn unwasm(filename: &str, update_db: bool) -> Result<(), ErrorActive> {
     let meta_values = MetaValues::from_wasm_file(filename)?;
     let set_element = search_name(&meta_values.name)?;
@@ -421,8 +637,10 @@ pub fn unwasm(filename: &str, update_db: bool) -> Result<(), ErrorActive> {
     load_meta_print(&shortcut)
 }
 
-/// Function to generate text file with hex string metadata, for defaults generation
-/// Takes metadata only from the database
+/// `meta_default_file -name <network_name> -version <metadata_version>`
+///
+/// Generate text file with hex string metadata, from a hot database
+/// [`METATREE`] entry, for `defaults` crate.
 pub fn meta_default_file(name: &str, version: u32) -> Result<(), ErrorActive> {
     let meta_values = get_meta_values_by_name_version::<Active>(HOT_DB_NAME, name, version)?;
     let filename = format!("{}/{}{}", EXPORT_FOLDER, name, version);
