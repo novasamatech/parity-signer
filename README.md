@@ -1,9 +1,9 @@
-<center align="center">
+<p align="center">
   <a href="https://parity.io/signer/">
     <img src="docs/src/res/logo-black.svg#gh-light-mode-only" alt="Logo Black" width="600">
     <img src="docs/src/res/logo-white.svg#gh-dark-mode-only" alt="Logo White" width="600">
   </a>
-</center>
+</p>
 
 <p align="center">
     <br><br><br>
