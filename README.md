@@ -118,6 +118,8 @@ However, we strongly recommend that you use a real device for development, as so
 
 ## Android
 
+> ⚠️ Android build has only been tested on Linux. If you manage by some miracle to run this on a Mac, please add the steps to this Readme
+
 **1.** Download [Android Studio](https://developer.android.com/studio).
 
 **2.** Open the project from the `android` directory.
