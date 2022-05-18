@@ -1,7 +1,7 @@
 <p align="center">
   <a href="https://parity.io/signer/">
-    <img src="docs/src/res/logo-black.jpg#gh-light-mode-only" alt="Logo Black" width="500">
-    <img src="docs/src/res/logo-white.jpg#gh-dark-mode-only" alt="Logo White" width="500">
+    <img src="docs/src/res/logo-black.svg#gh-light-mode-only" alt="Logo Black" width="500">
+    <img src="docs/src/res/logo-white.svg#gh-dark-mode-only" alt="Logo White" width="500">
   </a>
 </p>
 
