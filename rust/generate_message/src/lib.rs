@@ -229,7 +229,7 @@ use parser::{Command, Show};
 mod remove;
 use remove::remove_info;
 mod show;
-use show::{check_file, show_address_book, show_database};
+use show::{check_file, show_metadata, show_networks};
 mod specs;
 use specs::gen_add_specs;
 mod make_message;
@@ -243,8 +243,8 @@ use make_message::make_message;
 pub fn full_run(command: Command) -> Result<(), ErrorActive> {
     match command {
         Command::Show(x) => match x {
-            Show::Database => show_database(),
-            Show::AddressBook => show_address_book(),
+            Show::Metadata => show_metadata(),
+            Show::Networks => show_networks(),
             Show::CheckFile(path) => check_file(path),
         },
         Command::Types => prep_types::<Active>(HOT_DB_NAME)?.write(TYLO),

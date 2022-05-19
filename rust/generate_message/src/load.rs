@@ -41,7 +41,7 @@
 //!
 //! Output file is exported in dedicated [`FOLDER`](constants::FOLDER). File
 //! name is `<name><version>`.
-use constants::{ADDRESS_BOOK, EXPORT_FOLDER, HOT_DB_NAME, METATREE};
+use constants::{EXPORT_FOLDER, HOT_DB_NAME, METATREE};
 use db_handling::helpers::{get_meta_values_by_name_version, open_db, open_tree};
 use definitions::{
     error::{ErrorSource, MetadataError, MetadataSource},
@@ -50,29 +50,21 @@ use definitions::{
         IncomingMetadataSourceActiveStr, NotFoundActive,
     },
     keyring::MetaKeyPrefix,
-    metadata::{AddressBookEntry, MetaValues},
+    metadata::MetaValues,
 };
 
-use crate::helpers::{error_occured, filter_address_book_by_url, network_specs_from_entry, Write};
+use crate::helpers::{
+    address_book_content, error_occured, filter_address_book_by_url, network_specs_from_entry,
+    Write,
+};
 use crate::metadata_db_utils::{add_new, prepare_metadata, write_metadata, SortedMetaValues};
 use crate::metadata_shortcut::{meta_shortcut, MetaShortCut};
 use crate::output_prep::load_meta_print;
-use crate::parser::{Content, Instruction, Set};
+use crate::parser::{Content, InstructionMeta, Set};
 
-/// Process `load_metadata` command according to the [`Instruction`] received
-/// from the command line
-pub fn gen_load_meta(instruction: Instruction) -> Result<(), ErrorActive> {
-    // At the moment, `load_metadata` contains identical payloads for all
-    // encryptions.
-    if instruction.over.encryption.is_some() {
-        return Err(ErrorActive::NotSupported);
-    }
-
-    // Token override is unavailable for metadata loading.
-    if instruction.over.token.is_some() {
-        return Err(ErrorActive::NotSupported);
-    }
-
+/// Process `load_metadata` command according to the [`InstructionMeta`]
+/// received from the command line
+pub fn gen_load_meta(instruction: InstructionMeta) -> Result<(), ErrorActive> {
     match instruction.set {
         // `-f` setting key: produce payload files from existing database
         // entries.
@@ -80,7 +72,7 @@ pub fn gen_load_meta(instruction: Instruction) -> Result<(), ErrorActive> {
             // `$ cargo run load_metadata -f -a`
             //
             // Make payloads for all metadata entries in the database.
-            Content::All => {
+            Content::All { pass_errors } => {
                 // Get `AddressSpecs` for each network in `ADDRESS_BOOK`
                 let set = address_specs_set()?;
 
@@ -88,7 +80,7 @@ pub fn gen_load_meta(instruction: Instruction) -> Result<(), ErrorActive> {
                 for x in set.iter() {
                     match meta_f_a_element(x) {
                         Ok(()) => (),
-                        Err(e) => error_occured(e, instruction.pass_errors)?,
+                        Err(e) => error_occured(e, pass_errors)?,
                     }
                 }
                 Ok(())
@@ -113,7 +105,7 @@ pub fn gen_load_meta(instruction: Instruction) -> Result<(), ErrorActive> {
             //
             // Make rpc calls for all networks in `ADDRESS_BOOK`, produce
             // `load_metadata` payload files.
-            Content::All => {
+            Content::All { pass_errors } => {
                 // Collect `AddressSpecs` for each network in `ADDRESS_BOOK`
                 let set = address_specs_set()?;
 
@@ -121,7 +113,7 @@ pub fn gen_load_meta(instruction: Instruction) -> Result<(), ErrorActive> {
                 for x in set.iter() {
                     match meta_d_a_element(x) {
                         Ok(()) => (),
-                        Err(e) => error_occured(e, instruction.pass_errors)?,
+                        Err(e) => error_occured(e, pass_errors)?,
                     }
                 }
                 Ok(())
@@ -165,7 +157,7 @@ pub fn gen_load_meta(instruction: Instruction) -> Result<(), ErrorActive> {
                 // If there are two entries for the same network and different
                 // encryption, fetch and (possibly) payload export is done only
                 // once: `load_metadata` payloads do not specify encryption.
-                Content::All => meta_kpt_a(&write, instruction.pass_errors),
+                Content::All { pass_errors } => meta_kpt_a(&write, pass_errors),
 
                 // `$ cargo run load_metadata -k -n network_name`
                 //
@@ -200,7 +192,7 @@ pub fn gen_load_meta(instruction: Instruction) -> Result<(), ErrorActive> {
                 //
                 // Only one entry is processed for each network (network
                 // encryption is not a part of `load_metadata` payload).
-                Content::All => meta_kpt_a(&write, instruction.pass_errors),
+                Content::All { pass_errors } => meta_kpt_a(&write, pass_errors),
 
                 // `$ cargo run load_metadata -p -n network_name`
                 //
@@ -235,7 +227,7 @@ pub fn gen_load_meta(instruction: Instruction) -> Result<(), ErrorActive> {
                 //
                 // Only one entry is processed for each network (network
                 // encryption is not a part of `load_metadata` payload).
-                Content::All => meta_kpt_a(&write, instruction.pass_errors),
+                Content::All { pass_errors } => meta_kpt_a(&write, pass_errors),
 
                 // `$ cargo run load_metadata -n network_name`
                 //
@@ -443,7 +435,7 @@ fn meta_kpt_n(name: &str, write: &Write) -> Result<(), ErrorActive> {
     write_metadata(sorted_meta_values)
 }
 
-/// Network information from [`ADDRESS_BOOK`] and
+/// Network information from [`ADDRESS_BOOK`](constants::ADDRESS_BOOK) and
 /// [`SPECSTREEPREP`](constants::SPECSTREEPREP)
 ///
 /// This data is sufficient to make rpc calls and check that the metadata is
@@ -458,20 +450,12 @@ struct AddressSpecs {
 
 /// Collect all unique [`AddressSpecs`] from the hot database
 fn address_specs_set() -> Result<Vec<AddressSpecs>, ErrorActive> {
-    let mut set: Vec<AddressBookEntry> = Vec::new();
-    {
-        let database = open_db::<Active>(HOT_DB_NAME)?;
-        let address_book = open_tree::<Active>(&database, ADDRESS_BOOK)?;
-        for x in address_book.iter().flatten() {
-            let address_book_entry = AddressBookEntry::from_entry(x)?;
-            set.push(address_book_entry);
-        }
-    }
+    let set = address_book_content()?;
     if set.is_empty() {
         return Err(ErrorActive::Database(DatabaseActive::AddressBookEmpty));
     }
     let mut out: Vec<AddressSpecs> = Vec::new();
-    for x in set.iter() {
+    for (_, x) in set.iter() {
         let specs = network_specs_from_entry(x)?;
         for y in out.iter() {
             if y.name == specs.name {

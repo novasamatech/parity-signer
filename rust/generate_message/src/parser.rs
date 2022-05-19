@@ -19,7 +19,7 @@ pub enum Command {
     ///
     /// # Display content of the metadata [`METATREE`](constants::METATREE) tree of the hot database
     ///
-    /// `$ cargo run show -database`
+    /// `$ cargo run show -metadata`
     ///
     /// Function prints for each entry in hot database
     /// [`METATREE`](constants::METATREE) tree:
@@ -30,7 +30,7 @@ pub enum Command {
     ///
     /// # Display content of the address book [`ADDRESS_BOOK`](constants::ADDRESS_BOOK) tree of the hot database
     ///
-    /// `$ cargo run show -address_book`
+    /// `$ cargo run show -networks`
     ///
     /// Function prints for each entry in hot database
     /// [`ADDRESS_BOOK`](constants::ADDRESS_BOOK) tree:
@@ -40,6 +40,8 @@ pub enum Command {
     /// - url address at which rpc calls are made for the network
     /// - network encryption
     /// - additional marker that the network is a default one
+    /// - network title as it will be displayed in Signer, from
+    /// [`NetworkSpecsToSend`](definitions::network_specs::NetworkSpecsToSend)
     ///
     /// # Check external file with hex-encoded metadata
     ///
@@ -62,7 +64,8 @@ pub enum Command {
     /// QR. Output file name is `sign_me_load_types`.
     Types,
 
-    /// # Prepare payload for `load_metadata` update according to `Instruction`
+    /// # Prepare payload for `load_metadata` update according to
+    /// [`InstructionMeta`]
     ///
     /// `$ cargo run load_metadata <key(s)> <(argument)>`
     ///
@@ -92,10 +95,12 @@ pub enum Command {
     /// - `-u` followed by single url address: reserved for networks with no
     /// record yet in the [`ADDRESS_BOOK`](constants::ADDRESS_BOOK)
     ///
-    /// `-s` key could be used to stop processing after first error.
-    Load(Instruction),
+    /// `-a` key could be used with `-s` key, to stop processing after first
+    /// error.
+    Load(InstructionMeta),
 
-    /// # Prepare payload for `add_specs` update according to `Instruction`
+    /// # Prepare payload for `add_specs` update according to
+    /// [`InstructionSpecs`]
     ///
     /// `$ cargo run add_specs <keys> <argument(s)>`
     ///
@@ -122,7 +127,8 @@ pub enum Command {
     /// - `-u` followed by single url address: reserved for networks with no
     /// record yet in the [`ADDRESS_BOOK`](constants::ADDRESS_BOOK)
     ///
-    /// `-s` key could be used to stop processing after first error.
+    /// `-a` key could be used with `-s` key, to stop processing after first
+    /// error.
     ///
     /// Key specifying encryption algorithm supported by the network is optional
     /// for `-n` reference key (since there is already an entry in the database
@@ -138,7 +144,7 @@ pub enum Command {
     /// multiple allowed decimals and unit values retrieved as arrays of equal
     /// size. To override token, key `-token` followed by `u8` decimals value
     /// and `String` unit value is used.
-    Specs(Instruction),
+    Specs(InstructionSpecs),
 
     /// Complete update QR generation, either signed or unsigned
     ///
@@ -434,26 +440,32 @@ pub enum Command {
 /// Display data commands
 pub enum Show {
     /// Show all hot database [`METATREE`](constants::METATREE) entries
-    Database,
+    Metadata,
 
     /// Show all hot database [`ADDRESS_BOOK`](constants::ADDRESS_BOOK) entries
-    AddressBook,
+    Networks,
 
     /// Check that external file is valid network metadata and search for
     /// similar entry in hot database [`METATREE`](constants::METATREE)
     CheckFile(String),
 }
 
-/// Command details for `load_metadata` and `add_specs`
-pub struct Instruction {
+/// Command details for `load_metadata`
+pub struct InstructionMeta {
     /// Setting key, as read from command line
     pub set: Set,
 
     /// Reference key, as read from command line
     pub content: Content,
+}
 
-    /// Flag to indicate skipping error, optional `-s` key sets this to false
-    pub pass_errors: bool,
+/// Command details for `add_specs`
+pub struct InstructionSpecs {
+    /// Setting key, as read from command line
+    pub set: Set,
+
+    /// Reference key, as read from command line
+    pub content: Content,
 
     /// Overrides, relevant only for `add_specs` command
     pub over: Override,
@@ -462,7 +474,12 @@ pub struct Instruction {
 /// Reference key for `load_metadata` and `add_specs` commands
 pub enum Content {
     /// Key `-a`: deal with all relevant database entries
-    All,
+    ///
+    /// Associated data is a flag to indicate skipping errors when processing
+    /// `-a`.
+    /// Passing optional `-s` key sets this to false, i.e. makes the run stop
+    /// after the first error encountered.
+    All { pass_errors: bool },
 
     /// Key `-n`: process only the network referred to by:
     ///
@@ -644,6 +661,11 @@ pub struct Override {
     /// network or to add another encryption algorithm in known network.
     pub encryption: Option<Encryption>,
 
+    /// Network title override, so that user can specify the network title in
+    /// [`NetworkSpecsToSend`](definitions::network_specs::NetworkSpecsToSend)
+    /// that determines under what title the network is displayed in the Signer
+    pub title: Option<String>,
+
     /// Token override to specify decimals and units used to display balance in
     /// network transactions.
     ///
@@ -672,22 +694,22 @@ impl Command {
                 match arg.as_str() {
                     "show" => match args.next() {
                         Some(show) => match show.to_lowercase().as_str() {
-                            "-database" => {
+                            "-metadata" => {
                                 if args.next().is_some() {
                                     Err(ErrorActive::CommandParser(
                                         CommandParser::UnexpectedKeyArgumentSequence,
                                     ))
                                 } else {
-                                    Ok(Command::Show(Show::Database))
+                                    Ok(Command::Show(Show::Metadata))
                                 }
                             }
-                            "-address_book" => {
+                            "-networks" => {
                                 if args.next().is_some() {
                                     Err(ErrorActive::CommandParser(
                                         CommandParser::UnexpectedKeyArgumentSequence,
                                     ))
                                 } else {
-                                    Ok(Command::Show(Show::AddressBook))
+                                    Ok(Command::Show(Show::Networks))
                                 }
                             }
                             _ => Err(ErrorActive::CommandParser(
@@ -722,12 +744,13 @@ impl Command {
                         }
                     }
                     "load_metadata" | "add_specs" => {
-                        let mut set_key = None;
+                        let mut set = None;
                         let mut content_key = None;
-                        let mut pass_errors = true;
+                        let mut s_key_used = false;
                         let mut name = None;
-                        let mut encryption_override_key = None;
+                        let mut encryption = None;
                         let mut token = None;
+                        let mut title = None;
                         while let Some(x) = args.next() {
                             let x = x.to_lowercase();
                             if x.starts_with('-') {
@@ -740,45 +763,61 @@ impl Command {
                                         }
                                         None => content_key = Some(x),
                                     },
-                                    "-d" | "-f" | "-k" | "-p" | "-t" => match set_key {
+                                    "-d" | "-f" | "-k" | "-p" | "-t" => match set {
                                         Some(_) => {
                                             return Err(ErrorActive::CommandParser(
                                                 CommandParser::DoubleKey(CommandDoubleKey::Set),
                                             ))
                                         }
-                                        None => set_key = Some(x),
-                                    },
-                                    "-s" => pass_errors = false,
-                                    "-ed25519" | "-sr25519" | "-ecdsa" => {
-                                        if arg == "load_metadata" {
-                                            return Err(ErrorActive::CommandParser(
-                                                CommandParser::UnexpectedKeyArgumentSequence,
-                                            ));
+                                        None => {
+                                            set = match x.as_str() {
+                                                "-d" => Some(Set::D),
+                                                "-f" => Some(Set::F),
+                                                "-k" => Some(Set::K),
+                                                "-p" => Some(Set::P),
+                                                "-t" => Some(Set::T),
+                                                _ => unreachable!(),
+                                            };
                                         }
-                                        match encryption_override_key {
-                                            Some(_) => {
+                                    },
+                                    "-s" => s_key_used = true,
+                                    "-ed25519" | "-sr25519" | "-ecdsa" => match encryption {
+                                        Some(_) => {
+                                            if arg == "load_metadata" {
+                                                return Err(ErrorActive::CommandParser(
+                                                    CommandParser::UnexpectedKeyArgumentSequence,
+                                                ));
+                                            } else {
                                                 return Err(ErrorActive::CommandParser(
                                                     CommandParser::DoubleKey(
                                                         CommandDoubleKey::CryptoOverride,
                                                     ),
-                                                ))
+                                                ));
                                             }
-                                            None => encryption_override_key = Some(x),
                                         }
-                                    }
+                                        None => {
+                                            encryption = match x.as_str() {
+                                                "-ed25519" => Some(Encryption::Ed25519),
+                                                "-sr25519" => Some(Encryption::Sr25519),
+                                                "-ecdsa" => Some(Encryption::Ecdsa),
+                                                _ => unreachable!(),
+                                            };
+                                        }
+                                    },
                                     "-token" => {
-                                        if arg == "load_metadata" {
-                                            return Err(ErrorActive::CommandParser(
-                                                CommandParser::UnexpectedKeyArgumentSequence,
-                                            ));
-                                        }
                                         match token {
                                             Some(_) => {
-                                                return Err(ErrorActive::CommandParser(
-                                                    CommandParser::DoubleKey(
-                                                        CommandDoubleKey::TokenOverride,
-                                                    ),
-                                                ))
+                                                if arg == "load_metadata" {
+                                                    return Err(ErrorActive::CommandParser(
+                                                        CommandParser::UnexpectedKeyArgumentSequence,
+                                                    ));
+                                                } else {
+                                                    return Err(ErrorActive::CommandParser(
+                                                        CommandParser::DoubleKey(
+                                                            CommandDoubleKey::TokenOverride,
+                                                        ),
+                                                    ));
+                                                }
                                             }
                                             None => token = match args.next() {
                                                 Some(b) => match b.parse::<u8>() {
@@ -813,6 +852,33 @@ impl Command {
                                             },
                                         }
                                     }
+                                    "-title" => match title {
+                                        Some(_) => {
+                                            if arg == "load_metadata" {
+                                                return Err(ErrorActive::CommandParser(
+                                                    CommandParser::UnexpectedKeyArgumentSequence,
+                                                ));
+                                            } else {
+                                                return Err(ErrorActive::CommandParser(
+                                                    CommandParser::DoubleKey(
+                                                        CommandDoubleKey::TitleOverride,
+                                                    ),
+                                                ));
+                                            }
+                                        }
+                                        None => {
+                                            title = match args.next() {
+                                                Some(b) => Some(b),
+                                                None => {
+                                                    return Err(ErrorActive::CommandParser(
+                                                        CommandParser::NeedArgument(
+                                                            CommandNeedArgument::TitleOverride,
+                                                        ),
+                                                    ))
+                                                }
+                                            }
+                                        }
+                                    },
                                     _ => {
                                         return Err(ErrorActive::CommandParser(
                                             CommandParser::UnexpectedKeyArgumentSequence,
@@ -831,28 +897,7 @@ impl Command {
                             }
                         }
 
-                        let set = match set_key {
-                            Some(x) => match x.as_str() {
-                                "-d" => Set::D,
-                                "-f" => Set::F,
-                                "-k" => Set::K,
-                                "-p" => Set::P,
-                                "-t" => Set::T,
-                                _ => unreachable!(),
-                            },
-                            None => Set::T,
-                        };
-
-                        let encryption = match encryption_override_key {
-                            Some(x) => match x.as_str() {
-                                "-ed25519" => Some(Encryption::Ed25519),
-                                "-sr25519" => Some(Encryption::Sr25519),
-                                "-ecdsa" => Some(Encryption::Ecdsa),
-                                _ => unreachable!(),
-                            },
-                            None => None,
-                        };
-                        let over = Override { encryption, token };
+                        let set = set.unwrap_or(Set::T);
 
                         let content = match content_key {
                             Some(x) => match x.as_str() {
@@ -864,10 +909,22 @@ impl Command {
                                             ),
                                         ));
                                     }
-                                    Content::All
+                                    if s_key_used {
+                                        Content::All { pass_errors: false }
+                                    } else {
+                                        Content::All { pass_errors: true }
+                                    }
                                 }
                                 "-n" => match name {
-                                    Some(n) => Content::Name(n),
+                                    Some(n) => {
+                                        if s_key_used {
+                                            return Err(ErrorActive::CommandParser(
+                                                CommandParser::UnexpectedKeyArgumentSequence,
+                                            ));
+                                        } else {
+                                            Content::Name(n)
+                                        }
+                                    }
                                     None => {
                                         return Err(ErrorActive::CommandParser(
                                             CommandParser::NeedArgument(
@@ -877,7 +934,15 @@ impl Command {
                                     }
                                 },
                                 "-u" => match name {
-                                    Some(a) => Content::Address(a),
+                                    Some(a) => {
+                                        if s_key_used {
+                                            return Err(ErrorActive::CommandParser(
+                                                CommandParser::UnexpectedKeyArgumentSequence,
+                                            ));
+                                        } else {
+                                            Content::Address(a)
+                                        }
+                                    }
                                     None => {
                                         return Err(ErrorActive::CommandParser(
                                             CommandParser::NeedArgument(
@@ -895,16 +960,23 @@ impl Command {
                             }
                         };
 
-                        let instruction = Instruction {
-                            set,
-                            content,
-                            pass_errors,
-                            over,
-                        };
-
                         match arg.as_str() {
-                            "load_metadata" => Ok(Command::Load(instruction)),
-                            "add_specs" => Ok(Command::Specs(instruction)),
+                            "load_metadata" => {
+                                if encryption.is_some() || token.is_some() || title.is_some() {
+                                    return Err(ErrorActive::CommandParser(
+                                        CommandParser::UnexpectedKeyArgumentSequence,
+                                    ));
+                                }
+                                Ok(Command::Load(InstructionMeta { set, content }))
+                            }
+                            "add_specs" => {
+                                let over = Override {
+                                    encryption,
+                                    title,
+                                    token,
+                                };
+                                Ok(Command::Specs(InstructionSpecs { set, content, over }))
+                            }
                             _ => unreachable!(),
                         }
                     }

@@ -66,6 +66,7 @@ pub fn specs_shortcut(
     address: &str,
     encryption: Encryption,
     optional_token_override: Option<TokenOverride>,
+    optional_signer_title_override: Option<String>,
 ) -> Result<SpecsShortCut, ErrorActive> {
     // check entries in address book, to see if the url address is already known
     let entries = filter_address_book_by_url(address)?;
@@ -134,19 +135,25 @@ pub fn specs_shortcut(
             ));
         }
 
+        let title = optional_signer_title_override.unwrap_or(format!(
+            "{}-{}",
+            meta_values.name,
+            encryption.show()
+        ));
+
         // Otherwise `NetworkSpecsToSend` entry is constructed with fetched and
         // user-entered values and with default colors.
         let specs = NetworkSpecsToSend {
             base58prefix: new_properties.base58prefix,
             color: COLOR.to_string(),
             decimals: new_properties.decimals,
-            encryption: encryption.clone(),
+            encryption,
             genesis_hash,
             logo: meta_values.name.to_string(),
             name: meta_values.name.to_string(),
             path_id: format!("//{}", meta_values.name),
             secondary_color: SECONDARY_COLOR.to_string(),
-            title: format!("{}-{}", meta_values.name, encryption.show()),
+            title,
             unit: new_properties.unit,
         };
         Ok(SpecsShortCut {
@@ -162,7 +169,8 @@ pub fn specs_shortcut(
         // tuple below is `specs` with appropriate title and encryption and
         // `update` flag to indicate if the entry is not yet in the database,
         // and could be added if requested
-        let (specs, update) = process_indices(&entries, encryption)?;
+        let (specs, update) =
+            process_indices(&entries, encryption, optional_signer_title_override)?;
 
         let url = address.to_string();
 

@@ -1,5 +1,4 @@
 //! Hot database helpers
-//!
 use constants::{ADDRESS_BOOK, HOT_DB_NAME, SPECSTREEPREP};
 use db_handling::{
     db_transactions::TrDbHot,
@@ -16,6 +15,7 @@ use definitions::{
 use parity_scale_codec::Encode;
 use sled::Batch;
 
+/// Get [`AddressBookEntry`] from the database for given address book title
 pub fn get_address_book_entry(title: &str) -> Result<AddressBookEntry, ErrorActive> {
     let database = open_db::<Active>(HOT_DB_NAME)?;
     let address_book = open_tree::<Active>(&database, ADDRESS_BOOK)?;
@@ -28,12 +28,18 @@ pub fn get_address_book_entry(title: &str) -> Result<AddressBookEntry, ErrorActi
     }
 }
 
-/// Function to get NetworkSpecsToSend for given address book title
+/// Get [`NetworkSpecsToSend`] from the database for given address book title
 pub fn network_specs_from_title(title: &str) -> Result<NetworkSpecsToSend, ErrorActive> {
     network_specs_from_entry(&get_address_book_entry(title)?)
 }
 
-/// Function to get NetworkSpecsToSend for given address book entry
+/// Get [`NetworkSpecsToSend`] corresponding to the given entry in
+/// [`ADDRESS_BOOK`] tree.
+///
+/// Entries in [`ADDRESS_BOOK`] and [`SPECSTREEPREP`] trees for any network can
+/// be added and removed only simultaneously.
+// TODO consider combining those, key would be address book title, network specs
+// key will stay only in cold database then?
 pub fn network_specs_from_entry(
     address_book_entry: &AddressBookEntry,
 ) -> Result<NetworkSpecsToSend, ErrorActive> {
@@ -53,8 +59,10 @@ pub fn network_specs_from_entry(
     Ok(network_specs)
 }
 
-/// Function to get SCALE encoded network specs entry by given network_key, decode it
-/// as NetworkSpecsToSend, and check for genesis hash mismatch. Is used for hot db only
+/// Try to get network specs [`NetworkSpecsToSend`] from the hot database.
+///
+/// If the [`NetworkSpecsKey`] and associated [`NetworkSpecsToSend`] are not
+/// found in the [`SPECSTREEPREP`], the result is `Ok(None)`.
 pub fn try_get_network_specs_to_send(
     network_specs_key: &NetworkSpecsKey,
 ) -> Result<Option<NetworkSpecsToSend>, ErrorActive> {
@@ -70,6 +78,10 @@ pub fn try_get_network_specs_to_send(
     }
 }
 
+/// Get network specs [`NetworkSpecsToSend`] from the hot database.
+///
+/// Network specs here are expected to be found, not finding them results in an
+/// error.
 pub fn get_network_specs_to_send(
     network_specs_key: &NetworkSpecsKey,
 ) -> Result<NetworkSpecsToSend, ErrorActive> {
@@ -81,14 +93,27 @@ pub fn get_network_specs_to_send(
     }
 }
 
-/// Function to update chainspecs and address_book trees of the database
+/// Update the database when introducing a new network.
+///
+/// Inputs `&str` url address that is used for rpc calls and already prepared
+/// [`NetworkSpecsToSend`].
+///
+/// Adds simultaneously [`AddressBookEntry`] to [`ADDRESS_BOOK`] and
+/// [`NetworkSpecsToSend`] to [`SPECSTREEPREP`].
+///
+/// Key for [`AddressBookEntry`], the network address book title coincides with
+/// `title` field of the [`NetworkSpecsToSend`] entry.
 pub fn update_db(address: &str, network_specs: &NetworkSpecsToSend) -> Result<(), ErrorActive> {
     let mut network_specs_prep_batch = Batch::default();
     network_specs_prep_batch.insert(
         NetworkSpecsKey::from_parts(&network_specs.genesis_hash, &network_specs.encryption).key(),
         network_specs.encode(),
     );
-    let address_book_new_key = AddressBookKey::from_title(&network_specs.title);
+    let address_book_new_key = AddressBookKey::from_title(&format!(
+        "{}-{}",
+        network_specs.name,
+        network_specs.encryption.show()
+    ));
     let address_book_new_entry_encoded = AddressBookEntry {
         name: network_specs.name.to_string(),
         genesis_hash: network_specs.genesis_hash,
@@ -122,18 +147,25 @@ pub enum Write {
     None,    // -p key
 }
 
-/// Function to filter address_book entries by url address
-pub fn filter_address_book_by_url(address: &str) -> Result<Vec<AddressBookEntry>, ErrorActive> {
+pub fn address_book_content() -> Result<Vec<(String, AddressBookEntry)>, ErrorActive> {
     let database = open_db::<Active>(HOT_DB_NAME)?;
     let address_book = open_tree::<Active>(&database, ADDRESS_BOOK)?;
+    let mut out: Vec<(String, AddressBookEntry)> = Vec::new();
+    for x in address_book.iter().flatten() {
+        out.push(AddressBookEntry::process_entry(x)?)
+    }
+    Ok(out)
+}
+
+/// Function to filter address_book entries by url address
+pub fn filter_address_book_by_url(address: &str) -> Result<Vec<AddressBookEntry>, ErrorActive> {
     let mut out: Vec<AddressBookEntry> = Vec::new();
     let mut found_name = None;
-    for x in address_book.iter().flatten() {
-        let new_address_book_entry = AddressBookEntry::from_entry(x)?;
-        if new_address_book_entry.address == address {
+    for (_, x) in address_book_content()?.into_iter() {
+        if x.address == address {
             found_name = match found_name {
                 Some(name) => {
-                    if name == new_address_book_entry.name {
+                    if name == x.name {
                         Some(name)
                     } else {
                         return Err(ErrorActive::Database(DatabaseActive::TwoNamesForUrl {
@@ -141,9 +173,9 @@ pub fn filter_address_book_by_url(address: &str) -> Result<Vec<AddressBookEntry>
                         }));
                     }
                 }
-                None => Some(new_address_book_entry.name.to_string()),
+                None => Some(x.name.to_string()),
             };
-            out.push(new_address_book_entry)
+            out.push(x)
         }
     }
     Ok(out)
@@ -200,6 +232,7 @@ fn get_indices(
 pub fn process_indices(
     entries: &[AddressBookEntry],
     encryption: Encryption,
+    optional_signer_title_override: Option<String>,
 ) -> Result<(NetworkSpecsToSend, bool), ErrorActive> {
     let indices = get_indices(entries, encryption.to_owned())?;
     match indices.index_correct_encryption {
@@ -219,8 +252,12 @@ pub fn process_indices(
                 }
             };
             let mut specs_found = get_network_specs_to_send(&network_specs_key)?;
-            specs_found.encryption = encryption.clone();
-            specs_found.title = format!("{}-{}", specs_found.name, encryption.show());
+            specs_found.title = optional_signer_title_override.unwrap_or(format!(
+                "{}-{}",
+                specs_found.name,
+                encryption.show()
+            ));
+            specs_found.encryption = encryption;
             Ok((specs_found, true))
         }
     }

@@ -77,8 +77,8 @@ Program is run by
 Possible commands are:  
 
 - `show` followed by a key:  
-    - `-database` to show network `specname` and `spec_version` for all networks in the metadata tree the database  
-    - `-address_book` to show network `title`, `url address`, `encryption` and `(default)` marking if the encryption is default one for this network for all networks in the address_book tree of the database  
+    - `-metadata` to show network name, version and metadata hash for all networks in the metadata tree the database  
+    - `-networks` to show network address book title, url address, encryption (with optional default marker) and network title as it will be displayed in Signer, for all networks in the address_book tree of the database  
     
 - `types` without any keys to generate `load_types` message  
 
@@ -91,7 +91,7 @@ Possible commands are:
         - `-t` default setting: update database through rpc calls, produce ALL requested output files  
     - reference keys (exactly only one has to be used):  
         - `-a`: process all networks
-        - `-n` followed by one name (network **specname** for load_metadata, i.e. `polkadot`, `westend` etc, the one that goes before version in output of `show -database`; network **title** for add_specs, i.e. `polkadot`, `westend-ed25519`, `rococo-AgainUpdatedGenesisHash` and the likes, whatever title shows in output of`show -address_book` (so far only vanilla names and vanilla names followed by encryption could be encountered))
+        - `-n` followed by one name (network **specname** for load_metadata, i.e. `polkadot`, `westend` etc, the one that goes before version in output of `show -metadata`; network **title** for add_specs, i.e. `polkadot`, `westend-ed25519`, `rococo-AgainUpdatedGenesisHash` and the likes, whatever title shows in output of`show -networks`)
         - `-u` followed by one url address
     - optional `-s` key to stop the program if any failure occurs. By default the program informs user of unsuccessful attempt and proceeds.  
     - encryption override keys (maximum one can be used), to set encryption in network specs when generationg `add_specs` message; ideally should be used for networks not in the database with `-u` reference key, other usages are however possible; supported variants:  
@@ -232,8 +232,8 @@ Release cold database is the one loaded into Signer.
 
 ## List of currently supported command and key combinations (without `make` and `sign` variants)  
 
-`$ cargo run show -database`  
-`$ cargo run show -address_book`  
+`$ cargo run show -metadata`  
+`$ cargo run show -networks`  
 
 `$ cargo run load_types`  
 
@@ -252,8 +252,6 @@ Release cold database is the one loaded into Signer.
 `$ cargo run add_specs -f -a`  
 `$ cargo run add_specs -f -n network_title`  
 `$ cargo run add_specs -f -n network_title -ed25519`[^1]  
-`$ cargo run add_specs -f -u network_url`  
-`$ cargo run add_specs -f -u network_url -ed25519`  
 `$ cargo run add_specs -d -u network_url -ed25519`  
 `$ cargo run add_specs -d -u network_url -ed25519 -token 12 MEOW`[^2]  
 `$ cargo run add_specs -p -n network_title -ed25519`  

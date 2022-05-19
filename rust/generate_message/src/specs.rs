@@ -13,77 +13,65 @@
 //! Payload `add_specs` is exported in dedicated [`FOLDER`](constants::FOLDER)
 //! to (optionally) be signed and later be transformed into `add_specs` update
 //! QR. Output file name is `sign_me_add_specs_<name>_<encryption>`.
-use constants::{ADDRESS_BOOK, HOT_DB_NAME};
-use db_handling::helpers::{open_db, open_tree};
 use definitions::{
     crypto::Encryption,
-    error_active::{Active, DatabaseActive, ErrorActive, Fetch, NotFoundActive},
+    error_active::{DatabaseActive, ErrorActive, Fetch},
     keyring::NetworkSpecsKey,
     metadata::AddressBookEntry,
 };
-use sled::IVec;
 
 use crate::helpers::{
-    error_occured, filter_address_book_by_url, get_address_book_entry, get_network_specs_to_send,
-    network_specs_from_entry, network_specs_from_title, process_indices,
-    try_get_network_specs_to_send, update_db,
+    address_book_content, error_occured, get_address_book_entry, get_network_specs_to_send,
+    network_specs_from_entry, network_specs_from_title, try_get_network_specs_to_send, update_db,
 };
 use crate::metadata_shortcut::specs_shortcut;
 use crate::output_prep::print_specs;
-use crate::parser::{Content, Instruction, Set, TokenOverride};
+use crate::parser::{Content, InstructionSpecs, Set, TokenOverride};
 
-/// Process `add_specs` command according to the [`Instruction`] received from
-/// the command line
-pub fn gen_add_specs(instruction: Instruction) -> Result<(), ErrorActive> {
+/// Process `add_specs` command according to the [`InstructionSpecs`] received
+/// from the command line
+pub fn gen_add_specs(instruction: InstructionSpecs) -> Result<(), ErrorActive> {
     match instruction.set {
         // `-f` setting key: produce `add_specs` payload files from existing
         // database entries.
-        //
-        // Note that `-f` key processed with an encryption override **will not**
-        // add entry with a new encryption in the database.
         Set::F => match instruction.content {
             // `$ cargo run add_specs -f -a`
             //
             // Make `add_specs` payloads for all specs entries in the database.
-            Content::All => {
-                // makes no sense to override encryption for all entries at once
-                if instruction.over.encryption.is_some() {
-                    return Err(ErrorActive::NotSupported);
-                }
-
-                // ...or to override token for all entries at once
-                if instruction.over.token.is_some() {
+            Content::All { pass_errors } => {
+                // makes no sense to override encryption, or token, or title
+                // for all entries at once
+                if instruction.over.encryption.is_some()
+                    || instruction.over.token.is_some()
+                    || instruction.over.title.is_some()
+                {
                     return Err(ErrorActive::NotSupported);
                 }
 
                 // collect `ADDRESS_BOOK` entries
-                let mut address_book_set: Vec<(IVec, IVec)> = Vec::new();
-                {
-                    let database = open_db::<Active>(HOT_DB_NAME)?;
-                    let address_book = open_tree::<Active>(&database, ADDRESS_BOOK)?;
-                    if address_book.is_empty() {
-                        return Err(ErrorActive::Database(DatabaseActive::AddressBookEmpty));
-                    }
-                    for x in address_book.iter().flatten() {
-                        address_book_set.push(x)
-                    }
+                let address_book_set = address_book_content()?;
+                if address_book_set.is_empty() {
+                    return Err(ErrorActive::Database(DatabaseActive::AddressBookEmpty));
                 }
 
                 // process each entry
-                for address_book_entry_encoded in address_book_set.into_iter() {
-                    match specs_f_a_element(address_book_entry_encoded) {
+                for (_, address_book_entry) in address_book_set.iter() {
+                    match specs_f_a_element(address_book_entry) {
                         Ok(()) => (),
-                        Err(e) => error_occured(e, instruction.pass_errors)?,
+                        Err(e) => error_occured(e, pass_errors)?,
                     }
                 }
                 Ok(())
             }
 
             // `$ cargo run add_specs -f -n network_address_book_title
-            // <optional encryption override>`
+            // <optional encryption override> <optional signer title override>`
             //
             // Make `add_specs` payload for single specs entry **already in the
             // database**, referred to by network address book title.
+            //
+            // Entry with encryption override and/or signer title override
+            // **will not** be added to the database.
             Content::Name(name) => {
                 // entry is expected to be in the database, meaning the token is
                 // already set up
@@ -92,28 +80,15 @@ pub fn gen_add_specs(instruction: Instruction) -> Result<(), ErrorActive> {
                 if instruction.over.token.is_some() {
                     return Err(ErrorActive::NotSupported);
                 }
-                specs_f_n(&name, instruction.over.encryption)
+                specs_f_n(&name, instruction.over.encryption, instruction.over.title)
             }
 
-            // `$ cargo run add_specs -f -u network_url_address
-            // <optional encryption override>`
-            //
-            // Make `add_specs` payload(s) for specs entries **already in the
-            // database**, referred to by network url address.
-            //
-            // Multiple payloads will be produced if multiple encryptions are
-            // in the database for the same network and no encryption override
-            // is invoked.
-            Content::Address(address) => {
-                // key `-f` implies that the entry is in the database, even
-                // though it is searched for by url address
-                //
-                // token is set up, changing it is not allowed
-                if instruction.over.token.is_some() {
-                    return Err(ErrorActive::NotSupported);
-                }
-                specs_f_u(&address, instruction.over.encryption)
-            }
+            // `-u` content key is to provide the url address for rpc calls;
+            // since `-f` indicates the data is taken from the database, the
+            // the combination seems of no use.
+            // To address a specific network from the database, `-f -n` key
+            // combination is suggested.
+            Content::Address(_) => Err(ErrorActive::NotSupported),
         },
 
         // `-d` setting key: produce `add_specs` payloads through rpc calls,
@@ -125,7 +100,7 @@ pub fn gen_add_specs(instruction: Instruction) -> Result<(), ErrorActive> {
             //
             // Network specs are expected to remain constant over time,
             // therefore this command seems to be of no use.
-            Content::All => Err(ErrorActive::NotSupported),
+            Content::All { pass_errors: _ } => Err(ErrorActive::NotSupported),
 
             // `-n` key implies that the action is done for the network already
             // having an address book title in the database;
@@ -134,7 +109,8 @@ pub fn gen_add_specs(instruction: Instruction) -> Result<(), ErrorActive> {
             Content::Name(_) => Err(ErrorActive::NotSupported),
 
             // `$ cargo run add_specs -d -u network_url_address
-            // <encryption override> <optional token override>`
+            // <encryption override> <optional token override> <optional signer
+            // title override>`
             //
             // Produce `add_specs` payload by making rpc calls at
             // `network_url_address`, print payload file, do not update the
@@ -149,11 +125,19 @@ pub fn gen_add_specs(instruction: Instruction) -> Result<(), ErrorActive> {
             // This command is expected to be used mostly for truly unknown
             // networks, and **must** contain encryption override.
             //
+            // Command may contain signer title override to set up the network
+            // title that is displayed in Signer.
+            //
             // In some cases the command may contain token override as well.
             Content::Address(address) => {
                 // not allowed to proceed without encryption override defined
                 if let Some(encryption) = instruction.over.encryption {
-                    specs_d_u(&address, encryption, instruction.over.token)
+                    specs_d_u(
+                        &address,
+                        encryption,
+                        instruction.over.token,
+                        instruction.over.title,
+                    )
                 } else {
                     Err(ErrorActive::NotSupported)
                 }
@@ -171,7 +155,7 @@ pub fn gen_add_specs(instruction: Instruction) -> Result<(), ErrorActive> {
         Set::P => match instruction.content {
             // Network specs are expected to remain constant over time,
             // this command seems to be of no use.
-            Content::All => Err(ErrorActive::NotSupported),
+            Content::All { pass_errors: _ } => Err(ErrorActive::NotSupported),
 
             // `$ cargo run add_specs -p -n network_address_book_title
             // <encryption override>`
@@ -188,7 +172,8 @@ pub fn gen_add_specs(instruction: Instruction) -> Result<(), ErrorActive> {
                 }
 
                 // using this command makes sense only if the encryption
-                // override is set
+                // override is set or if the user decided to change the network
+                // title in [`NetworkSpecsToSend`]
                 if let Some(encryption) = instruction.over.encryption {
                     specs_pt_n(&name, encryption, false)
                 } else {
@@ -213,7 +198,13 @@ pub fn gen_add_specs(instruction: Instruction) -> Result<(), ErrorActive> {
             Content::Address(address) => {
                 // not allowed to proceed without encryption override defined
                 if let Some(encryption) = instruction.over.encryption {
-                    specs_pt_u(&address, encryption, instruction.over.token, false)
+                    specs_pt_u(
+                        &address,
+                        encryption,
+                        instruction.over.token,
+                        instruction.over.title,
+                        false,
+                    )
                 } else {
                     Err(ErrorActive::NotSupported)
                 }
@@ -226,7 +217,7 @@ pub fn gen_add_specs(instruction: Instruction) -> Result<(), ErrorActive> {
         Set::T => match instruction.content {
             // Network specs are expected to remain constant over time,
             // this command seems to be of no use.
-            Content::All => Err(ErrorActive::NotSupported),
+            Content::All { pass_errors: _ } => Err(ErrorActive::NotSupported),
 
             // `$ cargo run add_specs -n network_address_book_title
             // <encryption override>`
@@ -270,7 +261,13 @@ pub fn gen_add_specs(instruction: Instruction) -> Result<(), ErrorActive> {
             Content::Address(address) => {
                 // not allowed to proceed without encryption override defined
                 if let Some(encryption) = instruction.over.encryption {
-                    specs_pt_u(&address, encryption, instruction.over.token, true)
+                    specs_pt_u(
+                        &address,
+                        encryption,
+                        instruction.over.token,
+                        instruction.over.title,
+                        true,
+                    )
                 } else {
                     Err(ErrorActive::NotSupported)
                 }
@@ -285,80 +282,43 @@ pub fn gen_add_specs(instruction: Instruction) -> Result<(), ErrorActive> {
 /// [`NetworkSpecsToSend`](definitions::network_specs::NetworkSpecsToSend) from
 /// the database using information in address book entry
 /// - Output raw bytes payload file
-fn specs_f_a_element(entry: (IVec, IVec)) -> Result<(), ErrorActive> {
-    let network_specs = network_specs_from_entry(&AddressBookEntry::from_entry(entry)?)?;
+fn specs_f_a_element(entry: &AddressBookEntry) -> Result<(), ErrorActive> {
+    let network_specs = network_specs_from_entry(entry)?;
     print_specs(&network_specs)
 }
 
-/// `add_specs -f -n network_address_book_title <optional encryption override>`
+/// `add_specs -f -n network_address_book_title <optional encryption override>
+/// <optional signer title override>`
 ///
 /// - Get address book entry for the network using `network_address_book_title`
 /// - Get network specs
 /// [`NetworkSpecsToSend`](definitions::network_specs::NetworkSpecsToSend) from
 /// the database using information in address book entry
 /// - Output raw bytes payload file
-fn specs_f_n(title: &str, encryption_override: Option<Encryption>) -> Result<(), ErrorActive> {
+fn specs_f_n(
+    title: &str,
+    optional_encryption_override: Option<Encryption>,
+    optional_signer_title_override: Option<String>,
+) -> Result<(), ErrorActive> {
     let mut network_specs = network_specs_from_title(title)?;
-    match encryption_override {
+    match optional_encryption_override {
         Some(encryption) => {
-            network_specs.encryption = encryption.clone();
-            network_specs.title = format!("{}-{}", network_specs.name, encryption.show());
-            print_specs(&network_specs)
+            if network_specs.encryption == encryption {
+                if let Some(new_title) = optional_signer_title_override {
+                    network_specs.title = new_title
+                }
+                print_specs(&network_specs)
+            } else {
+                network_specs.title = optional_signer_title_override.unwrap_or(format!(
+                    "{}-{}",
+                    network_specs.name,
+                    encryption.show()
+                ));
+                network_specs.encryption = encryption;
+                print_specs(&network_specs)
+            }
         }
         None => print_specs(&network_specs),
-    }
-}
-
-/// `add_specs -f -u network_url_address <optional encryption override>`
-///
-/// Note that no database updates happen here.
-///
-/// ## Encryption override **is not** invoked:
-///
-/// - Get all address book entries corresponding to `network_url_address`
-/// (corresponding address book titles could be, for example, `westend`,
-/// `westend-ed25519`, and `westend-ecdsa`)
-/// - Get network specs
-/// [`NetworkSpecsToSend`](definitions::network_specs::NetworkSpecsToSend) from
-/// the database for each of these using information in address book entry
-/// - Output raw bytes payload files
-///
-/// ## Encryption override **is** invoked:
-///
-/// - Get all address book entries corresponding to `network_url_address`
-/// - Get existing or construct new network specs
-/// [`NetworkSpecsToSend`](definitions::network_specs::NetworkSpecsToSend) with
-/// correct encryption and title, using or modifying data for the most
-/// preferable address book entry
-/// - Output raw bytes payload file
-///
-/// Address book entries in order of preference:
-///
-/// 1. with encryption matching the override
-/// 2. the one marked default
-/// 3. any entry corresponding to url provided
-fn specs_f_u(address: &str, encryption_override: Option<Encryption>) -> Result<(), ErrorActive> {
-    let entries = filter_address_book_by_url(address)?;
-    if entries.is_empty() {
-        return Err(ErrorActive::NotFound(
-            NotFoundActive::AddressBookEntryWithUrl {
-                url: address.to_string(),
-            },
-        ));
-    }
-    match encryption_override {
-        Some(encryption) => {
-            let network_specs = process_indices(&entries, encryption)?.0;
-            print_specs(&network_specs)
-        }
-        None => {
-            for x in entries.iter() {
-                let network_specs_key = NetworkSpecsKey::from_parts(&x.genesis_hash, &x.encryption);
-                let network_specs = get_network_specs_to_send(&network_specs_key)?;
-                print_specs(&network_specs)?;
-            }
-            Ok(())
-        }
     }
 }
 
@@ -376,8 +336,14 @@ fn specs_d_u(
     address: &str,
     encryption: Encryption,
     optional_token_override: Option<TokenOverride>,
+    optional_signer_title_override: Option<String>,
 ) -> Result<(), ErrorActive> {
-    let shortcut = specs_shortcut(address, encryption, optional_token_override)?;
+    let shortcut = specs_shortcut(
+        address,
+        encryption,
+        optional_token_override,
+        optional_signer_title_override,
+    )?;
     print_specs(&shortcut.specs)
 }
 
@@ -404,13 +370,14 @@ fn specs_d_u(
 ///
 /// Note that no fetch is done while processing this command.
 ///
-/// Network address book title is the key in [`ADDRESS_BOOK`] tree, it is
-/// built as `<network name>-<encryption>` for non-default networks. Default
-/// networks have `<network name>` as an address book title. Field `title` in
-/// network specs
-/// [`NetworkSpecsToSend`](definitions::network_specs::NetworkSpecsToSend) is
-/// also `<network name>-<encryption>` for non-default networks. Default
-/// networks have `<Network name>` as `title` field.
+/// Network address book title is the key in
+/// [`ADDRESS_BOOK`](constants::ADDRESS_BOOK) tree, it is built as
+/// `<network name>-<encryption>` for non-default networks. Default networks
+/// have `<network name>` as an address book title. Field `title` in network
+/// specs [`NetworkSpecsToSend`](definitions::network_specs::NetworkSpecsToSend)
+/// is also `<network name>-<encryption>` for non-default networks unless this
+/// is overridden by the user. Default networks have `<Network name>` as `title`
+/// field.
 fn specs_pt_n(title: &str, encryption: Encryption, printing: bool) -> Result<(), ErrorActive> {
     let address_book_entry = get_address_book_entry(title)?;
     let network_specs_key_existing = NetworkSpecsKey::from_parts(
@@ -480,9 +447,15 @@ fn specs_pt_u(
     address: &str,
     encryption: Encryption,
     optional_token_override: Option<TokenOverride>,
+    optional_signer_title_override: Option<String>,
     printing: bool,
 ) -> Result<(), ErrorActive> {
-    let shortcut = specs_shortcut(address, encryption.to_owned(), optional_token_override)?;
+    let shortcut = specs_shortcut(
+        address,
+        encryption.to_owned(),
+        optional_token_override,
+        optional_signer_title_override,
+    )?;
     if shortcut.update {
         update_db(address, &shortcut.specs)?;
         if printing {
@@ -668,12 +641,12 @@ mod tests {
         ];
         let mut all_clear = true;
         for address in address_set {
-            let instruction = Instruction {
+            let instruction = InstructionSpecs {
                 set: Set::D,
                 content: Content::Address(address.to_string()),
-                pass_errors: true,
                 over: Override {
                     encryption: Some(Encryption::Sr25519),
+                    title: None,
                     token: None,
                 },
             };
