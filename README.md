@@ -138,10 +138,10 @@ We hightly recommend you to update all existing plugins and SDK's for Kotlin, Gr
 Core Rust code is fully covered by tests and they are run in CI on each commit. To run tests on your machine:
 
 ```
-cd rust && cargo test
+cd rust && cargo test --locked
 ```
 
-We don't have test for UIs for now, which means Swift and Kotlin are not covered. We plan to do it in the future.
+We don't have test for UIs for now (other then navigation which is handled on rust side), which means Swift and Kotlin are not covered. We plan to do it in the future.
 
 
 # Bugs and Feedback
