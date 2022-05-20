@@ -81,7 +81,7 @@ fun HistoryCard(card: Event, timestamp: String) {
 				image = Icons.Default.Warning,
 				line1 = timestamp,
 				line2 = "Message signing error!",
-				line3 = card.signMessageDisplay.message,
+				line3 = card.signMessageDisplay.userComment.decode64(),
 				danger = true
 			)
 		}
@@ -90,7 +90,7 @@ fun HistoryCard(card: Event, timestamp: String) {
 				image = Icons.Default.Done,
 				line1 = timestamp,
 				line2 = "Generated signature for message",
-				line3 = card.signMessageDisplay.message
+				line3 = card.signMessageDisplay.userComment.decode64()
 			)
 		}
 		is Event.MetadataAdded -> {

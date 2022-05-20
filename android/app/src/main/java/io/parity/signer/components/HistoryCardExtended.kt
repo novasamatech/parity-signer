@@ -96,7 +96,7 @@ fun HistoryCardExtended(
 				image = Icons.Default.Warning,
 				line1 = timestamp,
 				line2 = "Message signing error!",
-				line3 = "", // TODO: Error,
+				line3 = "message:" + eventVal.signMessageDisplay.message + " user comment: " + eventVal.signMessageDisplay.userComment.decode64(),
 				danger = true
 			)
 		}
@@ -105,7 +105,7 @@ fun HistoryCardExtended(
 				image = Icons.Default.Done,
 				line1 = timestamp,
 				line2 = "Generated signature for message",
-				line3 = eventVal.signMessageDisplay.userComment.decode64()
+				line3 = "message:" + eventVal.signMessageDisplay.message + " user comment: " + eventVal.signMessageDisplay.userComment.decode64()
 			)
 		}
 		is Event.MetadataAdded -> {
