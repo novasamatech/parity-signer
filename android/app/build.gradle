@@ -82,6 +82,7 @@ cargo {
 	targets = ["arm", "arm64", "x86_64"]
 	apiLevel = 21
 	profile = 'release'
+	extraCargoBuildArguments = ["--locked"]
 	exec { spec, toolchain ->
 		if (toolchain.target == "x86_64-linux-android") {
 			spec.environment("AR_x86_64-linux-android", "$ndkDir/toolchains/llvm/prebuilt/linux-x86_64/bin/llvm-ar")
