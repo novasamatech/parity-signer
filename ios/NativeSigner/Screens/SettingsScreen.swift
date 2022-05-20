@@ -36,11 +36,13 @@ struct SettingsScreen: View {
                         base58: "encryption: " + (content.encryption ?? "unknown"), path: content.publicKey!.truncateMiddle(length: 8), hasPwd: false, identicon: content.identicon ?? [], seedName: "", multiselect: false
                     ))
                     } else {
-                        Text("Error!").foregroundColor(Color("SignalDanger")).font(FBase(style: .h4))
                         if let errorMessage = content.error {
+                            Text("Error!").foregroundColor(Color("SignalDanger")).font(FBase(style: .h4))
                             Text(errorMessage).foregroundColor(Color("SignalDanger")).font(FBase(style: .body2))
                         } else {
-                            Text("Navigation error, consider factory reset").foregroundColor(Color("SignalDanger")).font(FBase(style: .body2))
+                            AddressCard(address: Address(
+                                base58: "", path: "None", hasPwd: false, identicon: [], seedName: "", multiselect: false
+                            ))
                         }
                     }
                 }
