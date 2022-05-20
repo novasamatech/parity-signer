@@ -36,7 +36,8 @@ use crate::helpers::make_batch_clear_tree;
 fn default_hot_address_book(database_name: &str) -> Result<Batch, ErrorActive> {
     let mut batch = make_batch_clear_tree::<Active>(database_name, ADDRESS_BOOK)?;
     for x in default_address_book().iter() {
-        let address_book_key = AddressBookKey::from_title(&x.name);
+        let address_book_key =
+            AddressBookKey::from_title(&format!("{}-{}", x.name, x.encryption.show()));
         batch.insert(address_book_key.key(), x.encode());
     }
     Ok(batch)

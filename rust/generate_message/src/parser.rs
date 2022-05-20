@@ -674,11 +674,17 @@ pub struct Override {
     /// - network has no database record yet
     /// - network has multiple decimals and unit values, those were retrieved as
     /// arrays of equal size.
-    pub token: Option<TokenOverride>,
+    pub token: Option<Token>,
+}
+
+impl Override {
+    pub fn all_empty(&self) -> bool {
+        self.encryption.is_none() && self.title.is_none() && self.token.is_none()
+    }
 }
 
 /// Data from command line for token override
-pub struct TokenOverride {
+pub struct Token {
     pub decimals: u8,
     pub unit: String,
 }
@@ -822,7 +828,7 @@ impl Command {
                                             None => token = match args.next() {
                                                 Some(b) => match b.parse::<u8>() {
                                                     Ok(decimals) => match args.next() {
-                                                        Some(c) => Some(TokenOverride {
+                                                        Some(c) => Some(Token {
                                                             decimals,
                                                             unit: c.to_string(),
                                                         }),

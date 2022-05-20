@@ -5,7 +5,6 @@ use db_handling::{
     helpers::{open_db, open_tree},
 };
 use definitions::{
-    crypto::Encryption,
     error::ErrorSource,
     error_active::{Active, DatabaseActive, ErrorActive, MismatchActive, NotFoundActive},
     keyring::{AddressBookKey, NetworkSpecsKey},
@@ -158,14 +157,16 @@ pub fn address_book_content() -> Result<Vec<(String, AddressBookEntry)>, ErrorAc
 }
 
 /// Function to filter address_book entries by url address
-pub fn filter_address_book_by_url(address: &str) -> Result<Vec<AddressBookEntry>, ErrorActive> {
-    let mut out: Vec<AddressBookEntry> = Vec::new();
+pub fn filter_address_book_by_url(
+    address: &str,
+) -> Result<Vec<(String, AddressBookEntry)>, ErrorActive> {
+    let mut out: Vec<(String, AddressBookEntry)> = Vec::new();
     let mut found_name = None;
-    for (_, x) in address_book_content()?.into_iter() {
-        if x.address == address {
+    for (title, address_book_entry) in address_book_content()?.into_iter() {
+        if address_book_entry.address == address {
             found_name = match found_name {
                 Some(name) => {
-                    if name == x.name {
+                    if name == address_book_entry.name {
                         Some(name)
                     } else {
                         return Err(ErrorActive::Database(DatabaseActive::TwoNamesForUrl {
@@ -173,105 +174,22 @@ pub fn filter_address_book_by_url(address: &str) -> Result<Vec<AddressBookEntry>
                         }));
                     }
                 }
-                None => Some(x.name.to_string()),
+                None => Some(address_book_entry.name.to_string()),
             };
-            out.push(x)
+            out.push((title, address_book_entry))
         }
     }
     Ok(out)
 }
 
-/// Struct to store indices (id found) for correct encryption and for default entry
-struct Indices {
-    index_correct_encryption: Option<usize>,
-    index_default: Option<usize>,
-}
-
-/// Function to search through a vector of AddressBookEntry (for use with sets having the same address)
-/// for entry with given encryption and for default entry;
-/// Checks that there is only one default entry and only one entry with given encryption for this address
-fn get_indices(
-    entries: &[AddressBookEntry],
-    encryption: Encryption,
-) -> Result<Indices, ErrorActive> {
-    let mut index_correct_encryption = None;
-    let mut index_default = None;
-    for (i, x) in entries.iter().enumerate() {
-        if x.encryption == encryption {
-            match index_correct_encryption {
-                Some(_) => {
-                    return Err(ErrorActive::Database(
-                        DatabaseActive::TwoEntriesAddressEncryption {
-                            url: x.address.to_string(),
-                            encryption,
-                        },
-                    ))
-                }
-                None => index_correct_encryption = Some(i),
-            }
-        }
-        if x.def {
-            match index_default {
-                Some(_) => {
-                    return Err(ErrorActive::Database(DatabaseActive::TwoDefaultsAddress {
-                        url: x.address.to_string(),
-                    }))
-                }
-                None => index_default = Some(i),
-            }
-        }
-    }
-    Ok(Indices {
-        index_correct_encryption,
-        index_default,
-    })
-}
-
-/// Function to use the indices to get the most appropriate chainspecs entry to modify,
-/// and modify its encryption and title
-pub fn process_indices(
-    entries: &[AddressBookEntry],
-    encryption: Encryption,
-    optional_signer_title_override: Option<String>,
-) -> Result<(NetworkSpecsToSend, bool), ErrorActive> {
-    let indices = get_indices(entries, encryption.to_owned())?;
-    match indices.index_correct_encryption {
-        Some(i) => {
-            let network_specs_key =
-                NetworkSpecsKey::from_parts(&entries[i].genesis_hash, &entries[i].encryption);
-            let network_specs = get_network_specs_to_send(&network_specs_key)?;
-            Ok((network_specs, false))
-        }
-        None => {
-            let network_specs_key = match indices.index_default {
-                Some(i) => {
-                    NetworkSpecsKey::from_parts(&entries[i].genesis_hash, &entries[i].encryption)
-                }
-                None => {
-                    NetworkSpecsKey::from_parts(&entries[0].genesis_hash, &entries[0].encryption)
-                }
-            };
-            let mut specs_found = get_network_specs_to_send(&network_specs_key)?;
-            specs_found.title = optional_signer_title_override.unwrap_or(format!(
-                "{}-{}",
-                specs_found.name,
-                encryption.show()
-            ));
-            specs_found.encryption = encryption;
-            Ok((specs_found, true))
-        }
-    }
-}
-
-/// Function to search through chainspecs tree of the database for the given genesis hash
-pub fn genesis_hash_in_hot_db(genesis_hash: [u8; 32]) -> Result<bool, ErrorActive> {
-    let database = open_db::<Active>(HOT_DB_NAME)?;
-    let chainspecs = open_tree::<Active>(&database, SPECSTREEPREP)?;
-    let mut out = false;
-    for x in chainspecs.iter().flatten() {
-        let network_specs = NetworkSpecsToSend::from_entry_checked(x)?;
-        if network_specs.genesis_hash == genesis_hash {
-            out = true;
+/// Function to search through address book tree of the database for the given genesis hash
+pub fn genesis_hash_in_hot_db(
+    genesis_hash: [u8; 32],
+) -> Result<Option<AddressBookEntry>, ErrorActive> {
+    let mut out = None;
+    for (_, address_book_entry) in address_book_content()?.into_iter() {
+        if address_book_entry.genesis_hash == genesis_hash {
+            out = Some(address_book_entry);
             break;
         }
     }

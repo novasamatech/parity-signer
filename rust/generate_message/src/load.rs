@@ -341,7 +341,7 @@ fn meta_d_n(name: &str) -> Result<(), ErrorActive> {
 fn meta_d_u(address: &str) -> Result<(), ErrorActive> {
     if let Ok(a) = filter_address_book_by_url(address) {
         if !a.is_empty() {
-            println!("Warning. Address book contains an entry for {} with same url address {}. With `-d` setting key the consistency between the fetched metadata and existing database entries was not checked.", a[0].name, address)
+            println!("Warning. Address book contains an entry for {} with same url address {}. With `-d` setting key the consistency between the fetched metadata and existing database entries was not checked.", a[0].1.name, address)
         }
     }
     let shortcut = meta_shortcut(address)?;

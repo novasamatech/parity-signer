@@ -506,7 +506,7 @@ impl MetaSetElement {
 ///
 /// `ADDRESS_BOOK` tree stores SCALE-encoded [`AddressBookEntry`] entries under
 /// keys [`AddressBookKey`]
-#[derive(Decode, Encode, PartialEq)]
+#[derive(Debug, Decode, Encode, PartialEq)]
 #[cfg(feature = "active")]
 pub struct AddressBookEntry {
     /// Network name, as it appears in `Version` constant in metadata  
