@@ -9,7 +9,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Lock
 import androidx.compose.runtime.Composable
 import io.parity.signer.components.Identicon
-import io.parity.signer.models.decode64
 import io.parity.signer.ui.theme.Crypto400
 import io.parity.signer.ui.theme.Text400
 import io.parity.signer.ui.theme.Text600
@@ -28,7 +27,7 @@ fun TCAuthor(author: Address) {
 			)
 			Row {
 				Text(
-					author.seedName.decode64(),
+					author.seedName,
 					style = MaterialTheme.typography.body1,
 					color = MaterialTheme.colors.Crypto400
 				)

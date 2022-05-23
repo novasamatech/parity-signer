@@ -32,12 +32,12 @@ struct RecoverSeedName: View {
                         data.lastError = ""
                     })
                     .onSubmit {
-                        if (seedName != "") && !data.checkSeedCollision(seedName: seedName.encode64()) {
-                            data.pushButton(action: .goForward, details: seedName.encode64())
+                        if (seedName != "") && !data.checkSeedCollision(seedName: seedName) {
+                            data.pushButton(action: .goForward, details: seedName)
                         }
                     }
                     .onAppear(perform: {
-                        seedName = content.seedName.decode64()
+                        seedName = content.seedName
                         nameFocused = content.keyboard
                     })
                     .padding(.horizontal, 8)
@@ -48,9 +48,9 @@ struct RecoverSeedName: View {
             BigButton(
                 text: "Next",
                 action: {
-                    data.pushButton(action: .goForward, details: seedName.encode64())
+                    data.pushButton(action: .goForward, details: seedName)
                 },
-                isDisabled: (seedName == "") || data.checkSeedCollision(seedName: seedName.encode64())
+                isDisabled: (seedName == "") || data.checkSeedCollision(seedName: seedName)
             )
             Spacer()
         }.padding()

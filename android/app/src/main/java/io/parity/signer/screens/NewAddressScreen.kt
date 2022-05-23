@@ -50,7 +50,7 @@ fun NewAddressScreen(
 		Row {
 			HeaderBar(
 				line1 = "Create new key",
-				line2 = "For seed ${seedName.decode64()}"
+				line2 = "For seed ${seedName}"
 			)
 			Spacer(Modifier.weight(1f))
 		}
@@ -74,7 +74,7 @@ fun NewAddressScreen(
 			},
 			prefix = {
 				Text(
-					seedName.decode64(),
+					seedName,
 					style = MaterialTheme.typography.body2,
 					color = MaterialTheme.colors.Text600
 				)

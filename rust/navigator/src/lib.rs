@@ -61,19 +61,13 @@ pub fn do_action(
 }
 
 /// Should be called in the beginning to recall things stored only by phone
-pub fn init_navigation(dbname: &str, seed_names: &str) {
+pub fn init_navigation(dbname: &str, seed_names: Vec<String>) {
     //This operation has to happen; lock thread and do not ignore.
     let guard = STATE.lock();
     match guard {
         Ok(mut navstate) => {
             (*navstate).dbname = Some(dbname.to_string());
-            if !seed_names.is_empty() {
-                (*navstate).seed_names = seed_names.split(',').map(|a| a.to_string()).collect();
-                (*navstate).seed_names.sort();
-                (*navstate).seed_names.dedup();
-            } else {
-                (*navstate).seed_names = Vec::new();
-            }
+            (*navstate).seed_names = seed_names;
             match db_handling::helpers::get_all_networks::<Signer>(dbname) {
                 Ok(a) => {
                     for x in a.iter() {
@@ -93,17 +87,11 @@ pub fn init_navigation(dbname: &str, seed_names: &str) {
 }
 
 /// Should be called when seed names are modified in native to synchronize data
-pub fn update_seed_names(seed_names: &str) {
+pub fn update_seed_names(seed_names: Vec<String>) {
     let guard = STATE.lock();
     match guard {
         Ok(mut navstate) => {
-            if !seed_names.is_empty() {
-                (*navstate).seed_names = seed_names.split(',').map(|a| a.to_string()).collect();
-                (*navstate).seed_names.sort();
-                (*navstate).seed_names.dedup();
-            } else {
-                (*navstate).seed_names = Vec::new();
-            }
+            (*navstate).seed_names = seed_names;
         }
         Err(_) => {
             //TODO: maybe more grace here?

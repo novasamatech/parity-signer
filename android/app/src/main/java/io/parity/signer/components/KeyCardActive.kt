@@ -14,7 +14,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.unit.dp
-import io.parity.signer.models.decode64
 import io.parity.signer.ui.theme.Bg200
 import io.parity.signer.uniffi.Address
 import io.parity.signer.uniffi.MKeysCard
@@ -72,7 +71,7 @@ fun KeyCardActive(
 					hasPwd = address.hasPwd,
 					identicon = address.identicon,
 					multiselect = address.multiselect,
-					seedName = rootSeed.decode64()
+					seedName = rootSeed
 				), multiselectMode
 			)
 			Spacer(modifier = Modifier.weight(1f, true))

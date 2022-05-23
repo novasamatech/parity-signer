@@ -13,7 +13,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import io.parity.signer.models.abbreviateString
-import io.parity.signer.models.decode64
 import io.parity.signer.ui.theme.*
 
 @Composable
@@ -49,7 +48,7 @@ fun SeedCard(
 			Spacer(modifier = Modifier.width(10.dp))
 			Column {
 				Text(
-					seedName.decode64(),
+					seedName,
 					color = MaterialTheme.colors.Text600,
 					style = MaterialTheme.typography.subtitle1
 				)

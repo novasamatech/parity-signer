@@ -19,7 +19,7 @@ struct NewAddressScreen: View {
     var body: some View {
         ZStack {
             ScrollView {
-                HeaderBar(line1: "Create new key", line2: "For seed " + content.seedName.decode64())
+                HeaderBar(line1: "Create new key", line2: "For seed " + content.seedName)
                 //SeedCardForManager(seedName: data.selectedSeed)
                 NetworkCard(title: content.networkTitle, logo: content.networkLogo)
                 VStack (alignment: .leading) {
@@ -27,7 +27,7 @@ struct NewAddressScreen: View {
                     ZStack {
                         RoundedRectangle(cornerRadius: 8).stroke(Color("Crypto400")).frame(height: 39)
                         HStack {
-                            Text(content.seedName.decode64())
+                            Text(content.seedName)
                             TextField("Path", text: $path, prompt: Text("//<network>//input"))
                                 .foregroundColor(Color("Crypto400"))
                                 .font(FCrypto(style: .body2))

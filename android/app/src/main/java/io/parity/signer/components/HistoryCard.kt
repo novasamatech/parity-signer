@@ -3,7 +3,6 @@ package io.parity.signer.components
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.runtime.Composable
-import io.parity.signer.models.decode64
 import io.parity.signer.models.encodeHex
 import io.parity.signer.uniffi.Event
 import io.parity.signer.uniffi.VerifierValue
@@ -65,7 +64,7 @@ fun HistoryCard(card: Event, timestamp: String) {
 				image = Icons.Default.Pattern,
 				line1 = timestamp,
 				line2 = "Key created",
-				line3 = card.identityHistory.seedName.decode64() + card.identityHistory.path
+				line3 = card.identityHistory.seedName + card.identityHistory.path
 			)
 		}
 		is Event.IdentityRemoved -> {
@@ -73,7 +72,7 @@ fun HistoryCard(card: Event, timestamp: String) {
 				image = Icons.Default.Delete,
 				line1 = timestamp,
 				line2 = "Key removed",
-				line3 = card.identityHistory.seedName.decode64() + card.identityHistory.path
+				line3 = card.identityHistory.seedName + card.identityHistory.path
 			)
 		}
 		is Event.MessageSignError -> {
@@ -81,7 +80,7 @@ fun HistoryCard(card: Event, timestamp: String) {
 				image = Icons.Default.Warning,
 				line1 = timestamp,
 				line2 = "Message signing error!",
-				line3 = card.signMessageDisplay.userComment.decode64(),
+				line3 = card.signMessageDisplay.userComment,
 				danger = true
 			)
 		}
@@ -90,7 +89,7 @@ fun HistoryCard(card: Event, timestamp: String) {
 				image = Icons.Default.Done,
 				line1 = timestamp,
 				line2 = "Generated signature for message",
-				line3 = card.signMessageDisplay.userComment.decode64()
+				line3 = card.signMessageDisplay.userComment
 			)
 		}
 		is Event.MetadataAdded -> {
@@ -157,7 +156,7 @@ fun HistoryCard(card: Event, timestamp: String) {
 				image = Icons.Default.Pattern,
 				line1 = timestamp,
 				line2 = "Seed created",
-				line3 = card.seedCreated.decode64()
+				line3 = card.seedCreated
 			)
 		}
 		is Event.SeedNameWasShown -> {
@@ -165,7 +164,7 @@ fun HistoryCard(card: Event, timestamp: String) {
 				image = Icons.Default.Warning,
 				line1 = timestamp,
 				line2 = "Seed was shown",
-				line3 = card.seedNameWasShown.decode64()
+				line3 = card.seedNameWasShown
 			)
 		}
 		is Event.NetworkSpecsSigned -> {
@@ -209,7 +208,7 @@ fun HistoryCard(card: Event, timestamp: String) {
 				image = Icons.Default.Dangerous,
 				line1 = timestamp,
 				line2 = "Signing failure",
-				line3 = card.signDisplay.userComment.decode64(),
+				line3 = card.signDisplay.userComment,
 				danger = true
 			)
 		}
@@ -218,7 +217,7 @@ fun HistoryCard(card: Event, timestamp: String) {
 				image = Icons.Default.Done,
 				line1 = timestamp,
 				line2 = "Transaction signed",
-				line3 = card.signDisplay.userComment.decode64()
+				line3 = card.signDisplay.userComment
 			)
 		}
 		is Event.TypesAdded -> {

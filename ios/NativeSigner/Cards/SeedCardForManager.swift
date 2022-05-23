@@ -16,7 +16,7 @@ struct SeedCardForManager: View {
             HStack {
                 Identicon(identicon: seedNameCard.identicon)
                 VStack (alignment: .leading) {
-                    Text(seedNameCard.seedName.decode64())
+                    Text(seedNameCard.seedName)
                         .foregroundColor(Color("Text600"))
                         .font(FBase(style: .subtitle1))
                 }

@@ -53,14 +53,14 @@ struct HistoryCard: View {
                 timestamp: timestamp,
                 danger: false,
                 line1: "Key created",
-                line2: value.seedName.decode64() + value.path
+                line2: value.seedName + value.path
             )
             case .identityRemoved(let value): HistoryCardTemplate(
                 image: "xmark.rectangle.portrait",
                 timestamp: timestamp,
                 danger: false,
                 line1: "Key removed",
-                line2: value.seedName.decode64() + value.path
+                line2: value.seedName + value.path
             )
             case .metadataAdded(let value): HistoryCardTemplate(
                 image: "plus.viewfinder",
@@ -110,14 +110,14 @@ struct HistoryCard: View {
                     timestamp: timestamp,
                     danger: false,
                     line1: "Seed created",
-                    line2: text.decode64()
+                    line2: text
                 )
             case .seedNameWasShown(let text): HistoryCardTemplate(
                 image: "eye.trianglebadge.exclamationmark.fill",
                 timestamp: timestamp,
                 danger: false,
                 line1: "Seed was shown",
-                line2: text.decode64()
+                line2: text
             )
             case .networkSpecsSigned(let value): HistoryCardTemplate(
                 image: "signature",

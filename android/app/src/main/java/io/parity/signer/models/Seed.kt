@@ -20,9 +20,9 @@ internal fun SignerDataModel.refreshSeedNames(init: Boolean = false) {
 	clearError()
 	val allNames = sharedPreferences.all.keys.sorted().toTypedArray()
 	if (init) {
-		initNavigation(dbName, allNames.joinToString(","))
+		initNavigation(dbName, allNames.toList())
 	} else {
-		updateSeedNames(allNames.joinToString(separator = ","))
+		updateSeedNames(allNames.toList())
 	}
 	_seedNames.value = allNames
 }

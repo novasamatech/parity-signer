@@ -530,12 +530,12 @@ interface ScreenData {
 namespace signer {
     FooterButton? action_get_name([ByRef] Action action);
 
-    void init_navigation([ByRef] string dbname, [ByRef] string seed_names);
+    void init_navigation([ByRef] string dbname, sequence<string> seed_names);
 
     [Throws=ErrorDisplayed]
     ActionResult? backend_action(Action action, [ByRef] string details, [ByRef] string seed_phrase);
 
-    void update_seed_names([ByRef] string seed_names);
+    void update_seed_names(sequence<string> seed_names);
 
     [Throws=ErrorDisplayed]
     u32 qrparser_get_packets_total([ByRef] string data, boolean cleaned);

@@ -59,11 +59,11 @@ fn backend_action(
     navigator::do_action(action, details, seed_phrase).map_err(|s| ErrorDisplayed::Str { s })
 }
 
-fn init_navigation(dbname: &str, seed_names: &str) {
+fn init_navigation(dbname: &str, seed_names: Vec<String>) {
     navigator::init_navigation(dbname, seed_names)
 }
 
-fn update_seed_names(seed_names: &str) {
+fn update_seed_names(seed_names: Vec<String>) {
     navigator::update_seed_names(seed_names)
 }
 

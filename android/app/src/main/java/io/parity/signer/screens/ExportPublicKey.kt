@@ -55,15 +55,15 @@ fun ExportPublicKey(keyDetails: MKeyDetails) {
 		)
 		HeaderBar(line1 = "KEY DETAILS", line2 = "")
 		Row {
-			Text("Base58 key:")
+			Text("Base58 key: ")
 			Text(keyDetails.address.base58)
 		}
 		Row {
-			Text("Hex key:")
+			Text("Hex key: ")
 			Text(keyDetails.pubkey)
 		}
 		Row {
-			Text("Seed name:")
+			Text("Seed name: ")
 			Text(keyDetails.address.seedName)
 		}
 	}

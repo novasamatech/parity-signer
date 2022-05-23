@@ -78,7 +78,7 @@ class SignerDataModel: ObservableObject {
         monitor.start(queue: self.queue)
         if self.onboardingDone {
             self.refreshSeeds()
-            initNavigation(dbname: dbName, seedNames: seedNames.joined(separator: ","))
+            initNavigation(dbname: dbName, seedNames: seedNames)
             self.totalRefresh()
         }
     }
@@ -138,7 +138,7 @@ extension SignerDataModel {
                              if self.canaryDead {
                              device_was_online(nil, self.dbName)
                              }*/
-                        initNavigation(dbname: dbName, seedNames: seedNames.joined(separator: ","))
+                        initNavigation(dbname: dbName, seedNames: seedNames)
                             self.totalRefresh()
                             self.refreshSeeds()
                     } catch {
@@ -175,7 +175,7 @@ extension SignerDataModel {
             }
             self.onboardingDone = false
             self.seedNames = []
-            initNavigation(dbname: dbName, seedNames: seedNames.joined(separator: ","))
+            initNavigation(dbname: dbName, seedNames: seedNames)
         }
     }
     

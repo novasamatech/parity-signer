@@ -16,8 +16,6 @@ import io.parity.signer.components.BigButton
 import io.parity.signer.components.HeadingOverline
 import io.parity.signer.components.SingleTextInput
 import io.parity.signer.models.SignerDataModel
-import io.parity.signer.models.decode64
-import io.parity.signer.models.encode64
 import io.parity.signer.ui.theme.Text600
 import io.parity.signer.uniffi.Action
 import io.parity.signer.uniffi.MRecoverSeedName
@@ -51,10 +49,10 @@ fun RecoverSeedName(
 			},
 			onDone = {
 				if (seedName.value.isNotBlank() && signerDataModel.seedNames.value?.contains(
-						seedName.value.encode64()
+						seedName.value
 					) == false
 				) {
-					button(Action.GO_FORWARD, seedName.value.encode64())
+					button(Action.GO_FORWARD, seedName.value)
 				}
 			},
 			isCrypto = true,
@@ -73,10 +71,10 @@ fun RecoverSeedName(
 			text = "Next",
 			action = {
 				focusManager.clearFocus()
-				button(Action.GO_FORWARD, seedName.value.encode64())
+				button(Action.GO_FORWARD, seedName.value)
 			},
 			isDisabled = seedName.value.isBlank() || (signerDataModel.seedNames.value?.contains(
-				seedName.value.encode64()
+				seedName.value
 			) != false)
 		)
 	}
@@ -86,7 +84,7 @@ fun RecoverSeedName(
 			focusRequester.requestFocus()
 		}
 		seedName.value =
-			recoverSeedName.seedName.decode64()
+			recoverSeedName.seedName
 		onDispose { focusManager.clearFocus() }
 	}
 }

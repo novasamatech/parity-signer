@@ -12,7 +12,7 @@ fun SignerDataModel.signTransaction(
 			seedName
 		)
 		if (seedPhrase.isNotBlank()) {
-			pushButton(Action.GO_FORWARD, comment.encode64(), seedPhrase)
+			pushButton(Action.GO_FORWARD, comment, seedPhrase)
 		}
 	}
 }
