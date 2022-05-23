@@ -12,7 +12,6 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import io.parity.signer.components.*
-import io.parity.signer.models.decode64
 import io.parity.signer.ui.theme.Bg200
 import io.parity.signer.ui.theme.Crypto400
 import io.parity.signer.ui.theme.CryptoTypography
@@ -44,7 +43,7 @@ fun SeedBackup(
 			Column(
 				modifier = Modifier.padding(20.dp)
 			) {
-				HeaderBar("Backup", seedName.decode64())
+				HeaderBar("Backup", seedName)
 				HeadingOverline("SEED PHRASE")
 				SeedBox(seedPhrase = seedPhrase, status = seedBoxStatus)
 				HeadingOverline("DERIVED KEYS")

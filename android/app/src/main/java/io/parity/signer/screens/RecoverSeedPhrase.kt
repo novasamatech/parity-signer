@@ -49,7 +49,7 @@ fun RecoverSeedPhrase(
 			modifier = Modifier.fillMaxWidth(1f)
 		) {
 			Text(
-				recoverSeedPhrase.seedName.decode64(),
+				recoverSeedPhrase.seedName,
 				style = MaterialTheme.typography.subtitle1
 			)
 		}

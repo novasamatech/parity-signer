@@ -16,7 +16,6 @@ import io.parity.signer.components.BigButton
 import io.parity.signer.components.HeadingOverline
 import io.parity.signer.components.SingleTextInput
 import io.parity.signer.models.SignerDataModel
-import io.parity.signer.models.encode64
 import io.parity.signer.ui.theme.Text600
 import io.parity.signer.uniffi.Action
 import io.parity.signer.uniffi.MNewSeed
@@ -50,10 +49,10 @@ fun NewSeedScreen(
 			},
 			onDone = {
 				if (seedName.value.isNotBlank() && (signerDataModel.seedNames.value?.contains(
-						seedName.value.encode64()
+						seedName.value
 					) == false)
 				) {
-					button(Action.GO_FORWARD, seedName.value.encode64())
+					button(Action.GO_FORWARD, seedName.value)
 				}
 			},
 			isCrypto = true,
@@ -71,10 +70,10 @@ fun NewSeedScreen(
 			text = "Generate seed phrase",
 			action = {
 				focusManager.clearFocus()
-				button(Action.GO_FORWARD, seedName.value.encode64())
+				button(Action.GO_FORWARD, seedName.value)
 			},
 			isDisabled = seedName.value.isBlank() || (signerDataModel.seedNames.value?.contains(
-				seedName.value.encode64()
+				seedName.value
 			) != false)
 		)
 	}
