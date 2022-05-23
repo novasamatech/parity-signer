@@ -307,6 +307,7 @@ class SignerDataModel : ViewModel() {
 			OnBoardingState.Yes else _onBoardingDone.value = OnBoardingState.No
 		if (checkRefresh) {
 			getAlertState()
+			isAirplaneOn()
 			refreshSeedNames(init = true)
 			pushButton(Action.START)
 		}
