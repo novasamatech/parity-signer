@@ -16,7 +16,7 @@ struct NewSeedBackupModal: View {
         ZStack {
             RoundedRectangle(cornerRadius: 8).foregroundColor(Color("Bg200"))
             VStack {
-                HeaderBar(line1: "Backup Seed Phrase", line2: content.seed.decode64())
+                HeaderBar(line1: "Backup Seed Phrase", line2: content.seed)
                 ZStack {
                     //RoundedRectangle(cornerRadius: 8).foregroundColor(Color("Crypto100")).frame(height: 200)
                     Text(content.seedPhrase)

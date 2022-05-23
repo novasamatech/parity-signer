@@ -64,19 +64,6 @@ extension String {
     }
 }
 
-/**
- * Base64 screening utils
- */
-extension String {
-    func encode64() -> String {
-        return Data(self.utf8).base64EncodedString()
-    }
-    
-    func decode64() -> String {
-        return String(decoding: Data(base64Encoded: self) ?? Data(), as: UTF8.self)
-    }
-}
-
 extension TransactionCardSet {
     func assemble() -> [TransactionCard] {
         var assembled: [TransactionCard] = []

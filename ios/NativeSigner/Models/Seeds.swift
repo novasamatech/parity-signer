@@ -47,7 +47,7 @@ extension SignerDataModel {
             else {
                 print("no seeds available")
                 self.seedNames = []
-                updateSeedNames(seedNames: seedNames.joined(separator: ","))
+                updateSeedNames(seedNames: seedNames)
                 return
             }
             let seedNames = itemFound.map{item -> String in
@@ -59,13 +59,13 @@ extension SignerDataModel {
                 return seedName
             }
             self.seedNames = seedNames.sorted()
-            updateSeedNames(seedNames: seedNames.joined(separator: ","))
+            updateSeedNames(seedNames: seedNames)
             self.authenticated = true
         }
         case errSecItemNotFound: do {
             print("no seeds available")
             self.seedNames = []
-            updateSeedNames(seedNames: seedNames.joined(separator: ","))
+            updateSeedNames(seedNames: seedNames)
             self.authenticated = true
             return
         }
@@ -115,7 +115,7 @@ extension SignerDataModel {
         }
         self.seedNames.append(seedName)
         self.seedNames = self.seedNames.sorted()
-        updateSeedNames(seedNames: self.seedNames.joined(separator: ","))
+        updateSeedNames(seedNames: self.seedNames)
         self.pushButton(action: .goForward, details: createRoots ? "true" : "false", seedPhrase: seedPhrase)
     }
     
@@ -213,7 +213,7 @@ extension SignerDataModel {
                     return element != seedName
                 }
                 self.seedNames = seedNames.sorted()
-                updateSeedNames(seedNames: self.seedNames.joined(separator: ","))
+                updateSeedNames(seedNames: self.seedNames)
                 pushButton(action: .removeSeed)
             } else {
                 self.lastError = SecCopyErrorMessageString(status, nil)! as String

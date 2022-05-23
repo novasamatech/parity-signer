@@ -29,7 +29,7 @@ struct SeedKeyCard: View {
                     }
                 }.frame(width: 30, height: 30)
                 VStack (alignment: .leading) {
-                    Text(seedCard.seedName.decode64())
+                    Text(seedCard.seedName)
                         .foregroundColor(Color("Text600"))
                         .font(FBase(style: .subtitle1))
                     Text(seedCard.base58.truncateMiddle(length: 8))
