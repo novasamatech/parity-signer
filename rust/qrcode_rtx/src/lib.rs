@@ -1,4 +1,5 @@
-use constants::{BACK_COLOR, BORDER, CHUNK_SIZE, FPS_DEN, FPS_NOM, MAIN_COLOR, SCALING};
+use bitvec::prelude::{BitVec, Msb0};
+use constants::{qr_palette, BORDER, CHUNK_SIZE, FPS_DEN, FPS_NOM, SCALING};
 use qrcode_static::png_qr;
 use qrcodegen::{QrCode, QrCodeEcc};
 use std::fs;
@@ -61,25 +62,25 @@ fn make_apng(data: Vec<QrCode>, output_name: &str) -> Result<(), Box<dyn std::er
     let size: u32 = (data[0].size() as u32) * (SCALING as u32) + 2 * border_size as u32;
     let mut encoder = png::Encoder::new(&mut output_file, size, size);
 
-    encoder.set_color(png::ColorType::Grayscale);
+    encoder.set_color(png::ColorType::Indexed);
+    encoder.set_palette(qr_palette());
     encoder.set_animated(frames_count, 0)?;
     encoder.set_frame_delay(FPS_NOM, FPS_DEN)?;
-    encoder.set_depth(png::BitDepth::Eight);
+    encoder.set_depth(png::BitDepth::One);
 
     let mut writer = encoder.write_header()?;
     // making actual apng
     // qr.get_module(x,y) = false corresponds to back color (white by default)
     // qr.get_module(x,y) = true corresponds to main color (black by default)
     for qr in data.iter() {
-        let mut buffer: Vec<u8> = Vec::with_capacity((size * size) as usize);
+        let mut buffer: Vec<u8> = Vec::new();
         for y in 0..size {
+            let mut pixels: BitVec<u8, Msb0> = BitVec::with_capacity(size as usize);
             for x in 0..size {
-                if qr.get_module(x as i32 / SCALING - BORDER, y as i32 / SCALING - BORDER) {
-                    buffer.push(MAIN_COLOR);
-                } else {
-                    buffer.push(BACK_COLOR);
-                }
+                pixels
+                    .push(!qr.get_module(x as i32 / SCALING - BORDER, y as i32 / SCALING - BORDER))
             }
+            buffer.extend_from_slice(&pixels.into_vec());
         }
         writer.write_image_data(&buffer)?;
     }
