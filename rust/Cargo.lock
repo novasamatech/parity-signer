@@ -2333,7 +2333,7 @@ dependencies = [
 name = "qrcode_rtx"
 version = "0.1.0"
 dependencies = [
- "bitvec",
+ "bitvec 1.0.0",
  "constants",
  "hex",
  "png 0.17.5",
@@ -2347,7 +2347,7 @@ name = "qrcode_static"
 version = "0.1.0"
 dependencies = [
  "anyhow",
- "bitvec",
+ "bitvec 1.0.0",
  "constants",
  "hex",
  "png 0.17.5",
