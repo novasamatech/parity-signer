@@ -22,13 +22,10 @@ use definitions::{
 
 use crate::helpers::{
     address_book_content, error_occured, filter_address_book_by_url, genesis_hash_in_hot_db,
-    get_address_book_entry, network_specs_from_entry, network_specs_from_title,
-    try_get_network_specs_to_send, update_db,
+    get_address_book_entry, network_specs_from_entry, network_specs_from_title, print_specs,
+    specs_agnostic, try_get_network_specs_to_send, update_db, update_known_specs,
+    update_modify_encryption_specs,
 };
-use crate::metadata_shortcut::{
-    specs_agnostic, update_known_specs, update_modify_encryption_specs,
-};
-use crate::output_prep::print_specs;
 use crate::parser::{Content, InstructionSpecs, Override, Set, Token};
 
 /// Process `add_specs` command according to the [`InstructionSpecs`] received

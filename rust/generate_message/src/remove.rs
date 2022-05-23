@@ -63,7 +63,7 @@ use definitions::{
 };
 use sled::Batch;
 
-use crate::helpers::{get_address_book_entry, specname_in_db};
+use crate::helpers::{get_address_book_entry, is_specname_in_db};
 use crate::parser::Remove;
 
 /// Remove information from the database
@@ -93,7 +93,7 @@ pub fn remove_info(info: Remove) -> Result<(), ErrorActive> {
 
             // if the address book has no more entries with same network name,
             // except the one currently being removed, the metadata gets removed
-            if !specname_in_db(&address_book_entry.name, &network_title)? {
+            if !is_specname_in_db(&address_book_entry.name, &network_title)? {
                 let database = open_db::<Active>(HOT_DB_NAME)?;
                 let metadata = open_tree::<Active>(&database, METATREE)?;
                 let meta_key_prefix = MetaKeyPrefix::from_name(&address_book_entry.name);

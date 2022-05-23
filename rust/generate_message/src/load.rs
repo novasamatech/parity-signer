@@ -54,12 +54,10 @@ use definitions::{
 };
 
 use crate::helpers::{
-    address_book_content, error_occured, filter_address_book_by_url, network_specs_from_entry,
+    add_new, address_book_content, error_occured, load_meta_print, meta_shortcut,
+    network_specs_from_entry, prepare_metadata, write_metadata, MetaShortCut, SortedMetaValues,
     Write,
 };
-use crate::metadata_db_utils::{add_new, prepare_metadata, write_metadata, SortedMetaValues};
-use crate::metadata_shortcut::{meta_shortcut, MetaShortCut};
-use crate::output_prep::load_meta_print;
 use crate::parser::{Content, InstructionMeta, Set};
 
 /// Process `load_metadata` command according to the [`InstructionMeta`]
@@ -137,9 +135,9 @@ pub fn gen_load_meta(instruction: InstructionMeta) -> Result<(), ErrorActive> {
             // This is intended for the networks that do not have yet entries in
             // `ADDRESS_BOOK`.
             //
-            // If the rpc call is done at address already known to the
-            // `ADDRESS_BOOK`, a warning will be issued that the metadata is
-            // not checked for consistency with existing data in the database.
+            // This key combination is completely agnostic and will not address
+            // the database at all. If there are changes in the base58 prefix or
+            // genesis hash, this will not be found here.
             Content::Address(address) => meta_d_u(&address),
         },
 
@@ -339,11 +337,6 @@ fn meta_d_n(name: &str) -> Result<(), ErrorActive> {
 /// in the metadata is no longer same as in network specs on record, there will
 /// no error produced here.
 fn meta_d_u(address: &str) -> Result<(), ErrorActive> {
-    if let Ok(a) = filter_address_book_by_url(address) {
-        if !a.is_empty() {
-            println!("Warning. Address book contains an entry for {} with same url address {}. With `-d` setting key the consistency between the fetched metadata and existing database entries was not checked.", a[0].1.name, address)
-        }
-    }
     let shortcut = meta_shortcut(address)?;
     if shortcut.meta_values.warn_incomplete_extensions {
         warn(&shortcut.meta_values.name, shortcut.meta_values.version);

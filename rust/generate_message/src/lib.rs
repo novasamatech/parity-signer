@@ -224,6 +224,8 @@ mod helpers;
 pub mod interpret_specs;
 mod load;
 use load::{gen_load_meta, meta_default_file, unwasm};
+mod make_message;
+use make_message::make_message;
 pub mod parser;
 use parser::{Command, Show};
 mod remove;
@@ -232,11 +234,6 @@ mod show;
 use show::{check_file, show_metadata, show_networks};
 mod specs;
 use specs::gen_add_specs;
-mod make_message;
-mod metadata_db_utils;
-mod metadata_shortcut;
-mod output_prep;
-use make_message::make_message;
 
 /// Function to process incoming command as interpreted by parser
 
