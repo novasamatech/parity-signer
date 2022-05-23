@@ -290,7 +290,7 @@ fn flow_test_1() {
     let dbname = "for_tests/flow_test_1";
     populate_cold_nav_test(dbname).unwrap();
     init_db::<Signer>(dbname, verifier_alice_sr25519()).unwrap();
-    init_navigation(dbname, "");
+    init_navigation(dbname, Vec::new());
 
     let action = do_action(Action::Start, "", "").unwrap().unwrap();
     let expected_action = ActionResult {
@@ -1900,7 +1900,7 @@ fn flow_test_1() {
         "GoForward on NewSeed screen with NewSeedBackup modal active. Expected Keys screen with no modals."
     );
 
-    update_seed_names(r#"Portia"#);
+    update_seed_names(vec![String::from("Portia")]);
 
     let mut action = do_action(Action::GoBack, "", "").unwrap().unwrap();
     erase_identicon(&mut action.screen_data);
@@ -2678,7 +2678,7 @@ fn flow_test_1() {
         )
     );
 
-    update_seed_names(r#"Portia,Alice"#);
+    update_seed_names(vec![String::from("Portia"),String::from("Alice")]);
 
     let mut alice_polkadot_keys_action = action;
 
@@ -3285,7 +3285,7 @@ fn flow_test_1() {
     */
     // Switching to log. Maybe we want to switch here to updated SeedSelector?
 
-    update_seed_names(r#"Alice"#);
+    update_seed_names(vec![String::from("Alice")]);
 
     do_action(Action::RightButtonAction, "", "")
         .unwrap()
@@ -5725,7 +5725,7 @@ fn flow_test_1() {
         )
     );
 
-    update_seed_names(r#"Alice,Pepper"#);
+    update_seed_names(vec![String::from("Alice"),String::from("Pepper")]);
 
     do_action(Action::NetworkSelector, "", "").unwrap().unwrap();
     let mut action = do_action(
