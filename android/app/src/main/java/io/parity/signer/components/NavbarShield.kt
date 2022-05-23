@@ -14,9 +14,15 @@ import io.parity.signer.ui.theme.SignalDanger
 import io.parity.signer.ui.theme.SignalWarning
 
 @Composable
-fun NavbarShield(alert: ShieldAlert?, active: Boolean) {
-	if (active) {
-		Icon(
+fun NavbarShield(alertState: State<AlertState?>) {
+
+	when (alertState.value) {
+		AlertState.None -> Icon(
+			Icons.Default.GppGood,
+			"device is safe",
+			tint = MaterialTheme.colors.Crypto400
+		)
+		AlertState.Active -> Icon(
 			Icons.Default.GppBad,
 			"device is online",
 			tint = MaterialTheme.colors.SignalDanger
