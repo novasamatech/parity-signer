@@ -2678,7 +2678,7 @@ fn flow_test_1() {
         )
     );
 
-    update_seed_names(vec![String::from("Portia"),String::from("Alice")]);
+    update_seed_names(vec![String::from("Portia"), String::from("Alice")]);
 
     let mut alice_polkadot_keys_action = action;
 
@@ -5725,7 +5725,7 @@ fn flow_test_1() {
         )
     );
 
-    update_seed_names(vec![String::from("Alice"),String::from("Pepper")]);
+    update_seed_names(vec![String::from("Alice"), String::from("Pepper")]);
 
     do_action(Action::NetworkSelector, "", "").unwrap().unwrap();
     let mut action = do_action(
