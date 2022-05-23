@@ -8,6 +8,7 @@ edition = "2018"
 
 [dependencies]
 anyhow = "1.0.42"
+bitvec = "1.0.0"
 constants = {path = "../constants"}
 hex = "0.4.3"
 png = "0.17.3"
