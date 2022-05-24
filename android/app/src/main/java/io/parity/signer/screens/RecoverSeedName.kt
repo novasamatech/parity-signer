@@ -45,7 +45,6 @@ fun RecoverSeedName(
 			content = seedName,
 			update = {
 				seedName.value = it
-				signerDataModel.clearError()
 			},
 			onDone = {
 				if (seedName.value.isNotBlank() && signerDataModel.seedNames.value?.contains(

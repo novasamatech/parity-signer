@@ -15,7 +15,6 @@ import io.parity.signer.models.AlertState
 import io.parity.signer.ui.theme.Bg000
 import io.parity.signer.ui.theme.modal
 import io.parity.signer.uniffi.Action
-import io.parity.signer.uniffi.ShieldAlert
 
 @Composable
 fun NewSeedMenu(

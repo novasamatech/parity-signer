@@ -15,7 +15,6 @@ fun SignerDataModel.addKey(path: String, seedName: String) {
 			}
 		} catch (e: java.lang.Exception) {
 			Log.e("Add key error", e.toString())
-			_lastError.value = e.toString()
 		}
 	}
 }
@@ -29,7 +28,6 @@ fun SignerDataModel.increment(number: Int, seedName: String) {
 			}
 		} catch (e: java.lang.Exception) {
 			Log.e("Add key error", e.toString())
-			_lastError.value = e.toString()
 		}
 	}
 }

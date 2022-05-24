@@ -41,7 +41,7 @@ class SignerDataModel : ViewModel() {
 	private var hasStrongbox: Boolean = false
 
 	// Alert
-	internal val _alertState: MutableLiveData<AlertState> = MutableLiveData(AlertState.None)
+	private val _alertState: MutableLiveData<AlertState> = MutableLiveData(AlertState.None)
 
 	// State of the app being unlocked
 	private val _authenticated = MutableLiveData(false)
@@ -61,27 +61,23 @@ class SignerDataModel : ViewModel() {
 	internal var action = JSONObject()
 
 	// Internal storage for model data:
-	// TODO: hard types for these
 
 	// Seeds
 	internal val _seedNames = MutableLiveData(arrayOf<String>())
-
-	// Error
-	internal val _lastError = MutableLiveData("")
 
 	// Navigator
 	// TODO: consider extracting components as separate livedata
 	internal val _actionResult = MutableLiveData(
 		ActionResult(
-			"",
-			false,
-			false,
-			null,
-			null,
-			ScreenNameType.H4,
-			ScreenData.Documents,
-			null,
-			null,
+			screenLabel = "",
+			back = false,
+			footer = false,
+			footerButton = null,
+			rightButton = null,
+			screenNameType = ScreenNameType.H4,
+			screenData = ScreenData.Documents,
+			modalData = null,
+			alertData = null,
 		)
 	)
 
@@ -96,8 +92,6 @@ class SignerDataModel : ViewModel() {
 	val progress: LiveData<Float> = _progress
 
 	val seedNames: LiveData<Array<String>> = _seedNames
-
-	val lastError: LiveData<String> = _lastError
 
 	// Observables for screens state
 
@@ -192,7 +186,7 @@ class SignerDataModel : ViewModel() {
 	/**
 	 * Init database with no general certificate
 	 */
-	fun jailbreak() {
+	private fun jailbreak() {
 		wipe()
 		copyAsset("")
 		historyInitHistoryNoCert(dbName)
@@ -330,14 +324,6 @@ class SignerDataModel : ViewModel() {
 		authentication.authenticate(activity) {
 			jailbreak()
 		}
-	}
-
-	/**
-	 * Just clears last error;
-	 * Run every time user does something
-	 */
-	fun clearError() {
-		_lastError.value = ""
 	}
 
 	fun isStrongBoxProtected(): Boolean {

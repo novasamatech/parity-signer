@@ -22,7 +22,6 @@ import kotlinx.coroutines.delay
 
 /**
  * Modal to show seed phrase. Dangerous place.
- * TODO: make sure seed phrase is cleared at all times!!!
  */
 @Composable
 fun SeedBackup(

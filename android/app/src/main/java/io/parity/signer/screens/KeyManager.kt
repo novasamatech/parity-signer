@@ -28,7 +28,6 @@ import io.parity.signer.ui.theme.Action400
 import io.parity.signer.ui.theme.Bg100
 import io.parity.signer.ui.theme.Bg200
 import io.parity.signer.uniffi.Action
-import io.parity.signer.uniffi.AlertData
 import io.parity.signer.uniffi.MKeys
 import kotlin.math.absoluteValue
 

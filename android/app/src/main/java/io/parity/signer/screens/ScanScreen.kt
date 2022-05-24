@@ -61,9 +61,9 @@ fun ScanScreen(
 					val previewView = PreviewView(context)
 					val barcodeScanner = BarcodeScanning.getClient()
 
-					//This might be done more elegantly, if needed.
-					//But it's pretty obvious that the app needs camera
-					//and why; also it just works so far and code is tiny.
+					// This might be done more elegantly, if needed.
+					// But it's pretty obvious that the app needs camera
+					// and why; also it just works so far and code is tiny.
 					signerDataModel.handleCameraPermissions()
 
 					cameraProviderFuture.addListener({

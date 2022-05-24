@@ -18,9 +18,7 @@ import io.parity.signer.uniffi.Action
 import io.parity.signer.uniffi.MSeeds
 
 /**
- * Select seed for creating derivations
- *
- * TODO: really replace this with seedmanager element?
+ * Select seed for backup
  */
 @Composable
 fun SelectSeedForBackup(seeds: MSeeds, signerDataModel: SignerDataModel) {

@@ -16,7 +16,6 @@ import io.parity.signer.models.AlertState
 import io.parity.signer.models.abbreviateString
 import io.parity.signer.ui.theme.*
 import io.parity.signer.uniffi.Action
-import io.parity.signer.uniffi.AlertData
 import io.parity.signer.uniffi.MSettings
 
 /**

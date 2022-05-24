@@ -17,7 +17,6 @@ import io.parity.signer.uniffi.updateSeedNames
  * which is somewhat asynchronous
  */
 internal fun SignerDataModel.refreshSeedNames(init: Boolean = false) {
-	clearError()
 	val allNames = sharedPreferences.all.keys.sorted().toTypedArray()
 	if (init) {
 		initNavigation(dbName, allNames.toList())
@@ -38,7 +37,7 @@ fun SignerDataModel.addSeed(
 
 	// Check if seed name already exists
 	if (seedNames.value?.contains(seedName) as Boolean) {
-		_lastError.value = "Seed with this name already exists!"
+		return
 	}
 
 	// Run standard login prompt!
@@ -62,7 +61,6 @@ fun SignerDataModel.addSeed(
 				seedPhrase = seedPhrase
 			)
 		} catch (e: java.lang.Exception) {
-			_lastError.value = e.toString()
 			Log.e("Seed creation error", e.toString())
 		}
 	}

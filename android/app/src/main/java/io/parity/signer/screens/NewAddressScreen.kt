@@ -10,7 +10,6 @@ import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.unit.dp
 import io.parity.signer.components.*
-import io.parity.signer.models.*
 import io.parity.signer.ui.theme.Text600
 import io.parity.signer.uniffi.*
 
@@ -50,7 +49,7 @@ fun NewAddressScreen(
 		Row {
 			HeaderBar(
 				line1 = "Create new key",
-				line2 = "For seed ${seedName}"
+				line2 = "For seed $seedName"
 			)
 			Spacer(Modifier.weight(1f))
 		}

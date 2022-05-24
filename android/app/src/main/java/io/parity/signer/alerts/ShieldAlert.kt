@@ -5,7 +5,6 @@ import androidx.compose.runtime.State
 import io.parity.signer.components.AlertComponent
 import io.parity.signer.models.AlertState
 import io.parity.signer.uniffi.Action
-import io.parity.signer.uniffi.ShieldAlert
 
 @Composable
 fun ShieldAlert(

@@ -45,7 +45,6 @@ fun NewSeedScreen(
 			content = seedName,
 			update = {
 				seedName.value = it
-				signerDataModel.clearError()
 			},
 			onDone = {
 				if (seedName.value.isNotBlank() && (signerDataModel.seedNames.value?.contains(
@@ -81,10 +80,6 @@ fun NewSeedScreen(
 		if (newSeed.keyboard) {
 			focusRequester.requestFocus()
 		}
-		/* TODO: seed_name
-		seedName.value =
-			signerDataModel.screenData.value?.optString("seed_name")?.decode64() ?: ""
-		*/
 		onDispose { focusManager.clearFocus() }
 	}
 }
