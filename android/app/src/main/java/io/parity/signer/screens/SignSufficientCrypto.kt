@@ -25,7 +25,14 @@ fun SignSufficientCrypto(
 				Row(Modifier.clickable {
 					signSufficientCrypto(identity.seedName, identity.addressKey)
 				}) {
-					
+					KeyCard(identity = Address(
+						base58 = identity.publicKey,
+						path = identity.path,
+						hasPwd = identity.hasPwd,
+						identicon = identity.identicon,
+						seedName = identity.seedName,
+						multiselect = null
+					))
 				}
 			}
 		}
