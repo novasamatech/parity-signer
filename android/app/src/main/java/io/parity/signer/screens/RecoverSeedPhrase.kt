@@ -29,11 +29,11 @@ fun RecoverSeedPhrase(
 	signerDataModel: SignerDataModel
 ) {
 	val seedPhrase =
-		recoverSeedPhrase.draft //remember { mutableStateOf(listOf<String>()) }
+		recoverSeedPhrase.draft // remember { mutableStateOf(listOf<String>()) }
 	val guessWord =
-		recoverSeedPhrase.guessSet //remember { mutableStateOf(listOf<String>()) }
+		recoverSeedPhrase.guessSet // remember { mutableStateOf(listOf<String>()) }
 	val seedPhraseReady = recoverSeedPhrase.readySeed
-	val seedWordText = recoverSeedPhrase.readySeed ?: ""
+	val seedWordText = recoverSeedPhrase.userInput
 	val seedWord = TextFieldValue(
 		seedWordText,
 		selection = TextRange(seedWordText.length)
@@ -75,10 +75,12 @@ fun RecoverSeedPhrase(
 				value = createRoots.value,
 				role = Role.Checkbox,
 				onValueChange = { createRoots.value = it }
-			)) {
+			)
+		) {
 			Checkbox(
 				checked = createRoots.value,
-				onCheckedChange = { createRoots.value = it })
+				onCheckedChange = { createRoots.value = it }
+			)
 			Text("Create seed keys")
 		}
 		Spacer(Modifier.weight(0.1f))
@@ -93,7 +95,6 @@ fun RecoverSeedPhrase(
 								seedPhrase = it,
 								createRoots = createRoots.value
 							)
-
 						}
 					}
 				},
@@ -102,5 +103,4 @@ fun RecoverSeedPhrase(
 		}
 		Spacer(Modifier.weight(0.1f))
 	}
-
 }

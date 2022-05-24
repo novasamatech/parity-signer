@@ -40,7 +40,7 @@ fun RestoreSeedPhraseBox(
 			horizontalAlignment = Alignment.CenterHorizontally,
 			modifier = Modifier.fillMaxWidth(1f)
 		) {
-			//TODO: make this thing interactive
+			// TODO: make this thing interactive
 			Text(
 				seedPhrase
 					.joinToString(" "),
