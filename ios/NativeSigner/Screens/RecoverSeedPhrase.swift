@@ -51,10 +51,10 @@ struct RecoverSeedPhrase: View {
                                     .onSubmit {
                                     }
                                     .onChange(of: content, perform: { input in
-                                        userInput = input.userInput
+                                        userInput = " " + input.userInput // TODO: this in rust
                                     })
                                     .onAppear(perform: {
-                                        userInput = content.userInput
+                                        userInput = " " + content.userInput
                                         focus = content.keyboard
                                     })
                                     .padding(.horizontal, 12)

@@ -33,7 +33,7 @@ fun RecoverSeedPhrase(
 	val guessWord =
 		recoverSeedPhrase.guessSet // remember { mutableStateOf(listOf<String>()) }
 	val seedPhraseReady = recoverSeedPhrase.readySeed
-	val seedWordText = recoverSeedPhrase.userInput
+	val seedWordText = " " + recoverSeedPhrase.userInput // TODO: `" " +` in rust
 	val seedWord = TextFieldValue(
 		seedWordText,
 		selection = TextRange(seedWordText.length)
