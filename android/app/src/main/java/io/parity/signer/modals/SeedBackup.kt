@@ -58,7 +58,7 @@ fun SeedBackup(
 						}
 						val networkDerivations = pack.idSet.sortedBy { it.path }
 						/*
-						//TODO: this could have been neat items block,
+						// TODO: this could have been neat items block,
 						//but passworded keys might collide
 						//
 						//add this to revert:
@@ -101,7 +101,6 @@ fun SeedBackup(
 										Spacer(Modifier.weight(1f))
 									}
 								}
-
 							}
 						}
 					}
@@ -113,7 +112,9 @@ fun SeedBackup(
 					modifier = Modifier.fillMaxSize()
 				) {
 					BigButton(
-						text = if (time.value > 0) "Hide seed phrase in " + (time.value / 1000L).toString() + "s" else "",
+						text = if (time.value > 0)
+							"Hide seed phrase in " + (time.value / 1000L).toString() + "s"
+						else "",
 						action = {
 							seedBoxStatus = SeedBoxStatus.Timeout
 							seedPhrase = ""

@@ -73,7 +73,7 @@ fun SignerApp(signerDataModel: SignerDataModel) {
 					BackHandler {
 						// TODO: implement this in backend
 						if (
-							actionResult.value?.alertData == null && //no alert state
+							actionResult.value?.alertData == null &&
 							actionResult.value?.modalData == null &&
 							(
 								actionResult.value?.screenData is ScreenData.Log ||

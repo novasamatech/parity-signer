@@ -131,6 +131,6 @@ fun SignerDataModel.getSeedForBackup(
 		}
 	} else {
 		setSeedPhrase("")
-		setSeedBoxStatus(SeedBoxStatus.Locked)
+		setSeedBoxStatus(SeedBoxStatus.Network)
 	}
 }

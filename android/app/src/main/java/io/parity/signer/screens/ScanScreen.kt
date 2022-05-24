@@ -54,7 +54,7 @@ fun ScanScreen(
 		Box(
 			Modifier.padding(8.dp)
 		) {
-			//TODO: use all the cores needed to make this smooth
+			// TODO: use all the cores needed to make this smooth
 			AndroidView(
 				factory = { context ->
 					val executor = ContextCompat.getMainExecutor(context)
