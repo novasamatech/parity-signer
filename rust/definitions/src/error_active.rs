@@ -378,6 +378,7 @@ impl ErrorSource for Active {
                             CommandNeedArgument::MetaDefaultFileName => "`-name`",
                             CommandNeedArgument::MetaDefaultFileVersion => "`-version`",
                             CommandNeedArgument::CheckFile => "check_file",
+                            CommandNeedArgument::ShowSpecsTitle => "`show -specs`",
                         };
                         format!("{} must be followed by an agrument.", insert)
                     },
@@ -1756,6 +1757,9 @@ pub enum CommandNeedArgument {
 
     /// Command `check_file` must be followed by the file path
     CheckFile,
+
+    /// Command `show -specs` must be followed by the network address book title
+    ShowSpecsTitle,
 }
 
 /// Unsuitable argument for the key in `generate_message` command

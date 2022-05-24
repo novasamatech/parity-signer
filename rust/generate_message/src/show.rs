@@ -8,7 +8,7 @@ use definitions::{
     metadata::MetaValues,
 };
 
-use crate::helpers::{address_book_content, network_specs_from_entry};
+use crate::helpers::{address_book_content, network_specs_from_entry, network_specs_from_title};
 
 /// Display all metadata currenty stored in the hot database
 ///
@@ -167,4 +167,25 @@ pub fn check_file(path: String) -> Result<(), ErrorActive> {
 /// Hash metadata and produce hash hexadecimal string
 fn hash_string(meta: &[u8]) -> String {
     hex::encode(blake2b(32, &[], meta).as_bytes())
+}
+
+/// Show network specs for user-entered address book title
+pub fn show_specs(title: String) -> Result<(), ErrorActive> {
+    let specs = network_specs_from_title(&title)?;
+    println!(
+        "address book title: {}\nbase58 prefix: {}\ncolor: {}\ndecimals: {}\nencryption: {}\ngenesis_hash: {}\nlogo: {}\nname: {}\npath_id: {}\nsecondary_color: {}\ntitle: {}\nunit: {}",
+        title,
+        specs.base58prefix,
+        specs.color,
+        specs.decimals,
+        specs.encryption.show(),
+        hex::encode(specs.genesis_hash),
+        specs.logo,
+        specs.name,
+        specs.path_id,
+        specs.secondary_color,
+        specs.title,
+        specs.unit
+    );
+    Ok(())
 }

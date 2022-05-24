@@ -231,7 +231,7 @@ use parser::{Command, Show};
 mod remove;
 use remove::remove_info;
 mod show;
-use show::{check_file, show_metadata, show_networks};
+use show::{check_file, show_metadata, show_networks, show_specs};
 mod specs;
 use specs::gen_add_specs;
 
@@ -242,6 +242,7 @@ pub fn full_run(command: Command) -> Result<(), ErrorActive> {
         Command::Show(x) => match x {
             Show::Metadata => show_metadata(),
             Show::Networks => show_networks(),
+            Show::Specs(title) => show_specs(title),
             Show::CheckFile(path) => check_file(path),
         },
         Command::Types => prep_types::<Active>(HOT_DB_NAME)?.write(TYLO),

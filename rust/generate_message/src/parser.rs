@@ -43,6 +43,14 @@ pub enum Command {
     /// - network title as it will be displayed in Signer, from
     /// [`NetworkSpecsToSend`](definitions::network_specs::NetworkSpecsToSend)
     ///
+    /// # Show network specs for a network, as they are recorded in the hot database
+    ///
+    /// `$ cargo run show -specs <network address book title>`
+    ///
+    /// Function prints network address book title and corresponding
+    /// [`NetworkSpecsToSend`](definitions::network_specs::NetworkSpecsToSend)
+    /// from [`SPECSTREEPREP`] tree of the hot database.
+    ///
     /// # Check external file with hex-encoded metadata
     ///
     /// `$ cargo run check_file <path>`
@@ -445,8 +453,13 @@ pub enum Show {
     /// Show all hot database [`ADDRESS_BOOK`](constants::ADDRESS_BOOK) entries
     Networks,
 
+    /// Show network specs from [`SPECSTREEPREP`](constants::SPECSTREEPREP)
+    /// entry. Associated data is user-entered network address book title.
+    Specs(String),
+
     /// Check that external file is valid network metadata and search for
-    /// similar entry in hot database [`METATREE`](constants::METATREE)
+    /// similar entry in hot database [`METATREE`](constants::METATREE).
+    /// Associated data is user-provided path to the metadata file.
     CheckFile(String),
 }
 
@@ -718,6 +731,22 @@ impl Command {
                                     Ok(Command::Show(Show::Networks))
                                 }
                             }
+                            "-specs" => match args.next() {
+                                Some(title) => {
+                                    if args.next().is_some() {
+                                        Err(ErrorActive::CommandParser(
+                                            CommandParser::UnexpectedKeyArgumentSequence,
+                                        ))
+                                    } else {
+                                        Ok(Command::Show(Show::Specs(title)))
+                                    }
+                                }
+                                None => {
+                                    Err(ErrorActive::CommandParser(CommandParser::NeedArgument(
+                                        CommandNeedArgument::ShowSpecsTitle,
+                                    )))
+                                }
+                            },
                             _ => Err(ErrorActive::CommandParser(
                                 CommandParser::UnexpectedKeyArgumentSequence,
                             )),
