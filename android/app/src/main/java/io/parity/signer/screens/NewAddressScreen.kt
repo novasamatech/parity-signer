@@ -18,7 +18,7 @@ fun NewAddressScreen(
 	deriveKey: MDeriveKey,
 	button: (Action, String) -> Unit,
 	addKey: (String, String) -> Unit,
-	dbName: String,
+	checkPath: (String, String, String) -> DerivationCheck
 ) {
 	val derivationPath = remember { mutableStateOf("") }
 	val buttonGood = remember { mutableStateOf(false) }
@@ -64,11 +64,10 @@ fun NewAddressScreen(
 			update = {
 				derivationPath.value = it
 				derivationState =
-					substratePathCheck(
-						seedName = seedName,
-						path = it,
-						network = networkSpecKey,
-						dbname = dbName
+					checkPath(
+						seedName,
+						it,
+						networkSpecKey
 					)
 			},
 			prefix = {

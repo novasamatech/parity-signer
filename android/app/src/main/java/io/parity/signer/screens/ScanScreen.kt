@@ -2,6 +2,7 @@ package io.parity.signer.screens
 
 import androidx.camera.core.CameraSelector
 import androidx.camera.core.ImageAnalysis
+import androidx.camera.core.ImageProxy
 import androidx.camera.core.Preview
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.camera.view.PreviewView
@@ -22,6 +23,7 @@ import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.ContextCompat
+import com.google.mlkit.vision.barcode.BarcodeScanner
 import com.google.mlkit.vision.barcode.BarcodeScanning
 import io.parity.signer.components.ScanProgressBar
 import io.parity.signer.models.SignerDataModel
@@ -38,7 +40,11 @@ fun ScanScreen(
 	captured: State<Int?>,
 	total: State<Int?>,
 	button: (Action, String, String) -> Unit,
-	signerDataModel: SignerDataModel,
+	handleCameraPermissions: () -> Unit,
+	processFrame: (
+		barcodeScanner: BarcodeScanner,
+		imageProxy: ImageProxy
+	) -> Unit,
 ) {
 	val lifecycleOwner = LocalLifecycleOwner.current
 	val context = LocalContext.current
@@ -64,7 +70,7 @@ fun ScanScreen(
 					// This might be done more elegantly, if needed.
 					// But it's pretty obvious that the app needs camera
 					// and why; also it just works so far and code is tiny.
-					signerDataModel.handleCameraPermissions()
+					handleCameraPermissions()
 
 					cameraProviderFuture.addListener({
 						val cameraProvider = cameraProviderFuture.get()
@@ -82,7 +88,7 @@ fun ScanScreen(
 							.build()
 							.apply {
 								setAnalyzer(executor) { imageProxy ->
-									signerDataModel.processFrame(barcodeScanner, imageProxy)
+									processFrame(barcodeScanner, imageProxy)
 								}
 							}
 
@@ -104,7 +110,6 @@ fun ScanScreen(
 					)
 					.clip(RoundedCornerShape(8.dp))
 			)
-
 		}
 		Column(
 			verticalArrangement = Arrangement.Bottom,

@@ -2,6 +2,8 @@ package io.parity.signer.models
 
 import android.util.Log
 import io.parity.signer.uniffi.Action
+import io.parity.signer.uniffi.DerivationCheck
+import io.parity.signer.uniffi.substratePathCheck
 
 /**
  * Add key to database; uses phone crypto to fetch seeds!
@@ -30,4 +32,13 @@ fun SignerDataModel.increment(number: Int, seedName: String) {
 			Log.e("Add key error", e.toString())
 		}
 	}
+}
+
+fun SignerDataModel.checkPath(seedName: String, path: String, network: String): DerivationCheck {
+	return substratePathCheck(
+		seedName = seedName,
+		path = path,
+		network = network,
+		dbname = dbName
+	)
 }

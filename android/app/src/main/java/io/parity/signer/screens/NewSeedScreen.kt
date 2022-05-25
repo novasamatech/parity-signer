@@ -15,7 +15,6 @@ import androidx.compose.ui.unit.dp
 import io.parity.signer.components.BigButton
 import io.parity.signer.components.HeadingOverline
 import io.parity.signer.components.SingleTextInput
-import io.parity.signer.models.SignerDataModel
 import io.parity.signer.ui.theme.Text600
 import io.parity.signer.uniffi.Action
 import io.parity.signer.uniffi.MNewSeed
@@ -24,7 +23,7 @@ import io.parity.signer.uniffi.MNewSeed
 fun NewSeedScreen(
 	newSeed: MNewSeed,
 	button: (action: Action, details: String) -> Unit,
-	signerDataModel: SignerDataModel
+	seedNames: Array<String>
 ) {
 	val seedName = remember { mutableStateOf("") }
 	val focusManager = LocalFocusManager.current
@@ -47,9 +46,9 @@ fun NewSeedScreen(
 				seedName.value = it
 			},
 			onDone = {
-				if (seedName.value.isNotBlank() && (signerDataModel.seedNames.value?.contains(
+				if (seedName.value.isNotBlank() && !seedNames.contains(
 						seedName.value
-					) == false)
+					)
 				) {
 					button(Action.GO_FORWARD, seedName.value)
 				}
@@ -71,9 +70,9 @@ fun NewSeedScreen(
 				focusManager.clearFocus()
 				button(Action.GO_FORWARD, seedName.value)
 			},
-			isDisabled = seedName.value.isBlank() || (signerDataModel.seedNames.value?.contains(
+			isDisabled = seedName.value.isBlank() || seedNames.contains(
 				seedName.value
-			) != false)
+			)
 		)
 	}
 	DisposableEffect(Unit) {

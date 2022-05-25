@@ -27,12 +27,14 @@ fun ScreenSelector(
 	val button1: (Action) -> Unit = { action -> button(action, "", "") }
 	val button2: (Action, String) -> Unit =
 		{ action, details -> button(action, details, "") }
+	val seedNames = signerDataModel.seedNames.value ?: emptyArray()
+
 	when (screenData) {
 		is ScreenData.DeriveKey -> NewAddressScreen(
 			screenData.f,
 			button = button2,
 			addKey = signerDataModel::addKey,
-			dbName = signerDataModel.dbName,
+			checkPath = signerDataModel::checkPath,
 		)
 		ScreenData.Documents -> Documents()
 		is ScreenData.KeyDetails -> ExportPublicKey(screenData.f)
@@ -53,69 +55,60 @@ fun ScreenSelector(
 			button2,
 		)
 		is ScreenData.NNetworkDetails -> NetworkDetails(
-			screenData.f, // default fallback
+			screenData.f,
 			button2
 		)
 		is ScreenData.NewSeed -> NewSeedScreen(
 			screenData.f,
 			signerDataModel::pushButton,
-			signerDataModel = signerDataModel
+			seedNames
 		)
 		is ScreenData.RecoverSeedName -> RecoverSeedName(
 			screenData.f,
 			signerDataModel::pushButton,
-			signerDataModel = signerDataModel
+			seedNames
 		)
 		is ScreenData.RecoverSeedPhrase -> RecoverSeedPhrase(
-			screenData.f,
-			signerDataModel::pushButton,
-			signerDataModel = signerDataModel
+			recoverSeedPhrase = screenData.f,
+			button = signerDataModel::pushButton,
+			addSeed = signerDataModel::addSeed
 		)
 		ScreenData.Scan -> ScanScreen(
 			progress = progress,
 			captured = captured,
 			total = total,
 			button = signerDataModel::pushButton,
-			signerDataModel = signerDataModel,
+			handleCameraPermissions = signerDataModel::handleCameraPermissions,
+			processFrame = signerDataModel::processFrame
 		)
 		is ScreenData.SeedSelector -> SeedManager(
 			screenData.f,
-			signerDataModel = signerDataModel
+			button2
 		)
 		is ScreenData.SelectSeedForBackup -> SelectSeedForBackup(
 			screenData.f,
-			signerDataModel = signerDataModel
+			button2
 		)
 		is ScreenData.Settings -> SettingsScreen(
 			screenData.f,
 			button1 = button1,
-			isStrongBoxProtected = { signerDataModel.isStrongBoxProtected() },
-			getAppVersion = { signerDataModel.getAppVersion() },
-			wipeToFactory = { signerDataModel.wipeToFactory() },
+			isStrongBoxProtected = signerDataModel::isStrongBoxProtected,
+			getAppVersion = signerDataModel::getAppVersion,
+			wipeToFactory = signerDataModel::wipeToFactory,
 			alertState = alertState,
 		)
 		is ScreenData.SignSufficientCrypto -> SignSufficientCrypto(
 			screenData.f,
-			signSufficientCrypto = { seedName, addressKey ->
-				signerDataModel.signSufficientCrypto(
-					seedName,
-					addressKey
-				)
-			}
+			signerDataModel::signSufficientCrypto
 		)
 		is ScreenData.Transaction -> TransactionPreview(
 			screenData.f,
 			signerDataModel::pushButton,
-			signTransaction = { comment, seedName ->
-				signerDataModel.signTransaction(
-					comment,
-					seedName
-				)
-			}
+			signerDataModel::signTransaction
 		)
 		is ScreenData.VVerifier -> VerifierScreen(
 			screenData.f,
-			wipeToJailbreak = { signerDataModel.wipeToJailbreak() }
+			signerDataModel::wipeToJailbreak
 		)
 	}
 }
@@ -140,7 +133,7 @@ fun ModalSelector(
 			modalData.f,
 			alertState,
 			button1,
-			removeSeed = { signerDataModel.removeSeed(it) }
+			signerDataModel::removeSeed
 		)
 		is ModalData.NetworkSelector -> NetworkSelector(
 			modalData.f,

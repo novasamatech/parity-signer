@@ -21,7 +21,10 @@ import io.parity.signer.uniffi.MSeeds
  * Select seed for backup
  */
 @Composable
-fun SelectSeedForBackup(seeds: MSeeds, signerDataModel: SignerDataModel) {
+fun SelectSeedForBackup(
+	seeds: MSeeds,
+	pushButton: (Action, String) -> Unit
+) {
 	val cards = seeds.seedNameCards
 
 	LazyColumn(
@@ -31,15 +34,15 @@ fun SelectSeedForBackup(seeds: MSeeds, signerDataModel: SignerDataModel) {
 		items(cards.size) { item ->
 			Row(
 				Modifier
-					//.padding(top = 3.dp, start = 12.dp, end = 12.dp)
+					// .padding(top = 3.dp, start = 12.dp, end = 12.dp)
 					.background(MaterialTheme.colors.Bg200)
 			) {
 				Row(
 					Modifier
 						.clickable {
-							signerDataModel.pushButton(
+							pushButton(
 								Action.BACKUP_SEED,
-								details = cards[item].seedName
+								cards[item].seedName
 							)
 						}
 						.weight(1f, true)

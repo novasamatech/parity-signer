@@ -26,7 +26,11 @@ import io.parity.signer.uniffi.MRecoverSeedPhrase
 fun RecoverSeedPhrase(
 	recoverSeedPhrase: MRecoverSeedPhrase,
 	button: (action: Action, details: String) -> Unit,
-	signerDataModel: SignerDataModel
+	addSeed: (
+		seedName: String,
+		seedPhrase: String,
+		createRoots: Boolean
+	) -> Unit
 ) {
 	val seedPhrase =
 		recoverSeedPhrase.draft // remember { mutableStateOf(listOf<String>()) }
@@ -90,10 +94,10 @@ fun RecoverSeedPhrase(
 				action = {
 					recoverSeedPhrase.seedName.let { seedName ->
 						seedPhraseReady?.let {
-							signerDataModel.addSeed(
-								seedName = seedName,
-								seedPhrase = it,
-								createRoots = createRoots.value
+							addSeed(
+								seedName,
+								it,
+								createRoots.value
 							)
 						}
 					}

@@ -9,8 +9,6 @@ import io.parity.signer.uniffi.Action
 import io.parity.signer.uniffi.qrparserGetPacketsTotal
 import io.parity.signer.uniffi.qrparserTryDecodeQrSequence
 
-// MARK: Camera tools begin
-
 /**
  * Barcode detecting function.
  * This uses experimental features

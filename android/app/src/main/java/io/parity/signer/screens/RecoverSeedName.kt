@@ -24,7 +24,7 @@ import io.parity.signer.uniffi.MRecoverSeedName
 fun RecoverSeedName(
 	recoverSeedName: MRecoverSeedName,
 	button: (action: Action, details: String) -> Unit,
-	signerDataModel: SignerDataModel
+	seedNames: Array<String>
 ) {
 	val seedName = remember { mutableStateOf("") }
 	val focusManager = LocalFocusManager.current
@@ -47,9 +47,9 @@ fun RecoverSeedName(
 				seedName.value = it
 			},
 			onDone = {
-				if (seedName.value.isNotBlank() && signerDataModel.seedNames.value?.contains(
+				if (seedName.value.isNotBlank() && !seedNames.contains(
 						seedName.value
-					) == false
+					)
 				) {
 					button(Action.GO_FORWARD, seedName.value)
 				}
@@ -72,9 +72,9 @@ fun RecoverSeedName(
 				focusManager.clearFocus()
 				button(Action.GO_FORWARD, seedName.value)
 			},
-			isDisabled = seedName.value.isBlank() || (signerDataModel.seedNames.value?.contains(
+			isDisabled = seedName.value.isBlank() || seedNames.contains(
 				seedName.value
-			) != false)
+			)
 		)
 	}
 
