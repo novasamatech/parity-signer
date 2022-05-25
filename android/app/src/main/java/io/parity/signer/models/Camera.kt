@@ -100,5 +100,3 @@ internal fun SignerDataModel.resetScan() {
 	_total.value = null
 	_progress.value = 0.0f
 }
-
-// MARK: Camera tools end

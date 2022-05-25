@@ -13,7 +13,6 @@ fun SignerDataModel.pushButton(
 	details: String = "",
 	seedPhrase: String = ""
 ) {
-	//Here we just list all possible arguments coming from backend
 	try {
 		_actionResult.value = backendAction(button, details, seedPhrase)
 	} catch (e: java.lang.Exception) {

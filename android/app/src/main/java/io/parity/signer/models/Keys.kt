@@ -34,7 +34,11 @@ fun SignerDataModel.increment(number: Int, seedName: String) {
 	}
 }
 
-fun SignerDataModel.checkPath(seedName: String, path: String, network: String): DerivationCheck {
+fun SignerDataModel.checkPath(
+	seedName: String,
+	path: String,
+	network: String
+): DerivationCheck {
 	return substratePathCheck(
 		seedName = seedName,
 		path = path,

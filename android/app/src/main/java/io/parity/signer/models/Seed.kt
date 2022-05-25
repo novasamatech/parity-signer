@@ -8,8 +8,6 @@ import io.parity.signer.uniffi.historySeedNameWasShown
 import io.parity.signer.uniffi.initNavigation
 import io.parity.signer.uniffi.updateSeedNames
 
-// MARK: Seed management begin
-
 /**
  * Refresh seed names list
  * should be called within authentication envelope

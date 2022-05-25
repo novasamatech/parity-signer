@@ -12,15 +12,6 @@ fun String.decodeHex(): ByteArray {
 	return chunked(2).map { it.toInt(16).toByte() }.toByteArray()
 }
 
-/*
-fun String.encode64(): String {
-	return Base64.encodeToString(this.toByteArray(), Base64.DEFAULT)
-}
-
-fun String.decode64(): String {
-	return String(Base64.decode(this, Base64.DEFAULT))
-}
-*/
 /**
  * Replace middle of long string with "..."
  * length: number of symbols to keep on either side

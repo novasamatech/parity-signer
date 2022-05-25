@@ -84,9 +84,9 @@ fun PasswordConfirm(
 		}
 	}
 	DisposableEffect(Unit) {
-		//if (signerDataModel.modalData.value?.optBoolean("keyboard") == true) {
+		// if (signerDataModel.modalData.value?.optBoolean("keyboard") == true) {
 		focusRequester.requestFocus()
-		//}
+		// }
 		onDispose { focusManager.clearFocus() }
 	}
 }
