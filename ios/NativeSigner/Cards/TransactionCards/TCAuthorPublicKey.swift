@@ -11,7 +11,7 @@ struct TCAuthorPublicKey: View {
     var value: MVerifierDetails
     var body: some View {
         HStack {
-            Image(systemName: "circle.fill").foregroundColor(Color("Text600")).imageScale(.large)
+            Identicon(identicon: value.identicon)
             VStack (alignment: .leading) {
                 Text("Signed with " + value.encryption)
                     .foregroundColor(Color("Text400")).font(FBase(style: .body2))

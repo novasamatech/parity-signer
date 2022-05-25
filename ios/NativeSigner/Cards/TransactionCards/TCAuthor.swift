@@ -15,7 +15,7 @@ struct TCAuthor: View {
             VStack (alignment: .leading) {
                 Text("From:")
                     .foregroundColor(Color("Text400"))
-                Text(author.seedName + author.path + (author.hasPwd == true ? "///" : "")) //TODO: hasPwd should be real field
+                Text(author.seedName + author.path + (author.hasPwd == true ? "///" : ""))
                     .foregroundColor(Color("Crypto400"))
                 Text(author.base58)
                     .font(.caption2)
