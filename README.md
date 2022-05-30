@@ -143,11 +143,14 @@ However, we strongly recommend that you use a real device for development, as so
 
 1. Install NDK. Go to `File -> Project Structure -> SDK Location`. Next to the "Android NDK location" section, click "Download Android NDK" button.
 
-We hightly recommend you to update all existing plugins and SDK's for Kotlin, Gradle, etc even if you just downloaded a fresh Android Studio. It's always a good idea to restart Android Studio after that. This can save you many hours on Stackoverflow trying to fix random errors like "NDK not found".
+1. Connect your device or create a virtual one. Open `Tools -> Device Manager` and create a new phone simulator with the latest Android.
 
-4. Connect your device or create a virtual one. Open `Tools -> Device Manager` and create a new phone simulator with the latest Android.
+1. Run the project (Ctrl+R). It should build the Rust core library automatically.
 
-5. Run the project (Ctrl+R). It should build the Rust core library automatically.
+⚠️  We hightly recommend you to update all existing plugins and SDK's for Kotlin, Gradle,
+etc even if you just downloaded a fresh Android Studio. It's always a good idea to restart
+Android Studio after that. This can save you many hours on Stackoverflow trying to fix
+random errors like "NDK not found".
 
 # Tests
 
