@@ -1,4 +1,5 @@
 use bip39::{Language, Mnemonic};
+use constants::test_values::alice_sr_secret_abracadabra;
 use definitions::history::{
     Entry, IdentityHistory, MetaValuesDisplay, MetaValuesExport, NetworkSpecsDisplay,
     NetworkSpecsExport, NetworkVerifierDisplay, SignDisplay, SignMessageDisplay, TypesExport,
@@ -481,7 +482,19 @@ fn derive_prep_alice_collided() {
             .to_string(),
         suggested_derivation: "//Alice".to_string(),
         keyboard: false,
-        derivation_check: None,
+        derivation_check: Some(NavDerivationCheck {
+            button_good: false,
+            where_to: None,
+            collision: Some(Address {
+                base58: "5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY".to_string(),
+                path: "//Alice".to_string(),
+                has_pwd: false,
+                identicon: alice_sr_alice().to_vec(),
+                seed_name: "Alice".to_string(),
+                multiselect: None,
+            }),
+            error: None,
+        }),
     };
     assert_eq!(key, expected_key);
     fs::remove_dir_all(dbname).unwrap();
@@ -536,7 +549,19 @@ fn derive_prep_alice_collided_with_password() {
             .to_string(),
         suggested_derivation: "//secret///abracadabra".to_string(),
         keyboard: false,
-        derivation_check: None, //TODO "collision":{"base58":"5EkMjdgyuHqnWA9oWXUoFRaMwMUgMJ1ik9KtMpPNuTuZTi2t","path":"//secret","has_pwd":true,"identicon":"<alice_sr25519_//secret///abracadabra>","seed_name":"Alice"}
+        derivation_check: Some(NavDerivationCheck {
+            button_good: false,
+            where_to: None,
+            collision: Some(Address {
+                base58: "5EkMjdgyuHqnWA9oWXUoFRaMwMUgMJ1ik9KtMpPNuTuZTi2t".to_string(),
+                path: "//secret".to_string(),
+                has_pwd: true,
+                identicon: alice_sr_secret_abracadabra().to_vec(),
+                seed_name: "Alice".to_string(),
+                multiselect: None,
+            }),
+            error: None,
+        }),
     };
     assert_eq!(key, expected_key);
     fs::remove_dir_all(dbname).unwrap();

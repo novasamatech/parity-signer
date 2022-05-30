@@ -433,19 +433,23 @@ pub fn derive_prep(
     keyboard: bool,
 ) -> Result<MDeriveKey, ErrorSigner> {
     let network_specs = get_network_specs(database_name, network_specs_key)?;
-    let _collision = collision.map(|(multisigner, address_details)| {
+    let derivation_check = collision.map(|(multisigner, address_details)| {
         let base58 = print_multisigner_as_base58(&multisigner, Some(network_specs.base58prefix));
         let path = address_details.path;
         let has_pwd = address_details.has_pwd;
         let identicon = make_identicon_from_multisigner(&multisigner);
         let seed_name = seed_name.to_string();
-        Address {
+        let collision = Address {
             base58,
             path,
             has_pwd,
             identicon,
             seed_name,
             multiselect: None,
+        };
+        NavDerivationCheck {
+            collision: Some(collision),
+            ..Default::default()
         }
     });
 
@@ -456,7 +460,7 @@ pub fn derive_prep(
         network_specs_key: hex::encode(network_specs_key.key()),
         suggested_derivation: suggest.to_string(),
         keyboard,
-        derivation_check: None,
+        derivation_check,
     })
 }
 
