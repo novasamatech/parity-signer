@@ -59,7 +59,7 @@ fun TransactionCard(card: TransactionCard) {
 			is Card.NetworkNameCard -> TCNetworkName(text = txCard.f)
 			is Card.NewSpecsCard -> TCNewSpecs(specs = txCard.f)
 			is Card.NonceCard -> TCNonce(text = txCard.f)
-			Card.NoneCard -> {}
+			Card.NoneCard -> Text("None")
 			is Card.PalletCard -> TCPallet(text = txCard.f)
 			is Card.TextCard -> Text(String(txCard.f.decodeHex()))
 			is Card.TipCard -> TCTip(txCard.f)
