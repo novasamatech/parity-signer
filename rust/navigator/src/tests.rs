@@ -75,6 +75,10 @@ lazy_static! {
     static ref OS_MSG: Regex = Regex::new(r#"Os \{[^}]*\}"#).expect("checked_construction");
 }
 
+fn cut_os_msg(error: &str) -> String {
+    OS_MSG.replace_all(error, r#"Os {**}"#).to_string()
+}
+
 fn cut_seed_remove_identicon(data: &mut Option<ModalData>) -> String {
     if let Some(ModalData::NewSeedBackup { f }) = data {
         let res = f.seed_phrase.clone();
@@ -6330,7 +6334,7 @@ fn flow_test_1() {
                             sign_message_display: SignMessageDisplay {
                                 message,
                                 network_name: "westend".to_string(),
-                                signed_by: verifier_value,
+                                signed_by: verifier_value.clone(),
                                 user_comment: "Pepper tries sending text from passworded account"
                                     .to_string(),
                             },
@@ -6433,45 +6437,130 @@ fn flow_test_1() {
     );
 
     do_action(Action::GoBack, "", "").unwrap().unwrap();
-    /* TODO: This piece has to be re-worked with error handling.
 
-        {
-            let _database = db_handling::helpers::open_db::<Signer>(dbname).unwrap(); // database got unavailable for some reason
+    {
+        // database got unavailable for some reason
+        let _database = db_handling::helpers::open_db::<Signer>(dbname).unwrap();
 
-            let real_json = do_action(Action::NavbarKeys, "", "").unwrap();
-            let expected_json = r#"{"screen":"SeedSelector","screenLabel":"Select seed","back":false,"footer":true,"footerButton":"Keys","rightButton":"NewSeed","screenNameType":"h1","modal":"Empty","alert":"ErrorDisplay","screenData":{"seedNameCards":[]},"modalData":{},"alertData":{"error":"Database error. Internal error. IO error: could not acquire lock on "for_tests/flow_test_1/db": Os {**}"}}"#;
-            let cut_real_json = cut_os_msg(&real_json);
-            assert!(cut_real_json == expected_json, "Tried to switch from Log to Keys with unavailable database. Expected empty SeedSelector with ErrorDisplay alert, got:\n{}", real_json);
-
-            let real_json = do_action(Action::GoBack, "", "").unwrap();
-            let expected_json = r#"{"screen":"Settings","screenLabel":"","back":false,"footer":true,"footerButton":"Settings","rightButton":"None","screenNameType":"h4","modal":"Empty","alert":"Empty","screenData":{"error":"Database error. Internal error. IO error: could not acquire lock on "for_tests/flow_test_1/db": Os {**}"},"modalData":{},"alertData":{}}"#;
-            let cut_real_json = cut_os_msg(&real_json);
-            assert!(cut_real_json == expected_json, "GoBack on SeedSelector with ErrorDisplay alert. Expected Settings screen with error displayed in screen details, got:\n{}", real_json);
+        let mut action = do_action(Action::NavbarKeys, "", "").unwrap().unwrap();
+        let expected_alert = "Database error. Internal error. IO error: could not acquire lock on \"for_tests/flow_test_1/db\": Os {**}".to_string();
+        let expected_action = ActionResult {
+            screen_label: "Select seed".to_string(),
+            back: false,
+            footer: true,
+            footer_button: Some(FooterButton::Keys),
+            right_button: Some(RightButton::NewSeed),
+            screen_name_type: ScreenNameType::H1,
+            modal_data: None,
+            alert_data: Some(AlertData::ErrorData { f: expected_alert }),
+            screen_data: ScreenData::Settings {
+                f: MSettings {
+                    ..Default::default()
+                },
+            },
+        };
+        if let Some(AlertData::ErrorData { ref mut f }) = action.alert_data {
+            *f = cut_os_msg(f);
+        } else {
+            panic!("Expected AlertData::ErrorData");
         }
 
-        // Aaand, we are back
-        let real_json = do_action(Action::NavbarSettings, "", "").unwrap();
-        assert!(
-            real_json == current_settings_json,
-            "Reload Settings. Expected known Settings screen with no errors, got:\n{}",
-            real_json
+        assert_eq!(
+            action, expected_action,
+            "Tried to switch from Log to Keys with unavailable database."
         );
 
-        let real_json = do_action(Action::NavbarLog, "", "").unwrap();
-        let cut_real_json = cut_public_key(&cut_base58(&cut_identicon(&timeless(&real_json))));
-        let expected_json = r#"{"screen":"Log","screenLabel":"","back":false,"footer":true,"footerButton":"Log","rightButton":"LogRight","screenNameType":"h4","modal":"Empty","alert":"Empty","screenData":{"log":[{"order":1,"timestamp":"**","events":[{"event":"message_signed","payload":{"message":"4c6f72656d20697073756d20646f6c6f722073697420616d65742c20636f6e73656374657475722061646970697363696e6720656c69742c2073656420646f20656975736d6f642074656d706f7220696e6369646964756e74207574206c61626f726520657420646f6c6f7265206d61676e6120616c697175612e20557420656e696d206164206d696e696d2076656e69616d2c2071756973206e6f737472756420657865726369746174696f6e20756c6c616d636f206c61626f726973206e69736920757420616c697175697020657820656120636f6d6d6f646f20636f6e7365717561742e2044756973206175746520697275726520646f6c6f7220696e20726570726568656e646572697420696e20766f6c7570746174652076656c697420657373652063696c6c756d20646f6c6f726520657520667567696174206e756c6c612070617269617475722e204578636570746575722073696e74206f6363616563617420637570696461746174206e6f6e2070726f6964656e742c2073756e7420696e2063756c706120717569206f666669636961206465736572756e74206d6f6c6c697420616e696d20696420657374206c61626f72756d2e","network_name":"westend","signed_by":{"public_key":"**","identicon":"**","encryption":"sr25519"},"user_comment":"Pepper tries better"}}]},{"order":0,"timestamp":"**","events":[{"event":"history_cleared"}]}],"total_entries":2},"modalData":{},"alertData":{}}"#;
-        assert!(
-            cut_real_json == expected_json,
-            "Switched to Log from Settings. Expected Log screen, got:\n{}",
-            real_json
-        );
+        let mut action = do_action(Action::GoBack, "", "").unwrap().unwrap();
 
-        // What if the database is not initiated properly? This should have been a separate test, but mutex.
-        populate_cold_nav_test(dbname).unwrap(); // no init after population
-        let real_json = do_action(Action::NavbarSettings, "", "").unwrap();
-        let expected_json = r#"{"screen":"Settings","screenLabel":"","back":false,"footer":true,"footerButton":"Settings","rightButton":"None","screenNameType":"h4","modal":"Empty","alert":"Empty","screenData":{"error":"Could not find general verifier."},"modalData":{},"alertData":{}}"#;
-        assert!(real_json == expected_json, "Switched to Settings from Log with non-initiated database. Expected Settings screen with error on screen, and no alerts (we should still allow to reset Signer), got:\n{}", real_json);
-    */
+        if let Some(AlertData::ErrorData { ref mut f }) = action.alert_data {
+            *f = cut_os_msg(f);
+        } else {
+            panic!("Expected AlertData::ErrorData");
+        }
+
+        assert_eq!(
+            action, expected_action,
+            "GoBack on SeedSelector with ErrorDisplay alert."
+        );
+    }
+
+    // Aaand, we are back
+    let action = do_action(Action::NavbarSettings, "", "").unwrap().unwrap();
+    assert_eq!(
+        action, current_settings_action,
+        "Reload Settings. Expected known Settings screen with no errors.",
+    );
+
+    let mut action = do_action(Action::NavbarLog, "", "").unwrap().unwrap();
+    erase_log_timestamps(&mut action.screen_data);
+    let expected_action = ActionResult {
+        screen_label: String::new(),
+        back: false,
+        footer: true,
+        footer_button: Some(FooterButton::Log),
+        right_button: Some(RightButton::LogRight),
+        screen_name_type: ScreenNameType::H4,
+        screen_data: ScreenData::Log {
+            f: MLog {
+                log: vec![
+                    History {
+                        order: 1,
+                        timestamp: String::new(),
+                        events: vec![Event::MessageSigned {
+                            sign_message_display: SignMessageDisplay {
+                                message: String::from_utf8_lossy(&hex::decode(&card_text).unwrap())
+                                    .to_string(),
+                                network_name: "westend".to_string(),
+                                signed_by: verifier_value,
+                                user_comment: "Pepper tries better".to_string(),
+                            },
+                        }],
+                    },
+                    History {
+                        order: 0,
+                        timestamp: String::new(),
+                        events: vec![Event::HistoryCleared],
+                    },
+                ],
+            },
+        },
+        modal_data: None,
+        alert_data: None,
+    };
+    assert_eq!(
+        action, expected_action,
+        "Switched to Log from Settings. Expected Log screen.",
+    );
+
+    // no init after population
+    populate_cold_nav_test(dbname).unwrap();
+    let action = do_action(Action::NavbarSettings, "", "").unwrap().unwrap();
+    let expected_action = ActionResult {
+        screen_label: String::new(),
+        back: false,
+        footer: true,
+        footer_button: Some(FooterButton::Settings),
+        right_button: None,
+        screen_name_type: ScreenNameType::H4,
+        screen_data: ScreenData::Settings {
+            f: MSettings {
+                ..Default::default()
+            },
+        },
+        modal_data: None,
+        alert_data: Some(AlertData::ErrorData {
+            f: "Could not find general verifier.".to_string(),
+        }),
+    };
+
+    assert_eq!(
+        action, expected_action,
+        concat!(
+            "Switched to Settings from Log with non-initiated database. ",
+            "Expected Settings screen with error on screen, and no alerts ",
+            "(we should still allow to reset Signer)"
+        )
+    );
 
     std::fs::remove_dir_all(dbname).unwrap();
 }
