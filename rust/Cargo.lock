@@ -3890,11 +3890,12 @@ dependencies = [
 
 [[package]]
 name = "uniffi_build"
-version = "0.8.0"
+version = "0.17.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "fa6892022dca2c387d91aced1ae78f12cca854cdf395ae8035616d100d54f18c"
+checksum = "b7b35d8e19c773c42176343a92ce8480443e5aa19f02deb75572acf7f8a51bbb"
 dependencies = [
  "anyhow",
+ "uniffi_bindgen",
 ]
 
 [[package]]

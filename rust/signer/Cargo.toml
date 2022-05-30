@@ -34,7 +34,7 @@ jni = { version = "0.16.0" }
 [build-dependencies]
 definitions = {path = "../definitions"}
 generate_message = {path = "../generate_message"}
-uniffi_build = "0.8"
+uniffi_build = { version = "0.17.0", features = ["builtin-bindgen"] }
 
 [lib]
 crate-type = ["staticlib", "cdylib"]
