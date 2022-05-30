@@ -210,7 +210,11 @@ pub fn print_identities_for_seed_name_and_network(
             other_id.push((multisigner, address_details, identicon, swiped, multiselect))
         }
     }
-    let root = root_id.unwrap_or_default();
+    let root = root_id.unwrap_or(MSeedKeyCard {
+        seed_name: seed_name.to_string(),
+        identicon: EMPTY_PNG.to_vec(),
+        ..Default::default()
+    });
     let set: Vec<_> = other_id
         .into_iter()
         .map(

@@ -12,7 +12,7 @@ use constants::{
         alice_sr_alice_westend, alice_sr_kusama, alice_sr_polkadot, alice_sr_root,
         alice_sr_secret_path_multipass, alice_sr_westend, alice_sr_westend_0, alice_sr_westend_1,
         alice_sr_westend_2, alice_westend_alice_qr, alice_westend_alice_secret_secret_qr,
-        alice_westend_root_qr, alice_westend_westend_qr, bob, kusama_9130, kusama_9151,
+        alice_westend_root_qr, alice_westend_westend_qr, bob, empty_png, kusama_9130, kusama_9151,
         types_known,
     },
     ALICE_SEED_PHRASE,
@@ -2654,7 +2654,11 @@ fn flow_test_1() {
                 }],
                 // since root == 'false' in do_action above.
                 // TODO: This has to be wrapped with Option<_>.
-                root: MSeedKeyCard::default(),
+                root: MSeedKeyCard {
+                    seed_name: "Alice".to_string(),
+                    identicon: empty_png().to_vec(),
+                    ..Default::default()
+                },
                 network: MNetworkCard {
                     title: "Polkadot".to_string(),
                     logo: "polkadot".to_string(),
@@ -2891,7 +2895,11 @@ fn flow_test_1() {
                 ],
                 // since root == 'false' in do_action above.
                 // TODO: This has to be wrapped with Option<_>.
-                root: MSeedKeyCard::default(),
+                root: MSeedKeyCard {
+                    seed_name: "Alice".to_string(),
+                    identicon: empty_png().to_vec(),
+                    ..Default::default()
+                },
                 network: MNetworkCard {
                     title: "Polkadot".to_string(),
                     logo: "polkadot".to_string(),
@@ -3404,7 +3412,11 @@ fn flow_test_1() {
                     swiped: false,
                     multiselect: false,
                 }],
-                root: MSeedKeyCard::default(),
+                root: MSeedKeyCard {
+                    seed_name: "Alice".to_string(),
+                    identicon: empty_png().to_vec(),
+                    ..Default::default()
+                },
                 network: MNetworkCard {
                     title: "Westend".to_string(),
                     logo: "westend".to_string(),
@@ -3567,8 +3579,8 @@ fn flow_test_1() {
                     },
                 ],
                 root: MSeedKeyCard {
-                    seed_name: String::new(), // TODO: "Alice".to_string(),
-                    identicon: vec![],        // TODO: empty_png(),
+                    seed_name: "Alice".to_string(),
+                    identicon: empty_png().to_vec(),
                     address_key: String::new(),
                     base58: String::new(),
                     swiped: false,
@@ -3791,12 +3803,9 @@ fn flow_test_1() {
                     },
                 ],
                 root: MSeedKeyCard {
-                    seed_name: String::new(), // TODO: "Alice".to_string(),
-                    identicon: vec![],        // TODO: empty_png(),
-                    address_key: String::new(),
-                    base58: String::new(),
-                    swiped: false,
-                    multiselect: false,
+                    seed_name: "Alice".to_string(),
+                    identicon: empty_png().to_vec(),
+                    ..Default::default()
                 },
                 network: MNetworkCard {
                     title: "Westend".to_string(),
@@ -5698,7 +5707,7 @@ fn flow_test_1() {
                     multiselect: false,
                 }],
                 root: MSeedKeyCard {
-                    seed_name: String::new(), // TODO "Pepper".to_string(),
+                    seed_name: "Pepper".to_string(),
                     identicon: vec![],
                     address_key: String::new(),
                     base58: String::new(),
@@ -5755,12 +5764,8 @@ fn flow_test_1() {
                     multiselect: false,
                 }],
                 root: MSeedKeyCard {
-                    seed_name: String::new(), // TODO "Pepper".to_string(),
-                    identicon: vec![],
-                    address_key: String::new(),
-                    base58: String::new(),
-                    swiped: false,
-                    multiselect: false,
+                    seed_name: "Pepper".to_string(),
+                    ..Default::default()
                 },
                 network: MNetworkCard {
                     title: "Westend".to_string(),
@@ -6110,12 +6115,8 @@ fn flow_test_1() {
                     multiselect: false,
                 }],
                 root: MSeedKeyCard {
-                    seed_name: String::new(), // TODO "Pepper".to_string(),
-                    identicon: vec![],
-                    address_key: String::new(),
-                    base58: String::new(),
-                    swiped: false,
-                    multiselect: false,
+                    seed_name: "Pepper".to_string(),
+                    ..Default::default()
                 },
                 network: MNetworkCard {
                     title: "Westend".to_string(),
