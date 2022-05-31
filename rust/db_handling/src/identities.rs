@@ -755,7 +755,7 @@ pub enum DerivationCheck {
 /// of password-free valid derivation. Bad format of the derivation is **not**
 /// an error, UI just does not allow to proceed.
 #[cfg(feature = "signer")]
-pub(crate) fn derivation_check(
+pub fn derivation_check(
     seed_name: &str,
     path: &str,
     network_specs_key: &NetworkSpecsKey,

@@ -671,14 +671,24 @@ impl State {
         (new_navstate, errorline)
     }
 
-    fn handle_new_key(&self, details_str: &str) -> (Navstate, String) {
+    fn handle_new_key(&self, dbname: &str, details_str: &str) -> (Navstate, String) {
         let mut new_navstate = self.navstate.clone();
         let errorline = String::new();
         match self.navstate.screen {
             Screen::Keys(ref keys_state) => {
+                let collision = match db_handling::identities::derivation_check(
+                    &keys_state.seed_name(),
+                    details_str,
+                    &keys_state.network_specs_key(),
+                    dbname,
+                ) {
+                    Ok(db_handling::identities::DerivationCheck::NoPassword(a)) => a,
+                    _ => None,
+                };
                 new_navstate = Navstate::clean_screen(Screen::DeriveKey(DeriveState::new(
                     details_str,
                     keys_state,
+                    collision,
                 )));
             }
             _ => println!("NewKey does nothing here"),
@@ -1833,7 +1843,7 @@ impl State {
                 }
                 Action::SelectSeed => self.handle_select_seed(dbname, details_str),
                 Action::SelectKey => self.handle_select_key(dbname, details_str),
-                Action::NewKey => self.handle_new_key(details_str),
+                Action::NewKey => self.handle_new_key(dbname, details_str),
                 Action::RightButtonAction => self.handle_right_button(),
                 Action::Shield => self.handle_shield(),
                 Action::NewSeed => self.handle_new_seed(),

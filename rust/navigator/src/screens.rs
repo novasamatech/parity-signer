@@ -349,11 +349,15 @@ impl AddressStateMulti {
 }
 
 impl DeriveState {
-    pub fn new(entered_string: &str, keys_state: &KeysState) -> Self {
+    pub fn new(
+        entered_string: &str,
+        keys_state: &KeysState,
+        collision: Option<(MultiSigner, AddressDetails)>,
+    ) -> Self {
         Self {
             entered_info: EnteredInfo(entered_string.to_string()),
             keys_state: keys_state.to_owned(),
-            collision: None,
+            collision,
         }
     }
     pub fn blank_keys_state(&self) -> KeysState {
