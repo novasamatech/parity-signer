@@ -685,10 +685,7 @@ pub fn history_hex_checksum(database_name: &str) -> Result<String, ErrorSigner> 
     let checksum = history
         .checksum()
         .map_err(|e| ErrorSigner::Database(DatabaseSigner::Internal(e)))?;
-    Ok(format!(
-        "\"checksum\":\"{}\"",
-        hex::encode(checksum.encode()).to_uppercase()
-    ))
+    Ok(hex::encode(checksum.encode()).to_uppercase())
 }
 
 /// Clear transaction tree of the database.
