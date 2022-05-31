@@ -90,13 +90,25 @@ struct HistoryCardExtended: View {
                 line1: "Network removed",
                 line2: value.specs.title
             )
-            case .networkVerifierSet(let value): HistoryCardTemplate(
-                image: "checkmark.shield",
-                timestamp: timestamp,
-                danger: false,
-                line1: "Network verifier set",
-                line2: value.genesisHash.map{String(format: "%02X", $0)}.joined()
-            )
+            case .networkVerifierSet(let value):
+                switch(value.validCurrentVerifier) {
+                case .general:
+                    HistoryCardTemplate(
+                    image: "checkmark.shield",
+                    timestamp: timestamp,
+                    danger: false,
+                    line1: "Network verifier set",
+                    line2: value.generalVerifier.show() + " for network with genesis hash " + value.genesisHash.map{String(format: "%02X", $0)}.joined()
+                )
+                case .custom(let verifier):
+                    HistoryCardTemplate(
+                    image: "checkmark.shield",
+                    timestamp: timestamp,
+                    danger: false,
+                    line1: "Network verifier set",
+                    line2: verifier.show() + " for network with genesis hash " + value.genesisHash.map{String(format: "%02X", $0)}.joined()
+                )
+                }
             case .resetDangerRecord: HistoryCardTemplate(
                 image: "checkmark.shield",
                 timestamp: timestamp,

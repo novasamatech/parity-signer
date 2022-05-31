@@ -95,7 +95,7 @@ struct HistoryCard: View {
                 timestamp: timestamp,
                 danger: false,
                 line1: "Network verifier set",
-                line2: value.genesisHash.map{String(format: "%02X", $0)}.joined()
+                line2: value.validCurrentVerifier == .general ? "general" : "custom" + " for network with genesis hash " + value.genesisHash.map{String(format: "%02X", $0)}.joined()
             )
             case .resetDangerRecord: HistoryCardTemplate(
                 image: "checkmark.shield",
