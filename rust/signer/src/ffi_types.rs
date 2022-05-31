@@ -1,4 +1,5 @@
 use crate::UniffiCustomTypeConverter;
+use definitions::helpers::{multisigner_to_encryption, multisigner_to_public};
 pub use definitions::{
     crypto::Encryption,
     history::{
@@ -37,14 +38,17 @@ pub type MultiSigner = sp_runtime::MultiSigner;
 pub type H256 = sp_core::H256;
 
 impl UniffiCustomTypeConverter for sp_runtime::MultiSigner {
-    type Builtin = String;
+    type Builtin = Vec<String>;
 
-    fn into_custom(val: Self::Builtin) -> uniffi::Result<Self> {
-        Ok(serde_json::from_str(&val)?)
+    fn into_custom(_val: Self::Builtin) -> uniffi::Result<Self> {
+        panic!("UI never inputs the MultiSigner")
     }
 
     fn from_custom(obj: Self) -> Self::Builtin {
-        obj.to_string()
+        vec![
+            hex::encode(multisigner_to_public(&obj)),
+            multisigner_to_encryption(&obj).show(),
+        ]
     }
 }
 

@@ -3,6 +3,7 @@ package io.parity.signer.components
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.runtime.Composable
+import io.parity.signer.models.abbreviateString
 import io.parity.signer.models.encodeHex
 import io.parity.signer.uniffi.Event
 import io.parity.signer.uniffi.VerifierValue
@@ -38,7 +39,8 @@ fun HistoryCard(card: Event, timestamp: String) {
 						image = Icons.Default.Shield,
 						line1 = timestamp,
 						line2 = "General verifier set",
-						line3 = it.m
+						line3 = it.m.getOrElse(0) { "" }
+							.abbreviateString(8) + it.m.getOrElse(1) { "" }
 					)
 				}
 			}

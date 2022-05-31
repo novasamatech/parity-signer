@@ -22,7 +22,7 @@ typedef sequence<u8> Sr25519Public;
 typedef sequence<u8> EcdsaPublic;
 
 [Custom]
-typedef string MultiSigner;
+typedef sequence<string> MultiSigner;
 
 [Enum]
 interface VerifierValue {
