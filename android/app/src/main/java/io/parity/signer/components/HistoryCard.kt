@@ -6,6 +6,7 @@ import androidx.compose.runtime.Composable
 import io.parity.signer.models.abbreviateString
 import io.parity.signer.models.encodeHex
 import io.parity.signer.uniffi.Event
+import io.parity.signer.uniffi.ValidCurrentVerifier
 import io.parity.signer.uniffi.VerifierValue
 
 /**
@@ -135,12 +136,30 @@ fun HistoryCard(card: Event, timestamp: String) {
 			}
 		}
 		is Event.NetworkVerifierSet -> {
+			var line3 =
+				when (val ver = card.networkVerifierDisplay.validCurrentVerifier) {
+					is ValidCurrentVerifier.Custom -> {
+						when (val v = ver.v.v) {
+							is VerifierValue.Standard -> v.m.getOrElse(0) { "" }
+							null -> ""
+						}
+					}
+					ValidCurrentVerifier.General -> {
+						when (val v = card.networkVerifierDisplay.generalVerifier.v) {
+							is VerifierValue.Standard -> v.m.getOrElse(0) { "" }
+							null -> ""
+						}
+					}
+				}
+
+			line3 += " for network with genesis hash " + card.networkVerifierDisplay.genesisHash.toUByteArray()
+				.toByteArray().encodeHex()
 			card.networkVerifierDisplay.genesisHash.let {
 				HistoryCardTemplate(
 					image = Icons.Default.Shield,
 					line1 = timestamp,
 					line2 = "Network verifier set",
-					line3 = it.toUByteArray().toByteArray().encodeHex()
+					line3 = line3
 				)
 			}
 		}
