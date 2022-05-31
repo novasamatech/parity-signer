@@ -55,7 +55,7 @@ sign the update:
 - `0xff` means the update is not signed
 
 Derivations import and testing are always unsigned, with `<encryption code>`
-`0xff`.
+always `0xff`.
 
 Signer supports following `<payload code>` variants:
 
@@ -122,7 +122,7 @@ Signer can generate a signature for transaction only if:
 - the Signer has network specs on file for the network, with matching encryption
 - the Signer has metadata on file that corresponds to the metadata used to
 create the transaction on the hot side
-- key used is associated with the network
+- key used exists in Signer and is associated with the network
 
 ### Example
 
@@ -195,12 +195,101 @@ transaction posing as a message.
 SCALE-encoded String contains compact of the string length followed by `u8`
 representation of the string symbols. Transaction could be parsed by the message
 parser only if there are no transaction extensions including `Nonce`, thus they
-are clearly distinguished.
+are clearly distinguished. There are networks on `polkadot-js` that have zero
+length extensions (Shell, for one), so this is also not a truly safe situation.
+Shell, however, has `DisallowSigned` in extensions, so there could be some check
+designed, maybe. If another network does not name extension translating the same
+information as `ForbidSigned` or something along the lines.
 
-`<Bytes>` wrapped messages imply the would-be sneaked call data length is 15
-(`<` as byte decodes as `Compact`) and SCALE-extensions end with `[u8]` slice
-corresponding to `</Bytes>` String. This is a very specific situation, and
-although theoretically possible, it seems unlikely.
-
+`<Bytes>` wrapped messages imply the would-be sneaked call is done in pallet `<`
+with method `B`, and that the extensions (typically, the last one is block hash)
+end in `</Bytes>`. Although unlikely, this is possible.
 
 ## Update
+
+Update has following general structure:
+
+<table>
+    <tr>
+        <td>prelude</td><td>verifier public key (if signed)</td><td>update payload</td><td>reserved tail</td><td>signature (if signed)</td>
+    </tr>
+</table>
+
+Note that the `verifier public key` and `signature` parts appear only in signed
+uploads. Preludes `[0x53, 0xff, 0x<payload code>]` are followed only by the
+update payload.
+
+`reserved tail` currently is not used and is expected to be empty. It could be
+used later if the multisignatures are introduced for the updates. Expecting
+`reserved tail` in update processing is done to keep code continuity in case
+multisignatures introduction ever happens.
+
+Because of the `reserved tail`, the `update payload` length has to be always
+exactly declared, so that the `update payload` part could be cut correctly from
+the update.
+
+Detailed description of the update payloads and form in which they are used in
+update itself and for generating update signature, could be found in Rust module
+`definitions::qr_transfers`.
+
+### `add_specs` update payload
+
+Introduces a new network to Signer, i.e. adds network specs to the Signer
+database.
+
+Update payload consists of **double** SCALE-encoded `NetworkSpecsToSend` (second
+SCALE is to have the exact payload length).
+
+Payload signature is generated for SCALE-encoded `NetworkSpecsToSend`.
+
+### `load_metadata` update payload
+
+Loads metadata for a network already known to Signer, i.e. for a network with
+network specs in the Signer database.
+
+Update payload consists of concatenated SCALE-encoded metadata `Vec<u8>` and
+network genesis hash (H256, always 32 bytes).
+
+Same blob is used to generate the signature.
+
+### `load_types` update payload
+
+Loads types information.
+
+Type information is needed to decode transactions made in networks with metadata
+RuntimeMetadata version V12 or V13.
+
+Most of the networks are already using RuntimeMetadata version V14, which has
+types information incorporated in the metadata itself.
+
+The `load_types` update is expected to become obsolete soon.
+
+Update payload consists of **double** SCALE-encoded `Vec<TypeEntry>` (second
+SCALE is to have the exact payload length).
+
+Payload signature is generated for SCALE-encoded `Vec<TypeEntry>`.
+
+### Verifiers
+
+Signer can accept both verified and non-verified updates, however, information
+once verified can not be replaced or updated by a weaker verifier without full
+Signer reset.
+
+A verifier could be `Some(_)` with corresponding public key inside or `None`.
+All verifiers for the data follow trust on first use principle. If new
+verifier is set up instead of the old one, all the data that was verified by the
+old verifier gets removed to avoid confusion regarding which verifier has signed
+the data.
+
+General verifier is the strongest and the most reliable verifier known to the
+Signer. General verifier could sign all kinds of updates. By default the Signer
+uses Parity-associated key as general verifier, but users can remove it and set
+their own. There could be only one general verifier at any time.
+
+
+
+
+
+
+
+
