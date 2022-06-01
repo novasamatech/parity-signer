@@ -11,7 +11,7 @@ struct RecoverSeedPhrase: View {
     @EnvironmentObject var data: SignerDataModel
     @State private var userInput: String = " "
     @State private var createRoots: Bool = true
-    @State private var errorMessage: String? = ""
+    @State private var shadowUserInput: String = " "
     @FocusState private var focus: Bool
     var content: MRecoverSeedPhrase
     
@@ -47,9 +47,13 @@ struct RecoverSeedPhrase: View {
                                     .submitLabel(.done)
                                     .onChange(of: userInput, perform: { word in
                                         data.pushButton(action: .textEntry, details: word)
+                                        shadowUserInput = word
                                     })
                                     .onSubmit {
                                     }
+                                    .onChange(of: shadowUserInput, perform: { word in
+                                        userInput = " " + content.userInput
+                                    })
                                     .onChange(of: content, perform: { input in
                                         userInput = " " + input.userInput // TODO: this in rust
                                     })
