@@ -140,13 +140,13 @@ fun HistoryCard(card: Event, timestamp: String) {
 				when (val ver = card.networkVerifierDisplay.validCurrentVerifier) {
 					is ValidCurrentVerifier.Custom -> {
 						when (val v = ver.v.v) {
-							is VerifierValue.Standard -> v.m.getOrElse(0) { "" }
+							is VerifierValue.Standard -> "custom"
 							null -> ""
 						}
 					}
 					ValidCurrentVerifier.General -> {
 						when (val v = card.networkVerifierDisplay.generalVerifier.v) {
-							is VerifierValue.Standard -> v.m.getOrElse(0) { "" }
+							is VerifierValue.Standard -> "general"
 							null -> ""
 						}
 					}

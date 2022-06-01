@@ -7,6 +7,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import io.parity.signer.components.Identicon
 import io.parity.signer.components.MetadataCard
 import io.parity.signer.components.NetworkCard
 import io.parity.signer.uniffi.Action
@@ -52,12 +53,16 @@ fun NetworkDetails(
 				"general" -> {
 					Text("general")
 				}
-				"network" -> {
-					Column {
-						Text("custom")
-						Text(
-							networkDetails.currentVerifier.details.toString()
-						)
+				"custom" -> {
+					Row {
+						Identicon(identicon = networkDetails.currentVerifier.details.identicon)
+						Column {
+							Text("custom")
+							Text(
+								networkDetails.currentVerifier.details.publicKey
+							)
+							Text("encryption: " + networkDetails.currentVerifier.details.encryption)
+						}
 					}
 				}
 				"none" -> {

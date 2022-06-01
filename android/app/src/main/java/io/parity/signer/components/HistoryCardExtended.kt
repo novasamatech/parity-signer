@@ -153,13 +153,13 @@ fun HistoryCardExtended(
 				when (val ver = eventVal.networkVerifierDisplay.validCurrentVerifier) {
 					is ValidCurrentVerifier.Custom -> {
 						when (val v = ver.v.v) {
-							is VerifierValue.Standard -> v.m.getOrElse(0) { "" }
+							is VerifierValue.Standard -> v.m.getOrElse(0) { "" } + " with encryption " + v.m.getOrElse(1) {""}
 							null -> ""
 						}
 					}
 					ValidCurrentVerifier.General -> {
 						when (val v = eventVal.networkVerifierDisplay.generalVerifier.v) {
-							is VerifierValue.Standard -> v.m.getOrElse(0) { "" }
+							is VerifierValue.Standard -> "general"
 							null -> ""
 						}
 					}
