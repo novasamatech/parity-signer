@@ -26,17 +26,17 @@ use definitions::{
         NetworkSpecsExport, SignDisplay, SignMessageDisplay, TypesDisplay, TypesExport,
     },
     navigation::{
-        ActionResult, Address, AlertData, Card, DerivationCheck, DerivationEntry, DerivationPack,
-        FooterButton, History, MBackup, MDeriveKey, MEnterPassword, MEventMaybeDecoded,
-        MKeyDetails, MKeyDetailsMulti, MKeys, MKeysCard, MLog, MLogDetails, MLogRight, MMMNetwork,
-        MMNetwork, MManageMetadata, MManageNetworks, MMetadataRecord, MNetworkCard,
-        MNetworkDetails, MNetworkMenu, MNewSeed, MNewSeedBackup, MPasswordConfirm, MRawKey,
-        MRecoverSeedName, MRecoverSeedPhrase, MSCCall, MSCContent, MSCCurrency, MSCEnumVariantName,
-        MSCEraMortal, MSCFieldName, MSCId, MSCNameVersion, MSCNetworkInfo, MSeedKeyCard, MSeedMenu,
-        MSeeds, MSettings, MSignSufficientCrypto, MSignatureReady, MSufficientCryptoReady,
-        MTransaction, MTypesInfo, MVerifier, MVerifierDetails, ModalData, Network,
-        NetworkSpecsToSend, RightButton, ScreenData, ScreenNameType, SeedNameCard, TransactionCard,
-        TransactionCardSet, TransactionType,
+        ActionResult, Address, AlertData, Card, DerivationCheck, DerivationDestination,
+        DerivationEntry, DerivationPack, FooterButton, History, MBackup, MDeriveKey,
+        MEnterPassword, MEventMaybeDecoded, MKeyDetails, MKeyDetailsMulti, MKeys, MKeysCard, MLog,
+        MLogDetails, MLogRight, MMMNetwork, MMNetwork, MManageMetadata, MManageNetworks,
+        MMetadataRecord, MNetworkCard, MNetworkDetails, MNetworkMenu, MNewSeed, MNewSeedBackup,
+        MPasswordConfirm, MRawKey, MRecoverSeedName, MRecoverSeedPhrase, MSCCall, MSCContent,
+        MSCCurrency, MSCEnumVariantName, MSCEraMortal, MSCFieldName, MSCId, MSCNameVersion,
+        MSCNetworkInfo, MSeedKeyCard, MSeedMenu, MSeeds, MSettings, MSignSufficientCrypto,
+        MSignatureReady, MSufficientCryptoReady, MTransaction, MTypesInfo, MVerifier,
+        MVerifierDetails, ModalData, Network, NetworkSpecsToSend, RightButton, ScreenData,
+        ScreenNameType, SeedNameCard, TransactionCard, TransactionCardSet, TransactionType,
     },
     network_specs::{NetworkSpecs, ValidCurrentVerifier, Verifier, VerifierValue},
 };
@@ -2798,6 +2798,7 @@ fn flow_test_1() {
                 keyboard: true,
                 derivation_check: DerivationCheck {
                     button_good: true,
+                    where_to: Some(DerivationDestination::Pin),
                     ..Default::default()
                 },
             },
@@ -2838,6 +2839,7 @@ fn flow_test_1() {
                 keyboard: false,
                 derivation_check: DerivationCheck {
                     button_good: true,
+                    where_to: Some(DerivationDestination::Pwd),
                     ..Default::default()
                 },
             },
@@ -4233,6 +4235,7 @@ fn flow_test_1() {
                 keyboard: true,
                 derivation_check: DerivationCheck {
                     button_good: true,
+                    where_to: Some(DerivationDestination::Pin),
                     ..Default::default()
                 },
             },
@@ -6059,6 +6062,7 @@ fn flow_test_1() {
                 keyboard: true,
                 derivation_check: DerivationCheck {
                     button_good: true,
+                    where_to: Some(DerivationDestination::Pin),
                     ..Default::default()
                 },
             },
@@ -6080,6 +6084,7 @@ fn flow_test_1() {
     });
     if let ScreenData::DeriveKey { ref mut f } = expected_action.screen_data {
         f.suggested_derivation = "//0///secret".to_string();
+        f.derivation_check.where_to = Some(DerivationDestination::Pwd);
         f.keyboard = false;
     } else {
         panic!("");
