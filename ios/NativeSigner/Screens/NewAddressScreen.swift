@@ -12,7 +12,7 @@ struct NewAddressScreen: View {
     @EnvironmentObject var data: SignerDataModel
     @State var path: String = ""
     @FocusState private var focusedField: Bool
-    @State var derivationCheck: DerivationCheck? = nil
+    @State private var derivationCheck: DerivationCheck? = nil
     
     var content: MDeriveKey
     
@@ -88,12 +88,11 @@ struct NewAddressScreen: View {
             path = content.suggestedDerivation
             derivationCheck = content.derivationCheck
             focusedField = content.keyboard
-            print(content)
         }
-        .onChange(of: content) { newContent in
-            path = newContent.suggestedDerivation
-            derivationCheck = newContent.derivationCheck
-            focusedField = newContent.keyboard
+        .onChange(of: content) { _ in
+            path = content.suggestedDerivation
+            derivationCheck = content.derivationCheck
+            focusedField = content.keyboard
         }
     }
 }
