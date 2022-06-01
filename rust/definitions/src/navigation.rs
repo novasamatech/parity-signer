@@ -324,7 +324,7 @@ pub struct MDeriveKey {
     pub network_specs_key: String,
     pub suggested_derivation: String,
     pub keyboard: bool,
-    pub derivation_check: Option<DerivationCheck>,
+    pub derivation_check: DerivationCheck,
 }
 
 #[derive(Clone, Debug, Default, PartialEq)]

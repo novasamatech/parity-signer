@@ -415,7 +415,7 @@ dictionary MDeriveKey {
     string network_specs_key;
     string suggested_derivation;
     boolean keyboard;
-    DerivationCheck? derivation_check;
+    DerivationCheck derivation_check;
 };
 
 dictionary DerivationCheck {

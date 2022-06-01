@@ -26,17 +26,17 @@ use definitions::{
         NetworkSpecsExport, SignDisplay, SignMessageDisplay, TypesDisplay, TypesExport,
     },
     navigation::{
-        ActionResult, Address, AlertData, Card, DerivationEntry, DerivationPack, FooterButton,
-        History, MBackup, MDeriveKey, MEnterPassword, MEventMaybeDecoded, MKeyDetails,
-        MKeyDetailsMulti, MKeys, MKeysCard, MLog, MLogDetails, MLogRight, MMMNetwork, MMNetwork,
-        MManageMetadata, MManageNetworks, MMetadataRecord, MNetworkCard, MNetworkDetails,
-        MNetworkMenu, MNewSeed, MNewSeedBackup, MPasswordConfirm, MRawKey, MRecoverSeedName,
-        MRecoverSeedPhrase, MSCCall, MSCContent, MSCCurrency, MSCEnumVariantName, MSCEraMortal,
-        MSCFieldName, MSCId, MSCNameVersion, MSCNetworkInfo, MSeedKeyCard, MSeedMenu, MSeeds,
-        MSettings, MSignSufficientCrypto, MSignatureReady, MSufficientCryptoReady, MTransaction,
-        MTypesInfo, MVerifier, MVerifierDetails, ModalData, Network, NetworkSpecsToSend,
-        RightButton, ScreenData, ScreenNameType, SeedNameCard, TransactionCard, TransactionCardSet,
-        TransactionType,
+        ActionResult, Address, AlertData, Card, DerivationCheck, DerivationEntry, DerivationPack,
+        FooterButton, History, MBackup, MDeriveKey, MEnterPassword, MEventMaybeDecoded,
+        MKeyDetails, MKeyDetailsMulti, MKeys, MKeysCard, MLog, MLogDetails, MLogRight, MMMNetwork,
+        MMNetwork, MManageMetadata, MManageNetworks, MMetadataRecord, MNetworkCard,
+        MNetworkDetails, MNetworkMenu, MNewSeed, MNewSeedBackup, MPasswordConfirm, MRawKey,
+        MRecoverSeedName, MRecoverSeedPhrase, MSCCall, MSCContent, MSCCurrency, MSCEnumVariantName,
+        MSCEraMortal, MSCFieldName, MSCId, MSCNameVersion, MSCNetworkInfo, MSeedKeyCard, MSeedMenu,
+        MSeeds, MSettings, MSignSufficientCrypto, MSignatureReady, MSufficientCryptoReady,
+        MTransaction, MTypesInfo, MVerifier, MVerifierDetails, ModalData, Network,
+        NetworkSpecsToSend, RightButton, ScreenData, ScreenNameType, SeedNameCard, TransactionCard,
+        TransactionCardSet, TransactionType,
     },
     network_specs::{NetworkSpecs, ValidCurrentVerifier, Verifier, VerifierValue},
 };
@@ -2796,7 +2796,10 @@ fn flow_test_1() {
                     "0191b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3".to_string(),
                 suggested_derivation: String::new(),
                 keyboard: true,
-                derivation_check: None,
+                derivation_check: DerivationCheck {
+                    button_good: true,
+                    ..Default::default()
+                },
             },
         },
         modal_data: None,
@@ -2833,7 +2836,10 @@ fn flow_test_1() {
                     "0191b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3".to_string(),
                 suggested_derivation: "//secret//path///multipass".to_string(),
                 keyboard: false,
-                derivation_check: None,
+                derivation_check: DerivationCheck {
+                    button_good: true,
+                    ..Default::default()
+                },
             },
         },
         modal_data: Some(ModalData::PasswordConfirm {
@@ -4225,7 +4231,10 @@ fn flow_test_1() {
                     "01e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e".to_string(),
                 suggested_derivation: String::new(),
                 keyboard: true,
-                derivation_check: None,
+                derivation_check: DerivationCheck {
+                    button_good: true,
+                    ..Default::default()
+                },
             },
         },
         modal_data: None,
@@ -6048,7 +6057,10 @@ fn flow_test_1() {
                     "01e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e".to_string(),
                 suggested_derivation: String::new(),
                 keyboard: true,
-                derivation_check: None,
+                derivation_check: DerivationCheck {
+                    button_good: true,
+                    ..Default::default()
+                },
             },
         },
         modal_data: None,

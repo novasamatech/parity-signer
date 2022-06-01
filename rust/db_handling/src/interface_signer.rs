@@ -433,25 +433,31 @@ pub fn derive_prep(
     keyboard: bool,
 ) -> Result<MDeriveKey, ErrorSigner> {
     let network_specs = get_network_specs(database_name, network_specs_key)?;
-    let derivation_check = collision.map(|(multisigner, address_details)| {
-        let base58 = print_multisigner_as_base58(&multisigner, Some(network_specs.base58prefix));
-        let path = address_details.path;
-        let has_pwd = address_details.has_pwd;
-        let identicon = make_identicon_from_multisigner(&multisigner);
-        let seed_name = seed_name.to_string();
-        let collision = Address {
-            base58,
-            path,
-            has_pwd,
-            identicon,
-            seed_name,
-            multiselect: None,
-        };
-        NavDerivationCheck {
-            collision: Some(collision),
-            ..Default::default()
+
+    let derivation_check = match collision {
+        Some((multisigner, address_details)) => {
+            let base58 =
+                print_multisigner_as_base58(&multisigner, Some(network_specs.base58prefix));
+            let path = address_details.path;
+            let has_pwd = address_details.has_pwd;
+            let identicon = make_identicon_from_multisigner(&multisigner);
+            let seed_name = seed_name.to_string();
+            let collision = Address {
+                base58,
+                path,
+                has_pwd,
+                identicon,
+                seed_name,
+                multiselect: None,
+            };
+
+            NavDerivationCheck {
+                collision: Some(collision),
+                ..Default::default()
+            }
         }
-    });
+        None => dynamic_path_check_unhexed(database_name, seed_name, suggest, network_specs_key),
+    };
 
     Ok(MDeriveKey {
         seed_name: seed_name.to_string(),
@@ -484,54 +490,61 @@ pub fn dynamic_path_check(
     network_specs_key_hex: &str,
 ) -> NavDerivationCheck {
     match NetworkSpecsKey::from_hex(network_specs_key_hex) {
-        Ok(network_specs_key) => match get_network_specs(database_name, &network_specs_key) {
-            Ok(network_specs) => {
-                match derivation_check(seed_name, path, &network_specs_key, database_name) {
-                    Ok(DerivationCheck::BadFormat) => NavDerivationCheck {
-                        button_good: false,
-                        ..Default::default()
-                    },
-                    Ok(DerivationCheck::Password) => NavDerivationCheck {
-                        button_good: true,
-                        where_to: Some(DerivationDestination::Pwd),
-                        ..Default::default()
-                    },
-                    Ok(DerivationCheck::NoPassword(None)) => NavDerivationCheck {
-                        button_good: true,
-                        where_to: Some(DerivationDestination::Pin),
-                        ..Default::default()
-                    },
-                    Ok(DerivationCheck::NoPassword(Some((multisigner, address_details)))) => {
-                        let address_base58 = print_multisigner_as_base58(
-                            &multisigner,
-                            Some(network_specs.base58prefix),
-                        );
-                        let identicon = make_identicon_from_multisigner(&multisigner);
-                        let collision_display = Address {
-                            base58: address_base58,
-                            path: address_details.path,
-                            has_pwd: address_details.has_pwd,
-                            identicon,
-                            seed_name: seed_name.to_string(),
-                            multiselect: None,
-                        };
-                        NavDerivationCheck {
-                            button_good: false,
-                            collision: Some(collision_display),
-                            ..Default::default()
-                        }
-                    }
-                    Err(e) => NavDerivationCheck {
-                        error: Some(<Signer>::show(&e)),
-                        ..Default::default()
-                    },
-                }
-            }
-            Err(e) => NavDerivationCheck {
-                error: Some(<Signer>::show(&e)),
-                ..Default::default()
-            },
+        Ok(key) => dynamic_path_check_unhexed(database_name, seed_name, path, &key),
+        Err(e) => NavDerivationCheck {
+            error: Some(<Signer>::show(&e)),
+            ..Default::default()
         },
+    }
+}
+
+fn dynamic_path_check_unhexed(
+    database_name: &str,
+    seed_name: &str,
+    path: &str,
+    network_specs_key: &NetworkSpecsKey,
+) -> NavDerivationCheck {
+    match get_network_specs(database_name, &network_specs_key) {
+        Ok(network_specs) => {
+            match derivation_check(seed_name, path, &network_specs_key, database_name) {
+                Ok(DerivationCheck::BadFormat) => NavDerivationCheck {
+                    button_good: false,
+                    ..Default::default()
+                },
+                Ok(DerivationCheck::Password) => NavDerivationCheck {
+                    button_good: true,
+                    where_to: Some(DerivationDestination::Pwd),
+                    ..Default::default()
+                },
+                Ok(DerivationCheck::NoPassword(None)) => NavDerivationCheck {
+                    button_good: true,
+                    where_to: Some(DerivationDestination::Pin),
+                    ..Default::default()
+                },
+                Ok(DerivationCheck::NoPassword(Some((multisigner, address_details)))) => {
+                    let address_base58 =
+                        print_multisigner_as_base58(&multisigner, Some(network_specs.base58prefix));
+                    let identicon = make_identicon_from_multisigner(&multisigner);
+                    let collision_display = Address {
+                        base58: address_base58,
+                        path: address_details.path,
+                        has_pwd: address_details.has_pwd,
+                        identicon,
+                        seed_name: seed_name.to_string(),
+                        multiselect: None,
+                    };
+                    NavDerivationCheck {
+                        button_good: false,
+                        collision: Some(collision_display),
+                        ..Default::default()
+                    }
+                }
+                Err(e) => NavDerivationCheck {
+                    error: Some(<Signer>::show(&e)),
+                    ..Default::default()
+                },
+            }
+        }
         Err(e) => NavDerivationCheck {
             error: Some(<Signer>::show(&e)),
             ..Default::default()

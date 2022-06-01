@@ -435,7 +435,11 @@ fn derive_prep_alice() {
             .to_string(),
         suggested_derivation: "//secret//derive".to_string(),
         keyboard: false,
-        derivation_check: None,
+        derivation_check: NavDerivationCheck {
+            button_good: true,
+            where_to: Some(DerivationDestination::Pin),
+            ..Default::default()
+        },
     };
     assert_eq!(key, expected_key);
     fs::remove_dir_all(dbname).unwrap();
@@ -482,7 +486,7 @@ fn derive_prep_alice_collided() {
             .to_string(),
         suggested_derivation: "//Alice".to_string(),
         keyboard: false,
-        derivation_check: Some(NavDerivationCheck {
+        derivation_check: NavDerivationCheck {
             button_good: false,
             where_to: None,
             collision: Some(Address {
@@ -494,7 +498,7 @@ fn derive_prep_alice_collided() {
                 multiselect: None,
             }),
             error: None,
-        }),
+        },
     };
     assert_eq!(key, expected_key);
     fs::remove_dir_all(dbname).unwrap();
@@ -549,7 +553,7 @@ fn derive_prep_alice_collided_with_password() {
             .to_string(),
         suggested_derivation: "//secret///abracadabra".to_string(),
         keyboard: false,
-        derivation_check: Some(NavDerivationCheck {
+        derivation_check: NavDerivationCheck {
             button_good: false,
             where_to: None,
             collision: Some(Address {
@@ -561,7 +565,7 @@ fn derive_prep_alice_collided_with_password() {
                 multiselect: None,
             }),
             error: None,
-        }),
+        },
     };
     assert_eq!(key, expected_key);
     fs::remove_dir_all(dbname).unwrap();

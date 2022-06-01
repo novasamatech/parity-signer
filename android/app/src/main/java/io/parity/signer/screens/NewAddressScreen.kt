@@ -141,7 +141,7 @@ fun NewAddressScreen(
 			focusRequester.requestFocus()
 		}
 		derivationPath.value = deriveKey.suggestedDerivation
-		deriveKey.derivationCheck?.let {
+		deriveKey.derivationCheck.let {
 			derivationState = it
 		}
 		onDispose { focusManager.clearFocus() }
