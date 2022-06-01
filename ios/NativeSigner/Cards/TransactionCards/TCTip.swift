@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct TCTip: View {
-    var value: Currency
+    var value: MscCurrency
     var body: some View {
         HStack {
             Text("Tip")

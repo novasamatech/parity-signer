@@ -1,24 +1,17 @@
 package io.parity.signer.components
 
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import com.halilibo.richtext.markdown.Markdown
 import com.halilibo.richtext.ui.RichText
-import com.halilibo.richtext.ui.RichTextStyle
 import com.halilibo.richtext.ui.material.MaterialRichText
-import io.parity.signer.ui.theme.Text600
-import io.parity.signer.ui.theme.Typography
 
 /**
  * Terms and conditions content.
  */
 @Composable
 fun TAC() {
-	MaterialRichText() {
-		RichText(
-
-		) {
+	MaterialRichText {
+		RichText {
 			Markdown(
 				"""
 **PARITY SIGNER MOBILE APPLICATION - END USER LICENCE AGREEMENT**

@@ -1,8 +1,8 @@
 use frame_metadata::v14::RuntimeMetadataV14;
 use parity_scale_codec::Decode;
 use scale_info::{form::PortableForm, Type};
+use sp_core::H256;
 use sp_runtime::generic::Era;
-use std::convert::TryInto;
 
 use definitions::{
     error_signer::{ParserDecodingError, ParserError},
@@ -116,8 +116,8 @@ impl Ext {
 
 pub(crate) struct FoundExt {
     pub(crate) era: Option<Era>,
-    pub(crate) genesis_hash: Option<[u8; 32]>,
-    pub(crate) block_hash: Option<[u8; 32]>,
+    pub(crate) genesis_hash: Option<H256>,
+    pub(crate) block_hash: Option<H256>,
     pub(crate) network_version_printed: Option<String>,
 }
 
@@ -158,7 +158,7 @@ pub(crate) fn special_case_hash(
 ) -> Result<DecodedOut, ParserError> {
     match data.get(0..32) {
         Some(a) => {
-            let decoded_hash: [u8; 32] = a.try_into().expect("constant length, always fits");
+            let decoded_hash = H256::from_slice(a);
             let remaining_vector = data[32..].to_vec();
             let fancy_out = match hash {
                 Hash::GenesisHash => {

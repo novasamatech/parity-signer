@@ -21,11 +21,11 @@ struct NetworkDetails: View {
                     }
                     HStack {
                         Text("base58 prefix:")
-                        Text(content.base58prefix)
+                        Text(String(content.base58prefix))
                     }
                     HStack {
                         Text("decimals:")
-                        Text(content.decimals)
+                        Text(String(content.decimals))
                     }
                     HStack {
                         Text("unit:")
@@ -33,17 +33,19 @@ struct NetworkDetails: View {
                     }
                     HStack {
                         Text("genesis hash:")
-                        Text(content.genesis_hash)
+                        Text(content.genesisHash).fixedSize(horizontal: false, vertical: true)
                     }
                     HStack {
-                        Text("Verifier certificate: ")
-                        switch content.current_verifier.type {
+                        Text("Verifier certificate: ").fixedSize(horizontal: false, vertical: true)
+                        switch content.currentVerifier.ttype {
                         case "general":
-                            Text("General")
-                        case "network":
+                            Text("general")
+                        case "custom":
+                            Identicon(identicon: content.currentVerifier.details.identicon)
                             VStack {
                                 Text("custom")
-                                Text(String(describing: content.current_verifier.details))
+                                Text(content.currentVerifier.details.publicKey).fixedSize(horizontal: false, vertical: true)
+                                Text("encryption: " + content.currentVerifier.details.encryption)
                             }
                         case "none":
                             Text("none")
@@ -55,11 +57,11 @@ struct NetworkDetails: View {
                 Text("Metadata available:")
                 ScrollView {
                     LazyVStack {
-                        ForEach(content.meta, id: \.meta_hash) {
+                        ForEach(content.meta, id: \.metaHash) {
                             metaEntry in
                             Button(
                                 action: {
-                                    data.pushButton(buttonID: .ManageMetadata, details: metaEntry.spec_version)
+                                    data.pushButton(action: .manageMetadata, details: metaEntry.specsVersion)
                                 }
                             ){
                             MetadataCard(meta: metaEntry)

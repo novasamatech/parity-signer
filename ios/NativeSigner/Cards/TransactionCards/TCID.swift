@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct TCID: View {
-    var value: Id
+    var value: MscId
     var body: some View {
         HStack {
             Identicon(identicon: value.identicon)

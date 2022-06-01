@@ -109,9 +109,12 @@ pub fn try_get_valid_current_verifier(
                     // ([`Verifier`]), unless both values are `None`.
                     // If such entry is found, it indicates that the database is
                     // corrupted.
-                    if let ValidCurrentVerifier::Custom(ref custom_verifier) = b {
+                    if let ValidCurrentVerifier::Custom {
+                        v: ref custom_verifier,
+                    } = b
+                    {
                         if (custom_verifier == &general_verifier)
-                            && (general_verifier != Verifier(None))
+                            && (general_verifier != Verifier { v: None })
                         {
                             return Err(ErrorSigner::Database(
                                 DatabaseSigner::CustomVerifierIsGeneral(verifier_key.to_owned()),
@@ -206,7 +209,7 @@ pub fn genesis_hash_in_specs(
             &network_specs_key,
             network_specs_encoded,
         )?;
-        if network_specs.genesis_hash == genesis_hash[..] {
+        if network_specs.genesis_hash.as_bytes() == &genesis_hash[..] {
             found_base58prefix = match found_base58prefix {
                 Some(base58prefix) => {
                     if base58prefix == network_specs.base58prefix {
@@ -253,15 +256,8 @@ pub fn get_general_verifier(database_name: &str) -> Result<Verifier, ErrorSigner
     }
 }
 
-/// Display general verifier [`Verifier`] from the Signer database
-#[cfg(feature = "signer")]
-pub fn display_general_verifier(database_name: &str) -> Result<String, ErrorSigner> {
-    Ok(get_general_verifier(database_name)?.show_card())
-}
-
-/// Try to get types information from the database.
-///
-/// If no types information is found, result is `Ok(None)`.
+/// Function to try and get types information from the database
+/// Applicable to both Active side and Signer side
 pub fn try_get_types<T: ErrorSource>(
     database_name: &str,
 ) -> Result<Option<Vec<TypeEntry>>, T::Error> {
@@ -511,13 +507,13 @@ pub fn remove_network(
     let general_verifier = get_general_verifier(database_name)?;
     let network_specs = get_network_specs(database_name, network_specs_key)?;
 
-    let verifier_key = VerifierKey::from_parts(&network_specs.genesis_hash);
+    let verifier_key = VerifierKey::from_parts(network_specs.genesis_hash.as_bytes());
     let valid_current_verifier = get_valid_current_verifier(&verifier_key, database_name)?;
 
     // modify verifier as needed
-    if let ValidCurrentVerifier::Custom(ref a) = valid_current_verifier {
-        match a {
-            Verifier(None) => (),
+    if let ValidCurrentVerifier::Custom { ref v } = valid_current_verifier {
+        match v {
+            Verifier { v: None } => (),
             _ => {
                 verifiers_batch.remove(verifier_key.key());
                 verifiers_batch.insert(verifier_key.key(), (CurrentVerifier::Dead).encode());
@@ -529,7 +525,9 @@ pub fn remove_network(
     for meta_values in get_meta_values_by_name(database_name, &network_specs.name)?.iter() {
         let meta_key = MetaKey::from_parts(&meta_values.name, meta_values.version);
         meta_batch.remove(meta_key.key());
-        events.push(Event::MetadataRemoved(MetaValuesDisplay::get(meta_values)));
+        events.push(Event::MetadataRemoved {
+            meta_values_display: MetaValuesDisplay::get(meta_values),
+        });
     }
 
     {
@@ -545,11 +543,13 @@ pub fn remove_network(
                 NetworkSpecs::from_entry_with_key_checked::<Signer>(&x_network_specs_key, entry)?;
             if x_network_specs.genesis_hash == network_specs.genesis_hash {
                 network_specs_batch.remove(x_network_specs_key.key());
-                events.push(Event::NetworkSpecsRemoved(NetworkSpecsDisplay::get(
-                    &x_network_specs,
-                    &valid_current_verifier,
-                    &general_verifier,
-                )));
+                events.push(Event::NetworkSpecsRemoved {
+                    network_specs_display: NetworkSpecsDisplay::get(
+                        &x_network_specs,
+                        &valid_current_verifier,
+                        &general_verifier,
+                    ),
+                });
                 keys_to_wipe.push(x_network_specs_key);
             } else if x_network_specs.order > network_specs.order {
                 x_network_specs.order -= 1;
@@ -569,9 +569,9 @@ pub fn remove_network(
                         &address_details.encryption,
                         &multisigner_to_public(&multisigner),
                         &address_details.path,
-                        &network_specs.genesis_hash,
+                        network_specs.genesis_hash.as_bytes(),
                     );
-                    events.push(Event::IdentityRemoved(identity_history));
+                    events.push(Event::IdentityRemoved { identity_history });
                     address_details.network_id = address_details
                         .network_id
                         .into_iter()
@@ -625,7 +625,9 @@ pub fn remove_metadata(
     let meta_values_display = MetaValuesDisplay::get(&meta_values);
     let history_batch = events_to_batch::<Signer>(
         database_name,
-        vec![Event::MetadataRemoved(meta_values_display)],
+        vec![Event::MetadataRemoved {
+            meta_values_display,
+        }],
     )?;
     TrDbCold::new()
         .set_metadata(meta_batch) // remove metadata
@@ -652,10 +654,12 @@ pub fn remove_metadata(
 pub fn remove_types_info(database_name: &str) -> Result<(), ErrorSigner> {
     let mut settings_batch = Batch::default();
     settings_batch.remove(TYPES);
-    let events: Vec<Event> = vec![Event::TypesRemoved(TypesDisplay::get(
-        &ContentLoadTypes::generate(&get_types::<Signer>(database_name)?),
-        &get_general_verifier(database_name)?,
-    ))];
+    let events: Vec<Event> = vec![Event::TypesRemoved {
+        types_display: TypesDisplay::get(
+            &ContentLoadTypes::generate(&get_types::<Signer>(database_name)?),
+            &get_general_verifier(database_name)?,
+        ),
+    }];
     TrDbCold::new()
         .set_history(events_to_batch::<Signer>(database_name, events)?) // add history
         .set_settings(settings_batch) // upd settings

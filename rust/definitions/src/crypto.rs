@@ -138,15 +138,21 @@ impl SufficientCrypto {
             SufficientCrypto::Ed25519 {
                 public,
                 signature: _,
-            } => VerifierValue::Standard(MultiSigner::Ed25519(public.to_owned())),
+            } => VerifierValue::Standard {
+                m: MultiSigner::Ed25519(public.to_owned()),
+            },
             SufficientCrypto::Sr25519 {
                 public,
                 signature: _,
-            } => VerifierValue::Standard(MultiSigner::Sr25519(public.to_owned())),
+            } => VerifierValue::Standard {
+                m: MultiSigner::Sr25519(public.to_owned()),
+            },
             SufficientCrypto::Ecdsa {
                 public,
                 signature: _,
-            } => VerifierValue::Standard(MultiSigner::Ecdsa(public.to_owned())),
+            } => VerifierValue::Standard {
+                m: MultiSigner::Ecdsa(public.to_owned()),
+            },
         }
     }
 

@@ -19,7 +19,7 @@ struct NewSeedMenu: View {
                         text: "New seed",
                         action: {
                             if data.alert { data.alertShow = true } else {
-                                data.pushButton(buttonID: .NewSeed)
+                                data.pushButton(action: .newSeed)
                             }
                         }
                     )
@@ -28,7 +28,7 @@ struct NewSeedMenu: View {
                         isShaded: true,
                         action: {
                             if data.alert { data.alertShow = true } else {
-                                data.pushButton(buttonID: .RecoverSeed)
+                                data.pushButton(action: .recoverSeed)
                             }
                         }
                     )

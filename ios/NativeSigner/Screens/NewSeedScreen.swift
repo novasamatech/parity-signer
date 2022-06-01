@@ -33,8 +33,8 @@ struct NewSeedScreen: View {
                     })
                     .onSubmit {
                         nameFocused = false
-                        if (seedName != "") && !data.checkSeedCollision(seedName: seedName.encode64()) {
-                            data.pushButton(buttonID: .GoForward, details: seedName.encode64())
+                        if (seedName != "") && !data.checkSeedCollision(seedName: seedName) {
+                            data.pushButton(action: .goForward, details: seedName)
                         }
                     }
                     .onAppear(perform: {
@@ -52,9 +52,9 @@ struct NewSeedScreen: View {
                 text: "Generate seed phrase",
                 action: {
                     nameFocused = false
-                    data.pushButton(buttonID: .GoForward, details: seedName.encode64())
+                    data.pushButton(action: .goForward, details: seedName)
                 },
-                isDisabled: (seedName == "") || data.checkSeedCollision(seedName: seedName.encode64())
+                isDisabled: (seedName == "") || data.checkSeedCollision(seedName: seedName)
             )
             Spacer()
         }.padding()

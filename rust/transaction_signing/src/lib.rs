@@ -1,7 +1,10 @@
 use sp_runtime::MultiSigner;
 
 use db_handling::db_transactions::TrDbColdStub;
-use definitions::{error_signer::ErrorSigner, keyring::NetworkSpecsKey, users::AddressDetails};
+use definitions::{
+    error_signer::ErrorSigner, keyring::NetworkSpecsKey, navigation::MSCContent,
+    users::AddressDetails,
+};
 
 mod sign_message;
 use sign_message::{
@@ -23,7 +26,7 @@ pub fn handle_sign(
     pwd_entry: &str,
     user_comment: &str,
     database_name: &str,
-) -> Result<String, ErrorSigner> {
+) -> Result<Vec<u8>, ErrorSigner> {
     create_signature_png(
         seed_phrase,
         pwd_entry,
@@ -48,7 +51,7 @@ pub fn sign_content(
     database_name: &str,
     seed_phrase: &str,
     pwd_entry: &str,
-) -> Result<String, ErrorSigner> {
+) -> Result<(Vec<u8>, MSCContent), ErrorSigner> {
     match content {
         SufficientContent::AddSpecs(network_specs_key) => sufficient_crypto_add_specs(
             &network_specs_key,
