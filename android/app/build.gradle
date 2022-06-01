@@ -57,6 +57,7 @@ android {
 	buildToolsVersion '31.0.0'
 	compileSdk 32
 	ndkVersion '24.0.8215888'
+    namespace 'io.parity.signer'
 }
 
 android.applicationVariants.all { variant ->
