@@ -61,8 +61,9 @@ Signer supports following `<payload code>` variants:
 
 - `0x00` legacy mortal transaction
 - `0x02` transaction (both mortal and immortal)
-- `0x03` message
+- `0x03` message, **content under discussion**
 - `0x80` load metadata update
+- `0x7f` load compressed metadata update, **proposal only**
 - `0x81` load types update
 - `0xc1` add specs update
 - `0xde` derivations import
@@ -70,6 +71,17 @@ Signer supports following `<payload code>` variants:
 
 Note: old UOS specified `0x00` as mortal transaction and `0x02` as immortal one,
 but currently both mortal and immortal transactions from polkadot-js are `0x02`.
+
+## Shared QR code processing stages:
+
+1. Read QR code, try interpreting it, and get the hexadecimal string from into
+Rust (hexadecimal string is getting changes to raw bytes soon).
+If QR code is not processable, nothing happens and the scanner keeps trying to
+catch a processable one.
+2. Analyze prelude: is it Substrate? is it a known payload type? If not, Signer
+always produces an error and suggests to scan supported payload.
+
+Further processing is done based on the payload type.
 
 ## Transaction
 
@@ -117,12 +129,260 @@ for it as is. For blobs longer than 257 bytes, 32 byte hash (`blake2-rfc`) is
 signed instead. This is inherited from earlier Signer versions, and is currently
 compatible with polkadot-js.
 
-Signer can generate a signature for transaction only if:
+### Transaction parsing stages:
 
-- the Signer has network specs on file for the network, with matching encryption
-- the Signer has metadata on file that corresponds to the metadata used to
-create the transaction on the hot side
-- key used exists in Signer and is associated with the network
+1. Cut the QR data and get:
+
+    - encryption (1 `u8` from prelude)
+    - transaction author public key, its length matching the encryption (32 or
+    33 `u8` immediately after the prelude)
+    - network genesis hash (32 `u8` at the end)
+    - SCALE-encoded call data and SCALE-encoded extensions as a combined blob
+    (everything that remains in between the transaction author public kay and
+    the network genesis hash)
+
+    If the data length is insufficient, Signer produces an error and suggests to
+load non-damaged transaction.
+
+2. Search the Signer database for the network specs (from the network genesis
+hash and encryption).
+
+    If the network specs are not found, Signer shows:
+
+    - public key and encryption of the transaction author key
+    - error message, that suggests to add network with found genesis hash
+
+3. Search the Signer database for the address key (from the transaction author
+public key and encryption). Signer will try to interpret and display the
+transaction in any case. Signing will be possible only if the parsing is
+successful and the address key is known to Signer and is extended to the network
+in question.
+
+    - Address key not found. Signing not possible. Output shows:
+
+        - public key and encryption of the transaction author key
+        - call and extensions parsing result
+        - warning message, that suggests to add the address into Signer
+    
+    - Address key is found, but it is not extended to the network used. Signing
+    not possible. Output shows:
+        
+        - detailed author key information (base58 representation, identicon,
+        address details such as address being passworded etc)
+        - call and extensions parsing result
+        - warning message, that suggests extending the address into the network
+        used
+    
+    - Address key is found and is extended to the network used. Signer will
+    proceed to try and interpret the call and extensions. Detailed author
+    information will be output regardless of the parsing outcome. <- this is not so currently, need to fix it.
+    The signing will be allowed only if the parsing is successful.
+    
+4. Separate the call and extensions. Call is prefixed by its length compact,
+the compact is cut off, the part with length that was indicated in the compact
+goes into call data, the part that remains goes into extensions data.
+
+    If no compact is found or the length is insufficient, Signer produces an
+error that call and extensions could not be separated.
+
+5. Get the metadata set from the Signer database, by the network name from the
+network specs. Metadata is used to interpret extensions and then the call
+itself.
+
+    If there are no metadata entries for the network at all, Signer produces an
+error and asks to load the metadata.
+
+    Metadata `RuntimeVersion` supported by Signer are `V12`, `V13`, and `V14`.
+The crucial feature of the `V14` is that the metadata contains the description
+of the types used in the call and extensions production. `V12` and `V13` are
+legacy versions and provide only text identifires for the types, and in order to
+use them, the supplemental types information is needed.
+
+5. Process the extensions.
+
+    Signer already knows in which network the transaction was made, but does not
+yet know the metadata version. Metadata version must be one of the signable
+extensions. At the same time, the extensions and their order are recorded in the
+network metadata. Thus, all metadata entries from the set are checked, from
+newest to oldest, in an attempt to find metadata that both decodes the
+extensions and has a version that matches the metadata version decoded from the
+extensions.
+
+    If processing extensions with a single metadata entry results in an error,
+the next metadata entry is tried. The errors would be displayed to user only if
+all attempts with existing metadata have failed.
+
+    Typically, the extensions are quite stable in between the metadata versions
+and in between the networks, however, they can be and sometimes are different.
+
+    In legacy metadata (`RuntimeVersion` being `V12` and `V13`) extensions have
+identifiers only, and in Signer the extensions for `V12` and `V13` are
+hardcoded as:
+
+    - `Era` era
+    - `Compact(u64)` nonce
+    - `Compact(u128)` tip
+    - `u32` metadata version
+    - `u32` tx version
+    - `H256` genesis hash
+    - `H256` block hash
+    
+    If the extensions could not be decoded as the standard set or not all
+extensions blob is used, the Signer rejects this metadata version and adds error
+into the error set.
+
+    Metadata `V14` has extensions with both identifiers and properly described
+types, and Signer decodes extensions as they are recorded in the metadata. For
+this, 
+[`ExtrinsicMetadata`](https://paritytech.github.io/substrate/master/frame_metadata/v14/struct.ExtrinsicMetadata.html)
+part of the metadata
+[`RuntimeMetadataV14`](https://paritytech.github.io/substrate/master/frame_metadata/v14/struct.RuntimeMetadataV14.html)
+is used. Vector `signed_extensions` in `ExtrinsicMetadata` is scanned twice,
+first for types in `ty` of the
+[`SignedExtensionMetadata`](https://paritytech.github.io/substrate/master/frame_metadata/v14/struct.SignedExtensionMetadata.html)
+and then for types in `additional_signed` of the `SignedExtensionMetadata`. The
+types, when resolved through the types database from the metadata, allow to cut
+correct length blobs from the whole SCALE-encoded extensions blob and decode
+them properly.
+
+    If any of these small decodings fails, the metadata version gets rejected by
+the Signer and an error is added to the error set. Same happens if after all
+extensions are scanned, some part of extensions blob remains unused.
+
+    There are some special extensions that must be treated separately. The
+`identifier` in `SignedExtensionMetadata` and `ident` segment of the type
+[`Path`](https://paritytech.github.io/substrate/master/scale_info/struct.Path.html)
+are used to trigger types interpretation as specially treated extensions. Each
+`identifier` is encountered twice, once for `ty` scan, and once for
+`additional_signed` scan. In some cases only one of those types has non-empty
+content, in some cases it is both. To distinguish the two, the type-associated
+path is used, which points to where the type is defined in Substrate code.
+Type-associated path has priority over the identifier.
+
+    Path triggers:
+
+    | Path | Type is interpreted as |
+    | :- | :- |
+    | `Era` | `Era` |
+    | `CheckNonce` | `Nonce` |
+    | `ChargeTransactionPayment` | tip, gets displayed as balance with decimals and unit corresponding to the network specs |
+
+    Identifier triggers, are used if the path trigger was not activated:
+
+    | Identifier | Type, if not empty and if there is no path trigger, is interpreted as | Note |
+    | :- | :- | :- |
+    | `CheckSpecVersion` | metadata version | gets checked with the metatada version from the metadata |
+    | `CheckTxVersion` | tx version | |
+    | `CheckGenesis` | network genesis hash | must match the genesis hash that was cut from the tail of the transaction |
+    | `CheckMortality` | block hash | must match the genesis hash if the transaction is immortal; `Era` has same identifier, but is distinguished by the path |
+    | `CheckNonce` | nonce | |
+    | `ChargeTransactionPayment` | tip, gets displayed as balance with decimals and unit corresponding to the network specs |
+
+     If the extension is not a special case, it is displayed as normal parser
+output and does not participate in deciding if the transaction could be signed.
+
+    After all extensions are processed, the decoding must yield following
+extensions:
+
+    - exactly one `Era`
+    - exactly one `Nonce` <- this is not so currently, fix it
+    - exactly one `BlockHash`
+    - exactly one `GenesisHash` <- this is not so currently, fix it
+    - exactly one metadata version
+
+    If the extension set is different, this results in Signer error for this
+particular metadata version, this error goes into error set.
+    
+    The extensions in the metadata are checked on the metadata loading step,
+long before any transactions are even produced. Metadata with incomplete
+extensions causes a warning on `load_metadata` update generation step, and
+another one when an update with such metadata gets loaded into Signer.
+Nevertheless, such metadata loading into Signer is allowed, as there could be
+other uses for metadata except signable transaction signing. Probably.
+    
+    If the metadata version in extensions does not match the metadata version
+of the metadata used, this results in Signer error for this particular metadata
+version, this error goes into error set.
+    
+    If the extensions are completely decoded, with correct set of the special
+extensions and the metadata version from the extensions match the metadata
+version of the metadata used, the extensions are considered correctly parsed,
+and Signer can proceed to the call decoding.
+
+    If all metadata entries from the Signer database were tested and no suitable
+solution is found, Signer produces an error stating that all attempts to decode
+extensions have failed. This could be used by variety of reasons (see above),
+but so far the most common one observed was users having the metadata in Signer
+not up-to-date with the metadata on chain. Thus, the error must have a
+recommendation to update the metadata first.
+
+6. Process the call data.
+
+    After the metadata with correct version is established, it is used to parse
+the call data itself. Each call begins with `u8` pallet index, this is the
+decoding entry point.
+
+    For `V14` metadata the correct pallet is found in the set of available ones
+in `pallets` field of
+[`RuntimeMetadataV14`](https://paritytech.github.io/substrate/master/frame_metadata/v14/struct.RuntimeMetadataV14.html),
+by `index` field in corresponding
+[`PalletMetadata`](https://paritytech.github.io/substrate/master/frame_metadata/v14/struct.PalletMetadata.html).
+The `calls` field of this `PalletMetadata`, if it is `Some(_)`, contains
+[`PalletCallMetadata`](https://paritytech.github.io/substrate/master/frame_metadata/v14/struct.PalletCallMetadata.html)
+that provides the available calls enum described in `types` registry of the
+`RuntimeMetadataV14`. For each type in the registry, including this calls enum,
+encoded data size is determined, and the decoding is done according to the type.
+
+    For `V12` and `V13` metadata the correct pallet is also found by scanning
+the available pallets and searching for correct pallet index. Then the call is
+found using the call index (second `u8` of the call data). Each call has
+associated set of argument names and argument types, however, the argument type
+is just a text identifier. The type definitions are not in the metadata and
+transactions decoding requires supplemental types information. By default, the
+Signer contains types information that was constructed for Westend when Westend
+was still using `V13` metadata and it was so far reasonably sufficient for
+simple transactions parsing. If the Signer does not find the type information in
+the database **and** has to decode the transaction using `V12` or `V13`
+metadata, error is produced, indicating that there are no types. Elsewise, for
+each encountered argument type the encoded data size is determined, and the
+decoding is done according to the argument type.
+    
+    There are types requiring special display:
+    
+    - calls (for cases when a call contains other calls)
+    - numbers that are processed as the balances
+    
+    Calls in `V14` parsing are distinguished by `Call` in `ident` segment of the
+type [`Path`](https://paritytech.github.io/substrate/master/scale_info/struct.Path.html).
+Calls in `V12` and `V13` metadata are distinguished by any element of the set
+of calls type identifiers in string argument type.
+
+    At the moment the numbers that should be displayed as balance in
+transacrtions with `V14` metadata are determined by the type name `type_name` of
+the corresponding
+[`Field`](https://paritytech.github.io/substrate/master/scale_info/struct.Field.html)
+being:
+    
+    - `Balance`
+    - `T::Balance`
+    - `BalanceOf<T>`
+    - `ExtendedBalance`
+    - `BalanceOf<T, I>`
+    - `DepositBalance`
+    - `PalletBalanceOf<T>`
+
+    Similar identifiers are used in `V12` and `V13`, the checked value is the
+string argument type itself.
+
+    There could be other instances when the number should be displayed as
+balance. However, sometimes the balance is **not** the balance in the units
+in the network specs, for example in the `assets` pallet. See issue
+[#1050](https://github.com/paritytech/parity-signer/issues/1050) and comments
+there for details.
+    
+    If no errors were encountered while parsing and all call data was used in
+the process, the transaction is considered parsed and is displayed to the user,
+either ready for signing (if all other checks have passed) or as read-only.
 
 ### Example
 
@@ -173,50 +433,28 @@ Message has following structure:
 
 <table>
     <tr>
-        <td>prelude</td><td>public key</td><td>message payload</td><td>network genesis hash</td>
+        <td>prelude</td><td>public key</td><td>`<Bytes> [u8] slice </Bytes>`</td><td>network genesis hash</td>
     </tr>
 </table>
 
-There are two types of the message payload considered to be allowed in the
-Signer:
+The message itself is the `[u8]` slice wrapped in `<Bytes>..</Bytes>`.
+Only `[u8]` slice is rendered for user, however whole payload, including
+`<Bytes>..</Bytes>` wrapping is getting signed.
 
-| Message payload | What is rendered to user | What gets signed |
-|:-|:-|:-|
-| SCALE-encoded String | String | SCALE-encoded String |
-| `<Bytes>..</Bytes>` wrapped `[u8]` slice | `[u8]` slice | `<Bytes>..</Bytes>` wrapped `[u8]` slice |
-
-`<Bytes>..</Bytes>` wrapped `[u8]` slice is represented as String if all bytes
-are valid UTF-8. If not all bytes are valid UTF-8, `[u8]` slice is represented
-as hexadecimal string. Signer must specify which representation is used.
+`[u8]` slice is represented as String if all bytes are valid UTF-8. If not all
+bytes are valid UTF-8 or if the `<Bytes>..</Bytes>` wrapping is not found,
+Signer produces an error.
 
 It is critical that the message payloads are always clearly distinguishable from
 the transaction payloads, i.e. it is never possible to trick user to sign
 transaction posing as a message.
 
-Transaction part that is signed:
-
-<table>
-    <tr>
-        <td>method (pallet, method, call content)</td><td>extensions</td>
-    </tr>
-</table>
-
-There must be some checking that the message is definitely not a transaction.
-Notable, here it is a transaction in any network, since once the signature is
-generated and in the open, it could be applied to anything.
-
-SCALE-encoded String contains compact of the string length `l = [l1, .., lx]`
-(possibly single or multiple `u8`) followed by `[u8]` representation of the
-string symbols. If any network metadata contains `l1` pallet number with method
-`l2` (or, if the length compact is a single `u8`, first string symbol as `u8`),
-the message could be passed as transaction in this particular network.
-
-`<Bytes>` wrapped messages imply the would-be sneaked call is done in pallet `<`
-with method `B`, and that the extensions (typically, the last one is block hash)
-end in `</Bytes>`.
-
-Thus both cases are definitely not impossible. In `<Bytes>` case potentially
-dangerous pallet and method are static.
+`<Bytes>..</Bytes>` wrapping of the messages mean that the would-be sneaked call
+is done in pallet with index `60` (`<` as byte) with method `66` (`B` as byte),
+and that the extensions (typically, the last one is block hash) end in
+`</Bytes>`. This could be any Substrate-compatible metadata. To ensure that
+`<Bytes>..</Bytes>` wrapping is safe, pallet with index `60` and with method
+`66` get blocked in Substrate.
 
 ## Update
 
