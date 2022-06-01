@@ -33,17 +33,19 @@ struct NetworkDetails: View {
                     }
                     HStack {
                         Text("genesis hash:")
-                        Text(content.genesisHash)
+                        Text(content.genesisHash).fixedSize(horizontal: false, vertical: true)
                     }
                     HStack {
-                        Text("Verifier certificate: ")
+                        Text("Verifier certificate: ").fixedSize(horizontal: false, vertical: true)
                         switch content.currentVerifier.ttype {
                         case "general":
-                            Text("General")
-                        case "network":
+                            Text("general")
+                        case "custom":
+                            Identicon(identicon: content.currentVerifier.details.identicon)
                             VStack {
                                 Text("custom")
-                                Text(String(describing: content.currentVerifier.details))
+                                Text(content.currentVerifier.details.publicKey).fixedSize(horizontal: false, vertical: true)
+                                Text("encryption: " + content.currentVerifier.details.encryption)
                             }
                         case "none":
                             Text("none")

@@ -88,6 +88,7 @@ struct NewAddressScreen: View {
             path = content.suggestedDerivation
             derivationCheck = content.derivationCheck
             focusedField = content.keyboard
+            print(content)
         }
         .onChange(of: content) { newContent in
             path = newContent.suggestedDerivation
