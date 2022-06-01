@@ -133,14 +133,17 @@ fun NewAddressScreen(
 			)
 		}
 	}
+
+	LaunchedEffect(key1 = deriveKey) {
+		derivationState = deriveKey.derivationCheck
+	}
+
 	DisposableEffect(Unit) {
 		if (deriveKey.keyboard) {
 			focusRequester.requestFocus()
 		}
 		derivationPath.value = deriveKey.suggestedDerivation
-		deriveKey.derivationCheck.let {
-			derivationState = it
-		}
+		derivationState = deriveKey.derivationCheck
 		onDispose { focusManager.clearFocus() }
 	}
 }
