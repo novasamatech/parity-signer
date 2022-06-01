@@ -150,7 +150,7 @@ Transaction:
 | Call part | Meaning |
 |:-|:-|
 | `04` | Pallet index 4 (`Balances`) in metadata, entry point for decoding |
-| `03` | Call index 3 in pallet 4 (`transfer_keep_alive`), search in metadata what the call contains. Here it is `MultiAddress` for transfer destination and `Compact(u128)` balance. |
+| `03` | Method index 3 in pallet 4 (`transfer_keep_alive`), search in metadata what the method contains. Here it is `MultiAddress` for transfer destination and `Compact(u128)` balance. |
 | `00` | Enum variant in `MultiAddress`, `AccountId` |
 | `8eaf04151687736326c9fea17e25fc5287613693c912909cb226aa4794f26a48` | Associated `AccountId` data, Bob public key |
 | `0700e8764817` | `Compact(u128)` balance. Amount paid: 100000000000 or, with Westend decimals and unit, 100.000000000 mWND. |
@@ -177,7 +177,8 @@ Message has following structure:
     </tr>
 </table>
 
-There are two types of the message payload allowed in the Signer:
+There are two types of the message payload considered to be allowed in the
+Signer:
 
 | Message payload | What is rendered to user | What gets signed |
 |:-|:-|:-|
@@ -186,24 +187,36 @@ There are two types of the message payload allowed in the Signer:
 
 `<Bytes>..</Bytes>` wrapped `[u8]` slice is represented as String if all bytes
 are valid UTF-8. If not all bytes are valid UTF-8, `[u8]` slice is represented
-as hexadecimal string. Signer specifies which representation is used.
+as hexadecimal string. Signer must specify which representation is used.
 
 It is critical that the message payloads are always clearly distinguishable from
 the transaction payloads, i.e. it is never possible to trick user to sign
 transaction posing as a message.
 
-SCALE-encoded String contains compact of the string length followed by `u8`
-representation of the string symbols. Transaction could be parsed by the message
-parser only if there are no transaction extensions including `Nonce`, thus they
-are clearly distinguished. There are networks on `polkadot-js` that have zero
-length extensions (Shell, for one), so this is also not a truly safe situation.
-Shell, however, has `DisallowSigned` in extensions, so there could be some check
-designed, maybe. If another network does not name extension translating the same
-information as `ForbidSigned` or something along the lines.
+Transaction part that is signed:
+
+<table>
+    <tr>
+        <td>method (pallet, method, call content)</td><td>extensions</td>
+    </tr>
+</table>
+
+There must be some checking that the message is definitely not a transaction.
+Notable, here it is a transaction in any network, since once the signature is
+generated and in the open, it could be applied to anything.
+
+SCALE-encoded String contains compact of the string length `l = [l1, .., lx]`
+(possibly single or multiple `u8`) followed by `[u8]` representation of the
+string symbols. If any network metadata contains `l1` pallet number with method
+`l2` (or, if the length compact is a single `u8`, first string symbol as `u8`),
+the message could be passed as transaction in this particular network.
 
 `<Bytes>` wrapped messages imply the would-be sneaked call is done in pallet `<`
 with method `B`, and that the extensions (typically, the last one is block hash)
-end in `</Bytes>`. Although unlikely, this is possible.
+end in `</Bytes>`.
+
+Thus both cases are definitely not impossible. In `<Bytes>` case potentially
+dangerous pallet and method are static.
 
 ## Update
 
