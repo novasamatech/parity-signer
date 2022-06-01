@@ -504,9 +504,9 @@ fn dynamic_path_check_unhexed(
     path: &str,
     network_specs_key: &NetworkSpecsKey,
 ) -> NavDerivationCheck {
-    match get_network_specs(database_name, &network_specs_key) {
+    match get_network_specs(database_name, network_specs_key) {
         Ok(network_specs) => {
-            match derivation_check(seed_name, path, &network_specs_key, database_name) {
+            match derivation_check(seed_name, path, network_specs_key, database_name) {
                 Ok(DerivationCheck::BadFormat) => NavDerivationCheck {
                     button_good: false,
                     ..Default::default()
