@@ -7,8 +7,10 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.runtime.Composable
 import io.parity.signer.models.abbreviateString
+import io.parity.signer.models.encodeHex
 import io.parity.signer.uniffi.Event
 import io.parity.signer.uniffi.MEventMaybeDecoded
+import io.parity.signer.uniffi.ValidCurrentVerifier
 import io.parity.signer.uniffi.VerifierValue
 
 /**
@@ -147,11 +149,29 @@ fun HistoryCardExtended(
 			)
 		}
 		is Event.NetworkVerifierSet -> {
+			var line3 =
+				when (val ver = eventVal.networkVerifierDisplay.validCurrentVerifier) {
+					is ValidCurrentVerifier.Custom -> {
+						when (val v = ver.v.v) {
+							is VerifierValue.Standard -> v.m.getOrElse(0) { "" }
+							null -> ""
+						}
+					}
+					ValidCurrentVerifier.General -> {
+						when (val v = eventVal.networkVerifierDisplay.generalVerifier.v) {
+							is VerifierValue.Standard -> v.m.getOrElse(0) { "" }
+							null -> ""
+						}
+					}
+				}
+
+			line3 += " for network with genesis hash " + eventVal.networkVerifierDisplay.genesisHash.toUByteArray()
+				.toByteArray().encodeHex()
 			HistoryCardTemplate(
 				image = Icons.Default.Shield,
 				line1 = timestamp,
 				line2 = "Network verifier set",
-				line3 = eventVal.networkVerifierDisplay.genesisHash.toString()
+				line3 = line3
 			)
 		}
 		is Event.ResetDangerRecord -> {
