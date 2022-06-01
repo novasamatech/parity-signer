@@ -21,12 +21,9 @@ fun NewAddressScreen(
 	checkPath: (String, String, String) -> DerivationCheck
 ) {
 	val derivationPath = remember { mutableStateOf("") }
-	val buttonGood = remember { mutableStateOf(false) }
-	val whereTo = remember { mutableStateOf<DerivationDestination?>(null) }
-	val collision = remember { mutableStateOf<Address?>(null) }
 	val seedName = deriveKey.seedName
 	val networkSpecKey = deriveKey.networkSpecsKey
-	var derivationState by remember(buttonGood, whereTo, collision) {
+	var derivationState by remember() {
 		mutableStateOf(
 			DerivationCheck(
 				false,
@@ -103,7 +100,7 @@ fun NewAddressScreen(
 			focusManager = focusManager,
 			focusRequester = focusRequester
 		)
-		collision.value?.let {
+		derivationState.collision?.let {
 			Column(
 				Modifier.fillMaxWidth(1f)
 			) {
