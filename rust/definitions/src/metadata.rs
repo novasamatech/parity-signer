@@ -198,6 +198,9 @@ impl MetaValues {
                     filename: filename.to_string(),
                 }
             }
+            IncomingMetadataSourceActiveStr::Check { filename } => NotHexActive::CheckedMetadata {
+                filename: filename.to_string(),
+            },
         };
         let meta_vec = unhex::<Active>(meta, what)?;
         match Self::from_slice_metadata(&meta_vec) {
@@ -504,7 +507,7 @@ impl MetaSetElement {
 ///
 /// `ADDRESS_BOOK` tree stores SCALE-encoded [`AddressBookEntry`] entries under
 /// keys [`AddressBookKey`]
-#[derive(Decode, Encode, PartialEq)]
+#[derive(Debug, Decode, Encode, PartialEq)]
 #[cfg(feature = "active")]
 pub struct AddressBookEntry {
     /// Network name, as it appears in `Version` constant in metadata  

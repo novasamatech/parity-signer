@@ -77,21 +77,21 @@ Program is run by
 Possible commands are:  
 
 - `show` followed by a key:  
-    - `-database` to show network `specname` and `spec_version` for all networks in the metadata tree the database  
-    - `-address_book` to show network `title`, `url address`, `encryption` and `(default)` marking if the encryption is default one for this network for all networks in the address_book tree of the database  
+    - `-metadata` to show network name, version and metadata hash for all networks in the metadata tree the database  
+    - `-networks` to show network address book title, url address, encryption (with optional default marker) and network title as it will be displayed in Signer, for all networks in the address_book tree of the database  
     
 - `types` without any keys to generate `load_types` message  
 
 - `load_metadata` and `add_specs` with following possible keys (only the key combinations most likely to be needed are implemented at the moment, tickets filing is suggested for others if they are needed):  
     - setting keys (maximum one can be used):  
         - `-d`: do NOT update the database, make rpc calls, and produce ALL requested output files  
-        - `-f`: do NOT run rps calls, produce ALL requested output files from existing database  
+        - `-f`: do NOT run rpc calls, produce ALL requested output files from existing database  
         - `-k`: update database through rpc calls, produce requested output files only for UPDATED database entries  
         - `-p`: update database through rpc calls, do NOT produce any output files  
         - `-t` default setting: update database through rpc calls, produce ALL requested output files  
     - reference keys (exactly only one has to be used):  
         - `-a`: process all networks
-        - `-n` followed by one name (network **specname** for load_metadata, i.e. `polkadot`, `westend` etc, the one that goes before version in output of `show -database`; network **title** for add_specs, i.e. `polkadot`, `westend-ed25519`, `rococo-AgainUpdatedGenesisHash` and the likes, whatever title shows in output of`show -address_book` (so far only vanilla names and vanilla names followed by encryption could be encountered))
+        - `-n` followed by one name (network **specname** for load_metadata, i.e. `polkadot`, `westend` etc, the one that goes before version in output of `show -metadata`; network **title** for add_specs, i.e. `polkadot`, `westend-ed25519`, `rococo-AgainUpdatedGenesisHash` and the likes, whatever title shows in output of`show -networks`)
         - `-u` followed by one url address
     - optional `-s` key to stop the program if any failure occurs. By default the program informs user of unsuccessful attempt and proceeds.  
     - encryption override keys (maximum one can be used), to set encryption in network specs when generationg `add_specs` message; ideally should be used for networks not in the database with `-u` reference key, other usages are however possible; supported variants:  
@@ -101,7 +101,7 @@ Possible commands are:
     - token override key `-token` immediately followed by decimals value (should be `u8`) and unit name; could be used when generating network specs for networks with several supported tokens, when normal fetch returns an array instead of a single value; could be used only with `-u` reference key in `add_specs` generation **only** for networks not known to the database;  
     
 - `make` to `make_message` with following possible keys:  
-    - optional content key: `-qr` will generate only apng qr code, `-text` will generate only text file with hex encoded message; by default, both qr code and text message are generated; content keys are expected immediately after `make` command, if at all; keys to follow could go in any order, but with content immediately following the key.  
+    - optional content key: `-qr` will generate only apng qr code, `-text` will generate only text file with hex encoded message; by default, both qr code and text message are generated; content key is expected immediately after `make` command, if at all; keys to follow could go in any order, but with argument immediately following the key.  
     - key `-crypto` followed by encryption variant used in message verification:  
         - `ed25519`  
         - `sr25519`  
@@ -111,7 +111,7 @@ Possible commands are:
         - `load_types`  
         - `load_metadata`  
         - `add_specs`
-    - key `-verifier` (has to be entered if only the `-crypto` was `ed25519`, `sr25519`, or `ecdsa`), followed by:  
+    - key `-verifier` (can be entered if only the `-crypto` argument was `ed25519`, `sr25519`, or `ecdsa`), followed by:  
         - `Alice` to generate messages "verified" by Alice (used for tests)  
         - `-hex` followed by actual hex line of public key  
         - `-file` followed by file name ****, to read verifier public key as Vec<u8> from file named `****` from folder `../files/for_signing/`  
@@ -122,7 +122,7 @@ Possible commands are:
     - optional key `-name` followed by `****` - name override to save file named `****` for apng export and file named `****.txt` into folder `../files/signed/`  
     
 - `sign` to `make_message` using sufficient crypto information received from elsewhere, for example, from signer device, with following keys:  
-    - optional content key: `-qr` will generate only apng qr code, `-text` will generate only text file with hex encoded message; by default, both qr code and text message are generated; content keys are expected immediately after `make` command, if at all; keys to follow could go in any order, but with content immediately following the key.  
+    - optional content key: `-qr` will generate only apng qr code, `-text` will generate only text file with hex encoded message; by default, both qr code and text message are generated; content key is expected immediately after `sign` command, if at all; keys to follow could go in any order, but with argument immediately following the key.  
     - key `-sufficient` followed by:  
         - `-hex` followed by actual hex line of hex represented SCALE encoded sufficient crypto  
         - `-file` followed by file name ****, to read SCALE encoded sufficient crypto as Vec<u8> from file named `****` from folder `../files/for_signing/`  
@@ -144,7 +144,7 @@ Possible commands are:
 - `transfer_meta_to_cold_release` without any keys, to transfer metadata from hot database in its current state into cold database `COLD_DB_NAME_RELEASE` without any identities added  
 
 - `derivations` to generate Signer-readable qr code to import derivations, with following keys:  
-    - optional content key: `-qr` will generate only apng qr code, `-text` will generate only text file with hex encoded message; by default, both qr code and text message are generated; content keys are expected immediately after `derivations` command, if at all; keys to follow could go in any order, but with content immediately following the key.  
+    - optional content key: `-qr` will generate only apng qr code, `-text` will generate only text file with hex encoded message; by default, both qr code and text message are generated; content keys are expected immediately after `derivations` command, if at all; keys to follow could go in any order, but with argument immediately following the key.  
     - key `-title` followed by network title, the storage key in address book  
     - key `-payload` followed by file name to read derivation from, in `../generate_message` folder. Derivations should be on individual line each, empty line count as empty derivations (root ones). See file `../generate_message/standard_derivations_list` for formatting example. All succesfully read derivations will be also printed to user during the run. For now duplicates are allowed when creating transfer, only one entry is made in Signer when accepting the payload.  
 
@@ -152,6 +152,11 @@ Possible commands are:
     - key `-payload` followed by file name for .wasm file, in `../generate_message` folder.  
     - optional key `-d` to **not** write into the database the result, i.e. only create the intermediate file. By default, the results are written in the database.  
 
+- `meta_default_file` to produce a network metadata file that will be part of the release metadata set in `defaults` crate. Use with following keys:  
+    - key `-name` followed by the network name  
+    - key `-version` followed by the network version  
+
+- `check_file` followed by path to the file, to check that the file is a valid hex-encoded metadata and, if it has a matching record in the hot database, assert that the metadata in file and database is identical.  
 
 ## Example commands  
 
@@ -227,8 +232,8 @@ Release cold database is the one loaded into Signer.
 
 ## List of currently supported command and key combinations (without `make` and `sign` variants)  
 
-`$ cargo run show -database`  
-`$ cargo run show -address_book`  
+`$ cargo run show -metadata`  
+`$ cargo run show -networks`  
 
 `$ cargo run load_types`  
 
@@ -246,20 +251,15 @@ Release cold database is the one loaded into Signer.
 
 `$ cargo run add_specs -f -a`  
 `$ cargo run add_specs -f -n network_title`  
-`$ cargo run add_specs -f -n network_title -ed25519` (*)  
-`$ cargo run add_specs -f -u network_url`  
-`$ cargo run add_specs -f -u network_url -ed25519` (*)  
-`$ cargo run add_specs -d -u network_url -ed25519` (*)  
-`$ cargo run add_specs -d -u network_url -ed25519 -token 12 MEOW` (*) (**)  
-`$ cargo run add_specs -p -n network_title -ed25519` (*)  
-`$ cargo run add_specs -p -u network_url -ed25519` (*)  
-`$ cargo run add_specs -p -u network_url -ed25519 -token 12 MEOW` (*) (**)  
-`$ cargo run add_specs -t -n network_title -ed25519` (*)  
-`$ cargo run add_specs -t -u network_url -ed25519` (*)  
-`$ cargo run add_specs -t -u network_url -ed25519 -token 12 MEOW` (*) (**)  
-`$ cargo run add_specs -n network_title -ed25519` (*)  
-`$ cargo run add_specs -u network_url -ed25519` (*)  
-`$ cargo run add_specs -u network_url -ed25519 -token 12 MEOW` (*) (**)  
+`$ cargo run add_specs -f -n network_title -ed25519`[^1]  
+`$ cargo run add_specs -d -u network_url -ed25519`  
+`$ cargo run add_specs -d -u network_url -ed25519 -token 12 MEOW`[^2]  
+`$ cargo run add_specs -p -n network_title -ed25519`  
+`$ cargo run add_specs -p -u network_url -ed25519`  
+`$ cargo run add_specs -p -u network_url -ed25519 -token 12 MEOW`  
+`$ cargo run add_specs -t -n network_title -ed25519` or identical `$ cargo run add_specs -n network_title -ed25519`  
+`$ cargo run add_specs -t -u network_url -ed25519` or identical `$ cargo run add_specs -u network_url -ed25519`  
+`$ cargo run add_specs -t -u network_url -ed25519 -token 12 MEOW` or identical `$ cargo run add_specs -u network_url -ed25519 -token 12 MEOW`  
 
 `$ cargo run remove -title westend-ed25519`  
 `$ cargo run remove -name kusama -version 9090`  
@@ -274,5 +274,10 @@ Release cold database is the one loaded into Signer.
 
 `$ cargo run unwasm -payload westend_runtime-v9150.compact.compressed.wasm`  
 
-(*) encryption override key should correspond to appropriate encryption for the network in question
-(**) token override is possible only for networks that (1) are not in the database and (2) have multiple allowed tokens; use caution;
+`$ cargo run meta_default_file -name westend -version 9200`
+
+`$ cargo run check_file "../defaults/release_metadata/westend9200"`
+
+[^1]: encryption override key should correspond to appropriate encryption for the network in question  
+
+[^2]: token override is possible only for networks that (1) are not in the database and (2) have multiple allowed tokens; use caution;  

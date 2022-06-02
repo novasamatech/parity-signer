@@ -1,3 +1,4 @@
+//! Command line parser for the client
 use constants::FOLDER;
 use definitions::{
     crypto::{Encryption, SufficientCrypto},
@@ -12,128 +13,697 @@ use sp_core::{ecdsa, ed25519, sr25519};
 use std::convert::TryInto;
 use std::{env, path::PathBuf};
 
-/// Expected typical run commands:
-/// `$ cargo run show database`
-/// `$ cargo run show address_book`
-/// `$ cargo run load_metadata -n westend`
-/// `$ cargo run add_specs -d -n -ed25519 westend`
-/// `$ cargo run add_network -u wss://unknown-network.eu -ecdsa`
-/// `$ cargo run derivations -title westend -payload my_derivations_file`
-
-/// Enum to describe the incoming command contents
+/// Commands to execute
 pub enum Command {
+    /// Execute [`Show`] command.
+    ///
+    /// # Display content of the metadata [`METATREE`](constants::METATREE) tree of the hot database
+    ///
+    /// `$ cargo run show -metadata`
+    ///
+    /// Function prints for each entry in hot database
+    /// [`METATREE`](constants::METATREE) tree:
+    ///
+    /// - network name
+    /// - network version
+    /// - hexadecimal metadata hash
+    ///
+    /// # Display content of the address book [`ADDRESS_BOOK`](constants::ADDRESS_BOOK) tree of the hot database
+    ///
+    /// `$ cargo run show -networks`
+    ///
+    /// Function prints for each entry in hot database
+    /// [`ADDRESS_BOOK`](constants::ADDRESS_BOOK) tree:
+    ///
+    /// - address book title for the network, used only to distinguish between
+    /// address book entries
+    /// - url address at which rpc calls are made for the network
+    /// - network encryption
+    /// - additional marker that the network is a default one
+    /// - network title as it will be displayed in Signer, from
+    /// [`NetworkSpecsToSend`](definitions::network_specs::NetworkSpecsToSend)
+    ///
+    /// # Show network specs for a network, as they are recorded in the hot database
+    ///
+    /// `$ cargo run show -specs <network address book title>`
+    ///
+    /// Function prints network address book title and corresponding
+    /// [`NetworkSpecsToSend`](definitions::network_specs::NetworkSpecsToSend)
+    /// from [`SPECSTREEPREP`] tree of the hot database.
+    ///
+    /// # Check external file with hex-encoded metadata
+    ///
+    /// `$ cargo run check_file <path>`
+    ///
+    /// Function asserts that:
+    ///
+    /// - the file contains valid metadata, with retrievable network name and
+    /// version
+    /// - if the metadata for same network name and version is in the hot
+    /// database, it completely matches the one from the file
     Show(Show),
+
+    /// # Prepare payload for `load_types` update
+    ///
+    /// `$ cargo run load_types`
+    ///
+    /// A file is generated in dedicated [`FOLDER`](constants::FOLDER) to
+    /// (optionally) be signed and later be transformed into `load_types` update
+    /// QR. Output file name is `sign_me_load_types`.
     Types,
-    Load(Instruction),
-    Specs(Instruction),
+
+    /// # Prepare payload for `load_metadata` update according to
+    /// [`InstructionMeta`]
+    ///
+    /// `$ cargo run load_metadata <key(s)> <(argument)>`
+    ///
+    /// A file is generated in dedicated [`FOLDER`](constants::FOLDER) to
+    /// (optionally) be signed and later be transformed into `load_metadata`
+    /// update QR. Output file name is `sign_me_load_metadata_<name>V<version>`.
+    ///
+    /// Setting keys that could be used in command line (maximum one):
+    ///
+    /// - `-d`: do **not** update the database, make rpc calls, and produce
+    /// output files
+    /// - `-f`: do **not** run rpc calls, produce output files from database as
+    /// it is
+    /// - `-k`: update database through rpc calls, produce output files only for
+    /// **updated** database entries
+    /// - `-p`: update database through rpc calls, do **not** produce any output
+    /// files
+    /// - `-t` (no setting key defaults here): update database through rpc
+    /// calls, produce output files
+    ///
+    /// Reference keys (exactly only one has to be used):
+    ///
+    /// - `-a`: all networks with entries in the
+    /// [`ADDRESS_BOOK`](constants::ADDRESS_BOOK) tree of the hot database
+    /// - `-n` followed by single network name: for a network with existing
+    /// record in the [`ADDRESS_BOOK`](constants::ADDRESS_BOOK)
+    /// - `-u` followed by single url address: reserved for networks with no
+    /// record yet in the [`ADDRESS_BOOK`](constants::ADDRESS_BOOK)
+    ///
+    /// `-a` key could be used with `-s` key, to stop processing after first
+    /// error.
+    Load(InstructionMeta),
+
+    /// # Prepare payload for `add_specs` update according to
+    /// [`InstructionSpecs`]
+    ///
+    /// `$ cargo run add_specs <keys> <argument(s)>`
+    ///
+    /// A file is generated in dedicated [`FOLDER`](constants::FOLDER) to
+    /// (optionally) be signed and later be transformed into `add_specs` update
+    /// QR. Output file name is `sign_me_add_specs_<name>_<encryption>`.
+    ///
+    /// Setting keys that could be used in command line (maximum one):
+    ///
+    /// - `-d`: do **not** update the database, make rpc calls, and produce
+    /// output files
+    /// - `-f`: do **not** run rpc calls, produce output files
+    /// - `-p`: update database through rpc calls, do **not** produce any output
+    /// files
+    /// - `-t` (no setting key defaults here): update database through rpc
+    /// calls, produce output files
+    ///
+    /// Reference keys (exactly only one has to be used):
+    ///
+    /// - `-a`: all networks with entries in the
+    /// [`ADDRESS_BOOK`](constants::ADDRESS_BOOK) tree of the hot database
+    /// - `-n` followed by single network address book title: for a network with
+    /// existing record in the [`ADDRESS_BOOK`](constants::ADDRESS_BOOK)
+    /// - `-u` followed by single url address: reserved for networks with no
+    /// record yet in the [`ADDRESS_BOOK`](constants::ADDRESS_BOOK)
+    ///
+    /// `-a` key could be used with `-s` key, to stop processing after first
+    /// error.
+    ///
+    /// Key specifying encryption algorithm supported by the network is optional
+    /// for `-n` reference key (since there is already an entry in the database
+    /// with specified encryption) and mandatory for `-u` reference key.
+    /// Supported variants are:
+    ///
+    /// - `-ed25519`
+    /// - `-sr25519`
+    /// - `-ecdsa`
+    ///
+    /// Sequence invoking token override could be used when processing
+    /// individual network that (1) has no database record yet and (2) has
+    /// multiple allowed decimals and unit values retrieved as arrays of equal
+    /// size. To override token, key `-token` followed by `u8` decimals value
+    /// and `String` unit value is used.
+    Specs(InstructionSpecs),
+
+    /// Complete update QR generation, either signed or unsigned
+    ///
+    /// If update is signed and accepted in Signer, the signature author will
+    /// become a verifier in Signer, and some data afterwards could be accepted
+    /// by Signer only if signed by the same verifier.
+    ///
+    /// Verifier keys must be kept safe.
+    ///
+    /// # Assemble QR update with external signature
+    ///
+    /// `$ cargo run make <key(s)> <argument(s)>`
+    ///
+    /// Keys to be used in command line:
+    ///
+    /// - Optional output format key: `-qr` will generate only apng qr code,
+    /// `-text` will generate only text file with hex-encoded update. By
+    /// default, i.e. if content key is not provided, both qr code and text
+    /// message are generated. Optional output format key is expected
+    /// immediately after `make` command, if at all; keys to follow could go in
+    /// any order, but with argument immediately following the key.
+    ///
+    /// - Key `-crypto` followed by encryption used to make update signature:
+    ///    - `ed25519`
+    ///    - `sr25519`
+    ///    - `ecdsa`
+    ///    - `none` if the message is not verified
+    ///
+    /// - Key `-msgtype` followed by message type:
+    ///    - `load_types`
+    ///    - `load_metadata`
+    ///    - `add_specs`
+    ///
+    /// - Key `-verifier` (can be entered if only the `-crypto` argument was
+    /// `ed25519`, `sr25519`, or `ecdsa`), followed by:
+    ///    - `Alice` to generate messages "verified" by Alice (used for tests)
+    ///    - `-hex` followed by hex public key
+    ///    - `-file` followed by file path in dedicated
+    /// [`FOLDER`](constants::FOLDER) with public key as raw bytes
+    ///
+    /// - Key `-payload` followed by file path in dedicated
+    /// [`FOLDER`](constants::FOLDER) containing already generated payload as
+    /// raw bytes
+    ///
+    /// - Key `-signature` (can be entered if only the `-crypto` argument was
+    /// `ed25519`, `sr25519`, or `ecdsa` **and** `-verifier` is not `Alice`),
+    /// followed by:
+    ///    - `-hex` followed by hex signature
+    ///    - `-file` followed by file path in dedicated
+    /// [`FOLDER`](constants::FOLDER) with signature as raw bytes
+    ///
+    /// - Optional key `-name` followed by path override for export file in
+    /// dedicated [`EXPORT_FOLDER`](constants::EXPORT_FOLDER)
+    ///
+    /// ### Example: generate `load_metadata` QR code for westend metadata version 9200.
+    ///
+    /// At this point the payload is already prepared with `load_metadata`
+    /// command. File `sign_me_load_metadata_westendV9200` is in dedicated
+    /// [`FOLDER`](constants::FOLDER).
+    ///
+    /// After `make` command is executed, QR code will appear in dedicated
+    /// [`EXPORT_FOLDER`](constants::EXPORT_FOLDER).
+    ///
+    /// ### `make` for external signature
+    ///
+    /// Content of the payload file `sign_me_load_metadata_westendV9200` is
+    /// signed using some external tool, for example, `subkey`. Hexadecimal
+    /// `public key`, hexadecimal `signature`, and `encryption` will be needed
+    /// to run command:
+    ///
+    /// `$ cargo run make -qr -crypto <encryption> -msgtype load_metadata
+    /// -verifier -hex <public key> -payload sign_me_load_metadata_westendV9200
+    /// -signature -hex <signature>`
+    ///
+    /// Output file name would be `load_metadata_westendV9200`.
+    ///
+    /// ### `make` for test verifier Alice
+    ///
+    /// Alice has a well-known [seed phrase](constants::ALICE_SEED_PHRASE).
+    /// Here derivation `//Alice` is used.
+    /// Payloads signed by Alice are used for testing in Signer. The signature
+    /// in this case is generated automatically and is not supplied in command
+    /// line.
+    ///
+    /// `$ cargo run make -qr -crypto <encryption> -msgtype load_metadata
+    /// -verifier Alice -payload sign_me_load_metadata_westendV9200`.
+    ///
+    /// Output file name would be `load_metadata_westendV9200_Alice-<encryption>`.
+    ///
+    /// ### `make` with no signature
+    ///
+    /// `$ cargo run make -qr -crypto none -msgtype load_metadata -payload
+    /// sign_me_load_metadata_westendV9200`
+    ///
+    /// Output file name would be `load_metadata_westendV9200_unverified`.
+    ///
+    /// Note that the validity of the signature, if applicable, and the payload
+    /// content are checked before assembling QR update.
+    ///
+    /// # Assemble QR update using `SufficientCrypto` produced by Signer
+    ///
+    /// Updates could be signed in Signer itself, by generating
+    /// [`SufficientCrypto`] for data that is already in the Signer, with one of
+    /// the Signer keys. Signer exports `SufficientCrypto` as a static QR code,
+    /// its content is fed into command line.
+    ///
+    /// `$ cargo run sign <key(s)> <argument(s)>`
+    ///
+    /// Keys to be used in command line:
+    ///
+    /// - Optional output format key: `-qr` will generate only apng qr code,
+    /// `-text` will generate only text file with hex-encoded update. By
+    /// default, i.e. if content key is not provided, both qr code and text
+    /// message are generated. Optional output format key is expected
+    /// immediately after `make` command, if at all; keys to follow could go in
+    /// any order, but with argument immediately following the key.
+    ///
+    /// - Key `-sufficient` followed by:
+    ///    - `-hex` followed by hexadecimal string with SCALE-encoded
+    /// [`SufficientCrypto`], i.e. Signer QR code output content
+    ///    - `-file` followed by file path in dedicated
+    /// [`FOLDER`](constants::FOLDER) with SCALE-encoded [`SufficientCrypto`] as
+    /// raw bytes
+    ///
+    /// - Key `-msgtype` followed by message type:
+    ///    - `load_types`
+    ///    - `load_metadata`
+    ///    - `add_specs`
+    ///
+    /// - Key `-payload` followed by file path in dedicated
+    /// [`FOLDER`](constants::FOLDER) containing already generated payload as
+    /// raw bytes
+    ///
+    /// - Optional key `-name` followed by path override for export file in
+    /// dedicated [`EXPORT_FOLDER`](constants::EXPORT_FOLDER)
+    ///
+    /// Note that the validity of the signature, if applicable, and the payload
+    /// content are checked before assembling QR update.
+    ///
+    /// Generating `SufficientCrypto` in Signer is suggested mainly for update
+    /// distribution purposes. A dedicated (i.e. used only for updates signing),
+    /// kept physically safe Signer is strongly suggested, with a dedicated key
+    /// for updates signing. As the Signer can accept only payloads with
+    /// verifier not weaker than the one used before, and the whole purpose of
+    /// the process is to generate a signature for payload, it is expected that
+    /// this isolated Signer will receive unsigned or weakly signed updates,
+    /// thoroughly check them and export `SufficientCrypto`, so that a signed
+    /// update could be made for other, routinely used Signer devices.
+    ///
+    /// ### Example: generate `load_metadata` QR code for westend metadata version 9200.
+    ///
+    /// At this point the payload is already prepared with `load_metadata`
+    /// command. File `sign_me_load_metadata_westendV9200` is in dedicated
+    /// [`FOLDER`](constants::FOLDER). Hexadecimal `hex_sufficient` string is
+    /// from [`SufficientCrypto`] QR code produced the Signer.
+    ///
+    /// After `make` command is executed, QR code will appear in dedicated
+    /// [`EXPORT_FOLDER`](constants::EXPORT_FOLDER).
+    ///
+    /// `$ cargo run sign -qr -sufficient -hex <hex_sufficient> -msgtype
+    /// load_metadata -payload sign_me_load_metadata_westendV9200`
+    ///
+    /// Output file name would be `load_metadata_westendV9200`.
     Make(Make),
+
+    /// Remove data from the hot database
+    ///
+    /// # Remove a single metadata entry
+    ///
+    /// `$ cargo run remove -name <network name> -version <network version>`
+    ///
+    /// # Remove all data associated with a network
+    ///
+    /// `$ cargo run remove -title <network address book title>`
+    ///
+    /// This will remove:
+    /// - address book entry
+    /// [`AddressBookEntry`](definitions::metadata::AddressBookEntry) from
+    /// [`ADDRESS_BOOK`](constants::ADDRESS_BOOK) tree
+    /// - network specs
+    /// [`NetworkSpecsToSend`](definitions::network_specs::NetworkSpecsToSend)
+    /// from [`SPECSTREEPREP`](constants::SPECSTREEPREP) tree
+    /// - all associated metadata entries from [`METATREE`](constants::METATREE)
+    /// if there are no other address book entries this metadata is associated
+    /// with
     Remove(Remove),
+
+    /// # Restore hot database to default state
+    ///
+    /// `$ cargo run restore_defaults`
+    ///
+    /// By default, hot database contains
+    ///
+    /// - [`ADDRESS_BOOK`](constants::ADDRESS_BOOK) and
+    /// [`SPECSTREEPREP`](constants::SPECSTREEPREP) entries for default networks
+    /// Polkadot, Kusama, and Westend
+    /// - types information in [`SETTREE`](constants::SETTREE)
+    /// - **no** metadata entries in [`METATREE`](constants::METATREE)
     RestoreDefaults,
+
+    /// # Generate release cold database
+    ///
+    /// `$ cargo run make_cold_release <optional path>`
+    ///
+    /// This generates release cold database (unitiniated) at user-provided path
+    /// or, if no valid path is given, at default path
+    /// [`COLD_DB_NAME_RELEASE`](constants::COLD_DB_NAME_RELEASE).
+    ///
+    /// The cold release database, as generated, contains:
+    ///
+    /// - network specs for default networks (Polkadot, Kusama, Westend)
+    /// - verifier information for default networks, with verifiers set to the
+    /// general one
+    /// - two latest metadata versions for default networks
+    /// - default types information
+    ///
+    /// Note that the general verifier is not specified and history is not
+    /// started. This will be done only in Signer itself.
     MakeColdRelease(Option<PathBuf>),
-    TransferMetaRelease,
+
+    /// # Transfer metadata from hot database to release cold database
+    ///
+    /// `$ cargo run transfer_meta_to_cold_release <optional path>`
+    ///
+    /// This transfers metadata from hot database to release cold database at
+    /// user-provided path or, if no valid path is given, at default path
+    /// [`COLD_DB_NAME_RELEASE`](constants::COLD_DB_NAME_RELEASE).
+    ///
+    /// Metadata is transfered only for the networks that are known to the cold
+    /// database, i.e. the ones having
+    /// [`NetworkSpecs`](definitions::network_specs::NetworkSpecs) on record.
+    TransferMetaRelease(Option<PathBuf>),
+
+    /// # Make QR update with `derivations` payload
+    ///
+    /// `$ cargo run derivations <keys> <arguments>`
+    ///
+    /// Keys to be used in command line:
+    ///
+    /// - Optional output format key: `-qr` will generate only apng qr code,
+    /// `-text` will generate only text file with hex-encoded update. By
+    /// default, i.e. if content key is not provided, both qr code and text
+    /// message are generated. Optional output format key is expected
+    /// immediately after `make` command, if at all; keys to follow could go in
+    /// any order, but with argument immediately following the key.
+    ///
+    /// - Key `-payload` followed by file path in `/generate_message/` folder.
+    /// File contains password-free derivations, each on its own line. Only
+    /// suitable derivations will be processed. Processed derivations are also
+    /// printed for user to check.
+    ///
+    /// - Key `-title` followed by network address book title, to indicate to
+    /// which network the derivatinos belong.
+    ///
+    /// Output file name would be `derivations-<network address book title>`.
     Derivations(Derivations),
+
+    /// # Prepare payload for `load_metadata` update from `.wasm` file
+    ///
+    /// `$ cargo run unwasm <key(s)> <argument>`
+    ///
+    /// A file is generated in dedicated [`FOLDER`](constants::FOLDER) to
+    /// (optionally) be signed and later be transformed into `load_metadata`
+    /// update QR. Output file name is `sign_me_load_metadata_<name>V<version>`.
+    ///
+    /// This could be used to generate update QR codes before the metadata
+    /// becomes accessible from the node. As `load_metadata` payload contains
+    /// genesis hash, it must be retrieved from the hot database. Thus, `unwasm`
+    /// command could be used only for the networks introduced already to the
+    /// hot database.
+    ///
+    /// Keys to be used in command line:
+    ///
+    /// - Key `-payload` followed by `.wasm` file path in `/generate_message/`
+    /// folder.
+    ///
+    /// - Optional `-d` key to skip updating the database.
     Unwasm { filename: String, update_db: bool },
+
+    /// # Make metadata file for `defaults` set
+    ///
+    /// `$ cargo run meta_default_file -name <network name> -version
+    /// <network_version>`
+    ///
+    /// Produces file with hex-encoded network metadata from the hot database
+    /// [`METATREE`](constants::METATREE) entry.
+    ///
+    /// Output file named `<network_name><network_version>` is generated in
+    /// dedicated [`EXPORT_FOLDER`](constants::EXPORT_FOLDER).
     MetaDefaultFile { name: String, version: u32 },
 }
 
+/// Display data commands
 pub enum Show {
-    Database,
-    AddressBook,
+    /// Show all hot database [`METATREE`](constants::METATREE) entries
+    Metadata,
+
+    /// Show all hot database [`ADDRESS_BOOK`](constants::ADDRESS_BOOK) entries
+    Networks,
+
+    /// Show network specs from [`SPECSTREEPREP`](constants::SPECSTREEPREP)
+    /// entry. Associated data is user-entered network address book title.
+    Specs(String),
+
+    /// Check that external file is valid network metadata and search for
+    /// similar entry in hot database [`METATREE`](constants::METATREE).
+    /// Associated data is user-provided path to the metadata file.
+    CheckFile(String),
 }
 
-pub struct Instruction {
+/// Command details for `load_metadata`
+pub struct InstructionMeta {
+    /// Setting key, as read from command line
     pub set: Set,
+
+    /// Reference key, as read from command line
     pub content: Content,
-    pub pass_errors: bool,
+}
+
+/// Command details for `add_specs`
+pub struct InstructionSpecs {
+    /// Setting key, as read from command line
+    pub set: Set,
+
+    /// Reference key, as read from command line
+    pub content: Content,
+
+    /// Overrides, relevant only for `add_specs` command
     pub over: Override,
 }
 
+/// Reference key for `load_metadata` and `add_specs` commands
 pub enum Content {
-    All,
+    /// Key `-a`: deal with all relevant database entries
+    ///
+    /// Associated data is a flag to indicate skipping errors when processing
+    /// `-a`.
+    /// Passing optional `-s` key sets this to false, i.e. makes the run stop
+    /// after the first error encountered.
+    All { pass_errors: bool },
+
+    /// Key `-n`: process only the network referred to by:
+    ///
+    /// - network name (in `load_metadata` command)
+    /// - network address book title (in `add_specs` command)
     Name(String),
+
+    /// Key `-u`: process only the network referred to by url address
     Address(String),
 }
 
+/// Setting key for `load_metadata` and `add_specs` commands
 pub enum Set {
-    D, // key `-d`: do NOT update the database, make rpc calls, and produce ALL possible output files
-    F, // key `-f`: do NOT run rps calls, produce ALL possible output files from existing database
-    K, // key `-k`: update database through rpc calls, produce output files only for UPDATED database entries
-    P, // key `-p`: update database through rpc calls, do NOT produce any output files
-    T, // key `-t`: default setting, update database through rpc calls, produce ALL possible output files
+    /// Key `-d`: do **not** update the database, make rpc calls, and produce
+    /// output files
+    D,
+
+    /// Key `-f`: do **not** run rpc calls, produce output files from database
+    /// as it is
+    F,
+
+    /// Key `-k`: update database through rpc calls, produce output files only
+    /// for **updated** database entries
+    K,
+
+    /// Key `-p`: update database through rpc calls, do **not** produce any
+    /// output files
+    P,
+
+    /// Key `-t` (no setting key defaults here): update database through rpc
+    /// calls, produce output files
+    T,
 }
 
+/// Data to process `make` and `sign` commands
 pub struct Make {
+    /// Target output format
     pub goal: Goal,
+
+    /// Who is signing the payload
     pub crypto: Crypto,
+
+    /// Payload
     pub msg: Msg,
+
+    /// Output name override
     pub name: Option<String>,
 }
 
+/// Target output format for `derivations`, `make` and `sign` commands
 pub enum Goal {
+    /// Only QR code
     Qr,
+
+    /// Only text file with hexadecimal string (used for tests)
     Text,
+
+    /// Both QR code and text file, default
     Both,
 }
 
+/// Verifier-to-be, for `make` and `sign` commands
 pub enum Crypto {
+    /// Alice key, with well-known [seed phrase](constants::ALICE_SEED_PHRASE)
+    /// and derivation `//Alice`, to generate test updating payloads.
+    ///
+    /// Associated data is [`Encryption`] algorithm used.
     Alice(Encryption),
+
+    /// No verifier, to make unsigned updates.
     None,
+
+    /// Real verifier, [`SufficientCrypto`] is either assembled from `make`
+    /// command input parts or from `sign` command input directly.
     Sufficient(SufficientCrypto),
 }
 
+/// Payload for `make` and `sign` commands
+///
+/// Associated data is `Vec<u8>` blob that becomes part of the update.
+///
+/// Payload content details are described in [definitions::qr_transfers].
 pub enum Msg {
+    /// `load_types` payload
     LoadTypes(Vec<u8>),
+
+    /// `load_metadata` payload
     LoadMetadata(Vec<u8>),
+
+    /// `add_specs` payload
     AddSpecs(Vec<u8>),
 }
 
+/// Argument for `-crypto` key in `make` command
 enum CryptoType {
+    /// `ed25519` argument
     Ed25519,
+
+    /// `sr25519` argument
     Sr25519,
+
+    /// `ecdsa` argument
     Ecdsa,
+
+    /// `none` argument
     None,
 }
 
+/// Argument for `-msgtype` key in `make` and `sign` commands
 enum MsgType {
+    /// `load_types` argument
     LoadTypes,
+
+    /// `load_metadata` argument
     LoadMetadata,
+
+    /// `add_specs` argument
     AddSpecs,
 }
 
+/// Argument for `-verifier` key in `make` command
 enum VerKey {
+    /// Hexadecimal string input, entered with `-hex` key.
+    ///
+    /// Associated data is the string itself.
     Hex(String),
+
+    /// Input from file, entered with `-file` key.
+    ///
+    /// Associated data is the file path.
     File(String),
+
+    /// Verifier is Alice
     Alice,
 }
 
+/// Argument for `-signature` key in `make` command
 enum Entry {
+    /// Hexadecimal string input, entered with `-hex` key.
+    ///
+    /// Associated data is the string itself.
     Hex(String),
+
+    /// Input from file, entered with `-file` key.
+    ///
+    /// Associated data is the file path.
     File(String),
 }
 
+/// Data to process `remove` command
 pub enum Remove {
+    /// Removing all network data by network address book title.
+    ///
+    /// Associated data is user-entered network address book title.
     Title(String),
+
+    /// Remove specified network metadata entry.
+    ///
+    /// Associated data is network name and version.
     SpecNameVersion { name: String, version: u32 },
 }
 
+/// Data to process `derivations` command
 pub struct Derivations {
+    /// Target output format
     pub goal: Goal,
+
+    /// Address book title for network in which addresses with imported
+    /// derivations will be made in Signer
     pub title: String,
+
+    /// Contents of the payload file
     pub derivations: String,
 }
 
+/// Overrides for `add_specs` command
 pub struct Override {
+    /// [`Encryption`] override to specify encryption algorithm used by a new
+    /// network or to add another encryption algorithm in known network.
     pub encryption: Option<Encryption>,
-    pub token: Option<TokenOverride>,
+
+    /// Network title override, so that user can specify the network title in
+    /// [`NetworkSpecsToSend`](definitions::network_specs::NetworkSpecsToSend)
+    /// that determines under what title the network is displayed in the Signer
+    pub title: Option<String>,
+
+    /// Token override to specify decimals and units used to display balance in
+    /// network transactions.
+    ///
+    /// Token override could be invoked only if:
+    ///
+    /// - network has no database record yet
+    /// - network has multiple decimals and unit values, those were retrieved as
+    /// arrays of equal size.
+    pub token: Option<Token>,
 }
 
-pub struct TokenOverride {
+impl Override {
+    pub fn all_empty(&self) -> bool {
+        self.encryption.is_none() && self.title.is_none() && self.token.is_none()
+    }
+}
+
+/// Data from command line for token override
+pub struct Token {
     pub decimals: u8,
     pub unit: String,
 }
 
 impl Command {
-    /// FUnction to interpret command line input
+    /// Interpret command line input into `Command`
     pub fn new(mut args: env::Args) -> Result<Command, ErrorActive> {
         args.next();
 
@@ -143,30 +713,60 @@ impl Command {
                 match arg.as_str() {
                     "show" => match args.next() {
                         Some(show) => match show.to_lowercase().as_str() {
-                            "-database" => {
+                            "-metadata" => {
                                 if args.next().is_some() {
                                     Err(ErrorActive::CommandParser(
                                         CommandParser::UnexpectedKeyArgumentSequence,
                                     ))
                                 } else {
-                                    Ok(Command::Show(Show::Database))
+                                    Ok(Command::Show(Show::Metadata))
                                 }
                             }
-                            "-address_book" => {
+                            "-networks" => {
                                 if args.next().is_some() {
                                     Err(ErrorActive::CommandParser(
                                         CommandParser::UnexpectedKeyArgumentSequence,
                                     ))
                                 } else {
-                                    Ok(Command::Show(Show::AddressBook))
+                                    Ok(Command::Show(Show::Networks))
                                 }
                             }
+                            "-specs" => match args.next() {
+                                Some(title) => {
+                                    if args.next().is_some() {
+                                        Err(ErrorActive::CommandParser(
+                                            CommandParser::UnexpectedKeyArgumentSequence,
+                                        ))
+                                    } else {
+                                        Ok(Command::Show(Show::Specs(title)))
+                                    }
+                                }
+                                None => {
+                                    Err(ErrorActive::CommandParser(CommandParser::NeedArgument(
+                                        CommandNeedArgument::ShowSpecsTitle,
+                                    )))
+                                }
+                            },
                             _ => Err(ErrorActive::CommandParser(
                                 CommandParser::UnexpectedKeyArgumentSequence,
                             )),
                         },
                         None => Err(ErrorActive::CommandParser(CommandParser::NeedKey(
                             CommandNeedKey::Show,
+                        ))),
+                    },
+                    "check_file" => match args.next() {
+                        Some(path) => {
+                            if args.next().is_some() {
+                                Err(ErrorActive::CommandParser(
+                                    CommandParser::UnexpectedKeyArgumentSequence,
+                                ))
+                            } else {
+                                Ok(Command::Show(Show::CheckFile(path)))
+                            }
+                        }
+                        None => Err(ErrorActive::CommandParser(CommandParser::NeedArgument(
+                            CommandNeedArgument::CheckFile,
                         ))),
                     },
                     "load_types" => {
@@ -179,12 +779,13 @@ impl Command {
                         }
                     }
                     "load_metadata" | "add_specs" => {
-                        let mut set_key = None;
+                        let mut set = None;
                         let mut content_key = None;
-                        let mut pass_errors = true;
+                        let mut s_key_used = false;
                         let mut name = None;
-                        let mut encryption_override_key = None;
+                        let mut encryption = None;
                         let mut token = None;
+                        let mut title = None;
                         while let Some(x) = args.next() {
                             let x = x.to_lowercase();
                             if x.starts_with('-') {
@@ -197,50 +798,66 @@ impl Command {
                                         }
                                         None => content_key = Some(x),
                                     },
-                                    "-d" | "-f" | "-k" | "-p" | "-t" => match set_key {
+                                    "-d" | "-f" | "-k" | "-p" | "-t" => match set {
                                         Some(_) => {
                                             return Err(ErrorActive::CommandParser(
                                                 CommandParser::DoubleKey(CommandDoubleKey::Set),
                                             ))
                                         }
-                                        None => set_key = Some(x),
-                                    },
-                                    "-s" => pass_errors = false,
-                                    "-ed25519" | "-sr25519" | "-ecdsa" => {
-                                        if arg == "load_metadata" {
-                                            return Err(ErrorActive::CommandParser(
-                                                CommandParser::UnexpectedKeyArgumentSequence,
-                                            ));
+                                        None => {
+                                            set = match x.as_str() {
+                                                "-d" => Some(Set::D),
+                                                "-f" => Some(Set::F),
+                                                "-k" => Some(Set::K),
+                                                "-p" => Some(Set::P),
+                                                "-t" => Some(Set::T),
+                                                _ => unreachable!(),
+                                            };
                                         }
-                                        match encryption_override_key {
-                                            Some(_) => {
+                                    },
+                                    "-s" => s_key_used = true,
+                                    "-ed25519" | "-sr25519" | "-ecdsa" => match encryption {
+                                        Some(_) => {
+                                            if arg == "load_metadata" {
+                                                return Err(ErrorActive::CommandParser(
+                                                    CommandParser::UnexpectedKeyArgumentSequence,
+                                                ));
+                                            } else {
                                                 return Err(ErrorActive::CommandParser(
                                                     CommandParser::DoubleKey(
                                                         CommandDoubleKey::CryptoOverride,
                                                     ),
-                                                ))
+                                                ));
                                             }
-                                            None => encryption_override_key = Some(x),
                                         }
-                                    }
+                                        None => {
+                                            encryption = match x.as_str() {
+                                                "-ed25519" => Some(Encryption::Ed25519),
+                                                "-sr25519" => Some(Encryption::Sr25519),
+                                                "-ecdsa" => Some(Encryption::Ecdsa),
+                                                _ => unreachable!(),
+                                            };
+                                        }
+                                    },
                                     "-token" => {
-                                        if arg == "load_metadata" {
-                                            return Err(ErrorActive::CommandParser(
-                                                CommandParser::UnexpectedKeyArgumentSequence,
-                                            ));
-                                        }
                                         match token {
                                             Some(_) => {
-                                                return Err(ErrorActive::CommandParser(
-                                                    CommandParser::DoubleKey(
-                                                        CommandDoubleKey::TokenOverride,
-                                                    ),
-                                                ))
+                                                if arg == "load_metadata" {
+                                                    return Err(ErrorActive::CommandParser(
+                                                        CommandParser::UnexpectedKeyArgumentSequence,
+                                                    ));
+                                                } else {
+                                                    return Err(ErrorActive::CommandParser(
+                                                        CommandParser::DoubleKey(
+                                                            CommandDoubleKey::TokenOverride,
+                                                        ),
+                                                    ));
+                                                }
                                             }
                                             None => token = match args.next() {
                                                 Some(b) => match b.parse::<u8>() {
                                                     Ok(decimals) => match args.next() {
-                                                        Some(c) => Some(TokenOverride {
+                                                        Some(c) => Some(Token {
                                                             decimals,
                                                             unit: c.to_string(),
                                                         }),
@@ -270,6 +887,33 @@ impl Command {
                                             },
                                         }
                                     }
+                                    "-title" => match title {
+                                        Some(_) => {
+                                            if arg == "load_metadata" {
+                                                return Err(ErrorActive::CommandParser(
+                                                    CommandParser::UnexpectedKeyArgumentSequence,
+                                                ));
+                                            } else {
+                                                return Err(ErrorActive::CommandParser(
+                                                    CommandParser::DoubleKey(
+                                                        CommandDoubleKey::TitleOverride,
+                                                    ),
+                                                ));
+                                            }
+                                        }
+                                        None => {
+                                            title = match args.next() {
+                                                Some(b) => Some(b),
+                                                None => {
+                                                    return Err(ErrorActive::CommandParser(
+                                                        CommandParser::NeedArgument(
+                                                            CommandNeedArgument::TitleOverride,
+                                                        ),
+                                                    ))
+                                                }
+                                            }
+                                        }
+                                    },
                                     _ => {
                                         return Err(ErrorActive::CommandParser(
                                             CommandParser::UnexpectedKeyArgumentSequence,
@@ -288,28 +932,7 @@ impl Command {
                             }
                         }
 
-                        let set = match set_key {
-                            Some(x) => match x.as_str() {
-                                "-d" => Set::D,
-                                "-f" => Set::F,
-                                "-k" => Set::K,
-                                "-p" => Set::P,
-                                "-t" => Set::T,
-                                _ => unreachable!(),
-                            },
-                            None => Set::T,
-                        };
-
-                        let encryption = match encryption_override_key {
-                            Some(x) => match x.as_str() {
-                                "-ed25519" => Some(Encryption::Ed25519),
-                                "-sr25519" => Some(Encryption::Sr25519),
-                                "-ecdsa" => Some(Encryption::Ecdsa),
-                                _ => unreachable!(),
-                            },
-                            None => None,
-                        };
-                        let over = Override { encryption, token };
+                        let set = set.unwrap_or(Set::T);
 
                         let content = match content_key {
                             Some(x) => match x.as_str() {
@@ -321,10 +944,22 @@ impl Command {
                                             ),
                                         ));
                                     }
-                                    Content::All
+                                    if s_key_used {
+                                        Content::All { pass_errors: false }
+                                    } else {
+                                        Content::All { pass_errors: true }
+                                    }
                                 }
                                 "-n" => match name {
-                                    Some(n) => Content::Name(n),
+                                    Some(n) => {
+                                        if s_key_used {
+                                            return Err(ErrorActive::CommandParser(
+                                                CommandParser::UnexpectedKeyArgumentSequence,
+                                            ));
+                                        } else {
+                                            Content::Name(n)
+                                        }
+                                    }
                                     None => {
                                         return Err(ErrorActive::CommandParser(
                                             CommandParser::NeedArgument(
@@ -334,7 +969,15 @@ impl Command {
                                     }
                                 },
                                 "-u" => match name {
-                                    Some(a) => Content::Address(a),
+                                    Some(a) => {
+                                        if s_key_used {
+                                            return Err(ErrorActive::CommandParser(
+                                                CommandParser::UnexpectedKeyArgumentSequence,
+                                            ));
+                                        } else {
+                                            Content::Address(a)
+                                        }
+                                    }
                                     None => {
                                         return Err(ErrorActive::CommandParser(
                                             CommandParser::NeedArgument(
@@ -352,16 +995,23 @@ impl Command {
                             }
                         };
 
-                        let instruction = Instruction {
-                            set,
-                            content,
-                            pass_errors,
-                            over,
-                        };
-
                         match arg.as_str() {
-                            "load_metadata" => Ok(Command::Load(instruction)),
-                            "add_specs" => Ok(Command::Specs(instruction)),
+                            "load_metadata" => {
+                                if encryption.is_some() || token.is_some() || title.is_some() {
+                                    return Err(ErrorActive::CommandParser(
+                                        CommandParser::UnexpectedKeyArgumentSequence,
+                                    ));
+                                }
+                                Ok(Command::Load(InstructionMeta { set, content }))
+                            }
+                            "add_specs" => {
+                                let over = Override {
+                                    encryption,
+                                    title,
+                                    token,
+                                };
+                                Ok(Command::Specs(InstructionSpecs { set, content, over }))
+                            }
                             _ => unreachable!(),
                         }
                     }
@@ -957,24 +1607,30 @@ impl Command {
                             Ok(Command::RestoreDefaults)
                         }
                     }
-                    "make_cold_release" => {
-                        if args.next().is_some() {
-                            Err(ErrorActive::CommandParser(
-                                CommandParser::UnexpectedKeyArgumentSequence,
-                            ))
-                        } else {
-                            Ok(Command::MakeColdRelease(None))
+                    "make_cold_release" => match args.next() {
+                        Some(path) => {
+                            if args.next().is_some() {
+                                Err(ErrorActive::CommandParser(
+                                    CommandParser::UnexpectedKeyArgumentSequence,
+                                ))
+                            } else {
+                                Ok(Command::MakeColdRelease(Some(PathBuf::from(path))))
+                            }
                         }
-                    }
-                    "transfer_meta_to_cold_release" => {
-                        if args.next().is_some() {
-                            Err(ErrorActive::CommandParser(
-                                CommandParser::UnexpectedKeyArgumentSequence,
-                            ))
-                        } else {
-                            Ok(Command::TransferMetaRelease)
+                        None => Ok(Command::MakeColdRelease(None)),
+                    },
+                    "transfer_meta_to_cold_release" => match args.next() {
+                        Some(path) => {
+                            if args.next().is_some() {
+                                Err(ErrorActive::CommandParser(
+                                    CommandParser::UnexpectedKeyArgumentSequence,
+                                ))
+                            } else {
+                                Ok(Command::TransferMetaRelease(Some(PathBuf::from(path))))
+                            }
                         }
-                    }
+                        None => Ok(Command::TransferMetaRelease(None)),
+                    },
                     "derivations" => {
                         let mut goal = Goal::Both; // default option for `derivations`
                         let mut args = args.peekable();
@@ -1191,6 +1847,7 @@ impl Command {
     }
 }
 
+/// Get verifier infortmation from command line arguments
 fn process_verifier_and_signature(
     verifier_found: Option<VerKey>,
     signature_found: Option<Entry>,
@@ -1233,6 +1890,7 @@ fn process_verifier_and_signature(
     }
 }
 
+/// Get `Vec<u8>` signature draft from command line entry into
 fn get_needed_signature(signature_found: Option<Entry>) -> Result<Vec<u8>, ErrorActive> {
     match signature_found {
         Some(Entry::Hex(t)) => Ok(unhex::<Active>(&t, NotHexActive::InputSignature)?),
@@ -1249,6 +1907,7 @@ fn get_needed_signature(signature_found: Option<Entry>) -> Result<Vec<u8>, Error
     }
 }
 
+/// Fit public key and signature drafts into [`SufficientCrypto`]
 fn into_sufficient(
     verifier_public_key: Vec<u8>,
     signature: Vec<u8>,

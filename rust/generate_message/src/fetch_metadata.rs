@@ -1,3 +1,29 @@
+//! Fetch network information from a node using rpc calls
+//!
+//! Preparing `add_specs` and `load_metadata` updates for Signer may require
+//! gathering network information from a node.
+//!
+//! For `add_specs` update, fetched information and corresponding rpc calls are:
+//!
+//! - latest network metadata, to get network name and, optionally, base58
+//! prefix (call `state_getMetadata`)
+//! - network genesis hash (call `chain_getBlockHash`, for 0th block)
+//! - network properties, to get base58 prefix, decimals, and units (call
+//! `system_properties`)
+//!
+//! Note that the only way to get network name is from the network metadata
+//! `Version` constant. It is expected that as the network metadata versions are
+//! bumped up, the network name remains the same.
+//!
+//! For `load_metadata` update, fetched information and corresponding rpc calls
+//! are:
+//!
+//! - latest network metadata, to get metadata itself, network name and version
+//! (call `state_getMetadata`)
+//! - network genesis hash (call `chain_getBlockHash`, for 0th block)
+//!
+//! This module deals only with the rpc calls part and does **no processing**
+//! of the fetched data.
 use jsonrpsee::core::client::ClientT;
 use jsonrpsee::rpc_params;
 use jsonrpsee::ws_client::WsClientBuilder;
@@ -8,28 +34,55 @@ use serde_json::{
     value::{Number, Value},
 };
 
+/// Data from rpc calls for `load_metadata` update.
+///
+/// Note that this data is sufficient for update generation, i.e. nothing else
+/// has to be known about the network beforehand to produce an update.
 pub struct FetchedInfo {
+    /// Fetched metadata, as a hexadecimal string
     pub meta: String,
+
+    /// Fetched genesis hash, as a hexadecimal string
     pub genesis_hash: String,
 }
 
+/// Data from rpc calls for `add_specs` update.
+///
+/// Note that this data is **not** sufficient for update generation. At least
+/// network encryption is needed additionally.
 pub struct FetchedInfoWithNetworkSpecs {
+    /// Fetched metadata, as a hexadecimal string
     pub meta: String,
+
+    /// Fetched genesis hash, as a hexadecimal string
     pub genesis_hash: String,
+
+    /// Fetched network properties, as a `Map`
+    ///
+    /// Properties are expected to contain base58 prefix, decimals, and units,
+    /// but in some cases some data may be missing.
     pub properties: Map<String, Value>,
 }
 
 lazy_static! {
-// stolen from sp_core
-// removed seed phrase part
-// last '+' used to be '*', but empty password is an error
+    /// Regex to add port to addresses that have no port specified.
+    ///
+    /// See tests for behavior examples.
     static ref PORT: Regex = Regex::new(r"^(?P<body>wss://[^/]*?)(?P<port>:[0-9]+)?(?P<tail>/.*)?$").expect("known value");
 }
 
+/// Supply address with port if needed.
+///
+/// Transform address as it is displayed to user in <https://polkadot.js.org/>
+/// to address with port added if necessary that could be fed to `jsonrpsee`
+/// client.
 fn address_with_port(str_address: &str) -> String {
-    // note: here the port is set to 443 if there is no default, since default port is unavailable for now;
-    // see for details `https://github.com/paritytech/jsonrpsee/issues/554`
-    // some addresses already have port specified, and should be left as is
+    // The port is set here to default 443 if there is no port specified in
+    // address itself, since default port in `jsonrpsee` is unavailable for now.
+    //
+    // See for details <https://github.com/paritytech/jsonrpsee/issues/554`>
+    //
+    // Some addresses have port specified, and should be left as is.
     match PORT.captures(str_address) {
         Some(caps) => {
             if caps.name("port").is_some() {
@@ -45,13 +98,12 @@ fn address_with_port(str_address: &str) -> String {
     }
 }
 
-/// Function to fetch the metadata as String and genesis hash as String from given address,
-/// actually fetches stuff, is slow
-
+/// Fetch network metadata and genesis hash as hexadecimal strings from given
+/// url address.
 #[tokio::main]
 pub async fn fetch_info(str_address: &str) -> Result<FetchedInfo, Box<dyn std::error::Error>> {
     let client = WsClientBuilder::default()
-        .build(address_with_port(str_address))
+        .build(address_with_port(str_address)) // port supplied if needed
         .await?;
     let response: Value = client.request("state_getMetadata", rpc_params![]).await?;
     let meta = match response {
@@ -71,15 +123,14 @@ pub async fn fetch_info(str_address: &str) -> Result<FetchedInfo, Box<dyn std::e
     Ok(FetchedInfo { meta, genesis_hash })
 }
 
-/// Function to fetch the metadata as String, genesis hash as String, and network specs from given address,
-/// actually fetches stuff, is slow
-
+/// Fetch network metadata and genesis hash as hexadecimal strings, and network
+/// properties from given url address.
 #[tokio::main]
 pub async fn fetch_info_with_network_specs(
     str_address: &str,
 ) -> Result<FetchedInfoWithNetworkSpecs, Box<dyn std::error::Error>> {
     let client = WsClientBuilder::default()
-        .build(address_with_port(str_address))
+        .build(address_with_port(str_address)) // port supplied if needed
         .await?;
     let response: Value = client.request("state_getMetadata", rpc_params![]).await?;
     let meta = match response {

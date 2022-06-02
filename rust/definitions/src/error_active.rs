@@ -23,6 +23,7 @@ use crate::{
         MetadataSource, SpecsKeySource, TransferContent,
     },
     keyring::{AddressBookKey, AddressKey, MetaKey, NetworkSpecsKey},
+    metadata::AddressBookEntry,
 };
 
 /// Enum-marker indicating that error originates on the Active side
@@ -97,6 +98,12 @@ impl ErrorSource for Active {
             MetadataSource::Incoming(IncomingMetadataSourceActive::Str(
                 IncomingMetadataSourceActiveStr::Default { filename },
             )) => ErrorActive::DefaultLoading(DefaultLoading::FaultyMetadata { filename, error }),
+            MetadataSource::Incoming(IncomingMetadataSourceActive::Str(
+                IncomingMetadataSourceActiveStr::Check { filename },
+            )) => ErrorActive::Check {
+                filename,
+                check: Check::FaultyMetadata(error),
+            },
             MetadataSource::Incoming(IncomingMetadataSourceActive::Wasm { filename }) => {
                 ErrorActive::Wasm {
                     filename,
@@ -174,6 +181,7 @@ impl ErrorSource for Active {
                     NotHexActive::InputPublicKey => String::from("Input public key"),
                     NotHexActive::InputSignature => String::from("Input signature"),
                     NotHexActive::DefaultMetadata {filename} => format!("Default network metadata from file {}", filename),
+                    NotHexActive::CheckedMetadata {filename} => format!("Checked metadata from file {}", filename),
                 };
                 format!("{} is not in hexadecimal format.", insert)
             },
@@ -220,7 +228,6 @@ impl ErrorSource for Active {
                     DatabaseActive::TwoDefaultsAddress{url} => format!("Hot database contains two default entries for network with url {}.", url),
                     DatabaseActive::HotDatabaseMetadataOverTwoEntries{name} => format!("More than two entries for network {} in hot database.", name),
                     DatabaseActive::HotDatabaseMetadataSameVersionTwice{name, version} => format!("Two entries for {} version {}.", name, version),
-                    DatabaseActive::NewAddressKnownGenesisHash{url, genesis_hash} => format!("Url address {} is not encountered in the hot database entries, however, fetched genesis hash {} is present in hot database entries. To change the network url, delete old entry.", url, hex::encode(genesis_hash)),
                     DatabaseActive::TwoGenesisHashVariantsForName{name} => format!("Two different genesis hash entries for network {} in address book.", name),
                     DatabaseActive::TwoUrlVariantsForName{name} => format!("Two different url entries for network {} in address book.", name),
                     DatabaseActive::TwoNamesForUrl{url} => format!("Two different network names in entries for url address {} in address book.", url),
@@ -246,7 +253,8 @@ impl ErrorSource for Active {
                             SpecsError::DecimalsArrayUnitsNot => String::from("Unexpected result for multi-token network. Decimals are fetched as an array with more than one element, whereas units are not."),
                             SpecsError::DecimalsUnitsArrayLength{decimals, unit} => format!("Unexpected result for multi-token network. Length of decimals array {} does not match the length of units array {}.", decimals, unit),
                             SpecsError::UnitsArrayDecimalsNot => String::from("Unexpected result for multi-token network. Units are fetched as an array with more than one element, whereas decimals are not."),
-                            SpecsError::OverrideIgnored => String::from("Fetched single value for token decimals and unit. Token override is not possible."),
+                            SpecsError::OverrideIgnoredSingle => String::from("Fetched single value for token decimals and unit. Token override is not possible."),
+                            SpecsError::OverrideIgnoredNone => String::from("Network has no value for token decimals and unit. Token override is not possible."),
                         };
                         format!("Problem with network specs from {}. {}", url, insert)
                     },
@@ -256,13 +264,17 @@ impl ErrorSource for Active {
                             Changed::Base58Prefix{old, new} => ("base58 prefix", old.to_string(), new.to_string()),
                             Changed::GenesisHash{old, new} => ("genesis hash", hex::encode(old), hex::encode(new)),
                             Changed::Decimals{old, new} => ("decimals value", old.to_string(), new.to_string()),
+                            Changed::DecimalsBecameNone{old} => ("decimals value", old.to_string(), "no value".to_string()),
                             Changed::Name{old, new} => ("name", old.to_string(), new.to_string()),
                             Changed::Unit{old, new} => ("unit", old.to_string(), new.to_string()),
+                            Changed::UnitBecameNone{old} => ("unit", old.to_string(), "no value".to_string()),
                         };
                         format!("Network {} fetched from {} differs from the one in the hot database. Old: {}. New: {}.", insert, url, old, new)
                     },
                     Fetch::UnexpectedFetchedGenesisHashFormat{value} => format!("Fetched genesis hash {} has unexpected format and does not fit into [u8;32] array.", value),
                     Fetch::SpecsInDb{name, encryption} => format!("Network specs entry for {} and encryption {} is already in database.", name, encryption.show()),
+                    Fetch::UKeyUrlInDb {title, url} => format!("There is already an entry with address {} for network {}.\nKnown networks should be processed with `-n` content key.", url, title),
+                    Fetch::UKeyHashInDb{address_book_entry, url} => format!("Fetch at {} resulted in data already known to the hot database.\nNetwork {} with genesis hash {} has address set to {}.\nTo change the url, delete old entry.", url, address_book_entry.name, hex::encode(address_book_entry.genesis_hash), address_book_entry.address),
                 };
                 format!("Fetching error. {}", insert)
             },
@@ -323,6 +335,7 @@ impl ErrorSource for Active {
                             CommandDoubleKey::Set => "set",
                             CommandDoubleKey::CryptoOverride => "encryption override",
                             CommandDoubleKey::TokenOverride => "token override",
+                            CommandDoubleKey::TitleOverride => "title override",
                             CommandDoubleKey::CryptoKey => "`-crypto`",
                             CommandDoubleKey::MsgType => "`-msgtype`",
                             CommandDoubleKey::Verifier => "`-verifier`",
@@ -341,6 +354,7 @@ impl ErrorSource for Active {
                         let insert = match b {
                             CommandNeedArgument::TokenUnit => "`-token ***'",
                             CommandNeedArgument::TokenDecimals => "'-token'",
+                            CommandNeedArgument::TitleOverride => "'-title'",
                             CommandNeedArgument::NetworkName => "`-n`",
                             CommandNeedArgument::NetworkUrl => "`-u`",
                             CommandNeedArgument::CryptoKey => "`-crypto`",
@@ -365,6 +379,8 @@ impl ErrorSource for Active {
                             CommandNeedArgument::DerivationsTitle => "'-title'",
                             CommandNeedArgument::MetaDefaultFileName => "`-name`",
                             CommandNeedArgument::MetaDefaultFileVersion => "`-version`",
+                            CommandNeedArgument::CheckFile => "check_file",
+                            CommandNeedArgument::ShowSpecsTitle => "`show -specs`",
                         };
                         format!("{} must be followed by an agrument.", insert)
                     },
@@ -414,6 +430,12 @@ impl ErrorSource for Active {
                     Wasm::RuntimeBlob(e) => format!("Error processing .wasm file {}. Unable to generate RuntimeBlob. {}", filename, e),
                     Wasm::WasmiInstance(e) => format!("Error processing .wasm file {}. Unable to generate WasmiInstance. {}", filename, e),
                     Wasm::WasmiRuntime(e) => format!("Error processing .wasm file {}. Unable to generate WasmiRuntime. {}", filename, e),
+                }
+            },
+            ErrorActive::Check{filename, check} => {
+                match check {
+                    Check::FaultyMetadata(e) => format!("Metadata error in file {}. {}", filename, e.show()),
+                    Check::MetadataFile(e) => format!("Error processing file {}. Unable to load file. {}", filename, e),
                 }
             },
         }
@@ -503,6 +525,15 @@ pub enum ErrorActive {
         /// error details
         wasm: Wasm,
     },
+
+    /// Error processing the metadata file that user tried to check
+    Check {
+        /// path of the file being checked
+        filename: String,
+
+        /// error details
+        check: Check,
+    },
 }
 
 impl std::fmt::Display for ErrorActive {
@@ -544,8 +575,11 @@ pub enum NotHexActive {
     InputSignature,
 
     /// Default network metadata, used to generate cold database, with filename
-    /// as an associated data.
+    /// as associated data.
     DefaultMetadata { filename: String },
+
+    /// Network metadata user tries to check, with filename as associated data
+    CheckedMetadata { filename: String },
 }
 
 /// Source of unsuitable metadata on the Active side
@@ -566,6 +600,9 @@ pub enum IncomingMetadataSourceActiveStr {
 
     /// Metadata is the default one, associated data is the filename.
     Default { filename: String },
+
+    /// Metadata is from the metadata file that must be checked
+    Check { filename: String },
 }
 
 /// Source of damaged [`NetworkSpecsKey`], exclusive for the active side.
@@ -681,27 +718,6 @@ pub enum DatabaseActive {
 
         /// network version
         version: u32,
-    },
-
-    /// Fetched through rpc call network genesis hash is known to the hot
-    /// database, although the url address used for rpc call is not.
-    ///
-    /// Hot database does not allow to store more than one trusted url address
-    /// for rpc calls for same network.
-    ///
-    /// Alternative url address could be used if the database is not updated
-    /// (`-d` key is used).
-    ///
-    /// To update the address in the database in case the old one is no longer
-    /// acceptable, one should remove old entry, and only then add the new one.
-    NewAddressKnownGenesisHash {
-        /// new for database url address used for rpc call, for which a known
-        /// genesis hash was retrieved
-        url: String,
-
-        /// network genesis hash that was fetched through rpc call and found in
-        /// the database
-        genesis_hash: H256,
     },
 
     /// `ADDRESS_BOOK` tree of the hot database contains
@@ -1044,10 +1060,41 @@ pub enum Fetch {
         /// network supported encryption
         encryption: Encryption,
     },
+
+    /// Tried to fetch with `-u` key using address already known to the database
+    UKeyUrlInDb {
+        /// network address book title
+        title: String,
+
+        /// url address
+        url: String,
+    },
+
+    /// Tried to fetch with `-u` key using address not known to the database,
+    /// but got genesis hash that is already known.
+    ///
+    /// Likely tried to fetch with different address when one already is in the
+    /// database.
+    ///
+    /// Hot database does not allow to store more than one trusted url address
+    /// for rpc calls for same network.
+    ///
+    /// Alternative url address could be used if the database is not updated
+    /// (`-d` key is used).
+    ///
+    /// To update the address in the database in case the old one is no longer
+    /// acceptable, one should remove old entry, and only then add the new one.
+    UKeyHashInDb {
+        /// address book entry with exactly matching genesis hash
+        address_book_entry: AddressBookEntry,
+
+        /// url address used for fetch
+        url: String,
+    },
 }
 
 /// Errors on the active side with network specs received through rpc call
-#[derive(Debug)]
+#[derive(Debug, PartialEq)]
 pub enum SpecsError {
     /// Network base58 prefix information is not found neither in results of
     /// the `system_properties` rpc call, nor in `System` pallet of the metadata
@@ -1082,8 +1129,8 @@ pub enum SpecsError {
     /// Network unit information **is not found** in the results if the
     /// `system_properties` rpc call, but the decimals information **is found**.
     ///
-    /// Associated data is the fetched decimals value.
-    DecimalsNoUnit(u8),
+    /// Associated data is the fetched decimals value, could be array too.
+    DecimalsNoUnit(String),
 
     /// Network unit information received through `system_properties`
     /// rpc call could not be transformed into expected `String` value.
@@ -1107,7 +1154,8 @@ pub enum SpecsError {
     /// through `system_properties` rpc call. Received decimals are not an array.
     UnitsArrayDecimalsNot,
 
-    /// Unit and decimal override is not allowed.
+    /// Unit and decimal override is not allowed, when network has a single
+    /// token.
     ///
     /// The only case when the decimals and unit override is permitted is when
     /// the network has a matching set of decimals and units, and user has to
@@ -1116,7 +1164,10 @@ pub enum SpecsError {
     /// If the network has a single decimals value and a single unit value, i.e.
     /// the values that would be suitable on their own, and user attempts to
     /// override it, this error appears.
-    OverrideIgnored,
+    OverrideIgnoredSingle,
+
+    /// Unit and decimal override is not allowed, when network has no token.
+    OverrideIgnoredNone,
 }
 
 /// Data received through rpc call is different from the data in hot database
@@ -1154,6 +1205,15 @@ pub enum Changed {
     /// Network decimals value is expected to be permanent.
     Decimals { old: u8, new: u8 },
 
+    /// Network decimals value in
+    /// [`NetworkSpecsToSend`](crate::network_specs::NetworkSpecsToSend)
+    /// stored in `SPECSTREEPREP` tree of the hot database has some value,
+    /// freshly fetched specs have no decimals.
+    ///
+    /// Network decimals value is expected to be permanent. Override for no
+    /// decimals at the moment is blocked.
+    DecimalsBecameNone { old: u8 },
+
     /// Network name is stored in multiple places in the hot database:
     ///
     /// - in `name` field of network specs
@@ -1179,6 +1239,15 @@ pub enum Changed {
     ///
     /// Network unit value is expected to be permanent.
     Unit { old: String, new: String },
+
+    /// Network unit value in
+    /// [`NetworkSpecsToSend`](crate::network_specs::NetworkSpecsToSend)
+    /// stored in `SPECSTREEPREP` tree of the hot database has some value,
+    /// freshly fetched specs have no unit.
+    ///
+    /// Network unit value is expected to be permanent. Override for no
+    /// unit at the moment is blocked.
+    UnitBecameNone { old: String },
 }
 
 /// Error loading of the defaults
@@ -1475,12 +1544,18 @@ pub enum CommandDoubleKey {
     CryptoOverride,
 
     /// Command `add_specs`, when used for networks without network specs
-    /// entries in `SPECSTREEPREP` and with mora than one token supported,
+    /// entries in `SPECSTREEPREP` and with more than one token supported,
     /// could use token override. For this, key `-token` followed by `u8`
     /// decimals and `String` unit arguments is used.
     ///
     /// Token override key may be used only once.
     TokenOverride,
+
+    /// Command `add_specs` could use network title override to set up the
+    /// network title displayed in Signer.
+    ///
+    /// Title override key may be used only once.
+    TitleOverride,
 
     /// Command `make` must have exactly one `-crypto` key, followed by the
     /// encryption argument.
@@ -1561,6 +1636,10 @@ pub enum CommandNeedArgument {
     /// sequence. Otherwise the parser will try to interpret as `u8` decimals
     /// the next key and complain that it is not `u8`.
     TokenDecimals,
+
+    /// Key `-title` in `add_specs` command was supposed to be followed by
+    /// `String` argument, which was not provided.
+    TitleOverride,
 
     /// Commands `add_specs` and `load_metadata` with content key `-n` require
     /// network identifier: network address book title for `add_specs` and
@@ -1674,9 +1753,15 @@ pub enum CommandNeedArgument {
     /// name.
     MetaDefaultFileName,
 
-    /// Key `-version` in `meta_Default_file` command must be followed by
+    /// Key `-version` in `meta_default_file` command must be followed by
     /// network version.
     MetaDefaultFileVersion,
+
+    /// Command `check_file` must be followed by the file path
+    CheckFile,
+
+    /// Command `show -specs` must be followed by the network address book title
+    ShowSpecsTitle,
 }
 
 /// Unsuitable argument for the key in `generate_message` command
@@ -1815,4 +1900,18 @@ pub enum Wasm {
 
     /// Error generating `WasmiRuntime`.
     WasmiRuntime(sc_executor_common::error::WasmError),
+}
+
+/// Error checking metadata file
+#[derive(Debug)]
+pub enum Check {
+    /// Metadata extracted from the metadata file is not suitable to be used in
+    /// Signer.
+    ///
+    /// Associated data is [`MetadataError`] specifying what exactly is wrong
+    /// with the metadata.
+    FaultyMetadata(MetadataError),
+
+    /// Unable to read directory with default metadata
+    MetadataFile(std::io::Error),
 }
