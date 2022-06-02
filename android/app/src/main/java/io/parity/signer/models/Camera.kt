@@ -39,7 +39,7 @@ fun SignerDataModel.processFrame(
 										"[\"$payloadString\"]",
 										true
 									)
-									resetScan()
+									resetScanValues()
 									pushButton(Action.TRANSACTION_FETCHED, payload)
 								} catch (e: java.lang.Exception) {
 									Log.e("Single frame decode failed", e.toString())
@@ -60,7 +60,7 @@ fun SignerDataModel.processFrame(
 									true
 								)
 								if (payload.isNotEmpty()) {
-									resetScan()
+									resetScanValues()
 									pushButton(Action.TRANSACTION_FETCHED, payload)
 								}
 							} catch (e: java.lang.Exception) {
@@ -94,7 +94,7 @@ fun SignerDataModel.processFrame(
 /**
  * Clears camera progress
  */
-internal fun SignerDataModel.resetScan() {
+fun SignerDataModel.resetScanValues() {
 	bucket = arrayOf()
 	_captured.value = null
 	_total.value = null
