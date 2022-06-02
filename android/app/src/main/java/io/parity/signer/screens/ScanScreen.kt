@@ -14,22 +14,33 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.State
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
+import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.ContextCompat
 import com.google.mlkit.vision.barcode.BarcodeScanner
 import com.google.mlkit.vision.barcode.BarcodeScanning
 import io.parity.signer.components.ScanProgressBar
-import io.parity.signer.models.SignerDataModel
-import io.parity.signer.models.processFrame
 import io.parity.signer.ui.theme.Crypto400
 import io.parity.signer.uniffi.Action
+
+@Composable
+fun KeepScreenOn() {
+	val currentView = LocalView.current
+	DisposableEffect(Unit) {
+		currentView.keepScreenOn = true
+		onDispose {
+			currentView.keepScreenOn = false
+		}
+	}
+}
 
 /**
  * Main scanner screen. One of navigation roots.
@@ -52,6 +63,8 @@ fun ScanScreen(
 		remember { ProcessCameraProvider.getInstance(context) }
 
 	val resetScan: () -> Unit = { button(Action.GO_BACK, "", "") }
+
+	KeepScreenOn()
 	Column(
 		Modifier
 			.fillMaxSize()
