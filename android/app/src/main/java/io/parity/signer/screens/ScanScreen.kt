@@ -68,8 +68,10 @@ fun ScanScreen(
 		button(Action.GO_BACK, "", "")
 	}
 
-  KeepScreenOn()
-  
+	if ((captured.value ?: 0) > 0) {
+		KeepScreenOn()
+	}
+
 	Column(
 		Modifier
 			.fillMaxSize()
