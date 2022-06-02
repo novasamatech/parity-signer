@@ -13,6 +13,7 @@
 
 - [Development](./development/Development.md)
     - [Building-And-Publishing](./development/Building-And-Publishing.md)
+    - [Signer ecosystem](./development/Signer-Structure.md)
     - [QA Checking List](./development/QA-Checking-List.md)
     - [Troubleshooting](./development/Troubleshooting.md)
     - [Changelog](./about/Changelog.md)

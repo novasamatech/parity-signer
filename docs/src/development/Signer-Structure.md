@@ -44,9 +44,59 @@ Sub-folders of the `rust` folder:
 
 ### FFI interface
 
-For interfacing rust code and native interface we use uniffi framework. It ensures type safety across the interface and exposes fraction of Rust code as convenient handles with native appearance.
+For interfacing rust code and native interface we use
+[uniffi](https://mozilla.github.io/uniffi-rs/) framework. It is a framework intended to aid
+building cross-platform software in Rust especially for the cases of re-using components
+written in Rust in the smartphone application development contexts. Other than Signer itself
+one of the most notable users of the `uniffi` framework are the
+[Mozilla Application Services]( https://github.com/mozilla/application-services/)
 
-**TODO couple words about build process choices**
+`uniffi` framework provides a way for the developer to define a clear and a typesafe `FFI` interface
+between components written in `Rust` and languates such as `Kotlin` and `Swift`. This approach
+leads to a much more robust architecture than implementing a homegrown FFI with, say,
+passing JSON-serialized data back and forth between `Kotlin` and `Rust` code. Here is why.
+
+Suppose the application needs to pass a following structure through FFI from `Kotlin` to `Rust`
+or back:
+
+```rust,noplaypen
+#[derive(Serialize, Deserialize)]
+struct Address {
+    street: String,
+    city: String,
+}
+```
+
+This would mean that on the `Kotlin` side of the FFI there would have to be some way of
+turning this type from JSON into a `Kotlin` type. It may be some sort of scheme or even
+a manual JSON value-by-key data extraction.
+
+Now suppose this struct is changed by adding and removing some fields:
+
+```rust,noplaypen
+#[derive(Serialize, Deserialize)]
+struct Address {
+    country: String,
+    city: String,
+    index: usize,
+}
+```
+
+After this change on a Rust-side the developer would have to _remember_ to reflect these
+changes on the `Kotlin` and `Swift` sides and if that is no done there is a chance that
+it will not be caught in build-time by CI. It is quite hard to remember everything and
+having a guarantee that such things would be caught at compile time is much better
+than not having this sort of guarantee. One of the things `uniffi` solves is exactly this:
+it provides compile-time guarantees of typesafety.
+
+The other concern with the JSON serialization approach is performance. As long as
+small objects are transfered back and forth it is no trouble encoding them into strings.
+But suppose the application requires transfering bigger blobs of binary data such as `png` images
+or even some metadata files. Using JSON would force the developer to encode such blobs as
+`Strings` before passing them into FFI and decoding them back into binary blobs on the other side
+of the FFI. `uniffi` helps to avoid this also.
+
+
 
 ### Native frontend
 
