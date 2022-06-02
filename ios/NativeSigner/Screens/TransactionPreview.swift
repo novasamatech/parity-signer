@@ -18,13 +18,13 @@ struct TransactionPreview: View {
         VStack {
             TransactionBlock(cards: content.content.assemble())
             VStack {
-                if let address = content.author_info {
-                    AddressCard(address: address.intoAddress())
+                if let address = content.authorInfo {
+                    AddressCard(address: address)
                 }
-                if let network = content.network_info {
-                    NetworkCard(title: network.network_title, logo: network.network_logo)
+                if let network = content.networkInfo {
+                    NetworkCard(title: network.networkTitle, logo: network.networkLogo)
                 }
-                if (content.type == .sign) {
+                if (content.ttype == .sign) {
                     HStack {
                         Text("LOG NOTE").font(FBase(style: .overline)).foregroundColor(Color("Text400"))
                         Spacer()
@@ -50,7 +50,7 @@ struct TransactionPreview: View {
                 }
                 Spacer()
                 VStack {
-                    switch content.type {
+                    switch content.ttype {
                     case .sign:
                         BigButton(
                             text: "Unlock key and sign",
@@ -62,9 +62,9 @@ struct TransactionPreview: View {
                                     data.alertShow = true
                                 } else {
                                     data.pushButton(
-                                        buttonID: .GoForward,
+                                        action: .goForward,
                                         details: Data(comment.utf8).base64EncodedString(),
-                                        seedPhrase: data.getSeed(seedName: content.author_info?.seed ?? "")
+                                        seedPhrase: data.getSeed(seedName: content.authorInfo?.seedName ?? "")
                                     )
                                 }
                             }
@@ -73,28 +73,28 @@ struct TransactionPreview: View {
                         BigButton(
                             text: "Approve",
                             action: {
-                                data.pushButton(buttonID: .GoForward)
+                                data.pushButton(action: .goForward)
                             })
                     case .read:
                         EmptyView()
-                    case .import_derivations:
+                    case .importDerivations:
                         BigButton(
                             text: "Select seed",
                             isCrypto: true,
                             action: {
-                                data.pushButton(buttonID: .GoForward)
+                                data.pushButton(action: .goForward)
                             })
                     case .done:
                         EmptyView()
                     }
-                    if content.type != .done {
+                    if content.ttype != .done {
                         BigButton(
                             text: "Decline",
                             isShaded: true,
                             isDangerous: true,
                             action: {
                                 focus = false
-                                data.pushButton(buttonID: .GoBack)})
+                                data.pushButton(action: .goBack)})
                     }
                 }
             }

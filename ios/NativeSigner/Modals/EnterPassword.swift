@@ -17,7 +17,7 @@ struct EnterPassword: View {
             RoundedRectangle(cornerRadius: 20.0).foregroundColor(Color("Bg000"))
             VStack {
                 HeaderBar(line1: "SECRET PATH", line2: "///password")
-                AddressCard(address: content.author_info.intoAddress())
+                AddressCard(address: content.authorInfo)
                 if (content.counter>0) {
                     Text("Attempt " + String(content.counter) + " of 3")
                 }
@@ -45,7 +45,7 @@ struct EnterPassword: View {
                     text: "Next",
                     isCrypto: true,
                     action: {
-                    data.pushButton(buttonID: .GoForward, details: password)
+                    data.pushButton(action: .goForward, details: password)
                 },
                     isDisabled: password == ""
                 )

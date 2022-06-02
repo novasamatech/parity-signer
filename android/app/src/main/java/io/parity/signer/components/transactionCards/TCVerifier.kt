@@ -7,22 +7,22 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import io.parity.signer.components.Identicon
 import io.parity.signer.ui.theme.Crypto400
-import org.json.JSONObject
+import io.parity.signer.uniffi.MVerifierDetails
 
 @Composable
-fun TCVerifier(payload: JSONObject) {
+fun TCVerifier(verifier: MVerifierDetails) {
 	Column {
 		Text("VERIFIER CERTIFICATE")
 		Row {
-			Identicon(identicon = payload.optString("identicon"))
+			Identicon(identicon = verifier.identicon)
 			Column {
 				Row {
 					Text("key:")
-					Text(payload.optString("public_key"), color = MaterialTheme.colors.Crypto400)
+					Text(verifier.publicKey, color = MaterialTheme.colors.Crypto400)
 				}
 				Row {
 					Text("crypto:")
-					Text(payload.optString("encryption"), color = MaterialTheme.colors.Crypto400)
+					Text(verifier.encryption, color = MaterialTheme.colors.Crypto400)
 				}
 			}
 		}

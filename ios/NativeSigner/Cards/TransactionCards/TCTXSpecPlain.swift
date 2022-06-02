@@ -8,14 +8,14 @@
 import SwiftUI
 
 struct TCTXSpecPlain: View {
-    let content: TxSpecPlain
+    let content: MscTxSpecPlain
     var body: some View {
         HStack{
             VStack{
                 Text("Unknown network")
-                TCNameValueTemplate(name: "Genesis hash", value: content.network_genesis_hash)
+                TCNameValueTemplate(name: "Genesis hash", value: content.networkGenesisHash)
                 TCNameValueTemplate(name: "Version", value: content.version)
-                TCNameValueTemplate(name: "Tx version", value: content.tx_version)
+                TCNameValueTemplate(name: "Tx version", value: content.txVersion)
             }
             Spacer()
         }

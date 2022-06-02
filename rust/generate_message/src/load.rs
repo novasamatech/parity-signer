@@ -41,6 +41,8 @@
 //!
 //! Output file is exported in dedicated [`FOLDER`](constants::FOLDER). File
 //! name is `<name><version>`.
+use sp_core::H256;
+
 use constants::{EXPORT_FOLDER, HOT_DB_NAME, METATREE};
 use db_handling::helpers::{get_meta_values_by_name_version, open_db, open_tree};
 use definitions::{
@@ -437,7 +439,7 @@ fn meta_kpt_n(name: &str, write: &Write) -> Result<(), ErrorActive> {
 struct AddressSpecs {
     address: String,
     base58prefix: u16,
-    genesis_hash: [u8; 32],
+    genesis_hash: H256,
     name: String,
 }
 

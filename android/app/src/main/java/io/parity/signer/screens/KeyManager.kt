@@ -19,37 +19,32 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.unit.dp
-import io.parity.signer.ButtonID
-import io.parity.signer.ShieldAlert
 import io.parity.signer.components.BottomMultiselectBar
 import io.parity.signer.components.KeySelector
 import io.parity.signer.components.NetworkLogoName
 import io.parity.signer.components.SeedCard
+import io.parity.signer.models.AlertState
 import io.parity.signer.ui.theme.Action400
 import io.parity.signer.ui.theme.Bg100
 import io.parity.signer.ui.theme.Bg200
-import org.json.JSONArray
-import org.json.JSONObject
+import io.parity.signer.uniffi.Action
+import io.parity.signer.uniffi.MKeys
 import kotlin.math.absoluteValue
 
 /**
- * Key manager screen; here all key/identity/seed creation and deletion
- * operations should happen. This is final point in navigation:
- * all subsequent interactions should be in modals or drop-down menus
+ * Key manager screen
  */
 @Composable
 fun KeyManager(
-	button: (button: ButtonID, details: String) -> Unit,
+	button: (action: Action, details: String) -> Unit,
 	increment: (Int, String) -> Unit,
-	screenData: JSONObject,
-	alertState: ShieldAlert?
+	mKeys: MKeys,
+	alertState: State<AlertState?>
 ) {
-	//val screenData = signerDataModel.screenData.value
-	val rootKey = screenData.optJSONObject("root") ?: JSONObject()
-	val keySet = screenData.optJSONArray("set") ?: JSONArray()
-	//val network = signerDataModel.screenData.value?.optJSONObject("network")
-	val multiselectMode = screenData.optBoolean("multiselect_mode")
-	val multiselectCount = screenData.optString("multiselect_count")
+	val rootKey = mKeys.root
+	val keySet = mKeys.set
+	val multiselectMode = mKeys.multiselectMode
+	val multiselectCount = mKeys.multiselectCount
 	var offsetX by remember { mutableStateOf(0f) }
 
 	Box {
@@ -59,18 +54,12 @@ fun KeyManager(
 					.pointerInput(Unit) {
 						detectTapGestures(
 							onTap = {
-								if (rootKey
-										.optString("address_key")
-										.isNotBlank()
-								)
-									button(ButtonID.SelectKey, rootKey.optString("address_key"))
+								if (rootKey.addressKey.isNotBlank())
+									button(Action.SELECT_KEY, rootKey.addressKey)
 							},
 							onLongPress = {
-								if (rootKey
-										.optString("address_key")
-										.isNotBlank()
-								)
-									button(ButtonID.LongTap, rootKey.optString("address_key"))
+								if (rootKey.addressKey.isNotBlank())
+									button(Action.LONG_TAP, rootKey.addressKey)
 							}
 						)
 					}
@@ -81,11 +70,8 @@ fun KeyManager(
 						orientation = Orientation.Horizontal,
 						onDragStopped = {
 							if (offsetX.absoluteValue > 20f) {
-								if (rootKey
-										.optString("address_key")
-										.isNotBlank()
-								)
-									button(ButtonID.Swipe, rootKey.optString("address_key"))
+								if (rootKey.addressKey.isNotBlank())
+									button(Action.SWIPE, rootKey.addressKey)
 							}
 							offsetX = 0f
 						}
@@ -95,35 +81,35 @@ fun KeyManager(
 					.fillMaxWidth()
 			) {
 				SeedCard(
-					seedName = rootKey.optString("seed_name", "error"),
-					identicon = rootKey.optString("identicon"),
-					base58 = rootKey.optString("base58"),
+					seedName = rootKey.seedName,
+					identicon = rootKey.identicon,
+					base58 = rootKey.base58,
 					showAddress = true,
 					multiselectMode = multiselectMode,
-					selected = rootKey.optBoolean("multiselect"),
-					swiped = rootKey.optBoolean("swiped"),
+					selected = rootKey.multiselect,
+					swiped = rootKey.swiped,
 					increment = { number ->
 						increment(
 							number,
-							rootKey.optString("seed_name")
+							rootKey.seedName
 						)
 					},
-					delete = { button(ButtonID.RemoveKey, "") }
+					delete = { button(Action.REMOVE_KEY, "") }
 				)
 			}
 			Row(
 				verticalAlignment = Alignment.CenterVertically,
 				modifier = Modifier
-					.clickable { button(ButtonID.NetworkSelector, "") }
+					.clickable { button(Action.NETWORK_SELECTOR, "") }
 					.padding(top = 3.dp, start = 12.dp, end = 12.dp)
 					.background(MaterialTheme.colors.Bg100)
 					.fillMaxWidth()
 					.padding(top = 8.dp, start = 20.dp, end = 12.dp)
 			) {
-				screenData.optJSONObject("network")?.let { network ->
+				mKeys.network.let { network ->
 					NetworkLogoName(
-						logo = network.optString("logo"),
-						name = network.optString("title")
+						logo = network.logo,
+						name = network.title
 					)
 				}
 				Spacer(Modifier.width(8.dp))
@@ -144,10 +130,10 @@ fun KeyManager(
 				Text("DERIVED KEYS")
 				Spacer(Modifier.weight(1f, true))
 				IconButton(onClick = {
-					if (alertState == ShieldAlert.None)
-						button(ButtonID.NewKey, "")
+					if (alertState.value == AlertState.None)
+						button(Action.NEW_KEY, "")
 					else
-						button(ButtonID.Shield, "")
+						button(Action.SHIELD, "")
 				}) {
 					Icon(
 						Icons.Default.AddCircleOutline,
@@ -158,9 +144,10 @@ fun KeyManager(
 			}
 			KeySelector(
 				button,
-				{ number -> increment(number, rootKey.optString("seed_name")) },
+				{ number -> increment(number, rootKey.seedName) },
 				keySet,
-				multiselectMode
+				multiselectMode,
+				rootKey.seedName,
 			)
 		}
 		if (multiselectMode) {
@@ -168,8 +155,8 @@ fun KeyManager(
 				Spacer(Modifier.weight(1f))
 				BottomMultiselectBar(
 					count = multiselectCount,
-					delete = { button(ButtonID.RemoveKey, "") },
-					export = { button(ButtonID.ExportMultiSelect, "") }
+					delete = { button(Action.REMOVE_KEY, "") },
+					export = { button(Action.EXPORT_MULTI_SELECT, "") }
 				)
 			}
 		}

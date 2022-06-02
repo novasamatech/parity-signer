@@ -18,7 +18,7 @@ struct NetworkDetailsMenu: View {
                     text: "Sign network specs",
                     isShaded: true,
                     isCrypto: true,
-                    action:{data.pushButton(buttonID: .SignNetworkSpecs)}
+                    action:{data.pushButton(action: .signNetworkSpecs)}
                 )
                 BigButton(
                     text: "Delete network",
@@ -31,11 +31,11 @@ struct NetworkDetailsMenu: View {
         }
         .gesture(DragGesture().onEnded{drag in
             if drag.translation.height > 40 {
-                data.pushButton(buttonID: .GoBack)
+                data.pushButton(action: .goBack)
             }
         })
         .alert(isPresented: $removeNetworkAlert, content: {
-            Alert(title: Text("Remove network?"), message: Text("This network will be removed for whole device"), primaryButton: .cancel(Text("Cancel")), secondaryButton: .destructive(Text("Remove network"), action: {data.pushButton(buttonID: .RemoveNetwork)}))
+            Alert(title: Text("Remove network?"), message: Text("This network will be removed for whole device"), primaryButton: .cancel(Text("Cancel")), secondaryButton: .destructive(Text("Remove network"), action: {data.pushButton(action: .removeNetwork)}))
         })
     }
 }

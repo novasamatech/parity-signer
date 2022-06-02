@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct TCFieldName: View {
-    var value: FieldName
+    var value: MscFieldName
     @State private var showDoc = false
     var body: some View {
         Button (action: {
@@ -19,22 +19,22 @@ struct TCFieldName: View {
                     Text(value.name)
                         .foregroundColor(Color("Text600"))
                     Spacer()
-                    if value.docs_field_name + value.path_type + value.docs_type != "" {
+                    if value.docsFieldName + value.pathType + value.docsType != "" {
                         Text("?")
                             .foregroundColor(Color("Action400"))
                     }
                 }
                 if showDoc {
                     VStack {
-                        Text("Path: " + value.path_type).foregroundColor(Color("Text600"))
-                        Text(AttributedString(fromHexDocs: value.docs_field_name) ?? "docs parsing error in iOS, please refer to other sources")
+                        Text("Path: " + value.pathType).foregroundColor(Color("Text600"))
+                        Text(AttributedString(fromHexDocs: value.docsFieldName) ?? "docs parsing error in iOS, please refer to other sources")
                             .foregroundColor(Color("Text600"))
-                        Text(AttributedString(fromHexDocs: value.docs_type) ?? "docs parsing error in iOS, please refer to other sources")
+                        Text(AttributedString(fromHexDocs: value.docsType) ?? "docs parsing error in iOS, please refer to other sources")
                             .foregroundColor(Color("Text600"))
                     }
                 }
             }
-        }.disabled(value.docs_field_name + value.path_type + value.docs_type == "")
+        }.disabled(value.docsFieldName + value.pathType + value.docsType == "")
     }
 }
 

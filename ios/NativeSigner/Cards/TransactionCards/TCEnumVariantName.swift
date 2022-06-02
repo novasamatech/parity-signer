@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct TCEnumVariantName: View {
-    var value: EnumVariantName
+    var value: MscEnumVariantName
     @State private var showDoc = false
     var body: some View {
         Button (action: {
@@ -19,17 +19,17 @@ struct TCEnumVariantName: View {
                     Text(value.name)
                         .foregroundColor(Color("Text600"))
                     Spacer()
-                    if value.docs_enum_variant != "" {
+                    if value.docsEnumVariant != "" {
                         Text("?")
                             .foregroundColor(Color("Action400"))
                     }
                 }
                 if showDoc {
-                    Text(AttributedString(fromHexDocs: value.docs_enum_variant) ?? "docs parsing error in iOS, please refer to other sources")
+                    Text(AttributedString(fromHexDocs: value.docsEnumVariant) ?? "docs parsing error in iOS, please refer to other sources")
                         .foregroundColor(Color("Text600"))
                 }
             }
-        }.disabled(value.docs_enum_variant == "")
+        }.disabled(value.docsEnumVariant == "")
     }
 }
 

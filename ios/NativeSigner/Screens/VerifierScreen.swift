@@ -14,12 +14,10 @@ struct VerifierScreen: View {
     var body: some View {
         VStack {
             HStack {
-                Image(uiImage: UIImage(data: Data(fromHexEncodedString: content.identicon) ?? Data()) ?? UIImage())
-                    .resizable(resizingMode: .stretch)
-                    .frame(width: 42, height: 42)
+                Identicon(identicon: content.identicon, rowHeight: 42)
                 VStack{
                     Text("General verifier certificate")
-                    Text(content.public_key)
+                    Text(content.publicKey)
                     Text("encryption: " + content.encryption)
                 }
             }

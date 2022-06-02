@@ -2,6 +2,7 @@
 use parity_scale_codec::Encode;
 use serde_json::{map::Map, value::Value};
 use sled::Batch;
+use sp_core::H256;
 use std::{cmp::Ordering, convert::TryInto};
 
 use constants::{
@@ -205,9 +206,7 @@ pub fn filter_address_book_by_url(
 }
 
 /// Search through [`ADDRESS_BOOK`] entries for the one with given genesis hash.
-pub fn genesis_hash_in_hot_db(
-    genesis_hash: [u8; 32],
-) -> Result<Option<AddressBookEntry>, ErrorActive> {
+pub fn genesis_hash_in_hot_db(genesis_hash: H256) -> Result<Option<AddressBookEntry>, ErrorActive> {
     let mut out = None;
     for (_, address_book_entry) in address_book_content()?.into_iter() {
         if address_book_entry.genesis_hash == genesis_hash {
@@ -487,7 +486,7 @@ pub fn write_metadata(sorted_meta_values: SortedMetaValues) -> Result<(), ErrorA
 /// Data for `load_metadata` payload
 pub struct MetaShortCut {
     pub meta_values: MetaValues,
-    pub genesis_hash: [u8; 32],
+    pub genesis_hash: H256,
 }
 
 /// Get data needed for `load_metadata` payload [`MetaShortCut`] from given url
@@ -613,7 +612,7 @@ pub fn update_modify_encryption_specs(
 
 /// Interpreted metadata and genesis hash and raw properties.
 struct CommonSpecsFetch {
-    genesis_hash: [u8; 32],
+    genesis_hash: H256,
     meta_values: MetaValues,
     properties: Map<String, Value>,
 }
@@ -792,7 +791,7 @@ fn common_specs_processing(
 /// Inputs url `address` from which the data was fetched and hex
 /// `fetched_genesis_hash`.
 // TODO fix genesis hash type if we fix genesis hash type after all
-fn get_genesis_hash(address: &str, fetched_genesis_hash: &str) -> Result<[u8; 32], ErrorActive> {
+fn get_genesis_hash(address: &str, fetched_genesis_hash: &str) -> Result<H256, ErrorActive> {
     let genesis_hash_vec = unhex::<Active>(
         fetched_genesis_hash,
         NotHexActive::FetchedGenesisHash {
@@ -809,7 +808,7 @@ fn get_genesis_hash(address: &str, fetched_genesis_hash: &str) -> Result<[u8; 32
             ))
         }
     };
-    Ok(out)
+    Ok(out.into())
 }
 
 /// Write to file raw bytes payload of `load_metadata` update

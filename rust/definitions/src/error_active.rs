@@ -14,6 +14,8 @@
 //! This module gathers all possible [`ErrorActive`] errors in one place, so that
 //! error management is easier.
 
+use sp_core::H256;
+
 use crate::{
     crypto::Encryption,
     error::{
@@ -433,7 +435,7 @@ impl ErrorSource for Active {
             ErrorActive::Check{filename, check} => {
                 match check {
                     Check::FaultyMetadata(e) => format!("Metadata error in file {}. {}", filename, e.show()),
-                    Check::MetadataFile(e) => format!("Error processing .wasm file {}. Unable to load file. {}", filename, e),
+                    Check::MetadataFile(e) => format!("Error processing file {}. Unable to load file. {}", filename, e),
                 }
             },
         }
@@ -1193,7 +1195,7 @@ pub enum Changed {
     /// Westend), the `defaults` crate must be updated as well.
     ///
     /// Associated data is the genesis hash values in question.
-    GenesisHash { old: [u8; 32], new: [u8; 32] },
+    GenesisHash { old: H256, new: H256 },
 
     /// Network decimals value in
     /// [`NetworkSpecsToSend`](crate::network_specs::NetworkSpecsToSend)

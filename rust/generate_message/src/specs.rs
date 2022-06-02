@@ -155,11 +155,7 @@ pub fn gen_add_specs(instruction: InstructionSpecs) -> Result<(), ErrorActive> {
             // Payload files are not created.
             Content::Name(name) => {
                 // using this command makes sense only if there is some override
-                if !instruction.over.all_empty() {
-                    specs_pt_n(&name, instruction.over, false)
-                } else {
-                    Err(ErrorActive::NotSupported)
-                }
+                specs_pt_n(&name, instruction.over, false)
             }
 
             // `$ cargo run add_specs -p -u network_url_address
@@ -208,14 +204,7 @@ pub fn gen_add_specs(instruction: InstructionSpecs) -> Result<(), ErrorActive> {
             // displayed network title
             //
             // Payload files are created.
-            Content::Name(name) => {
-                // using this command makes sense only if there is some override
-                if !instruction.over.all_empty() {
-                    specs_pt_n(&name, instruction.over, true)
-                } else {
-                    Err(ErrorActive::NotSupported)
-                }
-            }
+            Content::Name(name) => specs_pt_n(&name, instruction.over, true),
 
             // `$ cargo run add_specs -u network_url_address
             // <encryption override> <optional token override>`

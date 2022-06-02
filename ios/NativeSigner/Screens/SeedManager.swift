@@ -14,10 +14,10 @@ struct SeedManager: View {
         VStack {
             ScrollView {
                 LazyVStack {
-                    ForEach(content.seedNameCards.sorted(by: {$0.seed_name < $1.seed_name}), id: \.seed_name) {seedNameCard in
+                    ForEach(content.seedNameCards.sorted(by: {$0.seedName < $1.seedName}), id: \.seedName) {seedNameCard in
                         HStack {
                             Button(action: {
-                                data.pushButton(buttonID: .SelectSeed, details: seedNameCard.seed_name)
+                                data.pushButton(action: .selectSeed, details: seedNameCard.seedName)
                             }) {
                                 SeedCardForManager(seedNameCard: seedNameCard)
                                 Spacer()

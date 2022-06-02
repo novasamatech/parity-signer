@@ -35,6 +35,7 @@ use crate::error_signer::{ErrorSigner, InputSigner};
 use crate::helpers::pic_types;
 use crate::network_specs::NetworkSpecsToSend;
 use crate::types::TypeEntry;
+use sp_core::H256;
 
 /// `load_metadata` QR code content  
 ///
@@ -45,12 +46,12 @@ pub struct ContentLoadMeta(Vec<u8>);
 #[derive(Decode, Encode)]
 struct DecodedContentLoadMeta {
     meta: Vec<u8>,
-    genesis_hash: [u8; 32],
+    genesis_hash: H256,
 }
 
 impl ContentLoadMeta {
     /// Generate [`ContentLoadMeta`] from metadata `&[u8]` slice and network genesis hash.
-    pub fn generate(meta: &[u8], genesis_hash: &[u8; 32]) -> Self {
+    pub fn generate(meta: &[u8], genesis_hash: &H256) -> Self {
         Self(
             DecodedContentLoadMeta {
                 meta: meta.to_vec(),
@@ -74,7 +75,7 @@ impl ContentLoadMeta {
     }
 
     /// Get genesis hash `[u8; 32]` from [`ContentLoadMeta`].
-    pub fn genesis_hash<T: ErrorSource>(&self) -> Result<[u8; 32], T::Error> {
+    pub fn genesis_hash<T: ErrorSource>(&self) -> Result<H256, T::Error> {
         match <DecodedContentLoadMeta>::decode(&mut &self.0[..]) {
             Ok(a) => Ok(a.genesis_hash),
             Err(_) => Err(<T>::transfer_content_error(TransferContent::LoadMeta)),
@@ -82,7 +83,7 @@ impl ContentLoadMeta {
     }
 
     /// Get metadata `Vec<u8>` and genesis hash `[u8; 32]` from [`ContentLoadMeta`] as a tuple.
-    pub fn meta_genhash<T: ErrorSource>(&self) -> Result<(Vec<u8>, [u8; 32]), T::Error> {
+    pub fn meta_genhash<T: ErrorSource>(&self) -> Result<(Vec<u8>, H256), T::Error> {
         match <DecodedContentLoadMeta>::decode(&mut &self.0[..]) {
             Ok(a) => Ok((a.meta, a.genesis_hash)),
             Err(_) => Err(<T>::transfer_content_error(TransferContent::LoadMeta)),
@@ -244,19 +245,15 @@ impl ContentLoadTypes {
         self.encode()
     }
 
-    /// Generate json consisting of types information hash and corresponding id pic  
+    /// Generate types information hash and corresponding id pic  
     ///
     /// Types information hash is calculated for `Vec<u8>` of encoded types information,
     /// as it would be stored in the database  
     #[cfg(feature = "signer")]
-    pub fn show(&self) -> String {
+    pub fn show(&self) -> (String, Vec<u8>) {
         let types_hash = blake2b(32, &[], &self.store()).as_bytes().to_vec();
-        let types_id_pic = hex::encode(pic_types(&types_hash));
-        format!(
-            "\"types_hash\":\"{}\",\"types_id_pic\":\"{}\"",
-            hex::encode(types_hash),
-            types_id_pic
-        )
+        let types_id_pic = pic_types(&types_hash);
+        (hex::encode(types_hash), types_id_pic)
     }
 }
 
@@ -277,18 +274,14 @@ pub struct ContentDerivations(Vec<u8>);
 #[derive(Decode, Encode)]
 struct DecodedContentDerivations {
     encryption: Encryption,
-    genesis_hash: [u8; 32],
+    genesis_hash: H256,
     derivations: Vec<String>,
 }
 
 impl ContentDerivations {
     /// Generate [`ContentDerivations`] from network encryption [`Encryption`],
     /// genesis hash `[u8; 32]`, and set of derivations `&[String]`.  
-    pub fn generate(
-        encryption: &Encryption,
-        genesis_hash: &[u8; 32],
-        derivations: &[String],
-    ) -> Self {
+    pub fn generate(encryption: &Encryption, genesis_hash: &H256, derivations: &[String]) -> Self {
         Self(
             DecodedContentDerivations {
                 encryption: encryption.to_owned(),
@@ -309,7 +302,7 @@ impl ContentDerivations {
     #[cfg(feature = "signer")]
     pub fn encryption_genhash_derivations(
         &self,
-    ) -> Result<(Encryption, [u8; 32], Vec<String>), ErrorSigner> {
+    ) -> Result<(Encryption, H256, Vec<String>), ErrorSigner> {
         match <DecodedContentDerivations>::decode(&mut &self.0[..]) {
             Ok(a) => Ok((a.encryption, a.genesis_hash, a.derivations)),
             Err(_) => Err(ErrorSigner::Input(InputSigner::TransferDerivations)),

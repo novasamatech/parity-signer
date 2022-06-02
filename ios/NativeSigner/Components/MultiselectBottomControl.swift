@@ -31,14 +31,14 @@ struct MultiselectBottomControl: View {
                         secondaryButton: .destructive(
                             Text("Delete"),
                             action: {
-                                data.pushButton(buttonID: .RemoveKey)
+                                data.pushButton(action: .removeKey)
                             }
                         )
                     )
                 })
                 Spacer()
                 Button(action: {
-                    data.pushButton(buttonID: .ExportMultiSelect)
+                    data.pushButton(action: .exportMultiSelect)
                 }) {
                     SmallButton(text: "Export")
                 }.disabled(selectedCount == "0")

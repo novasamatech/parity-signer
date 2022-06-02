@@ -12,7 +12,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Lock
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
-import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -27,14 +26,17 @@ import io.parity.signer.models.SignerDataModel
 import io.parity.signer.models.addKey
 import io.parity.signer.ui.theme.Bg200
 import io.parity.signer.ui.theme.modal
+import io.parity.signer.uniffi.MPasswordConfirm
 
 @Composable
-fun PasswordConfirm(signerDataModel: SignerDataModel) {
+fun PasswordConfirm(
+	passwordConfirm: MPasswordConfirm,
+	signerDataModel: SignerDataModel
+) {
 	val passwordCheck = remember { mutableStateOf("") }
-	val pwd = signerDataModel.modalData.value?.optString("pwd")
-	val croppedPath = signerDataModel.modalData.value?.optString("cropped_path")
-	val seedName = signerDataModel.modalData.value?.optString("seed_name") ?: ""
-	val lastError = signerDataModel.lastError.observeAsState()
+	val pwd = passwordConfirm.pwd
+	val croppedPath = passwordConfirm.croppedPath
+	val seedName = passwordConfirm.seedName
 	val focusManager = LocalFocusManager.current
 	val focusRequester = remember { FocusRequester() }
 
@@ -52,12 +54,10 @@ fun PasswordConfirm(signerDataModel: SignerDataModel) {
 				Text("$croppedPath///")
 				Image(Icons.Default.Lock, contentDescription = "Locked account")
 			}
-			Text(lastError.value.toString())
 			SingleTextInput(
 				content = passwordCheck,
 				update = {
 					passwordCheck.value = it
-					signerDataModel.clearError()
 				},
 				onDone = {
 					if (passwordCheck.value == pwd) {
@@ -84,9 +84,9 @@ fun PasswordConfirm(signerDataModel: SignerDataModel) {
 		}
 	}
 	DisposableEffect(Unit) {
-		//if (signerDataModel.modalData.value?.optBoolean("keyboard") == true) {
+		// if (signerDataModel.modalData.value?.optBoolean("keyboard") == true) {
 		focusRequester.requestFocus()
-		//}
+		// }
 		onDispose { focusManager.clearFocus() }
 	}
 }

@@ -179,11 +179,16 @@ pub const ALICE_SEED_PHRASE: &str =
 #[cfg(feature = "active")]
 pub const CHUNK_SIZE: u16 = 1072;
 
-/// Main color for grayscale QR codes (both static and animated ones)
-pub const MAIN_COLOR: u8 = 0x00;
+/// Main color for QR codes (both static and animated ones)
+pub const MAIN_COLOR: [u8; 3] = [0x00, 0x00, 0x00];
 
-/// Background color for grayscale QR codes (both static and animated ones)
-pub const BACK_COLOR: u8 = 0xFF;
+/// Background color for QR codes (both static and animated ones)
+pub const BACK_COLOR: [u8; 3] = [0xff, 0xff, 0xff];
+
+/// Color palette for QR codes (both static and animated ones)
+pub fn qr_palette() -> Vec<u8> {
+    [MAIN_COLOR.to_vec(), BACK_COLOR.to_vec()].concat()
+}
 
 /// Scaling factor for QR codes (size of QR code dot, in pixels)
 pub const SCALING: i32 = 4;
