@@ -56,15 +56,20 @@ fun ScanScreen(
 		barcodeScanner: BarcodeScanner,
 		imageProxy: ImageProxy
 	) -> Unit,
+	resetScanValues: () -> Unit,
 ) {
 	val lifecycleOwner = LocalLifecycleOwner.current
 	val context = LocalContext.current
 	val cameraProviderFuture =
 		remember { ProcessCameraProvider.getInstance(context) }
 
-	val resetScan: () -> Unit = { button(Action.GO_BACK, "", "") }
+	val resetScan: () -> Unit = {
+		resetScanValues()
+		button(Action.GO_BACK, "", "")
+	}
 
-	KeepScreenOn()
+  KeepScreenOn()
+  
 	Column(
 		Modifier
 			.fillMaxSize()
