@@ -16,12 +16,12 @@ struct SelectSeed: View {
             VStack {
                 ScrollView {
                     LazyVStack {
-                        ForEach(content.seedNameCards.sorted(by: {$0.seed_name < $1.seed_name}), id: \.seed_name) {seedNameCard in
+                        ForEach(content.seedNameCards.sorted(by: {$0.seedName < $1.seedName}), id: \.seedName) {seedNameCard in
                             HStack {
                                 Button(action: {
-                                    let seedPhrase = data.getSeed(seedName: seedNameCard.seed_name)
+                                    let seedPhrase = data.getSeed(seedName: seedNameCard.seedName)
                                     if seedPhrase != "" {
-                                        data.pushButton(buttonID: .GoForward, details: seedNameCard.seed_name, seedPhrase: seedPhrase)
+                                        data.pushButton(action: .goForward, details: seedNameCard.seedName, seedPhrase: seedPhrase)
                                     }
                                 }) {
                                     SeedCardForManager(seedNameCard: seedNameCard)

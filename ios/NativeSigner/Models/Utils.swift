@@ -64,15 +64,48 @@ extension String {
     }
 }
 
-/**
- * Base64 screening utils
- */
-extension String {
-    func encode64() -> String {
-        return Data(self.utf8).base64EncodedString()
+extension TransactionCardSet {
+    func assemble() -> [TransactionCard] {
+        var assembled: [TransactionCard] = []
+        assembled.append(contentsOf: self.author ?? [])
+        assembled.append(contentsOf: self.error ?? [])
+        assembled.append(contentsOf: self.extensions ?? [])
+        assembled.append(contentsOf: self.importingDerivations ?? [])
+        assembled.append(contentsOf: self.message ?? [])
+        assembled.append(contentsOf: self.meta ?? [])
+        assembled.append(contentsOf: self.method ?? [])
+        assembled.append(contentsOf: self.newSpecs ?? [])
+        assembled.append(contentsOf: self.verifier ?? [])
+        assembled.append(contentsOf: self.warning ?? [])
+        assembled.append(contentsOf: self.typesInfo ?? [])
+        return assembled.sorted(by: {
+            $0.index < $1.index
+        })
     }
-    
-    func decode64() -> String {
-        return String(decoding: Data(base64Encoded: self) ?? Data(), as: UTF8.self)
+}
+
+extension MRecoverSeedPhrase {
+    func draftPhrase() -> String {
+        return self.draft.joined(separator: " ")
+    }
+}
+
+extension Verifier {
+    func show() -> String {
+        switch(self.v) {
+        case .standard(let value):
+            return value[0]
+        case .none:
+            return "None"
+        }
+    }
+}
+
+extension VerifierValue {
+    func show() -> String {
+        switch(self) {
+        case .standard(let value):
+            return value [0]
+        }
     }
 }

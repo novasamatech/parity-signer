@@ -19,7 +19,7 @@ struct PasswordConfirm: View {
             VStack {
                 HeaderBar(line1: "Confirm secret path", line2: "Details")
                 HStack {
-                    Text(content.cropped_path + "///")
+                    Text(content.croppedPath + "///")
                     Image(systemName: "lock").foregroundColor(Color("Crypto400"))
                         .font(FCrypto(style: .body2))
                 }
@@ -46,7 +46,7 @@ struct PasswordConfirm: View {
                 BigButton(
                     text: "Next",
                     action: {
-                        data.createAddress(path: content.cropped_path+"///"+content.pwd, seedName: content.seed_name)
+                        data.createAddress(path: content.croppedPath+"///"+content.pwd, seedName: content.seedName)
                     },
                     isDisabled: passwordCheck != content.pwd
                 )

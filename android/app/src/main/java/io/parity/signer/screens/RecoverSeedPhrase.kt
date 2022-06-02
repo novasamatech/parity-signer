@@ -6,7 +6,6 @@ import androidx.compose.material.Checkbox
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -15,28 +14,35 @@ import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
-import io.parity.signer.ButtonID
 import io.parity.signer.components.BigButton
 import io.parity.signer.components.HeadingOverline
 import io.parity.signer.components.RestoreSeedPhraseBox
 import io.parity.signer.components.RestoreSeedPhraseSuggest
 import io.parity.signer.models.*
+import io.parity.signer.uniffi.Action
+import io.parity.signer.uniffi.MRecoverSeedPhrase
 
 @Composable
 fun RecoverSeedPhrase(
-	button: (button: ButtonID, details: String) -> Unit,
-	signerDataModel: SignerDataModel
+	recoverSeedPhrase: MRecoverSeedPhrase,
+	button: (action: Action, details: String) -> Unit,
+	addSeed: (
+		seedName: String,
+		seedPhrase: String,
+		createRoots: Boolean
+	) -> Unit
 ) {
-  val screenData = signerDataModel.screenData.observeAsState()
-	val seedPhrase = screenData.value?.optJSONArray("draft")?.toListOfJSONObjects()?: listOf() //remember { mutableStateOf(listOf<String>()) }
-	val guessWord = screenData.value?.optJSONArray("guess_set")?.toListOfStrings() ?: listOf() //remember { mutableStateOf(listOf<String>()) }
-	val seedPhraseReady = screenData.value?.optString("ready_seed")
-	val seedWordText = screenData.value?.optString("user_input")?: ""
+	val seedPhrase =
+		recoverSeedPhrase.draft // remember { mutableStateOf(listOf<String>()) }
+	val guessWord =
+		recoverSeedPhrase.guessSet // remember { mutableStateOf(listOf<String>()) }
+	val seedPhraseReady = recoverSeedPhrase.readySeed
+	val seedWordText = " " + recoverSeedPhrase.userInput // TODO: `" " +` in rust
 	val seedWord = TextFieldValue(
-				seedWordText,
-				selection = TextRange(seedWordText.length)
+		seedWordText,
+		selection = TextRange(seedWordText.length)
 	)
-	val createSeedKeys = remember { mutableStateOf(true) }
+	val createRoots = remember { mutableStateOf(true) }
 
 	Column(
 		verticalArrangement = Arrangement.Top,
@@ -47,8 +53,7 @@ fun RecoverSeedPhrase(
 			modifier = Modifier.fillMaxWidth(1f)
 		) {
 			Text(
-				signerDataModel.screenData.value?.optString("seed_name")?.decode64()
-					?: "Error: no seed name",
+				recoverSeedPhrase.seedName,
 				style = MaterialTheme.typography.subtitle1
 			)
 		}
@@ -59,8 +64,7 @@ fun RecoverSeedPhrase(
 			seedPhrase = seedPhrase,
 			seedWord = seedWord,
 			button = button,
-			keyboard = signerDataModel.screenData.value?.optBoolean("keyboard")
-				?: false
+			keyboard = recoverSeedPhrase.keyboard
 		)
 
 		Spacer(Modifier.height(12.dp))
@@ -72,36 +76,35 @@ fun RecoverSeedPhrase(
 		Row(
 			verticalAlignment = Alignment.CenterVertically,
 			modifier = Modifier.toggleable(
-				value = createSeedKeys.value,
+				value = createRoots.value,
 				role = Role.Checkbox,
-				onValueChange = { createSeedKeys.value = it }
-			)) {
+				onValueChange = { createRoots.value = it }
+			)
+		) {
 			Checkbox(
-				checked = createSeedKeys.value,
-				onCheckedChange = { createSeedKeys.value = it })
+				checked = createRoots.value,
+				onCheckedChange = { createRoots.value = it }
+			)
 			Text("Create seed keys")
 		}
 		Spacer(Modifier.weight(0.1f))
-		//if (true) { //TODO: hide when keyboard is shown
+		if (recoverSeedPhrase.keyboard) {
 			BigButton(
 				text = "Next",
 				action = {
-					signerDataModel.screenData.value?.let { screenData ->
-						screenData.optString("seed_name").let { seedName ->
-							seedPhraseReady?.let {
-								signerDataModel.addSeed(
-									seedName = seedName,
-									seedPhrase = it,
-									createSeedKeys = createSeedKeys.value
-								)
-							}
+					recoverSeedPhrase.seedName.let { seedName ->
+						seedPhraseReady?.let {
+							addSeed(
+								seedName,
+								it,
+								createRoots.value
+							)
 						}
 					}
 				},
 				isDisabled = seedPhraseReady == null
 			)
-		//}
+		}
 		Spacer(Modifier.weight(0.1f))
 	}
-
 }

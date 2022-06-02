@@ -8,14 +8,14 @@
 import SwiftUI
 
 struct TCAuthorPublicKey: View {
-    var value: AuthorPublicKey
+    var value: MVerifierDetails
     var body: some View {
         HStack {
-            Image(systemName: "circle.fill").foregroundColor(Color("Text600")).imageScale(.large)
+            Identicon(identicon: value.identicon)
             VStack (alignment: .leading) {
                 Text("Signed with " + value.encryption)
                     .foregroundColor(Color("Text400")).font(FBase(style: .body2))
-                Text(value.public_key)
+                Text(value.publicKey)
                     .font(FCrypto(style: .body2))
                     .foregroundColor(Color("Crypto400"))
             }

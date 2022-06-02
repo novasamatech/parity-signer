@@ -94,8 +94,8 @@ val CryptoTypography = Typography(
 	)
 )
 
-//Special font for network labels
-//TODO: labels could be stored in db instead!
+// Special font for network labels
+// TODO: labels could be stored in db instead!
 private val Web3Font = Font(R.font.web3_regular)
 private val Web3FontFamily = FontFamily(Web3Font)
 

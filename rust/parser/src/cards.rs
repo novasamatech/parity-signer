@@ -1,4 +1,7 @@
-use sp_core::crypto::{AccountId32, Ss58AddressFormat, Ss58Codec};
+use sp_core::{
+    crypto::{AccountId32, Ss58AddressFormat, Ss58Codec},
+    H256,
+};
 use sp_runtime::generic::Era;
 
 #[derive(Clone)]
@@ -40,7 +43,7 @@ pub enum ParserCard {
     },
     Era(Era),
     Nonce(String),
-    BlockHash([u8; 32]),
+    BlockHash(H256),
     Tip {
         number: String,
         units: String,

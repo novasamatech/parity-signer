@@ -508,8 +508,9 @@ impl TrDbColdStub {
         self.metadata_stub = self
             .metadata_stub
             .new_addition(meta_key.key(), meta_values.meta.to_vec());
-        self.history_stub
-            .push(Event::MetadataAdded(MetaValuesDisplay::get(meta_values)));
+        self.history_stub.push(Event::MetadataAdded {
+            meta_values_display: MetaValuesDisplay::get(meta_values),
+        });
         self
     }
 
@@ -524,8 +525,9 @@ impl TrDbColdStub {
     pub fn remove_metadata(mut self, meta_values: &MetaValues) -> Self {
         let meta_key = MetaKey::from_parts(&meta_values.name, meta_values.version);
         self.metadata_stub = self.metadata_stub.new_removal(meta_key.key());
-        self.history_stub
-            .push(Event::MetadataRemoved(MetaValuesDisplay::get(meta_values)));
+        self.history_stub.push(Event::MetadataRemoved {
+            meta_values_display: MetaValuesDisplay::get(meta_values),
+        });
         self
     }
 
@@ -572,12 +574,13 @@ impl TrDbColdStub {
         self.network_specs_stub = self
             .network_specs_stub
             .new_addition(network_specs_key.key(), network_specs.encode());
-        self.history_stub
-            .push(Event::NetworkSpecsAdded(NetworkSpecsDisplay::get(
+        self.history_stub.push(Event::NetworkSpecsAdded {
+            network_specs_display: NetworkSpecsDisplay::get(
                 &network_specs,
                 valid_current_verifier,
                 general_verifier,
-            )));
+            ),
+        });
         {
             let database = open_db::<Signer>(database_name)?;
             let identities = open_tree::<Signer>(&database, ADDRTREE)?;
@@ -598,14 +601,15 @@ impl TrDbColdStub {
                     self.addresses_stub = self
                         .addresses_stub
                         .new_addition(address_key.key(), address_details.encode());
-                    self.history_stub
-                        .push(Event::IdentityAdded(IdentityHistory::get(
+                    self.history_stub.push(Event::IdentityAdded {
+                        identity_history: IdentityHistory::get(
                             &address_details.seed_name,
                             &address_details.encryption,
                             &multisigner_to_public(&multisigner),
                             &address_details.path,
-                            &network_specs.genesis_hash,
-                        )));
+                            network_specs.genesis_hash.as_bytes(),
+                        ),
+                    });
                 }
             }
         }
@@ -637,12 +641,13 @@ impl TrDbColdStub {
         let network_specs_key =
             NetworkSpecsKey::from_parts(&network_specs.genesis_hash, &network_specs.encryption);
         self.network_specs_stub = self.network_specs_stub.new_removal(network_specs_key.key());
-        self.history_stub
-            .push(Event::NetworkSpecsRemoved(NetworkSpecsDisplay::get(
+        self.history_stub.push(Event::NetworkSpecsRemoved {
+            network_specs_display: NetworkSpecsDisplay::get(
                 network_specs,
                 valid_current_verifier,
                 general_verifier,
-            )));
+            ),
+        });
         self
     }
 
@@ -657,8 +662,9 @@ impl TrDbColdStub {
         self.settings_stub = self
             .settings_stub
             .new_addition(GENERALVERIFIER.to_vec(), general_verifier.encode());
-        self.history_stub
-            .push(Event::GeneralVerifierSet(general_verifier.to_owned()));
+        self.history_stub.push(Event::GeneralVerifierSet {
+            verifier: general_verifier.to_owned(),
+        });
         self
     }
 
@@ -673,10 +679,9 @@ impl TrDbColdStub {
         self.settings_stub = self
             .settings_stub
             .new_addition(TYPES.to_vec(), types.store());
-        self.history_stub.push(Event::TypesAdded(TypesDisplay::get(
-            types,
-            general_verifier,
-        )));
+        self.history_stub.push(Event::TypesAdded {
+            types_display: TypesDisplay::get(types, general_verifier),
+        });
         self
     }
 
@@ -689,11 +694,9 @@ impl TrDbColdStub {
     /// changed.
     pub fn remove_types(mut self, types: &ContentLoadTypes, general_verifier: &Verifier) -> Self {
         self.settings_stub = self.settings_stub.new_removal(TYPES.to_vec());
-        self.history_stub
-            .push(Event::TypesRemoved(TypesDisplay::get(
-                types,
-                general_verifier,
-            )));
+        self.history_stub.push(Event::TypesRemoved {
+            types_display: TypesDisplay::get(types, general_verifier),
+        });
         self
     }
 
@@ -715,12 +718,13 @@ impl TrDbColdStub {
             verifier_key.key(),
             CurrentVerifier::Valid(valid_current_verifier.to_owned()).encode(),
         );
-        self.history_stub
-            .push(Event::NetworkVerifierSet(NetworkVerifierDisplay::get(
+        self.history_stub.push(Event::NetworkVerifierSet {
+            network_verifier_display: NetworkVerifierDisplay::get(
                 verifier_key,
                 valid_current_verifier,
                 general_verifier,
-            )));
+            ),
+        });
         self
     }
 
@@ -953,7 +957,9 @@ impl TrDbColdSign {
         user_comment: &str,
         database_name: &str,
     ) -> Result<u32, ErrorSigner> {
-        let signed_by = VerifierValue::Standard(self.multisigner());
+        let signed_by = VerifierValue::Standard {
+            m: self.multisigner(),
+        };
         let mut history = self.history;
         let mut for_transaction = Batch::default();
         match self.content {
@@ -962,9 +968,9 @@ impl TrDbColdSign {
                 let sign_display =
                     SignDisplay::get(&transaction, &self.network_name, &signed_by, user_comment);
                 if wrong_password {
-                    history.push(Event::TransactionSignError(sign_display))
+                    history.push(Event::TransactionSignError { sign_display })
                 } else {
-                    history.push(Event::TransactionSigned(sign_display));
+                    history.push(Event::TransactionSigned { sign_display });
                     for_transaction = make_batch_clear_tree::<Signer>(database_name, TRANSACTION)?;
                 }
             }
@@ -972,9 +978,13 @@ impl TrDbColdSign {
                 let sign_message_display =
                     SignMessageDisplay::get(&message, &self.network_name, &signed_by, user_comment);
                 if wrong_password {
-                    history.push(Event::MessageSignError(sign_message_display))
+                    history.push(Event::MessageSignError {
+                        sign_message_display,
+                    })
                 } else {
-                    history.push(Event::MessageSigned(sign_message_display));
+                    history.push(Event::MessageSigned {
+                        sign_message_display,
+                    });
                     for_transaction = make_batch_clear_tree::<Signer>(database_name, TRANSACTION)?;
                 }
             }

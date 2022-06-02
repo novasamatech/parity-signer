@@ -6,19 +6,21 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.State
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import io.parity.signer.ButtonID
-import io.parity.signer.ShieldAlert
 import io.parity.signer.components.BigButton
 import io.parity.signer.components.HeaderBar
-import io.parity.signer.models.SignerDataModel
-import io.parity.signer.models.pushButton
+import io.parity.signer.models.AlertState
 import io.parity.signer.ui.theme.Bg000
 import io.parity.signer.ui.theme.modal
+import io.parity.signer.uniffi.Action
 
 @Composable
-fun NewSeedMenu(signerDataModel: SignerDataModel) {
+fun NewSeedMenu(
+	alertState: State<AlertState?>,
+	button: (Action) -> Unit
+) {
 	Column {
 		Spacer(Modifier.weight(1f))
 		Surface(
@@ -32,18 +34,18 @@ fun NewSeedMenu(signerDataModel: SignerDataModel) {
 				BigButton(
 					text = "New seed",
 					action = {
-						if (signerDataModel.alertState.value == ShieldAlert.None)
-							signerDataModel.pushButton(ButtonID.NewSeed)
+						if (alertState.value == AlertState.None)
+							button(Action.NEW_SEED)
 						else
-							signerDataModel.pushButton(ButtonID.Shield)
+							button(Action.SHIELD)
 					})
 				BigButton(
 					text = "Recover seed",
 					action = {
-						if (signerDataModel.alertState.value == ShieldAlert.None)
-							signerDataModel.pushButton(ButtonID.RecoverSeed)
+						if (alertState.value == AlertState.None)
+							button(Action.RECOVER_SEED)
 						else
-							signerDataModel.pushButton(ButtonID.Shield)
+							button(Action.SHIELD)
 					},
 					isShaded = true
 				)

@@ -14,6 +14,8 @@
 //! This module gathers all possible [`ErrorActive`] errors in one place, so that
 //! error management is easier.
 
+use sp_core::H256;
+
 use crate::{
     crypto::Encryption,
     error::{
@@ -699,7 +701,7 @@ pub enum DatabaseActive {
 
         /// network genesis hash that was fetched through rpc call and found in
         /// the database
-        genesis_hash: [u8; 32],
+        genesis_hash: H256,
     },
 
     /// `ADDRESS_BOOK` tree of the hot database contains
@@ -1142,7 +1144,7 @@ pub enum Changed {
     /// Westend), the `defaults` crate must be updated as well.
     ///
     /// Associated data is the genesis hash values in question.
-    GenesisHash { old: [u8; 32], new: [u8; 32] },
+    GenesisHash { old: H256, new: H256 },
 
     /// Network decimals value in
     /// [`NetworkSpecsToSend`](crate::network_specs::NetworkSpecsToSend)
