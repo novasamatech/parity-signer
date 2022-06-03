@@ -273,8 +273,8 @@ impl ErrorSource for Active {
                     },
                     Fetch::UnexpectedFetchedGenesisHashFormat{value} => format!("Fetched genesis hash {} has unexpected format and does not fit into [u8;32] array.", value),
                     Fetch::SpecsInDb{name, encryption} => format!("Network specs entry for {} and encryption {} is already in database.", name, encryption.show()),
-                    Fetch::UKeyUrlInDb {title, url} => format!("There is already an entry with address {} for network {}.\nKnown networks should be processed with `-n` content key.", url, title),
-                    Fetch::UKeyHashInDb{address_book_entry, url} => format!("Fetch at {} resulted in data already known to the hot database.\nNetwork {} with genesis hash {} has address set to {}.\nTo change the url, delete old entry.", url, address_book_entry.name, hex::encode(address_book_entry.genesis_hash), address_book_entry.address),
+                    Fetch::UKeyUrlInDb {title, url} => format!("There is already an entry with address {} for network {}. Known networks should be processed with `-n` content key.", url, title),
+                    Fetch::UKeyHashInDb{address_book_entry, url} => format!("Fetch at {} resulted in data already known to the hot database. Network {} with genesis hash {} has address set to {}. To change the url, delete old entry.", url, address_book_entry.name, hex::encode(address_book_entry.genesis_hash), address_book_entry.address),
                 };
                 format!("Fetching error. {}", insert)
             },

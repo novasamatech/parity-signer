@@ -5,7 +5,8 @@ use constants::{HOT_DB_NAME, METATREE};
 use db_handling::helpers::{open_db, open_tree, try_get_meta_values_by_name_version};
 use definitions::{
     error_active::{Active, Check, ErrorActive, IncomingMetadataSourceActiveStr},
-    metadata::MetaValues,
+    metadata::{AddressBookEntry, MetaValues},
+    network_specs::NetworkSpecsToSend,
 };
 
 use crate::helpers::{address_book_content, network_specs_from_entry, network_specs_from_title};
@@ -33,9 +34,12 @@ pub fn show_metadata() -> Result<(), ErrorActive> {
         println!("Database has no metadata entries.");
         return Ok(());
     }
-    println!("Database has metadata information for following networks:");
+    let mut set: Vec<MetaValues> = Vec::new();
     for x in metadata.iter().flatten() {
-        let meta_values = MetaValues::from_entry_checked::<Active>(x)?;
+        set.push(MetaValues::from_entry_checked::<Active>(x)?);
+    }
+    println!("Database has metadata information for following networks:");
+    for meta_values in set.iter() {
         println!(
             "\t{} {}, metadata hash {}",
             meta_values.name,
@@ -73,24 +77,37 @@ pub fn show_networks() -> Result<(), ErrorActive> {
         println!("Address book is empty.");
         return Ok(());
     }
+    struct SetPart {
+        title: String,
+        address_book_entry: AddressBookEntry,
+        network_specs: NetworkSpecsToSend,
+    }
+    let mut set: Vec<SetPart> = Vec::new();
+    for (title, address_book_entry) in address_book_set.into_iter() {
+        let network_specs = network_specs_from_entry(&address_book_entry)?;
+        set.push(SetPart {
+            title,
+            address_book_entry,
+            network_specs,
+        })
+    }
     println!("Address book has entries for following networks:");
-    for (title, address_book_entry) in address_book_set.iter() {
-        let network_specs = network_specs_from_entry(address_book_entry)?;
-        if address_book_entry.def {
+    for x in set.iter() {
+        if x.address_book_entry.def {
             println!(
                 "\t{} at {}, encryption {} (default), Signer display title {}",
-                title,
-                address_book_entry.address,
-                address_book_entry.encryption.show(),
-                network_specs.title,
+                x.title,
+                x.address_book_entry.address,
+                x.address_book_entry.encryption.show(),
+                x.network_specs.title,
             );
         } else {
             println!(
                 "\t{} at {}, encryption {}, Signer display title {}",
-                title,
-                address_book_entry.address,
-                address_book_entry.encryption.show(),
-                network_specs.title,
+                x.title,
+                x.address_book_entry.address,
+                x.address_book_entry.encryption.show(),
+                x.network_specs.title,
             );
         }
     }
