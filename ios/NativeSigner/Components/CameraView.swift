@@ -23,6 +23,7 @@ struct CameraView: View {
                     }
                     .onDisappear {
                         print("shutdown camera")
+                        UIApplication.shared.isIdleTimerDisabled = false
                         model.shutdown()
                     }
                     .onReceive(model.$payload, perform: { payload in
@@ -43,6 +44,11 @@ struct CameraView: View {
                     })
                     .onReceive(model.$captured, perform: {rCaptured in
                         captured = rCaptured
+                        if (rCaptured ?? 0 > 0) {
+                            UIApplication.shared.isIdleTimerDisabled = true
+                        } else {
+                            UIApplication.shared.isIdleTimerDisabled = false
+                        }
                     })
                     .mask(
                         VStack {
