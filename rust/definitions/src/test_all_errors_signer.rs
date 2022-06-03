@@ -771,6 +771,9 @@ pub fn error_signer() -> Vec<ErrorSigner> {
     // `NoNetworksAvailable` error.
     out.push(ErrorSigner::NoNetworksAvailable);
 
+    // `TempBlockMsg` error //TODO remove after message fix
+    out.push(ErrorSigner::TempBlockMsg);
+
     out
 }
 
@@ -1159,6 +1162,7 @@ mod tests {
 "Wrong password."
 "Wrong password."
 "No networks available. Please load networks information to proceed."
+"This is a message payload. Message signing is temporarily disabled in Signer."
 "#;
         assert!(print == print_expected, "\nReceived: {}", print);
     }

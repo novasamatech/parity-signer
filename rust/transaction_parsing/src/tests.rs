@@ -2371,6 +2371,7 @@ fn parse_transaction_8_error_on_parsing() {
     fs::remove_dir_all(dbname).unwrap();
 }
 
+/*
 #[test]
 fn parse_msg_1() {
     let dbname = "for_tests/parse_msg_1";
@@ -2442,6 +2443,7 @@ fn parse_msg_2() {
     }
     fs::remove_dir_all(dbname).unwrap();
 }
+*/
 
 #[test]
 fn import_derivations() {

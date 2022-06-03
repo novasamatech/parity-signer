@@ -1,3 +1,4 @@
+// TODO there is temp block on message signing, restore commented parts as needed
 use parity_scale_codec::{Decode, Encode};
 use pretty_assertions::assert_eq;
 use sled::{open, Db, Tree};
@@ -22,7 +23,7 @@ use definitions::{
     crypto::Encryption,
     error::{AddressKeySource, ErrorSource},
     error_signer::{DatabaseSigner, ErrorSigner, Signer},
-    history::{Entry, Event, SignDisplay, SignMessageDisplay},
+    history::{Entry, Event, SignDisplay /*, SignMessageDisplay*/},
     keyring::{AddressKey, MetaKey, NetworkSpecsKey, VerifierKey},
     navigation::{
         Address, Card, MMetadataRecord, MSCAuthorPlain, MSCCall, MSCCurrency, MSCEnumVariantName,
@@ -565,6 +566,7 @@ fn can_sign_transaction_1() {
     fs::remove_dir_all(dbname).unwrap();
 }
 
+/*
 // can sign a message
 #[test]
 fn can_sign_message_1() {
@@ -680,6 +682,7 @@ fn can_sign_message_1() {
     }
     fs::remove_dir_all(dbname).unwrap();
 }
+*/
 
 #[test]
 fn add_specs_westend_no_network_info_not_signed() {

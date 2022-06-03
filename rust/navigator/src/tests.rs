@@ -23,20 +23,21 @@ use definitions::{
     error_signer::Signer,
     history::{
         Event, IdentityHistory, MetaValuesDisplay, MetaValuesExport, NetworkSpecsDisplay,
-        NetworkSpecsExport, SignDisplay, SignMessageDisplay, TypesDisplay, TypesExport,
+        NetworkSpecsExport, SignDisplay, /* SignMessageDisplay,*/ TypesDisplay, TypesExport,
     },
     navigation::{
         ActionResult, Address, AlertData, Card, DerivationCheck, DerivationDestination,
         DerivationEntry, DerivationPack, FooterButton, History, MBackup, MDeriveKey,
-        MEnterPassword, MEventMaybeDecoded, MKeyDetails, MKeyDetailsMulti, MKeys, MKeysCard, MLog,
-        MLogDetails, MLogRight, MMMNetwork, MMNetwork, MManageMetadata, MManageNetworks,
-        MMetadataRecord, MNetworkCard, MNetworkDetails, MNetworkMenu, MNewSeed, MNewSeedBackup,
-        MPasswordConfirm, MRawKey, MRecoverSeedName, MRecoverSeedPhrase, MSCCall, MSCContent,
-        MSCCurrency, MSCEnumVariantName, MSCEraMortal, MSCFieldName, MSCId, MSCNameVersion,
-        MSCNetworkInfo, MSeedKeyCard, MSeedMenu, MSeeds, MSettings, MSignSufficientCrypto,
-        MSignatureReady, MSufficientCryptoReady, MTransaction, MTypesInfo, MVerifier,
-        MVerifierDetails, ModalData, Network, NetworkSpecsToSend, RightButton, ScreenData,
-        ScreenNameType, SeedNameCard, TransactionCard, TransactionCardSet, TransactionType,
+        /*MEnterPassword, */ MEventMaybeDecoded, MKeyDetails, MKeyDetailsMulti, MKeys,
+        MKeysCard, MLog, MLogDetails, MLogRight, MMMNetwork, MMNetwork, MManageMetadata,
+        MManageNetworks, MMetadataRecord, MNetworkCard, MNetworkDetails, MNetworkMenu, MNewSeed,
+        MNewSeedBackup, MPasswordConfirm, MRawKey, MRecoverSeedName, MRecoverSeedPhrase, MSCCall,
+        MSCContent, MSCCurrency, MSCEnumVariantName, MSCEraMortal, MSCFieldName, MSCId,
+        MSCNameVersion, MSCNetworkInfo, MSeedKeyCard, MSeedMenu, MSeeds, MSettings,
+        MSignSufficientCrypto, MSignatureReady, MSufficientCryptoReady, MTransaction, MTypesInfo,
+        MVerifier, MVerifierDetails, ModalData, Network, NetworkSpecsToSend, RightButton,
+        ScreenData, ScreenNameType, SeedNameCard, TransactionCard, TransactionCardSet,
+        TransactionType,
     },
     network_specs::{NetworkSpecs, ValidCurrentVerifier, Verifier, VerifierValue},
 };
@@ -75,9 +76,12 @@ lazy_static! {
     static ref OS_MSG: Regex = Regex::new(r#"Os \{[^}]*\}"#).expect("checked_construction");
 }
 
+// TODO uncomment this when message signing is returned
+/*
 fn cut_os_msg(error: &str) -> String {
     OS_MSG.replace_all(error, r#"Os {**}"#).to_string()
 }
+*/
 
 fn cut_seed_remove_identicon(data: &mut Option<ModalData>) -> String {
     if let Some(ModalData::NewSeedBackup { f }) = data {
@@ -5483,10 +5487,12 @@ fn flow_test_1() {
         .unwrap();
     do_action(Action::ClearLog, "", "").unwrap().unwrap();
 
+    // TODO this is added because of temporary block on the message signing
     // let's scan a text message
     do_action(Action::NavbarScan, "", "").unwrap().unwrap();
     let message_hex = "5301033efeca331d646d8a2986374bb3bb8d6e9e3cfcdd7c45c2b69104fab5d61d3f34f5064c6f72656d20697073756d20646f6c6f722073697420616d65742c20636f6e73656374657475722061646970697363696e6720656c69742c2073656420646f20656975736d6f642074656d706f7220696e6369646964756e74207574206c61626f726520657420646f6c6f7265206d61676e6120616c697175612e20557420656e696d206164206d696e696d2076656e69616d2c2071756973206e6f737472756420657865726369746174696f6e20756c6c616d636f206c61626f726973206e69736920757420616c697175697020657820656120636f6d6d6f646f20636f6e7365717561742e2044756973206175746520697275726520646f6c6f7220696e20726570726568656e646572697420696e20766f6c7570746174652076656c697420657373652063696c6c756d20646f6c6f726520657520667567696174206e756c6c612070617269617475722e204578636570746575722073696e74206f6363616563617420637570696461746174206e6f6e2070726f6964656e742c2073756e7420696e2063756c706120717569206f666669636961206465736572756e74206d6f6c6c697420616e696d20696420657374206c61626f72756d2ee143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e";
-    let card_text = "4c6f72656d20697073756d20646f6c6f722073697420616d65742c20636f6e73656374657475722061646970697363696e6720656c69742c2073656420646f20656975736d6f642074656d706f7220696e6369646964756e74207574206c61626f726520657420646f6c6f7265206d61676e6120616c697175612e20557420656e696d206164206d696e696d2076656e69616d2c2071756973206e6f737472756420657865726369746174696f6e20756c6c616d636f206c61626f726973206e69736920757420616c697175697020657820656120636f6d6d6f646f20636f6e7365717561742e2044756973206175746520697275726520646f6c6f7220696e20726570726568656e646572697420696e20766f6c7570746174652076656c697420657373652063696c6c756d20646f6c6f726520657520667567696174206e756c6c612070617269617475722e204578636570746575722073696e74206f6363616563617420637570696461746174206e6f6e2070726f6964656e742c2073756e7420696e2063756c706120717569206f666669636961206465736572756e74206d6f6c6c697420616e696d20696420657374206c61626f72756d2e".to_string();
+    let card_text =
+        "This is a message payload. Message signing is temporarily disabled in Signer.".to_string();
     let action = do_action(Action::TransactionFetched, message_hex, "")
         .unwrap()
         .unwrap();
@@ -5500,28 +5506,18 @@ fn flow_test_1() {
         screen_data: ScreenData::Transaction {
             f: MTransaction {
                 content: TransactionCardSet {
-                    message: Some(vec![TransactionCard {
+                    error: Some(vec![TransactionCard {
                         index: 0,
                         indent: 0,
-                        card: Card::TextCard {
+                        card: Card::ErrorCard {
                             f: card_text.clone(),
                         },
                     }]),
                     ..Default::default()
                 },
-                ttype: TransactionType::Sign,
-                author_info: Some(Address {
-                    base58: "5DVJWniDyUja5xnG4t5i3Rrd2Gguf1fzxPYfgZBbKcvFqk4N".to_string(),
-                    identicon: alice_sr_westend().to_vec(),
-                    seed_name: "Alice".to_string(),
-                    path: "//westend".to_string(),
-                    has_pwd: false,
-                    multiselect: None,
-                }),
-                network_info: Some(MSCNetworkInfo {
-                    network_title: "Westend".to_string(),
-                    network_logo: "westend".to_string(),
-                }),
+                ttype: TransactionType::Read,
+                author_info: None,
+                network_info: None,
             },
         },
         modal_data: None,
@@ -5536,54 +5532,156 @@ fn flow_test_1() {
         )
     );
 
-    let action = do_action(Action::GoForward, "text test", ALICE_SEED_PHRASE)
-        .unwrap()
-        .unwrap();
-    let signature_hex = if let Some(ModalData::SignatureReady {
-        f: MSignatureReady { ref signature },
-    }) = action.modal_data
-    {
-        String::from_utf8(qr_payload(signature)).unwrap()
-    } else {
-        panic!(
-            "Expected ModalData::SigantureReady, got {:?}",
-            action.modal_data
-        );
-    };
+    do_action(Action::GoBack, "", "").unwrap().unwrap();
 
+    // TODO this is removed because of temporary block on the message signing
     /*
-    assert_eq!(
-        action, expected_action,
-        "GoForward on parsed transaction. Expected modal SignatureReady",
-    );
-    */
+        // let's scan a text message
+        do_action(Action::NavbarScan, "", "").unwrap().unwrap();
+        let message_hex = "5301033efeca331d646d8a2986374bb3bb8d6e9e3cfcdd7c45c2b69104fab5d61d3f34f5064c6f72656d20697073756d20646f6c6f722073697420616d65742c20636f6e73656374657475722061646970697363696e6720656c69742c2073656420646f20656975736d6f642074656d706f7220696e6369646964756e74207574206c61626f726520657420646f6c6f7265206d61676e6120616c697175612e20557420656e696d206164206d696e696d2076656e69616d2c2071756973206e6f737472756420657865726369746174696f6e20756c6c616d636f206c61626f726973206e69736920757420616c697175697020657820656120636f6d6d6f646f20636f6e7365717561742e2044756973206175746520697275726520646f6c6f7220696e20726570726568656e646572697420696e20766f6c7570746174652076656c697420657373652063696c6c756d20646f6c6f726520657520667567696174206e756c6c612070617269617475722e204578636570746575722073696e74206f6363616563617420637570696461746174206e6f6e2070726f6964656e742c2073756e7420696e2063756c706120717569206f666669636961206465736572756e74206d6f6c6c697420616e696d20696420657374206c61626f72756d2ee143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e";
+        let card_text = "4c6f72656d20697073756d20646f6c6f722073697420616d65742c20636f6e73656374657475722061646970697363696e6720656c69742c2073656420646f20656975736d6f642074656d706f7220696e6369646964756e74207574206c61626f726520657420646f6c6f7265206d61676e6120616c697175612e20557420656e696d206164206d696e696d2076656e69616d2c2071756973206e6f737472756420657865726369746174696f6e20756c6c616d636f206c61626f726973206e69736920757420616c697175697020657820656120636f6d6d6f646f20636f6e7365717561742e2044756973206175746520697275726520646f6c6f7220696e20726570726568656e646572697420696e20766f6c7570746174652076656c697420657373652063696c6c756d20646f6c6f726520657520667567696174206e756c6c612070617269617475722e204578636570746575722073696e74206f6363616563617420637570696461746174206e6f6e2070726f6964656e742c2073756e7420696e2063756c706120717569206f666669636961206465736572756e74206d6f6c6c697420616e696d20696420657374206c61626f72756d2e".to_string();
+        let action = do_action(Action::TransactionFetched, message_hex, "")
+            .unwrap()
+            .unwrap();
+        let expected_action = ActionResult {
+            screen_label: String::new(),
+            back: true,
+            footer: false,
+            footer_button: Some(FooterButton::Scan),
+            right_button: None,
+            screen_name_type: ScreenNameType::H1,
+            screen_data: ScreenData::Transaction {
+                f: MTransaction {
+                    content: TransactionCardSet {
+                        message: Some(vec![TransactionCard {
+                            index: 0,
+                            indent: 0,
+                            card: Card::TextCard {
+                                f: card_text.clone(),
+                            },
+                        }]),
+                        ..Default::default()
+                    },
+                    ttype: TransactionType::Sign,
+                    author_info: Some(Address {
+                        base58: "5DVJWniDyUja5xnG4t5i3Rrd2Gguf1fzxPYfgZBbKcvFqk4N".to_string(),
+                        identicon: alice_sr_westend().to_vec(),
+                        seed_name: "Alice".to_string(),
+                        path: "//westend".to_string(),
+                        has_pwd: false,
+                        multiselect: None,
+                    }),
+                    network_info: Some(MSCNetworkInfo {
+                        network_title: "Westend".to_string(),
+                        network_logo: "westend".to_string(),
+                    }),
+                },
+            },
+            modal_data: None,
+            alert_data: None,
+        };
 
-    assert!(
-        signature_is_good(message_hex, &signature_hex),
-        "Produced bad signature: \n{}",
-        signature_hex
-    );
+        assert_eq!(
+            action, expected_action,
+            concat!(
+                "TransactionFetched on Scan screen containing message transaction. ",
+                "Expected Transaction screen with no modals"
+            )
+        );
 
-    let mut action = do_action(Action::GoBack, "", "").unwrap().unwrap();
-    erase_log_timestamps(&mut action.screen_data);
-    let signed_by = "3efeca331d646d8a2986374bb3bb8d6e9e3cfcdd7c45c2b69104fab5d61d3f34";
-    let expected_action = ActionResult {
-        screen_label: String::new(),
-        back: false,
-        footer: true,
-        footer_button: Some(FooterButton::Log),
-        right_button: Some(RightButton::LogRight),
-        screen_name_type: ScreenNameType::H4,
-        screen_data: ScreenData::Log {
-            f: MLog {
-                log: vec![
-                    History {
-                        order: 1,
-                        timestamp: String::new(),
-                        events: vec![Event::MessageSigned {
+        let action = do_action(Action::GoForward, "text test", ALICE_SEED_PHRASE)
+            .unwrap()
+            .unwrap();
+        let signature_hex = if let Some(ModalData::SignatureReady {
+            f: MSignatureReady { ref signature },
+        }) = action.modal_data
+        {
+            String::from_utf8(qr_payload(signature)).unwrap()
+        } else {
+            panic!(
+                "Expected ModalData::SigantureReady, got {:?}",
+                action.modal_data
+            );
+        };
+
+        /*
+        assert_eq!(
+            action, expected_action,
+            "GoForward on parsed transaction. Expected modal SignatureReady",
+        );
+        */
+
+        assert!(
+            signature_is_good(message_hex, &signature_hex),
+            "Produced bad signature: \n{}",
+            signature_hex
+        );
+
+        let mut action = do_action(Action::GoBack, "", "").unwrap().unwrap();
+        erase_log_timestamps(&mut action.screen_data);
+        let signed_by = "3efeca331d646d8a2986374bb3bb8d6e9e3cfcdd7c45c2b69104fab5d61d3f34";
+        let expected_action = ActionResult {
+            screen_label: String::new(),
+            back: false,
+            footer: true,
+            footer_button: Some(FooterButton::Log),
+            right_button: Some(RightButton::LogRight),
+            screen_name_type: ScreenNameType::H4,
+            screen_data: ScreenData::Log {
+                f: MLog {
+                    log: vec![
+                        History {
+                            order: 1,
+                            timestamp: String::new(),
+                            events: vec![Event::MessageSigned {
+                                sign_message_display: SignMessageDisplay {
+                                    message: String::from_utf8(hex::decode(&card_text).unwrap())
+                                        .unwrap(),
+                                    network_name: "westend".to_string(),
+                                    signed_by: VerifierValue::Standard {
+                                        m: MultiSigner::Sr25519(
+                                            sp_core::sr25519::Public::try_from(
+                                                hex::decode(signed_by).unwrap().as_ref(),
+                                            )
+                                            .unwrap(),
+                                        ),
+                                    },
+                                    user_comment: "text test".to_string(),
+                                },
+                            }],
+                        },
+                        History {
+                            order: 0,
+                            timestamp: String::new(),
+                            events: vec![Event::HistoryCleared],
+                        },
+                    ],
+                },
+            },
+            modal_data: None,
+            alert_data: None,
+        };
+        assert_eq!(
+            action, expected_action,
+            "GoBack from Transaction with SignatureReady modal. Expected Log.",
+        );
+
+        let mut action = do_action(Action::ShowLogDetails, "1", "").unwrap().unwrap();
+        erase_log_timestamps(&mut action.screen_data);
+        let expected_action = ActionResult {
+            screen_label: "Event details".to_string(),
+            back: true,
+            footer: true,
+            footer_button: Some(FooterButton::Log),
+            right_button: None,
+            screen_name_type: ScreenNameType::H4,
+            screen_data: ScreenData::LogDetails {
+                f: MLogDetails {
+                    timestamp: String::new(),
+                    events: vec![MEventMaybeDecoded {
+                        event: Event::MessageSigned {
                             sign_message_display: SignMessageDisplay {
-                                message: String::from_utf8(hex::decode(&card_text).unwrap())
-                                    .unwrap(),
+                                message: String::from_utf8(hex::decode(&card_text).unwrap()).unwrap(),
                                 network_name: "westend".to_string(),
                                 signed_by: VerifierValue::Standard {
                                     m: MultiSigner::Sr25519(
@@ -5595,75 +5693,32 @@ fn flow_test_1() {
                                 },
                                 user_comment: "text test".to_string(),
                             },
-                        }],
-                    },
-                    History {
-                        order: 0,
-                        timestamp: String::new(),
-                        events: vec![Event::HistoryCleared],
-                    },
-                ],
-            },
-        },
-        modal_data: None,
-        alert_data: None,
-    };
-    assert_eq!(
-        action, expected_action,
-        "GoBack from Transaction with SignatureReady modal. Expected Log.",
-    );
-
-    let mut action = do_action(Action::ShowLogDetails, "1", "").unwrap().unwrap();
-    erase_log_timestamps(&mut action.screen_data);
-    let expected_action = ActionResult {
-        screen_label: "Event details".to_string(),
-        back: true,
-        footer: true,
-        footer_button: Some(FooterButton::Log),
-        right_button: None,
-        screen_name_type: ScreenNameType::H4,
-        screen_data: ScreenData::LogDetails {
-            f: MLogDetails {
-                timestamp: String::new(),
-                events: vec![MEventMaybeDecoded {
-                    event: Event::MessageSigned {
-                        sign_message_display: SignMessageDisplay {
-                            message: String::from_utf8(hex::decode(&card_text).unwrap()).unwrap(),
-                            network_name: "westend".to_string(),
-                            signed_by: VerifierValue::Standard {
-                                m: MultiSigner::Sr25519(
-                                    sp_core::sr25519::Public::try_from(
-                                        hex::decode(signed_by).unwrap().as_ref(),
-                                    )
-                                    .unwrap(),
-                                ),
-                            },
-                            user_comment: "text test".to_string(),
                         },
-                    },
-                    decoded: None,
-                    signed_by: None,
-                    verifier_details: None,
-                }],
+                        decoded: None,
+                        signed_by: None,
+                        verifier_details: None,
+                    }],
+                },
             },
-        },
-        modal_data: None,
-        alert_data: None,
-    };
+            modal_data: None,
+            alert_data: None,
+        };
 
-    assert_eq!(
-        action, expected_action,
-        concat!(
-            "ShowLogDetails on Log screen with order 1. ",
-            "Expected LogDetails screen with decoded message and no modals."
-        )
-    );
+        assert_eq!(
+            action, expected_action,
+            concat!(
+                "ShowLogDetails on Log screen with order 1. ",
+                "Expected LogDetails screen with decoded message and no modals."
+            )
+        );
 
-    do_action(Action::GoBack, "", "").unwrap().unwrap();
-    do_action(Action::RightButtonAction, "", "")
-        .unwrap()
-        .unwrap();
-    do_action(Action::ClearLog, "", "").unwrap().unwrap();
+        do_action(Action::GoBack, "", "").unwrap().unwrap();
+        do_action(Action::RightButtonAction, "", "")
+            .unwrap()
+            .unwrap();
+        do_action(Action::ClearLog, "", "").unwrap().unwrap();
+
+    */
 
     do_action(Action::NavbarKeys, "", "").unwrap().unwrap();
     do_action(Action::RightButtonAction, "", "")
@@ -6105,7 +6160,8 @@ fn flow_test_1() {
     let mut action = do_action(Action::GoForward, "//0///secret", &seed_phrase_pepper)
         .unwrap()
         .unwrap();
-    let (pepper_key0_public, pepper_key0_base58, pepper_key0_identicon) =
+    // TODO uncomment this when message is fixed
+    let (_pepper_key0_public, _pepper_key0_base58, _pepper_key0_identicon) =
         if let ScreenData::Keys { ref f } = action.screen_data {
             (
                 f.set[0].address_key.strip_prefix("01").unwrap().to_string(),
@@ -6158,396 +6214,400 @@ fn flow_test_1() {
         )
     );
 
-    do_action(Action::NavbarScan, "", "").unwrap().unwrap();
-    let message_hex = message_hex.replace(
-        "3efeca331d646d8a2986374bb3bb8d6e9e3cfcdd7c45c2b69104fab5d61d3f34",
-        &pepper_key0_public,
-    );
-    let action = do_action(Action::TransactionFetched, &message_hex, "")
+    // TODO this is commented for now because of the temporary block on the message signing
+    /*
+        do_action(Action::NavbarScan, "", "").unwrap().unwrap();
+        let message_hex = message_hex.replace(
+            "3efeca331d646d8a2986374bb3bb8d6e9e3cfcdd7c45c2b69104fab5d61d3f34",
+            &pepper_key0_public,
+        );
+        let action = do_action(Action::TransactionFetched, &message_hex, "")
+            .unwrap()
+            .unwrap();
+        let mut expected_action = ActionResult {
+            screen_label: String::new(),
+            back: true,
+            footer: false,
+            footer_button: Some(FooterButton::Scan),
+            right_button: None,
+            screen_name_type: ScreenNameType::H1,
+            screen_data: ScreenData::Transaction {
+                f: MTransaction {
+                    content: TransactionCardSet {
+                        message: Some(vec![TransactionCard {
+                            index: 0,
+                            indent: 0,
+                            card: Card::TextCard {
+                                f: card_text.clone(),
+                            },
+                        }]),
+                        ..Default::default()
+                    },
+                    ttype: TransactionType::Sign,
+                    author_info: Some(Address {
+                        base58: pepper_key0_base58.clone(),
+                        identicon: pepper_key0_identicon.clone(),
+                        seed_name: "Pepper".to_string(),
+                        path: "//0".to_string(),
+                        has_pwd: true,
+                        multiselect: None,
+                    }),
+                    network_info: Some(MSCNetworkInfo {
+                        network_title: "Westend".to_string(),
+                        network_logo: "westend".to_string(),
+                    }),
+                },
+            },
+            modal_data: None,
+            alert_data: None,
+        };
+        let mut text_sign_action = expected_action.clone();
+        assert_eq!(
+            action, expected_action,
+            concat!(
+                "TransactionFetched on Scan screen containing message transaction. ",
+                "Expected Transaction screen with no modals"
+            )
+        );
+
+        let action = do_action(
+            Action::GoForward,
+            "Pepper tries sending text from passworded account",
+            &seed_phrase_pepper,
+        )
         .unwrap()
         .unwrap();
-    let mut expected_action = ActionResult {
-        screen_label: String::new(),
-        back: true,
-        footer: false,
-        footer_button: Some(FooterButton::Scan),
-        right_button: None,
-        screen_name_type: ScreenNameType::H1,
-        screen_data: ScreenData::Transaction {
-            f: MTransaction {
-                content: TransactionCardSet {
-                    message: Some(vec![TransactionCard {
-                        index: 0,
-                        indent: 0,
-                        card: Card::TextCard {
-                            f: card_text.clone(),
-                        },
-                    }]),
-                    ..Default::default()
-                },
-                ttype: TransactionType::Sign,
-                author_info: Some(Address {
+        expected_action.modal_data = Some(ModalData::EnterPassword {
+            f: MEnterPassword {
+                author_info: Address {
                     base58: pepper_key0_base58.clone(),
                     identicon: pepper_key0_identicon.clone(),
                     seed_name: "Pepper".to_string(),
                     path: "//0".to_string(),
                     has_pwd: true,
                     multiselect: None,
-                }),
-                network_info: Some(MSCNetworkInfo {
-                    network_title: "Westend".to_string(),
-                    network_logo: "westend".to_string(),
-                }),
-            },
-        },
-        modal_data: None,
-        alert_data: None,
-    };
-    let mut text_sign_action = expected_action.clone();
-    assert_eq!(
-        action, expected_action,
-        concat!(
-            "TransactionFetched on Scan screen containing message transaction. ",
-            "Expected Transaction screen with no modals"
-        )
-    );
-
-    let action = do_action(
-        Action::GoForward,
-        "Pepper tries sending text from passworded account",
-        &seed_phrase_pepper,
-    )
-    .unwrap()
-    .unwrap();
-    expected_action.modal_data = Some(ModalData::EnterPassword {
-        f: MEnterPassword {
-            author_info: Address {
-                base58: pepper_key0_base58.clone(),
-                identicon: pepper_key0_identicon.clone(),
-                seed_name: "Pepper".to_string(),
-                path: "//0".to_string(),
-                has_pwd: true,
-                multiselect: None,
-            },
-            counter: 1,
-        },
-    });
-    assert_eq!(
-        action, expected_action,
-        concat!(
-            "GoForward on Transaction screen for passworded address. ",
-            "Expected Transaction screen with EnterPassword modal"
-        )
-    );
-
-    let action = do_action(Action::GoForward, "wrong_one", "")
-        .unwrap()
-        .unwrap();
-    expected_action.modal_data = Some(ModalData::EnterPassword {
-        f: MEnterPassword {
-            author_info: Address {
-                base58: pepper_key0_base58.clone(),
-                identicon: pepper_key0_identicon.clone(),
-                seed_name: "Pepper".to_string(),
-                path: "//0".to_string(),
-                has_pwd: true,
-                multiselect: None,
-            },
-            counter: 2,
-        },
-    });
-    expected_action.alert_data = Some(AlertData::ErrorData {
-        f: "Wrong password.".to_string(),
-    });
-
-    assert_eq!(
-        action, expected_action,
-        concat!(
-            "GoForward on Transaction screen for passworded address with wrong password. ",
-            "Expected Transaction screen with EnterPassword modal with counter at 2."
-        )
-    );
-
-    do_action(Action::GoBack, "", "").unwrap().unwrap();
-    let action = do_action(Action::GoForward, "wrong_two", "")
-        .unwrap()
-        .unwrap();
-    expected_action.modal_data = Some(ModalData::EnterPassword {
-        f: MEnterPassword {
-            author_info: Address {
-                base58: pepper_key0_base58,
-                identicon: pepper_key0_identicon,
-                seed_name: "Pepper".to_string(),
-                path: "//0".to_string(),
-                has_pwd: true,
-                multiselect: None,
-            },
-            counter: 3,
-        },
-    });
-    assert_eq!(
-        action, expected_action,
-        concat!(
-            "GoForward on Transaction screen for passworded address with second wrong password. ",
-            "Expected Transaction screen with EnterPassword modal with counter at 3"
-        )
-    );
-
-    do_action(Action::GoBack, "", "").unwrap().unwrap();
-    let mut action = do_action(Action::GoForward, "wrong_three", "")
-        .unwrap()
-        .unwrap();
-    erase_log_timestamps(&mut action.screen_data);
-
-    let verifier_value = VerifierValue::Standard {
-        m: MultiSigner::Sr25519(
-            sp_core::sr25519::Public::try_from(hex::decode(&pepper_key0_public).unwrap().as_ref())
-                .unwrap(),
-        ),
-    };
-    let network_genesis_hash =
-        hex::decode("e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e").unwrap();
-    let message = String::from_utf8(hex::decode(&card_text).unwrap()).unwrap();
-    let expected_action = ActionResult {
-        screen_label: String::new(),
-        back: false,
-        footer: true,
-        footer_button: Some(FooterButton::Log),
-        right_button: Some(RightButton::LogRight),
-        screen_name_type: ScreenNameType::H4,
-        screen_data: ScreenData::Log {
-            f: MLog {
-                log: vec![
-                    History {
-                        order: 5,
-                        timestamp: String::new(),
-                        events: vec![Event::MessageSignError {
-                            sign_message_display: SignMessageDisplay {
-                                message: message.clone(),
-                                network_name: "westend".to_string(),
-                                signed_by: verifier_value.clone(),
-                                user_comment: "Pepper tries sending text from passworded account"
-                                    .to_string(),
-                            },
-                        }],
-                    },
-                    History {
-                        order: 4,
-                        timestamp: String::new(),
-                        events: vec![Event::MessageSignError {
-                            sign_message_display: SignMessageDisplay {
-                                message: message.clone(),
-                                network_name: "westend".to_string(),
-                                signed_by: verifier_value.clone(),
-                                user_comment: "Pepper tries sending text from passworded account"
-                                    .to_string(),
-                            },
-                        }],
-                    },
-                    History {
-                        order: 3,
-                        timestamp: String::new(),
-                        events: vec![Event::MessageSignError {
-                            sign_message_display: SignMessageDisplay {
-                                message,
-                                network_name: "westend".to_string(),
-                                signed_by: verifier_value.clone(),
-                                user_comment: "Pepper tries sending text from passworded account"
-                                    .to_string(),
-                            },
-                        }],
-                    },
-                    History {
-                        order: 2,
-                        timestamp: String::new(),
-                        events: vec![Event::IdentityAdded {
-                            identity_history: IdentityHistory {
-                                seed_name: "Pepper".to_string(),
-                                encryption: Encryption::Sr25519,
-                                public_key: hex::decode(&pepper_key0_public).unwrap(),
-                                path: "//0".to_string(),
-                                network_genesis_hash: network_genesis_hash.clone(),
-                            },
-                        }],
-                    },
-                    History {
-                        order: 1,
-                        timestamp: String::new(),
-                        events: vec![Event::IdentityRemoved {
-                            identity_history: IdentityHistory {
-                                seed_name: "Pepper".to_string(),
-                                encryption: Encryption::Sr25519,
-                                public_key: hex::decode(pepper_westend_public).unwrap(),
-                                path: "//westend".to_string(),
-                                network_genesis_hash,
-                            },
-                        }],
-                    },
-                    History {
-                        order: 0,
-                        timestamp: String::new(),
-                        events: vec![Event::HistoryCleared],
-                    },
-                ],
-            },
-        },
-        modal_data: None,
-        alert_data: Some(AlertData::ErrorData {
-            f: "Wrong password.".to_string(),
-        }),
-    };
-
-    assert_eq!(
-        action, expected_action,
-        concat!(
-            "GoForward on Transaction screen for passworded ",
-            "address with third wrong password. Expected Log screen"
-        )
-    );
-
-    do_action(Action::RightButtonAction, "", "")
-        .unwrap()
-        .unwrap();
-    do_action(Action::ClearLog, "", "").unwrap().unwrap();
-
-    do_action(Action::NavbarScan, "", "").unwrap().unwrap();
-    do_action(Action::TransactionFetched, &message_hex, "")
-        .unwrap()
-        .unwrap();
-    do_action(
-        Action::GoForward,
-        "Pepper tries better",
-        &seed_phrase_pepper,
-    )
-    .unwrap();
-    let action = do_action(Action::GoForward, "secret", "").unwrap().unwrap();
-    let signature_hex = if let Some(ModalData::SignatureReady {
-        f: MSignatureReady { ref signature },
-    }) = action.modal_data
-    {
-        text_sign_action.modal_data = Some(ModalData::SignatureReady {
-            f: MSignatureReady {
-                signature: signature.clone(),
+                },
+                counter: 1,
             },
         });
-
-        String::from_utf8(qr_payload(signature)).unwrap()
-    } else {
-        panic!(
-            "Expected ModalData::SigantureReady, got {:?}",
-            action.modal_data
+        assert_eq!(
+            action, expected_action,
+            concat!(
+                "GoForward on Transaction screen for passworded address. ",
+                "Expected Transaction screen with EnterPassword modal"
+            )
         );
-    };
 
-    assert_eq!(
-        action, text_sign_action,
-        concat!(
-            "GoForward on Transaction screen for passworded address with correct password. ",
-            "Expected Transaction screen with SignatureReady modal."
-        )
-    );
+        let action = do_action(Action::GoForward, "wrong_one", "")
+            .unwrap()
+            .unwrap();
+        expected_action.modal_data = Some(ModalData::EnterPassword {
+            f: MEnterPassword {
+                author_info: Address {
+                    base58: pepper_key0_base58.clone(),
+                    identicon: pepper_key0_identicon.clone(),
+                    seed_name: "Pepper".to_string(),
+                    path: "//0".to_string(),
+                    has_pwd: true,
+                    multiselect: None,
+                },
+                counter: 2,
+            },
+        });
+        expected_action.alert_data = Some(AlertData::ErrorData {
+            f: "Wrong password.".to_string(),
+        });
 
-    assert!(
-        signature_is_good(&message_hex, &signature_hex),
-        "Produced bad signature: \n{}",
-        signature_hex
-    );
+        assert_eq!(
+            action, expected_action,
+            concat!(
+                "GoForward on Transaction screen for passworded address with wrong password. ",
+                "Expected Transaction screen with EnterPassword modal with counter at 2."
+            )
+        );
 
-    do_action(Action::GoBack, "", "").unwrap().unwrap();
+        do_action(Action::GoBack, "", "").unwrap().unwrap();
+        let action = do_action(Action::GoForward, "wrong_two", "")
+            .unwrap()
+            .unwrap();
+        expected_action.modal_data = Some(ModalData::EnterPassword {
+            f: MEnterPassword {
+                author_info: Address {
+                    base58: pepper_key0_base58,
+                    identicon: pepper_key0_identicon,
+                    seed_name: "Pepper".to_string(),
+                    path: "//0".to_string(),
+                    has_pwd: true,
+                    multiselect: None,
+                },
+                counter: 3,
+            },
+        });
+        assert_eq!(
+            action, expected_action,
+            concat!(
+                "GoForward on Transaction screen for passworded address with second wrong password. ",
+                "Expected Transaction screen with EnterPassword modal with counter at 3"
+            )
+        );
 
-    {
-        // database got unavailable for some reason
-        let _database = db_handling::helpers::open_db::<Signer>(dbname).unwrap();
+        do_action(Action::GoBack, "", "").unwrap().unwrap();
+        let mut action = do_action(Action::GoForward, "wrong_three", "")
+            .unwrap()
+            .unwrap();
+        erase_log_timestamps(&mut action.screen_data);
 
-        let mut action = do_action(Action::NavbarKeys, "", "").unwrap().unwrap();
-        let expected_alert = "Database error. Internal error. IO error: could not acquire lock on \"for_tests/flow_test_1/db\": Os {**}".to_string();
+        let verifier_value = VerifierValue::Standard {
+            m: MultiSigner::Sr25519(
+                sp_core::sr25519::Public::try_from(hex::decode(&pepper_key0_public).unwrap().as_ref())
+                    .unwrap(),
+            ),
+        };
+        let network_genesis_hash =
+            hex::decode("e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e").unwrap();
+        let message = String::from_utf8(hex::decode(&card_text).unwrap()).unwrap();
         let expected_action = ActionResult {
-            screen_label: "Select seed".to_string(),
+            screen_label: String::new(),
             back: false,
             footer: true,
-            footer_button: Some(FooterButton::Keys),
-            right_button: Some(RightButton::NewSeed),
-            screen_name_type: ScreenNameType::H1,
-            modal_data: None,
-            alert_data: Some(AlertData::ErrorData { f: expected_alert }),
-            screen_data: ScreenData::Settings {
-                f: MSettings {
-                    ..Default::default()
+            footer_button: Some(FooterButton::Log),
+            right_button: Some(RightButton::LogRight),
+            screen_name_type: ScreenNameType::H4,
+            screen_data: ScreenData::Log {
+                f: MLog {
+                    log: vec![
+                        History {
+                            order: 5,
+                            timestamp: String::new(),
+                            events: vec![Event::MessageSignError {
+                                sign_message_display: SignMessageDisplay {
+                                    message: message.clone(),
+                                    network_name: "westend".to_string(),
+                                    signed_by: verifier_value.clone(),
+                                    user_comment: "Pepper tries sending text from passworded account"
+                                        .to_string(),
+                                },
+                            }],
+                        },
+                        History {
+                            order: 4,
+                            timestamp: String::new(),
+                            events: vec![Event::MessageSignError {
+                                sign_message_display: SignMessageDisplay {
+                                    message: message.clone(),
+                                    network_name: "westend".to_string(),
+                                    signed_by: verifier_value.clone(),
+                                    user_comment: "Pepper tries sending text from passworded account"
+                                        .to_string(),
+                                },
+                            }],
+                        },
+                        History {
+                            order: 3,
+                            timestamp: String::new(),
+                            events: vec![Event::MessageSignError {
+                                sign_message_display: SignMessageDisplay {
+                                    message,
+                                    network_name: "westend".to_string(),
+                                    signed_by: verifier_value.clone(),
+                                    user_comment: "Pepper tries sending text from passworded account"
+                                        .to_string(),
+                                },
+                            }],
+                        },
+                        History {
+                            order: 2,
+                            timestamp: String::new(),
+                            events: vec![Event::IdentityAdded {
+                                identity_history: IdentityHistory {
+                                    seed_name: "Pepper".to_string(),
+                                    encryption: Encryption::Sr25519,
+                                    public_key: hex::decode(&pepper_key0_public).unwrap(),
+                                    path: "//0".to_string(),
+                                    network_genesis_hash: network_genesis_hash.clone(),
+                                },
+                            }],
+                        },
+                        History {
+                            order: 1,
+                            timestamp: String::new(),
+                            events: vec![Event::IdentityRemoved {
+                                identity_history: IdentityHistory {
+                                    seed_name: "Pepper".to_string(),
+                                    encryption: Encryption::Sr25519,
+                                    public_key: hex::decode(pepper_westend_public).unwrap(),
+                                    path: "//westend".to_string(),
+                                    network_genesis_hash,
+                                },
+                            }],
+                        },
+                        History {
+                            order: 0,
+                            timestamp: String::new(),
+                            events: vec![Event::HistoryCleared],
+                        },
+                    ],
                 },
             },
+            modal_data: None,
+            alert_data: Some(AlertData::ErrorData {
+                f: "Wrong password.".to_string(),
+            }),
         };
-        if let Some(AlertData::ErrorData { ref mut f }) = action.alert_data {
-            *f = cut_os_msg(f);
-        } else {
-            panic!("Expected AlertData::ErrorData");
-        }
 
         assert_eq!(
             action, expected_action,
-            "Tried to switch from Log to Keys with unavailable database."
+            concat!(
+                "GoForward on Transaction screen for passworded ",
+                "address with third wrong password. Expected Log screen"
+            )
         );
 
-        let mut action = do_action(Action::GoBack, "", "").unwrap().unwrap();
+        do_action(Action::RightButtonAction, "", "")
+            .unwrap()
+            .unwrap();
+        do_action(Action::ClearLog, "", "").unwrap().unwrap();
 
-        if let Some(AlertData::ErrorData { ref mut f }) = action.alert_data {
-            *f = cut_os_msg(f);
+        do_action(Action::NavbarScan, "", "").unwrap().unwrap();
+        do_action(Action::TransactionFetched, &message_hex, "")
+            .unwrap()
+            .unwrap();
+        do_action(
+            Action::GoForward,
+            "Pepper tries better",
+            &seed_phrase_pepper,
+        )
+        .unwrap();
+        let action = do_action(Action::GoForward, "secret", "").unwrap().unwrap();
+        let signature_hex = if let Some(ModalData::SignatureReady {
+            f: MSignatureReady { ref signature },
+        }) = action.modal_data
+        {
+            text_sign_action.modal_data = Some(ModalData::SignatureReady {
+                f: MSignatureReady {
+                    signature: signature.clone(),
+                },
+            });
+
+            String::from_utf8(qr_payload(signature)).unwrap()
         } else {
-            panic!("Expected AlertData::ErrorData");
-        }
+            panic!(
+                "Expected ModalData::SigantureReady, got {:?}",
+                action.modal_data
+            );
+        };
 
         assert_eq!(
-            action, expected_action,
-            "GoBack on SeedSelector with ErrorDisplay alert."
+            action, text_sign_action,
+            concat!(
+                "GoForward on Transaction screen for passworded address with correct password. ",
+                "Expected Transaction screen with SignatureReady modal."
+            )
         );
-    }
 
-    // Aaand, we are back
-    let action = do_action(Action::NavbarSettings, "", "").unwrap().unwrap();
-    assert_eq!(
-        action, current_settings_action,
-        "Reload Settings. Expected known Settings screen with no errors.",
-    );
+        assert!(
+            signature_is_good(&message_hex, &signature_hex),
+            "Produced bad signature: \n{}",
+            signature_hex
+        );
 
-    let mut action = do_action(Action::NavbarLog, "", "").unwrap().unwrap();
-    erase_log_timestamps(&mut action.screen_data);
-    let expected_action = ActionResult {
-        screen_label: String::new(),
-        back: false,
-        footer: true,
-        footer_button: Some(FooterButton::Log),
-        right_button: Some(RightButton::LogRight),
-        screen_name_type: ScreenNameType::H4,
-        screen_data: ScreenData::Log {
-            f: MLog {
-                log: vec![
-                    History {
-                        order: 1,
-                        timestamp: String::new(),
-                        events: vec![Event::MessageSigned {
-                            sign_message_display: SignMessageDisplay {
-                                message: String::from_utf8_lossy(&hex::decode(&card_text).unwrap())
-                                    .to_string(),
-                                network_name: "westend".to_string(),
-                                signed_by: verifier_value,
-                                user_comment: "Pepper tries better".to_string(),
-                            },
-                        }],
+        do_action(Action::GoBack, "", "").unwrap().unwrap();
+
+        {
+            // database got unavailable for some reason
+            let _database = db_handling::helpers::open_db::<Signer>(dbname).unwrap();
+
+            let mut action = do_action(Action::NavbarKeys, "", "").unwrap().unwrap();
+            let expected_alert = "Database error. Internal error. IO error: could not acquire lock on \"for_tests/flow_test_1/db\": Os {**}".to_string();
+            let expected_action = ActionResult {
+                screen_label: "Select seed".to_string(),
+                back: false,
+                footer: true,
+                footer_button: Some(FooterButton::Keys),
+                right_button: Some(RightButton::NewSeed),
+                screen_name_type: ScreenNameType::H1,
+                modal_data: None,
+                alert_data: Some(AlertData::ErrorData { f: expected_alert }),
+                screen_data: ScreenData::Settings {
+                    f: MSettings {
+                        ..Default::default()
                     },
-                    History {
-                        order: 0,
-                        timestamp: String::new(),
-                        events: vec![Event::HistoryCleared],
-                    },
-                ],
+                },
+            };
+            if let Some(AlertData::ErrorData { ref mut f }) = action.alert_data {
+                *f = cut_os_msg(f);
+            } else {
+                panic!("Expected AlertData::ErrorData");
+            }
+
+            assert_eq!(
+                action, expected_action,
+                "Tried to switch from Log to Keys with unavailable database."
+            );
+
+            let mut action = do_action(Action::GoBack, "", "").unwrap().unwrap();
+
+            if let Some(AlertData::ErrorData { ref mut f }) = action.alert_data {
+                *f = cut_os_msg(f);
+            } else {
+                panic!("Expected AlertData::ErrorData");
+            }
+
+            assert_eq!(
+                action, expected_action,
+                "GoBack on SeedSelector with ErrorDisplay alert."
+            );
+        }
+
+        // Aaand, we are back
+        let action = do_action(Action::NavbarSettings, "", "").unwrap().unwrap();
+        assert_eq!(
+            action, current_settings_action,
+            "Reload Settings. Expected known Settings screen with no errors.",
+        );
+
+        let mut action = do_action(Action::NavbarLog, "", "").unwrap().unwrap();
+        erase_log_timestamps(&mut action.screen_data);
+        let expected_action = ActionResult {
+            screen_label: String::new(),
+            back: false,
+            footer: true,
+            footer_button: Some(FooterButton::Log),
+            right_button: Some(RightButton::LogRight),
+            screen_name_type: ScreenNameType::H4,
+            screen_data: ScreenData::Log {
+                f: MLog {
+                    log: vec![
+                        History {
+                            order: 1,
+                            timestamp: String::new(),
+                            events: vec![Event::MessageSigned {
+                                sign_message_display: SignMessageDisplay {
+                                    message: String::from_utf8_lossy(&hex::decode(&card_text).unwrap())
+                                        .to_string(),
+                                    network_name: "westend".to_string(),
+                                    signed_by: verifier_value,
+                                    user_comment: "Pepper tries better".to_string(),
+                                },
+                            }],
+                        },
+                        History {
+                            order: 0,
+                            timestamp: String::new(),
+                            events: vec![Event::HistoryCleared],
+                        },
+                    ],
+                },
             },
-        },
-        modal_data: None,
-        alert_data: None,
-    };
-    assert_eq!(
-        action, expected_action,
-        "Switched to Log from Settings. Expected Log screen.",
-    );
+            modal_data: None,
+            alert_data: None,
+        };
+        assert_eq!(
+            action, expected_action,
+            "Switched to Log from Settings. Expected Log screen.",
+        );
+
+    */
 
     // no init after population
     populate_cold_nav_test(dbname).unwrap();
