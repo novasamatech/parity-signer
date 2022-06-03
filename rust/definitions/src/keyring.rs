@@ -2,8 +2,8 @@
 //!
 //! Cold database has following trees:  
 //!
-//! - `SPECSTREE`, for network specs [`NetworkSpecs`](crate::network_specs::NetworkSpecs)
-//! entries, with keys [`NetworkSpecsKey`]  
+//! - `SPECSTREE`, for network specs `NetworkSpecs` entries, with keys
+//! [`NetworkSpecsKey`]  
 //! - `VERIFIERS`, for network verifier [`CurrentVerifier`](crate::network_specs::CurrentVerifier)
 //! entries, with keys [`VerifierKey`]  
 //! - `METATREE`, for `Vec<u8>` metadata entries, with keys [`MetaKey`] and
@@ -25,12 +25,12 @@
 //! - `METATREE`, for `Vec<u8>` metadata entries, with keys [`MetaKey`] and
 //! prefix search with [`MetaKeyPrefix`]  
 //! - `SETTREE`, for types information  
-//! - `ADDRESS_BOOK` for [`AddressBookEntry`](crate::metadata::AddressBookEntry)
-//! data needed to maintain hot database and send rpc calls to fetch network
-//! information, with keys [`AddressBookKey`]  
+//! - `ADDRESS_BOOK` for `AddressBookEntry` data needed to maintain hot database
+//! and send rpc calls to fetch network information, with keys `AddressBookKey`
 //!
 use parity_scale_codec::{Decode, Encode};
 use sled::IVec;
+use sp_core::H256;
 use sp_runtime::MultiSigner;
 
 #[cfg(feature = "active")]
@@ -64,19 +64,19 @@ pub struct NetworkSpecsKey(Vec<u8>);
 /// genesis hash inside
 #[derive(Decode, Encode)]
 enum NetworkSpecsKeyContent {
-    Ed25519(Vec<u8>),
-    Sr25519(Vec<u8>),
-    Ecdsa(Vec<u8>),
+    Ed25519(H256),
+    Sr25519(H256),
+    Ecdsa(H256),
 }
 
 impl NetworkSpecsKey {
     /// Generate [`NetworkSpecsKey`] from parts: network genesis hash and
     /// [`Encryption`]
-    pub fn from_parts(genesis_hash: &[u8], encryption: &Encryption) -> Self {
+    pub fn from_parts(genesis_hash: &H256, encryption: &Encryption) -> Self {
         let network_key_content = match encryption {
-            Encryption::Ed25519 => NetworkSpecsKeyContent::Ed25519(genesis_hash.to_vec()),
-            Encryption::Sr25519 => NetworkSpecsKeyContent::Sr25519(genesis_hash.to_vec()),
-            Encryption::Ecdsa => NetworkSpecsKeyContent::Ecdsa(genesis_hash.to_vec()),
+            Encryption::Ed25519 => NetworkSpecsKeyContent::Ed25519(*genesis_hash),
+            Encryption::Sr25519 => NetworkSpecsKeyContent::Sr25519(*genesis_hash),
+            Encryption::Ecdsa => NetworkSpecsKeyContent::Ecdsa(*genesis_hash),
         };
         Self(network_key_content.encode())
     }
@@ -104,11 +104,11 @@ impl NetworkSpecsKey {
         )?))
     }
 
-    /// Get genesis hash as `Vec<u8>` and [`Encryption`] from [`NetworkSpecsKey`]
+    /// Get genesis hash as `H256` and [`Encryption`] from [`NetworkSpecsKey`]
     pub fn genesis_hash_encryption<T: ErrorSource>(
         &self,
         source: SpecsKeySource<T>,
-    ) -> Result<(Vec<u8>, Encryption), T::Error> {
+    ) -> Result<(H256, Encryption), T::Error> {
         match <NetworkSpecsKeyContent>::decode(&mut &self.0[..]) {
             Ok(a) => match a {
                 NetworkSpecsKeyContent::Ed25519(b) => Ok((b, Encryption::Ed25519)),

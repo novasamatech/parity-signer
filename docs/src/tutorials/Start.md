@@ -12,7 +12,7 @@ Wipe the phone to factory state. This is good time to install newer version of o
 
 ### Set up phone
 
-Before installing the Signer, you need to set up the phone. It is essential that you enable sufficient authentication method; your secret seeds in Signer are as safe as the phone is. Seed secrets are protected with hardware encryption based on vendor authentification protocol. Other than that, you might want to select dark mode (Signer remains dark for historic reasons)
+Before installing the Signer, you need to set up the phone. It is essential that you enable sufficient authentication method; your secret seeds in Signer are as safe as the phone is. Seed secrets are protected with hardware encryption based on vendor authentification protocol. Other than that, you might want to select dark mode (Signer remains dark for historic reasons).
 
 ### Install Signer
 
@@ -24,7 +24,9 @@ Before starting the Signer, you should make sure that network is disabled. Many 
 
 ## First start
 
-When you first launch Signer, it prompts you to read and accept terms and conditions and privacy policy. Once that is done, the database is pre-populated with built-in networks and Signer is ready for use. It could [import network data](./New-Network.md) or [read transactions](./Kusama-tutorial.md), but to sign anything you need to create keys.
+When you first launch Signer, it prompts you to read and accept terms and conditions and privacy policy. Once that is done, the database is pre-populated with built-in networks and Signer is ready for use. It could [import network data](./Add-New-Network.md) or [read transactions](./Kusama-tutorial.md), but to sign anything you need to create keys.
+
+<!-- TODO for advanced users: If you would like to replace general verifier certificate (link to explanation?), this is time to do it, as that operation will wipe all data from Signer - something like this might be useful here" -->
 
 ### Create keys
 

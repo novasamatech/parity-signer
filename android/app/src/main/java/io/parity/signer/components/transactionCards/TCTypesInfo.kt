@@ -3,12 +3,12 @@ package io.parity.signer.components.transactionCards
 import androidx.compose.foundation.layout.Row
 import androidx.compose.runtime.Composable
 import io.parity.signer.components.Identicon
-import org.json.JSONObject
+import io.parity.signer.uniffi.MTypesInfo
 
 @Composable
-fun TCTypesInfo(payload: JSONObject) {
+fun TCTypesInfo(types: MTypesInfo) {
 	Row {
-		Identicon(identicon = payload.optString("types_id_pic"))
-		TCNameValueTemplate(name = "Types hash:", value = payload.optString("types_hash"))
+		types.typesIdPic?.let { Identicon (identicon = it) }
+		TCNameValueTemplate(name = "Types hash:", value = types.typesHash ?: "")
 	}
 }

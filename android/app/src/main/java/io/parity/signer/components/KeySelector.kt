@@ -7,33 +7,34 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import io.parity.signer.ButtonID
-import io.parity.signer.models.toListOfJSONObjects
-import org.json.JSONArray
+import io.parity.signer.uniffi.Action
+import io.parity.signer.uniffi.MKeysCard
 
 @Composable
 fun KeySelector(
-	button: (button: ButtonID, details: String) -> Unit,
+	button: (action: Action, details: String) -> Unit,
 	increment: (Int) -> Unit,
-	keySet: JSONArray,
-	multiSelectMode: Boolean
+	keySet: List<MKeysCard>,
+	multiSelectMode: Boolean,
+	rootSeed: String,
 ) {
-	val addresses = keySet.toListOfJSONObjects().sortedBy { it.optString("path") }
+	val addresses = keySet.sortedBy { it.path }
 	LazyColumn {
 		this.items(
 			items = addresses,
 			key = {
-				it.optString("address_key")
+				it.addressKey
 			}
 		) { address ->
-			val addressKey = address.optString("address_key")
+			val addressKey = address.addressKey
 			KeyCardActive(
 				address,
-				selectButton = { button(ButtonID.SelectKey, addressKey) },
-				longTapButton = { button(ButtonID.LongTap, addressKey) },
-				swipe = { button(ButtonID.Swipe, addressKey) },
+				rootSeed = rootSeed,
+				selectButton = { button(Action.SELECT_KEY, addressKey) },
+				longTapButton = { button(Action.LONG_TAP, addressKey) },
+				swipe = { button(Action.SWIPE, addressKey) },
 				increment,
-				delete = { button(ButtonID.RemoveKey, "") },
+				delete = { button(Action.REMOVE_KEY, "") },
 				multiSelectMode
 			)
 		}

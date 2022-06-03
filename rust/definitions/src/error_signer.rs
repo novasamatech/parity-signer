@@ -14,7 +14,7 @@
 //! This module gathers all possible [`ErrorSigner`] errors in one place, so that
 //! error management is easier.
 use anyhow::anyhow;
-use sp_core::crypto::SecretStringError;
+use sp_core::{crypto::SecretStringError, H256};
 #[cfg(feature = "test")]
 use variant_count::VariantCount;
 
@@ -118,7 +118,7 @@ impl ErrorSource for Signer {
     fn specs_genesis_hash_mismatch(key: NetworkSpecsKey, genesis_hash: Vec<u8>) -> Self::Error {
         ErrorSigner::Database(DatabaseSigner::Mismatch(MismatchSigner::SpecsGenesisHash {
             key,
-            genesis_hash,
+            genesis_hash: H256::from_slice(&genesis_hash),
         }))
     }
     fn specs_encryption_mismatch(key: NetworkSpecsKey, encryption: Encryption) -> Self::Error {
@@ -244,7 +244,7 @@ impl ErrorSource for Signer {
                     DatabaseSigner::SpecsCollision{name, encryption} => format!("More than one entry for network specs with name {} and encryption {}.", name, encryption.show()),
                     DatabaseSigner::DifferentNamesSameGenesisHash{name1, name2, genesis_hash} => format!("Different network names ({}, {}) in database for same genesis hash {}.", name1, name2, hex::encode(genesis_hash)),
                     DatabaseSigner::CustomVerifierIsGeneral(key) => format!("Network with genesis hash {} verifier is set as a custom one. This custom verifier coinsides the database general verifier and not None. This should not have happened and likely indicates database corruption.", hex::encode(key.genesis_hash())),
-                    DatabaseSigner::TwoRootKeys{seed_name, encryption} => format!("More than one root key (i.e. with empty path and without password) found for seed name {} and encryption {}.", seed_name, encryption.show()),
+                    DatabaseSigner::TwoRootKeys{seed_name, encryption} => format!("More than one seed key (i.e. with empty path and without password) found for seed name {} and encryption {}.", seed_name, encryption.show()),
                     DatabaseSigner::DifferentBase58Specs{genesis_hash, base58_1, base58_2} => format!("More than one base58 prefix in network specs database entries for network with genesis hash {}: {} and {}.", hex::encode(genesis_hash), base58_1, base58_2),
                 };
                 format!("Database error. {}", insert)
@@ -267,7 +267,7 @@ impl ErrorSource for Signer {
                     InputSigner::LoadMetaNoSpecs{name, valid_current_verifier, general_verifier} => {
                         let insert = match valid_current_verifier {
                             ValidCurrentVerifier::General => format!("{} (general verifier)", general_verifier.show_error()),
-                            ValidCurrentVerifier::Custom(a) => format!("{} (custom verifier)", a.show_error()),
+                            ValidCurrentVerifier::Custom{v} => format!("{} (custom verifier)", v.show_error()),
                         };
                         format!("Network {} was previously known to the database with verifier {}. However, no network specs are in the database at the moment. Add network specs before loading the metadata.", name, insert)
                     },
@@ -452,9 +452,9 @@ impl ErrorSigner {
 /// [`InterfaceSigner`] error means that rust backend can not process the
 /// information sent by the frontend.
 ///
-/// Signer rust backend sends data into frontend as `json` strings. Frontend
-/// parses these `json` strings, displays them, and can send back into rust
-/// some parts of the data that the user has, for example, selected.
+/// Signer rust backend sends data into frontend as [`ActionResult`]s. Frontend
+/// displays them, and can send back into rust some parts of the data of
+/// the user input.
 ///
 /// Data that user can type from keyboard is processed as is, it does not
 /// cause errors on the interface.
@@ -699,7 +699,7 @@ pub enum DatabaseSigner {
     /// Associated data is [`VerifierKey`] corresponding to faulty entry.
     CustomVerifierIsGeneral(VerifierKey),
 
-    /// Database has two root addresses (i.e. with empty derivation path and no
+    /// Database has two seed addresses (i.e. with empty derivation path and no
     /// password) for same seed name and [`Encryption`]
     ///
     /// This indicates the database corruption, since the encrypion method,
@@ -708,13 +708,13 @@ pub enum DatabaseSigner {
         /// seed name
         seed_name: String,
 
-        /// encryption algorithm for which two root keys were found
+        /// encryption algorithm for which two seed keys were found
         encryption: Encryption,
     },
 
     /// Network specs entries have same genesis hash, but different base58 prefix
     DifferentBase58Specs {
-        genesis_hash: [u8; 32],
+        genesis_hash: H256,
         base58_1: u16,
         base58_2: u16,
     },
@@ -867,7 +867,7 @@ pub enum MismatchSigner {
         // TODO: could be [u8; 32] array here; we may want to decide and fix in
         // several places if the genesis hash may at all be something different
         // from [u8;32] array
-        genesis_hash: Vec<u8>,
+        genesis_hash: H256,
     },
 
     /// [`NetworkSpecsKey`] is built using network genesis hash and [`Encryption`].
@@ -1013,7 +1013,7 @@ pub enum InputSigner {
     /// and base58 prefix in stored network specs is different from the base58
     /// prefix in the received ones.
     DifferentBase58 {
-        genesis_hash: [u8; 32],
+        genesis_hash: H256,
         base58_database: u16,
         base58_input: u16,
     },
@@ -1226,7 +1226,7 @@ pub enum InputSigner {
     /// `SPECSTREE` tree of the database.
     UnknownNetwork {
         /// network genesis hash
-        genesis_hash: Vec<u8>,
+        genesis_hash: H256,
 
         /// encryption algorithm supported by the network
         encryption: Encryption,
@@ -1428,7 +1428,7 @@ pub enum NotFoundSigner {
     /// which the imported derivations are user to create addresses.
     NetworkForDerivationsImport {
         /// network genesis hash
-        genesis_hash: [u8; 32],
+        genesis_hash: H256,
 
         /// network supported encryption
         encryption: Encryption,

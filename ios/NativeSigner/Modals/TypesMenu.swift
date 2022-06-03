@@ -14,13 +14,11 @@ struct TypesMenu: View {
     var body: some View {
         MenuStack {
             HeaderBar(line1: "MANAGE TYPES", line2: "Select action").padding(.top, 10)
-            if content.types_on_file {
+            if content.typesOnFile {
                 HStack {
-                    Image(uiImage: UIImage(data: Data(fromHexEncodedString: content.types_id_pic ?? "") ?? Data()) ?? UIImage())
-                        .resizable(resizingMode: .stretch)
-                        .frame(width: 28, height: 28)
+                    Identicon(identicon: content.typesIdPic ?? []) //TODO: this is potentially different image
                 }
-                Text(content.types_hash ?? "none")
+                Text(content.typesHash ?? "none")
             } else {
                 Text("Pre-v14 types not installed")
             }
@@ -29,7 +27,7 @@ struct TypesMenu: View {
                     text: "Sign types",
                     isShaded: true,
                     isCrypto: true,
-                    action:{data.pushButton(buttonID: .SignTypes)}
+                    action:{data.pushButton(action: .signTypes)}
                 )
                 BigButton(
                     text: "Delete types",
@@ -41,19 +39,23 @@ struct TypesMenu: View {
         }
         .gesture(DragGesture().onEnded{drag in
             if drag.translation.height > 40 {
-                data.pushButton(buttonID: .GoBack)
+                data.pushButton(action: .goBack)
             }
         })
         .alert(isPresented: $removeTypesAlert, content: {
-            Alert(title: Text("Remove types?"), message: Text("Types information needed for support of pre-v14 metadata will be removed. Are you sure?"), primaryButton: .cancel(Text("Cancel")), secondaryButton: .destructive(Text("Remove types"), action: {data.pushButton(buttonID: .RemoveTypes)}))
+            Alert(title: Text("Remove types?"),
+                  message: Text("Types information needed for support of pre-v14 metadata will be removed. Are you sure?"),
+                  primaryButton: .cancel(Text("Cancel")),
+                  secondaryButton: .destructive(Text("Remove types"),
+                                                action: {data.pushButton(action: .removeTypes)}))
         })
     }
 }
 
 /*
-struct TypesMenu_Previews: PreviewProvider {
-    static var previews: some View {
-        TypesMenu()
-    }
-}
-*/
+ struct TypesMenu_Previews: PreviewProvider {
+ static var previews: some View {
+ TypesMenu()
+ }
+ }
+ */

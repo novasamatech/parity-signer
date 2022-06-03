@@ -17,6 +17,7 @@ import androidx.security.crypto.EncryptedSharedPreferences
 import androidx.security.crypto.MasterKey
 import io.parity.signer.*
 import io.parity.signer.components.Authentication
+import io.parity.signer.uniffi.*
 import org.json.JSONObject
 import java.io.File
 import java.io.FileOutputStream
@@ -28,10 +29,10 @@ class SignerDataModel : ViewModel() {
 	private val REQUIRED_PERMISSIONS = arrayOf(Manifest.permission.CAMERA)
 	private val REQUEST_CODE_PERMISSIONS = 10
 
-	//Internal model values
+	// Internal model values
 	private val _onBoardingDone = MutableLiveData(OnBoardingState.InProgress)
 
-	//TODO: something about this
+	// TODO: something about this
 	// It leaks context objects,
 	// but is really quite convenient in composable things
 	lateinit var context: Context
@@ -39,90 +40,75 @@ class SignerDataModel : ViewModel() {
 	private lateinit var masterKey: MasterKey
 	private var hasStrongbox: Boolean = false
 
-	//Alert
-	private val _alertState = MutableLiveData(ShieldAlert.None)
+	// Alert
+	private val _alertState: MutableLiveData<AlertState> = MutableLiveData(AlertState.None)
 
-	//State of the app being unlocked
+	// State of the app being unlocked
 	private val _authenticated = MutableLiveData(false)
 
-	//Authenticator to call!
+	// Authenticator to call!
 	internal var authentication: Authentication =
 		Authentication(setAuth = { _authenticated.value = it })
 
-	//Camera stuff
+	// Camera stuff
 	internal var bucket = arrayOf<String>()
 	internal var payload: String = ""
 	internal val _total = MutableLiveData<Int?>(null)
 	internal val _captured = MutableLiveData<Int?>(null)
 	internal val _progress = MutableLiveData(0.0f)
 
-	//Transaction
+	// Transaction
 	internal var action = JSONObject()
 
-	//Internal storage for model data:
-	//TODO: hard types for these
+	// Internal storage for model data:
 
-	//Seeds
+	// Seeds
 	internal val _seedNames = MutableLiveData(arrayOf<String>())
 
-	//Error
-	internal val _lastError = MutableLiveData("")
+	// Navigator
+	// TODO: consider extracting components as separate livedata
+	internal val _actionResult = MutableLiveData(
+		ActionResult(
+			screenLabel = "",
+			back = false,
+			footer = false,
+			footerButton = null,
+			rightButton = null,
+			screenNameType = ScreenNameType.H4,
+			screenData = ScreenData.Documents,
+			modalData = null,
+			alertData = null,
+		)
+	)
 
-	//Navigator
-	internal val _screen = MutableLiveData(SignerScreen.Log)
-	internal val _screenLabel = MutableLiveData("")
-	internal val _back = MutableLiveData(false)
-	internal val _footerButton = MutableLiveData("")
-	internal val _footer = MutableLiveData(false)
-	internal val _rightButton = MutableLiveData("None")
-	internal val _screenNameType = MutableLiveData("h4")
-	internal val _modal = MutableLiveData(SignerModal.Empty)
-	internal val _alert = MutableLiveData(SignerAlert.Empty)
-	internal var _screenData = MutableLiveData(JSONObject())
-	internal var _modalData = MutableLiveData(JSONObject())
-	internal var _alertData = MutableLiveData(JSONObject())
-
-	//Data storage locations
+	// Data storage locations
 	internal var dbName: String = ""
 	private val keyStore = "AndroidKeyStore"
 	internal lateinit var sharedPreferences: SharedPreferences
 
-	//Observables for model data
+	// Observables for model data
 	internal val total: LiveData<Int?> = _total
 	internal val captured: LiveData<Int?> = _captured
 	val progress: LiveData<Float> = _progress
 
 	val seedNames: LiveData<Array<String>> = _seedNames
 
-	val lastError: LiveData<String> = _lastError
-
-	//Observables for screens state
+	// Observables for screens state
 
 	val onBoardingDone: LiveData<OnBoardingState> = _onBoardingDone
 	val authenticated: LiveData<Boolean> = _authenticated
 
-	val alertState: LiveData<ShieldAlert> = _alertState
+	val alertState: LiveData<AlertState> = _alertState
 
-	val screen: LiveData<SignerScreen> = _screen
-	val modal: LiveData<SignerModal> = _modal
-	val alert: LiveData<SignerAlert> = _alert
-	val screenLabel: LiveData<String> = _screenLabel
-	val back: LiveData<Boolean> = _back
-	val footer: LiveData<Boolean> = _footer
-	val footerButton: LiveData<String> = _footerButton
-	val rightButton: LiveData<String> = _rightButton
-	val screenNameType: LiveData<String> = _screenNameType
-	val screenData: LiveData<JSONObject> = _screenData
-	val modalData: LiveData<JSONObject> = _modalData
-	val alertData: LiveData<JSONObject> = _alertData
+	val actionResult: LiveData<ActionResult> = _actionResult
 
-	//MARK: init boilerplate begin
+	// MARK: init boilerplate begin
 
 	/**
 	 * Init on object creation, context not passed yet! Pass it and call next init
 	 */
 	init {
-		//actually load RustNative code
+		// actually load RustNative code
 		System.loadLibrary("signer")
 	}
 
@@ -130,11 +116,13 @@ class SignerDataModel : ViewModel() {
 	 * Don't forget to call real init after defining context!
 	 */
 	fun lateInit() {
-		//Define local database name
+		// Define local database name
 		dbName = context.applicationContext.filesDir.toString() + "/Database"
 		authentication.context = context
 		hasStrongbox = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
-			context.packageManager.hasSystemFeature(PackageManager.FEATURE_STRONGBOX_KEYSTORE)
+			context
+				.packageManager
+				.hasSystemFeature(PackageManager.FEATURE_STRONGBOX_KEYSTORE)
 		} else {
 			false
 		}
@@ -142,7 +130,7 @@ class SignerDataModel : ViewModel() {
 
 		Log.d("strongbox available:", hasStrongbox.toString())
 
-		//Airplane mode detector
+		// Airplane mode detector
 		isAirplaneOn()
 
 		val intentFilter = IntentFilter("android.intent.action.AIRPLANE_MODE")
@@ -155,12 +143,12 @@ class SignerDataModel : ViewModel() {
 
 		context.registerReceiver(receiver, intentFilter)
 
-		//Init crypto for seeds:
-		//https://developer.android.com/training/articles/keystore
+		// Init crypto for seeds:
+		// https://developer.android.com/training/articles/keystore
 		masterKey = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
 			MasterKey.Builder(context)
 				.setKeyScheme(MasterKey.KeyScheme.AES256_GCM)
-				.setRequestStrongBoxBacked(true) //This might cause failures but shouldn't
+				.setRequestStrongBoxBacked(true) // This might cause failures but shouldn't
 				.setUserAuthenticationRequired(true)
 				.build()
 		} else {
@@ -170,7 +158,8 @@ class SignerDataModel : ViewModel() {
 				.build()
 		}
 
-		//Imitate ios behavior
+		// Imitate ios behavior
+		Log.e("ENCRY", "$context $keyStore $masterKey")
 		authentication.authenticate(activity) {
 			sharedPreferences = EncryptedSharedPreferences(
 				context,
@@ -197,7 +186,7 @@ class SignerDataModel : ViewModel() {
 	/**
 	 * Init database with no general certificate
 	 */
-	fun jailbreak() {
+	private fun jailbreak() {
 		wipe()
 		copyAsset("")
 		historyInitHistoryNoCert(dbName)
@@ -210,7 +199,7 @@ class SignerDataModel : ViewModel() {
 	@SuppressLint("ApplySharedPref")
 	fun wipe() {
 		deleteDir(File(dbName))
-		sharedPreferences.edit().clear().commit() //No, not apply(), do it now!
+		sharedPreferences.edit().clear().commit() // No, not apply(), do it now!
 	}
 
 	/**
@@ -267,16 +256,16 @@ class SignerDataModel : ViewModel() {
 				0
 			) == 0
 		) {
-			if (alertState.value != ShieldAlert.Active) {
-				_alertState.value = ShieldAlert.Active
+			if (alertState.value != AlertState.Active) {
+				_alertState.value = AlertState.Active
 				if (onBoardingDone.value == OnBoardingState.Yes) historyDeviceWasOnline(
 					dbName
 				)
 			}
 		} else {
-			if (alertState.value == ShieldAlert.Active) {
+			if (alertState.value == AlertState.Active) {
 				_alertState.value = if (onBoardingDone.value == OnBoardingState.Yes)
-					ShieldAlert.Past else ShieldAlert.None
+					AlertState.Past else AlertState.None
 			}
 		}
 	}
@@ -298,9 +287,9 @@ class SignerDataModel : ViewModel() {
 		}
 	}
 
-	//MARK: Init boilerplate end
+	// MARK: Init boilerplate end
 
-	//MARK: General utils begin
+	// MARK: General utils begin
 
 	/**
 	 * This returns the app into starting state; should be called
@@ -312,17 +301,29 @@ class SignerDataModel : ViewModel() {
 			OnBoardingState.Yes else _onBoardingDone.value = OnBoardingState.No
 		if (checkRefresh) {
 			getAlertState()
+			isAirplaneOn()
 			refreshSeedNames(init = true)
-			pushButton(ButtonID.Start)
+			pushButton(Action.START)
 		}
 	}
 
 	/**
-	 * Just clears last error;
-	 * Run every time user does something
+	 * Auth user and wipe the Signer to initial state
 	 */
-	fun clearError() {
-		_lastError.value = ""
+	fun wipeToFactory() {
+		authentication.authenticate(activity) {
+			wipe()
+			totalRefresh()
+		}
+	}
+
+	/**
+	 * Auth user and wipe Signer to state without general verifier certificate
+	 */
+	fun wipeToJailbreak() {
+		authentication.authenticate(activity) {
+			jailbreak()
+		}
 	}
 
 	fun isStrongBoxProtected(): Boolean {
@@ -338,61 +339,25 @@ class SignerDataModel : ViewModel() {
 
 	private fun getAlertState() {
 		_alertState.value = if (historyGetWarnings(dbName)) {
-			if (alertState.value == ShieldAlert.Active) ShieldAlert.Active else ShieldAlert.Past
+			if (alertState.value == AlertState.Active) AlertState.Active else AlertState.Past
 		} else {
-			ShieldAlert.None
+			AlertState.None
 		}
 	}
 
 	fun acknowledgeWarning() {
-		if (alertState.value == ShieldAlert.Past) {
+		if (alertState.value == AlertState.Past) {
 			historyAcknowledgeWarnings(dbName)
-			_alertState.value = ShieldAlert.None
+			_alertState.value = AlertState.None
 		}
 	}
+}
 
-	//MARK: General utils end
-
-	//MARK: rust native section begin
-
-	external fun backendAction(
-		action: String,
-		details: String,
-		seedPhrase: String
-	): String
-
-	external fun initNavigation(
-		dbname: String,
-		seedNames: String
-	)
-
-	external fun updateSeedNames(seedNames: String)
-
-	external fun qrparserGetPacketsTotal(data: String, cleaned: Boolean): Int
-	external fun qrparserTryDecodeQrSequence(
-		data: String,
-		cleaned: Boolean
-	): String
-
-	external fun substratePathCheck(
-		seedName: String,
-		path: String,
-		network: String,
-		dbname: String
-	): String
-
-	private external fun historyInitHistoryWithCert(dbname: String)
-	private external fun historyInitHistoryNoCert(dbname: String)
-	private external fun historyDeviceWasOnline(dbname: String)
-	private external fun historyGetWarnings(dbname: String): Boolean
-	private external fun historyAcknowledgeWarnings(dbname: String)
-
-	//external fun historyEntrySystem(entry: String, dbname: String)
-	external fun historySeedNameWasShown(seedName: String, dbname: String)
-
-	//external fun testGetAllTXCards(dbname: String): String
-	//external fun testGetAllLogCards(dbname: String): String
-
-	//MARK: rust native section end
-
+/**
+ * Describes current state of network detection alertness
+ */
+enum class AlertState {
+	None,
+	Active,
+	Past
 }

@@ -2,37 +2,37 @@ package io.parity.signer.modals
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.material.*
+import androidx.compose.material.Icon
+import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Surface
+import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Lock
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import io.parity.signer.components.*
-import io.parity.signer.models.SignerDataModel
-import io.parity.signer.models.decode64
-import io.parity.signer.models.getSeed
-import io.parity.signer.models.toListOfJSONObjects
 import io.parity.signer.ui.theme.Bg200
 import io.parity.signer.ui.theme.Crypto400
 import io.parity.signer.ui.theme.CryptoTypography
 import io.parity.signer.ui.theme.modal
+import io.parity.signer.uniffi.MBackup
+import io.parity.signer.uniffi.MscNetworkInfo
 import kotlinx.coroutines.delay
 
 /**
  * Modal to show seed phrase. Dangerous place.
- * TODO: make sure seed phrase is cleared at all times!!!
  */
 @Composable
-fun SeedBackup(signerDataModel: SignerDataModel) {
-	val seedName = signerDataModel.modalData.value?.optString("seed_name") ?: ""
+fun SeedBackup(
+	backup: MBackup,
+	getSeedForBackup: (String, (String) -> Unit, (SeedBoxStatus) -> Unit) -> Unit
+) {
+	val seedName = backup.seedName
 	var seedPhrase by remember { mutableStateOf("") }
 	var seedBoxStatus by remember { mutableStateOf(SeedBoxStatus.Locked) }
-	val derivations =
-		signerDataModel.modalData.value?.optJSONArray("derivations")
-			?.toListOfJSONObjects()?.sortedBy { it.optInt("network_order") }
-			?: listOf()
-	val time = remember { mutableStateOf(60000L) } //Countdown time
+	val derivations = backup.derivations.sortedBy { it.networkOrder }
+	val time = remember { mutableStateOf(60000L) } // Countdown time in ms
 
 	Surface(
 		color = MaterialTheme.colors.Bg200,
@@ -42,20 +42,23 @@ fun SeedBackup(signerDataModel: SignerDataModel) {
 			Column(
 				modifier = Modifier.padding(20.dp)
 			) {
-				HeaderBar("Backup", seedName.decode64())
+				HeaderBar("Backup", seedName)
 				HeadingOverline("SEED PHRASE")
 				SeedBox(seedPhrase = seedPhrase, status = seedBoxStatus)
 				HeadingOverline("DERIVED KEYS")
 				LazyColumn {
 					for (pack in derivations) {
 						item {
-							NetworkCard(pack)
+							NetworkCard(
+								MscNetworkInfo(
+									networkTitle = pack.networkTitle,
+									networkLogo = pack.networkLogo
+								)
+							)
 						}
-						val networkDerivations =
-							pack.getJSONArray("id_set")
-								.toListOfJSONObjects().sortedBy { it.optString("path") }
+						val networkDerivations = pack.idSet.sortedBy { it.path }
 						/*
-						//TODO: this could have been neat items block,
+						// TODO: this could have been neat items block,
 						//but passworded keys might collide
 						//
 						//add this to revert:
@@ -70,7 +73,7 @@ fun SeedBackup(signerDataModel: SignerDataModel) {
 						)*/
 						for (record in networkDerivations) {
 							item {
-								if (record.optString("path").isBlank()) {
+								if (record.path.isBlank()) {
 									Text(
 										"seed key",
 										style = CryptoTypography.body2,
@@ -79,11 +82,11 @@ fun SeedBackup(signerDataModel: SignerDataModel) {
 								} else {
 									Row {
 										Text(
-											record.optString("path"),
+											record.path,
 											style = CryptoTypography.body2,
 											color = MaterialTheme.colors.Crypto400
 										)
-										if (record.optBoolean("has_pwd")) {
+										if (record.hasPwd) {
 											Text(
 												"///",
 												style = CryptoTypography.body2,
@@ -98,7 +101,6 @@ fun SeedBackup(signerDataModel: SignerDataModel) {
 										Spacer(Modifier.weight(1f))
 									}
 								}
-
 							}
 						}
 					}
@@ -110,7 +112,9 @@ fun SeedBackup(signerDataModel: SignerDataModel) {
 					modifier = Modifier.fillMaxSize()
 				) {
 					BigButton(
-						text = if (time.value > 0) "Hide seed phrase in " + (time.value / 1000L).toString() + "s" else "",
+						text = if (time.value > 0)
+							"Hide seed phrase in " + (time.value / 1000L).toString() + "s"
+						else "",
 						action = {
 							seedBoxStatus = SeedBoxStatus.Timeout
 							seedPhrase = ""
@@ -134,20 +138,7 @@ fun SeedBackup(signerDataModel: SignerDataModel) {
 	}
 
 	DisposableEffect(Unit) {
-		if (signerDataModel.alertState.value == io.parity.signer.ShieldAlert.None) {
-			signerDataModel.authentication.authenticate(signerDataModel.activity) {
-				seedPhrase = signerDataModel.getSeed(seedName, backup = true)
-				if (seedPhrase.isBlank()) {
-					seedPhrase = ""
-					seedBoxStatus = SeedBoxStatus.Error
-				} else {
-					seedBoxStatus = SeedBoxStatus.Seed
-				}
-			}
-		} else {
-			seedPhrase = ""
-			seedBoxStatus = SeedBoxStatus.Locked
-		}
+		getSeedForBackup(seedName, { seedPhrase = it }, { seedBoxStatus = it })
 		onDispose { seedPhrase = "" }
 	}
 }

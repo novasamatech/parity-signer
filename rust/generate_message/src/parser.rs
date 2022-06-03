@@ -29,8 +29,6 @@ pub enum Command {
     Make(Make),
     Remove(Remove),
     RestoreDefaults,
-    MakeColdWithIdentities,
-    TransferMeta,
     MakeColdRelease(Option<PathBuf>),
     TransferMetaRelease,
     Derivations(Derivations),
@@ -957,24 +955,6 @@ impl Command {
                             ))
                         } else {
                             Ok(Command::RestoreDefaults)
-                        }
-                    }
-                    "make_cold_with_identities" => {
-                        if args.next().is_some() {
-                            Err(ErrorActive::CommandParser(
-                                CommandParser::UnexpectedKeyArgumentSequence,
-                            ))
-                        } else {
-                            Ok(Command::MakeColdWithIdentities)
-                        }
-                    }
-                    "transfer_meta_to_cold" => {
-                        if args.next().is_some() {
-                            Err(ErrorActive::CommandParser(
-                                CommandParser::UnexpectedKeyArgumentSequence,
-                            ))
-                        } else {
-                            Ok(Command::TransferMeta)
                         }
                     }
                     "make_cold_release" => {

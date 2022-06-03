@@ -1,6 +1,9 @@
 yarn-error.log
 *.log
 
+# docs
+docs/book
+
 # jest cache
 test/.jest/
 
@@ -80,12 +83,14 @@ android/app/debug
 
 # iOS
 ios/NativeSigner/Database/Database/*
+ios/NativeSigner/Generated
 
 # rust
 rust/target
 rust/*/target
 rust/db_handling/signer_database
 rust/database/database_cold_release
+rust/database/database_hot
 rust/qrcode_static/*.png
 rust/files/for_signing/*
 rust/files/signed/*

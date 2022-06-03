@@ -1,23 +1,18 @@
-# Parity-Signer
+- [About Parity Signer](./README.md)
+    - [FAQ](./about/FAQ.md)
+    - [Security-And-Privacy](./about/Security-And-Privacy.md)
+    - [Hierarchical-Deterministic-Key-Derivation](./tutorials/Hierarchical-Deterministic-Key-Derivation.md)
+    - [Changelog](./about/Changelog.md)
 
-- [Parity-Signer](./README.md)
+- [User Guides](./tutorials/SUMMARY.md)
+    - [Start](./tutorials/Start.md)
+    - [Upgrading](./tutorials/Upgrading.md)
+    - [Add New Network](./tutorials/Add-New-Network.md)
+    - [Kusama-tutorial](./tutorials/Kusama-tutorial.md)
+    - [Recover-Account-Polkadotjs](./tutorials/Recover-Account-Polkadotjs.md)
 
-## wiki
-
-- [FAQ](./wiki/FAQ.md)
-- [Building-And-Publishing](./wiki/Building-And-Publishing.md)
-- [Changelog](./wiki/Changelog.md)
-- [Development](./wiki/Development.md)
-- [QA](./wiki/QA.md)
-- [Security-And-Privacy](./wiki/Security-And-Privacy.md)
-- [Test](./wiki/Test.md)
-- [Troubleshooting](./wiki/Troubleshooting.md)
-- [Upgrading](./wiki/Upgrading.md)
-
-## tutorials
-
-- [Hierarchical-Deterministic-Key-Derivation](./tutorials/Hierarchical-Deterministic-Key-Derivation.md)
-- [Kusama-tutorial](./tutorials/Kusama-tutorial.md)
-- [New-Network](./tutorials/New-Network.md)
-- [Recover-Account-Polkadotjs](./tutorials/Recover-Account-Polkadotjs.md)
-- [Start](./tutorials/Start.md)
+- [Development](./development/Development.md)
+    - [Building-And-Publishing](./development/Building-And-Publishing.md)
+    - [QA Checking List](./development/QA-Checking-List.md)
+    - [Troubleshooting](./development/Troubleshooting.md)
+    - [Changelog](./about/Changelog.md)

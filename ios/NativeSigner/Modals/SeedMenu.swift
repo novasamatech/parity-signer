@@ -18,7 +18,7 @@ struct SeedMenu: View {
                 BigButton(
                     text: "Backup",
                     action: {
-                        data.pushButton(buttonID: .BackupSeed)
+                        data.pushButton(action: .backupSeed)
                     }
                 )
                 BigButton(
@@ -27,7 +27,7 @@ struct SeedMenu: View {
                     isCrypto: true,
                     action:{
                         if data.alert { data.alertShow = true } else {
-                            data.pushButton(buttonID: .NewKey)
+                            data.pushButton(action: .newKey)
                         }
                     }
                 )

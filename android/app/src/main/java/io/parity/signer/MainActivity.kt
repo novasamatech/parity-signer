@@ -16,21 +16,26 @@ import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.halilibo.richtext.ui.material.SetupMaterialRichText
 import io.parity.signer.components.BigButton
 import io.parity.signer.components.BottomBar
 import io.parity.signer.components.TopBar
+import io.parity.signer.models.AlertState
 import io.parity.signer.models.SignerDataModel
 import io.parity.signer.models.pushButton
 import io.parity.signer.screens.LandingView
 import io.parity.signer.screens.WaitingScreen
 import io.parity.signer.ui.theme.ParitySignerTheme
 import io.parity.signer.ui.theme.Text600
+import io.parity.signer.uniffi.*
 
 @ExperimentalMaterialApi
 @ExperimentalAnimationApi
 class MainActivity : AppCompatActivity() {
-	//rust library is initialized inside data model
+	init {
+		initLogging("SIGNER_RUST_LOG")
+	}
+
+	// rust library is initialized inside data model
 	private val signerDataModel by viewModels<SignerDataModel>()
 
 	override fun onCreate(savedInstanceState: Bundle?) {
@@ -56,47 +61,62 @@ fun SignerApp(signerDataModel: SignerDataModel) {
 	ParitySignerTheme {
 		val onBoardingDone = signerDataModel.onBoardingDone.observeAsState()
 		val authenticated = signerDataModel.authenticated.observeAsState()
-		val signerScreen = signerDataModel.screen.observeAsState()
-		val signerModal = signerDataModel.modal.observeAsState()
-		val signerAlert = signerDataModel.alert.observeAsState()
+		val actionResult = signerDataModel.actionResult.observeAsState()
 		val shieldAlert = signerDataModel.alertState.observeAsState()
-		val footer = signerDataModel.footer.observeAsState()
+		val progress = signerDataModel.progress.observeAsState()
+		val captured = signerDataModel.captured.observeAsState()
+		val total = signerDataModel.total.observeAsState()
 
 		when (onBoardingDone.value) {
 			OnBoardingState.Yes -> {
 				if (authenticated.value == true) {
 					BackHandler {
-						//TODO: implement this in backend
+						// TODO: implement this in backend
 						if (
-							signerDataModel.alert.value == SignerAlert.Empty
-							&&
-							signerDataModel.modal.value == SignerModal.Empty
-							&&
+							actionResult.value?.alertData == null &&
+							actionResult.value?.modalData == null &&
 							(
-								signerDataModel.screen.value == SignerScreen.Log || signerDataModel.screen.value == SignerScreen.Scan || signerDataModel.screen.value == SignerScreen.SeedSelector || signerDataModel.screen.value == SignerScreen.Settings)
+								actionResult.value?.screenData is ScreenData.Log ||
+									actionResult.value?.screenData is ScreenData.Scan ||
+									actionResult.value?.screenData is ScreenData.SeedSelector ||
+									actionResult.value?.screenData is ScreenData.Settings
+								)
 						) {
 							signerDataModel.activity.moveTaskToBack(true)
 						} else
-							signerDataModel.pushButton(ButtonID.GoBack)
+							signerDataModel.pushButton(Action.GO_BACK)
 					}
-					//Structure to contain all app
+					// Structure to contain all app
 					Scaffold(
 						topBar = {
-							TopBar(signerDataModel = signerDataModel)
+							TopBar(signerDataModel = signerDataModel, alertState = shieldAlert)
 						},
 						bottomBar = {
-							if (footer.value == true) BottomBar(signerDataModel = signerDataModel)
+							if (actionResult.value?.footer == true) BottomBar(signerDataModel = signerDataModel)
 						}
 					) { innerPadding ->
 						Box(modifier = Modifier.padding(innerPadding)) {
-							ScreenSelector(signerScreen.value, signerDataModel)
-							ModalSelector(
-								modal = signerModal.value ?: SignerModal.Empty,
+							ScreenSelector(
+								screenData = actionResult.value?.screenData
+									?: ScreenData.Documents,//default fallback
+								alertState = shieldAlert,
+								progress = progress,
+								captured = captured,
+								total = total,
+								button = signerDataModel::pushButton,
 								signerDataModel = signerDataModel
 							)
+							ModalSelector(
+								modalData = actionResult.value?.modalData,
+								alertState = shieldAlert,
+								button = signerDataModel::pushButton,
+								signerDataModel = signerDataModel,
+							)
 							AlertSelector(
-								alert = signerAlert.value ?: SignerAlert.Empty,
-								signerDataModel = signerDataModel
+								alert = actionResult.value?.alertData,
+								alertState = shieldAlert,
+								button = signerDataModel::pushButton,
+								acknowledgeWarning = signerDataModel::acknowledgeWarning
 							)
 						}
 					}
@@ -109,15 +129,16 @@ fun SignerApp(signerDataModel: SignerDataModel) {
 								signerDataModel.authentication.authenticate(signerDataModel.activity) {
 									signerDataModel.totalRefresh()
 								}
-							})
+							}
+						)
 						Spacer(Modifier.weight(0.5f))
 					}
 				}
 			}
 			OnBoardingState.No -> {
-				if (shieldAlert.value == ShieldAlert.None) {
+				if (shieldAlert.value == AlertState.None) {
 					Scaffold {
-						LandingView(signerDataModel = signerDataModel)
+						LandingView(signerDataModel::onBoard)
 					}
 				} else {
 					Box(
@@ -141,7 +162,8 @@ fun SignerApp(signerDataModel: SignerDataModel) {
 							text = "Unlock app",
 							action = {
 								signerDataModel.lateInit()
-							})
+							}
+						)
 						Spacer(Modifier.weight(0.5f))
 					}
 				}

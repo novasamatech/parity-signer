@@ -9,6 +9,7 @@ use definitions::{
     keyring::MetaKeyPrefix,
     metadata::{AddressBookEntry, MetaValues},
 };
+use sp_core::H256;
 
 use crate::helpers::{error_occured, filter_address_book_by_url, network_specs_from_entry, Write};
 use crate::metadata_db_utils::{add_new, prepare_metadata, write_metadata, SortedMetaValues};
@@ -250,7 +251,7 @@ fn meta_kpt_n(name: &str, write: &Write) -> Result<(), ErrorActive> {
 struct AddressSpecs {
     address: String,
     base58prefix: u16,
-    genesis_hash: [u8; 32],
+    genesis_hash: H256,
     name: String,
 }
 
