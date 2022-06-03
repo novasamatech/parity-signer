@@ -5510,7 +5510,7 @@ fn flow_test_1() {
                         index: 0,
                         indent: 0,
                         card: Card::ErrorCard {
-                            f: card_text.clone(),
+                            f: card_text,
                         },
                     }]),
                     ..Default::default()
