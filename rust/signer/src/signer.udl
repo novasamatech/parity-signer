@@ -1,0 +1,792 @@
+[Error]
+interface ErrorDisplayed {
+    Str(string s);
+};
+
+dictionary MetaValuesDisplay {
+    string name;
+    u32 version;
+    sequence<u8> meta_hash;
+};
+
+[Custom]
+typedef sequence<u8> H256;
+
+[Custom]
+typedef sequence<u8> Ed25519Public;
+
+[Custom]
+typedef sequence<u8> Sr25519Public;
+
+[Custom]
+typedef sequence<u8> EcdsaPublic;
+
+[Custom]
+typedef sequence<string> MultiSigner;
+
+[Enum]
+interface VerifierValue {
+    Standard(MultiSigner m);
+};
+
+dictionary Verifier {
+    VerifierValue? v;
+};
+
+enum Encryption {
+    "Ed25519",
+    "Sr25519",
+    "Ecdsa",
+};
+
+[Enum]
+interface ValidCurrentVerifier {
+    General();
+    Custom(Verifier v);
+};
+
+dictionary NetworkSpecs {
+    u16 base58prefix;
+    string color;
+    u8 decimals;
+    Encryption encryption;
+    H256 genesis_hash;
+    string logo;
+    string name;
+    u8 order;
+    string path_id;
+    string secondary_color;
+    string title;
+    string unit;
+};
+
+dictionary NetworkSpecsToSend {
+    u16 base58prefix;
+    string color;
+    u8 decimals;
+    Encryption encryption;
+    H256 genesis_hash;
+    string logo;
+    string name;
+    string path_id;
+    string secondary_color;
+    string title;
+    string unit;
+};
+
+dictionary NetworkSpecsDisplay {
+    NetworkSpecs specs;
+    ValidCurrentVerifier valid_current_verifier;
+    Verifier general_verifier;
+};
+
+
+dictionary NetworkSpecsExport {
+    NetworkSpecsToSend specs_to_send;
+    VerifierValue signed_by;
+};
+
+dictionary NetworkVerifierDisplay {
+    sequence<u8> genesis_hash;
+    ValidCurrentVerifier valid_current_verifier;
+    Verifier general_verifier;
+};
+
+dictionary TypesDisplay {
+    sequence<u8> types_hash;
+    Verifier verifier;
+};
+
+dictionary TypesExport {
+    sequence<u8> types_hash;
+    VerifierValue signed_by;
+};
+
+dictionary SignDisplay {
+    sequence<u8> transaction;
+    string network_name;
+    VerifierValue signed_by;
+    string user_comment;
+};
+
+dictionary SignMessageDisplay {
+    string message;
+    string network_name;
+    VerifierValue signed_by;
+    string user_comment;
+};
+
+dictionary IdentityHistory {
+    string seed_name;
+    Encryption encryption;
+    sequence<u8> public_key;
+    string path;
+    sequence<u8> network_genesis_hash;
+};
+
+dictionary MetaValuesExport {
+    string name;
+    u32 version;
+    sequence<u8> meta_hash;
+    VerifierValue signed_by;
+};
+
+enum FooterButton {
+    "Log",
+    "Scan",
+    "Keys",
+    "Settings",
+    "Back",
+};
+
+enum RightButton {
+    "LogRight",
+    "NewSeed",
+    "Backup",
+    "MultiSelect",
+    "NDMenu",
+    "TypesInfo",
+    "KeyMenu",
+};
+
+enum ScreenNameType {
+    "H1",
+    "H4",
+};
+
+enum ShieldAlert {
+    "Past",
+};
+
+[Enum]
+interface AlertData {
+    Shield(ShieldAlert? f);
+    ErrorData(string f);
+    Confirm();
+};
+
+
+dictionary ActionResult {
+    string screen_label;
+    boolean back;
+    boolean footer;
+    FooterButton? footer_button;
+    RightButton? right_button;
+    ScreenNameType screen_name_type;
+    ScreenData screen_data;
+    ModalData? modal_data;
+    AlertData? alert_data;
+};
+
+
+
+dictionary MetaValues {
+    string name;
+    u32 version;
+    u16? optional_base58prefix;
+    boolean warn_incomplete_extensions;
+    sequence<u8> meta;
+};
+
+[Enum]
+interface Event {
+    MetadataAdded(MetaValuesDisplay meta_values_display);
+    MetadataRemoved(MetaValuesDisplay meta_values_display);
+    MetadataSigned(MetaValuesExport meta_values_export);
+    NetworkSpecsAdded(NetworkSpecsDisplay network_specs_display);
+    NetworkSpecsRemoved(NetworkSpecsDisplay network_specs_display);
+    NetworkSpecsSigned(NetworkSpecsExport network_specs_export);
+    NetworkVerifierSet(NetworkVerifierDisplay network_verifier_display);
+    GeneralVerifierSet(Verifier verifier);
+    TypesAdded(TypesDisplay types_display);
+    TypesRemoved(TypesDisplay types_display);
+    TypesSigned(TypesExport types_export);
+    TransactionSigned(SignDisplay sign_display);
+    TransactionSignError(SignDisplay sign_display);
+    MessageSigned(SignMessageDisplay sign_message_display);
+    MessageSignError(SignMessageDisplay sign_message_display);
+    IdentityAdded(IdentityHistory identity_history);
+    IdentityRemoved(IdentityHistory identity_history);
+    IdentitiesWiped();
+    DeviceWasOnline();
+    ResetDangerRecord();
+    SeedCreated(string seed_created);
+    SeedNameWasShown(string seed_name_was_shown);
+    Warning(string warning);
+    WrongPassword();
+    UserEntry(string user_entry);
+    SystemEntry(string system_entry);
+    HistoryCleared();
+    DatabaseInitiated();
+};
+
+enum Action {
+    "Start",
+    "NavbarLog",
+    "NavbarScan",
+    "NavbarKeys",
+    "NavbarSettings",
+    "GoBack",
+    "GoForward",
+    "SelectSeed",
+    "SelectKey",
+    "NewKey",
+    "RightButtonAction",
+    "Shield",
+    "NewSeed",
+    "RecoverSeed",
+    "BackupSeed",
+    "NetworkSelector",
+    "NextUnit",
+    "PreviousUnit",
+    "ChangeNetwork",
+    "CheckPassword",
+    "TransactionFetched",
+    "RemoveNetwork",
+    "RemoveMetadata",
+    "RemoveTypes",
+    "SignNetworkSpecs",
+    "SignMetadata",
+    "SignTypes",
+    "ManageNetworks",
+    "ViewGeneralVerifier",
+    "ManageMetadata",
+    "RemoveKey",
+    "RemoveSeed",
+    "ClearLog",
+    "CreateLogComment",
+    "ShowLogDetails",
+    "Swipe",
+    "LongTap",
+    "SelectAll",
+    "ExportMultiSelect",
+    "Increment",
+    "ShowDocuments",
+    "TextEntry",
+    "PushWord",
+    "Nothing",
+};
+
+dictionary Identity {
+    string seed_name;
+    string address_key;
+    string public_key;
+    sequence<u8> identicon;
+    boolean has_pwd;
+    string path;
+    boolean is_multiselect;
+    string base58;
+};
+
+dictionary MSeedKeyCard {
+    string seed_name;
+    sequence<u8> identicon;
+    string address_key;
+    string base58;
+    boolean swiped;
+    boolean multiselect;
+};
+
+dictionary MNetworkCard {
+    string title;
+    string logo;
+};
+
+dictionary MKeys {
+    sequence<MKeysCard> set;
+    MSeedKeyCard root;
+    MNetworkCard network;
+    boolean multiselect_mode;
+    string multiselect_count;
+};
+
+dictionary MKeysCard {
+    string address_key;
+    string base58;
+    sequence<u8> identicon;
+    boolean has_pwd;
+    string path;
+    boolean swiped;
+    boolean multiselect;
+};
+
+dictionary MSettings {
+    string? public_key;
+    sequence<u8>? identicon;
+    string? encryption;
+    string? error;
+};
+
+dictionary MLog {
+    sequence<History> log;
+};
+
+dictionary History {
+    u32 order;
+    string timestamp;
+    sequence<Event> events;
+};
+
+dictionary MEventMaybeDecoded {
+    Event event;
+    Address? signed_by;
+    TransactionCardSet? decoded;
+    MVerifierDetails? verifier_details;
+};
+
+dictionary MLogDetails {
+    string timestamp;
+    sequence<MEventMaybeDecoded> events;
+};
+
+dictionary MTransaction {
+    TransactionCardSet content;
+    TransactionType ttype;
+    Address? author_info;
+    MSCNetworkInfo? network_info;
+};
+
+enum TransactionType {
+    "Sign",
+    "Stub",
+    "Read",
+    "ImportDerivations",
+    "Done",
+};
+
+dictionary TransactionCard {
+    u32 index;
+    u32 indent;
+    Card card;
+};
+
+dictionary TransactionCardSet {
+    sequence<TransactionCard>? author;
+    sequence<TransactionCard>? error;
+    sequence<TransactionCard>? extensions;
+    sequence<TransactionCard>? importing_derivations;
+    sequence<TransactionCard>? message;
+    sequence<TransactionCard>? meta;
+    sequence<TransactionCard>? method;
+    sequence<TransactionCard>? new_specs;
+    sequence<TransactionCard>? verifier;
+    sequence<TransactionCard>? warning;
+    sequence<TransactionCard>? types_info;
+};
+
+dictionary SeedNameCard {
+    string seed_name;
+    sequence<u8> identicon;
+};
+
+dictionary MSeeds {
+    sequence<SeedNameCard> seed_name_cards;
+};
+
+dictionary MKeyDetails {
+    sequence<u8> qr;
+    string pubkey;
+    MSCNetworkInfo network_info;
+    Address address;
+};
+
+dictionary MNewSeed {
+    boolean keyboard;
+};
+
+dictionary MRecoverSeedName {
+    boolean keyboard;
+    string seed_name;
+};
+
+dictionary MRecoverSeedPhrase {
+    boolean keyboard;
+    string seed_name;
+    string user_input;
+    sequence<string> guess_set;
+    sequence<string> draft;
+    string? ready_seed;
+};
+
+dictionary MDeriveKey {
+    string seed_name;
+    string network_title;
+    string network_logo;
+    string network_specs_key;
+    string suggested_derivation;
+    boolean keyboard;
+    DerivationCheck derivation_check;
+};
+
+dictionary DerivationCheck {
+    boolean button_good;
+    DerivationDestination? where_to;
+    Address? collision;
+    string? error;
+};
+
+dictionary Address {
+    string base58;
+    string path;
+    boolean has_pwd;
+    sequence<u8> identicon;
+    string seed_name;
+    boolean? multiselect;
+};
+
+enum DerivationDestination {
+    "Pwd",
+    "Pin",
+};
+
+dictionary MVerifierDetails {
+    string public_key;
+    sequence<u8> identicon;
+    string encryption;
+};
+
+dictionary MNetworkDetails {
+    u16 base58prefix;
+    string color;
+    u8 decimals;
+    Encryption encryption;
+    string genesis_hash;
+    string logo;
+    string name;
+    string order;
+    string path_id;
+    string secondary_color;
+    string title;
+    string unit;
+    MVerifier current_verifier;
+    sequence<MMetadataRecord> meta;
+};
+
+dictionary MVerifier {
+    string ttype;
+    MVerifierDetails details;
+};
+
+dictionary MMetadataRecord {
+    string specname;
+    string specs_version;
+    string meta_hash;
+    sequence<u8> meta_id_pic;
+};
+
+dictionary MRawKey {
+    string seed_name;
+    string address_key;
+    string public_key;
+    sequence<u8> identicon;
+    boolean has_pwd;
+    string path;
+};
+
+dictionary MSignSufficientCrypto {
+    sequence<MRawKey> identities;
+};
+
+dictionary MKeyDetailsMulti {
+    MKeyDetails key_details;
+    string current_number;
+    string out_of;
+};
+
+dictionary MMNetwork {
+    string key;
+    string title;
+    string logo;
+    u8 order;
+};
+
+dictionary MManageNetworks {
+    sequence<MMNetwork> networks;
+};
+
+[Enum]
+interface ScreenData {
+    Scan();
+    Keys(MKeys f);
+    Settings(MSettings f);
+    Log(MLog f);
+    LogDetails(MLogDetails f);
+    Transaction(MTransaction f);
+    SeedSelector(MSeeds f);
+    KeyDetails(MKeyDetails f);
+    NewSeed(MNewSeed f);
+    RecoverSeedName(MRecoverSeedName f);
+    RecoverSeedPhrase(MRecoverSeedPhrase f);
+    DeriveKey(MDeriveKey f);
+    VVerifier(MVerifierDetails f);
+    ManageNetworks(MManageNetworks f);
+    NNetworkDetails(MNetworkDetails f);
+    SignSufficientCrypto(MSignSufficientCrypto f);
+    SelectSeedForBackup(MSeeds f);
+    Documents();
+    KeyDetailsMulti(MKeyDetailsMulti f);
+};
+
+namespace signer {
+    FooterButton? action_get_name([ByRef] Action action);
+
+    void init_navigation([ByRef] string dbname, sequence<string> seed_names);
+
+    [Throws=ErrorDisplayed]
+    ActionResult? backend_action(Action action, [ByRef] string details, [ByRef] string seed_phrase);
+
+    void update_seed_names(sequence<string> seed_names);
+
+    [Throws=ErrorDisplayed]
+    u32 qrparser_get_packets_total([ByRef] string data, boolean cleaned);
+
+    [Throws=ErrorDisplayed]
+    string qrparser_try_decode_qr_sequence([ByRef] string data, boolean cleaned);
+
+    DerivationCheck substrate_path_check([ByRef] string seed_name, [ByRef] string path, [ByRef] string network, [ByRef] string dbname);
+
+    [Throws=ErrorDisplayed]
+    void history_init_history_with_cert([ByRef] string dbname);
+
+    [Throws=ErrorDisplayed]
+    void history_init_history_no_cert([ByRef] string dbname);
+
+    [Throws=ErrorDisplayed]
+    void history_device_was_online([ByRef] string dbname);
+
+    [Throws=ErrorDisplayed]
+    boolean history_get_warnings([ByRef] string dbname);
+
+    [Throws=ErrorDisplayed]
+    void history_acknowledge_warnings([ByRef] string dbname);
+
+    [Throws=ErrorDisplayed]
+    void history_entry_system(Event event, [ByRef] string dbname);
+
+    [Throws=ErrorDisplayed]
+    void history_seed_name_was_shown([ByRef] string seed_name, [ByRef] string dbname);
+
+    TransactionCardSet get_all_tx_cards();
+
+    string get_all_log_cards();
+
+    void init_logging(string tag);
+};
+
+
+[Enum]
+interface MSCContent {
+    LoadTypes(string types, sequence<u8> pic);
+    LoadMetadata(string name, u32 version);
+    AddSpecs(MSCNetworkInfo f);
+};
+
+dictionary MSufficientCryptoReady {
+    Address author_info;
+    sequence<u8> sufficient;
+    MSCContent content;
+};
+
+dictionary MBackup {
+    string seed_name;
+    sequence<DerivationPack> derivations;
+};
+
+dictionary DerivationPack {
+    string network_title;
+    string network_logo;
+    string network_order;
+    sequence<DerivationEntry> id_set;
+};
+
+dictionary DerivationEntry {
+    string path;
+    boolean has_pwd;
+};
+
+dictionary MSeedMenu {
+    string seed;
+};
+
+dictionary MNewSeedBackup {
+    string seed;
+    string seed_phrase;
+    sequence<u8> identicon;
+};
+
+dictionary Network {
+    string key;
+    string logo;
+    u32 order;
+    boolean selected;
+    string title;
+};
+
+dictionary MNetworkMenu {
+    sequence<Network> networks;
+};
+
+dictionary MPasswordConfirm {
+    string pwd;
+    string seed_name;
+    string cropped_path;
+};
+
+dictionary MSignatureReady {
+    sequence<u8> signature;
+};
+
+dictionary MEnterPassword {
+    Address author_info;
+    u32 counter;
+};
+
+dictionary MLogRight {
+    string checksum;
+};
+
+dictionary MMMNetwork {
+    string title;
+    string logo;
+    u32 order;
+    boolean current_on_screen;
+};
+
+dictionary MManageMetadata {
+    string name;
+    string version;
+    string meta_hash;
+    sequence<u8> meta_id_pic;
+    sequence<MMMNetwork> networks;
+};
+
+dictionary MTypesInfo {
+    boolean types_on_file;
+    string? types_hash;
+    sequence<u8>? types_id_pic;
+};
+
+[Enum]
+interface ModalData {
+    SufficientCryptoReady(MSufficientCryptoReady f);
+    Backup(MBackup f);
+    SeedMenu(MSeedMenu f);
+    NewSeedBackup(MNewSeedBackup f);
+    NetworkSelector(MNetworkMenu f);
+    PasswordConfirm(MPasswordConfirm f);
+    SignatureReady(MSignatureReady f);
+    EnterPassword(MEnterPassword f);
+    LogRight(MLogRight f);
+    TypesInfo(MTypesInfo f);
+    NewSeedMenu();
+    NetworkDetailsMenu();
+    ManageMetadata(MManageMetadata f);
+    KeyDetailsAction();
+    LogComment();
+    SelectSeed(MSeeds f);
+};
+
+dictionary MSCAuthorPlain {
+    string base58;
+    sequence<u8> identicon;
+};
+
+dictionary MSCCall {
+    string method_name;
+    string docs;
+};
+
+dictionary MSCCurrency {
+    string amount;
+    string units;
+};
+
+dictionary MSCEnumVariantName {
+    string name;
+    string docs_enum_variant;
+};
+
+dictionary MSCEraMortal {
+    string era;
+    string phase;
+    string period;
+};
+
+dictionary MSCFieldName {
+    string name;
+    string docs_field_name;
+    string path_type;
+    string docs_type;
+};
+
+dictionary MSCFieldNumber {
+    string number;
+    string docs_field_number;
+    string path_type;
+    string docs_type;
+};
+
+dictionary MSCId {
+    string base58;
+    sequence<u8> identicon;
+};
+
+dictionary MSCNameVersion {
+    string name;
+    string version;
+};
+
+dictionary MSCNetworkInfo {
+    string network_title;
+    string network_logo;
+};
+
+dictionary MSCTip {
+    string amount;
+    string units;
+};
+
+dictionary MSCTxSpecPlain {
+    string network_genesis_hash;
+    string version;
+    string tx_version;
+};
+
+[Enum]
+interface Card {
+    AuthorCard(Address f);
+    AuthorPlainCard(MSCAuthorPlain f);
+    AuthorPublicKeyCard(MVerifierDetails f);
+    BalanceCard(MSCCurrency f);
+    BitVecCard(string f);
+    BlockHashCard(string f);
+    CallCard(MSCCall f);
+    DefaultCard(string f);
+    DerivationsCard(sequence<string> f);
+    EnumVariantNameCard(MSCEnumVariantName f);
+    EraImmortalCard();
+    EraMortalCard(MSCEraMortal f);
+    ErrorCard(string f);
+    FieldNameCard(MSCFieldName f);
+    FieldNumberCard(MSCFieldNumber f);
+    IdCard(MSCId f);
+    IdentityFieldCard(string f);
+    MetaCard(MMetadataRecord f);
+    NameVersionCard(MSCNameVersion f);
+    NetworkGenesisHashCard(string f);
+    NetworkNameCard(string f);
+    NetworkInfoCard(MSCNetworkInfo f);
+    NewSpecsCard(NetworkSpecsToSend f);
+    NonceCard(string f);
+    NoneCard();
+    PalletCard(string f);
+    TextCard(string f);
+    TipCard(MSCCurrency f);
+    TipPlainCard(string f);
+    TxSpecCard(string f);
+    TxSpecPlainCard(MSCTxSpecPlain f);
+    TypesInfoCard(MTypesInfo f);
+    VarNameCard(string f);
+    VerifierCard(MVerifierDetails f);
+    WarningCard(string f);
+};

@@ -11,6 +11,8 @@ use definitions::{
     error_signer::{ErrorSigner, ExtraAddressKeySourceSigner, Signer},
     helpers::{make_identicon_from_multisigner, multisigner_to_public},
     keyring::{AddressKey, NetworkSpecsKey},
+    navigation::{Address, TransactionCardSet},
+    network_specs::NetworkSpecs,
     users::AddressDetails,
 };
 use transaction_parsing;
@@ -19,12 +21,12 @@ use transaction_signing;
 const MAX_COUNT_SET: u8 = 3;
 
 ///All screens
-#[derive(Debug, Clone)]
+#[derive(Clone, Debug)]
 pub enum Screen {
     Log,
     LogDetails(u32),
     Scan,
-    Transaction(TransactionState),
+    Transaction(Box<TransactionState>),
     SeedSelector,
     Keys(KeysState),
     KeyDetails(AddressState),
@@ -85,10 +87,10 @@ pub struct DeriveState {
 }
 
 ///State of transaction screen
-#[derive(Debug, Clone)]
+#[derive(Clone, Debug)]
 pub struct TransactionState {
     entered_info: EnteredInfo,
-    action: transaction_parsing::Action,
+    action: transaction_parsing::TransactionAction,
     comment: String,
     counter: u8,
 }
@@ -96,7 +98,7 @@ pub struct TransactionState {
 ///State of screen generating sufficient crypto
 #[derive(Debug, Clone)]
 pub struct SufficientCryptoState {
-    key_selected: Option<(MultiSigner, AddressDetails, String)>,
+    key_selected: Option<(MultiSigner, AddressDetails, Address)>,
     entered_info: EnteredInfo,
     content: transaction_signing::SufficientContent,
     counter: u8,
@@ -347,11 +349,15 @@ impl AddressStateMulti {
 }
 
 impl DeriveState {
-    pub fn new(entered_string: &str, keys_state: &KeysState) -> Self {
+    pub fn new(
+        entered_string: &str,
+        keys_state: &KeysState,
+        collision: Option<(MultiSigner, AddressDetails)>,
+    ) -> Self {
         Self {
             entered_info: EnteredInfo(entered_string.to_string()),
             keys_state: keys_state.to_owned(),
-            collision: None,
+            collision,
         }
     }
     pub fn blank_keys_state(&self) -> KeysState {
@@ -421,12 +427,12 @@ impl TransactionState {
     pub fn update_checksum_sign(
         &self,
         new_checksum: u32,
-        content: String,
+        content: TransactionCardSet,
         has_pwd: bool,
-        author_info: String,
-        network_info: String,
+        author_info: Address,
+        network_info: NetworkSpecs,
     ) -> Self {
-        let action = transaction_parsing::Action::Sign {
+        let action = transaction_parsing::TransactionAction::Sign {
             content,
             checksum: new_checksum,
             has_pwd,
@@ -440,7 +446,7 @@ impl TransactionState {
             counter: self.counter + 1,
         }
     }
-    pub fn action(&self) -> transaction_parsing::Action {
+    pub fn action(&self) -> transaction_parsing::TransactionAction {
         self.action.to_owned()
     }
     pub fn seed(&self) -> String {
@@ -469,7 +475,7 @@ impl SufficientCryptoState {
     pub fn content(&self) -> transaction_signing::SufficientContent {
         self.content.to_owned()
     }
-    pub fn key_selected(&self) -> Option<(MultiSigner, AddressDetails, String)> {
+    pub fn key_selected(&self) -> Option<(MultiSigner, AddressDetails, Address)> {
         self.key_selected.to_owned()
     }
     pub fn update(
@@ -478,14 +484,15 @@ impl SufficientCryptoState {
         address_details: &AddressDetails,
         new_secret_string: &str,
     ) -> Self {
-        let hex_identicon = hex::encode(make_identicon_from_multisigner(multisigner));
-        let author_info = format!(
-            "\"base58\":\"{}\",\"identicon\":\"{}\",\"seed\":\"{}\",\"derivation_path\":\"{}\"",
-            hex::encode(multisigner_to_public(multisigner)),
-            hex_identicon,
-            address_details.seed_name,
-            address_details.path
-        );
+        let identicon = make_identicon_from_multisigner(multisigner);
+        let author_info = Address {
+            base58: hex::encode(multisigner_to_public(multisigner)),
+            identicon,
+            seed_name: address_details.seed_name.clone(),
+            path: address_details.path.clone(),
+            has_pwd: address_details.has_pwd,
+            multiselect: None,
+        };
         Self {
             key_selected: Some((
                 multisigner.to_owned(),
@@ -592,26 +599,26 @@ impl Screen {
 
     pub fn has_back(&self) -> bool {
         match self {
-            Screen::Log => false,
-            Screen::LogDetails(_) => true,
-            Screen::Scan => false,
-            Screen::Transaction(_) => true,
-            Screen::SeedSelector => false,
-            Screen::Keys(_) => true,
-            Screen::KeyDetails(_) => true,
-            Screen::KeyDetailsMulti(_) => true,
-            Screen::NewSeed => true,
-            Screen::RecoverSeedName(_) => true,
-            Screen::RecoverSeedPhrase(_) => true,
-            Screen::DeriveKey(_) => true,
-            Screen::Settings => false,
-            Screen::Verifier => true,
-            Screen::ManageNetworks => true,
-            Screen::NetworkDetails(_) => true,
-            Screen::SelectSeedForBackup => true,
-            Screen::SignSufficientCrypto(_) => true,
-            Screen::Documents => true,
-            Screen::Nowhere => false,
+            Screen::Log
+            | Screen::Scan
+            | Screen::Settings
+            | Screen::SeedSelector
+            | Screen::Nowhere => false,
+            Screen::Transaction(_)
+            | Screen::LogDetails(_)
+            | Screen::Keys(_)
+            | Screen::KeyDetails(_)
+            | Screen::KeyDetailsMulti(_)
+            | Screen::NewSeed
+            | Screen::RecoverSeedName(_)
+            | Screen::RecoverSeedPhrase(_)
+            | Screen::DeriveKey(_)
+            | Screen::Verifier
+            | Screen::ManageNetworks
+            | Screen::NetworkDetails(_)
+            | Screen::SelectSeedForBackup
+            | Screen::SignSufficientCrypto(_)
+            | Screen::Documents => true,
         }
     }
 }

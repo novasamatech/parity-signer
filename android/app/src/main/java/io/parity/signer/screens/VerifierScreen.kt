@@ -7,21 +7,22 @@ import androidx.compose.runtime.*
 import io.parity.signer.alerts.AndroidCalledConfirm
 import io.parity.signer.components.BigButton
 import io.parity.signer.components.Identicon
-import io.parity.signer.models.SignerDataModel
-import org.json.JSONObject
+import io.parity.signer.uniffi.MVerifierDetails
 
 @Composable
-fun VerifierScreen(signerDataModel: SignerDataModel) {
-	val verifierDetails = signerDataModel.screenData.value ?: JSONObject()
+fun VerifierScreen(
+	verifierDetails: MVerifierDetails,
+	wipeToJailbreak: () -> Unit
+) {
 	var jailbreakAlert by remember { mutableStateOf(false) }
 
 	Column {
 		Row {
-			Identicon(identicon = verifierDetails.optString("identicon"))
+			Identicon(identicon = verifierDetails.identicon)
 			Column {
 				Text("General verifier certificate")
-				Text(verifierDetails.optString("public_key"))
-				Text("encryption: " + verifierDetails.optString("encryption"))
+				Text(verifierDetails.publicKey)
+				Text("encryption: " + verifierDetails.encryption)
 			}
 		}
 		BigButton(
@@ -37,11 +38,7 @@ fun VerifierScreen(signerDataModel: SignerDataModel) {
 		header = "Wipe ALL data?",
 		text = "Remove all data and set general verifier blank so that it could be set later. This operation can not be reverted. Do not proceed unless you absolutely know what you are doing, there is no need to use this procedure in most cases. Misusing this feature may lead to loss of funds!",
 		back = { jailbreakAlert = false },
-		forward = {
-			signerDataModel.authentication.authenticate(signerDataModel.activity) {
-				signerDataModel.jailbreak()
-			}
-		},
+		forward = { wipeToJailbreak() },
 		backText = "Cancel",
 		forwardText = "I understand"
 	)

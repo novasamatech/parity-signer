@@ -11,44 +11,44 @@ struct ScreenSelector: View {
     @EnvironmentObject var data: SignerDataModel
     
     var body: some View {
-        switch (data.actionResult.screen) {
-        case .Scan :
+        switch (data.actionResult.screenData) {
+        case .scan :
             TransactionScreen()
-        case .Keys(let value):
+        case .keys(let value):
             KeyManager(content: value)
-        case .Settings(let value) :
+        case .settings(let value) :
             SettingsScreen(content: value)
-        case .Log(let value) :
+        case .log(let value) :
             HistoryScreen(content: value)
-        case .LogDetails(let value):
+        case .logDetails(let value):
             EventDetails(content: value)
-        case .Transaction(let value):
+        case .transaction(let value):
             TransactionPreview(content: value)
-        case .SeedSelector(let value):
+        case .seedSelector(let value):
             SeedManager(content: value)
-        case .KeyDetails(let value):
+        case .keyDetails(let value):
             ExportAddress(content: value)
-        case .NewSeed(let value):
+        case .newSeed(let value):
             NewSeedScreen(content: value)
-        case .RecoverSeedName(let value):
+        case .recoverSeedName(let value):
             RecoverSeedName(content: value)
-        case .RecoverSeedPhrase(let value):
+        case .recoverSeedPhrase(let value):
             RecoverSeedPhrase(content: value)
-        case .DeriveKey(let value):
+        case .deriveKey(let value):
             NewAddressScreen(content: value)
-        case .Verifier(let value):
+        case .vVerifier(let value):
             VerifierScreen(content: value)
-        case .ManageNetworks(let value):
+        case .manageNetworks(let value):
             ManageNetworks(content: value)
-        case .NetworkDetails(let value):
+        case .nNetworkDetails(let value):
             NetworkDetails(content: value)
-        case .SignSufficientCrypto(let value):
+        case .signSufficientCrypto(let value):
             SignSufficientCrypto(content: value)
-        case .SelectSeedForBackup(let value):
+        case .selectSeedForBackup(let value):
             SelectSeedForBackup(content: value)
-        case .Documents:
+        case .documents:
             DocumentModal()
-        case .KeyDetailsMulti(let value):
+        case .keyDetailsMulti(let value):
             KeyDetailsMulti(content: value)
         }
     }

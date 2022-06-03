@@ -10,7 +10,6 @@ import androidx.compose.material.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import io.parity.signer.ButtonID
 import io.parity.signer.components.SeedCard
 import io.parity.signer.models.SignerDataModel
 import io.parity.signer.models.getSeed
@@ -18,12 +17,12 @@ import io.parity.signer.models.pushButton
 import io.parity.signer.ui.theme.Bg100
 import io.parity.signer.ui.theme.Bg200
 import io.parity.signer.ui.theme.modal
-import org.json.JSONArray
+import io.parity.signer.uniffi.Action
+import io.parity.signer.uniffi.MSeeds
 
 @Composable
-fun SelectSeed(signerDataModel: SignerDataModel) {
-	val cards = signerDataModel.screenData.value?.getJSONArray("seedNameCards")
-		?: JSONArray()
+fun SelectSeed(seeds: MSeeds, signerDataModel: SignerDataModel) {
+	val cards = seeds.seedNameCards
 
 	Surface(
 		color = MaterialTheme.colors.Bg100,
@@ -32,7 +31,7 @@ fun SelectSeed(signerDataModel: SignerDataModel) {
 		LazyColumn(
 			modifier = Modifier.padding(20.dp)
 		) {
-			items(cards.length()) { item ->
+			items(cards.size) { item ->
 				Row(
 					Modifier
 						.padding(top = 3.dp, start = 12.dp, end = 12.dp)
@@ -42,14 +41,11 @@ fun SelectSeed(signerDataModel: SignerDataModel) {
 						Modifier
 							.clickable {
 								signerDataModel.authentication.authenticate(signerDataModel.activity) {
-									val seedName =
-										cards
-											.getJSONObject(item)
-											.optString("seed_name")
+									val seedName = cards[item].seedName
 									val seedPhrase = signerDataModel.getSeed(seedName)
 									if (seedPhrase.isNotBlank()) {
 										signerDataModel.pushButton(
-											ButtonID.GoForward,
+											Action.GO_FORWARD,
 											seedName,
 											seedPhrase
 										)
@@ -59,8 +55,8 @@ fun SelectSeed(signerDataModel: SignerDataModel) {
 							.weight(1f, true)
 					) {
 						SeedCard(
-							seedName = cards.getJSONObject(item).getString("seed_name"),
-							identicon = cards.getJSONObject(item).getString("identicon")
+							seedName = cards[item].seedName,
+							identicon = cards[item].identicon,
 						)
 					}
 				}

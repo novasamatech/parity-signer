@@ -218,7 +218,9 @@ pub fn init_db<T: ErrorSource>(
     let clear_history_batch = make_batch_clear_tree::<T>(database_name, HISTORY)?;
     let events = vec![
         Event::DatabaseInitiated,
-        Event::GeneralVerifierSet(general_verifier),
+        Event::GeneralVerifierSet {
+            verifier: general_verifier,
+        },
     ];
     let start_zero = true;
     let history_batch =
@@ -245,7 +247,7 @@ pub fn signer_init_with_cert(database_name: &str) -> Result<(), ErrorSigner> {
 /// Function is applied during `Remove general certificate` procedure.
 #[cfg(feature = "signer")]
 pub fn signer_init_no_cert(database_name: &str) -> Result<(), ErrorSigner> {
-    init_db::<Signer>(database_name, Verifier(None))
+    init_db::<Signer>(database_name, Verifier { v: None })
 }
 
 /// Generate initiated test cold database with no network-associated data.

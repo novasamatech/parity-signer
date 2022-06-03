@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct TCNewSpecs: View {
-    var value: NewSpecs
+    var value: NetworkSpecsToSend
     var body: some View {
         VStack {
             Text("NEW NETWORK").foregroundColor(Color("Text600"))
@@ -22,13 +22,13 @@ struct TCNewSpecs: View {
                 HStack {
                     Text("base58 prefix:")
                         .foregroundColor(Color("Text400"))
-                    Text(value.base58prefix)
+                    Text(String(value.base58prefix))
                         .foregroundColor(Color("Text600"))
                 }
                 HStack {
                     Text("decimals:")
                         .foregroundColor(Color("Text400"))
-                    Text(value.decimals)
+                    Text(String(value.decimals))
                         .foregroundColor(Color("Text600"))
                 }
                 HStack {
@@ -40,13 +40,15 @@ struct TCNewSpecs: View {
                 HStack {
                     Text("genesis hash:")
                         .foregroundColor(Color("Text400"))
-                    Text(value.genesis_hash)
+                    Text(value.genesisHash.map{String(format: "%02X", $0)}.joined())
                         .foregroundColor(Color("Text600"))
                 }
                 HStack {
                     Text("crypto:")
                         .foregroundColor(Color("Text400"))
-                    Text(value.encryption)
+                    Text(
+                        value.encryption == .ed25519 ? "ed25519" : value.encryption == .sr25519 ? "sr25519" : value.encryption == .ecdsa ? "ecdsa" : "error"
+                    )
                         .foregroundColor(Color("Text600"))
                 }
                 HStack {
@@ -63,7 +65,7 @@ struct TCNewSpecs: View {
                 HStack {
                     Text("default path:")
                         .foregroundColor(Color("Text400"))
-                    Text(value.path_id)
+                    Text(value.pathId)
                         .foregroundColor(Color("Text600"))
                 }
             }

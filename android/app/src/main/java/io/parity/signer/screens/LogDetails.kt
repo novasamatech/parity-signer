@@ -5,17 +5,15 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import io.parity.signer.components.HistoryCardExtended
-import io.parity.signer.models.SignerDataModel
-import org.json.JSONObject
+import io.parity.signer.uniffi.MLogDetails
 
 @Composable
-fun LogDetails(signerDataModel: SignerDataModel) {
-	val content = signerDataModel.screenData.value?: JSONObject()
+fun LogDetails(logDetails: MLogDetails) {
 	Column {
-		Text(content.optString("timestamp"))
+		Text(logDetails.timestamp)
 		LazyColumn {
-			items(content.optJSONArray("events")?.length() ?: 0) { index ->
-				HistoryCardExtended(card = content.getJSONArray("events").getJSONObject(index))
+			items(logDetails.events.size) { index ->
+				HistoryCardExtended(logDetails.events[index], logDetails.timestamp)
 			}
 		}
 	}

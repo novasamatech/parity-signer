@@ -13,28 +13,37 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import io.parity.signer.models.abbreviateString
-import io.parity.signer.models.decode64
 import io.parity.signer.ui.theme.*
-import org.json.JSONObject
+import io.parity.signer.uniffi.Address
 
 /**
  * A card to show key info; only visual things.
  * TODO: paint root keys in scary colors
  */
 @Composable
-fun KeyCard(identity: JSONObject, multiselectMode: Boolean = false) {
+fun KeyCard(identity: Address, multiselectMode: Boolean = false) {
 	Row(
 		verticalAlignment = Alignment.CenterVertically,
 		modifier = Modifier
 			.padding(8.dp)
 	) {
 		Box(contentAlignment = Alignment.BottomEnd) {
-			Identicon(identity.optString("identicon"))
+			Identicon(identity.identicon)
 			if (multiselectMode) {
-				if(identity.optBoolean("multiselect")) {
-					Icon(Icons.Default.CheckCircle, "Not multiselected", tint = MaterialTheme.colors.Action400)
-				} else {
-					Icon(Icons.Outlined.Circle, "Multiselected", tint = MaterialTheme.colors.Action400)
+				identity.multiselect?.let {
+					if (it) {
+						Icon(
+							Icons.Default.CheckCircle,
+							"Not multiselected",
+							tint = MaterialTheme.colors.Action400
+						)
+					} else {
+						Icon(
+							Icons.Outlined.Circle,
+							"Multiselected",
+							tint = MaterialTheme.colors.Action400
+						)
+					}
 				}
 			}
 		}
@@ -44,16 +53,16 @@ fun KeyCard(identity: JSONObject, multiselectMode: Boolean = false) {
 				verticalAlignment = Alignment.CenterVertically
 			) {
 				Text(
-					identity.optString("seed_name", identity.optString("seed")).decode64(),
+					identity.seedName,
 					color = MaterialTheme.colors.Text600,
 					style = MaterialTheme.typography.subtitle1
 				)
 				Text(
-					identity.optString("path", identity.optString("derivation_path")),
+					identity.path,
 					color = MaterialTheme.colors.Crypto400,
 					style = CryptoTypography.body2
 				)
-				if (identity.optBoolean("has_pwd", false)) {
+				if (identity.hasPwd) {
 					Text(
 						"///",
 						color = MaterialTheme.colors.Crypto400,
@@ -67,7 +76,7 @@ fun KeyCard(identity: JSONObject, multiselectMode: Boolean = false) {
 				}
 			}
 			Text(
-				identity.optString("base58").abbreviateString(8),
+				identity.base58.abbreviateString(8),
 				color = MaterialTheme.colors.Text400,
 				style = CryptoTypography.body2
 			)

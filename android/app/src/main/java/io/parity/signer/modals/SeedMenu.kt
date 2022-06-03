@@ -8,19 +8,22 @@ import androidx.compose.material.Surface
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import io.parity.signer.ButtonID
-import io.parity.signer.ShieldAlert
 import io.parity.signer.alerts.AndroidCalledConfirm
 import io.parity.signer.components.BigButton
 import io.parity.signer.components.HeaderBar
-import io.parity.signer.models.SignerDataModel
-import io.parity.signer.models.pushButton
-import io.parity.signer.models.removeSeed
+import io.parity.signer.models.AlertState
 import io.parity.signer.ui.theme.Bg000
 import io.parity.signer.ui.theme.modal
+import io.parity.signer.uniffi.Action
+import io.parity.signer.uniffi.MSeedMenu
 
 @Composable
-fun SeedMenu(signerDataModel: SignerDataModel) {
+fun SeedMenu(
+	seedMenu: MSeedMenu,
+	alertState: State<AlertState?>,
+	button: (Action) -> Unit,
+	removeSeed: (String) -> Unit
+) {
 	var confirm by remember { mutableStateOf(false) }
 
 	Column {
@@ -36,18 +39,19 @@ fun SeedMenu(signerDataModel: SignerDataModel) {
 				BigButton(
 					text = "Backup",
 					action = {
-						if (signerDataModel.alertState.value == ShieldAlert.None)
-							signerDataModel.pushButton(ButtonID.BackupSeed)
+						if (alertState.value == AlertState.None)
+							button(Action.BACKUP_SEED)
 						else
-							signerDataModel.pushButton(ButtonID.Shield)
-					})
+							button(Action.SHIELD)
+					}
+				)
 				BigButton(
 					text = "Derive new key",
 					action = {
-						if (signerDataModel.alertState.value == ShieldAlert.None)
-							signerDataModel.pushButton(ButtonID.NewKey)
+						if (alertState.value == AlertState.None)
+							button(Action.NEW_KEY)
 						else
-							signerDataModel.pushButton(ButtonID.Shield)
+							button(Action.SHIELD)
 					},
 					isShaded = true,
 					isCrypto = true
@@ -57,9 +61,7 @@ fun SeedMenu(signerDataModel: SignerDataModel) {
 					isShaded = true,
 					isDangerous = true,
 					action = {
-						val seedName =
-							signerDataModel.modalData.value?.optString("seed") ?: ""
-						signerDataModel.removeSeed(seedName)
+						confirm = true
 					}
 				)
 			}
@@ -69,11 +71,12 @@ fun SeedMenu(signerDataModel: SignerDataModel) {
 	AndroidCalledConfirm(
 		show = confirm,
 		header = "Forget this seed forever?",
-		text = "This seed will be removed for all networks. This is not reversible. Are you sure?",
+		text = "This seed will be removed for all networks. " +
+			"This is not reversible. Are you sure?",
 		back = { confirm = false },
 		forward = {
-			signerDataModel.modalData.value?.optString("seed")?.let {
-				if (it.isNotBlank()) signerDataModel.removeSeed(it)
+			seedMenu.seed.let {
+				if (seedMenu.seed.isNotBlank()) removeSeed(it)
 			}
 		},
 		backText = "Cancel",

@@ -15,13 +15,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.unit.dp
-import io.parity.signer.ButtonID
 import io.parity.signer.components.HeaderBar
 import io.parity.signer.components.SingleTextInput
 import io.parity.signer.models.SignerDataModel
 import io.parity.signer.models.pushButton
 import io.parity.signer.ui.theme.Bg000
 import io.parity.signer.ui.theme.modal
+import io.parity.signer.uniffi.Action
 
 @Composable
 fun LogComment(signerDataModel: SignerDataModel) {
@@ -46,7 +46,7 @@ fun LogComment(signerDataModel: SignerDataModel) {
 					comment.value = it
 				},
 				onDone = {
-					signerDataModel.pushButton(ButtonID.GoForward, comment.value)
+					signerDataModel.pushButton(Action.GO_FORWARD, comment.value)
 				},
 				focusManager = focusManager,
 				focusRequester = focusRequester

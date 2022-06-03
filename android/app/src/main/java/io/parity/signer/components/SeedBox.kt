@@ -18,7 +18,8 @@ fun SeedBox(seedPhrase: String, status: SeedBoxStatus = SeedBoxStatus.Seed) {
 			SeedBoxStatus.Seed -> MaterialTheme.colors.Crypto100
 			SeedBoxStatus.Timeout -> MaterialTheme.colors.Bg200
 			SeedBoxStatus.Error -> MaterialTheme.colors.BgDanger
-			SeedBoxStatus.Locked -> MaterialTheme.colors.BgDanger
+			SeedBoxStatus.Locked -> MaterialTheme.colors.Bg200
+			SeedBoxStatus.Network -> MaterialTheme.colors.BgDanger
 		},
 		modifier = Modifier.padding(8.dp)
 	) {
@@ -52,6 +53,15 @@ fun SeedBox(seedPhrase: String, status: SeedBoxStatus = SeedBoxStatus.Seed) {
 			}
 			SeedBoxStatus.Locked -> {
 				Text(
+					"Seed is locked now",
+					style = MaterialTheme.typography.body1,
+					color = MaterialTheme.colors.Text300,
+					textAlign = TextAlign.Left,
+					modifier = Modifier.padding(8.dp)
+				)
+			}
+			SeedBoxStatus.Network -> {
+				Text(
 					"Network connected! Seeds are not available now. Please enable airplane mode and disconnect all cables to access the seed phrase",
 					style = MaterialTheme.typography.body1,
 					color = MaterialTheme.colors.SignalDanger,
@@ -67,5 +77,6 @@ enum class SeedBoxStatus {
 	Seed,
 	Timeout,
 	Error,
+	Network,
 	Locked;
 }

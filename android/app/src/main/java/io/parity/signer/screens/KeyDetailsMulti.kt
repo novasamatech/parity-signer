@@ -9,22 +9,21 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.*
-import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
-import io.parity.signer.ButtonID
 import io.parity.signer.components.KeyCard
 import io.parity.signer.components.NetworkCard
-import io.parity.signer.models.SignerDataModel
 import io.parity.signer.models.intoImageBitmap
-import io.parity.signer.models.pushButton
 import io.parity.signer.ui.theme.Bg200
-import org.json.JSONObject
+import io.parity.signer.uniffi.Action
+import io.parity.signer.uniffi.MKeyDetailsMulti
 
 @Composable
-fun KeyDetailsMulti(signerDataModel: SignerDataModel) {
-	val address = signerDataModel.screenData.observeAsState()
+fun KeyDetailsMulti(
+	keyDetailsMulti: MKeyDetailsMulti,
+	button: (Action) -> Unit
+) {
 	var offset by remember { mutableStateOf(0f) }
 
 	Column(
@@ -38,14 +37,16 @@ fun KeyDetailsMulti(signerDataModel: SignerDataModel) {
 					MaterialTheme.colors.Bg200
 				)
 				.fillMaxWidth()
-		) { KeyCard(identity = address.value ?: JSONObject()) }
-		Row (
+		) {
+			KeyCard(identity = keyDetailsMulti.keyDetails.address)
+		}
+		Row(
 			Modifier.padding(top = 3.dp, start = 12.dp, end = 12.dp)
 		) {
-			NetworkCard(address.value ?: JSONObject())
+			NetworkCard(network = keyDetailsMulti.keyDetails.networkInfo)
 		}
 		Image(
-			(address.value?.optString("qr") ?: "").intoImageBitmap(),
+			(keyDetailsMulti.keyDetails.qr).intoImageBitmap(),
 			contentDescription = "QR with address to scan",
 			contentScale = ContentScale.FillWidth,
 			modifier = Modifier
@@ -59,10 +60,10 @@ fun KeyDetailsMulti(signerDataModel: SignerDataModel) {
 					},
 					onDragStopped = {
 						if (offset < -100) {
-							signerDataModel.pushButton(ButtonID.NextUnit)
+							button(Action.NEXT_UNIT)
 						} else {
 							if (offset > 100) {
-								signerDataModel.pushButton(ButtonID.PreviousUnit)
+								button(Action.PREVIOUS_UNIT)
 							}
 						}
 						offset = 0f
@@ -70,9 +71,7 @@ fun KeyDetailsMulti(signerDataModel: SignerDataModel) {
 				)
 		)
 		Text(
-			"Key " + address.value?.optString("current_number") + " out of " + address.value?.optString(
-				"out_of"
-			)
+			"Key " + keyDetailsMulti.currentNumber + " out of " + keyDetailsMulti.outOf
 		)
 	}
 }
