@@ -72,7 +72,7 @@ Signer supports following `<payload code>` variants:
 Note: old UOS specified `0x00` as mortal transaction and `0x02` as immortal one,
 but currently both mortal and immortal transactions from polkadot-js are `0x02`.
 
-## Shared QR code processing stages:
+## Shared QR code processing sequence:
 
 1. Read QR code, try interpreting it, and get the hexadecimal string from into
 Rust (hexadecimal string is getting changes to raw bytes soon).
@@ -129,7 +129,7 @@ for it as is. For blobs longer than 257 bytes, 32 byte hash (`blake2-rfc`) is
 signed instead. This is inherited from earlier Signer versions, and is currently
 compatible with polkadot-js.
 
-### Transaction parsing stages:
+### Transaction parsing sequence
 
 1. Cut the QR data and get:
 
@@ -192,7 +192,7 @@ itself.
     If there are no metadata entries for the network at all, Signer produces an
 error and asks to load the metadata.
 
-    Metadata `RuntimeVersion` supported by Signer are `V12`, `V13`, and `V14`.
+    `RuntimeMetadata` versions supported by Signer are `V12`, `V13`, and `V14`.
 The crucial feature of the `V14` is that the metadata contains the description
 of the types used in the call and extensions production. `V12` and `V13` are
 legacy versions and provide only text identifires for the types, and in order to
@@ -215,9 +215,9 @@ all attempts with existing metadata have failed.
     Typically, the extensions are quite stable in between the metadata versions
 and in between the networks, however, they can be and sometimes are different.
 
-    In legacy metadata (`RuntimeVersion` being `V12` and `V13`) extensions have
-identifiers only, and in Signer the extensions for `V12` and `V13` are
-hardcoded as:
+    In legacy metadata (`RuntimeMetadata` version being `V12` and `V13`)
+extensions have identifiers only, and in Signer the extensions for `V12` and
+`V13` are hardcoded as:
 
     - `Era` era
     - `Compact(u64)` nonce
@@ -384,6 +384,29 @@ there for details.
 the process, the transaction is considered parsed and is displayed to the user,
 either ready for signing (if all other checks have passed) or as read-only.
 
+7. If the user chooses to sign the transaction, the Signer produces QR code with
+signature, that should be read back into the hot side. As soon as the signature
+QR code is generated, the Signer considers the transaction signed.
+
+    All signed transactions are entered in the history log, and could be seen
+and decoded again from the history log. Transactions not signed by the user do
+not go in the history log.
+
+    If the key used for the transaction is passworded, user has three attempts
+to enter the password correctly. Each incorrect password entry is reflected in
+the history.
+
+    In the time interval between Signer displaying the parsed transaction and
+the user approving it, the transaction details needed to generate the signature
+and history log details are temporarily stored in the database. The temporary
+storage gets cleared each time before and after use. Signer extracts the stored
+transaction data only if the database checksum stored in navigator state is
+same as the the current checksum of the database. If the password is entered
+incorrectly, the database is updated with "wrong password" history entry, and
+the checksum in the state gets updated accordingly. Eventually, all transaction
+info can and will be moved into state itself and temporary storage will not be
+used.
+
 ### Example
 
 Alice makes transfer to Bob in Westend network.
@@ -470,6 +493,13 @@ Note that the `verifier public key` and `signature` parts appear only in signed
 uploads. Preludes `[0x53, 0xff, 0x<payload code>]` are followed only by the
 update payload.
 
+| Encryption | Public key length, bytes | Signature length, bytes |
+|:-|:-| :- |
+| Ed25519 | 32 | 64 |
+| Sr25519 | 32 | 64 |
+| Ecdsa | 33 | 65 |
+| no encryption | 0 | 0 |
+
 `reserved tail` currently is not used and is expected to be empty. It could be
 used later if the multisignatures are introduced for the updates. Expecting
 `reserved tail` in update processing is done to keep code continuity in case
@@ -493,6 +523,14 @@ SCALE is to have the exact payload length).
 
 Payload signature is generated for SCALE-encoded `NetworkSpecsToSend`.
 
+Network specs identifier in the Signer database is `NetworkSpecsKey`, a key
+built from encryption used by the network and the network genesis hash. There
+could be networks with multiple encryption algorithms supported, thus the
+encryption encryption is part of the key. Network specs could be different for
+networks with same genesis hash and different encryptions, except the base58
+prefix. The reason is that the base58 prefix can be a part of the network
+metadata, and the network metadata is not encryption-specific.
+
 ### `load_metadata` update payload
 
 Loads metadata for a network already known to Signer, i.e. for a network with
@@ -502,6 +540,30 @@ Update payload consists of concatenated SCALE-encoded metadata `Vec<u8>` and
 network genesis hash (H256, always 32 bytes).
 
 Same blob is used to generate the signature.
+
+Network metadata identifier in the Signer database is `MetaKey`, a key built
+from the network name and network metadata version.
+
+Network metadata that can get into Signer and can be used by Signer only if it
+complies with following requirements:
+
+- metadata vector starts with `b"meta"` prelude
+- part of the metadata vector after `b"meta"` prelude is decodeable as [`RuntimeMetadata`](https://paritytech.github.io/substrate/master/frame_metadata/enum.RuntimeMetadata.html)
+- `RuntimeMetadata` version of the metadata is `V12`, `V13` or `V14`
+- Metadata has `System` pallet
+- There is `Version` constant in `System` pallet
+- `Version` is decodable as [`RuntimeVersion`](https://paritytech.github.io/substrate/master/sp_version/struct.RuntimeVersion.html)
+- If the metadata contain base58 prefix, it must be decodeable as `u16` or `u8`
+
+Additionally, if the metadata `V14` is received, its associated extensions will
+be scanned and user will be warned if the extensions are incompatible with
+transactions signing.
+
+Also in case of the metadata `V14` the type of the encoded data stored in the
+`Version` constant is also stored in the metadata types registry and in
+principle could be different from `RuntimeVersion` above. At the moment, the
+type of the `Version` is hardcoded, and any other types would not be processed
+and would get rejected with an error.
 
 ### `load_types` update payload
 
@@ -537,10 +599,48 @@ Signer. General verifier could sign all kinds of updates. By default the Signer
 uses Parity-associated key as general verifier, but users can remove it and set
 their own. There could be only one general verifier at any time.
 
+Custom verifier could be used for a network information that was verified, but
+not with general verifier. There could be as many as needed custom verifiers at
+any time, and custom verifier could switched to the general verifier seamlessly.
+
+### Shared update processing sequence:
+
+1. Cut the QR data and get:
+
+    - encryption used by verifier (1 `u8` from prelude)
+    - (only if the update is signed, i.e. the encryption is **not** `0xff`):
+        
+        - update verifier public key, its length matching the encryption (32 or
+        33 `u8` immediately after the prelude)
+        - update verifier signature, its length matching the encryption (64 or
+        65 `u8` at the end)
+        
+    - concatenated update payload and reserved tail
+
+    If the data length is insufficient, Signer produces an error and suggests to
+load non-damaged transaction.
+
+2. Using the payload type from the prelude, determine the update payload length
+and cut payload from the reserved tail, which remains unused.
+
+    If the data length is insufficient, Signer produces an error and suggests to
+load non-damaged transaction.
+
+3. Verify the signature for the payload. If this fails, Signer produces an error
+indicating that the update signature is invalid.
+
+### `add_specs` processing sequence
+
+1. If the signature is valid, update payload is decoded and then processed
+according to the prelude. If the decoding is not successful, Signer produces an
+error.
 
 
+### `load_meta` processing sequence
 
+1. Update payload is cut into network metadata and network genesis hash.
 
+### `load_types` processing sequence
 
 
 
