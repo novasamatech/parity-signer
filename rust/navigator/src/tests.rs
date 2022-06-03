@@ -5509,9 +5509,7 @@ fn flow_test_1() {
                     error: Some(vec![TransactionCard {
                         index: 0,
                         indent: 0,
-                        card: Card::ErrorCard {
-                            f: card_text,
-                        },
+                        card: Card::ErrorCard { f: card_text },
                     }]),
                     ..Default::default()
                 },
