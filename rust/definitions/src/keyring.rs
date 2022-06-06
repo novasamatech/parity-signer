@@ -137,27 +137,27 @@ impl NetworkSpecsKey {
 /// - network specs, for any encryption algorithm  
 /// - network metadata
 #[derive(Decode, Encode, Debug, Clone, PartialEq)]
-pub struct VerifierKey(Vec<u8>);
+pub struct VerifierKey(H256);
 
 impl VerifierKey {
     /// Generate [`VerifierKey`] from network genesis hash
-    pub fn from_parts(genesis_hash: &[u8]) -> Self {
-        Self(genesis_hash.to_vec())
+    pub fn from_parts(genesis_hash: H256) -> Self {
+        Self(genesis_hash)
     }
 
     /// Transform database `IVec` key into [`VerifierKey`]  
     pub fn from_ivec(ivec: &IVec) -> Self {
-        Self(ivec.to_vec())
+        Self(H256::from_slice(ivec))
     }
 
     /// Get genesis hash from the [`VerifierKey`]
     pub fn genesis_hash(&self) -> Vec<u8> {
-        self.0.to_vec()
+        self.0.as_bytes().to_vec()
     }
 
     /// Transform [`VerifierKey`] into `Vec<u8>` database key  
     pub fn key(&self) -> Vec<u8> {
-        self.0.to_vec()
+        self.0.as_bytes().to_vec()
     }
 }
 

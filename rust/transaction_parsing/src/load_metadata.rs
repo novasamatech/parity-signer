@@ -44,7 +44,7 @@ pub fn load_metadata(
         }
     };
     let general_verifier = get_general_verifier(database_name)?;
-    let verifier_key = VerifierKey::from_parts(genesis_hash.as_bytes());
+    let verifier_key = VerifierKey::from_parts(genesis_hash);
     let valid_current_verifier = match try_get_valid_current_verifier(&verifier_key, database_name)?
     {
         Some(a) => a,
