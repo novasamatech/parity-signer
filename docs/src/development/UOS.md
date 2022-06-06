@@ -133,7 +133,7 @@ compatible with polkadot-js.
 
 1. Cut the QR data and get:
 
-    - encryption (1 `u8` from prelude)
+    - encryption (single `u8` from prelude)
     - transaction author public key, its length matching the encryption (32 or
     33 `u8` immediately after the prelude)
     - network genesis hash (32 `u8` at the end)
@@ -493,6 +493,10 @@ Note that the `verifier public key` and `signature` parts appear only in signed
 uploads. Preludes `[0x53, 0xff, 0x<payload code>]` are followed only by the
 update payload.
 
+Every time user receives an unsigned update, the Signer displays a warning that
+the update is not verified. Generally, the use of unsigned updates is
+discouraged.
+
 | Encryption | Public key length, bytes | Signature length, bytes |
 |:-|:-| :- |
 | Ed25519 | 32 | 64 |
@@ -523,13 +527,14 @@ SCALE is to have the exact payload length).
 
 Payload signature is generated for SCALE-encoded `NetworkSpecsToSend`.
 
-Network specs identifier in the Signer database is `NetworkSpecsKey`, a key
-built from encryption used by the network and the network genesis hash. There
-could be networks with multiple encryption algorithms supported, thus the
-encryption encryption is part of the key. Network specs could be different for
-networks with same genesis hash and different encryptions, except the base58
-prefix. The reason is that the base58 prefix can be a part of the network
-metadata, and the network metadata is not encryption-specific.
+Network specs are stored in dedicated `SPECSTREE` tree of the Signer database.
+Network specs identifier is `NetworkSpecsKey`, a key built from encryption used
+by the network and the network genesis hash. There could be networks with
+multiple encryption algorithms supported, thus the encryption encryption is part
+of the key. Network specs could be different for networks with same genesis hash
+and different encryptions, except the base58 prefix. The reason is that the
+base58 prefix can be a part of the network metadata, and the network metadata is
+not encryption-specific.
 
 ### `load_metadata` update payload
 
@@ -541,8 +546,9 @@ network genesis hash (H256, always 32 bytes).
 
 Same blob is used to generate the signature.
 
-Network metadata identifier in the Signer database is `MetaKey`, a key built
-from the network name and network metadata version.
+Network metadata is stored in dedicated `METATREE` tree of the Signer database.
+Network metadata identifier in is `MetaKey`, a key built from the network name
+and network metadata version.
 
 Network metadata that can get into Signer and can be used by Signer only if it
 complies with following requirements:
@@ -582,6 +588,9 @@ SCALE is to have the exact payload length).
 
 Payload signature is generated for SCALE-encoded `Vec<TypeEntry>`.
 
+Types information is stored in `SETTREE` tree of the Signer database, under key
+`TYPES`.
+
 ### Verifiers
 
 Signer can accept both verified and non-verified updates, however, information
@@ -589,25 +598,88 @@ once verified can not be replaced or updated by a weaker verifier without full
 Signer reset.
 
 A verifier could be `Some(_)` with corresponding public key inside or `None`.
-All verifiers for the data follow trust on first use principle. If new
-verifier is set up instead of the old one, all the data that was verified by the
-old verifier gets removed to avoid confusion regarding which verifier has signed
-the data.
+All verifiers for the data follow trust on first use principle.
+
+Signer uses:
+- a single general verifier
+- a network verifier for each of the networks introduced to the Signer
+
+General verifier information is stored in `SETTREE` tree of the Signer database,
+under key `GENERALVERIFIER`. General verifier is always set to a value, be it
+`Some(_)` or `None`. Removing the general verifier means setting it to `None`.
+If no general verifier entry is found in the database, the database is
+considered corrupted and the Signer must be reset.
+
+Network verifier information is stored in dedicated `VERIFIERS` tree of the
+Signer database. Network verifier identifier is `VerifierKey`, a key built from
+the network genesis hash. Same network verifier is used for network specs with
+any encryption algorithm and for network metadata. Network verifier could be
+valid or invalid. Valid network verifier could be general or custom. Verifiers
+installed as a result of an update are always valid. Invalid network verifier
+blocks the use of the network unless the Signer is reset, it appears if user
+marks custom verifier as no longer trusted.
+
+Updating verifier could cause some data verified by the old verifier to be
+removed, to avoid confusion regarding which verifier has signed the data
+currently stored in the database. The data removed is called "hold", and user
+receives a warning if accepting new update would cause hold data to be removed.
+
+#### General verifier
 
 General verifier is the strongest and the most reliable verifier known to the
 Signer. General verifier could sign all kinds of updates. By default the Signer
 uses Parity-associated key as general verifier, but users can remove it and set
 their own. There could be only one general verifier at any time.
 
-Custom verifier could be used for a network information that was verified, but
-not with general verifier. There could be as many as needed custom verifiers at
-any time, and custom verifier could switched to the general verifier seamlessly.
+General verifier could be removed only by complete wipe of the Signer, through
+`Remove general certificate` button in the Settings. This will reset the Signer
+database to the default content and set the general verifier as `None`, that
+will be updated to the first verifier encountered by the Signer.
 
-### Shared update processing sequence:
+Expected usage for this is that the user removes old general verifier and
+immediately afterwards loads an update from the preferred source, thus setting
+the general verifier to the user-preferred value.
+
+General verifier can be updated from `None` to `Some(_)` by accepting a verified
+update. This would result in removing "general hold", i.e.:
+
+- all network data (network specs and metadata) for the networks for which the
+verifier is set to the general one
+- types information
+
+General verifier could not be changed from `Some(_)` to another, different
+`Some(_)` by simply accepting updates.
+
+Note that if the general verifier is `None`, none of the custom verifiers could
+be `Some(_)`. Similarly, if the verifier is recorded as custom in the database,
+its value can not be the same as the value of the general verifier. If found,
+those situations indicate the database corruption.
+
+#### Custom verifiers
+
+Custom verifiers could be used for network information that was verified, but
+not with the general verifier. There could be as many as needed custom verifiers
+at any time. Custom verifier is considered weaker than the general verifier.
+
+Custom verifier set to `None` could be updated to:
+
+- Another custom verifier set to `Some(_)`
+- General verifier
+
+Custom verifier set to `Some(_)` could be updated to general verifier.
+
+These verifier updates can be done by accepting an update signed by a new
+verifier.
+
+Any of the custom network verifier updates would result in removing "hold", i.e.
+all network specs entries (for all encryption algorithms on file) and all
+network metadata entries.
+
+### Common update processing sequence:
 
 1. Cut the QR data and get:
 
-    - encryption used by verifier (1 `u8` from prelude)
+    - encryption used by verifier (single `u8` from prelude)
     - (only if the update is signed, i.e. the encryption is **not** `0xff`):
         
         - update verifier public key, its length matching the encryption (32 or
@@ -618,23 +690,58 @@ any time, and custom verifier could switched to the general verifier seamlessly.
     - concatenated update payload and reserved tail
 
     If the data length is insufficient, Signer produces an error and suggests to
-load non-damaged transaction.
+load non-damaged update.
 
 2. Using the payload type from the prelude, determine the update payload length
 and cut payload from the reserved tail, which remains unused.
 
     If the data length is insufficient, Signer produces an error and suggests to
-load non-damaged transaction.
+load non-damaged update.
 
 3. Verify the signature for the payload. If this fails, Signer produces an error
-indicating that the update signature is invalid.
+indicating that the update has invalid signature.
 
 ### `add_specs` processing sequence
 
-1. If the signature is valid, update payload is decoded and then processed
-according to the prelude. If the decoding is not successful, Signer produces an
-error.
+1. Transform update payload into `ContentAddSpecs` and retrieve the incoming
+`NetworkSpecsToSend`.
 
+2. If the genesis hash from the retrieved network specs is already known to the
+Signer database (i.e. there are entries in the `SPECSTREE` with same genesis
+hash even though the encryption not necessarily matches), the Signer checks that
+the base58 prefix in the received specs is same as in the specs already in the
+Signer database. The reason is that the base58 prefix can be a part of the
+network metadata, and the network metadata is not encryption-specific.
+
+3. Signer checks the verifier entry for the received genesis hash.
+
+    If there are no entries, i.e. the network is altogether new to the Signer,
+the specs get added into the database. During the same database transaction the
+network verifier is set up:
+
+    | `add_specs` update verification | General verifier in Signer database | Action |
+    | :- | :- | :- |
+    | unverified, `0xff` update encryption code | `None` or `Some(_)` | (1) set network verifier to custom, `None` (regardless of the general verifier); (2) add specs |
+    | verified by `a` | `None` | (1) set network verifier to general; (2) set general verifier to `Some(a)`, process the general hold; (3) add specs|
+    | verified by `a` | `Some(b)` | (1) set network verifier to custom, `Some(a)`; (2) add specs |
+    | verified by `a` | `Some(a)` | (1) set network verifier to general; (2) add specs |
+    
+    If there are entries, i.e. the network was known to the Signer at some
+point after the last Signer reset, the network verifier in the database and the
+verifier of the update are compared.
+
+    | `add_specs` update verification | Network verifier in Signer database | General verifier in Signer database | Action |
+    | :- | :- | :- | :- |
+    | unverified, `0xff` update encryption code | custom, `None` | `None` | accept specs if good |
+    | unverified, `0xff` update encryption code | custom, `None` | `Some(a)` | accept specs if good |
+    | unverified, `0xff` update encryption code | general | `None` | accept specs if good |
+    | unverified, `0xff` update encryption code | general | `Some(a)` | error: message should have been signed by `a` |
+    | verified by `a` | custom, `None` | `None` | (1) change network verifier to general, process the network hold; (2) set general verifier to `Some(a)`, process the general hold; (3) accept specs if good |
+    | verified by `a` | custom, `None` | `Some(a)` | (1) change network verifier to general, process the network hold; (2) accept specs if good |
+    | verified by `a` | custom, `None` | `Some(b)` | (1) change network verifier to custom, `Some(a)`, process the network hold; (2) accept specs if good |
+    | verified by `a` | custom, `Some(a)` | `Some(b)` | accept specs if good |
+    | verified by `a` | custom, `Some(b)` | `Some(a)` | (1) change network verifier to general, process the network hold; (2) accept specs if good |
+    | verified by `a` | custom, `Some(b)` | `Some(c)` | error: message should have been signed by `b` or `c` |
 
 ### `load_meta` processing sequence
 
