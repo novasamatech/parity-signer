@@ -29,7 +29,7 @@ jobs:
           toolchain:      stable
 
       - name:             Setup mdBook
-        uses:             peaceiris/actions-mdbook@v1.1.13
+        uses:             peaceiris/actions-mdbook@v1.1.14
         with:
           mdbook-version: 'latest'
 
