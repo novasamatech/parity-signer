@@ -65,6 +65,13 @@ pub fn load_metadata(
                 }))
             }
         };
+    if meta_values.name != network_specs.name {
+        return Err(ErrorSigner::Input(InputSigner::LoadMetaWrongGenesisHash {
+            name_metadata: meta_values.name,
+            name_specs: network_specs.name,
+            genesis_hash: network_specs.genesis_hash,
+        }));
+    }
     if let Some(prefix_from_meta) = meta_values.optional_base58prefix {
         if prefix_from_meta != network_specs.base58prefix {
             return Err(<Signer>::faulty_metadata(
