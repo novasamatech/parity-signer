@@ -123,7 +123,7 @@ fn print_db_content(dbname: &str) -> String {
     let mut verifiers_set: Vec<String> = Vec::new();
     let verifiers: Tree = database.open_tree(VERIFIERS).unwrap();
     for (verifier_key_vec, current_verifier_encoded) in verifiers.iter().flatten() {
-        let verifier_key = VerifierKey::from_ivec(&verifier_key_vec);
+        let verifier_key = VerifierKey::from_ivec::<Signer>(&verifier_key_vec).unwrap();
         let current_verifier = CurrentVerifier::decode(&mut &current_verifier_encoded[..]).unwrap();
         match current_verifier {
             CurrentVerifier::Valid(a) => {

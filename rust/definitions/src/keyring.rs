@@ -146,8 +146,12 @@ impl VerifierKey {
     }
 
     /// Transform database `IVec` key into [`VerifierKey`]  
-    pub fn from_ivec(ivec: &IVec) -> Self {
-        Self(H256::from_slice(ivec))
+    pub fn from_ivec<T: ErrorSource>(ivec: &IVec) -> Result<Self, T::Error> {
+        let bytes: [u8; 32] = ivec
+            .to_vec()
+            .try_into()
+            .map_err(|_| <T>::faulty_database_types())?;
+        Ok(Self(bytes.into()))
     }
 
     /// Get genesis hash from the [`VerifierKey`]

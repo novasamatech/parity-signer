@@ -112,7 +112,7 @@ impl GeneralHold {
         let settings = open_tree::<Signer>(&database, SETTREE)?;
         let verifiers = open_tree::<Signer>(&database, VERIFIERS)?;
         for (verifier_key_vec, current_verifier_encoded) in verifiers.iter().flatten() {
-            let verifier_key = VerifierKey::from_ivec(&verifier_key_vec);
+            let verifier_key = VerifierKey::from_ivec::<Signer>(&verifier_key_vec)?;
             let current_verifier =
                 match <CurrentVerifier>::decode(&mut &current_verifier_encoded[..]) {
                     Ok(a) => a,
