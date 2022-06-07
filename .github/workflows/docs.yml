@@ -1,4 +1,4 @@
-name:                     Check links and Publish Docs
+name:                       Check links and Publish Docs
 
 on:
   pull_request:
@@ -10,47 +10,87 @@ on:
       - 'docs/**'
 
 jobs:
-  deploy-docs:
-    name:                 Deploy docs
-    runs-on:              ubuntu-latest
+  user-docs:
+    name:                   User docs
+    runs-on:                ubuntu-latest
     steps:
 
-      - name:             Cancel Previous Runs
-        uses:             styfle/cancel-workflow-action@0.9.1
+      - name:               Cancel Previous Runs
+        uses:               styfle/cancel-workflow-action@0.9.1
         with:
-          access_token:   ${{ github.token }}
+          access_token:     ${{ github.token }}
 
-      - name:             Checkout repository
-        uses:             actions/checkout@v3.0.2
+      - name:               Checkout repository
+        uses:               actions/checkout@v3.0.2
 
-      - name:             Use Rust toolchain
-        uses:             actions-rs/toolchain@v1
+      - name:               Use Rust toolchain
+        uses:               actions-rs/toolchain@v1
         with:
-          toolchain:      stable
+          toolchain:        stable
 
-      - name:             Setup mdBook
-        uses:             peaceiris/actions-mdbook@v1.1.13
+      - name:               Setup mdBook
+        uses:               peaceiris/actions-mdbook@v1.1.13
         with:
-          mdbook-version: 'latest'
+          mdbook-version:   latest
 
-      - name:             Install mdbook-linkcheck
-        uses:             baptiste0928/cargo-install@v1
+      - name:               Install mdbook-linkcheck
+        uses:               baptiste0928/cargo-install@v1
         with:
-          crate:          mdbook-linkcheck
+          crate:            mdbook-linkcheck
 
-      - name:             Install mdbook-mermaid
-        uses:             baptiste0928/cargo-install@v1
+      - name:               Install mdbook-mermaid
+        uses:               baptiste0928/cargo-install@v1
         with:
-          crate:          mdbook-mermaid
+          crate:            mdbook-mermaid
 
-      - name:             Build docs
-        run:              |
+      - name:               Build docs
+        run:                |
           mdbook build docs
 
-      - name:             Deploy documentation
-        uses:             peaceiris/actions-gh-pages@v3
+      - name:               Deploy documentation
+        uses:               peaceiris/actions-gh-pages@v3
         # if:               ${{ github.ref == 'refs/heads/master' }}
         with:
-          github_token:   ${{ secrets.GITHUB_TOKEN }}
-          publish_branch: gh-pages
-          publish_dir:    docs/book/html/
+          github_token:       ${{ github.token }}
+          publish_dir:        ./docs/book/html/
+          destination_dir:    ./
+
+  rustdocs:
+    name:                     Build rustdoc
+    runs-on:                  ubuntu-latest
+    steps:
+
+      - name:                 Cancel Previous Runs
+        uses:                 styfle/cancel-workflow-action@0.9.1
+        with:
+          access_token:       ${{ github.token }}
+
+      - name:                 Checkout sources
+        uses:                 actions/checkout@v3
+        with:
+          fetch-depth:        1
+          submodules:         recursive
+
+      - name:                 Install system dependancies
+        run:                  |
+          sudo apt update
+          sudo apt install -y clang libclang-dev libopencv-dev
+
+      - name:                 Rust Cache
+        uses:                 Swatinem/rust-cache@v1.3.0
+        with:
+          working-directory:  rust
+
+      - name:                 cargo doc
+        run:                  |
+          cd rust
+          cargo doc --all-features --verbose
+
+      - name:                 Deploy
+        uses:                 peaceiris/actions-gh-pages@v3
+        # if:                   ${{ github.ref == 'refs/heads/master' }}
+        with:
+          github_token:       ${{ github.token }}
+          publish_dir:        ./rust/target/doc
+          destination_dir:    ./rustdocs
+          force_orphan:       true
