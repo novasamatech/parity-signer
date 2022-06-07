@@ -25,8 +25,10 @@ import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.ContextCompat
+import com.google.mlkit.vision.barcode.BarcodeScannerOptions
 import com.google.mlkit.vision.barcode.BarcodeScanner
 import com.google.mlkit.vision.barcode.BarcodeScanning
+import com.google.mlkit.vision.barcode.common.Barcode
 import io.parity.signer.components.ScanProgressBar
 import io.parity.signer.ui.theme.Crypto400
 import io.parity.signer.uniffi.Action
@@ -85,7 +87,12 @@ fun ScanScreen(
 				factory = { context ->
 					val executor = ContextCompat.getMainExecutor(context)
 					val previewView = PreviewView(context)
-					val barcodeScanner = BarcodeScanning.getClient()
+					// mlkit docs: The default option is not recommended because it tries
+					// to scan all barcode formats, which is slow.
+					val options = BarcodeScannerOptions.Builder()
+						.setBarcodeFormats(Barcode.FORMAT_QR_CODE).build()
+
+					val barcodeScanner = BarcodeScanning.getClient(options)
 
 					// This might be done more elegantly, if needed.
 					// But it's pretty obvious that the app needs camera
