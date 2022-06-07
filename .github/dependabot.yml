@@ -2,6 +2,6 @@ version: 2
 updates:
   - package-ecosystem: "cargo"
     directory: "/rust"
+    labels: "dependabot"
     schedule:
       interval: "daily"
-      labels: "dependabot"
