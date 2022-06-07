@@ -5,8 +5,8 @@ updates:
     labels: ["dependabot"]
     schedule:
       interval: "daily"
-    - package-ecosystem: "github-actions"
-      directory: "/"
-      labels: ["dependabot"]
-      schedule:
-        interval: "daily"
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    labels: ["dependabot"]
+    schedule:
+      interval: "daily"
