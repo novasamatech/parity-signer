@@ -17,15 +17,12 @@ import androidx.compose.ui.unit.dp
 import io.parity.signer.components.HeaderBar
 import io.parity.signer.components.KeyCard
 import io.parity.signer.components.NetworkCard
-import io.parity.signer.models.SignerDataModel
 import io.parity.signer.models.intoImageBitmap
 import io.parity.signer.ui.theme.Bg200
-import org.json.JSONObject
+import io.parity.signer.uniffi.MKeyDetails
 
 @Composable
-fun ExportPublicKey(signerDataModel: SignerDataModel) {
-	val address = signerDataModel.screenData.value ?: JSONObject()
-
+fun ExportPublicKey(keyDetails: MKeyDetails) {
 	Column(
 		modifier = Modifier
 			.fillMaxWidth()
@@ -39,31 +36,35 @@ fun ExportPublicKey(signerDataModel: SignerDataModel) {
 				)
 				.fillMaxWidth()
 		) {
-			KeyCard(identity = address)
+			KeyCard(identity = keyDetails.address)
 		}
-		Row (
+		Row(
 			Modifier.padding(top = 3.dp, start = 12.dp, end = 12.dp)
-			) {
-			NetworkCard(address)
+		) {
+			NetworkCard(
+				network = keyDetails.networkInfo
+			)
 		}
 		Image(
-			address.optString("qr").intoImageBitmap(),
+			keyDetails.qr.intoImageBitmap(),
 			contentDescription = "QR with address to scan",
 			contentScale = ContentScale.FillWidth,
-			modifier = Modifier.padding(12.dp).fillMaxWidth(1f)
+			modifier = Modifier
+				.padding(12.dp)
+				.fillMaxWidth(1f)
 		)
 		HeaderBar(line1 = "KEY DETAILS", line2 = "")
 		Row {
-			Text("Base58 key:")
-			Text(address.optString("base58"))
+			Text("Base58 key: ")
+			Text(keyDetails.address.base58)
 		}
 		Row {
-			Text("Hex key:")
-			Text(address.optString("pubkey"))
+			Text("Hex key: ")
+			Text(keyDetails.pubkey)
 		}
 		Row {
-			Text("Seed name:")
-			Text(address.optString("seed_name"))
+			Text("Seed name: ")
+			Text(keyDetails.address.seedName)
 		}
 	}
 }

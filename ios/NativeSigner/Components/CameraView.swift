@@ -23,12 +23,13 @@ struct CameraView: View {
                     }
                     .onDisappear {
                         print("shutdown camera")
+                        UIApplication.shared.isIdleTimerDisabled = false
                         model.shutdown()
                     }
                     .onReceive(model.$payload, perform: { payload in
                         if payload != nil {
                             DispatchQueue.main.async {
-                                data.pushButton(buttonID: .TransactionFetched, details: payload ?? "")
+                                data.pushButton(action: .transactionFetched, details: payload ?? "")
                             }
                         }
                     })
@@ -43,6 +44,11 @@ struct CameraView: View {
                     })
                     .onReceive(model.$captured, perform: {rCaptured in
                         captured = rCaptured
+                        if (rCaptured ?? 0 > 0) {
+                            UIApplication.shared.isIdleTimerDisabled = true
+                        } else {
+                            UIApplication.shared.isIdleTimerDisabled = false
+                        }
                     })
                     .mask(
                         VStack {

@@ -35,7 +35,7 @@ struct LogComment: View {
                                 focused = true
                             }
                             .onSubmit {
-                                data.pushButton(buttonID: .GoForward, details: comment)
+                                data.pushButton(action: .goForward, details: comment)
                             }
                     }
                 }

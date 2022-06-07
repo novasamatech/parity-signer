@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct TCNameVersion: View {
-    let value: NameVersion
+    let value: MscNameVersion
     var body: some View {
         TCNameValueTemplate(name: value.name, value: value.version)
     }

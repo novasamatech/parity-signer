@@ -7,20 +7,25 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.runtime.Composable
 import io.parity.signer.models.abbreviateString
-import io.parity.signer.models.decode64
-import io.parity.signer.models.parseTransaction
-import org.json.JSONArray
-import org.json.JSONObject
+import io.parity.signer.models.encodeHex
+import io.parity.signer.uniffi.Event
+import io.parity.signer.uniffi.MEventMaybeDecoded
+import io.parity.signer.uniffi.ValidCurrentVerifier
+import io.parity.signer.uniffi.VerifierValue
 
 /**
  * Detailed history event description representation selector
  */
 @Composable
-fun HistoryCardExtended(card: JSONObject) {
-	val timestamp = ""
-	val payload = card.optJSONObject("payload")
-	when (card.getString("event")) {
-		"database_initiated" -> {
+fun HistoryCardExtended(
+	event: MEventMaybeDecoded,
+	timestamp: String
+) {
+	val decodedTransaction = event.decoded
+	val signedBy = event.signedBy
+	val verifierDetails = event.verifierDetails
+	when (val eventVal = event.event) {
+		is Event.DatabaseInitiated -> {
 			HistoryCardTemplate(
 				image = Icons.Default.Smartphone,
 				line1 = timestamp,
@@ -28,7 +33,7 @@ fun HistoryCardExtended(card: JSONObject) {
 				line3 = ""
 			)
 		}
-		"device_online" -> {
+		is Event.DeviceWasOnline -> {
 			HistoryCardTemplate(
 				image = Icons.Default.Dangerous,
 				line1 = timestamp,
@@ -37,17 +42,24 @@ fun HistoryCardExtended(card: JSONObject) {
 				danger = true
 			)
 		}
-		"general_verifier_added" -> {
+		is Event.GeneralVerifierSet -> {
+			val hex = eventVal.verifier.v.let {
+				when (it) {
+					is VerifierValue.Standard -> {
+						it.m
+					}
+					else -> listOf()
+				}
+			}
 			HistoryCardTemplate(
 				image = Icons.Default.Shield,
 				line1 = timestamp,
 				line2 = "General verifier set",
-				line3 = payload?.optString("hex")
-					?.abbreviateString(8) + payload
-					?.optString("encryption")
+				line3 = hex.getOrElse(0) { "" }
+					.abbreviateString(8) + hex.getOrElse(1) { "" }
 			)
 		}
-		"history_cleared" -> {
+		is Event.HistoryCleared -> {
 			HistoryCardTemplate(
 				image = Icons.Default.DeleteForever,
 				line1 = timestamp,
@@ -55,7 +67,7 @@ fun HistoryCardExtended(card: JSONObject) {
 				line3 = ""
 			)
 		}
-		"identities_wiped" -> {
+		is Event.IdentitiesWiped -> {
 			HistoryCardTemplate(
 				image = Icons.Default.Delete,
 				line1 = timestamp,
@@ -63,88 +75,106 @@ fun HistoryCardExtended(card: JSONObject) {
 				line3 = ""
 			)
 		}
-		"identity_added" -> {
-			HistoryCardTemplate(
-				image = Icons.Default.Pattern,
-				line1 = timestamp,
-				line2 = "Key created",
-				line3 = payload
-					?.optString("seed_name")?.decode64() + payload
-					?.optString("path")
-			)
+		is Event.IdentityAdded -> {
+			eventVal.identityHistory.let {
+				HistoryCardTemplate(
+					image = Icons.Default.Pattern,
+					line1 = timestamp,
+					line2 = "Key created",
+					line3 = it.seedName + it.path
+				)
+			}
 		}
-		"identity_removed" -> {
-			HistoryCardTemplate(
-				image = Icons.Default.Delete,
-				line1 = timestamp,
-				line2 = "Key removed",
-				line3 = payload
-					?.optString("seed_name")?.decode64() + payload
-					?.optString("path")
-			)
+		is Event.IdentityRemoved -> {
+			eventVal.identityHistory.let {
+				HistoryCardTemplate(
+					image = Icons.Default.Delete,
+					line1 = timestamp,
+					line2 = "Key removed",
+					line3 = it.seedName + it.path
+				)
+			}
 		}
-		"message_sign_error" -> {
+		is Event.MessageSignError -> {
 			HistoryCardTemplate(
 				image = Icons.Default.Warning,
 				line1 = timestamp,
 				line2 = "Message signing error!",
-				line3 = payload?.optString("Error") ?: "",
+				line3 = "message:" + eventVal.signMessageDisplay.message + " user comment: " + eventVal.signMessageDisplay.userComment,
 				danger = true
 			)
 		}
-		"message_signed" -> {
+		is Event.MessageSigned -> {
 			HistoryCardTemplate(
 				image = Icons.Default.Done,
 				line1 = timestamp,
 				line2 = "Generated signature for message",
-				line3 = payload?.optString("user_comment")?.decode64() ?: ""
+				line3 = "message:" + eventVal.signMessageDisplay.message + " user comment: " + eventVal.signMessageDisplay.userComment
 			)
 		}
-		"metadata_added" -> {
-			HistoryCardTemplate(
-				image = Icons.Default.QrCodeScanner,
-				line1 = timestamp,
-				line2 = "Metadata added",
-				line3 = payload?.optString("specname") + " version " + payload?.optString(
-					"spec_version"
+		is Event.MetadataAdded -> {
+			eventVal.metaValuesDisplay.let {
+				HistoryCardTemplate(
+					image = Icons.Default.QrCodeScanner,
+					line1 = timestamp,
+					line2 = "Metadata added",
+					line3 = it.name + " version " + it.version
 				)
-			)
+			}
 		}
-		"metadata_removed" -> {
-			HistoryCardTemplate(
-				image = Icons.Default.Delete,
-				line1 = timestamp,
-				line2 = "Metadata removed",
-				line3 = payload?.optString("specname") + " version " + payload?.optString(
-					"spec_version"
+		is Event.MetadataRemoved -> {
+			eventVal.metaValuesDisplay.let {
+				HistoryCardTemplate(
+					image = Icons.Default.Delete,
+					line1 = timestamp,
+					line2 = "Metadata removed",
+					line3 = it.name + " version " + it.version
 				)
-			)
+			}
 		}
-		"network_specs_added" -> {
+		is Event.NetworkSpecsAdded -> {
 			HistoryCardTemplate(
 				image = Icons.Default.QrCodeScanner,
 				line1 = timestamp,
 				line2 = "Network added",
-				line3 = payload?.optString("title") ?: ""
+				line3 = eventVal.networkSpecsDisplay.specs.title,
 			)
 		}
-		"network_removed" -> {
+		is Event.NetworkSpecsRemoved -> {
 			HistoryCardTemplate(
 				image = Icons.Default.Delete,
 				line1 = timestamp,
 				line2 = "Network removed",
-				line3 = payload?.optString("title") ?: ""
+				line3 = eventVal.networkSpecsDisplay.specs.title
 			)
 		}
-		"network_verifier_set" -> {
+		is Event.NetworkVerifierSet -> {
+			var line3 =
+				when (val ver = eventVal.networkVerifierDisplay.validCurrentVerifier) {
+					is ValidCurrentVerifier.Custom -> {
+						when (val v = ver.v.v) {
+							is VerifierValue.Standard -> v.m.getOrElse(0) { "" } + " with encryption " + v.m.getOrElse(1) {""}
+							null -> ""
+						}
+					}
+					ValidCurrentVerifier.General -> {
+						when (val v = eventVal.networkVerifierDisplay.generalVerifier.v) {
+							is VerifierValue.Standard -> "general"
+							null -> ""
+						}
+					}
+				}
+
+			line3 += " for network with genesis hash " + eventVal.networkVerifierDisplay.genesisHash.toUByteArray()
+				.toByteArray().encodeHex()
 			HistoryCardTemplate(
 				image = Icons.Default.Shield,
 				line1 = timestamp,
 				line2 = "Network verifier set",
-				line3 = payload?.optString("genesis_hash") ?: ""
+				line3 = line3
 			)
 		}
-		"reset_danger_record" -> {
+		is Event.ResetDangerRecord -> {
 			HistoryCardTemplate(
 				image = Icons.Default.DeleteForever,
 				line1 = timestamp,
@@ -153,39 +183,41 @@ fun HistoryCardExtended(card: JSONObject) {
 				danger = true
 			)
 		}
-		"seed_created" -> {
+		is Event.SeedCreated -> {
 			HistoryCardTemplate(
 				image = Icons.Default.Pattern,
 				line1 = timestamp,
 				line2 = "Seed created",
-				line3 = card.optString("payload").decode64()
+				line3 = eventVal.seedCreated
 			)
 		}
-		"seed_name_shown" -> {
+		is Event.SeedNameWasShown -> {
 			HistoryCardTemplate(
 				image = Icons.Default.Warning,
 				line1 = timestamp,
 				line2 = "Seed was shown",
-				line3 = card.optString("payload").decode64()
+				line3 = eventVal.seedNameWasShown
 			)
 		}
-		"add_specs_message_signed" -> {
+		is Event.NetworkSpecsSigned -> {
 			HistoryCardTemplate(
 				image = Icons.Default.Verified,
 				line1 = timestamp,
 				line2 = "Network specs signed",
-				line3 = payload?.optString("title") ?: ""
+				line3 = eventVal.networkSpecsExport.specsToSend.title
 			)
 		}
-		"load_metadata_message_signed" -> {
-			HistoryCardTemplate(
-				image = Icons.Default.Verified,
-				line1 = timestamp,
-				line2 = "Meta signed",
-				line3 = payload?.optString("specname") + payload?.optString("spec_version")
-			)
+		is Event.MetadataSigned -> {
+			eventVal.metaValuesExport.let {
+				HistoryCardTemplate(
+					image = Icons.Default.Verified,
+					line1 = timestamp,
+					line2 = "Meta signed",
+					line3 = it.name + it.version
+				)
+			}
 		}
-		"load_types_message_signed" -> {
+		is Event.TypesSigned -> {
 			HistoryCardTemplate(
 				image = Icons.Default.Verified,
 				line1 = timestamp,
@@ -193,45 +225,53 @@ fun HistoryCardExtended(card: JSONObject) {
 				line3 = ""
 			)
 		}
-		"system_entered_event" -> {
+		is Event.SystemEntry -> {
 			HistoryCardTemplate(
 				image = Icons.Default.Warning,
 				line1 = timestamp,
 				line2 = "System entry",
-				line3 = card.optString("payload")
+				line3 = eventVal.systemEntry
 			)
 		}
-		"transaction_sign_error" -> {
+		is Event.TransactionSignError -> {
 			HistoryCardTemplate(
 				image = Icons.Default.Dangerous,
 				line1 = timestamp,
 				line2 = "Signing failure",
-				line3 = card.optJSONObject("payload")?.optString("user_comment")?.decode64() ?: "",
+				line3 = eventVal.signDisplay.userComment,
 				danger = true
 			)
 		}
-		"transaction_signed" -> {
-			val content = card.optJSONObject("payload")?: JSONObject()
+		is Event.TransactionSigned -> {
 			Column {
 				Text("Transaction signed")
-				TransactionPreviewField(
-					transaction = content.optJSONObject("transaction")?.parseTransaction() ?: JSONArray()
-				)
+
+				if (decodedTransaction != null) {
+					TransactionPreviewField(
+						cardSet = decodedTransaction
+					)
+				}
 				Text("Signed by:")
 				Row {
-					Identicon(identicon = content.optJSONObject("signed_by")?.optString("identicon") ?: "")
+					Identicon(
+						identicon = signedBy?.identicon ?: listOf()
+					)
 					Column {
-						Text(content.optJSONObject("signed_by")?.optString("hex") ?: "")
-						Text(content.optJSONObject("signed_by")?.optString("encryption") ?: "")
+						Text(verifierDetails?.publicKey ?: "")
+						Text(
+							verifierDetails?.encryption ?: ""
+						)
 					}
 				}
 				Text("In network")
-				Text(content.optString("network_name"))
+				Text(eventVal.signDisplay.networkName)
 				Text("Comment:")
-				Text(card.optJSONObject("payload")?.optString("user_comment")?.decode64() ?: "")
+				Text(
+					eventVal.signDisplay.userComment
+				)
 			}
 		}
-		"types_info_updated" -> {
+		is Event.TypesAdded -> {
 			HistoryCardTemplate(
 				image = Icons.Default.QrCodeScanner,
 				line1 = timestamp,
@@ -239,7 +279,7 @@ fun HistoryCardExtended(card: JSONObject) {
 				line3 = ""
 			)
 		}
-		"types_removed" -> {
+		is Event.TypesRemoved -> {
 			HistoryCardTemplate(
 				image = Icons.Default.Remove,
 				line1 = timestamp,
@@ -248,38 +288,29 @@ fun HistoryCardExtended(card: JSONObject) {
 				danger = true
 			)
 		}
-		"user_entered_event" -> {
+		is Event.UserEntry -> {
 			HistoryCardTemplate(
 				image = Icons.Default.Note,
 				line1 = timestamp,
 				line2 = "User entry",
-				line3 = card.optString("payload")
+				line3 = eventVal.userEntry
 			)
 		}
-		"warning" -> {
+		is Event.Warning -> {
 			HistoryCardTemplate(
 				image = Icons.Default.Warning,
 				line1 = timestamp,
 				line2 = "Warning!",
-				line3 = card.optString("payload"),
+				line3 = eventVal.warning,
 				danger = true
 			)
 		}
-		"wrong_password_entered" -> {
+		is Event.WrongPassword -> {
 			HistoryCardTemplate(
 				image = Icons.Default.Warning,
 				line1 = timestamp,
 				line2 = "Wrong password entered",
 				line3 = "operation declined",
-				danger = true
-			)
-		}
-		else -> {
-			HistoryCardTemplate(
-				image = Icons.Default.Error,
-				line1 = timestamp,
-				line2 = "Record corrupted",
-				line3 = card.getString("event"),
 				danger = true
 			)
 		}

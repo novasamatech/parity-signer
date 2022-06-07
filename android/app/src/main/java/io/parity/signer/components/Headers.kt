@@ -23,7 +23,11 @@ fun HeaderBar(
 ) {
 	Column(modifier = modifier) {
 		HeadingOverline(text = line1)
-		Text(line2, style = MaterialTheme.typography.subtitle2, color = MaterialTheme.colors.Text400)
+		Text(
+			line2,
+			style = MaterialTheme.typography.subtitle2,
+			color = MaterialTheme.colors.Text400
+		)
 		Divider()
 		Spacer(Modifier.height(12.dp))
 	}
@@ -31,6 +35,10 @@ fun HeaderBar(
 
 @Composable
 fun HeadingOverline(text: String) {
-	Text(text.uppercase(), style = MaterialTheme.typography.overline, color = MaterialTheme.colors.Text600)
+	Text(
+		text.uppercase(),
+		style = MaterialTheme.typography.overline,
+		color = MaterialTheme.colors.Text600
+	)
 }
 
