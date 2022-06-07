@@ -1,4 +1,4 @@
-name:                       Check links and Publish Docs
+name:                         Check links and Publish Docs
 
 on:
   pull_request:
@@ -11,49 +11,49 @@ on:
 
 jobs:
   user-docs:
-    name:                   User docs
-    runs-on:                ubuntu-latest
+    name:                     User docs
+    runs-on:                  ubuntu-latest
     steps:
 
-      - name:               Cancel Previous Runs
-        uses:               styfle/cancel-workflow-action@0.9.1
+      - name:                 Cancel Previous Runs
+        uses:                 styfle/cancel-workflow-action@0.9.1
         with:
-          access_token:     ${{ github.token }}
+          access_token:       ${{ github.token }}
 
-      - name:               Checkout repository
-        uses:               actions/checkout@v3.0.2
+      - name:                 Checkout repository
+        uses:                 actions/checkout@v3.0.2
 
-      - name:               Use Rust toolchain
-        uses:               actions-rs/toolchain@v1
+      - name:                 Use Rust toolchain
+        uses:                 actions-rs/toolchain@v1
         with:
-          toolchain:        stable
+          toolchain:          stable
 
-      - name:               Setup mdBook
-        uses:               peaceiris/actions-mdbook@v1.1.13
+      - name:                 Setup mdBook
+        uses:                 peaceiris/actions-mdbook@v1.1.13
         with:
-          mdbook-version:   latest
+          mdbook-version:     latest
 
-      - name:               Install mdbook-linkcheck
-        uses:               baptiste0928/cargo-install@v1
+      - name:                 Install mdbook-linkcheck
+        uses:                 baptiste0928/cargo-install@v1
         with:
-          crate:            mdbook-linkcheck
+          crate:              mdbook-linkcheck
 
-      - name:               Install mdbook-mermaid
-        uses:               baptiste0928/cargo-install@v1
+      - name:                 Install mdbook-mermaid
+        uses:                 baptiste0928/cargo-install@v1
         with:
-          crate:            mdbook-mermaid
+          crate:              mdbook-mermaid
 
-      - name:               Build docs
-        run:                |
+      - name:                 Build docs
+        run:                  |
           mdbook build docs
 
-      - name:               Deploy documentation
-        uses:               peaceiris/actions-gh-pages@v3
-        # if:               ${{ github.ref == 'refs/heads/master' }}
+      - name:                 Deploy documentation
+        uses:                 peaceiris/actions-gh-pages@v3
+        # if:                 ${{ github.ref == 'refs/heads/master' }}
         with:
           github_token:       ${{ github.token }}
           publish_dir:        ./docs/book/html/
-          destination_dir:    ./
+          destination_dir:    ./user-docs
 
   rustdocs:
     name:                     Build rustdoc
