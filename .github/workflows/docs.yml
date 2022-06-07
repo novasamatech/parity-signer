@@ -47,7 +47,7 @@ jobs:
         run:                  |
           mdbook build docs
 
-      - name:                 Deploy documentation
+      - name:                 Deploy user documentation
         uses:                 peaceiris/actions-gh-pages@v3
         # if:                 ${{ github.ref == 'refs/heads/master' }}
         with:
@@ -86,11 +86,10 @@ jobs:
           cd rust
           cargo doc --all-features --verbose
 
-      - name:                 Deploy
+      - name:                 Deploy rustdoc
         uses:                 peaceiris/actions-gh-pages@v3
         # if:                   ${{ github.ref == 'refs/heads/master' }}
         with:
           github_token:       ${{ github.token }}
           publish_dir:        ./rust/target/doc
           destination_dir:    ./rustdocs
-          force_orphan:       true
