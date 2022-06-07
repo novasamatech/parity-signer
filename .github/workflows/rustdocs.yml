@@ -6,6 +6,8 @@ on:
   push:
     branches:
       - master
+  tags:
+      - 'v*.*.*'
 
 jobs:
   rustdocs:
@@ -43,4 +45,4 @@ jobs:
         uses:                 peaceiris/actions-gh-pages@v3
         with:
           github_token:       ${{ github.token }}
-          publish_dir:        target/doc
+          publish_dir:        ./parity-signer/target/doc
