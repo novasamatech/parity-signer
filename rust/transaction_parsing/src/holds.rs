@@ -62,7 +62,7 @@ fn collect_set(
                             DatabaseSigner::DifferentNamesSameGenesisHash {
                                 name1: n,
                                 name2: network_specs.name,
-                                genesis_hash,
+                                genesis_hash: network_specs.genesis_hash,
                             },
                         ));
                     }
