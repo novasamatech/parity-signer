@@ -46,3 +46,5 @@ jobs:
         with:
           github_token:       ${{ github.token }}
           publish_dir:        ./rust/target/doc
+          destination_dir:    ./rustdocs
+          force_orphan:       true
