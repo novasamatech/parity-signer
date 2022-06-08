@@ -271,6 +271,7 @@ impl ErrorSource for Signer {
                         };
                         format!("Network {} was previously known to the database with verifier {}. However, no network specs are in the database at the moment. Add network specs before loading the metadata.", name, insert)
                     },
+                    InputSigner::LoadMetaWrongGenesisHash {name_metadata, name_specs, genesis_hash} => format!("Update payload contains metadata for network {}. Genesis hash in payload ({}) matches database genesis hash for another network, {}.", name_metadata, hex::encode(genesis_hash), name_specs),
                     InputSigner::NeedVerifier{name, verifier_value} => format!("Saved network {} information was signed by verifier {}. Received information is not signed.", name, verifier_value.show_error()),
                     InputSigner::NeedGeneralVerifier{content, verifier_value} => {
                         let insert = match content {
@@ -689,11 +690,10 @@ pub enum DatabaseSigner {
 
     /// While searching for all networks with same genesis hash, found that
     /// there are networks with same genesis hash, but different names.
-    // TODO: is this really an error? if it is, add error to data loading too.
     DifferentNamesSameGenesisHash {
         name1: String,
         name2: String,
-        genesis_hash: Vec<u8>,
+        genesis_hash: H256,
     },
 
     /// Network [`CurrentVerifier`](crate::network_specs::CurrentVerifier) is
@@ -1083,6 +1083,28 @@ pub enum InputSigner {
 
         /// Signer general verifier
         general_verifier: Verifier,
+    },
+
+    /// User attempted to load into Signer the metadata for the network that
+    /// has a [`NetworkSpecs`](crate::network_specs::NetworkSpecs) entry in the
+    /// `SPECSTREE` tree of the Signer database, but specs have a different
+    /// network name.
+    ///
+    /// Most likely, wrong genesis hash was attached to the metadata update.
+    ///
+    /// Since the network metadata in `METATREE` is identified by network name,
+    /// and verifier is identified by the genesis hash, this should be checked
+    /// on `load_metadata`.
+    LoadMetaWrongGenesisHash {
+        /// network name as it is in the received metadata
+        name_metadata: String,
+
+        /// network name as it is in the network specs for genesis hash
+        name_specs: String,
+
+        /// genesis hash from the `load_metadata` payload, that was used to find
+        /// the network specs and verifier information
+        genesis_hash: H256,
     },
 
     /// Received `add_specs` or `load_metadata` update payload is not verified.

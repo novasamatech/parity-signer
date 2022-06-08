@@ -21,7 +21,7 @@ jobs:
           access_token:   ${{ github.token }}
 
       - name:             Checkout repository
-        uses:             actions/checkout@v2.4.0
+        uses:             actions/checkout@v3.0.2
 
       - name:             Use Rust toolchain
         uses:             actions-rs/toolchain@v1
@@ -29,7 +29,7 @@ jobs:
           toolchain:      stable
 
       - name:             Setup mdBook
-        uses:             peaceiris/actions-mdbook@v1.1.13
+        uses:             peaceiris/actions-mdbook@v1.1.14
         with:
           mdbook-version: 'latest'
 

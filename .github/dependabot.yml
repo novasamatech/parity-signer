@@ -1,0 +1,12 @@
+version: 2
+updates:
+  - package-ecosystem: "cargo"
+    directory: "/rust"
+    labels: ["dependabot"]
+    schedule:
+      interval: "daily"
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    labels: ["dependabot"]
+    schedule:
+      interval: "daily"

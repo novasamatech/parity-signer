@@ -217,7 +217,7 @@ pub fn default_verifiers() -> Vec<(VerifierKey, CurrentVerifier)> {
     let mut out: Vec<(VerifierKey, CurrentVerifier)> = Vec::new();
     for x in default_network_info() {
         out.push((
-            VerifierKey::from_parts(x.genesis_hash.as_bytes()),
+            VerifierKey::from_parts(x.genesis_hash),
             CurrentVerifier::Valid(ValidCurrentVerifier::General),
         ));
     }
