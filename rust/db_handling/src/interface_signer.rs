@@ -572,7 +572,7 @@ pub fn network_details_by_key(
         title,
         unit,
     } = get_network_specs(database_name, network_specs_key)?;
-    let verifier_key = VerifierKey::from_parts(genesis_hash.as_bytes());
+    let verifier_key = VerifierKey::from_parts(genesis_hash);
     let general_verifier = get_general_verifier(database_name)?;
     let current_verifier = get_valid_current_verifier(&verifier_key, database_name)?;
     let meta: Vec<_> = get_meta_values_by_name(database_name, &name)?
