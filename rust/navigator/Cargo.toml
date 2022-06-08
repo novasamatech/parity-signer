@@ -21,7 +21,7 @@ sp-core = {git = "https://github.com/paritytech/substrate", default-features = f
 sp-runtime = {git = "https://github.com/paritytech/substrate", default-features = false}
 transaction_parsing = {path = "../transaction_parsing"}
 transaction_signing = {path = "../transaction_signing"}
-zeroize = "1.5.3"
+zeroize = "1.5.5"
 
 [dev-dependencies]
 pretty_assertions = "1"
