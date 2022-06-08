@@ -591,7 +591,7 @@ pub fn all_events_preview() -> Vec<Event> {
         },
         Event::NetworkVerifierSet {
             network_verifier_display: NetworkVerifierDisplay::get(
-                &VerifierKey::from_parts(network_specs.genesis_hash.as_bytes()),
+                &VerifierKey::from_parts(network_specs.genesis_hash),
                 &valid_current_verifier,
                 &verifier,
             ),
