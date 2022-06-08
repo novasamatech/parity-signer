@@ -25,7 +25,7 @@ pub fn add_specs(data_hex: &str, database_name: &str) -> Result<TransactionActio
     let checked_info = pass_crypto(data_hex, TransferContent::AddSpecs)?;
     let specs = ContentAddSpecs::from_slice(&checked_info.message).specs::<Signer>()?;
     let network_specs_key = NetworkSpecsKey::from_parts(&specs.genesis_hash, &specs.encryption);
-    let verifier_key = VerifierKey::from_parts(specs.genesis_hash.as_bytes());
+    let verifier_key = VerifierKey::from_parts(specs.genesis_hash);
     let possible_valid_current_verifier =
         try_get_valid_current_verifier(&verifier_key, database_name)?;
     let general_verifier = get_general_verifier(database_name)?;

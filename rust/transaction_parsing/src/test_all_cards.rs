@@ -219,7 +219,7 @@ Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deseru
     );
     warning.push(
         Card::Warning(Warning::VerifierChangingToGeneral {
-            verifier_key: &VerifierKey::from_parts(network_specs_westend.genesis_hash.as_bytes()),
+            verifier_key: &VerifierKey::from_parts(network_specs_westend.genesis_hash),
             hold: &Hold {
                 metadata_set: Vec::new(),
                 network_specs_set: Vec::new(),
@@ -229,7 +229,7 @@ Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deseru
     );
     warning.push(
         Card::Warning(Warning::VerifierChangingToCustom {
-            verifier_key: &VerifierKey::from_parts(network_specs_westend.genesis_hash.as_bytes()),
+            verifier_key: &VerifierKey::from_parts(network_specs_westend.genesis_hash),
             hold: &Hold {
                 metadata_set: Vec::new(),
                 network_specs_set: Vec::new(),
@@ -239,7 +239,7 @@ Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deseru
     );
     warning.push(
         Card::Warning(Warning::VerifierGeneralSuper {
-            verifier_key: &VerifierKey::from_parts(network_specs_westend.genesis_hash.as_bytes()),
+            verifier_key: &VerifierKey::from_parts(network_specs_westend.genesis_hash),
             hold: &Hold {
                 metadata_set: Vec::new(),
                 network_specs_set: Vec::new(),
