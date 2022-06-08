@@ -749,8 +749,10 @@ fn flow_test_1() {
                 color: "#000".to_string(),
                 decimals: 12,
                 encryption: Encryption::Sr25519,
-                genesis_hash: "b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe"
-                    .to_string(),
+                genesis_hash: H256::from_str(
+                    "b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe",
+                )
+                .unwrap(),
                 logo: "kusama".to_string(),
                 name: "kusama".to_string(),
                 order: "1".to_string(),
@@ -861,8 +863,10 @@ fn flow_test_1() {
                 color: "#000".to_string(),
                 decimals: 12,
                 encryption: Encryption::Sr25519,
-                genesis_hash: "b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe"
-                    .to_string(),
+                genesis_hash: H256::from_str(
+                    "b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe",
+                )
+                .unwrap(),
                 logo: "kusama".to_string(),
                 name: "kusama".to_string(),
                 order: "1".to_string(),
@@ -1265,8 +1269,10 @@ fn flow_test_1() {
                 color: "#000".to_string(),
                 decimals: 12,
                 encryption: Encryption::Sr25519,
-                genesis_hash: "b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe"
-                    .to_string(),
+                genesis_hash: H256::from_str(
+                    "b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe",
+                )
+                .unwrap(),
                 logo: "kusama".to_string(),
                 name: "kusama".to_string(),
                 order: "2".to_string(),
@@ -1466,8 +1472,10 @@ fn flow_test_1() {
                 color: "#000".to_string(),
                 decimals: 12,
                 encryption: Encryption::Sr25519,
-                genesis_hash: "b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe"
-                    .to_string(),
+                genesis_hash: H256::from_str(
+                    "b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe",
+                )
+                .unwrap(),
                 logo: "kusama".to_string(),
                 name: "kusama".to_string(),
                 order: "2".to_string(),
