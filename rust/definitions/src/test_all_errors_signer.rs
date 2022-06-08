@@ -776,6 +776,11 @@ pub fn error_signer() -> Vec<ErrorSigner> {
     // `NoNetworksAvailable` error.
     out.push(ErrorSigner::NoNetworksAvailable);
 
+    // `TimeFormat` error.
+    out.push(ErrorSigner::TimeFormat(
+        time::error::Format::InvalidComponent("distance"),
+    ));
+
     out
 }
 
@@ -1165,6 +1170,7 @@ mod tests {
 "Wrong password."
 "Wrong password."
 "No networks available. Please load networks information to proceed."
+"Unable to produce timestamp. The distance component cannot be formatted into the requested format."
 "#;
         assert!(print == print_expected, "\nReceived: {}", print);
     }

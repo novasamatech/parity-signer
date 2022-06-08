@@ -149,7 +149,7 @@ pub(crate) fn events_in_batch<T: ErrorSource>(
         .format(&time::macros::format_description!(
             "[year]-[month]-[day] [hour]:[minute]:[second].[subsecond]"
         ))
-        .unwrap();
+        .map_err(|e| <T>::timestamp_format(e))?;
     let history_entry = Entry { timestamp, events };
     out_prep.insert(order.store(), history_entry.encode());
     Ok(out_prep)
