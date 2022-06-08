@@ -38,8 +38,10 @@ use parity_scale_codec::Encode;
 use regex::Regex;
 #[cfg(feature = "signer")]
 use sled::Batch;
+#[cfg(feature = "active")]
+use sp_core::H256;
 #[cfg(any(feature = "active", feature = "signer"))]
-use sp_core::{ecdsa, ed25519, sr25519, Pair, H256};
+use sp_core::{ecdsa, ed25519, sr25519, Pair};
 #[cfg(any(feature = "active", feature = "signer"))]
 use sp_runtime::MultiSigner;
 #[cfg(any(feature = "active", feature = "signer"))]
