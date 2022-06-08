@@ -33,7 +33,7 @@ struct NetworkDetails: View {
                     }
                     HStack {
                         Text("genesis hash:")
-                        Text(content.genesisHash).fixedSize(horizontal: false, vertical: true)
+                        Text(content.genesisHash.map{String(format: "%02X", $0)}.joined()).fixedSize(horizontal: false, vertical: true)
                     }
                     HStack {
                         Text("Verifier certificate: ").fixedSize(horizontal: false, vertical: true)

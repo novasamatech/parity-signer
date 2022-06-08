@@ -111,7 +111,7 @@ impl ErrorSource for Active {
             EntryDecodingActive::NetworkSpecs(key),
         ))
     }
-    fn specs_genesis_hash_mismatch(key: NetworkSpecsKey, genesis_hash: Vec<u8>) -> Self::Error {
+    fn specs_genesis_hash_mismatch(key: NetworkSpecsKey, genesis_hash: H256) -> Self::Error {
         ErrorActive::Database(DatabaseActive::Mismatch(MismatchActive::SpecsGenesisHash {
             key,
             genesis_hash,
@@ -881,7 +881,7 @@ pub enum MismatchActive {
         key: NetworkSpecsKey,
 
         /// genesis hash as it is in the `NetworkSpecs`
-        genesis_hash: Vec<u8>,
+        genesis_hash: H256,
     },
 
     /// [`NetworkSpecsKey`] is built using network genesis hash and [`Encryption`].
@@ -905,7 +905,7 @@ pub enum MismatchActive {
         key: NetworkSpecsKey,
 
         /// genesis hash as it is in the `NetworkSpecsToSend`
-        genesis_hash: Vec<u8>,
+        genesis_hash: H256,
     },
 
     /// [`NetworkSpecsKey`] is built using network genesis hash and [`Encryption`].
