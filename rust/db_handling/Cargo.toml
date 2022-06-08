@@ -21,7 +21,7 @@ sled = "0.34.6"
 sp-core = {git = "https://github.com/paritytech/substrate", default-features = false, features = ["full_crypto"], optional = true}
 sp-runtime = {git = "https://github.com/paritytech/substrate", default-features = false, optional = true}
 tiny-bip39 = {version = "0.8.0", default-features = false, optional = true}
-zeroize = {version = "1.5.3", optional = true}
+zeroize = {version = "1.5.5", optional = true}
 
 [dev-dependencies]
 pretty_assertions = { version = "1.2" }
