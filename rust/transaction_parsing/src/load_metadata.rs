@@ -44,7 +44,7 @@ pub fn load_metadata(
         }
     };
     let general_verifier = get_general_verifier(database_name)?;
-    let verifier_key = VerifierKey::from_parts(genesis_hash.as_bytes());
+    let verifier_key = VerifierKey::from_parts(genesis_hash);
     let valid_current_verifier = match try_get_valid_current_verifier(&verifier_key, database_name)?
     {
         Some(a) => a,
@@ -65,6 +65,13 @@ pub fn load_metadata(
                 }))
             }
         };
+    if meta_values.name != network_specs.name {
+        return Err(ErrorSigner::Input(InputSigner::LoadMetaWrongGenesisHash {
+            name_metadata: meta_values.name,
+            name_specs: network_specs.name,
+            genesis_hash: network_specs.genesis_hash,
+        }));
+    }
     if let Some(prefix_from_meta) = meta_values.optional_base58prefix {
         if prefix_from_meta != network_specs.base58prefix {
             return Err(<Signer>::faulty_metadata(

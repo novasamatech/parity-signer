@@ -95,7 +95,7 @@ fn meta_key() -> MetaKey {
 /// `VerifierKey` mock value.
 fn verifier_key() -> VerifierKey {
     VerifierKey::from_parts(
-        &hex::decode("853faffbfc6713c1f899bf16547fcfbf733ae8361b8ca0129699d01d4f2181fd").unwrap(),
+        H256::from_str("853faffbfc6713c1f899bf16547fcfbf733ae8361b8ca0129699d01d4f2181fd").unwrap(),
     )
 }
 
@@ -349,7 +349,7 @@ fn database_signer() -> Vec<DatabaseSigner> {
     // All remaining [`DatabaseSigner`] errors.
     out.append(&mut vec![
         DatabaseSigner::UnexpectedGenesisHash {
-            verifier_key: VerifierKey::from_parts(genesis_hash().as_bytes()),
+            verifier_key: VerifierKey::from_parts(genesis_hash()),
             network_specs_key: network_specs_key_good(),
         },
         DatabaseSigner::SpecsCollision {
@@ -359,7 +359,7 @@ fn database_signer() -> Vec<DatabaseSigner> {
         DatabaseSigner::DifferentNamesSameGenesisHash {
             name1: String::from("westend"),
             name2: String::from("WeStEnD"),
-            genesis_hash: genesis_hash().as_bytes().to_vec(),
+            genesis_hash: genesis_hash(),
         },
         DatabaseSigner::CustomVerifierIsGeneral(verifier_key()),
         DatabaseSigner::TwoRootKeys {
@@ -432,6 +432,11 @@ fn input_signer() -> Vec<InputSigner> {
             name: String::from("westend"),
             valid_current_verifier: ValidCurrentVerifier::General,
             general_verifier: verifier_sr25519(),
+        },
+        InputSigner::LoadMetaWrongGenesisHash {
+            name_metadata: String::from("acala"),
+            name_specs: String::from("westend"),
+            genesis_hash: genesis_hash(),
         },
         InputSigner::NeedVerifier {
             name: String::from("kulupu"),
@@ -1067,6 +1072,7 @@ mod tests {
 "Bad input data. Received payload has bad signature."
 "Bad input data. Network kulupu is not in the database. Add network specs before loading the metadata."
 "Bad input data. Network westend was previously known to the database with verifier public key: 8eaf04151687736326c9fea17e25fc5287613693c912909cb226aa4794f26a48, encryption: sr25519 (general verifier). However, no network specs are in the database at the moment. Add network specs before loading the metadata."
+"Bad input data. Update payload contains metadata for network acala. Genesis hash in payload (e143f23803ca50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e) matches database genesis hash for another network, westend."
 "Bad input data. Saved network kulupu information was signed by verifier public key: 8eaf04151687736326c9fea17e25fc5287613693c912909cb226aa4794f26a48, encryption: ed25519. Received information is not signed."
 "Bad input data. General verifier in the database is public key: 8eaf04151687736326c9fea17e25fc5287613693c912909cb226aa4794f26a48, encryption: sr25519. Received unsigned westend network information could be accepted only if signed by the general verifier."
 "Bad input data. General verifier in the database is public key: 8eaf04151687736326c9fea17e25fc5287613693c912909cb226aa4794f26a48, encryption: sr25519. Received unsigned types information could be accepted only if signed by the general verifier."
