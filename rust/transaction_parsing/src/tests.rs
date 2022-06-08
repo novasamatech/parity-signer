@@ -1718,7 +1718,7 @@ fn add_specs_bad_westend_ed25519_not_signed() {
         error: Some(vec![TransactionCard {
             index: 0,
             indent: 0,
-            card: Card::ErrorCard { f: "Bad input data. Network with genesis hash e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e already has entries in the database with base58 prefix 42. Received network specs have different base58 prefix 115.".to_string()
+            card: Card::ErrorCard { f: "Bad input data. Network westend with genesis hash e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e already has entries in the database with base58 prefix 42. Received network specs have same genesis hash and different base58 prefix 115.".to_string()
             },
         }]),
         ..Default::default()
