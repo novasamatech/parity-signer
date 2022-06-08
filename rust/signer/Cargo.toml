@@ -24,7 +24,6 @@ env_logger = "0.9"
 
 [target.'cfg(target_os = "android")'.dependencies]
 android_logger = "0.11"
-jni = { version = "0.16.0" }
 
 [build-dependencies]
 definitions = {path = "../definitions"}
