@@ -33,6 +33,7 @@ use serde_json::{
     map::Map,
     value::{Number, Value},
 };
+use sp_core::H256;
 
 /// Data from rpc calls for `load_metadata` update.
 ///
@@ -41,6 +42,9 @@ use serde_json::{
 pub struct FetchedInfo {
     /// Fetched metadata, as a hexadecimal string
     pub meta: String,
+
+    /// Block hash, at which the metadata was fetched
+    pub block_hash: String,
 
     /// Fetched genesis hash, as a hexadecimal string
     pub genesis_hash: String,
@@ -105,7 +109,14 @@ pub async fn fetch_info(str_address: &str) -> Result<FetchedInfo, Box<dyn std::e
     let client = WsClientBuilder::default()
         .build(address_with_port(str_address)) // port supplied if needed
         .await?;
-    let response: Value = client.request("state_getMetadata", rpc_params![]).await?;
+    let response: Value = client.request("chain_getBlockHash", rpc_params![]).await?;
+    let block_hash = match response {
+        Value::String(x) => x,
+        _ => return Err(Box::from("Unexpected block hash format")),
+    };
+    let response: Value = client
+        .request("state_getMetadata", rpc_params![&block_hash])
+        .await?;
     let meta = match response {
         Value::String(x) => x,
         _ => return Err(Box::from("Unexpected metadata format")),
@@ -120,7 +131,32 @@ pub async fn fetch_info(str_address: &str) -> Result<FetchedInfo, Box<dyn std::e
         Value::String(x) => x,
         _ => return Err(Box::from("Unexpected genesis hash format")),
     };
-    Ok(FetchedInfo { meta, genesis_hash })
+    Ok(FetchedInfo {
+        meta,
+        block_hash,
+        genesis_hash,
+    })
+}
+
+/// Fetch network metadata from given url address at given block
+#[tokio::main]
+pub async fn fetch_meta_at_block(
+    str_address: &str,
+    block_hash: H256,
+) -> Result<String, Box<dyn std::error::Error>> {
+    let client = WsClientBuilder::default()
+        .build(address_with_port(str_address)) // port supplied if needed
+        .await?;
+    let response: Value = client
+        .request(
+            "state_getMetadata",
+            rpc_params![Value::String(format!("0x{}", hex::encode(block_hash)))],
+        )
+        .await?;
+    match response {
+        Value::String(x) => Ok(x),
+        _ => Err(Box::from("Unexpected metadata format")),
+    }
 }
 
 /// Fetch network metadata and genesis hash as hexadecimal strings, and network

@@ -93,8 +93,15 @@ impl ErrorSource for Active {
                 })
             }
             MetadataSource::Incoming(IncomingMetadataSourceActive::Str(
-                IncomingMetadataSourceActiveStr::Fetch { url },
-            )) => ErrorActive::Fetch(Fetch::FaultyMetadata { url, error }),
+                IncomingMetadataSourceActiveStr::Fetch {
+                    url,
+                    optional_block,
+                },
+            )) => ErrorActive::Fetch(Fetch::FaultyMetadata {
+                url,
+                optional_block,
+                error,
+            }),
             MetadataSource::Incoming(IncomingMetadataSourceActive::Str(
                 IncomingMetadataSourceActiveStr::Default { filename },
             )) => ErrorActive::DefaultLoading(DefaultLoading::FaultyMetadata { filename, error }),
@@ -175,13 +182,18 @@ impl ErrorSource for Active {
         match error {
             ErrorActive::NotHex(a) => {
                 let insert = match a {
-                    NotHexActive::FetchedMetadata {url} => format!("Network metadata fetched from url {}", url),
+                    NotHexActive::FetchedMetadata {url, optional_block} => match optional_block{
+                        Some(hash) => format!("Network metadata fetched from url {} at block {}", url, hex::encode(hash)),
+                        None => format!("Network metadata fetched from url {}", url),
+                    },
                     NotHexActive::FetchedGenesisHash {url} => format!("Network genesis hash fetched from url {}", url),
+                    NotHexActive::FetchedBlockHash {url} => format!("Network block hash fetched from url {}", url),
                     NotHexActive::InputSufficientCrypto => String::from("Input sufficient crypto data"),
                     NotHexActive::InputPublicKey => String::from("Input public key"),
                     NotHexActive::InputSignature => String::from("Input signature"),
                     NotHexActive::DefaultMetadata {filename} => format!("Default network metadata from file {}", filename),
                     NotHexActive::CheckedMetadata {filename} => format!("Checked metadata from file {}", filename),
+                    NotHexActive::EnteredBlockHash => String::from("Input block hash"),
                 };
                 format!("{} is not in hexadecimal format.", insert)
             },
@@ -207,6 +219,7 @@ impl ErrorSource for Active {
                             EntryDecodingActive::NetworkSpecs(x) => format!("network specs (NetworkSpecs) entry for key {}.", hex::encode(x.key())),
                             EntryDecodingActive::NetworkSpecsToSend(x) => format!("network specs (NetworkSpecsToSend) entry for key {}.", hex::encode(x.key())),
                             EntryDecodingActive::Types => String::from("types information."),
+                            EntryDecodingActive::BlockHash {name, version} => format!("fetch block hash for metadata {}{}", name, version),
                         };
                         format!("Unable to decode {}", insert)
                     },
@@ -238,9 +251,22 @@ impl ErrorSource for Active {
             },
             ErrorActive::Fetch(a) => {
                 let insert = match a {
-                    Fetch::FaultyMetadata{url, error} => format!("Metadata from {} is not suitable. {}", url, error.show()),
+                    Fetch::FaultyMetadata{url, optional_block, error} => match optional_block {
+                        Some(hash) => format!("Metadata from {} at block hash {} is not suitable. {}", url, hex::encode(hash), error.show()),
+                        None => format!("Metadata from {} is not suitable. {}", url, error.show()),
+                    },
                     Fetch::EarlierVersion{name, old_version, new_version} => format!("For {} the newly received version ({}) is lower than the latest version in the hot database ({}).", name, new_version, old_version),
-                    Fetch::SameVersionDifferentMetadata{name, version} => format!("Fetched metadata for {}{} differs from the one in the hot database.", name, version),
+                    Fetch::SameVersionDifferentMetadata{name, version, block_hash_in_db, block_hash_in_fetch} => {
+                        let db_block_insert = match block_hash_in_db {
+                            Some(a) => hex::encode(a),
+                            None => String::from("unknown"),
+                        };
+                        let fetch_block_insert = match block_hash_in_fetch {
+                            Some(a) => hex::encode(a),
+                            None => String::from("unknown"),
+                        };
+                        format!("Metadata {}{} fetched now at block hash {} differs from the one in the hot database, block hash {}.", name, version, fetch_block_insert, db_block_insert)
+                    },
                     Fetch::FaultySpecs{url, error} => {
                         let insert = match error {
                             SpecsError::NoBase58Prefix => String::from("No base58 prefix."),
@@ -272,6 +298,7 @@ impl ErrorSource for Active {
                         format!("Network {} fetched from {} differs from the one in the hot database. Old: {}. New: {}.", insert, url, old, new)
                     },
                     Fetch::UnexpectedFetchedGenesisHashFormat{value} => format!("Fetched genesis hash {} has unexpected format and does not fit into [u8;32] array.", value),
+                    Fetch::UnexpectedFetchedBlockHashFormat{value} => format!("Fetched block hash {} has unexpected format and does not fit into [u8;32] array.", value),
                     Fetch::SpecsInDb{name, encryption} => format!("Network specs entry for {} and encryption {} is already in database.", name, encryption.show()),
                     Fetch::UKeyUrlInDb {title, url} => format!("There is already an entry with address {} for network {}. Known networks should be processed with `-n` content key.", url, title),
                     Fetch::UKeyHashInDb{address_book_entry, url} => format!("Fetch at {} resulted in data already known to the hot database. Network {} with genesis hash {} has address set to {}. To change the url, delete old entry.", url, address_book_entry.name, hex::encode(address_book_entry.genesis_hash), address_book_entry.address),
@@ -326,6 +353,8 @@ impl ErrorSource for Active {
                             CommandNeedKey::DerivationsTitle => "'-title'",
                             CommandNeedKey::MetaDefaultFileName => "`-name`",
                             CommandNeedKey::MetaDefaultFileVersion => "`-version`",
+                            CommandNeedKey::MetaAtBlockUrl => "`-u`",
+                            CommandNeedKey::MetaAtBlockHash => "`-block`",
                         };
                         format!("Expected {} key to be used.", insert)
                     },
@@ -347,6 +376,8 @@ impl ErrorSource for Active {
                             CommandDoubleKey::DerivationsTitle => "'-title'",
                             CommandDoubleKey::MetaDefaultFileName => "`-name`",
                             CommandDoubleKey::MetaDefaultFileVersion => "`-version`",
+                            CommandDoubleKey::MetaAtBlockUrl => "`-u`",
+                            CommandDoubleKey::MetaAtBlockHash => "`-block`",
                         };
                         format!("More than one entry for {} key is not allowed.", insert)
                     },
@@ -381,6 +412,8 @@ impl ErrorSource for Active {
                             CommandNeedArgument::MetaDefaultFileVersion => "`-version`",
                             CommandNeedArgument::CheckFile => "check_file",
                             CommandNeedArgument::ShowSpecsTitle => "`show -specs`",
+                            CommandNeedArgument::MetaAtBlockUrl => "`-u`",
+                            CommandNeedArgument::MetaAtBlockHash => "`-block`",
                         };
                         format!("{} must be followed by an agrument.", insert)
                     },
@@ -416,6 +449,7 @@ impl ErrorSource for Active {
                     InputActive::FaultyMetadataInPayload(e) => format!("Metadata in the message to sign is not suitable. {}", e.show()),
                     InputActive::BadSignature => String::from("Bad signature."),
                     InputActive::NoValidDerivationsToExport => String::from("No valid password-free derivations found to generate ContentDerivations."),
+                    InputActive::BlockHashLength => String::from("Provided block hash has wrong length."),
                 }
             },
             ErrorActive::Qr(e) => format!("Error generating qr code. {}", e),
@@ -551,12 +585,20 @@ pub enum NotHexActive {
     /// Network metadata, fetched through rpc call.
     ///
     /// Associated data is the url address used for the fetching.
-    FetchedMetadata { url: String },
+    FetchedMetadata {
+        url: String,
+        optional_block: Option<H256>,
+    },
 
     /// Network genesis hash, fetched through rpc call.
     ///
     /// Associated data is the url address used for the fetching.
     FetchedGenesisHash { url: String },
+
+    /// Network block hash, fetched through rpc call.
+    ///
+    /// Associated data is the url address used for the fetching.
+    FetchedBlockHash { url: String },
 
     /// [`SufficientCrypto`](crate::crypto::SufficientCrypto) received in
     /// command line in `generate_message` client.
@@ -580,6 +622,9 @@ pub enum NotHexActive {
 
     /// Network metadata user tries to check, with filename as associated data
     CheckedMetadata { filename: String },
+
+    /// User-entered block hash for metadata fetching
+    EnteredBlockHash,
 }
 
 /// Source of unsuitable metadata on the Active side
@@ -595,8 +640,12 @@ pub enum IncomingMetadataSourceActive {
 /// Source of unsuitable hexadecimal string metadata on the Active side
 #[derive(Debug)]
 pub enum IncomingMetadataSourceActiveStr {
-    /// Metadata was fetched, associated data is url used for rpc call.
-    Fetch { url: String },
+    /// Metadata was fetched, associated data is url used for rpc call and block
+    /// hash, if the metadata was fetched for specific block hash.
+    Fetch {
+        url: String,
+        optional_block: Option<H256>,
+    },
 
     /// Metadata is the default one, associated data is the filename.
     Default { filename: String },
@@ -849,6 +898,9 @@ pub enum EntryDecodingActive {
     /// Types information from hot database, i.e. encoded `Vec<TypeEntry>`
     /// stored in `SETTREE` under the key `TYPES`, could not be decoded.
     Types,
+
+    /// Block hash from `META_HISTORY` tree entry
+    BlockHash { name: String, version: u32 },
 }
 
 /// Mismatch errors within database on active side
@@ -992,6 +1044,10 @@ pub enum Fetch {
         /// url address used for rpc call
         url: String,
 
+        /// optional block hash: `None` for standard fetch, `Some(_)` for debug
+        /// fetch at specified block
+        optional_block: Option<H256>,
+
         /// what exactly is wrong with the metadata
         error: MetadataError,
     },
@@ -1017,6 +1073,13 @@ pub enum Fetch {
 
         /// network version
         version: u32,
+
+        /// optionally recorded block hash for which the metadata was fetched
+        ///when recorded in the database
+        block_hash_in_db: Option<H256>,
+
+        /// block hash for which the metadata is fetched now
+        block_hash_in_fetch: Option<H256>,
     },
 
     /// Fetched network specs are not suitable for use in Signer.
@@ -1049,6 +1112,12 @@ pub enum Fetch {
     /// Fetched genesis hash could not be transformed in expected [u8; 32] value.
     UnexpectedFetchedGenesisHashFormat {
         /// genesis hash value as received through rpc call
+        value: String,
+    },
+
+    /// Fetched block hash could not be transformed in expected [u8; 32] value.
+    UnexpectedFetchedBlockHashFormat {
+        /// block hash value as received through rpc call
         value: String,
     },
 
@@ -1506,6 +1575,13 @@ pub enum CommandNeedKey {
     /// Command `meta_default_file` must have `-version` key followed by the
     /// network metadata version to specify the metadata being exported.
     MetaDefaultFileVersion,
+
+    /// Command `meta_at_block` must have `-u` key followed by the network url.
+    MetaAtBlockUrl,
+
+    /// Command `meta_at_block` must have `-block` key followed by the
+    /// hexadecimal block hash.
+    MetaAtBlockHash,
 }
 
 /// Key in `generate_message` command encountered twice
@@ -1607,6 +1683,14 @@ pub enum CommandDoubleKey {
     /// Command `meta_default_file` must have exactly one `-version` key followed
     /// by the network version.
     MetaDefaultFileVersion,
+
+    /// Command `meta_at_block` must have exactly one `-u` key followed by the
+    /// network url.
+    MetaAtBlockUrl,
+
+    /// Command `meta_at_block` must have exactly one `-block` key followed by
+    /// the hexadecimal block hash.
+    MetaAtBlockHash,
 }
 
 /// Missing argument for the key in `generate_message` command
@@ -1762,6 +1846,13 @@ pub enum CommandNeedArgument {
 
     /// Command `show -specs` must be followed by the network address book title
     ShowSpecsTitle,
+
+    /// Key `-u` in `meta_at_block` command must be followed by the network url.
+    MetaAtBlockUrl,
+
+    /// Key `-block` in `meta_at_block` command must be followed by the
+    /// hexadecimal block hash.
+    MetaAtBlockHash,
 }
 
 /// Unsuitable argument for the key in `generate_message` command
@@ -1868,6 +1959,9 @@ pub enum InputActive {
     /// Provided file contains no valid password-free derivations that could be
     /// exported
     NoValidDerivationsToExport,
+
+    /// User-entered block hash has invalid length
+    BlockHashLength,
 }
 
 /// Errors with `wasm` files processing

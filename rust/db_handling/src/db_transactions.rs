@@ -17,7 +17,9 @@ use sp_runtime::MultiSigner;
 
 #[cfg(feature = "active")]
 use constants::{ADDRESS_BOOK, SPECSTREEPREP};
-use constants::{ADDRTREE, HISTORY, METATREE, SETTREE, SPECSTREE, TRANSACTION, VERIFIERS};
+use constants::{
+    ADDRTREE, HISTORY, METATREE, META_HISTORY, SETTREE, SPECSTREE, TRANSACTION, VERIFIERS,
+};
 #[cfg(feature = "signer")]
 use constants::{DRV, GENERALVERIFIER, SIGN, STUB, TYPES};
 
@@ -235,6 +237,9 @@ pub struct TrDbHot {
     /// `Batch` to be applied to [`METATREE`] tree
     for_metadata: Batch,
 
+    /// `Batch` to be applied to [`META_HISTORY`] tree
+    for_meta_history: Batch,
+
     /// `Batch` to be applied to [`SPECSTREEPREP`] tree
     for_network_specs_prep: Batch,
 
@@ -249,6 +254,7 @@ impl TrDbHot {
         Self {
             for_address_book: Batch::default(),
             for_metadata: Batch::default(),
+            for_meta_history: Batch::default(),
             for_network_specs_prep: Batch::default(),
             for_settings: Batch::default(),
         }
@@ -265,6 +271,13 @@ impl TrDbHot {
     /// applied to [`METATREE`] tree.
     pub fn set_metadata(mut self, for_metadata: Batch) -> Self {
         self.for_metadata = for_metadata;
+        self
+    }
+
+    /// Set `for_meta_history` field in [`TrDbHot`] with `Batch` that will be
+    /// applied to [`META_HISTORY`] tree.
+    pub fn set_meta_history(mut self, for_meta_history: Batch) -> Self {
+        self.for_meta_history = for_meta_history;
         self
     }
 
@@ -288,21 +301,37 @@ impl TrDbHot {
         let database = open_db::<Active>(database_name)?;
         let address_book = open_tree::<Active>(&database, ADDRESS_BOOK)?;
         let metadata = open_tree::<Active>(&database, METATREE)?;
+        let meta_history = open_tree::<Active>(&database, META_HISTORY)?;
         let network_specs_prep = open_tree::<Active>(&database, SPECSTREEPREP)?;
         let settings = open_tree::<Active>(&database, SETTREE)?;
-        match (&address_book, &metadata, &network_specs_prep, &settings).transaction(
-            |(tx_address_book, tx_metadata, tx_network_specs_prep, tx_settings)| {
-                tx_address_book.apply_batch(&self.for_address_book)?;
-                tx_address_book.flush();
-                tx_metadata.apply_batch(&self.for_metadata)?;
-                tx_metadata.flush();
-                tx_network_specs_prep.apply_batch(&self.for_network_specs_prep)?;
-                tx_network_specs_prep.flush();
-                tx_settings.apply_batch(&self.for_settings)?;
-                tx_settings.flush();
-                Ok(())
-            },
-        ) {
+        match (
+            &address_book,
+            &metadata,
+            &meta_history,
+            &network_specs_prep,
+            &settings,
+        )
+            .transaction(
+                |(
+                    tx_address_book,
+                    tx_metadata,
+                    tx_meta_history,
+                    tx_network_specs_prep,
+                    tx_settings,
+                )| {
+                    tx_address_book.apply_batch(&self.for_address_book)?;
+                    tx_address_book.flush();
+                    tx_metadata.apply_batch(&self.for_metadata)?;
+                    tx_metadata.flush();
+                    tx_meta_history.apply_batch(&self.for_meta_history)?;
+                    tx_meta_history.flush();
+                    tx_network_specs_prep.apply_batch(&self.for_network_specs_prep)?;
+                    tx_network_specs_prep.flush();
+                    tx_settings.apply_batch(&self.for_settings)?;
+                    tx_settings.flush();
+                    Ok(())
+                },
+            ) {
             Ok(()) => Ok(()),
             Err(e) => Err(<Active>::db_transaction(e)),
         }

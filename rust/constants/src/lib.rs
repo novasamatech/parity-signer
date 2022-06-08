@@ -26,6 +26,7 @@
 //!
 //! - [`SPECSTREEPREP`], with network specs in hot database format
 //! - [`METATREE`], with network metadata, at most two versions for each network
+//! - [`META_HISTORY`], with block hash at which the metadata was fetched
 //! - [`ADDRESS_BOOK`], with network information needed to make rpc calls
 //! - [`SETTREE`], containing types information
 //!
@@ -132,6 +133,11 @@ pub const HOT_DB_NAME: &str = "../database/database_hot";
 /// Tree name for the tree storing the network specs in hot database
 #[cfg(feature = "active")]
 pub const SPECSTREEPREP: &[u8] = b"chainspecs_prep";
+
+/// Tree name for the tree storing the network block hash at the time of
+/// metadata fetch, in hot database
+#[cfg(feature = "active")]
+pub const META_HISTORY: &[u8] = b"metadata_history";
 
 /// Tree name for the tree storing the address book in hot database, with data
 /// necessary for rpc calls

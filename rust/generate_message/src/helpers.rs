@@ -6,7 +6,8 @@ use sp_core::H256;
 use std::{cmp::Ordering, convert::TryInto};
 
 use constants::{
-    ADDRESS_BOOK, COLOR, HOT_DB_NAME, LOAD, METATREE, SECONDARY_COLOR, SPECS, SPECSTREEPREP,
+    ADDRESS_BOOK, COLOR, EXPORT_FOLDER, HOT_DB_NAME, LOAD, METATREE, META_HISTORY, SECONDARY_COLOR,
+    SPECS, SPECSTREEPREP,
 };
 use db_handling::{
     db_transactions::TrDbHot,
@@ -17,16 +18,16 @@ use definitions::{
     error::ErrorSource,
     error_active::{
         Active, Changed, DatabaseActive, ErrorActive, Fetch, IncomingMetadataSourceActiveStr,
-        MismatchActive, NotFoundActive, NotHexActive, SpecsError,
+        InputActive, MismatchActive, NotFoundActive, NotHexActive, SpecsError,
     },
     helpers::unhex,
     keyring::{AddressBookKey, MetaKey, NetworkSpecsKey},
-    metadata::{AddressBookEntry, MetaValues},
+    metadata::{AddressBookEntry, MetaHistoryEntry, MetaValues},
     network_specs::NetworkSpecsToSend,
     qr_transfers::{ContentAddSpecs, ContentLoadMeta},
 };
 
-use crate::fetch_metadata::{fetch_info, fetch_info_with_network_specs};
+use crate::fetch_metadata::{fetch_info, fetch_info_with_network_specs, fetch_meta_at_block};
 use crate::interpret_specs::{check_specs, interpret_properties, TokenFetch};
 use crate::parser::Token;
 
@@ -233,13 +234,51 @@ pub fn is_specname_in_db(name: &str, except_title: &str) -> Result<bool, ErrorAc
     Ok(out)
 }
 
+/// Get all entries from `META_HISTORY`.
+pub fn meta_history_content() -> Result<Vec<MetaHistoryEntry>, ErrorActive> {
+    let database = open_db::<Active>(HOT_DB_NAME)?;
+    let meta_history = open_tree::<Active>(&database, META_HISTORY)?;
+    let mut out: Vec<MetaHistoryEntry> = Vec::new();
+    for x in meta_history.iter().flatten() {
+        out.push(MetaHistoryEntry::from_entry(x)?)
+    }
+    Ok(out)
+}
+
+/// `MetaValues` from the `METATREE` with block hash at the time of fetch
+#[derive(Clone)]
+pub struct MetaValuesStamped {
+    pub meta_values: MetaValues,
+    pub at_block_hash: Option<H256>,
+}
+
 /// Read all network metadata entries from the database.
-fn read_metadata_database() -> Result<Vec<MetaValues>, ErrorActive> {
+pub fn read_metadata_database() -> Result<Vec<MetaValuesStamped>, ErrorActive> {
     let database = open_db::<Active>(HOT_DB_NAME)?;
     let metadata = open_tree::<Active>(&database, METATREE)?;
-    let mut out: Vec<MetaValues> = Vec::new();
+    let meta_history = open_tree::<Active>(&database, META_HISTORY)?;
+    let mut out: Vec<MetaValuesStamped> = Vec::new();
     for x in metadata.iter().flatten() {
-        out.push(MetaValues::from_entry_checked::<Active>(x)?)
+        let meta_values = MetaValues::from_entry_checked::<Active>(x)?;
+        let meta_key = MetaKey::from_parts(&meta_values.name, meta_values.version);
+        let at_block_hash = match meta_history
+            .get(meta_key.key())
+            .map_err(<Active>::db_internal)?
+        {
+            Some(meta_history_entry_encoded) => Some(
+                MetaHistoryEntry::from_entry_with_key_parts(
+                    &meta_values.name,
+                    meta_values.version,
+                    &meta_history_entry_encoded,
+                )?
+                .block_hash,
+            ),
+            None => None,
+        };
+        out.push(MetaValuesStamped {
+            meta_values,
+            at_block_hash,
+        })
     }
     Ok(out)
 }
@@ -247,21 +286,21 @@ fn read_metadata_database() -> Result<Vec<MetaValues>, ErrorActive> {
 /// Sorted metadata entries
 pub struct SortedMetaValues {
     /// Set of the metadata entries with latest version known to the database.
-    pub newer: Vec<MetaValues>,
+    pub newer: Vec<MetaValuesStamped>,
 
     /// Other metadata entries. Since there are maximum two entries allowed,
     /// this set contains at most one entry for each network.
-    pub older: Vec<MetaValues>,
+    pub older: Vec<MetaValuesStamped>,
 }
 
 /// Sort the metadata entries form the database into sets of newer and older, by
 /// metadata version.
-fn sort_metavalues(meta_values: Vec<MetaValues>) -> Result<SortedMetaValues, ErrorActive> {
+fn sort_metavalues(meta_values: Vec<MetaValuesStamped>) -> Result<SortedMetaValues, ErrorActive> {
     // newer metadata set, i.e. with higher version for given network
-    let mut newer: Vec<MetaValues> = Vec::new();
+    let mut newer: Vec<MetaValuesStamped> = Vec::new();
 
     // older metadata set
-    let mut older: Vec<MetaValues> = Vec::new();
+    let mut older: Vec<MetaValuesStamped> = Vec::new();
 
     // scan through all available metadata and collect `newer` and `older` sets
     for x in meta_values.iter() {
@@ -276,14 +315,14 @@ fn sort_metavalues(meta_values: Vec<MetaValues>) -> Result<SortedMetaValues, Err
         // search for the network name in already collected elements of `newer`
         // set
         for (i, y) in newer.iter().enumerate() {
-            if x.name == y.name {
+            if x.meta_values.name == y.meta_values.name {
                 // search for the network name in already collected elements of
                 // `older` set; should not find any;
                 for z in older.iter() {
-                    if x.name == z.name {
+                    if x.meta_values.name == z.meta_values.name {
                         return Err(ErrorActive::Database(
                             DatabaseActive::HotDatabaseMetadataOverTwoEntries {
-                                name: x.name.to_string(),
+                                name: x.meta_values.name.to_string(),
                             },
                         ));
                     }
@@ -292,7 +331,7 @@ fn sort_metavalues(meta_values: Vec<MetaValues>) -> Result<SortedMetaValues, Err
                 found_in_new = true;
 
                 // where the entry goes, based on the version
-                match x.version.cmp(&y.version) {
+                match x.meta_values.version.cmp(&y.meta_values.version) {
                     // `x` entry goes to `older`
                     Ordering::Less => older.push(x.to_owned()),
 
@@ -300,8 +339,8 @@ fn sort_metavalues(meta_values: Vec<MetaValues>) -> Result<SortedMetaValues, Err
                     Ordering::Equal => {
                         return Err(ErrorActive::Database(
                             DatabaseActive::HotDatabaseMetadataSameVersionTwice {
-                                name: x.name.to_string(),
-                                version: x.version,
+                                name: x.meta_values.name.to_string(),
+                                version: x.meta_values.version,
                             },
                         ))
                     }
@@ -332,43 +371,37 @@ fn sort_metavalues(meta_values: Vec<MetaValues>) -> Result<SortedMetaValues, Err
     Ok(SortedMetaValues { newer, older })
 }
 
-/// Possibly updated sorted metadata entries
-pub struct UpdSortedMetaValues {
-    /// Sorted metadata entries, after attempt to add a new entry.
-    pub sorted: SortedMetaValues,
-
-    /// Flag to indicate if the entry was added.
-    pub upd_done: bool,
-}
-
 /// Add new [`MetaValues`] entry to [`SortedMetaValues`]
 ///
 /// If the fetched metadata is good and has later version than the ones in
 /// [`SortedMetaValues`], it is added to `newer` set, any previous value from
 /// `newer` is moved to `older`. If there was any value in `older`, it gets
 /// kicked out.
+///
+/// If there was no block hash in hot database and the metadata did not change,
+/// a new block hash could be added if it is known.
 pub fn add_new(
-    new: &MetaValues,
-    sorted: &SortedMetaValues,
-) -> Result<UpdSortedMetaValues, ErrorActive> {
-    // flag to indicate that updates were done, i.e. the database entries should
-    // be rewritten
-    let mut upd_done = false;
+    new: &MetaValuesStamped,
+    sorted: &mut SortedMetaValues,
+) -> Result<bool, ErrorActive> {
+    // action to perform after sorting on found entry
+    enum Found {
+        DoNothing,
+        Replace {
+            move_from_newer: usize,
+            remove_from_older: Option<usize>,
+        },
+        UpdateBlock {
+            in_newer: usize,
+        },
+    }
 
-    // entry number to remove from `newer` set, and put into `older` set, if any
-    let mut num_new = None;
-
-    // entry number to remove from `older` set, if any
-    let mut num_old = None;
-
-    // flag to indicate that the number was found in `newer` set
-    let mut found_in_newer = false;
+    let mut similar_entries: Option<Found> = None;
 
     // search for entry with same name through `newer` existing entries
     for (i, x) in sorted.newer.iter().enumerate() {
-        if new.name == x.name {
-            found_in_newer = true;
-            match new.version.cmp(&x.version) {
+        if new.meta_values.name == x.meta_values.name {
+            similar_entries = match new.meta_values.version.cmp(&x.meta_values.version) {
                 // earlier metadata should not be fetched through rpc call;
                 //
                 // version downgrades happened, but these should always be
@@ -378,9 +411,9 @@ pub fn add_new(
                 // file - no reason to accept it either;
                 Ordering::Less => {
                     return Err(ErrorActive::Fetch(Fetch::EarlierVersion {
-                        name: x.name.to_string(),
-                        old_version: x.version,
-                        new_version: new.version,
+                        name: x.meta_values.name.to_string(),
+                        old_version: x.meta_values.version,
+                        new_version: new.meta_values.version,
                     }))
                 }
 
@@ -389,77 +422,80 @@ pub fn add_new(
                 // check that metadata is exactly the same, different metadata
                 // under same version is an error;
                 Ordering::Equal => {
-                    if new.meta != x.meta {
+                    if new.meta_values.meta != x.meta_values.meta {
                         // metadata comparing, hopefully never to be needed
                         // again
                         //
                         // prints the difference for user to check
                         let mut sus1: Vec<u8> = Vec::new();
                         let mut sus2: Vec<u8> = Vec::new();
-                        for a in 0..x.meta.len() {
-                            if new.meta[a] != x.meta[a] {
+                        for a in 0..x.meta_values.meta.len() {
+                            if new.meta_values.meta[a] != x.meta_values.meta[a] {
                                 println!("Suspicious number {}", a);
-                                sus1.push(new.meta[a]);
-                                sus2.push(x.meta[a]);
+                                sus1.push(new.meta_values.meta[a]);
+                                sus2.push(x.meta_values.meta[a]);
                             }
                         }
                         println!("new: {:?}, in db: {:?}", sus1, sus2);
 
                         return Err(ErrorActive::Fetch(Fetch::SameVersionDifferentMetadata {
-                            name: new.name.to_string(),
-                            version: new.version,
+                            name: new.meta_values.name.to_string(),
+                            version: new.meta_values.version,
+                            block_hash_in_db: x.at_block_hash,
+                            block_hash_in_fetch: new.at_block_hash,
                         }));
+                    }
+                    match x.at_block_hash {
+                        Some(_) => Some(Found::DoNothing),
+                        None => Some(Found::UpdateBlock { in_newer: i }),
                     }
                 }
 
                 // fetched newer metadata
                 Ordering::Greater => {
-                    // found entry in `newer` to move into `older`
-                    num_new = Some(i);
+                    let mut remove_from_older = None;
 
                     // check if there is entry in `older` to be kicked
                     // altogether
                     for (j, y) in sorted.older.iter().enumerate() {
-                        if x.name == y.name {
+                        if x.meta_values.name == y.meta_values.name {
                             // found entry in `older` to be removed
-                            num_old = Some(j);
+                            remove_from_older = Some(j);
                             break;
                         }
                     }
+                    Some(Found::Replace {
+                        move_from_newer: i,
+                        remove_from_older,
+                    })
                 }
+            };
+            break;
+        }
+    }
+
+    match similar_entries {
+        Some(Found::DoNothing) => Ok(false),
+        Some(Found::Replace {
+            move_from_newer,
+            remove_from_older,
+        }) => {
+            if let Some(j) = remove_from_older {
+                sorted.older.remove(j);
             }
+            sorted.older.push(sorted.newer.remove(move_from_newer));
+            sorted.newer.push(new.to_owned());
+            Ok(true)
+        }
+        Some(Found::UpdateBlock { in_newer }) => {
+            sorted.newer[in_newer].at_block_hash = new.at_block_hash;
+            Ok(false)
+        }
+        None => {
+            sorted.newer.push(new.to_owned());
+            Ok(true)
         }
     }
-    let mut sorted_output = SortedMetaValues {
-        newer: sorted.newer.to_vec(),
-        older: sorted.older.to_vec(),
-    };
-
-    // no entries found in `newer`, i.e. no entries at all
-    if !found_in_newer {
-        upd_done = true;
-
-        // push received entry into `newer`
-        sorted_output.newer.push(new.to_owned());
-    } else {
-        // remove known entry from `older` if needed
-        if let Some(j) = num_old {
-            upd_done = true;
-            sorted_output.older.remove(j);
-        }
-
-        // move known entry from `newer` to `older` , push received entry into
-        // `newer`
-        if let Some(i) = num_new {
-            upd_done = true;
-            sorted_output.older.push(sorted_output.newer.remove(i));
-            sorted_output.newer.push(new.to_owned());
-        }
-    }
-    Ok(UpdSortedMetaValues {
-        sorted: sorted_output,
-        upd_done,
-    })
 }
 
 /// Collect and sort metadata from [`METATREE`] tree of the hot database
@@ -469,17 +505,24 @@ pub fn prepare_metadata() -> Result<SortedMetaValues, ErrorActive> {
 }
 
 /// Clear [`METATREE`] tree of the hot database and write
-/// new sorted metadata into it
+/// new sorted metadata into it.
+///
+/// Update [`META_HISTORY`] tree.
 pub fn write_metadata(sorted_meta_values: SortedMetaValues) -> Result<(), ErrorActive> {
     let mut metadata_batch = make_batch_clear_tree::<Active>(HOT_DB_NAME, METATREE)?;
+    let mut meta_history_batch = Batch::default();
     let mut all_meta = sorted_meta_values.newer;
     all_meta.extend_from_slice(&sorted_meta_values.older);
     for x in all_meta.iter() {
-        let meta_key = MetaKey::from_parts(&x.name, x.version);
-        metadata_batch.insert(meta_key.key(), &x.meta[..]);
+        let meta_key = MetaKey::from_parts(&x.meta_values.name, x.meta_values.version);
+        metadata_batch.insert(meta_key.key(), &x.meta_values.meta[..]);
+        if let Some(hash) = x.at_block_hash {
+            meta_history_batch.insert(meta_key.key(), hash.encode());
+        }
     }
     TrDbHot::new()
         .set_metadata(metadata_batch)
+        .set_meta_history(meta_history_batch)
         .apply(HOT_DB_NAME)
 }
 
@@ -489,9 +532,31 @@ pub struct MetaShortCut {
     pub genesis_hash: H256,
 }
 
+/// Fetched data for `load_metadata` payload and database update
+pub struct MetaFetched {
+    pub meta_values: MetaValues,
+    pub block_hash: H256,
+    pub genesis_hash: H256,
+}
+
+impl MetaFetched {
+    pub fn stamped(&self) -> MetaValuesStamped {
+        MetaValuesStamped {
+            meta_values: self.meta_values.to_owned(),
+            at_block_hash: Some(self.block_hash),
+        }
+    }
+    pub fn cut(&self) -> MetaShortCut {
+        MetaShortCut {
+            meta_values: self.meta_values.to_owned(),
+            genesis_hash: self.genesis_hash,
+        }
+    }
+}
+
 /// Get data needed for `load_metadata` payload [`MetaShortCut`] from given url
 /// address
-pub fn meta_shortcut(address: &str) -> Result<MetaShortCut, ErrorActive> {
+pub fn meta_fetch(address: &str) -> Result<MetaFetched, ErrorActive> {
     let new_info = fetch_info(address).map_err(|e| {
         ErrorActive::Fetch(Fetch::Failed {
             url: address.to_string(),
@@ -499,17 +564,63 @@ pub fn meta_shortcut(address: &str) -> Result<MetaShortCut, ErrorActive> {
         })
     })?;
 
-    let genesis_hash = get_genesis_hash(address, &new_info.genesis_hash)?;
+    let genesis_hash = get_hash(
+        &new_info.genesis_hash,
+        Hash::Genesis {
+            url: address.to_string(),
+        },
+    )?;
+    let block_hash = get_hash(
+        &new_info.block_hash,
+        Hash::BlockFetched {
+            url: address.to_string(),
+        },
+    )?;
     let meta_values = MetaValues::from_str_metadata(
         &new_info.meta,
         IncomingMetadataSourceActiveStr::Fetch {
             url: address.to_string(),
+            optional_block: None,
         },
     )?;
-    Ok(MetaShortCut {
+    Ok(MetaFetched {
         meta_values,
+        block_hash,
         genesis_hash,
     })
+}
+
+/// `meta_at_block -u <network_url_address> -block <block_hash>`
+///
+/// Get metadata for specific block and produce output file.
+///
+/// For investigating silent metadata update cases.
+pub fn debug_meta_at_block(address: &str, hex_block_hash: &str) -> Result<(), ErrorActive> {
+    let block_hash = get_hash(hex_block_hash, Hash::BlockEntered)?;
+    let meta_fetched = fetch_meta_at_block(address, block_hash).map_err(|e| {
+        ErrorActive::Fetch(Fetch::Failed {
+            url: address.to_string(),
+            error: e.to_string(),
+        })
+    })?;
+    let meta_values = MetaValues::from_str_metadata(
+        &meta_fetched,
+        IncomingMetadataSourceActiveStr::Fetch {
+            url: address.to_string(),
+            optional_block: Some(block_hash),
+        },
+    )?;
+    let filename = format!(
+        "{}/{}{}_{}",
+        EXPORT_FOLDER,
+        meta_values.name,
+        meta_values.version,
+        hex::encode(block_hash)
+    );
+    match std::fs::write(&filename, hex::encode(meta_values.meta)) {
+        Ok(_) => Ok(()),
+        Err(e) => Err(ErrorActive::Output(e)),
+    }
 }
 
 /// Prepare [`NetworkSpecsToSend`] using only url address and user-entered data
@@ -628,7 +739,12 @@ fn common_specs_fetch(address: &str) -> Result<CommonSpecsFetch, ErrorActive> {
     })?;
 
     // genesis hash in proper format
-    let genesis_hash = get_genesis_hash(address, &new_info.genesis_hash)?;
+    let genesis_hash = get_hash(
+        &new_info.genesis_hash,
+        Hash::Genesis {
+            url: address.to_string(),
+        },
+    )?;
 
     // `MetaValues` are needed to get network name and (optionally) base58
     // prefix
@@ -636,6 +752,7 @@ fn common_specs_fetch(address: &str) -> Result<CommonSpecsFetch, ErrorActive> {
         &new_info.meta,
         IncomingMetadataSourceActiveStr::Fetch {
             url: address.to_string(),
+            optional_block: None,
         },
     )?;
 
@@ -786,27 +903,48 @@ fn common_specs_processing(
     Ok(update_done)
 }
 
-/// Transform genesis hash from fetched hexadecimal string into proper format
+/// The kind of hash processed. Determines the error.
+enum Hash {
+    BlockEntered,
+    BlockFetched { url: String },
+    Genesis { url: String },
+}
+
+/// Transform hash from fetched hexadecimal string into `H256` format
 ///
-/// Inputs url `address` from which the data was fetched and hex
-/// `fetched_genesis_hash`.
-// TODO fix genesis hash type if we fix genesis hash type after all
-fn get_genesis_hash(address: &str, fetched_genesis_hash: &str) -> Result<H256, ErrorActive> {
-    let genesis_hash_vec = unhex::<Active>(
-        fetched_genesis_hash,
-        NotHexActive::FetchedGenesisHash {
-            url: address.to_string(),
+/// Inputs url `address` from which the data was fetched, hexadecimal
+/// `fetched_hash` and `Hash` used to produce correct error in case the format
+/// is incorrect.
+fn get_hash(fetched_hash: &str, what: Hash) -> Result<H256, ErrorActive> {
+    let not_hex = match what {
+        Hash::BlockEntered => NotHexActive::EnteredBlockHash,
+        Hash::BlockFetched { ref url } => NotHexActive::FetchedBlockHash {
+            url: url.to_string(),
         },
-    )?;
-    let out: [u8; 32] = match genesis_hash_vec.try_into() {
+        Hash::Genesis { ref url } => NotHexActive::FetchedGenesisHash {
+            url: url.to_string(),
+        },
+    };
+    let hash_vec = unhex::<Active>(fetched_hash, not_hex)?;
+    let out: [u8; 32] = match hash_vec.try_into() {
         Ok(a) => a,
-        Err(_) => {
-            return Err(ErrorActive::Fetch(
-                Fetch::UnexpectedFetchedGenesisHashFormat {
-                    value: fetched_genesis_hash.to_string(),
-                },
-            ))
-        }
+        Err(_) => match what {
+            Hash::BlockEntered => return Err(ErrorActive::Input(InputActive::BlockHashLength)),
+            Hash::BlockFetched { url: _ } => {
+                return Err(ErrorActive::Fetch(
+                    Fetch::UnexpectedFetchedBlockHashFormat {
+                        value: fetched_hash.to_string(),
+                    },
+                ))
+            }
+            Hash::Genesis { url: _ } => {
+                return Err(ErrorActive::Fetch(
+                    Fetch::UnexpectedFetchedGenesisHashFormat {
+                        value: fetched_hash.to_string(),
+                    },
+                ))
+            }
+        },
     };
     Ok(out.into())
 }

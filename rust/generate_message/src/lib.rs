@@ -221,6 +221,7 @@ mod derivations;
 use derivations::process_derivations;
 pub mod fetch_metadata;
 mod helpers;
+use helpers::debug_meta_at_block;
 pub mod interpret_specs;
 mod load;
 use load::{gen_load_meta, meta_default_file, unwasm};
@@ -231,7 +232,7 @@ use parser::{Command, Show};
 mod remove;
 use remove::remove_info;
 mod show;
-use show::{check_file, show_metadata, show_networks, show_specs};
+use show::{check_file, show_block_history, show_metadata, show_networks, show_specs};
 mod specs;
 use specs::gen_add_specs;
 
@@ -244,6 +245,7 @@ pub fn full_run(command: Command) -> Result<(), ErrorActive> {
             Show::Networks => show_networks(),
             Show::Specs(title) => show_specs(title),
             Show::CheckFile(path) => check_file(path),
+            Show::BlockHistory => show_block_history(),
         },
         Command::Types => prep_types::<Active>(HOT_DB_NAME)?.write(TYLO),
         Command::Load(instruction) => gen_load_meta(instruction),
@@ -265,5 +267,6 @@ pub fn full_run(command: Command) -> Result<(), ErrorActive> {
             update_db,
         } => unwasm(&filename, update_db),
         Command::MetaDefaultFile { name, version } => meta_default_file(&name, version),
+        Command::MetaAtBlock { url, block_hash } => debug_meta_at_block(&url, &block_hash),
     }
 }

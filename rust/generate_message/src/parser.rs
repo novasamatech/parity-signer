@@ -443,6 +443,17 @@ pub enum Command {
     /// Output file named `<network_name><network_version>` is generated in
     /// dedicated [`EXPORT_FOLDER`](constants::EXPORT_FOLDER).
     MetaDefaultFile { name: String, version: u32 },
+
+    /// # Make metadata file with metadata from specific block
+    ///
+    /// `$ cargo run meta_at_block -u <network_url_address> -block <block_hash>`
+    ///
+    /// Produces file with hex-encoded network metadata fetched for specific
+    /// block hash at provided address.
+    ///
+    /// Output file named `<network_name><network_version>_<block_hash>` is
+    /// generated in dedicated [`EXPORT_FOLDER`](constants::EXPORT_FOLDER).
+    MetaAtBlock { url: String, block_hash: String },
 }
 
 /// Display data commands
@@ -461,6 +472,9 @@ pub enum Show {
     /// similar entry in hot database [`METATREE`](constants::METATREE).
     /// Associated data is user-provided path to the metadata file.
     CheckFile(String),
+
+    /// Show all entries from [`META_HISTORY`](constants::META_HISTORY) tree
+    BlockHistory,
 }
 
 /// Command details for `load_metadata`
@@ -747,6 +761,15 @@ impl Command {
                                     )))
                                 }
                             },
+                            "-block_history" => {
+                                if args.next().is_some() {
+                                    Err(ErrorActive::CommandParser(
+                                        CommandParser::UnexpectedKeyArgumentSequence,
+                                    ))
+                                } else {
+                                    Ok(Command::Show(Show::BlockHistory))
+                                }
+                            }
                             _ => Err(ErrorActive::CommandParser(
                                 CommandParser::UnexpectedKeyArgumentSequence,
                             )),
@@ -1836,6 +1859,68 @@ impl Command {
                             },
                             None => Err(ErrorActive::CommandParser(CommandParser::NeedKey(
                                 CommandNeedKey::MetaDefaultFileName,
+                            ))),
+                        }
+                    }
+                    "meta_at_block" => {
+                        let mut url_found = None;
+                        let mut block_found = None;
+                        while let Some(a) = args.next() {
+                            match a.as_str() {
+                                "-u" => {
+                                    if url_found.is_some() {
+                                        return Err(ErrorActive::CommandParser(
+                                            CommandParser::DoubleKey(
+                                                CommandDoubleKey::MetaAtBlockUrl,
+                                            ),
+                                        ));
+                                    }
+                                    url_found = match args.next() {
+                                        Some(b) => Some(b.to_string()),
+                                        None => {
+                                            return Err(ErrorActive::CommandParser(
+                                                CommandParser::NeedArgument(
+                                                    CommandNeedArgument::MetaAtBlockUrl,
+                                                ),
+                                            ))
+                                        }
+                                    };
+                                }
+                                "-block" => {
+                                    if block_found.is_some() {
+                                        return Err(ErrorActive::CommandParser(
+                                            CommandParser::DoubleKey(
+                                                CommandDoubleKey::MetaAtBlockHash,
+                                            ),
+                                        ));
+                                    }
+                                    block_found = match args.next() {
+                                        Some(b) => Some(b.to_string()),
+                                        None => {
+                                            return Err(ErrorActive::CommandParser(
+                                                CommandParser::NeedArgument(
+                                                    CommandNeedArgument::MetaAtBlockHash,
+                                                ),
+                                            ))
+                                        }
+                                    };
+                                }
+                                _ => {
+                                    return Err(ErrorActive::CommandParser(
+                                        CommandParser::UnexpectedKeyArgumentSequence,
+                                    ))
+                                }
+                            }
+                        }
+                        match url_found {
+                            Some(url) => match block_found {
+                                Some(block_hash) => Ok(Command::MetaAtBlock { url, block_hash }),
+                                None => Err(ErrorActive::CommandParser(CommandParser::NeedKey(
+                                    CommandNeedKey::MetaAtBlockHash,
+                                ))),
+                            },
+                            None => Err(ErrorActive::CommandParser(CommandParser::NeedKey(
+                                CommandNeedKey::MetaAtBlockUrl,
                             ))),
                         }
                     }

@@ -1,15 +1,18 @@
 //! Utils to display the database content and to verify default metadata files
 use blake2_rfc::blake2b::blake2b;
 
-use constants::{HOT_DB_NAME, METATREE};
-use db_handling::helpers::{open_db, open_tree, try_get_meta_values_by_name_version};
+use constants::HOT_DB_NAME;
+use db_handling::helpers::try_get_meta_values_by_name_version;
 use definitions::{
     error_active::{Active, Check, ErrorActive, IncomingMetadataSourceActiveStr},
     metadata::{AddressBookEntry, MetaValues},
     network_specs::NetworkSpecsToSend,
 };
 
-use crate::helpers::{address_book_content, network_specs_from_entry, network_specs_from_title};
+use crate::helpers::{
+    address_book_content, meta_history_content, network_specs_from_entry, network_specs_from_title,
+    read_metadata_database,
+};
 
 /// Display all metadata currenty stored in the hot database
 ///
@@ -28,23 +31,23 @@ use crate::helpers::{address_book_content, network_specs_from_entry, network_spe
 /// combination is unique identifier of the metadata. Hashes could be used to
 /// compare metadata contents.
 pub fn show_metadata() -> Result<(), ErrorActive> {
-    let database = open_db::<Active>(HOT_DB_NAME)?;
-    let metadata = open_tree::<Active>(&database, METATREE)?;
-    if metadata.is_empty() {
+    let meta_values_stamped_set = read_metadata_database()?;
+    if meta_values_stamped_set.is_empty() {
         println!("Database has no metadata entries.");
         return Ok(());
     }
-    let mut set: Vec<MetaValues> = Vec::new();
-    for x in metadata.iter().flatten() {
-        set.push(MetaValues::from_entry_checked::<Active>(x)?);
-    }
-    println!("Database has metadata information for following networks:");
-    for meta_values in set.iter() {
+    println!("Database has metadata information for following networks:\n");
+    for x in meta_values_stamped_set.iter() {
+        let block_hash_insert = match x.at_block_hash {
+            Some(h) => format!("fetched at block hash {}", hex::encode(h)),
+            None => String::from("no block hash on record"),
+        };
         println!(
-            "\t{} {}, metadata hash {}",
-            meta_values.name,
-            meta_values.version,
-            hash_string(&meta_values.meta)
+            "{} {}, metadata hash {}, {}",
+            x.meta_values.name,
+            x.meta_values.version,
+            hash_string(&x.meta_values.meta),
+            block_hash_insert
         );
     }
     Ok(())
@@ -91,11 +94,11 @@ pub fn show_networks() -> Result<(), ErrorActive> {
             network_specs,
         })
     }
-    println!("Address book has entries for following networks:");
+    println!("Address book has entries for following networks:\n");
     for x in set.iter() {
         if x.address_book_entry.def {
             println!(
-                "\t{} at {}, encryption {} (default), Signer display title {}",
+                "{} at {}, encryption {} (default), Signer display title {}",
                 x.title,
                 x.address_book_entry.address,
                 x.address_book_entry.encryption.show(),
@@ -103,7 +106,7 @@ pub fn show_networks() -> Result<(), ErrorActive> {
             );
         } else {
             println!(
-                "\t{} at {}, encryption {}, Signer display title {}",
+                "{} at {}, encryption {}, Signer display title {}",
                 x.title,
                 x.address_book_entry.address,
                 x.address_book_entry.encryption.show(),
@@ -204,5 +207,24 @@ pub fn show_specs(title: String) -> Result<(), ErrorActive> {
         specs.title,
         specs.unit
     );
+    Ok(())
+}
+
+/// Show metadata fetch history from `META_HISTORY` tree
+pub fn show_block_history() -> Result<(), ErrorActive> {
+    let meta_history_set = meta_history_content()?;
+    if meta_history_set.is_empty() {
+        println!("Database has no metadata fetch history entries on record.");
+        return Ok(());
+    }
+    println!("Database has following metadata fetch history:\n");
+    for x in meta_history_set.iter() {
+        println!(
+            "{} {}, fetched at block {}",
+            x.name,
+            x.version,
+            hex::encode(x.block_hash),
+        );
+    }
     Ok(())
 }

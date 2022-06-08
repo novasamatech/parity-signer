@@ -56,9 +56,9 @@ use definitions::{
 };
 
 use crate::helpers::{
-    add_new, address_book_content, error_occured, load_meta_print, meta_shortcut,
-    network_specs_from_entry, prepare_metadata, write_metadata, MetaShortCut, SortedMetaValues,
-    Write,
+    add_new, address_book_content, error_occured, load_meta_print, meta_fetch,
+    network_specs_from_entry, prepare_metadata, write_metadata, MetaFetched, MetaShortCut,
+    MetaValuesStamped, SortedMetaValues, Write,
 };
 use crate::parser::{Content, InstructionMeta, Set};
 
@@ -309,8 +309,8 @@ fn meta_f_n(name: &str) -> Result<(), ErrorActive> {
 /// - Check the metadata integrity with the data on record in the database
 /// - Output raw bytes payload file
 fn meta_d_a_element(set_element: &AddressSpecs) -> Result<(), ErrorActive> {
-    let shortcut = shortcut_set_element(set_element)?;
-    load_meta_print(&shortcut)
+    let meta_fetch = fetch_set_element(set_element)?;
+    load_meta_print(&meta_fetch.cut())
 }
 
 /// `load_metadata -d -n network_name`
@@ -339,11 +339,14 @@ fn meta_d_n(name: &str) -> Result<(), ErrorActive> {
 /// in the metadata is no longer same as in network specs on record, there will
 /// no error produced here.
 fn meta_d_u(address: &str) -> Result<(), ErrorActive> {
-    let shortcut = meta_shortcut(address)?;
-    if shortcut.meta_values.warn_incomplete_extensions {
-        warn(&shortcut.meta_values.name, shortcut.meta_values.version);
+    let meta_fetched = meta_fetch(address)?;
+    if meta_fetched.meta_values.warn_incomplete_extensions {
+        warn(
+            &meta_fetched.meta_values.name,
+            meta_fetched.meta_values.version,
+        );
     }
-    load_meta_print(&shortcut)
+    load_meta_print(&meta_fetched.cut())
 }
 
 /// `load_metadata <-k/-p/-t> -a` whole
@@ -357,12 +360,9 @@ fn meta_kpt_a(write: &Write, pass_errors: bool) -> Result<(), ErrorActive> {
     let set = address_specs_set()?;
     let mut sorted_meta_values = prepare_metadata()?;
     for x in set.iter() {
-        sorted_meta_values = match meta_kpt_a_element(x, write, &sorted_meta_values) {
-            Ok(a) => a,
-            Err(e) => {
-                error_occured(e, pass_errors)?;
-                sorted_meta_values
-            }
+        match meta_kpt_a_element(x, write, &mut sorted_meta_values) {
+            Ok(_) => (),
+            Err(e) => error_occured(e, pass_errors)?,
         };
     }
     write_metadata(sorted_meta_values)
@@ -383,31 +383,35 @@ fn meta_kpt_a(write: &Write, pass_errors: bool) -> Result<(), ErrorActive> {
 fn meta_kpt_a_element(
     set_element: &AddressSpecs,
     write: &Write,
-    sorted_meta_values: &SortedMetaValues,
-) -> Result<SortedMetaValues, ErrorActive> {
-    let shortcut = shortcut_set_element(set_element)?;
-    let upd_sorted = add_new(&shortcut.meta_values, sorted_meta_values)?;
+    sorted_meta_values: &mut SortedMetaValues,
+) -> Result<(), ErrorActive> {
+    let meta_fetched = fetch_set_element(set_element)?;
+    let got_meta_update = add_new(&meta_fetched.stamped(), sorted_meta_values)?;
     match write {
-        Write::All => load_meta_print(&shortcut)?,
+        Write::All => load_meta_print(&meta_fetched.cut())?,
         Write::OnlyNew => {
-            if upd_sorted.upd_done {
-                load_meta_print(&shortcut)?
+            if got_meta_update {
+                load_meta_print(&meta_fetched.cut())?
             }
         }
         Write::None => (),
     }
-    if upd_sorted.upd_done {
+    if got_meta_update {
         println!(
-            "Fetched new metadata {}{}",
-            shortcut.meta_values.name, shortcut.meta_values.version
+            "Fetched new metadata {}{} at block hash {}",
+            meta_fetched.meta_values.name,
+            meta_fetched.meta_values.version,
+            hex::encode(meta_fetched.block_hash)
         )
     } else {
         println!(
-            "Fetched previously known metadata {}{}",
-            shortcut.meta_values.name, shortcut.meta_values.version
+            "Fetched previously known metadata {}{} at block hash {}",
+            meta_fetched.meta_values.name,
+            meta_fetched.meta_values.version,
+            hex::encode(meta_fetched.block_hash)
         )
     }
-    Ok(upd_sorted.sorted)
+    Ok(())
 }
 
 /// `load_metadata <-k/-p/-t> -n network_name`
@@ -426,7 +430,7 @@ fn meta_kpt_a_element(
 /// `load_metadata` payload should be created.
 fn meta_kpt_n(name: &str, write: &Write) -> Result<(), ErrorActive> {
     let mut sorted_meta_values = prepare_metadata()?;
-    sorted_meta_values = meta_kpt_a_element(&search_name(name)?, write, &sorted_meta_values)?;
+    meta_kpt_a_element(&search_name(name)?, write, &mut sorted_meta_values)?;
     write_metadata(sorted_meta_values)
 }
 
@@ -517,27 +521,27 @@ fn search_name(name: &str) -> Result<AddressSpecs, ErrorActive> {
 ///
 /// Outputs [`MetaShortCut`], the data sufficient to produce `load_metadata`
 /// payload.
-fn shortcut_set_element(set_element: &AddressSpecs) -> Result<MetaShortCut, ErrorActive> {
-    let shortcut = meta_shortcut(&set_element.address)?;
-    if shortcut.meta_values.name != set_element.name {
+fn fetch_set_element(set_element: &AddressSpecs) -> Result<MetaFetched, ErrorActive> {
+    let meta_fetched = meta_fetch(&set_element.address)?;
+    if meta_fetched.meta_values.name != set_element.name {
         return Err(ErrorActive::Fetch(Fetch::ValuesChanged {
             url: set_element.address.to_string(),
             what: Changed::Name {
                 old: set_element.name.to_string(),
-                new: shortcut.meta_values.name,
+                new: meta_fetched.meta_values.name,
             },
         }));
     }
-    if shortcut.genesis_hash != set_element.genesis_hash {
+    if meta_fetched.genesis_hash != set_element.genesis_hash {
         return Err(ErrorActive::Fetch(Fetch::ValuesChanged {
             url: set_element.address.to_string(),
             what: Changed::GenesisHash {
                 old: set_element.genesis_hash,
-                new: shortcut.genesis_hash,
+                new: meta_fetched.genesis_hash,
             },
         }));
     }
-    if let Some(prefix_from_meta) = shortcut.meta_values.optional_base58prefix {
+    if let Some(prefix_from_meta) = meta_fetched.meta_values.optional_base58prefix {
         if prefix_from_meta != set_element.base58prefix {
             return Err(<Active>::faulty_metadata(
                 MetadataError::Base58PrefixSpecsMismatch {
@@ -547,15 +551,19 @@ fn shortcut_set_element(set_element: &AddressSpecs) -> Result<MetaShortCut, Erro
                 MetadataSource::Incoming(IncomingMetadataSourceActive::Str(
                     IncomingMetadataSourceActiveStr::Fetch {
                         url: set_element.address.to_string(),
+                        optional_block: None,
                     },
                 )),
             ));
         }
     }
-    if shortcut.meta_values.warn_incomplete_extensions {
-        warn(&shortcut.meta_values.name, shortcut.meta_values.version);
+    if meta_fetched.meta_values.warn_incomplete_extensions {
+        warn(
+            &meta_fetched.meta_values.name,
+            meta_fetched.meta_values.version,
+        );
     }
-    Ok(shortcut)
+    Ok(meta_fetched)
 }
 
 /// Show warning if the metadata (v14) has incomplete set of signed extensions
@@ -595,8 +603,13 @@ pub fn unwasm(filename: &str, update_db: bool) -> Result<(), ErrorActive> {
     }
     let genesis_hash = set_element.genesis_hash;
     if update_db {
-        let upd_sorted = add_new(&meta_values, &prepare_metadata()?)?;
-        if upd_sorted.upd_done {
+        let meta_values_stamped = MetaValuesStamped {
+            meta_values: meta_values.to_owned(),
+            at_block_hash: None,
+        };
+        let mut sorted_meta_values = prepare_metadata()?;
+        let got_meta_update = add_new(&meta_values_stamped, &mut sorted_meta_values)?;
+        if got_meta_update {
             println!(
                 "Unwasmed new metadata {}{}",
                 meta_values.name, meta_values.version
@@ -607,7 +620,7 @@ pub fn unwasm(filename: &str, update_db: bool) -> Result<(), ErrorActive> {
                 meta_values.name, meta_values.version
             )
         }
-        write_metadata(upd_sorted.sorted)?;
+        write_metadata(sorted_meta_values)?;
     }
     let shortcut = MetaShortCut {
         meta_values,
