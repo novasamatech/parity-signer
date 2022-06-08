@@ -10,6 +10,7 @@ import androidx.compose.ui.Modifier
 import io.parity.signer.components.Identicon
 import io.parity.signer.components.MetadataCard
 import io.parity.signer.components.NetworkCard
+import io.parity.signer.models.encodeHex
 import io.parity.signer.uniffi.Action
 import io.parity.signer.uniffi.MNetworkDetails
 import io.parity.signer.uniffi.MscNetworkInfo
@@ -45,7 +46,10 @@ fun NetworkDetails(
 		}
 		Row {
 			Text("genesis hash:")
-			Text(networkDetails.genesisHash)
+			Text(
+				networkDetails.genesisHash.toUByteArray()
+					.toByteArray().encodeHex()
+			)
 		}
 		Row {
 			Text("Verifier certificate:")

@@ -3,6 +3,7 @@ package io.parity.signer.components.transactionCards
 import androidx.compose.foundation.layout.Column
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import io.parity.signer.models.encodeHex
 import io.parity.signer.uniffi.MscTxSpecPlain
 
 @Composable
@@ -11,7 +12,8 @@ fun TCTXSpecPlain(specsPlain: MscTxSpecPlain) {
 		Text("Unknown network")
 		TCNameValueTemplate(
 			name = "Genesis hash",
-			value = specsPlain.networkGenesisHash
+			value = specsPlain.networkGenesisHash.toUByteArray()
+				.toByteArray().encodeHex()
 		)
 		TCNameValueTemplate(name = "Version", value = specsPlain.version)
 		TCNameValueTemplate(name = "Tx version", value = specsPlain.txVersion)
