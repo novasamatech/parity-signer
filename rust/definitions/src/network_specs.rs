@@ -458,7 +458,7 @@ impl NetworkSpecs {
         if &genesis_hash_vec[..] != network_specs.genesis_hash.as_bytes() {
             return Err(<T>::specs_genesis_hash_mismatch(
                 network_specs_key.to_owned(),
-                network_specs.genesis_hash.as_bytes().to_vec(),
+                network_specs.genesis_hash,
             ));
         }
         if encryption != network_specs.encryption {
@@ -532,7 +532,7 @@ impl NetworkSpecsToSend {
             return Err(ErrorActive::Database(DatabaseActive::Mismatch(
                 MismatchActive::SpecsToSendGenesisHash {
                     key: network_specs_key.to_owned(),
-                    genesis_hash: network_specs_to_send.genesis_hash.as_bytes().to_vec(),
+                    genesis_hash: network_specs_to_send.genesis_hash,
                 },
             )));
         }
