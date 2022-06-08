@@ -19,6 +19,7 @@
 //! `Event::HistoryCleared`.
 use blake2_rfc::blake2b::blake2b;
 use parity_scale_codec::{Decode, Encode};
+use sp_core::H256;
 use sp_runtime::MultiSigner;
 #[cfg(feature = "signer")]
 use std::convert::TryInto;
@@ -151,7 +152,7 @@ impl NetworkSpecsExport {
 /// Event content for setting network verifier
 #[derive(Debug, Decode, Encode, PartialEq, Clone)]
 pub struct NetworkVerifierDisplay {
-    pub genesis_hash: Vec<u8>,
+    pub genesis_hash: H256,
     pub valid_current_verifier: ValidCurrentVerifier,
     pub general_verifier: Verifier,
 }

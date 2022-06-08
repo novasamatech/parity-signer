@@ -1992,7 +1992,7 @@ fn test_all_events() {
         &entries,
         &Event::NetworkVerifierSet {
             network_verifier_display: NetworkVerifierDisplay {
-                genesis_hash: hex::decode(
+                genesis_hash: H256::from_str(
                     "e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e"
                 )
                 .unwrap(),

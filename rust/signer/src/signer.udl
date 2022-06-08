@@ -87,7 +87,7 @@ dictionary NetworkSpecsExport {
 };
 
 dictionary NetworkVerifierDisplay {
-    sequence<u8> genesis_hash;
+    H256 genesis_hash;
     ValidCurrentVerifier valid_current_verifier;
     Verifier general_verifier;
 };
