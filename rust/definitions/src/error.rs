@@ -1,6 +1,6 @@
 //! Trait [`ErrorSource`] and error-related types shared by Signer and active
 //! sides
-use sp_core::crypto::SecretStringError;
+use sp_core::{crypto::SecretStringError, H256};
 use sp_runtime::MultiSigner;
 #[cfg(feature = "test")]
 use variant_count::VariantCount;
@@ -111,7 +111,7 @@ pub trait ErrorSource {
     /// `Error` when there is genesis hash mismatch between stored
     /// [`NetworkSpecs`](crate::network_specs::NetworkSpecs) contents and the
     /// [`NetworkSpecsKey`]
-    fn specs_genesis_hash_mismatch(key: NetworkSpecsKey, genesis_hash: Vec<u8>) -> Self::Error;
+    fn specs_genesis_hash_mismatch(key: NetworkSpecsKey, genesis_hash: H256) -> Self::Error;
 
     /// `Error` when there is encryption mismatch between stored
     /// [`NetworkSpecs`](crate::network_specs::NetworkSpecs) contents and the

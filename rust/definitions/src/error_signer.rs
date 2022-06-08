@@ -115,10 +115,10 @@ impl ErrorSource for Signer {
             EntryDecodingSigner::NetworkSpecs(key),
         ))
     }
-    fn specs_genesis_hash_mismatch(key: NetworkSpecsKey, genesis_hash: Vec<u8>) -> Self::Error {
+    fn specs_genesis_hash_mismatch(key: NetworkSpecsKey, genesis_hash: H256) -> Self::Error {
         ErrorSigner::Database(DatabaseSigner::Mismatch(MismatchSigner::SpecsGenesisHash {
             key,
-            genesis_hash: H256::from_slice(&genesis_hash),
+            genesis_hash,
         }))
     }
     fn specs_encryption_mismatch(key: NetworkSpecsKey, encryption: Encryption) -> Self::Error {
