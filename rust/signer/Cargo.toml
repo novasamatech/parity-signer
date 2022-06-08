@@ -22,7 +22,7 @@ zeroize = {version = "1.5.5", features = ["zeroize_derive"]}
 
 sp-runtime = {git = "https://github.com/paritytech/substrate", default-features = false}
 sp-core = {git = "https://github.com/paritytech/substrate", default-features = false, features = ["full_crypto"]}
-serde_json = "1.0.79"
+serde_json = "1.0.81"
 
 [target.'cfg(not(target_os = "android"))'.dependencies]
 env_logger = "0.9"
